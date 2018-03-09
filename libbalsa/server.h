@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,7 +22,7 @@
 #define __LIBBALSA_SERVER_H__
 
 #ifndef BALSA_VERSION
-#   error "Include config.h before this file."
+# error "Include config.h before this file."
 #endif
 
 #include "imap/libimap.h"
@@ -30,11 +30,11 @@
 #include "net-client.h"
 
 #if defined(HAVE_LIBSECRET)
-#   include <libsecret/secret.h>
+#include <libsecret/secret.h>
 extern const SecretSchema *LIBBALSA_SERVER_SECRET_SCHEMA;
-#   define libbalsa_free_password secret_password_free
+#define libbalsa_free_password secret_password_free
 #else
-#   define libbalsa_free_password g_free
+#define libbalsa_free_password g_free
 #endif                          /* defined(HAVE_LIBSECRET) */
 
 #define LIBBALSA_TYPE_SERVER \
@@ -74,70 +74,64 @@ struct _LibBalsaServer {
      * between SSL and non-SSL builds. We just fail if SSL is requested
      * in non-SSL build. */
     LibBalsaTlsMode tls_mode;
-    unsigned use_ssl : 1;
-    unsigned remember_passwd : 1;
-    unsigned try_anonymous : 1; /* user wants anonymous access */
+    unsigned use_ssl:1;
+    unsigned remember_passwd:1;
+    unsigned try_anonymous:1; /* user wants anonymous access */
 };
 
 struct _LibBalsaServerClass {
     GObjectClass parent_class;
 
-    void (*set_username) (LibBalsaServer *server,
-                          const gchar    *name);
-    void (*set_host) (LibBalsaServer *server,
-                      const gchar    *host,
-                      gboolean        use_ssl);
-    void (*config_changed) (LibBalsaServer *server);
-    gchar *(*get_password) (LibBalsaServer *server);
+    void (*set_username) (LibBalsaServer * server, const gchar * name);
+    void (*set_host) (LibBalsaServer * server,
+		      const gchar * host, gboolean use_ssl);
+    void (*config_changed) (LibBalsaServer * server);
+    gchar *(*get_password) (LibBalsaServer * server);
 };
 
 LibBalsaServer *libbalsa_server_new(void);
 
-void libbalsa_server_set_username(LibBalsaServer *server,
-                                  const gchar    *username);
-void libbalsa_server_set_password(LibBalsaServer *server,
-                                  const gchar    *passwd);
-void libbalsa_server_set_host(LibBalsaServer *server,
-                              const gchar    *host,
-                              gboolean        use_ssl);
-gchar *libbalsa_server_get_password(LibBalsaServer  *server,
-                                    LibBalsaMailbox *mbox);
+void libbalsa_server_set_username(LibBalsaServer * server,
+				  const gchar * username);
+void libbalsa_server_set_password(LibBalsaServer * server,
+				  const gchar * passwd);
+void libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
+                              gboolean use_ssl);
+gchar *libbalsa_server_get_password(LibBalsaServer * server,
+				    LibBalsaMailbox * mbox);
 
-void libbalsa_server_config_changed(LibBalsaServer *server);
-void libbalsa_server_load_config(LibBalsaServer *server);
-void libbalsa_server_save_config(LibBalsaServer *server);
+void libbalsa_server_config_changed(LibBalsaServer * server);
+void libbalsa_server_load_config(LibBalsaServer * server);
+void libbalsa_server_save_config(LibBalsaServer * server);
 
 
-void libbalsa_server_user_cb(ImapUserEventType ue,
-                             void             *arg,
-                             ...);
+void libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...);
 
 /* NetClient related signal handlers */
 gchar **libbalsa_server_get_auth(NetClient *client,
-                                 gboolean   need_passwd,
-                                 gpointer   user_data);
+								 gboolean   need_passwd,
+								 gpointer   user_data);
 gboolean libbalsa_server_check_cert(NetClient           *client,
-                                    GTlsCertificate     *peer_cert,
-                                    GTlsCertificateFlags errors,
-                                    gpointer             user_data);
+           	   	   	   	   	   	    GTlsCertificate     *peer_cert,
+									GTlsCertificateFlags errors,
+									gpointer             user_data);
 gchar *libbalsa_server_get_cert_pass(NetClient        *client,
-                                     const GByteArray *cert_der,
-                                     gpointer          user_data);
+									 const GByteArray *cert_der,
+									 gpointer          user_data);
 
-void libbalsa_server_connect_signals(LibBalsaServer *server,
-                                     GCallback       cb,
-                                     gpointer        cb_data);
+void libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
+                                     gpointer cb_data);
 
 /* Check whether a server can be reached */
 
-void libbalsa_server_test_can_reach(LibBalsaServer           *server,
-                                    LibBalsaCanReachCallback *cb,
-                                    gpointer                  cb_data);
+void libbalsa_server_test_can_reach(LibBalsaServer           * server,
+                                    LibBalsaCanReachCallback * cb,
+                                    gpointer                   cb_data);
 
 /* Private: used only by LibBalsaMailboxRemote */
-void libbalsa_server_test_can_reach_full(LibBalsaServer           *server,
-                                         LibBalsaCanReachCallback *cb,
-                                         gpointer                  cb_data,
-                                         GObject                  *source_object);
+void libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
+                                         LibBalsaCanReachCallback * cb,
+                                         gpointer                   cb_data,
+                                         GObject                  * source_object);
 
-#endif                          /* __LIBBALSA_SERVER_H__ */
+#endif				/* __LIBBALSA_SERVER_H__ */

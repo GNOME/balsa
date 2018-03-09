@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -56,37 +56,27 @@ typedef struct {
 #define C_HEADER_SEP            12
 
 
-gint p_string_width_from_layout(PangoLayout *layout,
-                                const gchar *text);
-gint p_string_height_from_layout(PangoLayout *layout,
-                                 const gchar *text);
-gboolean cairo_print_pixbuf(cairo_t         *cairo_ctx,
-                            const GdkPixbuf *pixbuf,
-                            gdouble          c_at_x,
-                            gdouble          c_at_y,
-                            gdouble          scale);
-gboolean cairo_print_surface(cairo_t         *cairo_ctx,
-                             cairo_surface_t *surface,
-                             gdouble          c_at_x,
-                             gdouble          c_at_y,
-                             gdouble          scale);
-GList *split_for_layout(PangoLayout     *layout,
-                        const gchar     *text,
-                        PangoAttrList   *attributes,
-                        BalsaPrintSetup *psetup,
-                        gboolean         is_header,
-                        GArray         **offsets);
+gint p_string_width_from_layout(PangoLayout * layout, const gchar * text);
+gint p_string_height_from_layout(PangoLayout * layout, const gchar * text);
+gboolean cairo_print_pixbuf(cairo_t * cairo_ctx, const GdkPixbuf * pixbuf,
+			    gdouble c_at_x, gdouble c_at_y, gdouble scale);
+gboolean cairo_print_surface(cairo_t * cairo_ctx, cairo_surface_t * surface,
+			     gdouble c_at_x, gdouble c_at_y, gdouble scale);
+GList *split_for_layout(PangoLayout * layout, const gchar * text,
+			PangoAttrList * attributes,
+			BalsaPrintSetup * psetup, gboolean is_header,
+			GArray ** offsets);
 
 
 /*  == print object base class stuff ==  */
 
-#define BALSA_TYPE_PRINT_OBJECT                 \
+#define BALSA_TYPE_PRINT_OBJECT			\
     (balsa_print_object_get_type())
-#define BALSA_PRINT_OBJECT(obj)                                         \
+#define BALSA_PRINT_OBJECT(obj)						\
     G_TYPE_CHECK_INSTANCE_CAST(obj, BALSA_TYPE_PRINT_OBJECT, BalsaPrintObject)
-#define BALSA_PRINT_OBJECT_CLASS(klass)                                 \
+#define BALSA_PRINT_OBJECT_CLASS(klass)					\
     G_TYPE_CHECK_CLASS_CAST(klass, BALSA_TYPE_PRINT_OBJECT, BalsaPrintObjectClass)
-#define BALSA_IS_PRINT_OBJECT(obj)                      \
+#define BALSA_IS_PRINT_OBJECT(obj)			\
     G_TYPE_CHECK_INSTANCE_TYPE(obj, BALSA_TYPE_PRINT_OBJECT)
 
 
@@ -110,24 +100,23 @@ struct _BalsaPrintObject {
 struct _BalsaPrintObjectClass {
     GObjectClass parent;
 
-    void (*draw) (BalsaPrintObject *self,
-                  GtkPrintContext  *context,
-                  cairo_t          *cairo_ctx);
+    void (*draw) (BalsaPrintObject * self, GtkPrintContext * context,
+		  cairo_t * cairo_ctx);
 };
 
 
 GType balsa_print_object_get_type(void);
-GList *balsa_print_objects_append_from_body(GList           *list,
-                                            GtkPrintContext *context,
-                                            LibBalsaMessageBody *
-                                            mime_body,
-                                            BalsaPrintSetup *psetup);
-void balsa_print_object_draw(BalsaPrintObject *self,
-                             GtkPrintContext  *context,
-                             cairo_t          *cairo_ctx);
+GList *balsa_print_objects_append_from_body(GList * list,
+					    GtkPrintContext * context,
+					    LibBalsaMessageBody *
+					    mime_body,
+					    BalsaPrintSetup * psetup);
+void balsa_print_object_draw(BalsaPrintObject * self,
+			     GtkPrintContext * context,
+			     cairo_t * cairo_ctx);
 
 
 G_END_DECLS
 
 
-#endif                          /* __BALSA_PRINT_OBJECT_H__ */
+#endif				/* __BALSA_PRINT_OBJECT_H__ */

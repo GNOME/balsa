@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,7 +22,7 @@
 #define __LIBBALSA_MISC_H__
 
 #ifndef BALSA_VERSION
-#   error "Include config.h before this file."
+# error "Include config.h before this file."
 #endif
 
 #include <stdio.h>
@@ -74,11 +74,8 @@ struct _LibBalsaCodesetInfo {
     const gchar *win;
 };
 
-typedef void (*libbalsa_url_cb_t) (GtkTextBuffer *,
-                                   GtkTextIter *,
-                                   const gchar *,
-                                   guint,
-                                   gpointer);
+typedef void (*libbalsa_url_cb_t) (GtkTextBuffer *, GtkTextIter *,
+				   const gchar *, guint, gpointer);
 typedef struct _LibBalsaUrlInsertInfo LibBalsaUrlInsertInfo;
 struct _LibBalsaUrlInsertInfo {
     libbalsa_url_cb_t callback;
@@ -91,91 +88,61 @@ struct _LibBalsaUrlInsertInfo {
 
 extern LibBalsaCodesetInfo libbalsa_codeset_info[];
 GtkWidget *libbalsa_charset_button_new(void);
-LibBalsaTextAttribute libbalsa_text_attr_string(const gchar *string);
-LibBalsaTextAttribute libbalsa_text_attr_file(const gchar *filename);
+LibBalsaTextAttribute libbalsa_text_attr_string(const gchar * string);
+LibBalsaTextAttribute libbalsa_text_attr_file(const gchar * filename);
 
 gchar *libbalsa_get_domainname(void);
-
 #define libbalsa_urlencode(str) (g_uri_escape_string((str), NULL, FALSE))
 #define libbalsa_urldecode(str) (g_uri_unescape_string((str), NULL))
 
-gboolean libbalsa_find_word(const gchar *word,
-                            const gchar *str);
-void libbalsa_wrap_string(gchar *str,
-                          int    width);
-GString *libbalsa_process_text_rfc2646(gchar   *par,
-                                       gint     width,
-                                       gboolean from_screen,
-                                       gboolean to_screen,
-                                       gboolean quote,
-                                       gboolean delsp);
-gchar *libbalsa_wrap_rfc2646(gchar   *par,
-                             gint     width,
-                             gboolean from_screen,
-                             gboolean to_screen,
-                             gboolean delsp);
-void libbalsa_wrap_view(GtkTextView *view,
-                        gint         length);
-void libbalsa_unwrap_buffer(GtkTextBuffer *buffer,
-                            GtkTextIter   *iter,
-                            gint           lines);
+gboolean libbalsa_find_word(const gchar * word, const gchar * str);
+void libbalsa_wrap_string(gchar * str, int width);
+GString *libbalsa_process_text_rfc2646(gchar * par, gint width,
+				       gboolean from_screen,
+				       gboolean to_screen, gboolean quote,
+				       gboolean delsp);
+gchar *libbalsa_wrap_rfc2646(gchar * par, gint width,
+                             gboolean from_screen, gboolean to_screen,
+			     gboolean delsp);
+void libbalsa_wrap_view(GtkTextView * view, gint length);
+void libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
+                            gint lines);
 
 gboolean libbalsa_delete_directory_contents(const gchar *path);
 gchar *libbalsa_expand_path(const gchar *path);
-gboolean libbalsa_mktempdir(gchar **name);
+gboolean libbalsa_mktempdir(gchar ** name);
 LibBalsaCodeset libbalsa_set_fallback_codeset(LibBalsaCodeset codeset);
-gboolean libbalsa_utf8_sanitize(gchar       **text,
-                                gboolean      fallback,
+gboolean libbalsa_utf8_sanitize(gchar ** text, gboolean fallback,
                                 gchar const **target);
-gboolean libbalsa_utf8_strstr(const gchar *s1,
-                              const gchar *s2);
-gboolean libbalsa_insert_with_url(GtkTextBuffer         *buffer,
-                                  const char            *chars,
-                                  guint                  len,
-                                  GtkTextTag            *tag,
-                                  LibBalsaUrlInsertInfo *url_info);
-void libbalsa_unwrap_selection(GtkTextBuffer *buffer,
-                               GRegex        *rex);
-gboolean libbalsa_match_regex(const gchar *line,
-                              GRegex      *rex,
-                              guint       *count,
-                              guint       *index);
+gboolean libbalsa_utf8_strstr(const gchar *s1,const gchar *s2);
+gboolean libbalsa_insert_with_url(GtkTextBuffer * buffer,
+				  const char *chars,
+				  guint len,
+				  GtkTextTag * tag,
+				  LibBalsaUrlInsertInfo *url_info);
+void libbalsa_unwrap_selection(GtkTextBuffer * buffer, GRegex * rex);
+gboolean libbalsa_match_regex(const gchar * line, GRegex * rex,
+			      guint * count, guint * index);
 
-int libbalsa_safe_open(const char *path,
-                       int         flags,
-                       mode_t      mode,
-                       GError    **err);
-int libbalsa_lock_file(const char *path,
-                       int         fd,
-                       int         excl,
-                       int         dot,
-                       int         timeout);
-int libbalsa_unlock_file(const char *path,
-                         int         fd,
-                         int         dot);
-int libbalsa_safe_rename(const char *src,
-                         const char *target);
-
+int libbalsa_safe_open (const char *path, int flags, mode_t mode, GError **err);
+int libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout);
+int libbalsa_unlock_file (const char *path, int fd, int dot);
+int libbalsa_safe_rename (const char *src, const char *target);
 #define libbalsa_str_has_prefix(str, prefix) g_str_has_prefix((str), (prefix))
 
-gboolean libbalsa_ia_rfc2821_equal(const InternetAddress *a,
-                                   const InternetAddress *b);
+gboolean libbalsa_ia_rfc2821_equal(const InternetAddress * a,
+				   const InternetAddress * b);
 
 GtkWidget *libbalsa_create_grid(void);
-GtkWidget *libbalsa_create_grid_label(const gchar *label,
-                                      GtkWidget   *grid,
-                                      gint         row);
-GtkWidget *libbalsa_create_grid_entry(GtkWidget   *grid,
-                                      GCallback    func,
-                                      gpointer     data,
-                                      gint         row,
-                                      const gchar *initval,
-                                      GtkWidget   *hotlabel);
-GtkWidget *libbalsa_create_grid_check(const gchar *label,
-                                      GtkWidget   *grid,
-                                      gint         row,
-                                      gboolean     initval);
-GtkSizeGroup *libbalsa_create_size_group(GtkWidget *chooser);
+GtkWidget *libbalsa_create_grid_label(const gchar * label, GtkWidget * grid,
+                                      gint row);
+GtkWidget *libbalsa_create_grid_entry(GtkWidget * grid, GCallback func,
+                                      gpointer data, gint row,
+                                      const gchar * initval,
+                                      GtkWidget * hotlabel);
+GtkWidget *libbalsa_create_grid_check(const gchar * label, GtkWidget * grid,
+                                      gint row, gboolean initval);
+GtkSizeGroup *libbalsa_create_size_group(GtkWidget * chooser);
 
 void libbalsa_assure_balsa_dir(void);
 gchar *libbalsa_guess_ldap_base(void);
@@ -183,22 +150,16 @@ gchar *libbalsa_guess_ldap_name(void);
 
 gboolean libbalsa_ldap_exists(const gchar *server);
 
-gboolean libbalsa_path_is_below_dir(const gchar *path,
-                                    const gchar *dir);
+gboolean libbalsa_path_is_below_dir(const gchar * path, const gchar * dir);
 
 gchar *libbalsa_size_to_gchar(guint64 length);
 
-gchar *libbalsa_text_to_html(const gchar *title,
-                             const gchar *body,
-                             const gchar *lang);
-GString *libbalsa_html_encode_hyperlinks(GString *paragraph);
-gchar *libbalsa_font_string_to_css(const gchar *font_string,
-                                   const gchar *name);
+gchar * libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lang);
+GString * libbalsa_html_encode_hyperlinks(GString * paragraph);
+gchar *libbalsa_font_string_to_css(const gchar * font_string, const gchar * name);
 
-gboolean libbalsa_clear_source_id(guint *tag);
-void libbalsa_clear_list(GList        **list,
-                         GDestroyNotify free_func);
-void libbalsa_clear_slist(GSList       **list,
-                          GDestroyNotify free_func);
+gboolean libbalsa_clear_source_id(guint * tag);
+void libbalsa_clear_list(GList ** list, GDestroyNotify free_func);
+void libbalsa_clear_slist(GSList ** list, GDestroyNotify free_func);
 
-#endif                          /* __LIBBALSA_MISC_H__ */
+#endif				/* __LIBBALSA_MISC_H__ */

@@ -23,7 +23,7 @@
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#   include "config.h"
+# include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "address-book-ldif.h"
 
@@ -32,15 +32,18 @@
 
 #include <glib/gi18n.h>
 
-static void libbalsa_address_book_ldif_class_init(LibBalsaAddressBookLdifClass *
-                                                  klass);
+static void
+libbalsa_address_book_ldif_class_init(LibBalsaAddressBookLdifClass *
+                                      klass);
 
-static LibBalsaABErr libbalsa_address_book_ldif_parse_address(FILE            *stream_in,
-                                                              LibBalsaAddress *address_in,
-                                                              FILE            *stream_out,
-                                                              LibBalsaAddress *address_out);
-static LibBalsaABErr libbalsa_address_book_ldif_save_address(FILE            *stream,
-                                                             LibBalsaAddress *address);
+static LibBalsaABErr
+libbalsa_address_book_ldif_parse_address(FILE * stream_in,
+                                         LibBalsaAddress * address_in,
+                                         FILE * stream_out,
+                                         LibBalsaAddress * address_out);
+static LibBalsaABErr
+libbalsa_address_book_ldif_save_address(FILE * stream,
+                                        LibBalsaAddress * address);
 
 struct _LibBalsaAddressBookLdif {
     LibBalsaAddressBookText parent;
@@ -54,13 +57,12 @@ G_DEFINE_TYPE(LibBalsaAddressBookLdif, libbalsa_address_book_ldif,
               LIBBALSA_TYPE_ADDRESS_BOOK_TEXT)
 
 static void
-libbalsa_address_book_ldif_init(LibBalsaAddressBookLdif *ab_ldif)
+libbalsa_address_book_ldif_init(LibBalsaAddressBookLdif * ab_ldif)
 {
 }
 
-
 static void
-libbalsa_address_book_ldif_class_init(LibBalsaAddressBookLdifClass *klass)
+libbalsa_address_book_ldif_class_init(LibBalsaAddressBookLdifClass * klass)
 {
     LibBalsaAddressBookTextClass *address_book_text_class =
         LIBBALSA_ADDRESS_BOOK_TEXT_CLASS(klass);
@@ -71,18 +73,16 @@ libbalsa_address_book_ldif_class_init(LibBalsaAddressBookLdifClass *klass)
         libbalsa_address_book_ldif_save_address;
 }
 
-
 /* Public method */
 LibBalsaAddressBook *
-libbalsa_address_book_ldif_new(const gchar *name,
-                               const gchar *path)
+libbalsa_address_book_ldif_new(const gchar * name, const gchar * path)
 {
     LibBalsaAddressBookLdif *ab_ldif;
 
     ab_ldif =
         LIBBALSA_ADDRESS_BOOK_LDIF(g_object_new
-                                       (LIBBALSA_TYPE_ADDRESS_BOOK_LDIF,
-                                       NULL));
+                                   (LIBBALSA_TYPE_ADDRESS_BOOK_LDIF,
+                                    NULL));
 
     libbalsa_address_book_set_name(LIBBALSA_ADDRESS_BOOK(ab_ldif), name);
     libbalsa_address_book_text_set_path(LIBBALSA_ADDRESS_BOOK_TEXT(ab_ldif), path);
@@ -90,146 +90,123 @@ libbalsa_address_book_ldif_new(const gchar *name,
     return LIBBALSA_ADDRESS_BOOK(ab_ldif);
 }
 
-
 /* Helpers */
 
 /* according to rfc2849, value_spec must be either 7-bit ASCII
    (safe-string) or a base64-string. Or an url, which is not
    implemented yet.
- */
-static gchar *
-string_to_value_spec(const gchar *str)
+*/
+static gchar*
+string_to_value_spec(const gchar* str)
 {
     gboolean issafe = TRUE;
-    const gchar *p;
+    const gchar* p;
 
-    for (p = str; *p != '\0' && issafe; p++) {
-        issafe = (*p & 0x80) == 0;
-    }
+    for(p = str; *p != '\0' && issafe; p++)
+	issafe = (*p &0x80) == 0;
 
     if (issafe) {
-        return g_strconcat(" ", str, NULL);
+	return g_strconcat(" ",str, NULL);
     } else {
-        gsize len;
-        gsize sz;
-        gchar *res;
+	gsize len;
+	gsize sz;
+	gchar *res;
         gsize outlen;
         gint state = 0;
         gint save = 0;
 
-        len = strlen(str);
-        sz = (len / 3 + 1) * 4 + 1;
-        res = g_malloc(sz + 2);
-        strcpy(res, ": ");
+	len = strlen(str);
+	sz = (len / 3 + 1) * 4 + 1;
+	res = g_malloc(sz + 2);
+	strcpy(res, ": ");
         outlen = g_base64_encode_step((const guchar *) str, len, FALSE, res + 2,
                                       &state, &save);
         outlen += g_base64_encode_close(FALSE, res + 2 + outlen, &state, &save);
         res[2 + outlen] = '\0';
 
-        return res;
+	return res;
     }
 }
 
-
-static gchar *
-value_spec_to_string(gchar *str)
+static gchar*
+value_spec_to_string(gchar* str)
 {
     gchar *res;
-    if (str[0] == ':') {
+    if(str[0] == ':') {
         gsize out_len;
 
         res = (gchar *) g_base64_decode(g_strchug(str + 1), &out_len);
-    } else {
-        res = g_strdup(g_strstrip(str));
-    }
+    } else
+	res = g_strdup(g_strstrip(str));
     return res;
 }
-
 
 /* member_value_to_mail:
  * str: dn of a an address book entry.
  * returns: email address associated with the entry.
  * We are cheap and just parse the dn. This may not work generally.
  */
-static gchar *
-member_value_to_mail(gchar *str)
+static gchar*
+member_value_to_mail(gchar* str)
 {
     gchar *res, *unencoded = value_spec_to_string(str);
     gchar *mail = strstr(unencoded, "mail=");
-    if (mail) {
-        gchar *eos = strchr(mail, ',');
-        if (eos) {
-            *eos = '\0';
-        }
-        res = g_strdup(mail + 5);
-    } else {
-        res = NULL;
-    }
+    if(mail) {
+        gchar *eos = strchr(mail,',');
+        if(eos) *eos = '\0';
+        res = g_strdup(mail+5);
+    } else res = NULL;
     g_free(unencoded);
     return res;
 }
 
-
-static gchar *
-read_line(FILE *f)
+	
+static gchar*
+read_line(FILE* f)
 {
     char buf[256];
-    GString *res = g_string_new("");
+    GString* res = g_string_new("");
     int len, emptyp = 1;
-
-    while ( fgets(buf, sizeof(buf), f)) {
-        emptyp = 0;
-        g_string_append(res, buf);
-        if (((len = strlen(buf)) > 0) && (buf[len - 1] == '\n')) {
-            break;
-        }
+    
+    while( fgets(buf, sizeof(buf), f)) {
+	emptyp = 0;
+	g_string_append(res, buf);
+	if((len=strlen(buf))> 0 && buf[len-1] == '\n') break;
     }
     g_strchomp(res->str);
-    if (res->str[res->len] == '\n') {
-        res->str[res->len] = '\0';
-    }
+    if(res->str[res->len] == '\n') res->str[res->len] = '\0';
 
     return g_string_free(res, emptyp);
 }
 
-
 /* build_name:
    Builds a full name and returns the pointer to the allocated memory chunk.
-   Returns a NULL pointer if it couldn't figure out a name.
- */
+   Returns a NULL pointer if it couldn't figure out a name. 
+*/
 static gchar *
-build_name(const gchar *cn,
-           const gchar *givenname,
-           const gchar *surname)
+build_name(const gchar *cn, const gchar *givenname, const gchar *surname)
 {
     gchar *name = NULL;
 
-    if (cn && *cn) {
-        name = g_strdup(cn);
-    } else if (givenname && *givenname && surname && *surname) {
-        name = g_strconcat (givenname, " ", surname, NULL);
-    } else if (givenname && *givenname) {
-        name = g_strdup(givenname);
-    } else if (surname && *surname) {
-        name = g_strdup(surname);
-    } else {
-        name = g_strdup(_("No-Name"));
-    }
+    if(cn && *cn) {
+	name = g_strdup(cn);
+    } else if(givenname && *givenname && surname && *surname) {
+	name = g_strconcat (givenname," ",surname,NULL);
+    } else if(givenname && *givenname) {
+	name = g_strdup(givenname);
+    } else if(surname && *surname) {
+	name = g_strdup(surname);
+    } else name = g_strdup(_("No-Name")); 
     return name;
 }
 
-
 /* address_new_prefill:
    takes over the string ownership!
- */
+*/
 static void
-address_new_prefill(LibBalsaAddress *address,
-                    GList           *address_list,
-                    gchar           *nickn,
-                    gchar           *givenn,
-                    gchar           *surn,
-                    gchar           *fulln,
-                    gchar           *org)
+address_new_prefill(LibBalsaAddress * address, GList * address_list,
+                    gchar * nickn, gchar * givenn, gchar * surn,
+                    gchar * fulln, gchar * org)
 {
     gchar *full_name;
 
@@ -264,13 +241,11 @@ address_new_prefill(LibBalsaAddress *address,
                                        full_name != NULL ? full_name : _("No-Id"));
     }
 
-    if (full_name == NULL) {
+    if (full_name == NULL)
         libbalsa_address_set_full_name(address, _("No-Name"));
-    }
 
     g_free(full_name);
 }
-
 
 /* Class methods */
 
@@ -278,19 +253,18 @@ address_new_prefill(LibBalsaAddress *address,
  * Write various lines to the output stream.
  */
 static void
-lbab_ldif_write_dn(FILE            *stream,
-                   LibBalsaAddress *address)
+lbab_ldif_write_dn(FILE * stream, LibBalsaAddress * address)
 {
     const gchar *full_name = libbalsa_address_get_full_name(address);
     gchar *cn = NULL;
     const gchar *addr;
     gchar *value, *value_spec;
 
-    if ((full_name != NULL) && (full_name[0] != '\0')) {
+    if (full_name != NULL && full_name[0] != '\0') {
         cn = g_strdup(full_name);
     } else {
         const gchar *first_name = libbalsa_address_get_first_name(address);
-        const gchar *last_name = libbalsa_address_get_last_name(address);
+        const gchar *last_name  = libbalsa_address_get_last_name(address);
 
         cn = build_name(NULL, first_name, last_name);
         if (cn == NULL) {
@@ -304,11 +278,10 @@ lbab_ldif_write_dn(FILE            *stream,
     }
 
     addr = libbalsa_address_get_addr(address);
-    if ((addr != NULL) && (addr[0] != '\0')) {
+    if (addr != NULL && addr[0] != '\0') {
         value = g_strdup_printf("cn=%s,mail=%s", cn, addr);
-    } else {
+    } else
         value = g_strdup_printf("cn=%s", cn);
-    }
     value_spec = string_to_value_spec(value);
     fprintf(stream, "dn:%s\n", value_spec);
     g_free(value_spec);
@@ -320,10 +293,8 @@ lbab_ldif_write_dn(FILE            *stream,
     g_free(cn);
 }
 
-
 static void
-lbab_ldif_write_addresses(FILE            *stream,
-                          LibBalsaAddress *address)
+lbab_ldif_write_addresses(FILE * stream, LibBalsaAddress * address)
 {
     GList *list;
 
@@ -331,7 +302,7 @@ lbab_ldif_write_addresses(FILE            *stream,
          list != NULL; list = list->next) {
         const gchar *mail = list->data;
 
-        if ((mail != NULL) && (mail[0] != '\0')) {
+        if (mail != NULL && mail[0] != '\0') {
             gchar *value_spec = string_to_value_spec(mail);
             fprintf(stream, "mail:%s\n", value_spec);
             g_free(value_spec);
@@ -339,38 +310,32 @@ lbab_ldif_write_addresses(FILE            *stream,
     }
 }
 
-
 static void
-lbab_ldif_write_surname(FILE            *stream,
-                        LibBalsaAddress *address)
+lbab_ldif_write_surname(FILE * stream, LibBalsaAddress * address)
 {
     const gchar *last_name = libbalsa_address_get_last_name(address);
 
-    if ((last_name != NULL) && (last_name[0] != '\0')) {
+    if (last_name != NULL && last_name[0] != '\0') {
         gchar *value_spec = string_to_value_spec(last_name);
         fprintf(stream, "sn:%s\n", value_spec);
         g_free(value_spec);
     }
 }
 
-
 static void
-lbab_ldif_write_givenname(FILE            *stream,
-                          LibBalsaAddress *address)
+lbab_ldif_write_givenname(FILE * stream, LibBalsaAddress * address)
 {
     const gchar *first_name = libbalsa_address_get_first_name(address);
 
-    if ((first_name != NULL) && (first_name[0] != '\0')) {
+    if (first_name != NULL && first_name[0] != '\0') {
         gchar *value_spec = string_to_value_spec(first_name);
         fprintf(stream, "givenname:%s\n", value_spec);
         g_free(value_spec);
     }
 }
 
-
 static void
-lbab_ldif_write_nickname(FILE            *stream,
-                         LibBalsaAddress *address)
+lbab_ldif_write_nickname(FILE * stream, LibBalsaAddress * address)
 {
     const gchar *nick_name = libbalsa_address_get_nick_name(address);
 
@@ -381,10 +346,8 @@ lbab_ldif_write_nickname(FILE            *stream,
     }
 }
 
-
 static void
-lbab_ldif_write_organization(FILE            *stream,
-                             LibBalsaAddress *address)
+lbab_ldif_write_organization(FILE * stream, LibBalsaAddress * address)
 {
     const gchar *organization = libbalsa_address_get_nick_name(address);
 
@@ -395,72 +358,65 @@ lbab_ldif_write_organization(FILE            *stream,
     }
 }
 
-
 /*
  * Parse one address from the input stream; if an output stream is
  * given, create an item on it for the output address.
  */
 static LibBalsaABErr
-libbalsa_address_book_ldif_parse_address(FILE            *stream,
-                                         LibBalsaAddress *address,
-                                         FILE            *stream_out,
-                                         LibBalsaAddress *address_out)
+libbalsa_address_book_ldif_parse_address(FILE * stream,
+                                         LibBalsaAddress * address,
+                                         FILE * stream_out,
+                                         LibBalsaAddress * address_out)
 {
     gchar *line;
     gchar *surname = NULL, *givenname = NULL, *nickname = NULL,
-          *fullname = NULL, *organization = NULL;
+	*fullname = NULL, *organization = NULL;
     gint in_ldif = FALSE;
     GList *address_list = NULL;
     guint wrote = 0;
 
-    for (; (line = read_line(stream)) != NULL || in_ldif; g_free(line)) {
+    for (; (line=read_line(stream)) != NULL || in_ldif; g_free(line) ) {
         if (line) {
             /*
              * Check if it is a card.
              */
             if (g_ascii_strncasecmp(line, "dn:", 3) == 0) {
                 in_ldif = TRUE;
-                if (stream_out) {
+                if (stream_out)
                     lbab_ldif_write_dn(stream_out, address_out);
-                }
                 continue;
             }
 
             if (!in_ldif) {
-                if (stream_out && *line) {
+                if (stream_out && *line)
                     fprintf(stream_out, "%s\n", line);
-                }
                 continue;
             }
 
             g_strchomp(line);
         }
 
-        if (!line || (line[0] == '\0')) {
+	if (!line || line[0] == '\0') {
             LibBalsaABErr res = LBABERR_CANNOT_READ;
             /*
              * We are done loading a card.
              */
             if (address_list) {
                 if (stream_out) {
-                    if (!(wrote & (1 << LAST_NAME))) {
+                    if (!(wrote & (1 << LAST_NAME)))
                         lbab_ldif_write_surname(stream_out, address_out);
-                    }
-                    if (!(wrote & (1 << FIRST_NAME))) {
+                    if (!(wrote & (1 << FIRST_NAME)))
                         lbab_ldif_write_givenname(stream_out, address_out);
-                    }
-                    if (!(wrote & (1 << NICK_NAME))) {
+                    if (!(wrote & (1 << NICK_NAME)))
                         lbab_ldif_write_nickname(stream_out, address_out);
-                    }
-                    if (!(wrote & (1 << ORGANIZATION))) {
+                    if (!(wrote & (1 << ORGANIZATION)))
                         lbab_ldif_write_organization(stream_out, address_out);
-                    }
                     lbab_ldif_write_addresses(stream_out, address_out);
                     res = fprintf(stream_out, "\n") < 0 ?
                         LBABERR_CANNOT_WRITE : LBABERR_OK;
                 }
 
-                if (address) {
+	        if (address) {
                     address_new_prefill(address,
                                         g_list_reverse(address_list),
                                         nickname, givenname, surname,
@@ -469,7 +425,7 @@ libbalsa_address_book_ldif_parse_address(FILE            *stream,
                     return LBABERR_OK;
                 }
                 g_list_free_full(address_list, g_free);
-            }
+	    } 
             /* Record without e-mail address, or we're not creating
              * addresses: free memory. */
             g_free(fullname);
@@ -479,87 +435,85 @@ libbalsa_address_book_ldif_parse_address(FILE            *stream,
             g_free(organization);
             g_free(line);
             return res;
-        }
+	}
 
-        if (g_ascii_strncasecmp(line, "cn:", 3) == 0) {
-            fullname = value_spec_to_string(g_strchug(line + 3));
-            continue;
-        }
+	if (g_ascii_strncasecmp(line, "cn:", 3) == 0) {
+	    fullname = value_spec_to_string(g_strchug(line + 3));
+	    continue;
+	}
 
-        if (g_ascii_strncasecmp(line, "sn:", 3) == 0) {
-            surname = value_spec_to_string(g_strchug(line + 3));
+	if (g_ascii_strncasecmp(line, "sn:", 3) == 0) {
+	    surname = value_spec_to_string(g_strchug(line + 3));
             if (stream_out) {
                 lbab_ldif_write_surname(stream_out, address_out);
                 wrote |= 1 << LAST_NAME;
             }
-            continue;
-        }
+	    continue;
+	}
 
-        if (g_ascii_strncasecmp(line, "givenname:", 10) == 0) {
-            givenname = value_spec_to_string(g_strchug(line + 10));
+	if (g_ascii_strncasecmp(line, "givenname:", 10) == 0) {
+	    givenname = value_spec_to_string(g_strchug(line + 10));
             if (stream_out) {
                 lbab_ldif_write_givenname(stream_out, address_out);
                 wrote |= 1 << FIRST_NAME;
             }
-            continue;
-        }
+	    continue;
+	}
 
-        if (g_ascii_strncasecmp(line, "xmozillanickname:", 17) == 0) {
-            nickname = value_spec_to_string(g_strchug(line + 17));
+	if (g_ascii_strncasecmp(line, "xmozillanickname:", 17) == 0) {
+	    nickname = value_spec_to_string(g_strchug(line + 17));
             if (stream_out) {
                 lbab_ldif_write_nickname(stream_out, address_out);
                 wrote |= 1 << NICK_NAME;
             }
-            continue;
-        }
+	    continue;
+	}
 
-        if (g_ascii_strncasecmp(line, "o:", 2) == 0) {
-            organization = value_spec_to_string(g_strchug(line + 2));
+	if (g_ascii_strncasecmp(line, "o:", 2) == 0) {
+	    organization = value_spec_to_string(g_strchug(line + 2));
             if (stream_out) {
                 lbab_ldif_write_organization(stream_out, address_out);
                 wrote |= 1 << ORGANIZATION;
             }
-            continue;
-        }
+	    continue;
+	}
 
-        if (g_ascii_strncasecmp(line, "member:", 7) == 0) {
+	if (g_ascii_strncasecmp(line, "member:", 7) == 0) {
             address_list =
                 g_list_prepend(address_list,
                                member_value_to_mail(g_strchug(line + 7)));
-            continue;
-        }
+	    continue;
+	}
 
-        /*
-         * fetch all e-mail fields
-         */
-        if (g_ascii_strncasecmp(line, "mail:", 5) == 0) {
-            address_list =
-                g_list_prepend(address_list,
-                               value_spec_to_string(g_strchug(line + 5)));
-            continue;
-        }
+	/*
+	 * fetch all e-mail fields
+	 */
+	if (g_ascii_strncasecmp(line, "mail:", 5) == 0) {
+	    address_list = 
+		g_list_prepend(address_list, 
+			       value_spec_to_string(g_strchug(line + 5)));
+	    continue;
+	}
 
-        /*
+        /* 
          * unknown line
          */
-        if (stream_out && *line) {
+        if (stream_out && *line)
             fprintf(stream_out, "%s\n", line);
-        }
     }
 
     return LBABERR_CANNOT_READ;
 }
 
-
 /*
  * Write one address to the output stream.
  */
 static LibBalsaABErr
-libbalsa_address_book_ldif_save_address(FILE            *stream,
-                                        LibBalsaAddress *address)
+libbalsa_address_book_ldif_save_address(FILE * stream,
+                                        LibBalsaAddress * address)
 {
-    if ((fseek(stream, -2, SEEK_END) == 0)
-        && ((fgetc(stream) != '\n') || (fgetc(stream) != '\n'))) {
+    if (fseek(stream, -2, SEEK_END) == 0
+        && (fgetc(stream) != '\n' || fgetc(stream) != '\n')) {
         fseek(stream, 0, SEEK_END);
         fputc('\n', stream);
     }

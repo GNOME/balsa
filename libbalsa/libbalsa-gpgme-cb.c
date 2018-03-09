@@ -19,15 +19,15 @@
 
 
 #ifdef HAVE_CONFIG_H
-#   include <config.h>
+#include <config.h>
 #endif
 
 #ifdef HAVE_LOCALE_H
-#   include <locale.h>
+#include <locale.h>
 #endif
 
 #if HAVE_MACOSX_DESKTOP
-#   include "macosx-helpers.h"
+#include "macosx-helpers.h"
 #endif
 
 #include <gpgme.h>
@@ -41,7 +41,7 @@
 
 
 #ifdef G_LOG_DOMAIN
-#   undef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
 #endif
 #define G_LOG_DOMAIN "crypto"
 
@@ -66,72 +66,65 @@ typedef struct {
 } ask_passphrase_data_t;
 
 
-static void key_selection_changed_cb(GtkTreeSelection *selection,
-                                     gpgme_key_t      *key);
-static gint sort_iter_cmp_fn(GtkTreeModel *model,
-                             GtkTreeIter  *a,
-                             GtkTreeIter  *b,
-                             gpointer      data);
-static gchar *get_passphrase_real(const gchar *uid_hint,
-                                  const gchar *passphrase_info,
-                                  int          prev_was_bad,
-                                  GtkWindow   *parent);
+static void key_selection_changed_cb(GtkTreeSelection * selection,
+				     gpgme_key_t * key);
+static gint sort_iter_cmp_fn(GtkTreeModel *model, GtkTreeIter *a,
+					 GtkTreeIter *b, gpointer data);
+static gchar *get_passphrase_real(const gchar * uid_hint,
+				  const gchar * passphrase_info,
+				  int prev_was_bad, GtkWindow * parent);
 
 static gboolean get_passphrase_idle(gpointer data);
 
 
 gpgme_error_t
-lb_gpgme_passphrase(void        *hook,
-                    const gchar *uid_hint,
-                    const gchar *passphrase_info,
-                    int          prev_was_bad,
-                    int          fd)
+lb_gpgme_passphrase(void *hook, const gchar * uid_hint,
+		    const gchar * passphrase_info, int prev_was_bad,
+		    int fd)
 {
     int foo, bar;
     gchar *passwd;
     gchar *p;
     GtkWindow *parent;
 
-    if (hook && GTK_IS_WINDOW(hook)) {
-        parent = (GtkWindow *) hook;
-    } else {
-        parent = NULL;
-    }
+    if (hook && GTK_IS_WINDOW(hook))
+	parent = (GtkWindow *) hook;
+    else
+	parent = NULL;
 
-    if (!libbalsa_am_i_subthread()) {
-        passwd =
-            get_passphrase_real(uid_hint, passphrase_info, prev_was_bad,
-                                parent);
-    } else {
-        static GMutex get_passphrase_lock;
-        ask_passphrase_data_t apd;
+    if (!libbalsa_am_i_subthread())
+	passwd =
+	    get_passphrase_real(uid_hint, passphrase_info, prev_was_bad,
+				parent);
+    else {
+	static GMutex get_passphrase_lock;
+	ask_passphrase_data_t apd;
 
-        g_mutex_lock(&get_passphrase_lock);
-        g_cond_init(&apd.cond);
-        apd.uid_hint = uid_hint;
-        apd.was_bad = prev_was_bad;
-        apd.passphrase_info = passphrase_info;
-        apd.parent = parent;
-        apd.done = FALSE;
-        g_idle_add(get_passphrase_idle, &apd);
-        while (!apd.done) {
-            g_cond_wait(&apd.cond, &get_passphrase_lock);
-        }
-        g_cond_clear(&apd.cond);
-        g_mutex_unlock(&get_passphrase_lock);
-        passwd = apd.res;
+	g_mutex_lock(&get_passphrase_lock);
+	g_cond_init(&apd.cond);
+	apd.uid_hint = uid_hint;
+	apd.was_bad = prev_was_bad;
+	apd.passphrase_info = passphrase_info;
+	apd.parent = parent;
+	apd.done = FALSE;
+	g_idle_add(get_passphrase_idle, &apd);
+	while (!apd.done) {
+		g_cond_wait(&apd.cond, &get_passphrase_lock);
+	}
+	g_cond_clear(&apd.cond);
+	g_mutex_unlock(&get_passphrase_lock);
+	passwd = apd.res;
     }
 
     if (!passwd) {
-        foo = write(fd, "\n", 1);
-        return foo > 0 ? GPG_ERR_CANCELED : GPG_ERR_EIO;
+	foo = write(fd, "\n", 1);
+	return foo > 0 ? GPG_ERR_CANCELED : GPG_ERR_EIO;
     }
 
     /* send the passphrase and erase the string */
     foo = write(fd, passwd, strlen(passwd));
-    for (p = passwd; *p; p++) {
-        *p = random();
-    }
+    for (p = passwd; *p; p++)
+	*p = random();
     g_free(passwd);
     bar = write(fd, "\n", 1);
     return foo > 0 && bar > 0 ? GPG_ERR_NO_ERROR : GPG_ERR_EIO;
@@ -139,35 +132,29 @@ lb_gpgme_passphrase(void        *hook,
 
 
 static void
-lb_gpgme_row_activated_cb(GtkTreeView       *tree_view,
-                          GtkTreePath       *path,
-                          GtkTreeViewColumn *column,
-                          gpointer           user_data)
+lb_gpgme_row_activated_cb(GtkTreeView       * tree_view,
+                          GtkTreePath       * path,
+                          GtkTreeViewColumn * column,
+                          gpointer            user_data)
 {
     GtkTreeIter iter;
     GtkTreeModel *model;
 
     model = gtk_tree_view_get_model(tree_view);
     if (gtk_tree_model_get_iter(model, &iter, path)) {
-        gpgme_key_t key;
-        GtkWidget *dialog;
+    	gpgme_key_t key;
+    	GtkWidget *dialog;
 
         gtk_tree_model_get(model, &iter, GPG_KEY_PTR_COLUMN, &key, -1);
-        dialog = libbalsa_key_dialog(GTK_WINDOW(
-                                         user_data), GTK_BUTTONS_CLOSE, key, GPG_SUBKEY_CAP_ALL, NULL,
-                                     NULL);
+        dialog = libbalsa_key_dialog(GTK_WINDOW(user_data), GTK_BUTTONS_CLOSE, key, GPG_SUBKEY_CAP_ALL, NULL, NULL);
         (void) gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_widget_destroy(dialog);
     }
 }
 
-
 gpgme_key_t
-lb_gpgme_select_key(const gchar     *user_name,
-                    lb_key_sel_md_t  mode,
-                    GList           *keys,
-                    gpgme_protocol_t protocol,
-                    GtkWindow       *parent)
+lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
+		    gpgme_protocol_t protocol, GtkWindow * parent)
 {
     GtkWidget *dialog;
     GtkWidget *vbox;
@@ -175,21 +162,21 @@ lb_gpgme_select_key(const gchar     *user_name,
     GtkWidget *scrolled_window;
     GtkWidget *tree_view;
     GtkListStore *model;
-    GtkTreeSortable *sortable;
+	GtkTreeSortable *sortable;
     GtkTreeSelection *selection;
     GtkTreeIter iter;
     gchar *prompt;
     gpgme_key_t use_key = NULL;
     gint width, height;
-    GtkCellRenderer *renderer;
-    GtkTreeViewColumn *column;
+	GtkCellRenderer *renderer;
+	GtkTreeViewColumn *column;
 
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(_("Select key"),
-                                         parent,
-                                         GTK_DIALOG_DESTROY_WITH_PARENT |
+					 parent,
+					 GTK_DIALOG_DESTROY_WITH_PARENT |
                                          libbalsa_dialog_flags(),
-                                         _("_OK"), GTK_RESPONSE_OK,
+                                         _("_OK"),     GTK_RESPONSE_OK,
                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
                                          NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
@@ -202,29 +189,26 @@ lb_gpgme_select_key(const gchar     *user_name,
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
     g_object_set(G_OBJECT(vbox), "margin", 12, NULL);
     switch (mode) {
-    case LB_SELECT_PRIVATE_KEY:
-        prompt =
-            g_strdup_printf(_("Select the private key for the signer “%s”"),
-                            user_name);
-        break;
-
-    case LB_SELECT_PUBLIC_KEY_USER:
-        prompt =
-            g_strdup_printf(_("Select the public key for the recipient “%s”"),
-                            user_name);
-        break;
-
-    case LB_SELECT_PUBLIC_KEY_ANY:
-        prompt =
-            g_strdup_printf(_("There seems to be no public key for recipient "
-                              "“%s” in your key ring.\nIf you are sure that the "
-                              "recipient owns a different key, select it from "
-                              "the list."), user_name);
-        break;
-
-    default:
-        g_assert_not_reached();
-    }
+    	case LB_SELECT_PRIVATE_KEY:
+    		prompt =
+    			g_strdup_printf(_("Select the private key for the signer “%s”"),
+    							user_name);
+    		break;
+    	case LB_SELECT_PUBLIC_KEY_USER:
+    		prompt =
+    			g_strdup_printf(_("Select the public key for the recipient “%s”"),
+                         		user_name);
+    		break;
+    	case LB_SELECT_PUBLIC_KEY_ANY:
+    		prompt =
+    			g_strdup_printf(_("There seems to be no public key for recipient "
+    	                          "“%s” in your key ring.\nIf you are sure that the "
+    							  "recipient owns a different key, select it from "
+    							  "the list."), user_name);
+    		break;
+    	default:
+    		g_assert_not_reached();
+   	}
     label = gtk_label_new(prompt);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     g_free(prompt);
@@ -236,15 +220,15 @@ lb_gpgme_select_key(const gchar     *user_name,
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW
-                                            (scrolled_window),
-                                        GTK_SHADOW_ETCHED_IN);
+					(scrolled_window),
+					GTK_SHADOW_ETCHED_IN);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
-                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    	GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_vexpand(scrolled_window, TRUE);
     gtk_box_pack_start(GTK_BOX(vbox), scrolled_window);
 
-    model = gtk_list_store_new(GPG_KEY_NUM_COLUMNS, G_TYPE_STRING,      /* user ID */
-                               G_TYPE_POINTER); /* key */
+    model = gtk_list_store_new(GPG_KEY_NUM_COLUMNS, G_TYPE_STRING,	/* user ID */
+			       G_TYPE_POINTER);	/* key */
     sortable = GTK_TREE_SORTABLE(model);
     gtk_tree_sortable_set_sort_func(sortable, 0, sort_iter_cmp_fn, NULL, NULL);
     gtk_tree_sortable_set_sort_column_id(sortable, 0, GTK_SORT_ASCENDING);
@@ -257,35 +241,35 @@ lb_gpgme_select_key(const gchar     *user_name,
     g_object_set_data(G_OBJECT(selection), "first", GUINT_TO_POINTER(1));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
     g_signal_connect(G_OBJECT(selection), "changed",
-                     G_CALLBACK(key_selection_changed_cb), &use_key);
+		     G_CALLBACK(key_selection_changed_cb), &use_key);
 
     /* add the keys */
     while (keys != NULL) {
-        gpgme_key_t key = (gpgme_key_t) keys->data;
+    	gpgme_key_t key = (gpgme_key_t) keys->data;
 
-        /* simply add the primary uid -- the user can show the full key details */
-        if ((key->uids != NULL) && (key->uids->uid != NULL)) {
-            gchar *uid_info;
+    	/* simply add the primary uid -- the user can show the full key details */
+    	if ((key->uids != NULL) && (key->uids->uid != NULL)) {
+    		gchar *uid_info;
 
-            uid_info = libbalsa_cert_subject_readable(key->uids->uid);
-            gtk_list_store_append(model, &iter);
-            gtk_list_store_set(model, &iter,
-                               GPG_KEY_USER_ID_COLUMN, uid_info,
-                               GPG_KEY_PTR_COLUMN, key, -1);
-            g_free(uid_info);
-        }
-        keys = keys->next;
+    		uid_info = libbalsa_cert_subject_readable(key->uids->uid);
+    		gtk_list_store_append(model, &iter);
+    		gtk_list_store_set(model, &iter,
+    			GPG_KEY_USER_ID_COLUMN, uid_info,
+				GPG_KEY_PTR_COLUMN, key, -1);
+    		g_free(uid_info);
+    	}
+    	keys = keys->next;
     }
 
     g_object_unref(G_OBJECT(model));
 
-    renderer = gtk_cell_renderer_text_new();
-    column =
-        gtk_tree_view_column_new_with_attributes(_("User ID"),
-                                                 renderer, "text", 0,
-                                                 NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-    gtk_tree_view_column_set_resizable(column, TRUE);
+	renderer = gtk_cell_renderer_text_new();
+	column =
+	    gtk_tree_view_column_new_with_attributes(_("User ID"),
+						     renderer, "text", 0,
+						     NULL);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+	gtk_tree_view_column_set_resizable(column, TRUE);
 
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
 
@@ -294,7 +278,7 @@ lb_gpgme_select_key(const gchar     *user_name,
     gtk_window_set_default_size(GTK_WINDOW(dialog), (2 * width) / 3, (2 * height) / 3);
 
     if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK) {
-        use_key = NULL;
+    	use_key = NULL;
     }
     gtk_widget_destroy(dialog);
 
@@ -304,8 +288,8 @@ lb_gpgme_select_key(const gchar     *user_name,
 
 gboolean
 lb_gpgme_accept_low_trust_key(const gchar *user_name,
-                              gpgme_key_t  key,
-                              GtkWindow   *parent)
+				  	  	  	  gpgme_key_t  key,
+							  GtkWindow   *parent)
 {
     GtkWidget *dialog;
     gint result;
@@ -315,13 +299,10 @@ lb_gpgme_accept_low_trust_key(const gchar *user_name,
     g_return_val_if_fail((user_name != NULL) && (key != NULL), FALSE);
 
     /* create the dialog */
-    message2 =
-        g_strdup_printf(_("The owner trust for this key is “%s” only.\nUse this key anyway?"),
-                        libbalsa_gpgme_validity_to_gchar_short(key->owner_trust));
-    dialog =
-        libbalsa_key_dialog(parent, GTK_BUTTONS_YES_NO, key, GPG_SUBKEY_CAP_ENCRYPT, _(
-                                "Insufficient key owner trust"),
-                            message2);
+    message2 = g_strdup_printf(_("The owner trust for this key is “%s” only.\nUse this key anyway?"),
+    	libbalsa_gpgme_validity_to_gchar_short(key->owner_trust));
+    dialog = libbalsa_key_dialog(parent, GTK_BUTTONS_YES_NO, key, GPG_SUBKEY_CAP_ENCRYPT, _("Insufficient key owner trust"),
+    	message2);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
@@ -337,18 +318,13 @@ lb_gpgme_accept_low_trust_key(const gchar *user_name,
 #include "padlock-keyhole.xpm"
 
 /*
- * FIXME - usually, the passphrase should /never/ be requested using this function, but directly
- * by GnuPG using pinentry which
- * guarantees, inter alia, the use of safe (unpagable) memory.  For GnuPG >= 2.1 the pinentry
- * mode has to be set to
- * GPGME_PINENTRY_MODE_LOOPBACK to enable the passphrase callback.  Consider to remove this
- * function completely...
+ * FIXME - usually, the passphrase should /never/ be requested using this function, but directly by GnuPG using pinentry which
+ * guarantees, inter alia, the use of safe (unpagable) memory.  For GnuPG >= 2.1 the pinentry mode has to be set to
+ * GPGME_PINENTRY_MODE_LOOPBACK to enable the passphrase callback.  Consider to remove this function completely...
  */
 static gchar *
-get_passphrase_real(const gchar *uid_hint,
-                    const gchar *passphrase_info,
-                    int          prev_was_bad,
-                    GtkWindow   *parent)
+get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
+		    int prev_was_bad, GtkWindow * parent)
 {
     static GdkPixbuf *padlock_keyhole = NULL;
     GtkWidget *dialog, *entry, *vbox, *hbox;
@@ -356,9 +332,9 @@ get_passphrase_real(const gchar *uid_hint,
 
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(_("Enter Passphrase"), parent,
-                                         GTK_DIALOG_DESTROY_WITH_PARENT |
+					 GTK_DIALOG_DESTROY_WITH_PARENT |
                                          libbalsa_dialog_flags(),
-                                         _("_OK"), GTK_RESPONSE_OK,
+                                         _("_OK"),     GTK_RESPONSE_OK,
                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
                                          NULL);
 #if HAVE_MACOSX_DESKTOP
@@ -370,26 +346,22 @@ get_passphrase_real(const gchar *uid_hint,
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_box_pack_start(GTK_BOX(hbox), vbox);
-    if (!padlock_keyhole) {
-        padlock_keyhole =
-            gdk_pixbuf_new_from_xpm_data(padlock_keyhole_xpm);
-    }
+    if (!padlock_keyhole)
+	padlock_keyhole =
+	    gdk_pixbuf_new_from_xpm_data(padlock_keyhole_xpm);
     gtk_box_pack_start(GTK_BOX(vbox), gtk_image_new_from_pixbuf(padlock_keyhole));
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_box_pack_start(GTK_BOX(hbox), vbox);
-    if (prev_was_bad) {
-        prompt =
-            g_strdup_printf(_
-                            (
-                                "%s\nThe passphrase for this key was bad, please try again!\n\nKey: %s"),
-                            passphrase_info, uid_hint);
-    } else {
-        prompt =
-            g_strdup_printf(_
-                            (
-                                "%s\nPlease enter the passphrase for the secret key!\n\nKey: %s"),
-                            passphrase_info, uid_hint);
-    }
+    if (prev_was_bad)
+	prompt =
+	    g_strdup_printf(_
+			    ("%s\nThe passphrase for this key was bad, please try again!\n\nKey: %s"),
+			    passphrase_info, uid_hint);
+    else
+	prompt =
+	    g_strdup_printf(_
+			    ("%s\nPlease enter the passphrase for the secret key!\n\nKey: %s"),
+			    passphrase_info, uid_hint);
     gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(prompt));
     g_free(prompt);
     entry = gtk_entry_new();
@@ -401,11 +373,10 @@ get_passphrase_real(const gchar *uid_hint,
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_widget_grab_focus(entry);
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
-        passwd = gtk_editable_get_chars(GTK_EDITABLE(entry), 0, -1);
-    } else {
-        passwd = NULL;
-    }
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK)
+	passwd = gtk_editable_get_chars(GTK_EDITABLE(entry), 0, -1);
+    else
+	passwd = NULL;
 
     gtk_widget_destroy(dialog);
 
@@ -422,8 +393,8 @@ get_passphrase_idle(gpointer data)
     ask_passphrase_data_t *apd = (ask_passphrase_data_t *) data;
 
     apd->res =
-        get_passphrase_real(apd->uid_hint, apd->passphrase_info,
-                            apd->was_bad, apd->parent);
+	get_passphrase_real(apd->uid_hint, apd->passphrase_info,
+			    apd->was_bad, apd->parent);
     apd->done = TRUE;
     g_cond_signal(&apd->cond);
     return FALSE;
@@ -432,43 +403,39 @@ get_passphrase_idle(gpointer data)
 
 /* callback function if a new row is selected in the list */
 static void
-key_selection_changed_cb(GtkTreeSelection *selection,
-                         gpgme_key_t      *key)
+key_selection_changed_cb(GtkTreeSelection * selection, gpgme_key_t * key)
 {
     GtkDialog *dialog =
-        GTK_DIALOG(g_object_get_data(G_OBJECT(selection), "dialog"));
+    	GTK_DIALOG(g_object_get_data(G_OBJECT(selection), "dialog"));
 
     if (GPOINTER_TO_UINT(g_object_get_data(G_OBJECT(selection), "first")) != 0) {
-        gtk_tree_selection_unselect_all(selection);
-        g_object_set_data(G_OBJECT(selection), "first", GUINT_TO_POINTER(0));
+    	gtk_tree_selection_unselect_all(selection);
+    	g_object_set_data(G_OBJECT(selection), "first", GUINT_TO_POINTER(0));
     } else {
         GtkTreeIter iter;
         GtkTreeModel *model;
 
         if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-            gtk_tree_model_get(model, &iter, GPG_KEY_PTR_COLUMN, key, -1);
-            gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_OK, TRUE);
+        	gtk_tree_model_get(model, &iter, GPG_KEY_PTR_COLUMN, key, -1);
+        	gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_OK, TRUE);
         } else {
-            gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_OK, FALSE);
+        	gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_OK, FALSE);
         }
     }
 }
 
-
 /* compare function for the key list */
 static gint
-sort_iter_cmp_fn(GtkTreeModel *model,
-                 GtkTreeIter  *a,
-                 GtkTreeIter  *b,
-                 gpointer      data)
+sort_iter_cmp_fn(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b,
+				 gpointer data)
 {
-    gchar *name1, *name2;
-    gint result;
+	gchar *name1, *name2;
+	gint result;
 
-    gtk_tree_model_get(model, a, 0, &name1, -1);
-    gtk_tree_model_get(model, b, 0, &name2, -1);
-    result = g_utf8_collate(name1, name2);
-    g_free(name1);
-    g_free(name2);
-    return result;
-}
+	gtk_tree_model_get(model, a, 0, &name1, -1);
+	gtk_tree_model_get(model, b, 0, &name2, -1);
+	result = g_utf8_collate(name1, name2);
+	g_free(name1);
+	g_free(name2);
+	return result;
+ }

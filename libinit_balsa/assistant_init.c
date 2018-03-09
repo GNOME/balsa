@@ -5,20 +5,20 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#   include "config.h"
+# include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "assistant_init.h"
 
@@ -37,18 +37,18 @@
 #include "assistant_page_finish.h"
 
 static void
-balsa_initdruid_cancel(GtkAssistant *druid)
+balsa_initdruid_cancel(GtkAssistant * druid)
 {
     GtkWidget *dialog =
         gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
-                                              (GTK_WIDGET(druid),
-                                              GTK_TYPE_WINDOW)),
+                                          (GTK_WIDGET(druid), 
+                                           GTK_TYPE_WINDOW)),
                                GTK_DIALOG_MODAL,
                                GTK_MESSAGE_QUESTION,
                                GTK_BUTTONS_YES_NO,
                                _("This will exit Balsa.\n"
                                  "Do you really want to do this?"));
-    GtkResponseType reply =
+    GtkResponseType reply = 
         gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 
@@ -58,37 +58,34 @@ balsa_initdruid_cancel(GtkAssistant *druid)
     }
 }
 
-
 static void
-balsa_initdruid_apply(GtkAssistant *druid)
+balsa_initdruid_apply(GtkAssistant * druid)
 {
     gchar *address_book;
     LibBalsaAddressBook *ab = NULL;
 
     address_book = g_build_filename(g_get_home_dir(), "GnomeCard.gcrd", NULL);
-    if (g_file_test(address_book, G_FILE_TEST_EXISTS)) {
+    if (g_file_test(address_book, G_FILE_TEST_EXISTS))
         ab = libbalsa_address_book_vcard_new(_("GnomeCard Address Book"),
                                              address_book);
-    }
     g_free(address_book);
-    if (!ab) {
-        address_book = g_build_filename(g_get_home_dir(),
-                                        ".addressbook.ldif", NULL);
-        if (g_file_test(address_book, G_FILE_TEST_EXISTS)) {
+    if(!ab) {
+        address_book = g_build_filename(g_get_home_dir(), 
+                                   ".addressbook.ldif", NULL);
+        if (g_file_test(address_book, G_FILE_TEST_EXISTS))
             ab = libbalsa_address_book_ldif_new(_("Address Book"),
                                                 address_book);
-        }
         g_free(address_book);
     }
-    if (!ab) {
+    if(!ab) {
         /* This will be the default address book and its location */
-        address_book = g_build_filename(g_get_home_dir(),
+        address_book = g_build_filename(g_get_home_dir(), 
                                         ".balsa", "addressbook.ldif", NULL);
         ab = libbalsa_address_book_ldif_new(_("Address Book"),
-                                            address_book);
+                                            address_book); 
         g_free(address_book);
         libbalsa_assure_balsa_dir();
-    }
+   }
 
     balsa_app.address_book_list =
         g_list_prepend(balsa_app.address_book_list, ab);
@@ -104,9 +101,8 @@ balsa_initdruid_apply(GtkAssistant *druid)
     gtk_main_quit();
 }
 
-
 void
-balsa_initdruid(GtkAssistant *assistant)
+balsa_initdruid(GtkAssistant * assistant)
 {
     g_return_if_fail(assistant != NULL);
     g_return_if_fail(GTK_IS_ASSISTANT(assistant));
@@ -131,7 +127,6 @@ dismiss_the_wizard(GtkWidget *wizard)
     gtk_widget_destroy(wizard);
     return FALSE;
 }
-
 
 void
 balsa_init_begin(void)

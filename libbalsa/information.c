@@ -6,27 +6,27 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#   include "config.h"
+# include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "information.h"
 #include "libbalsa.h"
 
 #ifdef HAVE_NOTIFY
-#   include <libnotify/notify.h>
-#   include <gtk/gtk.h>
+#include <libnotify/notify.h>
+#include <gtk/gtk.h>
 #endif
 #include <string.h>
 
@@ -36,17 +36,16 @@ struct information_data {
     gchar *msg;
 };
 
-static gboolean libbalsa_information_idle_handler(struct information_data *);
+static gboolean libbalsa_information_idle_handler(struct information_data*);
 
 LibBalsaInformationFunc libbalsa_real_information_func;
 
 #ifdef HAVE_NOTIFY
-static void lbi_notification_closed_cb(NotifyNotification *note,
-                                       gpointer            data);
+static void lbi_notification_closed_cb(NotifyNotification * note,
+                                       gpointer data);
 
 static void
-lbi_notification_parent_weak_notify(gpointer data,
-                                    GObject *parent)
+lbi_notification_parent_weak_notify(gpointer data, GObject * parent)
 {
     NotifyNotification *note = NOTIFY_NOTIFICATION(data);
     g_signal_handlers_disconnect_by_func(note, lbi_notification_closed_cb,
@@ -55,17 +54,13 @@ lbi_notification_parent_weak_notify(gpointer data,
     g_object_unref(note);
 }
 
-
 static void
-lbi_notification_closed_cb(NotifyNotification *note,
-                           gpointer            data)
+lbi_notification_closed_cb(NotifyNotification * note, gpointer data)
 {
     GObject *parent = G_OBJECT(data);
     g_object_weak_unref(parent, lbi_notification_parent_weak_notify, note);
     g_object_unref(note);
 }
-
-
 #endif
 
 /*
@@ -79,10 +74,8 @@ lbi_notification_closed_cb(NotifyNotification *note,
  *
  */
 void
-libbalsa_information_varg(GtkWindow              *parent,
-                          LibBalsaInformationType type,
-                          const char             *fmt,
-                          va_list                 ap)
+libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
+                          const char *fmt, va_list ap)
 {
     struct information_data *data;
 
@@ -100,15 +93,12 @@ libbalsa_information_varg(GtkWindow              *parent,
         case LIBBALSA_INFORMATION_MESSAGE:
             icon_str = "dialog-information";
             break;
-
         case LIBBALSA_INFORMATION_WARNING:
             icon_str = "dialog-warning";
             break;
-
         case LIBBALSA_INFORMATION_ERROR:
             icon_str = "dialog-error";
             break;
-
         default:
             icon_str = NULL;
             break;
@@ -120,32 +110,24 @@ libbalsa_information_varg(GtkWindow              *parent,
         for (p = msg; (q = strpbrk(p, "<>&\"")) != NULL; p = ++q) {
             g_string_append_len(escaped, p, q - p);
             switch (*q) {
-            case '<': g_string_append(escaped, "&lt;");
-                break;
-
-            case '>': g_string_append(escaped, "&gt;");
-                break;
-
-            case '&': g_string_append(escaped, "&amp;");
-                break;
-
-            case '"': g_string_append(escaped, "&quot;");
-                break;
-
-            default: break;
+                case '<': g_string_append(escaped, "&lt;");   break;
+                case '>': g_string_append(escaped, "&gt;");   break;
+                case '&': g_string_append(escaped, "&amp;");  break;
+                case '"': g_string_append(escaped, "&quot;"); break;
+                default: break;
             }
         }
         g_string_append(escaped, p);
         g_free(msg);
 
-#   if HAVE_NOTIFY >= 7
+#if HAVE_NOTIFY >= 7
         note = notify_notification_new("Balsa", escaped->str, icon_str);
         notify_notification_set_hint(note, "desktop-entry",
                                      g_variant_new_string("balsa"));
-#   else
+#else
         /* prior to 0.7.0 */
         note = notify_notification_new("Balsa", escaped->str, icon_str, NULL);
-#   endif
+#endif
 
         g_string_free(escaped, TRUE);
 
@@ -158,9 +140,8 @@ libbalsa_information_varg(GtkWindow              *parent,
             g_signal_connect(note, "closed",
                              G_CALLBACK(lbi_notification_closed_cb),
                              parent);
-        } else {
+        } else
             g_object_unref(note);
-        }
         return;
     }
     /* Fall through to the ordinary notification scheme */
@@ -171,40 +152,32 @@ libbalsa_information_varg(GtkWindow              *parent,
 
     /* We format the string here. It must be free()d in the idle
      * handler We parse the args here because by the time the idle
-     * function runs we will no longer be in this stack frame.
+     * function runs we will no longer be in this stack frame. 
      */
     data->msg = g_strdup_vprintf(fmt, ap);
-    if (parent) {
+    if (parent)
         g_object_add_weak_pointer(G_OBJECT(parent),
                                   (gpointer) & data->parent);
-    }
     g_idle_add((GSourceFunc) libbalsa_information_idle_handler, data);
 }
 
-
 void
 libbalsa_information(LibBalsaInformationType type,
-                     const char             *fmt,
-                     ...)
+                     const char *fmt, ...)
 {
     va_list va_args;
 
 #ifndef DEBUG
-    if (type == LIBBALSA_INFORMATION_DEBUG) {
-        return;
-    }
+    if (type == LIBBALSA_INFORMATION_DEBUG) return;
 #endif
     va_start(va_args, fmt);
     libbalsa_information_varg(NULL, type, fmt, va_args);
     va_end(va_args);
 }
 
-
 void
-libbalsa_information_parented(GtkWindow              *parent,
-                              LibBalsaInformationType type,
-                              const char             *fmt,
-                              ...)
+libbalsa_information_parented(GtkWindow *parent, LibBalsaInformationType type,
+                              const char *fmt, ...)
 {
     va_list va_args;
 
@@ -213,9 +186,8 @@ libbalsa_information_parented(GtkWindow              *parent,
     va_end(va_args);
 }
 
-
 /*
- * This is an idle handler, so we need to grab the GDK lock
+ * This is an idle handler, so we need to grab the GDK lock 
  */
 static gboolean
 libbalsa_information_idle_handler(struct information_data *data)
@@ -224,10 +196,9 @@ libbalsa_information_idle_handler(struct information_data *data)
                                    data->message_type,
                                    data->msg);
 
-    if (data->parent) {
-        g_object_remove_weak_pointer(G_OBJECT(data->parent),
-                                     (gpointer) & data->parent);
-    }
+    if(data->parent)
+        g_object_remove_weak_pointer(G_OBJECT(data->parent), 
+                                     (gpointer) &data->parent);
     g_free(data->msg);
     g_free(data);
     return FALSE;

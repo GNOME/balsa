@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -21,7 +21,7 @@
 #define __BALSA_APP_H__
 
 #ifndef BALSA_VERSION
-#   error "Include config.h before this file."
+# error "Include config.h before this file."
 #endif
 
 #include "libbalsa.h"
@@ -36,11 +36,8 @@
 
 /* Work around nonprivileged installs so we can find icons */
 #ifdef BALSA_LOCAL_INSTALL
-#   define gnome_pixmap_file( s ) g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL )
-#   define gnome_unconditional_pixmap_file( s ) g_strconcat( BALSA_RESOURCE_PREFIX, \
-                                                             "/pixmaps", \
-                                                             s, \
-                                                             NULL )
+#define gnome_pixmap_file( s ) g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps/", s, NULL ) 
+#define gnome_unconditional_pixmap_file( s ) g_strconcat( BALSA_RESOURCE_PREFIX, "/pixmaps", s, NULL ) 
 #endif
 
 /* global definitions */
@@ -135,10 +132,10 @@ extern struct BalsaApplication {
     GtkApplication *application;
 
     /* personal information */
-    GList *identities;
-    LibBalsaIdentity *current_ident;
+    GList* identities;
+    LibBalsaIdentity* current_ident;
 
-    GSList *filters;
+    GSList* filters;
 
     gchar *local_mail_directory;
 
@@ -153,8 +150,7 @@ extern struct BalsaApplication {
     GtkTreeStore *mblist_tree_store;
 
     LibBalsaMailbox *inbox;
-    GList *inbox_input;         /* mailboxes such as POP3, etc that will be appending into inbox
-                                 */
+    GList *inbox_input;		/* mailboxes such as POP3, etc that will be appending into inbox */
     LibBalsaMailbox *sentbox;
     LibBalsaMailbox *draftbox;
     LibBalsaMailbox *outbox;
@@ -176,7 +172,7 @@ extern struct BalsaApplication {
     /* system wide sound event and you want Balsa to behave differently */
     /* There is no prefs setting for this item */
     gint notify_new_mail_sound;
-
+    
     gint notify_new_mail_dialog;
     gint notify_new_mail_icon;
 
@@ -186,7 +182,7 @@ extern struct BalsaApplication {
 
     /* automatically expunge mailboxes after XX hours */
     gboolean expunge_auto;
-    gint expunge_timeout;       /* seconds */
+    gint expunge_timeout;	/* seconds */
 
     gint check_imap;
     gint check_imap_inbox;
@@ -225,7 +221,7 @@ extern struct BalsaApplication {
     gint index_size_width;
 
     /*gint mblist_height; PKGW: unused */
-    gint notebook_height;       /* PKGW: used :-) */
+    gint notebook_height;	/* PKGW: used :-) */
 
     /* Column width settings for mailbox list window, not fully implemented yet */
     gint mblist_name_width;
@@ -253,9 +249,7 @@ extern struct BalsaApplication {
     gboolean expand_tree;
     gboolean show_mblist;
     gboolean show_notebook_tabs;
-    enum {
-        LAYOUT_DEFAULT, LAYOUT_WIDE_MSG, LAYOUT_WIDE_SCREEN
-    } layout_type;
+    enum { LAYOUT_DEFAULT, LAYOUT_WIDE_MSG, LAYOUT_WIDE_SCREEN } layout_type;
     gboolean view_message_on_open;
     gboolean ask_before_select;
     gboolean pgdownmod;
@@ -308,7 +302,7 @@ extern struct BalsaApplication {
     /* list of currently open mailboxes */
     GList *open_mailbox_list;  /* data is a pointer to the mailbox */
     gchar *current_mailbox_url;/* remember for next session */
-
+    
     /* fonts */
     gboolean use_system_fonts;
     gchar *message_font;
@@ -324,9 +318,9 @@ extern struct BalsaApplication {
     gdouble margin_top;
     gdouble margin_right;
     gdouble margin_bottom;
-    gchar *print_header_font;  /* font for printing headers */
-    gchar *print_body_font;    /* font for printing text parts */
-    gchar *print_footer_font;  /* font for printing footers */
+    gchar* print_header_font;  /* font for printing headers */
+    gchar* print_body_font;    /* font for printing text parts */
+    gchar* print_footer_font;  /* font for printing footers */
     gboolean print_highlight_cited;
     gboolean print_highlight_phrases;
 
@@ -347,7 +341,7 @@ extern struct BalsaApplication {
     LibBalsaAddressBook *default_address_book;
 
     /* spell checking */
-    gchar *spell_check_lang;
+    gchar   *spell_check_lang;
 #if HAVE_GSPELL || HAVE_GTKSPELL
     gboolean spell_check_active;
 #else                           /* HAVE_GSPELL */
@@ -377,7 +371,7 @@ extern struct BalsaApplication {
     /* gpgme stuff */
     gboolean has_openpgp;
     gboolean has_smime;
-#endif
+#endif 
 
     /* Most recently used lists */
     GList *folder_mru;
@@ -390,38 +384,32 @@ extern struct BalsaApplication {
     int default_client;
 } balsa_app;
 
-#define BALSA_IS_MAILBOX_SPECIAL(a) ((a) == balsa_app.inbox || (a) == balsa_app.trash || \
-                                     (a) == balsa_app.outbox || (a) == balsa_app.draftbox || \
-                                     (a) == balsa_app.sentbox)
+#define BALSA_IS_MAILBOX_SPECIAL(a) ((a)==balsa_app.inbox || (a)==balsa_app.trash || (a)==balsa_app.outbox||(a)==balsa_app.draftbox || (a)==balsa_app.sentbox)
 
 void balsa_app_init(void);
 void balsa_app_destroy(void);
-void update_timer(gboolean update,
-                  guint    minutes);
+void update_timer(gboolean update, guint minutes);
 
-gchar *ask_password(LibBalsaServer  *server,
-                    LibBalsaMailbox *mbox);
-void balsa_open_mailbox_list(gchar **urls);
+gchar *ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox);
+void balsa_open_mailbox_list(gchar ** urls);
 
 /* Search functions */
-BalsaMailboxNode *balsa_find_mailbox(LibBalsaMailbox *mailbox);
-BalsaMailboxNode *balsa_find_dir(LibBalsaServer *server,
-                                 const gchar    *path);
-BalsaMailboxNode *balsa_find_url(const gchar *url);
-LibBalsaMailbox *balsa_find_mailbox_by_url(const gchar *url);
-LibBalsaMailbox *balsa_find_sentbox_by_url(const gchar *url);
-void balsa_add_open_mailbox_urls(GPtrArray *url_array);
+BalsaMailboxNode *balsa_find_mailbox(LibBalsaMailbox * mailbox);
+BalsaMailboxNode *balsa_find_dir(LibBalsaServer *server, const gchar * path);
+BalsaMailboxNode *balsa_find_url(const gchar * url);
+LibBalsaMailbox *balsa_find_mailbox_by_url(const gchar * url);
+LibBalsaMailbox *balsa_find_sentbox_by_url(const gchar * url);
+void balsa_add_open_mailbox_urls(GPtrArray * url_array);
 
 /** Returns a short mailbox name that identifies the host. This is
     longer than LibBalsaMailbox::name which contains only filename
     without information about mailbox's location in the hierarchy. */
-gchar *balsa_get_short_mailbox_name(const gchar *url);
-gboolean balsa_find_iter_by_data(GtkTreeIter *iter,
-                                 gpointer     data);
-BalsaIndex *balsa_find_index_by_mailbox(LibBalsaMailbox *mailbox);
+gchar *balsa_get_short_mailbox_name(const gchar * url);
+gboolean balsa_find_iter_by_data(GtkTreeIter * iter, gpointer data);
+BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 
-void  balsa_remove_children_mailbox_nodes(BalsaMailboxNode *mbnode);
+void  balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode);
 
 GRegex *balsa_quote_regex_new(void);
 
-#endif                          /* __BALSA_APP_H__ */
+#endif				/* __BALSA_APP_H__ */

@@ -21,7 +21,7 @@
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#   include "config.h"
+# include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
 #include <gtk/gtk.h>
@@ -29,23 +29,21 @@
 #include "application-helpers.h"
 
 typedef struct {
-    GAction *action;
+    GAction  *action;
     GVariant *parameter;
 } AccelInfo;
 
 static void
-accel_info_free(AccelInfo *info)
+accel_info_free(AccelInfo * info)
 {
-    if (info->parameter) {
+    if (info->parameter)
         g_variant_unref(info->parameter);
-    }
     g_free(info);
 }
 
-
 static gboolean
-accel_activate(GtkAccelGroup  *accel_group,
-               GObject        *acceleratable,
+accel_activate(GtkAccelGroup * accel_group,
+               GObject       * acceleratable,
                guint           keyval,
                GdkModifierType modifier,
                gpointer        user_data)
@@ -57,12 +55,11 @@ accel_activate(GtkAccelGroup  *accel_group,
     return TRUE;
 }
 
-
 static void
-extract_accel_from_menu_item(GMenuModel    *model,
-                             gint           item,
-                             GActionMap    *action_map,
-                             GtkAccelGroup *accel_group)
+extract_accel_from_menu_item(GMenuModel    * model,
+                             gint            item,
+                             GActionMap    * action_map,
+                             GtkAccelGroup * accel_group)
 {
     GMenuAttributeIter *iter;
     const gchar *key;
@@ -74,14 +71,13 @@ extract_accel_from_menu_item(GMenuModel    *model,
     iter = g_menu_model_iterate_item_attributes(model, item);
     while (g_menu_attribute_iter_get_next(iter, &key, &value)) {
         if (g_str_equal(key, "action")
-            && g_variant_is_of_type(value, G_VARIANT_TYPE_STRING)) {
+            && g_variant_is_of_type(value, G_VARIANT_TYPE_STRING))
             action = g_variant_get_string(value, NULL);
-        } else if (g_str_equal(key, "accel")
-                   && g_variant_is_of_type(value, G_VARIANT_TYPE_STRING)) {
+        else if (g_str_equal(key, "accel")
+                 && g_variant_is_of_type(value, G_VARIANT_TYPE_STRING))
             accel = g_variant_get_string(value, NULL);
-        } else if (g_str_equal(key, "target")) {
+        else if (g_str_equal(key, "target"))
             target = g_variant_ref(value);
-        }
         g_variant_unref(value);
     }
     g_object_unref(iter);
@@ -105,16 +101,14 @@ extract_accel_from_menu_item(GMenuModel    *model,
                                 closure);
     }
 
-    if (target) {
+    if (target)
         g_variant_unref(target);
-    }
 }
 
-
 static void
-extract_accels_from_menu(GMenuModel    *model,
-                         GActionMap    *action_map,
-                         GtkAccelGroup *accel_group)
+extract_accels_from_menu(GMenuModel    * model,
+                         GActionMap    * action_map,
+                         GtkAccelGroup * accel_group)
 {
     gint i, n = g_menu_model_get_n_items(model);
     GMenuLinkIter *iter;
@@ -133,10 +127,9 @@ extract_accels_from_menu(GMenuModel    *model,
     }
 }
 
-
 static GtkAccelGroup *
-get_accel_group(GMenuModel *model,
-                GActionMap *action_map)
+get_accel_group(GMenuModel * model,
+                GActionMap * action_map)
 {
     GtkAccelGroup *accel_group;
 
@@ -145,7 +138,6 @@ get_accel_group(GMenuModel *model,
 
     return accel_group;
 }
-
 
 /*
  * libbalsa_window_get_menu_bar
@@ -165,12 +157,12 @@ get_accel_group(GMenuModel *model,
  */
 
 GtkWidget *
-libbalsa_window_get_menu_bar(GtkApplicationWindow *window,
-                             const GActionEntry   *entries,
-                             gint                  n_entries,
-                             const gchar          *ui_file,
-                             GError              **error,
-                             gpointer              cb_data)
+libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
+                             const GActionEntry   * entries,
+                             gint                   n_entries,
+                             const gchar          * ui_file,
+                             GError              ** error,
+                             gpointer               cb_data)
 {
     GActionMap *map = G_ACTION_MAP(window);
     GtkBuilder *builder;
@@ -195,7 +187,6 @@ libbalsa_window_get_menu_bar(GtkApplicationWindow *window,
     return menu_bar;
 }
 
-
 /*
  * libbalsa_window_set_accels
  *
@@ -207,25 +198,23 @@ libbalsa_window_get_menu_bar(GtkApplicationWindow *window,
  */
 
 void
-libbalsa_window_set_accels(GtkApplicationWindow *window,
-                           GMenuModel           *menu_model)
+libbalsa_window_set_accels(GtkApplicationWindow * window,
+                           GMenuModel           * menu_model)
 {
     GSList *accel_groups;
     GtkAccelGroup *accel_group;
 
     /* Remove current accelerators: */
     accel_groups = gtk_accel_groups_from_object(G_OBJECT(window));
-    if (accel_groups) {
+    if (accel_groups)
         /* Last is first... */
         gtk_window_remove_accel_group(GTK_WINDOW(window),
                                       accel_groups->data);
-    }
 
     accel_group = get_accel_group(menu_model, G_ACTION_MAP(window));
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
     g_object_unref(accel_group);
 }
-
 
 /*
  * libbalsa_window_add_accelerator
@@ -238,9 +227,9 @@ libbalsa_window_set_accels(GtkApplicationWindow *window,
  */
 
 void
-libbalsa_window_add_accelerator(GtkApplicationWindow *window,
-                                const gchar          *accel,
-                                const gchar          *action_name)
+libbalsa_window_add_accelerator(GtkApplicationWindow * window,
+                                const gchar          * accel,
+                                const gchar          * action_name)
 {
     GActionMap *action_map = G_ACTION_MAP(window);
     guint accel_key;
@@ -279,7 +268,6 @@ libbalsa_window_add_accelerator(GtkApplicationWindow *window,
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
 }
 
-
 /*
  * libbalsa_toggle_activated
  *
@@ -292,9 +280,9 @@ libbalsa_window_add_accelerator(GtkApplicationWindow *window,
  */
 
 void
-libbalsa_toggle_activated(GSimpleAction *action,
-                          GVariant      *parameter,
-                          gpointer       user_data)
+libbalsa_toggle_activated(GSimpleAction * action,
+                          GVariant      * parameter,
+                          gpointer        user_data)
 {
     GVariant *action_state;
     gboolean state;
@@ -304,7 +292,6 @@ libbalsa_toggle_activated(GSimpleAction *action,
     g_action_change_state(G_ACTION(action), g_variant_new_boolean(!state));
     g_variant_unref(action_state);
 }
-
 
 /*
  * libbalsa_radio_activated
@@ -318,9 +305,9 @@ libbalsa_toggle_activated(GSimpleAction *action,
  */
 
 void
-libbalsa_radio_activated(GSimpleAction *action,
-                         GVariant      *parameter,
-                         gpointer       user_data)
+libbalsa_radio_activated(GSimpleAction * action,
+                         GVariant      * parameter,
+                         gpointer        user_data)
 {
     g_action_change_state(G_ACTION(action), parameter);
 }

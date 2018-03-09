@@ -152,7 +152,6 @@ libbalsa_completion_new(LibBalsaCompletionFunc func)
     return gcomp;
 }
 
-
 /**
  * libbalsa_completion_add_items:
  * @cmp: the #LibBalsaCompletion.
@@ -161,8 +160,8 @@ libbalsa_completion_new(LibBalsaCompletionFunc func)
  * Adds items to the #LibBalsaCompletion.
  **/
 void
-libbalsa_completion_add_items(LibBalsaCompletion *cmp,
-                              GList              *items)
+libbalsa_completion_add_items(LibBalsaCompletion * cmp,
+                              GList              * items)
 {
     GList *it;
 
@@ -177,7 +176,6 @@ libbalsa_completion_add_items(LibBalsaCompletion *cmp,
     }
 }
 
-
 /**
  * libbalsa_completion_clear_items:
  * @cmp: the #LibBalsaCompletion.
@@ -185,7 +183,7 @@ libbalsa_completion_add_items(LibBalsaCompletion *cmp,
  * Removes all items from the #LibBalsaCompletion.
  **/
 void
-libbalsa_completion_clear_items(LibBalsaCompletion *cmp)
+libbalsa_completion_clear_items(LibBalsaCompletion * cmp)
 {
     g_return_if_fail(cmp != NULL);
 
@@ -193,7 +191,6 @@ libbalsa_completion_clear_items(LibBalsaCompletion *cmp)
     g_clear_pointer(&cmp->cache, (GDestroyNotify) g_list_free);
     g_clear_pointer(&cmp->prefix, (GDestroyNotify) g_free);
 }
-
 
 /**
  * libbalsa_completion_complete:
@@ -207,8 +204,8 @@ libbalsa_completion_clear_items(LibBalsaCompletion *cmp)
  * target items.
  **/
 GList *
-libbalsa_completion_complete(LibBalsaCompletion *cmp,
-                             const gchar        *prefix)
+libbalsa_completion_complete(LibBalsaCompletion * cmp,
+                             const gchar        * prefix)
 {
     gsize plen, len;
     gboolean done = FALSE;
@@ -220,7 +217,7 @@ libbalsa_completion_complete(LibBalsaCompletion *cmp,
     len = strlen(prefix);
     if (cmp->prefix && cmp->cache) {
         plen = strlen(cmp->prefix);
-        if ((plen <= len) && !cmp->strncmp_func(prefix, cmp->prefix, plen)) {
+        if (plen <= len && !cmp->strncmp_func(prefix, cmp->prefix, plen)) {
             /* use the cache */
             list = cmp->cache;
             while (list) {
@@ -230,9 +227,8 @@ libbalsa_completion_complete(LibBalsaCompletion *cmp,
                                       cmp->func ? cmp->func(list->
                                                             data) : (gchar
                                                                      *)
-                                      list->data, len)) {
+                                      list->data, len))
                     cmp->cache = g_list_delete_link(cmp->cache, list);
-                }
 
                 list = next;
             }
@@ -246,20 +242,18 @@ libbalsa_completion_complete(LibBalsaCompletion *cmp,
         for (list = cmp->items; list != NULL && *prefix != '\0'; list = list->next) {
             if (cmp->strncmp_func(prefix,
                                   cmp->func ? cmp->func(list->data)
-                                  : (gchar *) list->data,
+                                            : (gchar *) list->data,
                                   len) == 0) {
                 cmp->cache = g_list_prepend(cmp->cache, list->data);
             }
         }
     }
     g_clear_pointer(&cmp->prefix, (GDestroyNotify) g_free);
-    if (cmp->cache != NULL) {
+    if (cmp->cache != NULL)
         cmp->prefix = g_strdup(prefix);
-    }
 
     return *prefix != '\0' ? cmp->cache : cmp->items;
 }
-
 
 /**
  * libbalsa_completion_free:
@@ -268,14 +262,13 @@ libbalsa_completion_complete(LibBalsaCompletion *cmp,
  * Frees all memory used by the #LibBalsaCompletion.
  **/
 void
-libbalsa_completion_free(LibBalsaCompletion *cmp)
+libbalsa_completion_free(LibBalsaCompletion * cmp)
 {
     g_return_if_fail(cmp != NULL);
 
     libbalsa_completion_clear_items(cmp);
     g_free(cmp);
 }
-
 
 /**
  * libbalsa_completion_set_compare:
@@ -286,11 +279,10 @@ libbalsa_completion_free(LibBalsaCompletion *cmp)
  * comparison function is strncmp().
  **/
 void
-libbalsa_completion_set_compare(LibBalsaCompletion           *cmp,
+libbalsa_completion_set_compare(LibBalsaCompletion          * cmp,
                                 LibBalsaCompletionStrncmpFunc strncmp_func)
 {
     cmp->strncmp_func = strncmp_func;
 }
-
 
 #define __G_COMPLETION_C__

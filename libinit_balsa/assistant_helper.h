@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,7 +27,7 @@ typedef struct EntryMaster_s EntryMaster;
 
 struct EntryData_s {
     GtkAssistant *druid;
-    GtkWidget *page;
+    GtkWidget    *page;
     guint num;
     EntryMaster *master;
 };
@@ -41,32 +41,23 @@ struct EntryMaster_s {
 };
 
 #define ENTRY_MASTER_INIT { 0, 0, 0 }
-#define ENTRY_MASTER_P_DONE( ep ) (((ep)->setbits & (ep)->donemask) == (ep)->donemask)
-#define ENTRY_MASTER_DONE( e ) (((e).setbits & (e).donemask) == (e).donemask)
+#define ENTRY_MASTER_P_DONE( ep ) ( ((ep)->setbits & (ep)->donemask) == (ep)->donemask )
+#define ENTRY_MASTER_DONE( e ) ( ((e).setbits & (e).donemask) == (e).donemask )
 
-GtkWidget *balsa_init_add_grid_entry(GtkGrid      *grid,
-                                     guint         num,
-                                     const gchar  *ltext,
-                                     const gchar  *etext,
-                                     EntryData    *ed,
-                                     GtkAssistant *druid,
-                                     GtkWidget    *page,
-                                     GtkWidget   **dest);
-void balsa_init_add_grid_option(GtkGrid      *grid,
-                                guint         num,
-                                const gchar  *ltext,
-                                const gchar **optns,
-                                GtkAssistant *druid,
-                                GtkWidget   **dest);
-void balsa_init_add_grid_checkbox(GtkGrid      *grid,
-                                  guint         num,
-                                  const gchar  *ltext,
-                                  gboolean      defval,
-                                  GtkAssistant *druid,
-                                  GtkWidget   **dest);
+GtkWidget *balsa_init_add_grid_entry(GtkGrid * grid, guint num,
+                                     const gchar * ltext,
+                                     const gchar * etext, EntryData * ed,
+                                     GtkAssistant * druid,
+                                     GtkWidget * page, GtkWidget ** dest);
+void balsa_init_add_grid_option(GtkGrid *grid, guint num,
+                                const gchar *ltext, const gchar **optns,
+                                GtkAssistant *druid, GtkWidget **dest);
+void balsa_init_add_grid_checkbox(GtkGrid *grid, guint num,
+                                  const gchar *ltext, gboolean defval,
+                                  GtkAssistant *druid, GtkWidget **dest);
 gint balsa_option_get_active(GtkWidget *option_widget);
 
-gboolean balsa_init_create_to_directory(const gchar *dir,
-                                        gchar      **complaint);
+gboolean balsa_init_create_to_directory(const gchar * dir,
+                                        gchar ** complaint);
 
 #endif

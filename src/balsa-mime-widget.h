@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -51,29 +51,26 @@ G_DECLARE_DERIVABLE_TYPE(BalsaMimeWidget, balsa_mime_widget, BALSA, MIME_WIDGET,
  * Method definitions.
  */
 
-BalsaMimeWidget * balsa_mime_widget_new(BalsaMessage * bm,
-                                        LibBalsaMessageBody * mime_body,
-                                        gpointer data);
+BalsaMimeWidget *balsa_mime_widget_new(BalsaMessage * bm,
+				       LibBalsaMessageBody * mime_body,
+				       gpointer data);
 
 /*
  * Getters
  */
 
-GtkWidget *balsa_mime_widget_get_widget(BalsaMimeWidget *mw);
-GtkWidget *balsa_mime_widget_get_container(BalsaMimeWidget *mw);
-GtkWidget *balsa_mime_widget_get_header_widget(BalsaMimeWidget *mw);
+GtkWidget *balsa_mime_widget_get_widget       (BalsaMimeWidget * mw);
+GtkWidget *balsa_mime_widget_get_container    (BalsaMimeWidget * mw);
+GtkWidget *balsa_mime_widget_get_header_widget(BalsaMimeWidget * mw);
 
 /*
  * Setters
  */
 
-void balsa_mime_widget_set_widget(BalsaMimeWidget *mw,
-                                  GtkWidget       *widget);
-void balsa_mime_widget_set_container(BalsaMimeWidget *mw,
-                                     GtkWidget       *widget);
-void balsa_mime_widget_set_header_widget(BalsaMimeWidget *mw,
-                                         GtkWidget       *widget);
+void balsa_mime_widget_set_widget       (BalsaMimeWidget * mw, GtkWidget * widget);
+void balsa_mime_widget_set_container    (BalsaMimeWidget * mw, GtkWidget * widget);
+void balsa_mime_widget_set_header_widget(BalsaMimeWidget * mw, GtkWidget * widget);
 
 G_END_DECLS
 
-#endif                          /* __BALSA_MIME_WIDGET_H__ */
+#endif				/* __BALSA_MIME_WIDGET_H__ */

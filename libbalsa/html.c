@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -36,7 +36,7 @@
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#   include "config.h"
+# include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "html.h"
 
@@ -53,8 +53,7 @@
  * otherwise, caller must g_free buf
  */
 static gssize
-lbh_get_body_content(LibBalsaMessageBody *body,
-                     gchar              **buf)
+lbh_get_body_content(LibBalsaMessageBody * body, gchar ** buf)
 {
     gssize len;
     GError *err = NULL;
@@ -77,19 +76,15 @@ lbh_get_body_content(LibBalsaMessageBody *body,
     return libbalsa_html_filter(html_type, buf, len);
 }
 
+# if defined(HAVE_WEBKIT)
 
-#   if defined(HAVE_WEBKIT)
-
-#      ifdef HTML2TEXT
+#ifdef HTML2TEXT
 
 /* common function for all Webkit versions */
 static void
-html2text(gchar **text,
-          gsize   len)
+html2text(gchar ** text, gsize len)
 {
-    gchar *html2text[] = {
-        HTML2TEXT, NULL, NULL, NULL
-    };
+    gchar *html2text[] = { HTML2TEXT, NULL, NULL, NULL };
     GFile *html_data;
     GFileIOStream *stream;
     GError *err = NULL;
@@ -106,12 +101,12 @@ html2text(gchar **text,
             gint pathidx;
 
             g_output_stream_flush(ostream, NULL, NULL);
-#         if defined(HTML2TEXT_UCOPT)
+#if defined(HTML2TEXT_UCOPT)
             html2text[1] = "--unicode-snob";
             pathidx = 2;
-#         else
+#else
             pathidx = 1;
-#         endif
+#endif
             html2text[pathidx] = g_file_get_path(html_data);
             if (g_spawn_sync(NULL, html2text, NULL,
                              G_SPAWN_STDERR_TO_DEV_NULL, NULL, NULL,
@@ -134,53 +129,52 @@ html2text(gchar **text,
     }
 }
 
+#else
 
-#      else
+#define html2text(p, l)
 
-#         define html2text(p, l)
+#endif
 
-#      endif
-
-#      if defined(USE_WEBKIT2)
+#  if defined(USE_WEBKIT2)
 
 /*
  * Experimental support for WebKit2.
  */
 
-#         define DEBUG_WEBKIT2 FALSE
-#         if DEBUG_WEBKIT2
-#            define d(x) x
-#         else
-#            define d(x)
-#         endif
+#define DEBUG_WEBKIT2 FALSE
+#if DEBUG_WEBKIT2
+#define d(x) x
+#else
+#define d(x)
+#endif
 
 /* WebKitContextMenuItem uses GtkAction, which is deprecated.
  * We don't use it, but it breaks the git-tree build, so we just mangle
  * it: */
-#         define GtkAction GAction
-#         include <webkit2/webkit2.h>
-#         undef GtkAction
+#define GtkAction GAction
+#include <webkit2/webkit2.h>
+#undef GtkAction
 
 typedef struct {
-    LibBalsaMessageBody *body;
-    LibBalsaHtmlCallback hover_cb;
-    LibBalsaHtmlCallback clicked_cb;
-    GtkWidget *info_bar;
-    WebKitWebView *web_view;
-    gchar *uri;
+    LibBalsaMessageBody  *body;
+    LibBalsaHtmlCallback  hover_cb;
+    LibBalsaHtmlCallback  clicked_cb;
+    GtkWidget            *info_bar;
+    WebKitWebView        *web_view;
+    gchar                *uri;
     LibBalsaHtmlSearchCallback search_cb;
-    gpointer search_cb_data;
-    gchar *search_text;
+    gpointer                   search_cb_data;
+    gchar                    * search_text;
 } LibBalsaWebKitInfo;
 
-#         define LIBBALSA_HTML_INFO "libbalsa-webkit2-info"
+#define LIBBALSA_HTML_INFO "libbalsa-webkit2-info"
 
 /*
  * Unlike older HTML widgets, webkit2 wants UTF-8 text
  */
 static gssize
-lbh_get_body_content_utf8(LibBalsaMessageBody *body,
-                          gchar              **utf8_text)
+lbh_get_body_content_utf8(LibBalsaMessageBody  * body,
+                          gchar               ** utf8_text)
 {
     gchar *text;
     gssize len;
@@ -188,9 +182,8 @@ lbh_get_body_content_utf8(LibBalsaMessageBody *body,
     gsize utf8_len;
 
     len = lbh_get_body_content(body, &text);
-    if (len < 0) {
+    if (len < 0)
         return len;
-    }
 
     charset = libbalsa_message_body_charset(body);
     if (charset) {
@@ -210,54 +203,50 @@ lbh_get_body_content_utf8(LibBalsaMessageBody *body,
     return strlen(text);
 }
 
-
 /*
  * GDestroyNotify func
  */
 static void
-lbh_webkit_info_free(LibBalsaWebKitInfo *info)
+lbh_webkit_info_free(LibBalsaWebKitInfo * info)
 {
     if (info->uri) {
         g_free(info->uri);
-        (*info->hover_cb)(NULL);
+        (*info->hover_cb) (NULL);
     }
 
     g_free(info->search_text);
     g_free(info);
 }
 
-
 /*
  * Callback for the "mouse-target-changed" signal
  */
 static void
-lbh_mouse_target_changed_cb(WebKitWebView       *web_view,
-                            WebKitHitTestResult *hit_test_result,
-                            guint                modifiers,
-                            gpointer             data)
+lbh_mouse_target_changed_cb(WebKitWebView       * web_view,
+                            WebKitHitTestResult * hit_test_result,
+                            guint                 modifiers,
+                            gpointer              data)
 {
     LibBalsaWebKitInfo *info = data;
     const gchar *uri;
 
     uri = webkit_hit_test_result_get_link_uri(hit_test_result);
 
-    if (g_strcmp0(uri, info->uri) == 0) {
+    if (g_strcmp0(uri, info->uri) == 0)
         /* No change */
         return;
-    }
 
     if (info->uri) {
         g_free(info->uri);
         info->uri = NULL;
-        (*info->hover_cb)(NULL);
+        (*info->hover_cb) (NULL);
     }
 
     if (uri) {
         info->uri = g_strdup(uri);
-        (*info->hover_cb)(uri);
+        (*info->hover_cb) (uri);
     }
 }
-
 
 /*
  * Callback for the "decide-policy" signal
@@ -266,8 +255,8 @@ lbh_mouse_target_changed_cb(WebKitWebView       *web_view,
  */
 
 static void
-lbh_navigation_policy_decision(WebKitPolicyDecision *decision,
-                               gpointer              data)
+lbh_navigation_policy_decision(WebKitPolicyDecision * decision,
+                               gpointer               data)
 {
     LibBalsaWebKitInfo *info = data;
     WebKitNavigationPolicyDecision *navigation_decision;
@@ -279,7 +268,7 @@ lbh_navigation_policy_decision(WebKitPolicyDecision *decision,
     navigation_decision = WEBKIT_NAVIGATION_POLICY_DECISION(decision);
     navigation_action =
         webkit_navigation_policy_decision_get_navigation_action
-            (navigation_decision);
+        (navigation_decision);
     navigation_type =
         webkit_navigation_action_get_navigation_type(navigation_action);
     request = webkit_navigation_action_get_request(navigation_action);
@@ -292,21 +281,18 @@ lbh_navigation_policy_decision(WebKitPolicyDecision *decision,
                   navigation_type));
         webkit_policy_decision_use(decision);
         break;
-
     case WEBKIT_NAVIGATION_TYPE_LINK_CLICKED:
         d(g_print("%s clicked %s\n", __func__, uri));
-        (*info->clicked_cb)(uri);
-
+        (*info->clicked_cb) (uri);
     default:
         d(g_print("%s type %d, ignored\n", __func__, navigation_type));
         webkit_policy_decision_ignore(decision);
     }
 }
 
-
 static void
-lbh_new_window_policy_decision(WebKitPolicyDecision *decision,
-                               gpointer              data)
+lbh_new_window_policy_decision(WebKitPolicyDecision * decision,
+                               gpointer               data)
 {
     WebKitNavigationPolicyDecision *navigation_decision;
     WebKitNavigationAction *navigation_action;
@@ -315,57 +301,51 @@ lbh_new_window_policy_decision(WebKitPolicyDecision *decision,
 
     navigation_decision = WEBKIT_NAVIGATION_POLICY_DECISION(decision);
     navigation_action =
-        webkit_navigation_policy_decision_get_navigation_action
+         webkit_navigation_policy_decision_get_navigation_action
             (navigation_decision);
     switch (webkit_navigation_action_get_navigation_type
-                (navigation_action)) {
+            (navigation_action)) {
     case WEBKIT_NAVIGATION_TYPE_LINK_CLICKED:
         request = webkit_navigation_action_get_request(navigation_action);
         d(g_print("%s clicked %s\n", __func__,
                   webkit_uri_request_get_uri(request)));
-        (*info->clicked_cb)(webkit_uri_request_get_uri(request));
-
+        (*info->clicked_cb) (webkit_uri_request_get_uri(request));
     default:
         d(g_print("%s type %d, ignored\n", __func__,
                   webkit_navigation_action_get_navigation_type
-                      (navigation_action)));
+                  (navigation_action)));
 
         webkit_policy_decision_ignore(decision);
     }
 }
 
-
 static void
-lbh_response_policy_decision(WebKitPolicyDecision *decision,
-                             gpointer              data)
+lbh_response_policy_decision(WebKitPolicyDecision * decision,
+                             gpointer               data)
 {
     d(g_print("%s uri %s, ignored\n", __func__,
               webkit_uri_request_get_uri
-                  (webkit_response_policy_decision_get_request
-                      (WEBKIT_RESPONSE_POLICY_DECISION(decision)))));
+              (webkit_response_policy_decision_get_request
+               (WEBKIT_RESPONSE_POLICY_DECISION(decision)))));
     webkit_policy_decision_ignore(decision);
 }
 
-
 static gboolean
-lbh_decide_policy_cb(WebKitWebView           *web_view,
-                     WebKitPolicyDecision    *decision,
-                     WebKitPolicyDecisionType decision_type,
-                     gpointer                 data)
+lbh_decide_policy_cb(WebKitWebView           * web_view,
+                     WebKitPolicyDecision    * decision,
+                     WebKitPolicyDecisionType  decision_type,
+                     gpointer                  data)
 {
     switch (decision_type) {
     case WEBKIT_POLICY_DECISION_TYPE_NAVIGATION_ACTION:
         lbh_navigation_policy_decision(decision, data);
         break;
-
     case WEBKIT_POLICY_DECISION_TYPE_NEW_WINDOW_ACTION:
         lbh_new_window_policy_decision(decision, data);
         break;
-
     case WEBKIT_POLICY_DECISION_TYPE_RESPONSE:
         lbh_response_policy_decision(decision, data);
         break;
-
     default:
         /* Making no decision results in
          * webkit_policy_decision_use(). */
@@ -375,7 +355,6 @@ lbh_decide_policy_cb(WebKitWebView           *web_view,
     return TRUE;
 }
 
-
 /*
  * Show the GtkInfoBar for asking about downloading images
  *
@@ -383,9 +362,8 @@ lbh_decide_policy_cb(WebKitWebView           *web_view,
  */
 
 static void
-lbh_info_bar_response_cb(GtkInfoBar *info_bar,
-                         gint        response_id,
-                         gpointer    data)
+lbh_info_bar_response_cb(GtkInfoBar * info_bar,
+                         gint response_id, gpointer data)
 {
     LibBalsaWebKitInfo *info = data;
 
@@ -406,49 +384,47 @@ lbh_info_bar_response_cb(GtkInfoBar *info_bar,
     info->info_bar = NULL;
 }
 
-
 static void
-lbh_info_bar_realize_cb(GtkInfoBar *info_bar)
+lbh_info_bar_realize_cb(GtkInfoBar * info_bar)
 {
     gtk_info_bar_set_default_response(info_bar, GTK_RESPONSE_CLOSE);
 }
 
-
 static GtkWidget *
-lbh_info_bar(LibBalsaWebKitInfo *info)
+lbh_info_bar(LibBalsaWebKitInfo * info)
 {
     GtkWidget *info_bar_widget;
     GtkInfoBar *info_bar;
     GtkWidget *label;
     GtkWidget *content_area;
-#         ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
+#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
     static const gchar text[] =
-        N_("This message part contains images "
-           "from a remote server.\n"
-           "To protect your privacy, "
-           "Balsa has not downloaded them.\n"
-           "You may choose to download them "
-           "if you trust the server.");
-#         else                  /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
+                 N_("This message part contains images "
+                    "from a remote server.\n"
+                    "To protect your privacy, "
+                    "Balsa has not downloaded them.\n"
+                    "You may choose to download them "
+                    "if you trust the server.");
+#else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     static const gchar text[] =
-        N_("This message part contains images "
-           "from a remote server. "
-           "To protect your privacy, "
-           "Balsa has not downloaded them. "
-           "You may choose to download them "
-           "if you trust the server.");
-#         endif                 /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
+                 N_("This message part contains images "
+                    "from a remote server. "
+                    "To protect your privacy, "
+                    "Balsa has not downloaded them. "
+                    "You may choose to download them "
+                    "if you trust the server.");
+#endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
 
     info_bar_widget =
         gtk_info_bar_new_with_buttons(_("_Download images"),
-                                      GTK_RESPONSE_OK,
-                                      _("_Close"), GTK_RESPONSE_CLOSE,
-                                      NULL);
+                                     GTK_RESPONSE_OK,
+                                     _("_Close"), GTK_RESPONSE_CLOSE,
+                                     NULL);
 
     info_bar = GTK_INFO_BAR(info_bar_widget);
     gtk_orientable_set_orientation(GTK_ORIENTABLE
-                                       (gtk_info_bar_get_action_area
-                                           (info_bar)), GTK_ORIENTATION_VERTICAL);
+                                   (gtk_info_bar_get_action_area
+                                    (info_bar)), GTK_ORIENTATION_VERTICAL);
 
     label = gtk_label_new(_(text));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
@@ -465,14 +441,13 @@ lbh_info_bar(LibBalsaWebKitInfo *info)
     return info_bar_widget;
 }
 
-
 /*
  * Callback for the "resource-load-started" signal
  */
 static void
-lbh_resource_notify_response_cb(WebKitWebResource *resource,
-                                GParamSpec        *pspec,
-                                gpointer           data)
+lbh_resource_notify_response_cb(WebKitWebResource * resource,
+                                GParamSpec        * pspec,
+                                gpointer            data)
 {
     LibBalsaWebKitInfo *info = data;
     const gchar *mime_type;
@@ -481,9 +456,8 @@ lbh_resource_notify_response_cb(WebKitWebResource *resource,
     response = webkit_web_resource_get_response(resource);
     mime_type = webkit_uri_response_get_mime_type(response);
     d(g_print("%s mime-type %s\n", __func__, mime_type));
-    if (g_ascii_strncasecmp(mime_type, "image/", 6) != 0) {
+    if (g_ascii_strncasecmp(mime_type, "image/", 6) != 0)
         return;
-    }
 
     if (info->info_bar) {
         d(g_print("%s %s destroy info_bar\n", __func__,
@@ -498,43 +472,39 @@ lbh_resource_notify_response_cb(WebKitWebResource *resource,
     }
 }
 
-
 static void
-lbh_resource_load_started_cb(WebKitWebView     *web_view,
-                             WebKitWebResource *resource,
-                             WebKitURIRequest  *request,
-                             gpointer           data)
+lbh_resource_load_started_cb(WebKitWebView     * web_view,
+                             WebKitWebResource * resource,
+                             WebKitURIRequest  * request,
+                             gpointer            data)
 {
     const gchar *uri;
 
     uri = webkit_uri_request_get_uri(request);
-    if (!g_ascii_strcasecmp(uri, "about:blank")) {
+    if (!g_ascii_strcasecmp(uri, "about:blank"))
         return;
-    }
 
     g_signal_connect(resource, "notify::response",
                      G_CALLBACK(lbh_resource_notify_response_cb), data);
 }
 
-
 /*
  * Callback for the "web-process-crashed" signal
  */
 static gboolean
-lbh_web_process_crashed_cb(WebKitWebView *web_view,
-                           gpointer       data)
+lbh_web_process_crashed_cb(WebKitWebView * web_view,
+                           gpointer        data)
 {
     d(g_print("%s\n", __func__));
     return FALSE;
 }
 
-
 /*
  * WebKitURISchemeRequestCallback for "cid:" URIs
  */
 static void
-lbh_cid_cb(WebKitURISchemeRequest *request,
-           gpointer                data)
+lbh_cid_cb(WebKitURISchemeRequest * request,
+           gpointer                 data)
 {
     LibBalsaWebKitInfo *info = *(LibBalsaWebKitInfo **) data;
     const gchar *path;
@@ -544,7 +514,7 @@ lbh_cid_cb(WebKitURISchemeRequest *request,
     d(g_print("%s path %s\n", __func__, path));
 
     if ((body =
-             libbalsa_message_get_part_by_id(info->body->message, path))) {
+         libbalsa_message_get_part_by_id(info->body->message, path))) {
         gchar *content;
         gssize len;
 
@@ -564,16 +534,15 @@ lbh_cid_cb(WebKitURISchemeRequest *request,
     }
 }
 
-
 /*
  * Callback for the "context-menu" signal
  */
 static gboolean
-lbh_context_menu_cb(WebKitWebView       *web_view,
-                    WebKitContextMenu   *context_menu,
-                    GdkEvent            *event,
-                    WebKitHitTestResult *hit_test_result,
-                    gpointer             data)
+lbh_context_menu_cb(WebKitWebView       * web_view,
+                    WebKitContextMenu   * context_menu,
+                    GdkEvent            * event,
+                    WebKitHitTestResult * hit_test_result,
+                    gpointer              data)
 {
     GtkWidget *parent;
     gboolean retval;
@@ -590,9 +559,8 @@ lbh_context_menu_cb(WebKitWebView       *web_view,
     return retval;
 }
 
-
 /* Create a new WebKitWebView widget:
- * body                 LibBalsaMessageBody that belongs to the
+ * body 		LibBalsaMessageBody that belongs to the
  *                      LibBalsaMessage from which to extract any
  *			HTML objects (by url);
  * hover_cb             callback for link-hover signal;
@@ -600,9 +568,9 @@ lbh_context_menu_cb(WebKitWebView       *web_view,
  */
 
 GtkWidget *
-libbalsa_html_new(LibBalsaMessageBody *body,
-                  LibBalsaHtmlCallback hover_cb,
-                  LibBalsaHtmlCallback clicked_cb)
+libbalsa_html_new(LibBalsaMessageBody * body,
+                  LibBalsaHtmlCallback  hover_cb,
+                  LibBalsaHtmlCallback  clicked_cb)
 {
     gchar *text;
     gssize len;
@@ -618,17 +586,16 @@ libbalsa_html_new(LibBalsaMessageBody *body,
         "<[^>]*src\\s*=\\s*['\"]?\\s*[^c][^i][^d][^:]";
 
     len = lbh_get_body_content_utf8(body, &text);
-    if (len < 0) {
+    if (len < 0)
         return NULL;
-    }
 
     info = g_new(LibBalsaWebKitInfo, 1);
-    info->body = body;
-    info->hover_cb = hover_cb;
-    info->clicked_cb = clicked_cb;
-    info->info_bar = NULL;
-    info->uri = NULL;
-    info->search_text = NULL;
+    info->body            = body;
+    info->hover_cb        = hover_cb;
+    info->clicked_cb      = clicked_cb;
+    info->info_bar        = NULL;
+    info->uri             = NULL;
+    info->search_text     = NULL;
 
     widget = webkit_web_view_new();
     /* WebkitWebView is uncontrollably scrollable, so if we don't set a
@@ -658,7 +625,7 @@ libbalsa_html_new(LibBalsaMessageBody *body,
     webkit_settings_set_enable_plugins(settings, FALSE);
     webkit_settings_set_auto_load_images
         (settings,
-        g_regex_match_simple(cid_regex, text, G_REGEX_CASELESS, 0));
+         g_regex_match_simple(cid_regex, text, G_REGEX_CASELESS, 0));
 
     g_signal_connect(web_view, "mouse-target-changed",
                      G_CALLBACK(lbh_mouse_target_changed_cb), info);
@@ -689,53 +656,45 @@ libbalsa_html_new(LibBalsaMessageBody *body,
     return vbox;
 }
 
-
 void
-libbalsa_html_to_string(gchar **text,
-                        size_t  len)
+libbalsa_html_to_string(gchar ** text, size_t len)
 {
     /* this widget does not support conversion to a string. */
     html2text(text, len);
 }
 
-
 /*
  * We may be passed either the WebKitWebView or its container:
  */
 static gboolean
-lbh_get_web_view(GtkWidget      *widget,
-                 WebKitWebView **web_view)
+lbh_get_web_view(GtkWidget * widget, WebKitWebView ** web_view)
 {
-    if (!WEBKIT_IS_WEB_VIEW(widget)) {
+    if (!WEBKIT_IS_WEB_VIEW(widget))
         widget =
             g_object_get_data(G_OBJECT(widget), "libbalsa-html-web-view");
-    }
 
     *web_view = (WebKitWebView *) widget;
 
     return WEBKIT_IS_WEB_VIEW(*web_view);
 }
 
-
 /*
  * Does the widget support zoom?
  */
 gboolean
-libbalsa_html_can_zoom(GtkWidget *widget)
+libbalsa_html_can_zoom(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
     return lbh_get_web_view(widget, &web_view);
 }
 
-
 /*
  * Zoom the widget.
  */
-#         define LIBBALSA_HTML_ZOOM_FACTOR 1.2
+#define LIBBALSA_HTML_ZOOM_FACTOR 1.2
 void
-libbalsa_html_zoom(GtkWidget *widget,
-                   gint       in_out)
+libbalsa_html_zoom(GtkWidget * widget, gint in_out)
 {
     WebKitWebView *web_view;
 
@@ -748,15 +707,12 @@ libbalsa_html_zoom(GtkWidget *widget,
         case +1:
             zoom_level *= LIBBALSA_HTML_ZOOM_FACTOR;
             break;
-
         case -1:
             zoom_level /= LIBBALSA_HTML_ZOOM_FACTOR;
             break;
-
         case 0:
             zoom_level = 1.0;
             break;
-
         default:
             break;
         }
@@ -765,60 +721,53 @@ libbalsa_html_zoom(GtkWidget *widget,
     }
 }
 
-
 /*
  * Does the widget support selecting text?
  */
 gboolean
-libbalsa_html_can_select(GtkWidget *widget)
+libbalsa_html_can_select(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
     return lbh_get_web_view(widget, &web_view);
 }
-
 
 /*
  * Select all the text.
  */
 void
-libbalsa_html_select_all(GtkWidget *widget)
+libbalsa_html_select_all(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
-    if (lbh_get_web_view(widget, &web_view)) {
+    if (lbh_get_web_view(widget, &web_view))
         webkit_web_view_execute_editing_command
             (web_view, WEBKIT_EDITING_COMMAND_SELECT_ALL);
-    }
 }
-
 
 /*
  * Copy selected text to the clipboard.
  */
 void
-libbalsa_html_copy(GtkWidget *widget)
+libbalsa_html_copy(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
-    if (lbh_get_web_view(widget, &web_view)) {
+    if (lbh_get_web_view(widget, &web_view))
         webkit_web_view_execute_editing_command
             (web_view, WEBKIT_EDITING_COMMAND_COPY);
-    }
 }
-
 
 /*
  * Does the widget support searching text?
  */
 gboolean
-libbalsa_html_can_search(GtkWidget *widget)
+libbalsa_html_can_search(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
     return lbh_get_web_view(widget, &web_view);
 }
-
 
 /*
  * Search for the text; if text is empty, call the callback with TRUE
@@ -826,14 +775,13 @@ libbalsa_html_can_search(GtkWidget *widget)
  */
 
 static void
-lbh_search_failed_to_find_text_cb(WebKitFindController *controller,
-                                  gpointer              data)
+lbh_search_failed_to_find_text_cb(WebKitFindController * controller,
+                                  gpointer               data)
 {
     LibBalsaWebKitInfo *info = data;
 
     (*info->search_cb)(info->search_text, FALSE, info->search_cb_data);
 }
-
 
 static void
 lbh_search_found_text_cb(WebKitFindController *controller,
@@ -845,11 +793,10 @@ lbh_search_found_text_cb(WebKitFindController *controller,
     (*info->search_cb)(info->search_text, TRUE, info->search_cb_data);
 }
 
-
 static void
-lbh_search_init(LibBalsaWebKitInfo        *info,
-                WebKitFindController      *controller,
-                const gchar               *text,
+lbh_search_init(LibBalsaWebKitInfo       * info,
+                WebKitFindController     * controller,
+                const gchar              * text,
                 gboolean                   find_forward,
                 gboolean                   wrap,
                 LibBalsaHtmlSearchCallback search_cb,
@@ -879,41 +826,36 @@ lbh_search_init(LibBalsaWebKitInfo        *info,
     }
 
     find_options = WEBKIT_FIND_OPTIONS_CASE_INSENSITIVE;
-    if (!find_forward) {
+    if (!find_forward)
         find_options |= WEBKIT_FIND_OPTIONS_BACKWARDS;
-    }
-    if (wrap) {
+    if (wrap)
         find_options |= WEBKIT_FIND_OPTIONS_WRAP_AROUND;
-    }
 
     webkit_find_controller_search(controller, text, find_options,
                                   G_MAXUINT);
 }
 
-
 static void
-lbh_search_continue(WebKitFindController *controller,
-                    const gchar          *text,
-                    gboolean              find_forward,
-                    gboolean              wrap)
+lbh_search_continue(WebKitFindController * controller,
+                    const gchar          * text,
+                    gboolean               find_forward,
+                    gboolean               wrap)
 {
     guint32 find_options;
     guint32 orig_find_options;
 
     orig_find_options = find_options =
-            webkit_find_controller_get_options(controller);
+        webkit_find_controller_get_options(controller);
 
-    if (!find_forward) {
+    if (!find_forward)
         find_options |= WEBKIT_FIND_OPTIONS_BACKWARDS;
-    } else {
+    else
         find_options &= ~WEBKIT_FIND_OPTIONS_BACKWARDS;
-    }
 
-    if (wrap) {
+    if (wrap)
         find_options |= WEBKIT_FIND_OPTIONS_WRAP_AROUND;
-    } else {
+    else
         find_options &= ~WEBKIT_FIND_OPTIONS_WRAP_AROUND;
-    }
 
     if (find_options != orig_find_options) {
         /* No setter for find-options, so we start a new search */
@@ -921,18 +863,16 @@ lbh_search_continue(WebKitFindController *controller,
                                       G_MAXUINT);
     } else {
         /* OK to use next/previous methods */
-        if (find_forward) {
+        if (find_forward)
             webkit_find_controller_search_next(controller);
-        } else {
+        else
             webkit_find_controller_search_previous(controller);
-        }
     }
 }
 
-
 void
-libbalsa_html_search(GtkWidget                 *widget,
-                     const gchar               *text,
+libbalsa_html_search(GtkWidget                * widget,
+                     const gchar              * text,
                      gboolean                   find_forward,
                      gboolean                   wrap,
                      LibBalsaHtmlSearchCallback search_cb,
@@ -957,56 +897,51 @@ libbalsa_html_search(GtkWidget                 *widget,
     }
 }
 
-
 /*
  * We do not need selection bounds.
  */
 gboolean
-libbalsa_html_get_selection_bounds(GtkWidget    *widget,
-                                   GdkRectangle *selection_bounds)
+libbalsa_html_get_selection_bounds(GtkWidget    * widget,
+                                   GdkRectangle * selection_bounds)
 {
     return FALSE;
 }
-
 
 /*
  * Get the WebKitWebView widget from the container; we need to connect
  * to its "populate-popup" signal.
  */
 GtkWidget *
-libbalsa_html_popup_menu_widget(GtkWidget *widget)
+libbalsa_html_popup_menu_widget(GtkWidget * widget)
 {
     return NULL;
 }
 
-
 GtkWidget *
-libbalsa_html_get_view_widget(GtkWidget *widget)
+libbalsa_html_get_view_widget(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
     return lbh_get_web_view(widget, &web_view) ?
-           GTK_WIDGET(web_view) : NULL;
+        GTK_WIDGET(web_view) : NULL;
 }
-
 
 /*
  * Does the widget support printing?
  */
 gboolean
-libbalsa_html_can_print(GtkWidget *widget)
+libbalsa_html_can_print(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
     return lbh_get_web_view(widget, &web_view);
 }
 
-
 /*
  * Print the widget's content.
  */
 void
-libbalsa_html_print(GtkWidget *widget)
+libbalsa_html_print(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
@@ -1015,9 +950,8 @@ libbalsa_html_print(GtkWidget *widget)
         WebKitPrintOperation *print_operation;
         WebKitPrintOperationResponse response;
 
-        if (!settings) {
+        if (!settings)
             settings = gtk_print_settings_new();
-        }
 
         print_operation = webkit_print_operation_new(web_view);
         webkit_print_operation_set_print_settings(print_operation,
@@ -1034,20 +968,19 @@ libbalsa_html_print(GtkWidget *widget)
     }
 }
 
-
-#      else                     /* defined(USE_WEBKIT2) */
-#         include <webkit/webkit.h>
-#         include <JavaScriptCore/JavaScript.h>
+#  else                         /* defined(USE_WEBKIT2) */
+#include <webkit/webkit.h>
+#include <JavaScriptCore/JavaScript.h>
 
 typedef struct {
-    LibBalsaMessageBody *body;
-    LibBalsaHtmlCallback hover_cb;
-    LibBalsaHtmlCallback clicked_cb;
-    WebKitWebFrame *frame;
-    gboolean download_images;
-    GtkWidget *vbox;
-    gboolean has_info_bar;
-    WebKitWebView *web_view;
+    LibBalsaMessageBody  *body;
+    LibBalsaHtmlCallback  hover_cb;
+    LibBalsaHtmlCallback  clicked_cb;
+    WebKitWebFrame       *frame;
+    gboolean              download_images;
+    GtkWidget            *vbox;
+    gboolean              has_info_bar;
+    WebKitWebView        *web_view;
 } LibBalsaWebKitInfo;
 
 /*
@@ -1056,16 +989,15 @@ typedef struct {
  * Pass the URI to the handler set by the caller
  */
 static void
-lbh_hovering_over_link_cb(GtkWidget   *web_view,
-                          const gchar *title,
-                          const gchar *uri,
-                          gpointer     data)
+lbh_hovering_over_link_cb(GtkWidget   * web_view,
+                          const gchar * title,
+                          const gchar * uri,
+                          gpointer      data)
 {
     LibBalsaWebKitInfo *info = data;
 
     (*info->hover_cb)(uri);
 }
-
 
 /*
  * Callback for the "navigation-policy-decision-requested" signal
@@ -1075,12 +1007,12 @@ lbh_hovering_over_link_cb(GtkWidget   *web_view,
  * are supposed to open in their own windows.
  */
 static gboolean
-lbh_navigation_policy_decision_requested_cb(WebKitWebView             *web_view,
-                                            WebKitWebFrame            *frame,
-                                            WebKitNetworkRequest      *request,
-                                            WebKitWebNavigationAction *action,
-                                            WebKitWebPolicyDecision   *decision,
-                                            gpointer                   data)
+lbh_navigation_policy_decision_requested_cb(WebKitWebView             * web_view,
+                                            WebKitWebFrame            * frame,
+                                            WebKitNetworkRequest      * request,
+                                            WebKitWebNavigationAction * action,
+                                            WebKitWebPolicyDecision   * decision,
+                                            gpointer                    data)
 {
     WebKitWebNavigationReason reason;
     LibBalsaWebKitInfo *info = data;
@@ -1089,21 +1021,21 @@ lbh_navigation_policy_decision_requested_cb(WebKitWebView             *web_view,
 
     /* First request is for "about:blank"; we must allow it, but first
      * we store the main frame, so we can detect a new frame later. */
-    if (!info->frame) {
+    if (!info->frame)
         info->frame = frame;
-    } else if ((web_view == info->web_view)
-               && (frame != info->frame)
-               && (reason == WEBKIT_WEB_NAVIGATION_REASON_OTHER)) {
-        g_message("%s new frame ignored:\n URI=“%s”", __func__,
+    else if (web_view == info->web_view
+             && frame != info->frame
+             && reason == WEBKIT_WEB_NAVIGATION_REASON_OTHER) {
+        g_message("%s new frame ignored:\n URI=“%s”", __func__, 
                   webkit_network_request_get_uri(request));
         webkit_web_policy_decision_ignore(decision);
         return TRUE;
     }
 
-    if ((reason == WEBKIT_WEB_NAVIGATION_REASON_LINK_CLICKED) ||
-        ((web_view != info->web_view)
-         && (reason == WEBKIT_WEB_NAVIGATION_REASON_OTHER))) {
-        (*info->clicked_cb)(webkit_network_request_get_uri(request));
+    if (reason == WEBKIT_WEB_NAVIGATION_REASON_LINK_CLICKED ||
+        (web_view != info->web_view
+         && reason == WEBKIT_WEB_NAVIGATION_REASON_OTHER)) {
+        (*info->clicked_cb) (webkit_network_request_get_uri(request));
         webkit_web_policy_decision_ignore(decision);
         return TRUE;
     }
@@ -1111,15 +1043,13 @@ lbh_navigation_policy_decision_requested_cb(WebKitWebView             *web_view,
     return FALSE;
 }
 
-
 /*
  * Show the GtkInfoBar for asking about downloading images
  */
 
 static void
-lbh_info_bar_response_cb(GtkInfoBar *info_bar,
-                         gint        response_id,
-                         gpointer    user_data)
+lbh_info_bar_response_cb(GtkInfoBar * info_bar,
+                         gint response_id, gpointer user_data)
 {
     LibBalsaWebKitInfo *info = user_data;
 
@@ -1131,7 +1061,7 @@ lbh_info_bar_response_cb(GtkInfoBar *info_bar,
             webkit_web_view_reload_bypass_cache(info->web_view);
             webkit_web_view_load_string(info->web_view, text, "text/html",
                                         libbalsa_message_body_charset
-                                            (info->body), NULL);
+                                        (info->body), NULL);
             g_free(text);
         }
     }
@@ -1139,9 +1069,8 @@ lbh_info_bar_response_cb(GtkInfoBar *info_bar,
     gtk_widget_destroy(GTK_WIDGET(info_bar));
 }
 
-
 static void
-lbh_show_info_bar(LibBalsaWebKitInfo *info)
+lbh_show_info_bar(LibBalsaWebKitInfo * info)
 {
     GtkWidget *info_bar_widget;
     GtkInfoBar *info_bar;
@@ -1154,15 +1083,14 @@ lbh_show_info_bar(LibBalsaWebKitInfo *info)
                     "You may choose to download them "
                     "if you trust the server.");
 
-    if (info->has_info_bar) {
+    if (info->has_info_bar)
         return;
-    }
 
     info_bar_widget =
         gtk_info_bar_new_with_buttons(_("_Download images"),
-                                      GTK_RESPONSE_OK,
-                                      _("_Close"), GTK_RESPONSE_CLOSE,
-                                      NULL);
+                                     GTK_RESPONSE_OK,
+                                     _("_Close"), GTK_RESPONSE_CLOSE,
+                                     NULL);
     gtk_box_pack_start(GTK_BOX(info->vbox), info_bar_widget);
 
     info_bar = GTK_INFO_BAR(info_bar_widget);
@@ -1181,7 +1109,6 @@ lbh_show_info_bar(LibBalsaWebKitInfo *info)
     info->has_info_bar = TRUE;
 }
 
-
 /*
  * Callback for the "resource-request-starting" signal
  *
@@ -1190,28 +1117,26 @@ lbh_show_info_bar(LibBalsaWebKitInfo *info)
  */
 
 static void
-lbh_resource_request_starting_cb(WebKitWebView         *web_view,
-                                 WebKitWebFrame        *frame,
-                                 WebKitWebResource     *resource,
-                                 WebKitNetworkRequest  *request,
-                                 WebKitNetworkResponse *response,
-                                 gpointer               data)
+lbh_resource_request_starting_cb(WebKitWebView         * web_view,
+                                 WebKitWebFrame        * frame,
+                                 WebKitWebResource     * resource,
+                                 WebKitNetworkRequest  * request,
+                                 WebKitNetworkResponse * response,
+                                 gpointer                data)
 {
     const gchar *uri = webkit_network_request_get_uri(request);
     LibBalsaWebKitInfo *info = data;
 
-    if (!g_ascii_strcasecmp(uri, "about:blank")) {
+    if (!g_ascii_strcasecmp(uri, "about:blank"))
         return;
-    }
 
     if (g_ascii_strncasecmp(uri, "cid:", 4)) {
         /* Not a "cid:" request: disable loading. */
         static GHashTable *cache = NULL;
 
-        if (!cache) {
+        if (!cache)
             cache = g_hash_table_new_full(g_str_hash, g_str_equal,
                                           g_free, NULL);
-        }
 
         if (!g_hash_table_lookup(cache, uri)) {
             if (info->download_images) {
@@ -1227,7 +1152,7 @@ lbh_resource_request_starting_cb(WebKitWebView         *web_view,
 
         /* Replace "cid:" request with a "file:" request. */
         if ((body =
-                 libbalsa_message_get_part_by_id(info->body->message, uri + 4))
+             libbalsa_message_get_part_by_id(info->body->message, uri + 4))
             && libbalsa_message_body_save_temporary(body, NULL)) {
             gchar *file_uri =
                 g_strconcat("file://", body->temp_filename, NULL);
@@ -1236,7 +1161,6 @@ lbh_resource_request_starting_cb(WebKitWebView         *web_view,
         }
     }
 }
-
 
 /*
  * To handle a clicked link that is supposed to open in a new window
@@ -1249,76 +1173,71 @@ lbh_resource_request_starting_cb(WebKitWebView         *web_view,
  * Allow the new window only if it is needed because a link was clicked.
  */
 static gboolean
-lbh_new_window_policy_decision_requested_cb(WebKitWebView             *web_view,
-                                            WebKitWebFrame            *frame,
-                                            WebKitNetworkRequest      *request,
-                                            WebKitWebNavigationAction *action,
-                                            WebKitWebPolicyDecision   *decision,
-                                            gpointer                   data)
+lbh_new_window_policy_decision_requested_cb(WebKitWebView             * web_view,
+                                            WebKitWebFrame            * frame,
+                                            WebKitNetworkRequest      * request,
+                                            WebKitWebNavigationAction * action,
+                                            WebKitWebPolicyDecision   * decision,
+                                            gpointer                    data)
 {
     WebKitWebNavigationReason reason;
 
     g_object_get(action, "reason", &reason, NULL);
 
-    if (reason == WEBKIT_WEB_NAVIGATION_REASON_LINK_CLICKED) {
+    if (reason == WEBKIT_WEB_NAVIGATION_REASON_LINK_CLICKED)
         return FALSE;
-    }
 
     webkit_web_policy_decision_ignore(decision);
     return TRUE;
 }
 
-
 /*
  * Idle handler to actually unref it.
  */
 static gboolean
-lbh_web_view_ready_idle(WebKitWebView *web_view)
+lbh_web_view_ready_idle(WebKitWebView * web_view)
 {
     g_object_unref(g_object_ref_sink(web_view));
 
     return FALSE;
 }
 
-
 /*
  * Window is ready, now we destroy it.
  */
 static gboolean
-lbh_web_view_ready_cb(WebKitWebView *web_view,
-                      gpointer       data)
+lbh_web_view_ready_cb(WebKitWebView * web_view,
+                      gpointer        data)
 {
     g_idle_add((GSourceFunc) lbh_web_view_ready_idle, web_view);
 
     return TRUE;
 }
 
-
 /*
  * WebKit wants a new window.
  */
 static WebKitWebView *
-lbh_create_web_view_cb(WebKitWebView  *web_view,
-                       WebKitWebFrame *frame,
-                       gpointer        data)
+lbh_create_web_view_cb(WebKitWebView  * web_view,
+                       WebKitWebFrame * frame,
+                       gpointer         data)
 {
     GtkWidget *widget;
 
     widget = webkit_web_view_new();
     g_signal_connect(widget, "navigation-policy-decision-requested",
                      G_CALLBACK
-                         (lbh_navigation_policy_decision_requested_cb), data);
+                     (lbh_navigation_policy_decision_requested_cb), data);
     g_signal_connect(widget, "web-view-ready", G_CALLBACK(lbh_web_view_ready_cb),
                      NULL);
 
     return WEBKIT_WEB_VIEW(widget);
 }
 
-
 /* Create a new WebKitWebView widget:
  * text			the HTML source;
  * len			length of text;
- * body                 LibBalsaMessageBody that belongs to the
+ * body 		LibBalsaMessageBody that belongs to the
  *                      LibBalsaMessage from which to extract any
  *			HTML objects (by url);
  * hover_cb             callback for link-hover signal;
@@ -1326,9 +1245,9 @@ lbh_create_web_view_cb(WebKitWebView  *web_view,
  */
 
 GtkWidget *
-libbalsa_html_new(LibBalsaMessageBody *body,
-                  LibBalsaHtmlCallback hover_cb,
-                  LibBalsaHtmlCallback clicked_cb)
+libbalsa_html_new(LibBalsaMessageBody * body,
+                  LibBalsaHtmlCallback  hover_cb,
+                  LibBalsaHtmlCallback  clicked_cb)
 {
     gchar *text;
     gssize len;
@@ -1338,18 +1257,17 @@ libbalsa_html_new(LibBalsaMessageBody *body,
     LibBalsaWebKitInfo *info;
 
     len = lbh_get_body_content(body, &text);
-    if (len < 0) {
+    if (len < 0)
         return NULL;
-    }
 
     info = g_new(LibBalsaWebKitInfo, 1);
-    info->body = body;
-    info->hover_cb = hover_cb;
-    info->clicked_cb = clicked_cb;
-    info->frame = NULL;
+    info->body            = body;
+    info->hover_cb        = hover_cb;
+    info->clicked_cb      = clicked_cb;
+    info->frame           = NULL;
     info->download_images = FALSE;
-    info->has_info_bar = FALSE;
-    info->vbox = vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    info->has_info_bar    = FALSE;
+    info->vbox = vbox     = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
     widget = webkit_web_view_new();
     gtk_widget_set_vexpand(widget, TRUE);
@@ -1361,15 +1279,15 @@ libbalsa_html_new(LibBalsaMessageBody *body,
                            g_free);
 
     g_object_set(webkit_web_view_get_settings(web_view),
-                 "enable-scripts", FALSE,
-                 "enable-plugins", FALSE,
+                 "enable-scripts",   FALSE,
+                 "enable-plugins",   FALSE,
                  NULL);
 
     g_signal_connect(web_view, "hovering-over-link",
                      G_CALLBACK(lbh_hovering_over_link_cb), info);
     g_signal_connect(web_view, "navigation-policy-decision-requested",
                      G_CALLBACK
-                         (lbh_navigation_policy_decision_requested_cb), info);
+                     (lbh_navigation_policy_decision_requested_cb), info);
     g_signal_connect(web_view, "resource-request-starting",
                      G_CALLBACK(lbh_resource_request_starting_cb), info);
     g_signal_connect(web_view, "new-window-policy-decision-requested",
@@ -1388,19 +1306,15 @@ libbalsa_html_new(LibBalsaMessageBody *body,
     return vbox;
 }
 
-
 void
-libbalsa_html_to_string(gchar **text,
-                        size_t  len)
+libbalsa_html_to_string(gchar ** text, size_t len)
 {
     /* this widget does not support conversion to a string. */
     html2text(text, len);
 }
 
-
 static gboolean
-lbh_get_web_view(GtkWidget      *widget,
-                 WebKitWebView **web_view)
+lbh_get_web_view(GtkWidget * widget, WebKitWebView ** web_view)
 {
     *web_view =
         g_object_get_data(G_OBJECT(widget), "libbalsa-html-web-view");
@@ -1408,25 +1322,22 @@ lbh_get_web_view(GtkWidget      *widget,
     return *web_view && WEBKIT_IS_WEB_VIEW(*web_view);
 }
 
-
 /*
  * Does the widget support zoom?
  */
 gboolean
-libbalsa_html_can_zoom(GtkWidget *widget)
+libbalsa_html_can_zoom(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
     return lbh_get_web_view(widget, &web_view);
 }
 
-
 /*
  * Zoom the widget.
  */
 void
-libbalsa_html_zoom(GtkWidget *widget,
-                   gint       in_out)
+libbalsa_html_zoom(GtkWidget * widget, gint in_out)
 {
     WebKitWebView *web_view;
 
@@ -1435,88 +1346,77 @@ libbalsa_html_zoom(GtkWidget *widget,
         case +1:
             webkit_web_view_zoom_in(web_view);
             break;
-
         case -1:
             webkit_web_view_zoom_out(web_view);
             break;
-
         case 0:
             webkit_web_view_set_zoom_level(web_view, 1.0);
             break;
-
         default:
             break;
         }
     }
 }
 
-
 /*
  * Does the widget support selecting text?
  */
 gboolean
-libbalsa_html_can_select(GtkWidget *widget)
+libbalsa_html_can_select(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
     return lbh_get_web_view(widget, &web_view);
 }
-
 
 /*
  * Select all the text.
  */
 void
-libbalsa_html_select_all(GtkWidget *widget)
+libbalsa_html_select_all(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
-    if (lbh_get_web_view(widget, &web_view)) {
+    if (lbh_get_web_view(widget, &web_view))
         webkit_web_view_select_all(web_view);
-    }
 }
-
 
 /*
  * Copy selected text to the clipboard.
  */
 void
-libbalsa_html_copy(GtkWidget *widget)
+libbalsa_html_copy(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
-    if (lbh_get_web_view(widget, &web_view)) {
+    if (lbh_get_web_view(widget, &web_view))
         webkit_web_view_copy_clipboard(web_view);
-    }
 }
-
 
 /*
  * Does the widget support searching text?
  */
 gboolean
-libbalsa_html_can_search(GtkWidget *widget)
+libbalsa_html_can_search(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
     return lbh_get_web_view(widget, &web_view);
 }
 
-
 /*
  * JavaScript-based helpers for text search
  */
 static JSGlobalContextRef
-lbh_js_get_global_context(WebKitWebView *web_view)
+lbh_js_get_global_context(WebKitWebView * web_view)
 {
     WebKitWebFrame *web_frame = webkit_web_view_get_main_frame(web_view);
     return webkit_web_frame_get_global_context(web_frame);
 }
 
-
 static JSValueRef
-lbh_js_run_script(JSContextRef ctx,
-                  const gchar *script)
+lbh_js_run_script(JSContextRef  ctx,
+                  const gchar * script)
 {
     JSStringRef str;
     JSValueRef value;
@@ -1528,27 +1428,25 @@ lbh_js_run_script(JSContextRef ctx,
     return value;
 }
 
-
 static gint
-lbh_js_object_get_property(JSContextRef ctx,
-                           JSObjectRef  object,
-                           const gchar *property_name)
+lbh_js_object_get_property(JSContextRef  ctx,
+                           JSObjectRef   object,
+                           const gchar * property_name)
 {
-    JSStringRef str = JSStringCreateWithUTF8CString(property_name);
+    JSStringRef str  = JSStringCreateWithUTF8CString(property_name);
     JSValueRef value = JSObjectGetProperty(ctx, object, str, NULL);
     JSStringRelease(str);
 
     return (gint) JSValueToNumber(ctx, value, NULL);
 }
 
-
 /*
  * Search for the text; if text is empty, return TRUE (for consistency
  * with GtkTextIter methods).
  */
 void
-libbalsa_html_search(GtkWidget                 *widget,
-                     const gchar               *text,
+libbalsa_html_search(GtkWidget                * widget,
+                     const gchar              * text,
                      gboolean                   find_forward,
                      gboolean                   wrap,
                      LibBalsaHtmlSearchCallback search_cb,
@@ -1557,9 +1455,8 @@ libbalsa_html_search(GtkWidget                 *widget,
     WebKitWebView *web_view;
     gboolean retval;
 
-    if (!lbh_get_web_view(widget, &web_view)) {
+    if (!lbh_get_web_view(widget, &web_view))
         return;
-    }
 
     if (!*text) {
         gchar script[] = "window.getSelection().removeAllRanges()";
@@ -1578,14 +1475,13 @@ libbalsa_html_search(GtkWidget                 *widget,
     return;
 }
 
-
 /*
  * Get the rectangle containing the currently selected text, for
  * scrolling.
  */
 gboolean
-libbalsa_html_get_selection_bounds(GtkWidget    *widget,
-                                   GdkRectangle *selection_bounds)
+libbalsa_html_get_selection_bounds(GtkWidget    * widget,
+                                   GdkRectangle * selection_bounds)
 {
     WebKitWebView *web_view;
     JSGlobalContextRef ctx;
@@ -1593,9 +1489,8 @@ libbalsa_html_get_selection_bounds(GtkWidget    *widget,
         "window.getSelection().getRangeAt(0).getBoundingClientRect()";
     JSValueRef value;
 
-    if (!lbh_get_web_view(widget, &web_view)) {
+    if (!lbh_get_web_view(widget, &web_view))
         return FALSE;
-    }
 
     ctx = lbh_js_get_global_context(web_view);
     value = lbh_js_run_script(ctx, script);
@@ -1623,45 +1518,41 @@ libbalsa_html_get_selection_bounds(GtkWidget    *widget,
     return FALSE;
 }
 
-
 /*
  * Get the WebKitWebView widget from the container; we need to connect
  * to its "populate-popup" signal.
  */
 GtkWidget *
-libbalsa_html_popup_menu_widget(GtkWidget *widget)
+libbalsa_html_popup_menu_widget(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
     return lbh_get_web_view(widget, &web_view) ?
-           GTK_WIDGET(web_view) : NULL;
+        GTK_WIDGET(web_view) : NULL;
 }
 
-
 GtkWidget *
-libbalsa_html_get_view_widget(GtkWidget *widget)
+libbalsa_html_get_view_widget(GtkWidget * widget)
 {
     return libbalsa_html_popup_menu_widget(widget);
 }
-
 
 /*
  * Does the widget support printing?
  */
 gboolean
-libbalsa_html_can_print(GtkWidget *widget)
+libbalsa_html_can_print(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
     return lbh_get_web_view(widget, &web_view);
 }
 
-
 /*
  * Print the widget's content.
  */
 void
-libbalsa_html_print(GtkWidget *widget)
+libbalsa_html_print(GtkWidget * widget)
 {
     WebKitWebView *web_view;
 
@@ -1671,19 +1562,18 @@ libbalsa_html_print(GtkWidget *widget)
     }
 }
 
-
-#      endif                    /* defined(USE_WEBKIT2) */
-#   else                        /* defined(HAVE_WEBKIT) */
+#  endif                        /* defined(USE_WEBKIT2) */
+# else                          /* defined(HAVE_WEBKIT) */
 
 /* Code for GtkHTML-4 */
-#      include <gtkhtml/gtkhtml.h>
-#      include <gtkhtml/gtkhtml-stream.h>
+#include <gtkhtml/gtkhtml.h>
+#include <gtkhtml/gtkhtml-stream.h>
 
 /* Forward reference. */
-static gboolean libbalsa_html_url_requested(GtkWidget       *html,
-                                            const gchar     *url,
-                                            gpointer         stream,
-                                            LibBalsaMessage *msg);
+static gboolean libbalsa_html_url_requested(GtkWidget * html,
+					    const gchar * url,
+					    gpointer stream,
+					    LibBalsaMessage * msg);
 
 typedef struct {
     LibBalsaHtmlCallback hover_cb;
@@ -1691,70 +1581,60 @@ typedef struct {
 } LibBalsaHTMLInfo;
 
 static void
-lbh_navigation_requested_cb(GtkWidget   *widget,
-                            const gchar *uri,
-                            gpointer     data)
+lbh_navigation_requested_cb(GtkWidget   * widget,
+                            const gchar * uri,
+                            gpointer      data)
 {
     LibBalsaHTMLInfo *info = data;
 
-    if (info->clicked_cb) {
+    if (info->clicked_cb)
         (*info->clicked_cb)(uri);
-    }
 }
-
 
 static void
-lbh_hovering_over_link_cb(GtkWidget   *widget,
-                          const gchar *uri,
-                          gpointer     data)
+lbh_hovering_over_link_cb(GtkWidget   * widget,
+                          const gchar * uri,
+                          gpointer      data)
 {
     LibBalsaHTMLInfo *info = data;
 
-    if (info->hover_cb) {
-        (*info->hover_cb)(uri);
-    }
+    if (info->hover_cb)
+        (*info->hover_cb) (uri);
 }
-
 
 /* Callback for exporting an HTML part as text/plain. */
 static gboolean
-libbalsa_html_receiver_fn(gpointer     engine,
-                          const gchar *data,
-                          size_t       len,
-                          GString     *export_string)
+libbalsa_html_receiver_fn(gpointer engine, const gchar * data, size_t len,
+			  GString * export_string)
 {
     g_string_append(export_string, data);
     return TRUE;
 }
 
-
 /* Widget-dependent helper. */
 static void
-libbalsa_html_write_mime_stream(GtkHTMLStream *stream,
-                                GMimeStream   *mime_stream)
+libbalsa_html_write_mime_stream(GtkHTMLStream * stream,
+                                GMimeStream * mime_stream)
 {
     gint i;
     char buf[4096];
 
-    while ((i = g_mime_stream_read(mime_stream, buf, sizeof(buf))) > 0) {
-        gtk_html_stream_write(stream, buf, i);
-    }
+    while ((i = g_mime_stream_read(mime_stream, buf, sizeof(buf))) > 0)
+	gtk_html_stream_write(stream, buf, i);
     gtk_html_stream_close(stream, GTK_HTML_STREAM_OK);
 }
-
 
 /* Helper for creating a new GtkHTML widget:
  * text			the HTML source;
  * len			length of text;
  * charset		source charset, or NULL;
- * export_string        if we want the text exported as text/plain, a
- *                      GString to receive it; otherwise NULL;
+ * export_string 	if we want the text exported as text/plain, a
+ * 			GString to receive it; otherwise NULL;
  */
 static GtkWidget *
-lbh_new(const gchar *text,
-        size_t       len,
-        const gchar *charset,
-        GString     *export_string)
+lbh_new(const gchar * text, size_t len,
+	const gchar * charset,
+        GString * export_string)
 {
     GtkWidget *html;
     GtkHTMLStream *stream;
@@ -1762,8 +1642,8 @@ lbh_new(const gchar *text,
     html = gtk_html_new();
     stream = gtk_html_begin(GTK_HTML(html));
     if (len > 0) {
-        if (charset && (g_ascii_strcasecmp(charset, "us-ascii") != 0)
-            && (g_ascii_strcasecmp(charset, "utf-8") != 0)) {
+        if (charset && g_ascii_strcasecmp(charset, "us-ascii") != 0
+            && g_ascii_strcasecmp(charset, "utf-8") != 0) {
             const gchar *charset_iconv;
             gchar *s;
             gsize bytes_written;
@@ -1777,25 +1657,21 @@ lbh_new(const gchar *text,
                           __func__, charset_iconv, error->message);
                 g_error_free(error);
                 gtk_html_write(GTK_HTML(html), stream, text, len);
-            } else {
+            } else
                 gtk_html_write(GTK_HTML(html), stream, s, bytes_written);
-            }
             g_free(s);
-        } else {
+        } else
             gtk_html_write(GTK_HTML(html), stream, text, len);
-        }
     }
-    if (export_string) {
-        gtk_html_export(GTK_HTML(html), "text/plain",
-                        (GtkHTMLSaveReceiverFn) libbalsa_html_receiver_fn,
-                        export_string);
-    }
+    if (export_string)
+	gtk_html_export(GTK_HTML(html), "text/plain",
+			(GtkHTMLSaveReceiverFn) libbalsa_html_receiver_fn,
+			export_string);
     gtk_html_end(GTK_HTML(html), stream, GTK_HTML_STREAM_OK);
-    if (export_string) {
-        gtk_html_export(GTK_HTML(html), "text/plain",
-                        (GtkHTMLSaveReceiverFn) libbalsa_html_receiver_fn,
-                        export_string);
-    }
+    if (export_string)
+	gtk_html_export(GTK_HTML(html), "text/plain",
+			(GtkHTMLSaveReceiverFn) libbalsa_html_receiver_fn,
+			export_string);
 
     gtk_html_set_editable(GTK_HTML(html), FALSE);
     gtk_html_allow_selection(GTK_HTML(html), TRUE);
@@ -1803,20 +1679,19 @@ lbh_new(const gchar *text,
     return html;
 }
 
-
 /* Create a new HtmlView widget:
  * text			the HTML source;
  * len			length of text;
- * body                 LibBalsaMessageBody that belongs to the
+ * body 		LibBalsaMessageBody that belongs to the
  *                      LibBalsaMessage from which to extract any
  *			HTML objects (by url);
  * hover_cb             callback for the "on-url" signal;
  * link_clicked_cb	callback for the "link-clicked" signal;
  */
 GtkWidget *
-libbalsa_html_new(LibBalsaMessageBody *body,
-                  LibBalsaHtmlCallback hover_cb,
-                  LibBalsaHtmlCallback clicked_cb)
+libbalsa_html_new(LibBalsaMessageBody * body,
+                  LibBalsaHtmlCallback  hover_cb,
+                  LibBalsaHtmlCallback  clicked_cb)
 {
     gssize len;
     gchar *text;
@@ -1824,9 +1699,8 @@ libbalsa_html_new(LibBalsaMessageBody *body,
     LibBalsaHTMLInfo *info;
 
     len = lbh_get_body_content(body, &text);
-    if (len < 0) {
+    if (len < 0)
         return NULL;
-    }
 
     widget = lbh_new(text, len, libbalsa_message_body_charset(body), NULL);
     g_free(text);
@@ -1849,20 +1723,18 @@ libbalsa_html_new(LibBalsaMessageBody *body,
     return widget;
 }
 
-
 /* Use an HtmlView widget to convert html text to a (null-terminated) string:
  * text			the HTML source;
  * len			length of text;
  * frees and reallocates the string.
  */
 void
-libbalsa_html_to_string(gchar **text,
-                        size_t  len)
+libbalsa_html_to_string(gchar ** text, size_t len)
 {
     GtkWidget *html;
     GString *str;
 
-    str = g_string_new(NULL);   /* We want only the text, in str. */
+    str = g_string_new(NULL);	/* We want only the text, in str. */
     html = lbh_new(*text, len, NULL, str);
     gtk_widget_destroy(html);
 
@@ -1870,88 +1742,77 @@ libbalsa_html_to_string(gchar **text,
     *text = g_string_free(str, FALSE);
 }
 
-
 /*
  * Does the widget support zoom?
  */
 gboolean
-libbalsa_html_can_zoom(GtkWidget *widget)
+libbalsa_html_can_zoom(GtkWidget * widget)
 {
     return GTK_IS_HTML(widget);
 }
-
 
 /*
  * Zoom the widget.
  */
 void
-libbalsa_html_zoom(GtkWidget *widget,
-                   gint       in_out)
+libbalsa_html_zoom(GtkWidget * widget, gint in_out)
 {
     switch (in_out) {
     case +1:
-        gtk_html_zoom_in(GTK_HTML(widget));
-        break;
-
+	gtk_html_zoom_in(GTK_HTML(widget));
+	break;
     case -1:
-        gtk_html_zoom_out(GTK_HTML(widget));
-        break;
-
+	gtk_html_zoom_out(GTK_HTML(widget));
+	break;
     case 0:
-        gtk_html_zoom_reset(GTK_HTML(widget));
-        break;
-
+	gtk_html_zoom_reset(GTK_HTML(widget));
+	break;
     default:
-        break;
+	break;
     }
 }
-
 
 /*
  * Does the widget support selecting text?
  */
 gboolean
-libbalsa_html_can_select(GtkWidget *widget)
+libbalsa_html_can_select(GtkWidget * widget)
 {
     return GTK_IS_HTML(widget);
 }
-
 
 /*
  * Select all the text.
  */
 void
-libbalsa_html_select_all(GtkWidget *widget)
+libbalsa_html_select_all(GtkWidget * widget)
 {
     gtk_html_select_all(GTK_HTML(widget));
 }
-
 
 /*
  * Copy selected text to the clipboard.
  */
 void
-libbalsa_html_copy(GtkWidget *widget)
+libbalsa_html_copy(GtkWidget * widget)
 {
     gtk_html_copy(GTK_HTML(widget));
 }
-
 
 /*
  * Does the widget support printing?
  */
 gboolean
-libbalsa_html_can_print(GtkWidget *widget)
+libbalsa_html_can_print(GtkWidget * widget)
 {
     return GTK_IS_HTML(widget);
 }
-
 
 /*
  * Print the widget's content.
  */
 void
-libbalsa_html_print(GtkWidget *widget)
+libbalsa_html_print(GtkWidget * widget)
 {
     GtkPrintOperation *operation = gtk_print_operation_new();
     gtk_html_print_operation_run(GTK_HTML(widget), operation,
@@ -1960,37 +1821,31 @@ libbalsa_html_print(GtkWidget *widget)
     g_object_unref(operation);
 }
 
-
 static gboolean
-libbalsa_html_url_requested(GtkWidget       *html,
-                            const gchar     *url,
-                            gpointer         stream,
-                            LibBalsaMessage *msg)
+libbalsa_html_url_requested(GtkWidget * html, const gchar * url,
+			    gpointer stream, LibBalsaMessage * msg)
 {
     LibBalsaMessageBody *body;
     GMimeStream *mime_stream;
 
     if (strncmp(url, "cid:", 4)) {
-        /* printf("non-local URL request ignored: %s\n", url); */
-        return FALSE;
+	/* printf("non-local URL request ignored: %s\n", url); */
+	return FALSE;
     }
     if ((body =
-             libbalsa_message_get_part_by_id(msg, url + 4)) == NULL) {
-        gchar *s = g_strconcat("<", url + 4, ">", NULL);
+         libbalsa_message_get_part_by_id(msg, url + 4)) == NULL) {
+	gchar *s = g_strconcat("<", url + 4, ">", NULL);
 
-        if (s == NULL) {
-            return FALSE;
-        }
+	if (s == NULL)
+	    return FALSE;
 
-        body = libbalsa_message_get_part_by_id(msg, s);
-        g_free(s);
-        if (body == NULL) {
-            return FALSE;
-        }
+	body = libbalsa_message_get_part_by_id(msg, s);
+	g_free(s);
+	if (body == NULL)
+	    return FALSE;
     }
-    if (!(mime_stream = libbalsa_message_body_get_stream(body, NULL))) {
+    if (!(mime_stream = libbalsa_message_body_get_stream(body, NULL)))
         return FALSE;
-    }
 
     libbalsa_mailbox_lock_store(msg->mailbox);
     g_mime_stream_reset(mime_stream);
@@ -2002,20 +1857,18 @@ libbalsa_html_url_requested(GtkWidget       *html,
     return TRUE;
 }
 
-
 /*
  * Neither widget supports searching text
  */
 gboolean
-libbalsa_html_can_search(GtkWidget *widget)
+libbalsa_html_can_search(GtkWidget * widget)
 {
     return FALSE;
 }
 
-
 void
-libbalsa_html_search(GtkWidget                 *widget,
-                     const gchar               *text,
+libbalsa_html_search(GtkWidget                * widget,
+                     const gchar              * text,
                      gboolean                   find_forward,
                      gboolean                   wrap,
                      LibBalsaHtmlSearchCallback search_cb,
@@ -2023,14 +1876,12 @@ libbalsa_html_search(GtkWidget                 *widget,
 {
 }
 
-
 gboolean
-libbalsa_html_get_selection_bounds(GtkWidget    *widget,
-                                   GdkRectangle *selection_bounds)
+libbalsa_html_get_selection_bounds(GtkWidget    * widget,
+                                   GdkRectangle * selection_bounds)
 {
     return FALSE;
 }
-
 
 /*
  * Neither widget implements its own popup widget.
@@ -2041,25 +1892,21 @@ libbalsa_html_popup_menu_widget(GtkWidget *widget)
     return NULL;
 }
 
-
 /*
  * Each widget is its own view widget.
  */
 GtkWidget *
-libbalsa_html_get_view_widget(GtkWidget *widget)
+libbalsa_html_get_view_widget(GtkWidget * widget)
 {
     return widget;
 }
 
-
-#   endif                       /* defined(HAVE_WEBKIT) */
+# endif                         /* defined(HAVE_WEBKIT) */
 
 /* Filter text/enriched or text/richtext to text/html, if we have GMime
  * >= 2.1.0; free and reallocate the text. */
 guint
-libbalsa_html_filter(LibBalsaHTMLType html_type,
-                     gchar          **text,
-                     guint            len)
+libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text, guint len)
 {
     guint retval = len;
     GMimeStream *stream;
@@ -2071,16 +1918,14 @@ libbalsa_html_filter(LibBalsaHTMLType html_type,
 
     switch (html_type) {
     case LIBBALSA_HTML_TYPE_ENRICHED:
-        flags = 0;
-        break;
-
+	flags = 0;
+	break;
     case LIBBALSA_HTML_TYPE_RICHTEXT:
-        flags = GMIME_FILTER_ENRICHED_IS_RICHTEXT;
-        break;
-
+	flags = GMIME_FILTER_ENRICHED_IS_RICHTEXT;
+	break;
     case LIBBALSA_HTML_TYPE_HTML:
     default:
-        return retval;
+	return retval;
     }
 
     stream = g_mime_stream_mem_new();
@@ -2105,33 +1950,26 @@ libbalsa_html_filter(LibBalsaHTMLType html_type,
     return retval;
 }
 
-
 LibBalsaHTMLType
-libbalsa_html_type(const gchar *mime_type)
+libbalsa_html_type(const gchar * mime_type)
 {
-    if (!strcmp(mime_type, "text/html")) {
-        return LIBBALSA_HTML_TYPE_HTML;
-    }
-    if (!strcmp(mime_type, "text/enriched")) {
-        return LIBBALSA_HTML_TYPE_ENRICHED;
-    }
-    if (!strcmp(mime_type, "text/richtext")) {
-        return LIBBALSA_HTML_TYPE_RICHTEXT;
-    }
+    if (!strcmp(mime_type, "text/html"))
+	return LIBBALSA_HTML_TYPE_HTML;
+    if (!strcmp(mime_type, "text/enriched"))
+	return LIBBALSA_HTML_TYPE_ENRICHED;
+    if (!strcmp(mime_type, "text/richtext"))
+	return LIBBALSA_HTML_TYPE_RICHTEXT;
     return LIBBALSA_HTML_TYPE_NONE;
 }
 
-
-#else                           /* HAVE_HTML_WIDGET */
+#else				/* HAVE_HTML_WIDGET */
 
 LibBalsaHTMLType
-libbalsa_html_type(const gchar *mime_type)
+libbalsa_html_type(const gchar * mime_type)
 {
-    if (!strcmp(mime_type, "text/html")) {
-        return LIBBALSA_HTML_TYPE_HTML;
-    }
+    if (!strcmp(mime_type, "text/html"))
+	return LIBBALSA_HTML_TYPE_HTML;
     return LIBBALSA_HTML_TYPE_NONE;
 }
 
-
-#endif                          /* HAVE_HTML_WIDGET */
+#endif				/* HAVE_HTML_WIDGET */

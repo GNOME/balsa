@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -21,7 +21,7 @@
 #define __BALSA_MESSAGE_H__
 
 #ifndef BALSA_VERSION
-#   error "Include config.h before this file."
+# error "Include config.h before this file."
 #endif
 
 #include "libbalsa.h"
@@ -31,12 +31,8 @@ G_BEGIN_DECLS
 
 
 #define BALSA_TYPE_MESSAGE          (balsa_message_get_type ())
-#define BALSA_MESSAGE(obj)          G_TYPE_CHECK_INSTANCE_CAST (obj, \
-                                                                BALSA_TYPE_MESSAGE, \
-                                                                BalsaMessage)
-#define BALSA_MESSAGE_CLASS(klass)  G_TYPE_CHECK_CLASS_CAST (klass, \
-                                                             BALSA_TYPE_MESSAGE, \
-                                                             BalsaMessageClass)
+#define BALSA_MESSAGE(obj)          G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_MESSAGE, BalsaMessage)
+#define BALSA_MESSAGE_CLASS(klass)  G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_MESSAGE, BalsaMessageClass)
 #define BALSA_IS_MESSAGE(obj)       G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_MESSAGE)
 
 
@@ -54,108 +50,101 @@ typedef enum {
 } BalsaMessageFocusState;
 
 struct _BalsaMessage {
-    GtkBox parent;
+        GtkBox parent;
 
-    GtkWidget *stack;
-    GtkWidget *switcher;
+        GtkWidget *stack;
+        GtkWidget *switcher;
 
-    /* Top-level MIME widget */
-    BalsaMimeWidget *bm_widget;
+        /* Top-level MIME widget */
+        BalsaMimeWidget *bm_widget;
 
-    /* header-related information */
-    ShownHeaders shown_headers;
+	/* header-related information */
+	ShownHeaders shown_headers;
 
-    /* Widgets to hold content */
-    GtkWidget *scroll;
+	/* Widgets to hold content */
+	GtkWidget *scroll;
 
-    /* Widget to hold structure tree */
-    GtkWidget *treeview;
-    gint info_count;
-    GList *save_all_list;
-    GtkWidget *save_all_popup;
+        /* Widget to hold structure tree */
+        GtkWidget *treeview;
+        gint info_count;
+        GList *save_all_list;
+        GtkWidget *save_all_popup;
+    
+	gboolean wrap_text;
 
-    gboolean wrap_text;
+        BalsaPartInfo *current_part;
+        GtkWidget *parts_popup;
+        gboolean force_inline;
 
-    BalsaPartInfo *current_part;
-    GtkWidget *parts_popup;
-    gboolean force_inline;
+	LibBalsaMessage *message;
 
-    LibBalsaMessage *message;
+        BalsaMessageFocusState focus_state;
 
-    BalsaMessageFocusState focus_state;
+        /* Find-in-message stuff */
+        GtkWidget  *find_bar;
+        GtkWidget  *find_entry;
+        GtkWidget  *find_next;
+        GtkWidget  *find_prev;
+        GtkWidget  *find_sep;
+        GtkWidget  *find_label;
+        GtkTextIter find_iter;
+        gboolean    find_forward;
 
-    /* Find-in-message stuff */
-    GtkWidget *find_bar;
-    GtkWidget *find_entry;
-    GtkWidget *find_next;
-    GtkWidget *find_prev;
-    GtkWidget *find_sep;
-    GtkWidget *find_label;
-    GtkTextIter find_iter;
-    gboolean find_forward;
+        /* Tab position for headers */
+        gint tab_position;
 
-    /* Tab position for headers */
-    gint tab_position;
-
-    /* Widget to hold Faces */
-    GtkWidget *face_box;
+        /* Widget to hold Faces */
+        GtkWidget *face_box;
 
 #ifdef HAVE_HTML_WIDGET
-    gpointer html_find_info;
-#endif                          /* HAVE_HTML_WIDGET */
+        gpointer html_find_info;
+#endif				/* HAVE_HTML_WIDGET */
 };
 
 struct _BalsaMessageClass {
-    GtkNotebookClass parent_class;
+	GtkNotebookClass parent_class;
 
-    void (*select_part) (BalsaMessage *message);
+	void (*select_part) (BalsaMessage * message);
 };
 
 GType balsa_message_get_type(void);
 GtkWidget *balsa_message_new(void);
 
-gboolean balsa_message_set(BalsaMessage    *bmessage,
-                           LibBalsaMailbox *mailbox,
-                           guint            msgno);
+gboolean balsa_message_set(BalsaMessage * bmessage,
+			   LibBalsaMailbox * mailbox, guint msgno);
 
-void balsa_message_next_part(BalsaMessage *bmessage);
-gboolean balsa_message_has_next_part(BalsaMessage *bmessage);
-void balsa_message_previous_part(BalsaMessage *bmessage);
-gboolean balsa_message_has_previous_part(BalsaMessage *bmessage);
-void balsa_message_save_current_part(BalsaMessage *bmessage);
-void balsa_message_copy_part(const gchar         *url,
-                             LibBalsaMessageBody *part);
+void balsa_message_next_part(BalsaMessage * bmessage);
+gboolean balsa_message_has_next_part(BalsaMessage * bmessage);
+void balsa_message_previous_part(BalsaMessage * bmessage);
+gboolean balsa_message_has_previous_part(BalsaMessage * bmessage);
+void balsa_message_save_current_part(BalsaMessage * bmessage);
+void balsa_message_copy_part(const gchar *url, LibBalsaMessageBody *part);
 
-void balsa_message_set_displayed_headers(BalsaMessage *bmessage,
-                                         ShownHeaders  sh);
-void balsa_message_set_wrap(BalsaMessage *bmessage,
-                            gboolean      wrap);
+void balsa_message_set_displayed_headers(BalsaMessage * bmessage,
+					     ShownHeaders sh);
+void balsa_message_set_wrap(BalsaMessage * bmessage, gboolean wrap);
 
-gboolean balsa_message_can_select(BalsaMessage *bmessage);
-gboolean balsa_message_grab_focus(BalsaMessage *bmessage);
-gchar *balsa_message_sender_to_gchar(InternetAddressList *list,
-                                     gint                 which);
-GtkWidget *balsa_message_current_part_widget(BalsaMessage *bmessage);
+gboolean balsa_message_can_select(BalsaMessage * bmessage);
+gboolean balsa_message_grab_focus(BalsaMessage * bmessage);
+gchar * balsa_message_sender_to_gchar(InternetAddressList * list, gint which);
+GtkWidget *balsa_message_current_part_widget(BalsaMessage * bmessage);
 GtkWindow *balsa_get_parent_window(GtkWidget *widget);
 
 #ifdef HAVE_HTML_WIDGET
-#   define BALSA_MESSAGE_ZOOM_KEY "balsa-message-zoom"
-gboolean balsa_message_can_zoom(BalsaMessage *bm);
-void balsa_message_zoom(BalsaMessage *bm,
-                        gint          in_out);
-
-#endif                          /* HAVE_HTML_WIDGET */
+#define BALSA_MESSAGE_ZOOM_KEY "balsa-message-zoom"
+gboolean balsa_message_can_zoom(BalsaMessage * bm);
+void balsa_message_zoom(BalsaMessage * bm, gint in_out);
+#endif				/* HAVE_HTML_WIDGET */
 
 #ifdef HAVE_GPGME
-void balsa_message_perform_crypto(LibBalsaMessage      *message,
-                                  LibBalsaChkCryptoMode chk_mode,
-                                  gboolean              no_mp_signed,
-                                  guint                 max_ref);
-
+void balsa_message_perform_crypto(LibBalsaMessage * message,
+				  LibBalsaChkCryptoMode chk_mode,
+				  gboolean no_mp_signed,
+				  guint max_ref);
 #endif
 
-void balsa_message_find_in_message(BalsaMessage *bm);
+void balsa_message_find_in_message (BalsaMessage * bm);
 
 G_END_DECLS
 
-#endif                          /* __BALSA_MESSAGE_H__ */
+#endif				/* __BALSA_MESSAGE_H__ */

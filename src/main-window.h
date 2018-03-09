@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -21,11 +21,11 @@
 #define __MAIN_WINDOW_H__
 
 #ifndef BALSA_VERSION
-#   error "Include config.h before this file."
+# error "Include config.h before this file."
 #endif
 
 #ifdef HAVE_NOTIFY
-#   include <libnotify/notify.h>
+#include <libnotify/notify.h>
 #endif
 
 #include <gio/gio.h>
@@ -33,20 +33,14 @@
 #include "mailbox-node.h"
 #include "toolbar-factory.h"
 
-#define BALSA_TYPE_WINDOW                      (balsa_window_get_type ())
-#define BALSA_WINDOW(obj)                      (G_TYPE_CHECK_INSTANCE_CAST (obj, \
-                                                                            BALSA_TYPE_WINDOW, \
-                                                                            BalsaWindow))
-#define BALSA_WINDOW_CLASS(klass)              (G_TYPE_CHECK_CLASS_CAST (klass, \
-                                                                         BALSA_TYPE_WINDOW, \
-                                                                         BalsaWindowClass))
-#define BALSA_IS_WINDOW(obj)                   (G_TYPE_CHECK_INSTANCE_TYPE (obj, \
-                                                                            BALSA_TYPE_WINDOW))
-#define BALSA_IS_WINDOW_CLASS(klass)           (G_TYPE_CHECK_CLASS_TYPE (klass, \
-                                                                         BALSA_TYPE_WINDOW))
+#define BALSA_TYPE_WINDOW		       (balsa_window_get_type ())
+#define BALSA_WINDOW(obj)		       (G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_WINDOW, BalsaWindow))
+#define BALSA_WINDOW_CLASS(klass)	       (G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_WINDOW, BalsaWindowClass))
+#define BALSA_IS_WINDOW(obj)		       (G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_WINDOW))
+#define BALSA_IS_WINDOW_CLASS(klass)	       (G_TYPE_CHECK_CLASS_TYPE (klass, BALSA_TYPE_WINDOW))
 #define BALSA_WINDOW_GET_CLASS(window)                       \
     (G_TYPE_INSTANCE_GET_CLASS ((window), BALSA_TYPE_WINDOW, \
-                                BalsaWindowClass))
+				BalsaWindowClass))
 
 typedef struct _BalsaWindow BalsaWindow;
 typedef struct _BalsaWindowClass BalsaWindowClass;
@@ -68,7 +62,7 @@ struct _BalsaWindow {
     GtkWidget *mblist;
     GtkWidget *sos_entry;       /* SenderOrSubject filter entry */
     GtkWidget *notebook;
-    GtkWidget *preview;         /* message is child */
+    GtkWidget *preview;		/* message is child */
     GtkWidget *paned_master;
     GtkWidget *paned_slave;
     GtkWidget *current_index;
@@ -97,12 +91,11 @@ struct _BalsaWindow {
 struct _BalsaWindowClass {
     GtkApplicationWindowClass parent_class;
 
-    void (*open_mbnode)  (BalsaWindow      *window,
-                          BalsaMailboxNode *mbnode,
-                          gboolean          set_current);
-    void (*close_mbnode) (BalsaWindow      *window,
-                          BalsaMailboxNode *mbnode);
-    void (*identities_changed) (BalsaWindow *window);
+    void (*open_mbnode)  (BalsaWindow * window,
+                          BalsaMailboxNode * mbnode,
+                          gboolean set_current);
+    void (*close_mbnode) (BalsaWindow * window, BalsaMailboxNode * mbnode);
+    void (*identities_changed) (BalsaWindow * window);
 };
 
 /*
@@ -122,76 +115,55 @@ enum {
 GType balsa_window_get_type(void);
 GtkWidget *balsa_window_new(void);
 gboolean balsa_window_fix_paned(BalsaWindow *window);
-GtkWidget *balsa_window_find_current_index(BalsaWindow *window);
+GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 void balsa_window_update_book_menus(BalsaWindow *window);
-void balsa_window_refresh(BalsaWindow *window);
-void balsa_window_open_mbnode(BalsaWindow      *window,
-                              BalsaMailboxNode *mbnode,
-                              gboolean          set_current);
-void balsa_window_close_mbnode(BalsaWindow      *window,
-                               BalsaMailboxNode *mbnode);
+void balsa_window_refresh(BalsaWindow * window);
+void balsa_window_open_mbnode(BalsaWindow * window,
+                              BalsaMailboxNode*mbnode,
+                              gboolean set_current);
+void balsa_window_close_mbnode(BalsaWindow * window, BalsaMailboxNode*mbnode);
 void balsa_identities_changed(BalsaWindow *bw);
 
-void balsa_window_update_tab(BalsaMailboxNode *mbnode);
-void enable_empty_trash(BalsaWindow *window,
-                        TrashState   status);
-void balsa_window_enable_continue(BalsaWindow *window);
+void balsa_window_update_tab(BalsaMailboxNode * mbnode);
+void enable_empty_trash(BalsaWindow * window, TrashState status);
+void balsa_window_enable_continue(BalsaWindow * window);
 void balsa_change_window_layout(BalsaWindow *window);
-gboolean mail_progress_notify_cb(GIOChannel   *source,
-                                 GIOCondition  condition,
-                                 BalsaWindow **window);
-gboolean send_progress_notify_cb(GIOChannel   *source,
-                                 GIOCondition  condition,
-                                 BalsaWindow **window);
-void check_new_messages_real(BalsaWindow *window,
-                             gboolean     background_check);
-void check_new_messages_count(LibBalsaMailbox *mailbox,
-                              gboolean         notify);
-void empty_trash(BalsaWindow *window);
-void update_view_menu(BalsaWindow *window);
+gboolean mail_progress_notify_cb(GIOChannel * source,
+                                 GIOCondition condition,
+                                 BalsaWindow ** window);
+gboolean send_progress_notify_cb(GIOChannel * source,
+                                 GIOCondition condition,
+                                 BalsaWindow ** window);
+void check_new_messages_real(BalsaWindow * window, gboolean background_check);
+void check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify);
+void empty_trash(BalsaWindow * window);
+void update_view_menu(BalsaWindow * window);
 BalsaToolbarModel *balsa_window_get_toolbar_model(void);
-void balsa_window_add_action_entries(GActionMap *action_map);
-void balsa_window_select_all(GtkWindow *window);
-gboolean balsa_window_next_unread(BalsaWindow *window);
+void balsa_window_add_action_entries(GActionMap * action_map);
+void balsa_window_select_all(GtkWindow * window);
+gboolean balsa_window_next_unread(BalsaWindow * window);
 
 /* functions to manipulate the progress bars of the window */
-gboolean balsa_window_setup_progress(BalsaWindow *window,
-                                     const gchar *text);
-void balsa_window_clear_progress(BalsaWindow *window);
-void balsa_window_increment_progress(BalsaWindow *window,
-                                     gdouble      fraction,
-                                     gboolean     flush);
-void balsa_window_increase_activity(BalsaWindow *window,
-                                    const gchar *message);
-void balsa_window_decrease_activity(BalsaWindow *window,
-                                    const gchar *message);
-void balsa_window_set_statusbar(BalsaWindow     *window,
-                                LibBalsaMailbox *mailbox);
+gboolean balsa_window_setup_progress(BalsaWindow * window,
+                                     const gchar * text);
+void balsa_window_clear_progress(BalsaWindow* window);
+void balsa_window_increment_progress(BalsaWindow * window,
+                                     gdouble fraction, gboolean flush);
+void balsa_window_increase_activity(BalsaWindow * window,
+                                    const gchar * message);
+void balsa_window_decrease_activity(BalsaWindow * window,
+                                    const gchar * message);
+void balsa_window_set_statusbar(BalsaWindow     * window,
+                                LibBalsaMailbox * mailbox);
 
 #if defined(__FILE__) && defined(__LINE__)
-#   ifdef __FUNCTION__
-#      define BALSA_DEBUG_MSG(message)  if (balsa_app.debug) fprintf(stderr, \
-                                                                     "[%lu] %12s | %4d | %30s: %s\n", \
-                                                                     (unsigned long) time(NULL), \
-                                                                     __FILE__, \
-                                                                     __LINE__, \
-                                                                     __FUNCTION__, \
-                                                                     message)
-#      define BALSA_DEBUG() if (balsa_app.debug) fprintf (stderr, "[%lu] %12s | %4d | %30s\n", \
-                                                          (unsigned long) time( \
-                                                              NULL), __FILE__, __LINE__, \
-                                                          __FUNCTION__)
-#   else
-#      define BALSA_DEBUG_MSG(message)  if (balsa_app.debug) fprintf(stderr, \
-                                                                     "[%lu] %12s | %4d: %s\n", \
-                                                                     (unsigned long) time(NULL), \
-                                                                     __FILE__, \
-                                                                     __LINE__, \
-                                                                     message)
-#      define BALSA_DEBUG() if (balsa_app.debug) fprintf(stderr, "[%lu] %12s | %4d\n", \
-                                                         (unsigned long) time( \
-                                                             NULL), __FILE__, __LINE__)
-#   endif
+# ifdef __FUNCTION__
+#  define BALSA_DEBUG_MSG(message)  if (balsa_app.debug)  fprintf(stderr, "[%lu] %12s | %4d | %30s: %s\n", (unsigned long) time(NULL), __FILE__, __LINE__, __FUNCTION__, message)
+#  define BALSA_DEBUG() if (balsa_app.debug) fprintf (stderr, "[%lu] %12s | %4d | %30s\n", (unsigned long) time(NULL), __FILE__, __LINE__, __FUNCTION__)
+# else
+#  define BALSA_DEBUG_MSG(message)  if (balsa_app.debug)  fprintf(stderr, "[%lu] %12s | %4d: %s\n", (unsigned long) time(NULL), __FILE__, __LINE__, message)
+#  define BALSA_DEBUG() if (balsa_app.debug)  fprintf(stderr, "[%lu] %12s | %4d\n", (unsigned long) time(NULL), __FILE__, __LINE__)
+# endif
 #endif
 
-#endif                          /* __MAIN_WINDOW_H__ */
+#endif				/* __MAIN_WINDOW_H__ */

@@ -6,20 +6,20 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 /*
  * mailbox_filter.h
- *
+ * 
  * Header defining filters associated to mailbox
  * Basically it's a filter plus fields related to automatic running
  * Author : Emmanuel Allaud
@@ -34,15 +34,11 @@
 #define MAILBOX_FILTERS_URL_KEY "Mailbox-URL"
 
 /*
- * Defines for the when field of mailbox controlling when to automatically run associated
- * filters of a mailbox
- * For now : on incoming mails, before closing a mailbox (to have something like a purge
- * mechanism)
+ * Defines for the when field of mailbox controlling when to automatically run associated filters of a mailbox
+ * For now : on incoming mails, before closing a mailbox (to have something like a purge mechanism)
  * FIXME : we need surely more than that
- * We should be able to remember the last message in the mailbox that has been filtered (so that
- * automatic filtering
- * leads to apply filters only on those messages in the mailbox that have never been filtered
- * before)
+ * We should be able to remember the last message in the mailbox that has been filtered (so that automatic filtering
+ * leads to apply filters only on those messages in the mailbox that have never been filtered before)
  */
 
 #define FILTER_WHEN_NEVER    0          /* Ie manual only */
@@ -57,19 +53,17 @@
 #define FILTER_WHEN_CHKFLAG(x, y) (((x)->when) & (y))
 
 typedef struct _LibBalsaMailboxFilter {
-    LibBalsaFilter *actual_filter;
+    LibBalsaFilter* actual_filter;
     gint when;
 } LibBalsaMailboxFilter;
 
 /* Returns a slist of filters having the corresponding when field */
 
-GSList *libbalsa_mailbox_filters_when(GSList *filters,
-                                      gint    when);
+GSList * libbalsa_mailbox_filters_when(GSList * filters, gint when);
 
 /* Loads the filters associated to the mailbox */
-void config_mailbox_filters_load(LibBalsaMailbox *mbox);
-
+void config_mailbox_filters_load(LibBalsaMailbox * mbox);
 /* Saves the filters associated to the mailbox */
-gchar *mailbox_filters_section_lookup(const gchar *url);
+gchar * mailbox_filters_section_lookup(const gchar * url);
 
-#endif                          /* __MAILBOX_FILTER_H__ */
+#endif				/* __MAILBOX_FILTER_H__ */

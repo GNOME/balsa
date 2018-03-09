@@ -5,20 +5,20 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#   include "config.h"
+# include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "store-address.h"
 
@@ -26,7 +26,7 @@
 #include <glib/gi18n.h>
 
 #if HAVE_MACOSX_DESKTOP
-#   include "macosx-helpers.h"
+#  include "macosx-helpers.h"
 #endif
 
 #include "balsa-app.h"
@@ -42,36 +42,35 @@ struct _StoreAddressInfo {
 };
 
 /* statics */
-static GtkWidget *store_address_dialog(StoreAddressInfo *info);
-static void store_address_weak_notify(StoreAddressInfo *info,
-                                      gpointer          message);
-static void store_address_response(GtkWidget        *dialog,
-                                   gint              response,
+static GtkWidget *store_address_dialog(StoreAddressInfo * info);
+static void store_address_weak_notify(StoreAddressInfo * info,
+                                      gpointer message);
+static void store_address_response(GtkWidget * dialog, gint response,
                                    StoreAddressInfo *info);
-static void store_address_free(StoreAddressInfo *info);
-static gboolean store_address_from_entries(GtkWindow        *window,
-                                           StoreAddressInfo *info,
-                                           GtkWidget       **entries);
-static GtkWidget *store_address_book_frame(StoreAddressInfo *info);
-static GtkWidget *store_address_note_frame(StoreAddressInfo *info);
-static void store_address_book_menu_cb(GtkWidget        *widget,
-                                       StoreAddressInfo *info);
-static void store_address_add_address(StoreAddressInfo *info,
-                                      const gchar      *label,
-                                      InternetAddress  *address,
-                                      InternetAddress  *group);
-static void store_address_add_lbaddress(StoreAddressInfo      *info,
+static void store_address_free(StoreAddressInfo * info);
+static gboolean store_address_from_entries(GtkWindow *window,
+                                           StoreAddressInfo * info,
+                                           GtkWidget ** entries);
+static GtkWidget *store_address_book_frame(StoreAddressInfo * info);
+static GtkWidget *store_address_note_frame(StoreAddressInfo * info);
+static void store_address_book_menu_cb(GtkWidget * widget, 
+                                       StoreAddressInfo * info);
+static void store_address_add_address(StoreAddressInfo * info,
+                                      const gchar * label,
+                                      InternetAddress * address,
+                                      InternetAddress * group);
+static void store_address_add_lbaddress(StoreAddressInfo * info,
                                         const LibBalsaAddress *address);
-static void store_address_add_list(StoreAddressInfo    *info,
-                                   const gchar         *label,
-                                   InternetAddressList *list);
+static void store_address_add_list(StoreAddressInfo * info,
+                                   const gchar * label,
+				   InternetAddressList * list);
 
-/*
+/* 
  * public interface: balsa_store_address
  */
 #define BALSA_STORE_ADDRESS_KEY "balsa-store-address"
 void
-balsa_store_address_from_messages(GList *messages)
+balsa_store_address_from_messages(GList * messages)
 {
     StoreAddressInfo *info = NULL;
     GList *message_list = NULL;
@@ -81,18 +80,16 @@ balsa_store_address_from_messages(GList *messages)
         gpointer data = g_object_get_data(G_OBJECT(list->data),
                                           BALSA_STORE_ADDRESS_KEY);
 
-        if (data) {
+        if (data)
             info = data;
-        } else {
+        else
             message_list = g_list_prepend(message_list, list->data);
-        }
     }
 
     if (!message_list) {
         /* All messages are already showing. */
-        if (info) {
+        if (info)
             gtk_window_present(GTK_WINDOW(info->dialog));
-        }
         return;
     }
 
@@ -121,7 +118,6 @@ balsa_store_address_from_messages(GList *messages)
     gtk_widget_show(GTK_WIDGET(info->dialog));
 }
 
-
 void
 balsa_store_address(const LibBalsaAddress *address)
 {
@@ -140,24 +136,19 @@ balsa_store_address(const LibBalsaAddress *address)
     gtk_widget_show(GTK_WIDGET(info->dialog));
 }
 
-
 /* Weak notify that a message was deleted; remove it from our list. */
 static void
-store_address_weak_notify(StoreAddressInfo *info,
-                          gpointer          message)
+store_address_weak_notify(StoreAddressInfo * info, gpointer message)
 {
     info->message_list = g_list_remove(info->message_list, message);
-    if (!info->message_list) {
+    if (!info->message_list)
         gtk_dialog_response(GTK_DIALOG(info->dialog), GTK_RESPONSE_NONE);
-    }
 }
-
 
 /* Response signal handler for the dialog. */
 static void
-store_address_response(GtkWidget        *dialog,
-                       gint              response,
-                       StoreAddressInfo *info)
+store_address_response(GtkWidget * dialog, gint response,
+                       StoreAddressInfo * info)
 {
     GtkNotebook *notebook = GTK_NOTEBOOK(info->notebook);
     GList *list;
@@ -174,10 +165,9 @@ store_address_response(GtkWidget        *dialog,
 
         page = gtk_notebook_get_current_page(notebook);
         entries = g_list_nth_data(info->entries_list, page);
-        if (!store_address_from_entries(GTK_WINDOW(dialog), info, entries)) {
+        if (!store_address_from_entries(GTK_WINDOW(dialog), info, entries))
             /* Keep the dialog open. */
             return;
-        }
     }
 
     /* Let go of remaining messages. */
@@ -191,21 +181,19 @@ store_address_response(GtkWidget        *dialog,
     store_address_free(info);
 }
 
-
 /* Clean up when we're done, or if there's nothing to do. */
 static void
-store_address_free(StoreAddressInfo *info)
+store_address_free(StoreAddressInfo * info)
 {
     g_list_free(info->message_list);
     gtk_widget_destroy(info->dialog);
     g_free(info);
 }
 
-
 /* store_address_dialog:
  * create the main dialog */
 static GtkWidget *
-store_address_dialog(StoreAddressInfo *info)
+store_address_dialog(StoreAddressInfo * info)
 {
     GtkWidget *dialog;
     GtkWidget *vbox;
@@ -221,7 +209,7 @@ store_address_dialog(StoreAddressInfo *info)
                                     NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_widget_grab_focus(gtk_dialog_get_widget_for_response
-                              (GTK_DIALOG(dialog), GTK_RESPONSE_OK));
+                          (GTK_DIALOG(dialog), GTK_RESPONSE_OK));
     vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
 #if HAVE_MACOSX_DESKTOP
@@ -242,60 +230,52 @@ store_address_dialog(StoreAddressInfo *info)
     return dialog;
 }
 
-
 /* store_address_from_entries:
  * make the actual address book entry */
 static gboolean
-store_address_from_entries(GtkWindow        *window,
-                           StoreAddressInfo *info,
-                           GtkWidget       **entries)
+store_address_from_entries(GtkWindow *window, StoreAddressInfo * info,
+                           GtkWidget ** entries)
 {
     LibBalsaAddress *address;
     LibBalsaABErr rc;
 
     if (info->current_address_book == NULL) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("No address book selected…"));
+    		      _("No address book selected…"));
         return FALSE;
     }
 
     address = libbalsa_address_new_from_edit_entries(entries);
     rc = libbalsa_address_book_add_address(info->current_address_book,
                                            address);
-    if (rc != LBABERR_OK) {
+    if(rc != LBABERR_OK) {
         const gchar *msg =
             libbalsa_address_book_strerror(info->current_address_book, rc);
-        if (!msg) {
-            switch (rc) {
-            case LBABERR_CANNOT_WRITE:
+        if(!msg) {
+            switch(rc) {
+            case LBABERR_CANNOT_WRITE: 
                 msg = _("Address could not be written to this address book.");
                 break;
-
             case LBABERR_CANNOT_CONNECT:
-                msg = _("Address book could not be accessed.");
-                break;
-
+                msg = _("Address book could not be accessed."); break;
             case LBABERR_DUPLICATE:
                 msg = _("This mail address is already in this address book.");
                 break;
-
             default:
-                msg = _("Unexpected address book error. Report it.");
-                break;
+                msg = _("Unexpected address book error. Report it."); break;
             }
         }
         balsa_information_parented(window, LIBBALSA_INFORMATION_ERROR, "%s", msg);
     }
-
+    
     g_object_unref(address);
     return rc == LBABERR_OK;
 }
 
-
 /* store_address_book_frame:
  * create the frame containing the address book menu */
 static GtkWidget *
-store_address_book_frame(StoreAddressInfo *info)
+store_address_book_frame(StoreAddressInfo * info)
 {
     guint default_ab_offset = 0;
     GtkWidget *hbox;
@@ -321,15 +301,13 @@ store_address_book_frame(StoreAddressInfo *info)
         const gchar *name;
 
         address_book = LIBBALSA_ADDRESS_BOOK(ab_list->data);
-        if (info->current_address_book == NULL) {
+        if (info->current_address_book == NULL)
             info->current_address_book = address_book;
-        }
 
         name = libbalsa_address_book_get_name(address_book);
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box), name);
-        if (address_book == balsa_app.default_address_book) {
+        if (address_book == balsa_app.default_address_book)
             default_ab_offset = off;
-        }
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), default_ab_offset);
 
@@ -338,7 +316,6 @@ store_address_book_frame(StoreAddressInfo *info)
 
     return hbox;
 }
-
 
 /* store_address_note_frame:
  * create the frame containing the notebook with address information */
@@ -354,48 +331,43 @@ store_address_note_frame(StoreAddressInfo *info)
 
     for (list = info->message_list; list; list = list->next) {
         message = LIBBALSA_MESSAGE(list->data);
-        if (message->headers) {
-            store_address_add_list(info, _("From: "), message->headers->from);
-            store_address_add_list(info, _("To: "), message->headers->to_list);
-            store_address_add_list(info, _("CC: "), message->headers->cc_list);
-            store_address_add_list(info, _("BCC: "), message->headers->bcc_list);
-        }
+	if (message->headers) {
+	    store_address_add_list(info, _("From: "), message->headers->from);
+	    store_address_add_list(info, _("To: "), message->headers->to_list);
+	    store_address_add_list(info, _("CC: "), message->headers->cc_list);
+	    store_address_add_list(info, _("BCC: "), message->headers->bcc_list);
+	}
     }
 
     return info->notebook;
 }
 
-
 /* store_address_book_menu_cb:
  * callback for the address book menu */
 static void
-store_address_book_menu_cb(GtkWidget        *widget,
-                           StoreAddressInfo *info)
+store_address_book_menu_cb(GtkWidget * widget, 
+                           StoreAddressInfo * info)
 {
     guint i = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
     GList *nth = g_list_nth(balsa_app.address_book_list, i);
-    if (nth) {
+    if(nth)
         info->current_address_book = LIBBALSA_ADDRESS_BOOK(nth->data);
-    }
 }
-
 
 /* store_address_add_address:
  * make a new page in the notebook */
 static void
-store_address_add_address(StoreAddressInfo *info,
-                          const gchar      *lab,
-                          InternetAddress  *ia,
-                          InternetAddress  *group)
+store_address_add_address(StoreAddressInfo * info,
+                          const gchar * lab, InternetAddress * ia,
+			  InternetAddress * group)
 {
     gchar *text;
     LibBalsaAddress *address;
     gchar *label_text;
     GtkWidget **entries, *ew;
 
-    if (ia == NULL) {
+    if (ia == NULL)
         return;
-    }
 
     entries = g_new(GtkWidget *, NUM_FIELDS);
     info->entries_list = g_list_append(info->entries_list, entries);
@@ -414,10 +386,9 @@ store_address_add_address(StoreAddressInfo *info,
         for (j = 0; j < internet_address_list_length(members); j++) {
             InternetAddress *member_address =
                 internet_address_list_get_address(members, j);
-            if (INTERNET_ADDRESS_IS_MAILBOX(member_address)) {
+            if (INTERNET_ADDRESS_IS_MAILBOX(member_address))
                 libbalsa_address_add_addr
                     (address, INTERNET_ADDRESS_MAILBOX(member_address)->addr);
-            }
         }
     } else {
         libbalsa_address_add_addr(address, INTERNET_ADDRESS_MAILBOX(ia)->addr);
@@ -427,18 +398,16 @@ store_address_add_address(StoreAddressInfo *info,
 
     label_text = g_strconcat(lab, text, NULL);
     g_free(text);
-    if (g_utf8_strlen(label_text, -1) > 15) {
+    if (g_utf8_strlen(label_text, -1) > 15)
         /* truncate to an arbitrary length: */
         *g_utf8_offset_to_pointer(label_text, 15) = '\0';
-    }
     gtk_notebook_append_page(GTK_NOTEBOOK(info->notebook), ew,
                              gtk_label_new(label_text));
     g_free(label_text);
 }
 
-
 static void
-store_address_add_lbaddress(StoreAddressInfo      *info,
+store_address_add_lbaddress(StoreAddressInfo * info,
                             const LibBalsaAddress *address)
 {
     gchar *label_text;
@@ -456,29 +425,26 @@ store_address_add_lbaddress(StoreAddressInfo      *info,
 
     full_name = libbalsa_address_get_full_name(address);
     label_text = g_strdup(full_name != NULL ? full_name : addr);
-    if (g_utf8_strlen(label_text, -1) > 15) {
+    if (g_utf8_strlen(label_text, -1) > 15)
         /* truncate to an arbitrary length: */
         *g_utf8_offset_to_pointer(label_text, 15) = '\0';
-    }
     gtk_notebook_append_page(GTK_NOTEBOOK(info->notebook), ew,
                              gtk_label_new(label_text));
     g_free(label_text);
 }
 
-
 /* store_address_add_list:
  * take a list of addresses and pass them one at a time to
  * store_address_add_address */
 static void
-store_address_add_list(StoreAddressInfo    *info,
-                       const gchar         *label,
-                       InternetAddressList *list)
+store_address_add_list(StoreAddressInfo    * info,
+                       const gchar         * label,
+                       InternetAddressList * list)
 {
     int i, j;
 
-    if (!list) {
+    if (!list)
         return;
-    }
 
     for (i = 0; i < internet_address_list_length(list); i++) {
         InternetAddress *ia = internet_address_list_get_address(list, i);
@@ -488,7 +454,7 @@ store_address_add_list(StoreAddressInfo    *info,
         if (INTERNET_ADDRESS_IS_MAILBOX(ia)) {
             store_address_add_address(info, label, ia, NULL);
         } else if (dist_list_mode) {
-            store_address_add_address(info, label, ia, ia);
+                store_address_add_address(info, label, ia, ia);
         } else {
             InternetAddressList *members =
                 INTERNET_ADDRESS_GROUP(ia)->members;
@@ -497,10 +463,9 @@ store_address_add_list(StoreAddressInfo    *info,
                 InternetAddress *member_address =
                     internet_address_list_get_address(members, j);
 
-                if (INTERNET_ADDRESS_IS_MAILBOX(member_address)) {
+                if (INTERNET_ADDRESS_IS_MAILBOX(member_address))
                     store_address_add_address(info, label, member_address,
                                               ia);
-                }
             }
         }
     }

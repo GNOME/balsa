@@ -58,33 +58,39 @@ typedef gchar *(*LibBalsaCompletionFunc) (gpointer);
 /* LibBalsaCompletion
  */
 
-typedef gint (*LibBalsaCompletionStrncmpFunc) (const gchar *s1,
-                                               const gchar *s2,
-                                               gsize        n);
+typedef gint (*LibBalsaCompletionStrncmpFunc) (const gchar * s1,
+                                               const gchar * s2,
+                                               gsize         n);
 
 struct _LibBalsaCompletion {
-    GList *items;
-    LibBalsaCompletionFunc func;
+    GList                        *items;
+    LibBalsaCompletionFunc        func;
 
-    gchar *prefix;
-    GList *cache;
+    gchar                        *prefix;
+    GList                        *cache;
     LibBalsaCompletionStrncmpFunc strncmp_func;
 };
 
-LibBalsaCompletion *libbalsa_completion_new(LibBalsaCompletionFunc func);
+LibBalsaCompletion *
+libbalsa_completion_new          (LibBalsaCompletionFunc func);
 
-void libbalsa_completion_add_items(LibBalsaCompletion *cmp,
-                                   GList              *items);
+void
+libbalsa_completion_add_items    (LibBalsaCompletion * cmp,
+                                  GList              * items);
 
-void libbalsa_completion_clear_items(LibBalsaCompletion *cmp);
+void
+libbalsa_completion_clear_items  (LibBalsaCompletion * cmp);
 
-GList *libbalsa_completion_complete(LibBalsaCompletion *cmp,
-                                    const gchar        *prefix);
+GList *
+libbalsa_completion_complete     (LibBalsaCompletion * cmp,
+                                  const gchar        * prefix);
 
-void libbalsa_completion_set_compare(LibBalsaCompletion *cmp,
-                                     LibBalsaCompletionStrncmpFunc
-                                     strncmp_func);
+void
+libbalsa_completion_set_compare  (LibBalsaCompletion * cmp,
+                                  LibBalsaCompletionStrncmpFunc
+                                                       strncmp_func);
 
-void libbalsa_completion_free(LibBalsaCompletion *cmp);
+void
+libbalsa_completion_free         (LibBalsaCompletion * cmp);
 
 G_END_DECLS

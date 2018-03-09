@@ -5,21 +5,21 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#   include "config.h"
+# include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "assistant_page_directory.h"
 
@@ -44,39 +44,35 @@
 #define DRAFTBOX_NAME "Draftbox"
 #define TRASH_NAME    "Trash"
 
-static const gchar *const init_mbnames[NUM_EDs] = {
+static const gchar * const init_mbnames[NUM_EDs] = {
     N_("_Inbox:"), N_("_Outbox:"), N_("_Sentbox:"), N_("_Draftbox:"),
     N_("_Trash:")
 };
 
-static void balsa_druid_page_directory_prepare(GtkAssistant            *druid,
-                                               GtkWidget               *page,
-                                               BalsaDruidPageDirectory *dir);
-static void balsa_druid_page_directory_back(GtkAssistant            *druid,
-                                            GtkWidget               *page,
-                                            BalsaDruidPageDirectory *dir);
-static void balsa_druid_page_directory_next(GtkAssistant            *druid,
-                                            GtkWidget               *page,
-                                            BalsaDruidPageDirectory *dir);
-static void unconditional_mailbox(const gchar      *path,
-                                  const gchar      *prettyname,
-                                  LibBalsaMailbox **box,
-                                  gchar           **error);
+static void balsa_druid_page_directory_prepare(GtkAssistant * druid,
+                                               GtkWidget * page,
+                                               BalsaDruidPageDirectory * dir);
+static void balsa_druid_page_directory_back(GtkAssistant * druid,
+                                            GtkWidget * page,
+                                            BalsaDruidPageDirectory * dir);
+static void balsa_druid_page_directory_next(GtkAssistant * druid,
+                                            GtkWidget * page,
+                                            BalsaDruidPageDirectory * dir);
+static void unconditional_mailbox(const gchar * path,
+                                  const gchar * prettyname,
+                                  LibBalsaMailbox ** box, gchar ** error);
 
 static void
-unconditional_mailbox(const gchar      *path,
-                      const gchar      *prettyname,
-                      LibBalsaMailbox **box,
-                      gchar           **error)
+unconditional_mailbox(const gchar * path, const gchar * prettyname,
+                      LibBalsaMailbox ** box, gchar ** error)
 {
     gchar *dup;
     gchar *index;
     ciss_url_t url;
     gboolean ssl = FALSE, is_remote = FALSE;
 
-    if ((*error) != NULL) {
+    if ((*error) != NULL)
         return;
-    }
 
     dup = g_strdup(path);
     index = strrchr(dup, G_DIR_SEPARATOR);
@@ -84,8 +80,8 @@ unconditional_mailbox(const gchar      *path,
     if (index == NULL) {
         (*error) =
             g_strdup_printf(_
-                                ("The pathname “%s” must be specified"
-                                " canonically — it must start with a “/”."),
+                            ("The pathname “%s” must be specified"
+                             " canonically — it must start with a “/”."),
                             dup);
         g_free(dup);
         return;
@@ -106,26 +102,21 @@ unconditional_mailbox(const gchar      *path,
     switch (url.scheme) {
     case U_IMAPS:
         ssl = TRUE;
-
     case U_IMAP:
         *box = libbalsa_mailbox_imap_new();
-        libbalsa_mailbox_imap_set_path((LibBalsaMailboxImap *) *box,
+        libbalsa_mailbox_imap_set_path((LibBalsaMailboxImap *) * box,
                                        url.path);
         is_remote = TRUE;
         break;
-
     case U_POPS:
         ssl = TRUE;
-
     case U_POP:
         *box = (LibBalsaMailbox *) libbalsa_mailbox_pop3_new();
         is_remote = TRUE;
         break;
-
     case U_FILE:
         *box = libbalsa_mailbox_local_new(url.path, TRUE);
         break;
-
     default:
         *box = libbalsa_mailbox_local_new(path, TRUE);
         if (!*box) {
@@ -148,45 +139,40 @@ unconditional_mailbox(const gchar      *path,
     if (*box == NULL) {
         if (strcmp("/var/spool/mail/", path)) {
             char tmp[32] = "/tmp/balsa.XXXXXX";
-            /* Don't fail if you can't create the spool mailbox. */
-            close(mkstemp(tmp));
-            *box = libbalsa_mailbox_local_new(tmp, FALSE);
-            if (*box) {
-                free((*box)->url);
-                (*box)->url = g_strdup_printf("file://%s", path);
-            }
-            unlink(tmp);
-        }
+	    /* Don't fail if you can't create the spool mailbox. */
+	    close(mkstemp(tmp));
+		*box = libbalsa_mailbox_local_new(tmp, FALSE);
+		if (*box) {
+			free((*box)->url);
+			(*box)->url = g_strdup_printf("file://%s",path);
+		}
+		unlink(tmp);
+	}
     }
     if ( *box == NULL) {
-        (*error) =
-            g_strdup_printf(_
+            (*error) =
+                g_strdup_printf(_
                                 ("The mailbox “%s” does not appear to be valid."),
-                            path);
+                                path);
         return;
     }
 
     (*box)->name = g_strdup(gettext(prettyname));
 
     config_mailbox_add(*box, (char *) prettyname);
-    if (box == &balsa_app.outbox) {
+    if (box == &balsa_app.outbox)
         (*box)->no_reassemble = TRUE;
-    }
 }
 
-
 static void
-verify_mailbox_entry(GtkWidget        *entry,
-                     const gchar      *name,
-                     LibBalsaMailbox **mailbox,
-                     gboolean         *verify)
+verify_mailbox_entry(GtkWidget * entry, const gchar * name,
+                     LibBalsaMailbox ** mailbox, gboolean * verify)
 {
     const gchar *text;
     gchar *error;
 
-    if (!*verify) {
+    if (!*verify)
         return;
-    }
 
     text = gtk_entry_get_text(GTK_ENTRY(entry));
     error = NULL;
@@ -195,8 +181,8 @@ verify_mailbox_entry(GtkWidget        *entry,
     if (error) {
         GtkWidget *dlg =
             gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
-                                                  (GTK_WIDGET(entry),
-                                                  GTK_TYPE_WINDOW)),
+                                              (GTK_WIDGET(entry),
+                                               GTK_TYPE_WINDOW)),
                                    GTK_DIALOG_MODAL,
                                    GTK_MESSAGE_ERROR,
                                    GTK_BUTTONS_OK,
@@ -209,10 +195,8 @@ verify_mailbox_entry(GtkWidget        *entry,
     }
 }
 
-
 static void
-verify_button_clicked_cb(GtkWidget *button,
-                         gpointer   data)
+verify_button_clicked_cb(GtkWidget * button, gpointer data)
 {
     BalsaDruidPageDirectory *dir = data;
     gboolean verify = TRUE;
@@ -230,9 +214,8 @@ verify_button_clicked_cb(GtkWidget *button,
     gtk_assistant_set_page_complete(dir->druid, dir->page, verify);
 }
 
-
 static GtkWidget *
-verify_button(BalsaDruidPageDirectory *dir)
+verify_button(BalsaDruidPageDirectory * dir)
 {
     GtkWidget *button;
 
@@ -243,21 +226,18 @@ verify_button(BalsaDruidPageDirectory *dir)
     return button;
 }
 
-
 static void
-entry_changed_cb(GtkEditable *editable,
-                 gpointer     data)
+entry_changed_cb(GtkEditable * editable, gpointer data)
 {
     BalsaDruidPageDirectory *dir = data;
 
     gtk_assistant_set_page_complete(dir->druid, dir->page, FALSE);
 }
 
-
 static void
-balsa_druid_page_directory_init(BalsaDruidPageDirectory *dir,
-                                GtkWidget               *page,
-                                GtkAssistant            *druid)
+balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
+                                GtkWidget * page,
+                                GtkAssistant * druid)
 {
     GtkGrid *grid;
     GtkWidget *label_widget;
@@ -265,9 +245,7 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory *dir,
     int i;
     GtkWidget **init_widgets[NUM_EDs];
     gchar *imap_inbox = libbalsa_guess_imap_inbox();
-    gchar *init_presets[NUM_EDs] = {
-        NULL, NULL, NULL, NULL, NULL
-    };
+    gchar *init_presets[NUM_EDs] = { NULL, NULL, NULL, NULL, NULL };
 
     dir->druid = druid;
     dir->paths_locked = FALSE;
@@ -286,9 +264,9 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory *dir,
 
     gtk_grid_attach(grid, GTK_WIDGET(label), 0, 0, 2, 1);
 
-    if (0 /* FIXME: libbalsa_mailbox_exists(imap_inbox) */ ) {
+    if (0 /* FIXME: libbalsa_mailbox_exists(imap_inbox) */ )
         init_presets[INBOX] = imap_inbox;
-    } else {
+    else {
         g_free(imap_inbox);
         init_presets[INBOX] = libbalsa_guess_mail_spool();
     }
@@ -303,11 +281,10 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory *dir,
         gchar *preset;
         GtkWidget *entry;
 
-        if (init_presets[i]) {
+        if (init_presets[i])
             preset = init_presets[i];
-        } else {
+        else
             preset = g_strdup("[Dummy value]");
-        }
 
         entry = balsa_init_add_grid_entry(grid, i, _(init_mbnames[i]),
                                           preset, NULL, NULL, NULL,
@@ -331,7 +308,7 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory *dir,
 
 
 void
-balsa_druid_page_directory(GtkAssistant *druid)
+balsa_druid_page_directory(GtkAssistant * druid)
 {
     BalsaDruidPageDirectory *dir;
 
@@ -343,22 +320,20 @@ balsa_druid_page_directory(GtkAssistant *druid)
     g_object_weak_ref(G_OBJECT(druid), (GWeakNotify)g_free, dir);
 }
 
-
 static void
-balsa_druid_page_directory_prepare(GtkAssistant            *druid,
-                                   GtkWidget               *page,
-                                   BalsaDruidPageDirectory *dir)
+balsa_druid_page_directory_prepare(GtkAssistant * druid,
+                                   GtkWidget * page,
+                                   BalsaDruidPageDirectory * dir)
 {
     gchar *buf;
     gint current_page_no = gtk_assistant_get_current_page(druid);
 
-    if (page != dir->page) { /* This is not the page to be prepared. */
-        if (dir->need_set) {
-            if (current_page_no > dir->my_num) {
+    if(page != dir->page) { /* This is not the page to be prepared. */
+        if(dir->need_set) {
+            if(current_page_no > dir->my_num)
                 balsa_druid_page_directory_next(druid, page, dir);
-            } else {
+            else
                 balsa_druid_page_directory_back(druid, page, dir);
-            }
             dir->need_set = FALSE;
         }
         return;
@@ -403,18 +378,15 @@ balsa_druid_page_directory_prepare(GtkAssistant            *druid,
 
 
 static void
-balsa_druid_page_directory_back(GtkAssistant            *druid,
-                                GtkWidget               *page,
-                                BalsaDruidPageDirectory *dir)
+balsa_druid_page_directory_back(GtkAssistant *druid, GtkWidget *page,
+                                BalsaDruidPageDirectory * dir)
 {
     dir->paths_locked = FALSE;
 }
 
-
 static void
-balsa_druid_page_directory_next(GtkAssistant            *page,
-                                GtkWidget               *druid,
-                                BalsaDruidPageDirectory *dir)
+balsa_druid_page_directory_next(GtkAssistant * page, GtkWidget * druid,
+                                BalsaDruidPageDirectory * dir)
 {
     dir->paths_locked = TRUE;
 }

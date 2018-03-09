@@ -23,7 +23,7 @@
    without introducing extra dependencies. External library
    dependencies should go to libbalsa.c */
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#   include "config.h"
+# include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "misc.h"
 
@@ -44,65 +44,56 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-static const gchar *libbalsa_get_codeset_name(const gchar    *txt,
-                                              LibBalsaCodeset Codeset);
-
+static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
+					      LibBalsaCodeset Codeset);
 #ifndef HAVE_STRUCT_UTSNAME_DOMAINNAME
 static int
-getdnsdomainname(char  *s,
-                 size_t l)
+getdnsdomainname (char *s, size_t l)
 {
-    FILE *f;
-    char tmp[1024];
-    char *p = NULL;
-    char *q;
+  FILE *f;
+  char tmp[1024];
+  char *p = NULL;
+  char *q;
 
-    if ((f = fopen ("/etc/resolv.conf", "r")) == NULL) {
-        return (-1);
+  if ((f = fopen ("/etc/resolv.conf", "r")) == NULL) return (-1);
+
+  tmp[sizeof (tmp) - 1] = 0;
+
+  l--; /* save room for the terminal \0 */
+
+  while (fgets (tmp, sizeof (tmp) - 1, f) != NULL)
+  {
+    p = tmp;
+    while ( g_ascii_isspace (*p)) p++;
+    if (strncmp ("domain", p, 6) == 0 || strncmp ("search", p, 6) == 0)
+    {
+      p += 6;
+      
+      for (q = strtok (p, " \t\n"); q; q = strtok (NULL, " \t\n"))
+	if (strcmp (q, "."))
+	  break;
+
+      if (q)
+      {
+	  char *a = q;
+	  
+	  for (; *q; q++)
+	      a = q;
+	  
+	  if (*a == '.')
+	      *a = '\0';
+	  
+	  g_stpcpy (s, q);
+	  fclose (f);
+	  return 0;
+      }
+      
     }
+  }
 
-    tmp[sizeof (tmp) - 1] = 0;
-
-    l--; /* save room for the terminal \0 */
-
-    while (fgets (tmp, sizeof (tmp) - 1, f) != NULL) {
-        p = tmp;
-        while ( g_ascii_isspace (*p)) {
-            p++;
-        }
-        if ((strncmp ("domain", p, 6) == 0) || (strncmp ("search", p, 6) == 0)) {
-            p += 6;
-
-            for (q = strtok (p, " \t\n"); q; q = strtok (NULL, " \t\n")) {
-                if (strcmp (q, ".")) {
-                    break;
-                }
-            }
-
-            if (q) {
-                char *a = q;
-
-                for (; *q; q++) {
-                    a = q;
-                }
-
-                if (*a == '.') {
-                    *a = '\0';
-                }
-
-                g_stpcpy (s, q);
-                fclose (f);
-                return 0;
-            }
-
-        }
-    }
-
-    fclose (f);
-    return (-1);
+  fclose (f);
+  return (-1);
 }
-
-
 #endif                          /* !HAVE_STRUCT_UTSNAME_DOMAINNAME */
 
 gchar *
@@ -114,62 +105,52 @@ libbalsa_get_domainname(void)
     uname(&utsname);
 
     return g_strdup(utsname.domainname);
-
 #else                           /* HAVE_STRUCT_UTSNAME_DOMAINNAME */
     char domainname[256]; /* arbitrary length */
     gchar *d;
-
+ 
     uname(&utsname);
     d = strchr( utsname.nodename, '.' );
-    if (d) {
-        return g_strdup( d + 1 );
+    if(d) {
+        return g_strdup( d+1 );
     }
-
+ 
     if ( getdnsdomainname(domainname, sizeof(domainname)) == 0 ) {
-        return g_strdup(domainname);
+	return g_strdup(domainname);
     }
     return NULL;
-
 #endif                          /* HAVE_STRUCT_UTSNAME_DOMAINNAME */
 }
-
 
 /* libbalsa_find_word:
    searches given word delimited by blanks or string boundaries in given
    string. IS NOT case-sensitive.
    Returns TRUE if the word is found.
- */
-gboolean
-libbalsa_find_word(const gchar *word,
-                   const gchar *str)
+*/
+gboolean libbalsa_find_word(const gchar * word, const gchar * str)
 {
     const gchar *ptr = str;
     int len = strlen(word);
 
     while (*ptr) {
-        if (g_ascii_strncasecmp(word, ptr, len) == 0) {
-            return TRUE;
-        }
-        /* skip one word */
-        while (*ptr && !isspace((int)*ptr)) {
-            ptr++;
-        }
-        while (*ptr && isspace((int) *ptr)) {
-            ptr++;
-        }
+	if (g_ascii_strncasecmp(word, ptr, len) == 0)
+	    return TRUE;
+	/* skip one word */
+	while (*ptr && !isspace((int)*ptr))
+	    ptr++;
+	while (*ptr && isspace((int) *ptr))
+	    ptr++;
     }
     return FALSE;
 }
 
-
 /* libbalsa_wrap_string
    wraps given string replacing spaces with '\n'.  do changes in place.
-   lnbeg - line beginning position, sppos - space position,
+   lnbeg - line beginning position, sppos - space position, 
    te - tab's extra space.
- */
+*/
 void
-libbalsa_wrap_string(gchar *str,
-                     int    width)
+libbalsa_wrap_string(gchar * str, int width)
 {
     const int minl = width / 2;
 
@@ -185,29 +166,27 @@ libbalsa_wrap_string(gchar *str,
     space_pos = ptr = str;
 
     while (*ptr) {
-        switch (*ptr) {
-        case '\t':
-            te += 7;
-            break;
-
-        case '\n':
-            line_begin_offset = ptr_offset + 1;
-            te = 0;
-            break;
-
-        case ' ':
-            space_pos = ptr;
-            space_pos_offset = ptr_offset;
-            break;
-        }
-        if ((ptr_offset - line_begin_offset >= width - te)
-            && (space_pos_offset >= line_begin_offset + minl)) {
-            *space_pos = '\n';
-            line_begin_offset = space_pos_offset + 1;
-            te = 0;
-        }
-        ptr = g_utf8_next_char(ptr);
-        ptr_offset++;
+	switch (*ptr) {
+	case '\t':
+	    te += 7;
+	    break;
+	case '\n':
+	    line_begin_offset = ptr_offset + 1;
+	    te = 0;
+	    break;
+	case ' ':
+	    space_pos = ptr;
+	    space_pos_offset = ptr_offset;
+	    break;
+	}
+	if (ptr_offset - line_begin_offset >= width - te 
+	     && space_pos_offset >= line_begin_offset + minl) {
+	    *space_pos = '\n';
+	    line_begin_offset = space_pos_offset + 1;
+	    te = 0;
+	}
+	ptr=g_utf8_next_char(ptr);
+	ptr_offset++;
     }
 }
 
@@ -215,75 +194,73 @@ libbalsa_wrap_string(gchar *str,
 /* Delete the contents of a directory (not the directory itself).
    Return TRUE if everything was OK.
    If FALSE is returned then errno will be set to some useful value.
- */
+*/
 gboolean
 libbalsa_delete_directory_contents(const gchar *path)
 {
-    GDir *dir;
-    gboolean result;
+	GDir *dir;
+	gboolean result;
 
     g_return_val_if_fail(path != NULL, FALSE);
     dir = g_dir_open(path, 0, NULL);
     if (dir == NULL) {
-        result = FALSE;
+    	result = FALSE;
     } else {
-        const gchar *item;
+    	const gchar *item;
 
-        result = TRUE;
-        item = g_dir_read_name(dir);
-        while (result && (item != NULL)) {
-            gchar *full_path;
+    	result = TRUE;
+    	item = g_dir_read_name(dir);
+    	while (result && (item != NULL)) {
+    		gchar *full_path;
 
-            full_path = g_build_filename(path, item, NULL);
-            if (g_file_test(full_path, G_FILE_TEST_IS_DIR)) {
-                result = libbalsa_delete_directory_contents(full_path);
-                if (g_rmdir(full_path) != 0) {
-                    result = FALSE;
-                }
-            } else {
-                if (g_unlink(full_path) != 0) {
-                    result = FALSE;
-                }
-            }
-            g_free(full_path);
-            item = g_dir_read_name(dir);
-        }
-        g_dir_close(dir);
+    		full_path = g_build_filename(path, item, NULL);
+    		if (g_file_test(full_path, G_FILE_TEST_IS_DIR)) {
+    	   		result = libbalsa_delete_directory_contents(full_path);
+    			if (g_rmdir(full_path) != 0) {
+    				result = FALSE;
+    			}
+    		} else {
+    	   		if (g_unlink(full_path) != 0) {
+    				result = FALSE;
+    			}
+    		}
+    		g_free(full_path);
+    		item = g_dir_read_name(dir);
+    	}
+    	g_dir_close(dir);
     }
 
     return result;
 }
 
-
 /* libbalsa_expand_path:
    We handle only references to ~/.
- */
-gchar *
-libbalsa_expand_path(const gchar *path)
+*/
+gchar*
+libbalsa_expand_path(const gchar * path)
 {
     const gchar *home = g_get_home_dir();
-
-    if (path[0] == '~') {
-        if (path[1] == '/') {
-            return g_strconcat(home, path + 1, NULL);
-        } else if (path[1] == '\0') {
+   
+    if(path[0] == '~') {
+        if(path[1] == '/')
+            return g_strconcat(home, path+1, NULL);
+        else if(path[1] == '\0')
             return g_strdup(home);
-        }
         /* else: unrecognized combination */
     }
     return g_strdup(path);
 }
 
 
+
 /* create a uniq directory, resulting name should be freed with g_free */
-gboolean
-libbalsa_mktempdir(char **s)
+gboolean 
+libbalsa_mktempdir (char **s)
 {
     g_return_val_if_fail(s != NULL, FALSE);
     *s = g_build_filename(g_get_tmp_dir(), "balsa-tmpdir-XXXXXX", NULL);
     return g_mkdtemp_full(*s, 0700) != NULL;
 }
-
 
 /* libbalsa_set_fallback_codeset: sets the codeset for incorrectly
  * encoded characters. */
@@ -303,8 +280,7 @@ libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
     sanitize_fallback_codeset = codeset;
     return ret;
 }
-
-
+    
 /* libbalsa_utf8_sanitize
  *
  * Validate utf-8 text, and if validation fails, replace each offending
@@ -323,149 +299,132 @@ libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
  * NOTE:    The text is either modified in place or replaced and freed.
  */
 gboolean
-libbalsa_utf8_sanitize(gchar       **text,
-                       gboolean      fallback,
-                       gchar const **target)
+libbalsa_utf8_sanitize(gchar **text, gboolean fallback,
+		       gchar const **target)
 {
     gchar *p;
 
-    if (target) {
-        *target = NULL;
-    }
-    if (!*text || g_utf8_validate(*text, -1, NULL)) {
-        return TRUE;
-    }
+    if (target)
+	*target = NULL;
+    if (!*text || g_utf8_validate(*text, -1, NULL))
+	return TRUE;
 
     if (fallback) {
-        gsize b_written;
-        GError *conv_error = NULL;
-        const gchar *use_enc =
+	gsize b_written;
+	GError *conv_error = NULL;
+	const gchar *use_enc =
             libbalsa_get_codeset_name(*text, sanitize_fallback_codeset);
-        p = g_convert(*text, strlen(*text), "utf-8", use_enc, NULL,
+	p = g_convert(*text, strlen(*text), "utf-8", use_enc, NULL,
                       &b_written, &conv_error);
 
-        if (p) {
-            g_free(*text);
-            *text = p;
-            if (target) {
-                *target = use_enc;
-            }
-            return FALSE;
-        }
-        g_message("conversion %s -> utf8 failed: %s", use_enc,
+	if (p) {
+	    g_free(*text);
+	    *text = p;
+	    if (target)
+		*target = use_enc;
+	    return FALSE;
+	}
+	g_message("conversion %s -> utf8 failed: %s", use_enc,
                   conv_error->message);
-        g_error_free(conv_error);
+	g_error_free(conv_error);
     }
     p = *text;
-    while (!g_utf8_validate(p, -1, (const gchar **) &p)) {
-        *p++ = '?';
-    }
+    while (!g_utf8_validate(p, -1, (const gchar **) &p))
+	*p++ = '?';
 
     return FALSE;
 }
-
 
 /* libbalsa_utf8_strstr() returns TRUE if s2 is a substring of s1.
  * libbalsa_utf8_strstr is case insensitive
  * this functions understands utf8 strings (as you might have guessed ;-)
  */
 gboolean
-libbalsa_utf8_strstr(const gchar *s1,
-                     const gchar *s2)
+libbalsa_utf8_strstr(const gchar *s1, const gchar *s2)
 {
-    const gchar *p, *q;
+    const gchar * p,* q;
 
     /* convention : NULL string is contained in anything */
-    if (!s2) {
-        return TRUE;
-    }
+    if (!s2) return TRUE;
     /* s2 is non-NULL, so if s1==NULL we return FALSE :)*/
-    if (!s1) {
-        return FALSE;
-    }
+    if (!s1) return FALSE;
     /* OK both are non-NULL now*/
     /* If s2 is the empty string return TRUE */
-    if (!*s2) {
-        return TRUE;
-    }
+    if (!*s2) return TRUE;
     while (*s1) {
-        /* We look for the first char of s2*/
-        for (; *s1 &&
-             g_unichar_toupper(g_utf8_get_char(s2)) != g_unichar_toupper(g_utf8_get_char(s1));
-             s1 = g_utf8_next_char(s1)) {
-        }
-        if (*s1) {
-            /* We found the first char let see if this potential match is an actual one */
-            s1 = g_utf8_next_char(s1);
-            q = s1;
-            p = g_utf8_next_char(s2);
-            while (*q && *p &&
-                   g_unichar_toupper(g_utf8_get_char(p))
-                   == g_unichar_toupper(g_utf8_get_char(q))) {
-                p = g_utf8_next_char(p);
-                q = g_utf8_next_char(q);
-            }
-            /* We have a match if p has reached the end of s2, ie *p==0 */
-            if (!*p) {
-                return TRUE;
-            }
-        }
+	/* We look for the first char of s2*/
+	for (;*s1 &&
+		 g_unichar_toupper(g_utf8_get_char(s2))!=g_unichar_toupper(g_utf8_get_char(s1));
+	     s1 = g_utf8_next_char(s1));
+	if (*s1) {
+	    /* We found the first char let see if this potential match is an actual one */
+	    s1 = g_utf8_next_char(s1);
+	    q = s1;
+	    p = g_utf8_next_char(s2);
+	    while (*q && *p && 
+		   g_unichar_toupper(g_utf8_get_char(p))
+		   ==g_unichar_toupper(g_utf8_get_char(q))) {
+		p = g_utf8_next_char(p);
+		q = g_utf8_next_char(q);
+	    }
+	    /* We have a match if p has reached the end of s2, ie *p==0 */
+	    if (!*p) return TRUE;
+	}
     }
     return FALSE;
 }
-
 
 /* The LibBalsaCodeset enum is not used for anything currently, but this
  * list must be the same length, and should probably be kept consistent: */
 LibBalsaCodesetInfo libbalsa_codeset_info[LIBBALSA_NUM_CODESETS] = {
     {N_("West European"),       /* WEST_EUROPE          */
-     "iso-8859-1", "windows-1252"},
+     "iso-8859-1", "windows-1252"} ,
     {N_("East European"),       /* EAST_EUROPE          */
-     "iso-8859-2", "windows-1250"},
+     "iso-8859-2", "windows-1250"} ,
     {N_("South European"),      /* SOUTH_EUROPE         */
-     "iso-8859-3"},
+     "iso-8859-3"} ,
     {N_("North European"),      /* NORTH_EUROPE         */
-     "iso-8859-4"},
+     "iso-8859-4"} ,
     {N_("Cyrillic"),            /* CYRILLIC             */
-     "iso-8859-5", "windows-1251"},
+     "iso-8859-5", "windows-1251"} ,
     {N_("Arabic"),              /* ARABIC               */
-     "iso-8859-6", "windows-1256"},
+     "iso-8859-6", "windows-1256"} ,
     {N_("Greek"),               /* GREEK                */
-     "iso-8859-7", "windows-1253"},
+     "iso-8859-7", "windows-1253"} ,
     {N_("Hebrew"),              /* HEBREW               */
-     "iso-8859-8", "windows-1255"},
+     "iso-8859-8", "windows-1255"} ,
     {N_("Turkish"),             /* TURKISH              */
-     "iso-8859-9", "windows-1254"},
+     "iso-8859-9", "windows-1254"} ,
     {N_("Nordic"),              /* NORDIC               */
-     "iso-8859-10"},
+     "iso-8859-10"} ,
     {N_("Thai"),                /* THAI                 */
-     "iso-8859-11"},
+     "iso-8859-11"} ,
     {N_("Baltic"),              /* BALTIC               */
-     "iso-8859-13", "windows-1257"},
+     "iso-8859-13", "windows-1257"} ,
     {N_("Celtic"),              /* CELTIC               */
-     "iso-8859-14"},
+     "iso-8859-14"} ,
     {N_("West European (euro)"),  /* WEST_EUROPE_EURO     */
-     "iso-8859-15"},
+     "iso-8859-15"} ,
     {N_("Russian"),             /* RUSSIAN              */
-     "koi-8r"},
+     "koi-8r"} ,
     {N_("Ukrainian"),           /* UKRAINE              */
-     "koi-8u"},
+     "koi-8u"} ,
     {N_("Japanese"),            /* JAPAN                */
-     "iso-2022-jp"},
+     "iso-2022-jp"} ,
     {N_("Korean"),              /* KOREA                */
-     "euc-kr"},
+     "euc-kr"} ,
     {N_("East European"),       /* EAST_EUROPE_WIN      */
-     "windows-1250"},
+     "windows-1250"} ,
     {N_("Cyrillic"),            /* CYRILLIC_WIN         */
-     "windows-1251"},
+     "windows-1251"} ,
     {N_("Greek"),               /* GREEK_WIN            */
-     "windows-1253"},
+     "windows-1253"} ,
     {N_("Hebrew"),              /* HEBREW_WIN           */
-     "windows-1255"},
+     "windows-1255"} ,
     {N_("Arabic"),              /* ARABIC_WIN           */
-     "windows-1256"},
+     "windows-1256"} ,
     {N_("Baltic"),              /* BALTIC_WIN           */
-     "windows-1257"},
+     "windows-1257"} ,
 };
 
 /*
@@ -474,20 +433,17 @@ LibBalsaCodesetInfo libbalsa_codeset_info[LIBBALSA_NUM_CODESETS] = {
  * usually means that txt contains windows (not iso) characters.
  */
 static const gchar *
-libbalsa_get_codeset_name(const gchar    *txt,
-                          LibBalsaCodeset Codeset)
+libbalsa_get_codeset_name(const gchar * txt, LibBalsaCodeset Codeset)
 {
     LibBalsaCodesetInfo *info = &libbalsa_codeset_info[Codeset];
 
     if (txt && info->win) {
         LibBalsaTextAttribute attr = libbalsa_text_attr_string(txt);
-        if (attr & LIBBALSA_TEXT_HI_CTRL) {
+        if (attr & LIBBALSA_TEXT_HI_CTRL)
             return info->win;
-        }
     }
     return info->std;
 }
-
 
 /* Create a GtkComboBox with the national charsets as options;
  * called when some text is found to be neither US-ASCII nor UTF-8, so
@@ -508,9 +464,8 @@ libbalsa_charset_button_new(void)
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box), tmp);
         g_free(tmp);
 
-        if (!g_ascii_strcasecmp(info->std, locale_charset)) {
-            active = n;
-        }
+	if (!g_ascii_strcasecmp(info->std, locale_charset))
+	    active = n;
     }
 
     /* locale_charset may be UTF-8, in which case it was not found,
@@ -520,37 +475,29 @@ libbalsa_charset_button_new(void)
     return combo_box;
 }
 
-
 /* Helper */
 static void
-lb_text_attr(const gchar *text,
-             gssize       len,
-             gboolean    *has_esc,
-             gboolean    *has_hi_bit,
-             gboolean    *has_hi_ctrl)
+lb_text_attr(const gchar * text, gssize len, gboolean * has_esc,
+             gboolean * has_hi_bit, gboolean * has_hi_ctrl)
 {
-    if (len < 0) {
+    if (len < 0)
         len = strlen(text);
-    }
 
     for (; --len >= 0; text++) {
-        guchar c = *text;
-        if (c == 0x1b) {
+	guchar c = *text;
+        if (c == 0x1b)
             *has_esc = TRUE;
-        }
         if (c >= 0x80) {
             *has_hi_bit = TRUE;
-            if (c <= 0x9f) {
+            if (c <= 0x9f)
                 *has_hi_ctrl = TRUE;
-            }
         }
     }
 }
 
-
 /* Return text attributes of a string. */
 LibBalsaTextAttribute
-libbalsa_text_attr_string(const gchar *string)
+libbalsa_text_attr_string(const gchar * string)
 {
     LibBalsaTextAttribute attr;
     gboolean has_esc = FALSE;
@@ -562,28 +509,23 @@ libbalsa_text_attr_string(const gchar *string)
     is_utf8 = g_utf8_validate(string, -1, NULL);
 
     attr = 0;
-    if (has_esc) {
+    if (has_esc)
         attr |= LIBBALSA_TEXT_ESC;
-    }
-    if (has_hi_bit) {
+    if (has_hi_bit)
         attr |= LIBBALSA_TEXT_HI_BIT;
-    }
-    if (has_hi_ctrl) {
+    if (has_hi_ctrl)
         attr |= LIBBALSA_TEXT_HI_CTRL;
-    }
-    if (is_utf8 && has_hi_bit) {
+    if (is_utf8 && has_hi_bit)
         attr |= LIBBALSA_TEXT_HI_UTF8;
-    }
 
     return attr;
 }
-
 
 /* Return text attributes of the contents of a file;
  * filename is in URI form;
  * returns -1 on error. */
 LibBalsaTextAttribute
-libbalsa_text_attr_file(const gchar *filename)
+libbalsa_text_attr_file(const gchar * filename)
 {
     GFile *file;
     GFileInputStream *stream;
@@ -599,24 +541,21 @@ libbalsa_text_attr_file(const gchar *filename)
     file = g_file_new_for_uri(filename);
     stream = g_file_read(file, NULL, NULL);
     g_object_unref(file);
-    if (!stream) {
+    if (!stream)
         return -1;
-    }
 
     while ((bytes = g_input_stream_read(G_INPUT_STREAM(stream), new_chars,
-                                        (sizeof buf) - (new_chars - buf), NULL,
-                                        NULL)) > 0) {
-        gboolean test_bits;
+                               (sizeof buf) - (new_chars - buf), NULL,
+                               NULL)) > 0) {
+	gboolean test_bits;
 
-        test_bits = !has_esc || !has_hi_bit || !has_hi_ctrl;
-        if (!test_bits && !is_utf8) {
-            break;
-        }
+	test_bits = !has_esc || !has_hi_bit || !has_hi_ctrl;
+	if (!test_bits && !is_utf8)
+	    break;
 
-        if (test_bits) {
+        if (test_bits)
             lb_text_attr(new_chars, bytes, &has_esc, &has_hi_bit,
                          &has_hi_ctrl);
-        }
 
         if (is_utf8) {
             const gchar *end;
@@ -639,127 +578,116 @@ libbalsa_text_attr_file(const gchar *filename)
 
     g_object_unref(stream);
 
-    if (bytes < 0) {
+    if (bytes < 0)
         return -1;
-    }
 
     attr = 0;
-    if (has_esc) {
+    if (has_esc)
         attr |= LIBBALSA_TEXT_ESC;
-    }
-    if (has_hi_bit) {
+    if (has_hi_bit)
         attr |= LIBBALSA_TEXT_HI_BIT;
-    }
-    if (has_hi_ctrl) {
+    if (has_hi_ctrl)
         attr |= LIBBALSA_TEXT_HI_CTRL;
-    }
-    if (is_utf8 && has_hi_bit) {
+    if (is_utf8 && has_hi_bit)
         attr |= LIBBALSA_TEXT_HI_UTF8;
-    }
 
     return attr;
 }
 
+#define compare_stat(osb, nsb)  ( (osb.st_dev != nsb.st_dev || osb.st_ino != nsb.st_ino || osb.st_rdev != nsb.st_rdev) ? -1 : 0 )
 
-#define compare_stat(osb, \
-                     nsb)  ((osb.st_dev != nsb.st_dev || osb.st_ino != nsb.st_ino || \
-                             osb.st_rdev != nsb.st_rdev) ? -1 : 0)
-
-int
-libbalsa_safe_open(const char *path,
-                   int         flags,
-                   mode_t      mode,
-                   GError    **err)
+int 
+libbalsa_safe_open (const char *path, int flags, mode_t mode, GError **err)
 {
-    struct stat osb, nsb;
-    int fd;
-
-    if ((fd = open (path, flags, mode)) < 0) {
-        g_set_error(err, LIBBALSA_ERROR_QUARK, errno,
-                    _("Cannot open %s: %s"), path, g_strerror(errno));
-        return fd;
-    }
-
-    /* make sure the file is not symlink */
-    if ((lstat (path, &osb) < 0) || (fstat (fd, &nsb) < 0) ||
-        (compare_stat(osb, nsb) == -1)) {
-        close (fd);
-        g_set_error(err, LIBBALSA_ERROR_QUARK, errno,
-                    _("Cannot open %s: is a symbolic link"), path);
-        return (-1);
-    }
-
-    return (fd);
+  struct stat osb, nsb;
+  int fd;
+ 
+  if ((fd = open (path, flags, mode)) < 0) {
+      g_set_error(err, LIBBALSA_ERROR_QUARK, errno,
+                  _("Cannot open %s: %s"), path, g_strerror(errno));
+      return fd;
+  }
+ 
+  /* make sure the file is not symlink */
+  if (lstat (path, &osb) < 0 || fstat (fd, &nsb) < 0 ||
+      compare_stat(osb, nsb) == -1) {
+      close (fd);
+      g_set_error(err, LIBBALSA_ERROR_QUARK, errno,
+                  _("Cannot open %s: is a symbolic link"), path);
+      return (-1);
+  }
+ 
+  return (fd);
 }
 
-
-/*
+/* 
  * This function is supposed to do nfs-safe renaming of files.
- *
+ * 
  * Warning: We don't check whether src and target are equal.
  */
 
-int
-libbalsa_safe_rename(const char *src,
-                     const char *target)
+int 
+libbalsa_safe_rename (const char *src, const char *target)
 {
-    struct stat ssb, tsb;
+  struct stat ssb, tsb;
 
-    if (!src || !target) {
-        return -1;
-    }
+  if (!src || !target)
+    return -1;
 
-    if (link (src, target) != 0) {
-
-        /*
-         * Coda does not allow cross-directory links, but tells
-         * us it's a cross-filesystem linking attempt.
-         *
-         * However, the Coda rename call is allegedly safe to use.
-         *
-         * With other file systems, rename should just fail when
-         * the files reside on different file systems, so it's safe
-         * to try it here.
-         *
-         */
-
-        if (errno == EXDEV) {
-            return rename (src, target);
-        }
-
-        return -1;
-    }
+  if (link (src, target) != 0)
+  {
 
     /*
-     * Stat both links and check if they are equal.
+     * Coda does not allow cross-directory links, but tells
+     * us it's a cross-filesystem linking attempt.
+     * 
+     * However, the Coda rename call is allegedly safe to use.
+     * 
+     * With other file systems, rename should just fail when 
+     * the files reside on different file systems, so it's safe
+     * to try it here.
+     *
      */
 
-    if (stat (src, &ssb) == -1) {
-        return -1;
-    }
+    if (errno == EXDEV)
+      return rename (src, target);
+    
+    return -1;
+  }
 
-    if (stat (target, &tsb) == -1) {
-        return -1;
-    }
+  /*
+   * Stat both links and check if they are equal.
+   */
+  
+  if (stat (src, &ssb) == -1)
+  {
+    return -1;
+  }
+  
+  if (stat (target, &tsb) == -1)
+  {
+    return -1;
+  }
 
-    /*
-     * pretend that the link failed because the target file
-     * did already exist.
-     */
+  /* 
+   * pretend that the link failed because the target file
+   * did already exist.
+   */
 
-    if (compare_stat (ssb, tsb) == -1) {
-        errno = EEXIST;
-        return -1;
-    }
+  if (compare_stat (ssb, tsb) == -1)
+  {
+    errno = EEXIST;
+    return -1;
+  }
 
-    /*
-     * Unlink the original link.  Should we really ignore the return
-     * value here? XXX
-     */
+  /*
+   * Unlink the original link.  Should we really ignore the return
+   * value here? XXX
+   */
 
-    unlink (src);
+  unlink (src);
 
-    return 0;
+  return 0;
 }
 
 
@@ -770,19 +698,13 @@ libbalsa_safe_rename(const char *src,
  *      dot             if dot != 0, try to dotlock the file
  *      timeout         should retry locking?
  */
-int
-libbalsa_lock_file(const char *path,
-                   int         fd,
-                   int         excl,
-                   int         dot,
-                   int         timeout)
+int 
+libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout)
 {
 #if defined (USE_FCNTL) || defined (USE_FLOCK)
     int count;
     int attempt;
-    struct stat prev_sb = {
-        0
-    };
+    struct stat prev_sb = { 0 };
 #endif
     int r = 0;
 
@@ -795,110 +717,105 @@ libbalsa_lock_file(const char *path,
 
     count = 0;
     attempt = 0;
-    while (fcntl (fd, F_SETLK, &lck) == -1) {
-        struct stat sb;
-        g_print("%s(): fcntl errno %d.\n", __FUNCTION__, errno);
-        if ((errno != EAGAIN) && (errno != EACCES)) {
-            libbalsa_information
-                (LIBBALSA_INFORMATION_DEBUG, "fcntl failed, errno=%d.", errno);
-            return -1;
-        }
-
-        if (fstat (fd, &sb) != 0) {
-            sb.st_size = 0;
-        }
-
-        if (count == 0) {
-            prev_sb = sb;
-        }
-
-        /* only unlock file if it is unchanged */
-        if ((prev_sb.st_size == sb.st_size) && (++count >= (timeout ? MAXLOCKATTEMPT : 0))) {
-            if (timeout) {
-                libbalsa_information
-                    (LIBBALSA_INFORMATION_WARNING,
-                    _("Timeout exceeded while attempting fcntl lock!"));
-            }
-            return (-1);
-        }
-
-        prev_sb = sb;
-
-        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-                             _("Waiting for fcntl lock… %d"), ++attempt);
-        sleep (1);
-    }
+    while (fcntl (fd, F_SETLK, &lck) == -1)
+	{
+	    struct stat sb;
+	    g_print("%s(): fcntl errno %d.\n", __FUNCTION__, errno);
+    if (errno != EAGAIN && errno != EACCES)
+	{
+	    libbalsa_information
+		(LIBBALSA_INFORMATION_DEBUG, "fcntl failed, errno=%d.", errno);
+	    return -1;
+	}
+ 
+    if (fstat (fd, &sb) != 0)
+	sb.st_size = 0;
+     
+    if (count == 0)
+	prev_sb = sb;
+ 
+    /* only unlock file if it is unchanged */
+    if (prev_sb.st_size == sb.st_size && ++count >= (timeout?MAXLOCKATTEMPT:0))
+	{
+	    if (timeout)
+		libbalsa_information
+		    (LIBBALSA_INFORMATION_WARNING,
+		     _("Timeout exceeded while attempting fcntl lock!"));
+	    return (-1);
+	}
+ 
+    prev_sb = sb;
+ 
+    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+			 _("Waiting for fcntl lock… %d"), ++attempt);
+    sleep (1);
+}
 #endif /* USE_FCNTL */
-
+ 
 #ifdef USE_FLOCK
-    count = 0;
-    attempt = 0;
-    while (flock (fd, (excl ? LOCK_EX : LOCK_SH) | LOCK_NB) == -1) {
-        struct stat sb;
-        if (errno != EWOULDBLOCK) {
-            libbalsa_message ("flock: %s", strerror(errno));
-            r = -1;
-            break;
-        }
-
-        if (fstat(fd, &sb) != 0 ) {
-            sb.st_size = 0;
-        }
-
-        if (count == 0) {
-            prev_sb = sb;
-        }
-
-        /* only unlock file if it is unchanged */
-        if ((prev_sb.st_size == sb.st_size) && (++count >= (timeout ? MAXLOCKATTEMPT : 0))) {
-            if (timeout) {
-                libbalsa_message (_("Timeout exceeded while attempting flock lock!"));
-            }
-            r = -1;
-            break;
-        }
-
-        prev_sb = sb;
-
-        libbalsa_message (_("Waiting for flock attempt… %d"), ++attempt);
-        sleep (1);
-    }
+count = 0;
+attempt = 0;
+while (flock (fd, (excl ? LOCK_EX : LOCK_SH) | LOCK_NB) == -1)
+{
+    struct stat sb;
+    if (errno != EWOULDBLOCK)
+	{
+	    libbalsa_message ("flock: %s", strerror(errno));
+	    r = -1;
+	    break;
+	}
+ 
+    if (fstat(fd,&sb) != 0 )
+	sb.st_size=0;
+     
+    if (count == 0)
+	prev_sb=sb;
+ 
+    /* only unlock file if it is unchanged */
+    if (prev_sb.st_size == sb.st_size && ++count >= (timeout?MAXLOCKATTEMPT:0))
+	{
+	    if (timeout)
+		libbalsa_message (_("Timeout exceeded while attempting flock lock!"));
+	    r = -1;
+	    break;
+	}
+ 
+    prev_sb = sb;
+ 
+    libbalsa_message (_("Waiting for flock attempt… %d"), ++attempt);
+    sleep (1);
+}
 #endif /* USE_FLOCK */
-
+ 
 #ifdef USE_DOTLOCK
-    if ((r == 0) && dot) {
-        r = dotlock_file (path, fd, timeout);
-    }
+if (r == 0 && dot)
+     r = dotlock_file (path, fd, timeout);
 #endif /* USE_DOTLOCK */
-
-    if (r == -1) {
-        /* release any other locks obtained in this routine */
-
+ 
+     if (r == -1)
+{
+    /* release any other locks obtained in this routine */
+ 
 #ifdef USE_FCNTL
-        lck.l_type = F_UNLCK;
-        fcntl (fd, F_SETLK, &lck);
+    lck.l_type = F_UNLCK;
+    fcntl (fd, F_SETLK, &lck);
 #endif /* USE_FCNTL */
-
+ 
 #ifdef USE_FLOCK
-        flock (fd, LOCK_UN);
+    flock (fd, LOCK_UN);
 #endif /* USE_FLOCK */
-
-        return (-1);
-    }
-
-    return 0;
+ 
+    return (-1);
+}
+ 
+return 0;
 }
 
-
-int
-libbalsa_unlock_file(const char *path,
-                     int         fd,
-                     int         dot)
+int 
+libbalsa_unlock_file (const char *path, int fd, int dot)
 {
 #ifdef USE_FCNTL
-    struct flock unlockit = {
-        F_UNLCK, 0, 0, 0
-    };
+    struct flock unlockit = { F_UNLCK, 0, 0, 0 };
 
     memset (&unlockit, 0, sizeof (struct flock));
     unlockit.l_type = F_UNLCK;
@@ -911,9 +828,8 @@ libbalsa_unlock_file(const char *path,
 #endif
 
 #ifdef USE_DOTLOCK
-    if (dot) {
-        undotlock_file (path, fd);
-    }
+    if (dot)
+	undotlock_file (path, fd);
 #endif
 
     return 0;
@@ -923,40 +839,36 @@ libbalsa_unlock_file(const char *path,
 /* libbalsa_ia_rfc2821_equal
    compares two addresses according to rfc2821: local-part@domain is equal,
    if the local-parts are case sensitive equal, but the domain case-insensitive
- */
+*/
 gboolean
-libbalsa_ia_rfc2821_equal(const InternetAddress *a,
-                          const InternetAddress *b)
+libbalsa_ia_rfc2821_equal(const InternetAddress * a,
+			  const InternetAddress * b)
 {
     const gchar *a_atptr, *b_atptr;
     const gchar *a_addr, *b_addr;
     gint a_atpos, b_atpos;
 
-    if (!INTERNET_ADDRESS_IS_MAILBOX(a) || !INTERNET_ADDRESS_IS_MAILBOX(b)) {
+    if (!INTERNET_ADDRESS_IS_MAILBOX(a) || !INTERNET_ADDRESS_IS_MAILBOX(b))
         return FALSE;
-    }
 
     /* first find the "@" in the two addresses */
     a_addr = INTERNET_ADDRESS_MAILBOX(a)->addr;
     b_addr = INTERNET_ADDRESS_MAILBOX(b)->addr;
     a_atptr = strchr(a_addr, '@');
     b_atptr = strchr(b_addr, '@');
-    if (!a_atptr || !b_atptr) {
+    if (!a_atptr || !b_atptr)
         return FALSE;
-    }
     a_atpos = a_atptr - a_addr;
     b_atpos = b_atptr - b_addr;
 
     /* now compare the strings */
-    if (!a_atpos || !b_atpos || (a_atpos != b_atpos) ||
+    if (!a_atpos || !b_atpos || a_atpos != b_atpos || 
         strncmp(a_addr, b_addr, a_atpos) ||
-        g_ascii_strcasecmp(a_atptr, b_atptr)) {
+        g_ascii_strcasecmp(a_atptr, b_atptr))
         return FALSE;
-    } else {
+    else
         return TRUE;
-    }
 }
-
 
 /*
  * Utilities for making consistent dialogs.
@@ -977,16 +889,13 @@ libbalsa_create_grid(void)
     return grid;
 }
 
-
 /* create_label:
    Create a label and add it to a table in the first column of given row,
-   setting the keyval to found accelerator value, that can be later used
+   setting the keyval to found accelerator value, that can be later used 
    in create_entry.
- */
+*/
 GtkWidget *
-libbalsa_create_grid_label(const gchar *text,
-                           GtkWidget   *grid,
-                           gint         row)
+libbalsa_create_grid_label(const gchar * text, GtkWidget * grid, gint row)
 {
     GtkWidget *label;
 
@@ -999,15 +908,12 @@ libbalsa_create_grid_label(const gchar *text,
     return label;
 }
 
-
 /* create_check:
    creates a checkbox with a given label and places them in given array.
- */
+*/
 GtkWidget *
-libbalsa_create_grid_check(const gchar *text,
-                           GtkWidget   *grid,
-                           gint         row,
-                           gboolean     initval)
+libbalsa_create_grid_check(const gchar * text, GtkWidget * grid, gint row,
+                           gboolean initval)
 {
     GtkWidget *check_button;
     GtkWidget *label;
@@ -1021,23 +927,18 @@ libbalsa_create_grid_check(const gchar *text,
 
     gtk_grid_attach(GTK_GRID(grid), check_button, 0, row, 2, 1);
 
-    if (initval) {
+    if (initval)
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button),
                                      TRUE);
-    }
 
     return check_button;
 }
 
-
 /* Create a text entry and add it to the table */
 GtkWidget *
-libbalsa_create_grid_entry(GtkWidget   *grid,
-                           GCallback    changed_func,
-                           gpointer     data,
-                           gint         row,
-                           const gchar *initval,
-                           GtkWidget   *hotlabel)
+libbalsa_create_grid_entry(GtkWidget * grid, GCallback changed_func,
+                           gpointer data, gint row, const gchar * initval,
+                           GtkWidget * hotlabel)
 {
     GtkWidget *entry;
 
@@ -1046,40 +947,34 @@ libbalsa_create_grid_entry(GtkWidget   *grid,
 
     gtk_grid_attach(GTK_GRID(grid), entry, 1, row, 1, 1);
 
-    if (initval) {
+    if (initval)
         gtk_entry_set_text(GTK_ENTRY(entry), initval);
-    }
 
     gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
 
     /* Watch for changes... */
-    if (changed_func) {
+    if (changed_func)
         g_signal_connect(entry, "changed", changed_func, data);
-    }
 
     return entry;
 }
-
 
 /* Create a GtkSizeGroup and add to it any GtkLabel packed in a GtkGrid
  * inside the chooser widget; size_group will be unreffed when the
  * chooser widget is finalized. */
 static void
-lb_create_size_group_func(GtkWidget *widget,
-                          gpointer   data)
+lb_create_size_group_func(GtkWidget * widget, gpointer data)
 {
     if (GTK_IS_LABEL(widget) &&
-        GTK_IS_GRID(gtk_widget_get_parent(widget))) {
+        GTK_IS_GRID(gtk_widget_get_parent(widget)))
         gtk_size_group_add_widget(GTK_SIZE_GROUP(data), widget);
-    } else if (GTK_IS_CONTAINER(widget)) {
+    else if (GTK_IS_CONTAINER(widget))
         gtk_container_foreach(GTK_CONTAINER(widget),
                               lb_create_size_group_func, data);
-    }
 }
 
-
 GtkSizeGroup *
-libbalsa_create_size_group(GtkWidget *chooser)
+libbalsa_create_size_group(GtkWidget * chooser)
 {
     GtkSizeGroup *size_group;
 
@@ -1091,15 +986,13 @@ libbalsa_create_size_group(GtkWidget *chooser)
     return size_group;
 }
 
-
 void
 libbalsa_assure_balsa_dir(void)
 {
-    gchar *dir = g_strconcat(g_get_home_dir(), "/.balsa", NULL);
-    mkdir(dir, S_IRUSR | S_IWUSR | S_IXUSR);
+    gchar* dir = g_strconcat(g_get_home_dir(), "/.balsa", NULL);
+    mkdir(dir, S_IRUSR|S_IWUSR|S_IXUSR);
     g_free(dir);
 }
-
 
 /* Some more "guess" functions symmetric to libbalsa_guess_mail_spool()... */
 
@@ -1107,108 +1000,94 @@ libbalsa_assure_balsa_dir(void)
 #define IMAP_SERVER "mx"
 #define LDAP_SERVER "ldap"
 
-static gchar *
+static gchar*
 qualified_hostname(const char *name)
 {
-    gchar *domain = libbalsa_get_domainname();
+    gchar *domain=libbalsa_get_domainname();
 
-    if (domain) {
-        gchar *host = g_strdup_printf("%s.%s", name, domain);
+    if(domain) {
+	gchar *host=g_strdup_printf("%s.%s", name, domain);
+	
+	g_free(domain);
 
-        g_free(domain);
-
-        return host;
-    } else {
-        return g_strdup(name);
-    }
+	return host;
+    } else
+	return g_strdup(name);
 }
 
 
-gchar *
-libbalsa_guess_imap_server()
+gchar *libbalsa_guess_imap_server()
 {
     return qualified_hostname(IMAP_SERVER);
 }
 
-
-gchar *
-libbalsa_guess_ldap_server()
+gchar *libbalsa_guess_ldap_server()
 {
     return qualified_hostname(LDAP_SERVER);
 }
 
-
-gchar *
-libbalsa_guess_imap_inbox()
+gchar *libbalsa_guess_imap_inbox()
 {
     gchar *server = libbalsa_guess_imap_server();
 
-    if (server) {
-        gchar *url = g_strdup_printf("imap://%s/INBOX", server);
+    if(server) {
+	gchar *url = g_strdup_printf("imap://%s/INBOX", server);
+	
+	g_free(server);
 
-        g_free(server);
-
-        return url;
+	return url;
     }
 
     return NULL;
 }
 
-
-gchar *
-libbalsa_guess_ldap_base()
+gchar *libbalsa_guess_ldap_base()
 {
     gchar *server = libbalsa_guess_ldap_server();
 
     /* Note: Assumes base dn is "o=<domain name>". Somewhat speculative... */
-    if (server) {
-        gchar *base = NULL, *domain;
+    if(server) {
+	gchar *base=NULL, *domain;
 
-        if ((domain = strchr(server, '.'))) {
-            base = g_strdup_printf("o=%s", domain + 1);
-        }
+	if((domain=strchr(server, '.')))
+	   base = g_strdup_printf("o=%s", domain+1);
+	
+	g_free(server);
 
-        g_free(server);
-
-        return base;
+	return base;
     }
     return NULL;
 }
 
-
-gchar *
-libbalsa_guess_ldap_name()
+gchar *libbalsa_guess_ldap_name()
 {
     gchar *base = libbalsa_guess_ldap_base();
 
-    if (base) {
-        gchar *name = strchr(base, '=');
-        gchar *dir_name = g_strdup_printf(_("LDAP Directory for %s"),
-                                          (name ? name + 1 : base));
-        g_free(base);
+    if(base) {
+	gchar *name = strchr(base, '=');
+	gchar *dir_name = g_strdup_printf(_("LDAP Directory for %s"), 
+					  (name?name+1:base));
+	g_free(base);
 
-        return dir_name;
-    }
+	return dir_name;
+    } 
 
     return NULL;
 }
 
 
 gboolean
-libbalsa_path_is_below_dir(const gchar *path,
-                           const gchar *dir)
+libbalsa_path_is_below_dir(const gchar * path, const gchar * dir)
 {
     gsize len;
 
-    if (!path || !dir || !g_str_has_prefix(path, dir)) {
+    if (!path || !dir || !g_str_has_prefix(path, dir))
         return FALSE;
-    }
 
     len = strlen(dir);
 
     return dir[len - 1] == G_DIR_SEPARATOR || path[len] == G_DIR_SEPARATOR;
 }
-
 
 #define LIBBALSA_RADIX 1024.0
 #define MAX_WITHOUT_SUFFIX 9999
@@ -1222,23 +1101,19 @@ libbalsa_size_to_gchar(guint64 size)
 
         for (s = suffix; /* *s != '\0' */; s++) {
             displayed_size /= LIBBALSA_RADIX;
-            if (displayed_size < 9.995) {
+            if (displayed_size < 9.995)
                 return g_strdup_printf("%.2f%c", displayed_size, *s);
-            }
-            if (displayed_size < 99.95) {
+            if (displayed_size < 99.95)
                 return g_strdup_printf("%.1f%c", displayed_size, *s);
-            }
-            if ((displayed_size < LIBBALSA_RADIX - 0.5) || !s[1]) {
+            if (displayed_size < LIBBALSA_RADIX - 0.5 || !s[1])
                 return g_strdup_printf("%" G_GUINT64_FORMAT "%c",
                                        ((guint64) (displayed_size + 0.5)),
                                        *s);
-            }
         }
     }
 
     return g_strdup_printf("%" G_GUINT64_FORMAT, size);
 }
-
 
 /*
  * libbalsa_font_string_to_css: construct CSS text corresponding to a
@@ -1252,8 +1127,8 @@ libbalsa_size_to_gchar(guint64 size)
  */
 
 gchar *
-libbalsa_font_string_to_css(const gchar *font_string,
-                            const gchar *name)
+libbalsa_font_string_to_css(const gchar * font_string,
+                            const gchar * name)
 {
     PangoFontDescription *desc;
     PangoFontMask mask;
@@ -1334,14 +1209,13 @@ libbalsa_font_string_to_css(const gchar *font_string,
     return g_string_free(string, FALSE);
 }
 
-
 /*
  * Convenience function for removing and clearing a GSource id
  *
  * Returns TRUE if the GSource was removed
  */
 gboolean
-libbalsa_clear_source_id(guint *tag)
+libbalsa_clear_source_id(guint * tag)
 {
     gboolean retval;
 
@@ -1354,7 +1228,6 @@ libbalsa_clear_source_id(guint *tag)
     return retval;
 }
 
-
 /*
  * Convenience functions for freeing list items' data and clearing the
  * list
@@ -1363,17 +1236,14 @@ libbalsa_clear_source_id(guint *tag)
  * g_clear_pointer(&list, (GDestroyNotify) g_list_free);
  */
 void
-libbalsa_clear_list(GList        **list,
-                    GDestroyNotify free_func)
+libbalsa_clear_list(GList ** list, GDestroyNotify free_func)
 {
     g_list_free_full(*list, free_func);
     *list = NULL;
 }
 
-
 void
-libbalsa_clear_slist(GSList       **list,
-                     GDestroyNotify free_func)
+libbalsa_clear_slist(GSList ** list, GDestroyNotify free_func)
 {
     g_slist_free_full(*list, free_func);
     *list = NULL;

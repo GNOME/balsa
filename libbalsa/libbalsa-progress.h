@@ -22,7 +22,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#   include <config.h>
+#include <config.h>
 #endif
 
 #include <gtk/gtk.h>
@@ -30,15 +30,13 @@
 
 /** \brief Progress dialogue
  *
- * Structure containing the actual progress dialogue widget and a mutex for protecting
- * concurrent accesses.  As to initialise a
- * variable of this type, put it either in static memory, or set the \ref ProgressDialog::dialog
- * to NULL and initialise \ref
+ * Structure containing the actual progress dialogue widget and a mutex for protecting concurrent accesses.  As to initialise a
+ * variable of this type, put it either in static memory, or set the \ref ProgressDialog::dialog to NULL and initialise \ref
  * ProgressDialog::mutex.
  */
 typedef struct {
-    GtkWidget *dialog;
-    GMutex mutex;
+	GtkWidget *dialog;
+	GMutex     mutex;
 } ProgressDialog;
 
 
@@ -49,48 +47,41 @@ typedef struct {
  * \param parent parent window
  * \param progress_id progress identifier, also used as section title, \em must be unique
  *
- * If the passed progress dialogue \ref ProgressDialog::dialog is NULL, a new dialogue is
- * created.
+ * If the passed progress dialogue \ref ProgressDialog::dialog is NULL, a new dialogue is created.
  *
- * If no progress section with the passed id exists, it is appended.  An already existing
- * section is revealed if necessary.
+ * If no progress section with the passed id exists, it is appended.  An already existing section is revealed if necessary.
  *
- * \note This function may be called from a thread.  In this case, the function will block in
- * the thread until the "real" work has
+ * \note This function may be called from a thread.  In this case, the function will block in the thread until the "real" work has
  *       been done in the main thread.
  */
 void libbalsa_progress_dialog_ensure(ProgressDialog *progress_dialog,
-                                     const gchar    *dialog_title,
-                                     GtkWindow      *parent,
-                                     const gchar    *progress_id);
+									 const gchar    *dialog_title,
+									 GtkWindow      *parent,
+									 const gchar    *progress_id);
 
 
 /** \brief Progress dialogue update
  *
  * \param progress_dialog progress dialogue, initialised by libbalsa_progress_dialog_ensure()
  * \param progress_id progress identifier passed to libbalsa_progress_dialog_ensure()
- * \param finished indicates whether the progress element shall be removed from the dialogue.
- * When no progress elements are left,
+ * \param finished indicates whether the progress element shall be removed from the dialogue.  When no progress elements are left,
  *                 the dialogue is destroyed
- * \param fraction progress bar value between 0.0 and 1.0, or INF to switch to activity mode, or
- * NAN to keep the current value
- * \param message printf-like format string which shall be printed above the progress bar, or
- * NULL to keep the current message
+ * \param fraction progress bar value between 0.0 and 1.0, or INF to switch to activity mode, or NAN to keep the current value
+ * \param message printf-like format string which shall be printed above the progress bar, or NULL to keep the current message
  * \param ... additional arguments for the message format string
  *
  * Update the information of the passed progress dialogue.
  *
- * \note This function may be called from a thread.  In this case, the "real" work is done in an
- * idle callback and may therefore
+ * \note This function may be called from a thread.  In this case, the "real" work is done in an idle callback and may therefore
  *       be performed only after this function returns.
  */
 void libbalsa_progress_dialog_update(ProgressDialog *progress_dialog,
-                                     const gchar    *progress_id,
-                                     gboolean        finished,
-                                     gdouble         fraction,
-                                     const gchar    *message,
-                                     ...)
-G_GNUC_PRINTF(5, 6);
+									 const gchar    *progress_id,
+									 gboolean        finished,
+									 gdouble         fraction,
+									 const gchar    *message,
+									 ...)
+	G_GNUC_PRINTF(5, 6);
 
 
 #endif /* LIBBALSA_PROGRESS_H_ */

@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,38 +30,38 @@ G_BEGIN_DECLS
  * Main object structure
  */
 #ifndef __TYPEDEF_BALSA_DRUID_PAGE_USER__
-#   define __TYPEDEF_BALSA_DRUID_PAGE_USER__
-typedef struct _BalsaDruidPageUser BalsaDruidPageUser;
+#define __TYPEDEF_BALSA_DRUID_PAGE_USER__
+    typedef struct _BalsaDruidPageUser BalsaDruidPageUser;
 #endif
 #define BALSA_DRUID_PAGE_USER(obj) ((BalsaDruidPageUser *) obj)
-struct _BalsaDruidPageUser {
-    GtkWidget *page;
-    GtkWidget *incoming_srv;
-    GtkWidget *incoming_type;
-    GtkWidget *security;
-    GtkWidget *login;
-    GtkWidget *passwd;
-    GtkWidget *remember_passwd;
-    GtkWidget *smtp;
-    GtkWidget *name;
-    GtkWidget *email;
-    GtkWidget *localmaildir;
-    EntryMaster emaster;
-    EntryData ed0;
-    EntryData ed1;
-    EntryData ed2;
-    EntryData ed3;
-    EntryData ed4;
-    EntryData ed5;
-    EntryData ed6;
-    EntryData ed7;
-    gboolean need_set;
-};
+    struct _BalsaDruidPageUser {
+        GtkWidget *page;
+        GtkWidget *incoming_srv;
+        GtkWidget *incoming_type;
+        GtkWidget *security;
+        GtkWidget *login;
+        GtkWidget *passwd;
+        GtkWidget *remember_passwd;
+        GtkWidget *smtp;
+        GtkWidget *name;
+        GtkWidget *email;
+        GtkWidget *localmaildir;
+        EntryMaster emaster;
+        EntryData ed0;
+        EntryData ed1;
+        EntryData ed2;
+        EntryData ed3;
+        EntryData ed4;
+        EntryData ed5;
+        EntryData ed6;
+        EntryData ed7;
+        gboolean need_set;
+    };
 
 /*
  * Public methods
  */
-void balsa_druid_page_user(GtkAssistant *druid);
+    void balsa_druid_page_user(GtkAssistant * druid);
 
 G_END_DECLS
 

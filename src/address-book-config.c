@@ -5,20 +5,20 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#   include "config.h"
+# include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "address-book-config.h"
 
@@ -28,7 +28,7 @@
 #include <glib/gi18n.h>
 
 #if HAVE_MACOSX_DESKTOP
-#   include "macosx-helpers.h"
+#  include "macosx-helpers.h"
 #endif
 
 typedef struct _AddressBookConfig AddressBookConfig;
@@ -43,75 +43,68 @@ struct _AddressBookConfig {
     GType type;
 
     union {
-        struct {
-            GtkWidget *load;
-            GtkWidget *save;
-        } externq;
-
+	struct {
+		GtkWidget *load;
+		GtkWidget *save;
+	} externq;
+	
 #ifdef ENABLE_LDAP
-        struct {
-            GtkWidget *host;
-            GtkWidget *base_dn;
-            GtkWidget *bind_dn;
-            GtkWidget *book_dn;
-            GtkWidget *passwd;
-            GtkWidget *enable_tls;
-        } ldap;
+	struct {
+	    GtkWidget *host;
+	    GtkWidget *base_dn;
+	    GtkWidget *bind_dn;
+	    GtkWidget *book_dn;
+	    GtkWidget *passwd;
+	    GtkWidget *enable_tls;
+	} ldap;
 #endif
     } ab_specific;
 
     LibBalsaAddressBook *address_book;
     BalsaAddressBookCallback *callback;
-    GtkWindow *parent;
+    GtkWindow* parent;
 };
 
-static GtkWidget *create_dialog_from_type(AddressBookConfig *abc);
-static GtkWidget *create_local_dialog(AddressBookConfig *abc,
-                                      const gchar       *type);
-static GtkWidget *create_externq_dialog(AddressBookConfig *abc);
-
+static GtkWidget *create_dialog_from_type(AddressBookConfig * abc);
+static GtkWidget *create_local_dialog(AddressBookConfig * abc,
+                                      const gchar * type);
+static GtkWidget *create_externq_dialog(AddressBookConfig * abc);
 #ifdef ENABLE_LDAP
-static GtkWidget *create_ldap_dialog(AddressBookConfig *abc);
-
+static GtkWidget *create_ldap_dialog(AddressBookConfig * abc);
 #endif
 #ifdef HAVE_SQLITE
-static GtkWidget *create_gpe_dialog(AddressBookConfig *abc);
-
+static GtkWidget *create_gpe_dialog(AddressBookConfig * abc);
 #endif
 #ifdef HAVE_RUBRICA
-static GtkWidget *create_rubrica_dialog(AddressBookConfig *abc);
-
+static GtkWidget *create_rubrica_dialog(AddressBookConfig * abc);
 #endif
 #ifdef HAVE_OSMO
 static GtkWidget *create_osmo_dialog(AddressBookConfig *abc);
-
 #endif
 
-static void help_button_cb(AddressBookConfig *abc);
-static gboolean handle_close(AddressBookConfig *abc);
-static gboolean bad_path(gchar     *path,
-                         GtkWindow *window,
-                         gint       type);
-static gboolean create_book(AddressBookConfig *abc);
-static void modify_book(AddressBookConfig *abc);
+static void help_button_cb(AddressBookConfig * abc);
+static gboolean handle_close(AddressBookConfig * abc);
+static gboolean bad_path(gchar * path, GtkWindow * window, gint type);
+static gboolean create_book(AddressBookConfig * abc);
+static void modify_book(AddressBookConfig * abc);
 
 /*
  * Create and run the address book configuration window.
  *
- * address_book is the address book to configure. If it is
+ * address_book is the address book to configure. If it is 
  * NULL then a new address book is created, the user is prompted
  * for the kind of address book to create.
  *
  * Returns the configured/new mailbox if the user presses Update/Add
  * or NULL if the user cancels.
- *
+ * 
  * The address book returned will have been setup.
  *
  */
 void
-balsa_address_book_config_new(LibBalsaAddressBook     *address_book,
+balsa_address_book_config_new(LibBalsaAddressBook * address_book,
                               BalsaAddressBookCallback callback,
-                              GtkWindow               *parent)
+                              GtkWindow* parent)
 {
     AddressBookConfig *abc;
 
@@ -129,18 +122,16 @@ balsa_address_book_config_new(LibBalsaAddressBook     *address_book,
     abc->type = G_TYPE_FROM_INSTANCE(address_book);
     abc->window = create_dialog_from_type(abc);
 
-    if (address_book) {
-        gtk_widget_grab_focus(abc->name_entry);
-    }
+    if (address_book)
+	gtk_widget_grab_focus(abc->name_entry);
 
     gtk_widget_show(GTK_WIDGET(abc->window));
 }
 
-
 void
-balsa_address_book_config_new_from_type(GType                    type,
+balsa_address_book_config_new_from_type(GType type,
                                         BalsaAddressBookCallback callback,
-                                        GtkWindow               *parent)
+                                        GtkWindow* parent)
 {
     AddressBookConfig *abc;
 
@@ -153,40 +144,31 @@ balsa_address_book_config_new_from_type(GType                    type,
     gtk_widget_show(GTK_WIDGET(abc->window));
 }
 
-
 static void
-edit_book_response(GtkWidget         *dialog,
-                   gint               response,
-                   AddressBookConfig *abc)
+edit_book_response(GtkWidget * dialog, gint response,
+                   AddressBookConfig * abc)
 {
     switch (response) {
     case GTK_RESPONSE_HELP:
         help_button_cb(abc);
         return;
-
     case GTK_RESPONSE_APPLY:
-        if (handle_close(abc)) {
+        if (handle_close(abc))
             break;
-        } else {
+        else
             return;
-        }
-
     default:
         break;
     }
 
     gtk_widget_destroy(dialog);
-    if (abc->address_book) {
+    if (abc->address_book)
         g_object_set_data(G_OBJECT(abc->address_book), "balsa-abc", NULL);
-    }
 }
-
 
 /* Radio buttons */
 static void
-add_radio_buttons(GtkWidget         *grid,
-                  gint               row,
-                  AddressBookConfig *abc)
+add_radio_buttons(GtkWidget * grid, gint row, AddressBookConfig * abc)
 {
     GtkWidget *label;
     GSList *radio_group;
@@ -218,19 +200,16 @@ add_radio_buttons(GtkWidget         *grid,
 
     button = abc->as_i_type;
     if (abc->address_book) {
-        if (!libbalsa_address_book_get_expand_aliases(abc->address_book)) {
+        if (!libbalsa_address_book_get_expand_aliases(abc->address_book))
             button = abc->never;
-        } else if (libbalsa_address_book_get_is_expensive(abc->address_book)) {
+        else if (libbalsa_address_book_get_is_expensive(abc->address_book))
             button = abc->on_request;
-        }
     }
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 }
 
-
 static GtkWidget *
-create_local_dialog(AddressBookConfig *abc,
-                    const gchar       *type)
+create_local_dialog(AddressBookConfig * abc, const gchar * type)
 {
     GtkWidget *dialog;
     gchar *title;
@@ -256,8 +235,8 @@ create_local_dialog(AddressBookConfig *abc,
         gtk_file_chooser_dialog_new(title, abc->parent,
                                     GTK_FILE_CHOOSER_ACTION_SAVE,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                    _("_Help"), GTK_RESPONSE_HELP,
-                                    action, GTK_RESPONSE_APPLY,
+                                    _("_Help"),   GTK_RESPONSE_HELP,
+                                    action,       GTK_RESPONSE_APPLY,
                                     NULL);
     g_free(title);
 #if HAVE_MACOSX_DESKTOP
@@ -295,23 +274,20 @@ create_local_dialog(AddressBookConfig *abc,
     return dialog;
 }
 
-
 static GtkWidget *
-create_vcard_dialog(AddressBookConfig *abc)
+create_vcard_dialog(AddressBookConfig * abc)
 {
     return create_local_dialog(abc, "VCARD");
 }
 
-
 static GtkWidget *
-create_ldif_dialog(AddressBookConfig *abc)
+create_ldif_dialog(AddressBookConfig * abc)
 {
     return create_local_dialog(abc, "LDIF");
 }
 
-
 static GtkWidget *
-create_dialog_from_type(AddressBookConfig *abc)
+create_dialog_from_type(AddressBookConfig * abc)
 {
     if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD) {
         return create_vcard_dialog(abc);
@@ -319,26 +295,21 @@ create_dialog_from_type(AddressBookConfig *abc)
         return create_externq_dialog(abc);
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
         return create_ldif_dialog(abc);
-
 #ifdef ENABLE_LDAP
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {
         return create_ldap_dialog(abc);
-
 #endif
 #ifdef HAVE_SQLITE
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_GPE) {
         return create_gpe_dialog(abc);
-
 #endif
 #ifdef HAVE_RUBRICA
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA) {
         return create_rubrica_dialog(abc);
-
 #endif
 #ifdef HAVE_OSMO
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
-        return create_osmo_dialog(abc);
-
+    	return create_osmo_dialog(abc);
 #endif
     } else {
         g_assert_not_reached();
@@ -347,10 +318,8 @@ create_dialog_from_type(AddressBookConfig *abc)
     return NULL;
 }
 
-
 static GtkWidget *
-create_generic_dialog(AddressBookConfig *abc,
-                      const gchar       *type)
+create_generic_dialog(AddressBookConfig * abc, const gchar * type)
 {
     GtkWidget *dialog;
     gchar *title;
@@ -385,7 +354,6 @@ create_generic_dialog(AddressBookConfig *abc,
     return dialog;
 }
 
-
 #ifdef HAVE_OSMO
 static GtkWidget *
 create_osmo_dialog(AddressBookConfig *abc)
@@ -419,9 +387,9 @@ create_osmo_dialog(AddressBookConfig *abc)
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
     g_free(title);
-#   if HAVE_MACOSX_DESKTOP
+#if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, abc->parent);
-#   endif
+#endif
     size_group = libbalsa_create_size_group(dialog);
 
     grid = libbalsa_create_grid();
@@ -438,19 +406,17 @@ create_osmo_dialog(AddressBookConfig *abc)
 
     return dialog;
 }
-
-
 #endif /* HAVE_OSMO */
 
 static GtkWidget *
-create_externq_dialog(AddressBookConfig *abc)
+create_externq_dialog(AddressBookConfig * abc)
 {
     GtkWidget *dialog;
     GtkWidget *grid;
     GtkWidget *label;
-    LibBalsaAddressBookExtern *ab;
+    LibBalsaAddressBookExtern* ab;
 
-    ab = (LibBalsaAddressBookExtern *)abc->address_book; /* may be NULL */
+    ab = (LibBalsaAddressBookExtern*)abc->address_book; /* may be NULL */
     grid = libbalsa_create_grid();
     g_object_set(G_OBJECT(grid), "margin", 5, NULL);
 
@@ -458,19 +424,18 @@ create_externq_dialog(AddressBookConfig *abc)
 
     label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
     abc->name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, 0,
-                                                 ab != NULL
-                                                 ? libbalsa_address_book_get_name(abc->
-                                                                                  address_book)
-                                                 : NULL,
-                                                 label);
+				   ab != NULL
+                                   ? libbalsa_address_book_get_name(abc->address_book)
+                                   : NULL,
+				   label);
 
     label = gtk_label_new(_("Load program location:"));
     gtk_widget_set_halign(label, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(grid), label, 0, 1, 1, 1);
     abc->ab_specific.externq.load =
         gtk_file_chooser_button_new
-            (_("Select load program for address book"),
-            GTK_FILE_CHOOSER_ACTION_OPEN);
+        (_("Select load program for address book"),
+         GTK_FILE_CHOOSER_ACTION_OPEN);
     gtk_widget_set_hexpand(abc->ab_specific.externq.load, TRUE);
     gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.externq.load,
                     1, 1, 1, 1);
@@ -482,8 +447,8 @@ create_externq_dialog(AddressBookConfig *abc)
     gtk_grid_attach(GTK_GRID(grid), label, 0, 2, 1, 1);
     abc->ab_specific.externq.save =
         gtk_file_chooser_button_new
-            (_("Select save program for address book"),
-            GTK_FILE_CHOOSER_ACTION_OPEN);
+        (_("Select save program for address book"),
+         GTK_FILE_CHOOSER_ACTION_OPEN);
     gtk_widget_set_hexpand(abc->ab_specific.externq.save, TRUE);
     gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.externq.save,
                     1, 2, 1, 1);
@@ -494,10 +459,10 @@ create_externq_dialog(AddressBookConfig *abc)
 
     if (ab) {
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
-                                          (abc->ab_specific.externq.load),
+                                      (abc->ab_specific.externq.load),
                                       libbalsa_address_book_extern_get_load(ab));
         gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
-                                          (abc->ab_specific.externq.save),
+                                      (abc->ab_specific.externq.save),
                                       libbalsa_address_book_extern_get_save(ab));
     }
 
@@ -507,91 +472,86 @@ create_externq_dialog(AddressBookConfig *abc)
     return dialog;
 }
 
-
 #ifdef ENABLE_LDAP
 static GtkWidget *
-create_ldap_dialog(AddressBookConfig *abc)
+create_ldap_dialog(AddressBookConfig * abc)
 {
     GtkWidget *dialog;
     GtkWidget *grid = libbalsa_create_grid();
 
-    LibBalsaAddressBookLdap *ab;
-    GtkWidget *label;
+    LibBalsaAddressBookLdap* ab;
+    GtkWidget* label;
     gchar *host = g_strdup_printf("ldap://%s", libbalsa_guess_ldap_server());
     gchar *base = libbalsa_guess_ldap_base();
     gchar *name = libbalsa_guess_ldap_name();
 
-    ab = (LibBalsaAddressBookLdap *)abc->address_book; /* may be NULL */
+    ab = (LibBalsaAddressBookLdap*)abc->address_book; /* may be NULL */
 
     /* mailbox name */
 
     label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
     abc->name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, 0,
-                                                 ab != NULL
-                                                 ? libbalsa_address_book_get_name(abc->
-                                                                                  address_book)
-                                                 : NULL,
-                                                 label);
+				   ab != NULL
+                                   ? libbalsa_address_book_get_name(abc->address_book)
+                                   : NULL,
+				   label);
 
     label = libbalsa_create_grid_label(_("_Host Name"), grid, 1);
-    abc->ab_specific.ldap.host =
-        libbalsa_create_grid_entry(grid, NULL, NULL, 1,
-                                   ab ? libbalsa_address_book_ldap_get_host(ab) : host, label);
+    abc->ab_specific.ldap.host = 
+	libbalsa_create_grid_entry(grid, NULL, NULL, 1, 
+		     ab ? libbalsa_address_book_ldap_get_host(ab) : host, label);
 
     label = libbalsa_create_grid_label(_("Base Domain _Name"), grid, 2);
-    abc->ab_specific.ldap.base_dn =
-        libbalsa_create_grid_entry(grid, NULL, NULL, 2,
-                                   ab ? libbalsa_address_book_ldap_get_base_dn(ab) : base,
-                                   label);
+    abc->ab_specific.ldap.base_dn = 
+	libbalsa_create_grid_entry(grid, NULL, NULL, 2, 
+		     ab ? libbalsa_address_book_ldap_get_base_dn(ab) : base, label);
 
     label = libbalsa_create_grid_label(_("_User Name (Bind DN)"), grid, 3);
-    abc->ab_specific.ldap.bind_dn =
-        libbalsa_create_grid_entry(grid, NULL, NULL, 3,
-                                   ab ? libbalsa_address_book_ldap_get_bind_dn(ab) : "", label);
+    abc->ab_specific.ldap.bind_dn = 
+	libbalsa_create_grid_entry(grid, NULL, NULL, 3, 
+		     ab ? libbalsa_address_book_ldap_get_bind_dn(ab) : "", label);
 
     label = libbalsa_create_grid_label(_("_Password"), grid, 4);
-    abc->ab_specific.ldap.passwd =
-        libbalsa_create_grid_entry(grid, NULL, NULL, 4,
-                                   ab ? libbalsa_address_book_ldap_get_passwd(ab) : "", label);
+    abc->ab_specific.ldap.passwd = 
+	libbalsa_create_grid_entry(grid, NULL, NULL, 4, 
+		     ab ? libbalsa_address_book_ldap_get_passwd(ab) : "", label);
     gtk_entry_set_visibility(GTK_ENTRY(abc->ab_specific.ldap.passwd), FALSE);
 
     label = libbalsa_create_grid_label(_("_User Address Book DN"), grid, 5);
-    abc->ab_specific.ldap.book_dn =
-        libbalsa_create_grid_entry(grid, NULL, NULL, 5,
-                                   ab ? libbalsa_address_book_ldap_get_book_dn(ab) : "", label);
+    abc->ab_specific.ldap.book_dn = 
+	libbalsa_create_grid_entry(grid, NULL, NULL, 5,
+		     ab ? libbalsa_address_book_ldap_get_book_dn(ab) : "", label);
 
     abc->ab_specific.ldap.enable_tls =
-        libbalsa_create_grid_check(_("Enable _TLS"), grid, 6,
-                                   ab ? libbalsa_address_book_ldap_get_enable_tls(ab) : FALSE);
+	libbalsa_create_grid_check(_("Enable _TLS"), grid, 6,
+		     ab ? libbalsa_address_book_ldap_get_enable_tls(ab) : FALSE);
 
     add_radio_buttons(grid, 7, abc);
 
     g_free(base);
     g_free(name);
     g_free(host);
-
+    
     dialog = create_generic_dialog(abc, "LDAP");
     g_object_set(G_OBJECT(grid), "margin", 12, NULL);
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), grid);
     return dialog;
 }
-
-
 #endif
 
 #ifdef HAVE_SQLITE
 static GtkWidget *
-create_gpe_dialog(AddressBookConfig *abc)
+create_gpe_dialog(AddressBookConfig * abc)
 {
     GtkWidget *dialog;
     GtkWidget *grid = libbalsa_create_grid();
 
-    LibBalsaAddressBook *ab;
-    GtkWidget *label;
+    LibBalsaAddressBook* ab;
+    GtkWidget* label;
 
     g_object_set(G_OBJECT(grid), "margin", 5, NULL);
 
-    ab = (LibBalsaAddressBook *)abc->address_book; /* may be NULL */
+    ab = (LibBalsaAddressBook*)abc->address_book; /* may be NULL */
 
     /* mailbox name */
 
@@ -610,22 +570,18 @@ create_gpe_dialog(AddressBookConfig *abc)
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), grid);
     return dialog;
 }
-
-
 #endif
 
 #if HAVE_RUBRICA
 static GtkWidget *
-create_rubrica_dialog(AddressBookConfig *abc)
+create_rubrica_dialog(AddressBookConfig * abc)
 {
     return create_local_dialog(abc, "Rubrica");
 }
-
-
 #endif
 
 static void
-help_button_cb(AddressBookConfig *abc)
+help_button_cb(AddressBookConfig * abc)
 {
     GError *err = NULL;
 
@@ -657,60 +613,49 @@ enum {
  *                      correct it.
  */
 static gboolean
-chooser_bad_path(GtkFileChooser *chooser,
-                 GtkWindow      *window,
-                 gint            type)
+chooser_bad_path(GtkFileChooser * chooser, GtkWindow * window, gint type)
 {
     return bad_path(gtk_file_chooser_get_filename(chooser), window, type);
 }
 
-
 static gboolean
-handle_close(AddressBookConfig *abc)
+handle_close(AddressBookConfig * abc)
 {
     if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD) {
         if (chooser_bad_path(GTK_FILE_CHOOSER(abc->window),
-                             GTK_WINDOW(abc->window),
-                             ADDRESS_BOOK_CONFIG_PATH_FILE)) {
+                     GTK_WINDOW(abc->window),
+                     ADDRESS_BOOK_CONFIG_PATH_FILE))
             return FALSE;
-        }
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
         if (chooser_bad_path(GTK_FILE_CHOOSER(abc->window),
-                             GTK_WINDOW(abc->window),
-                             ADDRESS_BOOK_CONFIG_PATH_FILE)) {
+                     GTK_WINDOW(abc->window),
+                     ADDRESS_BOOK_CONFIG_PATH_FILE))
             return FALSE;
-        }
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
         if (chooser_bad_path(GTK_FILE_CHOOSER(abc->ab_specific.externq.load),
-                             GTK_WINDOW(abc->window),
-                             ADDRESS_BOOK_CONFIG_PATH_LOAD)) {
+                     GTK_WINDOW(abc->window),
+                     ADDRESS_BOOK_CONFIG_PATH_LOAD))
             return FALSE;
-        }
         if (chooser_bad_path(GTK_FILE_CHOOSER(abc->ab_specific.externq.save),
-                             GTK_WINDOW(abc->window),
-                             ADDRESS_BOOK_CONFIG_PATH_SAVE)) {
+                     GTK_WINDOW(abc->window),
+                     ADDRESS_BOOK_CONFIG_PATH_SAVE))
             return FALSE;
-        }
     }
 
-    if (abc->address_book == NULL) {
+    if (abc->address_book == NULL)
         return create_book(abc);
-    } else {
+    else
         modify_book(abc);
-    }
 
     return TRUE;
 }
-
 
 /* bad_path:
  *
  * Returns TRUE if the path is bad and the user wants to correct it
  */
 static gboolean
-bad_path(gchar     *path,
-         GtkWindow *window,
-         gint       type)
+bad_path(gchar * path, GtkWindow * window, gint type)
 {
     GtkWidget *ask;
     gint clicked_button;
@@ -720,11 +665,11 @@ bad_path(gchar     *path,
         return FALSE;
     }
     ask = gtk_message_dialog_new(window,
-                                 GTK_DIALOG_MODAL |
-                                 GTK_DIALOG_DESTROY_WITH_PARENT,
+				 GTK_DIALOG_MODAL|
+				 GTK_DIALOG_DESTROY_WITH_PARENT,
                                  GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
                                  _("No path found. "
-                                   "Do you want to give one?"));
+				   "Do you want to give one?"));
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(ask, window);
 #endif
@@ -734,9 +679,8 @@ bad_path(gchar     *path,
     return clicked_button == GTK_RESPONSE_YES;
 }
 
-
 static gboolean
-create_book(AddressBookConfig *abc)
+create_book(AddressBookConfig * abc)
 {
     LibBalsaAddressBook *address_book = NULL;
     const gchar *name = gtk_entry_get_text(GTK_ENTRY(abc->name_entry));
@@ -744,27 +688,24 @@ create_book(AddressBookConfig *abc)
     if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD) {
         gchar *path =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
-        if (path != NULL) {
+        if (path != NULL)
             address_book = libbalsa_address_book_vcard_new(name, path);
-        }
         g_free(path);
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
 #define GET_FILENAME(chooser) \
-    gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser))
+  gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser))
         gchar *load = GET_FILENAME(abc->ab_specific.externq.load);
         gchar *save = GET_FILENAME(abc->ab_specific.externq.save);
-        if ((load != NULL) && (save != NULL)) {
+        if (load != NULL && save != NULL)
             address_book =
                 libbalsa_address_book_externq_new(name, load, save);
-        }
         g_free(load);
         g_free(save);
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
         gchar *path =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
-        if (path != NULL) {
+        if (path != NULL)
             address_book = libbalsa_address_book_ldif_new(name, path);
-        }
         g_free(path);
 #ifdef ENABLE_LDAP
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {
@@ -780,7 +721,7 @@ create_book(AddressBookConfig *abc)
             gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.book_dn));
         gboolean enable_tls =
             gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                             (abc->ab_specific.ldap.enable_tls));
+                                         (abc->ab_specific.ldap.enable_tls));
         address_book =
             libbalsa_address_book_ldap_new(name, host, base_dn,
                                            bind_dn, passwd, book_dn,
@@ -795,18 +736,16 @@ create_book(AddressBookConfig *abc)
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA) {
         gchar *path =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
-        if (path != NULL) {
+        if (path != NULL)
             address_book = libbalsa_address_book_rubrica_new(name, path);
-        }
         g_free(path);
 #endif
 #ifdef HAVE_OSMO
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
-        address_book = libbalsa_address_book_osmo_new(name);
+    	address_book = libbalsa_address_book_osmo_new(name);
 #endif
-    } else {
+    } else
         g_assert_not_reached();
-    }
 
     if (address_book != NULL) {
         gboolean active;
@@ -823,9 +762,8 @@ create_book(AddressBookConfig *abc)
     return address_book != NULL;
 }
 
-
 static void
-modify_book(AddressBookConfig *abc)
+modify_book(AddressBookConfig * abc)
 {
     LibBalsaAddressBook *address_book = abc->address_book;
     gboolean active;
@@ -833,7 +771,7 @@ modify_book(AddressBookConfig *abc)
     libbalsa_address_book_set_name(address_book,
                                    gtk_entry_get_text(GTK_ENTRY(abc->name_entry)));
 
-    if ((abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD)
+    if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD
         || abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF
 #ifdef HAVE_RUBRICA
         || abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA
@@ -844,17 +782,16 @@ modify_book(AddressBookConfig *abc)
         gchar *path =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
 
-        if (path != NULL) {
+        if (path != NULL)
             libbalsa_address_book_text_set_path(ab_text, path);
-        }
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN) {
         LibBalsaAddressBookExtern *externq;
         gchar *load =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
-                                              (abc->ab_specific.externq.load));
+                                           (abc->ab_specific.externq.load));
         gchar *save =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
-                                              (abc->ab_specific.externq.save));
+                                           (abc->ab_specific.externq.save));
 
         externq = LIBBALSA_ADDRESS_BOOK_EXTERN(address_book);
         if (load) {
@@ -880,7 +817,7 @@ modify_book(AddressBookConfig *abc)
             gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.ldap.book_dn));
         gboolean enable_tls =
             gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                             (abc->ab_specific.ldap.enable_tls));
+                                         (abc->ab_specific.ldap.enable_tls));
 
         ldap = LIBBALSA_ADDRESS_BOOK_LDAP(address_book);
 
@@ -898,11 +835,10 @@ modify_book(AddressBookConfig *abc)
 #endif /* HAVE_SQLITE */
 #if HAVE_OSMO
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
-        /* nothing to do here */
+    	/* nothing to do here */
 #endif
-    } else {
+    } else
         g_assert_not_reached();
-    }
 
     active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->never));
     libbalsa_address_book_set_expand_aliases(address_book, !active);
@@ -912,94 +848,75 @@ modify_book(AddressBookConfig *abc)
     abc->callback(address_book, FALSE);
 }
 
-
 /* Pref manager callbacks */
 
 static void
-add_vcard_cb(GtkWidget         *widget,
-             AddressBookConfig *abc)
+add_vcard_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
     abc->window = create_vcard_dialog(abc);
     gtk_widget_show(abc->window);
 }
 
-
 static void
-add_externq_cb(GtkWidget         *widget,
-               AddressBookConfig *abc)
+add_externq_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN;
     abc->window = create_externq_dialog(abc);
     gtk_widget_show(abc->window);
 }
 
-
 static void
-add_ldif_cb(GtkWidget         *widget,
-            AddressBookConfig *abc)
+add_ldif_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDIF;
     abc->window = create_ldif_dialog(abc);
     gtk_widget_show(abc->window);
 }
 
-
 #ifdef ENABLE_LDAP
 static void
-add_ldap_cb(GtkWidget         *widget,
-            AddressBookConfig *abc)
+add_ldap_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
     abc->window = create_ldap_dialog(abc);
     gtk_widget_show(abc->window);
 }
-
-
 #endif /* ENABLE_LDAP */
 
 #ifdef HAVE_SQLITE
 static void
-add_gpe_cb(GtkWidget         *widget,
-           AddressBookConfig *abc)
+add_gpe_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
     abc->window = create_gpe_dialog(abc);
     gtk_widget_show(abc->window);
 }
-
-
 #endif /* HAVE_SQLITE */
 
 #ifdef HAVE_RUBRICA
 static void
-add_rubrica_cb(GtkWidget         *widget,
-               AddressBookConfig *abc)
+add_rubrica_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
     abc->window = create_rubrica_dialog(abc);
     gtk_widget_show(abc->window);
 }
-
-
 #endif /* HAVE_SQLITE */
 
 #ifdef HAVE_OSMO
 static void
-add_osmo_cb(GtkWidget         *widget,
-            AddressBookConfig *abc)
+add_osmo_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_OSMO;
     abc->window = create_osmo_dialog(abc);
     gtk_widget_show(abc->window);
 }
-
-
 #endif /* HAVE_OSMO */
 
 GtkWidget *
 balsa_address_book_add_menu(BalsaAddressBookCallback callback,
-                            GtkWindow               *parent)
+                            GtkWindow * parent)
 {
     GtkWidget *menu;
     GtkWidget *menuitem;

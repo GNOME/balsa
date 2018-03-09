@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,16 +29,14 @@
 
 typedef struct _CompletionData CompletionData;
 struct _CompletionData {
-    gchar *string;
-    InternetAddress *ia;
+	gchar *string;
+	InternetAddress *ia;
 };
 
-CompletionData *completion_data_new(InternetAddress *ia,
-                                    const gchar     *nick_name);
-void completion_data_free(CompletionData *data);
-gchar *completion_data_extract(CompletionData *data);
-gint strncmp_word(const gchar *s1,
-                  const gchar *s2,
-                  gsize        n);
+CompletionData *completion_data_new(InternetAddress * ia,
+                                    const gchar * nick_name);
+void completion_data_free(CompletionData * data);
+gchar *completion_data_extract(CompletionData * data);
+gint strncmp_word(const gchar * s1, const gchar * s2, gsize n);
 
 #endif

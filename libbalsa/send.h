@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,12 +23,12 @@
 #define __SEND_H__
 
 #ifndef BALSA_VERSION
-#   error "Include config.h before this file."
+# error "Include config.h before this file."
 #endif
 
 #include "libbalsa.h"
 
-typedef LibBalsaMailbox * (*LibBalsaFccboxFinder)(const gchar *url);
+typedef LibBalsaMailbox* (*LibBalsaFccboxFinder)(const gchar *url);
 typedef enum _LibBalsaMsgCreateResult LibBalsaMsgCreateResult;
 enum _LibBalsaMsgCreateResult {
     LIBBALSA_MESSAGE_CREATE_OK,
@@ -43,37 +43,37 @@ enum _LibBalsaMsgCreateResult {
     LIBBALSA_MESSAGE_SERVER_ERROR
 };
 
-gboolean libbalsa_message_postpone(LibBalsaMessage *message,
-                                   LibBalsaMailbox *draftbox,
-                                   LibBalsaMessage *reply_message,
-                                   gchar          **extra_headers,
-                                   gboolean         flow,
-                                   GError         **error);
+gboolean libbalsa_message_postpone(LibBalsaMessage * message,
+				   LibBalsaMailbox * draftbox,
+				   LibBalsaMessage * reply_message,
+				   gchar ** extra_headers,
+				   gboolean flow, 
+				   GError **error);
 
-LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage *message,
-                                               LibBalsaMailbox *outbox,
-                                               LibBalsaMailbox *fccbox,
+LibBalsaMsgCreateResult libbalsa_message_queue(LibBalsaMessage* message, 
+					       LibBalsaMailbox* outbox,
+                                               LibBalsaMailbox* fccbox,
                                                LibBalsaSmtpServer *
                                                smtp_server,
-                                               gboolean         flow,
-                                               GError         **error);
+					       gboolean flow,
+					       GError ** error);
 LibBalsaMsgCreateResult libbalsa_message_send(LibBalsaMessage     *message,
                                               LibBalsaMailbox     *outbox,
                                               LibBalsaMailbox     *fccbox,
                                               LibBalsaFccboxFinder finder,
                                               LibBalsaSmtpServer  *smtp_server,
-                                              gboolean             show_progress,
+											  gboolean			   show_progress,
                                               GtkWindow           *parent,
                                               gboolean             flow,
-                                              GError             **error);
+					                          GError             **error);
 void libbalsa_process_queue(LibBalsaMailbox     *outbox,
                             LibBalsaFccboxFinder finder,
-                            GSList              *smtp_servers,
-                            gboolean             show_progress,
-                            GtkWindow           *parent);
+							GSList              *smtp_servers,
+							gboolean			 show_progress,
+							GtkWindow           *parent);
 
 void libbalsa_auto_send_init(GSourceFunc auto_send_cb);
 void libbalsa_auto_send_config(gboolean enable,
-                               guint    timeout_minutes);
+					           guint    timeout_minutes);
 
 #endif /* __SEND_H__ */

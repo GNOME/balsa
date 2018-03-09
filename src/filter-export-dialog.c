@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option) 
  * any later version.
- *
+ *  
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *
+ *  
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,22 +26,22 @@
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#   include "config.h"
+# include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "filter-export.h"
 
 #include "balsa-app.h"
 
-#include <glib/gi18n.h> /* Must come after balsa-app.h. */
+#include <glib/gi18n.h>	/* Must come after balsa-app.h. */
 
 /* To prevent user from silmultaneously edit/export filters */
 
 extern gboolean fe_already_open;
-extern GList *fr_dialogs_opened;
+extern GList * fr_dialogs_opened;
 
-gboolean fex_already_open = FALSE;
+gboolean fex_already_open=FALSE;
 
-GtkWidget *fex_window;
+GtkWidget * fex_window;
 
 /*
  * filters_export_dialog()
@@ -49,7 +49,7 @@ GtkWidget *fex_window;
  * Returns immediately, but fires off the filter export dialog.
  */
 void
-filters_export_dialog(GtkWindow *parent)
+filters_export_dialog(GtkWindow * parent)
 {
     GtkTreeView *list;
     GtkTreeModel *model;
@@ -59,14 +59,14 @@ filters_export_dialog(GtkWindow *parent)
     GSList *filter_list;
 
     if (fr_dialogs_opened) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
+	balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("There are opened filter run dialogs, "
                             "close them before you can modify filters."));
-        return;
+	return;
     }
     if (fex_already_open) {
-        gtk_window_present(GTK_WINDOW(fex_window));
-        return;
+	gtk_window_present(GTK_WINDOW(fex_window));
+	return;
     }
 
     fex_already_open = TRUE;
@@ -83,8 +83,8 @@ filters_export_dialog(GtkWindow *parent)
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
-                                   GTK_POLICY_AUTOMATIC,
-                                   GTK_POLICY_AUTOMATIC);
+				   GTK_POLICY_AUTOMATIC,
+				   GTK_POLICY_AUTOMATIC);
 
     list =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
@@ -114,7 +114,7 @@ filters_export_dialog(GtkWindow *parent)
     g_signal_connect(G_OBJECT(fex_window), "response",
                      G_CALLBACK(fex_dialog_response), list);
     g_signal_connect(G_OBJECT(fex_window), "destroy",
-                     G_CALLBACK(fex_destroy_window_cb), NULL);
+		     G_CALLBACK(fex_destroy_window_cb), NULL);
 
     gtk_widget_show(GTK_WIDGET(fex_window));
 }

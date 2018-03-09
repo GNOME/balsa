@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,28 +35,29 @@
 
 /* Load conditions list using filter_section_name as prefix to find sections */
 
-void libbalsa_conditions_new_from_config(gchar* prefix,
-                                         gchar * filter_section_name,
-                                         LibBalsaFilter* fil);
+void libbalsa_conditions_new_from_config(gchar          *prefix,
+                                         gchar          *filter_section_name,
+                                         LibBalsaFilter *fil);
 
 /* Save conditions list using filter_section_name as prefix to create
  * sections. */
 
-void libbalsa_clean_condition_sections(const gchar * prefix,
-				       const gchar * filter_section_name);
+void libbalsa_clean_condition_sections(const gchar *prefix,
+                                       const gchar *filter_section_name);
 
-void libbalsa_conditions_save_config(GSList * conds,const gchar * prefix,
-                                     const gchar * filter_section_name);
+void libbalsa_conditions_save_config(GSList      *conds,
+                                     const gchar *prefix,
+                                     const gchar *filter_section_name);
 
-void libbalsa_filter_save_config(LibBalsaFilter * f);
+void libbalsa_filter_save_config(LibBalsaFilter *f);
 
 /* libbalsa_filter_new_from_config can position filter_errno on error */
-LibBalsaFilter* libbalsa_filter_new_from_config(void);
+LibBalsaFilter *libbalsa_filter_new_from_config(void);
 
 /* Loads the filters associated to the mailbox */
-void libbalsa_mailbox_filters_load_config(LibBalsaMailbox * mbox);
+void libbalsa_mailbox_filters_load_config(LibBalsaMailbox *mbox);
 
 /* Saves the filters associated to the mailbox */
-void libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox);
+void libbalsa_mailbox_filters_save_config(LibBalsaMailbox *mbox);
 
 #endif  /* __FILTER_FILE_H__ */

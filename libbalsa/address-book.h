@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -36,109 +36,111 @@ typedef enum {
     LBABERR_DUPLICATE,
     LBABERR_ADDRESS_NOT_FOUND
 } LibBalsaABErr;
-    
+
 typedef struct _LibBalsaAddressBook LibBalsaAddressBook;
 typedef struct _LibBalsaAddressBookClass LibBalsaAddressBookClass;
 
 typedef LibBalsaABErr (*LibBalsaAddressBookLoadFunc)(LibBalsaAddressBook *ab,
-                                                     LibBalsaAddress *address,
-                                                     gpointer closure);
+                                                     LibBalsaAddress     *address,
+                                                     gpointer             closure);
 
 struct _LibBalsaAddressBookClass {
     GObjectClass parent;
 
-    LibBalsaABErr (*load) (LibBalsaAddressBook * ab,
-                           const gchar *filter,
+    LibBalsaABErr (*load) (LibBalsaAddressBook        *ab,
+                           const gchar                *filter,
                            LibBalsaAddressBookLoadFunc callback,
-                           gpointer closure);
+                           gpointer                    closure);
 
     /* adds given address to the address book, updating the permanent
      * storage. */
-    LibBalsaABErr (*add_address) (LibBalsaAddressBook * ab,
-                                  LibBalsaAddress * address);
+    LibBalsaABErr (*add_address) (LibBalsaAddressBook *ab,
+                                  LibBalsaAddress     *address);
 
     /* remove given address to the address book, updating the permanent
      * storage. */
-    LibBalsaABErr (*remove_address) (LibBalsaAddressBook * ab,
-                                     LibBalsaAddress * address);
+    LibBalsaABErr (*remove_address) (LibBalsaAddressBook *ab,
+                                     LibBalsaAddress     *address);
 
     /* Sets new entries for given address, copying fields from newval.
      * Updates the permanent storage. */
-    LibBalsaABErr (*modify_address) (LibBalsaAddressBook * ab,
-                                     LibBalsaAddress * address,
-                                     LibBalsaAddress * newval);
+    LibBalsaABErr (*modify_address) (LibBalsaAddressBook *ab,
+                                     LibBalsaAddress     *address,
+                                     LibBalsaAddress     *newval);
 
-    void (*save_config) (LibBalsaAddressBook * ab, const gchar * prefix);
-    void (*load_config) (LibBalsaAddressBook * ab, const gchar * prefix);
+    void (*save_config) (LibBalsaAddressBook *ab,
+                         const gchar         *prefix);
+    void (*load_config) (LibBalsaAddressBook *ab,
+                         const gchar         *prefix);
 
-    GList* (*alias_complete) (LibBalsaAddressBook * ab, const gchar *prefix);
+    GList * (*alias_complete) (LibBalsaAddressBook *ab,
+                               const gchar         *prefix);
 };
 
 LibBalsaAddressBook *libbalsa_address_book_new_from_config(const gchar *
-							   prefix);
+                                                           prefix);
 
 /*
-  This will call the callback function once for each address in the
-  address book.  The recipient should make sure to ref the address if
-  they will be keeping a reference to it around. The callback may
-  occur asynchronously.
-  
-  After all addresses are loaded the callback will be called with
-  address==NULL.  
-*/
-LibBalsaABErr libbalsa_address_book_load(LibBalsaAddressBook * ab,
-                                         const char *filter,
+   This will call the callback function once for each address in the
+   address book.  The recipient should make sure to ref the address if
+   they will be keeping a reference to it around. The callback may
+   occur asynchronously.
+
+   After all addresses are loaded the callback will be called with
+   address==NULL.
+ */
+LibBalsaABErr libbalsa_address_book_load(LibBalsaAddressBook        *ab,
+                                         const char                 *filter,
                                          LibBalsaAddressBookLoadFunc callback,
-                                         gpointer closure);
+                                         gpointer                    closure);
 
 LibBalsaABErr libbalsa_address_book_add_address(LibBalsaAddressBook *ab,
-                                                LibBalsaAddress *address);
+                                                LibBalsaAddress     *address);
 LibBalsaABErr libbalsa_address_book_remove_address(LibBalsaAddressBook *ab,
-                                                   LibBalsaAddress *address);
+                                                   LibBalsaAddress     *address);
 LibBalsaABErr libbalsa_address_book_modify_address(LibBalsaAddressBook *ab,
-                                                   LibBalsaAddress *address,
-                                                   LibBalsaAddress *newval);
+                                                   LibBalsaAddress     *address,
+                                                   LibBalsaAddress     *newval);
 
-void libbalsa_address_book_set_status(LibBalsaAddressBook * ab,
-                                      const gchar         * status);
-void libbalsa_address_book_save_config(LibBalsaAddressBook * ab,
-				       const gchar * prefix);
-void libbalsa_address_book_load_config(LibBalsaAddressBook * ab,
-				       const gchar * prefix);
+void libbalsa_address_book_set_status(LibBalsaAddressBook *ab,
+                                      const gchar         *status);
+void libbalsa_address_book_save_config(LibBalsaAddressBook *ab,
+                                       const gchar         *prefix);
+void libbalsa_address_book_load_config(LibBalsaAddressBook *ab,
+                                       const gchar         *prefix);
 
-const gchar* libbalsa_address_book_strerror(LibBalsaAddressBook * ab,
-					    LibBalsaABErr err);
+const gchar *libbalsa_address_book_strerror(LibBalsaAddressBook *ab,
+                                            LibBalsaABErr        err);
 
 /*
 
- Returns a list of LibBalsaAddress objects. The caller is responsible
- for unref()ing these address objects when it is finished with them
- and for freeing the list.
+   Returns a list of LibBalsaAddress objects. The caller is responsible
+   for unref()ing these address objects when it is finished with them
+   and for freeing the list.
 
-*/
-GList *libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab, 
-					    const gchar *prefix);
+ */
+GList *libbalsa_address_book_alias_complete(LibBalsaAddressBook *ab,
+                                            const gchar         *prefix);
 
 /*
  * Getters
  */
-gboolean      libbalsa_address_book_get_dist_list_mode(LibBalsaAddressBook * ab);
-gboolean      libbalsa_address_book_get_expand_aliases(LibBalsaAddressBook * ab);
-gboolean      libbalsa_address_book_get_is_expensive  (LibBalsaAddressBook * ab);
-const gchar * libbalsa_address_book_get_name          (LibBalsaAddressBook * ab);
-const gchar * libbalsa_address_book_get_config_prefix (LibBalsaAddressBook * ab);
+gboolean      libbalsa_address_book_get_dist_list_mode(LibBalsaAddressBook *ab);
+gboolean      libbalsa_address_book_get_expand_aliases(LibBalsaAddressBook *ab);
+gboolean      libbalsa_address_book_get_is_expensive(LibBalsaAddressBook *ab);
+const gchar *libbalsa_address_book_get_name(LibBalsaAddressBook *ab);
+const gchar *libbalsa_address_book_get_config_prefix(LibBalsaAddressBook *ab);
 
 /*
  * Setters
  */
-void libbalsa_address_book_set_dist_list_mode(LibBalsaAddressBook * ab,
-                                              gboolean              dist_list_mode);
-void libbalsa_address_book_set_expand_aliases(LibBalsaAddressBook * ab,
-                                              gboolean              expand_aliases);
-void libbalsa_address_book_set_is_expensive  (LibBalsaAddressBook * ab,
-                                              gboolean              is_expensive);
-void libbalsa_address_book_set_name          (LibBalsaAddressBook * ab,
-                                              const gchar         * name);
+void libbalsa_address_book_set_dist_list_mode(LibBalsaAddressBook *ab,
+                                              gboolean             dist_list_mode);
+void libbalsa_address_book_set_expand_aliases(LibBalsaAddressBook *ab,
+                                              gboolean             expand_aliases);
+void libbalsa_address_book_set_is_expensive(LibBalsaAddressBook *ab,
+                                            gboolean             is_expensive);
+void libbalsa_address_book_set_name(LibBalsaAddressBook *ab,
+                                    const gchar         *name);
 
 #endif
-

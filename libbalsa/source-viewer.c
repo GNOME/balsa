@@ -4,24 +4,24 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* this is simple window that reads text from given file and shows 
+/* this is simple window that reads text from given file and shows
    in in a GtkText widget.
-*/
+ */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
 #include <stdio.h>
@@ -44,17 +44,18 @@ typedef struct {
 } LibBalsaSourceViewerInfo;
 
 static void
-lsv_close_activated(GSimpleAction * action,
-                    GVariant      * parameter,
-                    gpointer        user_data)
+lsv_close_activated(GSimpleAction *action,
+                    GVariant      *parameter,
+                    gpointer       user_data)
 {
     gtk_widget_destroy(GTK_WIDGET(user_data));
 }
 
+
 static void
-lsv_copy_activated(GSimpleAction * action,
-                   GVariant      * parameter,
-                   gpointer        user_data)
+lsv_copy_activated(GSimpleAction *action,
+                   GVariant      *parameter,
+                   gpointer       user_data)
 {
     LibBalsaSourceViewerInfo *lsvi =
         g_object_get_data(G_OBJECT(user_data), "lsvi");
@@ -67,10 +68,11 @@ lsv_copy_activated(GSimpleAction * action,
     gtk_text_buffer_copy_clipboard(buffer, clipboard);
 }
 
+
 static void
-lsv_select_activated(GSimpleAction * action,
-                     GVariant      * parameter,
-                     gpointer        user_data)
+lsv_select_activated(GSimpleAction *action,
+                     GVariant      *parameter,
+                     gpointer       user_data)
 {
     LibBalsaSourceViewerInfo *lsvi =
         g_object_get_data(G_OBJECT(user_data), "lsvi");
@@ -83,9 +85,11 @@ lsv_select_activated(GSimpleAction * action,
     gtk_text_buffer_move_mark_by_name(buffer, "selection_bound", &end);
 }
 
+
 static void
-lsv_show_message(const char *message, LibBalsaSourceViewerInfo * lsvi,
-                 gboolean escape)
+lsv_show_message(const char               *message,
+                 LibBalsaSourceViewerInfo *lsvi,
+                 gboolean                  escape)
 {
     GtkTextBuffer *buffer;
     GtkTextIter start;
@@ -94,25 +98,26 @@ lsv_show_message(const char *message, LibBalsaSourceViewerInfo * lsvi,
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(lsvi->text));
     gtk_text_buffer_set_text(buffer, "", 0);
 
-    if (escape)
-	tmp = g_strescape(message, "\n“");
-    else {
-	tmp = g_strdup(message);
-	libbalsa_utf8_sanitize(&tmp, FALSE, NULL);
+    if (escape) {
+        tmp = g_strescape(message, "\n“");
+    } else {
+        tmp = g_strdup(message);
+        libbalsa_utf8_sanitize(&tmp, FALSE, NULL);
     }
     if (tmp) {
-	gtk_text_buffer_insert_at_cursor(buffer, tmp, -1);
-	g_free(tmp);
+        gtk_text_buffer_insert_at_cursor(buffer, tmp, -1);
+        g_free(tmp);
     }
 
     gtk_text_buffer_get_start_iter(buffer, &start);
     gtk_text_buffer_place_cursor(buffer, &start);
 }
 
+
 static void
-lsv_escape_change_state(GSimpleAction * action,
-                        GVariant      * state,
-                        gpointer        user_data)
+lsv_escape_change_state(GSimpleAction *action,
+                        GVariant      *state,
+                        gpointer       user_data)
 {
     LibBalsaSourceViewerInfo *lsvi =
         g_object_get_data(G_OBJECT(user_data), "lsvi");
@@ -122,14 +127,15 @@ lsv_escape_change_state(GSimpleAction * action,
     char *raw_message;
 
     if (!msg->mailbox) {
-	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Mailbox closed"));
-	return;
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Mailbox closed"));
+        return;
     }
     msg_stream = libbalsa_mailbox_get_message_stream(msg->mailbox, msg->msgno,
-						     TRUE);
-    if (msg_stream == NULL)
-	return;
+                                                     TRUE);
+    if (msg_stream == NULL) {
+        return;
+    }
 
     mem_stream = g_mime_stream_mem_new();
     libbalsa_mailbox_lock_store(msg->mailbox);
@@ -147,54 +153,61 @@ lsv_escape_change_state(GSimpleAction * action,
     g_simple_action_set_state(action, state);
 }
 
+
 static GActionEntry win_entries[] = {
-    {"lsv-close",  lsv_close_activated},
-    {"lsv-copy",   lsv_copy_activated},
+    {"lsv-close", lsv_close_activated},
+    {"lsv-copy", lsv_copy_activated},
     {"lsv-select", lsv_select_activated},
     {"lsv-escape", libbalsa_toggle_activated, NULL, "false",
-        lsv_escape_change_state}
+     lsv_escape_change_state}
 };
 
 static void
-lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
+lsv_window_destroy_notify(LibBalsaSourceViewerInfo *lsvi)
 {
     g_object_unref(lsvi->msg);
     g_free(lsvi);
 }
 
+
 /* libbalsa_show_message_source:
    pops up a window containing the source of the message msg.
-*/
+ */
 
 static void
-lsv_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc,
-                     gint baseline, GtkAllocation * clip,
-                     LibBalsaSourceViewerInfo * lsvi)
+lsv_size_allocate_cb(GtkWidget                *window,
+                     GtkAllocation            *alloc,
+                     gint                      baseline,
+                     GtkAllocation            *clip,
+                     LibBalsaSourceViewerInfo *lsvi)
 {
     GdkWindow *gdk_window;
     gboolean maximized;
 
     gdk_window = gtk_widget_get_window(window);
-    if (gdk_window == NULL)
+    if (gdk_window == NULL) {
         return;
+    }
 
     maximized =
         (gdk_window_get_state(gdk_window) &
          (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN)) != 0;
 
-    if (!maximized)
+    if (!maximized) {
         gtk_window_get_size(GTK_WINDOW(window), lsvi->width, lsvi->height);
+    }
 }
+
 
 #define BALSA_SOURCE_VIEWER "balsa-source-viewer"
 
 void
-libbalsa_show_message_source(GtkApplication  * application,
-                             LibBalsaMessage * msg,
-                             const gchar     * font,
-			     gboolean        * escape_specials,
-                             gint            * width,
-                             gint            * height)
+libbalsa_show_message_source(GtkApplication  *application,
+                             LibBalsaMessage *msg,
+                             const gchar     *font,
+                             gboolean        *escape_specials,
+                             gint            *width,
+                             gint            *height)
 {
     GtkWidget *text;
     gchar *css;
@@ -219,7 +232,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     gtk_css_provider_load_from_data(css_provider, css, -1);
     g_free(css);
 
-    gtk_style_context_add_provider(gtk_widget_get_style_context(text) ,
+    gtk_style_context_add_provider(gtk_widget_get_style_context(text),
                                    GTK_STYLE_PROVIDER(css_provider),
                                    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
     g_object_unref(css_provider);

@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,22 +35,22 @@ struct _BalsaCiteBarClass {
     GtkWidgetClass parent_class;
 };
 
-static void balsa_cite_bar_measure  (GtkWidget    * widget,
-                                     GtkOrientation orientation,
-                                     gint           for_size,
-                                     gint         * minimum,
-                                     gint         * natural,
-                                     gint         * minimum_baseline,
-                                     gint         * natural_baseline);
-static void balsa_cite_bar_snapshot (GtkWidget * widget,
-                                     GtkSnapshot * snapshot);
+static void balsa_cite_bar_measure(GtkWidget     *widget,
+                                   GtkOrientation orientation,
+                                   gint           for_size,
+                                   gint          *minimum,
+                                   gint          *natural,
+                                   gint          *minimum_baseline,
+                                   gint          *natural_baseline);
+static void balsa_cite_bar_snapshot(GtkWidget   *widget,
+                                    GtkSnapshot *snapshot);
 
 G_DEFINE_TYPE(BalsaCiteBar, balsa_cite_bar, GTK_TYPE_WIDGET)
 
-static GtkWidgetClass *parent_class = NULL;
+static GtkWidgetClass * parent_class = NULL;
 
 static void
-balsa_cite_bar_class_init(BalsaCiteBarClass * class)
+balsa_cite_bar_class_init(BalsaCiteBarClass *class)
 {
     GtkWidgetClass *widget_class;
 
@@ -58,18 +58,22 @@ balsa_cite_bar_class_init(BalsaCiteBarClass * class)
 
     parent_class = g_type_class_peek_parent(class);
 
-    widget_class->measure  = balsa_cite_bar_measure;
+    widget_class->measure = balsa_cite_bar_measure;
     widget_class->snapshot = balsa_cite_bar_snapshot;
 }
 
+
 static void
-balsa_cite_bar_init(BalsaCiteBar * cite_bar)
+balsa_cite_bar_init(BalsaCiteBar *cite_bar)
 {
     gtk_widget_set_has_window(GTK_WIDGET(cite_bar), FALSE);
 }
 
+
 GtkWidget *
-balsa_cite_bar_new(gint height, gint bars, gint dimension)
+balsa_cite_bar_new(gint height,
+                   gint bars,
+                   gint dimension)
 {
     BalsaCiteBar *cite_bar;
 
@@ -83,15 +87,18 @@ balsa_cite_bar_new(gint height, gint bars, gint dimension)
     /* the width is 1/4 of the dimension, the spaceing 3/4, but both
      * at least 1 pixel */
     cite_bar->width = dimension / 4;
-    if (cite_bar->width == 0)
+    if (cite_bar->width == 0) {
         cite_bar->width = 1;
+    }
     cite_bar->space = dimension - cite_bar->width;
 
     return GTK_WIDGET(cite_bar);
 }
 
+
 void
-balsa_cite_bar_resize(BalsaCiteBar * cite_bar, gint height)
+balsa_cite_bar_resize(BalsaCiteBar *cite_bar,
+                      gint          height)
 {
     g_return_if_fail(BALSA_IS_CITE_BAR(cite_bar));
 
@@ -99,14 +106,15 @@ balsa_cite_bar_resize(BalsaCiteBar * cite_bar, gint height)
     gtk_widget_queue_resize(GTK_WIDGET(cite_bar));
 }
 
+
 static void
-balsa_cite_bar_measure(GtkWidget    * widget,
+balsa_cite_bar_measure(GtkWidget     *widget,
                        GtkOrientation orientation,
                        gint           for_size,
-                       gint         * minimum,
-                       gint         * natural,
-                       gint         * minimum_baseline,
-                       gint         * natural_baseline)
+                       gint          *minimum,
+                       gint          *natural,
+                       gint          *minimum_baseline,
+                       gint          *natural_baseline)
 {
     BalsaCiteBar *cite_bar;
 
@@ -114,16 +122,18 @@ balsa_cite_bar_measure(GtkWidget    * widget,
 
     if (orientation == GTK_ORIENTATION_HORIZONTAL) {
         *minimum = *natural =
-            cite_bar->bars * (cite_bar->width + cite_bar->space) -
-            cite_bar->space;
+                cite_bar->bars * (cite_bar->width + cite_bar->space) -
+                cite_bar->space;
     } else {
         *minimum = *natural = cite_bar->height;
         *minimum_baseline = *natural_baseline = 0;
     }
 }
 
+
 static void
-balsa_cite_bar_snapshot(GtkWidget * widget, GtkSnapshot * snapshot)
+balsa_cite_bar_snapshot(GtkWidget   *widget,
+                        GtkSnapshot *snapshot)
 {
     GtkStyleContext *context;
     GdkRGBA rgba;

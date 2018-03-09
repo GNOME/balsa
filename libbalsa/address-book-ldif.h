@@ -31,7 +31,7 @@
 G_DECLARE_FINAL_TYPE(LibBalsaAddressBookLdif, libbalsa_address_book_ldif,
                      LIBBALSA, ADDRESS_BOOK_LDIF, LibBalsaAddressBookText)
 
-LibBalsaAddressBook *libbalsa_address_book_ldif_new(const gchar * name,
-                                                    const gchar * path);
+LibBalsaAddressBook * libbalsa_address_book_ldif_new(const gchar * name,
+                                                     const gchar * path);
 
 #endif /* __LIBBALSA_ADDRESS_BOOK_LDIF_H__ */

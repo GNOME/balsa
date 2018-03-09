@@ -18,7 +18,7 @@
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "identity.h"
 
@@ -30,11 +30,11 @@
 #include "misc.h"
 
 #if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
+#   include "macosx-helpers.h"
 #endif
 
 #ifdef HAVE_GPGME
-#  include "libbalsa-gpgme.h"
+#   include "libbalsa-gpgme.h"
 #endif
 
 #include <string.h>
@@ -45,26 +45,27 @@
  */
 
 /* Forward references. */
-static void libbalsa_identity_dispose(GObject* object);
-static void libbalsa_identity_finalize(GObject* object);
+static void libbalsa_identity_dispose(GObject *object);
+static void libbalsa_identity_finalize(GObject *object);
 
 G_DEFINE_TYPE(LibBalsaIdentity, libbalsa_identity, G_TYPE_OBJECT)
 
 static void
-libbalsa_identity_class_init(LibBalsaIdentityClass* klass)
+libbalsa_identity_class_init(LibBalsaIdentityClass *klass)
 {
-    GObjectClass* object_class;
+    GObjectClass *object_class;
 
     object_class = G_OBJECT_CLASS(klass);
-    object_class->dispose  = libbalsa_identity_dispose;
+    object_class->dispose = libbalsa_identity_dispose;
     object_class->finalize = libbalsa_identity_finalize;
 }
+
 
 /*
  * Instance inititialization function: set defaults for new objects.
  */
 static void
-libbalsa_identity_init(LibBalsaIdentity* ident)
+libbalsa_identity_init(LibBalsaIdentity *ident)
 {
     ident->identity_name = NULL;
     ident->ia = NULL;
@@ -91,16 +92,17 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->request_mdn = FALSE;
     ident->request_dsn = FALSE;
     /*
-    ident->face = NULL;
-    ident->x_face = NULL;
-    */
+       ident->face = NULL;
+       ident->x_face = NULL;
+     */
 }
+
 
 /*
  * Destroy the object, freeing all the values in the process.
  */
 static void
-libbalsa_identity_dispose(GObject * object)
+libbalsa_identity_dispose(GObject *object)
 {
     LibBalsaIdentity *ident = LIBBALSA_IDENTITY(object);
 
@@ -110,8 +112,9 @@ libbalsa_identity_dispose(GObject * object)
     G_OBJECT_CLASS(libbalsa_identity_parent_class)->dispose(object);
 }
 
+
 static void
-libbalsa_identity_finalize(GObject * object)
+libbalsa_identity_finalize(GObject *object)
 {
     LibBalsaIdentity *ident = LIBBALSA_IDENTITY(object);
 
@@ -130,6 +133,7 @@ libbalsa_identity_finalize(GObject * object)
     G_OBJECT_CLASS(libbalsa_identity_parent_class)->finalize(object);
 }
 
+
 /*
  * Public methods.
  */
@@ -138,7 +142,7 @@ libbalsa_identity_finalize(GObject * object)
  * Create a new object with the default identity name.  Does not add
  * it to the list of identities for the application.
  */
-GObject*
+GObject *
 libbalsa_identity_new(void)
 {
     return libbalsa_identity_new_with_name(_("New Identity"));
@@ -149,10 +153,10 @@ libbalsa_identity_new(void)
  * Create a new object with the specified identity name.  Does not add
  * it to the list of identities for the application.
  */
-GObject*
-libbalsa_identity_new_with_name(const gchar* ident_name)
+GObject *
+libbalsa_identity_new_with_name(const gchar *ident_name)
 {
-    LibBalsaIdentity* ident;
+    LibBalsaIdentity *ident;
 
     ident = g_object_new(LIBBALSA_TYPE_IDENTITY, NULL);
     libbalsa_identity_set_identity_name(ident, ident_name);
@@ -162,7 +166,8 @@ libbalsa_identity_new_with_name(const gchar* ident_name)
 
 
 void
-libbalsa_identity_set_identity_name(LibBalsaIdentity* ident, const gchar* name)
+libbalsa_identity_set_identity_name(LibBalsaIdentity *ident,
+                                    const gchar      *name)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -172,8 +177,8 @@ libbalsa_identity_set_identity_name(LibBalsaIdentity* ident, const gchar* name)
 
 
 void
-libbalsa_identity_set_address(LibBalsaIdentity * ident,
-                              InternetAddress * ia)
+libbalsa_identity_set_address(LibBalsaIdentity *ident,
+                              InternetAddress  *ia)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -182,7 +187,8 @@ libbalsa_identity_set_address(LibBalsaIdentity * ident,
 
 
 void
-libbalsa_identity_set_replyto(LibBalsaIdentity* ident, const gchar* address)
+libbalsa_identity_set_replyto(LibBalsaIdentity *ident,
+                              const gchar      *address)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -192,7 +198,8 @@ libbalsa_identity_set_replyto(LibBalsaIdentity* ident, const gchar* address)
 
 
 void
-libbalsa_identity_set_domain(LibBalsaIdentity* ident, const gchar* dom)
+libbalsa_identity_set_domain(LibBalsaIdentity *ident,
+                             const gchar      *dom)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -202,7 +209,8 @@ libbalsa_identity_set_domain(LibBalsaIdentity* ident, const gchar* dom)
 
 
 void
-libbalsa_identity_set_bcc(LibBalsaIdentity* ident, const gchar* bcc)
+libbalsa_identity_set_bcc(LibBalsaIdentity *ident,
+                          const gchar      *bcc)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -212,7 +220,8 @@ libbalsa_identity_set_bcc(LibBalsaIdentity* ident, const gchar* bcc)
 
 
 void
-libbalsa_identity_set_reply_string(LibBalsaIdentity* ident, const gchar* reply)
+libbalsa_identity_set_reply_string(LibBalsaIdentity *ident,
+                                   const gchar      *reply)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -222,7 +231,8 @@ libbalsa_identity_set_reply_string(LibBalsaIdentity* ident, const gchar* reply)
 
 
 void
-libbalsa_identity_set_forward_string(LibBalsaIdentity* ident, const gchar* forward)
+libbalsa_identity_set_forward_string(LibBalsaIdentity *ident,
+                                     const gchar      *forward)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -232,7 +242,8 @@ libbalsa_identity_set_forward_string(LibBalsaIdentity* ident, const gchar* forwa
 
 
 void
-libbalsa_identity_set_send_mp_alternative(LibBalsaIdentity* ident, gboolean send_mp_alternative)
+libbalsa_identity_set_send_mp_alternative(LibBalsaIdentity *ident,
+                                          gboolean          send_mp_alternative)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->send_mp_alternative = send_mp_alternative;
@@ -240,7 +251,8 @@ libbalsa_identity_set_send_mp_alternative(LibBalsaIdentity* ident, gboolean send
 
 
 void
-libbalsa_identity_set_signature_path(LibBalsaIdentity* ident, const gchar* path)
+libbalsa_identity_set_signature_path(LibBalsaIdentity *ident,
+                                     const gchar      *path)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -250,7 +262,8 @@ libbalsa_identity_set_signature_path(LibBalsaIdentity* ident, const gchar* path)
 
 
 void
-libbalsa_identity_set_sig_executable(LibBalsaIdentity* ident, gboolean sig_executable)
+libbalsa_identity_set_sig_executable(LibBalsaIdentity *ident,
+                                     gboolean          sig_executable)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->sig_executable = sig_executable;
@@ -258,7 +271,8 @@ libbalsa_identity_set_sig_executable(LibBalsaIdentity* ident, gboolean sig_execu
 
 
 void
-libbalsa_identity_set_sig_sending(LibBalsaIdentity* ident, gboolean sig_sending)
+libbalsa_identity_set_sig_sending(LibBalsaIdentity *ident,
+                                  gboolean          sig_sending)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->sig_sending = sig_sending;
@@ -266,7 +280,8 @@ libbalsa_identity_set_sig_sending(LibBalsaIdentity* ident, gboolean sig_sending)
 
 
 void
-libbalsa_identity_set_sig_whenforward(LibBalsaIdentity* ident, gboolean forward)
+libbalsa_identity_set_sig_whenforward(LibBalsaIdentity *ident,
+                                      gboolean          forward)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->sig_whenforward = forward;
@@ -274,7 +289,8 @@ libbalsa_identity_set_sig_whenforward(LibBalsaIdentity* ident, gboolean forward)
 
 
 void
-libbalsa_identity_set_sig_whenreply(LibBalsaIdentity* ident, gboolean reply)
+libbalsa_identity_set_sig_whenreply(LibBalsaIdentity *ident,
+                                    gboolean          reply)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->sig_whenreply = reply;
@@ -282,7 +298,8 @@ libbalsa_identity_set_sig_whenreply(LibBalsaIdentity* ident, gboolean reply)
 
 
 void
-libbalsa_identity_set_sig_separator(LibBalsaIdentity* ident, gboolean separator)
+libbalsa_identity_set_sig_separator(LibBalsaIdentity *ident,
+                                    gboolean          separator)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->sig_separator = separator;
@@ -290,7 +307,8 @@ libbalsa_identity_set_sig_separator(LibBalsaIdentity* ident, gboolean separator)
 
 
 void
-libbalsa_identity_set_sig_prepend(LibBalsaIdentity* ident, gboolean prepend)
+libbalsa_identity_set_sig_prepend(LibBalsaIdentity *ident,
+                                  gboolean          prepend)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->sig_prepend = prepend;
@@ -298,7 +316,8 @@ libbalsa_identity_set_sig_prepend(LibBalsaIdentity* ident, gboolean prepend)
 
 
 void
-libbalsa_identity_set_face_path(LibBalsaIdentity *ident, const gchar *path)
+libbalsa_identity_set_face_path(LibBalsaIdentity *ident,
+                                const gchar      *path)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -308,7 +327,8 @@ libbalsa_identity_set_face_path(LibBalsaIdentity *ident, const gchar *path)
 
 
 void
-libbalsa_identity_set_x_face_path(LibBalsaIdentity *ident, const gchar *path)
+libbalsa_identity_set_x_face_path(LibBalsaIdentity *ident,
+                                  const gchar      *path)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -318,7 +338,8 @@ libbalsa_identity_set_x_face_path(LibBalsaIdentity *ident, const gchar *path)
 
 
 void
-libbalsa_identity_set_request_mdn(LibBalsaIdentity *ident, gboolean request)
+libbalsa_identity_set_request_mdn(LibBalsaIdentity *ident,
+                                  gboolean          request)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->request_mdn = request;
@@ -326,7 +347,8 @@ libbalsa_identity_set_request_mdn(LibBalsaIdentity *ident, gboolean request)
 
 
 void
-libbalsa_identity_set_request_dsn(LibBalsaIdentity *ident, gboolean request)
+libbalsa_identity_set_request_dsn(LibBalsaIdentity *ident,
+                                  gboolean          request)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->request_dsn = request;
@@ -334,7 +356,8 @@ libbalsa_identity_set_request_dsn(LibBalsaIdentity *ident, gboolean request)
 
 
 void
-libbalsa_identity_set_always_trust(LibBalsaIdentity *ident, gboolean trust)
+libbalsa_identity_set_always_trust(LibBalsaIdentity *ident,
+                                   gboolean          trust)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->always_trust = trust;
@@ -342,7 +365,8 @@ libbalsa_identity_set_always_trust(LibBalsaIdentity *ident, gboolean trust)
 
 
 void
-libbalsa_identity_set_warn_send_plain(LibBalsaIdentity *ident, gboolean warn)
+libbalsa_identity_set_warn_send_plain(LibBalsaIdentity *ident,
+                                      gboolean          warn)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->warn_send_plain = warn;
@@ -350,7 +374,8 @@ libbalsa_identity_set_warn_send_plain(LibBalsaIdentity *ident, gboolean warn)
 
 
 void
-libbalsa_identity_set_force_gpg_key_id(LibBalsaIdentity *ident, const gchar *key_id)
+libbalsa_identity_set_force_gpg_key_id(LibBalsaIdentity *ident,
+                                       const gchar      *key_id)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -360,7 +385,8 @@ libbalsa_identity_set_force_gpg_key_id(LibBalsaIdentity *ident, const gchar *key
 
 
 void
-libbalsa_identity_set_force_smime_key_id(LibBalsaIdentity *ident, const gchar *key_id)
+libbalsa_identity_set_force_smime_key_id(LibBalsaIdentity *ident,
+                                         const gchar      *key_id)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -371,18 +397,22 @@ libbalsa_identity_set_force_smime_key_id(LibBalsaIdentity *ident, const gchar *k
 
 /** Returns a signature for given identity, adding a signature prefix
     if needed. parent can be NULL. */
-gchar*
-libbalsa_identity_get_signature(LibBalsaIdentity * ident, GError ** error)
+gchar *
+libbalsa_identity_get_signature(LibBalsaIdentity *ident,
+                                GError          **error)
 {
     gchar *ret = NULL, *path;
     gchar *retval;
 
-    if (ident->signature_path == NULL || *ident->signature_path == '\0')
-	return NULL;
+    if ((ident->signature_path == NULL) || (*ident->signature_path == '\0')) {
+        return NULL;
+    }
 
     path = libbalsa_expand_path(ident->signature_path);
     if (ident->sig_executable) {
-        gchar *argv[] = {"/bin/sh", "-c", path, NULL};
+        gchar *argv[] = {
+            "/bin/sh", "-c", path, NULL
+        };
         gchar *standard_error = NULL;
 
         if (!g_spawn_sync(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL,
@@ -396,15 +426,16 @@ libbalsa_identity_get_signature(LibBalsaIdentity * ident, GError ** error)
         }
         g_free(standard_error);
     } else {
-    	if (!g_file_get_contents(path, &ret, NULL, error)) {
+        if (!g_file_get_contents(path, &ret, NULL, error)) {
             g_prefix_error(error, _("Cannot read signature file “%s”: "),
                            ident->signature_path);
-    	}
+        }
     }
     g_free(path);
 
-    if ((error != NULL && *error != NULL) || ret == NULL)
+    if (((error != NULL) && (*error != NULL)) || (ret == NULL)) {
         return NULL;
+    }
 
     if (!libbalsa_utf8_sanitize(&ret, FALSE, NULL)) {
         g_set_error(error, LIBBALSA_ERROR_QUARK, -1,
@@ -425,9 +456,10 @@ libbalsa_identity_get_signature(LibBalsaIdentity * ident, GError ** error)
     return retval;
 }
 
+
 void
-libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
-                                  LibBalsaSmtpServer * smtp_server)
+libbalsa_identity_set_smtp_server(LibBalsaIdentity   *ident,
+                                  LibBalsaSmtpServer *smtp_server)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
 
@@ -438,13 +470,13 @@ libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
 /* libbalsa_identity_new_config:
    factory-type method creating new Identity object from given
    configuration data.
-*/
-LibBalsaIdentity*
-libbalsa_identity_new_config(const gchar* name)
+ */
+LibBalsaIdentity *
+libbalsa_identity_new_config(const gchar *name)
 {
-    LibBalsaIdentity* ident;
+    LibBalsaIdentity *ident;
     gchar *fname, *email;
-    gchar* tmpstr;
+    gchar *tmpstr;
 
     fname = libbalsa_conf_get_string("FullName");
     email = libbalsa_conf_get_string("Address");
@@ -497,16 +529,19 @@ libbalsa_identity_new_config(const gchar* name)
     return ident;
 }
 
+
 void
-libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
+libbalsa_identity_save(LibBalsaIdentity *ident,
+                       const gchar      *group)
 {
     g_return_if_fail(ident);
 
     libbalsa_conf_push_group(group);
     libbalsa_conf_set_string("FullName", ident->ia ? ident->ia->name : NULL);
 
-    if (ident->ia && INTERNET_ADDRESS_IS_MAILBOX (ident->ia))
+    if (ident->ia && INTERNET_ADDRESS_IS_MAILBOX (ident->ia)) {
         libbalsa_conf_set_string("Address", INTERNET_ADDRESS_MAILBOX(ident->ia)->addr);
+    }
 
     libbalsa_conf_set_string("ReplyTo", ident->replyto);
     libbalsa_conf_set_string("Domain", ident->domain);
@@ -525,10 +560,12 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
     libbalsa_conf_set_bool("SigReply", ident->sig_whenreply);
     libbalsa_conf_set_bool("SigSeparator", ident->sig_separator);
     libbalsa_conf_set_bool("SigPrepend", ident->sig_prepend);
-    if (ident->face)
+    if (ident->face) {
         libbalsa_conf_set_string("FacePath", ident->face);
-    if (ident->x_face)
+    }
+    if (ident->x_face) {
         libbalsa_conf_set_string("XFacePath", ident->x_face);
+    }
     libbalsa_conf_set_bool("RequestMDN", ident->request_mdn);
     libbalsa_conf_set_bool("RequestDSN", ident->request_dsn);
 
@@ -547,7 +584,8 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
 /* collected helper stuff for GPGME support */
 
 void
-libbalsa_identity_set_gpg_sign(LibBalsaIdentity* ident, gboolean sign)
+libbalsa_identity_set_gpg_sign(LibBalsaIdentity *ident,
+                               gboolean          sign)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->gpg_sign = sign;
@@ -555,7 +593,8 @@ libbalsa_identity_set_gpg_sign(LibBalsaIdentity* ident, gboolean sign)
 
 
 void
-libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity* ident, gboolean encrypt)
+libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity *ident,
+                                  gboolean          encrypt)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->gpg_encrypt = encrypt;
@@ -563,7 +602,8 @@ libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity* ident, gboolean encrypt)
 
 
 void
-libbalsa_identity_set_crypt_protocol(LibBalsaIdentity* ident, gint protocol)
+libbalsa_identity_set_crypt_protocol(LibBalsaIdentity *ident,
+                                     gint              protocol)
 {
     g_return_if_fail(LIBBALSA_IS_IDENTITY(ident));
     ident->crypt_protocol = protocol;

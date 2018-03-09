@@ -18,7 +18,7 @@
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
 #include <signal.h>
@@ -26,11 +26,11 @@
 #include <unistd.h>
 
 #ifdef HAVE_LOCALE_H
-#include <locale.h>
+#   include <locale.h>
 #endif
 
 #ifdef HAVE_RUBRICA
-#include <libxml/xmlversion.h>
+#   include <libxml/xmlversion.h>
 #endif
 
 #include <glib/gi18n.h>
@@ -51,8 +51,8 @@
 #include "libinit_balsa/assistant_init.h"
 
 #ifdef HAVE_GPGME
-#include "libbalsa-gpgme.h"
-#include "libbalsa-gpgme-cb.h"
+#   include "libbalsa-gpgme.h"
+#   include "libbalsa-gpgme-cb.h"
 #endif
 
 static void config_init(gboolean check_only);
@@ -62,10 +62,10 @@ static void balsa_cleanup(void);
 /* We need separate variable for storing command line requests to check the
    mail because such selection cannot be stored in balsa_app and later
    saved to the configuration file.
-*/
+ */
 static gchar **cmd_line_open_mailboxes;
 static gboolean cmd_check_mail_on_startup,
-    cmd_open_unread_mailbox, cmd_open_inbox, cmd_get_stats;
+                cmd_open_unread_mailbox, cmd_open_inbox, cmd_get_stats;
 
 /* opt_attach_list: list of attachments */
 static gchar **opt_attach_list = NULL;
@@ -81,6 +81,7 @@ accel_map_load(void)
     g_free(accel_map_filename);
 }
 
+
 static void
 accel_map_save(void)
 {
@@ -90,6 +91,7 @@ accel_map_save(void)
     g_free(accel_map_filename);
 }
 
+
 static gboolean
 balsa_main_check_new_messages(gpointer data)
 {
@@ -97,64 +99,67 @@ balsa_main_check_new_messages(gpointer data)
     return FALSE;
 }
 
+
 /* check_special_mailboxes:
    check for special mailboxes. Cannot use GUI because main window is not
    initialized yet.
-*/
+ */
 static gboolean
 check_special_mailboxes(void)
 {
     gboolean bomb = FALSE;
 
     if (balsa_app.inbox == NULL) {
-	g_warning(_("Balsa cannot open your “%s” mailbox."), _("Inbox"));
-	bomb = TRUE;
+        g_warning(_("Balsa cannot open your “%s” mailbox."), _("Inbox"));
+        bomb = TRUE;
     }
 
     if (balsa_app.outbox == NULL) {
-	g_warning(_("Balsa cannot open your “%s” mailbox."),
-		  _("Outbox"));
-	bomb = TRUE;
+        g_warning(_("Balsa cannot open your “%s” mailbox."),
+                  _("Outbox"));
+        bomb = TRUE;
     }
 
     if (balsa_app.sentbox == NULL) {
-	g_warning(_("Balsa cannot open your “%s” mailbox."),
-		  _("Sentbox"));
-	bomb = TRUE;
+        g_warning(_("Balsa cannot open your “%s” mailbox."),
+                  _("Sentbox"));
+        bomb = TRUE;
     }
 
     if (balsa_app.draftbox == NULL) {
-	g_warning(_("Balsa cannot open your “%s” mailbox."),
-		  _("Draftbox"));
-	bomb = TRUE;
+        g_warning(_("Balsa cannot open your “%s” mailbox."),
+                  _("Draftbox"));
+        bomb = TRUE;
     }
 
     if (balsa_app.trash == NULL) {
-	g_warning(_("Balsa cannot open your “%s” mailbox."), _("Trash"));
-	bomb = TRUE;
+        g_warning(_("Balsa cannot open your “%s” mailbox."), _("Trash"));
+        bomb = TRUE;
     }
 
     return bomb;
 }
 
+
 static void
 config_init(gboolean check_only)
 {
-    while(!config_load() && !check_only) {
-	balsa_init_begin();
+    while (!config_load() && !check_only) {
+        balsa_init_begin();
         config_defclient_save();
     }
 }
+
 
 static void
 mailboxes_init(gboolean check_only)
 {
     check_special_mailboxes();
     if (!balsa_app.inbox && !check_only) {
-	g_warning("*** error loading mailboxes\n");
-	balsa_init_begin();
+        g_warning("*** error loading mailboxes\n");
+        balsa_init_begin();
         config_defclient_save();
-	return;
+        return;
     }
 }
 
@@ -185,8 +190,9 @@ initial_open_unread_mailboxes()
 static gboolean
 initial_open_inbox()
 {
-    if (!balsa_app.inbox)
-	return FALSE;
+    if (!balsa_app.inbox) {
+        return FALSE;
+    }
 
     printf("opening %s..\n", balsa_app.inbox->name);
     balsa_mblist_open_mailbox_hidden(balsa_app.inbox);
@@ -194,29 +200,37 @@ initial_open_inbox()
     return FALSE;
 }
 
+
 static void
-balsa_get_stats(long *unread, long *unsent)
+balsa_get_stats(long *unread,
+                long *unsent)
 {
 
-    if(balsa_app.inbox && libbalsa_mailbox_open(balsa_app.inbox, NULL) ) {
+    if (balsa_app.inbox && libbalsa_mailbox_open(balsa_app.inbox, NULL)) {
         /* set threading type to load messages */
         libbalsa_mailbox_set_threading(balsa_app.inbox,
                                        balsa_app.inbox->view->threading_type);
         *unread = balsa_app.inbox->unread_messages;
         libbalsa_mailbox_close(balsa_app.inbox, FALSE);
-    } else *unread = -1;
-    if(balsa_app.draftbox && libbalsa_mailbox_open(balsa_app.outbox, NULL)){
+    } else {
+        *unread = -1;
+    }
+    if (balsa_app.draftbox && libbalsa_mailbox_open(balsa_app.outbox, NULL)) {
         *unsent = libbalsa_mailbox_total_messages(balsa_app.outbox);
         libbalsa_mailbox_close(balsa_app.outbox, FALSE);
-    } else *unsent = -1;
+    } else {
+        *unsent = -1;
+    }
 }
 
+
 static gboolean
-open_mailboxes_idle_cb(gchar ** urls)
+open_mailboxes_idle_cb(gchar **urls)
 {
     balsa_open_mailbox_list(urls);
     return FALSE;
 }
+
 
 static void
 balsa_check_open_mailboxes(void)
@@ -233,9 +247,10 @@ balsa_check_open_mailboxes(void)
     g_idle_add((GSourceFunc) open_mailboxes_idle_cb, urls);
 }
 
+
 /* scan_mailboxes:
    this is an idle handler. Expands subtrees.
-*/
+ */
 static gboolean
 scan_mailboxes_idle_cb()
 {
@@ -247,19 +262,19 @@ scan_mailboxes_idle_cb()
     model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
     /* The model contains only nodes from config. */
     for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
-	 valid = gtk_tree_model_iter_next(model, &iter)) {
-	BalsaMailboxNode *mbnode;
+         valid = gtk_tree_model_iter_next(model, &iter)) {
+        BalsaMailboxNode *mbnode;
 
-	gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
-	balsa_mailbox_node_append_subtree(mbnode);
-	g_object_unref(mbnode);
+        gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
+        balsa_mailbox_node_append_subtree(mbnode);
+        g_object_unref(mbnode);
     }
     /* The root-node (typically ~/mail) isn't in the model, so its
      * children will be appended to the top level. */
     balsa_mailbox_node_append_subtree(balsa_app.root_node);
 
     url_array = g_ptr_array_new();
-    if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox){
+    if (cmd_open_unread_mailbox || balsa_app.open_unread_mailbox) {
         GList *l, *gl;
 
         gl = balsa_mblist_find_all_unread_mboxes(NULL);
@@ -282,15 +297,17 @@ scan_mailboxes_idle_cb()
         urls = g_strsplit(join, ";", 20);
         g_free(join);
 
-        for (p = urls; *p; p++)
+        for (p = urls; *p; p++) {
             g_ptr_array_add(url_array, *p);
+        }
         g_free(urls); /* not g_strfreev */
     }
 
     if (balsa_app.remember_open_mboxes) {
-        if (balsa_app.current_mailbox_url)
+        if (balsa_app.current_mailbox_url) {
             g_ptr_array_add(url_array,
                             g_strdup(balsa_app.current_mailbox_url));
+        }
         balsa_add_open_mailbox_urls(url_array);
     }
 
@@ -304,7 +321,7 @@ scan_mailboxes_idle_cb()
                                                             FALSE));
     }
 
-    if(cmd_get_stats) {
+    if (cmd_get_stats) {
         long unread, unsent;
         balsa_get_stats(&unread, &unsent);
         printf("Unread: %ld Unsent: %ld\n", unread, unsent);
@@ -313,13 +330,16 @@ scan_mailboxes_idle_cb()
     return FALSE;
 }
 
+
 /* periodic_expunge_func makes sure that even the open mailboxes get
  * expunged now and than, even if they are opened longer than
  * balsa_app.expunge_timeout. If we did not do it, the mailboxes would in
  * principle grow indefinetely. */
 static gboolean
-mbnode_expunge_func(GtkTreeModel *model, GtkTreePath *path,
-                    GtkTreeIter *iter, GSList ** list)
+mbnode_expunge_func(GtkTreeModel *model,
+                    GtkTreePath  *path,
+                    GtkTreeIter  *iter,
+                    GSList      **list)
 {
     BalsaMailboxNode *mbnode;
 
@@ -331,37 +351,42 @@ mbnode_expunge_func(GtkTreeModel *model, GtkTreePath *path,
     return FALSE;
 }
 
+
 static gboolean
 periodic_expunge_cb(void)
 {
     GSList *list = NULL, *l;
 
     /* should we enforce expunging now and then? Perhaps not... */
-    if(!balsa_app.expunge_auto) return TRUE;
+    if (!balsa_app.expunge_auto) {
+        return TRUE;
+    }
 
     libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                          _("Compressing mail folders…"));
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc)mbnode_expunge_func,
-			   &list);
+                           (GtkTreeModelForeachFunc)mbnode_expunge_func,
+                           &list);
 
     for (l = list; l; l = l->next) {
         BalsaMailboxNode *mbnode = l->data;
         if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox)
             && !mbnode->mailbox->readonly) {
             time_t tm = time(NULL);
-            if (tm-mbnode->last_use > balsa_app.expunge_timeout)
+            if (tm - mbnode->last_use > balsa_app.expunge_timeout) {
                 libbalsa_mailbox_sync_storage(mbnode->mailbox, TRUE);
+            }
         }
         g_object_unref(mbnode);
     }
     g_slist_free(list);
 
     /* purge imap cache? leave 15MB */
-    libbalsa_imap_purge_temp_dir(15*1024*1024);
+    libbalsa_imap_purge_temp_dir(15 * 1024 * 1024);
 
     return TRUE; /* do it later as well */
 }
+
 
 /*
  * Wrappers for libbalsa access to the progress bar.
@@ -371,10 +396,11 @@ periodic_expunge_cb(void)
  * Initialize the progress bar and set text.
  */
 static GTimeVal prev_time_val;
-static gdouble  min_fraction;
+static gdouble min_fraction;
 static void
-balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
-                        guint total)
+balsa_progress_set_text(LibBalsaProgress *progress,
+                        const gchar      *text,
+                        guint             total)
 {
     gboolean rc = FALSE;
 
@@ -384,8 +410,9 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
 
     /* balsa_window_setup_progress is thread-safe, so we do not check
      * for a subthread */
-    if (!text || total >= LIBBALSA_PROGRESS_MIN_COUNT)
+    if (!text || (total >= LIBBALSA_PROGRESS_MIN_COUNT)) {
         rc = balsa_window_setup_progress(balsa_app.main_window, text);
+    }
     g_get_current_time(&prev_time_val);
     min_fraction = LIBBALSA_PROGRESS_MIN_UPDATE_STEP;
 
@@ -393,47 +420,57 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
         LIBBALSA_PROGRESS_YES : LIBBALSA_PROGRESS_NO;
 }
 
+
 /*
  * Set the fraction in the progress bar.
  */
 
 static void
-balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
+balsa_progress_set_fraction(LibBalsaProgress *progress,
+                            gdouble           fraction)
 {
     GTimeVal time_val;
     guint elapsed;
 
-    if (*progress == LIBBALSA_PROGRESS_NO)
+    if (*progress == LIBBALSA_PROGRESS_NO) {
         return;
+    }
 
-    if (fraction > 0.0 && fraction < min_fraction)
+    if ((fraction > 0.0) && (fraction < min_fraction)) {
         return;
+    }
 
     g_get_current_time(&time_val);
     elapsed = time_val.tv_sec - prev_time_val.tv_sec;
     elapsed *= G_USEC_PER_SEC;
     elapsed += time_val.tv_usec - prev_time_val.tv_usec;
-    if (elapsed < LIBBALSA_PROGRESS_MIN_UPDATE_USECS)
+    if (elapsed < LIBBALSA_PROGRESS_MIN_UPDATE_USECS) {
         return;
+    }
 
     g_time_val_add(&time_val, LIBBALSA_PROGRESS_MIN_UPDATE_USECS);
     min_fraction += LIBBALSA_PROGRESS_MIN_UPDATE_STEP;
 
-    if (balsa_app.main_window)
+    if (balsa_app.main_window) {
         balsa_window_increment_progress(balsa_app.main_window, fraction,
                                         !libbalsa_am_i_subthread());
-}
-
-static void
-balsa_progress_set_activity(gboolean set, const gchar * text)
-{
-    if (balsa_app.main_window) {
-        if (set)
-            balsa_window_increase_activity(balsa_app.main_window, text);
-        else
-            balsa_window_decrease_activity(balsa_app.main_window, text);
     }
 }
+
+
+static void
+balsa_progress_set_activity(gboolean     set,
+                            const gchar *text)
+{
+    if (balsa_app.main_window) {
+        if (set) {
+            balsa_window_increase_activity(balsa_app.main_window, text);
+        } else {
+            balsa_window_decrease_activity(balsa_app.main_window, text);
+        }
+    }
+}
+
 
 static gboolean
 balsa_check_open_compose_window(void)
@@ -446,18 +483,20 @@ balsa_check_open_compose_window(void)
         snd->quit_on_close = FALSE;
 
         if (opt_compose_email) {
-            if (g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
+            if (g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0) {
                 sendmsg_window_process_url(opt_compose_email + 7,
                                            sendmsg_window_set_field, snd);
-            else
+            } else {
                 sendmsg_window_set_field(snd, "to", opt_compose_email);
+            }
             g_free(opt_compose_email);
             opt_compose_email = NULL;
         }
 
         if (opt_attach_list) {
-            for (attach = opt_attach_list; *attach; ++attach)
+            for (attach = opt_attach_list; *attach; ++attach) {
                 add_attachment(snd, *attach, FALSE, NULL);
+            }
             g_strfreev(opt_attach_list);
             opt_attach_list = NULL;
         }
@@ -468,9 +507,11 @@ balsa_check_open_compose_window(void)
     return FALSE;
 }
 
+
 /* -------------------------- main --------------------------------- */
 static int
-real_main(int argc, char *argv[])
+real_main(int   argc,
+          char *argv[])
 {
     GtkWidget *window;
     gchar *default_icon;
@@ -490,8 +531,10 @@ real_main(int argc, char *argv[])
 
 #ifdef HAVE_GPGME
     /* initialise the gpgme library and set the callback funcs */
-    libbalsa_gpgme_init(lb_gpgme_passphrase, lb_gpgme_select_key,
-			lb_gpgme_accept_low_trust_key);
+    libbalsa_gpgme_init(lb_gpgme_passphrase,
+                        lb_gpgme_select_key,
+                        lb_gpgme_accept_low_trust_key);
+
 #endif
 
     balsa_app_init();
@@ -501,7 +544,7 @@ real_main(int argc, char *argv[])
     libbalsa_filters_set_url_mapper(balsa_find_mailbox_by_url);
     libbalsa_filters_set_filter_list(&balsa_app.filters);
 
-    libbalsa_progress_set_text     = balsa_progress_set_text;
+    libbalsa_progress_set_text = balsa_progress_set_text;
     libbalsa_progress_set_fraction = balsa_progress_set_fraction;
     libbalsa_progress_set_activity = balsa_progress_set_activity;
 
@@ -511,7 +554,7 @@ real_main(int argc, char *argv[])
     config_init(cmd_get_stats);
 
     default_icon = balsa_pixmap_finder("balsa_icon.png");
-    if(default_icon) { /* may be NULL for developer installations */
+    if (default_icon) { /* may be NULL for developer installations */
         gtk_window_set_default_icon_from_file(default_icon, NULL);
         g_free(default_icon);
     }
@@ -521,7 +564,7 @@ real_main(int argc, char *argv[])
     window = balsa_window_new();
     balsa_app.main_window = BALSA_WINDOW(window);
     g_object_add_weak_pointer(G_OBJECT(window),
-			      (gpointer) &balsa_app.main_window);
+                              (gpointer) & balsa_app.main_window);
 
     /* load mailboxes */
     config_load_sections();
@@ -558,9 +601,10 @@ real_main(int argc, char *argv[])
     }
     g_timeout_add_seconds(1801, (GSourceFunc) periodic_expunge_cb, NULL);
 
-    if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup)
+    if (cmd_check_mail_on_startup || balsa_app.check_mail_upon_startup) {
         g_idle_add((GSourceFunc) balsa_main_check_new_messages,
                    balsa_app.main_window);
+    }
 
     accel_map_load();
     gtk_main();
@@ -572,6 +616,7 @@ real_main(int argc, char *argv[])
     return 0;
 }
 
+
 static void
 balsa_cleanup(void)
 {
@@ -580,13 +625,14 @@ balsa_cleanup(void)
     libbalsa_conf_drop_all();
 }
 
+
 /*
  * Parse command line options
  */
 static gint
-parse_options(int                       argc,
-              char                   ** argv,
-              GApplicationCommandLine * command_line)
+parse_options(int                      argc,
+              char                   **argv,
+              GApplicationCommandLine *command_line)
 {
     static gboolean help;
     static gboolean version;
@@ -648,7 +694,7 @@ parse_options(int                       argc,
      * also support the legacy "-?".
      * If we got an error, we check to see if it was caused by -?,
      * and if so, honor it: */
-    if (!rc && strcmp(*++argv, "-?") == 0) {
+    if (!rc && (strcmp(*++argv, "-?") == 0)) {
         rc = help = TRUE;
         g_error_free(error);
     }
@@ -690,9 +736,11 @@ parse_options(int                       argc,
     return status;
 }
 
+
 static void
-handle_remote(int argc, char **argv,
-              GApplicationCommandLine * command_line)
+handle_remote(int                      argc,
+              char                   **argv,
+              GApplicationCommandLine *command_line)
 {
     if (cmd_get_stats) {
         glong unread, unsent;
@@ -702,17 +750,21 @@ handle_remote(int argc, char **argv,
                                          "Unread: %ld Unsent: %ld\n",
                                          unread, unsent);
     } else {
-        if (cmd_check_mail_on_startup)
+        if (cmd_check_mail_on_startup) {
             balsa_main_check_new_messages(balsa_app.main_window);
+        }
 
-        if (cmd_open_unread_mailbox)
+        if (cmd_open_unread_mailbox) {
             initial_open_unread_mailboxes();
+        }
 
-        if (cmd_open_inbox)
+        if (cmd_open_inbox) {
             initial_open_inbox();
+        }
 
-        if (cmd_line_open_mailboxes)
+        if (cmd_line_open_mailboxes) {
             balsa_check_open_mailboxes();
+        }
 
         if (!balsa_check_open_compose_window()) {
             /* Move the main window to the request's screen */
@@ -721,10 +773,11 @@ handle_remote(int argc, char **argv,
     }
 }
 
+
 static int
-command_line_cb(GApplication            * application,
-                GApplicationCommandLine * command_line,
-                gpointer                  user_data)
+command_line_cb(GApplication            *application,
+                GApplicationCommandLine *command_line,
+                gpointer                 user_data)
 {
     gchar **args, **argv;
     gint argc;
@@ -748,8 +801,9 @@ command_line_cb(GApplication            * application,
             /* This is the primary instance; start up as usual. */
             status = real_main(argc, argv);
         }
-    } else if (status == 2) /* handled a "help" or "version" request */
+    } else if (status == 2) { /* handled a "help" or "version" request */
         status = 0;
+    }
 
     g_free(argv);
     g_strfreev(args);
@@ -757,15 +811,17 @@ command_line_cb(GApplication            * application,
     return status;
 }
 
+
 int
-main(int argc, char **argv)
+main(int    argc,
+     char **argv)
 {
     GtkApplication *application;
     int status;
 
     balsa_app.application = application =
-        gtk_application_new("org.desktop.Balsa",
-                            G_APPLICATION_HANDLES_COMMAND_LINE);
+            gtk_application_new("org.desktop.Balsa",
+                                G_APPLICATION_HANDLES_COMMAND_LINE);
     g_signal_connect(application, "command-line",
                      G_CALLBACK(command_line_cb), NULL);
     g_object_set(application, "register-session", TRUE, NULL);

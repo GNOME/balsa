@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,7 +22,7 @@
 #define __LIBBALSA_H__
 
 #ifndef BALSA_VERSION
-# error "Include config.h before this file."
+#   error "Include config.h before this file."
 #endif
 
 typedef struct _LibBalsaCondition LibBalsaCondition;
@@ -52,22 +52,22 @@ typedef struct _LibbalsaVfs LibbalsaVfs;
 #include "address-book-extern.h"
 
 #if ENABLE_LDAP
-#include "address-book-ldap.h"
+#   include "address-book-ldap.h"
 #endif
 #if HAVE_SQLITE
-#include "address-book-gpe.h"
+#   include "address-book-gpe.h"
 #endif
 #if HAVE_RUBRICA
-#include "address-book-rubrica.h"
+#   include "address-book-rubrica.h"
 #endif
 #if HAVE_OSMO
-#include "address-book-osmo.h"
+#   include "address-book-osmo.h"
 #endif
 
 /* Callback for testing whether a mailbox or server can be reached: */
-typedef void LibBalsaCanReachCallback(GObject * object,
-                                      gboolean  can_reach,
-                                      gpointer  cb_data);
+typedef void LibBalsaCanReachCallback (GObject *object,
+                                       gboolean can_reach,
+                                       gpointer cb_data);
 
 #include "mailbox.h"
 #include "mailbox_local.h"
@@ -82,8 +82,10 @@ typedef void LibBalsaCanReachCallback(GObject * object,
  * Error domains for GError:
  */
 GQuark libbalsa_scanner_error_quark(void);
+
 #define LIBBALSA_SCANNER_ERROR libbalsa_scanner_error_quark()
 GQuark libbalsa_mailbox_error_quark(void);
+
 #define LIBBALSA_MAILBOX_ERROR libbalsa_mailbox_error_quark()
 
 /*
@@ -111,14 +113,15 @@ enum {
  * Initialize the library
  */
 void libbalsa_init(LibBalsaInformationFunc information_callback);
-void libbalsa_set_spool(const gchar * spool);
+void libbalsa_set_spool(const gchar *spool);
 
-void libbalsa_show_message_source(GtkApplication * application,
-                                  LibBalsaMessage * msg,
-                                  const gchar * font,
-                                  gboolean *escape_specials,
-                                  gint * width, gint * height);
-gchar *libbalsa_rot(const gchar * pass);
+void libbalsa_show_message_source(GtkApplication  *application,
+                                  LibBalsaMessage *msg,
+                                  const gchar     *font,
+                                  gboolean        *escape_specials,
+                                  gint            *width,
+                                  gint            *height);
+gchar *libbalsa_rot(const gchar *pass);
 
 gchar *libbalsa_guess_email_address(void);
 gchar *libbalsa_guess_mail_spool(void);
@@ -131,19 +134,22 @@ gchar *libbalsa_guess_ldap_server(void);
 gchar *libbalsa_guess_imap_inbox(void);
 
 
-gchar* libbalsa_date_to_utf8(time_t date, const gchar *date_string);
+gchar *libbalsa_date_to_utf8(time_t       date,
+                             const gchar *date_string);
 LibBalsaMessageStatus libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags);
 
-gboolean libbalsa_is_cert_known(X509* cert, long vfy_result);
+gboolean libbalsa_is_cert_known(X509 *cert,
+                                long  vfy_result);
 void libbalsa_certs_destroy(void);
 
 gboolean libbalsa_abort_on_timeout(const char *host);
 
 GThread *libbalsa_get_main_thread(void);
 gboolean libbalsa_am_i_subthread(void);
-void libbalsa_message(const char *fmt, ...)
-	G_GNUC_PRINTF(1, 2);
-gchar * libbalsa_rot(const gchar * pass);
+void libbalsa_message(const char *fmt,
+                      ...)
+G_GNUC_PRINTF(1, 2);
+gchar *libbalsa_rot(const gchar *pass);
 
 typedef enum {
     LIBBALSA_PROGRESS_NO = 0,
@@ -159,33 +165,37 @@ typedef enum {
 #define LIBBALSA_PROGRESS_MIN_UPDATE_USECS 50000
 #define LIBBALSA_PROGRESS_MIN_UPDATE_STEP  0.05
 
-extern void (*libbalsa_progress_set_text) (LibBalsaProgress * progress,
-                                           const gchar * text,
-                                           guint total);
-extern void (*libbalsa_progress_set_fraction) (LibBalsaProgress * progress,
-                                               gdouble fraction);
-extern void (*libbalsa_progress_set_activity) (gboolean set,
-                                               const gchar * text);
+extern void (*libbalsa_progress_set_text)(LibBalsaProgress *progress,
+                                          const gchar *text,
+                                          guint total);
+extern void (*libbalsa_progress_set_fraction) (LibBalsaProgress *progress,
+                                               gdouble           fraction);
+extern void (*libbalsa_progress_set_activity) (gboolean     set,
+                                               const gchar *text);
 
 /*
  * Face and X-Face header support.
  */
-gchar *libbalsa_get_header_from_path(const gchar * header,
-                                     const gchar * path, gsize * size,
-                                     GError ** err);
-GtkWidget *libbalsa_get_image_from_face_header(const gchar * content,
-                                               GError ** err);
+gchar *libbalsa_get_header_from_path(const gchar *header,
+                                     const gchar *path,
+                                     gsize       *size,
+                                     GError     **err);
+GtkWidget *libbalsa_get_image_from_face_header(const gchar *content,
+                                               GError     **err);
+
 #if HAVE_COMPFACE
-GtkWidget *libbalsa_get_image_from_x_face_header(const gchar * content,
-                                                 GError ** err);
+GtkWidget *libbalsa_get_image_from_x_face_header(const gchar *content,
+                                                 GError     **err);
+
 #endif                          /* HAVE_COMPFACE */
 
 GQuark libbalsa_image_error_quark(void);
+
 #define LIBBALSA_IMAGE_ERROR libbalsa_image_error_quark()
 enum LibBalsaImageError {
     LIBBALSA_IMAGE_ERROR_NO_DATA
 #if HAVE_COMPFACE
-        ,
+    ,
     LIBBALSA_IMAGE_ERROR_FORMAT,
     LIBBALSA_IMAGE_ERROR_BUFFER,
     LIBBALSA_IMAGE_ERROR_BAD_DATA
@@ -196,6 +206,7 @@ GtkDialogFlags libbalsa_dialog_flags(void);
 
 #if HAVE_GTKSOURCEVIEW
 GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases);
+
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
 #endif                          /* __LIBBALSA_H__ */

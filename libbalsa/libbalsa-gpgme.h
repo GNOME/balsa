@@ -22,7 +22,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#   include <config.h>
 #endif
 
 #include <gpgme.h>
@@ -52,11 +52,11 @@ G_BEGIN_DECLS
  * - parent window
  * Return: the key the user selected, or NULL if the operation shall be cancelled
  */
-typedef gpgme_key_t(*lbgpgme_select_key_cb) (const gchar *,
-						 	 	 	 	 	 lb_key_sel_md_t,
-											 GList *,
-											 gpgme_protocol_t,
-											 GtkWindow *);
+typedef gpgme_key_t (*lbgpgme_select_key_cb) (const gchar *,
+                                              lb_key_sel_md_t,
+                                              GList *,
+                                              gpgme_protocol_t,
+                                              GtkWindow *);
 
 /** Callback to ask the user whether a key with low trust shall be accepted
  * Parameters:
@@ -65,75 +65,77 @@ typedef gpgme_key_t(*lbgpgme_select_key_cb) (const gchar *,
  * - parent window
  * Return: TRUE to accept the key, FALSE to reject it
  */
-typedef gboolean(*lbgpgme_accept_low_trust_cb) (const gchar *,
-												gpgme_key_t,
-												GtkWindow *);
+typedef gboolean (*lbgpgme_accept_low_trust_cb) (const gchar *,
+                                                 gpgme_key_t,
+                                                 GtkWindow *);
 
 
 
 void libbalsa_gpgme_init(gpgme_passphrase_cb_t       get_passphrase,
-			 	 	 	 lbgpgme_select_key_cb       select_key_cb,
-						 lbgpgme_accept_low_trust_cb accept_low_trust);
+                         lbgpgme_select_key_cb       select_key_cb,
+                         lbgpgme_accept_low_trust_cb accept_low_trust);
 gboolean libbalsa_gpgme_check_crypto_engine(gpgme_protocol_t protocol);
-gpgme_ctx_t libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,
-										  gpgme_passphrase_cb_t   callback,
-										  GtkWindow				 *parent,
-										  GError                **error)
-	G_GNUC_WARN_UNUSED_RESULT;
-gboolean libbalsa_gpgme_ctx_set_home(gpgme_ctx_t   ctx,
-									 const gchar  *home_dir,
-									 GError      **error);
+gpgme_ctx_t libbalsa_gpgme_new_with_proto(gpgme_protocol_t      protocol,
+                                          gpgme_passphrase_cb_t callback,
+                                          GtkWindow            *parent,
+                                          GError              **error)
+G_GNUC_WARN_UNUSED_RESULT;
+gboolean libbalsa_gpgme_ctx_set_home(gpgme_ctx_t  ctx,
+                                     const gchar *home_dir,
+                                     GError     **error);
 
-GMimeGpgmeSigstat *libbalsa_gpgme_verify(GMimeStream * content,
-					 GMimeStream * sig_plain,
-					 gpgme_protocol_t protocol,
-					 gboolean singlepart_mode,
-					 GError ** error)
-	G_GNUC_WARN_UNUSED_RESULT;
+GMimeGpgmeSigstat *libbalsa_gpgme_verify(GMimeStream     *content,
+                                         GMimeStream     *sig_plain,
+                                         gpgme_protocol_t protocol,
+                                         gboolean         singlepart_mode,
+                                         GError         **error)
+G_GNUC_WARN_UNUSED_RESULT;
 
-gpgme_hash_algo_t libbalsa_gpgme_sign(const gchar * userid,
-				      GMimeStream * istream,
-				      GMimeStream * ostream,
-				      gpgme_protocol_t protocol,
-				      gboolean singlepart_mode,
-				      GtkWindow * parent, GError ** error);
+gpgme_hash_algo_t libbalsa_gpgme_sign(const gchar     *userid,
+                                      GMimeStream     *istream,
+                                      GMimeStream     *ostream,
+                                      gpgme_protocol_t protocol,
+                                      gboolean         singlepart_mode,
+                                      GtkWindow       *parent,
+                                      GError         **error);
 
-gboolean libbalsa_gpgme_encrypt(GPtrArray * recipients,
-			   const char *sign_for,
-			   GMimeStream * istream,
-			   GMimeStream * ostream,
-			   gpgme_protocol_t protocol,
-			   gboolean singlepart_mode,
-			   gboolean trust_all_keys,
-			   GtkWindow * parent, GError ** error);
+gboolean libbalsa_gpgme_encrypt(GPtrArray       *recipients,
+                                const char      *sign_for,
+                                GMimeStream     *istream,
+                                GMimeStream     *ostream,
+                                gpgme_protocol_t protocol,
+                                gboolean         singlepart_mode,
+                                gboolean         trust_all_keys,
+                                GtkWindow       *parent,
+                                GError         **error);
 
-GMimeGpgmeSigstat *libbalsa_gpgme_decrypt(GMimeStream * crypted,
-					  GMimeStream * plain,
-					  gpgme_protocol_t protocol,
-					  GtkWindow * parent,
-					  GError ** error)
-	G_GNUC_WARN_UNUSED_RESULT;
+GMimeGpgmeSigstat *libbalsa_gpgme_decrypt(GMimeStream     *crypted,
+                                          GMimeStream     *plain,
+                                          gpgme_protocol_t protocol,
+                                          GtkWindow       *parent,
+                                          GError         **error)
+G_GNUC_WARN_UNUSED_RESULT;
 
-gchar *libbalsa_gpgme_get_pubkey(gpgme_protocol_t   protocol,
-								 const gchar       *name,
-								 GtkWindow 		   *parent,
-								 GError           **error)
-	G_GNUC_WARN_UNUSED_RESULT;
+gchar *libbalsa_gpgme_get_pubkey(gpgme_protocol_t protocol,
+                                 const gchar     *name,
+                                 GtkWindow       *parent,
+                                 GError         **error)
+G_GNUC_WARN_UNUSED_RESULT;
 
-gchar *libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
-  	  	  	  	  	  	  	  	 const gchar       *name,
-								 GtkWindow 		   *parent,
-								 GError           **error)
-	G_GNUC_WARN_UNUSED_RESULT;
+gchar *libbalsa_gpgme_get_seckey(gpgme_protocol_t protocol,
+                                 const gchar     *name,
+                                 GtkWindow       *parent,
+                                 GError         **error)
+G_GNUC_WARN_UNUSED_RESULT;
 
-void libbalsa_gpgme_set_error(GError        **error,
-					          gpgme_error_t   gpgme_err,
-							  const gchar    *format,
-							  ...)
-	G_GNUC_PRINTF(3, 4);
+void libbalsa_gpgme_set_error(GError      **error,
+                              gpgme_error_t gpgme_err,
+                              const gchar  *format,
+                              ...)
+G_GNUC_PRINTF(3, 4);
 
 
 G_END_DECLS
 
 
-#endif				/* LIBBALSA_GPGME_H_ */
+#endif                          /* LIBBALSA_GPGME_H_ */

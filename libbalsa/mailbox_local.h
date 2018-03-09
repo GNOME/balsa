@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -37,7 +37,7 @@
     (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_LOCAL))
 #define LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox) \
     (G_TYPE_INSTANCE_GET_CLASS ((mailbox), LIBBALSA_TYPE_MAILBOX_LOCAL, \
-				LibBalsaMailboxLocalClass))
+                                LibBalsaMailboxLocalClass))
 
 GType libbalsa_mailbox_local_get_type(void);
 
@@ -45,7 +45,7 @@ typedef struct _LibBalsaMailboxLocal LibBalsaMailboxLocal;
 typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
 
 struct _LibBalsaMailboxLocalPool {
-    LibBalsaMessage * message;
+    LibBalsaMessage *message;
     guint pool_seqno;
 };
 typedef struct _LibBalsaMailboxLocalPool LibBalsaMailboxLocalPool;
@@ -76,51 +76,55 @@ struct _LibBalsaMailboxLocal {
     guint pool_seqno;
 };
 
-typedef gboolean LibBalsaMailboxLocalAddMessageFunc(LibBalsaMailboxLocal *
-                                                    local,
-                                                    GMimeStream * stream,
-                                                    LibBalsaMessageFlag
-                                                    flags, GError ** err);
+typedef gboolean LibBalsaMailboxLocalAddMessageFunc (LibBalsaMailboxLocal *
+                                                     local,
+                                                     GMimeStream *stream,
+                                                     LibBalsaMessageFlag
+                                                     flags, GError **err);
 
 struct _LibBalsaMailboxLocalClass {
     LibBalsaMailboxClass klass;
 
-    gint (*check_files)(const gchar * path, gboolean create);
-    void (*set_path)(LibBalsaMailboxLocal * local, const gchar * path);
-    void (*remove_files)(LibBalsaMailboxLocal * local);
-    guint (*fileno)(LibBalsaMailboxLocal * local, guint msgno);
-    LibBalsaMailboxLocalMessageInfo *(*get_info)(LibBalsaMailboxLocal * local,
-                                                 guint msgno);
+    gint (*check_files)(const gchar *path,
+                        gboolean     create);
+    void (*set_path)(LibBalsaMailboxLocal *local,
+                     const gchar          *path);
+    void (*remove_files)(LibBalsaMailboxLocal *local);
+    guint (*fileno)(LibBalsaMailboxLocal *local,
+                    guint                 msgno);
+    LibBalsaMailboxLocalMessageInfo *(*get_info)(LibBalsaMailboxLocal *local,
+                                                 guint                 msgno);
     LibBalsaMailboxLocalAddMessageFunc *add_message;
 };
 
-LibBalsaMailbox *libbalsa_mailbox_local_new(const gchar * path,
-                                            gboolean      create);
-gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
-				     const gchar * path, gboolean create);
+LibBalsaMailbox *libbalsa_mailbox_local_new(const gchar *path,
+                                            gboolean     create);
+gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal *mailbox,
+                                     const gchar          *path,
+                                     gboolean              create);
 void libbalsa_mailbox_local_set_threading_info(LibBalsaMailboxLocal *
                                                local);
 
 #define libbalsa_mailbox_local_get_path(mbox) \
-	((const gchar *) (LIBBALSA_MAILBOX(mbox))->url+7)
+    ((const gchar *) (LIBBALSA_MAILBOX(mbox))->url + 7)
 
-void libbalsa_mailbox_local_load_messages(LibBalsaMailbox * mailbox,
-					  guint last_msgno);
-void libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
-                                          guint msgno,
-                                          LibBalsaMessage * message);
-void libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox * mailbox,
-					  guint msgno);
+void libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
+                                          guint            last_msgno);
+void libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal *local,
+                                          guint                 msgno,
+                                          LibBalsaMessage      *message);
+void libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox *mailbox,
+                                          guint            msgno);
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);
 
 /* Helpers for maildir and mh. */
 GMimeMessage *libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox *
-						      mailbox,
-						      const gchar * name1,
-						      const gchar * name2);
+                                                      mailbox,
+                                                      const gchar *name1,
+                                                      const gchar *name2);
 GMimeStream *libbalsa_mailbox_local_get_message_stream(LibBalsaMailbox *
-						       mailbox,
-						       const gchar * name1,
-						       const gchar * name2);
+                                                       mailbox,
+                                                       const gchar *name1,
+                                                       const gchar *name2);
 
-#endif				/* __LIBBALSA_MAILBOX_LOCAL_H__ */
+#endif                          /* __LIBBALSA_MAILBOX_LOCAL_H__ */

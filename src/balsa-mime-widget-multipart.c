@@ -7,18 +7,18 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "balsa-mime-widget-multipart.h"
 
@@ -29,9 +29,10 @@
 
 
 BalsaMimeWidget *
-balsa_mime_widget_new_multipart(BalsaMessage * bm,
-				LibBalsaMessageBody * mime_body,
-				const gchar * content_type, gpointer data)
+balsa_mime_widget_new_multipart(BalsaMessage        *bm,
+                                LibBalsaMessageBody *mime_body,
+                                const gchar         *content_type,
+                                gpointer             data)
 {
     BalsaMimeWidget *mw;
     GtkWidget *widget;
@@ -46,13 +47,13 @@ balsa_mime_widget_new_multipart(BalsaMessage * bm,
 
 #ifdef HAVE_GPGME
     if (!g_ascii_strcasecmp("multipart/signed", content_type) &&
-	mime_body->parts && mime_body->parts->next &&
-	mime_body->parts->next->sig_info) {
-        GtkWidget * crypto_frame;
+        mime_body->parts && mime_body->parts->next &&
+        mime_body->parts->next->sig_info) {
+        GtkWidget *crypto_frame;
 
-	crypto_frame =
-	    balsa_mime_widget_crypto_frame(mime_body->parts->next, widget,
-					   mime_body->was_encrypted, FALSE, NULL);
+        crypto_frame =
+            balsa_mime_widget_crypto_frame(mime_body->parts->next, widget,
+                                           mime_body->was_encrypted, FALSE, NULL);
         balsa_mime_widget_set_widget(mw, crypto_frame);
     }
 #endif

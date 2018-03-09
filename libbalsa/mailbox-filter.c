@@ -6,27 +6,27 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 /*
  * mailbox_filter.h
- * 
+ *
  * Header defining filters associated to mailbox
  * Basically it's a filter plus fields related to automatic running
  * Author : Emmanuel Allaud
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
 #include <string.h>
@@ -41,17 +41,21 @@
  * There is no copy, the new list references object of the source list
  */
 
-GSList* 
-libbalsa_mailbox_filters_when(GSList * filters, gint when)
+GSList *
+libbalsa_mailbox_filters_when(GSList *filters,
+                              gint    when)
 {
-    GSList * lst = NULL;
-    for (; filters != NULL; filters = filters->next)
-	if (FILTER_WHEN_CHKFLAG((LibBalsaMailboxFilter*)filters->data,when))
-	    lst = g_slist_prepend(lst,((LibBalsaMailboxFilter*)filters->data)->actual_filter);
+    GSList *lst = NULL;
+    for (; filters != NULL; filters = filters->next) {
+        if (FILTER_WHEN_CHKFLAG((LibBalsaMailboxFilter *)filters->data, when)) {
+            lst = g_slist_prepend(lst, ((LibBalsaMailboxFilter *)filters->data)->actual_filter);
+        }
+    }
     lst = g_slist_reverse(lst);
 
     return lst;
 }
+
 
 /* Looks for a mailbox filters group with MBOX_URL field equals to mbox->url
  * returns the group name or NULL if none found
@@ -63,8 +67,9 @@ struct lbmf_section_lookup_info {
 };
 
 static gboolean
-lbmf_section_lookup_func(const gchar * key, const gchar * value,
-                         gpointer data)
+lbmf_section_lookup_func(const gchar *key,
+                         const gchar *value,
+                         gpointer     data)
 {
     struct lbmf_section_lookup_info *info = data;
     gchar *url;
@@ -72,15 +77,17 @@ lbmf_section_lookup_func(const gchar * key, const gchar * value,
     libbalsa_conf_push_group(key);
     url = libbalsa_conf_get_string(MAILBOX_FILTERS_URL_KEY);
     libbalsa_conf_pop_group();
-    if (strcmp(url, info->name) == 0)
+    if (strcmp(url, info->name) == 0) {
         info->group = g_strdup(key);
+    }
     g_free(url);
 
     return info->group != NULL;
 }
 
+
 gchar *
-mailbox_filters_section_lookup(const gchar * name)
+mailbox_filters_section_lookup(const gchar *name)
 {
     struct lbmf_section_lookup_info info;
 
@@ -89,21 +96,22 @@ mailbox_filters_section_lookup(const gchar * name)
     info.name = name;
     info.group = NULL;
     libbalsa_conf_foreach_group(MAILBOX_FILTERS_SECTION_PREFIX,
-                                  lbmf_section_lookup_func, &info);
+                                lbmf_section_lookup_func, &info);
 
     return info.group;
 }
 
+
 void
-config_mailbox_filters_load(LibBalsaMailbox * mbox)
+config_mailbox_filters_load(LibBalsaMailbox *mbox)
 {
-    gchar * group;
+    gchar *group;
 
     group = mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
     if (group) {
-	libbalsa_conf_push_group(group);
-	g_free(group);
-	libbalsa_mailbox_filters_load_config(mbox);
-	libbalsa_conf_pop_group();
+        libbalsa_conf_push_group(group);
+        g_free(group);
+        libbalsa_mailbox_filters_load_config(mbox);
+        libbalsa_conf_pop_group();
     }
 }

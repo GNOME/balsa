@@ -6,20 +6,20 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "server.h"
 
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 
 #if defined(HAVE_LIBSECRET)
-#include <libsecret/secret.h>
+#   include <libsecret/secret.h>
 #endif                          /* defined(HAVE_LIBSECRET) */
 
 #include <openssl/err.h>
@@ -42,25 +42,26 @@
 static const SecretSchema server_schema = {
     "org.gnome.Balsa.NetworkPassword", SECRET_SCHEMA_NONE,
     {
-	{ "protocol", SECRET_SCHEMA_ATTRIBUTE_STRING },
-	{ "server",   SECRET_SCHEMA_ATTRIBUTE_STRING },
-	{ "user",     SECRET_SCHEMA_ATTRIBUTE_STRING },
-	{ NULL, 0 }
+        { "protocol", SECRET_SCHEMA_ATTRIBUTE_STRING },
+        { "server", SECRET_SCHEMA_ATTRIBUTE_STRING },
+        { "user", SECRET_SCHEMA_ATTRIBUTE_STRING },
+        { NULL, 0 }
     }
 };
 const SecretSchema *LIBBALSA_SERVER_SECRET_SCHEMA = &server_schema;
 #endif                          /* defined(HAVE_LIBSECRET) */
 
 static GObjectClass *parent_class = NULL;
-static void libbalsa_server_class_init(LibBalsaServerClass * klass);
-static void libbalsa_server_init(LibBalsaServer * server);
-static void libbalsa_server_finalize(GObject * object);
+static void libbalsa_server_class_init(LibBalsaServerClass *klass);
+static void libbalsa_server_init(LibBalsaServer *server);
+static void libbalsa_server_finalize(GObject *object);
 
-static void libbalsa_server_real_set_username(LibBalsaServer * server,
-					      const gchar * username);
-static void libbalsa_server_real_set_host(LibBalsaServer * server,
-					  const gchar * host,
-                                          gboolean use_ssl);
+static void libbalsa_server_real_set_username(LibBalsaServer *server,
+                                              const gchar    *username);
+static void libbalsa_server_real_set_host(LibBalsaServer *server,
+                                          const gchar    *host,
+                                          gboolean        use_ssl);
+
 /* static gchar* libbalsa_server_real_get_password(LibBalsaServer *server); */
 
 enum {
@@ -99,8 +100,9 @@ libbalsa_server_get_type(void)
     return server_type;
 }
 
+
 static void
-libbalsa_server_class_init(LibBalsaServerClass * klass)
+libbalsa_server_class_init(LibBalsaServerClass *klass)
 {
     GObjectClass *object_class;
 
@@ -111,68 +113,70 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
     object_class->finalize = libbalsa_server_finalize;
 
     libbalsa_server_signals[SET_USERNAME] =
-	g_signal_new("set-username",
+        g_signal_new("set-username",
                      G_TYPE_FROM_CLASS(object_class),
                      G_SIGNAL_RUN_FIRST,
-		     G_STRUCT_OFFSET(LibBalsaServerClass,
-				     set_username),
+                     G_STRUCT_OFFSET(LibBalsaServerClass,
+                                     set_username),
                      NULL, NULL,
                      g_cclosure_marshal_VOID__STRING,
                      G_TYPE_NONE, 1,
-		     G_TYPE_STRING);
+                     G_TYPE_STRING);
     libbalsa_server_signals[SET_HOST] =
-	g_signal_new("set-host",
+        g_signal_new("set-host",
                      G_TYPE_FROM_CLASS(object_class),
                      G_SIGNAL_RUN_FIRST,
-		     G_STRUCT_OFFSET(LibBalsaServerClass,
+                     G_STRUCT_OFFSET(LibBalsaServerClass,
                                      set_host),
                      NULL, NULL,
                      libbalsa_VOID__POINTER_INT,
                      G_TYPE_NONE, 2,
                      G_TYPE_POINTER, G_TYPE_INT
-		     );
+                     );
     libbalsa_server_signals[CONFIG_CHANGED] =
-	g_signal_new("config-changed",
+        g_signal_new("config-changed",
                      G_TYPE_FROM_CLASS(object_class),
                      G_SIGNAL_RUN_FIRST,
-		     G_STRUCT_OFFSET(LibBalsaServerClass,
-				     config_changed),
+                     G_STRUCT_OFFSET(LibBalsaServerClass,
+                                     config_changed),
                      NULL, NULL,
                      g_cclosure_marshal_VOID__VOID,
                      G_TYPE_NONE, 0);
 
 
     libbalsa_server_signals[GET_PASSWORD] =
-	g_signal_new("get-password",
+        g_signal_new("get-password",
                      G_TYPE_FROM_CLASS(object_class),
                      G_SIGNAL_RUN_LAST,
-		     G_STRUCT_OFFSET(LibBalsaServerClass,
-			             get_password),
+                     G_STRUCT_OFFSET(LibBalsaServerClass,
+                                     get_password),
                      NULL, NULL,
-		     libbalsa_POINTER__OBJECT,
+                     libbalsa_POINTER__OBJECT,
                      G_TYPE_POINTER, 1,
                      LIBBALSA_TYPE_MAILBOX);
 
     klass->set_username = libbalsa_server_real_set_username;
     klass->set_host = libbalsa_server_real_set_host;
-    klass->get_password = NULL;	/* libbalsa_server_real_get_password; */
+    klass->get_password = NULL; /* libbalsa_server_real_get_password; */
 }
 
+
 static void
-libbalsa_server_init(LibBalsaServer * server)
+libbalsa_server_init(LibBalsaServer *server)
 {
     server->protocol = "pop3"; /* Is this a sane default value? */
     server->host = NULL;
     server->user = NULL;
     server->passwd = NULL;
     server->remember_passwd = TRUE;
-    server->use_ssl         = FALSE;
-    server->tls_mode        = LIBBALSA_TLS_ENABLED;
-    server->security		= NET_CLIENT_CRYPT_STARTTLS;
+    server->use_ssl = FALSE;
+    server->tls_mode = LIBBALSA_TLS_ENABLED;
+    server->security = NET_CLIENT_CRYPT_STARTTLS;
 }
 
+
 static void
-libbalsa_server_finalize(GObject * object)
+libbalsa_server_finalize(GObject *object)
 {
     LibBalsaServer *server;
 
@@ -185,17 +189,18 @@ libbalsa_server_finalize(GObject * object)
     g_free(server->cert_file);
 
     if (server->passwd != NULL) {
-    	memset(server->passwd, 0, strlen(server->passwd));
+        memset(server->passwd, 0, strlen(server->passwd));
     }
     libbalsa_free_password(server->passwd);
 
     if (server->cert_passphrase != NULL) {
-    	memset(server->cert_passphrase, 0, strlen(server->cert_passphrase));
+        memset(server->cert_passphrase, 0, strlen(server->cert_passphrase));
     }
     g_free(server->cert_passphrase);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
+
 
 LibBalsaServer *
 libbalsa_server_new(void)
@@ -207,20 +212,22 @@ libbalsa_server_new(void)
     return server;
 }
 
+
 void
-libbalsa_server_set_username(LibBalsaServer * server,
-			     const gchar * username)
+libbalsa_server_set_username(LibBalsaServer *server,
+                             const gchar    *username)
 {
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     g_signal_emit(G_OBJECT(server),
-		  libbalsa_server_signals[SET_USERNAME], 0, username);
+                  libbalsa_server_signals[SET_USERNAME], 0, username);
 }
 
+
 void
-libbalsa_server_set_password(LibBalsaServer * server,
-                             const gchar * passwd)
+libbalsa_server_set_password(LibBalsaServer *server,
+                             const gchar    *passwd)
 {
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
@@ -228,20 +235,23 @@ libbalsa_server_set_password(LibBalsaServer * server,
     server->passwd = g_strdup(passwd);
 }
 
+
 void
-libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
-                         gboolean use_ssl)
+libbalsa_server_set_host(LibBalsaServer *server,
+                         const gchar    *host,
+                         gboolean        use_ssl)
 {
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     g_signal_emit(G_OBJECT(server), libbalsa_server_signals[SET_HOST],
-		  0, host, use_ssl);
+                  0, host, use_ssl);
 
 }
 
+
 void
-libbalsa_server_config_changed(LibBalsaServer * server)
+libbalsa_server_config_changed(LibBalsaServer *server)
 {
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
@@ -250,9 +260,10 @@ libbalsa_server_config_changed(LibBalsaServer * server)
                   0);
 }
 
+
 gchar *
-libbalsa_server_get_password(LibBalsaServer * server,
-			     LibBalsaMailbox * mbox)
+libbalsa_server_get_password(LibBalsaServer  *server,
+                             LibBalsaMailbox *mbox)
 {
     gchar *retval = NULL;
 
@@ -264,9 +275,10 @@ libbalsa_server_get_password(LibBalsaServer * server,
     return retval;
 }
 
+
 static void
-libbalsa_server_real_set_username(LibBalsaServer * server,
-				  const gchar * username)
+libbalsa_server_real_set_username(LibBalsaServer *server,
+                                  const gchar    *username)
 {
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
@@ -274,9 +286,11 @@ libbalsa_server_real_set_username(LibBalsaServer * server,
     server->user = g_strdup(username);
 }
 
+
 static void
-libbalsa_server_real_set_host(LibBalsaServer * server, const gchar * host,
-                              gboolean use_ssl)
+libbalsa_server_real_set_host(LibBalsaServer *server,
+                              const gchar    *host,
+                              gboolean        use_ssl)
 {
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
@@ -288,27 +302,29 @@ libbalsa_server_real_set_host(LibBalsaServer * server, const gchar * host,
 
 #if 0
 static gchar *
-libbalsa_server_real_get_password(LibBalsaServer * server)
+libbalsa_server_real_get_password(LibBalsaServer *server)
 {
     g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
 
     return g_strdup(server->passwd);
 }
+
+
 #endif
 
 
 /* libbalsa_server_load_config:
    load the server configuration using gnome-config.
-   Try to use sensible defaults. 
+   Try to use sensible defaults.
    FIXME: Port field is kept here only for compatibility, drop after 1.4.x
    release.
-*/
+ */
 void
-libbalsa_server_load_config(LibBalsaServer * server)
+libbalsa_server_load_config(LibBalsaServer *server)
 {
     gboolean d;
     server->host = libbalsa_conf_get_string("Server");
-    if(server->host && strrchr(server->host, ':') == NULL) {
+    if (server->host && (strrchr(server->host, ':') == NULL)) {
         gint port;
         port = libbalsa_conf_get_int_with_default("Port", &d);
         if (!d) {
@@ -316,24 +332,27 @@ libbalsa_server_load_config(LibBalsaServer * server)
             g_free(server->host);
             server->host = newhost;
         }
-    }       
+    }
     server->use_ssl = libbalsa_conf_get_bool("SSL=false");
     d = FALSE;
     server->tls_mode = libbalsa_conf_get_int_with_default("TLSMode", &d);
-    if(d) server->tls_mode = LIBBALSA_TLS_ENABLED;
+    if (d) {
+        server->tls_mode = LIBBALSA_TLS_ENABLED;
+    }
     d = FALSE;
     server->security = libbalsa_conf_get_int_with_default("Security", &d);
     if (d) {
-    	server->security = NET_CLIENT_CRYPT_STARTTLS;
+        server->security = NET_CLIENT_CRYPT_STARTTLS;
     }
     server->user = libbalsa_conf_private_get_string("Username");
-    if (!server->user)
-	server->user = g_strdup(getenv("USER"));
+    if (!server->user) {
+        server->user = g_strdup(getenv("USER"));
+    }
 
     server->try_anonymous = libbalsa_conf_get_bool("Anonymous=false");
     server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
 
-    if(server->remember_passwd) {
+    if (server->remember_passwd) {
 #if defined(HAVE_LIBSECRET)
         GError *err = NULL;
 
@@ -341,8 +360,8 @@ libbalsa_server_load_config(LibBalsaServer * server)
             secret_password_lookup_sync(LIBBALSA_SERVER_SECRET_SCHEMA,
                                         NULL, &err,
                                         "protocol", server->protocol,
-                                        "server",   server->host,
-                                        "user",     server->user,
+                                        "server", server->host,
+                                        "user", server->user,
                                         NULL);
         if (err) {
             libbalsa_free_password(server->passwd);
@@ -358,11 +377,11 @@ libbalsa_server_load_config(LibBalsaServer * server)
                 server->passwd = buff;
                 secret_password_store_sync
                     (LIBBALSA_SERVER_SECRET_SCHEMA, NULL,
-                     _("Balsa passwords"), server->passwd, NULL, &err,
-                     "protocol", server->protocol,
-                     "server",   server->host,
-                     "user",     server->user,
-                     NULL);
+                    _("Balsa passwords"), server->passwd, NULL, &err,
+                    "protocol", server->protocol,
+                    "server", server->host,
+                    "user", server->user,
+                    NULL);
                 /* We could in principle clear the password in the
                  * config file here but we do not for the backward
                  * compatibility. */
@@ -374,17 +393,17 @@ libbalsa_server_load_config(LibBalsaServer * server)
             }
         }
 #else
-	server->passwd = libbalsa_conf_private_get_string("Password");
-	if (server->passwd != NULL) {
-	    gchar *buff = libbalsa_rot(server->passwd);
-	    libbalsa_free_password(server->passwd);
-	    server->passwd = buff;
-	}
+        server->passwd = libbalsa_conf_private_get_string("Password");
+        if (server->passwd != NULL) {
+            gchar *buff = libbalsa_rot(server->passwd);
+            libbalsa_free_password(server->passwd);
+            server->passwd = buff;
+        }
 #endif
     }
-    if(server->passwd && server->passwd[0] == '\0') {
-	libbalsa_free_password(server->passwd);
-	server->passwd = NULL;
+    if (server->passwd && (server->passwd[0] == '\0')) {
+        libbalsa_free_password(server->passwd);
+        server->passwd = NULL;
     }
 
     server->client_cert = libbalsa_conf_get_bool("NeedClientCert=false");
@@ -396,27 +415,28 @@ libbalsa_server_load_config(LibBalsaServer * server)
         g_free(server->cert_passphrase);
         server->cert_passphrase = tmp;
     } else {
-    	g_free(server->cert_passphrase);
-    	server->cert_passphrase = NULL;
+        g_free(server->cert_passphrase);
+        server->cert_passphrase = NULL;
     }
 }
+
 
 /* libbalsa_server_save_config:
    save config.
    It is bit tricky to decide the value of the remember_passwd field.
-   Should empty values be remembered? Even if they are, balsa will 
+   Should empty values be remembered? Even if they are, balsa will
    still ask for the password if it is empty.
-*/
+ */
 void
-libbalsa_server_save_config(LibBalsaServer * server)
+libbalsa_server_save_config(LibBalsaServer *server)
 {
     libbalsa_conf_set_string("Server", server->host);
     libbalsa_conf_private_set_string("Username", server->user);
-    libbalsa_conf_set_bool("Anonymous",          server->try_anonymous);
-    libbalsa_conf_set_bool("RememberPasswd", 
-                          server->remember_passwd && server->passwd != NULL);
+    libbalsa_conf_set_bool("Anonymous", server->try_anonymous);
+    libbalsa_conf_set_bool("RememberPasswd",
+                           server->remember_passwd && server->passwd != NULL);
 
-    if (server->remember_passwd && server->passwd != NULL) {
+    if (server->remember_passwd && (server->passwd != NULL)) {
 #if defined(HAVE_LIBSECRET)
         GError *err = NULL;
 
@@ -424,8 +444,8 @@ libbalsa_server_save_config(LibBalsaServer * server)
                                    _("Balsa passwords"), server->passwd,
                                    NULL, &err,
                                    "protocol", server->protocol,
-                                   "server",   server->host,
-                                   "user",     server->user,
+                                   "server", server->host,
+                                   "user", server->user,
                                    NULL);
         if (err) {
             printf(_("Error storing password for %s@%s: %s\n"),
@@ -433,15 +453,15 @@ libbalsa_server_save_config(LibBalsaServer * server)
             g_error_free(err);
         }
 #else
-	gchar *buff = libbalsa_rot(server->passwd);
-	libbalsa_conf_private_set_string("Password", buff);
-	g_free(buff);
+        gchar *buff = libbalsa_rot(server->passwd);
+        libbalsa_conf_private_set_string("Password", buff);
+        g_free(buff);
 #endif                          /* defined(HAVE_LIBSECRET) */
     }
 
     libbalsa_conf_set_bool("NeedClientCert", server->client_cert);
     if (server->cert_file != NULL) {
-    	libbalsa_conf_set_string("UserCertificateFile", server->cert_file);
+        libbalsa_conf_set_string("UserCertificateFile", server->cert_file);
     }
     if (server->cert_passphrase != NULL) {
         gchar *tmp = libbalsa_rot(server->cert_passphrase);
@@ -455,102 +475,121 @@ libbalsa_server_save_config(LibBalsaServer * server)
     libbalsa_conf_set_int("Security", server->security);
 }
 
+
 void
-libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
+libbalsa_server_user_cb(ImapUserEventType ue,
+                        void             *arg,
+                        ...)
 {
     va_list alist;
     int *ok;
     LibBalsaServer *is = LIBBALSA_SERVER(arg);
 
     va_start(alist, arg);
-    switch(ue) {
+    switch (ue) {
     case IME_GET_USER_PASS: {
-        gchar *method = va_arg(alist, gchar*);
-        gchar **user = va_arg(alist, gchar**);
-        gchar **pass = va_arg(alist, gchar**);
-        ok = va_arg(alist, int*);
-        if(!is->passwd) {
+        gchar *method = va_arg(alist, gchar *);
+        gchar **user = va_arg(alist, gchar **);
+        gchar **pass = va_arg(alist, gchar **);
+        ok = va_arg(alist, int *);
+        if (!is->passwd) {
             is->passwd = libbalsa_server_get_password(is, NULL);
         }
         *ok = is->passwd != NULL;
-        if(*ok) {
-            g_free(*user); *user = g_strdup(is->user);
-            g_free(*pass); *pass = g_strdup(is->passwd);
+        if (*ok) {
+            g_free(*user);
+            *user = g_strdup(is->user);
+            g_free(*pass);
+            *pass = g_strdup(is->passwd);
             libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                  /* host, authentication method */
-                                 _("Logging in to %s using %s"), 
-                                   is->host, method);
+                                 _("Logging in to %s using %s"),
+                                 is->host, method);
         }
         break;
     }
+
     case IME_GET_USER:  { /* for eg kerberos */
         gchar **user;
-        va_arg(alist, gchar*); /* Ignore the method */
-        user = va_arg(alist, gchar**);
-        ok = va_arg(alist, int*);
+        va_arg(alist, gchar *); /* Ignore the method */
+        user = va_arg(alist, gchar **);
+        ok = va_arg(alist, int *);
         *ok = 1; /* consider popping up a dialog window here */
-        g_free(*user); *user = g_strdup(is->user);
+        g_free(*user);
+        *user = g_strdup(is->user);
         break;
     }
+
     case IME_TLS_VERIFY_ERROR:  {
         long vfy_result;
         SSL *ssl;
         X509 *cert;
-        ok = va_arg(alist, int*);
+        ok = va_arg(alist, int *);
         vfy_result = va_arg(alist, long);
         X509_verify_cert_error_string(vfy_result);
 #if 0
         printf("IMAP:TLS: failed cert verification: %ld : %s.\n",
                vfy_result, reason);
 #endif
-        ssl = va_arg(alist, SSL*);
+        ssl = va_arg(alist, SSL *);
         cert = SSL_get_peer_certificate(ssl);
-	if(cert) {
-	    *ok = libbalsa_is_cert_known(cert, vfy_result);
-	    X509_free(cert);
-	}
+        if (cert) {
+            *ok = libbalsa_is_cert_known(cert, vfy_result);
+            X509_free(cert);
+        }
         break;
     }
+
     case IME_TLS_NO_PEER_CERT: {
-        ok = va_arg(alist, int*); *ok = 0;
+        ok = va_arg(alist, int *);
+        *ok = 0;
         printf("IMAP:TLS: Server presented no cert!\n");
         break;
     }
+
     case IME_TLS_WEAK_CIPHER: {
-        ok = va_arg(alist, int*); *ok = 1;
+        ok = va_arg(alist, int *);
+        *ok = 1;
         printf("IMAP:TLS: Weak cipher accepted.\n");
         break;
     }
+
     case IME_TIMEOUT: {
-        ok = va_arg(alist, int*); *ok = 1;
+        ok = va_arg(alist, int *);
+        *ok = 1;
         /* *ok = libbalsa_abort_on_timeout(is->host); */
         /* For now, always timeout. The UI needs some work. */
         break;
     }
-    default: g_warning("unhandled imap event type! Fix the code."); break;
+
+    default: g_warning("unhandled imap event type! Fix the code.");
+        break;
     }
     va_end(alist);
 }
+
 
 /* Connect the server's "get-password" signal to the callback; if the
  * ask-password callback is connected more than once, the dialog is
  * popped up the corresponding number of times, so we'll ignore the
  * request if a callback is already connected. */
 void
-libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
-                                gpointer cb_data)
+libbalsa_server_connect_signals(LibBalsaServer *server,
+                                GCallback       cb,
+                                gpointer        cb_data)
 {
     if (!g_signal_has_handler_pending(server,
                                       libbalsa_server_signals
-                                      [GET_PASSWORD], 0, TRUE))
+                                      [GET_PASSWORD], 0, TRUE)) {
         g_signal_connect(server, "get-password", cb, cb_data);
+    }
 }
 
 
 gchar **
 libbalsa_server_get_auth(NetClient *client,
-						 gboolean   need_passwd,
-         	 	 	 	 gpointer   user_data)
+                         gboolean   need_passwd,
+                         gpointer   user_data)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(user_data);
     gchar **result = NULL;
@@ -561,11 +600,11 @@ libbalsa_server_get_auth(NetClient *client,
         result = g_new0(gchar *, 3U);
         result[0] = g_strdup(server->user);
         if (need_passwd) {
-        	if ((server->passwd != NULL) && (server->passwd[0] != '\0')) {
-        		result[1] = g_strdup(server->passwd);
-        	} else {
-        		result[1] = libbalsa_server_get_password(server, NULL);
-        	}
+            if ((server->passwd != NULL) && (server->passwd[0] != '\0')) {
+                result[1] = g_strdup(server->passwd);
+            } else {
+                result[1] = libbalsa_server_get_password(server, NULL);
+            }
         }
     }
     return result;
@@ -574,9 +613,9 @@ libbalsa_server_get_auth(NetClient *client,
 
 gboolean
 libbalsa_server_check_cert(NetClient           *client,
-           	   	   	   	   GTlsCertificate     *peer_cert,
-						   GTlsCertificateFlags errors,
-						   gpointer             user_data)
+                           GTlsCertificate     *peer_cert,
+                           GTlsCertificateFlags errors,
+                           gpointer             user_data)
 {
     GByteArray *cert_der = NULL;
     gboolean result = FALSE;
@@ -627,25 +666,27 @@ libbalsa_server_check_cert(NetClient           *client,
 
 gchar *
 libbalsa_server_get_cert_pass(NetClient        *client,
-			  	  	  	  	  const GByteArray *cert_der,
-							  gpointer          user_data)
+                              const GByteArray *cert_der,
+                              gpointer          user_data)
 {
-	/* FIXME - we just return the passphrase from the config, but we may also want to show a dialogue here... */
-	return g_strdup(LIBBALSA_SERVER(user_data)->cert_passphrase);
+    /* FIXME - we just return the passphrase from the config, but we may also want to show a
+       dialogue here... */
+    return g_strdup(LIBBALSA_SERVER(user_data)->cert_passphrase);
 }
+
 
 /* Test whether a server is reachable */
 
 typedef struct {
-    LibBalsaCanReachCallback * cb;
-    gpointer                   cb_data;
-    GObject                  * source_object;
+    LibBalsaCanReachCallback *cb;
+    gpointer cb_data;
+    GObject *source_object;
 } CanReachInfo;
 
 static void
-libbalsa_server_can_reach_cb(GObject      * monitor,
-                             GAsyncResult * res,
-                             gpointer       user_data)
+libbalsa_server_can_reach_cb(GObject      *monitor,
+                             GAsyncResult *res,
+                             gpointer      user_data)
 {
     CanReachInfo *info = user_data;
     gboolean can_reach;
@@ -657,11 +698,12 @@ libbalsa_server_can_reach_cb(GObject      * monitor,
     g_free(info);
 }
 
+
 void
-libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
-                                    LibBalsaCanReachCallback * cb,
-                                    gpointer                   cb_data,
-                                    GObject                  * source_object)
+libbalsa_server_test_can_reach_full(LibBalsaServer           *server,
+                                    LibBalsaCanReachCallback *cb,
+                                    gpointer                  cb_data,
+                                    GObject                  *source_object)
 {
     CanReachInfo *info;
     gchar *host;
@@ -670,8 +712,8 @@ libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
     GSocketConnectable *address;
 
     info = g_new(CanReachInfo, 1);
-    info->cb              = cb;
-    info->cb_data         = cb_data;
+    info->cb = cb;
+    info->cb_data = cb_data;
     info->source_object = g_object_ref(source_object);
 
     monitor = g_network_monitor_get_default();
@@ -679,7 +721,7 @@ libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
     host = g_strdup(server->host);
     colon = strchr(host, ':');
     if (colon != NULL) {
-    	colon[0] = '\0';
+        colon[0] = '\0';
     }
     address = g_network_address_new(host, 0);
     g_free(host);
@@ -688,10 +730,11 @@ libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
     g_object_unref(address);
 }
 
+
 void
-libbalsa_server_test_can_reach(LibBalsaServer           * server,
-                               LibBalsaCanReachCallback * cb,
-                               gpointer                   cb_data)
+libbalsa_server_test_can_reach(LibBalsaServer           *server,
+                               LibBalsaCanReachCallback *cb,
+                               gpointer                  cb_data)
 {
     libbalsa_server_test_can_reach_full(server, cb, cb_data, (GObject *) server);
 }

@@ -27,49 +27,50 @@
  * Add remarks here...
  */
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
 #if defined(HAVE_OSMO)
 
-#include <string.h>
-#include <glib.h>
-#include <gio/gio.h>
-#include <glib/gi18n.h>
+#   include <string.h>
+#   include <glib.h>
+#   include <gio/gio.h>
+#   include <glib/gi18n.h>
 
-#include "address-book.h"
-#include "rfc6350.h"
-#include "address-book-osmo.h"
-#include "misc.h"
-
-
-/* for the time being, osmo svn rev. 1099 accepts only reading via DBus, not writing new or modified records */
-#undef OSMO_CAN_WRITE
+#   include "address-book.h"
+#   include "rfc6350.h"
+#   include "address-book-osmo.h"
+#   include "misc.h"
 
 
-#define LOOKUP_MIN_LEN					2U
+/* for the time being, osmo svn rev. 1099 accepts only reading via DBus, not writing new or
+   modified records */
+#   undef OSMO_CAN_WRITE
+
+
+#   define LOOKUP_MIN_LEN                                  2U
 
 
 static void libbalsa_address_book_osmo_dispose(GObject *object);
-static LibBalsaABErr libbalsa_address_book_osmo_load(LibBalsaAddressBook 		 *ab,
-                                                     const gchar				 *filter,
+static LibBalsaABErr libbalsa_address_book_osmo_load(LibBalsaAddressBook        *ab,
+                                                     const gchar                *filter,
                                                      LibBalsaAddressBookLoadFunc callback,
-                                                     gpointer					 closure);
+                                                     gpointer                    closure);
 static GList *libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
-                                                        const gchar			*prefix);
+                                                        const gchar         *prefix);
 static GList *osmo_read_addresses(LibBalsaAddressBookOsmo *osmo,
-								  const gchar			  *filter,
-								  GError				  **error);
+                                  const gchar             *filter,
+                                  GError                 **error);
 
 
 struct _LibBalsaAddressBookOsmo {
-	LibBalsaAddressBook parent;
+    LibBalsaAddressBook parent;
 
-	GDBusProxy *proxy;
+    GDBusProxy *proxy;
 };
 
 struct _LibBalsaAddressBookOsmoClass {
-	LibBalsaAddressBookClass parent_class;
+    LibBalsaAddressBookClass parent_class;
 };
 
 G_DEFINE_TYPE(LibBalsaAddressBookOsmo, libbalsa_address_book_osmo, LIBBALSA_TYPE_ADDRESS_BOOK);
@@ -78,22 +79,22 @@ G_DEFINE_TYPE(LibBalsaAddressBookOsmo, libbalsa_address_book_osmo, LIBBALSA_TYPE
 static void
 libbalsa_address_book_osmo_class_init(LibBalsaAddressBookOsmoClass *klass)
 {
-	LibBalsaAddressBookClass *address_book_class;
-	GObjectClass *object_class;
+    LibBalsaAddressBookClass *address_book_class;
+    GObjectClass *object_class;
 
-	object_class = G_OBJECT_CLASS(klass);
-	address_book_class = LIBBALSA_ADDRESS_BOOK_CLASS(klass);
+    object_class = G_OBJECT_CLASS(klass);
+    address_book_class = LIBBALSA_ADDRESS_BOOK_CLASS(klass);
 
-	object_class->dispose = libbalsa_address_book_osmo_dispose;
+    object_class->dispose = libbalsa_address_book_osmo_dispose;
 
-	address_book_class->load = libbalsa_address_book_osmo_load;
-#if defined(OSMO_CAN_WRITE)
-	address_book_class->add_address = libbalsa_address_book_osmo_add_address;
-	address_book_class->remove_address = libbalsa_address_book_osmo_remove_address;
-	address_book_class->modify_address = libbalsa_address_book_osmo_modify_address;
-#endif
+    address_book_class->load = libbalsa_address_book_osmo_load;
+#   if defined(OSMO_CAN_WRITE)
+    address_book_class->add_address = libbalsa_address_book_osmo_add_address;
+    address_book_class->remove_address = libbalsa_address_book_osmo_remove_address;
+    address_book_class->modify_address = libbalsa_address_book_osmo_modify_address;
+#   endif
 
-	address_book_class->alias_complete = libbalsa_address_book_osmo_alias_complete;
+    address_book_class->alias_complete = libbalsa_address_book_osmo_alias_complete;
 }
 
 
@@ -107,71 +108,71 @@ libbalsa_address_book_osmo_init(LibBalsaAddressBookOsmo *osmo)
 static void
 libbalsa_address_book_osmo_dispose(GObject *object)
 {
-	LibBalsaAddressBookOsmo *osmo;
+    LibBalsaAddressBookOsmo *osmo;
 
-	osmo = LIBBALSA_ADDRESS_BOOK_OSMO(object);
-        g_clear_object(&osmo->proxy);
+    osmo = LIBBALSA_ADDRESS_BOOK_OSMO(object);
+    g_clear_object(&osmo->proxy);
 
-	G_OBJECT_CLASS(libbalsa_address_book_osmo_parent_class)->dispose(object);
+    G_OBJECT_CLASS(libbalsa_address_book_osmo_parent_class)->dispose(object);
 }
 
 
 LibBalsaAddressBook *
 libbalsa_address_book_osmo_new(const gchar *name)
 {
-	LibBalsaAddressBook *ab = NULL;
-	LibBalsaAddressBookOsmo *osmo;
+    LibBalsaAddressBook *ab = NULL;
+    LibBalsaAddressBookOsmo *osmo;
 
-	osmo = LIBBALSA_ADDRESS_BOOK_OSMO(g_object_new(LIBBALSA_TYPE_ADDRESS_BOOK_OSMO, NULL));
-	ab = LIBBALSA_ADDRESS_BOOK(osmo);
-        libbalsa_address_book_set_name(ab, name);
+    osmo = LIBBALSA_ADDRESS_BOOK_OSMO(g_object_new(LIBBALSA_TYPE_ADDRESS_BOOK_OSMO, NULL));
+    ab = LIBBALSA_ADDRESS_BOOK(osmo);
+    libbalsa_address_book_set_name(ab, name);
 
-	return ab;
+    return ab;
 }
 
 
 static LibBalsaABErr
-libbalsa_address_book_osmo_load(LibBalsaAddressBook 		*ab,
-                                const gchar 				*filter,
+libbalsa_address_book_osmo_load(LibBalsaAddressBook        *ab,
+                                const gchar                *filter,
                                 LibBalsaAddressBookLoadFunc callback,
-                                gpointer					closure)
+                                gpointer                    closure)
 {
-	LibBalsaABErr result;
+    LibBalsaABErr result;
 
-	g_return_val_if_fail (LIBBALSA_IS_ADDRESS_BOOK_OSMO(ab), LBABERR_OK);
+    g_return_val_if_fail (LIBBALSA_IS_ADDRESS_BOOK_OSMO(ab), LBABERR_OK);
 
-	if (callback == NULL) {
-		result = LBABERR_OK;
-	} else {
-		LibBalsaAddressBookOsmo *osmo;
-		GError *error = NULL;
-		GList *addresses;
+    if (callback == NULL) {
+        result = LBABERR_OK;
+    } else {
+        LibBalsaAddressBookOsmo *osmo;
+        GError *error = NULL;
+        GList *addresses;
 
-		osmo = LIBBALSA_ADDRESS_BOOK_OSMO(ab);
+        osmo = LIBBALSA_ADDRESS_BOOK_OSMO(ab);
 
-		addresses = osmo_read_addresses(osmo, filter, &error);
-		if (error != NULL) {
-                        gchar *status =
-                            g_strdup_printf(_("Reading Osmo contacts failed: %s"),
-                                            error->message);
-			libbalsa_address_book_set_status(ab, status);
-                        g_free(status);
-			g_error_free(error);
-			result = LBABERR_CANNOT_SEARCH;
-		} else {
-			GList *this_addr;
+        addresses = osmo_read_addresses(osmo, filter, &error);
+        if (error != NULL) {
+            gchar *status =
+                g_strdup_printf(_("Reading Osmo contacts failed: %s"),
+                                error->message);
+            libbalsa_address_book_set_status(ab, status);
+            g_free(status);
+            g_error_free(error);
+            result = LBABERR_CANNOT_SEARCH;
+        } else {
+            GList *this_addr;
 
-			for (this_addr = addresses; this_addr != NULL; this_addr = this_addr->next) {
-				callback(ab, LIBBALSA_ADDRESS(this_addr->data), closure);
-			}
-			callback(ab, NULL, closure);
-			g_list_free_full(addresses, g_object_unref);
-			libbalsa_address_book_set_status(ab, NULL);
-			result = LBABERR_OK;
-		}
-	}
+            for (this_addr = addresses; this_addr != NULL; this_addr = this_addr->next) {
+                callback(ab, LIBBALSA_ADDRESS(this_addr->data), closure);
+            }
+            callback(ab, NULL, closure);
+            g_list_free_full(addresses, g_object_unref);
+            libbalsa_address_book_set_status(ab, NULL);
+            result = LBABERR_OK;
+        }
+    }
 
-	return result;
+    return result;
 }
 
 
@@ -182,20 +183,21 @@ libbalsa_address_book_osmo_load(LibBalsaAddressBook 		*ab,
  * \return TRUE if needle is found anywhere in haystack
  */
 static gboolean
-utf8_strstr(const gchar *haystack, const gchar *utf8_needle)
+utf8_strstr(const gchar *haystack,
+            const gchar *utf8_needle)
 {
-	gboolean result;
+    gboolean result;
 
-	if (haystack != NULL) {
-		gchar *test;
+    if (haystack != NULL) {
+        gchar *test;
 
-		test = g_utf8_casefold(haystack, -1);
-		result = (strstr(test, utf8_needle) != NULL);
-		g_free(test);
-	} else {
-		result = FALSE;
-	}
-	return result;
+        test = g_utf8_casefold(haystack, -1);
+        result = (strstr(test, utf8_needle) != NULL);
+        g_free(test);
+    } else {
+        result = FALSE;
+    }
+    return result;
 }
 
 
@@ -205,77 +207,79 @@ utf8_strstr(const gchar *haystack, const gchar *utf8_needle)
  * \param utf8_needle utf8 "needle" string as returned by g_utf8_casefold()
  * \return TRUE if any address string field contains needle
  *
- * The fields checked are LibBalsaAddress::full_name, LibBalsaAddress::first_name, LibBalsaAddress::last_name,
+ * The fields checked are LibBalsaAddress::full_name, LibBalsaAddress::first_name,
+ * LibBalsaAddress::last_name,
  * LibBalsaAddress::nick_name and LibBalsaAddress::organization.
  */
 static inline gboolean
-utf8_lba_strstr(LibBalsaAddress *address, const gchar *utf8_needle)
+utf8_lba_strstr(LibBalsaAddress *address,
+                const gchar     *utf8_needle)
 {
-	return utf8_strstr(libbalsa_address_get_full_name(address), utf8_needle) ||
-		utf8_strstr(libbalsa_address_get_first_name(address), utf8_needle) ||
-		utf8_strstr(libbalsa_address_get_last_name(address), utf8_needle) ||
-		utf8_strstr(libbalsa_address_get_nick_name(address), utf8_needle) ||
-		utf8_strstr(libbalsa_address_get_organization(address), utf8_needle);
+    return utf8_strstr(libbalsa_address_get_full_name(address), utf8_needle) ||
+           utf8_strstr(libbalsa_address_get_first_name(address), utf8_needle) ||
+           utf8_strstr(libbalsa_address_get_last_name(address), utf8_needle) ||
+           utf8_strstr(libbalsa_address_get_nick_name(address), utf8_needle) ||
+           utf8_strstr(libbalsa_address_get_organization(address), utf8_needle);
 }
 
 
 static GList *
 libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
-                                          const gchar 		  *prefix)
+                                          const gchar         *prefix)
 {
-	LibBalsaAddressBookOsmo *osmo;
-	GError *error = NULL;
-	GList *addresses;
-	GList *result = NULL;
+    LibBalsaAddressBookOsmo *osmo;
+    GError *error = NULL;
+    GList *addresses;
+    GList *result = NULL;
 
-	g_return_val_if_fail(LIBBALSA_ADDRESS_BOOK_OSMO(ab), NULL);
+    g_return_val_if_fail(LIBBALSA_ADDRESS_BOOK_OSMO(ab), NULL);
 
-	osmo = LIBBALSA_ADDRESS_BOOK_OSMO(ab);
+    osmo = LIBBALSA_ADDRESS_BOOK_OSMO(ab);
 
-	if (!libbalsa_address_book_get_expand_aliases(ab) ||
-            strlen(prefix) < LOOKUP_MIN_LEN) {
-		return NULL;
-	}
+    if (!libbalsa_address_book_get_expand_aliases(ab) ||
+        (strlen(prefix) < LOOKUP_MIN_LEN)) {
+        return NULL;
+    }
 
-	g_debug("%s: filter for %s", __func__, prefix);
-	addresses = osmo_read_addresses(osmo, prefix, &error);
-	if (error != NULL) {
-		g_warning("%s: cannot read contacts from Osmo: %s", __func__, error->message);
-		g_error_free(error);
-	} else {
-		GList *p;
-		gchar *utf8_filter;
+    g_debug("%s: filter for %s", __func__, prefix);
+    addresses = osmo_read_addresses(osmo, prefix, &error);
+    if (error != NULL) {
+        g_warning("%s: cannot read contacts from Osmo: %s", __func__, error->message);
+        g_error_free(error);
+    } else {
+        GList *p;
+        gchar *utf8_filter;
 
-		utf8_filter = g_utf8_casefold(prefix, -1);
-		for (p = addresses; p != NULL; p = p->next) {
-			LibBalsaAddress *this_addr = LIBBALSA_ADDRESS(p->data);
-			GList *this_mail;
-			gboolean names_match;
+        utf8_filter = g_utf8_casefold(prefix, -1);
+        for (p = addresses; p != NULL; p = p->next) {
+            LibBalsaAddress *this_addr = LIBBALSA_ADDRESS(p->data);
+            GList *this_mail;
+            gboolean names_match;
 
-			names_match = utf8_lba_strstr(this_addr, utf8_filter);
-			for (this_mail = libbalsa_address_get_addr_list(this_addr);
-                             this_mail != NULL; this_mail = this_mail->next) {
-				const gchar *mail_addr = (gchar *) this_mail->data;
+            names_match = utf8_lba_strstr(this_addr, utf8_filter);
+            for (this_mail = libbalsa_address_get_addr_list(this_addr);
+                 this_mail != NULL; this_mail = this_mail->next) {
+                const gchar *mail_addr = (gchar *) this_mail->data;
 
-				if (names_match || (strstr(mail_addr, prefix) != NULL)) {
-                                        const gchar *full_name;
-					InternetAddress *addr;
+                if (names_match || (strstr(mail_addr, prefix) != NULL)) {
+                    const gchar *full_name;
+                    InternetAddress *addr;
 
-                                        full_name =
-                                            libbalsa_address_get_full_name(this_addr),
-					g_debug("%s: found %s <%s>", __func__,
-                                                full_name, mail_addr);
-					addr = internet_address_mailbox_new(full_name,
-                                                mail_addr);
-					result = g_list_prepend(result, g_object_ref(addr));
-				}
-			}
-		}
-		g_free(utf8_filter);
-		g_list_free_full(addresses, g_object_unref);
-	}
+                    full_name =
+                        libbalsa_address_get_full_name(this_addr),
+                    g_debug("%s: found %s <%s>", __func__,
+                            full_name, mail_addr);
+                    addr = internet_address_mailbox_new(full_name,
+                                                        mail_addr);
+                    result = g_list_prepend(result, g_object_ref(addr));
+                }
+            }
+        }
+        g_free(utf8_filter);
+        g_list_free_full(addresses, g_object_unref);
+    }
 
-	return g_list_reverse(result);
+    return g_list_reverse(result);
 }
 
 
@@ -284,86 +288,102 @@ libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
  * \param osmo Osmo address book object
  * \param filter search filter, NULL or "" for all entries
  * \param error filled with error information on error
- * \return a list \ref LibBalsaAddress items on success or NULL on error or if no item matches the search filter
+ * \return a list \ref LibBalsaAddress items on success or NULL on error or if no item matches
+ * the search filter
  *
- * Create the proxy LibBalsaAddressBookOsmo::proxy if required, and ask Osmo for addresses.  Only items with any mail address are
- * added to the returned list.  The caller can distinguish between an error and an empty query result by checking if error is not
+ * Create the proxy LibBalsaAddressBookOsmo::proxy if required, and ask Osmo for addresses.
+ * Only items with any mail address are
+ * added to the returned list.  The caller can distinguish between an error and an empty query
+ * result by checking if error is not
  * NULL.
  *
  * \note The caller must free the returned list.
  */
 static GList *
 osmo_read_addresses(LibBalsaAddressBookOsmo *osmo,
-					const gchar				*filter,
-					GError					**error)
+                    const gchar             *filter,
+                    GError                 **error)
 {
-	GList *addresses = NULL;
+    GList *addresses = NULL;
 
-	/* connect to DBus unless we already have a proxy */
-	if (osmo->proxy == NULL) {
-		osmo->proxy =
-			g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION, G_DBUS_PROXY_FLAGS_NONE, NULL, "org.clayo.osmo.Contacts",
-									  	  "/org/clayo/osmo/Contacts", "org.clayo.osmo.Contacts", NULL, error);
-	}
+    /* connect to DBus unless we already have a proxy */
+    if (osmo->proxy == NULL) {
+        osmo->proxy =
+            g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION,
+                                          G_DBUS_PROXY_FLAGS_NONE,
+                                          NULL,
+                                          "org.clayo.osmo.Contacts",
+                                          "/org/clayo/osmo/Contacts",
+                                          "org.clayo.osmo.Contacts",
+                                          NULL,
+                                          error);
+    }
 
-	/* proceed only if we have the proxy */
-	if (osmo->proxy != NULL) {
-		GVariant *request;
-		GVariant *reply;
+    /* proceed only if we have the proxy */
+    if (osmo->proxy != NULL) {
+        GVariant *request;
+        GVariant *reply;
 
-		if (filter != NULL) {
-			request = g_variant_new("(s)", filter);
-		} else {
-			request = g_variant_new("(s)", "");
-		}
-		reply = g_dbus_proxy_call_sync(osmo->proxy, "Find", request, G_DBUS_CALL_FLAGS_NONE, -1, NULL, error);
+        if (filter != NULL) {
+            request = g_variant_new("(s)", filter);
+        } else {
+            request = g_variant_new("(s)", "");
+        }
+        reply = g_dbus_proxy_call_sync(osmo->proxy,
+                                       "Find",
+                                       request,
+                                       G_DBUS_CALL_FLAGS_NONE,
+                                       -1,
+                                       NULL,
+                                       error);
 
-		/* proceed only if we got a reply */
-		if (reply != NULL) {
-			gchar *vcards;
-			GInputStream *stream;
-			GDataInputStream *data;
-			gboolean eos;
+        /* proceed only if we got a reply */
+        if (reply != NULL) {
+            gchar *vcards;
+            GInputStream *stream;
+            GDataInputStream *data;
+            gboolean eos;
 
-			/* create a stream from the VCards */
-			g_variant_get(reply, "(s)", &vcards);
-			stream = g_memory_input_stream_new_from_data(vcards, -1, NULL);
-			data = g_data_input_stream_new(stream);
-			g_data_input_stream_set_newline_type(data, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
+            /* create a stream from the VCards */
+            g_variant_get(reply, "(s)", &vcards);
+            stream = g_memory_input_stream_new_from_data(vcards, -1, NULL);
+            data = g_data_input_stream_new(stream);
+            g_data_input_stream_set_newline_type(data, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
 
-			/* decode all returned VCard's, skip those without email addresses */
-			eos = FALSE;
-			do {
-				LibBalsaAddress *this_addr;
+            /* decode all returned VCard's, skip those without email addresses */
+            eos = FALSE;
+            do {
+                LibBalsaAddress *this_addr;
 
-				this_addr = rfc6350_parse_from_stream(data, &eos, error);
-				if (this_addr != NULL) {
-					if (libbalsa_address_get_addr(this_addr) != NULL) {
-						addresses = g_list_prepend(addresses, this_addr);
-					} else {
-						g_object_unref(G_OBJECT(this_addr));
-					}
-				}
-			} while (!eos && (*error == NULL));
+                this_addr = rfc6350_parse_from_stream(data, &eos, error);
+                if (this_addr != NULL) {
+                    if (libbalsa_address_get_addr(this_addr) != NULL) {
+                        addresses = g_list_prepend(addresses, this_addr);
+                    } else {
+                        g_object_unref(G_OBJECT(this_addr));
+                    }
+                }
+            } while (!eos && (*error == NULL));
 
-			/* clean up */
-			g_object_unref(G_OBJECT(data));
-			g_object_unref(G_OBJECT(stream));
-			g_free(vcards);
-			g_variant_unref(reply);
+            /* clean up */
+            g_object_unref(G_OBJECT(data));
+            g_object_unref(G_OBJECT(stream));
+            g_free(vcards);
+            g_variant_unref(reply);
 
-			/* drop list on error, reverse order otherwise */
-			if (addresses != NULL) {
-				if (*error != NULL) {
-					libbalsa_clear_list(&addresses, g_object_unref);
-				} else {
-					addresses = g_list_reverse(addresses);
-				}
-			}
-		}
-	}
+            /* drop list on error, reverse order otherwise */
+            if (addresses != NULL) {
+                if (*error != NULL) {
+                    libbalsa_clear_list(&addresses, g_object_unref);
+                } else {
+                    addresses = g_list_reverse(addresses);
+                }
+            }
+        }
+    }
 
-	return addresses;
+    return addresses;
 }
+
 
 #endif /* HAVE_OSMO */

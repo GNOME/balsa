@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,8 +26,9 @@
 
 typedef struct _MessageWindow MessageWindow;
 
-void message_window_new(LibBalsaMailbox * mailbox, guint msgno);
+void message_window_new(LibBalsaMailbox *mailbox,
+                        guint            msgno);
 BalsaToolbarModel *message_window_get_toolbar_model(void);
-void message_window_add_action_entries(GActionMap * action_map);
+void message_window_add_action_entries(GActionMap *action_map);
 
-#endif				/* __MESSAGE_WINDOW_H__ */
+#endif                          /* __MESSAGE_WINDOW_H__ */

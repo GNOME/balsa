@@ -6,20 +6,20 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "libbalsa-conf.h"
 
@@ -56,7 +56,7 @@ static GSList *lbc_groups;
     ((priv) ? ++lbc_conf_priv.changes : ++lbc_conf.changes)
 
 static gchar *
-lbc_readfile(const gchar * filename)
+lbc_readfile(const gchar *filename)
 {
     gchar *buf;
     gchar **split;
@@ -76,35 +76,41 @@ lbc_readfile(const gchar * filename)
     return buf;
 }
 
+
 static void
-lbc_init(LibBalsaConf * conf, const gchar * filename,
-         const gchar * old_dir, gboolean private)
+lbc_init(LibBalsaConf *conf,
+         const gchar  *filename,
+         const gchar  *old_dir,
+         gboolean private)
 {
     struct stat buf;
     GError *error = NULL;
     gint rc;
 
     conf->private = private;
-    if (!conf->path)
+    if (!conf->path) {
         conf->path =
             g_build_filename(g_get_home_dir(), ".balsa", filename, NULL);
+    }
     rc = stat(conf->path, &buf);
     if (conf->key_file) {
-        if (rc >= 0 && buf.st_mtime <= conf->mtime)
+        if ((rc >= 0) && (buf.st_mtime <= conf->mtime)) {
             /* found the config file, and it hasn't been touched since
              * we loaded it */
             return;
+        }
     } else {
         conf->key_file = g_key_file_new();
-        if (rc < 0)
+        if (rc < 0) {
             /* no config file--must be first time startup */
             return;
+        }
     }
     conf->mtime = buf.st_mtime;
 
     libbalsa_assure_balsa_dir();
     if (!g_key_file_load_from_file
-        (conf->key_file, conf->path, G_KEY_FILE_NONE, &error)) {
+            (conf->key_file, conf->path, G_KEY_FILE_NONE, &error)) {
         gchar *old_path;
         gchar *key_file_text;
         static gboolean warn = TRUE;
@@ -128,7 +134,7 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
              * revert to the default ';'. */
             g_key_file_set_list_separator(conf->key_file, ';');
         }
-        if (key_file_text == NULL || error != NULL) {
+        if ((key_file_text == NULL) || (error != NULL)) {
 #if DEBUG
             g_message("Could not load key file from file “%s”: %s",
                       old_path,
@@ -138,13 +144,15 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
             warn = FALSE;
         }
         g_free(old_path);
-        if (warn)
+        if (warn) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Your Balsa configuration "
                                    "is now stored in "
                                    "“~/.balsa/config”."));
+        }
     }
 }
+
 
 static GRecMutex lbc_mutex;
 
@@ -161,24 +169,27 @@ lbc_lock(void)
     }
 }
 
+
 static void
 lbc_unlock(void)
 {
     g_rec_mutex_unlock(&lbc_mutex);
 }
 
-/* 
+
+/*
  * Call @func for each group that begins with @prefix.
  * @func is called with arguments:
  *   const gchar * @key		the group;
  *   const gchar * @value	the trailing part of the group name,
- *   				following the @prefix;
+ *                              following the @prefix;
  *   gpointer @data		the @data passed in.
  * Iteration terminates when @func returns TRUE.
  */
 void
-libbalsa_conf_foreach_group(const gchar * prefix,
-                            LibBalsaConfForeachFunc func, gpointer data)
+libbalsa_conf_foreach_group(const gchar            *prefix,
+                            LibBalsaConfForeachFunc func,
+                            gpointer                data)
 {
     gchar **groups, **group;
     gsize pref_len = strlen(prefix);
@@ -188,44 +199,49 @@ libbalsa_conf_foreach_group(const gchar * prefix,
     groups = g_key_file_get_groups(lbc_conf.key_file, NULL);
     for (group = groups; *group; group++) {
         if (g_str_has_prefix(*group, prefix)
-            && func(*group, *group + pref_len, data))
+            && func(*group, *group + pref_len, data)) {
             break;
+        }
     }
     g_strfreev(groups);
 
     lbc_unlock();
 }
 
+
 void
-libbalsa_conf_foreach_keys(const gchar * group,
-			   LibBalsaConfForeachFunc func, gpointer data)
+libbalsa_conf_foreach_keys(const gchar            *group,
+                           LibBalsaConfForeachFunc func,
+                           gpointer                data)
 {
     gchar **keys, **key;
 
     lbc_lock();
 
     if ((keys = g_key_file_get_keys(lbc_conf.key_file, group, NULL, NULL))) {
-	for (key = keys; *key; key++) {
-	    gchar * val = g_key_file_get_value(lbc_conf.key_file, group, *key, NULL);
-	    if (func(*key, val, data)) {
-		g_free(val);
-		break;
-	    }
-	    g_free(val);
-	}
-	g_strfreev(keys);
+        for (key = keys; *key; key++) {
+            gchar *val = g_key_file_get_value(lbc_conf.key_file, group, *key, NULL);
+            if (func(*key, val, data)) {
+                g_free(val);
+                break;
+            }
+            g_free(val);
+        }
+        g_strfreev(keys);
     }
 
     lbc_unlock();
 }
 
+
 void
-libbalsa_conf_push_group(const gchar * group)
+libbalsa_conf_push_group(const gchar *group)
 {
 
     lbc_lock();                 /* Will be held until prefix is popped. */
     lbc_groups = g_slist_prepend(lbc_groups, g_strdup(group));
 }
+
 
 void
 libbalsa_conf_pop_group(void)
@@ -235,14 +251,17 @@ libbalsa_conf_pop_group(void)
     lbc_unlock();               /* Held since prefix was pushed. */
 }
 
+
 void
-libbalsa_conf_remove_group_(const char *group, gboolean priv)
+libbalsa_conf_remove_group_(const char *group,
+                            gboolean    priv)
 {
     lbc_lock();
     g_key_file_remove_group(LBC_KEY_FILE(priv), group, NULL);
     LBC_CHANGED(priv);
     lbc_unlock();
 }
+
 
 gboolean
 libbalsa_conf_has_group(const char *group)
@@ -251,27 +270,32 @@ libbalsa_conf_has_group(const char *group)
             g_key_file_has_group(lbc_conf_priv.key_file, group));
 }
 
+
 gboolean
-libbalsa_conf_has_key(const gchar * key)
+libbalsa_conf_has_key(const gchar *key)
 {
     /* g_key_file_has_key returns FALSE on error, but that is OK */
     return (g_key_file_has_key(lbc_conf.key_file, lbc_groups->data,
                                key, NULL) ||
             g_key_file_has_key(lbc_conf_priv.key_file, lbc_groups->data,
-                                  key, NULL));
+                               key, NULL));
 }
 
+
 static void
-lbc_remove_key(LibBalsaConf * conf, const char *key)
+lbc_remove_key(LibBalsaConf *conf,
+               const char   *key)
 {
     GError *error = NULL;
 
     g_key_file_remove_key(conf->key_file, lbc_groups->data, key, &error);
-    if (error)
+    if (error) {
         g_error_free(error);
-    else
+    } else {
         ++conf->changes;
+    }
 }
+
 
 void
 libbalsa_conf_clean_key(const char *key)
@@ -282,31 +306,39 @@ libbalsa_conf_clean_key(const char *key)
     lbc_unlock();
 }
 
+
 void
-libbalsa_conf_set_bool_(const char *path, gboolean value, gboolean priv)
+libbalsa_conf_set_bool_(const char *path,
+                        gboolean    value,
+                        gboolean    priv)
 {
     g_key_file_set_boolean(LBC_KEY_FILE(priv), lbc_groups->data, path,
                            value);
     LBC_CHANGED(priv);
 }
 
+
 static gchar *
-lbc_get_key(const char *path, const char **defval)
+lbc_get_key(const char  *path,
+            const char **defval)
 {
     const gchar *equals;
     gchar *key;
 
     equals = strchr(path, '=');
     key = equals ? g_strndup(path, equals - path) : g_strdup(path);
-    if (defval)
+    if (defval) {
         *defval = equals ? ++equals : NULL;
+    }
 
     return key;
 }
 
+
 gboolean
-libbalsa_conf_get_bool_with_default_(const char *path, gboolean * def,
-                                     gboolean priv)
+libbalsa_conf_get_bool_with_default_(const char *path,
+                                     gboolean   *def,
+                                     gboolean    priv)
 {
     gchar *key;
     const gchar *defval;
@@ -323,15 +355,18 @@ libbalsa_conf_get_bool_with_default_(const char *path, gboolean * def,
         retval = g_strcmp0(defval, "true") == 0;
     }
 
-    if (def)
+    if (def) {
         *def = error != NULL;
+    }
 
     return retval;
 }
 
+
 gint
 libbalsa_conf_get_int_with_default_(const char *path,
-                                    gboolean * def, gboolean priv)
+                                    gboolean   *def,
+                                    gboolean    priv)
 {
     gchar *key;
     const gchar *defval;
@@ -345,19 +380,23 @@ libbalsa_conf_get_int_with_default_(const char *path,
     g_free(key);
     if (error) {
         g_error_free(error);
-        if (defval)
+        if (defval) {
             retval = g_ascii_strtoull(defval, NULL, 10);
+        }
     }
 
-    if (def)
+    if (def) {
         *def = error != NULL;
+    }
 
     return retval;
 }
 
+
 gdouble
 libbalsa_conf_get_double_with_default_(const char *path,
-				       gboolean * def, gboolean priv)
+                                       gboolean   *def,
+                                       gboolean    priv)
 {
     gchar *key;
     const gchar *defval;
@@ -367,48 +406,60 @@ libbalsa_conf_get_double_with_default_(const char *path,
     key = lbc_get_key(path, &defval);
     retval =
         g_key_file_get_double(LBC_KEY_FILE(priv), lbc_groups->data, key,
-			      &error);
+                              &error);
     g_free(key);
     if (error) {
         g_error_free(error);
-        if (defval)
+        if (defval) {
             retval = g_ascii_strtod(defval, NULL);
+        }
     }
 
-    if (def)
+    if (def) {
         *def = error != NULL;
+    }
 
     return retval;
 }
 
+
 void
-libbalsa_conf_set_int_(const char *path, int value, gboolean priv)
+libbalsa_conf_set_int_(const char *path,
+                       int         value,
+                       gboolean    priv)
 {
     g_key_file_set_integer(LBC_KEY_FILE(priv), lbc_groups->data, path,
                            value);
     LBC_CHANGED(priv);
 }
 
+
 void
-libbalsa_conf_set_double_(const char *path, double value, gboolean priv)
+libbalsa_conf_set_double_(const char *path,
+                          double      value,
+                          gboolean    priv)
 {
     g_key_file_set_double(LBC_KEY_FILE(priv), lbc_groups->data, path,
-			  value);
+                          value);
     LBC_CHANGED(priv);
 }
 
+
 void
-libbalsa_conf_set_string_(const char *path, const char *value,
-                          gboolean priv)
+libbalsa_conf_set_string_(const char *path,
+                          const char *value,
+                          gboolean    priv)
 {
     g_key_file_set_string(LBC_KEY_FILE(priv), lbc_groups->data, path,
                           value ? value : "");
     LBC_CHANGED(priv);
 }
 
+
 gchar *
-libbalsa_conf_get_string_with_default_(const char *path, gboolean * def,
-                                       gboolean priv)
+libbalsa_conf_get_string_with_default_(const char *path,
+                                       gboolean   *def,
+                                       gboolean    priv)
 {
     gchar *key;
     const gchar *defval;
@@ -425,14 +476,17 @@ libbalsa_conf_get_string_with_default_(const char *path, gboolean * def,
         retval = g_strdup(defval);
     }
 
-    if (def)
+    if (def) {
         *def = error != NULL;
+    }
 
     return retval;
 }
 
+
 void
-libbalsa_conf_set_vector(const char *path, int argc,
+libbalsa_conf_set_vector(const char       *path,
+                         int               argc,
                          const char *const argv[])
 {
     g_key_file_set_string_list(lbc_conf.key_file, lbc_groups->data, path,
@@ -440,9 +494,12 @@ libbalsa_conf_set_vector(const char *path, int argc,
     ++lbc_conf.changes;
 }
 
+
 void
-libbalsa_conf_get_vector_with_default(const char *path, gint * argcp,
-                                      char ***argvp, gboolean * def)
+libbalsa_conf_get_vector_with_default(const char *path,
+                                      gint       *argcp,
+                                      char     ***argvp,
+                                      gboolean   *def)
 {
     GError *error = NULL;
     gsize len;
@@ -451,15 +508,18 @@ libbalsa_conf_get_vector_with_default(const char *path, gint * argcp,
         g_key_file_get_string_list(lbc_conf.key_file, lbc_groups->data,
                                    path, &len, &error);
     *argcp = len;
-    if (error)
+    if (error) {
         g_error_free(error);
+    }
 
-    if (def)
+    if (def) {
         *def = error != NULL;
+    }
 }
 
+
 static void
-lbc_drop_all(LibBalsaConf * conf)
+lbc_drop_all(LibBalsaConf *conf)
 {
     g_key_file_free(conf->key_file);
     conf->key_file = NULL;
@@ -467,6 +527,7 @@ lbc_drop_all(LibBalsaConf * conf)
     conf->path = NULL;
     conf->changes = 0;
 }
+
 
 void
 libbalsa_conf_drop_all(void)
@@ -477,15 +538,17 @@ libbalsa_conf_drop_all(void)
     lbc_unlock();
 }
 
+
 static void
-lbc_sync(LibBalsaConf * conf)
+lbc_sync(LibBalsaConf *conf)
 {
     gchar *buf;
     gsize len;
     GError *error = NULL;
 
-    if (!conf->changes)
+    if (!conf->changes) {
         return;
+    }
 
     buf = g_key_file_to_data(conf->key_file, &len, &error);
     if (error) {
@@ -508,8 +571,8 @@ lbc_sync(LibBalsaConf * conf)
             g_error_free(error);
 #if DEBUG
         } else {
-                g_message("Failed to rewrite config file “%s”;"
-                          " changes not saved", conf->path);
+            g_message("Failed to rewrite config file “%s”;"
+                      " changes not saved", conf->path);
 #endif                          /* DEBUG */
         }
     } else if (conf->private) {
@@ -518,6 +581,7 @@ lbc_sync(LibBalsaConf * conf)
 
     g_free(buf);
 }
+
 
 static guint lbc_sync_idle_id;
 G_LOCK_DEFINE_STATIC(lbc_sync_idle_id);
@@ -537,6 +601,7 @@ libbalsa_conf_sync(void)
     lbc_unlock();
 }
 
+
 static gboolean
 libbalsa_conf_sync_idle_cb(gpointer data)
 {
@@ -545,6 +610,7 @@ libbalsa_conf_sync_idle_cb(gpointer data)
     return FALSE;
 }
 
+
 void
 libbalsa_conf_queue_sync(void)
 {
@@ -552,9 +618,10 @@ libbalsa_conf_queue_sync(void)
 #if DEBUG
     g_print("%s id %d, will be set if zero\n", __func__, lbc_sync_idle_id);
 #endif                          /* DEBUG */
-    if (!lbc_sync_idle_id)
+    if (!lbc_sync_idle_id) {
         lbc_sync_idle_id =
             g_idle_add((GSourceFunc) libbalsa_conf_sync_idle_cb, NULL);
+    }
 #if DEBUG
     g_print("%s id now %d\n", __func__, lbc_sync_idle_id);
 #endif                          /* DEBUG */

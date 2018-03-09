@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -24,14 +24,15 @@
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
 #include "filter.h"
 #include <glib/gi18n.h>
 
 /*
- * Error reporting use this global gint. All function that positions it will destroy previous error, so
+ * Error reporting use this global gint. All function that positions it will destroy previous
+ * error, so
  * be sure to check it after each function in which error can occur.
  */
 
@@ -56,7 +57,7 @@ gchar *filter_errlist[] = {
  * Returns a pointer to the appropriate string in filter_errlist
  * based on the errnum passed.  It corrects the sign of the integer
  * if need be.
- * 
+ *
  * Arguments:
  *    gint filter_errno - the error number for which a string is requested
  *
@@ -67,7 +68,7 @@ gchar *
 filter_strerror(gint error)
 {
     return _(filter_errlist[(error > 0) ? error : -error]);
-}				/* end filter_strerror() */
+}                               /* end filter_strerror() */
 
 
 /*
@@ -80,10 +81,10 @@ filter_strerror(gint error)
  *    gchar *s - string to be prepended to the error message.
  */
 void
-filter_perror(const gchar * s)
+filter_perror(const gchar *s)
 {
     gchar *error_string;
 
     error_string = filter_strerror(filter_errno);
-    g_warning("%s: %s\n", s,error_string);
-}				/* end filter_perror */
+    g_warning("%s: %s\n", s, error_string);
+}                               /* end filter_perror */

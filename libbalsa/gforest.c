@@ -1,6 +1,6 @@
 /* Balsa E-Mail Library
  * Copyright (C) 1998 Stuart Parmenter
- *  
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
@@ -19,16 +19,16 @@
 #include "gforest.h"
 
 GForrest *
-g_forest_new (void)
+g_forest_new(void)
 {
-  GForrest *gf;
+    GForrest *gf;
 
-  gf = g_malloc (sizeof (GForest));
-  gf->key = NULL;
-  gf->data = NULL;
-  gf->list = NULL;
-  gf->sibling = NULL;
-  gf->children = NULL;
+    gf = g_malloc (sizeof (GForest));
+    gf->key = NULL;
+    gf->data = NULL;
+    gf->list = NULL;
+    gf->sibling = NULL;
+    gf->children = NULL;
 
-  return gf;
+    return gf;
 }

@@ -6,14 +6,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -34,22 +34,25 @@ enum _LibBalsaInformationType {
 
 typedef enum _LibBalsaInformationType LibBalsaInformationType;
 
-typedef void (*LibBalsaInformationFunc) (GtkWindow *parent, 
+typedef void (*LibBalsaInformationFunc) (GtkWindow              *parent,
                                          LibBalsaInformationType message_type,
-                                         const gchar * fmt);
+                                         const gchar            *fmt);
 
 
 extern LibBalsaInformationFunc libbalsa_real_information_func;
 
 void libbalsa_information(LibBalsaInformationType type,
-                          const char *fmt, ...)
-	G_GNUC_PRINTF(2, 3);
-void libbalsa_information_parented(GtkWindow *parent,
+                          const char             *fmt,
+                          ...)
+G_GNUC_PRINTF(2, 3);
+void libbalsa_information_parented(GtkWindow              *parent,
                                    LibBalsaInformationType type,
-                                   const char *fmt, ...)
-	G_GNUC_PRINTF(3, 4);
-void libbalsa_information_varg(GtkWindow *parent,
+                                   const char             *fmt,
+                                   ...)
+G_GNUC_PRINTF(3, 4);
+void libbalsa_information_varg(GtkWindow              *parent,
                                LibBalsaInformationType type,
-                               const char *fmt, va_list ap);
+                               const char             *fmt,
+                               va_list                 ap);
 
 #endif

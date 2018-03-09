@@ -5,20 +5,20 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "balsa-app.h"
 #include "balsa-icons.h"
@@ -40,10 +40,10 @@
 #include "save-restore.h"
 
 #if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
+#   include "macosx-helpers.h"
 #endif
 
-#include <glib/gi18n.h>	/* Must come after balsa-app.h. */
+#include <glib/gi18n.h> /* Must come after balsa-app.h. */
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
@@ -52,9 +52,10 @@ struct BalsaApplication balsa_app;
 
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
-*/
+ */
 static gchar *
-ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
+ask_password_real(LibBalsaServer  *server,
+                  LibBalsaMailbox *mbox)
 {
     GtkWidget *dialog, *entry, *rememb;
     GtkWidget *content_area;
@@ -68,15 +69,16 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 #endif                          /* defined(HAVE_LIBSECRET) */
 
     g_return_val_if_fail(server != NULL, NULL);
-    if (mbox)
-	prompt =
-	    g_strdup_printf(_("Opening remote mailbox %s.\n"
+    if (mbox) {
+        prompt =
+            g_strdup_printf(_("Opening remote mailbox %s.\n"
                               "The _password for %s@%s:"),
-			    mbox->name, server->user, server->host);
-    else
-	prompt =
-	    g_strdup_printf(_("_Password for %s@%s (%s):"), server->user,
-			    server->host, server->protocol);
+                            mbox->name, server->user, server->host);
+    } else {
+        prompt =
+            g_strdup_printf(_("_Password for %s@%s (%s):"), server->user,
+                            server->host, server->protocol);
+    }
 
     dialog = gtk_dialog_new_with_buttons(_("Password needed"),
                                          GTK_WINDOW(balsa_app.main_window),
@@ -84,7 +86,7 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
                                          libbalsa_dialog_flags(),
                                          _("_OK"), GTK_RESPONSE_OK,
                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                         NULL); 
+                                         NULL);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif
@@ -99,33 +101,36 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
 
-    rememb =  gtk_check_button_new_with_mnemonic(_(remember_password_message));
+    rememb = gtk_check_button_new_with_mnemonic(_(remember_password_message));
     gtk_box_pack_start(GTK_BOX(content_area), rememb);
-    if(server->remember_passwd)
+    if (server->remember_passwd) {
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rememb), TRUE);
+    }
 
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_widget_grab_focus (entry);
 
-    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
         unsigned old_rem = server->remember_passwd;
         passwd = gtk_editable_get_chars(GTK_EDITABLE(entry), 0, -1);
         server->remember_passwd =
             !!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rememb));
         libbalsa_server_set_password(server, passwd);
-        if( server->remember_passwd || old_rem )
+        if ( server->remember_passwd || old_rem ) {
             libbalsa_server_config_changed(server);
+        }
     }
     gtk_widget_destroy(dialog);
     return passwd;
 }
 
+
 typedef struct {
     GCond cond;
-    LibBalsaServer* server;
-    LibBalsaMailbox* mbox;
-    gchar* res;
+    LibBalsaServer *server;
+    LibBalsaMailbox *mbox;
+    gchar *res;
     gboolean done;
 } AskPasswdData;
 
@@ -135,18 +140,20 @@ typedef struct {
 static gboolean
 ask_passwd_idle(gpointer data)
 {
-    AskPasswdData* apd = (AskPasswdData*)data;
+    AskPasswdData *apd = (AskPasswdData *)data;
     apd->res = ask_password_real(apd->server, apd->mbox);
     apd->done = TRUE;
     g_cond_signal(&apd->cond);
     return FALSE;
 }
 
+
 /* ask_password_mt:
    GDK lock must not be held.
-*/
+ */
 static gchar *
-ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
+ask_password_mt(LibBalsaServer  *server,
+                LibBalsaMailbox *mbox)
 {
     static GMutex ask_passwd_lock;
     AskPasswdData apd;
@@ -154,23 +161,24 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
     g_mutex_lock(&ask_passwd_lock);
     g_cond_init(&apd.cond);
     apd.server = server;
-    apd.mbox   = mbox;
-    apd.done   = FALSE;
+    apd.mbox = mbox;
+    apd.done = FALSE;
     g_idle_add(ask_passwd_idle, &apd);
     while (!apd.done) {
-    	g_cond_wait(&apd.cond, &ask_passwd_lock);
+        g_cond_wait(&apd.cond, &ask_passwd_lock);
     }
-    
+
     g_cond_clear(&apd.cond);
     g_mutex_unlock(&ask_passwd_lock);
     return apd.res;
 }
 
+
 static gboolean
 set_passwd_from_matching_server(GtkTreeModel *model,
-				GtkTreePath *path,
-				GtkTreeIter *iter,
-				gpointer data)
+                                GtkTreePath  *path,
+                                GtkTreeIter  *iter,
+                                gpointer      data)
 {
     LibBalsaServer *server;
     LibBalsaServer *master;
@@ -179,72 +187,82 @@ set_passwd_from_matching_server(GtkTreeModel *model,
 
     gtk_tree_model_get(model, iter, 0, &node, -1);
     g_return_val_if_fail(node != NULL, FALSE);
-    if(node->server) {
+    if (node->server) {
         server = node->server;
-	g_object_unref(node);
+        g_object_unref(node);
     } else {
         mbox = node->mailbox;
-	g_object_unref(node);
-        if(!mbox) /* eg. a collection of mboxes */
+        g_object_unref(node);
+        if (!mbox) { /* eg. a collection of mboxes */
             return FALSE;
+        }
         g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbox), FALSE);
 
-        if (!LIBBALSA_IS_MAILBOX_REMOTE(mbox)) return FALSE;
+        if (!LIBBALSA_IS_MAILBOX_REMOTE(mbox)) {
+            return FALSE;
+        }
         server = LIBBALSA_MAILBOX_REMOTE_SERVER(mbox);
         g_return_val_if_fail(server != NULL, FALSE);
     }
     g_return_val_if_fail(server->host != NULL, FALSE);
     g_return_val_if_fail(server->user != NULL, FALSE);
-    if (server->passwd == NULL) return FALSE;
+    if (server->passwd == NULL) {
+        return FALSE;
+    }
 
     master = (LibBalsaServer *)data;
     g_return_val_if_fail(LIBBALSA_IS_SERVER(master), FALSE);
-    if (master == server) return FALSE;
+    if (master == server) {
+        return FALSE;
+    }
 
     g_return_val_if_fail(server->host != NULL, FALSE);
     g_return_val_if_fail(server->user != NULL, FALSE);
 
     if ((strcmp(server->host, master->host) == 0) &&
-	(strcmp(server->user, master->user) == 0)) {
-	g_free(master->passwd);
-	master->passwd = g_strdup(server->passwd);
-	return TRUE;
-    };
-    
+        (strcmp(server->user, master->user) == 0)) {
+        g_free(master->passwd);
+        master->passwd = g_strdup(server->passwd);
+        return TRUE;
+    }
+
     return FALSE;
 }
+
+
 /* ask_password:
    when called from thread, gdk lock must not be held.
-*/
+ */
 gchar *
-ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
+ask_password(LibBalsaServer  *server,
+             LibBalsaMailbox *mbox)
 {
     gchar *password;
 
     g_return_val_if_fail(server != NULL, NULL);
-    
+
     password = NULL;
     if (mbox) {
-	gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			       (GtkTreeModelForeachFunc)
-			       set_passwd_from_matching_server, server);
+        gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
+                               (GtkTreeModelForeachFunc)
+                               set_passwd_from_matching_server, server);
 
-	if (server->passwd != NULL) {
-	    password = server->passwd;
-	    server->passwd = NULL;
-	}
+        if (server->passwd != NULL) {
+            password = server->passwd;
+            server->passwd = NULL;
+        }
     }
 
     if (!password) {
         G_LOCK_DEFINE_STATIC(ask_password);
 
         G_LOCK(ask_password);
-	password = !libbalsa_am_i_subthread() ?
+        password = !libbalsa_am_i_subthread() ?
             ask_password_real(server, mbox) : ask_password_mt(server, mbox);
         G_UNLOCK(ask_password);
-	return password;
+        return password;
     }
-	return password;
+    return password;
 }
 
 
@@ -252,8 +270,12 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
 static gboolean
 send_queued_messages_auto_cb(gpointer data)
 {
-	g_debug("%s: %p", __func__, data);
-	libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url, balsa_app.smtp_servers, FALSE, NULL);
+    g_debug("%s: %p", __func__, data);
+    libbalsa_process_queue(balsa_app.outbox,
+                           balsa_find_sentbox_by_url,
+                           balsa_app.smtp_servers,
+                           FALSE,
+                           NULL);
     return (data == NULL);
 }
 
@@ -261,8 +283,8 @@ send_queued_messages_auto_cb(gpointer data)
 void
 balsa_app_init(void)
 {
-    /* 
-     * initalize application structure before ALL ELSE 
+    /*
+     * initalize application structure before ALL ELSE
      * to some reasonable defaults
      */
     balsa_app.identities = NULL;
@@ -358,7 +380,7 @@ balsa_app_init(void)
 
     balsa_app.print_header_font = g_strdup(DEFAULT_PRINT_HEADER_FONT);
     balsa_app.print_footer_font = g_strdup(DEFAULT_PRINT_FOOTER_FONT);
-    balsa_app.print_body_font   = g_strdup(DEFAULT_PRINT_BODY_FONT);
+    balsa_app.print_body_font = g_strdup(DEFAULT_PRINT_BODY_FONT);
     balsa_app.print_highlight_cited = FALSE;
     balsa_app.print_highlight_phrases = FALSE;
 
@@ -367,7 +389,7 @@ balsa_app_init(void)
     balsa_app.default_address_book = NULL;
 
     /* Filters */
-    balsa_app.filters=NULL;
+    balsa_app.filters = NULL;
 
     /* spell check */
 #if HAVE_GSPELL || HAVE_GTKSPELL
@@ -401,11 +423,12 @@ balsa_app_init(void)
 #endif
 
     /* Message filing */
-    balsa_app.folder_mru=NULL;
-    balsa_app.fcc_mru=NULL;
+    balsa_app.folder_mru = NULL;
+    balsa_app.fcc_mru = NULL;
 
     libbalsa_auto_send_init(send_queued_messages_auto_cb);
 }
+
 
 void
 balsa_app_destroy(void)
@@ -416,23 +439,27 @@ balsa_app_destroy(void)
 
     /* now free filters */
     g_slist_foreach(balsa_app.filters, (GFunc)libbalsa_filter_free,
-		    GINT_TO_POINTER(TRUE));
+                    GINT_TO_POINTER(TRUE));
     g_clear_pointer(&balsa_app.filters, (GDestroyNotify) g_slist_free);
 
     libbalsa_clear_list(&balsa_app.identities, g_object_unref);
     libbalsa_clear_list(&balsa_app.folder_mru, g_free);
     libbalsa_clear_list(&balsa_app.fcc_mru, g_free);
 
-    if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
+    if (balsa_app.debug) {
+        g_print("balsa_app: Finished cleaning up.\n");
+    }
 }
+
 
 static gboolean
 check_new_messages_auto_cb(gpointer data)
 {
     check_new_messages_real(balsa_app.main_window, TRUE);
 
-    if (balsa_app.debug)
+    if (balsa_app.debug) {
         fprintf(stderr, "Auto-checked for new messages…\n");
+    }
 
     /*  preserver timer */
     return TRUE;
@@ -440,7 +467,8 @@ check_new_messages_auto_cb(gpointer data)
 
 
 void
-update_timer(gboolean update, guint minutes)
+update_timer(gboolean update,
+             guint    minutes)
 {
     libbalsa_clear_source_id(&balsa_app.check_mail_timer_id);
 
@@ -460,35 +488,41 @@ update_timer(gboolean update, guint minutes)
  */
 
 static gboolean
-append_url_if_open(const gchar * group, const gchar * encoded_url,
-                   GPtrArray * array)
+append_url_if_open(const gchar *group,
+                   const gchar *encoded_url,
+                   GPtrArray   *array)
 {
     gchar *url;
 
     url = libbalsa_urldecode(encoded_url);
 
-    if (config_mailbox_was_open(url))
+    if (config_mailbox_was_open(url)) {
         g_ptr_array_add(array, url);
-    else
+    } else {
         g_free(url);
+    }
 
     return FALSE;
 }
 
+
 static void
-open_mailbox_by_url(const gchar * url, gboolean hidden)
+open_mailbox_by_url(const gchar *url,
+                    gboolean     hidden)
 {
     LibBalsaMailbox *mailbox;
 
     mailbox = balsa_find_mailbox_by_url(url);
-    if (balsa_app.debug)
+    if (balsa_app.debug) {
         fprintf(stderr, "balsa_open_mailbox_list: opening %s => %p..\n",
                 url, mailbox);
+    }
     if (mailbox) {
-        if (hidden)
+        if (hidden) {
             balsa_mblist_open_mailbox_hidden(mailbox);
-        else
+        } else {
             balsa_mblist_open_mailbox(mailbox);
+        }
     } else {
         /* Do not try to open it next time. */
         LibBalsaMailboxView *view = config_load_mailbox_view(url);
@@ -507,8 +541,9 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
     }
 }
 
+
 void
-balsa_open_mailbox_list(gchar ** urls)
+balsa_open_mailbox_list(gchar **urls)
 {
     gboolean hidden = FALSE;
     gchar **tmp;
@@ -519,9 +554,11 @@ balsa_open_mailbox_list(gchar ** urls)
         gchar **p;
 
         /* Have we already seen this URL? */
-        for (p = urls; p < tmp; ++p)
-            if (!strcmp(*p, *tmp))
+        for (p = urls; p < tmp; ++p) {
+            if (!strcmp(*p, *tmp)) {
                 break;
+            }
+        }
         if (p == tmp) {
             open_mailbox_by_url(*tmp, hidden);
             hidden = TRUE;
@@ -531,84 +568,95 @@ balsa_open_mailbox_list(gchar ** urls)
     g_strfreev(urls);
 }
 
+
 void
-balsa_add_open_mailbox_urls(GPtrArray * url_array)
+balsa_add_open_mailbox_urls(GPtrArray *url_array)
 {
     libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
                                 (LibBalsaConfForeachFunc)
                                 append_url_if_open, url_array);
 }
 
-/* 
+
+/*
  * Utilities for searching a GNode tree of BalsaMailboxNodes
  *
  * First a structure for the search info
  */
 struct _BalsaFind {
     gconstpointer data;
-    LibBalsaServer   *server;
+    LibBalsaServer *server;
     BalsaMailboxNode *mbnode;
 };
 typedef struct _BalsaFind BalsaFind;
 
 static gint
-find_mailbox(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
-	     gpointer user_data)
+find_mailbox(GtkTreeModel *model,
+             GtkTreePath  *path,
+             GtkTreeIter  *iter,
+             gpointer      user_data)
 {
     BalsaFind *bf = user_data;
     BalsaMailboxNode *mbnode;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     if (mbnode->mailbox == bf->data) {
-	bf->mbnode = mbnode;
-	return TRUE;
+        bf->mbnode = mbnode;
+        return TRUE;
     }
     g_object_unref(mbnode);
 
     return FALSE;
 }
 
+
 /* balsa_find_mailbox:
    looks for given mailbox in the GNode tree, usually but not limited to
    balsa_app.mailbox_nodes; caller must unref mbnode if non-NULL.
-*/
+ */
 BalsaMailboxNode *
-balsa_find_mailbox(LibBalsaMailbox * mailbox)
+balsa_find_mailbox(LibBalsaMailbox *mailbox)
 {
     BalsaFind bf;
 
     bf.data = mailbox;
     bf.mbnode = NULL;
-    if (balsa_app.mblist_tree_store)
+    if (balsa_app.mblist_tree_store) {
         gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
                                find_mailbox, &bf);
+    }
 
     return bf.mbnode;
 }
 
+
 /* balsa_find_dir:
    looks for a mailbox node with dir equal to path.
    returns NULL on failure; caller must unref mbnode when non-NULL.
-*/
+ */
 static gint
-find_path(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
-	  BalsaFind * bf)
+find_path(GtkTreeModel *model,
+          GtkTreePath  *path,
+          GtkTreeIter  *iter,
+          BalsaFind    *bf)
 {
     BalsaMailboxNode *mbnode;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
-    if (mbnode->server == bf->server &&
-        g_strcmp0(mbnode->dir, (const gchar *) bf->data) == 0) {
-	bf->mbnode = mbnode;
-	return TRUE;
+    if ((mbnode->server == bf->server) &&
+        (g_strcmp0(mbnode->dir, (const gchar *) bf->data) == 0)) {
+        bf->mbnode = mbnode;
+        return TRUE;
     }
     g_object_unref(mbnode);
 
     return FALSE;
 }
 
+
 BalsaMailboxNode *
-balsa_find_dir(LibBalsaServer *server, const gchar * path)
+balsa_find_dir(LibBalsaServer *server,
+               const gchar    *path)
 {
     BalsaFind bf;
 
@@ -616,14 +664,17 @@ balsa_find_dir(LibBalsaServer *server, const gchar * path)
     bf.server = server;
     bf.mbnode = NULL;
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			   (GtkTreeModelForeachFunc) find_path, &bf);
+                           (GtkTreeModelForeachFunc) find_path, &bf);
 
     return bf.mbnode;
 }
 
+
 static gint
-find_url(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
-	 BalsaFind * bf)
+find_url(GtkTreeModel *model,
+         GtkTreePath  *path,
+         GtkTreeIter  *iter,
+         BalsaFind    *bf)
 {
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
@@ -638,21 +689,23 @@ find_url(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
     return FALSE;
 }
 
+
 /* balsa_find_url:
  * looks for a mailbox node with the given url.
  * returns NULL on failure; caller must unref mbnode when non-NULL.
  */
 
 BalsaMailboxNode *
-balsa_find_url(const gchar * url)
+balsa_find_url(const gchar *url)
 {
     BalsaFind bf;
 
     bf.data = url;
     bf.mbnode = NULL;
 
-    if (balsa_app.mblist_tree_store)
+    if (balsa_app.mblist_tree_store) {
         g_object_ref(balsa_app.mblist_tree_store);
+    }
     /*
      * Check again, in case the main thread managed to finalize
      * balsa_app.mblist_tree_store between the check and the object-ref.
@@ -667,31 +720,34 @@ balsa_find_url(const gchar * url)
     return bf.mbnode;
 }
 
+
 /* balsa_find_mailbox_by_url:
  * looks for a mailbox with the given url.
  * returns NULL on failure
  */
 LibBalsaMailbox *
-balsa_find_mailbox_by_url(const gchar * url)
+balsa_find_mailbox_by_url(const gchar *url)
 {
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox = NULL;
 
     if ((mbnode = balsa_find_url(url))) {
-	mailbox = mbnode->mailbox;
-	g_object_unref(mbnode);
+        mailbox = mbnode->mailbox;
+        g_object_unref(mbnode);
     }
     return mailbox;
 }
 
-LibBalsaMailbox*
+
+LibBalsaMailbox *
 balsa_find_sentbox_by_url(const gchar *url)
 {
     LibBalsaMailbox *res = balsa_find_mailbox_by_url(url);
     return res ? res : balsa_app.sentbox;
 }
 
-gchar*
+
+gchar *
 balsa_get_short_mailbox_name(const gchar *url)
 {
     BalsaMailboxNode *mbnode;
@@ -707,6 +763,7 @@ balsa_get_short_mailbox_name(const gchar *url)
     return g_strdup(url);
 }
 
+
 struct balsa_find_iter_by_data_info {
     GtkTreeIter *iter;
     gpointer data;
@@ -714,34 +771,40 @@ struct balsa_find_iter_by_data_info {
 };
 
 static gboolean
-balsa_find_iter_by_data_func(GtkTreeModel * model, GtkTreePath * path,
-			       GtkTreeIter * iter, gpointer user_data)
+balsa_find_iter_by_data_func(GtkTreeModel *model,
+                             GtkTreePath  *path,
+                             GtkTreeIter  *iter,
+                             gpointer      user_data)
 {
     struct balsa_find_iter_by_data_info *bf = user_data;
     BalsaMailboxNode *mbnode = NULL;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
-    if(!mbnode)
+    if (!mbnode) {
         return FALSE;
-    if (mbnode == bf->data || mbnode->mailbox == bf->data) {
-	*bf->iter = *iter;
-	bf->found = TRUE;
+    }
+    if ((mbnode == bf->data) || (mbnode->mailbox == bf->data)) {
+        *bf->iter = *iter;
+        bf->found = TRUE;
     }
     g_object_unref(mbnode);
 
     return bf->found;
 }
 
+
 gboolean
-balsa_find_iter_by_data(GtkTreeIter * iter , gpointer data)
+balsa_find_iter_by_data(GtkTreeIter *iter,
+                        gpointer     data)
 {
     struct balsa_find_iter_by_data_info bf;
     GtkTreeModel *model;
 
     /* We may call it from initial config, it's ok for
        mblist_tree_store not to exist. */
-    if(!balsa_app.mblist_tree_store)
+    if (!balsa_app.mblist_tree_store) {
         return FALSE;
+    }
 
     model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
 
@@ -753,77 +816,85 @@ balsa_find_iter_by_data(GtkTreeIter * iter , gpointer data)
     return bf.found;
 }
 
+
 /* End of search utilities. */
 
 /* balsa_remove_children_mailbox_nodes:
    remove all children of given node leaving the node itself intact.
  */
 static void
-ba_remove_children_mailbox_nodes(GtkTreeModel * model, GtkTreeIter * parent,
-				 GSList ** specials)
+ba_remove_children_mailbox_nodes(GtkTreeModel *model,
+                                 GtkTreeIter  *parent,
+                                 GSList      **specials)
 {
     GtkTreeIter iter;
     BalsaMailboxNode *mbnode;
     gboolean valid;
 
-    if (!gtk_tree_model_iter_children(model, &iter, parent))
-	return;
+    if (!gtk_tree_model_iter_children(model, &iter, parent)) {
+        return;
+    }
 
     do {
-	gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
-	if (mbnode->parent) {
-	    LibBalsaMailbox *mailbox = mbnode->mailbox;
-	    if (mailbox == balsa_app.inbox
-		|| mailbox == balsa_app.outbox
-		|| mailbox == balsa_app.sentbox
-		|| mailbox == balsa_app.draftbox
-		|| mailbox == balsa_app.trash) {
-		g_object_ref(mailbox);
-		*specials = g_slist_prepend(*specials, mailbox);
-	    }
-	    ba_remove_children_mailbox_nodes(model, &iter, specials);
-	    valid =
-		gtk_tree_store_remove(balsa_app.mblist_tree_store, &iter);
-	} else {
-	    printf("sparing %s %s\n",
-		   mbnode->mailbox ? "mailbox" : "folder ",
-		   mbnode->mailbox ? mbnode->mailbox->name : mbnode->name);
-	    valid = gtk_tree_model_iter_next(model, &iter);
-	}
-	g_object_unref(mbnode); 
+        gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
+        if (mbnode->parent) {
+            LibBalsaMailbox *mailbox = mbnode->mailbox;
+            if ((mailbox == balsa_app.inbox)
+                || (mailbox == balsa_app.outbox)
+                || (mailbox == balsa_app.sentbox)
+                || (mailbox == balsa_app.draftbox)
+                || (mailbox == balsa_app.trash)) {
+                g_object_ref(mailbox);
+                *specials = g_slist_prepend(*specials, mailbox);
+            }
+            ba_remove_children_mailbox_nodes(model, &iter, specials);
+            valid =
+                gtk_tree_store_remove(balsa_app.mblist_tree_store, &iter);
+        } else {
+            printf("sparing %s %s\n",
+                   mbnode->mailbox ? "mailbox" : "folder ",
+                   mbnode->mailbox ? mbnode->mailbox->name : mbnode->name);
+            valid = gtk_tree_model_iter_next(model, &iter);
+        }
+        g_object_unref(mbnode);
     } while (valid);
 }
 
+
 void
-balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode)
+balsa_remove_children_mailbox_nodes(BalsaMailboxNode *mbnode)
 {
     GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
     GtkTreeIter parent;
     GtkTreeIter *iter = NULL;
     GSList *specials = NULL, *l;
 
-    if (balsa_app.debug)
-	printf("Destroying children of %p %s\n",
-	       mbnode, mbnode && mbnode->name ? mbnode->name : "");
+    if (balsa_app.debug) {
+        printf("Destroying children of %p %s\n",
+               mbnode, mbnode && mbnode->name ? mbnode->name : "");
+    }
 
-    if (mbnode && balsa_find_iter_by_data(&parent, mbnode))
-	iter = &parent;
+    if (mbnode && balsa_find_iter_by_data(&parent, mbnode)) {
+        iter = &parent;
+    }
 
     ba_remove_children_mailbox_nodes(model, iter, &specials);
 
-    for (l = specials; l; l = l->next)
+    for (l = specials; l; l = l->next) {
         balsa_mblist_mailbox_node_append(NULL,
                                          balsa_mailbox_node_new_from_mailbox
-                                         (l->data));
+                                             (l->data));
+    }
     g_slist_free(specials);
 }
 
+
 /* balsa_find_index_by_mailbox:
-   returns BalsaIndex displaying passed mailbox, or NULL, if mailbox is 
+   returns BalsaIndex displaying passed mailbox, or NULL, if mailbox is
    not displayed.
-*/
-BalsaIndex*
-balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
+ */
+BalsaIndex *
+balsa_find_index_by_mailbox(LibBalsaMailbox *mailbox)
 {
     GtkWidget *page;
     GtkWidget *index;
@@ -831,30 +902,32 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     g_return_val_if_fail(balsa_app.notebook, NULL);
 
     for (i = 0;
-	 (page =
-	  gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
-	 i++) {
+         (page =
+              gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
+         i++) {
         index = gtk_bin_get_child(GTK_BIN(page));
-	if (index && BALSA_INDEX(index)->mailbox_node
-            && BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
-	    return BALSA_INDEX(index);
+        if (index && BALSA_INDEX(index)->mailbox_node
+            && (BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)) {
+            return BALSA_INDEX(index);
+        }
     }
 
     /* didn't find a matching mailbox */
     return NULL;
 }
 
+
 GRegex *
 balsa_quote_regex_new(void)
 {
-    static GRegex *regex  = NULL;
-    static gchar  *string = NULL;
+    static GRegex *regex = NULL;
+    static gchar *string = NULL;
 
     if (g_strcmp0(string, balsa_app.quote_regex) != 0) {
         /* We have not initialized the GRegex, or balsa_app.quote_regex
          * has changed. */
         g_clear_pointer(&string, (GDestroyNotify) g_free);
-        g_clear_pointer(&regex,  (GDestroyNotify) g_regex_unref);
+        g_clear_pointer(&regex, (GDestroyNotify) g_regex_unref);
     }
 
     if (regex == NULL) {

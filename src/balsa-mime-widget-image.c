@@ -18,7 +18,7 @@
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
 #include "balsa-mime-widget-image.h"
@@ -32,7 +32,7 @@
  * GObject class definitions
  */
 struct _BalsaMimeWidgetImage {
-    BalsaMimeWidget  parent;
+    BalsaMimeWidget parent;
 
     guint img_check_size_id;
     GdkPixbuf *pixbuf;
@@ -48,15 +48,16 @@ G_DEFINE_TYPE(BalsaMimeWidgetImage,
               BALSA_TYPE_MIME_WIDGET);
 
 static void
-balsa_mime_widget_image_init(BalsaMimeWidgetImage * mwi)
+balsa_mime_widget_image_init(BalsaMimeWidgetImage *mwi)
 {
     mwi->img_check_size_id = 0;
     mwi->pixbuf = NULL;
     mwi->gesture = NULL;
 }
 
+
 static void
-balsa_mime_widget_image_dispose(GObject * object)
+balsa_mime_widget_image_dispose(GObject *object)
 {
     BalsaMimeWidgetImage *mwi = (BalsaMimeWidgetImage *) object;
 
@@ -67,13 +68,16 @@ balsa_mime_widget_image_dispose(GObject * object)
     G_OBJECT_CLASS(balsa_mime_widget_image_parent_class)->dispose(object);
 }
 
+
 static void
-balsa_mime_widget_image_class_init(BalsaMimeWidgetImageClass * klass)
+balsa_mime_widget_image_class_init(BalsaMimeWidgetImageClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
     object_class->dispose = balsa_mime_widget_image_dispose;
 }
+
+
 /*
  * End of GObject class definitions
  */
@@ -98,8 +102,9 @@ balsa_mime_widget_image_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
     }
 }
 
+
 static gboolean
-img_check_size(BalsaMimeWidgetImage * mwi)
+img_check_size(BalsaMimeWidgetImage *mwi)
 {
     GtkWidget *widget;
     GtkImage *image;
@@ -129,14 +134,16 @@ img_check_size(BalsaMimeWidgetImage * mwi)
 
     image = GTK_IMAGE(widget);
     switch (gtk_image_get_storage_type(image)) {
-        case GTK_IMAGE_SURFACE:
-            curr_w = cairo_image_surface_get_width(gtk_image_get_surface(image));
-            break;
-        case GTK_IMAGE_TEXTURE:
-            curr_w = gdk_texture_get_width(gtk_image_get_texture(image));
-            break;
-        default:
-            curr_w = 0;
+    case GTK_IMAGE_SURFACE:
+        curr_w = cairo_image_surface_get_width(gtk_image_get_surface(image));
+        break;
+
+    case GTK_IMAGE_TEXTURE:
+        curr_w = gdk_texture_get_width(gtk_image_get_texture(image));
+        break;
+
+    default:
+        curr_w = 0;
     }
 
     gtk_widget_get_allocation(viewport, &allocation);
@@ -151,38 +158,41 @@ img_check_size(BalsaMimeWidgetImage * mwi)
     dst_w = CLAMP(dst_w, 32, orig_width);
 
     if (dst_w != curr_w) {
-	GdkPixbuf *scaled_pixbuf;
-	gint dst_h;
+        GdkPixbuf *scaled_pixbuf;
+        gint dst_h;
 
-	dst_h = (gfloat)dst_w / (gfloat)orig_width * gdk_pixbuf_get_height(pixbuf);
-	scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, dst_w, dst_h,
-						GDK_INTERP_BILINEAR);
-	gtk_image_set_from_pixbuf(image, scaled_pixbuf);
-	g_object_unref(scaled_pixbuf);
+        dst_h = (gfloat)dst_w / (gfloat)orig_width * gdk_pixbuf_get_height(pixbuf);
+        scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, dst_w, dst_h,
+                                                GDK_INTERP_BILINEAR);
+        gtk_image_set_from_pixbuf(image, scaled_pixbuf);
+        g_object_unref(scaled_pixbuf);
     }
 
     return G_SOURCE_REMOVE;
 }
 
+
 static void
 img_size_allocate_cb(BalsaMimeWidgetImage *mwi)
 {
-    if (mwi->pixbuf != NULL && mwi->img_check_size_id == 0) {
+    if ((mwi->pixbuf != NULL) && (mwi->img_check_size_id == 0)) {
         mwi->img_check_size_id = g_idle_add((GSourceFunc) img_check_size, mwi);
     }
 }
+
 
 /*
  * Public method
  */
 
 BalsaMimeWidget *
-balsa_mime_widget_new_image(BalsaMessage * bm,
-                            LibBalsaMessageBody * mime_body,
-			    const gchar * content_type, gpointer data)
+balsa_mime_widget_new_image(BalsaMessage        *bm,
+                            LibBalsaMessageBody *mime_body,
+                            const gchar         *content_type,
+                            gpointer             data)
 {
     GtkWidget *image;
-    GError * load_err = NULL;
+    GError *load_err = NULL;
     BalsaMimeWidgetImage *mwi;
     BalsaMimeWidget *mw;
 
@@ -193,14 +203,14 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
 
     mwi->pixbuf = libbalsa_message_body_get_pixbuf(mime_body, &load_err);
     if (mwi->pixbuf == NULL) {
-	if (load_err != NULL) {
+        if (load_err != NULL) {
             balsa_information(LIBBALSA_INFORMATION_ERROR,
-			      _("Error loading attached image: %s\n"),
-			      load_err->message);
-	    g_error_free(load_err);
-	}
+                              _("Error loading attached image: %s\n"),
+                              load_err->message);
+            g_error_free(load_err);
+        }
         g_object_unref(mwi);
-	return NULL;
+        return NULL;
     }
 
     image = gtk_image_new_from_icon_name("image-missing");

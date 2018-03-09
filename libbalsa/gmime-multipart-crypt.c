@@ -11,21 +11,21 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-#include "config.h"
-#endif				/* HAVE_CONFIG_H */
+#   include "config.h"
+#endif                          /* HAVE_CONFIG_H */
 
 #include <string.h>
 #include <unistd.h>
@@ -37,7 +37,7 @@
 
 
 #ifdef G_LOG_DOMAIN
-#  undef G_LOG_DOMAIN
+#   undef G_LOG_DOMAIN
 #endif
 #define G_LOG_DOMAIN "crypto"
 
@@ -53,7 +53,7 @@
  * Ref: RFC 3156, sect. 3.
  **/
 static void
-sign_prepare(GMimeObject * mime_part)
+sign_prepare(GMimeObject *mime_part)
 {
     GMimeContentEncoding encoding;
     GMimeObject *subpart;
@@ -62,35 +62,40 @@ sign_prepare(GMimeObject * mime_part)
         GMimeMultipart *multipart;
         int i, n;
 
-	multipart = (GMimeMultipart *) mime_part;
+        multipart = (GMimeMultipart *) mime_part;
 
-	if (GMIME_IS_MULTIPART_SIGNED(multipart) ||
-	    GMIME_IS_MULTIPART_ENCRYPTED(multipart)) {
-	    /* must not modify these parts as they must be treated as opaque */
-	    return;
-	}
+        if (GMIME_IS_MULTIPART_SIGNED(multipart) ||
+            GMIME_IS_MULTIPART_ENCRYPTED(multipart)) {
+            /* must not modify these parts as they must be treated as opaque */
+            return;
+        }
 
-	n = g_mime_multipart_get_count(multipart);
-	for (i = 0; i < n; i++) {
-	    subpart = g_mime_multipart_get_part(multipart, i);
-	    sign_prepare(subpart);
-	}
+        n = g_mime_multipart_get_count(multipart);
+        for (i = 0; i < n; i++) {
+            subpart = g_mime_multipart_get_part(multipart, i);
+            sign_prepare(subpart);
+        }
     } else if (GMIME_IS_MESSAGE_PART(mime_part)) {
-	subpart = GMIME_MESSAGE_PART(mime_part)->message->mime_part;
-	sign_prepare(subpart);
+        subpart = GMIME_MESSAGE_PART(mime_part)->message->mime_part;
+        sign_prepare(subpart);
     } else {
-	encoding = g_mime_part_get_content_encoding(GMIME_PART(mime_part));
-	if ((encoding != GMIME_CONTENT_ENCODING_BASE64) && (encoding != GMIME_CONTENT_ENCODING_7BIT))
-	    g_mime_part_set_content_encoding(GMIME_PART(mime_part),
-					     GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
+        encoding = g_mime_part_get_content_encoding(GMIME_PART(mime_part));
+        if ((encoding != GMIME_CONTENT_ENCODING_BASE64) &&
+            (encoding != GMIME_CONTENT_ENCODING_7BIT)) {
+            g_mime_part_set_content_encoding(GMIME_PART(mime_part),
+                                             GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE);
+        }
     }
 }
 
 
 gboolean
-g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
-		      const gchar * userid, gpgme_protocol_t protocol,
-		      GtkWindow * parent, GError ** err)
+g_mime_gpgme_mps_sign(GMimeMultipartSigned *mps,
+                      GMimeObject          *content,
+                      const gchar          *userid,
+                      gpgme_protocol_t      protocol,
+                      GtkWindow            *parent,
+                      GError              **err)
 {
     GMimeStream *stream;
     GMimeStream *filtered;
@@ -120,7 +125,8 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered), filter);
     g_object_unref(filter);
 
-    /* Note: see rfc3156, section 5.4 (this is the main difference between rfc2015 and rfc3156) */
+    /* Note: see rfc3156, section 5.4 (this is the main difference between rfc2015 and rfc3156)
+     */
     filter = g_mime_filter_strip_new();
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered), filter);
     g_object_unref(filter);
@@ -141,13 +147,13 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
 
     /* sign the content stream */
     hash_algo =
-	libbalsa_gpgme_sign(userid, filtered, sigstream, protocol, FALSE,
-			    parent, err);
+        libbalsa_gpgme_sign(userid, filtered, sigstream, protocol, FALSE,
+                            parent, err);
     g_object_unref(filtered);
     if (hash_algo == GPGME_MD_NONE) {
-	g_object_unref(sigstream);
-	g_object_unref(stream);
-	return FALSE;
+        g_object_unref(sigstream);
+        g_object_unref(stream);
+        return FALSE;
     }
 
     g_mime_stream_reset(sigstream);
@@ -156,14 +162,14 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
     /* set the multipart/signed protocol and micalg */
     content_type = g_mime_object_get_content_type(GMIME_OBJECT(mps));
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
-	micalg =
-	    g_strdup_printf("PGP-%s", gpgme_hash_algo_name(hash_algo));
-	proto_type = "application/pgp-signature";
-	sig_subtype = "pgp-signature";
+        micalg =
+            g_strdup_printf("PGP-%s", gpgme_hash_algo_name(hash_algo));
+        proto_type = "application/pgp-signature";
+        sig_subtype = "pgp-signature";
     } else {
-	micalg = g_strdup(gpgme_hash_algo_name(hash_algo));
-	proto_type = "application/pkcs7-signature";
-	sig_subtype = "pkcs7-signature";
+        micalg = g_strdup(gpgme_hash_algo_name(hash_algo));
+        proto_type = "application/pkcs7-signature";
+        sig_subtype = "pkcs7-signature";
     }
     g_mime_content_type_set_parameter(content_type, "micalg", micalg);
     g_free(micalg);
@@ -189,9 +195,9 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
      * the CipherContext class - maybe ::sign can take/output a
      * GMimePart instead. */
     if (protocol == GPGME_PROTOCOL_CMS) {
-	g_mime_part_set_content_encoding(signature,
-					 GMIME_CONTENT_ENCODING_BASE64);
-	g_mime_part_set_filename(signature, "smime.p7m");
+        g_mime_part_set_content_encoding(signature,
+                                         GMIME_CONTENT_ENCODING_BASE64);
+        g_mime_part_set_filename(signature, "smime.p7m");
     }
 
     /* save the content and signature parts */
@@ -206,7 +212,8 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
 
 
 GMimeGpgmeSigstat *
-g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
+g_mime_gpgme_mps_verify(GMimeMultipartSigned *mps,
+                        GError              **error)
 {
     const gchar *protocol;
     gpgme_protocol_t crypto_prot;
@@ -223,54 +230,57 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
     g_return_val_if_fail(GMIME_IS_MULTIPART_SIGNED(mps), NULL);
 
     if (g_mime_multipart_get_count(GMIME_MULTIPART(mps)) < 2) {
-	g_set_error(error, GMIME_ERROR, GMIME_ERROR_PARSE_ERROR, "%s",
-		    _
-		    ("Cannot verify multipart/signed part due to missing subparts."));
-	return NULL;
+        g_set_error(error, GMIME_ERROR, GMIME_ERROR_PARSE_ERROR, "%s",
+                    _
+                        ("Cannot verify multipart/signed part due to missing subparts."));
+        return NULL;
     }
 
     /* grab the protocol so we can configure the GpgME context */
     protocol =
-	g_mime_object_get_content_type_parameter(GMIME_OBJECT(mps),
-						 "protocol");
+        g_mime_object_get_content_type_parameter(GMIME_OBJECT(mps),
+                                                 "protocol");
     if (protocol) {
-	if (g_ascii_strcasecmp("application/pgp-signature", protocol) == 0)
-	    crypto_prot = GPGME_PROTOCOL_OpenPGP;
-	else if (g_ascii_strcasecmp
-		 ("application/pkcs7-signature", protocol) == 0
-		 || g_ascii_strcasecmp("application/x-pkcs7-signature",
-				       protocol) == 0)
-	    crypto_prot = GPGME_PROTOCOL_CMS;
-	else
-	    crypto_prot = GPGME_PROTOCOL_UNKNOWN;
-    } else
-	crypto_prot = GPGME_PROTOCOL_UNKNOWN;
+        if (g_ascii_strcasecmp("application/pgp-signature", protocol) == 0) {
+            crypto_prot = GPGME_PROTOCOL_OpenPGP;
+        } else if ((g_ascii_strcasecmp
+                        ("application/pkcs7-signature", protocol) == 0)
+                   || (g_ascii_strcasecmp("application/x-pkcs7-signature",
+                                          protocol) == 0)) {
+            crypto_prot = GPGME_PROTOCOL_CMS;
+        } else {
+            crypto_prot = GPGME_PROTOCOL_UNKNOWN;
+        }
+    } else {
+        crypto_prot = GPGME_PROTOCOL_UNKNOWN;
+    }
 
     /* eject on unknown protocols */
     if (crypto_prot == GPGME_PROTOCOL_UNKNOWN) {
-	g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_VALUE,
-		    _("unsupported protocol “%s”"), protocol);
-	return NULL;
+        g_set_error(error, GPGME_ERROR_QUARK, GPG_ERR_INV_VALUE,
+                    _("unsupported protocol “%s”"), protocol);
+        return NULL;
     }
 
     signature =
-	g_mime_multipart_get_part(GMIME_MULTIPART(mps),
-				  GMIME_MULTIPART_SIGNED_SIGNATURE);
+        g_mime_multipart_get_part(GMIME_MULTIPART(mps),
+                                  GMIME_MULTIPART_SIGNED_SIGNATURE);
 
     /* make sure the protocol matches the signature content-type */
     content_type = g_mime_content_type_to_string(signature->content_type);
     if (g_ascii_strcasecmp(content_type, protocol) != 0) {
-	g_set_error(error, GMIME_ERROR, GMIME_ERROR_PARSE_ERROR, "%s",
-		    _
-		    ("Cannot verify multipart/signed part: signature content-type does not match protocol."));
-	g_free(content_type);
-	return NULL;
+        g_set_error(error, GMIME_ERROR, GMIME_ERROR_PARSE_ERROR, "%s",
+                    _
+                    (
+                        "Cannot verify multipart/signed part: signature content-type does not match protocol."));
+        g_free(content_type);
+        return NULL;
     }
     g_free(content_type);
 
     content =
-	g_mime_multipart_get_part(GMIME_MULTIPART(mps),
-				  GMIME_MULTIPART_SIGNED_CONTENT);
+        g_mime_multipart_get_part(GMIME_MULTIPART(mps),
+                                  GMIME_MULTIPART_SIGNED_CONTENT);
 
     /* get the content stream */
     stream = g_mime_stream_mem_new();
@@ -279,7 +289,7 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
     /* Note: see rfc2015 or rfc3156, section 5.1 */
     crlf_filter = g_mime_filter_crlf_new(TRUE, FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
-			     crlf_filter);
+                             crlf_filter);
     g_object_unref(crlf_filter);
 
     g_mime_object_write_to_stream(content, filtered_stream);
@@ -292,14 +302,14 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
 
     /* a s/mime signature is always encoded, a pgp signature shouldn't,
      * but there exist implementations which encode it... */
-	sigstream = g_mime_stream_mem_new();
-	g_mime_data_wrapper_write_to_stream(wrapper, sigstream);
+    sigstream = g_mime_stream_mem_new();
+    g_mime_data_wrapper_write_to_stream(wrapper, sigstream);
     g_mime_stream_reset(sigstream);
 
     /* verify the signature */
     result =
-	libbalsa_gpgme_verify(stream, sigstream, crypto_prot, FALSE,
-			      error);
+        libbalsa_gpgme_verify(stream, sigstream, crypto_prot, FALSE,
+                              error);
     g_object_unref(stream);
     g_object_unref(sigstream);
 
@@ -308,10 +318,12 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
 
 
 gboolean
-g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
-			 GMimeObject * content, GPtrArray * recipients,
-			 gboolean trust_all, GtkWindow * parent,
-			 GError ** err)
+g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted *mpe,
+                         GMimeObject             *content,
+                         GPtrArray               *recipients,
+                         gboolean                 trust_all,
+                         GtkWindow               *parent,
+                         GError                 **err)
 {
     GMimeStream *filtered_stream;
     GMimeStream *ciphertext;
@@ -330,7 +342,7 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
 
     crlf_filter = g_mime_filter_crlf_new(TRUE, FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
-			     crlf_filter);
+                             crlf_filter);
     g_object_unref(crlf_filter);
 
     g_mime_object_write_to_stream(content, filtered_stream);
@@ -343,11 +355,11 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
     /* encrypt the content stream */
     ciphertext = g_mime_stream_mem_new();
     if (!libbalsa_gpgme_encrypt
-	(recipients, NULL, stream, ciphertext, GPGME_PROTOCOL_OpenPGP,
-	 FALSE, trust_all, parent, err)) {
-	g_object_unref(ciphertext);
-	g_object_unref(stream);
-	return FALSE;
+            (recipients, NULL, stream, ciphertext, GPGME_PROTOCOL_OpenPGP,
+            FALSE, trust_all, parent, err)) {
+        g_object_unref(ciphertext);
+        g_object_unref(stream);
+        return FALSE;
     }
 
     g_object_unref(stream);
@@ -355,27 +367,27 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
 
     /* construct the version part */
     version_part =
-	g_mime_part_new_with_type("application", "pgp-encrypted");
+        g_mime_part_new_with_type("application", "pgp-encrypted");
     g_mime_part_set_content_encoding(version_part,
-				     GMIME_CONTENT_ENCODING_7BIT);
+                                     GMIME_CONTENT_ENCODING_7BIT);
     stream =
-	g_mime_stream_mem_new_with_buffer("Version: 1\n",
-					  strlen("Version: 1\n"));
+        g_mime_stream_mem_new_with_buffer("Version: 1\n",
+                                          strlen("Version: 1\n"));
     wrapper =
-	g_mime_data_wrapper_new_with_stream(stream,
-					    GMIME_CONTENT_ENCODING_7BIT);
+        g_mime_data_wrapper_new_with_stream(stream,
+                                            GMIME_CONTENT_ENCODING_7BIT);
     g_mime_part_set_content_object(version_part, wrapper);
     g_object_unref(wrapper);
     g_object_unref(stream);
 
     /* construct the encrypted mime part */
     encrypted_part =
-	g_mime_part_new_with_type("application", "octet-stream");
+        g_mime_part_new_with_type("application", "octet-stream");
     g_mime_part_set_content_encoding(encrypted_part,
-				     GMIME_CONTENT_ENCODING_7BIT);
+                                     GMIME_CONTENT_ENCODING_7BIT);
     wrapper =
-	g_mime_data_wrapper_new_with_stream(ciphertext,
-					    GMIME_CONTENT_ENCODING_7BIT);
+        g_mime_data_wrapper_new_with_stream(ciphertext,
+                                            GMIME_CONTENT_ENCODING_7BIT);
     g_mime_part_set_content_object(encrypted_part, wrapper);
     g_object_unref(ciphertext);
     g_object_unref(wrapper);
@@ -384,13 +396,13 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
     /* FIXME: make sure there aren't any other parts?? */
     g_mime_multipart_add(GMIME_MULTIPART(mpe), GMIME_OBJECT(version_part));
     g_mime_multipart_add(GMIME_MULTIPART(mpe),
-			 GMIME_OBJECT(encrypted_part));
+                         GMIME_OBJECT(encrypted_part));
     g_object_unref(encrypted_part);
     g_object_unref(version_part);
 
     /* set the content-type params for this multipart/encrypted part */
     g_mime_object_set_content_type_parameter(GMIME_OBJECT(mpe), "protocol",
-					     "application/pgp-encrypted");
+                                             "application/pgp-encrypted");
     g_mime_multipart_set_boundary(GMIME_MULTIPART(mpe), NULL);
 
     return TRUE;
@@ -398,7 +410,7 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
 
 
 static GMimeStream *
-g_mime_data_wrapper_get_decoded_stream(GMimeDataWrapper * wrapper)
+g_mime_data_wrapper_get_decoded_stream(GMimeDataWrapper *wrapper)
 {
     GMimeStream *decoded_stream;
     GMimeFilter *decoder;
@@ -409,16 +421,17 @@ g_mime_data_wrapper_get_decoded_stream(GMimeDataWrapper * wrapper)
     case GMIME_CONTENT_ENCODING_BASE64:
     case GMIME_CONTENT_ENCODING_QUOTEDPRINTABLE:
     case GMIME_CONTENT_ENCODING_UUENCODE:
-	decoder = g_mime_filter_basic_new(wrapper->encoding, FALSE);
-	decoded_stream = g_mime_stream_filter_new(wrapper->stream);
-	g_mime_stream_filter_add(GMIME_STREAM_FILTER(decoded_stream),
-				 decoder);
-	g_object_unref(decoder);
-	break;
+        decoder = g_mime_filter_basic_new(wrapper->encoding, FALSE);
+        decoded_stream = g_mime_stream_filter_new(wrapper->stream);
+        g_mime_stream_filter_add(GMIME_STREAM_FILTER(decoded_stream),
+                                 decoder);
+        g_object_unref(decoder);
+        break;
+
     default:
-	decoded_stream = wrapper->stream;
-	g_object_ref(wrapper->stream);
-	break;
+        decoded_stream = wrapper->stream;
+        g_object_ref(wrapper->stream);
+        break;
     }
 
     return decoded_stream;
@@ -426,9 +439,10 @@ g_mime_data_wrapper_get_decoded_stream(GMimeDataWrapper * wrapper)
 
 
 GMimeObject *
-g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
-			 GMimeGpgmeSigstat ** signature,
-			 GtkWindow * parent, GError ** err)
+g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted *mpe,
+                         GMimeGpgmeSigstat      **signature,
+                         GtkWindow               *parent,
+                         GError                 **err)
 {
     GMimeObject *decrypted, *version, *encrypted;
     GMimeStream *stream, *ciphertext;
@@ -444,51 +458,53 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
     g_return_val_if_fail(GMIME_IS_MULTIPART_ENCRYPTED(mpe), NULL);
 
     if (signature && *signature) {
-	g_object_unref(G_OBJECT(*signature));
-	*signature = NULL;
+        g_object_unref(G_OBJECT(*signature));
+        *signature = NULL;
     }
 
     protocol =
-	g_mime_object_get_content_type_parameter(GMIME_OBJECT(mpe),
-						 "protocol");
+        g_mime_object_get_content_type_parameter(GMIME_OBJECT(mpe),
+                                                 "protocol");
 
     /* make sure the protocol is present and matches the cipher encrypt protocol */
     if (!protocol
-	|| g_ascii_strcasecmp("application/pgp-encrypted",
-			      protocol) != 0) {
-	g_set_error(err, GMIME_ERROR, GMIME_ERROR_PROTOCOL_ERROR,
-		    _
-		    ("Cannot decrypt multipart/encrypted part: unsupported encryption protocol “%s”."),
-		    protocol ? protocol : _("(none)"));
-	return NULL;
+        || (g_ascii_strcasecmp("application/pgp-encrypted",
+                               protocol) != 0)) {
+        g_set_error(err, GMIME_ERROR, GMIME_ERROR_PROTOCOL_ERROR,
+                    _
+                    (
+                        "Cannot decrypt multipart/encrypted part: unsupported encryption protocol “%s”."),
+                    protocol ? protocol : _("(none)"));
+        return NULL;
     }
 
     version =
-	g_mime_multipart_get_part(GMIME_MULTIPART(mpe),
-				  GMIME_MULTIPART_ENCRYPTED_VERSION);
+        g_mime_multipart_get_part(GMIME_MULTIPART(mpe),
+                                  GMIME_MULTIPART_ENCRYPTED_VERSION);
 
     /* make sure the protocol matches the version part's content-type */
     content_type = g_mime_content_type_to_string(version->content_type);
     if (g_ascii_strcasecmp(content_type, protocol) != 0) {
-	g_set_error(err, GMIME_ERROR, GMIME_ERROR_PROTOCOL_ERROR, "%s",
-		    _
-		    ("Cannot decrypt multipart/encrypted part: content-type does not match protocol."));
-	g_free(content_type);
-	return NULL;
+        g_set_error(err, GMIME_ERROR, GMIME_ERROR_PROTOCOL_ERROR, "%s",
+                    _
+                    (
+                        "Cannot decrypt multipart/encrypted part: content-type does not match protocol."));
+        g_free(content_type);
+        return NULL;
     }
     g_free(content_type);
 
     /* get the encrypted part and check that it is of type application/octet-stream */
     encrypted =
-	g_mime_multipart_get_part(GMIME_MULTIPART(mpe),
-				  GMIME_MULTIPART_ENCRYPTED_CONTENT);
+        g_mime_multipart_get_part(GMIME_MULTIPART(mpe),
+                                  GMIME_MULTIPART_ENCRYPTED_CONTENT);
     mime_type = g_mime_object_get_content_type(encrypted);
     if (!g_mime_content_type_is_type
-	(mime_type, "application", "octet-stream")) {
-	g_set_error(err, GMIME_ERROR, GMIME_ERROR_PROTOCOL_ERROR, "%s",
-		    _
-		    ("Cannot decrypt multipart/encrypted part: unexpected content type"));
-	return NULL;
+            (mime_type, "application", "octet-stream")) {
+        g_set_error(err, GMIME_ERROR, GMIME_ERROR_PROTOCOL_ERROR, "%s",
+                    _
+                        ("Cannot decrypt multipart/encrypted part: unexpected content type"));
+        return NULL;
     }
 
     /* get the ciphertext stream */
@@ -500,18 +516,18 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
     filtered_stream = g_mime_stream_filter_new(stream);
     crlf_filter = g_mime_filter_crlf_new(FALSE, FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
-			     crlf_filter);
+                             crlf_filter);
     g_object_unref(crlf_filter);
 
     /* get the cleartext */
     sigstat =
-	libbalsa_gpgme_decrypt(ciphertext, filtered_stream,
-			       GPGME_PROTOCOL_OpenPGP, parent, err);
+        libbalsa_gpgme_decrypt(ciphertext, filtered_stream,
+                               GPGME_PROTOCOL_OpenPGP, parent, err);
     if (!sigstat) {
-	g_object_unref(filtered_stream);
-	g_object_unref(ciphertext);
-	g_object_unref(stream);
-	return NULL;
+        g_object_unref(filtered_stream);
+        g_object_unref(ciphertext);
+        g_object_unref(stream);
+        return NULL;
     }
 
     g_mime_stream_flush(filtered_stream);
@@ -527,20 +543,22 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
     g_object_unref(parser);
 
     if (!decrypted) {
-	g_set_error(err, GMIME_ERROR, GMIME_ERROR_PARSE_ERROR, "%s",
-		    _
-		    ("Cannot decrypt multipart/encrypted part: failed to parse decrypted content"));
-	g_object_unref(G_OBJECT(sigstat));
-	return NULL;
+        g_set_error(err, GMIME_ERROR, GMIME_ERROR_PARSE_ERROR, "%s",
+                    _
+                    (
+                        "Cannot decrypt multipart/encrypted part: failed to parse decrypted content"));
+        g_object_unref(G_OBJECT(sigstat));
+        return NULL;
     }
 
 
     /* cache the decrypted part */
     if (signature) {
-	if (sigstat->status != GPG_ERR_NOT_SIGNED)
-	    *signature = sigstat;
-	else
-	    g_object_unref(G_OBJECT(sigstat));
+        if (sigstat->status != GPG_ERR_NOT_SIGNED) {
+            *signature = sigstat;
+        } else {
+            g_object_unref(G_OBJECT(sigstat));
+        }
     }
 
     return decrypted;

@@ -6,27 +6,27 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 /*
  * LibBalsaAddressBookText
- * 
+ *
  * The code that is common to vCard (== GnomeCard) and LDIF address
  * books ...
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "address-book-text.h"
 
@@ -44,39 +44,29 @@
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
 
-static void
-libbalsa_address_book_text_class_init(LibBalsaAddressBookTextClass *
-                                      klass);
-static void
-libbalsa_address_book_text_init(LibBalsaAddressBookText * ab_text);
-static void
-libbalsa_address_book_text_finalize(GObject * object);
+static void libbalsa_address_book_text_class_init(LibBalsaAddressBookTextClass *
+                                                  klass);
+static void libbalsa_address_book_text_init(LibBalsaAddressBookText *ab_text);
+static void libbalsa_address_book_text_finalize(GObject *object);
 
-static LibBalsaABErr
-libbalsa_address_book_text_load(LibBalsaAddressBook * ab,
-                                const gchar * filter,
-                                LibBalsaAddressBookLoadFunc callback,
-                                gpointer data);
-static LibBalsaABErr
-libbalsa_address_book_text_add_address(LibBalsaAddressBook * ab,
-                                       LibBalsaAddress * address);
-static LibBalsaABErr
-libbalsa_address_book_text_remove_address(LibBalsaAddressBook * ab,
-                                          LibBalsaAddress * address);
-static LibBalsaABErr
-libbalsa_address_book_text_modify_address(LibBalsaAddressBook * ab,
-                                          LibBalsaAddress * address,
-                                          LibBalsaAddress * newval);
+static LibBalsaABErr libbalsa_address_book_text_load(LibBalsaAddressBook        *ab,
+                                                     const gchar                *filter,
+                                                     LibBalsaAddressBookLoadFunc callback,
+                                                     gpointer                    data);
+static LibBalsaABErr libbalsa_address_book_text_add_address(LibBalsaAddressBook *ab,
+                                                            LibBalsaAddress     *address);
+static LibBalsaABErr libbalsa_address_book_text_remove_address(LibBalsaAddressBook *ab,
+                                                               LibBalsaAddress     *address);
+static LibBalsaABErr libbalsa_address_book_text_modify_address(LibBalsaAddressBook *ab,
+                                                               LibBalsaAddress     *address,
+                                                               LibBalsaAddress     *newval);
 
-static void
-libbalsa_address_book_text_save_config(LibBalsaAddressBook * ab,
-                                        const gchar * prefix);
-static void
-libbalsa_address_book_text_load_config(LibBalsaAddressBook * ab,
-                                       const gchar * prefix);
-static GList *
-libbalsa_address_book_text_alias_complete(LibBalsaAddressBook * ab,
-                                          const gchar * prefix);
+static void libbalsa_address_book_text_save_config(LibBalsaAddressBook *ab,
+                                                   const gchar         *prefix);
+static void libbalsa_address_book_text_load_config(LibBalsaAddressBook *ab,
+                                                   const gchar         *prefix);
+static GList *libbalsa_address_book_text_alias_complete(LibBalsaAddressBook *ab,
+                                                        const gchar         *prefix);
 
 /* GObject class stuff */
 
@@ -91,10 +81,10 @@ typedef struct {
 } LibBalsaAddressBookTextPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE(LibBalsaAddressBookText, libbalsa_address_book_text,
-        LIBBALSA_TYPE_ADDRESS_BOOK)
+                           LIBBALSA_TYPE_ADDRESS_BOOK)
 
 static void
-libbalsa_address_book_text_class_init(LibBalsaAddressBookTextClass * klass)
+libbalsa_address_book_text_class_init(LibBalsaAddressBookTextClass *klass)
 {
     LibBalsaAddressBookClass *address_book_class;
     GObjectClass *object_class;
@@ -121,8 +111,9 @@ libbalsa_address_book_text_class_init(LibBalsaAddressBookTextClass * klass)
         libbalsa_address_book_text_alias_complete;
 }
 
+
 static void
-libbalsa_address_book_text_init(LibBalsaAddressBookText * ab_text)
+libbalsa_address_book_text_init(LibBalsaAddressBookText *ab_text)
 {
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);
@@ -136,6 +127,7 @@ libbalsa_address_book_text_init(LibBalsaAddressBookText * ab_text)
                                 completion_data_extract);
     libbalsa_completion_set_compare(priv->name_complete, strncmp_word);
 }
+
 
 typedef struct {
     long begin;
@@ -152,16 +144,19 @@ lbab_text_item_new(void)
     return item;
 }
 
+
 static void
-lbab_text_item_free(LibBalsaAddressBookTextItem * item)
+lbab_text_item_free(LibBalsaAddressBookTextItem *item)
 {
-    if (item->address)
+    if (item->address) {
         g_object_unref(item->address);
+    }
     g_free(item);
 }
 
+
 static void
-libbalsa_address_book_text_finalize(GObject * object)
+libbalsa_address_book_text_finalize(GObject *object)
 {
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(object);
     LibBalsaAddressBookTextPrivate *priv =
@@ -174,18 +169,20 @@ libbalsa_address_book_text_finalize(GObject * object)
     G_OBJECT_CLASS(libbalsa_address_book_text_parent_class)->finalize(object);
 }
 
+
 /* Load helpers */
 
 /* returns true if the book has changed or there is an error */
 static gboolean
-lbab_text_address_book_need_reload(LibBalsaAddressBookText * ab_text)
+lbab_text_address_book_need_reload(LibBalsaAddressBookText *ab_text)
 {
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);
     struct stat stat_buf;
 
-    if (stat(priv->path, &stat_buf) == -1)
+    if (stat(priv->path, &stat_buf) == -1) {
         return TRUE;
+    }
 
     if (stat_buf.st_mtime > priv->mtime) {
         priv->mtime = stat_buf.st_mtime;
@@ -195,12 +192,15 @@ lbab_text_address_book_need_reload(LibBalsaAddressBookText * ab_text)
     return FALSE;
 }
 
+
 /* Case-insensitive utf-8 string-has-prefix */
 static gboolean
-lbab_text_starts_from(const gchar * str, const gchar * filter_hi)
+lbab_text_starts_from(const gchar *str,
+                      const gchar *filter_hi)
 {
-    if (!str)
+    if (!str) {
         return FALSE;
+    }
 
     while (*str && *filter_hi &&
            g_unichar_toupper(g_utf8_get_char(str)) ==
@@ -212,21 +212,23 @@ lbab_text_starts_from(const gchar * str, const gchar * filter_hi)
     return *filter_hi == '\0';
 }
 
+
 /* To create distribution lists based on the ORG field:
  * #define MAKE_GROUP_BY_ORGANIZATION TRUE
  */
 #if MAKE_GROUP_BY_ORGANIZATION
 static void
-lbab_text_group_address(const gchar * group_name,
-                        GSList * lbab_text_group_addresses,
-                        GList ** completion_list)
+lbab_text_group_address(const gchar *group_name,
+                        GSList      *lbab_text_group_addresses,
+                        GList      **completion_list)
 {
     GSList *l;
     CompletionData *cmp_data;
     InternetAddress *ia;
 
-    if (!lbab_text_group_addresses || !lbab_text_group_addresses->next)
+    if (!lbab_text_group_addresses || !lbab_text_group_addresses->next) {
         return;
+    }
 
     ia = internet_address_group_new(group_name);
     for (l = lbab_text_group_addresses; l; l = l->next) {
@@ -237,7 +239,7 @@ lbab_text_group_address(const gchar * group_name,
              mailbox = mailbox->next) {
             InternetAddress *member =
                 internet_address_mailbox_new(libbalsa_address_get_full_name(address),
-					     mailbox->data);
+                                             mailbox->data);
             internet_address_group_add_member((InternetAddressGroup *)ia, member);
             g_object_unref(member);
         }
@@ -248,36 +250,42 @@ lbab_text_group_address(const gchar * group_name,
     g_object_unref(ia);
     *completion_list = g_list_prepend(*completion_list, cmp_data);
 }
+
+
 #endif                          /* MAKE_GROUP_BY_ORGANIZATION */
 
 /* GCompareFunc for LibBalsaAddressBookTextItem */
 static gint
-lbab_text_item_compare(LibBalsaAddressBookTextItem * a,
-                       LibBalsaAddressBookTextItem * b)
+lbab_text_item_compare(LibBalsaAddressBookTextItem *a,
+                       LibBalsaAddressBookTextItem *b)
 {
     g_return_val_if_fail(a != NULL, -1);
     g_return_val_if_fail(b != NULL, 1);
 
-    if (a->address == NULL)
+    if (a->address == NULL) {
         return -1;
-    if (b->address == NULL)
+    }
+    if (b->address == NULL) {
         return 1;
+    }
 
     return g_ascii_strcasecmp(libbalsa_address_get_full_name(a->address),
                               libbalsa_address_get_full_name(b->address));
 }
 
+
 /* Load the book from the stream */
 static gboolean
-lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
+lbab_text_load_file(LibBalsaAddressBookText *ab_text,
+                    FILE                    *stream)
 {
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);
     LibBalsaAddressBook *ab = ( LibBalsaAddressBook *) ab_text;
-    LibBalsaABErr(*parse_address) (FILE * stream_in,
-                                   LibBalsaAddress * address,
-                                   FILE * stream_out,
-                                   LibBalsaAddress * newval);
+    LibBalsaABErr (*parse_address) (FILE            *stream_in,
+                                    LibBalsaAddress *address,
+                                    FILE            *stream_out,
+                                    LibBalsaAddress *newval);
     GSList *list = NULL;
     GList *completion_list = NULL;
     CompletionData *cmp_data;
@@ -285,8 +293,9 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
     GHashTable *group_table;
 #endif                          /* MAKE_GROUP_BY_ORGANIZATION */
 
-    if (!lbab_text_address_book_need_reload(ab_text))
+    if (!lbab_text_address_book_need_reload(ab_text)) {
         return TRUE;
+    }
 
     libbalsa_clear_slist(&priv->item_list, (GDestroyNotify) lbab_text_item_free);
     libbalsa_completion_clear_items(priv->name_complete);
@@ -306,8 +315,9 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
         list = g_slist_prepend(list, item);
     }
 
-    if (!list)
+    if (!list) {
         return TRUE;
+    }
 
     priv->item_list =
         g_slist_sort(list, (GCompareFunc) lbab_text_item_compare);
@@ -325,12 +335,13 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
 #endif                          /* MAKE_GROUP_BY_ORGANIZATION */
         GList *addr_list;
 
-        if (!address)
+        if (!address) {
             continue;
+        }
 
         addr_list = libbalsa_address_get_addr_list(address);
-	if (libbalsa_address_book_get_dist_list_mode(ab)
-            && addr_list != NULL && addr_list->next != NULL) {
+        if (libbalsa_address_book_get_dist_list_mode(ab)
+            && (addr_list != NULL) && (addr_list->next != NULL)) {
             /* Create a group address. */
             InternetAddress *ia =
                 internet_address_group_new(libbalsa_address_get_full_name(address));
@@ -362,8 +373,9 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
         }
 
 #if MAKE_GROUP_BY_ORGANIZATION
-        if (!address->organization || !*address->organization)
+        if (!address->organization || !*address->organization) {
             continue;
+        }
         groups = g_strsplit(address->organization, ";", 0);
         for (group = groups; *group; group++) {
             gchar *group_name;
@@ -396,19 +408,24 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
     return TRUE;
 }
 
+
 /* Lock and unlock an address book file */
 static gboolean
-lbab_text_lock_book(LibBalsaAddressBookText * ab_text, FILE * stream,
-                    gboolean exclusive)
+lbab_text_lock_book(LibBalsaAddressBookText *ab_text,
+                    FILE                    *stream,
+                    gboolean                 exclusive)
 {
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);
 
     return (libbalsa_lock_file
-            (priv->path, fileno(stream), exclusive, TRUE, TRUE) >= 0);
+                (priv->path, fileno(stream), exclusive, TRUE, TRUE) >= 0);
 }
+
+
 static void
-lbab_text_unlock_book(LibBalsaAddressBookText * ab_text, FILE * stream)
+lbab_text_unlock_book(LibBalsaAddressBookText *ab_text,
+                      FILE                    *stream)
 {
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);
@@ -416,12 +433,14 @@ lbab_text_unlock_book(LibBalsaAddressBookText * ab_text, FILE * stream)
     libbalsa_unlock_file(priv->path, fileno(stream), TRUE);
 }
 
+
 /* Modify helpers */
 
 /* Create a temporary file for the modified book */
 static LibBalsaABErr
-lbab_text_open_temp(LibBalsaAddressBookText * ab_text, gchar ** path,
-                    FILE ** stream)
+lbab_text_open_temp(LibBalsaAddressBookText *ab_text,
+                    gchar                  **path,
+                    FILE                   **stream)
 {
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);
@@ -440,15 +459,17 @@ lbab_text_open_temp(LibBalsaAddressBookText * ab_text, gchar ** path,
     return LBABERR_OK;
 }
 
+
 /* Rename the temporary file as the real book */
 static LibBalsaABErr
-lbab_text_close_temp(LibBalsaAddressBookText * ab_text, const gchar * path)
+lbab_text_close_temp(LibBalsaAddressBookText *ab_text,
+                     const gchar             *path)
 {
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);
 
-    if (unlink(priv->path) < 0
-        && g_file_error_from_errno(errno) != G_FILE_ERROR_NOENT) {
+    if ((unlink(priv->path) < 0)
+        && (g_file_error_from_errno(errno) != G_FILE_ERROR_NOENT)) {
 #if DEBUG
         g_message("Failed to unlink address book file “%s”\n"
                   " new address book file saved as “%s”", priv->path,
@@ -469,10 +490,13 @@ lbab_text_close_temp(LibBalsaAddressBookText * ab_text, const gchar * path)
     return LBABERR_OK;
 }
 
+
 /* Copy part of one stream to another */
 static LibBalsaABErr
-lbab_text_copy_stream(FILE * stream_in, long begin, long end,
-                      FILE * stream_out)
+lbab_text_copy_stream(FILE *stream_in,
+                      long  begin,
+                      long  end,
+                      FILE *stream_out)
 {
     gint count;
     size_t len;
@@ -487,23 +511,26 @@ lbab_text_copy_stream(FILE * stream_in, long begin, long end,
         gchar buf[4096];
 
         len = MIN(sizeof buf, (size_t) count);
-        if (fread(buf, 1, len, stream_in) < len)
+        if (fread(buf, 1, len, stream_in) < len) {
             return LBABERR_CANNOT_READ;
-        if (fwrite(buf, 1, len, stream_out) < len)
+        }
+        if (fwrite(buf, 1, len, stream_out) < len) {
             return LBABERR_CANNOT_WRITE;
+        }
     }
 
     return LBABERR_OK;
 }
 
+
 /* Class methods */
 
 /* Load method */
 static LibBalsaABErr
-libbalsa_address_book_text_load(LibBalsaAddressBook * ab,
-                                const gchar * filter,
+libbalsa_address_book_text_load(LibBalsaAddressBook        *ab,
+                                const gchar                *filter,
                                 LibBalsaAddressBookLoadFunc callback,
-                                gpointer data)
+                                gpointer                    data)
 {
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
     LibBalsaAddressBookTextPrivate *priv =
@@ -514,8 +541,9 @@ libbalsa_address_book_text_load(LibBalsaAddressBook * ab,
     gchar *filter_hi = NULL;
 
     stream = fopen(priv->path, "r");
-    if (!stream)
+    if (!stream) {
         return LBABERR_CANNOT_READ;
+    }
 
     ok = lbab_text_lock_book(ab_text, stream, FALSE);
     if (ok) {
@@ -523,41 +551,47 @@ libbalsa_address_book_text_load(LibBalsaAddressBook * ab,
         lbab_text_unlock_book(ab_text, stream);
     }
     fclose(stream);
-    if (!ok)
+    if (!ok) {
         return LBABERR_CANNOT_READ;
+    }
 
-    if (filter)
+    if (filter) {
         filter_hi = g_utf8_strup(filter, -1);
+    }
 
     for (list = priv->item_list; list; list = list->next) {
         LibBalsaAddressBookTextItem *item = list->data;
         LibBalsaAddress *address = item->address;
 
-        if (!address)
+        if (!address) {
             continue;
+        }
 
         if (callback
             && (!filter_hi
                 ||
                 lbab_text_starts_from(libbalsa_address_get_last_name
-                                      (address), filter_hi)
+                                          (address), filter_hi)
                 ||
                 lbab_text_starts_from(libbalsa_address_get_full_name
-                                      (address), filter_hi)))
+                                          (address), filter_hi))) {
             callback(ab, address, data);
+        }
     }
-    if (callback)
+    if (callback) {
         callback(ab, NULL, data);
+    }
 
     g_free(filter_hi);
 
     return LBABERR_OK;
 }
 
+
 /* Add address method */
 static LibBalsaABErr
-libbalsa_address_book_text_add_address(LibBalsaAddressBook * ab,
-                                       LibBalsaAddress * new_address)
+libbalsa_address_book_text_add_address(LibBalsaAddressBook *ab,
+                                       LibBalsaAddress     *new_address)
 {
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
     LibBalsaAddressBookTextPrivate *priv =
@@ -567,8 +601,9 @@ libbalsa_address_book_text_add_address(LibBalsaAddressBook * ab,
     LibBalsaABErr res = LBABERR_OK;
 
     stream = fopen(priv->path, "a+");
-    if (stream == NULL)
+    if (stream == NULL) {
         return LBABERR_CANNOT_WRITE;
+    }
 
     if (!lbab_text_lock_book(ab_text, stream, TRUE)) {
         fclose(stream);
@@ -581,11 +616,12 @@ libbalsa_address_book_text_add_address(LibBalsaAddressBook * ab,
 
     new_item.address = new_address;
     if (g_slist_find_custom(priv->item_list, &new_item,
-                            (GCompareFunc) lbab_text_item_compare))
+                            (GCompareFunc) lbab_text_item_compare)) {
         return LBABERR_DUPLICATE;
+    }
 
     res = LIBBALSA_ADDRESS_BOOK_TEXT_GET_CLASS(ab_text)->save_address
-        (stream, new_address);
+            (stream, new_address);
 
     lbab_text_unlock_book(ab_text, stream);
     fclose(stream);
@@ -596,19 +632,21 @@ libbalsa_address_book_text_add_address(LibBalsaAddressBook * ab,
     return res;
 }
 
+
 /* Remove address method */
 static LibBalsaABErr
-libbalsa_address_book_text_remove_address(LibBalsaAddressBook * ab,
-                                          LibBalsaAddress * address)
+libbalsa_address_book_text_remove_address(LibBalsaAddressBook *ab,
+                                          LibBalsaAddress     *address)
 {
     return libbalsa_address_book_text_modify_address(ab, address, NULL);
 }
 
+
 /* Modify address method */
 static LibBalsaABErr
-libbalsa_address_book_text_modify_address(LibBalsaAddressBook * ab,
-                                          LibBalsaAddress * address,
-                                          LibBalsaAddress * newval)
+libbalsa_address_book_text_modify_address(LibBalsaAddressBook *ab,
+                                          LibBalsaAddress     *address,
+                                          LibBalsaAddress     *newval)
 {
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
     LibBalsaAddressBookTextPrivate *priv =
@@ -621,8 +659,9 @@ libbalsa_address_book_text_modify_address(LibBalsaAddressBook * ab,
     gchar *path = NULL;
     FILE *stream_out = NULL;
 
-    if ((stream_in = fopen(priv->path, "r")) == NULL)
+    if ((stream_in = fopen(priv->path, "r")) == NULL) {
         return LBABERR_CANNOT_READ;
+    }
 
     if (!lbab_text_lock_book(ab_text, stream_in, FALSE)) {
         fclose(stream_in);
@@ -643,28 +682,34 @@ libbalsa_address_book_text_modify_address(LibBalsaAddressBook * ab,
 
     res = lbab_text_open_temp(ab_text, &path, &stream_out);
 
-    if (res == LBABERR_OK)
+    if (res == LBABERR_OK) {
         res = lbab_text_copy_stream(stream_in, 0, item->begin, stream_out);
+    }
 
-    if (res == LBABERR_OK && newval)
+    if ((res == LBABERR_OK) && newval) {
         res = LIBBALSA_ADDRESS_BOOK_TEXT_GET_CLASS(ab)->parse_address
-            (stream_in, NULL, stream_out, newval);
+                (stream_in, NULL, stream_out, newval);
+    }
 
-    if (res == LBABERR_OK)
+    if (res == LBABERR_OK) {
         res = lbab_text_copy_stream(stream_in, item->end, -1, stream_out);
+    }
 
     lbab_text_unlock_book(ab_text, stream_in);
     fclose(stream_in);
 
-    if (stream_out)
+    if (stream_out) {
         fclose(stream_out);
+    }
 
-    if (res == LBABERR_OK)
+    if (res == LBABERR_OK) {
         res = lbab_text_close_temp(ab_text, path);
+    }
 #if DEBUG
-    else
+    else {
         g_message("Failed to write to temporary address book file “%s”\n"
                   " changes not saved", path);
+    }
 #endif                          /* DEBUG */
     g_free(path);
 
@@ -674,10 +719,11 @@ libbalsa_address_book_text_modify_address(LibBalsaAddressBook * ab,
     return res;
 }
 
+
 /* Save config method */
 static void
-libbalsa_address_book_text_save_config(LibBalsaAddressBook * ab,
-                                       const gchar * prefix)
+libbalsa_address_book_text_save_config(LibBalsaAddressBook *ab,
+                                       const gchar         *prefix)
 {
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
     LibBalsaAddressBookTextPrivate *priv =
@@ -685,13 +731,15 @@ libbalsa_address_book_text_save_config(LibBalsaAddressBook * ab,
 
     libbalsa_conf_set_string("Path", priv->path);
 
-    LIBBALSA_ADDRESS_BOOK_CLASS(libbalsa_address_book_text_parent_class)->save_config(ab, prefix);
+    LIBBALSA_ADDRESS_BOOK_CLASS(libbalsa_address_book_text_parent_class)->save_config(ab,
+                                                                                      prefix);
 }
+
 
 /* Load config method */
 static void
-libbalsa_address_book_text_load_config(LibBalsaAddressBook * ab,
-                                       const gchar * prefix)
+libbalsa_address_book_text_load_config(LibBalsaAddressBook *ab,
+                                       const gchar         *prefix)
 {
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
     LibBalsaAddressBookTextPrivate *priv =
@@ -700,13 +748,15 @@ libbalsa_address_book_text_load_config(LibBalsaAddressBook * ab,
     g_free(priv->path);
     priv->path = libbalsa_conf_get_string("Path");
 
-    LIBBALSA_ADDRESS_BOOK_CLASS(libbalsa_address_book_text_parent_class)->load_config(ab, prefix);
+    LIBBALSA_ADDRESS_BOOK_CLASS(libbalsa_address_book_text_parent_class)->load_config(ab,
+                                                                                      prefix);
 }
+
 
 /* Alias complete method */
 static GList *
-libbalsa_address_book_text_alias_complete(LibBalsaAddressBook * ab,
-                                          const gchar * prefix)
+libbalsa_address_book_text_alias_complete(LibBalsaAddressBook *ab,
+                                          const gchar         *prefix)
 {
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
     LibBalsaAddressBookTextPrivate *priv =
@@ -715,12 +765,14 @@ libbalsa_address_book_text_alias_complete(LibBalsaAddressBook * ab,
     GList *list;
     GList *res = NULL;
 
-    if (!libbalsa_address_book_get_expand_aliases(ab))
+    if (!libbalsa_address_book_get_expand_aliases(ab)) {
         return NULL;
+    }
 
     stream = fopen(priv->path, "r");
-    if (!stream)
+    if (!stream) {
         return NULL;
+    }
 
     if (!lbab_text_lock_book(ab_text, stream, FALSE)) {
         fclose(stream);
@@ -733,8 +785,8 @@ libbalsa_address_book_text_alias_complete(LibBalsaAddressBook * ab,
     fclose(stream);
 
     for (list =
-         libbalsa_completion_complete(priv->name_complete,
-                                      (gchar *) prefix);
+             libbalsa_completion_complete(priv->name_complete,
+                                          (gchar *) prefix);
          list; list = list->next) {
         InternetAddress *ia = ((CompletionData *) list->data)->ia;
         g_object_ref(ia);
@@ -744,12 +796,13 @@ libbalsa_address_book_text_alias_complete(LibBalsaAddressBook * ab,
     return g_list_reverse(res);
 }
 
+
 /*
  * Getter
  */
 
 const gchar *
-libbalsa_address_book_text_get_path(LibBalsaAddressBookText * ab_text)
+libbalsa_address_book_text_get_path(LibBalsaAddressBookText *ab_text)
 {
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);
@@ -757,13 +810,14 @@ libbalsa_address_book_text_get_path(LibBalsaAddressBookText * ab_text)
     return priv->path;
 }
 
+
 /*
  * Setter
  */
 
 void
-libbalsa_address_book_text_set_path(LibBalsaAddressBookText * ab_text,
-                                    const gchar             * path)
+libbalsa_address_book_text_set_path(LibBalsaAddressBookText *ab_text,
+                                    const gchar             *path)
 {
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);

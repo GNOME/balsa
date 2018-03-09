@@ -6,20 +6,20 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 #include "abook-completion.h"
 
@@ -34,7 +34,8 @@
  * Create a new CompletionData
  */
 CompletionData *
-completion_data_new(InternetAddress * ia, const gchar * nick_name)
+completion_data_new(InternetAddress *ia,
+                    const gchar     *nick_name)
 {
     GString *string;
     gchar *address_string;
@@ -50,13 +51,16 @@ completion_data_new(InternetAddress * ia, const gchar * nick_name)
     ret->ia = ia;
 
     string = g_string_new(nick_name);
-    if (string->len > 0)
-	g_string_append_c(string, ' ');
+    if (string->len > 0) {
+        g_string_append_c(string, ' ');
+    }
     address_string = internet_address_to_string(ia, FALSE);
     /* Remove '"' and '<'. */
-    for (p = q = address_string; *p; p++)
-        if (*p != '"' && *p != '<')
+    for (p = q = address_string; *p; p++) {
+        if ((*p != '"') && (*p != '<')) {
             *q++ = *p;
+        }
+    }
     *q = '\0';
     g_string_append(string, address_string);
     g_free(address_string);
@@ -72,25 +76,28 @@ completion_data_new(InternetAddress * ia, const gchar * nick_name)
     return ret;
 }
 
+
 /*
  * Free a CompletionData
  */
 void
-completion_data_free(CompletionData * data)
+completion_data_free(CompletionData *data)
 {
     g_object_unref(data->ia);
     g_free(data->string);
     g_free(data);
 }
 
+
 /*
  * The LibBalsaCompletionFunc
  */
 gchar *
-completion_data_extract(CompletionData * data)
+completion_data_extract(CompletionData *data)
 {
     return data->string;
 }
+
 
 /*
  * A LibBalsaCompletionStrncmpFunc for matching words instead of the
@@ -100,7 +107,9 @@ completion_data_extract(CompletionData * data)
  */
 
 gint
-strncmp_word(const gchar * s1, const gchar * s2, gsize n)
+strncmp_word(const gchar *s1,
+             const gchar *s2,
+             gsize        n)
 {
     const gchar *match;
     gint retval;
@@ -110,10 +119,12 @@ strncmp_word(const gchar * s1, const gchar * s2, gsize n)
 
     match = s2;
     do {
-	if (!(retval = strncmp(s1, match, n)))
-	    break;
-	if ((match = strchr(match, ' ')))
-	    ++match;
+        if (!(retval = strncmp(s1, match, n))) {
+            break;
+        }
+        if ((match = strchr(match, ' '))) {
+            ++match;
+        }
     } while (match);
 
     return retval;

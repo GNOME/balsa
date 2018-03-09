@@ -6,20 +6,20 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
 #include <string.h>
@@ -32,21 +32,25 @@
 
 /* FIXME: The content of this file could go to message.c */
 
-static GString *process_mime_multipart(LibBalsaMessage * message,
-                                       LibBalsaMessageBody * body,
-				       gchar * reply_prefix_str,
-				       gint llen, gboolean ignore_html,
-                                       gboolean flow);
+static GString *process_mime_multipart(LibBalsaMessage     *message,
+                                       LibBalsaMessageBody *body,
+                                       gchar               *reply_prefix_str,
+                                       gint                 llen,
+                                       gboolean             ignore_html,
+                                       gboolean             flow);
 
 /* process_mime_part:
    returns string representation of given message part.
    NOTE: may return NULL(!).
-*/
+ */
 
 GString *
-process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
-		  gchar * reply_prefix_str, gint llen, gboolean ignore_html,
-                  gboolean flow)
+process_mime_part(LibBalsaMessage     *message,
+                  LibBalsaMessageBody *body,
+                  gchar               *reply_prefix_str,
+                  gint                 llen,
+                  gboolean             ignore_html,
+                  gboolean             flow)
 {
     gchar *res = NULL;
 #ifdef HAVE_HTML_WIDGET
@@ -64,33 +68,38 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
     case LIBBALSA_MESSAGE_BODY_TYPE_MODEL:
     case LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE:
     case LIBBALSA_MESSAGE_BODY_TYPE_VIDEO:
-	break;
+        break;
+
     case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
         reply = process_mime_multipart(message, body, reply_prefix_str,
                                        llen, ignore_html, flow);
-	break;
-    case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
-	/* don't return text/html stuff... */
-	mime_type = libbalsa_message_body_get_mime_type(body);
-	html_type = libbalsa_html_type(mime_type);
-	g_free(mime_type);
+        break;
 
-	if (ignore_html && html_type)
-	    break;
+    case LIBBALSA_MESSAGE_BODY_TYPE_TEXT:
+        /* don't return text/html stuff... */
+        mime_type = libbalsa_message_body_get_mime_type(body);
+        html_type = libbalsa_html_type(mime_type);
+        g_free(mime_type);
+
+        if (ignore_html && html_type) {
+            break;
+        }
 
 #ifdef HAVE_HTML_WIDGET
-	allocated = libbalsa_message_body_get_content(body, &res, NULL);
-	if (!res)
-	    return NULL;
+        allocated = libbalsa_message_body_get_content(body, &res, NULL);
+        if (!res) {
+            return NULL;
+        }
 
-	if (html_type) {
-	    allocated = libbalsa_html_filter(html_type, &res, allocated);
-	    libbalsa_html_to_string(&res, allocated);
-	}
+        if (html_type) {
+            allocated = libbalsa_html_filter(html_type, &res, allocated);
+            libbalsa_html_to_string(&res, allocated);
+        }
 #else  /* HAVE_HTML_WIDGET */
-	libbalsa_message_body_get_content(body, &res, NULL);
-	if (!res)
-	    return NULL;
+        libbalsa_message_body_get_content(body, &res, NULL);
+        if (!res) {
+            return NULL;
+        }
 #endif /* HAVE_HTML_WIDGET */
 
         if (flow && libbalsa_message_body_is_flowed(body)) {
@@ -109,50 +118,59 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
         }
 
         if (llen > 0) {
-	    if (reply_prefix_str)
-		llen -= strlen(reply_prefix_str);
-	    libbalsa_wrap_string(res, llen);
-	}
+            if (reply_prefix_str) {
+                llen -= strlen(reply_prefix_str);
+            }
+            libbalsa_wrap_string(res, llen);
+        }
 
         if (reply_prefix_str || flow) {
-	    gchar *str, *ptr;
-	    /* prepend the prefix to all the lines */
+            gchar *str, *ptr;
+            /* prepend the prefix to all the lines */
 
-	    reply = g_string_new("");
-	    str = res;
-	    do {
-		ptr = strchr(str, '\n');
-		if (ptr)
-		    *ptr = '\0';
-                if (reply_prefix_str)
-		reply = g_string_append(reply, reply_prefix_str);
+            reply = g_string_new("");
+            str = res;
+            do {
+                ptr = strchr(str, '\n');
+                if (ptr) {
+                    *ptr = '\0';
+                }
+                if (reply_prefix_str) {
+                    reply = g_string_append(reply, reply_prefix_str);
+                }
                 if (flow) {
                     gchar *p;
                     /* we're making a `format=flowed' message, but the
                      * message we're quoting was `format=fixed', so we
                      * must make sure all lines are `fixed'--that is,
                      * trim any trailing ' ' characters */
-                    for (p = str; *p; ++p);
-                    while (*--p == ' ');
+                    for (p = str; *p; ++p) {
+                    }
+                    while (*--p == ' ') {
+                    }
                     *++p = '\0';
                 }
-		reply = g_string_append(reply, str);
-		reply = g_string_append_c(reply, '\n');
-		str = ptr;
-	    } while (str++);
-	} else
-	    reply = g_string_new(res);
-	g_free(res);
-	break;
+                reply = g_string_append(reply, str);
+                reply = g_string_append_c(reply, '\n');
+                str = ptr;
+            } while (str++);
+        } else {
+            reply = g_string_new(res);
+        }
+        g_free(res);
+        break;
     }
     return reply;
 }
 
+
 static GString *
-process_mime_multipart(LibBalsaMessage * message,
-                       LibBalsaMessageBody * body,
-		       gchar * reply_prefix_str, gint llen,
-		       gboolean ignore_html, gboolean flow)
+process_mime_multipart(LibBalsaMessage     *message,
+                       LibBalsaMessageBody *body,
+                       gchar               *reply_prefix_str,
+                       gint                 llen,
+                       gboolean             ignore_html,
+                       gboolean             flow)
 {
     LibBalsaMessageBody *part;
     GString *res = NULL, *s;
@@ -160,23 +178,30 @@ process_mime_multipart(LibBalsaMessage * message,
     for (part = body->parts; part; part = part->next) {
         s = process_mime_part(message, part, reply_prefix_str, llen,
                               ignore_html, flow);
-	if (!s)
-	    continue;
-	if (res) {
-	    if (res->str[res->len - 1] != '\n')
-		g_string_append_c(res, '\n');
-	    g_string_append_c(res, '\n');
-	    g_string_append(res, s->str);
-	    g_string_free(s, TRUE);
-	} else
-	    res = s;
+        if (!s) {
+            continue;
+        }
+        if (res) {
+            if (res->str[res->len - 1] != '\n') {
+                g_string_append_c(res, '\n');
+            }
+            g_string_append_c(res, '\n');
+            g_string_append(res, s->str);
+            g_string_free(s, TRUE);
+        } else {
+            res = s;
+        }
     }
     return res;
 }
 
+
 GString *
-content2reply(LibBalsaMessageBody * root, gchar * reply_prefix_str,
-	      gint llen, gboolean ignore_html, gboolean flow)
+content2reply(LibBalsaMessageBody *root,
+              gchar               *reply_prefix_str,
+              gint                 llen,
+              gboolean             ignore_html,
+              gboolean             flow)
 {
     LibBalsaMessage *message = root->message;
     LibBalsaMessageBody *body;
@@ -184,23 +209,26 @@ content2reply(LibBalsaMessageBody * root, gchar * reply_prefix_str,
 
     libbalsa_message_body_ref(message, FALSE, FALSE);
     for (body = root; body; body = body->next) {
-	res = process_mime_part(message, body, reply_prefix_str, llen,
+        res = process_mime_part(message, body, reply_prefix_str, llen,
                                 ignore_html, flow);
-	if (!res)
-	    continue;
-	if (reply) {
-	    reply = g_string_append(reply, res->str);
-	    g_string_free(res, TRUE);
-	} else
-	    reply = res;
+        if (!res) {
+            continue;
+        }
+        if (reply) {
+            reply = g_string_append(reply, res->str);
+            g_string_free(res, TRUE);
+        } else {
+            reply = res;
+        }
     }
     libbalsa_message_body_unref(message);
 
     return reply;
 }
 
+
 /*
- * implement RFC2646 `text=flowed' 
+ * implement RFC2646 `text=flowed'
  * first version by Emmanuel <e allaud wanadoo fr>
  * this version by Peter <PeterBloomfield mindspring com>
  *
@@ -226,8 +254,8 @@ content2reply(LibBalsaMessageBody * root, gchar * reply_prefix_str,
  * http://www.faqs.org/rfcs/rfc3676.html
  */
 
-#define MAX_WIDTH	997	/* enshrined somewhere */
-#define QUOTE_CHAR	'>'
+#define MAX_WIDTH       997     /* enshrined somewhere */
+#define QUOTE_CHAR      '>'
 
 /*
  * we'll use one routine to parse text into paragraphs
@@ -242,7 +270,9 @@ typedef struct {
 } rfc2646text;
 
 static GList *
-unwrap_rfc2646(gchar * str, gboolean from_screen, gboolean delsp)
+unwrap_rfc2646(gchar   *str,
+               gboolean from_screen,
+               gboolean delsp)
 {
     GList *list = NULL;
 
@@ -260,50 +290,59 @@ unwrap_rfc2646(gchar * str, gboolean from_screen, gboolean delsp)
             gchar *p;
             gint len;
 
-            for (p = str; *p == QUOTE_CHAR; p++)
-                /* nothing */;
+            for (p = str; *p == QUOTE_CHAR; p++) {
+                /* nothing */
+            }
             len = p - str;
             sig_sep = (p[0] == '-' && p[1] == '-' && p[2] == ' '
                        && (p[3] == '\n'
                            || (p[3] == '\r' && p[4] == '\n')));
-            if (text->quote_depth < 0)
+            if (text->quote_depth < 0) {
                 text->quote_depth = len;
-            else if (len != text->quote_depth || sig_sep)
+            } else if ((len != text->quote_depth) || sig_sep) {
                 /* broken! a flowed line was followed by either a line
                  * with different quote depth, or a sig separator
                  *
                  * we'll break before updating str, so we pick up this
                  * line again on the next pass through this loop */
                 break;
+            }
 
-            if (*p == ' ' && (!from_screen || len > 0))
+            if ((*p == ' ') && (!from_screen || (len > 0))) {
                 /* space stuffed */
                 p++;
+            }
 
             /* move str to the start of the next line, if any */
-            for (str = p; *str && *str != '\n'; str++)
-                /* nothing */;
+            for (str = p; *str && *str != '\n'; str++) {
+                /* nothing */
+            }
             len = str - p;
-            if (*str)
+            if (*str) {
                 str++;
+            }
 
-            if(len>0 && p[len-1] == '\r')
+            if ((len > 0) && (p[len - 1] == '\r')) {
                 len--;  /* take care of '\r\n' line endings */
-	    flowed = (len > 0 && p[len - 1] == ' ' && !sig_sep);
-	    if (flowed && delsp)
-		/* Don't include the last space. */
-		--len;
+            }
+            flowed = (len > 0 && p[len - 1] == ' ' && !sig_sep);
+            if (flowed && delsp) {
+                /* Don't include the last space. */
+                --len;
+            }
 
             g_string_append_len(string, p, len);
         }
         text->str = g_string_free(string, FALSE);
         if (flowed) {
-	    /* Broken: remove trailing spaces. */
+            /* Broken: remove trailing spaces. */
             gchar *p = text->str;
-            while (*p)
+            while (*p) {
                 p++;
-            while (--p >= text->str && *p == ' ')
-                /* nothing */ ;
+            }
+            while (--p >= text->str && *p == ' ') {
+                /* nothing */
+            }
             *++p = '\0';
         }
         list = g_list_append(list, text);
@@ -312,6 +351,7 @@ unwrap_rfc2646(gchar * str, gboolean from_screen, gboolean delsp)
     return list;
 }
 
+
 /*
  * we'll use one routine to wrap the paragraphs
  *
@@ -319,8 +359,11 @@ unwrap_rfc2646(gchar * str, gboolean from_screen, gboolean delsp)
  * if it's going to the screen, don't space-stuff unquoted lines
  * */
 static void
-dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
-               gboolean quote, GString * result)
+dowrap_rfc2646(GList   *list,
+               gint     width,
+               gboolean to_screen,
+               gboolean quote,
+               GString *result)
 {
     const gint max_width = to_screen ? G_MAXINT : MAX_WIDTH - 4;
 
@@ -332,8 +375,9 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
 
         str = text->str;
         qd = text->quote_depth;
-        if (quote)
+        if (quote) {
             qd++;
+        }
         /* one output line per middle loop */
         do {                    /* ... while (*str); */
             gboolean first_word = TRUE;
@@ -343,8 +387,9 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
             gint i;
 
             /* start of line: emit quote string */
-            for (i = 0; i < qd; i++)
+            for (i = 0; i < qd; i++) {
                 g_string_append_c(result, QUOTE_CHAR);
+            }
             /* space-stuffing:
              * - for the wire, stuffing is required for lines beginning
              *   with ` ', `>', or `From '
@@ -353,13 +398,13 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
              *   of quoting string and text
              * - ...but we mustn't stuff `-- ' */
             if (((!to_screen
-                  && (*str == ' ' || *str == QUOTE_CHAR
-                      || !strncmp(str, "From ", 5))) || len > 0)
+                  && ((*str == ' ') || (*str == QUOTE_CHAR)
+                      || !strncmp(str, "From ", 5))) || (len > 0))
                 && strcmp(str, "-- ")) {
                 g_string_append_c(result, ' ');
                 ++len;
             }
-            /* 
+            /*
              * wrapping strategy:
              * break line into words, each with its trailing whitespace;
              * emit words while they don't break the width;
@@ -376,11 +421,12 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                     str = g_utf8_next_char(str);
                 }
                 while ((str - start) < max_width && isspace((int)*str)) {
-                    if (*str == '\t')
+                    if (*str == '\t') {
                         len += 8 - len % 8;
-                    else
+                    } else {
                         len++;
-                    str = g_utf8_next_char(str);;
+                    }
+                    str = g_utf8_next_char(str);
                 }
                 /*
                  * to avoid some unnecessary space-stuffing,
@@ -388,16 +434,18 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
                  * (we already passed any spaces, so just check for '>'
                  * and "From ")
                  * */
-                if ((str - start) < max_width && *str
-                    && (*str == QUOTE_CHAR
-                        || !strncmp(str, "From ", 5)))
+                if (((str - start) < max_width) && *str
+                    && ((*str == QUOTE_CHAR)
+                        || !strncmp(str, "From ", 5))) {
                     continue;
+                }
 
-                if (!*str || len > width || (str - start) >= max_width) {
+                if (!*str || (len > width) || ((str - start) >= max_width)) {
                     /* allow an overlong first word, otherwise back up
                      * str */
-                    if (len > width && !first_word)
+                    if ((len > width) && !first_word) {
                         str = line_break;
+                    }
                     g_string_append_len(result, start, str - start);
                     break;
                 }
@@ -406,40 +454,45 @@ dowrap_rfc2646(GList * list, gint width, gboolean to_screen,
             }                   /* end of loop over words */
 
             if (*str) {         /* line separator */
-                if (to_screen || str == start)
-		    g_string_append_c(result, '\n');
-		else		/* DelSP = Yes */
-		    g_string_append(result, " \n");
-	    }
+                if (to_screen || (str == start)) {
+                    g_string_append_c(result, '\n');
+                } else {        /* DelSP = Yes */
+                    g_string_append(result, " \n");
+                }
+            }
         } while (*str);         /* end of loop over output lines */
 
         g_free(text->str);
         g_free(text);
         list = list->next;
-        if (list != NULL)       /* paragraph separator */
+        if (list != NULL) {     /* paragraph separator */
             g_string_append_c(result, '\n');
+        }
     }                           /* end of paragraph */
 }
 
+
 /* GString *libbalsa_process_text_rfc2646:
-   re-wrap given flowed string to required width. 
+   re-wrap given flowed string to required width.
    Parameters:
    gchar * par:          string to be wrapped
    gint width:           maximum length of wrapped line
    gboolean from_screen: is par from the text input area of
                          a sendmsg-window?
    gboolean to_screen:   is the wrapped text going to be
-                         displayed in the text area of a sendmsg-window 
+                         displayed in the text area of a sendmsg-window
                          or of a received message window?
-   gboolean quote:       should the wrapped lines be prefixed 
+   gboolean quote:       should the wrapped lines be prefixed
                          with the RFC 2646 quote character '>'?
    gboolean delsp:	 was the message formatted with DelSp=Yes?
-*/
+ */
 GString *
-libbalsa_process_text_rfc2646(gchar * par, gint width,
+libbalsa_process_text_rfc2646(gchar   *par,
+                              gint     width,
                               gboolean from_screen,
-                              gboolean to_screen, gboolean quote,
-			      gboolean delsp)
+                              gboolean to_screen,
+                              gboolean quote,
+                              gboolean delsp)
 {
     gint len = strlen(par);
     GString *result = g_string_sized_new(len);
@@ -452,14 +505,18 @@ libbalsa_process_text_rfc2646(gchar * par, gint width,
     return result;
 }
 
+
 /* libbalsa_wrap_rfc2646:
    wraps given string using soft breaks according to rfc2646
    convenience function, uses libbalsa_process_text_rfc2646 to do all
    the work, but returns a gchar * and g_free's the string passed in
-*/
+ */
 gchar *
-libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
-                      gboolean to_screen, gboolean delsp)
+libbalsa_wrap_rfc2646(gchar   *par,
+                      gint     width,
+                      gboolean from_screen,
+                      gboolean to_screen,
+                      gboolean delsp)
 {
     GString *result;
 
@@ -470,6 +527,7 @@ libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
     return g_string_free(result, FALSE);
 }
 
+
 /*
  * libbalsa_wrap_view(GtkTextView * view, gint length)
  *
@@ -477,14 +535,18 @@ libbalsa_wrap_rfc2646(gchar * par, gint width, gboolean from_screen,
  */
 
 /* Forward references: */
-static GtkTextTag *get_quote_tag(GtkTextIter * iter);
-static gint get_quote_depth(GtkTextIter * iter, gchar ** quote_string);
-static gchar *get_line(GtkTextBuffer * buffer, GtkTextIter * iter);
-static gboolean is_in_url(GtkTextIter * iter, gint offset,
-                          GtkTextTag * url_tag);
+static GtkTextTag *get_quote_tag(GtkTextIter *iter);
+static gint get_quote_depth(GtkTextIter *iter,
+                            gchar      **quote_string);
+static gchar *get_line(GtkTextBuffer *buffer,
+                       GtkTextIter   *iter);
+static gboolean is_in_url(GtkTextIter *iter,
+                          gint         offset,
+                          GtkTextTag  *url_tag);
 
 void
-libbalsa_wrap_view(GtkTextView * view, gint length)
+libbalsa_wrap_view(GtkTextView *view,
+                   gint         length)
 {
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(view);
     GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
@@ -498,96 +560,104 @@ libbalsa_wrap_view(GtkTextView * view, gint length)
 
     /* Loop over original lines. */
     while (!gtk_text_iter_is_end(&iter)) {
-	GtkTextTag *quote_tag;
-	gchar *quote_string;
-	gint quote_len;
+        GtkTextTag *quote_tag;
+        gchar *quote_string;
+        gint quote_len;
 
-	quote_tag = get_quote_tag(&iter);
-	quote_len = get_quote_depth(&iter, &quote_string);
-	if (quote_string) {
-	    if (quote_string[quote_len])
-		quote_len++;
-	    else {
-		gchar *tmp = g_strconcat(quote_string, " ", NULL);
-		g_free(quote_string);
-		quote_string = tmp;
-	    }
-	}
+        quote_tag = get_quote_tag(&iter);
+        quote_len = get_quote_depth(&iter, &quote_string);
+        if (quote_string) {
+            if (quote_string[quote_len]) {
+                quote_len++;
+            } else {
+                gchar *tmp = g_strconcat(quote_string, " ", NULL);
+                g_free(quote_string);
+                quote_string = tmp;
+            }
+        }
 
-	/* Loop over breaks within the original line. */
-	while (!gtk_text_iter_ends_line(&iter)) {
-	    gchar *line;
-	    gint num_chars;
-	    gint attrs_len;
-	    gint offset;
-	    gint len;
-	    gint brk_offset = 0;
-	    gunichar c = 0;
-	    gboolean in_space = FALSE;
+        /* Loop over breaks within the original line. */
+        while (!gtk_text_iter_ends_line(&iter)) {
+            gchar *line;
+            gint num_chars;
+            gint attrs_len;
+            gint offset;
+            gint len;
+            gint brk_offset = 0;
+            gunichar c = 0;
+            gboolean in_space = FALSE;
 
-	    line = get_line(buffer, &iter);
-	    num_chars = g_utf8_strlen(line, -1);
-	    attrs_len = num_chars + 1;
-	    log_attrs = g_renew(PangoLogAttr, log_attrs, attrs_len);
-	    pango_get_log_attrs(line, -1, -1, language, log_attrs, attrs_len);
-	    g_free(line);
+            line = get_line(buffer, &iter);
+            num_chars = g_utf8_strlen(line, -1);
+            attrs_len = num_chars + 1;
+            log_attrs = g_renew(PangoLogAttr, log_attrs, attrs_len);
+            pango_get_log_attrs(line, -1, -1, language, log_attrs, attrs_len);
+            g_free(line);
 
-	    for (len = offset = quote_len;
-		 len < length && offset < num_chars; offset++) {
-		gtk_text_iter_set_line_offset(&iter, offset);
-		c = gtk_text_iter_get_char(&iter);
-		if (c == '\t')
-		    len = ((len + 8) / 8) * 8;
-		else if (g_unichar_isprint(c))
-		    len++;
+            for (len = offset = quote_len;
+                 len < length && offset < num_chars; offset++) {
+                gtk_text_iter_set_line_offset(&iter, offset);
+                c = gtk_text_iter_get_char(&iter);
+                if (c == '\t') {
+                    len = ((len + 8) / 8) * 8;
+                } else if (g_unichar_isprint(c)) {
+                    len++;
+                }
 
-		if (log_attrs[offset].is_line_break
-		    && !is_in_url(&iter, offset, url_tag))
-		    brk_offset = offset;
-	    }
+                if (log_attrs[offset].is_line_break
+                    && !is_in_url(&iter, offset, url_tag)) {
+                    brk_offset = offset;
+                }
+            }
 
-	    if (len < length)
-		break;
+            if (len < length) {
+                break;
+            }
 
-	    in_space = g_unichar_isspace(c);
-	    if (brk_offset > quote_len && !in_space)
-		/* Break at the last break we saw. */
-		gtk_text_iter_set_line_offset(&iter, brk_offset);
-	    else {
+            in_space = g_unichar_isspace(c);
+            if ((brk_offset > quote_len) && !in_space) {
+                /* Break at the last break we saw. */
+                gtk_text_iter_set_line_offset(&iter, brk_offset);
+            } else {
                 GtkTextIter start = iter;
-		/* Break at the next line break. */
-		if (offset <= quote_len)
-		    offset = quote_len + 1;
-		while (offset < num_chars
-		       && (is_in_url(&iter, offset, url_tag)
-			   || !log_attrs[offset].is_line_break))
-		    offset++;
+                /* Break at the next line break. */
+                if (offset <= quote_len) {
+                    offset = quote_len + 1;
+                }
+                while (offset < num_chars
+                       && (is_in_url(&iter, offset, url_tag)
+                           || !log_attrs[offset].is_line_break)) {
+                    offset++;
+                }
 
-		if (offset >= num_chars)
-		    /* No next line break. */
-		    break;
+                if (offset >= num_chars) {
+                    /* No next line break. */
+                    break;
+                }
 
                 /* Trim extra trailing whitespace */
                 gtk_text_iter_forward_char(&start);
                 gtk_text_buffer_delete(buffer, &start, &iter);
-	    }
+            }
 
-	    gtk_text_buffer_insert(buffer, &iter, "\n", 1);
-	    if (quote_string)
-		gtk_text_buffer_insert_with_tags(buffer, &iter,
-						 quote_string, -1,
-						 quote_tag, NULL);
-	}
-	g_free(quote_string);
-	gtk_text_iter_forward_line(&iter);
+            gtk_text_buffer_insert(buffer, &iter, "\n", 1);
+            if (quote_string) {
+                gtk_text_buffer_insert_with_tags(buffer, &iter,
+                                                 quote_string, -1,
+                                                 quote_tag, NULL);
+            }
+        }
+        g_free(quote_string);
+        gtk_text_iter_forward_line(&iter);
     }
     g_free(log_attrs);
 }
 
+
 /* Find the quote tag, if any, at iter; doesn't move iter; returns tag
  * or NULL. */
 static GtkTextTag *
-get_quote_tag(GtkTextIter * iter)
+get_quote_tag(GtkTextIter *iter)
 {
     GtkTextTag *quote_tag = NULL;
     GSList *list;
@@ -598,8 +668,9 @@ get_quote_tag(GtkTextIter * iter)
         gchar *name;
         g_object_get(G_OBJECT(tag), "name", &name, NULL);
         if (name) {
-            if (!strncmp(name, "quote-", 6))
+            if (!strncmp(name, "quote-", 6)) {
                 quote_tag = tag_list->data;
+            }
             g_free(name);
         }
     }
@@ -608,13 +679,15 @@ get_quote_tag(GtkTextIter * iter)
     return quote_tag;
 }
 
+
 /* Move the iter over a string of consecutive '>' characters, and an
  * optional ' ' character; returns the number of '>'s, and, if
  * quote_string is not NULL, stores an allocated copy of the string
  * (including the trailing ' ') at quote_string (or NULL, if there were
  * no '>'s). */
 static gint
-get_quote_depth(GtkTextIter * iter, gchar ** quote_string)
+get_quote_depth(GtkTextIter *iter,
+                gchar      **quote_string)
 {
     gint quote_depth = 0;
     GtkTextIter start = *iter;
@@ -623,58 +696,71 @@ get_quote_depth(GtkTextIter * iter, gchar ** quote_string)
         quote_depth++;
         gtk_text_iter_forward_char(iter);
     }
-    if (quote_depth > 0 && gtk_text_iter_get_char(iter) == ' ')
+    if ((quote_depth > 0) && (gtk_text_iter_get_char(iter) == ' ')) {
         gtk_text_iter_forward_char(iter);
+    }
 
     if (quote_string) {
-        if (quote_depth > 0)
+        if (quote_depth > 0) {
             *quote_string = gtk_text_iter_get_text(&start, iter);
-        else
+        } else {
             *quote_string = NULL;
+        }
     }
 
     return quote_depth;
 }
 
+
 /* Move the iter to the start of the line it's on; returns an allocated
  * copy of the line (utf-8, including invisible characters and image
  * markers). */
 static gchar *
-get_line(GtkTextBuffer * buffer, GtkTextIter * iter)
+get_line(GtkTextBuffer *buffer,
+         GtkTextIter   *iter)
 {
     GtkTextIter end;
 
     gtk_text_iter_set_line_offset(iter, 0);
     end = *iter;
-    if (!gtk_text_iter_ends_line(&end))
+    if (!gtk_text_iter_ends_line(&end)) {
         gtk_text_iter_forward_to_line_end(&end);
+    }
 
     return gtk_text_buffer_get_slice(buffer, iter, &end, TRUE);
 }
 
+
 /* Move the iter to position offset in the current line, and test
  * whether it's in an URL. */
 static gboolean
-is_in_url(GtkTextIter * iter, gint offset, GtkTextTag * url_tag)
+is_in_url(GtkTextIter *iter,
+          gint         offset,
+          GtkTextTag  *url_tag)
 {
     gtk_text_iter_set_line_offset(iter, offset);
     return url_tag ? (gtk_text_iter_has_tag(iter, url_tag)
                       && !gtk_text_iter_starts_tag(iter, url_tag)) : FALSE;
 }
 
+
 /* Remove soft newlines and associated quote strings from num_paras
  * paragraphs in the buffer, starting at the line before iter; if
  * num_paras < 0, process the whole buffer. */
 
 /* Forward references: */
-static gboolean prescanner(const gchar * p, guint len);
-static void mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter,
-                      GtkTextTag * tag, const gchar * p);
+static gboolean prescanner(const gchar *p,
+                           guint        len);
+static void mark_urls(GtkTextBuffer *buffer,
+                      GtkTextIter   *iter,
+                      GtkTextTag    *tag,
+                      const gchar   *p);
 static GRegex *get_url_reg(void);
 
 void
-libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
-		       gint num_paras)
+libbalsa_unwrap_buffer(GtkTextBuffer *buffer,
+                       GtkTextIter   *iter,
+                       gint           num_paras)
 {
     GtkTextTagTable *table = gtk_text_buffer_get_tag_table(buffer);
     GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
@@ -683,67 +769,74 @@ libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
     gtk_text_iter_set_line_offset(iter, 0);
 
     for (; num_paras; num_paras--) {
-	gint quote_depth;
-	GtkTextIter start;
-	gchar *line;
+        gint quote_depth;
+        GtkTextIter start;
+        gchar *line;
 
-	gtk_text_iter_set_line_offset(iter, 0);
-	quote_depth = get_quote_depth(iter, NULL);
+        gtk_text_iter_set_line_offset(iter, 0);
+        quote_depth = get_quote_depth(iter, NULL);
 
-	/* Move to the end of the line, if not there already. */
-	if (!gtk_text_iter_ends_line(iter)
-	    && !gtk_text_iter_forward_to_line_end(iter))
-	    return;
-	/* Save this iter as the start of a possible deletion. */
-	start = *iter;
-	/* Move to the start of the next line. */
-	if (!gtk_text_iter_forward_line(iter))
-	    return;
+        /* Move to the end of the line, if not there already. */
+        if (!gtk_text_iter_ends_line(iter)
+            && !gtk_text_iter_forward_to_line_end(iter)) {
+            return;
+        }
+        /* Save this iter as the start of a possible deletion. */
+        start = *iter;
+        /* Move to the start of the next line. */
+        if (!gtk_text_iter_forward_line(iter)) {
+            return;
+        }
 
-	if (num_paras < 0) {
-	    /* This is a wrap_body call, not a continuous wrap, so we'll
-	     * remove spaces before a hard newline. */
-	    GtkTextIter tmp_iter;
+        if (num_paras < 0) {
+            /* This is a wrap_body call, not a continuous wrap, so we'll
+             * remove spaces before a hard newline. */
+            GtkTextIter tmp_iter;
 
-	    /* Make sure it's not a usenet sig separator: */
-	    tmp_iter = start;
-	    if (!(gtk_text_iter_backward_char(&tmp_iter)
-		  && gtk_text_iter_get_char(&tmp_iter) == ' '
-		  && gtk_text_iter_backward_char(&tmp_iter)
-		  && gtk_text_iter_get_char(&tmp_iter) == '-'
-		  && gtk_text_iter_backward_char(&tmp_iter)
-		  && gtk_text_iter_get_char(&tmp_iter) == '-'
-		  && gtk_text_iter_get_line_offset(&tmp_iter) ==
-		  quote_depth)) {
-		*iter = start;
-		while (gtk_text_iter_get_line_offset(&start) >
-		       (quote_depth ? quote_depth + 1 : 0)) {
-		    gtk_text_iter_backward_char(&start);
-		    if (gtk_text_iter_get_char(&start) != ' ') {
-			gtk_text_iter_forward_char(&start);
-			break;
-		    }
-		}
-		gtk_text_buffer_delete(buffer, &start, iter);
-	    }
-	    if (!gtk_text_iter_forward_line(iter))
-		return;
-	}
+            /* Make sure it's not a usenet sig separator: */
+            tmp_iter = start;
+            if (!(gtk_text_iter_backward_char(&tmp_iter)
+                  && (gtk_text_iter_get_char(&tmp_iter) == ' ')
+                  && gtk_text_iter_backward_char(&tmp_iter)
+                  && (gtk_text_iter_get_char(&tmp_iter) == '-')
+                  && gtk_text_iter_backward_char(&tmp_iter)
+                  && (gtk_text_iter_get_char(&tmp_iter) == '-')
+                  && (gtk_text_iter_get_line_offset(&tmp_iter) ==
+                      quote_depth))) {
+                *iter = start;
+                while (gtk_text_iter_get_line_offset(&start) >
+                       (quote_depth ? quote_depth + 1 : 0)) {
+                    gtk_text_iter_backward_char(&start);
+                    if (gtk_text_iter_get_char(&start) != ' ') {
+                        gtk_text_iter_forward_char(&start);
+                        break;
+                    }
+                }
+                gtk_text_buffer_delete(buffer, &start, iter);
+            }
+            if (!gtk_text_iter_forward_line(iter)) {
+                return;
+            }
+        }
 
-	line = get_line(buffer, &start);
-	if (prescanner(line, strlen(line)))
-	    mark_urls(buffer, &start, url_tag, line);
-	g_free(line);
+        line = get_line(buffer, &start);
+        if (prescanner(line, strlen(line))) {
+            mark_urls(buffer, &start, url_tag, line);
+        }
+        g_free(line);
     }
 }
 
+
 /* Mark URLs in one line of the buffer */
 static void
-mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
-          const gchar * line)
+mark_urls(GtkTextBuffer *buffer,
+          GtkTextIter   *iter,
+          GtkTextTag    *tag,
+          const gchar   *line)
 {
     const gchar *p = line;
-    const gchar * const line_end = line + strlen(line);
+    const gchar *const line_end = line + strlen(line);
     GRegex *url_reg = get_url_reg();
     GMatchInfo *url_match;
     GtkTextIter start = *iter;
@@ -761,12 +854,14 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
 
             p += end_pos;
         }
-        if (!prescanner(p, line_end - p))
+        if (!prescanner(p, line_end - p)) {
             break;
+        }
         g_match_info_free(url_match);
     }
     g_match_info_free(url_match);
 }
+
 
 /*
  * End of wrap/unwrap view.
@@ -776,52 +871,61 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
 /* libbalsa_insert_with_url:
  * do a gtk_text_buffer_insert, but mark URL's with balsa_app.url_color
  *
- * prescanner: 
+ * prescanner:
  * used to find candidates for lines containing URL's.
  * Empirially, this approach is faster (by factor of 8) than scanning
  * entire message with regexec. YMMV.
- * s - is the line to scan. 
+ * s - is the line to scan.
  * returns TRUE if the line may contain an URL.
  */
 static gboolean
-prescanner(const gchar * s, guint len)
+prescanner(const gchar *s,
+           guint        len)
 {
     gint left = len - 5;
 
     while (--left > 0) {
         switch (tolower(*s++)) {
         case 'f':              /* ftp:/, ftps: */
-            if (tolower(*s) == 't' &&
-                tolower(*(s + 1)) == 'p' &&
-                (*(s + 2) == ':' || tolower(*(s + 2)) == 's') &&
-                (*(s + 3) == ':' || *(s + 3) == '/'))
+            if ((tolower(*s) == 't') &&
+                (tolower(*(s + 1)) == 'p') &&
+                ((*(s + 2) == ':') || (tolower(*(s + 2)) == 's')) &&
+                ((*(s + 3) == ':') || (*(s + 3) == '/'))) {
                 return TRUE;
+            }
             break;
+
         case 'h':              /* http:, https */
-            if (tolower(*s) == 't' &&
-                tolower(*(s + 1)) == 't' &&
-                tolower(*(s + 2)) == 'p' &&
-                (*(s + 3) == ':' || tolower(*(s + 3)) == 's'))
+            if ((tolower(*s) == 't') &&
+                (tolower(*(s + 1)) == 't') &&
+                (tolower(*(s + 2)) == 'p') &&
+                ((*(s + 3) == ':') || (tolower(*(s + 3)) == 's'))) {
                 return TRUE;
+            }
             break;
+
         case 'm':              /* mailt */
-            if (tolower(*s) == 'a' &&
-                tolower(*(s + 1)) == 'i' &&
-                tolower(*(s + 2)) == 'l' && tolower(*(s + 3)) == 't')
+            if ((tolower(*s) == 'a') &&
+                (tolower(*(s + 1)) == 'i') &&
+                (tolower(*(s + 2)) == 'l') && (tolower(*(s + 3)) == 't')) {
                 return TRUE;
+            }
             break;
+
         case 'n':              /* news:, nntp: */
-            if ((tolower(*s) == 'e' || tolower(*s) == 'n') &&
-                (tolower(*(s + 1)) == 'w' || tolower(*(s + 1)) == 't') &&
-                (tolower(*(s + 2)) == 's' || tolower(*(s + 2)) == 'p') &&
-                *(s + 3) == ':')
+            if (((tolower(*s) == 'e') || (tolower(*s) == 'n')) &&
+                ((tolower(*(s + 1)) == 'w') || (tolower(*(s + 1)) == 't')) &&
+                ((tolower(*(s + 2)) == 's') || (tolower(*(s + 2)) == 'p')) &&
+                (*(s + 3) == ':')) {
                 return TRUE;
+            }
             break;
         }
     }
 
     return FALSE;
 }
+
 
 struct url_regex_info {
     GRegex *url_reg;
@@ -846,19 +950,21 @@ get_url_helper(struct url_regex_info *info)
     return info->url_reg;
 }
 
+
 static GRegex *
 get_url_reg(void)
 {
     static struct url_regex_info info = {
         NULL,
         "(((https?|ftps?|nntp)://)|(mailto:|news:))"
-            "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]])+",
+        "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]])+",
         __func__,
         "url regex compilation failed"
     };
 
     return get_url_helper(&info);
 }
+
 
 static GRegex *
 get_ml_url_reg(void)
@@ -876,6 +982,7 @@ get_ml_url_reg(void)
     return get_url_helper(&info);
 }
 
+
 static GRegex *
 get_ml_flowed_url_reg(void)
 {
@@ -889,11 +996,12 @@ get_ml_flowed_url_reg(void)
     return get_url_helper(&info);
 }
 
+
 gboolean
-libbalsa_insert_with_url(GtkTextBuffer * buffer,
-                         const char *chars,
-                         guint len,
-                         GtkTextTag * tag,
+libbalsa_insert_with_url(GtkTextBuffer         *buffer,
+                         const char            *chars,
+                         guint                  len,
+                         GtkTextTag            *tag,
                          LibBalsaUrlInsertInfo *url_info)
 {
     GtkTextIter iter;
@@ -903,7 +1011,7 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
     gint start_pos, end_pos;
     GRegex *url_reg;
     GMatchInfo *url_match;
-    const gchar * const line_end = chars + len;
+    const gchar *const line_end = chars + len;
 
     gtk_text_buffer_get_iter_at_mark(buffer, &iter,
                                      gtk_text_buffer_get_insert(buffer));
@@ -912,7 +1020,7 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
         const gchar *url_end;
         gchar *url, *q, *r;
 
-        if (!(url_end = strchr(chars, '>')) || url_end >= line_end) {
+        if (!(url_end = strchr(chars, '>')) || (url_end >= line_end)) {
             g_string_append_len(url_info->ml_url_buffer, chars,
                                 line_end - chars);
             g_string_append_c(url_info->ml_url_buffer, '\n');
@@ -926,9 +1034,11 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
                                          url_info->ml_url_buffer->len,
                                          url_tag, tag, NULL);
         q = url = g_new(gchar, url_info->ml_url_buffer->len);
-        for (r = url_info->ml_url_buffer->str; *r; r++)
-            if (*r > ' ')
+        for (r = url_info->ml_url_buffer->str; *r; r++) {
+            if (*r > ' ') {
                 *q++ = *r;
+            }
+        }
         url_info->callback(buffer, &iter, url, q - url,
                            url_info->callback_data);
         g_free(url);
@@ -955,8 +1065,8 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
                                          start_pos, tag, NULL);
 
         /* check if we hit a multi-line URL... (see RFC 1738) */
-        if ((start_pos > 0 && (chars[start_pos - 1] == '<')) ||
-            (start_pos > 4 &&
+        if (((start_pos > 0) && (chars[start_pos - 1] == '<')) ||
+            ((start_pos > 4) &&
              !g_ascii_strncasecmp(chars + start_pos - 5, "<URL:", 5))) {
             GMatchInfo *ml_url_match;
             gint ml_start_pos, ml_end_pos;
@@ -964,33 +1074,35 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
             /* if the input is flowed, we may see a space at
              * url_match.rm_eo - in this case the complete remainder
              * of the ml uri should be in the passed buffer... */
-            if (url_info->buffer_is_flowed && chars[end_pos] == ' ') {
+            if (url_info->buffer_is_flowed && (chars[end_pos] == ' ')) {
                 if (g_regex_match(get_ml_flowed_url_reg(), chars + end_pos,
                                   0, &ml_url_match)
                     && g_match_info_fetch_pos(ml_url_match, 0,
                                               &ml_start_pos, &ml_end_pos)
-                    && ml_start_pos == 0)
+                    && (ml_start_pos == 0)) {
                     end_pos += ml_end_pos - 1;
+                }
                 g_match_info_free(ml_url_match);
             } else if (chars[end_pos] != '>') {
                 if (g_regex_match(get_ml_url_reg(), chars + end_pos,
                                   0, &ml_url_match)
                     && g_match_info_fetch_pos(ml_url_match, 0,
                                               &ml_start_pos, NULL)
-                    && ml_start_pos == 0) {
+                    && (ml_start_pos == 0)) {
                     chars += start_pos;
                     url_info->ml_url_buffer =
                         g_string_new_len(chars, line_end - chars);
                     g_string_append_c(url_info->ml_url_buffer, '\n');
                 }
                 g_match_info_free(ml_url_match);
-                if (url_info->ml_url_buffer)
+                if (url_info->ml_url_buffer) {
                     return TRUE;
+                }
             }
         }
 
         /* add the url - it /may/ contain spaces if the text is flowed */
-        if ((spc = strchr(chars + start_pos, ' ')) && spc < chars + end_pos) {
+        if ((spc = strchr(chars + start_pos, ' ')) && (spc < chars + end_pos)) {
             GString *uri_real = g_string_new("");
             gchar *q, *buf;
 
@@ -1028,8 +1140,9 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
                 && g_match_info_fetch_pos(url_match, 0, &start_pos,
                                           &end_pos)
                 && chars + start_pos < line_end;
-        } else
+        } else {
             match = FALSE;
+        }
     }
     g_match_info_free(url_match);
 
@@ -1039,8 +1152,10 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
     return FALSE;
 }
 
+
 void
-libbalsa_unwrap_selection(GtkTextBuffer * buffer, GRegex * rex)
+libbalsa_unwrap_selection(GtkTextBuffer *buffer,
+                          GRegex        *rex)
 {
     GtkTextIter start, end;
     gchar *line;
@@ -1056,64 +1171,73 @@ libbalsa_unwrap_selection(GtkTextBuffer * buffer, GRegex * rex)
     /* Find quote depth and index of first non-quoted character. */
     line = get_line(buffer, &start);
     if (libbalsa_match_regex(line, rex, &quote_depth, &index)) {
-	/* skip one regular space following the quote characters */
-	if (line[index] == ' ')
-	    index++;
-	/* Replace quote string with standard form. */
-	end = start;
-	gtk_text_iter_set_line_index(&end, index);
-	gtk_text_buffer_delete(buffer, &start, &end);
-	do
-	    gtk_text_buffer_insert(buffer, &start, ">", 1);
-	while (--quote_depth);
-	gtk_text_buffer_insert(buffer, &start, " ", 1);
+        /* skip one regular space following the quote characters */
+        if (line[index] == ' ') {
+            index++;
+        }
+        /* Replace quote string with standard form. */
+        end = start;
+        gtk_text_iter_set_line_index(&end, index);
+        gtk_text_buffer_delete(buffer, &start, &end);
+        do {
+            gtk_text_buffer_insert(buffer, &start, ">", 1);
+        } while (--quote_depth);
+        gtk_text_buffer_insert(buffer, &start, " ", 1);
     }
     g_free(line);
 
     /* Unwrap remaining lines. */
     ins_quote = FALSE;
     while (gtk_text_iter_ends_line(&start)
-	   || gtk_text_iter_forward_to_line_end(&start)) {
-	gtk_text_buffer_get_iter_at_mark(buffer, &end, selection_end);
-	if (gtk_text_iter_compare(&start, &end) >= 0)
-	    break;
-	end = start;
-	if (!gtk_text_iter_forward_line(&end))
-	    break;
-	line = get_line(buffer, &end);
-	if (libbalsa_match_regex(line, rex, &quote_depth, &index) &&
-	    line[index] == ' ')
-	    index++;
-	gtk_text_iter_set_line_index(&end, index);
-	gtk_text_buffer_delete(buffer, &start, &end);
-	/* empty lines separate paragraphs */
-	if (line[index] == '\0') {
-	    gtk_text_buffer_insert(buffer, &start, "\n", 1);
-	    while (quote_depth--)
-		gtk_text_buffer_insert(buffer, &start, ">", 1);
-	    gtk_text_buffer_insert(buffer, &start, "\n", 1);
-	    ins_quote = TRUE;
-	} else if (ins_quote) {
-	    while (quote_depth--)
-		gtk_text_buffer_insert(buffer, &start, ">", 1);
-	    gtk_text_buffer_insert(buffer, &start, " ", 1);
-	    ins_quote = FALSE;
-	}
-	g_free(line);
-	/* Insert a space, if the line didn't end with one. */
-	if (!gtk_text_iter_starts_line(&start)) {
-	    gtk_text_iter_backward_char(&start);
-	    if (gtk_text_iter_get_char(&start) != ' ') {
-		start = end;
-		gtk_text_buffer_insert(buffer, &start, " ", 1);
-	    }
-	}
+           || gtk_text_iter_forward_to_line_end(&start)) {
+        gtk_text_buffer_get_iter_at_mark(buffer, &end, selection_end);
+        if (gtk_text_iter_compare(&start, &end) >= 0) {
+            break;
+        }
+        end = start;
+        if (!gtk_text_iter_forward_line(&end)) {
+            break;
+        }
+        line = get_line(buffer, &end);
+        if (libbalsa_match_regex(line, rex, &quote_depth, &index) &&
+            (line[index] == ' ')) {
+            index++;
+        }
+        gtk_text_iter_set_line_index(&end, index);
+        gtk_text_buffer_delete(buffer, &start, &end);
+        /* empty lines separate paragraphs */
+        if (line[index] == '\0') {
+            gtk_text_buffer_insert(buffer, &start, "\n", 1);
+            while (quote_depth--) {
+                gtk_text_buffer_insert(buffer, &start, ">", 1);
+            }
+            gtk_text_buffer_insert(buffer, &start, "\n", 1);
+            ins_quote = TRUE;
+        } else if (ins_quote) {
+            while (quote_depth--) {
+                gtk_text_buffer_insert(buffer, &start, ">", 1);
+            }
+            gtk_text_buffer_insert(buffer, &start, " ", 1);
+            ins_quote = FALSE;
+        }
+        g_free(line);
+        /* Insert a space, if the line didn't end with one. */
+        if (!gtk_text_iter_starts_line(&start)) {
+            gtk_text_iter_backward_char(&start);
+            if (gtk_text_iter_get_char(&start) != ' ') {
+                start = end;
+                gtk_text_buffer_insert(buffer, &start, " ", 1);
+            }
+        }
     }
 }
 
+
 gboolean
-libbalsa_match_regex(const gchar * line, GRegex * rex, guint * count,
-                     guint * index)
+libbalsa_match_regex(const gchar *line,
+                     GRegex      *rex,
+                     guint       *count,
+                     guint       *index)
 {
     GMatchInfo *rm;
     gint c;
@@ -1131,23 +1255,25 @@ libbalsa_match_regex(const gchar * line, GRegex * rex, guint * count,
     }
     g_match_info_free(rm);
 
-    if (count)
+    if (count) {
         *count = c;
-    if (index)
+    }
+    if (index) {
         *index = p - line;
+    }
     return c > 0;
 }
 
 
 GString *
-libbalsa_html_encode_hyperlinks(GString * paragraph)
+libbalsa_html_encode_hyperlinks(GString *paragraph)
 {
-    GString * retval;
-    gchar * p;
+    GString *retval;
+    gchar *p;
     GRegex *url_reg = get_url_reg();
     GMatchInfo *url_match;
     gboolean match;
-    gchar * markup;
+    gchar *markup;
 
     /* check for any url */
     if (!prescanner(paragraph->str, paragraph->len)) {
@@ -1166,8 +1292,9 @@ libbalsa_html_encode_hyperlinks(GString * paragraph)
     while (match) {
         gint start_pos, end_pos;
 
-        if (!g_match_info_fetch_pos(url_match, 0, &start_pos, &end_pos))
+        if (!g_match_info_fetch_pos(url_match, 0, &start_pos, &end_pos)) {
             break;
+        }
 
         /* add the url to the result */
         if (start_pos > 0) {
@@ -1186,8 +1313,9 @@ libbalsa_html_encode_hyperlinks(GString * paragraph)
         if (prescanner(p, paragraph->len - (p - paragraph->str))) {
             g_match_info_free(url_match);
             match = g_regex_match(url_reg, p, 0, &url_match);
-        } else
+        } else {
             match = FALSE;
+        }
     }
     g_match_info_free(url_match);
 
@@ -1205,45 +1333,52 @@ libbalsa_html_encode_hyperlinks(GString * paragraph)
 
 
 gchar *
-libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lang)
+libbalsa_text_to_html(const gchar *title,
+                      const gchar *body,
+                      const gchar *lang)
 {
-    GString * html_body =
+    GString *html_body =
         g_string_new("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n");
-    gchar * html_subject;
-    const gchar * start = body;
-    gchar * html_lang;
+    gchar *html_subject;
+    const gchar *start = body;
+    gchar *html_lang;
 
     /* set the html header, including the primary language and the title */
     if (lang) {
-        gchar * p;
+        gchar *p;
 
         html_lang = g_strdup(lang);
-        if ((p = strchr(html_lang, '_')))
+        if ((p = strchr(html_lang, '_'))) {
             *p = '-';
-    } else
+        }
+    } else {
         html_lang = g_strdup("x-unknown");
+    }
     html_subject = g_markup_escape_text(title, -1);
-    g_string_append_printf(html_body, 
+    g_string_append_printf(html_body,
                            "<html lang=\"%s\"><head>\n"
                            "<title>%s</title>\n"
                            "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n"
                            "<style type=\"text/css\">\n"
                            "  p { margin-top: 0px; margin-bottom: 0px; }\n"
                            "</style></head>\n"
-                           "<body>\n", html_lang, html_subject);
+                           "<body>\n",
+                           html_lang,
+                           html_subject);
     g_free(html_subject);
     g_free(html_lang);
 
     /* add the lines of the message body */
     while (*start) {
-        const gchar * eol = strchr(start, '\n');
-        const gchar * p = start;
+        const gchar *eol = strchr(start, '\n');
+        const gchar *p = start;
         PangoDirection direction = PANGO_DIRECTION_NEUTRAL;
-        GString * html;
+        GString *html;
         gsize idx;
 
-        if (!eol)
+        if (!eol) {
             eol = start + strlen(start);
+        }
 
         /* find the first real char to determine the paragraph direction */
         while (p < eol && direction == PANGO_DIRECTION_NEUTRAL) {
@@ -1260,12 +1395,13 @@ libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lan
         /* replace a series of n spaces by (n - 1) &nbsp; and one space */
         idx = 0;
         while (idx < html->len) {
-            if (html->str[idx] == ' ' && (idx == 0 || html->str[idx + 1] == ' ')) {
+            if ((html->str[idx] == ' ') && ((idx == 0) || (html->str[idx + 1] == ' '))) {
                 html->str[idx++] = '&';
                 html = g_string_insert(html, idx, "nbsp;");
                 idx += 5;
-            } else
+            } else {
                 idx = g_utf8_next_char(html->str + idx) - html->str;
+            }
         }
 
         /* append the paragraph, always stating the proper direction */
@@ -1276,13 +1412,14 @@ libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lan
 
         /* next line */
         start = eol;
-        if (*start)
+        if (*start) {
             start++;
+        }
     }
 
     /* close the html context */
     html_body = g_string_append(html_body, "</body></html>\n");
-    
+
     /* return the utf-8 encoded text/html */
     return g_string_free(html_body, FALSE);
 }

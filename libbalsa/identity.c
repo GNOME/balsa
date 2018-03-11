@@ -435,12 +435,12 @@ libbalsa_identity_set_smtp_server(LibBalsaIdentity * ident,
 }
 
 
-/* libbalsa_identity_new_config:
+/* libbalsa_identity_new_from_config:
    factory-type method creating new Identity object from given
    configuration data.
 */
 LibBalsaIdentity*
-libbalsa_identity_new_config(const gchar* name)
+libbalsa_identity_new_from_config(const gchar* name)
 {
     LibBalsaIdentity* ident;
     gchar *fname, *email;

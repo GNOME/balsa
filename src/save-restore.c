@@ -1599,7 +1599,7 @@ config_identity_load(const gchar * key, const gchar * value, gpointer data)
     gchar *smtp_server_name;
 
     libbalsa_conf_push_group(key);
-    ident = libbalsa_identity_new_config(value);
+    ident = libbalsa_identity_new_from_config(value);
     smtp_server_name = libbalsa_conf_get_string("SmtpServer");
     libbalsa_identity_set_smtp_server(ident,
                                       find_smtp_server_by_name
@@ -1634,7 +1634,7 @@ config_identities_load()
 	libbalsa_conf_push_group("identity-default");
         balsa_app.identities =
             g_list_prepend(NULL,
-                           libbalsa_identity_new_config("default"));
+                           libbalsa_identity_new_from_config("default"));
 	libbalsa_conf_pop_group();
     }
 

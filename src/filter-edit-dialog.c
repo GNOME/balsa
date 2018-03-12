@@ -383,7 +383,7 @@ build_action_page(GtkWindow * window)
     /* The notification area */
 
     frame = gtk_frame_new(_("Notification:"));
-    gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
+    gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
     gtk_box_pack_start(GTK_BOX(page), frame);
 
@@ -435,7 +435,7 @@ build_action_page(GtkWindow * window)
 
     /* The action area */
     frame = gtk_frame_new(_("Action to perform:"));
-    gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
+    gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
     gtk_box_pack_start(GTK_BOX(page), frame);
 

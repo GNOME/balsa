@@ -937,8 +937,7 @@ get_field_frame(void)
     GtkWidget *frame = gtk_frame_new(_("Match Fields"));
     GList *list;
 
-    gtk_frame_set_label_align(GTK_FRAME(frame),
-                              GTK_POS_LEFT, GTK_POS_TOP);
+    gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
 
     grid = gtk_grid_new();
@@ -1139,7 +1138,7 @@ build_type_notebook()
         gtk_label_new(_("Match when one of these flags is set:"));
     gtk_grid_attach(GTK_GRID(page), fe_type_flag_label, 0, 0, 1, 1);
     frame = gtk_frame_new(NULL);
-    gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
+    gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
     gtk_grid_attach(GTK_GRID(page), frame, 0, 1, 1, 1);
 

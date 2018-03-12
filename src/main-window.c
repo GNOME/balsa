@@ -3781,8 +3781,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
          * the search. */
 
 	frame = gtk_frame_new(_("In:"));
-	gtk_frame_set_label_align(GTK_FRAME(frame),
-				  GTK_POS_LEFT, GTK_POS_TOP);
+	gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
         gtk_widget_set_margin_top(frame, 2);
 	gtk_box_pack_start(GTK_BOX(vbox), frame);

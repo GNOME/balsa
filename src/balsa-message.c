@@ -2364,8 +2364,10 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
         for (id_list = balsa_app.identities; !mdn_ident && id_list;
              id_list = id_list->next) {
             LibBalsaIdentity *ident = LIBBALSA_IDENTITY(id_list->data);
+            InternetAddress *ia;
 
-            if (libbalsa_ia_rfc2821_equal(ident->ia, bm_get_mailbox(list)))
+            ia = libbalsa_identity_get_address(ident);
+            if (libbalsa_ia_rfc2821_equal(ia, bm_get_mailbox(list)))
                 mdn_ident = ident;
         }
     }
@@ -2377,8 +2379,10 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
         for (id_list = balsa_app.identities; !mdn_ident && id_list;
              id_list = id_list->next) {
             LibBalsaIdentity *ident = LIBBALSA_IDENTITY(id_list->data);
+            InternetAddress *ia;
 
-            if (libbalsa_ia_rfc2821_equal(ident->ia, bm_get_mailbox(list)))
+            ia = libbalsa_identity_get_address(ident);
+            if (libbalsa_ia_rfc2821_equal(ia, bm_get_mailbox(list)))
                 mdn_ident = ident;
         }
     }
@@ -2419,7 +2423,7 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
 
         result = libbalsa_message_send(mdn, balsa_app.outbox, NULL,
 				       balsa_find_sentbox_by_url,
-				       mdn_ident->smtp_server,
+				       libbalsa_identity_get_smtp_server(mdn_ident),
 					   balsa_app.send_progress_dialog,
                                        parent,
 				       TRUE, &error);
@@ -2448,7 +2452,7 @@ static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
     message = libbalsa_message_new();
     message->headers->from = internet_address_list_new();
     internet_address_list_add(message->headers->from,
-                              balsa_app.current_ident->ia);
+                              libbalsa_identity_get_address(balsa_app.current_ident));
     message->headers->date = time(NULL);
     libbalsa_message_set_subject(message, "Message Disposition Notification");
     message->headers->to_list = internet_address_list_new ();
@@ -2493,9 +2497,9 @@ static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
 	g_string_append_printf(report, "Original-Recipient: %s\n",
 			       original_rcpt);
     g_string_append_printf(report, "Final-Recipient: rfc822; %s\n",
-                           INTERNET_ADDRESS_MAILBOX(balsa_app.
-                                                    current_ident->ia)->
-                           addr);
+                           INTERNET_ADDRESS_MAILBOX
+                           (libbalsa_identity_get_address
+                            (balsa_app.current_ident))->addr);
     if (for_msg->message_id)
         g_string_append_printf(report, "Original-Message-ID: <%s>\n",
                                for_msg->message_id);
@@ -2560,8 +2564,8 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
         result =
             libbalsa_message_send(send_msg, balsa_app.outbox, NULL,
                                   balsa_find_sentbox_by_url,
-                                  mdn_ident->smtp_server,
-								  balsa_app.send_progress_dialog,
+				  libbalsa_identity_get_smtp_server(mdn_ident),
+                                  balsa_app.send_progress_dialog,
                                   gtk_window_get_transient_for
                                   ((GtkWindow *) dialog),
                                   TRUE, &error);

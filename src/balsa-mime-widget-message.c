@@ -343,7 +343,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     message = libbalsa_message_new();
     message->headers->from = internet_address_list_new();
     internet_address_list_add(message->headers->from,
-                              balsa_app.current_ident->ia);
+                              libbalsa_identity_get_address(balsa_app.current_ident));
 
     data = libbalsa_message_body_get_parameter(mime_body, "subject");
     if (data) {
@@ -382,7 +382,8 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     libbalsa_message_append_part(message, body);
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,
 				   balsa_find_sentbox_by_url,
-				   balsa_app.current_ident->smtp_server,
+				   libbalsa_identity_get_smtp_server
+                                   (balsa_app.current_ident),
 				   balsa_app.send_progress_dialog,
                                    GTK_WINDOW(gtk_widget_get_toplevel
                                               (button)),

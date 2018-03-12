@@ -1607,7 +1607,8 @@ config_identity_load(const gchar * key, const gchar * value, gpointer data)
     g_free(smtp_server_name);
     libbalsa_conf_pop_group();
     balsa_app.identities = g_list_prepend(balsa_app.identities, ident);
-    if (g_ascii_strcasecmp(default_ident, ident->identity_name) == 0)
+    if (g_ascii_strcasecmp(libbalsa_identity_get_identity_name(ident),
+                           default_ident) == 0)
         balsa_app.current_ident = ident;
 
     return FALSE;
@@ -1658,8 +1659,9 @@ config_identities_save(void)
     gchar *prefix;
 
     libbalsa_conf_push_group("identity");
-    libbalsa_conf_set_string("CurrentIdentity", 
-                            balsa_app.current_ident->identity_name);
+    libbalsa_conf_set_string("CurrentIdentity",
+                             libbalsa_identity_get_identity_name
+                             (balsa_app.current_ident));
     libbalsa_conf_pop_group();
 
     config_remove_groups(IDENTITY_SECTION_PREFIX);
@@ -1668,7 +1670,7 @@ config_identities_save(void)
     for (list = balsa_app.identities; list; list = list->next) {
 	ident = LIBBALSA_IDENTITY(list->data);
 	prefix = g_strconcat(IDENTITY_SECTION_PREFIX, 
-			     ident->identity_name, NULL);
+			     libbalsa_identity_get_identity_name(ident), NULL);
         libbalsa_identity_save(ident, prefix);
 	g_free(prefix);
     }

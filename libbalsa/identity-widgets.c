@@ -60,7 +60,10 @@ get_selected_identity(GtkTreeView * tree)
 static gint
 compare_identities(LibBalsaIdentity *id1, LibBalsaIdentity *id2)
 {
-    return g_ascii_strcasecmp(id1->identity_name, id2->identity_name);
+    const gchar *name1 = libbalsa_identity_get_identity_name(id1);
+    const gchar *name2 = libbalsa_identity_get_identity_name(id2);
+
+    return g_ascii_strcasecmp(name1, name2);
 }
 
 static gboolean
@@ -109,7 +112,7 @@ identity_list_update_real(GtkTreeView * tree,
         gtk_list_store_append(store, &iter);
         gtk_list_store_set(store, &iter,
                            DEFAULT_COLUMN, ident == default_id,
-                           NAME_COLUMN, ident->identity_name,
+                           NAME_COLUMN, libbalsa_identity_get_identity_name(ident),
                            IDENT_COLUMN, ident,
                            -1);
     }
@@ -392,7 +395,8 @@ static void add_show_menu(const char *label, gpointer data,
 static void ident_dialog_free_values(GPtrArray * values);
 
 static void display_frame_set_gpg_mode(GObject * dialog,
-                                       const gchar * key, gint * value);
+                                       const gchar * key,
+                                       LibBalsaIdentity * ident);
 
 static void ident_dialog_add_smtp_menu(GtkWidget * grid, gint row,
                                        GtkDialog * dialog,
@@ -1115,7 +1119,8 @@ ident_dialog_update(GObject * dlg)
     for (list = *identities; list != NULL; list = list->next) {
         exist_ident = list->data;
 
-        if (g_ascii_strcasecmp(exist_ident->identity_name, text) == 0
+        if (g_ascii_strcasecmp(libbalsa_identity_get_identity_name(exist_ident),
+                               text) == 0
             && id != exist_ident) {
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                  _("Error: An identity with that"
@@ -1504,68 +1509,67 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
         return;
 
     ident_dialog_update(dialog);
-    display_frame_set_field(dialog, "identity-name", ident->identity_name);
-    display_frame_set_field(dialog, "identity-fullname", ident->ia ? ident->ia->name : NULL);
-    if (ident->ia && INTERNET_ADDRESS_IS_MAILBOX (ident->ia))
+    display_frame_set_field(dialog, "identity-name", libbalsa_identity_get_identity_name(ident));
+    display_frame_set_field(dialog, "identity-fullname", libbalsa_identity_get_address(ident) ? libbalsa_identity_get_address(ident)->name : NULL);
+    if (libbalsa_identity_get_address(ident) && INTERNET_ADDRESS_IS_MAILBOX (libbalsa_identity_get_address(ident)))
         display_frame_set_field(dialog, "identity-address",
-                                INTERNET_ADDRESS_MAILBOX(ident->ia)->addr);
+                                INTERNET_ADDRESS_MAILBOX(libbalsa_identity_get_address(ident))->addr);
     else
         display_frame_set_field(dialog, "identity-address", NULL);
 
-    display_frame_set_field(dialog, "identity-replyto", ident->replyto);
-    display_frame_set_field(dialog, "identity-domain", ident->domain);
-    display_frame_set_field(dialog, "identity-bcc", ident->bcc);
+    display_frame_set_field(dialog, "identity-replyto", libbalsa_identity_get_replyto(ident));
+    display_frame_set_field(dialog, "identity-domain", libbalsa_identity_get_domain(ident));
+    display_frame_set_field(dialog, "identity-bcc", libbalsa_identity_get_bcc(ident));
     display_frame_set_field(dialog, "identity-replystring",
-                            ident->reply_string);
+                            libbalsa_identity_get_reply_string(ident));
     display_frame_set_field(dialog, "identity-forwardstring",
-                            ident->forward_string);
+                            libbalsa_identity_get_forward_string(ident));
     display_frame_set_boolean(dialog, "identity-sendmpalternative",
-                              ident->send_mp_alternative);
+                              libbalsa_identity_get_send_mp_alternative(ident));
     display_frame_set_server(dialog, "identity-smtp-server",
-                             ident->smtp_server);
+                             libbalsa_identity_get_smtp_server(ident));
 
     display_frame_set_path(dialog, "identity-sigpath",
-                           ident->signature_path, FALSE);
-    display_frame_set_boolean(dialog, "identity-sigexecutable", ident->sig_executable);
+                           libbalsa_identity_get_signature_path(ident), FALSE);
+    display_frame_set_boolean(dialog, "identity-sigexecutable", libbalsa_identity_get_sig_executable(ident));
 
-    display_frame_set_boolean(dialog, "identity-sigappend", ident->sig_sending);
+    display_frame_set_boolean(dialog, "identity-sigappend", libbalsa_identity_get_sig_sending(ident));
     display_frame_set_boolean(dialog, "identity-whenforward",
-                              ident->sig_whenforward);
+                              libbalsa_identity_get_sig_whenforward(ident));
     display_frame_set_boolean(dialog, "identity-whenreply",
-                              ident->sig_whenreply);
+                              libbalsa_identity_get_sig_whenreply(ident));
     display_frame_set_boolean(dialog, "identity-sigseparator",
-                              ident->sig_separator);
+                              libbalsa_identity_get_sig_separator(ident));
     display_frame_set_boolean(dialog, "identity-sigprepend",
-                              ident->sig_prepend);
+                              libbalsa_identity_get_sig_prepend(ident));
 
     face_box = g_object_get_data(G_OBJECT(dialog),
                                  path_info[LBI_PATH_TYPE_FACE].box_key);
     gtk_widget_hide(face_box);
     display_frame_set_path(dialog, path_info[LBI_PATH_TYPE_FACE].path_key,
-                           ident->face, TRUE);
+                           libbalsa_identity_get_face_path(ident), TRUE);
 
     face_box = g_object_get_data(G_OBJECT(dialog),
                                  path_info[LBI_PATH_TYPE_XFACE].box_key);
     gtk_widget_hide(face_box);
     display_frame_set_path(dialog, path_info[LBI_PATH_TYPE_XFACE].path_key,
-                           ident->x_face, TRUE);
+                           libbalsa_identity_get_x_face_path(ident), TRUE);
     display_frame_set_boolean(dialog, "identity-requestmdn",
-                              ident->request_mdn);
+                              libbalsa_identity_get_request_mdn(ident));
     display_frame_set_boolean(dialog, "identity-requestdsn",
-                              ident->request_dsn);
+                              libbalsa_identity_get_request_dsn(ident));
 
     display_frame_set_boolean(dialog, "identity-gpgsign",
-                              ident->gpg_sign);
+                              libbalsa_identity_get_gpg_sign(ident));
     display_frame_set_boolean(dialog, "identity-gpgencrypt",
-                              ident->gpg_encrypt);
+                              libbalsa_identity_get_gpg_encrypt(ident));
     display_frame_set_boolean(dialog, "identity-trust-always",
-                              ident->always_trust);
+                              libbalsa_identity_get_always_trust(ident));
     display_frame_set_boolean(dialog, "identity-warn-send-plain",
-                              ident->warn_send_plain);
-    display_frame_set_gpg_mode(dialog, "identity-crypt-protocol",
-			   &ident->crypt_protocol);
-    display_frame_set_field(dialog, "identity-keyid", ident->force_gpg_key_id);
-    display_frame_set_field(dialog, "identity-keyid-sm", ident->force_smime_key_id);
+                              libbalsa_identity_get_warn_send_plain(ident));
+    display_frame_set_gpg_mode(dialog, "identity-crypt-protocol", ident);
+    display_frame_set_field(dialog, "identity-keyid", libbalsa_identity_get_force_gpg_key_id(ident));
+    display_frame_set_field(dialog, "identity-keyid-sm", libbalsa_identity_get_force_smime_key_id(ident));
 }
 
 
@@ -1611,22 +1615,25 @@ display_frame_set_path(GObject * dialog,
 
 
 static void
-display_frame_set_gpg_mode(GObject * dialog, const gchar* key, gint * value)
+display_frame_set_gpg_mode(GObject * dialog, const gchar* key, LibBalsaIdentity * ident)
 {
     GtkComboBox *opt_menu = g_object_get_data(G_OBJECT(dialog), key);
+    gint value = libbalsa_identity_get_crypt_protocol(ident);
 
-    switch (*value)
+    switch (value)
         {
+        case LIBBALSA_PROTECT_RFC3156:
+	    gtk_combo_box_set_active(opt_menu, 0);
+            break;
         case LIBBALSA_PROTECT_OPENPGP:
 	    gtk_combo_box_set_active(opt_menu, 1);
             break;
         case LIBBALSA_PROTECT_SMIMEV3:
 	    gtk_combo_box_set_active(opt_menu, 2);
             break;
-        case LIBBALSA_PROTECT_RFC3156:
         default:
 	    gtk_combo_box_set_active(opt_menu, 0);
-            *value = LIBBALSA_PROTECT_RFC3156;
+            libbalsa_identity_set_crypt_protocol(ident, LIBBALSA_PROTECT_RFC3156);
         }
 }
 
@@ -1781,8 +1788,8 @@ libbalsa_identity_combo_box(GList       * identities,
         GtkTreeIter iter;
 
         ident = list->data;
-        from = internet_address_to_string(ident->ia, FALSE);
-	name = g_strconcat("(", ident->identity_name, ")", NULL);
+        from = internet_address_to_string(libbalsa_identity_get_address(ident), FALSE);
+	name = g_strconcat("(", libbalsa_identity_get_identity_name(ident), ")", NULL);
 
         gtk_list_store_append(store, &iter);
         gtk_list_store_set(store, &iter,
@@ -1794,7 +1801,7 @@ libbalsa_identity_combo_box(GList       * identities,
         g_free(from);
         g_free(name);
 
-        if (g_strcmp0(active_name, ident->identity_name) == 0)
+        if (g_strcmp0(active_name, libbalsa_identity_get_identity_name(ident)) == 0)
             gtk_combo_box_set_active_iter(GTK_COMBO_BOX(combo_box), &iter);
     }
     g_object_unref(store);

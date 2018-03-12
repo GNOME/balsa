@@ -39,55 +39,19 @@ G_DECLARE_FINAL_TYPE(LibBalsaIdentity,
                      IDENTITY,
                      GObject)
 
-struct _LibBalsaIdentity {
-    GObject object;
-
-    gchar *identity_name;
-
-    InternetAddress *ia;
-    gchar *replyto;
-    gchar *domain;
-    gchar *bcc;
-    gchar *reply_string;
-    gchar *forward_string;
-    gboolean send_mp_alternative;
-
-    gchar *signature_path;
-    gboolean sig_executable;
-    gboolean sig_sending;
-    gboolean sig_whenforward;
-    gboolean sig_whenreply;
-    gboolean sig_separator;
-    gboolean sig_prepend;
-    gchar *face;
-    gchar *x_face;
-    gboolean request_mdn;
-    gboolean request_dsn;
-
-    gboolean gpg_sign;
-    gboolean gpg_encrypt;
-    gboolean always_trust;
-    gboolean warn_send_plain;
-    gint crypt_protocol;
-    gchar *force_gpg_key_id;
-    gchar *force_smime_key_id;
-    LibBalsaSmtpServer *smtp_server;
-};
-
-struct _LibBalsaIdentityClass {
-    GObjectClass parent_class;
-};
-
-
 /* Function prototypes */
-GObject *libbalsa_identity_new(void);
-GObject *libbalsa_identity_new_with_name(const gchar *ident_name);
+LibBalsaIdentity *libbalsa_identity_new(void);
+LibBalsaIdentity *libbalsa_identity_new_with_name(const gchar *ident_name);
+LibBalsaIdentity *libbalsa_identity_new_from_config(const gchar *name);
+void              libbalsa_identity_save(LibBalsaIdentity *ident,
+                                         const gchar      *prefix);
 
+/* Setters */
 void     libbalsa_identity_set_identity_name(LibBalsaIdentity *ident,
                                              const gchar      *name);
 void     libbalsa_identity_set_address(LibBalsaIdentity *ident,
                                        InternetAddress  *ia);
-void     libbalsa_identity_set_replyto(LibBalsaIdentity *id,
+void     libbalsa_identity_set_replyto(LibBalsaIdentity *ident,
                                        const gchar      *reply_to);
 void     libbalsa_identity_set_domain(LibBalsaIdentity *ident,
                                       const gchar      *text);
@@ -142,10 +106,38 @@ void libbalsa_identity_set_gpg_encrypt(LibBalsaIdentity *ident,
 void libbalsa_identity_set_crypt_protocol(LibBalsaIdentity *ident,
                                           gint              proto);
 
-LibBalsaIdentity *libbalsa_identity_new_from_config(const gchar *name);
-void              libbalsa_identity_save(LibBalsaIdentity *id,
-                                         const gchar      *prefix);
 
+/*
+ * Getters
+ */
+
+gboolean     libbalsa_identity_get_sig_prepend(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_sig_whenreply(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_sig_whenforward(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_sig_sending(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_send_mp_alternative(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_request_mdn(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_request_dsn(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_warn_send_plain(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_always_trust(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_gpg_sign(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_gpg_encrypt(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_sig_executable(LibBalsaIdentity *ident);
+gboolean     libbalsa_identity_get_sig_separator(LibBalsaIdentity *ident);
+gint         libbalsa_identity_get_crypt_protocol(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_identity_name(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_force_gpg_key_id(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_force_smime_key_id(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_replyto(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_bcc(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_reply_string(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_forward_string(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_domain(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_face_path(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_x_face_path(LibBalsaIdentity *ident);
+const gchar *libbalsa_identity_get_signature_path(LibBalsaIdentity *ident);
+InternetAddress *libbalsa_identity_get_address(LibBalsaIdentity *ident);
+LibBalsaSmtpServer * libbalsa_identity_get_smtp_server(LibBalsaIdentity * ident);
 
 G_END_DECLS
 

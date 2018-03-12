@@ -1649,7 +1649,8 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 
         model = gtk_combo_box_get_model(combo_box);
         gtk_tree_model_get(model, &iter, 2, &ident, -1);
-        libbalsa_mailbox_set_identity_name(mailbox, ident->identity_name);
+        libbalsa_mailbox_set_identity_name(mailbox,
+                                           libbalsa_identity_get_identity_name(ident));
         g_object_unref(ident);
         changed = TRUE;
     }

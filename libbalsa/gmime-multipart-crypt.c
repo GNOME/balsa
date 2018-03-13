@@ -537,7 +537,7 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 
     /* cache the decrypted part */
     if (signature) {
-	if (sigstat->status != GPG_ERR_NOT_SIGNED)
+	if (g_mime_gpgme_sigstat_get_status(sigstat) != GPG_ERR_NOT_SIGNED)
 	    *signature = sigstat;
 	else
 	    g_object_unref(G_OBJECT(sigstat));

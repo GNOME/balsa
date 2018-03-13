@@ -195,7 +195,8 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 	if (add_signature) {
 	    gchar *header =
 		g_strdup_printf(_("This is an inline %s signed %s message part:"),
-				body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP ?
+				g_mime_gpgme_sigstat_get_protocol(body->sig_info)
+                                == GPGME_PROTOCOL_OpenPGP ?
 				_("OpenPGP") : _("S/MIME"), conttype);
 	    bpo_list = balsa_print_object_separator(bpo_list, psetup);
 	    bpo_list = balsa_print_object_header_crypto(bpo_list, context, body, header, psetup);

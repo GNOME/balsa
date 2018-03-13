@@ -785,12 +785,13 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 	if (part->parts
 	    && part->parts->next
 	    && part->parts->next->sig_info
-	    && part->parts->next->sig_info->status !=
+	    && g_mime_gpgme_sigstat_get_status(part->parts->next->sig_info) !=
 	    GPG_ERR_NOT_SIGNED)
 	    /* top-level part is RFC 3156 or RFC 2633 signed */
 	    add_header_sigstate(grid, part->parts->next->sig_info);
 	else if (part->sig_info
-		 && part->sig_info->status != GPG_ERR_NOT_SIGNED)
+		 && g_mime_gpgme_sigstat_get_status(part->sig_info) !=
+                 GPG_ERR_NOT_SIGNED)
 	    /* top-level is OpenPGP (RFC 2440) signed */
 	    add_header_sigstate(grid, part->sig_info);
     }
@@ -849,13 +850,13 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
     gchar *format;
     gchar *msg;
     GtkWidget *label;
+    gpgme_error_t status;
 
-    format = siginfo->status ==
-        GPG_ERR_NO_ERROR ? "<i>%s%s</i>" : "<b><i>%s%s</i></b>";
-    msg = g_markup_printf_escaped
-        (format,
-        	g_mime_gpgme_sigstat_protocol_name(siginfo),
-         libbalsa_gpgme_sig_stat_to_gchar(siginfo->status));
+    status = g_mime_gpgme_sigstat_get_status(siginfo);
+    format = status == GPG_ERR_NO_ERROR ? "<i>%s%s</i>" : "<b><i>%s%s</i></b>";
+    msg = g_markup_printf_escaped(format,
+                                  g_mime_gpgme_sigstat_protocol_name(siginfo),
+                                  libbalsa_gpgme_sig_stat_to_gchar(status));
 
     label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(label), msg);

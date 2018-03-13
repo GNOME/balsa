@@ -234,7 +234,8 @@ balsa_print_object_header_new_real(GList * list,
 
 	    g_string_append_printf(header_buf, "%s%s\n",
 	    	g_mime_gpgme_sigstat_protocol_name(siginfo),
-                                   libbalsa_gpgme_sig_stat_to_gchar(siginfo->status));
+                                   libbalsa_gpgme_sig_stat_to_gchar
+                                   (g_mime_gpgme_sigstat_get_status(siginfo)));
 	}
     }
 #endif				/* HAVE_GPGME */
@@ -389,8 +390,8 @@ balsa_print_object_header_crypto(GList *list, GtkPrintContext * context,
     pango_font_description_free(header_font);
 
     /* check if the key needs to be loaded */
-    if (((body->sig_info->summary & GPGME_SIGSUM_KEY_MISSING) == 0) &&
-    	(body->sig_info->key == NULL)) {
+    if (((g_mime_gpgme_sigstat_get_summary(body->sig_info) & GPGME_SIGSUM_KEY_MISSING) == 0) &&
+    	(g_mime_gpgme_sigstat_get_key(body->sig_info) == NULL)) {
     	g_mime_gpgme_sigstat_load_key(body->sig_info);
     }
 

@@ -2669,6 +2669,7 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
     GdkPixbuf *icon;
     gchar * new_title;
     const gchar * icon_name;
+    gpgme_error_t status;
 
     if ((libbalsa_message_body_protection(body) &
          (LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_ERROR)) ==
@@ -2683,21 +2684,21 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
     if (!icon_title)
         return icon;
 
+    status = g_mime_gpgme_sigstat_get_status(body->sig_info);
     if (*icon_title &&
 	g_ascii_strcasecmp(content_type, "application/pgp-signature") &&
 	g_ascii_strcasecmp(content_type, "application/pkcs7-signature") &&
-	g_ascii_strcasecmp(content_type, "application/x-pkcs7-signature"))
+	g_ascii_strcasecmp(content_type, "application/x-pkcs7-signature")) {
 	new_title = g_strconcat(*icon_title, "; ",
 		g_mime_gpgme_sigstat_protocol_name(body->sig_info),
-				libbalsa_gpgme_sig_stat_to_gchar(body->sig_info->status),
+				libbalsa_gpgme_sig_stat_to_gchar(status),
 				NULL);
-    else
+    } else
 	new_title = g_strconcat(g_mime_gpgme_sigstat_protocol_name(body->sig_info),
-				libbalsa_gpgme_sig_stat_to_gchar(body->sig_info->status),
+				libbalsa_gpgme_sig_stat_to_gchar(status),
 				NULL);
 
-    if (*icon_title)
-	g_free(*icon_title);
+    g_free(*icon_title);
     *icon_title = new_title;
 
     return icon;
@@ -2910,7 +2911,8 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 				 _("Detected a good signature"));
 	    break;
 	case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
-	    if (body->parts->next->sig_info->protocol == GPGME_PROTOCOL_CMS)
+	    if (g_mime_gpgme_sigstat_get_protocol(body->parts->next->sig_info)
+                == GPGME_PROTOCOL_CMS)
 		libbalsa_information
 		    (LIBBALSA_INFORMATION_MESSAGE,
 		     _("Detected a good signature with insufficient "
@@ -2928,7 +2930,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 		 _("Checking the signature of the message sent by %s with "
 		   "subject “%s” returned:\n%s"),
 		 chk_crypto->sender, chk_crypto->subject,
-		 libbalsa_gpgme_sig_stat_to_gchar(body->parts->next->sig_info->status));
+		 libbalsa_gpgme_sig_stat_to_gchar(g_mime_gpgme_sigstat_get_status(body->parts->next->sig_info)));
 	    break;
 	default:
 	    break;
@@ -3031,7 +3033,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
     libbalsa_mailbox_unlock_store(body->message->mailbox);
 
     if (body->sig_info && sig_res == GPG_ERR_NO_ERROR) {
-        if ((body->sig_info->summary & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
+        if ((g_mime_gpgme_sigstat_get_summary(body->sig_info) & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
         	g_debug("%s: detected a good signature", __func__);
         } else {
             libbalsa_information

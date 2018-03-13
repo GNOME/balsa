@@ -874,21 +874,32 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
 
 #ifdef HAVE_GPGME
 LibBalsaMsgProtectState
-libbalsa_message_body_protect_state(LibBalsaMessageBody *body)
+libbalsa_message_body_protect_state(LibBalsaMessageBody * body)
 {
-	LibBalsaMsgProtectState state;
+    gpgme_error_t status;
+    LibBalsaMsgProtectState state;
 
-	if ((body == NULL) || (body->sig_info == NULL) || (body->sig_info->status == GPG_ERR_NOT_SIGNED) ||
-		(body->sig_info->status == GPG_ERR_CANCELED)) {
-		state = LIBBALSA_MSG_PROTECT_NONE;
-	} else if (body->sig_info->status != GPG_ERR_NO_ERROR) {
-		state = LIBBALSA_MSG_PROTECT_SIGN_BAD;
-	} else if ((body->sig_info->summary & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
-		state = LIBBALSA_MSG_PROTECT_SIGN_GOOD;
-	} else {
-		state = LIBBALSA_MSG_PROTECT_SIGN_NOTRUST;
-	}
+    if ((body == NULL) || (body->sig_info == NULL)) {
+        return LIBBALSA_MSG_PROTECT_NONE;
+    }
 
-	return state;
+    status = g_mime_gpgme_sigstat_get_status(body->sig_info);
+
+    if (status == GPG_ERR_NOT_SIGNED || status == GPG_ERR_CANCELED) {
+        state = LIBBALSA_MSG_PROTECT_NONE;
+    } else if (status != GPG_ERR_NO_ERROR) {
+        state = LIBBALSA_MSG_PROTECT_SIGN_BAD;
+    } else {
+        gpgme_sigsum_t summary =
+            g_mime_gpgme_sigstat_get_summary(body->sig_info);
+
+        if ((summary & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
+            state = LIBBALSA_MSG_PROTECT_SIGN_GOOD;
+        } else {
+            state = LIBBALSA_MSG_PROTECT_SIGN_NOTRUST;
+        }
+    }
+
+    return state;
 }
 #endif

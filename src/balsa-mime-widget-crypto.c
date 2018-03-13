@@ -111,9 +111,13 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     GtkWidget *vbox, *label;
     GtkWidget *signature_widget;
     gchar **lines;
+    gpgme_error_t status;
 
-    if (!mime_body->sig_info ||
-	mime_body->sig_info->status == GPG_ERR_NOT_SIGNED)
+    if (mime_body->sig_info == NULL)
+	return NULL;
+
+    status = g_mime_gpgme_sigstat_get_status(mime_body->sig_info);
+    if (status == GPG_ERR_NOT_SIGNED)
 	return NULL;
 
     infostr = g_mime_gpgme_sigstat_to_gchar(mime_body->sig_info, FALSE, balsa_app.date_string);
@@ -128,17 +132,19 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(vbox), label);
-    if (mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP) {
+    if (g_mime_gpgme_sigstat_get_protocol(mime_body->sig_info)
+            == GPGME_PROTOCOL_OpenPGP) {
         GtkWidget *button;
 
-        if (mime_body->sig_info->status == GPG_ERR_NO_PUBKEY) {
+        if (status == GPG_ERR_NO_PUBKEY) {
             button = gtk_button_new_with_mnemonic(_("_Search key server for this key"));
         } else {
             button = gtk_button_new_with_mnemonic(_("_Search key server for updates of this key"));
         }
         g_signal_connect(G_OBJECT(button), "clicked",
                          G_CALLBACK(on_gpg_key_button),
-                         (gpointer)mime_body->sig_info->fingerprint);
+                         (gpointer) g_mime_gpgme_sigstat_get_fingerprint
+                                    (mime_body->sig_info));
         gtk_box_pack_start(GTK_BOX(vbox), button);
     }
 
@@ -154,8 +160,9 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     /* add a callback to load the key when the user wants to show the details
      * Note: do *not* pass mime_body->sig_info to the callback, as it will be replaced when the user re-checks the signature or
      * opens the message again in a separate window */
-    if (((mime_body->sig_info->summary & GPGME_SIGSUM_KEY_MISSING) == 0) &&
-    	(mime_body->sig_info->key == NULL)) {
+    if (((g_mime_gpgme_sigstat_get_summary(mime_body->sig_info)
+          & GPGME_SIGSUM_KEY_MISSING) == 0) &&
+    	(g_mime_gpgme_sigstat_get_key(mime_body->sig_info) == NULL)) {
     	g_signal_connect(expander, "activate", (GCallback) show_public_key_data, mime_body);
     	g_object_set_data(G_OBJECT(expander), "vbox", vbox);
     }
@@ -353,16 +360,23 @@ show_public_key_data(GtkExpander *expander,
 
 	g_message("%s: %p %p %p", __func__, expander, body, body->sig_info);
 	if (body->sig_info != NULL) {
-		if (body->sig_info->key == NULL) {
+                gpgme_key_t key;
+
+                key = g_mime_gpgme_sigstat_get_key(body->sig_info);
+		if (key == NULL) {
 			g_mime_gpgme_sigstat_load_key(body->sig_info);
 		}
 
-		if ((g_object_get_data(G_OBJECT(expander), "vbox") != NULL) && (body->sig_info->key != NULL)) {
+		if (g_object_get_data(G_OBJECT(expander), "vbox") != NULL &&
+                    key != NULL) {
 			GtkWidget *key_widget;
 			GtkBox *vbox;
+                        const gchar *fingerprint;
 
 			vbox = GTK_BOX(g_object_steal_data(G_OBJECT(expander), "vbox"));
-			key_widget = libbalsa_gpgme_key(body->sig_info->key, body->sig_info->fingerprint, 0U, FALSE);
+                        fingerprint =
+                            g_mime_gpgme_sigstat_get_fingerprint(body->sig_info);
+			key_widget = libbalsa_gpgme_key(key, fingerprint, 0U, FALSE);
 			gtk_box_pack_start(vbox, key_widget);
 			gtk_box_reorder_child(vbox, key_widget, 1U);
 		}

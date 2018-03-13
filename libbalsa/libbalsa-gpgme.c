@@ -347,7 +347,7 @@ libbalsa_gpgme_verify(GMimeStream * content, GMimeStream * sig_plain,
     	libbalsa_gpgme_set_error(error, err,
 			       _("signature verification failed"));
 	result = g_mime_gpgme_sigstat_new(ctx);
-	result->status = err;
+	g_mime_gpgme_sigstat_set_status(result, err);
     } else
 	result = g_mime_gpgme_sigstat_new_from_gpgme_ctx(ctx);
 

@@ -200,13 +200,13 @@ create_pop3_mbx(const gchar *name, const gchar* host, gint security,
 {
     LibBalsaMailboxPop3 *pop = libbalsa_mailbox_pop3_new();
     LibBalsaMailbox *mbx   = LIBBALSA_MAILBOX(pop);
-    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(pop);
+    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(pop);
 
     libbalsa_server_set_username(server, login);
     libbalsa_server_set_password(server, passwd);
     libbalsa_server_set_host(server, host, FALSE);
-    server->security        = security;
-    server->remember_passwd = remember;
+    libbalsa_server_set_security(server, security);
+    libbalsa_server_set_remember_passwd(server, remember);
     mbx->name               = g_strdup(name && *name ? name : host);
     pop->check              = TRUE;
     pop->disable_apop       = FALSE;
@@ -230,15 +230,15 @@ create_imap_mbx(const gchar *name, const gchar* host, gint security,
     libbalsa_server_set_host(server, host, security == NET_CLIENT_CRYPT_ENCRYPTED);
     switch (security) {
     case NET_CLIENT_CRYPT_STARTTLS:
-    	server->tls_mode   = LIBBALSA_TLS_REQUIRED;
+     libbalsa_server_set_tls_mode(server, LIBBALSA_TLS_REQUIRED);
     	break;
     case NET_CLIENT_CRYPT_STARTTLS_OPT:
-    	server->tls_mode   = LIBBALSA_TLS_ENABLED;
+     libbalsa_server_set_tls_mode(server, LIBBALSA_TLS_ENABLED);
     	break;
     default:
-    	server->tls_mode   = LIBBALSA_TLS_DISABLED;
+     libbalsa_server_set_tls_mode(server, LIBBALSA_TLS_DISABLED);
     }
-    server->remember_passwd = remember;
+    libbalsa_server_set_remember_passwd(server, remember);
     mbnode = balsa_mailbox_node_new_imap_folder(server, NULL);
     mbnode->name = g_strdup(name && *name ? name : host);
 

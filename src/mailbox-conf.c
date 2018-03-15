@@ -211,7 +211,7 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
     };
     GtkWidget *label;
     GtkWidget *box;
-    gboolean use_ssl = s && s->use_ssl;
+    gboolean use_ssl = s && libbalsa_server_get_use_ssl(s);
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
@@ -233,7 +233,7 @@ balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc, LibBalsaServer *s,
     mailbox_conf_combo_box_make(GTK_COMBO_BOX_TEXT(bsc->tls_option),
                                 G_N_ELEMENTS(tls_menu), tls_menu);
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsc->tls_option),
-                             s ? s->tls_mode : LIBBALSA_TLS_ENABLED);
+                             s ? libbalsa_server_get_tls_mode(s) : LIBBALSA_TLS_ENABLED);
     gtk_grid_attach(bsc->grid, bsc->tls_option, 1, 1, 1, 1);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), bsc->tls_option);
 
@@ -309,10 +309,10 @@ balsa_server_conf_set_values(BalsaServerConf *bsc, LibBalsaServer *server)
     g_return_if_fail(server);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(bsc->use_ssl), 
-                                 server->use_ssl);
+                                 libbalsa_server_get_use_ssl(server));
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsc->tls_option),
-                             server->tls_mode);
-    gtk_widget_set_sensitive(bsc->tls_option, !server->use_ssl);
+                             libbalsa_server_get_tls_mode(server));
+    gtk_widget_set_sensitive(bsc->tls_option, !libbalsa_server_get_use_ssl(server));
 }
 
 
@@ -681,20 +681,20 @@ mailbox_conf_set_values_pop3(LibBalsaMailbox   *mailbox,
 	gboolean sensitive;
 
 	pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
-	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+	server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
 
 	/* basic settings */
-	if (server->host != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server), server->host);
+	if (libbalsa_server_get_host(server) != NULL) {
+		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server), libbalsa_server_get_host(server));
 	}
-	gtk_combo_box_set_active(GTK_COMBO_BOX(mcw->mb_data.pop3.security), server->security - 1);
+	gtk_combo_box_set_active(GTK_COMBO_BOX(mcw->mb_data.pop3.security), libbalsa_server_get_security(server) - 1);
 
-	if (server->user != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.username), server->user);
+	if (libbalsa_server_get_user(server) != NULL) {
+		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.username), libbalsa_server_get_user(server));
 	}
 
-	if (server->passwd != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.password), server->passwd);
+	if (libbalsa_server_get_passwd(server) != NULL) {
+		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.password), libbalsa_server_get_passwd(server));
 	}
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.delete_from_server), pop3->delete_from_server);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check), pop3->check);
@@ -705,18 +705,18 @@ mailbox_conf_set_values_pop3(LibBalsaMailbox   *mailbox,
 	gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd, pop3->filter);
 
 	/* advanced settings */
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.bsc.need_client_cert), server->client_cert);
-	sensitive = (server->security != NET_CLIENT_CRYPT_NONE);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.bsc.need_client_cert), libbalsa_server_get_client_cert(server));
+	sensitive = (libbalsa_server_get_security(server) != NET_CLIENT_CRYPT_NONE);
 	gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.need_client_cert, sensitive);
-	sensitive = sensitive & server->client_cert;
+	sensitive = sensitive & libbalsa_server_get_client_cert(server);
 
-    if (server->cert_file != NULL) {
-    	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(mcw->mb_data.pop3.bsc.client_cert_file), server->cert_file);
+    if (libbalsa_server_get_cert_file(server) != NULL) {
+    	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(mcw->mb_data.pop3.bsc.client_cert_file), libbalsa_server_get_cert_file(server));
     }
     gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.client_cert_file, sensitive);
 
-	if (server->cert_passphrase != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.client_cert_passwd), server->cert_passphrase);
+	if (libbalsa_server_get_cert_passphrase(server) != NULL) {
+		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.client_cert_passwd), libbalsa_server_get_cert_passphrase(server));
 	}
 	gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.client_cert_passwd, sensitive);
 
@@ -757,23 +757,23 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 		LibBalsaServer *server;
 		const gchar *path;
 		imap = LIBBALSA_MAILBOX_IMAP(mailbox);
-		server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+		server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
 
-		if (server->host)
+		if (libbalsa_server_get_host(server))
 			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.bsc.server),
-				server->host);
-		if (server->user)
+				libbalsa_server_get_host(server));
+		if (libbalsa_server_get_user(server))
 			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.username),
-				server->user);
+				libbalsa_server_get_user(server));
 		gtk_toggle_button_set_active
 		(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.anonymous),
-			server->try_anonymous);
+			libbalsa_server_get_try_anonymous(server));
 		gtk_toggle_button_set_active
 		(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.remember),
-			server->remember_passwd);
-		if (server->passwd)
+			libbalsa_server_get_remember_passwd(server));
+		if (libbalsa_server_get_passwd(server))
 			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.password),
-				server->passwd);
+				libbalsa_server_get_passwd(server));
 		path = libbalsa_mailbox_imap_get_path(imap);
 		if (path)
 			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath),
@@ -789,10 +789,10 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 			gtk_toggle_button_set_active
 			(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.has_bugs),
 				TRUE);
-		if(!server->try_anonymous)
+		if(!libbalsa_server_get_try_anonymous(server))
 			gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.anonymous),
 				FALSE);
-		if(!server->remember_passwd)
+		if(!libbalsa_server_get_remember_passwd(server))
 			gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.password),
 				FALSE);
 	}
@@ -892,7 +892,7 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 	BalsaServerConf *bsc;
 
 	mailbox = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
-	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+	server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
 	bsc = &mcw->mb_data.pop3.bsc;
 
 	/* basic data */
@@ -901,7 +901,7 @@ update_pop_mailbox(MailboxConfWindow *mcw)
             gtk_editable_get_chars(GTK_EDITABLE(mcw->mailbox_name), 0, -1);
 
 	libbalsa_server_set_host(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server)), FALSE);
-	server->security = gtk_combo_box_get_active(GTK_COMBO_BOX(mcw->mb_data.pop3.security)) + 1;
+ libbalsa_server_set_security(server, gtk_combo_box_get_active(GTK_COMBO_BOX(mcw->mb_data.pop3.security)) + 1);
 
 	libbalsa_server_set_username(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.username)));
 	libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.password)));
@@ -915,11 +915,9 @@ update_pop_mailbox(MailboxConfWindow *mcw)
             gtk_editable_get_chars(GTK_EDITABLE(mcw->mb_data.pop3.filter_cmd), 0, -1);
 
 	/* advanced settings */
-	server->client_cert = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(bsc->need_client_cert));
-	g_free(server->cert_file);
-	server->cert_file = g_strdup(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(bsc->client_cert_file)));;
-	g_free(server->cert_passphrase);
-	server->cert_passphrase = gtk_editable_get_chars(GTK_EDITABLE(bsc->client_cert_passwd), 0, -1);
+ libbalsa_server_set_client_cert(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(bsc->need_client_cert)));
+ libbalsa_server_set_cert_file(server, g_strdup(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(bsc->client_cert_file))));;
+ libbalsa_server_set_cert_passphrase(server, gtk_editable_get_chars(GTK_EDITABLE(bsc->client_cert_passwd), 0, -1));
 	mailbox->disable_apop = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop));
 	mailbox->enable_pipe = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe));
 }
@@ -935,7 +933,7 @@ update_imap_mailbox(MailboxConfWindow *mcw)
     LibBalsaServer* server;
 
     mailbox = LIBBALSA_MAILBOX_IMAP(mcw->mailbox);
-    server  = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    server  = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
     if (!server) {
 	server = LIBBALSA_SERVER(libbalsa_imap_server_new("",""));
 	libbalsa_mailbox_remote_set_server(LIBBALSA_MAILBOX_REMOTE(mailbox),
@@ -949,13 +947,13 @@ update_imap_mailbox(MailboxConfWindow *mcw)
     libbalsa_server_set_username(server,
 				 gtk_entry_get_text(GTK_ENTRY
 						    (mcw->mb_data.imap.username)));
-    server->try_anonymous = 
+    libbalsa_server_set_try_anonymous(server,
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->
-                                                       mb_data.imap.anonymous));
-    server->remember_passwd = 
+                                                       mb_data.imap.anonymous)));
+    libbalsa_server_set_remember_passwd(server,
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->
-                                                       mb_data.imap.remember));
-    server->tls_mode = balsa_server_conf_get_tls_mode(&mcw->mb_data.imap.bsc);
+                                                       mb_data.imap.remember)));
+    libbalsa_server_set_tls_mode(server, balsa_server_conf_get_tls_mode(&mcw->mb_data.imap.bsc));
     libbalsa_server_set_password(server,
 				 gtk_entry_get_text(GTK_ENTRY
 						    (mcw->mb_data.imap.password)));
@@ -975,8 +973,7 @@ update_imap_mailbox(MailboxConfWindow *mcw)
                              balsa_server_conf_get_use_ssl
                              (&mcw->mb_data.imap.bsc));
     libbalsa_server_config_changed(server);
-    g_signal_connect(G_OBJECT(server), "get-password",
-                     G_CALLBACK(ask_password), mailbox);
+    libbalsa_server_connect_get_password(server, G_CALLBACK(ask_password), mailbox);
 
     libbalsa_mailbox_imap_set_path(mailbox,
 				   (path == NULL || path[0] == '\0') 

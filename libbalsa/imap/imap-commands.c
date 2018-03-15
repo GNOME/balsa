@@ -1395,7 +1395,7 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
                             ImapFetchBodyOptions options,
                             ImapFetchBodyCb body_cb, void *arg)
 {
-  char cmd[160];
+  char cmd[200];
   ImapFetchBodyInternalCb fcb;
   void          *farg;
   ImapResponse rc;

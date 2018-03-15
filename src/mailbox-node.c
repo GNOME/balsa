@@ -512,7 +512,7 @@ imap_dir_cb(BalsaMailboxNode* mb)
                              ? _("Scanning of %s failed: %s\n"
                                  "Check network connectivity.")
                              : _("Scanning of %s failed: %s"),
-                             mb->server->host,
+                             libbalsa_server_get_host(mb->server),
                              error->message);
         g_error_free(error);
         imap_scan_destroy_tree(&imap_tree);
@@ -605,16 +605,17 @@ balsa_mailbox_node_new_from_config(const gchar* group)
     folder->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
 
     if(balsa_app.debug)
-	printf("Server loaded, host: %s, %s.\n", folder->server->host,
-	       folder->server->use_ssl ? "SSL" : "no SSL");
+	printf("Server loaded, host: %s, %s.\n",
+               libbalsa_server_get_host(folder->server),
+	       libbalsa_server_get_use_ssl(folder->server) ? "SSL" : "no SSL");
     g_signal_connect_swapped(G_OBJECT(folder->server), "config-changed", 
                              G_CALLBACK(config_folder_update), folder);
     g_signal_connect(G_OBJECT(folder), "show-prop-dialog", 
 		     G_CALLBACK(folder_conf_imap_node), NULL);
     g_signal_connect(G_OBJECT(folder), "append-subtree", 
 		     G_CALLBACK(imap_dir_cb), NULL);
-    libbalsa_server_connect_signals(folder->server,
-                                    G_CALLBACK(ask_password), NULL);
+    libbalsa_server_connect_get_password(folder->server,
+                                         G_CALLBACK(ask_password), NULL);
     balsa_mailbox_node_load_config(folder, group);
 
     folder->dir = libbalsa_conf_get_string("Directory");

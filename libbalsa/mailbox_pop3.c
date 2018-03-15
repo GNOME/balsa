@@ -468,10 +468,10 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	guint allow_auth;
 
 	/* create the mailbox connection */
-	if (server->security == NET_CLIENT_CRYPT_ENCRYPTED) {
-		pop = net_client_pop_new(server->host, 995U, server->security, mbox->enable_pipe);
+	if (libbalsa_server_get_security(server) == NET_CLIENT_CRYPT_ENCRYPTED) {
+		pop = net_client_pop_new(libbalsa_server_get_host(server), 995U, libbalsa_server_get_security(server), mbox->enable_pipe);
 	} else {
-		pop = net_client_pop_new(server->host, 110U, server->security, mbox->enable_pipe);
+		pop = net_client_pop_new(libbalsa_server_get_host(server), 110U, libbalsa_server_get_security(server), mbox->enable_pipe);
 	}
 	if (pop == NULL) {
 		return NULL;
@@ -488,10 +488,10 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	net_client_set_timeout(NET_CLIENT(pop), 60U);
 
 	/* load client certificate if configured */
-	if (server->client_cert) {
+	if (libbalsa_server_get_client_cert(server)) {
 		g_signal_connect(G_OBJECT(pop), "cert-pass", G_CALLBACK(libbalsa_server_get_cert_pass), server);
-		if (!net_client_set_cert_from_file(NET_CLIENT(pop), server->cert_file, &error)) {
-			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), server->cert_file,
+		if (!net_client_set_cert_from_file(NET_CLIENT(pop), libbalsa_server_get_cert_file(server), &error)) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), libbalsa_server_get_cert_file(server),
 				error->message);
 			g_error_free(error);
 			g_object_unref(G_OBJECT(pop));
@@ -504,9 +504,9 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(libbalsa_server_get_auth), server);
 
 	/* connect server */
-	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mbox), LIBBALSA_NTFY_INIT, INFINITY, _("Connecting %s…"), server->host);
+	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mbox), LIBBALSA_NTFY_INIT, INFINITY, _("Connecting %s…"), libbalsa_server_get_host(server));
 	if (!net_client_pop_connect(pop, NULL, &error)) {
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s: cannot connect %s: %s"), name, server->host,
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s: cannot connect %s: %s"), name, libbalsa_server_get_host(server),
 			error->message);
 		g_error_free(error);
 		net_client_shutdown(NET_CLIENT(pop));
@@ -542,7 +542,7 @@ update_msg_list(struct fetch_data         *fd,
 
 	/* load uid's if messages shall be left on the server */
 	if (!mbox->delete_from_server) {
-		uid_prefix = g_strconcat(server->user, "@", server->host, NULL);
+		uid_prefix = g_strconcat(libbalsa_server_get_user(server), "@", libbalsa_server_get_host(server), NULL);
 		prefix_len = strlen(uid_prefix);
 		uids = mp_load_uids(uid_prefix);
 		*current_uids = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
@@ -623,7 +623,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 		return;
 	}
 
-	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mbox);
+	server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mbox);
 
 	/* open the mailbox connection and get the messages list (note: initiates the progress dialogue) */
 	pop = libbalsa_mailbox_pop3_startup(server, mbox, mailbox->name, &msg_list);
@@ -674,7 +674,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 
 		/* store uid list */
 		if (result && !mbox->delete_from_server) {
-			gchar *uid_prefix = g_strconcat(server->user, "@", server->host, NULL);
+			gchar *uid_prefix = g_strconcat(libbalsa_server_get_user(server), "@", libbalsa_server_get_host(server), NULL);
 
 			mp_save_uids(current_uids, uid_prefix, &err);
 			g_free(uid_prefix);
@@ -709,7 +709,7 @@ libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
 
     pop = LIBBALSA_MAILBOX_POP3(mailbox);
 
-    libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
+    libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox));
 
     libbalsa_conf_set_bool("Check", pop->check);
     libbalsa_conf_set_bool("Delete", pop->delete_from_server);
@@ -734,7 +734,7 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 
     pop = LIBBALSA_MAILBOX_POP3(mailbox);
 
-    libbalsa_server_load_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
+    libbalsa_server_load_config(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox));
 
     pop->check = libbalsa_conf_get_bool("Check=false");
     pop->delete_from_server = libbalsa_conf_get_bool("Delete=false");

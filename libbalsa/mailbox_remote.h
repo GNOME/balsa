@@ -46,8 +46,8 @@
 #define LIBBALSA_IS_MAILBOX_REMOTE_CLASS(klass) \
     (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_REMOTE))
 
-#define LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox) \
-    (LIBBALSA_SERVER(LIBBALSA_MAILBOX_REMOTE(mailbox)->server))
+#define LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox) \
+    ((LibBalsaServer *) LIBBALSA_MAILBOX_REMOTE(mailbox)->server)
 
 typedef struct _LibBalsaMailboxRemoteClass LibBalsaMailboxRemoteClass;
 

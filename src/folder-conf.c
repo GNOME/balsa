@@ -184,11 +184,10 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     } else {
         insert = TRUE;
 	s = LIBBALSA_SERVER(libbalsa_imap_server_new(username, host));
-        g_signal_connect(G_OBJECT(s), "get-password",
-                         G_CALLBACK(ask_password), NULL);
+        libbalsa_server_connect_get_password(s, G_CALLBACK(ask_password), NULL);
     }
 
-    s->tls_mode = balsa_server_conf_get_tls_mode(&fcw->bsc);
+    libbalsa_server_set_tls_mode(s, balsa_server_conf_get_tls_mode(&fcw->bsc));
     libbalsa_imap_server_set_max_connections
         (LIBBALSA_IMAP_SERVER(s),
          gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
@@ -206,10 +205,10 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
         (LIBBALSA_IMAP_SERVER(s),
          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_status)));
     libbalsa_server_set_username(s, username);
-    s->try_anonymous =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->anonymous));
-    s->remember_passwd =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
+    libbalsa_server_set_try_anonymous(s,
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->anonymous)));
+    libbalsa_server_set_remember_passwd(s,
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember)));
     libbalsa_server_set_password(s,
                                  gtk_entry_get_text(GTK_ENTRY
                                                     (fcw->password)));
@@ -372,7 +371,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     label = libbalsa_create_grid_label(_("_Server:"), grid, 1);
     fcw->bsc.server =
         libbalsa_create_grid_entry(grid, G_CALLBACK(validate_folder),
-                                   fcw, r++, s ? s->host : default_server,
+                                   fcw, r++, s ? libbalsa_server_get_host(s) : default_server,
                                    label);
     fcw->bsc.default_ports = IMAP_DEFAULT_PORTS;
     g_free(default_server);
@@ -380,23 +379,23 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     label= libbalsa_create_grid_label(_("Use_r name:"), grid, r);
     fcw->username =
         libbalsa_create_grid_entry(grid, G_CALLBACK(validate_folder),
-                                   fcw, r++, s ? s->user : g_get_user_name(),
+                                   fcw, r++, s ? libbalsa_server_get_user(s) : g_get_user_name(),
                                    label);
 
     label = libbalsa_create_grid_label(_("_Password:"), grid, r);
     fcw->password =
         libbalsa_create_grid_entry(grid, NULL, NULL, r++,
-                                   s ? s->passwd : NULL, label);
+                                   s ? libbalsa_server_get_passwd(s) : NULL, label);
     gtk_entry_set_visibility(GTK_ENTRY(fcw->password), FALSE);
 
     fcw->anonymous =
         libbalsa_create_grid_check(_("_Anonymous access"), grid, r++,
-                                   s ? s->try_anonymous : FALSE);
+                                   s ? libbalsa_server_get_try_anonymous(s) : FALSE);
     g_signal_connect(G_OBJECT(fcw->anonymous), "toggled",
                      G_CALLBACK(anonymous_cb), fcw);
     fcw->remember =
         libbalsa_create_grid_check(_(remember_password_message), grid, r++,
-                                   s ? s->remember_passwd : TRUE);
+                                   s ? libbalsa_server_get_remember_passwd(s) : TRUE);
     g_signal_connect(G_OBJECT(fcw->remember), "toggled",
                      G_CALLBACK(remember_cb), fcw);
 
@@ -502,7 +501,7 @@ browse_button_response(GtkDialog * dialog, gint response,
                                mbnode->dir);
         if(mbnode->server)
             gtk_label_set_label(GTK_LABEL(bbd->sdd->host_label),
-                                mbnode->server->host);
+                                libbalsa_server_get_host(mbnode->server));
     }
     validate_sub_folder(NULL, bbd->sdd);
     gtk_widget_set_sensitive(bbd->button, TRUE);
@@ -836,7 +835,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     (void) libbalsa_create_grid_label(_("Host:"), grid, row);
     sdd->host_label =
         gtk_label_new(sdd->mbnode && sdd->mbnode->server
-                      ? sdd->mbnode->server->host : "");
+                      ? libbalsa_server_get_host(sdd->mbnode->server) : "");
     gtk_widget_set_halign(sdd->host_label, GTK_ALIGN_START);
     gtk_widget_set_hexpand(sdd->host_label, TRUE);
     gtk_grid_attach(GTK_GRID(grid), sdd->host_label, 1, row, 1, 1);

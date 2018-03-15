@@ -363,7 +363,7 @@ libbalsa_mailbox_imap_new(void)
 void
 libbalsa_mailbox_imap_update_url(LibBalsaMailboxImap* mailbox)
 {
-    LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
 
     g_free(LIBBALSA_MAILBOX(mailbox)->url);
     LIBBALSA_MAILBOX(mailbox)->url = libbalsa_imap_url(s, mailbox->path);
@@ -470,7 +470,7 @@ get_header_cache_path(LibBalsaMailboxImap *mimap)
     LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE(mimap)->server;
     gchar *cache_dir = get_cache_dir(TRUE); /* FIXME */
     gchar *header_file = g_strdup_printf("%s@%s-%s-%u-headers2",
-					 s->user, s->host,
+					 libbalsa_server_get_user(s), libbalsa_server_get_host(s),
 					 (mimap->path ? mimap->path : "INBOX"),
 					 mimap->uid_validity);
     gchar *encoded_path = libbalsa_urlencode(header_file);
@@ -495,7 +495,7 @@ get_cache_name_pair(LibBalsaMailboxImap* mailbox, const gchar *type,
 
     res[0] = get_cache_dir(is_persistent);
     fname = g_strdup_printf("%s@%s-%s-%u-%u-%s",
-                            s->user, s->host,
+                            libbalsa_server_get_user(s), libbalsa_server_get_host(s),
                             (mailbox->path ? mailbox->path : "INBOX"),
                             uid_validity, uid, type);
     res[1] = libbalsa_urlencode(fname);
@@ -566,7 +566,7 @@ clean_dir(const char *dir_name, off_t cache_size)
 static gboolean
 clean_cache(LibBalsaMailbox* mailbox)
 {
-    LibBalsaServer *s= LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    LibBalsaServer *s= LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
     gboolean is_persistent =
         libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(s));
     gchar* dir;
@@ -642,7 +642,7 @@ libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap, GError **err)
     g_return_val_if_fail(LIBBALSA_MAILBOX_IMAP(mimap), NULL);
 
     if(!mimap->handle) {
-        LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mimap);
+        LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap);
         LibBalsaImapServer *imap_server;
         if (!LIBBALSA_IS_IMAP_SERVER(server))
             return NULL;
@@ -657,7 +657,7 @@ libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap, GError **err)
 
 #define RELEASE_HANDLE(mailbox,handle) \
     libbalsa_imap_server_release_handle( \
-		LIBBALSA_IMAP_SERVER(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox)),\
+		LIBBALSA_IMAP_SERVER(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox)),\
 		handle)
 
 static void
@@ -979,7 +979,7 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap,
 
     g_return_val_if_fail(LIBBALSA_MAILBOX_IMAP(mimap), NULL);
 
-    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mimap);
+    server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap);
     if (!LIBBALSA_IS_IMAP_SERVER(server))
 	return NULL;
     imap_server = LIBBALSA_IMAP_SERVER(server);
@@ -1285,7 +1285,7 @@ static gboolean
 lbm_imap_check(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
     ImapMboxHandle *handle;
     gulong id;
 
@@ -1646,7 +1646,7 @@ libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 
     libbalsa_conf_set_string("Path", mimap->path);
 
-    libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
+    libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox));
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->save_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->save_config(mailbox, prefix);
@@ -1750,15 +1750,14 @@ libbalsa_mailbox_imap_reconnect(LibBalsaMailboxImap* mimap)
 
     if (mimap->handle &&
         imap_mbox_is_disconnected (mimap->handle)) {
-        printf("Reconnecting %s (%u)\n",
-               LIBBALSA_MAILBOX_REMOTE_SERVER(mimap)->host,
-               (unsigned)time(NULL));
+        const gchar *host =
+            libbalsa_server_get_host(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap));
+
+        printf("Reconnecting %s (%u)\n", host, (unsigned)time(NULL));
         if (imap_mbox_handle_reconnect
             (mimap->handle, &(LIBBALSA_MAILBOX(mimap)->readonly))
             == IMAP_SUCCESS)
-            printf("Reconnected %s (%u)\n",
-                   LIBBALSA_MAILBOX_REMOTE_SERVER(mimap)->host,
-                   (unsigned)time(NULL));
+            printf("Reconnected %s (%u)\n", host, (unsigned)time(NULL));
     }
 }
 
@@ -1896,14 +1895,14 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox, GError **err)
 gchar *
 libbalsa_imap_url(LibBalsaServer * server, const gchar * path)
 {
-    gchar *enc = libbalsa_urlencode(server->user);
+    gchar *enc = libbalsa_urlencode(libbalsa_server_get_user(server));
     gchar *url = g_strdup_printf("imap%s://%s@%s/%s",
 #ifdef USE_SSL_TO_SET_IMAPS_IN_URL
                                  server->use_ssl ? "s" : "",
 #else
                                  "",
 #endif
-                                 enc, server->host,
+                                 enc, libbalsa_server_get_host(server),
                                  path ? path : "");
     g_free(enc);
 
@@ -2236,7 +2235,7 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
        something else, like "audio", "*" - we do not prefetch such
        parts yet. Also, we save some RTTS for very small messages by
        fetching them in their entirety. */
-    server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
     if(!imap_mbox_handle_can_do(mimap->handle, IMCAP_FETCHBODY) ||
        libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(server),
                                     ISBUG_FETCH) ||
@@ -2997,8 +2996,8 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
 	struct append_to_cache_data atcd;
 	gchar *cache_dir;
 
-	atcd.user = s->user;
-	atcd.host = s->host;
+	atcd.user = libbalsa_server_get_user(s);
+	atcd.host = libbalsa_server_get_host(s);
 	atcd.path = mimap->path ? mimap->path : "INBOX";
 	atcd.cache_dir = cache_dir = get_cache_dir(is_persistent);
 	atcd.curr_name = macd.outfiles;
@@ -3350,7 +3349,7 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 		libbalsa_imap_server_has_persistent_cache(is);
 	    gchar *dir_name = get_cache_dir(is_persistent);
 	    gchar *src_prefix = g_strdup_printf("%s@%s-%s-%u-",
-						s->user, s->host,
+						libbalsa_server_get_user(s), libbalsa_server_get_host(s),
 						(mimap->path 
 						 ? mimap->path : "INBOX"),
 						mimap->uid_validity);
@@ -3376,8 +3375,9 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 				g_build_filename(dir_name, filename, NULL);
 			    gchar *dst_prefix =
 				g_strdup_printf("%s@%s-%s-%u-%u%s",
-						s->user, s->host,
-						(dst_imap->path 
+						libbalsa_server_get_user(s),
+                                                libbalsa_server_get_host(s),
+						(dst_imap->path
 						 ? dst_imap->path : "INBOX"),
 						uid_sequence.uid_validity,
 						nth, tail);

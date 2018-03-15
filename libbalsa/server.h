@@ -37,47 +37,19 @@ extern const SecretSchema *LIBBALSA_SERVER_SECRET_SCHEMA;
 #define libbalsa_free_password g_free
 #endif                          /* defined(HAVE_LIBSECRET) */
 
-#define LIBBALSA_TYPE_SERVER \
-    (libbalsa_server_get_type())
-#define LIBBALSA_SERVER(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_SERVER, LibBalsaServer))
-#define LIBBALSA_SERVER_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_SERVER, \
-                              LibBalsaServerClass))
-#define LIBBALSA_IS_SERVER(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_SERVER))
-#define LIBBALSA_IS_SERVER_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_SERVER))
+#define LIBBALSA_TYPE_SERVER (libbalsa_server_get_type())
 
-GType libbalsa_server_get_type(void);
-
-typedef struct _LibBalsaServerClass LibBalsaServerClass;
+G_DECLARE_DERIVABLE_TYPE(LibBalsaServer,
+                         libbalsa_server,
+                         LIBBALSA,
+                         SERVER,
+                         GObject)
 
 typedef enum {
     LIBBALSA_TLS_DISABLED,
     LIBBALSA_TLS_ENABLED,
     LIBBALSA_TLS_REQUIRED
 } LibBalsaTlsMode;
-
-struct _LibBalsaServer {
-    GObject object;
-    const gchar *protocol; /**< type of the server: imap, pop3, or smtp. */
-
-    gchar *host;
-    gchar *user;
-    gchar *passwd;
-    NetClientCryptMode security;
-    gboolean client_cert;
-    gchar *cert_file;
-    gchar *cert_passphrase;
-    /* We include SSL support in UI unconditionally to preserve config
-     * between SSL and non-SSL builds. We just fail if SSL is requested
-     * in non-SSL build. */
-    LibBalsaTlsMode tls_mode;
-    unsigned use_ssl:1;
-    unsigned remember_passwd:1;
-    unsigned try_anonymous:1; /* user wants anonymous access */
-};
 
 struct _LibBalsaServerClass {
     GObjectClass parent_class;
@@ -119,8 +91,8 @@ gchar *libbalsa_server_get_cert_pass(NetClient        *client,
 									 const GByteArray *cert_der,
 									 gpointer          user_data);
 
-void libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
-                                     gpointer cb_data);
+void libbalsa_server_connect_get_password(LibBalsaServer * server, GCallback cb,
+                                          gpointer cb_data);
 
 /* Check whether a server can be reached */
 
@@ -133,5 +105,35 @@ void libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
                                          LibBalsaCanReachCallback * cb,
                                          gpointer                   cb_data,
                                          GObject                  * source_object);
+
+/*
+ * Getters
+ */
+
+LibBalsaTlsMode libbalsa_server_get_tls_mode(LibBalsaServer * server);
+NetClientCryptMode libbalsa_server_get_security(LibBalsaServer * server);
+gboolean libbalsa_server_get_use_ssl(LibBalsaServer * server);
+gboolean libbalsa_server_get_client_cert(LibBalsaServer * server);
+gboolean libbalsa_server_get_try_anonymous(LibBalsaServer * server);
+gboolean libbalsa_server_get_remember_passwd(LibBalsaServer * server);
+const gchar * libbalsa_server_get_user(LibBalsaServer * server);
+const gchar * libbalsa_server_get_host(LibBalsaServer * server);
+const gchar * libbalsa_server_get_protocol(LibBalsaServer * server);
+const gchar * libbalsa_server_get_cert_file(LibBalsaServer * server);
+const gchar * libbalsa_server_get_cert_passphrase(LibBalsaServer * server);
+const gchar * libbalsa_server_get_passwd(LibBalsaServer * server);
+
+/*
+ * Setters
+ */
+
+void libbalsa_server_set_tls_mode(LibBalsaServer * server, LibBalsaTlsMode tls_mode);
+void libbalsa_server_set_security(LibBalsaServer * server, NetClientCryptMode security);
+void libbalsa_server_set_try_anonymous(LibBalsaServer * server, gboolean try_anonymous);
+void libbalsa_server_set_remember_passwd(LibBalsaServer * server, gboolean remember_passwd);
+void libbalsa_server_set_client_cert(LibBalsaServer * server, gboolean client_cert);
+void libbalsa_server_set_protocol(LibBalsaServer * server, const gchar * protocol);
+void libbalsa_server_set_cert_file(LibBalsaServer * server, const gchar * cert_file);
+void libbalsa_server_set_cert_passphrase(LibBalsaServer * server, const gchar * cert_passphrase);
 
 #endif				/* __LIBBALSA_SERVER_H__ */

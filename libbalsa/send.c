@@ -646,7 +646,7 @@ lbs_check_reachable_cb(GObject  *object,
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Cannot reach SMTP server %s (%s), any queued message will remain in %s."),
 							 libbalsa_smtp_server_get_name(smtp_server),
-							 LIBBALSA_SERVER(smtp_server)->host,
+							 libbalsa_server_get_host(LIBBALSA_SERVER(smtp_server)),
 							 send_info->outbox->name);
 	}
 
@@ -771,20 +771,20 @@ lbs_process_queue_init_session(LibBalsaServer* server)
 {
 	NetClientSmtp* session;
 
-	if (server->security == NET_CLIENT_CRYPT_ENCRYPTED) {
-		session = net_client_smtp_new(server->host, 465U, server->security);
+	if (libbalsa_server_get_security(server) == NET_CLIENT_CRYPT_ENCRYPTED) {
+		session = net_client_smtp_new(libbalsa_server_get_host(server), 465U, libbalsa_server_get_security(server));
 	} else {
 		// FIXME - submission (587) is the standard, but most isp's use 25...
-		session = net_client_smtp_new(server->host, 587U, server->security);
+		session = net_client_smtp_new(libbalsa_server_get_host(server), 587U, libbalsa_server_get_security(server));
 	}
 
 	/* load client certificate if configured */
-	if (server->client_cert) {
+	if (libbalsa_server_get_client_cert(server)) {
 		GError* error = NULL;
 
 		g_signal_connect(G_OBJECT(session), "cert-pass", G_CALLBACK(libbalsa_server_get_cert_pass), server);
-		if (!net_client_set_cert_from_file(NET_CLIENT(session), server->cert_file, &error)) {
-			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), server->cert_file,
+		if (!net_client_set_cert_from_file(NET_CLIENT(session), libbalsa_server_get_cert_file(server), &error)) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), libbalsa_server_get_cert_file(server),
 				error->message);
 			g_error_free(error);
 			g_object_unref(session);

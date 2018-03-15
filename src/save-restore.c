@@ -385,9 +385,9 @@ config_mailbox_init(const gchar * prefix)
     if (mailbox == NULL)
 	return FALSE;
     if (LIBBALSA_IS_MAILBOX_REMOTE(mailbox)) {
-	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-        libbalsa_server_connect_signals(server,
-                                        G_CALLBACK(ask_password), mailbox);
+	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
+        libbalsa_server_connect_get_password(server,
+                                             G_CALLBACK(ask_password), mailbox);
 	g_signal_connect_swapped(server, "config-changed",
                                  G_CALLBACK(config_mailbox_update),
 				 mailbox);
@@ -467,8 +467,8 @@ config_load_smtp_server(const gchar * key, const gchar * value, gpointer data)
 
     libbalsa_conf_push_group(key);
     smtp_server = libbalsa_smtp_server_new_from_config(value);
-    libbalsa_server_connect_signals(LIBBALSA_SERVER(smtp_server),
-				    G_CALLBACK(ask_password), NULL);
+    libbalsa_server_connect_get_password(LIBBALSA_SERVER(smtp_server),
+                                         G_CALLBACK(ask_password), NULL);
     libbalsa_conf_pop_group();
     libbalsa_smtp_server_add_to_list(smtp_server, smtp_servers);
 
@@ -912,6 +912,7 @@ config_global_load(void)
 	LibBalsaSmtpServer *smtp_server;
 	LibBalsaServer *server;
 	gchar *passphrase, *hostname;
+        gchar *esmtp_user;
 
 	smtp_server = libbalsa_smtp_server_new();
 	libbalsa_smtp_server_set_name(smtp_server,
@@ -925,8 +926,10 @@ config_global_load(void)
                                                   &def_used);
 	libbalsa_server_set_host(server, hostname, FALSE);
         g_free(hostname);
-	libbalsa_server_set_username(server,
-		libbalsa_conf_get_string("ESMTPUser"));
+
+        esmtp_user = libbalsa_conf_get_string("ESMTPUser");
+	libbalsa_server_set_username(server, esmtp_user);
+        g_free(esmtp_user);
 
         passphrase = libbalsa_conf_private_get_string("ESMTPPassphrase");
 	if (passphrase) {
@@ -937,15 +940,15 @@ config_global_load(void)
         }
 
         /* default set to "Use TLS if possible" */
-	server->tls_mode = libbalsa_conf_get_int("ESMTPTLSMode=1");
+        libbalsa_server_set_tls_mode(server, libbalsa_conf_get_int("ESMTPTLSMode=1"));
 
 	passphrase =
 	    libbalsa_conf_private_get_string("ESMTPCertificatePassphrase");
 	if (passphrase) {
             gchar* passphrase_rot = libbalsa_rot(passphrase);
             g_free(passphrase);
-	    g_free(server->cert_passphrase);
-	    server->cert_passphrase = passphrase_rot;
+	    libbalsa_server_set_cert_passphrase(server, passphrase_rot);
+            g_free(passphrase_rot);
 	}
     }
 

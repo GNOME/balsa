@@ -72,11 +72,11 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 	prompt =
 	    g_strdup_printf(_("Opening remote mailbox %s.\n"
                               "The _password for %s@%s:"),
-			    mbox->name, server->user, server->host);
+			    mbox->name, libbalsa_server_get_user(server), libbalsa_server_get_host(server));
     else
 	prompt =
-	    g_strdup_printf(_("_Password for %s@%s (%s):"), server->user,
-			    server->host, server->protocol);
+	    g_strdup_printf(_("_Password for %s@%s (%s):"), libbalsa_server_get_user(server),
+			    libbalsa_server_get_host(server), libbalsa_server_get_protocol(server));
 
     dialog = gtk_dialog_new_with_buttons(_("Password needed"),
                                          GTK_WINDOW(balsa_app.main_window),
@@ -101,7 +101,7 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 
     rememb =  gtk_check_button_new_with_mnemonic(_(remember_password_message));
     gtk_box_pack_start(GTK_BOX(content_area), rememb);
-    if(server->remember_passwd)
+    if(libbalsa_server_get_remember_passwd(server))
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rememb), TRUE);
 
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
@@ -109,12 +109,12 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
     gtk_widget_grab_focus (entry);
 
     if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
-        unsigned old_rem = server->remember_passwd;
+        unsigned old_rem = libbalsa_server_get_remember_passwd(server);
         passwd = gtk_editable_get_chars(GTK_EDITABLE(entry), 0, -1);
-        server->remember_passwd =
-            !!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rememb));
+        libbalsa_server_set_remember_passwd(server,
+            !!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rememb)));
         libbalsa_server_set_password(server, passwd);
-        if( server->remember_passwd || old_rem )
+        if( libbalsa_server_get_remember_passwd(server) || old_rem )
             libbalsa_server_config_changed(server);
     }
     gtk_widget_destroy(dialog);
@@ -190,31 +190,29 @@ set_passwd_from_matching_server(GtkTreeModel *model,
         g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbox), FALSE);
 
         if (!LIBBALSA_IS_MAILBOX_REMOTE(mbox)) return FALSE;
-        server = LIBBALSA_MAILBOX_REMOTE_SERVER(mbox);
+        server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mbox);
         g_return_val_if_fail(server != NULL, FALSE);
     }
-    g_return_val_if_fail(server->host != NULL, FALSE);
-    g_return_val_if_fail(server->user != NULL, FALSE);
-    if (server->passwd == NULL) return FALSE;
+    g_return_val_if_fail(libbalsa_server_get_host(server) != NULL, FALSE);
+    g_return_val_if_fail(libbalsa_server_get_user(server) != NULL, FALSE);
+    if (libbalsa_server_get_passwd(server) == NULL) return FALSE;
 
     master = (LibBalsaServer *)data;
     g_return_val_if_fail(LIBBALSA_IS_SERVER(master), FALSE);
     if (master == server) return FALSE;
 
-    g_return_val_if_fail(server->host != NULL, FALSE);
-    g_return_val_if_fail(server->user != NULL, FALSE);
+    g_return_val_if_fail(libbalsa_server_get_host(server) != NULL, FALSE);
+    g_return_val_if_fail(libbalsa_server_get_user(server) != NULL, FALSE);
 
-    if ((strcmp(server->host, master->host) == 0) &&
-	(strcmp(server->user, master->user) == 0)) {
-	g_free(master->passwd);
-	master->passwd = g_strdup(server->passwd);
+    if ((strcmp(libbalsa_server_get_host(server), libbalsa_server_get_host(master)) == 0) &&
+	(strcmp(libbalsa_server_get_user(server), libbalsa_server_get_user(master)) == 0)) {
+	libbalsa_server_set_password(master, libbalsa_server_get_passwd(server));
 	return TRUE;
     };
-    
+
     return FALSE;
 }
 /* ask_password:
-   when called from thread, gdk lock must not be held.
 */
 gchar *
 ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
@@ -222,16 +220,16 @@ ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
     gchar *password;
 
     g_return_val_if_fail(server != NULL, NULL);
-    
+
     password = NULL;
     if (mbox) {
 	gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			       (GtkTreeModelForeachFunc)
 			       set_passwd_from_matching_server, server);
 
-	if (server->passwd != NULL) {
-	    password = server->passwd;
-	    server->passwd = NULL;
+	if (libbalsa_server_get_passwd(server) != NULL) {
+	    password = g_strdup(libbalsa_server_get_passwd(server));
+	    libbalsa_server_set_password(server, NULL);
 	}
     }
 
@@ -698,7 +696,7 @@ balsa_get_short_mailbox_name(const gchar *url)
 
     if ((mbnode = balsa_find_url(url)) && mbnode->mailbox) {
         if (mbnode->server) {
-            return g_strconcat(mbnode->server->host, ":",
+            return g_strconcat(libbalsa_server_get_host(mbnode->server), ":",
                                mbnode->mailbox->name, NULL);
         } else {
             return g_strdup(mbnode->mailbox->name);

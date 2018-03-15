@@ -582,6 +582,7 @@ libbalsa_imap_server_new_from_config(void)
             g_clear_pointer(&passwd, libbalsa_free_password);
         }
         libbalsa_server_set_password(server, passwd);
+        libbalsa_free_password(passwd);
     }
     return imap_server;
 }

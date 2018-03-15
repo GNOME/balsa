@@ -890,6 +890,7 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 	LibBalsaMailboxPop3 *mailbox;
 	LibBalsaServer *server;
 	BalsaServerConf *bsc;
+        gchar *filename;
 
 	mailbox = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
 	server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
@@ -901,7 +902,7 @@ update_pop_mailbox(MailboxConfWindow *mcw)
             gtk_editable_get_chars(GTK_EDITABLE(mcw->mailbox_name), 0, -1);
 
 	libbalsa_server_set_host(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server)), FALSE);
- libbalsa_server_set_security(server, gtk_combo_box_get_active(GTK_COMBO_BOX(mcw->mb_data.pop3.security)) + 1);
+        libbalsa_server_set_security(server, gtk_combo_box_get_active(GTK_COMBO_BOX(mcw->mb_data.pop3.security)) + 1);
 
 	libbalsa_server_set_username(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.username)));
 	libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.password)));
@@ -915,9 +916,14 @@ update_pop_mailbox(MailboxConfWindow *mcw)
             gtk_editable_get_chars(GTK_EDITABLE(mcw->mb_data.pop3.filter_cmd), 0, -1);
 
 	/* advanced settings */
- libbalsa_server_set_client_cert(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(bsc->need_client_cert)));
- libbalsa_server_set_cert_file(server, g_strdup(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(bsc->client_cert_file))));;
- libbalsa_server_set_cert_passphrase(server, gtk_editable_get_chars(GTK_EDITABLE(bsc->client_cert_passwd), 0, -1));
+        libbalsa_server_set_client_cert(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(bsc->need_client_cert)));
+
+        filename =
+            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(bsc->client_cert_file));
+        libbalsa_server_set_cert_file(server, filename);
+        g_free(filename);
+
+        libbalsa_server_set_cert_passphrase(server, gtk_entry_get_text(GTK_ENTRY(bsc->client_cert_passwd)));
 	mailbox->disable_apop = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop));
 	mailbox->enable_pipe = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe));
 }

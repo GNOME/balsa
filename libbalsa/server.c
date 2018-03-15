@@ -220,8 +220,8 @@ libbalsa_server_config_changed(LibBalsaServer * server)
                   0);
 }
 
-gchar *
-libbalsa_server_get_password(LibBalsaServer * server,
+static gchar *
+libbalsa_server_ask_password(LibBalsaServer * server,
 			     LibBalsaMailbox * mbox)
 {
     gchar *retval = NULL;
@@ -456,7 +456,7 @@ libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
         gchar **pass = va_arg(alist, gchar**);
         ok = va_arg(alist, int*);
         if(!priv->passwd) {
-            priv->passwd = libbalsa_server_get_password(is, NULL);
+            priv->passwd = libbalsa_server_ask_password(is, NULL);
         }
         *ok = priv->passwd != NULL;
         if(*ok) {
@@ -551,7 +551,7 @@ libbalsa_server_get_auth(NetClient *client,
         	if ((priv->passwd != NULL) && (priv->passwd[0] != '\0')) {
         		result[1] = g_strdup(priv->passwd);
         	} else {
-        		result[1] = libbalsa_server_get_password(server, NULL);
+        		result[1] = libbalsa_server_ask_password(server, NULL);
         	}
         }
     }
@@ -752,7 +752,7 @@ libbalsa_server_get_remember_passwd(LibBalsaServer * server)
 }
 
 const gchar *
-libbalsa_server_get_user(LibBalsaServer * server)
+libbalsa_server_get_username(LibBalsaServer * server)
 {
     LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
 
@@ -802,7 +802,7 @@ libbalsa_server_get_cert_passphrase(LibBalsaServer * server)
 }
 
 const gchar *
-libbalsa_server_get_passwd(LibBalsaServer * server)
+libbalsa_server_get_password(LibBalsaServer * server)
 {
     LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
 

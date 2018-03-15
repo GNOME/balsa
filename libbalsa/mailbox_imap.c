@@ -470,7 +470,7 @@ get_header_cache_path(LibBalsaMailboxImap *mimap)
     LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE(mimap)->server;
     gchar *cache_dir = get_cache_dir(TRUE); /* FIXME */
     gchar *header_file = g_strdup_printf("%s@%s-%s-%u-headers2",
-					 libbalsa_server_get_user(s), libbalsa_server_get_host(s),
+					 libbalsa_server_get_username(s), libbalsa_server_get_host(s),
 					 (mimap->path ? mimap->path : "INBOX"),
 					 mimap->uid_validity);
     gchar *encoded_path = libbalsa_urlencode(header_file);
@@ -495,7 +495,7 @@ get_cache_name_pair(LibBalsaMailboxImap* mailbox, const gchar *type,
 
     res[0] = get_cache_dir(is_persistent);
     fname = g_strdup_printf("%s@%s-%s-%u-%u-%s",
-                            libbalsa_server_get_user(s), libbalsa_server_get_host(s),
+                            libbalsa_server_get_username(s), libbalsa_server_get_host(s),
                             (mailbox->path ? mailbox->path : "INBOX"),
                             uid_validity, uid, type);
     res[1] = libbalsa_urlencode(fname);
@@ -1895,7 +1895,7 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox, GError **err)
 gchar *
 libbalsa_imap_url(LibBalsaServer * server, const gchar * path)
 {
-    gchar *enc = libbalsa_urlencode(libbalsa_server_get_user(server));
+    gchar *enc = libbalsa_urlencode(libbalsa_server_get_username(server));
     gchar *url = g_strdup_printf("imap%s://%s@%s/%s",
 #ifdef USE_SSL_TO_SET_IMAPS_IN_URL
                                  server->use_ssl ? "s" : "",
@@ -2996,7 +2996,7 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
 	struct append_to_cache_data atcd;
 	gchar *cache_dir;
 
-	atcd.user = libbalsa_server_get_user(s);
+	atcd.user = libbalsa_server_get_username(s);
 	atcd.host = libbalsa_server_get_host(s);
 	atcd.path = mimap->path ? mimap->path : "INBOX";
 	atcd.cache_dir = cache_dir = get_cache_dir(is_persistent);
@@ -3349,7 +3349,7 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 		libbalsa_imap_server_has_persistent_cache(is);
 	    gchar *dir_name = get_cache_dir(is_persistent);
 	    gchar *src_prefix = g_strdup_printf("%s@%s-%s-%u-",
-						libbalsa_server_get_user(s), libbalsa_server_get_host(s),
+						libbalsa_server_get_username(s), libbalsa_server_get_host(s),
 						(mimap->path 
 						 ? mimap->path : "INBOX"),
 						mimap->uid_validity);
@@ -3375,7 +3375,7 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 				g_build_filename(dir_name, filename, NULL);
 			    gchar *dst_prefix =
 				g_strdup_printf("%s@%s-%s-%u-%u%s",
-						libbalsa_server_get_user(s),
+						libbalsa_server_get_username(s),
                                                 libbalsa_server_get_host(s),
 						(dst_imap->path
 						 ? dst_imap->path : "INBOX"),

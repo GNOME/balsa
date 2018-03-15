@@ -379,13 +379,13 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     label= libbalsa_create_grid_label(_("Use_r name:"), grid, r);
     fcw->username =
         libbalsa_create_grid_entry(grid, G_CALLBACK(validate_folder),
-                                   fcw, r++, s ? libbalsa_server_get_user(s) : g_get_user_name(),
+                                   fcw, r++, s ? libbalsa_server_get_username(s) : g_get_user_name(),
                                    label);
 
     label = libbalsa_create_grid_label(_("_Password:"), grid, r);
     fcw->password =
         libbalsa_create_grid_entry(grid, NULL, NULL, r++,
-                                   s ? libbalsa_server_get_passwd(s) : NULL, label);
+                                   s ? libbalsa_server_get_password(s) : NULL, label);
     gtk_entry_set_visibility(GTK_ENTRY(fcw->password), FALSE);
 
     fcw->anonymous =

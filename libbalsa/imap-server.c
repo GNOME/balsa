@@ -154,13 +154,13 @@ static void
 libbalsa_imap_server_set_host(LibBalsaServer * server,
                               const gchar * host, gboolean use_ssl)
 {
-    if(libbalsa_server_get_user(server) && host) { /* we have been initialized... */
+    if(libbalsa_server_get_username(server) && host) { /* we have been initialized... */
         LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
         g_mutex_lock(&imap_servers_lock);
         g_hash_table_steal(imap_servers, imap_server->key);
         g_free(imap_server->key);
         imap_server->key =
-            g_strdup_printf("%s@%s", libbalsa_server_get_user(server), host);
+            g_strdup_printf("%s@%s", libbalsa_server_get_username(server), host);
         g_hash_table_insert(imap_servers, imap_server->key, imap_server);
         g_mutex_unlock(&imap_servers_lock);
     }
@@ -490,7 +490,7 @@ libbalsa_imap_server_new_from_config(void)
     imap_server = get_or_create(user, host);
     server = LIBBALSA_SERVER(imap_server);
 
-    if (libbalsa_server_get_user(server) == NULL) {
+    if (libbalsa_server_get_username(server) == NULL) {
         gboolean use_ssl;
 
         libbalsa_server_set_username(server, user);
@@ -518,7 +518,7 @@ libbalsa_imap_server_new_from_config(void)
     d1 = libbalsa_conf_get_bool_with_default("UseIdle", &d);
     if(!d) imap_server->use_idle = !!d1;
 
-    if (libbalsa_server_get_passwd(server) == NULL) {
+    if (libbalsa_server_get_password(server) == NULL) {
         gboolean remember_passwd;
         gchar *passwd = NULL;
 
@@ -531,7 +531,7 @@ libbalsa_imap_server_new_from_config(void)
             GError *err = NULL;
 
             const_host = libbalsa_server_get_host(server);
-            const_user = libbalsa_server_get_user(server);
+            const_user = libbalsa_server_get_username(server);
             passwd = secret_password_lookup_sync(LIBBALSA_SERVER_SECRET_SCHEMA,
                                                  NULL, &err,
                                                  "protocol",

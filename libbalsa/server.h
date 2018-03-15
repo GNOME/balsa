@@ -69,8 +69,6 @@ void libbalsa_server_set_password(LibBalsaServer * server,
 				  const gchar * passwd);
 void libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
                               gboolean use_ssl);
-gchar *libbalsa_server_get_password(LibBalsaServer * server,
-				    LibBalsaMailbox * mbox);
 
 void libbalsa_server_config_changed(LibBalsaServer * server);
 void libbalsa_server_load_config(LibBalsaServer * server);
@@ -116,12 +114,12 @@ gboolean libbalsa_server_get_use_ssl(LibBalsaServer * server);
 gboolean libbalsa_server_get_client_cert(LibBalsaServer * server);
 gboolean libbalsa_server_get_try_anonymous(LibBalsaServer * server);
 gboolean libbalsa_server_get_remember_passwd(LibBalsaServer * server);
-const gchar * libbalsa_server_get_user(LibBalsaServer * server);
+const gchar * libbalsa_server_get_username(LibBalsaServer * server);
 const gchar * libbalsa_server_get_host(LibBalsaServer * server);
 const gchar * libbalsa_server_get_protocol(LibBalsaServer * server);
 const gchar * libbalsa_server_get_cert_file(LibBalsaServer * server);
 const gchar * libbalsa_server_get_cert_passphrase(LibBalsaServer * server);
-const gchar * libbalsa_server_get_passwd(LibBalsaServer * server);
+const gchar * libbalsa_server_get_password(LibBalsaServer * server);
 
 /*
  * Setters

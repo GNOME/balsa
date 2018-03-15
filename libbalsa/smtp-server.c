@@ -522,8 +522,8 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     /* user name and password */
     sdi->user = gtk_entry_new();
     smtp_server_add_widget(grid, ++row, _("_User Name:"), sdi->user);
-    if (libbalsa_server_get_user(server) != NULL) {
-        gtk_entry_set_text(GTK_ENTRY(sdi->user), libbalsa_server_get_user(server));
+    if (libbalsa_server_get_username(server) != NULL) {
+        gtk_entry_set_text(GTK_ENTRY(sdi->user), libbalsa_server_get_username(server));
     }
     g_signal_connect(sdi->user, "changed", G_CALLBACK(smtp_server_changed), sdi);
 
@@ -531,8 +531,8 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     smtp_server_add_widget(grid, ++row, _("_Pass Phrase:"), sdi->pass);
     g_object_set(G_OBJECT(sdi->pass), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
     gtk_entry_set_visibility(GTK_ENTRY(sdi->pass), FALSE);
-    if (libbalsa_server_get_passwd(server) != NULL) {
-        gtk_entry_set_text(GTK_ENTRY(sdi->pass), libbalsa_server_get_passwd(server));
+    if (libbalsa_server_get_password(server) != NULL) {
+        gtk_entry_set_text(GTK_ENTRY(sdi->pass), libbalsa_server_get_password(server));
     }
     g_signal_connect(sdi->pass, "changed", G_CALLBACK(smtp_server_changed), sdi);
 

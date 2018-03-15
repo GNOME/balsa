@@ -689,12 +689,12 @@ mailbox_conf_set_values_pop3(LibBalsaMailbox   *mailbox,
 	}
 	gtk_combo_box_set_active(GTK_COMBO_BOX(mcw->mb_data.pop3.security), libbalsa_server_get_security(server) - 1);
 
-	if (libbalsa_server_get_user(server) != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.username), libbalsa_server_get_user(server));
+	if (libbalsa_server_get_username(server) != NULL) {
+		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.username), libbalsa_server_get_username(server));
 	}
 
-	if (libbalsa_server_get_passwd(server) != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.password), libbalsa_server_get_passwd(server));
+	if (libbalsa_server_get_password(server) != NULL) {
+		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.password), libbalsa_server_get_password(server));
 	}
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.delete_from_server), pop3->delete_from_server);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check), pop3->check);
@@ -762,18 +762,18 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 		if (libbalsa_server_get_host(server))
 			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.bsc.server),
 				libbalsa_server_get_host(server));
-		if (libbalsa_server_get_user(server))
+		if (libbalsa_server_get_username(server))
 			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.username),
-				libbalsa_server_get_user(server));
+				libbalsa_server_get_username(server));
 		gtk_toggle_button_set_active
 		(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.anonymous),
 			libbalsa_server_get_try_anonymous(server));
 		gtk_toggle_button_set_active
 		(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.remember),
 			libbalsa_server_get_remember_passwd(server));
-		if (libbalsa_server_get_passwd(server))
+		if (libbalsa_server_get_password(server))
 			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.password),
-				libbalsa_server_get_passwd(server));
+				libbalsa_server_get_password(server));
 		path = libbalsa_mailbox_imap_get_path(imap);
 		if (path)
 			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath),

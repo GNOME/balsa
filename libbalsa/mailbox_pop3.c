@@ -542,7 +542,7 @@ update_msg_list(struct fetch_data         *fd,
 
 	/* load uid's if messages shall be left on the server */
 	if (!mbox->delete_from_server) {
-		uid_prefix = g_strconcat(libbalsa_server_get_user(server), "@", libbalsa_server_get_host(server), NULL);
+		uid_prefix = g_strconcat(libbalsa_server_get_username(server), "@", libbalsa_server_get_host(server), NULL);
 		prefix_len = strlen(uid_prefix);
 		uids = mp_load_uids(uid_prefix);
 		*current_uids = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
@@ -674,7 +674,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 
 		/* store uid list */
 		if (result && !mbox->delete_from_server) {
-			gchar *uid_prefix = g_strconcat(libbalsa_server_get_user(server), "@", libbalsa_server_get_host(server), NULL);
+			gchar *uid_prefix = g_strconcat(libbalsa_server_get_username(server), "@", libbalsa_server_get_host(server), NULL);
 
 			mp_save_uids(current_uids, uid_prefix, &err);
 			g_free(uid_prefix);

@@ -133,7 +133,7 @@ libbalsa_server_init(LibBalsaServer * server)
 {
     LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
 
-    priv->protocol        = "pop3"; /* Is this a sane default value? */
+    priv->protocol        = g_strdup("pop3"); /* Is this a sane default value? */
     priv->host            = NULL;
     priv->user            = NULL;
     priv->passwd          = NULL;

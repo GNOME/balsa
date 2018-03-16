@@ -47,9 +47,7 @@
 /** wait 60 seconds for packets */
 #define IMAP_CMD_TIMEOUT (60*1000)
 
-static LibBalsaServerClass *parent_class = NULL;
-
-struct LibBalsaImapServer_ {
+struct _LibBalsaImapServer {
     LibBalsaServer server;
     
     guint connection_cleanup_id;
@@ -70,13 +68,12 @@ struct LibBalsaImapServer_ {
     unsigned use_idle:1;  /**< IDLE will work: no dummy firewall on the way */
 };
 
-typedef struct LibBalsaImapServerClass_ {
+struct _LibBalsaImapServerClass {
     LibBalsaServerClass parent_class;
+};
 
-} LibBalsaImapServerClass;
+G_DEFINE_TYPE(LibBalsaImapServer, libbalsa_imap_server, LIBBALSA_TYPE_SERVER)
 
-static void libbalsa_imap_server_class_init(LibBalsaImapServerClass * klass);
-static void libbalsa_imap_server_init(LibBalsaImapServer * server);
 static void libbalsa_imap_server_finalize(GObject * object);
 static gboolean connection_cleanup(gpointer ptr);
 
@@ -108,32 +105,6 @@ static int by_last_user(gconstpointer a, gconstpointer b)
     return ((struct handle_info*)a)->last_user != b;
 }
 
-GType
-libbalsa_imap_server_get_type(void)
-{
-    static GType server_type = 0;
-
-    if (!server_type) {
-        static const GTypeInfo server_info = {
-            sizeof(LibBalsaImapServerClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-            (GClassInitFunc) libbalsa_imap_server_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-            sizeof(LibBalsaImapServer),
-            0,                  /* n_preallocs */
-            (GInstanceInitFunc) libbalsa_imap_server_init
-        };
-
-        server_type =
-            g_type_register_static(LIBBALSA_TYPE_SERVER, "LibBalsaImapServer",
-                                   &server_info, 0);
-    }
-
-    return server_type;
-}
-
 static void libbalsa_imap_server_set_username(LibBalsaServer * server,
                                               const gchar * name)
 {
@@ -148,7 +119,8 @@ static void libbalsa_imap_server_set_username(LibBalsaServer * server,
         g_hash_table_insert(imap_servers, imap_server->key, imap_server);
         g_mutex_unlock(&imap_servers_lock);
     }
-    (parent_class)->set_username(server, name);
+    LIBBALSA_SERVER_CLASS(libbalsa_imap_server_parent_class)->
+        set_username(server, name);
 }
 static void
 libbalsa_imap_server_set_host(LibBalsaServer * server,
@@ -164,7 +136,8 @@ libbalsa_imap_server_set_host(LibBalsaServer * server,
         g_hash_table_insert(imap_servers, imap_server->key, imap_server);
         g_mutex_unlock(&imap_servers_lock);
     }
-    (parent_class)->set_host(server, host, use_ssl);
+    LIBBALSA_SERVER_CLASS(libbalsa_imap_server_parent_class)->
+        set_host(server, host, use_ssl);
 }
 static void
 libbalsa_imap_server_class_init(LibBalsaImapServerClass * klass)
@@ -174,8 +147,6 @@ libbalsa_imap_server_class_init(LibBalsaImapServerClass * klass)
 
     object_class = G_OBJECT_CLASS(klass);
     server_class = LIBBALSA_SERVER_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     object_class->finalize = libbalsa_imap_server_finalize;
 
@@ -222,7 +193,7 @@ libbalsa_imap_server_finalize(GObject * object)
     g_mutex_clear(&imap_server->lock);
     g_free(imap_server->key);
 
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(libbalsa_imap_server_parent_class)->finalize(object);
 }
 
 gint ImapDebug = 0;
@@ -239,7 +210,7 @@ monitor_cb(const char *buffer, int length, int direction, void *arg)
     if (direction) {
       const gchar *login;
       int login_length;
-          
+
       login = g_strstr_len(buffer, length, "LOGIN ");
       if (login) {
         login_length = 6;

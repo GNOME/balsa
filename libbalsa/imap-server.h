@@ -21,22 +21,15 @@
 #define __IMAP_SERVER_H__
 
 #include <glib-object.h>
+#include "server.h"
 
-#define LIBBALSA_TYPE_IMAP_SERVER \
-    (libbalsa_imap_server_get_type())
-#define LIBBALSA_IMAP_SERVER(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST(obj, LIBBALSA_TYPE_IMAP_SERVER, \
-                                LibBalsaImapServer))
-#define LIBBALSA_IMAP_SERVER_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_IMAP_SERVER, \
-                             LibBalsaImapServerClass))
-#define LIBBALSA_IS_IMAP_SERVER(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE(obj, LIBBALSA_TYPE_IMAP_SERVER))
-#define LIBBALSA_IS_IMAP_SERVER_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE(klass, LIBBALSA_TYPE_IMAP_SERVER))
+#define LIBBALSA_TYPE_IMAP_SERVER libbalsa_imap_server_get_type()
 
-GType libbalsa_imap_server_get_type(void);
-typedef struct LibBalsaImapServer_ LibBalsaImapServer;
+G_DECLARE_FINAL_TYPE(LibBalsaImapServer,
+                     libbalsa_imap_server,
+                     LIBBALSA,
+                     IMAP_SERVER,
+                     LibBalsaServer)
 
 LibBalsaImapServer* libbalsa_imap_server_new(const gchar *username,
                                              const gchar *host);

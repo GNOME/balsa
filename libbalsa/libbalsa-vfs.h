@@ -33,25 +33,13 @@ G_BEGIN_DECLS
 
 
 /* a vfs file description as GObject */
-#define LIBBALSA_TYPE_VFS            (libbalsa_vfs_get_type())
-#define LIBBALSA_VFS(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), LIBBALSA_TYPE_VFS, LibbalsaVfs))
-#define LIBBALSA_VFS_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), LIBBALSA_TYPE_VFS, LibbalsaVfsClass))
-#define LIBBALSA_IS_VFS(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), LIBBALSA_TYPE_VFS))
-#define LIBBALSA_IS_VFS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), LIBBALSA_TYPE_VFS))
-#define LIBBALSA_VFS_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), LIBBALSA_TYPE_VFS, LibbalsaVfsClass))
+#define LIBBALSA_TYPE_VFS libbalsa_vfs_get_type()
 
-typedef struct _LibbalsaVfsClass LibbalsaVfsClass;
-
-
-struct _LibbalsaVfs {
-    GObject parent;
-
-    struct _LibbalsaVfsPriv * priv;
-};
-
-struct _LibbalsaVfsClass {
-    GObjectClass parent;
-};
+G_DECLARE_FINAL_TYPE(LibbalsaVfs,
+                     libbalsa_vfs,
+                     LIBBALSA,
+                     VFS,
+                     GObject)
 
 gboolean libbalsa_vfs_local_only(void);
 

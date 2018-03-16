@@ -61,9 +61,6 @@ struct _LibbalsaVfsPriv {
 };
 
 
-static GObjectClass *libbalsa_vfs_parent_class = NULL;
-
-
 static void libbalsa_vfs_class_init(LibbalsaVfsClass * klass);
 static void libbalsa_vfs_init(LibbalsaVfs * self);
 static void libbalsa_vfs_dispose(LibbalsaVfs * self);
@@ -76,45 +73,25 @@ libbalsa_vfs_local_only(void)
     return FALSE;
 }
 
+struct _LibbalsaVfs {
+    GObject parent;
 
-GType
-libbalsa_vfs_get_type(void)
-{
-    static GType libbalsa_vfs_type = 0;
+    struct _LibbalsaVfsPriv * priv;
+};
 
-    if (!libbalsa_vfs_type) {
-        static const GTypeInfo libbalsa_vfs_type_info = {
-            sizeof(LibbalsaVfsClass),     /* class_size */
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-            (GClassInitFunc) libbalsa_vfs_class_init,   /* class_init */
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-            sizeof(LibbalsaVfs),  /* instance_size */
-            0,                  /* n_preallocs */
-            (GInstanceInitFunc) libbalsa_vfs_init,      /* instance_init */
-            /* no value_table */
-        };
+struct _LibbalsaVfsClass {
+    GObjectClass parent;
+};
 
-        libbalsa_vfs_type =
-            g_type_register_static(G_TYPE_OBJECT, "LibbalsaVfs",
-                                   &libbalsa_vfs_type_info, 0);
-    }
-
-    return libbalsa_vfs_type;
-}
-
+G_DEFINE_TYPE(LibbalsaVfs, libbalsa_vfs, G_TYPE_OBJECT)
 
 static void
 libbalsa_vfs_class_init(LibbalsaVfsClass * klass)
 {
     GObjectClass *gobject_klass = G_OBJECT_CLASS(klass);
 
-    libbalsa_vfs_parent_class = g_type_class_peek(G_TYPE_OBJECT);
-    gobject_klass->dispose =
-        (GObjectFinalizeFunc) libbalsa_vfs_dispose;
-    gobject_klass->finalize =
-        (GObjectFinalizeFunc) libbalsa_vfs_finalize;
+    gobject_klass->dispose  = (GObjectFinalizeFunc) libbalsa_vfs_dispose;
+    gobject_klass->finalize = (GObjectFinalizeFunc) libbalsa_vfs_finalize;
 }
 
 
@@ -138,7 +115,7 @@ libbalsa_vfs_dispose(LibbalsaVfs * self)
         g_clear_object(&priv->info);
     }
 
-    libbalsa_vfs_parent_class->dispose(G_OBJECT(self));
+    G_OBJECT_CLASS(libbalsa_vfs_parent_class)->dispose(G_OBJECT(self));
 }
 
 
@@ -159,7 +136,7 @@ libbalsa_vfs_finalize(LibbalsaVfs * self)
         g_free(priv);
     }
 
-    libbalsa_vfs_parent_class->finalize(G_OBJECT(self));
+    G_OBJECT_CLASS(libbalsa_vfs_parent_class)->finalize(G_OBJECT(self));
 }
 
 

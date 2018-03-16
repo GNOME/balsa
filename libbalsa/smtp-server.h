@@ -13,7 +13,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of 
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,32 +22,23 @@
 
 #include <gtk/gtk.h>
 #include "libbalsa.h"
+#include "server.h"
 
-#define LIBBALSA_TYPE_SMTP_SERVER				\
-    (libbalsa_smtp_server_get_type())
-#define LIBBALSA_SMTP_SERVER(obj)				\
-    (G_TYPE_CHECK_INSTANCE_CAST(obj, LIBBALSA_TYPE_SMTP_SERVER,	\
-                                LibBalsaSmtpServer))
-#define LIBBALSA_SMTP_SERVER_CLASS(klass)			\
-    (G_TYPE_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_SMTP_SERVER,	\
-                             LibBalsaSmtpServerClass))
-#define LIBBALSA_IS_SMTP_SERVER(obj)				\
-    (G_TYPE_CHECK_INSTANCE_TYPE(obj, LIBBALSA_TYPE_SMTP_SERVER))
-#define LIBBALSA_IS_SMTP_SERVER_CLASS(klass)			\
-    (G_TYPE_CHECK_CLASS_TYPE(klass, LIBBALSA_TYPE_SMTP_SERVER))
+#define LIBBALSA_TYPE_SMTP_SERVER libbalsa_smtp_server_get_type()
 
-GType libbalsa_smtp_server_get_type(void);
+G_DECLARE_FINAL_TYPE(LibBalsaSmtpServer,
+                     libbalsa_smtp_server,
+                     LIBBALSA,
+                     SMTP_SERVER,
+                     LibBalsaServer)
 
 LibBalsaSmtpServer *libbalsa_smtp_server_new(void);
-LibBalsaSmtpServer *libbalsa_smtp_server_new_from_config(const gchar *
-                                                         name);
+LibBalsaSmtpServer *libbalsa_smtp_server_new_from_config(const gchar * name);
 void libbalsa_smtp_server_save_config(LibBalsaSmtpServer * server);
 void libbalsa_smtp_server_set_name(LibBalsaSmtpServer * smtp_server,
                                    const gchar * name);
-const gchar *libbalsa_smtp_server_get_name(LibBalsaSmtpServer *
-                                           smtp_server);
-guint libbalsa_smtp_server_get_big_message(LibBalsaSmtpServer *
-                                           smtp_server);
+const gchar *libbalsa_smtp_server_get_name(LibBalsaSmtpServer * smtp_server);
+guint libbalsa_smtp_server_get_big_message(LibBalsaSmtpServer * smtp_server);
 void libbalsa_smtp_server_add_to_list(LibBalsaSmtpServer * smtp_server,
                                       GSList ** server_list);
 

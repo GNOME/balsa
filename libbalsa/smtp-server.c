@@ -39,8 +39,6 @@
 #  include "macosx-helpers.h"
 #endif
 
-static LibBalsaServerClass *parent_class = NULL;
-
 struct _LibBalsaSmtpServer {
     LibBalsaServer server;
 
@@ -49,13 +47,15 @@ struct _LibBalsaSmtpServer {
     gint lock_state;	/* 0 means unlocked; access via atomic operations */
 };
 
-typedef struct _LibBalsaSmtpServerClass {
+struct _LibBalsaSmtpServerClass {
     LibBalsaServerClass parent_class;
-} LibBalsaSmtpServerClass;
+};
 
-/* Server class methods */
+/* Class boilerplate */
 
-/* Object class method */
+G_DEFINE_TYPE(LibBalsaSmtpServer, libbalsa_smtp_server, LIBBALSA_TYPE_SERVER)
+
+/* Class methods */
 
 static void
 libbalsa_smtp_server_finalize(GObject * object)
@@ -68,7 +68,7 @@ libbalsa_smtp_server_finalize(GObject * object)
 
     g_free(smtp_server->name);
 
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(libbalsa_smtp_server_parent_class)->finalize(object);
 }
 
 static void
@@ -77,8 +77,6 @@ libbalsa_smtp_server_class_init(LibBalsaSmtpServerClass * klass)
     GObjectClass *object_class;
 
     object_class = G_OBJECT_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     object_class->finalize = libbalsa_smtp_server_finalize;
 }
@@ -90,34 +88,6 @@ libbalsa_smtp_server_init(LibBalsaSmtpServer * smtp_server)
 
     /* Change the default. */
     libbalsa_server_set_remember_passwd(LIBBALSA_SERVER(smtp_server), TRUE);
-}
-
-/* Class boilerplate */
-
-GType
-libbalsa_smtp_server_get_type(void)
-{
-    static GType server_type = 0;
-
-    if (!server_type) {
-        static const GTypeInfo server_info = {
-            sizeof(LibBalsaSmtpServerClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-            (GClassInitFunc) libbalsa_smtp_server_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-            sizeof(LibBalsaSmtpServer),
-            0,                  /* n_preallocs */
-            (GInstanceInitFunc) libbalsa_smtp_server_init
-        };
-
-        server_type =
-            g_type_register_static(LIBBALSA_TYPE_SERVER,
-                                   "LibBalsaSmtpServer", &server_info, 0);
-    }
-
-    return server_type;
 }
 
 /* Public methods */

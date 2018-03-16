@@ -129,11 +129,8 @@ img_check_size(BalsaMimeWidgetImage * mwi)
 
     image = GTK_IMAGE(widget);
     switch (gtk_image_get_storage_type(image)) {
-        case GTK_IMAGE_SURFACE:
-            curr_w = cairo_image_surface_get_width(gtk_image_get_surface(image));
-            break;
-        case GTK_IMAGE_TEXTURE:
-            curr_w = gdk_texture_get_width(gtk_image_get_texture(image));
+        case GTK_IMAGE_PAINTABLE:
+            curr_w = gdk_paintable_get_intrinsic_width(GDK_PAINTABLE(image));
             break;
         default:
             curr_w = 0;

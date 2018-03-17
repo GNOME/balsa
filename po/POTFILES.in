@@ -32,6 +32,7 @@ libbalsa/libbalsa-gpgme-widgets.c
 libbalsa/libbalsa-progress.c
 libbalsa/libbalsa-vfs.c
 libbalsa/mailbox.c
+libbalsa/mailbox.h
 libbalsa/mailbox_imap.c
 libbalsa/mailbox_local.c
 libbalsa/mailbox_maildir.c
@@ -39,6 +40,7 @@ libbalsa/mailbox_mbox.c
 libbalsa/mailbox_mh.c
 libbalsa/mailbox_pop3.c
 libbalsa/message.c
+libbalsa/message.h
 libbalsa/misc.c
 libbalsa/rfc2445.c
 libbalsa/rfc3156.c

@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
 "product=balsa&keywords=I18N+L10N&component=general\n"
-"POT-Creation-Date: 2018-02-13 18:28+0100\n"
-"PO-Revision-Date: 2018-02-13 18:29+0100\n"
+"POT-Creation-Date: 2018-03-18 01:24+0100\n"
+"PO-Revision-Date: 2018-03-18 01:25+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -195,7 +195,7 @@ msgid "Reply To:"
 msgstr "Odpowiedź do:"
 
 #: ../libbalsa/body.c:121 ../libbalsa/mailbox_local.c:1829
-#: ../libbalsa/message.c:848
+#: ../libbalsa/message.c:848 ../libbalsa/message.h:188
 msgid "(No subject)"
 msgstr "(Brak tematu)"
 
@@ -1485,6 +1485,11 @@ msgstr "Rekonstrukcja wiadomości"
 #, c-format
 msgid "Finding duplicate messages in source mailbox failed"
 msgstr "Wyszukanie podwójnych wiadomości w skrzynce źródłowej się nie powiodło"
+
+#: ../libbalsa/mailbox.h:54 ../libbalsa/mailbox.h:63
+#, c-format
+msgid "*** ERROR: Mailbox Stream Closed: %s ***\n"
+msgstr "*** BŁĄD: zamknięto strumień skrzynki: %s ***\n"
 
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by

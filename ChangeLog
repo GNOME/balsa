@@ -1,6 +1,11 @@
 2018-03-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/imap/imap-commands.c (imap_mbox_handle_fetch_body):
+	silence a gcc gripe about snprintf.
+
+2018-03-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/imap-commands.c (imap_mbox_handle_fetch_body):
 	silence a gcc gripe about strncpy.
 
 2018-02-27  Pawel Salek <pawsa0@gmail.com>

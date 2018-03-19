@@ -196,21 +196,22 @@ balsa_print_object_header_new_real(GList * list,
 	/* check for face and x-face */
 	if (!face) {
 	    GError *err = NULL;
-	    GtkWidget * f_widget = NULL;
+	    GdkPixbuf *f_pixbuf = NULL;
 
-	    if (!g_ascii_strcasecmp("Face", pair[0]))
-		f_widget = libbalsa_get_image_from_face_header(pair[1], &err);
+	    if (g_ascii_strcasecmp("Face", pair[0]) == 0)
+		f_pixbuf = libbalsa_get_pixbuf_from_face_header(pair[1], &err);
 #if HAVE_COMPFACE
-	    else if (!g_ascii_strcasecmp("X-Face", pair[0]))
-		f_widget = libbalsa_get_image_from_x_face_header(pair[1], &err);
+	    else if (g_ascii_strcasecmp("X-Face", pair[0]) == 0)
+		f_pixbuf = libbalsa_get_pixbuf_from_x_face_header(pair[1], &err);
 #endif                          /* HAVE_COMPFACE */
-	    if (err)
+	    if (err != NULL)
+                /* FIXME report something? */
 		g_error_free(err);
 
-	    if (f_widget) {
-		face = gtk_image_get_surface(GTK_IMAGE(f_widget));
+	    if (f_pixbuf != NULL) {
+		face = gdk_cairo_surface_create_from_pixbuf(f_pixbuf, 0, NULL);
 		cairo_surface_reference(face);
-		gtk_widget_destroy(f_widget);
+		g_object_unref(f_pixbuf);
 	    }
 	}
 

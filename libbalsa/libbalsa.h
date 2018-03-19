@@ -173,9 +173,13 @@ extern void (*libbalsa_progress_set_activity) (gboolean set,
 gchar *libbalsa_get_header_from_path(const gchar * header,
                                      const gchar * path, gsize * size,
                                      GError ** err);
+GdkPixbuf *libbalsa_get_pixbuf_from_face_header(const gchar * content,
+                                                GError ** err);
 GtkWidget *libbalsa_get_image_from_face_header(const gchar * content,
                                                GError ** err);
 #if HAVE_COMPFACE
+GdkPixbuf *libbalsa_get_pixbuf_from_x_face_header(const gchar * content,
+                                                  GError ** err);
 GtkWidget *libbalsa_get_image_from_x_face_header(const gchar * content,
                                                  GError ** err);
 #endif                          /* HAVE_COMPFACE */

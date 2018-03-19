@@ -815,14 +815,14 @@ libbalsa_get_header_from_path(const gchar * header, const gchar * path,
     return content;
 }
 
-GtkWidget *
-libbalsa_get_image_from_face_header(const gchar * content, GError ** err)
+GdkPixbuf *
+libbalsa_get_pixbuf_from_face_header(const gchar * content, GError ** err)
 {
     GMimeStream *stream;
     GMimeStream *stream_filter;
     GMimeFilter *filter;
     GByteArray *array;
-    GtkWidget *image = NULL;
+    GdkPixbuf *pixbuf = NULL;
 
     stream = g_mime_stream_mem_new();
     stream_filter = g_mime_stream_filter_new(stream);
@@ -846,25 +846,42 @@ libbalsa_get_image_from_face_header(const gchar * content, GError ** err)
         gdk_pixbuf_loader_close(loader, *err ? NULL : err);
 
         if (!*err)
-            image = gtk_image_new_from_pixbuf(gdk_pixbuf_loader_get_pixbuf
-                                              (loader));
+            pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
         g_object_unref(loader);
     }
     g_object_unref(stream);
+
+    return pixbuf;
+}
+
+GtkWidget *
+libbalsa_get_image_from_face_header(const gchar * content, GError ** err)
+{
+    GdkPixbuf *pixbuf;
+    GtkWidget *image;
+
+    pixbuf = libbalsa_get_pixbuf_from_face_header(content, err);
+
+    if (pixbuf != NULL) {
+        image = gtk_image_new_from_pixbuf(pixbuf);
+        g_object_unref(pixbuf);
+    } else {
+        image = NULL;
+    }
 
     return image;
 }
 
 #if HAVE_COMPFACE
 GtkWidget *
-libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
+libbalsa_get_pixbuf_from_x_face_header(const gchar * content, GError ** err)
 {
     gchar buf[2048];
     GdkPixbuf *pixbuf;
     guchar *pixels;
     gint lines;
     const gchar *p;
-    GtkWidget *image = NULL;
+    GdkPixbuf *pixbuf = NULL;
 
     strncpy(buf, content, sizeof buf - 1);
 
@@ -872,11 +889,11 @@ libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
     case -1:
         g_set_error(err, LIBBALSA_IMAGE_ERROR, LIBBALSA_IMAGE_ERROR_FORMAT,
                     _("Invalid input format"));
-        return image;
+        return NULL;
     case -2:
         g_set_error(err, LIBBALSA_IMAGE_ERROR, LIBBALSA_IMAGE_ERROR_BUFFER,
                     _("Internal buffer overrun"));
-        return image;
+        return NULL;
     }
 
     pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, 48, 48);
@@ -894,7 +911,7 @@ libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
                         /* Translators: please do not translate Face. */
                         _("Bad X-Face data"));
             g_object_unref(pixbuf);
-            return image;
+            return NULL;
         }
         for (j = 0, q = pixels; j < 3; j++)
             for (k = 15; k >= 0; --k){
@@ -907,8 +924,23 @@ libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
         pixels += gdk_pixbuf_get_rowstride(pixbuf);
     }
 
-    image = gtk_image_new_from_pixbuf(pixbuf);
-    g_object_unref(pixbuf);
+    return pixbuf;
+}
+
+GtkWidget *
+libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
+{
+    GdkPixbuf *pixbuf;
+    GtkWidget *image;
+
+    pixbuf = libbalsa_get_pixbuf_from_x_face_header(content, err);
+
+    if (pixbuf != NULL) {
+        image = gtk_image_new_from_pixbuf(pixbuf);
+        g_object_unref(pixbuf);
+    } else {
+        image = NULL;
+    }
 
     return image;
 }

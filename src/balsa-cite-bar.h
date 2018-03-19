@@ -32,7 +32,7 @@ G_DECLARE_FINAL_TYPE(BalsaCiteBar,
                      balsa_cite_bar,
                      BALSA,
                      CITE_BAR,
-                     GObject)
+                     GtkWidget)
 
 GtkWidget* balsa_cite_bar_new    (gint height, gint bars, gint dimension);
 void       balsa_cite_bar_resize (BalsaCiteBar *cite_bar, gint height);

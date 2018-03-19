@@ -47,16 +47,12 @@ static void balsa_cite_bar_snapshot (GtkWidget * widget,
 
 G_DEFINE_TYPE(BalsaCiteBar, balsa_cite_bar, GTK_TYPE_WIDGET)
 
-static GtkWidgetClass *parent_class = NULL;
-
 static void
 balsa_cite_bar_class_init(BalsaCiteBarClass * class)
 {
     GtkWidgetClass *widget_class;
 
     widget_class = (GtkWidgetClass *) class;
-
-    parent_class = g_type_class_peek_parent(class);
 
     widget_class->measure  = balsa_cite_bar_measure;
     widget_class->snapshot = balsa_cite_bar_snapshot;

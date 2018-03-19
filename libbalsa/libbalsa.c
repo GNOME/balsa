@@ -873,11 +873,10 @@ libbalsa_get_image_from_face_header(const gchar * content, GError ** err)
 }
 
 #if HAVE_COMPFACE
-GtkWidget *
+GdkPixbuf *
 libbalsa_get_pixbuf_from_x_face_header(const gchar * content, GError ** err)
 {
     gchar buf[2048];
-    GdkPixbuf *pixbuf;
     guchar *pixels;
     gint lines;
     const gchar *p;

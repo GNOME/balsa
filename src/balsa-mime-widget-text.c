@@ -1211,29 +1211,34 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 {
     BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     GtkWidget *widget;
+    GtkWidget *popup_menu;
 
-    mw->widget =
+    widget =
         libbalsa_html_new(mime_body,
                           (LibBalsaHtmlCallback) bm_widget_on_url,
                           (LibBalsaHtmlCallback) handle_url);
-    g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
+    g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);
 
-    g_signal_connect(libbalsa_html_get_view_widget(mw->widget),
+    g_signal_connect(libbalsa_html_get_view_widget(widget),
                      "key_press_event",
                      G_CALLBACK(balsa_mime_widget_key_press_event), bm);
-    if ((widget = libbalsa_html_popup_menu_widget(mw->widget))) {
-        g_object_set_data(G_OBJECT(widget), "balsa-message", bm);
-        g_signal_connect(widget, "populate-popup",
-                         G_CALLBACK(bmwt_populate_popup_cb), mw->widget);
+    if ((popup_menu = libbalsa_html_popup_menu_widget(widget)) != NULL) {
+        g_object_set_data(G_OBJECT(popup_menu), "balsa-message", bm);
+        g_signal_connect(popup_menu, "populate-popup",
+                         G_CALLBACK(bmwt_populate_popup_cb), widget);
     } else {
-        mwt->gesture = gtk_gesture_multi_press_new(mw->widget);
+        BalsaMimeWidgetText *mwt = BALSA_MIME_WIDGET_TEXT(mw);
+
+        mwt->gesture = gtk_gesture_multi_press_new(widget);
         gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(mwt->gesture), 0);
         g_signal_connect(mwt->gesture, "pressed",
                          G_CALLBACK(mwt_gesture_pressed_cb), bm);
 
-        g_signal_connect(mw->widget, "popup-menu",
+        g_signal_connect(widget, "popup-menu",
                          G_CALLBACK(balsa_gtk_html_popup), bm);
     }
+
+    balsa_mime_widget_set_widget(mw, widget);
 
     return mw;
 }

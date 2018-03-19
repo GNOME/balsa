@@ -2586,8 +2586,16 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
 gboolean
 balsa_message_can_zoom(BalsaMessage * bm)
 {
-    return bm->current_part
-        && libbalsa_html_can_zoom(bm->current_part->mime_widget->widget);
+    gboolean can_zoom = FALSE;
+
+    if (bm->current_part != NULL) {
+        GtkWidget *widget;
+
+        widget = balsa_mime_widget_get_widget(bm->current_part->mime_widget);
+        can_zoom = libbalsa_html_can_zoom(widget);
+    }
+
+    return can_zoom;
 }
 
 /* Zoom an html item. */
@@ -2609,7 +2617,7 @@ balsa_message_zoom(BalsaMessage * bm, gint in_out)
      g_object_set_data(G_OBJECT(bm->message), BALSA_MESSAGE_ZOOM_KEY,
                      GINT_TO_POINTER(zoom));
 
-     libbalsa_html_zoom(bm->current_part->mime_widget->widget, in_out);
+     libbalsa_html_zoom(balsa_mime_widget_get_widget(bm->current_part->mime_widget), in_out);
 
 }
 #endif /* HAVE_HTML_WIDGET */

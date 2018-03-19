@@ -1445,7 +1445,7 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
       /* We have to strip last section part and replace it with HEADER */
       unsigned sz;
       char *last_dot = strrchr(section, '.');
-      strncpy(prefix, section, sizeof(prefix));
+      strncpy(prefix, section, sizeof(prefix) - 1);
       
       if(last_dot) {
         sz = last_dot-section+1;

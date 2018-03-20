@@ -171,16 +171,16 @@ lsv_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc,
                      gint baseline, GtkAllocation * clip,
                      LibBalsaSourceViewerInfo * lsvi)
 {
-    GdkWindow *gdk_window;
+    GdkSurface *surface;
     gboolean maximized;
 
-    gdk_window = gtk_widget_get_window(window);
-    if (gdk_window == NULL)
+    surface = gtk_widget_get_surface(window);
+    if (surface == NULL)
         return;
 
     maximized =
-        (gdk_window_get_state(gdk_window) &
-         (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN)) != 0;
+        (gdk_surface_get_state(surface) &
+         (GDK_SURFACE_STATE_MAXIMIZED | GDK_SURFACE_STATE_FULLSCREEN)) != 0;
 
     if (!maximized)
         gtk_window_get_size(GTK_WINDOW(window), lsvi->width, lsvi->height);

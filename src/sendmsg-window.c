@@ -1310,15 +1310,15 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 static void
 sw_size_alloc_cb(GtkWidget * window)
 {
-    GdkWindow *gdk_window;
+    GdkSurface *surface;
 
-    gdk_window = gtk_widget_get_window(window);
-    if (gdk_window == NULL)
+    surface = gtk_widget_get_surface(window);
+    if (surface == NULL)
         return;
 
     balsa_app.sw_maximized =
-        (gdk_window_get_state(gdk_window) &
-         (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN)) != 0;
+        (gdk_surface_get_state(surface) &
+         (GDK_SURFACE_STATE_MAXIMIZED | GDK_SURFACE_STATE_FULLSCREEN)) != 0;
 
     if (!balsa_app.sw_maximized)
         gtk_window_get_size(GTK_WINDOW(window),
@@ -4989,7 +4989,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
                                     _("_Send"),   GTK_RESPONSE_OK,
                                     NULL);
     gtk_window_set_resizable (GTK_WINDOW (no_subj_dialog), FALSE);
-    gtk_window_set_type_hint (GTK_WINDOW (no_subj_dialog), GDK_WINDOW_TYPE_HINT_DIALOG);
+    gtk_window_set_type_hint (GTK_WINDOW (no_subj_dialog), GDK_SURFACE_TYPE_HINT_DIALOG);
 
     dialog_vbox = gtk_dialog_get_content_area(GTK_DIALOG(no_subj_dialog));
     g_object_set(G_OBJECT(dialog_vbox), "margin", 6, NULL);

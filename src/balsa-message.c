@@ -387,12 +387,12 @@ bm_find_scroll_to_selection(BalsaMessage * bm,
                                     &end_location);
     end_location.width = 0;
     gdk_rectangle_union(&begin_location, &end_location, &begin_location);
-    gtk_text_view_buffer_to_window_coords(text_view,
-                                          GTK_TEXT_WINDOW_WIDGET,
-                                          begin_location.x,
-                                          begin_location.y,
-                                          &begin_location.x,
-                                          &begin_location.y);
+    gtk_text_view_buffer_to_surface_coords(text_view,
+                                           GTK_TEXT_WINDOW_WIDGET,
+                                           begin_location.x,
+                                           begin_location.y,
+                                           &begin_location.x,
+                                           &begin_location.y);
 
     bm_find_scroll_to_rectangle(bm, GTK_WIDGET(text_view), &begin_location);
 }
@@ -3258,7 +3258,7 @@ balsa_message_find_in_message(BalsaMessage * bm)
         bm_find_set_status(bm, BM_FIND_STATUS_INIT);
 
         gtk_widget_show(bm->find_bar);
-        if (gtk_widget_get_window(bm->find_entry))
+        if (gtk_widget_get_has_surface(bm->find_entry))
             gtk_widget_grab_focus(bm->find_entry);
     }
 }

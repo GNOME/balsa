@@ -3553,7 +3553,7 @@ bw_display_new_mail_notification(int num_new, int has_new)
             gtk_window_set_title(GTK_WINDOW(dlg), _("Balsa: New mail"));
             gtk_window_set_role(GTK_WINDOW(dlg), "new_mail_dialog");
             gtk_window_set_type_hint(GTK_WINDOW(dlg),
-                    GDK_WINDOW_TYPE_HINT_NORMAL);
+                    GDK_SURFACE_TYPE_HINT_NORMAL);
             g_signal_connect(G_OBJECT(dlg), "response",
                     G_CALLBACK(gtk_widget_destroy), NULL);
             g_object_add_weak_pointer(G_OBJECT(dlg), (gpointer) & dlg);
@@ -3588,7 +3588,7 @@ bw_display_new_mail_notification(int num_new, int has_new)
         gtk_window_set_title(GTK_WINDOW(dlg), _("Balsa: New mail"));
         gtk_window_set_role(GTK_WINDOW(dlg), "new_mail_dialog");
         gtk_window_set_type_hint(GTK_WINDOW(dlg),
-                                 GDK_WINDOW_TYPE_HINT_NORMAL);
+                                 GDK_SURFACE_TYPE_HINT_NORMAL);
         g_signal_connect(G_OBJECT(dlg), "response",
                          G_CALLBACK(gtk_widget_destroy), NULL);
         g_object_add_weak_pointer(G_OBJECT(dlg), (gpointer) & dlg);

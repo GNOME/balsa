@@ -61,7 +61,7 @@ balsa_cite_bar_class_init(BalsaCiteBarClass * class)
 static void
 balsa_cite_bar_init(BalsaCiteBar * cite_bar)
 {
-    gtk_widget_set_has_window(GTK_WIDGET(cite_bar), FALSE);
+    gtk_widget_set_has_surface(GTK_WIDGET(cite_bar), FALSE);
 }
 
 GtkWidget *

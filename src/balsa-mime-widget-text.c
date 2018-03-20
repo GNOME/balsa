@@ -482,12 +482,12 @@ static gboolean
 fix_text_widget(GtkWidget *widget, gpointer data)
 {
     if (data != NULL) {
-        GdkWindow *window = gtk_widget_get_window(widget);
+        GdkSurface *surface = gtk_widget_get_surface(widget);
 
-        gdk_window_set_events(window,
-                              gdk_window_get_events(window) |
-                              GDK_POINTER_MOTION_MASK |
-                              GDK_LEAVE_NOTIFY_MASK);
+        gdk_surface_set_events(surface,
+                               gdk_surface_get_events(surface) |
+                               GDK_POINTER_MOTION_MASK |
+                               GDK_LEAVE_NOTIFY_MASK);
     }
 
     if (!url_cursor_normal || !url_cursor_over_url) {
@@ -982,13 +982,13 @@ draw_cite_bar_real(cite_bar_t * bar, BalsaMimeWidgetText * mwt)
 
     /* get the locations */
     gtk_text_view_get_iter_location(view, &bar->start_iter, &location);
-    gtk_text_view_buffer_to_window_coords(view, GTK_TEXT_WINDOW_TEXT,
-                                          location.x, location.y,
-                                          &x_pos, &y_pos);
+    gtk_text_view_buffer_to_surface_coords(view, GTK_TEXT_WINDOW_TEXT,
+                                           location.x, location.y,
+                                           &x_pos, &y_pos);
     gtk_text_view_get_iter_location(view, &bar->end_iter, &location);
-    gtk_text_view_buffer_to_window_coords(view, GTK_TEXT_WINDOW_TEXT,
-                                          location.x, location.y,
-                                          &x_pos, &height);
+    gtk_text_view_buffer_to_surface_coords(view, GTK_TEXT_WINDOW_TEXT,
+                                           location.x, location.y,
+                                           &x_pos, &height);
     height -= y_pos;
 
     /* add a new widget if necessary */

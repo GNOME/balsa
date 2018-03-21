@@ -845,7 +845,7 @@ lbav_entry_changed_cb(GtkEntry * entry, LibBalsaAddressView * address_view)
 
     completion = gtk_entry_get_completion(entry);
 
-    if (gtk_widget_get_has_surface(GTK_WIDGET(entry)))
+    if (gtk_widget_get_realized(GTK_WIDGET(entry)))
         lbav_entry_setup_matches(address_view, entry, completion,
                                  LIBBALSA_ADDRESS_VIEW_MATCH_FAST);
     address_view->last_was_escape = FALSE;

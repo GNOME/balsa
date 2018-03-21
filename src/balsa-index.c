@@ -1409,7 +1409,7 @@ bndx_mailbox_changed_idle(BalsaIndex * bindex)
 static void
 bndx_mailbox_changed_cb(LibBalsaMailbox * mailbox, BalsaIndex * bindex)
 {
-    if (!gtk_widget_get_has_surface(GTK_WIDGET(bindex)))
+    if (!gtk_widget_get_realized(GTK_WIDGET(bindex)))
         return;
 
     /* Find the next message to be shown now, not later in the idle
@@ -2107,7 +2107,7 @@ bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path)
     GtkTreePath *tmp;
     gint i, j;
 
-    if (!gtk_widget_get_has_surface(GTK_WIDGET(index)))
+    if (!gtk_widget_get_realized(GTK_WIDGET(index)))
         return;
 
     tmp = gtk_tree_path_copy(path);
@@ -2660,7 +2660,7 @@ balsa_index_ensure_visible(BalsaIndex * index)
     GdkRectangle rect;
     GtkTreePath *path = NULL;
 
-    if (!gtk_widget_get_has_surface(GTK_WIDGET(tree_view)))
+    if (!gtk_widget_get_realized(GTK_WIDGET(tree_view)))
         return;
 
     if (!bndx_find_current_msgno(index, &path, NULL)) {

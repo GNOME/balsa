@@ -6155,7 +6155,7 @@ sw_spell_check_activated(GSimpleAction * action,
     BalsaSpellCheck *sc;
 
     if (bsmsg->spell_checker) {
-        if (gtk_widget_get_has_surface(bsmsg->spell_checker)) {
+        if (gtk_widget_get_realized(bsmsg->spell_checker)) {
             gtk_window_present(GTK_WINDOW(bsmsg->spell_checker));
             return;
         } else

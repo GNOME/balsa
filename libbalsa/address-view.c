@@ -719,7 +719,7 @@ static void
 lbav_add_from_list(LibBalsaAddressView * address_view,
                    gint row, InternetAddressList * list)
 {
-    gint type;
+    gint type = 0;
     int i;
 
     for (i = 0; i < internet_address_list_length(list); i++) {
@@ -732,7 +732,8 @@ lbav_add_from_list(LibBalsaAddressView * address_view,
 
         if (i == 0) {
             child = lbav_get_combo(address_view, row);
-            type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
+            if (child != NULL)
+                type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
 
             child = lbav_get_button(address_view, row);
             gtk_widget_destroy(child);

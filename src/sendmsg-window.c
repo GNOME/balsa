@@ -3981,22 +3981,8 @@ guess_identity(BalsaSendmsg* bsmsg, LibBalsaMessage * message)
 static void
 setup_headers_from_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity *ident)
 {
-    const gchar *addr;
-
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from[1]),
                              g_list_index(balsa_app.identities, ident));
-
-    addr = libbalsa_identity_get_replyto(ident);
-    if (addr != NULL)
-        libbalsa_address_view_set_from_string(bsmsg->replyto_view,
-                                              "Reply To:",
-                                              addr);
-
-    addr = libbalsa_identity_get_bcc(ident);
-    if (addr != NULL)
-        libbalsa_address_view_set_from_string(bsmsg->recipient_view,
-                                              "BCC:",
-                                              addr);
 
     /* Make sure the blank line is "To:" */
     libbalsa_address_view_add_from_string(bsmsg->recipient_view,

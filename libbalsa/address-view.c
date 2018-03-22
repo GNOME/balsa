@@ -410,7 +410,7 @@ lbav_close_button_clicked(GtkWidget           * button,
 {
     gint row;
     GtkWidget *child;
-    gint type;
+    gint type = 0;
 
     for (row = 0; (child = lbav_get_button(address_view, row)) != NULL; row++) {
         if (child == button) {
@@ -419,7 +419,8 @@ lbav_close_button_clicked(GtkWidget           * button,
     }
 
     child = lbav_get_combo(address_view, row);
-    type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
+    if (child != NULL)
+        type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
 
     lbav_remove_row(address_view, row);
 
@@ -542,7 +543,7 @@ lbav_entry_activated(GtkEntry            * entry,
 {
     gint row;
     GtkWidget *child;
-    gint type;
+    gint type = 0;
 
     for (row = 0; (child = lbav_get_entry(address_view, row)) != NULL; row++) {
         if (child == (GtkWidget *) entry) {
@@ -555,7 +556,8 @@ lbav_entry_activated(GtkEntry            * entry,
     lbav_set_button(address_view, row, WITH_CLOSE_ICON);
 
     child = lbav_get_combo(address_view, row);
-    type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
+    if (child != NULL)
+        type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
     lbav_ensure_blank_row(address_view, type);
 
     g_signal_emit(address_view, address_view_signals[VIEW_CHANGED], 0);
@@ -781,7 +783,7 @@ lbav_remove_type(LibBalsaAddressView * address_view, gint type)
     GtkWidget *child;
 
     for (row = 0; (child = lbav_get_combo(address_view, row)) != NULL; /* nothing */) {
-        gint this_type;
+        gint this_type = 0;
 
         this_type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
 
@@ -1103,7 +1105,7 @@ libbalsa_address_view_add_to_row(LibBalsaAddressView * address_view,
 {
     gint row;
     GtkWidget *child;
-    gint type;
+    gint type = 0;
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view));
 
@@ -1116,7 +1118,8 @@ libbalsa_address_view_add_to_row(LibBalsaAddressView * address_view,
     lbav_add_from_string(address_view, row, addresses);
 
     child = lbav_get_combo(address_view, row);
-    type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
+    if (child != NULL)
+        type = gtk_combo_box_get_active(GTK_COMBO_BOX(child));
     lbav_ensure_blank_row(address_view, type);
 }
 

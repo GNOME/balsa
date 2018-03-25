@@ -782,9 +782,8 @@ check_call_url(GtkGestureMultiPress *multi_press,
 
     gesture = GTK_GESTURE(multi_press);
     event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
-    g_return_if_fail(event != NULL);
 
-    if (!gdk_event_get_state(event, &state)) {
+    if (event == NULL || !gdk_event_get_state(event, &state)) {
         return;
     }
 

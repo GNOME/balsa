@@ -146,8 +146,9 @@ static
 void save_filters(BalsaFilterRunDialog * p)
 {
     if (p->filters_modified) {
-	g_slist_free_full(p->mbox->filters, g_free);
-	p->mbox->filters = build_selected_filters_list(p->selected_filters,FALSE);
+	libbalsa_mailbox_set_filters(p->mbox,
+                                     build_selected_filters_list(p->selected_filters,
+                                                                 FALSE));
 	config_mailbox_filters_save(p->mbox);
 	p->filters_modified=FALSE;
     }
@@ -209,7 +210,7 @@ fr_apply_selected_pressed_func(GtkTreeModel * model, GtkTreePath * path,
     if (fil->action == FILTER_RUN
         || fil->action == FILTER_TRASH
         || (fil->action == FILTER_COLOR && fil->action_string[0])
-        || strcmp(fil->action_string, p->mbox->url) != 0)
+        || strcmp(fil->action_string, libbalsa_mailbox_get_url(p->mbox)) != 0)
         p->filters = g_slist_append(p->filters, fil);
 }
 
@@ -233,7 +234,7 @@ fr_apply_selected_pressed(BalsaFilterRunDialog * p)
     else
         balsa_information(LIBBALSA_INFORMATION_MESSAGE,
                           _("Filter applied to “%s”."),
-                          p->mbox->name);
+                          libbalsa_mailbox_get_name(p->mbox));
 
     g_slist_free(p->filters);
 }
@@ -255,7 +256,7 @@ fr_apply_now_pressed(BalsaFilterRunDialog* p)
     else
         balsa_information(LIBBALSA_INFORMATION_MESSAGE,
                           _("Filter applied to “%s”."),
-                          p->mbox->name);
+                          libbalsa_mailbox_get_name(p->mbox));
 }
 
 static void
@@ -269,7 +270,7 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
     if (fil->action == FILTER_RUN
         || fil->action == FILTER_TRASH
         || (fil->action == FILTER_COLOR && fil->action_string[0])
-        || strcmp(fil->action_string, p->mbox->url) != 0) {
+        || strcmp(fil->action_string, libbalsa_mailbox_get_url(p->mbox)) != 0) {
         /* Ok we can add the filter to this mailbox, there is no recursion problem */
         LibBalsaMailboxFilter *mf = g_new(LibBalsaMailboxFilter, 1);
         GtkTreeModel *sel_model =
@@ -297,7 +298,7 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
                             "the filter “%s” is “%s”.\n"
                             "You can’t associate it with the same "
                             "mailbox (that causes recursion)."),
-                          fil->name, p->mbox->name);
+                          fil->name, libbalsa_mailbox_get_name(p->mbox));
 
     if (!libbalsa_mailbox_can_match(p->mbox, fil->condition))
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -307,7 +308,7 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
 			    " regular expressions match with IMAP mailboxes,"
 			    " it is done by a very slow method; if possible, use substring match"
 			    " instead."),
-			  fil->name, p->mbox->name);
+			  fil->name, libbalsa_mailbox_get_name(p->mbox));
 }
 
 void

@@ -69,7 +69,7 @@ struct _SubfolderDialogData {
     FOLDER_CONF_COMMON;
     BalsaMailboxConfView *mcv;
     GtkWidget *parent_folder, *folder_name, *host_label;
-    gchar *old_folder, *old_parent;
+    const gchar *old_folder, *old_parent;
     BalsaMailboxNode *parent;   /* (new) parent of the mbnode.  */
     /* Used for renaming and creation */
 };
@@ -774,7 +774,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 	    return;
 	}
 	sdd->parent = mn->parent;
-	sdd->old_folder = mn->mailbox->name;
+	sdd->old_folder = libbalsa_mailbox_get_name(mn->mailbox);
     } else {
 	/* create */
         sdd->old_folder = NULL;
@@ -871,20 +871,22 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         GString *rights_str;
         gchar * rights;
         gchar * quotas;
+        gboolean readonly;
 
         ++row;
         (void) libbalsa_create_grid_label(_("Permissions:"), grid, row);
 
         /* mailbox closed: no detailed permissions available */
+        readonly = libbalsa_mailbox_get_readonly(mn->mailbox);
         if (!libbalsa_mailbox_imap_is_connected(LIBBALSA_MAILBOX_IMAP(mn->mailbox))) {
-            rights_str = g_string_new(std_acls[mn->mailbox->readonly ? 1 : 3]);
+            rights_str = g_string_new(std_acls[readonly ? 1 : 3]);
             rights_str =
                 g_string_append(rights_str,
                                 _("\ndetailed permissions are available only for open folders"));
         } else {
             rights = libbalsa_imap_get_rights(LIBBALSA_MAILBOX_IMAP(mn->mailbox));
             if (!rights) {
-                rights_str = g_string_new(std_acls[mn->mailbox->readonly ? 1 : 3]);
+                rights_str = g_string_new(std_acls[readonly ? 1 : 3]);
                 rights_str =
                     g_string_append(rights_str,
                                     _("\nthe server does not support ACLs"));

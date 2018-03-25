@@ -1094,7 +1094,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not access message %u "
                             "in mailbox “%s”."),
-			  msgno, mailbox->name);
+			  msgno, libbalsa_mailbox_get_name(mailbox));
         return FALSE;
     }
 
@@ -1106,7 +1106,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not access message %u "
                             "in mailbox “%s”."),
-			  (unsigned int) message->msgno, mailbox->name);
+			  (unsigned int) message->msgno, libbalsa_mailbox_get_name(mailbox));
         return FALSE;
     }
 
@@ -1160,7 +1160,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
     /*
      * emit read message
      */
-    if (is_new && !mailbox->readonly)
+    if (is_new && !libbalsa_mailbox_get_readonly(mailbox))
         libbalsa_mailbox_msgno_change_flags(mailbox, message->msgno, 0,
                                             LIBBALSA_MESSAGE_FLAG_NEW);
 
@@ -1571,7 +1571,7 @@ balsa_message_copy_part(const gchar *url, LibBalsaMessageBody *part)
     if (!libbalsa_mailbox_add_message(mailbox, stream, 0, &err)) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("Appending message to %s failed: %s"),
-			     mailbox->name,
+			     libbalsa_mailbox_get_name(mailbox),
 			     err ? err->message : "?");
 	g_clear_error(&err);
     }

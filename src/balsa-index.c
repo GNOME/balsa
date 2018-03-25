@@ -823,6 +823,7 @@ static gboolean
 bndx_scroll_on_open_idle(BalsaIndex *index)
 {
     LibBalsaMailbox *mailbox;
+    guint msgno;
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreePath *path;
     gpointer view_on_open;
@@ -832,9 +833,8 @@ bndx_scroll_on_open_idle(BalsaIndex *index)
 
     balsa_index_update_tree(index, balsa_app.expand_tree);
     mailbox = index->mailbox_node->mailbox;
-    if (mailbox->first_unread) {
-	unsigned msgno = mailbox->first_unread;
-	mailbox->first_unread = 0;
+    if ((msgno = libbalsa_mailbox_get_first_unread(mailbox))) {
+	libbalsa_mailbox_set_first_unread(mailbox, 0);
         if(!libbalsa_mailbox_msgno_find(mailbox, msgno, &path, NULL))
             return FALSE; /* Oops! */
     } else {
@@ -916,7 +916,7 @@ bndx_mailbox_row_inserted_cb(LibBalsaMailbox * mailbox, GtkTreePath * path,
 {
     guint msgno;
 
-    if (mailbox->state != LB_MAILBOX_STATE_OPEN)
+    if (libbalsa_mailbox_get_state(mailbox) != LB_MAILBOX_STATE_OPEN)
         return;
 
     gtk_tree_model_get(GTK_TREE_MODEL(mailbox), iter,
@@ -1375,6 +1375,7 @@ static gboolean
 bndx_mailbox_changed_idle(BalsaIndex * bindex)
 {
     LibBalsaMailbox *mailbox;
+    guint msgno;
     GtkTreePath *path;
 
     if (bndx_clear_if_last_ref(&bindex))
@@ -1383,12 +1384,11 @@ bndx_mailbox_changed_idle(BalsaIndex * bindex)
     bindex->has_mailbox_changed_idle = FALSE;
 
     mailbox = bindex->mailbox_node->mailbox;
-    if (mailbox->first_unread
-        && libbalsa_mailbox_msgno_find(mailbox, mailbox->first_unread,
-                                       &path, NULL)) {
+    if ((msgno = libbalsa_mailbox_get_first_unread(mailbox)) > 0
+        && libbalsa_mailbox_msgno_find(mailbox, msgno, &path, NULL)) {
         bndx_expand_to_row(bindex, path);
         gtk_tree_path_free(path);
-        mailbox->first_unread = 0;
+        libbalsa_mailbox_set_first_unread(mailbox, 0);
     }
 
     if (bndx_find_current_msgno(bindex, &path, NULL)) {
@@ -1905,6 +1905,7 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent * event)
     GtkWidget *submenu;
     LibBalsaMailbox* mailbox;
     gboolean any;
+    gboolean readonly;
     gboolean any_deleted = FALSE;
     gboolean any_not_deleted = FALSE;
     GArray *selected = balsa_index_selected_msgnos_new(index);
@@ -1929,17 +1930,18 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent * event)
                           GINT_TO_POINTER(any));
 
     mailbox = index->mailbox_node->mailbox;
+    readonly = libbalsa_mailbox_get_readonly(mailbox);
     gtk_widget_set_sensitive(index->delete_item,
-                             any_not_deleted && !mailbox->readonly);
+                             any_not_deleted && !readonly);
     gtk_widget_set_sensitive(index->undelete_item,
-                             any_deleted && !mailbox->readonly);
+                             any_deleted && !readonly);
     gtk_widget_set_sensitive(index->move_to_trash_item,
                              any && mailbox != balsa_app.trash
-                             && !mailbox->readonly);
+                             && !readonly);
     gtk_widget_set_sensitive(index->toggle_item,
-                             any && !mailbox->readonly);
+                             any && !readonly);
     gtk_widget_set_sensitive(index->move_to_item,
-                             any && !mailbox->readonly);
+                             any && !readonly);
 
     submenu =
         balsa_mblist_mru_menu(GTK_WINDOW
@@ -2068,6 +2070,7 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
     gboolean success;
     LibBalsaMailbox *from_mailbox;
     GError *e = NULL;
+    const gchar *to_mailbox_name;
 
     if (msgnos->len == 0)
         return;
@@ -2077,13 +2080,14 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
         libbalsa_mailbox_messages_copy(from_mailbox, msgnos, to_mailbox, &e) :
         libbalsa_mailbox_messages_move(from_mailbox, msgnos, to_mailbox, &e);
 
+    to_mailbox_name = libbalsa_mailbox_get_name(to_mailbox);
     if (!success) {
 	balsa_information
             (LIBBALSA_INFORMATION_WARNING,
              ngettext("Failed to copy %d message to mailbox “%s”: %s",
                       "Failed to copy %d messages to mailbox “%s”: %s",
                       msgnos->len),
-             msgnos->len, to_mailbox->name, e ? e->message : "?");
+             msgnos->len, to_mailbox_name, e ? e->message : "?");
 	return;
     }
 
@@ -2093,7 +2097,7 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
         enable_empty_trash(balsa_app.main_window, TRASH_FULL);
     balsa_information(LIBBALSA_INFORMATION_MESSAGE,
                       copy ? _("Copied to “%s”.")
-                      : _("Moved to “%s”."), to_mailbox->name);
+                      : _("Moved to “%s”."), to_mailbox_name);
     if (!copy)
 	/* Note when message was flagged as deleted, for use in
 	 * auto-expunge. */
@@ -2189,14 +2193,14 @@ balsa_index_expunge(BalsaIndex * index)
     g_return_if_fail(index != NULL);
 
     mailbox = index->mailbox_node->mailbox;
-    if (mailbox->readonly)
+    if (libbalsa_mailbox_get_readonly(mailbox))
 	return;
 
     rc = libbalsa_mailbox_sync_storage(mailbox, TRUE);
     if (!rc)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Committing mailbox %s failed."),
-			  mailbox->name);
+			  libbalsa_mailbox_get_name(mailbox));
 }
 
 /* Message window */

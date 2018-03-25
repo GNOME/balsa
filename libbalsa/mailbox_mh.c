@@ -221,7 +221,7 @@ libbalsa_mailbox_mh_new(const gchar * path, gboolean create)
 
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_MH, NULL);
 
-    mailbox->is_directory = TRUE;
+    libbalsa_mailbox_set_is_directory(mailbox, TRUE);
 
     if (libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mailbox),
                                         path, create) != 0) {
@@ -340,7 +340,7 @@ lbm_mh_parse_mailbox(LibBalsaMailboxMh * mh, gboolean add_msg_info)
     GDir *dir;
     const gchar *filename;
 
-    path = libbalsa_mailbox_local_get_path(mh);
+    path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mh);
 
     if ((dir = g_dir_open(path, 0, NULL)) == NULL)
 	return;
@@ -515,7 +515,7 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox, GError **err)
     struct stat st;
     const gchar* path;
    
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
 
     if (stat(path, &st) == -1) {
 	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
@@ -531,8 +531,8 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox, GError **err)
     mh->msgno_2_msg_info = g_ptr_array_new();
     mh->last_fileno = 0;
     
-    mailbox->readonly = access (path, W_OK);
-    mailbox->unread_messages = 0;
+    libbalsa_mailbox_set_readonly(mailbox, access(path, W_OK));
+    libbalsa_mailbox_clear_unread_messages(mailbox);
     lbm_mh_parse_both(mh);
 
 #ifdef DEBUG
@@ -613,7 +613,8 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
 {
     struct stat st, st_sequences;
     LibBalsaMailboxMh *mh = LIBBALSA_MAILBOX_MH(mailbox);
-    const gchar *path = libbalsa_mailbox_local_get_path(mailbox);
+    const gchar *path =
+        libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
     int modified = 0;
     guint renumber, msgno;
     struct message_info *msg_info;
@@ -819,14 +820,14 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     recent.first  = recent.last = -1;
     recent.line   = g_mime_stream_mem_new();
 
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
 
     msgno = 1;
     while (msgno <= mh->msgno_2_msg_info->len) {
 	msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
 	if (msg_info->local_info.flags == LIBBALSA_MESSAGE_FLAG_INVALID)
 	    msg_info->local_info.flags = msg_info->orig_flags;
-	if (mailbox->state == LB_MAILBOX_STATE_CLOSING)
+	if (libbalsa_mailbox_get_state(mailbox) == LB_MAILBOX_STATE_CLOSING)
 	    msg_info->local_info.flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
 
 	if (expunge && (msg_info->local_info.flags
@@ -891,7 +892,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     }
 
     /* open tempfile */
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
     fd = libbalsa_mailbox_mh_open_temp(path, &name_used);
     if (fd == -1)
     {

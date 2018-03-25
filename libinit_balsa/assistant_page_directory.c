@@ -139,14 +139,18 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
     if (*box == NULL) {
         if (strcmp("/var/spool/mail/", path)) {
             char tmp[32] = "/tmp/balsa.XXXXXX";
+
 	    /* Don't fail if you can't create the spool mailbox. */
 	    close(mkstemp(tmp));
-		*box = libbalsa_mailbox_local_new(tmp, FALSE);
-		if (*box) {
-			free((*box)->url);
-			(*box)->url = g_strdup_printf("file://%s",path);
-		}
-		unlink(tmp);
+            *box = libbalsa_mailbox_local_new(tmp, FALSE);
+            if (*box != NULL) {
+                gchar *url;
+
+                url = g_strdup_printf("file://%s", path);
+                libbalsa_mailbox_set_url(*box, url);
+                g_free(url);
+            }
+            unlink(tmp);
 	}
     }
     if ( *box == NULL) {
@@ -157,11 +161,11 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
         return;
     }
 
-    (*box)->name = g_strdup(gettext(prettyname));
+    libbalsa_mailbox_set_name(*box, gettext(prettyname));
 
     config_mailbox_add(*box, (char *) prettyname);
     if (box == &balsa_app.outbox)
-        (*box)->no_reassemble = TRUE;
+        libbalsa_mailbox_set_no_reassemble(*box, TRUE);
 }
 
 static void

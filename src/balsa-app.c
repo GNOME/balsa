@@ -72,7 +72,7 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 	prompt =
 	    g_strdup_printf(_("Opening remote mailbox %s.\n"
                               "The _password for %s@%s:"),
-			    mbox->name, libbalsa_server_get_username(server), libbalsa_server_get_host(server));
+			    libbalsa_mailbox_get_name(mbox), libbalsa_server_get_username(server), libbalsa_server_get_host(server));
     else
 	prompt =
 	    g_strdup_printf(_("_Password for %s@%s (%s):"), libbalsa_server_get_username(server),
@@ -627,7 +627,8 @@ find_url(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
     LibBalsaMailbox *mailbox;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
-    if ((mailbox = mbnode->mailbox) && !strcmp(mailbox->url, bf->data)) {
+    if ((mailbox = mbnode->mailbox) != NULL &&
+        strcmp(libbalsa_mailbox_get_url(mailbox), bf->data) == 0) {
         bf->mbnode = mbnode;
         return TRUE;
     }
@@ -697,9 +698,9 @@ balsa_get_short_mailbox_name(const gchar *url)
     if ((mbnode = balsa_find_url(url)) && mbnode->mailbox) {
         if (mbnode->server) {
             return g_strconcat(libbalsa_server_get_host(mbnode->server), ":",
-                               mbnode->mailbox->name, NULL);
+                               libbalsa_mailbox_get_name(mbnode->mailbox), NULL);
         } else {
-            return g_strdup(mbnode->mailbox->name);
+            return g_strdup(libbalsa_mailbox_get_name(mbnode->mailbox));
         }
     }
     return g_strdup(url);
@@ -785,7 +786,7 @@ ba_remove_children_mailbox_nodes(GtkTreeModel * model, GtkTreeIter * parent,
 	} else {
 	    printf("sparing %s %s\n",
 		   mbnode->mailbox ? "mailbox" : "folder ",
-		   mbnode->mailbox ? mbnode->mailbox->name : mbnode->name);
+		   mbnode->mailbox ? libbalsa_mailbox_get_name(mbnode->mailbox) : mbnode->name);
 	    valid = gtk_tree_model_iter_next(model, &iter);
 	}
 	g_object_unref(mbnode); 

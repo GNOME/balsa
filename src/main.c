@@ -173,7 +173,7 @@ initial_open_unread_mailboxes()
         for (l = gl; l; l = l->next) {
             LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(l->data);
 
-            printf("opening %s..\n", mailbox->name);
+            printf("opening %s..\n", libbalsa_mailbox_get_name(mailbox));
             balsa_mblist_open_mailbox(mailbox);
         }
         g_list_free(gl);
@@ -188,7 +188,7 @@ initial_open_inbox()
     if (!balsa_app.inbox)
 	return FALSE;
 
-    printf("opening %s..\n", balsa_app.inbox->name);
+    printf("opening %s..\n", libbalsa_mailbox_get_name(balsa_app.inbox));
     balsa_mblist_open_mailbox_hidden(balsa_app.inbox);
 
     return FALSE;
@@ -200,9 +200,12 @@ balsa_get_stats(long *unread, long *unsent)
 
     if(balsa_app.inbox && libbalsa_mailbox_open(balsa_app.inbox, NULL) ) {
         /* set threading type to load messages */
+        LibBalsaMailboxView *view;
+
+        view = libbalsa_mailbox_get_view(balsa_app.inbox);
         libbalsa_mailbox_set_threading(balsa_app.inbox,
-                                       balsa_app.inbox->view->threading_type);
-        *unread = balsa_app.inbox->unread_messages;
+                                       view->threading_type);
+        *unread = libbalsa_mailbox_get_unread_messages(balsa_app.inbox);
         libbalsa_mailbox_close(balsa_app.inbox, FALSE);
     } else *unread = -1;
     if(balsa_app.draftbox && libbalsa_mailbox_open(balsa_app.outbox, NULL)){
@@ -265,7 +268,7 @@ scan_mailboxes_idle_cb()
         gl = balsa_mblist_find_all_unread_mboxes(NULL);
         for (l = gl; l; l = l->next) {
             LibBalsaMailbox *mailbox = l->data;
-            g_ptr_array_add(url_array, g_strdup(mailbox->url));
+            g_ptr_array_add(url_array, g_strdup(libbalsa_mailbox_get_url(mailbox)));
         }
         g_list_free(gl);
     }
@@ -295,7 +298,7 @@ scan_mailboxes_idle_cb()
     }
 
     if (cmd_open_inbox || balsa_app.open_inbox_upon_startup) {
-        g_ptr_array_add(url_array, g_strdup(balsa_app.inbox->url));
+        g_ptr_array_add(url_array, g_strdup(libbalsa_mailbox_get_url(balsa_app.inbox)));
     }
 
     if (url_array->len) {
@@ -348,7 +351,7 @@ periodic_expunge_cb(void)
     for (l = list; l; l = l->next) {
         BalsaMailboxNode *mbnode = l->data;
         if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox)
-            && !mbnode->mailbox->readonly) {
+            && !libbalsa_mailbox_get_readonly(mbnode->mailbox)) {
             time_t tm = time(NULL);
             if (tm-mbnode->last_use > balsa_app.expunge_timeout)
                 libbalsa_mailbox_sync_storage(mbnode->mailbox, TRUE);

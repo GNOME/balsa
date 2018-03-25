@@ -115,6 +115,9 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
     LibBalsaFilter* fil;
     gboolean def;
     GSList * lst;
+    GSList * filters;
+
+    filters = libbalsa_mailbox_get_filters(mbox);
 
     /* We load the associated filters */
     libbalsa_conf_get_vector_with_default(MAILBOX_FILTERS_KEY,&nb_filters,
@@ -126,25 +129,26 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 		LibBalsaMailboxFilter* mf = g_new(LibBalsaMailboxFilter,1);
 
 		mf->actual_filter = fil;
-		mbox->filters=g_slist_prepend(mbox->filters, mf);
+		filters = g_slist_prepend(filters, mf);
 	    }
 	    else
 		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 				     _("Invalid filters %s for mailbox %s"),
-                                     filters_names[i], mbox->name);
+                                     filters_names[i],
+                                     libbalsa_mailbox_get_name(mbox));
 	}
-	mbox->filters=g_slist_reverse(mbox->filters);
+	libbalsa_mailbox_set_filters(mbox, g_slist_reverse(filters));
     }
     g_strfreev(filters_names);
     if (!def) {
 	libbalsa_conf_get_vector_with_default(MAILBOX_FILTERS_WHEN_KEY,
                                              &nb_filters,&filters_names,&def);
-	if (def)
-	    for(lst = mbox->filters; lst != NULL; lst = lst->next)
+	if (def) {
+	    for(lst = filters; lst != NULL; lst = lst->next)
 		FILTER_WHEN_SETFLAG((LibBalsaMailboxFilter*)lst->data,
 				    FILTER_WHEN_NEVER);
-	else {
-	    lst=mbox->filters;
+        } else {
+	    lst = filters;
 	    for (i=0;i<nb_filters && lst != NULL;i++) {
 		((LibBalsaMailboxFilter*)lst->data)->when =
                     atoi(filters_names[i]);
@@ -170,7 +174,7 @@ libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
      * Note : in all the following we never copy the filters name, so we don't have to (and me must not!) free any gchar *
      * That's why we only free g_slist and gchar **
      */
-    for (fil = mbox->filters; fil != NULL; fil = fil->next) {
+    for (fil = libbalsa_mailbox_get_filters(mbox); fil != NULL; fil = fil->next) {
 	names=g_slist_prepend(names,
                               ((LibBalsaMailboxFilter*)fil->data)->actual_filter->name);
 	nb_filters++;
@@ -187,7 +191,7 @@ libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
     libbalsa_conf_set_vector(MAILBOX_FILTERS_KEY,nb_filters,
                             (const gchar**)filters_names);
 
-    fil=mbox->filters;
+    fil=libbalsa_mailbox_get_filters(mbox);
     for (i=0;i<nb_filters;i++) {
 	filters_names[i]=
             g_strdup_printf("%d",

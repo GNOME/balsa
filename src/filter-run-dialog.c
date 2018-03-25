@@ -180,6 +180,7 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox, GtkWindow * parent)
     BalsaFilterRunDialog *p;
     gchar * dialog_title;
     gboolean use_headerbar = TRUE;
+    GSList *filters;
 
     g_return_val_if_fail(mbox, NULL);
 
@@ -194,18 +195,19 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox, GtkWindow * parent)
     p->mbox=mbox;
     libbalsa_mailbox_open(p->mbox, NULL); 
     dialog_title=g_strconcat(_("Filters of Mailbox: "),
-                             p->mbox->name,NULL);
+                             libbalsa_mailbox_get_name(p->mbox),NULL);
     gtk_window_set_title(GTK_WINDOW(p),dialog_title);
     gtk_window_set_role(GTK_WINDOW(p), "filter-run");
     g_free(dialog_title);
 
     /* Load associated filters if needed */
-    if (!p->mbox->filters)
+    if (libbalsa_mailbox_get_filters(p->mbox) == NULL)
 	config_mailbox_filters_load(p->mbox);
 
     /* Populate the lists */
-    populate_available_filters_list(p->available_filters,mbox->filters);
-    populate_selected_filters_list(p->selected_filters,mbox->filters);
+    filters = libbalsa_mailbox_get_filters(mbox);
+    populate_available_filters_list(p->available_filters, filters);
+    populate_selected_filters_list(p->selected_filters, filters);
 
     return GTK_WIDGET(p);
 }
@@ -495,7 +497,8 @@ filters_run_dialog(LibBalsaMailbox * mbox,
     /* We look for an existing dialog box for this mailbox */
     for (lst = fr_dialogs_opened; lst != NULL; lst = lst->next) {
         BalsaFilterRunDialog *dialog = lst->data;
-        if (strcmp(dialog->mbox->url, mbox->url) == 0)
+        if (strcmp(libbalsa_mailbox_get_url(dialog->mbox),
+                   libbalsa_mailbox_get_url(mbox)) == 0)
             break;
     }
     if (lst) {

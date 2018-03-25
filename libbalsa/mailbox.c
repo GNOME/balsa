@@ -104,58 +104,77 @@ static void  mbox_drag_source_init(GtkTreeDragSourceIface *iface);
 /* GtkTreeSortable function prototypes */
 static void  mbox_sortable_init(GtkTreeSortableIface *iface);
 
-GType
-libbalsa_mailbox_get_type(void)
-{
-    static GType mailbox_type = 0;
-
-    if (!mailbox_type) {
-        static const GTypeInfo mailbox_info = {
-            sizeof(LibBalsaMailboxClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-            (GClassInitFunc) libbalsa_mailbox_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-            sizeof(LibBalsaMailbox),
-            0,                  /* n_preallocs */
-            (GInstanceInitFunc) libbalsa_mailbox_init
-        };
-
-        static const GInterfaceInfo mbox_model_info = {
-            (GInterfaceInitFunc) mbox_model_init,
-            NULL,
-            NULL
-        };
+typedef struct _LibBalsaMailboxPrivate LibBalsaMailboxPrivate;
+struct _LibBalsaMailboxPrivate {
+    gint stamp; /* used to determine iterators' validity. Increased on each
+                 * modification of mailbox. */
     
-        static const GInterfaceInfo mbox_drag_source_info = {
-            (GInterfaceInitFunc) mbox_drag_source_init,
-            NULL,
-            NULL
-        };
-
-        static const GInterfaceInfo mbox_sortable_info = {
-            (GInterfaceInitFunc) mbox_sortable_init,
-            NULL,
-            NULL
-        };
+    gchar *config_prefix;       /* unique string identifying mailbox */
+                                /* in the config file                */
+    gchar *name;                /* displayed name for a special mailbox; */
+                                /* Isn't it a GUI thing?                 */
+    gchar *url; /* Unique resource locator, file://, imap:// etc */
+    guint open_ref;
     
-        mailbox_type =
-            g_type_register_static(G_TYPE_OBJECT, "LibBalsaMailbox",
-                                   &mailbox_info, 0);
-        g_type_add_interface_static(mailbox_type,
-                                    GTK_TYPE_TREE_MODEL,
-                                    &mbox_model_info);
-        g_type_add_interface_static(mailbox_type,
-                                    GTK_TYPE_TREE_DRAG_SOURCE,
-                                    &mbox_drag_source_info);
-        g_type_add_interface_static(mailbox_type,
-                                    GTK_TYPE_TREE_SORTABLE,
-                                    &mbox_sortable_info);
-    }
+    GRecMutex rec_mutex;
 
-    return mailbox_type;
-}
+    gboolean is_directory;
+    gboolean readonly;
+
+    GPtrArray *mindex;  /* the basic message index used for index
+                         * displaying/columns of GtkTreeModel interface
+                         * and NOTHING else. */
+    GNode *msg_tree; /* the possibly filtered tree of messages */
+    LibBalsaCondition *view_filter; /* to choose a subset of messages
+                                     * to be displayed, e.g., only
+                                     * undeleted. */
+    LibBalsaCondition *persistent_view_filter; /* the part of the view 
+                                                * filter that will persist 
+                                                * to the next time the
+                                                * mailbox is opened */
+    gboolean view_filter_pending;  /* a view filter has been set
+                                    * but the view has not been updated */
+
+    /* info fields */
+    gboolean has_unread_messages;
+    glong unread_messages; /* number of unread messages in the mailbox */
+    unsigned first_unread; /* set to 0 if there is no unread present.
+                            * used for automatical scrolling down on opening.
+                            */
+    /* Associated filters (struct mailbox_filter) */
+    GSList * filters;
+    gboolean filters_loaded;
+
+    LibBalsaMailboxView *view;
+    LibBalsaMailboxState state;
+
+    /* Whether to reassemble a message from its parts. */
+    gboolean no_reassemble;
+
+    /* Whether the tree has been changed since some event. */
+    gboolean msg_tree_changed;
+
+    /* Array of msgnos that need to be displayed. */
+    GArray *msgnos_pending;
+    /* Array of msgnos that have been changed. */
+    GArray *msgnos_changed;
+
+    guint changed_idle_id;
+    guint queue_check_idle_id;
+    guint need_threading_idle_id;
+};
+
+G_DEFINE_TYPE_WITH_CODE(LibBalsaMailbox,
+                        libbalsa_mailbox,
+                        G_TYPE_OBJECT,
+                        G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_MODEL,
+                                              mbox_model_init)
+                        G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_DRAG_SOURCE,
+                                              mbox_drag_source_init)
+                        G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_SORTABLE,
+                                              mbox_sortable_init)
+                        G_ADD_PRIVATE(LibBalsaMailbox)
+                       )
 
 static void
 libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
@@ -236,28 +255,29 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
 static void
 libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
 {
-    mailbox->lock = FALSE;
-    mailbox->is_directory = FALSE;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 
-    mailbox->config_prefix = NULL;
-    mailbox->name = NULL;
-    mailbox->url = NULL;
+    g_rec_mutex_init(&priv->rec_mutex);
+    priv->is_directory = FALSE;
 
-    mailbox->open_ref = 0;
-    mailbox->has_unread_messages = FALSE;
-    mailbox->unread_messages = 0;
+    priv->config_prefix = NULL;
+    priv->name = NULL;
+    priv->url = NULL;
 
-    mailbox->readonly = FALSE;
-    mailbox->disconnected = FALSE;
+    priv->open_ref = 0;
+    priv->has_unread_messages = FALSE;
+    priv->unread_messages = 0;
 
-    mailbox->filters=NULL;
-    mailbox->filters_loaded = FALSE;
-    mailbox->view=NULL;
-    /* mailbox->stamp is incremented before we use it, so it won't be
+    priv->readonly = FALSE;
+
+    priv->filters=NULL;
+    priv->filters_loaded = FALSE;
+    priv->view=NULL;
+    /* priv->stamp is incremented before we use it, so it won't be
      * zero for a long, long time... */
-    mailbox->stamp = g_random_int() / 2;
+    priv->stamp = g_random_int() / 2;
 
-    mailbox->no_reassemble = FALSE;
+    priv->no_reassemble = FALSE;
 }
 
 /*
@@ -274,29 +294,32 @@ static void
 libbalsa_mailbox_dispose(GObject * object)
 {
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(object);
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 
-    while (mailbox->open_ref > 0)
+    g_rec_mutex_clear(&priv->rec_mutex);
+
+    while (priv->open_ref > 0)
         libbalsa_mailbox_close(mailbox, FALSE);
 
-    if (mailbox->msgnos_pending != NULL) {
+    if (priv->msgnos_pending != NULL) {
         g_signal_handlers_disconnect_by_func(mailbox,
                                              lbm_get_index_entry_expunged_cb,
-                                             mailbox->msgnos_pending);
-        g_array_free(mailbox->msgnos_pending, TRUE);
-        mailbox->msgnos_pending = NULL;
+                                             priv->msgnos_pending);
+        g_array_free(priv->msgnos_pending, TRUE);
+        priv->msgnos_pending = NULL;
     }
 
-    if (mailbox->msgnos_changed != NULL) {
+    if (priv->msgnos_changed != NULL) {
         g_signal_handlers_disconnect_by_func(mailbox,
                                              lbm_msgno_changed_expunged_cb,
-                                             mailbox->msgnos_changed);
-        g_array_free(mailbox->msgnos_changed, TRUE);
-        mailbox->msgnos_changed = NULL;
+                                             priv->msgnos_changed);
+        g_array_free(priv->msgnos_changed, TRUE);
+        priv->msgnos_changed = NULL;
     }
 
-    libbalsa_clear_source_id(&mailbox->changed_idle_id);
-    libbalsa_clear_source_id(&mailbox->queue_check_idle_id);
-    libbalsa_clear_source_id(&mailbox->need_threading_idle_id);
+    libbalsa_clear_source_id(&priv->changed_idle_id);
+    libbalsa_clear_source_id(&priv->queue_check_idle_id);
+    libbalsa_clear_source_id(&priv->need_threading_idle_id);
 
     G_OBJECT_CLASS(parent_class)->dispose(object);
 }
@@ -305,6 +328,8 @@ libbalsa_mailbox_dispose(GObject * object)
 static gchar*
 get_from_field(LibBalsaMessage *message)
 {
+    LibBalsaMailbox *mailbox = message->mailbox;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     InternetAddressList *address_list = NULL;
     const gchar *name_str = NULL;
     gboolean append_dots = FALSE;
@@ -313,8 +338,8 @@ get_from_field(LibBalsaMessage *message)
     g_return_val_if_fail(message->mailbox, NULL);
 
     if (message->headers) {
-        if (message->mailbox->view &&
-            message->mailbox->view->show == LB_MAILBOX_SHOW_TO)
+        if (priv->view &&
+            priv->view->show == LB_MAILBOX_SHOW_TO)
             address_list = message->headers->to_list;
         else
             address_list = message->headers->from;
@@ -408,12 +433,14 @@ lbm_index_entry_free(LibBalsaMailboxIndexEntry *entry)
 void
 libbalsa_mailbox_index_entry_clear(LibBalsaMailbox * mailbox, guint msgno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     g_return_if_fail(msgno > 0);
 
-    if (msgno <= mailbox->mindex->len) {
+    if (msgno <= priv->mindex->len) {
         LibBalsaMailboxIndexEntry **entry = (LibBalsaMailboxIndexEntry **)
-            & g_ptr_array_index(mailbox->mindex, msgno - 1);
+            & g_ptr_array_index(priv->mindex, msgno - 1);
         lbm_index_entry_free(*entry);
         *entry = NULL;
 
@@ -428,12 +455,13 @@ void
 libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
                                  unsigned msgno, LibBalsaMessageFlag f)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     LibBalsaMailboxIndexEntry *entry;
 
-    if (msgno > mailbox->mindex->len)
+    if (msgno > priv->mindex->len)
         return;
 
-    entry = g_ptr_array_index(mailbox->mindex, msgno-1);
+    entry = g_ptr_array_index(priv->mindex, msgno-1);
     if (VALID_ENTRY(entry)) {
         entry->status_icon = 
             libbalsa_get_icon_from_flags(f);
@@ -449,22 +477,21 @@ libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
 static void
 libbalsa_mailbox_finalize(GObject * object)
 {
-    LibBalsaMailbox *mailbox;
+    LibBalsaMailbox *mailbox = (LibBalsaMailbox *) object;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 
-    g_return_if_fail(object != NULL);
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    mailbox = LIBBALSA_MAILBOX(object);
+    g_free(priv->config_prefix);
+    g_free(priv->name);
+    g_free(priv->url);
 
-    g_free(mailbox->config_prefix);
-    g_free(mailbox->name);
-    g_free(mailbox->url);
+    libbalsa_condition_unref(priv->view_filter);
+    libbalsa_condition_unref(priv->persistent_view_filter);
 
-    libbalsa_condition_unref(mailbox->view_filter);
-    libbalsa_condition_unref(mailbox->persistent_view_filter);
+    g_slist_free_full(priv->filters, g_free);
 
-    g_slist_free_full(mailbox->filters, g_free);
-
-    libbalsa_mailbox_view_free(mailbox->view);
+    libbalsa_mailbox_view_free(priv->view);
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -528,13 +555,15 @@ libbalsa_mailbox_new_from_config(const gchar * group)
 static void
 libbalsa_mailbox_free_mindex(LibBalsaMailbox *mailbox)
 {
-    if(mailbox->mindex) {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    if(priv->mindex) {
         unsigned i;
         /* we could have used g_ptr_array_foreach but it is >=2.4.0 */
-        for(i=0; i<mailbox->mindex->len; i++)
-            lbm_index_entry_free(g_ptr_array_index(mailbox->mindex, i));
-        g_ptr_array_free(mailbox->mindex, TRUE);
-        mailbox->mindex = NULL;
+        for(i=0; i<priv->mindex->len; i++)
+            lbm_index_entry_free(g_ptr_array_index(priv->mindex, i));
+        g_ptr_array_free(priv->mindex, TRUE);
+        priv->mindex = NULL;
     }
 }
 
@@ -544,6 +573,7 @@ static gboolean lbm_set_threading(LibBalsaMailbox * mailbox,
 gboolean
 libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     gboolean retval;
 
     g_return_val_if_fail(mailbox != NULL, FALSE);
@@ -552,26 +582,26 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
 
     libbalsa_lock_mailbox(mailbox);
 
-    if (mailbox->open_ref > 0) {
-        mailbox->open_ref++;
+    if (priv->open_ref > 0) {
+        priv->open_ref++;
 	libbalsa_mailbox_check(mailbox);
         retval = TRUE;
     } else {
 	LibBalsaMailboxState saved_state;
 
-        mailbox->stamp++;
-        if(mailbox->mindex) g_warning("mindex set - I leak memory");
-        mailbox->mindex = g_ptr_array_new();
+        priv->stamp++;
+        if(priv->mindex) g_warning("mindex set - I leak memory");
+        priv->mindex = g_ptr_array_new();
 
-	saved_state = mailbox->state;
-	mailbox->state = LB_MAILBOX_STATE_OPENING;
+	saved_state = priv->state;
+	priv->state = LB_MAILBOX_STATE_OPENING;
         retval =
             LIBBALSA_MAILBOX_GET_CLASS(mailbox)->open_mailbox(mailbox, err);
         if(retval) {
-            mailbox->open_ref++;
-	    mailbox->state = LB_MAILBOX_STATE_OPEN;
+            priv->open_ref++;
+	    priv->state = LB_MAILBOX_STATE_OPEN;
 	} else {
-	    mailbox->state = saved_state;
+	    priv->state = saved_state;
             libbalsa_mailbox_free_mindex(mailbox);
 	}
     }
@@ -588,7 +618,9 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
 gboolean
 libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox)
 {
-    if(mailbox->open_ref == 0) return TRUE;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    if(priv->open_ref == 0) return TRUE;
     if(MAILBOX_CLOSED(mailbox)) return FALSE;
     return TRUE;
 }
@@ -596,16 +628,20 @@ libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox)
 gboolean
 libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     
 
-    return mailbox->open_ref>0; /* this will break unlisted mailbox types */
+    return priv->open_ref>0; /* this will break unlisted mailbox types */
 }
     
 void
 libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     g_return_if_fail(MAILBOX_OPEN(mailbox));
@@ -614,18 +650,18 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
     g_object_ref(mailbox);
     libbalsa_lock_mailbox(mailbox);
 
-    if (--mailbox->open_ref == 0) {
-	mailbox->state = LB_MAILBOX_STATE_CLOSING;
+    if (--priv->open_ref == 0) {
+	priv->state = LB_MAILBOX_STATE_CLOSING;
         /* do not try expunging read-only mailboxes, it's a waste of time */
-        expunge = expunge && !mailbox->readonly;
+        expunge = expunge && !priv->readonly;
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox, expunge);
-        if(mailbox->msg_tree) {
-            g_node_destroy(mailbox->msg_tree);
-            mailbox->msg_tree = NULL;
+        if(priv->msg_tree) {
+            g_node_destroy(priv->msg_tree);
+            priv->msg_tree = NULL;
         }
         libbalsa_mailbox_free_mindex(mailbox);
-        mailbox->stamp++;
-	mailbox->state = LB_MAILBOX_STATE_CLOSED;
+        priv->stamp++;
+	priv->state = LB_MAILBOX_STATE_CLOSED;
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -636,10 +672,12 @@ void
 libbalsa_mailbox_set_unread_messages_flag(LibBalsaMailbox * mailbox,
                                           gboolean has_unread)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    mailbox->has_unread_messages = (has_unread != FALSE);
+    priv->has_unread_messages = (has_unread != FALSE);
     libbalsa_mailbox_changed(mailbox);
 }
 
@@ -674,6 +712,8 @@ libbalsa_mailbox_progress_notify(LibBalsaMailbox       *mailbox,
 void
 libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
@@ -681,7 +721,7 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
     libbalsa_lock_mailbox(mailbox);
 
     /* Remove any scheduled idle callback. */
-    libbalsa_clear_source_id(&mailbox->queue_check_idle_id);
+    libbalsa_clear_source_id(&priv->queue_check_idle_id);
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->check(mailbox);
 
@@ -691,9 +731,11 @@ libbalsa_mailbox_check(LibBalsaMailbox * mailbox)
 static gboolean
 lbm_changed_idle_cb(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     libbalsa_lock_mailbox(mailbox);
     g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
-    mailbox->changed_idle_id = 0;
+    priv->changed_idle_id = 0;
     libbalsa_unlock_mailbox(mailbox);
     return FALSE;
 }
@@ -701,9 +743,11 @@ lbm_changed_idle_cb(LibBalsaMailbox * mailbox)
 static void
 lbm_changed_schedule_idle(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     libbalsa_lock_mailbox(mailbox);
-    if (!mailbox->changed_idle_id)
-        mailbox->changed_idle_id =
+    if (!priv->changed_idle_id)
+        priv->changed_idle_id =
             g_idle_add((GSourceFunc) lbm_changed_idle_cb, mailbox);
     libbalsa_unlock_mailbox(mailbox);
 }
@@ -711,11 +755,13 @@ lbm_changed_schedule_idle(LibBalsaMailbox * mailbox)
 void
 libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     libbalsa_lock_mailbox(mailbox);
     if (!g_signal_has_handler_pending
         (mailbox, libbalsa_mailbox_signals[CHANGED], 0, TRUE)) {
         /* No one cares, so don't set any message counts--that might
-         * cause mailbox->view to be created. */
+         * cause priv->view to be created. */
         libbalsa_unlock_mailbox(mailbox);
         return;
     }
@@ -725,11 +771,11 @@ libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
         libbalsa_mailbox_set_total(mailbox,
                                    libbalsa_mailbox_total_messages
                                    (mailbox));
-        libbalsa_mailbox_set_unread(mailbox, mailbox->unread_messages);
-    } else if (mailbox->has_unread_messages
+        libbalsa_mailbox_set_unread(mailbox, priv->unread_messages);
+    } else if (priv->has_unread_messages
                && libbalsa_mailbox_get_unread(mailbox) <= 0) {
         /* Mail has arrived in a closed mailbox since our last check;
-         * total is unknown, but mailbox->has_unread_messages is valid. */
+         * total is unknown, but priv->has_unread_messages is valid. */
         libbalsa_mailbox_set_total(mailbox, -1);
         libbalsa_mailbox_set_unread(mailbox, 1);
     }
@@ -790,6 +836,7 @@ libbalsa_mailbox_can_match(LibBalsaMailbox * mailbox,
 static gboolean
 lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GSList *filters;
     guint progress_count;
     GSList *lst;
@@ -805,12 +852,12 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
         return FALSE;
     g_object_remove_weak_pointer(G_OBJECT(mailbox), (gpointer) &mailbox);
 
-    if (!mailbox->filters_loaded) {
+    if (!priv->filters_loaded) {
         config_mailbox_filters_load(mailbox);
-        mailbox->filters_loaded = TRUE;
+        priv->filters_loaded = TRUE;
     }
 
-    filters = libbalsa_mailbox_filters_when(mailbox->filters,
+    filters = libbalsa_mailbox_filters_when(priv->filters,
                                             FILTER_WHEN_INCOMING);
 
     if (!filters)
@@ -841,7 +888,7 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
                                             (TRUE,
                                              LIBBALSA_MESSAGE_FLAG_DELETED));
 
-    text = g_strdup_printf(_("Applying filter rules to %s"), mailbox->name);
+    text = g_strdup_printf(_("Applying filter rules to %s"), priv->name);
     total = libbalsa_mailbox_total_messages(mailbox);
     progress_total = progress_count * total;
     libbalsa_progress_set_text(&progress, text, progress_total);
@@ -905,6 +952,8 @@ void
 libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
                              const gchar * group)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
@@ -912,8 +961,8 @@ libbalsa_mailbox_save_config(LibBalsaMailbox * mailbox,
     /* These are incase this section was used for another
      * type of mailbox that has now been deleted...
      */
-    g_free(mailbox->config_prefix);
-    mailbox->config_prefix = g_strdup(group);
+    g_free(priv->config_prefix);
+    priv->config_prefix = g_strdup(group);
     libbalsa_conf_private_remove_group(group);
     libbalsa_conf_remove_group(group);
 
@@ -995,6 +1044,8 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
                                     GArray * msgnos,
                                     LibBalsaMailbox * dest, GError ** err)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+    LibBalsaMailboxPrivate *dest_priv = libbalsa_mailbox_get_instance_private(dest);
     gchar *text;
     guint successfully_copied;
     struct MsgCopyData mcd;
@@ -1004,8 +1055,8 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
     g_assert(LIBBALSA_MAILBOX_GET_CLASS(dest) != NULL);
     g_return_val_if_fail(dest != mailbox, FALSE);
 
-    text = g_strdup_printf(_("Copying from %s to %s"), mailbox->name,
-                           dest->name);
+    text = g_strdup_printf(_("Copying from %s to %s"), priv->name,
+                           dest_priv->name);
     mcd.progress = LIBBALSA_PROGRESS_INIT;
     libbalsa_progress_set_text(&mcd.progress, text, msgnos->len);
     g_free(text);
@@ -1047,25 +1098,29 @@ static void
 libbalsa_mailbox_real_save_config(LibBalsaMailbox * mailbox,
                                   const gchar * group)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_conf_set_string("Type",
                              g_type_name(G_OBJECT_TYPE(mailbox)));
-    libbalsa_conf_set_string("Name", mailbox->name);
+    libbalsa_conf_set_string("Name", priv->name);
 }
 
 static void
 libbalsa_mailbox_real_load_config(LibBalsaMailbox * mailbox,
                                   const gchar * group)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    g_free(mailbox->config_prefix);
-    mailbox->config_prefix = g_strdup(group);
+    g_free(priv->config_prefix);
+    priv->config_prefix = g_strdup(group);
 
-    g_free(mailbox->name);
-    mailbox->name = libbalsa_conf_get_string("Name=Mailbox");
+    g_free(priv->name);
+    priv->name = libbalsa_conf_get_string("Name=Mailbox");
 }
 
 static gboolean
@@ -1161,7 +1216,7 @@ lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
 {
     for (node = node->children; node; node = node->next) {
 	LibBalsaMailboxIndexEntry *entry =
-	    /* g_ptr_array_index(lmm->mindex, msgno - 1); ?? */
+	    /* g_ptr_array_index(priv->mindex, msgno - 1); ?? */
 	    lbm_get_index_entry(lmm, GPOINTER_TO_UINT(node->data));
 	if ((entry && entry->unseen) || lbm_node_has_unseen_child(lmm, node))
 	    return TRUE;
@@ -1169,7 +1224,7 @@ lbm_node_has_unseen_child(LibBalsaMailbox * lmm, GNode * node)
     return FALSE;
 }
 
-/* Protects access to mailbox->msgnos_changed; may be locked
+/* Protects access to priv->msgnos_changed; may be locked
  * with or without the gdk lock, so WE MUST NOT GRAB THE GDK LOCK WHILE
  * HOLDING IT. */
 
@@ -1181,8 +1236,10 @@ static void lbm_update_msgnos(LibBalsaMailbox * mailbox, guint seqno,
 static void
 lbm_msgno_changed_expunged_cb(LibBalsaMailbox * mailbox, guint seqno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_mutex_lock(&msgnos_changed_lock);
-    lbm_update_msgnos(mailbox, seqno, mailbox->msgnos_changed);
+    lbm_update_msgnos(mailbox, seqno, priv->msgnos_changed);
     g_mutex_unlock(&msgnos_changed_lock);
 }
 
@@ -1191,15 +1248,17 @@ static void
 lbm_msgno_row_changed(LibBalsaMailbox * mailbox, guint msgno,
                       GtkTreeIter * iter)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     if (!iter->user_data)
         iter->user_data =
-            g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+            g_node_find(priv->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
                         GUINT_TO_POINTER(msgno));
 
     if (iter->user_data) {
         GtkTreePath *path;
 
-        iter->stamp = mailbox->stamp;
+        iter->stamp = priv->stamp;
         path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), iter);
         g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_CHANGED], 0,
                       path, iter);
@@ -1211,27 +1270,28 @@ lbm_msgno_row_changed(LibBalsaMailbox * mailbox, guint msgno,
 static gboolean
 lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     guint i;
 
-    if (!mailbox->msgnos_changed)
+    if (!priv->msgnos_changed)
         return FALSE;
 
 #define DEBUG FALSE
 #if DEBUG
-    g_print("%s %s %d requested\n", __func__, mailbox->name,
-            mailbox->msgnos_changed->len);
+    g_print("%s %s %d requested\n", __func__, priv->name,
+            priv->msgnos_changed->len);
 #endif
 
     g_mutex_lock(&msgnos_changed_lock);
-    for (i = 0; i < mailbox->msgnos_changed->len; i++) {
-        guint msgno = g_array_index(mailbox->msgnos_changed, guint, i);
+    for (i = 0; i < priv->msgnos_changed->len; i++) {
+        guint msgno = g_array_index(priv->msgnos_changed, guint, i);
         GtkTreeIter iter;
 
         if (!MAILBOX_OPEN(mailbox))
             break;
 
 #if DEBUG
-        g_print("%s %s msgno %d\n", __func__, mailbox->name, msgno);
+        g_print("%s %s msgno %d\n", __func__, priv->name, msgno);
 #endif
         g_mutex_unlock(&msgnos_changed_lock);
         iter.user_data = NULL;
@@ -1240,10 +1300,10 @@ lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
     }
 
 #if DEBUG
-    g_print("%s %s %d processed\n", __func__, mailbox->name,
-            mailbox->msgnos_changed->len);
+    g_print("%s %s %d processed\n", __func__, priv->name,
+            priv->msgnos_changed->len);
 #endif
-    mailbox->msgnos_changed->len = 0;
+    priv->msgnos_changed->len = 0;
     g_mutex_unlock(&msgnos_changed_lock);
 
     g_object_unref(mailbox);
@@ -1255,27 +1315,29 @@ static void
 lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
                   GtkTreeIter * iter)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     if (libbalsa_am_i_subthread()) {
         g_mutex_lock(&msgnos_changed_lock);
-        if (!mailbox->msgnos_changed) {
-            mailbox->msgnos_changed =
+        if (!priv->msgnos_changed) {
+            priv->msgnos_changed =
                 g_array_new(FALSE, FALSE, sizeof(guint));
             g_signal_connect(mailbox, "message-expunged",
                              G_CALLBACK(lbm_msgno_changed_expunged_cb),
                              NULL);
         }
-        if (mailbox->msgnos_changed->len == 0)
+        if (priv->msgnos_changed->len == 0)
             g_idle_add((GSourceFunc) lbm_msgnos_changed_idle_cb,
                        g_object_ref(mailbox));
 
-        g_array_append_val(mailbox->msgnos_changed, seqno);
+        g_array_append_val(priv->msgnos_changed, seqno);
         g_mutex_unlock(&msgnos_changed_lock);
 
         /* Not calling lbm_msgno_row_changed, so we must make sure
          * iter->user_data is set: */
         if (!iter->user_data)
             iter->user_data =
-                g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+                g_node_find(priv->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
                             GUINT_TO_POINTER(seqno));
         return;
     }
@@ -1286,9 +1348,10 @@ lbm_msgno_changed(LibBalsaMailbox * mailbox, guint seqno,
 void
 libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GtkTreeIter iter;
 
-    if (!mailbox->msg_tree) {
+    if (!priv->msg_tree) {
         return;
     }
 
@@ -1308,11 +1371,13 @@ libbalsa_mailbox_msgno_changed(LibBalsaMailbox * mailbox, guint seqno)
 static gboolean
 lbm_need_threading_idle_cb(LibBalsaMailbox *mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     libbalsa_lock_mailbox(mailbox);
 
-    lbm_set_threading(mailbox, mailbox->view->threading_type);
+    lbm_set_threading(mailbox, priv->view->threading_type);
 
-    mailbox->need_threading_idle_id = 0;
+    priv->need_threading_idle_id = 0;
 
     libbalsa_unlock_mailbox(mailbox);
 
@@ -1323,21 +1388,22 @@ void
 libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
                                 GNode * parent, GNode ** sibling)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GtkTreeIter iter;
     GtkTreePath *path;
 
-    if (!mailbox->msg_tree)
+    if (!priv->msg_tree)
         return;
 #undef SANITY_CHECK
 #ifdef SANITY_CHECK
-    g_return_if_fail(!g_node_find(mailbox->msg_tree,
+    g_return_if_fail(!g_node_find(priv->msg_tree,
                                   G_PRE_ORDER, G_TRAVERSE_ALL,
                                   GUINT_TO_POINTER(seqno)));
 #endif
 
     /* Insert node into the message tree before getting path. */
     iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
-    iter.stamp = mailbox->stamp;
+    iter.stamp = priv->stamp;
     *sibling = g_node_insert_after(parent, *sibling, iter.user_data);
 
     if (g_signal_has_handler_pending(mailbox,
@@ -1350,36 +1416,37 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
     }
 
     libbalsa_lock_mailbox(mailbox);
-    if (mailbox->need_threading_idle_id == 0) {
-        mailbox->need_threading_idle_id =
+    if (priv->need_threading_idle_id == 0) {
+        priv->need_threading_idle_id =
             g_idle_add((GSourceFunc) lbm_need_threading_idle_cb, mailbox);
     }
     libbalsa_unlock_mailbox(mailbox);
 
-    mailbox->msg_tree_changed = TRUE;
+    priv->msg_tree_changed = TRUE;
 }
 
 static void
 libbalsa_mailbox_msgno_filt_in(LibBalsaMailbox *mailbox, guint seqno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GtkTreeIter iter;
     GtkTreePath *path;
 
-    if (!mailbox->msg_tree) {
+    if (!priv->msg_tree) {
         return;
     }
 
     /* Insert node into the message tree before getting path. */
     iter.user_data = g_node_new(GUINT_TO_POINTER(seqno));
-    iter.stamp = mailbox->stamp;
-    g_node_prepend(mailbox->msg_tree, iter.user_data);
+    iter.stamp = priv->stamp;
+    g_node_prepend(priv->msg_tree, iter.user_data);
 
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
     g_signal_emit(mailbox, libbalsa_mbox_model_signals[ROW_INSERTED], 0,
                   path, &iter);
     gtk_tree_path_free(path);
 
-    mailbox->msg_tree_changed = TRUE;
+    priv->msg_tree_changed = TRUE;
     lbm_changed_schedule_idle(mailbox);
 }
 
@@ -1406,6 +1473,7 @@ decrease_post(GNode *node, gpointer data)
 void
 libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GtkTreeIter iter;
     GtkTreePath *path;
     struct remove_data dt;
@@ -1415,7 +1483,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     g_signal_emit(mailbox, libbalsa_mailbox_signals[MESSAGE_EXPUNGED],
                   0, seqno);
 
-    if (!mailbox->msg_tree) {
+    if (!priv->msg_tree) {
         return;
     }
 
@@ -1423,16 +1491,16 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     dt.seqno = seqno;
     dt.node = NULL;
 
-    g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
+    g_node_traverse(priv->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     decrease_post, &dt);
 
-    if (seqno <= mailbox->mindex->len) {
-        lbm_index_entry_free(g_ptr_array_index(mailbox->mindex,
+    if (seqno <= priv->mindex->len) {
+        lbm_index_entry_free(g_ptr_array_index(priv->mindex,
                                                seqno - 1));
-        g_ptr_array_remove_index(mailbox->mindex, seqno - 1);
+        g_ptr_array_remove_index(priv->mindex, seqno - 1);
     }
 
-    mailbox->msg_tree_changed = TRUE;
+    priv->msg_tree_changed = TRUE;
 
     if (!dt.node) {
         /* It's ok, apparently the view did not include this message */
@@ -1440,7 +1508,7 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     }
 
     iter.user_data = dt.node;
-    iter.stamp = mailbox->stamp;
+    iter.stamp = priv->stamp;
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
 
     /* First promote any children to the node's parent; we'll insert
@@ -1466,8 +1534,8 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     }
 
     libbalsa_lock_mailbox(mailbox);
-    if (mailbox->need_threading_idle_id == 0) {
-        mailbox->need_threading_idle_id =
+    if (priv->need_threading_idle_id == 0) {
+        priv->need_threading_idle_id =
             g_idle_add((GSourceFunc) lbm_need_threading_idle_cb, mailbox);
     }
     libbalsa_unlock_mailbox(mailbox);
@@ -1485,22 +1553,23 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     }
     
     gtk_tree_path_free(path);
-    mailbox->stamp++;
+    priv->stamp++;
 }
 
 static void
 libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, GNode * node)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GtkTreeIter iter;
     GtkTreePath *path;
     GNode *child, *parent;
 
-    if (!mailbox->msg_tree) {
+    if (!priv->msg_tree) {
         return;
     }
 
     iter.user_data = node;
-    iter.stamp = mailbox->stamp;
+    iter.stamp = priv->stamp;
     path = gtk_tree_model_get_path(GTK_TREE_MODEL(mailbox), &iter);
 
     /* First promote any children to the node's parent; we'll insert
@@ -1538,9 +1607,9 @@ libbalsa_mailbox_msgno_filt_out(LibBalsaMailbox * mailbox, GNode * node)
     }
     
     gtk_tree_path_free(path);
-    mailbox->stamp++;
+    priv->stamp++;
 
-    mailbox->msg_tree_changed = TRUE;
+    priv->msg_tree_changed = TRUE;
     lbm_changed_schedule_idle(mailbox);
 }
 
@@ -1557,12 +1626,13 @@ lbm_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
                      LibBalsaMailboxSearchIter * search_iter,
                      gboolean hold_selected)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     gboolean match;
     GNode *node;
 
     match = search_iter ?
         libbalsa_mailbox_message_match(mailbox, seqno, search_iter) : TRUE;
-    node = g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+    node = g_node_find(priv->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
                        GUINT_TO_POINTER(seqno));
     if (node) {
         if (!match) {
@@ -1615,9 +1685,11 @@ libbalsa_mailbox_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
                                   LibBalsaMailboxSearchIter * search_iter,
                                   gboolean hold_selected)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    if (!mailbox->msg_tree) {
+    if (!priv->msg_tree) {
         return;
     }
 
@@ -1658,9 +1730,11 @@ libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition)
 LibBalsaMailboxSearchIter *
 libbalsa_mailbox_search_iter_view(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
 
-    return libbalsa_mailbox_search_iter_new(mailbox->view_filter);
+    return libbalsa_mailbox_search_iter_new(priv->view_filter);
 }
 
 /* Increment reference count of a LibBalsaMailboxSearchIter, if it is
@@ -1748,17 +1822,18 @@ gboolean
 libbalsa_mailbox_msgno_find(LibBalsaMailbox * mailbox, guint seqno,
                             GtkTreePath ** path, GtkTreeIter * iter)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GtkTreeIter tmp_iter;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(seqno > 0, FALSE);
 
-    if (!mailbox->msg_tree || !(tmp_iter.user_data =
-        g_node_find(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
+    if (!priv->msg_tree || !(tmp_iter.user_data =
+        g_node_find(priv->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
                     GINT_TO_POINTER(seqno))))
         return FALSE;
 
-    tmp_iter.stamp = mailbox->stamp;
+    tmp_iter.stamp = priv->stamp;
 
     if (path)
         *path =
@@ -1876,11 +1951,12 @@ libbalsa_mailbox_total_messages(LibBalsaMailbox * mailbox)
 gboolean
 libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     gboolean retval = TRUE;
 
     g_return_val_if_fail(mailbox != NULL, FALSE);
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-    g_return_val_if_fail(!mailbox->readonly, TRUE);
+    g_return_val_if_fail(!priv->readonly, TRUE);
     g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_lock_mailbox(mailbox);
@@ -1902,15 +1978,16 @@ static void
 lbm_cache_message(LibBalsaMailbox * mailbox, guint msgno,
                   LibBalsaMessage * message)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     LibBalsaMailboxIndexEntry *entry;
 
-    if (mailbox->mindex->len < msgno)
-        g_ptr_array_set_size(mailbox->mindex, msgno);
+    if (priv->mindex->len < msgno)
+        g_ptr_array_set_size(priv->mindex, msgno);
 
-    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+    entry = g_ptr_array_index(priv->mindex, msgno - 1);
 
     if (!entry) {
-        g_ptr_array_index(mailbox->mindex, msgno - 1) =
+        g_ptr_array_index(priv->mindex, msgno - 1) =
             entry = g_new(LibBalsaMailboxIndexEntry, 1);
         lbm_index_entry_populate_from_msg(entry, message);
     } else if (entry->idle_pending)
@@ -1920,6 +1997,7 @@ lbm_cache_message(LibBalsaMailbox * mailbox, guint msgno,
 LibBalsaMessage *
 libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     LibBalsaMessage *message;
 
     g_return_val_if_fail(mailbox != NULL, NULL);
@@ -1930,7 +2008,7 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     if (!MAILBOX_OPEN(mailbox)) {
         g_message(_("libbalsa_mailbox_get_message: mailbox %s is closed"),
-                  mailbox->name);
+                  priv->name);
         libbalsa_unlock_mailbox(mailbox);
         return NULL;
     }
@@ -1943,7 +2021,7 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     message = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
                                                                msgno);
-    if (message && mailbox->mindex)
+    if (message && priv->mindex)
         /* Cache the message info, if we do not already have it. */
         lbm_cache_message(mailbox, msgno, message);
 
@@ -2044,6 +2122,7 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
                                        LibBalsaMessageFlag set,
                                        LibBalsaMessageFlag clear)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     gboolean retval;
     guint i;
     gboolean real_flag;
@@ -2052,7 +2131,7 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
     g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     real_flag = (set | clear) & LIBBALSA_MESSAGE_FLAGS_REAL;
-    g_return_val_if_fail(!mailbox->readonly || !real_flag, FALSE);
+    g_return_val_if_fail(!priv->readonly || !real_flag, FALSE);
 
     if (msgnos->len == 0)
 	return TRUE;
@@ -2063,7 +2142,7 @@ libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
     retval = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
 	messages_change_flags(mailbox, msgnos, set, clear);
 
-    if (retval && mailbox->mindex && mailbox->view_filter) {
+    if (retval && priv->mindex && priv->view_filter) {
         LibBalsaMailboxSearchIter *iter_view =
             libbalsa_mailbox_search_iter_view(mailbox);
         for (i = 0; i < msgnos->len; i++) {
@@ -2162,23 +2241,24 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
                                  LibBalsaCondition *cond,
                                  gboolean update_immediately)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     gboolean retval = FALSE;
 
     g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     libbalsa_lock_mailbox(mailbox);
 
-    if (!libbalsa_condition_compare(mailbox->view_filter, cond))
-        mailbox->view_filter_pending = TRUE;
+    if (!libbalsa_condition_compare(priv->view_filter, cond))
+        priv->view_filter_pending = TRUE;
 
-    libbalsa_condition_unref(mailbox->view_filter);
-    mailbox->view_filter = libbalsa_condition_ref(cond);
+    libbalsa_condition_unref(priv->view_filter);
+    priv->view_filter = libbalsa_condition_ref(cond);
 
-    if (update_immediately && mailbox->view_filter_pending) {
+    if (update_immediately && priv->view_filter_pending) {
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
                                                                 cond);
-        retval = lbm_set_threading(mailbox, mailbox->view->threading_type);
-        mailbox->view_filter_pending = FALSE;
+        retval = lbm_set_threading(mailbox, priv->view->threading_type);
+        priv->view_filter_pending = FALSE;
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -2189,9 +2269,11 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
 void
 libbalsa_mailbox_make_view_filter_persistent(LibBalsaMailbox * mailbox)
 {
-    libbalsa_condition_unref(mailbox->persistent_view_filter);
-    mailbox->persistent_view_filter =
-        libbalsa_condition_ref(mailbox->view_filter);
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    libbalsa_condition_unref(priv->persistent_view_filter);
+    priv->persistent_view_filter =
+        libbalsa_condition_ref(priv->view_filter);
 }
 
 /* Test message flags. */
@@ -2235,8 +2317,10 @@ static void lbm_sort(LibBalsaMailbox * mbox, GNode * parent);
 static void
 lbm_check_and_sort(LibBalsaMailbox * mailbox)
 {
-    if (mailbox->msg_tree)
-        lbm_sort(mailbox, mailbox->msg_tree);
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    if (priv->msg_tree)
+        lbm_sort(mailbox, priv->msg_tree);
 
     libbalsa_mailbox_changed(mailbox);
 }
@@ -2331,13 +2415,15 @@ libbalsa_mailbox_view_free(LibBalsaMailboxView * view)
 static LibBalsaMailboxView *
 lbm_get_view(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     if (!mailbox)
 	return &libbalsa_mailbox_view_default;
 
-    if (!mailbox->view)
-        mailbox->view = libbalsa_mailbox_view_new();
+    if (!priv->view)
+        priv->view = libbalsa_mailbox_view_new();
 
-    return mailbox->view;
+    return priv->view;
 }
 
 /* Set methods; NULL mailbox is valid, and changes the default value. */
@@ -2473,11 +2559,12 @@ gboolean
 libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
                                 LibBalsaChkCryptoMode gpg_chk_mode)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     LibBalsaMailboxView *view;
 
-    g_return_val_if_fail(mailbox != NULL && mailbox->view != NULL, FALSE);
+    g_return_val_if_fail(mailbox != NULL && priv->view != NULL, FALSE);
 
-    view = mailbox->view;
+    view = priv->view;
     if (view->gpg_chk_mode != gpg_chk_mode) {
 	view->gpg_chk_mode = gpg_chk_mode;
 	return TRUE;
@@ -2542,8 +2629,10 @@ libbalsa_mailbox_set_mtime(LibBalsaMailbox * mailbox, time_t mtime)
 const gchar *
 libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->identity_name :
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->identity_name :
 	libbalsa_mailbox_view_default.identity_name;
 }
 
@@ -2551,67 +2640,85 @@ libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox)
 LibBalsaMailboxThreadingType
 libbalsa_mailbox_get_threading_type(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->threading_type :
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->threading_type :
 	libbalsa_mailbox_view_default.threading_type;
 }
 
 LibBalsaMailboxSortType
 libbalsa_mailbox_get_sort_type(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->sort_type : libbalsa_mailbox_view_default.sort_type;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->sort_type : libbalsa_mailbox_view_default.sort_type;
 }
 
 LibBalsaMailboxSortFields
 libbalsa_mailbox_get_sort_field(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->sort_field :
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->sort_field :
 	libbalsa_mailbox_view_default.sort_field;
 }
 
 LibBalsaMailboxShow
 libbalsa_mailbox_get_show(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->show : libbalsa_mailbox_view_default.show;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->show : libbalsa_mailbox_view_default.show;
 }
 
 LibBalsaMailboxSubscribe
 libbalsa_mailbox_get_subscribe(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->subscribe : libbalsa_mailbox_view_default.subscribe;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->subscribe : libbalsa_mailbox_view_default.subscribe;
 }
 
 gboolean
 libbalsa_mailbox_get_exposed(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->exposed : libbalsa_mailbox_view_default.exposed;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->exposed : libbalsa_mailbox_view_default.exposed;
 }
 
 gboolean
 libbalsa_mailbox_get_open(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->open : libbalsa_mailbox_view_default.open;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->open : libbalsa_mailbox_view_default.open;
 }
 
 gint
 libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->filter : libbalsa_mailbox_view_default.filter;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->filter : libbalsa_mailbox_view_default.filter;
 }
 
 #ifdef HAVE_GPGME
 LibBalsaChkCryptoMode
 libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->gpg_chk_mode :
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->gpg_chk_mode :
 	libbalsa_mailbox_view_default.gpg_chk_mode;
 }
 #endif
@@ -2619,9 +2726,11 @@ libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox)
 gint
 libbalsa_mailbox_get_unread(LibBalsaMailbox * mailbox)
 {
-    if (mailbox && mailbox->view) {
-        mailbox->view->used = 1;
-	return mailbox->view->unread;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    if (mailbox && priv->view) {
+        priv->view->used = 1;
+	return priv->view->unread;
     } else 
         return libbalsa_mailbox_view_default.unread;
 }
@@ -2629,15 +2738,19 @@ libbalsa_mailbox_get_unread(LibBalsaMailbox * mailbox)
 gint
 libbalsa_mailbox_get_total(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->total : libbalsa_mailbox_view_default.total;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->total : libbalsa_mailbox_view_default.total;
 }
 
 time_t
 libbalsa_mailbox_get_mtime(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->mtime : libbalsa_mailbox_view_default.mtime;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (mailbox && priv->view) ?
+	priv->view->mtime : libbalsa_mailbox_view_default.mtime;
 }
 
 /* End of get methods. */
@@ -2654,9 +2767,9 @@ libbalsa_mailbox_get_mtime(LibBalsaMailbox * mailbox)
     ((iter)!= NULL && \
      (iter)->user_data != NULL && \
      LIBBALSA_IS_MAILBOX(tree_model) && \
-     ((LibBalsaMailbox *) tree_model)->stamp == (iter)->stamp)
+     ((LibBalsaMailboxPrivate *) libbalsa_mailbox_get_instance_private(((LibBalsaMailbox *) tree_model)))->stamp == (iter)->stamp)
 #define VALIDATE_ITER(iter, tree_model) \
-    ((iter)->stamp = ((LibBalsaMailbox *) tree_model)->stamp)
+    ((iter)->stamp = ((LibBalsaMailboxPrivate *) libbalsa_mailbox_get_instance_private((LibBalsaMailbox *) tree_model))->stamp)
 #define INVALIDATE_ITER(iter) ((iter)->stamp = 0)
 
 static GtkTreeModelFlags mbox_model_get_flags  (GtkTreeModel      *tree_model);
@@ -2808,6 +2921,8 @@ mbox_model_get_path_helper(GNode * node, GNode * msg_tree)
 static GtkTreePath *
 mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
 {
+    LibBalsaMailbox *mailbox = (LibBalsaMailbox *) tree_model;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GNode *node;
 #ifdef SANITY_CHECK
     GNode *parent_node;
@@ -2824,9 +2939,7 @@ mbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
 
     g_return_val_if_fail(node->parent != NULL, NULL);
 
-    return mbox_model_get_path_helper(node,
-                                      LIBBALSA_MAILBOX(tree_model)->
-                                      msg_tree);
+    return mbox_model_get_path_helper(node, priv->msg_tree);
 }
 
 /* mbox_model_get_value: 
@@ -2838,36 +2951,39 @@ static GdkPixbuf *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
 static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
 
 
-/* Protects access to mailbox->msgnos_pending; */
+/* Protects access to priv->msgnos_pending; */
 static GMutex get_index_entry_lock;
 
 static void
 lbm_get_index_entry_expunged_cb(LibBalsaMailbox * mailbox, guint seqno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_mutex_lock(&get_index_entry_lock);
-    lbm_update_msgnos(mailbox, seqno, mailbox->msgnos_pending);
+    lbm_update_msgnos(mailbox, seqno, priv->msgnos_pending);
     g_mutex_unlock(&get_index_entry_lock);
 }
 
 static void
 lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     guint i;
 
 #if DEBUG
-    g_print("%s %s %d requested\n", __func__, mailbox->name,
-            mailbox->msgnos_pending->len);
+    g_print("%s %s %d requested\n", __func__, priv->name,
+            priv->msgnos_pending->len);
 #endif
     g_mutex_lock(&get_index_entry_lock);
-    for (i = 0; i < mailbox->msgnos_pending->len; i++) {
-        guint msgno = g_array_index(mailbox->msgnos_pending, guint, i);
+    for (i = 0; i < priv->msgnos_pending->len; i++) {
+        guint msgno = g_array_index(priv->msgnos_pending, guint, i);
         LibBalsaMessage *message;
 
         if (!MAILBOX_OPEN(mailbox))
             break;
 
 #if DEBUG
-        g_print("%s %s msgno %d\n", __func__, mailbox->name, msgno);
+        g_print("%s %s msgno %d\n", __func__, priv->name, msgno);
 #endif
         g_mutex_unlock(&get_index_entry_lock);
         if ((message = libbalsa_mailbox_get_message(mailbox, msgno)))
@@ -2878,10 +2994,10 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
     }
 
 #if DEBUG
-    g_print("%s %s %d processed\n", __func__, mailbox->name,
-            mailbox->msgnos_pending->len);
+    g_print("%s %s %d processed\n", __func__, priv->name,
+            priv->msgnos_pending->len);
 #endif
-    mailbox->msgnos_pending->len = 0;
+    priv->msgnos_pending->len = 0;
     g_mutex_unlock(&get_index_entry_lock);
 
     g_object_unref(mailbox);
@@ -2891,26 +3007,27 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
 static LibBalsaMailboxIndexEntry *
 lbm_get_index_entry(LibBalsaMailbox * lmm, guint msgno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(lmm);
     LibBalsaMailboxIndexEntry *entry;
 
-    if (!lmm->mindex)
+    if (!priv->mindex)
         return NULL;
 
-    if (lmm->mindex->len < msgno )
-        g_ptr_array_set_size(lmm->mindex, msgno);
+    if (priv->mindex->len < msgno )
+        g_ptr_array_set_size(priv->mindex, msgno);
 
-    entry = g_ptr_array_index(lmm->mindex, msgno - 1);
+    entry = g_ptr_array_index(priv->mindex, msgno - 1);
     if (entry)
         return entry->idle_pending ? NULL : entry;
 
     g_mutex_lock(&get_index_entry_lock);
-    if (!lmm->msgnos_pending) {
-        lmm->msgnos_pending = g_array_new(FALSE, FALSE, sizeof(guint));
+    if (!priv->msgnos_pending) {
+        priv->msgnos_pending = g_array_new(FALSE, FALSE, sizeof(guint));
         g_signal_connect(lmm, "message-expunged",
                          G_CALLBACK(lbm_get_index_entry_expunged_cb), NULL);
     }
 
-    if (!lmm->msgnos_pending->len) {
+    if (!priv->msgnos_pending->len) {
         GThread *get_index_entry_thread;
 
         g_object_ref(lmm);
@@ -2921,10 +3038,10 @@ lbm_get_index_entry(LibBalsaMailbox * lmm, guint msgno)
         g_thread_unref(get_index_entry_thread);
     }
 
-    g_array_append_val(lmm->msgnos_pending, msgno);
+    g_array_append_val(priv->msgnos_pending, msgno);
     /* Make sure we have a "pending" index entry before releasing the
      * lock. */
-    g_ptr_array_index(lmm->mindex, msgno - 1) =
+    g_ptr_array_index(priv->mindex, msgno - 1) =
         lbm_index_entry_new_pending();
     g_mutex_unlock(&get_index_entry_lock);
 
@@ -3046,14 +3163,15 @@ mbox_model_iter_children(GtkTreeModel      *tree_model,
                          GtkTreeIter       *iter,
                          GtkTreeIter       *parent)
 {
+    LibBalsaMailboxPrivate *priv =
+        libbalsa_mailbox_get_instance_private(((LibBalsaMailbox *) tree_model));
     GNode *node;
 
     INVALIDATE_ITER(iter);
     g_return_val_if_fail(parent == NULL ||
                          VALID_ITER(parent, tree_model), FALSE);
 
-    node = parent ? parent->user_data
-                  : LIBBALSA_MAILBOX(tree_model)->msg_tree;
+    node = parent ? parent->user_data : priv->msg_tree;
     node = node->children;
     if (node) {
         iter->user_data = node;
@@ -3081,12 +3199,13 @@ static gint
 mbox_model_iter_n_children(GtkTreeModel      *tree_model,
                            GtkTreeIter       *iter)
 {
+    LibBalsaMailboxPrivate *priv =
+        libbalsa_mailbox_get_instance_private(((LibBalsaMailbox *) tree_model));
     GNode *node;
 
     g_return_val_if_fail(iter == NULL || VALID_ITER(iter, tree_model), 0);
 
-    node = iter ? iter->user_data
-                : LIBBALSA_MAILBOX(tree_model)->msg_tree;
+    node = iter ? iter->user_data : priv->msg_tree;
 
     return node ? g_node_n_children(node) : 0;
 }
@@ -3097,19 +3216,20 @@ mbox_model_iter_nth_child(GtkTreeModel  * tree_model,
                           GtkTreeIter   * parent,
                           gint            n)
 {
+    LibBalsaMailboxPrivate *priv =
+        libbalsa_mailbox_get_instance_private(((LibBalsaMailbox *) tree_model));
     GNode *node;
 
     INVALIDATE_ITER(iter);
-    if(!LIBBALSA_MAILBOX(tree_model)->msg_tree) 
+    if(!priv->msg_tree) 
         return FALSE; /* really, this should be never called when
                        * msg_tree == NULL but the FALSE response is
                        * fair as well and only a bit dirtier.
                        * I have more critical problems to debug now. */
     g_return_val_if_fail(parent == NULL
-                         ||VALID_ITER(parent, tree_model), FALSE);
+                         || VALID_ITER(parent, tree_model), FALSE);
 
-    node = parent ? parent->user_data
-                  : LIBBALSA_MAILBOX(tree_model)->msg_tree;
+    node = parent ? parent->user_data : priv->msg_tree;
     if(!node) /* the tree has been destroyed already (mailbox has been
                * closed), there is nothing to iterate over. This happens
                * only if mailbox is closed but a view is still active. 
@@ -3130,6 +3250,8 @@ mbox_model_iter_parent(GtkTreeModel     * tree_model,
                        GtkTreeIter      * iter,
                        GtkTreeIter      * child)
 {
+    LibBalsaMailboxPrivate *priv =
+        libbalsa_mailbox_get_instance_private(((LibBalsaMailbox *) tree_model));
     GNode *node;
 
     INVALIDATE_ITER(iter);
@@ -3138,7 +3260,7 @@ mbox_model_iter_parent(GtkTreeModel     * tree_model,
 
     node = child->user_data;
     node = node->parent;
-    if (node && node != LIBBALSA_MAILBOX(tree_model)->msg_tree) {
+    if (node && node != priv->msg_tree) {
         iter->user_data = node;
         VALIDATE_ITER(iter, tree_model);
         return TRUE;
@@ -3314,25 +3436,26 @@ mbox_compare_func(const SortTuple * a,
                   const SortTuple * b,
                   LibBalsaMailbox * mbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mbox);
     guint msgno_a;
     guint msgno_b;
     gint retval;
 
     msgno_a = GPOINTER_TO_UINT(a->node->data);
     msgno_b = GPOINTER_TO_UINT(b->node->data);
-    if (mbox->view->sort_field == LB_MAILBOX_SORT_NO)
+    if (priv->view->sort_field == LB_MAILBOX_SORT_NO)
 	retval = msgno_a - msgno_b;
     else {
 	LibBalsaMailboxIndexEntry *message_a;
 	LibBalsaMailboxIndexEntry *message_b;
 
-	message_a = g_ptr_array_index(mbox->mindex, msgno_a - 1);
-	message_b = g_ptr_array_index(mbox->mindex, msgno_b - 1);
+	message_a = g_ptr_array_index(priv->mindex, msgno_a - 1);
+	message_b = g_ptr_array_index(priv->mindex, msgno_b - 1);
 
 	if (!(VALID_ENTRY(message_a) && VALID_ENTRY(message_b)))
 	    return 0;
 
-	switch (mbox->view->sort_field) {
+	switch (priv->view->sort_field) {
 	case LB_MAILBOX_SORT_SENDER:
 	    retval = mbox_compare_from(message_a, message_b);
 	    break;
@@ -3352,7 +3475,7 @@ mbox_compare_func(const SortTuple * a,
 
         if (retval == 0) {
             /* resolve ties using previous sort column */
-            switch (mbox->view->sort_field_prev) {
+            switch (priv->view->sort_field_prev) {
             case LB_MAILBOX_SORT_SENDER:
                 retval = mbox_compare_from(message_a, message_b);
                 break;
@@ -3372,7 +3495,7 @@ mbox_compare_func(const SortTuple * a,
         }
     }
 
-    if (mbox->view->sort_type == LB_MAILBOX_SORT_TYPE_DESC) {
+    if (priv->view->sort_type == LB_MAILBOX_SORT_TYPE_DESC) {
         retval = -retval;
     }
 
@@ -3388,12 +3511,13 @@ mbox_compare_func(const SortTuple * a,
 static gboolean
 lbm_has_valid_index_entry(LibBalsaMailbox * mailbox, guint msgno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     LibBalsaMailboxIndexEntry *entry;
 
-    if (msgno > mailbox->mindex->len)
+    if (msgno > priv->mindex->len)
         return FALSE;
 
-    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+    entry = g_ptr_array_index(priv->mindex, msgno - 1);
 
     return VALID_ENTRY(entry);
 }
@@ -3401,11 +3525,12 @@ lbm_has_valid_index_entry(LibBalsaMailbox * mailbox, guint msgno)
 static void
 lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mbox);
     GArray *sort_array;
     GPtrArray *node_array;
     GNode *node, *tmp_node, *prev;
     guint i, j;
-    gboolean sort_no = mbox->view->sort_field == LB_MAILBOX_SORT_NO;
+    gboolean sort_no = priv->view->sort_field == LB_MAILBOX_SORT_NO;
 #if !defined(LOCAL_MAILBOX_SORTED_JUST_ONCE_ON_OPENING)
     gboolean can_sort_all = sort_no || LIBBALSA_IS_MAILBOX_IMAP(mbox);
 #else
@@ -3466,7 +3591,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
             else
                 node = parent->children = tmp_node;
             tmp_node->prev = prev;
-            mbox->msg_tree_changed = TRUE;
+            priv->msg_tree_changed = TRUE;
         } else
             g_assert(prev == NULL || prev->next == tmp_node);
         prev = tmp_node;
@@ -3490,7 +3615,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
             j++;
         }
 
-        iter.stamp = mbox->stamp;
+        iter.stamp = priv->stamp;
         iter.user_data = parent;
         path = parent->parent ? mbox_model_get_path(GTK_TREE_MODEL(mbox), &iter)
                               : gtk_tree_path_new();
@@ -3514,11 +3639,12 @@ mbox_get_sort_column_id(GtkTreeSortable * sortable,
                         GtkSortType     * order)
 {
     LibBalsaMailbox *mbox = (LibBalsaMailbox *) sortable;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mbox);
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(sortable), FALSE);
 
     if (sort_column_id) {
-        switch (mbox->view->sort_field) {
+        switch (priv->view->sort_field) {
         default:
         case LB_MAILBOX_SORT_NO:
             *sort_column_id = LB_MBOX_MSGNO_COL;
@@ -3539,7 +3665,7 @@ mbox_get_sort_column_id(GtkTreeSortable * sortable,
     }
 
     if (order)
-        *order = (mbox->view->sort_type ==
+        *order = (priv->view->sort_type ==
                   LB_MAILBOX_SORT_TYPE_DESC ? GTK_SORT_DESCENDING :
                   GTK_SORT_ASCENDING);
 
@@ -3553,13 +3679,14 @@ mbox_set_sort_column_id(GtkTreeSortable * sortable,
                         GtkSortType       order)
 {
     LibBalsaMailbox *mbox = (LibBalsaMailbox *) sortable;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mbox);
     LibBalsaMailboxView *view;
     LibBalsaMailboxSortFields new_field;
     LibBalsaMailboxSortType new_type;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(sortable));
 
-    view = mbox->view;
+    view = priv->view;
 
     switch (sort_column_id) {
     default:
@@ -3605,7 +3732,7 @@ mbox_set_sort_column_id(GtkTreeSortable * sortable,
             return;
     }
     libbalsa_lock_mailbox(mbox);
-    lbm_sort(mbox, mbox->msg_tree);
+    lbm_sort(mbox, priv->msg_tree);
     libbalsa_unlock_mailbox(mbox);
 
     libbalsa_mailbox_changed(mbox);
@@ -3640,6 +3767,7 @@ void
 libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
                                     GNode * node, GNode * parent)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GtkTreeIter iter;
     GtkTreePath *path;
     GNode *current_parent;
@@ -3650,13 +3778,13 @@ libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
     g_return_if_fail(!parent || !g_node_is_ancestor(node, parent));
 #endif
 
-    iter.stamp = mailbox->stamp;
+    iter.stamp = priv->stamp;
 
-    path = mbox_model_get_path_helper(node, mailbox->msg_tree);
+    path = mbox_model_get_path_helper(node, priv->msg_tree);
     current_parent = node->parent;
     g_node_unlink(node);
     if (path) {
-        /* The node was in mailbox->msg_tree. */
+        /* The node was in priv->msg_tree. */
         g_signal_emit(mailbox,
                       libbalsa_mbox_model_signals[ROW_DELETED], 0, path);
         if (!current_parent->children) {
@@ -3676,9 +3804,9 @@ libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
     }
 
     g_node_prepend(parent, node);
-    path = mbox_model_get_path_helper(parent, mailbox->msg_tree);
+    path = mbox_model_get_path_helper(parent, priv->msg_tree);
     if (path) {
-        /* The parent is in mailbox->msg_tree. */
+        /* The parent is in priv->msg_tree. */
         if (!node->next) {
             /* It is the first child. */
             iter.user_data = parent;
@@ -3697,7 +3825,7 @@ libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
                           0, path, &iter);
         gtk_tree_path_free(path);
 
-        mailbox->msg_tree_changed = TRUE;
+        priv->msg_tree_changed = TRUE;
     }
 }
 
@@ -3787,6 +3915,7 @@ lbm_update_msg_tree_move(GNode * new_node,
 static void
 lbm_update_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     struct lbm_update_msg_tree_info mti;
 
     mti.mailbox = mailbox;
@@ -3798,13 +3927,13 @@ lbm_update_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
     g_node_traverse(new_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     (GNodeTraverseFunc) lbm_update_msg_tree_populate, &mti);
     /* Remove deadwood. */
-    g_node_traverse(mailbox->msg_tree, G_POST_ORDER, G_TRAVERSE_ALL, -1,
+    g_node_traverse(priv->msg_tree, G_POST_ORDER, G_TRAVERSE_ALL, -1,
                     (GNodeTraverseFunc) lbm_update_msg_tree_prune, &mti);
 
     /* Clear the nodes array and repopulate it with nodes in the current
      * tree. */
     memset(mti.nodes, 0, sizeof(GNode *) * mti.total);
-    g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
+    g_node_traverse(priv->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     (GNodeTraverseFunc) lbm_update_msg_tree_populate, &mti);
     /* Check parent-child relationships. */
     g_node_traverse(new_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
@@ -3816,19 +3945,20 @@ lbm_update_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 static void
 lbm_set_msg_tree(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GtkTreeIter iter;
     GNode *node;
     GtkTreePath *path;
 
-    iter.stamp = ++mailbox->stamp;
+    iter.stamp = ++priv->stamp;
 
-    if (!mailbox->msg_tree)
+    if (!priv->msg_tree)
         return;
 
     path = gtk_tree_path_new();
     gtk_tree_path_down(path);
 
-    for (node = mailbox->msg_tree->children; node; node = node->next) {
+    for (node = priv->msg_tree->children; node; node = node->next) {
         iter.user_data = node;
         g_signal_emit(mailbox,
                       libbalsa_mbox_model_signals[ROW_INSERTED], 0, path,
@@ -3846,17 +3976,19 @@ lbm_set_msg_tree(LibBalsaMailbox * mailbox)
 void
 libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox, GNode * new_tree)
 {
-    if (mailbox->msg_tree && mailbox->msg_tree->children) {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    if (priv->msg_tree && priv->msg_tree->children) {
         lbm_update_msg_tree(mailbox, new_tree);
         g_node_destroy(new_tree);
     } else {
-        if (mailbox->msg_tree)
-            g_node_destroy(mailbox->msg_tree);
-        mailbox->msg_tree = new_tree;
+        if (priv->msg_tree)
+            g_node_destroy(priv->msg_tree);
+        priv->msg_tree = new_tree;
         lbm_set_msg_tree(mailbox);
     }
 
-    mailbox->msg_tree_changed = TRUE;
+    priv->msg_tree_changed = TRUE;
 }
 
 static GMimeMessage *
@@ -3905,6 +4037,7 @@ lbm_try_reassemble_func(GMimeObject * parent, GMimeObject * mime_part,
 static void
 lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     gchar *text;
     guint total_messages;
     LibBalsaProgress progress;
@@ -3914,7 +4047,7 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
     GArray *messages = g_array_new(FALSE, FALSE, sizeof(guint));
 
     text = g_strdup_printf(_("Searching %s for partial messages"),
-                           mailbox->name);
+                           priv->name);
     total_messages = libbalsa_mailbox_total_messages(mailbox);
     libbalsa_progress_set_text(&progress, text, total_messages);
     g_free(text);
@@ -4054,9 +4187,10 @@ void
 libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
                                 const gchar * id)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GSList *ids;
 
-    if (mailbox->no_reassemble)
+    if (priv->no_reassemble)
         return;
 
     ids = g_object_get_data(G_OBJECT(mailbox), LBM_TRY_REASSEMBLE_IDS);
@@ -4110,8 +4244,9 @@ libbalsa_mailbox_unregister_msgnos(LibBalsaMailbox * mailbox,
 LibBalsaMessageStatus
 libbalsa_mailbox_msgno_get_status(LibBalsaMailbox * mailbox, guint msgno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     LibBalsaMailboxIndexEntry *entry =
-        g_ptr_array_index(mailbox->mindex, msgno - 1);
+        g_ptr_array_index(priv->mindex, msgno - 1);
     return VALID_ENTRY(entry) ?
         entry->status_icon : LIBBALSA_MESSAGE_STATUS_ICONS_NUM;
 }
@@ -4119,8 +4254,9 @@ libbalsa_mailbox_msgno_get_status(LibBalsaMailbox * mailbox, guint msgno)
 const gchar *
 libbalsa_mailbox_msgno_get_subject(LibBalsaMailbox * mailbox, guint msgno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     LibBalsaMailboxIndexEntry *entry =
-        g_ptr_array_index(mailbox->mindex, msgno - 1);
+        g_ptr_array_index(priv->mindex, msgno - 1);
     return VALID_ENTRY(entry) ? entry->subject : NULL;
 }
 
@@ -4129,13 +4265,14 @@ void
 libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
 				     guint msgno, LibBalsaMessage * message)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     LibBalsaMailboxIndexEntry *entry;
     LibBalsaMessageAttach attach_icon;
 
-    if (!mailbox || !mailbox->mindex || mailbox->mindex->len < msgno)
+    if (!mailbox || !priv->mindex || priv->mindex->len < msgno)
 	return;
 
-    entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+    entry = g_ptr_array_index(priv->mindex, msgno - 1);
     if (!VALID_ENTRY(entry))
 	return;
 
@@ -4163,6 +4300,7 @@ lbm_check_real(LibBalsaMailbox * mailbox)
 static gboolean
 lbm_check_idle(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GThread *check_thread;
 
     check_thread = g_thread_new("lbm_check_real", (GThreadFunc) lbm_check_real,
@@ -4170,7 +4308,7 @@ lbm_check_idle(LibBalsaMailbox * mailbox)
     g_thread_unref(check_thread);
 
     libbalsa_lock_mailbox(mailbox);
-    mailbox->queue_check_idle_id = 0;
+    priv->queue_check_idle_id = 0;
     libbalsa_unlock_mailbox(mailbox);
 
     return FALSE;
@@ -4179,9 +4317,11 @@ lbm_check_idle(LibBalsaMailbox * mailbox)
 static void
 lbm_queue_check(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     libbalsa_lock_mailbox(mailbox);
-    if (!mailbox->queue_check_idle_id)
-        mailbox->queue_check_idle_id =
+    if (!priv->queue_check_idle_id)
+        priv->queue_check_idle_id =
             g_idle_add((GSourceFunc) lbm_check_idle, mailbox);
     libbalsa_unlock_mailbox(mailbox);
 }
@@ -4202,13 +4342,14 @@ libbalsa_mailbox_search_iter_step(LibBalsaMailbox * mailbox,
                                   gboolean forward,
                                   guint stop_msgno)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GNode *node;
     gboolean retval = FALSE;
     gint total;
 
     node = iter->user_data;
     if (!node)
-        node = mailbox->msg_tree;
+        node = priv->msg_tree;
 
     total = libbalsa_mailbox_total_messages(mailbox);
     for (;;) {
@@ -4252,6 +4393,7 @@ gint
 libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
                                  LibBalsaMailbox * dest, GError ** err)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     GArray *msgnos = NULL;
     gint retval;
 
@@ -4261,7 +4403,7 @@ libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
         msgnos =
             LIBBALSA_MAILBOX_GET_CLASS(mailbox)->duplicate_msgnos(mailbox);
 
-    if (mailbox->state == LB_MAILBOX_STATE_CLOSED) {
+    if (priv->state == LB_MAILBOX_STATE_CLOSED) {
         /* duplicate msgnos was interrupted */
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_DUPLICATES_ERROR,
@@ -4310,8 +4452,10 @@ void
 libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
                                LibBalsaMessage * message)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-    if (!mailbox->mindex)
+    if (!priv->mindex)
         return;
     g_return_if_fail(msgno > 0);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
@@ -4323,18 +4467,19 @@ static void
 lbm_set_color(LibBalsaMailbox * mailbox, GArray * msgnos,
               const gchar * color, gboolean foreground)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     guint i;
 
     for (i = 0; i < msgnos->len; i++) {
         guint msgno = g_array_index(msgnos, guint, i);
         LibBalsaMailboxIndexEntry *entry;
 
-        if (msgno > mailbox->mindex->len)
+        if (msgno > priv->mindex->len)
             return;
 
-        entry = g_ptr_array_index(mailbox->mindex, msgno - 1);
+        entry = g_ptr_array_index(priv->mindex, msgno - 1);
         if (!entry)
-            entry = g_ptr_array_index(mailbox->mindex, msgno - 1) =
+            entry = g_ptr_array_index(priv->mindex, msgno - 1) =
                 g_new0(LibBalsaMailboxIndexEntry, 1);
 
         if (foreground) {
@@ -4370,4 +4515,274 @@ void libbalsa_mailbox_test_can_reach(LibBalsaMailbox          * mailbox,
     g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->test_can_reach(mailbox, cb, cb_data);
+}
+
+/*
+ * Getters
+ */
+
+GSList *
+libbalsa_mailbox_get_filters(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->filters;
+}
+
+const gchar *
+libbalsa_mailbox_get_name(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->name;
+}
+
+const gchar *
+libbalsa_mailbox_get_url(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->url;
+}
+
+glong
+libbalsa_mailbox_get_unread_messages(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->unread_messages;
+}
+
+guint
+libbalsa_mailbox_get_first_unread(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->first_unread;
+}
+
+LibBalsaCondition *
+libbalsa_mailbox_get_view_filter(LibBalsaMailbox * mailbox,
+                                 gboolean persistent)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return persistent ?  priv->persistent_view_filter : priv->view_filter;
+}
+
+GNode *
+libbalsa_mailbox_get_msg_tree(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->msg_tree;
+}
+
+gboolean
+libbalsa_mailbox_get_msg_tree_changed(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->msg_tree_changed;
+}
+
+LibBalsaMailboxState
+libbalsa_mailbox_get_state(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->state;
+}
+
+LibBalsaMailboxIndexEntry *
+libbalsa_mailbox_get_index_entry(LibBalsaMailbox * mailbox, guint msgno)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return (LibBalsaMailboxIndexEntry *) g_ptr_array_index(priv->mindex, msgno - 1);
+}
+
+LibBalsaMailboxView *
+libbalsa_mailbox_get_view(LibBalsaMailbox * mailbox)
+{
+    return lbm_get_view(mailbox);
+}
+
+gint
+libbalsa_mailbox_get_stamp(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->stamp;
+}
+
+guint
+libbalsa_mailbox_get_open_ref(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->open_ref;
+}
+
+gboolean
+libbalsa_mailbox_get_readonly(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->readonly;
+}
+
+const gchar *
+libbalsa_mailbox_get_config_prefix(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->config_prefix;
+}
+
+gboolean
+libbalsa_mailbox_get_has_unread_messages(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    return priv->has_unread_messages;
+}
+
+/*
+ * Setters
+ */
+
+void
+libbalsa_mailbox_clear_unread_messages(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    priv->unread_messages = 0;
+}
+
+void
+libbalsa_mailbox_set_filters(LibBalsaMailbox * mailbox, GSList * filters)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    libbalsa_clear_slist(&priv->filters, g_free);
+    priv->filters = filters;
+}
+
+void
+libbalsa_mailbox_set_url(LibBalsaMailbox * mailbox, const gchar * url)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    g_free(priv->url);
+    priv->url = g_strdup(url);
+}
+
+void
+libbalsa_mailbox_set_first_unread(LibBalsaMailbox * mailbox, guint first)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    priv->first_unread = first;
+}
+
+void
+libbalsa_mailbox_set_msg_tree_changed(LibBalsaMailbox * mailbox, gboolean changed)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    priv->msg_tree_changed = changed;
+}
+
+void
+libbalsa_mailbox_set_is_directory(LibBalsaMailbox * mailbox, gboolean is_directory)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    priv->is_directory = is_directory;
+}
+
+void
+libbalsa_mailbox_set_readonly(LibBalsaMailbox * mailbox, gboolean readonly)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    priv->readonly = readonly;
+}
+
+void
+libbalsa_mailbox_set_no_reassemble(LibBalsaMailbox * mailbox, gboolean no_reassemble)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    priv->no_reassemble = no_reassemble;
+}
+
+void
+libbalsa_mailbox_set_name(LibBalsaMailbox * mailbox, const gchar * name)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    g_free(priv->name);
+    priv->name = g_strdup(name);
+}
+
+void
+libbalsa_mailbox_set_view(LibBalsaMailbox * mailbox, LibBalsaMailboxView * view)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    libbalsa_mailbox_view_free(priv->view);
+    priv->view = view;
+}
+
+void
+libbalsa_mailbox_set_has_unread_messages(LibBalsaMailbox * mailbox,
+                                         gboolean has_unread_messages)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    priv->has_unread_messages = has_unread_messages;
+}
+
+void
+libbalsa_mailbox_set_config_prefix(LibBalsaMailbox * mailbox,
+                                   const gchar * config_prefix)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    g_free(priv->config_prefix);
+    priv->config_prefix = g_strdup(config_prefix);
+}
+
+/*
+ * Incrementers
+ */
+
+void
+libbalsa_mailbox_add_to_unread_messages(LibBalsaMailbox * mailbox, glong count)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    priv->unread_messages += count;
+}
+
+/*
+ * Locking
+ */
+
+void
+libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    g_rec_mutex_lock(&priv->rec_mutex);
+}
+
+void
+libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    g_rec_mutex_unlock(&priv->rec_mutex);
 }

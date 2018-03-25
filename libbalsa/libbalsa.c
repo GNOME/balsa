@@ -723,59 +723,6 @@ libbalsa_am_i_subthread(void)
     return g_thread_self() != main_thread_id;
 }
 
-
-#include "libbalsa_private.h"	/* for prototypes */
-static GMutex mailbox_mutex;
-static GCond  mailbox_cond;
-
-/* Lock/unlock a mailbox; no argument checking--we'll assume the caller
- * took care of that. 
- */
-#define LIBBALSA_DEBUG_THREADS FALSE
-void
-libbalsa_lock_mailbox(LibBalsaMailbox * mailbox)
-{
-	GThread *thread_id = g_thread_self();
-
-    g_mutex_lock(&mailbox_mutex);
-
-    if (mailbox->thread_id && mailbox->thread_id != thread_id)
-        while (mailbox->lock)
-            g_cond_wait(&mailbox_cond, &mailbox_mutex);
-
-    /* We'll assume that no-one would destroy a mailbox while we've been
-     * trying to lock it. If they have, we have larger problems than
-     * this reference! */
-    mailbox->lock++;
-    mailbox->thread_id = thread_id;
-
-    g_mutex_unlock(&mailbox_mutex);
-}
-
-void
-libbalsa_unlock_mailbox(LibBalsaMailbox * mailbox)
-{
-	GThread *self;
-
-    self = g_thread_self();
-
-    g_mutex_lock(&mailbox_mutex);
-
-    if (mailbox->lock == 0 || self != mailbox->thread_id) {
-	g_warning("Not holding mailbox lock!!!");
-        g_mutex_unlock(&mailbox_mutex);
-	return;
-    }
-
-    if(--mailbox->lock == 0) {
-        mailbox->thread_id = 0;
-        g_cond_broadcast(&mailbox_cond);
-    }
-
-    g_mutex_unlock(&mailbox_mutex);
-}
-
-
 /* Initialized by the front end. */
 void (*libbalsa_progress_set_text) (LibBalsaProgress * progress,
                                     const gchar * text, guint total);

@@ -1327,6 +1327,7 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
     gchar *tmp;
+    const gchar *url;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     mailbox = mbnode->mailbox;
@@ -1335,13 +1336,14 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
 	return FALSE;
 
     /* First we free the filters list (which is now obsolete) */
-    libbalsa_clear_slist(&mailbox->filters, g_free);
+    libbalsa_mailbox_set_filters(mailbox, NULL);
     /* Second we replace old filters name by the new ones
      * Note : deleted filters are also removed */
     if (!filters_names_changes)
 	return FALSE;
-    tmp = mailbox_filters_section_lookup(mailbox->url ?
-					 mailbox->url : mailbox->name);
+    url = libbalsa_mailbox_get_url(mailbox);
+    tmp = mailbox_filters_section_lookup(url != NULL ?  url :
+                                         libbalsa_mailbox_get_name(mailbox));
     if (tmp) {
 	gchar **filters_names = NULL;
 	gboolean def;

@@ -447,7 +447,7 @@ lbs_message_queue_real(LibBalsaMessage    *message,
 
     if (fccbox != NULL) {
         g_mime_object_set_header(GMIME_OBJECT(message->mime_msg), "X-Balsa-Fcc",
-                                 fccbox->url);
+                                 libbalsa_mailbox_get_url(fccbox));
     }
     g_mime_object_set_header(GMIME_OBJECT(message->mime_msg), "X-Balsa-DSN",
                              message->request_dsn ? "1" : "0");
@@ -645,9 +645,9 @@ lbs_check_reachable_cb(GObject  *object,
 	} else {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Cannot reach SMTP server %s (%s), any queued message will remain in %s."),
-							 libbalsa_smtp_server_get_name(smtp_server),
-							 libbalsa_server_get_host(LIBBALSA_SERVER(smtp_server)),
-							 send_info->outbox->name);
+                             libbalsa_smtp_server_get_name(smtp_server),
+                             libbalsa_server_get_host(LIBBALSA_SERVER(smtp_server)),
+                             libbalsa_mailbox_get_name(send_info->outbox));
 	}
 
 	if (!thread_started) {
@@ -938,20 +938,23 @@ balsa_send_message_success(MessageQueueItem *mqi,
 
 		if (fccurl != NULL) {
 			LibBalsaMailbox *fccbox = info->finder(fccurl);
+                        const gchar *fccname = libbalsa_mailbox_get_name(fccbox);
 			GError *err = NULL;
 
 			if (!info->no_dialog) {
 				libbalsa_progress_dialog_update(&send_progress_dialog, info->progress_id, FALSE, NAN,
-					_("Save message in %s…"), fccbox->name);
+					_("Save message in %s…"), fccname);
 			}
 
 			libbalsa_message_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_FLAGGED);
 			libbalsa_mailbox_sync_storage(mqi->orig->mailbox, FALSE);
 			remove = libbalsa_message_copy(mqi->orig, fccbox, &err);
 			if (!remove) {
-				libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Saving sent message to %s failed: %s"), fccbox->name,
-					err ? err->message : "?");
-				g_clear_error(&err);
+                            libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+                                                 _("Saving sent message to %s failed: %s"),
+                                                 fccname,
+                                                 err != NULL ? err->message : "?");
+                            g_clear_error(&err);
 			}
 		}
 

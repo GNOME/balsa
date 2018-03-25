@@ -332,7 +332,10 @@ update_view_defaults(const gchar * group, const gchar * url,
     LibBalsaMailboxView *view;
 
     mailbox = balsa_find_mailbox_by_url(url);
-    view = mailbox ? mailbox->view : config_load_mailbox_view(url);
+    view =
+        mailbox !=
+        NULL ? libbalsa_mailbox_get_view(mailbox) :
+        config_load_mailbox_view(url);
 
     if (!view)
         return FALSE;
@@ -961,7 +964,7 @@ static void
 add_other_server(BalsaMailboxNode * mbnode, GtkTreeModel * model)
 {
     gchar *protocol = NULL;
-    gchar *name = NULL;
+    const gchar *name = NULL;
     gboolean append = FALSE;
 
     if (mbnode) {
@@ -969,7 +972,7 @@ add_other_server(BalsaMailboxNode * mbnode, GtkTreeModel * model)
         if (mailbox) {
             if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
                 protocol = "IMAP";
-                name = mailbox->name;
+                name = libbalsa_mailbox_get_name(mailbox);
                 append = TRUE;
             }
         } else
@@ -3557,7 +3560,7 @@ update_mail_servers(void)
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                            MS_PROT_COLUMN, protocol,
-                           MS_NAME_COLUMN, mbnode->mailbox->name,
+                           MS_NAME_COLUMN, libbalsa_mailbox_get_name(mbnode->mailbox),
                            MS_DATA_COLUMN, mbnode, -1);
     }
     /*

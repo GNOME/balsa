@@ -480,8 +480,11 @@ address_book_response(GtkWidget * ab, gint response,
 static void
 sw_delete_draft(BalsaSendmsg * bsmsg)
 {
-    LibBalsaMessage *message = bsmsg->draft_message;
-    if (message && message->mailbox && !message->mailbox->readonly)
+    LibBalsaMessage *message;
+
+    message = bsmsg->draft_message;
+    if (message != NULL && message->mailbox != NULL
+        && !libbalsa_mailbox_get_readonly(message->mailbox))
         libbalsa_message_change_flags(message,
                                       LIBBALSA_MESSAGE_FLAG_DELETED, 0);
 }
@@ -2582,8 +2585,9 @@ create_info_pane(BalsaSendmsg * bsmsg)
 #undef REPLY_TO_ROW
 
     /* fcc: mailbox folder where the message copy will be written to */
-    if (!balsa_app.fcc_mru)
-        balsa_mblist_mru_add(&balsa_app.fcc_mru, balsa_app.sentbox->url);
+    if (balsa_app.fcc_mru == NULL)
+        balsa_mblist_mru_add(&balsa_app.fcc_mru,
+                             libbalsa_mailbox_get_url(balsa_app.sentbox));
     balsa_mblist_mru_add(&balsa_app.fcc_mru, "");
     if (balsa_app.copy_to_sentbox) {
         /* move the NULL option to the bottom */
@@ -5236,7 +5240,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                                        bsmsg->flow, &error);
     if (result == LIBBALSA_MESSAGE_CREATE_OK) {
 	if (bsmsg->parent_message && bsmsg->parent_message->mailbox
-            && !bsmsg->parent_message->mailbox->readonly)
+            && !libbalsa_mailbox_get_readonly(bsmsg->parent_message->mailbox))
 	    libbalsa_message_reply(bsmsg->parent_message);
         sw_delete_draft(bsmsg);
     }

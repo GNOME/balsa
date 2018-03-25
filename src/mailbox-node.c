@@ -195,7 +195,7 @@ balsa_mailbox_node_dispose(GObject * object)
     if (mailbox != NULL) {
         libbalsa_mailbox_set_open(mailbox,
                                   libbalsa_mailbox_is_open(mailbox));
-        config_save_mailbox_view(mailbox->url, mailbox->view);
+        config_save_mailbox_view(libbalsa_mailbox_get_url(mailbox), libbalsa_mailbox_get_view(mailbox));
 	if (balsa_app.main_window != NULL) {
 	    balsa_window_close_mbnode(balsa_app.main_window, mn);
         }
@@ -402,8 +402,10 @@ load_mailbox_view(BalsaMailboxNode * mbnode)
 {
     LibBalsaMailbox *mailbox = mbnode->mailbox;
 
-    if (!mailbox->view)
-        mailbox->view = config_load_mailbox_view(mailbox->url);
+    if (!libbalsa_mailbox_get_view(mailbox))
+        libbalsa_mailbox_set_view(mailbox,
+                                  config_load_mailbox_view
+                                  (libbalsa_mailbox_get_url(mailbox)));
 }
 
 static gboolean
@@ -430,10 +432,10 @@ imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
     libbalsa_mailbox_imap_set_path(m, isi->fn);
     if(balsa_app.debug)
         printf("imap_scan_attach_mailbox: add mbox of name %s "
-	       "(full path %s)\n", isi->fn, mailbox->url);
+	       "(full path %s)\n", isi->fn, libbalsa_mailbox_get_url(mailbox));
     /* avoid allocating the name again: */
-    mailbox->name = mbnode->name;
-    mbnode->name = NULL;
+    libbalsa_mailbox_set_name(mailbox, mbnode->name);
+    g_clear_pointer(&mbnode->name, g_free);
     mbnode->mailbox = mailbox;
     load_mailbox_view(mbnode);
     if (isi->special) {
@@ -443,7 +445,7 @@ imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
         *isi->special = mailbox;
 	g_object_add_weak_pointer(G_OBJECT(m), (gpointer) isi->special);
         if (isi->special == &balsa_app.outbox)
-            mailbox->no_reassemble = TRUE;
+            libbalsa_mailbox_set_no_reassemble(mailbox, TRUE);
     }
 
     return TRUE;
@@ -562,7 +564,8 @@ balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox * mb)
     if (LIBBALSA_IS_MAILBOX_MH(mb) || LIBBALSA_IS_MAILBOX_MAILDIR(mb)) {
 	/* Mh and Maildir mailboxes are directories, and may be nested,
 	 * so we need to be able to append a subtree. */
-	mbn->name = g_strdup(libbalsa_mailbox_local_get_path(mb));
+	mbn->name =
+            g_strdup(libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mb));
 	mbn->dir = g_strdup(mbn->name);
 	g_signal_connect(G_OBJECT(mbn), "append-subtree", 
                          G_CALLBACK(read_dir_cb), NULL);
@@ -735,7 +738,7 @@ balsa_mailbox_local_append(LibBalsaMailbox* mbx)
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mbx));
 
-    dir = g_strdup(libbalsa_mailbox_local_get_path(mbx));
+    dir = g_strdup(libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mbx));
     while (dir[1] /* i.e. dir != "/" */
            && !(parent = find_dir(dir))) {
         gchar* tmp =  g_path_get_dirname(dir);
@@ -882,17 +885,19 @@ bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
             gboolean has_unread_messages = FALSE;
 
             if (mn->mailbox)
-                has_unread_messages = mn->mailbox->has_unread_messages;
+                has_unread_messages =
+                    libbalsa_mailbox_get_has_unread_messages(mn->mailbox);
             balsa_mailbox_node_rescan(mn);
             if (!l->data)
                 continue;
             if (mn->mailbox)
-                mn->mailbox->has_unread_messages = has_unread_messages;
+                libbalsa_mailbox_set_has_unread_messages
+                    (mn->mailbox, has_unread_messages);
             mn->scanned = TRUE;
         } else if (balsa_app.debug)
             g_print("%s: %s “%s” was already scanned\n", __func__,
                     mn->mailbox ? "mailbox" : "folder",
-                    mn->mailbox ? mn->mailbox->name : mn->name);
+                    mn->mailbox ? libbalsa_mailbox_get_name(mn->mailbox) : mn->name);
         g_object_remove_weak_pointer(G_OBJECT(mn), & l->data);
     }
     g_slist_free(list);
@@ -1175,15 +1180,25 @@ remove_special_mailbox_by_url(const gchar* url, LibBalsaMailbox *** special)
 {
     LibBalsaMailbox **mailbox;
 
-    if (balsa_app.trash && strcmp(url, balsa_app.trash->url) == 0)
+    if (balsa_app.trash && strcmp(url,
+                                  libbalsa_mailbox_get_url(balsa_app.trash))
+            == 0)
 	mailbox = &balsa_app.trash;
-    else if (balsa_app.inbox && strcmp(url, balsa_app.inbox->url) == 0)
+    else if (balsa_app.inbox && strcmp(url,
+                                       libbalsa_mailbox_get_url(balsa_app.inbox))
+            == 0)
 	mailbox = &balsa_app.inbox;
-    else if (balsa_app.outbox && strcmp(url, balsa_app.outbox->url) == 0)
+    else if (balsa_app.outbox && strcmp(url,
+                                        libbalsa_mailbox_get_url(balsa_app.outbox))
+            == 0)
 	mailbox = &balsa_app.outbox;
-    else if (balsa_app.sentbox && strcmp(url, balsa_app.sentbox->url) == 0)
+    else if (balsa_app.sentbox && strcmp(url,
+                                         libbalsa_mailbox_get_url(balsa_app.sentbox))
+            == 0)
 	mailbox = &balsa_app.sentbox;
-    else if (balsa_app.draftbox && strcmp(url, balsa_app.draftbox->url) == 0)
+    else if (balsa_app.draftbox && strcmp(url,
+                                          libbalsa_mailbox_get_url(balsa_app.draftbox))
+            == 0)
 	mailbox = &balsa_app.draftbox;
     else
         mailbox = NULL;
@@ -1232,13 +1247,13 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
 	    printf("Not accessible mailbox %s\n", path);
 	    return NULL;
 	}
-	mailbox->name = g_strdup(name);
+	libbalsa_mailbox_set_name(mailbox, name);
 	
 	mbnode = balsa_mailbox_node_new_from_mailbox(mailbox);
 	
 	if (balsa_app.debug)
 	    g_print(_("Local mailbox %s loaded as: %s\n"),
-		    mailbox->name,
+		    libbalsa_mailbox_get_name(mailbox),
 		    g_type_name(G_OBJECT_TYPE(mailbox)));
         if (balsa_app.check_mail_upon_startup
             && libbalsa_mailbox_get_subscribe(mailbox) !=

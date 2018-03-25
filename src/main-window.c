@@ -2453,7 +2453,7 @@ bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     }
     bw_action_set_enabled(window, "mailbox-expunge",
     /* cppcheck-suppress nullPointer */
-                          mailbox && !mailbox->readonly);
+                          mailbox && !libbalsa_mailbox_get_readonly(mailbox));
 
     bw_actions_set_enabled(window, mailbox_actions,
                            G_N_ELEMENTS(mailbox_actions), enable);
@@ -2509,7 +2509,8 @@ bw_enable_message_menus(BalsaWindow * window, guint msgno)
     bw_actions_set_enabled(window, message_actions,
                            G_N_ELEMENTS(message_actions), enable);
 
-    enable_mod = (enable && !bindex->mailbox_node->mailbox->readonly);
+    enable_mod =
+        (enable && !libbalsa_mailbox_get_readonly(bindex->mailbox_node->mailbox));
     bw_actions_set_enabled(window, modify_message_actions,
                            G_N_ELEMENTS(modify_message_actions),
                            enable_mod);
@@ -2761,7 +2762,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
 
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
 
-    lab = gtk_label_new(mbnode->mailbox->name);
+    lab = gtk_label_new(libbalsa_mailbox_get_name(mbnode->mailbox));
     gtk_widget_set_name(lab, "balsa-notebook-tab-label");
 
     /* Try to make text not bold: */
@@ -2792,7 +2793,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
                      G_CALLBACK(bw_mailbox_tab_close_cb), mbnode);
     gtk_box_pack_start(GTK_BOX(box), but);
 
-    gtk_widget_set_tooltip_text(box, mbnode->mailbox->url);
+    gtk_widget_set_tooltip_text(box, libbalsa_mailbox_get_url(mbnode->mailbox));
     return box;
 }
 
@@ -2948,7 +2949,7 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
          (balsa_app.layout_type == LAYOUT_WIDE_SCREEN)
          ? BALSA_INDEX_NARROW : BALSA_INDEX_WIDE);
 
-    message = g_strdup_printf(_("Opening %s"), mailbox->name);
+    message = g_strdup_printf(_("Opening %s"), libbalsa_mailbox_get_name(mailbox));
     balsa_window_increase_activity(window, message);
 
     info = g_new(BalsaWindowRealOpenMbnodeInfo, 1);
@@ -3178,7 +3179,7 @@ bw_check_mailbox_progress_cb(LibBalsaMailbox* mailbox, gint action, gdouble frac
 {
 	gchar *progress_id;
 
-	progress_id = g_strdup_printf("POP3: %s", mailbox->name);
+	progress_id = g_strdup_printf("POP3: %s", libbalsa_mailbox_get_name(mailbox));
 	if (action == LIBBALSA_NTFY_INIT) {
 		libbalsa_progress_dialog_ensure(&progress_dialog, _("Checking Mail…"), GTK_WINDOW(balsa_app.main_window), progress_id);
 	}
@@ -3235,7 +3236,7 @@ bw_check_mailbox_list(struct check_messages_thread_info *info, GList *mailbox_li
         		g_signal_connect(G_OBJECT(mailbox), "progress-notify", G_CALLBACK(bw_check_mailbox_progress_cb), mailbox);
         }
         bw_pop_mbox->thread = g_thread_new(NULL, (GThreadFunc) bw_check_mailbox, mailbox);
-        g_debug("launched thread %p for checking POP3 mailbox %s", bw_pop_mbox->thread, mailbox->name);
+        g_debug("launched thread %p for checking POP3 mailbox %s", bw_pop_mbox->thread, libbalsa_mailbox_get_name(mailbox));
         check_mbx = g_list_prepend(check_mbx, bw_pop_mbox);
     }
 
@@ -3373,10 +3374,10 @@ check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
     if (notify) {
         gint num_new, has_new;
 
-        num_new = mailbox->unread_messages - info->unread_messages;
+        num_new = libbalsa_mailbox_get_unread_messages(mailbox) - info->unread_messages;
         if (num_new < 0)
             num_new = 0;
-        has_new = mailbox->has_unread_messages - info->has_unread_messages;
+        has_new = libbalsa_mailbox_get_has_unread_messages(mailbox) - info->has_unread_messages;
         if (has_new < 0)
             has_new = 0;
 
@@ -3384,8 +3385,8 @@ check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
 	    bw_display_new_mail_notification(num_new, has_new);
     }
 
-    info->unread_messages = mailbox->unread_messages;
-    info->has_unread_messages = mailbox->has_unread_messages;
+    info->unread_messages = libbalsa_mailbox_get_unread_messages(mailbox);
+    info->has_unread_messages = libbalsa_mailbox_get_has_unread_messages(mailbox);
 }
 
 /* this one is called only in the threaded code */
@@ -3395,7 +3396,7 @@ bw_mailbox_check(LibBalsaMailbox * mailbox, struct check_messages_thread_info *i
     if (libbalsa_mailbox_get_subscribe(mailbox) == LB_MAILBOX_SUBSCRIBE_NO)
         return;
 
-    g_debug("checking mailbox %s", mailbox->name);
+    g_debug("checking mailbox %s", libbalsa_mailbox_get_name(mailbox));
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
     	if ((info->window != NULL) && !info->window->network_available) {
     		return;
@@ -3403,12 +3404,12 @@ bw_mailbox_check(LibBalsaMailbox * mailbox, struct check_messages_thread_info *i
 
     	if (info->with_progress_dialog) {
     		libbalsa_progress_dialog_update(&progress_dialog, _("Mailboxes"), FALSE, INFINITY,
-    			_("IMAP mailbox: %s"), mailbox->url);
+    			_("IMAP mailbox: %s"), libbalsa_mailbox_get_url(mailbox));
     	}
     } else if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
     	if (info->with_progress_dialog) {
     		libbalsa_progress_dialog_update(&progress_dialog, _("Mailboxes"), FALSE, INFINITY,
-    			_("Local mailbox: %s"), mailbox->name);
+    			_("Local mailbox: %s"), libbalsa_mailbox_get_name(mailbox));
     	}
     } else {
     	g_assert_not_reached();
@@ -4192,12 +4193,12 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     time(&index->mailbox_node->last_use);
 
     mailbox = index->mailbox_node->mailbox;
-    if (mailbox->name) {
-        if (mailbox->readonly) {
+    if (libbalsa_mailbox_get_name(mailbox)) {
+        if (libbalsa_mailbox_get_readonly(mailbox)) {
             title =
-                g_strdup_printf(_("Balsa: %s (read-only)"), mailbox->name);
+                g_strdup_printf(_("Balsa: %s (read-only)"), libbalsa_mailbox_get_name(mailbox));
         } else {
-            title = g_strdup_printf(_("Balsa: %s"), mailbox->name);
+            title = g_strdup_printf(_("Balsa: %s"), libbalsa_mailbox_get_name(mailbox));
         }
         gtk_window_set_title(GTK_WINDOW(window), title);
         g_free(title);
@@ -4223,7 +4224,7 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     balsa_index_ensure_visible(index);
 
     g_free(balsa_app.current_mailbox_url);
-    balsa_app.current_mailbox_url = g_strdup(mailbox->url);
+    balsa_app.current_mailbox_url = g_strdup(libbalsa_mailbox_get_url(mailbox));
 }
 
 static void
@@ -4677,19 +4678,19 @@ void
 balsa_window_set_statusbar(BalsaWindow * window, LibBalsaMailbox * mailbox)
 {
     gint total_messages = libbalsa_mailbox_total_messages(mailbox);
-    gint unread_messages = mailbox->unread_messages;
+    gint unread_messages = libbalsa_mailbox_get_unread_messages(mailbox);
     gint hidden_messages;
     GString *desc = g_string_new(NULL);
     GtkStatusbar *statusbar;
     guint context_id;
 
     hidden_messages =
-        mailbox->msg_tree ? total_messages -
-        (g_node_n_nodes(mailbox->msg_tree, G_TRAVERSE_ALL) - 1) : 0;
+        libbalsa_mailbox_get_msg_tree(mailbox) ? total_messages -
+        (g_node_n_nodes(libbalsa_mailbox_get_msg_tree(mailbox), G_TRAVERSE_ALL) - 1) : 0;
 
     /* xgettext: this is the first part of the message
      * "Shown mailbox: %s with %d messages, %d new, %d hidden". */
-    g_string_append_printf(desc, _("Shown mailbox: %s "), mailbox->name);
+    g_string_append_printf(desc, _("Shown mailbox: %s "), libbalsa_mailbox_get_name(mailbox));
     if (total_messages > 0) {
         /* xgettext: this is the second part of the message
          * "Shown mailbox: %s with %d messages, %d new, %d hidden". */
@@ -4754,13 +4755,13 @@ balsa_window_next_unread(BalsaWindow * window)
                                    GTK_MESSAGE_QUESTION,
                                    GTK_BUTTONS_YES_NO,
                                    _("The next unread message is in %s"),
-                                   mailbox->name);
+                                   libbalsa_mailbox_get_name(mailbox));
 #if HAVE_MACOSX_DESKTOP
         libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(window));
 #endif
         gtk_message_dialog_format_secondary_text
             (GTK_MESSAGE_DIALOG(dialog),
-             _("Do you want to select %s?"), mailbox->name);
+             _("Do you want to select %s?"), libbalsa_mailbox_get_name(mailbox));
         gtk_dialog_set_default_response(GTK_DIALOG(dialog),
                                         GTK_RESPONSE_YES);
         response = gtk_dialog_run(GTK_DIALOG(dialog));

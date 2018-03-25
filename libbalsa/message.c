@@ -566,11 +566,11 @@ libbalsa_message_change_flags(LibBalsaMessage * message,
     g_return_if_fail(LIBBALSA_IS_MAILBOX(message->mailbox));
     g_return_if_fail(message->msgno > 0);
 
-    if (message->mailbox->readonly) {
+    if (libbalsa_mailbox_get_readonly(message->mailbox)) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Mailbox (%s) is read-only: "
                                "cannot change flags."),
-                             message->mailbox->name);
+                             libbalsa_mailbox_get_name(message->mailbox));
         return;
     }
 

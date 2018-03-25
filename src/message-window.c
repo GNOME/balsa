@@ -319,7 +319,8 @@ mw_set_buttons_sensitive(MessageWindow * mw)
     enable = index && balsa_index_previous_msgno(index, current_msgno) > 0;
     mw_set_enabled(mw, "previous-message", enable);
 
-    enable = index && index->mailbox_node->mailbox->unread_messages > 0;
+    enable = index != NULL &&
+        libbalsa_mailbox_get_unread_messages(index->mailbox_node->mailbox) > 0;
     mw_set_enabled(mw, "next-unread", enable);
 
     enable = index
@@ -885,7 +886,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
                           &move_menu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(move_menu), submenu);
 
-    if (mailbox->readonly) {
+    if (libbalsa_mailbox_get_readonly(mailbox)) {
 	gtk_widget_set_sensitive(move_menu, FALSE);
 	mw_disable_trash(mw);
     }

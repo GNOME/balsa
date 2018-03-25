@@ -28,24 +28,19 @@
 #include <gdk/gdk.h>
 #include <gmime/gmime.h>
 
-#define LIBBALSA_TYPE_MAILBOX \
-    (libbalsa_mailbox_get_type())
-#define LIBBALSA_MAILBOX(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX, LibBalsaMailbox))
-#define LIBBALSA_MAILBOX_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX, \
-                              LibBalsaMailboxClass))
-#define LIBBALSA_IS_MAILBOX(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX))
-#define LIBBALSA_IS_MAILBOX_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX))
-#define LIBBALSA_MAILBOX_GET_CLASS(mailbox) \
-    (G_TYPE_INSTANCE_GET_CLASS ((mailbox), LIBBALSA_TYPE_MAILBOX, \
-				LibBalsaMailboxClass))
+#define LIBBALSA_TYPE_MAILBOX (libbalsa_mailbox_get_type())
 
-#define MAILBOX_OPEN(mailbox)     (mailbox->state != LB_MAILBOX_STATE_CLOSED)
+G_DECLARE_DERIVABLE_TYPE(LibBalsaMailbox,
+                         libbalsa_mailbox,
+                         LIBBALSA,
+                         MAILBOX,
+                         GObject)
 
-#define MAILBOX_CLOSED(mailbox)   (mailbox->state == LB_MAILBOX_STATE_CLOSED)
+#define MAILBOX_OPEN(mailbox) \
+        (libbalsa_mailbox_get_state(mailbox) != LB_MAILBOX_STATE_CLOSED)
+
+#define MAILBOX_CLOSED(mailbox) \
+        (libbalsa_mailbox_get_state(mailbox) == LB_MAILBOX_STATE_CLOSED)
 
 #define RETURN_IF_MAILBOX_CLOSED(mailbox)\
 do {\
@@ -145,7 +140,6 @@ enum LibBalsaMailboxCapability {
 /*
  * structures
  */
-typedef struct _LibBalsaMailboxClass LibBalsaMailboxClass;
 
 typedef struct _LibBalsaMailboxView LibBalsaMailboxView;
 struct _LibBalsaMailboxView {
@@ -182,69 +176,6 @@ struct _LibBalsaMailboxView {
     int unread;
     int total;
     time_t mtime;       /* Mailbox mtime when counts were cached. */
-};
-
-struct _LibBalsaMailbox {
-    GObject object;
-    gint stamp; /* used to determine iterators' validity. Increased on each
-                 * modification of mailbox. */
-    
-    gchar *config_prefix;       /* unique string identifying mailbox */
-                                /* in the config file                */
-    gchar *name;                /* displayed name for a special mailbox; */
-                                /* Isn't it a GUI thing?                 */
-    gchar *url; /* Unique resource locator, file://, imap:// etc */
-    guint open_ref;
-    
-    int lock; /* 0 if mailbox is unlocked; */
-              /* >0 if mailbox is (recursively locked). */
-    GThread *thread_id; /* id of thread that locked the mailbox */
-    gboolean is_directory;
-    gboolean readonly;
-    gboolean disconnected;
-
-    GPtrArray *mindex;  /* the basic message index used for index
-                         * displaying/columns of GtkTreeModel interface
-                         * and NOTHING else. */
-    GNode *msg_tree; /* the possibly filtered tree of messages;
-                      * gdk lock MUST BE HELD when accessing. */
-    LibBalsaCondition *view_filter; /* to choose a subset of messages
-                                     * to be displayed, e.g., only
-                                     * undeleted. */
-    LibBalsaCondition *persistent_view_filter; /* the part of the view 
-                                                * filter that will persist 
-                                                * to the next time the
-                                                * mailbox is opened */
-    gboolean view_filter_pending;  /* a view filter has been set
-                                    * but the view has not been updated */
-
-    /* info fields */
-    gboolean has_unread_messages;
-    glong unread_messages; /* number of unread messages in the mailbox */
-    unsigned first_unread; /* set to 0 if there is no unread present.
-                            * used for automatical scrolling down on opening.
-                            */
-    /* Associated filters (struct mailbox_filter) */
-    GSList * filters;
-    gboolean filters_loaded;
-
-    LibBalsaMailboxView *view;
-    LibBalsaMailboxState state;
-
-    /* Whether to reassemble a message from its parts. */
-    gboolean no_reassemble;
-
-    /* Whether the tree has been changed since some event. */
-    gboolean msg_tree_changed;
-
-    /* Array of msgnos that need to be displayed. */
-    GArray *msgnos_pending;
-    /* Array of msgnos that have been changed. */
-    GArray *msgnos_changed;
-
-    guint changed_idle_id;
-    guint queue_check_idle_id;
-    guint need_threading_idle_id;
 };
 
 /* Search iter */
@@ -329,8 +260,6 @@ struct _LibBalsaMailboxClass {
                             LibBalsaCanReachCallback * cb,
                             gpointer                   cb_data);
 };
-
-GType libbalsa_mailbox_get_type(void);
 
 LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
 
@@ -671,5 +600,51 @@ typedef enum {
 } LibBalsaMailboxColumn;
 
 extern gchar **libbalsa_mailbox_date_format;
+
+/*
+ * Getters
+ */
+GSList * libbalsa_mailbox_get_filters(LibBalsaMailbox * mailbox);
+const gchar * libbalsa_mailbox_get_name(LibBalsaMailbox * mailbox);
+const gchar * libbalsa_mailbox_get_url(LibBalsaMailbox * mailbox);
+glong libbalsa_mailbox_get_unread_messages(LibBalsaMailbox * mailbox);
+guint libbalsa_mailbox_get_first_unread(LibBalsaMailbox * mailbox);
+LibBalsaCondition * libbalsa_mailbox_get_view_filter(LibBalsaMailbox * mailbox,
+                                                     gboolean persistent);
+GNode * libbalsa_mailbox_get_msg_tree(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_get_msg_tree_changed(LibBalsaMailbox * mailbox);
+LibBalsaMailboxState libbalsa_mailbox_get_state(LibBalsaMailbox * mailbox);
+LibBalsaMailboxIndexEntry *libbalsa_mailbox_get_index_entry(LibBalsaMailbox * mailbox,
+                                                            guint msgno);
+LibBalsaMailboxView * libbalsa_mailbox_get_view(LibBalsaMailbox * mailbox);
+gint libbalsa_mailbox_get_stamp(LibBalsaMailbox * mailbox);
+guint libbalsa_mailbox_get_open_ref(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_get_readonly(LibBalsaMailbox * mailbox);
+const gchar * libbalsa_mailbox_get_config_prefix(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_get_has_unread_messages(LibBalsaMailbox * mailbox);
+
+/*
+ * Setters
+ */
+void libbalsa_mailbox_clear_unread_messages(LibBalsaMailbox * mailbox);
+void libbalsa_mailbox_set_filters(LibBalsaMailbox * mailbox, GSList * filters);
+void libbalsa_mailbox_set_url(LibBalsaMailbox * mailbox, const gchar * url);
+void libbalsa_mailbox_set_first_unread(LibBalsaMailbox * mailbox, guint first);
+void libbalsa_mailbox_set_msg_tree_changed(LibBalsaMailbox * mailbox, gboolean changed);
+void libbalsa_mailbox_set_is_directory(LibBalsaMailbox * mailbox, gboolean is_directory);
+void libbalsa_mailbox_set_readonly(LibBalsaMailbox * mailbox, gboolean readonly);
+void libbalsa_mailbox_set_no_reassemble(LibBalsaMailbox * mailbox,
+                                        gboolean no_reassemble);
+void libbalsa_mailbox_set_name(LibBalsaMailbox * mailbox, const gchar * name);
+void libbalsa_mailbox_set_view(LibBalsaMailbox * mailbox, LibBalsaMailboxView * view);
+void libbalsa_mailbox_set_has_unread_messages(LibBalsaMailbox * mailbox,
+                                              gboolean has_unread_messages);
+void libbalsa_mailbox_set_config_prefix(LibBalsaMailbox * mailbox,
+                                        const gchar * config_prefix);
+
+/*
+ * Incrementers
+ */
+void libbalsa_mailbox_add_to_unread_messages(LibBalsaMailbox * mailbox, glong count);
 
 #endif				/* __LIBBALSA_MAILBOX_H__ */

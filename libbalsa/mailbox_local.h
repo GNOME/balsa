@@ -23,26 +23,13 @@
 
 #include "libbalsa.h"
 
-#define LIBBALSA_TYPE_MAILBOX_LOCAL \
-    (libbalsa_mailbox_local_get_type())
-#define LIBBALSA_MAILBOX_LOCAL(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_LOCAL, \
-                                 LibBalsaMailboxLocal))
-#define LIBBALSA_MAILBOX_LOCAL_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX_LOCAL, \
-                              LibBalsaMailboxLocalClass))
-#define LIBBALSA_IS_MAILBOX_LOCAL(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_LOCAL))
-#define LIBBALSA_IS_MAILBOX_LOCAL_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_LOCAL))
-#define LIBBALSA_MAILBOX_LOCAL_GET_CLASS(mailbox) \
-    (G_TYPE_INSTANCE_GET_CLASS ((mailbox), LIBBALSA_TYPE_MAILBOX_LOCAL, \
-				LibBalsaMailboxLocalClass))
+#define LIBBALSA_TYPE_MAILBOX_LOCAL libbalsa_mailbox_local_get_type()
 
-GType libbalsa_mailbox_local_get_type(void);
-
-typedef struct _LibBalsaMailboxLocal LibBalsaMailboxLocal;
-typedef struct _LibBalsaMailboxLocalClass LibBalsaMailboxLocalClass;
+G_DECLARE_DERIVABLE_TYPE(LibBalsaMailboxLocal,
+                         libbalsa_mailbox_local,
+                         LIBBALSA,
+                         MAILBOX_LOCAL,
+                         LibBalsaMailbox)
 
 struct _LibBalsaMailboxLocalPool {
     LibBalsaMessage * message;
@@ -57,24 +44,6 @@ struct _LibBalsaMailboxLocalMessageInfo {
     gboolean loaded;
 };
 typedef struct _LibBalsaMailboxLocalMessageInfo LibBalsaMailboxLocalMessageInfo;
-
-struct _LibBalsaMailboxLocal {
-    LibBalsaMailbox mailbox;
-
-    guint sync_id;  /* id of the idle mailbox sync job  */
-    guint sync_time; /* estimated time of sync job execution (in seconds),
-                      * used to  throttle frequency of large mbox syncing. */
-    guint sync_cnt; /* we do not want to rely on the time of last sync since
-                     * some sync can be faster than others. Instead, we
-                     * average the syncing time for mailbox. */
-    guint thread_id;    /* id of the idle mailbox thread job */
-    guint save_tree_id; /* id of the idle mailbox save-tree job */
-    guint load_messages_id; /* id of the idle load-messages job */
-    guint msgno;            /* where to start loading messages */
-    GPtrArray *threading_info;
-    LibBalsaMailboxLocalPool message_pool[LBML_POOL_SIZE];
-    guint pool_seqno;
-};
 
 typedef gboolean LibBalsaMailboxLocalAddMessageFunc(LibBalsaMailboxLocal *
                                                     local,

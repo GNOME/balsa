@@ -54,12 +54,6 @@ struct message_info {
     ((((orig_flags) ^ (flags)) & LIBBALSA_MESSAGE_FLAGS_REAL) != 0)
 #define FLAGS_CHANGED(msg_info) \
     FLAGS_REALLY_DIFFER(msg_info->orig_flags, msg_info->local_info.flags)
-  
-
-static LibBalsaMailboxLocalClass *parent_class = NULL;
-
-static void libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass *klass);
-static void libbalsa_mailbox_maildir_init(LibBalsaMailboxMaildir * mailbox);
 
 /* Object class method */
 static void libbalsa_mailbox_maildir_finalize(GObject * object);
@@ -107,32 +101,23 @@ static void free_message_info(struct message_info *msg_info);
 static int libbalsa_mailbox_maildir_open_temp (const gchar *dest_path,
 					  char **name_used);
 
-GType
-libbalsa_mailbox_maildir_get_type(void)
-{
-    static GType mailbox_type = 0;
+struct _LibBalsaMailboxMaildir {
+    LibBalsaMailboxLocal parent;
 
-    if (!mailbox_type) {
-	static const GTypeInfo mailbox_info = {
-	    sizeof(LibBalsaMailboxMaildirClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_mailbox_maildir_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaMailboxMaildir),
-            0,                  /* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_mailbox_maildir_init
-	};
+    GHashTable* messages_info;
+    GPtrArray* msgno_2_msg_info;
+    gchar *curdir;
+    gchar *newdir;
+    gchar *tmpdir;
+};
 
-	mailbox_type =
-	    g_type_register_static(LIBBALSA_TYPE_MAILBOX_LOCAL,
-	                           "LibBalsaMailboxMaildir",
-                                   &mailbox_info, 0);
-    }
+struct _LibBalsaMailboxMaildirClass {
+    LibBalsaMailboxLocalClass klass;
+};
 
-    return mailbox_type;
-}
+G_DEFINE_TYPE(LibBalsaMailboxMaildir,
+              libbalsa_mailbox_maildir,
+              LIBBALSA_TYPE_MAILBOX_LOCAL)
 
 static void
 libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
@@ -144,8 +129,6 @@ libbalsa_mailbox_maildir_class_init(LibBalsaMailboxMaildirClass * klass)
     object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
     libbalsa_mailbox_local_class = LIBBALSA_MAILBOX_LOCAL_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     object_class->finalize = libbalsa_mailbox_maildir_finalize;
 
@@ -286,8 +269,7 @@ libbalsa_mailbox_maildir_finalize(GObject * object)
     g_free(mdir->tmpdir);
     mdir->tmpdir = NULL;
 
-    if (G_OBJECT_CLASS(parent_class)->finalize)
-	G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(libbalsa_mailbox_maildir_parent_class)->finalize(object);
 }
 
 static void
@@ -301,7 +283,7 @@ libbalsa_mailbox_maildir_load_config(LibBalsaMailbox * mailbox,
     lbm_maildir_set_subdirs(mdir, path);
     g_free(path);
 
-    LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
+    LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_maildir_parent_class)->load_config(mailbox, prefix);
 }
 
 static GMimeStream *
@@ -343,7 +325,7 @@ lbm_maildir_remove_files(LibBalsaMailboxLocal *mailbox)
 			     _("Could not remove %s:\n%s"),
 			     path, strerror(errno));
     }
-    LIBBALSA_MAILBOX_LOCAL_CLASS(parent_class)->remove_files(mailbox);
+    LIBBALSA_MAILBOX_LOCAL_CLASS(libbalsa_mailbox_maildir_parent_class)->remove_files(mailbox);
 }
 
 static LibBalsaMessageFlag parse_filename(const gchar *subdir,
@@ -633,8 +615,8 @@ libbalsa_mailbox_maildir_close_mailbox(LibBalsaMailbox * mailbox,
     if (mdir->msgno_2_msg_info->len != len)
         libbalsa_mailbox_changed(mailbox);
 
-    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
-        LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
+    if (LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_maildir_parent_class)->close_mailbox)
+        LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_maildir_parent_class)->close_mailbox(mailbox,
                                                             expunge);
 
     /* Now it's safe to free the message info. */
@@ -852,7 +834,7 @@ libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
 						    msg_info->filename);
     }
 
-    return LIBBALSA_MAILBOX_CLASS(parent_class)->
+    return LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_maildir_parent_class)->
         fetch_message_structure(mailbox, message, flags);
 }
 

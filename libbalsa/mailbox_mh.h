@@ -21,38 +21,16 @@
 #ifndef __LIBBALSA_MAILBOX_MH_H__
 #define __LIBBALSA_MAILBOX_MH_H__
 
-#define LIBBALSA_TYPE_MAILBOX_MH \
-    (libbalsa_mailbox_mh_get_type())
-#define LIBBALSA_MAILBOX_MH(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_MH, \
-                                 LibBalsaMailboxMh))
-#define LIBBALSA_MAILBOX_MH_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX_MH, \
-                              LibBalsaMailboxMhClass))
-#define LIBBALSA_IS_MAILBOX_MH(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_MH))
-#define LIBBALSA_IS_MAILBOX_MH_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_MH))
+#define LIBBALSA_TYPE_MAILBOX_MH libbalsa_mailbox_mh_get_type()
 
-typedef struct _LibBalsaMailboxMh LibBalsaMailboxMh;
-typedef struct _LibBalsaMailboxMhClass LibBalsaMailboxMhClass;
+G_DECLARE_FINAL_TYPE(LibBalsaMailboxMh,
+                     libbalsa_mailbox_mh,
+                     LIBBALSA,
+                     MAILBOX_MH,
+                     LibBalsaMailboxLocal)
 
-struct _LibBalsaMailboxMh {
-    LibBalsaMailboxLocal parent;
-
-    GHashTable* messages_info;
-    GPtrArray* msgno_2_msg_info;
-    gchar* sequences_filename;
-    time_t mtime_sequences;
-    guint last_fileno;
-};
-
-struct _LibBalsaMailboxMhClass {
-    LibBalsaMailboxLocalClass klass;
-};
-
-GType libbalsa_mailbox_mh_get_type(void);
 LibBalsaMailbox *libbalsa_mailbox_mh_new(const gchar * path,
                                          gboolean      create);
+
 #endif
 

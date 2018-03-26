@@ -20,23 +20,13 @@
 #ifndef __LIBBALSA_MAILBOX_IMAP_H__
 #define __LIBBALSA_MAILBOX_IMAP_H__
 
-#define LIBBALSA_TYPE_MAILBOX_IMAP \
-    (libbalsa_mailbox_imap_get_type())
-#define LIBBALSA_MAILBOX_IMAP(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_IMAP, \
-                                 LibBalsaMailboxImap))
-#define LIBBALSA_MAILBOX_IMAP_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX_IMAP, \
-                              LibBalsaMailboxImapClass))
-#define LIBBALSA_IS_MAILBOX_IMAP(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_IMAP))
-#define LIBBALSA_IS_MAILBOX_IMAP_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_IMAP))
+#define LIBBALSA_TYPE_MAILBOX_IMAP libbalsa_mailbox_imap_get_type()
 
-GType libbalsa_mailbox_imap_get_type(void);
-
-typedef struct _LibBalsaMailboxImap LibBalsaMailboxImap;
-typedef struct _LibBalsaMailboxImapClass LibBalsaMailboxImapClass;
+G_DECLARE_FINAL_TYPE(LibBalsaMailboxImap,
+                     libbalsa_mailbox_imap,
+                     LIBBALSA,
+                     MAILBOX_IMAP,
+                     LibBalsaMailboxRemote)
 
 #define POINTER_TO_UID(p) GPOINTER_TO_UINT(p)
 #define UID_TO_POINTER(p) GUINT_TO_POINTER(p)

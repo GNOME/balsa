@@ -92,8 +92,6 @@ struct message_info {
     LibBalsaMessageFlag user_flags;
 };
 
-static LibBalsaMailboxClass *parent_class = NULL;
-
 static off_t ImapCacheSize = 30*1024*1024; /* 30MB */
 
  /* issue message if downloaded part has more than this size */
@@ -206,32 +204,9 @@ static struct message_info *message_info_from_msgno(
 
 #define IMAP_MAILBOX_UID_VALIDITY(mailbox) (LIBBALSA_MAILBOX_IMAP(mailbox)->uid_validity)
 
-GType
-libbalsa_mailbox_imap_get_type(void)
-{
-    static GType mailbox_type = 0;
-
-    if (!mailbox_type) {
-	static const GTypeInfo mailbox_info = {
-	    sizeof(LibBalsaMailboxImapClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_mailbox_imap_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaMailboxImap),
-            0,                  /* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_mailbox_imap_init
-	};
-
-	mailbox_type =
-	    g_type_register_static(LIBBALSA_TYPE_MAILBOX_REMOTE,
-	                           "LibBalsaMailboxImap",
-			           &mailbox_info, 0);
-    }
-
-    return mailbox_type;
-}
+G_DEFINE_TYPE(LibBalsaMailboxImap,
+              libbalsa_mailbox_imap,
+              LIBBALSA_TYPE_MAILBOX_REMOTE)
 
 static void
 libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
@@ -241,8 +216,6 @@ libbalsa_mailbox_imap_class_init(LibBalsaMailboxImapClass * klass)
 
     object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     object_class->dispose  = libbalsa_mailbox_imap_dispose;
     object_class->finalize = libbalsa_mailbox_imap_finalize;
@@ -325,7 +298,7 @@ libbalsa_mailbox_imap_dispose(GObject * object)
     mailbox = LIBBALSA_MAILBOX_IMAP(object);
     libbalsa_clear_source_id(&mailbox->unread_update_id);
 
-    G_OBJECT_CLASS(parent_class)->dispose(object);
+    G_OBJECT_CLASS(libbalsa_mailbox_imap_parent_class)->dispose(object);
 }
 
 /* libbalsa_mailbox_imap_finalize:
@@ -348,7 +321,7 @@ libbalsa_mailbox_imap_finalize(GObject * object)
     g_array_free(mailbox->sort_ranks, TRUE);
     g_list_free_full(mailbox->acls, (GDestroyNotify) imap_user_acl_free);
 
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(libbalsa_mailbox_imap_parent_class)->finalize(object);
 }
 
 LibBalsaMailbox*
@@ -1665,8 +1638,9 @@ libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
 
     libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox));
 
-    if (LIBBALSA_MAILBOX_CLASS(parent_class)->save_config)
-	LIBBALSA_MAILBOX_CLASS(parent_class)->save_config(mailbox, prefix);
+    if (LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_imap_parent_class)->save_config)
+	LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_imap_parent_class)->
+            save_config(mailbox, prefix);
 }
 
 static void
@@ -1700,8 +1674,9 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
 
     libbalsa_mailbox_remote_set_server(remote, server);
 
-    if (LIBBALSA_MAILBOX_CLASS(parent_class)->load_config)
-	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
+    if (LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_imap_parent_class)->load_config)
+	LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_imap_parent_class)->
+            load_config(mailbox, prefix);
 
     libbalsa_mailbox_imap_update_url(mimap);
 }
@@ -3419,7 +3394,8 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
     }
 
     /* Couldn't use server-side copy, fall back to default method. */
-    return parent_class->messages_copy(mailbox, msgnos, dest, err);
+    return LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_imap_parent_class)->
+        messages_copy(mailbox, msgnos, dest, err);
 }
 
 void

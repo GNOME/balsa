@@ -91,7 +91,6 @@ enum {
     LAST_MODEL_SIGNAL
 };
 
-static GObjectClass *parent_class = NULL;
 static guint libbalsa_mailbox_signals[LAST_SIGNAL];
 static guint libbalsa_mbox_model_signals[LAST_MODEL_SIGNAL];
 
@@ -180,8 +179,6 @@ static void
 libbalsa_mailbox_class_init(LibBalsaMailboxClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     /* This signal is emitted by the mailbox when new messages are
        retrieved (check mail or opening of the mailbox). This is used
@@ -324,7 +321,7 @@ libbalsa_mailbox_dispose(GObject *object)
     libbalsa_clear_source_id(&priv->queue_check_idle_id);
     libbalsa_clear_source_id(&priv->need_threading_idle_id);
 
-    G_OBJECT_CLASS(parent_class)->dispose(object);
+    G_OBJECT_CLASS(libbalsa_mailbox_parent_class)->dispose(object);
 }
 
 
@@ -511,7 +508,7 @@ libbalsa_mailbox_finalize(GObject *object)
 
     libbalsa_mailbox_view_free(priv->view);
 
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(libbalsa_mailbox_parent_class)->finalize(object);
 }
 
 
@@ -685,10 +682,7 @@ libbalsa_mailbox_close(LibBalsaMailbox *mailbox,
         /* do not try expunging read-only mailboxes, it's a waste of time */
         expunge = expunge && !priv->readonly;
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_mailbox(mailbox, expunge);
-        if (priv->msg_tree) {
-            g_node_destroy(priv->msg_tree);
-            priv->msg_tree = NULL;
-        }
+        g_clear_pointer(&priv->msg_tree, (GDestroyNotify) g_node_destroy);
         libbalsa_mailbox_free_mindex(mailbox);
         priv->stamp++;
         priv->state = LB_MAILBOX_STATE_CLOSED;

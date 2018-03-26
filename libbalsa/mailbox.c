@@ -300,8 +300,6 @@ libbalsa_mailbox_dispose(GObject *object)
     LibBalsaMailbox *mailbox     = LIBBALSA_MAILBOX(object);
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 
-    g_rec_mutex_clear(&priv->rec_mutex);
-
     while (priv->open_ref > 0) {
         libbalsa_mailbox_close(mailbox, FALSE);
     }
@@ -499,6 +497,8 @@ libbalsa_mailbox_finalize(GObject *object)
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    g_rec_mutex_clear(&priv->rec_mutex);
 
     g_free(priv->config_prefix);
     g_free(priv->name);

@@ -48,8 +48,6 @@ struct message_info {
 
 #define REAL_FLAGS(flags) (flags & LIBBALSA_MESSAGE_FLAGS_REAL)
 
-static LibBalsaMailboxLocalClass *parent_class = NULL;
-
 static void libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass *klass);
 static void libbalsa_mailbox_mh_init(LibBalsaMailboxMh * mailbox);
 static void libbalsa_mailbox_mh_finalize(GObject * object);
@@ -86,33 +84,23 @@ static gboolean libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox
                                                             flags);
 static guint libbalsa_mailbox_mh_total_messages(LibBalsaMailbox * mailbox);
 
+struct _LibBalsaMailboxMh {
+    LibBalsaMailboxLocal parent;
 
-GType
-libbalsa_mailbox_mh_get_type(void)
-{
-    static GType mailbox_type = 0;
+    GHashTable* messages_info;
+    GPtrArray* msgno_2_msg_info;
+    gchar* sequences_filename;
+    time_t mtime_sequences;
+    guint last_fileno;
+};
 
-    if (!mailbox_type) {
-	static const GTypeInfo mailbox_info = {
-	    sizeof(LibBalsaMailboxMhClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_mailbox_mh_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaMailboxMh),
-            0,                  /* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_mailbox_mh_init
-	};
+struct _LibBalsaMailboxMhClass {
+    LibBalsaMailboxLocalClass klass;
+};
 
-	mailbox_type =
-	    g_type_register_static(LIBBALSA_TYPE_MAILBOX_LOCAL,
-	                           "LibBalsaMailboxMh",
-                                   &mailbox_info, 0);
-    }
-
-    return mailbox_type;
-}
+G_DEFINE_TYPE(LibBalsaMailboxMh,
+              libbalsa_mailbox_mh,
+              LIBBALSA_TYPE_MAILBOX_LOCAL)
 
 static void
 libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
@@ -124,8 +112,6 @@ libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass * klass)
     object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
     libbalsa_mailbox_local_class = LIBBALSA_MAILBOX_LOCAL_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     object_class->finalize = libbalsa_mailbox_mh_finalize;
 
@@ -237,7 +223,7 @@ libbalsa_mailbox_mh_finalize(GObject * object)
 {
     LibBalsaMailboxMh *mh = LIBBALSA_MAILBOX_MH(object);
     g_free(mh->sequences_filename);
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(libbalsa_mailbox_mh_parent_class)->finalize(object);
 }
 
 static void
@@ -251,7 +237,7 @@ libbalsa_mailbox_mh_load_config(LibBalsaMailbox * mailbox,
     lbm_mh_set_sequences_filename(mh, path);
     g_free(path);
 
-    LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
+    LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mh_parent_class)->load_config(mailbox, prefix);
 }
 
 #define MH_BASENAME(msg_info) \
@@ -295,7 +281,7 @@ lbm_mh_remove_files(LibBalsaMailboxLocal *mailbox)
 			     _("Could not remove %s:\n%s"),
 			     path, strerror(errno));
     }
-    LIBBALSA_MAILBOX_LOCAL_CLASS(parent_class)->remove_files(mailbox);
+    LIBBALSA_MAILBOX_LOCAL_CLASS(libbalsa_mailbox_mh_parent_class)->remove_files(mailbox);
 }
 
 
@@ -714,8 +700,8 @@ libbalsa_mailbox_mh_close_mailbox(LibBalsaMailbox * mailbox,
     g_hash_table_destroy(mh->messages_info);
     mh->messages_info = NULL;
 
-    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
-        LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
+    if (LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mh_parent_class)->close_mailbox)
+        LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mh_parent_class)->close_mailbox(mailbox,
                                                             expunge);
 
     /* Now it's safe to free the message info. */
@@ -1024,7 +1010,7 @@ libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox * mailbox,
 	}
     }
 
-    return LIBBALSA_MAILBOX_CLASS(parent_class)->
+    return LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mh_parent_class)->
         fetch_message_structure(mailbox, message, flags);
 }
 

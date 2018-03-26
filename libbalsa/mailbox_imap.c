@@ -310,15 +310,16 @@ static void
 libbalsa_mailbox_imap_dispose(GObject * object)
 {
     LibBalsaMailboxRemote *remote;
+    LibBalsaServer *server;
     LibBalsaMailboxImap *mailbox;
 
     remote = LIBBALSA_MAILBOX_REMOTE(object);
-    if (remote->server != NULL) {
-        g_signal_handlers_disconnect_matched(remote->server,
+    server = libbalsa_mailbox_remote_get_server(remote);
+    if (server != NULL) {
+        g_signal_handlers_disconnect_matched(server,
                                              G_SIGNAL_MATCH_DATA, 0,
                                              (GQuark) 0, NULL, NULL,
                                              remote);
-	g_clear_object(&remote->server);
     }
 
     mailbox = LIBBALSA_MAILBOX_IMAP(object);
@@ -472,7 +473,7 @@ get_cache_dir(gboolean is_persistent)
 static gchar*
 get_header_cache_path(LibBalsaMailboxImap *mimap)
 {
-    LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE(mimap)->server;
+    LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap);
     gchar *cache_dir = get_cache_dir(TRUE); /* FIXME */
     gchar *header_file = g_strdup_printf("%s@%s-%s-%u-headers2",
 					 libbalsa_server_get_username(s), libbalsa_server_get_host(s),
@@ -491,7 +492,7 @@ static gchar**
 get_cache_name_pair(LibBalsaMailboxImap* mailbox, const gchar *type,
                     ImapUID uid)
 {
-    LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
+    LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
     LibBalsaImapServer *is = LIBBALSA_IMAP_SERVER(s);
     gboolean is_persistent = libbalsa_imap_server_has_persistent_cache(is);
     gchar **res = g_malloc(3*sizeof(gchar*));
@@ -1169,7 +1170,7 @@ free_messages_info(LibBalsaMailboxImap * mbox)
 static void
 libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
 {
-    LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
+    LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
     LibBalsaImapServer *is = LIBBALSA_IMAP_SERVER(s);
     gboolean is_persistent = libbalsa_imap_server_has_persistent_cache(is);
     LibBalsaMailboxImap *mbox = LIBBALSA_MAILBOX_IMAP(mailbox);
@@ -1674,6 +1675,7 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxImap *mimap;
     LibBalsaMailboxRemote *remote;
+    LibBalsaServer *server;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox));
 
@@ -1690,11 +1692,13 @@ libbalsa_mailbox_imap_load_config(LibBalsaMailbox * mailbox,
     }
 
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
-    remote->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
+    server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
 
-    g_signal_connect(G_OBJECT(remote->server), "config-changed",
+    g_signal_connect(G_OBJECT(server), "config-changed",
 		     G_CALLBACK(server_host_settings_changed_cb),
 		     (gpointer) mailbox);
+
+    libbalsa_mailbox_remote_set_server(remote, server);
 
     if (LIBBALSA_MAILBOX_CLASS(parent_class)->load_config)
 	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
@@ -3006,7 +3010,7 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
     if(!imap_sequence_empty(&uid_sequence) &&
        g_list_length(macd.outfiles) == imap_sequence_length(&uid_sequence)) {
 	/* Hurray, server returned UID data on appended messages! */
-	LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
+	LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
 	LibBalsaImapServer *is = LIBBALSA_IMAP_SERVER(s);
 	gboolean is_persistent = libbalsa_imap_server_has_persistent_cache(is);
 	struct append_to_cache_data atcd;
@@ -3326,8 +3330,8 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 				    LibBalsaMailbox * dest, GError **err)
 {
     if (LIBBALSA_IS_MAILBOX_IMAP(dest) &&
-	LIBBALSA_MAILBOX_REMOTE(dest)->server ==
-	LIBBALSA_MAILBOX_REMOTE(mailbox)->server) {
+	LIBBALSA_MAILBOX_REMOTE_GET_SERVER(dest) ==
+	LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox)) {
         gboolean ret;
 	LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 	ImapMboxHandle *handle = LIBBALSA_MAILBOX_IMAP(mailbox)->handle;
@@ -3359,7 +3363,7 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
         } else if(!imap_sequence_empty(&uid_sequence)) {
 	    /* Copy cache files. */
 	    GDir *dir;
-	    LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE(mailbox)->server;
+	    LibBalsaServer *s      = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
 	    LibBalsaImapServer *is = LIBBALSA_IMAP_SERVER(s);
 	    LibBalsaMailboxImap *dst_imap = LIBBALSA_MAILBOX_IMAP(dest);
 	    gboolean is_persistent =

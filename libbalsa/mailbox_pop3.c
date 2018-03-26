@@ -48,7 +48,6 @@ struct _LibBalsaMailboxPop3Class {
     void (*config_changed) (LibBalsaMailboxPop3* mailbox_pop3);
 };
 
-static void libbalsa_mailbox_pop3_dispose(GObject * object);
 static void libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class *
 					     klass);
 static void libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox_pop3);
@@ -96,15 +95,11 @@ libbalsa_mailbox_pop3_get_type(void)
 static void
 libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class * klass)
 {
-    GObjectClass *object_class;
     LibBalsaMailboxClass *libbalsa_mailbox_class;
 
-    object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
     parent_class = g_type_class_peek_parent(klass);
-
-    object_class->dispose = libbalsa_mailbox_pop3_dispose;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_pop3_open;
     libbalsa_mailbox_class->check = libbalsa_mailbox_pop3_check;
@@ -128,17 +123,7 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox_pop3)
     mailbox_pop3->filter = FALSE;
     mailbox_pop3->filter_cmd = NULL;
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox_pop3);
-    remote->server = libbalsa_server_new();
-}
-
-static void
-libbalsa_mailbox_pop3_dispose(GObject * object)
-{
-    LibBalsaMailboxRemote *remote = LIBBALSA_MAILBOX_REMOTE(object);
-
-    g_clear_object(&remote->server);
-
-    G_OBJECT_CLASS(parent_class)->dispose(object);
+    libbalsa_mailbox_remote_set_server(remote, libbalsa_server_new());
 }
 
 LibBalsaMailboxPop3*

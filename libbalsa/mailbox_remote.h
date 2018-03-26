@@ -33,37 +33,24 @@
      all mailboxes....  which arguably we might want eventually,
      and claim that a directory is a "server", but until then...
  */
-#define LIBBALSA_TYPE_MAILBOX_REMOTE \
-    (libbalsa_mailbox_remote_get_type())
-#define LIBBALSA_MAILBOX_REMOTE(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_REMOTE, \
-                                 LibBalsaMailboxRemote))
-#define LIBBALSA_MAILBOX_REMOTE_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX, \
-                              LibBalsaMailboxRemoteClass))
-#define LIBBALSA_IS_MAILBOX_REMOTE(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_REMOTE))
-#define LIBBALSA_IS_MAILBOX_REMOTE_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_REMOTE))
+#define LIBBALSA_TYPE_MAILBOX_REMOTE libbalsa_mailbox_remote_get_type()
 
-#define LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox) \
-    ((LibBalsaServer *) LIBBALSA_MAILBOX_REMOTE(mailbox)->server)
-
-typedef struct _LibBalsaMailboxRemoteClass LibBalsaMailboxRemoteClass;
-
-struct _LibBalsaMailboxRemote {
-    LibBalsaMailbox mailbox;
-
-    LibBalsaServer *server;
-};
+G_DECLARE_DERIVABLE_TYPE(LibBalsaMailboxRemote,
+                         libbalsa_mailbox_remote,
+                         LIBBALSA,
+                         MAILBOX_REMOTE,
+                         LibBalsaMailbox)
 
 struct _LibBalsaMailboxRemoteClass {
     LibBalsaMailboxClass parent_class;
 };
 
-GType libbalsa_mailbox_remote_get_type(void);
+LibBalsaServer *libbalsa_mailbox_remote_get_server(LibBalsaMailboxRemote *remote);
+/* Macro to avoid casts: */
+#define LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox) \
+    libbalsa_mailbox_remote_get_server(LIBBALSA_MAILBOX_REMOTE(mailbox))
 
-void libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote* m, 
-					LibBalsaServer* s);
+void libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote *remote,
+					LibBalsaServer        *server);
 
 #endif				/* __LIBBALSA_MAILBOX_REMOTE_H__ */

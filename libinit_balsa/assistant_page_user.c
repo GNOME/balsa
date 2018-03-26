@@ -208,11 +208,11 @@ create_pop3_mbx(const gchar *name, const gchar* host, gint security,
     libbalsa_server_set_security(server, security);
     libbalsa_server_set_remember_passwd(server, remember);
     libbalsa_mailbox_set_name(mbx, name != NULL && name[0] != '\0' ? name : host);
-    pop->check              = TRUE;
-    pop->disable_apop       = FALSE;
-    pop->delete_from_server = TRUE;
-    pop->filter             = FALSE;
-    pop->filter_cmd         = g_strdup("procmail -f -");
+    libbalsa_mailbox_pop3_set_check(pop, TRUE);
+    libbalsa_mailbox_pop3_set_disable_apop(pop, FALSE);
+    libbalsa_mailbox_pop3_set_delete_from_server(pop, TRUE);
+    libbalsa_mailbox_pop3_set_filter(pop, FALSE);
+    libbalsa_mailbox_pop3_set_filter_cmd(pop, "procmail -f -");
     
     return mbx;
 }

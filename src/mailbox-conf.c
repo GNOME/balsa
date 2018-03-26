@@ -675,55 +675,86 @@ mailbox_conf_edit(BalsaMailboxNode * mbnode)
 }
 
 static void
-mailbox_conf_set_values_pop3(LibBalsaMailbox   *mailbox,
-							 MailboxConfWindow *mcw)
+mailbox_conf_set_values_pop3(LibBalsaMailbox * mailbox,
+                             MailboxConfWindow * mcw)
 {
-	LibBalsaMailboxPop3 *pop3;
-	LibBalsaServer *server;
-	gboolean sensitive;
+    LibBalsaMailboxPop3 *pop3;
+    LibBalsaServer *server;
+    const gchar *filter_cmd;
+    gboolean sensitive;
 
-	pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
-	server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
+    pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
+    server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
 
-	/* basic settings */
-	if (libbalsa_server_get_host(server) != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server), libbalsa_server_get_host(server));
-	}
-	gtk_combo_box_set_active(GTK_COMBO_BOX(mcw->mb_data.pop3.security), libbalsa_server_get_security(server) - 1);
+    /* basic settings */
+    if (libbalsa_server_get_host(server) != NULL) {
+        gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server),
+                           libbalsa_server_get_host(server));
+    }
+    gtk_combo_box_set_active(GTK_COMBO_BOX(mcw->mb_data.pop3.security),
+                             libbalsa_server_get_security(server) - 1);
 
-	if (libbalsa_server_get_username(server) != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.username), libbalsa_server_get_username(server));
-	}
+    if (libbalsa_server_get_username(server) != NULL) {
+        gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.username),
+                           libbalsa_server_get_username(server));
+    }
 
-	if (libbalsa_server_get_password(server) != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.password), libbalsa_server_get_password(server));
-	}
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.delete_from_server), pop3->delete_from_server);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check), pop3->check);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter), pop3->filter);
-	if (pop3->filter_cmd != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd), pop3->filter_cmd);
-	}
-	gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd, pop3->filter);
+    if (libbalsa_server_get_password(server) != NULL) {
+        gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.password),
+                           libbalsa_server_get_password(server));
+    }
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (mcw->mb_data.pop3.delete_from_server),
+                                 libbalsa_mailbox_pop3_get_delete_from_server
+                                 (pop3));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (mcw->mb_data.pop3.check),
+                                 libbalsa_mailbox_pop3_get_check(pop3));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (mcw->mb_data.pop3.filter),
+                                 libbalsa_mailbox_pop3_get_filter(pop3));
 
-	/* advanced settings */
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.bsc.need_client_cert), libbalsa_server_get_client_cert(server));
-	sensitive = (libbalsa_server_get_security(server) != NET_CLIENT_CRYPT_NONE);
-	gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.need_client_cert, sensitive);
-	sensitive = sensitive & libbalsa_server_get_client_cert(server);
+    filter_cmd = libbalsa_mailbox_pop3_get_filter_cmd(pop3);
+    if (filter_cmd != NULL)
+        gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd), filter_cmd);
+    gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd, filter_cmd != NULL);
+
+    /* advanced settings */
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (mcw->mb_data.pop3.bsc.need_client_cert),
+                                 libbalsa_server_get_client_cert(server));
+    sensitive =
+        (libbalsa_server_get_security(server) != NET_CLIENT_CRYPT_NONE);
+    gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.need_client_cert,
+                             sensitive);
+    sensitive = sensitive & libbalsa_server_get_client_cert(server);
 
     if (libbalsa_server_get_cert_file(server) != NULL) {
-    	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(mcw->mb_data.pop3.bsc.client_cert_file), libbalsa_server_get_cert_file(server));
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
+                                      (mcw->mb_data.pop3.bsc.
+                                       client_cert_file),
+                                      libbalsa_server_get_cert_file
+                                      (server));
     }
-    gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.client_cert_file, sensitive);
+    gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.client_cert_file,
+                             sensitive);
 
-	if (libbalsa_server_get_cert_passphrase(server) != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.client_cert_passwd), libbalsa_server_get_cert_passphrase(server));
-	}
-	gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.client_cert_passwd, sensitive);
+    if (libbalsa_server_get_cert_passphrase(server) != NULL) {
+        gtk_entry_set_text(GTK_ENTRY
+                           (mcw->mb_data.pop3.bsc.client_cert_passwd),
+                           libbalsa_server_get_cert_passphrase(server));
+    }
+    gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.client_cert_passwd,
+                             sensitive);
 
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop), pop3->disable_apop);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe), pop3->enable_pipe);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (mcw->mb_data.pop3.disable_apop),
+                                 libbalsa_mailbox_pop3_get_disable_apop
+                                 (pop3));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                                 (mcw->mb_data.pop3.enable_pipe),
+                                 libbalsa_mailbox_pop3_get_enable_pipe
+                                 (pop3));
 }
 
 
@@ -887,45 +918,86 @@ fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, gchar ** path)
  * Update a pop3 mailbox with details from the dialog
  */
 static void
-update_pop_mailbox(MailboxConfWindow *mcw)
+update_pop_mailbox(MailboxConfWindow * mcw)
 {
-	LibBalsaMailboxPop3 *mailbox;
-	LibBalsaServer *server;
-	BalsaServerConf *bsc;
-        gchar *filename;
+    LibBalsaMailboxPop3 *mailbox;
+    LibBalsaServer *server;
+    BalsaServerConf *bsc;
+    gchar *filename;
 
-	mailbox = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
-	server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
-	bsc = &mcw->mb_data.pop3.bsc;
+    mailbox = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
+    server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
+    bsc = &mcw->mb_data.pop3.bsc;
 
-	/* basic data */
-        libbalsa_mailbox_set_name((LibBalsaMailbox *) mailbox,
-                                  gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)));
-	libbalsa_server_set_host(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server)), FALSE);
-        libbalsa_server_set_security(server, gtk_combo_box_get_active(GTK_COMBO_BOX(mcw->mb_data.pop3.security)) + 1);
+    /* basic data */
+    libbalsa_mailbox_set_name((LibBalsaMailbox *) mailbox,
+                              gtk_entry_get_text(GTK_ENTRY
+                                                 (mcw->mailbox_name)));
+    libbalsa_server_set_host(server,
+                             gtk_entry_get_text(GTK_ENTRY
+                                                (mcw->mb_data.pop3.bsc.
+                                                 server)), FALSE);
+    libbalsa_server_set_security(server,
+                                 gtk_combo_box_get_active(GTK_COMBO_BOX
+                                                          (mcw->mb_data.
+                                                           pop3.
+                                                           security)) + 1);
 
-	libbalsa_server_set_username(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.username)));
-	libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.password)));
-	libbalsa_server_config_changed(server);
+    libbalsa_server_set_username(server,
+                                 gtk_entry_get_text(GTK_ENTRY
+                                                    (mcw->mb_data.pop3.
+                                                     username)));
+    libbalsa_server_set_password(server,
+                                 gtk_entry_get_text(GTK_ENTRY
+                                                    (mcw->mb_data.pop3.
+                                                     password)));
+    libbalsa_server_config_changed(server);
 
-	mailbox->check = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check));
-	mailbox->delete_from_server = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON (mcw->mb_data.pop3.delete_from_server));
-	mailbox->filter = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter));
-	g_free(mailbox->filter_cmd);
-	mailbox->filter_cmd =
-            gtk_editable_get_chars(GTK_EDITABLE(mcw->mb_data.pop3.filter_cmd), 0, -1);
+    libbalsa_mailbox_pop3_set_check(mailbox,
+                                    gtk_toggle_button_get_active
+                                    (GTK_TOGGLE_BUTTON
+                                     (mcw->mb_data.pop3.check)));
+    libbalsa_mailbox_pop3_set_delete_from_server(mailbox,
+                                                 gtk_toggle_button_get_active
+                                                 (GTK_TOGGLE_BUTTON
+                                                  (mcw->mb_data.pop3.
+                                                   delete_from_server)));
+    libbalsa_mailbox_pop3_set_filter(mailbox,
+                                     gtk_toggle_button_get_active
+                                     (GTK_TOGGLE_BUTTON
+                                      (mcw->mb_data.pop3.filter)));
+    libbalsa_mailbox_pop3_set_filter_cmd(mailbox,
+                                         gtk_entry_get_text(GTK_ENTRY
+                                                            (mcw->mb_data.
+                                                             pop3.
+                                                             filter_cmd)));
 
-	/* advanced settings */
-        libbalsa_server_set_client_cert(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(bsc->need_client_cert)));
+    /* advanced settings */
+    libbalsa_server_set_client_cert(server,
+                                    gtk_toggle_button_get_active
+                                    (GTK_TOGGLE_BUTTON
+                                     (bsc->need_client_cert)));
 
-        filename =
-            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(bsc->client_cert_file));
-        libbalsa_server_set_cert_file(server, filename);
-        g_free(filename);
+    filename =
+        gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
+                                      (bsc->client_cert_file));
+    libbalsa_server_set_cert_file(server, filename);
+    g_free(filename);
 
-        libbalsa_server_set_cert_passphrase(server, gtk_entry_get_text(GTK_ENTRY(bsc->client_cert_passwd)));
-	mailbox->disable_apop = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop));
-	mailbox->enable_pipe = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe));
+    libbalsa_server_set_cert_passphrase(server,
+                                        gtk_entry_get_text(GTK_ENTRY
+                                                           (bsc->
+                                                            client_cert_passwd)));
+    libbalsa_mailbox_pop3_set_disable_apop(mailbox,
+                                           gtk_toggle_button_get_active
+                                           (GTK_TOGGLE_BUTTON
+                                            (mcw->mb_data.pop3.
+                                             disable_apop)));
+    libbalsa_mailbox_pop3_set_enable_pipe(mailbox,
+                                          gtk_toggle_button_get_active
+                                          (GTK_TOGGLE_BUTTON
+                                           (mcw->mb_data.pop3.
+                                            enable_pipe)));
 }
 
 /*

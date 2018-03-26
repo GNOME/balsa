@@ -40,12 +40,25 @@
 enum {
     LAST_SIGNAL
 };
-static LibBalsaMailboxClass *parent_class = NULL;
 
 struct _LibBalsaMailboxPop3Class {
     LibBalsaMailboxRemoteClass klass;
 
     void (*config_changed) (LibBalsaMailboxPop3* mailbox_pop3);
+};
+
+struct _LibBalsaMailboxPop3 {
+    LibBalsaMailboxRemote mailbox;
+
+    gboolean check;
+    gboolean delete_from_server;
+    gchar *filter_cmd;
+    LibBalsaMailbox *inbox;
+    gint msg_size_limit;
+    gboolean filter; /* filter through procmail/filter_cmd? */
+    gboolean disable_apop; /* Some servers claim to support it but
+                              * they do not. */
+    gboolean enable_pipe;  /* ditto */
 };
 
 static void libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class *
@@ -60,46 +73,25 @@ static void libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
 static void libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 					      const gchar * prefix);
+static void libbalsa_mailbox_pop3_finalize(GObject *object);
 
 
 #define MBOX_POP3_ERROR 	(g_quark_from_static_string("mailbox-pop3"))
 
-
-GType
-libbalsa_mailbox_pop3_get_type(void)
-{
-    static GType mailbox_type = 0;
-
-    if (!mailbox_type) {
-	static const GTypeInfo mailbox_info = {
-	    sizeof(LibBalsaMailboxPop3Class),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_mailbox_pop3_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaMailboxPop3),
-            0,                  /* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_mailbox_pop3_init
-	};
-
-	mailbox_type =
-	    g_type_register_static(LIBBALSA_TYPE_MAILBOX_REMOTE,
-                                   "LibBalsaMailboxPOP3",
-			           &mailbox_info, 0);
-    }
-
-    return mailbox_type;
-}
+G_DEFINE_TYPE(LibBalsaMailboxPop3,
+              libbalsa_mailbox_pop3,
+              LIBBALSA_TYPE_MAILBOX_REMOTE)
 
 static void
 libbalsa_mailbox_pop3_class_init(LibBalsaMailboxPop3Class * klass)
 {
+    GObjectClass *object_class;
     LibBalsaMailboxClass *libbalsa_mailbox_class;
 
+    object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
 
-    parent_class = g_type_class_peek_parent(klass);
+    object_class->finalize = libbalsa_mailbox_pop3_finalize;
 
     libbalsa_mailbox_class->open_mailbox = libbalsa_mailbox_pop3_open;
     libbalsa_mailbox_class->check = libbalsa_mailbox_pop3_check;
@@ -124,6 +116,16 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox_pop3)
     mailbox_pop3->filter_cmd = NULL;
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox_pop3);
     libbalsa_mailbox_remote_set_server(remote, libbalsa_server_new());
+}
+
+static void
+libbalsa_mailbox_pop3_finalize(GObject *object)
+{
+    LibBalsaMailboxPop3 *mailbox_pop3 = (LibBalsaMailboxPop3 *) object;
+
+    g_free(mailbox_pop3->filter_cmd);
+
+    G_OBJECT_CLASS(libbalsa_mailbox_pop3_parent_class)->finalize(object);
 }
 
 LibBalsaMailboxPop3*
@@ -719,8 +721,9 @@ libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
     if(mailbox_pop3->filter_cmd)
         libbalsa_conf_set_string("FilterCmd", mailbox_pop3->filter_cmd);
 
-    if (LIBBALSA_MAILBOX_CLASS(parent_class)->save_config)
-	LIBBALSA_MAILBOX_CLASS(parent_class)->save_config(mailbox, prefix);
+    if (LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_pop3_parent_class)->save_config)
+	LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_pop3_parent_class)->
+            save_config(mailbox, prefix);
 
 }
 
@@ -746,8 +749,9 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 	g_free(mailbox_pop3->filter_cmd); mailbox_pop3->filter_cmd = NULL;
     }
 
-    if (LIBBALSA_MAILBOX_CLASS(parent_class)->load_config)
-	LIBBALSA_MAILBOX_CLASS(parent_class)->load_config(mailbox, prefix);
+    if (LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_pop3_parent_class)->load_config)
+	LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_pop3_parent_class)->
+            load_config(mailbox, prefix);
 
 }
 void
@@ -760,12 +764,99 @@ libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
 
     mailbox_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
 
-	mailbox_pop3->inbox=inbox;
+    mailbox_pop3->inbox=inbox;
 }
+
+/*
+ * Getters
+ */
+
+gboolean
+libbalsa_mailbox_pop3_get_delete_from_server(LibBalsaMailboxPop3 *mailbox_pop3)
+{
+    return mailbox_pop3->delete_from_server;
+}
+
+gboolean
+libbalsa_mailbox_pop3_get_check(LibBalsaMailboxPop3 *mailbox_pop3)
+{
+    return mailbox_pop3->check;
+}
+
+gboolean
+libbalsa_mailbox_pop3_get_filter(LibBalsaMailboxPop3 *mailbox_pop3)
+{
+    return mailbox_pop3->filter;
+}
+
+const gchar *
+libbalsa_mailbox_pop3_get_filter_cmd(LibBalsaMailboxPop3 *mailbox_pop3)
+{
+    return mailbox_pop3->filter_cmd;
+}
+
+gboolean
+libbalsa_mailbox_pop3_get_disable_apop(LibBalsaMailboxPop3 *mailbox_pop3)
+{
+    return mailbox_pop3->disable_apop;
+}
+
+gboolean
+libbalsa_mailbox_pop3_get_enable_pipe(LibBalsaMailboxPop3 *mailbox_pop3)
+{
+    return mailbox_pop3->enable_pipe;
+}
+
+/*
+ * Setters
+ */
 
 void
 libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPop3 *mailbox_pop3,
                                          gint sz_limit)
 {
     mailbox_pop3->msg_size_limit = sz_limit;
+}
+
+void
+libbalsa_mailbox_pop3_set_check(LibBalsaMailboxPop3 *mailbox_pop3,
+                                gboolean check)
+{
+    mailbox_pop3->check = check;
+}
+
+void
+libbalsa_mailbox_pop3_set_disable_apop(LibBalsaMailboxPop3 *mailbox_pop3,
+                                       gboolean disable_apop)
+{
+    mailbox_pop3->disable_apop = disable_apop;
+}
+
+void
+libbalsa_mailbox_pop3_set_delete_from_server(LibBalsaMailboxPop3 *mailbox_pop3,
+                                             gboolean delete_from_server)
+{
+    mailbox_pop3->delete_from_server = delete_from_server;
+}
+
+void
+libbalsa_mailbox_pop3_set_filter(LibBalsaMailboxPop3 *mailbox_pop3,
+                                 gboolean filter)
+{
+    mailbox_pop3->filter = filter;
+}
+
+void
+libbalsa_mailbox_pop3_set_filter_cmd(LibBalsaMailboxPop3 *mailbox_pop3,
+                                     const gchar * filter_cmd)
+{
+    g_free(mailbox_pop3->filter_cmd);
+    mailbox_pop3->filter_cmd = g_strdup(filter_cmd);
+}
+
+void
+libbalsa_mailbox_pop3_set_enable_pipe(LibBalsaMailboxPop3 *mailbox_pop3,
+                                             gboolean enable_pipe)
+{
+    mailbox_pop3->enable_pipe = enable_pipe;
 }

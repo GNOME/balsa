@@ -21,42 +21,44 @@
 #ifndef __LIBBALSA_MAILBOX_POP3_H__
 #define __LIBBALSA_MAILBOX_POP3_H__
 
-#define LIBBALSA_TYPE_MAILBOX_POP3 \
-    (libbalsa_mailbox_pop3_get_type())
-#define LIBBALSA_MAILBOX_POP3(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_POP3, \
-                                 LibBalsaMailboxPop3))
-#define LIBBALSA_MAILBOX_POP3_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX_POP3, \
-                              LibBalsaMailboxPop3Class))
-#define LIBBALSA_IS_MAILBOX_POP3(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_POP3))
-#define LIBBALSA_IS_MAILBOX_POP3_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_POP3))
+#define LIBBALSA_TYPE_MAILBOX_POP3 libbalsa_mailbox_pop3_get_type()
 
-GType libbalsa_mailbox_pop3_get_type(void);
-
-typedef struct _LibBalsaMailboxPop3 LibBalsaMailboxPop3;
-typedef struct _LibBalsaMailboxPop3Class LibBalsaMailboxPop3Class;
-
-struct _LibBalsaMailboxPop3 {
-    LibBalsaMailboxRemote mailbox;
-
-    gboolean check;
-    gboolean delete_from_server;
-    gchar *filter_cmd;
-    LibBalsaMailbox *inbox;
-    gint msg_size_limit;
-    gboolean filter; /* filter through procmail/filter_cmd? */
-    gboolean disable_apop; /* Some servers claim to support it but
-                              * they do not. */
-    gboolean enable_pipe;  /* ditto */
-};
+G_DECLARE_FINAL_TYPE(LibBalsaMailboxPop3,
+                     libbalsa_mailbox_pop3,
+                     LIBBALSA,
+                     MAILBOX_POP3,
+                     LibBalsaMailboxRemote)
 
 LibBalsaMailboxPop3 *libbalsa_mailbox_pop3_new(void);
 void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
                                      LibBalsaMailbox *inbox);
+
+/*
+ * Getters
+ */
+gboolean libbalsa_mailbox_pop3_get_delete_from_server(LibBalsaMailboxPop3 *mailbox_pop3);
+gboolean libbalsa_mailbox_pop3_get_check(LibBalsaMailboxPop3 *mailbox_pop3);
+gboolean libbalsa_mailbox_pop3_get_filter(LibBalsaMailboxPop3 *mailbox_pop3);
+const gchar * libbalsa_mailbox_pop3_get_filter_cmd(LibBalsaMailboxPop3 *mailbox_pop3);
+gboolean libbalsa_mailbox_pop3_get_disable_apop(LibBalsaMailboxPop3 *mailbox_pop3);
+gboolean libbalsa_mailbox_pop3_get_enable_pipe(LibBalsaMailboxPop3 *mailbox_pop3);
+
+/*
+ * Setters
+ */
 void libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPop3 *mailbox,
                                               gint sz_limit);
+void libbalsa_mailbox_pop3_set_check(LibBalsaMailboxPop3 *mailbox_pop3,
+                                     gboolean check);
+void libbalsa_mailbox_pop3_set_disable_apop(LibBalsaMailboxPop3 *mailbox_pop3,
+                                            gboolean disable_apop);
+void libbalsa_mailbox_pop3_set_delete_from_server(LibBalsaMailboxPop3 *mailbox_pop3,
+                                             gboolean delete_from_server);
+void libbalsa_mailbox_pop3_set_filter(LibBalsaMailboxPop3 *mailbox_pop3,
+                                 gboolean filter);
+void libbalsa_mailbox_pop3_set_filter_cmd(LibBalsaMailboxPop3 *mailbox_pop3,
+                                     const gchar * filter_cmd);
+void libbalsa_mailbox_pop3_set_enable_pipe(LibBalsaMailboxPop3 *mailbox_pop3,
+                                             gboolean enable_pipe);
 
 #endif				/* __LIBBALSA_MAILBOX_POP3_H__ */

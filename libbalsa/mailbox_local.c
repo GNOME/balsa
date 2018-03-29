@@ -337,9 +337,9 @@ lbm_local_get_message_with_msg_info(LibBalsaMailboxLocal *local,
     g_object_add_weak_pointer(G_OBJECT(message),
                               (gpointer) & msg_info->message);
 
-    message->flags   = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
-    message->mailbox = LIBBALSA_MAILBOX(local);
-    message->msgno   = msgno;
+    libbalsa_message_set_flags(message, msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL);
+    libbalsa_message_set_mailbox(message, LIBBALSA_MAILBOX(local));
+    libbalsa_message_set_msgno(message, msgno);
     libbalsa_message_load_envelope(message);
     lbml_add_message_to_pool(local, message);
 }
@@ -912,6 +912,7 @@ message_match_real(LibBalsaMailbox   *mailbox,
     LibBalsaMailboxLocalInfo *info =
         msgno <= priv->threading_info->len ?
         g_ptr_array_index(priv->threading_info, msgno - 1) : NULL;
+    LibBalsaMessageHeaders *headers;
 
     /* We may be able to match the msgno from info cached in entry or
      * info; if those are NULL, we'll need to fetch the message, so we
@@ -930,6 +931,9 @@ message_match_real(LibBalsaMailbox   *mailbox,
         return FALSE;   /* Can't match. */
 
     }
+
+    headers = libbalsa_message_get_headers(message);
+
     switch (cond->type) {
     case CONDITION_STRING:
         if (CONDITION_CHKMATCH(cond, (CONDITION_MATCH_TO |
@@ -954,10 +958,9 @@ message_match_real(LibBalsaMailbox   *mailbox,
         /* do the work */
         if (CONDITION_CHKMATCH(cond, CONDITION_MATCH_TO)) {
             g_assert(is_refed);
-            if (message->headers->to_list) {
+            if (headers->to_list != NULL) {
                 gchar *str =
-                    internet_address_list_to_string(message->headers->
-                                                    to_list, FALSE);
+                    internet_address_list_to_string(headers->to_list, FALSE);
                 match =
                     libbalsa_utf8_strstr(str, cond->match.string.string);
                 g_free(str);
@@ -982,10 +985,9 @@ message_match_real(LibBalsaMailbox   *mailbox,
         }
         if (CONDITION_CHKMATCH(cond, CONDITION_MATCH_CC)) {
             g_assert(is_refed);
-            if (message->headers->cc_list) {
+            if (headers->cc_list != NULL) {
                 gchar *str =
-                    internet_address_list_to_string(message->headers->
-                                                    cc_list, FALSE);
+                    internet_address_list_to_string(headers->cc_list, FALSE);
                 match =
                     libbalsa_utf8_strstr(str, cond->match.string.string);
                 g_free(str);
@@ -1018,12 +1020,13 @@ message_match_real(LibBalsaMailbox   *mailbox,
         if (CONDITION_CHKMATCH(cond, CONDITION_MATCH_BODY)) {
             GString *body;
             g_assert(is_refed);
-            if (!message->mailbox) {
+            if (libbalsa_message_get_mailbox(message) == NULL) {
                 /* No need to body-unref */
                 g_object_unref(message);
                 return FALSE; /* We don't want to match if an error occurred */
             }
-            body = content2reply(message->body_list, NULL, 0, FALSE, FALSE);
+            body = content2reply(libbalsa_message_get_body_list(message),
+                                 NULL, 0, FALSE, FALSE);
             if (body) {
                 if (body->str) {
                     match = libbalsa_utf8_strstr(body->str,
@@ -1103,15 +1106,16 @@ libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal *local,
         libbalsa_mailbox_local_get_instance_private(local);
     gpointer *entry;
     LibBalsaMailboxLocalInfo *info;
+    LibBalsaMessageHeaders *headers;
 
-    if (!message) {
+    if (message == NULL) {
         return;
     }
 
     libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(local), msgno,
                                    message);
 
-    if (!priv->threading_info) {
+    if (priv->threading_info == NULL) {
         return;
     }
 
@@ -1120,21 +1124,21 @@ libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal *local,
     }
     entry = &g_ptr_array_index(priv->threading_info, msgno - 1);
 
-    if (*entry) {
+    if (*entry != NULL) {
         return;
     }
 
     *entry                   = info = g_new(LibBalsaMailboxLocalInfo, 1);
-    info->message_id         = g_strdup(message->message_id);
-    info->refs_for_threading =
-        libbalsa_message_refs_for_threading(message);
 
+    info->message_id         = g_strdup(libbalsa_message_get_message_id(message));
+    info->refs_for_threading = libbalsa_message_refs_for_threading(message);
     info->sender = NULL;
-    if (message->headers->from) {
-        info->sender =
-            internet_address_list_to_string(message->headers->from, FALSE);
+
+    headers = libbalsa_message_get_headers(message);
+    if (headers->from != NULL) {
+        info->sender = internet_address_list_to_string(headers->from, FALSE);
     }
-    if (!info->sender) {
+    if (info->sender == NULL) {
         info->sender = g_strdup("");
     }
 }
@@ -1510,23 +1514,27 @@ libbalsa_mailbox_local_fetch_structure(LibBalsaMailbox  *mailbox,
                                        LibBalsaMessage  *message,
                                        LibBalsaFetchFlag flags)
 {
-    GMimeMessage *mime_message = message->mime_msg;
+    GMimeMessage *mime_message;
+    LibBalsaMessageHeaders *headers;
 
-    if (!mime_message || !mime_message->mime_part) {
+    mime_message = libbalsa_message_get_mime_msg(message);
+    if (mime_message == NULL || mime_message->mime_part == NULL) {
         return FALSE;
     }
+
+    headers = libbalsa_message_get_headers(message);
 
     if (flags & LB_FETCH_STRUCTURE) {
         LibBalsaMessageBody *body = libbalsa_message_body_new(message);
         libbalsa_message_body_set_mime_body(body,
                                             mime_message->mime_part);
         libbalsa_message_append_part(message, body);
-        libbalsa_message_headers_from_gmime(message->headers, mime_message);
+        libbalsa_message_headers_from_gmime(headers, mime_message);
     }
     if (flags & LB_FETCH_RFC822_HEADERS) {
-        message->headers->user_hdrs =
+        headers->user_hdrs =
             libbalsa_message_user_hdrs_from_gmime(mime_message);
-        message->has_all_headers = 1;
+        libbalsa_message_set_has_all_headers(message, TRUE);
     }
 
     return TRUE;
@@ -1537,11 +1545,15 @@ static void
 libbalsa_mailbox_local_fetch_headers(LibBalsaMailbox *mailbox,
                                      LibBalsaMessage *message)
 {
-    g_return_if_fail(message->headers->user_hdrs == NULL);
+    LibBalsaMessageHeaders *headers;
+    GMimeMessage *mime_msg;
 
-    if (message->mime_msg) {
-        message->headers->user_hdrs =
-            libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
+    headers = libbalsa_message_get_headers(message);
+    g_return_if_fail(headers->user_hdrs == NULL);
+
+    mime_msg = libbalsa_message_get_mime_msg(message);
+    if (mime_msg != NULL) {
+        headers->user_hdrs = libbalsa_message_user_hdrs_from_gmime(mime_msg);
     } else {
         libbalsa_mailbox_fetch_message_structure(mailbox, message,
                                                  LB_FETCH_RFC822_HEADERS);
@@ -2513,10 +2525,9 @@ libbalsa_mailbox_local_messages_change_flags(LibBalsaMailbox    *mailbox,
         }
         ++changed;
 
-        if (msg_info->message) {
-            msg_info->message->flags = msg_info->flags;
+        if (msg_info->message != NULL) {
+            libbalsa_message_set_flags(msg_info->message, msg_info->flags);
         }
-
         libbalsa_mailbox_index_set_flags(mailbox, msgno, msg_info->flags);
 
         if (msg_info->loaded) {

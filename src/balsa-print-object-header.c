@@ -332,9 +332,13 @@ balsa_print_object_header_from_message(GList *list,
 				       const gchar * subject,
 				       BalsaPrintSetup * psetup)
 {
+    LibBalsaMessageBody *body_list;
+    LibBalsaMessageHeaders *headers;
+
+    body_list = libbalsa_message_get_body_list(message);
+    headers = libbalsa_message_get_headers(message);
     return balsa_print_object_header_new_real(list, context,
-					      message->body_list,
-					      message->headers, subject,
+					      body_list, headers, subject,
 					      psetup, FALSE);
 }
 

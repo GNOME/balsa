@@ -1307,10 +1307,9 @@ check_text_encoding(BalsaMessage * bm, gchar *text_buf)
                                 &target_cs)
         && !g_object_get_data(G_OBJECT(bm->message),
                               BALSA_MIME_WIDGET_NEW_TEXT_NOTIFIED)) {
-        gchar *from =
-            balsa_message_sender_to_gchar(bm->message->headers->from, 0);
-        gchar *subject =
-            g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
+        LibBalsaMessageHeaders *headers = libbalsa_message_get_headers(bm->message);
+        gchar *from = balsa_message_sender_to_gchar(headers->from, 0);
+        gchar *subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
 
         libbalsa_utf8_sanitize(&from,    balsa_app.convert_unknown_8bit,
                                NULL);

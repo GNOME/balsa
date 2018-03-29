@@ -104,13 +104,15 @@ gboolean
 libbalsa_condition_matches(LibBalsaCondition* cond,
 			   LibBalsaMessage * message)
 {
+    LibBalsaMessageHeaders *headers;
     gboolean match = FALSE;
     gchar * str;
     GString * body;
     gboolean will_ref;
 
-    g_return_val_if_fail(cond, FALSE);
-    g_return_val_if_fail(message->headers != NULL, FALSE);
+    g_return_val_if_fail(cond != NULL, FALSE);
+    headers = libbalsa_message_get_headers(message);
+    g_return_val_if_fail(headers != NULL, FALSE);
 
     switch (cond->type) {
     case CONDITION_STRING:
@@ -128,20 +130,14 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
             }
         }
         /* do the work */
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO)
-            && message->headers->to_list) {
-            str =
-                internet_address_list_to_string(message->headers->to_list,
-                                                FALSE);
-	    match=libbalsa_utf8_strstr(str,cond->match.string.string);
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_TO) && headers->to_list != NULL) {
+            str = internet_address_list_to_string(headers->to_list, FALSE);
+	    match = libbalsa_utf8_strstr(str,cond->match.string.string);
 	    g_free(str);
             if(match) break;
 	}
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM)
-            && message->headers->from) {
-            str =
-                internet_address_list_to_string(message->headers->from,
-                                                FALSE);
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_FROM) && headers->from != NULL) {
+            str = internet_address_list_to_string(headers->from, FALSE);
 	    match=libbalsa_utf8_strstr(str,cond->match.string.string);
 	    g_free(str);
 	    if (match) break;
@@ -153,11 +149,8 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
                 break;
             }
 	}
-	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC)
-            && message->headers->cc_list) {
-            str =
-                internet_address_list_to_string(message->headers->cc_list,
-                                                FALSE);
+	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_CC) && headers->cc_list != NULL) {
+            str = internet_address_list_to_string(headers->cc_list, FALSE);
 	    match=libbalsa_utf8_strstr(str,cond->match.string.string);
 	    g_free(str);
 	    if (match) break;
@@ -177,10 +170,10 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
             }
 	}
 	if (CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY)) {
-	    if (!message->mailbox)
+	    if (libbalsa_message_get_mailbox(message) == NULL)
 		return FALSE; /* We don't want to match if an error occurred */
-            body =
-                content2reply(message->body_list, NULL, 0, FALSE, FALSE);
+            body = content2reply(libbalsa_message_get_body_list(message),
+                                 NULL, 0, FALSE, FALSE);
 	    if (body) {
 		if (body->str)
                     match = libbalsa_utf8_strstr(body->str,
@@ -193,9 +186,9 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
     case CONDITION_REGEX:
         break;
     case CONDITION_DATE:
-        match = message->headers->date>=cond->match.date.date_low
+        match = headers->date >= cond->match.date.date_low
 	       && (cond->match.date.date_high==0 ||
-                   message->headers->date<=cond->match.date.date_high);
+                   headers->date <= cond->match.date.date_high);
         break;
     case CONDITION_FLAG:
         match = LIBBALSA_MESSAGE_HAS_FLAG(message, cond->match.flags);
@@ -371,9 +364,9 @@ libbalsa_condition_can_match(LibBalsaCondition * cond,
     switch (cond->type) {
     case CONDITION_STRING:
 	return !(CONDITION_CHKMATCH(cond, CONDITION_MATCH_BODY)
-		 && message->body_list == NULL)
+		 && libbalsa_message_get_body_list(message) == NULL)
 	    && !(CONDITION_CHKMATCH(cond, CONDITION_MATCH_US_HEAD)
-		 && message->mime_msg == NULL);
+		 && libbalsa_message_get_mime_msg(message) == NULL);
     case CONDITION_AND:
     case CONDITION_OR:
 	return libbalsa_condition_can_match(cond->match.andor.left,

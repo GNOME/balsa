@@ -224,6 +224,7 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
     gchar *subject;
     gchar *date;
     GString *footer_string;
+    LibBalsaMessageHeaders *headers;
 
     /* initialise the context */
     page_setup = gtk_print_context_get_page_setup(context);
@@ -285,9 +286,9 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
 	footer_string = g_string_new(date);
     g_free(date);
 
-    if (pdata->message->headers->from) {
-	gchar *from =
-	    internet_address_list_to_string(pdata->message->headers->from, FALSE);
+    headers = libbalsa_message_get_headers(pdata->message);
+    if (headers->from != NULL) {
+	gchar *from = internet_address_list_to_string(headers->from, FALSE);
 
 	libbalsa_utf8_sanitize(&from, balsa_app.convert_unknown_8bit,
 			       NULL);
@@ -325,15 +326,15 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
 
     /* add the message headers */
     pdata->setup.c_y_pos = 0.0;	/* to simplify calculating the layout... */
-    pdata->print_parts = 
+    pdata->print_parts =
 	balsa_print_object_header_from_message(NULL, context, pdata->message,
 					       subject, &pdata->setup);
     g_free(subject);
 
     /* add the mime bodies */
-    pdata->print_parts = 
+    pdata->print_parts =
 	scan_body(pdata->print_parts, context, &pdata->setup,
-		  pdata->message->body_list, FALSE);
+		  libbalsa_message_get_body_list(pdata->message), FALSE);
 
     /* done */
     gtk_print_operation_set_n_pages(operation, pdata->setup.page_count);

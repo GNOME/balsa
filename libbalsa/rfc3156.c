@@ -361,7 +361,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	g_object_unref(G_OBJECT(body->parts->next->sig_info));
 
     /* verify the signature */
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+    libbalsa_mailbox_lock_store(libbalsa_message_get_mailbox(body->message));
     result = g_mime_gpgme_mps_verify(GMIME_MULTIPART_SIGNED(body->mime_part), &error);
     if (!result) {
 	if (error) {
@@ -375,7 +375,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     }
 
     body->parts->next->sig_info = result;
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(libbalsa_message_get_mailbox(body->message));
     return TRUE;
 }
 
@@ -420,7 +420,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     		smime_encrypted = body->was_encrypted;
     }
 
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+    libbalsa_mailbox_lock_store(libbalsa_message_get_mailbox(body->message));
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
     	mime_obj =
     		g_mime_gpgme_mpe_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
@@ -430,7 +430,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     		g_mime_application_pkcs7_decrypt_verify(GMIME_PART(body->mime_part),
     			&sig_state, parent, &error);
     }
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(libbalsa_message_get_mailbox(body->message));
 
     /* check the result */
     if (mime_obj == NULL) {
@@ -456,7 +456,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     	body->was_encrypted = smime_encrypted;
     }
     if (body->was_encrypted)
-        body->message->prot_state = LIBBALSA_MSG_PROTECT_CRYPT;
+        libbalsa_message_set_prot_state(body->message, LIBBALSA_MSG_PROTECT_CRYPT);
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
     if (sig_state) {

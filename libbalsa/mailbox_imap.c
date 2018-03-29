@@ -690,22 +690,25 @@ static void
 lbimap_update_flags(LibBalsaMessage *message,
                     ImapMessage     *imsg)
 {
-    message->flags = 0;
+    LibBalsaMessageFlag flags = 0;
+
     if (!IMSG_FLAG_SEEN(imsg->flags)) {
-        message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+        flags |= LIBBALSA_MESSAGE_FLAG_NEW;
     }
     if (IMSG_FLAG_DELETED(imsg->flags)) {
-        message->flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
+        flags |= LIBBALSA_MESSAGE_FLAG_DELETED;
     }
     if (IMSG_FLAG_FLAGGED(imsg->flags)) {
-        message->flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
+        flags |= LIBBALSA_MESSAGE_FLAG_FLAGGED;
     }
     if (IMSG_FLAG_ANSWERED(imsg->flags)) {
-        message->flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
+        flags |= LIBBALSA_MESSAGE_FLAG_REPLIED;
     }
     if (IMSG_FLAG_RECENT(imsg->flags)) {
-        message->flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
+        flags |= LIBBALSA_MESSAGE_FLAG_RECENT;
     }
+
+    libbalsa_message_set_flags(message, flags);
 }
 
 
@@ -861,18 +864,18 @@ imap_flags_cb(unsigned             cnt,
                connection is up. */
             ImapMessage *imsg =
                 imap_mbox_handle_get_msg(mimap->handle, seqno[i]);
-            if (!imsg) {
+            if (imsg == NULL) {
                 continue;
             }
 
-            flags = msg_info->message->flags;
+            flags = libbalsa_message_get_flags(msg_info->message);
             lbimap_update_flags(msg_info->message, imsg);
-            if (flags == msg_info->message->flags) {
+            if (flags == libbalsa_message_get_flags(msg_info->message)) {
                 continue;
             }
 
             libbalsa_mailbox_index_set_flags(mailbox, seqno[i],
-                                             msg_info->message->flags);
+                                             libbalsa_message_get_flags(msg_info->message));
             ++mimap->search_stamp;
         }
     }
@@ -1017,8 +1020,8 @@ imap_expunge_cb(ImapMboxHandle      *handle,
             &g_array_index(mimap->messages_info, struct message_info, i);
 
         g_assert(info != NULL);
-        if (info->message) {
-            info->message->msgno = i + 1;
+        if (info->message != NULL) {
+            libbalsa_message_set_msgno(info->message, i + 1);
         }
     }
 
@@ -1236,8 +1239,8 @@ free_messages_info(LibBalsaMailboxImap *mbox)
         gchar *msgid;
         struct message_info *msg_info =
             &g_array_index(messages_info, struct message_info, i);
-        if (msg_info->message) {
-            msg_info->message->mailbox = NULL;
+        if (msg_info->message != NULL) {
+            libbalsa_message_set_mailbox(msg_info->message, NULL);
             g_object_unref(msg_info->message);
         }
         msgid = g_ptr_array_index(mbox->msgids, i);
@@ -2238,7 +2241,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     gchar *hdr;
 
     g_return_val_if_fail(mimap->opened, FALSE);
-    imsg = mi_get_imsg(mimap, message->msgno);
+    imsg = mi_get_imsg(mimap, libbalsa_message_get_msgno(message));
 
     if (!imsg || !imsg->envelope) {
         /* Connection severed and and restore
@@ -2249,20 +2252,20 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 
     lbimap_update_flags(message, imsg);
 
-    lb_set_headers(message->headers, imsg->envelope, FALSE);
+    lb_set_headers(libbalsa_message_get_headers(message), imsg->envelope, FALSE);
     if ((hdr = imsg->fetched_header_fields) && *hdr && (*hdr != '\r')) {
         libbalsa_message_set_headers_from_string(message, hdr);
     }
-    envelope        = imsg->envelope;
-    message->length = imsg->rfc822size;
+    envelope = imsg->envelope;
+    libbalsa_message_set_length(message, imsg->rfc822size);
     libbalsa_message_set_subject_from_header(message, envelope->subject);
-    message->sender =
-        internet_address_new_list_from_imap_address_list(envelope->sender);
-    libbalsa_message_set_in_reply_to_from_string(message,
-                                                 envelope->in_reply_to);
-    if (envelope->message_id) {
-        message->message_id =
-            g_mime_utils_decode_message_id(envelope->message_id);
+    libbalsa_message_set_sender(message,
+        internet_address_new_list_from_imap_address_list(envelope->sender));
+    libbalsa_message_set_in_reply_to_from_string(message, envelope->in_reply_to);
+    if (envelope->message_id != NULL) {
+        gchar *message_id = g_mime_utils_decode_message_id(envelope->message_id);
+        libbalsa_message_set_message_id(message, message_id);
+        g_free(message_id);
     }
 
     return TRUE;
@@ -2285,18 +2288,20 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox *mailbox,
     }
 
     if (!msg_info->message) {
-        LibBalsaMessage *msg = libbalsa_message_new();
-        msg->msgno   = msgno;
-        msg->mailbox = mailbox;
-        if (libbalsa_mailbox_imap_load_envelope(mimap, msg)) {
+        LibBalsaMessage *message;
+
+        message = libbalsa_message_new();
+        libbalsa_message_set_msgno(message, msgno);
+        libbalsa_message_set_mailbox(message, mailbox);
+        if (libbalsa_mailbox_imap_load_envelope(mimap, message)) {
             gchar *id;
-            msg_info->message = msg;
-            if (libbalsa_message_is_partial(msg, &id)) {
+            msg_info->message = message;
+            if (libbalsa_message_is_partial(message, &id)) {
                 libbalsa_mailbox_try_reassemble(mailbox, id);
                 g_free(id);
             }
         } else {
-            g_object_unref(G_OBJECT(msg));
+            g_object_unref(message);
         }
     }
     if (msg_info->message) {
@@ -2405,14 +2410,17 @@ get_struct_from_cache(LibBalsaMailbox  *mailbox,
                       LibBalsaMessage  *message,
                       LibBalsaFetchFlag flags)
 {
-    if (!message->mime_msg) {
+    GMimeMessage *mime_msg;
+    LibBalsaMessageHeaders *headers;
+
+    if ((mime_msg = libbalsa_message_get_mime_msg(message)) == NULL) {
         gchar **pair, *filename;
         int fd;
         GMimeStream *stream, *fstream;
         GMimeFilter *filter;
         GMimeParser *mime_parser;
         LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-        ImapMessage *imsg          = mi_get_imsg(mimap, message->msgno);
+        ImapMessage *imsg          = mi_get_imsg(mimap, libbalsa_message_get_msgno(message));
 
         if (!imsg) {
             return FALSE;
@@ -2440,25 +2448,27 @@ get_struct_from_cache(LibBalsaMailbox  *mailbox,
         g_object_unref(fstream);
 
         g_mime_parser_set_scan_from(mime_parser, FALSE);
-        message->mime_msg = g_mime_parser_construct_message(mime_parser);
+        mime_msg = g_mime_parser_construct_message(mime_parser);
         g_object_unref(mime_parser);
+
+        libbalsa_message_set_mime_msg(message, mime_msg);
     }
 
     /* follow libbalsa_mailbox_local_fetch_structure here;
      * perhaps create common helper */
+    headers = libbalsa_message_get_headers(message);
     if (flags & LB_FETCH_STRUCTURE) {
         LibBalsaMessageBody *body = libbalsa_message_body_new(message);
         libbalsa_message_body_set_mime_body(body,
-                                            message->mime_msg->mime_part);
+                                            mime_msg->mime_part);
         libbalsa_message_append_part(message, body);
-        libbalsa_message_headers_from_gmime(message->headers,
-                                            message->mime_msg);
+        libbalsa_message_headers_from_gmime(headers,
+                                            mime_msg);
     }
     if (flags & LB_FETCH_RFC822_HEADERS) {
-        g_assert(message->headers != NULL);
-        message->headers->user_hdrs =
-            libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
-        message->has_all_headers = 1;
+        g_assert(headers != NULL);
+        headers->user_hdrs = libbalsa_message_user_hdrs_from_gmime(mime_msg);
+        libbalsa_message_set_has_all_headers(message, TRUE);
     }
     return TRUE;
 }
@@ -2472,7 +2482,10 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox  *mailbox,
     ImapResponse rc;
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     LibBalsaServer *server;
+    LibBalsaMessageHeaders *headers;
+    glong msgno;
     ImapFetchType ift = 0;
+
     g_return_val_if_fail(mimap->opened, FALSE);
 
     /* Work around some server bugs by fetching the RFC2822 form of
@@ -2484,17 +2497,19 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox  *mailbox,
        parts yet. Also, we save some RTTS for very small messages by
        fetching them in their entirety. */
     server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
+    headers = libbalsa_message_get_headers(message);
+    msgno = libbalsa_message_get_msgno(message);
     if (!imap_mbox_handle_can_do(mimap->handle, IMCAP_FETCHBODY) ||
         libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(server),
                                      ISBUG_FETCH) ||
         (LIBBALSA_MESSAGE_GET_LENGTH(message) < 8192) ||
-        (message->headers &&
-         (!message->headers->content_type ||
-          g_mime_content_type_is_type(message->headers->content_type, "text", "*")))) {
+        (headers != NULL &&
+         (headers->content_type == NULL ||
+          g_mime_content_type_is_type(headers->content_type, "text", "*")))) {
         /* we could optimize this part a little bit: we do not need to
          * keep reopening the stream. */
         GMimeStream *stream =
-            libbalsa_mailbox_imap_get_message_stream(mailbox, message->msgno,
+            libbalsa_mailbox_imap_get_message_stream(mailbox, msgno,
                                                      FALSE);
         if (!stream) { /* oops, connection broken or the message disappeared? */
             return FALSE;
@@ -2514,12 +2529,10 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox  *mailbox,
     }
 
     II(rc, mimap->handle,
-       imap_mbox_handle_fetch_range(mimap->handle, message->msgno,
-                                    message->msgno, ift));
+       imap_mbox_handle_fetch_range(mimap->handle, msgno, msgno, ift));
     if (rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
         gchar *hdr;
-        ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
-                                                   message->msgno);
+        ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle, msgno);
         /* in case of msg number discrepancies: */
         g_return_val_if_fail(im != NULL, FALSE);
         if (flags & LB_FETCH_STRUCTURE) {
@@ -2530,7 +2543,7 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox  *mailbox,
         if ((flags & LB_FETCH_RFC822_HEADERS) &&
             (hdr = im->fetched_header_fields) && *hdr && (*hdr != '\r')) {
             libbalsa_message_set_headers_from_string(message, hdr);
-            message->has_all_headers = 1;
+            libbalsa_message_set_has_all_headers(message, TRUE);
         }
         return TRUE;
     }
@@ -2545,16 +2558,15 @@ libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     ImapResponse rc;
+    glong msgno;
 
+    msgno = libbalsa_message_get_msgno(message);
     II(rc, mimap->handle,
-       imap_mbox_handle_fetch_range(mimap->handle,
-                                    message->msgno,
-                                    message->msgno,
+       imap_mbox_handle_fetch_range(mimap->handle, msgno, msgno,
                                     IMFETCH_RFC822HEADERS_SELECTED));
     if (rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
         const gchar *hdr;
-        ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle,
-                                                   message->msgno);
+        ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle, msgno);
         if ((hdr = im->fetched_header_fields) && *hdr && (*hdr != '\r')) {
             libbalsa_message_set_headers_from_string(message, hdr);
         }
@@ -2628,20 +2640,20 @@ print_structure(LibBalsaMessageBody *part,
 
 #endif
 static gchar *
-get_section_for(LibBalsaMessage     *msg,
+get_section_for(LibBalsaMessage     *message,
                 LibBalsaMessageBody *part)
 {
     GString *section = g_string_new("");
     LibBalsaMessageBody *parent;
 
-    parent = msg->body_list;
+    parent = libbalsa_message_get_body_list(message);
     if (libbalsa_message_body_is_multipart(parent)) {
         parent = parent->parts;
     }
 
     if (!is_child_of(parent, part, section, TRUE)) {
-        g_warning("Internal error, part %p not found in msg %p.\n",
-                  part, msg);
+        g_warning("Internal error, part %p not found in message %p.\n",
+                  part, message);
         g_string_free(section, TRUE);
         return g_strdup("1");
     }
@@ -2717,17 +2729,17 @@ get_parent(LibBalsaMessageBody *root,
 
 
 static gboolean
-lbm_imap_get_msg_part_from_cache(LibBalsaMessage     *msg,
+lbm_imap_get_msg_part_from_cache(LibBalsaMessage     *message,
                                  LibBalsaMessageBody *part,
                                  GError             **err)
 {
     GMimeStream *partstream = NULL;
-
     gchar **pair, *part_name;
-    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
+    LibBalsaMailbox *mailbox = libbalsa_message_get_mailbox(message);
+    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     FILE *fp;
     gchar *section;
-    ImapMessage *imsg = mi_get_imsg(mimap, msg->msgno);
+    ImapMessage *imsg = mi_get_imsg(mimap, libbalsa_message_get_msgno(message));
 
     if (!imsg) {
         g_set_error(err,
@@ -2738,7 +2750,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage     *msg,
     }
 
     /* look for a part cache */
-    section   = get_section_for(msg, part);
+    section   = get_section_for(message, part);
     pair      = get_cache_name_pair(mimap, "part", imsg->uid);
     part_name = g_strconcat(pair[0], G_DIR_SEPARATOR_S,
                             pair[1], "-", section, NULL);
@@ -2750,8 +2762,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage     *msg,
         ImapResponse rc;
         LibBalsaMessageBody *parent;
 
-        libbalsa_lock_mailbox(msg->mailbox);
-        mimap = LIBBALSA_MAILBOX_IMAP(msg->mailbox);
+        libbalsa_lock_mailbox(mailbox);
 
         dt.body = imap_message_get_body_from_section(imsg, section);
         if (!dt.body) {
@@ -2775,7 +2786,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage     *msg,
          * which has no headers. In this case, we have to fake them.
          * We could and probably should dump there first the headers
          * that we have already fetched... */
-        parent = get_parent(msg->body_list, part, NULL);
+        parent = get_parent(libbalsa_message_get_body_list(message), part, NULL);
         if (parent == NULL) {
             ifbo = IMFB_NONE;
         } else {
@@ -2788,13 +2799,14 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage     *msg,
         rc = IMR_OK;
         if (dt.body->octets > 0) {
             II(rc, mimap->handle,
-               imap_mbox_handle_fetch_body(mimap->handle, msg->msgno,
+               imap_mbox_handle_fetch_body(mimap->handle,
+                                           libbalsa_message_get_msgno(message),
                                            section, FALSE, ifbo, append_str, &dt));
         }
-        libbalsa_unlock_mailbox(msg->mailbox);
+        libbalsa_unlock_mailbox(mailbox);
         if (rc != IMR_OK) {
             fprintf(stderr, "Error fetching imap message no %lu section %s\n",
-                    msg->msgno, section);
+                    libbalsa_message_get_msgno(message), section);
             g_free(dt.block);
             g_free(section);
             g_strfreev(pair);

@@ -75,18 +75,17 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     /* a reply may be created only for unread requests */
     if ((vcal_obj->method == ITIP_REQUEST) &&
 	LIBBALSA_MESSAGE_IS_UNREAD(lbm)) {
+        LibBalsaMessageHeaders *headers;
+
+        headers = libbalsa_message_get_headers(lbm);
 	may_reply = TRUE;
-	if (lbm->headers) {
-	    if (lbm->headers->reply_to)
-                sender =
-                    internet_address_list_get_address(lbm->headers->
-                                                      reply_to, 0);
-	    else if (lbm->headers && lbm->headers->from)
-                sender =
-                    internet_address_list_get_address(lbm->headers->from,
-                                                      0);
-	} else if (lbm->sender)
-	    sender = internet_address_list_get_address(lbm->sender, 0);
+	if (headers != NULL) {
+	    if (headers->reply_to != NULL)
+                sender = internet_address_list_get_address(headers-> reply_to, 0);
+	    else if (headers->from != NULL)
+                sender = internet_address_list_get_address(headers->from, 0);
+	} else if (libbalsa_message_get_sender(lbm))
+	    sender = internet_address_list_get_address(libbalsa_message_get_sender(lbm), 0);
     }
 
     /* add events */
@@ -297,10 +296,10 @@ vevent_reply(GObject * button, GtkWidget * box)
 
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
-    message->headers->from = internet_address_list_new();
-    internet_address_list_add(message->headers->from, ia);
-    message->headers->to_list = internet_address_list_parse_string(rcpt);
-    message->headers->date = time(NULL);
+    libbalsa_message_get_headers(message)->from = internet_address_list_new();
+    internet_address_list_add(libbalsa_message_get_headers(message)->from, ia);
+    libbalsa_message_get_headers(message)->to_list = internet_address_list_parse_string(rcpt);
+    libbalsa_message_get_headers(message)->date = time(NULL);
 
     /* create the message subject */
     dummy = g_strdup_printf("%s: %s",
@@ -324,7 +323,8 @@ vevent_reply(GObject * button, GtkWidget * box)
     params[0] = g_strdup("method");
     params[1] = g_strdup("reply");
     params[2] = NULL;
-    message->parameters = g_list_prepend(message->parameters, params);
+    libbalsa_message_set_parameters(message,
+            g_list_prepend(libbalsa_message_get_parameters(message), params));
 
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,
 				   balsa_find_sentbox_by_url,

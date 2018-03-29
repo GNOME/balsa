@@ -189,7 +189,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     /* on local mailboxes only, to avoid possibly long downloads */
     if ((content_type == NULL ||
 	 g_ascii_strcasecmp(content_type, "application/octet-stream") == 0)
-	&& LIBBALSA_IS_MAILBOX_LOCAL(mime_body->message->mailbox)) {
+	&& LIBBALSA_IS_MAILBOX_LOCAL(libbalsa_message_get_mailbox(mime_body->message))) {
         GError *err = NULL;
 	GMimeStream *stream = 
             libbalsa_message_body_get_stream(mime_body, &err);

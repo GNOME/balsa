@@ -559,10 +559,12 @@ parse_mailbox(LibBalsaMailboxMbox *mbox)
                         g_memdup(&msg_info, sizeof(msg_info)));
         mbox->messages_info_changed = TRUE;
 
-        msg->flags   = msg_info.orig_flags;
-        msg->length  = msg_info.end - (msg_info.start + msg_info.from_len);
-        msg->mailbox = LIBBALSA_MAILBOX(mbox);
-        msg->msgno   = ++msgno;
+        libbalsa_message_set_flags(msg, msg_info.orig_flags);
+        libbalsa_message_set_length(msg,
+                                    msg_info.end -
+                                    (msg_info.start + msg_info.from_len));
+        libbalsa_message_set_mailbox(msg, LIBBALSA_MAILBOX(mbox));
+        libbalsa_message_set_msgno(msg, ++msgno);
         /* We must drop the mime-stream lock to call
          * libbalsa_mailbox_local_cache_message, which calls
          * libbalsa_mailbox_cache_message(), as it may grab the
@@ -586,10 +588,14 @@ parse_mailbox(LibBalsaMailboxMbox *mbox)
 static void
 free_message_info(struct message_info *msg_info)
 {
-    if (msg_info->local_info.message) {
-        msg_info->local_info.message->mailbox = NULL;
-        msg_info->local_info.message->msgno   = 0;
-        g_object_remove_weak_pointer(G_OBJECT(msg_info->local_info.message),
+    LibBalsaMessage *message;
+
+    message = msg_info->local_info.message;
+
+    if (message != NULL) {
+        libbalsa_message_set_mailbox(message, NULL);
+        libbalsa_message_set_msgno(message, 0);
+        g_object_remove_weak_pointer(G_OBJECT(message),
                                      (gpointer) & msg_info->local_info.message);
         msg_info->local_info.message = NULL;
     }
@@ -1834,8 +1840,8 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox *mailbox,
             mbox->messages_info_changed = TRUE;
             continue;
         }
-        if (msg_info->local_info.message) {
-            msg_info->local_info.message->msgno = j + 1;
+        if (msg_info->local_info.message != NULL) {
+            libbalsa_message_set_msgno(msg_info->local_info.message, j + 1);
         }
 
         msg_info->status = msg_info->x_status = msg_info->mime_version = -1;
@@ -1869,16 +1875,17 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox *mailbox,
         msg_info->end        = g_mime_parser_tell(gmime_parser);
         msg_info->orig_flags = REAL_FLAGS(msg_info->local_info.flags);
         g_assert(mime_msg->mime_part != NULL);
-        if (!msg_info->local_info.message || !msg_info->local_info.message->mime_msg) {
+        if (msg_info->local_info.message == NULL ||
+            libbalsa_message_get_mime_msg(msg_info->local_info.message) == NULL) {
             g_object_unref(mime_msg);
         } else {
-            g_object_unref(msg_info->local_info.message->mime_msg);
-            msg_info->local_info.message->mime_msg = mime_msg;
+            libbalsa_message_set_mime_msg(msg_info->local_info.message, mime_msg);
             /*
              * reinit the message parts info
              */
-            libbalsa_message_body_set_mime_body(msg_info->local_info.message->body_list,
-                                                mime_msg->mime_part);
+            libbalsa_message_body_set_mime_body
+                (libbalsa_message_get_body_list(msg_info->local_info.message),
+                 mime_msg->mime_part);
         }
 
         j++;
@@ -1908,8 +1915,11 @@ libbalsa_mailbox_mbox_fetch_message_structure(LibBalsaMailbox  *mailbox,
                                               LibBalsaMessage  *message,
                                               LibBalsaFetchFlag flags)
 {
-    if (!message->mime_msg) {
-        message->mime_msg = lbm_mbox_get_mime_message(mailbox, message->msgno);
+    if (libbalsa_message_get_mime_msg(message) == NULL) {
+        libbalsa_message_set_mime_msg(message,
+                                      lbm_mbox_get_mime_message
+                                      (mailbox,
+                                       libbalsa_message_get_msgno(message)));
     }
 
     return LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mbox_parent_class)->
@@ -2044,6 +2054,7 @@ lbm_mbox_add_message(LibBalsaMailboxLocal *local,
 {
     LibBalsaMailbox *mailbox = (LibBalsaMailbox *) local;
     LibBalsaMessage *message;
+    LibBalsaMessageHeaders *headers;
     gchar date_string[27];
     gchar *sender;
     gchar *address;
@@ -2060,10 +2071,11 @@ lbm_mbox_add_message(LibBalsaMailboxLocal *local,
     message = libbalsa_message_new();
     libbalsa_message_load_envelope_from_stream(message, stream);
 
-    ctime_r(&(message->headers->date), date_string);
+    headers = libbalsa_message_get_headers(message);
+    ctime_r(&(headers->date), date_string);
 
-    sender = message->headers->from ?
-        internet_address_list_to_string(message->headers->from, FALSE) :
+    sender = headers->from != NULL ?
+        internet_address_list_to_string(headers->from, FALSE) :
         g_strdup("none");
 
     g_object_unref(message);

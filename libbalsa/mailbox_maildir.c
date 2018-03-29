@@ -613,7 +613,7 @@ libbalsa_mailbox_maildir_check(LibBalsaMailbox *mailbox)
     for (msgno = renumber; msgno <= mdir->msgno_2_msg_info->len; msgno++) {
         msg_info = message_info_from_msgno(mdir, msgno);
         if (msg_info->local_info.message) {
-            msg_info->local_info.message->msgno = msgno;
+            libbalsa_message_set_msgno(msg_info->local_info.message, msgno);
         }
     }
 
@@ -632,8 +632,8 @@ free_message_info(struct message_info *msg_info)
     g_free(msg_info->key);
     g_free(msg_info->filename);
     if (msg_info->local_info.message) {
-        msg_info->local_info.message->mailbox = NULL;
-        msg_info->local_info.message->msgno   = 0;
+        libbalsa_message_set_mailbox(msg_info->local_info.message, NULL);
+        libbalsa_message_set_msgno(msg_info->local_info.message, 0);
         g_object_remove_weak_pointer(G_OBJECT(msg_info->local_info.message),
                                      (gpointer) & msg_info->local_info.message);
     }
@@ -845,7 +845,7 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox *mailbox,
     for (msgno = renumber; msgno <= mdir->msgno_2_msg_info->len; msgno++) {
         msg_info = message_info_from_msgno(mdir, msgno);
         if (msg_info->local_info.message) {
-            msg_info->local_info.message->msgno = msgno;
+            libbalsa_message_set_msgno(msg_info->local_info.message, msgno);
         }
     }
 
@@ -882,14 +882,14 @@ libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox  *mailbox,
                                                  LibBalsaMessage  *message,
                                                  LibBalsaFetchFlag flags)
 {
-    if (!message->mime_msg) {
+    if (libbalsa_message_get_mime_msg(message) == NULL) {
         struct message_info *msg_info =
             message_info_from_msgno((LibBalsaMailboxMaildir *) mailbox,
-                                    message->msgno);
-        message->mime_msg =
+                                    libbalsa_message_get_msgno(message));
+        libbalsa_message_set_mime_msg(message,
             libbalsa_mailbox_local_get_mime_message(mailbox,
                                                     msg_info->subdir,
-                                                    msg_info->filename);
+                                                    msg_info->filename));
     }
 
     return LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_maildir_parent_class)->

@@ -330,12 +330,15 @@ store_address_note_frame(StoreAddressInfo *info)
     g_object_set(G_OBJECT(info->notebook), "margin", 4, NULL);
 
     for (list = info->message_list; list; list = list->next) {
+        LibBalsaMessageHeaders *headers;
+
         message = LIBBALSA_MESSAGE(list->data);
-	if (message->headers) {
-	    store_address_add_list(info, _("From: "), message->headers->from);
-	    store_address_add_list(info, _("To: "), message->headers->to_list);
-	    store_address_add_list(info, _("CC: "), message->headers->cc_list);
-	    store_address_add_list(info, _("BCC: "), message->headers->bcc_list);
+        headers = libbalsa_message_get_headers(message);
+	if (headers != NULL) {
+	    store_address_add_list(info, _("From: "), headers->from);
+	    store_address_add_list(info, _("To: "), headers->to_list);
+	    store_address_add_list(info, _("CC: "), headers->cc_list);
+	    store_address_add_list(info, _("BCC: "), headers->bcc_list);
 	}
     }
 

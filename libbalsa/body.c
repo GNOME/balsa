@@ -213,9 +213,11 @@ libbalsa_message_body_set_multipart(LibBalsaMessageBody * body,
 static void
 libbalsa_message_body_set_text_rfc822headers(LibBalsaMessageBody *body)
 {
+    LibBalsaMailbox *mailbox;
     GMimeStream *headers;
 
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+    mailbox = libbalsa_message_get_mailbox(body->message);
+    libbalsa_mailbox_lock_store(mailbox);
     headers = libbalsa_message_body_get_stream(body, NULL);
 
     if (headers != NULL) {
@@ -232,7 +234,7 @@ libbalsa_message_body_set_text_rfc822headers(LibBalsaMessageBody *body)
 	g_object_unref(dummy_msg);
     }
 
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(mailbox);
 }
 
 static void
@@ -507,6 +509,8 @@ libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
         GMimeStream *stream_null;
         GMimeStream *stream_filter;
         GMimeFilter *filter_windows;
+        LibBalsaMailbox *mailbox;
+
 
         stream_null = g_mime_stream_null_new();
         stream_filter = g_mime_stream_filter_new(stream_null);
@@ -516,10 +520,11 @@ libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
         g_mime_stream_filter_add(GMIME_STREAM_FILTER(stream_filter),
                                  filter_windows);
 
-        libbalsa_mailbox_lock_store(body->message->mailbox);
+        mailbox = libbalsa_message_get_mailbox(body->message);
+        libbalsa_mailbox_lock_store(mailbox);
         g_mime_stream_reset(stream);
         g_mime_stream_write_to_stream(stream, stream_filter);
-        libbalsa_mailbox_unlock_store(body->message->mailbox);
+        libbalsa_mailbox_unlock_store(mailbox);
         g_object_unref(stream_filter);
 
         charset = g_mime_filter_windows_real_charset(GMIME_FILTER_WINDOWS
@@ -543,15 +548,17 @@ libbalsa_message_body_get_message_part_stream(LibBalsaMessageBody * body,
                                               GError ** err)
 {
     GMimeStream *stream;
+    LibBalsaMailbox *mailbox;
     ssize_t bytes_written;
     GMimeMessage *msg = g_mime_message_part_get_message
         (GMIME_MESSAGE_PART(body->mime_part));
 
     stream = g_mime_stream_mem_new();
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+    mailbox = libbalsa_message_get_mailbox(body->message);
+    libbalsa_mailbox_lock_store(mailbox);
     bytes_written =
         g_mime_object_write_to_stream(GMIME_OBJECT(msg), stream);
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(mailbox);
     printf("Written %ld bytes of embedded message\n",
            (long) bytes_written);
 
@@ -573,7 +580,7 @@ libbalsa_message_body_get_stream(LibBalsaMessageBody * body, GError **err)
     g_return_val_if_fail(body != NULL, NULL);
     g_return_val_if_fail(body->message != NULL, NULL);
 
-    if (!body->message->mailbox) {
+    if (libbalsa_message_get_mailbox(body->message) == NULL) {
         if (err != NULL && *err == NULL) {
             g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                         LIBBALSA_MAILBOX_ACCESS_ERROR,
@@ -620,6 +627,7 @@ libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf,
 {
     GMimeStream *stream, *stream_mem;
     GByteArray *array;
+    LibBalsaMailbox *mailbox;
     gssize len;
 
     g_return_val_if_fail(body != NULL, -1);
@@ -635,10 +643,11 @@ libbalsa_message_body_get_content(LibBalsaMessageBody * body, gchar ** buf,
     stream_mem = g_mime_stream_mem_new_with_byte_array(array);
     g_mime_stream_mem_set_owner(GMIME_STREAM_MEM(stream_mem), FALSE);
 
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+    mailbox = libbalsa_message_get_mailbox(body->message);
+    libbalsa_mailbox_lock_store(mailbox);
     g_mime_stream_reset(stream);
     len = g_mime_stream_write_to_stream(stream, stream_mem);
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(mailbox);
     g_object_unref(stream);
     g_object_unref(stream_mem);
 
@@ -662,6 +671,7 @@ GdkPixbuf *
 libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 {
     GMimeStream *stream;
+    LibBalsaMailbox *mailbox;
     gchar *mime_type;
     GdkPixbufLoader *loader;
     GdkPixbuf *pixbuf = NULL;
@@ -670,7 +680,8 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
     if (!stream)
         return pixbuf;
 
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+    mailbox = libbalsa_message_get_mailbox(body->message);
+    libbalsa_mailbox_lock_store(mailbox);
     g_mime_stream_reset(stream);
 
     mime_type = libbalsa_message_body_get_mime_type(body);
@@ -704,7 +715,7 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
         g_object_unref(loader);
     }
 
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(mailbox);
     g_object_unref(stream);
 
     return pixbuf;
@@ -716,6 +727,7 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
                                   GError ** err)
 {
     GMimeStream *stream;
+    LibBalsaMailbox *mailbox;
     ssize_t len;
 
     stream = libbalsa_message_body_get_stream(body, err);
@@ -723,7 +735,8 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
         return FALSE;
     g_clear_error(err);
 
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+    mailbox = libbalsa_message_get_mailbox(body->message);
+    libbalsa_mailbox_lock_store(mailbox);
 
     if (stream) {
         g_mime_stream_reset(stream);
@@ -740,7 +753,7 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
         /* body->mime_part is neither a GMimePart nor a GMimeMessagePart. */
         len = g_mime_object_write_to_stream(body->mime_part, dest);
 
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(mailbox);
     g_object_unref(dest);
 
     if (len < 0)

@@ -326,27 +326,29 @@ libbalsa_mailbox_dispose(GObject *object)
 
 
 static gchar *
-get_from_field(LibBalsaMessage *message)
+get_from_field(LibBalsaMailbox *mailbox,
+               LibBalsaMessage *message)
 {
-    LibBalsaMailbox *mailbox          = message->mailbox;
     LibBalsaMailboxPrivate *priv      = libbalsa_mailbox_get_instance_private(mailbox);
     InternetAddressList *address_list = NULL;
     const gchar *name_str             = NULL;
     gboolean append_dots              = FALSE;
     gchar *from;
+    LibBalsaMessageHeaders *headers;
 
-    g_return_val_if_fail(message->mailbox, NULL);
+    g_return_val_if_fail(libbalsa_message_get_mailbox(message) != NULL, NULL);
 
-    if (message->headers) {
+    headers = libbalsa_message_get_headers(message);
+    if (headers != NULL) {
         if (priv->view &&
             (priv->view->show == LB_MAILBOX_SHOW_TO)) {
-            address_list = message->headers->to_list;
+            address_list = headers->to_list;
         } else {
-            address_list = message->headers->from;
+            address_list = headers->from;
         }
     }
 
-    if (address_list) {
+    if (address_list != NULL) {
         gint i, len = internet_address_list_length(address_list);
 
         for (i = 0; i < len && name_str == NULL; i++) {
@@ -396,23 +398,25 @@ get_from_field(LibBalsaMessage *message)
 
 
 static void
-lbm_index_entry_populate_from_msg(LibBalsaMailboxIndexEntry *entry,
+lbm_index_entry_populate_from_msg(LibBalsaMailbox           *mailbox,
+                                  LibBalsaMailboxIndexEntry *entry,
                                   LibBalsaMessage           *msg)
 {
-    entry->from           = get_from_field(msg);
+    entry->from           = get_from_field(mailbox, msg);
     entry->subject        = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(msg));
-    entry->msg_date       = msg->headers->date;
+    entry->msg_date       = libbalsa_message_get_headers(msg)->date;
     entry->internal_date  = 0; /* FIXME */
-    entry->status_icon    = libbalsa_get_icon_from_flags(msg->flags);
+    entry->status_icon    = libbalsa_get_icon_from_flags(libbalsa_message_get_flags(msg));
     entry->attach_icon    = libbalsa_message_get_attach_icon(msg);
-    entry->size           = msg->length;
+    entry->size           = libbalsa_message_get_length(msg);
     entry->foreground     = NULL;
     entry->background     = NULL;
     entry->foreground_set = 0;
     entry->background_set = 0;
     entry->unseen         = LIBBALSA_MESSAGE_IS_UNREAD(msg);
     entry->idle_pending   = 0;
-    libbalsa_mailbox_msgno_changed(msg->mailbox, msg->msgno);
+
+    libbalsa_mailbox_msgno_changed(mailbox, libbalsa_message_get_msgno(msg));
 }
 
 
@@ -1027,7 +1031,7 @@ static void
 libbalsa_mailbox_real_release_message(LibBalsaMailbox *mailbox,
                                       LibBalsaMessage *message)
 {
-    g_clear_object(&message->mime_msg);
+    libbalsa_message_set_mime_msg(message, NULL);
 }
 
 
@@ -2156,9 +2160,9 @@ lbm_cache_message(LibBalsaMailbox *mailbox,
     if (!entry) {
         g_ptr_array_index(priv->mindex, msgno - 1) =
             entry                                  = g_new(LibBalsaMailboxIndexEntry, 1);
-        lbm_index_entry_populate_from_msg(entry, message);
+        lbm_index_entry_populate_from_msg(mailbox, entry, message);
     } else if (entry->idle_pending) {
-        lbm_index_entry_populate_from_msg(entry, message);
+        lbm_index_entry_populate_from_msg(mailbox, entry, message);
     }
 }
 
@@ -2234,11 +2238,9 @@ void
 libbalsa_mailbox_release_message(LibBalsaMailbox *mailbox,
                                  LibBalsaMessage *message)
 {
-    g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-    g_return_if_fail(message != NULL);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-    g_return_if_fail(mailbox == message->mailbox);
+    g_return_if_fail(mailbox == libbalsa_message_get_mailbox(message));
     g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->release_message(mailbox, message);
@@ -2254,9 +2256,9 @@ libbalsa_mailbox_set_msg_headers(LibBalsaMailbox *mailbox,
     g_return_if_fail(message != NULL);
     g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
 
-    if (!message->has_all_headers) {
+    if (!libbalsa_message_get_has_all_headers(message)) {
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->fetch_headers(mailbox, message);
-        message->has_all_headers = 1;
+        libbalsa_message_set_has_all_headers(message, TRUE);
     }
 }
 
@@ -2266,14 +2268,16 @@ libbalsa_mailbox_get_message_part(LibBalsaMessage     *message,
                                   LibBalsaMessageBody *part,
                                   GError             **err)
 {
+    LibBalsaMailbox *mailbox;
+
     g_return_val_if_fail(message != NULL, FALSE);
-    g_return_val_if_fail(message->mailbox != NULL, FALSE);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(message->mailbox), FALSE);
-    g_assert(LIBBALSA_MAILBOX_GET_CLASS(message->mailbox) != NULL);
+
+    mailbox = libbalsa_message_get_mailbox(message);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_assert(LIBBALSA_MAILBOX_GET_CLASS(mailbox) != NULL);
     g_return_val_if_fail(part != NULL, FALSE);
 
-    return LIBBALSA_MAILBOX_GET_CLASS(message->mailbox)
-           ->get_message_part(message, part, err);
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message_part(message, part, err);
 }
 
 
@@ -4403,29 +4407,32 @@ libbalsa_mailbox_set_msg_tree(LibBalsaMailbox *mailbox,
 
 static GMimeMessage *
 lbm_get_mime_msg(LibBalsaMailbox *mailbox,
-                 LibBalsaMessage *msg)
+                 LibBalsaMessage *message)
 {
     GMimeMessage *mime_msg;
 
-    if (!msg->mime_msg) {
-        libbalsa_mailbox_fetch_message_structure(mailbox, msg,
+    mime_msg = libbalsa_message_get_mime_msg(message);
+    if (mime_msg == NULL) {
+        libbalsa_mailbox_fetch_message_structure(mailbox, message,
                                                  LB_FETCH_RFC822_HEADERS);
     }
-    mime_msg = msg->mime_msg;
-    if (mime_msg) {
+    mime_msg = libbalsa_message_get_mime_msg(message);
+    if (mime_msg != NULL) {
         g_object_ref(mime_msg);
     } else {
         GMimeStream *stream;
         GMimeParser *parser;
 
-        stream = libbalsa_mailbox_get_message_stream(mailbox, msg->msgno,
-                                                     TRUE);
+        stream =
+            libbalsa_mailbox_get_message_stream(mailbox,
+                                                libbalsa_message_get_msgno(message),
+                                                TRUE);
         parser = g_mime_parser_new_with_stream(stream);
         g_object_unref(stream);
         mime_msg = g_mime_parser_construct_message(parser);
         g_object_unref(parser);
     }
-    libbalsa_mailbox_release_message(mailbox, msg);
+    libbalsa_mailbox_release_message(mailbox, message);
 
     return mime_msg;
 }
@@ -4554,15 +4561,16 @@ lbm_try_reassemble(LibBalsaMailbox *mailbox,
 
     if (partials->len == total) {
         LibBalsaMessage *message = libbalsa_message_new();
-        message->flags |= LIBBALSA_MESSAGE_FLAG_NEW;
+
+        libbalsa_message_set_flags(message, LIBBALSA_MESSAGE_FLAG_NEW);
 
         libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
                              _("Reconstructing message"));
         libbalsa_mailbox_lock_store(mailbox);
-        message->mime_msg =
+        libbalsa_message_set_mime_msg(message,
             g_mime_message_partial_reconstruct_message((GMimeMessagePartial
                                                         **) partials->
-                                                       pdata, total);
+                                                       pdata, total));
         libbalsa_message_copy(message, mailbox, NULL);
         libbalsa_mailbox_unlock_store(mailbox);
 

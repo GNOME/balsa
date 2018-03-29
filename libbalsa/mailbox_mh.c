@@ -533,8 +533,8 @@ lbm_mh_free_message_info(struct message_info *msg_info)
         return;
     }
     if (msg_info->local_info.message) {
-        msg_info->local_info.message->mailbox = NULL;
-        msg_info->local_info.message->msgno   = 0;
+        libbalsa_message_set_mailbox(msg_info->local_info.message, NULL);
+        libbalsa_message_set_msgno(msg_info->local_info.message, 0);
         g_object_remove_weak_pointer(G_OBJECT(msg_info->local_info.message),
                                      (gpointer) & msg_info->local_info.message);
     }
@@ -743,7 +743,7 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox *mailbox)
     for (msgno = renumber; msgno <= mh->msgno_2_msg_info->len; msgno++) {
         msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
         if (msg_info->local_info.message) {
-            msg_info->local_info.message->msgno = msgno;
+            libbalsa_message_set_msgno(msg_info->local_info.message, msgno);
         }
     }
 
@@ -962,7 +962,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox *mailbox,
     for (msgno = 1; msgno <= mh->msgno_2_msg_info->len; msgno++) {
         msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
         if (msg_info->local_info.message) {
-            msg_info->local_info.message->msgno = msgno;
+            libbalsa_message_set_msgno(msg_info->local_info.message, msgno);
         }
     }
 
@@ -1085,24 +1085,25 @@ libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox  *mailbox,
                                             LibBalsaMessage  *message,
                                             LibBalsaFetchFlag flags)
 {
-    if (!message->mime_msg) {
+    if (libbalsa_message_get_mime_msg(message) == NULL) {
         struct message_info *msg_info;
         gchar *base_name;
+        GMimeMessage *mime_msg;
 
         msg_info =
             lbm_mh_message_info_from_msgno(LIBBALSA_MAILBOX_MH(mailbox),
-                                           message->msgno);
+                                           libbalsa_message_get_msgno(message));
 
-        base_name         = MH_BASENAME(msg_info);
-        message->mime_msg =
-            libbalsa_mailbox_local_get_mime_message(mailbox, base_name, NULL);
+        base_name = MH_BASENAME(msg_info);
+        mime_msg = libbalsa_mailbox_local_get_mime_message(mailbox, base_name, NULL);
         g_free(base_name);
 
-        if (message->mime_msg) {
-            g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
+        if (mime_msg != NULL) {
+            g_mime_object_remove_header(GMIME_OBJECT(mime_msg),
                                         "Status");
-            g_mime_object_remove_header(GMIME_OBJECT(message->mime_msg),
+            g_mime_object_remove_header(GMIME_OBJECT(mime_msg),
                                         "X-Status");
+            libbalsa_message_set_mime_msg(message, mime_msg);
         }
     }
 

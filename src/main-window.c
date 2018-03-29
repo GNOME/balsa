@@ -4242,7 +4242,7 @@ bw_index_changed_cb(GtkWidget * widget, gpointer data)
     bw_enable_mailbox_menus(window, index);
 
     current_msgno = BALSA_MESSAGE(window->preview)->message ?
-        BALSA_MESSAGE(window->preview)->message->msgno : 0;
+        libbalsa_message_get_msgno(BALSA_MESSAGE(window->preview)->message) : 0;
 
     if (current_msgno != index->current_msgno)
         bw_idle_replace(window, index);

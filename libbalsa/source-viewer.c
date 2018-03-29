@@ -117,24 +117,28 @@ lsv_escape_change_state(GSimpleAction * action,
     LibBalsaSourceViewerInfo *lsvi =
         g_object_get_data(G_OBJECT(user_data), "lsvi");
     LibBalsaMessage *msg = lsvi->msg;
+    LibBalsaMailbox *mailbox;
     GMimeStream *msg_stream;
     GMimeStream *mem_stream;
     char *raw_message;
 
-    if (!msg->mailbox) {
+    mailbox = libbalsa_message_get_mailbox(msg);
+    if (mailbox == NULL) {
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Mailbox closed"));
 	return;
     }
-    msg_stream = libbalsa_mailbox_get_message_stream(msg->mailbox, msg->msgno,
-						     TRUE);
+    msg_stream =
+        libbalsa_mailbox_get_message_stream(mailbox,
+                                            libbalsa_message_get_msgno(msg),
+                                            TRUE);
     if (msg_stream == NULL)
 	return;
 
     mem_stream = g_mime_stream_mem_new();
-    libbalsa_mailbox_lock_store(msg->mailbox);
+    libbalsa_mailbox_lock_store(mailbox);
     g_mime_stream_write_to_stream(msg_stream, mem_stream);
-    libbalsa_mailbox_unlock_store(msg->mailbox);
+    libbalsa_mailbox_unlock_store(mailbox);
     g_mime_stream_write(mem_stream, "", 1); /* close string */
     raw_message = (char *) GMIME_STREAM_MEM(mem_stream)->buffer->data;
 
@@ -208,7 +212,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     GAction *escape_action;
 
     g_return_if_fail(msg);
-    g_return_if_fail(MAILBOX_OPEN(msg->mailbox));
+    g_return_if_fail(MAILBOX_OPEN(libbalsa_message_get_mailbox(msg)));
 
     text = gtk_text_view_new();
 

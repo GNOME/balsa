@@ -1886,8 +1886,8 @@ font_modified_cb(GtkWidget * widget, GtkWidget * pbox)
     properties_modified_cb(widget, pbox);
 
     gtk_font_chooser_set_level(GTK_FONT_CHOOSER(widget),
-                               show_size ? GTK_FONT_CHOOSER_LEVEL_FONT
-                                         : GTK_FONT_CHOOSER_LEVEL_FACE);
+                               show_size ? GTK_FONT_CHOOSER_LEVEL_SIZE
+                                         : GTK_FONT_CHOOSER_LEVEL_STYLE);
     g_object_set_data(G_OBJECT(widget), "font-modified",
                       GINT_TO_POINTER(TRUE));
 }
@@ -2450,9 +2450,9 @@ pm_grid_add_preview_font_group(GtkWidget * grid_widget)
 
     if (use_default_font_size) {
         gtk_font_chooser_set_level(GTK_FONT_CHOOSER(pui->message_font_button),
-                                   GTK_FONT_CHOOSER_LEVEL_FACE);
+                                   GTK_FONT_CHOOSER_LEVEL_STYLE);
         gtk_font_chooser_set_level(GTK_FONT_CHOOSER(pui->subject_font_button),
-                                   GTK_FONT_CHOOSER_LEVEL_FACE);
+                                   GTK_FONT_CHOOSER_LEVEL_STYLE);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                      (pui->use_default_font_size), TRUE);
     }

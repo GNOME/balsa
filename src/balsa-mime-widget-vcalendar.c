@@ -278,6 +278,7 @@ vevent_reply(GObject * button, GtkWidget * box)
 	GPOINTER_TO_INT(g_object_get_data(button, "mode"));
     gchar *rcpt;
     LibBalsaMessage *message;
+    LibBalsaMessageHeaders *headers;
     LibBalsaMessageBody *body;
     gchar *dummy;
     gchar **params;
@@ -298,10 +299,11 @@ vevent_reply(GObject * button, GtkWidget * box)
 
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
-    libbalsa_message_get_headers(message)->from = internet_address_list_new();
-    internet_address_list_add(libbalsa_message_get_headers(message)->from, ia);
-    libbalsa_message_get_headers(message)->to_list = internet_address_list_parse_string(rcpt);
-    libbalsa_message_get_headers(message)->date = time(NULL);
+    headers = libbalsa_message_get_headers(message);
+    headers->from = internet_address_list_new();
+    internet_address_list_add(headers->from, ia);
+    headers->to_list = internet_address_list_parse_string(rcpt);
+    headers->date = time(NULL);
 
     /* create the message subject */
     dummy = g_strdup_printf("%s: %s",

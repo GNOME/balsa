@@ -619,7 +619,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 	g_clear_object(&bsmsg->parent_message);
     }
 
-    if (bsmsg->draft_message) {
+    if (bsmsg->draft_message != NULL) {
         LibBalsaMailbox *mailbox;
 
         g_object_set_data(G_OBJECT(bsmsg->draft_message),
@@ -2613,9 +2613,8 @@ create_info_pane(BalsaSendmsg * bsmsg)
         LibBalsaMessageHeaders *headers;
 
         headers = libbalsa_message_get_headers(bsmsg->draft_message);
-        if (headers != NULL && headers->fcc_url != NULL) {
+        if (headers->fcc_url != NULL)
             balsa_mblist_mru_add(&balsa_app.fcc_mru, headers->fcc_url);
-        }
     }
 
     bsmsg->fcc[1] =
@@ -3070,10 +3069,12 @@ message_part_get_subject(LibBalsaMessageBody *part)
 
     if (part->embhdrs != NULL)
         subj = part->embhdrs->subject;
-    if (subj == NULL && part->message != NULL)
-        subj = libbalsa_message_get_subject(part->message);
-    if (subj == NULL)
-        subj = _("No subject");
+    if (subj == NULL) {
+        if (part->message != NULL)
+            subj = libbalsa_message_get_subject(part->message);
+        if (subj == NULL)
+            subj = _("No subject");
+    }
 
     subject = g_strdup(subj);
     libbalsa_utf8_sanitize(&subject, balsa_app.convert_unknown_8bit, NULL);

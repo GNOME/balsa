@@ -33,16 +33,6 @@ G_BEGIN_DECLS
 typedef struct _GMimeFilterHeader GMimeFilterHeader;
 typedef struct _GMimeFilterHeaderClass GMimeFilterHeaderClass;
 
-struct _GMimeFilterHeader {
-	GMimeFilter parent_object;
-	gboolean headers_done;
-	gboolean drop_header;
-};
-
-struct _GMimeFilterHeaderClass {
-	GMimeFilterClass parent_class;
-};
-
 GType g_mime_filter_header_get_type(void);
 GMimeFilter *g_mime_filter_header_new(void);
 

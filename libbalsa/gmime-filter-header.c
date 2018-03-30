@@ -29,6 +29,16 @@ static void filter_complete(GMimeFilter *filter, char *in, size_t len, size_t pr
 static void filter_reset(GMimeFilter *filter);
 
 
+struct _GMimeFilterHeader {
+	GMimeFilter parent_object;
+	gboolean headers_done;
+	gboolean drop_header;
+};
+
+struct _GMimeFilterHeaderClass {
+	GMimeFilterClass parent_class;
+};
+
 G_DEFINE_TYPE(GMimeFilterHeader, g_mime_filter_header, GMIME_TYPE_FILTER)
 
 

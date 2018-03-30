@@ -634,23 +634,28 @@ balsa_print_object_text_calendar(GList * list,
     /* add fields from the events*/
     desc_buf = g_string_new("");
     pod->p_label_width = 0;
-    for (this_ev = vcal_obj->vevent; this_ev != NULL; this_ev = this_ev->next) {
+    for (this_ev = libbalsa_vcal_get_vevent(vcal_obj);
+         this_ev != NULL; this_ev = this_ev->next) {
         LibBalsaVEvent * event = (LibBalsaVEvent *) this_ev->data;
+        const gchar *description;
+        GList *attendee;
 
         if (desc_buf->len > 0)
             g_string_append_c(desc_buf, '\n');
         ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
-                       event->summary, _("Summary"));
+                       libbalsa_vevent_get_summary(event), _("Summary"));
         ADD_VCAL_ADDRESS(desc_buf, pod->p_label_width, test_layout,
-                         event->organizer, _("Organizer"));
+                         libbalsa_vevent_get_organizer(event), _("Organizer"));
         ADD_VCAL_DATE(desc_buf, pod->p_label_width, test_layout,
-                      event->start, _("Start"));
+                      libbalsa_vevent_get_start(event), _("Start"));
         ADD_VCAL_DATE(desc_buf, pod->p_label_width, test_layout,
-                      event->end, _("End"));
+                      libbalsa_vevent_get_end(event), _("End"));
         ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
-                       event->location, _("Location"));
-        if (event->attendee) {
-            GList * att = event->attendee;
+                       libbalsa_vevent_get_location(event), _("Location"));
+
+        attendee = libbalsa_vevent_get_attendee(event);
+        if (attendee != NULL) {
+            GList * att = attendee;
             gchar * this_att;
 
             this_att =
@@ -666,8 +671,10 @@ balsa_print_object_text_calendar(GList * list,
                 g_free(this_att);
             }
         }
-        if (event->description) {
-            gchar ** desc_lines = g_strsplit(event->description, "\n", -1);
+
+        description = libbalsa_vevent_get_description(event);
+        if (description != NULL) {
+            gchar ** desc_lines = g_strsplit(description, "\n", -1);
             gint i;
 
             ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,

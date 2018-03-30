@@ -42,10 +42,6 @@ typedef enum {
 } LibBalsaVCalRole;
 
 
-static GObjectClass *libbalsa_vcal_parent_class = NULL;
-static GObjectClass *libbalsa_vevent_parent_class = NULL;
-
-
 /* LibBalsaAddress extra object data */
 #define RFC2445_ROLE            "RFC2445:Role"
 #define RFC2445_PARTSTAT        "RFC2445:PartStat"
@@ -97,40 +93,28 @@ static struct {
 
 
 /* --- VCal GObject stuff --- */
-GType
-libbalsa_vcal_get_type(void)
-{
-    static GType libbalsa_vcal_type = 0;
 
-    if (!libbalsa_vcal_type) {
-	static const GTypeInfo libbalsa_vcal_type_info = {
-	    sizeof(LibBalsaVCalClass),	/* class_size */
-	    NULL,		/* base_init */
-	    NULL,		/* base_finalize */
-	    (GClassInitFunc) libbalsa_vcal_class_init,	/* class_init */
-	    NULL,		/* class_finalize */
-	    NULL,		/* class_data */
-	    sizeof(LibBalsaVCal),	/* instance_size */
-	    0,			/* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_vcal_init,	/* instance_init */
-	    /* no value_table */
-	};
+struct _LibBalsaVCal {
+    GObject parent;
 
-	libbalsa_vcal_type =
-	    g_type_register_static(G_TYPE_OBJECT, "LibBalsaVCal",
-				   &libbalsa_vcal_type_info, 0);
-    }
+    /* method */
+    LibBalsaVCalMethod method;
 
-    return libbalsa_vcal_type;
-}
+    /* linked list of VEVENT entries */
+    GList *vevent;
+};
 
+struct _LibBalsaVCalClass {
+    GObjectClass parent;
+};
+
+G_DEFINE_TYPE(LibBalsaVCal, libbalsa_vcal, G_TYPE_OBJECT)
 
 static void
 libbalsa_vcal_class_init(LibBalsaVCalClass * klass)
 {
     GObjectClass *gobject_klass = G_OBJECT_CLASS(klass);
 
-    libbalsa_vcal_parent_class = g_type_class_peek(G_TYPE_OBJECT);
     gobject_klass->finalize = (GObjectFinalizeFunc) libbalsa_vcal_finalize;
 }
 
@@ -150,7 +134,7 @@ libbalsa_vcal_finalize(LibBalsaVCal * self)
 
     g_list_free_full(self->vevent, g_object_unref);
 
-    libbalsa_vcal_parent_class->finalize(G_OBJECT(self));
+    G_OBJECT_CLASS(libbalsa_vcal_parent_class)->finalize(G_OBJECT(self));
 }
 
 
@@ -162,32 +146,27 @@ libbalsa_vcal_new(void)
 
 
 /* --- VEvent GObject stuff --- */
-GType
-libbalsa_vevent_get_type(void)
-{
-    static GType libbalsa_vevent_type = 0;
 
-    if (!libbalsa_vevent_type) {
-	static const GTypeInfo libbalsa_vevent_type_info = {
-	    sizeof(LibBalsaVEventClass),	/* class_size */
-	    NULL,		/* base_init */
-	    NULL,		/* base_finalize */
-	    (GClassInitFunc) libbalsa_vevent_class_init,	/* class_init */
-	    NULL,		/* class_finalize */
-	    NULL,		/* class_data */
-	    sizeof(LibBalsaVEvent),	/* instance_size */
-	    0,			/* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_vevent_init,	/* instance_init */
-	    /* no value_table */
-	};
+struct _LibBalsaVEvent {
+    GObject parent;
 
-	libbalsa_vevent_type =
-	    g_type_register_static(G_TYPE_OBJECT, "LibBalsaVEvent",
-				   &libbalsa_vevent_type_info, 0);
-    }
+    LibBalsaAddress *organizer;
+    GList *attendee;
+    time_t stamp;
+    time_t start;
+    time_t end;
+    gchar *uid;
+    gchar *summary;
+    gchar *location;
+    gchar *description;
+};
 
-    return libbalsa_vevent_type;
-}
+
+struct _LibBalsaVEventClass {
+    GObjectClass parent;
+};
+
+G_DEFINE_TYPE(LibBalsaVEvent, libbalsa_vevent, G_TYPE_OBJECT)
 
 
 static void
@@ -195,7 +174,6 @@ libbalsa_vevent_class_init(LibBalsaVEventClass * klass)
 {
     GObjectClass *gobject_klass = G_OBJECT_CLASS(klass);
 
-    libbalsa_vevent_parent_class = g_type_class_peek(G_TYPE_OBJECT);
     gobject_klass->finalize =
 	(GObjectFinalizeFunc) libbalsa_vevent_finalize;
 }
@@ -222,7 +200,7 @@ libbalsa_vevent_finalize(LibBalsaVEvent * self)
     g_free(self->location);
     g_free(self->description);
 
-    libbalsa_vevent_parent_class->finalize(G_OBJECT(self));
+    G_OBJECT_CLASS(libbalsa_vevent_parent_class)->finalize(G_OBJECT(self));
 }
 
 
@@ -785,4 +763,62 @@ vcal_str_to_part_stat(const gchar * pstat)
 	 pstat_list[n].pstat_id
 	 && g_ascii_strcasecmp(pstat, pstat_list[n].pstat_id); n++);
     return pstat_list[n].pstat;
+}
+
+/*
+ * Getters
+ */
+
+LibBalsaVCalMethod
+libbalsa_vcal_get_method(LibBalsaVCal *vcal)
+{
+    return vcal->method;
+}
+
+GList *
+libbalsa_vcal_get_vevent(LibBalsaVCal *vcal)
+{
+    return vcal->vevent;
+}
+
+const gchar *
+libbalsa_vevent_get_summary(LibBalsaVEvent *vevent)
+{
+    return vevent->summary;
+}
+
+LibBalsaAddress *
+libbalsa_vevent_get_organizer(LibBalsaVEvent *vevent)
+{
+    return vevent->organizer;
+}
+
+time_t
+libbalsa_vevent_get_start(LibBalsaVEvent *vevent)
+{
+    return vevent->start;
+}
+
+time_t
+libbalsa_vevent_get_end(LibBalsaVEvent *vevent)
+{
+    return vevent->end;
+}
+
+const gchar *
+libbalsa_vevent_get_location(LibBalsaVEvent *vevent)
+{
+    return vevent->location;
+}
+
+GList *
+libbalsa_vevent_get_attendee(LibBalsaVEvent *vevent)
+{
+    return vevent->attendee;
+}
+
+const gchar *
+libbalsa_vevent_get_description(LibBalsaVEvent *vevent)
+{
+    return vevent->description;
 }

@@ -71,6 +71,8 @@ G_BEGIN_DECLS
 
 	LibBalsaMailboxSearchIter *search_iter;
         BalsaIndexWidthPreference width_preference;
+
+        GtkGesture *gesture;
     };
 
     struct _BalsaIndexClass {

@@ -239,17 +239,14 @@ bndx_destroy(GObject * obj)
         }
     }
 
-    if (index->search_iter) {
-        libbalsa_mailbox_search_iter_unref(index->search_iter);
-        index->search_iter = NULL;
-    }
+    g_clear_pointer(&index->search_iter, libbalsa_mailbox_search_iter_unref);
+    g_clear_pointer(&index->filter_string, g_free);
 
     g_clear_object(&index->popup_menu);
+    g_clear_object(&index->gesture);
 
-    g_free(index->filter_string); index->filter_string = NULL;
-
-    if (G_OBJECT_CLASS(parent_class)->dispose)
-        (*G_OBJECT_CLASS(parent_class)->dispose) (obj);
+    if (G_OBJECT_CLASS(parent_class)->dispose != NULL)
+        G_OBJECT_CLASS(parent_class)->dispose(obj);
 }
 
 /* Widget class popup menu method. */
@@ -431,8 +428,8 @@ bndx_instance_init(BalsaIndex * index)
     /* we want to handle button presses to pop up context menus if
      * necessary */
     gesture = gtk_gesture_multi_press_new(GTK_WIDGET(index));
+    index->gesture = gesture;
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-    g_object_set_data_full(G_OBJECT(index), "balsa-gesture", gesture, g_object_unref);
     g_signal_connect(gesture, "pressed",
 		     G_CALLBACK(bndx_gesture_pressed_cb), NULL);
 

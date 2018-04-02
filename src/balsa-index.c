@@ -617,13 +617,15 @@ bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
                         gpointer              user_data)
 {
     GtkGesture *gesture;
+    GdkEventSequence *sequence;
     const GdkEvent *event;
     BalsaIndex *index;
     GtkTreeView *tree_view;
     GtkTreePath *path;
 
     gesture = GTK_GESTURE(multi_press);
-    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press));
+    event = gtk_gesture_get_last_event(gesture, sequence);
     g_return_if_fail(event != NULL);
     if (!gdk_event_triggers_context_menu(event))
         return;

@@ -428,10 +428,14 @@ bndx_instance_init(BalsaIndex * index)
     /* we want to handle button presses to pop up context menus if
      * necessary */
     gesture = gtk_gesture_multi_press_new(GTK_WIDGET(index));
-    index->gesture = gesture;
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
     g_signal_connect(gesture, "pressed",
 		     G_CALLBACK(bndx_gesture_pressed_cb), NULL);
+    /* We need to claim the event sequence before GtkTreeView gets it,
+     * so we jump in at the capture phase: */
+    gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture),
+                                               GTK_PHASE_CAPTURE);
+    index->gesture = gesture;
 
     g_signal_connect(tree_view, "row-activated",
 		     G_CALLBACK(bndx_row_activated), NULL);
@@ -621,6 +625,8 @@ bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
     const GdkEvent *event;
     BalsaIndex *index;
     GtkTreeView *tree_view;
+    gint bx;
+    gint by;
     GtkTreePath *path;
 
     gesture = GTK_GESTURE(multi_press);
@@ -630,16 +636,19 @@ bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
     if (!gdk_event_triggers_context_menu(event))
         return;
 
+    gtk_gesture_set_sequence_state(gesture, sequence, GTK_EVENT_SEQUENCE_CLAIMED);
+
     index = BALSA_INDEX(gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture)));
     tree_view = GTK_TREE_VIEW(index);
+    gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (gint) x, (gint) y,
+                                                      &bx, &by);
 
     /* pop up the context menu:
      * - if the clicked-on message is already selected, don't change
      *   the selection;
      * - if it isn't, select it (cancelling any previous selection)
      * - then create and show the menu */
-    if (gtk_tree_view_get_path_at_pos(tree_view, (gint) x, (gint) y,
-                                      &path, NULL, NULL, NULL)) {
+    if (gtk_tree_view_get_path_at_pos(tree_view, bx, by, &path, NULL, NULL, NULL)) {
         GtkTreeSelection *selection =
             gtk_tree_view_get_selection(tree_view);
 

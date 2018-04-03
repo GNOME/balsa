@@ -929,10 +929,7 @@ message_match_real(LibBalsaMailbox   *mailbox,
 
     if (entry->idle_pending) {
         return FALSE;   /* Can't match. */
-
     }
-
-    headers = libbalsa_message_get_headers(message);
 
     switch (cond->type) {
     case CONDITION_STRING:
@@ -958,6 +955,7 @@ message_match_real(LibBalsaMailbox   *mailbox,
         /* do the work */
         if (CONDITION_CHKMATCH(cond, CONDITION_MATCH_TO)) {
             g_assert(is_refed);
+            headers = libbalsa_message_get_headers(message);
             if (headers->to_list != NULL) {
                 gchar *str =
                     internet_address_list_to_string(headers->to_list, FALSE);
@@ -985,6 +983,7 @@ message_match_real(LibBalsaMailbox   *mailbox,
         }
         if (CONDITION_CHKMATCH(cond, CONDITION_MATCH_CC)) {
             g_assert(is_refed);
+            headers = libbalsa_message_get_headers(message);
             if (headers->cc_list != NULL) {
                 gchar *str =
                     internet_address_list_to_string(headers->cc_list, FALSE);

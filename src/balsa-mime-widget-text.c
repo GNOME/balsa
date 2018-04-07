@@ -498,16 +498,6 @@ fix_text_widget(GtkWidget *widget, gpointer data)
     }
     gtk_widget_set_cursor(widget, url_cursor_normal);
 
-    /*
-     * The first time we click in a text part, the text widget grabs the
-     * focus, and that leads the container that holds it to scroll to
-     * its focus child, namely the text widget. That moves the text
-     * under the pointer, so the click is received somewhere other than
-     * was intended. Grabbing the focus on realization seems to avert
-     * the scrolling.
-     */
-    gtk_widget_grab_focus(widget);
-
     return FALSE;
 }
 

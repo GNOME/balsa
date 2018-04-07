@@ -172,8 +172,7 @@ lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
 
 static void
 lsv_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc,
-                     gint baseline, GtkAllocation * clip,
-                     LibBalsaSourceViewerInfo * lsvi)
+                     gint baseline, LibBalsaSourceViewerInfo * lsvi)
 {
     GdkSurface *surface;
     gboolean maximized;

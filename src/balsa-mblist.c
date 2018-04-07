@@ -107,8 +107,7 @@ static gint bmbl_row_compare(GtkTreeModel * model,
                              GtkTreeIter * iter1,
                              GtkTreeIter * iter2, gpointer data);
 static void bmbl_column_resize(GtkWidget * widget, GtkAllocation * allocation,
-                               gint baseline, GtkAllocation * clip,
-                               gpointer data);
+                               gint baseline, gpointer data);
 static void bmbl_drag_cb(GtkWidget        * widget,
                          GdkDragContext   * context,
                          gint               x,
@@ -765,8 +764,7 @@ bmbl_do_popup(GtkTreeView * tree_view, GtkTreePath * path,
  * */
 static void
 bmbl_column_resize(GtkWidget * widget, GtkAllocation * allocation,
-                   gint baseline, GtkAllocation * clip,
-                   gpointer data)
+                   gint baseline, gpointer data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     gint name_width =
@@ -1750,8 +1748,7 @@ bmbl_mru_activate_cb(GtkWidget * item, gpointer data)
  */
 static void
 bmbl_mru_size_allocate_cb(GtkWidget * widget, GdkRectangle * allocation,
-                          gint baseline, GtkAllocation * clip,
-                          gpointer user_data)
+                          gint baseline, gpointer user_data)
 {
     GdkSurface *surface;
     gboolean maximized;

@@ -92,7 +92,6 @@ static void bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
 static void bndx_column_resize(GtkWidget     * widget,
                                GtkAllocation * allocation,
                                gint            baseline,
-                               GtkAllocation * clip,
                                gpointer        user_data);
 static void bndx_tree_expand_cb(GtkTreeView * tree_view,
                                 GtkTreeIter * iter, GtkTreePath * path,
@@ -756,8 +755,7 @@ bndx_tree_collapse_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
 /* When a column is resized, store the new size for later use */
 static void
 bndx_column_resize(GtkWidget * widget, GtkAllocation * allocation,
-                   gint baseline, GtkAllocation * clip,
-                   gpointer user_data)
+                   gint baseline, gpointer user_data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
 

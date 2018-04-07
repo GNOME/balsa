@@ -330,6 +330,8 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
                          G_CALLBACK(store_button_coords), NULL);
 	g_signal_connect(mwt->gesture, "released",
 			 G_CALLBACK(check_call_url), mwt);
+        gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(mwt->gesture),
+                                                   GTK_PHASE_CAPTURE);
 
         mwt->controller = gtk_event_controller_motion_new(widget);
         g_signal_connect(mwt->controller, "motion",
@@ -777,13 +779,15 @@ check_call_url(GtkGestureMultiPress *multi_press,
 {
     BalsaMimeWidgetText *mwt = user_data;
     GtkGesture *gesture;
+    GdkEventSequence *sequence;
     const GdkEvent *event;
     GdkModifierType state;
 
     gesture = GTK_GESTURE(multi_press);
-    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    sequence = gtk_gesture_get_last_updated_sequence(gesture);
+    event = gtk_gesture_get_last_event(gesture, sequence);
 
-    if (event == NULL || !gdk_event_get_state(event, &state)) {
+    if (!gdk_event_get_state(event, &state)) {
         return;
     }
 
@@ -793,8 +797,17 @@ check_call_url(GtkGestureMultiPress *multi_press,
         message_url_t *url;
 
         url = find_url(mwt, (gint) x, (gint) y);
-        if (url != NULL)
+        if (url != NULL) {
             handle_url(url->url);
+            /*
+             * Don't let GtkTextView handle the click, because it grabs
+             * the focus, and then GtkContainer tries to scroll to the
+             * focus child, which moves the text under the pointer in a
+             * confusing way.
+             */
+            gtk_gesture_set_sequence_state(gesture, sequence,
+                                           GTK_EVENT_SEQUENCE_CLAIMED);
+        }
     }
 }
 

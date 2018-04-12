@@ -1,3 +1,13 @@
+2018-04-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix the "scroll on click" issue
+	(https://bugzilla.gnome.org/show_bug.cgi?id=795085)
+
+	* src/balsa-message.c (balsa_message_init): wrap the
+	BalsaMimeWidget::widget in a GtkViewport; if we do not,
+	GtkContainer does it for us, but also sets it up to scroll when
+	first clicked, which leaves the wrong text under the pointer.
+
 2018-03-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/imap/imap-commands.c (imap_mbox_handle_fetch_body):

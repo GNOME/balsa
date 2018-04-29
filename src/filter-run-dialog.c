@@ -5,20 +5,20 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
-# include "config.h"
+#   include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
 #include <string.h>
@@ -50,43 +50,37 @@ enum {
     LAST_SIGNAL,
 };
 
-static GObjectClass *parent_class = NULL;
 static gint balsa_filter_run_dialog_signals[LAST_SIGNAL];
 
-GList * fr_dialogs_opened=NULL;
+GList *fr_dialogs_opened = NULL;
 
 /* BalsaFilterRunDialog methods */
 
-static void balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass *
-                                               klass);
-static void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p);
-static void balsa_filter_run_dispose(GObject * object);
+static void balsa_filter_run_dispose(GObject *object);
 
-static void fr_refresh(BalsaFilterRunDialog * dialog,
-                       GSList * names_changing, gpointer throwaway);
-
-static void 
-populate_available_filters_list(GtkTreeView * filter_list,
-                                GSList * mailbox_filters)
+static void
+populate_available_filters_list(GtkTreeView *filter_list,
+                                GSList      *mailbox_filters)
 {
     LibBalsaFilter *fil;
     GSList *source, *lst;
     GtkTreeModel *model = gtk_tree_view_get_model(filter_list);
     GtkTreeIter iter;
 
-    for (source=balsa_app.filters;source;source=source->next) {
-	fil=(LibBalsaFilter *)source->data;
-	/* We look for each filter in the mailbox list */
-	for (lst=mailbox_filters;
-             lst && fil!=((LibBalsaMailboxFilter*)lst->data)->actual_filter;
-             lst=lst->next);
-	/* If it's not in mailbox list we can add it to available filters */
-	if (!lst) {
+    for (source = balsa_app.filters; source; source = source->next) {
+        fil = (LibBalsaFilter *)source->data;
+        /* We look for each filter in the mailbox list */
+        for (lst = mailbox_filters;
+             lst && fil != ((LibBalsaMailboxFilter *)lst->data)->actual_filter;
+             lst = lst->next) {
+        }
+        /* If it's not in mailbox list we can add it to available filters */
+        if (!lst) {
             gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
             gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                                NAME_COLUMN, fil->name,
                                DATA_COLUMN, fil, -1);
-	}
+        }
     }
     if (gtk_tree_model_get_iter_first(model, &iter)) {
         GtkTreeSelection *selection =
@@ -95,23 +89,24 @@ populate_available_filters_list(GtkTreeView * filter_list,
     }
 }
 
+
 /* Set the toggle button corresponding to the when type */
 
 static void
-populate_selected_filters_list(GtkTreeView * filter_list,
-                               GSList * filters_list)
+populate_selected_filters_list(GtkTreeView *filter_list,
+                               GSList      *filters_list)
 {
     LibBalsaMailboxFilter *fil, *mf;
     GtkTreeModel *model = gtk_tree_view_get_model(filter_list);
     GtkTreeIter iter;
 
     for (; filters_list; filters_list = filters_list->next) {
-        mf = g_new(LibBalsaMailboxFilter, 1);
+        mf  = g_new(LibBalsaMailboxFilter, 1);
         fil = (LibBalsaMailboxFilter *) filters_list->data;
         *mf = *fil;
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-        gtk_list_store_set(GTK_LIST_STORE(model), &iter, 
-                           NAME_COLUMN, fil->actual_filter->name, 
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                           NAME_COLUMN, fil->actual_filter->name,
                            DATA_COLUMN, mf,
                            INCOMING_COLUMN,
                            FILTER_WHEN_CHKFLAG(fil, FILTER_WHEN_INCOMING),
@@ -126,59 +121,38 @@ populate_selected_filters_list(GtkTreeView * filter_list,
     }
 }
 
-GType
-balsa_filter_run_dialog_get_type(void)
-{
-    static GType balsa_filter_run_dialog_type = 0;
 
-    if (!balsa_filter_run_dialog_type) {
-	GTypeInfo balsa_filter_run_dialog_info = {
-	    sizeof(BalsaFilterRunDialogClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) balsa_filter_run_dialog_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(BalsaFilterRunDialog),
-            0,                  /* n_preallocs */
-	    (GInstanceInitFunc) balsa_filter_run_dialog_init
-	};
-
-	balsa_filter_run_dialog_type =
-	    g_type_register_static(GTK_TYPE_DIALOG,
-	                           "BalsaFilterRunDialog",
-                                   &balsa_filter_run_dialog_info, 0);
-    }
-
-    return balsa_filter_run_dialog_type;
-}
-
+G_DEFINE_TYPE(BalsaFilterRunDialog, balsa_filter_run_dialog, GTK_TYPE_DIALOG)
 
 static void
-balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass * klass)
+balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
-    parent_class = g_type_class_peek_parent(klass);
 
+    /* FIXME : this is the future implementation of a signal
+     * that will be able to tell each filter-run dialog box
+     * that filters have changed and that they have to refresh their content.
+     * We'll see that later if it's worth the pain
+     */
     balsa_filter_run_dialog_signals[REFRESH] =
-	g_signal_new("refresh",
+        g_signal_new("refresh",
                      G_TYPE_FROM_CLASS(object_class),
                      G_SIGNAL_RUN_FIRST,
-		     G_STRUCT_OFFSET(BalsaFilterRunDialogClass, refresh),
+		     0,
                      NULL, NULL,
 		     NULL,
                      G_TYPE_NONE, 1, G_TYPE_OBJECT);
 
     object_class->dispose = balsa_filter_run_dispose;
-
-    klass->refresh = fr_refresh;
 }
 
+
 static GtkWidget *
-balsa_filter_run_dialog_new(LibBalsaMailbox * mbox, GtkWindow * parent)
+balsa_filter_run_dialog_new(LibBalsaMailbox *mbox,
+                            GtkWindow       *parent)
 {
     BalsaFilterRunDialog *p;
-    gchar * dialog_title;
+    gchar *dialog_title;
     gboolean use_headerbar = TRUE;
     GSList *filters;
 
@@ -191,17 +165,17 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox, GtkWindow * parent)
                      NULL);
 
     /* We set the dialog title */
-    p->mbox=mbox;
-    libbalsa_mailbox_open(p->mbox, NULL); 
-    dialog_title=g_strconcat(_("Filters of Mailbox: "),
-                             libbalsa_mailbox_get_name(p->mbox),NULL);
-    gtk_window_set_title(GTK_WINDOW(p),dialog_title);
+    p->mbox = mbox;
+    libbalsa_mailbox_open(p->mbox, NULL);
+    dialog_title = g_strconcat(_("Filters of Mailbox: "),
+                               libbalsa_mailbox_get_name(p->mbox), NULL);
+    gtk_window_set_title(GTK_WINDOW(p), dialog_title);
     gtk_window_set_role(GTK_WINDOW(p), "filter-run");
     g_free(dialog_title);
 
     /* Load associated filters if needed */
     if (libbalsa_mailbox_get_filters(p->mbox) == NULL)
-	config_mailbox_filters_load(p->mbox);
+        config_mailbox_filters_load(p->mbox);
 
     /* Populate the lists */
     filters = libbalsa_mailbox_get_filters(mbox);
@@ -211,8 +185,9 @@ balsa_filter_run_dialog_new(LibBalsaMailbox * mbox, GtkWindow * parent)
     return GTK_WIDGET(p);
 }
 
+
 static GtkTreeView *
-selected_filters_new(BalsaFilterRunDialog * p)
+selected_filters_new(BalsaFilterRunDialog *p)
 {
     GtkListStore *list_store;
     GtkTreeView *view;
@@ -225,31 +200,31 @@ selected_filters_new(BalsaFilterRunDialog * p)
     g_object_unref(list_store);
 
     renderer = gtk_cell_renderer_text_new();
-    column =
+    column   =
         gtk_tree_view_column_new_with_attributes(_("Name"), renderer, "text",
                                                  0, NULL);
     gtk_tree_view_append_column(view, column);
 
     renderer = gtk_cell_renderer_toggle_new();
-    g_object_set_data(G_OBJECT(renderer), BALSA_FILTER_KEY, 
+    g_object_set_data(G_OBJECT(renderer), BALSA_FILTER_KEY,
                       GINT_TO_POINTER(INCOMING_COLUMN));
     g_signal_connect(G_OBJECT(renderer), "toggled",
                      G_CALLBACK(selected_list_toggled), p);
     column = gtk_tree_view_column_new_with_attributes(_("On reception"),
                                                       renderer,
-                                                      "active", 
+                                                      "active",
                                                       INCOMING_COLUMN,
                                                       NULL);
     gtk_tree_view_append_column(view, column);
 
     renderer = gtk_cell_renderer_toggle_new();
-    g_object_set_data(G_OBJECT(renderer), BALSA_FILTER_KEY, 
+    g_object_set_data(G_OBJECT(renderer), BALSA_FILTER_KEY,
                       GINT_TO_POINTER(CLOSING_COLUMN));
     g_signal_connect(G_OBJECT(renderer), "toggled",
                      G_CALLBACK(selected_list_toggled), p);
     column = gtk_tree_view_column_new_with_attributes(_("On exit"),
                                                       renderer,
-                                                      "active", 
+                                                      "active",
                                                       CLOSING_COLUMN,
                                                       NULL);
     gtk_tree_view_append_column(view, column);
@@ -257,13 +232,14 @@ selected_filters_new(BalsaFilterRunDialog * p)
     return view;
 }
 
+
 /*
  * Callbacks for the selection "changed" signal of the available and
  * selected lists
  */
 static void
-available_list_selection_changed(GtkTreeSelection * selection,
-                                 gpointer           user_data)
+available_list_selection_changed(GtkTreeSelection *selection,
+                                 gpointer          user_data)
 {
     BalsaFilterRunDialog *p = user_data;
     gboolean selected;
@@ -273,9 +249,10 @@ available_list_selection_changed(GtkTreeSelection * selection,
     gtk_widget_set_sensitive(p->add_button, selected);
 }
 
+
 static void
-selected_list_selection_changed(GtkTreeSelection * selection,
-                                gpointer           user_data)
+selected_list_selection_changed(GtkTreeSelection *selection,
+                                gpointer          user_data)
 {
     BalsaFilterRunDialog *p = user_data;
     gboolean selected;
@@ -287,10 +264,12 @@ selected_list_selection_changed(GtkTreeSelection * selection,
     gtk_widget_set_sensitive(p->move_down_button, selected);
 }
 
-static 
-void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
+
+static
+void
+balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 {
-    GtkWidget * bbox, * hbox,* vbox;
+    GtkWidget *bbox, *hbox, *vbox;
     GtkTreeSelection *selection;
     GtkWidget *button;
     GtkWidget *sw;
@@ -303,18 +282,18 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 
     /*
        /-----------------\
-       | /---\  | /---\  |
-       | |   | -> |   |  |
-       | |   |  | |   |  |
-       | |   | <- |   |  |
-       | \---/  | \---/  |
-       \-----------------/
+     | /---\  | /---\  |
+     | |   | -> |   |  |
+     | |   |  | |   |  |
+     | |   | <- |   |  |
+     | \---/  | \---/  |
+     \-----------------/
      */
 
     gtk_dialog_add_buttons(GTK_DIALOG(p),
-                           _("_OK"),     GTK_RESPONSE_OK,
+                           _("_OK"), GTK_RESPONSE_OK,
                            _("_Cancel"), GTK_RESPONSE_CANCEL,
-                           _("_Help"),   GTK_RESPONSE_HELP,
+                           _("_Help"), GTK_RESPONSE_HELP,
                            NULL);
 
     g_signal_connect(G_OBJECT(p), "response",
@@ -322,7 +301,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     g_signal_connect(G_OBJECT(p), "destroy",
                      G_CALLBACK(fr_destroy_window_cb), NULL);
 
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,2);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(p))),
 		       hbox, TRUE, TRUE, 0);
@@ -342,8 +321,8 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
-				   GTK_POLICY_AUTOMATIC,
-				   GTK_POLICY_AUTOMATIC);
+                                   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_AUTOMATIC);
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(p->available_filters));
     gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 0);
@@ -356,7 +335,7 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 
     /* "Apply selected" button */
     p->apply_selected_button = button =
-        gtk_button_new_with_mnemonic(_("_Apply Selected"));
+            gtk_button_new_with_mnemonic(_("_Apply Selected"));
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_apply_selected_pressed), p);
@@ -396,8 +375,8 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
-				   GTK_POLICY_AUTOMATIC,
-				   GTK_POLICY_AUTOMATIC);
+                                   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_AUTOMATIC);
 
     p->selected_filters = selected_filters_new(p);
     g_signal_connect(G_OBJECT(p->selected_filters), "row-activated",
@@ -440,37 +419,31 @@ void balsa_filter_run_dialog_init(BalsaFilterRunDialog * p)
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     p->apply_now_button = button =
-        gtk_button_new_with_mnemonic(_("A_pply Now!"));
+            gtk_button_new_with_mnemonic(_("A_pply Now!"));
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(fr_apply_now_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
-    p->filters_modified=FALSE;
+    p->filters_modified = FALSE;
 }
+
 
 /* balsa_filter_run_dispose:
-   FIXME: why is it called twice? Is it a problem?
-*/
+ */
 static void
-balsa_filter_run_dispose(GObject * object)
+balsa_filter_run_dispose(GObject *object)
 {
-    BalsaFilterRunDialog* bfrd = BALSA_FILTER_RUN_DIALOG(object);
-    if (bfrd->mbox)
+    BalsaFilterRunDialog *bfrd = BALSA_FILTER_RUN_DIALOG(object);
+
+    if (bfrd->mbox != NULL) {
         libbalsa_mailbox_close(bfrd->mbox, balsa_app.expunge_on_close);
-    bfrd->mbox = NULL;
-    G_OBJECT_CLASS(parent_class)->dispose(object);
+        bfrd->mbox = NULL;
+    }
+
+    G_OBJECT_CLASS(balsa_filter_run_dialog_parent_class)->dispose(object);
 }
 
-static void
-fr_refresh(BalsaFilterRunDialog * fr_dialog,GSList * names_changing,
-           gpointer throwaway)
-{
-    /* FIXME : this is the future implementation of a signal that will be able to tell each filter-run dialog box
-     * that filters have changed and that they have to refresh their content
-     * We'll see that later if it's worth the pain
-     */
-}
 
 /* filter_run_dialog(LibBalsaMailbox *mbox)
  * params:
@@ -478,17 +451,17 @@ fr_refresh(BalsaFilterRunDialog * fr_dialog,GSList * names_changing,
  */
 
 void
-filters_run_dialog(LibBalsaMailbox * mbox,
-                   GtkWindow       * parent)
+filters_run_dialog(LibBalsaMailbox *mbox,
+                   GtkWindow       *parent)
 {
-    GList * lst;
-    GtkWidget * p;
+    GList *lst;
+    GtkWidget *p;
 
     if (fe_already_open) {
-	balsa_information(LIBBALSA_INFORMATION_ERROR,
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("The filters dialog is opened, close it "
                             "before you can run filters on any mailbox"));
-	return;
+        return;
     }
     /* We look for an existing dialog box for this mailbox */
     for (lst = fr_dialogs_opened; lst; lst = g_list_next(lst)) {
@@ -507,8 +480,8 @@ filters_run_dialog(LibBalsaMailbox * mbox,
     p = balsa_filter_run_dialog_new(mbox, parent);
     if (!p) return;
 
-    gtk_window_set_default_size(GTK_WINDOW(p),500,250);
-    fr_dialogs_opened=g_list_prepend(fr_dialogs_opened,p);
+    gtk_window_set_default_size(GTK_WINDOW(p), 500, 250);
+    fr_dialogs_opened = g_list_prepend(fr_dialogs_opened, p);
 
     gtk_widget_show_all(p);
 }

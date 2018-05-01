@@ -23,27 +23,14 @@
 #include <glib-object.h>
 #include "toolbar-prefs.h"
 
-GType balsa_toolbar_model_get_type(void);
+#define BALSA_TYPE_TOOLBAR_MODEL balsa_toolbar_model_get_type()
 
-#define BALSA_TYPE_TOOLBAR_MODEL \
-    (balsa_toolbar_model_get_type ())
-#define BALSA_TOOLBAR_MODEL(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_TOOLBAR_MODEL, \
-                                 BalsaToolbarModel))
-#define BALSA_TOOLBAR_MODEL_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_TOOLBAR_MODEL, \
-                              BalsaToolbarModelClass))
-#define BALSA_IS_TOOLBAR_MODEL(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_TOOLBAR_MODEL))
-#define BALSA_IS_TOOLBAR_MODEL_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE (klass, BALSA_TYPE_TOOLBAR_MODEL))
+G_DECLARE_FINAL_TYPE(BalsaToolbarModel,
+                     balsa_toolbar_model,
+                     BALSA,
+                     TOOLBAR_MODEL,
+                     GObject);
 
-typedef struct BalsaToolbarModel_ BalsaToolbarModel;
-typedef struct BalsaToolbarModelClass_ BalsaToolbarModelClass;
-
-struct BalsaToolbarModelClass_ {
-    GObjectClass parent_class;
-};
 typedef void (*BalsaToolbarFunc) (GtkWidget *, gpointer);
 #define BALSA_TOOLBAR_FUNC(f) ((BalsaToolbarFunc) (f))
 

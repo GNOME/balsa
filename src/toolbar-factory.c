@@ -42,7 +42,7 @@ static const gchar *const balsa_toolbar_names[] =
  * The BalsaToolbarModel class.
  */
 
-struct BalsaToolbarModel_ {
+struct _BalsaToolbarModel {
     GObject object;
 
     GHashTable      *legal;
@@ -58,31 +58,36 @@ enum {
     LAST_SIGNAL
 };
 
-static GObjectClass* parent_class;
 static guint model_signals[LAST_SIGNAL] = { 0 };
+
+G_DEFINE_TYPE(BalsaToolbarModel, balsa_toolbar_model, G_TYPE_OBJECT)
+
+static void
+balsa_toolbar_model_dispose(GObject * object)
+{
+    BalsaToolbarModel *model = BALSA_TOOLBAR_MODEL(object);
+
+    g_clear_object(&model->settings);
+
+    G_OBJECT_CLASS(balsa_toolbar_model_parent_class)->dispose(object);
+}
+
 
 static void
 balsa_toolbar_model_finalize(GObject * object)
 {
     BalsaToolbarModel *model = BALSA_TOOLBAR_MODEL(object);
 
-    if (model->legal) {
+    if (model->legal != NULL)
         g_hash_table_destroy(model->legal);
-        model->legal = NULL;
-    }
-    if (model->settings) {
-        g_object_unref(model->settings);
-        model->settings = NULL;
-    }
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+
+    G_OBJECT_CLASS(balsa_toolbar_model_parent_class)->finalize(object);
 }
 
 static void
 balsa_toolbar_model_class_init(BalsaToolbarModelClass* klass)
 {
     GObjectClass *object_class = (GObjectClass *) klass;
-
-    parent_class = g_type_class_peek_parent(klass);
 
     model_signals[CHANGED] =
         g_signal_new("changed", G_TYPE_FROM_CLASS(object_class),
@@ -93,6 +98,7 @@ balsa_toolbar_model_class_init(BalsaToolbarModelClass* klass)
 
     object_class = G_OBJECT_CLASS(klass);
     object_class->finalize = balsa_toolbar_model_finalize;
+    object_class->dispose = balsa_toolbar_model_dispose;
 }
 
 static void
@@ -100,33 +106,6 @@ balsa_toolbar_model_init(BalsaToolbarModel * model)
 {
     model->legal =
         g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-}
-
-GType
-balsa_toolbar_model_get_type()
-{
-    static GType balsa_toolbar_model_type = 0;
-
-    if (!balsa_toolbar_model_type) {
-        static const GTypeInfo balsa_toolbar_model_info = {
-            sizeof(BalsaToolbarModelClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-            (GClassInitFunc) balsa_toolbar_model_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-            sizeof(BalsaToolbarModel),
-            0,                  /* n_preallocs */
-            (GInstanceInitFunc) balsa_toolbar_model_init,
-        };
-
-        balsa_toolbar_model_type =
-            g_type_register_static(G_TYPE_OBJECT,
-                                   "BalsaToolbarModel",
-                                   &balsa_toolbar_model_info, 0);
-    }
-
-    return balsa_toolbar_model_type;
 }
 
 /* End of class boilerplate */

@@ -1,3 +1,17 @@
+2018-05-01  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	Display time stamps of date-only RFC 5545 iCalendar events
+
+I noticed that “VALUE=DATE” time stamps (date only, without time) in RFC 5545 iCalendar parts (MIME type text/calendar) are not displayed.
+
+The attached trivial patch add parsing, displaying and printing such values  As to simplify life, the date-only values are printed using the “%x” conversion specification, instead of extracting the date part from balsa_app.date_string.
+
+	* libbalsa/rfc2445.c (libbalsa_vcal_new_from_body),
+	(date_time_2445_to_time_t):
+	* libbalsa/rfc2445.h:
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget):
+	* src/balsa-print-object-text.c (balsa_print_object_text_calendar):
+
 2018-04-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix the "scroll on click" issue

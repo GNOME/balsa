@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * VCalendar (RFC 2445) stuff
- * Copyright (C) 2009 Albrecht Dreﬂ <albrecht.dress@arcor.de>
+ * Copyright (C) 2009 Albrecht Dre√ü <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,7 +95,9 @@ struct _LibBalsaVEvent {
     GList *attendee;
     time_t stamp;
     time_t start;
+    gboolean start_date_only;
     time_t end;
+    gboolean end_date_only;
     gchar *uid;
     gchar *summary;
     gchar *location;

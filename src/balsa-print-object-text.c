@@ -555,11 +555,12 @@ balsa_print_object_text_vcard(GList * list,
 	}								\
     } while(0)
 
-#define ADD_VCAL_DATE(buf, labwidth, layout, date, descr)               \
+#define ADD_VCAL_DATE(buf, labwidth, layout, date, date_only, descr)	\
     do {                                                                \
         if (date != (time_t) -1) {                                      \
             gchar * _dstr =                                             \
-                libbalsa_date_to_utf8(date, balsa_app.date_string);     \
+                libbalsa_date_to_utf8(date,								\
+                	date_only ? "%x" : balsa_app.date_string);     		\
             ADD_VCAL_FIELD(buf, labwidth, layout, _dstr, descr);        \
             g_free(_dstr);                                              \
         }                                                               \
@@ -650,9 +651,9 @@ balsa_print_object_text_calendar(GList * list,
         ADD_VCAL_ADDRESS(desc_buf, pod->p_label_width, test_layout,
                          event->organizer, _("Organizer"));
         ADD_VCAL_DATE(desc_buf, pod->p_label_width, test_layout,
-                      event->start, _("Start"));
+                      event->start, event->start_date_only, _("Start"));
         ADD_VCAL_DATE(desc_buf, pod->p_label_width, test_layout,
-                      event->end, _("End"));
+                      event->end, event->end_date_only, _("End"));
         ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
                        event->location, _("Location"));
         if (event->attendee) {

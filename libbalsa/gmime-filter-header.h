@@ -23,27 +23,16 @@
 
 G_BEGIN_DECLS
 
-#define GMIME_TYPE_FILTER_HEADER            (g_mime_filter_header_get_type())
-#define GMIME_FILTER_HEADER(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), GMIME_TYPE_FILTER_HEADER, GMimeFilterHeader))
-#define GMIME_FILTER_HEADER_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), GMIME_TYPE_FILTER_HEADER, GMimeFilterHeaderClass))
-#define GMIME_IS_FILTER_HEADER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), GMIME_TYPE_FILTER_HEADER))
-#define GMIME_IS_FILTER_HEADER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), GMIME_TYPE_FILTER_HEADER))
-#define GMIME_FILTER_HEADER_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), GMIME_TYPE_FILTER_HEADER, GMimeFilterHeaderClass))
+#define GMIME_TYPE_FILTER_HEADER g_mime_filter_header_get_type()
 
-typedef struct _GMimeFilterHeader GMimeFilterHeader;
-typedef struct _GMimeFilterHeaderClass GMimeFilterHeaderClass;
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GMimeFilter, g_object_unref)
 
-struct _GMimeFilterHeader {
-	GMimeFilter parent_object;
-	gboolean headers_done;
-	gboolean drop_header;
-};
+G_DECLARE_FINAL_TYPE(GMimeFilterHeader,
+                     g_mime_filter_header,
+                     GMIME,
+                     FILTER_HEADER,
+                     GMimeFilter);
 
-struct _GMimeFilterHeaderClass {
-	GMimeFilterClass parent_class;
-};
-
-GType g_mime_filter_header_get_type(void);
 GMimeFilter *g_mime_filter_header_new(void);
 
 G_END_DECLS

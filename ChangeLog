@@ -1,3 +1,10 @@
+2018-05-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	New files for migrating to GResource
+
+	* ui/balsa-ab.gresource.xml:
+	* ui/balsa.gresource.xml:
+
 2018-05-01  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	Display time stamps of date-only RFC 5545 iCalendar events

@@ -6577,7 +6577,7 @@ sendmsg_window_new()
     GError *error = NULL;
     GtkWidget *menubar;
     GtkWidget *paned;
-    gchar *ui_file;
+    const gchar resource_path[] = "/org/desktop/Balsa/sendmsg-window.ui";
     const gchar *current_locale;
 
     bsmsg = g_malloc(sizeof(BalsaSendmsg));
@@ -6634,13 +6634,10 @@ sendmsg_window_new()
                       (GWeakNotify) gtk_widget_destroy, window);
 
     /* Set up the GMenu structures */
-    ui_file = g_build_filename(BALSA_DATA_PREFIX, "ui",
-                               "sendmsg-window.ui", NULL);
     menubar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
                                            win_entries,
                                            G_N_ELEMENTS(win_entries),
-                                           ui_file, &error, bsmsg);
-    g_free(ui_file);
+                                           resource_path, &error, bsmsg);
     if (error) {
         g_print("%s %s\n", __func__, error->message);
         g_error_free(error);

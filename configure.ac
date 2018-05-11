@@ -167,6 +167,10 @@ AC_CHECK_MEMBERS([struct utsname.domainname],[],[],[[#include<sys/utsname.h>]])
 #
 AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
 
+# glib-compile-resources
+#
+AC_PATH_PROG([GLIB_COMPILE_RESOURCES], [glib-compile-resources])
+
 # yelp
 #
 AC_MSG_CHECKING([for Yelp tool])

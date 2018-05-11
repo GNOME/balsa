@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/desktop/Balsa">
+    <file compressed="true">main-window.ui</file>
+    <file compressed="true">message-window.ui</file>
+    <file compressed="true">sendmsg-window.ui</file>
+    <file compressed="true">source-viewer.ui</file>
+  </gresource>
+</gresources>

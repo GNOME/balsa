@@ -753,13 +753,22 @@ src_include           = include_directories('src')
 
 gnome = import('gnome')
 
+balsa_resources = gnome.compile_resources('balsa-resources',
+                                          'ui/balsa.gresource.xml',
+                                          source_dir : 'ui',
+                                          c_name     : 'balsa')
+
+balsa_ab_resources = gnome.compile_resources('balsa-ab-resources',
+                                             'ui/balsa-ab.gresource.xml',
+                                             source_dir : 'ui',
+                                             c_name     : 'balsa_ab')
+
 subdir('sounds')
 subdir('images')
 subdir('libnetclient')
 subdir('libbalsa')
 subdir('libinit_balsa')
 subdir('src')
-subdir('ui')
 if help_files
   subdir('doc')
 endif

@@ -2049,16 +2049,14 @@ static void
 bw_set_menus(BalsaWindow * window)
 {
     GtkBuilder *builder;
-    gchar *ui_file;
+    const gchar resource_path[] = "/org/desktop/Balsa/main-window.ui";
     GError *err = NULL;
 
     bw_add_app_action_entries(G_ACTION_MAP(balsa_app.application), window);
     bw_add_win_action_entries(G_ACTION_MAP(window));
 
     builder = gtk_builder_new();
-    ui_file = g_build_filename(BALSA_DATA_PREFIX, "ui", "main-window.ui",
-                               NULL);
-    if (gtk_builder_add_from_file(builder, ui_file, &err)) {
+    if (gtk_builder_add_from_resource(builder, resource_path, &err)) {
         gtk_application_set_app_menu(balsa_app.application,
                                      G_MENU_MODEL(gtk_builder_get_object
                                                   (builder, "app-menu")));
@@ -2068,11 +2066,10 @@ bw_set_menus(BalsaWindow * window)
     } else {
         g_print("%s error: %s\n", __func__, err->message);
         balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Error adding from %s: %s\n"), ui_file,
+                          _("Error adding from %s: %s\n"), resource_path,
                           err->message);
         g_error_free(err);
     }
-    g_free(ui_file);
     g_object_unref(builder);
 }
 

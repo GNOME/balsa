@@ -809,7 +809,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     GtkWidget *vbox;
     static const gchar *const header_options[] =
         { "none", "selected", "all" };
-    gchar *ui_file;
+    const gchar resource_path[] = "/org/desktop/Balsa/message-window.ui";
     GAction *action;
 
     if (!mailbox || !msgno)
@@ -833,21 +833,17 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     /* Set up the GMenu structures */
-    ui_file = g_build_filename(BALSA_DATA_PREFIX, "ui",
-                               "message-window.ui", NULL);
     menubar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
                                            win_entries,
                                            G_N_ELEMENTS(win_entries),
-                                           ui_file, &error, mw);
+                                           resource_path, &error, mw);
     if (!menubar) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Error adding from %s: %s\n"), ui_file,
+                             _("Error adding from %s: %s\n"), resource_path,
                              error->message);
-        g_free(ui_file);
         g_error_free(error);
         return;
     }
-    g_free(ui_file);
     gtk_widget_show(menubar);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));

@@ -34,7 +34,7 @@
 GtkWidget *libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
                                         const GActionEntry   * entries,
                                         gint                   n_entries,
-                                        const gchar          * ui_file,
+                                        const gchar          * resource_path,
                                         GError              ** error,
                                         gpointer               cb_data);
 

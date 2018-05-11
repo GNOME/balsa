@@ -145,22 +145,22 @@ get_accel_group(GMenuModel * model,
  * Construct a menu-bar for a GtkApplicationWindow that does not use the
  * GApplication's menubar
  *
- * window       the GtkApplicationWindow
- * entries      array of GActionEntry structures
- * n_entries    length of the array
- * ui_file      filename for GtkBuilder input defining a menu named
- *              "menubar"
- * error        GError for returning error information
- * cb_data      user data for GAction callbacks
+ * window        the GtkApplicationWindow
+ * entries       array of GActionEntry structures
+ * n_entries     length of the array
+ * resource_path resource path for GtkBuilder input defining a menu named
+ *               "menubar"
+ * error         GError for returning error information
+ * cb_data       user data for GAction callbacks
  *
- * returns:     the GtkMenuBar
+ * returns:      the GtkMenuBar
  */
 
 GtkWidget *
 libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
                              const GActionEntry   * entries,
                              gint                   n_entries,
-                             const gchar          * ui_file,
+                             const gchar          * resource_path,
                              GError              ** error,
                              gpointer               cb_data)
 {
@@ -171,7 +171,7 @@ libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
     g_action_map_add_action_entries(map, entries, n_entries, cb_data);
 
     builder = gtk_builder_new();
-    if (gtk_builder_add_from_file(builder, ui_file, error)) {
+    if (gtk_builder_add_from_resource(builder, resource_path, error)) {
         GMenuModel *menu_model;
 
         menu_model =

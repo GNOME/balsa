@@ -99,13 +99,26 @@ balsa_spell_extra =		\
 		spell-check.h
 endif
 
+resource_xml = $(top_srcdir)/ui/balsa.gresource.xml
+
+balsa-resources.c: $(resource_xml) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/ui --generate-dependencies $(resource_xml))
+	$(AM_V_GEN)				\
+	$(GLIB_COMPILE_RESOURCES)		\
+		--sourcedir=$(top_srcdir)/ui	\
+		--target=$@			\
+		--generate-source		\
+		--c-name=balsa			\
+		$(resource_xml)
+
+balsa_built_sources =		\
+	balsa-resources.c
+
 balsa_SOURCES =			\
 	$(balsa_BASE_SRCLIST)	\
 	$(balsa_spell_extra) \
-	$(balsa_print_source)
+	$(balsa_print_source)	\
+	$(balsa_built_sources)
 
-
-DISTCLEANFILES = $(balsa_IDL_SRCLIST)
 
 EXTRA_DIST = $(balsa_spell_extra_dist)
 
@@ -123,15 +136,29 @@ balsa_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
 	$(top_builddir)/libbalsa/imap/libimap.a	\
 	$(top_builddir)/libnetclient/libnetclient.a \
-	$(balsa_IDL_OBJS) \
 	$(INTLLIBS) \
         $(BALSA_LIBS)
 
 
+ab_resource_xml = $(top_srcdir)/ui/balsa-ab.gresource.xml
+
+balsa-ab-resources.c: $(ab_resource_xml) $(shell $(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/ui --generate-dependencies $(ab_resource_xml))
+	$(AM_V_GEN)				\
+	$(GLIB_COMPILE_RESOURCES)		\
+		--sourcedir=$(top_srcdir)/ui	\
+		--target=$@			\
+		--generate-source		\
+		--c-name=balsa_ab		\
+		$(ab_resource_xml)
+
+balsa_ab_built_sources =		\
+	balsa-ab-resources.c
+
 
 balsa_ab_SOURCES =	ab-main.c		\
 			address-book-config.c	\
-			address-book-config.h	
+			address-book-config.h	\
+			balsa-ab-resources.c
 
 balsa_ab_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\
@@ -140,7 +167,3 @@ balsa_ab_LDADD = \
 dist-hook:
 	mkdir $(distdir)/pixmaps
 	cp $(srcdir)/pixmaps/*.{xpm,png} $(distdir)/pixmaps
-
-$(balsa_IDL_SRCLIST): $(srcdir)/$(idl_DATA) 
-	$(ORBIT_IDL) -I $(LIBBONOBO_IDL) -I $(BONOBO_ACTIVATION_IDL) \
-	$(srcdir)/$(idl_DATA)

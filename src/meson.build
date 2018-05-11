@@ -103,7 +103,7 @@ balsa_compile_arg = '-DGNOMELOCALEDIR="' + locale_dir + '"'
 balsa_compile_dep = declare_dependency(compile_args : balsa_compile_arg)
 balsa_libs = [libinit_balsa_a, libbalsa_a, libimap_a, libnetclient_a]
 
-executable('balsa', balsa_sources,
+executable('balsa', balsa_sources, balsa_resources,
            dependencies        : balsa_deps + [balsa_compile_dep],
            include_directories : [top_include, libbalsa_include, libnetclient_include],
            link_with           : balsa_libs,
@@ -114,7 +114,7 @@ balsa_ab_sources = [
   'address-book-config.c'
   ]
 
-executable('balsa_ab', balsa_ab_sources,
+executable('balsa_ab', balsa_ab_sources, balsa_ab_resources,
            dependencies        : balsa_ab_deps,
            include_directories : [top_include, libbalsa_include],
            link_with           : libbalsa_a,

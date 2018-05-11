@@ -202,7 +202,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     GtkCssProvider *css_provider;
     GtkWidget *vbox, *interior;
     GtkWidget *window;
-    gchar *ui_file;
+    const gchar resource_path[] = "/org/desktop/Balsa/source-viewer.ui";
     GtkWidget *menu_bar;
     GError *err = NULL;
     LibBalsaSourceViewerInfo *lsvi;
@@ -239,21 +239,17 @@ libbalsa_show_message_source(GtkApplication  * application,
     gtk_window_set_role(GTK_WINDOW(window), "message-source");
     gtk_window_set_default_size(GTK_WINDOW(window), *width, *height);
 
-    ui_file = g_build_filename(BALSA_DATA_PREFIX, "ui", "source-viewer.ui",
-                               NULL);
     menu_bar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
                                             win_entries,
                                             G_N_ELEMENTS(win_entries),
-                                            ui_file, &err, window);
+                                            resource_path, &err, window);
     if (!menu_bar) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Error adding from %s: %s\n"), ui_file,
+                             _("Error adding from %s: %s\n"), resource_path,
                              err->message);
-        g_free(ui_file);
         g_error_free(err);
         return;
     }
-    g_free(ui_file);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
 #if HAVE_MACOSX_DESKTOP

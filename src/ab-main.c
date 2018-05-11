@@ -580,13 +580,11 @@ get_main_menu(GtkApplication * application)
             address_book_change_state},
     };
     GtkBuilder *builder;
-    gchar *ui_file;
+    const gchar resource_path[] = "/org/desktop/BalsaAb/ab-main.ui";
     GError *err = NULL;
 
     builder = gtk_builder_new();
-    ui_file = g_build_filename(BALSA_DATA_PREFIX, "ui", "ab-main.ui",
-                               NULL);
-    if (gtk_builder_add_from_file(builder, ui_file, &err)) {
+    if (gtk_builder_add_from_resource(builder, resource_path, &err)) {
         gtk_application_set_menubar(application,
                                     G_MENU_MODEL(gtk_builder_get_object
                                                  (builder, "menubar")));
@@ -596,7 +594,6 @@ get_main_menu(GtkApplication * application)
         g_print("%s error: %s\n", __func__, err->message);
         g_error_free(err);
     }
-    g_free(ui_file);
     g_object_unref(builder);
 
     g_action_map_add_action_entries(G_ACTION_MAP(contacts_app.window),

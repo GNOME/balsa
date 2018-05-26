@@ -84,8 +84,8 @@ void balsa_toolbar_model_add_entries(BalsaToolbarModel       * model,
 GHashTable *balsa_toolbar_model_get_legal(BalsaToolbarModel * model);
 GArray *balsa_toolbar_model_get_current(BalsaToolbarModel * model);
 gboolean balsa_toolbar_model_is_standard(BalsaToolbarModel * model);
-void balsa_toolbar_model_insert_icon(BalsaToolbarModel * model,
-                                     gchar * icon, gint position);
+void balsa_toolbar_model_append_icon(BalsaToolbarModel * model,
+                                     gchar             * icon);
 void balsa_toolbar_model_delete_icon(BalsaToolbarModel * model,
                                      gchar * icon);
 void balsa_toolbar_model_clear(BalsaToolbarModel * model);

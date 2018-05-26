@@ -381,8 +381,8 @@ balsa_toolbar_model_is_standard(BalsaToolbarModel * model)
 /* Add an icon to the list of current icons in a BalsaToolbarModel.
  */
 void
-balsa_toolbar_model_insert_icon(BalsaToolbarModel * model, gchar * icon,
-                                gint position)
+balsa_toolbar_model_append_icon(BalsaToolbarModel * model,
+                                gchar             * icon)
 {
     const gchar *real_button = balsa_toolbar_sanitize_id(icon);
 
@@ -391,10 +391,7 @@ balsa_toolbar_model_insert_icon(BalsaToolbarModel * model, gchar * icon,
 
         entry.action = g_strdup(g_hash_table_lookup(model->legal, real_button));
         entry.icon   = g_strdup(real_button);
-        if (position >= 0)
-            g_array_insert_val(model->current, position, entry);
-        else
-            g_array_append_val(model->current, entry);
+        g_array_append_val(model->current, entry);
     } else
         g_warning(_("Unknown toolbar icon “%s”"), icon);
 }

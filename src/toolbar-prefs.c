@@ -718,9 +718,8 @@ tp_page_refresh_preview(ToolbarPage * page)
 
         gtk_tree_model_get(model, &iter, TP_ITEM_COLUMN, &item, -1);
         if (item >= 0 && item < toolbar_button_count)
-            balsa_toolbar_model_insert_icon(page->model,
-                                            toolbar_buttons[item].pixmap_id,
-                                            -1);
+            balsa_toolbar_model_append_icon(page->model,
+                                            toolbar_buttons[item].pixmap_id);
     }
 }
 

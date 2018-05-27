@@ -1,0 +1,1 @@
+https://wiki.gnome.org/Newcomers/SubmitContribution

@@ -6771,13 +6771,18 @@ sendmsg_window_reply(LibBalsaMailbox * mailbox, guint msgno,
 {
     LibBalsaMessage *message =
         libbalsa_mailbox_get_message(mailbox, msgno);
-    BalsaSendmsg *bsmsg = sendmsg_window_new();
+    BalsaSendmsg *bsmsg;
 
     g_assert(message);
     switch(reply_type) {
+    case SEND_REPLY_GROUP:
+        if (libbalsa_message_get_user_header(message, "list-post") == NULL) {
+            g_object_unref(message);
+            return NULL;
+        }
     case SEND_REPLY:
     case SEND_REPLY_ALL:
-    case SEND_REPLY_GROUP:
+        bsmsg = sendmsg_window_new();
         bsmsg->type = reply_type;       break;
     default: printf("reply_type: %d\n", reply_type); g_assert_not_reached();
     }

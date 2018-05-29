@@ -1,5 +1,12 @@
 2018-05-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-index.c (bndx_selection_changed): Emit
+	"index-changed" even if the preview does not need to be updated,
+	so that the main window menus can be enabled/disabled
+	appropriately.
+
+2018-05-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/sendmsg-window.c (sendmsg_window_reply): If the message is
 	a reply to a mailing list, check that the message we are
 	replying to actually came from a mailing list; if not, return

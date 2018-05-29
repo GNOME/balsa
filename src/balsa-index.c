@@ -593,8 +593,10 @@ bndx_selection_changed(GtkTreeSelection * selection, BalsaIndex * index)
             }
             gtk_tree_path_free(path);
 
-            if (!update_preview)
+            if (!update_preview) {
+                g_signal_emit(G_OBJECT(index), balsa_index_signals[INDEX_CHANGED], 0);
                 return;
+            }
         }
     }
 

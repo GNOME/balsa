@@ -1,3 +1,9 @@
+2018-05-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (bw_enable_message_menus): Disable "reply to
+	group" when the message is not from an RFC-2369-compliant mail list.
+	<URL:https://tools.ietf.org/html/rfc2369>
+
 2018-05-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	New files for migrating to GResource

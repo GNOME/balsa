@@ -2140,7 +2140,7 @@ static const gchar *const mailbox_actions[] = {
 };
 
 static const gchar *const message_actions[] = {
-    "reply", "reply-all", "reply-group",
+    "reply", "reply-all",
     "store-address", "view-source", "forward-attached", "forward-inline",
     "pipe", "select-thread"
 };
@@ -2489,10 +2489,28 @@ bw_enable_message_menus(BalsaWindow * window, guint msgno)
 {
     gboolean enable, enable_mod, enable_store;
     BalsaIndex *bindex = BALSA_INDEX(window->current_index);
+    gboolean enable_reply_group;
 
     enable = (msgno != 0 && bindex != NULL);
     bw_actions_set_enabled(window, current_message_actions,
                            G_N_ELEMENTS(current_message_actions), enable);
+
+    enable_reply_group = FALSE;
+    if (enable) {
+        GList *messages, *list;
+
+        messages = balsa_index_selected_list(BALSA_INDEX(bindex));
+        for (list = messages; list != NULL; list = list->next) {
+            LibBalsaMessage *message = list->data;
+
+            if (libbalsa_message_get_user_header(message, "list-post") != NULL) {
+                enable_reply_group = TRUE;
+                break;
+            }
+        }
+        g_list_free_full(messages, g_object_unref);
+    }
+    bw_action_set_enabled(window, "reply-group", enable_reply_group);
 
     enable = (bindex != NULL
               && balsa_index_count_selected_messages(bindex) > 0);

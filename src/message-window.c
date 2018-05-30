@@ -907,6 +907,9 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     if (!balsa_app.show_message_toolbar)
         gtk_widget_hide(mw->toolbar);
 
+    mw_set_enabled(mw, "reply-group",
+                   libbalsa_message_get_user_header(message, "list-post") != NULL);
+
     gtk_window_set_default_size(GTK_WINDOW(window),
                                 balsa_app.message_window_width, 
                                 balsa_app.message_window_height);

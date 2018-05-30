@@ -1,5 +1,11 @@
 2018-05-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-index.c (bndx_compose_foreach): When replying to
+	group, count how many messages were skipped for not having the
+	"list-post" header, and report them.
+
+2018-05-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/message-window.c (message_window_new): Disable "reply to
 	group" when the message is not from an RFC-2369-compliant
 	mailing list.

@@ -1526,12 +1526,15 @@ static void
 bndx_compose_foreach(BalsaIndex * index, SendType send_type)
 {
     LibBalsaMailbox *mailbox = index->mailbox_node->mailbox;
-    GArray *selected = balsa_index_selected_msgnos_new(index);
+    GArray *selected;
     guint i;
+    guint skipped = 0U;
 
+    selected = balsa_index_selected_msgnos_new(index);
     for (i = 0; i < selected->len; i++) {
         guint msgno = g_array_index(selected, guint, i);
         BalsaSendmsg *sm;
+
         switch(send_type) {
         case SEND_REPLY:
         case SEND_REPLY_ALL:
@@ -1545,11 +1548,25 @@ bndx_compose_foreach(BalsaIndex * index, SendType send_type)
             g_assert_not_reached();
             sm = NULL; /** silence invalid warnings */
         }
-        if (sm)
+
+        if (sm != NULL) {
             g_signal_connect(G_OBJECT(sm->window), "destroy",
                              G_CALLBACK(sendmsg_window_destroy_cb), NULL);
+        } else {
+            ++skipped;
+        }
     }
     balsa_index_selected_msgnos_free(index, selected);
+
+    if (skipped != 0U) {
+        balsa_information_parented
+            (GTK_WINDOW(balsa_app.main_window),
+             LIBBALSA_INFORMATION_WARNING,
+             ngettext("Reply to Group: %d message is not from a mailing list.",
+                      "Reply to Group: %d messages are not from a mailing list.",
+                      skipped),
+             skipped);
+    }
 }
 
 /*

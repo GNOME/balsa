@@ -1,3 +1,11 @@
+2018-05-31  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	Mitigate EFail vulnerability for Webkit2
+
+	* libbalsa/html.c (lbh_navigation_policy_decision): ignore all
+	decisions except WEBKIT_NAVIGATION_TYPE_LINK_CLICKED;
+	(libbalsa_html_new): disable Java and JavaScript.
+
 2018-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-index.c (bndx_compose_foreach): Count skipped

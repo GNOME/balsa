@@ -280,17 +280,11 @@ lbh_navigation_policy_decision(WebKitPolicyDecision * decision,
     uri = webkit_uri_request_get_uri(request);
 
     switch (navigation_type) {
-    case WEBKIT_NAVIGATION_TYPE_OTHER:
-    case WEBKIT_NAVIGATION_TYPE_RELOAD:
-        d(g_print("%s uri %s, type %d, used\n", __func__, uri,
-                  navigation_type));
-        webkit_policy_decision_use(decision);
-        break;
     case WEBKIT_NAVIGATION_TYPE_LINK_CLICKED:
         d(g_print("%s clicked %s\n", __func__, uri));
         (*info->clicked_cb) (uri);
     default:
-        d(g_print("%s type %d, ignored\n", __func__, navigation_type));
+        d(g_print("%s uri %s, type %d, ignored\n", __func__, uri, navigation_type));
         webkit_policy_decision_ignore(decision);
     }
 }
@@ -628,6 +622,9 @@ libbalsa_html_new(LibBalsaMessageBody * body,
 
     settings = webkit_web_view_get_settings(web_view);
     webkit_settings_set_enable_plugins(settings, FALSE);
+    webkit_settings_set_enable_javascript(settings, FALSE);
+	webkit_settings_set_enable_java(settings, FALSE);
+	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);
     webkit_settings_set_auto_load_images
         (settings,
          g_regex_match_simple(cid_regex, text, G_REGEX_CASELESS, 0));

@@ -1,5 +1,10 @@
 2018-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/filter-edit-callbacks.c (fe_new_pressed): Do not leak
+	new_item.
+
+2018-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-index.c (bndx_pipe_queue_last): Do not leak
 	PipeData.
 

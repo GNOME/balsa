@@ -1,5 +1,10 @@
 2018-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-index.c (bndx_pipe_queue_last): Do not leak
+	PipeData.
+
+2018-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_get_matchings):
 	Do not leak ImapSearchData.
 

@@ -1,3 +1,8 @@
+2018-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-index.c (bndx_compose_foreach): Count skipped
+	messages only when replying to group.
+
 2018-05-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-index.c (bndx_compose_foreach): When replying to

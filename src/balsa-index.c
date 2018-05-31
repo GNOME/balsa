@@ -1552,7 +1552,7 @@ bndx_compose_foreach(BalsaIndex * index, SendType send_type)
         if (sm != NULL) {
             g_signal_connect(G_OBJECT(sm->window), "destroy",
                              G_CALLBACK(sendmsg_window_destroy_cb), NULL);
-        } else {
+        } else if (send_type == SEND_REPLY_GROUP) {
             ++skipped;
         }
     }

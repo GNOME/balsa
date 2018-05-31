@@ -3977,7 +3977,11 @@ ir_body_type_1part (struct siobuf *sio, ImapBody * body,
       rc = ir_envelope (sio, env);
 #if GMAIL_BUG_20100725
       if (rc == IMR_PARSE)
+        {
+	  if (env)
+	    imap_envelope_free (env);
           break;
+        }
 #endif /* GMAIL_BUG_20100725 */
       if (rc != IMR_OK)
 	{
@@ -3986,14 +3990,22 @@ ir_body_type_1part (struct siobuf *sio, ImapBody * body,
 	  return rc;
 	}
       if (sio_getc (sio) != ' ')
-        return IMR_PROTOCOL;
+	{
+          if (env)
+            imap_envelope_free (env);
+          return IMR_PROTOCOL;
+	}
       if (body)
 	{
 	  b = imap_body_new ();
 	  body->envelope = env;
 	}
       else
-	b = NULL;
+        {
+	  b = NULL;
+	  if (env)
+	    imap_envelope_free (env);
+        }
       rc = ir_body (sio, sio_getc (sio), b, type);
       if (body)
 	imap_body_append_child (body, b);

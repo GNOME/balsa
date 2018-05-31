@@ -1,3 +1,8 @@
+2018-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/imap-handle.c (ir_body_type_1part): Do not leak
+	ImapEnvelope.
+
 2018-05-31  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	Mitigate EFail vulnerability for Webkit2

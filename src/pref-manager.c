@@ -3232,7 +3232,7 @@ open_preferences_manager_idle(void)
 
     name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
                                          (pui->mail_directory));
-    if (!name || strcmp(name, balsa_app.local_mail_directory) != 0) {
+    if (g_strcmp0(name, balsa_app.local_mail_directory) != 0) {
         /* Chooser still hasn't been initialized. */
         g_free(name);
         return TRUE;

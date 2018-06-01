@@ -1801,9 +1801,8 @@ lbm_mbox_message_new(GMimeMessage * mime_message,
     LibBalsaMessageFlag flags = 0;
 
 #if defined(THIS_HAS_BEEN_TESTED)
-    if (mime_message->subject &&
-	!strcmp(mime_message->subject,
-		"DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA")) {
+    if (!g_strcmp0(mime_message->subject,
+                   "DON'T DELETE THIS MESSAGE -- FOLDER INTERNAL DATA")) {
 	return NULL;
     }
 #endif

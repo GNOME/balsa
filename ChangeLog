@@ -1,5 +1,31 @@
 2018-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use g_strcmp0() for NULL-safe comparisons
+
+	* libbalsa/address-book-rubrica.c (extract_net):
+	* libbalsa/gmime-gpgme-signature.c
+	(libbalsa_cert_subject_readable):
+	* libbalsa/html.c (lbh_mouse_target_changed_cb),
+	(libbalsa_html_search):
+	* libbalsa/identity.c (libbalsa_identity_combo_box):
+	* libbalsa/mailbox.c (libbalsa_mailbox_set_identity_name),
+	(lbm_try_reassemble):
+	* libbalsa/mailbox_mbox.c (lbm_mbox_message_new):
+	* libbalsa/smtp-server.c (smtp_server_compare):
+	* src/ab-main.c (bab_config_init):
+	* src/balsa-app.c (find_path), (balsa_quote_regex_new):
+	* src/balsa-icons.c (load_balsa_pixmap):
+	* src/filter-edit-callbacks.c (change_filter_name):
+	* src/folder-conf.c (subfolder_conf_clicked_ok),
+	(folder_conf_imap_sub_node):
+	* src/mailbox-node.c (remove_special_mailbox_by_url):
+	* src/pref-manager.c (open_preferences_manager_idle):
+	* src/save-restore.c (config_address_book_load):
+	* src/sendmsg-window.c (sw_preferred_charset),
+	(find_locale_index_by_locale), (has_file_attached):
+
+2018-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/filter-edit-callbacks.c (fe_new_pressed): Do not leak
 	new_item.
 

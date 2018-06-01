@@ -236,18 +236,17 @@ lbh_mouse_target_changed_cb(WebKitWebView       * web_view,
 
     uri = webkit_hit_test_result_get_link_uri(hit_test_result);
 
-    if ((!uri && !info->uri)
-        || (uri && info->uri && !strcmp(uri, info->uri)))
+    if (g_strcmp0(uri, info->uri) == 0)
         /* No change */
         return;
 
-    if (info->uri) {
+    if (info->uri != NULL) {
         g_free(info->uri);
         info->uri = NULL;
         (*info->hover_cb) (NULL);
     }
 
-    if (uri) {
+    if (uri != NULL) {
         info->uri = g_strdup(uri);
         (*info->hover_cb) (uri);
     }
@@ -890,7 +889,7 @@ libbalsa_html_search(GtkWidget                * widget,
     info = g_object_get_data(G_OBJECT(web_view), LIBBALSA_HTML_INFO);
     controller = webkit_web_view_get_find_controller(web_view);
 
-    if (!info->search_text || strcmp(text, info->search_text)) {
+    if (g_strcmp0(text, info->search_text) != 0) {
         lbh_search_init(info, controller, text, find_forward, wrap,
                         search_cb, cb_data);
     } else {

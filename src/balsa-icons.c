@@ -76,7 +76,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, const balsa_pixmap_t *bpixmap)
      * alternative name if not */
     if (!gtk_icon_theme_has_icon(icon_theme, bpixmap->stock_id)) {
 	pixmap_fallback_t *fb = fallback_id;
-	while (fb->def_id && strcmp(fb->def_id, bpixmap->stock_id))
+	while (g_strcmp0(fb->def_id, bpixmap->stock_id) != 0)
 	    fb++;
 	if (fb->def_id) {
 	    use_id = fb->fb_id;

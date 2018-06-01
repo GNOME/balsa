@@ -635,11 +635,11 @@ subfolder_conf_clicked_ok(SubfolderDialogData * sdd)
             mailbox_conf_view_check(sdd->mcv, sdd->mbnode->mailbox);
         
         /* rename */
-        if ((sdd->old_parent && strcmp(parent, sdd->old_parent)) ||
-            (sdd->old_folder && strcmp(folder, sdd->old_folder))) {
+        if (g_strcmp0(parent, sdd->old_parent) != 0 ||
+            g_strcmp0(folder, sdd->old_folder) != 0) {
             gint button = GTK_RESPONSE_OK;
-            if (sdd->old_folder && !strcmp(sdd->old_folder, "INBOX") &&
-                (!sdd->old_parent || !*sdd->old_parent)) {
+            if (g_strcmp0(sdd->old_folder, "INBOX") == 0 &&
+                (sdd->old_parent == NULL || sdd->old_parent[0] == '\0')) {
                 gchar *msg =
                     g_strdup_printf(_
                                     ("Renaming Inbox is special!\n"
@@ -904,7 +904,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 
                 /* my rights */
                 for (n = 0;
-                     std_acls[n] && strcmp(std_acls[n], rights);
+                     g_strcmp0(std_acls[n], rights) != 0;
                      n += 2);
                 rights_str = g_string_new(_("mine: "));
                 if (std_acls[n])
@@ -920,7 +920,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 
                     for (uid = 0; acls[uid]; uid += 2) {
                         for (n = 0;
-                             std_acls[n] && strcmp(std_acls[n], acls[uid + 1]);
+                             g_strcmp0(std_acls[n], acls[uid + 1]) != 0;
                              n += 2);
                         if (std_acls[n])
                             g_string_append_printf(rights_str,

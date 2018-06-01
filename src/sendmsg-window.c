@@ -226,8 +226,7 @@ sw_preferred_charset(BalsaSendmsg * bsmsg)
     guint i;
 
     for (i = 0; i < G_N_ELEMENTS(locales); i++)
-        if (bsmsg->spell_check_lang && locales[i].locale
-            && strcmp(bsmsg->spell_check_lang, locales[i].locale) == 0)
+        if (g_strcmp0(bsmsg->spell_check_lang, locales[i].locale) == 0)
             return locales[i].charset;
 
     return NULL;
@@ -680,7 +679,7 @@ find_locale_index_by_locale(const gchar * locale)
     unsigned i, j, maxfit = 0;
     gint maxpos = -1;
 
-    if (!locale || strcmp(locale, "C") == 0)
+    if (locale == NULL || strcmp(locale, "C") == 0)
         locale = "en_US";
     for (i = 0; i < ELEMENTS(locales); i++) {
 	for (j = 0; locale[j] && locales[i].locale[j] == locale[j]; j++);
@@ -2750,7 +2749,7 @@ has_file_attached(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
     if (!info)
 	return FALSE;
     uri = libbalsa_vfs_get_uri(info->file_uri);
-    if (uri && !strcmp(find_file->name, uri))
+    if (g_strcmp0(find_file->name, uri) == 0)
 	find_file->found = TRUE;
     g_object_unref(info);
 

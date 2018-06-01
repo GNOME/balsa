@@ -611,7 +611,7 @@ find_path(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     if (mbnode->server == bf->server &&
-        mbnode->dir && !strcmp(mbnode->dir, bf->data)) {
+        g_strcmp0(mbnode->dir, bf->data) == 0) {
 	bf->mbnode = mbnode;
 	return TRUE;
     }
@@ -863,14 +863,12 @@ balsa_quote_regex_new(void)
     static GRegex *regex  = NULL;
     static gchar  *string = NULL;
 
-    if (string && strcmp(string, balsa_app.quote_regex) != 0) {
-        g_free(string);
-        string = NULL;
-        g_regex_unref(regex);
-        regex = NULL;
+    if (g_strcmp0(string, balsa_app.quote_regex) != 0) {
+        g_clear_pointer(&string, g_free);
+        g_clear_pointer(&regex, g_regex_unref);
     }
 
-    if (!regex) {
+    if (regex == NULL) {
         GError *err = NULL;
 
         regex = g_regex_new(balsa_app.quote_regex, 0, 0, &err);

@@ -2351,7 +2351,7 @@ libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxView *view = lbm_get_view(mailbox);
 
-    if (!view->identity_name || strcmp(view->identity_name, identity_name)) {
+    if (g_strcmp0(view->identity_name, identity_name) != 0) {
 	g_free(view->identity_name);
 	view->identity_name = g_strdup(identity_name);
 	if (mailbox)
@@ -4008,8 +4008,7 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
             g_mime_multipart_foreach((GMimeMultipart *)
                                      mime_message->mime_part,
                                      lbm_try_reassemble_func, &partial);
-            if (partial
-                && strcmp(g_mime_message_partial_get_id(partial), id) == 0) {
+            if (g_strcmp0(g_mime_message_partial_get_id(partial), id) == 0) {
                 g_ptr_array_add(partials, partial);
                 if (g_mime_message_partial_get_total(partial) > 0)
                     total = g_mime_message_partial_get_total(partial);

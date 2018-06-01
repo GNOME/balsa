@@ -1178,15 +1178,15 @@ remove_special_mailbox_by_url(const gchar* url, LibBalsaMailbox *** special)
 {
     LibBalsaMailbox **mailbox;
 
-    if (balsa_app.trash && strcmp(url, balsa_app.trash->url) == 0)
+    if (g_strcmp0(url, balsa_app.trash->url) == 0)
 	mailbox = &balsa_app.trash;
-    else if (balsa_app.inbox && strcmp(url, balsa_app.inbox->url) == 0)
+    else if (g_strcmp0(url, balsa_app.inbox->url) == 0)
 	mailbox = &balsa_app.inbox;
-    else if (balsa_app.outbox && strcmp(url, balsa_app.outbox->url) == 0)
+    else if (g_strcmp0(url, balsa_app.outbox->url) == 0)
 	mailbox = &balsa_app.outbox;
-    else if (balsa_app.sentbox && strcmp(url, balsa_app.sentbox->url) == 0)
+    else if (g_strcmp0(url, balsa_app.sentbox->url) == 0)
 	mailbox = &balsa_app.sentbox;
-    else if (balsa_app.draftbox && strcmp(url, balsa_app.draftbox->url) == 0)
+    else if (g_strcmp0(url, balsa_app.draftbox->url) == 0)
 	mailbox = &balsa_app.draftbox;
     else
         mailbox = NULL;

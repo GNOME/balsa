@@ -76,8 +76,12 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, const balsa_pixmap_t *bpixmap)
      * alternative name if not */
     if (!gtk_icon_theme_has_icon(icon_theme, bpixmap->stock_id)) {
 	pixmap_fallback_t *fb = fallback_id;
-	while (g_strcmp0(fb->def_id, bpixmap->stock_id) != 0)
+	while (fb->def_id && g_strcmp0(fb->def_id, bpixmap->stock_id) != 0)
 	    fb++;
+	if (!fb->def_id) {
+	    BICONS_LOG("No GTK or custom icon for %s\n", bpixmap);
+	    return;
+	}
 	if (fb->def_id) {
 	    use_id = fb->fb_id;
             BICONS_LOG("\t(%s not found, fall back to %s)",

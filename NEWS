@@ -1,3 +1,16 @@
+* Balsa-2.5.6 release. Release date 2018-06-01
+
+Changes wrt to 2.5.5 tag:
+
+- fix scroll on click issue
+
+- display time stamps of date-only RFC 5545 iCalendar events
+
+- disable reply-to-group when the message is not from an
+  RFC-2369-compliant mail list
+
+- Mitigate EFail vulnerability for Webkit2
+
 * Balsa-2.5.5 release. Release date 2018-02-26
 
 Changes wrt to 2.5.4 tag:

@@ -1,5 +1,10 @@
 2018-06-01  Pawel Salek  <pawsa0@gmail.com>
 
+	* NEWS, configure.ac: release balsa-2.5.6
+	* src/Makefile.am: add missing xml files
+
+2018-06-01  Pawel Salek  <pawsa0@gmail.com>
+
 	* src/balsa-icons.c: don't let missing icons stop balsa.
 
 2018-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>

@@ -120,7 +120,7 @@ balsa_SOURCES =			\
 	$(balsa_built_sources)
 
 
-EXTRA_DIST = $(balsa_spell_extra_dist)
+EXTRA_DIST = $(balsa_spell_extra_dist) $(resource_xml) $(ab_resource_xml)
 
 AM_CPPFLAGS = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \

@@ -1,3 +1,13 @@
+2018-06-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not seg fault on delayed exit
+
+	* libbalsa/mailbox.c
+	(lbm_changed_schedule_idle): ref the mailbox
+	(lbm_changed_idle_cb): and unref it;
+	* src/main-window.c (check_new_messages_real): check for
+	balsa_app.mblist_tree_store == NULL, and do not dereference it.
+
 2018-06-01  Pawel Salek  <pawsa0@gmail.com>
 
 	* NEWS, configure.ac: release balsa-2.5.6

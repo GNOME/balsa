@@ -717,7 +717,10 @@ lbm_changed_idle_cb(LibBalsaMailbox * mailbox)
     g_signal_emit(mailbox, libbalsa_mailbox_signals[CHANGED], 0);
     mailbox->changed_idle_id = 0;
     libbalsa_unlock_mailbox(mailbox);
-    return FALSE;
+
+    g_object_unref(mailbox);
+
+    return G_SOURCE_REMOVE;
 }
 
 static void
@@ -726,7 +729,7 @@ lbm_changed_schedule_idle(LibBalsaMailbox * mailbox)
     libbalsa_lock_mailbox(mailbox);
     if (!mailbox->changed_idle_id)
         mailbox->changed_idle_id =
-            g_idle_add((GSourceFunc) lbm_changed_idle_cb, mailbox);
+            g_idle_add((GSourceFunc) lbm_changed_idle_cb, g_object_ref(mailbox));
     libbalsa_unlock_mailbox(mailbox);
 }
 

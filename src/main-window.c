@@ -3325,7 +3325,10 @@ check_new_messages_real(BalsaWindow * window, gboolean background_check)
     if (window && !BALSA_IS_WINDOW(window))
         return;
 
-    list = NULL;
+    if (balsa_app.mblist_tree_store == NULL)
+        /* Quitt'n time! */
+        return;
+
     /*  Only Run once -- If already checking mail, return.  */
     if (!g_atomic_int_dec_and_test(&checking_mail)) {
     	g_atomic_int_inc(&checking_mail);
@@ -3341,6 +3344,7 @@ check_new_messages_real(BalsaWindow * window, gboolean background_check)
     if (window)
         bw_action_set_enabled(window, "get-new-mail", FALSE);
 
+    list = NULL;
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc) bw_add_mbox_to_checklist,
 			   &list);

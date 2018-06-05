@@ -1,5 +1,10 @@
 2018-06-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/address-book-rubrica.c (extract_net): Fix a typo that
+	broke the build.
+
+2018-06-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Do not seg fault on delayed exit
 
 	* libbalsa/mailbox.c

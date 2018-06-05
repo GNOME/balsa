@@ -684,7 +684,7 @@ extract_net(xmlNodePtr entry, GList ** mail_addrs)
 	if (!xmlStrcmp(entry->name, CXMLCHARP("Uri"))
 	    && g_strcmp0(uri_type = xml_node_get_attr(entry, CXMLCHARP("type")),
                          "email") == 0
-	    && (mail_addr = xml_node_get_text(entry) != NULL))
+	    && (mail_addr = xml_node_get_text(entry)) != NULL)
 	    *mail_addrs = g_list_prepend(*mail_addrs, mail_addr);
 	g_free(uri_type);
 

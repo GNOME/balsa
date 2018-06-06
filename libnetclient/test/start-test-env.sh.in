@@ -23,5 +23,5 @@ EOF
 
 echo "shut down echo and GnuTLS servers..."
 @SCREEN@ -S e_echo -X quit
-@SCREEN@ -S s_server1 -X quit
-@SCREEN@ -S s_server2 -X quit
+@SCREEN@ -S s_server1 -X stuff $'\003'
+@SCREEN@ -S s_server2 -X stuff $'\003'

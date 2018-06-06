@@ -17,8 +17,10 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-void imap_quote_string(char *dest, size_t dlen, const char *src);
-void imap_unquote_string(char *s);
+#include <glib.h>
+
+gchar *imap_quote_string(const gchar *src)
+	G_GNUC_WARN_UNUSED_RESULT;
 char* imap_next_word(char *s);
 char* imap_skip_atom(char *s);
 

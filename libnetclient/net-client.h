@@ -67,6 +67,7 @@ enum _NetClientError {
 	NET_CLIENT_ERROR_NOT_CONNECTED,			/**< The client is not connected. */
 	NET_CLIENT_ERROR_CONNECTION_LOST,		/**< The connection is lost. */
 	NET_CLIENT_ERROR_TLS_ACTIVE,			/**< TLS is already active for the connection. */
+	NET_CLIENT_ERROR_COMP_ACTIVE,			/**< Compression is already active for the connection. */
 	NET_CLIENT_ERROR_LINE_TOO_LONG,			/**< The line is too long. */
 	NET_CLIENT_ERROR_GNUTLS,				/**< A GnuTLS error occurred. */
 	NET_CLIENT_ERROR_GSSAPI					/**< A GSSAPI error occurred. */
@@ -194,6 +195,17 @@ gboolean net_client_set_cert_from_file(NetClient *client, const gchar *pem_path,
 gboolean net_client_start_tls(NetClient *client, GError **error);
 
 
+/** @brief Start compression
+ *
+ * @param client network client
+ * @param error filled with error information on error
+ * @return TRUE if the connection is now compressed, FALSE on error
+ *
+ * Enable deflate compression of the connection, as defined by e. g. RFC 4978 <em>The IMAP COMPRESS Extension</em>.
+ */
+gboolean net_client_start_compression(NetClient *client, GError **error);
+
+
 /** @brief Read a CRLF-terminated line from a network client
  *
  * @param client network client
@@ -279,6 +291,26 @@ gboolean net_client_execute(NetClient *client, gchar **response, const gchar *re
 gboolean net_client_set_timeout(NetClient *client, guint timeout_secs);
 
 
+/** @brief Get the socket
+ *
+ * @param client network client
+ * @return the network client's socket on success, or NULL on error
+ *
+ * Gets the underlying GSocket object of the network client connection, e. g. for monitoring it via a GSource.
+ */
+GSocket *net_client_get_socket(NetClient *client);
+
+
+/** @brief Check for pending input data
+ *
+ * @param client network client
+ * @return TRUE if data is available for reading
+ *
+ * Returns if data is ready for reading, because either the socket is ready, or there is still data in the buffering input stream.
+ */
+gboolean net_client_can_read(NetClient *client);
+
+
 /** 
  * @mainpage
  *
@@ -286,6 +318,8 @@ gboolean net_client_set_timeout(NetClient *client, guint timeout_secs);
  * module (see file net-client.h), containing the line-based IO methods, and on top of that SMTP (RFC 5321) and POP3 (RFC 1939)
  * client classes (see files net-client-smtp.h and net-client-pop.h, respectively).  The file net-client-utils.h contains some
  * helper functions for authentication.
+ *
+ * The module net-client-siobuf.h implements some functions for replacing the @em siobuf in Balsa's libbalsa/imap module.
  *
  * \author Written by Albrecht Dreß mailto:albrecht.dress@arcor.de
  * \copyright Copyright &copy; Albrecht Dreß 2017<br/>

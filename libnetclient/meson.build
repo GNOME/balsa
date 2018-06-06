@@ -7,6 +7,8 @@ libnetclient_a_sources = [
   'net-client-pop.h',
   'net-client-smtp.c',
   'net-client-smtp.h',
+  'net-client-siobuf.c',
+  'net-client-siobuf.h',
   'net-client-utils.c',
   'net-client-utils.h'
   ]

@@ -22,7 +22,7 @@
 #include <glib.h>
 #include <time.h>
 
-#include "siobuf.h"
+#include "siobuf-nc.h"
 #include "imap_search.h"
 #include "imap_private.h"
 
@@ -258,7 +258,7 @@ imap_search_checks(const ImapSearchKey *s, ImapSearchKeyType s_type)
 void
 imap_search_key_set_next(ImapSearchKey *list, ImapSearchKey *next)
 {
-  if(list->next) g_warning("I may be loosing my tail now!\n");
+  if(list->next) g_warning("I may be loosing my tail now!");
   list->next = next;
 }
 static void
@@ -319,13 +319,11 @@ imap_write_key_string(ImapMboxHandle *handle, ImapSearchKey *k,
       int c;
       ImapResponse rc;
       unsigned len = strlen(k->d.string.s);
-      sio_printf(handle->sio, "{%u}\r\n", len);
-      imap_handle_flush(handle);
-      do
-        rc = imap_cmd_step(handle, cmdno);
-      while(rc == IMR_UNTAGGED);
+      sio_printf(handle->sio, "{%u}", len);
+      net_client_siobuf_flush(handle->sio, NULL);
+      rc = imap_cmd_process_untagged(handle, cmdno);
       if (rc != IMR_RESPOND) {
-        fprintf(stderr, "%s(): unexpected response:\n", __FUNCTION__);
+        g_debug("%s(): unexpected response", __FUNCTION__);
         return rc;
       }
       /* consume to the end of line */
@@ -518,22 +516,16 @@ imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid,
       sio_printf(h->sio, "%s%s %s %u:%u ", tag, uid ? " UID" : "", cmd_string,
                lo, hi);
       if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
-	sio_write(h->sio, "\r\n", 2);
-	imap_handle_flush(h);
-	do {
-	  ir = imap_cmd_step(h, cmdno);
-	} while(ir == IMR_UNTAGGED);
+	net_client_siobuf_flush(h->sio, NULL);
+	ir = imap_cmd_process_untagged(h, cmdno);
       } else break;
     }
   } else { /* no split */
     cmdno = imap_make_tag(tag);
     sio_printf(h->sio, "%s%s %s ", tag, uid ? " UID" : "", cmd_string);
     if( (ir=imap_write_key(h, s, cmdno, can_do_literals)) == IMR_OK) {
-      sio_write(h->sio, "\r\n", 2);
-      imap_handle_flush(h);
-      do {
-	  ir = imap_cmd_step(h, cmdno);
-      } while(ir == IMR_UNTAGGED);
+      net_client_siobuf_flush(h->sio, NULL);
+      ir = imap_cmd_process_untagged(h, cmdno);
     }
   }
   h->search_cb  = ocb;

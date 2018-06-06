@@ -1,3 +1,64 @@
+2018-06-05  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	IMAP goes GIO
+
+	Changes to libnetclient/*:
+	As I mentioned above, in the libnetclient library I added a module
+	which “simulates” the character-buffering methods of libbalsa/imap/siobuf.[hc].
+	Other improvements include:
+	- transparent compression (RFC 4978) support – which revealed a bug
+	  in GIO sending crap when finalising the connection.
+	  This is not really harmful, but may confuse a network-based IDS
+	  (see <https://bugzilla.gnome.org/show_bug.cgi?id=795985>);
+	- helper function for wiping auth data with random chars
+	  before freeing the string;
+	- improved unit tests.
+
+	Changes to libbalsa/imap/*:
+	- siobuf.[hc] are removed, siobuf-nc.h providing a “glue layer”
+	  for libnetclient is added
+	- auth-cram.c, imap-auth.[ch]: partly re-written; uses libnetclient signals;
+	  replace fixed-length strings by dynamically allocated glib strings
+	  which is safer; simplifications by using libnetclient functions
+	- auth-gssapi.c: simplified by using libnetclient helpers;
+	  glib strings as above
+	- imap-commands.c, imap-handle.[ch], imap_search.c, imap_tst.c:
+	  simplifications by using libnetclient functions, removed some unused functions
+	- imap-tls.c, imap_compress.[ch]: massive simplification
+	  as all “real” work is implemented in GIO via libnetclient
+	- imap_private.h: modification of struct _ImapMboxHandle
+	  to use libnetclient stuff, and remove obsolete fields
+	- util.c: simplified quoting function, removed unused unquoting
+	In all modules, I replaced the mixture of debugging functions ([f]printf)
+	by g_debug etc.
+
+	Changes to libbalsa/*:
+	- imap-server.c: cleaned up unused monitor cb, use unified security
+	  (from libnetclient) instead of separate ssl/tls settings
+	- libbalsa.c: replace OpenSSL-based certificate functions
+	  by GTlsCertificate and GnuTLS (if GCR is not available,
+	  remember that GIO is based on GnuTLS)
+	- misc.c: tiny improvement for assuring ~/.balsa
+	- server.[ch]: use NetClientCryptMode instead of use_ssl and tls_mode;
+	  remove obsolete libbalsa_server_user_cb (replaced by libnetclient's signals);
+	  simplify libbalsa_server_check_cert
+	- smtp-server.c: use changed server api
+
+	Changes to libinit_balsa/*:
+	- assistant_page_user.c: use changed server api
+
+	Changes to src/*:
+	- folder-conf.c: configure IMAP according to changed server api
+	  (note: widget (de)activation logic not yet fully functional)
+	- src/mailbox-conf.[ch]: ditto, but with a working (de)activation logic
+	  (I think)
+	- mailbox-node.c: use g_debug instead of printf
+	- main.c: remove IMAP debug option (use G_MESSAGES_DEBUG, as always)
+	- save-restore.c: remove obsolete item
+
+	On the top-level:
+	- the configure/meson checks for OpenSSL and ZLib have been removed
+
 2018-06-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/address-book-rubrica.c (extract_net): Fix a typo that

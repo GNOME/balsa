@@ -23,6 +23,7 @@
 #include "ab-window.h"
 
 #include <string.h>
+#include <stdlib.h>
 #include <glib/gi18n.h>
 #include "address-view.h"
 #include "balsa-app.h"

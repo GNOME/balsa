@@ -33,8 +33,7 @@ libimap_a_SOURCES = \
 	libimap-marshal.c	\
 	libimap-marshal.h	\
 	libimap.h	\
-	siobuf.c	\
-	siobuf.h	\
+	siobuf-nc.h	\
 	util.c		\
 	util.h
 
@@ -44,6 +43,7 @@ EXTRA_DIST = \
 AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libnetclient \
 	-I${top_srcdir}/libbalsa/imap \
+	-DG_LOG_DOMAIN=\"imap\" \
 	$(BALSA_CFLAGS)
 
 AM_CFLAGS   = $(LIBIMAP_CFLAGS) -ansi

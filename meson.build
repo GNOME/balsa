@@ -349,39 +349,6 @@ if osmo
     description : 'If defined, enable Osmo address book support.')
 endif # osmo
 
-# OpenSSL configuration.
-#
-ssl_dep = dependency('openssl')
-if not ssl_dep.found()
-  if not compiler.has_header('openssl/ssl.h')
-    error('OpenSSL headers not found')
-  endif
-
-  # Look for SSL_library_init
-  code = '''
-  /* Override any GCC internal prototype to avoid an error.
-     Use char because int might match the return type of a GCC
-     builtin and then its argument prototype would still apply.  */
-  char SSL_library_init ();
-  int
-  main ()
-  {
-    return SSL_library_init ();
-  }
-  '''
-  ssl_link_args = ['-lssl', '-lcrypto']
-  result = compiler.links(code,
-                          args : ssl_link_args,
-                          name : 'OpenSSL test')
-  if result
-    ssl_dep = declare_dependency(linkargs : ssl_link_args)
-  else
-    error('libssl not found')
-  endif
-endif # not ssl_dep.found()
-balsa_deps += ssl_dep
-balsa_ab_deps += ssl_dep
-
 # KRB5/GSSAPI configuration.
 #
 if gss
@@ -554,10 +521,6 @@ conf.set('HAVE_DECL_CTIME_R',
 if compiler.has_function('ctime_r')
   conf.set('HAVE_CTIME_R', 1,
     description : 'Define to 1 if you have the ‘ctime_r’ function.')
-endif
-
-if not compiler.has_header('zlib.h')
-  error('zlib library required')
 endif
 
 if compiler.has_header('locale.h')

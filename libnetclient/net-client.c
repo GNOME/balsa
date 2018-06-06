@@ -16,9 +16,25 @@
 #include <stdio.h>
 #include <glib/gi18n.h>
 #include <gnutls/x509.h>
+#include "net-client-utils.h"
 #include "net-client.h"
 
 
+/*
+ * Stacking of the streams:
+ * Input channel:
+ *   GSocketClient *sock
+ *      GSocketConnection *plain_conn
+ *         GIOStream *tls_conn -- optional
+ *            GInputStream *comp_istream -- optional
+ *               GDataInputStream *istream
+ *
+ * Output channel:
+ *   GSocketClient *sock
+ *      GSocketConnection *plain_conn
+ *         GIOStream *tls_conn -- optional
+ *            GOutputStream *ostream -- optionally compressed
+ */
 struct _NetClientPrivate {
 	gchar *host_and_port;
 	guint16 default_port;
@@ -30,6 +46,10 @@ struct _NetClientPrivate {
 	GDataInputStream *istream;
 	GOutputStream *ostream;
 	GTlsCertificate *certificate;
+
+	GZlibCompressor *comp;
+	GZlibDecompressor *decomp;
+	GInputStream *comp_istream;
 };
 
 
@@ -133,7 +153,27 @@ void
 net_client_shutdown(const NetClient *client)
 {
 	if (NET_IS_CLIENT(client)) {
-		/* note: we must unref the GDataInputStream, but *not* the GOutputStream! */
+		/* Note: we must unref the GDataInputStream, but the GOutputStream only if compression is active! */
+		if (client->priv->comp != NULL) {
+			/* Note: for some strange reason, GIO decides to send a 0x03 0x00 sequence when closing a compressed connection, before
+			 * sending the usual FIN, ACK TCP reply packet.  As the remote server does not expect the former (the connection has
+			 * already been closed on its side), it replies with with a RST TCP packet.  Unref'ing client->priv->ostream and
+			 * client->priv->comp /after/ all other components of the connection fixes the issue for unencrypted connections, but
+			 * throws a critical error for TLS.  Observed with gio 2.48.2 and 2.50.3, no idea how it can be fixed.
+			 * See also https://bugzilla.gnome.org/show_bug.cgi?id=795985. */
+			if (client->priv->ostream != NULL) {
+				g_object_unref(G_OBJECT(client->priv->ostream));
+			}
+			g_object_unref(G_OBJECT(client->priv->comp));
+		}
+		if (client->priv->decomp != NULL) {
+			g_object_unref(G_OBJECT(client->priv->decomp));
+			client->priv->decomp = NULL;
+		}
+		if (client->priv->comp_istream!= NULL) {
+			g_object_unref(G_OBJECT(client->priv->comp_istream));
+			client->priv->comp_istream = NULL;
+		}
 		if (client->priv->istream != NULL) {
 			g_object_unref(G_OBJECT(client->priv->istream));
 			client->priv->istream = NULL;
@@ -374,8 +414,7 @@ net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **
 						g_byte_array_unref(cert_der);
 						if (key_pass != NULL) {
 							res = gnutls_x509_privkey_import2(key, &data, GNUTLS_X509_FMT_PEM, key_pass, 0);
-							memset(key_pass, 0, strlen(key_pass));
-							g_free(key_pass);
+							net_client_free_authstr(key_pass);
 						}
 					}
 				}
@@ -476,12 +515,70 @@ net_client_start_tls(NetClient *client, GError **error)
 
 
 gboolean
+net_client_start_compression(NetClient *client, GError **error)
+{
+	gboolean result = FALSE;
+
+	g_return_val_if_fail(NET_IS_CLIENT(client), FALSE);
+
+	if (client->priv->plain_conn == NULL) {
+		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_NOT_CONNECTED, _("not connected"));
+	} else if (client->priv->comp != NULL) {
+		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_COMP_ACTIVE, _("connection is already compressed"));
+	} else {
+		client->priv->comp = g_zlib_compressor_new(G_ZLIB_COMPRESSOR_FORMAT_RAW, -1);
+		client->priv->decomp = g_zlib_decompressor_new(G_ZLIB_COMPRESSOR_FORMAT_RAW);
+
+		g_filter_input_stream_set_close_base_stream(G_FILTER_INPUT_STREAM(client->priv->istream), FALSE);
+		g_object_unref(client->priv->istream);
+
+		if (client->priv->tls_conn != NULL) {
+			client->priv->comp_istream =
+				g_converter_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(client->priv->tls_conn)),
+					G_CONVERTER(client->priv->decomp));
+		} else {
+			client->priv->comp_istream =
+				g_converter_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(client->priv->plain_conn)),
+					G_CONVERTER(client->priv->decomp));
+		}
+		client->priv->istream = g_data_input_stream_new(client->priv->comp_istream);
+		g_data_input_stream_set_newline_type(client->priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
+
+		client->priv->ostream = g_converter_output_stream_new(client->priv->ostream, G_CONVERTER(client->priv->comp));
+		result = TRUE;
+		g_debug("connection is compressed");
+	}
+
+	return result;
+}
+
+
+gboolean
 net_client_set_timeout(NetClient *client, guint timeout_secs)
 {
 	g_return_val_if_fail(NET_IS_CLIENT(client), FALSE);
 
 	g_socket_client_set_timeout(client->priv->sock, timeout_secs);
 	return TRUE;
+}
+
+
+GSocket *
+net_client_get_socket(NetClient *client)
+{
+	g_return_val_if_fail(NET_IS_CLIENT(client) && (client->priv->plain_conn != NULL), NULL);
+
+	return g_socket_connection_get_socket(client->priv->plain_conn);
+}
+
+
+gboolean
+net_client_can_read(NetClient *client)
+{
+	g_return_val_if_fail(NET_IS_CLIENT(client) && (client->priv->plain_conn != NULL) && (client->priv->istream != NULL), FALSE);
+
+	return (g_socket_condition_check(g_socket_connection_get_socket(client->priv->plain_conn), G_IO_IN) != 0) ||
+		(g_buffered_input_stream_get_available(G_BUFFERED_INPUT_STREAM(client->priv->istream)) > 0U);
 }
 
 

@@ -27,7 +27,7 @@
 #include "send.h"
 
 #include <math.h>
-
+#include <stdlib.h>
 #include <string.h>
 
 #include "libbalsa.h"

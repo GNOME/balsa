@@ -23,7 +23,7 @@
 #include "imap-handle.h"
 #include "imap-commands.h"
 #include "imap_private.h"
-#include "siobuf.h"
+#include "siobuf-nc.h"
 #include "util.h"
 
 #define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
@@ -122,7 +122,7 @@ imap_check_capability(ImapMboxHandle* handle)
 
   if (!(imap_mbox_handle_can_do(handle, IMCAP_IMAP4) ||
         imap_mbox_handle_can_do(handle, IMCAP_IMAP4REV1))) {
-    g_warning("IMAP4rev1 required but not provided.\n");
+    g_warning("IMAP4rev1 required but not provided.");
     return FALSE;
   }  
   return TRUE;
@@ -495,11 +495,8 @@ append_commit(ImapMboxHandle *handle, unsigned cmdno, ImapSequence *uid_seq)
     handle->uidplus.dst = uid_seq->ranges;
     handle->uidplus.store_response = 1;
   }
-  sio_write(handle->sio, "\r\n", 2);
-  sio_flush(handle->sio);
-  do {
-    rc = imap_cmd_step (handle, cmdno);
-  } while (rc == IMR_UNTAGGED);
+  net_client_siobuf_flush(handle->sio, NULL);
+  rc = imap_cmd_process_untagged(handle, cmdno);
 
   if(uid_seq) {
     if(uid_seq->uid_validity == 0) {
@@ -579,27 +576,21 @@ imap_mbox_append_multi_real(ImapMboxHandle *handle,
       /* MULTIAPPEND continuation */
       if(flags) {
 	gchar *str = enum_flag_to_str(flags);
-	sio_printf(handle->sio, " (%s) {%lu%s}\r\n", str,
+	sio_printf(handle->sio, " (%s) {%lu%s}", str,
 		   (unsigned long)msg_size, litstr);
 	g_free(str);
       } else 
-	sio_printf(handle->sio, " {%lu%s}\r\n",
+	sio_printf(handle->sio, " {%lu%s}",
 		   (unsigned long)msg_size, litstr);
     }
 
     if(use_literal)
       rc = IMR_RESPOND; /* we do it without flushing */
     else {
-      sio_flush(handle->sio);
-      do {
-	rc = imap_cmd_step (handle, cmdno);
-      } while (rc == IMR_UNTAGGED);
+    	net_client_siobuf_flush(handle->sio, NULL);
+    	rc = imap_cmd_process_untagged(handle, cmdno);
       if(rc != IMR_RESPOND) return rc;
-      EAT_LINE(handle, c);
-      if(c == -1) {
-	imap_handle_disconnect(handle);
-	return IMR_SEVERED;
-      }
+      net_client_siobuf_discard_line(handle->sio, NULL);
     }
 
     for(s=0; s<msg_size; s+= delta) {
@@ -940,12 +931,9 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
     }
   }
   if(cmd) { /* was ever altered */
-    sio_flush(h->sio);
     for(i=0; i<issued_cmd; i++) {
       h->search_arg = &flag[i];
-      do {
-        rc = imap_cmd_step(h, cmdno[i]);
-      } while (rc == IMR_UNTAGGED);
+      rc = imap_cmd_process_untagged(h, cmdno[i]);
     }
     imap_handle_idle_enable(h, 30);
   }
@@ -1040,7 +1028,7 @@ set_avail_headers(ImapMboxHandle *h, const char *seq, ImapFetchType ift)
         }
       
       break;
-    default: g_warning("unexpected sequence %s\n", seq);
+    default: g_warning("unexpected sequence %s", seq);
     }
     if(*tmp==',') tmp++;
     s = tmp;
@@ -1681,11 +1669,8 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
         return rc;
     }
 
-    sio_write(h->sio, "\r\n", 2);
-    imap_handle_flush(h);
-    do
-      rc = imap_cmd_step(h, cmdno);
-    while(rc == IMR_UNTAGGED);
+    net_client_siobuf_flush(h->sio, NULL);
+    rc = imap_cmd_process_untagged(h, cmdno);
     imap_handle_idle_enable(h, 30);
   }
  exit_cleanup:
@@ -1998,12 +1983,9 @@ imap_mbox_sort_filter(ImapMboxHandle *handle, ImapSortKey key, int ascending,
             != IMR_OK)
           return rc;
       }
-      sio_write(handle->sio, "\r\n", 2);
       imap_handle_idle_enable(handle, 30);
-      imap_handle_flush(handle);
-      do
-        rc = imap_cmd_step(handle, cmdno);
-      while(rc == IMR_UNTAGGED);
+      net_client_siobuf_flush(handle->sio, NULL);
+      rc = imap_cmd_process_untagged(handle, cmdno);
     } else {                                           /* CASE 2b */
       /* try client-side sorting... */
       if(handle->enable_client_sort) {

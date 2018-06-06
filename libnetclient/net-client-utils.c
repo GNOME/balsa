@@ -12,7 +12,6 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#include <string.h>
 #include <stdio.h>
 #include <glib/gi18n.h>
 #include "net-client.h"
@@ -56,16 +55,13 @@ net_client_cram_calc(const gchar *base64_challenge, GChecksumType chksum_type, c
 
 	chal_plain = g_base64_decode(base64_challenge, &plain_len);
 	digest = g_compute_hmac_for_data(chksum_type, (const guchar *) passwd, strlen(passwd), chal_plain, plain_len);
-	memset(chal_plain, 0, plain_len);
-	g_free(chal_plain);
+	net_client_free_authstr((gchar *) chal_plain);
 
 	auth_buf = g_strdup_printf("%s %s", user, digest);
-	memset(digest, 0, strlen(digest));
-	g_free(digest);
+	net_client_free_authstr(digest);
 
 	base64_buf = g_base64_encode((const guchar *) auth_buf, strlen(auth_buf));
-	memset(auth_buf, 0, strlen(auth_buf));
-	g_free(auth_buf);
+	net_client_free_authstr(auth_buf);
 
 	return base64_buf;
 }
@@ -107,10 +103,25 @@ net_client_auth_plain_calc(const gchar *user, const gchar *passwd)
 	strcpy(&plain_buf[user_len + 1U], user);
 	strcpy(&plain_buf[(2U * user_len) + 2U], passwd);
 	base64_buf = g_base64_encode((const guchar *) plain_buf, (2U * user_len) + passwd_len + 2U);
+	/* contains \0 chars, cannot use net_client_free_authstr */
 	memset(plain_buf, 0, (2U * user_len) + passwd_len + 2U);
 	g_free(plain_buf);
 
 	return base64_buf;
+}
+
+
+void
+net_client_free_authstr(gchar *str)
+{
+	if (str != NULL) {
+		guint n;
+
+		for (n = 0; str[n] != '\0'; n++) {
+			str[n] = g_random_int_range(32, 128);
+		}
+		g_free(str);
+	}
 }
 
 

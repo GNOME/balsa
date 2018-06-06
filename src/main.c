@@ -611,8 +611,6 @@ parse_options(int                       argc,
         {"get-stats", 's', 0, G_OPTION_ARG_NONE,
          &(cmd_get_stats),
          N_("Prints number unread and unsent messages"), NULL},
-        {"debug-imap", 'D', 0, G_OPTION_ARG_NONE, &ImapDebug,
-         N_("Debug IMAP connection"), NULL},
         {"help", 'h', 0, G_OPTION_ARG_NONE, &help, N_("Show help options"), NULL},
         {"version", 'v', 0, G_OPTION_ARG_NONE, &version, N_("Show version"), NULL},
         /* last but not least a special option that collects filenames */

@@ -17,22 +17,8 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <zlib.h>
-
 #include "imap-handle.h"
 
-struct ImapCompressContext {
-  z_stream out_stream;
-  z_stream in_stream;
-  char *in_buffer;
-  char *out_buffer;
-  unsigned long in_uncompressed, in_compressed;
-  unsigned long out_uncompressed, out_compressed;
-};
-
 ImapResponse imap_compress(ImapMboxHandle* h);
-
-void imap_compress_init(struct ImapCompressContext *buf);
-void imap_compress_release(struct ImapCompressContext *buf);
 
 #endif /* __IMAP_COMPRESS_H__ */

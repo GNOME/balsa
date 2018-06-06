@@ -20,9 +20,6 @@
 #define _XOPEN_SOURCE 500
 #define _DEFAULT_SOURCE     1
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
 #include <glib.h>
 #include <glib-object.h>
 #include <ctype.h>
@@ -34,24 +31,13 @@
 #include <unistd.h>
 #include <gmime/gmime-utils.h>
 
-#if defined(HAVE_RES_INIT)
-#include <netinet/in.h>
-#include <arpa/nameser.h>
-#include <resolv.h>
-#endif                          /* defined(HAVE_RES_INIT) */
-
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-
 #include "libimap-marshal.h"
 #include "imap-auth.h"
 #include "imap-handle.h"
 #include "imap-commands.h"
 #include "imap_private.h"
-#include "siobuf.h"
+#include "siobuf-nc.h"
 #include "util.h"
-
-#define ASYNC_DEBUG 0
 
 #define LONG_STRING 512
 #define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
@@ -107,6 +93,10 @@ static ImapResponse ir_handle_response(ImapMboxHandle *h);
 static ImapAddress* imap_address_from_string(const gchar *string, gchar **n);
 static gchar*       imap_address_to_string(const ImapAddress *addr);
 
+static gboolean async_process(GSocket      *source,
+			  	  	  	  	  GIOCondition  condition,
+							  gpointer      data);
+
 static GType
 imap_mbox_handle_get_type()
 {
@@ -145,8 +135,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->msg_cache = NULL;
   handle->flag_cache=  g_array_new(FALSE, TRUE, sizeof(ImapFlagCache));
   handle->doing_logout = FALSE;
-  handle->using_tls = 0;
-  handle->tls_mode = IMAP_TLS_ENABLED;
+  handle->tls_mode = NET_CLIENT_CRYPT_STARTTLS;
   handle->idle_state = IDLE_INACTIVE;
   handle->cmd_info = NULL;
   handle->status_resps = g_hash_table_new_full(g_str_hash, g_str_equal,
@@ -154,6 +143,9 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
 
   handle->info_cb  = NULL;
   handle->info_arg = NULL;
+  handle->auth_cb = NULL;
+  handle->auth_arg = NULL;
+  handle->cert_cb = NULL;
   handle->op_cancelled = 0;
   handle->enable_anonymous = 0;
   handle->enable_client_sort = 0;
@@ -234,7 +226,7 @@ imap_handle_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state)
   case IMAP_OPT_CLIENT_SORT: h->enable_client_sort = !!state; break;
   case IMAP_OPT_COMPRESS:    h->enable_compress    = !!state; break;
   case IMAP_OPT_IDLE:        h->enable_idle        = !!state; break;
-  default: g_warning("imap_set_option: invalid option\n");
+  default: g_warning("imap_set_option: invalid option");
   }
 }
 
@@ -246,17 +238,16 @@ imap_handle_set_infocb(ImapMboxHandle* h, ImapInfoCb cb, void *arg)
 }
 
 void
-imap_handle_set_usercb(ImapMboxHandle* h, ImapUserCb cb, void *arg)
+imap_handle_set_authcb(ImapMboxHandle* h, GCallback cb, void *arg)
 {
-  h->user_cb  = cb;
-  h->user_arg = arg;
+	h->auth_cb  = cb;
+	h->auth_arg = arg;
 }
 
 void
-imap_handle_set_monitorcb(ImapMboxHandle* h, ImapMonitorCb cb, void*arg)
+imap_handle_set_certcb(ImapMboxHandle* h, GCallback cb)
 {
-  h->monitor_cb  = cb;
-  h->monitor_arg = arg;
+	h->cert_cb  = cb;
 }
 
 void
@@ -329,63 +320,83 @@ imap_handle_set_timeout(ImapMboxHandle *h, int milliseconds)
   int old_timeout = h->timeout;
   h->timeout = milliseconds;
   if(h->sio)
-    sio_set_timeout(h->sio, milliseconds);
+    net_client_set_timeout(NET_CLIENT(h->sio), (milliseconds + 500) / 1000);
   return old_timeout;
 }
+
+/* Called with a locked handle. */
+static void
+socket_source_add(ImapMboxHandle *h)
+{
+	if (h->sock_source == NULL) {
+	    h->sock_source = g_socket_create_source(net_client_get_socket(NET_CLIENT(h->sio)), G_IO_IN|G_IO_HUP, NULL);
+	    g_source_set_callback(h->sock_source, (GSourceFunc) async_process, h, NULL);
+	    g_source_attach(h->sock_source, NULL);
+	    g_debug("async_process() registered");
+	}
+}
+
+/* Called with a locked handle. */
+static void
+socket_source_remove(ImapMboxHandle *h)
+{
+	if (h->sock_source != NULL) {
+		g_source_destroy(h->sock_source);
+		g_source_unref(h->sock_source);
+		h->sock_source = NULL;
+	    g_debug("async_process() removed");
+	}
+}
+
 
 /** Called with a locked handle. */
 static gboolean
 async_process_real(ImapMboxHandle *h)
 {
-  ImapResponse rc = IMR_UNTAGGED;
-  unsigned async_cmd;
-  int retval;
+	ImapResponse rc = IMR_UNTAGGED;
+	unsigned async_cmd;
 
-  async_cmd = cmdi_get_pending(h->cmd_info);
-  if(ASYNC_DEBUG) printf("async_process() enter loop\n");
-  while( (retval = sio_poll(h->sio, TRUE, FALSE, TRUE)) != -1 &&
-         (retval & SIO_READ) != 0) {
-    rc=imap_cmd_step(h, async_cmd);
-    if(h->idle_state == IDLE_RESPONSE_PENDING) {
-      int c;
-      if(rc != IMR_RESPOND) {
-	g_message("async_process_real() expected IMR_RESPOND but got %d\n", rc);
-	imap_handle_disconnect(h);
-	return FALSE;
-      }
-      EAT_LINE(h, c);
-      if (c == '\n') {
-	h->idle_state = IDLE_ACTIVE;
-	if (ASYNC_DEBUG) printf("IDLE is now ACTIVE\n");
-      }
-    } else if (rc == IMR_UNKNOWN ||
-	rc == IMR_SEVERED || rc == IMR_BYE || rc == IMR_PROTOCOL ||
-	rc  == IMR_BAD) {
-      printf("async_process() got unexpected response %i!\n"
-             "Last message was: \"%s\" - shutting down connection.\n",
-             rc, h->last_msg);
-      imap_handle_disconnect(h);
-      return FALSE;
-    }
-    async_cmd = cmdi_get_pending(h->cmd_info);
-    if(ASYNC_DEBUG)
-      printf("async_process() loop iteration finished, next async_cmd=%x\n",
-           async_cmd);
-  }
-  if(ASYNC_DEBUG) printf("async_process() loop left\n");
-  if(h->idle_state == IDLE_INACTIVE && async_cmd == 0) {
-    if(ASYNC_DEBUG) printf("Last async command completed.\n");
-    if(h->async_watch_id) {
-      g_source_remove(h->async_watch_id);
-      h->async_watch_id = 0;
-    }
-    imap_handle_idle_enable(h, IDLE_TIMEOUT);
-  }
-  if(ASYNC_DEBUG)
-    printf("async_process() sio: %d rc: %d returns %d (%d cmds in queue)\n",
-           retval, rc, h->idle_state == IDLE_INACTIVE && async_cmd == 0,
-           g_list_length(h->cmd_info));
-  return h->idle_state != IDLE_INACTIVE || async_cmd != 0;
+	g_debug("%s: ENTER", __func__);
+	async_cmd = cmdi_get_pending(h->cmd_info);
+	g_debug("%s: enter loop, cmnd %u", __func__, async_cmd);
+	while (net_client_can_read(NET_CLIENT(h->sio))) {
+		rc = imap_cmd_step(h, async_cmd);
+		if (h->idle_state == IDLE_RESPONSE_PENDING) {
+			int c;
+			if(rc != IMR_RESPOND) {
+				g_message("%s: expected IMR_RESPOND but got %d", __func__, rc);
+				imap_handle_disconnect(h);
+				return G_SOURCE_REMOVE;
+			}
+			EAT_LINE(h, c);
+			if (c == '\n') {
+				h->idle_state = IDLE_ACTIVE;
+				g_debug("%s: IDLE is now ACTIVE", __func__);
+			}
+		} else if (rc == IMR_UNKNOWN ||
+			rc == IMR_SEVERED || rc == IMR_BYE || rc == IMR_PROTOCOL ||
+			rc  == IMR_BAD) {
+			g_debug("%s: got unexpected response %i! "
+				"Last message was: \"%s\" - shutting down connection.",
+				__func__, rc, h->last_msg);
+			imap_handle_disconnect(h);
+			return G_SOURCE_REMOVE;
+		}
+		async_cmd = cmdi_get_pending(h->cmd_info);
+		g_debug("%s: loop iteration finished, next async_cmd=%x", __func__,
+			async_cmd);
+	}
+	g_debug("%s: loop left", __func__);
+	if (h->idle_state == IDLE_INACTIVE && async_cmd == 0) {
+		g_debug("%s: Last async command completed.", __func__);
+		socket_source_remove(h);
+		imap_handle_idle_enable(h, IDLE_TIMEOUT);
+	}
+	g_debug("%s: rc: %d returns %d (%d cmds in queue)", __func__,
+		rc, h->idle_state == IDLE_INACTIVE && async_cmd == 0,
+		g_list_length(h->cmd_info));
+	g_debug("%s: DONE", __func__);
+	return h->idle_state != IDLE_INACTIVE || async_cmd != 0;
 }
 
 /* imap_handle_idle_enable: enables calling IDLE command after seconds
@@ -402,31 +413,35 @@ async_process_real(ImapMboxHandle *h)
    by IDLE and STORE commands, for example. */
 
 static gboolean
-async_process(GIOChannel *source, GIOCondition condition, gpointer data)
+async_process(GSocket      *source,
+			  GIOCondition  condition,
+			  gpointer      data)
 {
-  ImapMboxHandle *h = (ImapMboxHandle*)data;
-  gboolean retval_async;
+	ImapMboxHandle *h = (ImapMboxHandle *) data;
+	gboolean retval_async;
 
-  g_return_val_if_fail(h, FALSE);
+	g_return_val_if_fail(h, FALSE);
 
-  if(ASYNC_DEBUG) printf("async_process() ENTER\n");
-  if(!g_mutex_trylock(&h->mutex))
-    return FALSE;/* async data on already locked handle? Don't try again. */
-  if(ASYNC_DEBUG) printf("async_process() LOCKED\n");
-  if(h->state == IMHS_DISCONNECTED) {
-    if(ASYNC_DEBUG) printf("async_process() on disconnected\n");
-    g_mutex_unlock(&h->mutex);
-    return FALSE;
-  }
-  if( (condition & G_IO_HUP) == G_IO_HUP) {
-      imap_handle_disconnect(h);
-      g_mutex_unlock(&h->mutex);
-      return FALSE;
-  }
-  retval_async = async_process_real(h);
+	g_debug("%s: ENTER", __func__);
+	if (g_mutex_trylock(&h->mutex)) {
+		g_debug("%s: LOCKED", __func__);
+		if (h->state == IMHS_DISCONNECTED) {
+			g_debug("%s: on disconnected", __func__);
+			retval_async = G_SOURCE_REMOVE;
+		} else if ((condition & G_IO_HUP) == G_IO_HUP) {
+			g_debug("%s: hangup", __func__);
+			imap_handle_disconnect(h);
+			retval_async = G_SOURCE_REMOVE;
+		} else {
+			retval_async = async_process_real(h);
+		}
+		g_mutex_unlock(&h->mutex);
+	} else {
+		retval_async = G_SOURCE_REMOVE;		/* async data on already locked handle? Don't try again. */
+	}
 
-  g_mutex_unlock(&h->mutex);
-  return retval_async;
+	g_debug("%s: DONE (keep: %d)", __func__, retval_async);
+	return retval_async;
 }
 
 static gboolean
@@ -450,16 +465,10 @@ idle_start(gpointer data)
   IMAP_REQUIRED_STATE3(h, IMHS_CONNECTED, IMHS_AUTHENTICATED,
                        IMHS_SELECTED, FALSE);
 
-  asyncno = imap_make_tag(tag); sio_write(h->sio, tag, strlen(tag));
-  sio_write(h->sio, " IDLE\r\n", 7); sio_flush(h->sio);
+  asyncno = imap_make_tag(tag);
+  net_client_write_line(NET_CLIENT(h->sio), "%s IDLE", NULL, tag);
   cmdi_add_handler(&h->cmd_info, asyncno, cmdi_empty, NULL);
-  if(!h->iochannel) {
-    h->iochannel = g_io_channel_unix_new(h->sd);
-    g_io_channel_set_encoding(h->iochannel, NULL, NULL);
-  }
-  if(ASYNC_DEBUG) printf("async_process() registered\n");
-  h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN|G_IO_HUP,
-				     async_process, h);
+  socket_source_add(h);
   h->idle_state = IDLE_RESPONSE_PENDING;
 
   g_mutex_unlock(&h->mutex);
@@ -480,15 +489,10 @@ imap_cmd_issue(ImapMboxHandle* h, const char* cmd)
   if (imap_cmd_start(h, cmd, &async_cmd)<0)
     return IMR_SEVERED;  /* irrecoverable connection error. */
 
-  sio_flush(h->sio);
-  if(ASYNC_DEBUG) printf("command '%s' issued.\n", cmd);
+  g_debug("command '%s' issued.", cmd);
   cmdi_add_handler(&h->cmd_info, async_cmd, cmdi_empty, NULL);
-  if(!h->iochannel) {
-    h->iochannel = g_io_channel_unix_new(h->sd);
-    g_io_channel_set_encoding(h->iochannel, NULL, NULL);
-  }
-  h->async_watch_id = g_io_add_watch(h->iochannel, G_IO_IN|G_IO_HUP,
-                                     async_process, h);
+  socket_source_add(h);
+
   return IMR_OK /* async_cmd */;
 }
 
@@ -498,7 +502,7 @@ imap_handle_idle_enable(ImapMboxHandle *h, int seconds)
   if( !h->enable_idle || !imap_mbox_handle_can_do(h, IMCAP_IDLE))
     return FALSE;
   if(h->idle_state != IDLE_INACTIVE) {
-    fprintf(stderr, "IDLE already enabled\n");
+    g_warning("IDLE already enabled");
     return FALSE;
   }
   if(!h->idle_enable_id)
@@ -513,17 +517,14 @@ imap_handle_idle_disable(ImapMboxHandle *h)
     g_source_remove(h->idle_enable_id);
     h->idle_enable_id = 0;
   }
-  if(h->async_watch_id) {
-    g_source_remove(h->async_watch_id);
-    h->async_watch_id = 0;
+  if(h->sock_source != NULL) {
+	socket_source_remove(h);
     if(h->sio && h->idle_state == IDLE_RESPONSE_PENDING) {
       int c;
       ImapResponse rc;
       unsigned async_cmd = cmdi_get_pending(h->cmd_info);
 
-      do {
-	rc = imap_cmd_step(h, async_cmd);
-      } while (rc == IMR_UNTAGGED);
+      rc = imap_cmd_process_untagged(h, async_cmd);
       if(rc != IMR_RESPOND) {
 	imap_handle_disconnect(h);
 	return FALSE;
@@ -537,7 +538,7 @@ imap_handle_idle_disable(ImapMboxHandle *h)
     }
     if (h->sio &&  h->idle_state == IDLE_ACTIVE) {
       /* we might have been disconnected before */
-      sio_write(h->sio,"DONE\r\n",6); sio_flush(h->sio);
+      net_client_write_line(NET_CLIENT(h->sio), "DONE", NULL);
       h->idle_state = IDLE_INACTIVE;
     }
   }
@@ -554,22 +555,12 @@ imap_handle_op_cancelled(ImapMboxHandle *h)
 void
 imap_handle_disconnect(ImapMboxHandle *h)
 {
-  /* cppcheck-suppress unreadVariable */
-  gboolean still_connected __attribute__ ((__unused__));
-
-  still_connected = imap_handle_idle_disable(h);
+  gboolean G_GNUC_UNUSED dummy;
+  dummy = imap_handle_idle_disable(h);
   if(h->sio) {
-    sio_detach(h->sio); h->sio = NULL;
-    imap_compress_release(&h->compress);
+    g_object_unref(h->sio); h->sio = NULL;
   }
-  if(h->iochannel) {
-    g_io_channel_unref(h->iochannel); h->iochannel = NULL;
-  }
-  if(h->async_watch_id) {
-    g_source_remove(h->async_watch_id);
-    h->async_watch_id = 0;
-  }
-  close(h->sd);
+  socket_source_remove(h);
   h->state = IMHS_DISCONNECTED;
 }
 
@@ -583,14 +574,13 @@ int imap_mbox_is_selected     (ImapMboxHandle *h)
 { return IMAP_MBOX_IS_SELECTED(h); }
 
 ImapResult
-imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host, int over_ssl)
+imap_mbox_handle_connect(ImapMboxHandle* ret, const char *host)
 {
   ImapResult rc;
 
   g_return_val_if_fail(imap_mbox_is_disconnected(ret), IMAP_CONNECT_FAILED);
 
   g_mutex_lock(&ret->mutex);
-  ret->over_ssl = over_ssl;
 
   g_free(ret->host);   ret->host   = g_strdup(host);
 
@@ -670,10 +660,10 @@ imap_handle_force_disconnect(ImapMboxHandle *h)
   g_mutex_unlock(&h->mutex);
 }
 
-ImapTlsMode
-imap_handle_set_tls_mode(ImapMboxHandle* r, ImapTlsMode state)
+NetClientCryptMode
+imap_handle_set_tls_mode(ImapMboxHandle* r, NetClientCryptMode state)
 {
-  ImapTlsMode res;
+  NetClientCryptMode res;
   g_return_val_if_fail(r,0);
   res = r->tls_mode;
   r->tls_mode = state;
@@ -689,60 +679,7 @@ struct ListData {
   void * cb_data;
 };
 
-int
-imap_socket_open(const char* host, const char *def_port)
-{
-  static const int USEIPV6 = 1;
-  int rc, fd = -1;
-  
-  /* --- IPv4/6 --- */
-  /* "65536\0" */
-  const char *port;
-  char *hostname;
-  struct addrinfo hints;
-  struct addrinfo* res;
-  struct addrinfo* cur;
-  
-  /* we accept v4 or v6 STREAM sockets */
-  memset (&hints, 0, sizeof (hints));
-
-  hints.ai_family = USEIPV6 ? AF_UNSPEC : AF_INET;
-  hints.ai_socktype = SOCK_STREAM;
-
-  port = strrchr(host, ':');
-  if (port) {
-    hostname = g_strndup(host, port-host);
-    port ++;
-  } else {
-    port = def_port;
-    hostname = g_strdup(host);
-  }
-  rc = getaddrinfo(hostname, port, &hints, &res);
-#if defined(HAVE_RES_INIT)
-  if (rc == EAI_AGAIN) {
-    res_init();
-    rc = getaddrinfo(hostname, port, &hints, &res);
-  }
-#endif                          /* defined(HAVE_RES_INIT) */
-  g_free(hostname);
-  if(rc)
-    return -1;
-  
-  for (cur = res; cur != NULL; cur = cur->ai_next) {
-    fd = socket (cur->ai_family, cur->ai_socktype, cur->ai_protocol);
-    if (fd >= 0) {
-      if ((rc=connect(fd, cur->ai_addr, cur->ai_addrlen)) == 0) {
-	break;
-      } else {
-	close (fd);
-        fd = -1;
-      }
-    }
-  }
-  freeaddrinfo (res);
-  return fd; /* FIXME: provide more info why the connection failed. */
-}
-
+#if 0
 static int
 imap_timeout_cb(void *arg)
 {
@@ -762,13 +699,13 @@ imap_timeout_cb(void *arg)
 
   return ok;
 }
+#endif
 
 static ImapResult
 imap_mbox_connect(ImapMboxHandle* handle)
 {
-  static const int SIO_BUFSZ=8192;
   ImapResponse resp;
-  const char *service = "imap";
+  GError *error = NULL;
 
   /* reset some handle status */
   handle->op_cancelled = FALSE;
@@ -776,72 +713,58 @@ imap_mbox_connect(ImapMboxHandle* handle)
   handle->can_fetch_body = TRUE;
   handle->idle_state = IDLE_INACTIVE;
   if(handle->sio) {
-    sio_detach(handle->sio); handle->sio = NULL;
-    imap_compress_release(&handle->compress);
+    g_object_unref(handle->sio); handle->sio = NULL;
   }
 
-  handle->using_tls = 0;
-  if(handle->over_ssl) service = "imaps";
-
-  handle->sd = imap_socket_open(handle->host, service);
-  if(handle->sd<0)
-    return IMAP_CONNECT_FAILED;
+  handle->sio = net_client_siobuf_new(handle->host,
+	  handle->tls_mode == NET_CLIENT_CRYPT_ENCRYPTED ? 993 : 143);
+  g_signal_connect(G_OBJECT(handle->sio), "auth", handle->auth_cb, handle->auth_arg);
+  g_signal_connect(G_OBJECT(handle->sio), "cert-check", handle->cert_cb, handle->sio);
+  if (!net_client_connect(NET_CLIENT(handle->sio), &error)) {
+	imap_mbox_handle_set_msg(handle, error->message);
+	g_clear_error(&error);
+	return IMAP_CONNECT_FAILED;
+  }
   
-  /* Add buffering to the socket */
-  handle->sio = sio_attach(handle->sd, handle->sd, SIO_BUFSZ);
-  if (handle->sio == NULL) {
-    close(handle->sd);
-    return IMAP_NOMEM;
-  }
-  imap_compress_init(&handle->compress);
+#if 0
   if(handle->timeout>0) {
     sio_set_timeout(handle->sio, handle->timeout);
     sio_set_timeoutcb(handle->sio, imap_timeout_cb, handle);
   }
-  if(handle->over_ssl) {
-    SSL *ssl = imap_create_ssl();
-    if(!ssl) {
-      imap_mbox_handle_set_msg(handle,"SSL context could not be created");
-      return IMAP_UNSECURE;
-    }
-    if(imap_setup_ssl(handle->sio, handle->host, ssl,
-                      handle->user_cb, handle->user_arg)) 
-      handle->using_tls = 1;
-    else {
-      imap_mbox_handle_set_msg(handle,"SSL negotiation failed");
-      imap_handle_disconnect(handle);
+#endif
+  if (handle->tls_mode == NET_CLIENT_CRYPT_ENCRYPTED) {
+    if (!net_client_start_tls(NET_CLIENT(handle->sio), &error)) {
+      imap_mbox_handle_set_msg(handle, error->message);
+	  g_clear_error(&error);
       return IMAP_UNSECURE;
     }
   }
-  if(handle->monitor_cb) 
-    sio_set_monitorcb(handle->sio, handle->monitor_cb, handle->monitor_arg);
 
   handle->state = IMHS_CONNECTED;
   if ( (resp=imap_cmd_step(handle, 0)) != IMR_UNTAGGED) {
-    g_message("imap_mbox_connect:unexpected initial response(%d):\n%s\n",
+    g_message("imap_mbox_connect:unexpected initial response(%d): %s",
 	      resp, handle->last_msg);
     imap_handle_disconnect(handle);
     return IMAP_PROTOCOL_ERROR;
   }
   handle->can_fetch_body = 
     (strncmp(handle->last_msg, "Microsoft Exchange", 18) != 0);
-  if(handle->over_ssl)
-    resp = IMR_OK; /* secured already with SSL */
-  else if(handle->tls_mode != IMAP_TLS_DISABLED &&
-          imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) {
+  if((handle->tls_mode == NET_CLIENT_CRYPT_ENCRYPTED) ||
+	 (handle->tls_mode == NET_CLIENT_CRYPT_NONE)) {
+    resp = IMAP_SUCCESS; /* secured already with SSL, or no encryption requested */
+  } else if(imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) {
     if( imap_handle_starttls(handle) != IMR_OK) {
       imap_mbox_handle_set_msg(handle,"TLS negotiation failed");
-      return IMAP_UNSECURE; /* TLS negotiation error */
+      resp = IMAP_UNSECURE; /* TLS negotiation error */
+    } else {
+      resp = IMAP_SUCCESS; /* secured with TLS */
     }
-    resp = IMR_OK; /* secured with TLS */
-  } else
-    resp = IMR_NO; /* not over SSL and TLS unavailable */
-  if(handle->tls_mode == IMAP_TLS_REQUIRED && resp != IMR_OK) {
-    imap_mbox_handle_set_msg(handle,"TLS required but not available");
-    return IMAP_UNSECURE;
+  } else {
+	imap_mbox_handle_set_msg(handle,"TLS required but not available");
+    resp = IMR_NO; /* TLS unavailable */
   }
 
-  return IMAP_SUCCESS;
+  return resp;
 }
 
 unsigned
@@ -853,7 +776,7 @@ imap_make_tag(ImapCmdTag tag)
 }
 
 static int
-imap_get_atom(struct siobuf *sio, char* atom, size_t len)
+imap_get_atom(NetClientSioBuf *sio, char* atom, size_t len)
 {
   unsigned i;
   int c = 0;
@@ -866,7 +789,7 @@ imap_get_atom(struct siobuf *sio, char* atom, size_t len)
 
 #define IS_FLAG_CHAR(c) (strchr("(){ %*\"]",(c))==NULL&&(c)>0x1f&&(c)!=0x7f)
 static int
-imap_get_flag(struct siobuf *sio, char* flag, size_t len)
+imap_get_flag(NetClientSioBuf *sio, char* flag, size_t len)
 {
   unsigned i;
   int c = 0;
@@ -886,7 +809,7 @@ imap_get_flag(struct siobuf *sio, char* flag, size_t len)
 */
 #define IS_TAG_CHAR(c) (strchr("(){ %\"\\]",(c))==NULL&&(c)>0x1f&&(c)!=0x7f)
 static int
-imap_cmd_get_tag(struct siobuf *sio, char* tag, size_t len)
+imap_cmd_get_tag(NetClientSioBuf *sio, char* tag, size_t len)
 {
   unsigned i;
   int c = 0;
@@ -1090,80 +1013,6 @@ imap_mbox_handle_get_msg(ImapMboxHandle* h, unsigned seqno)
   g_return_val_if_fail(h, 0);
   g_return_val_if_fail(seqno-1<h->exists, NULL);
   return h->msg_cache[seqno-1];
-}
-
-ImapMessage*
-imap_mbox_handle_get_msg_v(ImapMboxHandle* h, unsigned no)
-{
-  g_return_val_if_fail(h, 0);
-  g_return_val_if_fail(no-1<h->exists, NULL);
-  if(mbox_view_is_active(&h->mbox_view))
-    no = mbox_view_get_msg_no(&h->mbox_view, no);
-  return h->msg_cache[no-1];
-}
-unsigned
-imap_mbox_get_msg_no(ImapMboxHandle* h, unsigned no)
-{
-  g_return_val_if_fail(h, 0);
-  if(!mbox_view_is_active(&h->mbox_view))
-    return no;
-  else
-    return mbox_view_get_msg_no(&h->mbox_view, no);
-}
-
-unsigned
-imap_mbox_get_rev_no(ImapMboxHandle* h, unsigned seqno)
-{
-  if(!mbox_view_is_active(&h->mbox_view))
-    return seqno;
-  else
-    return mbox_view_get_rev_no(&h->mbox_view, seqno);
-}
-
-
-static void
-set_view_cb(ImapMboxHandle* handle, unsigned seqno, void*arg)
-{
-  mbox_view_append_no(&handle->mbox_view, seqno);
-}
-
-unsigned
-imap_mbox_set_view(ImapMboxHandle *h, ImapMsgFlag fl, gboolean state)
-{
-  char *flag;
-  gchar * cmd;
-  const gchar *cmd_prefix;
-  void *arg;
-  ImapSearchCb cb;
-  ImapResponse rc;
-
-  mbox_view_dispose(&h->mbox_view);
-  if(fl==0)
-    return 1;
-
-  if(imap_mbox_handle_can_do(h, IMCAP_ESEARCH))
-    cmd_prefix = "SEARCH RETURN (ALL) ";
-  else
-    cmd_prefix = "SEARCH ALL ";
-
-  switch(fl) {
-  case IMSGF_SEEN:     flag = "SEEN"; break;
-  case IMSGF_ANSWERED: flag = "ANSWERED"; break;
-  case IMSGF_FLAGGED:  flag = "FLAGGED"; break;
-  case IMSGF_DELETED:  flag = "DELETED"; break;
-  case IMSGF_DRAFT:    flag = "DRAFT"; break;
-  case IMSGF_RECENT:   flag = "RECENT"; break;
-  default: return 1;
-  }
-  cb  = h->search_cb;  h->search_cb  = (ImapSearchCb)set_view_cb;
-  arg = h->search_arg; h->search_arg = NULL;
-  g_free(h->mbox_view.filter_str);
-  h->mbox_view.filter_str = g_strconcat(state ? "" : "UN", flag, NULL);
-  cmd = g_strconcat(cmd_prefix, h->mbox_view.filter_str, NULL);
-  rc = imap_cmd_exec(h, cmd);
-  g_free(cmd);
-  h->search_cb = cb; h->search_arg = arg;
-  return rc == IMR_OK;
 }
 
 const char*
@@ -1549,7 +1398,7 @@ imap_sequence_nth(ImapSequence *i_seq, unsigned nth)
       return r->lo + nth;
     nth -= range_length;
   }
-  g_warning("imap_sequence_nth: too large parameter; returning bogus data\n");
+  g_warning("imap_sequence_nth: too large parameter; returning bogus data");
   return 0;
 }
 
@@ -1966,10 +1815,7 @@ imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned *cmdno)
     return -1;
 
   *cmdno = imap_make_tag(tag);
-  sio_write(handle->sio, tag, strlen(tag));
-  sio_write(handle->sio, " ", 1);
-  sio_write(handle->sio, cmd, strlen(cmd));
-  sio_write(handle->sio, "\r\n", 2);
+  net_client_write_line(NET_CLIENT(handle->sio), "%s %s", NULL, tag, cmd);
   return 1;
 }
 
@@ -1990,18 +1836,11 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   g_return_val_if_fail(handle, IMR_BAD);
   g_return_val_if_fail(handle->state != IMHS_DISCONNECTED, IMR_BAD);
 
-  if(ERR_peek_error()) {
-    fprintf(stderr, "OpenSSL error in %s():\n", __FUNCTION__);
-    ERR_print_errors_fp(stderr);
-    fprintf(stderr, "\nEnd of print_errors - severing the connection...\n");
-    imap_handle_disconnect(handle);
-    return IMR_SEVERED;
-  }
   ci = cmdi_find_by_no(handle->cmd_info, lastcmd);
   if(ci && ci->completed) {
     /* The response to this command has been encountered earlier,
        send it. */
-    printf("Sending stored response to %x and removing info.\n",  lastcmd);
+    g_debug("Sending stored response to %x and removing info.",  lastcmd);
     rc = ci->rc;
     handle->cmd_info = g_list_remove(handle->cmd_info, ci);
     g_free(ci);
@@ -2009,7 +1848,7 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   }
 
   if( imap_cmd_get_tag(handle->sio, tag, sizeof(tag))<0) {
-    printf("IMAP connection to %s severed.\n", handle->host);
+    g_debug("IMAP connection to %s severed.", handle->host);
     imap_handle_disconnect(handle);
     return IMR_SEVERED;
   }
@@ -2029,7 +1868,7 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   /* tagged completion code is the only alternative. */
   /* our command tags are hexadecimal numbers, at most 7 chars */
   if(sscanf(tag, "%7x", &cmdno) != 1) {
-    printf("scanning '%s' for tag number failed. Cannot recover.\n", tag);
+    g_warning("scanning '%s' for tag number failed. Cannot recover.", tag);
     imap_handle_disconnect(handle);
     return IMR_BAD;
   }
@@ -2042,17 +1881,17 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
   ci = cmdi_find_by_no(handle->cmd_info, cmdno);
 #ifdef DEBUG
   if(lastcmd != cmdno)
-    printf("Looking for %x and encountered response to %x (%p)\n",
+    g_debug("Looking for %x and encountered response to %x (%p)",
            lastcmd, cmdno, ci);
 #endif
   if(ci) {
     if(ci->complete_cb && !ci->complete_cb(handle, ci->cb_data)) {
       ci->rc = rc;
       ci->completed = 1;
-      printf("Cmd %x marked as completed with rc=%d\n", cmdno, rc);
+      g_debug("Cmd %x marked as completed with rc=%d", cmdno, rc);
     } else {
 #ifdef DEBUG
-      printf("CmdInfo for cmd %x removed\n", cmdno);
+      g_debug("CmdInfo for cmd %x removed", cmdno);
 #endif
       handle->cmd_info = g_list_remove(handle->cmd_info, ci);
       g_free(ci);
@@ -2062,6 +1901,17 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
     return IMR_SEVERED;
   else
     return lastcmd == cmdno ? rc : IMR_UNTAGGED;
+}
+
+ImapResponse
+imap_cmd_process_untagged(ImapMboxHandle* handle, unsigned cmdno)
+{
+	ImapResponse rc;
+
+	do {
+		rc = imap_cmd_step(handle, cmdno);
+	} while (rc == IMR_UNTAGGED);
+	return rc;
 }
 
 /**executes a command, and wait for the response from the server.
@@ -2088,13 +1938,10 @@ imap_cmd_exec_cmdno(ImapMboxHandle* handle, const char* cmd,
 
   if(ret_cmdno) *ret_cmdno = cmdno;
   g_return_val_if_fail(handle->state != IMHS_DISCONNECTED && 1, IMR_BAD);
-  sio_flush(handle->sio);
   if(handle->state == IMHS_DISCONNECTED)
     return IMR_SEVERED;
 
-  do {
-    rc = imap_cmd_step (handle, cmdno);
-  } while (rc == IMR_UNTAGGED);
+  rc = imap_cmd_process_untagged(handle, cmdno);
 
   imap_handle_idle_enable(handle, IDLE_TIMEOUT);
 
@@ -2135,14 +1982,11 @@ imap_cmd_exec_cmds(ImapMboxHandle* handle, const char** cmds,
   }
   if (rc == IMR_OK) {
     g_return_val_if_fail(handle->state != IMHS_DISCONNECTED && 1, IMR_BAD);
-    sio_flush(handle->sio);
     if(handle->state == IMHS_DISCONNECTED)
       rc = IMR_SEVERED;
     else {
       for (cmd_count=0; cmds[cmd_count]; ++cmd_count) {
-	do {
-	  rc = imap_cmd_step (handle, cmdnos[cmd_count]);
-	} while (rc == IMR_UNTAGGED);
+    	  rc = imap_cmd_process_untagged(handle, cmdnos[cmd_count]);
 
 	if ( !(rc == IMR_OK || rc == IMR_NO || rc == IMR_BAD) ) {
 	  ret_rc = rc;
@@ -2162,57 +2006,8 @@ imap_cmd_exec_cmds(ImapMboxHandle* handle, const char** cmds,
   return ret_rc;
 }
 
-int
-imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len)
-{
-  g_return_val_if_fail(conn, -1);
-  g_return_val_if_fail(conn->sio, -1);
-
-  sio_write(conn->sio, buf, len); /* why it is void? */
-  return 0;
-}
-
-void
-imap_handle_flush(ImapMboxHandle *handle)
-{
-  g_return_if_fail(handle);
-  g_return_if_fail(handle->sio);
-  sio_flush(handle->sio);
-}
-
-char*
-imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz)
-{
-  char* rc;
-  g_return_val_if_fail(h, NULL);
-  g_return_val_if_fail(h->sio, NULL);
-
-  rc = sio_gets(h->sio, buf, sz);
-  if(rc == NULL)
-      imap_handle_disconnect(h);
-  return rc;
-}
-
-const char*
-lbi_strerror(ImapResult rc)
-{
-  switch(rc) {
-   
-  case IMAP_SUCCESS:        return "action succeeded";
-  case IMAP_NOMEM:          return "not enough memory";
-  case IMAP_CONNECT_FAILED: return "transport level connect failed";
-  case IMAP_PROTOCOL_ERROR: return "unexpected server response";
-  case IMAP_AUTH_FAILURE:   return "authentication failure";
-  case IMAP_AUTH_UNAVAIL:   return "no supported authentication method available ";
-  case IMAP_UNSECURE:       return "secure connection requested but "
-                              "could not be established.";
-  case IMAP_SELECT_FAILED: return "SELECT command failed";
-  default: return "Unknown error";
-  }
-}
-
 static GString*
-imap_get_string_with_lookahead(struct siobuf* sio, int c)
+imap_get_string_with_lookahead(NetClientSioBuf *sio, int c)
 { /* string */  
   GString *res = NULL;
   if(c=='"') { /* quoted */
@@ -2236,8 +2031,8 @@ imap_get_string_with_lookahead(struct siobuf* sio, int c)
     if(len==0 || buf[len-1] != '}') return NULL;
     buf[len-1] = '\0';
     len = strtol(buf, NULL, 10);
-    if( c != 0x0d) { printf("lit1:%d\n",c); return NULL;}
-    if( (c=sio_getc(sio)) != 0x0a) { printf("lit1:%d\n",c); return NULL;}
+    if( c != 0x0d) { g_debug("lit1:%d",c); return NULL;}
+    if( (c=sio_getc(sio)) != 0x0a) { g_debug("lit1:%d",c); return NULL;}
     res = g_string_sized_new(len+1);
     if(len>0) sio_read(sio, res->str, len);
     res->len = len;
@@ -2248,14 +2043,14 @@ imap_get_string_with_lookahead(struct siobuf* sio, int c)
 
 /* see the spec for the definition of string */
 static char*
-imap_get_string(struct siobuf* sio)
+imap_get_string(NetClientSioBuf *sio)
 {
   GString * s = imap_get_string_with_lookahead(sio, sio_getc(sio));
   return s ? g_string_free(s, FALSE) : NULL;
 }
 
 static gboolean
-imap_is_nil (struct siobuf *sio, int c)
+imap_is_nil (NetClientSioBuf *sio, int c)
 {
   return g_ascii_toupper (c) == 'N' && g_ascii_toupper (sio_getc (sio)) == 'I'
     && g_ascii_toupper (sio_getc (sio)) == 'L';
@@ -2263,7 +2058,7 @@ imap_is_nil (struct siobuf *sio, int c)
 
 /* see the spec for the definition of nstring */
 static char*
-imap_get_nstring(struct siobuf* sio)
+imap_get_nstring(NetClientSioBuf *sio)
 {
   int c = sio_getc(sio);
   if(toupper(c)=='N') { /* nil */
@@ -2278,7 +2073,7 @@ imap_get_nstring(struct siobuf* sio)
 /* see the spec for the definition of astring */
 #define IS_ASTRING_CHAR(c) (strchr("(){ %*\"\\", (c))==0&&(c)>0x1F&&(c)!=0x7F)
 static char*
-imap_get_astring(struct siobuf *sio, int* lookahead)
+imap_get_astring(NetClientSioBuf *sio, int* lookahead)
 {
   char* res;
   int c = sio_getc(sio);
@@ -2300,7 +2095,7 @@ imap_get_astring(struct siobuf *sio, int* lookahead)
 
 /* nstring / literal8 as in the BINARY extension */
 static GString*
-imap_get_binary_string(struct siobuf *sio)
+imap_get_binary_string(NetClientSioBuf *sio)
 {
   int c = sio_getc(sio);
   if(toupper(c)=='N') { /* nil */
@@ -2322,14 +2117,14 @@ imap_get_binary_string(struct siobuf *sio)
 #include "imap-handle.h"
 
 static int
-ignore_bad_charset(struct siobuf *sio, int c)
+ignore_bad_charset(NetClientSioBuf *sio, int c)
 {
   while(c==' ') {
     gchar * astring = imap_get_astring(sio, &c); 
     g_free(astring);
   }
   if(c != ')')
-    fprintf(stderr,"ignore_bad_charset: expected ')' got '%c'\n", c);
+    g_warning("ignore_bad_charset: expected ')' got '%c'", c);
   else c = sio_getc(sio);
   return c;
 }
@@ -2459,7 +2254,7 @@ ir_get_append_copy_uids(ImapMboxHandle *h, gboolean append_only)
     if( (rc = imap_get_sequence(h, NULL, NULL)) != IMR_OK)
       return rc;
     if( (c=sio_getc(h->sio)) != ' ') {
-      printf("Expected ' ' found '%c'\n", c);
+      g_debug("Expected ' ' found '%c'", c);
       return IMR_PROTOCOL;
     }
   }
@@ -2519,7 +2314,7 @@ ir_resp_text_code(ImapMboxHandle *h)
   default: while( c != ']' && (c=sio_getc(h->sio)) != EOF) ; break;
   }
   if(c != ']')
-    printf("ir_resp_text_code, on exit c=%c\n", c);
+    g_debug("ir_resp_text_code, on exit c=%c", c);
   return c == ']' ? rc : IMR_PROTOCOL;
 }
 
@@ -2551,7 +2346,7 @@ ir_ok(ImapMboxHandle *h)
     if(h->info_cb)
       h->info_cb(h, rc, line, h->info_arg);
     else
-      printf("INFO : '%s'\n", line);
+      g_debug("INFO : '%s'", line);
     rc = IMR_OK; /* in case it was IMR_ALERT */
   }
   return rc;
@@ -2569,7 +2364,7 @@ ir_no(ImapMboxHandle *h)
     if(h->info_cb)
       h->info_cb(h, IMR_NO, line, h->info_arg);
     else
-      printf("WARN : '%s'\n", line);
+      g_debug("WARN : '%s'", line);
   }
   return IMR_NO;
 }
@@ -2585,7 +2380,7 @@ ir_bad(ImapMboxHandle *h)
     if(h->info_cb)
       h->info_cb(h, IMR_BAD, line, h->info_arg);
     else
-      printf("ERROR: %s\n", line);
+      g_debug("ERROR: %s", line);
   }
   return IMR_BAD;
 }
@@ -2612,10 +2407,8 @@ ir_bye(ImapMboxHandle *h)
     imap_mbox_handle_set_state(h, IMHS_DISCONNECTED);
     /* we close the connection here unless we are doing logout. */
     if(h->sio) {
-      sio_detach(h->sio); h->sio = NULL; 
-      imap_compress_release(&h->compress);
+      g_object_unref(h->sio); h->sio = NULL;
     }
-    close(h->sd);
   }
   return IMR_BYE;
 }
@@ -2624,11 +2417,11 @@ static ImapResponse
 ir_check_crlf(ImapMboxHandle *h, int c)
 {
   if( c != 0x0d) {
-    printf("CR:%d\n",c);
+    g_debug("CR:%d",c);
     return IMR_PROTOCOL;
   }
   if( (c=sio_getc(h->sio)) != 0x0a) {
-    printf("LF:%d\n",c);
+    g_debug("LF:%d",c);
     return IMR_PROTOCOL;
   }
   return IMR_OK;
@@ -2766,7 +2559,7 @@ ir_esearch(ImapMboxHandle *h)
     c = imap_get_atom(h->sio, atom, sizeof(atom));
     if(c == EOF) return IMR_SEVERED;
     if(g_ascii_strcasecmp(atom, "TAG")) { /* TAG is the only acceptable response here! */
-      printf("ESearch expected TAG encountered %s\n", atom);
+      g_debug("ESearch expected TAG encountered %s", atom);
       return IMR_PROTOCOL; 
     }
     if(c != ' ')
@@ -2843,7 +2636,7 @@ static ImapResponse
 ir_flags(ImapMboxHandle *h)
 {
   /* FIXME: implement! */
-  int c; EAT_LINE(h, c);
+  net_client_siobuf_discard_line(h->sio, NULL);
   return IMR_OK;
 }
 
@@ -2946,7 +2739,7 @@ ir_quotaroot(ImapMboxHandle *h)
   mbox = imap_get_astring(h->sio, &eol);
   if (mbox) {
     if (strcmp(mbox, mbx7))
-      fprintf(stderr, "expected QUOTAROOT for %s, not for %s\n", mbx7, mbox);
+      g_debug("expected QUOTAROOT for %s, not for %s", mbx7, mbox);
     else {
       if (eol == ' ')
         h->quota_root = imap_get_astring(h->sio, &eol);
@@ -2973,7 +2766,7 @@ ir_quota(ImapMboxHandle *h)
   h->quota_max_k = h->quota_used_k = 0;
   if (root) {
     if (strcmp(root, h->quota_root))
-      fprintf(stderr, "expected QUOTA for %s, not for %s\n", h->quota_root,
+      g_debug("expected QUOTA for %s, not for %s", h->quota_root,
               root);
     else {
       while ((c = sio_getc(h->sio)) != -1 && c == ' ');
@@ -2997,7 +2790,7 @@ ir_quota(ImapMboxHandle *h)
               h->quota_used_k = strtoul(usage, &endptr1, 10);
               h->quota_max_k = strtoul(limit, &endptr2, 10);
               if (*endptr1 != '\0' || *endptr2 != '\0') {
-                fprintf(stderr, "bad QUOTA '%s %s %s'\n", resource, usage,
+                g_debug("bad QUOTA '%s %s %s'", resource, usage,
                         limit);
                 h->quota_max_k = h->quota_used_k = 0;
                 c = ')';
@@ -3071,7 +2864,7 @@ ir_myrights(ImapMboxHandle *h)
   mbox = imap_get_astring(h->sio, &eol);
   if (mbox && eol == ' ') {
     if (strcmp(mbox, mbx7))
-      fprintf(stderr, "expected MYRIGHTS for %s, not for %s\n", mbx7, mbox);
+      g_debug("expected MYRIGHTS for %s, not for %s", mbx7, mbox);
     else {
       retval = extract_acl(h, "\n", &h->rights, NULL);
       h->has_rights = 1;
@@ -3110,7 +2903,7 @@ ir_getacl(ImapMboxHandle *h)
 
   mbx7 = imap_utf8_to_mailbox(h->mbox);
   if (strcmp(mbox, mbx7)) {
-    fprintf(stderr, "expected ACL for %s, not for %s\n", mbx7, mbox);
+    g_debug("expected ACL for %s, not for %s", mbx7, mbox);
     retval = IMR_NO;
   } else if (eol == '\n') {
     retval = IMR_OK;
@@ -3215,7 +3008,7 @@ imap_address_to_string(const ImapAddress *addr)
    (eg., when end of list is found instead).
 */
 static ImapAddress*
-imap_get_address(struct siobuf* sio)
+imap_get_address(NetClientSioBuf *sio)
 {
   char *addr[4], *p;
   ImapAddress *res = NULL;
@@ -3275,7 +3068,7 @@ imap_get_address(struct siobuf* sio)
 }
 
 static ImapResponse
-imap_get_addr_list (struct siobuf *sio, ImapAddress ** list)
+imap_get_addr_list (NetClientSioBuf *sio, ImapAddress ** list)
 {
   int c;
   ImapAddress *res;
@@ -3304,7 +3097,7 @@ imap_get_addr_list (struct siobuf *sio, ImapAddress ** list)
 }
 
 static ImapResponse
-ir_envelope(struct siobuf *sio, ImapEnvelope *env)
+ir_envelope(NetClientSioBuf *sio, ImapEnvelope *env)
 {
   int c;
   char *date, *str;
@@ -3315,14 +3108,14 @@ ir_envelope(struct siobuf *sio, ImapEnvelope *env)
 #if GMAIL_BUG_20100725 == 1
   /* GMAIL returns sometimes NIL instead of the envelope. */
   if (c == 'N') {
-      printf("GMail message/rfc822 bug detected.\n");      
+      g_debug("GMail message/rfc822 bug detected.");
       env = NULL;
       if (sio_getc(sio) == 'I' &&
           sio_getc(sio) == 'L') return IMR_PARSE;
   }
 #endif /* GMAIL_BUG_20100725 */
   if( c != '(') {
-      printf("envelope's ( expected but got '%c'\n", c);
+      g_debug("envelope's ( expected but got '%c'", c);
       return IMR_PROTOCOL;
   }
 
@@ -3355,10 +3148,10 @@ ir_envelope(struct siobuf *sio, ImapEnvelope *env)
   if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   str = imap_get_nstring(sio);
   if(env) env->in_reply_to = str; else g_free(str);
-  if( (c=sio_getc(sio)) != ' ') { printf("c=%c\n",c); return IMR_PROTOCOL;}
+  if( (c=sio_getc(sio)) != ' ') { g_debug("c=%c",c); return IMR_PROTOCOL;}
   str = imap_get_nstring(sio);
   if(env) env->message_id = str; else g_free(str);
-  if( (c=sio_getc(sio)) != ')') { printf("c=%d\n",c);return IMR_PROTOCOL;}
+  if( (c=sio_getc(sio)) != ')') { g_debug("c=%d",c);return IMR_PROTOCOL;}
   return IMR_OK;
 }
 
@@ -3420,7 +3213,7 @@ ir_msg_att_rfc822_size(ImapMboxHandle *h, int c, unsigned seqno)
 }
 
 static ImapResponse
-ir_media(struct siobuf* sio, ImapMediaBasic *imb, ImapBody *body)
+ir_media(NetClientSioBuf *sio, ImapMediaBasic *imb, ImapBody *body)
 {
   gchar *type, *subtype;
 
@@ -3455,7 +3248,7 @@ ir_media(struct siobuf* sio, ImapMediaBasic *imb, ImapBody *body)
 }
 
 static ImapResponse
-ir_body_fld_param_hash(struct siobuf* sio, GHashTable * params)
+ir_body_fld_param_hash(NetClientSioBuf *sio, GHashTable * params)
 {
   int c;
   gchar *key, *val;
@@ -3478,13 +3271,13 @@ ir_body_fld_param_hash(struct siobuf* sio, GHashTable * params)
 }
 
 static ImapResponse
-ir_body_fld_param(struct siobuf* sio, ImapBody *body)
+ir_body_fld_param(NetClientSioBuf *sio, ImapBody *body)
 {
   return ir_body_fld_param_hash(sio, body ? body->params : NULL);
 }
 
 static ImapResponse
-ir_body_fld_id(struct siobuf* sio, ImapBody *body)
+ir_body_fld_id(NetClientSioBuf *sio, ImapBody *body)
 {
   gchar* id = imap_get_nstring(sio);
 
@@ -3496,7 +3289,7 @@ ir_body_fld_id(struct siobuf* sio, ImapBody *body)
 }
 
 static ImapResponse
-ir_body_fld_desc(struct siobuf* sio, ImapBody *body)
+ir_body_fld_desc(NetClientSioBuf *sio, ImapBody *body)
 {
   gchar* desc = imap_get_nstring(sio);
   if(body)
@@ -3507,7 +3300,7 @@ ir_body_fld_desc(struct siobuf* sio, ImapBody *body)
 }
 
 static ImapResponse
-ir_body_fld_enc(struct siobuf* sio, ImapBody *body)
+ir_body_fld_enc(NetClientSioBuf *sio, ImapBody *body)
 {
   gchar* str = imap_get_string(sio);
   ImapBodyEncoding enc;
@@ -3527,7 +3320,7 @@ ir_body_fld_enc(struct siobuf* sio, ImapBody *body)
 }
 
 static ImapResponse
-ir_body_fld_octets(struct siobuf* sio, ImapBody *body)
+ir_body_fld_octets(NetClientSioBuf *sio, ImapBody *body)
 {
   char buf[12];
   int c = imap_get_atom(sio, buf, sizeof(buf));
@@ -3539,7 +3332,7 @@ ir_body_fld_octets(struct siobuf* sio, ImapBody *body)
 }
 
 static ImapResponse
-ir_body_fields(struct siobuf* sio, ImapBody *body)
+ir_body_fields(NetClientSioBuf *sio, ImapBody *body)
 {
   ImapResponse rc;
   int c;
@@ -3547,7 +3340,7 @@ ir_body_fields(struct siobuf* sio, ImapBody *body)
   if( (rc=ir_body_fld_param (sio, body))!=IMR_OK) return rc;
   if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
   if( (rc=ir_body_fld_id    (sio, body))!=IMR_OK) return rc;
-  if((c=sio_getc(sio)) != ' ') { printf("err=%c\n", c); return IMR_PROTOCOL; }
+  if((c=sio_getc(sio)) != ' ') { g_debug("err=%c", c); return IMR_PROTOCOL; }
   if( (rc=ir_body_fld_desc  (sio, body))!=IMR_OK) return rc;
   if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
   if( (rc=ir_body_fld_enc   (sio, body))!=IMR_OK) return rc;
@@ -3558,7 +3351,7 @@ ir_body_fields(struct siobuf* sio, ImapBody *body)
 }
 
 static ImapResponse
-ir_body_fld_lines(struct siobuf* sio, ImapBody* body)
+ir_body_fld_lines(NetClientSioBuf *sio, ImapBody* body)
 {
   char buf[12];
   int c = imap_get_atom(sio, buf, sizeof(buf));
@@ -3571,7 +3364,7 @@ ir_body_fld_lines(struct siobuf* sio, ImapBody* body)
 
 /* body_fld_dsp = "(" string SP body_fld_param ")" / nil */
 static ImapResponse
-ir_body_fld_dsp (struct siobuf *sio, ImapBody * body)
+ir_body_fld_dsp (NetClientSioBuf *sio, ImapBody * body)
 {
   ImapResponse rc;
   int c;
@@ -3625,7 +3418,7 @@ ir_body_fld_dsp (struct siobuf *sio, ImapBody * body)
 
 /* body-fld-lang = nstring / "(" string *(SP string) ")" */
 static ImapResponse
-ir_body_fld_lang (struct siobuf *sio, ImapBody * body)
+ir_body_fld_lang (NetClientSioBuf *sio, ImapBody * body)
 {
   int c;
 
@@ -3667,7 +3460,7 @@ ir_body_fld_lang (struct siobuf *sio, ImapBody * body)
  *                  "(" body-extension *(SP body-extension) ")"
  */
 static ImapResponse
-ir_body_extension (struct siobuf *sio, ImapBody * body)
+ir_body_extension (NetClientSioBuf *sio, ImapBody * body)
 {
   int c;
 
@@ -3716,7 +3509,7 @@ typedef enum _ImapBodyExtensibility ImapBodyExtensibility;
  */
 
 static ImapResponse
-ir_body_ext_mpart (struct siobuf *sio, ImapBody * body,
+ir_body_ext_mpart (NetClientSioBuf *sio, ImapBody * body,
 		   ImapBodyExtensibility type)
 {
   ImapResponse rc;
@@ -3795,7 +3588,7 @@ ir_body_ext_mpart (struct siobuf *sio, ImapBody * body,
  *                   ; "BODY" fetch
  */
 static ImapResponse
-ir_body_ext_1part (struct siobuf *sio, ImapBody * body,
+ir_body_ext_1part (NetClientSioBuf *sio, ImapBody * body,
 		   ImapBodyExtensibility type)
 {
   ImapResponse rc;
@@ -3812,8 +3605,8 @@ ir_body_ext_1part (struct siobuf *sio, ImapBody * body,
     sio_ungetc(sio);
     if(isdigit(c)) { 
       char buf[20];
-      printf("Incorrect GMail number-of-lines entry detected. "
-	     "Working around.\n");
+      g_debug("Incorrect GMail number-of-lines entry detected. "
+	     "Working around.");
       c = imap_get_atom(sio, buf, sizeof(buf));
       if(c != ' ')
 	return IMR_PROTOCOL;
@@ -3883,10 +3676,10 @@ ir_body_ext_1part (struct siobuf *sio, ImapBody * body,
 /* body-type-mpart = 1*body SP media-subtype
  *                   [SP body-ext-mpart]
  */
-static ImapResponse ir_body (struct siobuf *sio, int c, ImapBody * body,
+static ImapResponse ir_body (NetClientSioBuf *sio, int c, ImapBody * body,
 			     ImapBodyExtensibility type);
 static ImapResponse
-ir_body_type_mpart (struct siobuf *sio, ImapBody * body,
+ir_body_type_mpart (NetClientSioBuf *sio, ImapBody * body,
 		    ImapBodyExtensibility type)
 {
   ImapResponse rc;
@@ -3942,7 +3735,7 @@ ir_body_type_mpart (struct siobuf *sio, ImapBody * body,
  *                   [SP body-ext-1part]
  */
 static ImapResponse
-ir_body_type_1part (struct siobuf *sio, ImapBody * body,
+ir_body_type_1part (NetClientSioBuf *sio, ImapBody * body,
 		    ImapBodyExtensibility type)
 {
   ImapResponse rc;
@@ -4045,7 +3838,7 @@ ir_body_type_1part (struct siobuf *sio, ImapBody * body,
 
 /* body = "(" (body-type-1part / body-type-mpart) ")" */
 static ImapResponse
-ir_body (struct siobuf *sio, int c, ImapBody * body,
+ir_body (NetClientSioBuf *sio, int c, ImapBody * body,
 	 ImapBodyExtensibility type)
 {
   ImapResponse rc;
@@ -4070,7 +3863,7 @@ ir_body (struct siobuf *sio, int c, ImapBody * body,
 
 /* read [section] and following string. FIXME: other kinds of body. */ 
 static ImapResponse
-ir_body_section(struct siobuf *sio, unsigned seqno,
+ir_body_section(NetClientSioBuf *sio, unsigned seqno,
 		ImapFetchBodyType body_type,
 		ImapFetchBodyInternalCb body_cb, void *arg)
 {

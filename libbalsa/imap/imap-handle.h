@@ -19,6 +19,7 @@
 
 #include <glib.h>
 
+#include "net-client.h"
 #include "libimap.h"
 
 typedef enum {
@@ -120,22 +121,21 @@ typedef void(*ImapListCb)(ImapMboxHandle*handle, int delim,
 
 ImapMboxHandle *imap_mbox_handle_new(void);
 void imap_handle_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state);
-void imap_handle_set_monitorcb(ImapMboxHandle* h, ImapMonitorCb cb, void*);
 void imap_handle_set_infocb(ImapMboxHandle* h, ImapInfoCb cb, void*);
-void imap_handle_set_usercb(ImapMboxHandle* h, ImapUserCb cb, void*);
 void imap_handle_set_flagscb(ImapMboxHandle* h, ImapFlagsCb cb, void*);
+void imap_handle_set_authcb(ImapMboxHandle* h, GCallback cb, void *arg);
+void imap_handle_set_certcb(ImapMboxHandle* h, GCallback cb);
 int imap_handle_set_timeout(ImapMboxHandle *, int milliseconds);
 gboolean imap_handle_idle_enable(ImapMboxHandle *, int seconds);
 gboolean imap_handle_idle_disable(ImapMboxHandle *)
     __attribute__ ((warn_unused_result));
 gboolean imap_handle_op_cancelled(ImapMboxHandle *h);
-ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst, 
-                                    int over_ssl);
+ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst);
 ImapResult imap_mbox_handle_reconnect(ImapMboxHandle* r,
                                       gboolean *readonly);
 void imap_handle_force_disconnect(ImapMboxHandle *h);
 
-ImapTlsMode imap_handle_set_tls_mode(ImapMboxHandle *h, ImapTlsMode option);
+NetClientCryptMode imap_handle_set_tls_mode(ImapMboxHandle *h, NetClientCryptMode option);
 
 /* int below is a boolean */
 int      imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);
@@ -159,17 +159,11 @@ ImapResponse imap_mbox_handle_fetch_env(ImapMboxHandle* handle,
                                         const gchar *seq);
 
 ImapMessage* imap_mbox_handle_get_msg(ImapMboxHandle* handle, unsigned seqno);
-ImapMessage* imap_mbox_handle_get_msg_v(ImapMboxHandle* handle, unsigned no);
-unsigned imap_mbox_get_msg_no(ImapMboxHandle* h, unsigned no);
-unsigned imap_mbox_get_rev_no(ImapMboxHandle* h, unsigned seqno);
 
 unsigned imap_mbox_handle_first_unseen(ImapMboxHandle* handle);
-unsigned imap_mbox_find_next(ImapMboxHandle* handle, unsigned start, 
-                             const char *search_str);
 ImapResponse imap_mbox_find_all(ImapMboxHandle *h, const char *search_str,
                                 unsigned *msgcnt, unsigned**msgs);
 
-unsigned imap_mbox_set_view(ImapMboxHandle *h, ImapMsgFlag f, gboolean state);
 unsigned imap_mbox_set_sort(ImapMboxHandle *h, ImapSortKey isr, 
                             int ascending);
 const char *imap_mbox_get_filter(ImapMboxHandle *h);

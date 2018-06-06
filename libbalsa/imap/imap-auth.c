@@ -27,10 +27,14 @@
 #include "imap-auth.h"
 #include "util.h"
 #include "imap_private.h"
-#include "siobuf.h"
+#include "siobuf-nc.h"
+#include "net-client-utils.h"
 
 static ImapResult imap_auth_anonymous(ImapMboxHandle* handle);
 static ImapResult imap_auth_plain(ImapMboxHandle* handle);
+static ImapResult imap_auth_login(ImapMboxHandle* handle);
+
+typedef ImapResult (*ImapAuthenticator)(ImapMboxHandle* handle);
 
 /* ordered from strongest to weakest. Auth anonymous does not really
  * belong here, does it? */
@@ -70,49 +74,59 @@ imap_authenticate(ImapMboxHandle* handle)
 /* =================================================================== */
 /*                           AUTHENTICATORS                            */
 /* =================================================================== */
-#define SHORT_STRING 64
 /* imap_auth_login: Plain LOGIN support */
-ImapResult
+static ImapResult
 imap_auth_login(ImapMboxHandle* handle)
 {
-  char q_user[SHORT_STRING], q_pass[SHORT_STRING];
-  char buf[2*SHORT_STRING+7];
-  char *user = NULL, *pass = NULL;
-  ImapResponse rc;
-  int ok;
+  gchar **auth_data;
+  ImapResult result;
   
   if (imap_mbox_handle_can_do(handle, IMCAP_LOGINDISABLED))
     return IMAP_AUTH_UNAVAIL;
   
-  ok = 0;
-  if(!ok && handle->user_cb)
-    handle->user_cb(IME_GET_USER_PASS, handle->user_arg,
-                    "LOGIN", &user, &pass, &ok);
-  if(!ok || user == NULL || pass == NULL) {
+  g_signal_emit_by_name(handle->sio, "auth", TRUE, &auth_data);
+  if((auth_data == NULL) || (auth_data[0] == NULL) || (auth_data[1] == NULL)) {
     imap_mbox_handle_set_msg(handle, "Authentication cancelled");
+	g_strfreev(auth_data);
     return IMAP_AUTH_CANCELLED;
   }
 
-  imap_quote_string(q_user, sizeof (q_user), user);
-  imap_quote_string(q_pass, sizeof (q_pass), pass);
-  g_free(user); g_free(pass); /* FIXME: clean passwd first */
-  g_snprintf (buf, sizeof (buf), "LOGIN %s %s", q_user, q_pass);
-  rc = imap_cmd_exec(handle, buf);
-  return  (rc== IMR_OK) ?  IMAP_SUCCESS : IMAP_AUTH_FAILURE;
+  /* RFC 6855, Sect. 5, explicitly forbids UTF-8 usernames or passwords */
+  if (!g_str_is_ascii(auth_data[0]) || !g_str_is_ascii(auth_data[1])) {
+	  imap_mbox_handle_set_msg(handle, "Cannot LOGIN with UTF-8 username or password");
+	  result = IMAP_AUTH_CANCELLED;
+  } else {
+	  gchar *q_user;
+	  gchar *q_pass;
+	  gchar *buf;
+	  ImapResponse rc;
+
+	  q_user = imap_quote_string(auth_data[0]);
+	  q_pass = imap_quote_string(auth_data[1]);
+	  buf = g_strjoin(" ", "LOGIN", q_user, q_pass, NULL);
+	  net_client_free_authstr(q_user);
+	  net_client_free_authstr(q_pass);
+	  rc = imap_cmd_exec(handle, buf);
+	  net_client_free_authstr(buf);
+
+	  result = (rc == IMR_OK) ? IMAP_SUCCESS : IMAP_AUTH_FAILURE;
+  }
+
+  net_client_free_authstr(auth_data[0]);
+  net_client_free_authstr(auth_data[1]);
+  g_free(auth_data);
+  return result;
 }
 
 /* =================================================================== */
 /* SASL PLAIN RFC-2595                                                 */
 /* =================================================================== */
-#define WAIT_FOR_PROMPT(rc,handle,cmdno) \
-    do (rc) = imap_cmd_step((handle), (cmdno)); while((rc) == IMR_UNTAGGED);
-
 static ImapResult
 imap_auth_sasl(ImapMboxHandle* handle, ImapCapability cap,
 	       const char *sasl_cmd,
 	       gboolean (*getmsg)(ImapMboxHandle *h, char **msg, int *msglen))
 {
-  char *msg = NULL, *msg64;
+  char *msg64;
   ImapResponse rc;
   int msglen;
   unsigned cmdno;
@@ -122,77 +136,56 @@ imap_auth_sasl(ImapMboxHandle* handle, ImapCapability cap,
     return IMAP_AUTH_UNAVAIL;
   sasl_ir = imap_mbox_handle_can_do(handle, IMCAP_SASLIR);
   
-  if(!getmsg(handle, &msg, &msglen)) {
+  if(!getmsg(handle, &msg64, &msglen)) {
     imap_mbox_handle_set_msg(handle, "Authentication cancelled");
     return IMAP_AUTH_CANCELLED;
   }
   
-  msg64 = g_base64_encode((const guchar *) msg, msglen);
-  g_free(msg);
-
   if(sasl_ir) { /* save one RTT */
     ImapCmdTag tag;
     if(IMAP_MBOX_IS_DISCONNECTED(handle))
       return IMAP_AUTH_UNAVAIL;
     cmdno = imap_make_tag(tag);
-    sio_write(handle->sio, tag, strlen(tag));
-    sio_write(handle->sio, " ", 1);
-    sio_write(handle->sio, sasl_cmd, strlen(sasl_cmd));
-    sio_write(handle->sio, " ", 1);
+    net_client_write_line(NET_CLIENT(handle->sio), "%s %s %s",
+    	NULL, tag, sasl_cmd, msg64);
   } else {
-    int c;
     if(imap_cmd_start(handle, sasl_cmd, &cmdno) <0) {
-      g_free(msg64);
+      net_client_free_authstr(msg64);
       return IMAP_AUTH_FAILURE;
     }
-    imap_handle_flush(handle);
-    WAIT_FOR_PROMPT(rc,handle,cmdno);
+    rc = imap_cmd_process_untagged(handle, cmdno);
     
     if (rc != IMR_RESPOND) {
-      g_warning("imap %s: unexpected response.\n", sasl_cmd);
-      g_free(msg64);
+      g_warning("imap %s: unexpected response.", sasl_cmd);
+      net_client_free_authstr(msg64);
       return IMAP_AUTH_FAILURE;
     }
-    while( (c=sio_getc((handle)->sio)) != EOF && c != '\n');
-    if(c == EOF) {
-      imap_handle_disconnect(handle);
-      g_free(msg64);
-      return IMAP_AUTH_FAILURE;
-    }
+    net_client_siobuf_discard_line(handle->sio, NULL);
+    net_client_write_line(NET_CLIENT(handle->sio), "%s", NULL, msg64);
   }
-  sio_write(handle->sio, msg64, strlen(msg64));
-  sio_write(handle->sio, "\r\n", 2);
-  g_free(msg64);
-  imap_handle_flush(handle);
-  do
-    rc = imap_cmd_step (handle, cmdno);
-  while (rc == IMR_UNTAGGED);
+  net_client_free_authstr(msg64);
+  rc = imap_cmd_process_untagged(handle, cmdno);
   return  (rc== IMR_OK) ?  IMAP_SUCCESS : IMAP_AUTH_FAILURE;
 }
 
 static gboolean
 getmsg_plain(ImapMboxHandle *h, char **retmsg, int *retmsglen)
 {
-  char *user = NULL, *pass = NULL, *msg;
-  int ok, userlen, passlen, msglen;
-  ok = 0;
-  if(!ok && h->user_cb)
-    h->user_cb(IME_GET_USER_PASS, h->user_arg,
-                    "LOGIN", &user, &pass, &ok);
-  if(!ok || user == NULL || pass == NULL)
-    return 0;
+	gchar **auth_data;
+	gboolean result;
 
-  userlen = strlen(user);
-  passlen = strlen(pass);
-  msglen  = 2*userlen + passlen + 2;
-  msg     = g_malloc(msglen+1);
-  strcpy(msg, user); 
-  strcpy(msg+userlen+1, user);
-  strcpy(msg+userlen*2+2, pass); 
-  g_free(user); g_free(pass);
-  *retmsg = msg;
-  *retmsglen = msglen;
-  return 1;
+	g_signal_emit_by_name(h->sio, "auth", TRUE, &auth_data);
+	if ((auth_data == NULL) || (auth_data[0] == NULL) || (auth_data[1] == NULL)) {
+		result = FALSE;
+	} else {
+		*retmsg = net_client_auth_plain_calc(auth_data[0], auth_data[1]);
+		*retmsglen = strlen(*retmsg);
+		result = TRUE;
+	}
+	net_client_free_authstr(auth_data[0]);
+	net_client_free_authstr(auth_data[1]);
+	g_free(auth_data);
+	return result;
 }
 
 static ImapResult
@@ -209,14 +202,19 @@ imap_auth_plain(ImapMboxHandle* handle)
 static gboolean
 getmsg_anonymous(ImapMboxHandle *h, char **retmsg, int *retmsglen)
 {
-  int ok = 0;
-  if(!ok && h->user_cb)
-    h->user_cb(IME_GET_USER, h->user_arg,
-	       "ANONYMOUS", retmsg, &ok);
-  if(!ok || *retmsg == NULL)
-    return 0;
-  *retmsglen = strlen(*retmsg);
-  return 1;
+	gchar **auth_data;
+	gboolean result;
+
+	g_signal_emit_by_name(h->sio, "auth", FALSE, &auth_data);
+	if((auth_data == NULL) || (auth_data[0] == NULL)) {
+		result = FALSE;
+	} else {
+		*retmsg = g_base64_encode((const guchar *) auth_data[0], strlen(auth_data[0]));
+		*retmsglen = strlen(*retmsg);
+		result = TRUE;
+	}
+	g_strfreev(auth_data);
+	return result;
 }
 
 static ImapResult

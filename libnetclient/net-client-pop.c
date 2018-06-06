@@ -175,12 +175,10 @@ net_client_pop_connect(NetClientPop *client, gchar **greeting, GError **error)
 		g_signal_emit_by_name(client, "auth", need_pwd, &auth_data);
 		if ((auth_data != NULL) && (auth_data[0] != NULL)) {
 			result = net_client_pop_auth(client, auth_data[0], auth_data[1], auth_supported, error);
-			memset(auth_data[0], 0, strlen(auth_data[0]));
-			if (auth_data[1] != NULL) {
-				memset(auth_data[1], 0, strlen(auth_data[1]));
-			}
+			net_client_free_authstr(auth_data[0]);
+			net_client_free_authstr(auth_data[1]);
 		}
-		g_strfreev(auth_data);
+		g_free(auth_data);
 	}
 
 	return result;
@@ -527,8 +525,7 @@ net_client_pop_auth_plain(NetClientPop *client, const gchar *user, const gchar *
 		if (result) {
 			result = net_client_pop_execute(client, "%s", NULL, error, base64_buf);
 		}
-		memset(base64_buf, 0, strlen(base64_buf));
-		g_free(base64_buf);
+		net_client_free_authstr(base64_buf);
 	} else {
 		result = FALSE;
 	}
@@ -548,13 +545,11 @@ net_client_pop_auth_login(NetClientPop *client, const gchar *user, const gchar *
 
 		base64_buf = g_base64_encode((const guchar *) user, strlen(user));
 		result = net_client_pop_execute_sasl(client, "%s", NULL, error, base64_buf);
-		memset(base64_buf, 0, strlen(base64_buf));
-		g_free(base64_buf);
+		net_client_free_authstr(base64_buf);
 		if (result) {
 			base64_buf = g_base64_encode((const guchar *) passwd, strlen(passwd));
 			result = net_client_pop_execute(client, "%s", NULL, error, base64_buf);
-			memset(base64_buf, 0, strlen(base64_buf));
-			g_free(base64_buf);
+			net_client_free_authstr(base64_buf);
 		}
 	}
 
@@ -585,11 +580,9 @@ net_client_pop_auth_apop(NetClientPop *client, const gchar *user, const gchar *p
 
 	auth_buf = g_strconcat(client->priv->apop_banner, passwd, NULL);
 	md5_buf = g_compute_checksum_for_string(G_CHECKSUM_MD5, auth_buf, -1);
-	memset(auth_buf, 0, strlen(auth_buf));
-	g_free(auth_buf);
+	net_client_free_authstr(auth_buf);
 	result = net_client_pop_execute(client, "APOP %s %s", NULL, error, user, md5_buf);
-	memset(md5_buf, 0, strlen(md5_buf));
-	g_free(md5_buf);
+	net_client_free_authstr(md5_buf);
 
 	return result;
 }
@@ -607,8 +600,7 @@ net_client_pop_auth_cram(NetClientPop *client, GChecksumType chksum_type, const 
 		auth_buf = net_client_cram_calc(challenge, chksum_type, user, passwd);
 		if (auth_buf != NULL) {
 			result = net_client_pop_execute(client, "%s", NULL, error, auth_buf);
-			memset(auth_buf, 0, strlen(auth_buf));
-			g_free(auth_buf);
+			net_client_free_authstr(auth_buf);
 		} else {
 			result = FALSE;
 		}

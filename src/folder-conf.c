@@ -58,7 +58,6 @@ struct _FolderDialogData {
     BalsaServerConf bsc;
     GtkWidget *folder_name, *port, *username, *anonymous, *remember,
         *password, *subscribed, *list_inbox, *prefix;
-    GtkWidget *use_ssl, *tls_mode;
     GtkWidget *connection_limit, *enable_persistent,
         *use_idle, *has_bugs, *use_status;
 };
@@ -154,10 +153,25 @@ static void
 validate_folder(GtkWidget *w, FolderDialogData * fcw)
 {
     gboolean sensitive = TRUE;
-    if (!*gtk_entry_get_text(GTK_ENTRY(fcw->folder_name)))
-	sensitive = FALSE;
-    else if (!*gtk_entry_get_text(GTK_ENTRY(fcw->bsc.server)))
-	sensitive = FALSE;
+
+    if (!*gtk_entry_get_text(GTK_ENTRY(fcw->folder_name))) {
+    	sensitive = FALSE;
+    } else if (!*gtk_entry_get_text(GTK_ENTRY(fcw->bsc.server))) {
+    	sensitive = FALSE;
+    }
+
+    /* encryption w/ client cert requires cert file */
+    if (sensitive &&
+    	((gtk_combo_box_get_active(GTK_COMBO_BOX(fcw->bsc.security)) + 1) != NET_CLIENT_CRYPT_NONE) &&
+		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->bsc.need_client_cert))) {
+    	gchar *cert_file;
+
+    	cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(fcw->bsc.client_cert_file));
+    	if ((cert_file == NULL) || (cert_file[0] == '\0')) {
+    		sensitive = FALSE;
+    	}
+    	g_free(cert_file);
+    }
 
     gtk_dialog_set_response_sensitive(fcw->dialog, GTK_RESPONSE_OK, sensitive);
 }
@@ -174,6 +188,19 @@ remember_cb(GtkToggleButton * button, FolderDialogData * fcw)
 {
     gtk_widget_set_sensitive(fcw->password,
                              gtk_toggle_button_get_active(button));
+}
+
+static void
+security_cb(GtkComboBox *combo, FolderDialogData *fcw)
+{
+	gboolean sensitive;
+
+	sensitive = (gtk_combo_box_get_active(combo) + 1) != NET_CLIENT_CRYPT_NONE;
+	gtk_widget_set_sensitive(fcw->bsc.need_client_cert, sensitive);
+	sensitive = sensitive & gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->bsc.need_client_cert));
+	gtk_widget_set_sensitive(fcw->bsc.client_cert_file, sensitive);
+	gtk_widget_set_sensitive(fcw->bsc.client_cert_passwd, sensitive);
+	validate_folder(GTK_WIDGET(combo), fcw);
 }
 
 static gboolean
@@ -197,7 +224,7 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
                          G_CALLBACK(ask_password), NULL);
     }
 
-    s->tls_mode = balsa_server_conf_get_tls_mode(&fcw->bsc);
+    s->security = balsa_server_conf_get_security(&fcw->bsc);
     libbalsa_imap_server_set_max_connections
         (LIBBALSA_IMAP_SERVER(s),
          gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
@@ -243,8 +270,7 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     fcw->mbnode->list_inbox =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->list_inbox));
 
-    libbalsa_server_set_host(s, host, 
-                             balsa_server_conf_get_use_ssl(&fcw->bsc));
+    libbalsa_server_set_host(s, host, s->security);
     libbalsa_server_config_changed(s); /* trigger config save */
 
     if (insert) {
@@ -331,7 +357,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
                              gtk_label_new_with_mnemonic(_("_Basic")));
-    advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc, s, 3);
+    advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc);
     /* Limit number of connections */
     fcw->connection_limit = 
         balsa_server_conf_add_spinner
@@ -383,8 +409,19 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
         libbalsa_create_grid_entry(grid, G_CALLBACK(validate_folder),
                                    fcw, r++, s ? s->host : default_server,
                                    label);
-    fcw->bsc.default_ports = IMAP_DEFAULT_PORTS;
     g_free(default_server);
+
+    label = libbalsa_create_grid_label(_("Se_curity:"), grid, r);
+    fcw->bsc.security = gtk_combo_box_text_new();
+    gtk_widget_set_hexpand(fcw->bsc.security, TRUE);
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fcw->bsc.security), _("IMAP over SSL (IMAPS)"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fcw->bsc.security), _("TLS required"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fcw->bsc.security), _("TLS if possible (not recommended)"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fcw->bsc.security), _("None (not recommended)"));
+    gtk_grid_attach(GTK_GRID(grid), fcw->bsc.security, 1, r++, 1, 1);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(fcw->bsc.security), s ? s->security - 1 : NET_CLIENT_CRYPT_STARTTLS - 1);
+    g_signal_connect(fcw->bsc.security, "changed", G_CALLBACK(security_cb), fcw);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), fcw->bsc.security);
 
     label= libbalsa_create_grid_label(_("Use_r name:"), grid, r);
     fcw->username =

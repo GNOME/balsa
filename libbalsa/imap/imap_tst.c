@@ -38,36 +38,23 @@
 struct {
   char *user;
   char *password;
-  ImapTlsMode tls_mode;
-  gboolean over_ssl;
-  gboolean monitor;
+  NetClientCryptMode tls_mode;
   gboolean anonymous;
   gboolean compress;
-} TestContext = { NULL, NULL, IMAP_TLS_ENABLED, FALSE, FALSE, FALSE, FALSE };
-
-static void
-monitor_cb(const char *buffer, int length, int direction, void *arg)
-{
-  int i;
-  printf("IMAP %c: ", direction ? 'C' : 'S');
-  for (i = 0; i < length; i++)
-    putchar(buffer[i]);
-
-  fflush(NULL);
-}
+} TestContext = { NULL, NULL, NET_CLIENT_CRYPT_STARTTLS_OPT, FALSE, FALSE };
 
 
 static gchar*
-get_user(const char* method) {
+get_user() {
 
   if(TestContext.user) {
-    printf("Login with method %s as user: %s\n", method, TestContext.user);
+    printf("Login as user: %s\n", TestContext.user);
     return g_strdup(TestContext.user);
   } else {
     char buf[256];
     size_t len;
 
-    fprintf(stderr, "Login with method %s as user: ", method);
+    fprintf(stderr, "Login as user: ");
     fflush(stderr);
     if(!fgets(buf, sizeof(buf), stdin))
       return NULL;
@@ -110,54 +97,24 @@ get_password()
   }
 }
 
-static void
-user_cb(ImapUserEventType ue, void *arg, ...)
+static gchar **
+auth_cb(NetClient *client, gboolean need_passwd, gpointer user_data)
 {
-    va_list alist;
-    va_start(alist, arg);
-    switch(ue) {
-        int *ok;
-    case IME_GET_USER_PASS: {
-        gchar *method = va_arg(alist, gchar*);
-        gchar **user = va_arg(alist, gchar**);
-        gchar **pass = va_arg(alist, gchar**);
-        ok = va_arg(alist, int*);
-	g_free(*user); *user = get_user(method);
-	g_free(*pass); *pass = get_password();
-        *ok = 1; printf("Logging in with %s\n", method);
-        break;
+    gchar **result = NULL;
+
+    result = g_new0(gchar *, 3U);
+    result[0] = get_user();
+    if (need_passwd) {
+    	result[1] = get_password();
     }
-    case IME_GET_USER:  { /* for eg kerberos */
-        gchar **user;
-        gchar *method;
-        method = va_arg(alist, gchar*);
-        user = va_arg(alist, gchar**);
-        ok = va_arg(alist, int*);
-        *ok = 1; /* consider popping up a dialog window here */
-        g_free(*user); *user = get_user(method);
-        break;
-    }
-    case IME_TLS_VERIFY_ERROR:
-        ok = va_arg(alist, int*);
-	*ok = 1;
-        break;
-    case IME_TLS_NO_PEER_CERT: {
-        ok = va_arg(alist, int*); *ok = 0;
-        printf("IMAP:TLS: Server presented no cert!\n");
-        break;
-    }
-    case IME_TLS_WEAK_CIPHER: {
-        ok = va_arg(alist, int*); *ok = 1;
-        printf("IMAP:TLS: Weak cipher accepted.\n");
-        break;
-    }
-    case IME_TIMEOUT: {
-        ok = va_arg(alist, int*); *ok = 1;
-        break;
-    }
-    default: g_warning("unhandled imap event type! Fix the code."); break;
-    }
-    va_end(alist);
+    return result;
+}
+
+static gboolean
+cert_cb(NetClient *client, GTlsCertificate *peer_cert, GTlsCertificateFlags errors, gpointer user_data)
+{
+	printf("cert error 0x%x, accepted...\n", errors);
+	return TRUE;
 }
 
 static ImapMboxHandle*
@@ -171,11 +128,11 @@ get_handle(const char *host)
 
   if(TestContext.compress)
     imap_handle_set_option(h, IMAP_OPT_COMPRESS, TRUE);
-  if(TestContext.monitor)
-    imap_handle_set_monitorcb(h, monitor_cb, NULL);
 
-  imap_handle_set_usercb(h, user_cb, NULL);
-  if(imap_mbox_handle_connect(h, host, TestContext.over_ssl) != IMAP_SUCCESS) {
+  imap_handle_set_authcb(h, G_CALLBACK(auth_cb), NULL);
+  imap_handle_set_certcb(h, G_CALLBACK(cert_cb));
+
+  if(imap_mbox_handle_connect(h, host) != IMAP_SUCCESS) {
     g_object_unref(h);
     return NULL;
   }
@@ -629,14 +586,10 @@ process_options(int argc, char *argv[])
       TestContext.anonymous = TRUE;
     } else if( strcmp(argv[first_arg], "-c") == 0) {
       TestContext.compress = TRUE;
-    } else if( strcmp(argv[first_arg], "-m") == 0) {
-      TestContext.monitor = TRUE;
-    } else if( strcmp(argv[first_arg], "-s") == 0) {
-      TestContext.over_ssl = TRUE;
     } else if( strcmp(argv[first_arg], "-T") == 0) {
-      TestContext.tls_mode = IMAP_TLS_REQUIRED;
+      TestContext.tls_mode = NET_CLIENT_CRYPT_STARTTLS;
     } else if( strcmp(argv[first_arg], "-t") == 0) {
-      TestContext.tls_mode = IMAP_TLS_DISABLED;
+      TestContext.tls_mode = NET_CLIENT_CRYPT_NONE;
     } else {
       break; /* break the loop - non-option encountered. */
     }

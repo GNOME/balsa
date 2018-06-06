@@ -6,6 +6,8 @@ libnetclient_a_SOURCES =	\
 	net-client.h			\
 	net-client-pop.c		\
 	net-client-pop.h		\
+	net-client-siobuf.c		\
+	net-client-siobuf.h		\
 	net-client-smtp.c		\
 	net-client-smtp.h		\
 	net-client-utils.c		\

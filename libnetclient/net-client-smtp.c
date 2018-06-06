@@ -161,12 +161,10 @@ net_client_smtp_connect(NetClientSmtp *client, gchar **greeting, GError **error)
 		g_signal_emit_by_name(client, "auth", need_pwd, &auth_data);
 		if ((auth_data != NULL) && (auth_data[0] != NULL)) {
 			result = net_client_smtp_auth(client, auth_data[0], auth_data[1], auth_supported, error);
-			memset(auth_data[0], 0, strlen(auth_data[0]));
-			if (auth_data[1] != NULL) {
-				memset(auth_data[1], 0, strlen(auth_data[1]));
-			}
+			net_client_free_authstr(auth_data[0]);
+			net_client_free_authstr(auth_data[1]);
 		}
-		g_strfreev(auth_data);
+		g_free(auth_data);
 	}
 
 	return result;
@@ -427,8 +425,7 @@ net_client_smtp_auth_plain(NetClientSmtp *client, const gchar *user, const gchar
 	base64_buf = net_client_auth_plain_calc(user, passwd);
 	if (base64_buf != NULL) {
 		result = net_client_smtp_execute(client, "AUTH PLAIN %s", NULL, error, base64_buf);
-		memset(base64_buf, 0, strlen(base64_buf));
-		g_free(base64_buf);
+		net_client_free_authstr(base64_buf);
 	} else {
 		result = FALSE;
 	}
@@ -445,13 +442,11 @@ net_client_smtp_auth_login(NetClientSmtp *client, const gchar *user, const gchar
 
 	base64_buf = g_base64_encode((const guchar *) user, strlen(user));
 	result = net_client_smtp_execute(client, "AUTH LOGIN %s", NULL, error, base64_buf);
-	memset(base64_buf, 0, strlen(base64_buf));
-	g_free(base64_buf);
+	net_client_free_authstr(base64_buf);
 	if (result) {
 		base64_buf = g_base64_encode((const guchar *) passwd, strlen(passwd));
 		result = net_client_smtp_execute(client, "%s", NULL, error, base64_buf);
-		memset(base64_buf, 0, strlen(base64_buf));
-		g_free(base64_buf);
+		net_client_free_authstr(base64_buf);
 	}
 
 	return result;
@@ -471,8 +466,7 @@ net_client_smtp_auth_cram(NetClientSmtp *client, GChecksumType chksum_type, cons
 		auth_buf = net_client_cram_calc(challenge, chksum_type, user, passwd);
 		if (auth_buf != NULL) {
 			result = net_client_smtp_execute(client, "%s", NULL, error, auth_buf);
-			memset(auth_buf, 0, strlen(auth_buf));
-			g_free(auth_buf);
+			net_client_free_authstr(auth_buf);
 		} else {
 			result = FALSE;
 		}

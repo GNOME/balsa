@@ -13,19 +13,25 @@
  */
 
 #include <sys/types.h>
+#include <poll.h>
 #include <signal.h>
 #include <string.h>
 #include <sput.h>
 #include "net-client.h"
 #include "net-client-smtp.h"
 #include "net-client-pop.h"
+#include "net-client-siobuf.h"
 #include "net-client-utils.h"
+
+
+#define SUPPRESS_CRITICALS		1
 
 
 static void test_basic(void);
 static void test_basic_crypt(void);
 static void test_smtp(void);
 static void test_pop3(void);
+static void test_siobuf(void);
 static void test_utils(void);
 
 
@@ -35,10 +41,11 @@ log_dummy(const gchar G_GNUC_UNUSED *log_domain, GLogLevelFlags G_GNUC_UNUSED lo
 {
 }
 
+
 int
 main(G_GNUC_UNUSED int argc, G_GNUC_UNUSED char **argv)
 {
-	g_log_set_default_handler(log_dummy, NULL);
+	g_log_set_handler("libnetclient", G_LOG_LEVEL_MASK, log_dummy, NULL);
 
 	sput_start_testing();
 
@@ -53,6 +60,9 @@ main(G_GNUC_UNUSED int argc, G_GNUC_UNUSED char **argv)
 
 	sput_enter_suite("test POP3");
 	sput_run_test(test_pop3);
+
+	sput_enter_suite("test SIOBUF (libbalsa/imap compatibility layer)");
+	sput_run_test(test_siobuf);
 
 	sput_enter_suite("test utility functions");
 	sput_run_test(test_utils);
@@ -70,13 +80,21 @@ test_basic(void)
 	GError *error = NULL;
 	gboolean op_res;
 	gchar *read_res;
+	struct pollfd fds[1];
 
 	sput_fail_unless(net_client_new(NULL, 65000, 42) == NULL, "missing host");
 
 	sput_fail_unless((basic = net_client_new("localhost", 64999, 42)) != NULL, "localhost; port 64999");
 	sput_fail_unless(net_client_get_host(NULL) == NULL, "get host w/o client");
+	sput_fail_unless(net_client_get_socket(NULL) == NULL, "get host w/o client");
 	sput_fail_unless(strcmp(net_client_get_host(basic), "localhost") == 0, "read host ok");
+	sput_fail_unless(net_client_get_socket(basic) == NULL, "get socket w/o connection");
+	sput_fail_unless(net_client_can_read(NULL) == FALSE, "check can read w/o client");
+	sput_fail_unless(net_client_can_read(basic) == FALSE, "check can read w/o connection");
 	sput_fail_unless(net_client_connect(basic, NULL) == FALSE, "connect failed");
+	op_res = net_client_start_compression(basic, &error);
+	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_NOT_CONNECTED), "start compression: not connected");
+	g_clear_error(&error);
 	g_object_unref(basic);
 
 	sput_fail_unless((basic = net_client_new("www.google.com", 80, 1)) != NULL, "www.google.com:80; port 0");
@@ -101,6 +119,7 @@ test_basic(void)
 	op_res = net_client_configure(basic, "localhost", 65000, 42, &error);
 	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_CONNECTED), "cannot configure already connected");
 	g_clear_error(&error);
+	sput_fail_unless(net_client_get_socket(basic) != NULL, "get socket ok");
 
 	sput_fail_unless(net_client_write_buffer(NULL, "xxx", 3U, NULL) == FALSE, "write buffer w/o client");
 	sput_fail_unless(net_client_write_buffer(basic, NULL, 3U, NULL) == FALSE, "write buffer w/o buffer");
@@ -137,8 +156,54 @@ test_basic(void)
 	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_LINE_TOO_LONG), "read line too long");
 	g_clear_error(&error);
 
-	sput_fail_unless(net_client_write_buffer(basic, "DISCONNECT\r\n", 12U, NULL) == TRUE, "disconnect");
+	sput_fail_unless(net_client_can_read(basic) == FALSE, "no data");
+	sput_fail_unless(net_client_write_buffer(basic, "line1\r\nline2\r\n", 14U, NULL) == TRUE, "write lines");
+	sput_fail_unless(net_client_can_read(basic) == TRUE, "data ready");
+	op_res = net_client_read_line(basic, &read_res, NULL);
+	sput_fail_unless((op_res == TRUE) && (strcmp("line1", read_res) == 0), "read line 1 ok");
+	g_free(read_res);
+	sput_fail_unless(net_client_can_read(basic) == TRUE, "data ready");
+	op_res = net_client_read_line(basic, &read_res, NULL);
+	sput_fail_unless((op_res == TRUE) && (strcmp("line2", read_res) == 0), "read line 2 ok");
+	g_free(read_res);
+	sput_fail_unless(net_client_can_read(basic) == FALSE, "no data");
 
+	sput_fail_unless(net_client_start_compression(NULL, NULL) == FALSE, "start compression w/o client");
+	op_res = net_client_execute(basic, &read_res, "COMPRESS", NULL);
+	sput_fail_unless((op_res == TRUE) && (strcmp("COMPRESS", read_res) == 0), "execute 'COMPRESS' ok");
+	g_free(read_res);
+	sput_fail_unless(net_client_start_compression(basic, NULL) == TRUE, "start compression");
+	op_res = net_client_start_compression(basic, &error);
+	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_COMP_ACTIVE), "compression already enabled");
+	g_clear_error(&error);
+
+	sput_fail_unless(net_client_can_read(basic) == FALSE, "no data");
+	sput_fail_unless(net_client_write_buffer(basic, "line1\r\nline2\r\n", 14U, NULL) == TRUE, "write lines");
+	sput_fail_unless(net_client_can_read(basic) == TRUE, "data ready");
+	op_res = net_client_read_line(basic, &read_res, NULL);
+	sput_fail_unless((op_res == TRUE) && (strcmp("line1", read_res) == 0), "read line 1 ok");
+	g_free(read_res);
+	sput_fail_unless(net_client_can_read(basic) == TRUE, "data ready");
+	op_res = net_client_read_line(basic, &read_res, NULL);
+	sput_fail_unless((op_res == TRUE) && (strcmp("line2", read_res) == 0), "read line 2 ok");
+	g_free(read_res);
+	sput_fail_unless(net_client_can_read(basic) == FALSE, "no data");
+
+	fds[0].fd = g_socket_get_fd(net_client_get_socket(basic));
+	fds[0].events = POLLIN;
+	poll(fds, 1, 0);
+	sput_fail_unless((fds[0].revents & POLLIN) == 0, "no data for reading");
+
+	sput_fail_unless(net_client_write_line(basic, "Hi There", NULL) == TRUE, "send data");
+
+	poll(fds, 1, 1000);
+	sput_fail_unless((fds[0].revents & POLLIN) == POLLIN, "data ready for reading");
+
+	op_res = net_client_read_line(basic, &read_res, NULL);
+	sput_fail_unless((op_res == TRUE) && (strcmp("Hi There", read_res) == 0), "receive data ok");
+	g_free(read_res);
+
+	sput_fail_unless(net_client_write_buffer(basic, "DISCONNECT\r\n", 12U, NULL) == TRUE, "disconnect");
 	op_res = net_client_read_line(basic, NULL, &error);
 	sput_fail_unless((op_res == FALSE) && (error->code = NET_CLIENT_ERROR_CONNECTION_LOST), "read line, client lost");
 	g_clear_error(&error);
@@ -175,7 +240,9 @@ test_basic_crypt(void)
 {
 	NetClient *basic;
 	gboolean op_res;
+	gchar *read_res;
 	GError *error = NULL;
+	struct pollfd fds[1];
 
 	/* tests without client cert check */
 	sput_fail_unless((basic = net_client_new("localhost", 65001, 42)) != NULL, "localhost; port 65001");
@@ -200,6 +267,36 @@ test_basic_crypt(void)
 	op_res = net_client_start_tls(basic, &error);
 	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_TLS_ACTIVE), "start tls: already started");
 	g_clear_error(&error);
+
+	fds[0].fd = g_socket_get_fd(net_client_get_socket(basic));
+	fds[0].events = POLLIN;
+	poll(fds, 1, 0);
+	sput_fail_unless((fds[0].revents & POLLIN) == 0, "no data for reading");
+
+	sput_fail_unless(net_client_write_line(basic, "Hi There", NULL) == TRUE, "send data");
+
+	poll(fds, 1, 1000);
+	sput_fail_unless((fds[0].revents & POLLIN) == POLLIN, "data ready for reading");
+
+	op_res = net_client_read_line(basic, &read_res, NULL);
+	sput_fail_unless((op_res == TRUE) && (strcmp("Hi There", read_res) == 0), "read data ok");
+	g_free(read_res);
+
+	sput_fail_unless(net_client_can_read(basic) == FALSE, "no data");
+	sput_fail_unless(net_client_write_buffer(basic, "line1\r\nline2\r\n", 14U, NULL) == TRUE, "write lines");
+	sput_fail_unless(net_client_can_read(basic) == TRUE, "data ready");
+	op_res = net_client_read_line(basic, &read_res, NULL);
+	sput_fail_unless((op_res == TRUE) && (strcmp("line1", read_res) == 0), "read line 1 ok");
+	g_free(read_res);
+	sput_fail_unless(net_client_can_read(basic) == TRUE, "data ready");
+	op_res = net_client_read_line(basic, &read_res, NULL);
+	sput_fail_unless((op_res == TRUE) && (strcmp("line2", read_res) == 0), "read line 2 ok");
+	g_free(read_res);
+	sput_fail_unless(net_client_can_read(basic) == FALSE, "no data");
+
+	/* compression on top of tls */
+	sput_fail_unless(net_client_start_compression(basic, NULL) == TRUE, "start compression");
+	// TODO - how can we check exchanging compressed data over tls?
 	g_object_unref(basic);
 
 	/* tests with client cert check */
@@ -689,6 +786,98 @@ test_pop3(void)
 
 }
 
+
+static void
+test_siobuf(void)
+{
+	NetClientSioBuf *siobuf;
+	gchar buffer[64];
+	GError *error = NULL;
+	gint read_res;
+	gboolean op_res;
+	gchar *recv_data;
+
+	sput_fail_unless(net_client_siobuf_new(NULL, 65000) == NULL, "missing host");
+	sput_fail_unless((siobuf = net_client_siobuf_new("localhost", 65000)) != NULL, "localhost; port 65000");
+
+	sput_fail_unless(net_client_siobuf_getc(NULL, NULL)  == -1, "getc w/o client");
+	sput_fail_unless(net_client_siobuf_getc(siobuf, NULL) == -1, "getc fails, not connected");
+
+	sput_fail_unless(net_client_siobuf_gets(NULL, buffer, 1024U, NULL) == NULL, "gets w/o client");
+	sput_fail_unless(net_client_siobuf_gets(siobuf, NULL, 1024U, NULL) == NULL, "gets w/o buffer");
+	sput_fail_unless(net_client_siobuf_gets(siobuf, buffer, 0U, NULL) == NULL, "gets w/o buffer size");
+	sput_fail_unless(net_client_siobuf_gets(siobuf, buffer, 32U, NULL) == NULL, "gets fails, not connected");
+
+	sput_fail_unless(net_client_siobuf_read(NULL, buffer, 1024U, NULL) == -1, "read w/o client");
+	sput_fail_unless(net_client_siobuf_read(siobuf, NULL, 1024U, NULL) == -1, "read w/o buffer");
+	sput_fail_unless(net_client_siobuf_read(siobuf, buffer, 0U, NULL) == -1, "read w/o buffer size");
+	sput_fail_unless(net_client_siobuf_read(siobuf, buffer, 32U, NULL) == -1, "read fails, not connected");
+
+	sput_fail_unless(net_client_siobuf_ungetc(NULL) == -1, "ungetc w/o client");
+	sput_fail_unless(net_client_siobuf_ungetc(siobuf) == -1, "ungetc at beginning of buffer");
+
+	sput_fail_unless(net_client_set_timeout(NET_CLIENT(siobuf), 10) == TRUE, "set timeout");
+	sput_fail_unless(net_client_connect(NET_CLIENT(siobuf), NULL) == TRUE, "connect");
+	sput_fail_unless(net_client_write_buffer(NET_CLIENT(siobuf), "line1\r\nLINE2\r\nABCD3\r\n", 21U, NULL) == TRUE, "write data");
+
+	sput_fail_unless(net_client_siobuf_getc(siobuf, NULL) == 'l', "getc ok");
+	sput_fail_unless(net_client_siobuf_getc(siobuf, NULL) == 'i', "getc ok");
+	sput_fail_unless(net_client_siobuf_ungetc(siobuf) == 0, "ungetc ok");
+	sput_fail_unless(net_client_siobuf_ungetc(siobuf) == 0, "ungetc ok");
+	sput_fail_unless(net_client_siobuf_ungetc(siobuf) == -1, "ungetc at beginning of buffer");
+
+	sput_fail_unless((net_client_siobuf_gets(siobuf, buffer, 3U, NULL) == buffer) && (strcmp(buffer, "li") == 0), "gets ok");
+	sput_fail_unless((net_client_siobuf_gets(siobuf, buffer, 32U, NULL) == buffer) && (strcmp(buffer, "ne1\r\n") == 0), "gets ok");
+
+	memset(buffer, 0, sizeof(buffer));
+	sput_fail_unless((net_client_siobuf_read(siobuf, buffer, 10U, NULL) == 10) && (strcmp(buffer, "LINE2\r\nABC") == 0), "read ok");
+	memset(buffer, 0, sizeof(buffer));
+	read_res = net_client_siobuf_read(siobuf, buffer, 10U, &error);
+	sput_fail_unless((read_res == 4) && (strcmp(buffer, "D3\r\n") == 0) && (error->code == G_IO_ERROR_TIMED_OUT), "short read ok");
+	g_clear_error(&error);
+
+	net_client_siobuf_write(NULL, "abcd", 4U);
+	net_client_siobuf_write(siobuf, NULL, 4U);
+	net_client_siobuf_write(siobuf, "abcd", 0U);
+	net_client_siobuf_write(siobuf, "abcd", 4U);
+
+	net_client_siobuf_printf(NULL, "%d", 4711);
+	net_client_siobuf_printf(siobuf, NULL);
+	net_client_siobuf_printf(siobuf, "%d", 4711);
+
+	sput_fail_unless(net_client_siobuf_flush(NULL, NULL) == FALSE, "flush write w/o client");
+	sput_fail_unless(net_client_siobuf_flush(siobuf, NULL) == TRUE, "flush successful");
+	sput_fail_unless(net_client_siobuf_flush(siobuf, NULL) == FALSE, "flush write w/o data");
+
+	op_res = net_client_read_line(NET_CLIENT(siobuf), &recv_data, &error);
+	sput_fail_unless(op_res && (strcmp(recv_data, "abcd4711") == 0), "buffered write: read back ok");
+	g_free(recv_data);
+	sput_fail_unless(net_client_can_read(NET_CLIENT(siobuf)) == FALSE, "no data left");
+
+	net_client_siobuf_write(siobuf, "abcd\r\n1234\r\nqrst\r\n9876", 22U);
+	sput_fail_unless(net_client_siobuf_flush(siobuf, NULL) == TRUE, "flush successful");
+
+	sput_fail_unless(net_client_siobuf_get_line(NULL, NULL) == NULL, "get line w/o client");
+	sput_fail_unless(net_client_siobuf_getc(siobuf, NULL) == 'a', "getc ok");
+	recv_data = net_client_siobuf_get_line(siobuf, NULL);
+	sput_fail_unless(strcmp(recv_data, "bcd") == 0, "get line #1 ok");
+	g_free(recv_data);
+	recv_data = net_client_siobuf_get_line(siobuf, NULL);
+	sput_fail_unless(strcmp(recv_data, "1234") == 0, "get line #2 ok");
+	g_free(recv_data);
+	sput_fail_unless((net_client_siobuf_gets(siobuf, buffer, 5U, NULL) == buffer) && (strcmp(buffer, "qrst") == 0), "gets ok");
+	recv_data = net_client_siobuf_get_line(siobuf, NULL);
+	sput_fail_unless(strcmp(recv_data, "") == 0, "get line #3 ok");
+	g_free(recv_data);
+
+	sput_fail_unless(net_client_siobuf_getc(siobuf, NULL) == '9', "getc ok");
+	sput_fail_unless(net_client_siobuf_discard_line(NULL, NULL) == -1, "discard line w/o client");
+	sput_fail_unless(net_client_siobuf_discard_line(siobuf, NULL) == '\n', "discard line ok");
+	sput_fail_unless(net_client_siobuf_discard_line(siobuf, NULL) == -1, "discard line w/o data");
+	sput_fail_unless(net_client_siobuf_get_line(siobuf, NULL) == NULL, "get line w/o data");
+
+	g_object_unref(siobuf);
+}
 
 static void
 test_utils(void)

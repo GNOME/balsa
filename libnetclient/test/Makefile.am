@@ -2,7 +2,8 @@
 
 # Note: the following hack is needed so lcov recognises the paths of the sources...
 libsrcdir = $(shell echo $(abs_srcdir) | sed -e 's;/test$$;;')
-test_src = $(libsrcdir)/net-client.c $(libsrcdir)/net-client-pop.c $(libsrcdir)/net-client-smtp.c $(libsrcdir)/net-client-utils.c
+test_src = $(libsrcdir)/net-client.c $(libsrcdir)/net-client-pop.c $(libsrcdir)/net-client-siobuf.c \
+	$(libsrcdir)/net-client-smtp.c $(libsrcdir)/net-client-utils.c
 
 EXTRA_DIST = 		\
 	tests.c			\
@@ -25,7 +26,7 @@ clean-local:
 	-rm -rf gcov
 
 tests:	tests.c
-	$(CC) $(LIBNETCLIENT_CFLAGS) $(CPPFLAGS) $(TESTFLAGS) -I. -I.. -I../.. $< $(test_src) -o $@ $(LIBNETCLIENT_LIBS)
+	$(CC) $(LIBNETCLIENT_CFLAGS) $(CPPFLAGS) $(TESTFLAGS) -DG_LOG_DOMAIN=\"libnetclient\" -I. -I.. -I../.. $< $(test_src) -o $@ $(LIBNETCLIENT_LIBS)
 	$(VALGRIND) $(VALGRFLAGS) ./$@
 	$(LCOV) $(LCOVFLGS) -c -b $(libsrcdir) -d $(abs_srcdir) --no-external -o $@.covi
 	$(LCOV) $(LCOVFLGS) -r $@.covi $< -o $@.covi

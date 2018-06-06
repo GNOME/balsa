@@ -233,9 +233,6 @@ dnl #####################################################################
 dnl 4. Libraries.
 dnl #####################################################################
 
-dnl Make sure ld finds zlib:
-LIBS="$LIBS -lz"
-
 PKG_CHECK_MODULES(BALSA, [
 glib-2.0 >= 2.40.0
 gtk+-3.0 >= 3.10.0
@@ -451,18 +448,6 @@ else
     AC_MSG_RESULT([no])
 fi
 
-# OpenSSL configuration.
-#
-PKG_CHECK_MODULES(OPENSSL, [openssl],
-   [BALSA_CFLAGS="$OPENSSL_CFLAGS $BALSA_CFLAGS"
-    BALSA_LIBS="$OPENSSL_LIBS $BALSA_LIBS"],
-   [ AC_CHECK_HEADERS([openssl/ssl.h], [],
-                      [AC_MSG_ERROR([OpenSSL headers not found])], [])
-     AC_SEARCH_LIBS(SSL_library_init, ssl,
-                    [BALSA_LIBS="$BALSA_LIBS -lssl -lcrypto"],
-                    [AC_MSG_ERROR([libssl not found])], [-lcrypto]) ]
-)
-
 # KRB5/GSSAPI configuration.
 #
 if test "x$with_gss" != xno  ; then
@@ -626,7 +611,6 @@ AC_STDC_HEADERS
 
 AC_CHECK_DECLS([ctime_r], [], [], [[#include <time.h>]])
 AC_CHECK_FUNCS([ctime_r])
-AC_CHECK_HEADER([zlib.h],,AC_MSG_ERROR([zlib library required]))
 
 # more warnings.
 #

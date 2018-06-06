@@ -21,37 +21,30 @@
 
 /* IMAP login/authentication code */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 
 #include "imap-auth.h"
 #include "net-client-utils.h"
 
 #include "imap_private.h"
 
-#define LONG_STRING 1024
-
 /* imap_auth_cram_md5: AUTH=CRAM-MD5 support. */
 ImapResult
 imap_auth_cram(ImapMboxHandle* handle)
 {
-  char ibuf[LONG_STRING*2];
+  gchar *challenge;
   gchar *auth_buf;
   unsigned cmdno;
-  int rc, ok;
-  char *user = NULL, *pass = NULL;
+  int rc;
+  gchar **auth_data;
 
   if (!imap_mbox_handle_can_do(handle, IMCAP_ACRAM_MD5))
     return IMAP_AUTH_UNAVAIL;
 
-  ok = 0;
-  if(!ok && handle->user_cb)
-    handle->user_cb(IME_GET_USER_PASS, handle->user_arg, 
-                    "CRAM-MD5", &user, &pass, &ok);
-  if(!ok || user == NULL || pass == NULL) {
+  g_signal_emit_by_name(handle->sio, "auth", TRUE, &auth_data);
+  if((auth_data == NULL) || (auth_data[0] == NULL) || (auth_data[1] == NULL)) {
     imap_mbox_handle_set_msg(handle, "Authentication cancelled");
+	g_strfreev(auth_data);
     return IMAP_AUTH_CANCELLED;
   }
 
@@ -65,29 +58,29 @@ imap_auth_cram(ImapMboxHandle* handle)
    * primary host name of the server. The syntax of the unencoded form must
    * correspond to that of an RFC 822 'msg-id' [RFC822] as described in [POP3].
    */
-  imap_handle_flush(handle);
-  do
-    rc = imap_cmd_step(handle, cmdno);
-  while(rc == IMR_UNTAGGED);
+  rc = imap_cmd_process_untagged(handle, cmdno);
 
   if (rc != IMR_RESPOND) {
-    g_warning("cram-md5: unexpected response:\n");
+    g_warning("cram-md5: unexpected response: %d", rc);
     return IMAP_AUTH_FAILURE;
   }
-  imap_mbox_gets(handle, ibuf, sizeof(ibuf)); /* check error */
-  auth_buf = net_client_cram_calc(ibuf, G_CHECKSUM_MD5, user, pass);
-  g_free(user);
-  memset(pass, 0, strlen(pass));
-  g_free(pass);
+  challenge = net_client_siobuf_get_line(handle->sio, NULL);
+  if (challenge != NULL) {
+	  auth_buf = net_client_cram_calc(challenge, G_CHECKSUM_MD5, auth_data[0], auth_data[1]);
+  } else {
+	  auth_buf = NULL;
+  }
+  g_free(challenge);
+  net_client_free_authstr(auth_data[0]);
+  net_client_free_authstr(auth_data[1]);
+  g_free(auth_data);
+  if (auth_buf == NULL) {
+	  return IMAP_AUTH_FAILURE;
+  }
 
-  imap_handle_write(handle, auth_buf, strlen(auth_buf));
-  imap_handle_write(handle, "\r\n", 2U);
-  imap_handle_flush(handle);
-  memset(auth_buf, 0, strlen(auth_buf));
-  g_free(auth_buf);
-  do
-    rc = imap_cmd_step (handle, cmdno);
-  while (rc == IMR_UNTAGGED);
+  net_client_write_line(NET_CLIENT(handle->sio), "%s", NULL, auth_buf);
+  net_client_free_authstr(auth_buf);
+  rc = imap_cmd_process_untagged(handle, cmdno);
 
   return rc == IMR_OK ? IMAP_SUCCESS : IMAP_AUTH_FAILURE;
 }

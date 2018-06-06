@@ -42,12 +42,6 @@ typedef enum {
   IMAP_SELECT_FAILED /* SELECT command failed */
 } ImapResult;
 
-typedef enum {
-  IMAP_TLS_DISABLED,
-  IMAP_TLS_ENABLED,
-  IMAP_TLS_REQUIRED
-} ImapTlsMode;
-
 typedef enum { 
   IMLIST_MARKED = 0,
   IMLIST_UNMARKED,
@@ -272,8 +266,6 @@ void imap_mbox_handle_msg_deserialize(ImapMboxHandle *h, unsigned msgno,
 void*        imap_message_serialize(ImapMessage *);
 ImapMessage* imap_message_deserialize(void *data);
 size_t imap_serialized_message_size(void *data);
-
-const char *lbi_strerror(ImapResult rc);
 
 /* RFC 4314: IMAP ACL's */
 typedef enum {

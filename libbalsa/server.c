@@ -30,12 +30,11 @@
 #include <libsecret/secret.h>
 #endif                          /* defined(HAVE_LIBSECRET) */
 
-#include <openssl/err.h>
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "libbalsa-marshal.h"
 #include "libbalsa-conf.h"
+#include "net-client-utils.h"
 #include <glib/gi18n.h>
 
 #if defined(HAVE_LIBSECRET)
@@ -58,9 +57,9 @@ static void libbalsa_server_finalize(GObject * object);
 
 static void libbalsa_server_real_set_username(LibBalsaServer * server,
 					      const gchar * username);
-static void libbalsa_server_real_set_host(LibBalsaServer * server,
-					  const gchar * host,
-                                          gboolean use_ssl);
+static void libbalsa_server_real_set_host(LibBalsaServer     *server,
+					  	  	  	  	  	  const gchar        *host,
+										  NetClientCryptMode  security);
 /* static gchar* libbalsa_server_real_get_password(LibBalsaServer *server); */
 
 enum {
@@ -166,8 +165,6 @@ libbalsa_server_init(LibBalsaServer * server)
     server->user = NULL;
     server->passwd = NULL;
     server->remember_passwd = TRUE;
-    server->use_ssl         = FALSE;
-    server->tls_mode        = LIBBALSA_TLS_ENABLED;
     server->security		= NET_CLIENT_CRYPT_STARTTLS;
 }
 
@@ -190,10 +187,7 @@ libbalsa_server_finalize(GObject * object)
 
     g_free(server->cert_file);
     server->cert_file = NULL;
-    if (server->cert_passphrase != NULL) {
-    	memset(server->cert_passphrase, 0, strlen(server->cert_passphrase));
-    }
-    g_free(server->cert_passphrase);
+    net_client_free_authstr(server->cert_passphrase);
     server->cert_passphrase = NULL;
 
     G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -234,13 +228,13 @@ libbalsa_server_set_password(LibBalsaServer * server,
 
 void
 libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
-                         gboolean use_ssl)
+                         NetClientCryptMode security)
 {
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     g_signal_emit(G_OBJECT(server), libbalsa_server_signals[SET_HOST],
-		  0, host, use_ssl);
+		  0, host, security);
 
 }
 
@@ -280,13 +274,13 @@ libbalsa_server_real_set_username(LibBalsaServer * server,
 
 static void
 libbalsa_server_real_set_host(LibBalsaServer * server, const gchar * host,
-                              gboolean use_ssl)
+	NetClientCryptMode  security)
 {
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     g_free(server->host);
     server->host = g_strdup(host);
-    server->use_ssl = use_ssl;
+    server->security = security;
 }
 
 
@@ -300,10 +294,47 @@ libbalsa_server_real_get_password(LibBalsaServer * server)
 }
 #endif
 
+void
+libbalsa_server_load_security_config(LibBalsaServer *server)
+{
+	gboolean not_found;
+
+    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+
+    server->security = libbalsa_conf_get_int_with_default("Security", &not_found);
+    if (not_found) {
+    	gboolean want_ssl;
+
+    	g_debug("server %s@%s: no security config, try to read old settings", server->protocol, server->host);
+    	want_ssl = libbalsa_conf_get_bool_with_default("SSL", &not_found);
+    	if (want_ssl && !not_found) {
+    		server->security = NET_CLIENT_CRYPT_ENCRYPTED;
+    	} else {
+    		int want_tls;
+
+    		want_tls = libbalsa_conf_get_int_with_default("TLSMode", &not_found);
+    		if (not_found) {
+    			server->security = NET_CLIENT_CRYPT_STARTTLS;
+    		} else {
+    			switch (want_tls) {
+    			case 0:
+    				server->security = NET_CLIENT_CRYPT_NONE;
+    				break;
+    			case 1:
+    				server->security = NET_CLIENT_CRYPT_STARTTLS_OPT;
+    				break;
+    			default:
+    				server->security = NET_CLIENT_CRYPT_STARTTLS;
+    			}
+    		}
+    	}
+    }
+
+}
 
 /* libbalsa_server_load_config:
    load the server configuration using gnome-config.
-   Try to use sensible defaults. 
+   Try to use sensible defaults.
    FIXME: Port field is kept here only for compatibility, drop after 1.4.x
    release.
 */
@@ -320,16 +351,8 @@ libbalsa_server_load_config(LibBalsaServer * server)
             g_free(server->host);
             server->host = newhost;
         }
-    }       
-    server->use_ssl = libbalsa_conf_get_bool("SSL=false");
-    d = FALSE;
-    server->tls_mode = libbalsa_conf_get_int_with_default("TLSMode", &d);
-    if(d) server->tls_mode = LIBBALSA_TLS_ENABLED;
-    d = FALSE;
-    server->security = libbalsa_conf_get_int_with_default("Security", &d);
-    if (d) {
-    	server->security = NET_CLIENT_CRYPT_STARTTLS;
     }
+    libbalsa_server_load_security_config(server);
     server->user = libbalsa_conf_private_get_string("Username");
     if (!server->user)
 	server->user = g_strdup(getenv("USER"));
@@ -454,86 +477,7 @@ libbalsa_server_save_config(LibBalsaServer * server)
         g_free(tmp);
     }
 
-    libbalsa_conf_set_bool("SSL", server->use_ssl);
-    libbalsa_conf_set_int("TLSMode", server->tls_mode);
     libbalsa_conf_set_int("Security", server->security);
-}
-
-void
-libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...)
-{
-    va_list alist;
-    int *ok;
-    LibBalsaServer *is = LIBBALSA_SERVER(arg);
-
-    va_start(alist, arg);
-    switch(ue) {
-    case IME_GET_USER_PASS: {
-        gchar *method = va_arg(alist, gchar*);
-        gchar **user = va_arg(alist, gchar**);
-        gchar **pass = va_arg(alist, gchar**);
-        ok = va_arg(alist, int*);
-        if(!is->passwd) {
-            is->passwd = libbalsa_server_get_password(is, NULL);
-        }
-        *ok = is->passwd != NULL;
-        if(*ok) {
-            g_free(*user); *user = g_strdup(is->user);
-            g_free(*pass); *pass = g_strdup(is->passwd);
-            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                                 /* host, authentication method */
-                                 _("Logging in to %s using %s"), 
-                                   is->host, method);
-        }
-        break;
-    }
-    case IME_GET_USER:  { /* for eg kerberos */
-        gchar **user;
-        va_arg(alist, gchar*); /* Ignore the method */
-        user = va_arg(alist, gchar**);
-        ok = va_arg(alist, int*);
-        *ok = 1; /* consider popping up a dialog window here */
-        g_free(*user); *user = g_strdup(is->user);
-        break;
-    }
-    case IME_TLS_VERIFY_ERROR:  {
-        long vfy_result;
-        SSL *ssl;
-        X509 *cert;
-        ok = va_arg(alist, int*);
-        vfy_result = va_arg(alist, long);
-        X509_verify_cert_error_string(vfy_result);
-#if 0
-        printf("IMAP:TLS: failed cert verification: %ld : %s.\n",
-               vfy_result, reason);
-#endif
-        ssl = va_arg(alist, SSL*);
-        cert = SSL_get_peer_certificate(ssl);
-	if(cert) {
-	    *ok = libbalsa_is_cert_known(cert, vfy_result);
-	    X509_free(cert);
-	}
-        break;
-    }
-    case IME_TLS_NO_PEER_CERT: {
-        ok = va_arg(alist, int*); *ok = 0;
-        printf("IMAP:TLS: Server presented no cert!\n");
-        break;
-    }
-    case IME_TLS_WEAK_CIPHER: {
-        ok = va_arg(alist, int*); *ok = 1;
-        printf("IMAP:TLS: Weak cipher accepted.\n");
-        break;
-    }
-    case IME_TIMEOUT: {
-        ok = va_arg(alist, int*); *ok = 1;
-        /* *ok = libbalsa_abort_on_timeout(is->host); */
-        /* For now, always timeout. The UI needs some work. */
-        break;
-    }
-    default: g_warning("unhandled imap event type! Fix the code."); break;
-    }
-    va_end(alist);
 }
 
 /* Connect the server's "get-password" signal to the callback; if the
@@ -561,7 +505,7 @@ libbalsa_server_get_auth(NetClient *client,
 
     g_debug("%s: %p %p: encrypted = %d", __func__, client, user_data,
             net_client_is_encrypted(client));
-    if (server->try_anonymous == 0U) {
+    if ((server->try_anonymous == 0U) || (strcmp(server->protocol, "imap") == 0)) {
         result = g_new0(gchar *, 3U);
         result[0] = g_strdup(server->user);
         if (need_passwd) {
@@ -582,50 +526,7 @@ libbalsa_server_check_cert(NetClient           *client,
 						   GTlsCertificateFlags errors,
 						   gpointer             user_data)
 {
-    GByteArray *cert_der = NULL;
-    gboolean result = FALSE;
-
-    /* FIXME - this a hack, simulating the (OpenSSL based) input for libbalsa_is_cert_known().
-        If we switch completely to
-     * (GnuTLS based) GTlsCertificate/GTlsClientConnection, we can omit this... */
-    g_debug("%s: %p %p %u %p", __func__, client, peer_cert, errors, user_data);
-
-    /* create a OpenSSL X509 object from the certificate's DER data */
-    g_object_get(G_OBJECT(peer_cert), "certificate", &cert_der, NULL);
-    if (cert_der != NULL) {
-        X509 *ossl_cert;
-        const unsigned char *der_p;
-
-        der_p = (const unsigned char *) cert_der->data;
-        ossl_cert = d2i_X509(NULL, &der_p, cert_der->len);
-        g_byte_array_unref(cert_der);
-
-        if (ossl_cert != NULL) {
-            long vfy_result;
-
-            /* convert the GIO error flags into OpenSSL error flags */
-            if ((errors & G_TLS_CERTIFICATE_UNKNOWN_CA) == G_TLS_CERTIFICATE_UNKNOWN_CA) {
-                vfy_result = X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT;
-            } else if ((errors & G_TLS_CERTIFICATE_BAD_IDENTITY) ==
-                       G_TLS_CERTIFICATE_BAD_IDENTITY) {
-                vfy_result = X509_V_ERR_SUBJECT_ISSUER_MISMATCH;
-            } else if ((errors & G_TLS_CERTIFICATE_NOT_ACTIVATED) ==
-                       G_TLS_CERTIFICATE_NOT_ACTIVATED) {
-                vfy_result = X509_V_ERR_CERT_NOT_YET_VALID;
-            } else if ((errors & G_TLS_CERTIFICATE_EXPIRED) == G_TLS_CERTIFICATE_EXPIRED) {
-                vfy_result = X509_V_ERR_CERT_HAS_EXPIRED;
-            } else if ((errors & G_TLS_CERTIFICATE_REVOKED) == G_TLS_CERTIFICATE_REVOKED) {
-                vfy_result = X509_V_ERR_CERT_REVOKED;
-            } else {
-                vfy_result = X509_V_ERR_APPLICATION_VERIFICATION;
-            }
-
-            result = libbalsa_is_cert_known(ossl_cert, vfy_result);
-            X509_free(ossl_cert);
-        }
-    }
-
-    return result;
+	return libbalsa_is_cert_known(peer_cert, errors);
 }
 
 

@@ -71,6 +71,16 @@ gchar *net_client_auth_plain_calc(const gchar *user, const gchar *passwd)
 	G_GNUC_MALLOC;
 
 
+/** @brief Safely free an authentication string
+ *
+ * @param str string
+ *
+ * This function can be used to safely free an authentication string.  It overwrites the passed string with random characters, and
+ * then frees it.
+ */
+void net_client_free_authstr(gchar *str);
+
+
 #if defined(HAVE_GSSAPI)
 
 /** @brief Create a GSSAPI authentication context

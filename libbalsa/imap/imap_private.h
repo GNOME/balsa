@@ -19,9 +19,10 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include <openssl/ssl.h>
 
 #include "config.h"
+
+#include "net-client-siobuf.h"
 
 #include "imap-commands.h"
 #include "imap_compress.h"
@@ -54,8 +55,8 @@ typedef struct {
 struct _ImapMboxHandle {
   GObject object;
 
-  int sd; /* socket descriptor */
-  struct siobuf * sio;
+  NetClientSioBuf *sio;
+
   char *host;
   char* mbox; /* currently selected mailbox, if any */
   int timeout; /* timeout in milliseconds */
@@ -82,9 +83,6 @@ struct _ImapMboxHandle {
                           * processing of current line is finished. */
   GNode *thread_root; /* deprecated! */
 
-  /** Compression data */
-  struct ImapCompressContext compress;
-
   struct {
     GList* src; /**< returned by COPY */
     GList* dst; /**< returned by APPEND and COPY */
@@ -96,28 +94,27 @@ struct _ImapMboxHandle {
   gboolean doing_logout;
   ImapInfoCb info_cb;
   void *info_arg;
-  ImapUserCb user_cb; /* for user interaction, if really necessary */
-  void *user_arg;
+
+  GCallback auth_cb;	/* authentication callback ("auth" signal) */
+  void *auth_arg;
+
+  GCallback cert_cb;	/* untrusted certificate callback ("cert-check" signal) */
 
   ImapFlagsCb flags_cb;
   void *flags_arg;
   ImapFetchBodyInternalCb body_cb;
   void *body_arg;
 
-  ImapMonitorCb monitor_cb;
-  void *monitor_arg;
-
   ImapSearchCb search_cb;
   void *search_arg;
 
   GHashTable *status_resps; /* A hash of STATUS responses that we wait for */
 
-  GIOChannel *iochannel; /* IO channel used for monitoring the connection */
+  GSource *sock_source;
   GMutex mutex;
   guint idle_enable_id; /* callback to issue IDLE after a period of
                            inactivity */
-  guint async_watch_id;  /* callback to process incoming data */
-  ImapTlsMode tls_mode; /* disabled, enabled, required */
+  NetClientCryptMode tls_mode; /* disabled, enabled, required */
   enum { IDLE_INACTIVE, IDLE_RESPONSE_PENDING, IDLE_ACTIVE }
     idle_state; /*  IDLE State? */
   unsigned op_cancelled:1; /* last op timed out and was cancelled by user */
@@ -138,10 +135,6 @@ struct _ImapMboxHandle {
   gulong quota_max_k;         /**< max. available quota in kByte */
   gulong quota_used_k;        /**< used quota in kByte */
   gchar *quota_root;
-
-  unsigned over_ssl:1; /* transmission is to be made over SSL-protected
-                        * connection, usually to imaps port. */
-  unsigned using_tls:1;
 };
 
 #define IMAP_MBOX_IS_DISCONNECTED(h)  ((h)->state == IMHS_DISCONNECTED)
@@ -170,7 +163,7 @@ struct _ImapMboxHandle {
 
 #define IS_ATOM_CHAR(c) (strchr("(){ %*\"\\]",(c))==NULL&&(c)>0x1f&&(c)!=0x7f)
 
-#define EAT_LINE(h, c) while( (c=sio_getc(h->sio)) != -1 && c != '\n')
+#define EAT_LINE(h, c) c = net_client_siobuf_discard_line(h->sio, NULL)
 
 extern const char* imap_msg_flags[6];
 
@@ -189,7 +182,6 @@ ImapResponse imap_cmd_exec_cmds(ImapMboxHandle* handle, const char** cmds,
 				unsigned rc_to_return);
 
 ImapResponse imap_cmd_issue(ImapMboxHandle* handle, const char* cmd);
-char* imap_mbox_gets(ImapMboxHandle *h, char* buf, size_t sz);
 
 ImapResponse imap_write_key(ImapMboxHandle *handle, ImapSearchKey *s,
                             unsigned cmdno, int use_literal);
@@ -198,10 +190,6 @@ ImapResponse imap_search_exec_unlocked(ImapMboxHandle *h, gboolean uid,
 				       ImapSearchCb cb, void *cb_arg);
 ImapResponse imap_assure_needed_flags(ImapMboxHandle *h,
                                       ImapMsgFlag needed_flags);
-
-SSL* imap_create_ssl(void);
-int imap_setup_ssl(struct siobuf *sio, const char* host, SSL *ssl,
-                   ImapUserCb user_cb, void *user_arg);
 
 void imap_handle_disconnect(ImapMboxHandle *h);
 ImapConnectionState imap_mbox_handle_get_state(ImapMboxHandle *h);
@@ -219,12 +207,9 @@ gchar *imap_coalesce_set(int cnt, unsigned *seqnos);
 /* even more private functions */
 int imap_cmd_start(ImapMboxHandle* handle, const char* cmd, unsigned* cmdno);
 ImapResponse imap_cmd_step(ImapMboxHandle* handle, unsigned cmdno);
-int      imap_handle_write(ImapMboxHandle *conn, const char *buf, size_t len);
-void     imap_handle_flush(ImapMboxHandle *handle);
+ImapResponse imap_cmd_process_untagged(ImapMboxHandle* handle, unsigned cmdno);
 unsigned imap_make_tag(ImapCmdTag tag);
 void mbox_view_append_no(MboxView *mv, unsigned seqno);
-
-int imap_socket_open(const char* host, const char *def_port);
 
 extern const char* imap_status_item_names[5];
 #endif /* __IMAP_PRIVATE_H__ */

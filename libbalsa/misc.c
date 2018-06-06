@@ -985,8 +985,8 @@ libbalsa_create_size_group(GtkWidget * chooser)
 void
 libbalsa_assure_balsa_dir(void)
 {
-    gchar* dir = g_strconcat(g_get_home_dir(), "/.balsa", NULL);
-    mkdir(dir, S_IRUSR|S_IWUSR|S_IXUSR);
+    gchar* dir = g_build_filename(g_get_home_dir(), ".balsa", NULL);
+    g_mkdir_with_parents(dir, S_IRUSR|S_IWUSR|S_IXUSR);
     g_free(dir);
 }
 

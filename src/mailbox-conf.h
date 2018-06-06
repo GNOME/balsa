@@ -48,22 +48,17 @@ void mailbox_conf_view_check(BalsaMailboxConfView * mcc,
 
 
 typedef struct {
-    GtkWidget *use_ssl;
-    GtkWidget *tls_mode;
+    GtkWidget *security;
     GtkGrid   *grid;       /* internal */
-    GtkWidget *tls_option; /* internal */
     GtkWidget *server;     /* internal */
     GtkWidget *need_client_cert;
     GtkWidget *client_cert_file;
     GtkWidget *client_cert_passwd;
-    const gchar *default_ports;
     unsigned   used_rows;  /* internal */
 } BalsaServerConf;
-#define IMAP_DEFAULT_PORTS "143 993 imap imaps"
 
-GtkWidget* balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc,
-                                                 LibBalsaServer *s,
-                                                 int extra_rows);
+
+GtkWidget*      balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc);
 GtkWidget*      balsa_server_conf_add_checkbox(BalsaServerConf *bsc,
                                                const char *label);
 GtkWidget*      balsa_server_conf_add_spinner(BalsaServerConf *bsc,
@@ -72,7 +67,6 @@ GtkWidget*      balsa_server_conf_add_spinner(BalsaServerConf *bsc,
                                               gint initial_value);
 void            balsa_server_conf_set_values(BalsaServerConf *bsc,
                                              LibBalsaServer *server);
-gboolean        balsa_server_conf_get_use_ssl(BalsaServerConf *bsc);
-LibBalsaTlsMode balsa_server_conf_get_tls_mode(BalsaServerConf *bsc);
+NetClientCryptMode balsa_server_conf_get_security(BalsaServerConf *bsc);
 
 #endif				/* __MAILBOX_CONF_H__ */

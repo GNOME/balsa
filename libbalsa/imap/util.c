@@ -27,71 +27,28 @@
 
 #define SKIPWS(c) while (*(c) && isspace ((unsigned char) *(c))) c++;
 
-void
-imap_quote_string(char *dest, size_t dlen, const char *src)
+gchar *
+imap_quote_string(const gchar *src)
 {
-  char quote[] = "\"\\", *pt;
-  const char *s;
+	g_return_val_if_fail(src != NULL, NULL);
 
-  pt = dest;
-  s  = src;
+	if ((strchr(src, '"') == NULL) && (strchr(src, '\\') == NULL)) {
+		/* no need to quote... */
+		return g_strdup(src);
+	} else {
+		GString *buf;
 
-  *pt++ = '"';
-  /* save room for trailing quote-char */
-  dlen -= 2;
-  
-  for (; *s && dlen; s++)
-  {
-    if (strchr (quote, *s))
-    {
-      dlen -= 2;
-      if (!dlen)
-	break;
-      *pt++ = '\\';
-      *pt++ = *s;
-    }
-    else
-    {
-      *pt++ = *s;
-      dlen--;
-    }
-  }
-  *pt++ = '"';
-  *pt = 0;
-}
-
-/* imap_unquote_string: 
- *  modify the argument removing quote characters 
- */
-void
-imap_unquote_string (char *s)
-{
-  char *d = s;
-
-  if (*s == '\"')
-    s++;
-  else
-    return;
-
-  while (*s)
-  {
-    if (*s == '\"')
-    {
-      *d = '\0';
-      return;
-    }
-    if (*s == '\\')
-    {
-      s++;
-    }
-    if (*s)
-    {
-      *d = *s;
-      d++;
-      s++;
-    }
-  }
-  *d = '\0';
+		buf = g_string_sized_new(strlen(src + 3U));
+		g_string_append_c(buf, '"');
+		for (; *src != '\0'; src++) {
+			if ((*src == '"') || (*src == '\\')) {
+				g_string_append_c(buf, '\\');
+			}
+			g_string_append_c(buf, *src);
+		}
+		g_string_append_c(buf, '"');
+		return g_string_free(buf, FALSE);
+	}
 }
 
 /* imap_skip_atom: return index into string where next IMAP atom begins.

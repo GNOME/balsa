@@ -53,11 +53,13 @@ GType libbalsa_server_get_type(void);
 
 typedef struct _LibBalsaServerClass LibBalsaServerClass;
 
+#if 0
 typedef enum {
     LIBBALSA_TLS_DISABLED,
     LIBBALSA_TLS_ENABLED,
     LIBBALSA_TLS_REQUIRED
 } LibBalsaTlsMode;
+#endif
 
 struct _LibBalsaServer {
     GObject object;
@@ -73,8 +75,8 @@ struct _LibBalsaServer {
     /* We include SSL support in UI unconditionally to preserve config
      * between SSL and non-SSL builds. We just fail if SSL is requested
      * in non-SSL build. */
-    LibBalsaTlsMode tls_mode;
-    unsigned use_ssl:1;
+    //LibBalsaTlsMode tls_mode;
+    //unsigned use_ssl:1;
     unsigned remember_passwd:1;
     unsigned try_anonymous:1; /* user wants anonymous access */
 };
@@ -84,7 +86,7 @@ struct _LibBalsaServerClass {
 
     void (*set_username) (LibBalsaServer * server, const gchar * name);
     void (*set_host) (LibBalsaServer * server,
-		      const gchar * host, gboolean use_ssl);
+		      const gchar * host, NetClientCryptMode  security);
     void (*config_changed) (LibBalsaServer * server);
     gchar *(*get_password) (LibBalsaServer * server);
 };
@@ -95,17 +97,17 @@ void libbalsa_server_set_username(LibBalsaServer * server,
 				  const gchar * username);
 void libbalsa_server_set_password(LibBalsaServer * server,
 				  const gchar * passwd);
-void libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
-                              gboolean use_ssl);
+void libbalsa_server_set_host(LibBalsaServer     *server,
+							  const gchar        *host,
+							  NetClientCryptMode  security);
 gchar *libbalsa_server_get_password(LibBalsaServer * server,
 				    LibBalsaMailbox * mbox);
 
 void libbalsa_server_config_changed(LibBalsaServer * server);
 void libbalsa_server_load_config(LibBalsaServer * server);
+void libbalsa_server_load_security_config(LibBalsaServer * server);
 void libbalsa_server_save_config(LibBalsaServer * server);
 
-
-void libbalsa_server_user_cb(ImapUserEventType ue, void *arg, ...);
 
 /* NetClient related signal handlers */
 gchar **libbalsa_server_get_auth(NetClient *client,

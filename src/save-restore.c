@@ -934,9 +934,6 @@ config_global_load(void)
 	    g_free(passphrase_rot);
         }
 
-        /* default set to "Use TLS if possible" */
-	server->tls_mode = libbalsa_conf_get_int("ESMTPTLSMode=1");
-
 	passphrase =
 	    libbalsa_conf_private_get_string("ESMTPCertificatePassphrase");
 	if (passphrase) {

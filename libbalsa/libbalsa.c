@@ -669,13 +669,13 @@ libbalsa_ask_for_cert_acceptance(GTlsCertificate      *cert,
     } else if ((errors & G_TLS_CERTIFICATE_BAD_IDENTITY) == G_TLS_CERTIFICATE_BAD_IDENTITY) {
     	acd.explanation = _("the certificate does not match the expected identity of the site that it was retrieved from");
     } else if ((errors & G_TLS_CERTIFICATE_NOT_ACTIVATED) == G_TLS_CERTIFICATE_NOT_ACTIVATED) {
-    	acd.explanation = _("the certificate's activation time is still in the future");
+    	acd.explanation = _("the certificate’s activation time is still in the future");
     } else if ((errors & G_TLS_CERTIFICATE_EXPIRED) == G_TLS_CERTIFICATE_EXPIRED) {
     	acd.explanation = _("the certificate has expired");
     } else if ((errors & G_TLS_CERTIFICATE_REVOKED) == G_TLS_CERTIFICATE_REVOKED) {
     	acd.explanation = _("the certificate has been revoked ");
     } else if ((errors & G_TLS_CERTIFICATE_INSECURE) == G_TLS_CERTIFICATE_INSECURE) {
-    	acd.explanation = _("the certificate's algorithm is considered insecure");
+    	acd.explanation = _("the certificate’s algorithm is considered insecure");
     } else {
     	acd.explanation = _("an error occurred validating the certificate");
     }

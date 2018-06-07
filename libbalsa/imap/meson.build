@@ -16,8 +16,7 @@ libimap_a_sources = [
   'imap-tls.c',
   'imap_private.h',
   'libimap.h',
-  'siobuf.c',
-  'siobuf.h',
+  'siobuf-nc.h',
   'util.c',
   'util.h'
   ]
@@ -71,6 +70,7 @@ libimap_a = static_library('imap', libimap_a_sources, libimap_marshal_files,
 imap_tst_sources = 'imap_tst.c'
 
 imap_tst = executable('imap_tst', imap_tst_sources,
-                      link_with    : [libimap_a, libnetclient_a],
-                      dependencies : balsa_deps,
-                      install      : false)
+                      link_with           : [libimap_a, libnetclient_a],
+                      dependencies        : balsa_deps,
+                      include_directories : libnetclient_include,
+                      install             : false)

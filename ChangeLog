@@ -1,3 +1,9 @@
+2018-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/meson.build: Edit libimap_a_sources to reflect
+	the previous commit, and add libnetclient_include to the
+	include_directories for imap_tst.
+
 2018-06-05  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	IMAP goes GIO

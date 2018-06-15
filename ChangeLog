@@ -1,3 +1,9 @@
+2018-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libinit_balsa/assistant_page_directory.c
+	(unconditional_mailbox): adapt to new libbalsa_server_set_host()
+	API.
+
 2018-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/imap/meson.build: Edit libimap_a_sources to reflect

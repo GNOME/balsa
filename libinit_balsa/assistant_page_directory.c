@@ -129,7 +129,9 @@ unconditional_mailbox(const gchar * path, const gchar * prettyname,
 
     if (is_remote) {
         libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_SERVER(*box),
-                                 url.host, ssl);
+                                 url.host,
+                                 ssl ? NET_CLIENT_CRYPT_ENCRYPTED :
+                                       NET_CLIENT_CRYPT_NONE);
         libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_SERVER(*box),
                                      getenv("USER"));
     }

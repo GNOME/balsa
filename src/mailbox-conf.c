@@ -156,6 +156,7 @@ mailbox_conf_combo_box_info_free(struct mailbox_conf_combo_box_info *info)
     g_free(info);
 }
 
+#ifdef HAVE_GPGME
 static void
 mailbox_conf_combo_box_make(GtkComboBoxText * combo_box, unsigned cnt,
                             const struct menu_data *data)
@@ -175,6 +176,7 @@ mailbox_conf_combo_box_make(GtkComboBoxText * combo_box, unsigned cnt,
                            (GDestroyNotify)
                            mailbox_conf_combo_box_info_free);
 }
+#endif /* HAVE_GPGME */
 
 
 GtkWidget*

@@ -1,5 +1,9 @@
 2018-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/mailbox-conf.c: Build with gpgme desabled.
+
+2018-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libinit_balsa/assistant_page_directory.c
 	(unconditional_mailbox): adapt to new libbalsa_server_set_host()
 	API.

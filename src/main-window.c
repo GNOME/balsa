@@ -1543,8 +1543,9 @@ view_source_activated(GSimpleAction * action,
     bindex = balsa_window_find_current_index(window);
     g_return_if_fail(bindex != NULL);
 
-    messages = balsa_index_selected_list(BALSA_INDEX(bindex));
     g_object_get(G_OBJECT(window), "application", &application, NULL);
+
+    messages = balsa_index_selected_list(BALSA_INDEX(bindex));
     for (list = messages; list; list = list->next) {
 	LibBalsaMessage *message = list->data;
 
@@ -1554,8 +1555,9 @@ view_source_activated(GSimpleAction * action,
                                      &balsa_app.source_width,
                                      &balsa_app.source_height);
     }
-
     g_list_free_full(messages, g_object_unref);
+
+    g_object_unref(application);
 }
 
 static void
@@ -2056,7 +2058,6 @@ bw_set_menus(BalsaWindow * window)
     GError *err = NULL;
 
     g_object_get(G_OBJECT(window), "application", &application, NULL);
-
     bw_add_app_action_entries(G_ACTION_MAP(application), window);
     bw_add_win_action_entries(G_ACTION_MAP(window));
 
@@ -2076,6 +2077,7 @@ bw_set_menus(BalsaWindow * window)
         g_error_free(err);
     }
     g_object_unref(builder);
+    g_object_unref(application);
 }
 
 /*

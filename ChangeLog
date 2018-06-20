@@ -1,5 +1,10 @@
 2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/main-window.c (view_source_activated), (bw_set_menus): Do
+	not leak application.
+
+2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/main-window.c
 	(balsa_window_new): Pass the GtkApplication as an argument to
 	balsa_window_new();

@@ -1,5 +1,17 @@
 2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Migrate new mail notification from NotifyNotification to
+	GNotification.
+
+	* src/main-window.c (bw_is_active_notify),
+	(check_new_messages_count), (bw_display_new_mail_notification):
+	Migrate new mail notification from NotifyNotification to
+	GNotification.
+	* src/main-window.h: Use a boolean to remember when a
+	notification is being shown.
+
+2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/main-window.c (view_source_activated), (bw_set_menus): Do
 	not leak application.
 

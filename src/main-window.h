@@ -24,10 +24,6 @@
 # error "Include config.h before this file."
 #endif
 
-#ifdef HAVE_NOTIFY
-#include <libnotify/notify.h>
-#endif
-
 #include <gio/gio.h>
 
 #include "mailbox-node.h"
@@ -78,9 +74,7 @@ struct _BalsaWindow {
     guint activity_counter;
     GSList *activity_messages;
 
-#ifdef HAVE_NOTIFY
-    NotifyNotification *new_mail_note;
-#endif                         /* HAVE_NOTIFY */
+    gboolean new_mail_notification_sent;
 
     /* Support GNetworkMonitor: */
     gboolean network_available;

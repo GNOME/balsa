@@ -1,5 +1,15 @@
 2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/main-window.c
+	(balsa_window_new): Pass the GtkApplication as an argument to
+	balsa_window_new();
+	(view_source_activated), (bw_set_menus): Get the GtkApplication
+	as a property of BalsaWindow, instead of from the balsa-app
+	structure;
+	* src/main-window.h: New API for balsa_window_new().
+
+2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/main.c (balsa_startup_cb), (balsa_shutdown_cb),
 	(balsa_activate_cb), (balsa_command_line_cb), (main): Use all the
 	GApplication signals, instead of doing it all in the

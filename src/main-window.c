@@ -1536,6 +1536,7 @@ view_source_activated(GSimpleAction * action,
                       gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    GtkApplication *application;
     GtkWidget *bindex;
     GList *messages, *list;
 
@@ -1543,10 +1544,11 @@ view_source_activated(GSimpleAction * action,
     g_return_if_fail(bindex != NULL);
 
     messages = balsa_index_selected_list(BALSA_INDEX(bindex));
+    g_object_get(G_OBJECT(window), "application", &application, NULL);
     for (list = messages; list; list = list->next) {
 	LibBalsaMessage *message = list->data;
 
-	libbalsa_show_message_source(balsa_app.application,
+	libbalsa_show_message_source(application,
                                      message, balsa_app.message_font,
 				     &balsa_app.source_escape_specials,
                                      &balsa_app.source_width,
@@ -2048,19 +2050,22 @@ balsa_window_add_action_entries(GActionMap * action_map)
 static void
 bw_set_menus(BalsaWindow * window)
 {
+    GtkApplication *application;
     GtkBuilder *builder;
     const gchar resource_path[] = "/org/desktop/Balsa/main-window.ui";
     GError *err = NULL;
 
-    bw_add_app_action_entries(G_ACTION_MAP(balsa_app.application), window);
+    g_object_get(G_OBJECT(window), "application", &application, NULL);
+
+    bw_add_app_action_entries(G_ACTION_MAP(application), window);
     bw_add_win_action_entries(G_ACTION_MAP(window));
 
     builder = gtk_builder_new();
     if (gtk_builder_add_from_resource(builder, resource_path, &err)) {
-        gtk_application_set_app_menu(balsa_app.application,
+        gtk_application_set_app_menu(application,
                                      G_MENU_MODEL(gtk_builder_get_object
                                                   (builder, "app-menu")));
-        gtk_application_set_menubar(balsa_app.application,
+        gtk_application_set_menubar(application,
                                     G_MENU_MODEL(gtk_builder_get_object
                                                  (builder, "menubar")));
     } else {
@@ -2178,7 +2183,7 @@ bw_enable_next_unread(BalsaWindow * window, gboolean has_unread_mailbox)
 }
 
 GtkWidget *
-balsa_window_new()
+balsa_window_new(GtkApplication *application)
 {
     BalsaWindow *window;
     BalsaToolbarModel *model;
@@ -2196,7 +2201,7 @@ balsa_window_new()
     balsa_register_pixmaps();
 
     window = g_object_new(BALSA_TYPE_WINDOW,
-                          "application", balsa_app.application,
+                          "application", application,
                           NULL);
 
     /* Set up the GMenu structures */
@@ -2350,8 +2355,6 @@ balsa_window_new()
 
     g_signal_connect(window, "size_allocate",
                      G_CALLBACK(bw_size_allocate_cb), NULL);
-    g_signal_connect(window, "destroy",
-                     G_CALLBACK (gtk_main_quit), NULL);
     g_signal_connect(window, "delete-event",
                      G_CALLBACK(bw_delete_cb), NULL);
 

@@ -113,7 +113,7 @@ enum {
 };
 
 GType balsa_window_get_type(void);
-GtkWidget *balsa_window_new(void);
+GtkWidget *balsa_window_new(GtkApplication *application);
 gboolean balsa_window_fix_paned(BalsaWindow *window);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 void balsa_window_update_book_menus(BalsaWindow *window);

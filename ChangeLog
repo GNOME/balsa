@@ -1,3 +1,10 @@
+2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main.c (balsa_startup_cb), (balsa_shutdown_cb),
+	(balsa_activate_cb), (balsa_command_line_cb), (main): Use all the
+	GApplication signals, instead of doing it all in the
+	command-line handler.
+
 2018-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/mailbox-conf.c: Build with gpgme desabled.

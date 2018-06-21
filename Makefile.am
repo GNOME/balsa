@@ -9,8 +9,8 @@ pixmapdir = $(datadir)/pixmaps
 pixmap_DATA = gnome-balsa2.png
 
 desktopdir = $(datadir)/applications
-desktop_in_files = balsa.desktop.in balsa-mailto-handler.desktop.in
-desktop_DATA = balsa.desktop balsa-mailto-handler.desktop
+desktop_in_files = org.desktop.Balsa.desktop.in balsa-mailto-handler.desktop.in
+desktop_DATA = org.desktop.Balsa.desktop balsa-mailto-handler.desktop
 
 @INTLTOOL_DESKTOP_RULE@
 

@@ -725,7 +725,7 @@ AC_CONFIG_FILES([
 Makefile
 balsa.1
 balsa.spec
-balsa.desktop.in
+org.desktop.Balsa.desktop.in
 balsa-mailto-handler.desktop.in
 po/Makefile.in
 sounds/Makefile

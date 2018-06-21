@@ -1,5 +1,10 @@
 2018-06-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* configure.ac, Makefile.am, meson.build: Rename balsa.desktop
+	to org.desktop.Balsa.desktop.
+
+2018-06-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/main-window.c (view_source_activated), (bw_set_menus):
 	get the application from the window, not using g_object_get();
 	(balsa_window_new): do not leak adjustments.

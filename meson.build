@@ -636,7 +636,7 @@ gettext_package = 'balsa'
 add_project_arguments('-DGETTEXT_PACKAGE="' + gettext_package + '"', language : 'c')
 subdir('po')
 
-desktop_files = ['balsa.desktop', 'balsa-mailto-handler.desktop']
+desktop_files = ['org.desktop.Balsa.desktop', 'balsa-mailto-handler.desktop']
 foreach file : desktop_files
   file_in = configure_file(input         : file + '.meson',
                            output        : file + '.in',

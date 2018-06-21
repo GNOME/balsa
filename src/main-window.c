@@ -1544,14 +1544,12 @@ view_source_activated(GSimpleAction * action,
                       gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
-    GtkApplication *application;
+    GtkApplication *application = gtk_window_get_application(GTK_WINDOW(window));
     GtkWidget *bindex;
     GList *messages, *list;
 
     bindex = balsa_window_find_current_index(window);
     g_return_if_fail(bindex != NULL);
-
-    g_object_get(G_OBJECT(window), "application", &application, NULL);
 
     messages = balsa_index_selected_list(BALSA_INDEX(bindex));
     for (list = messages; list; list = list->next) {
@@ -1564,8 +1562,6 @@ view_source_activated(GSimpleAction * action,
                                      &balsa_app.source_height);
     }
     g_list_free_full(messages, g_object_unref);
-
-    g_object_unref(application);
 }
 
 static void
@@ -2060,12 +2056,11 @@ balsa_window_add_action_entries(GActionMap * action_map)
 static void
 bw_set_menus(BalsaWindow * window)
 {
-    GtkApplication *application;
+    GtkApplication *application = gtk_window_get_application(GTK_WINDOW(window));
     GtkBuilder *builder;
     const gchar resource_path[] = "/org/desktop/Balsa/main-window.ui";
     GError *err = NULL;
 
-    g_object_get(G_OBJECT(window), "application", &application, NULL);
     bw_add_app_action_entries(G_ACTION_MAP(application), window);
     bw_add_win_action_entries(G_ACTION_MAP(window));
 
@@ -2085,7 +2080,6 @@ bw_set_menus(BalsaWindow * window)
         g_error_free(err);
     }
     g_object_unref(builder);
-    g_object_unref(application);
 }
 
 /*
@@ -2292,6 +2286,8 @@ balsa_window_new(GtkApplication *application)
     g_object_get(G_OBJECT(balsa_app.mblist), "hadjustment", &hadj,
                  "vadjustment", &vadj, NULL);
     window->mblist = gtk_scrolled_window_new(hadj, vadj);
+    g_object_unref(hadj);
+    g_object_unref(vadj);
 
     gtk_container_add(GTK_CONTAINER(window->mblist),
                       GTK_WIDGET(balsa_app.mblist));

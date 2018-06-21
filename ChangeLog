@@ -1,3 +1,9 @@
+2018-06-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (view_source_activated), (bw_set_menus):
+	get the application from the window, not using g_object_get();
+	(balsa_window_new): do not leak adjustments.
+
 2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Migrate new mail notification from NotifyNotification to

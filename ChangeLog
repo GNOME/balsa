@@ -1,3 +1,9 @@
+2018-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (bw_is_active_notify),
+	(bw_display_new_mail_notification):
+	get the application from the window, not using g_object_get();
+
 2018-06-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* configure.ac, Makefile.am, meson.build: Rename balsa.desktop

@@ -675,12 +675,10 @@ bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
         BalsaWindow *window = BALSA_WINDOW(gobject);
 
         if (window->new_mail_notification_sent) {
-            GApplication *application;
+            GtkApplication *application = gtk_window_get_application(gtk_window);
 
-            g_object_get(G_OBJECT(window), "application", &application, NULL);
-            g_application_withdraw_notification(application,
+            g_application_withdraw_notification(G_APPLICATION(application),
                                                 NEW_MAIL_NOTIFICATION);
-            g_object_unref(application);
 
             window->new_mail_notification_sent = FALSE;
         }
@@ -3536,7 +3534,7 @@ bw_display_new_mail_notification(int num_new, int has_new)
     static gint num_total = 0;
     gchar *msg = NULL;
     static GNotification *notification;
-    GApplication *application;
+    GtkApplication *application;
 
     if (!balsa_app.notify_new_mail_dialog)
         return;
@@ -3570,9 +3568,9 @@ bw_display_new_mail_notification(int num_new, int has_new)
     g_notification_set_body(notification, msg);
     g_free(msg);
 
-    g_object_get(G_OBJECT(window), "application", &application, NULL);
-    g_application_send_notification(application, NEW_MAIL_NOTIFICATION, notification);
-    g_object_unref(application);
+    application = gtk_window_get_application(window);
+    g_application_send_notification(G_APPLICATION(application),
+                                    NEW_MAIL_NOTIFICATION, notification);
 }
 
 /*Callback to create or disconnect an IMAP mbox. */

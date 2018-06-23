@@ -1,5 +1,28 @@
 2018-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Migrate from libnotify to GNotification
+
+	* README: Remove reference to libnotify.
+	* configure.ac: Do not configure it.
+	* meson.build: Ditto.
+	* meson_options.txt: Ditto.
+	* libbalsa/information.c (lbi_notification_parent_weak_notify),
+	(libbalsa_information_varg), (libbalsa_notification_new): Use
+	GNotification instead, and we do not need to drop through to
+	balsa-information.
+	* libbalsa/information.h: New function libbalsa_notification_new.
+	* libbalsa/libbalsa.c (libbalsa_init): Clean up initialization.
+	* libbalsa/libbalsa.h: Ditto.
+	* src/main.c (balsa_notification_notify_cb),
+	(balsa_setup_libbalsa_notification), (balsa_startup_cb): Get a
+	GNotification, and use its "notify" signal to show or withdraw
+	it.
+	* src/ab-main.c (balsa_ab_notification_notify_cb),
+	(balsa_ab_notification_shutdown_cb),
+	(balsa_ab_setup_libbalsa_notification), (main): Ditto.
+
+2018-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-icons.c (balsa_icon_id): Return NULL if the
 	icon-table has been destroyed;
 	(balsa_register_pixbufs): cope with it;

@@ -31,10 +31,6 @@
 #include <stdarg.h>
 #include <unistd.h>
 
-#ifdef HAVE_NOTIFY
-#include <libnotify/notify.h>
-#endif
-
 #if ENABLE_LDAP
 #include <ldap.h>
 #endif
@@ -73,15 +69,9 @@ libbalsa_message(const char *fmt, ...)
 }
 
 void
-libbalsa_init(LibBalsaInformationFunc information_callback)
+libbalsa_init(void)
 {
-#ifdef HAVE_NOTIFY
-    notify_init("Basics");
-#endif
-
     main_thread_id = g_thread_self();
-
-    libbalsa_real_information_func = information_callback;
 
     g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
 

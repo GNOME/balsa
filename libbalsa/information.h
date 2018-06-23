@@ -34,12 +34,6 @@ enum _LibBalsaInformationType {
 
 typedef enum _LibBalsaInformationType LibBalsaInformationType;
 
-typedef void (*LibBalsaInformationFunc) (GtkWindow *parent, 
-                                         LibBalsaInformationType message_type,
-                                         const gchar * fmt);
-
-
-extern LibBalsaInformationFunc libbalsa_real_information_func;
 
 void libbalsa_information(LibBalsaInformationType type,
                           const char *fmt, ...)
@@ -51,5 +45,7 @@ void libbalsa_information_parented(GtkWindow *parent,
 void libbalsa_information_varg(GtkWindow *parent,
                                LibBalsaInformationType type,
                                const char *fmt, va_list ap);
+
+GNotification * libbalsa_notification_new(const gchar *title);
 
 #endif

@@ -23,142 +23,90 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "information.h"
 #include "libbalsa.h"
-
-#ifdef HAVE_NOTIFY
-#include <libnotify/notify.h>
-#include <gtk/gtk.h>
-#endif
 #include <string.h>
 
-struct information_data {
-    GtkWindow *parent;
-    LibBalsaInformationType message_type;
-    gchar *msg;
-};
-
-static gboolean libbalsa_information_idle_handler(struct information_data*);
-
-LibBalsaInformationFunc libbalsa_real_information_func;
-
-#ifdef HAVE_NOTIFY
-static void lbi_notification_closed_cb(NotifyNotification * note,
-                                       gpointer data);
+static GNotification *notification;
 
 static void
 lbi_notification_parent_weak_notify(gpointer data, GObject * parent)
 {
-    NotifyNotification *note = NOTIFY_NOTIFICATION(data);
-    g_signal_handlers_disconnect_by_func(note, lbi_notification_closed_cb,
-                                         parent);
-    notify_notification_close(note, NULL);
-    g_object_unref(note);
+    if (notification == NULL)
+        return;
+
+    g_object_set_data(G_OBJECT(notification), "send", GINT_TO_POINTER(FALSE));
+    g_signal_emit_by_name(notification, "notify", NULL);
 }
 
-static void
-lbi_notification_closed_cb(NotifyNotification * note, gpointer data)
-{
-    GObject *parent = G_OBJECT(data);
-    g_object_weak_unref(parent, lbi_notification_parent_weak_notify, note);
-    g_object_unref(note);
-}
-#endif
-
-/*
- * We are adding an idle handler - we do not need to hold the gdk lock
- * for this.
- *
- * We can't just grab the GDK lock and call the real_error function
- * since this runs a dialog, which has a nested g_main loop - glib
- * doesn't like haveing main loops active in two threads at one
- * time. When the idle handler gets run it is from the main thread.
- *
- */
 void
 libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
                           const char *fmt, va_list ap)
 {
-    struct information_data *data;
+    gchar *msg, *p, *q;
+    GString *escaped;
+    const gchar *icon_str;
+    GIcon *icon;
+
+    if (notification == NULL)
+        return;
 
     g_return_if_fail(fmt != NULL);
-    g_assert(libbalsa_real_information_func != NULL);
 
-#ifdef HAVE_NOTIFY
-    if (notify_is_initted()) {
-        gchar *msg, *p, *q;
-        GString *escaped;
-        NotifyNotification *note;
-        char *icon_str;
+    switch (type) {
+    case LIBBALSA_INFORMATION_MESSAGE:
+        icon_str = "dialog-information";
+        break;
+    case LIBBALSA_INFORMATION_WARNING:
+        icon_str = "dialog-warning";
+        break;
+    case LIBBALSA_INFORMATION_ERROR:
+        icon_str = "dialog-error";
+        break;
+    default:
+        icon_str = NULL;
+        break;
+    }
 
-        switch (type) {
-        case LIBBALSA_INFORMATION_MESSAGE:
-            icon_str = "dialog-information";
+    icon = g_themed_icon_new(icon_str);
+    g_notification_set_icon(notification, icon);
+    g_object_unref(icon);
+
+    msg = g_strdup_vprintf(fmt, ap);
+    /* GNotification uses HTML markup (???), so we must replace '<' and
+     * '&' with the corresponding entity in the message string. */
+    escaped = g_string_new(NULL);
+    for (p = msg; (q = strpbrk(p, "<>&\"")) != NULL; p = ++q) {
+        g_string_append_len(escaped, p, q - p);
+        switch (*q) {
+        case '<':
+            g_string_append(escaped, "&lt;");
             break;
-        case LIBBALSA_INFORMATION_WARNING:
-            icon_str = "dialog-warning";
+        case '>':
+            g_string_append(escaped, "&gt;");
             break;
-        case LIBBALSA_INFORMATION_ERROR:
-            icon_str = "dialog-error";
+        case '&':
+            g_string_append(escaped, "&amp;");
+            break;
+        case '"':
+            g_string_append(escaped, "&quot;");
             break;
         default:
-            icon_str = NULL;
             break;
         }
-        msg = g_strdup_vprintf(fmt, ap);
-        /* libnotify/DBUS uses HTML markup, so we must replace '<' and
-         * '&' with the corresponding entity in the message string. */
-        escaped = g_string_new(NULL);
-        for (p = msg; (q = strpbrk(p, "<>&\"")) != NULL; p = ++q) {
-            g_string_append_len(escaped, p, q - p);
-            switch (*q) {
-                case '<': g_string_append(escaped, "&lt;");   break;
-                case '>': g_string_append(escaped, "&gt;");   break;
-                case '&': g_string_append(escaped, "&amp;");  break;
-                case '"': g_string_append(escaped, "&quot;"); break;
-                default: break;
-            }
-        }
-        g_string_append(escaped, p);
-        g_free(msg);
-
-#if HAVE_NOTIFY >= 7
-        note = notify_notification_new("Balsa", escaped->str, icon_str);
-        notify_notification_set_hint(note, "desktop-entry",
-                                     g_variant_new_string("balsa"));
-#else
-        /* prior to 0.7.0 */
-        note = notify_notification_new("Balsa", escaped->str, icon_str, NULL);
-#endif
-
-        g_string_free(escaped, TRUE);
-
-        notify_notification_set_timeout(note, 7000);    /* 7 seconds */
-        notify_notification_show(note, NULL);
-        if (parent) {
-            /* Close with parent if earlier. */
-            g_object_weak_ref(G_OBJECT(parent),
-                              lbi_notification_parent_weak_notify, note);
-            g_signal_connect(note, "closed",
-                             G_CALLBACK(lbi_notification_closed_cb),
-                             parent);
-        } else
-            g_object_unref(note);
-        return;
     }
-    /* Fall through to the ordinary notification scheme */
-#endif
-    data = g_new(struct information_data, 1);
-    data->parent = parent;
-    data->message_type = type;
+    g_string_append(escaped, p);
+    g_free(msg);
 
-    /* We format the string here. It must be free()d in the idle
-     * handler We parse the args here because by the time the idle
-     * function runs we will no longer be in this stack frame. 
-     */
-    data->msg = g_strdup_vprintf(fmt, ap);
-    if (parent)
-        g_object_add_weak_pointer(G_OBJECT(parent),
-                                  (gpointer) & data->parent);
-    g_idle_add((GSourceFunc) libbalsa_information_idle_handler, data);
+    g_notification_set_body(notification, escaped->str);
+    g_string_free(escaped, TRUE);
+
+    g_object_set_data(G_OBJECT(notification), "send", GINT_TO_POINTER(TRUE));
+    g_signal_emit_by_name(notification, "notify", NULL);
+
+    if (parent != NULL) {
+        /* Close with parent if earlier. */
+        g_object_weak_ref(G_OBJECT(parent),
+                          lbi_notification_parent_weak_notify, NULL);
+    }
 }
 
 void
@@ -186,20 +134,12 @@ libbalsa_information_parented(GtkWindow *parent, LibBalsaInformationType type,
     va_end(va_args);
 }
 
-/*
- * This is an idle handler, so we need to grab the GDK lock 
- */
-static gboolean
-libbalsa_information_idle_handler(struct information_data *data)
+GNotification *
+libbalsa_notification_new(const gchar *title)
 {
-    libbalsa_real_information_func(data->parent,
-                                   data->message_type,
-                                   data->msg);
+    notification = g_notification_new(title);
 
-    if(data->parent)
-        g_object_remove_weak_pointer(G_OBJECT(data->parent), 
-                                     (gpointer) &data->parent);
-    g_free(data->msg);
-    g_free(data);
-    return FALSE;
+    g_object_add_weak_pointer(G_OBJECT(notification), (gpointer *) &notification);
+
+    return notification;
 }

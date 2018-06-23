@@ -54,7 +54,6 @@ html_widget   = get_option('html-widget')
 gtksourceview = get_option('gtksourceview')
 spell_checker = get_option('spell-checker')
 ldap          = get_option('ldap')
-libnotify     = get_option('libnotify')
 igemacint     = get_option('macosx-desktop')
 rubrica       = get_option('rubrica')
 osmo          = get_option('osmo')
@@ -376,30 +375,6 @@ if gss
   libnetclient_deps += krb5_dep
 endif # gss
 
-# Libnotify configuration
-#
-if libnotify
-  notify_dep = dependency('libnotify',
-                          version  : '>= 0.7.0',
-                          required : false)
-  if notify_dep.found()
-    notifyver = 7
-  else
-    notify_dep = dependency('libnotify',
-                            version  : '>= 0.4.0',
-                            required : false)
-    if notify_dep.found()
-      notifyver = 4
-    else
-      error('*** You enabled notify but the library is not found.')
-    endif
-  endif
-  conf.set('HAVE_NOTIFY', notifyver,
-    description : 'Defined when libnotify can be used.')
-  balsa_deps += notify_dep
-  balsa_ab_deps += notify_dep
-endif # libnotify
-
 # gcr configuration
 #
 if gcr
@@ -676,7 +651,6 @@ summary = [
   '                Use GSS: @0@'.format(gss),
   '             Use SQLite: @0@'.format(sqlite),
   '          Spell checker: @0@'.format(spell_checker),
-  '          Use Libnotify: @0@'.format(libnotify),
   '      Use GtkSourceView: @0@'.format(gtksourceview),
   '           Use Compface: @0@'.format(compface),
   '          Use libsecret: @0@'.format(libsecret),

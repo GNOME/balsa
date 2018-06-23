@@ -1,5 +1,12 @@
 2018-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-icons.c (balsa_icon_id): Return NULL if the
+	icon-table has been destroyed;
+	(balsa_register_pixbufs): cope with it;
+	* src/toolbar-prefs.c (tp_store_set): ditto.
+
+2018-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/mailbox_imap.c (lbm_imap_check): Object-ref handle
 	while we check for a list-response.
 

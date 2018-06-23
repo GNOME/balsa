@@ -233,6 +233,9 @@ balsa_register_pixbufs(GtkWidget * widget)
         gint width, height;
         const gchar *use_id = balsa_icon_id(icons[i].icon);
 
+        if (use_id == NULL) /* No icon table */
+            break;
+
         gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &width, &height);
         pixbuf =
             gtk_icon_theme_load_icon(icon_theme, use_id, width,
@@ -250,7 +253,13 @@ balsa_register_pixbufs(GtkWidget * widget)
 const gchar *
 balsa_icon_id(const gchar * name)
 {
-    const gchar *retval = g_hash_table_lookup(balsa_icon_table, name);
+    const gchar *retval = NULL;
 
-    return retval ? retval : name;
+    if (balsa_icon_table != NULL) {
+        retval = g_hash_table_lookup(balsa_icon_table, name);
+        if (retval == NULL)
+            retval = name;
+    }
+
+    return retval;
 }

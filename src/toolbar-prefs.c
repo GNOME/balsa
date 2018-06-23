@@ -833,24 +833,29 @@ tp_page_swap_rows(ToolbarPage * page, gboolean forward)
 static void
 tp_store_set(GtkListStore * store, GtkTreeIter * iter, gint item)
 {
-    GdkPixbuf *pixbuf;
+    GdkPixbuf *pixbuf = NULL;
     gchar *text;
 
     text = g_strdup(balsa_toolbar_button_text(item));
     replace_nl_with_space(text);
-    pixbuf =
-        (item > 0
-         ? gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
-                                    balsa_icon_id(toolbar_buttons[item].pixmap_id),
-                                    GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL)
-         : NULL);
+
+    if (item > 0) {
+        const gchar *icon_id;
+
+        icon_id = balsa_icon_id(toolbar_buttons[item].pixmap_id);
+        if (icon_id != NULL)
+            pixbuf =
+                gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), icon_id,
+                                         GTK_ICON_SIZE_LARGE_TOOLBAR, 0, NULL);
+    }
+
     gtk_list_store_set(store, iter,
                        TP_TEXT_COLUMN, text,
                        TP_ICON_COLUMN, pixbuf,
                        TP_ITEM_COLUMN, item,
                        -1);
     g_free(text);
-    if (pixbuf)
+    if (pixbuf != NULL)
         g_object_unref(pixbuf);
 }
 

@@ -1,3 +1,8 @@
+2018-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/mailbox_imap.c (lbm_imap_check): Object-ref handle
+	while we check for a list-response.
+
 2018-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/main-window.c (bw_is_active_notify),

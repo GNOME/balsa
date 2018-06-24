@@ -1,5 +1,10 @@
 2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/information.c (libbalsa_information_varg): if message
+	is an empty string, withdraw the notification.
+
+2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/imap-server.c (lb_imap_server_info_free),
 	(lb_imap_server_cleanup): Check for NULL 'struct handle_info *'.
 

@@ -45,6 +45,7 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
     GString *escaped;
     const gchar *icon_str;
     GIcon *icon;
+    gboolean send;
 
     if (notification == NULL)
         return;
@@ -97,9 +98,10 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
     g_free(msg);
 
     g_notification_set_body(notification, escaped->str);
+    send = *escaped->str != '\0';
     g_string_free(escaped, TRUE);
 
-    g_object_set_data(G_OBJECT(notification), "send", GINT_TO_POINTER(TRUE));
+    g_object_set_data(G_OBJECT(notification), "send", GINT_TO_POINTER(send));
     g_signal_emit_by_name(notification, "notify", NULL);
 
     if (parent != NULL) {

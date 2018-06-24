@@ -1,5 +1,15 @@
 2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Make the 'Balsa closes…' notification outlive the main window,
+	and close it when shut-down is complete.
+
+	* src/main-window.c (quit_activated): NULL parent makes the
+	notification outlive the window.
+	* src/main.c (balsa_shutdown_cb): send an empty notification
+	string to withdraw the notification.
+
+2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/information.c (libbalsa_information_varg): if message
 	is an empty string, withdraw the notification.
 

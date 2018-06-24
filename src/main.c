@@ -573,6 +573,7 @@ balsa_shutdown_cb(void)
     libbalsa_conf_drop_all();
     accel_map_save();
     libbalsa_imap_server_close_all_connections();
+    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, "%s", "");
 }
 
 static void

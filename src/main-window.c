@@ -1015,7 +1015,7 @@ quit_activated(GSimpleAction * action,
     GdkEventAny e = { GDK_DELETE, NULL, 0 };
 
     e.window = gtk_widget_get_window(GTK_WIDGET(window));
-    libbalsa_information_parented(window,
+    libbalsa_information_parented(NULL, /* to outlive the window */
                                   LIBBALSA_INFORMATION_MESSAGE,
                                   _("Balsa closes files and connections."
                                     " Please wait…"));

@@ -581,6 +581,11 @@ balsa_activate_cb(GApplication *application,
 {
     GtkWidget *window;
 
+    if (balsa_app.main_window != NULL) {
+        gtk_window_present(GTK_WINDOW(balsa_app.main_window));
+        return;
+    }
+
     window = balsa_window_new(GTK_APPLICATION(application));
     balsa_app.main_window = BALSA_WINDOW(window);
     g_object_add_weak_pointer(G_OBJECT(window),

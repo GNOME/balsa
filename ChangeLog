@@ -1,3 +1,8 @@
+2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main.c (balsa_activate_cb): Present the main-window, if we
+	already have one.
+
 2018-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Migrate from libnotify to GNotification

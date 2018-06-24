@@ -1,5 +1,10 @@
 2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/imap-server.c (lb_imap_server_info_free),
+	(lb_imap_server_cleanup): Check for NULL 'struct handle_info *'.
+
+2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/main.c (balsa_activate_cb): Present the main-window, if we
 	already have one.
 

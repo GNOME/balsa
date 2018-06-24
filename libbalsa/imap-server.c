@@ -290,7 +290,8 @@ lb_imap_server_info_new(LibBalsaServer *server)
 static void
 lb_imap_server_info_free(struct handle_info *info)
 {
-    g_assert(info != NULL);
+    if (info == NULL)
+        return;
 
     //imap_handle_force_disconnect(info->handle); -- FIXME unref'ing handle will disconnect?
     g_object_unref(info->handle);
@@ -318,7 +319,7 @@ lb_imap_server_cleanup(LibBalsaImapServer * imap_server)
         GList *next = list->next;
         struct handle_info *info = list->data;
 
-        if (info->last_used < idle_marker) {
+        if (info == NULL || info->last_used < idle_marker) {
             imap_server->free_handles =
                 g_list_delete_link(imap_server->free_handles, list);
             lb_imap_server_info_free(info);

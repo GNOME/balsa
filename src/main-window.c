@@ -663,6 +663,8 @@ bw_notify_is_maximized_cb(GtkWindow  * window,
     balsa_app.mw_maximized = gtk_window_is_maximized(window);
 }
 
+#define NEW_MAIL_NOTIFICATION "new-mail-notification"
+
 static void
 bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
                     gpointer user_data)
@@ -670,12 +672,16 @@ bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
     GtkWindow *gtk_window = GTK_WINDOW(gobject);
 
     if (gtk_window_is_active(gtk_window)) {
-#ifdef HAVE_NOTIFY
         BalsaWindow *window = BALSA_WINDOW(gobject);
 
-        if (window->new_mail_note)
-            notify_notification_close(window->new_mail_note, NULL);
-#endif                          /* HAVE_NOTIFY */
+        if (window->new_mail_notification_sent) {
+            GtkApplication *application = gtk_window_get_application(gtk_window);
+
+            g_application_withdraw_notification(G_APPLICATION(application),
+                                                NEW_MAIL_NOTIFICATION);
+
+            window->new_mail_notification_sent = FALSE;
+        }
         gtk_window_set_urgency_hint(gtk_window, FALSE);
     }
 }
@@ -1009,7 +1015,7 @@ quit_activated(GSimpleAction * action,
     GdkEventAny e = { GDK_DELETE, NULL, 0 };
 
     e.window = gtk_widget_get_window(GTK_WIDGET(window));
-    libbalsa_information_parented(window,
+    libbalsa_information_parented(NULL, /* to outlive the window */
                                   LIBBALSA_INFORMATION_MESSAGE,
                                   _("Balsa closes files and connections."
                                     " Please wait…"));
@@ -1536,6 +1542,7 @@ view_source_activated(GSimpleAction * action,
                       gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    GtkApplication *application = gtk_window_get_application(GTK_WINDOW(window));
     GtkWidget *bindex;
     GList *messages, *list;
 
@@ -1546,13 +1553,12 @@ view_source_activated(GSimpleAction * action,
     for (list = messages; list; list = list->next) {
 	LibBalsaMessage *message = list->data;
 
-	libbalsa_show_message_source(balsa_app.application,
+	libbalsa_show_message_source(application,
                                      message, balsa_app.message_font,
 				     &balsa_app.source_escape_specials,
                                      &balsa_app.source_width,
                                      &balsa_app.source_height);
     }
-
     g_list_free_full(messages, g_object_unref);
 }
 
@@ -2048,19 +2054,20 @@ balsa_window_add_action_entries(GActionMap * action_map)
 static void
 bw_set_menus(BalsaWindow * window)
 {
+    GtkApplication *application = gtk_window_get_application(GTK_WINDOW(window));
     GtkBuilder *builder;
     const gchar resource_path[] = "/org/desktop/Balsa/main-window.ui";
     GError *err = NULL;
 
-    bw_add_app_action_entries(G_ACTION_MAP(balsa_app.application), window);
+    bw_add_app_action_entries(G_ACTION_MAP(application), window);
     bw_add_win_action_entries(G_ACTION_MAP(window));
 
     builder = gtk_builder_new();
     if (gtk_builder_add_from_resource(builder, resource_path, &err)) {
-        gtk_application_set_app_menu(balsa_app.application,
+        gtk_application_set_app_menu(application,
                                      G_MENU_MODEL(gtk_builder_get_object
                                                   (builder, "app-menu")));
-        gtk_application_set_menubar(balsa_app.application,
+        gtk_application_set_menubar(application,
                                     G_MENU_MODEL(gtk_builder_get_object
                                                  (builder, "menubar")));
     } else {
@@ -2178,7 +2185,7 @@ bw_enable_next_unread(BalsaWindow * window, gboolean has_unread_mailbox)
 }
 
 GtkWidget *
-balsa_window_new()
+balsa_window_new(GtkApplication *application)
 {
     BalsaWindow *window;
     BalsaToolbarModel *model;
@@ -2196,7 +2203,7 @@ balsa_window_new()
     balsa_register_pixmaps();
 
     window = g_object_new(BALSA_TYPE_WINDOW,
-                          "application", balsa_app.application,
+                          "application", application,
                           NULL);
 
     /* Set up the GMenu structures */
@@ -2277,6 +2284,8 @@ balsa_window_new()
     g_object_get(G_OBJECT(balsa_app.mblist), "hadjustment", &hadj,
                  "vadjustment", &vadj, NULL);
     window->mblist = gtk_scrolled_window_new(hadj, vadj);
+    g_object_unref(hadj);
+    g_object_unref(vadj);
 
     gtk_container_add(GTK_CONTAINER(window->mblist),
                       GTK_WIDGET(balsa_app.mblist));
@@ -2350,8 +2359,6 @@ balsa_window_new()
 
     g_signal_connect(window, "size_allocate",
                      G_CALLBACK(bw_size_allocate_cb), NULL);
-    g_signal_connect(window, "destroy",
-                     G_CALLBACK (gtk_main_quit), NULL);
     g_signal_connect(window, "delete-event",
                      G_CALLBACK(bw_delete_cb), NULL);
 
@@ -3411,7 +3418,7 @@ check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
         if (has_new < 0)
             has_new = 0;
 
-        if (num_new || has_new)
+        if (num_new != 0 || has_new != 0)
 	    bw_display_new_mail_notification(num_new, has_new);
     }
 
@@ -3524,113 +3531,46 @@ static void
 bw_display_new_mail_notification(int num_new, int has_new)
 {
     GtkWindow *window = GTK_WINDOW(balsa_app.main_window);
-    static GtkWidget *dlg = NULL;
     static gint num_total = 0;
     gchar *msg = NULL;
-
-    if (num_new <= 0 && has_new <= 0)
-        return;
-
-    if (!gtk_window_is_active(window))
-        gtk_window_set_urgency_hint(window, TRUE);
+    static GNotification *notification;
+    GtkApplication *application;
 
     if (!balsa_app.notify_new_mail_dialog)
         return;
 
-#ifdef HAVE_NOTIFY
-    /* Before attemtping to use the notifications check whether they
-       are actually available - perhaps the underlying connection to
-       dbus could not be created? In any case, we must not continue or
-       ugly things will happen, at least with libnotify-0.4.2. */
-    if (notify_is_initted()) {
-        if (gtk_window_is_active(window))
-            return;
+    if (gtk_window_is_active(window))
+        return;
+    else
+        gtk_window_set_urgency_hint(window, TRUE);
 
-        if (balsa_app.main_window->new_mail_note) {
-            /* the user didn't acknowledge the last info, so we'll
-             * accumulate the count */
-            num_total += num_new;
-        } else {
-            num_total = num_new;
-#if HAVE_NOTIFY >=7
-            balsa_app.main_window->new_mail_note =
-                notify_notification_new("Balsa", NULL, NULL);
-            notify_notification_set_hint(balsa_app.main_window->
-                                         new_mail_note, "desktop-entry",
-                                         g_variant_new_string("balsa"));
-#else
-            balsa_app.main_window->new_mail_note =
-                notify_notification_new("Balsa", NULL, NULL, NULL);
-#endif
-            g_object_add_weak_pointer(G_OBJECT(balsa_app.main_window->
-                                               new_mail_note),
-                                      (gpointer) & balsa_app.main_window->
-                                      new_mail_note);
-            g_signal_connect(balsa_app.main_window->new_mail_note,
-                             "closed", G_CALLBACK(g_object_unref), NULL);
-        }
-    } else {
-        if (dlg) {
-            /* the user didn't acknowledge the last info, so we'll
-             * accumulate the count */
-            num_total += num_new;
-            gtk_window_present(GTK_WINDOW(dlg));
-        } else {
-            num_total = num_new;
-            dlg = gtk_message_dialog_new(NULL, /* NOT transient for
-                                                * Balsa's main window */
-                    (GtkDialogFlags) 0,
-                    GTK_MESSAGE_INFO,
-                    GTK_BUTTONS_OK, "%s", msg);
-            gtk_window_set_title(GTK_WINDOW(dlg), _("Balsa: New mail"));
-            gtk_window_set_role(GTK_WINDOW(dlg), "new_mail_dialog");
-            gtk_window_set_type_hint(GTK_WINDOW(dlg),
-                    GDK_WINDOW_TYPE_HINT_NORMAL);
-            g_signal_connect(G_OBJECT(dlg), "response",
-                    G_CALLBACK(gtk_widget_destroy), NULL);
-            g_object_add_weak_pointer(G_OBJECT(dlg), (gpointer) & dlg);
-            gtk_widget_show_all(GTK_WIDGET(dlg));
-        }
+    if (g_once_init_enter(&notification)) {
+        GNotification *tmp;
+        GIcon *icon;
+
+        tmp = g_notification_new("Balsa");
+        icon = g_themed_icon_new("dialog-information");
+        g_notification_set_icon(tmp, icon);
+        g_object_unref(icon);
+        g_once_init_leave(&notification, tmp);
     }
 
-    msg = bw_get_new_message_notification_string(num_new, num_total);
-    if (balsa_app.main_window->new_mail_note) {
-        notify_notification_update(balsa_app.main_window->new_mail_note,
-                                   "Balsa", msg, "dialog-information");
-        /* 30 seconds: */
-        notify_notification_set_timeout(balsa_app.main_window->
-                                        new_mail_note, 30000);
-        notify_notification_show(balsa_app.main_window->new_mail_note,
-                                 NULL);
-    } else
-        gtk_message_dialog_set_markup(GTK_MESSAGE_DIALOG(dlg), msg);
-#else
-    if (dlg) {
+    if (balsa_app.main_window->new_mail_notification_sent) {
         /* the user didn't acknowledge the last info, so we'll
          * accumulate the count */
         num_total += num_new;
-        gtk_window_present(GTK_WINDOW(dlg));
     } else {
         num_total = num_new;
-        dlg = gtk_message_dialog_new(NULL, /* NOT transient for
-                                            * Balsa's main window */
-                                     (GtkDialogFlags) 0,
-                                     GTK_MESSAGE_INFO,
-                                     GTK_BUTTONS_OK, "%s", msg);
-        gtk_window_set_title(GTK_WINDOW(dlg), _("Balsa: New mail"));
-        gtk_window_set_role(GTK_WINDOW(dlg), "new_mail_dialog");
-        gtk_window_set_type_hint(GTK_WINDOW(dlg),
-                                 GDK_WINDOW_TYPE_HINT_NORMAL);
-        g_signal_connect(G_OBJECT(dlg), "response",
-                         G_CALLBACK(gtk_widget_destroy), NULL);
-        g_object_add_weak_pointer(G_OBJECT(dlg), (gpointer) & dlg);
-        gtk_widget_show_all(GTK_WIDGET(dlg));
+        balsa_app.main_window->new_mail_notification_sent = TRUE;
     }
 
     msg = bw_get_new_message_notification_string(num_new, num_total);
-    gtk_message_dialog_set_markup(GTK_MESSAGE_DIALOG(dlg), msg);
-#endif
+    g_notification_set_body(notification, msg);
     g_free(msg);
+
+    application = gtk_window_get_application(window);
+    g_application_send_notification(G_APPLICATION(application),
+                                    NEW_MAIL_NOTIFICATION, notification);
 }
 
 /*Callback to create or disconnect an IMAP mbox. */

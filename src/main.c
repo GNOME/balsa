@@ -55,10 +55,6 @@
 #include "libbalsa-gpgme-cb.h"
 #endif
 
-static void config_init(gboolean check_only);
-static void mailboxes_init(gboolean check_only);
-static void balsa_cleanup(void);
-
 /* We need separate variable for storing command line requests to check the
    mail because such selection cannot be stored in balsa_app and later
    saved to the configuration file.
@@ -468,11 +464,45 @@ balsa_check_open_compose_window(void)
     return FALSE;
 }
 
-/* -------------------------- main --------------------------------- */
-static int
-real_main(int argc, char *argv[])
+/*
+ * Set up GNotification for libbalsa
+ */
+
+#define BALSA_NOTIFICATION "balsa-notification"
+
+static void
+balsa_notification_notify_cb(GNotification *notification,
+                             GParamSpec *pspec,
+                             GApplication *application)
 {
-    GtkWidget *window;
+    gboolean send;
+
+    send = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(notification), "send"));
+    if (send) {
+        g_application_send_notification(application,
+                                        BALSA_NOTIFICATION, notification);
+    } else {
+        g_application_withdraw_notification(application, BALSA_NOTIFICATION);
+    }
+}
+
+static void
+balsa_setup_libbalsa_notification(GApplication *application)
+{
+    GNotification *notification;
+
+    notification = libbalsa_notification_new("Balsa");
+    g_signal_connect(notification, "notify",
+                     G_CALLBACK(balsa_notification_notify_cb), application);
+    g_signal_connect_swapped(application, "shutdown",
+                             G_CALLBACK(g_object_unref), notification);
+}
+
+/* -------------------------- main --------------------------------- */
+static void
+balsa_startup_cb(GApplication *application,
+           gpointer      user_data)
+{
     gchar *default_icon;
 
 #ifdef ENABLE_NLS
@@ -497,7 +527,8 @@ real_main(int argc, char *argv[])
     balsa_app_init();
 
     /* Initialize libbalsa */
-    libbalsa_init((LibBalsaInformationFunc) balsa_information_real);
+    balsa_setup_libbalsa_notification(application);
+    libbalsa_init();
     libbalsa_filters_set_url_mapper(balsa_find_mailbox_by_url);
     libbalsa_filters_set_filter_list(&balsa_app.filters);
 
@@ -516,23 +547,12 @@ real_main(int argc, char *argv[])
         g_free(default_icon);
     }
 
-    signal( SIGPIPE, SIG_IGN );
-
-    window = balsa_window_new();
-    balsa_app.main_window = BALSA_WINDOW(window);
-    g_object_add_weak_pointer(G_OBJECT(window),
-			      (gpointer) &balsa_app.main_window);
-
-    /* load mailboxes */
-    config_load_sections();
-    mailboxes_init(cmd_get_stats);
-
     if (cmd_get_stats) {
         long unread, unsent;
         balsa_get_stats(&unread, &unsent);
         printf("Unread: %ld Unsent: %ld\n", unread, unsent);
         g_application_quit(G_APPLICATION(balsa_app.application));
-        return 0;
+        return;
     }
 
 #ifdef HAVE_GPGME
@@ -541,6 +561,36 @@ real_main(int argc, char *argv[])
     balsa_app.has_smime =
         libbalsa_gpgme_check_crypto_engine(GPGME_PROTOCOL_CMS);
 #endif /* HAVE_GPGME */
+
+    accel_map_load();
+}
+
+static void
+balsa_shutdown_cb(void)
+{
+    balsa_app_destroy();
+
+    libbalsa_conf_drop_all();
+    accel_map_save();
+    libbalsa_imap_server_close_all_connections();
+    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, "%s", "");
+}
+
+static void
+balsa_activate_cb(GApplication *application,
+            gpointer      user_data)
+{
+    GtkWidget *window;
+
+    if (balsa_app.main_window != NULL) {
+        gtk_window_present(GTK_WINDOW(balsa_app.main_window));
+        return;
+    }
+
+    window = balsa_window_new(GTK_APPLICATION(application));
+    balsa_app.main_window = BALSA_WINDOW(window);
+    g_object_add_weak_pointer(G_OBJECT(window),
+			      (gpointer) &balsa_app.main_window);
 
     balsa_check_open_compose_window();
 
@@ -562,22 +612,9 @@ real_main(int argc, char *argv[])
         g_idle_add((GSourceFunc) balsa_main_check_new_messages,
                    balsa_app.main_window);
 
-    accel_map_load();
-    gtk_main();
-
-    balsa_cleanup();
-    accel_map_save();
-
-    libbalsa_imap_server_close_all_connections();
-    return 0;
-}
-
-static void
-balsa_cleanup(void)
-{
-    balsa_app_destroy();
-
-    libbalsa_conf_drop_all();
+    /* load mailboxes */
+    config_load_sections();
+    mailboxes_init(cmd_get_stats);
 }
 
 /*
@@ -720,7 +757,7 @@ handle_remote(int argc, char **argv,
 }
 
 static int
-command_line_cb(GApplication            * application,
+balsa_command_line_cb(GApplication            * application,
                 GApplicationCommandLine * command_line,
                 gpointer                  user_data)
 {
@@ -743,8 +780,7 @@ command_line_cb(GApplication            * application,
              * handle the command line. */
             handle_remote(argc, argv, command_line);
         } else {
-            /* This is the primary instance; start up as usual. */
-            status = real_main(argc, argv);
+            g_application_activate(application);
         }
     } else if (status == 2) /* handled a "help" or "version" request */
         status = 0;
@@ -764,9 +800,16 @@ main(int argc, char **argv)
     balsa_app.application = application =
         gtk_application_new("org.desktop.Balsa",
                             G_APPLICATION_HANDLES_COMMAND_LINE);
-    g_signal_connect(application, "command-line",
-                     G_CALLBACK(command_line_cb), NULL);
     g_object_set(application, "register-session", TRUE, NULL);
+
+    g_signal_connect(application, "command-line",
+                     G_CALLBACK(balsa_command_line_cb), NULL);
+    g_signal_connect(application, "startup",
+                     G_CALLBACK(balsa_startup_cb), NULL);
+    g_signal_connect(application, "activate",
+                     G_CALLBACK(balsa_activate_cb), NULL);
+    g_signal_connect(application, "shutdown",
+                     G_CALLBACK(balsa_shutdown_cb), NULL);
 
     status = g_application_run(G_APPLICATION(application), argc, argv);
 

@@ -55,11 +55,6 @@ option('ldap',
   value       : 'false',
   description : 'Use OpenLDAP if available (true|false|path to LDAP installation, default=false)')
 
-option('libnotify',
-  type        : 'boolean',
-  value       : true,
-  description : 'Use libnotify if available (default=true)')
-
 option('macosx-desktop',
   type        : 'boolean',
   value       : false,

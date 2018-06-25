@@ -101,9 +101,6 @@ authors in a mail header.
 	Use GtkSourceview for highlighting structured phrases in
 messages, and for syntax highlighting in attachments.
 
---with-libnotify
-	Use libnotify for sending desktop notifications.
-
 
 Libraries:
 ---------

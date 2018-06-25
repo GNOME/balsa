@@ -111,7 +111,7 @@ enum {
 /*
  * Initialize the library
  */
-void libbalsa_init(LibBalsaInformationFunc information_callback);
+void libbalsa_init(void);
 void libbalsa_set_spool(const gchar * spool);
 
 void libbalsa_show_message_source(GtkApplication * application,

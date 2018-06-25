@@ -1,3 +1,114 @@
+2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Make the 'Balsa closes…' notification outlive the main window,
+	and close it when shut-down is complete.
+
+	* src/main-window.c (quit_activated): NULL parent makes the
+	notification outlive the window.
+	* src/main.c (balsa_shutdown_cb): send an empty notification
+	string to withdraw the notification.
+
+2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/information.c (libbalsa_information_varg): if message
+	is an empty string, withdraw the notification.
+
+2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap-server.c (lb_imap_server_info_free),
+	(lb_imap_server_cleanup): Check for NULL 'struct handle_info *'.
+
+2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main.c (balsa_activate_cb): Present the main-window, if we
+	already have one.
+
+2018-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Migrate from libnotify to GNotification
+
+	* README: Remove reference to libnotify.
+	* configure.ac: Do not configure it.
+	* meson.build: Ditto.
+	* meson_options.txt: Ditto.
+	* libbalsa/information.c (lbi_notification_parent_weak_notify),
+	(libbalsa_information_varg), (libbalsa_notification_new): Use
+	GNotification instead, and we do not need to drop through to
+	balsa-information.
+	* libbalsa/information.h: New function libbalsa_notification_new.
+	* libbalsa/libbalsa.c (libbalsa_init): Clean up initialization.
+	* libbalsa/libbalsa.h: Ditto.
+	* src/main.c (balsa_notification_notify_cb),
+	(balsa_setup_libbalsa_notification), (balsa_startup_cb): Get a
+	GNotification, and use its "notify" signal to show or withdraw
+	it.
+	* src/ab-main.c (balsa_ab_notification_notify_cb),
+	(balsa_ab_notification_shutdown_cb),
+	(balsa_ab_setup_libbalsa_notification), (main): Ditto.
+
+2018-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-icons.c (balsa_icon_id): Return NULL if the
+	icon-table has been destroyed;
+	(balsa_register_pixbufs): cope with it;
+	* src/toolbar-prefs.c (tp_store_set): ditto.
+
+2018-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/mailbox_imap.c (lbm_imap_check): Object-ref handle
+	while we check for a list-response.
+
+2018-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (bw_is_active_notify),
+	(bw_display_new_mail_notification):
+	get the application from the window, not using g_object_get();
+
+2018-06-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* configure.ac, Makefile.am, meson.build: Rename balsa.desktop
+	to org.desktop.Balsa.desktop.
+
+2018-06-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (view_source_activated), (bw_set_menus):
+	get the application from the window, not using g_object_get();
+	(balsa_window_new): do not leak adjustments.
+
+2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Migrate new mail notification from NotifyNotification to
+	GNotification.
+
+	* src/main-window.c (bw_is_active_notify),
+	(check_new_messages_count), (bw_display_new_mail_notification):
+	Migrate new mail notification from NotifyNotification to
+	GNotification.
+	* src/main-window.h: Use a boolean to remember when a
+	notification is being shown.
+
+2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c (view_source_activated), (bw_set_menus): Do
+	not leak application.
+
+2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main-window.c
+	(balsa_window_new): Pass the GtkApplication as an argument to
+	balsa_window_new();
+	(view_source_activated), (bw_set_menus): Get the GtkApplication
+	as a property of BalsaWindow, instead of from the balsa-app
+	structure;
+	* src/main-window.h: New API for balsa_window_new().
+
+2018-06-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/main.c (balsa_startup_cb), (balsa_shutdown_cb),
+	(balsa_activate_cb), (balsa_command_line_cb), (main): Use all the
+	GApplication signals, instead of doing it all in the
+	command-line handler.
+
 2018-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/mailbox-conf.c: Build with gpgme desabled.

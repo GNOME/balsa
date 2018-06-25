@@ -24,10 +24,6 @@
 # error "Include config.h before this file."
 #endif
 
-#ifdef HAVE_NOTIFY
-#include <libnotify/notify.h>
-#endif
-
 #include <gio/gio.h>
 
 #include "mailbox-node.h"
@@ -78,9 +74,7 @@ struct _BalsaWindow {
     guint activity_counter;
     GSList *activity_messages;
 
-#ifdef HAVE_NOTIFY
-    NotifyNotification *new_mail_note;
-#endif                         /* HAVE_NOTIFY */
+    gboolean new_mail_notification_sent;
 
     /* Support GNetworkMonitor: */
     gboolean network_available;
@@ -113,7 +107,7 @@ enum {
 };
 
 GType balsa_window_get_type(void);
-GtkWidget *balsa_window_new(void);
+GtkWidget *balsa_window_new(GtkApplication *application);
 gboolean balsa_window_fix_paned(BalsaWindow *window);
 GtkWidget *balsa_window_find_current_index(BalsaWindow * window);
 void balsa_window_update_book_menus(BalsaWindow *window);

@@ -103,11 +103,6 @@ AC_ARG_WITH([ldap],
                   [Use OpenLDAP if available (default=no)]),
 		  [with_ldap=$withval],[with_ldap=no])
 
-AC_ARG_WITH([libnotify],
-   AC_HELP_STRING([--with-libnotify],
-                  [Use libnotify if available (default=yes)]),
-		  [with_libnotify=$withval],[with_libnotify=yes])
-
 AC_ARG_WITH([macosx-desktop],
    AC_HELP_STRING([--with-macosx-desktop],
 	          [Use Mac OS X Desktop Integration (default=no, extremely experimental)]),
@@ -469,18 +464,6 @@ if test "x$with_gss" != xno  ; then
    fi
 fi
 
-# Libnotify configuration
-if test x$with_libnotify != xno; then
-    PKG_CHECK_MODULES(NOTIFY, [ libnotify >= 0.7.0 ], [notifyver=7],
-      [PKG_CHECK_MODULES(NOTIFY, [ libnotify >= 0.4.0 ], [notifyver=4],
-        [AC_MSG_ERROR([*** You enabled notify but the library is not found.])])])
-    AC_DEFINE_UNQUOTED(HAVE_NOTIFY,$notifyver,
-                       [Defined when libnotify can be used.])
-    BALSA_LIBS="$BALSA_LIBS $NOTIFY_LIBS"
-    BALSA_AB_LIBS="$BALSA_AB_LIBS $NOTIFY_LIBS"
-    with_libnotify=" >= 0.$notifyver"
-fi
-
 # gcr configuration
 if test x$with_gcr != xno; then
     PKG_CHECK_MODULES(GCR, [ gcr-3 ])
@@ -725,7 +708,7 @@ AC_CONFIG_FILES([
 Makefile
 balsa.1
 balsa.spec
-balsa.desktop.in
+org.desktop.Balsa.desktop.in
 balsa-mailto-handler.desktop.in
 po/Makefile.in
 sounds/Makefile
@@ -762,7 +745,6 @@ echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"
 echo "             Spell checker: $use_spell_checker"
-echo "             Use Libnotify: $with_libnotify"
 echo "         Use GtkSourceView: $with_gtksourceview"
 echo "              Use Compface: $with_compface"
 echo "             Use libsecret: $with_libsecret"

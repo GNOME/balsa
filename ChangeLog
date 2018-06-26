@@ -1,5 +1,12 @@
 2018-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/main-window.c (bw_real_open_mbnode_idle_cb),
+	(bw_real_open_mbnode_thread), (balsa_window_real_open_mbnode),
+	(bw_mailbox_check): Use g_application_{hold,release} to keep the
+	GApplication alive while mailboxes are being opened.
+
+2018-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/mailbox.c (libbalsa_mailbox_finalize),
 	(lbm_changed_idle_cb), (lbm_changed_schedule_idle),
 	(lbm_run_filters_on_reception_idle_cb),

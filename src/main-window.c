@@ -2835,24 +2835,26 @@ typedef struct {
     BalsaWindow      *window;
     gchar            *message;
     gboolean          set_current;
+    GApplication     *application;
 } BalsaWindowRealOpenMbnodeInfo;
 
 static gboolean
 bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
 {
-    BalsaIndex       *index   = info->index;
-    BalsaMailboxNode *mbnode  = info->mbnode;
-    BalsaWindow      *window  = info->window;
-    LibBalsaMailbox  *mailbox = mbnode->mailbox;
-    GtkWidget        *label;
-    GtkWidget        *scroll;
-    gint              page_num;
+    BalsaIndex        *index   = info->index;
+    BalsaMailboxNode  *mbnode  = info->mbnode;
+    BalsaWindow       *window  = info->window;
+    LibBalsaMailbox   *mailbox = mbnode->mailbox;
+    GtkWidget         *label;
+    GtkWidget         *scroll;
+    gint               page_num;
     LibBalsaCondition *filter;
 
-    if (!window) {
+    if (window == NULL) {
         g_free(info->message);
         g_object_unref(g_object_ref_sink(index));
         g_object_unref(mbnode);
+        g_application_release(info->application);
         g_free(info);
         return FALSE;
     }
@@ -2865,6 +2867,7 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     if (balsa_find_notebook_page_num(mailbox) >= 0) {
         g_object_unref(g_object_ref_sink(index));
         g_object_unref(mbnode);
+        g_application_release(info->application);
         g_free(info);
         return FALSE;
     }
@@ -2908,6 +2911,7 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
      * without being shown first. */
     balsa_index_scroll_on_open(index);
 
+    g_application_release(info->application);
     g_free(info);
 
     return FALSE;
@@ -2925,12 +2929,24 @@ bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info)
     /* Use a mutex to ensure we open only one mailbox at a time */
     g_mutex_lock(&open_lock);
 
+    if (info->window == NULL) {
+        g_application_release(info->application);
+        g_free(info);
+        g_mutex_unlock(&open_lock);
+        return;
+    }
+
     try_cnt = 0;
     do {
         g_clear_error(&err);
         successp = libbalsa_mailbox_open(mailbox, &err);
-        if (!balsa_app.main_window)
+
+        if (info->window == NULL) {
+            g_application_release(info->application);
+            g_free(info);
+            g_mutex_unlock(&open_lock);
             return;
+        }
 
         if(successp) break;
         if(err && err->code != LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR)
@@ -2953,6 +2969,7 @@ bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info)
         g_free(info->message);
         g_object_unref(g_object_ref_sink(info->index));
         g_object_unref(info->mbnode);
+        g_application_release(info->application);
         g_free(info);
     }
     g_mutex_unlock(&open_lock);
@@ -2982,12 +2999,18 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
     balsa_window_increase_activity(window, message);
 
     info = g_new(BalsaWindowRealOpenMbnodeInfo, 1);
+
     info->window = window;
     g_object_add_weak_pointer(G_OBJECT(window), (gpointer) &info->window);
+
     info->mbnode = g_object_ref(mbnode);
     info->set_current = set_current;
     info->index = index;
     info->message = message;
+
+    info->application = G_APPLICATION(gtk_window_get_application(GTK_WINDOW(window)));
+    g_application_hold(info->application);
+
     open_thread =
     	g_thread_new("bw_real_open_mbnode_thread",
     				 (GThreadFunc) bw_real_open_mbnode_thread,
@@ -3430,6 +3453,8 @@ check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify)
 static void
 bw_mailbox_check(LibBalsaMailbox * mailbox, struct check_messages_thread_info *info)
 {
+    if (balsa_app.main_window == NULL)
+        return;
     if (libbalsa_mailbox_get_subscribe(mailbox) == LB_MAILBOX_SUBSCRIBE_NO)
         return;
 

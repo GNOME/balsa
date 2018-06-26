@@ -245,6 +245,7 @@ struct _LibBalsaMailbox {
     guint changed_idle_id;
     guint queue_check_idle_id;
     guint need_threading_idle_id;
+    guint run_filters_idle_id;
 };
 
 /* Search iter */

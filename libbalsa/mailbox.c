@@ -490,6 +490,11 @@ libbalsa_mailbox_finalize(GObject * object)
         mailbox->need_threading_idle_id = 0;
     }
 
+    if (mailbox->run_filters_idle_id) {
+        g_source_remove(mailbox->run_filters_idle_id);
+        mailbox->run_filters_idle_id = 0;
+    }
+
     G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
@@ -718,8 +723,6 @@ lbm_changed_idle_cb(LibBalsaMailbox * mailbox)
     mailbox->changed_idle_id = 0;
     libbalsa_unlock_mailbox(mailbox);
 
-    g_object_unref(mailbox);
-
     return G_SOURCE_REMOVE;
 }
 
@@ -729,7 +732,7 @@ lbm_changed_schedule_idle(LibBalsaMailbox * mailbox)
     libbalsa_lock_mailbox(mailbox);
     if (!mailbox->changed_idle_id)
         mailbox->changed_idle_id =
-            g_idle_add((GSourceFunc) lbm_changed_idle_cb, g_object_ref(mailbox));
+            g_idle_add((GSourceFunc) lbm_changed_idle_cb, mailbox);
     libbalsa_unlock_mailbox(mailbox);
 }
 
@@ -822,11 +825,9 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
     guint progress_total;
     LibBalsaProgress progress;
 
-    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &mailbox);
-    g_object_unref(mailbox);
-    if (!mailbox)
-        return FALSE;
-    g_object_remove_weak_pointer(G_OBJECT(mailbox), (gpointer) &mailbox);
+    libbalsa_lock_mailbox(mailbox);
+
+    mailbox->run_filters_idle_id = 0;
 
     if (!mailbox->filters_loaded) {
         config_mailbox_filters_load(mailbox);
@@ -836,10 +837,14 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
     filters = libbalsa_mailbox_filters_when(mailbox->filters,
                                             FILTER_WHEN_INCOMING);
 
-    if (!filters)
+    if (filters == NULL) {
+        libbalsa_unlock_mailbox(mailbox);
         return FALSE;
+    }
+
     if (!filters_prepare_to_run(filters)) {
         g_slist_free(filters);
+        libbalsa_unlock_mailbox(mailbox);
         return FALSE;
     }
 
@@ -853,7 +858,6 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
             ++progress_count;
     }
 
-    libbalsa_lock_mailbox(mailbox);
     if (!recent_undeleted)
         recent_undeleted =
             libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
@@ -909,9 +913,10 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
         g_array_free(msgnos, TRUE);
     }
     libbalsa_progress_set_text(&progress, NULL, 0);
-    libbalsa_unlock_mailbox(mailbox);
 
     g_slist_free(filters);
+    libbalsa_unlock_mailbox(mailbox);
+
     return FALSE;
 }
 
@@ -920,8 +925,8 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
 {
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    g_idle_add((GSourceFunc) lbm_run_filters_on_reception_idle_cb,
-               g_object_ref(mailbox));
+    mailbox->run_filters_idle_id =
+        g_idle_add((GSourceFunc) lbm_run_filters_on_reception_idle_cb, mailbox);
 }
 
 void

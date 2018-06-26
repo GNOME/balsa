@@ -1,5 +1,14 @@
 2018-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize),
+	(lbm_changed_idle_cb), (lbm_changed_schedule_idle),
+	(lbm_run_filters_on_reception_idle_cb),
+	(libbalsa_mailbox_run_filters_on_reception): manage idle ids.
+	* libbalsa/mailbox.h: new idle id for run-filters-on-reception
+	idle handler.
+
+2018-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/libbalsa-conf.c (libbalsa_conf_foreach_group): check
 	that the key-file has not been dropped.
 

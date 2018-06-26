@@ -541,9 +541,11 @@ imap_search_exec(ImapMboxHandle *h, gboolean uid,
 {
   ImapResponse rc;
 
+  g_object_ref(h);
   g_mutex_lock(&h->mutex);
   rc = imap_search_exec_unlocked(h, uid, s, cb, cb_arg);
   g_mutex_unlock(&h->mutex);
+  g_object_unref(h);
 
   return rc;
 }

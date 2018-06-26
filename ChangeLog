@@ -1,3 +1,8 @@
+2018-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/imap/imap_search.c (imap_search_exec): keep the
+	handle alive while searching.
+
 2018-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Make the 'Balsa closes…' notification outlive the main window,

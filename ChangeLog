@@ -1,5 +1,10 @@
 2018-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/libbalsa-conf.c (libbalsa_conf_foreach_group): check
+	that the key-file has not been dropped.
+
+2018-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/imap/imap_search.c (imap_search_exec): keep the
 	handle alive while searching.
 

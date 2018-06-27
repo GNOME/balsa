@@ -988,7 +988,7 @@ about_activated(GSimpleAction * action,
     gtk_show_about_dialog(window,
                           "version", BALSA_VERSION,
                           "copyright",
-                          "Copyright \xc2\xa9 1997-2018 The Balsa Developers",
+                          "Copyright © 1997-2018 The Balsa Developers",
                           "comments",
                           _("The Balsa email client is part of "
                             "the GNOME desktop environment."),
@@ -1000,7 +1000,7 @@ about_activated(GSimpleAction * action,
                           strcmp(translator_credits, "translator-credits") ?
 			  translator_credits : NULL,
 			  "logo", balsa_logo,
-                          "website", "http://balsa.gnome.org",
+                          "website", "https://pawsa.fedorapeople.org/balsa/",
                           "wrap-license", TRUE,
                           NULL);
     g_object_unref(balsa_logo);

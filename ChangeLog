@@ -1,5 +1,10 @@
 2018-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/main-window.c (about_activated): Update the 'about'
+	dialog.
+
+2018-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/main-window.c (bw_real_open_mbnode_idle_cb),
 	(bw_real_open_mbnode_thread), (balsa_window_real_open_mbnode),
 	(bw_mailbox_check): Use g_application_{hold,release} to keep the

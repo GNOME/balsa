@@ -1,3 +1,11 @@
+2018-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libnetclient/net-client.c (net_client_class_init),
+	(net_client_init): g_type_class_add_private() is soon to be
+	deprecated; use G_DEFINE_TYPE_WITH_PRIVATE intead;
+	also use net_client_get_instance_private() instead of
+	G_TYPE_INSTANCE_GET_PRIVATE().
+
 2018-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/main-window.c (about_activated): Update the 'about'

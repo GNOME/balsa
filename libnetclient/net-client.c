@@ -56,7 +56,7 @@ struct _NetClientPrivate {
 static guint signals[3];
 
 
-G_DEFINE_TYPE(NetClient, net_client, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE(NetClient, net_client, G_TYPE_OBJECT)
 
 
 static void net_client_finalise(GObject *object);
@@ -589,7 +589,6 @@ net_client_class_init(NetClientClass *klass)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
 
-	g_type_class_add_private(klass, sizeof(NetClientPrivate));
 	gobject_class->finalize = net_client_finalise;
 	signals[0] = g_signal_new("cert-check", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_BOOLEAN, 2U,
 		G_TYPE_TLS_CERTIFICATE, G_TYPE_TLS_CERTIFICATE_FLAGS);
@@ -602,7 +601,7 @@ net_client_class_init(NetClientClass *klass)
 static void
 net_client_init(NetClient *self)
 {
-	self->priv = G_TYPE_INSTANCE_GET_PRIVATE(self, NET_CLIENT_TYPE, NetClientPrivate);
+	self->priv = net_client_get_instance_private(self);
 	self->priv->sock = g_socket_client_new();
 	if (self->priv->sock != NULL) {
 		g_socket_client_set_timeout(self->priv->sock, 180U);

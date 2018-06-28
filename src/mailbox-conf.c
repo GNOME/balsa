@@ -140,6 +140,7 @@ static void check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw);
 
 /* ========================================================= */
 /* BEGIN BalsaServerConf =================================== */
+#ifdef HAVE_GPGME
 struct menu_data {
     const char *label;
     int tag;
@@ -149,7 +150,6 @@ struct mailbox_conf_combo_box_info {
 };
 #define BALSA_MC_COMBO_BOX_INFO "balsa-mailbox-conf-combo-box-info"
 
-#ifdef HAVE_GPGME
 static void
 mailbox_conf_combo_box_info_free(struct mailbox_conf_combo_box_info *info)
 {

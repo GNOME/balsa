@@ -1,5 +1,9 @@
 2018-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/mailbox-conf.c: Really build with gpgme desabled.
+
+2018-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libnetclient/net-client.c (net_client_class_init),
 	(net_client_init): g_type_class_add_private() is soon to be
 	deprecated; use G_DEFINE_TYPE_WITH_PRIVATE intead;

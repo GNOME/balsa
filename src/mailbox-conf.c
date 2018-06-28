@@ -149,6 +149,7 @@ struct mailbox_conf_combo_box_info {
 };
 #define BALSA_MC_COMBO_BOX_INFO "balsa-mailbox-conf-combo-box-info"
 
+#ifdef HAVE_GPGME
 static void
 mailbox_conf_combo_box_info_free(struct mailbox_conf_combo_box_info *info)
 {
@@ -156,7 +157,6 @@ mailbox_conf_combo_box_info_free(struct mailbox_conf_combo_box_info *info)
     g_free(info);
 }
 
-#ifdef HAVE_GPGME
 static void
 mailbox_conf_combo_box_make(GtkComboBoxText * combo_box, unsigned cnt,
                             const struct menu_data *data)

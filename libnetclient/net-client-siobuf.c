@@ -26,7 +26,7 @@ struct _NetClientSioBufPrivate {
 };
 
 
-G_DEFINE_TYPE(NetClientSioBuf, net_client_siobuf, NET_CLIENT_TYPE)
+G_DEFINE_TYPE_WITH_PRIVATE(NetClientSioBuf, net_client_siobuf, NET_CLIENT_TYPE)
 
 
 static void net_client_siobuf_finalise(GObject *object);
@@ -262,7 +262,7 @@ net_client_siobuf_class_init(NetClientSioBufClass *klass)
 static void
 net_client_siobuf_init(NetClientSioBuf *self)
 {
-	self->priv = g_new0(NetClientSioBufPrivate, 1U);
+	self->priv = net_client_siobuf_get_instance_private(self);
 }
 
 
@@ -296,10 +296,7 @@ net_client_siobuf_finalise(GObject *object)
 	const NetClientSioBuf *client = NET_CLIENT_SIOBUF(object);
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_siobuf_parent_class);
 
-	if (client->priv != NULL) {
-		g_string_free(client->priv->buffer, TRUE);
-		g_string_free(client->priv->writebuf, TRUE);
-		g_free(client->priv);
-	}
+	g_string_free(client->priv->buffer, TRUE);
+	g_string_free(client->priv->writebuf, TRUE);
 	(*parent_class->finalize)(object);
 }

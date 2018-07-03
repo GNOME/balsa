@@ -1,3 +1,14 @@
+2018-07-03  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	libnetclient private data fixes
+
+	* libnetclient/net-client-pop.c, libnetclient/net-client-siobuf.c,
+	  libnetclient/net-client-smtp.c: properly access and destroy the private data
+	* libnetclient/test/Makefile.am: fix lcov cleaning the test app
+	  from the coverage data
+	* libnetclient/test/cert.pem, libnetclient/test/cert_u.pem:
+	  replace expired snakeoil certs for testing
+
 2018-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/mailbox-conf.c: Really build with gpgme desabled.

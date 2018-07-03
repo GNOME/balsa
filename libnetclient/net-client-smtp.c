@@ -49,7 +49,7 @@ typedef struct {
 #define SMTP_DATA_BUF_SIZE			8192U
 
 
-G_DEFINE_TYPE(NetClientSmtp, net_client_smtp, NET_CLIENT_TYPE)
+G_DEFINE_TYPE_WITH_PRIVATE(NetClientSmtp, net_client_smtp, NET_CLIENT_TYPE)
 
 
 static void net_client_smtp_finalise(GObject *object);
@@ -342,7 +342,7 @@ net_client_smtp_class_init(NetClientSmtpClass *klass)
 static void
 net_client_smtp_init(NetClientSmtp *self)
 {
-	self->priv = g_new0(NetClientSmtpPrivate, 1U);
+	self->priv = net_client_smtp_get_instance_private(self);
 	self->priv->auth_allowed[0] = NET_CLIENT_SMTP_AUTH_ALL;
 	self->priv->auth_allowed[1] = NET_CLIENT_SMTP_AUTH_SAFE;
 }
@@ -360,7 +360,6 @@ net_client_smtp_finalise(GObject *object)
 		(void) net_client_execute(NET_CLIENT(client), NULL, "QUIT", NULL);
 	}
 
-	g_free(client->priv);
 	(*parent_class->finalize)(object);
 }
 

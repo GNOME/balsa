@@ -40,11 +40,11 @@ struct _NetClientPopPrivate {
 #define IS_ML_TERM(str)				((str[0] == '.') && (str[1] == '\0'))
 /*lint -emacro(9079,POP_MSG_INFO) -emacro(9087,POP_MSG_INFO)
  * allow conversion of GList data pointer, MISRA C:2012, Rules 11.3, 11.5 */
-#define POP_MSG_INFO(list)				((NetClientPopMessageInfo *) ((list)->data))
+#define POP_MSG_INFO(list)			((NetClientPopMessageInfo *) ((list)->data))
 /*lint -restore */
 
 
-G_DEFINE_TYPE(NetClientPop, net_client_pop, NET_CLIENT_TYPE)
+G_DEFINE_TYPE_WITH_PRIVATE(NetClientPop, net_client_pop, NET_CLIENT_TYPE)
 
 
 static void net_client_pop_finalise(GObject *object);
@@ -380,7 +380,7 @@ net_client_pop_class_init(NetClientPopClass *klass)
 static void
 net_client_pop_init(NetClientPop *self)
 {
-	self->priv = g_new0(NetClientPopPrivate, 1U);
+	self->priv = net_client_pop_get_instance_private(self);
 	self->priv->auth_allowed[0] = NET_CLIENT_POP_AUTH_ALL;
 	self->priv->auth_allowed[1] = NET_CLIENT_POP_AUTH_SAFE;
 }
@@ -397,10 +397,7 @@ net_client_pop_finalise(GObject *object)
 		(void) net_client_execute(NET_CLIENT(client), NULL, "QUIT", NULL);
 	}
 
-	if (client->priv != NULL) {
-		g_free(client->priv->apop_banner);
-		g_free(client->priv);
-	}
+	g_free(client->priv->apop_banner);
 	(*parent_class->finalize)(object);
 }
 

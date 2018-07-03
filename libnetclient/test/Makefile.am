@@ -29,5 +29,5 @@ tests:	tests.c
 	$(CC) $(LIBNETCLIENT_CFLAGS) $(CPPFLAGS) $(TESTFLAGS) -DG_LOG_DOMAIN=\"libnetclient\" -I. -I.. -I../.. $< $(test_src) -o $@ $(LIBNETCLIENT_LIBS)
 	$(VALGRIND) $(VALGRFLAGS) ./$@
 	$(LCOV) $(LCOVFLGS) -c -b $(libsrcdir) -d $(abs_srcdir) --no-external -o $@.covi
-	$(LCOV) $(LCOVFLGS) -r $@.covi $< -o $@.covi
+	$(LCOV) $(LCOVFLGS) -r $@.covi '*/'$< -o $@.covi
 	$(GENHTML) $(GENHTMLFLGS) -o gcov $@.covi

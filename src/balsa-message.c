@@ -393,16 +393,17 @@ bm_find_scroll_to_rectangle(BalsaMessage * bm,
                             GdkRectangle * rectangle)
 {
     gint x, y;
-    GtkAdjustment *hadj, *vadj;
+    GtkAdjustment *adj;
+    GtkScrolledWindow *scroll = GTK_SCROLLED_WINDOW(bm->scroll);
 
     gtk_widget_translate_coordinates(widget, bm->bm_widget->widget,
                                      rectangle->x, rectangle->y,
                                      &x, &y);
 
-    g_object_get(G_OBJECT(bm->scroll), "hadjustment", &hadj,
-                                       "vadjustment", &vadj, NULL);
-    gtk_adjustment_clamp_page(hadj, x, x + rectangle->width);
-    gtk_adjustment_clamp_page(vadj, y, y + rectangle->height);
+    adj = gtk_scrolled_window_get_hadjustment(scroll);
+    gtk_adjustment_clamp_page(adj, x, x + rectangle->width);
+    adj = gtk_scrolled_window_get_vadjustment(scroll);
+    gtk_adjustment_clamp_page(adj, y, y + rectangle->height);
 }
 
 static void
@@ -2300,12 +2301,13 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
     g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
 
     if (body != NULL) {
-        GtkAdjustment *hadj, *vadj;
+        GtkScrolledWindow *scroll = GTK_SCROLLED_WINDOW(bm->scroll);
+        GtkAdjustment *adj;
 
-        g_object_get(G_OBJECT(bm->scroll), "hadjustment", &hadj,
-                                           "vadjustment", &vadj, NULL);
-        gtk_adjustment_set_value(hadj, 0);
-        gtk_adjustment_set_value(vadj, 0);
+        adj = gtk_scrolled_window_get_hadjustment(scroll);
+        gtk_adjustment_set_value(adj, 0);
+        adj = gtk_scrolled_window_get_vadjustment(scroll);
+        gtk_adjustment_set_value(adj, 0);
     }
 }
 

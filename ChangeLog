@@ -1,5 +1,10 @@
 2018-07-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-mime-widget.c (balsa_mime_widget_new): Do not leak
+	  the GtkAdjustment.
+
+2018-07-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-message.c (bm_find_scroll_to_rectangle), (select_part):
 	  Use gtk_scrolled_window_get_{h,v}adjustment() instead of
 	  GObject properties (and consequently, do not leak the

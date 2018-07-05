@@ -189,6 +189,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
                              NULL);
 		g_signal_connect(vadj, "changed",
 				 G_CALLBACK(vadj_change_cb), mw->widget);
+                g_object_unref(vadj);
             }
 
             gtk_widget_show_all(mw->widget);

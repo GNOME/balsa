@@ -235,6 +235,20 @@ directory. It should contain the following:
 filename=/path/to/your/browser
 
 
+Debugging:
+---------
+Set the environment variable G_MESSAGES_DEBUG to print debugging
+information to the console.  The value shall be either a space-
+separated list of log domains, or the special value "all".  The
+following custom domains are implemented in Balsa:
+- libnetclient: low-level network IO.  Warning: the output may contain
+        plain-text passwords.
+- imap: IMAP server interaction.  Warning: the output may contain
+        plain-text passwords.
+- crypto: GnuPG and S/MIME crypto operations
+- html: HTML rendering with webkit2
+
+
 Reporting Bugs:
 --------------
 	See http://balsa.gnome.org/bugs.html for instructions.

@@ -44,12 +44,12 @@
 #include <string.h>
 #include <glib/gi18n.h>
 
+#ifdef HAVE_HTML_WIDGET
+
 #ifdef G_LOG_DOMAIN
 #  undef G_LOG_DOMAIN
 #endif
 #define G_LOG_DOMAIN "html"
-
-#ifdef HAVE_HTML_WIDGET
 
 /*
  * Used by all HTML widgets
@@ -281,8 +281,12 @@ lbh_navigation_policy_decision(WebKitPolicyDecision * decision,
         g_debug("%s clicked %s", __func__, uri);
         (*info->clicked_cb) (uri);
     default:
-        g_debug("%s uri %s, type %d, ignored", __func__, uri, navigation_type);
-        webkit_policy_decision_ignore(decision);
+        if (g_ascii_strcasecmp(uri, "about:blank") != 0) {
+            g_debug("%s uri %s, type %d, ignored", __func__, uri, navigation_type);
+        	webkit_policy_decision_ignore(decision);
+        } else {
+        	g_debug("%s uri %s, type %d loaded", __func__, uri, navigation_type);
+        }
     }
 }
 

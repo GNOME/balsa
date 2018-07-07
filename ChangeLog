@@ -1,3 +1,11 @@
+2018-07-07  Albrecht Dreß <albrecht.dress@arcor.de>
+
+	Fix HTML rendering with webkit2gtk-4.0 < 2.20
+
+	* README: document use of G_MESSAGES_DEBUG=…
+	* libbalsa/html.c (lbh_navigation_policy_decision):
+	  allow the rendering of “about:blank”.
+
 2018-07-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use g_debug() instead of conditionally compiled printing

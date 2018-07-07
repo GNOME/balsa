@@ -1,3 +1,12 @@
+2018-07-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use g_debug() instead of conditionally compiled printing
+
+	* libbalsa/html.c (lbh_navigation_policy_decision),
+	(lbh_new_window_policy_decision), (lbh_response_policy_decision),
+	(lbh_resource_notify_response_cb), (lbh_web_process_crashed_cb),
+	(lbh_cid_cb), (libbalsa_html_new):
+
 2018-07-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-mime-widget.c (balsa_mime_widget_new): Do not leak

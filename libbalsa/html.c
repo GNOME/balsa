@@ -44,6 +44,11 @@
 #include <string.h>
 #include <glib/gi18n.h>
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "html"
+
 #ifdef HAVE_HTML_WIDGET
 
 /*
@@ -140,13 +145,6 @@ html2text(gchar ** text, gsize len)
 /*
  * Experimental support for WebKit2.
  */
-
-#define DEBUG_WEBKIT2 FALSE
-#if DEBUG_WEBKIT2
-#define d(x) x
-#else
-#define d(x)
-#endif
 
 /* WebKitContextMenuItem uses GtkAction, which is deprecated.
  * We don't use it, but it breaks the git-tree build, so we just mangle
@@ -280,10 +278,10 @@ lbh_navigation_policy_decision(WebKitPolicyDecision * decision,
 
     switch (navigation_type) {
     case WEBKIT_NAVIGATION_TYPE_LINK_CLICKED:
-        d(g_print("%s clicked %s\n", __func__, uri));
+        g_debug("%s clicked %s", __func__, uri);
         (*info->clicked_cb) (uri);
     default:
-        d(g_print("%s uri %s, type %d, ignored\n", __func__, uri, navigation_type));
+        g_debug("%s uri %s, type %d, ignored", __func__, uri, navigation_type);
         webkit_policy_decision_ignore(decision);
     }
 }
@@ -305,13 +303,13 @@ lbh_new_window_policy_decision(WebKitPolicyDecision * decision,
             (navigation_action)) {
     case WEBKIT_NAVIGATION_TYPE_LINK_CLICKED:
         request = webkit_navigation_action_get_request(navigation_action);
-        d(g_print("%s clicked %s\n", __func__,
-                  webkit_uri_request_get_uri(request)));
+        g_debug("%s clicked %s", __func__,
+                webkit_uri_request_get_uri(request));
         (*info->clicked_cb) (webkit_uri_request_get_uri(request));
     default:
-        d(g_print("%s type %d, ignored\n", __func__,
-                  webkit_navigation_action_get_navigation_type
-                  (navigation_action)));
+        g_debug("%s type %d, ignored", __func__,
+                webkit_navigation_action_get_navigation_type
+                (navigation_action));
 
         webkit_policy_decision_ignore(decision);
     }
@@ -321,10 +319,10 @@ static void
 lbh_response_policy_decision(WebKitPolicyDecision * decision,
                              gpointer               data)
 {
-    d(g_print("%s uri %s, ignored\n", __func__,
-              webkit_uri_request_get_uri
-              (webkit_response_policy_decision_get_request
-               (WEBKIT_RESPONSE_POLICY_DECISION(decision)))));
+    g_debug("%s uri %s, ignored", __func__,
+            webkit_uri_request_get_uri
+            (webkit_response_policy_decision_get_request
+             (WEBKIT_RESPONSE_POLICY_DECISION(decision))));
     webkit_policy_decision_ignore(decision);
 }
 
@@ -453,20 +451,20 @@ lbh_resource_notify_response_cb(WebKitWebResource * resource,
 
     response = webkit_web_resource_get_response(resource);
     mime_type = webkit_uri_response_get_mime_type(response);
-    d(g_print("%s mime-type %s\n", __func__, mime_type));
+    g_debug("%s mime-type %s", __func__, mime_type);
     if (g_ascii_strncasecmp(mime_type, "image/", 6) != 0)
         return;
 
     if (info->info_bar) {
-        d(g_print("%s %s destroy info_bar\n", __func__,
-                  webkit_web_resource_get_uri(resource)));
+        g_debug("%s %s destroy info_bar", __func__,
+                webkit_web_resource_get_uri(resource));
         /* web_view is loading an image from its cache, so we do not
          * need to ask the user for permission to download */
         gtk_widget_destroy(info->info_bar);
         info->info_bar = NULL;
     } else {
-        d(g_print("%s %s null info_bar\n", __func__,
-                  webkit_web_resource_get_uri(resource)));
+        g_debug("%s %s null info_bar", __func__,
+                webkit_web_resource_get_uri(resource));
     }
 }
 
@@ -493,7 +491,7 @@ static gboolean
 lbh_web_process_crashed_cb(WebKitWebView * web_view,
                            gpointer        data)
 {
-    d(g_print("%s\n", __func__));
+    g_debug("%s", __func__);
     return FALSE;
 }
 
@@ -509,7 +507,7 @@ lbh_cid_cb(WebKitURISchemeRequest * request,
     LibBalsaMessageBody *body;
 
     path = webkit_uri_scheme_request_get_path(request);
-    d(g_print("%s path %s\n", __func__, path));
+    g_debug("%s path %s", __func__, path);
 
     if ((body =
          libbalsa_message_get_part_by_id(info->body->message, path))) {
@@ -616,7 +614,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
         webkit_web_context_register_uri_scheme(context, "cid", lbh_cid_cb,
                                                &info, NULL);
         have_registered_cid = TRUE;
-        d(g_print("%s registered cid: scheme\n", __func__));
+        g_debug("%s registered cid: scheme", __func__);
     }
 
     settings = webkit_web_view_get_settings(web_view);
@@ -647,7 +645,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     if (g_regex_match_simple(src_regex, text, G_REGEX_CASELESS, 0)) {
         info->info_bar = lbh_info_bar(info);
         gtk_box_pack_start(GTK_BOX(vbox), info->info_bar, FALSE, FALSE, 0);
-        d(g_print("%s shows info_bar\n", __func__));
+        g_debug("%s shows info_bar", __func__);
     }
 
     webkit_web_view_load_html(web_view, text, NULL);

@@ -119,7 +119,7 @@ static GList *fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
     "balsa-mime-widget-text-new-notified"
 
 #define BALSA_LEFT_MARGIN   2
-#define BALSA_RIGHT_MARGIN 15
+#define BALSA_RIGHT_MARGIN  2
 
 BalsaMimeWidget *
 balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,

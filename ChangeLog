@@ -1,3 +1,14 @@
+2018-07-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Work around MR gtk!236
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text): use
+	GtkWidget margins instead of GtkTextView margins, to make the
+	window shrinkable and to avoid button creep;
+	* src/sendmsg-window.c (create_text_area): ditto, to make the
+	window shrinkable (does not fix the problem when GtkSourceView
+	is used).
+
 2018-07-07  Albrecht Dreß <albrecht.dress@arcor.de>
 
 	Fix HTML rendering with webkit2gtk-4.0 < 2.20

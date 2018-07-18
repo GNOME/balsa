@@ -2875,6 +2875,8 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_text_view_set_left_margin(text_view, 2);
     gtk_text_view_set_right_margin(text_view, 2);
 #else  /* GTK_MR_236_IS_MERGED */
+    gtk_text_view_set_left_margin(text_view, 0);
+    gtk_text_view_set_right_margin(text_view, 0);
     gtk_widget_set_margin_start(bsmsg->text, 2);
     gtk_widget_set_margin_end(bsmsg->text, 2);
 #endif /* GTK_MR_236_IS_MERGED */

@@ -1,5 +1,13 @@
 2018-07-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	More work around MR gtk!236
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text): set
+	  the GtkTextView margins to zero;
+	* src/sendmsg-window.c (create_text_area): ditto.
+
+2018-07-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Work around MR gtk!236
 
 	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text): use

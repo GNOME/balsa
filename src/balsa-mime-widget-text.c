@@ -183,6 +183,8 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget),  BALSA_LEFT_MARGIN);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), BALSA_RIGHT_MARGIN);
 #else  /* GTK_MR_236_IS_MERGED */
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget), 0);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), 0);
     gtk_widget_set_margin_start(mw->widget, BALSA_LEFT_MARGIN);
     gtk_widget_set_margin_end(mw->widget, BALSA_RIGHT_MARGIN);
 #endif /* GTK_MR_236_IS_MERGED */

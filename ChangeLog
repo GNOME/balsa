@@ -1,3 +1,8 @@
+2018-07-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/html.c: Handle the deprecation of GtkAction more
+	  cleanly.
+
 2018-07-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	More work around MR gtk!236

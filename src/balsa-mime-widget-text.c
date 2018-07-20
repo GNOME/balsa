@@ -179,15 +179,15 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
     /* configure text or source view */
     gtk_text_view_set_editable(GTK_TEXT_VIEW(mw->widget), FALSE);
-#if GTK_MR_236_IS_MERGED
+#if GTK_CHECK_VERSION(3, 23, 1)
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget),  BALSA_LEFT_MARGIN);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), BALSA_RIGHT_MARGIN);
-#else  /* GTK_MR_236_IS_MERGED */
+#else  /* GTK_CHECK_VERSION(3, 23, 1) */
     gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget), 0);
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), 0);
     gtk_widget_set_margin_start(mw->widget, BALSA_LEFT_MARGIN);
     gtk_widget_set_margin_end(mw->widget, BALSA_RIGHT_MARGIN);
-#endif /* GTK_MR_236_IS_MERGED */
+#endif /* GTK_CHECK_VERSION(3, 23, 1) */
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(mw->widget), GTK_WRAP_WORD_CHAR);
 
     /* set the message font */

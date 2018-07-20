@@ -1,3 +1,10 @@
+2018-07-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text): MR
+	  gtk!236 has been merged; the fix will be in Gtk 3.24 when it
+	  is released, but for building against unstable versions the
+	  test is GTK_CHECK_VERSION(3, 23, 1).
+
 2018-07-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/html.c: Handle the deprecation of GtkAction more

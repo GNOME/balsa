@@ -2871,15 +2871,15 @@ create_text_area(BalsaSendmsg * bsmsg)
     bsmsg->text = gtk_text_view_new();
 #endif                          /* HAVE_GTKSOURCEVIEW */
     text_view = GTK_TEXT_VIEW(bsmsg->text);
-#if GTK_MR_236_IS_MERGED
+#if GTK_CHECK_VERSION(3, 23, 1)
     gtk_text_view_set_left_margin(text_view, 2);
     gtk_text_view_set_right_margin(text_view, 2);
-#else  /* GTK_MR_236_IS_MERGED */
+#else  /* GTK_CHECK_VERSION(3, 23, 1) */
     gtk_text_view_set_left_margin(text_view, 0);
     gtk_text_view_set_right_margin(text_view, 0);
     gtk_widget_set_margin_start(bsmsg->text, 2);
     gtk_widget_set_margin_end(bsmsg->text, 2);
-#endif /* GTK_MR_236_IS_MERGED */
+#endif /* GTK_CHECK_VERSION(3, 23, 1) */
 
     /* set the message font */
     if (!balsa_app.use_system_fonts) {

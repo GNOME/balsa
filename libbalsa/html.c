@@ -146,13 +146,13 @@ html2text(gchar ** text, gsize len)
  * Experimental support for WebKit2.
  */
 
-#if defined(GTK_DISABLE_DEPRECATED)
 /* WebKitContextMenuItem uses GtkAction, which is deprecated.
- * We don't use it, but it breaks the git-tree build, so we temporarily
- * turn off deprecation warnings: */
-#undef GTK_DISABLE_DEPRECATED
+ * We don't use it, but it breaks the git-tree build, so we just mangle
+ * it: */
+#if defined(GTK_DISABLE_DEPRECATED)
+#define GtkAction GAction
 #include <webkit2/webkit2.h>
-#define GTK_DISABLE_DEPRECATED
+#undef GtkAction
 #else  /* defined(GTK_DISABLE_DEPRECATED) */
 #include <webkit2/webkit2.h>
 #endif /* defined(GTK_DISABLE_DEPRECATED) */

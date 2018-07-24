@@ -575,7 +575,7 @@ case "$use_spell_checker" in
     if $PKG_CONFIG enchant-2 ; then
         PKG_CHECK_MODULES(SPELL, [ enchant-2 ])
     else
-        PKG_CHECK_MODULES(SPELL, [ enchant <= 1.6.0 ])
+        PKG_CHECK_MODULES(SPELL, [ enchant != 1.6.1 ])
     fi
     ;;
     *)

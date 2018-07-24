@@ -479,7 +479,7 @@ elif spell_checker == 'internal'
                          required : false)
   if not spell_dep.found()
     spell_dep = dependency('enchant',
-                           version : '<= 1.6.0')
+                           version : '!= 1.6.1')
   endif
 endif
 

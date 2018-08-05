@@ -82,6 +82,7 @@ typedef struct _SortTuple SortTuple;
 struct _SortTuple {
     guint offset;
     GNode *node;
+    time_t thread_date;
 };
 
 typedef enum {

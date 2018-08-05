@@ -3333,6 +3333,13 @@ mbox_compare_subject(LibBalsaMailboxIndexEntry * message_a,
     return g_ascii_strcasecmp(message_a->subject, message_b->subject);
 }
 
+static gint
+mbox_compare_date(LibBalsaMailboxIndexEntry * message_a,
+                  LibBalsaMailboxIndexEntry * message_b)
+{
+    return message_a->msg_date - message_b->msg_date;
+}
+
 /* Thread date stuff */
 
 typedef struct {
@@ -3380,9 +3387,9 @@ mbox_get_thread_date(const SortTuple *tuple,
 }
 
 static gint
-mbox_compare_date(const SortTuple *a,
-                  const SortTuple *b,
-                  LibBalsaMailbox *mbox)
+mbox_compare_thread_date(const SortTuple *a,
+                         const SortTuple *b,
+                         LibBalsaMailbox *mbox)
 {
     return mbox_get_thread_date(a, mbox) - mbox_get_thread_date(b, mbox);
 }
@@ -3427,7 +3434,10 @@ mbox_compare_func(const SortTuple * a,
 	    retval = mbox_compare_subject(message_a, message_b);
 	    break;
 	case LB_MAILBOX_SORT_DATE:
-	    retval = mbox_compare_date(a, b, mbox);
+            retval =
+                mbox->view->threading_type == LB_MAILBOX_THREADING_FLAT
+                ? mbox_compare_date(message_a, message_b)
+                : mbox_compare_thread_date(a, b, mbox);
 	    break;
 	case LB_MAILBOX_SORT_SIZE:
 	    retval = mbox_compare_size(message_a, message_b);
@@ -3447,7 +3457,10 @@ mbox_compare_func(const SortTuple * a,
                 retval = mbox_compare_subject(message_a, message_b);
                 break;
 	    case LB_MAILBOX_SORT_DATE:
-	        retval = mbox_compare_date(a, b, mbox);
+	        retval =
+                    mbox->view->threading_type == LB_MAILBOX_THREADING_FLAT
+                    ? mbox_compare_date(message_a, message_b)
+                    : mbox_compare_thread_date(a, b, mbox);
 	        break;
             case LB_MAILBOX_SORT_SIZE:
                 retval = mbox_compare_size(message_a, message_b);

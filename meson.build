@@ -190,21 +190,8 @@ if html_widget == 'gtkhtml4'
   html_dep = dependency('libgtkhtml-4.0')
   conf.set('HAVE_GTKHTML4', 1,
     description : 'Defined when GtkHtml-4 can be used.')
-elif html_widget == 'webkit' or html_widget == 'webkit2'
-  if html_widget == 'webkit2'
-    html_dep = dependency('webkit2gtk-4.0')
-    conf.set('USE_WEBKIT2', 1,
-      description : 'Defined when WebKit2 is requested.')
-  else
-    html_dep = dependency('webkit2gtk-3.0',
-                          version  : '>= 1.5.1',
-                          required : false)
-    if html_dep.found()
-      java_dep = dependency('javascriptcoregtk-3.0')
-    else
-      html_dep = dependency('webkit2gtk-3.0')
-    endif
-  endif
+elif html_widget == 'webkit2'
+  html_dep = dependency('webkit2gtk-4.0')
   conf.set('HAVE_WEBKIT', 1,
     description : 'Defined when WebKit can be used.')
 
@@ -670,16 +657,6 @@ or just plain not work. Use it at your own risk. You have been warned.
 ======================================================================
 ''')
 
-endif
-
-if html_widget == 'webkit'
-  message('''
-*** You have configured Balsa to use the old webkitgtk HTML widget.
-*** This widget is no longer being actively developed, and likely
-*** has security issues fixed in the newer webkit2 widget.
-*** Balsa will continue support for the old webkit widget only
-*** while needed by long-term-stable releases of major distributors.
-  ''')
 endif
 
 top_include           = include_directories('.')

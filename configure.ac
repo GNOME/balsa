@@ -82,7 +82,7 @@ AC_ARG_WITH(gss,
                   [with_gss=$withval],[with_gss=no])
 
 AC_ARG_WITH(html-widget,
-            AC_HELP_STRING([--with-html-widget=(no|gtkhtml4|webkit|webkit2)],
+            AC_HELP_STRING([--with-html-widget=(no|gtkhtml4|webkit2)],
                            [select the HTML renderer (default webkit2)]),
             [use_html_widget=$withval],
             [use_html_widget=webkit2])
@@ -289,18 +289,9 @@ case "$use_html_widget" in
              [AC_MSG_ERROR([*** You enabled gtkhtml4 but it was not found.])])])
         AC_DEFINE(HAVE_GTKHTML4,1,[Defined when GtkHtml-4 can be used.])
     ;;
-    webkit | webkit2)
+    webkit2)
         AC_MSG_RESULT([$use_html_widget])
-        if test $use_html_widget = webkit2 ; then
-            PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.0 ])
-            AC_DEFINE(USE_WEBKIT2,1,[Defined when WebKit2 is requested.])
-        else
-            if $PKG_CONFIG --atleast-version=1.5.1 webkitgtk-3.0 ; then
-                PKG_CHECK_MODULES(HTML, [webkitgtk-3.0 javascriptcoregtk-3.0])
-            else
-                PKG_CHECK_MODULES(HTML, [webkitgtk-3.0])
-            fi
-        fi
+        PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.0 ])
         AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
         AC_PATH_PROGS(HTML2TEXT,
                       [python-html2text  \
@@ -759,14 +750,4 @@ if test x"$BALSA_FROM_GIT" = xyes ; then
 	echo "or just plain not work. Use it at your own risk. You have been warned."
 	echo "======================================================================"
 	echo ""
-fi
-
-if test x"$use_html_widget" = xwebkit ; then
-    AC_MSG_WARN([
-*** You have configured Balsa to use the old webkitgtk HTML widget.
-*** This widget is no longer being actively developed, and likely
-*** has security issues fixed in the newer webkit2 widget.
-*** Balsa will continue support for the old webkit widget only
-*** while needed by long-term-stable releases of major distributors.
-                 ])
 fi

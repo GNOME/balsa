@@ -186,14 +186,8 @@ endif
 
 # HTML widget
 #
-if html_widget == 'gtkhtml4'
-  html_dep = dependency('libgtkhtml-4.0')
-  conf.set('HAVE_GTKHTML4', 1,
-    description : 'Defined when GtkHtml-4 can be used.')
-elif html_widget == 'webkit2'
+if html_widget == 'webkit2'
   html_dep = dependency('webkit2gtk-4.0')
-  conf.set('HAVE_WEBKIT', 1,
-    description : 'Defined when WebKit can be used.')
 
   html2text = find_program('python-html2text',
                            'html2markdown',
@@ -215,11 +209,9 @@ elif html_widget == 'webkit2'
   else
     message('You cannot properly quote html-only messags.')
   endif
-endif
 
-if is_variable('html_dep')
   conf.set('HAVE_HTML_WIDGET', 1,
-    description : 'Defined when any HTML widget can be used.')
+    description : 'Defined when an HTML widget can be used.')
   balsa_deps += html_dep
 endif
 
@@ -627,7 +619,7 @@ i18n.merge_file(
 
 summary = [
   '',
-  '======= Final configuration =======',
+  '============= Final configuration =============',
   ' Installing into prefix: @0@'.format(get_option('prefix')),
   'Enable compile warnings: @0@'.format(more_warnings),
   '            HTML widget: @0@'.format(html_widget),
@@ -642,7 +634,7 @@ summary = [
   '           Use Compface: @0@'.format(compface),
   '          Use libsecret: @0@'.format(libsecret),
   '                Use gcr: @0@'.format(gcr),
-  '===================================',
+  '===============================================',
   ''
   ]
 

@@ -82,7 +82,7 @@ AC_ARG_WITH(gss,
                   [with_gss=$withval],[with_gss=no])
 
 AC_ARG_WITH(html-widget,
-            AC_HELP_STRING([--with-html-widget=(no|gtkhtml4|webkit2)],
+            AC_HELP_STRING([--with-html-widget=(no|webkit2)],
                            [select the HTML renderer (default webkit2)]),
             [use_html_widget=$withval],
             [use_html_widget=webkit2])
@@ -282,17 +282,9 @@ AC_SUBST(BALSA_DEFS)
 #
 AC_MSG_CHECKING(whether to use an HTML widget)
 case "$use_html_widget" in
-    gtkhtml4)
-        AC_MSG_RESULT([$use_html_widget])
-        PKG_CHECK_MODULES(HTML, [ libgtkhtml-4.0 ], [],
-          [PKG_CHECK_MODULES(HTML, [ libgtkhtml-4.0 ],[],
-             [AC_MSG_ERROR([*** You enabled gtkhtml4 but it was not found.])])])
-        AC_DEFINE(HAVE_GTKHTML4,1,[Defined when GtkHtml-4 can be used.])
-    ;;
     webkit2)
         AC_MSG_RESULT([$use_html_widget])
         PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.0 ])
-        AC_DEFINE(HAVE_WEBKIT,1,[Defined when WebKit can be used.])
         AC_PATH_PROGS(HTML2TEXT,
                       [python-html2text  \
                        html2markdown     \
@@ -324,7 +316,7 @@ case "$use_html_widget" in
 esac
 
 if test x"$use_html_widget" != xno ; then
-    AC_DEFINE(HAVE_HTML_WIDGET,1,[Defined when any HTML widget can be used.])
+    AC_DEFINE(HAVE_HTML_WIDGET,1,[Defined when an HTML widget can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $HTML_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $HTML_LIBS"
 fi
@@ -620,6 +612,7 @@ if test -d "${srcdir}/.git" ; then
 -DG_DISABLE_SINGLE_INCLUDES \
 -DGDK_DISABLE_DEPRECATED \
 -DGDK_PIXBUF_DISABLE_DEPRECATED \
+-DGDK_PIXBUF_DISABLE_SINGLE_INCLUDES \
 -DGDK_MULTIDEVICE_SAFE \
 -DGMIME_DISABLE_DEPRECATED \
 -DGNOME_DISABLE_DEPRECATED \
@@ -631,11 +624,6 @@ if test -d "${srcdir}/.git" ; then
 -DPANGO_DISABLE_DEPRECATED \
 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 \
 "
-
-    if test x"$use_html_widget" != xgtkhtml2 ; then
-        BALSA_DEFS="$BALSA_DEFS \
-        -DGDK_PIXBUF_DISABLE_SINGLE_INCLUDES"
-    fi
 else
 	BALSA_FROM_GIT=no
 fi

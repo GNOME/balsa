@@ -916,7 +916,7 @@ add_menu_entry(GtkWidget * menu, const gchar * label, GCallback cb,
     GtkWidget *menuitem;
 
     menuitem = label ? gtk_menu_item_new_with_mnemonic(label)
-	: gtk_menu_item_new();
+	: gtk_separator_menu_item_new();
 
     if (cb)
 	g_signal_connect(G_OBJECT(menuitem), "activate",
@@ -1037,6 +1037,14 @@ mb_empty_trash_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
     empty_trash(balsa_app.main_window);
 }
 
+gboolean
+balsa_mailbox_node_is_imap(const BalsaMailboxNode *mbnode)
+{
+	return (mbnode != NULL) &&
+		(mbnode->server != NULL) &&
+		(strcmp(mbnode->server->protocol, "imap") == 0);
+}
+
 GtkWidget *
 balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 {
@@ -1060,13 +1068,13 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 		   G_CALLBACK(mailbox_conf_add_maildir_cb), NULL);
     add_menu_entry(submenu, _("Local M_H mailbox…"),
 		   G_CALLBACK(mailbox_conf_add_mh_cb), NULL);
-    add_menu_entry(submenu, _("Remote _IMAP mailbox…"), 
-		   G_CALLBACK(mailbox_conf_add_imap_cb), NULL);
     add_menu_entry(submenu, NULL, NULL, mbnode);
     add_menu_entry(submenu, _("Remote IMAP _folder…"), 
 		   G_CALLBACK(folder_conf_add_imap_cb), NULL);
-    add_menu_entry(submenu, _("Remote IMAP _subfolder…"), 
-		   G_CALLBACK(folder_conf_add_imap_sub_cb), NULL);
+    if (balsa_mailbox_node_is_imap(mbnode)) {
+    	add_menu_entry(submenu, _("Remote IMAP _subfolder…"),
+		   G_CALLBACK(folder_conf_add_imap_sub_cb), mbnode);
+    }
     gtk_widget_show(submenu);
     
     /* Translators: popup menu item "New" mailbox or folder */

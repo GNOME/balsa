@@ -24,11 +24,6 @@
             translatable='yes'>Local MH mailbox…</attribute>
           <attribute name='action'>app.new-mh</attribute>
         </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Remote IMAP mailbox…</attribute>
-          <attribute name='action'>app.new-imap-box</attribute>
-        </item>
       </section>
       <section>
         <item>

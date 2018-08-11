@@ -111,4 +111,7 @@ void balsa_mailbox_node_clear_children_cache(BalsaMailboxNode * mbnode);
 /* applicable to any mailbox node */
 void balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode);
 
+/* return if the passed node resides on a remote IMAP server */
+gboolean balsa_mailbox_node_is_imap(const BalsaMailboxNode *mbnode);
+
 #endif

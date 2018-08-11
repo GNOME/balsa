@@ -795,15 +795,15 @@ set_ok_sensitive(GtkDialog * dialog)
 void
 folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 {
-    GtkWidget *content, *grid, *button, *label, *hbox;
+    GtkWidget *grid, *button, *label, *hbox;
     SubfolderDialogData *sdd;
     static SubfolderDialogData *sdd_new = NULL;
     guint row;
 
-    /* Allow only one dialog per mailbox node, and one with mn == NULL
-     * for creating a new subfolder. */
-    sdd = mn ? g_object_get_data(G_OBJECT(mn), BALSA_FOLDER_CONF_IMAP_KEY)
-             : sdd_new;
+    g_assert(mn != NULL);
+
+    /* Allow only one dialog per mailbox node */
+    sdd = g_object_get_data(G_OBJECT(mn), BALSA_FOLDER_CONF_IMAP_KEY);
     if (sdd) {
         gtk_window_present(GTK_WINDOW(sdd->dialog));
         return;
@@ -812,7 +812,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     sdd = g_new(SubfolderDialogData, 1);
     sdd->ok = (CommonDialogFunc) subfolder_conf_clicked_ok;
 
-    if ((sdd->mbnode = mn)) {
+    sdd->mbnode = mn;
 	/* update */
 	if (!mn->mailbox) {
             balsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -823,11 +823,6 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 	}
 	sdd->parent = mn->parent;
 	sdd->old_folder = mn->mailbox->name;
-    } else {
-	/* create */
-        sdd->old_folder = NULL;
-        sdd->parent = NULL;
-    }
     sdd->old_parent = sdd->mbnode ? sdd->mbnode->parent->dir : NULL;
 
     sdd->dialog = 
@@ -836,7 +831,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                     GTK_WINDOW(balsa_app.main_window),
                     GTK_DIALOG_DESTROY_WITH_PARENT | /* must NOT be modal */
                     libbalsa_dialog_flags(),
-                    mn ? _("_Update") : _("_Create"), GTK_RESPONSE_OK,
+                    _("_Update"), GTK_RESPONSE_OK,
                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                     _("_Help"), GTK_RESPONSE_HELP,
                     NULL));
@@ -863,14 +858,8 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
     gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
-    if (mn)
-        content = grid;
-    else {
-        content = gtk_frame_new(_("Create subfolder"));
-        gtk_container_add(GTK_CONTAINER(content), grid);
-    }
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(sdd->dialog)),
-                       content, TRUE, TRUE, 0);
+                       grid, TRUE, TRUE, 0);
  
     row = 0;
     /* INPUT FIELD CREATION */
@@ -904,9 +893,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
     gtk_grid_attach(GTK_GRID(grid), hbox, 1, row, 1, 1);
 
-    if (!mn)
-        validate_sub_folder(NULL, sdd);
-    else {
+    {
         static const char *std_acls[] = {
             "lrs", N_("read-only"),
             "lrswipkxte", N_("read-write"),
@@ -1075,7 +1062,66 @@ folder_conf_add_imap_cb(GtkWidget * widget, gpointer data)
 void
 folder_conf_add_imap_sub_cb(GtkWidget * widget, gpointer data)
 {
-    folder_conf_imap_sub_node(NULL);
+	BalsaMailboxNode *mbnode = BALSA_MAILBOX_NODE(data);
+
+	if (mbnode != NULL) {
+		GtkWidget *dialog;
+		GtkWidget *grid;
+		GtkWidget *plabel;
+		GtkWidget *label;
+		GtkWidget *name_entry;
+		gint row;
+		int result;
+
+		dialog = gtk_dialog_new_with_buttons(_("Create IMAP subfolder"),
+             GTK_WINDOW(balsa_app.main_window),
+             GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+             _("_Create"), GTK_RESPONSE_ACCEPT,
+             _("_Cancel"), GTK_RESPONSE_REJECT,
+             NULL);
+		gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_REJECT);
+	    grid = libbalsa_create_grid();
+	    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
+	    gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
+	    gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
+	    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), grid, TRUE, TRUE, 0);
+
+	    row = 0;
+	    (void) libbalsa_create_grid_label(_("Subfolder of:"), grid, row);
+	    plabel = gtk_label_new(mbnode->mailbox != NULL ? mbnode->dir : _("server (top level)"));
+	    gtk_widget_set_halign(plabel, GTK_ALIGN_START);
+	    gtk_widget_set_hexpand(plabel, TRUE);
+	    gtk_grid_attach(GTK_GRID(grid), plabel, 1, row++, 1, 1);
+	    label = libbalsa_create_grid_label(_("_Folder name:"), grid, row);
+	    name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, row, NULL, label);
+	    gtk_widget_show_all(grid);
+
+	    result = gtk_dialog_run(GTK_DIALOG(dialog));
+	    if (result == GTK_RESPONSE_ACCEPT) {
+	    	const gchar *new_name;
+
+	        new_name = gtk_entry_get_text(GTK_ENTRY(name_entry));
+	        if ((mbnode->delim != 0) && (strchr(new_name, mbnode->delim) != NULL)) {
+	        	balsa_information(LIBBALSA_INFORMATION_ERROR,
+	        		_("The character “%c” is used as hierarchy separator by the server "
+	        		  "and therefore not permitted in the folder name."),
+					mbnode->delim);
+	        } else {
+	        	GError *err = NULL;
+
+	        	if (libbalsa_imap_new_subfolder(mbnode->dir, new_name, mbnode->subscribed, mbnode->server, &err)) {
+	        		/* see it as server sees it: */
+	        		balsa_mailbox_node_rescan(mbnode);
+	        	} else {
+	        		balsa_information(LIBBALSA_INFORMATION_ERROR,
+	        			_("Folder creation failed. Reason: %s"),
+						err ? err->message : "unknown");
+	        		g_clear_error(&err);
+	        	}
+	        }
+	    }
+	    gtk_widget_destroy(dialog);
+	}
 }
 
 void

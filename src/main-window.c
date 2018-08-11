@@ -867,14 +867,6 @@ new_mh_activated(GSimpleAction * action,
 }
 
 static void
-new_imap_box_activated(GSimpleAction * action,
-                       GVariant      * parameter,
-                       gpointer        user_data)
-{
-    mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_IMAP);
-}
-
-static void
 new_imap_folder_activated(GSimpleAction * action,
                           GVariant      * parameter,
                           gpointer        user_data)
@@ -887,7 +879,11 @@ new_imap_subfolder_activated(GSimpleAction * action,
                              GVariant      * parameter,
                              gpointer        user_data)
 {
-    folder_conf_imap_sub_node(NULL);
+	BalsaMailboxNode *mbnode = balsa_mblist_get_selected_node(balsa_app.mblist);
+
+	if (balsa_mailbox_node_is_imap(mbnode)) {
+		folder_conf_add_imap_sub_cb(NULL, mbnode);
+	}
 }
 
 static void
@@ -1926,7 +1922,6 @@ bw_add_app_action_entries(GActionMap * action_map, gpointer user_data)
         {"new-mbox",              new_mbox_activated},
         {"new-maildir",           new_maildir_activated},
         {"new-mh",                new_mh_activated},
-        {"new-imap-box",          new_imap_box_activated},
         {"new-imap-folder",       new_imap_folder_activated},
         {"new-imap-subfolder",    new_imap_subfolder_activated},
         {"toolbars",              toolbars_activated},
@@ -2454,6 +2449,7 @@ bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 
     bw_actions_set_enabled(window, mailbox_actions,
                            G_N_ELEMENTS(mailbox_actions), enable);
+    bw_action_set_enabled(window, "new-imap-subfolder", balsa_mailbox_node_is_imap(mbnode));
     bw_action_set_enabled(window, "next-message",
                           index && index->next_message);
     bw_action_set_enabled(window, "previous-message",

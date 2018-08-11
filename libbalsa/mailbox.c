@@ -3340,6 +3340,62 @@ mbox_compare_date(LibBalsaMailboxIndexEntry * message_a,
     return message_a->msg_date - message_b->msg_date;
 }
 
+/* Thread date stuff */
+
+typedef struct {
+    time_t           thread_date;
+    LibBalsaMailbox *mbox;
+} LibBalsaMailboxThreadDateInfo;
+
+static gboolean
+mbox_get_thread_date_traverse_func(GNode   *node,
+                                   gpointer data)
+{
+    LibBalsaMailboxThreadDateInfo *info = data;
+    guint msgno = GPOINTER_TO_UINT(node->data);
+    LibBalsaMailboxIndexEntry *message =
+        g_ptr_array_index(info->mbox->mindex, msgno - 1);
+
+    if (message != NULL) {
+        time_t msg_date = message->msg_date;
+
+        if (msg_date > info->thread_date)
+            info->thread_date = msg_date;
+
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+static time_t
+mbox_get_thread_date(const SortTuple *tuple,
+                     LibBalsaMailbox *mbox)
+{
+    if (tuple->thread_date == 0) {
+        LibBalsaMailboxThreadDateInfo info = { 0, mbox };
+
+        g_node_traverse(tuple->node, G_IN_ORDER, G_TRAVERSE_ALL, -1,
+                        mbox_get_thread_date_traverse_func, &info);
+
+        /* Cast away the 'const' qualifier so that we can cache the
+         * thread date: */
+        ((SortTuple *) tuple)->thread_date = info.thread_date;
+    }
+
+    return tuple->thread_date;
+}
+
+static gint
+mbox_compare_thread_date(const SortTuple *a,
+                         const SortTuple *b,
+                         LibBalsaMailbox *mbox)
+{
+    return mbox_get_thread_date(a, mbox) - mbox_get_thread_date(b, mbox);
+}
+
+/* End of thread date stuff */
+
 static gint
 mbox_compare_size(LibBalsaMailboxIndexEntry * message_a,
                   LibBalsaMailboxIndexEntry * message_b)
@@ -3378,7 +3434,10 @@ mbox_compare_func(const SortTuple * a,
 	    retval = mbox_compare_subject(message_a, message_b);
 	    break;
 	case LB_MAILBOX_SORT_DATE:
-	    retval = mbox_compare_date(message_a, message_b);
+            retval =
+                mbox->view->threading_type == LB_MAILBOX_THREADING_FLAT
+                ? mbox_compare_date(message_a, message_b)
+                : mbox_compare_thread_date(a, b, mbox);
 	    break;
 	case LB_MAILBOX_SORT_SIZE:
 	    retval = mbox_compare_size(message_a, message_b);
@@ -3397,9 +3456,12 @@ mbox_compare_func(const SortTuple * a,
             case LB_MAILBOX_SORT_SUBJECT:
                 retval = mbox_compare_subject(message_a, message_b);
                 break;
-            case LB_MAILBOX_SORT_DATE:
-                retval = mbox_compare_date(message_a, message_b);
-                break;
+	    case LB_MAILBOX_SORT_DATE:
+	        retval =
+                    mbox->view->threading_type == LB_MAILBOX_THREADING_FLAT
+                    ? mbox_compare_date(message_a, message_b)
+                    : mbox_compare_thread_date(a, b, mbox);
+	        break;
             case LB_MAILBOX_SORT_SIZE:
                 retval = mbox_compare_size(message_a, message_b);
                 break;
@@ -3468,6 +3530,7 @@ lbm_sort(LibBalsaMailbox * mbox, GNode * parent)
             /* We have the sort fields. */
             sort_tuple.offset = node_array->len;
             sort_tuple.node = tmp_node;
+            sort_tuple.thread_date = 0;
             g_array_append_val(sort_array, sort_tuple);
         }
         g_ptr_array_add(node_array, tmp_node);

@@ -1,3 +1,23 @@
+2018-08-11  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Improve IMAP folder configuration
+	Commit b821fb65cec529f52fee7757c870fb9ef131d653 was erased from
+	the git log by a later merge--oops!
+
+	* src/folder-conf.c: simplify folder_conf_imap_sub_node()
+	  which is now used only for modifying an existing folder,
+	  not for creating a new one;
+	  put the logic for the latter into folder_conf_add_imap_sub_cb().
+	  Note that folder_conf_imap_sub_node() still needs some refactoring…
+	* src/mailbox-node.[ch]: replace empty items by separators in add_menu_entry();
+	  export helper balsa_mailbox_node_is_imap()
+	  indicating if a BalsaMailboxNode is on an IMAP server;
+	  in balsa_mailbox_node_get_context_menu() remove the “Remote IMAP folder”
+	  and show “Remote IMAP subfolder” for IMAP BalsaMailboxNodes only
+	* src/main-window.c: “Remote IMAP folder”, activate “Remote IMAP subfolder”
+	  for selected IMAP BalsaMailboxNodes only
+	* ui/main-window.ui: remove “Remote IMAP folder” from the ui
+
 2018-07-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* meson.build: Change the pkg-config test for enchant from

@@ -186,27 +186,8 @@ endif
 
 # HTML widget
 #
-if html_widget == 'gtkhtml4'
-  html_dep = dependency('libgtkhtml-4.0')
-  conf.set('HAVE_GTKHTML4', 1,
-    description : 'Defined when GtkHtml-4 can be used.')
-elif html_widget == 'webkit' or html_widget == 'webkit2'
-  if html_widget == 'webkit2'
-    html_dep = dependency('webkit2gtk-4.0')
-    conf.set('USE_WEBKIT2', 1,
-      description : 'Defined when WebKit2 is requested.')
-  else
-    html_dep = dependency('webkit2gtk-3.0',
-                          version  : '>= 1.5.1',
-                          required : false)
-    if html_dep.found()
-      java_dep = dependency('javascriptcoregtk-3.0')
-    else
-      html_dep = dependency('webkit2gtk-3.0')
-    endif
-  endif
-  conf.set('HAVE_WEBKIT', 1,
-    description : 'Defined when WebKit can be used.')
+if html_widget == 'webkit2'
+  html_dep = dependency('webkit2gtk-4.0')
 
   html2text = find_program('python-html2text',
                            'html2markdown',
@@ -228,11 +209,9 @@ elif html_widget == 'webkit' or html_widget == 'webkit2'
   else
     message('You cannot properly quote html-only messags.')
   endif
-endif
 
-if is_variable('html_dep')
   conf.set('HAVE_HTML_WIDGET', 1,
-    description : 'Defined when any HTML widget can be used.')
+    description : 'Defined when an HTML widget can be used.')
   balsa_deps += html_dep
 endif
 
@@ -640,7 +619,7 @@ i18n.merge_file(
 
 summary = [
   '',
-  '======= Final configuration =======',
+  '============= Final configuration =============',
   ' Installing into prefix: @0@'.format(get_option('prefix')),
   'Enable compile warnings: @0@'.format(more_warnings),
   '            HTML widget: @0@'.format(html_widget),
@@ -655,7 +634,7 @@ summary = [
   '           Use Compface: @0@'.format(compface),
   '          Use libsecret: @0@'.format(libsecret),
   '                Use gcr: @0@'.format(gcr),
-  '===================================',
+  '===============================================',
   ''
   ]
 
@@ -670,16 +649,6 @@ or just plain not work. Use it at your own risk. You have been warned.
 ======================================================================
 ''')
 
-endif
-
-if html_widget == 'webkit'
-  message('''
-*** You have configured Balsa to use the old webkitgtk HTML widget.
-*** This widget is no longer being actively developed, and likely
-*** has security issues fixed in the newer webkit2 widget.
-*** Balsa will continue support for the old webkit widget only
-*** while needed by long-term-stable releases of major distributors.
-  ''')
 endif
 
 top_include           = include_directories('.')

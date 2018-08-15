@@ -65,10 +65,9 @@ Note: requires GpgME version >= 1.5.0
 	This enables GSSAPI Kerberos based authentication scheme. 
 Specify the kerberos directory as the argument.
 
---with-html-widget=(no|gtkhtml4|webkit|webkit2)
-        Choose preferred HTML renderer library.  Note that webkit is
-not actively supported any more and thus not recommended.
-When using webkit or webkit2, in order to quote html-only messages
+--with-html-widget=(no|gtkhtml4|webkit2)
+        Choose preferred HTML renderer library.
+When using webkit2, in order to quote html-only messages
 it is recommended to install a html-to-text conversion tool.  Supported
 tools are python-html2text, html2markdown, html2markdown.py2,
 html2markdown.py3 and html2text.

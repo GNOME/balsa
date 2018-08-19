@@ -756,12 +756,10 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
                                      mailbox->persistent_view_filter, TRUE);
 
     if (local->thread_id) {
-        /* Rethread immediately. */
-        LibBalsaMailboxThreadingType cur_type =
-            libbalsa_mailbox_get_threading_type(mailbox);
         g_source_remove(local->thread_id);
         local->thread_id = 0;
-        libbalsa_mailbox_set_threading(mailbox, cur_type);
+        /* Rethread immediately. */
+        libbalsa_mailbox_set_threading(mailbox);
     }
 
     if (local->save_tree_id) {
@@ -1102,9 +1100,8 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
  * Threading
  */
 
-static void lbml_threading_jwz(LibBalsaMailbox * mailbox);
-static void lbml_threading_simple(LibBalsaMailbox * mailbox,
-				  LibBalsaMailboxThreadingType th_type);
+static void lbml_thread_messages(LibBalsaMailbox *mailbox, gboolean subject_gather);
+static void lbml_threading_flat(LibBalsaMailbox * mailbox);
 
 void 
 libbalsa_mailbox_local_set_threading_info(LibBalsaMailboxLocal * local)
@@ -1119,11 +1116,13 @@ lbml_set_threading(LibBalsaMailbox * mailbox,
 {
     switch (thread_type) {
     case LB_MAILBOX_THREADING_JWZ:
-        lbml_threading_jwz(mailbox);
+        lbml_thread_messages(mailbox, TRUE);
+        break;
+    case LB_MAILBOX_THREADING_SIMPLE:
+        lbml_thread_messages(mailbox, FALSE);
         break;
     case LB_MAILBOX_THREADING_FLAT:
-    case LB_MAILBOX_THREADING_SIMPLE:
-        lbml_threading_simple(mailbox, thread_type);
+        lbml_threading_flat(mailbox);
         break;
     }
 }
@@ -1138,8 +1137,9 @@ lbml_set_threading_idle_cb(LbmlSetThreadingInfo * info)
 {
     lbml_set_threading(info->mailbox, info->thread_type);
     g_object_unref(info->mailbox);
-    g_slice_free(LbmlSetThreadingInfo, info);
-    return FALSE;
+    g_free(info);
+
+    return G_SOURCE_REMOVE;
 }
 
 static void
@@ -1187,7 +1187,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
     if (libbalsa_am_i_subthread()) {
         LbmlSetThreadingInfo *info;
 
-        info = g_slice_new(LbmlSetThreadingInfo);
+        info = g_new(LbmlSetThreadingInfo, 1);
         info->mailbox = g_object_ref(mailbox);
         info->thread_type = thread_type;
         g_idle_add((GSourceFunc) lbml_set_threading_idle_cb, info);
@@ -1291,12 +1291,8 @@ lbm_local_thread_idle(LibBalsaMailboxLocal * local)
 
     libbalsa_lock_mailbox(mailbox);
 
-    if (MAILBOX_OPEN(mailbox)) {
-        LibBalsaMailboxThreadingType cur_type =
-            libbalsa_mailbox_get_threading_type(mailbox);
-
-        libbalsa_mailbox_set_threading(mailbox, cur_type);
-    }
+    if (MAILBOX_OPEN(mailbox))
+        libbalsa_mailbox_set_threading(mailbox);
     local->thread_id = 0;
 
     libbalsa_unlock_mailbox(mailbox);
@@ -1421,12 +1417,11 @@ libbalsa_mailbox_local_get_msg_part(LibBalsaMessage *msg,
 /*  Start of threading functions  */
 /*--------------------------------*/
 /*
- * This code includes two message threading functions.
- * The first is the implementation of jwz's algorithm describled at
- * http://www.jwz.org/doc/threading.html . The another is very simple and 
- * trivial one. If you confirm that your mailbox includes every threaded 
- * messages, the later will be enough. Those functions are selectable on
- * each mailbox by setting the 'type' member in BalsaIndex. If you don't need
+ * Threading is implementated using jwz's algorithm describled at
+ * http://www.jwz.org/doc/threading.html. It is implemented with an option
+ * to avoid the "subject gather" step, which is needed only if some
+ * messages do not have a valid and complete "References" header, and
+ * can otherwise be annoying. If you don't need
  * message threading functionality, just specify 'LB_MAILBOX_THREADING_FLAT'. 
  *
  * ymnk@jcraft.com
@@ -1475,7 +1470,7 @@ lbml_info_free(ThreadingInfo * ti)
 }
 
 static void
-lbml_threading_jwz(LibBalsaMailbox * mailbox)
+lbml_thread_messages(LibBalsaMailbox * mailbox, gboolean subject_gather)
 {
     /* This implementation of JWZ's algorithm uses a second tree, rooted
      * at ti.root, for the message IDs.  Each node in the second tree
@@ -1495,12 +1490,14 @@ lbml_threading_jwz(LibBalsaMailbox * mailbox)
     g_node_traverse(ti.root, G_POST_ORDER, G_TRAVERSE_ALL, -1,
 		    (GNodeTraverseFunc) lbml_prune, &ti);
 
-    /* Do the evil subject gather and merge on the second tree. */
-    ti.subject_table = g_hash_table_new(g_str_hash, g_str_equal);
-    g_node_children_foreach(ti.root, G_TRAVERSE_ALL,
-			    (GNodeForeachFunc) lbml_subject_gather, &ti);
-    g_node_children_foreach(ti.root, G_TRAVERSE_ALL,
-			    (GNodeForeachFunc) lbml_subject_merge, &ti);
+    if (subject_gather) {
+        /* Do the evil subject gather and merge on the second tree. */
+        ti.subject_table = g_hash_table_new(g_str_hash, g_str_equal);
+        g_node_children_foreach(ti.root, G_TRAVERSE_ALL,
+                                (GNodeForeachFunc) lbml_subject_gather, &ti);
+        g_node_children_foreach(ti.root, G_TRAVERSE_ALL,
+                                (GNodeForeachFunc) lbml_subject_merge, &ti);
+    }
 
     /* Traverse the second tree and reparent corresponding nodes in the
      * mailbox's msg_tree. */
@@ -1991,86 +1988,26 @@ lbml_clear_empty(GNode * msg_tree)
 }
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
 
-/* yet another message threading function */
+/*------------------------------*/
+/*       Flat threading         */
+/*------------------------------*/
 
-static gboolean lbml_insert_message(GNode * node, ThreadingInfo * ti);
-static gboolean lbml_thread_message(GNode * node, ThreadingInfo * ti);
+static gboolean
+lbml_unthread_message(GNode * node, LibBalsaMailbox * mailbox)
+{
+    if (node->parent != NULL && node->parent != mailbox->msg_tree)
+        libbalsa_mailbox_unlink_and_prepend(mailbox, node, mailbox->msg_tree);
+
+    return FALSE;
+}
 
 static void
-lbml_threading_simple(LibBalsaMailbox * mailbox,
-		      LibBalsaMailboxThreadingType type)
+lbml_threading_flat(LibBalsaMailbox * mailbox)
 {
-    GNode *msg_tree = mailbox->msg_tree;
-    ThreadingInfo ti;
-
-    lbml_info_setup(mailbox, &ti);
-
-    if (type == LB_MAILBOX_THREADING_SIMPLE)
-	g_node_traverse(msg_tree, G_POST_ORDER, G_TRAVERSE_ALL,
-			-1, (GNodeTraverseFunc) lbml_insert_message, &ti);
-
-    ti.type = type;
-    g_node_traverse(msg_tree, G_POST_ORDER, G_TRAVERSE_ALL, -1,
-		    (GNodeTraverseFunc) lbml_thread_message, &ti);
-
-#ifdef MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT
-    lbml_clear_empty(msg_tree);
-#endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
-
-    lbml_info_free(&ti);
+    g_node_traverse(mailbox->msg_tree, G_POST_ORDER, G_TRAVERSE_ALL, -1,
+		    (GNodeTraverseFunc) lbml_unthread_message, mailbox);
 }
 
-static gboolean
-lbml_insert_message(GNode * node, ThreadingInfo * ti)
-{
-    LibBalsaMailboxLocalInfo *info;
-
-    if (!node->parent)
-	return FALSE;
-
-    info = lbml_get_info(node, ti);
-    if (!info)
-	return FALSE;
-
-    if (info->message_id)
-	g_hash_table_insert(ti->id_table, info->message_id, node);
-
-    return FALSE;
-}
-
-static gboolean
-lbml_thread_message(GNode * node, ThreadingInfo * ti)
-{
-    if (!node->parent)
-        return FALSE;
-
-    if (ti->type == LB_MAILBOX_THREADING_FLAT) {
-        if (node->parent != ti->mailbox->msg_tree)
-            libbalsa_mailbox_unlink_and_prepend(ti->mailbox, node,
-                                                ti->mailbox->msg_tree);
-    } else {
-        LibBalsaMailboxLocalInfo *info;
-        GList *refs;
-        GNode *parent = NULL;
-
-        info = lbml_get_info(node, ti);
-        if (!info)
-            return FALSE;
-
-        refs = info->refs_for_threading;
-        if (refs)
-            parent = g_hash_table_lookup(ti->id_table,
-                                         g_list_last(refs)->data);
-
-        if (!parent)
-            parent = ti->mailbox->msg_tree;
-        if (parent != node->parent && parent != node
-            && !g_node_is_ancestor(node, parent))
-            libbalsa_mailbox_unlink_and_prepend(ti->mailbox, node, parent);
-    }
-
-    return FALSE;
-}
 /*------------------------------*/
 /*  End of threading functions  */
 /*------------------------------*/

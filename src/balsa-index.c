@@ -2058,7 +2058,8 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
 
 /* balsa_index_set_threading_type: public method. */
 void
-balsa_index_set_threading_type(BalsaIndex * index, int thtype)
+balsa_index_set_threading_type(BalsaIndex * index,
+                               LibBalsaMailboxThreadingType threading_type)
 {
     LibBalsaMailbox *mailbox;
 
@@ -2067,12 +2068,15 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     mailbox = index->mailbox_node->mailbox;
     g_return_if_fail(mailbox != NULL);
 
-    if (thtype != LB_MAILBOX_THREADING_FLAT
+    if (threading_type == libbalsa_mailbox_get_threading_type(mailbox))
+        return;
+
+    if (threading_type != LB_MAILBOX_THREADING_FLAT
         && !libbalsa_mailbox_prepare_threading(mailbox, 0))
         return;
-    libbalsa_mailbox_set_threading_type(mailbox, thtype);
 
-    libbalsa_mailbox_set_threading(mailbox, thtype);
+    libbalsa_mailbox_set_threading_type(mailbox, threading_type);
+    libbalsa_mailbox_set_threading(mailbox);
     balsa_index_update_tree(index, balsa_app.expand_tree);
 }
 

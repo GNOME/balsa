@@ -101,7 +101,7 @@ typedef enum {
  * update pref-manager.c so the preferences work correctly */
 typedef enum {
     LB_MAILBOX_THREADING_FLAT,
-    LB_MAILBOX_THREADING_SIMPLE,
+    LB_MAILBOX_THREADING_SIMPLE, /* JWZ without the subject-gather step */
     LB_MAILBOX_THREADING_JWZ
 } LibBalsaMailboxThreadingType;
 
@@ -518,8 +518,7 @@ gboolean libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
     libbalsa_mailbox_set_msg_tree and libbalsa_mailbox_unlink_and_prepend
     are helpers for the subclass methods.
 */
-void libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
-				    LibBalsaMailboxThreadingType thread_type);
+void libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox);
 void libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox,
 				   GNode * msg_tree);
 void libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,

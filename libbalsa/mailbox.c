@@ -570,9 +570,8 @@ libbalsa_mailbox_free_mindex(LibBalsaMailbox *mailbox)
     }
 }
 
-static gboolean lbm_set_threading(LibBalsaMailbox * mailbox,
-                                  LibBalsaMailboxThreadingType
-                                  thread_type);
+static gboolean lbm_set_threading(LibBalsaMailbox * mailbox);
+
 gboolean
 libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
 {
@@ -1345,8 +1344,7 @@ lbm_need_threading_idle_cb(LibBalsaMailbox *mailbox)
 {
     libbalsa_lock_mailbox(mailbox);
 
-    lbm_set_threading(mailbox, mailbox->view->threading_type);
-
+    lbm_set_threading(mailbox);
     mailbox->need_threading_idle_id = 0;
 
     libbalsa_unlock_mailbox(mailbox);
@@ -2198,7 +2196,7 @@ libbalsa_mailbox_set_view_filter(LibBalsaMailbox *mailbox,
     if (update_immediately && mailbox->view_filter_pending) {
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->update_view_filter(mailbox,
                                                                 cond);
-        retval = lbm_set_threading(mailbox, mailbox->view->threading_type);
+        retval = lbm_set_threading(mailbox);
         mailbox->view_filter_pending = FALSE;
     }
 
@@ -2264,18 +2262,18 @@ lbm_set_threading_idle_cb(LibBalsaMailbox * mailbox)
 {
     lbm_check_and_sort(mailbox);
     g_object_unref(mailbox);
-    return FALSE;
+
+    return G_SOURCE_REMOVE;
 }
 
 static gboolean
-lbm_set_threading(LibBalsaMailbox * mailbox,
-                  LibBalsaMailboxThreadingType thread_type)
+lbm_set_threading(LibBalsaMailbox * mailbox)
 {
     if (!MAILBOX_OPEN(mailbox))
         return FALSE;
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
-                                                       thread_type);
+                                                       mailbox->view->threading_type);
     if (libbalsa_am_i_subthread()) {
         g_idle_add((GSourceFunc) lbm_set_threading_idle_cb, g_object_ref(mailbox));
     } else {
@@ -2286,14 +2284,13 @@ lbm_set_threading(LibBalsaMailbox * mailbox,
 }
 
 void
-libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
-                               LibBalsaMailboxThreadingType thread_type)
+libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox)
 {
     g_return_if_fail(mailbox != NULL);
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     libbalsa_lock_mailbox(mailbox);
-    lbm_set_threading(mailbox, thread_type);
+    lbm_set_threading(mailbox);
     libbalsa_unlock_mailbox(mailbox);
 }
 

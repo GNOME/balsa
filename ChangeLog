@@ -27,31 +27,46 @@
 	* src/pref-manager.c: clean up menu
 	* src/save-restore.c: migrate IMAP mailboxes to IMAP folders
 
-2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+2018-08-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
-	Make BalsaWindow::progress_bar a weak pointer
+	Simplify threading
 
-	* src/main-window.c (balsa_window_new), (bw_progress_timeout),
-	  (balsa_window_increase_activity), (balsa_window_decrease_activity),
-	  (balsa_window_setup_progress), (balsa_window_increment_progress):
-	  make BalsaWindow::progress_bar a weak pointer and test whether
-	  it is NULL before dereferencing.
+	Change THREADING_SIMPLE to mean JWZ without the 'subject gather'
+	phase, and change the UI to enable or disable threading instead
+	of offering the choice of threading algorithms.
 
-2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+	Still to do: add UI for choosing JWZ instead of SIMPLE.
 
-	Check for valid msgno
-
-	* libbalsa/mailbox.c (mbox_get_thread_date_traverse_func): check
-	that the msgno that we get from the GNode is in the valid range
-	1 <= msgno <= mindex->len.
-
-2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
-
-	Clear timeout source id in handler
-
-	* libbalsa/mailbox_local.c (lbm_local_sync_real),
-	(lbm_local_sync_idle): clear LibBalsaMailboxLocal::sync_id in
-	the timeout handler, not in the thread that it creates.
+	* libbalsa/mailbox.c (lbm_need_threading_idle_cb),
+	(libbalsa_mailbox_set_view_filter), (lbm_set_threading_idle_cb),
+	(lbm_set_threading), (libbalsa_mailbox_set_threading): do not
+	pass threading type to _set_threading, just get it from the
+	view.
+	* libbalsa/mailbox.h: ditto.
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_close_mailbox),
+	(lbml_set_threading), (lbml_set_threading_idle_cb),
+	(libbalsa_mailbox_local_set_threading), (lbm_local_thread_idle),
+	(lbml_thread_messages), (lbml_unthread_message),
+	(lbml_threading_flat): change THREADING_SIMPLE to mean JWZ
+	without the 'subject gather' phase, and simplify THREADING_FLAT.
+	* src/balsa-index.c (balsa_index_set_threading_type): do nothing
+	if the type has not changed.
+	* src/balsa-index.h: the threading type is
+	LibBalsaMailboxThreadingType.
+	* src/main-window.c (threading_change_state),
+	(bw_add_win_action_entries), (balsa_window_new),
+	(bw_enable_expand_collapse), (bw_enable_mailbox_menus),
+	(bw_set_thread_messages), (bw_real_open_mbnode_idle_cb): remove
+	the threading type radio buttons, and replace them with a
+	'Thread messages' check-box.
+	* src/main.c (balsa_get_stats): new API for
+	libbalsa_mailbox_set_threading.
+	* src/pref-manager.c (update_view_defaults), (apply_prefs),
+	(set_prefs), (pm_grid_add_threading_group),
+	(open_preferences_manager): remove the threading type combo box,
+	and replace it with a 'Thread messages by default' check-box.
+	* ui/main-window.ui: remove the threading type radio buttons,
+	and replace them with a 'Thread messages' check-box.
 
 2018-08-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 

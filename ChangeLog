@@ -37,6 +37,16 @@
 	  make BalsaWindow::progress_bar a weak pointer and test whether
 	  it is NULL before dereferencing.
 
+2018-08-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Limit use of LibBalsaMailboxThreadingType in src/ to balsa-index.c
+
+	* src/main-window.c (threading_change_state): pass
+	gboolean thread_messages to balsa-index, instead of
+	LibBalsaMailboxThreadingType threading_type;
+	* src/balsa-index.c (balsa_index_set_thread_messages): ditto;
+	* src/balsa-index.h: change API.
+
 2018-08-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Simplify threading

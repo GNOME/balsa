@@ -1863,16 +1863,13 @@ threading_change_state(GSimpleAction * action,
     BalsaWindow *window = BALSA_WINDOW(user_data);
     GtkWidget *index;
     gboolean thread_messages;
-    LibBalsaMailboxThreadingType threading_type;
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
 
     thread_messages = g_variant_get_boolean(state);
-    threading_type =
-        thread_messages ? LB_MAILBOX_THREADING_SIMPLE : LB_MAILBOX_THREADING_FLAT;
 
     index = balsa_window_find_current_index(window);
-    balsa_index_set_threading_type(BALSA_INDEX(index), threading_type);
+    balsa_index_set_thread_messages(BALSA_INDEX(index), thread_messages);
 
     /* bw->current_index may have been destroyed and cleared during
      * set-threading: */

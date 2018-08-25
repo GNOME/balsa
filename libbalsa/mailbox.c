@@ -2301,6 +2301,7 @@ libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox)
 static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     NULL,			/* identity_name        */
     LB_MAILBOX_THREADING_FLAT,	/* threading_type       */
+    FALSE,                      /* subject_gather       */
     0,				/* filter               */
     LB_MAILBOX_SORT_TYPE_ASC,	/* sort_type            */
     LB_MAILBOX_SORT_NO,         /* sort_field           */
@@ -2381,6 +2382,19 @@ libbalsa_mailbox_set_threading_type(LibBalsaMailbox * mailbox,
     if (view->threading_type != threading_type) {
 	view->threading_type = threading_type;
 	if (mailbox)
+	    view->in_sync = 0;
+    }
+}
+
+void
+libbalsa_mailbox_set_subject_gather(LibBalsaMailbox * mailbox,
+                                    gboolean          subject_gather)
+{
+    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+
+    if (view->subject_gather != subject_gather) {
+	view->subject_gather = subject_gather;
+	if (mailbox != NULL)
 	    view->in_sync = 0;
     }
 }
@@ -2568,6 +2582,15 @@ libbalsa_mailbox_get_threading_type(LibBalsaMailbox * mailbox)
 	mailbox->view->threading_type :
 	libbalsa_mailbox_view_default.threading_type;
 }
+
+gboolean
+libbalsa_mailbox_get_subject_gather(LibBalsaMailbox * mailbox)
+{
+    return (mailbox != NULL && mailbox->view != NULL) ?
+        mailbox->view->subject_gather :
+        libbalsa_mailbox_view_default.subject_gather;
+}
+
 
 LibBalsaMailboxSortType
 libbalsa_mailbox_get_sort_type(LibBalsaMailbox * mailbox)

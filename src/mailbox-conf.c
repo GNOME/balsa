@@ -69,6 +69,9 @@ struct _BalsaMailboxConfView {
 #ifdef HAVE_GPGME
     GtkWidget *chk_crypt;
 #endif
+    GtkWidget *thread_messages;
+    GtkWidget *subject_gather;
+    LibBalsaMailbox *mailbox;
 };
 typedef struct _MailboxConfWindow MailboxConfWindow;
 struct _MailboxConfWindow {
@@ -1295,6 +1298,31 @@ enum {
     IDENTITY_COMBO_BOX_N_COLUMNS
 };
 
+static void
+thread_messages_toggled(GtkWidget * widget,
+                        BalsaMailboxConfView * view_info)
+{
+    gboolean thread_messages;
+
+    thread_messages = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+    gtk_widget_set_sensitive(view_info->subject_gather, thread_messages);
+    /* Rethread now */
+    balsa_window_set_thread_messages(balsa_app.main_window, thread_messages);
+}
+
+static void
+subject_gather_toggled(GtkWidget * widget,
+                       BalsaMailboxConfView * view_info)
+{
+    gboolean subject_gather;
+
+    subject_gather = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+    libbalsa_mailbox_set_subject_gather(view_info->mailbox, subject_gather);
+    /* Rethread now */
+    balsa_window_set_thread_messages(balsa_app.main_window, TRUE);
+}
+
+
 static BalsaMailboxConfView *
 mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
                            GtkWindow * window,
@@ -1307,9 +1335,11 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     BalsaMailboxConfView *view_info;
     GtkWidget *widget;
     const gchar *identity_name;
+    gboolean thread_messages;
 
     view_info = g_new(BalsaMailboxConfView, 1);
     g_object_weak_ref(G_OBJECT(window), (GWeakNotify) g_free, view_info);
+    view_info->mailbox = mailbox;
     view_info->window = window;
 
     label = libbalsa_create_grid_label(_("_Identity:"), grid, row);
@@ -1391,6 +1421,25 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
         g_signal_connect_swapped(view_info->subscribe, "toggled",
                                  callback, window);
 
+    /* Thread messages check button */
+    thread_messages =
+        libbalsa_mailbox_get_threading_type(mailbox) !=
+        LB_MAILBOX_THREADING_FLAT;
+    view_info->thread_messages =
+        libbalsa_create_grid_check(_("_Thread messages"), grid, ++row,
+                                   thread_messages);
+    g_signal_connect(view_info->thread_messages, "toggled",
+                     G_CALLBACK(thread_messages_toggled), view_info);
+
+    /* Subject gather check button */
+    view_info->subject_gather =
+        libbalsa_create_grid_check(_("_Merge threads with the same subject"),
+                                   grid, ++row,
+                                   libbalsa_mailbox_get_subject_gather(mailbox));
+    gtk_widget_set_sensitive(view_info->subject_gather, thread_messages);
+    g_signal_connect(view_info->subject_gather, "toggled",
+                     G_CALLBACK(subject_gather_toggled), view_info);
+
     return view_info;
 }
 
@@ -1440,7 +1489,6 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
     changed = FALSE;
 
     libbalsa_mailbox_view_free(mailbox->view);
-    g_print("%s set view on %s\n", __func__, mailbox->name);
     mailbox->view = config_load_mailbox_view(mailbox->url);
     if (!mailbox->view) {
 	/* The mailbox may not have its URL yet */

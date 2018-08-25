@@ -2069,8 +2069,14 @@ balsa_index_set_thread_messages(BalsaIndex * index,
     mailbox = index->mailbox_node->mailbox;
     g_return_if_fail(mailbox != NULL);
 
-    threading_type =
-        thread_messages ? LB_MAILBOX_THREADING_SIMPLE : LB_MAILBOX_THREADING_FLAT;
+    if (thread_messages) {
+        if (libbalsa_mailbox_get_subject_gather(mailbox))
+            threading_type = LB_MAILBOX_THREADING_JWZ;
+        else
+            threading_type = LB_MAILBOX_THREADING_SIMPLE;
+    } else {
+        threading_type = LB_MAILBOX_THREADING_FLAT;
+    }
 
     if (threading_type == libbalsa_mailbox_get_threading_type(mailbox))
         return;

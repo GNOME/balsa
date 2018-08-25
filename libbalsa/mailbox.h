@@ -152,6 +152,7 @@ typedef struct _LibBalsaMailboxView LibBalsaMailboxView;
 struct _LibBalsaMailboxView {
     gchar *identity_name;
     LibBalsaMailboxThreadingType threading_type;
+    gboolean subject_gather;
     /** filter is a frontend-specific code determining used view
      * filter.  GUI usually allows to generate only a subset of all
      * possible LibBalsaCondition's and mapping from arbitary
@@ -532,6 +533,8 @@ gboolean libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_set_threading_type(LibBalsaMailbox * mailbox,
 					 LibBalsaMailboxThreadingType
 					 threading_type);
+void libbalsa_mailbox_set_subject_gather(LibBalsaMailbox * mailbox,
+                                         gboolean subject_gather);
 void libbalsa_mailbox_set_sort_type(LibBalsaMailbox * mailbox,
 				    LibBalsaMailboxSortType sort_type);
 void libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
@@ -556,6 +559,7 @@ void libbalsa_mailbox_set_mtime (LibBalsaMailbox * mailbox, time_t mtime);
 const gchar *libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox);
 LibBalsaMailboxThreadingType
 libbalsa_mailbox_get_threading_type(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_get_subject_gather(LibBalsaMailbox * mailbox);
 LibBalsaMailboxSortType libbalsa_mailbox_get_sort_type(LibBalsaMailbox *
 						       mailbox);
 LibBalsaMailboxSortFields libbalsa_mailbox_get_sort_field(LibBalsaMailbox *

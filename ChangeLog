@@ -37,6 +37,25 @@
 	  make BalsaWindow::progress_bar a weak pointer and test whether
 	  it is NULL before dereferencing.
 
+2018-08-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Add UI for 'merge threads by subject'
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_set_subject_gather),
+	(libbalsa_mailbox_get_subject_gather): new methods.
+	* libbalsa/mailbox.h: add LibBalsaMailboxView::subject_gather
+	and declare the getter/setter.
+	* src/balsa-index.c (balsa_index_set_thread_messages): use
+	thread-messages and subject-gather to decide whether threading
+	is flat, simple, or JWZ.
+	* src/mailbox-conf.c (thread_messages_toggled),
+	(subject_gather_toggled), (mailbox_conf_view_new_full),
+	(mailbox_conf_view_check): add the UI to the mailbox config
+	dialog.
+	* src/main-window.c (bw_enable_mailbox_menus),
+	(balsa_window_set_thread_messages): export -set-thread-messages.
+	* src/main-window.h: ditto.
+
 2018-08-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Limit use of LibBalsaMailboxThreadingType in src/ to balsa-index.c

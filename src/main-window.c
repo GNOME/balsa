@@ -142,7 +142,6 @@ static gboolean bw_is_open_mailbox(LibBalsaMailbox *m);
 
 static void bw_mailbox_tab_close_cb(GtkWidget * widget, gpointer data);
 
-static void bw_set_thread_messages(BalsaWindow * window, gboolean thread_messages);
 static void bw_show_mbtree(BalsaWindow * window);
 static void bw_set_filter_menu(BalsaWindow * window, int gui_filter);
 static LibBalsaCondition *bw_get_view_filter(BalsaWindow * window);
@@ -2435,9 +2434,9 @@ bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
                           libbalsa_mailbox_can_move_duplicates(mailbox));
 
     if (mailbox != NULL) {
-        bw_set_thread_messages(window,
-                               libbalsa_mailbox_get_threading_type(mailbox)
-                               != LB_MAILBOX_THREADING_FLAT);
+        balsa_window_set_thread_messages(window,
+                                         libbalsa_mailbox_get_threading_type(mailbox)
+                                         != LB_MAILBOX_THREADING_FLAT);
 	bw_set_filter_menu(window, libbalsa_mailbox_get_filter(mailbox));
     }
 
@@ -2622,8 +2621,8 @@ bw_enable_part_menu_items(BalsaWindow * window)
                           balsa_message_has_previous_part(msg));
 }
 
-static void
-bw_set_thread_messages(BalsaWindow * window, gboolean thread_messages)
+void
+balsa_window_set_thread_messages(BalsaWindow * window, gboolean thread_messages)
 {
     GtkWidget *index;
     BalsaMailboxNode *mbnode;

@@ -149,6 +149,7 @@ void balsa_window_decrease_activity(BalsaWindow * window,
                                     const gchar * message);
 void balsa_window_set_statusbar(BalsaWindow     * window,
                                 LibBalsaMailbox * mailbox);
+void balsa_window_set_thread_messages(BalsaWindow * window, gboolean thread_messages);
 
 #if defined(__FILE__) && defined(__LINE__)
 # ifdef __FUNCTION__

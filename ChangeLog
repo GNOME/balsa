@@ -37,6 +37,14 @@
 	  make BalsaWindow::progress_bar a weak pointer and test whether
 	  it is NULL before dereferencing.
 
+2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Clear timeout source id in handler
+
+	* libbalsa/mailbox_local.c (lbm_local_sync_real),
+	(lbm_local_sync_idle): clear LibBalsaMailboxLocal::sync_id in
+	the timeout handler, not in the thread that it creates.
+
 2018-08-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Add UI for 'merge threads by subject'

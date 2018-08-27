@@ -70,6 +70,14 @@
 
 2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Check for valid msgno
+
+	* libbalsa/mailbox.c (mbox_get_thread_date_traverse_func): check
+	that the msgno that we get from the GNode is in the valid range
+	1 <= msgno <= mindex->len.
+
+2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Clear timeout source id in handler
 
 	* libbalsa/mailbox_local.c (lbm_local_sync_real),

@@ -2136,13 +2136,11 @@ lbm_local_sync_real(LibBalsaMailboxLocal * local)
 
     time(&tstart);
     libbalsa_lock_mailbox(mailbox);
-    if (local->sync_id &&                       /* request still pending */
-        MAILBOX_OPEN(mailbox) &&                   /* mailbox still open */
+    if (MAILBOX_OPEN(mailbox) &&                   /* mailbox still open */
         !libbalsa_mailbox_sync_storage(mailbox, FALSE))   /* cannot sync */
 	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
 			     _("Failed to sync mailbox “%s”"),
 			     mailbox->name);
-    local->sync_id = 0;
     local->sync_time += time(NULL)-tstart;
     local->sync_cnt++;
     libbalsa_unlock_mailbox(mailbox);
@@ -2154,11 +2152,12 @@ lbm_local_sync_idle(LibBalsaMailboxLocal * local)
 {
     GThread *sync_thread;
 
+    local->sync_id = 0;
     sync_thread =
     	g_thread_new("lbm_local_sync_real", (GThreadFunc) lbm_local_sync_real, local);
     g_thread_unref(sync_thread);
 
-    return FALSE;
+    return G_SOURCE_REMOVE;
 }
 
 static void

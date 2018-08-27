@@ -68,6 +68,14 @@
 	* ui/main-window.ui: remove the threading type radio buttons,
 	and replace them with a 'Thread messages' check-box.
 
+2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Clear timeout source id in handler
+
+	* libbalsa/mailbox_local.c (lbm_local_sync_real),
+	(lbm_local_sync_idle): clear LibBalsaMailboxLocal::sync_id in
+	the timeout handler, not in the thread that it creates.
+
 2018-08-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Add UI for 'merge threads by subject'

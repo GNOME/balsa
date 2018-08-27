@@ -3352,11 +3352,12 @@ mbox_get_thread_date_traverse_func(GNode   *node,
                                    gpointer data)
 {
     LibBalsaMailboxThreadDateInfo *info = data;
-    guint msgno = GPOINTER_TO_UINT(node->data);
-    LibBalsaMailboxIndexEntry *message =
-        g_ptr_array_index(info->mbox->mindex, msgno - 1);
+    guint msgno;
+    LibBalsaMailboxIndexEntry *message;
 
-    if (message != NULL) {
+    if ((msgno = GPOINTER_TO_UINT(node->data)) > 0 &&
+        msgno <= info->mbox->mindex->len &&
+        (message = g_ptr_array_index(info->mbox->mindex, msgno - 1)) != NULL) {
         time_t msg_date = message->msg_date;
 
         if (msg_date > info->thread_date)
@@ -3365,6 +3366,8 @@ mbox_get_thread_date_traverse_func(GNode   *node,
         return FALSE;
     }
 
+    /* Either a bad msgno or a NULL message: stop the traversal before
+     * something bad happens. */
     return TRUE;
 }
 

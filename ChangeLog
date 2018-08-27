@@ -1,5 +1,15 @@
 2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Make BalsaWindow::progress_bar a weak pointer
+
+	* src/main-window.c (balsa_window_new), (bw_progress_timeout),
+	  (balsa_window_increase_activity), (balsa_window_decrease_activity),
+	  (balsa_window_setup_progress), (balsa_window_increment_progress):
+	  make BalsaWindow::progress_bar a weak pointer and test whether
+	  it is NULL before dereferencing.
+
+2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Check for valid msgno
 
 	* libbalsa/mailbox.c (mbox_get_thread_date_traverse_func): check

@@ -2224,6 +2224,8 @@ balsa_window_new(GtkApplication *application)
     gtk_box_pack_end(GTK_BOX(window->vbox), hbox, FALSE, FALSE, 0);
 
     window->progress_bar = gtk_progress_bar_new();
+    g_object_add_weak_pointer(G_OBJECT(window->progress_bar),
+                              (gpointer *) &window->progress_bar);
     gtk_widget_set_valign(window->progress_bar, GTK_ALIGN_CENTER);
     gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(window->progress_bar),
                                     0.01);
@@ -4428,15 +4430,19 @@ static gboolean bw_notebook_drag_motion_cb(GtkWidget * widget,
  *
  * Use of the progress bar to show a fraction of a task takes priority.
  **/
-static gint
-bw_progress_timeout(BalsaWindow ** window)
+static gboolean
+bw_progress_timeout(gpointer user_data)
 {
+    BalsaWindow *window = *(BalsaWindow **) user_data;
+
     if (balsa_app.show_statusbar
-        && *window && (*window)->progress_type == BALSA_PROGRESS_ACTIVITY)
-        gtk_progress_bar_pulse(GTK_PROGRESS_BAR((*window)->progress_bar));
+        && window != NULL
+        && window->progress_bar != NULL
+        && window->progress_type == BALSA_PROGRESS_ACTIVITY)
+        gtk_progress_bar_pulse(GTK_PROGRESS_BAR(window->progress_bar));
 
     /* return true so it continues to be called */
-    return *window != NULL;
+    return window != NULL;
 }
 
 
@@ -4452,17 +4458,20 @@ balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
 {
     static BalsaWindow *window_save = NULL;
 
+    if (window->progress_bar == NULL)
+        return;
+
     if (!window_save) {
         window_save = window;
         g_object_add_weak_pointer(G_OBJECT(window_save),
-                                  (gpointer) &window_save);
+                                  (gpointer *) &window_save);
     }
 
-    if (!window->activity_handler)
+    if (window->activity_handler == 0) {
         /* add a timeout to make the activity bar move */
         window->activity_handler =
-            g_timeout_add(50, (GSourceFunc) bw_progress_timeout,
-                          &window_save);
+            g_timeout_add(50, bw_progress_timeout, &window_save);
+    }
 
     /* increment the reference counter */
     ++window->activity_counter;
@@ -4488,6 +4497,9 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
 {
     GSList *link;
     GtkProgressBar *progress_bar;
+
+    if (window->progress_bar == NULL)
+        return;
 
     link = g_slist_find_custom(window->activity_messages, message,
                                (GCompareFunc) strcmp);
@@ -4551,6 +4563,9 @@ balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
 {
     BalsaWindowSetupProgressInfo *info;
 
+    if (window->progress_bar == NULL)
+        return FALSE;
+
     if (text) {
         /* make sure the progress bar is currently unused */
         if (window->progress_type == BALSA_PROGRESS_INCREMENT)
@@ -4584,6 +4599,9 @@ void
 balsa_window_increment_progress(BalsaWindow * window, gdouble fraction,
                                 gboolean flush)
 {
+    if (window->progress_bar == NULL)
+        return;
+
     /* make sure the progress bar is being incremented */
     if (window->progress_type != BALSA_PROGRESS_INCREMENT)
         return;

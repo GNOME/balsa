@@ -70,6 +70,15 @@
 
 2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Apply threading changes on 'Update'
+
+	* src/mailbox-conf.c (thread_messages_toggled),
+	(mailbox_conf_view_new_full), (mailbox_conf_view_check):
+	apply threading changes on 'Update' instead of instantly on
+	checking the boxes.
+
+2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Check for valid msgno
 
 	* libbalsa/mailbox.c (mbox_get_thread_date_traverse_func): check

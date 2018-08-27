@@ -1306,20 +1306,6 @@ thread_messages_toggled(GtkWidget * widget,
 
     thread_messages = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
     gtk_widget_set_sensitive(view_info->subject_gather, thread_messages);
-    /* Rethread now */
-    balsa_window_set_thread_messages(balsa_app.main_window, thread_messages);
-}
-
-static void
-subject_gather_toggled(GtkWidget * widget,
-                       BalsaMailboxConfView * view_info)
-{
-    gboolean subject_gather;
-
-    subject_gather = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
-    libbalsa_mailbox_set_subject_gather(view_info->mailbox, subject_gather);
-    /* Rethread now */
-    balsa_window_set_thread_messages(balsa_app.main_window, TRUE);
 }
 
 
@@ -1428,6 +1414,14 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     view_info->thread_messages =
         libbalsa_create_grid_check(_("_Thread messages"), grid, ++row,
                                    thread_messages);
+    if (mcw != NULL) {
+        g_signal_connect(view_info->thread_messages, "toggled",
+                         G_CALLBACK(check_for_blank_fields), mcw);
+    }
+    if (callback != NULL) {
+        g_signal_connect_swapped(view_info->thread_messages, "toggled",
+                                 callback, window);
+    }
     g_signal_connect(view_info->thread_messages, "toggled",
                      G_CALLBACK(thread_messages_toggled), view_info);
 
@@ -1436,9 +1430,15 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
         libbalsa_create_grid_check(_("_Merge threads with the same subject"),
                                    grid, ++row,
                                    libbalsa_mailbox_get_subject_gather(mailbox));
+    if (mcw != NULL) {
+        g_signal_connect(view_info->subject_gather, "toggled",
+                         G_CALLBACK(check_for_blank_fields), mcw);
+    }
+    if (callback != NULL) {
+        g_signal_connect_swapped(view_info->subject_gather, "toggled",
+                                 callback, window);
+    }
     gtk_widget_set_sensitive(view_info->subject_gather, thread_messages);
-    g_signal_connect(view_info->subject_gather, "toggled",
-                     G_CALLBACK(subject_gather_toggled), view_info);
 
     return view_info;
 }
@@ -1520,6 +1520,16 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 				       LB_MAILBOX_SUBSCRIBE_YES :
 				       LB_MAILBOX_SUBSCRIBE_NO))
 	changed = TRUE;
+
+    /* Threading */
+
+    active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                          (view_info->subject_gather));
+    libbalsa_mailbox_set_subject_gather(view_info->mailbox, active);
+
+    active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                          (view_info->thread_messages));
+    balsa_window_set_thread_messages(balsa_app.main_window, active);
 
 #ifdef HAVE_GPGME
     if (libbalsa_mailbox_set_crypto_mode(mailbox,

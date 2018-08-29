@@ -90,7 +90,6 @@ GType balsa_mailbox_node_get_type(void);
 BalsaMailboxNode *balsa_mailbox_node_new(void);
 BalsaMailboxNode *balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox *m);
 BalsaMailboxNode *balsa_mailbox_node_new_from_dir(const gchar* dir);
-BalsaMailboxNode *balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p);
 BalsaMailboxNode *balsa_mailbox_node_new_imap_folder(LibBalsaServer* s, 
 						     const char*p);
 BalsaMailboxNode *balsa_mailbox_node_new_from_config(const gchar* prefix);

@@ -134,7 +134,6 @@ static BalsaMailboxConfView *
 static GtkWidget *create_dialog(MailboxConfWindow *mcw);
 static GtkWidget *create_local_mailbox_dialog(MailboxConfWindow *mcw);
 static GtkWidget *create_pop_mailbox_dialog(MailboxConfWindow *mcw);
-static GtkWidget *create_imap_mailbox_dialog(MailboxConfWindow *mcw);
 
 static void check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw);
 
@@ -309,12 +308,6 @@ void
 mailbox_conf_add_mh_cb(GtkWidget * widget, gpointer data)
 {
     mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_MH);
-}
-
-void
-mailbox_conf_add_imap_cb(GtkWidget * widget, gpointer data)
-{
-    mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_IMAP);
 }
 
 void
@@ -1058,8 +1051,6 @@ create_dialog(MailboxConfWindow *mcw)
 	return create_local_mailbox_dialog(mcw);
     } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3) ) {
 	return create_pop_mailbox_dialog(mcw);
-    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_IMAP) ) {
-	return create_imap_mailbox_dialog(mcw);
     } else {
 	g_warning("Unknown mailbox type: %s\n",
                   g_type_name(mcw->mailbox_type));
@@ -1278,132 +1269,6 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 
     dialog = create_generic_dialog(mcw);
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), notebook);
-    return dialog;
-}
-
-static void
-anon_toggle_cb(GtkToggleButton *anon_button, MailboxConfWindow *mcw)
-{
-    gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.anonymous),
-                             gtk_toggle_button_get_active(anon_button));
-}
-static void
-remember_toggle_cb(GtkToggleButton *remember_button, MailboxConfWindow *mcw)
-{
-    gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.password),
-                             gtk_toggle_button_get_active(remember_button));
-}
-
-static void
-entry_activated(GtkEntry * entry, MailboxConfWindow * mcw)
-{
-    if (mcw->ok_sensitive)
-        gtk_dialog_response(GTK_DIALOG(mcw->window), MCW_RESPONSE);
-}
-
-static GtkWidget *
-create_imap_mailbox_dialog(MailboxConfWindow *mcw)
-{
-    GtkWidget *dialog;
-    GtkWidget *notebook, *advanced, *grid;
-    GtkWidget *label;
-    GtkWidget *entry;
-    gint row = -1;
-
-#if defined(HAVE_LIBSECRET)
-    static const gchar *remember_password_message =
-        N_("_Remember password in Secret Service");
-#else
-    static const gchar *remember_password_message =
-        N_("_Remember password");
-#endif                          /* defined(HAVE_LIBSECRET) */
-
-    notebook = gtk_notebook_new();
-    grid = libbalsa_create_grid();
-    gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
-                             gtk_label_new_with_mnemonic(_("_Basic")));
-
-    /* mailbox name */
-    label = libbalsa_create_grid_label(_("Mailbox _name:"), grid, ++row);
-    mcw->mailbox_name =
-        libbalsa_create_grid_entry(grid, G_CALLBACK(check_for_blank_fields),
-                                   mcw, row, NULL, label);
-
-    /* imap server */
-    label = libbalsa_create_grid_label(_("_Server:"), grid, ++row);
-    mcw->mb_data.imap.bsc.server =
-	libbalsa_create_grid_entry(grid, G_CALLBACK(check_for_blank_fields),
-                                   mcw, row++, "localhost", label);
-
-    /* security */
-    mcw->mb_data.imap.bsc.security = create_security_entry(grid, &row, mcw);
-
-    /* username  */
-    label = libbalsa_create_grid_label(_("_Username:"), grid, ++row);
-    mcw->mb_data.imap.username =
-	libbalsa_create_grid_entry(grid, G_CALLBACK(check_for_blank_fields),
-                                   mcw, row, g_get_user_name(), label);
-
-    /* toggle for anonymous password */
-    mcw->mb_data.imap.anonymous =
-	libbalsa_create_grid_check(_("_Anonymous access"), grid,
-                                   ++row, FALSE);
-    g_signal_connect(G_OBJECT(mcw->mb_data.imap.anonymous), "toggled",
-                     G_CALLBACK(anon_toggle_cb), mcw);
-    /* toggle for remember password */
-    mcw->mb_data.imap.remember =
-	libbalsa_create_grid_check(_(remember_password_message), grid,
-                                   ++row, FALSE);
-    g_signal_connect(G_OBJECT(mcw->mb_data.imap.remember), "toggled",
-                     G_CALLBACK(remember_toggle_cb), mcw);
-
-   /* password field */
-    label = libbalsa_create_grid_label(_("Pass_word:"), grid, ++row);
-    mcw->mb_data.imap.password =
-	libbalsa_create_grid_entry(grid, NULL, NULL, row, NULL, label);
-    gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.imap.password), FALSE);
-
-    label = libbalsa_create_grid_label(_("F_older path:"), grid, ++row);
-
-    mcw->mb_data.imap.folderpath = entry = gtk_entry_new();
-    gtk_widget_set_hexpand(entry, TRUE);
-    gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath), "INBOX");
-
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), 
-                                  mcw->mb_data.imap.folderpath);
-    g_signal_connect(G_OBJECT(mcw->mb_data.imap.folderpath), "activate",
-                     G_CALLBACK(entry_activated), mcw);
-    g_signal_connect(G_OBJECT(mcw->mb_data.imap.folderpath), "changed",
-                     G_CALLBACK(check_for_blank_fields), mcw);
-
-    gtk_grid_attach(GTK_GRID(grid), entry, 1, row, 1, 1);
-
-    advanced =
-        balsa_server_conf_get_advanced_widget(&mcw->mb_data.imap.bsc);
-    mcw->mb_data.imap.enable_persistent = 
-        balsa_server_conf_add_checkbox(&mcw->mb_data.imap.bsc,
-                                       _("Enable _persistent cache"));
-    mcw->mb_data.imap.has_bugs = 
-        balsa_server_conf_add_checkbox(&mcw->mb_data.imap.bsc,
-                                       _("Enable _bug workarounds"));
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
-                             gtk_label_new_with_mnemonic(_("_Advanced")));
-
-    gtk_widget_show_all(notebook);
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
-    gtk_widget_grab_focus(mcw->mailbox_name? 
-                          mcw->mailbox_name : mcw->mb_data.imap.bsc.server);
-
-    dialog = create_generic_dialog(mcw);
-    gtk_container_add(GTK_CONTAINER
-                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      notebook);
-
-    mcw->view_info =
-        mailbox_conf_view_new_full(mcw->mailbox, GTK_WINDOW(dialog), grid,
-                                   ++row, NULL, mcw, NULL);
-
     return dialog;
 }
 

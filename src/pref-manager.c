@@ -1702,10 +1702,6 @@ server_add_menu_widget(void)
     g_signal_connect(G_OBJECT(menuitem), "activate",
                      G_CALLBACK(pop3_add_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    menuitem = gtk_menu_item_new_with_label(_("Remote IMAP mailbox…"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
-		     G_CALLBACK(mailbox_conf_add_imap_cb), NULL);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     menuitem = gtk_menu_item_new_with_label(_("Remote IMAP folder…"));
     g_signal_connect(G_OBJECT(menuitem), "activate",
 		     G_CALLBACK(folder_conf_add_imap_cb), NULL);

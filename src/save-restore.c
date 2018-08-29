@@ -98,9 +98,44 @@ config_load_section(const gchar * key, const gchar * value, gpointer data)
     return FALSE;
 }
 
+static gboolean
+migrate_imap_mailboxes(const gchar *key, const gchar *value, gpointer data)
+{
+	gchar *type;
+
+    libbalsa_conf_push_group(key);
+	type = libbalsa_conf_get_string("Type");
+	if ((type != NULL) && (strcmp(type, "LibBalsaMailboxImap") == 0)) {
+		BalsaMailboxNode *mbnode;
+
+		/* try to load the IMAP mailbox as folder */
+		libbalsa_conf_pop_group();
+		mbnode = balsa_mailbox_node_new_from_config(key);
+	    if (mbnode != NULL) {
+	    	/* destroy the old config, save as IMAP folder config */
+	    	balsa_mblist_mailbox_node_append(NULL, mbnode);
+			libbalsa_conf_remove_group(key);
+			libbalsa_conf_private_remove_group(key);
+			g_free(mbnode->config_prefix);
+			mbnode->config_prefix = config_get_unused_group(FOLDER_SECTION_PREFIX);
+	    	g_signal_connect_swapped(mbnode->server, "config-changed", G_CALLBACK(config_folder_update), mbnode);
+	    	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+	    		"Migrated IMAP mailbox “%s” to IMAP folder. Please review its configuration.", mbnode->name);
+	    }
+	} else {
+		libbalsa_conf_pop_group();
+	}
+	g_free(type);
+
+    return FALSE;
+}
+
 void
 config_load_sections(void)
 {
+	/* hack - migrate all LibBalsaMailboxImap mailboxes to IMAP folders */
+    libbalsa_conf_foreach_group(MAILBOX_SECTION_PREFIX, migrate_imap_mailboxes, NULL);
+
     libbalsa_conf_foreach_group(MAILBOX_SECTION_PREFIX,
                                 config_load_section,
                                 config_mailbox_init);
@@ -1483,8 +1518,7 @@ config_get_unused_group(const gchar * prefix)
     libbalsa_conf_foreach_group(prefix, config_get_used_group, &max);
 
     name = g_strdup_printf("%s%d", prefix, ++max);
-    if (balsa_app.debug)
-        g_print("config_mailbox_get_highest_number: name='%s'\n", name);
+    g_debug("config_mailbox_get_highest_number: name='%s'", name);
 
     return name;
 }

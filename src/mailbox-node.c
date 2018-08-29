@@ -618,6 +618,9 @@ balsa_mailbox_node_new_from_config(const gchar* group)
     balsa_mailbox_node_load_config(folder, group);
 
     folder->dir = libbalsa_conf_get_string("Directory");
+    if (folder->dir == NULL) {
+    	folder->dir = g_strdup("");
+    }
     folder->subscribed =
 	libbalsa_conf_get_bool("Subscribed"); 
     folder->list_inbox =
@@ -644,22 +647,6 @@ balsa_mailbox_node_new_imap_node(LibBalsaServer* s, const char*p)
     folder->dir = g_strdup(p);
     g_signal_connect(G_OBJECT(folder), "append-subtree", 
 		     G_CALLBACK(imap_dir_cb), NULL);
-
-    return folder;
-}
-
-BalsaMailboxNode*
-balsa_mailbox_node_new_imap(LibBalsaServer* s, const char*p)
-{
-    BalsaMailboxNode * folder = balsa_mailbox_node_new_imap_node(s, p);
-    g_assert(s);
-
-    folder->mailbox = libbalsa_mailbox_imap_new();
-    g_object_ref(G_OBJECT(folder->mailbox));
-    libbalsa_mailbox_remote_set_server(
-	LIBBALSA_MAILBOX_REMOTE(folder->mailbox), s);
-    libbalsa_mailbox_imap_set_path(LIBBALSA_MAILBOX_IMAP(folder->mailbox), p);
-    load_mailbox_view(folder);
 
     return folder;
 }

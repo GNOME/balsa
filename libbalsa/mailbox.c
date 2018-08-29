@@ -537,6 +537,11 @@ libbalsa_mailbox_new_from_config(const gchar * group)
         else
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Bad local mailbox path “%s”"), path);
+    } else if (type == LIBBALSA_TYPE_MAILBOX_IMAP) {
+    	g_critical("old-style IMAP mailbox %s should have been converted to IMAP folder", group);
+        libbalsa_conf_pop_group();
+        g_free(type_str);
+        return NULL;
     }
     mailbox = (type != G_TYPE_OBJECT ? g_object_new(type, NULL) : NULL);
     if (mailbox == NULL)

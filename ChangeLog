@@ -1,3 +1,18 @@
+2018-08-29  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Move single IMAP mailboxes to folders
+
+	* libbalsa/mailbox.c: print paranoid warning if
+	  libbalsa_mailbox_new_from_config() is called for an IMAP mailbox
+	* src/mailbox-conf.[ch]: remove obsolete
+	  mailbox_conf_add_imap_cb(), create_imap_mailbox_dialog() and
+	  dependent functions
+	* src/mailbox-node.[ch]: make sure BalsaMailboxNode::dir
+	  is properly initialised; remove obsolete
+	  balsa_mailbox_node_new_imap()
+	* src/pref-manager.c: clean up menu
+	* src/save-restore.c: migrate IMAP mailboxes to IMAP folders
+
 2018-08-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Make BalsaWindow::progress_bar a weak pointer

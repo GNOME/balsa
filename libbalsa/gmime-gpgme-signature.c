@@ -268,8 +268,10 @@ libbalsa_cert_subject_readable(const gchar *subject)
         if (equals) {
             *equals++ = '\0';
             for (ldap_elem = ldap_id_list;
-                 g_strcmp0(ldap_elem->ldap_id, elements[n]) != 0;
-                 ldap_elem++);
+                 (ldap_elem->ldap_id != NULL) && (strcmp(ldap_elem->ldap_id, elements[n]) != 0);
+                 ldap_elem++) {
+            	/* nothing to do */
+            }
             if (ldap_elem->ldap_id != NULL)
                 result = g_string_append(result, ldap_elem->readable);
             else

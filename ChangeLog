@@ -1,3 +1,9 @@
+2018-09-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/information.c (libbalsa_information_varg): use
+	  g_markup_escape_text to entity-escape the body of a
+	  GNotification, instead of our home-brewed non-UTF8-safe version.
+
 2018-09-05  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Fix crash listing S/MIME certificates

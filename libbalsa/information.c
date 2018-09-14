@@ -41,8 +41,8 @@ void
 libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
                           const char *fmt, va_list ap)
 {
-    gchar *msg, *p, *q;
-    GString *escaped;
+    gchar *msg;
+    gchar *escaped;
     const gchar *icon_str;
     GIcon *icon;
     gboolean send;
@@ -74,32 +74,12 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
     msg = g_strdup_vprintf(fmt, ap);
     /* GNotification uses HTML markup (???), so we must replace '<' and
      * '&' with the corresponding entity in the message string. */
-    escaped = g_string_new(NULL);
-    for (p = msg; (q = strpbrk(p, "<>&\"")) != NULL; p = ++q) {
-        g_string_append_len(escaped, p, q - p);
-        switch (*q) {
-        case '<':
-            g_string_append(escaped, "&lt;");
-            break;
-        case '>':
-            g_string_append(escaped, "&gt;");
-            break;
-        case '&':
-            g_string_append(escaped, "&amp;");
-            break;
-        case '"':
-            g_string_append(escaped, "&quot;");
-            break;
-        default:
-            break;
-        }
-    }
-    g_string_append(escaped, p);
+    escaped = g_markup_escape_text(msg, -1);
     g_free(msg);
 
-    g_notification_set_body(notification, escaped->str);
-    send = *escaped->str != '\0';
-    g_string_free(escaped, TRUE);
+    g_notification_set_body(notification, escaped);
+    send = escaped[0] != '\0';
+    g_free(escaped);
 
     g_object_set_data(G_OBJECT(notification), "send", GINT_TO_POINTER(send));
     g_signal_emit_by_name(notification, "notify", NULL);

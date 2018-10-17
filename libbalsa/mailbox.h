@@ -101,7 +101,7 @@ typedef enum {
  * update pref-manager.c so the preferences work correctly */
 typedef enum {
     LB_MAILBOX_THREADING_FLAT,
-    LB_MAILBOX_THREADING_SIMPLE,
+    LB_MAILBOX_THREADING_SIMPLE, /* JWZ without the subject-gather step */
     LB_MAILBOX_THREADING_JWZ
 } LibBalsaMailboxThreadingType;
 
@@ -152,6 +152,7 @@ typedef struct _LibBalsaMailboxView LibBalsaMailboxView;
 struct _LibBalsaMailboxView {
     gchar *identity_name;
     LibBalsaMailboxThreadingType threading_type;
+    gboolean subject_gather;
     /** filter is a frontend-specific code determining used view
      * filter.  GUI usually allows to generate only a subset of all
      * possible LibBalsaCondition's and mapping from arbitary
@@ -518,8 +519,7 @@ gboolean libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
     libbalsa_mailbox_set_msg_tree and libbalsa_mailbox_unlink_and_prepend
     are helpers for the subclass methods.
 */
-void libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox,
-				    LibBalsaMailboxThreadingType thread_type);
+void libbalsa_mailbox_set_threading(LibBalsaMailbox *mailbox);
 void libbalsa_mailbox_set_msg_tree(LibBalsaMailbox * mailbox,
 				   GNode * msg_tree);
 void libbalsa_mailbox_unlink_and_prepend(LibBalsaMailbox * mailbox,
@@ -533,6 +533,8 @@ gboolean libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_set_threading_type(LibBalsaMailbox * mailbox,
 					 LibBalsaMailboxThreadingType
 					 threading_type);
+void libbalsa_mailbox_set_subject_gather(LibBalsaMailbox * mailbox,
+                                         gboolean subject_gather);
 void libbalsa_mailbox_set_sort_type(LibBalsaMailbox * mailbox,
 				    LibBalsaMailboxSortType sort_type);
 void libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
@@ -557,6 +559,7 @@ void libbalsa_mailbox_set_mtime (LibBalsaMailbox * mailbox, time_t mtime);
 const gchar *libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox);
 LibBalsaMailboxThreadingType
 libbalsa_mailbox_get_threading_type(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_get_subject_gather(LibBalsaMailbox * mailbox);
 LibBalsaMailboxSortType libbalsa_mailbox_get_sort_type(LibBalsaMailbox *
 						       mailbox);
 LibBalsaMailboxSortFields libbalsa_mailbox_get_sort_field(LibBalsaMailbox *

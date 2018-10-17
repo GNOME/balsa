@@ -153,11 +153,10 @@ typedef struct _PropertyUI {
     GtkWidget *url_color;
 
     /* sorting and threading prefs */
-    GtkWidget *tree_expand_check;
     GtkWidget *default_sort_field;
     gint sort_field_index;
-    GtkWidget *default_threading_type;
-    gint threading_type_index;
+    GtkWidget *thread_messages_check;
+    GtkWidget *tree_expand_check;
 
     /* quote regex */
     GtkWidget *mark_quoted;
@@ -341,8 +340,14 @@ update_view_defaults(const gchar * group, const gchar * url,
         view->filter = pui->filter;
     if (view->sort_field == libbalsa_mailbox_get_sort_field(NULL))
         view->sort_field = pui->sort_field_index;
-    if (view->threading_type == libbalsa_mailbox_get_threading_type(NULL))
-        view->threading_type = pui->threading_type_index;
+    if (view->threading_type == libbalsa_mailbox_get_threading_type(NULL)) {
+        if (gtk_toggle_button_get_active
+            (GTK_TOGGLE_BUTTON(pui->thread_messages_check))) {
+            view->threading_type = LB_MAILBOX_THREADING_SIMPLE;
+        } else {
+            view->threading_type = LB_MAILBOX_THREADING_FLAT;
+        }
+    }
 
     if (!mailbox) {
         config_save_mailbox_view(url, view);
@@ -612,7 +617,15 @@ apply_prefs(GtkDialog * pbox)
 
     /* sorting and threading */
     libbalsa_mailbox_set_sort_field(NULL, pui->sort_field_index);
-    libbalsa_mailbox_set_threading_type(NULL, pui->threading_type_index);
+
+    { /* Scope */
+        gboolean thread_messages =
+            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->thread_messages_check));
+        libbalsa_mailbox_set_threading_type(NULL, thread_messages ?
+                                            LB_MAILBOX_THREADING_SIMPLE :
+                                            LB_MAILBOX_THREADING_FLAT);
+    }
+
     balsa_app.expand_tree =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->tree_expand_check));
@@ -814,14 +827,16 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->empty_trash),
                                  balsa_app.empty_trash_on_exit);
 
-    /* threading */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->tree_expand_check),
-                                 balsa_app.expand_tree);
+    /* sorting and threading */
     pui->sort_field_index = libbalsa_mailbox_get_sort_field(NULL);
     pm_combo_box_set_level(pui->default_sort_field, pui->sort_field_index);
-    pui->threading_type_index = libbalsa_mailbox_get_threading_type(NULL);
-    pm_combo_box_set_level(pui->default_threading_type,
-                           pui->threading_type_index);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->thread_messages_check),
+                                 libbalsa_mailbox_get_threading_type(NULL)
+                                 != LB_MAILBOX_THREADING_FLAT);
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->tree_expand_check),
+                                 balsa_app.expand_tree);
 
 #if !(HAVE_GSPELL || HAVE_GTKSPELL)
     /* spelling */
@@ -2406,13 +2421,8 @@ pm_grid_add_threading_group(GtkWidget * grid_widget)
                                  sort_field_label, G_N_ELEMENTS(sort_field_label),
                                  &pui->sort_field_index);
 
-    label = pm_grid_attach_label(grid, 1, ++row, 1, 1, _("Default threading style:"));
-    gtk_widget_set_hexpand(label, FALSE);
-    pui->default_threading_type =
-        pm_grid_attach_pref_menu(grid, 2, row, 1, 1,
-                                 threading_type_label, NUM_THREADING_STYLES,
-                                 &pui->threading_type_index);
-
+    pui->thread_messages_check =
+        pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Thread messages by default"));
     pui->tree_expand_check =
         pm_grid_attach_check(grid, 1, ++row, 2, 1, _("Expand threads on open"));
 
@@ -3502,6 +3512,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* threading */
+    g_signal_connect(G_OBJECT(pui->thread_messages_check), "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
     g_signal_connect(G_OBJECT(pui->tree_expand_check), "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 

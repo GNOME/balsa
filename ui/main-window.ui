@@ -262,21 +262,8 @@
       <section>
         <item>
           <attribute name='label'
-            translatable='yes'>_Flat index</attribute>
+            translatable='yes'>Th_read messages</attribute>
           <attribute name='action'>win.threading</attribute>
-          <attribute name='target'>flat</attribute>
-        </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Si_mple threading</attribute>
-          <attribute name='action'>win.threading</attribute>
-          <attribute name='target'>simple</attribute>
-        </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>_JWZ threading</attribute>
-          <attribute name='action'>win.threading</attribute>
-          <attribute name='target'>jwz</attribute>
         </item>
       </section>
       <section>

@@ -2056,10 +2056,12 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
     bndx_changed_find_row(index);
 }
 
-/* balsa_index_set_threading_type: public method. */
+/* balsa_index_set_thread_messages: public method. */
 void
-balsa_index_set_threading_type(BalsaIndex * index, int thtype)
+balsa_index_set_thread_messages(BalsaIndex * index,
+                                gboolean thread_messages)
 {
+    LibBalsaMailboxThreadingType threading_type;
     LibBalsaMailbox *mailbox;
 
     g_return_if_fail(index != NULL);
@@ -2067,12 +2069,23 @@ balsa_index_set_threading_type(BalsaIndex * index, int thtype)
     mailbox = index->mailbox_node->mailbox;
     g_return_if_fail(mailbox != NULL);
 
-    if (thtype != LB_MAILBOX_THREADING_FLAT
-        && !libbalsa_mailbox_prepare_threading(mailbox, 0))
-        return;
-    libbalsa_mailbox_set_threading_type(mailbox, thtype);
+    if (thread_messages) {
+        if (libbalsa_mailbox_get_subject_gather(mailbox))
+            threading_type = LB_MAILBOX_THREADING_JWZ;
+        else
+            threading_type = LB_MAILBOX_THREADING_SIMPLE;
+    } else {
+        threading_type = LB_MAILBOX_THREADING_FLAT;
+    }
 
-    libbalsa_mailbox_set_threading(mailbox, thtype);
+    if (threading_type == libbalsa_mailbox_get_threading_type(mailbox))
+        return;
+
+    if (thread_messages && !libbalsa_mailbox_prepare_threading(mailbox, 0))
+        return;
+
+    libbalsa_mailbox_set_threading_type(mailbox, threading_type);
+    libbalsa_mailbox_set_threading(mailbox);
     balsa_index_update_tree(index, balsa_app.expand_tree);
 }
 

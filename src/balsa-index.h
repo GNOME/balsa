@@ -107,7 +107,8 @@ G_BEGIN_DECLS
                                           BalsaIndexWidthPreference pref);
     void balsa_index_scroll_on_open(BalsaIndex *index);
     void balsa_index_update_tree(BalsaIndex *bindex, gboolean expand);
-    void balsa_index_set_threading_type(BalsaIndex * bindex, int thtype);
+    void balsa_index_set_thread_messages(BalsaIndex * bindex,
+                                         gboolean thread_messages);
     void balsa_index_set_view_filter(BalsaIndex *bindex,
                                      int filter_no,
                                      const gchar *filter_string,

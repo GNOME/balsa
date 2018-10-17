@@ -194,10 +194,9 @@ static void
 balsa_get_stats(long *unread, long *unsent)
 {
 
-    if(balsa_app.inbox && libbalsa_mailbox_open(balsa_app.inbox, NULL) ) {
+    if (balsa_app.inbox && libbalsa_mailbox_open(balsa_app.inbox, NULL)) {
         /* set threading type to load messages */
-        libbalsa_mailbox_set_threading(balsa_app.inbox,
-                                       balsa_app.inbox->view->threading_type);
+        libbalsa_mailbox_set_threading(balsa_app.inbox);
         *unread = balsa_app.inbox->unread_messages;
         libbalsa_mailbox_close(balsa_app.inbox, FALSE);
     } else *unread = -1;

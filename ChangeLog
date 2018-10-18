@@ -1,3 +1,9 @@
+2018-10-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-mime-widget-callbacks.c (bmw_set_can_focus),
+	(balsa_mime_widget_limit_focus), (balsa_mime_widget_unlimit_focus):
+	gtk_container_*_focus_chain functions are deprecated.
+
 2018-09-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/information.c (libbalsa_information_varg): use

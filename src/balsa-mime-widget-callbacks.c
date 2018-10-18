@@ -257,33 +257,53 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
     return TRUE;
 }
 
+/*
+ * Focus callbacks
+ */
+
+static void
+bmw_set_can_focus(GtkWidget *widget,
+                  gpointer   data)
+{
+    if (GTK_IS_CONTAINER(widget))
+        gtk_container_foreach(GTK_CONTAINER(widget), bmw_set_can_focus, data);
+    gtk_widget_set_can_focus(widget, GPOINTER_TO_INT(data));
+}
+
 
 gint
-balsa_mime_widget_limit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm)
+balsa_mime_widget_limit_focus(GtkWidget     *widget,
+                              GdkEventFocus *event,
+                              BalsaMessage  *bm)
 {
     /* Disable can_focus on other message parts so that TAB does not
      * attempt to move the focus on them. */
-    GList *list = g_list_append(NULL, widget);
+    bmw_set_can_focus(bm->bm_widget->container, GINT_TO_POINTER(FALSE));
+    gtk_widget_set_can_focus(widget, TRUE);
 
-    gtk_container_set_focus_chain(GTK_CONTAINER(bm->bm_widget->container), list);
-    g_list_free(list);
     if (bm->focus_state == BALSA_MESSAGE_FOCUS_STATE_NO)
         bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_YES;
+
     return FALSE;
 }
 
 
 gint
-balsa_mime_widget_unlimit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm)
+balsa_mime_widget_unlimit_focus(GtkWidget     *widget,
+                                GdkEventFocus *event,
+                                BalsaMessage  *bm)
 {
-    gtk_container_unset_focus_chain(GTK_CONTAINER(bm->bm_widget->container));
-    if (bm->message) {
+    bmw_set_can_focus(bm->bm_widget->container, GINT_TO_POINTER(TRUE));
+
+    if (bm->message != NULL) {
         BalsaMessageFocusState focus_state = bm->focus_state;
+
         if (focus_state == BALSA_MESSAGE_FOCUS_STATE_HOLD) {
             balsa_message_grab_focus(bm);
             bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_YES;
         } else
             bm->focus_state = BALSA_MESSAGE_FOCUS_STATE_NO;
     }
+
     return FALSE;
 }

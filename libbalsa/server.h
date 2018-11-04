@@ -29,14 +29,6 @@
 #include "libbalsa.h"
 #include "net-client.h"
 
-#if defined(HAVE_LIBSECRET)
-#include <libsecret/secret.h>
-extern const SecretSchema *LIBBALSA_SERVER_SECRET_SCHEMA;
-#define libbalsa_free_password secret_password_free
-#else
-#define libbalsa_free_password g_free
-#endif                          /* defined(HAVE_LIBSECRET) */
-
 #define LIBBALSA_TYPE_SERVER \
     (libbalsa_server_get_type())
 #define LIBBALSA_SERVER(obj) \
@@ -53,13 +45,6 @@ GType libbalsa_server_get_type(void);
 
 typedef struct _LibBalsaServerClass LibBalsaServerClass;
 
-#if 0
-typedef enum {
-    LIBBALSA_TLS_DISABLED,
-    LIBBALSA_TLS_ENABLED,
-    LIBBALSA_TLS_REQUIRED
-} LibBalsaTlsMode;
-#endif
 
 struct _LibBalsaServer {
     GObject object;
@@ -72,13 +57,9 @@ struct _LibBalsaServer {
     gboolean client_cert;
     gchar *cert_file;
     gchar *cert_passphrase;
-    /* We include SSL support in UI unconditionally to preserve config
-     * between SSL and non-SSL builds. We just fail if SSL is requested
-     * in non-SSL build. */
-    //LibBalsaTlsMode tls_mode;
-    //unsigned use_ssl:1;
-    unsigned remember_passwd:1;
-    unsigned try_anonymous:1; /* user wants anonymous access */
+    gboolean remember_passwd;
+    gboolean remember_cert_passphrase;
+    gboolean try_anonymous; /* user wants anonymous access */
 };
 
 struct _LibBalsaServerClass {
@@ -100,8 +81,6 @@ void libbalsa_server_set_password(LibBalsaServer * server,
 void libbalsa_server_set_host(LibBalsaServer     *server,
 							  const gchar        *host,
 							  NetClientCryptMode  security);
-gchar *libbalsa_server_get_password(LibBalsaServer * server,
-				    LibBalsaMailbox * mbox);
 
 void libbalsa_server_config_changed(LibBalsaServer * server);
 void libbalsa_server_load_config(LibBalsaServer * server);

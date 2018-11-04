@@ -115,6 +115,7 @@ imap_gss_auth_loop(ImapMboxHandle* handle, NetClientGssCtx *gss_ctx, unsigned cm
 ImapResult
 imap_auth_gssapi(ImapMboxHandle* handle)
 {
+	gchar **auth_data;
     NetClientGssCtx *gss_ctx;
     GError *error = NULL;
     ImapResult retval;
@@ -123,8 +124,15 @@ imap_auth_gssapi(ImapMboxHandle* handle)
         return IMAP_AUTH_UNAVAIL;
     }
 
+    g_signal_emit_by_name(handle->sio, "auth", FALSE, &auth_data);
+    if((auth_data == NULL) || (auth_data[0] == NULL)) {
+    	imap_mbox_handle_set_msg(handle, "User name required, authentication cancelled");
+    	g_strfreev(auth_data);
+    	return IMAP_AUTH_CANCELLED;
+    }
+
     /* try to create the context */
-    gss_ctx = net_client_gss_ctx_new("imap", handle->host, "test", &error);
+    gss_ctx = net_client_gss_ctx_new("imap", handle->host, auth_data[0], &error);
     if (gss_ctx == NULL) {
     	retval = IMAP_AUTH_UNAVAIL;
     } else {
@@ -145,6 +153,7 @@ imap_auth_gssapi(ImapMboxHandle* handle)
 		net_client_gss_ctx_free(gss_ctx);
 		retval = (result && (rc == IMR_OK)) ? IMAP_SUCCESS : IMAP_AUTH_UNAVAIL;
     }
+	g_strfreev(auth_data);
 
     if (error != NULL) {
         gchar *err_msg;

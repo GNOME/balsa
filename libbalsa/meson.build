@@ -127,6 +127,8 @@ libbalsa_a_sources = [
   'send.h',
   'server.c',
   'server.h',
+  'server-config.c',
+  'server-config.h',
   'smtp-server.c',
   'smtp-server.h',
   'source-viewer.c',

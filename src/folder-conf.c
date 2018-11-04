@@ -30,6 +30,7 @@
 #include "save-restore.h"
 #include "pref-manager.h"
 #include "imap-server.h"
+#include "server-config.h"
 #include <glib/gi18n.h>
 
 #if HAVE_MACOSX_DESKTOP
@@ -55,9 +56,9 @@ struct _CommonDialogData {
 
 struct _FolderDialogData {
     FOLDER_CONF_COMMON;
-    BalsaServerConf bsc;
-    GtkWidget *folder_name, *port, *username, *anonymous, *remember,
-        *password, *subscribed, *list_inbox, *prefix;
+    LibBalsaServerCfg *server_cfg;
+    LibBalsaServer *server;
+    GtkWidget *subscribed, *list_inbox, *prefix;
     GtkWidget *connection_limit, *enable_persistent,
         *use_idle, *has_bugs, *use_status;
 };
@@ -150,141 +151,64 @@ folder_conf_response(GtkDialog * dialog, int response,
    Creates the node when mn == NULL.
 */
 static void 
-validate_folder(GtkWidget *w, FolderDialogData * fcw)
+validate_folder(GtkWidget G_GNUC_UNUSED *w, FolderDialogData *fcw)
 {
-    gboolean sensitive = TRUE;
-
-    if (!*gtk_entry_get_text(GTK_ENTRY(fcw->folder_name))) {
-    	sensitive = FALSE;
-    } else if (!*gtk_entry_get_text(GTK_ENTRY(fcw->bsc.server))) {
-    	sensitive = FALSE;
-    }
-
-    /* encryption w/ client cert requires cert file */
-    if (sensitive &&
-    	((gtk_combo_box_get_active(GTK_COMBO_BOX(fcw->bsc.security)) + 1) != NET_CLIENT_CRYPT_NONE) &&
-		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->bsc.need_client_cert))) {
-    	gchar *cert_file;
-
-    	cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(fcw->bsc.client_cert_file));
-    	if ((cert_file == NULL) || (cert_file[0] == '\0')) {
-    		sensitive = FALSE;
-    	}
-    	g_free(cert_file);
-    }
-
-    gtk_dialog_set_response_sensitive(fcw->dialog, GTK_RESPONSE_OK, sensitive);
-}
-
-static void
-anonymous_cb(GtkToggleButton * button, FolderDialogData * fcw)
-{
-    gtk_widget_set_sensitive(fcw->anonymous,
-                             gtk_toggle_button_get_active(button));
-}
-
-static void
-remember_cb(GtkToggleButton * button, FolderDialogData * fcw)
-{
-    gtk_widget_set_sensitive(fcw->password,
-                             gtk_toggle_button_get_active(button));
-}
-
-static void
-security_cb(GtkComboBox *combo, FolderDialogData *fcw)
-{
-	gboolean sensitive;
-
-	sensitive = (gtk_combo_box_get_active(combo) + 1) != NET_CLIENT_CRYPT_NONE;
-	gtk_widget_set_sensitive(fcw->bsc.need_client_cert, sensitive);
-	sensitive = sensitive & gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->bsc.need_client_cert));
-	gtk_widget_set_sensitive(fcw->bsc.client_cert_file, sensitive);
-	gtk_widget_set_sensitive(fcw->bsc.client_cert_passwd, sensitive);
-	validate_folder(GTK_WIDGET(combo), fcw);
+    gtk_dialog_set_response_sensitive(fcw->dialog, GTK_RESPONSE_OK, libbalsa_server_cfg_valid(fcw->server_cfg));
 }
 
 static gboolean
 folder_conf_clicked_ok(FolderDialogData * fcw)
 {
     gboolean insert;
-    LibBalsaServer *s;
-    const gchar *username;
-    const gchar *host;
-
-    host = gtk_entry_get_text(GTK_ENTRY(fcw->bsc.server));
-    username = gtk_entry_get_text(GTK_ENTRY(fcw->username));
+    LibBalsaImapServer *imap;
 
     if (fcw->mbnode) {
         insert = FALSE;
-        s = fcw->mbnode->server;
     } else {
         insert = TRUE;
-	s = LIBBALSA_SERVER(libbalsa_imap_server_new(username, host));
-        g_signal_connect(G_OBJECT(s), "get-password",
+        g_signal_connect(G_OBJECT(fcw->server), "get-password",
                          G_CALLBACK(ask_password), NULL);
     }
 
-    s->security = balsa_server_conf_get_security(&fcw->bsc);
-    libbalsa_imap_server_set_max_connections
-        (LIBBALSA_IMAP_SERVER(s),
-         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
-                                          (fcw->connection_limit)));
-    libbalsa_imap_server_enable_persistent_cache
-        (LIBBALSA_IMAP_SERVER(s),
-         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent)));
-    libbalsa_imap_server_set_use_idle
-        (LIBBALSA_IMAP_SERVER(s), 
-         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_idle)));
-    libbalsa_imap_server_set_bug
-        (LIBBALSA_IMAP_SERVER(s), ISBUG_FETCH,
-         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->has_bugs)));
-    libbalsa_imap_server_set_use_status
-        (LIBBALSA_IMAP_SERVER(s),
-         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_status)));
-    libbalsa_server_set_username(s, username);
-    s->try_anonymous =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->anonymous));
-    s->remember_passwd =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->remember));
-    libbalsa_server_set_password(s,
-                                 gtk_entry_get_text(GTK_ENTRY
-                                                    (fcw->password)));
-    if (!fcw->mbnode) {
-        fcw->mbnode = balsa_mailbox_node_new_imap_folder(s, NULL);
-	/* mbnode will be unrefed in folder_conf_response. */
-	g_object_ref(fcw->mbnode);
-        /* The mailbox node takes over ownership of the
-         * FolderDialogData. */
-        g_object_set_data_full(G_OBJECT(fcw->mbnode),
-                               BALSA_FOLDER_CONF_IMAP_KEY, fcw,
-                               (GDestroyNotify) folder_conf_destroy_cdd);
-    }
+    libbalsa_server_cfg_assign_server(fcw->server_cfg, fcw->server);
 
-    g_free(fcw->mbnode->dir);
-    fcw->mbnode->dir = g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw->prefix)));
-    g_free(fcw->mbnode->name);
-    fcw->mbnode->name =
-        g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw->folder_name)));
-    fcw->mbnode->subscribed =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->subscribed));
-    fcw->mbnode->list_inbox =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->list_inbox));
-
-    libbalsa_server_set_host(s, host, s->security);
-    libbalsa_server_config_changed(s); /* trigger config save */
+    imap = LIBBALSA_IMAP_SERVER(fcw->server);
+    libbalsa_imap_server_set_max_connections(imap, gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(fcw->connection_limit)));
+    libbalsa_imap_server_enable_persistent_cache(imap, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent)));
+    libbalsa_imap_server_set_use_idle(imap, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_idle)));
+    libbalsa_imap_server_set_bug(imap, ISBUG_FETCH, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->has_bugs)));
+    libbalsa_imap_server_set_use_status(imap, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->use_status)));
 
     if (insert) {
-	balsa_mblist_mailbox_node_append(NULL, fcw->mbnode);
-        balsa_mailbox_node_append_subtree(fcw->mbnode);
-        config_folder_add(fcw->mbnode, NULL);
-	g_signal_connect_swapped(s, "config-changed",
-		                 G_CALLBACK(config_folder_update),
-				 fcw->mbnode);
-        update_mail_servers();
-    } else {
-        balsa_mailbox_node_rescan(fcw->mbnode);
-	balsa_mblist_mailbox_node_redraw(fcw->mbnode);
+    	fcw->mbnode = balsa_mailbox_node_new_imap_folder(fcw->server, NULL);
+    	g_object_ref(fcw->mbnode);
+    	/* The mailbox node takes over ownership of the
+    	 * FolderDialogData. */
+    	g_object_set_data_full(G_OBJECT(fcw->mbnode),
+    		BALSA_FOLDER_CONF_IMAP_KEY, fcw,
+			(GDestroyNotify) folder_conf_destroy_cdd);
     }
+
+    g_free(fcw->mbnode->name);
+    fcw->mbnode->name = g_strdup(libbalsa_server_cfg_get_name(fcw->server_cfg));
+    fcw->mbnode->subscribed = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->subscribed));
+    fcw->mbnode->list_inbox = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fcw->list_inbox));
+    g_free(fcw->mbnode->dir);
+    fcw->mbnode->dir = g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw->prefix)));
+
+    libbalsa_server_config_changed(fcw->server); /* trigger config save */
+
+    if (insert) {
+    	balsa_mblist_mailbox_node_append(NULL, fcw->mbnode);
+    	balsa_mailbox_node_append_subtree(fcw->mbnode);
+    	config_folder_add(fcw->mbnode, NULL);
+    	g_signal_connect_swapped(fcw->server, "config-changed", G_CALLBACK(config_folder_update), fcw->mbnode);
+    	update_mail_servers();
+    } else {
+    	balsa_mailbox_node_rescan(fcw->mbnode);
+    	balsa_mblist_mailbox_node_redraw(fcw->mbnode);
+    }
+
     return TRUE;
 }
 
@@ -295,20 +219,8 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
 void
 folder_conf_imap_node(BalsaMailboxNode *mn)
 {
-    GtkWidget *notebook, *grid, *label, *advanced;
     FolderDialogData *fcw;
     static FolderDialogData *fcw_new;
-    LibBalsaServer *s;
-    gchar *default_server;
-    int r = 0;
-
-#if defined(HAVE_LIBSECRET)
-    static const gchar *remember_password_message =
-        N_("_Remember password in Secret Service");
-#else
-    static const gchar *remember_password_message =
-        N_("_Remember password");
-#endif                          /* defined(HAVE_LIBSECRET) */
 
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new folder. */
@@ -319,9 +231,13 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
         return;
     }
 
-    s = mn ? mn->server : NULL;
-
     fcw = g_new(FolderDialogData, 1);
+    if (mn != NULL) {
+    	fcw->server = mn->server;
+    } else {
+    	fcw->server = g_object_new(LIBBALSA_TYPE_IMAP_SERVER, NULL);
+    }
+
     fcw->ok = (CommonDialogFunc) folder_conf_clicked_ok;
     fcw->mbnode = mn;
     fcw->dialog =
@@ -350,127 +266,42 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                                   (gpointer) &fcw_new);
     }
 
-    notebook = gtk_notebook_new();
-    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(fcw->dialog)),
-                       notebook, TRUE, TRUE, 0);
-    grid = libbalsa_create_grid();
-    gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
-                             gtk_label_new_with_mnemonic(_("_Basic")));
-    advanced = balsa_server_conf_get_advanced_widget(&fcw->bsc);
-    /* Limit number of connections */
-    fcw->connection_limit = 
-        balsa_server_conf_add_spinner
-        (&fcw->bsc, _("_Max number of connections:"), 1, 40, 1,
-         s 
-         ? libbalsa_imap_server_get_max_connections(LIBBALSA_IMAP_SERVER(s))
-         : 20);
-    fcw->enable_persistent = 
-        balsa_server_conf_add_checkbox(&fcw->bsc,
-                                       _("Enable _persistent cache"));
-    if(!s || 
-       libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(s)))
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->enable_persistent),
-                                     TRUE);
-    fcw->use_idle = 
-        balsa_server_conf_add_checkbox(&fcw->bsc,
-                                       _("Use IDLE command"));
-    if(s &&
-       libbalsa_imap_server_get_use_idle(LIBBALSA_IMAP_SERVER(s)))
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->use_idle),
-                                     TRUE);
-    fcw->has_bugs = 
-        balsa_server_conf_add_checkbox(&fcw->bsc,
-                                       _("Enable _bug workarounds"));
-    if(s &&
-       libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(s), ISBUG_FETCH))
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->has_bugs),
-                                     TRUE);
-    fcw->use_status = 
-        balsa_server_conf_add_checkbox(&fcw->bsc,
-                                       _("Use STATUS for mailbox checking"));
-    if(s &&
-       libbalsa_imap_server_get_use_status(LIBBALSA_IMAP_SERVER(s)))
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->use_status),
-                                     TRUE);
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced,
-                             gtk_label_new_with_mnemonic(_("_Advanced")));
+    fcw->server_cfg = libbalsa_server_cfg_new(fcw->server, (mn != NULL) ? mn->name : NULL);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(fcw->dialog))), GTK_WIDGET(fcw->server_cfg));
+    g_signal_connect(fcw->server_cfg, "changed", G_CALLBACK(validate_folder), fcw);
 
-    /* INPUT FIELD CREATION */
-    label = libbalsa_create_grid_label(_("Descriptive _name:"), grid, 0);
-    fcw->folder_name =
-        libbalsa_create_grid_entry(grid, G_CALLBACK(validate_folder),
-                                   fcw, r++, mn ? mn->name : NULL,
-				   label);
+    /* additional basic settings */
+    fcw->subscribed = libbalsa_server_cfg_add_check(fcw->server_cfg, TRUE, _("Subscribed _folders only"),
+    	(mn != NULL) ? mn->subscribed : FALSE, NULL, NULL);
+    fcw->list_inbox = libbalsa_server_cfg_add_check(fcw->server_cfg, TRUE, _("Always show _Inbox"),
+    	(mn != NULL) ? mn->list_inbox : TRUE, NULL, NULL);
+    fcw->prefix = libbalsa_server_cfg_add_entry(fcw->server_cfg, TRUE, _("Pr_efix:"),
+    	(mn != NULL) ? mn->dir : NULL, NULL, NULL);
 
-    default_server = libbalsa_guess_imap_server();
-    label = libbalsa_create_grid_label(_("_Server:"), grid, 1);
-    fcw->bsc.server =
-        libbalsa_create_grid_entry(grid, G_CALLBACK(validate_folder),
-                                   fcw, r++, s ? s->host : default_server,
-                                   label);
-    g_free(default_server);
-
-    label = libbalsa_create_grid_label(_("Se_curity:"), grid, r);
-    fcw->bsc.security = gtk_combo_box_text_new();
-    gtk_widget_set_hexpand(fcw->bsc.security, TRUE);
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fcw->bsc.security), _("IMAP over SSL (IMAPS)"));
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fcw->bsc.security), _("TLS required"));
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fcw->bsc.security), _("TLS if possible (not recommended)"));
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fcw->bsc.security), _("None (not recommended)"));
-    gtk_grid_attach(GTK_GRID(grid), fcw->bsc.security, 1, r++, 1, 1);
-    gtk_combo_box_set_active(GTK_COMBO_BOX(fcw->bsc.security), s ? s->security - 1 : NET_CLIENT_CRYPT_STARTTLS - 1);
-    g_signal_connect(fcw->bsc.security, "changed", G_CALLBACK(security_cb), fcw);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), fcw->bsc.security);
-
-    label= libbalsa_create_grid_label(_("Use_r name:"), grid, r);
-    fcw->username =
-        libbalsa_create_grid_entry(grid, G_CALLBACK(validate_folder),
-                                   fcw, r++, s ? s->user : g_get_user_name(),
-                                   label);
-
-    label = libbalsa_create_grid_label(_("_Password:"), grid, r);
-    fcw->password =
-        libbalsa_create_grid_entry(grid, NULL, NULL, r++,
-                                   s ? s->passwd : NULL, label);
-    gtk_entry_set_visibility(GTK_ENTRY(fcw->password), FALSE);
-
-    fcw->anonymous =
-        libbalsa_create_grid_check(_("_Anonymous access"), grid, r++,
-                                   s ? s->try_anonymous : FALSE);
-    g_signal_connect(G_OBJECT(fcw->anonymous), "toggled",
-                     G_CALLBACK(anonymous_cb), fcw);
-    fcw->remember =
-        libbalsa_create_grid_check(_(remember_password_message), grid, r++,
-                                   s ? s->remember_passwd : TRUE);
-    g_signal_connect(G_OBJECT(fcw->remember), "toggled",
-                     G_CALLBACK(remember_cb), fcw);
-
-    fcw->subscribed =
-        libbalsa_create_grid_check(_("Subscribed _folders only"), grid, r++,
-                                   mn ? mn->subscribed : FALSE);
-    fcw->list_inbox =
-        libbalsa_create_grid_check(_("Always show _Inbox"), grid, r++,
-                                   mn ? mn->list_inbox : TRUE);
-
-    label = libbalsa_create_grid_label(_("Pr_efix:"), grid, r);
-    fcw->prefix =
-        libbalsa_create_grid_entry(grid, NULL, NULL, r++,
-                                   mn ? mn->dir : NULL, label);
+    /* additional advanced settings */
+    fcw->connection_limit = gtk_spin_button_new_with_range(1.0, 40.0, 1.0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(fcw->connection_limit),
+    	(gdouble) libbalsa_imap_server_get_max_connections(LIBBALSA_IMAP_SERVER(fcw->server)));
+    libbalsa_server_cfg_add_item(fcw->server_cfg, FALSE, _("_Max number of connections:"), fcw->connection_limit);
+    fcw->enable_persistent = libbalsa_server_cfg_add_check(fcw->server_cfg, FALSE, _("Enable _persistent cache"),
+    	libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(fcw->server)), NULL, NULL);
+    fcw->use_idle = libbalsa_server_cfg_add_check(fcw->server_cfg, FALSE, _("Use IDLE command"),
+    	libbalsa_imap_server_get_use_idle(LIBBALSA_IMAP_SERVER(fcw->server)), NULL, NULL);
+    fcw->has_bugs = libbalsa_server_cfg_add_check(fcw->server_cfg, FALSE, _("Enable _bug workarounds"),
+    	libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(fcw->server), ISBUG_FETCH), NULL, NULL);
+    fcw->use_status = libbalsa_server_cfg_add_check(fcw->server_cfg, FALSE, _("Use STATUS for mailbox checking"),
+    	libbalsa_imap_server_get_use_status(LIBBALSA_IMAP_SERVER(fcw->server)), NULL, NULL);
 
     gtk_widget_show_all(GTK_WIDGET(fcw->dialog));
 
     validate_folder(NULL, fcw);
-    gtk_widget_grab_focus(fcw->folder_name);
 
     gtk_dialog_set_default_response(fcw->dialog, 
                                     mn ? GTK_RESPONSE_OK 
                                     : GTK_RESPONSE_CANCEL);
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
 
     g_signal_connect(G_OBJECT(fcw->dialog), "response",
                      G_CALLBACK(folder_conf_response), fcw);
-    gtk_widget_show_all(GTK_WIDGET(fcw->dialog));
 }
 
 /* folder_conf_imap_sub_node:

@@ -119,7 +119,6 @@ void libbalsa_show_message_source(GtkApplication * application,
                                   const gchar * font,
                                   gboolean *escape_specials,
                                   gint * width, gint * height);
-gchar *libbalsa_rot(const gchar * pass);
 
 gchar *libbalsa_guess_email_address(void);
 gchar *libbalsa_guess_mail_spool(void);
@@ -143,7 +142,6 @@ GThread *libbalsa_get_main_thread(void);
 gboolean libbalsa_am_i_subthread(void);
 void libbalsa_message(const char *fmt, ...)
 	G_GNUC_PRINTF(1, 2);
-gchar * libbalsa_rot(const gchar * pass);
 
 typedef enum {
     LIBBALSA_PROGRESS_NO = 0,

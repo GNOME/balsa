@@ -21,7 +21,6 @@
 #define __MAILBOX_CONF_H__
 
 #include "mailbox-node.h"
-
 #include "server.h"
 
 typedef struct _BalsaMailboxConfView BalsaMailboxConfView;
@@ -44,28 +43,5 @@ BalsaMailboxConfView *mailbox_conf_view_new(LibBalsaMailbox * mailbox,
                                             GCallback callback);
 void mailbox_conf_view_check(BalsaMailboxConfView * mcc,
                              LibBalsaMailbox * mailbox);
-
-
-typedef struct {
-    GtkWidget *security;
-    GtkGrid   *grid;       /* internal */
-    GtkWidget *server;     /* internal */
-    GtkWidget *need_client_cert;
-    GtkWidget *client_cert_file;
-    GtkWidget *client_cert_passwd;
-    unsigned   used_rows;  /* internal */
-} BalsaServerConf;
-
-
-GtkWidget*      balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc);
-GtkWidget*      balsa_server_conf_add_checkbox(BalsaServerConf *bsc,
-                                               const char *label);
-GtkWidget*      balsa_server_conf_add_spinner(BalsaServerConf *bsc,
-                                              const char *label,
-                                              gint lo, gint hi, gint step,
-                                              gint initial_value);
-void            balsa_server_conf_set_values(BalsaServerConf *bsc,
-                                             LibBalsaServer *server);
-NetClientCryptMode balsa_server_conf_get_security(BalsaServerConf *bsc);
 
 #endif				/* __MAILBOX_CONF_H__ */

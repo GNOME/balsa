@@ -126,7 +126,7 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
     mailbox->msg_size_limit = -1;
 
     mailbox->filter = FALSE;
-    mailbox->filter_cmd = NULL;
+    mailbox->filter_cmd = g_strdup("procmail -f -");
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server = libbalsa_server_new();
 }

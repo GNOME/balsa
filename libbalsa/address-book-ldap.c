@@ -835,8 +835,8 @@ libbalsa_address_book_ldap_save_config(LibBalsaAddressBook * ab,
 
     libbalsa_conf_set_string("Host", ldap->host);
     if(ldap->base_dn) libbalsa_conf_set_string("BaseDN", ldap->base_dn);
-    if(ldap->bind_dn) libbalsa_conf_private_set_string("BindDN", ldap->bind_dn);
-    if(ldap->passwd)  libbalsa_conf_private_set_string("Passwd", ldap->passwd);
+    if(ldap->bind_dn) libbalsa_conf_private_set_string("BindDN", ldap->bind_dn, FALSE);
+    if(ldap->passwd)  libbalsa_conf_private_set_string("Passwd", ldap->passwd, FALSE);
     if(ldap->priv_book_dn)
         libbalsa_conf_set_string("BookDN", ldap->priv_book_dn);
     libbalsa_conf_set_bool("EnableTLS", ldap->enable_tls);
@@ -860,11 +860,11 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
 	g_free(ldap->base_dn); ldap->base_dn = NULL; 
     }
 
-    ldap->bind_dn = libbalsa_conf_private_get_string("BindDN");
+    ldap->bind_dn = libbalsa_conf_private_get_string("BindDN", FALSE);
     if(ldap->bind_dn && *ldap->bind_dn == 0) { 
 	g_free(ldap->bind_dn); ldap->bind_dn = NULL; 
     }
-    ldap->passwd = libbalsa_conf_private_get_string("Passwd");
+    ldap->passwd = libbalsa_conf_private_get_string("Passwd", FALSE);
     if(ldap->passwd && *ldap->passwd == 0) { 
 	g_free(ldap->passwd); ldap->passwd = NULL; 
     }

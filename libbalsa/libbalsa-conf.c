@@ -48,6 +48,9 @@ static LibBalsaConf lbc_conf;
 static LibBalsaConf lbc_conf_priv;
 static GSList *lbc_groups;
 
+static gchar * libbalsa_rot(const gchar * pass)
+	G_GNUC_WARN_UNUSED_RESULT;
+
 #define BALSA_KEY_FILE "config"
 #define DEBUG FALSE
 #define LBC_KEY_FILE(priv) \
@@ -411,6 +414,21 @@ libbalsa_conf_set_string_(const char *path, const char *value,
     LBC_CHANGED(priv);
 }
 
+void
+libbalsa_conf_private_set_string(const gchar *path, const gchar *value, gboolean obfuscated)
+{
+	if (obfuscated && (value != NULL)) {
+		gchar *obf;
+
+		obf = libbalsa_rot(value);
+		libbalsa_conf_set_string_(path, obf, TRUE);
+		memset(obf, 0, strlen(obf));
+		g_free(obf);
+	} else {
+		libbalsa_conf_set_string_(path, value, TRUE);
+	}
+}
+
 gchar *
 libbalsa_conf_get_string_with_default_(const char *path, gboolean * def,
                                        gboolean priv)
@@ -434,6 +452,23 @@ libbalsa_conf_get_string_with_default_(const char *path, gboolean * def,
         *def = error != NULL;
 
     return retval;
+}
+
+gchar *
+libbalsa_conf_private_get_string(const gchar *path, gboolean obfuscated)
+{
+	gchar *result;
+
+	result = libbalsa_conf_get_string_with_default_(path, NULL, TRUE);
+	if (obfuscated && (result != NULL)) {
+		gchar *deob;
+
+		deob = libbalsa_rot(result);
+		memset(result, 0, strlen(result));
+		g_free(result);
+		result = deob;
+	}
+	return result;
 }
 
 void
@@ -567,4 +602,30 @@ libbalsa_conf_queue_sync(void)
     g_print("%s id now %d\n", __func__, lbc_sync_idle_id);
 #endif                          /* DEBUG */
     G_UNLOCK(lbc_sync_idle_id);
+}
+
+
+/* libbalsa_rot:
+   return rot13'ed string.
+*/
+static gchar *
+libbalsa_rot(const gchar * pass)
+{
+    gchar *buff;
+    gint len = 0, i = 0;
+
+    /*PKGW: let's do the assert() BEFORE we coredump... */
+
+    len = strlen(pass);
+    buff = g_strdup(pass);
+
+    for (i = 0; i < len; i++) {
+	if ((buff[i] <= 'M' && buff[i] >= 'A')
+	    || (buff[i] <= 'm' && buff[i] >= 'a'))
+	    buff[i] += 13;
+	else if ((buff[i] <= 'Z' && buff[i] >= 'N')
+		 || (buff[i] <= 'z' && buff[i] >= 'n'))
+	    buff[i] -= 13;
+    }
+    return buff;
 }

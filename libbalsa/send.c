@@ -784,6 +784,10 @@ lbs_process_queue_init_session(LibBalsaServer* server)
 		session = net_client_smtp_new(server->host, 587U, server->security);
 	}
 
+	/* connect signals */
+	g_signal_connect(G_OBJECT(session), "cert-check", G_CALLBACK(libbalsa_server_check_cert), session);
+	g_signal_connect(G_OBJECT(session), "auth", G_CALLBACK(libbalsa_server_get_auth), server);
+
 	/* load client certificate if configured */
 	if (server->client_cert) {
 		GError* error = NULL;
@@ -796,10 +800,6 @@ lbs_process_queue_init_session(LibBalsaServer* server)
 			g_object_unref(session);
 			session = NULL;
 		}
-	} else {
-		/* connect signals */
-		g_signal_connect(G_OBJECT(session), "cert-check", G_CALLBACK(libbalsa_server_check_cert), session);
-		g_signal_connect(G_OBJECT(session), "auth", G_CALLBACK(libbalsa_server_get_auth), server);
 	}
 
 	return session;

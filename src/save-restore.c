@@ -961,21 +961,17 @@ config_global_load(void)
 	libbalsa_server_set_username(server,
 		libbalsa_conf_get_string("ESMTPUser"));
 
-        passphrase = libbalsa_conf_private_get_string("ESMTPPassphrase");
+        passphrase = libbalsa_conf_private_get_string("ESMTPPassphrase", TRUE);
 	if (passphrase) {
-            gchar* passphrase_rot = libbalsa_rot(passphrase);
-            g_free(passphrase); 
-            libbalsa_server_set_password(server, passphrase_rot);
-	    g_free(passphrase_rot);
+            libbalsa_server_set_password(server, passphrase);
+	    g_free(passphrase);
         }
 
 	passphrase =
-	    libbalsa_conf_private_get_string("ESMTPCertificatePassphrase");
+	    libbalsa_conf_private_get_string("ESMTPCertificatePassphrase", TRUE);
 	if (passphrase) {
-            gchar* passphrase_rot = libbalsa_rot(passphrase);
-            g_free(passphrase);
 	    g_free(server->cert_passphrase);
-	    server->cert_passphrase = passphrase_rot;
+	    server->cert_passphrase = passphrase;
 	}
     }
 

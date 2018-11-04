@@ -50,6 +50,7 @@
 #include "mailbox-node.h"
 #include "pref-manager.h"
 #include "save-restore.h"
+#include "server-config.h"
 
 #include "libbalsa.h"
 #include "imap-server.h"
@@ -62,7 +63,6 @@
 #endif
 
 struct _BalsaMailboxConfView {
-    GtkWindow *window;
     GtkWidget *identity_combo_box;
     GtkWidget *show_to;
     GtkWidget *subscribe;
@@ -73,7 +73,9 @@ struct _BalsaMailboxConfView {
     GtkWidget *subject_gather;
     LibBalsaMailbox *mailbox;
 };
+
 typedef struct _MailboxConfWindow MailboxConfWindow;
+
 struct _MailboxConfWindow {
     LibBalsaMailbox *mailbox;
 
@@ -81,33 +83,22 @@ struct _MailboxConfWindow {
 
     void (*ok_handler)(MailboxConfWindow*);
     const gchar *ok_button_name;
-    GtkWidget *mailbox_name;
     GType mailbox_type;
     BalsaMailboxConfView *view_info;
-    gboolean ok_sensitive;
 
     union {
-	/* for imap mailboxes & directories */
+	/* for local mailboxes */
 	struct {
-	    GtkWidget *port;
-	    GtkWidget *username;
-            GtkWidget *anonymous;
-            GtkWidget *remember;
-	    GtkWidget *password;
-	    GtkWidget *folderpath;
-            GtkWidget *enable_persistent, *has_bugs;
-            BalsaServerConf bsc;
-	} imap;
+	    GtkWidget *mailbox_name;
+	} local;
 
 	/* for pop3 mailboxes */
 	struct {
-	    GtkWidget *username;
-	    GtkWidget *password;
+		LibBalsaServerCfg *server_cfg;
 	    GtkWidget *check;
 	    GtkWidget *delete_from_server;
-            BalsaServerConf bsc;
-            GtkWidget *disable_apop;
-            GtkWidget *enable_pipe;
+	    GtkWidget *disable_apop;
+	    GtkWidget *enable_pipe;
 	    GtkWidget *filter;
 	    GtkWidget *filter_cmd;
 	} pop3;
@@ -119,10 +110,6 @@ static void mailbox_conf_add(MailboxConfWindow *conf_window);
 
 /* misc functions */
 static void mailbox_conf_set_values(MailboxConfWindow *mcw);
-
-static void fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, 
-                              gchar ** path);
-static void update_imap_mailbox(MailboxConfWindow *mcw);
 
 static void update_pop_mailbox(MailboxConfWindow *mcw);
 static BalsaMailboxConfView *
@@ -140,158 +127,6 @@ static GtkWidget *create_pop_mailbox_dialog(MailboxConfWindow *mcw);
 
 static void check_for_blank_fields(GtkWidget *widget, MailboxConfWindow *mcw);
 
-/* ========================================================= */
-/* BEGIN BalsaServerConf =================================== */
-#ifdef HAVE_GPGME
-struct menu_data {
-    const char *label;
-    int tag;
-};
-struct mailbox_conf_combo_box_info {
-    GSList *tags;
-};
-#define BALSA_MC_COMBO_BOX_INFO "balsa-mailbox-conf-combo-box-info"
-
-static void
-mailbox_conf_combo_box_info_free(struct mailbox_conf_combo_box_info *info)
-{
-    g_slist_free(info->tags);
-    g_free(info);
-}
-
-static void
-mailbox_conf_combo_box_make(GtkComboBoxText * combo_box, unsigned cnt,
-                            const struct menu_data *data)
-{
-    struct mailbox_conf_combo_box_info *info =
-        g_new(struct mailbox_conf_combo_box_info, 1);
-    gint i;
-
-    info->tags = NULL;
-    for (i = cnt; --i >= 0;) {
-        gtk_combo_box_text_prepend_text(combo_box, _(data[i].label));
-        info->tags =
-            g_slist_prepend(info->tags, GINT_TO_POINTER(data[i].tag));
-    }
-    g_object_set_data_full(G_OBJECT(combo_box), BALSA_MC_COMBO_BOX_INFO,
-                           info,
-                           (GDestroyNotify)
-                           mailbox_conf_combo_box_info_free);
-}
-#endif /* HAVE_GPGME */
-
-
-GtkWidget*
-balsa_server_conf_get_advanced_widget(BalsaServerConf *bsc)
-{
-    GtkWidget *box;
-    GtkWidget *label;
-
-    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-
-    bsc->grid = GTK_GRID(libbalsa_create_grid());
-    gtk_container_set_border_width(GTK_CONTAINER(bsc->grid), 12);
-    gtk_box_pack_start(GTK_BOX(box), GTK_WIDGET(bsc->grid), FALSE, FALSE, 0);
-
-    bsc->used_rows = 0U;
-
-    /* client certificate configuration */
-    bsc->need_client_cert = balsa_server_conf_add_checkbox(bsc, _("Server requires client certificate"));
-
-    label = libbalsa_create_grid_label(_("Certificate _File:"), GTK_WIDGET(bsc->grid), bsc->used_rows);
-    bsc->client_cert_file = gtk_file_chooser_button_new(_("Choose Client Certificate"), GTK_FILE_CHOOSER_ACTION_OPEN);
-    gtk_widget_set_hexpand(bsc->client_cert_file, TRUE);
-    gtk_grid_attach(bsc->grid, bsc->client_cert_file, 1, bsc->used_rows++, 1, 1);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), bsc->client_cert_file);
-
-    label = libbalsa_create_grid_label(_("Certificate _Pass Phrase:"), GTK_WIDGET(bsc->grid), bsc->used_rows);
-    bsc->client_cert_passwd = libbalsa_create_grid_entry(GTK_WIDGET(bsc->grid), NULL, NULL, bsc->used_rows++, NULL, label);
-    g_object_set(G_OBJECT(bsc->client_cert_passwd), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
-    gtk_entry_set_visibility(GTK_ENTRY(bsc->client_cert_passwd), FALSE);
-
-    return box;
-}
-
-GtkWidget*
-balsa_server_conf_add_checkbox(BalsaServerConf *bsc,
-                               const char *label)
-{
-    return libbalsa_create_grid_check(label, GTK_WIDGET(bsc->grid),
-                                      bsc->used_rows++, FALSE);
-}
-
-GtkWidget*
-balsa_server_conf_add_spinner(BalsaServerConf *bsc,
-                              const char *label, gint lo, gint hi, gint step,
-                              gint initial_value)
-{
-    GtkWidget *spin_button;
-    GtkWidget *lbl = libbalsa_create_grid_label(label, GTK_WIDGET(bsc->grid),
-                                                bsc->used_rows);
-    spin_button = gtk_spin_button_new_with_range(lo, hi, step);
-    gtk_widget_set_hexpand(spin_button, TRUE);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(spin_button),
-			      (float) initial_value);
-
-    gtk_grid_attach(bsc->grid, spin_button, 1, bsc->used_rows, 1, 1);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(lbl), spin_button);
-    bsc->used_rows++;
-    return spin_button;
-}
-
-NetClientCryptMode
-balsa_server_conf_get_security(BalsaServerConf *bsc)
-{
-	return gtk_combo_box_get_active(GTK_COMBO_BOX(bsc->security)) + 1;
-}
-
-/* END BalsaServerConf ===================================== */
-/* ========================================================= */
-
-static void
-pop3_enable_filter_cb(GtkWidget * w, MailboxConfWindow * mcw)
-{
-    GtkToggleButton *button = GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter);
-    gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd,
-                             gtk_toggle_button_get_active(button));
-    check_for_blank_fields(NULL, mcw);
-}
-
-static void
-client_cert_changed(GtkToggleButton *button, MailboxConfWindow *mcw)
-{
-	gboolean sensitive;
-	BalsaServerConf *bsc;
-
-	if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3)) {
-		bsc = &mcw->mb_data.pop3.bsc;
-	} else {
-		bsc = &mcw->mb_data.imap.bsc;
-	}
-	sensitive = gtk_toggle_button_get_active(button);
-	gtk_widget_set_sensitive(bsc->client_cert_file, sensitive);
-	gtk_widget_set_sensitive(bsc->client_cert_passwd, sensitive);
-    check_for_blank_fields(NULL, mcw);
-}
-
-static void
-security_changed(GtkComboBox *combo, MailboxConfWindow *mcw)
-{
-	gboolean sensitive;
-	BalsaServerConf *bsc;
-
-	if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3)) {
-		bsc = &mcw->mb_data.pop3.bsc;
-	} else {
-		bsc = &mcw->mb_data.imap.bsc;
-	}
-	sensitive = (gtk_combo_box_get_active(combo) + 1) != NET_CLIENT_CRYPT_NONE;
-	gtk_widget_set_sensitive(bsc->need_client_cert, sensitive);
-	sensitive = sensitive & gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(bsc->need_client_cert));
-	gtk_widget_set_sensitive(bsc->client_cert_file, sensitive);
-	gtk_widget_set_sensitive(bsc->client_cert_passwd, sensitive);
-    check_for_blank_fields(NULL, mcw);
-}
 
 /* BEGIN OF COMMONLY USED CALLBACKS SECTION ---------------------- */
 
@@ -495,17 +330,23 @@ static void
 conf_response_cb(GtkDialog* dialog, gint response, MailboxConfWindow * mcw)
 {
     switch(response) {
-    case MCW_RESPONSE: mcw->ok_handler(mcw); 
-        /* fall through */
+    case MCW_RESPONSE:
+    	/* add or update */
+    	mcw->ok_handler(mcw);
+        g_object_set_data(G_OBJECT(mcw->mailbox), BALSA_MAILBOX_CONF_DIALOG, NULL);
+        break;
     default:
-        if (mcw->mailbox)
-            g_object_set_data(G_OBJECT(mcw->mailbox),
-                              BALSA_MAILBOX_CONF_DIALOG, NULL);
-        gtk_widget_destroy(GTK_WIDGET(dialog));
-        /* fall through */
-    case 0:
+    	/* everything else */
+    	if (mcw->ok_handler == mailbox_conf_add) {
+    		/* add: destroy intermediate mailbox */
+    		g_object_unref(mcw->mailbox);
+    		mcw->mailbox = NULL;
+    	} else {
+            g_object_set_data(G_OBJECT(mcw->mailbox), BALSA_MAILBOX_CONF_DIALOG, NULL);
+    	}
         break;
     }
+    gtk_widget_destroy(GTK_WIDGET(dialog));
 }
 
 static GtkWidget *
@@ -526,20 +367,23 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GType mailbox_type,
     } else {
         mcw->ok_handler = mailbox_conf_add;
         mcw->ok_button_name = _("_Add");
+        mcw->mailbox = g_object_new(mailbox_type, NULL);
     }
     mcw->mailbox_type = mailbox_type;
 
     mcw->window = GTK_DIALOG(create_dialog(mcw));
     g_object_weak_ref(G_OBJECT(mcw->window), (GWeakNotify) g_free, mcw);
     
-    gtk_dialog_set_response_sensitive(mcw->window, MCW_RESPONSE, FALSE);
-    mcw->ok_sensitive = FALSE;
+    if (!g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3)) {
+    	gtk_dialog_set_response_sensitive(mcw->window, MCW_RESPONSE, FALSE);
+    }
     gtk_dialog_set_default_response(mcw->window,
                                     update ? GTK_RESPONSE_CANCEL :
                                     MCW_RESPONSE);
 
-    if(mbnode)
+    if ((mbnode != NULL) && (mbnode == NULL) && (!g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3))) {
         mailbox_conf_set_values(mcw);
+    }
 
     g_signal_connect(G_OBJECT(mcw->window), "response", 
                      G_CALLBACK(conf_response_cb), mcw);
@@ -589,61 +433,10 @@ mailbox_conf_edit(BalsaMailboxNode * mbnode)
                       dialog);
 }
 
-static void
-mailbox_conf_set_values_pop3(LibBalsaMailbox   *mailbox,
-							 MailboxConfWindow *mcw)
-{
-	LibBalsaMailboxPop3 *pop3;
-	LibBalsaServer *server;
-	gboolean sensitive;
-
-	pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
-	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-
-	/* basic settings */
-	if (server->host != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server), server->host);
-	}
-	gtk_combo_box_set_active(GTK_COMBO_BOX(mcw->mb_data.pop3.bsc.security), server->security - 1);
-
-	if (server->user != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.username), server->user);
-	}
-
-	if (server->passwd != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.password), server->passwd);
-	}
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.delete_from_server), pop3->delete_from_server);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check), pop3->check);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter), pop3->filter);
-	if (pop3->filter_cmd != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd), pop3->filter_cmd);
-	}
-	gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd, pop3->filter);
-
-	/* advanced settings */
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.bsc.need_client_cert), server->client_cert);
-	sensitive = (server->security != NET_CLIENT_CRYPT_NONE);
-	gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.need_client_cert, sensitive);
-	sensitive = sensitive & server->client_cert;
-
-    if (server->cert_file != NULL) {
-    	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(mcw->mb_data.pop3.bsc.client_cert_file), server->cert_file);
-    }
-    gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.client_cert_file, sensitive);
-
-	if (server->cert_passphrase != NULL) {
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.client_cert_passwd), server->cert_passphrase);
-	}
-	gtk_widget_set_sensitive(mcw->mb_data.pop3.bsc.client_cert_passwd, sensitive);
-
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop), pop3->disable_apop);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe), pop3->enable_pipe);
-}
-
-
 /*
  * Initialise the dialogs fields from mcw->mailbox
+ *
+ * Note: used for local mailboxes only
  */
 static void
 mailbox_conf_set_values(MailboxConfWindow *mcw)
@@ -652,65 +445,19 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
 
 	mailbox = mcw->mailbox;
 
-	g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+	g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
 
-	if (mcw->mailbox_name && mailbox->name)
-		gtk_entry_set_text(GTK_ENTRY(mcw->mailbox_name), mailbox->name);
+	if (mcw->mb_data.local.mailbox_name && mailbox->name)
+		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.local.mailbox_name), mailbox->name);
 
-	if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
-		if (mailbox->url) {
-			GtkFileChooser *chooser = GTK_FILE_CHOOSER(mcw->window);
-			LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
-			const gchar *path = libbalsa_mailbox_local_get_path(local);
-			gchar *basename = g_path_get_basename(path);
-			gtk_file_chooser_set_filename(chooser, path);
-			gtk_file_chooser_set_current_name(chooser, basename);
-			g_free(basename);
-		}
-	} else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
-		mailbox_conf_set_values_pop3(mailbox, mcw);
-	} else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-		LibBalsaMailboxImap *imap;
-		LibBalsaServer *server;
-		const gchar *path;
-		imap = LIBBALSA_MAILBOX_IMAP(mailbox);
-		server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-
-		if (server->host)
-			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.bsc.server),
-				server->host);
-		if (server->user)
-			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.username),
-				server->user);
-		gtk_toggle_button_set_active
-		(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.anonymous),
-			server->try_anonymous);
-		gtk_toggle_button_set_active
-		(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.remember),
-			server->remember_passwd);
-		if (server->passwd)
-			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.password),
-				server->passwd);
-		path = libbalsa_mailbox_imap_get_path(imap);
-		if (path)
-			gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.imap.folderpath),
-				path);
-		if(libbalsa_imap_server_has_persistent_cache
-			(LIBBALSA_IMAP_SERVER(server)))
-			gtk_toggle_button_set_active
-			(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.enable_persistent),
-				TRUE);
-		if(libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(server),
-			ISBUG_FETCH))
-			gtk_toggle_button_set_active
-			(GTK_TOGGLE_BUTTON(mcw->mb_data.imap.has_bugs),
-				TRUE);
-		if(!server->try_anonymous)
-			gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.anonymous),
-				FALSE);
-		if(!server->remember_passwd)
-			gtk_widget_set_sensitive(GTK_WIDGET(mcw->mb_data.imap.password),
-				FALSE);
+	if (mailbox->url) {
+		GtkFileChooser *chooser = GTK_FILE_CHOOSER(mcw->window);
+		LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+		const gchar *path = libbalsa_mailbox_local_get_path(local);
+		gchar *basename = g_path_get_basename(path);
+		gtk_file_chooser_set_filename(chooser, path);
+		gtk_file_chooser_set_current_name(chooser, basename);
+		g_free(basename);
 	}
 }
 
@@ -722,85 +469,46 @@ mailbox_conf_set_values(MailboxConfWindow *mcw)
  * on any widget which can affect the validity of the input.
  */
 static void
-check_for_blank_fields(GtkWidget G_GNUC_UNUSED *widget, MailboxConfWindow *mcw)
+check_for_blank_fields(GtkWidget G_GNUC_UNUSED *widget,
+					   MailboxConfWindow       *mcw)
 {
     gboolean sensitive;
-    BalsaServerConf *bsc = NULL;
 
-    if (mcw == NULL || mcw->window == NULL)
+    if ((mcw == NULL) || (mcw->window == NULL)) {
         return;
-
-    sensitive = TRUE;
-
-    if (mcw->mailbox_name &&!*gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name))) {
-    	sensitive = FALSE;
-    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL) ) {
-    	gchar *filename =
-    		gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(mcw->window));
-    	if (filename) {
-    		g_free(filename);
-    	} else {
-    		sensitive = FALSE;
-    	}
-    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_IMAP ) ) {
-    	bsc = &mcw->mb_data.imap.bsc;
-    	if (!*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.folderpath))
-    		|| !*gtk_entry_get_text(GTK_ENTRY(bsc->server))
-			|| !*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.imap.username))) {
-    		sensitive = FALSE;
-    	}
-    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3) ) {
-    	/* POP3: require user name and server */
-    	bsc = &mcw->mb_data.pop3.bsc;
-    	if ((gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.username))[0] == '\0') ||
-    		(gtk_entry_get_text(GTK_ENTRY(bsc->server))[0] == '\0')) {
-    		sensitive = FALSE;
-    	}
-    	/* procmail filtering requires command */
-    	if (sensitive &&
-    		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter)) &&
-			(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd))[0] == '\0')) {
-    		sensitive = FALSE;
-    	}
     }
 
-    /* encryption w/ client cert requires cert file */
-    if (sensitive && (bsc != NULL) &&
-    	((gtk_combo_box_get_active(GTK_COMBO_BOX(bsc->security)) + 1) != NET_CLIENT_CRYPT_NONE) &&
-		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(bsc->need_client_cert))) {
-    	gchar *cert_file;
+    if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3)) {
+    	gboolean enable_filter;
 
-    	cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(bsc->client_cert_file));
-    	if ((cert_file == NULL) || (cert_file[0] == '\0')) {
-    		sensitive = FALSE;
+    	sensitive = libbalsa_server_cfg_valid(mcw->mb_data.pop3.server_cfg);
+
+    	/* procmail filter */
+    	enable_filter = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter));
+    	gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd, enable_filter);
+    	if (enable_filter) {
+    		sensitive = sensitive && (*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd)) != '\0');
     	}
-    	g_free(cert_file);
+    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL)) {
+    	sensitive = TRUE;
+
+        if ((mcw->mb_data.local.mailbox_name != NULL) &&
+        	(*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.mailbox_name)) == '\0')) {
+        	sensitive = FALSE;
+        } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL)) {
+        	gchar *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(mcw->window));
+        	if (filename != NULL) {
+        		g_free(filename);
+        	} else {
+        		sensitive = FALSE;
+        	}
+        }
+    } else {
+    	g_assert_not_reached();
     }
 
     gtk_dialog_set_response_sensitive(mcw->window, MCW_RESPONSE, sensitive);
-    mcw->ok_sensitive = sensitive;
-}
-
-/*
- * Update an IMAP mailbox with details from the dialog
- */
-static void
-fill_in_imap_data(MailboxConfWindow *mcw, gchar ** name, gchar ** path)
-{
-    *path =
-	gtk_editable_get_chars(GTK_EDITABLE(mcw->mb_data.imap.folderpath),
-                               0, -1);
-
-    if (mcw->mailbox_name && (!(*name =
-	  g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name))))
-	|| *(g_strstrip(*name)) == '\0')) {
-	if (*name)
-	    g_free(*name);
-
-	*name = g_strdup_printf(_("%s on %s"), *path,
-				gtk_entry_get_text(GTK_ENTRY
-						   (mcw->mb_data.imap.bsc.server)));
-    }
+    gtk_dialog_set_default_response(mcw->window, sensitive ? MCW_RESPONSE : GTK_RESPONSE_CANCEL);
 }
 
 /*
@@ -811,21 +519,14 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 {
 	LibBalsaMailboxPop3 *mailbox;
 	LibBalsaServer *server;
-	BalsaServerConf *bsc;
 
 	mailbox = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
 	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-	bsc = &mcw->mb_data.pop3.bsc;
 
 	/* basic data */
 	g_free(LIBBALSA_MAILBOX(mailbox)->name);
-	LIBBALSA_MAILBOX(mailbox)->name = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mailbox_name)));
-
-	server->security = balsa_server_conf_get_security(&mcw->mb_data.pop3.bsc);
-	libbalsa_server_set_host(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.bsc.server)), server->security);
-
-	libbalsa_server_set_username(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.username)));
-	libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.password)));
+	LIBBALSA_MAILBOX(mailbox)->name = g_strdup(libbalsa_server_cfg_get_name(mcw->mb_data.pop3.server_cfg));
+	libbalsa_server_cfg_assign_server(mcw->mb_data.pop3.server_cfg, server);
 	libbalsa_server_config_changed(server);
 
 	mailbox->check = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check));
@@ -835,72 +536,8 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 	mailbox->filter_cmd = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd)));
 
 	/* advanced settings */
-	server->client_cert = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(bsc->need_client_cert));
-	g_free(server->cert_file);
-	server->cert_file = g_strdup(gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(bsc->client_cert_file)));;
-	g_free(server->cert_passphrase);
-	server->cert_passphrase = g_strdup(gtk_entry_get_text(GTK_ENTRY(bsc->client_cert_passwd)));
 	mailbox->disable_apop = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop));
 	mailbox->enable_pipe = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe));
-}
-
-/*
- * Update an imap mcw->mailbox with details from the dialog
- */
-static void
-update_imap_mailbox(MailboxConfWindow *mcw)
-{
-    gchar *path;
-    LibBalsaMailboxImap *mailbox;
-    LibBalsaServer* server;
-
-    mailbox = LIBBALSA_MAILBOX_IMAP(mcw->mailbox);
-    server  = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
-    if (!server) {
-	server = LIBBALSA_SERVER(libbalsa_imap_server_new("",""));
-	libbalsa_mailbox_remote_set_server(LIBBALSA_MAILBOX_REMOTE(mailbox),
-					   server);
-	g_signal_connect_swapped(server, "config-changed",
-                                 G_CALLBACK(config_mailbox_update),
-				 mailbox);
-    }
-    g_free(LIBBALSA_MAILBOX(mailbox)->name);
-    fill_in_imap_data(mcw, &LIBBALSA_MAILBOX(mailbox)->name, &path);
-    libbalsa_server_set_username(server,
-				 gtk_entry_get_text(GTK_ENTRY
-						    (mcw->mb_data.imap.username)));
-    server->try_anonymous = 
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->
-                                                       mb_data.imap.anonymous));
-    server->remember_passwd = 
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->
-                                                       mb_data.imap.remember));
-	server->security = balsa_server_conf_get_security(&mcw->mb_data.imap.bsc);
-    libbalsa_server_set_password(server,
-				 gtk_entry_get_text(GTK_ENTRY
-						    (mcw->mb_data.imap.password)));
-    libbalsa_imap_server_enable_persistent_cache
-        (LIBBALSA_IMAP_SERVER(server),
-         gtk_toggle_button_get_active
-         GTK_TOGGLE_BUTTON(mcw->mb_data.imap.enable_persistent));
-    libbalsa_imap_server_set_bug
-        (LIBBALSA_IMAP_SERVER(server), ISBUG_FETCH,
-         gtk_toggle_button_get_active
-         GTK_TOGGLE_BUTTON(mcw->mb_data.imap.has_bugs));
-    /* Set host after all other server changes, as it triggers
-     * save-to-config for any folder or mailbox using this server. */
-    libbalsa_server_set_host(server,
-			     gtk_entry_get_text(GTK_ENTRY
-						(mcw->mb_data.imap.bsc.server)),
-						server->security);
-    libbalsa_server_config_changed(server);
-    g_signal_connect(G_OBJECT(server), "get-password",
-                     G_CALLBACK(ask_password), mailbox);
-
-    libbalsa_mailbox_imap_set_path(mailbox,
-				   (path == NULL || path[0] == '\0') 
-				   ? "INBOX" : path);
-    g_free(path);
 }
 
 /* conf_update_mailbox:
@@ -959,8 +596,8 @@ mailbox_conf_update(MailboxConfWindow *mcw)
             g_free(path_dir);
 	}
 
-        name = mcw->mailbox_name ?
-            gtk_editable_get_chars(GTK_EDITABLE(mcw->mailbox_name), 0, -1)
+        name = mcw->mb_data.local.mailbox_name ?
+            gtk_editable_get_chars(GTK_EDITABLE(mcw->mb_data.local.mailbox_name), 0, -1)
             : g_path_get_basename(filename);
 	if (strcmp(name, mailbox->name)) {
 	    /* Change name. */
@@ -975,10 +612,8 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 	g_free(path);
     } else if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
 	update_pop_mailbox(mcw);
-    } else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-	update_imap_mailbox(mcw);
-        /* update_imap_mailbox saved the config so we do not need to here: */
-	return;
+    } else {
+    	g_assert_not_reached();
     }
 
     if (mailbox->config_prefix)
@@ -998,7 +633,6 @@ mailbox_conf_add(MailboxConfWindow * mcw)
     BalsaMailboxNode *mbnode;
     gboolean save_to_config = TRUE;
 
-    mcw->mailbox = g_object_new(mcw->mailbox_type, NULL);
     mailbox_conf_view_check(mcw->view_info, mcw->mailbox);
 
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
@@ -1018,7 +652,7 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 	save_to_config =
             !libbalsa_path_is_below_dir(path,
                                         balsa_app.local_mail_directory);
-        printf("Save to config: %d\n", save_to_config);
+        g_debug("Save to config: %d", save_to_config);
 	mcw->mailbox->name = g_path_get_basename(path);
         g_free(path);
 
@@ -1031,9 +665,7 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 	balsa_app.inbox_input =
 	    g_list_append(balsa_app.inbox_input, mbnode);
     } else if ( LIBBALSA_IS_MAILBOX_IMAP(mcw->mailbox) ) {
-	update_imap_mailbox(mcw);
-	balsa_mblist_mailbox_node_append(NULL, mbnode);
-	update_mail_servers();
+    	g_assert_not_reached();
     } else if ( !LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
 	g_assert_not_reached();
     }
@@ -1050,15 +682,14 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 static GtkWidget *
 create_dialog(MailboxConfWindow *mcw)
 {
-    if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL) ) {
-	return create_local_mailbox_dialog(mcw);
-    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3) ) {
-	return create_pop_mailbox_dialog(mcw);
-    } else {
-	g_warning("Unknown mailbox type: %s\n",
-                  g_type_name(mcw->mailbox_type));
-	return NULL;
-    }
+	if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL)) {
+		return create_local_mailbox_dialog(mcw);
+	} else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3)) {
+		return create_pop_mailbox_dialog(mcw);
+	} else {
+		g_warning("Unknown mailbox type: %s\n", g_type_name(mcw->mailbox_type));
+		return NULL;
+	}
 }
 
 static void
@@ -1081,22 +712,20 @@ balsa_get_entry(GtkWidget * widget, GtkWidget ** entry)
  * so we don't change button sensitivity.
  */
 static void
-local_mailbox_dialog_cb(GtkWidget * widget, MailboxConfWindow * mcw)
+local_mailbox_dialog_cb(GtkWidget         *widget,
+						MailboxConfWindow *mcw)
 {
-    gchar *filename =
-        gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(mcw->window));
+    gchar *filename = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(mcw->window));
 
-    if (filename) {
+    if (filename != NULL) {
         gboolean changed = TRUE;
-        if (mcw->mailbox) {
-            LibBalsaMailboxLocal *local =
-                LIBBALSA_MAILBOX_LOCAL(mcw->mailbox);
-            const gchar *path = libbalsa_mailbox_local_get_path(local);
-            changed = strcmp(filename, path);
+        if (mcw->mailbox != NULL) {
+            changed = (g_strcmp0(filename, mcw->mailbox->url) != 0);
         }
         g_free(filename);
-        if (changed)
+        if (changed) {
             check_for_blank_fields(widget, mcw);
+        }
     }
 }
 
@@ -1105,7 +734,6 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 {
     GtkWidget *dialog;
     GtkWidget *grid;
-    GtkWidget *label = NULL;
     gint row = -1;
     GtkFileChooserAction action;
     GtkWidget *entry = NULL;
@@ -1115,15 +743,6 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 
     grid = libbalsa_create_grid();
 
-    /* mailbox name */
-    if(mcw->mailbox && mcw->mailbox->config_prefix) {
-        label = libbalsa_create_grid_label(_("_Mailbox Name:"), grid, ++row);
-        mcw->mailbox_name =
-            libbalsa_create_grid_entry(grid,
-                                       G_CALLBACK(check_for_blank_fields),
-                                       mcw, row, NULL, label);
-    } else mcw->mailbox_name = NULL;
-
     type = g_type_name(mcw->mailbox_type) + 15;
     title = g_strdup_printf(mcw->mailbox ?
                             _("Local %s Mailbox Properties") :
@@ -1131,7 +750,7 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 
     action = mcw->mailbox_type == LIBBALSA_TYPE_MAILBOX_MBOX ?
         GTK_FILE_CHOOSER_ACTION_SAVE :
-        GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER;
+		GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER;
     dialog =
         gtk_file_chooser_dialog_new(title,
                                     GTK_WINDOW(balsa_app.main_window),
@@ -1144,15 +763,37 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif
 
-    size_group = libbalsa_create_size_group(dialog);
-    if (label)
-        gtk_size_group_add_widget(size_group, label);
-
     gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), grid);
-    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog),
-	                                balsa_app.local_mail_directory);
+    if (mcw->mailbox->url != NULL) {
+		const gchar *path = libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox));
+		gchar *basename = g_path_get_basename(path);
+
+		g_message("'%s' -> '%s' '%s'", mcw->mailbox->url, path, basename);
+		//gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog), path);
+		//gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), basename);
+		gtk_file_chooser_set_uri(GTK_FILE_CHOOSER(dialog), mcw->mailbox->url);
+		g_free(basename);
+		// FIXME - not optimal
+    } else {
+        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), balsa_app.local_mail_directory);
+    }
     g_signal_connect(G_OBJECT(dialog), "selection-changed",
                      G_CALLBACK(local_mailbox_dialog_cb), mcw);
+
+    size_group = libbalsa_create_size_group(dialog);
+    if (mcw->mailbox->config_prefix) {
+        GtkWidget *label;
+
+        label = libbalsa_create_grid_label(_("_Mailbox Name:"), grid, ++row);
+        mcw->mb_data.local.mailbox_name =
+            libbalsa_create_grid_entry(grid,
+                                       G_CALLBACK(check_for_blank_fields),
+                                       mcw, row, mcw->mailbox->name, label);
+        gtk_size_group_add_widget(size_group, label);
+    } else {
+    	mcw->mb_data.local.mailbox_name = NULL;
+    }
+
     balsa_get_entry(dialog, &entry);
     if (entry)
 	g_signal_connect(G_OBJECT(entry), "changed",
@@ -1166,113 +807,51 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 }
 
 static GtkWidget *
-create_generic_dialog(MailboxConfWindow * mcw)
-{
-    GtkWidget *dialog =
-        gtk_dialog_new_with_buttons(_("Remote Mailbox Configurator"),
-                                    GTK_WINDOW(balsa_app.main_window),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    libbalsa_dialog_flags(),
-                                    mcw->ok_button_name, MCW_RESPONSE,
-                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                    NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
-#endif
-    return dialog;
-}
-
-static GtkWidget *
-create_security_entry(GtkWidget *grid, gint *row, MailboxConfWindow *mcw)
-{
-    GtkWidget *label;
-    GtkWidget *security;
-
-    label = libbalsa_create_grid_label(_("Se_curity:"), grid, *row);
-    security = gtk_combo_box_text_new();
-    gtk_widget_set_hexpand(security, TRUE);
-    if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3)) {
-    	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(security), _("POP3 over SSL (POP3S)"));
-    } else {
-    	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(security), _("IMAP over SSL (IMAPS)"));
-    }
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(security), _("TLS required"));
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(security), _("TLS if possible (not recommended)"));
-    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(security), _("None (not recommended)"));
-    gtk_grid_attach(GTK_GRID(grid), security, 1, (*row)++, 1, 1);
-    g_signal_connect(security, "changed", G_CALLBACK(security_changed), mcw);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(label), security);
-    return security;
-}
-
-static GtkWidget *
 create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 {
-    GtkWidget *dialog;
-    GtkWidget *notebook, *grid, *label, *advanced;
-    gint row;
+	LibBalsaMailbox *mailbox = mcw->mailbox;
+    LibBalsaMailboxPop3 *pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
 
-    notebook = gtk_notebook_new();
-    grid = libbalsa_create_grid();
-    gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), grid,
-                             gtk_label_new_with_mnemonic(_("_Basic")));
-    row = 0;
+	mcw->window = GTK_DIALOG(gtk_dialog_new_with_buttons(_("Remote Mailbox Configurator"),
+        GTK_WINDOW(balsa_app.main_window),
+		GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+        mcw->ok_button_name, MCW_RESPONSE,
+		_("_Cancel"), GTK_RESPONSE_CANCEL,
+        NULL));
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(mcw->window, GTK_WINDOW(balsa_app.main_window));
+#endif
 
-    /* mailbox name */
-    label = libbalsa_create_grid_label(_("Mailbox _name:"), grid, row);
-    mcw->mailbox_name = libbalsa_create_grid_entry(grid, G_CALLBACK(check_for_blank_fields), mcw, row++, NULL, label);
-    /* pop server */
-    label = libbalsa_create_grid_label(_("_Server:"), grid, row);
-    mcw->mb_data.pop3.bsc.server =
-    	libbalsa_create_grid_entry(grid, G_CALLBACK(check_for_blank_fields), mcw, row++, "localhost", label);
-
-    /* security */
-    mcw->mb_data.pop3.bsc.security = create_security_entry(grid, &row, mcw);
-
-    /* username  */
-    label= libbalsa_create_grid_label(_("Use_r name:"), grid, row);
-    mcw->mb_data.pop3.username =
-    	libbalsa_create_grid_entry(grid, G_CALLBACK(check_for_blank_fields), mcw, row++, g_get_user_name(), label);
-
-    /* password field */
-    label = libbalsa_create_grid_label(_("Pass_word:"), grid, row);
-    mcw->mb_data.pop3.password = libbalsa_create_grid_entry(grid, NULL, NULL, row++, NULL, label);
-    gtk_entry_set_visibility(GTK_ENTRY(mcw->mb_data.pop3.password), FALSE);
+    mcw->mb_data.pop3.server_cfg = libbalsa_server_cfg_new(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox), mailbox->name);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(mcw->window))), GTK_WIDGET(mcw->mb_data.pop3.server_cfg));
+    g_signal_connect(mcw->mb_data.pop3.server_cfg, "changed", G_CALLBACK(check_for_blank_fields), mcw);
 
     /* toggle for deletion from server */
-    mcw->mb_data.pop3.delete_from_server =
-	libbalsa_create_grid_check(_("_Delete messages from server after download"), grid, row++, TRUE);
+    mcw->mb_data.pop3.delete_from_server = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE,
+    	_("_Delete messages from server after download"), pop3->delete_from_server, NULL, NULL);
 
     /* toggle for check */
-    mcw->mb_data.pop3.check =
-	libbalsa_create_grid_check(_("_Enable check for new mail"), grid, row++, TRUE);
+    mcw->mb_data.pop3.check = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE, _("_Enable check for new mail"),
+    	pop3->check, NULL, NULL);
 
     /* Procmail */
-    mcw->mb_data.pop3.filter =
-	libbalsa_create_grid_check(_("_Filter messages through procmail"), grid, row++, FALSE);
-    g_signal_connect(G_OBJECT(mcw->mb_data.pop3.filter), "toggled", G_CALLBACK(pop3_enable_filter_cb), mcw);
-    label = libbalsa_create_grid_label(_("Fi_lter Command:"), grid, row);
-    mcw->mb_data.pop3.filter_cmd =
-	libbalsa_create_grid_entry(grid, G_CALLBACK(check_for_blank_fields), mcw, row++, "procmail -f -", label);
+    mcw->mb_data.pop3.filter = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE,
+    	_("_Filter messages through procmail"), pop3->filter, G_CALLBACK(check_for_blank_fields), mcw);
+    mcw->mb_data.pop3.filter_cmd = libbalsa_server_cfg_add_entry(mcw->mb_data.pop3.server_cfg, TRUE, _("Fi_lter Command:"),
+    	pop3->filter_cmd, G_CALLBACK(check_for_blank_fields), mcw);
 
-    advanced = balsa_server_conf_get_advanced_widget(&mcw->mb_data.pop3.bsc);
-    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), advanced, gtk_label_new_with_mnemonic(_("_Advanced")));
-   	g_signal_connect(mcw->mb_data.pop3.bsc.need_client_cert, "toggled", G_CALLBACK(client_cert_changed), mcw);
-   	g_signal_connect(mcw->mb_data.pop3.bsc.client_cert_file, "file-set", G_CALLBACK(check_for_blank_fields), mcw);
+    /* advanced - toggle for apop */
+    mcw->mb_data.pop3.disable_apop = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, FALSE, _("Disable _APOP"),
+    	pop3->disable_apop, NULL, NULL);
 
-    /* toggle for apop */
-    mcw->mb_data.pop3.disable_apop = balsa_server_conf_add_checkbox(&mcw->mb_data.pop3.bsc, _("Disable _APOP"));
     /* toggle for enabling pipeling */
-    mcw->mb_data.pop3.enable_pipe = balsa_server_conf_add_checkbox(&mcw->mb_data.pop3.bsc, _("Overlap commands"));
+    mcw->mb_data.pop3.enable_pipe = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, FALSE, _("Overlap commands"),
+    	pop3->enable_pipe, NULL, NULL);
 
-    gtk_widget_show_all(notebook);
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
-    gtk_widget_grab_focus(mcw->mailbox_name);
+    /* initially call the check */
+    check_for_blank_fields(NULL, mcw);
 
-    dialog = create_generic_dialog(mcw);
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), notebook);
-    return dialog;
+    return GTK_WIDGET(mcw->window);
 }
 
 /* Manage the widgets that control aspects of the view, not the config.
@@ -1326,7 +905,6 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     view_info = g_new(BalsaMailboxConfView, 1);
     g_object_weak_ref(G_OBJECT(window), (GWeakNotify) g_free, view_info);
     view_info->mailbox = mailbox;
-    view_info->window = window;
 
     label = libbalsa_create_grid_label(_("_Identity:"), grid, row);
     if (size_group)
@@ -1348,12 +926,6 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
 #ifdef HAVE_GPGME
     {
 	/* scope */
-	static const struct menu_data chk_crypt_menu[] = {
-	    { N_("Never"),       LB_MAILBOX_CHK_CRYPT_NEVER  },
-	    { N_("If Possible"), LB_MAILBOX_CHK_CRYPT_MAYBE  },
-	    { N_("Always"),      LB_MAILBOX_CHK_CRYPT_ALWAYS }
-	};
-
         label =
             libbalsa_create_grid_label(_("_Decrypt and check\n"
                                          "signatures automatically:"),
@@ -1363,12 +935,11 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
 
         view_info->chk_crypt = gtk_combo_box_text_new();
         gtk_label_set_mnemonic_widget(GTK_LABEL(label), view_info->chk_crypt);
-        mailbox_conf_combo_box_make(GTK_COMBO_BOX_TEXT(view_info->chk_crypt),
-                                    ELEMENTS(chk_crypt_menu),
-                                    chk_crypt_menu);
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(view_info->chk_crypt), _("Never"));
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(view_info->chk_crypt), _("If Possible"));
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(view_info->chk_crypt), _("Always"));
         gtk_combo_box_set_active(GTK_COMBO_BOX(view_info->chk_crypt),
-                                 libbalsa_mailbox_get_crypto_mode
-                                 (mailbox));
+                                 libbalsa_mailbox_get_crypto_mode(mailbox));
         if (mcw)
             g_signal_connect(view_info->chk_crypt, "changed",
                              G_CALLBACK(check_for_blank_fields), mcw);
@@ -1452,21 +1023,6 @@ mailbox_conf_view_new(LibBalsaMailbox * mailbox,
                                       NULL, NULL, callback);
 }
 
-#ifdef HAVE_GPGME
-static LibBalsaChkCryptoMode
-balsa_mailbox_conf_get_crypto_mode(BalsaMailboxConfView *view_info)
-{
-    struct mailbox_conf_combo_box_info *info =
-        g_object_get_data(G_OBJECT(view_info->chk_crypt),
-                          BALSA_MC_COMBO_BOX_INFO);
-    gint active =
-        gtk_combo_box_get_active(GTK_COMBO_BOX(view_info->chk_crypt));
-
-    return (LibBalsaChkCryptoMode)
-        GPOINTER_TO_INT(g_slist_nth_data(info->tags, active));
-}
-#endif
-
 /* When closing the dialog, check whether any view items were changed,
  * and carry out the changes if necessary.
  *
@@ -1533,7 +1089,7 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 
 #ifdef HAVE_GPGME
     if (libbalsa_mailbox_set_crypto_mode(mailbox,
-					 balsa_mailbox_conf_get_crypto_mode(view_info)))
+					 gtk_combo_box_get_active(GTK_COMBO_BOX(view_info->chk_crypt))))
 	changed = TRUE;
 #endif
 

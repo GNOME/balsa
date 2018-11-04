@@ -95,8 +95,9 @@ void libbalsa_conf_set_string_               (const char *path,
                                               gboolean priv);
 #define libbalsa_conf_set_string(path,new_value) \
         (libbalsa_conf_set_string_((path),(new_value),FALSE))
-#define libbalsa_conf_private_set_string(path,new_value) \
-        (libbalsa_conf_set_string_((path),(new_value),TRUE))
+void libbalsa_conf_private_set_string(const gchar *path,
+    								  const gchar *value,
+									  gboolean     obfuscated);
 
 char *libbalsa_conf_get_string_with_default_ (const char *path,
                                               gboolean * def,
@@ -105,8 +106,9 @@ char *libbalsa_conf_get_string_with_default_ (const char *path,
         (libbalsa_conf_get_string_with_default_((path),NULL, FALSE))
 #define libbalsa_conf_get_string_with_default(path, def) \
         (libbalsa_conf_get_string_with_default_((path),(def), FALSE))
-#define libbalsa_conf_private_get_string(path) \
-        (libbalsa_conf_get_string_with_default_((path),NULL, TRUE))
+gchar *libbalsa_conf_private_get_string(const gchar *path,
+										gboolean	 obfuscated)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 void libbalsa_conf_set_vector                (const char *path,
 	                                      int argc,

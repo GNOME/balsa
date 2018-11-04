@@ -1,3 +1,32 @@
+2018-11-04  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Unified server configuration GUI
+
+	* libbalsa/Makefile.am, libbalsa/meson.build: add new
+	server-config module
+	* libbalsa/imap-server.c: use common config class; ensure server
+	hash key required by changed folder conf approach
+	* libbalsa/libbalsa-conf.[ch]: add option for obfuscated private
+	string, so libbalsa_rot() is used only locally
+	* libbalsa/address-book-ldap.c: use changed libbalsa-conf api
+	* libbalsa/libbalsa.[ch]: libbalsa_rot() moved to
+	libbalsa/libbalsa-conf.c
+	* libbalsa/mailbox_pop3.c: properly initialise procmail command
+	* libbalsa/send.c: fix broken signal connections if a user
+	certificate is used
+	* libbalsa/server-config.[ch]: implement new server config
+	gui class
+	* libbalsa/server.[ch]: use new config gui; refactor libsecret
+	stuff; store user cert passphrase using libsecret if requested;
+	clean up exported types
+	* libbalsa/smtp-server.c: use new config gui
+	* src/folder-conf.c: use new config gui; Note: slightly changed
+	approach for adding an IMAP folder
+	* src/mailbox-conf.[ch]: use new config gui, removes loads of
+	obsolete exported code
+	* src/mailbox-node.c: use g_debug() for debug messages
+	* src/save-restore.c: use changed libbalsa-conf api
+
 2018-10-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/main-window.c (bw_create_index_widget):

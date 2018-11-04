@@ -269,7 +269,7 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * group)
     g_return_if_fail(!mn->parent);
 
     if(mn->name)
-	printf("Saving mailbox node %s with group %s\n", mn->name, group);
+	g_debug("Saving mailbox node %s with group %s", mn->name, group);
     libbalsa_imap_server_save_config(LIBBALSA_IMAP_SERVER(mn->server));
     libbalsa_conf_set_string("Name",      mn->name);
     libbalsa_conf_set_string("Directory", mn->dir);
@@ -282,7 +282,7 @@ balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * group)
         children_names = g_ptr_array_new();
         balsa_mailboxes_append_children(model, &iter,
                                         children_names);
-        printf("Saving %d children\n", children_names->len);
+        g_debug("Saving %d children", children_names->len);
         libbalsa_conf_set_vector("Children", children_names->len,
                                  (const char*const*)(children_names->pdata));
         g_ptr_array_foreach(children_names, (GFunc)g_free, NULL);
@@ -366,9 +366,7 @@ check_local_path(const gchar * path, guint depth)
     libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
                                 (LibBalsaConfForeachFunc) check_url_func,
                                 &cpi);
-    if(balsa_app.debug) 
-	printf("check_local_path: path “%s” must_scan %d.\n",
-               cpi.url, cpi.must_scan);
+    g_debug("check_local_path: path “%s” must_scan %d.", cpi.url, cpi.must_scan);
     g_free(cpi.url);
 
     return cpi.must_scan;
@@ -429,9 +427,7 @@ imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
     libbalsa_mailbox_remote_set_server(LIBBALSA_MAILBOX_REMOTE(m),
 				       mbnode->server);
     libbalsa_mailbox_imap_set_path(m, isi->fn);
-    if(balsa_app.debug)
-        printf("imap_scan_attach_mailbox: add mbox of name %s "
-	       "(full path %s)\n", isi->fn, mailbox->url);
+    g_debug("imap_scan_attach_mailbox: add mbox of name %s (full path %s)", isi->fn, mailbox->url);
     /* avoid allocating the name again: */
     mailbox->name = mbnode->name;
     mbnode->name = NULL;
@@ -541,10 +537,10 @@ imap_dir_cb(BalsaMailboxNode* mb)
     }
     imap_scan_destroy_tree(&imap_tree);
 
-    if(balsa_app.debug && mb->name)
-        printf("imap_dir_cb:  main mailbox node %s mailbox is %p\n", 
-               mb->name, mb->mailbox);
-    if(balsa_app.debug) printf("%d: Scanning done.\n", (int)time(NULL));
+    if (mb->name) {
+    	g_debug("imap_dir_cb: main mailbox node %s mailbox is %p", mb->name, mb->mailbox);
+    }
+    g_debug("%d: Scanning done.", (int)time(NULL));
     gtk_statusbar_pop(statusbar, context_id);
 
     /* We can save the cache now... */
@@ -781,8 +777,9 @@ restore_children_from_cache(BalsaMailboxNode *mn)
     imap_scan_item isi;
 
     if(!children) {
-        if(mn->name)
-            printf("No cache for %s - quitting.\n", mn->name);
+        if (mn->name) {
+        	g_debug("No cache for %s - quitting.", mn->name);
+        }
         return FALSE;
     }
 
@@ -1226,7 +1223,7 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
 	    mailbox = NULL;
 	}
 	if(!mailbox) {/* local mailbox could not be created; privileges? */
-	    printf("Not accessible mailbox %s\n", path);
+		g_warning("Not accessible mailbox %s", path);
 	    return NULL;
 	}
 	mailbox->name = g_strdup(name);
@@ -1395,10 +1392,8 @@ handle_imap_path(const char *fn, char delim, int noselect, int noscan,
 	    /* ignore mailboxes that begin with a dot */
 	    return;
     }
-    if (balsa_app.debug)
-	printf("handle_imap_path: Adding mailbox of path “%s” "
-	       "delim `%c' noselect %d noscan %d\n",
-	       fn, delim, noselect, noscan);
+    g_debug("handle_imap_path: Adding mailbox of path “%s” delim `%c' noselect %d noscan %d",
+    	fn, delim, noselect, noscan);
     add_imap_entry(fn, delim, noscan, !noselect, marked, data);
 }
 
@@ -1425,9 +1420,7 @@ check_imap_path(const gchar *fn, LibBalsaServer * server, guint depth)
     libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
                                 (LibBalsaConfForeachFunc) check_url_func,
                                 &cpi);
-    if(balsa_app.debug) 
-	printf("check_imap_path: path “%s” must_scan %d.\n",
-               cpi.url, cpi.must_scan);
+    g_debug("check_imap_path: path “%s” must_scan %d.", cpi.url, cpi.must_scan);
     g_free(cpi.url);
 
     return cpi.must_scan;
@@ -1443,8 +1436,7 @@ mark_imap_path(const gchar * fn, gpointer data)
     imap_scan_tree *tree = data;
     GSList *list;
 
-    if(balsa_app.debug) 
-	printf("mark_imap_path: find path “%s”.\n", fn);
+    g_debug("mark_imap_path: find path “%s”.", fn);
     for (list = tree->list; list; list = list->next) {
         imap_scan_item *item = list->data;
         if (!strcmp(item->fn, fn)) {
@@ -1452,6 +1444,7 @@ mark_imap_path(const gchar * fn, gpointer data)
             break;
         }
     }
-    if (!list && balsa_app.debug)
-	printf(" not found.\n");
+    if (!list) {
+    	g_debug("… not found.");
+    }
 }

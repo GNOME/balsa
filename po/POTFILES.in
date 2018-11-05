@@ -47,6 +47,7 @@ libbalsa/rfc3156.c
 libbalsa/rfc6350.c
 libbalsa/send.c
 libbalsa/server.c
+libbalsa/server-config.c
 libbalsa/smtp-server.c
 libbalsa/source-viewer.c
 libinit_balsa/assistant_helper.c

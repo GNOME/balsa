@@ -69,15 +69,15 @@ struct _LibBalsaServerClass {
     void (*set_host) (LibBalsaServer * server,
 		      const gchar * host, NetClientCryptMode  security);
     void (*config_changed) (LibBalsaServer * server);
-    gchar *(*get_password) (LibBalsaServer * server);
 };
 
 LibBalsaServer *libbalsa_server_new(void);
 
 void libbalsa_server_set_username(LibBalsaServer * server,
 				  const gchar * username);
-void libbalsa_server_set_password(LibBalsaServer * server,
-				  const gchar * passwd);
+void libbalsa_server_set_password(LibBalsaServer *server,
+				  	  	  	  	  const gchar    *passwd,
+								  gboolean        for_cert);
 void libbalsa_server_set_host(LibBalsaServer     *server,
 							  const gchar        *host,
 							  NetClientCryptMode  security);
@@ -96,9 +96,9 @@ gboolean libbalsa_server_check_cert(NetClient           *client,
            	   	   	   	   	   	    GTlsCertificate     *peer_cert,
 									GTlsCertificateFlags errors,
 									gpointer             user_data);
-gchar *libbalsa_server_get_cert_pass(NetClient        *client,
-									 const GByteArray *cert_der,
-									 gpointer          user_data);
+gchar *libbalsa_server_get_cert_pass(NetClient *client,
+									 gchar     *cert_subject,
+									 gpointer   user_data);
 
 void libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
                                      gpointer cb_data);

@@ -491,7 +491,7 @@ handle_connection_error(int rc, struct handle_info *info,
     gchar *msg = imap_mbox_handle_get_last_msg(info->handle);
     switch(rc) {
     case IMAP_AUTH_FAILURE:
-        libbalsa_server_set_password(server, NULL); break;
+        libbalsa_server_set_password(server, NULL, FALSE); break;
     case IMAP_CONNECT_FAILED:
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_NETWORK_ERROR,

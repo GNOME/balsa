@@ -947,10 +947,10 @@ libbalsa_image_error_quark(void)
 }
 
 #if GTK_CHECK_VERSION(3, 12, 0)
-GtkDialogFlags
-libbalsa_dialog_flags(void)
+gboolean
+libbalsa_use_headerbar(void)
 {
-	static GtkDialogFlags dialog_flags = GTK_DIALOG_USE_HEADER_BAR;
+	static gboolean use_headerbar = TRUE;
 	static gint check_done = 0;
 
 	if (g_atomic_int_get(&check_done) == 0) {
@@ -958,10 +958,16 @@ libbalsa_dialog_flags(void)
 
 		dialog_env = g_getenv("BALSA_DIALOG_HEADERBAR");
 		if ((dialog_env != NULL) && (atoi(dialog_env) == 0)) {
-			dialog_flags = (GtkDialogFlags) 0;
+			use_headerbar = FALSE;
 		}
 		g_atomic_int_set(&check_done, 1);
 	}
-	return dialog_flags;
+	return use_headerbar;
+}
+
+GtkDialogFlags
+libbalsa_dialog_flags(void)
+{
+	return libbalsa_use_headerbar() ? GTK_DIALOG_USE_HEADER_BAR : (GtkDialogFlags) 0;
 }
 #endif

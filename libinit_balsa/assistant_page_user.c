@@ -202,7 +202,7 @@ create_pop3_mbx(const gchar *name, const gchar* host, gint security,
     LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(pop);
 
     libbalsa_server_set_username(server, login);
-    libbalsa_server_set_password(server, passwd);
+    libbalsa_server_set_password(server, passwd, FALSE);
     libbalsa_server_set_host(server, host, security);
     server->security        = security;
     server->remember_passwd = remember;
@@ -225,7 +225,7 @@ create_imap_mbx(const gchar *name, const gchar* host, NetClientCryptMode securit
     LibBalsaServer *server =
         LIBBALSA_SERVER(libbalsa_imap_server_new(login, host));
     libbalsa_server_set_username(server, login);
-    libbalsa_server_set_password(server, passwd);
+    libbalsa_server_set_password(server, passwd, FALSE);
     libbalsa_server_set_host(server, host, security);
     server->remember_passwd = remember;
     mbnode = balsa_mailbox_node_new_imap_folder(server, NULL);

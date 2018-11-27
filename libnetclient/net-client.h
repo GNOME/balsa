@@ -339,8 +339,8 @@ gboolean net_client_can_read(NetClient *client);
  * The following signals are implemented:
  *
  * - @anchor cert-pass cert-pass
- *   @code gchar *cert_pass(NetClient *client, GByteArray *peer_cert_der, gpointer user_data) @endcode The client certificate used
- *   for the connection has a password-protected key.  The certificate in DER format is passed to the signal handler, and shall
+ *   @code gchar *cert_pass(NetClient *client, char *cert_subject, gpointer user_data) @endcode The client certificate used
+ *   for the connection has a password-protected key.  The certificate subject is passed to the signal handler, which shall
  *   return a newly allocated string containing the password.  The string is wiped and freed when it is not needed any more.
  * - @anchor cert-check cert-check
  *   @code gboolean check_cert(NetClient *client, GTlsCertificate *peer_cert, GTlsCertificateFlags errors, gpointer user_data)

@@ -390,7 +390,9 @@ void balsa_app_init(void);
 void balsa_app_destroy(void);
 void update_timer(gboolean update, guint minutes);
 
-gchar *ask_password(LibBalsaServer * server, LibBalsaMailbox * mbox);
+gchar *ask_password(LibBalsaServer *server,
+	                const gchar    *cert_subject,
+					gpointer        user_data);
 void balsa_open_mailbox_list(gchar ** urls);
 
 /* Search functions */

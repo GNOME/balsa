@@ -1,3 +1,21 @@
+2018-11-27  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Password dialogue improvements
+
+	* libbalsa/imap-server.c, libbalsa/server-config.c,
+	libinit_balsa/assistant_page_user.c, src/save-restore.c: use
+	changed libbalsa_server_set_password() api
+	* libbalsa/libbalsa.[c]: implement GTK_DIALOG_USE_HEADER_BAR
+	detection as boolean for GCR dialogue
+	* libbalsa/server.[ch]: clean up signal definitions (remove
+	obsolete marshallers); remove unused class method;
+	adjust api's for libbalsa_server_set_password(),
+	libbalsa_server_get_password() and libbalsa_server_get_cert_pass()
+	* libnetclient/net-client.[ch]: pass cert subject only
+	instead of full binary data in the passphrase signal
+	* src/balsa-app.[ch]: use GCR password dialogue if available;
+	drop set_passwd_from_matching_server() which is never used
+
 2018-11-04  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Unified server configuration GUI

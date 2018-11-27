@@ -284,15 +284,14 @@ libbalsa_server_cfg_assign_server(LibBalsaServerCfg *server_cfg, LibBalsaServer 
     	server->try_anonymous = FALSE;
     }
     libbalsa_server_set_username(server, gtk_entry_get_text(GTK_ENTRY(priv->username)));
-    libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(priv->password)));
+    libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(priv->password)), FALSE);
     server->remember_passwd = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(priv->remember_pass));
 
     /* client certificate */
     server->client_cert = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(priv->require_cert));
     g_free(server->cert_file);
     server->cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(priv->cert_file));
-    g_free(server->cert_passphrase);
-    server->cert_passphrase = g_strdup(gtk_entry_get_text(GTK_ENTRY(priv->cert_pass)));
+    libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(priv->cert_pass)), TRUE);
     server->remember_cert_passphrase = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(priv->remember_cert_pass));
 }
 

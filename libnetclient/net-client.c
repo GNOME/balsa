@@ -395,28 +395,33 @@ net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **
 			} else {
 				res = gnutls_x509_privkey_import2(key, &data, GNUTLS_X509_FMT_PEM, NULL, 0);
 				if (res == GNUTLS_E_DECRYPTION_FAILED) {
-					size_t der_size;
-					guint8 *der_data;
+					size_t dn_size;
+					gchar *dn_str;
 
-					/* determine cert buffer size requirements */
-					der_size = 0U;
-					(void) gnutls_x509_crt_export(cert, GNUTLS_X509_FMT_DER, NULL, &der_size);
-					der_data = g_malloc(der_size);		/*lint !e9079 (MISRA C:2012 Rule 11.5) */
+					/* determine dn string buffer size requirements */
+					dn_size = 0U;
+					(void) gnutls_x509_crt_get_dn(cert, NULL, &dn_size);
+					dn_str = g_malloc0(dn_size + 1U);		/*lint !e9079 (MISRA C:2012 Rule 11.5) */
 
-					res = gnutls_x509_crt_export(cert, GNUTLS_X509_FMT_DER, der_data, &der_size);
+					res = gnutls_x509_crt_get_dn(cert, dn_str, &dn_size);
 					if (res == GNUTLS_E_SUCCESS) {
-						GByteArray *cert_der;
 						gchar *key_pass = NULL;
 
-						cert_der = g_byte_array_new_take(der_data, der_size);
+						if (!g_utf8_validate(dn_str, -1, NULL)) {
+							gchar *buf;
+
+							buf = g_locale_to_utf8(dn_str, -1, NULL, NULL, NULL);
+							g_free(dn_str);
+							dn_str = buf;
+						}
 						g_debug("emit 'cert-pass' signal for client %p", client);
-						g_signal_emit(client, signals[2], 0, cert_der, &key_pass);
-						g_byte_array_unref(cert_der);
+						g_signal_emit(client, signals[2], 0, dn_str, &key_pass);
 						if (key_pass != NULL) {
 							res = gnutls_x509_privkey_import2(key, &data, GNUTLS_X509_FMT_PEM, key_pass, 0);
 							net_client_free_authstr(key_pass);
 						}
 					}
+					g_free(dn_str);
 				}
 
 				/* on success, set the certificate using the unencrypted key */
@@ -594,7 +599,7 @@ net_client_class_init(NetClientClass *klass)
 		G_TYPE_TLS_CERTIFICATE, G_TYPE_TLS_CERTIFICATE_FLAGS);
 	signals[1] = g_signal_new("auth", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_STRV, 1U, G_TYPE_BOOLEAN);
 	signals[2] = g_signal_new("cert-pass", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_STRING, 1U,
-		G_TYPE_BYTE_ARRAY);
+		G_TYPE_STRING);
 }
 
 

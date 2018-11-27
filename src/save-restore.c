@@ -37,6 +37,7 @@
 #include "filter-funcs.h"
 #include "mailbox-filter.h"
 #include "libbalsa-conf.h"
+#include "net-client-utils.h"
 
 #include "smtp-server.h"
 #include "send.h"
@@ -420,7 +421,7 @@ config_mailbox_init(const gchar * prefix)
     if (LIBBALSA_IS_MAILBOX_REMOTE(mailbox)) {
 	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
         libbalsa_server_connect_signals(server,
-                                        G_CALLBACK(ask_password), mailbox);
+                                        G_CALLBACK(ask_password), NULL);
 	g_signal_connect_swapped(server, "config-changed",
                                  G_CALLBACK(config_mailbox_update),
 				 mailbox);
@@ -963,15 +964,15 @@ config_global_load(void)
 
         passphrase = libbalsa_conf_private_get_string("ESMTPPassphrase", TRUE);
 	if (passphrase) {
-            libbalsa_server_set_password(server, passphrase);
-	    g_free(passphrase);
+            libbalsa_server_set_password(server, passphrase, FALSE);
+            net_client_free_authstr(passphrase);
         }
 
 	passphrase =
 	    libbalsa_conf_private_get_string("ESMTPCertificatePassphrase", TRUE);
 	if (passphrase) {
-	    g_free(server->cert_passphrase);
-	    server->cert_passphrase = passphrase;
+        libbalsa_server_set_password(server, passphrase, TRUE);
+        net_client_free_authstr(passphrase);
 	}
     }
 

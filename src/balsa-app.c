@@ -26,11 +26,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* for creat(2) */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
 #include "filter-funcs.h"
 #include "libbalsa-conf.h"
 #include "misc.h"
@@ -43,10 +38,75 @@
 #  include "macosx-helpers.h"
 #endif
 
+#if HAVE_GCR
+#define GCR_API_SUBJECT_TO_CHANGE
+#include <gcr/gcr.h>
+#else
+#include <gnutls/x509.h>
+#endif
+
 #include <glib/gi18n.h>	/* Must come after balsa-app.h. */
 
 /* Global application structure */
 struct BalsaApplication balsa_app;
+
+#if HAVE_GCR
+
+static gchar *
+ask_password_real(LibBalsaServer *server, const gchar *cert_subject)
+{
+#if defined(HAVE_LIBSECRET)
+    static const gchar *remember_password_message =
+        N_("_Remember password in Secret Service");
+#else
+    static const gchar *remember_password_message =
+        N_("_Remember password");
+#endif                          /* defined(HAVE_LIBSECRET) */
+	GcrPromptDialog *dialog;
+	gchar *prompt;
+	gboolean *remember;
+	gchar *passwd;
+
+    g_return_val_if_fail(server != NULL, NULL);
+
+    if (cert_subject != NULL) {
+    	prompt = g_strdup_printf(_("Password to unlock the user certificate\n%s\nfor %s@%s (%s)"),
+    		cert_subject, server->user, server->host, server->protocol);
+    	remember = &server->remember_cert_passphrase;
+    } else {
+    	prompt = g_strdup_printf(_("Password for %s@%s (%s)"), server->user, server->host, server->protocol);
+    	remember = &server->remember_passwd;
+    }
+	dialog = g_object_new(GCR_TYPE_PROMPT_DIALOG,
+						  "use-header-bar", libbalsa_use_headerbar(),
+						  "title", _("Password needed"),
+						  "description", prompt,
+						  "message", _("Password needed"),
+						  "choice-label", remember_password_message,
+						  "cancel-label", _("_Cancel"),
+						  "continue-label", _("_OK"),
+						  "choice-chosen", *remember,
+						  "destroy-with-parent", TRUE,
+						  "transient-for", GTK_WINDOW(balsa_app.main_window),
+						  "modal", TRUE,
+						  NULL);
+	g_free(prompt);
+	passwd = g_strdup(gcr_prompt_password_run(GCR_PROMPT(dialog), NULL, NULL));
+	if (passwd != NULL) {
+		gboolean old_remember;
+
+		old_remember = *remember;
+		*remember = gcr_prompt_get_choice_chosen(GCR_PROMPT(dialog));
+		libbalsa_server_set_password(server, passwd, cert_subject != NULL);
+		if (*remember || old_remember) {
+			libbalsa_server_config_changed(server);
+		}
+	}
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+    return passwd;
+}
+
+#else
 
 #define HIG_PADDING 12
 
@@ -54,11 +114,17 @@ struct BalsaApplication balsa_app;
    asks the user for the password to the mailbox on given remote server.
 */
 static gchar *
-ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
+ask_password_real(LibBalsaServer * server, const gchar *cert_subject)
 {
-    GtkWidget *dialog, *entry, *rememb;
-    GtkWidget *content_area;
-    gchar *prompt, *passwd = NULL;
+	GtkWidget *dialog;
+	GtkWidget *content;
+	GtkWidget *grid;
+	GtkWidget *label;
+    GtkWidget *entry;
+    GtkWidget *rememb_check;
+    gchar *prompt;
+    gchar *passwd;
+	gboolean *remember;
 #if defined(HAVE_LIBSECRET)
     static const gchar *remember_password_message =
         N_("_Remember password in Secret Service");
@@ -68,15 +134,14 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 #endif                          /* defined(HAVE_LIBSECRET) */
 
     g_return_val_if_fail(server != NULL, NULL);
-    if (mbox)
-	prompt =
-	    g_strdup_printf(_("Opening remote mailbox %s.\n"
-                              "The _password for %s@%s:"),
-			    mbox->name, server->user, server->host);
-    else
-	prompt =
-	    g_strdup_printf(_("_Password for %s@%s (%s):"), server->user,
-			    server->host, server->protocol);
+    if (cert_subject != NULL) {
+    	prompt = g_strdup_printf(_("Password to unlock the user certificate\n%s\nfor %s@%s (%s)"),
+    		cert_subject, server->user, server->host, server->protocol);
+    	remember = &server->remember_cert_passphrase;
+    } else {
+    	prompt = g_strdup_printf(_("Password for %s@%s (%s)"), server->user, server->host, server->protocol);
+       	remember = &server->remember_passwd;
+    }
 
     dialog = gtk_dialog_new_with_buttons(_("Password needed"),
                                          GTK_WINDOW(balsa_app.main_window),
@@ -88,43 +153,51 @@ ask_password_real(LibBalsaServer * server, LibBalsaMailbox * mbox)
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif
-    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    gtk_box_set_spacing(GTK_BOX(content_area), HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(content_area),
-                      gtk_label_new_with_mnemonic(prompt));
+
+    content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    gtk_container_set_border_width(GTK_CONTAINER(content), HIG_PADDING);
+
+    grid = libbalsa_create_grid();
+    gtk_container_add(GTK_CONTAINER(content), grid);
+
+    gtk_grid_attach(GTK_GRID(grid), gtk_label_new(prompt), 0, 0, 2, 1);
     g_free(prompt);
-    gtk_container_add(GTK_CONTAINER(content_area),
-                      entry = gtk_entry_new());
-    gtk_entry_set_width_chars(GTK_ENTRY(entry), 20);
+
+    label = libbalsa_create_grid_label(_("Password:"), grid, 1);
+    entry = libbalsa_create_grid_entry(grid, NULL, NULL, 1, NULL, label);
+    g_object_set(G_OBJECT(entry), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
-
-    rememb =  gtk_check_button_new_with_mnemonic(_(remember_password_message));
-    gtk_container_add(GTK_CONTAINER(content_area), rememb);
-    if(server->remember_passwd)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(rememb), TRUE);
-
-    gtk_widget_show_all(content_area);
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
-    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-    gtk_widget_grab_focus (entry);
+    gtk_widget_grab_focus(entry);
 
-    if(gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
-        unsigned old_rem = server->remember_passwd;
-        passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
-        server->remember_passwd = 
-            !!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rememb));
-        libbalsa_server_set_password(server, passwd);
-        if( server->remember_passwd || old_rem )
-            libbalsa_server_config_changed(server);
+    rememb_check = libbalsa_create_grid_check(remember_password_message, grid, 2, *remember);
+
+    gtk_widget_show_all(grid);
+    gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+
+    if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK) {
+		gboolean old_remember;
+
+		old_remember = *remember;
+		passwd = g_strdup(gtk_entry_get_text(GTK_ENTRY(entry)));
+		*remember = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(rememb_check));
+		libbalsa_server_set_password(server, passwd, cert_subject != NULL);
+		if (*remember || old_remember) {
+			libbalsa_server_config_changed(server);
+		}
+    } else {
+    	passwd = NULL;
     }
     gtk_widget_destroy(dialog);
     return passwd;
 }
 
+#endif
+
 typedef struct {
     GCond cond;
     LibBalsaServer* server;
-    LibBalsaMailbox* mbox;
+    const gchar *cert_subject;
     gchar* res;
     gboolean done;
 } AskPasswdData;
@@ -136,7 +209,7 @@ static gboolean
 ask_passwd_idle(gpointer data)
 {
     AskPasswdData* apd = (AskPasswdData*)data;
-    apd->res = ask_password_real(apd->server, apd->mbox);
+    apd->res = ask_password_real(apd->server, apd->cert_subject);
     apd->done = TRUE;
     g_cond_signal(&apd->cond);
     return FALSE;
@@ -146,7 +219,7 @@ ask_passwd_idle(gpointer data)
    GDK lock must not be held.
 */
 static gchar *
-ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
+ask_password_mt(LibBalsaServer * server, const gchar *cert_subject)
 {
     static GMutex ask_passwd_lock;
     AskPasswdData apd;
@@ -154,7 +227,7 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
     g_mutex_lock(&ask_passwd_lock);
     g_cond_init(&apd.cond);
     apd.server = server;
-    apd.mbox   = mbox;
+    apd.cert_subject = cert_subject;
     apd.done   = FALSE;
     g_idle_add(ask_passwd_idle, &apd);
     while (!apd.done) {
@@ -166,84 +239,27 @@ ask_password_mt(LibBalsaServer * server, LibBalsaMailbox * mbox)
     return apd.res;
 }
 
-static gboolean
-set_passwd_from_matching_server(GtkTreeModel *model,
-				GtkTreePath *path,
-				GtkTreeIter *iter,
-				gpointer data)
-{
-    LibBalsaServer *server;
-    LibBalsaServer *master;
-    LibBalsaMailbox *mbox;
-    BalsaMailboxNode *node;
 
-    gtk_tree_model_get(model, iter, 0, &node, -1);
-    g_return_val_if_fail(node != NULL, FALSE);
-    if(node->server) {
-        server = node->server;
-	g_object_unref(node);
-    } else {
-        mbox = node->mailbox;
-	g_object_unref(node);
-        if(!mbox) /* eg. a collection of mboxes */
-            return FALSE;
-        g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mbox), FALSE);
-
-        if (!LIBBALSA_IS_MAILBOX_REMOTE(mbox)) return FALSE;
-        server = LIBBALSA_MAILBOX_REMOTE_SERVER(mbox);
-        g_return_val_if_fail(server != NULL, FALSE);
-    }
-    g_return_val_if_fail(server->host != NULL, FALSE);
-    g_return_val_if_fail(server->user != NULL, FALSE);
-    if (server->passwd == NULL) return FALSE;
-
-    master = (LibBalsaServer *)data;
-    g_return_val_if_fail(LIBBALSA_IS_SERVER(master), FALSE);
-    if (master == server) return FALSE;
-
-    g_return_val_if_fail(server->host != NULL, FALSE);
-    g_return_val_if_fail(server->user != NULL, FALSE);
-
-    if ((strcmp(server->host, master->host) == 0) &&
-	(strcmp(server->user, master->user) == 0)) {
-	g_free(master->passwd);
-	master->passwd = g_strdup(server->passwd);
-	return TRUE;
-    };
-    
-    return FALSE;
-}
 /* ask_password:
    when called from thread, gdk lock must not be held.
+   @param cert_data
 */
 gchar *
-ask_password(LibBalsaServer *server, LibBalsaMailbox *mbox)
+ask_password(LibBalsaServer *server, const gchar *cert_subject, gpointer user_data)
 {
+    G_LOCK_DEFINE_STATIC(ask_password);
     gchar *password;
 
     g_return_val_if_fail(server != NULL, NULL);
-    
-    password = NULL;
-    if (mbox) {
-	gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
-			       (GtkTreeModelForeachFunc)
-			       set_passwd_from_matching_server, server);
 
-	if (server->passwd != NULL) {
-	    password = server->passwd;
-	    server->passwd = NULL;
-	}
+    G_LOCK(ask_password);
+    if (libbalsa_am_i_subthread()) {
+    	password = ask_password_mt(server, cert_subject);
+    } else {
+    	password = ask_password_real(server, cert_subject);
     }
+	G_UNLOCK(ask_password);
 
-    if (!password) {
-        G_LOCK_DEFINE_STATIC(ask_password);
-
-        G_LOCK(ask_password);
-	password = !libbalsa_am_i_subthread() ?
-            ask_password_real(server, mbox) : ask_password_mt(server, mbox);
-        G_UNLOCK(ask_password);
-	return password;
-    }
 	return password;
 }
 

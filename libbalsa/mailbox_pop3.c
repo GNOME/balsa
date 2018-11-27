@@ -494,6 +494,10 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 		if (!net_client_set_cert_from_file(NET_CLIENT(pop), server->cert_file, &error)) {
 			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), server->cert_file,
 				error->message);
+			/* bad certificate private key password: clear it */
+			if (error->code == NET_CLIENT_ERROR_CERT_KEY_PASS) {
+				libbalsa_server_set_password(server, NULL, TRUE);
+			}
 			g_error_free(error);
 			g_object_unref(G_OBJECT(pop));
 			return NULL;
@@ -509,6 +513,10 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	if (!net_client_pop_connect(pop, NULL, &error)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s: cannot connect %s: %s"), name, server->host,
 			error->message);
+		/* authentication failed: clear password */
+		if (error->code == NET_CLIENT_ERROR_POP_AUTHFAIL) {
+			libbalsa_server_set_password(server, NULL, FALSE);
+		}
 		g_error_free(error);
 		net_client_shutdown(NET_CLIENT(pop));
 		g_object_unref(G_OBJECT(pop));

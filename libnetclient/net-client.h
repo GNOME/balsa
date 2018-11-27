@@ -69,7 +69,8 @@ enum _NetClientError {
 	NET_CLIENT_ERROR_TLS_ACTIVE,			/**< TLS is already active for the connection. */
 	NET_CLIENT_ERROR_COMP_ACTIVE,			/**< Compression is already active for the connection. */
 	NET_CLIENT_ERROR_LINE_TOO_LONG,			/**< The line is too long. */
-	NET_CLIENT_ERROR_GNUTLS,				/**< A GnuTLS error occurred. */
+	NET_CLIENT_ERROR_GNUTLS,				/**< A GnuTLS error occurred (bad certificate or key data, or internal error). */
+	NET_CLIENT_ERROR_CERT_KEY_PASS,			/**< GnuTLS could not decrypt the user certificate's private key. */
 	NET_CLIENT_ERROR_GSSAPI					/**< A GSSAPI error occurred. */
 };
 

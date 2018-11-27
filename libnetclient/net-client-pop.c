@@ -380,7 +380,7 @@ net_client_pop_class_init(NetClientPopClass *klass)
 static void
 net_client_pop_init(NetClientPop *self)
 {
-	self->priv = net_client_pop_get_instance_private(self);
+	self->priv = net_client_pop_get_instance_private(self);		/*lint !e9079 (MISRA C:2012 Rule 11.5) intended use */
 	self->priv->auth_allowed[0] = NET_CLIENT_POP_AUTH_ALL;
 	self->priv->auth_allowed[1] = NET_CLIENT_POP_AUTH_SAFE;
 }
@@ -503,6 +503,12 @@ net_client_pop_auth(NetClientPop *client, const gchar *user, const gchar *passwd
 		} else {
 			g_set_error(error, NET_CLIENT_POP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_POP_NO_AUTH,
 				_("no suitable authentication mechanism"));
+		}
+
+		/* POP3 does not define a mechanism to indicate that the authentication failed due to a too weak mechanism or wrong
+		 * credentials, so we treat all server -ERR responses as authentication failures */
+		if (!result && (*error != NULL) && ((*error)->code == NET_CLIENT_ERROR_POP_SERVER_ERR)) {
+			(*error)->code = NET_CLIENT_ERROR_POP_AUTHFAIL;
 		}
 	}
 

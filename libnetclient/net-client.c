@@ -450,7 +450,7 @@ net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **
 				gnutls_x509_privkey_deinit(key);
 
 				if (res != GNUTLS_E_SUCCESS) {
-					g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_GNUTLS, _("error loading key: %s"),
+					g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_CERT_KEY_PASS, _("error loading key: %s"),
 						gnutls_strerror(res));
 				}
 			}
@@ -606,7 +606,7 @@ net_client_class_init(NetClientClass *klass)
 static void
 net_client_init(NetClient *self)
 {
-	self->priv = net_client_get_instance_private(self);
+	self->priv = net_client_get_instance_private(self);		/*lint !e9079 (MISRA C:2012 Rule 11.5) intended use of this function */
 	self->priv->sock = g_socket_client_new();
 	if (self->priv->sock != NULL) {
 		g_socket_client_set_timeout(self->priv->sock, 180U);

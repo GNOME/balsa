@@ -796,6 +796,10 @@ lbs_process_queue_init_session(LibBalsaServer* server)
 		if (!net_client_set_cert_from_file(NET_CLIENT(session), server->cert_file, &error)) {
 			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), server->cert_file,
 				error->message);
+			/* bad certificate private key password: clear it */
+			if (error->code == NET_CLIENT_ERROR_CERT_KEY_PASS) {
+				libbalsa_server_set_password(server, NULL, TRUE);
+			}
 			g_error_free(error);
 			g_object_unref(session);
 			session = NULL;
@@ -1048,7 +1052,7 @@ balsa_send_message_real(SendMessageInfo *info)
             g_mutex_unlock(&send_messages_lock);
         }
     } else {
-        if (ERROR_IS_TRANSIENT(error)) {
+        if (ERROR_IS_TRANSIENT(error) || (error->code == NET_CLIENT_ERROR_SMTP_AUTHFAIL)) {
             GList *this_msg;
 
             /* Mark all messages as neither flagged nor deleted, so they can be resent later
@@ -1063,6 +1067,10 @@ balsa_send_message_real(SendMessageInfo *info)
                                                   LIBBALSA_MESSAGE_FLAG_DELETED);
                 }
             }
+        	if (error->code == NET_CLIENT_ERROR_SMTP_AUTHFAIL) {
+        		/* authentication failed: clear password */
+        		libbalsa_server_set_password(LIBBALSA_SERVER(info->smtp_server), NULL, FALSE);
+        	}
         }
         libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                              _("Connecting SMTP server %s (%s) failed: %s"),

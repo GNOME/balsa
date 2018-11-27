@@ -342,7 +342,7 @@ net_client_smtp_class_init(NetClientSmtpClass *klass)
 static void
 net_client_smtp_init(NetClientSmtp *self)
 {
-	self->priv = net_client_smtp_get_instance_private(self);
+	self->priv = net_client_smtp_get_instance_private(self);	/*lint !e9079 (MISRA C:2012 Rule 11.5) intended use */
 	self->priv->auth_allowed[0] = NET_CLIENT_SMTP_AUTH_ALL;
 	self->priv->auth_allowed[1] = NET_CLIENT_SMTP_AUTH_SAFE;
 }
@@ -685,8 +685,13 @@ net_client_smtp_eval_rescode(gint res_code, const gchar *reply, GError **error)
 		result = FALSE;
 		break;
 	case 5:
-		g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_PERMANENT,
-			_("permanent error %d: %s"), res_code, reply);
+		if ((res_code == 534) || (res_code == 535)) {
+			g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_AUTHFAIL,
+				_("authentication failure %d: %s"), res_code, reply);
+		} else {
+			g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_PERMANENT,
+				_("permanent error %d: %s"), res_code, reply);
+		}
 		result = FALSE;
 		break;
 	default:

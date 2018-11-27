@@ -43,9 +43,11 @@ typedef enum _NetClientSmtpDsnMode NetClientSmtpDsnMode;
 enum _NetClientSmtpError {
 	NET_CLIENT_ERROR_SMTP_PROTOCOL = 1,		/**< A bad server reply has been received. */
 	NET_CLIENT_ERROR_SMTP_TRANSIENT,   		/**< The server replied with a transient error code (code 4yz). */
-	NET_CLIENT_ERROR_SMTP_PERMANENT,   		/**< The server replied with a permanent error code (code 5yz). */
+	NET_CLIENT_ERROR_SMTP_PERMANENT,   		/**< The server replied with a permanent error code (code 5yz, except 534 or 535). */
 	NET_CLIENT_ERROR_SMTP_NO_AUTH,      	/**< The server offers no suitable authentication mechanism. */
-	NET_CLIENT_ERROR_SMTP_NO_STARTTLS		/**< The server does not support STARTTLS. */
+	NET_CLIENT_ERROR_SMTP_NO_STARTTLS,		/**< The server does not support STARTTLS. */
+	NET_CLIENT_ERROR_SMTP_AUTHFAIL			/**< Authentication failure (see RFC 4954, section 6): mechanism is too weak (534) or
+	 	 	 	 	 	 	 	 	 	 	 * credentials invalid (535). */
 };
 
 

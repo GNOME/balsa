@@ -1,5 +1,22 @@
 2018-11-27  Albrecht Dreß  <albrecht.dress@arcor.de>
 
+	Clear passwords if authentication fails
+
+	* libbalsa/mailbox_pop3.c, libbalsa/send.c: clear appropriate
+	password when libnetclient reports an authentication failure
+	(SMTP, POP), or could not decrypt a user certificate's private key
+	* libnetclient/net-client-pop.[ch]: report auth failure if the
+	server reports any error in the authentication phase (AUTH,
+	APOP, USER/PASS); fix nagging by Flexelint
+	* libnetclient/net-client-smtp.[ch]: report auth failure if
+	the server replies with status codes 534 or 535; fix nagging
+	by Flexelint
+	* libnetclient/net-client.[ch]: report a certificate key
+	decryption error if the passphrase is wrong
+
+
+2018-11-27  Albrecht Dreß  <albrecht.dress@arcor.de>
+
 	Fix broken IMAP special folders & other migration issues
 
 	* libbalsa/mailbox.[ch]: tell libbalsa_mailbox_new_from_config()

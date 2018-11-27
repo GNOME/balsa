@@ -44,7 +44,8 @@ enum _NetClientPopError {
 	NET_CLIENT_ERROR_POP_PROTOCOL = 1,		/**< A bad server reply has been received. */
 	NET_CLIENT_ERROR_POP_SERVER_ERR,   		/**< The server replied with an error. */
 	NET_CLIENT_ERROR_POP_NO_AUTH,      		/**< The server offers no suitable authentication mechanism. */
-	NET_CLIENT_ERROR_POP_NO_STARTTLS		/**< The server does not support STARTTLS. */
+	NET_CLIENT_ERROR_POP_NO_STARTTLS,		/**< The server does not support STARTTLS. */
+	NET_CLIENT_ERROR_POP_AUTHFAIL			/**< Authentication failure. */
 };
 
 

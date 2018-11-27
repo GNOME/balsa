@@ -66,6 +66,8 @@ static void config_identities_load(void);
 
 static void config_filters_load(void);
 
+static inline gboolean is_special_name(const gchar *name);
+
 #define folder_section_path(mn) \
     BALSA_MAILBOX_NODE(mn)->config_prefix ? \
     g_strdup(BALSA_MAILBOX_NODE(mn)->config_prefix) : \
@@ -103,25 +105,44 @@ static gboolean
 migrate_imap_mailboxes(const gchar *key, const gchar *value, gpointer data)
 {
 	gchar *type;
+	GHashTable *migrated = (GHashTable *) data;
 
     libbalsa_conf_push_group(key);
 	type = libbalsa_conf_get_string("Type");
-	if ((type != NULL) && (strcmp(type, "LibBalsaMailboxImap") == 0)) {
+	if ((type != NULL) && (strcmp(type, "LibBalsaMailboxImap") == 0) && !libbalsa_conf_get_bool("Migrated")) {
 		BalsaMailboxNode *mbnode;
 
 		/* try to load the IMAP mailbox as folder */
 		libbalsa_conf_pop_group();
 		mbnode = balsa_mailbox_node_new_from_config(key);
 	    if (mbnode != NULL) {
-	    	/* destroy the old config, save as IMAP folder config */
-	    	balsa_mblist_mailbox_node_append(NULL, mbnode);
-			libbalsa_conf_remove_group(key);
-			libbalsa_conf_private_remove_group(key);
-			g_free(mbnode->config_prefix);
-			mbnode->config_prefix = config_get_unused_group(FOLDER_SECTION_PREFIX);
-	    	g_signal_connect_swapped(mbnode->server, "config-changed", G_CALLBACK(config_folder_update), mbnode);
-	    	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-	    		"Migrated IMAP mailbox “%s” to IMAP folder. Please review its configuration.", mbnode->name);
+	    	gchar *folder_key;
+	    	gchar *oldname;
+
+	    	/* do not add the same folder multiple times */
+	    	folder_key = g_strconcat(mbnode->server->user, "@", mbnode->server->host, NULL);
+	    	oldname = g_strdup(mbnode->name);
+	    	if (g_hash_table_contains(migrated, folder_key)) {
+	    		g_object_unref(mbnode);
+	    		g_free(folder_key);
+	    	} else {
+	    		g_hash_table_add(migrated, folder_key);
+		    	g_free(mbnode->name);
+		    	mbnode->name = g_strdup(mbnode->server->host);
+		    	balsa_mblist_mailbox_node_append(NULL, mbnode);
+
+		    	g_free(mbnode->config_prefix);
+		    	mbnode->config_prefix = config_get_unused_group(FOLDER_SECTION_PREFIX);
+		    	g_signal_connect_swapped(mbnode->server, "config-changed", G_CALLBACK(config_folder_update), mbnode);
+	    	}
+
+	    	if (!is_special_name(value)) {
+				libbalsa_conf_remove_group(key);
+				libbalsa_conf_private_remove_group(key);
+				libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+						"Migrated IMAP mailbox “%s” to IMAP folder. Please review its configuration.", oldname);
+			}
+	    	g_free(oldname);
 	    }
 	} else {
 		libbalsa_conf_pop_group();
@@ -134,16 +155,20 @@ migrate_imap_mailboxes(const gchar *key, const gchar *value, gpointer data)
 void
 config_load_sections(void)
 {
-	/* hack - migrate all LibBalsaMailboxImap mailboxes to IMAP folders */
-    libbalsa_conf_foreach_group(MAILBOX_SECTION_PREFIX, migrate_imap_mailboxes, NULL);
+	GHashTable *migrated;
 
+	/* hack - migrate all LibBalsaMailboxImap mailboxes to IMAP folders */
+	migrated = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+    libbalsa_conf_foreach_group(MAILBOX_SECTION_PREFIX, migrate_imap_mailboxes, migrated);
+    g_hash_table_destroy(migrated);
+
+    libbalsa_conf_foreach_group(FOLDER_SECTION_PREFIX,
+                                config_load_section,
+                                config_folder_init);
     libbalsa_conf_foreach_group(MAILBOX_SECTION_PREFIX,
                                 config_load_section,
                                 config_mailbox_init);
     balsa_app.inbox_input = g_list_reverse(balsa_app.inbox_input);
-    libbalsa_conf_foreach_group(FOLDER_SECTION_PREFIX,
-                                config_load_section,
-                                config_folder_init);
 }
 
 static gint
@@ -204,6 +229,19 @@ sr_special_notify(gpointer data, GObject * mailbox)
 static gchar *specialNames[] = {
     INBOX_NAME, SENTBOX_NAME, TRASH_NAME, DRAFTS_NAME, OUTBOX_NAME
 };
+
+static inline gboolean
+is_special_name(const gchar *name)
+{
+	guint n;
+	gboolean res = FALSE;
+
+	for (n = 0U; !res && (n < G_N_ELEMENTS(specialNames)); n++) {
+		res = strcmp(name, specialNames[n]) == 0;
+	}
+	return res;
+}
+
 void
 config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 {
@@ -415,7 +453,7 @@ config_mailbox_init(const gchar * prefix)
 
     g_return_val_if_fail(prefix != NULL, FALSE);
 
-    mailbox = libbalsa_mailbox_new_from_config(prefix);
+    mailbox = libbalsa_mailbox_new_from_config(prefix, is_special_name(key));
     if (mailbox == NULL)
 	return FALSE;
     if (LIBBALSA_IS_MAILBOX_REMOTE(mailbox)) {
@@ -458,6 +496,10 @@ config_mailbox_init(const gchar * prefix)
 	    *special = mailbox;
             g_object_weak_ref(G_OBJECT(mailbox),
                               (GWeakNotify) sr_special_notify, special);
+            if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+            	/* IMAP folder, used as special mailbox: remember that we migrated it */
+            	libbalsa_mailbox_save_config(mailbox, prefix);
+            }
 	}
 
         balsa_mblist_mailbox_node_append(NULL, mbnode);

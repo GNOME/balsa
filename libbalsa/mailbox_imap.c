@@ -1647,6 +1647,7 @@ libbalsa_mailbox_imap_save_config(LibBalsaMailbox * mailbox,
     mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
 
     libbalsa_conf_set_string("Path", mimap->path);
+    libbalsa_conf_set_bool("Migrated", TRUE);
 
     libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
 

@@ -335,7 +335,8 @@ struct _LibBalsaMailboxClass {
 
 GType libbalsa_mailbox_get_type(void);
 
-LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar * prefix);
+LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar *prefix,
+												  gboolean     is_special);
 
 /* 
  * open and close a mailbox 

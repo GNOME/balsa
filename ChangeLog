@@ -1,5 +1,20 @@
 2018-11-27  Albrecht Dreß  <albrecht.dress@arcor.de>
 
+	Fix broken IMAP special folders & other migration issues
+
+	* libbalsa/mailbox.[ch]: tell libbalsa_mailbox_new_from_config()
+	if a folder is special, so it is processed even if it is an
+	IMAP one
+	* libbalsa/mailbox_imap.c: always set the "Migrated" flag for
+	LibBalsaMailboxImap mailboxes
+	* src/save-restore.c: in the migration process, track "user@host"
+	folder ids in a hash table to avoid duplicates; keep special IMAP
+	folders; load folders before mailboxes so special IMAP mailboxes
+	do not overwrite the folder's IMAP configs (the server config
+	originates from the first server seen)
+
+2018-11-27  Albrecht Dreß  <albrecht.dress@arcor.de>
+
 	Password dialogue improvements
 
 	* libbalsa/imap-server.c, libbalsa/server-config.c,

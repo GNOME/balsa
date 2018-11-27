@@ -500,7 +500,7 @@ libbalsa_mailbox_finalize(GObject * object)
 
 /* Create a new mailbox by loading it from a config entry... */
 LibBalsaMailbox *
-libbalsa_mailbox_new_from_config(const gchar * group)
+libbalsa_mailbox_new_from_config(const gchar * group, gboolean is_special)
 {
     gchar *type_str;
     GType type;
@@ -537,7 +537,7 @@ libbalsa_mailbox_new_from_config(const gchar * group)
         else
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Bad local mailbox path “%s”"), path);
-    } else if (type == LIBBALSA_TYPE_MAILBOX_IMAP) {
+    } else if ((type == LIBBALSA_TYPE_MAILBOX_IMAP) && !is_special) {
     	g_critical("old-style IMAP mailbox %s should have been converted to IMAP folder", group);
         libbalsa_conf_pop_group();
         g_free(type_str);

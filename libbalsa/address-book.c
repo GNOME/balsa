@@ -26,7 +26,6 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
-#include "libbalsa-marshal.h"
 #include "libbalsa-conf.h"
 
 static GObjectClass *parent_class = NULL;

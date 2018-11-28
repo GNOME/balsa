@@ -100,8 +100,6 @@ libbalsa_a_SOURCES = 		\
 	information.h		\
 	libbalsa-conf.c		\
 	libbalsa-conf.h		\
-	libbalsa-marshal.c	\
-	libbalsa-marshal.h	\
 	libbalsa-progress.c	\
 	libbalsa-progress.h	\
 	macosx-helpers.c	\
@@ -161,7 +159,6 @@ libbalsa_a_SOURCES = 		\
 
 
 EXTRA_DIST = 				\
-	libbalsa-marshal.list		\
 	padlock-keyhole.xpm		\
 	${libbalsa_gpgme_extra_dist}
 
@@ -171,19 +168,3 @@ AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	$(BALSA_DEFS)
 
 AM_CFLAGS = $(BALSA_CFLAGS)
-
-#Signal marshallers
-marshal_prefix = libbalsa
-libbalsa-marshal.h: libbalsa-marshal.list
-	( @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) $(srcdir)/libbalsa-marshal.list --header > libbalsa-marshal.tmp \
-	&& mv libbalsa-marshal.tmp libbalsa-marshal.h ) \
-	|| ( rm -f libbalsa-marshal.tmp && exit 1 )
-libbalsa-marshal.c: libbalsa-marshal.h
-	( echo "#include \"libbalsa-marshal.h\"" > libbalsa-marshal.tmp \
-	&& @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) $(srcdir)/libbalsa-marshal.list --body >> libbalsa-marshal.tmp \
-	&& mv libbalsa-marshal.tmp libbalsa-marshal.c ) \
-	|| ( rm -f libbalsa-marshal.tmp && exit 1 )
-
-CLEANFILES = libbalsa-marshal.c libbalsa-marshal.h
-
-$(libbalsa_a_OBJECTS): libbalsa-marshal.h

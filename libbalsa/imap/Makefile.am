@@ -30,15 +30,10 @@ libimap_a_SOURCES = \
 	imap_search.h	\
 	imap-tls.c	\
 	imap_private.h	\
-	libimap-marshal.c	\
-	libimap-marshal.h	\
 	libimap.h	\
 	siobuf-nc.h	\
 	util.c		\
 	util.h
-
-EXTRA_DIST = \
-	libimap-marshal.list
 
 AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-I${top_srcdir}/libnetclient \
@@ -47,19 +42,3 @@ AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	$(BALSA_CFLAGS)
 
 AM_CFLAGS   = $(LIBIMAP_CFLAGS) -ansi
-
-#Signal marshallers
-marshal_prefix = libimap
-marshal_srcdir = ${top_srcdir}/libbalsa/imap
-libimap-marshal.h: libimap-marshal.list
-	( @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) ${marshal_srcdir}/libimap-marshal.list --header > libimap-marshal.tmp \
-	&& mv libimap-marshal.tmp libimap-marshal.h ) \
-	|| ( rm -f libimap-marshal.tmp && exit 1 )
-libimap-marshal.c: libimap-marshal.h
-	( echo "#include \"libimap-marshal.h\"" > libimap-marshal.tmp \
-	&& @GLIB_GENMARSHAL@ --prefix=$(marshal_prefix) ${marshal_srcdir}/libimap-marshal.list --body >> libimap-marshal.tmp \
-	&& mv libimap-marshal.tmp libimap-marshal.c ) \
-	|| ( rm -f libimap-marshal.tmp && exit 1 )
-
-#$(libimap_la_OBJECTS): libimap-marshal.h
-$(libimap_a_OBJECTS): libimap-marshal.h

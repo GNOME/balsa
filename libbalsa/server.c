@@ -32,7 +32,6 @@
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
-#include "libbalsa-marshal.h"
 #include "libbalsa-conf.h"
 #include "net-client-utils.h"
 #include <glib/gi18n.h>

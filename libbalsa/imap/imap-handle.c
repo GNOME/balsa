@@ -31,7 +31,6 @@
 #include <unistd.h>
 #include <gmime/gmime-utils.h>
 
-#include "libimap-marshal.h"
 #include "imap-auth.h"
 #include "imap-handle.h"
 #include "imap-commands.h"
@@ -178,7 +177,7 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
                  G_SIGNAL_RUN_FIRST,
                  G_STRUCT_OFFSET(ImapMboxHandleClass, list_response),
                  NULL, NULL,
-                 libimap_VOID__INT_INT_POINTER, G_TYPE_NONE, 3,
+                 NULL, G_TYPE_NONE, 3,
                  G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
 
   imap_mbox_handle_signals[LSUB_RESPONSE] = 
@@ -187,7 +186,7 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
                  G_SIGNAL_RUN_FIRST,
                  G_STRUCT_OFFSET(ImapMboxHandleClass, lsub_response),
                  NULL, NULL,
-                 libimap_VOID__INT_INT_POINTER, G_TYPE_NONE, 3,
+                 NULL, G_TYPE_NONE, 3,
                  G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
 
   imap_mbox_handle_signals[EXPUNGE_NOTIFY] = 

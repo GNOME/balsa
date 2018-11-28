@@ -152,18 +152,6 @@ libnetclient_deps = [glib_dep,
                      gio_dep,
                      gnutls_dep]
 
-# glib-genmarshal
-#
-# If glib is too old, we cannot use gnome.genmarshal
-# because it generates a source file that does not include the header file,
-# which causes an error when compiling with -Wmissing-prototypes and -Werror.
-
-use_gnome_genmarshal = glib_dep.version().version_compare('>= 2.53.4')
-if not use_gnome_genmarshal
-  glib_genmarshal = run_command('pkg-config',
-                                ['--variable=glib_genmarshal', 'glib-2.0']).stdout().strip()
-endif
-
 # Check whether res_init is available
 result = compiler.has_function('res_init', prefix : '#include <resolv.h>')
 if not result

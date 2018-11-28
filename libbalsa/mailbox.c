@@ -28,7 +28,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "libbalsa-marshal.h"
 #include "libbalsa.h"
 #include "libbalsa-conf.h"
 #include "mailbox-filter.h"
@@ -194,7 +193,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
                                      progress_notify),
                      NULL, NULL,
-                     libbalsa_VOID__INT_DOUBLE_STRING, G_TYPE_NONE,
+                     NULL, G_TYPE_NONE,
                      3U, G_TYPE_INT, G_TYPE_DOUBLE, G_TYPE_STRING);
 
     object_class->dispose = libbalsa_mailbox_dispose;

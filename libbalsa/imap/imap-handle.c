@@ -169,7 +169,7 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
                  G_SIGNAL_RUN_FIRST,
                  G_STRUCT_OFFSET(ImapMboxHandleClass, fetch_response),
                  NULL, NULL,
-                 g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                 NULL, G_TYPE_NONE, 0);
 
   imap_mbox_handle_signals[LIST_RESPONSE] = 
     g_signal_new("list-response",
@@ -195,7 +195,7 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
                  G_SIGNAL_RUN_FIRST,
                  G_STRUCT_OFFSET(ImapMboxHandleClass, expunge_notify),
                  NULL, NULL,
-                 g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1,
+                 NULL, G_TYPE_NONE, 1,
 		 G_TYPE_INT);
 
   imap_mbox_handle_signals[EXISTS_NOTIFY] = 
@@ -204,7 +204,7 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
                  G_SIGNAL_RUN_FIRST,
                  G_STRUCT_OFFSET(ImapMboxHandleClass, exists_notify),
                  NULL, NULL,
-                 g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                 NULL, G_TYPE_NONE, 0);
 
   object_class->finalize = imap_mbox_handle_finalize;
 }

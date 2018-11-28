@@ -74,7 +74,7 @@ libbalsa_cell_renderer_button_class_init(LibBalsaCellRendererButtonClass *
         g_signal_new("activated",
                      G_OBJECT_CLASS_TYPE(object_class),
                      0, 0, NULL, NULL,
-                     g_cclosure_marshal_VOID__STRING,
+                     NULL,
                      G_TYPE_NONE,
                      1, G_TYPE_STRING);
 }

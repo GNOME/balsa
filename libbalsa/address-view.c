@@ -131,7 +131,7 @@ libbalsa_address_view_class_init(LibBalsaAddressViewClass * klass)
         g_signal_new("open-address-book",
                      G_OBJECT_CLASS_TYPE(object_class),
                      0, 0, NULL, NULL,
-                     g_cclosure_marshal_VOID__POINTER,
+                     NULL,
                      G_TYPE_NONE, 1, G_TYPE_POINTER);
 }
 

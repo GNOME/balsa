@@ -89,7 +89,7 @@ balsa_toolbar_model_class_init(BalsaToolbarModelClass* klass)
                      G_SIGNAL_RUN_FIRST,
                      0,
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                     NULL, G_TYPE_NONE, 0);
 
     object_class = G_OBJECT_CLASS(klass);
     object_class->finalize = balsa_toolbar_model_finalize;

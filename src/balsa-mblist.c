@@ -188,7 +188,7 @@ bmbl_class_init(BalsaMBListClass * klass)
                      G_SIGNAL_RUN_FIRST,
                      G_STRUCT_OFFSET(BalsaMBListClass, has_unread_mailbox),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__INT,
+                     NULL,
                      G_TYPE_NONE,
                      1, G_TYPE_INT);
 

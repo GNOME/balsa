@@ -204,7 +204,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
                      G_SIGNAL_RUN_FIRST,
                      G_STRUCT_OFFSET(BalsaWindowClass, identities_changed),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                     NULL, G_TYPE_NONE, 0);
 
     object_class->dispose = balsa_window_destroy;
 

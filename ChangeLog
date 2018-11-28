@@ -1,5 +1,22 @@
 2018-11-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Pass NULL instead of a stock marshaller to g_signal_new().
+
+	* libbalsa/address-view.c (libbalsa_address_view_class_init):
+	* libbalsa/cell-renderer-button.c
+	(libbalsa_cell_renderer_button_class_init):
+	* libbalsa/imap/imap-handle.c (imap_mbox_handle_class_init):
+	* libbalsa/mailbox.c (libbalsa_mailbox_class_init):
+	* src/balsa-index.c (bndx_class_init):
+	* src/balsa-mblist.c (bmbl_class_init):
+	* src/balsa-message.c (balsa_message_class_init):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_class_init):
+	* src/mailbox-node.c (balsa_mailbox_node_class_init):
+	* src/main-window.c (balsa_window_class_init):
+	* src/toolbar-factory.c (balsa_toolbar_model_class_init):
+
+2018-11-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Remove marshal lists
 
 	* libbalsa/imap/libimap-marshal.list:

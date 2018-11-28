@@ -166,7 +166,7 @@ balsa_filter_run_dialog_class_init(BalsaFilterRunDialogClass * klass)
                      G_SIGNAL_RUN_FIRST,
 		     G_STRUCT_OFFSET(BalsaFilterRunDialogClass, refresh),
                      NULL, NULL,
-		     g_cclosure_marshal_VOID__OBJECT,
+		     NULL,
                      G_TYPE_NONE, 1, G_TYPE_OBJECT);
 
     object_class->dispose = balsa_filter_run_dispose;

@@ -174,7 +174,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
                                      changed),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+                     NULL, G_TYPE_NONE, 0);
 
     libbalsa_mailbox_signals[MESSAGE_EXPUNGED] =
         g_signal_new("message-expunged",
@@ -183,7 +183,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
                      G_STRUCT_OFFSET(LibBalsaMailboxClass,
                                      message_expunged),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1,
+                     NULL, G_TYPE_NONE, 1,
                      G_TYPE_INT);
 
     libbalsa_mailbox_signals[PROGRESS_NOTIFY] =

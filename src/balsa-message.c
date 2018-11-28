@@ -234,7 +234,7 @@ balsa_message_class_init(BalsaMessageClass * klass)
                      G_SIGNAL_RUN_FIRST,
                      G_STRUCT_OFFSET(BalsaMessageClass, select_part),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__VOID,
+                     NULL,
                      G_TYPE_NONE, 0);
 
     object_class->dispose = balsa_message_destroy;

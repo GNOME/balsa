@@ -190,7 +190,7 @@ bndx_class_init(BalsaIndexClass * klass)
                      G_STRUCT_OFFSET(BalsaIndexClass,
                                      index_changed),
                      NULL, NULL,
-		     g_cclosure_marshal_VOID__VOID,
+		     NULL,
                      G_TYPE_NONE, 0);
 
     object_class->dispose = bndx_destroy;

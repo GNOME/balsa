@@ -134,7 +134,7 @@ balsa_mailbox_node_class_init(BalsaMailboxNodeClass * klass)
                      G_SIGNAL_RUN_FIRST,
                      G_STRUCT_OFFSET(BalsaMailboxNodeClass, save_config),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__POINTER,
+                     NULL,
 		     G_TYPE_NONE, 1,
 	             G_TYPE_POINTER);
     balsa_mailbox_node_signals[LOAD_CONFIG] =
@@ -143,7 +143,7 @@ balsa_mailbox_node_class_init(BalsaMailboxNodeClass * klass)
                      G_SIGNAL_RUN_FIRST,
                      G_STRUCT_OFFSET(BalsaMailboxNodeClass, load_config),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__POINTER,
+                     NULL,
 		     G_TYPE_NONE, 1,
 	             G_TYPE_POINTER);
     balsa_mailbox_node_signals[SHOW_PROP_DIALOG] =
@@ -153,7 +153,7 @@ balsa_mailbox_node_class_init(BalsaMailboxNodeClass * klass)
                      G_STRUCT_OFFSET(BalsaMailboxNodeClass,
                                      show_prop_dialog),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__VOID,
+                     NULL,
 		     G_TYPE_NONE, 0);
     balsa_mailbox_node_signals[APPEND_SUBTREE] =
 	g_signal_new("append-subtree",
@@ -161,7 +161,7 @@ balsa_mailbox_node_class_init(BalsaMailboxNodeClass * klass)
                      G_SIGNAL_RUN_FIRST,
                      G_STRUCT_OFFSET(BalsaMailboxNodeClass, append_subtree),
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__VOID,
+                     NULL,
 		     G_TYPE_NONE, 0);
 
     klass->save_config = balsa_mailbox_node_real_save_config;

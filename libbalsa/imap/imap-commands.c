@@ -26,8 +26,6 @@
 #include "siobuf-nc.h"
 #include "util.h"
 
-#define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
-
 struct fetch_data {
   ImapMboxHandle* h;
   ImapFetchType ift;
@@ -59,7 +57,7 @@ need_fetch(unsigned seqno, struct fetch_data* fd)
       && fd->h->msg_cache[seqno-1]->rfc822size <0) return seqno;
 
   available_headers = fd->h->msg_cache[seqno-1]->available_headers;
-  for(i=0; i<ELEMENTS(header); i++) {
+  for(i=0; i<G_N_ELEMENTS(header); i++) {
     if( (fd->ift & header[i]) &&
         !(available_headers & (header[i]|IMFETCH_RFC822HEADERS|
                                IMFETCH_RFC822HEADERS_SELECTED))) {
@@ -406,13 +404,13 @@ ImapResponse
 imap_mbox_status(ImapMboxHandle *r, const char*what,
                  struct ImapStatusResult *res)
 {
-  const char *item_arr[ELEMENTS(imap_status_item_names)+1];
+  const char *item_arr[G_N_ELEMENTS(imap_status_item_names)+1];
   ImapResponse rc = IMR_OK;
   unsigned i, ipos;
   
   for(ipos = i= 0; res[i].item != IMSTAT_NONE; i++) {
     /* repeated items? */
-    g_return_val_if_fail(i<ELEMENTS(imap_status_item_names), IMR_BAD);
+    g_return_val_if_fail(i<G_N_ELEMENTS(imap_status_item_names), IMR_BAD);
     /* invalid item? */
     g_return_val_if_fail(res[i].item>=IMSTAT_MESSAGES &&
                          res[i].item<=IMSTAT_UNSEEN, IMR_BAD);
@@ -440,7 +438,7 @@ enum_flag_to_str(ImapMsgFlags flg)
   GString *flags_str = g_string_new("");
   unsigned idx;
 
-  for(idx=0; idx < ELEMENTS(imap_msg_flags); idx++) {
+  for(idx=0; idx < G_N_ELEMENTS(imap_msg_flags); idx++) {
     if((flg & (1<<idx)) == 0) continue;
     if(*flags_str->str) g_string_append_c(flags_str, ' ');
     g_string_append_c(flags_str, '\\');

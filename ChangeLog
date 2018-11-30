@@ -1,5 +1,29 @@
 2018-11-30  Albrecht Dreß  <albrecht.dress@arcor.de>
 
+	Replace custom ELEMENTS macro with Glib G_N_ELEMENTS
+
+	* libbalsa/filter-funcs.c (libbalsa_condition_new_from_string),
+	(append_header_names), (append_flag_names):
+	* libbalsa/identity.c (md_sig_path_changed):
+	* libbalsa/imap/imap-commands.c (need_fetch), (imap_mbox_status),
+	(enum_flag_to_str):
+	* libbalsa/imap/imap-handle.c (ir_capability_data),
+	(ir_resp_text_code), (ir_list_lsub), (ir_status),
+	(ir_msg_att_flags), (ir_fetch_seq), (ir_handle_response):
+	* libbalsa/libbalsa.h:
+	* libbalsa/mailbox.c (mbox_model_get_value):
+	* src/balsa-index.c (bndx_instance_init), (bndx_popup_menu_create):
+	* src/balsa-mblist.c (balsa_mblist_default_signal_bindings):
+	* src/filter-edit-callbacks.c (build_condition_dialog):
+	* src/filter-edit-dialog.c (build_match_page), (build_action_page):
+	* src/main-window.c (bw_create_index_widget):
+	* src/sendmsg-window.c (find_locale_index_by_locale),
+	(create_email_entry), (sw_attachment_list), (create_text_area),
+	(create_lang_menu):
+	* src/toolbar-factory.c:
+
+2018-11-30  Albrecht Dreß  <albrecht.dress@arcor.de>
+
 	Fix confusing signature info
 
 	* libbalsa/gmime-gpgme-signature.c: hide unavailable data if a

@@ -1184,7 +1184,7 @@ void build_condition_dialog(GtkWidget * condition_dialog)
     label = gtk_label_new_with_mnemonic(_("Search T_ype:"));
     gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 5);
     fe_search_option_menu = 
-        fe_build_option_menu(fe_search_type, ELEMENTS(fe_search_type),
+        fe_build_option_menu(fe_search_type, G_N_ELEMENTS(fe_search_type),
                              G_CALLBACK(fe_typesmenu_cb), field_frame);
     gtk_box_pack_start(GTK_BOX(box), fe_search_option_menu, FALSE, FALSE, 5);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), fe_search_option_menu);

@@ -177,8 +177,7 @@ button_data toolbar_buttons[]={
     {"gtk-edit",             N_("Edit"),            FALSE},
 };
 
-const int toolbar_button_count =
-    sizeof(toolbar_buttons) / sizeof(button_data);
+const int toolbar_button_count = G_N_ELEMENTS(toolbar_buttons);
 
 /* Public methods. */
 const gchar *

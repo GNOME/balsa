@@ -39,7 +39,6 @@
 #include "util.h"
 
 #define LONG_STRING 512
-#define ELEMENTS(x) (sizeof (x) / sizeof(x[0]))
 
 #define IDLE_TIMEOUT 30
 
@@ -2160,7 +2159,7 @@ ir_capability_data(ImapMboxHandle *handle)
   
   do {
     c = imap_get_atom(handle->sio, atom, sizeof(atom));
-    for (x=0; x<ELEMENTS(capabilities); x++)
+    for (x=0; x<G_N_ELEMENTS(capabilities); x++)
       if (g_ascii_strncasecmp(atom, capabilities[x],
                               strlen(capabilities[x])) == 0) {
 	handle->capabilities[x] = 1;
@@ -2274,7 +2273,7 @@ ir_resp_text_code(ImapMboxHandle *h)
   int c = imap_get_atom(h->sio, buf, sizeof(buf));
   ImapResponse rc = IMR_OK;
 
-  for(o=0; o<ELEMENTS(resp_text_code); o++)
+  for(o=0; o<G_N_ELEMENTS(resp_text_code); o++)
     if(g_ascii_strcasecmp(buf, resp_text_code[o]) == 0) break;
 
   switch(o) {
@@ -2453,7 +2452,7 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
     unsigned i;
     if(c!= '\\') return IMR_PROTOCOL;
     c = imap_get_atom(h->sio, buf, sizeof(buf));
-    for(i=0; i< ELEMENTS(mbx_flags); i++) {
+    for(i=0; i< G_N_ELEMENTS(mbx_flags); i++) {
       if(g_ascii_strcasecmp(buf, mbx_flags[i]) ==0) {
         IMAP_MBOX_SET_FLAG(flags, i);
         break;
@@ -2518,7 +2517,7 @@ ir_status(ImapMboxHandle *h)
     /* FIXME: process the response */
     if(resp) {
       unsigned idx, i;
-      for(idx=0; idx<ELEMENTS(imap_status_item_names); idx++)
+      for(idx=0; idx<G_N_ELEMENTS(imap_status_item_names); idx++)
         if(g_ascii_strcasecmp(item, imap_status_item_names[idx]) == 0)
           break;
       for(i= 0; resp[i].item != IMSTAT_NONE; i++) {
@@ -2706,7 +2705,7 @@ ir_msg_att_flags(ImapMboxHandle *h, int c, unsigned seqno)
   do {
     char buf[LONG_STRING];
     c = imap_get_flag(h->sio, buf, sizeof(buf));
-    for(i=0; i<ELEMENTS(imap_msg_flags); i++)
+    for(i=0; i<G_N_ELEMENTS(imap_msg_flags); i++)
       if(buf[0] == '\\' && g_ascii_strcasecmp(imap_msg_flags[i], buf+1) == 0) {
         msg->flags |= 1<<i;
         break;
@@ -4030,7 +4029,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
       atom[i] = c;
     }
     atom[i] = '\0';
-    for(i=0; i<ELEMENTS(msg_att); i++) {
+    for(i=0; i<G_N_ELEMENTS(msg_att); i++) {
       if(g_ascii_strcasecmp(atom, msg_att[i].name) == 0) {
         if( (rc=msg_att[i].handler(h, c, seqno)) != IMR_OK)
           return rc;
@@ -4197,7 +4196,7 @@ ir_handle_response(ImapMboxHandle *h)
     c = imap_get_atom(h->sio, atom, sizeof(atom));
     if (c == 0x0d)
       sio_ungetc(h->sio);
-    for(i=0; i<ELEMENTS(NumHandlers); i++) {
+    for(i=0; i<G_N_ELEMENTS(NumHandlers); i++) {
       if(g_ascii_strncasecmp(atom, NumHandlers[i].response, 
                              NumHandlers[i].keyword_len) == 0) {
         rc = NumHandlers[i].handler(h, seqno);
@@ -4209,7 +4208,7 @@ ir_handle_response(ImapMboxHandle *h)
 
     if (c == 0x0d)
       sio_ungetc(h->sio);
-    for(i=0; i<ELEMENTS(ResponseHandlers); i++) {
+    for(i=0; i<G_N_ELEMENTS(ResponseHandlers); i++) {
       if(g_ascii_strncasecmp(atom, ResponseHandlers[i].response, 
                              ResponseHandlers[i].keyword_len) == 0) {
         rc = ResponseHandlers[i].handler(h);

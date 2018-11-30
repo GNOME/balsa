@@ -166,8 +166,12 @@ g_mime_gpgme_sigstat_to_gchar(const GMimeGpgmeSigstat *info,
     g_return_val_if_fail(date_string != NULL, NULL);
     msg = g_string_new(g_mime_gpgme_sigstat_protocol_name(info));
     msg = g_string_append(msg, libbalsa_gpgme_sig_stat_to_gchar(info->status));
-    g_string_append_printf(msg, _("\nSignature validity: %s"), libbalsa_gpgme_validity_to_gchar(info-> validity));
-    append_time_t(msg, _("\nSigned on: %s"), info->sign_time, date_string);
+    if ((info->status != GPG_ERR_BAD_SIGNATURE) && (info->status != GPG_ERR_NO_DATA)) {
+    	if (info->status != GPG_ERR_NO_PUBKEY) {
+    		g_string_append_printf(msg, _("\nSignature validity: %s"), libbalsa_gpgme_validity_to_gchar(info-> validity));
+    	}
+    	append_time_t(msg, _("\nSigned on: %s"), info->sign_time, date_string);
+    }
     if (info->fingerprint) {
     	g_string_append_printf(msg, _("\nKey fingerprint: %s"), info->fingerprint);
     }

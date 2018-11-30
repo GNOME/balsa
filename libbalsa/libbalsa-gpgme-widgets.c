@@ -165,9 +165,11 @@ libbalsa_gpgme_key(gpgme_key_t           key,
 		GtkWidget *subkey_expander;
 		GtkWidget *subkey_box;
 		gpgme_subkey_t subkey;
+		size_t fingerprint_len = 0U;		/* assignment makes gcc happy */
 
 		if (fingerprint != NULL) {
 			subkey_expander = gtk_expander_new(_("Subkey used"));
+			fingerprint_len = strlen(fingerprint);
 		} else if (subkey_capa != GPG_SUBKEY_CAP_ALL) {
 			gchar *capa_str;
 			gchar *label_str;
@@ -191,7 +193,11 @@ libbalsa_gpgme_key(gpgme_key_t           key,
 
 		for (subkey = key->subkeys; subkey != NULL; subkey = subkey->next) {
 			if (fingerprint != NULL) {
-				if (strcmp(fingerprint, subkey->fpr) == 0) {
+				size_t offs;
+
+				/* if the signature is invalid, the fingerprint only the end of the subkey's fingerprint */
+				offs = strlen(subkey->fpr) - fingerprint_len;
+				if (strcmp(fingerprint, &subkey->fpr[offs]) == 0) {
 					gtk_box_pack_end(GTK_BOX(subkey_box), create_subkey_widget(subkey), FALSE, FALSE, 2);
 				}
 			} else if ((((subkey_capa & GPG_SUBKEY_CAP_SIGN) != 0U) && (subkey->can_sign != 0)) ||
@@ -284,10 +290,16 @@ libbalsa_gpgme_key_to_gchar(gpgme_key_t  key,
 	/* subkey information */
 	if (key->subkeys != NULL) {
 		gpgme_subkey_t subkey;
+		size_t fingerprint_len;
 
 		g_string_append_printf(result, "\n%s", _("Subkey used"));
+		fingerprint_len = strlen(fingerprint);
 		for (subkey = key->subkeys; subkey != NULL; subkey = subkey->next) {
-			if (strcmp(fingerprint, subkey->fpr) == 0) {
+			size_t offs;
+
+			/* if the signature is invalid, the fingerprint only the end of the subkey's fingerprint */
+			offs = strlen(subkey->fpr) - fingerprint_len;
+			if (strcmp(fingerprint, &subkey->fpr[offs]) == 0) {
 				gchar *details_str;
 				gchar *timebuf;
 

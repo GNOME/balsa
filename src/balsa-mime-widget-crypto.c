@@ -342,7 +342,6 @@ show_public_key_data(GtkExpander *expander,
 {
 	LibBalsaMessageBody *body = (LibBalsaMessageBody *) user_data;
 
-	g_message("%s: %p %p %p", __func__, expander, body, body->sig_info);
 	if (body->sig_info != NULL) {
 		if (body->sig_info->key == NULL) {
 			g_mime_gpgme_sigstat_load_key(body->sig_info);

@@ -1,3 +1,14 @@
+2018-11-30  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Fix confusing signature info
+
+	* libbalsa/gmime-gpgme-signature.c: hide unavailable data if a
+	signature is bad, the public key missing, or without signature
+	data at all
+	* libbalsa/libbalsa-gpgme-widgets.c: find proper subkey even if
+	only the end of the fingerprint is given
+	* src/balsa-mime-widget-crypto.c: remove useless debug message
+
 2018-11-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Pass NULL instead of a stock marshaller to g_signal_new().

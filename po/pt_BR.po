@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2018-11-05 00:43+0000\n"
-"PO-Revision-Date: 2018-11-05 08:30-0200\n"
+"POT-Creation-Date: 2018-11-27 19:35+0000\n"
+"PO-Revision-Date: 2018-12-01 21:26-0200\n"
 "Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
@@ -513,13 +513,13 @@ msgstr "A assinatura em %s não é um texto no formato UTF-8."
 #: ../libbalsa/libbalsa-gpgme-cb.c:356 ../libbalsa/smtp-server.c:375
 #: ../src/ab-main.c:854 ../src/ab-window.c:142 ../src/address-book-config.c:237
 #: ../src/address-book-config.c:342 ../src/address-book-config.c:388
-#: ../src/balsa-app.c:86 ../src/balsa-index.c:2684 ../src/balsa-mblist.c:1890
-#: ../src/balsa-message.c:1774 ../src/balsa-mime-widget-callbacks.c:85
-#: ../src/filter-edit-callbacks.c:1247 ../src/filter-edit-dialog.c:404
-#: ../src/filter-edit-dialog.c:573 ../src/filter-export-dialog.c:79
-#: ../src/filter-run-dialog.c:316 ../src/folder-conf.c:250
-#: ../src/folder-conf.c:438 ../src/folder-conf.c:666 ../src/folder-conf.c:911
-#: ../src/mailbox-conf.c:213 ../src/mailbox-conf.c:234
+#: ../src/balsa-app.c:86 ../src/balsa-app.c:151 ../src/balsa-index.c:2684
+#: ../src/balsa-mblist.c:1890 ../src/balsa-message.c:1774
+#: ../src/balsa-mime-widget-callbacks.c:85 ../src/filter-edit-callbacks.c:1247
+#: ../src/filter-edit-dialog.c:404 ../src/filter-edit-dialog.c:573
+#: ../src/filter-export-dialog.c:79 ../src/filter-run-dialog.c:316
+#: ../src/folder-conf.c:250 ../src/folder-conf.c:438 ../src/folder-conf.c:666
+#: ../src/folder-conf.c:911 ../src/mailbox-conf.c:213 ../src/mailbox-conf.c:234
 #: ../src/mailbox-conf.c:250 ../src/mailbox-conf.c:759
 #: ../src/mailbox-conf.c:819 ../src/pref-manager.c:3290
 #: ../src/sendmsg-window.c:530 ../src/sendmsg-window.c:1553
@@ -532,13 +532,14 @@ msgstr "_Cancelar"
 
 #: ../libbalsa/identity.c:475 ../libbalsa/libbalsa-gpgme-cb.c:196
 #: ../libbalsa/libbalsa-gpgme-cb.c:355 ../libbalsa/smtp-server.c:374
-#: ../src/ab-window.c:141 ../src/balsa-app.c:85 ../src/balsa-message.c:1775
-#: ../src/balsa-mime-widget-callbacks.c:86 ../src/filter-edit-callbacks.c:1246
-#: ../src/filter-edit-dialog.c:572 ../src/filter-export-dialog.c:78
-#: ../src/filter-run-dialog.c:315 ../src/main-window.c:3806
-#: ../src/pref-manager.c:3288 ../src/sendmsg-window.c:1552
-#: ../src/sendmsg-window.c:2006 ../src/sendmsg-window.c:3338
-#: ../src/sendmsg-window.c:4690 ../src/store-address.c:209
+#: ../src/ab-window.c:141 ../src/balsa-app.c:87 ../src/balsa-app.c:150
+#: ../src/balsa-message.c:1775 ../src/balsa-mime-widget-callbacks.c:86
+#: ../src/filter-edit-callbacks.c:1246 ../src/filter-edit-dialog.c:572
+#: ../src/filter-export-dialog.c:78 ../src/filter-run-dialog.c:315
+#: ../src/main-window.c:3806 ../src/pref-manager.c:3288
+#: ../src/sendmsg-window.c:1552 ../src/sendmsg-window.c:2006
+#: ../src/sendmsg-window.c:3338 ../src/sendmsg-window.c:4690
+#: ../src/store-address.c:209
 msgid "_OK"
 msgstr "_OK"
 
@@ -1539,42 +1540,42 @@ msgstr ""
 "O comando IMAP SEARCH falhou para a caixa de correio %s\n"
 "retornando ao método de procura padrão"
 
-#: ../libbalsa/mailbox_imap.c:1673
+#: ../libbalsa/mailbox_imap.c:1674
 #, c-format
 msgid "No path found for mailbox “%s”, using “%s”"
 msgstr "Nenhum caminho encontrado para a caixa de correio “%s”, usando “%s”"
 
-#: ../libbalsa/mailbox_imap.c:1801 ../libbalsa/mailbox_imap.c:1842
+#: ../libbalsa/mailbox_imap.c:1802 ../libbalsa/mailbox_imap.c:1843
 #, c-format
 msgid "Cannot get IMAP handle"
 msgstr "Impossível obter o manipulador IMAP"
 
-#: ../libbalsa/mailbox_imap.c:2447 ../libbalsa/mailbox_imap.c:2513
+#: ../libbalsa/mailbox_imap.c:2448 ../libbalsa/mailbox_imap.c:2514
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr "Erro ao recuperar mensagem do servidor IMAP: %s"
 
-#: ../libbalsa/mailbox_imap.c:2481
+#: ../libbalsa/mailbox_imap.c:2482
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Recebendo %u kB"
 
-#: ../libbalsa/mailbox_imap.c:2525
+#: ../libbalsa/mailbox_imap.c:2526
 #, c-format
 msgid "Cannot create temporary file"
 msgstr "Impossível criar o arquivo temporário"
 
-#: ../libbalsa/mailbox_imap.c:2545
+#: ../libbalsa/mailbox_imap.c:2546
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Impossível escrever no arquivo temporário %s"
 
-#: ../libbalsa/mailbox_imap.c:2774 ../libbalsa/mailbox_imap.c:2893
+#: ../libbalsa/mailbox_imap.c:2775 ../libbalsa/mailbox_imap.c:2894
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Enviando %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:3195
+#: ../libbalsa/mailbox_imap.c:3196
 msgid "Server-side threading not supported."
 msgstr "O encadeamento usado pelo servidor não é suportado."
 
@@ -1788,37 +1789,37 @@ msgid "Cannot load certificate file %s: %s"
 msgstr "Não foi possível carregar o arquivo de certificado %s: %s"
 
 #. connect server
-#: ../libbalsa/mailbox_pop3.c:508 ../libbalsa/send.c:1005
+#: ../libbalsa/mailbox_pop3.c:512 ../libbalsa/send.c:1009
 #, c-format
 msgid "Connecting %s…"
 msgstr "Conectado a %s…"
 
-#: ../libbalsa/mailbox_pop3.c:510
+#: ../libbalsa/mailbox_pop3.c:514
 #, c-format
 msgid "POP3 mailbox %s: cannot connect %s: %s"
 msgstr "Caixa de correio POP3 %s: não foi possível conectar %s: %s"
 
 #. load message list
-#: ../libbalsa/mailbox_pop3.c:519
+#: ../libbalsa/mailbox_pop3.c:527
 msgid "List messages…"
 msgstr "Imprimir mensagens…"
 
-#: ../libbalsa/mailbox_pop3.c:521
+#: ../libbalsa/mailbox_pop3.c:529
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr "Ocorreu erro na caixa de correio POP3 %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:566
+#: ../libbalsa/mailbox_pop3.c:574
 #, c-format
 msgid "POP3 message %d oversized: %s — skipped."
 msgstr "A mensagem POP3 %d excedeu o tamanho: %s — ignorada."
 
-#: ../libbalsa/mailbox_pop3.c:640 ../libbalsa/send.c:1015
+#: ../libbalsa/mailbox_pop3.c:648 ../libbalsa/send.c:1019
 #, c-format
 msgid "Connected to %s"
 msgstr "Conectado a %s"
 
-#: ../libbalsa/mailbox_pop3.c:655
+#: ../libbalsa/mailbox_pop3.c:663
 #, c-format
 msgid "%lu new message (%s)"
 msgid_plural "%lu new messages (%s)"
@@ -1826,17 +1827,17 @@ msgstr[0] "%lu nova mensagem (%s)"
 msgstr[1] "%lu novas mensagens (%s)"
 
 # Fica melhor "Exclusão" do que "Excluindo" na interface gráfica
-#: ../libbalsa/mailbox_pop3.c:666
+#: ../libbalsa/mailbox_pop3.c:674
 msgid "Deleting messages on server…"
 msgstr "Excluindo mensagens no servidor…"
 
-#: ../libbalsa/mailbox_pop3.c:689
+#: ../libbalsa/mailbox_pop3.c:697
 #, c-format
 msgid "POP3 error: %s"
 msgstr "Erro de POP3: %s"
 
 # 26
-#: ../libbalsa/mailbox_pop3.c:699 ../libbalsa/send.c:1084
+#: ../libbalsa/mailbox_pop3.c:707 ../libbalsa/send.c:1092
 msgid "Finished"
 msgstr "Concluído"
 
@@ -2153,21 +2154,21 @@ msgstr ""
 "Não foi possível atingir o servidor SMTP %s (%s), qualquer mensagem "
 "enfileirada será mantida em %s."
 
-#: ../libbalsa/send.c:846
+#: ../libbalsa/send.c:850
 msgid "Sending Mail"
 msgstr "Enviando mensagem"
 
-#: ../libbalsa/send.c:951
+#: ../libbalsa/send.c:955
 #, c-format
 msgid "Save message in %s…"
 msgstr "Salvar mensagem em %s…"
 
-#: ../libbalsa/send.c:958
+#: ../libbalsa/send.c:962
 #, c-format
 msgid "Saving sent message to %s failed: %s"
 msgstr "Gravação da mensagem enviada em %s falhou: %s"
 
-#: ../libbalsa/send.c:989
+#: ../libbalsa/send.c:993
 #, c-format
 msgid ""
 "Sending message failed: %s\n"
@@ -2176,29 +2177,29 @@ msgstr ""
 "Envio de mensagem falhou: %s\n"
 "A mensagem ficou na sua caixa de saída."
 
-#: ../libbalsa/send.c:1068
+#: ../libbalsa/send.c:1076
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr "Conexão com o servidor SMTP %s (%s) falhou: %s"
 
-#: ../libbalsa/send.c:1087
+#: ../libbalsa/send.c:1095
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
 msgstr[0] "Mensagem %u transmitida para %s"
 msgstr[1] "Mensagens %u transmitidas para %s"
 
-#: ../libbalsa/send.c:1267 ../libbalsa/send.c:1333
+#: ../libbalsa/send.c:1275 ../libbalsa/send.c:1341
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Não é possível ler %s: %s"
 
-#: ../libbalsa/send.c:1270 ../libbalsa/send.c:1336
+#: ../libbalsa/send.c:1278 ../libbalsa/send.c:1344
 #, c-format
 msgid "Cannot read %s"
 msgstr "Não é possível ler %s"
 
-#: ../libbalsa/send.c:1300
+#: ../libbalsa/send.c:1308
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2206,53 +2207,47 @@ msgstr ""
 "Não é possível determinar o conjunto de caracteres para o arquivo texto "
 "“%s”; enviando como o tipo MIME “%s”"
 
-#: ../libbalsa/send.c:1804
+#: ../libbalsa/send.c:1812
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Esta mensagem não será criptografada para o destinatário Cco."
 msgstr[1] "Esta mensagem não será criptografada para os destinatários Cco."
 
-#: ../libbalsa/send.c:1899
+#: ../libbalsa/send.c:1907
 msgid "This message will not be encrypted for the BCC: recipient(s)."
 msgstr "Essa mensagem não será criptografada para o(s) destinatário(s) de CCO."
 
-#: ../libbalsa/server.c:359
+#: ../libbalsa/server.c:348
 msgid "Balsa passwords"
 msgstr "Senhas do Balsa"
 
-#: ../libbalsa/server.c:365
+#: ../libbalsa/server.c:354
 #, c-format
-#| msgid "Error storing password for %s@%s: %s\n"
 msgid "Error storing password for %s@%s:%s: %s"
 msgstr "Erro ao armazenar senha para %s@%s:%s: %s"
 
-#: ../libbalsa/server.c:386
+#: ../libbalsa/server.c:375
 #, c-format
-#| msgid "Error looking up password for %s@%s: %s\n"
 msgid "Error looking up password for %s@%s:%s: %s"
 msgstr "Erro ao procurar senha para %s@%s:%s: %s"
 
-#: ../libbalsa/server.c:392
+#: ../libbalsa/server.c:381
 msgid "loaded fallback password from private config file"
 msgstr "carregada senha reserva do arquivo de configuração privado"
 
 #: ../libbalsa/server-config.c:75
-#| msgid "_Remember password in Secret Service"
 msgid "_Remember user password in Secret Service"
 msgstr "Lemb_rar da senha do usuário no serviço secreto"
 
 #: ../libbalsa/server-config.c:76
-#| msgid "_Remember password in Secret Service"
 msgid "_Remember certificate pass phrase in Secret Service"
 msgstr "Lemb_rar da frase secreta do certificado no serviço secreto"
 
 #: ../libbalsa/server-config.c:80
-#| msgid "_Remember your password:"
 msgid "_Remember user password"
 msgstr "Lemb_rar da senha do usuário"
 
 #: ../libbalsa/server-config.c:81
-#| msgid "Certificate _Pass Phrase:"
 msgid "_Remember certificate pass phrase"
 msgstr "Lemb_rar da frase secreta do certificado"
 
@@ -2276,7 +2271,6 @@ msgid "Se_curity:"
 msgstr "Se_gurança:"
 
 #: ../libbalsa/server-config.c:120
-#| msgid "Server requires authentication"
 msgid "Server requires _authentication"
 msgstr "O servidor requer _autenticação"
 
@@ -2295,7 +2289,6 @@ msgstr "_Avançado"
 
 #. client certificate and passphrase
 #: ../libbalsa/server-config.c:143
-#| msgid "Server requires client certificate"
 msgid "Server _requires client certificate"
 msgstr "O servidor _requer um certificado de cliente"
 
@@ -2311,21 +2304,20 @@ msgstr "Arquivo de c_ertificado:"
 msgid "Certificate _Pass Phrase:"
 msgstr "_Frase secreta do Certificado:"
 
-#: ../libbalsa/server-config.c:370
+#: ../libbalsa/server-config.c:369
 #, c-format
-#| msgid "SMTP over SSL (SMTPS)"
 msgid "%s over SSL (%sS)"
 msgstr "%s sobre SSL (%sS)"
 
-#: ../libbalsa/server-config.c:374 ../libinit_balsa/assistant_page_user.c:69
+#: ../libbalsa/server-config.c:373 ../libinit_balsa/assistant_page_user.c:69
 msgid "TLS required"
 msgstr "TLS exigido"
 
-#: ../libbalsa/server-config.c:375 ../libinit_balsa/assistant_page_user.c:70
+#: ../libbalsa/server-config.c:374 ../libinit_balsa/assistant_page_user.c:70
 msgid "TLS if possible (not recommended)"
 msgstr "TLS se possível (não recomendado)"
 
-#: ../libbalsa/server-config.c:376 ../libinit_balsa/assistant_page_user.c:71
+#: ../libbalsa/server-config.c:375 ../libinit_balsa/assistant_page_user.c:71
 msgid "None (not recommended)"
 msgstr "Nenhuma (não recomendado)"
 
@@ -2654,22 +2646,22 @@ msgstr "erro ao carregar o certificado: %s"
 msgid "error initializing key: %s"
 msgstr "erro ao inicializar a chave: %s"
 
-#: ../libnetclient/net-client.c:448
+#: ../libnetclient/net-client.c:453
 #, c-format
 msgid "error loading key: %s"
 msgstr "erro ao carregar a chave: %s"
 
-#: ../libnetclient/net-client.c:488 ../libnetclient/net-client.c:525
+#: ../libnetclient/net-client.c:493 ../libnetclient/net-client.c:530
 #, c-format
 msgid "not connected"
 msgstr "não conectado"
 
-#: ../libnetclient/net-client.c:490
+#: ../libnetclient/net-client.c:495
 #, c-format
 msgid "connection is already encrypted"
 msgstr "a conexão já está criptografada"
 
-#: ../libnetclient/net-client.c:527
+#: ../libnetclient/net-client.c:532
 #, c-format
 msgid "connection is already compressed"
 msgstr "a conexão já está compactada"
@@ -2677,7 +2669,7 @@ msgstr "a conexão já está compactada"
 #. unexpected server reply
 #: ../libnetclient/net-client-pop.c:212 ../libnetclient/net-client-pop.c:428
 #: ../libnetclient/net-client-smtp.c:581 ../libnetclient/net-client-smtp.c:652
-#: ../libnetclient/net-client-smtp.c:694
+#: ../libnetclient/net-client-smtp.c:699
 #, c-format
 msgid "bad server reply: %s"
 msgstr "resposta inválida do servidor: %s"
@@ -2687,7 +2679,7 @@ msgstr "resposta inválida do servidor: %s"
 msgid "bad server reply"
 msgstr "resposta inválida do servidor"
 
-#: ../libnetclient/net-client-pop.c:420 ../libnetclient/net-client-pop.c:693
+#: ../libnetclient/net-client-pop.c:420 ../libnetclient/net-client-pop.c:699
 #, c-format
 msgid "error: %s"
 msgstr "erro: %s"
@@ -2717,7 +2709,13 @@ msgstr "o servidor remoto não oferece suporte a STARTTLS"
 msgid "transient error %d: %s"
 msgstr "erro transiente %d: %s"
 
-#: ../libnetclient/net-client-smtp.c:689
+#: ../libnetclient/net-client-smtp.c:690
+#, c-format
+#| msgid "encryption failed: %s"
+msgid "authentication failure %d: %s"
+msgstr "falha de autenticação %d: %s"
+
+#: ../libnetclient/net-client-smtp.c:693
 #, c-format
 msgid "permanent error %d: %s"
 msgstr "erro permanente %d: %s"
@@ -2981,33 +2979,41 @@ msgstr "Catálogo de endereços Rubrica2"
 msgid "Osmo Address Book"
 msgstr "Catálogo de endereços Osmo"
 
-#: ../src/balsa-app.c:64
+#: ../src/balsa-app.c:60 ../src/balsa-app.c:130
 msgid "_Remember password in Secret Service"
 msgstr "Lemb_rar da senha no serviço secreto"
 
-#: ../src/balsa-app.c:67
+#: ../src/balsa-app.c:63 ../src/balsa-app.c:133
 msgid "_Remember password"
 msgstr "Lemb_rar senha"
 
-#: ../src/balsa-app.c:73
+#: ../src/balsa-app.c:73 ../src/balsa-app.c:138
 #, c-format
 msgid ""
-"Opening remote mailbox %s.\n"
-"The _password for %s@%s:"
+"Password to unlock the user certificate\n"
+"%s\n"
+"for %s@%s (%s)"
 msgstr ""
-"Abrindo caixa de correio remota %s.\n"
-"A _senha para %s@%s:"
+"A senha para destravar o certificado de usuário\n"
+"%s\n"
+"para %s@%s (%s)"
 
-#: ../src/balsa-app.c:78
+#: ../src/balsa-app.c:77 ../src/balsa-app.c:142
 #, c-format
-msgid "_Password for %s@%s (%s):"
-msgstr "_Senha para %s@%s (%s):"
+#| msgid "_Password for %s@%s (%s):"
+msgid "Password for %s@%s (%s)"
+msgstr "Senha para %s@%s (%s)"
 
-#: ../src/balsa-app.c:81
+#: ../src/balsa-app.c:82 ../src/balsa-app.c:84 ../src/balsa-app.c:146
 msgid "Password needed"
 msgstr "Necessita uma senha"
 
-#: ../src/balsa-app.c:519
+#: ../src/balsa-app.c:166
+#| msgid "_Password:"
+msgid "Password:"
+msgstr "Senha:"
+
+#: ../src/balsa-app.c:535
 #, c-format
 msgid "Couldn’t open mailbox “%s”"
 msgstr "Não foi possível abrir a caixa de correio “%s”"
@@ -4026,7 +4032,7 @@ msgstr "T_ipo da busca:"
 msgid "Edit condition for filter: "
 msgstr "Editar condição para filtro: "
 
-#: ../src/filter-edit-callbacks.c:1483 ../src/save-restore.c:1884
+#: ../src/filter-edit-callbacks.c:1483 ../src/save-restore.c:1927
 msgid "Filter with no condition was omitted"
 msgstr "Filtro sem condições foi omitido"
 
@@ -4731,7 +4737,6 @@ msgid "_Subscribe for new mail check"
 msgstr "A_ssinar verificação de novos e-mails"
 
 #: ../src/mailbox-conf.c:986
-#| msgid "H_ide messages"
 msgid "_Thread messages"
 msgstr "_Encadear mensagens"
 
@@ -5431,7 +5436,6 @@ msgid "Default sort column:"
 msgstr "Coluna de ordenação padrão:"
 
 #: ../src/pref-manager.c:2425
-#| msgid "sign messages by default"
 msgid "Thread messages by default"
 msgstr "Encadear mensagens por padrão"
 
@@ -5829,11 +5833,11 @@ msgstr "_Direita"
 msgid "Error printing message: %s"
 msgstr "Erro ao imprimir mensagem: %s"
 
-#: ../src/save-restore.c:595
+#: ../src/save-restore.c:638
 msgid "Error during filters loading: "
 msgstr "Erro ao carregar filtros: "
 
-#: ../src/save-restore.c:597
+#: ../src/save-restore.c:640
 #, c-format
 msgid ""
 "Error during filters loading: %s\n"
@@ -5842,11 +5846,11 @@ msgstr ""
 "Erro ao carregar filtros: %s\n"
 "Os filtros podem não estar corretos."
 
-#: ../src/save-restore.c:718
+#: ../src/save-restore.c:761
 msgid "The option not to recognize “format=flowed” text has been removed."
 msgstr "A opção para não reconhecer o texto “formato=preenchido” foi removida."
 
-#: ../src/save-restore.c:989
+#: ../src/save-restore.c:1032
 msgid ""
 "The option not to send “format=flowed” text is now on the Options menu of "
 "the compose window."
@@ -5854,14 +5858,14 @@ msgstr ""
 "A opção para não enviar texto como “formato=preenchido” está agora no menu "
 "Opções da janela de composição."
 
-#: ../src/save-restore.c:1028
+#: ../src/save-restore.c:1071
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 "A opção para requerer um MDN está agora no menu Opções da janela de "
 "composição."
 
-#: ../src/save-restore.c:1105
+#: ../src/save-restore.c:1148
 msgid ""
 "This version of Balsa uses a new user interface; if you have changed Balsa’s "
 "keyboard accelerators, you will need to set them again."
@@ -7073,7 +7077,6 @@ msgid "All _Headers"
 msgstr "Todos os _cabeçalhos"
 
 #: ../ui/main-window.ui.h:44
-#| msgid "H_ide messages"
 msgid "Th_read messages"
 msgstr "E_ncadear mensagens"
 
@@ -7339,6 +7342,13 @@ msgstr "Anexar chave pública Gnu_PG"
 msgid "_Escape Special Characters"
 msgstr "Descartar caracteres _especiais"
 
+#~ msgid ""
+#~ "Opening remote mailbox %s.\n"
+#~ "The _password for %s@%s:"
+#~ msgstr ""
+#~ "Abrindo caixa de correio remota %s.\n"
+#~ "A _senha para %s@%s:"
+
 #~ msgid "Falling back\n"
 #~ msgstr "Voltando\n"
 
@@ -7357,9 +7367,6 @@ msgstr "Descartar caracteres _especiais"
 
 #~ msgid "Use_r name:"
 #~ msgstr "Nome do usuá_rio:"
-
-#~ msgid "_Password:"
-#~ msgstr "_Senha:"
 
 #~ msgid "_Anonymous access"
 #~ msgstr "Acesso _anônimo"
@@ -8533,9 +8540,6 @@ msgstr "Descartar caracteres _especiais"
 
 #~ msgid "signing failed: %s"
 #~ msgstr "falha na assinatura: %s"
-
-#~ msgid "encryption failed: %s"
-#~ msgstr "falha na criptografia: %s"
 
 #~ msgid ""
 #~ "\n"

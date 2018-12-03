@@ -73,8 +73,6 @@
 
 #include "libinit_balsa/assistant_init.h"
 
-#include "libbalsa/libbalsa-marshal.h"
-
 #define MAILBOX_DATA "mailbox_data"
 
 enum {

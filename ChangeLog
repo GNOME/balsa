@@ -1,3 +1,9 @@
+2018-12-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not include no-longer-existing libbalsa/libbalsa-marshal.h
+
+	* src/main-window.c:
+
 2018-11-30  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Replace custom ELEMENTS macro with Glib G_N_ELEMENTS

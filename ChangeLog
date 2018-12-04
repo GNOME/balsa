@@ -1,3 +1,14 @@
+2018-12-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Deprecation cleanup
+
+	* libbalsa/mime.c (libbalsa_text_to_html):
+	pango_unichar_direction() is deprecated in Pango 1.44; a commit
+	message suggests using fribidi directly.
+	* configure.ac: add direct fribidi dependency; it is already an
+	indirect dependency through Pango.
+	* meson.build: ditto.
+
 2018-12-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Do not include no-longer-existing libbalsa/libbalsa-marshal.h

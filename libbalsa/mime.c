@@ -24,6 +24,7 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <fribidi.h>
 
 #include "libbalsa.h"
 #include "misc.h"
@@ -1243,7 +1244,7 @@ libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lan
     while (*start) {
         const gchar * eol = strchr(start, '\n');
         const gchar * p = start;
-        PangoDirection direction = PANGO_DIRECTION_NEUTRAL;
+        gboolean is_rtl = FALSE;
         GString * html;
         gsize idx;
 
@@ -1251,8 +1252,19 @@ libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lan
             eol = start + strlen(start);
 
         /* find the first real char to determine the paragraph direction */
-        while (p < eol && direction == PANGO_DIRECTION_NEUTRAL) {
-            direction = pango_unichar_direction(g_utf8_get_char(p));
+        /* Use the same logic as fribidi_get_par_direction(), but
+         * without allocating memory for all the gunichars and
+         * FriBidiCharTypes: */
+        while (p < eol) {
+            FriBidiCharType char_type;
+
+            char_type = fribidi_get_bidi_type(g_utf8_get_char(p));
+
+            if (FRIBIDI_IS_LETTER(char_type)) {
+                is_rtl = FRIBIDI_IS_RTL(char_type);
+                break;
+            }
+
             p = g_utf8_next_char(p);
         }
 
@@ -1275,7 +1287,7 @@ libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lan
 
         /* append the paragraph, always stating the proper direction */
         g_string_append_printf(html_body, "<p dir=\"%s\">%s</p>\n",
-                               direction == PANGO_DIRECTION_RTL ? "rtl" : "ltr",
+                               is_rtl ? "rtl" : "ltr",
                                *html->str ? html->str : "&nbsp;");
         g_string_free(html, TRUE);
 

@@ -133,6 +133,7 @@ gmime_dep   = dependency('gmime-2.6')
 gio_dep     = dependency('gio-2.0')
 gthread_dep = dependency('gthread-2.0')
 gnutls_dep  = dependency('gnutls')
+fribidi_dep = dependency('fribidi')
 
 # Dependencies for balsa
 balsa_deps = [glib_dep,
@@ -140,7 +141,8 @@ balsa_deps = [glib_dep,
               gmime_dep,
               gio_dep,
               gthread_dep,
-              gnutls_dep]
+              gnutls_dep,
+              fribidi_dep]
 
 # Dependencies for balsa_ab:
 balsa_ab_deps = [glib_dep,

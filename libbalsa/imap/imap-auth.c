@@ -182,9 +182,11 @@ getmsg_plain(ImapMboxHandle *h, char **retmsg, int *retmsglen)
 		*retmsglen = strlen(*retmsg);
 		result = TRUE;
 	}
-	net_client_free_authstr(auth_data[0]);
-	net_client_free_authstr(auth_data[1]);
-	g_free(auth_data);
+	if (auth_data != NULL) {
+		net_client_free_authstr(auth_data[0]);
+		net_client_free_authstr(auth_data[1]);
+		g_free(auth_data);
+	}
 	return result;
 }
 

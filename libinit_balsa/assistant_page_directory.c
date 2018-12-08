@@ -389,7 +389,7 @@ balsa_druid_page_directory_back(GtkAssistant *druid, GtkWidget *page,
 }
 
 static void
-balsa_druid_page_directory_next(GtkAssistant * page, GtkWidget * druid,
+balsa_druid_page_directory_next(GtkAssistant *druid, GtkWidget *page,
                                 BalsaDruidPageDirectory * dir)
 {
     dir->paths_locked = TRUE;

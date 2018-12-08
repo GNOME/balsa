@@ -375,8 +375,11 @@ store_address_add_address(StoreAddressInfo * info,
 
     text = internet_address_to_string(ia, FALSE);
     address = libbalsa_address_new();
-    address->full_name =
-        g_strdup(ia->name ? ia->name : group ? group->name : NULL);
+    if (ia->name != NULL) {
+    	address->full_name = g_strdup(ia->name);
+    } else {
+    	address->full_name = g_strdup((group != NULL) ? group->name : NULL);
+    }
     if (INTERNET_ADDRESS_IS_GROUP(ia)) {
         InternetAddressList *members;
         int j;

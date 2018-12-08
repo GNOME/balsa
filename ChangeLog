@@ -1,3 +1,21 @@
+2018-12-08  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Fix some issues detected by cppcheck
+
+	* libbalsa/imap/auth-gssapi.c: fix (unlikely) uninitialised use of rc
+	* libbalsa/imap/imap-auth.c: do not dereference NULL pointer if
+	  an error occurred
+	* libbalsa/libbalsa.c: fix signed/unsigned mismatch, and use
+	  g_debug instead of printf
+	* libbalsa/mailbox_imap.c: fix signed/unsigned mismatch
+	* libinit_balsa/assistant_page_directory.c: fix different
+	  parameters names in function prototype and implementation
+	* src/balsa-message.c, src/save-restore.c: do no dereference
+	  pointer before checking it it is not NULL
+	* src/sendmsg-window.c: fix false-positive about NULL pointer dereference
+	* src/store-address.c: fix false-positive by splitting an
+	  over-complex construct
+
 2018-12-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Deprecation cleanup

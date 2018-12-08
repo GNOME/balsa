@@ -1136,10 +1136,11 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
     gboolean is_new;
     GtkTreeIter iter;
     BalsaPartInfo *info;
-    gboolean has_focus = bm->focus_state != BALSA_MESSAGE_FOCUS_STATE_NO;
+    gboolean has_focus;
     LibBalsaMessage *message;
 
     g_return_val_if_fail(bm != NULL, FALSE);
+    has_focus = bm->focus_state != BALSA_MESSAGE_FOCUS_STATE_NO;
 
     bm_disable_find_entry(bm);
     balsa_message_clear_tree(bm);

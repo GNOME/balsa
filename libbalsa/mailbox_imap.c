@@ -2313,9 +2313,9 @@ static gboolean
 is_child_of(LibBalsaMessageBody *body, LibBalsaMessageBody *child,
             GString *s, gboolean modify)
 {
-    int i = 1;
+    guint i;
     gboolean do_mod;
-    for(i=1; body; body = body->next) {
+    for(i=1U; body; body = body->next) {
         if(body==child) {
             g_string_printf(s, "%u", i);
             return TRUE;

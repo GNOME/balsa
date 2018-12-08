@@ -449,9 +449,10 @@ static gint
 config_mailbox_init(const gchar * prefix)
 {
     LibBalsaMailbox *mailbox;
-    const gchar *key = prefix + strlen(MAILBOX_SECTION_PREFIX);
+    const gchar *key;
 
     g_return_val_if_fail(prefix != NULL, FALSE);
+    key = prefix + strlen(MAILBOX_SECTION_PREFIX);
 
     mailbox = libbalsa_mailbox_new_from_config(prefix, is_special_name(key));
     if (mailbox == NULL)

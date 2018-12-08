@@ -616,7 +616,7 @@ ask_cert_real(void *data)
      * not really necessary but helps with debugging. */
    while(gtk_events_pending()) 
         gtk_main_iteration_do(FALSE);
-    printf("%s returns %d\n", __FUNCTION__, i);
+    g_debug("%s returns %u", __func__, i);
     return i;
 }
 

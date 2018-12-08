@@ -6239,8 +6239,7 @@ sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
         break;
     default:
         g_assert_not_reached(); /* since it hardly makes sense... */
-        bsmsg = NULL; /** silence invalid warnings */
-
+        return NULL; /* silence invalid warnings */
     }
     g_object_unref(message);
 

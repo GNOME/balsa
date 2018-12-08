@@ -148,6 +148,8 @@ imap_auth_gssapi(ImapMboxHandle* handle)
     			(void) net_client_write_line(NET_CLIENT(handle->sio), "*", NULL);
     		}
     		rc = imap_cmd_process_untagged(handle, cmdno);
+    	} else {
+    		rc = IMR_BAD;
     	}
 
 		net_client_gss_ctx_free(gss_ctx);

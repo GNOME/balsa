@@ -1,3 +1,11 @@
+2018-12-09  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Clean up deadwood
+
+	* src/mailbox-conf.c (run_mailbox_conf),
+	(create_local_mailbox_dialog): remove the “deadwood”, and
+	a stray debug message…
+
 2018-12-08  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Fix some issues detected by cppcheck

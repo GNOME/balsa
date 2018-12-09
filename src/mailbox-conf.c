@@ -108,9 +108,6 @@ struct _MailboxConfWindow {
 static void mailbox_conf_update(MailboxConfWindow *conf_window);
 static void mailbox_conf_add(MailboxConfWindow *conf_window);
 
-/* misc functions */
-static void mailbox_conf_set_values(MailboxConfWindow *mcw);
-
 static void update_pop_mailbox(MailboxConfWindow *mcw);
 static BalsaMailboxConfView *
     mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
@@ -381,10 +378,6 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GType mailbox_type,
                                     update ? GTK_RESPONSE_CANCEL :
                                     MCW_RESPONSE);
 
-    if ((mbnode != NULL) && (mbnode == NULL) && (!g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3))) {
-        mailbox_conf_set_values(mcw);
-    }
-
     g_signal_connect(G_OBJECT(mcw->window), "response", 
                      G_CALLBACK(conf_response_cb), mcw);
     gtk_widget_show_all(GTK_WIDGET(mcw->window));
@@ -431,34 +424,6 @@ mailbox_conf_edit(BalsaMailboxNode * mbnode)
                          TRUE);
     g_object_set_data(G_OBJECT(mbnode->mailbox), BALSA_MAILBOX_CONF_DIALOG,
                       dialog);
-}
-
-/*
- * Initialise the dialogs fields from mcw->mailbox
- *
- * Note: used for local mailboxes only
- */
-static void
-mailbox_conf_set_values(MailboxConfWindow *mcw)
-{
-	LibBalsaMailbox * mailbox;
-
-	mailbox = mcw->mailbox;
-
-	g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
-
-	if (mcw->mb_data.local.mailbox_name && mailbox->name)
-		gtk_entry_set_text(GTK_ENTRY(mcw->mb_data.local.mailbox_name), mailbox->name);
-
-	if (mailbox->url) {
-		GtkFileChooser *chooser = GTK_FILE_CHOOSER(mcw->window);
-		LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
-		const gchar *path = libbalsa_mailbox_local_get_path(local);
-		gchar *basename = g_path_get_basename(path);
-		gtk_file_chooser_set_filename(chooser, path);
-		gtk_file_chooser_set_current_name(chooser, basename);
-		g_free(basename);
-	}
 }
 
 
@@ -768,7 +733,6 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 		const gchar *path = libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox));
 		gchar *basename = g_path_get_basename(path);
 
-		g_message("'%s' -> '%s' '%s'", mcw->mailbox->url, path, basename);
 		//gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog), path);
 		//gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), basename);
 		gtk_file_chooser_set_uri(GTK_FILE_CHOOSER(dialog), mcw->mailbox->url);

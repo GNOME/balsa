@@ -1,3 +1,13 @@
+2018-12-13  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Replace readdir() by g_dir_read_name()
+
+	* libbalsa/folder-scanners.c: replace opendir/readdir/closedir
+	  by g_dir_*, and refactor functions libbalsa_scanner_mdir()
+	  and libbalsa_scanner_local_dir_helper
+	* libbalsa/mailbox_imap.c: replace opendir/readdir/closedir
+	  by g_dir_*
+
 2018-12-09  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Clean up deadwood

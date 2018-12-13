@@ -32,7 +32,6 @@
 
 
 #include <stdlib.h>
-#include <dirent.h>
 #include <string.h>
 
 /* for open() */
@@ -519,19 +518,21 @@ cmp_by_time (gconstpointer  a, gconstpointer  b)
 static void
 clean_dir(const char *dir_name, off_t cache_size)
 {
-    DIR* dir;
-    struct dirent* key;
+    GDir* dir;
+    const gchar *entry;
     GList *list, *lst;
     off_t sz;
-    dir = opendir(dir_name);
-    if(!dir)
+
+    dir = g_dir_open(dir_name, 0U, NULL);	/* do not notify the user about errors */
+    if (!dir)
         return;
 
     list = NULL;
-    while ( (key=readdir(dir)) != NULL) {
+    while ((entry = g_dir_read_name(dir)) != NULL) {
         struct stat st;
         struct file_info *fi;
-        gchar *fname = g_build_filename(dir_name, key->d_name, NULL);
+        gchar *fname = g_build_filename(dir_name, entry, NULL);
+
         if(stat(fname, &st) == -1 || !S_ISREG(st.st_mode)) {
 	    g_free(fname);
             continue;
@@ -542,7 +543,7 @@ clean_dir(const char *dir_name, off_t cache_size)
         fi->time = st.st_atime;
         list = g_list_prepend(list, fi);
     }
-    closedir(dir);
+    g_dir_close(dir);
 
     list = g_list_sort(list, cmp_by_time);
     sz = 0;

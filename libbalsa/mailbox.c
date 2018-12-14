@@ -1676,7 +1676,7 @@ libbalsa_mailbox_search_iter_new(LibBalsaCondition * condition)
     if (!condition)
         return NULL;
 
-    iter = g_slice_new(LibBalsaMailboxSearchIter);
+    iter = g_new(LibBalsaMailboxSearchIter, 1);
     iter->mailbox = NULL;
     iter->stamp = 0;
     iter->condition = libbalsa_condition_ref(condition);
@@ -1721,7 +1721,7 @@ libbalsa_mailbox_search_iter_unref(LibBalsaMailboxSearchIter * search_iter)
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->search_iter_free(search_iter);
 
     libbalsa_condition_unref(search_iter->condition);
-    g_slice_free(LibBalsaMailboxSearchIter, search_iter);
+    g_free(search_iter);
 }
 
 /* GNode iterators; they return the root node when they run out of nodes,

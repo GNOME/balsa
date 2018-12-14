@@ -1,3 +1,12 @@
+2018-12-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Stop using GSlice; it may go away
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_search_iter_new): use
+	g_new(), not g_slice_new();
+	(libbalsa_mailbox_search_iter_unref): use g_free(), not
+	g_slice_free().
+
 2018-12-13  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Replace readdir() by g_dir_read_name()

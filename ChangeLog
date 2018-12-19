@@ -1,3 +1,13 @@
+2018-12-18  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	SMTP, POP: fall back to auth w/ password if GSS failed
+
+	* libnetclient/net-client-pop.c, libnetclient/net-client-smtp.c:
+	  retry auth with password if GSS auth failed; small performance
+	  improvement checking the various auth methods
+	* libnetclient/net-client-utils.c: print more (internal) debug
+	  info about failed GSS operations, fix nit-picks
+
 2018-12-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Stop using GSlice; it may go away

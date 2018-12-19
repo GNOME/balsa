@@ -171,12 +171,26 @@ net_client_pop_connect(NetClientPop *client, gchar **greeting, GError **error)
 
 		auth_data = NULL;
 		need_pwd = (auth_supported & NET_CLIENT_POP_AUTH_NO_PWD) == 0U;
-		g_debug("emit 'auth' signal for client %p", client);
+		g_debug("emit 'auth' signal for client %p, need pwd %d", client, need_pwd);
 		g_signal_emit_by_name(client, "auth", need_pwd, &auth_data);
 		if ((auth_data != NULL) && (auth_data[0] != NULL)) {
 			result = net_client_pop_auth(client, auth_data[0], auth_data[1], auth_supported, error);
 			net_client_free_authstr(auth_data[0]);
 			net_client_free_authstr(auth_data[1]);
+
+			/* if passwordless authentication failed, try again with password */
+			if (!result && !need_pwd) {
+				g_debug("passwordless authentication failed, retry w/ password: emit 'auth' signal for client %p", client);
+				g_clear_error(error);
+				g_free(auth_data);
+				g_signal_emit_by_name(client, "auth", TRUE, &auth_data);
+				if ((auth_data != NULL) && (auth_data[0] != NULL)) {
+					result = net_client_pop_auth(client, auth_data[0], auth_data[1],
+						auth_supported & ~NET_CLIENT_POP_AUTH_NO_PWD, error);
+					net_client_free_authstr(auth_data[0]);
+					net_client_free_authstr(auth_data[1]);
+				}
+			}
 		}
 		g_free(auth_data);
 	}
@@ -482,7 +496,10 @@ net_client_pop_auth(NetClientPop *client, const gchar *user, const gchar *passwd
 		auth_mask = client->priv->auth_allowed[1] & auth_supported;
 	}
 
-	if (((auth_mask & NET_CLIENT_POP_AUTH_NO_PWD) == 0U) && (passwd == NULL)) {
+	if (auth_mask == 0U) {
+		g_set_error(error, NET_CLIENT_POP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_POP_NO_AUTH,
+			_("no suitable authentication mechanism"));
+	} else if (((auth_mask & NET_CLIENT_POP_AUTH_NO_PWD) == 0U) && (passwd == NULL)) {
 		g_set_error(error, NET_CLIENT_POP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_POP_NO_AUTH, _("password required"));
 	} else {
 		/* first try authentication methods w/o password, then safe ones, and finally the plain-text methods */
@@ -501,14 +518,13 @@ net_client_pop_auth(NetClientPop *client, const gchar *user, const gchar *passwd
 		} else if ((auth_mask & NET_CLIENT_POP_AUTH_LOGIN) != 0U) {
 			result = net_client_pop_auth_login(client, user, passwd, error);
 		} else {
-			g_set_error(error, NET_CLIENT_POP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_POP_NO_AUTH,
-				_("no suitable authentication mechanism"));
+			g_assert_not_reached();
 		}
 
 		/* POP3 does not define a mechanism to indicate that the authentication failed due to a too weak mechanism or wrong
 		 * credentials, so we treat all server -ERR responses as authentication failures */
-		if (!result && (*error != NULL) && ((*error)->code == NET_CLIENT_ERROR_POP_SERVER_ERR)) {
-			(*error)->code = NET_CLIENT_ERROR_POP_AUTHFAIL;
+		if (!result && (*error != NULL) && ((*error)->code == (gint) NET_CLIENT_ERROR_POP_SERVER_ERR)) {
+			(*error)->code = (gint) NET_CLIENT_ERROR_POP_AUTHFAIL;
 		}
 	}
 

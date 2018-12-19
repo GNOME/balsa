@@ -70,7 +70,7 @@ net_client_cram_calc(const gchar *base64_challenge, GChecksumType chksum_type, c
 const gchar *
 net_client_chksum_to_str(GChecksumType chksum_type)
 {
-	/*lint -e{904} -e{9077} -e{9090}	(MISRA C:2012 Rules 15.5, 16.1, 16.3) */
+	/*lint -e{904} -e{9077} -e{9090} -e{788}	(MISRA C:2012 Rules 15.5, 16.1, 16.3) */
 	switch (chksum_type) {
 	case G_CHECKSUM_MD5:
 		return "MD5";
@@ -118,7 +118,7 @@ net_client_free_authstr(gchar *str)
 		guint n;
 
 		for (n = 0; str[n] != '\0'; n++) {
-			str[n] = g_random_int_range(32, 128);
+			str[n] = (gchar) g_random_int_range(32, 128);
 		}
 		g_free(str);
 	}
@@ -151,6 +151,7 @@ net_client_gss_ctx_new(const gchar *service, const gchar *host, const gchar *use
     if (GSS_ERROR(maj_stat) != 0U) {
     	gchar *gss_err = gss_error_string(maj_stat, min_stat);
 
+    	g_debug("gss_import_name: %x:%x: %s", maj_stat, min_stat, gss_err);
     	g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_GSSAPI, _("importing GSS service name %s failed: %s"),
     		service_str, gss_err);
     	g_free(gss_err);
@@ -194,6 +195,7 @@ net_client_gss_auth_step(NetClientGssCtx *gss_ctx, const gchar *in_token, gchar 
 	if ((maj_stat != GSS_S_COMPLETE) && (maj_stat != GSS_S_CONTINUE_NEEDED)) {
     	gchar *gss_err = gss_error_string(maj_stat, min_stat);
 
+    	g_debug("gss_init_sec_context: %x:%x: %s", maj_stat, min_stat, gss_err);
     	g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_GSSAPI, _("cannot initialize GSS security context: %s"),
     		gss_err);
     	g_free(gss_err);
@@ -233,6 +235,7 @@ net_client_gss_auth_finish(const NetClientGssCtx *gss_ctx, const gchar *in_token
 	if (maj_stat != GSS_S_COMPLETE) {
     	gchar *gss_err = gss_error_string(maj_stat, min_stat);
 
+    	g_debug("gss_unwrap: %x:%x: %s", maj_stat, min_stat, gss_err);
     	g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_GSSAPI, _("malformed GSS security token: %s"), gss_err);
     	g_free(gss_err);
 	} else {
@@ -258,6 +261,7 @@ net_client_gss_auth_finish(const NetClientGssCtx *gss_ctx, const gchar *in_token
 			if (maj_stat != GSS_S_COMPLETE) {
 				gchar *gss_err = gss_error_string(maj_stat, min_stat);
 
+		    	g_debug("gss_wrap: %x:%x: %s", maj_stat, min_stat, gss_err);
 				g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_GSSAPI, _("cannot create GSS login request: %s"),
 					gss_err);
 				g_free(gss_err);

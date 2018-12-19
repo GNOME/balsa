@@ -157,12 +157,26 @@ net_client_smtp_connect(NetClientSmtp *client, gchar **greeting, GError **error)
 
 		auth_data = NULL;
 		need_pwd = (auth_supported & NET_CLIENT_SMTP_AUTH_NO_PWD) == 0U;
-		g_debug("emit 'auth' signal for client %p", client);
+		g_debug("emit 'auth' signal for client %p, need pwd %d", client, need_pwd);
 		g_signal_emit_by_name(client, "auth", need_pwd, &auth_data);
 		if ((auth_data != NULL) && (auth_data[0] != NULL)) {
 			result = net_client_smtp_auth(client, auth_data[0], auth_data[1], auth_supported, error);
 			net_client_free_authstr(auth_data[0]);
 			net_client_free_authstr(auth_data[1]);
+
+			/* if passwordless authentication failed, try again with password */
+			if (!result && !need_pwd) {
+				g_debug("passwordless authentication failed, retry w/ password: emit 'auth' signal for client %p", client);
+				g_clear_error(error);
+				g_free(auth_data);
+				g_signal_emit_by_name(client, "auth", TRUE, &auth_data);
+				if ((auth_data != NULL) && (auth_data[0] != NULL)) {
+					result = net_client_smtp_auth(client, auth_data[0], auth_data[1],
+						auth_supported & ~NET_CLIENT_SMTP_AUTH_NO_PWD, error);
+					net_client_free_authstr(auth_data[0]);
+					net_client_free_authstr(auth_data[1]);
+				}
+			}
 		}
 		g_free(auth_data);
 	}
@@ -391,7 +405,10 @@ net_client_smtp_auth(NetClientSmtp *client, const gchar *user, const gchar *pass
 		auth_mask = client->priv->auth_allowed[1] & auth_supported;
 	}
 
-	if (((auth_mask & NET_CLIENT_SMTP_AUTH_NO_PWD) == 0U) && (passwd == NULL)) {
+	if (auth_mask == 0U) {
+		g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_NO_AUTH,
+			_("no suitable authentication mechanism"));
+	} else if (((auth_mask & NET_CLIENT_SMTP_AUTH_NO_PWD) == 0U) && (passwd == NULL)) {
 		g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_NO_AUTH, _("password required"));
 	} else {
 		/* first try authentication methods w/o password, then safe ones, and finally the plain-text methods */
@@ -406,8 +423,7 @@ net_client_smtp_auth(NetClientSmtp *client, const gchar *user, const gchar *pass
 		} else if ((auth_mask & NET_CLIENT_SMTP_AUTH_LOGIN) != 0U) {
 			result = net_client_smtp_auth_login(client, user, passwd, error);
 		} else {
-			g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_NO_AUTH,
-				_("no suitable authentication mechanism"));
+			g_assert_not_reached();
 		}
 	}
 

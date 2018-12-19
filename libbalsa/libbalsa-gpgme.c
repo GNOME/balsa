@@ -747,7 +747,7 @@ libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
 		GList *keys = NULL;
 
 		/* let gpgme list all available keys */
-		if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, name, TRUE, FALSE, error)) {
+		if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, name, TRUE, FALSE, FALSE, error)) {
 			if (keys != NULL) {
 				gpgme_key_t key;
 
@@ -913,7 +913,7 @@ get_key_from_name(gpgme_ctx_t   ctx,
 	}
 
 	/* let gpgme list keys */
-	list_res = libbalsa_gpgme_list_keys(ctx, &keys, &bad_keys, mail_name, secret, FALSE, error);
+	list_res = libbalsa_gpgme_list_keys(ctx, &keys, &bad_keys, mail_name, secret, FALSE, FALSE, error);
 	g_free(mail_name);
 	if (!list_res) {
 		return GPG_ERR_GENERAL;
@@ -992,7 +992,7 @@ get_pubkey(gpgme_ctx_t   ctx,
 	gpgme_key_t key = NULL;
 
 	/* let gpgme list all available keys */
-	if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, error)) {
+	if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, FALSE, error)) {
 		if (keys != NULL) {
 			/* let the user select a key from the list, even if there is only one */
 			if (select_key_cb != NULL) {

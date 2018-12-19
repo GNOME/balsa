@@ -1,5 +1,18 @@
 2018-12-18  Albrecht Dreß  <albrecht.dress@arcor.de>
 
+	Fix broken display of expired application/pgp-keys parts
+
+	* libbalsa/libbalsa-gpgme-keys.[hc]: add flag to
+	  libbalsa_gpgme_list_keys() for listing expired etc. keys, use
+	  the new api w/o allowing expired etc. keys
+	* libbalsa/libbalsa-gpgme.c, libbalsa/rfc3156.c: use the new
+	  api w/o allowing expired etc. keys
+	* src/balsa-mime-widget-crypto.c: use the new api, allowing
+	  expired etc. keys
+
+
+2018-12-18  Albrecht Dreß  <albrecht.dress@arcor.de>
+
 	Fix buffer overflow and missing include
 
 	* libbalsa/folder-scanners.c: fix missing include on old systems

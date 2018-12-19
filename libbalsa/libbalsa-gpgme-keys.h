@@ -42,6 +42,7 @@ G_BEGIN_DECLS
  * \param pattern key search pattern (e.g. name, fingerprint, ...), may be NULL to list all keys
  * \param secret TRUE to search for private keys, FALSE to search for public keys
  * \param on_keyserver TRUE to search on a key server, FALSE to search the local key ring
+ * \param list_bad_keys include expired, revoked, invalid and disabled keys
  * \param error filled with error information on error, may be NULL
  * \return TRUE on success, or FALSE if any error occurred
  *
@@ -61,6 +62,7 @@ gboolean libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 								  const gchar  *pattern,
 								  gboolean      secret,
 								  gboolean      on_keyserver,
+								  gboolean		list_bad_keys,
 								  GError      **error);
 
 /** \brief Load a key

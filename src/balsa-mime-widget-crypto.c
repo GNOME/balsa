@@ -292,7 +292,7 @@ create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
 
 			success = libbalsa_gpgme_ctx_set_home(ctx, temp_dir, error) &&
 				libbalsa_gpgme_import_ascii_key(ctx, key_buf, NULL, error) &&
-				libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, error);
+				libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, TRUE, error);
 
 			if (success && (keys != NULL)) {
 				GList *item;

@@ -68,6 +68,7 @@ libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 						 const gchar  *pattern,
 						 gboolean      secret,
 						 gboolean      on_keyserver,
+						 gboolean	   list_bad_keys,
 						 GError      **error)
 {
 	gpgme_error_t gpgme_err;
@@ -110,7 +111,7 @@ libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 
 				gpgme_err = gpgme_op_keylist_next(ctx, &key);
 				if (gpgme_err == GPG_ERR_NO_ERROR) {
-					if (check_key(key, secret, on_keyserver, now)) {
+					if (list_bad_keys || check_key(key, secret, on_keyserver, now)) {
 						*keys = g_list_prepend(*keys, key);
 					} else {
 						bad++;
@@ -353,7 +354,7 @@ gpgme_keyserver_run(gpointer user_data)
 	gboolean result;
 	GError *error = NULL;
 
-	result = libbalsa_gpgme_list_keys(keyserver_op->gpgme_ctx, &keys, NULL, keyserver_op->fingerprint, FALSE, TRUE, &error);
+	result = libbalsa_gpgme_list_keys(keyserver_op->gpgme_ctx, &keys, NULL, keyserver_op->fingerprint, FALSE, TRUE, FALSE, &error);
 	if (result) {
 		GtkWidget *dialog;
 

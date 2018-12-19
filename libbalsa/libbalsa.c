@@ -525,7 +525,7 @@ x509_fingerprint(gnutls_x509_crt_t cert)
 
     buf_size = 20U;
     g_message("%d", gnutls_x509_crt_get_fingerprint(cert, GNUTLS_DIG_SHA1, sha1_buf, &buf_size));
-    str_buf = g_malloc0(60U);
+    str_buf = g_malloc0(61U);
     for (n = 0; n < 20; n++) {
     	sprintf(&str_buf[3 * n], "%02x:", sha1_buf[n]);
     }

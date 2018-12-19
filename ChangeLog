@@ -1,5 +1,14 @@
 2018-12-18  Albrecht Dreß  <albrecht.dress@arcor.de>
 
+	Fix buffer overflow and missing include
+
+	* libbalsa/folder-scanners.c: fix missing include on old systems
+	  which do not indirectly import string.h, remove obsolete macro
+	* libbalsa/libbalsa.c: fix one-byte buffer overflow in
+	  x509_fingerprint()
+
+2018-12-18  Albrecht Dreß  <albrecht.dress@arcor.de>
+
 	SMTP, POP: fall back to auth w/ password if GSS failed
 
 	* libnetclient/net-client-pop.c, libnetclient/net-client-smtp.c:

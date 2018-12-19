@@ -22,6 +22,7 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "folder-scanners.h"
 
+#include <string.h>
 #include <glib/gstdio.h>
 
 #include "libbalsa.h"
@@ -29,10 +30,6 @@
 #include "imap-handle.h"
 #include "imap-commands.h"
 #include "imap-server.h"
-
-#ifndef PATH_MAX
-#define PATH_MAX _POSIX_PATH_MAX
-#endif
 
 typedef void (*local_scanner_helper) (gpointer rnode,
                                       const gchar * prefix,

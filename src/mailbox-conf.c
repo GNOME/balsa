@@ -729,7 +729,7 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 #endif
 
     gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), grid);
-    if (mcw->mailbox->url != NULL) {
+    if (mcw->mailbox != NULL && mcw->mailbox->url != NULL) {
 		const gchar *path = libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox));
 		gchar *basename = g_path_get_basename(path);
 

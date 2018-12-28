@@ -18,6 +18,11 @@ option('gpgme',
   value       : 'false',
   description : 'build with gpgme/GnuPG support (true|false|path to gpgme-config, default=false)')
 
+option('autocrypt',
+  type        : 'string',
+  value       : 'false',
+  description : 'build with Autocrypt support (see https://autocrypt.org/), default=no, requires gpgme and sqlite3')
+
 option('canberra',
   type        : 'boolean',
   value       : false,

@@ -39,6 +39,7 @@
 #include "balsa-mime-widget-message.h"
 #include "balsa-mime-widget-image.h"
 #include "balsa-mime-widget-crypto.h"
+#include "autocrypt.h"
 
 #include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -162,6 +163,9 @@ static GdkPixbuf * get_crypto_content_icon(LibBalsaMessageBody * body,
 static void message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm);
 #endif /* HAVE_GPGME */
 
+#ifdef ENABLE_AUTOCRYPT
+static inline gboolean autocrypt_in_use(void);
+#endif
 
 static void
 balsa_part_info_class_init(BalsaPartInfoClass *klass)
@@ -1216,8 +1220,22 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
      * present.
      *
      */
-    if (is_new && message->headers->dispnotify_to)
+    if (is_new && message->headers->dispnotify_to) {
         handle_mdn_request (balsa_get_parent_window(GTK_WIDGET(bm)), message);
+    }
+
+#ifdef ENABLE_AUTOCRYPT
+    /* check for Autocrypt information if the message is new only */
+    if (is_new && autocrypt_in_use()) {
+    	GError *error = NULL;
+
+    	autocrypt_from_message(message, &error);
+    	if (error != NULL) {
+    		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Autocrypt error: %s"), error->message);
+    	}
+    	g_clear_error(&error);
+    }
+#endif
 
     if (!gtk_tree_model_get_iter_first (gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview)),
                                         &iter))
@@ -3320,3 +3338,17 @@ balsa_message_find_in_message(BalsaMessage * bm)
             gtk_widget_grab_focus(bm->find_entry);
     }
 }
+
+#ifdef ENABLE_AUTOCRYPT
+static inline gboolean
+autocrypt_in_use(void)
+{
+	gboolean result = FALSE;
+	GList *ident;
+
+	for (ident = balsa_app.identities; !result && (ident != NULL); ident = ident->next) {
+		result = LIBBALSA_IDENTITY(ident->data)->autocrypt_mode != AUTOCRYPT_DISABLE;
+	}
+	return result;
+}
+#endif

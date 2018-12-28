@@ -59,6 +59,11 @@
           translatable='yes'>_Address Book</attribute>
         <attribute name='action'>app.address-book</attribute>
       </item>
+      <item>
+        <attribute name='label'
+          translatable='yes'>A_utocrypt Database</attribute>
+        <attribute name='action'>app.autocrypt-db</attribute>
+      </item>
     </section>
     <section>
       <item>
@@ -139,6 +144,11 @@
           <attribute name='action'>win.address-book</attribute>
           <attribute name='accel'>b</attribute>
         </item>
+      	<item>
+          <attribute name='label'
+          	translatable='yes'>A_utocrypt Database</attribute>
+          <attribute name='action'>win.autocrypt-db</attribute>
+       	</item>
       </section>
       <section>
         <item>

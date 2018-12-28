@@ -41,6 +41,11 @@ typedef struct _keyserver_op_t {
 } keyserver_op_t;
 
 
+static gboolean import_key_real(gpgme_ctx_t     ctx,
+								gconstpointer   key_buf,
+								gsize		    buf_len,
+								gchar         **import_info,
+								GError        **error);
 static inline gboolean check_key(const gpgme_key_t key,
 		  	  	  	  	  	  	 gboolean          secret,
 								 gboolean          on_keyserver,
@@ -266,25 +271,133 @@ libbalsa_gpgme_export_key(gpgme_ctx_t   ctx,
 
 
 /* documentation: see header file */
+gchar *
+libbalsa_gpgme_export_autocrypt_key(const gchar *fingerprint, const gchar *mailbox, GError **error)
+{
+	gchar *export_args[10] = { "", "--export", "--export-options", "export-minimal,no-export-attributes",
+		NULL, NULL, NULL, NULL, NULL, NULL };
+	gpgme_ctx_t ctx;
+	gchar *result = NULL;
+
+	g_return_val_if_fail((fingerprint != NULL) && (mailbox != NULL), NULL);
+
+	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_SPAWN, NULL, NULL, error);
+	if (ctx != NULL) {
+		gpgme_data_t keybuf;
+		gpgme_error_t gpgme_err;
+
+		gpgme_err = gpgme_data_new(&keybuf);
+		if (gpgme_err != GPG_ERR_NO_ERROR) {
+			libbalsa_gpgme_set_error(error, gpgme_err, _("cannot create data buffer"));
+		} else {
+			const gpg_capabilities *gpg_capas;
+			guint param_idx;
+
+			gpg_capas = libbalsa_gpgme_gpg_capabilities();
+			g_assert(gpg_capas != NULL);		/* paranoid - we're called for OpenPGP, so the info /should/ be there... */
+			param_idx = 4U;
+			if (gpg_capas->export_filter_subkey) {
+				export_args[param_idx++] = g_strdup("--export-filter");
+				export_args[param_idx++] = g_strdup("drop-subkey=usage!~e && usage!~s");
+
+			}
+			if (gpg_capas->export_filter_uid) {
+				export_args[param_idx++] = g_strdup("--export-filter");
+				export_args[param_idx++] = g_strdup_printf("keep-uid=mbox=%s", mailbox);
+			}
+			export_args[param_idx] = g_strdup(fingerprint);
+
+			/* run... */
+			gpgme_err = gpgme_op_spawn(ctx, gpg_capas->gpg_path, (const gchar **) export_args, NULL, keybuf, NULL, 0);
+			for (param_idx = 4U; export_args[param_idx] != NULL; param_idx++) {
+				g_free(export_args[param_idx]);
+			}
+			if (gpgme_err != GPG_ERR_NO_ERROR) {
+				libbalsa_gpgme_set_error(error, gpgme_err, _("cannot export minimal key for “%s”"), mailbox);
+				gpgme_data_release(keybuf);
+			} else {
+				size_t keysize;
+				void *keydata;
+
+				keydata = gpgme_data_release_and_get_mem(keybuf, &keysize);
+				if ((keydata == NULL) || (keysize == 0U)) {
+					g_set_error(error, GPGME_ERROR_QUARK, -1, _("cannot export minimal key for “%s”"), mailbox);
+				} else {
+					result = g_base64_encode(keydata, keysize);
+				}
+				gpgme_free(keydata);
+			}
+		}
+
+		gpgme_release(ctx);
+	}
+
+	return result;
+}
+
+
+/* documentation: see header file */
 gboolean
 libbalsa_gpgme_import_ascii_key(gpgme_ctx_t   ctx,
 								const gchar  *key_buf,
 								gchar       **import_info,
 								GError      **error)
 {
+	g_return_val_if_fail((ctx != NULL) && (key_buf != NULL), FALSE);
+
+	return import_key_real(ctx, key_buf, strlen(key_buf), import_info, error);
+}
+
+
+/* documentation: see header file */
+gboolean
+libbalsa_gpgme_import_bin_key(gpgme_ctx_t   ctx,
+							  GBytes   	   *key_buf,
+							  gchar       **import_info,
+							  GError      **error)
+{
+	gconstpointer key_data;
+	gsize key_len;
+
+	g_return_val_if_fail((ctx != NULL) && (key_buf != NULL), FALSE);
+	key_data = g_bytes_get_data(key_buf, &key_len);
+	return import_key_real(ctx, key_data, key_len, import_info, error);
+}
+
+
+/* ---- local functions ------------------------------------------------------ */
+
+/** \brief Import a binary or ASCII-armoured key
+ *
+ * \param ctx GpgME context
+ * \param key_buf ASCII or binary GnuPG key buffer
+ * \param buf_len number of bytes in the GnuPG key buffer
+ * \param import_info filled with human-readable information about the import, may be NULL
+ * \param error filled with error information on error, may be NULL
+ * \return TRUE on success, or FALSE on error
+ *
+ * Import an ASCII-armoured or binary GnuPG key into the key ring.
+ */
+static gboolean
+import_key_real(gpgme_ctx_t     ctx,
+				gconstpointer   key_buf,
+				gsize		    buf_len,
+				gchar         **import_info,
+				GError        **error)
+{
 	gpgme_data_t buffer;
 	gpgme_error_t gpgme_err;
 	gboolean result = FALSE;
 
-	g_return_val_if_fail((ctx != NULL) && (key_buf != NULL), FALSE);
+	g_return_val_if_fail(buf_len > 0, FALSE);
 
-	gpgme_err = gpgme_data_new_from_mem(&buffer, key_buf, strlen(key_buf), 1);
+	gpgme_err = gpgme_data_new_from_mem(&buffer, key_buf, buf_len, 0);
 	if (gpgme_err != GPG_ERR_NO_ERROR) {
 		libbalsa_gpgme_set_error(error, gpgme_err, _("cannot create data buffer"));
 	} else {
 		gpgme_err = gpgme_op_import(ctx, buffer);
 		if (gpgme_err != GPG_ERR_NO_ERROR) {
-			libbalsa_gpgme_set_error(error, gpgme_err, _("importing ASCII-armored key data failed"));
+			libbalsa_gpgme_set_error(error, gpgme_err, _("importing key data failed"));
 		} else {
 			result = TRUE;
 			if (import_info != NULL) {
@@ -297,8 +410,6 @@ libbalsa_gpgme_import_ascii_key(gpgme_ctx_t   ctx,
 	return result;
 }
 
-
-/* ---- local functions ------------------------------------------------------ */
 
 /** \brief Check if a key is usable
  *
@@ -363,11 +474,10 @@ gpgme_keyserver_run(gpointer user_data)
 				GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
 				_("Cannot find a key with fingerprint %s on the key server."), keyserver_op->fingerprint);
 		} else if (keys->next != NULL) {
+			/* more than one key found */
 			dialog = gtk_message_dialog_new(keyserver_op->parent,
 				GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
-				ngettext("Found %u key with fingerprint %s on the key server. Please check and import the proper key manually.",
-				         "Found %u keys with fingerprint %s on the key server. Please check and import the proper key manually.",
-				         g_list_length(keys)),
+				_("Found %u keys with fingerprint %s on the key server. Please check and import the proper key manually."),
 				g_list_length(keys), keyserver_op->fingerprint);
 		} else {
 			dialog = gpgme_keyserver_do_import(keyserver_op, (gpgme_key_t) keys->data);

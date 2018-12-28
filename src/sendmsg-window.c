@@ -79,6 +79,11 @@
 #if HAVE_GTKSOURCEVIEW
 #include <gtksourceview/gtksource.h>
 #endif                          /* HAVE_GTKSOURCEVIEW */
+#ifdef ENABLE_AUTOCRYPT
+#include "autocrypt.h"
+#include "libbalsa-gpgme.h"
+#include "libbalsa-gpgme-keys.h"
+#endif							/* ENABLE_AUTOCRYPT */
 
 typedef struct {
     pid_t pid_editor;
@@ -5045,6 +5050,58 @@ subject_not_empty(BalsaSendmsg * bsmsg)
 }
 
 #ifdef HAVE_GPGME
+
+static void
+config_dlg_button(GtkDialog *dialog, gint response_id, const gchar *icon_id)
+{
+	GtkWidget *button;
+
+	button = gtk_dialog_get_widget_for_response(dialog, response_id);
+	if (button != NULL) {
+		GtkWidget *image;
+
+		image = gtk_image_new_from_icon_name(icon_id, GTK_ICON_SIZE_BUTTON);
+		gtk_button_set_image(GTK_BUTTON(button), image);
+	}
+}
+
+static gboolean
+run_check_encrypt_dialog(BalsaSendmsg *bsmsg, const gchar *secondary_msg, gint default_button)
+{
+	GtkWidget *dialog;
+	gboolean result = TRUE;
+	gint choice;
+
+	dialog = gtk_message_dialog_new(GTK_WINDOW(bsmsg->window),
+	     GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL | libbalsa_dialog_flags(),
+	     GTK_MESSAGE_QUESTION,
+	     GTK_BUTTONS_NONE,
+		 _("Message could be encrypted"));
+	gtk_message_dialog_format_secondary_markup(GTK_MESSAGE_DIALOG(dialog), "%s", secondary_msg);
+	gtk_dialog_add_buttons(GTK_DIALOG(dialog),
+		_("Send _encrypted"), GTK_RESPONSE_YES,
+		_("Send _unencrypted"), GTK_RESPONSE_NO,
+		_("_Cancel"), GTK_RESPONSE_CANCEL,
+		NULL);
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), default_button);
+
+	/* add button images */
+	config_dlg_button(GTK_DIALOG(dialog), GTK_RESPONSE_YES, balsa_icon_id(BALSA_PIXMAP_GPG_ENCRYPT));
+	config_dlg_button(GTK_DIALOG(dialog), GTK_RESPONSE_NO, balsa_icon_id(BALSA_PIXMAP_SEND));
+
+	choice = gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+	if (choice == GTK_RESPONSE_YES) {
+	    bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->gpg_mode | LIBBALSA_PROTECT_ENCRYPT);
+	} else if ((choice == GTK_RESPONSE_CANCEL) || (choice == GTK_RESPONSE_DELETE_EVENT)) {
+	    result = FALSE;
+    } else {
+    	/* nothing to do */
+    }
+
+	return result;
+}
+
 static gboolean
 check_suggest_encryption(BalsaSendmsg * bsmsg)
 {
@@ -5052,9 +5109,10 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
     gboolean can_encrypt;
     gpgme_protocol_t protocol;
     gint len;
+    gboolean result = TRUE;
 
     /* check if the user wants to see the message */
-    if (!bsmsg->ident->warn_send_plain)
+    if ((bsmsg->ident == NULL) || !bsmsg->ident->warn_send_plain)
 	return TRUE;
 
     /* nothing to do if encryption is already enabled */
@@ -5087,77 +5145,168 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
         g_object_unref(ia_list);
     }
 
-    /* ask the user if we could encrypt this message */
+    /* ask the user if we should encrypt this message */
     if (can_encrypt) {
-	GtkWidget *dialog;
-	gint choice;
-	GtkWidget *button;
-	GtkWidget *hbox;
-	GtkWidget *image;
-	GtkWidget *label;
+    	gchar *message;
 
-	dialog = gtk_message_dialog_new
-	    (GTK_WINDOW(bsmsg->window),
-	     GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
-	     GTK_MESSAGE_QUESTION,
-	     GTK_BUTTONS_NONE,
-	     _("You did not select encryption for this message, although "
-               "%s public keys are available for all recipients. In order "
-               "to protect your privacy, the message could be %s encrypted."),
-             gpgme_get_protocol_name(protocol),
-             gpgme_get_protocol_name(protocol));
-#if HAVE_MACOSX_DESKTOP
-        libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
-#endif
+    	message = g_markup_printf_escaped(_("You did not select encryption for this message, although "
+    		"%s public keys are available for all recipients. In order "
+            "to protect your privacy, the message could be %s encrypted."),
+    		gpgme_get_protocol_name(protocol), gpgme_get_protocol_name(protocol));
+    	result = run_check_encrypt_dialog(bsmsg, message, GTK_RESPONSE_YES);
+    	g_free(message);
+    }
+    return result;
+}
 
+#ifdef ENABLE_AUTOCRYPT
+static gboolean
+import_autocrypt_keys(GList *missing_keys, GError **error)
+{
+	gpgme_ctx_t ctx;
+	gboolean result;
 
-	button = gtk_button_new();
-	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_YES);
-        gtk_widget_set_can_default(button, TRUE);
-	gtk_widget_grab_focus(button);
+	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
+	if (ctx != NULL) {
+		GList *key;
 
-	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-        gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
-        gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
-	gtk_container_add(GTK_CONTAINER(button), hbox);
-	image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_GPG_ENCRYPT),
-                                             GTK_ICON_SIZE_BUTTON);
-	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
-	label = gtk_label_new_with_mnemonic(_("Send _encrypted"));
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
-	gtk_widget_show_all(button);
+		result = TRUE;
+		for (key = missing_keys; result && (key != NULL); key = key->next) {
+			result = libbalsa_gpgme_import_bin_key(ctx, (GBytes *) key->data, NULL, error);
+		}
+		gpgme_release(ctx);
+	} else {
+		result = FALSE;
+	}
 
-	button = gtk_button_new();
-	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_NO);
-        gtk_widget_set_can_default(button, TRUE);
+	return result;
+}
 
-	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-        gtk_widget_set_halign(hbox, GTK_ALIGN_CENTER);
-        gtk_widget_set_valign(hbox, GTK_ALIGN_CENTER);
-	gtk_container_add(GTK_CONTAINER(button), hbox);
-	image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_SEND),
-                                             GTK_ICON_SIZE_BUTTON);
-	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
-	label = gtk_label_new_with_mnemonic(_("Send _unencrypted"));
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
-	gtk_widget_show_all(button);
+static gboolean
+check_autocrypt_recommendation(BalsaSendmsg *bsmsg)
+{
+    InternetAddressList *check_list;
+    InternetAddressList *tmp_list;
+    gint len;
+    AutocryptRecommend autocrypt_mode;
+    GList *missing_keys = NULL;
+    GError *error = NULL;
+    gboolean result;
 
-	button = gtk_button_new_with_mnemonic(_("_Cancel"));
-	gtk_widget_show(button);
-	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button, GTK_RESPONSE_CANCEL);
-        gtk_widget_set_can_default(button, TRUE);
+    /* check if autocrypt is enabled, use the non-Autocrypt approach if not */
+	if ((bsmsg->ident == NULL) || (bsmsg->ident->autocrypt_mode == AUTOCRYPT_DISABLE)) {
+		return check_suggest_encryption(bsmsg);
+	}
 
-	choice = gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
-	if (choice == GTK_RESPONSE_YES)
-	    bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->gpg_mode | LIBBALSA_PROTECT_ENCRYPT);
-	else if (choice == GTK_RESPONSE_CANCEL || choice == GTK_RESPONSE_DELETE_EVENT)
-	    return FALSE;
+    /* nothing to do if encryption is already enabled or if S/MIME mode is selected */
+    if ((bsmsg->gpg_mode & (LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_SMIMEV3)) != 0) {
+    	return TRUE;
     }
 
-    return TRUE;
+    /* we can not encrypt if we have bcc recipients */
+    tmp_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "BCC:");
+    len = internet_address_list_length(tmp_list);
+    g_object_unref(tmp_list);
+    if (len > 0) {
+        return TRUE;
+    }
+
+    /* get the Autocrypt recommendation for all To: and Cc: addresses */
+    check_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
+    tmp_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "CC:");
+    internet_address_list_append(check_list, tmp_list);
+    g_object_unref(tmp_list);
+    internet_address_list_add(check_list, bsmsg->ident->ia);		/* validates that we have a key for the current identity */
+    autocrypt_mode = autocrypt_recommendation(check_list, &missing_keys, &error);
+    g_object_unref(check_list);
+
+    /* eject on error or disabled */
+    if (autocrypt_mode <= AUTOCRYPT_ENCR_DISABLE) {
+    	if (autocrypt_mode == AUTOCRYPT_ENCR_ERROR) {
+    		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("error checking Autocrypt keys: %s"),
+    			(error != NULL) ? error->message : _("unknown"));
+    		g_clear_error(&error);
+    		result = FALSE;
+    	} else {
+    		result = TRUE;
+    	}
+    } else {
+    	gchar *message;
+    	const gchar *protoname;
+    	gint default_choice;
+
+    	protoname = gpgme_get_protocol_name(GPGME_PROTOCOL_OpenPGP);
+		message = g_markup_printf_escaped(_("You did not select encryption for this message, although "
+    		"%s public keys are available for all recipients. In order "
+            "to protect your privacy, the message could be %s encrypted."),
+			protoname, protoname);
+
+    	/* default to encryption if all participants have prefer-encrypt=mutual, or if we reply to an encrypted message */
+    	if (((autocrypt_mode == AUTOCRYPT_ENCR_AVAIL_MUTUAL) && (bsmsg->ident->autocrypt_mode == AUTOCRYPT_PREFER_ENCRYPT)) ||
+    		((bsmsg->parent_message != NULL) && (bsmsg->parent_message->prot_state == LIBBALSA_MSG_PROTECT_CRYPT))) {
+    		default_choice = GTK_RESPONSE_YES;
+    	} else if (autocrypt_mode == AUTOCRYPT_ENCR_AVAIL) {
+    		default_choice = GTK_RESPONSE_NO;
+    	} else {			/* autocrypt_mode == AUTOCRYPT_ENCR_DISCOURAGE */
+    		gchar *tmp_msg;
+
+    		default_choice = GTK_RESPONSE_NO;
+    		tmp_msg = g_strconcat(message,
+    			_("\nHowever, encryption is discouraged as the Autocrypt status indicates that "
+    			  "some recipients <i>might</i> no be able to read the message."), NULL);
+    		g_free(message);
+    		message = tmp_msg;
+    	}
+
+    	/* add a note if keys are imported into the key ring */
+    	if (missing_keys != NULL) {
+    		guint key_count;
+    		gchar *key_msg;
+    		gchar *tmp_msg;
+
+    		key_count = g_list_length(missing_keys);
+    		key_msg = g_strdup_printf(ngettext("<i>Note:</i> choosing encryption will import %u key from "
+    										   "the Autocrypt database into the GnuPG key ring.",
+											   "<i>Note:</i> choosing encryption will import %u keys from "
+    										   "the Autocrypt database into the GnuPG key ring.", key_count), key_count);
+    		tmp_msg = g_strconcat(message, "\n", key_msg, NULL);
+    		g_free(message);
+    		g_free(key_msg);
+    		message = tmp_msg;
+    	}
+
+    	/* run the dialog */
+    	result = run_check_encrypt_dialog(bsmsg, message, default_choice);
+
+    	if (result && ((bsmsg->gpg_mode & LIBBALSA_PROTECT_ENCRYPT) != 0)) {
+    		/* make sure the message is also signed as required by the Autocrypt standard, and that a protocol is selected */
+    		if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_PROTOCOL) == 0) {
+    			bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->gpg_mode | (LIBBALSA_PROTECT_RFC3156 + LIBBALSA_PROTECT_SIGN));
+    		} else {
+    			bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->gpg_mode | LIBBALSA_PROTECT_SIGN);
+    		}
+
+        	/* import any missing keys */
+        	if (missing_keys != NULL) {
+        		result = import_autocrypt_keys(missing_keys, &error);
+        		if (!result) {
+        			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot import Autocrypt keys: %s"), error->message);
+        			g_clear_error(&error);
+        		}
+        	}
+    	}
+    }
+
+    /* clean up the missing keys list */
+    if (missing_keys != NULL) {
+    	g_list_free_full(missing_keys, (GDestroyNotify) g_bytes_unref);
+    }
+
+    return result;
 }
-#endif
+#endif		/* ENABLE_AUTOCRYPT */
+#endif		/* HAVE_GPGME */
+
 
 /* "send message" menu and toolbar callback.
  */
@@ -5179,8 +5328,15 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 	return FALSE;
 
 #ifdef HAVE_GPGME
-    if (!check_suggest_encryption(bsmsg))
-	return FALSE;
+#ifdef ENABLE_AUTOCRYPT
+    if (!check_autocrypt_recommendation(bsmsg)) {
+    	return FALSE;
+    }
+#else
+    if (!check_suggest_encryption(bsmsg)) {
+    	return FALSE;
+    }
+#endif /* ENABLE_AUTOCRYPT */
 
     if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
         gboolean warn_mp;

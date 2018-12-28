@@ -43,6 +43,15 @@ G_BEGIN_DECLS
 #define GPGME_ERROR_QUARK (g_quark_from_static_string("gmime-gpgme"))
 
 
+struct _gpg_capabilities {
+	const gchar *gpg_path;				/**< OpenPGP engine path */
+	gboolean export_filter_uid;			/**< OpenPGP engine supports the 'keep-uid=...' export-filter option. */
+	gboolean export_filter_subkey;		/**< OpenPGP engine supports the 'drop-subkey=...' export-filter option. */
+};
+
+typedef struct _gpg_capabilities gpg_capabilities;
+
+
 /** Callback to select a key from a list
  * Parameters:
  * - user name
@@ -75,6 +84,7 @@ void libbalsa_gpgme_init(gpgme_passphrase_cb_t       get_passphrase,
 			 	 	 	 lbgpgme_select_key_cb       select_key_cb,
 						 lbgpgme_accept_low_trust_cb accept_low_trust);
 gboolean libbalsa_gpgme_check_crypto_engine(gpgme_protocol_t protocol);
+const gpg_capabilities *libbalsa_gpgme_gpg_capabilities(void);
 gpgme_ctx_t libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,
 										  gpgme_passphrase_cb_t   callback,
 										  GtkWindow				 *parent,

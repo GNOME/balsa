@@ -28,6 +28,7 @@
 #include <gtk/gtk.h>
 #include <gmime/internet-address.h>
 
+#include "autocrypt.h"
 #include "libbalsa.h"
 
 
@@ -85,6 +86,9 @@ G_BEGIN_DECLS
 	gint crypt_protocol;
         gchar *force_gpg_key_id;
         gchar *force_smime_key_id;
+#ifdef ENABLE_AUTOCRYPT
+        AutocryptMode autocrypt_mode;
+#endif
 	LibBalsaSmtpServer *smtp_server;
     };
 

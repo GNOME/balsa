@@ -2,6 +2,8 @@
 
 if gpgmecfg == 'true'
   libbalsa_gpgme_extra = [
+	'autocrypt.h',
+	'autocrypt.c',
     'libbalsa-gpgme.h',
     'libbalsa-gpgme.c',
     'libbalsa-gpgme-cb.h',

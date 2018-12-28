@@ -896,6 +896,16 @@ address_book_activated(GSimpleAction * action,
     gtk_widget_show(GTK_WIDGET(ab));
 }
 
+#ifdef ENABLE_AUTOCRYPT
+static void
+autocrypt_db_activated(GSimpleAction G_GNUC_UNUSED *action,
+                       GVariant      G_GNUC_UNUSED *parameter,
+                       gpointer                     user_data)
+{
+	autocrypt_db_dialog_run(balsa_app.date_string, GTK_WINDOW(user_data));
+}
+#endif
+
 static void
 prefs_activated(GSimpleAction * action,
                 GVariant      * parameter,
@@ -1890,6 +1900,9 @@ bw_add_app_action_entries(GActionMap * action_map, gpointer user_data)
         {"toolbars",              toolbars_activated},
         {"identities",            identities_activated},
         {"address-book",          address_book_activated},
+#ifdef ENABLE_AUTOCRYPT
+        {"autocrypt-db",          autocrypt_db_activated},
+#endif
         {"prefs",                 prefs_activated},
         {"help",                  help_activated},
         {"about",                 about_activated},
@@ -1912,6 +1925,9 @@ bw_add_win_action_entries(GActionMap * action_map)
         {"page-setup",            page_setup_activated},
         {"print",                 print_activated},
         {"address-book",          address_book_activated},
+#ifdef ENABLE_AUTOCRYPT
+        {"autocrypt-db",          autocrypt_db_activated},
+#endif
         {"quit",                  quit_activated},
         {"copy",                  copy_activated},
         {"select-all",            select_all_activated},

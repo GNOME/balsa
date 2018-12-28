@@ -120,17 +120,33 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
     if (mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP) {
+    	GtkWidget *hbox;
         GtkWidget *button;
 
+        hbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+        gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_EXPAND);
+        gtk_box_set_spacing(GTK_BOX(hbox), BMW_HBOX_SPACE);
+        gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
         if (mime_body->sig_info->status == GPG_ERR_NO_PUBKEY) {
+#ifdef ENABLE_AUTOCRYPT
+        	GBytes *autocrypt_key;
+
+        	autocrypt_key = autocrypt_get_key(mime_body->sig_info->fingerprint, NULL);
+        	if (autocrypt_key != NULL) {
+        		button = gtk_button_new_with_mnemonic(_("_Import Autocrypt key"));
+        		g_object_set_data_full(G_OBJECT(button), "autocrypt_key", autocrypt_key, (GDestroyNotify) g_bytes_unref);
+        		g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(on_key_import_button), NULL);
+        		gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+        	}
+#endif
             button = gtk_button_new_with_mnemonic(_("_Search key server for this key"));
         } else {
             button = gtk_button_new_with_mnemonic(_("_Search key server for updates of this key"));
         }
         g_signal_connect(G_OBJECT(button), "clicked",
                          G_CALLBACK(on_gpg_key_button),
-                         (gpointer)mime_body->sig_info->fingerprint);
-        gtk_box_pack_start(GTK_BOX(vbox), button, FALSE, FALSE, 0);
+                         (gpointer) mime_body->sig_info->fingerprint);
+        gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
     }
 
     /* Hack alert: if we omit the box below and use the expander as signature widget
@@ -241,17 +257,27 @@ on_key_import_button(GtkButton *button,
 					 gpointer   user_data)
 {
 	gpgme_ctx_t ctx;
-	gboolean success;
+	gboolean success = FALSE;
 	GError *error = NULL;
 	gchar *import_info = NULL;
 	GtkWidget *dialog;
 
 	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, &error);
 	if (ctx != NULL) {
-		success = libbalsa_gpgme_import_ascii_key(ctx, g_object_get_data(G_OBJECT(button), "keydata"), &import_info, &error);
+		const gchar *keydata;
+
+		keydata = g_object_get_data(G_OBJECT(button), "keydata");
+		if (keydata != NULL) {
+			success = libbalsa_gpgme_import_ascii_key(ctx, keydata, &import_info, &error);
+		} else {
+			GBytes *key_buf;
+
+			key_buf = (GBytes *) g_object_get_data(G_OBJECT(button), "autocrypt_key");
+			if (key_buf != NULL) {
+				success = libbalsa_gpgme_import_bin_key(ctx, key_buf, &import_info, &error);
+			}
+		}
 		gpgme_release(ctx);
-	} else {
-		success = FALSE;
 	}
 
 	if (success) {
@@ -266,7 +292,7 @@ on_key_import_button(GtkButton *button,
 			GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
 			GTK_MESSAGE_ERROR,
 			GTK_BUTTONS_CLOSE,
-			_("Error importing key data: %s"), error->message);
+			_("Error importing key data: %s"), (error != NULL) ? error->message : _("unknown error"));
 		g_clear_error(&error);
 	}
 	g_free(import_info);
@@ -328,6 +354,7 @@ create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
 
 			libbalsa_delete_directory_contents(temp_dir);
 			g_rmdir(temp_dir);
+			g_free(temp_dir);
 		}
 
 		gpgme_release(ctx);

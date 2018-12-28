@@ -115,6 +115,22 @@ gchar *libbalsa_gpgme_export_key(gpgme_ctx_t   ctx,
 								 GError      **error)
 	G_GNUC_WARN_UNUSED_RESULT;
 
+/** \brief Export a key for Autocrypt
+ *
+ * \param fingerprint key fingerprint, may be NULL
+ * \param mailbox key uid
+ * \param error filled with error information on error
+ * \return a newly allocated string containing the BASE64-encoded key on success, NULL on error
+ *
+ * Export the minimal key for using it in a Autocrypt: header.  If specified, the key is selected by the passed fingerprint,
+ * otherwise the first key matching the passed mailbox is used.  Depending on the gpg backend version, all other uid's and all
+ * subkeys which are not required are stripped.
+ */
+gchar *libbalsa_gpgme_export_autocrypt_key(const gchar  *fingerprint,
+										   const gchar  *mailbox,
+										   GError      **error)
+	G_GNUC_WARN_UNUSED_RESULT;
+
 /** \brief Import an ASCII-armoured key
  *
  * \param ctx GpgME context
@@ -130,6 +146,20 @@ gboolean libbalsa_gpgme_import_ascii_key(gpgme_ctx_t   ctx,
 										 gchar       **import_info,
 										 GError      **error);
 
+/** \brief Import a binary key
+ *
+ * \param ctx GpgME context
+ * \param key_buf binary GnuPG key buffer
+ * \param import_info filled with human-readable information about the import, may be NULL
+ * \param error filled with error information on error, may be NULL
+ * \return TRUE on success, or FALSE on error
+ *
+ * Import a binary GnuPG key into the key ring.
+ */
+gboolean libbalsa_gpgme_import_bin_key(gpgme_ctx_t   ctx,
+								   	   GBytes       *key_buf,
+									   gchar       **import_info,
+									   GError      **error);
 
 G_END_DECLS
 

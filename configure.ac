@@ -65,6 +65,10 @@ AC_ARG_WITH([gpgme],
                   [build with gpgme/GnuPG support (default=no, path to gpgme-config optional)]),
 	          [ gpgmecfg=$withval ], [ gpgmecfg=no ])
 
+AC_ARG_ENABLE([autocrypt],
+   AC_HELP_STRING([--enable-autocrypt],
+                  [build with Autocrypt support (see https://autocrypt.org/), default=no, requires gpgme and sqlite3)]),
+                  [autocrypt=$enableval], [autocrypt=no])
 
 AC_ARG_WITH(canberra,
    AC_HELP_STRING([--with-canberra],
@@ -360,6 +364,21 @@ if test x"$gpgmecfg" != xno ; then
 fi
 AM_CONDITIONAL([BUILD_WITH_GPGME], [test $gpgmecfg = "yes"])
 
+# Autocrypt support
+AC_MSG_CHECKING(whether to build with Autocrypt support)
+if test x"$gpgmecfg" != xno ; then
+	if test x"$autocrypt" != xno ; then
+		AC_MSG_RESULT([yes])
+		PKG_CHECK_MODULES(AUTOCRYPT, [sqlite3])
+		AC_DEFINE(ENABLE_AUTOCRYPT,1,[If defined, enable Autocrypt support])
+		BALSA_CFLAGS="$BALSA_CFLAGS $AUTOCRYPT_CFLAGS"
+		BALSA_LIBS="$BALSA_LIBS $AUTOCRYPT_LIBS"
+	else
+		AC_MSG_RESULT([no])
+	fi
+else
+	AC_MSG_RESULT([skipped, gpgme is disabled])
+fi
 
 # OpenLDAP configuration.
 #
@@ -716,6 +735,7 @@ echo "               HTML widget: $use_html_widget"
 echo "                 Use GNOME: $with_gnome"
 echo "              Use Canberra: $with_canberra"
 echo "                 Use GPGME: $gpgmecfg"
+echo "             Use Autocrypt: $autocrypt"
 echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"

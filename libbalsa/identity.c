@@ -117,6 +117,9 @@ libbalsa_identity_init(LibBalsaIdentity* ident)
     ident->crypt_protocol = LIBBALSA_PROTECT_OPENPGP;
     ident->force_gpg_key_id = NULL;
     ident->force_smime_key_id = NULL;
+#ifdef ENABLE_AUTOCRYPT
+    ident->autocrypt_mode = AUTOCRYPT_DISABLE;
+#endif
     ident->request_mdn = FALSE;
     ident->request_dsn = FALSE;
     /*
@@ -635,6 +638,16 @@ static void ident_dialog_add_gpg_menu(GtkWidget * grid, gint row,
                                       GtkDialog * dialog,
                                       const gchar * label_name,
                                       const gchar * menu_key);
+#ifdef ENABLE_AUTOCRYPT
+static void ident_dialog_add_autocrypt_menu(GtkWidget   *grid,
+											gint         row,
+											GtkDialog   *dialog,
+											const gchar *label_name,
+											const gchar *menu_key);
+static void display_frame_set_autocrypt_mode(GObject       *dialog,
+											 const gchar   *key,
+											 AutocryptMode *value);
+#endif
 static void add_show_menu(const char *label, gpointer data,
                           GtkWidget * menu);
 static void ident_dialog_free_values(GPtrArray * values);
@@ -1067,6 +1080,11 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
                            	   	  _("use certificate with this id for signing S/MIME messages\n"
                            	   		"(leave empty for automatic selection)"),
 								  "identity-keyid-sm");
+#ifdef ENABLE_AUTOCRYPT
+    ident_dialog_add_autocrypt_menu(grid, row++, dialog,
+		 	 	 	 	 	 	 	_("Autocrypt mode"),
+									"identity-autocrypt");
+#endif
 #ifndef HAVE_GPGME
     gtk_widget_set_sensitive(grid, FALSE);
 #endif
@@ -1546,6 +1564,9 @@ ident_dialog_update(GObject * dlg)
     id->force_gpg_key_id = g_strstrip(ident_dialog_get_text(dlg, "identity-keyid"));
     g_free(id->force_smime_key_id);
     id->force_smime_key_id = g_strstrip(ident_dialog_get_text(dlg, "identity-keyid-sm"));
+#ifdef ENABLE_AUTOCRYPT
+    id->autocrypt_mode  = GPOINTER_TO_INT(ident_dialog_get_value(dlg, "identity-autocrypt"));
+#endif
 
     return TRUE;
 }
@@ -1931,6 +1952,9 @@ display_frame_update(GObject * dialog, LibBalsaIdentity* ident)
 			   &ident->crypt_protocol);
     display_frame_set_field(dialog, "identity-keyid", ident->force_gpg_key_id);
     display_frame_set_field(dialog, "identity-keyid-sm", ident->force_smime_key_id);
+#ifdef ENABLE_AUTOCRYPT
+    display_frame_set_autocrypt_mode(dialog, "identity-autocrypt", &ident->autocrypt_mode);
+#endif
 }
 
 
@@ -2033,6 +2057,9 @@ libbalsa_identity_new_config(const gchar* name)
     ident->crypt_protocol = libbalsa_conf_get_int("CryptProtocol=16");
     ident->force_gpg_key_id = libbalsa_conf_get_string("ForceKeyID");
     ident->force_smime_key_id = libbalsa_conf_get_string("ForceKeyIDSMime");
+#ifdef ENABLE_AUTOCRYPT
+    ident->autocrypt_mode = libbalsa_conf_get_int("Autocrypt=0");
+#endif
 
     return ident;
 }
@@ -2079,6 +2106,9 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
     libbalsa_conf_set_int("CryptProtocol", ident->crypt_protocol);
     libbalsa_conf_set_string("ForceKeyID", ident->force_gpg_key_id);
     libbalsa_conf_set_string("ForceKeyIDSMime", ident->force_smime_key_id);
+#ifdef ENABLE_AUTOCRYPT
+    libbalsa_conf_set_int("Autocrypt", ident->autocrypt_mode);
+#endif
 
     libbalsa_conf_pop_group();
 }
@@ -2130,6 +2160,54 @@ display_frame_set_gpg_mode(GObject * dialog, const gchar* key, gint * value)
             *value = LIBBALSA_PROTECT_RFC3156;
         }
 }
+
+#ifdef ENABLE_AUTOCRYPT
+static void
+display_frame_set_autocrypt_mode(GObject * dialog, const gchar* key, AutocryptMode * value)
+{
+    GtkComboBox *opt_menu = g_object_get_data(G_OBJECT(dialog), key);
+
+    switch (*value)
+        {
+        case AUTOCRYPT_NOPREFERENCE:
+	    gtk_combo_box_set_active(opt_menu, 1);
+            break;
+        case AUTOCRYPT_PREFER_ENCRYPT:
+	    gtk_combo_box_set_active(opt_menu, 2);
+            break;
+        default:
+	    gtk_combo_box_set_active(opt_menu, 0);
+            *value = AUTOCRYPT_DISABLE;
+        }
+}
+
+static void
+ident_dialog_add_autocrypt_menu(GtkWidget * grid, gint row, GtkDialog * dialog,
+                          	    const gchar * label_name, const gchar * menu_key)
+{
+    GtkWidget *label;
+    GtkWidget *opt_menu;
+    GPtrArray *values;
+
+    label = gtk_label_new_with_mnemonic(label_name);
+    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
+
+    opt_menu = gtk_combo_box_text_new();
+    values = g_ptr_array_sized_new(3);
+    g_object_set_data_full(G_OBJECT(opt_menu), "identity-value", values,
+                           (GDestroyNotify) ident_dialog_free_values);
+    gtk_grid_attach(GTK_GRID(grid), opt_menu, 1, row, 1, 1);
+    g_object_set_data(G_OBJECT(dialog), menu_key, opt_menu);
+
+    add_show_menu(_("disabled"),
+                  GINT_TO_POINTER(AUTOCRYPT_DISABLE), opt_menu);
+    add_show_menu(_("enabled, no preference"),
+                  GINT_TO_POINTER(AUTOCRYPT_NOPREFERENCE), opt_menu);
+    add_show_menu(_("enabled, prefer encryption"),
+                  GINT_TO_POINTER(AUTOCRYPT_PREFER_ENCRYPT), opt_menu);
+}
+#endif
 
 /*
  * Add an option menu to the given dialog with a label next to it

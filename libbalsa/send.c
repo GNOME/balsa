@@ -1509,6 +1509,20 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     g_mime_object_append_header(GMIME_OBJECT(mime_message), "X-Mailer", tmp);
     g_free(tmp);
 
+#ifdef ENABLE_AUTOCRYPT
+    /* add Autocrypt header if requested */
+    if ((message->ident != NULL) && (message->ident->autocrypt_mode != AUTOCRYPT_DISABLE) &&
+    	!autocrypt_ignore(g_mime_object_get_content_type(mime_root))) {
+    	tmp = autocrypt_header(message->ident, NULL);
+    	if (tmp == NULL) {
+    		g_object_unref(G_OBJECT(mime_message));
+    		return LIBBALSA_MESSAGE_CREATE_ERROR;
+    	}
+    	g_mime_object_append_header(GMIME_OBJECT(mime_message), "Autocrypt", tmp);
+    	g_free(tmp);
+    }
+#endif
+
     message->mime_msg = mime_message;
 
     return LIBBALSA_MESSAGE_CREATE_OK;

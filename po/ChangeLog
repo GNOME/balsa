@@ -1,20 +1,14 @@
 2019-01-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
-	reviewed by: <delete if not using a buddy>
-
-	* POTFILES.in:
+	* POTFILES.in: add IMAP files with newly translatable strings
 
 2019-01-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
-	reviewed by: <delete if not using a buddy>
-
-	* POTFILES.in:
+	* POTFILES.in: add new files with translatable strings
 
 2017-09-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
-	reviewed by: <delete if not using a buddy>
-
-	* LINGUAS:
+	* LINGUAS: new file
 
 2015-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 

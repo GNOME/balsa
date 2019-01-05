@@ -48,6 +48,7 @@
 #include "imap-server.h"
 #include "libbalsa-conf.h"
 #include "autocrypt.h"
+#include "geometry-manager.h"
 
 #include "libinit_balsa/assistant_init.h"
 
@@ -591,6 +592,7 @@ balsa_activate_cb(GApplication *application,
             gpointer      user_data)
 {
     GtkWidget *window;
+    const geometry_t *main_size;
 
     if (balsa_app.main_window != NULL) {
         gtk_window_present(GTK_WINDOW(balsa_app.main_window));
@@ -605,7 +607,9 @@ balsa_activate_cb(GApplication *application,
     balsa_check_open_compose_window();
 
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
-    if (balsa_app.mw_maximized) {
+    main_size = geometry_manager_get("MainWindow");
+    g_assert(main_size != NULL);
+    if (main_size->maximized) {
         /*
          * When maximized at startup, the window changes from maximized
          * to not maximized a couple of times, so we wait until it has

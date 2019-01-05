@@ -31,6 +31,7 @@
 #include "sendmsg-window.h"
 #include "print.h"
 #include "mailbox-node.h"
+#include "geometry-manager.h"
 
 #include <glib/gi18n.h>
 #include <gdk/gdkkeysyms.h>
@@ -497,9 +498,7 @@ mw_view_source_activated(GSimpleAction * action, GVariant * parameter,
     MessageWindow *mw = (MessageWindow *) data;
     libbalsa_show_message_source(balsa_app.application,
                                  mw->message, balsa_app.message_font,
-                                 &balsa_app.source_escape_specials,
-                                 &balsa_app.source_width,
-                                 &balsa_app.source_height);
+                                 &balsa_app.source_escape_specials);
 }
 
 static void
@@ -508,25 +507,6 @@ mw_close_activated(GSimpleAction * action, GVariant * parameter,
 {
     MessageWindow *mw = (MessageWindow *) data;
     gtk_widget_destroy(mw->window);
-}
-
-static void
-size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
-{
-    GdkWindow *gdk_window;
-
-    gdk_window = gtk_widget_get_window(window);
-    if (gdk_window == NULL)
-        return;
-
-    balsa_app.message_window_maximized =
-        (gdk_window_get_state(gdk_window) &
-         (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN)) != 0;
-
-    if (!balsa_app.message_window_maximized)
-        gtk_window_get_size(GTK_WINDOW(window),
-                            & balsa_app.message_window_width,
-                            & balsa_app.message_window_height);
 }
 
 static void
@@ -863,8 +843,6 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 
     g_signal_connect(G_OBJECT(window), "destroy",
 		     G_CALLBACK(destroy_message_window), mw);
-    g_signal_connect(G_OBJECT(window), "size_allocate",
-                     G_CALLBACK(size_alloc_cb), NULL);
     
     mw->bindex = balsa_find_index_by_mailbox(mailbox);
     g_object_weak_ref(G_OBJECT(mw->bindex), mw_bindex_closed_cb, mw);
@@ -910,11 +888,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     mw_set_enabled(mw, "reply-group",
                    libbalsa_message_get_user_header(message, "list-post") != NULL);
 
-    gtk_window_set_default_size(GTK_WINDOW(window),
-                                balsa_app.message_window_width, 
-                                balsa_app.message_window_height);
-    if (balsa_app.message_window_maximized)
-        gtk_window_maximize(GTK_WINDOW(window));
+    geometry_manager_attach(GTK_WINDOW(window),"MessageWindow" );
 
     gtk_widget_show(window);
     mw_set_message(mw, message);

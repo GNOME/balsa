@@ -110,13 +110,11 @@ enum {
  * Initialize the library
  */
 void libbalsa_init(void);
-void libbalsa_set_spool(const gchar * spool);
 
 void libbalsa_show_message_source(GtkApplication * application,
                                   LibBalsaMessage * msg,
                                   const gchar * font,
-                                  gboolean *escape_specials,
-                                  gint * width, gint * height);
+                                  gboolean *escape_specials);
 
 gchar *libbalsa_guess_email_address(void);
 gchar *libbalsa_guess_mail_spool(void);

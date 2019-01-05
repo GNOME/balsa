@@ -67,6 +67,7 @@
 #include "toolbar-prefs.h"
 #include "toolbar-factory.h"
 #include "libbalsa-progress.h"
+#include "geometry-manager.h"
 
 #include "filter.h"
 #include "filter-funcs.h"
@@ -152,7 +153,6 @@ static void bw_find_real(BalsaWindow * window, BalsaIndex * bindex,
 static void bw_slave_position_cb(GtkPaned   * paned_slave,
                                  GParamSpec * pspec,
                                  gpointer     user_data);
-static void bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc);
 
 static void bw_notebook_switch_page_cb(GtkWidget * notebook,
                                        void * page,
@@ -640,19 +640,6 @@ balsa_window_get_toolbar_model(void)
                                     G_N_ELEMENTS(main_toolbar_extras));
 
     return model;
-}
-
-/*
- * "notify::is-maximized" signal handler
- */
-static void
-bw_notify_is_maximized_cb(GtkWindow  * window,
-                          GParamSpec * pspec,
-                          gpointer     user_data)
-{
-    /* Note when we are either maximized or fullscreen, to avoid saving
-     * nonsensical geometry. */
-    balsa_app.mw_maximized = gtk_window_is_maximized(window);
 }
 
 #define NEW_MAIL_NOTIFICATION "new-mail-notification"
@@ -1536,9 +1523,7 @@ view_source_activated(GSimpleAction * action,
 
 	libbalsa_show_message_source(application,
                                      message, balsa_app.message_font,
-				     &balsa_app.source_escape_specials,
-                                     &balsa_app.source_width,
-                                     &balsa_app.source_height);
+				     &balsa_app.source_escape_specials);
     }
     g_list_free_full(messages, g_object_unref);
 }
@@ -2212,9 +2197,6 @@ balsa_window_new(GtkApplication *application)
                        0);
 
     window->statusbar = gtk_statusbar_new();
-    g_signal_connect(window, "notify::is-maximized",
-                     G_CALLBACK(bw_notify_is_maximized_cb),
-                     window->statusbar);
     gtk_box_pack_start(GTK_BOX(hbox), window->statusbar, TRUE, TRUE, 0);
     gtk_widget_show_all(hbox);
 
@@ -2223,11 +2205,7 @@ balsa_window_new(GtkApplication *application)
                                         main_menu);
 #endif
 
-    gtk_window_set_resizable(GTK_WINDOW(window), TRUE);
-    gtk_window_set_default_size(GTK_WINDOW(window), balsa_app.mw_width,
-                                balsa_app.mw_height);
-    if (balsa_app.mw_maximized)
-        gtk_window_maximize(GTK_WINDOW(window));
+    geometry_manager_attach(GTK_WINDOW(window), "MainWindow");
 
     window->notebook = gtk_notebook_new();
     gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook),
@@ -2333,8 +2311,6 @@ balsa_window_new(GtkApplication *application)
     /* set initial state of next-unread controls */
     bw_enable_next_unread(window, FALSE);
 
-    g_signal_connect(window, "size_allocate",
-                     G_CALLBACK(bw_size_allocate_cb), NULL);
     g_signal_connect(window, "delete-event",
                      G_CALLBACK(bw_delete_cb), NULL);
 
@@ -4121,14 +4097,6 @@ bw_slave_position_cb(GtkPaned   * paned_slave,
     if (balsa_app.previewpane)
         balsa_app.notebook_height =
             gtk_paned_get_position(paned_slave);
-}
-
-    static void
-bw_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc)
-{
-    gtk_window_get_size(GTK_WINDOW(window),
-                        & balsa_app.mw_width,
-                        & balsa_app.mw_height);
 }
 
 /* When page is switched we change the preview window and the selected

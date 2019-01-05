@@ -159,6 +159,8 @@ libbalsa_a_SOURCES = 		\
 	source-viewer.c		\
 	url.c			\
 	url.h			\
+	geometry-manager.c	\
+	geometry-manager.h	\
 	${libbalsa_gpgme_extra}
 
 

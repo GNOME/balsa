@@ -65,6 +65,7 @@
 #include "address-view.h"
 #include "print.h"
 #include "macosx-helpers.h"
+#include "geometry-manager.h"
 
 #if !HAVE_GSPELL && !HAVE_GTKSPELL_3_0_3
 #include <enchant/enchant.h>
@@ -124,7 +125,6 @@ static void replace_identity_signature(BalsaSendmsg* bsmsg,
                                        const gchar* new_sig);
 static void update_bsmsg_identity(BalsaSendmsg*, LibBalsaIdentity*);
 
-static void sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc);
 static GString *quote_message_body(BalsaSendmsg * bsmsg,
                                    LibBalsaMessage * message,
                                    QuoteType type);
@@ -1303,26 +1303,6 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
     sw_action_set_active(bsmsg, "request-mdn", ident->request_mdn);
     sw_action_set_active(bsmsg, "request-dsn", ident->request_dsn);
-}
-
-
-static void
-sw_size_alloc_cb(GtkWidget * window, GtkAllocation * alloc)
-{
-    GdkWindow *gdk_window;
-
-    gdk_window = gtk_widget_get_window(window);
-    if (gdk_window == NULL)
-        return;
-
-    balsa_app.sw_maximized =
-        (gdk_window_get_state(gdk_window) &
-         (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN)) != 0;
-
-    if (!balsa_app.sw_maximized)
-        gtk_window_get_size(GTK_WINDOW(window),
-                            & balsa_app.sw_width,
-                            & balsa_app.sw_height);
 }
 
 
@@ -6754,15 +6734,7 @@ sendmsg_window_new()
 
     bsmsg->window = window =
         gtk_application_window_new(balsa_app.application);
-
-    /*
-     * restore the SendMsg window size
-     */
-    gtk_window_set_default_size(GTK_WINDOW(window),
-                                balsa_app.sw_width,
-                                balsa_app.sw_height);
-    if (balsa_app.sw_maximized)
-        gtk_window_maximize(GTK_WINDOW(window));
+    geometry_manager_attach(GTK_WINDOW(window), "SendMsgWindow");
 
     gtk_window_set_role(GTK_WINDOW(window), "compose");
 
@@ -6787,8 +6759,6 @@ sendmsg_window_new()
 		     G_CALLBACK(delete_event_cb), bsmsg);
     g_signal_connect(G_OBJECT(window), "destroy",
 		     G_CALLBACK(destroy_event_cb), bsmsg);
-    g_signal_connect(G_OBJECT(window), "size_allocate",
-		     G_CALLBACK(sw_size_alloc_cb), bsmsg);
     /* If any compose windows are open when Balsa is closed, we want
      * them also to be closed. */
     g_object_weak_ref(G_OBJECT(balsa_app.main_window),

@@ -32,6 +32,7 @@
 #include "libbalsa_private.h"
 #include "misc.h"
 #include "macosx-helpers.h"
+#include "geometry-manager.h"
 #include <glib/gi18n.h>
 
 typedef struct {
@@ -39,8 +40,6 @@ typedef struct {
     GtkWidget *text;
     GtkWidget *window;
     gboolean *escape_specials;
-    gint *width;
-    gint *height;
 } LibBalsaSourceViewerInfo;
 
 static void
@@ -168,34 +167,13 @@ lsv_window_destroy_notify(LibBalsaSourceViewerInfo * lsvi)
    pops up a window containing the source of the message msg.
 */
 
-static void
-lsv_size_allocate_cb(GtkWidget * window, GtkAllocation * alloc,
-                     LibBalsaSourceViewerInfo * lsvi)
-{
-    GdkWindow *gdk_window;
-    gboolean maximized;
-
-    gdk_window = gtk_widget_get_window(window);
-    if (gdk_window == NULL)
-        return;
-
-    maximized =
-        (gdk_window_get_state(gdk_window) &
-         (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN)) != 0;
-
-    if (!maximized)
-        gtk_window_get_size(GTK_WINDOW(window), lsvi->width, lsvi->height);
-}
-
 #define BALSA_SOURCE_VIEWER "balsa-source-viewer"
 
 void
 libbalsa_show_message_source(GtkApplication  * application,
                              LibBalsaMessage * msg,
                              const gchar     * font,
-			     gboolean        * escape_specials,
-                             gint            * width,
-                             gint            * height)
+			     gboolean        * escape_specials)
 {
     GtkWidget *text;
     gchar *css;
@@ -237,7 +215,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     window = gtk_application_window_new(application);
     gtk_window_set_title(GTK_WINDOW(window), _("Message Source"));
     gtk_window_set_role(GTK_WINDOW(window), "message-source");
-    gtk_window_set_default_size(GTK_WINDOW(window), *width, *height);
+    geometry_manager_attach(GTK_WINDOW(window), "SourceView");
 
     menu_bar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
                                             win_entries,
@@ -266,13 +244,8 @@ libbalsa_show_message_source(GtkApplication  * application,
     lsvi->text = text;
     lsvi->window = window;
     lsvi->escape_specials = escape_specials;
-    lsvi->width = width;
-    lsvi->height = height;
     g_object_set_data_full(G_OBJECT(window), "lsvi", lsvi,
                            (GDestroyNotify) lsv_window_destroy_notify);
-
-    g_signal_connect(window, "size-allocate",
-                     G_CALLBACK(lsv_size_allocate_cb), lsvi);
 
     gtk_widget_show_all(window);
 

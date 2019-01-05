@@ -38,6 +38,7 @@
 #include "rfc3156.h"
 #include "libbalsa-gpgme-widgets.h"
 #include "libbalsa-gpgme-cb.h"
+#include "geometry-manager.h"
 
 
 #ifdef G_LOG_DOMAIN
@@ -184,7 +185,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     GtkTreeIter iter;
     gchar *prompt;
     gpgme_key_t use_key = NULL;
-    gint width, height;
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
 
@@ -198,6 +198,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
                                          NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
     gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK, FALSE);
+	geometry_manager_attach(GTK_WINDOW(dialog), "KeyList");
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
@@ -206,7 +207,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_container_add(GTK_CONTAINER
 		      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
 		      vbox);
-   gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
+    gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
     switch (mode) {
     	case LB_SELECT_PRIVATE_KEY:
     		prompt =
@@ -229,6 +230,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     		g_assert_not_reached();
    	}
     label = gtk_label_new(prompt);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     g_free(prompt);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
@@ -290,9 +292,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
     g_signal_connect(tree_view, "button_press_event", G_CALLBACK(key_button_event_press_cb), dialog);
 
-    /* set window size to 2/3 of the parent */
-    gtk_window_get_size(parent, &width, &height);
-    gtk_window_set_default_size(GTK_WINDOW(dialog), (2 * width) / 3, (2 * height) / 3);
     gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
 
     if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK) {

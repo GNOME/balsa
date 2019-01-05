@@ -31,6 +31,7 @@
 #include "pref-manager.h"
 #include "imap-server.h"
 #include "server-config.h"
+#include "geometry-manager.h"
 #include <glib/gi18n.h>
 
 #if HAVE_MACOSX_DESKTOP
@@ -422,6 +423,8 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
     GtkTreeSelection *selection =
         gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
     BrowseButtonData *bbd;
+    const geometry_t *main_size;
+
     /*
      * Make only IMAP nodes selectable:
      */
@@ -467,10 +470,12 @@ browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
     /* Force the mailbox list to be a reasonable size. */
     gtk_widget_get_preferred_size(tree_view, NULL, &req);
     /* don't mess with the width, it gets saved! */
-    if (req.height > balsa_app.mw_height)
-        req.height = balsa_app.mw_height;
-    else if (req.height < balsa_app.mw_height / 2)
-        req.height = balsa_app.mw_height / 2;
+    main_size = geometry_manager_get("MainWindow");
+    g_assert(main_size != NULL);
+    if (req.height > main_size->height)
+        req.height = main_size->height;
+    else if (req.height < main_size->height / 2)
+        req.height = main_size->height / 2;
     gtk_window_set_default_size(GTK_WINDOW(dialog), req.width, req.height);
 
     /* To prevent multiple dialogs, desensitize the browse button. */

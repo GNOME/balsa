@@ -1,4 +1,28 @@
-2019-01-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+2018-01-05  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Simplify window geometry management
+
+	* libbalsa/Makefile.am: add geometry manager module
+	* libbalsa/geometry-manager.[hc]: geometry manager module
+	  implementation
+	* libbalsa/libbalsa-gpgme-cb.c: use geometry manager for the
+	  key list dialogue
+	* libbalsa/libbalsa-gpgme-widgets.c: use geometry manager for
+	  the key dialogue
+	* libbalsa/libbalsa.h: simplify libbalsa_show_message_source()
+	  api, remove unimplemented function prototype
+	* libbalsa/source-viewer.c: use geometry manager, simplify
+	  libbalsa_show_message_source() api
+	* src/balsa-app.c: remove initialisation of obsolete balsa_app
+	  items
+	* src/balsa-app.h: remove obsolete balsa_app items
+	* src/balsa-index.c: use new libbalsa_show_message_source() api
+	* src/folder-conf.c, src/main-window.c, src/main.c,
+	src/message-window.c, src/sendmsg-window.c: use geometry manager
+	  and new libbalsa_show_message_source() api
+	* src/save-restore.c: use geometry manager to load and save values
+
+2018-01-05  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	minor Autocrypt fixes
 

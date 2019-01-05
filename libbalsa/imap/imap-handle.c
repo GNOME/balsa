@@ -22,6 +22,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#include <glib/gi18n.h>
 #include <ctype.h>
 
 #include <stdio.h>
@@ -54,6 +55,7 @@
 #define LIT_IS_HANDLE_CLASS(klass) \
     (G_TYPE_CHECK_CLASS_TYPE(klass, LIT_TYPE_HANDLE))
 
+#define error_safe(e)	(((e != NULL) && ((e)->message != NULL)) ? (e)->message : _("unknown"))
 
 struct _ImapMboxHandleClass {
   GObjectClass parent_class;
@@ -718,8 +720,9 @@ imap_mbox_connect(ImapMboxHandle* handle)
 	  handle->tls_mode == NET_CLIENT_CRYPT_ENCRYPTED ? 993 : 143);
   g_signal_connect(G_OBJECT(handle->sio), "auth", handle->auth_cb, handle->auth_arg);
   g_signal_connect(G_OBJECT(handle->sio), "cert-check", handle->cert_cb, handle->sio);
+  /* FIXME - client certificate? */
   if (!net_client_connect(NET_CLIENT(handle->sio), &error)) {
-	imap_mbox_handle_set_msg(handle, error->message);
+	imap_mbox_handle_set_msg(handle, _("Connecting %s failed: %s"), handle->host, error_safe(error));
 	g_clear_error(&error);
 	return IMAP_CONNECT_FAILED;
   }
@@ -732,7 +735,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
 #endif
   if (handle->tls_mode == NET_CLIENT_CRYPT_ENCRYPTED) {
     if (!net_client_start_tls(NET_CLIENT(handle->sio), &error)) {
-      imap_mbox_handle_set_msg(handle, error->message);
+      imap_mbox_handle_set_msg(handle, _("TLS negotiation failed: %s"), error_safe(error));
 	  g_clear_error(&error);
       return IMAP_UNSECURE;
     }
@@ -751,14 +754,14 @@ imap_mbox_connect(ImapMboxHandle* handle)
 	 (handle->tls_mode == NET_CLIENT_CRYPT_NONE)) {
     resp = IMAP_SUCCESS; /* secured already with SSL, or no encryption requested */
   } else if(imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) {
-    if( imap_handle_starttls(handle) != IMR_OK) {
-      imap_mbox_handle_set_msg(handle,"TLS negotiation failed");
+    if( imap_handle_starttls(handle, &error) != IMR_OK) {
+      imap_mbox_handle_set_msg(handle, _("TLS negotiation failed: %s"), error_safe(error));
       resp = IMAP_UNSECURE; /* TLS negotiation error */
     } else {
       resp = IMAP_SUCCESS; /* secured with TLS */
     }
   } else {
-	imap_mbox_handle_set_msg(handle,"TLS required but not available");
+	imap_mbox_handle_set_msg(handle, _("TLS required but not available"));
     resp = IMR_NO; /* TLS unavailable */
   }
 
@@ -885,6 +888,17 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
   g_mutex_unlock(&handle->mutex);
   return delim;
 
+}
+
+void
+imap_mbox_handle_set_msg(ImapMboxHandle *handle, const gchar *fmt, ...)
+{
+	va_list va_args;
+
+	g_free(handle->last_msg);
+    va_start(va_args, fmt);
+    handle->last_msg = g_strdup_vprintf(fmt, va_args);
+    va_end(va_args);
 }
 
 char*
@@ -2340,7 +2354,7 @@ ir_ok(ImapMboxHandle *h)
     rc = IMR_OK;
   else if (rc != IMR_SEVERED && (l=strlen(line))>0 ) {
     line[l-2] = '\0'; 
-    imap_mbox_handle_set_msg(h, line);
+    imap_mbox_handle_set_msg(h, _("IMAP response: %s"), line);
     if(h->info_cb)
       h->info_cb(h, rc, line, h->info_arg);
     else
@@ -2358,7 +2372,7 @@ ir_no(ImapMboxHandle *h)
   sio_gets(h->sio, line, sizeof(line));
   /* look for information response codes here: section 7.1 of the draft */
   if( strlen(line)>2) {
-    imap_mbox_handle_set_msg(h, line);
+    imap_mbox_handle_set_msg(h, _("IMAP response: %s"), line);
     if(h->info_cb)
       h->info_cb(h, IMR_NO, line, h->info_arg);
     else
@@ -2374,7 +2388,7 @@ ir_bad(ImapMboxHandle *h)
   sio_gets(h->sio, line, sizeof(line));
   /* look for information response codes here: section 7.1 of the draft */
   if( strlen(line)>2) {
-    imap_mbox_handle_set_msg(h, line);
+    imap_mbox_handle_set_msg(h, _("IMAP response: %s"), line);
     if(h->info_cb)
       h->info_cb(h, IMR_BAD, line, h->info_arg);
     else
@@ -2401,7 +2415,7 @@ ir_bye(ImapMboxHandle *h)
   char line[LONG_STRING];
   sio_gets(h->sio, line, sizeof(line));
   if(!h->doing_logout) {/* it is not we, so it must be the server */
-    imap_mbox_handle_set_msg(h, line);
+    imap_mbox_handle_set_msg(h, _("IMAP response: %s"), line);
     imap_mbox_handle_set_state(h, IMHS_DISCONNECTED);
     /* we close the connection here unless we are doing logout. */
     if(h->sio) {

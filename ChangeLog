@@ -1,3 +1,15 @@
+2018-01-05  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	make IMAP messages translatable
+
+	* libbalsa/imap/auth-cram.c, libbalsa/imap/auth-gssapi.c,
+	libbalsa/imap/imap-commands.c, libbalsa/imap/imap-handle.c:
+	  make message strings translatable
+	* libbalsa/imap/imap-handle.c, libbalsa/imap/imap_private.h:
+	  implement imap_mbox_handle_set_msg() as function
+	* libbalsa/imap/imap-commands.h, libbalsa/imap/imap-tls.c:
+	  add GError to imap_handle_starttls() api
+
 2019-01-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix the meson build

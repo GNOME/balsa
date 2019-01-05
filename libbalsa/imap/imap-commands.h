@@ -134,7 +134,7 @@ ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
                                          void *arg);
 
 /* Experimental/Expansion */
-ImapResponse imap_handle_starttls(ImapMboxHandle *handle);
+ImapResponse imap_handle_starttls(ImapMboxHandle *handle, GError **error);
 ImapResponse imap_mbox_scan(ImapMboxHandle *r, const char*what,
                             const char*str);
 ImapResponse imap_mbox_unselect(ImapMboxHandle *h);

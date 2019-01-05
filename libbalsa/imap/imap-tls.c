@@ -45,7 +45,7 @@
 #include "imap_private.h"
 
 ImapResponse
-imap_handle_starttls(ImapMboxHandle *handle)
+imap_handle_starttls(ImapMboxHandle *handle, GError **error)
 {
 	ImapResponse rc;
 
@@ -57,7 +57,7 @@ imap_handle_starttls(ImapMboxHandle *handle)
 	if (rc != IMR_OK) {
 		return rc;
 	}
-	if (net_client_start_tls(NET_CLIENT(handle->sio), NULL)) {
+	if (net_client_start_tls(NET_CLIENT(handle->sio), error)) {
 		handle->has_capabilities = 0;
 		return IMR_OK;
 	} else {

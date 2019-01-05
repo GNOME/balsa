@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "imap-auth.h"
+#include <glib/gi18n.h>
 
 #if defined(HAVE_GSSAPI)
 #if defined(HAVE_HEIMDAL)
@@ -126,7 +127,7 @@ imap_auth_gssapi(ImapMboxHandle* handle)
 
     g_signal_emit_by_name(handle->sio, "auth", FALSE, &auth_data);
     if((auth_data == NULL) || (auth_data[0] == NULL)) {
-    	imap_mbox_handle_set_msg(handle, "User name required, authentication cancelled");
+    	imap_mbox_handle_set_msg(handle, _("User name required, authentication cancelled"));
     	g_strfreev(auth_data);
     	return IMAP_AUTH_CANCELLED;
     }
@@ -158,12 +159,8 @@ imap_auth_gssapi(ImapMboxHandle* handle)
 	g_strfreev(auth_data);
 
     if (error != NULL) {
-        gchar *err_msg;
-
     	g_message("%s: %s", __func__, error->message);
-    	err_msg = g_strdup_printf("GSSAPI auth failed: %s", error->message);
-    	imap_mbox_handle_set_msg(handle, err_msg);
-    	g_free(err_msg);
+    	imap_mbox_handle_set_msg(handle, _("GSSAPI authentication failed: %s"), error->message);
     	g_error_free(error);
     }
 

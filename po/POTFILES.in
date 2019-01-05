@@ -12,6 +12,7 @@ libbalsa/address-book-osmo.c
 libbalsa/address-book-vcard.c
 libbalsa/address.c
 libbalsa/address-view.c
+libbalsa/autocrypt.c
 libbalsa/body.c
 libbalsa/filter.c
 libbalsa/filter-error.c

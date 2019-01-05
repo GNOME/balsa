@@ -24,6 +24,7 @@
 
 #if defined ENABLE_AUTOCRYPT
 
+#include <stdlib.h>
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include <sqlite3.h>
@@ -141,6 +142,9 @@ autocrypt_init(GError **error)
 		gchar *db_path;
 		gboolean require_init;
 		int sqlite_res;
+
+		/* ensure that the config folder exists, otherwise Balsa will throw an error on first use */
+		libbalsa_assure_balsa_dir();
 
 		db_path = g_build_filename(g_get_home_dir(), ".balsa", "autocrypt.db", NULL);
 		require_init = (g_access(db_path, R_OK + W_OK) != 0);
@@ -828,7 +832,7 @@ add_or_update_user_info(const AutocryptData *user_info, time_t date_header, gboo
 		g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1, _("%s user “%s” failed: %s"), update ? _("update") : _("insert"),
 			user_info->addr, sqlite3_errmsg(autocrypt_db));
 	} else {
-		g_debug("%s user '%s'", update ? "updated" : "inserted", user_info->addr);
+		g_debug("%s user '%s': %d", update ? "updated" : "inserted", user_info->addr, sqlite3_changes(autocrypt_db));
 	}
 	sqlite3_reset(query[query_idx]);
 }
@@ -842,7 +846,7 @@ update_last_seen(const gchar *addr, time_t date_header, GError **error)
 		(sqlite3_step(query[3]) != SQLITE_DONE)) {
 		g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1, _("update user “%s” failed: %s"), addr, sqlite3_errmsg(autocrypt_db));
 	} else {
-		g_debug("updated last_seen for '%s'", addr);
+		g_debug("updated last_seen for '%s': %d", addr, sqlite3_changes(autocrypt_db));
 	}
 	sqlite3_reset(query[3]);
 }

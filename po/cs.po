@@ -2691,7 +2691,7 @@ msgstr "dočasná chyba %d: %s"
 #: ../libnetclient/net-client-smtp.c:690
 #, c-format
 msgid "authentication failure %d: %s"
-msgstr "ověření selhalo s chybou %s: %s"
+msgstr "ověření selhalo s chybou %d: %s"
 
 #: ../libnetclient/net-client-smtp.c:693
 #, c-format

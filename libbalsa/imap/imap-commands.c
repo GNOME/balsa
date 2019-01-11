@@ -1868,6 +1868,10 @@ imap_mbox_sort_msgno_client(ImapMboxHandle *handle, ImapSortKey key,
   sort_items = g_new(struct SortItem, cnt);
   for(i=0; i<cnt; i++) {
     sort_items[i].msg = imap_mbox_handle_get_msg(handle, msgno[i]);
+    if ((sort_items[i].msg == NULL) || (sort_items[i].msg->envelope == NULL)) {
+      g_free(sort_items);
+      return IMR_BAD;
+    }
     sort_items[i].no  = msgno[i];
   }
   switch(key) {

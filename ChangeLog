@@ -1,3 +1,11 @@
+2019-01-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Check for NULL message
+
+	* libbalsa/imap/imap-commands.c (imap_mbox_sort_msgno_client):
+	check for NULL message and for a message with a NULL envelope,
+	to avoid dereferencing NULL pointers.
+
 2018-01-10  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Minor autocrypt fixes

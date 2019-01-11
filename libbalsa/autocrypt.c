@@ -32,6 +32,7 @@
 #include "libbalsa-gpgme-keys.h"
 #include "libbalsa-gpgme-widgets.h"
 #include "identity.h"
+#include "geometry-manager.h"
 #include "autocrypt.h"
 
 
@@ -297,7 +298,6 @@ autocrypt_header(const LibBalsaIdentity *identity, GError **error)
 	const gchar *mailbox;
 	gchar *use_fpr = NULL;
 	gchar *result = NULL;
-	gchar *keydata;
 
 	g_return_val_if_fail((identity != NULL) && (identity->autocrypt_mode != AUTOCRYPT_DISABLE), NULL);
 	mailbox = internet_address_mailbox_get_addr(INTERNET_ADDRESS_MAILBOX(identity->ia));
@@ -321,27 +321,38 @@ autocrypt_header(const LibBalsaIdentity *identity, GError **error)
 			}
 			gpgme_release(ctx);
 		}
-		g_debug("found fingerprint %s for '%s'", use_fpr, mailbox);
+
+		if (use_fpr == NULL) {
+			g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1,
+				_("No usable private key for “%s” found! Please create a key or disable Autocrypt."), mailbox);
+		} else {
+			g_debug("found fingerprint %s for '%s'", use_fpr, mailbox);
+		}
 	} else {
 		use_fpr = g_strdup(identity->force_gpg_key_id);
 	}
 
-	keydata = libbalsa_gpgme_export_autocrypt_key(use_fpr, mailbox, error);
-	g_free(use_fpr);
-	if (keydata != NULL) {
-		GString *buffer;
-		gssize ins_fws;
+	if (use_fpr != NULL) {
+		gchar *keydata;
 
-		buffer = g_string_new(NULL);
-		g_string_append_printf(buffer, "addr=%s;", mailbox);
-		if (identity->autocrypt_mode == AUTOCRYPT_PREFER_ENCRYPT) {
-			g_string_append(buffer, "prefer-encrypt=mutual;");
+		keydata = libbalsa_gpgme_export_autocrypt_key(use_fpr, mailbox, error);
+		g_free(use_fpr);
+		if (keydata != NULL) {
+			GString *buffer;
+			gssize ins_fws;
+
+			buffer = g_string_new(NULL);
+			g_string_append_printf(buffer, "addr=%s;", mailbox);
+			if (identity->autocrypt_mode == AUTOCRYPT_PREFER_ENCRYPT) {
+				g_string_append(buffer, "prefer-encrypt=mutual;");
+			}
+			g_string_append_printf(buffer, "keydata=%s", keydata);
+			for (ins_fws = 66; ins_fws < (gssize) buffer->len; ins_fws += 78) {
+				g_string_insert(buffer, ins_fws, "\n\t");
+			}
+			result = g_string_free(buffer, FALSE);
+			g_free(keydata);
 		}
-		g_string_append_printf(buffer, "keydata=%s", keydata);
-		for (ins_fws = 66U; ins_fws < (gssize) buffer->len; ins_fws += 78) {
-			g_string_insert(buffer, ins_fws, "\n\t");
-		}
-		result = g_string_free(buffer, FALSE);
 	}
 
 	return result;
@@ -444,6 +455,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 
 	dialog = gtk_dialog_new_with_buttons(_("Autocrypt database"), parent,
 		GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), _("_Close"), GTK_RESPONSE_CLOSE, NULL);
+	geometry_manager_attach(GTK_WINDOW(dialog), "AutocryptDB");
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);

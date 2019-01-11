@@ -695,7 +695,10 @@ config_global_load(void)
 #ifdef HAVE_GPGME
     geometry_manager_init("KeyDialog", 400, 200, FALSE);
     geometry_manager_init("KeyList", 300, 200, FALSE);
-#endif
+#ifdef ENABLE_AUTOCRYPT
+    geometry_manager_init("AutocryptDB", 300, 200, FALSE);
+#endif  /* ENABLE_AUTOCRYPT */
+#endif  /* HAVE_GPGME */
 
     /* FIXME: PKGW: why comment this out? Breaks my Transfer context menu. */
     if (balsa_app.mblist_width < 100)

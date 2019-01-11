@@ -1,3 +1,15 @@
+2018-01-10  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Minor autocrypt fixes
+
+	* libbalsa/autocrypt.c: set a proper error message if no
+	  fingerprint of a usable private key can be identified for a
+	  mailbox; fix memory leak; attach Autocrypt database window to
+	  geometry manager
+	* libbalsa/send.c: do not add Autocrypt header when postponing;
+	  propagate error from creating Autocrypt header
+	* src/save-restore.c: restore Autocrypt database window geometry
+
 2018-01-05  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	make IMAP messages translatable

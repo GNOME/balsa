@@ -92,7 +92,11 @@ enum {
 
 
 static void autocrypt_close(void);
-static AutocryptData *parse_autocrypt_header(const gchar *value);
+static AutocryptData *scan_autocrypt_headers(GList * const  header_list,
+											 const gchar   *from_addr)
+	G_GNUC_WARN_UNUSED_RESULT;
+static AutocryptData *parse_autocrypt_header(const gchar *value)
+	G_GNUC_WARN_UNUSED_RESULT;
 static gboolean eval_autocrypt_attr(const gchar   *attr,
 									const gchar   *value,
 									gboolean      *seen,
@@ -196,16 +200,16 @@ autocrypt_from_message(LibBalsaMessage  *message,
 					   GError          **error)
 {
 	const gchar *from_addr;
-	GMimeHeaderList *headers;
-	GMimeHeaderIter iter;
-	AutocryptData *autocrypt = NULL;
+	AutocryptData *autocrypt;
 
 	g_return_if_fail(LIBBALSA_IS_MESSAGE(message) && (message->headers != NULL) && (message->headers->from != NULL) &&
-		(message->headers->content_type != NULL) && GMIME_IS_OBJECT(message->mime_msg) && (autocrypt_db != NULL));
+		(message->headers->content_type != NULL) && (autocrypt_db != NULL));
 
 	// FIXME - we should ignore spam - how can we detect it?
 
-	/* check for content types which shall be ignored */
+	/* check for content types which shall be ignored
+	 * Note: see Autocrypt Level 1 standard, section 2.3 (https://autocrypt.org/level1.html#updating-autocrypt-peer-state) for
+	 *       details about this and the following checks which may result in completely ignoring the message. */
 	if (autocrypt_ignore(message->headers->content_type)) {
 		g_debug("ignore %s/%s", g_mime_content_type_get_media_type(message->headers->content_type),
 			g_mime_content_type_get_media_subtype(message->headers->content_type));
@@ -231,40 +235,7 @@ autocrypt_from_message(LibBalsaMessage  *message,
 	g_debug("message from '%s', date %ld", from_addr, message->headers->date);
 
 	/* scan for Autocrypt headers */
-	headers = g_mime_object_get_header_list(GMIME_OBJECT(message->mime_msg));
-    if (g_mime_header_list_get_iter(headers, &iter)) {
-    	do {
-    		if ((g_ascii_strcasecmp(g_mime_header_iter_get_name(&iter), "Autocrypt") == 0) &&
-    			(g_mime_header_iter_get_value(&iter) != NULL)) {
-    			AutocryptData *new_data;
-
-    			new_data = parse_autocrypt_header(g_mime_header_iter_get_value(&iter));
-    			if (new_data != NULL) {
-    				if (autocrypt == NULL) {
-    					autocrypt = new_data;
-    				} else {
-    					g_info("more than one valid Autocrypt header, ignore message");
-    					autocrypt_free(autocrypt);
-    					autocrypt_free(new_data);
-    					return;
-    				}
-    			} else {
-    				/* ignore message with broken Autocrypt header */
-    				autocrypt_free(autocrypt);
-    				return;
-    			}
-    		}
-    	} while (g_mime_header_iter_next(&iter));
-    }
-
-    /* check if addr matches From: - ignore otherwise */
-    if (autocrypt != NULL) {
-    	if (g_ascii_strcasecmp(autocrypt->addr, from_addr) != 0) {
-    		g_info("Autocrypt header for '%s' in message from '%s', ignore message", autocrypt->addr, from_addr);
-    		autocrypt_free(autocrypt);
-    		return;
-    	}
-    }
+	autocrypt = scan_autocrypt_headers(message->headers->user_hdrs, from_addr);
 
     /* update the database */
     G_LOCK(db_mutex);
@@ -643,6 +614,58 @@ autocrypt_close(void)
 }
 
 
+/** \brief Extract Autocrypt data from message headers
+ *
+ * \param header_list list of headers pointing to gchar** (name, value) pairs
+ * \param from_addr sender mailbox extracted from the From: header
+ * \return the data extracted from the Autocrypt header, or NULL if no valid data is present
+ *
+ * The following rules apply according to the Autocrypt Level 1 standard:
+ * - invalid Autocrypt headers are just discarded, but checking for more Autocrypt headers continues (see section 2.1 <em>The
+ *   Autocrypt Header</em>, https://autocrypt.org/level1.html#the-autocrypt-header);
+ * - if the \em addr attribute of an otherwise valid Autocrypt header does not match the mailbox extracted from the From: message
+ *   header, the Autocrypt header shall be treated as being invalid and discarded (see section 2.1);
+ * - if more than one valid Autocrypt header is present, \em all Autocrypt headers shall be discarded (see section 2.3 <em>Updating
+ *   Autocrypt Peer State</em>, https://autocrypt.org/level1.html#updating-autocrypt-peer-state);
+ *
+ * Thus, this function returns a newly allocated Autocrypt data structure iff the passed headers list contains exactly \em one valid
+ * Autocrypt header.
+ */
+static AutocryptData *
+scan_autocrypt_headers(GList * const header_list, const gchar *from_addr)
+{
+	GList *header;
+	AutocryptData *result = NULL;
+
+	for (header = header_list; header != NULL; header = header->next) {
+		const gchar **header_parts = (const gchar **) header->data;
+
+		if ((g_ascii_strcasecmp(header_parts[0], "Autocrypt") == 0) && (header_parts[1] != NULL)) {
+			AutocryptData *new_data;
+
+			new_data = parse_autocrypt_header(header_parts[1]);
+			if (new_data != NULL) {
+				if (result == NULL) {
+			    	if (g_ascii_strcasecmp(new_data->addr, from_addr) != 0) {
+			    		g_info("Autocrypt header for '%s' in message from '%s', ignore header", new_data->addr, from_addr);
+			    		autocrypt_free(new_data);
+			    	} else {
+			    		result = new_data;
+			    	}
+				} else {
+					g_info("more than one valid Autocrypt header");
+					autocrypt_free(result);
+					autocrypt_free(new_data);
+					return NULL;
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+
 static AutocryptData *
 parse_autocrypt_header(const gchar *value)
 {
@@ -696,10 +719,11 @@ parse_autocrypt_header(const gchar *value)
 			} else {
 				GList *keys = NULL;
 				GError *error = NULL;
+				guint bad_keys = 0U;
 
 				success = libbalsa_gpgme_ctx_set_home(ctx, temp_dir, &error) &&
 					libbalsa_gpgme_import_bin_key(ctx, new_data->keydata, NULL, &error) &&
-					libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, FALSE, &error);
+					libbalsa_gpgme_list_keys(ctx, &keys, &bad_keys, NULL, FALSE, FALSE, FALSE, &error);
 				if (success && (keys != NULL) && (keys->next == NULL)) {
 					gpgme_key_t key = (gpgme_key_t) keys->data;
 
@@ -708,7 +732,8 @@ parse_autocrypt_header(const gchar *value)
 						new_data->expires = key->subkeys->expires;
 					}
 				} else {
-					g_warning("Failed to import key data: %s", (error != NULL) ? error->message : "unknown");
+					g_warning("Failed to import or list key data for '%s': %s (%u keys, %u bad)", new_data->addr,
+						(error != NULL) ? error->message : "unknown", (keys != NULL) ? g_list_length(keys) : 0U, bad_keys);
 				}
 				g_clear_error(&error);
 

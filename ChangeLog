@@ -1,3 +1,15 @@
+2018-01-13  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Get the Autocrypt headers from Balsa's user-headers instead of
+	from a GMimeMessage, which doesn't always exist.
+
+	* libbalsa/autocrypt.c (scan_autocrypt_headers): new function
+	for scanning Balsa's user-headers;
+	(autocrypt_from_message): use it, instead of
+	g_mime_object_get_header_list() and friends;
+	(parse_autocrypt_header): extend the (debug) output when
+	checking the key data from an Autocrypt header fails.
+
 2019-01-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Check for NULL message

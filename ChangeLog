@@ -1,3 +1,89 @@
+2018-01-13  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Get the Autocrypt headers from Balsa's user-headers instead of
+	from a GMimeMessage, which doesn't always exist.
+
+	* libbalsa/autocrypt.c (scan_autocrypt_headers): new function
+	for scanning Balsa's user-headers;
+	(autocrypt_from_message): use it, instead of
+	g_mime_object_get_header_list() and friends;
+	(parse_autocrypt_header): extend the (debug) output when
+	checking the key data from an Autocrypt header fails.
+
+2019-01-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Check for NULL message
+
+	* libbalsa/imap/imap-commands.c (imap_mbox_sort_msgno_client):
+	check for NULL message and for a message with a NULL envelope,
+	to avoid dereferencing NULL pointers.
+
+2018-01-10  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Minor autocrypt fixes
+
+	* libbalsa/autocrypt.c: set a proper error message if no
+	  fingerprint of a usable private key can be identified for a
+	  mailbox; fix memory leak; attach Autocrypt database window to
+	  geometry manager
+	* libbalsa/send.c: do not add Autocrypt header when postponing;
+	  propagate error from creating Autocrypt header
+	* src/save-restore.c: restore Autocrypt database window geometry
+
+2018-01-05  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	make IMAP messages translatable
+
+	* libbalsa/imap/auth-cram.c, libbalsa/imap/auth-gssapi.c,
+	libbalsa/imap/imap-commands.c, libbalsa/imap/imap-handle.c:
+	  make message strings translatable
+	* libbalsa/imap/imap-handle.c, libbalsa/imap/imap_private.h:
+	  implement imap_mbox_handle_set_msg() as function
+	* libbalsa/imap/imap-commands.h, libbalsa/imap/imap-tls.c:
+	  add GError to imap_handle_starttls() api
+
+2019-01-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix the meson build
+
+	* libbalsa/meson.build: add geometry manager module
+
+2018-01-05  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Simplify window geometry management
+
+	* libbalsa/Makefile.am: add geometry manager module
+	* libbalsa/geometry-manager.[hc]: geometry manager module
+	  implementation
+	* libbalsa/libbalsa-gpgme-cb.c: use geometry manager for the
+	  key list dialogue
+	* libbalsa/libbalsa-gpgme-widgets.c: use geometry manager for
+	  the key dialogue
+	* libbalsa/libbalsa.h: simplify libbalsa_show_message_source()
+	  api, remove unimplemented function prototype
+	* libbalsa/source-viewer.c: use geometry manager, simplify
+	  libbalsa_show_message_source() api
+	* src/balsa-app.c: remove initialisation of obsolete balsa_app
+	  items
+	* src/balsa-app.h: remove obsolete balsa_app items
+	* src/balsa-index.c: use new libbalsa_show_message_source() api
+	* src/folder-conf.c, src/main-window.c, src/main.c,
+	src/message-window.c, src/sendmsg-window.c: use geometry manager
+	  and new libbalsa_show_message_source() api
+	* src/save-restore.c: use geometry manager to load and save values
+
+2018-01-05  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	minor Autocrypt fixes
+
+	* libbalsa/autocrypt.c:
+	  * add missing include, required on Debian stretch
+	  * make sure the ~/.balsa folder exists before initialising
+	    the autocrypt sub-system (otherwise an error is thrown when
+	    balsa is started for the first time)
+	  * clarify debug messages, indicating if a database entry
+	    has actually been changed
+
 2018-12-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/mailbox-conf.c (create_local_mailbox_dialog): avoid

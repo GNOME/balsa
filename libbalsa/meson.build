@@ -2,6 +2,8 @@
 
 if gpgmecfg == 'true'
   libbalsa_gpgme_extra = [
+	'autocrypt.h',
+	'autocrypt.c',
     'libbalsa-gpgme.h',
     'libbalsa-gpgme.c',
     'libbalsa-gpgme-cb.h',
@@ -133,7 +135,9 @@ libbalsa_a_sources = [
   'smtp-server.h',
   'source-viewer.c',
   'url.c',
-  'url.h']
+  'url.h',
+  'geometry-manager.c',
+  'geometry-manager.h']
 
 libbalsa_a_sources += libbalsa_gpgme_extra
 

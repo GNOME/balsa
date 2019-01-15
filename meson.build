@@ -47,6 +47,7 @@ endif
 
 gnome_desktop = get_option('gnome-desktop')
 gpgmecfg      = get_option('gpgme')
+autocryptcfg  = get_option('autocrypt')
 canberra      = get_option('canberra')
 compface      = get_option('compface')
 gss           = get_option('gss')
@@ -239,6 +240,19 @@ if gpgmecfg != 'false'
              description : 'Defined when gpgme is available.')
     balsa_deps += gpgme_dep
     gpgmecfg = 'true'
+  endif
+endif
+
+# Autocrypt
+if gpgmecfg != 'false'
+  if autocryptcfg == 'true'
+    autocrypt_dep = dependency('sqlite3', required : true)
+    if autocrypt_dep.found()
+      conf.set('ENABLE_AUTOCRYPT', 1, description : 'If defined, enable Autocrypt support.')
+    else
+      error('*** You enabled Autocrypt but sqlite3 library is not found.')
+    endif
+    balsa_deps += autocrypt_dep
   endif
 endif
 
@@ -616,6 +630,7 @@ summary = [
   '              Use GNOME: @0@'.format(gnome_desktop),
   '           Use Canberra: @0@'.format(canberra),
   '              Use GPGME: @0@'.format(gpgmecfg),
+  '          Use Autocrypt: @0@'.format(autocryptcfg),
   '               Use LDAP: @0@'.format(ldap),
   '                Use GSS: @0@'.format(gss),
   '             Use SQLite: @0@'.format(sqlite),

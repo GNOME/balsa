@@ -22,6 +22,7 @@
 /* IMAP login/authentication code */
 
 #include <string.h>
+#include <glib/gi18n.h>
 
 #include "imap-auth.h"
 #include "net-client-utils.h"
@@ -43,7 +44,7 @@ imap_auth_cram(ImapMboxHandle* handle)
 
   g_signal_emit_by_name(handle->sio, "auth", TRUE, &auth_data);
   if((auth_data == NULL) || (auth_data[0] == NULL) || (auth_data[1] == NULL)) {
-    imap_mbox_handle_set_msg(handle, "Authentication cancelled");
+    imap_mbox_handle_set_msg(handle, _("Authentication cancelled"));
 	g_strfreev(auth_data);
     return IMAP_AUTH_CANCELLED;
   }

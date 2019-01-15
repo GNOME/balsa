@@ -189,17 +189,8 @@ extern struct BalsaApplication {
     gint quiet_background_check;
     gint msg_size_limit; /* for POP mailboxes; in kB */
 
-    /* GUI settings */
-    gint mw_width;
-    gint mw_height;
-    gboolean mw_maximized;
+    /* GUI settings (note: window sizes are tracked by the geometry-manager) */
     gint mblist_width;
-    gint sw_width; /* sendmsg window */
-    gint sw_height;
-    gboolean sw_maximized;
-    gint message_window_width;
-    gint message_window_height;
-    gboolean message_window_maximized;
 
     /* toolbars */
     int toolbar_wrap_button_text;
@@ -268,8 +259,6 @@ extern struct BalsaApplication {
 
     /* Source viewer */
     gboolean source_escape_specials;
-    gint source_width;
-    gint source_height;
 
     /* MRU mailbox tree */
     gint mru_tree_width;

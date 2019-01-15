@@ -23,6 +23,8 @@
 #include "libbalsa-gpgme-widgets.h"
 #include <string.h>
 #include <glib/gi18n.h>
+
+#include "geometry-manager.h"
 #include "rfc3156.h"
 
 
@@ -379,7 +381,7 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	default:
 		g_error("%s: buttons type %d not yet implemented", __func__, buttons);
 	}
-	gtk_window_set_resizable(GTK_WINDOW(dialog), TRUE);
+	geometry_manager_attach(GTK_WINDOW(dialog), "KeyDialog");
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);

@@ -47,6 +47,8 @@
 #include "information.h"
 #include "imap-server.h"
 #include "libbalsa-conf.h"
+#include "autocrypt.h"
+#include "geometry-manager.h"
 
 #include "libinit_balsa/assistant_init.h"
 
@@ -503,6 +505,9 @@ balsa_startup_cb(GApplication *application,
            gpointer      user_data)
 {
     gchar *default_icon;
+#ifdef ENABLE_AUTOCRYPT
+    GError *error = NULL;
+#endif
 
 #ifdef ENABLE_NLS
     /* Initialize the i18n stuff */
@@ -536,6 +541,13 @@ balsa_startup_cb(GApplication *application,
     libbalsa_progress_set_activity = balsa_progress_set_activity;
 
     libbalsa_mailbox_date_format = &balsa_app.date_string;
+
+#ifdef ENABLE_AUTOCRYPT
+    if (!autocrypt_init(&error)) {
+    	libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Autocrypt error: %s"), error->message);
+    	g_error_free(error);
+    }
+#endif
 
     /* checking for valid config files */
     config_init(cmd_get_stats);
@@ -580,6 +592,7 @@ balsa_activate_cb(GApplication *application,
             gpointer      user_data)
 {
     GtkWidget *window;
+    const geometry_t *main_size;
 
     if (balsa_app.main_window != NULL) {
         gtk_window_present(GTK_WINDOW(balsa_app.main_window));
@@ -594,7 +607,9 @@ balsa_activate_cb(GApplication *application,
     balsa_check_open_compose_window();
 
     g_idle_add((GSourceFunc) scan_mailboxes_idle_cb, NULL);
-    if (balsa_app.mw_maximized) {
+    main_size = geometry_manager_get("MainWindow");
+    g_assert(main_size != NULL);
+    if (main_size->maximized) {
         /*
          * When maximized at startup, the window changes from maximized
          * to not maximized a couple of times, so we wait until it has

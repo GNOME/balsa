@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <glib/gi18n.h>
 
 #include "imap-handle.h"
 #include "imap-commands.h"
@@ -1213,7 +1214,7 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
     g_free(seq);
     if(passthrough_data.pipeline_error){
       rc = IMR_NO;
-      imap_mbox_handle_set_msg(handle, "Unordered data received from server");
+      imap_mbox_handle_set_msg(handle, _("Unordered data received from server"));
     }
   }
   g_mutex_unlock(&handle->mutex);
@@ -1746,8 +1747,8 @@ imap_mbox_sort_msgno_srv(ImapMboxHandle *handle, ImapSortKey key,
       for(i=0; i<cnt; i++)
         msgno[i] = i + 1;
       imap_mbox_handle_set_msg(handle,
-                               "bug in implementation of SORT command on "
-                               "IMAP server exposed.");
+                               _("Bug in implementation of SORT command on "
+                               "IMAP server exposed."));
       rc = IMR_NO;
     }
   }
@@ -1867,6 +1868,10 @@ imap_mbox_sort_msgno_client(ImapMboxHandle *handle, ImapSortKey key,
   sort_items = g_new(struct SortItem, cnt);
   for(i=0; i<cnt; i++) {
     sort_items[i].msg = imap_mbox_handle_get_msg(handle, msgno[i]);
+    if ((sort_items[i].msg == NULL) || (sort_items[i].msg->envelope == NULL)) {
+      g_free(sort_items);
+      return IMR_BAD;
+    }
     sort_items[i].no  = msgno[i];
   }
   switch(key) {

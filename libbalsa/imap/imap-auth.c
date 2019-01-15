@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <glib/gi18n.h>
 
 #include "imap-handle.h"
 #include "imap-auth.h"
@@ -67,7 +68,7 @@ imap_authenticate(ImapMboxHandle* handle)
       return r;
     }
   }
-  imap_mbox_handle_set_msg(handle, "No way to authenticate is known");
+  imap_mbox_handle_set_msg(handle, _("No way to authenticate is known"));
   return r;
 }
 
@@ -86,14 +87,14 @@ imap_auth_login(ImapMboxHandle* handle)
   
   g_signal_emit_by_name(handle->sio, "auth", TRUE, &auth_data);
   if((auth_data == NULL) || (auth_data[0] == NULL) || (auth_data[1] == NULL)) {
-    imap_mbox_handle_set_msg(handle, "Authentication cancelled");
+    imap_mbox_handle_set_msg(handle, _("Authentication cancelled"));
 	g_strfreev(auth_data);
     return IMAP_AUTH_CANCELLED;
   }
 
   /* RFC 6855, Sect. 5, explicitly forbids UTF-8 usernames or passwords */
   if (!g_str_is_ascii(auth_data[0]) || !g_str_is_ascii(auth_data[1])) {
-	  imap_mbox_handle_set_msg(handle, "Cannot LOGIN with UTF-8 username or password");
+	  imap_mbox_handle_set_msg(handle, _("Cannot LOGIN with UTF-8 username or password"));
 	  result = IMAP_AUTH_CANCELLED;
   } else {
 	  gchar *q_user;
@@ -137,7 +138,7 @@ imap_auth_sasl(ImapMboxHandle* handle, ImapCapability cap,
   sasl_ir = imap_mbox_handle_can_do(handle, IMCAP_SASLIR);
   
   if(!getmsg(handle, &msg64, &msglen)) {
-    imap_mbox_handle_set_msg(handle, "Authentication cancelled");
+    imap_mbox_handle_set_msg(handle, _("Authentication cancelled"));
     return IMAP_AUTH_CANCELLED;
   }
   

@@ -78,9 +78,13 @@ static gchar *utf8_valid_str(const char *gpgme_str)
 static const gchar *get_utf8_locale(int category);
 #endif
 
+static void gpg_check_capas(const gchar *gpg_path,
+							const gchar *version);
+
 
 static gboolean has_proto_openpgp = FALSE;
 static gboolean has_proto_cms = FALSE;
+static gpg_capabilities gpg_capas;
 
 static gpgme_passphrase_cb_t gpgme_passphrase_cb = NULL;
 static lbgpgme_select_key_cb select_key_cb = NULL;
@@ -126,6 +130,9 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
 		g_debug("protocol %s: engine %s (home %s, version %s)",
 		      gpgme_get_protocol_name(e->protocol),
 		      e->file_name, e->home_dir, e->version);
+		if (e->protocol == GPGME_PROTOCOL_OpenPGP) {
+			gpg_check_capas(e->file_name, e->version);
+		}
 	    e = e->next;
 	}
     }
@@ -181,6 +188,24 @@ libbalsa_gpgme_check_crypto_engine(gpgme_protocol_t protocol)
     default:
 	return FALSE;
     }
+}
+
+
+/** \brief Get capabilities of the gpg engine
+ *
+ * \return a pointer to the capabilities of the GnuPG engine, or NULL if it is not supported
+ *
+ * If an engine for the OpenPGP protocol is available, return a structure containing the path of the executable, and information if
+ * some \em export-filter options are available.  This information is needed to export a minimal Autocrypt key, but unfortunately
+ * cannot be determined from the engine version.
+ *
+ * \sa libbalsa_gpgme_export_autocrypt_key(), gpg_check_capas()
+ * \todo Actually, gpgme should provide a minimalistic key export.
+ */
+const gpg_capabilities *
+libbalsa_gpgme_gpg_capabilities(void)
+{
+	return has_proto_openpgp ? &gpg_capas : NULL;
 }
 
 
@@ -1132,3 +1157,34 @@ get_utf8_locale(int category)
     return localebuf;
 }
 #endif
+
+/*
+ * Note: this function is a hack to detect if the gpg engine in use support the '--export-filter' options 'keep-uid=...' and
+ * 'drop-subkey=...' (since 2.2.9) needed for exporting a minimal Autocrypt key.
+ */
+static void
+gpg_check_capas(const gchar *gpg_path, const gchar *version)
+{
+	gchar *gpg_args[] = { (gchar *) gpg_path, "--export", "--export-filter", "keep-uid=primary=1", "0000000000000000", NULL };
+	gint exit_status;
+	guint major;
+	guint minor;
+	guint release;
+
+	gpg_capas.gpg_path = g_strdup(gpg_path);
+
+	/* check for the "--export-filter keep-uid=..." option */
+	if (g_spawn_sync(NULL, gpg_args, NULL, G_SPAWN_STDOUT_TO_DEV_NULL + G_SPAWN_STDERR_TO_DEV_NULL, NULL, NULL, NULL, NULL,
+					 &exit_status, NULL)) {
+		gpg_capas.export_filter_uid = g_spawn_check_exit_status(exit_status, NULL);
+	}
+	g_debug("%s supports '--export-filter keep-uid=...': %d", gpg_path, gpg_capas.export_filter_uid);
+
+	/* check for the "--export-filter drop-subkey=usage!~e && usage!~s" option */
+	if (sscanf(version, "%u.%u.%u", &major, &minor, &release) == 3) {
+		gpg_capas.export_filter_subkey = (major > 2U) ||
+			((major == 2U) && (minor > 2U)) ||
+			((major == 2U) && (minor == 2U) && (release >= 9U));
+	}
+	g_debug("%s supports '--export-filter drop-subkey=...': %d", gpg_path, gpg_capas.export_filter_subkey);
+}

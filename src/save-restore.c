@@ -38,6 +38,7 @@
 #include "mailbox-filter.h"
 #include "libbalsa-conf.h"
 #include "net-client-utils.h"
+#include "geometry-manager.h"
 
 #include "smtp-server.h"
 #include "send.h"
@@ -686,23 +687,19 @@ config_global_load(void)
 	d_get_gint("IndexSizeWidth", SIZE_DEFAULT_WIDTH);
 
     /* ... window sizes */
-    balsa_app.mw_width = libbalsa_conf_get_int("MainWindowWidth=640");
-    balsa_app.mw_height = libbalsa_conf_get_int("MainWindowHeight=480");
-    balsa_app.mw_maximized =
-        libbalsa_conf_get_bool("MainWindowMaximized=false");
+    geometry_manager_init("MainWindow", 640, 480, FALSE);
     balsa_app.mblist_width = libbalsa_conf_get_int("MailboxListWidth=130");
-    /* sendmsg window sizes */
-    balsa_app.sw_width = libbalsa_conf_get_int("SendMsgWindowWidth=640");
-    balsa_app.sw_height = libbalsa_conf_get_int("SendMsgWindowHeight=480");
-    balsa_app.sw_maximized =
-        libbalsa_conf_get_bool("SendmsgWindowMaximized=false");
-    /* message window sizes */
-    balsa_app.message_window_width =
-        libbalsa_conf_get_int("MessageWindowWidth=400");
-    balsa_app.message_window_height =
-        libbalsa_conf_get_int("MessageWindowHeight=500");
-    balsa_app.message_window_maximized =
-        libbalsa_conf_get_bool("MessageWindowMaximized=false");
+    geometry_manager_init("SendMsgWindow", 640, 480, FALSE);
+    geometry_manager_init("MessageWindow", 400, 500, FALSE);
+    geometry_manager_init("SourceView", 500, 400, FALSE);
+#ifdef HAVE_GPGME
+    geometry_manager_init("KeyDialog", 400, 200, FALSE);
+    geometry_manager_init("KeyList", 300, 200, FALSE);
+#ifdef ENABLE_AUTOCRYPT
+    geometry_manager_init("AutocryptDB", 300, 200, FALSE);
+#endif  /* ENABLE_AUTOCRYPT */
+#endif  /* HAVE_GPGME */
+
     /* FIXME: PKGW: why comment this out? Breaks my Transfer context menu. */
     if (balsa_app.mblist_width < 100)
 	balsa_app.mblist_width = 170;
@@ -871,8 +868,6 @@ config_global_load(void)
     libbalsa_conf_push_group("SourcePreview");
     balsa_app.source_escape_specials = 
         libbalsa_conf_get_bool("EscapeSpecials=true");
-    balsa_app.source_width  = libbalsa_conf_get_int("Width=500");
-    balsa_app.source_height = libbalsa_conf_get_int("Height=400");
     libbalsa_conf_pop_group();
 
     /* MRU mailbox tree ... */
@@ -1255,23 +1250,8 @@ config_save(void)
     libbalsa_conf_set_int("IndexDateWidth", balsa_app.index_date_width);
     libbalsa_conf_set_int("IndexSizeWidth", balsa_app.index_size_width);
 
-    libbalsa_conf_set_int("MainWindowWidth", balsa_app.mw_width);
-    libbalsa_conf_set_int("MainWindowHeight", balsa_app.mw_height);
-    libbalsa_conf_set_bool("MainWindowMaximized",
-                           !!balsa_app.mw_maximized);
+    geometry_manager_save();
     libbalsa_conf_set_int("MailboxListWidth", balsa_app.mblist_width);
-
-    libbalsa_conf_set_int("SendMsgWindowWidth", balsa_app.sw_width);
-    libbalsa_conf_set_int("SendMsgWindowHeight", balsa_app.sw_height);
-    libbalsa_conf_set_bool("SendmsgWindowMaximized",
-                           !!balsa_app.sw_maximized);
-
-    libbalsa_conf_set_int("MessageWindowWidth",
-                         balsa_app.message_window_width);
-    libbalsa_conf_set_int("MessageWindowHeight",
-                         balsa_app.message_window_height);
-    libbalsa_conf_set_bool("MessageWindowMaximized",
-                           !!balsa_app.message_window_maximized);
 
     libbalsa_conf_set_int("NotebookHeight", balsa_app.notebook_height);
 
@@ -1355,8 +1335,6 @@ config_save(void)
     libbalsa_conf_push_group("SourcePreview");
     libbalsa_conf_set_bool("EscapeSpecials",
                           balsa_app.source_escape_specials);
-    libbalsa_conf_set_int("Width",  balsa_app.source_width);
-    libbalsa_conf_set_int("Height", balsa_app.source_height);
     libbalsa_conf_pop_group();
 
     /* MRU mailbox tree ... */

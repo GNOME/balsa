@@ -5,6 +5,8 @@ noinst_LIBRARIES = libbalsa.a
 
 if BUILD_WITH_GPGME
 libbalsa_gpgme_extra = 		\
+	autocrypt.h				\
+	autocrypt.c				\
 	libbalsa-gpgme.h		\
 	libbalsa-gpgme.c		\
 	libbalsa-gpgme-cb.h		\
@@ -25,6 +27,8 @@ libbalsa_gpgme_extra_dist =
 else
 libbalsa_gpgme_extra =
 libbalsa_gpgme_extra_dist =	\
+	autocrypt.h				\
+	autocrypt.c				\
 	libbalsa-gpgme.h		\
 	libbalsa-gpgme.c		\
 	libbalsa-gpgme-cb.h		\
@@ -155,6 +159,8 @@ libbalsa_a_SOURCES = 		\
 	source-viewer.c		\
 	url.c			\
 	url.h			\
+	geometry-manager.c	\
+	geometry-manager.h	\
 	${libbalsa_gpgme_extra}
 
 

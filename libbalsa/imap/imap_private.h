@@ -195,8 +195,8 @@ void imap_handle_disconnect(ImapMboxHandle *h);
 ImapConnectionState imap_mbox_handle_get_state(ImapMboxHandle *h);
 void imap_mbox_handle_set_state(ImapMboxHandle *h,
                                 ImapConnectionState newstate);
-#define imap_mbox_handle_set_msg(h,s) \
-  do{g_free((h)->last_msg); (h)->last_msg = g_strdup(s); }while(0)
+void imap_mbox_handle_set_msg(ImapMboxHandle *handle, const gchar *fmt, ...)
+	G_GNUC_PRINTF(2, 3);
 
 typedef unsigned (*ImapCoalesceFunc)(int, void*);
 gchar* imap_coalesce_seq_range(int lo, int hi,

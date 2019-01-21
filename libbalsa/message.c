@@ -820,7 +820,9 @@ libbalsa_message_set_dispnotify(LibBalsaMessage * message,
 {
     g_return_if_fail(message);
 
-    g_object_unref(message->headers->dispnotify_to);
+    if (message->headers->dispnotify_to != NULL) {
+    	g_object_unref(message->headers->dispnotify_to);
+    }
     if (ia) {
 	message->headers->dispnotify_to = internet_address_list_new ();
 	internet_address_list_add (message->headers->dispnotify_to, ia);

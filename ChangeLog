@@ -1,3 +1,14 @@
+2018-01-20  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Do not trigger a CRITICAL message when request for a Message
+	Disposition Notification is activated
+	Fixes
+	https://mail.gnome.org/archives/balsa-list/2019-January/msg00018.html
+
+	* libbalsa/message.c (libbalsa_message_set_dispnotify): test
+	whether message->headers->dispnotify_to is NULL before unreffing
+	it.
+
 2018-01-13  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Get the Autocrypt headers from Balsa's user-headers instead of

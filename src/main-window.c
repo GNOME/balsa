@@ -894,9 +894,9 @@ autocrypt_db_activated(GSimpleAction G_GNUC_UNUSED *action,
 #endif
 
 static void
-prefs_activated(GSimpleAction * action,
-                GVariant      * parameter,
-                gpointer        user_data)
+settings_activated(GSimpleAction * action,
+                   GVariant      * parameter,
+                   gpointer        user_data)
 {
     open_preferences_manager(NULL, user_data);
 }
@@ -1873,36 +1873,15 @@ threading_change_state(GSimpleAction * action,
  */
 
 static void
-bw_add_app_action_entries(GActionMap * action_map, gpointer user_data)
+bw_add_win_action_entries(GActionMap * action_map)
 {
-    static GActionEntry app_entries[] = {
+    static GActionEntry win_entries[] = {
         {"new-message",           new_message_activated},
         {"new-mbox",              new_mbox_activated},
         {"new-maildir",           new_maildir_activated},
         {"new-mh",                new_mh_activated},
         {"new-imap-folder",       new_imap_folder_activated},
         {"new-imap-subfolder",    new_imap_subfolder_activated},
-        {"toolbars",              toolbars_activated},
-        {"identities",            identities_activated},
-        {"address-book",          address_book_activated},
-#ifdef ENABLE_AUTOCRYPT
-        {"autocrypt-db",          autocrypt_db_activated},
-#endif
-        {"prefs",                 prefs_activated},
-        {"help",                  help_activated},
-        {"about",                 about_activated},
-        {"quit",                  quit_activated}
-    };
-
-    g_action_map_add_action_entries(action_map, app_entries,
-                                    G_N_ELEMENTS(app_entries), user_data);
-}
-
-static void
-bw_add_win_action_entries(GActionMap * action_map)
-{
-    static GActionEntry win_entries[] = {
-        {"new-message",           new_message_activated},
         {"continue",              continue_activated},
         {"get-new-mail",          get_new_mail_activated},
         {"send-queued-mail",      send_queued_mail_activated},
@@ -1913,6 +1892,11 @@ bw_add_win_action_entries(GActionMap * action_map)
 #ifdef ENABLE_AUTOCRYPT
         {"autocrypt-db",          autocrypt_db_activated},
 #endif
+        {"settings",              settings_activated},
+        {"toolbars",              toolbars_activated},
+        {"identities",            identities_activated},
+        {"help",                  help_activated},
+        {"about",                 about_activated},
         {"quit",                  quit_activated},
         {"copy",                  copy_activated},
         {"select-all",            select_all_activated},
@@ -2006,7 +1990,6 @@ bw_add_win_action_entries(GActionMap * action_map)
 void
 balsa_window_add_action_entries(GActionMap * action_map)
 {
-    bw_add_app_action_entries(action_map, NULL);
     bw_add_win_action_entries(action_map);
 }
 
@@ -2018,14 +2001,10 @@ bw_set_menus(BalsaWindow * window)
     const gchar resource_path[] = "/org/desktop/Balsa/main-window.ui";
     GError *err = NULL;
 
-    bw_add_app_action_entries(G_ACTION_MAP(application), window);
     bw_add_win_action_entries(G_ACTION_MAP(window));
 
     builder = gtk_builder_new();
     if (gtk_builder_add_from_resource(builder, resource_path, &err)) {
-        gtk_application_set_app_menu(application,
-                                     G_MENU_MODEL(gtk_builder_get_object
-                                                  (builder, "app-menu")));
         gtk_application_set_menubar(application,
                                     G_MENU_MODEL(gtk_builder_get_object
                                                  (builder, "menubar")));

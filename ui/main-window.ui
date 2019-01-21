@@ -1,100 +1,46 @@
 <interface>
-  <menu id='app-menu'>
-    <submenu>
-      <attribute name='label' translatable='yes' context='appmenu' comments='Translators: app menu item - New message or mailbox'>_New</attribute>
-      <section>
-        <item>
-          <attribute name='label' translatable='yes'>_Message</attribute>
-          <attribute name='action'>app.new-message</attribute>
-        </item>
-      </section>
-      <section>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Local mbox mailbox…</attribute>
-          <attribute name='action'>app.new-mbox</attribute>
-        </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Local Maildir mailbox…</attribute>
-          <attribute name='action'>app.new-maildir</attribute>
-        </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Local MH mailbox…</attribute>
-          <attribute name='action'>app.new-mh</attribute>
-        </item>
-      </section>
-      <section>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Remote IMAP folder…</attribute>
-          <attribute name='action'>app.new-imap-folder</attribute>
-        </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Remote IMAP subfolder…</attribute>
-          <attribute name='action'>app.new-imap-subfolder</attribute>
-        </item>
-      </section>
-    </submenu>
-    <submenu>
-      <attribute name='label' translatable='yes'>_Settings</attribute>
-      <section>
-        <item>
-          <attribute name='label'
-            translatable='yes'>_Toolbars…</attribute>
-          <attribute name='action'>app.toolbars</attribute>
-        </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>_Identities…</attribute>
-          <attribute name='action'>app.identities</attribute>
-        </item>
-      </section>
-    </submenu>
-    <section>
-      <item>
-        <attribute name='label'
-          translatable='yes'>_Address Book</attribute>
-        <attribute name='action'>app.address-book</attribute>
-      </item>
-      <item>
-        <attribute name='label'
-          translatable='yes'>A_utocrypt Database</attribute>
-        <attribute name='action'>app.autocrypt-db</attribute>
-      </item>
-    </section>
-    <section>
-      <item>
-        <attribute name='label' translatable='yes'>_Preferences</attribute>
-        <attribute name='action'>app.prefs</attribute>
-      </item>
-    </section>
-    <section>
-      <item>
-        <attribute name='label' translatable='yes'>_Help</attribute>
-        <attribute name='action'>app.help</attribute>
-      </item>
-      <item>
-        <attribute name='label' translatable='yes'>_About</attribute>
-        <attribute name='action'>app.about</attribute>
-      </item>
-      <item>
-        <attribute name='label' translatable='yes'>_Quit</attribute>
-        <attribute name='action'>app.quit</attribute>
-      </item>
-    </section>
-  </menu>
   <menu id='menubar'>
     <submenu>
       <attribute name='label' translatable='yes'>_File</attribute>
       <section>
-        <item>
-          <attribute name='label' translatable='yes'>New _Message</attribute>
-          <attribute name='action'>win.new-message</attribute>
-          <attribute name='accel'>m</attribute>
-        </item>
+        <submenu>
+          <attribute name='label' translatable='yes' context='window menu' comments='Translators: window menu item - New message or mailbox'>_New</attribute>
+          <section>
+            <item>
+              <attribute name='label' translatable='yes'>_Message</attribute>
+              <attribute name='action'>win.new-message</attribute>
+            </item>
+          </section>
+          <section>
+            <item>
+              <attribute name='label'
+                translatable='yes'>Local mbox mailbox…</attribute>
+              <attribute name='action'>win.new-mbox</attribute>
+            </item>
+            <item>
+              <attribute name='label'
+                translatable='yes'>Local Maildir mailbox…</attribute>
+              <attribute name='action'>win.new-maildir</attribute>
+            </item>
+            <item>
+              <attribute name='label'
+                translatable='yes'>Local MH mailbox…</attribute>
+              <attribute name='action'>win.new-mh</attribute>
+            </item>
+          </section>
+          <section>
+            <item>
+              <attribute name='label'
+                translatable='yes'>Remote IMAP folder…</attribute>
+              <attribute name='action'>win.new-imap-folder</attribute>
+            </item>
+            <item>
+              <attribute name='label'
+                translatable='yes'>Remote IMAP subfolder…</attribute>
+              <attribute name='action'>win.new-imap-subfolder</attribute>
+            </item>
+          </section>
+        </submenu>
       </section>
       <section>
         <item>
@@ -151,6 +97,34 @@
        	</item>
       </section>
       <section>
+        <submenu>
+          <attribute name='label' translatable='yes'>_Preferences</attribute>
+          <item>
+            <attribute name='label'
+              translatable='yes'>_Settings…</attribute>
+            <attribute name='action'>win.settings</attribute>
+          </item>
+          <item>
+            <attribute name='label'
+              translatable='yes'>_Toolbars…</attribute>
+            <attribute name='action'>win.toolbars</attribute>
+          </item>
+          <item>
+            <attribute name='label'
+              translatable='yes'>_Identities…</attribute>
+            <attribute name='action'>win.identities</attribute>
+          </item>
+        </submenu>
+      </section>
+      <section>
+        <item>
+          <attribute name='label' translatable='yes'>_Help</attribute>
+          <attribute name='action'>win.help</attribute>
+        </item>
+        <item>
+          <attribute name='label' translatable='yes'>_About Balsa</attribute>
+          <attribute name='action'>win.about</attribute>
+        </item>
         <item>
           <attribute name='label' translatable='yes'>_Quit</attribute>
           <attribute name='action'>win.quit</attribute>

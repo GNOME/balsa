@@ -23,6 +23,20 @@
 	  webkit version 2.20;
 	  (libbalsa_html_new): do not auto-load images if any are
 	  external (that is, not cid: data)
+2019-01-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Remove application menu
+
+	GNOME has decided that application menus, shown in the top bar
+	of the GNOME desktop, are a bad idea. It was kind of a stretch
+	for Balsa to implement one, so it shouldn't be too hard to drop
+	it.
+
+	* src/main-window.c (settings_activated),
+	(bw_add_win_action_entries), (balsa_window_add_action_entries),
+	(bw_set_menus): move the appmenu items that are not already
+	duplicate in the File: menu back there;
+	* ui/main-window.ui: ditto.
 
 2018-01-20  Albrecht Dreß  <albrecht.dress@arcor.de>
 

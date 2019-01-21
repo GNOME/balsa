@@ -25,6 +25,11 @@
 	  external (that is, not cid: data)
 2019-01-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* ui/main-window.ui: Shuffle some menu items;
+	see https://gitlab.gnome.org/GNOME/balsa/issues/14
+
+2019-01-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* ui/main-window.ui: Restore 'm' shortcut for "New message"
 
 2019-01-20  Peter Bloomfield  <pbloomfield@bellsouth.net>

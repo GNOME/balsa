@@ -9,6 +9,7 @@
             <item>
               <attribute name='label' translatable='yes'>_Message</attribute>
               <attribute name='action'>win.new-message</attribute>
+              <attribute name='accel'>m</attribute>
             </item>
           </section>
           <section>

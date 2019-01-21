@@ -23,6 +23,10 @@
 	  webkit version 2.20;
 	  (libbalsa_html_new): do not auto-load images if any are
 	  external (that is, not cid: data)
+2019-01-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* ui/main-window.ui: Restore 'm' shortcut for "New message"
+
 2019-01-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Remove application menu

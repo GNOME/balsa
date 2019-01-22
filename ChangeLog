@@ -23,6 +23,18 @@
 	  webkit version 2.20;
 	  (libbalsa_html_new): do not auto-load images if any are
 	  external (that is, not cid: data)
+2019-01-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	More menu shuffling
+
+	* ui/main-window.ui:
+	  move "File → New → Message" to "Message → New…";
+	  move  "Mailbox → Close" to the foot of the "Mailbox" menu, and
+	  group "Remove Duplicates" and "Expunge Deleted Messages"
+	  immediately above it;
+	  move "Message → Next Message" and three friends to a new
+	  "Go" top-level menu.
+
 2019-01-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* ui/main-window.ui: Shuffle some menu items;

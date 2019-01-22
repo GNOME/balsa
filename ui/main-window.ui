@@ -7,13 +7,6 @@
           <attribute name='label' translatable='yes' context='window menu' comments='Translators: window menu item - New message or mailbox'>_New</attribute>
           <section>
             <item>
-              <attribute name='label' translatable='yes'>_Message</attribute>
-              <attribute name='action'>win.new-message</attribute>
-              <attribute name='accel'>m</attribute>
-            </item>
-          </section>
-          <section>
-            <item>
               <attribute name='label'
                 translatable='yes'>Local mbox mailbox…</attribute>
               <attribute name='action'>win.new-mbox</attribute>
@@ -287,32 +280,6 @@
     <submenu>
       <attribute name='label' translatable='yes'>Mail_box</attribute>
       <section>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Next Message</attribute>
-          <attribute name='action'>win.next-message</attribute>
-          <attribute name='accel'>n</attribute>
-        </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Previous Message</attribute>
-          <attribute name='action'>win.previous-message</attribute>
-          <attribute name='accel'>p</attribute>
-        </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Next Unread Message</attribute>
-          <attribute name='action'>win.next-unread</attribute>
-          <attribute name='accel'>&lt;Primary&gt;n</attribute>
-        </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>Next Flagged Message</attribute>
-          <attribute name='action'>win.next-flagged</attribute>
-          <attribute name='accel'>&lt;Primary&gt;&lt;Alt&gt;f</attribute>
-        </item>
-      </section>
-      <section>
         <submenu>
             <attribute name='label'
               translatable='yes'>_Hide Messages</attribute>
@@ -385,19 +352,6 @@
       <section>
         <item>
           <attribute name='label'
-            translatable='yes'>E_xpunge Deleted Messages</attribute>
-          <attribute name='action'>win.mailbox-expunge</attribute>
-        </item>
-        <item>
-          <attribute name='label'
-            translatable='yes'>_Close</attribute>
-          <attribute name='action'>win.mailbox-close</attribute>
-          <attribute name='accel'>&lt;Primary&gt;w</attribute>
-        </item>
-      </section>
-      <section>
-        <item>
-          <attribute name='label'
             translatable='yes'>Select _Filters…</attribute>
           <attribute name='action'>win.select-filters</attribute>
         </item>
@@ -408,11 +362,29 @@
             translatable='yes'>_Remove Duplicates</attribute>
           <attribute name='action'>win.remove-duplicates</attribute>
         </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>E_xpunge Deleted Messages</attribute>
+          <attribute name='action'>win.mailbox-expunge</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>_Close</attribute>
+          <attribute name='action'>win.mailbox-close</attribute>
+          <attribute name='accel'>&lt;Primary&gt;w</attribute>
+        </item>
       </section>
     </submenu>
     <submenu>
       <attribute name='label' translatable='yes'>_Message</attribute>
       <section>
+        <item>
+          <attribute name='label' translatable='yes'>_New…</attribute>
+          <attribute name='action'>win.new-message</attribute>
+          <attribute name='accel'>m</attribute>
+        </item>
         <item>
           <attribute name='label'
             translatable='yes'>_Reply…</attribute>
@@ -529,6 +501,35 @@
               translatable='yes'>_Store Address…</attribute>
           <attribute name='action'>win.store-address</attribute>
           <attribute name='accel'>s</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name='label' translatable='yes'>_Go</attribute>
+      <section>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Next Message</attribute>
+          <attribute name='action'>win.next-message</attribute>
+          <attribute name='accel'>n</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Previous Message</attribute>
+          <attribute name='action'>win.previous-message</attribute>
+          <attribute name='accel'>p</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Next Unread Message</attribute>
+          <attribute name='action'>win.next-unread</attribute>
+          <attribute name='accel'>&lt;Primary&gt;n</attribute>
+        </item>
+        <item>
+          <attribute name='label'
+            translatable='yes'>Next Flagged Message</attribute>
+          <attribute name='action'>win.next-flagged</attribute>
+          <attribute name='accel'>&lt;Primary&gt;&lt;Alt&gt;f</attribute>
         </item>
       </section>
     </submenu>

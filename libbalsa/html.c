@@ -471,6 +471,31 @@ lbh_resource_load_started_cb(WebKitWebView     * web_view,
                      G_CALLBACK(lbh_resource_notify_response_cb), data);
 }
 
+#if WEBKIT_CHECK_VERSION(2,20,0)
+/*
+ * Callback for the "web-process-terminated" signal
+ */
+static void
+lbh_web_process_terminated_cb(WebKitWebView                     *web_view,
+               	   	   	   	  WebKitWebProcessTerminationReason  reason,
+							  gpointer                           user_data)
+{
+	const gchar *reason_str;
+
+	switch (reason) {
+	case WEBKIT_WEB_PROCESS_CRASHED:
+		reason_str = "crashed";
+		break;
+	case WEBKIT_WEB_PROCESS_EXCEEDED_MEMORY_LIMIT:
+		reason_str = "exceeded memory limit";
+		break;
+	default:
+		reason_str = "unknown";
+		break;
+	}
+	g_warning("webkit process terminated abnormally: %s", reason_str);
+}
+#else
 /*
  * Callback for the "web-process-crashed" signal
  */
@@ -481,6 +506,7 @@ lbh_web_process_crashed_cb(WebKitWebView * web_view,
     g_debug("%s", __func__);
     return FALSE;
 }
+#endif
 
 /*
  * WebKitURISchemeRequestCallback for "cid:" URIs
@@ -567,6 +593,8 @@ libbalsa_html_new(LibBalsaMessageBody * body,
         "<[^>]*src\\s*=\\s*['\"]?\\s*cid:";
     static const gchar src_regex[] =
         "<[^>]*src\\s*=\\s*['\"]?\\s*[^c][^i][^d][^:]";
+    gboolean have_src_cid;
+    gboolean have_src_oth;
 
     len = lbh_get_body_content_utf8(body, &text);
     if (len < 0)
@@ -604,14 +632,15 @@ libbalsa_html_new(LibBalsaMessageBody * body,
         g_debug("%s registered cid: scheme", __func__);
     }
 
+    have_src_cid = g_regex_match_simple(cid_regex, text, G_REGEX_CASELESS, 0);
+    have_src_oth = g_regex_match_simple(src_regex, text, G_REGEX_CASELESS, 0);
+
     settings = webkit_web_view_get_settings(web_view);
     webkit_settings_set_enable_plugins(settings, FALSE);
     webkit_settings_set_enable_javascript(settings, FALSE);
 	webkit_settings_set_enable_java(settings, FALSE);
 	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);
-    webkit_settings_set_auto_load_images
-        (settings,
-         g_regex_match_simple(cid_regex, text, G_REGEX_CASELESS, 0));
+    webkit_settings_set_auto_load_images(settings, have_src_cid && !have_src_oth);
 
     g_signal_connect(web_view, "mouse-target-changed",
                      G_CALLBACK(lbh_mouse_target_changed_cb), info);
@@ -619,8 +648,13 @@ libbalsa_html_new(LibBalsaMessageBody * body,
                      G_CALLBACK(lbh_decide_policy_cb), info);
     g_signal_connect(web_view, "resource-load-started",
                      G_CALLBACK(lbh_resource_load_started_cb), info);
-    g_signal_connect(web_view, "web-process-crashed",
+#if WEBKIT_CHECK_VERSION(2,20,0)
+	g_signal_connect(web_view, "web-process-terminated",
+                     G_CALLBACK(lbh_web_process_terminated_cb), info);
+#else
+	g_signal_connect(web_view, "web-process-crashed",
                      G_CALLBACK(lbh_web_process_crashed_cb), info);
+#endif
     g_signal_connect(web_view, "context-menu",
                      G_CALLBACK(lbh_context_menu_cb), info);
 
@@ -629,7 +663,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     gtk_box_pack_end(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
 
     /* Simple check for possible resource requests: */
-    if (g_regex_match_simple(src_regex, text, G_REGEX_CASELESS, 0)) {
+    if (have_src_oth) {
         info->info_bar = lbh_info_bar(info);
         gtk_box_pack_start(GTK_BOX(vbox), info->info_bar, FALSE, FALSE, 0);
         g_debug("%s shows info_bar", __func__);

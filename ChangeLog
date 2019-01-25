@@ -1,3 +1,10 @@
+2018-01-24  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	* libbalsa/html.c (lbh_web_process_terminated_cb): new signal in
+	  webkit version 2.20;
+	  (libbalsa_html_new): do not auto-load images if any are
+	  external (that is, not cid: data)
+
 2018-01-20  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Do not trigger a CRITICAL message when request for a Message

@@ -448,7 +448,8 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
 				       LDAPMessage * e)
 {
     LibBalsaAddressBookLdap *ldap_ab;
-    gchar *email = NULL, *cn = NULL, *org = NULL, *uid = NULL;
+    GList *email = NULL;
+    gchar *cn = NULL, *org = NULL, *uid = NULL;
     gchar *first = NULL, *last = NULL;
     LibBalsaAddress *address = NULL;
     char *attr;
@@ -475,8 +476,8 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
 		    org = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 		if ((g_ascii_strcasecmp(attr, "uid") == 0) && (!uid))
 		    uid = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
-		if ((g_ascii_strcasecmp(attr, "mail") == 0) && (!email))
-		    email = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
+		if (g_ascii_strcasecmp(attr, "mail") == 0)
+		    email = g_list_prepend(email, g_strndup(vals[i]->bv_val, vals[i]->bv_len));
 	    }
 	    ldap_value_free_len(vals);
 	}
@@ -485,7 +486,7 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
     /*
      * Record will have e-mail (searched)
      */
-    if(email == NULL) email = g_strdup("none");
+    if(email == NULL) email = g_list_prepend(email, g_strdup("none"));
     g_return_val_if_fail(email != NULL, NULL);
 
     address = libbalsa_address_new();
@@ -500,20 +501,21 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
     address->last_name = last;
     address->nick_name = uid;
     address->organization = org;
-    address->address_list = g_list_prepend(address->address_list, email);
+    address->address_list = email;
 
     return address;
 }
 
-static InternetAddress*
-lbabl_get_internet_address(LDAP *dir, LDAPMessage * e)
+static GList *
+lbabl_get_internet_address(GList *addrs, LDAP *dir, LDAPMessage * e)
 {
-    InternetAddress *ia;
     BerElement *ber = NULL;
     char *attr;
     struct berval **vals;
     int i;
-    gchar *email = NULL, *sn = NULL, *cn = NULL, *first = NULL;
+    GList *email = NULL;
+    GList *p;
+    gchar *sn = NULL, *cn = NULL, *first = NULL;
 
     for (attr = ldap_first_attribute(dir, e, &ber);
 	 attr != NULL; 
@@ -529,25 +531,23 @@ lbabl_get_internet_address(LDAP *dir, LDAPMessage * e)
 		    cn = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
 		if ((g_ascii_strcasecmp(attr, "givenName") == 0) && (!first))
 		    first = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
-		if ((g_ascii_strcasecmp(attr, "mail") == 0) && (!email))
-		    email = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
+		if (g_ascii_strcasecmp(attr, "mail") == 0)
+		    email = g_list_prepend(email, g_strndup(vals[i]->bv_val, vals[i]->bv_len));
 	    }
 	    ldap_value_free_len(vals);
 	}
         ldap_memfree(attr);
     }
-    /*
-     * Record will have e-mail (searched)
-     */
-    if(email == NULL) email = g_strdup("none");
-    g_return_val_if_fail(email != NULL, NULL);
 
     if(!cn)
         cn = create_name(first, sn);
-    ia = internet_address_mailbox_new(cn, email);
-    g_free(email); g_free(sn); g_free(cn); g_free(first);
+    for (p = email; p != NULL; p = p->next) {
+    	addrs = g_list_prepend(addrs, internet_address_mailbox_new(cn, (const gchar *) p->data));
+    }
+    g_list_free_full(email, g_free);
+    g_free(sn); g_free(cn); g_free(first);
 
-    return ia;
+    return addrs;
 }
 /*
  * create_name()
@@ -953,7 +953,6 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 {
     static struct timeval timeout = { 15, 0 }; /* 15 sec timeout */
     LibBalsaAddressBookLdap *ldap_ab;
-    InternetAddress *addr;
     GList *res = NULL;
     gchar* filter;
     gchar* ldap;
@@ -996,8 +995,7 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 	if (result)
 	    for(e = ldap_first_entry(ldap_ab->directory, result);
 		e != NULL; e = ldap_next_entry(ldap_ab->directory, e)) {
-		addr = lbabl_get_internet_address(ldap_ab->directory, e);
-		res = g_list_prepend(res, addr);
+		res = lbabl_get_internet_address(res, ldap_ab->directory, e);
 	    }
     case LDAP_SIZELIMIT_EXCEEDED:
     case LDAP_TIMELIMIT_EXCEEDED:

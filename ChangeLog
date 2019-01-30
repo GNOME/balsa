@@ -1,3 +1,13 @@
+2018-01-30  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	LDAP address book: use all email attributes
+
+	* libbalsa_address_book_ldap_get_address(): assign the GList
+	  of all mail attribute strings to LibBalsaAddress instead of the
+	  first one only;
+	* lbabl_get_internet_address(): append separate InternetAddress
+	  to a GList instead on returning the first one only.
+
 2018-01-24  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	* libbalsa/html.c (lbh_web_process_terminated_cb): new signal in

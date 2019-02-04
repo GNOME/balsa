@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2019-01-17 11:38+0100\n"
-"PO-Revision-Date: 2019-01-17 11:39+0100\n"
+"POT-Creation-Date: 2019-02-04 18:39+0100\n"
+"PO-Revision-Date: 2019-02-04 18:40+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -112,8 +112,8 @@ msgstr "Nie można dodać podwójnego wpisu"
 msgid "Cannot find address in address book"
 msgstr "Nie można odnaleźć adresu w książce adresowej"
 
-#: ../libbalsa/address-book.c:320 ../src/main-window.c:2916
-#: ../src/main-window.c:4016 ../src/sendmsg-window.c:3810
+#: ../libbalsa/address-book.c:320 ../src/main-window.c:2895
+#: ../src/main-window.c:3995 ../src/sendmsg-window.c:3810
 msgid "Unknown error"
 msgstr "Nieznany błąd"
 
@@ -123,7 +123,7 @@ msgid "No-Id"
 msgstr "Brak identyfikatora"
 
 #: ../libbalsa/address-book-extern.c:214 ../libbalsa/address-book-extern.c:372
-#: ../libbalsa/address-book-ldap.c:497 ../libbalsa/address-book-ldif.c:212
+#: ../libbalsa/address-book-ldap.c:498 ../libbalsa/address-book-ldif.c:212
 #: ../libbalsa/address-book-ldif.c:236 ../libbalsa/address-book-ldif.c:255
 #: ../libbalsa/address-book-ldif.c:259 ../libbalsa/address-book-vcard.c:158
 #: ../libbalsa/address-book-vcard.c:256 ../libbalsa/address.c:404
@@ -223,8 +223,8 @@ msgstr "Baza danych Autocrypt"
 
 #: ../libbalsa/autocrypt.c:428 ../libbalsa/html.c:404
 #: ../libbalsa/identity.c:1796 ../src/ab-window.c:149
-#: ../src/mailbox-node.c:1100 ../src/main-window.c:3701
-#: ../src/toolbar-prefs.c:140 ../ui/main-window.ui.h:70
+#: ../src/mailbox-node.c:1100 ../src/main-window.c:3680
+#: ../src/toolbar-prefs.c:140 ../ui/main-window.ui.h:65
 #: ../ui/message-window.ui.h:4 ../ui/sendmsg-window.ui.h:12
 #: ../ui/source-viewer.ui.h:2
 msgid "_Close"
@@ -269,7 +269,7 @@ msgid "update user “%s” failed: %s"
 msgstr "zaktualizowanie użytkownika „%s” się nie powiodło: %s"
 
 #: ../libbalsa/body.c:121 ../libbalsa/mailbox_local.c:1826
-#: ../libbalsa/message.c:848 ../libbalsa/message.h:188
+#: ../libbalsa/message.c:850 ../libbalsa/message.h:188
 msgid "(No subject)"
 msgstr "(Brak tematu)"
 
@@ -592,7 +592,7 @@ msgstr "_Anuluj"
 #: ../src/balsa-message.c:1794 ../src/balsa-mime-widget-callbacks.c:86
 #: ../src/filter-edit-callbacks.c:1246 ../src/filter-edit-dialog.c:572
 #: ../src/filter-export-dialog.c:78 ../src/filter-run-dialog.c:315
-#: ../src/main-window.c:3796 ../src/pref-manager.c:3288
+#: ../src/main-window.c:3775 ../src/pref-manager.c:3288
 #: ../src/sendmsg-window.c:1537 ../src/sendmsg-window.c:1991
 #: ../src/sendmsg-window.c:3323 ../src/sendmsg-window.c:4675
 #: ../src/store-address.c:209
@@ -820,9 +820,9 @@ msgstr "Zarządzanie tożsamościami"
 #: ../src/address-book-config.c:386 ../src/filter-edit-callbacks.c:1248
 #: ../src/filter-edit-dialog.c:574 ../src/filter-export-dialog.c:80
 #: ../src/filter-run-dialog.c:317 ../src/folder-conf.c:252
-#: ../src/folder-conf.c:442 ../src/folder-conf.c:672 ../src/main-window.c:3700
+#: ../src/folder-conf.c:442 ../src/folder-conf.c:672 ../src/main-window.c:3679
 #: ../src/pref-manager.c:3291 ../src/toolbar-prefs.c:141 ../ui/ab-main.ui.h:16
-#: ../ui/main-window.ui.h:15
+#: ../ui/main-window.ui.h:88
 msgid "_Help"
 msgstr "Pomo_c"
 
@@ -2458,7 +2458,7 @@ msgstr "Skrzynka zamknięta"
 msgid "Message Source"
 msgstr "Źródło wiadomości"
 
-#: ../libbalsa/source-viewer.c:226 ../src/main-window.c:2035
+#: ../libbalsa/source-viewer.c:226 ../src/main-window.c:2014
 #: ../src/message-window.c:822
 #, c-format
 msgid "Error adding from %s: %s\n"
@@ -2884,7 +2884,7 @@ msgstr "_Adres"
 
 #: ../src/ab-main.c:844 ../src/address-book-config.c:226
 #: ../src/address-book-config.c:331 ../src/address-book-config.c:375
-#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3760
+#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3739
 #: ../src/pref-manager.c:3289
 msgid "_Apply"
 msgstr "_Zastosuj"
@@ -3051,7 +3051,7 @@ msgid "GPE Address Book"
 msgstr "Książka adresowa GPE"
 
 #: ../src/address-book-config.c:601 ../src/main-window.c:925
-#: ../src/main-window.c:3873
+#: ../src/main-window.c:3852
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Błąd podczas wyświetlania pomocy: %s\n"
@@ -3143,7 +3143,7 @@ msgstr[2] "Odpowiedź grupie: %d wiadomości nie jest z listy dyskusyjnej."
 msgid "Move to Trash failed: %s"
 msgstr "Przeniesienie do kosza się nie powiodło: %s"
 
-#: ../src/balsa-index.c:1822 ../ui/main-window.ui.h:74
+#: ../src/balsa-index.c:1822 ../ui/main-window.ui.h:68
 #: ../ui/message-window.ui.h:21
 msgid "_Reply…"
 msgstr "_Odpowiedz…"
@@ -3156,28 +3156,28 @@ msgstr "Odpowiedz _wszystkim…"
 msgid "Reply To _Group…"
 msgstr "Odpowiedz g_rupie…"
 
-#: ../src/balsa-index.c:1828 ../ui/main-window.ui.h:77
+#: ../src/balsa-index.c:1828 ../ui/main-window.ui.h:71
 #: ../ui/message-window.ui.h:24
 msgid "_Forward Attached…"
 msgstr "Przekaż w _załączniku…"
 
-#: ../src/balsa-index.c:1830 ../ui/main-window.ui.h:78
+#: ../src/balsa-index.c:1830 ../ui/main-window.ui.h:72
 #: ../ui/message-window.ui.h:25
 msgid "Forward _Inline…"
 msgstr "Przekaż w _treści…"
 
-#: ../src/balsa-index.c:1832 ../ui/main-window.ui.h:79
+#: ../src/balsa-index.c:1832 ../ui/main-window.ui.h:73
 msgid "_Pipe through…"
 msgstr "_Przefiltruj…"
 
-#: ../src/balsa-index.c:1834 ../ui/main-window.ui.h:88
+#: ../src/balsa-index.c:1834 ../ui/main-window.ui.h:82
 msgid "_Store Address…"
 msgstr "Zapisz adre_s…"
 
 #: ../src/balsa-index.c:1848 ../src/mailbox-node.c:1092
 #: ../src/mailbox-node.c:1108 ../src/pref-manager.c:2030
 #: ../src/pref-manager.c:2115 ../src/pref-manager.c:2795 ../ui/ab-main.ui.h:11
-#: ../ui/main-window.ui.h:68
+#: ../ui/main-window.ui.h:61
 msgid "_Delete"
 msgstr "_Usuń"
 
@@ -3193,7 +3193,7 @@ msgstr "Przenieś do _kosza"
 msgid "T_oggle"
 msgstr "_Przełącz"
 
-#: ../src/balsa-index.c:1863 ../ui/main-window.ui.h:62
+#: ../src/balsa-index.c:1863 ../ui/main-window.ui.h:55
 msgid "_Flagged"
 msgstr "_Z etykietą"
 
@@ -3831,7 +3831,7 @@ msgstr "Pomniejsz"
 msgid "Zoom 100%"
 msgstr "Oryginalny rozmiar"
 
-#: ../src/balsa-mime-widget-text.c:1079 ../ui/main-window.ui.h:28
+#: ../src/balsa-mime-widget-text.c:1079 ../ui/main-window.ui.h:21
 #: ../ui/message-window.ui.h:7 ../ui/sendmsg-window.ui.h:19
 msgid "Select _All"
 msgstr "Z_aznacz wszystko"
@@ -4072,15 +4072,15 @@ msgstr "_Wszystkie"
 msgid "C_lear"
 msgstr "Wyc_zyść"
 
-#: ../src/filter-edit-callbacks.c:963 ../src/main-window.c:3744
+#: ../src/filter-edit-callbacks.c:963 ../src/main-window.c:3723
 msgid "_Body"
 msgstr "_Treść"
 
-#: ../src/filter-edit-callbacks.c:964 ../src/main-window.c:3745
+#: ../src/filter-edit-callbacks.c:964 ../src/main-window.c:3724
 msgid "_To:"
 msgstr "_Do:"
 
-#: ../src/filter-edit-callbacks.c:965 ../src/main-window.c:3746
+#: ../src/filter-edit-callbacks.c:965 ../src/main-window.c:3725
 msgid "_From:"
 msgstr "_Od:"
 
@@ -4088,7 +4088,7 @@ msgstr "_Od:"
 msgid "_Subject"
 msgstr "_Temat"
 
-#: ../src/filter-edit-callbacks.c:967 ../src/main-window.c:3748
+#: ../src/filter-edit-callbacks.c:967 ../src/main-window.c:3727
 msgid "_CC:"
 msgstr "_DW:"
 
@@ -4246,7 +4246,7 @@ msgstr "_Nazwa filtru:"
 msgid "Operation between conditions:"
 msgstr "Działanie między warunkami:"
 
-#: ../src/filter-edit-dialog.c:310 ../ui/main-window.ui.h:26
+#: ../src/filter-edit-dialog.c:310 ../ui/main-window.ui.h:19
 #: ../ui/message-window.ui.h:5 ../ui/sendmsg-window.ui.h:13
 #: ../ui/source-viewer.ui.h:3
 msgid "_Edit"
@@ -4656,7 +4656,7 @@ msgstr ""
 msgid "Information — Balsa"
 msgstr "Informacje — Balsa"
 
-#: ../src/information-dialog.c:235 ../src/main-window.c:3765
+#: ../src/information-dialog.c:235 ../src/main-window.c:3744
 msgid "_Clear"
 msgstr "Wy_czyść"
 
@@ -5102,7 +5102,7 @@ msgstr[2] "Usunięto %d podwójnych plików"
 msgid "No duplicates found"
 msgstr "Nie odnaleziono podwójnych plików"
 
-#: ../src/main-window.c:2915
+#: ../src/main-window.c:2894
 #, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
@@ -5111,32 +5111,32 @@ msgstr ""
 "Nie można otworzyć skrzynki.\n"
 "%s."
 
-#: ../src/main-window.c:2951
+#: ../src/main-window.c:2930
 #, c-format
 msgid "Opening %s"
 msgstr "Otwieranie %s"
 
-#: ../src/main-window.c:3193 ../src/main-window.c:3342
-#: ../src/main-window.c:3459 ../src/main-window.c:3470
+#: ../src/main-window.c:3172 ../src/main-window.c:3321
+#: ../src/main-window.c:3438 ../src/main-window.c:3449
 msgid "Checking Mail…"
 msgstr "Wyszukiwanie poczty…"
 
-#: ../src/main-window.c:3421 ../src/main-window.c:3426
-#: ../src/main-window.c:3459 ../src/main-window.c:3465
+#: ../src/main-window.c:3400 ../src/main-window.c:3405
+#: ../src/main-window.c:3438 ../src/main-window.c:3444
 msgid "Mailboxes"
 msgstr "Skrzynki"
 
-#: ../src/main-window.c:3422
+#: ../src/main-window.c:3401
 #, c-format
 msgid "IMAP mailbox: %s"
 msgstr "Skrzynka IMAP: %s"
 
-#: ../src/main-window.c:3427
+#: ../src/main-window.c:3406
 #, c-format
 msgid "Local mailbox: %s"
 msgstr "Lokalna skrzynka: %s"
 
-#: ../src/main-window.c:3499
+#: ../src/main-window.c:3478
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
@@ -5144,69 +5144,69 @@ msgstr[0] "Odebrano %d nową wiadomość."
 msgstr[1] "Odebrano %d nowe wiadomości."
 msgstr[2] "Odebrano %d nowych wiadomości."
 
-#: ../src/main-window.c:3502
+#: ../src/main-window.c:3481
 msgid "You have new mail."
 msgstr "Nowa poczta."
 
-#: ../src/main-window.c:3696
+#: ../src/main-window.c:3675
 msgid "Search mailbox"
 msgstr "Przeszukiwanie skrzynki"
 
-#: ../src/main-window.c:3722
+#: ../src/main-window.c:3701
 msgid "_Search for:"
 msgstr "Wy_szukiwanie:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: ../src/main-window.c:3735
+#: ../src/main-window.c:3714
 msgid "In:"
 msgstr "W:"
 
-#: ../src/main-window.c:3747
+#: ../src/main-window.c:3726
 msgid "S_ubject"
 msgstr "T_emat"
 
 #. Frame with Apply and Clear buttons
-#: ../src/main-window.c:3752
+#: ../src/main-window.c:3731
 msgid "Show only matching messages"
 msgstr "Wyświetlenie tylko pasujących wiadomości"
 
 #. Frame with OK button
-#: ../src/main-window.c:3773
+#: ../src/main-window.c:3752
 msgid "Open next matching message"
 msgstr "Otwarcie następnej pasującej wiadomości"
 
-#: ../src/main-window.c:3785
+#: ../src/main-window.c:3764
 msgid "_Reverse search"
 msgstr "_Wyszukiwanie wstecz"
 
-#: ../src/main-window.c:3790
+#: ../src/main-window.c:3769
 msgid "_Wrap around"
 msgstr "_Automatyczny powrót do początku"
 
-#: ../src/main-window.c:4014
+#: ../src/main-window.c:3993
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "Nie można otworzyć Kosza: %s"
 
-#: ../src/main-window.c:4141
+#: ../src/main-window.c:4120
 #, c-format
 msgid "Balsa: %s (read-only)"
 msgstr "Balsa: %s (tylko do odczytu)"
 
-#: ../src/main-window.c:4143
+#: ../src/main-window.c:4122
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
 #. xgettext: this is the first part of the message
 #. * "Shown mailbox: %s with %d messages, %d new, %d hidden".
-#: ../src/main-window.c:4652
+#: ../src/main-window.c:4631
 #, c-format
 msgid "Shown mailbox: %s "
 msgstr "Wyświetlana skrzynka: %s "
 
-#: ../src/main-window.c:4657
+#: ../src/main-window.c:4636
 #, c-format
 msgid "with %d message"
 msgid_plural "with %d messages"
@@ -5214,7 +5214,7 @@ msgstr[0] "z %d wiadomością"
 msgstr[1] "z %d wiadomościami"
 msgstr[2] "z %d wiadomościami"
 
-#: ../src/main-window.c:4664
+#: ../src/main-window.c:4643
 #, c-format
 msgid ", %d new"
 msgid_plural ", %d new"
@@ -5222,7 +5222,7 @@ msgstr[0] ", %d nowa"
 msgstr[1] ", %d nowe"
 msgstr[2] ", %d nowych"
 
-#: ../src/main-window.c:4671
+#: ../src/main-window.c:4650
 #, c-format
 msgid ", %d hidden"
 msgid_plural ", %d hidden"
@@ -5230,12 +5230,12 @@ msgstr[0] ", %d ukryta"
 msgstr[1] ", %d ukryte"
 msgstr[2] ", %d ukrytych"
 
-#: ../src/main-window.c:4716
+#: ../src/main-window.c:4695
 #, c-format
 msgid "The next unread message is in %s"
 msgstr "Następna nieprzeczytana wiadomość jest w %s"
 
-#: ../src/main-window.c:4723
+#: ../src/main-window.c:4702
 #, c-format
 msgid "Do you want to select %s?"
 msgstr "Zaznaczyć %s?"
@@ -7007,7 +7007,7 @@ msgstr "Dodaj zaznaczony element do paska narzędziowego"
 msgid "Move selected item down"
 msgstr "Przenieś zaznaczony element w dół"
 
-#: ../ui/ab-main.ui.h:1 ../ui/main-window.ui.h:18 ../ui/message-window.ui.h:1
+#: ../ui/ab-main.ui.h:1 ../ui/main-window.ui.h:1 ../ui/message-window.ui.h:1
 #: ../ui/sendmsg-window.ui.h:1 ../ui/source-viewer.ui.h:1
 msgid "_File"
 msgstr "_Plik"
@@ -7042,11 +7042,11 @@ msgstr "Książka adresowa _GPE"
 msgid "_Rubrica Address Book"
 msgstr "Książka adresowa _Rubrica2"
 
-#: ../ui/ab-main.ui.h:10 ../ui/main-window.ui.h:67
+#: ../ui/ab-main.ui.h:10 ../ui/main-window.ui.h:60
 msgid "_Properties"
 msgstr "_Właściwości"
 
-#: ../ui/ab-main.ui.h:12 ../ui/main-window.ui.h:17
+#: ../ui/ab-main.ui.h:12 ../ui/main-window.ui.h:18
 msgid "_Quit"
 msgstr "Za_kończ"
 
@@ -7062,19 +7062,15 @@ msgstr "_Nowy wpis"
 msgid "_Delete Entry"
 msgstr "_Usuń wpis"
 
-#: ../ui/ab-main.ui.h:17 ../ui/main-window.ui.h:16
+#: ../ui/ab-main.ui.h:17
 msgid "_About"
 msgstr "_O programie"
 
-#. Translators: app menu item - New message or mailbox
-#: ../ui/main-window.ui.h:2
-msgctxt "appmenu"
+#. Translators: window menu item - New message or mailbox
+#: ../ui/main-window.ui.h:3
+msgctxt "window menu"
 msgid "_New"
 msgstr "_Nowa"
-
-#: ../ui/main-window.ui.h:3 ../ui/message-window.ui.h:20
-msgid "_Message"
-msgstr "Wiado_mość"
 
 #: ../ui/main-window.ui.h:4
 msgid "Local mbox mailbox…"
@@ -7093,265 +7089,281 @@ msgid "Remote IMAP subfolder…"
 msgstr "Zdalny podkatalog IMAP…"
 
 #: ../ui/main-window.ui.h:9
-msgid "_Settings"
-msgstr "U_stawienia"
-
-#: ../ui/main-window.ui.h:10
-msgid "_Toolbars…"
-msgstr "_Paski narzędziowe…"
-
-#: ../ui/main-window.ui.h:11
-msgid "_Identities…"
-msgstr "_Tożsamości…"
-
-#: ../ui/main-window.ui.h:12
-msgid "_Address Book"
-msgstr "Książka _adresowa"
-
-#: ../ui/main-window.ui.h:13
-msgid "A_utocrypt Database"
-msgstr "Baza danych A_utocrypt"
-
-#: ../ui/main-window.ui.h:14
-msgid "_Preferences"
-msgstr "_Preferencje"
-
-#: ../ui/main-window.ui.h:19
-msgid "New _Message"
-msgstr "Nowa wiado_mość"
-
-#: ../ui/main-window.ui.h:20
 msgid "_Continue"
 msgstr "_Kontynuuj"
 
-#: ../ui/main-window.ui.h:21
+#: ../ui/main-window.ui.h:10
 msgid "_Get New Mail"
 msgstr "_Pobierz nową pocztę"
 
-#: ../ui/main-window.ui.h:22
+#: ../ui/main-window.ui.h:11
 msgid "_Send Queued Mail"
 msgstr "_Wyślij pocztę z kolejki"
 
-#: ../ui/main-window.ui.h:23
+#: ../ui/main-window.ui.h:12
 msgid "Send and _Receive Mail"
 msgstr "_Wyślij i pobierz pocztę"
 
-#: ../ui/main-window.ui.h:24 ../ui/message-window.ui.h:2
+#: ../ui/main-window.ui.h:13 ../ui/message-window.ui.h:2
 msgid "Page _Setup"
 msgstr "_Ustawienia strony"
 
-#: ../ui/main-window.ui.h:25 ../ui/message-window.ui.h:3
+#: ../ui/main-window.ui.h:14 ../ui/message-window.ui.h:3
 #: ../ui/sendmsg-window.ui.h:11
 msgid "_Print…"
 msgstr "Wy_drukuj…"
 
-#: ../ui/main-window.ui.h:27 ../ui/message-window.ui.h:6
+#: ../ui/main-window.ui.h:15
+msgid "_Address Book"
+msgstr "Książka _adresowa"
+
+#: ../ui/main-window.ui.h:16
+msgid "A_utocrypt Database"
+msgstr "Baza danych A_utocrypt"
+
+#: ../ui/main-window.ui.h:17
+msgid "Empty _Trash"
+msgstr "_Opróżnij kosz"
+
+#: ../ui/main-window.ui.h:20 ../ui/message-window.ui.h:6
 #: ../ui/sendmsg-window.ui.h:17 ../ui/source-viewer.ui.h:4
 msgid "_Copy"
 msgstr "S_kopiuj"
 
-#: ../ui/main-window.ui.h:29
+#: ../ui/main-window.ui.h:22
 msgid "Select _Thread"
 msgstr "Zaznacz _wątek"
 
-#: ../ui/main-window.ui.h:30
+#: ../ui/main-window.ui.h:23
 msgid "_Find"
 msgstr "_Znajdź"
 
-#: ../ui/main-window.ui.h:31
+#: ../ui/main-window.ui.h:24
 msgid "Find Ne_xt"
 msgstr "Z_najdź następne"
 
-#: ../ui/main-window.ui.h:32 ../ui/message-window.ui.h:8
+#: ../ui/main-window.ui.h:25 ../ui/message-window.ui.h:8
 msgid "Find in _Message"
 msgstr "Znajdź w wiado_mości"
 
-#: ../ui/main-window.ui.h:33
+#: ../ui/main-window.ui.h:26
 msgid "F_ilters…"
 msgstr "_Filtry…"
 
-#: ../ui/main-window.ui.h:34
+#: ../ui/main-window.ui.h:27
 msgid "_Export Filters…"
 msgstr "Wy_eksportuj filtry…"
 
-#: ../ui/main-window.ui.h:35 ../ui/message-window.ui.h:9
+#: ../ui/main-window.ui.h:28
+msgid "_Preferences"
+msgstr "_Preferencje"
+
+#: ../ui/main-window.ui.h:29
+msgid "_Settings…"
+msgstr "U_stawienia…"
+
+#: ../ui/main-window.ui.h:30
+msgid "_Toolbars…"
+msgstr "_Paski narzędziowe…"
+
+#: ../ui/main-window.ui.h:31
+msgid "_Identities…"
+msgstr "_Tożsamości…"
+
+#: ../ui/main-window.ui.h:32 ../ui/message-window.ui.h:9
 #: ../ui/source-viewer.ui.h:6
 msgid "_View"
 msgstr "_Widok"
 
-#: ../ui/main-window.ui.h:36
+#: ../ui/main-window.ui.h:33
 msgid "_Show Mailbox Tree"
 msgstr "_Drzewo skrzynek"
 
-#: ../ui/main-window.ui.h:37
+#: ../ui/main-window.ui.h:34
 msgid "Show Mailbox _Tabs"
 msgstr "_Karty skrzynek"
 
-#: ../ui/main-window.ui.h:38 ../ui/message-window.ui.h:10
+#: ../ui/main-window.ui.h:35 ../ui/message-window.ui.h:10
 #: ../ui/sendmsg-window.ui.h:28
 msgid "Show Too_lbar"
 msgstr "Pasek _narzędziowy"
 
-#: ../ui/main-window.ui.h:39
+#: ../ui/main-window.ui.h:36
 msgid "Show St_atus Bar"
 msgstr "P_asek stanu"
 
-#: ../ui/main-window.ui.h:40
+#: ../ui/main-window.ui.h:37
 msgid "Show _Index Filter"
 msgstr "_Filtr indeksu"
 
-#: ../ui/main-window.ui.h:41 ../ui/message-window.ui.h:11
+#: ../ui/main-window.ui.h:38 ../ui/message-window.ui.h:11
 msgid "_Wrap"
 msgstr "_Zawijanie"
 
-#: ../ui/main-window.ui.h:42 ../ui/message-window.ui.h:12
+#: ../ui/main-window.ui.h:39 ../ui/message-window.ui.h:12
 msgid "_No Headers"
 msgstr "_Bez nagłówków"
 
-#: ../ui/main-window.ui.h:43 ../ui/message-window.ui.h:13
+#: ../ui/main-window.ui.h:40 ../ui/message-window.ui.h:13
 msgid "S_elected Headers"
 msgstr "_Zaznaczone nagłówki"
 
-#: ../ui/main-window.ui.h:44 ../ui/message-window.ui.h:14
+#: ../ui/main-window.ui.h:41 ../ui/message-window.ui.h:14
 msgid "All _Headers"
 msgstr "_Wszystkie nagłówki"
 
-#: ../ui/main-window.ui.h:45
+#: ../ui/main-window.ui.h:42
 msgid "Th_read messages"
 msgstr "Wąt_ki wiadomości"
 
-#: ../ui/main-window.ui.h:46
+#: ../ui/main-window.ui.h:43
 msgid "E_xpand All"
 msgstr "_Rozwiń wszystko"
 
-#: ../ui/main-window.ui.h:47
+#: ../ui/main-window.ui.h:44
 msgid "_Collapse All"
 msgstr "_Zwiń wszystko"
 
-#: ../ui/main-window.ui.h:48 ../ui/message-window.ui.h:15
+#: ../ui/main-window.ui.h:45 ../ui/message-window.ui.h:15
 msgid "Zoom _In"
 msgstr "_Powiększ"
 
-#: ../ui/main-window.ui.h:49 ../ui/message-window.ui.h:16
+#: ../ui/main-window.ui.h:46 ../ui/message-window.ui.h:16
 msgid "Zoom _Out"
 msgstr "P_omniejsz"
 
-#: ../ui/main-window.ui.h:51 ../ui/message-window.ui.h:18
+#: ../ui/main-window.ui.h:48 ../ui/message-window.ui.h:18
 #, no-c-format
 msgid "Zoom _100%"
 msgstr "_Oryginalny rozmiar"
 
-#: ../ui/main-window.ui.h:52
+#: ../ui/main-window.ui.h:49
 msgid "Mail_box"
 msgstr "_Skrzynka"
 
-#: ../ui/main-window.ui.h:53 ../ui/message-window.ui.h:30
-msgid "Next Message"
-msgstr "Następna wiadomość"
-
-#: ../ui/main-window.ui.h:54 ../ui/message-window.ui.h:31
-msgid "Previous Message"
-msgstr "Poprzednia wiadomość"
-
-#: ../ui/main-window.ui.h:55 ../ui/message-window.ui.h:32
-msgid "Next Unread Message"
-msgstr "Następna nieprzeczytana wiadomość"
-
-#: ../ui/main-window.ui.h:56 ../ui/message-window.ui.h:33
-msgid "Next Flagged Message"
-msgstr "Następna wiadomość z etykietą"
-
-#: ../ui/main-window.ui.h:57
+#: ../ui/main-window.ui.h:50
 msgid "_Hide Messages"
 msgstr "_Ukrywanie wiadomości"
 
-#: ../ui/main-window.ui.h:58
+#: ../ui/main-window.ui.h:51
 msgid "_Deleted"
 msgstr "U_sunięte"
 
-#: ../ui/main-window.ui.h:59
+#: ../ui/main-window.ui.h:52
 msgid "Un_deleted"
 msgstr "_Odtworzone"
 
-#: ../ui/main-window.ui.h:60
+#: ../ui/main-window.ui.h:53
 msgid "_Read"
 msgstr "_Przeczytane"
 
-#: ../ui/main-window.ui.h:61
+#: ../ui/main-window.ui.h:54
 msgid "Un_read"
 msgstr "Niep_rzeczytane"
 
-#: ../ui/main-window.ui.h:63
+#: ../ui/main-window.ui.h:56
 msgid "Un_flagged"
 msgstr "Bez _etykiety"
 
-#: ../ui/main-window.ui.h:64
+#: ../ui/main-window.ui.h:57
 msgid "_Answered"
 msgstr "_Z odpowiedzią"
 
-#: ../ui/main-window.ui.h:65
+#: ../ui/main-window.ui.h:58
 msgid "Un_answered"
 msgstr "_Bez odpowiedzi"
 
-#: ../ui/main-window.ui.h:66
+#: ../ui/main-window.ui.h:59
 msgid "_Reset Filter"
 msgstr "P_rzywróć filtr"
 
-#: ../ui/main-window.ui.h:69
-msgid "E_xpunge Deleted Messages"
-msgstr "_Wyczyść usunięte wiadomości"
-
-#: ../ui/main-window.ui.h:71
-msgid "Empty _Trash"
-msgstr "_Opróżnij kosz"
-
-#: ../ui/main-window.ui.h:72
+#: ../ui/main-window.ui.h:62
 msgid "Select _Filters…"
 msgstr "_Wybierz filtry…"
 
-#: ../ui/main-window.ui.h:73
+#: ../ui/main-window.ui.h:63
 msgid "_Remove Duplicates"
 msgstr "_Usuń podwójne pliki"
 
-#: ../ui/main-window.ui.h:75 ../ui/message-window.ui.h:22
+#: ../ui/main-window.ui.h:64
+msgid "E_xpunge Deleted Messages"
+msgstr "_Wyczyść usunięte wiadomości"
+
+#: ../ui/main-window.ui.h:66 ../ui/message-window.ui.h:20
+msgid "_Message"
+msgstr "Wiado_mość"
+
+#: ../ui/main-window.ui.h:67
+msgid "_New…"
+msgstr "_Nowa…"
+
+#: ../ui/main-window.ui.h:69 ../ui/message-window.ui.h:22
 msgid "Reply to _All…"
 msgstr "Odpowiedz _wszystkim…"
 
-#: ../ui/main-window.ui.h:76 ../ui/message-window.ui.h:23
+#: ../ui/main-window.ui.h:70 ../ui/message-window.ui.h:23
 msgid "Reply to _Group…"
 msgstr "Odpowiedz g_rupie…"
 
-#: ../ui/main-window.ui.h:80 ../ui/message-window.ui.h:26
+#: ../ui/main-window.ui.h:74 ../ui/message-window.ui.h:26
 msgid "_Next Part"
 msgstr "_Następna część"
 
-#: ../ui/main-window.ui.h:81 ../ui/message-window.ui.h:27
+#: ../ui/main-window.ui.h:75 ../ui/message-window.ui.h:27
 msgid "_Previous Part"
 msgstr "_Poprzednia część"
 
-#: ../ui/main-window.ui.h:82 ../ui/message-window.ui.h:28
+#: ../ui/main-window.ui.h:76 ../ui/message-window.ui.h:28
 msgid "Save Current Part…"
 msgstr "Zapisz bieżącą część…"
 
-#: ../ui/main-window.ui.h:83 ../ui/message-window.ui.h:29
+#: ../ui/main-window.ui.h:77 ../ui/message-window.ui.h:29
 msgid "_View Source…"
 msgstr "_Wyświetl źródło…"
 
-#: ../ui/main-window.ui.h:84 ../ui/source-viewer.ui.h:5
+#: ../ui/main-window.ui.h:78 ../ui/source-viewer.ui.h:5
 msgid "_Select Text"
 msgstr "_Zaznacz tekst"
 
-#: ../ui/main-window.ui.h:85 ../ui/message-window.ui.h:34
+#: ../ui/main-window.ui.h:79 ../ui/message-window.ui.h:34
 msgid "_Move to Trash"
 msgstr "_Przenieś do kosza"
 
-#: ../ui/main-window.ui.h:86
+#: ../ui/main-window.ui.h:80
 msgid "_Toggle Flag"
 msgstr "_Przełącz etykietę"
 
-#: ../ui/main-window.ui.h:87
+#: ../ui/main-window.ui.h:81
 msgid "_New"
-msgstr "_Nowe"
+msgstr "_Nowa"
+
+#: ../ui/main-window.ui.h:83
+msgid "_Go"
+msgstr "P_rzejdź"
+
+#: ../ui/main-window.ui.h:84 ../ui/message-window.ui.h:30
+msgid "Next Message"
+msgstr "Następna wiadomość"
+
+#: ../ui/main-window.ui.h:85 ../ui/message-window.ui.h:31
+msgid "Previous Message"
+msgstr "Poprzednia wiadomość"
+
+#: ../ui/main-window.ui.h:86 ../ui/message-window.ui.h:32
+msgid "Next Unread Message"
+msgstr "Następna nieprzeczytana wiadomość"
+
+#: ../ui/main-window.ui.h:87 ../ui/message-window.ui.h:33
+msgid "Next Flagged Message"
+msgstr "Następna wiadomość z etykietą"
+
+#: ../ui/main-window.ui.h:89
+msgid "_Contents"
+msgstr "_Spis treści"
+
+#: ../ui/main-window.ui.h:90
+msgid "_About Balsa"
+msgstr "_O programie"
 
 #: ../ui/sendmsg-window.ui.h:2
 msgid "_Include File…"

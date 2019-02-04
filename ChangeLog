@@ -1,3 +1,12 @@
+2019-02-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Restore running the address book editor
+
+	* src/meson.build: build the editor with the correct name:
+	"balsa-ab", not "balsa_ab";
+	* ui/balsa-ab.gresource.xml: use the correct prefix:
+	"/org/desktop/BalsaAb", not "/org/desktop/Balsa".
+
 2018-01-30  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	LDAP address book: use all email attributes

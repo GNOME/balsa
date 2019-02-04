@@ -114,7 +114,7 @@ balsa_ab_sources = [
   'address-book-config.c'
   ]
 
-executable('balsa_ab', balsa_ab_sources, balsa_ab_resources,
+executable('balsa-ab', balsa_ab_sources, balsa_ab_resources,
            dependencies        : balsa_ab_deps,
            include_directories : [top_include, libbalsa_include],
            link_with           : libbalsa_a,

@@ -1,3 +1,10 @@
+2019-02-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* meson_options.txt: make 'autocrypt' a boolean option, default
+	false;
+	* meson.build: rename 'autocryptcfg' to 'autocrypt', since it is
+	now boolean.
+
 2019-02-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Restore running the address book editor

@@ -489,10 +489,14 @@ append_url_if_open(const gchar * group, const gchar * encoded_url,
 
     url = libbalsa_urldecode(encoded_url);
 
-    if (config_mailbox_was_open(url))
-        g_ptr_array_add(array, url);
-    else
+    if (config_mailbox_was_open(url)) {
+        gint position;
+
+        position = config_mailbox_get_position(url);
+        g_ptr_array_insert(array, position, url);
+    } else {
         g_free(url);
+    }
 
     return FALSE;
 }

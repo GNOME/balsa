@@ -1,3 +1,22 @@
+2019-02-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Remember and restore the order of open mailboxes between
+	sessions.
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_set_open): set the
+	position to the unset value, -1, when a mailbox is closed;
+	(libbalsa_mailbox_set_position): new method;
+	(libbalsa_mailbox_get_position): ditto;
+	* libbalsa/mailbox.h: new methods.
+	* src/balsa-app.c (append_url_if_open): use the saved position
+	of a mailbox when added it to the window;
+	* src/main-window.c (balsa_window_new),
+	(bw_real_open_mbnode_idle_cb), (bw_notebook_page_notify_cb):
+	* src/save-restore.c (config_load_mailbox_view),
+	(config_save_mailbox_view), (config_mailbox_was_exposed),
+	(config_mailbox_get_int_property), (config_mailbox_get_position):
+	save and restore it.
+
 2019-02-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* meson_options.txt: make 'autocrypt' a boolean option, default

@@ -1783,6 +1783,9 @@ config_load_mailbox_view(const gchar * url)
     if (libbalsa_conf_has_key("Open"))
         view->open = libbalsa_conf_get_bool("Open");
 
+    if (libbalsa_conf_has_key("Position"))
+        view->position = libbalsa_conf_get_bool("Position");
+
 #ifdef HAVE_GPGME
     if (libbalsa_conf_has_key("CryptoMode"))
         view->gpg_chk_mode = libbalsa_conf_get_int("CryptoMode");
@@ -1836,9 +1839,12 @@ config_save_mailbox_view(const gchar * url, LibBalsaMailboxView * view)
 	libbalsa_conf_set_int("Subscribe",   view->subscribe);
     if (view->exposed        != libbalsa_mailbox_get_exposed(NULL))
 	libbalsa_conf_set_bool("Exposed",    view->exposed);
-    if (balsa_app.remember_open_mboxes &&
-        view->open           != libbalsa_mailbox_get_open(NULL))
-	libbalsa_conf_set_bool("Open",       view->open);
+    if (balsa_app.remember_open_mboxes) {
+        if (view->open       != libbalsa_mailbox_get_open(NULL))
+            libbalsa_conf_set_bool("Open",   view->open);
+        if (view->position   != libbalsa_mailbox_get_position(NULL))
+            libbalsa_conf_set_int("Position", view->position);
+    }
 #ifdef HAVE_GPGME
     if (view->gpg_chk_mode   != libbalsa_mailbox_get_crypto_mode(NULL))
 	libbalsa_conf_set_int("CryptoMode",  view->gpg_chk_mode);
@@ -2110,4 +2116,33 @@ gboolean
 config_mailbox_was_exposed(const gchar * url)
 {
     return config_mailbox_had_property(url, "Exposed");
+}
+
+static gint
+config_mailbox_get_int_property(const gchar * url, const gchar * key)
+{
+    gchar *prefix;
+    gint retval = -1;
+
+    prefix = view_by_url_prefix(url);
+    if (!libbalsa_conf_has_group(prefix)) {
+        g_free(prefix);
+        return retval;
+    }
+
+    libbalsa_conf_push_group(prefix);
+
+    if (libbalsa_conf_has_key(key))
+        retval = libbalsa_conf_get_int(key);
+
+    libbalsa_conf_pop_group();
+    g_free(prefix);
+
+    return retval;
+}
+
+gint
+config_mailbox_get_position(const gchar * url)
+{
+    return config_mailbox_get_int_property(url, "Position");
 }

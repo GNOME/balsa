@@ -1784,7 +1784,7 @@ config_load_mailbox_view(const gchar * url)
         view->open = libbalsa_conf_get_bool("Open");
 
     if (libbalsa_conf_has_key("Position"))
-        view->position = libbalsa_conf_get_bool("Position");
+        view->position = libbalsa_conf_get_int("Position");
 
 #ifdef HAVE_GPGME
     if (libbalsa_conf_has_key("CryptoMode"))

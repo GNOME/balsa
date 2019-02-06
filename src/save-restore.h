@@ -65,7 +65,6 @@ void config_save_mailbox_view(const gchar * url, LibBalsaMailboxView * view);
 
 gboolean config_mailbox_was_open(const gchar * url);
 gboolean config_mailbox_was_exposed(const gchar * url);
-gint config_mailbox_get_position(const gchar * url);
 
 void config_filters_save(void);
 void config_mailbox_filters_save(LibBalsaMailbox * mbox);

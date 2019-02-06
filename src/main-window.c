@@ -171,9 +171,6 @@ static gboolean bw_notebook_drag_motion_cb(GtkWidget* widget,
                                            GdkDragContext* context,
                                            gint x, gint y, guint time,
                                            gpointer user_data);
-static void bw_notebook_page_notify_cb(GtkWidget  *child,
-                                       GParamSpec *child_property,
-                                       gpointer    user_data);
 
 
 static GtkWidget *bw_notebook_label_new (BalsaMailboxNode* mbnode);
@@ -2138,7 +2135,6 @@ balsa_window_new(GtkApplication *application)
 #endif
     GtkAdjustment *hadj, *vadj;
     GAction *action;
-    GtkWidget *notebook;
 
     /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
      * - allows for grey out */
@@ -2190,24 +2186,23 @@ balsa_window_new(GtkApplication *application)
 
     geometry_manager_attach(GTK_WINDOW(window), "MainWindow");
 
-    window->notebook = notebook = gtk_notebook_new();
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(notebook),
+    window->notebook = gtk_notebook_new();
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook),
                                balsa_app.show_notebook_tabs);
-    gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), FALSE);
-    gtk_notebook_set_scrollable(GTK_NOTEBOOK (notebook), TRUE);
-    g_signal_connect(notebook, "switch_page",
+    gtk_notebook_set_show_border (GTK_NOTEBOOK(window->notebook), FALSE);
+    gtk_notebook_set_scrollable (GTK_NOTEBOOK (window->notebook), TRUE);
+    g_signal_connect(G_OBJECT(window->notebook), "switch_page",
                      G_CALLBACK(bw_notebook_switch_page_cb), window);
-    gtk_drag_dest_set(notebook, GTK_DEST_DEFAULT_ALL,
+    gtk_drag_dest_set (GTK_WIDGET (window->notebook), GTK_DEST_DEFAULT_ALL,
                        notebook_drop_types, NUM_DROP_TYPES,
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
-    g_signal_connect(notebook, "drag-data-received",
+    g_signal_connect(G_OBJECT (window->notebook), "drag-data-received",
                      G_CALLBACK (bw_notebook_drag_received_cb), NULL);
-    g_signal_connect(notebook, "drag-motion",
+    g_signal_connect(G_OBJECT (window->notebook), "drag-motion",
                      G_CALLBACK (bw_notebook_drag_motion_cb), NULL);
-
-    balsa_app.notebook = notebook;
-    g_object_add_weak_pointer(G_OBJECT(notebook),
-			      (gpointer *) &balsa_app.notebook);
+    balsa_app.notebook = window->notebook;
+    g_object_add_weak_pointer(G_OBJECT(window->notebook),
+			      (gpointer) &balsa_app.notebook);
 
     window->preview = balsa_message_new();
     gtk_widget_hide(window->preview);
@@ -2825,8 +2820,6 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
                                    GTK_POLICY_AUTOMATIC);
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(index));
     gtk_widget_show(scroll);
-    g_signal_connect(scroll, "child-notify::position",
-                     G_CALLBACK(bw_notebook_page_notify_cb), window->notebook);
     page_num = gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook),
                                         scroll, label);
     gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(window->notebook),
@@ -4354,22 +4347,6 @@ static gboolean bw_notebook_drag_motion_cb(GtkWidget * widget,
                     GDK_ACTION_MOVE, time);
 
     return FALSE;
-}
-
-static void
-bw_notebook_page_notify_cb(GtkWidget  *child,
-                           GParamSpec *child_property,
-                           gpointer    user_data)
-{
-    GtkNotebook *notebook = user_data;
-    BalsaIndex *bindex;
-    LibBalsaMailbox *mailbox;
-    gint page_num;
-
-    page_num = gtk_notebook_page_num(notebook, child);
-    bindex = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(child)));
-    mailbox = bindex->mailbox_node->mailbox;
-    libbalsa_mailbox_set_position(mailbox, page_num);
 }
 
 /* bw_progress_timeout

@@ -231,6 +231,37 @@
 	* libbalsa/mailbox_pop3.c: Do not leak the filter-cmd
 	* libbalsa/address-book-rubrica.c: Do not leak the completion
 
+2019-02-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Preserve tab order of open mailboxes across instances (#12)
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_set_position),
+	  (libbalsa_mailbox_get_position): manage the mailbox's position
+	  in the notebook;
+	  (libbalsa_mailbox_set_open): unset the position when the
+	  mailbox is closed;
+	* libbalsa/mailbox.h: new member 'position';
+	* libbalsa/mailbox_local.c (lbml_set_threading): guard against
+	  NULL msg_tree;
+	* src/balsa-app.c (position_compare_func),
+	  (balsa_add_open_mailbox_urls): sort the mailboxes to be opened
+	  by their position in the last instance;
+	* src/balsa-app.h: new member 'gboolean in_destruction';
+	* src/balsa-index.c (bndx_destroy), (bndx_selection_changed),
+	  (balsa_index_load_mailbox_node): take a strong ref on the
+	  BalsaMailboxNode instead of a weak ref;
+	* src/mailbox-node.c (balsa_mailbox_node_dispose): do not bother
+	  to close the mbnode;
+	* src/main-window.c (bw_notebook_page_notify_cb): callback for
+	  the "child-notify::position" signal;
+	  (bw_real_open_mbnode_idle_cb): connect to it;
+	  (balsa_window_destroy): set 'in_destruction';
+	* src/save-restore.c (config_load_mailbox_view),
+	  (config_save_mailbox_view): save and restore positions;
+	  (config_mailbox_get_int_property),
+	  (config_mailbox_get_position): new functions to get position;
+	* src/save-restore.h: new API.
+
 2019-02-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* meson_options.txt: make 'autocrypt' a boolean option, default

@@ -171,6 +171,9 @@ static gboolean bw_notebook_drag_motion_cb(GtkWidget* widget,
                                            GdkDragContext* context,
                                            gint x, gint y, guint time,
                                            gpointer user_data);
+static void bw_notebook_page_notify_cb(GtkWidget  *child,
+                                       GParamSpec *child_property,
+                                       gpointer    user_data);
 
 
 static GtkWidget *bw_notebook_label_new (BalsaMailboxNode* mbnode);
@@ -2820,6 +2823,8 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
                                    GTK_POLICY_AUTOMATIC);
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(index));
     gtk_widget_show(scroll);
+    g_signal_connect(scroll, "child-notify::position",
+                     G_CALLBACK(bw_notebook_page_notify_cb), window->notebook);
     page_num = gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook),
                                         scroll, label);
     gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(window->notebook),
@@ -3088,8 +3093,8 @@ balsa_window_destroy(GObject * object)
         window->network_changed_source_id = 0;
     }
 
-    if (G_OBJECT_CLASS(balsa_window_parent_class)->dispose != NULL)
-        G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
+    balsa_app.in_destruction = TRUE;
+    G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
 
     balsa_unregister_pixmaps();
 }
@@ -4348,6 +4353,28 @@ static gboolean bw_notebook_drag_motion_cb(GtkWidget * widget,
                     GDK_ACTION_MOVE, time);
 
     return FALSE;
+}
+
+static void
+bw_notebook_page_notify_cb(GtkWidget  *widget,
+                           GParamSpec *child_property,
+                           gpointer    notebook)
+{
+    GtkWidget *child;
+
+    if (balsa_app.in_destruction)
+        return;
+
+    child = gtk_bin_get_child(GTK_BIN(widget));
+
+    if (child != NULL) {
+        LibBalsaMailbox *mailbox;
+        gint page_num;
+
+        mailbox = BALSA_INDEX(child)->mailbox_node->mailbox;
+        page_num = gtk_notebook_page_num(notebook, widget);
+        libbalsa_mailbox_set_position(mailbox, page_num);
+    }
 }
 
 /* bw_progress_timeout

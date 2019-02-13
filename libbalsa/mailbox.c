@@ -2565,7 +2565,7 @@ libbalsa_mailbox_set_position(LibBalsaMailbox * mailbox, gint position)
     view->used = 1;
 
     if (view->position != position) {
-	view->position = position;
+        view->position = position;
         view->in_sync = 0;
     }
 }
@@ -2687,8 +2687,8 @@ libbalsa_mailbox_get_mtime(LibBalsaMailbox * mailbox)
 gint
 libbalsa_mailbox_get_position(LibBalsaMailbox * mailbox)
 {
-    return (mailbox && mailbox->view) ?
-	mailbox->view->position : libbalsa_mailbox_view_default.position;
+    return (mailbox != NULL && mailbox->view != NULL) ?
+        mailbox->view->position : libbalsa_mailbox_view_default.position;
 }
 
 /* End of get methods. */

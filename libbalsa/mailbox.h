@@ -184,7 +184,7 @@ struct _LibBalsaMailboxView {
     int unread;
     int total;
     time_t mtime;       /* Mailbox mtime when counts were cached. */
-    gint position;      /* Position in the notebook */
+    int position;       /* Position in the notebook */
 };
 
 struct _LibBalsaMailbox {

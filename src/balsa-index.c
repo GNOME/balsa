@@ -199,6 +199,13 @@ bndx_class_init(BalsaIndexClass * klass)
 }
 
 /* Object class destroy method. */
+static void
+bndx_mbnode_weak_notify(gpointer data, GObject *where_the_object_was)
+{
+    BalsaIndex *bindex = data;
+    bindex->mailbox_node = NULL;
+    gtk_widget_destroy(GTK_WIDGET(bindex));
+}
 
 static void
 bndx_destroy(GObject * obj)
@@ -208,23 +215,22 @@ bndx_destroy(GObject * obj)
     g_return_if_fail(obj != NULL);
     index = BALSA_INDEX(obj);
 
-    if (index->mailbox_node != NULL) {
-        LibBalsaMailbox *mailbox;
+    if (index->mailbox_node) {
+	LibBalsaMailbox* mailbox;
 
-        mailbox = index->mailbox_node->mailbox;
-        if (mailbox != NULL)
-            g_object_ref(mailbox);
+	if ((mailbox = index->mailbox_node->mailbox)) {
+	    g_signal_handlers_disconnect_matched(mailbox,
+						 G_SIGNAL_MATCH_DATA,
+						 0, 0, NULL, NULL, index);
+	    gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
+	    libbalsa_mailbox_close(mailbox, balsa_app.expunge_on_close);
+	}
 
-        g_object_unref(index->mailbox_node);
-        index->mailbox_node = NULL;
-
-        if (mailbox != NULL) {
-            g_signal_handlers_disconnect_matched(mailbox,
-                                                 G_SIGNAL_MATCH_DATA,
-                                                 0, 0, NULL, NULL, index);
-            gtk_tree_view_set_model(GTK_TREE_VIEW(index), NULL);
-            libbalsa_mailbox_close(mailbox, balsa_app.expunge_on_close);
-            g_object_unref(mailbox);
+	if (index->mailbox_node) {
+            g_object_weak_unref(G_OBJECT(index->mailbox_node),
+                                (GWeakNotify) bndx_mbnode_weak_notify,
+                                index);
+            index->mailbox_node = NULL;
         }
     }
 
@@ -238,10 +244,10 @@ bndx_destroy(GObject * obj)
         index->popup_menu = NULL;
     }
 
-    g_free(index->filter_string);
-    index->filter_string = NULL;
+    g_free(index->filter_string); index->filter_string = NULL;
 
-    G_OBJECT_CLASS(parent_class)->dispose(obj);
+    if (G_OBJECT_CLASS(parent_class)->dispose)
+        (*G_OBJECT_CLASS(parent_class)->dispose) (obj);
 }
 
 /* Widget class popup menu method. */
@@ -555,9 +561,6 @@ bndx_selection_changed_func(GtkTreeModel * model, GtkTreePath * path,
 static void
 bndx_selection_changed(GtkTreeSelection * selection, BalsaIndex * index)
 {
-    if (index->mailbox_node == NULL)
-        return;
-
     index->next_msgno = 0;
     gtk_tree_selection_selected_foreach(selection,
                                         (GtkTreeSelectionForeachFunc)
@@ -963,8 +966,9 @@ balsa_index_load_mailbox_node(BalsaIndex * index,
     /*
      * set the new mailbox
      */
-    index->mailbox_node = g_object_ref(mbnode);
-
+    index->mailbox_node = mbnode;
+    g_object_weak_ref(G_OBJECT(mbnode),
+                      (GWeakNotify) bndx_mbnode_weak_notify, index);
     /*
      * rename "from" column to "to" for outgoing mail
      */

@@ -856,6 +856,11 @@ balsa_message_destroy(GObject * object)
     }
 #endif                          /* HAVE_HTML_WIDGET */
 
+    if (bm->bm_widget) {
+	g_object_unref(bm->bm_widget);
+	bm->bm_widget = NULL;
+    }
+
     if (G_OBJECT_CLASS(parent_class)->dispose)
         (*G_OBJECT_CLASS(parent_class)->dispose) (object);
 }

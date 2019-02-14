@@ -94,10 +94,7 @@ balsa_mime_widget_init (GTypeInstance *instance, gpointer g_class)
 static void
 balsa_mime_widget_class_init(BalsaMimeWidgetClass * klass)
 {
-    GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
     parent_class = g_type_class_ref(G_TYPE_OBJECT);
-    object_class->finalize = balsa_mime_widget_destroy;
 }
 
 
@@ -198,23 +195,6 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
     g_free(content_type);
 
     return mw;
-}
-
-
-void
-balsa_mime_widget_destroy(GObject * object)
-{
-    BalsaMimeWidget * mime_widget = BALSA_MIME_WIDGET(object);
-
-    if (mime_widget->container && mime_widget->container != mime_widget->widget)
-	gtk_widget_destroy(mime_widget->container);
-    mime_widget->container = NULL;
-    if (mime_widget->widget) {
-        g_object_unref(mime_widget->widget);
-        mime_widget->widget = NULL;
-    }
-
-    G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 

@@ -68,7 +68,6 @@ GType balsa_mime_widget_get_type (void);
 BalsaMimeWidget *balsa_mime_widget_new(BalsaMessage * bm,
 				       LibBalsaMessageBody * mime_body,
 				       gpointer data);
-void balsa_mime_widget_destroy(GObject * object);
 void balsa_mime_widget_schedule_resize(GtkWidget * widget);
 
 

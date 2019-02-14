@@ -435,6 +435,10 @@ balsa_app_destroy(void)
     g_list_free(balsa_app.identities);
     balsa_app.identities = NULL;
 
+    g_list_foreach(balsa_app.inbox_input, (GFunc)g_object_unref, NULL);
+    g_list_free(balsa_app.inbox_input);
+    balsa_app.inbox_input = NULL;
+
 
     g_list_foreach(balsa_app.folder_mru, (GFunc)g_free, NULL);
     g_list_free(balsa_app.folder_mru);

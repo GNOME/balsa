@@ -135,8 +135,10 @@ static void
 libbalsa_mailbox_pop3_finalize(GObject * object)
 {
     LibBalsaMailboxRemote *remote = LIBBALSA_MAILBOX_REMOTE(object);
+    LibBalsaMailboxPop3 *mailbox = LIBBALSA_MAILBOX_POP3(object);
 
     g_object_unref(G_OBJECT(remote->server));
+    g_free(mailbox->filter_cmd);
 
     if (G_OBJECT_CLASS(parent_class)->finalize)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -750,6 +752,7 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
     pop->disable_apop = libbalsa_conf_get_bool("DisableApop=false");
     pop->enable_pipe = libbalsa_conf_get_bool("EnablePipe=false");
     pop->filter = libbalsa_conf_get_bool("Filter=false");
+    g_free(pop->filter_cmd);
     pop->filter_cmd = libbalsa_conf_get_string("FilterCmd");
     if(pop->filter_cmd && *pop->filter_cmd == '\0') {
 	g_free(pop->filter_cmd); pop->filter_cmd = NULL;

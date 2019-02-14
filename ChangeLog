@@ -1,3 +1,13 @@
+2019-02-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Plug some memory leaks
+
+	* src/balsa-mime-widget.[ch]: No need for a 'finalize' method
+	* src/balsa-message.c: Unref the BalsaMimeWidget
+	* src/balsa-app.c: Unref the POP3 mailboxes and free the list
+	* libbalsa/mailbox_pop3.c: Do not leak the filter-cmd
+	* libbalsa/address-book-rubrica.c: Do not leak the completion
+
 2019-02-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* meson_options.txt: make 'autocrypt' a boolean option, default

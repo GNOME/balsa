@@ -127,6 +127,8 @@ libbalsa_address_book_rubrica_init(LibBalsaAddressBookRubrica * ab_rubrica)
     ab_text->item_list = NULL;
     ab_text->mtime = 0;
 
+    if (ab_text->name_complete != NULL)
+        libbalsa_completion_free(ab_text->name_complete);
     ab_text->name_complete =
         libbalsa_completion_new((LibBalsaCompletionFunc)
                                 completion_data_extract);

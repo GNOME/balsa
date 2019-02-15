@@ -2247,7 +2247,8 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
        LIBBALSA_MESSAGE_GET_LENGTH(message)<8192 ||
        (message->headers &&
         (!message->headers->content_type ||
-         g_mime_content_type_is_type(message->headers->content_type, "text", "*"))) ){
+         !g_mime_content_type_is_type(message->headers->content_type,
+                                      "multipart", "*"))) ){
         /* we could optimize this part a little bit: we do not need to
          * keep reopening the stream. */
         GMimeStream *stream = 

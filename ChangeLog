@@ -1,3 +1,11 @@
+2019-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix broken decryption of s/mime messages loaded from imap
+
+	* libbalsa/mailbox_imap.c
+	(libbalsa_mailbox_imap_fetch_structure): fetch part if it is not
+	multipart/*, instead of only fetching text/*.
+
 2018-02-15  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Printing of HTML message parts

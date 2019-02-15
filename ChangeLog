@@ -1,3 +1,9 @@
+2019-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/mailbox-node.c (balsa_mailbox_node_dispose): now that we
+	unref POP3 mailboxes, which do not need to be saved in the
+	config file, we must not try to save them.
+
 2019-02-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Plug some memory leaks

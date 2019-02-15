@@ -193,11 +193,12 @@ balsa_mailbox_node_dispose(GObject * object)
     LibBalsaMailbox *mailbox = mn->mailbox;
 
     if (mailbox) {
-        libbalsa_mailbox_set_open(mailbox,
-                                  libbalsa_mailbox_is_open(mailbox));
-        config_save_mailbox_view(mailbox->url, mailbox->view);
-	if (balsa_app.main_window)
-	    balsa_window_close_mbnode(balsa_app.main_window, mn);
+        if (!LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
+            libbalsa_mailbox_set_open(mailbox, libbalsa_mailbox_is_open(mailbox));
+            config_save_mailbox_view(mailbox->url, mailbox->view);
+            if (balsa_app.main_window != NULL)
+                balsa_window_close_mbnode(balsa_app.main_window, mn);
+        }
 	g_object_unref(mailbox);
 	mn->mailbox = NULL;
     }

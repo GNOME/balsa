@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2016 Stuart Parmenter and others
- * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
+ * Copyright (C) 1997-2019 Stuart Parmenter and others
+ * Written by (C) Albrecht Dre√ü <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,11 @@ typedef struct {
 
     gint page_count;
     guint curr_depth;
+
+    /* note: the following two fields are relevant only if HTML support is enabled;
+     * don't hide them for code simplicity even if HTML support is disabled */
+    gboolean print_alt_html;	/* print text/html in multipart/alternative */
+    gboolean html_load_images;	/* load external images when printing text/html */
 } BalsaPrintSetup;
 
 

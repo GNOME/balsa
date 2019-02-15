@@ -78,6 +78,8 @@ balsa_print_source = print-gtk.c	\
 	balsa-print-object-default.h	\
 	balsa-print-object-header.c	\
 	balsa-print-object-header.h	\
+	balsa-print-object-html.c	\
+	balsa-print-object-html.h	\
 	balsa-print-object-image.c	\
 	balsa-print-object-image.h	\
 	balsa-print-object-text.c	\

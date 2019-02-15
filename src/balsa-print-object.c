@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2016 Stuart Parmenter and others
+ * Copyright (C) 1997-2019 Stuart Parmenter and others
  * Written by (C) Albrecht Dreß <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
@@ -32,6 +32,7 @@
 #include "balsa-print-object-header.h"
 #include "balsa-print-object-image.h"
 #include "balsa-print-object-text.h"
+#include "balsa-print-object-html.h"
 
 
 /* object related functions */
@@ -138,7 +139,7 @@ balsa_print_objects_append_from_body(GList * list,
         GList * (*handler)(GList *, GtkPrintContext *, LibBalsaMessageBody *,
                            BalsaPrintSetup *);
     } pr_handlers[] = {
-        { "text/html",                     -1, balsa_print_object_default },
+        { "text/html",                     -1, balsa_print_object_html },
         { "text/enriched",                 -1, balsa_print_object_default },
         { "text/richtext",                 -1, balsa_print_object_default },
         { "text/x-vcard",                  -1, balsa_print_object_text_vcard },

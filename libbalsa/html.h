@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2016 Stuart Parmenter and others,
+ * Copyright (C) 1997-2019 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -72,6 +72,10 @@ GtkWidget *libbalsa_html_get_view_widget(GtkWidget * widget);
 
 gboolean libbalsa_html_can_print(GtkWidget * widget);
 void libbalsa_html_print(GtkWidget * widget);
+cairo_surface_t *libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
+						   	   	   	   	    gdouble			 	 width,
+											gboolean 			 load_external_images)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 # endif				/* HAVE_HTML_WIDGET */
 

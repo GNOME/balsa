@@ -1,3 +1,21 @@
+2018-02-15  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Printing of HTML message parts
+
+	* libbalsa/html.[ch]: implement function for rendering to a
+	Cairo surface; refactor for extracting common code
+	* src/balsa-print-object-html.[ch]: implement printing the HTML
+	Cairo surface (new module)
+	* src/Makefile.am, src/meson.build: add new module
+	* src/balsa-print-object.c: use the new module for HTML (falls
+	back to default if built w/o HTML support)
+	* src/balsa-print-object.h: add the “volatile” HTML printing
+	options to BalsaPrintSetup
+	* src/print-gtk.c: refactor print dialogue to use GtkGrid;
+	add new options; add function for selecting the proper part
+	from multipart/alternative
+	* src/balsa-print-object-html.[ch]: new files
+
 2019-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/mailbox-node.c (balsa_mailbox_node_dispose): now that we

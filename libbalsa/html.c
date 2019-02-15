@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2016 Stuart Parmenter and others,
+ * Copyright (C) 1997-2019 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,16 @@
 #  undef G_LOG_DOMAIN
 #endif
 #define G_LOG_DOMAIN "html"
+
+
+#define CID_REGEX	"<[^>]*src\\s*=\\s*['\"]?\\s*cid:"
+#define SRC_REGEX	"<[^>]*src\\s*=\\s*['\"]?\\s*[^c][^i][^d][^:]"
+
+/* approximate image resolution for printing */
+#define HTML_PRINT_DPI			200.0
+/* zoom level for printing */
+#define HTML_PRINT_ZOOM			2.0
+
 
 /*
  * lbh_get_body_content
@@ -150,6 +160,10 @@ typedef struct {
     LibBalsaHtmlSearchCallback search_cb;
     gpointer                   search_cb_data;
     gchar                    * search_text;
+    /* stuff used for printing only */
+    gboolean              webprocess_error;
+	cairo_surface_t      *surface;
+	volatile gint         screenshot_done;
 } LibBalsaWebKitInfo;
 
 #define LIBBALSA_HTML_INFO "libbalsa-webkit2-info"
@@ -190,6 +204,8 @@ lbh_get_body_content_utf8(LibBalsaMessageBody  * body,
 
 /*
  * GDestroyNotify func
+ *
+ * Note: do *not* destroy the surface in this function!
  */
 static void
 lbh_webkit_info_free(LibBalsaWebKitInfo * info)
@@ -480,6 +496,7 @@ lbh_web_process_terminated_cb(WebKitWebView                     *web_view,
                	   	   	   	  WebKitWebProcessTerminationReason  reason,
 							  gpointer                           user_data)
 {
+    LibBalsaWebKitInfo *info = (LibBalsaWebKitInfo *) user_data;
 	const gchar *reason_str;
 
 	switch (reason) {
@@ -494,16 +511,19 @@ lbh_web_process_terminated_cb(WebKitWebView                     *web_view,
 		break;
 	}
 	g_warning("webkit process terminated abnormally: %s", reason_str);
+	info->webprocess_error = TRUE;
 }
 #else
 /*
  * Callback for the "web-process-crashed" signal
  */
 static gboolean
-lbh_web_process_crashed_cb(WebKitWebView * web_view,
-                           gpointer        data)
+lbh_web_process_crashed_cb(WebKitWebView          *web_view,
+                           gpointer 			   data)
 {
+    LibBalsaWebKitInfo *info = (LibBalsaWebKitInfo *) data;
     g_debug("%s", __func__);
+	info->webprocess_error = TRUE;
     return FALSE;
 }
 #endif
@@ -568,56 +588,28 @@ lbh_context_menu_cb(WebKitWebView       * web_view,
     return retval;
 }
 
-/* Create a new WebKitWebView widget:
- * body 		LibBalsaMessageBody that belongs to the
- *                      LibBalsaMessage from which to extract any
- *			HTML objects (by url);
- * hover_cb             callback for link-hover signal;
- * clicked_cb	        callback for the "link-clicked" signal;
- */
-
-GtkWidget *
-libbalsa_html_new(LibBalsaMessageBody * body,
-                  LibBalsaHtmlCallback  hover_cb,
-                  LibBalsaHtmlCallback  clicked_cb)
+static WebKitWebView *
+lbh_web_view_new(LibBalsaWebKitInfo *info,
+				 gint				 width,
+				 gint				 height,
+				 gboolean            auto_load_images)
 {
-    gchar *text;
-    gssize len;
-    GtkWidget *widget;
-    GtkWidget *vbox;
-    WebKitWebView *web_view;
-    static LibBalsaWebKitInfo *info;
-    static gboolean have_registered_cid = FALSE;
-    WebKitSettings *settings;
-    static const gchar cid_regex[] =
-        "<[^>]*src\\s*=\\s*['\"]?\\s*cid:";
-    static const gchar src_regex[] =
-        "<[^>]*src\\s*=\\s*['\"]?\\s*[^c][^i][^d][^:]";
-    gboolean have_src_cid;
-    gboolean have_src_oth;
+	WebKitWebView *view;
+	WebKitSettings *settings;
+	static guint have_registered_cid = 0U;
 
-    len = lbh_get_body_content_utf8(body, &text);
-    if (len < 0)
-        return NULL;
+	view = WEBKIT_WEB_VIEW(webkit_web_view_new());
+    g_object_set_data_full(G_OBJECT(view), LIBBALSA_HTML_INFO, info, (GDestroyNotify) lbh_webkit_info_free);
+    gtk_widget_set_size_request(GTK_WIDGET(view), width, height);
 
-    info = g_new(LibBalsaWebKitInfo, 1);
-    info->body            = body;
-    info->hover_cb        = hover_cb;
-    info->clicked_cb      = clicked_cb;
-    info->info_bar        = NULL;
-    info->uri             = NULL;
-    info->search_text     = NULL;
+	settings = webkit_web_view_get_settings(view);
+    webkit_settings_set_enable_plugins(settings, FALSE);
+    webkit_settings_set_enable_javascript(settings, FALSE);
+	webkit_settings_set_enable_java(settings, FALSE);
+	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);
+	webkit_settings_set_auto_load_images(settings, auto_load_images);
 
-    widget = webkit_web_view_new();
-    /* WebkitWebView is uncontrollably scrollable, so if we don't set a
-     * minimum size it may be just a few pixels high. */
-    gtk_widget_set_size_request(widget, -1, 200);
-
-    info->web_view = web_view = WEBKIT_WEB_VIEW(widget);
-    g_object_set_data_full(G_OBJECT(web_view), LIBBALSA_HTML_INFO, info,
-                           (GDestroyNotify) lbh_webkit_info_free);
-
-    if (!have_registered_cid) {
+	if (g_atomic_int_or(&have_registered_cid, 1U) == 0U) {
         WebKitWebContext *context;
         /* Apparently, WebKitWebContext is static, and does not like to
          * have the scheme registered many times (13? 15?), after which
@@ -625,42 +617,159 @@ libbalsa_html_new(LibBalsaMessageBody * body,
          * We register it once with the address of a static pointer to
          * LibBalsaWebKitInfo. */
 
-        context = webkit_web_view_get_context(web_view);
-        webkit_web_context_register_uri_scheme(context, "cid", lbh_cid_cb,
-                                               &info, NULL);
-        have_registered_cid = TRUE;
-        g_debug("%s registered cid: scheme", __func__);
+        context = webkit_web_view_get_context(view);
+        webkit_web_context_register_uri_scheme(context, "cid", lbh_cid_cb, &info, NULL);
+        g_debug("%s_ registered “cid:” scheme", __func__);
+	}
+
+#if WEBKIT_CHECK_VERSION(2,20,0)
+	g_signal_connect(view, "web-process-terminated", G_CALLBACK(lbh_web_process_terminated_cb), info);
+#else
+	g_signal_connect(view, "web-process-crashed", G_CALLBACK(lbh_web_process_crashed_cb), info);
+#endif
+    g_signal_connect(view, "decide-policy", G_CALLBACK(lbh_decide_policy_cb), info);
+    g_signal_connect(view, "resource-load-started", G_CALLBACK(lbh_resource_load_started_cb), info);
+
+	return view;
+}
+
+
+static void
+dump_snapshot(GObject      *source_object,
+              GAsyncResult *res,
+			  gpointer      user_data)
+{
+	LibBalsaWebKitInfo *info = (LibBalsaWebKitInfo *) user_data;
+	WebKitWebView *webview = WEBKIT_WEB_VIEW(source_object);
+	GError *error = NULL;
+
+	info->surface = webkit_web_view_get_snapshot_finish(webview, res, &error);
+	if (info->surface != NULL) {
+		g_debug("%s: html snapshot done, surface %p", __func__, info->surface);
+		cairo_surface_reference(info->surface);
+	} else {
+		g_warning("%s: error taking html snapshot: %s", __func__, error->message);
+		g_clear_error(&error);
+	}
+	g_atomic_int_inc(&info->screenshot_done);
+}
+
+
+/** \brief Render a HMTL part into a Cairo surface
+ *
+ * \param body HTML message body part
+ * \param width rendering width in Cairo units (1/72")
+ * \param load_external_images whether external images referenced by the HTML shall be loaded
+ * \return a cairo surface on success, or NULL on error
+ */
+cairo_surface_t *
+libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
+						   gdouble 				width,
+						   gboolean 			load_external_images)
+{
+	gint render_width;
+    gchar *text;
+    gboolean have_src_cid;
+    gboolean have_src_oth;
+    gssize len;
+	GtkWidget *offline_window;
+	WebKitWebView *view;
+	LibBalsaWebKitInfo *info;
+	cairo_surface_t *html_surface = NULL;
+
+	g_return_val_if_fail(body != NULL, NULL);
+    len = lbh_get_body_content_utf8(body, &text);
+    if (len < 0) {
+        return NULL;
     }
 
-    have_src_cid = g_regex_match_simple(cid_regex, text, G_REGEX_CASELESS, 0);
-    have_src_oth = g_regex_match_simple(src_regex, text, G_REGEX_CASELESS, 0);
+    have_src_cid = g_regex_match_simple(CID_REGEX, text, G_REGEX_CASELESS, 0);
+    have_src_oth = g_regex_match_simple(SRC_REGEX, text, G_REGEX_CASELESS, 0);
 
-    settings = webkit_web_view_get_settings(web_view);
-    webkit_settings_set_enable_plugins(settings, FALSE);
-    webkit_settings_set_enable_javascript(settings, FALSE);
-	webkit_settings_set_enable_java(settings, FALSE);
-	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);
-    webkit_settings_set_auto_load_images(settings, have_src_cid && !have_src_oth);
+    info = g_new0(LibBalsaWebKitInfo, 1);
+	offline_window = gtk_offscreen_window_new();
+	render_width = (gint) (width * HTML_PRINT_DPI / 72.0);
+	g_debug("%s: request Cairo width %g, render width %d", __func__, width, render_width);
+    gtk_window_set_default_size(GTK_WINDOW(offline_window), render_width, 200);
+    view = lbh_web_view_new(info, render_width, 200, load_external_images || (have_src_cid && !have_src_oth));
+    webkit_web_view_set_zoom_level(view, HTML_PRINT_ZOOM);			/* heuristic setting, any way to calculate it? */
+    gtk_container_add(GTK_CONTAINER(offline_window), GTK_WIDGET(view));
+    gtk_widget_show_all(offline_window);
 
-    g_signal_connect(web_view, "mouse-target-changed",
+    webkit_web_view_load_html(view, text, NULL);
+    g_free(text);
+
+    /* wait until the page is loaded */
+    while (webkit_web_view_is_loading(view)) {
+    	gtk_main_iteration_do(FALSE);
+    	g_usleep(100);
+    }
+
+    /* get the snapshot of the rendered html */
+    if (info->webprocess_error) {
+    	g_warning("%s: web process terminated abnormally, cannot take snapshot", __func__);
+    } else {
+    	g_debug("%s: html loaded, taking snapshot", __func__);
+    	webkit_web_view_get_snapshot(view, WEBKIT_SNAPSHOT_REGION_FULL_DOCUMENT, WEBKIT_SNAPSHOT_OPTIONS_NONE, NULL, dump_snapshot,
+    		info);
+    	while (g_atomic_int_get(&info->screenshot_done) == 0) {
+    		gtk_main_iteration_do(FALSE);
+    		g_usleep(100);
+    	}
+    	g_debug("%s: snapshot done, size %dx%d", __func__, cairo_image_surface_get_width(info->surface),
+    		cairo_image_surface_get_height(info->surface));
+    	html_surface = info->surface;
+    }
+
+    /* destroy the offscreen window */
+    gtk_widget_destroy(offline_window);
+
+    /* return the surface */
+    return html_surface;
+}
+
+
+/* Create a new WebKitWebView widget:
+ * body 		LibBalsaMessageBody that belongs to the
+ *                      LibBalsaMessage from which to extract any
+ *			HTML objects (by url);
+ * hover_cb             callback for link-hover signal;
+ * clicked_cb	        callback for the "link-clicked" signal;
+ */
+GtkWidget *
+libbalsa_html_new(LibBalsaMessageBody * body,
+                  LibBalsaHtmlCallback  hover_cb,
+                  LibBalsaHtmlCallback  clicked_cb)
+{
+    gchar *text;
+    gssize len;
+    GtkWidget *vbox;
+    LibBalsaWebKitInfo *info;
+    gboolean have_src_cid;
+    gboolean have_src_oth;
+
+    len = lbh_get_body_content_utf8(body, &text);
+    if (len < 0)
+        return NULL;
+
+    info = g_new0(LibBalsaWebKitInfo, 1);
+    info->body            = body;
+    info->hover_cb        = hover_cb;
+    info->clicked_cb      = clicked_cb;
+
+    have_src_cid = g_regex_match_simple(CID_REGEX, text, G_REGEX_CASELESS, 0);
+    have_src_oth = g_regex_match_simple(SRC_REGEX, text, G_REGEX_CASELESS, 0);
+
+    info->web_view = lbh_web_view_new(info, -1, 200, have_src_cid && !have_src_oth);
+
+    g_signal_connect(info->web_view, "mouse-target-changed",
                      G_CALLBACK(lbh_mouse_target_changed_cb), info);
-    g_signal_connect(web_view, "decide-policy",
-                     G_CALLBACK(lbh_decide_policy_cb), info);
-    g_signal_connect(web_view, "resource-load-started",
-                     G_CALLBACK(lbh_resource_load_started_cb), info);
-#if WEBKIT_CHECK_VERSION(2,20,0)
-	g_signal_connect(web_view, "web-process-terminated",
-                     G_CALLBACK(lbh_web_process_terminated_cb), info);
-#else
-	g_signal_connect(web_view, "web-process-crashed",
-                     G_CALLBACK(lbh_web_process_crashed_cb), info);
-#endif
-    g_signal_connect(web_view, "context-menu",
+    g_signal_connect(info->web_view, "context-menu",
                      G_CALLBACK(lbh_context_menu_cb), info);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    g_object_set_data(G_OBJECT(vbox), "libbalsa-html-web-view", web_view);
-    gtk_box_pack_end(GTK_BOX(vbox), widget, TRUE, TRUE, 0);
+    g_object_set_data(G_OBJECT(vbox), "libbalsa-html-web-view", info->web_view);
+    gtk_box_pack_end(GTK_BOX(vbox), GTK_WIDGET(info->web_view), TRUE, TRUE, 0);
 
     /* Simple check for possible resource requests: */
     if (have_src_oth) {
@@ -669,7 +778,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
         g_debug("%s shows info_bar", __func__);
     }
 
-    webkit_web_view_load_html(web_view, text, NULL);
+    webkit_web_view_load_html(info->web_view, text, NULL);
     g_free(text);
 
     return vbox;

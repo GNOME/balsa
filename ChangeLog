@@ -1,4 +1,28 @@
-2019-02-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+2018-02-15  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Relax secret key selection
+
+	Currently, the user can only select a key with a uid which matches
+	the account's email address.  However, there are use-cases where
+	this is not sufficient.  At work, we have an isolated network
+	with “internal” email addresses.  Outgoing messages are
+	re-written to public addresses, but the internal ones shall
+	not be exposed to the outside world (see e.g. [1]), i.e. the
+	key /must not/ carry a user-id for the internal address.  Thus,
+	neither auto-selection nor defining the key id in the gui works
+	(it would be possible to run gpg[sm] on the console to print
+	the id, and then copy it into the input field, though).
+
+	The patch enables selecting any valid private key in the identity
+	dialogue, but /not/ when a message shall be sent and the private
+	key cannot be determined.  Note that the vast majority of users
+	will probably never use this feature, i.e. use automatic key
+	selection (id is empty in the identity setup).
+
+	* libbalsa/libbalsa-gpgme.c (libbalsa_gpgme_get_seckey): relax
+	the selection of the private key in the identity setup dialogue
+
+2018-02-15  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Fix broken decryption of s/mime messages loaded from imap
 

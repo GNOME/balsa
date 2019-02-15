@@ -771,8 +771,10 @@ libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
 	if (ctx != NULL) {
 		GList *keys = NULL;
 
-		/* let gpgme list all available keys */
-		if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, name, TRUE, FALSE, FALSE, error)) {
+		/* Let gpgme list all available secret keys, including those not matching the passed email address.
+		 * Rationale: enable selecting a secret key even if the local email address is re-written by the MTA.
+		 * See e.g. http://www.postfix.org/ADDRESS_REWRITING_README.html#generic */
+		if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, TRUE, FALSE, FALSE, error)) {
 			if (keys != NULL) {
 				gpgme_key_t key;
 

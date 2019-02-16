@@ -935,6 +935,11 @@ imap_mbox_handle_finalize(GObject* gobject)
   g_list_free(handle->cmd_info); handle->cmd_info = NULL;
   g_hash_table_destroy(handle->status_resps); handle->status_resps = NULL;
 
+  if (handle->thread_root != NULL) {
+      g_node_destroy(handle->thread_root);
+      handle->thread_root = NULL;
+  }
+
   mbox_view_dispose(&handle->mbox_view);
   imap_mbox_resize_cache(handle, 0);
   g_free(handle->msg_cache); handle->msg_cache = NULL;

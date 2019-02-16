@@ -278,26 +278,23 @@ libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal * local)
 */
 
 static void
-lbml_add_message_to_pool(LibBalsaMailboxLocal * local,
-                         LibBalsaMessage * message)
+lbml_message_pool_take_message(LibBalsaMailboxLocal * local,
+                               LibBalsaMessage * message)
 {
     LibBalsaMailboxLocalPool *item, *oldest;
 
     ++local->pool_seqno;
 
     for (item = oldest = &local->message_pool[0];
-         item < &local->message_pool[LBML_POOL_SIZE]; item++) {
-        if (item->message == message) {
-            item->pool_seqno = local->pool_seqno;
-            return;
-        }
+         item < &local->message_pool[LBML_POOL_SIZE];
+         item++) {
         if (item->pool_seqno < oldest->pool_seqno)
             oldest = item;
     }
 
-    if (oldest->message)
+    if (oldest->message != NULL)
         g_object_unref(oldest->message);
-    oldest->message = g_object_ref(message);
+    oldest->message = message; /* we take over the reference count */
     oldest->pool_seqno = local->pool_seqno;
 }
 
@@ -311,13 +308,13 @@ lbm_local_get_message_with_msg_info(LibBalsaMailboxLocal * local,
 
     msg_info->message = message = libbalsa_message_new();
     g_object_add_weak_pointer(G_OBJECT(message),
-                              (gpointer) & msg_info->message);
+                              (gpointer *) & msg_info->message);
 
     message->flags = msg_info->flags & LIBBALSA_MESSAGE_FLAGS_REAL;
     message->mailbox = LIBBALSA_MAILBOX(local);
     message->msgno = msgno;
     libbalsa_message_load_envelope(message);
-    lbml_add_message_to_pool(local, message);
+    lbml_message_pool_take_message(local, message);
 }
 
 static gboolean message_match_real(LibBalsaMailbox * mailbox, guint msgno,
@@ -804,12 +801,10 @@ libbalsa_mailbox_local_get_message(LibBalsaMailbox * mailbox, guint msgno)
     LibBalsaMailboxLocalMessageInfo *msg_info =
         LIBBALSA_MAILBOX_LOCAL_GET_CLASS(local)->get_info(local, msgno);
 
-    if (msg_info->message)
-        return g_object_ref(msg_info->message);
+    if (msg_info->message == NULL)
+        lbm_local_get_message_with_msg_info(local, msgno, msg_info);
 
-    lbm_local_get_message_with_msg_info(local, msgno, msg_info);
-
-    return msg_info->message;
+    return g_object_ref(msg_info->message);
 }
 
 /* Search iters. We do not use the fallback version because it does

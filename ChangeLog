@@ -1,5 +1,16 @@
 2019-02-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox-local: Do not leak LibBalsaMessage
+
+	* libbalsa/mailbox_local.c (lbml_message_pool_take_message): new
+	name for 'lbml_add_message_to_pool', emphasizing that it takes
+	over the reference count;
+	(lbm_local_get_message_with_msg_info): use the new name;
+	(libbalsa_mailbox_local_get_message): always return a reference
+	to the LibBalsaMessage.
+
+2019-02-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	imap-mbox-handle: Do not leak a GNode tree
 
 	* libbalsa/imap/imap-handle.c (imap_mbox_handle_finalize):

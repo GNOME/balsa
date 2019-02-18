@@ -1,5 +1,10 @@
 2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/address.c (vcard_strsplit): eliminate one decrement,
+	and add an assertion to avoid a scan-build false positive
+
+2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/mailbox.c (libbalsa_mailbox_view_new): initialize a
 	view by structure assignment instead of g_memdup().
 

@@ -297,7 +297,7 @@ vcard_strsplit(const gchar * string)
 
     str_array = g_new(gchar*, n + 1);
 
-    str_array[n--] = NULL;
+    str_array[n] = NULL;
     for (slist = string_list; slist; slist = slist->next) {
 	gchar * str = (gchar *) slist->data;
 	gchar * p;
@@ -310,8 +310,9 @@ vcard_strsplit(const gchar * string)
 	    g_free(str);
 	    str = newstr;
 	}
-	str_array[n--] = str;
+	str_array[--n] = str;
     }
+    g_assert(n == 0);
 
     g_slist_free(string_list);
 

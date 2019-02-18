@@ -610,18 +610,6 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
     return retval;
 }
 
-/* libbalsa_mailbox_is_valid:
-   mailbox is valid when:
-   a). it is closed, b). it is open and has proper client context.
-*/
-gboolean
-libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox)
-{
-    if(mailbox->open_ref == 0) return TRUE;
-    if(MAILBOX_CLOSED(mailbox)) return FALSE;
-    return TRUE;
-}
-
 gboolean
 libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox)
 {

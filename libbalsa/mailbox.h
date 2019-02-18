@@ -343,7 +343,6 @@ LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar *prefix,
  */
 /* XXX these need to return a value if they failed */
 gboolean libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err);
-gboolean libbalsa_mailbox_is_valid(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_is_open(LibBalsaMailbox *mailbox);
 void libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge);
 

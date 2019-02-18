@@ -1,3 +1,8 @@
+2019-02-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/mailbox.c: remove an unused function;
+	* libbalsa/mailbox.h: do not export it.
+
 2019-02-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox-local: Do not leak LibBalsaMessage

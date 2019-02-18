@@ -1,3 +1,33 @@
+2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Cast weak-pointer-location to (gpointer *) in calls to
+	g_object{add,remove}_weak_pointer()
+
+	* libbalsa/identity.c (libbalsa_identity_config_dialog):
+	* libbalsa/mailbox_maildir.c (free_message_info):
+	* libbalsa/mailbox_mbox.c (free_message_info):
+	* libbalsa/mailbox_mh.c (lbm_mh_free_message_info):
+	* src/balsa-index.c (bndx_clear_if_last_ref), (bndx_pipe_response):
+	* src/balsa-mblist.c (balsa_mblist_get_store),
+	(update_mailbox_idle), (bmbl_mailbox_changed_cb):
+	* src/balsa-mime-widget-image.c
+	(balsa_mime_widget_image_resize_all), (img_check_size):
+	* src/filter-edit-callbacks.c (fe_edit_condition):
+	* src/folder-conf.c (folder_conf_imap_node),
+	(folder_conf_imap_sub_node):
+	* src/information-dialog.c (balsa_information_list):
+	* src/mailbox-conf.c (mailbox_conf_new):
+	* src/mailbox-node.c (imap_scan_attach_mailbox),
+	(balsa_mailbox_node_scan_children), (bmbn_scan_children_idle):
+	* src/main-window.c (balsa_window_new),
+	(bw_real_open_mbnode_idle_cb), (bw_real_open_mbnode_thread),
+	(balsa_window_real_open_mbnode), (bw_focus_idle),
+	(balsa_window_real_close_mbnode), (bw_notebook_switch_page_cb):
+	* src/main.c (balsa_activate_cb):
+	* src/message-window.c (destroy_message_window),
+	(message_window_new):
+	* src/toolbar-prefs.c (customize_dialog_cb):
+
 2019-02-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/mailbox.c: remove an unused function;

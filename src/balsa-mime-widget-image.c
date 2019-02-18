@@ -166,7 +166,7 @@ balsa_mime_widget_image_resize_all(GtkWidget * widget, gpointer user_data)
         g_object_set_data(G_OBJECT(widget), "check_size_sched",
                           GINT_TO_POINTER(TRUE));
         *widget_p = widget;
-        g_object_add_weak_pointer(G_OBJECT(widget), (gpointer) widget_p);
+        g_object_add_weak_pointer(G_OBJECT(widget), (gpointer *) widget_p);
         g_idle_add((GSourceFunc) img_check_size, widget_p);
     }
 }
@@ -203,7 +203,7 @@ img_check_size(GtkImage ** widget_p)
     if (!widget) {
 	return FALSE;
     }
-    g_object_remove_weak_pointer(G_OBJECT(widget), (gpointer) widget_p);
+    g_object_remove_weak_pointer(G_OBJECT(widget), (gpointer *) widget_p);
 
     viewport = gtk_widget_get_ancestor(GTK_WIDGET(widget), GTK_TYPE_VIEWPORT);
     orig_width = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),

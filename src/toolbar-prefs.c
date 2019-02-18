@@ -144,7 +144,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     libbalsa_macosx_menu_for_parent(customize_widget, GTK_WINDOW(active_window));
 #endif
     g_object_add_weak_pointer(G_OBJECT(customize_widget),
-                              (gpointer) & customize_widget);
+                              (gpointer *) & customize_widget);
     g_signal_connect(G_OBJECT(customize_widget), "response",
                      G_CALLBACK(tp_dialog_response_cb), NULL);
 

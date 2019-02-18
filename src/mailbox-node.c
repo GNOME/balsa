@@ -437,9 +437,9 @@ imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
     if (isi->special) {
 	if (*isi->special)
 	    g_object_remove_weak_pointer(G_OBJECT(*isi->special),
-					 (gpointer) isi->special);
+					 (gpointer *) isi->special);
         *isi->special = mailbox;
-	g_object_add_weak_pointer(G_OBJECT(m), (gpointer) isi->special);
+	g_object_add_weak_pointer(G_OBJECT(m), (gpointer *) isi->special);
         if (isi->special == &balsa_app.outbox)
             mailbox->no_reassemble = TRUE;
     }
@@ -837,7 +837,7 @@ balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode)
                                    BALSA_MAILBOX_NODE_LIST_KEY)) {
         BalsaMailboxNode **mn = g_new(BalsaMailboxNode *, 1);
         *mn = mbnode;
-        g_object_add_weak_pointer(G_OBJECT(mbnode), (gpointer) mn);
+        g_object_add_weak_pointer(G_OBJECT(mbnode), (gpointer *) mn);
         g_object_set_data(G_OBJECT(mbnode), BALSA_MAILBOX_NODE_LIST_KEY,
                           g_slist_reverse(list));
         g_idle_add((GSourceFunc) bmbn_scan_children_idle, mn);
@@ -884,7 +884,7 @@ bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
     if (*mbnode) {
         g_object_set_data(G_OBJECT(*mbnode), BALSA_MAILBOX_NODE_LIST_KEY,
                           NULL);
-        g_object_remove_weak_pointer(G_OBJECT(*mbnode), (gpointer) mbnode);
+        g_object_remove_weak_pointer(G_OBJECT(*mbnode), (gpointer *) mbnode);
     }
     g_free(mbnode);
 

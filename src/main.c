@@ -602,7 +602,7 @@ balsa_activate_cb(GApplication *application,
     window = balsa_window_new(GTK_APPLICATION(application));
     balsa_app.main_window = BALSA_WINDOW(window);
     g_object_add_weak_pointer(G_OBJECT(window),
-			      (gpointer) &balsa_app.main_window);
+			      (gpointer *) &balsa_app.main_window);
 
     balsa_check_open_compose_window();
 

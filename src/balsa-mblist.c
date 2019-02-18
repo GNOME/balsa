@@ -482,7 +482,7 @@ balsa_mblist_get_store(void)
                                G_TYPE_STRING      /* TOTAL_COLUMN  */
             );
         g_object_add_weak_pointer(G_OBJECT(balsa_app.mblist_tree_store),
-                                  (gpointer) & balsa_app.
+                                  (gpointer *) & balsa_app.
                                   mblist_tree_store);
     }
 
@@ -990,7 +990,7 @@ update_mailbox_idle(struct update_mbox_data *umd)
 
     if (umd->mailbox) {
         g_object_remove_weak_pointer(G_OBJECT(umd->mailbox),
-                                     (gpointer) & umd->mailbox);
+                                     (gpointer *) & umd->mailbox);
         g_object_set_data(G_OBJECT(umd->mailbox), "mblist-update", NULL);
 
         if (balsa_app.mblist_tree_store) {
@@ -1042,7 +1042,7 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
         g_object_set_data(G_OBJECT(mailbox), "mblist-update", umd);
         umd->mailbox = mailbox;
         g_object_add_weak_pointer(G_OBJECT(mailbox),
-                                  (gpointer) & umd->mailbox);
+                                  (gpointer *) & umd->mailbox);
         g_idle_add((GSourceFunc) update_mailbox_idle, umd);
     }
 

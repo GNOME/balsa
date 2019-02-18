@@ -1251,7 +1251,7 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
 	libbalsa_macosx_menu_for_parent(condition_dialog, GTK_WINDOW(fe_window));
 #endif
         g_object_add_weak_pointer(G_OBJECT(condition_dialog),
-                                  (gpointer) &condition_dialog);
+                                  (gpointer *) &condition_dialog);
 
         g_signal_connect(G_OBJECT(condition_dialog), "response",
                          G_CALLBACK(condition_dialog_response), NULL);

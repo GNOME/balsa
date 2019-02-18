@@ -255,7 +255,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     libbalsa_macosx_menu_for_parent(GTK_WIDGET(fcw->dialog), GTK_WINDOW(balsa_app.main_window));
 #endif
     g_object_add_weak_pointer(G_OBJECT(fcw->dialog),
-                              (gpointer) &fcw->dialog);
+                              (gpointer *) &fcw->dialog);
     gtk_window_set_role(GTK_WINDOW(fcw->dialog), "folder_config_dialog");
     if (mn) {
         g_object_set_data_full(G_OBJECT(mn),
@@ -264,7 +264,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     } else {
         fcw_new = fcw;
         g_object_add_weak_pointer(G_OBJECT(fcw->dialog),
-                                  (gpointer) &fcw_new);
+                                  (gpointer *) &fcw_new);
     }
 
     fcw->server_cfg = libbalsa_server_cfg_new(fcw->server, (mn != NULL) ? mn->name : NULL);
@@ -675,7 +675,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     libbalsa_macosx_menu_for_parent(GTK_WIDGET(sdd->dialog), GTK_WINDOW(balsa_app.main_window));
 #endif
     g_object_add_weak_pointer(G_OBJECT(sdd->dialog),
-                              (gpointer) &sdd->dialog);
+                              (gpointer *) &sdd->dialog);
     /* `Enter' key => Create: */
     gtk_dialog_set_default_response(GTK_DIALOG(sdd->dialog), GTK_RESPONSE_OK);
     gtk_window_set_role(GTK_WINDOW(sdd->dialog), "subfolder_config_dialog");
@@ -687,7 +687,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     } else {
         sdd_new = sdd;
         g_object_add_weak_pointer(G_OBJECT(sdd->dialog),
-                                  (gpointer) &sdd_new);
+                                  (gpointer *) &sdd_new);
     }
 
     grid = libbalsa_create_grid();

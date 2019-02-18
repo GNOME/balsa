@@ -2202,7 +2202,7 @@ balsa_window_new(GtkApplication *application)
                      G_CALLBACK (bw_notebook_drag_motion_cb), NULL);
     balsa_app.notebook = window->notebook;
     g_object_add_weak_pointer(G_OBJECT(window->notebook),
-			      (gpointer) &balsa_app.notebook);
+			      (gpointer *) &balsa_app.notebook);
 
     window->preview = balsa_message_new();
     gtk_widget_hide(window->preview);
@@ -2794,7 +2794,7 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
 
     balsa_window_decrease_activity(window, info->message);
     g_object_remove_weak_pointer(G_OBJECT(window),
-                                 (gpointer) &info->window);
+                                 (gpointer *) &info->window);
     g_free(info->message);
 
     if (balsa_find_notebook_page_num(mailbox) >= 0) {
@@ -2896,7 +2896,7 @@ bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info)
         if (info->window) {
             balsa_window_decrease_activity(info->window, info->message);
             g_object_remove_weak_pointer(G_OBJECT(info->window),
-                                         (gpointer) &info->window);
+                                         (gpointer *) &info->window);
         }
         g_free(info->message);
         g_object_unref(g_object_ref_sink(info->index));
@@ -2933,7 +2933,7 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
     info = g_new(BalsaWindowRealOpenMbnodeInfo, 1);
 
     info->window = window;
-    g_object_add_weak_pointer(G_OBJECT(window), (gpointer) &info->window);
+    g_object_add_weak_pointer(G_OBJECT(window), (gpointer *) &info->window);
 
     info->mbnode = g_object_ref(mbnode);
     info->set_current = set_current;
@@ -2958,7 +2958,7 @@ static gboolean
 bw_focus_idle(LibBalsaMailbox ** mailbox)
 {
     if (*mailbox)
-	g_object_remove_weak_pointer(G_OBJECT(*mailbox), (gpointer) mailbox);
+	g_object_remove_weak_pointer(G_OBJECT(*mailbox), (gpointer *) mailbox);
     if (balsa_app.mblist_tree_store)
         balsa_mblist_focus_mailbox(balsa_app.mblist, *mailbox);
     g_free(mailbox);
@@ -3003,7 +3003,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             bw_enable_message_menus(window, 0);
 	    if (window->current_index)
 		g_object_remove_weak_pointer(G_OBJECT(window->current_index),
-					     (gpointer)
+					     (gpointer *)
 					     &window->current_index);
             window->current_index = NULL;
 
@@ -3016,7 +3016,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
     mailbox = g_new(LibBalsaMailbox *, 1);
     if (index) {
 	*mailbox = BALSA_INDEX(index)->mailbox_node-> mailbox;
-	g_object_add_weak_pointer(G_OBJECT(*mailbox), (gpointer) mailbox);
+	g_object_add_weak_pointer(G_OBJECT(*mailbox), (gpointer *) mailbox);
     } else
 	*mailbox = NULL;
     g_idle_add((GSourceFunc) bw_focus_idle, mailbox);
@@ -4094,7 +4094,7 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
 
     if (window->current_index) {
 	g_object_remove_weak_pointer(G_OBJECT(window->current_index),
-				     (gpointer) &window->current_index);
+				     (gpointer *) &window->current_index);
 	/* Note when this mailbox was hidden, for use in auto-closing. */
 	time(&BALSA_INDEX(window->current_index)->mailbox_node->last_use);
         window->current_index = NULL;
@@ -4109,7 +4109,7 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
 
     window->current_index = GTK_WIDGET(index);
     g_object_add_weak_pointer(G_OBJECT(index),
-			      (gpointer) &window->current_index);
+			      (gpointer *) &window->current_index);
     /* Note when this mailbox was exposed, for use in auto-expunge. */
     time(&index->mailbox_node->last_use);
 

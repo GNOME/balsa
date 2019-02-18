@@ -503,7 +503,7 @@ lbm_mh_free_message_info(struct message_info *msg_info)
 	msg_info->local_info.message->mailbox = NULL;
 	msg_info->local_info.message->msgno   = 0;
 	g_object_remove_weak_pointer(G_OBJECT(msg_info->local_info.message),
-				     (gpointer) &msg_info->local_info.message);
+				     (gpointer *) &msg_info->local_info.message);
     }
     g_free(msg_info);
 }

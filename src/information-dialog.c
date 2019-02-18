@@ -248,7 +248,7 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 	gtk_window_set_role(GTK_WINDOW(information_dialog), "Information");
 
         g_object_add_weak_pointer(G_OBJECT(information_dialog),
-                                  (gpointer) &information_list);
+                                  (gpointer *) &information_list);
 
 	/* A scrolled window for the list. */
 	scrolled_window = gtk_scrolled_window_new(NULL, NULL);

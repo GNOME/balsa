@@ -366,7 +366,7 @@ destroy_message_window(GtkWidget * widget, MessageWindow * mw)
     }
 
     if (mw->mailbox) {
-        g_object_remove_weak_pointer(G_OBJECT(mw->mailbox), (gpointer) &mw->mailbox);
+        g_object_remove_weak_pointer(G_OBJECT(mw->mailbox), (gpointer *) &mw->mailbox);
         g_signal_handlers_disconnect_matched(G_OBJECT(mw->mailbox),
                                              G_SIGNAL_MATCH_DATA, 0, 0,
                                              NULL, NULL, mw);
@@ -850,7 +850,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 			     G_CALLBACK(mw_set_buttons_sensitive), mw);
 
     mw->mailbox = mailbox;
-    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) &mw->mailbox);
+    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer *) &mw->mailbox);
     g_signal_connect(mailbox, "message_expunged",
                      G_CALLBACK(mw_expunged_cb), mw);
 

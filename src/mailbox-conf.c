@@ -399,7 +399,7 @@ mailbox_conf_new(GType mailbox_type)
     }
 
     dialog = run_mailbox_conf(NULL, mailbox_type, FALSE);
-    g_object_add_weak_pointer(G_OBJECT(dialog), (gpointer) &dialog);
+    g_object_add_weak_pointer(G_OBJECT(dialog), (gpointer *) &dialog);
 }
 
 /*

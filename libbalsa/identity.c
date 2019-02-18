@@ -1806,7 +1806,7 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
     g_signal_connect(dialog, "response",
                      G_CALLBACK(md_response_cb), tree);
     g_object_set_data(G_OBJECT(dialog), "tree", tree);
-    g_object_add_weak_pointer(G_OBJECT(dialog), (gpointer) & dialog);
+    g_object_add_weak_pointer(G_OBJECT(dialog), (gpointer *) & dialog);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog),
                                     IDENTITY_RESPONSE_CLOSE);
 

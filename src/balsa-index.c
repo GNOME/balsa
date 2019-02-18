@@ -472,10 +472,10 @@ bndx_clear_if_last_ref(gpointer data)
 {
     GObject **object = data;
 
-    g_object_add_weak_pointer(G_OBJECT(*object), data);
+    g_object_add_weak_pointer(G_OBJECT(*object), (gpointer *) data);
     g_object_unref(*object);
     if (*object) {
-        g_object_remove_weak_pointer(*object, data);
+        g_object_remove_weak_pointer(*object, (gpointer *) data);
         return FALSE;
     }
     return TRUE;
@@ -2606,7 +2606,7 @@ bndx_pipe_response(GtkWidget * dialog, gint response,
 {
     LibBalsaMailbox *mailbox = info->mailbox;
 
-    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer) & mailbox);
+    g_object_add_weak_pointer(G_OBJECT(mailbox), (gpointer *) & mailbox);
 
     if (response == GTK_RESPONSE_OK) {
         gchar *pipe_cmd;
@@ -2634,7 +2634,7 @@ bndx_pipe_response(GtkWidget * dialog, gint response,
 
     if (!mailbox)
         return;
-    g_object_remove_weak_pointer(G_OBJECT(mailbox), (gpointer) & mailbox);
+    g_object_remove_weak_pointer(G_OBJECT(mailbox), (gpointer *) & mailbox);
 
     libbalsa_mailbox_close(mailbox, balsa_app.expunge_on_close);
     g_object_set_data(G_OBJECT(mailbox), BALSA_INDEX_PIPE_INFO, NULL);

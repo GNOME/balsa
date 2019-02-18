@@ -1,5 +1,10 @@
 2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/imap/imap-handle.c (imap_body_from_stringi): guard
+	against NULL pointer.
+
+2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-print-object-text.c (collect_attrs): initialize a
 	region by structure assignment instead of g_memdup().
 

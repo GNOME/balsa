@@ -1629,7 +1629,7 @@ imap_body_from_stringi(const gchar *s, gchar const** end)
   if(*s == '(') {
     s++;
     body->envelope = imap_envelope_from_stringi(s+1, &s);
-    if( *s != ')')
+    if(s == NULL || *s != ')')
       goto done;
     s++;
   } else s++; /* assuming it points to 'X' */

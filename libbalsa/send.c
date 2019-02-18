@@ -1202,7 +1202,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
                                      gboolean         postponing,
                                      GError         **error)
 {
-    gchar **mime_type;
     GMimeObject *mime_root = NULL;
     GMimeMessage *mime_message;
     LibBalsaMessageBody *body;
@@ -1231,12 +1230,13 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
         mime_part = NULL;
 
         if ((body->file_uri != NULL) || (body->filename != NULL)) {
+            gchar **mime_type;
+
             if (body->content_type != NULL) {
                 mime_type = parse_content_type(body->content_type);
             } else {
-                gchar *mt = g_strdup(libbalsa_vfs_get_mime_type(body->file_uri));
+                const gchar *mt = libbalsa_vfs_get_mime_type(body->file_uri);
                 mime_type = g_strsplit(mt, "/", 2);
-                g_free(mt);
             }
 
             if (body->attach_mode == LIBBALSA_ATTACH_AS_EXTBODY) {
@@ -1281,6 +1281,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
                         g_clear_error(&err);
                         g_free(msg);
                     }
+                    g_strfreev(mime_type);
                     return LIBBALSA_MESSAGE_CREATE_ERROR;
                 }
                 parser = g_mime_parser_new_with_stream(stream);
@@ -1348,6 +1349,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
                         g_free(msg);
                     }
                     g_object_unref(G_OBJECT(mime_part));
+                    g_strfreev(mime_type);
                     return LIBBALSA_MESSAGE_CREATE_ERROR;
                 }
                 content = g_mime_data_wrapper_new_with_stream(stream,

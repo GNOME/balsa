@@ -1,5 +1,11 @@
 2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/send.c (libbalsa_message_create_mime_message): do not
+	leak mime_type in error return paths; also reduce scope of
+	mime_type.
+
+2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/address.c (vcard_strsplit): eliminate one decrement,
 	and add an assertion to avoid a scan-build false positive
 

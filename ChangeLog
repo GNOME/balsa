@@ -1,5 +1,10 @@
 2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/address.c (libbalsa_address_new_from_vcard): do not
+	leak a string.
+
+2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Cast weak-pointer-location to (gpointer *) in calls to
 	g_object{add,remove}_weak_pointer()
 

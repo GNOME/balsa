@@ -409,6 +409,8 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
                 address->organization = org;
                 address->address_list = g_list_reverse(address_list);
 
+                g_free(vcard);
+
                 return address;
             }
 
@@ -515,6 +517,8 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
     g_free(org);
     g_list_foreach(address_list, (GFunc) g_free, NULL);
     g_list_free(address_list);
+
+    g_free(vcard);
 
     return NULL;
 }

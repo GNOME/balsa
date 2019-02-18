@@ -924,8 +924,10 @@ collect_attrs(GList * all_attr, guint offset, guint len)
 	     && region->start_index <= offset + len)
 	    || (region->end_index >= offset
 		&& region->end_index <= offset + len)) {
-	    PhraseRegion *this_reg =
-		g_memdup(region, sizeof(PhraseRegion));
+	    PhraseRegion *this_reg;
+
+	    this_reg = g_new(PhraseRegion, 1);
+            *this_reg = *region;
 
 	    if (this_reg->start_index < offset)
 		this_reg->start_index = 0;

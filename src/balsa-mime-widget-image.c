@@ -199,11 +199,12 @@ img_check_size(GtkImage ** widget_p)
     GtkAllocation allocation;
 
     widget = *widget_p;
-    g_free(widget_p);
     if (!widget) {
+        g_free(widget_p);
 	return FALSE;
     }
     g_object_remove_weak_pointer(G_OBJECT(widget), (gpointer *) widget_p);
+    g_free(widget_p);
 
     viewport = gtk_widget_get_ancestor(GTK_WIDGET(widget), GTK_TYPE_VIEWPORT);
     orig_width = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),

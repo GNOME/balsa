@@ -1,5 +1,10 @@
 2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-mime-widget-image.c (img_check_size): avoid scan-build
+	false positive.
+
+2019-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/imap/imap-handle.c (imap_body_from_stringi): guard
 	against NULL pointer.
 

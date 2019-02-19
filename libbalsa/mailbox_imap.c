@@ -2475,6 +2475,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
                message. This can be simulated by randomly
                disconnecting from the IMAP server. */
             fprintf(stderr, "Cannot find data for section %s\n", section);
+            g_strfreev(pair);
             return FALSE;
         }
         dt.block = g_malloc(dt.body->octets+1);
@@ -2507,25 +2508,26 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
         if(rc != IMR_OK) {
             fprintf(stderr, "Error fetching imap message no %lu section %s\n",
                     msg->msgno, section);
-            g_free(dt.block);
-            g_free(section); 
-            g_strfreev(pair);
-            g_free(part_name);
             g_set_error(err,
                         LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
                         _("Error fetching message from IMAP server: %s"), 
                         imap_mbox_handle_get_last_msg(mimap->handle));
+            g_free(dt.block);
+            g_free(section);
+            g_free(part_name);
+            g_strfreev(pair);
             return FALSE;
         }
         g_mkdir_with_parents(pair[0], S_IRUSR|S_IWUSR|S_IXUSR);
         fp = fopen(part_name, "wb+");
         if(!fp) {
-            g_free(section); 
-            g_strfreev(pair);
-            g_free(part_name);
             g_set_error(err,
                         LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
                         _("Cannot create temporary file"));
+            g_free(dt.block);
+            g_free(section);
+            g_free(part_name);
+            g_strfreev(pair);
             return FALSE;
         }
         if(ifbo == IMFB_NONE || dt.body->octets == 0) {
@@ -2546,10 +2548,10 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
             g_set_error(err,
                         LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
                         _("Cannot write to temporary file %s"), part_name);
-            g_free(section); 
-            g_strfreev(pair);
-            g_free(part_name);
             g_free(dt.block);
+            g_free(section);
+            g_free(part_name);
+            g_strfreev(pair);
             return FALSE; /* something better ? */
             }
         }
@@ -2565,9 +2567,9 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * msg,
         g_object_unref (parser);
     }
     g_object_unref (partstream);
-    g_free(section); 
-    g_strfreev(pair);
+    g_free(section);
     g_free(part_name);
+    g_strfreev(pair);
 
     return TRUE;
 }

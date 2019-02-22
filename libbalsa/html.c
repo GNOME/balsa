@@ -44,7 +44,7 @@
 
 
 #define CID_REGEX	"<[^>]*src\\s*=\\s*['\"]?\\s*cid:"
-#define SRC_REGEX	"<[^>]*src\\s*=\\s*['\"]?\\s*[^c][^i][^d][^:]"
+#define SRC_REGEX	"<[^>]*src\\s*=\\s*['\"]?\\s*[^c'\"][^i][^d][^:]"
 
 /* approximate image resolution for printing */
 #define HTML_PRINT_DPI			200.0
@@ -597,7 +597,9 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 	WebKitWebView *view;
 	WebKitSettings *settings;
 	static guint have_registered_cid = 0U;
+        static LibBalsaWebKitInfo *info_for_cid;
 
+        info_for_cid = info;
 	view = WEBKIT_WEB_VIEW(webkit_web_view_new());
     g_object_set_data_full(G_OBJECT(view), LIBBALSA_HTML_INFO, info, (GDestroyNotify) lbh_webkit_info_free);
     gtk_widget_set_size_request(GTK_WIDGET(view), width, height);
@@ -618,7 +620,7 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
          * LibBalsaWebKitInfo. */
 
         context = webkit_web_view_get_context(view);
-        webkit_web_context_register_uri_scheme(context, "cid", lbh_cid_cb, &info, NULL);
+        webkit_web_context_register_uri_scheme(context, "cid", lbh_cid_cb, &info_for_cid, NULL);
         g_debug("%s_ registered “cid:” scheme", __func__);
 	}
 

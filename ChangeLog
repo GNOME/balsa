@@ -1,3 +1,7 @@
+2019-02-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/html.c: simpler regular expression for non-cid schemes.
+
 2018-02-23  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Error in IMAP mailbox encoding

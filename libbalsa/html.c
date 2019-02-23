@@ -44,7 +44,8 @@
 
 
 #define CID_REGEX	"<[^>]*src\\s*=\\s*['\"]?\\s*cid:"
-#define SRC_REGEX	"<[^>]*src\\s*=\\s*['\"]?\\s*[^c'\"][^i][^d][^:]"
+/* use a negative lookahead assertion to match "src=" *not* followed by "cid:" */
+#define SRC_REGEX	"<[^>]*src\\s*=\\s*(?!['\"]?\\s*cid:)"
 
 /* approximate image resolution for printing */
 #define HTML_PRINT_DPI			200.0

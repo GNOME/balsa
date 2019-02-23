@@ -94,220 +94,101 @@ imap_next_word(char *s)
 /* ===================================================================
  * UTF-7 conversion routines as in RFC 2192
  * =================================================================== */
-/* UTF7 modified base64 alphabet */
-static char base64chars[] =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+,";
-#define UNDEFINED 64
 
-/* UTF16 definitions */
-#define UTF16MASK       0x03FFUL
-#define UTF16SHIFT      10
-#define UTF16BASE       0x10000UL
-#define UTF16HIGHSTART  0xD800UL
-#define UTF16HIGHEND    0xDBFFUL
-#define UTF16LOSTART    0xDC00UL
-#define UTF16LOEND      0xDFFFUL
+/* see RFC 3501, Section 5.1.3. Mailbox International Naming Convention:
+ * In modified UTF-7, printable US-ASCII characters, except for "&", represent themselves; that is, characters with octet values
+ * 0x20-0x25 and 0x27-0x7e. */
+#define IS_VALID_ASCII(c)	((((c) >= '\x20') && ((c) <= '\x25')) || (((c) >= '\x27') && ((c) <= '\x7e')))
 
-
-/* Convert an IMAP mailbox to a UTF-8 string.
- *  dst needs to have roughly 4 times the storage space of src
- *    Hex encoding can triple the size of the input
- *    UTF-7 can be slightly denser than UTF-8
- *     (worst case: 8 octets UTF-7 becomes 9 octets UTF-8)
- */
-char*
-imap_mailbox_to_utf8(const char *mbox)
+gchar *
+imap_utf8_to_mailbox(const gchar *mbox)
 {
-  unsigned c, i, bitcount;
-  unsigned long ucs4, utf16, bitbuf;
-  unsigned char base64[256];
-  const char *src;
-  char *dst, *res  = malloc(2*strlen(mbox)+1);
-  
-  bitbuf = 0;
-  dst = res;
-  src = mbox;
-  if(!dst) return NULL;
-  /* initialize modified base64 decoding table */
-  memset(base64, UNDEFINED, sizeof (base64));
-  for (i = 0; i < sizeof (base64chars); ++i) {
-    base64[(unsigned)base64chars[i]] = i;
-  }
-  
-  /* loop until end of string */
-  while (*src != '\0') {
-    c = *src++;
-    /* deal with literal characters and &- */
-    if (c != '&' || *src == '-') {
-      /* encode literally */
-      *dst++ = c;
-      /* skip over the '-' if this is an &- sequence */
-      if (c == '&') ++src;
-    } else {
-      /* convert modified UTF-7 -> UTF-16 -> UCS-4 -> UTF-8 -> HEX */
-      bitbuf = 0;
-      bitcount = 0;
-      ucs4 = 0;
-      while ((c = base64[(unsigned char) *src]) != UNDEFINED) {
-        ++src;
-        bitbuf = (bitbuf << 6) | c;
-        bitcount += 6;
-        /* enough bits for a UTF-16 character? */
-        if (bitcount >= 16) {
-          bitcount -= 16;
-          utf16 = (bitcount ? bitbuf >> bitcount
-                   : bitbuf) & 0xffff;
-          /* convert UTF16 to UCS4 */
-          if
-            (utf16 >= UTF16HIGHSTART && utf16 <= UTF16HIGHEND) {
-            ucs4 = (utf16 - UTF16HIGHSTART) << UTF16SHIFT;
-            continue;
-          } else if
-            (utf16 >= UTF16LOSTART && utf16 <= UTF16LOEND) {
-            ucs4 += utf16 - UTF16LOSTART + UTF16BASE;
-          } else {
-            ucs4 = utf16;
-          }
-          
-          /* convert UTF-16 range of UCS4 to UTF-8 */
-          if (ucs4 <= 0x7fUL) {
-            dst[0] = ucs4;
-            dst += 1;
-          } else if (ucs4 <= 0x7ffUL) {
-            dst[0] = 0xc0 | (ucs4 >> 6);
-            dst[1] = 0x80 | (ucs4 & 0x3f);
-            dst += 2;
-          } else if (ucs4 <= 0xffffUL) {
-            dst[0] = 0xe0 | (ucs4 >> 12);
-            dst[1] = 0x80 | ((ucs4 >> 6) & 0x3f);
-            dst[2] = 0x80 | (ucs4 & 0x3f);
-            dst += 3;
-          } else {
-            dst[0] = 0xf0 | (ucs4 >> 18);
-            dst[1] = 0x80 | ((ucs4 >> 12) & 0x3f);
-            dst[2] = 0x80 | ((ucs4 >> 6) & 0x3f);
-            dst[3] = 0x80 | (ucs4 & 0x3f);
-            dst += 4;
-          }
-        }
-      }
-      /* skip over trailing '-' in modified UTF-7 encoding */
-      if (*src == '-') ++src;
-    }
-  }
-  /* terminate destination string */
-  *dst = '\0';
-  return res;
+	GString *buffer;
+	const gchar *next_in;
+
+	buffer = g_string_sized_new(strlen(mbox));	/* sufficient size for ASCII only */
+	next_in = mbox;
+	while (*next_in != '\0') {
+		if (IS_VALID_ASCII(*next_in)) {
+			g_string_append_c(buffer, *next_in++);
+		} else if (*next_in == '&') {
+			g_string_append(buffer, "&-");		/* see RFC 3501, Section 5.1.3 */
+			next_in++;
+		} else {
+			const gchar *next_ascii;
+			gchar *utf7;
+			gsize utf7len;
+
+			next_ascii = g_utf8_next_char(next_in);
+			while ((*next_ascii != '\0') && !IS_VALID_ASCII(*next_ascii)) {
+				 next_ascii = g_utf8_next_char(next_ascii);
+			}
+			utf7 = g_convert(next_in, next_ascii - next_in, "utf7", "utf8", NULL, &utf7len, NULL);
+			if (utf7 != NULL) {
+				gsize n;
+				utf7[0] = '&';					/* see RFC 3501, Section 5.1.3 */
+
+				for (n = 1U; n < utf7len; n++) {
+					if (utf7[n] == '/') {		/* see RFC 3501, Section 5.1.3 */
+						utf7[n] = ',';
+					}
+				}
+				g_string_append_len(buffer, utf7, utf7len);
+				g_free(utf7);
+			}
+			next_in = next_ascii;
+		}
+	}
+
+	return g_string_free(buffer, FALSE);
 }
 
-/* Convert hex coded UTF-8 string to modified UTF-7 IMAP mailbox
- *  dst should be about twice the length of src to deal with non-hex
- *  coded URLs
- */
-char*
-imap_utf8_to_mailbox(const char *src)
+gchar *
+imap_mailbox_to_utf8(const gchar *mbox)
 {
-  unsigned int utf8pos, utf8total, c, utf7mode, bitstogo, utf16flag;
-  unsigned long ucs4 = 0, bitbuf = 0;
+	GString *buffer;
+	const gchar *next_in;
 
-  /* initialize hex lookup table */
-  char *dst, *res = malloc(2*strlen(src)+1);
-  dst = res;
-  if(!dst) return NULL;
+	buffer = g_string_sized_new(strlen(mbox));		/* always sufficiently long */
+	next_in = mbox;
+	while (*next_in != '\0') {
+		if (*next_in == '&') {
+			if (next_in[1] == '-') {				/* see RFC 3501, Section 5.1.3 */
+				g_string_append_c(buffer, '&');
+				next_in = &next_in[2];
+			} else {
+				gchar *utf7buf;
+				gchar *next_utf7;
+				gchar *utf8;
+				gsize utf8len;
 
-  utf7mode = 0;
-  utf8total = 0;
-  bitstogo = 0;
-  utf8pos = 0;
-  while ((c = (unsigned char)*src) != '\0') {
-    ++src;
-    /* normal character? */
-    if (c >= ' ' && c <= '~') {
-      /* switch out of UTF-7 mode */
-      if (utf7mode) {
-        if (bitstogo) {
-          *dst++ = base64chars[(bitbuf << (6 - bitstogo)) & 0x3F];
-        }
-        *dst++ = '-';
-        utf7mode = 0;
-        utf8pos  = 0;
-        bitstogo = 0;
-        utf8total= 0;
-      }
-      /* encode '\' as '\\', and '"' as '\"' */
-      if (c == '\\' || c == '"') {
-        *dst++ = '\\';
-      }
-      *dst++ = c;
-      /* encode '&' as '&-' */
-      if (c == '&') {
-        *dst++ = '-';
-      }
-      continue;
-    }
-    /* switch to UTF-7 mode */
-    if (!utf7mode) {
-      *dst++ = '&';
-      utf7mode = 1;
-    }
-    /* Encode US-ASCII characters as themselves */
-    if (c < 0x80) {
-      ucs4 = c;
-      utf8total = 1;
-    } else if (utf8total) {
-      /* save UTF8 bits into UCS4 */
-      ucs4 = (ucs4 << 6) | (c & 0x3FUL);
-      if (++utf8pos < utf8total) {
-        continue;
-      }
-    } else {
-      utf8pos = 1;
-      if (c < 0xE0) {
-        utf8total = 2;
-        ucs4 = c & 0x1F;
-      } else if (c < 0xF0) {
-        utf8total = 3;
-        ucs4 = c & 0x0F;
-      } else {
-        /* NOTE: can't convert UTF8 sequences longer than 4 */
-        utf8total = 4;
-        ucs4 = c & 0x03;
-      }
-      continue;
-    }
-    /* loop to split ucs4 into two utf16 chars if necessary */
-    utf8total = 0;
-    do {
-      if (ucs4 >= UTF16BASE) {
-        ucs4 -= UTF16BASE;
-        bitbuf = (bitbuf << 16) | ((ucs4 >> UTF16SHIFT)
-                                   + UTF16HIGHSTART);
-        ucs4 = (ucs4 & UTF16MASK) + UTF16LOSTART;
-        utf16flag = 1;
-      } else {
-        bitbuf = (bitbuf << 16) | ucs4;
-        utf16flag = 0;
-      }
-      bitstogo += 16;
-      /* spew out base64 */
-      while (bitstogo >= 6) {
-        bitstogo -= 6;
-        *dst++ = base64chars[(bitstogo ? (bitbuf >> bitstogo)
-                              : bitbuf)
-                             & 0x3F];
-      }
-    } while (utf16flag);
-  }
-  /* if in UTF-7 mode, finish in ASCII */
-  if (utf7mode) {
-    if (bitstogo) {
-      *dst++ = base64chars[(bitbuf << (6 - bitstogo)) & 0x3F];
-    }
-    *dst++ = '-';
-  }
-  /* tie off string */
-  *dst = '\0';
-  return res;
+				utf7buf = g_malloc0(strlen(next_in) + 1U);
+				utf7buf[0] = '+';					/* RFC 2152 shift character */
+				next_in++;
+				for (next_utf7 = &utf7buf[1]; (*next_in != '\0') && (*next_in != '-'); next_in++) {
+					if (*next_in == ',') {			/* see RFC 3501, Section 5.1.3 */
+						*next_utf7++ = '/';
+					} else {
+						*next_utf7++ = *next_in;
+					}
+				}
+				*next_utf7 = *next_in;
+				if (*next_in == '-') {
+					next_in++;
+				}
+				utf8 = g_convert(utf7buf, -1, "utf8", "utf7", NULL, &utf8len, NULL);
+				if (utf8 != NULL) {
+					g_string_append_len(buffer, utf8, utf8len);
+					g_free(utf8);
+				}
+				g_free(utf7buf);
+			}
+		} else {
+			g_string_append_c(buffer, *next_in++);
+		}
+	}
+
+	return g_string_free(buffer, FALSE);
 }
 
 #if 0

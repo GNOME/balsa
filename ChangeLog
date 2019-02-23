@@ -1,3 +1,24 @@
+2018-02-23  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Error in IMAP mailbox encoding
+
+	Balsa has a bug in encoding IMAP mailbox names to modified UTF-7
+	as defined in RFC 3501, sect. 5.1.3 [1], as the '\' (0x5c) is
+	encoded as '\\' which is explicitly prohibited.  To reproduce:
+	activate main() in libbalsa/imap/util.c, compile it, and run
+	e.g. (yes, the mailbox name is weird, but it includes all special
+	cases from the RFC…)
+
+	/util 'ϴä ab c&d+e/f\~ßx'
+	orig='ϴä ab c&d+e/f\~ßx' mbx='&A,QA5A- ab c&-d+e/f\\~&AN8-x' back='ϴä ab c&d+e/f\\~ßx'
+	WRONG CONVERSION: --------------------------------^^
+
+	* libbalsa/imap/util.c (imap_utf8_to_mailbox),
+	  (imap_mailbox_to_utf8): replace the hand-coded conversion by
+	  utilising g_convert(), and also fix the bug
+	* libbalsa/imap/util.h: declare them with the
+	  G_GNUC_WARN_UNUSED_RESULT attribute.
+
 2019-02-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/html.c (lbh_web_view_new): use a static location when

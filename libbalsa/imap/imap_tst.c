@@ -470,7 +470,6 @@ test_mbox_append_common(gboolean multi, int argc, char *argv[])
     mi.dir = dir;
     mi.fh = NULL;
     res = imap_mbox_append_multi(h, mailbox, msg_iterator, &mi, NULL);
-
   } else {
     for(res = IMR_OK; res == IMR_OK && (file = readdir(dir)) != NULL;) {
       struct stat buf;
@@ -496,7 +495,7 @@ test_mbox_append_common(gboolean multi, int argc, char *argv[])
   }
 
   g_object_unref(h);
-  return 0;
+  return res == IMR_OK ? 1 : 0;
 }
 
 /** Tests appending message by message. */

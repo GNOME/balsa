@@ -1528,7 +1528,9 @@ imap_mbox_store_flag(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   if(cmd) {
     res = imap_cmd_exec(h, cmd);
     g_free(cmd);
-  } res = IMR_OK;
+  } else {
+    res = IMR_OK; /* No action needs to be taken */
+  }
   g_mutex_unlock(&h->mutex);
   return res;
 }

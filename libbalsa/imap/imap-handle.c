@@ -794,12 +794,8 @@ imap_get_flag(NetClientSioBuf *sio, char* flag, size_t len)
 {
   unsigned i;
   int c = 0;
-  for(i=0; i<len-1 && (c=sio_getc(sio)) >=0 && IS_FLAG_CHAR(c); i++)
+  for(i=0; i<len-1 && (c=sio_getc(sio)) >=0 && IS_FLAG_CHAR(c); i++) {
     flag[i] = c;
-
-  if(i<len-1) {
-    if (c < 0)
-      return c;
   }
   flag[i] = '\0';
   return c;
@@ -816,10 +812,6 @@ imap_cmd_get_tag(NetClientSioBuf *sio, char* tag, size_t len)
   int c = 0;
   for(i=0; i<len-1 && (c=sio_getc(sio)) >=0 && IS_TAG_CHAR(c); i++) {
     tag[i] = c;
-  }
-  if(i<len-1) {
-    if (c < 0)
-      return c;
   }
   tag[i] = '\0';
   return c;
@@ -1790,7 +1782,6 @@ imap_message_deserialize(void *data)
   imsg->envelope = imap_envelope_from_string(ptr);
   ptr += strlen(ptr) + 1;
   imsg->body = imap_body_from_string(ptr);
-  ptr += strlen(ptr) + 1;
   return imsg;
 }
 
@@ -2000,7 +1991,7 @@ imap_cmd_exec_cmds(ImapMboxHandle* handle, const char** cmds,
   if (rc == IMR_OK) {
     g_return_val_if_fail(handle->state != IMHS_DISCONNECTED && 1, IMR_BAD);
     if(handle->state == IMHS_DISCONNECTED)
-      rc = IMR_SEVERED;
+      ret_rc = IMR_SEVERED;
     else {
       for (cmd_count=0; cmds[cmd_count]; ++cmd_count) {
     	  rc = imap_cmd_process_untagged(handle, cmdnos[cmd_count]);

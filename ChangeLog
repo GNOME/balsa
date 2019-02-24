@@ -1,3 +1,16 @@
+2019-02-24  Pawel Salek  <pawsa0@gmail.com>
+
+	Fix some issues raised by scan-build, the clang static analyzer
+
+	* libbalsa/imap/imap-commands.c (imap_mbox_store_flag): insert
+	missing "else";
+	* libbalsa/imap/imap-handle.c (imap_get_flag),
+	(imap_cmd_get_tag): always null-terminate the string;
+	(imap_message_deserialize): omit a dead increment;
+	(imap_cmd_exec_cmds): store the return code for return;
+	* libbalsa/imap/imap_tst.c (test_mbox_append_common): check the
+	return code for error.
+
 2019-02-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	gtk_window_present() will be deprecated in later versions of

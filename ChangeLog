@@ -1,5 +1,33 @@
 2019-02-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	gtk_window_present() will be deprecated in later versions of
+	Gtk-2.24, in favor of gtk_window_present_with_time().
+
+	We never have a time-stamp readily available, so just pass
+	gtk_get_current_event_time().
+
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(libbalsa_identity_config_dialog):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* src/address-book-config.c (balsa_address_book_config_new):
+	* src/balsa-index.c (balsa_index_pipe):
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/filter-run-dialog.c (filters_run_dialog):
+	* src/folder-conf.c (folder_conf_imap_node),
+	(folder_conf_imap_sub_node):
+	* src/mailbox-conf.c (mailbox_conf_new), (mailbox_conf_edit):
+	* src/main-window.c (check_new_messages_real):
+	* src/main.c (balsa_activate_cb), (handle_remote):
+	* src/message-window.c (mw_set_selected), (message_window_new):
+	* src/pref-manager.c (open_preferences_manager):
+	* src/sendmsg-window.c (address_book_cb),
+	(sw_spell_check_activated), (sendmsg_window_continue):
+	* src/store-address.c (balsa_store_address_from_messages):
+	* src/toolbar-prefs.c (customize_dialog_cb):
+
+2019-02-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/html.c: simpler regular expression for non-cid schemes.
 
 2018-02-23  Albrecht Dreß  <albrecht.dress@arcor.de>

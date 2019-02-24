@@ -595,7 +595,8 @@ balsa_activate_cb(GApplication *application,
     const geometry_t *main_size;
 
     if (balsa_app.main_window != NULL) {
-        gtk_window_present(GTK_WINDOW(balsa_app.main_window));
+        gtk_window_present_with_time(GTK_WINDOW(balsa_app.main_window),
+                                     gtk_get_current_event_time());
         return;
     }
 
@@ -765,7 +766,8 @@ handle_remote(int argc, char **argv,
 
         if (!balsa_check_open_compose_window()) {
             /* Move the main window to the request's screen */
-            gtk_window_present(GTK_WINDOW(balsa_app.main_window));
+            gtk_window_present_with_time(GTK_WINDOW(balsa_app.main_window),
+                                         gtk_get_current_event_time());
         }
     }
 }

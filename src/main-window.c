@@ -3297,7 +3297,8 @@ check_new_messages_real(BalsaWindow * window, gboolean background_check)
         g_debug("Already Checking Mail!");
         g_mutex_lock(&progress_dialog.mutex);
         if (progress_dialog.dialog != NULL) {
-        	gtk_window_present(GTK_WINDOW(progress_dialog.dialog));
+        	gtk_window_present_with_time(GTK_WINDOW(progress_dialog.dialog),
+                                             gtk_get_current_event_time());
         }
         g_mutex_unlock(&progress_dialog.mutex);
         return;

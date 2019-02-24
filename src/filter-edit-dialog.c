@@ -558,7 +558,8 @@ filters_edit_dialog(GtkWindow * parent)
 	return;
     }
     if (fe_already_open) {
-	gtk_window_present(GTK_WINDOW(fe_window));
+	gtk_window_present_with_time(GTK_WINDOW(fe_window),
+                                     gtk_get_current_event_time());
 	return;
     }
     

@@ -3274,7 +3274,8 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     /* only one preferences manager window */
     if (already_open) {
-        gtk_window_present(GTK_WINDOW(property_box));
+        gtk_window_present_with_time(GTK_WINDOW(property_box),
+                                     gtk_get_current_event_time());
         return;
     }
 

@@ -128,7 +128,8 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 
     /* There can only be one */
     if (customize_widget) {
-        gtk_window_present(GTK_WINDOW(customize_widget));
+        gtk_window_present_with_time(GTK_WINDOW(customize_widget),
+                                     gtk_get_current_event_time());
         return;
     }
 

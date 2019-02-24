@@ -354,7 +354,8 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     sdi = g_object_get_data(G_OBJECT(smtp_server),
                             LIBBALSA_SMTP_SERVER_DIALOG_KEY);
     if (sdi != NULL) {
-        gtk_window_present(GTK_WINDOW(sdi->dialog));
+        gtk_window_present_with_time(GTK_WINDOW(sdi->dialog),
+                                     gtk_get_current_event_time());
         return;
     }
 

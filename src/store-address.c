@@ -89,7 +89,8 @@ balsa_store_address_from_messages(GList * messages)
     if (!message_list) {
         /* All messages are already showing. */
         if (info)
-            gtk_window_present(GTK_WINDOW(info->dialog));
+            gtk_window_present_with_time(GTK_WINDOW(info->dialog),
+                                         gtk_get_current_event_time());
         return;
     }
 

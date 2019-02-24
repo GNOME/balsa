@@ -65,7 +65,8 @@ filters_export_dialog(GtkWindow * parent)
 	return;
     }
     if (fex_already_open) {
-	gtk_window_present(GTK_WINDOW(fex_window));
+	gtk_window_present_with_time(GTK_WINDOW(fex_window),
+                                     gtk_get_current_event_time());
 	return;
     }
 

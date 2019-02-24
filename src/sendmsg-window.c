@@ -444,7 +444,8 @@ address_book_cb(LibBalsaAddressView * address_view,
     ab = g_object_get_data(G_OBJECT(bsmsg->window),
                            BALSA_SENDMSG_ADDRESS_BOOK_KEY);
     if (ab) {
-        gtk_window_present(GTK_WINDOW(ab));
+        gtk_window_present_with_time(GTK_WINDOW(ab),
+                                     gtk_get_current_event_time());
         return;
     }
 
@@ -6296,7 +6297,8 @@ sw_spell_check_activated(GSimpleAction * action,
 
     if (bsmsg->spell_checker) {
         if (gtk_widget_get_window(bsmsg->spell_checker)) {
-            gtk_window_present(GTK_WINDOW(bsmsg->spell_checker));
+            gtk_window_present_with_time(GTK_WINDOW(bsmsg->spell_checker),
+                                         gtk_get_current_event_time());
             return;
         } else
             /* A spell checker was created, but not shown because of
@@ -7043,7 +7045,8 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
 
     if ((bsmsg = g_object_get_data(G_OBJECT(message),
                                    BALSA_SENDMSG_WINDOW_KEY))) {
-        gtk_window_present(GTK_WINDOW(bsmsg->window));
+        gtk_window_present_with_time(GTK_WINDOW(bsmsg->window),
+                                     gtk_get_current_event_time());
         return NULL;
     }
 

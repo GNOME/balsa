@@ -111,7 +111,8 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
     abc = g_object_get_data(G_OBJECT(address_book), "balsa-abc");
     if (abc) {
         /* Only one dialog per address book. */
-        gtk_window_present(GTK_WINDOW(abc->window));
+        gtk_window_present_with_time(GTK_WINDOW(abc->window),
+                                     gtk_get_current_event_time());
         return;
     }
 

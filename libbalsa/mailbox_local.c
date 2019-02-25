@@ -1109,6 +1109,9 @@ static void
 lbml_set_threading(LibBalsaMailbox * mailbox,
                    LibBalsaMailboxThreadingType thread_type)
 {
+    if (mailbox->msg_tree == NULL)
+        return;
+
     switch (thread_type) {
     case LB_MAILBOX_THREADING_JWZ:
         lbml_thread_messages(mailbox, TRUE);

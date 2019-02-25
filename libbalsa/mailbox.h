@@ -184,6 +184,7 @@ struct _LibBalsaMailboxView {
     int unread;
     int total;
     time_t mtime;       /* Mailbox mtime when counts were cached. */
+    int position;       /* Position in the notebook */
 };
 
 struct _LibBalsaMailbox {
@@ -555,6 +556,7 @@ gboolean libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
 void libbalsa_mailbox_set_unread(LibBalsaMailbox * mailbox, gint unread);
 void libbalsa_mailbox_set_total (LibBalsaMailbox * mailbox, gint total);
 void libbalsa_mailbox_set_mtime (LibBalsaMailbox * mailbox, time_t mtime);
+void libbalsa_mailbox_set_position(LibBalsaMailbox * mailbox, gint position);
 
 const gchar *libbalsa_mailbox_get_identity_name(LibBalsaMailbox * mailbox);
 LibBalsaMailboxThreadingType
@@ -576,6 +578,7 @@ LibBalsaChkCryptoMode libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox
 gint libbalsa_mailbox_get_unread(LibBalsaMailbox * mailbox);
 gint libbalsa_mailbox_get_total (LibBalsaMailbox * mailbox);
 time_t libbalsa_mailbox_get_mtime(LibBalsaMailbox * mailbox);
+gint libbalsa_mailbox_get_position(LibBalsaMailbox * mailbox);
 
 /** force update of given msgno */
 void libbalsa_mailbox_msgno_changed(LibBalsaMailbox  *mailbox, guint seqno);

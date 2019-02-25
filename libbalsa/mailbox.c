@@ -2304,7 +2304,8 @@ static LibBalsaMailboxView libbalsa_mailbox_view_default = {
 #endif
     -1,                         /* total messages	*/
     -1,                         /* unread messages	*/
-    0                           /* mod time             */
+    0,                          /* mod time             */
+    -1                          /* position             */
 };
 
 LibBalsaMailboxView *
@@ -2465,8 +2466,11 @@ libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open)
 
     if (view->open != open) {
 	view->open = open ? 1 : 0;
-	if (mailbox)
+	if (mailbox != NULL) {
+	    if (!open)
+                view->position = -1;
 	    view->in_sync = 0;
+        }
     }
 }
 
@@ -2545,6 +2549,23 @@ libbalsa_mailbox_set_mtime(LibBalsaMailbox * mailbox, time_t mtime)
 
     if (view->mtime != mtime) {
 	view->mtime = mtime;
+        view->in_sync = 0;
+    }
+}
+
+void
+libbalsa_mailbox_set_position(LibBalsaMailbox * mailbox, gint position)
+{
+    LibBalsaMailboxView *view;
+
+    /* Changing the default is not allowed. */
+    g_return_if_fail(mailbox != NULL);
+
+    view = lbm_get_view(mailbox);
+    view->used = 1;
+
+    if (view->position != position) {
+        view->position = position;
         view->in_sync = 0;
     }
 }
@@ -2661,6 +2682,13 @@ libbalsa_mailbox_get_mtime(LibBalsaMailbox * mailbox)
 {
     return (mailbox && mailbox->view) ?
 	mailbox->view->mtime : libbalsa_mailbox_view_default.mtime;
+}
+
+gint
+libbalsa_mailbox_get_position(LibBalsaMailbox * mailbox)
+{
+    return (mailbox != NULL && mailbox->view != NULL) ?
+        mailbox->view->position : libbalsa_mailbox_view_default.position;
 }
 
 /* End of get methods. */

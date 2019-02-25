@@ -557,12 +557,24 @@ balsa_open_mailbox_list(gchar ** urls)
     g_strfreev(urls);
 }
 
+static gint
+position_compare_func(gconstpointer a,
+                      gconstpointer b)
+{
+    const gchar *url_a = *(const gchar **) a;
+    const gchar *url_b = *(const gchar **) b;
+
+    return config_mailbox_get_position(url_a) - config_mailbox_get_position(url_b);
+}
+
 void
 balsa_add_open_mailbox_urls(GPtrArray * url_array)
 {
     libbalsa_conf_foreach_group(VIEW_BY_URL_SECTION_PREFIX,
                                 (LibBalsaConfForeachFunc)
                                 append_url_if_open, url_array);
+
+    g_ptr_array_sort(url_array, position_compare_func);
 }
 
 /* 

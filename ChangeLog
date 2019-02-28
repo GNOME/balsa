@@ -1,3 +1,15 @@
+2019-02-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Simplify handling "mailto:" URLs
+
+	* src/sendmsg-window.c (decode_and_strdup): simplify;
+	(sendmsg_window_process_url): drop the "field_setter func"
+	argument; it's always "sendmsg_window_set_field";
+	(set_list_post_rfc2369): use new API;
+	* src/sendmsg-window.h: export new API;
+	* src/balsa-mime-widget-text.c (handle_url): use new API;
+	* src/main.c (balsa_check_open_compose_window): ditto.
+
 2019-02-24  Pawel Salek  <pawsa0@gmail.com>
 
 	Fix some issues raised by scan-build, the clang static analyzer

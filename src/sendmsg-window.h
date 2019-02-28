@@ -130,10 +130,7 @@ G_BEGIN_DECLS
                             gboolean is_a_tmp_file, 
                             const gchar *forced_mime_type);
 
-    typedef void (*field_setter)(BalsaSendmsg *d, const gchar*, const gchar*);
-
-    void sendmsg_window_process_url(const char *url, field_setter func,
-				    void *data);
+    void sendmsg_window_process_url(const char *url, void *data);
     BalsaSendmsg *sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
                                                GArray * selected,
                                                SendType type);

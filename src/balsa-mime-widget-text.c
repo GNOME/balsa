@@ -786,7 +786,7 @@ handle_url(const gchar * url)
 {
     if (!g_ascii_strncasecmp(url, "mailto:", 7)) {
         BalsaSendmsg *snd = sendmsg_window_compose();
-        sendmsg_window_process_url(url + 7, sendmsg_window_set_field, snd);
+        sendmsg_window_process_url(url + 7, snd);
     } else {
         GtkStatusbar *statusbar;
         guint context_id;

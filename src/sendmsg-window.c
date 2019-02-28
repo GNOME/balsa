@@ -4375,36 +4375,39 @@ sw_grab_focus_to_text(GtkWidget * text)
    decodes given URL string up to the delimiter and places the
    eos pointer in newstr if supplied (eos==NULL if end of string was reached)
 */
-static gchar*
-decode_and_strdup(const gchar*str, int delim, gchar** newstr)
+static gchar *
+decode_and_strdup(const gchar * str, int delim, const gchar ** newstr)
 {
-    gchar num[3];
     GString *s = g_string_new(NULL);
     /* eos points to the character after the last to parse */
-    gchar *eos = strchr(str, delim);
+    const gchar *eos = strchr(str, delim);
 
-    if(!eos) eos = (gchar*)str + strlen(str);
-    while(str<eos) {
-	switch(*str) {
-	case '+':
-	    g_string_append_c(s, ' ');
-	    str++;
-	    break;
-	case '%':
-	    if(str+2<eos) {
-		strncpy(num, str+1, 2); num[2] = 0;
-		g_string_append_c(s, strtol(num,NULL,16));
-	    }
-	    str+=3;
-	    break;
-	default:
-	    g_string_append_c(s, *str++);
-	}
+    if (eos == NULL)
+        eos = str + strlen(str);
+
+    while (str < eos) {
+        switch (*str) {
+        case '+':
+            g_string_append_c(s, ' ');
+            str++;
+            break;
+        case '%':
+            if (str + 2 < eos) {
+                gchar num[3] = {str[1], str[2], '\0'};
+
+                g_string_append_c(s, strtol(num, NULL, 16));
+            }
+            str += 3;
+            break;
+        default:
+            g_string_append_c(s, *str++);
+        }
     }
-    if(newstr) *newstr = *eos ? eos+1 : NULL;
-    eos = s->str;
-    g_string_free(s,FALSE);
-    return eos;
+
+    if (newstr != NULL)
+        *newstr = *eos != '\0' ? eos + 1 : NULL;
+
+    return g_string_free(s, FALSE);
 }
 
 /* process_url:
@@ -4412,18 +4415,19 @@ decode_and_strdup(const gchar*str, int delim, gchar** newstr)
    of format 'key'='value' with ampersands as separators.
 */
 void
-sendmsg_window_process_url(const char *url, field_setter func, void *data)
+sendmsg_window_process_url(const char *url, void *data)
 {
-    gchar * ptr, *to, *key, *val;
+    const gchar *ptr;
+    gchar *to, *key, *val;
 
     to = decode_and_strdup(url,'?', &ptr);
-    func(data, "to", to);
+    sendmsg_window_set_field(data, "to", to);
     g_free(to);
     while(ptr) {
 	key = decode_and_strdup(ptr,'=', &ptr);
 	if(ptr) {
 	    val = decode_and_strdup(ptr,'&', &ptr);
-	    func(data, key, val);
+	    sendmsg_window_set_field(data, key, val);
 	    g_free(val);
 	}
 	g_free(key);
@@ -6461,10 +6465,13 @@ set_list_post_rfc2369(BalsaSendmsg * bsmsg, const gchar * url)
 	    break;
 	if (g_ascii_strncasecmp(url, "mailto:", 7) == 0) {
 	    /* we support mailto! */
-            gchar *field = g_strndup(&url[7], close - &url[7]);
-	    sendmsg_window_process_url(field, sendmsg_window_set_field,
-                                       bsmsg);
+            gchar *field;
+
+            url += 7;
+            field = g_strndup(url, close - url);
+            sendmsg_window_process_url(field, bsmsg);
             g_free(field);
+
 	    return TRUE;
 	}
 	if (!(*++close && *(close = rfc2822_skip_comments(close)) == ','))

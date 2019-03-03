@@ -1,3 +1,25 @@
+2019-03-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not attach files in response to clicking a "mailto:" URL
+
+	Only if the URL is passed to Balsa on the command line by "-m"
+	or "--compose".
+
+	Also, accept either "attach=" or "attachment=" in a "mailto:"
+	URL.
+
+	* src/sendmsg-window.c (sendmsg_window_process_url),
+	(sw_attach_file), (sendmsg_window_set_field),
+	(set_list_post_rfc2369): attach a file only if the request comes
+	from the command line;
+	* src/balsa-mime-widget-text.c (url_send_cb), (handle_url): this
+	request is not from the command line;
+	* src/main.c (balsa_check_open_compose_window): this request is
+	from the command line;
+	* src/sendmsg-window.h: new argument "gboolean
+	from_command_line" for sendmsg_window_process_url() and
+	sendmsg_window_set_field().
+
 2019-02-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Simplify handling "mailto:" URLs

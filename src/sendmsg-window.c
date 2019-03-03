@@ -4415,19 +4415,21 @@ decode_and_strdup(const gchar * str, int delim, const gchar ** newstr)
    of format 'key'='value' with ampersands as separators.
 */
 void
-sendmsg_window_process_url(const char *url, void *data)
+sendmsg_window_process_url(BalsaSendmsg *bsmsg,
+                           const char   *url,
+                           gboolean      from_command_line)
 {
     const gchar *ptr;
     gchar *to, *key, *val;
 
     to = decode_and_strdup(url,'?', &ptr);
-    sendmsg_window_set_field(data, "to", to);
+    sendmsg_window_set_field(bsmsg, "to", to, from_command_line);
     g_free(to);
     while(ptr) {
 	key = decode_and_strdup(ptr,'=', &ptr);
 	if(ptr) {
 	    val = decode_and_strdup(ptr,'&', &ptr);
-	    sendmsg_window_set_field(data, key, val);
+	    sendmsg_window_set_field(bsmsg, key, val, from_command_line);
 	    g_free(val);
 	}
 	g_free(key);
@@ -4452,14 +4454,7 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
                                    _("not an absolute path"));
         return;
     }
-    if (!(g_str_has_prefix(val, g_get_home_dir())
-          || g_str_has_prefix(val, g_get_tmp_dir()))) {
-        balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                   LIBBALSA_INFORMATION_WARNING,
-                                   _("Could not attach the file %s: %s."), val,
-                                   _("not in your directory"));
-        return;
-    }
+
     if (!g_file_test(val, G_FILE_TEST_EXISTS)) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
@@ -4505,7 +4500,7 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
 
 void
 sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
-                         const gchar * val)
+                         const gchar * val, gboolean from_command_line)
 {
     const gchar *type;
     g_return_if_fail(bsmsg);
@@ -4519,7 +4514,9 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
         return;
     }
 #if defined(NO_SECURITY_ISSUES_WITH_ATTACHMENTS)
-    if (g_ascii_strcasecmp(key, "attach") == 0) {
+    if (from_command_line &&
+        (g_ascii_strcasecmp(key, "attach") == 0 ||
+         g_ascii_strcasecmp(key, "attachment") == 0)) {
         sw_attach_file(bsmsg, val);
         return;
     }
@@ -6469,7 +6466,7 @@ set_list_post_rfc2369(BalsaSendmsg * bsmsg, const gchar * url)
 
             url += 7;
             field = g_strndup(url, close - url);
-            sendmsg_window_process_url(field, bsmsg);
+            sendmsg_window_process_url(bsmsg, field, FALSE);
             g_free(field);
 
 	    return TRUE;

@@ -468,7 +468,7 @@ url_send_cb(GtkWidget * menu_item, message_url_t * uri)
     BalsaSendmsg * newmsg;
 
     newmsg = sendmsg_window_compose();
-    sendmsg_window_set_field(newmsg, "body", uri->url);
+    sendmsg_window_set_field(newmsg, "body", uri->url, FALSE);
 }
 
 static gboolean
@@ -786,7 +786,7 @@ handle_url(const gchar * url)
 {
     if (!g_ascii_strncasecmp(url, "mailto:", 7)) {
         BalsaSendmsg *snd = sendmsg_window_compose();
-        sendmsg_window_process_url(url + 7, snd);
+        sendmsg_window_process_url(snd, url + 7, FALSE);
     } else {
         GtkStatusbar *statusbar;
         guint context_id;

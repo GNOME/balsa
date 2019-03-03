@@ -123,14 +123,16 @@ G_BEGIN_DECLS
                                           guint msgno);
 
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
-                                  const gchar* val);
+                                  const gchar* val, gboolean from_command_line);
 
     gboolean add_attachment(BalsaSendmsg * bsmsg,
                             const gchar *filename, 
                             gboolean is_a_tmp_file, 
                             const gchar *forced_mime_type);
 
-    void sendmsg_window_process_url(const char *url, void *data);
+    void sendmsg_window_process_url(BalsaSendmsg *bsmsg,
+                                    const char *url,
+                                    gboolean from_command_line);
     BalsaSendmsg *sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
                                                GArray * selected,
                                                SendType type);

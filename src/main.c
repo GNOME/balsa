@@ -444,9 +444,9 @@ balsa_check_open_compose_window(void)
 
         if (opt_compose_email) {
             if (g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
-                sendmsg_window_process_url(opt_compose_email + 7, snd);
+                sendmsg_window_process_url(snd, opt_compose_email + 7, TRUE);
             else
-                sendmsg_window_set_field(snd, "to", opt_compose_email);
+                sendmsg_window_set_field(snd, "to", opt_compose_email, TRUE);
             g_free(opt_compose_email);
             opt_compose_email = NULL;
         }

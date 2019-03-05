@@ -3,7 +3,7 @@ Balsa E-Mail Client 2.5.x
 
 See ChangeLog for the list of the recent changes and NEWS for highlights.
 
-Copyright (C) 1997-2016 Stuart Parmenter and others
+Copyright (C) 1997-2019 Stuart Parmenter and others
 
 See 'COPYING' for licence information.  Please note linking against
 OpenSSL libraries is explicitly allowed.
@@ -29,7 +29,13 @@ desktop environment.  It supports local mailboxes, POP3 and IMAP.
 
 Configuration:
 -------------
-	Balsa has a lot of options to its configure script; you
+        Balsa can be built using either Autotools (configure, make, and so on)
+or using Meson and an appropriate backend such as Ninja. Details of the
+autotools configure script follow; the corresponding Meson files, meson.build
+and meson_options.txt, provide exactly the same configuration options, in a
+more Mesonish way.
+
+        Balsa has a lot of options to its configure script; you
 should run './configure --help' to get an idea of them. More
 complete descriptions are here.
 
@@ -48,7 +54,7 @@ use this option to compile the code and hope for the best.
 (some Solaris setups require this).
 
 --with-gnome
-	Use GNOME libraries.  FIXME - what do we actually require?
+	Add "GNOME;" to Balsa's categories in the two .desktop files.
 
 --with-libsecret
 	Link to libsecret instead of gnome-keyring.
@@ -110,20 +116,11 @@ messages during compilation or when running precompiled binaries saying that
 libtdl is missing it means you need to install just that package).
 
 
-Website:
---------
-	Balsa source comes with the Balsa website in the
-directory for balsa/website/. Read balsa/website/README and
-balsa/website/INSTALL for more information. If you retrieved
-this source as a tarball or RPM or deb, this directory 
-may not exist. To get it, you need to go to ....
-
-
 Balsa GIT:
 ----------
-	Balsa is hosted on the Gnome git servers. To get
-the latest source, get the module 'balsa' from
-https://wiki.gnome.org/Git/Developers
+	Balsa is hosted on the Gnome GitLab server. To get
+the latest source, get the module 'balsa':
+git clone https://gitlab.gnome.org/GNOME/balsa.git
 
 
 Specifying the SMTP Server:
@@ -188,29 +185,29 @@ can be found at: http://projectmallard.org/
 Balsa as mailto protocol handler:
 ---------------------------------
 	Balsa can be used as mailto protocol handler; by default, a
-        desktop file that declares this capability is installed.
+desktop file that declares this capability is installed.
 
 
 Mailbox locking:
 ----------------
-    Balsa uses flock+dotfile for mailbox file locking. It does not
-    use fcntl (although it can be enabled) since this locking method is
-    very fragile and often not portable (see for example
-    http://www.washington.edu/pine/tech-notes/low-level.html#locking).
+        Balsa uses flock+dotfile for mailbox file locking. It does not
+use fcntl (although it can be enabled) since this locking method is
+very fragile and often not portable (see for example
+http://www.washington.edu/pine/tech-notes/low-level.html#locking).
 
-    Make sure that your spool directory has drwxrwxrwt (01777) access
-    privileges. Presently, dotfile locking requires this unconditionally
-    In the future, we may relax this requirement and will allow you to
-    shoot yourself in your leg.
+        Make sure that your spool directory has drwxrwxrwt (01777) access
+privileges. Presently, dotfile locking requires this unconditionally
+In the future, we may relax this requirement and will allow you to
+shoot yourself in your leg.
 
 POP3 mail filtering:
 -------------------
 
-    When the respective POP3 'mailbox' has the 'filter' box checked, the
-    downloaded mail is passed on to procmail which will use
-    ~/.procmailrc file as its configuration, so you can share it between
-    balsa and fetchmail and get consistent behavior no matter you use
-    balsa or fetchmail for downloading.
+        When the respective POP3 'mailbox' has the 'filter' box checked, the
+downloaded mail is passed on to procmail which will use
+~/.procmailrc file as its configuration, so you can share it between
+balsa and fetchmail and get consistent behavior no matter you use
+balsa or fetchmail for downloading.
 
 Simple example ~/.procmailrc file:
 --------- cut here ----------------
@@ -223,20 +220,9 @@ It is recommended to read procmail(1) and procmailrc(1) for more
 real-life examples and syntax explanation.
 
 
-Alternative browsers:
---------------------
-Start from checking settings in your Gnome Control Center. If your
-version of gnomecc does provide option to change the default browser,
-you will need to create a file named gnome-moz-remote in your .gnome
-directory. It should contain the following:
-
-[Mozilla]
-filename=/path/to/your/browser
-
-
 Debugging:
 ---------
-Set the environment variable G_MESSAGES_DEBUG to print debugging
+        Set the environment variable G_MESSAGES_DEBUG to print debugging
 information to the console.  The value shall be either a space-
 separated list of log domains, or the special value "all".  The
 following custom domains are implemented in Balsa:
@@ -250,8 +236,9 @@ following custom domains are implemented in Balsa:
 
 Reporting Bugs:
 --------------
-	See http://balsa.gnome.org/bugs.html for instructions.
-        Patches are welcome.
+	To report a bug, please create an issue at
+https://gitlab.gnome.org/GNOME/balsa/issues.
+Patches are welcome!
 
 
 Known issues:

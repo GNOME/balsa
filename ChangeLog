@@ -1,3 +1,11 @@
+2019-03-05  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	* libbalsa/send.c (libbalsa_create_rfc2440_buffer): fix confusing
+	bcc: encryption warning in libbalsa_create_rfc2440_buffer()
+	if no bcc: recipients are present;
+	(do_multipart_crypto): use singular/plural form of this warning
+	in do_multipart_crypto().
+
 2019-03-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Do not attach files in response to clicking a "mailto:" URL

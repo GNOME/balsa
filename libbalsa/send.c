@@ -1822,7 +1822,8 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessage *message,
                                         message->headers->cc_list);
         encrypt_for = get_mailbox_names(encrypt_for,
                                         message->headers->from);
-        if (message->headers->bcc_list != NULL) {
+        if ((message->headers->bcc_list != NULL) &&
+        	(internet_address_list_length(message->headers->bcc_list) > 0)) {
             libbalsa_information
                 (LIBBALSA_INFORMATION_WARNING,
                 ngettext("This message will not be encrypted "
@@ -1918,9 +1919,14 @@ do_multipart_crypto(LibBalsaMessage *message,
         if (message->headers->bcc_list
             && (internet_address_list_length(message->headers->
                                              bcc_list) > 0)) {
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _(
-                                     "This message will not be encrypted for the BCC: recipient(s)."));
+            libbalsa_information
+                (LIBBALSA_INFORMATION_WARNING,
+                ngettext("This message will not be encrypted "
+                         "for the BCC: recipient.",
+                         "This message will not be encrypted "
+                         "for the BCC: recipients.",
+                         internet_address_list_length
+                             (message->headers->bcc_list)));
         }
 
         if (message->gpg_mode & LIBBALSA_PROTECT_SIGN) {

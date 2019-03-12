@@ -1,3 +1,18 @@
+2019-03-12  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Broken mailbox view after moving IMAP folder sideways
+
+	I noticed a bug when a folder on a IMAP server is moved sideways,
+	e.g. from “INBOX/Folder1/Test” to “INBOX/Folder2/Test”:
+	after moving, a partial re-scan of the mailbox tree is performed,
+	which makes all my local folders disappear.  The effect does
+	not occur if the folder is moved up or down the tree.  I could
+	track down the source of the issue to src/folder-conf.c, function
+	subfolder_conf_clicked_ok().
+
+	* src/folder-conf.c (subfolder_conf_clicked_ok): rescan the
+	whole IMAP folder tree after a sideways move.
+
 2019-03-05  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	* libbalsa/send.c (libbalsa_create_rfc2440_buffer): fix confusing

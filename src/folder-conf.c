@@ -586,13 +586,12 @@ folder, parent);
 		    }
                 } else {
                     /* moved it sideways: a chain of folders might
-                     * go away, so we'd better rescan from higher up
+                     * go away, so we'd better rescan the complete IMAP server
                      */
                     BalsaMailboxNode *mb = sdd->mbnode->parent;
-                    while (!mb->mailbox && mb->parent)
+                    while ((mb->mailbox != NULL) && (mb->parent != NULL))
                         mb = mb->parent;
                     balsa_mailbox_node_rescan(mb);
-                    balsa_mailbox_node_rescan(sdd->mbnode);
                 }
             }
         }

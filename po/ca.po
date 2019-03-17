@@ -2861,7 +2861,7 @@ msgstr ""
 
 #: ../libinit_balsa/assistant_page_welcome.c:27
 msgid "Welcome to Balsa!"
-msgstr "Benvinguts al Balsa!"
+msgstr "Us donem la benvinguda al Balsa!"
 
 #: ../libinit_balsa/assistant_page_welcome.c:30
 #, fuzzy
@@ -7792,7 +7792,7 @@ msgstr "Mo_stra l'arbre de bústies"
 
 #: ../ui/main-window.ui.h:37
 msgid "Show Mailbox _Tabs"
-msgstr "Mostre les pes_tanyes de la bústia"
+msgstr "Mostra les pes_tanyes de la bústia"
 
 #: ../ui/main-window.ui.h:38 ../ui/message-window.ui.h:10
 #: ../ui/sendmsg-window.ui.h:28

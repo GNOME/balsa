@@ -1,3 +1,15 @@
+2019-03-21  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	I noticed that /sometimes/ closing the config dialogue of an
+	existing maildir mailbox segfaults.  It appears that this
+	is caused by an uninitialised file chooser (I modified the
+	particular code snippet a while ago…).  I am quite sure I
+	tested the changes, including maildir (the format I typically
+	use), no idea why this slipped through, sorry!
+
+	* src/mailbox-conf.c (create_local_mailbox_dialog):  Fix maildir
+	config crash
+
 2019-03-12  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Broken mailbox view after moving IMAP folder sideways

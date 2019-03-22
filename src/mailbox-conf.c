@@ -735,11 +735,9 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 		const gchar *path = libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox));
 		gchar *basename = g_path_get_basename(path);
 
-		//gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog), path);
-		//gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), basename);
-		gtk_file_chooser_set_uri(GTK_FILE_CHOOSER(dialog), mcw->mailbox->url);
+		gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog), path);
+		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), basename);
 		g_free(basename);
-		// FIXME - not optimal
     } else {
         gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), balsa_app.local_mail_directory);
     }

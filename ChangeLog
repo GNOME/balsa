@@ -1,3 +1,12 @@
+2019-03-23  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Do not include a trailing period ('.') when matching an URL.
+	Most often it's end-of-sentence punctuation rather than part of
+	the URL. See the thread at
+	<URL:https://mail.gnome.org/archives/balsa-list/2018-July/msg00000.html>.
+
+	* libbalsa/mime.c (get_url_reg): do not match a trailing period.
+
 2019-03-21  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	I noticed that /sometimes/ closing the config dialogue of an

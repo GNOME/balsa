@@ -858,7 +858,8 @@ get_url_reg(void)
     static struct url_regex_info info = {
         NULL,
         "(((https?|ftps?|nntp)://)|(mailto:|news:))"
-            "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]])+",
+            "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]])+"
+            "(%[0-9A-F]{2}|[-_!~*';/?:@&=+$,#[:alnum:]])",
         __func__,
         "url regex compilation failed"
     };

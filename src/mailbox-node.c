@@ -968,22 +968,6 @@ mb_draftbox_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 }
 
 static void
-mb_subscribe_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
-{
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox));
-    libbalsa_mailbox_imap_subscribe(LIBBALSA_MAILBOX_IMAP(mbnode->mailbox), 
-				    TRUE);
-}
-
-static void
-mb_unsubscribe_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
-{
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox));
-    libbalsa_mailbox_imap_subscribe(LIBBALSA_MAILBOX_IMAP(mbnode->mailbox),
-				     FALSE);
-}
-
-static void
 mb_rescan_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 {
     gchar *current_mailbox_url;
@@ -1107,14 +1091,6 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
                || mailbox == balsa_app.trash);
     if (!special && !mbnode->config_prefix)
 	add_menu_entry(menu, _("_Delete"), G_CALLBACK(mb_del_cb),  mbnode);
-
-    if(LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-        add_menu_entry(menu, NULL, NULL, NULL);
-        add_menu_entry(menu, _("_Subscribe"),   
-                       G_CALLBACK(mb_subscribe_cb),   mbnode);
-        add_menu_entry(menu, _("_Unsubscribe"), 
-                       G_CALLBACK(mb_unsubscribe_cb), mbnode);
-    }
 
     if (!special) {
         add_menu_entry(menu, NULL, NULL, NULL);

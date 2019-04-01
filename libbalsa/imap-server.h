@@ -70,6 +70,8 @@ typedef enum {
 void libbalsa_imap_server_set_bug(LibBalsaImapServer *server,
                                   LibBalsaImapServerBug bug, gboolean hasp);
 
+
+
 gboolean libbalsa_imap_server_has_bug(LibBalsaImapServer *server,
                                       LibBalsaImapServerBug bug);
 void libbalsa_imap_server_set_use_status(LibBalsaImapServer *server,
@@ -79,5 +81,9 @@ gboolean libbalsa_imap_server_get_use_status(LibBalsaImapServer *server);
 void libbalsa_imap_server_set_use_idle(LibBalsaImapServer *server,
                                        gboolean use_idle);
 gboolean libbalsa_imap_server_get_use_idle(LibBalsaImapServer *server);
+gboolean libbalsa_imap_server_subscriptions(LibBalsaImapServer  *server,
+											GPtrArray			*subscribe,
+											GPtrArray			*unsubscribe,
+											GError 			   **error);
 
 #endif /* __IMAP_SERVER_H__ */

@@ -24,9 +24,11 @@
 
 #include <string.h>
 #include <glib/gstdio.h>
+#include <glib/gi18n.h>
 
 #include "libbalsa.h"
 #include "libimap.h"
+#include "server.h"
 #include "imap-handle.h"
 #include "imap-commands.h"
 #include "imap-server.h"
@@ -446,4 +448,175 @@ libbalsa_scanner_imap_dir(gpointer rnode, LibBalsaServer * server,
     if (lsub_handler_id)
         g_signal_handler_disconnect(G_OBJECT(handle), lsub_handler_id);
     libbalsa_imap_server_release_handle(LIBBALSA_IMAP_SERVER(server), handle);
+}
+
+
+/* ---------------------------------------------------------------------
+ * IMAP folder tree functions (parent selection, subscription management)
+ * --------------------------------------------------------------------- */
+typedef struct {
+	gchar delim;
+	gboolean subscribed;
+	GHashTable *children;
+} folder_data_t;
+
+typedef struct {
+	GtkTreeStore *store;
+	GtkTreeIter *parent;
+} imap_tree_t;
+
+typedef struct {
+	ImapMboxHandle *handle;
+	gboolean subscriptions;
+} scan_data_t;
+
+static void imap_tree_scan(scan_data_t *scan_data,
+						   const gchar *list_path,
+						   GHashTable  *folders);
+static void imap_tree_to_store(gchar         *folder,
+							   folder_data_t *folder_data,
+							   imap_tree_t   *scan_data);
+
+GtkTreeStore *
+libbalsa_scanner_imap_tree(LibBalsaServer  *server,
+						   gboolean			subscriptions,
+						   GError         **error)
+{
+	scan_data_t scan_data;
+	imap_tree_t imap_store = { NULL, NULL };
+
+	g_return_val_if_fail(LIBBALSA_IS_IMAP_SERVER(server) && (error != NULL), NULL);
+
+	scan_data.handle = libbalsa_imap_server_get_handle(LIBBALSA_IMAP_SERVER(server), error);
+	if (scan_data.handle != NULL) {
+		GHashTable *folders;
+
+		scan_data.subscriptions = subscriptions;
+
+		/* scan the whole IMAP server tree */
+		folders = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+		imap_tree_scan(&scan_data, "", folders);
+		libbalsa_imap_server_release_handle(LIBBALSA_IMAP_SERVER(server), scan_data.handle);
+
+		/* create the resulting tree store */
+		imap_store.store = gtk_tree_store_new(LB_SCANNER_IMAP_N_COLS,
+			G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN, G_TYPE_BOOLEAN, PANGO_TYPE_STYLE);
+		g_hash_table_foreach(folders, (GHFunc) imap_tree_to_store, &imap_store);
+		g_hash_table_unref(folders);
+	} else {
+		if (*error == NULL) {
+			g_set_error(error, LIBBALSA_SCANNER_ERROR, LIBBALSA_SCANNER_ERROR_IMAP, _("Could not connect to “%s”"), server->host);
+		}
+	}
+
+	return imap_store.store;
+}
+
+
+static void
+imap_tree_scan_list_cb(ImapMboxHandle *handle,
+					   int             delim,
+					   ImapMboxFlags   flags,
+					   gchar          *folder,
+					   GHashTable     *folders)
+{
+	folder_data_t *folder_data;
+
+	folder_data = g_new0(folder_data_t, 1UL);
+	folder_data->delim = delim;
+	if (IMAP_MBOX_HAS_FLAG(flags, IMLIST_HASCHILDREN) != 0U) {
+		folder_data->children = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+	}
+	g_hash_table_insert(folders, g_strdup(folder), folder_data);
+}
+
+
+static void
+imap_tree_scan_lsub_cb(ImapMboxHandle *handle,
+					   int             delim,
+					   ImapMboxFlags   flags,
+					   gchar          *folder,
+					   GHashTable     *folders)
+{
+	folder_data_t *folder_data;
+
+	folder_data = g_hash_table_lookup(folders, folder);
+	if (folder_data != NULL) {
+		folder_data->subscribed = IMAP_MBOX_HAS_FLAG(flags, IMLIST_NOSELECT) == 0U;
+	} else {
+		g_critical("%s: cannot identify folder %s", __func__, folder);
+	}
+}
+
+
+static void
+imap_tree_scan_children(gchar         *folder_name,
+						folder_data_t *folder_data,
+						scan_data_t   *scan_data)
+{
+	if (folder_data->children != NULL) {
+		gchar *scan_name = g_strdup_printf("%s%c", folder_name, folder_data->delim);
+
+		imap_tree_scan(scan_data, scan_name, folder_data->children);
+		g_free(scan_name);
+	}
+}
+
+
+static void
+imap_tree_scan(scan_data_t *scan_data,
+			   const gchar *list_path,
+			   GHashTable  *folders)
+{
+	gulong list_handler_id;
+
+	list_handler_id = g_signal_connect(G_OBJECT(scan_data->handle), "list-response", G_CALLBACK(imap_tree_scan_list_cb), folders);
+	imap_mbox_list(scan_data->handle, list_path);
+	g_signal_handler_disconnect(G_OBJECT(scan_data->handle), list_handler_id);
+
+	if (scan_data->subscriptions) {
+		list_handler_id =
+			g_signal_connect(G_OBJECT(scan_data->handle), "lsub-response", G_CALLBACK(imap_tree_scan_lsub_cb), folders);
+		imap_mbox_lsub(scan_data->handle, list_path);
+		g_signal_handler_disconnect(G_OBJECT(scan_data->handle), list_handler_id);
+	}
+
+	g_hash_table_foreach(folders, (GHFunc) imap_tree_scan_children, scan_data);
+}
+
+
+static void
+imap_tree_to_store(gchar 		 *folder,
+				   folder_data_t *folder_data,
+				   imap_tree_t   *tree_data)
+{
+	GtkTreeIter iter;
+	gchar *disp_name;
+
+	gtk_tree_store_append(tree_data->store, &iter, tree_data->parent);
+	if (tree_data->parent != NULL) {
+		gchar *parent_path;
+
+		gtk_tree_model_get(GTK_TREE_MODEL(tree_data->store), tree_data->parent, LB_SCANNER_IMAP_PATH, &parent_path, -1);
+		disp_name = g_strdup(&folder[strlen(parent_path) + 1UL]);
+		g_free(parent_path);
+	} else {
+		disp_name = g_strdup(folder);
+	}
+	gtk_tree_store_set(tree_data->store, &iter,
+		LB_SCANNER_IMAP_FOLDER, disp_name,
+		LB_SCANNER_IMAP_PATH, folder,
+		LB_SCANNER_IMAP_SUBS_NEW, folder_data->subscribed,
+		LB_SCANNER_IMAP_SUBS_OLD, folder_data->subscribed,
+		LB_SCANNER_IMAP_STYLE, PANGO_STYLE_NORMAL, -1);
+	g_free(disp_name);
+
+	if (folder_data->children != NULL) {
+		imap_tree_t child_data;
+
+		child_data.store = tree_data->store;
+		child_data.parent = &iter;
+		g_hash_table_foreach(folder_data->children, (GHFunc) imap_tree_to_store, &child_data);
+		g_hash_table_unref(folder_data->children);
+	}
 }

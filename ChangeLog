@@ -1,3 +1,42 @@
+2019-04-01  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Improve IMAP folder parent selection, subscription management
+
+	* libbalsa/folder-scanners.[ch]: implement new function
+	libbalsa_scanner_imap_tree() for scanning an IMAP server's
+	folder structure and subscription state into a GtkTreeStore,
+	requires a bunch of helper functions
+	* libbalsa/imap-server.[ch]: implement new function
+	libbalsa_imap_server_subscriptions() for subscribing to and
+	unsubscribing from arrays of folders using a single IMAP
+	connection
+	* libbalsa/mailbox_imap.[ch]: remove unused function
+	libbalsa_mailbox_imap_subscribe() (obsoleted by
+	libbalsa_imap_server_subscriptions())
+	* src/folder-conf.c: implement new style subscription and parent
+	folder selection:
+	  • imap_apply_subscriptions() collects folders with modified
+	  subscription states from the GtkTreeView;
+	  • imap_update_subscriptions() applies changed subscription
+	  states, called from folder_conf_clicked_ok();
+	  • on_subscription_toggled() callback for subscription state checkbox;
+	  • create_imap_folder_dialog() create the dialogue for parent
+	  folder selection and subscription management;
+	  • folder_conf_imap_subscriptions() runs the subscription
+	  management dialogue;
+	  • fcw_subscribed_toggled() callback for activating the
+	  subscription management button;
+	  • folder_conf_imap_node() add button for subscription management;
+	  • select_parent_folder() find parent of a folder in the GtkTreeModel;
+	  • on_parent_double_click() callback for double-click folder selection;
+	  • browse_button_cb() modified, runs the parent selection dialogue;
+	  • remove obsolete functions browse_button_select_row_cb(),
+	  browse_button_row_activated(), browse_button_response(),
+	  folder_selection_func(), browse_button_data_free()
+	* src/mailbox-node.c: remove obsolete mailbox tree view entries
+	for (un)subscribing
+	* src/save-restore.c: add the two new dialogues to the geometry manager
+
 2019-03-23  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Do not include a trailing period ('.') when matching an URL.

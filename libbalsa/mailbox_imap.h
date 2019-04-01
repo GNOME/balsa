@@ -48,9 +48,6 @@ void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox,
 				    const gchar * path);
 const gchar* libbalsa_mailbox_imap_get_path(LibBalsaMailboxImap * mailbox);
 
-gboolean libbalsa_mailbox_imap_subscribe(LibBalsaMailboxImap * mailbox, 
-                                         gboolean subscribe);
-
 GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 						 LibBalsaCondition *condition,
 						 gboolean only_recent,

@@ -51,4 +51,31 @@ void libbalsa_scanner_imap_dir(gpointer rnode, LibBalsaServer * server,
                                gpointer cb_data, 
                                GError **error);
 
+
+/* Scan the passed IMAP server and return a GtkTreeStore containing all folders and (if requested) their subscription states.  The
+ * columns in the returned store are:
+ * 0: the folder name (G_TYPE_STRING)
+ * 1: the full path of the folder on the server (G_TYPE_STRING)
+ * 2 and 3: the current subscription state (G_TYPE_BOOLEAN), doubled as to track state changes and avoid unnecessary (UN)SUBSCRIBE
+ *    commands
+ * 4: the Pango rendering style for the folder name (PANGO_TYPE_STYLE)
+ *
+ * If subscriptions is FALSE, only the folder structure is read, columns 2 and 3 are always FALSE, and column 4 is always
+ * PANGO_STYLE_NORMAL.
+ */
+GtkTreeStore *libbalsa_scanner_imap_tree(LibBalsaServer  *server,
+										 gboolean		  subscriptions,
+										 GError         **error)
+	G_GNUC_WARN_UNUSED_RESULT;
+
+typedef enum {
+	LB_SCANNER_IMAP_FOLDER = 0,
+	LB_SCANNER_IMAP_PATH,
+	LB_SCANNER_IMAP_SUBS_NEW,
+	LB_SCANNER_IMAP_SUBS_OLD,
+	LB_SCANNER_IMAP_STYLE,
+	LB_SCANNER_IMAP_N_COLS
+} lb_scanner_imap_tree_cols_t;
+
+
 #endif				/* __FOLDER_SCANNERS_H__ */

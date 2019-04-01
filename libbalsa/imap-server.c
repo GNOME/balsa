@@ -887,3 +887,55 @@ libbalsa_imap_server_get_use_idle(LibBalsaImapServer *server)
 {
     return server->use_idle;
 }
+
+gboolean
+libbalsa_imap_server_subscriptions(LibBalsaImapServer  *server,
+								   GPtrArray           *subscribe,
+								   GPtrArray 		   *unsubscribe,
+								   GError 			  **error)
+{
+	ImapMboxHandle *handle;
+	gboolean result;
+
+	g_return_val_if_fail(LIBBALSA_IS_IMAP_SERVER(server), FALSE);
+
+	handle = libbalsa_imap_server_get_handle(server, error);
+	if (handle != NULL) {
+		guint n;
+
+		result = TRUE;
+		if (subscribe != NULL) {
+			for (n = 0U; result && (n < subscribe->len); n++) {
+				const gchar *mailbox = (const gchar *) g_ptr_array_index(subscribe, n);
+
+				if (imap_mbox_subscribe(handle, mailbox, TRUE) != IMR_OK) {
+					g_set_error(error, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
+						_("subscribing to “%s” failed"), mailbox);
+					result = FALSE;
+				} else {
+					g_debug("subscribed to %s, '%s'", LIBBALSA_SERVER(server)->host, mailbox);
+				}
+			}
+		}
+
+		if (result && (unsubscribe != NULL)) {
+			for (n = 0U; result && (n < unsubscribe->len); n++) {
+				const gchar *mailbox = (const gchar *) g_ptr_array_index(unsubscribe, n);
+
+				if (imap_mbox_subscribe(handle, mailbox, FALSE) != IMR_OK) {
+					g_set_error(error, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
+						_("unsubscribing from “%s” failed"), mailbox);
+					result = FALSE;
+				} else {
+					g_debug("unsubscribed from %s, '%s'", LIBBALSA_SERVER(server)->host, mailbox);
+				}
+			}
+		}
+
+		libbalsa_imap_server_release_handle(server, handle);
+	} else {
+		result = FALSE;
+	}
+
+	return result;
+}

@@ -31,6 +31,7 @@
 #include "pref-manager.h"
 #include "imap-server.h"
 #include "server-config.h"
+#include "folder-scanners.h"
 #include "geometry-manager.h"
 #include <glib/gi18n.h>
 
@@ -46,6 +47,7 @@ typedef gboolean (*CommonDialogFunc)(CommonDialogData * cdd);
 
 #define FOLDER_CONF_COMMON \
     GtkDialog *dialog; \
+    GtkTreeStore *store; \
     BalsaMailboxNode *mbnode; \
     CommonDialogFunc ok
 
@@ -129,6 +131,10 @@ folder_conf_response(GtkDialog * dialog, int response,
     default:
         gtk_widget_destroy(GTK_WIDGET(cdd->dialog));
         cdd->dialog = NULL;
+        if (cdd->store != NULL) {
+        	g_object_unref(cdd->store);
+        	cdd->store = NULL;
+        }
         if (cdd->mbnode) {
             /* Clearing the data signifies that the dialog has been
              * destroyed. It also triggers a call to
@@ -155,6 +161,55 @@ static void
 validate_folder(GtkWidget G_GNUC_UNUSED *w, FolderDialogData *fcw)
 {
     gtk_dialog_set_response_sensitive(fcw->dialog, GTK_RESPONSE_OK, libbalsa_server_cfg_valid(fcw->server_cfg));
+}
+
+static gboolean
+imap_apply_subscriptions(GtkTreeModel *model,
+    					 GtkTreePath  *path,
+						 GtkTreeIter  *iter,
+						 gpointer      data)
+{
+	gchar *mbox_path;
+	gboolean new_state;
+	gboolean old_state;
+	GPtrArray **changed = (GPtrArray **) data;
+
+	gtk_tree_model_get(model, iter,
+			LB_SCANNER_IMAP_PATH, &mbox_path,
+			LB_SCANNER_IMAP_SUBS_NEW, &new_state,
+			LB_SCANNER_IMAP_SUBS_OLD, &old_state, -1);
+	if (old_state != new_state) {
+		if (new_state) {
+			g_ptr_array_add(changed[0], mbox_path);
+		} else {
+			g_ptr_array_add(changed[1], mbox_path);
+		}
+	} else {
+		g_free(mbox_path);
+	}
+
+	return FALSE;
+}
+
+static void
+imap_update_subscriptions(FolderDialogData *fcw)
+{
+	if (fcw->store != NULL) {
+		GPtrArray *changed[2];		/* 0 subscribe, 1 unsubscribe */
+		GError *error = NULL;
+
+		changed[0] = g_ptr_array_new_full(4U, g_free);		/* count is a wild guess... */
+		changed[1] = g_ptr_array_new_full(4U, g_free);
+		gtk_tree_model_foreach(GTK_TREE_MODEL(fcw->store), imap_apply_subscriptions, changed);
+		if ((changed[0]->len > 0U) || (changed[1]->len > 0U)) {
+			if (!libbalsa_imap_server_subscriptions(LIBBALSA_IMAP_SERVER(fcw->server), changed[0], changed[1], &error)) {
+				libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Changing subscriptions failed: %s"), error->message);
+				g_clear_error(&error);
+			}
+		}
+		g_ptr_array_unref(changed[0]);
+		g_ptr_array_unref(changed[1]);
+	}
 }
 
 static gboolean
@@ -198,6 +253,7 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     fcw->mbnode->dir = g_strdup(gtk_entry_get_text(GTK_ENTRY(fcw->prefix)));
 
     libbalsa_server_config_changed(fcw->server); /* trigger config save */
+    imap_update_subscriptions(fcw);
 
     if (insert) {
     	balsa_mblist_mailbox_node_append(NULL, fcw->mbnode);
@@ -213,6 +269,145 @@ folder_conf_clicked_ok(FolderDialogData * fcw)
     return TRUE;
 }
 
+static void
+on_subscription_toggled(GtkCellRendererToggle *cell_renderer,
+						gchar                 *path,
+						GtkTreeStore          *store)
+{
+	GtkTreeIter iter;
+
+	if (gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(store), &iter, path)) {
+		gboolean state;
+		gboolean orig_state;
+
+		gtk_tree_model_get(GTK_TREE_MODEL(store), &iter,
+				LB_SCANNER_IMAP_SUBS_NEW, &state,
+				LB_SCANNER_IMAP_SUBS_OLD, &orig_state, -1);
+		state = !state;
+		gtk_tree_store_set(store, &iter,
+				LB_SCANNER_IMAP_SUBS_NEW, state,
+				LB_SCANNER_IMAP_STYLE, (state == orig_state) ? PANGO_STYLE_NORMAL : PANGO_STYLE_ITALIC, -1);
+	}
+}
+
+static GtkWidget *
+create_imap_folder_dialog(LibBalsaServer  *server,
+						  GtkWindow       *parent,
+						  const gchar     *geometry_key,
+						  gboolean         with_subsrciptions,
+						  const gchar     *title,
+						  const gchar     *message,
+						  GtkTreeStore   **store,
+						  GtkWidget      **treeview)
+{
+	GtkWidget *dialog;
+	GtkWidget *vbox;
+	GtkWidget *label;
+	GtkWidget *scrolled_wind;
+	GtkTreeSelection *selection;
+	GtkCellRenderer *renderer;
+	GtkTreeViewColumn *column;
+	GError *error = NULL;
+
+	/* get the folder tree from the server if required */
+	if (*store == NULL) {
+		*store = libbalsa_scanner_imap_tree(server, with_subsrciptions, &error);
+		if (*store == NULL) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot list IMAP folders: %s"), error->message);
+			g_clear_error(&error);
+			return NULL;
+		} else {
+			g_object_ref(G_OBJECT(*store));
+		}
+	}
+
+	/* dialog */
+	if (with_subsrciptions) {
+		dialog = gtk_dialog_new_with_buttons(title, parent, GTK_DIALOG_MODAL | libbalsa_dialog_flags(),
+				_("_Close"), GTK_RESPONSE_CLOSE, NULL);
+	} else {
+		dialog = gtk_dialog_new_with_buttons(title, parent, GTK_DIALOG_MODAL | libbalsa_dialog_flags(),
+				_("_Cancel"), GTK_RESPONSE_REJECT, _("_OK"), GTK_RESPONSE_ACCEPT, NULL);
+	}
+	geometry_manager_attach(GTK_WINDOW(dialog), geometry_key);
+
+	/* content: vbox, message label, scrolled window */
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
+	gtk_container_set_border_width(GTK_CONTAINER(vbox), 6);
+	gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
+	gtk_widget_set_vexpand(vbox, TRUE);
+
+	label = gtk_label_new(message);
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+	gtk_widget_set_halign(label, GTK_ALIGN_START);
+	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+
+	scrolled_wind = gtk_scrolled_window_new(NULL,NULL);
+	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrolled_wind), GTK_SHADOW_ETCHED_IN);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_wind), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+	gtk_box_pack_start(GTK_BOX(vbox), scrolled_wind, TRUE, TRUE, 0);
+
+	/* folder tree */
+	*treeview = gtk_tree_view_new_with_model(GTK_TREE_MODEL(*store));
+	gtk_container_add(GTK_CONTAINER(scrolled_wind), *treeview);
+	gtk_tree_view_expand_all(GTK_TREE_VIEW(*treeview));
+
+	renderer = gtk_cell_renderer_text_new();
+	column = gtk_tree_view_column_new_with_attributes(_("folder"), renderer,
+			"text", LB_SCANNER_IMAP_FOLDER,
+			"style", LB_SCANNER_IMAP_STYLE, NULL);
+	gtk_tree_view_column_set_expand(column, TRUE);
+	gtk_tree_view_column_set_sort_column_id(column, 0);
+	gtk_tree_view_append_column (GTK_TREE_VIEW(*treeview), column);
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(*treeview));
+
+	/* subscriptions if requested */
+	if (with_subsrciptions) {
+		renderer = gtk_cell_renderer_toggle_new();
+		g_signal_connect(renderer, "toggled", G_CALLBACK(on_subscription_toggled), *store);
+		g_object_set(renderer, "activatable", TRUE, NULL);
+		column = gtk_tree_view_column_new_with_attributes(_("subscribed"), renderer,
+				"active", LB_SCANNER_IMAP_SUBS_NEW, NULL);
+		gtk_tree_view_column_set_expand(column, FALSE);
+		gtk_tree_view_append_column (GTK_TREE_VIEW(*treeview), column);
+
+		gtk_tree_selection_set_mode(selection, GTK_SELECTION_NONE);
+	} else {
+		gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+	}
+
+	gtk_widget_show_all(vbox);
+
+	return dialog;
+}
+
+static void
+folder_conf_imap_subscriptions(GtkButton        *widget,
+							   FolderDialogData *fcw)
+{
+	GtkWidget *dialog;
+	GtkWidget *treeview;
+	gchar *label_str;
+
+	label_str = g_strdup_printf(_("Manage folder subscriptions of IMAP server “%s”"),
+			(fcw->mbnode != NULL) ? fcw->mbnode->name : _("unknown"));
+	dialog = create_imap_folder_dialog(fcw->server, GTK_WINDOW(fcw->dialog), "IMAPSubscriptions", TRUE, _("Manage subscriptions"),
+			label_str, &fcw->store, &treeview);
+	g_free(label_str);
+
+	if (dialog != NULL) {
+		(void) gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy(dialog);
+	}
+}
+
+static void
+fcw_subscribed_toggled(GtkToggleButton *toggle,
+					   GtkWidget       *button)
+{
+	gtk_widget_set_sensitive(button, gtk_toggle_button_get_active(toggle));
+}
+
 /* folder_conf_imap_node:
    show the IMAP Folder configuration dialog for given mailbox node.
    If mn is NULL, setup it with default values for folder creation.
@@ -222,6 +417,8 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
 {
     FolderDialogData *fcw;
     static FolderDialogData *fcw_new;
+    GtkWidget *box;
+    GtkWidget *button;
 
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new folder. */
@@ -233,7 +430,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
         return;
     }
 
-    fcw = g_new(FolderDialogData, 1);
+    fcw = g_new0(FolderDialogData, 1);
     if (mn != NULL) {
     	fcw->server = mn->server;
     } else {
@@ -272,9 +469,23 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(fcw->dialog))), GTK_WIDGET(fcw->server_cfg));
     g_signal_connect(fcw->server_cfg, "changed", G_CALLBACK(validate_folder), fcw);
 
-    /* additional basic settings */
-    fcw->subscribed = libbalsa_server_cfg_add_check(fcw->server_cfg, TRUE, _("Subscribed _folders only"),
-    	(mn != NULL) ? mn->subscribed : FALSE, NULL, NULL);
+    /* additional basic settings - subscription management */
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+    fcw->subscribed = gtk_check_button_new_with_mnemonic(_("Subscribed _folders only"));
+    gtk_box_pack_start(GTK_BOX(box), fcw->subscribed, TRUE, TRUE, 0);
+    button = gtk_button_new_with_label(_("Manage subscriptions…"));
+    g_signal_connect(button, "clicked", G_CALLBACK(folder_conf_imap_subscriptions), fcw);
+    if (mn != NULL) {
+    	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->subscribed), mn->subscribed);
+    	gtk_widget_set_sensitive(button, mn->subscribed);
+    } else {
+    	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fcw->subscribed), FALSE);
+    	gtk_widget_set_sensitive(button, FALSE);
+    }
+    gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
+    g_signal_connect(fcw->subscribed, "toggled", G_CALLBACK(fcw_subscribed_toggled), button);
+    libbalsa_server_cfg_add_row(fcw->server_cfg, TRUE, box, NULL);
+
     fcw->list_inbox = libbalsa_server_cfg_add_check(fcw->server_cfg, TRUE, _("Always show _Inbox"),
     	(mn != NULL) ? mn->list_inbox : TRUE, NULL, NULL);
     fcw->prefix = libbalsa_server_cfg_add_entry(fcw->server_cfg, TRUE, _("Pr_efix:"),
@@ -332,162 +543,91 @@ validate_sub_folder(GtkWidget * w, SubfolderDialogData * sdd)
                                                           (sdd->folder_name)));
 }
 
-/* callbacks for a `Browse...' button: */
-
-typedef struct _BrowseButtonData BrowseButtonData;
-struct _BrowseButtonData {
-    SubfolderDialogData *sdd;
-    GtkDialog *dialog;
-    GtkWidget *button;
-    BalsaMailboxNode *mbnode;
-};
-
-static void
-browse_button_select_row_cb(GtkTreeSelection * selection,
-                            BrowseButtonData * bbd)
-{
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    gboolean selected =
-        gtk_tree_selection_get_selected(selection, &model, &iter);
-
-    gtk_dialog_set_response_sensitive(bbd->dialog,
-                                      GTK_RESPONSE_OK, selected);
-    if (selected)
-        gtk_tree_model_get(model, &iter, 0, &bbd->mbnode, -1);
-    /* bbd->mbnode is unreffed when bbd is freed. */
-}
-
-static void
-browse_button_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
-                            GtkTreeViewColumn * column,
-                            BrowseButtonData * bbd)
-{
-    gtk_dialog_response(bbd->dialog, GTK_RESPONSE_OK);
-}
-
-static void
-browse_button_response(GtkDialog * dialog, gint response,
-                       BrowseButtonData * bbd)
-{
-    if (response == GTK_RESPONSE_OK) {
-        BalsaMailboxNode *mbnode = bbd->mbnode;
-        if (!mbnode)
-            return;
-
-        bbd->sdd->parent = mbnode;
-        if (mbnode->dir)
-            gtk_entry_set_text(GTK_ENTRY(bbd->sdd->parent_folder),
-                               mbnode->dir);
-        if(mbnode->server)
-            gtk_label_set_label(GTK_LABEL(bbd->sdd->host_label),
-                                mbnode->server->host);
-    }
-    validate_sub_folder(NULL, bbd->sdd);
-    gtk_widget_set_sensitive(bbd->button, TRUE);
-    gtk_widget_destroy(GTK_WIDGET(dialog));
-}
-
 static gboolean
-folder_selection_func(GtkTreeSelection * selection, GtkTreeModel * model,
-		      GtkTreePath * path, gboolean path_currently_selected,
-		      SubfolderDialogData * sdd)
+select_parent_folder(GtkTreeModel *model,
+					 GtkTreePath  *path,
+					 GtkTreeIter  *iter,
+					 gpointer      data)
 {
-    GtkTreeIter iter;
-    BalsaMailboxNode *mbnode;
-    gboolean retval;
+	const gchar *find_folder = (const gchar *) data;
+	gchar *foldername;
+	gboolean found;
 
-    gtk_tree_model_get_iter(model, &iter, path);
-    gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
-    retval = (LIBBALSA_IS_IMAP_SERVER(mbnode->server)
-	      && (sdd->mbnode == NULL
-		  || sdd->mbnode->server == mbnode->server));
-    g_object_unref(mbnode);
+	gtk_tree_model_get(model, iter,
+			LB_SCANNER_IMAP_PATH, &foldername, -1);
+	if ((foldername != NULL) && (strcmp(foldername, find_folder) == 0)) {
+		GtkTreeSelection *selection;
 
-    return retval;
+		selection = GTK_TREE_SELECTION(g_object_get_data(G_OBJECT(model), "selection"));
+		gtk_tree_selection_select_iter(selection, iter);
+		found = TRUE;
+	} else {
+		found = FALSE;
+	}
+	g_free(foldername);
+	return found;
 }
 
 static void
-browse_button_data_free(BrowseButtonData *bbd)
+on_parent_double_click(GtkTreeView G_GNUC_UNUSED       *treeview,
+					   GtkTreePath G_GNUC_UNUSED       *path,
+					   GtkTreeViewColumn G_GNUC_UNUSED *column,
+                       GtkDialog                       *dialog)
 {
-    if (bbd->mbnode)
-	g_object_unref(bbd->mbnode);
-    g_free(bbd);
+    gtk_dialog_response(dialog, GTK_RESPONSE_ACCEPT);
 }
 
 static void
-browse_button_cb(GtkWidget * widget, SubfolderDialogData * sdd)
+browse_button_cb(GtkWidget           *widget,
+				 SubfolderDialogData *sdd)
 {
-    GtkWidget *scroll, *dialog;
-    GtkRequisition req;
-    GtkWidget *tree_view = balsa_mblist_new();
-    GtkTreeSelection *selection =
-        gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-    BrowseButtonData *bbd;
-    const geometry_t *main_size;
+	GtkWidget *dialog;
+	GtkWidget *treeview;
+	gchar *label_str;
 
-    /*
-     * Make only IMAP nodes selectable:
-     */
-    gtk_tree_selection_set_select_function(selection,
-                                           (GtkTreeSelectionFunc) 
-                                           folder_selection_func, sdd,
-                                           NULL);
+	label_str = g_strdup_printf(_("Select parent folder of “%s”"), sdd->mbnode->mailbox->name);
+	dialog = create_imap_folder_dialog(sdd->mbnode->server, GTK_WINDOW(sdd->dialog), "IMAPSelectParent", FALSE,
+			_("Select parent folder"), label_str, &sdd->store, &treeview);
+	g_free(label_str);
 
-    dialog =
-        gtk_dialog_new_with_buttons(_("Select parent folder"),
-                                    GTK_WINDOW(sdd->dialog),
-                                    GTK_DIALOG_DESTROY_WITH_PARENT |
-                                    libbalsa_dialog_flags(),
-                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                    _("_Help"), GTK_RESPONSE_HELP,
-                                    NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(sdd->dialog));
-#endif
-    
-    scroll = gtk_scrolled_window_new(NULL, NULL);
-    gtk_box_pack_start(GTK_BOX
-                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       scroll, TRUE, TRUE, 0);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-                                   GTK_POLICY_AUTOMATIC,
-                                   GTK_POLICY_ALWAYS);
-    gtk_container_add(GTK_CONTAINER(scroll), tree_view);
-    gtk_widget_grab_focus(tree_view);
+	if (dialog != NULL) {
+		GtkTreeModel *model;
+		GtkTreeSelection *selection;
+		const gchar *current_parent;
+		gint result;
 
-    bbd = g_new(BrowseButtonData, 1);
-    bbd->sdd = sdd;
-    bbd->dialog = GTK_DIALOG(dialog);
-    bbd->button = widget;
-    bbd->mbnode = NULL;
-    g_object_weak_ref(G_OBJECT(dialog),
-		      (GWeakNotify) browse_button_data_free, bbd);
-    g_signal_connect(G_OBJECT(selection), "changed",
-                     G_CALLBACK(browse_button_select_row_cb), bbd);
-    g_signal_connect(G_OBJECT(tree_view), "row-activated",
-                     G_CALLBACK(browse_button_row_activated), bbd);
+		/* select the parent item (if any) */
+		model = gtk_tree_view_get_model(GTK_TREE_VIEW(treeview));
+		selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(treeview));
+		current_parent = gtk_entry_get_text(GTK_ENTRY(sdd->parent_folder));
+		if (current_parent[0] != '\0') {
+			g_object_set_data(G_OBJECT(model), "selection", selection);		/* needed in the callback */
+			gtk_tree_model_foreach(model, select_parent_folder, (gpointer) current_parent);
+		} else {
+			GtkTreeIter iter;
 
-    /* Force the mailbox list to be a reasonable size. */
-    gtk_widget_get_preferred_size(tree_view, NULL, &req);
-    /* don't mess with the width, it gets saved! */
-    main_size = geometry_manager_get("MainWindow");
-    g_assert(main_size != NULL);
-    if (req.height > main_size->height)
-        req.height = main_size->height;
-    else if (req.height < main_size->height / 2)
-        req.height = main_size->height / 2;
-    gtk_window_set_default_size(GTK_WINDOW(dialog), req.width, req.height);
+			/* no parent: select the first node */
+			gtk_tree_model_get_iter_first(model, &iter);
+			gtk_tree_selection_select_iter(selection, &iter);
+		}
+		g_signal_connect(treeview, "row-activated", G_CALLBACK(on_parent_double_click), dialog);
 
-    /* To prevent multiple dialogs, desensitize the browse button. */
-    gtk_widget_set_sensitive(widget, FALSE);
-    /* OK button is insensitive until some row is selected. */
-    gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog),
-                                      GTK_RESPONSE_OK, FALSE);
+		result = gtk_dialog_run(GTK_DIALOG(dialog));
+		if (result == GTK_RESPONSE_ACCEPT) {
+			GtkTreeIter iter;
 
-    g_signal_connect(G_OBJECT(dialog), "response",
-                     G_CALLBACK(browse_button_response), bbd);
-    gtk_widget_show_all(GTK_WIDGET(dialog));
+			if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
+				gchar *selected_path;
+
+				gtk_tree_model_get(model, &iter,
+						LB_SCANNER_IMAP_PATH, &selected_path, -1);
+				gtk_entry_set_text(GTK_ENTRY(sdd->parent_folder), selected_path);
+				g_free(selected_path);
+				validate_sub_folder(NULL, sdd);
+			}
+		}
+		gtk_widget_destroy(dialog);
+	}
 }
 
 static gboolean
@@ -646,7 +786,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         return;
     }
 
-    sdd = g_new(SubfolderDialogData, 1);
+    sdd = g_new0(SubfolderDialogData, 1);
     sdd->ok = (CommonDialogFunc) subfolder_conf_clicked_ok;
 
     sdd->mbnode = mn;

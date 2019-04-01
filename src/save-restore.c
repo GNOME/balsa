@@ -692,6 +692,8 @@ config_global_load(void)
     geometry_manager_init("SendMsgWindow", 640, 480, FALSE);
     geometry_manager_init("MessageWindow", 400, 500, FALSE);
     geometry_manager_init("SourceView", 500, 400, FALSE);
+    geometry_manager_init("IMAPSubscriptions", 200, 160, FALSE);
+    geometry_manager_init("IMAPSelectParent", 200, 160, FALSE);
 #ifdef HAVE_GPGME
     geometry_manager_init("KeyDialog", 400, 200, FALSE);
     geometry_manager_init("KeyList", 300, 200, FALSE);

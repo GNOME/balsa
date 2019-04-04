@@ -1,3 +1,11 @@
+2019-04-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use more precise types
+
+	* libbalsa/mailbox.c (mbox_model_init), (mbox_model_get_value):
+	Use the GTypes that are expected in
+	gtk_cell_renderer_text_set_property().
+
 2019-04-01  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Improve IMAP folder parent selection, subscription management

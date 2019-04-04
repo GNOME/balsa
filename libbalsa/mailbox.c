@@ -2766,12 +2766,12 @@ mbox_model_init(GtkTreeModelIface *iface)
     mbox_model_col_type[LB_MBOX_SUBJECT_COL] = G_TYPE_STRING;
     mbox_model_col_type[LB_MBOX_DATE_COL]    = G_TYPE_STRING;
     mbox_model_col_type[LB_MBOX_SIZE_COL]    = G_TYPE_STRING;
-    mbox_model_col_type[LB_MBOX_WEIGHT_COL]  = G_TYPE_UINT;
-    mbox_model_col_type[LB_MBOX_STYLE_COL]   = G_TYPE_UINT;
+    mbox_model_col_type[LB_MBOX_WEIGHT_COL]  = G_TYPE_INT;
+    mbox_model_col_type[LB_MBOX_STYLE_COL]   = PANGO_TYPE_STYLE;
     mbox_model_col_type[LB_MBOX_FOREGROUND_COL]     = G_TYPE_STRING;
-    mbox_model_col_type[LB_MBOX_FOREGROUND_SET_COL] = G_TYPE_UINT;
+    mbox_model_col_type[LB_MBOX_FOREGROUND_SET_COL] = G_TYPE_BOOLEAN;
     mbox_model_col_type[LB_MBOX_BACKGROUND_COL]     = G_TYPE_STRING;
-    mbox_model_col_type[LB_MBOX_BACKGROUND_SET_COL] = G_TYPE_UINT;
+    mbox_model_col_type[LB_MBOX_BACKGROUND_SET_COL] = G_TYPE_BOOLEAN;
 
 
     libbalsa_mbox_model_signals[ROW_CHANGED] =
@@ -3044,11 +3044,11 @@ mbox_model_get_value(GtkTreeModel *tree_model,
         else g_value_set_static_string(value, "          ");
         break;
     case LB_MBOX_WEIGHT_COL:
-        g_value_set_uint(value, msg && msg->unseen
+        g_value_set_int(value, msg != NULL && msg->unseen
                          ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL);
         break;
     case LB_MBOX_STYLE_COL:
-        g_value_set_uint(value, msg &&
+        g_value_set_enum(value, msg != NULL &&
 			 lbm_node_has_unseen_child(lmm,
 						   (GNode *) iter->user_data)
                          ? PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL);
@@ -3060,7 +3060,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
         }
         break;
     case LB_MBOX_FOREGROUND_SET_COL:
-        g_value_set_uint(value, msg && msg->foreground_set);
+        g_value_set_boolean(value, msg != NULL && msg->foreground_set);
         break;
     case LB_MBOX_BACKGROUND_COL:
         if(msg) {
@@ -3069,7 +3069,7 @@ mbox_model_get_value(GtkTreeModel *tree_model,
         }
         break;
     case LB_MBOX_BACKGROUND_SET_COL:
-        g_value_set_uint(value, msg && msg->background_set);
+        g_value_set_boolean(value, msg != NULL && msg->background_set);
         break;
     }
 }

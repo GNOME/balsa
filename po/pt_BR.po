@@ -19,16 +19,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2019-03-05 17:01+0000\n"
-"PO-Revision-Date: 2019-03-06 17:33-0300\n"
+"POT-Creation-Date: 2019-04-01 15:40+0000\n"
+"PO-Revision-Date: 2019-04-04 02:20-0300\n"
 "Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
-"Language-Team: Portuguese - Brazil <gnome-pt_br-list@gnome.org>\n"
+"Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
-"X-Generator: Gtranslator 3.31.90\n"
+"X-Generator: Gtranslator 3.32.0\n"
 "X-Project-Style: gnome\n"
 
 #: ../balsa.appdata.xml.in.h:1
@@ -229,8 +229,8 @@ msgid "Autocrypt database"
 msgstr "Banco de dados de Autocrypt"
 
 #: ../libbalsa/autocrypt.c:428 ../libbalsa/html.c:421
-#: ../libbalsa/identity.c:1798 ../src/ab-window.c:149
-#: ../src/mailbox-node.c:1101 ../src/main-window.c:3686
+#: ../libbalsa/identity.c:1798 ../src/ab-window.c:149 ../src/folder-conf.c:327
+#: ../src/mailbox-node.c:1085 ../src/main-window.c:3686
 #: ../src/toolbar-prefs.c:141 ../ui/main-window.ui.h:65
 #: ../ui/message-window.ui.h:4 ../ui/sendmsg-window.ui.h:12
 #: ../ui/source-viewer.ui.h:2
@@ -582,15 +582,15 @@ msgstr "A assinatura em %s não é um texto no formato UTF-8."
 #: ../src/balsa-mime-widget-callbacks.c:85 ../src/filter-edit-callbacks.c:1247
 #: ../src/filter-edit-dialog.c:404 ../src/filter-edit-dialog.c:574
 #: ../src/filter-export-dialog.c:80 ../src/filter-run-dialog.c:316
-#: ../src/folder-conf.c:252 ../src/folder-conf.c:442 ../src/folder-conf.c:673
-#: ../src/folder-conf.c:918 ../src/mailbox-conf.c:210 ../src/mailbox-conf.c:231
-#: ../src/mailbox-conf.c:247 ../src/mailbox-conf.c:726
-#: ../src/mailbox-conf.c:785 ../src/pref-manager.c:3291
-#: ../src/sendmsg-window.c:536 ../src/sendmsg-window.c:1539
-#: ../src/sendmsg-window.c:1991 ../src/sendmsg-window.c:3325
-#: ../src/sendmsg-window.c:4676 ../src/sendmsg-window.c:4975
-#: ../src/sendmsg-window.c:5066 ../src/spell-check.c:382
-#: ../src/store-address.c:209
+#: ../src/folder-conf.c:330 ../src/folder-conf.c:449 ../src/folder-conf.c:812
+#: ../src/folder-conf.c:1057 ../src/mailbox-conf.c:210
+#: ../src/mailbox-conf.c:231 ../src/mailbox-conf.c:247
+#: ../src/mailbox-conf.c:726 ../src/mailbox-conf.c:783
+#: ../src/pref-manager.c:3291 ../src/sendmsg-window.c:536
+#: ../src/sendmsg-window.c:1539 ../src/sendmsg-window.c:1991
+#: ../src/sendmsg-window.c:3325 ../src/sendmsg-window.c:4676
+#: ../src/sendmsg-window.c:4975 ../src/sendmsg-window.c:5066
+#: ../src/spell-check.c:382 ../src/store-address.c:209
 msgid "_Cancel"
 msgstr "_Cancelar"
 
@@ -600,10 +600,10 @@ msgstr "_Cancelar"
 #: ../src/balsa-message.c:1799 ../src/balsa-mime-widget-callbacks.c:86
 #: ../src/filter-edit-callbacks.c:1246 ../src/filter-edit-dialog.c:573
 #: ../src/filter-export-dialog.c:79 ../src/filter-run-dialog.c:315
-#: ../src/main-window.c:3781 ../src/pref-manager.c:3289
-#: ../src/sendmsg-window.c:1538 ../src/sendmsg-window.c:1992
-#: ../src/sendmsg-window.c:3324 ../src/sendmsg-window.c:4677
-#: ../src/store-address.c:210
+#: ../src/folder-conf.c:330 ../src/main-window.c:3781
+#: ../src/pref-manager.c:3289 ../src/sendmsg-window.c:1538
+#: ../src/sendmsg-window.c:1992 ../src/sendmsg-window.c:3324
+#: ../src/sendmsg-window.c:4677 ../src/store-address.c:210
 msgid "_OK"
 msgstr "_OK"
 
@@ -827,8 +827,8 @@ msgstr "Gerenciar Identidades"
 #: ../src/address-book-config.c:239 ../src/address-book-config.c:341
 #: ../src/address-book-config.c:387 ../src/filter-edit-callbacks.c:1248
 #: ../src/filter-edit-dialog.c:575 ../src/filter-export-dialog.c:81
-#: ../src/filter-run-dialog.c:317 ../src/folder-conf.c:253
-#: ../src/folder-conf.c:443 ../src/folder-conf.c:674 ../src/main-window.c:3685
+#: ../src/filter-run-dialog.c:317 ../src/folder-conf.c:450
+#: ../src/folder-conf.c:813 ../src/main-window.c:3685
 #: ../src/pref-manager.c:3292 ../src/toolbar-prefs.c:142 ../ui/ab-main.ui.h:16
 #: ../ui/main-window.ui.h:88
 msgid "_Help"
@@ -901,7 +901,8 @@ msgstr "Erro na implementação do comando SORT em servidor IMAP exposto."
 
 #: ../libbalsa/imap/imap-handle.c:58 ../libbalsa/rfc2445.c:88
 #: ../libbalsa/rfc2445.c:711 ../libbalsa/rfc2445.c:730
-#: ../libbalsa/rfc3156.c:689 ../src/sendmsg-window.c:5209
+#: ../libbalsa/rfc3156.c:689 ../src/folder-conf.c:393
+#: ../src/sendmsg-window.c:5209
 msgid "unknown"
 msgstr "desconhecido"
 
@@ -956,6 +957,18 @@ msgstr "Não é possível conectar ao servidor: %s"
 #, c-format
 msgid "Exceeded the number of connections per server %s"
 msgstr "Excedido o número de conexões por servidor %s"
+
+#: ../libbalsa/imap-server.c:913
+#, c-format
+#| msgid "%s user “%s” failed: %s"
+msgid "subscribing to “%s” failed"
+msgstr "inscrição para “%s” falhou"
+
+#: ../libbalsa/imap-server.c:927
+#, c-format
+#| msgid "exporting key for “%s” failed"
+msgid "unsubscribing from “%s” failed"
+msgstr "desinscrição de “%s” falhou"
 
 #: ../libbalsa/libbalsa.c:423 ../libbalsa/libbalsa.c:591
 msgid "SSL/TLS certificate"
@@ -1674,37 +1687,37 @@ msgstr ""
 msgid "No path found for mailbox “%s”, using “%s”"
 msgstr "Nenhum caminho encontrado para a caixa de correio “%s”, usando “%s”"
 
-#: ../libbalsa/mailbox_imap.c:1803 ../libbalsa/mailbox_imap.c:1844
+#: ../libbalsa/mailbox_imap.c:1780 ../libbalsa/mailbox_imap.c:1821
 #, c-format
 msgid "Cannot get IMAP handle"
 msgstr "Impossível obter o manipulador IMAP"
 
-#: ../libbalsa/mailbox_imap.c:2450 ../libbalsa/mailbox_imap.c:2513
+#: ../libbalsa/mailbox_imap.c:2427 ../libbalsa/mailbox_imap.c:2490
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr "Erro ao recuperar mensagem do servidor IMAP: %s"
 
-#: ../libbalsa/mailbox_imap.c:2485
+#: ../libbalsa/mailbox_imap.c:2462
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Recebendo %u kB"
 
-#: ../libbalsa/mailbox_imap.c:2526
+#: ../libbalsa/mailbox_imap.c:2503
 #, c-format
 msgid "Cannot create temporary file"
 msgstr "Impossível criar o arquivo temporário"
 
-#: ../libbalsa/mailbox_imap.c:2550
+#: ../libbalsa/mailbox_imap.c:2527
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Impossível escrever no arquivo temporário %s"
 
-#: ../libbalsa/mailbox_imap.c:2779 ../libbalsa/mailbox_imap.c:2898
+#: ../libbalsa/mailbox_imap.c:2756 ../libbalsa/mailbox_imap.c:2875
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Enviando %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:3200
+#: ../libbalsa/mailbox_imap.c:3177
 msgid "Server-side threading not supported."
 msgstr "O encadeamento usado pelo servidor não é suportado."
 
@@ -3187,8 +3200,8 @@ msgstr "Enviar _sinal através…"
 msgid "_Store Address…"
 msgstr "Arma_zenar endereço…"
 
-#: ../src/balsa-index.c:1848 ../src/mailbox-node.c:1093
-#: ../src/mailbox-node.c:1109 ../src/pref-manager.c:2030
+#: ../src/balsa-index.c:1848 ../src/mailbox-node.c:1077
+#: ../src/mailbox-node.c:1093 ../src/pref-manager.c:2030
 #: ../src/pref-manager.c:2115 ../src/pref-manager.c:2795 ../ui/ab-main.ui.h:11
 #: ../ui/main-window.ui.h:61
 msgid "_Delete"
@@ -4158,7 +4171,7 @@ msgstr "T_ipo da busca:"
 msgid "Edit condition for filter: "
 msgstr "Editar condição para filtro: "
 
-#: ../src/filter-edit-callbacks.c:1483 ../src/save-restore.c:1912
+#: ../src/filter-edit-callbacks.c:1483 ../src/save-restore.c:1914
 msgid "Filter with no condition was omitted"
 msgstr "Filtro sem condições foi omitido"
 
@@ -4297,7 +4310,7 @@ msgid "Use Sound…"
 msgstr "Usar som…"
 
 # 15
-#: ../src/filter-edit-dialog.c:405 ../src/mailbox-node.c:1099
+#: ../src/filter-edit-dialog.c:405 ../src/mailbox-node.c:1083
 msgid "_Open"
 msgstr "_Abrir"
 
@@ -4433,61 +4446,102 @@ msgstr ""
 "O diálogo de filtros está aberto, feche-o antes que você possa rodar os "
 "filtros em qualquer caixa de mensagem"
 
-#: ../src/folder-conf.c:118
+#: ../src/folder-conf.c:120
 #, c-format
 msgid "Error displaying config help: %s\n"
 msgstr "Erro ao exibir ajuda de configuração: %s\n"
 
-#: ../src/folder-conf.c:247
+#: ../src/folder-conf.c:206
+#, c-format
+#| msgid "Connecting %s failed: %s"
+msgid "Changing subscriptions failed: %s"
+msgstr "A alteração de inscrição falhou: %s"
+
+#: ../src/folder-conf.c:316
+#, c-format
+#| msgid "Cannot get IMAP handle"
+msgid "Cannot list IMAP folders: %s"
+msgstr "Não foi possível listar pastas IMAP: %s"
+
+#: ../src/folder-conf.c:356
+#| msgid "Subfolder of:"
+msgid "folder"
+msgstr "pasta"
+
+#: ../src/folder-conf.c:369
+#| msgid "_Unsubscribe"
+msgid "subscribed"
+msgstr "inscrito"
+
+#: ../src/folder-conf.c:392
+#, c-format
+msgid "Manage folder subscriptions of IMAP server “%s”"
+msgstr "Gerenciar inscrições de pastas do servidor IMAP “%s”"
+
+#: ../src/folder-conf.c:394
+#| msgid "Description"
+msgid "Manage subscriptions"
+msgstr "Gerenciar inscrições"
+
+#: ../src/folder-conf.c:444
 msgid "Remote IMAP folder"
 msgstr "Pasta IMAP remota"
 
-#: ../src/folder-conf.c:251 ../src/folder-conf.c:672 ../src/mailbox-conf.c:362
+#: ../src/folder-conf.c:448 ../src/folder-conf.c:811 ../src/mailbox-conf.c:362
 msgid "_Update"
 msgstr "_Atualizar"
 
-#: ../src/folder-conf.c:251
+#: ../src/folder-conf.c:448
 msgid "C_reate"
 msgstr "C_riar"
 
-#. additional basic settings
-#: ../src/folder-conf.c:276
+#: ../src/folder-conf.c:474
 msgid "Subscribed _folders only"
 msgstr "Apenas _pastas assinadas"
 
-#: ../src/folder-conf.c:278
+#: ../src/folder-conf.c:476
+msgid "Manage subscriptions…"
+msgstr "Gerenciar inscrições…"
+
+#: ../src/folder-conf.c:489
 msgid "Always show _Inbox"
 msgstr "Sempre mostrar a caixa de _entrada"
 
-#: ../src/folder-conf.c:280
+#: ../src/folder-conf.c:491
 msgid "Pr_efix:"
 msgstr "Pr_efixo:"
 
-#: ../src/folder-conf.c:287
+#: ../src/folder-conf.c:498
 msgid "_Max number of connections:"
 msgstr "Número _máximo de conexões:"
 
-#: ../src/folder-conf.c:288
+#: ../src/folder-conf.c:499
 msgid "Enable _persistent cache"
 msgstr "Habilitar cache _persistente"
 
-#: ../src/folder-conf.c:290
+#: ../src/folder-conf.c:501
 msgid "Use IDLE command"
 msgstr "Usar comando IDLE"
 
-#: ../src/folder-conf.c:292
+#: ../src/folder-conf.c:503
 msgid "Enable _bug workarounds"
 msgstr "Ha_bilitar tratamento de erros"
 
-#: ../src/folder-conf.c:294
+#: ../src/folder-conf.c:505
 msgid "Use STATUS for mailbox checking"
 msgstr "Utilize ESTADO para verificação da caixa de correio"
 
-#: ../src/folder-conf.c:438
+#: ../src/folder-conf.c:588
+#, c-format
+#| msgid "Select parent folder"
+msgid "Select parent folder of “%s”"
+msgstr "Selecionar pasta superior de “%s”"
+
+#: ../src/folder-conf.c:590
 msgid "Select parent folder"
 msgstr "Selecionar pasta superior"
 
-#: ../src/folder-conf.c:519
+#: ../src/folder-conf.c:659
 #, c-format
 msgid ""
 "Renaming Inbox is special!\n"
@@ -4502,29 +4556,29 @@ msgstr ""
 "A caixa de entrada e suas subpastas continuarão existindo.\n"
 "O que você deseja fazer?"
 
-#: ../src/folder-conf.c:526
+#: ../src/folder-conf.c:666
 msgid "Question"
 msgstr "Pergunta"
 
-#: ../src/folder-conf.c:530
+#: ../src/folder-conf.c:670
 msgid "Rename Inbox"
 msgstr "Renomear a caixa de entrada"
 
-#: ../src/folder-conf.c:532
+#: ../src/folder-conf.c:672
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../src/folder-conf.c:557
+#: ../src/folder-conf.c:697
 #, c-format
 msgid "Folder rename failed. Reason: %s"
 msgstr "Falha no nome da pasta. Razão: %s"
 
-#: ../src/folder-conf.c:609 ../src/folder-conf.c:955
+#: ../src/folder-conf.c:748 ../src/folder-conf.c:1094
 #, c-format
 msgid "Folder creation failed. Reason: %s"
 msgstr "Falha ao criar a pasta. Razão: %s"
 
-#: ../src/folder-conf.c:657
+#: ../src/folder-conf.c:796
 msgid ""
 "An IMAP folder that is not a mailbox\n"
 "has no properties that can be changed."
@@ -4532,60 +4586,60 @@ msgstr ""
 "Uma pasta IMAP que não é uma caixa de correio\n"
 "não tem propriedades que possam ser alteradas."
 
-#: ../src/folder-conf.c:668
+#: ../src/folder-conf.c:807
 msgid "Remote IMAP subfolder"
 msgstr "Subpasta IMAP remota"
 
 #. INPUT FIELD CREATION
-#: ../src/folder-conf.c:704 ../src/folder-conf.c:933
+#: ../src/folder-conf.c:843 ../src/folder-conf.c:1072
 msgid "_Folder name:"
 msgstr "Nome da _pasta:"
 
-#: ../src/folder-conf.c:710
+#: ../src/folder-conf.c:849
 msgid "Host:"
 msgstr "Host:"
 
-#: ../src/folder-conf.c:719 ../src/folder-conf.c:928
+#: ../src/folder-conf.c:858 ../src/folder-conf.c:1067
 msgid "Subfolder of:"
 msgstr "Subpasta de:"
 
-#: ../src/folder-conf.c:724
+#: ../src/folder-conf.c:863
 msgid "_Browse…"
 msgstr "_Navegar…"
 
-#: ../src/folder-conf.c:736
+#: ../src/folder-conf.c:875
 msgid "read-only"
 msgstr "somente leitura"
 
-#: ../src/folder-conf.c:737
+#: ../src/folder-conf.c:876
 msgid "read-write"
 msgstr "leitura-escrita"
 
-#: ../src/folder-conf.c:738
+#: ../src/folder-conf.c:877
 msgid "admin"
 msgstr "administração"
 
-#: ../src/folder-conf.c:739
+#: ../src/folder-conf.c:878
 msgid "post"
 msgstr "enviar"
 
-#: ../src/folder-conf.c:740
+#: ../src/folder-conf.c:879
 msgid "append"
 msgstr "inserir"
 
-#: ../src/folder-conf.c:741
+#: ../src/folder-conf.c:880
 msgid "delete"
 msgstr "excluir"
 
-#: ../src/folder-conf.c:742
+#: ../src/folder-conf.c:881
 msgid "special"
 msgstr "especial"
 
-#: ../src/folder-conf.c:748
+#: ../src/folder-conf.c:887
 msgid "Permissions:"
 msgstr "Permissões:"
 
-#: ../src/folder-conf.c:755
+#: ../src/folder-conf.c:894
 msgid ""
 "\n"
 "detailed permissions are available only for open folders"
@@ -4593,7 +4647,7 @@ msgstr ""
 "\n"
 "permissões detalhadas estão disponíveis apenas para pastas abertas"
 
-#: ../src/folder-conf.c:762
+#: ../src/folder-conf.c:901
 msgid ""
 "\n"
 "the server does not support ACLs"
@@ -4601,32 +4655,32 @@ msgstr ""
 "\n"
 "o servidor não aceita ACLs"
 
-#: ../src/folder-conf.c:771
+#: ../src/folder-conf.c:910
 msgid "mine: "
 msgstr "meu: "
 
-#: ../src/folder-conf.c:809
+#: ../src/folder-conf.c:948
 msgid "Quota:"
 msgstr "Cota:"
 
-#: ../src/folder-conf.c:813
+#: ../src/folder-conf.c:952
 msgid "quota information available only for open folders"
 msgstr "informação de cota disponível apenas para pastas abertas"
 
-#: ../src/folder-conf.c:818
+#: ../src/folder-conf.c:957
 msgid "the server does not support quotas"
 msgstr "o servidor não dá suporte a cotas"
 
-#: ../src/folder-conf.c:820
+#: ../src/folder-conf.c:959
 msgid "no limits"
 msgstr "sem limites"
 
-#: ../src/folder-conf.c:825
+#: ../src/folder-conf.c:964
 #, c-format
 msgid "%s of %s (%.1f%%) used"
 msgstr "%s de %s (%.1f%%) usado"
 
-#: ../src/folder-conf.c:862
+#: ../src/folder-conf.c:1001
 msgid ""
 "This folder is not stored in configuration. I do not yet know how to remove "
 "it from remote server."
@@ -4634,7 +4688,7 @@ msgstr ""
 "Esta pasta não está guardada nas configurações. Ainda não sei como removê-la "
 "do servidor remoto."
 
-#: ../src/folder-conf.c:871
+#: ../src/folder-conf.c:1010
 #, c-format
 msgid ""
 "This will remove the folder “%s” from the list.\n"
@@ -4643,23 +4697,23 @@ msgstr ""
 "Isto removerá a pasta “%s” da lista.\n"
 "Você deve usar “Nova pasta IMAP” depois para criar essa pasta novamente.\n"
 
-#: ../src/folder-conf.c:879
+#: ../src/folder-conf.c:1018
 msgid "Confirm"
 msgstr "Confirmar"
 
-#: ../src/folder-conf.c:914
+#: ../src/folder-conf.c:1053
 msgid "Create IMAP subfolder"
 msgstr "Criar subpasta IMAP"
 
-#: ../src/folder-conf.c:917
+#: ../src/folder-conf.c:1056
 msgid "_Create"
 msgstr "_Criar"
 
-#: ../src/folder-conf.c:929
+#: ../src/folder-conf.c:1068
 msgid "server (top level)"
 msgstr "servidor (nível de topo)"
 
-#: ../src/folder-conf.c:944
+#: ../src/folder-conf.c:1083
 #, c-format
 msgid ""
 "The character “%c” is used as hierarchy separator by the server and "
@@ -4794,46 +4848,46 @@ msgstr "Propriedades da caixa local %s"
 msgid "New Local %s Mailbox"
 msgstr "Nova caixa de correio %s local"
 
-#: ../src/mailbox-conf.c:753
+#: ../src/mailbox-conf.c:751
 msgid "_Mailbox Name:"
 msgstr "_Nome da caixa de correio:"
 
-#: ../src/mailbox-conf.c:781
+#: ../src/mailbox-conf.c:779
 msgid "Remote Mailbox Configurator"
 msgstr "Configurador remoto de caixa de correio"
 
-#: ../src/mailbox-conf.c:797
+#: ../src/mailbox-conf.c:795
 msgid "_Delete messages from server after download"
 msgstr "_Excluir mensagens do servidor depois de baixá-las"
 
 #. toggle for check
-#: ../src/mailbox-conf.c:800
+#: ../src/mailbox-conf.c:798
 msgid "_Enable check for new mail"
 msgstr "Habilitar checagem de novas m_ensagens"
 
-#: ../src/mailbox-conf.c:805
+#: ../src/mailbox-conf.c:803
 msgid "_Filter messages through procmail"
 msgstr "_Filtrar mensagens através do procmail"
 
-#: ../src/mailbox-conf.c:806
+#: ../src/mailbox-conf.c:804
 msgid "Fi_lter Command:"
 msgstr "Comando de fi_ltro:"
 
 #. advanced - toggle for apop
-#: ../src/mailbox-conf.c:810
+#: ../src/mailbox-conf.c:808
 msgid "Disable _APOP"
 msgstr "Desabilitar _APOP"
 
 #. toggle for enabling pipeling
-#: ../src/mailbox-conf.c:814
+#: ../src/mailbox-conf.c:812
 msgid "Overlap commands"
 msgstr "Comandos sobrepostos"
 
-#: ../src/mailbox-conf.c:875
+#: ../src/mailbox-conf.c:873
 msgid "_Identity:"
 msgstr "_Identidade:"
 
-#: ../src/mailbox-conf.c:896
+#: ../src/mailbox-conf.c:894
 msgid ""
 "_Decrypt and check\n"
 "signatures automatically:"
@@ -4841,32 +4895,32 @@ msgstr ""
 "_Descriptografar e verificar\n"
 "assinaturas automaticamente:"
 
-#: ../src/mailbox-conf.c:904 ../src/pref-manager.c:212
+#: ../src/mailbox-conf.c:902 ../src/pref-manager.c:212
 #: ../src/pref-manager.c:1161
 msgid "Never"
 msgstr "Nunca"
 
-#: ../src/mailbox-conf.c:905
+#: ../src/mailbox-conf.c:903
 msgid "If Possible"
 msgstr "Se possível"
 
-#: ../src/mailbox-conf.c:906 ../src/pref-manager.c:1163
+#: ../src/mailbox-conf.c:904 ../src/pref-manager.c:1163
 msgid "Always"
 msgstr "Sempre"
 
-#: ../src/mailbox-conf.c:922
+#: ../src/mailbox-conf.c:920
 msgid "Show _Recipient column instead of Sender"
 msgstr "Mostrar coluna _Destinatário ao invés de Remetente"
 
-#: ../src/mailbox-conf.c:936
+#: ../src/mailbox-conf.c:934
 msgid "_Subscribe for new mail check"
 msgstr "A_ssinar verificação de novos e-mails"
 
-#: ../src/mailbox-conf.c:952
+#: ../src/mailbox-conf.c:950
 msgid "_Thread messages"
 msgstr "_Encadear mensagens"
 
-#: ../src/mailbox-conf.c:967
+#: ../src/mailbox-conf.c:965
 msgid "_Merge threads with the same subject"
 msgstr "_Mesclar encadeamentos com o mesmo objetivo"
 
@@ -4893,85 +4947,77 @@ msgstr ""
 msgid "Scanning of %s failed: %s"
 msgstr "A busca de %s falhou: %s"
 
-#: ../src/mailbox-node.c:1050
+#: ../src/mailbox-node.c:1034
 msgid "Local _mbox mailbox…"
 msgstr "Caixa de correio _mbox local…"
 
-#: ../src/mailbox-node.c:1052
+#: ../src/mailbox-node.c:1036
 msgid "Local Mail_dir mailbox…"
 msgstr "Caixa de correio Mail_dir local…"
 
-#: ../src/mailbox-node.c:1054
+#: ../src/mailbox-node.c:1038
 msgid "Local M_H mailbox…"
 msgstr "Caixa de correio M_H local…"
 
-#: ../src/mailbox-node.c:1057
+#: ../src/mailbox-node.c:1041
 msgid "Remote IMAP _folder…"
 msgstr "_Pasta IMAP remota…"
 
-#: ../src/mailbox-node.c:1060
+#: ../src/mailbox-node.c:1044
 msgid "Remote IMAP _subfolder…"
 msgstr "_Subpasta IMAP remota…"
 
 #. Translators: popup menu item "New" mailbox or folder
-#: ../src/mailbox-node.c:1066
+#: ../src/mailbox-node.c:1050
 msgctxt "mailbox"
 msgid "_New"
 msgstr "_Nova"
 
 #. clicked on the empty space
-#: ../src/mailbox-node.c:1073 ../src/mailbox-node.c:1089
+#: ../src/mailbox-node.c:1057 ../src/mailbox-node.c:1073
 msgid "_Rescan"
 msgstr "Procurar _novamente"
 
-#: ../src/mailbox-node.c:1083
+#: ../src/mailbox-node.c:1067
 msgid "_Properties…"
 msgstr "_Propriedades…"
 
-#: ../src/mailbox-node.c:1113
-msgid "_Subscribe"
-msgstr "In_screver"
-
-#: ../src/mailbox-node.c:1115
-msgid "_Unsubscribe"
-msgstr "_Desinscrever"
-
-#: ../src/mailbox-node.c:1121
+#: ../src/mailbox-node.c:1097
 msgid "Mark as _Inbox"
 msgstr "Marcar como caixa de _entrada"
 
-#: ../src/mailbox-node.c:1123
+#: ../src/mailbox-node.c:1099
 msgid "_Mark as Sentbox"
 msgstr "_Marcar como enviadas"
 
-#: ../src/mailbox-node.c:1125
+#: ../src/mailbox-node.c:1101
 msgid "Mark as _Trash"
 msgstr "Marcar como _lixo"
 
-#: ../src/mailbox-node.c:1127
+#: ../src/mailbox-node.c:1103
 msgid "Mark as D_raftbox"
 msgstr "Marcar como _rascunhos"
 
-#: ../src/mailbox-node.c:1130
+#: ../src/mailbox-node.c:1106
 msgid "_Empty trash"
 msgstr "_Esvaziar lixeira"
 
-#: ../src/mailbox-node.c:1135
+#: ../src/mailbox-node.c:1111
 msgid "_Edit/Apply filters"
 msgstr "_Editar/Aplicar filtros"
 
-#: ../src/mailbox-node.c:1222
+#: ../src/mailbox-node.c:1198
 #, c-format
 msgid "The path “%s” does not lead to a mailbox."
 msgstr "O caminho “%s” não leva à caixa de correio."
 
 # 13
-#: ../src/mailbox-node.c:1235
+#: ../src/mailbox-node.c:1211
 #, c-format
 msgid "Local mailbox %s loaded as: %s\n"
 msgstr "Caixa de correio local %s carregada como: %s\n"
 
-#: ../src/mailbox-node.c:1266
+#: ../src/mailbox-node.c:1242
 #, c-format
 msgid "Local folder %s\n"
 msgstr "Pasta local %s\n"
@@ -5980,11 +6026,11 @@ msgstr ""
 "Erro ao carregar filtros: %s\n"
 "Os filtros podem não estar corretos."
 
-#: ../src/save-restore.c:759
+#: ../src/save-restore.c:761
 msgid "The option not to recognize “format=flowed” text has been removed."
 msgstr "A opção para não reconhecer o texto “formato=preenchido” foi removida."
 
-#: ../src/save-restore.c:1028
+#: ../src/save-restore.c:1030
 msgid ""
 "The option not to send “format=flowed” text is now on the Options menu of "
 "the compose window."
@@ -5992,14 +6038,14 @@ msgstr ""
 "A opção para não enviar texto como “formato=preenchido” está agora no menu "
 "Opções da janela de composição."
 
-#: ../src/save-restore.c:1067
+#: ../src/save-restore.c:1069
 msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 "A opção para requerer um MDN está agora no menu Opções da janela de "
 "composição."
 
-#: ../src/save-restore.c:1144
+#: ../src/save-restore.c:1146
 msgid ""
 "This version of Balsa uses a new user interface; if you have changed Balsa’s "
 "keyboard accelerators, you will need to set them again."
@@ -7096,7 +7142,6 @@ msgstr "_Sobre"
 
 #. Translators: window menu item - New message or mailbox
 #: ../ui/main-window.ui.h:3
-#| msgid "_New"
 msgctxt "window menu"
 msgid "_New"
 msgstr "_Nova"
@@ -7188,7 +7233,6 @@ msgid "_Preferences"
 msgstr "_Preferências"
 
 #: ../ui/main-window.ui.h:29
-#| msgid "_Settings"
 msgid "_Settings…"
 msgstr "Co_nfigurações…"
 
@@ -7324,7 +7368,6 @@ msgid "_Message"
 msgstr "_Mensagem"
 
 #: ../ui/main-window.ui.h:67
-#| msgid "_New"
 msgid "_New…"
 msgstr "_Nova…"
 
@@ -7369,7 +7412,6 @@ msgid "_New"
 msgstr "_Nova"
 
 #: ../ui/main-window.ui.h:83
-#| msgid "_No"
 msgid "_Go"
 msgstr "_Ir"
 
@@ -7394,7 +7436,6 @@ msgid "_Contents"
 msgstr "S_umário"
 
 #: ../ui/main-window.ui.h:90
-#| msgid "About Balsa"
 msgid "_About Balsa"
 msgstr "_Sobre o Balsa"
 
@@ -7526,6 +7567,9 @@ msgstr "Anexar chave pública Gnu_PG"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "Descartar caracteres _especiais"
+
+#~ msgid "_Subscribe"
+#~ msgstr "In_screver"
 
 #~ msgid "This message will not be encrypted for the BCC: recipient(s)."
 #~ msgstr ""

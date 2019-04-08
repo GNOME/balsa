@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2019-04-06 16:23+0200\n"
-"PO-Revision-Date: 2019-04-06 16:24+0200\n"
+"POT-Creation-Date: 2019-04-08 15:00+0200\n"
+"PO-Revision-Date: 2019-04-08 15:01+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -395,6 +395,11 @@ msgstr "Oraz"
 #: ../libbalsa/filter-funcs.c:472
 msgid "Or"
 msgstr "Lub"
+
+#: ../libbalsa/folder-scanners.c:508
+#, c-format
+msgid "Could not connect to “%s”"
+msgstr "Nie można połączyć z „%s”"
 
 #: ../libbalsa/gmime-application-pkcs7.c:129
 #, c-format

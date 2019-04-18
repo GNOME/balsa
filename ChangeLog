@@ -1,4 +1,12 @@
-2019-04-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+2019-04-18  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Fix the build after commit e92ec3140a1c81dbf86d90d0155cb2e08f519db2
+
+	* src/main-window.c (bw_update_progress_bar): cast with
+	'(GSourceFunc)', not with 'G_SOURCE_FUNC()', since we do not yet
+	require GLib 2.58!
+
+2019-04-18  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	geometry-manager: Remove a not-reached assertion
 

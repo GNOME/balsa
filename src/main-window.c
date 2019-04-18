@@ -4443,7 +4443,7 @@ bw_update_progress_bar(BalsaWindow *window,
     info->set_fraction = set_fraction;
     info->fraction = fraction;
 
-    g_idle_add(G_SOURCE_FUNC(bw_update_progress_bar_idle_cb), info);
+    g_idle_add((GSourceFunc) bw_update_progress_bar_idle_cb, info);
 }
 
 static void

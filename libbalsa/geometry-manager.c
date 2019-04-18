@@ -47,7 +47,6 @@ static void notify_is_maximized_cb(GtkWindow                *window,
 void
 geometry_manager_init(const gchar *key, gint width, gint height, gboolean maximized)
 {
-	geometry_t *size_item;
 	gchar *config_key;
 
 	g_return_if_fail((key != NULL) && (key[0] != '\0') && (width > 0) && (height > 0));
@@ -59,24 +58,24 @@ geometry_manager_init(const gchar *key, gint width, gint height, gboolean maximi
 		atexit(geometry_manager_destroy);
 	}
 
-	if (g_hash_table_contains(geometry_hash, key)) {
-		g_assert_not_reached();			/* programming error: key must be unique */
-	} else {
+	if (!g_hash_table_contains(geometry_hash, key)) {
+		geometry_t *size_item;
+
 		size_item = g_new0(geometry_t, 1);
 		g_hash_table_insert(geometry_hash, g_strdup(key), size_item);
+
+		config_key = g_strdup_printf("%sWidth=%d", key, width);
+		size_item->width = libbalsa_conf_get_int(config_key);
+		g_free(config_key);
+
+		config_key = g_strdup_printf("%sHeight=%d", key, height);
+		size_item->height = libbalsa_conf_get_int(config_key);
+		g_free(config_key);
+
+		config_key = g_strdup_printf("%sMaximized=%s", key, maximized ? "true" : "false");
+		size_item->maximized = libbalsa_conf_get_bool(config_key);
+		g_free(config_key);
 	}
-
-	config_key = g_strdup_printf("%sWidth=%d", key, width);
-	size_item->width = libbalsa_conf_get_int(config_key);
-	g_free(config_key);
-
-	config_key = g_strdup_printf("%sHeight=%d", key, height);
-	size_item->height = libbalsa_conf_get_int(config_key);
-	g_free(config_key);
-
-	config_key = g_strdup_printf("%sMaximized=%s", key, maximized ? "true" : "false");
-	size_item->maximized = libbalsa_conf_get_bool(config_key);
-	g_free(config_key);
 
 	G_UNLOCK(geometry_hash);
 }

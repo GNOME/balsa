@@ -1,5 +1,12 @@
 2019-04-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	geometry-manager: Remove a not-reached assertion
+
+	* libbalsa/geometry-manager.c (geometry_manager_init): a second
+	call with the same key is not necessarily an error.
+
+2019-04-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Call Gtk only from the main thread
 	https://mail.gnome.org/archives/balsa-list/2019-April/msg00006.html
 

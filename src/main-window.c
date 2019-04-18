@@ -4399,6 +4399,66 @@ bw_progress_timeout(gpointer user_data)
     return window != NULL;
 }
 
+/* bw_update_progress_bar and friends
+ **/
+
+typedef struct {
+    GtkProgressBar *progress_bar;
+    gboolean        set_text;
+    gchar          *text;
+    gboolean        set_fraction;
+    gdouble         fraction;
+} BalsaWindowSetupProgressInfo;
+
+static gboolean
+bw_update_progress_bar_idle_cb(BalsaWindowSetupProgressInfo * info)
+{
+    if (info->set_text)
+        gtk_progress_bar_set_text(info->progress_bar, info->text);
+    if (info->set_fraction)
+        gtk_progress_bar_set_fraction(info->progress_bar, info->fraction);
+
+    g_free(info->text);
+    g_object_unref(info->progress_bar);
+    g_free(info);
+
+    return G_SOURCE_REMOVE;
+}
+
+static void
+bw_update_progress_bar(BalsaWindow *window,
+                       gboolean     set_text,
+                       const gchar *text,
+                       gboolean     set_fraction,
+                       gdouble      fraction)
+{
+    /* Update the display in an idle callback, in case we were called in
+     * a sub-thread.*/
+    BalsaWindowSetupProgressInfo *info;
+
+    info = g_new(BalsaWindowSetupProgressInfo, 1);
+    info->progress_bar = GTK_PROGRESS_BAR(g_object_ref(window->progress_bar));
+    info->set_text = set_text;
+    info->text = g_strdup(text);
+    info->set_fraction = set_fraction;
+    info->fraction = fraction;
+
+    g_idle_add(G_SOURCE_FUNC(bw_update_progress_bar_idle_cb), info);
+}
+
+static void
+bw_progress_bar_set_text(BalsaWindow *window,
+                         const gchar *text)
+{
+    bw_update_progress_bar(window, TRUE, text, FALSE, 0.0);
+}
+
+static void
+bw_progress_bar_set_fraction(BalsaWindow *window,
+                             gdouble      fraction)
+{
+    bw_update_progress_bar(window, FALSE, NULL, TRUE, fraction);
+}
 
 /* balsa_window_increase_activity
  *
@@ -4433,8 +4493,7 @@ balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
         window->progress_type = BALSA_PROGRESS_ACTIVITY;
 
     if (window->progress_type == BALSA_PROGRESS_ACTIVITY)
-        gtk_progress_bar_set_text(GTK_PROGRESS_BAR(window->progress_bar),
-                                  message);
+        bw_progress_bar_set_text(window, message);
     window->activity_messages =
         g_slist_prepend(window->activity_messages, g_strdup(message));
 }
@@ -4450,7 +4509,9 @@ void
 balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
 {
     GSList *link;
-    GtkProgressBar *progress_bar;
+    gboolean set_text = FALSE;
+    const gchar *new_message = NULL;
+    gboolean clear_fraction = FALSE;
 
     if (window->progress_bar == NULL)
         return;
@@ -4461,11 +4522,11 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
     window->activity_messages =
         g_slist_delete_link(window->activity_messages, link);
 
-    progress_bar = GTK_PROGRESS_BAR(window->progress_bar);
-    if (window->progress_type == BALSA_PROGRESS_ACTIVITY)
-        gtk_progress_bar_set_text(progress_bar,
-                                  window->activity_messages ?
-                                  window->activity_messages->data : NULL);
+    if (window->progress_type == BALSA_PROGRESS_ACTIVITY) {
+        set_text = TRUE;
+        if (window->activity_messages != NULL)
+            new_message = window->activity_messages->data;
+    }
 
     /* decrement the counter if positive */
     if (window->activity_counter > 0 && --window->activity_counter == 0) {
@@ -4474,9 +4535,12 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
         window->activity_handler = 0;
         if (window->progress_type == BALSA_PROGRESS_ACTIVITY) {
             window->progress_type = BALSA_PROGRESS_NONE;
-            gtk_progress_bar_set_fraction(progress_bar, 0);
+            clear_fraction = TRUE;
         }
     }
+
+    if (set_text || clear_fraction)
+        bw_update_progress_bar(window, set_text, new_message, clear_fraction, 0.0);
 }
 
 
@@ -4494,33 +4558,13 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
  * returns false; if the initialization is successful it returns true.
  **/
 
-typedef struct {
-    GtkProgressBar *progress_bar;
-    gchar          *text;
-} BalsaWindowSetupProgressInfo;
-
-static gboolean
-bw_setup_progress_idle_cb(BalsaWindowSetupProgressInfo * info)
-{
-    gtk_progress_bar_set_text(info->progress_bar, info->text);
-    gtk_progress_bar_set_fraction(info->progress_bar, 0);
-
-    g_object_unref(info->progress_bar);
-    g_free(info->text);
-    g_free(info);
-
-    return FALSE;
-}
-
 gboolean
 balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
 {
-    BalsaWindowSetupProgressInfo *info;
-
     if (window->progress_bar == NULL)
         return FALSE;
 
-    if (text) {
+    if (text != NULL) {
         /* make sure the progress bar is currently unused */
         if (window->progress_type == BALSA_PROGRESS_INCREMENT)
             return FALSE;
@@ -4528,12 +4572,7 @@ balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
     } else
         window->progress_type = BALSA_PROGRESS_NONE;
 
-    /* Update the display in an idle callback, in case we were called in
-     * a sub-thread.*/
-    info = g_new(BalsaWindowSetupProgressInfo, 1);
-    info->progress_bar = GTK_PROGRESS_BAR(g_object_ref(window->progress_bar));
-    info->text = g_strdup(text);
-    g_idle_add((GSourceFunc) bw_setup_progress_idle_cb, info);
+    bw_update_progress_bar(window, TRUE, text, TRUE, 0.0);
 
     return TRUE;
 }
@@ -4560,8 +4599,7 @@ balsa_window_increment_progress(BalsaWindow * window, gdouble fraction,
     if (window->progress_type != BALSA_PROGRESS_INCREMENT)
         return;
 
-    gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(window->progress_bar),
-                                  fraction);
+    bw_progress_bar_set_fraction(window, fraction);
 
     if (flush)
         while (gtk_events_pending())

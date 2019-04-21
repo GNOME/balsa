@@ -628,22 +628,10 @@ lbav_insert_text_cb(GtkEditable * editable,
                     gint length,
                     gint * position, LibBalsaAddressView * address_view)
 {
-    gchar *p;
     gchar *ins_text = g_strndup(text, length);
 
     /* replace non-printable chars by spaces */
-    p = ins_text;
-    while (*p != '\0') {
-        gchar *next = g_utf8_next_char(p);
-
-        if (g_unichar_isprint(g_utf8_get_char(p)))
-            p = next;
-        else {
-            *p++ = ' ';
-            if (p != next)
-                memmove(p, next, strlen(next) + 1);
-        }
-    }
+    lbav_clean_text(ins_text);
 
     /* insert */
     g_signal_handlers_block_by_func(editable,

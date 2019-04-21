@@ -1,3 +1,11 @@
+2019-04-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	address-view: drop almost duplicate code
+
+	* libbalsa/address-view.c (lbav_insert_text_cb): use
+	lbav_clean_text to replace non-printable chars by spaces,
+	instead of using almost duplicative code.
+
 2019-04-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	send: Fix a compiler warning

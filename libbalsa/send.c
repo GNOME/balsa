@@ -1602,9 +1602,11 @@ libbalsa_set_message_id(GMimeMessage *mime_message)
         /* initialise some stuff on first-time use... */
         rand = g_rand_new_with_seed((guint32) time(NULL));
         strncpy(id_data.user_name, g_get_user_name(),
-                sizeof(id_data.user_name));
+                sizeof(id_data.user_name) - 1);
+        id_data.user_name[sizeof(id_data.user_name) - 1] = '\0';
         strncpy(id_data.host_name, g_get_host_name(),
-                sizeof(id_data.host_name));
+                sizeof(id_data.host_name) - 1);
+        id_data.host_name[sizeof(id_data.host_name) - 1] = '\0';
     }
 
     /* get some randomness... */

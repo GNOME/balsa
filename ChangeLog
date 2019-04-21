@@ -1,3 +1,14 @@
+2019-04-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	send: Fix a compiler warning
+
+	* libbalsa/send.c (libbalsa_set_message_id): strncpy() with n ==
+	sizeof(dest) generates:
+	"error: ‘__builtin_strncpy’ specified bound 16 equals
+	destination size [-Werror=stringop-truncation]"
+	We now specify one fewer bytes, and explicitly nullify the last
+	byte.
+
 2019-04-18  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Fix the build after commit e92ec3140a1c81dbf86d90d0155cb2e08f519db2

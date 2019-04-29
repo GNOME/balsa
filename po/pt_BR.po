@@ -19,8 +19,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2019-04-01 15:40+0000\n"
-"PO-Revision-Date: 2019-04-04 02:20-0300\n"
+"POT-Creation-Date: 2019-04-08 13:00+0000\n"
+"PO-Revision-Date: 2019-04-29 17:04-0300\n"
 "Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
@@ -403,6 +403,12 @@ msgstr "E"
 #: ../libbalsa/filter-funcs.c:472
 msgid "Or"
 msgstr "Ou"
+
+#: ../libbalsa/folder-scanners.c:508
+#, c-format
+#| msgid "could not set protocol “%s”"
+msgid "Could not connect to “%s”"
+msgstr "Não foi possível conectar a “%s”"
 
 #: ../libbalsa/gmime-application-pkcs7.c:129
 #, c-format
@@ -960,13 +966,11 @@ msgstr "Excedido o número de conexões por servidor %s"
 
 #: ../libbalsa/imap-server.c:913
 #, c-format
-#| msgid "%s user “%s” failed: %s"
 msgid "subscribing to “%s” failed"
 msgstr "inscrição para “%s” falhou"
 
 #: ../libbalsa/imap-server.c:927
 #, c-format
-#| msgid "exporting key for “%s” failed"
 msgid "unsubscribing from “%s” failed"
 msgstr "desinscrição de “%s” falhou"
 
@@ -4453,23 +4457,19 @@ msgstr "Erro ao exibir ajuda de configuração: %s\n"
 
 #: ../src/folder-conf.c:206
 #, c-format
-#| msgid "Connecting %s failed: %s"
 msgid "Changing subscriptions failed: %s"
 msgstr "A alteração de inscrição falhou: %s"
 
 #: ../src/folder-conf.c:316
 #, c-format
-#| msgid "Cannot get IMAP handle"
 msgid "Cannot list IMAP folders: %s"
 msgstr "Não foi possível listar pastas IMAP: %s"
 
 #: ../src/folder-conf.c:356
-#| msgid "Subfolder of:"
 msgid "folder"
 msgstr "pasta"
 
 #: ../src/folder-conf.c:369
-#| msgid "_Unsubscribe"
 msgid "subscribed"
 msgstr "inscrito"
 
@@ -4479,7 +4479,6 @@ msgid "Manage folder subscriptions of IMAP server “%s”"
 msgstr "Gerenciar inscrições de pastas do servidor IMAP “%s”"
 
 #: ../src/folder-conf.c:394
-#| msgid "Description"
 msgid "Manage subscriptions"
 msgstr "Gerenciar inscrições"
 
@@ -4533,7 +4532,6 @@ msgstr "Utilize ESTADO para verificação da caixa de correio"
 
 #: ../src/folder-conf.c:588
 #, c-format
-#| msgid "Select parent folder"
 msgid "Select parent folder of “%s”"
 msgstr "Selecionar pasta superior de “%s”"
 

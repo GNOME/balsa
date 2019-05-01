@@ -561,32 +561,6 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 }
 
 static void
-free_message_info(struct message_info *msg_info)
-{
-    if (msg_info->local_info.message) {
-	msg_info->local_info.message->mailbox = NULL;
-	msg_info->local_info.message->msgno   = 0;
-        g_object_remove_weak_pointer(G_OBJECT(msg_info->local_info.message),
-                                     (gpointer *) & msg_info->local_info.message);
-	msg_info->local_info.message = NULL;
-    }
-    g_free(msg_info);
-}
-
-static void
-free_messages_info(GPtrArray * msgno_2_msg_info)
-{
-    guint i;
-
-    for (i = 0; i < msgno_2_msg_info->len; i++) {
-        struct message_info *msg_info =
-            g_ptr_array_index(msgno_2_msg_info, i);
-        free_message_info(msg_info);
-    }
-    g_ptr_array_free(msgno_2_msg_info, TRUE);
-}
-
-static void
 lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
 {
     gchar *filename;
@@ -684,6 +658,21 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
     g_free(contents);
 }
 
+static void
+free_message_info(struct message_info *msg_info)
+{
+    LibBalsaMessage *message;
+
+    if ((message = msg_info->local_info.message) != NULL) {
+        message->mailbox = NULL;
+        message->msgno   = 0;
+        g_object_remove_weak_pointer(G_OBJECT(message),
+                                     (gpointer *) &msg_info->local_info.message);
+        msg_info->local_info.message = NULL;
+    }
+    g_free(msg_info);
+}
+
 static gboolean
 libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 {
@@ -738,7 +727,8 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
     libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
     mbox->gmime_stream = gmime_stream;
 
-    mbox->msgno_2_msg_info = g_ptr_array_new();
+    mbox->msgno_2_msg_info =
+        g_ptr_array_new_with_free_func((GDestroyNotify) free_message_info);
 
     mailbox->unread_messages = 0;
     time(&t0);
@@ -1099,7 +1089,6 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
         libbalsa_mime_stream_shared_lock(mbox_stream);
         g_mime_stream_seek(mbox_stream, offset, GMIME_STREAM_SEEK_SET);
 
-        free_message_info(msg_info);
         g_ptr_array_remove_index(mbox->msgno_2_msg_info, msgno - 1);
         mbox->messages_info_changed = TRUE;
     }
@@ -1142,7 +1131,7 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
         mbox->gmime_stream = NULL;
     }
 
-    free_messages_info(mbox->msgno_2_msg_info);
+    g_ptr_array_free(mbox->msgno_2_msg_info, TRUE);
     mbox->msgno_2_msg_info = NULL;
 }
 
@@ -1661,7 +1650,6 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    if (expunge &&
 		(msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_DELETED)) {
 	        libbalsa_mailbox_local_msgno_removed(mailbox, j + 1);
-		free_message_info(msg_info);
 		g_ptr_array_remove_index(mbox->msgno_2_msg_info, j);
                 mbox->messages_info_changed = TRUE;
 	    } else
@@ -1701,7 +1689,6 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    libbalsa_mailbox_local_msgno_removed(mailbox, j + 1);
 	    libbalsa_mime_stream_shared_lock(mbox_stream);
 	    g_mime_stream_seek(mbox_stream, offset, GMIME_STREAM_SEEK_SET);
-	    free_message_info(msg_info);
 	    g_ptr_array_remove_index(mbox->msgno_2_msg_info, j);
             mbox->messages_info_changed = TRUE;
 	    continue;

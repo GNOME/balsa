@@ -1,3 +1,15 @@
+2019-05-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox-mbox: Use g_ptr_array_new_with_free_func() to manage
+	deallocation of message_info structures.
+
+	* libbalsa/mailbox_mbox.c (free_message_info): refactor;
+	(libbalsa_mailbox_mbox_open): use g_ptr_array_new_with_free_func()
+	instead of g_ptr_array_new();
+	(libbalsa_mailbox_mbox_check),
+	(libbalsa_mailbox_mbox_close_mailbox),
+	(libbalsa_mailbox_mbox_sync): no need to manually deallocate.
+
 2019-04-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	address-view: drop almost duplicate code

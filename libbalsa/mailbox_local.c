@@ -1101,8 +1101,9 @@ static void lbml_threading_flat(LibBalsaMailbox * mailbox);
 void 
 libbalsa_mailbox_local_set_threading_info(LibBalsaMailboxLocal * local)
 {
-    if (!local->threading_info)
-        local->threading_info = g_ptr_array_new();
+    if (local->threading_info == NULL)
+        local->threading_info =
+            g_ptr_array_new_with_free_func((GDestroyNotify) lbm_local_free_info);
 }
 
 static void
@@ -1207,11 +1208,9 @@ libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox * mailbox,
 
     /* local might not have a threading-info array, and even if it does,
      * it might not be populated; we check both. */
-    if (local->threading_info && msgno <= local->threading_info->len) {
-	lbm_local_free_info(g_ptr_array_index(local->threading_info,
-			                      msgno - 1));
+    if (local->threading_info != NULL &&
+        msgno > 0 && msgno <= local->threading_info->len)
 	g_ptr_array_remove_index(local->threading_info, msgno - 1);
-    }
 
     libbalsa_mailbox_msgno_removed(mailbox, msgno);
 }

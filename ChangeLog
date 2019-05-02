@@ -1,5 +1,14 @@
 2019-05-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox-local: Use g_ptr_array_new_with_free_func() to manage
+	deallocation of threading_info structures.
+
+	* libbalsa/mailbox_local.c
+	(libbalsa_mailbox_local_set_threading_info),
+	(libbalsa_mailbox_local_msgno_removed)
+
+2019-05-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox: Use g_ptr_array_new_with_free_func() to manage
 	deallocation of LibBalsaMailboxIndexEntry.
 

@@ -370,7 +370,7 @@ lbm_index_entry_new_pending(void)
 static void
 lbm_index_entry_free(LibBalsaMailboxIndexEntry *entry)
 {
-    if(entry) {
+    if (entry != NULL) {
         if (!entry->idle_pending)
         {
             g_free(entry->from);
@@ -559,11 +559,7 @@ libbalsa_mailbox_new_from_config(const gchar * group, gboolean is_special)
 static void
 libbalsa_mailbox_free_mindex(LibBalsaMailbox *mailbox)
 {
-    if(mailbox->mindex) {
-        unsigned i;
-        /* we could have used g_ptr_array_foreach but it is >=2.4.0 */
-        for(i=0; i<mailbox->mindex->len; i++)
-            lbm_index_entry_free(g_ptr_array_index(mailbox->mindex, i));
+    if (mailbox->mindex != NULL) {
         g_ptr_array_free(mailbox->mindex, TRUE);
         mailbox->mindex = NULL;
     }
@@ -590,7 +586,8 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
 
         mailbox->stamp++;
         if(mailbox->mindex) g_warning("mindex set - I leak memory");
-        mailbox->mindex = g_ptr_array_new();
+        mailbox->mindex =
+            g_ptr_array_new_with_free_func((GDestroyNotify) lbm_index_entry_free);
 
 	saved_state = mailbox->state;
 	mailbox->state = LB_MAILBOX_STATE_OPENING;
@@ -1446,11 +1443,8 @@ libbalsa_mailbox_msgno_removed(LibBalsaMailbox * mailbox, guint seqno)
     g_node_traverse(mailbox->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL, -1,
                     decrease_post, &dt);
 
-    if (seqno <= mailbox->mindex->len) {
-        lbm_index_entry_free(g_ptr_array_index(mailbox->mindex,
-                                               seqno - 1));
+    if (seqno <= mailbox->mindex->len)
         g_ptr_array_remove_index(mailbox->mindex, seqno - 1);
-    }
 
     mailbox->msg_tree_changed = TRUE;
 

@@ -1,5 +1,14 @@
 2019-05-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox: Use g_ptr_array_new_with_free_func() to manage
+	deallocation of LibBalsaMailboxIndexEntry.
+
+	* libbalsa/mailbox.c (lbm_index_entry_free),
+	(libbalsa_mailbox_free_mindex), (libbalsa_mailbox_open),
+	(libbalsa_mailbox_msgno_removed)
+
+2019-05-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox-mbox: Use g_ptr_array_new_with_free_func() to manage
 	deallocation of message_info structures.
 

@@ -367,7 +367,7 @@ periodic_expunge_cb(void)
 /*
  * Initialize the progress bar and set text.
  */
-static GTimeVal prev_time_val;
+static gint64   prev_time_val;
 static gdouble  min_fraction;
 static void
 balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
@@ -383,7 +383,7 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
      * for a subthread */
     if (!text || total >= LIBBALSA_PROGRESS_MIN_COUNT)
         rc = balsa_window_setup_progress(balsa_app.main_window, text);
-    g_get_current_time(&prev_time_val);
+    prev_time_val = g_get_monotonic_time();
     min_fraction = LIBBALSA_PROGRESS_MIN_UPDATE_STEP;
 
     *progress = (text && rc) ?
@@ -397,8 +397,8 @@ balsa_progress_set_text(LibBalsaProgress * progress, const gchar * text,
 static void
 balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
 {
-    GTimeVal time_val;
-    guint elapsed;
+    gint64 time_val;
+    gint elapsed;
 
     if (*progress == LIBBALSA_PROGRESS_NO)
         return;
@@ -406,15 +406,13 @@ balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
     if (fraction > 0.0 && fraction < min_fraction)
         return;
 
-    g_get_current_time(&time_val);
-    elapsed = time_val.tv_sec - prev_time_val.tv_sec;
-    elapsed *= G_USEC_PER_SEC;
-    elapsed += time_val.tv_usec - prev_time_val.tv_usec;
+    time_val = g_get_monotonic_time();
+    elapsed = time_val - prev_time_val;
     if (elapsed < LIBBALSA_PROGRESS_MIN_UPDATE_USECS)
         return;
 
-    g_time_val_add(&time_val, LIBBALSA_PROGRESS_MIN_UPDATE_USECS);
-    min_fraction += LIBBALSA_PROGRESS_MIN_UPDATE_STEP;
+    prev_time_val += LIBBALSA_PROGRESS_MIN_UPDATE_USECS;
+    min_fraction  += LIBBALSA_PROGRESS_MIN_UPDATE_STEP;
 
     if (balsa_app.main_window)
         balsa_window_increment_progress(balsa_app.main_window, fraction,

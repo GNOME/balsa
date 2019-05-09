@@ -1,5 +1,11 @@
 2019-05-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	main-window: Port the subject-or-sender search bar to GtkSearchEntry
+
+	* src/main-window.c (bw_create_index_widget):
+
+2019-05-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	balsa-message: Port the find-in-message bar to GtkSearchBar and
 	GtkSearchEntry
 

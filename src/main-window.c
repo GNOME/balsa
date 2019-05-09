@@ -479,7 +479,7 @@ bw_create_index_widget(BalsaWindow *bw)
                                        i, view_filters[i].str);
     gtk_combo_box_set_active(GTK_COMBO_BOX(bw->filter_choice), 0);
     gtk_widget_show(bw->filter_choice);
-    bw->sos_entry = gtk_entry_new();
+    bw->sos_entry = gtk_search_entry_new();
     /* gtk_label_set_mnemonic_widget(GTK_LABEL(bw->filter_choice),
        bw->sos_entry); */
     g_signal_connect(G_OBJECT(bw->sos_entry), "focus_in_event",

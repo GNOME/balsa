@@ -1,3 +1,11 @@
+2019-05-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-message: Port the find-in-message bar to GtkSearchBar and
+	GtkSearchEntry
+
+	* src/balsa-message.c (bm_find_bar_new), (bm_disable_find_entry),
+	(balsa_message_init), (balsa_message_find_in_message):
+
 2019-05-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox-local: Use g_ptr_array_new_with_free_func() to manage

@@ -1,3 +1,12 @@
+2019-05-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	main-window: Clear the view filter when the search text is
+	cleared.
+
+	* src/main-window.c (bw_sos_icon_release): callback for the
+	"icon-release" signal from the GtkEntry; act on it.
+	(bw_create_index_widget): connect to the signal.
+
 2019-05-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	main-window: Port the subject-or-sender search bar to GtkSearchEntry

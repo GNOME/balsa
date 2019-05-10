@@ -457,6 +457,23 @@ static struct {
 };
 static gboolean view_filters_translated = FALSE;
 
+static void
+bw_sos_icon_release(GtkEntry            *entry,
+                    GtkEntryIconPosition icon_pos,
+                    GdkEvent            *event,
+                    gpointer             user_data)
+{
+    /* User clicked the button for clearing the text, so we also clear the
+     * search results. */
+    GtkWidget *button = user_data;
+
+    /* GtkSearchEntry will clear the text in its own icon-release
+     * handler, but we need to clear it now in order to revert to no
+     * filtering. */
+    gtk_entry_set_text(entry, "");
+    bw_filter_entry_activate(GTK_WIDGET(entry), button);
+}
+
 static GtkWidget*
 bw_create_index_widget(BalsaWindow *bw)
 {
@@ -479,6 +496,7 @@ bw_create_index_widget(BalsaWindow *bw)
                                        i, view_filters[i].str);
     gtk_combo_box_set_active(GTK_COMBO_BOX(bw->filter_choice), 0);
     gtk_widget_show(bw->filter_choice);
+
     bw->sos_entry = gtk_search_entry_new();
     /* gtk_label_set_mnemonic_widget(GTK_LABEL(bw->filter_choice),
        bw->sos_entry); */
@@ -486,14 +504,18 @@ bw_create_index_widget(BalsaWindow *bw)
                      G_CALLBACK(bw_enable_filter), bw);
     g_signal_connect(G_OBJECT(bw->sos_entry), "focus_out_event",
                      G_CALLBACK(bw_disable_filter), bw);
-    gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->sos_entry, TRUE, TRUE, 0);
-    gtk_widget_show(bw->sos_entry);
-    gtk_box_pack_start(GTK_BOX(bw->sos_bar),
-                       button = gtk_button_new(),
-                       FALSE, FALSE, 0);
+
+    button = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(button),
                       gtk_image_new_from_icon_name("gtk-ok",
                                                     GTK_ICON_SIZE_BUTTON));
+    g_signal_connect(bw->sos_entry, "icon-release",
+                     G_CALLBACK(bw_sos_icon_release), button);
+
+    gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->sos_entry, TRUE, TRUE, 0);
+    gtk_widget_show(bw->sos_entry);
+
+    gtk_box_pack_start(GTK_BOX(bw->sos_bar), button, FALSE, FALSE, 0);
     g_signal_connect(G_OBJECT(bw->sos_entry), "activate",
                      G_CALLBACK(bw_filter_entry_activate),
                      button);

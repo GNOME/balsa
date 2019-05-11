@@ -1,5 +1,17 @@
 2019-05-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* src/balsa-message.c (bm_find_bar_new): connect to
+	GtkSearchEntry's "search-changed" signal instead of GtkEditable's
+	"changed" signal; it provides a 150 msec delay:
+	"To make filtering appear more reactive, it is a good idea
+	to not react to every change in the entry text immediately,
+	but only after a short delay. To support this, GtkSearchEntry
+	emits the “search-changed” signal which can be used instead
+	of the “changed” signal."
+
+
+2019-05-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	main-window: Clear the view filter when the search text is
 	cleared.
 

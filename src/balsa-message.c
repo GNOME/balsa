@@ -614,7 +614,7 @@ bm_find_bar_new(BalsaMessage * bm)
     gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Find:")),
                        FALSE, FALSE, 0);
     bm->find_entry = gtk_search_entry_new();
-    g_signal_connect(bm->find_entry, "changed",
+    g_signal_connect(bm->find_entry, "search-changed",
                      G_CALLBACK(bm_find_entry_changed_cb), bm);
     gtk_box_pack_start(GTK_BOX(hbox), bm->find_entry, FALSE, FALSE, 0);
 

@@ -426,8 +426,12 @@ net_client_pop_read_reply(NetClientPop *client, gchar **reply, GError **error)
 	result = net_client_read_line(NET_CLIENT(client), &reply_buf, error);
 	if (result) {
 		if (strncmp(reply_buf, "+OK", 3U) == 0) {
-			if ((strlen(reply_buf) > 3U) && (reply != NULL)) {
-				*reply = g_strdup(&reply_buf[4]);
+			if (reply != NULL) {
+				if (strlen(reply_buf) > 3U) {
+					*reply = g_strdup(&reply_buf[4]);
+				} else {
+					*reply = g_strdup("");
+				}
 			}
 		} else if (strncmp(reply_buf, "-ERR", 4U) == 0) {
 			if (strlen(reply_buf) > 4U) {

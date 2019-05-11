@@ -1,3 +1,14 @@
+2019-05-11  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Fix issue #15: NULL-pointer deref in pop3 code
+
+	* libnetclient/net-client-pop.c: make sure
+	net_client_pop_read_reply() does not return a NULL server reply
+	string on success (fix issue #15)
+	* libnetclient/net-client-siobuf.c: silence a bunch of Flexelint
+	warnings, no change in code behaviour
+	* libnetclient/test/echoserver.py: add missing executable flag
+
 2019-05-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-message.c (bm_find_bar_new): connect to

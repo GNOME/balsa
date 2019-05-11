@@ -74,6 +74,7 @@ net_client_siobuf_read(NetClientSioBuf *client, void *buffer, gsize count, GErro
 		gsize avail;
 		gsize chunk;
 
+		/*lint -e{737,946,947,9029}		allowed exception according to MISRA Rules 18.2 and 18.3 */
 		avail = priv->buffer->len - (priv->read_ptr - priv->buffer->str);
 		if (avail > left) {
 			chunk = left;
@@ -119,6 +120,7 @@ net_client_siobuf_ungetc(NetClientSioBuf *client)
 	g_return_val_if_fail(NET_IS_CLIENT_SIOBUF(client), -1);
 
 	priv = client->priv;
+	/*lint -e{946}		allowed exception according to MISRA Rules 18.2 and 18.3 */
 	if ((priv->buffer->len != 0U) && (priv->read_ptr > priv->buffer->str)) {
 		priv->read_ptr--;
 		retval = 0;
@@ -142,6 +144,7 @@ net_client_siobuf_gets(NetClientSioBuf *client, gchar *buffer, gsize buflen, GEr
 		gsize avail;
 		gsize chunk;
 
+		/*lint -e{737,946,947,9029}		allowed exception according to MISRA Rules 18.2 and 18.3 */
 		avail = priv->buffer->len - (priv->read_ptr - priv->buffer->str);
 		if (avail > (buflen - 1U)) {
 			chunk = buflen - 1U;
@@ -163,7 +166,7 @@ net_client_siobuf_gets(NetClientSioBuf *client, gchar *buffer, gsize buflen, GEr
 gchar *
 net_client_siobuf_get_line(NetClientSioBuf *client, GError **error)
 {
-	NetClientSioBufPrivate *priv;
+	const NetClientSioBufPrivate *priv;
 	gchar *result;
 
 	g_return_val_if_fail(NET_IS_CLIENT_SIOBUF(client), NULL);
@@ -172,6 +175,7 @@ net_client_siobuf_get_line(NetClientSioBuf *client, GError **error)
 	if (net_client_siobuf_fill(client, error)) {
 		gsize avail;
 
+		/*lint -e{737,946,947,9029}		allowed exception according to MISRA Rules 18.2 and 18.3 */
 		avail = priv->buffer->len - (priv->read_ptr - priv->buffer->str);
 		if (avail > 2U) {
 			result = g_strndup(priv->read_ptr, avail - 2U);
@@ -210,7 +214,7 @@ net_client_siobuf_write(NetClientSioBuf *client, const void *buffer, gsize count
 {
 	g_return_if_fail(NET_IS_CLIENT_SIOBUF(client) && (buffer != NULL) && (count > 0U));
 
-	g_string_append_len(client->priv->writebuf, (const gchar *) buffer, count);
+	(void) g_string_append_len(client->priv->writebuf, (const gchar *) buffer, (gssize) count);
 }
 
 
@@ -230,16 +234,16 @@ net_client_siobuf_printf(NetClientSioBuf *client, const gchar *format, ...)
 gboolean
 net_client_siobuf_flush(NetClientSioBuf *client, GError **error)
 {
-	NetClientSioBufPrivate *priv;
+	const NetClientSioBufPrivate *priv;
 	gboolean result;
 
 	g_return_val_if_fail(NET_IS_CLIENT_SIOBUF(client), FALSE);
 
 	priv = client->priv;
 	if (priv->writebuf->len > 0U) {
-		g_string_append(priv->writebuf, "\r\n");
+		(void) g_string_append(priv->writebuf, "\r\n");
 		result = net_client_write_buffer(NET_CLIENT(client), priv->writebuf->str, priv->writebuf->len, error);
-		g_string_truncate(priv->writebuf, 0U);
+		(void) g_string_truncate(priv->writebuf, 0U);
 	} else {
 		result = FALSE;
 	}
@@ -277,8 +281,8 @@ net_client_siobuf_fill(NetClientSioBuf *client, GError **error)
 
 		result = net_client_read_line(NET_CLIENT(client), &read_buf, error);
 		if (result) {
-			g_string_assign(priv->buffer, read_buf);
-			g_string_append(priv->buffer, "\r\n");
+			(void) g_string_assign(priv->buffer, read_buf);
+			(void) g_string_append(priv->buffer, "\r\n");
 			priv->read_ptr = priv->buffer->str;
 			g_free(read_buf);
 		}
@@ -296,7 +300,7 @@ net_client_siobuf_finalise(GObject *object)
 	const NetClientSioBuf *client = NET_CLIENT_SIOBUF(object);
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_siobuf_parent_class);
 
-	g_string_free(client->priv->buffer, TRUE);
-	g_string_free(client->priv->writebuf, TRUE);
+	(void) g_string_free(client->priv->buffer, TRUE);
+	(void) g_string_free(client->priv->writebuf, TRUE);
 	(*parent_class->finalize)(object);
 }

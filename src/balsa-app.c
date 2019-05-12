@@ -269,6 +269,10 @@ static gboolean
 send_queued_messages_auto_cb(gpointer data)
 {
 	g_debug("%s: %p", __func__, data);
+
+        if (balsa_app.outbox == NULL)
+            return G_SOURCE_REMOVE;
+
 	libbalsa_process_queue(balsa_app.outbox, balsa_find_sentbox_by_url, balsa_app.smtp_servers, FALSE, NULL);
     return (data == NULL);
 }

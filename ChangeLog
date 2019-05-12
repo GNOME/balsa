@@ -1,3 +1,58 @@
+2019-05-12  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Fix “Johnny you are fired” vulnerabilities
+
+	* configure.ac: require gnutls >= 3.0
+	* libbalsa/body.[ch]: add helper functions for detecting multipart
+	    and inline signed bodies
+	* libbalsa/gmime-gpgme-signature.[ch]:
+	  • g_mime_gpgme_sigstat_new_from_gpgme_ctx() classify multiple
+	    signatures as possible attack, always load key if available;
+	  • add g_mime_gpgme_sigstat_info() giving the protocol,
+	    signer and signature status;
+	  • g_mime_gpgme_sigstat_to_gchar() use changed
+	    libbalsa_gpgme_sig_stat_to_gchar() interface, hide signature
+	    timestamp if it is missing;
+	  • add g_mime_gpgme_sigstat_signer() to get the OpenPGP or
+	    S/MIME signer as human-readable string;
+	  • add tokenize_subject() and cert_subject_cn_mail()
+	    for better evaluation of a certificate DN, and use them in
+	    libbalsa_cert_subject_readable()
+	* libbalsa/html.c: fix segfault on NULL body (detected with one
+	    of the broken “Johnny” samples)
+	* libbalsa/libbalsa-gpgme.[ch]:
+	  • add libbalsa_gpgme_protocol_name() to get consistent
+	    protocol naming (replaces gpgme_get_protocol_name() or
+	    hardcoded values);
+	  • define error code for multiple signatures
+	* libbalsa/rfc3156.[ch]:
+	  • change libbalsa_gpgme_sig_stat_to_gchar() to return a
+	    newly allocated string, possibly including error information
+	    from gpgme;
+	  • remove duplicated #define's
+	* src/balsa-message.c:#
+	  • get_crypto_content_icon() print extended signature info
+	    in the tree view;
+	  • libbalsa_msg_try_mp_signed() and libbalsa_msg_part_2440()
+	    use new libbalsa_gpgme_sig_stat_to_gchar() api
+	* src/balsa-mime-widget-crypto.c: drop code to
+	    load a signature's key as this is now done in
+	    g_mime_gpgme_sigstat_new_from_gpgme_ctx()
+	* src/balsa-mime-widget-message.c:
+	  • use new helpers for detecting signed parts;
+	  • use new libbalsa_gpgme_sig_stat_to_gchar() api
+	* src/balsa-print-object-header.[ch]:
+	  • use new helpers for detecting signed parts and
+	    g_mime_gpgme_sigstat_info();
+	  • remove now unused parameter from
+	    balsa_print_object_header_crypto(), and drop code to load a
+	    signature's key
+	* src/balsa-print-object.c: use modified
+	    balsa_print_object_header_crypto() api
+	* src/print-gtk.c: refactoring and simplification of printing
+	    signed and/or encrypted parts
+	* src/sendmsg-window.c: use libbalsa_gpgme_protocol_name()
+
 2019-05-11  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Fix issue #15: NULL-pointer deref in pop3 code

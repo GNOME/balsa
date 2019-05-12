@@ -27,7 +27,9 @@
 #include "balsa-print-object.h"
 #include "balsa-print-object-decor.h"
 #include "balsa-print-object-default.h"
-
+#ifdef HAVE_GPGME
+#include "libbalsa-gpgme.h"
+#endif
 
 /* object related functions */
 static void balsa_print_object_header_class_init(BalsaPrintObjectHeaderClass * klass);
@@ -222,19 +224,21 @@ balsa_print_object_header_new_real(GList * list,
 
 #ifdef HAVE_GPGME
     /* add a signature status to the string */
-    if (balsa_app.shown_headers != HEADERS_NONE && sig_body &&
-	sig_body->parts && sig_body->parts->next &&
-	sig_body->parts->next->sig_info) {
-	gint prot = libbalsa_message_body_protection(sig_body);
+    if (balsa_app.shown_headers != HEADERS_NONE) {
+	    gchar *info_str = NULL;
 
-	if ((prot & LIBBALSA_PROTECT_SIGN) &&
-	    (prot & (LIBBALSA_PROTECT_RFC3156 | LIBBALSA_PROTECT_SMIMEV3))) {
-	    GMimeGpgmeSigstat *siginfo = sig_body->parts->next->sig_info;
+    	if (libbalsa_message_body_multipart_signed(sig_body)) {
+    		info_str = g_mime_gpgme_sigstat_info(sig_body->parts->next->sig_info, TRUE);
+    	} else if (libbalsa_message_body_inline_signed(sig_body)) {
+    		info_str = g_mime_gpgme_sigstat_info(sig_body->sig_info, TRUE);
+    	} else {
+    		/* no signature available */
+    	}
 
-	    g_string_append_printf(header_buf, "%s%s\n",
-	    	g_mime_gpgme_sigstat_protocol_name(siginfo),
-                                   libbalsa_gpgme_sig_stat_to_gchar(siginfo->status));
-	}
+    	if (info_str != NULL) {
+    	    g_string_append_printf(header_buf, "%s\n", info_str);
+    	    g_free(info_str);
+    	}
     }
 #endif				/* HAVE_GPGME */
 
@@ -353,7 +357,7 @@ balsa_print_object_header_from_body(GList *list,
 #ifdef HAVE_GPGME
 GList *
 balsa_print_object_header_crypto(GList *list, GtkPrintContext * context,
-				 LibBalsaMessageBody * body, const gchar * label,
+				 LibBalsaMessageBody * body,
 				 BalsaPrintSetup * psetup)
 {
     gint first_page;
@@ -367,8 +371,9 @@ balsa_print_object_header_crypto(GList *list, GtkPrintContext * context,
     GList *this_chunk;
 
     /* only if the body has an attached signature info */
-    if (!body->sig_info)
-	return balsa_print_object_default(list, context, body, psetup);
+    if ((body->sig_info == NULL) || (body->sig_info->status == GPG_ERR_NOT_SIGNED)) {
+    	return balsa_print_object_default(list, context, body, psetup);
+    }
     
     /* start on new page if less than 2 header lines can be printed */
     if (psetup->c_y_pos + 2 * P_TO_C(psetup->p_hdr_font_height) >
@@ -387,20 +392,8 @@ balsa_print_object_header_crypto(GList *list, GtkPrintContext * context,
     pango_layout_set_font_description(test_layout, header_font);
     pango_font_description_free(header_font);
 
-    /* check if the key needs to be loaded */
-    if (((body->sig_info->summary & GPGME_SIGSUM_KEY_MISSING) == 0) &&
-    	(body->sig_info->key == NULL)) {
-    	g_mime_gpgme_sigstat_load_key(body->sig_info);
-    }
-
     /* create a buffer with the signature info */
     textbuf = g_mime_gpgme_sigstat_to_gchar(body->sig_info, TRUE, balsa_app.date_string);
-    if (label) {
-	gchar *newbuf = g_strconcat(label, "\n", textbuf, NULL);
-
-	g_free(textbuf);
-	textbuf = newbuf;
-    }
 
     /* configure the layout so we can use Pango to split the text into pages */
     pango_layout_set_width(test_layout, C_TO_P(c_use_width));

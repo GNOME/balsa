@@ -26,6 +26,7 @@
 #include <string.h>
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <gnutls/x509.h>
 #include "libbalsa-gpgme.h"
 #include "misc.h"
 #include "libbalsa.h"
@@ -45,6 +46,9 @@ static GObjectClass *g_mime_gpgme_sigstat_parent_class = NULL;
 static void g_mime_gpgme_sigstat_class_init(GMimeGpgmeSigstatClass *
 					    klass);
 static void g_mime_gpgme_sigstat_finalize(GMimeGpgmeSigstat * self);
+
+static gchar *cert_subject_cn_mail(const gchar *subject)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 
 /* GMimeGpgmeSigstat related stuff */
@@ -100,44 +104,37 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
     /* try to retrieve the result of a verify operation */
     result = gpgme_op_verify_result(ctx);
     if ((result != NULL) && (result->signatures != NULL)) {
-        /* there is at least one signature */
-        sig_stat->fingerprint = g_strdup(result->signatures->fpr);
-        sig_stat->sign_time = result->signatures->timestamp;
-        sig_stat->summary = result->signatures->summary;
-        sig_stat->status = gpgme_err_code(result->signatures->status);
-        sig_stat->validity = result->signatures->validity;
+        /* There is at least one signature - note that multiple signatures
+         * are never created by a MUA and may indicate an attack, see
+         * https://github.com/RUB-NDS/Johnny-You-Are-Fired/blob/master/paper/johnny-fired.pdf */
+    	if (result->signatures->next != NULL) {
+    		sig_stat->status = GPG_ERR_MULT_SIGNATURES;
+    	} else {
+			sig_stat->fingerprint = g_strdup(result->signatures->fpr);
+			sig_stat->sign_time = result->signatures->timestamp;
+			sig_stat->summary = result->signatures->summary;
+			sig_stat->status = gpgme_err_code(result->signatures->status);
+			sig_stat->validity = result->signatures->validity;
+
+			/* load the key unless it is known to be missing, using a different context */
+			if ((sig_stat->summary & GPGME_SIGSUM_KEY_MISSING) == 0) {
+				gpgme_ctx_t key_ctx;
+				GError *error = NULL;
+
+				key_ctx = libbalsa_gpgme_new_with_proto(sig_stat->protocol, NULL, NULL, &error);
+				if (key_ctx != NULL) {
+					sig_stat->key = libbalsa_gpgme_load_key(key_ctx, sig_stat->fingerprint, &error);
+					gpgme_release(key_ctx);
+				}
+				if (error != NULL) {
+					g_info("%s: error loading key with fp %s: %s", __func__, sig_stat->fingerprint, error->message);
+					g_clear_error(&error);
+				}
+			}
+    	}
     }
 
 	return sig_stat;
-}
-
-void
-g_mime_gpgme_sigstat_load_key(GMimeGpgmeSigstat *sigstat)
-{
-	g_return_if_fail(GMIME_IS_GPGME_SIGSTAT(sigstat));
-
-	if ((sigstat->key == NULL) && ((sigstat->summary & GPGME_SIGSUM_KEY_MISSING) == 0)) {
-		gpgme_ctx_t ctx;
-
-		ctx = libbalsa_gpgme_new_with_proto(sigstat->protocol, NULL, NULL, NULL);
-		sigstat->key = libbalsa_gpgme_load_key(ctx, sigstat->fingerprint, NULL);
-		gpgme_release(ctx);
-	}
-}
-
-const gchar *
-g_mime_gpgme_sigstat_protocol_name(const GMimeGpgmeSigstat *sigstat)
-{
-	g_return_val_if_fail(GMIME_IS_GPGME_SIGSTAT(sigstat), NULL);
-
-    switch (sigstat->protocol) {
-    case GPGME_PROTOCOL_OpenPGP:
-    	return _("PGP signature: ");
-    case GPGME_PROTOCOL_CMS:
-    	return _("S/MIME signature: ");
-    default:
-    	return _("(unknown protocol) ");
-    }
 }
 
 static inline void
@@ -156,21 +153,51 @@ append_time_t(GString     *str,
 }
 
 gchar *
+g_mime_gpgme_sigstat_info(const GMimeGpgmeSigstat *info,
+						  gboolean                 with_signer)
+{
+	gchar *signer_str = NULL;
+	gchar *status_str;
+	gchar *res_msg;
+
+    g_return_val_if_fail(GMIME_IS_GPGME_SIGSTAT(info), NULL);
+
+    if (with_signer) {
+    	signer_str = g_mime_gpgme_sigstat_signer(info);
+    }
+    status_str = libbalsa_gpgme_sig_stat_to_gchar(info->status);
+    if (signer_str != NULL) {
+    	res_msg = g_strdup_printf(_("%s signature of “%s”: %s"), libbalsa_gpgme_protocol_name(info->protocol),
+    			signer_str, status_str);
+    	g_free(signer_str);
+    } else {
+    	res_msg = g_strdup_printf(_("%s signature: %s"), libbalsa_gpgme_protocol_name(info->protocol), status_str);
+    }
+    g_free(status_str);
+    return res_msg;
+}
+
+gchar *
 g_mime_gpgme_sigstat_to_gchar(const GMimeGpgmeSigstat *info,
 							  gboolean                 full_details,
 				 	 	 	  const gchar             *date_string)
 {
     GString *msg;
+    gchar *status_str;
 
     g_return_val_if_fail(GMIME_IS_GPGME_SIGSTAT(info), NULL);
     g_return_val_if_fail(date_string != NULL, NULL);
-    msg = g_string_new(g_mime_gpgme_sigstat_protocol_name(info));
-    msg = g_string_append(msg, libbalsa_gpgme_sig_stat_to_gchar(info->status));
+    msg = g_string_new(libbalsa_gpgme_protocol_name(info->protocol));
+    status_str = libbalsa_gpgme_sig_stat_to_gchar(info->status);
+    g_string_append_printf(msg, _(" signature: %s"), status_str);
+    g_free(status_str);
     if ((info->status != GPG_ERR_BAD_SIGNATURE) && (info->status != GPG_ERR_NO_DATA)) {
     	if (info->status != GPG_ERR_NO_PUBKEY) {
-    		g_string_append_printf(msg, _("\nSignature validity: %s"), libbalsa_gpgme_validity_to_gchar(info-> validity));
+    		g_string_append_printf(msg, _("\nSignature validity: %s"), libbalsa_gpgme_validity_to_gchar(info->validity));
     	}
-    	append_time_t(msg, _("\nSigned on: %s"), info->sign_time, date_string);
+    	if (info->sign_time != (time_t) 0) {
+    		append_time_t(msg, _("\nSigned on: %s"), info->sign_time, date_string);
+    	}
     }
     if (info->fingerprint) {
     	g_string_append_printf(msg, _("\nKey fingerprint: %s"), info->fingerprint);
@@ -186,6 +213,40 @@ g_mime_gpgme_sigstat_to_gchar(const GMimeGpgmeSigstat *info,
     }
 
     return g_string_free(msg, FALSE);
+}
+
+
+gchar *
+g_mime_gpgme_sigstat_signer(const GMimeGpgmeSigstat *sigstat)
+{
+	gchar *result = NULL;
+
+    g_return_val_if_fail(GMIME_IS_GPGME_SIGSTAT(sigstat), NULL);
+
+    if (sigstat->key != NULL) {
+    	gpgme_user_id_t use_uid;
+
+    	/* skip revoked and invalid uid's... */
+    	use_uid = sigstat->key->uids;
+    	while ((use_uid != NULL) && ((use_uid->invalid != 0) || (use_uid->revoked != 0))) {
+    		use_uid = use_uid->next;
+    	}
+
+    	/* ...but fall back to the first if we didn't find one */
+    	if (use_uid == NULL) {
+    		use_uid = sigstat->key->uids;
+    	}
+
+    	if ((use_uid == NULL) || (use_uid->uid == NULL)) {
+    		result = g_strdup(_("unknown"));
+    	} else if (sigstat->protocol == GPGME_PROTOCOL_CMS) {
+    		result = cert_subject_cn_mail(use_uid->uid);
+    	} else {
+    		result = g_strdup(use_uid->uid);
+    	}
+    }
+
+    return result;
 }
 
 
@@ -238,65 +299,168 @@ hex_decode(const gchar *hexstr)
     return result;
 }
 
+/** \brief Split a S/MIME certificate subject string into tokens
+ *
+ * \param subject certificate subject string
+ * \param unescape unescape escaped parameters if set
+ * \return a NULL-terminated array of sanitised (OID name; value) pairs, or a single item
+ *
+ * Split the passed DN string of a S/MIME x509 certificate (see RFC 5280) into (OID name; value) pairs.  Numerical OID's are
+ * replaced by their string representations, and hex-encoded values are decoded.  If required, escaped values are unescaped.  All
+ * items are guaranteed to be utf8-clean.
+ *
+ * If the string starts with a '<', it contains an email address, and is returned untouched in the array.
+ */
+static gchar **
+tokenize_subject(const gchar *subject,
+				 gboolean     unescape)
+{
+	static GRegex *split_re = NULL;
+	static volatile guint initialized = 0U;
+	gchar **result;
+
+	/* create the reqular expression when called for teh first time */
+	if (g_atomic_int_or(&initialized, 1U) == 0U) {
+		/* split a DN string at unescaped ',' and '=' chars */
+		split_re = g_regex_new("(?<!\\\\)[,=]", 0, 0, NULL);
+		g_assert(split_re != NULL);
+	}
+
+	/* catch empty string */
+	if (subject == NULL) {
+		return NULL;
+	}
+
+	/* string starting with '<' indicates an email address */
+	if (subject[0] == '<') {
+		result = g_new0(gchar *, 2U);
+		result[0] = g_strdup(subject);
+	} else {
+		/* split into (oid, value) pairs */
+		result = g_regex_split(split_re, subject, 0);
+		if (result != NULL) {
+			gint n;
+
+			for (n = 0; (result[n] != NULL) && (result[n + 1] != NULL); n += 2) {
+				gchar *buffer;
+
+				/* fix oid if necessary */
+				buffer = g_strdup(gnutls_x509_dn_oid_name(result[n], GNUTLS_X509_DN_OID_RETURN_OID));
+				g_free(result[n]);
+				result[n] = buffer;
+
+				/* value: decode hex-encoded */
+				if (result[n + 1][0] == '#') {
+					buffer = hex_decode(&result[n + 1][1]);
+					g_free(result[n + 1]);
+					result[n + 1] = buffer;
+				} else if (unescape) {
+					buffer = g_strcompress(result[n + 1]);
+					g_free(result[n + 1]);
+					result[n + 1] = buffer;
+				} else {
+					/* keep value */
+				}
+				libbalsa_utf8_sanitize(&result[n + 1], TRUE, NULL);
+			}
+		}
+	}
+
+	return result;
+}
+
+/** \brief Create a readable string from a S/MIME certificate subject
+ *
+ * \param subject certificate subject string
+ * \return a readable string
+ *
+ * Extract the CN and EMAIL items from the passed subject, and return it as "CN <EMAIL>", omitting every part which is not
+ * available.  If both items are unavailable, return the readable subject by calling libbalsa_cert_subject_readable().  If the
+ * subject starts with '<', it contains an email address, which is just returned.
+ */
+static gchar *
+cert_subject_cn_mail(const gchar *subject)
+{
+	gchar *readable_subject = NULL;
+	gchar **elements;
+
+	/* catch empty string */
+	if (subject == NULL) {
+		return NULL;
+	}
+
+	/* string starting with '<' indicates an email address */
+	if (subject[0] == '<') {
+		return g_strdup(subject);
+	}
+
+	/* extract CN and/or EMAIL items */
+	elements = tokenize_subject(subject, TRUE);
+	if (elements != NULL) {
+		GString *buffer;
+		gint n;
+
+		buffer = g_string_new(NULL);
+		for (n = 0; (elements[n] != NULL) && (elements[n + 1] != NULL); n += 2) {
+			if (g_ascii_strcasecmp(elements[n], "CN") == 0) {
+				if (buffer->len > 0U) {
+					g_string_prepend_c(buffer, ' ');
+				}
+				g_string_prepend(buffer, elements[n + 1]);
+			} else if (g_ascii_strcasecmp(elements[n], "EMAIL") == 0) {
+				if (buffer->len > 0U) {
+					g_string_append_c(buffer, ' ');
+				}
+				g_string_append_printf(buffer, "<%s>", elements[n + 1]);
+			} else {
+				/* ignore all others */
+			}
+		}
+		g_strfreev(elements);
+
+		if (buffer->len > 0U) {
+			readable_subject = g_string_free(buffer, FALSE);
+		} else {
+			readable_subject = libbalsa_cert_subject_readable(subject);
+		}
+	}
+
+	return readable_subject;
+}
+
 /*
- * Change some fields in a S/MIME certificate to human-readable text.
- * Note: doesn't do any sophisticated error-checking...
+ * Return a S/MIME certificate subject as human-readable text.
  */
 gchar *
 libbalsa_cert_subject_readable(const gchar *subject)
 {
-    const struct {
-        gchar *ldap_id;
-        gchar *readable;
-    } ldap_id_list[] = {
-        { .ldap_id = "2.5.4.4", .readable = "sn" },
-        { .ldap_id = "2.5.4.5", .readable = "serialNumber" },
-        { .ldap_id = "2.5.4.42", .readable = "givenName" },
-        { .ldap_id = "1.2.840.113549.1.9.1", .readable = "email" },
-        { .ldap_id = NULL, .readable = NULL }
-    }, *ldap_elem;
     gchar **elements;
-    gint n;
-    GString *result;
-    gchar *readable_subject;
+    gchar *readable_subject = NULL;
 
-    if (!subject)
-        return NULL;
+    elements = tokenize_subject(subject, FALSE);
+    if (elements != NULL) {
+        GString *buffer;
+        gint n;
 
-    result = g_string_new(NULL);
-    elements = g_strsplit(subject, ",", -1);
-    for (n = 0; elements[n]; n++) {
-        gchar *equals;
+        buffer = g_string_new(NULL);
+		for (n = 0; (elements[n] != NULL) && (elements[n + 1] != NULL); n += 2) {
+			if (n > 0) {
+				g_string_append(buffer, ", ");
+			}
+			g_string_append_printf(buffer, "%s=%s", elements[n], elements[n + 1]);
+		}
 
-        equals = strchr(elements[n], '=');
-        if (equals) {
-            *equals++ = '\0';
-            for (ldap_elem = ldap_id_list;
-                 (ldap_elem->ldap_id != NULL) && (strcmp(ldap_elem->ldap_id, elements[n]) != 0);
-                 ldap_elem++) {
-            	/* nothing to do */
-            }
-            if (ldap_elem->ldap_id != NULL)
-                result = g_string_append(result, ldap_elem->readable);
-            else
-                result = g_string_append(result, elements[n]);
-            result = g_string_append_c(result, '=');
-            
-            if (*equals == '#') {
-                gchar *decoded;
+		if (elements[n] != NULL) {
+			if (n > 0) {
+				g_string_append_printf(buffer, ", %s", elements[n]);
+			} else {
+				g_string_append(buffer, elements[n]);
+			}
+		}
 
-                decoded = hex_decode(equals + 1);
-                result = g_string_append(result, decoded);
-                g_free(decoded);
-            } else
-                result = g_string_append(result, equals);
-        } else
-            result = g_string_append(result, elements[n]);
-        if (elements[n + 1])
-            result = g_string_append_c(result, ',');
+		g_strfreev(elements);
+		readable_subject = g_string_free(buffer, FALSE);
     }
-    g_strfreev(elements);
-    readable_subject = g_string_free(result, FALSE);
-    libbalsa_utf8_sanitize(&readable_subject, TRUE, NULL);
+
     return readable_subject;
 }

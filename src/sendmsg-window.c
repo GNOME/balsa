@@ -80,11 +80,13 @@
 #if HAVE_GTKSOURCEVIEW
 #include <gtksourceview/gtksource.h>
 #endif                          /* HAVE_GTKSOURCEVIEW */
+#ifdef HAVE_GPGME
+#include "libbalsa-gpgme.h"
 #ifdef ENABLE_AUTOCRYPT
 #include "autocrypt.h"
-#include "libbalsa-gpgme.h"
 #include "libbalsa-gpgme-keys.h"
 #endif							/* ENABLE_AUTOCRYPT */
+#endif							/* HAVE_GPGME */
 
 typedef struct {
     pid_t pid_editor;
@@ -5134,7 +5136,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
     	message = g_markup_printf_escaped(_("You did not select encryption for this message, although "
     		"%s public keys are available for all recipients. In order "
             "to protect your privacy, the message could be %s encrypted."),
-    		gpgme_get_protocol_name(protocol), gpgme_get_protocol_name(protocol));
+    		libbalsa_gpgme_protocol_name(protocol), libbalsa_gpgme_protocol_name(protocol));
     	result = run_check_encrypt_dialog(bsmsg, message, GTK_RESPONSE_YES);
     	g_free(message);
     }
@@ -5217,7 +5219,7 @@ check_autocrypt_recommendation(BalsaSendmsg *bsmsg)
     	const gchar *protoname;
     	gint default_choice;
 
-    	protoname = gpgme_get_protocol_name(GPGME_PROTOCOL_OpenPGP);
+    	protoname = libbalsa_gpgme_protocol_name(GPGME_PROTOCOL_OpenPGP);
 		message = g_markup_printf_escaped(_("You did not select encryption for this message, although "
     		"%s public keys are available for all recipients. In order "
             "to protect your privacy, the message could be %s encrypted."),

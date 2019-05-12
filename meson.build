@@ -133,7 +133,7 @@ gtk_dep     = dependency('gtk+-3.0', version : '>= 3.10.0')
 gmime_dep   = dependency('gmime-2.6')
 gio_dep     = dependency('gio-2.0')
 gthread_dep = dependency('gthread-2.0')
-gnutls_dep  = dependency('gnutls')
+gnutls_dep  = dependency('gnutls', version : '>= 3.0')
 fribidi_dep = dependency('fribidi')
 
 # Dependencies for balsa

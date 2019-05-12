@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  * Copyright (C) 1997-2016 Stuart Parmenter and others
- * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
+ * Written by (C) Albrecht Dre√ü <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,7 +71,6 @@ GList *balsa_print_object_header_from_body(GList *list,
 GList *balsa_print_object_header_crypto(GList *list,
 					GtkPrintContext * context,
 					LibBalsaMessageBody * body,
-					const gchar * label,
 					BalsaPrintSetup * psetup);
 #endif
 

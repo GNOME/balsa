@@ -53,11 +53,6 @@
 #define LIBBALSA_PROTECT_ALWAYS_TRUST  (1 << 6)
 
 
-/* some custom error messages */
-#define GPG_ERR_TRY_AGAIN          GPG_ERR_USER_15
-#define GPG_ERR_NOT_SIGNED         GPG_ERR_USER_16
-
-
 gint libbalsa_message_body_protection(LibBalsaMessageBody * body);
 gboolean libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
 				      gpgme_protocol_t protocol);
@@ -101,7 +96,8 @@ gpgme_error_t libbalsa_rfc2440_decrypt(GMimePart * part,
 				       GtkWindow * parent);
 
 /* helper functions to convert states to human-readable form */
-const gchar *libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat);
+gchar *libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
+	G_GNUC_WARN_UNUSED_RESULT;
 const gchar *libbalsa_gpgme_validity_to_gchar(gpgme_validity_t validity);
 const gchar *libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity);
 

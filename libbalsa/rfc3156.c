@@ -620,42 +620,41 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 
 
 /* conversion of status values to human-readable messages */
-const gchar *
+gchar *
 libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 {
-    switch (stat) {
-    case GPG_ERR_NO_ERROR:
-	return _("The signature is valid.");
-    case GPG_ERR_SIG_EXPIRED:
-	return _("The signature is valid but expired.");
-    case GPG_ERR_KEY_EXPIRED:
-	return _
-	    ("The signature is valid but the key used to verify the signature has expired.");
-    case GPG_ERR_CERT_REVOKED:
-	return _
-	    ("The signature is valid but the key used to verify the signature has been revoked.");
-    case GPG_ERR_BAD_SIGNATURE:
-	return _
-	    ("The signature is invalid.");
-    case GPG_ERR_NO_PUBKEY:
-	return
-	    _("The signature could not be verified due to a missing key.");
-    case GPG_ERR_NO_DATA:
-	return _("This part is not a real PGP signature.");
-    case GPG_ERR_INV_ENGINE:
-	return _
-	    ("The signature could not be verified due to an invalid crypto engine.");
-    case GPG_ERR_TRY_AGAIN:
-	return _
-	    ("GnuPG is rebuilding the trust database and is currently unavailable.");
-    default: {
-	gchar errbuf[4096];		/* should be large enough... */
+	switch (stat) {
+	case GPG_ERR_NO_ERROR:
+		return g_strdup(_("The signature is valid."));
+	case GPG_ERR_SIG_EXPIRED:
+		return g_strdup(_("The signature is valid but expired."));
+	case GPG_ERR_KEY_EXPIRED:
+		return g_strdup(_("The signature is valid but the key used to verify the signature has expired."));
+	case GPG_ERR_CERT_REVOKED:
+		return g_strdup(_("The signature is valid but the key used to verify the signature has been revoked."));
+	case GPG_ERR_BAD_SIGNATURE:
+		return g_strdup(_("The signature is invalid."));
+	case GPG_ERR_NO_PUBKEY:
+		return g_strdup(_("The signature could not be verified due to a missing key."));
+	case GPG_ERR_NO_DATA:
+		return g_strdup(_("This part is not a real signature."));
+	case GPG_ERR_INV_ENGINE:
+		return g_strdup(_("The signature could not be verified due to an invalid crypto engine."));
+	case GPG_ERR_TRY_AGAIN:
+		return g_strdup(_("GnuPG is rebuilding the trust database and is currently unavailable."));
+	case GPG_ERR_MULT_SIGNATURES:
+		return g_strdup(_("The signature contains multiple signers, this may be a forgery."));
+	default: {
+		gchar errbuf[4096];		/* should be large enough... */
 
-	gpgme_strerror_r(stat, errbuf, sizeof(errbuf));
-	g_debug("%s: stat %d: %s %s", __func__, stat, gpgme_strsource(stat), errbuf);
-	return _("An error prevented the signature verification.");
-    }
-    }
+		gpgme_strerror_r(stat, errbuf, sizeof(errbuf));
+		if (gpgme_err_source(stat) != GPG_ERR_SOURCE_UNKNOWN) {
+			return g_strdup_printf(_("An error prevented the signature verification: %s: %s"), gpgme_strsource(stat), errbuf);
+		} else {
+			return g_strdup_printf(_("An error prevented the signature verification: %s"), errbuf);
+		}
+	}
+	}
 }
 
 

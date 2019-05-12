@@ -28,11 +28,13 @@
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "send.h"
-#include "rfc3156.h"
 #include <glib/gi18n.h>
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
 #include "sendmsg-window.h"
+#ifdef HAVE_GPGME
+#include "libbalsa-gpgme.h"
+#endif
 
 typedef enum _rfc_extbody_t {
     RFC2046_EXTBODY_FTP,
@@ -779,17 +781,13 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 
 #ifdef HAVE_GPGME
     if (part) {
-	if (part->parts
-	    && part->parts->next
-	    && part->parts->next->sig_info
-	    && part->parts->next->sig_info->status !=
-	    GPG_ERR_NOT_SIGNED)
-	    /* top-level part is RFC 3156 or RFC 2633 signed */
+	if (libbalsa_message_body_multipart_signed(part)) {
+	    /* top-level part is RFC 3156 or RFC 8551 multipart/signed */
 	    add_header_sigstate(grid, part->parts->next->sig_info);
-	else if (part->sig_info
-		 && part->sig_info->status != GPG_ERR_NOT_SIGNED)
+	} else if (libbalsa_message_body_inline_signed(part)) {
 	    /* top-level is OpenPGP (RFC 2440) signed */
 	    add_header_sigstate(grid, part->sig_info);
+	}
     }
 #endif
 }
@@ -843,14 +841,13 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
 {
     gchar *format;
     gchar *msg;
+    gchar *info_str;
     GtkWidget *label;
 
-    format = siginfo->status ==
-        GPG_ERR_NO_ERROR ? "<i>%s%s</i>" : "<b><i>%s%s</i></b>";
-    msg = g_markup_printf_escaped
-        (format,
-        	g_mime_gpgme_sigstat_protocol_name(siginfo),
-         libbalsa_gpgme_sig_stat_to_gchar(siginfo->status));
+    info_str = g_mime_gpgme_sigstat_info(siginfo, TRUE);
+    format = (siginfo->status == GPG_ERR_NO_ERROR) ? "<i>%s</i>" : "<b><i>%s</i></b>";
+    msg = g_markup_printf_escaped(format, info_str);
+    g_free(info_str);
 
     label = gtk_label_new(NULL);
     gtk_label_set_markup(GTK_LABEL(label), msg);

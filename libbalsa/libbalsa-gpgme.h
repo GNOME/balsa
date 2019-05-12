@@ -36,6 +36,7 @@
 G_BEGIN_DECLS
 
 
+#define GPG_ERR_MULT_SIGNATURES        GPG_ERR_USER_13
 #define GPG_ERR_KEY_SELECTION          GPG_ERR_USER_14
 #define GPG_ERR_TRY_AGAIN              GPG_ERR_USER_15
 #define GPG_ERR_NOT_SIGNED             GPG_ERR_USER_16
@@ -83,6 +84,7 @@ typedef gboolean(*lbgpgme_accept_low_trust_cb) (const gchar *,
 void libbalsa_gpgme_init(gpgme_passphrase_cb_t       get_passphrase,
 			 	 	 	 lbgpgme_select_key_cb       select_key_cb,
 						 lbgpgme_accept_low_trust_cb accept_low_trust);
+const gchar *libbalsa_gpgme_protocol_name(gpgme_protocol_t protocol);
 gboolean libbalsa_gpgme_check_crypto_engine(gpgme_protocol_t protocol);
 const gpg_capabilities *libbalsa_gpgme_gpg_capabilities(void);
 gpgme_ctx_t libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,

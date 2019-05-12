@@ -39,7 +39,10 @@
 #include "balsa-mime-widget-message.h"
 #include "balsa-mime-widget-image.h"
 #include "balsa-mime-widget-crypto.h"
+#ifdef HAVE_GPGME
+#include "libbalsa-gpgme.h"
 #include "autocrypt.h"
+#endif
 
 #include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -2782,15 +2785,15 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
     if (*icon_title &&
 	g_ascii_strcasecmp(content_type, "application/pgp-signature") &&
 	g_ascii_strcasecmp(content_type, "application/pkcs7-signature") &&
-	g_ascii_strcasecmp(content_type, "application/x-pkcs7-signature"))
-	new_title = g_strconcat(*icon_title, "; ",
-		g_mime_gpgme_sigstat_protocol_name(body->sig_info),
-				libbalsa_gpgme_sig_stat_to_gchar(body->sig_info->status),
-				NULL);
-    else
-	new_title = g_strconcat(g_mime_gpgme_sigstat_protocol_name(body->sig_info),
-				libbalsa_gpgme_sig_stat_to_gchar(body->sig_info->status),
-				NULL);
+	g_ascii_strcasecmp(content_type, "application/x-pkcs7-signature")) {
+    	gchar *info_str;
+
+    	info_str = g_mime_gpgme_sigstat_info(body->sig_info, TRUE);
+    	new_title = g_strconcat(*icon_title, "; ", info_str, NULL);
+    	g_free(info_str);
+    } else {
+    	new_title = g_mime_gpgme_sigstat_info(body->sig_info, TRUE);
+    }
 
     if (*icon_title)
 	g_free(*icon_title);
@@ -3020,15 +3023,19 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 		     _("Detected a good signature with insufficient "
 		       "validity/trust"));
 	    break;
-	case LIBBALSA_MSG_PROTECT_SIGN_BAD:
-            libbalsa_information
+	case LIBBALSA_MSG_PROTECT_SIGN_BAD: {
+		gchar *status;
+
+		status = libbalsa_gpgme_sig_stat_to_gchar(body->parts->next->sig_info->status);
+		libbalsa_information
 		(chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 		 LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
 		 _("Checking the signature of the message sent by %s with "
 		   "subject “%s” returned:\n%s"),
-		 chk_crypto->sender, chk_crypto->subject,
-		 libbalsa_gpgme_sig_stat_to_gchar(body->parts->next->sig_info->status));
+		 chk_crypto->sender, chk_crypto->subject, status);
+		g_free(status);
 	    break;
+	}
 	default:
 	    break;
         }
@@ -3138,14 +3145,17 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		 _("Detected a good signature with insufficient "
 		   "validity/trust"));
         }
-    } else if (sig_res != GPG_ERR_NO_ERROR && sig_res != GPG_ERR_CANCELED)
-	libbalsa_information
-	    (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
-	     LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
-	     _("Checking the signature of the message sent by %s with "
-	       "subject “%s” returned:\n%s"),
-	     chk_crypto->sender, chk_crypto->subject,
-	     libbalsa_gpgme_sig_stat_to_gchar(sig_res));
+    } else if (sig_res != GPG_ERR_NO_ERROR && sig_res != GPG_ERR_CANCELED) {
+    	gchar *status;
+
+    	status = libbalsa_gpgme_sig_stat_to_gchar(sig_res);
+    	libbalsa_information(chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
+				LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
+				_("Checking the signature of the message sent by %s with "
+				  "subject “%s” returned:\n%s"),
+				  chk_crypto->sender, chk_crypto->subject, status);
+    	g_free(status);
+    }
 }
 
 

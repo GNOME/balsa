@@ -137,7 +137,9 @@ LibBalsaMessageBody *libbalsa_message_body_get_by_id(LibBalsaMessageBody *
                                                      const gchar * id);
 
 #ifdef HAVE_GPGME
-LibBalsaMsgProtectState libbalsa_message_body_protect_state(LibBalsaMessageBody *body);
+LibBalsaMsgProtectState libbalsa_message_body_protect_state(const LibBalsaMessageBody *body);
+gboolean libbalsa_message_body_multipart_signed(const LibBalsaMessageBody *body);
+gboolean libbalsa_message_body_inline_signed(const LibBalsaMessageBody *body);
 #endif
 
 

@@ -62,12 +62,15 @@ GMimeGpgmeSigstat *g_mime_gpgme_sigstat_new(gpgme_ctx_t ctx)
 	G_GNUC_WARN_UNUSED_RESULT;
 GMimeGpgmeSigstat *g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
 	G_GNUC_WARN_UNUSED_RESULT;
-void g_mime_gpgme_sigstat_load_key(GMimeGpgmeSigstat *sigstat);
 
-const gchar *g_mime_gpgme_sigstat_protocol_name(const GMimeGpgmeSigstat *sigstat);
+gchar *g_mime_gpgme_sigstat_info(const GMimeGpgmeSigstat *info,
+								 gboolean                 with_signer)
+	G_GNUC_WARN_UNUSED_RESULT;
 gchar *g_mime_gpgme_sigstat_to_gchar(const GMimeGpgmeSigstat *info,
 							  	  	 gboolean                 full_details,
 									 const gchar             *date_string)
+	G_GNUC_WARN_UNUSED_RESULT;
+gchar *g_mime_gpgme_sigstat_signer(const GMimeGpgmeSigstat *sigstat)
 	G_GNUC_WARN_UNUSED_RESULT;
 
 gchar *libbalsa_cert_subject_readable(const gchar *subject)

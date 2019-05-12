@@ -543,8 +543,8 @@ lbh_cid_cb(WebKitURISchemeRequest * request,
     path = webkit_uri_scheme_request_get_path(request);
     g_debug("%s path %s", __func__, path);
 
-    if ((body =
-         libbalsa_message_get_part_by_id(info->body->message, path))) {
+    if ((info->body != NULL) &&
+    	(body = libbalsa_message_get_part_by_id(info->body->message, path))) {
         gchar *content;
         gssize len;
 

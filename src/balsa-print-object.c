@@ -122,7 +122,7 @@ balsa_print_object_mp_crypto(GList * list, GtkPrintContext * context,
                                LibBalsaMessageBody * mime_body,
                                BalsaPrintSetup * psetup)
 {
-    return balsa_print_object_header_crypto(list, context, mime_body, NULL, psetup);
+    return balsa_print_object_header_crypto(list, context, mime_body, psetup);
 }
 #endif                          /* HAVE_GPGME */
 

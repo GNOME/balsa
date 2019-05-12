@@ -233,7 +233,7 @@ gtk+-3.0 >= 3.10.0
 gmime-2.6
 gio-2.0
 gthread-2.0
-gnutls
+gnutls >= 3.0
 fribidi
 ])
 

@@ -170,6 +170,28 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
 }
 
 
+/** \brief Return the protocol as human-readable string
+ *
+ * \param protocol Protocol to return as string.
+ * \return a static string denoting the passed protocol, or "unknown".
+ *
+ * Note that this function differs from gegme_get_protocol_name, as it returns "S/MIME" instead of "CMS" for GPGME_PROTOCOL_CMS,
+ * and "unknown" for all other protocols but GPGME_PROTOCOL_OpenPGP (which is returned as "OpenPGP").
+ */
+const gchar *
+libbalsa_gpgme_protocol_name(gpgme_protocol_t protocol)
+{
+    switch (protocol) {
+    case GPGME_PROTOCOL_OpenPGP:
+    	return _("OpenPGP");
+    case GPGME_PROTOCOL_CMS:
+    	return _("S/MIME");
+    default:
+    	return _("unknown");
+    }
+}
+
+
 /** \brief Check if a crypto engine is available
  *
  * \param protocol Protocol for which the engine is checked.
@@ -235,7 +257,7 @@ libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,
 	} else {
 		err = gpgme_set_protocol(ctx, protocol);
 		if (err != GPG_ERR_NO_ERROR) {
-			libbalsa_gpgme_set_error(error, err, _("could not set protocol “%s”"), gpgme_get_protocol_name(protocol));
+			libbalsa_gpgme_set_error(error, err, _("could not set protocol “%s”"), libbalsa_gpgme_protocol_name(protocol));
 		    gpgme_release(ctx);
 		    ctx = NULL;
 		} else {
@@ -290,7 +312,7 @@ libbalsa_gpgme_ctx_set_home(gpgme_ctx_t   ctx,
     		result = TRUE;
     	} else {
     		libbalsa_gpgme_set_error(error, err, _("could not set folder “%s” for engine “%s”"), home_dir,
-    			gpgme_get_protocol_name(protocol));
+    				libbalsa_gpgme_protocol_name(protocol));
     	}
     }
 
@@ -800,7 +822,7 @@ libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
 					GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
 					GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
 					_("No private key for protocol %s is available for the signer “%s”"),
-					gpgme_get_protocol_name(protocol), name);
+					libbalsa_gpgme_protocol_name(protocol), name);
 				(void) gtk_dialog_run(GTK_DIALOG(dialog));
 				gtk_widget_destroy(dialog);
 			}

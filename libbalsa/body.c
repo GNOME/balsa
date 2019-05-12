@@ -34,6 +34,10 @@
 #include "misc.h"
 #include <glib/gi18n.h>
 
+#ifdef HAVE_GPGME
+#include "libbalsa-gpgme.h"
+#endif
+
 LibBalsaMessageBody *
 libbalsa_message_body_new(LibBalsaMessage * message)
 {
@@ -878,7 +882,7 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
 
 #ifdef HAVE_GPGME
 LibBalsaMsgProtectState
-libbalsa_message_body_protect_state(LibBalsaMessageBody *body)
+libbalsa_message_body_protect_state(const LibBalsaMessageBody *body)
 {
 	LibBalsaMsgProtectState state;
 
@@ -894,5 +898,46 @@ libbalsa_message_body_protect_state(LibBalsaMessageBody *body)
 	}
 
 	return state;
+}
+
+/** \brief Check if a body is a multipart/signed with a valid signature
+ *
+ * \param body message body (part)
+ * \return TRUE if the body is a valid multipart/singed, fFALSE if not
+ *
+ * The body is a valid multipart/signed if it has the proper content type, exactly two sub-parts, of which the second has a
+ * \ref GMimeGpgmeSigstat which is not \ref GPG_ERR_NOT_SIGNED.  This applies to both OpenPGP (RFC 3156) and to S/MIME (RFC 8551)
+ * multipart/signed parts.
+ */
+gboolean
+libbalsa_message_body_multipart_signed(const LibBalsaMessageBody *body)
+{
+	return (body != NULL) &&
+			(body->content_type != NULL) &&
+			(g_ascii_strcasecmp(body->content_type, "multipart/signed") == 0) &&
+			(body->parts != NULL) &&					/* must have children */
+		    (body->parts->next != NULL) &&				/* must have *two* child parts... */
+		    (body->parts->next->next == NULL) &&		/* ...but not more */
+		    (body->parts->next->sig_info != NULL) &&
+		    (body->parts->next->sig_info->status != GPG_ERR_NOT_SIGNED);
+}
+
+
+/** \brief Check if a body is signed inline with a valid signature
+ *
+ * \param body message body (part)
+ * \return TRUE if the body is an inlined singed part, fFALSE if not
+ *
+ * The body is a valid inlined signed part if has a \ref GMimeGpgmeSigstat which is not \ref GPG_ERR_NOT_SIGNED.  This applies to
+ * - RFC 4880 message parts,
+ * - OpenPGP combined signed and encrypted parts (RFC 3156 sect. 6.2),
+ * - S/MIME application/pkcs7-mime "SignedData" parts (RFC 8551 sect. 3.5.2).
+ */
+gboolean
+libbalsa_message_body_inline_signed(const LibBalsaMessageBody *body)
+{
+	return (body != NULL) &&
+			(body->sig_info != NULL) &&
+			(body->sig_info->status != GPG_ERR_NOT_SIGNED);
 }
 #endif

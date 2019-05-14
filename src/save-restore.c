@@ -79,10 +79,14 @@ static inline gboolean is_special_name(const gchar *name);
     g_strdup(LIBBALSA_MAILBOX(mbox)->config_prefix) : \
     config_get_unused_group(MAILBOX_SECTION_PREFIX)
 
-#define address_book_section_path(ab) \
-    LIBBALSA_ADDRESS_BOOK(ab)->config_prefix ? \
-    g_strdup(LIBBALSA_ADDRESS_BOOK(ab)->config_prefix) : \
-    config_get_unused_group(ADDRESS_BOOK_SECTION_PREFIX)
+static gchar *
+address_book_section_path(LibBalsaAddressBook *address_book)
+{
+    const gchar *config_prefix = libbalsa_address_book_get_config_prefix(address_book);
+
+    return config_prefix != NULL ? g_strdup(config_prefix) :
+        config_get_unused_group(ADDRESS_BOOK_SECTION_PREFIX);
+}
 
 gint config_load(void)
 {
@@ -327,9 +331,11 @@ config_address_book_save(LibBalsaAddressBook * ab)
 void
 config_address_book_delete(LibBalsaAddressBook * ab)
 {
-    if (ab->config_prefix) {
-	libbalsa_conf_remove_group(ab->config_prefix);
-	libbalsa_conf_private_remove_group(ab->config_prefix);
+    const gchar *config_prefix = libbalsa_address_book_get_config_prefix(ab);
+
+    if (config_prefix != NULL) {
+	libbalsa_conf_remove_group(config_prefix);
+	libbalsa_conf_private_remove_group(config_prefix);
 	libbalsa_conf_queue_sync();
     }
 }
@@ -1486,10 +1492,10 @@ config_save(void)
 
     libbalsa_conf_set_bool("EmptyTrash", balsa_app.empty_trash_on_exit);
 
-    if (balsa_app.default_address_book)
+    if (balsa_app.default_address_book != NULL)
         libbalsa_conf_set_string("DefaultAddressBook",
-                                 balsa_app.default_address_book->
-                                 config_prefix);
+                                 libbalsa_address_book_get_config_prefix
+                                 (balsa_app.default_address_book));
     else
 	libbalsa_conf_clean_key("DefaultAddressBook");
 

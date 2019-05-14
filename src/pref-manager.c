@@ -943,16 +943,16 @@ update_address_books(void)
             type = _("Unknown");
 
         if (address_book == balsa_app.default_address_book) {
-            name = g_strdup_printf(_("%s (default)"), address_book->name);
+            name = g_strdup_printf(_("%s (default)"), libbalsa_address_book_get_name(address_book));
         } else {
-            name = g_strdup(address_book->name);
+            name = g_strdup(libbalsa_address_book_get_name(address_book));
         }
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                            AB_TYPE_COLUMN, type,
                            AB_NAME_COLUMN, name,
-                           AB_XPND_COLUMN, (address_book->expand_aliases
-                                            && !address_book->is_expensive),
+                           AB_XPND_COLUMN, (libbalsa_address_book_get_expand_aliases(address_book)
+                                            && !libbalsa_address_book_get_is_expensive(address_book)),
                            AB_DATA_COLUMN, address_book, -1);
 
         g_free(name);

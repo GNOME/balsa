@@ -97,7 +97,7 @@ libbalsa_address_book_ldif_new(const gchar * name, const gchar * path)
                                     NULL));
     ab = LIBBALSA_ADDRESS_BOOK(ab_ldif);
 
-    ab->name = g_strdup(name);
+    libbalsa_address_book_set_name(ab, name);
     LIBBALSA_ADDRESS_BOOK_TEXT(ab)->path = g_strdup(path);
 
     return ab;

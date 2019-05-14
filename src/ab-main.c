@@ -175,7 +175,7 @@ bab_set_address_book(LibBalsaAddressBook * ab,
          libbalsa_address_book_load(ab, filter,
                                     (LibBalsaAddressBookLoadFunc)
                                     bab_load_cb, model)) != LBABERR_OK) {
-        printf("error loading address book from %s: %d\n", ab->name,
+        printf("error loading address book from %s: %d\n", libbalsa_address_book_get_name(ab),
                ab_err);
     }
 
@@ -208,7 +208,7 @@ bab_window_set_title(LibBalsaAddressBook * address_book)
 #endif /* HAVE_RUBRICA */
 
     title =
-        g_strconcat(type, _(" address book: "), address_book->name, NULL);
+        g_strconcat(type, _(" address book: "), libbalsa_address_book_get_name(address_book), NULL);
     gtk_window_set_title(contacts_app.window, title);
     g_free(title);
 }
@@ -225,7 +225,7 @@ address_book_change_state(GSimpleAction * action,
     value = g_variant_get_string(state, NULL);
     for (l = contacts_app.address_book_list; l; l = l->next) {
         address_book = l->data;
-        if (address_book && strcmp(value, address_book->name) == 0)
+        if (address_book && strcmp(value, libbalsa_address_book_get_name(address_book)) == 0)
             break;
     }
 
@@ -276,7 +276,7 @@ set_address_book_menu_items(void)
 
         g_string_append(string, "<attribute name='label'>");
         g_string_append_printf(string, "_%d:%s", ++pos,
-                               address_book->name);
+                               libbalsa_address_book_get_name(address_book));
         g_string_append(string, "</attribute>");
 
         g_string_append(string, "<attribute name='action'>");
@@ -284,7 +284,7 @@ set_address_book_menu_items(void)
         g_string_append(string, "</attribute>");
 
         g_string_append(string, "<attribute name='target'>");
-        g_string_append(string, address_book->name);
+        g_string_append(string, libbalsa_address_book_get_name(address_book));
         g_string_append(string, "</attribute>");
 
         g_string_append(string, "<attribute name='accel'>");
@@ -337,17 +337,20 @@ get_unused_group(const gchar * prefix)
 static void
 address_book_change(LibBalsaAddressBook * address_book, gboolean append)
 {
+    const gchar *config_prefix;
     gchar *group;
 
-    if (append)
+    if (append) {
         contacts_app.address_book_list =
             g_list_append(contacts_app.address_book_list, address_book);
+    }
 
     set_address_book_menu_items();
     bab_window_set_title(address_book);
 
-    group = address_book->config_prefix ?
-        g_strdup(address_book->config_prefix) :
+    config_prefix = libbalsa_address_book_get_config_prefix(address_book);
+    group = config_prefix != NULL ?
+        g_strdup(config_prefix) :
         get_unused_group(ADDRESS_BOOK_SECTION_PREFIX);
     libbalsa_address_book_save_config(address_book, group);
     g_free(group);
@@ -441,15 +444,17 @@ file_delete_activated(GSimpleAction * action,
                       gpointer        user_data)
 {
     LibBalsaAddressBook *address_book;
+    const gchar *config_prefix;
     GList *list;
 
     if (!(address_book = contacts_app.address_book)
         || !g_list_next(contacts_app.address_book_list))
         return;
 
-    if (address_book->config_prefix) {
-        libbalsa_conf_remove_group(address_book->config_prefix);
-        libbalsa_conf_private_remove_group(address_book->config_prefix);
+    config_prefix = libbalsa_address_book_get_config_prefix(address_book);
+    if (config_prefix != NULL) {
+        libbalsa_conf_remove_group(config_prefix);
+        libbalsa_conf_private_remove_group(config_prefix);
         libbalsa_conf_queue_sync();
     }
 
@@ -1029,7 +1034,7 @@ bab_set_intial_address_book(LibBalsaAddressBook * ab,
 
     action =
         g_action_map_lookup_action(G_ACTION_MAP(window), "address-book");
-    g_action_change_state(action, g_variant_new_string(ab->name));
+    g_action_change_state(action, g_variant_new_string(libbalsa_address_book_get_name(ab)));
 }
 
 GtkDialogFlags

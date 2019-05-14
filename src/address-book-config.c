@@ -200,10 +200,10 @@ add_radio_buttons(GtkWidget * grid, gint row, AddressBookConfig * abc)
     gtk_grid_attach(GTK_GRID(grid), abc->never, 0, row, 2, 1);
 
     button = abc->as_i_type;
-    if (abc->address_book) {
-        if (!abc->address_book->expand_aliases)
+    if (abc->address_book != NULL) {
+        if (!libbalsa_address_book_get_expand_aliases(abc->address_book))
             button = abc->never;
-        else if (abc->address_book->is_expensive)
+        else if (libbalsa_address_book_get_is_expensive(abc->address_book))
             button = abc->on_request;
     }
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
@@ -222,10 +222,10 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
     GtkSizeGroup *size_group;
 
     ab = abc->address_book;
-    if (ab) {
+    if (ab != NULL) {
         title = g_strdup_printf(_("Modify %s Address Book"), type);
         action = _("_Apply");
-        name = ab->name;
+        name = libbalsa_address_book_get_name(ab);
     } else {
         title = g_strdup_printf(_("Add %s Address Book"), type);
         action = _("_Add");
@@ -374,7 +374,7 @@ create_osmo_dialog(AddressBookConfig *abc)
     if (ab) {
         title = g_strdup_printf(_("Modify Osmo Address Book"));
         action = _("_Apply");
-        name = ab->name;
+        name = libbalsa_address_book_get_name(ab);
     } else {
         title = g_strdup_printf(_("Add Osmo Address Book"));
         action = _("_Add");
@@ -425,8 +425,10 @@ create_externq_dialog(AddressBookConfig * abc)
     /* mailbox name */
 
     label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
-    abc->name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, 0, 
-				   ab ? abc->address_book->name : NULL, 
+    abc->name_entry =
+        libbalsa_create_grid_entry(grid, NULL, NULL, 0,
+				   ab != NULL ?
+                                   libbalsa_address_book_get_name(LIBBALSA_ADDRESS_BOOK(ab)) : NULL,
 				   label);
 
     label = gtk_label_new(_("Load program location:"));
@@ -491,8 +493,10 @@ create_ldap_dialog(AddressBookConfig * abc)
     /* mailbox name */
 
     label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
-    abc->name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, 0, 
-				   ab ? abc->address_book->name : name, 
+    abc->name_entry =
+        libbalsa_create_grid_entry(grid, NULL, NULL, 0, 
+				   ab != NULL ?
+                                   libbalsa_address_book_get_name(LIBBALSA_ADDRESS_BOOK(ab)) : name,
 				   label);
 
     label = libbalsa_create_grid_label(_("_Host Name"), grid, 1);
@@ -558,8 +562,10 @@ create_gpe_dialog(AddressBookConfig * abc)
     /* mailbox name */
 
     label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
-    abc->name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, 0, 
-				   ab ? ab->name : _("GPE Address Book"), 
+    abc->name_entry =
+        libbalsa_create_grid_entry(grid, NULL, NULL, 0,
+				   ab != NULL ?  libbalsa_address_book_get_name(ab) :
+                                   _("GPE Address Book"),
 				   label);
 
     add_radio_buttons(grid, 1, abc);
@@ -755,11 +761,11 @@ create_book(AddressBookConfig * abc)
     } else
         g_assert_not_reached();
 
-    if (address_book) {
-        address_book->expand_aliases =
-            !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->never));
-        address_book->is_expensive =
-            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->on_request));
+    if (address_book != NULL) {
+        libbalsa_address_book_set_expand_aliases(address_book,
+            !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->never)));
+        libbalsa_address_book_set_is_expensive(address_book,
+            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->on_request)));
         abc->callback(address_book, TRUE);
     }
 
@@ -771,9 +777,8 @@ modify_book(AddressBookConfig * abc)
 {
     LibBalsaAddressBook *address_book = abc->address_book;
 
-    g_free(address_book->name);
-    address_book->name =
-        g_strdup(gtk_entry_get_text(GTK_ENTRY(abc->name_entry)));
+    libbalsa_address_book_set_name(address_book,
+        gtk_entry_get_text(GTK_ENTRY(abc->name_entry)));
 
     if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD
         || abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF
@@ -846,10 +851,10 @@ modify_book(AddressBookConfig * abc)
     } else
         g_assert_not_reached();
 
-    address_book->expand_aliases =
-        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->never));
-    address_book->is_expensive =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->on_request));
+    libbalsa_address_book_set_expand_aliases(address_book,
+        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->never)));
+    libbalsa_address_book_set_is_expensive(address_book,
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->on_request)));
 
     abc->callback(address_book, FALSE);
 }

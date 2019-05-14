@@ -167,7 +167,7 @@ libbalsa_address_book_rubrica_new(const gchar * name, const gchar * path)
     ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab_rubrica);
     ab = LIBBALSA_ADDRESS_BOOK(ab_rubrica);
 
-    ab->name = g_strdup(name);
+    libbalsa_address_book_set_name(ab, name);
     ab_text->path = g_strdup(path);
 
     return ab;
@@ -228,7 +228,7 @@ libbalsa_address_book_rubrica_alias_complete(LibBalsaAddressBook * ab,
     GList *list;
     GList *res = NULL;
 
-    if (ab->expand_aliases == FALSE)
+    if (!libbalsa_address_book_get_expand_aliases(ab))
         return NULL;
 
     if (lbab_rubrica_load_xml(ab_rubrica, NULL) != LBABERR_OK)
@@ -468,7 +468,7 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
 	    continue;
 
 	if (address->address_list->next
-	    && LIBBALSA_ADDRESS_BOOK(ab_rubrica)->dist_list_mode) {
+	    && libbalsa_address_book_get_dist_list_mode(LIBBALSA_ADDRESS_BOOK(ab_rubrica))) {
 	    /* Create a group address. */
 	    InternetAddress *ia =
 		internet_address_group_new(address->full_name);

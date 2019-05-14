@@ -1,5 +1,76 @@
 2019-05-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use G_DECLARE_DERIVABLE_TYPE to declare LibBalsaAddressBook
+
+	The macro defines _LibBalsaAddressBook to be a bare structure
+	with a single GObject member. The instance data must be in a
+	_LibBalsaAddressBookPrivate structure, access to which is
+	channeled through getters and setters.
+
+	* libbalsa/address-book-extern.c
+	(libbalsa_address_book_externq_new),
+	(libbalsa_address_book_externq_alias_complete):
+	* libbalsa/address-book-gpe.c (libbalsa_address_book_gpe_init),
+	(libbalsa_address_book_gpe_new), (libbalsa_address_book_gpe_load):
+	* libbalsa/address-book-ldap.c (libbalsa_address_book_ldap_init),
+	(libbalsa_address_book_ldap_new),
+	(libbalsa_address_book_ldap_open_connection),
+	(libbalsa_address_book_ldap_add_address),
+	(libbalsa_address_book_ldap_remove_address),
+	(libbalsa_address_book_ldap_modify_address),
+	(libbalsa_address_book_ldap_load_config),
+	(libbalsa_address_book_ldap_alias_complete):
+	* libbalsa/address-book-ldif.c (libbalsa_address_book_ldif_new):
+	* libbalsa/address-book-osmo.c (libbalsa_address_book_osmo_init),
+	(libbalsa_address_book_osmo_new),
+	(libbalsa_address_book_osmo_load),
+	(libbalsa_address_book_osmo_alias_complete):
+	* libbalsa/address-book-rubrica.c
+	(libbalsa_address_book_rubrica_new),
+	(libbalsa_address_book_rubrica_alias_complete),
+	(lbab_rubrica_load_xml):
+	* libbalsa/address-book-text.c (lbab_text_load_file),
+	(libbalsa_address_book_text_alias_complete):
+	* libbalsa/address-book-vcard.c (libbalsa_address_book_vcard_new):
+	* libbalsa/address-book.c (libbalsa_address_book_class_init),
+	(libbalsa_address_book_init), (libbalsa_address_book_finalize),
+	(libbalsa_address_book_set_status),
+	(libbalsa_address_book_load_config),
+	(libbalsa_address_is_dist_list),
+	(libbalsa_address_book_real_save_config),
+	(libbalsa_address_book_real_load_config),
+	(libbalsa_address_book_strerror),
+	(libbalsa_address_book_get_expand_aliases),
+	(libbalsa_address_book_get_is_expensive),
+	(libbalsa_address_book_get_dist_list_mode),
+	(libbalsa_address_book_get_name),
+	(libbalsa_address_book_get_config_prefix),
+	(libbalsa_address_book_set_name),
+	(libbalsa_address_book_set_is_expensive),
+	(libbalsa_address_book_set_expand_aliases),
+	(libbalsa_address_book_set_dist_list_mode):
+	* libbalsa/address-book.h:
+	* libbalsa/address-view.c (lbav_get_matching_addresses):
+	* src/ab-main.c (bab_set_address_book), (bab_window_set_title),
+	(address_book_change_state), (set_address_book_menu_items),
+	(address_book_change), (file_delete_activated),
+	(bab_set_intial_address_book):
+	* src/ab-window.c (balsa_ab_window_load_books),
+	(balsa_ab_window_init), (balsa_ab_window_set_title),
+	(balsa_ab_window_load), (balsa_ab_window_dist_mode_toggled),
+	(balsa_ab_window_menu_changed):
+	* src/address-book-config.c (add_radio_buttons),
+	(create_local_dialog), (create_osmo_dialog),
+	(create_externq_dialog), (create_ldap_dialog), (create_gpe_dialog),
+	(create_book), (modify_book):
+	* src/pref-manager.c (update_address_books):
+	* src/save-restore.c (address_book_section_path),
+	(config_address_book_delete), (config_save):
+	* src/store-address.c (store_address_book_frame),
+	(store_address_add_list):
+
+2019-05-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Clean up conditional compilations after bumping required
 	versions.
 

@@ -1,5 +1,20 @@
 2019-05-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Clean up conditional compilations after bumping required
+	versions.
+
+	* libbalsa/libbalsa.c (libbalsa_dialog_flags):
+	* libbalsa/libbalsa.h:
+	* src/ab-main.c (libbalsa_dialog_flags):
+	* src/ab-window.c (balsa_ab_window_new):
+	* src/balsa-message.c (balsa_message_init):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_image_dispose),
+	(balsa_mime_widget_new_image):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_new):
+	* src/pref-manager.c (pm_grid_attach):
+
+2019-05-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Bump required version of GLib to 2.48, and Gtk3 to 3.18
 
 	* configure.ac:

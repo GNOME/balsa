@@ -1245,13 +1245,8 @@ pm_grid_attach(GtkGrid   * grid,
         gtk_widget_set_margin_start(child, INDENT_WIDTH);
         gtk_widget_set_hexpand(child, TRUE);
     }
-    if (GTK_IS_LABEL(child)) {
-#if GTK_CHECK_VERSION(3, 16, 0)
+    if (GTK_IS_LABEL(child))
         gtk_label_set_xalign((GtkLabel *) child, 0.0);
-#else
-        gtk_widget_set_halign(child, GTK_ALIGN_START);
-#endif
-    }
 
     gtk_grid_attach(grid, child, left, top, width, height);
 }

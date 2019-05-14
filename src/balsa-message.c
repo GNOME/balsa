@@ -735,10 +735,6 @@ balsa_message_init(BalsaMessage * bm)
     g_signal_connect(scroll, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
     gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
-#if !GTK_CHECK_VERSION(3, 15, 0)
-    g_signal_connect_after(bm, "style-updated",
-			   G_CALLBACK(bm_on_set_style), bm);
-#endif
     g_signal_connect(bm->scroll, "size-allocate",
 		     G_CALLBACK(on_content_size_alloc), NULL);
 

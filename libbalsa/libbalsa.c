@@ -946,7 +946,6 @@ libbalsa_image_error_quark(void)
     return quark;
 }
 
-#if GTK_CHECK_VERSION(3, 12, 0)
 gboolean
 libbalsa_use_headerbar(void)
 {
@@ -970,4 +969,3 @@ libbalsa_dialog_flags(void)
 {
 	return libbalsa_use_headerbar() ? GTK_DIALOG_USE_HEADER_BAR : (GtkDialogFlags) 0;
 }
-#endif

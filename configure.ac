@@ -228,8 +228,8 @@ dnl 4. Libraries.
 dnl #####################################################################
 
 PKG_CHECK_MODULES(BALSA, [
-glib-2.0 >= 2.40.0
-gtk+-3.0 >= 3.10.0
+glib-2.0 >= 2.48.0
+gtk+-3.0 >= 3.18.0
 gmime-2.6
 gio-2.0
 gthread-2.0
@@ -247,7 +247,7 @@ PKG_CHECK_MODULES(LIBNETCLIENT, [
 	glib-2.0
 	gio-2.0
 	gnutls
-])	
+])
 
 AC_MSG_CHECKING(whether res_init is available)
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <resolv.h>;]],

@@ -1,3 +1,10 @@
+2019-05-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Bump required version of GLib to 2.48, and Gtk3 to 3.18
+
+	* configure.ac:
+	* meson.build:
+
 2019-05-12  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Fix “Johnny you are fired” vulnerabilities

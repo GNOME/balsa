@@ -685,7 +685,7 @@ balsa_ab_window_set_title(BalsaAbWindow *ab)
 
     if (LIBBALSA_IS_ADDRESS_BOOK_VCARD(address_book))
         type = "vCard";
-    else if (LIBBALSA_IS_ADDRESS_BOOK_EXTERN(address_book))
+    else if (LIBBALSA_IS_ADDRESS_BOOK_EXTERNQ(address_book))
         type = "External query";
     else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book))
         type = "LDIF";

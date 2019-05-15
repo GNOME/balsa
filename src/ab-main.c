@@ -190,7 +190,7 @@ bab_window_set_title(LibBalsaAddressBook * address_book)
 
     if (LIBBALSA_IS_ADDRESS_BOOK_VCARD(address_book))
         type = "vCard";
-    else if (LIBBALSA_IS_ADDRESS_BOOK_EXTERN(address_book))
+    else if (LIBBALSA_IS_ADDRESS_BOOK_EXTERNQ(address_book))
         type = "External query";
     else if (LIBBALSA_IS_ADDRESS_BOOK_LDIF(address_book))
         type = "LDIF";
@@ -369,12 +369,12 @@ file_new_vcard_activated(GSimpleAction * action,
 }
 
 static void
-file_new_extern_activated(GSimpleAction * action,
+file_new_externq_activated(GSimpleAction * action,
                           GVariant      * state,
                           gpointer        user_data)
 {
     balsa_address_book_config_new_from_type
-        (LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN, address_book_change,
+        (LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ, address_book_change,
          contacts_app.window);
 }
 
@@ -563,7 +563,7 @@ get_main_menu(GtkApplication * application)
 {
     static GActionEntry win_entries[] = {
         {"file-new-vcard",      file_new_vcard_activated},
-        {"file-new-external",   file_new_extern_activated},
+        {"file-new-external",   file_new_externq_activated},
         {"file-new-ldif",       file_new_ldif_activated},
 #if ENABLE_LDAP
         {"file-new-ldap",       file_new_ldap_activated},
@@ -1012,7 +1012,7 @@ static void
 bab_init(void)
 {
     LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
-    LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN;
+    LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ;
     LIBBALSA_TYPE_ADDRESS_BOOK_LDIF;
 #if ENABLE_LDAP
     LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;

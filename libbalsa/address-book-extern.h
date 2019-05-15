@@ -28,36 +28,26 @@
 #include "address-book.h"
 #include <time.h>
 
-#define LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN		(libbalsa_address_book_externq_get_type())
-#define LIBBALSA_ADDRESS_BOOK_EXTERN(obj)		(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN, LibBalsaAddressBookExtern))
-#define LIBBALSA_ADDRESS_BOOK_EXTERN_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN, LibBalsaAddressBookExternClass))
-#define LIBBALSA_IS_ADDRESS_BOOK_EXTERN(obj)		(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN))
-#define LIBBALSA_IS_ADDRESS_BOOK_EXTERN_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK_EXTERN))
-
-typedef struct _LibBalsaAddressBookExtern LibBalsaAddressBookExtern;
-typedef struct _LibBalsaAddressBookExternClass
-    LibBalsaAddressBookExternClass;
-
-struct _LibBalsaAddressBookExtern {
-    LibBalsaAddressBook parent;
-
-    gchar *load;
-    gchar *save;
-
-    GList *address_list;
-
-    time_t mtime;
-};
-
-struct _LibBalsaAddressBookExternClass {
-    LibBalsaAddressBookClass parent_class;
-};
-
-GType libbalsa_address_book_externq_get_type(void);
+#define LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ (libbalsa_address_book_externq_get_type())
+G_DECLARE_FINAL_TYPE(LibBalsaAddressBookExternq, libbalsa_address_book_externq,
+        LIBBALSA, ADDRESS_BOOK_EXTERNQ, LibBalsaAddressBook)
 
 LibBalsaAddressBook *libbalsa_address_book_externq_new(const gchar * name,
-                                                       const gchar * load,
-                                                       const char * save);
+                                                      const gchar * load,
+                                                      const char * save);
 
+/*
+ * Getters
+ */
+const gchar *libbalsa_address_book_externq_get_load(LibBalsaAddressBookExternq * ab_externq);
+const gchar *libbalsa_address_book_externq_get_save(LibBalsaAddressBookExternq * ab_externq);
+
+/*
+ * Setters
+ */
+void libbalsa_address_book_externq_set_load(LibBalsaAddressBookExternq * ab_externq,
+                                           const gchar               * load);
+void libbalsa_address_book_externq_set_save(LibBalsaAddressBookExternq * ab_externq,
+                                           const gchar               * save);
 
 #endif

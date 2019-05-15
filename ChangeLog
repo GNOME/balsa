@@ -1,3 +1,37 @@
+2019-05-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use G_DECLARE_FINAL_TYPE to declare LibBalsaAddressBookExternq
+
+	Make the structure private, and provide and use the necessary
+	getters and setters.
+
+	Adopt libbalsa_address_book_externq as the namespace, and
+	ab_externq as the identifier.
+
+	* libbalsa/address-book-extern.c
+	(libbalsa_address_book_externq_class_init),
+	(libbalsa_address_book_externq_init),
+	(libbalsa_address_book_externq_finalize),
+	(libbalsa_address_book_externq_new), (lbe_load_cb),
+	(libbalsa_address_book_externq_load), (parse_externq_file),
+	(libbalsa_address_book_externq_add_address),
+	(libbalsa_address_book_externq_save_config),
+	(libbalsa_address_book_externq_load_config),
+	(libbalsa_address_book_externq_alias_complete),
+	(libbalsa_address_book_externq_get_load),
+	(libbalsa_address_book_externq_get_save),
+	(libbalsa_address_book_externq_set_load),
+	(libbalsa_address_book_externq_set_save):
+	* libbalsa/address-book-extern.h:
+	* libbalsa/libbalsa.c (libbalsa_init):
+	* src/ab-main.c (bab_window_set_title),
+	(file_new_externq_activated), (get_main_menu), (bab_init):
+	* src/ab-window.c (balsa_ab_window_set_title):
+	* src/address-book-config.c (create_dialog_from_type),
+	(create_externq_dialog), (handle_close), (create_book),
+	(modify_book), (add_externq_cb):
+	* src/pref-manager.c (update_address_books):
+
 2019-05-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use G_DECLARE_DERIVABLE_TYPE to declare LibBalsaAddressBookText

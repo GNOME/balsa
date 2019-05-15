@@ -39,29 +39,9 @@
 
 #include "address-book.h"
 
-#define LIBBALSA_TYPE_ADDRESS_BOOK_GPE		(libbalsa_address_book_gpe_get_type())
-#define LIBBALSA_ADDRESS_BOOK_GPE(obj)		(G_TYPE_CHECK_INSTANCE_CAST(obj, LIBBALSA_TYPE_ADDRESS_BOOK_GPE, LibBalsaAddressBookGpe))
-#define LIBBALSA_ADDRESS_BOOK_GPE_CLASS(klass)	(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK_GPE, LibBalsaAddressBookGpeClass))
-#define LIBBALSA_IS_ADDRESS_BOOK_GPE(obj)		(G_TYPE_CHECK_INSTANCE_TYPE(obj, LIBBALSA_TYPE_ADDRESS_BOOK_GPE))
-#define LIBBALSA_IS_ADDRESS_BOOK_GPE_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK_GPE))
-
-typedef struct _LibBalsaAddressBookGpe LibBalsaAddressBookGpe;
-typedef struct _LibBalsaAddressBookGpeClass LibBalsaAddressBookGpeClass;
-
-struct _LibBalsaAddressBookGpe {
-    LibBalsaAddressBook parent;
-#ifdef HAVE_SQLITE3
-    sqlite3 *db;
-#else                           /* HAVE_SQLITE3 */
-    sqlite *db;
-#endif                          /* HAVE_SQLITE3 */
-};
-
-struct _LibBalsaAddressBookGpeClass {
-    LibBalsaAddressBookClass parent_class;
-};
-
-GType libbalsa_address_book_gpe_get_type(void);
+#define LIBBALSA_TYPE_ADDRESS_BOOK_GPE (libbalsa_address_book_gpe_get_type())
+G_DECLARE_FINAL_TYPE(LibBalsaAddressBookGpe, libbalsa_address_book_gpe,
+        LIBBALSA, ADDRESS_BOOK_GPE, LibBalsaAddressBook)
 
 LibBalsaAddressBook *libbalsa_address_book_gpe_new(const gchar *name);
 

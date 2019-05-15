@@ -1,5 +1,15 @@
 2019-05-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use G_DECLARE_FINAL_TYPE to declare LibBalsaAddressBookLdif
+
+	Make the structure private; no need for getters and setters.
+
+	* libbalsa/address-book-ldif.c (libbalsa_address_book_ldif_init),
+	(libbalsa_address_book_ldif_new):
+	* libbalsa/address-book-ldif.h:
+
+2019-05-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use G_DECLARE_FINAL_TYPE to declare LibBalsaAddressBookLdap
 
 	Make the structure private, and provide and use the necessary

@@ -27,25 +27,9 @@
 
 #include "address-book-text.h"
 
-#define LIBBALSA_TYPE_ADDRESS_BOOK_LDIF			(libbalsa_address_book_ldif_get_type())
-#define LIBBALSA_ADDRESS_BOOK_LDIF(obj)			(G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_ADDRESS_BOOK_LDIF, LibBalsaAddressBookLdif))
-#define LIBBALSA_ADDRESS_BOOK_LDIF_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_ADDRESS_BOOK_LDIF, LibBalsaAddressBookLdifClass))
-#define LIBBALSA_IS_ADDRESS_BOOK_LDIF(obj)		(G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_ADDRESS_BOOK_LDIF))
-#define LIBBALSA_IS_ADDRESS_BOOK_LDIF_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_ADDRESS_BOOK_LDIF))
-
-typedef struct _LibBalsaAddressBookLdif LibBalsaAddressBookLdif;
-typedef struct _LibBalsaAddressBookLdifClass
-    LibBalsaAddressBookLdifClass;
-
-struct _LibBalsaAddressBookLdif {
-    LibBalsaAddressBookText parent;
-};
-
-struct _LibBalsaAddressBookLdifClass {
-    LibBalsaAddressBookTextClass parent_class;
-};
-
-GType libbalsa_address_book_ldif_get_type(void);
+#define LIBBALSA_TYPE_ADDRESS_BOOK_LDIF (libbalsa_address_book_ldif_get_type())
+G_DECLARE_FINAL_TYPE(LibBalsaAddressBookLdif, libbalsa_address_book_ldif,
+                     LIBBALSA, ADDRESS_BOOK_LDIF, LibBalsaAddressBookText)
 
 LibBalsaAddressBook *libbalsa_address_book_ldif_new(const gchar * name,
                                                     const gchar * path);

@@ -1,3 +1,44 @@
+2019-05-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use G_DECLARE_DERIVABLE_TYPE to declare LibBalsaAddressBookText
+
+	and provide and use the necessary getters and setters.
+
+	* libbalsa/address-book-ldif.c (libbalsa_address_book_ldif_new):
+	* libbalsa/address-book-rubrica.c
+	(libbalsa_address_book_rubrica_class_init),
+	(libbalsa_address_book_rubrica_init),
+	(libbalsa_address_book_rubrica_new),
+	(libbalsa_address_book_rubrica_load),
+	(libbalsa_address_book_rubrica_alias_complete),
+	(libbalsa_address_book_rubrica_add_address),
+	(libbalsa_address_book_rubrica_modify_address),
+	(lbab_rubrica_load_xml):
+	* libbalsa/address-book-text.c (lbab_text_item_free),
+	(libbalsa_address_book_text_class_init),
+	(libbalsa_address_book_text_init),
+	(libbalsa_address_book_text_finalize),
+	(lbab_text_address_book_need_reload), (lbab_text_load_file),
+	(lbab_text_lock_book), (lbab_text_unlock_book),
+	(lbab_text_open_temp), (lbab_text_close_temp),
+	(libbalsa_address_book_text_load),
+	(libbalsa_address_book_text_add_address),
+	(libbalsa_address_book_text_modify_address),
+	(libbalsa_address_book_text_save_config),
+	(libbalsa_address_book_text_load_config),
+	(libbalsa_address_book_text_alias_complete),
+	(libbalsa_address_book_text_get_path),
+	(libbalsa_address_book_text_get_item_list),
+	(libbalsa_address_book_text_get_mtime),
+	(libbalsa_address_book_text_get_name_complete),
+	(libbalsa_address_book_text_set_path),
+	(libbalsa_address_book_text_set_item_list),
+	(libbalsa_address_book_text_set_mtime),
+	(libbalsa_address_book_text_set_name_complete):
+	* libbalsa/address-book-text.h:
+	* libbalsa/address-book-vcard.c (libbalsa_address_book_vcard_new):
+	* src/address-book-config.c (create_local_dialog), (modify_book):
+
 2019-05-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use G_DECLARE_DERIVABLE_TYPE to declare LibBalsaAddressBook

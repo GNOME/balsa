@@ -50,7 +50,6 @@ libbalsa_address_book_rubrica_class_init(LibBalsaAddressBookRubricaClass *
 					 klass);
 static void libbalsa_address_book_rubrica_init(LibBalsaAddressBookRubrica *
 					       ab_rubrica);
-static void libbalsa_address_book_rubrica_finalize(GObject * object);
 
 static LibBalsaABErr libbalsa_address_book_rubrica_load(LibBalsaAddressBook
 							* ab,
@@ -99,12 +98,10 @@ libbalsa_address_book_rubrica_class_init(LibBalsaAddressBookRubricaClass *
 					 klass)
 {
     LibBalsaAddressBookClass *address_book_class;
-    GObjectClass *object_class;
+    LibBalsaAddressBookTextClass *address_book_text_class;
 
-    object_class = G_OBJECT_CLASS(klass);
     address_book_class = LIBBALSA_ADDRESS_BOOK_CLASS(klass);
-
-    object_class->finalize = libbalsa_address_book_rubrica_finalize;
+    address_book_text_class = LIBBALSA_ADDRESS_BOOK_TEXT_CLASS(klass);
 
     address_book_class->load = libbalsa_address_book_rubrica_load;
     address_book_class->add_address =
@@ -116,6 +113,8 @@ libbalsa_address_book_rubrica_class_init(LibBalsaAddressBookRubricaClass *
 
     address_book_class->alias_complete =
 	libbalsa_address_book_rubrica_alias_complete;
+
+    address_book_text_class->text_item_free_func = g_object_unref;
 }
 
 static void
@@ -123,33 +122,18 @@ libbalsa_address_book_rubrica_init(LibBalsaAddressBookRubrica * ab_rubrica)
 {
     LibBalsaAddressBookText *ab_text =
         LIBBALSA_ADDRESS_BOOK_TEXT(ab_rubrica);
-    ab_text->path = NULL;
-    ab_text->item_list = NULL;
-    ab_text->mtime = 0;
 
-    if (ab_text->name_complete != NULL)
-        libbalsa_completion_free(ab_text->name_complete);
-    ab_text->name_complete =
-        libbalsa_completion_new((LibBalsaCompletionFunc)
-                                completion_data_extract);
-    libbalsa_completion_set_compare(ab_text->name_complete, strncmp_word);
-}
+    libbalsa_address_book_text_set_path(ab_text, NULL);
+    libbalsa_address_book_text_set_item_list(ab_text, NULL);
+    libbalsa_address_book_text_set_mtime(ab_text, 0);
 
-static void
-libbalsa_address_book_rubrica_finalize(GObject * object)
-{
-    LibBalsaAddressBookText *ab_text;
-
-    ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(object);
-
-    /* item_list is different from the default
-     * LibBalsaAddressBookText::item_list, so we free it here. */
-    g_slist_foreach(ab_text->item_list, (GFunc) g_object_unref, NULL);
-    g_slist_free(ab_text->item_list);
-    ab_text->item_list = NULL;
-
-    (*G_OBJECT_CLASS(libbalsa_address_book_rubrica_parent_class)->
-     finalize) (object);
+    if (libbalsa_address_book_text_get_name_complete(ab_text) != NULL)
+        libbalsa_completion_free(libbalsa_address_book_text_get_name_complete(ab_text));
+    libbalsa_address_book_text_set_name_complete(ab_text,
+                                                 libbalsa_completion_new((LibBalsaCompletionFunc)
+                                                                          completion_data_extract));
+    libbalsa_completion_set_compare(libbalsa_address_book_text_get_name_complete(ab_text),
+                                    strncmp_word);
 }
 
 /* Public method */
@@ -168,7 +152,7 @@ libbalsa_address_book_rubrica_new(const gchar * name, const gchar * path)
     ab = LIBBALSA_ADDRESS_BOOK(ab_rubrica);
 
     libbalsa_address_book_set_name(ab, name);
-    ab_text->path = g_strdup(path);
+    libbalsa_address_book_text_set_path(ab_text, path);
 
     return ab;
 }
@@ -183,11 +167,12 @@ libbalsa_address_book_rubrica_load(LibBalsaAddressBook * ab,
     LibBalsaAddressBookRubrica *ab_rubrica =
 	LIBBALSA_ADDRESS_BOOK_RUBRICA(ab);
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
+    const gchar *path = libbalsa_address_book_text_get_path(ab_text);
     LibBalsaABErr load_res;
     gchar *filter_hi = NULL;
     GSList *list;
 
-    g_return_val_if_fail(ab_text->path != NULL, LBABERR_CANNOT_READ);
+    g_return_val_if_fail(path != NULL, LBABERR_CANNOT_READ);
 
     /* try to load the xml file if necessary */
     load_res = lbab_rubrica_load_xml(ab_rubrica, NULL);
@@ -197,7 +182,7 @@ libbalsa_address_book_rubrica_load(LibBalsaAddressBook * ab,
     if (filter)
 	filter_hi = g_utf8_strup(filter, -1);
 
-    for (list = ab_text->item_list; list; list = list->next) {
+    for (list = libbalsa_address_book_text_get_item_list(ab_text); list != NULL; list = list->next) {
 	LibBalsaAddress *address = LIBBALSA_ADDRESS(list->data);
 
 	if (!address)
@@ -235,7 +220,7 @@ libbalsa_address_book_rubrica_alias_complete(LibBalsaAddressBook * ab,
         return NULL;
 
     for (list =
-         libbalsa_completion_complete(ab_text->name_complete,
+         libbalsa_completion_complete(libbalsa_address_book_text_get_name_complete(ab_text),
                                       (gchar *) prefix);
          list; list = list->next) {
         InternetAddress *ia = ((CompletionData *) list->data)->ia;
@@ -253,6 +238,7 @@ libbalsa_address_book_rubrica_add_address(LibBalsaAddressBook * ab,
     LibBalsaAddressBookRubrica *ab_rubrica =
 	LIBBALSA_ADDRESS_BOOK_RUBRICA(ab);
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
+    const gchar *path = libbalsa_address_book_text_get_path(ab_text);
     int fd;
     xmlDocPtr doc = NULL;
     xmlNodePtr root_element = NULL;
@@ -264,18 +250,18 @@ libbalsa_address_book_rubrica_add_address(LibBalsaAddressBook * ab,
 	return result;
 
     /* eject if we already have this address */
-    if (g_slist_find_custom(ab_text->item_list, new_address,
+    if (g_slist_find_custom(libbalsa_address_book_text_get_item_list(ab_text), new_address,
 			    (GCompareFunc) address_compare)) {
 	xmlFreeDoc(doc);
 	return LBABERR_DUPLICATE;
     }
 
     /* try to open the address book for writing */
-    if ((fd = open(ab_text->path, O_WRONLY | O_CREAT, 0666)) == -1) {
+    if ((fd = open(path, O_WRONLY | O_CREAT, 0666)) == -1) {
 	xmlFreeDoc(doc);
 	return LBABERR_CANNOT_WRITE;
     }
-    if (libbalsa_lock_file(ab_text->path, fd, TRUE, TRUE, FALSE) < 0) {
+    if (libbalsa_lock_file(path, fd, TRUE, TRUE, FALSE) < 0) {
 	xmlFreeDoc(doc);
 	close(fd);
 	return LBABERR_CANNOT_WRITE;
@@ -298,14 +284,15 @@ libbalsa_address_book_rubrica_add_address(LibBalsaAddressBook * ab,
     lbab_insert_address_node(new_address, root_element);
 
     /* store the document */
-    if (xmlSaveFormatFileEnc(ab_text->path, doc, "UTF-8", 1) == -1)
+    if (xmlSaveFormatFileEnc(path, doc, "UTF-8", 1) == -1)
 	result = LBABERR_CANNOT_WRITE;
     else
 	result = LBABERR_OK;
-    libbalsa_unlock_file(ab_text->path, fd, FALSE);
+    libbalsa_unlock_file(path, fd, FALSE);
     close(fd);
     xmlFreeDoc(doc);
-    ab_text->mtime = 0;	/* force re-load upon the next access */
+    /* force re-load upon the next access: */
+    libbalsa_address_book_text_set_mtime(ab_text, 0);
 
     /* done */
     return result;
@@ -328,6 +315,7 @@ libbalsa_address_book_rubrica_modify_address(LibBalsaAddressBook * ab,
     LibBalsaAddressBookRubrica *ab_rubrica =
 	LIBBALSA_ADDRESS_BOOK_RUBRICA(ab);
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
+    const gchar *path = libbalsa_address_book_text_get_path(ab_text);
     int fd;
     xmlDocPtr doc = NULL;
     xmlNodePtr root_element;
@@ -371,25 +359,26 @@ libbalsa_address_book_rubrica_modify_address(LibBalsaAddressBook * ab,
 	lbab_insert_address_node(newval, root_element);
 
     /* try to open the address book for writing */
-    if ((fd = open(ab_text->path, O_WRONLY | O_CREAT, 0666)) == -1) {
+    if ((fd = open(path, O_WRONLY | O_CREAT, 0666)) == -1) {
 	xmlFreeDoc(doc);
 	return LBABERR_CANNOT_WRITE;
     }
-    if (libbalsa_lock_file(ab_text->path, fd, TRUE, TRUE, FALSE) < 0) {
+    if (libbalsa_lock_file(path, fd, TRUE, TRUE, FALSE) < 0) {
 	xmlFreeDoc(doc);
 	close(fd);
 	return LBABERR_CANNOT_WRITE;
     }
 
     /* store the document */
-    if (xmlSaveFormatFileEnc(ab_text->path, doc, "UTF-8", 1) == -1)
+    if (xmlSaveFormatFileEnc(path, doc, "UTF-8", 1) == -1)
 	result = LBABERR_CANNOT_WRITE;
     else
 	result = LBABERR_OK;
-    libbalsa_unlock_file(ab_text->path, fd, FALSE);
+    libbalsa_unlock_file(path, fd, FALSE);
     close(fd);
     xmlFreeDoc(doc);
-    ab_text->mtime = 0;	/* force re-load upon the next access */
+    /* force re-load upon the next access: */
+    libbalsa_address_book_text_set_mtime(ab_text, 0);
 
     /* done */
     return result;
@@ -402,6 +391,7 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
 {
     LibBalsaAddressBookText *ab_text =
         LIBBALSA_ADDRESS_BOOK_TEXT(ab_rubrica);
+    const gchar *path = libbalsa_address_book_text_get_path(ab_text);
     struct stat stat_buf;
     int fd;
     xmlDocPtr doc = NULL;
@@ -415,33 +405,30 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
 	*docptr = NULL;
 
     /* eject if the file did not change on disk and no document result pointer is passed */
-    if (!docptr && stat(ab_text->path, &stat_buf) == 0) {
-	if (stat_buf.st_mtime == ab_text->mtime)
+    if (!docptr && stat(path, &stat_buf) == 0) {
+	if (stat_buf.st_mtime == libbalsa_address_book_text_get_mtime(ab_text))
 	    return LBABERR_OK;
 	else
-	    ab_text->mtime = stat_buf.st_mtime;
+	    libbalsa_address_book_text_set_mtime(ab_text, stat_buf.st_mtime);
     }
 
     /* free old data */
-    g_slist_foreach(ab_text->item_list, (GFunc) g_object_unref, NULL);
-    g_slist_free(ab_text->item_list);
-    ab_text->item_list = NULL;
+    libbalsa_address_book_text_set_item_list(ab_text, NULL);
 
-    g_list_foreach(ab_text->name_complete->items,
+    g_list_foreach(libbalsa_address_book_text_get_name_complete(ab_text)->items,
 		   (GFunc) completion_data_free, NULL);
-    libbalsa_completion_clear_items(ab_text->name_complete);
-
+    libbalsa_completion_clear_items(libbalsa_address_book_text_get_name_complete(ab_text));
 
     /* try to read the address book */
-    if ((fd = open(ab_text->path, O_RDONLY)) == -1)
+    if ((fd = open(path, O_RDONLY)) == -1)
 	return LBABERR_CANNOT_READ;
-    if (libbalsa_lock_file(ab_text->path, fd, FALSE, TRUE, FALSE) < 0) {
+    if (libbalsa_lock_file(path, fd, FALSE, TRUE, FALSE) < 0) {
 	close(fd);
 	return LBABERR_CANNOT_READ;
     }
 
-    doc = xmlParseFile(ab_text->path);
-    libbalsa_unlock_file(ab_text->path, fd, FALSE);
+    doc = xmlParseFile(path);
+    libbalsa_unlock_file(path, fd, FALSE);
     close(fd);
     if (!doc)
 	return LBABERR_CANNOT_READ;
@@ -449,7 +436,8 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
     /* Get the root element node and extract cards if it is a Rubrica book */
     root_element = xmlDocGetRootElement(doc);
     if (!xmlStrcmp(root_element->name, CXMLCHARP("Rubrica")))
-	ab_text->item_list = extract_cards(root_element->children);
+        libbalsa_address_book_text_set_item_list(ab_text,
+                                                 extract_cards(root_element->children));
 
     /* return the document if requested of free it */
     if (docptr)
@@ -460,7 +448,7 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
     /* build the completion list */
     // FIXME - Rubrica provides groups...
     completion_list = NULL;
-    for (list = ab_text->item_list; list; list = list->next) {
+    for (list = libbalsa_address_book_text_get_item_list(ab_text); list != NULL; list = list->next) {
 	LibBalsaAddress *address = LIBBALSA_ADDRESS(list->data);
 	GList *l;
 
@@ -499,7 +487,8 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
     }
 
     completion_list = g_list_reverse(completion_list);
-    libbalsa_completion_add_items(ab_text->name_complete, completion_list);
+    libbalsa_completion_add_items(libbalsa_address_book_text_get_name_complete(ab_text),
+                                  completion_list);
     g_list_free(completion_list);
 
     return LBABERR_OK;

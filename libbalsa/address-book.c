@@ -105,7 +105,7 @@ libbalsa_address_book_new_from_config(const gchar * group)
     gchar *type_str;
     GType type;
     gboolean got_default;
-    LibBalsaAddressBook *address_book = NULL;
+    LibBalsaAddressBook *ab = NULL;
 
     libbalsa_conf_push_group(group);
     type_str = libbalsa_conf_get_string_with_default("Type", &got_default);
@@ -113,7 +113,7 @@ libbalsa_address_book_new_from_config(const gchar * group)
     if (got_default == TRUE) {
         /* type entry missing, skip it */
 	libbalsa_conf_pop_group();
-	return NULL;
+	return ab;
     }
 
     type = g_type_from_name(type_str);
@@ -121,17 +121,16 @@ libbalsa_address_book_new_from_config(const gchar * group)
         /* type unknown, skip it */
 	g_free(type_str);
 	libbalsa_conf_pop_group();
-	return NULL;
+	return ab;
     }
 
-    address_book = g_object_new(type, NULL);
-    libbalsa_address_book_load_config(address_book, group);
+    ab = g_object_new(type, NULL);
+    libbalsa_address_book_load_config(ab, group);
 
-    libbalsa_conf_pop_group();
     g_free(type_str);
+    libbalsa_conf_pop_group();
 
-    return address_book;
-
+    return ab;
 }
 
 LibBalsaABErr

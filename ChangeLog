@@ -1,5 +1,12 @@
 2019-05-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	address-book: Adopt ab as the identifier
+
+	* libbalsa/address-book.c (libbalsa_address_book_new_from_config):
+	* libbalsa/address-book.h:
+
+2019-05-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use G_DECLARE_FINAL_TYPE to declare LibBalsaAddressBookExternq
 
 	Make the structure private, and provide and use the necessary

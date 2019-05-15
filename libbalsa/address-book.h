@@ -70,8 +70,6 @@ struct _LibBalsaAddressBookClass {
     GList* (*alias_complete) (LibBalsaAddressBook * ab, const gchar *prefix);
 };
 
-GType libbalsa_address_book_get_type(void);
-
 LibBalsaAddressBook *libbalsa_address_book_new_from_config(const gchar *
 							   prefix);
 
@@ -113,7 +111,7 @@ const gchar* libbalsa_address_book_strerror(LibBalsaAddressBook * ab,
  and for freeing the list.
 
 */
-GList *libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab, 
+GList *libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab,
 					    const gchar *prefix);
 gboolean libbalsa_address_is_dist_list(LibBalsaAddressBook *ab,
 				       LibBalsaAddress *address);

@@ -110,7 +110,7 @@ libbalsa_address_book_new_from_config(const gchar * group)
     libbalsa_conf_push_group(group);
     type_str = libbalsa_conf_get_string_with_default("Type", &got_default);
 
-    if (got_default == TRUE) {
+    if (got_default) {
         /* type entry missing, skip it */
 	libbalsa_conf_pop_group();
 	return ab;
@@ -118,10 +118,15 @@ libbalsa_address_book_new_from_config(const gchar * group)
 
     type = g_type_from_name(type_str);
     if (type == 0) {
-        /* type unknown, skip it */
-	g_free(type_str);
-	libbalsa_conf_pop_group();
-	return ab;
+        /* Legacy: */
+        if (strcmp(type_str, "LibBalsaAddressBookExtern") == 0) {
+            type = g_type_from_name("LibBalsaAddressBookExternq");
+        } else {
+            /* type unknown, skip it */
+            g_free(type_str);
+            libbalsa_conf_pop_group();
+            return ab;
+        }
     }
 
     ab = g_object_new(type, NULL);

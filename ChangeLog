@@ -1,3 +1,12 @@
+2019-05-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not break user's config
+
+	* libbalsa/address-book.c
+	(libbalsa_address_book_new_from_config): if the type is
+	LibBalsaAddressBookExtern, it is no longer recognized, so we use
+	LibBalsaAddressBookExternq instead.
+
 2019-05-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use G_DECLARE_FINAL_TYPE to declare LibBalsaAddressBookOsmo

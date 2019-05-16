@@ -56,10 +56,20 @@ static LibBalsaABErr libbalsa_address_book_osmo_load(LibBalsaAddressBook 		 *ab,
                                                      gpointer					 closure);
 static GList *libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
                                                         const gchar			*prefix);
-static GList *osmo_read_addresses(LibBalsaAddressBookOsmo *osmo,
-								  const gchar			  *filter,
+static GList *osmo_read_addresses(LibBalsaAddressBookOsmo *ab_osmo,
+                                     const gchar             *filter,
 								  GError				  **error);
 
+
+struct _LibBalsaAddressBookOsmo {
+	LibBalsaAddressBook parent;
+
+	GDBusProxy *proxy;
+};
+
+struct _LibBalsaAddressBookOsmoClass {
+	LibBalsaAddressBookClass parent_class;
+};
 
 G_DEFINE_TYPE(LibBalsaAddressBookOsmo, libbalsa_address_book_osmo, LIBBALSA_TYPE_ADDRESS_BOOK);
 
@@ -87,21 +97,21 @@ libbalsa_address_book_osmo_class_init(LibBalsaAddressBookOsmoClass *klass)
 
 
 static void
-libbalsa_address_book_osmo_init(LibBalsaAddressBookOsmo *ab)
+libbalsa_address_book_osmo_init(LibBalsaAddressBookOsmo *ab_osmo)
 {
-	libbalsa_address_book_set_is_expensive(LIBBALSA_ADDRESS_BOOK(ab), FALSE);
+	libbalsa_address_book_set_is_expensive(LIBBALSA_ADDRESS_BOOK(ab_osmo), FALSE);
 }
 
 
 static void
 libbalsa_address_book_osmo_finalize(GObject *object)
 {
-	LibBalsaAddressBookOsmo *osmo;
+	LibBalsaAddressBookOsmo *ab_osmo;
 
-	osmo = LIBBALSA_ADDRESS_BOOK_OSMO(object);
-	if (osmo->proxy != NULL) {
-		g_object_unref(osmo->proxy);
-		osmo->proxy = NULL;
+	ab_osmo = LIBBALSA_ADDRESS_BOOK_OSMO(object);
+	if (ab_osmo->proxy != NULL) {
+		g_object_unref(ab_osmo->proxy);
+		ab_osmo->proxy = NULL;
 	}
 
 	G_OBJECT_CLASS(libbalsa_address_book_osmo_parent_class)->finalize(object);
@@ -112,10 +122,10 @@ LibBalsaAddressBook *
 libbalsa_address_book_osmo_new(const gchar *name)
 {
 	LibBalsaAddressBook *ab = NULL;
-	LibBalsaAddressBookOsmo *osmo;
+	LibBalsaAddressBookOsmo *ab_osmo;
 
-	osmo = LIBBALSA_ADDRESS_BOOK_OSMO(g_object_new(LIBBALSA_TYPE_ADDRESS_BOOK_OSMO, NULL));
-	ab = LIBBALSA_ADDRESS_BOOK(osmo);
+	ab_osmo = LIBBALSA_ADDRESS_BOOK_OSMO(g_object_new(LIBBALSA_TYPE_ADDRESS_BOOK_OSMO, NULL));
+	ab = LIBBALSA_ADDRESS_BOOK(ab_osmo);
 	libbalsa_address_book_set_name(ab, name);
 
 	return ab;
@@ -135,13 +145,13 @@ libbalsa_address_book_osmo_load(LibBalsaAddressBook 		*ab,
 	if (callback == NULL) {
 		result = LBABERR_OK;
 	} else {
-		LibBalsaAddressBookOsmo *osmo;
+		LibBalsaAddressBookOsmo *ab_osmo;
 		GError *error = NULL;
 		GList *addresses;
 
-		osmo = LIBBALSA_ADDRESS_BOOK_OSMO(ab);
+		ab_osmo = LIBBALSA_ADDRESS_BOOK_OSMO(ab);
 
-		addresses = osmo_read_addresses(osmo, filter, &error);
+		addresses = osmo_read_addresses(ab_osmo, filter, &error);
 		if (error != NULL) {
                         gchar *message;
 
@@ -216,20 +226,20 @@ static GList *
 libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
                                           const gchar 		  *prefix)
 {
-	LibBalsaAddressBookOsmo *osmo;
+	LibBalsaAddressBookOsmo *ab_osmo;
 	GError *error = NULL;
 	GList *addresses;
 	GList *result = NULL;
 
 	g_return_val_if_fail(LIBBALSA_ADDRESS_BOOK_OSMO(ab), NULL);
 
-	osmo = LIBBALSA_ADDRESS_BOOK_OSMO(ab);
+	ab_osmo = LIBBALSA_ADDRESS_BOOK_OSMO(ab);
 
 	if (!libbalsa_address_book_get_expand_aliases(ab) || strlen(prefix) < LOOKUP_MIN_LEN)
 		return NULL;
 
 	g_debug("%s: filter for %s", __func__, prefix);
-	addresses = osmo_read_addresses(osmo, prefix, &error);
+	addresses = osmo_read_addresses(ab_osmo, prefix, &error);
 	if (error != NULL) {
 		g_warning("%s: cannot read contacts from Osmo: %s", __func__, error->message);
 		g_error_free(error);
@@ -270,7 +280,7 @@ libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
 
 /** \brief Read filtered addresses from Osmo via DBus
  *
- * \param osmo Osmo address book object
+ * \param ab_osmo Osmo address book object
  * \param filter search filter, NULL or "" for all entries
  * \param error filled with error information on error
  * \return a list \ref LibBalsaAddress items on success or NULL on error or if no item matches the search filter
@@ -282,21 +292,21 @@ libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
  * \note The caller must free the returned list.
  */
 static GList *
-osmo_read_addresses(LibBalsaAddressBookOsmo *osmo,
-					const gchar				*filter,
-					GError					**error)
+osmo_read_addresses(LibBalsaAddressBookOsmo *ab_osmo,
+                    const gchar             *filter,
+                    GError                  **error)
 {
 	GList *addresses = NULL;
 
 	/* connect to DBus unless we already have a proxy */
-	if (osmo->proxy == NULL) {
-		osmo->proxy =
+	if (ab_osmo->proxy == NULL) {
+		ab_osmo->proxy =
 			g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION, G_DBUS_PROXY_FLAGS_NONE, NULL, "org.clayo.osmo.Contacts",
 									  	  "/org/clayo/osmo/Contacts", "org.clayo.osmo.Contacts", NULL, error);
 	}
 
 	/* proceed only if we have the proxy */
-	if (osmo->proxy != NULL) {
+	if (ab_osmo->proxy != NULL) {
 		GVariant *request;
 		GVariant *reply;
 
@@ -305,7 +315,7 @@ osmo_read_addresses(LibBalsaAddressBookOsmo *osmo,
 		} else {
 			request = g_variant_new("(s)", "");
 		}
-		reply = g_dbus_proxy_call_sync(osmo->proxy, "Find", request, G_DBUS_CALL_FLAGS_NONE, -1, NULL, error);
+		reply = g_dbus_proxy_call_sync(ab_osmo->proxy, "Find", request, G_DBUS_CALL_FLAGS_NONE, -1, NULL, error);
 
 		/* proceed only if we got a reply */
 		if (reply != NULL) {
@@ -330,14 +340,14 @@ osmo_read_addresses(LibBalsaAddressBookOsmo *osmo,
 					if (this_addr->address_list != NULL) {
 						addresses = g_list_prepend(addresses, this_addr);
 					} else {
-						g_object_unref(G_OBJECT(this_addr));
+						g_object_unref(this_addr);
 					}
 				}
 			} while (!eos && (*error == NULL));
 
 			/* clean up */
-			g_object_unref(G_OBJECT(data));
-			g_object_unref(G_OBJECT(stream));
+			g_object_unref(data);
+			g_object_unref(stream);
 			g_free(vcards);
 			g_variant_unref(reply);
 

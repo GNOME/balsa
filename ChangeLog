@@ -1,3 +1,25 @@
+2019-05-22  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Mitigate “Re: What's Up Johnny?” vulnerabilities
+
+	* src/balsa-app.h: add flag whether the user wants to be warned
+	  when replying to an encrypted message
+	* src/save-restore.c:
+	  • save/restore new flag
+	  • add reply selection dialogue to geometry manager
+	* src/sendmsg-window.c:
+	  • tree_add_quote_body(): refactoring, add information whether
+	    the part has been decrypted
+	  • scan_bodies(): use new tree_add_quote_body(), propagate
+	    information about encrypted containers
+	  • unselect_decrypted(): new function for deselecting all
+	    decrypted parts in the dialogue for selecting cited parts
+	  • quote_parts_select_dlg(): add message when replying to a
+	    fully or partially encrypted message, use geometry manager
+	  • show_decrypted_warning(): show dialogue when the user
+	    replies to a single-part decrypted message
+	  • collect_for_quote(): use new scan_bodies() api
+
 2019-05-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Do not break user's config

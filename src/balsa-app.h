@@ -360,6 +360,7 @@ extern struct BalsaApplication {
     /* gpgme stuff */
     gboolean has_openpgp;
     gboolean has_smime;
+    gboolean warn_reply_decrypted;
 #endif 
 
     /* Most recently used lists */

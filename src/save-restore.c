@@ -696,6 +696,7 @@ config_global_load(void)
     geometry_manager_init("MainWindow", 640, 480, FALSE);
     balsa_app.mblist_width = libbalsa_conf_get_int("MailboxListWidth=130");
     geometry_manager_init("SendMsgWindow", 640, 480, FALSE);
+    geometry_manager_init("SelectReplyParts", 400, 200, FALSE);
     geometry_manager_init("MessageWindow", 400, 500, FALSE);
     geometry_manager_init("SourceView", 500, 400, FALSE);
     geometry_manager_init("IMAPSubscriptions", 200, 160, FALSE);
@@ -1066,6 +1067,10 @@ config_global_load(void)
     g_free(balsa_app.compose_headers);
     balsa_app.compose_headers =
 	libbalsa_conf_get_string("ComposeHeaders=Recipients Subject");
+#ifdef HAVE_GPGME
+    balsa_app.warn_reply_decrypted =
+    	libbalsa_conf_get_bool("WarnReplyDecrypted=true");
+#endif
 
     /* Obsolete. */
     libbalsa_conf_get_bool_with_default("RequestDispositionNotification=false",
@@ -1470,6 +1475,9 @@ config_save(void)
     libbalsa_conf_set_string("ComposeHeaders", balsa_app.compose_headers);
     libbalsa_conf_set_bool("ExternEditorEditHeaders", balsa_app.edit_headers);
     libbalsa_conf_set_string("QuoteString", balsa_app.quote_str);
+#ifdef HAVE_GPGME
+    libbalsa_conf_set_bool("WarnReplyDecrypted", balsa_app.warn_reply_decrypted);
+#endif
 
     libbalsa_conf_pop_group();
 

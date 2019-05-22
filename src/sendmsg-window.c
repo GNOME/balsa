@@ -3060,54 +3060,92 @@ enum {
     QUOTE_INCLUDE,
     QUOTE_DESCRIPTION,
     QUOTE_BODY,
+	QUOTE_STYLE,
+	QUOTE_DECRYPTED,
     QOUTE_NUM_ELEMS
 };
 
-static void
-tree_add_quote_body(LibBalsaMessageBody * body, GtkTreeStore * store, GtkTreeIter * parent)
-{
-    GtkTreeIter iter;
-    gchar * mime_type = libbalsa_message_body_get_mime_type(body);
-    const gchar * disp_type;
-    static gboolean preselect;
-    gchar * description;
+typedef struct {
+	guint parts;
+	guint decrypted;
+} reply_collect_stat_t;
 
-    gtk_tree_store_append(store, &iter, parent);
-    if (body->mime_part)
-	disp_type = g_mime_object_get_disposition(body->mime_part);
-    else
-	disp_type = NULL;
-    /* cppcheck-suppress nullPointer */
-    preselect = !disp_type || *disp_type == '\0' ||
-	!g_ascii_strcasecmp(disp_type, "inline");
-    if (body->filename && *body->filename) {
-        if (preselect)
-            description = g_strdup_printf(_("inlined file “%s” (%s)"),
-                                          body->filename, mime_type);
-        else
-            description = g_strdup_printf(_("attached file “%s” (%s)"),
-                                          body->filename, mime_type);
-    } else {
-        if (preselect)
-            description = g_strdup_printf(_("inlined %s part"), mime_type);
-        else
-            description = g_strdup_printf(_("attached %s part"), mime_type);
-    }
-    g_free(mime_type);
-    gtk_tree_store_set(store, &iter,
-		       QUOTE_INCLUDE, preselect,
-		       QUOTE_DESCRIPTION, description,
-		       QUOTE_BODY, body,
-		       -1);
-    g_free(description);
+static void
+tree_add_quote_body(LibBalsaMessageBody  *body,
+					GtkTreeStore         *store,
+					GtkTreeIter          *parent,
+					gboolean              decrypted,
+					reply_collect_stat_t *stats)
+{
+	GtkTreeIter iter;
+	gchar *mime_type;
+	gchar *mime_desc;
+	static gboolean preselect;
+	GString *description;
+
+	/* preselect inline parts which includes all parts without Content-Disposition */
+	if (body->mime_part) {
+		const gchar *disp_type;
+
+		disp_type = g_mime_object_get_disposition(body->mime_part);
+		preselect = (disp_type == NULL) || (disp_type[0] == '\0') || (g_ascii_strcasecmp(disp_type, "inline") == 0);
+	} else {
+		preselect = TRUE;
+	}
+
+	/* mark decrypted parts, including those in a decrypted container */
+#ifdef HAVE_GPGME
+	decrypted |= body->was_encrypted;
+#endif
+	description = g_string_new(decrypted ? _("decrypted: ") : NULL);
+
+	/* attachment information */
+	mime_type = libbalsa_message_body_get_mime_type(body);
+	mime_desc = libbalsa_vfs_content_description(mime_type);
+	g_free(mime_type);
+	if ((body->filename != NULL) && (body->filename[0] != '\0')) {
+		if (preselect) {
+			g_string_append_printf(description, _("inlined file “%s” (%s)"),
+					body->filename, mime_desc);
+		} else {
+			g_string_append_printf(description, _("attached file “%s” (%s)"),
+					body->filename, mime_desc);
+		}
+	} else {
+		if (preselect) {
+			g_string_append_printf(description, _("inlined %s part"), mime_desc);
+		} else {
+			g_string_append_printf(description, _("attached %s part"), mime_desc);
+		}
+	}
+	g_free(mime_desc);
+
+	/* append to tree */
+	gtk_tree_store_append(store, &iter, parent);
+	gtk_tree_store_set(store, &iter,
+			QUOTE_INCLUDE, preselect,
+			QUOTE_DESCRIPTION, description->str,
+			QUOTE_BODY, body,
+			QUOTE_STYLE, decrypted ? PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL,
+			QUOTE_DECRYPTED, decrypted,
+			-1);
+	(void) g_string_free(description, TRUE);
+	stats->parts++;
+	if (decrypted) {
+		stats->decrypted++;
+	}
 }
 
-static gint
-scan_bodies(GtkTreeStore * bodies, GtkTreeIter * parent, LibBalsaMessageBody * body,
-	    gboolean ignore_html, gboolean container_mp_alt)
+static void
+scan_bodies(GtkTreeStore         *bodies,
+			GtkTreeIter          *parent,
+			LibBalsaMessageBody  *body,
+			gboolean              ignore_html,
+			gboolean              container_mp_alt,
+			gboolean              decrypted,
+			reply_collect_stat_t *stats)
 {
     gchar * mime_type;
-    gint count = 0;
 
     while (body) {
 	switch (libbalsa_message_body_type(body)) {
@@ -3126,20 +3164,25 @@ scan_bodies(GtkTreeStore * bodies, GtkTreeIter * parent, LibBalsaMessageBody * b
 		if (container_mp_alt) {
 		    if ((ignore_html && html_type == LIBBALSA_HTML_TYPE_NONE) ||
 			(!ignore_html && html_type != LIBBALSA_HTML_TYPE_NONE)) {
-			tree_add_quote_body(body, bodies, parent);
-			return count + 1;
+			tree_add_quote_body(body, bodies, parent, decrypted, stats);
+			return;
 		    }
 		} else {
-		    tree_add_quote_body(body, bodies, parent);
-		    count++;
+		    tree_add_quote_body(body, bodies, parent, decrypted, stats);
 		}
 		break;
 	    }
 
 	case LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART:
 	    mime_type = libbalsa_message_body_get_mime_type(body);
-	    count += scan_bodies(bodies, parent, body->parts, ignore_html,
-				 !g_ascii_strcasecmp(mime_type, "multipart/alternative"));
+	    scan_bodies(bodies, parent, body->parts, ignore_html,
+				 !g_ascii_strcasecmp(mime_type, "multipart/alternative"),
+#ifdef HAVE_GPGME
+				 body->was_encrypted | decrypted,
+#else
+				 FALSE,
+#endif
+				 stats);
 	    g_free(mime_type);
 	    break;
 
@@ -3170,11 +3213,14 @@ scan_bodies(GtkTreeStore * bodies, GtkTreeIter * parent, LibBalsaMessageBody * b
 				   QUOTE_INCLUDE, FALSE,
 				   QUOTE_DESCRIPTION, description,
 				   QUOTE_BODY, NULL,
+				   QUOTE_STYLE, decrypted ? PANGO_STYLE_OBLIQUE : PANGO_STYLE_NORMAL,
+				   QUOTE_DECRYPTED, decrypted,
 				   -1);
 		g_free(mime_type);
 		g_free(description);
-		count += scan_bodies(bodies, &iter, body->parts, ignore_html, 0);
+		scan_bodies(bodies, &iter, body->parts, ignore_html, 0, decrypted, stats);
 	    }
+	    break;
 
 	default:
 	    break;
@@ -3182,8 +3228,6 @@ scan_bodies(GtkTreeStore * bodies, GtkTreeIter * parent, LibBalsaMessageBody * b
 
 	body = body->next;
     }
-
-    return count;
 }
 
 static void
@@ -3303,8 +3347,28 @@ append_parts(GString * q_body, LibBalsaMessage *message, GtkTreeModel * model,
     } while (gtk_tree_model_iter_next(model, iter));
 }
 
+#ifdef HAVE_GPGME
 static gboolean
-quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
+unselect_decrypted(GtkTreeModel              *model,
+				   GtkTreePath G_GNUC_UNUSED *path,
+				   GtkTreeIter               *iter,
+				   gpointer G_GNUC_UNUSED     data)
+{
+    gboolean decrypted;
+
+    gtk_tree_model_get(model, iter, QUOTE_DECRYPTED, &decrypted, -1);
+    if (decrypted) {
+    	gtk_tree_store_set(GTK_TREE_STORE(model), iter,
+		   QUOTE_INCLUDE, FALSE, -1);
+    }
+	return FALSE;
+}
+#endif
+
+static gboolean
+quote_parts_select_dlg(GtkTreeStore               *tree_store,
+					   GtkWindow                  *parent,
+					   const reply_collect_stat_t *stats)
 {
     GtkWidget *dialog;
     GtkWidget *label;
@@ -3329,11 +3393,11 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
+    geometry_manager_attach(GTK_WINDOW(dialog), "SelectReplyParts");
 
     label = gtk_label_new(_("Select the parts of the message"
                             " which shall be quoted in the reply"));
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_label_set_selectable(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_valign(label, GTK_ALIGN_START);
 
@@ -3351,6 +3415,31 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
     gtk_box_pack_start(content_box, hbox, TRUE, TRUE, 0);
 
+#ifdef HAVE_GPGME
+    if (stats->decrypted > 0U) {
+    	GtkWidget *warning;
+
+    	if (stats->decrypted != stats->parts) {
+    		warning = gtk_label_new(NULL);
+    		gtk_label_set_markup(GTK_LABEL(warning),
+    			_("<b>Warning:</b> The original message contains an abnormal "
+    			  "mixture of encrypted and unencrypted parts. This "
+    			  "<i>might</i> indicate an attack.\nDouble-check the contents "
+    			  "of the reply before sending."));
+    		gtk_tree_model_foreach(GTK_TREE_MODEL(tree_store), unselect_decrypted, NULL);
+    	} else  {
+    		warning = gtk_label_new(_("You reply to an encrypted message. The reply will contain "
+    			  "the decrypted contents of the original message.\n"
+    			  "Consider to encrypt the reply, and verify that you do not "
+    			  "unintentionally leak sensitive information."));
+    	}
+        gtk_label_set_line_wrap(GTK_LABEL(warning), TRUE);
+        gtk_widget_set_halign(warning, GTK_ALIGN_START);
+        gtk_widget_set_valign(warning, GTK_ALIGN_START);
+        gtk_box_pack_start(GTK_BOX(vbox), warning, FALSE, FALSE, 0);
+    }
+#endif
+
     gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
     gtk_box_set_spacing(content_box, 14);
@@ -3364,7 +3453,6 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
 
     /* add the tree view */
     tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(tree_store));
-    gtk_widget_set_size_request(tree_view, -1, 100);
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree_view), FALSE);
     renderer = gtk_cell_renderer_toggle_new();
     g_signal_connect(renderer, "toggled", G_CALLBACK(cell_toggled_cb),
@@ -3376,6 +3464,7 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     gtk_tree_view_set_expander_column(GTK_TREE_VIEW(tree_view), column);
     column = gtk_tree_view_column_new_with_attributes(NULL, gtk_cell_renderer_text_new(),
 						      "text", QUOTE_DESCRIPTION,
+							  "style", QUOTE_STYLE,
                                                       NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
     gtk_tree_view_expand_all(GTK_TREE_VIEW(tree_view));
@@ -3390,6 +3479,7 @@ quote_parts_select_dlg(GtkTreeStore *tree_store, GtkWindow * parent)
     return result;
 }
 
+
 static gboolean
 tree_find_single_part(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 		      gpointer data)
@@ -3403,6 +3493,32 @@ tree_find_single_part(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 	return FALSE;
 }
 
+#ifdef HAVE_GPGME
+static void
+show_decrypted_warning(GtkWindow *parent)
+{
+	GtkWidget *dialog;
+	GtkWidget *remind_btn;
+
+	dialog = gtk_message_dialog_new(parent,
+		GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+		GTK_MESSAGE_WARNING,
+		GTK_BUTTONS_CLOSE,
+		_("You reply to an encrypted message. The reply will contain "
+		  "the decrypted contents of the original message.\n"
+		  "Consider to encrypt the reply, and verify that you do not "
+		  "unintentionally leak sensitive information."));
+	remind_btn = gtk_check_button_new_with_label(_("Do not remind me again."));
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(remind_btn), FALSE);
+	gtk_widget_show(remind_btn);
+	gtk_box_pack_end(GTK_BOX(gtk_message_dialog_get_message_area(GTK_MESSAGE_DIALOG(dialog))),
+		remind_btn, FALSE, FALSE, 0);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	balsa_app.warn_reply_decrypted = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(remind_btn));
+	gtk_widget_destroy(dialog);
+}
+#endif
+
 static GString *
 collect_for_quote(BalsaSendmsg        * bsmsg,
                   LibBalsaMessageBody * root,
@@ -3412,10 +3528,9 @@ collect_for_quote(BalsaSendmsg        * bsmsg,
                   gboolean              flow)
 {
     GtkTreeStore * tree_store;
-    gint text_bodies;
     LibBalsaMessage *message;
     GString *q_body = NULL;
-
+    reply_collect_stat_t stats;
 
     if (!root)
         return q_body;
@@ -3427,20 +3542,28 @@ collect_for_quote(BalsaSendmsg        * bsmsg,
      * in the reply, and if there is only one return this part */
     tree_store = gtk_tree_store_new(QOUTE_NUM_ELEMS,
 				    G_TYPE_BOOLEAN, G_TYPE_STRING,
-				    G_TYPE_POINTER);
-    text_bodies = scan_bodies(tree_store, NULL, root, ignore_html, FALSE);
-    if (text_bodies == 1) {
+				    G_TYPE_POINTER, PANGO_TYPE_STYLE,
+					G_TYPE_BOOLEAN);
+    stats.parts = 0U;
+    stats.decrypted = 0U;
+    scan_bodies(tree_store, NULL, root, ignore_html, FALSE, FALSE, &stats);
+    if (stats.parts == 1U) {
 	/* note: the only text body may be buried in an attached message, so
 	 * we have to search the tree store... */
 	LibBalsaMessageBody *this_body;
 
+#ifdef HAVE_GPGME
+	if ((stats.decrypted > 0U) && balsa_app.warn_reply_decrypted) {
+		show_decrypted_warning(GTK_WINDOW(bsmsg->window));
+	}
+#endif
 	gtk_tree_model_foreach(GTK_TREE_MODEL(tree_store), tree_find_single_part,
 			       &this_body);
 	if (this_body)
 	    q_body = process_mime_part(message, this_body, reply_prefix_str,
 				       llen, FALSE, flow);
-    } else if (text_bodies > 1) {
-	if (quote_parts_select_dlg(tree_store, GTK_WINDOW(bsmsg->window))) {
+    } else if (stats.parts > 1U) {
+	if (quote_parts_select_dlg(tree_store, GTK_WINDOW(bsmsg->window), &stats)) {
 	    GtkTreeIter iter;
 
 	    q_body = g_string_new("");

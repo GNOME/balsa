@@ -1,3 +1,19 @@
+* Balsa-2.5.7 release. Release date 2019-05-25
+
+Changes with respect to 2.5.6 tag:
+
+- mitigate ‚ÄúRe: What's Up Johnny?‚Äù vulnerabilities
+- code cleanup and adaptations to changing libraries.
+  New minimal requirements are: GLib - 2.48, Gtk3 - 3.18
+- fix bugs in referencing images from HTML emails
+- encryption: key selection improvents
+- printing HTML parts
+- Menu tree UI improvements.
+- improved IMAP folder configuration
+- IMAP and POP code ported to use glib / gio.
+- other bug fixes
+
+
 * Balsa-2.5.6 release. Release date 2018-06-01
 
 Changes wrt to 2.5.5 tag:
@@ -531,7 +547,7 @@ This is first release of GNOME2 port.
 
 - new icons (Ali Akcaagac).
 - handling MIME external-body types: receiving and sending.
-- forwarding messages as attachement (Albrecht Dreﬂ).
+- forwarding messages as attachement (Albrecht Dre√ü).
 - handling format=flowed messages (Peter Bloomfield, rfc2646).
 - improved handling of collapsed threads (Toralf Lund, Carlos).
 - handling of distribution lists for LDIF address books (Toralf Lund).
@@ -589,9 +605,9 @@ This is first release of GNOME2 port.
 * Balsa-1.1.5 development release. Release date 2001-05-21
 
 - libESMTP used for message submission: AUTH and PIPELINE extension available.
-- active URLs in text messages. (Albrecht Dreﬂ)
+- active URLs in text messages. (Albrecht Dre√ü)
 - pipe signature support. (Julian M Catchen)
-- printing rewritten: printing images etc. (Albrecht Dreﬂ)
+- printing rewritten: printing images etc. (Albrecht Dre√ü)
 
 * Balsa-1.1.4 development release. Release date 2001-04-20
 

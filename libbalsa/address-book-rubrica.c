@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2016 Stuart Parmenter and others,
+ * Copyright (C) 1997-2019 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * Rubrica2 address book support was written by Copyright (C)
@@ -88,6 +88,18 @@ static gchar *xml_node_get_attr(xmlNodePtr node, const xmlChar * attname);
 static gchar *xml_node_get_text(xmlNodePtr node);
 
 #define CXMLCHARP(x)  ((const xmlChar *)(x))
+
+struct _LibBalsaAddressBookRubrica {
+    LibBalsaAddressBookText parent;
+
+    GSList *item_list;
+    time_t mtime;
+    LibBalsaCompletion *name_complete;
+};
+
+struct _LibBalsaAddressBookRubricaClass {
+    LibBalsaAddressBookTextClass parent_class;
+};
 
 G_DEFINE_TYPE(LibBalsaAddressBookRubrica, libbalsa_address_book_rubrica,
         LIBBALSA_TYPE_ADDRESS_BOOK_TEXT);

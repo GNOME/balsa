@@ -456,7 +456,6 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
     completion_list = NULL;
     for (list = libbalsa_address_book_text_get_item_list(ab_text); list != NULL; list = list->next) {
 	LibBalsaAddress *address = LIBBALSA_ADDRESS(list->data);
-	GList *l;
 
 	if (!address)
 	    continue;
@@ -464,6 +463,7 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
 	if (address->address_list->next
 	    && libbalsa_address_book_get_dist_list_mode(LIBBALSA_ADDRESS_BOOK(ab_rubrica))) {
 	    /* Create a group address. */
+            GList *l;
 	    InternetAddress *ia =
 		internet_address_group_new(address->full_name);
             InternetAddressGroup *group = (InternetAddressGroup *) ia;

@@ -1,5 +1,5 @@
 project('balsa', 'c',
-        version         : '2.5.5',
+        version         : '2.5.7',
         default_options : 'sysconfdir=/etc')
 
 # if meson is used not in a git source tree, use project version:
@@ -489,27 +489,33 @@ endif
 # set more warnings.
 #
 
-if compiler.get_id() == 'gcc' and more_warnings
-  foreach argument : ['-Wsign-compare',
-                      '-Wpointer-arith',
-                      '-Wnested-externs',
-                      '-Wchar-subscripts',
-                      '-Wuninitialized',
-                      '-Wmissing-prototypes',
-                      '-Wreturn-type',
-                      '-Wdeclaration-after-statement']
-    if compiler.has_argument(argument)
-      add_global_arguments(argument, language : 'c')
-    endif
-  endforeach
-endif
+if more_warnings
+  # meson sets -Wall, so we do not need these:
+  # '-Wsign-compare',
+  # '-Wchar-subscripts',
+  # '-Wuninitialized',
+  # '-Wreturn-type',
+  args = compiler.get_supported_arguments([
+    '-Wpointer-arith',
+    '-Wnested-externs',
+    '-Wmissing-prototypes',
+    '-Wdeclaration-after-statement',
+  ])
+  add_global_arguments(args, language : 'c')
+endif # more_warnings
 
 # extra warnings for GIT.
 #
 if balsa_from_git
-  add_global_arguments('-Wall', '-Werror', '-Wdeprecated-declarations', language : 'c')
-  add_global_arguments('-DGMIME_DISABLE_DEPRECATED', language : 'c')
-  add_global_arguments('-O2', '-U_FORTIFY_SOURCE', '-D_FORTIFY_SOURCE=2', language : 'c')
+  args = compiler.get_supported_arguments([
+    '-Werror',
+    '-Wdeprecated-declarations',
+    '-DGMIME_DISABLE_DEPRECATED',
+    '-O2',
+    '-U_FORTIFY_SOURCE',
+    '-D_FORTIFY_SOURCE=2',
+  ])
+  add_global_arguments(args, language : 'c')
 endif # balsa_from_git
 
 #####################################################################

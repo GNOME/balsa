@@ -1,5 +1,9 @@
 2019-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* meson.build: specify meson version >= 0.43
+
+2019-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* meson.build: Bump default version to 2.5.7;
 	  use compiler.get_supported_arguments() to check all arguments at once,
 	  instead of looping through a list and checking them one at a time.

@@ -39,10 +39,6 @@
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
 
-static void
-libbalsa_address_book_vcard_class_init(LibBalsaAddressBookVcardClass *
-                                       klass);
-
 static LibBalsaABErr
 libbalsa_address_book_vcard_parse_address(FILE * stream_in,
                                           LibBalsaAddress * address_in,

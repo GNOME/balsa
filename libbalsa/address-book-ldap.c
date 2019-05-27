@@ -78,9 +78,6 @@ static char* complete_attrs[] = {
 };
 /* End of FIXME */
 
-static void
-libbalsa_address_book_ldap_class_init(LibBalsaAddressBookLdapClass * klass);
-static void libbalsa_address_book_ldap_init(LibBalsaAddressBookLdap * ab);
 static void libbalsa_address_book_ldap_finalize(GObject * object);
 
 static LibBalsaABErr libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab, 

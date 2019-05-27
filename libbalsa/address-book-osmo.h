@@ -39,8 +39,6 @@ G_DECLARE_FINAL_TYPE(LibBalsaAddressBookOsmo,
                      ADDRESS_BOOK_OSMO,
                      LibBalsaAddressBook);
 
-GType libbalsa_address_book_osmo_get_type(void);
-
 LibBalsaAddressBook *libbalsa_address_book_osmo_new(const gchar *name);
 
 

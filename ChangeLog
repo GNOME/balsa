@@ -1,5 +1,17 @@
 2019-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	address-books: remove redundant declarations
+
+	Some cleanup from using G_DECLARE_{DERIVABLE,FINAL}_TYPE macros
+
+	* libbalsa/address-book-ldap.c:
+	* libbalsa/address-book-osmo.h:
+	* libbalsa/address-book-rubrica.c:
+	* libbalsa/address-book-text.c:
+	* libbalsa/address-book-vcard.c:
+
+2019-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use G_DECLARE_FINAL_TYPE to declare LibBalsaAddressBookVcard
 
 	Make the structure private; no need for getters and setters.

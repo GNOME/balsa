@@ -45,12 +45,6 @@
 #include <glib/gi18n.h>
 
 
-static void
-libbalsa_address_book_rubrica_class_init(LibBalsaAddressBookRubricaClass *
-					 klass);
-static void libbalsa_address_book_rubrica_init(LibBalsaAddressBookRubrica *
-					       ab_rubrica);
-
 static LibBalsaABErr libbalsa_address_book_rubrica_load(LibBalsaAddressBook
 							* ab,
 							const gchar *

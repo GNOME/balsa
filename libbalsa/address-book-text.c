@@ -45,11 +45,6 @@
 #define LINE_LEN 256
 
 static void
-libbalsa_address_book_text_class_init(LibBalsaAddressBookTextClass *
-                                      klass);
-static void
-libbalsa_address_book_text_init(LibBalsaAddressBookText * ab_text);
-static void
 libbalsa_address_book_text_finalize(GObject * object);
 
 static LibBalsaABErr

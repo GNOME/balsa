@@ -54,8 +54,6 @@ struct _LibBalsaServerCfgPrivate {
 G_DEFINE_TYPE_WITH_PRIVATE(LibBalsaServerCfg, libbalsa_server_cfg, GTK_TYPE_NOTEBOOK)
 
 
-static void libbalsa_server_cfg_class_init(LibBalsaServerCfgClass *klass);
-static void libbalsa_server_cfg_init(LibBalsaServerCfg *self);
 static GtkWidget *server_cfg_add_entry(GtkWidget *grid, guint row, const gchar *label, const gchar *value, GCallback callback,
 								gpointer cb_data)
 	G_GNUC_WARN_UNUSED_RESULT;

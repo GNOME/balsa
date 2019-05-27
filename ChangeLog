@@ -1,5 +1,15 @@
 2019-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	various: remove redundant declarations
+
+	Some cleanup from using G_DEFINE_TYPE{,WITH_PRIVATE} macros
+
+	* libbalsa/gmime-filter-header.c:
+	* libbalsa/server-config.c:
+	* src/main-window.c:
+
+2019-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	address-books: remove redundant declarations
 
 	Some cleanup from using G_DECLARE_{DERIVABLE,FINAL}_TYPE macros

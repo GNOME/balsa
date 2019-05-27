@@ -104,8 +104,6 @@ static void bw_check_messages_thread(struct check_messages_thread_info
 
 static void bw_display_new_mail_notification(int num_new, int has_new);
 
-static void balsa_window_class_init(BalsaWindowClass * klass);
-static void balsa_window_init(BalsaWindow * window);
 static void balsa_window_real_open_mbnode(BalsaWindow *window,
                                           BalsaMailboxNode *mbnode,
                                           gboolean set_current);

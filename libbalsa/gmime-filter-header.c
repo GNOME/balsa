@@ -19,7 +19,6 @@
 #include <string.h>
 #include "gmime-filter-header.h"
 
-static void g_mime_filter_header_class_init(GMimeFilterHeaderClass *klass);
 static void g_mime_filter_header_finalize(GObject *object);
 
 static GMimeFilter *filter_copy(GMimeFilter *filter);

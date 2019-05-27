@@ -52,32 +52,16 @@ static LibBalsaABErr
 libbalsa_address_book_vcard_save_address(FILE * stream,
                                          LibBalsaAddress * address);
 
+struct _LibBalsaAddressBookVcard {
+    LibBalsaAddressBookText parent;
+};
 
-GType libbalsa_address_book_vcard_get_type(void)
-{
-    static GType address_book_vcard_type = 0;
+struct _LibBalsaAddressBookVcardClass {
+    LibBalsaAddressBookTextClass parent_class;
+};
 
-    if (!address_book_vcard_type) {
-	static const GTypeInfo address_book_vcard_info = {
-	    sizeof(LibBalsaAddressBookVcardClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_address_book_vcard_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaAddressBookVcard),
-            0,                  /* n_preallocs */
-	    NULL                /* instance_init */
-	};
-
-	address_book_vcard_type =
-            g_type_register_static(LIBBALSA_TYPE_ADDRESS_BOOK_TEXT,
-	                           "LibBalsaAddressBookVcard",
-			           &address_book_vcard_info, 0);
-    }
-
-    return address_book_vcard_type;
-}
+G_DEFINE_TYPE(LibBalsaAddressBookVcard, libbalsa_address_book_vcard,
+              LIBBALSA_TYPE_ADDRESS_BOOK_TEXT)
 
 static void
 libbalsa_address_book_vcard_class_init(LibBalsaAddressBookVcardClass *
@@ -92,18 +76,23 @@ libbalsa_address_book_vcard_class_init(LibBalsaAddressBookVcardClass *
         libbalsa_address_book_vcard_save_address;
 }
 
+static void
+libbalsa_address_book_vcard_init(LibBalsaAddressBookVcard * ab_vcard)
+{
+}
+
 /* Public method */
 LibBalsaAddressBook *
 libbalsa_address_book_vcard_new(const gchar * name, const gchar * path)
 {
-    LibBalsaAddressBookVcard *abvc;
+    LibBalsaAddressBookVcard *ab_vcard;
     LibBalsaAddressBook *ab;
 
-    abvc =
+    ab_vcard =
         LIBBALSA_ADDRESS_BOOK_VCARD(g_object_new
                                     (LIBBALSA_TYPE_ADDRESS_BOOK_VCARD,
                                      NULL));
-    ab = LIBBALSA_ADDRESS_BOOK(abvc);
+    ab = LIBBALSA_ADDRESS_BOOK(ab_vcard);
 
     libbalsa_address_book_set_name(ab, name);
     libbalsa_address_book_text_set_path(LIBBALSA_ADDRESS_BOOK_TEXT(ab), path);

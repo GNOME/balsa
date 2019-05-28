@@ -1,5 +1,10 @@
 2019-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/imap/imap-commands.h: remove redundant declaration of
+	imap_mbox_handle_can_do().
+
+2019-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/address-book-rubrica.c (lbab_rubrica_load_xml):
 	  reduce scope of a GList* variable so that another does not
 	  shadow it.

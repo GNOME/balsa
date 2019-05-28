@@ -22,7 +22,7 @@
 #include "imap_search.h"
 
 /* Any-State */
-int imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);
+/* int imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap); */
 ImapResponse imap_mbox_handle_noop(ImapMboxHandle *r);
 
 /* Non-Authenticated State */

@@ -32,9 +32,7 @@
 #include "balsa-mime-widget.h"
 #include "balsa-mime-widget-callbacks.h"
 #include "sendmsg-window.h"
-#ifdef HAVE_GPGME
 #include "libbalsa-gpgme.h"
-#endif
 
 typedef enum _rfc_extbody_t {
     RFC2046_EXTBODY_FTP,
@@ -77,10 +75,8 @@ static void extbody_send_mail(GtkWidget * button,
 /* message/rfc822 related stuff */
 static GtkWidget *bm_header_widget_new(BalsaMessage * bm,
 				       GtkWidget * const * buttons);
-#ifdef HAVE_GPGME
 static void add_header_sigstate(GtkGrid * grid,
 				GMimeGpgmeSigstat * siginfo);
-#endif
 
 static void bmw_message_set_headers(BalsaMessage        * bm,
                                     BalsaMimeWidget     * mw,
@@ -779,7 +775,6 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 	g_free(hdr);
     }
 
-#ifdef HAVE_GPGME
     if (part) {
 	if (libbalsa_message_body_multipart_signed(part)) {
 	    /* top-level part is RFC 3156 or RFC 8551 multipart/signed */
@@ -789,7 +784,6 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 	    add_header_sigstate(grid, part->sig_info);
 	}
     }
-#endif
 }
 
 static void
@@ -831,7 +825,6 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage           * bm,
                               bm->shown_headers == HEADERS_ALL);
 }
 
-#ifdef HAVE_GPGME
 /*
  * Add the short status of a signature info siginfo to the message headers in
  * view
@@ -857,4 +850,3 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
 
     gtk_grid_attach_next_to(grid, label, NULL, GTK_POS_BOTTOM, 2, 1);
 }
-#endif

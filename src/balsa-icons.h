@@ -74,16 +74,14 @@
 #define BALSA_PIXMAP_INFO_NEW                   "balsa_info_new"
 #define BALSA_PIXMAP_INFO_ATTACHMENT            BALSA_PIXMAP_ATTACHMENT
 #define BALSA_PIXMAP_INFO_DELETED               "edit-delete"
-#ifdef HAVE_GPGME
-#  define BALSA_PIXMAP_GPG_SIGN                 "balsa_gpg_sign"
-#  define BALSA_PIXMAP_GPG_ENCRYPT              "balsa_gpg_encrypt"
-#  define BALSA_PIXMAP_GPG_RECHECK              "balsa_gpg_recheck"
-#  define BALSA_PIXMAP_SIGN                     "balsa_sign"
-#  define BALSA_PIXMAP_SIGN_GOOD                "balsa_sign_good"
-#  define BALSA_PIXMAP_SIGN_NOTRUST             "balsa_sign_trust"
-#  define BALSA_PIXMAP_SIGN_BAD                 "balsa_sign_bad"
-#  define BALSA_PIXMAP_ENCR                     "balsa_encr"
-#endif
+#define BALSA_PIXMAP_GPG_SIGN                   "balsa_gpg_sign"
+#define BALSA_PIXMAP_GPG_ENCRYPT                "balsa_gpg_encrypt"
+#define BALSA_PIXMAP_GPG_RECHECK                "balsa_gpg_recheck"
+#define BALSA_PIXMAP_SIGN                       "balsa_sign"
+#define BALSA_PIXMAP_SIGN_GOOD                  "balsa_sign_good"
+#define BALSA_PIXMAP_SIGN_NOTRUST               "balsa_sign_trust"
+#define BALSA_PIXMAP_SIGN_BAD                   "balsa_sign_bad"
+#define BALSA_PIXMAP_ENCR                       "balsa_encr"
 
 #define BALSA_PIXMAP_BOOK_RED                   "balsa_book_red"
 #define BALSA_PIXMAP_BOOK_YELLOW                "balsa_book_yellow"

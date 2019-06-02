@@ -1,29 +1,5 @@
 # libbalsa/meson.build
 
-if gpgmecfg == 'true'
-  libbalsa_gpgme_extra = [
-	'autocrypt.h',
-	'autocrypt.c',
-    'libbalsa-gpgme.h',
-    'libbalsa-gpgme.c',
-    'libbalsa-gpgme-cb.h',
-    'libbalsa-gpgme-cb.c',
-    'libbalsa-gpgme-keys.h',
-    'libbalsa-gpgme-keys.c',
-    'libbalsa-gpgme-widgets.h',
-    'libbalsa-gpgme-widgets.c',
-    'gmime-multipart-crypt.h',
-    'gmime-multipart-crypt.c',
-    'gmime-part-rfc2440.h',
-    'gmime-part-rfc2440.c',
-    'gmime-gpgme-signature.h',
-    'gmime-gpgme-signature.c',
-    'gmime-application-pkcs7.h',
-    'gmime-application-pkcs7.c']
-else
-  libbalsa_gpgme_extra = []
-endif
-
 libbalsa_a_sources = [
   'abook-completion.c',
   'abook-completion.h',
@@ -51,6 +27,8 @@ libbalsa_a_sources = [
   'address.h',
   'application-helpers.c',
   'application-helpers.h',
+  'autocrypt.h',
+  'autocrypt.c',
   'body.c',
   'body.h',
   'cell-renderer-button.c',
@@ -69,8 +47,16 @@ libbalsa_a_sources = [
   'filter.h',
   'folder-scanners.c',
   'folder-scanners.h',
+  'gmime-application-pkcs7.h',
+  'gmime-application-pkcs7.c',
   'gmime-filter-header.c',
   'gmime-filter-header.h',
+  'gmime-gpgme-signature.h',
+  'gmime-gpgme-signature.c',
+  'gmime-multipart-crypt.h',
+  'gmime-multipart-crypt.c',
+  'gmime-part-rfc2440.h',
+  'gmime-part-rfc2440.c',
   'html.c',
   'html.h',
   'identity.c',
@@ -81,6 +67,14 @@ libbalsa_a_sources = [
   'information.h',
   'libbalsa-conf.c',
   'libbalsa-conf.h',
+  'libbalsa-gpgme.h',
+  'libbalsa-gpgme.c',
+  'libbalsa-gpgme-cb.h',
+  'libbalsa-gpgme-cb.c',
+  'libbalsa-gpgme-keys.h',
+  'libbalsa-gpgme-keys.c',
+  'libbalsa-gpgme-widgets.h',
+  'libbalsa-gpgme-widgets.c',
   'libbalsa-progress.c',
   'libbalsa-progress.h',
   'macosx-helpers.c',
@@ -138,8 +132,6 @@ libbalsa_a_sources = [
   'url.h',
   'geometry-manager.c',
   'geometry-manager.h']
-
-libbalsa_a_sources += libbalsa_gpgme_extra
 
 libimap_include = include_directories('imap')
 

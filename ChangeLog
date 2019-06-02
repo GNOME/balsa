@@ -1,5 +1,30 @@
 2019-06-02  Albrecht Dreß  <albrecht.dress@arcor.de>
 
+	Make GpgME/E2EE support a hard requirement
+
+	* INSTALL: ancient file, add pointer to README
+	* README: remove --with-gpgme option; add gpgme as requirement;
+	  briefly describe Balsa's E2EE support; clarify --with-libsecret
+	* configure.ac, meson.build, meson_options.txt: remove --with-gpgme option;
+	  fail if gpgme-config is unavailable; require gpgme >= 1.6.0
+	* libbalsa/Makefile.am, libbalsa/meson.build: remove conditional building with/without gpgme
+	* libbalsa/body.[ch], libbalsa/imap-server.c,
+	  libbalsa/mailbox.[ch], libbalsa/message.[ch],
+	  libbalsa/rfc3156.[ch], libbalsa/send.[ch],
+	  src/balsa-app.[ch], src/balsa-icons.[ch],
+	  src/balsa-message.[ch], src/balsa-mime-widget-crypto.[ch],
+	  src/balsa-mime-widget-message.c, src/balsa-mime-widget-multipartc,
+	  src/balsa-mime-widget.c, src/balsa-print-object-header.[ch],
+	  src/balsa-print-object.c, src/main.c, src/print-gtk.c,
+	  src/save-restore.c, src/sendmsg-window.[ch],
+	  src/toolbar-factory.c: remove conditional compilation (HAVE_GPGME)
+	* libbalsa/identity.c: remove conditional compilation (HAVE_GPGME);
+	  simplify append_ident_notebook_page()
+	* src/mailbox-conf.c: remove conditional compilation (HAVE_GPGME);
+	  remove useless scope in mailbox_conf_view_new_full()
+
+2019-06-02  Albrecht Dreß  <albrecht.dress@arcor.de>
+
 	libnetclient: use G_DECLARE*
 
 	* libnetclient/net-client-pop.[ch]: use G_DECLARE_FINAL_TYPE(),

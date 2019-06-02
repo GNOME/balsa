@@ -93,10 +93,8 @@ G_BEGIN_DECLS
 	gboolean req_dsn;	 /* send a delivery status notification */
 	gboolean quit_on_close; /* quit balsa after the compose window */
 	                        /* is closed.                          */
-#ifdef HAVE_GPGME
 	guint gpg_mode;
 	gboolean attach_pubkey;
-#endif
 
 #if !HAVE_GTKSOURCEVIEW
         GtkTextBuffer *buffer2;       /* Undo buffer. */

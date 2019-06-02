@@ -39,10 +39,8 @@
 #include "balsa-mime-widget-message.h"
 #include "balsa-mime-widget-image.h"
 #include "balsa-mime-widget-crypto.h"
-#ifdef HAVE_GPGME
 #include "libbalsa-gpgme.h"
 #include "autocrypt.h"
-#endif
 
 #include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -56,9 +54,7 @@
 #  include "macosx-helpers.h"
 #endif
 
-#ifdef HAVE_GPGME
-#  include "gmime-part-rfc2440.h"
-#endif
+#include "gmime-part-rfc2440.h"
 
 #  define FORWARD_SEARCH(iter, text, match_begin, match_end)            \
     gtk_text_iter_forward_search((iter), (text),                        \
@@ -156,15 +152,12 @@ static void balsa_part_info_init(GObject *object, gpointer data);
 static BalsaPartInfo* balsa_part_info_new(LibBalsaMessageBody* body);
 static void balsa_part_info_free(GObject * object);
 
-
-#ifdef HAVE_GPGME
 static LibBalsaMsgProtectState balsa_message_scan_signatures(LibBalsaMessageBody *body,
 							     LibBalsaMessage * message);
 static GdkPixbuf * get_crypto_content_icon(LibBalsaMessageBody * body,
 					   const gchar * content_type,
 					   gchar ** icon_title);
 static void message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm);
-#endif /* HAVE_GPGME */
 
 #ifdef ENABLE_AUTOCRYPT
 static inline gboolean autocrypt_in_use(void);
@@ -282,7 +275,6 @@ bm_header_tl_buttons(BalsaMessage * bm)
 
     array = g_ptr_array_new();
 
-#ifdef HAVE_GPGME
     button =
         gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_GPG_RECHECK),
                                       GTK_ICON_SIZE_BUTTON);
@@ -298,7 +290,6 @@ bm_header_tl_buttons(BalsaMessage * bm)
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(message_recheck_crypto_cb), bm);
     g_ptr_array_add(array, button);
-#endif
 
     button =
         gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_ATTACHMENT),
@@ -1199,7 +1190,6 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
         return FALSE;
     }
 
-#ifdef HAVE_GPGME
     balsa_message_perform_crypto(message,
 				 libbalsa_mailbox_get_crypto_mode(mailbox),
 				 FALSE, 1);
@@ -1211,7 +1201,6 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
         if (message->prot_state != prot_state)
             message->prot_state = prot_state;
     }
-#endif
 
     /* may update the icon */
     libbalsa_mailbox_msgno_update_attach(mailbox, message->msgno, message);
@@ -1525,7 +1514,6 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
         info->path = gtk_tree_model_get_path(model, iter);
 
         /* add to the tree view */
-#ifdef HAVE_GPGME
         content_icon =
 	    get_crypto_content_icon(body, content_type, &icon_title);
 	if (info->body->was_encrypted) {
@@ -1534,9 +1522,6 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
 	    g_free(icon_title);
 	    icon_title = new_title;
 	}
-#else
-	content_icon = NULL;
-#endif
         if (!content_icon)
 	    content_icon =
 		libbalsa_icon_finder(GTK_WIDGET(bm),
@@ -2192,7 +2177,6 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body,
     if (body) {
         retval = add_body(bm, body, container);
         for (body = body->next; body; body = body->next) {
-#ifdef HAVE_GPGME
 	    GMimeContentType *type =
 		g_mime_content_type_new_from_string(body->content_type);
 
@@ -2205,12 +2189,6 @@ add_multipart_mixed(BalsaMessage * bm, LibBalsaMessageBody * body,
 		  g_mime_content_type_is_type(type, "application", "x-pkcs7-signature"))))
                 add_body(bm, body, container);
 	    g_object_unref(type);
-#else
-            if (libbalsa_message_body_is_inline(body) ||
-		bm->force_inline ||
-		libbalsa_message_body_is_multipart(body))
-                add_body(bm, body, container);
-#endif
         }
     }
 
@@ -2709,7 +2687,6 @@ balsa_message_zoom(BalsaMessage * bm, gint in_out)
 #endif /* HAVE_HTML_WIDGET */
 
 
-#ifdef HAVE_GPGME
 /*
  * collected GPG(ME) helper stuff to make the source more readable
  */
@@ -3319,7 +3296,6 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
     g_object_unref(G_OBJECT(message));
 }
 
-#endif  /* HAVE_GPGME */
 
 /*
  * Public method for find-in-message.

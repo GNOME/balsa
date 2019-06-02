@@ -21,8 +21,6 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "rfc3156.h"
 
-#ifdef HAVE_GPGME
-
 #include <string.h>
 #include <gpgme.h>
 
@@ -764,5 +762,3 @@ have_pub_key_for(gpgme_ctx_t          gpgme_ctx,
 
     return result;
 }
-
-#endif				/* HAVE_GPGME */

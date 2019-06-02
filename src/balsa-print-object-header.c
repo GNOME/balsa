@@ -27,9 +27,7 @@
 #include "balsa-print-object.h"
 #include "balsa-print-object-decor.h"
 #include "balsa-print-object-default.h"
-#ifdef HAVE_GPGME
 #include "libbalsa-gpgme.h"
-#endif
 
 /* object related functions */
 static void balsa_print_object_header_class_init(BalsaPrintObjectHeaderClass * klass);
@@ -222,7 +220,6 @@ balsa_print_object_header_new_real(GList * list,
     /* add a small space between label and value */
     p_label_width += C_TO_P(C_LABEL_SEP);
 
-#ifdef HAVE_GPGME
     /* add a signature status to the string */
     if (balsa_app.shown_headers != HEADERS_NONE) {
 	    gchar *info_str = NULL;
@@ -240,7 +237,6 @@ balsa_print_object_header_new_real(GList * list,
     	    g_free(info_str);
     	}
     }
-#endif				/* HAVE_GPGME */
 
     /* strip the trailing '\n' */
     header_buf = g_string_truncate(header_buf, header_buf->len - 1);
@@ -354,7 +350,6 @@ balsa_print_object_header_from_body(GList *list,
 }
 
 
-#ifdef HAVE_GPGME
 GList *
 balsa_print_object_header_crypto(GList *list, GtkPrintContext * context,
 				 LibBalsaMessageBody * body,
@@ -431,7 +426,6 @@ balsa_print_object_header_crypto(GList *list, GtkPrintContext * context,
 
     return list;
 }
-#endif
 
 
 static void

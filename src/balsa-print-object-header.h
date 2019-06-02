@@ -67,12 +67,10 @@ GList *balsa_print_object_header_from_body(GList *list,
 					   GtkPrintContext * context,
 					   LibBalsaMessageBody * body,
 					   BalsaPrintSetup * psetup);
-#ifdef HAVE_GPGME
 GList *balsa_print_object_header_crypto(GList *list,
 					GtkPrintContext * context,
 					LibBalsaMessageBody * body,
 					BalsaPrintSetup * psetup);
-#endif
 
 
 G_END_DECLS

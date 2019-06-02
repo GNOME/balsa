@@ -44,6 +44,7 @@ Basically, Balsa requires
 - gmime-2.6
 - gio-2.0
 - gthread-2.0
+- gpgme >= 1.6.0
 
 --disable-more-warnings
 	Balsa by default is very sensitive to compilation warnings
@@ -56,15 +57,8 @@ use this option to compile the code and hope for the best.
 	Add "GNOME;" to Balsa's categories in the two .desktop files.
 
 --with-libsecret
-	Link to libsecret instead of gnome-keyring.
-
---with-gpgme[=gpgme-config]
-	Use GPGME library for GnuPG message signing and encryption.
-The path of the gpgme-config tool must be specified only if it is
-installed in an uncommon place.  See the (rather outdated) web page
-http://home.arcor.de/dralbrecht.dress/balsa/UsingGnuPG.html#FAQ
-for more details.
-Note: requires GpgME version >= 1.5.0
+	Link to libsecret to store credentials in the key ring instead of
+the obfuscated text file ~/.balsa/config-private.
 
 --with-gss[=/usr/kerberos]
 	This enables GSSAPI Kerberos based authentication scheme. 
@@ -119,6 +113,19 @@ Balsa GIT:
 	Balsa is hosted on the Gnome GitLab server. To get the latest
 source, get the module 'balsa':
 git clone https://gitlab.gnome.org/GNOME/balsa.git
+
+
+End-to-End Encryption (E2EE):
+-----------------------------
+	Balsa supports E2EE using the multipart OpenPGP (RFC 3156)
+or S/MIME (RFC RFC 8551) standards as well as single-part OpenPGP
+(RFC 4880).  Messages can be signed, encrypted, or both.  The GpgME
+library (https://gnupg.org/software/gpgme/) must be installed.  For
+the cryptographic operations, suitable backends like gnupg for the
+OpenPGP protocols and/or gpgsm for S/MIME are required.
+ 
+Optionally, Balsa can be configured to include Autocrypt support
+(https://autocrypt.org/index.html).
 
 
 Specifying the SMTP Server:

@@ -30,8 +30,6 @@
 #define LIBBALSA_PROTECT_SMIMEV3       (1 << 3)	/* RFC 2633 (S/MIME v3) */
 #define LIBBALSA_PROTECT_RFC3156       (1 << 4)	/* RFC 3156 (PGP/MIME) */
 
-#ifdef HAVE_GPGME
-
 #include <gpgme.h>
 #include "libbalsa.h"
 #include "misc.h"
@@ -101,5 +99,4 @@ gchar *libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 const gchar *libbalsa_gpgme_validity_to_gchar(gpgme_validity_t validity);
 const gchar *libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity);
 
-#endif				/* HAVE_GPGME */
 #endif				/* __RFC3156_H__ */

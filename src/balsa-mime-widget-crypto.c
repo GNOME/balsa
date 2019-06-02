@@ -22,7 +22,6 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "balsa-mime-widget-crypto.h"
 
-#ifdef HAVE_GPGME
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include <glib/gi18n.h>
@@ -359,5 +358,3 @@ create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
 
 	return success;
 }
-
-#endif  /* HAVE_GPGME */

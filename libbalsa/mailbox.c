@@ -2293,9 +2293,7 @@ static LibBalsaMailboxView libbalsa_mailbox_view_default = {
     0,				/* open                 */
     1,				/* in_sync              */
     0,				/* used 		*/
-#ifdef HAVE_GPGME
     LB_MAILBOX_CHK_CRYPT_MAYBE, /* gpg_chk_mode         */
-#endif
     -1,                         /* total messages	*/
     -1,                         /* unread messages	*/
     0,                          /* mod time             */
@@ -2480,7 +2478,6 @@ libbalsa_mailbox_set_filter(LibBalsaMailbox * mailbox, gint filter)
     }
 }
 
-#ifdef HAVE_GPGME
 gboolean 
 libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
                                 LibBalsaChkCryptoMode gpg_chk_mode)
@@ -2496,7 +2493,6 @@ libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
     } else
 	return FALSE;
 }
-#endif
 
 void
 libbalsa_mailbox_set_unread(LibBalsaMailbox * mailbox, gint unread)
@@ -2644,7 +2640,6 @@ libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox)
 	mailbox->view->filter : libbalsa_mailbox_view_default.filter;
 }
 
-#ifdef HAVE_GPGME
 LibBalsaChkCryptoMode
 libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox)
 {
@@ -2652,7 +2647,6 @@ libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox)
 	mailbox->view->gpg_chk_mode :
 	libbalsa_mailbox_view_default.gpg_chk_mode;
 }
-#endif
 
 gint
 libbalsa_mailbox_get_unread(LibBalsaMailbox * mailbox)
@@ -3238,7 +3232,6 @@ void libbalsa_mailbox_set_attach_icon(GdkPixbuf * pixbuf)
                               [LIBBALSA_MESSAGE_ATTACH_ATTACH]);
 }
 
-#ifdef HAVE_GPGME
 void libbalsa_mailbox_set_good_icon(GdkPixbuf * pixbuf)
 {
     libbalsa_mailbox_set_icon(pixbuf,
@@ -3273,7 +3266,6 @@ void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf)
                               &attach_icons
                               [LIBBALSA_MESSAGE_ATTACH_ENCR]);
 }
-#endif /* HAVE_GPGME */
 
 /* =================================================================== *
  * GtkTreeDragSource implementation functions.                         *

@@ -130,13 +130,11 @@ typedef enum {
     LB_MAILBOX_STATE_CLOSING
 } LibBalsaMailboxState;
 
-#ifdef HAVE_GPGME
 typedef enum {
     LB_MAILBOX_CHK_CRYPT_NEVER,     /* never auto decrypt/signature check */
     LB_MAILBOX_CHK_CRYPT_MAYBE,     /* auto decrypt/signature check if possible */
     LB_MAILBOX_CHK_CRYPT_ALWAYS     /* always auto decrypt/signature check */
 } LibBalsaChkCryptoMode;
-#endif
 
 enum LibBalsaMailboxCapability {
     LIBBALSA_MAILBOX_CAN_SORT,
@@ -170,9 +168,7 @@ struct _LibBalsaMailboxView {
     gboolean in_sync;		/* view is in sync with config */
     gboolean used;		/* keep track of usage         */
 
-#ifdef HAVE_GPGME
     LibBalsaChkCryptoMode gpg_chk_mode;
-#endif
 
     /* Display statistics:
      * - total >= 0                both counts are valid;
@@ -549,10 +545,8 @@ void libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox,
 				  gboolean exposed);
 void libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open);
 void libbalsa_mailbox_set_filter(LibBalsaMailbox * mailbox, gint filter);
-#ifdef HAVE_GPGME
 gboolean libbalsa_mailbox_set_crypto_mode(LibBalsaMailbox * mailbox,
 					  LibBalsaChkCryptoMode gpg_chk_mode);
-#endif
 void libbalsa_mailbox_set_unread(LibBalsaMailbox * mailbox, gint unread);
 void libbalsa_mailbox_set_total (LibBalsaMailbox * mailbox, gint total);
 void libbalsa_mailbox_set_mtime (LibBalsaMailbox * mailbox, time_t mtime);
@@ -572,9 +566,7 @@ LibBalsaMailboxSubscribe libbalsa_mailbox_get_subscribe(LibBalsaMailbox *
 gboolean libbalsa_mailbox_get_exposed(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_open(LibBalsaMailbox * mailbox);
 gint libbalsa_mailbox_get_filter(LibBalsaMailbox * mailbox);
-#ifdef HAVE_GPGME
 LibBalsaChkCryptoMode libbalsa_mailbox_get_crypto_mode(LibBalsaMailbox * mailbox);
-#endif
 gint libbalsa_mailbox_get_unread(LibBalsaMailbox * mailbox);
 gint libbalsa_mailbox_get_total (LibBalsaMailbox * mailbox);
 time_t libbalsa_mailbox_get_mtime(LibBalsaMailbox * mailbox);
@@ -614,13 +606,11 @@ void libbalsa_mailbox_set_trash_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_set_flagged_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_set_replied_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_set_attach_icon(GdkPixbuf * pixbuf);
-#ifdef HAVE_GPGME
 void libbalsa_mailbox_set_good_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_set_notrust_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_set_bad_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_set_sign_icon(GdkPixbuf * pixbuf);
 void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf);
-#endif /* HAVE_GPGME */
 
 /* Partial messages */
 void libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,

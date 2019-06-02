@@ -60,14 +60,9 @@ if test x$balsa_cv_fcntl = xyes; then
 	AC_DEFINE(USE_FCNTL,1,[Define if fcntl locking should be used.])
 fi
 
-AC_ARG_WITH([gpgme],
-   AC_HELP_STRING([--with-gpgme=gpgme-config],
-                  [build with gpgme/GnuPG support (default=no, path to gpgme-config optional)]),
-	          [ gpgmecfg=$withval ], [ gpgmecfg=no ])
-
 AC_ARG_ENABLE([autocrypt],
    AC_HELP_STRING([--enable-autocrypt],
-                  [build with Autocrypt support (see https://autocrypt.org/), default=no, requires gpgme and sqlite3)]),
+                  [build with Autocrypt support (see https://autocrypt.org/), default=no, requires sqlite3)]),
                   [autocrypt=$enableval], [autocrypt=no])
 
 AC_ARG_WITH(canberra,
@@ -324,60 +319,46 @@ fi
 
 # GPGME detection.
 # We don't use the std macro AM_PATH_GPGME here to avoid dependencies.
-
-AC_MSG_CHECKING(whether to build with gpgme/GnuPG support)
-if test x"$gpgmecfg" = xyes ; then
-	AC_MSG_RESULT(yes)
-	AC_PATH_PROG(gpgmecfg, gpgme-config, no)
-	if test "$gpgmecfg" = no; then
-	AC_MSG_ERROR([GPGme build requested but gpgme-config program not found.])
-        fi
+AC_PATH_PROG(gpgmecfg, gpgme-config, no)
+if test "$gpgmecfg" = no; then
+	AC_MSG_ERROR([gpgme-config program not found.])
+fi
+AC_MSG_CHECKING([gpgme library version])
+gpgmever=`$gpgmecfg --version`
+AC_MSG_RESULT($gpgmever)
+gpgme_ve=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
+gpgme_ma=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
+gpgme_mi=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
+if test $gpgme_ve -lt 1; then
+	gpgmecfg=no
+fi
+if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 6 \) ; then
+	gpgmecfg=no
 fi
 if test x"$gpgmecfg" != xno ; then
-	AC_MSG_CHECKING([gpgme library version])
-	gpgmever=`$gpgmecfg --version`
-	AC_MSG_RESULT($gpgmever)
-        gpgme_ve=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
-        gpgme_ma=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
-        gpgme_mi=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
-	if test $gpgme_ve -lt 1; then
-		gpgmecfg=no
-	fi
-	if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 5 \) ; then
-		gpgmecfg=no
-	fi
-	if test x"$gpgmecfg" != xno ; then
-	        if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 8 \) ; then
-		        BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --thread=pthread --libs`"
-		        if test x"$?" != x0 ; then
-			        AC_MSG_ERROR([*** You enabled gpgme support, but your gpgme installation does not support threads.])
-		        fi
-                else
-		        BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --libs`"
-                fi
-		AC_DEFINE(HAVE_GPGME,1,[Defined when gpgme is available.])
-		BALSA_CFLAGS="$BALSA_CFLAGS `$gpgmecfg --cflags`"
-		gpgmecfg=yes
+    if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 8 \) ; then
+		BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --thread=pthread --libs`"
+		if test x"$?" != x0 ; then
+			AC_MSG_ERROR([*** Your gpgme installation does not support threads.])
+		fi
 	else
-		AC_MSG_WARN([sorry, you need at least gpgme version 1.5.0])
+		BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --libs`"
 	fi
+	BALSA_CFLAGS="$BALSA_CFLAGS `$gpgmecfg --cflags`"
+else
+	AC_MSG_ERROR([sorry, you need at least gpgme version 1.6.0])
 fi
-AM_CONDITIONAL([BUILD_WITH_GPGME], [test $gpgmecfg = "yes"])
 
 # Autocrypt support
 AC_MSG_CHECKING(whether to build with Autocrypt support)
-if test x"$gpgmecfg" != xno ; then
-	if test x"$autocrypt" != xno ; then
-		AC_MSG_RESULT([yes])
-		PKG_CHECK_MODULES(AUTOCRYPT, [sqlite3])
-		AC_DEFINE(ENABLE_AUTOCRYPT,1,[If defined, enable Autocrypt support])
-		BALSA_CFLAGS="$BALSA_CFLAGS $AUTOCRYPT_CFLAGS"
-		BALSA_LIBS="$BALSA_LIBS $AUTOCRYPT_LIBS"
-	else
-		AC_MSG_RESULT([no])
-	fi
+if test x"$autocrypt" != xno ; then
+	AC_MSG_RESULT([yes])
+	PKG_CHECK_MODULES(AUTOCRYPT, [sqlite3])
+	AC_DEFINE(ENABLE_AUTOCRYPT,1,[If defined, enable Autocrypt support])
+	BALSA_CFLAGS="$BALSA_CFLAGS $AUTOCRYPT_CFLAGS"
+	BALSA_LIBS="$BALSA_LIBS $AUTOCRYPT_LIBS"
 else
-	AC_MSG_RESULT([skipped, gpgme is disabled])
+	AC_MSG_RESULT([no])
 fi
 
 # OpenLDAP configuration.
@@ -734,7 +715,6 @@ echo "   Enable compile warnings: $set_more_warnings"
 echo "               HTML widget: $use_html_widget"
 echo "                 Use GNOME: $with_gnome"
 echo "              Use Canberra: $with_canberra"
-echo "                 Use GPGME: $gpgmecfg"
 echo "             Use Autocrypt: $autocrypt"
 echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"

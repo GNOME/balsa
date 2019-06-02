@@ -116,12 +116,10 @@ static mime_delegate_t mime_delegate[] =
       {TRUE,  "text/",                         balsa_mime_widget_new_text},
       {TRUE,  "multipart/",                    balsa_mime_widget_new_multipart},
       {TRUE,  "image/",                        balsa_mime_widget_new_image},
-#ifdef HAVE_GPGME
       {FALSE, "application/pgp-signature",     balsa_mime_widget_new_signature},
       {FALSE, "application/pkcs7-signature",   balsa_mime_widget_new_signature},
       {FALSE, "application/x-pkcs7-signature", balsa_mime_widget_new_signature},
 	  {FALSE, "application/pgp-keys",		   balsa_mime_widget_new_pgpkey},
-#endif
       {FALSE, NULL,         NULL}
     };
 
@@ -161,7 +159,6 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 	    g_signal_connect(G_OBJECT(mw->widget), "focus_out_event",
 			     G_CALLBACK(balsa_mime_widget_unlimit_focus),
 			     (gpointer) bm);
-#ifdef HAVE_GPGME
 	    if (mime_body->sig_info &&
 		g_ascii_strcasecmp("application/pgp-signature", content_type) &&
 		g_ascii_strcasecmp("application/pkcs7-signature", content_type) &&
@@ -176,7 +173,6 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 		mw->widget = balsa_mime_widget_crypto_frame(mime_body, mw->widget,
 							    TRUE, TRUE, NULL);
 	    }
-#endif
             g_object_ref_sink(mw->widget);
 
 	    if (GTK_IS_LAYOUT(mw->widget)) {

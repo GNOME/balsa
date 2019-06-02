@@ -32,10 +32,8 @@ typedef LibBalsaMailbox* (*LibBalsaFccboxFinder)(const gchar *url);
 typedef enum _LibBalsaMsgCreateResult LibBalsaMsgCreateResult;
 enum _LibBalsaMsgCreateResult {
     LIBBALSA_MESSAGE_CREATE_OK,
-#ifdef HAVE_GPGME
     LIBBALSA_MESSAGE_SIGN_ERROR,
     LIBBALSA_MESSAGE_ENCRYPT_ERROR,
-#endif
     LIBBALSA_MESSAGE_CREATE_ERROR,
     LIBBALSA_MESSAGE_QUEUE_ERROR,
     LIBBALSA_MESSAGE_SAVE_ERROR,

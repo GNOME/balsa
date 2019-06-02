@@ -32,9 +32,7 @@
 #include "balsa-print-object.h"
 #include "balsa-print-object-decor.h"
 #include "balsa-print-object-header.h"
-#ifdef HAVE_GPGME
 #include "libbalsa-gpgme.h"
-#endif
 
 #if HAVE__NL_MEASUREMENT_MEASUREMENT
 #include <langinfo.h>
@@ -159,7 +157,6 @@ find_alt_part(LibBalsaMessageBody *parts,
 }
 
 
-#ifdef HAVE_GPGME
 static inline GList *
 begin_crypto_frame(GList 		   *bpo_list,
 				   BalsaPrintSetup *psetup,
@@ -179,7 +176,6 @@ begin_crypto_frame(GList 		   *bpo_list,
 	}
 	return bpo_list;
 }
-#endif				/* HAVE_GPGME */
 
 
 static GList *
@@ -194,9 +190,7 @@ print_single_part(GList 			  *bpo_list,
 		bpo_list = balsa_print_object_separator(bpo_list, psetup);
 	}
 	if (add_signature) {
-#ifdef HAVE_GPGME
 		bpo_list = begin_crypto_frame(bpo_list, psetup, TRUE, body->was_encrypted);
-#endif				/* HAVE_GPGME */
 	}
 	return balsa_print_objects_append_from_body(bpo_list, context, body, psetup);
 }
@@ -210,15 +204,12 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 	  LibBalsaMessageBody * body, gboolean no_first_sep)
 {
     gboolean add_signature = FALSE;
-#ifdef HAVE_GPGME
     gboolean have_crypto_frame;
 	gboolean is_mp_signed;
-#endif				/* HAVE_GPGME */
     while (body) {
 	gchar *conttype;
 
 	conttype = libbalsa_message_body_get_mime_type(body);
-#ifdef HAVE_GPGME
 	add_signature = body->sig_info &&
 	    g_ascii_strcasecmp(conttype, "application/pgp-signature") &&
 	    g_ascii_strcasecmp(conttype, "application/pkcs7-signature") &&
@@ -233,19 +224,16 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 	} else {
 	    have_crypto_frame = FALSE;
 	}
-#endif				/* HAVE_GPGME */
 
 	if (g_ascii_strncasecmp(conttype, "multipart/", 10)) {
 		bpo_list = print_single_part(bpo_list, context, psetup, body, no_first_sep, add_signature);
 		no_first_sep = FALSE;
-#ifdef HAVE_GPGME
 	} else if (add_signature && !is_mp_signed) {
 		if (!no_first_sep) {
 			bpo_list = balsa_print_object_separator(bpo_list, psetup);
 			no_first_sep = TRUE;
 		}
 		bpo_list = begin_crypto_frame(bpo_list, psetup, TRUE, body->was_encrypted);
-#endif				/* HAVE_GPGME */
 	}
 
 	if (body->parts) {
@@ -261,20 +249,14 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 	}
 
 	/* end the frame for an embedded message or encrypted stuff */
-	if (!g_ascii_strcasecmp(conttype, "message/rfc822")
-#ifdef HAVE_GPGME
-	    || have_crypto_frame
-#endif
-	    )
+	if (!g_ascii_strcasecmp(conttype, "message/rfc822") || have_crypto_frame)
 	    bpo_list = balsa_print_object_frame_end(bpo_list, psetup);
 
-#ifdef HAVE_GPGME
 	if (add_signature) {
 	    bpo_list = balsa_print_object_separator(bpo_list, psetup);
 	    bpo_list = balsa_print_object_header_crypto(bpo_list, context, body, psetup);
 	    bpo_list = balsa_print_object_frame_end(bpo_list, psetup);
 	}
-#endif				/* HAVE_GPGME */
 	g_free(conttype);
 
 	body = body->next;

@@ -24,8 +24,6 @@
 # error "Include config.h before this file."
 #endif
 
-#ifdef HAVE_GPGME
-
 #include "balsa-app.h"
 #include "balsa-message.h"
 #include "balsa-mime-widget.h"
@@ -50,5 +48,4 @@ const gchar *balsa_mime_widget_signature_icon_name(LibBalsaMsgProtectState prote
 
 G_END_DECLS
 
-#endif                          /* HAVE_GPGME */
 #endif				/* __BALSA_MIME_WIDGET_IMAGE_H__ */

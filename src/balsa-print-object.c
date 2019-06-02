@@ -116,7 +116,6 @@ balsa_print_object_emb_headers(GList * list, GtkPrintContext * context,
     return balsa_print_object_frame_end(list, psetup);
 }
 
-#ifdef HAVE_GPGME
 static GList *
 balsa_print_object_mp_crypto(GList * list, GtkPrintContext * context,
                                LibBalsaMessageBody * mime_body,
@@ -124,7 +123,6 @@ balsa_print_object_mp_crypto(GList * list, GtkPrintContext * context,
 {
     return balsa_print_object_header_crypto(list, context, mime_body, psetup);
 }
-#endif                          /* HAVE_GPGME */
 
 
 GList *
@@ -150,11 +148,9 @@ balsa_print_objects_append_from_body(GList * list,
         { "text/",                          5, balsa_print_object_text },
         { "image/",                         6, balsa_print_object_image },
         { "message/rfc822",                -1, balsa_print_object_emb_message },
-#ifdef HAVE_GPGME
         { "application/pgp-signature",     -1, balsa_print_object_mp_crypto },
         { "application/pkcs7-signature",   -1, balsa_print_object_mp_crypto },
         { "application/x-pkcs7-signature", -1, balsa_print_object_mp_crypto },
-#endif				/* HAVE_GPGME */
         { NULL,                            -1, balsa_print_object_default }
     };
     gchar *conttype;

@@ -99,10 +99,8 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->body_ref = 0;
     message->body_list = NULL;
     message->has_all_headers = 0;
-#ifdef HAVE_GPGME
     message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
     message->ident = NULL;
-#endif
 }
 
 
@@ -179,11 +177,9 @@ libbalsa_message_finalize(GObject * object)
 	message->mime_msg = NULL;
     }
 
-#ifdef HAVE_GPGME
     if (message->ident != NULL) {
     	g_object_unref(message->ident);
     }
-#endif
 
     if (message->tempdir) {
         if (rmdir(message->tempdir))
@@ -580,7 +576,6 @@ libbalsa_message_save(LibBalsaMessage * message, const gchar *filename)
 LibBalsaMessageAttach
 libbalsa_message_get_attach_icon(LibBalsaMessage * message)
 {
-#ifdef HAVE_GPGME
     if (libbalsa_message_is_pgp_encrypted(message))
 	return LIBBALSA_MESSAGE_ATTACH_ENCR;
     else if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE ||
@@ -598,7 +593,6 @@ libbalsa_message_get_attach_icon(LibBalsaMessage * message)
 	    return LIBBALSA_MESSAGE_ATTACH_SIGN;
 	}
     } else
-#endif
     if (libbalsa_message_has_attachment(message))
 	return LIBBALSA_MESSAGE_ATTACH_ATTACH;
     else
@@ -769,7 +763,6 @@ libbalsa_message_has_attachment(LibBalsaMessage * message)
     }
  }
 
-#ifdef HAVE_GPGME
 gboolean
 libbalsa_message_is_pgp_signed(LibBalsaMessage * message)
 {
@@ -789,7 +782,6 @@ libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message)
 	g_mime_content_type_is_type(message->headers->content_type,
 				    "multipart", "encrypted") : FALSE;
 }
-#endif
 
 void
 libbalsa_message_append_part(LibBalsaMessage * message,

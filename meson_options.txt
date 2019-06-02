@@ -13,11 +13,6 @@ option('fcntl',
   value       : true,
   description : 'Use fcntl() to lock files (default=true)')
 
-option('gpgme',
-  type        : 'string',
-  value       : 'false',
-  description : 'build with gpgme/GnuPG support (true|false|path to gpgme-config, default=false)')
-
 option('autocrypt',
   type        : 'boolean',
   value       : false,

@@ -33,10 +33,7 @@
 #include "libbalsa-vfs.h"
 #include "misc.h"
 #include <glib/gi18n.h>
-
-#ifdef HAVE_GPGME
 #include "libbalsa-gpgme.h"
-#endif
 
 LibBalsaMessageBody *
 libbalsa_message_body_new(LibBalsaMessage * message)
@@ -55,10 +52,8 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     body->temp_filename = NULL;
     body->charset = NULL;
 
-#ifdef HAVE_GPGME
     body->was_encrypted = FALSE;
     body->sig_info = NULL;
-#endif
 
     body->next = NULL;
     body->parts = NULL;
@@ -89,10 +84,8 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
 
     g_free(body->charset);
 
-#ifdef HAVE_GPGME
     if (body->sig_info)
 	g_object_unref(G_OBJECT(body->sig_info));
-#endif
 
     libbalsa_message_body_free(body->next);
     libbalsa_message_body_free(body->parts);
@@ -880,7 +873,6 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
     return libbalsa_message_body_get_by_id(body->next, id);
 }
 
-#ifdef HAVE_GPGME
 LibBalsaMsgProtectState
 libbalsa_message_body_protect_state(const LibBalsaMessageBody *body)
 {
@@ -940,4 +932,3 @@ libbalsa_message_body_inline_signed(const LibBalsaMessageBody *body)
 			(body->sig_info != NULL) &&
 			(body->sig_info->status != GPG_ERR_NOT_SIGNED);
 }
-#endif

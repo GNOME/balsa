@@ -52,10 +52,8 @@
 
 #include "libinit_balsa/assistant_init.h"
 
-#ifdef HAVE_GPGME
 #include "libbalsa-gpgme.h"
 #include "libbalsa-gpgme-cb.h"
-#endif
 
 /* We need separate variable for storing command line requests to check the
    mail because such selection cannot be stored in balsa_app and later
@@ -519,11 +517,9 @@ balsa_startup_cb(GApplication *application,
     LIBXML_TEST_VERSION
 #endif
 
-#ifdef HAVE_GPGME
     /* initialise the gpgme library and set the callback funcs */
     libbalsa_gpgme_init(lb_gpgme_passphrase, lb_gpgme_select_key,
 			lb_gpgme_accept_low_trust_key);
-#endif
 
     balsa_app_init();
 
@@ -563,12 +559,10 @@ balsa_startup_cb(GApplication *application,
         return;
     }
 
-#ifdef HAVE_GPGME
     balsa_app.has_openpgp =
         libbalsa_gpgme_check_crypto_engine(GPGME_PROTOCOL_OpenPGP);
     balsa_app.has_smime =
         libbalsa_gpgme_check_crypto_engine(GPGME_PROTOCOL_CMS);
-#endif /* HAVE_GPGME */
 
     accel_map_load();
 }

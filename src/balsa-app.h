@@ -356,12 +356,10 @@ extern struct BalsaApplication {
     gboolean convert_unknown_8bit;
     LibBalsaCodeset convert_unknown_8bit_codeset;
 
-#ifdef HAVE_GPGME
     /* gpgme stuff */
     gboolean has_openpgp;
     gboolean has_smime;
     gboolean warn_reply_decrypted;
-#endif 
 
     /* Most recently used lists */
     GList *folder_mru;

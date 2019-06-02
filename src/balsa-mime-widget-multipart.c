@@ -41,14 +41,12 @@ balsa_mime_widget_new_multipart(BalsaMessage * bm,
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     mw->widget = mw->container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
 
-#ifdef HAVE_GPGME
     if (!g_ascii_strcasecmp("multipart/signed", content_type) &&
 	mime_body->parts && mime_body->parts->next &&
 	mime_body->parts->next->sig_info)
 	mw->widget = 
 	    balsa_mime_widget_crypto_frame(mime_body->parts->next, mw->widget,
 					   mime_body->was_encrypted, FALSE, NULL);
-#endif
 
     return mw;
 }

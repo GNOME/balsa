@@ -47,7 +47,6 @@ if get_option('fcntl')
 endif
 
 gnome_desktop = get_option('gnome-desktop')
-gpgmecfg      = get_option('gpgme')
 autocrypt     = get_option('autocrypt')
 canberra      = get_option('canberra')
 compface      = get_option('compface')
@@ -209,52 +208,41 @@ endif
 
 # GPGME detection.
 
-if gpgmecfg == 'true'
-  gpgmecfg_program = find_program('gpgme-config', required : false)
-  if not gpgmecfg_program.found()
-    error('GPGme build requested but gpgme-config program not found.')
-  endif
-  gpgmecfg = gpgmecfg_program.path()
-endif
+gpgmecfg_program = find_program('gpgme-config', required : true)
+gpgmecfg = gpgmecfg_program.path()
 
-if gpgmecfg != 'false'
-  gpgmever = run_command(gpgmecfg, '--version').stdout().strip()
-  if gpgmever.version_compare('< 1.5.0')
-    gpgmecfg   = 'false'
-    message('Sorry, you need at least gpgme version 1.5.0')
+gpgmever = run_command(gpgmecfg, '--version').stdout().strip()
+if gpgmever.version_compare('< 1.6.0')
+  gpgmecfg   = 'false'
+  error('Sorry, you need at least gpgme version 1.6.0')
+else
+  if gpgmever.version_compare('< 1.8.0')
+    gpgme_libs = run_command(gpgmecfg, '--thread=pthread', '--libs')
   else
-    if gpgmever.version_compare('< 1.8.0')
-      gpgme_libs = run_command(gpgmecfg, '--thread=pthread', '--libs')
-    else
-      gpgme_libs = run_command(gpgmecfg, '--libs')
-    endif
-    if gpgme_libs.returncode() != 0
-      error('*** You enabled gpgme support, but your gpgme installation does not support threads.')
-    endif
-
-    gpgme_cflags = run_command(gpgmecfg, '--cflags')
-    gpgme_cflags = gpgme_cflags.stdout().strip().split()
-    gpgme_libs   = gpgme_libs.stdout().strip().split()
-
-    gpgme_dep = declare_dependency(compile_args : gpgme_cflags, link_args : gpgme_libs)
-    conf.set('HAVE_GPGME', 1,
-             description : 'Defined when gpgme is available.')
-    balsa_deps += gpgme_dep
-    gpgmecfg = 'true'
+    gpgme_libs = run_command(gpgmecfg, '--libs')
   endif
+  if gpgme_libs.returncode() != 0
+    error('*** Your gpgme installation does not support threads.')
+  endif
+
+  gpgme_cflags = run_command(gpgmecfg, '--cflags')
+  gpgme_cflags = gpgme_cflags.stdout().strip().split()
+  gpgme_libs   = gpgme_libs.stdout().strip().split()
+
+  gpgme_dep = declare_dependency(compile_args : gpgme_cflags, link_args : gpgme_libs)
+  balsa_deps += gpgme_dep
+  gpgmecfg = 'true'
 endif
 
 # Autocrypt
-if gpgmecfg != 'false'
-  if autocrypt
-    autocrypt_dep = dependency('sqlite3', required : true)
-    if autocrypt_dep.found()
-      conf.set('ENABLE_AUTOCRYPT', 1, description : 'If defined, enable Autocrypt support.')
-    else
-      error('*** You enabled Autocrypt but sqlite3 library is not found.')
-    endif
-    balsa_deps += autocrypt_dep
+if autocrypt
+  autocrypt_dep = dependency('sqlite3', required : true)
+  if autocrypt_dep.found()
+    conf.set('ENABLE_AUTOCRYPT', 1, description : 'If defined, enable Autocrypt support.')
+  else
+    error('*** You enabled Autocrypt but sqlite3 library is not found.')
   endif
+  balsa_deps += autocrypt_dep
 endif
 
 # OpenLDAP configuration.
@@ -636,7 +624,6 @@ summary = [
   '            HTML widget: @0@'.format(html_widget),
   '              Use GNOME: @0@'.format(gnome_desktop),
   '           Use Canberra: @0@'.format(canberra),
-  '              Use GPGME: @0@'.format(gpgmecfg),
   '          Use Autocrypt: @0@'.format(autocrypt),
   '               Use LDAP: @0@'.format(ldap),
   '                Use GSS: @0@'.format(gss),

@@ -44,10 +44,7 @@
 #include "identity.h"
 
 #include "libbalsa-progress.h"
-
-#ifdef HAVE_GPGME
 #include "libbalsa-gpgme.h"
-#endif
 
 #include <glib/gi18n.h>
 
@@ -233,7 +230,6 @@ send_message_info_destroy(SendMessageInfo *smi)
 }
 
 
-#if HAVE_GPGME
 static LibBalsaMsgCreateResult libbalsa_create_rfc2440_buffer(LibBalsaMessage *message,
                                                               GMimePart       *mime_part,
                                                               GtkWindow       *parent,
@@ -246,7 +242,6 @@ static LibBalsaMsgCreateResult do_multipart_crypto(LibBalsaMessage *message,
 static GMimePart *lb_create_pubkey_part(LibBalsaMessage  *message,
 				      	  	  	  	  	GtkWindow        *parent,
 										GError          **error);
-#endif
 
 static gpointer balsa_send_message_real(SendMessageInfo *info);
 static LibBalsaMsgCreateResult libbalsa_message_create_mime_message(LibBalsaMessage *message,
@@ -279,7 +274,6 @@ lbs_set_content(GMimePart *mime_part,
 }
 
 
-#ifdef HAVE_GPGME
 static GMimeObject *
 add_mime_body_plain(LibBalsaMessageBody     *body,
                     gboolean                 flow,
@@ -287,16 +281,10 @@ add_mime_body_plain(LibBalsaMessageBody     *body,
                     guint                    use_gpg_mode,
                     LibBalsaMsgCreateResult *crypt_res,
                     GError                 **error)
-#else
-static GMimeObject *
-add_mime_body_plain(LibBalsaMessageBody * body, gboolean flow, gboolean postpone)
-#endif
 {
     GMimePart *mime_part;
     const gchar *charset;
-#ifdef HAVE_GPGME
     GtkWindow *parent = g_object_get_data(G_OBJECT(body->message), "parent-window");
-#endif
 
     g_return_val_if_fail(body, NULL);
 
@@ -358,7 +346,6 @@ add_mime_body_plain(LibBalsaMessageBody * body, gboolean flow, gboolean postpone
         lbs_set_content(mime_part, body->buffer);
     }
 
-#ifdef HAVE_GPGME
     /* rfc 2440 sign/encrypt if requested */
     if (use_gpg_mode != 0) {
         *crypt_res =
@@ -371,7 +358,6 @@ add_mime_body_plain(LibBalsaMessageBody * body, gboolean flow, gboolean postpone
             return NULL;
         }
     }
-#endif
 
     /* if requested, add a text/html version in a multipart/alternative */
     if (body->html_buffer && !postpone) {
@@ -389,7 +375,6 @@ add_mime_body_plain(LibBalsaMessageBody * body, gboolean flow, gboolean postpone
                                                  "charset", "UTF-8");
         lbs_set_content(mime_part, body->html_buffer);
 
-#ifdef HAVE_GPGME
         if ((use_gpg_mode != 0) &&
             ((use_gpg_mode & LIBBALSA_PROTECT_MODE) != LIBBALSA_PROTECT_SIGN)) {
             *crypt_res =
@@ -402,7 +387,6 @@ add_mime_body_plain(LibBalsaMessageBody * body, gboolean flow, gboolean postpone
                 return NULL;
             }
         }
-#endif
 
         return GMIME_OBJECT(mpa);
     } else {
@@ -1133,7 +1117,6 @@ message_add_references(const LibBalsaMessage *message,
 }
 
 
-#ifdef HAVE_GPGME
 static GList *
 get_mailbox_names(GList               *list,
                   InternetAddressList *address_list)
@@ -1155,8 +1138,6 @@ get_mailbox_names(GList               *list,
     return list;
 }
 
-
-#endif
 
 /* We could have used g_strsplit_set(s, "/;", 3) but it is not
  * available in older glib. */
@@ -1209,16 +1190,12 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     gchar *tmp;
     GList *list;
     gboolean attach_pubkey = FALSE;
-#ifdef HAVE_GPGME
     GtkWindow *parent = g_object_get_data(G_OBJECT(message), "parent-window");
-#endif
 
-#ifdef HAVE_GPGME
     /* attach the public key only if we send the message, not if we just postpone it */
     if (!postponing && message->att_pubkey && ((message->gpg_mode & LIBBALSA_PROTECT_PROTOCOL) != 0)) {
     	attach_pubkey = TRUE;
     }
-#endif
 
     body = message->body_list;
     if ((body != NULL) && ((body->next != NULL) || attach_pubkey)) {
@@ -1361,7 +1338,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
             }
             g_strfreev(mime_type);
         } else if (body->buffer != NULL) {
-#ifdef HAVE_GPGME
             guint use_gpg_mode;
             LibBalsaMsgCreateResult crypt_res = LIBBALSA_MESSAGE_CREATE_OK;
 
@@ -1381,9 +1357,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
                 }
                 return crypt_res;
             }
-#else
-            mime_part = add_mime_body_plain(body, flow, postponing);
-#endif /* HAVE_GPGME */
         }
 
         if (mime_root != NULL) {
@@ -1397,7 +1370,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
         body = body->next;
     }
 
-#ifdef HAVE_GPGME
     if (attach_pubkey) {
     	GMimePart *pubkey_part;
 
@@ -1415,9 +1387,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
             mime_root = GMIME_OBJECT(pubkey_part);
         }
     }
-#endif
 
-#ifdef HAVE_GPGME
     if ((message->body_list != NULL) && !postponing) {
         LibBalsaMsgCreateResult crypt_res =
             do_multipart_crypto(message, &mime_root, parent, error);
@@ -1425,7 +1395,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
             return crypt_res;
         }
     }
-#endif
 
     mime_message = g_mime_message_new(TRUE);
     if (mime_root != NULL) {
@@ -1721,7 +1690,6 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage  *message,
 }
 
 
-#ifdef HAVE_GPGME
 /*
  * If the identity contains a forced key ID for the passed protocol, return the key ID.  Otherwise, return the email address of the
  * "From:" address list to let GpeME automagically select the proper key.
@@ -1959,6 +1927,3 @@ do_multipart_crypto(LibBalsaMessage *message,
 
     return LIBBALSA_MESSAGE_CREATE_OK;
 }
-
-
-#endif

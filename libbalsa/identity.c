@@ -33,9 +33,7 @@
 #  include "macosx-helpers.h"
 #endif
 
-#ifdef HAVE_GPGME
-#  include "libbalsa-gpgme.h"
-#endif
+#include "libbalsa-gpgme.h"
 
 #include <string.h>
 #include "smtp-server.h"
@@ -917,8 +915,7 @@ new_ident_cb(GtkTreeView * tree, GObject * dialog)
  */
 static GtkWidget*
 append_ident_notebook_page(GtkNotebook *notebook,
-			   const gchar * tab_label,
-                           const gchar * footnote)
+			   const gchar * tab_label)
 {
     GtkWidget *vbox;
     GtkWidget *grid;
@@ -927,13 +924,6 @@ append_ident_notebook_page(GtkNotebook *notebook,
     grid = libbalsa_create_grid();
     gtk_container_set_border_width(GTK_CONTAINER(grid), padding);
     gtk_box_pack_start(GTK_BOX(vbox), grid, FALSE, FALSE, 0);
-    if (footnote) {
-	GtkWidget *label;
-
-	label = gtk_label_new(footnote);
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-        gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-    }
     gtk_notebook_append_page(notebook, vbox, gtk_label_new(tab_label));
 
     return grid;
@@ -978,10 +968,9 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
     gint row;
     GObject *name;
     gpointer path;
-    gchar *footnote;
 
     /* create the "General" tab */
-    grid = append_ident_notebook_page(notebook, _("General"), NULL);
+    grid = append_ident_notebook_page(notebook, _("General"));
     row = 0;
     ident_dialog_add_entry(grid, row++, dialog, _("_Identity name:"),
 		           "identity-name");
@@ -995,7 +984,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
                            "identity-domain");
 
     /* create the "Messages" tab */
-    grid = append_ident_notebook_page(notebook, _("Messages"), NULL);
+    grid = append_ident_notebook_page(notebook, _("Messages"));
     row = 0;
     ident_dialog_add_entry(grid, row++, dialog, _("_BCC:"),
                            "identity-bcc");
@@ -1024,7 +1013,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
                                "identity-smtp-server", smtp_servers);
 
     /* create the "Signature" tab */
-    grid = append_ident_notebook_page(notebook, _("Signature"), NULL);
+    grid = append_ident_notebook_page(notebook, _("Signature"));
     row = 0;
     ident_dialog_add_check_and_entry(grid, row++, dialog,
                                      _("Signature _path"),
@@ -1048,15 +1037,9 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
                                  _("Prepend si_gnature"),
                                  "identity-sigprepend", FALSE);
 
-#ifdef HAVE_GPGME
-    footnote = NULL;
-#else
-    footnote = _("Signing and encrypting messages are possible "
-                 "only if Balsa is built with cryptographic support.");
-#endif
     /* create the "Security" tab */
     grid =
-        append_ident_notebook_page(notebook, _("Security"), footnote);
+        append_ident_notebook_page(notebook, _("Security"));
     row = 0;
     ident_dialog_add_checkbutton(grid, row++, dialog,
                                  _("sign messages by default"),
@@ -1085,9 +1068,6 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
     ident_dialog_add_autocrypt_menu(grid, row++, dialog,
 		 	 	 	 	 	 	 	_("Autocrypt mode"),
 									"identity-autocrypt");
-#endif
-#ifndef HAVE_GPGME
-    gtk_widget_set_sensitive(grid, FALSE);
 #endif
 
     name = g_object_get_data(G_OBJECT(dialog), "identity-name");
@@ -1180,7 +1160,6 @@ ident_dialog_add_entry(GtkWidget * grid, gint row, GtkDialog * dialog,
 }
 
 
-#ifdef HAVE_GPGME
 static void
 choose_key(GtkButton *button, gpointer user_data)
 {
@@ -1209,7 +1188,6 @@ choose_key(GtkButton *button, gpointer user_data)
         g_clear_error(&error);
 	}
 }
-#endif
 
 
 /*
@@ -1229,10 +1207,8 @@ ident_dialog_add_keysel_entry(GtkWidget   *grid,
 
 	ident_dialog_add_entry(grid, row, dialog, label_name, entry_key);
 	button = gtk_button_new_with_label(_("Choose…"));
-#ifdef HAVE_GPGME
 	g_object_set_data_full(G_OBJECT(button), "target", g_strdup(entry_key), (GDestroyNotify) g_free);
 	g_signal_connect(button, "clicked", G_CALLBACK(choose_key), dialog);
-#endif
 	gtk_grid_attach(GTK_GRID(grid), button, 2, row, 1, 1);
 }
 

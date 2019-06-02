@@ -80,13 +80,11 @@
 #if HAVE_GTKSOURCEVIEW
 #include <gtksourceview/gtksource.h>
 #endif                          /* HAVE_GTKSOURCEVIEW */
-#ifdef HAVE_GPGME
 #include "libbalsa-gpgme.h"
 #ifdef ENABLE_AUTOCRYPT
 #include "autocrypt.h"
 #include "libbalsa-gpgme-keys.h"
 #endif							/* ENABLE_AUTOCRYPT */
-#endif							/* HAVE_GPGME */
 
 typedef struct {
     pid_t pid_editor;
@@ -101,12 +99,10 @@ static gint message_postpone(BalsaSendmsg * bsmsg);
 static void balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg);
 static void check_readiness(BalsaSendmsg * bsmsg);
 static void init_menus(BalsaSendmsg *);
-#ifdef HAVE_GPGME
 static void bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg);
 static void bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
                                                 LibBalsaIdentity *new_ident);
 static void bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode);
-#endif
 
 #if !HAVE_GSPELL && !HAVE_GTKSPELL_3_0_3
 static void sw_spell_check_weak_notify(BalsaSendmsg * bsmsg);
@@ -1294,9 +1290,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     }
     sw_action_set_active(bsmsg, "send-html", bsmsg->ident->send_mp_alternative);
 
-#ifdef HAVE_GPGME
     bsmsg_update_gpg_ui_on_ident_change(bsmsg, ident);
-#endif
 
     g_free(old_sig);
     g_free(new_sig);
@@ -3094,9 +3088,7 @@ tree_add_quote_body(LibBalsaMessageBody  *body,
 	}
 
 	/* mark decrypted parts, including those in a decrypted container */
-#ifdef HAVE_GPGME
 	decrypted |= body->was_encrypted;
-#endif
 	description = g_string_new(decrypted ? _("decrypted: ") : NULL);
 
 	/* attachment information */
@@ -3177,12 +3169,7 @@ scan_bodies(GtkTreeStore         *bodies,
 	    mime_type = libbalsa_message_body_get_mime_type(body);
 	    scan_bodies(bodies, parent, body->parts, ignore_html,
 				 !g_ascii_strcasecmp(mime_type, "multipart/alternative"),
-#ifdef HAVE_GPGME
-				 body->was_encrypted | decrypted,
-#else
-				 FALSE,
-#endif
-				 stats);
+				 body->was_encrypted | decrypted, stats);
 	    g_free(mime_type);
 	    break;
 
@@ -3347,7 +3334,6 @@ append_parts(GString * q_body, LibBalsaMessage *message, GtkTreeModel * model,
     } while (gtk_tree_model_iter_next(model, iter));
 }
 
-#ifdef HAVE_GPGME
 static gboolean
 unselect_decrypted(GtkTreeModel              *model,
 				   GtkTreePath G_GNUC_UNUSED *path,
@@ -3363,7 +3349,6 @@ unselect_decrypted(GtkTreeModel              *model,
     }
 	return FALSE;
 }
-#endif
 
 static gboolean
 quote_parts_select_dlg(GtkTreeStore               *tree_store,
@@ -3415,7 +3400,6 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
     content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
     gtk_box_pack_start(content_box, hbox, TRUE, TRUE, 0);
 
-#ifdef HAVE_GPGME
     if (stats->decrypted > 0U) {
     	GtkWidget *warning;
 
@@ -3438,7 +3422,6 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
         gtk_widget_set_valign(warning, GTK_ALIGN_START);
         gtk_box_pack_start(GTK_BOX(vbox), warning, FALSE, FALSE, 0);
     }
-#endif
 
     gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
@@ -3493,7 +3476,6 @@ tree_find_single_part(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 	return FALSE;
 }
 
-#ifdef HAVE_GPGME
 static void
 show_decrypted_warning(GtkWindow *parent)
 {
@@ -3517,7 +3499,6 @@ show_decrypted_warning(GtkWindow *parent)
 	balsa_app.warn_reply_decrypted = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(remind_btn));
 	gtk_widget_destroy(dialog);
 }
-#endif
 
 static GString *
 collect_for_quote(BalsaSendmsg        * bsmsg,
@@ -3552,11 +3533,9 @@ collect_for_quote(BalsaSendmsg        * bsmsg,
 	 * we have to search the tree store... */
 	LibBalsaMessageBody *this_body;
 
-#ifdef HAVE_GPGME
 	if ((stats.decrypted > 0U) && balsa_app.warn_reply_decrypted) {
 		show_decrypted_warning(GTK_WINDOW(bsmsg->window));
 	}
-#endif
 	gtk_tree_model_foreach(GTK_TREE_MODEL(tree_store), tree_find_single_part,
 			       &this_body);
 	if (this_body)
@@ -4287,10 +4266,8 @@ static const BalsaToolbarEntry compose_toolbar[] = {
 static const BalsaToolbarEntry compose_toolbar_extras[] = {
     { "postpone",    BALSA_PIXMAP_POSTPONE    },
     { "request-mdn", BALSA_PIXMAP_REQUEST_MDN },
-#ifdef HAVE_GPGME
     { "sign",        BALSA_PIXMAP_GPG_SIGN    },
     { "encrypt",     BALSA_PIXMAP_GPG_ENCRYPT },
-#endif /* HAVE_GPGME */
     { "edit",        "gtk-edit"               },
 	{ "queue",		 BALSA_PIXMAP_QUEUE		  }
 };
@@ -4372,12 +4349,10 @@ bsm_prepare_for_setup(LibBalsaMessage *message)
     /* fill in that info:
      * ref the message so that we have all needed headers */
     libbalsa_message_body_ref(message, TRUE, TRUE);
-#ifdef HAVE_GPGME
     /* scan the message for encrypted parts - this is only possible if
        there is *no* other ref to it */
     balsa_message_perform_crypto(message, LB_MAILBOX_CHK_CRYPT_NEVER,
                                  TRUE, 1);
-#endif
 }
 
 /* libbalsa_message_body_unref() may destroy the @param part - this is
@@ -5045,7 +5020,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
                                attachment2message, message);
 
     message->headers->date = time(NULL);
-#ifdef HAVE_GPGME
     if (balsa_app.has_openpgp || balsa_app.has_smime) {
         message->gpg_mode =
             (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 ? bsmsg->gpg_mode : 0;
@@ -5055,7 +5029,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
         message->gpg_mode = 0;
         message->att_pubkey = FALSE;
     }
-#endif
 
     /* remember the parent window */
     g_object_set_data(G_OBJECT(message), "parent-window",
@@ -5155,8 +5128,6 @@ subject_not_empty(BalsaSendmsg * bsmsg)
 
     return response == GTK_RESPONSE_OK;
 }
-
-#ifdef HAVE_GPGME
 
 static void
 config_dlg_button(GtkDialog *dialog, gint response_id, const gchar *icon_id)
@@ -5412,7 +5383,6 @@ check_autocrypt_recommendation(BalsaSendmsg *bsmsg)
     return result;
 }
 #endif		/* ENABLE_AUTOCRYPT */
-#endif		/* HAVE_GPGME */
 
 
 /* "send message" menu and toolbar callback.
@@ -5423,9 +5393,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     LibBalsaMsgCreateResult result;
     LibBalsaMessage *message;
     LibBalsaMailbox *fcc;
-#ifdef HAVE_GPGME
     GtkTreeIter iter;
-#endif
     GError * error = NULL;
 
     if (!bsmsg->ready_to_send)
@@ -5434,7 +5402,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     if(!subject_not_empty(bsmsg))
 	return FALSE;
 
-#ifdef HAVE_GPGME
 #ifdef ENABLE_AUTOCRYPT
     if (!check_autocrypt_recommendation(bsmsg)) {
     	return FALSE;
@@ -5492,17 +5459,14 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                 return FALSE;
         }
     }
-#endif
 
     message = bsmsg2message(bsmsg);
     fcc = balsa_find_mailbox_by_url(bsmsg->fcc_url);
 
-#ifdef HAVE_GPGME
     balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                LIBBALSA_INFORMATION_DEBUG,
                                _("sending message with GPG mode %d"),
                                message->gpg_mode);
-#endif
 
     if(queue_only)
 	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
@@ -5536,12 +5500,10 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
             msg = _("Message could not be saved in sentbox"); break;
         case LIBBALSA_MESSAGE_SEND_ERROR:
             msg = _("Message could not be sent"); break;
-#ifdef HAVE_GPGME
 	case LIBBALSA_MESSAGE_SIGN_ERROR:
             msg = _("Message could not be signed"); break;
 	case LIBBALSA_MESSAGE_ENCRYPT_ERROR:
             msg = _("Message could not be encrypted"); break;
-#endif
         }
 	if (error)
 	    balsa_information_parented(GTK_WINDOW(bsmsg->window),
@@ -5609,12 +5571,10 @@ message_postpone(BalsaSendmsg * bsmsg)
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->req_mdn));
     g_ptr_array_add(headers, g_strdup("X-Balsa-DSN"));
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->req_dsn));
-#ifdef HAVE_GPGME
     g_ptr_array_add(headers, g_strdup("X-Balsa-Crypto"));
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->gpg_mode));
     g_ptr_array_add(headers, g_strdup("X-Balsa-Att-Pubkey"));
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->attach_pubkey));
-#endif
 
 #if HAVE_GSPELL || HAVE_GTKSPELL
     if (sw_action_get_active(bsmsg, "spell-check")) {
@@ -6230,7 +6190,6 @@ sw_send_html_change_state(GSimpleAction * action, GVariant * state, gpointer dat
     g_simple_action_set_state(action, state);
 }
 
-#ifdef HAVE_GPGME
 static void
 sw_gpg_helper(GSimpleAction  * action,
               GVariant       * state,
@@ -6299,7 +6258,6 @@ sw_gpg_mode_change_state(GSimpleAction  * action,
 
     g_simple_action_set_state(action, state);
 }
-#endif                          /* HAVE_GPGME */
 
 
 /* init_menus:
@@ -6679,7 +6637,6 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
     g_free(title);
 }
 
-#ifdef HAVE_GPGME
 static void
 bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg * bsmsg,
                                     LibBalsaIdentity * ident)
@@ -6751,7 +6708,6 @@ bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode)
     else
         g_action_change_state(action, g_variant_new_string("mime"));
 }
-#endif /* HAVE_GPGME */
 
 static GActionEntry win_entries[] = {
     {"include-file",     sw_include_file_activated      },
@@ -6801,7 +6757,6 @@ static GActionEntry win_entries[] = {
                          sw_flowed_change_state         },
     {"send-html",        libbalsa_toggle_activated, NULL, "false",
                          sw_send_html_change_state      },
-#ifdef HAVE_GPGME
     {"sign",             libbalsa_toggle_activated, NULL, "false",
                          sw_sign_change_state           },
     {"encrypt",          libbalsa_toggle_activated, NULL, "false",
@@ -6814,7 +6769,6 @@ static GActionEntry win_entries[] = {
                          sw_gpg_mode_change_state       },
 	{"attpubkey",        libbalsa_toggle_activated, NULL, "false",
 						 sw_att_pubkey_change_state     },
-#endif /* HAVE_GPGME */
     /* Only a toolbar button: */
     {"toolbar-send",     sw_toolbar_send_activated      }
 };
@@ -6877,10 +6831,8 @@ sendmsg_window_new()
 #if !HAVE_GTKSPELL && !HAVE_GSPELL
     bsmsg->spell_checker = NULL;
 #endif                          /* HAVE_GTKSPELL */
-#ifdef HAVE_GPGME
     bsmsg->gpg_mode = LIBBALSA_PROTECT_RFC3156;
     bsmsg->attach_pubkey = FALSE;
-#endif
     bsmsg->autosave_timeout_id = /* autosave every 5 minutes */
         g_timeout_add_seconds(60*5, (GSourceFunc)sw_autosave_timeout_cb, bsmsg);
 
@@ -6950,9 +6902,7 @@ sendmsg_window_new()
     sw_action_set_active(bsmsg, "send-html", bsmsg->ident->send_mp_alternative);
     sw_action_set_active(bsmsg, "show-toolbar", balsa_app.show_compose_toolbar);
 
-#ifdef HAVE_GPGME
     bsmsg_setup_gpg_ui(bsmsg);
-#endif
 
     /* Paned window for the addresses at the top, and the content at the
      * bottom: */
@@ -7195,7 +7145,6 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
         bsmsg->in_reply_to =
             g_strconcat("<", message->in_reply_to->data, ">", NULL);
 
-#ifdef HAVE_GPGME
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-Crypto")))
         bsmsg_setup_gpg_ui_by_mode(bsmsg, atoi(postpone_hdr));
@@ -7203,7 +7152,6 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     if (postpone_hdr != NULL) {
     	sw_action_set_active(bsmsg, "attpubkey", atoi(postpone_hdr) != 0);
     }
-#endif
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-MDN")))
         sw_action_set_active(bsmsg, "request-mdn", atoi(postpone_hdr) != 0);

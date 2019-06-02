@@ -33,10 +33,7 @@
 #include <gdk/gdk.h>
 
 #include "libbalsa-vfs.h"
-
-#ifdef HAVE_GPGME
 #include "gmime-gpgme-signature.h"
-#endif
 
 typedef enum _LibBalsaMessageBodyType LibBalsaMessageBodyType;
 
@@ -83,10 +80,8 @@ struct _LibBalsaMessageBody {
     gchar *charset;		/* the charset, used for sending, replying. */
     GMimeObject *mime_part;	/* mime body */
 
-#ifdef HAVE_GPGME
     gboolean was_encrypted;
-    GMimeGpgmeSigstat* sig_info;  /* info about a pgp signature body */
-#endif
+    GMimeGpgmeSigstat* sig_info;  /* info about a pgp or S/MIME signature body */
 
     LibBalsaMessageBody *next;	/* Next part in the message */
     LibBalsaMessageBody *parts;	/* The parts of a multipart or message/rfc822 message */
@@ -136,11 +131,9 @@ LibBalsaMessageBody *libbalsa_message_body_get_by_id(LibBalsaMessageBody *
                                                      body,
                                                      const gchar * id);
 
-#ifdef HAVE_GPGME
 LibBalsaMsgProtectState libbalsa_message_body_protect_state(const LibBalsaMessageBody *body);
 gboolean libbalsa_message_body_multipart_signed(const LibBalsaMessageBody *body);
 gboolean libbalsa_message_body_inline_signed(const LibBalsaMessageBody *body);
-#endif
 
 
 #endif				/* __LIBBALSA_BODY_H__ */

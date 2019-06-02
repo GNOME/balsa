@@ -701,13 +701,11 @@ config_global_load(void)
     geometry_manager_init("SourceView", 500, 400, FALSE);
     geometry_manager_init("IMAPSubscriptions", 200, 160, FALSE);
     geometry_manager_init("IMAPSelectParent", 200, 160, FALSE);
-#ifdef HAVE_GPGME
     geometry_manager_init("KeyDialog", 400, 200, FALSE);
     geometry_manager_init("KeyList", 300, 200, FALSE);
 #ifdef ENABLE_AUTOCRYPT
     geometry_manager_init("AutocryptDB", 300, 200, FALSE);
 #endif  /* ENABLE_AUTOCRYPT */
-#endif  /* HAVE_GPGME */
 
     /* FIXME: PKGW: why comment this out? Breaks my Transfer context menu. */
     if (balsa_app.mblist_width < 100)
@@ -1067,10 +1065,8 @@ config_global_load(void)
     g_free(balsa_app.compose_headers);
     balsa_app.compose_headers =
 	libbalsa_conf_get_string("ComposeHeaders=Recipients Subject");
-#ifdef HAVE_GPGME
     balsa_app.warn_reply_decrypted =
     	libbalsa_conf_get_bool("WarnReplyDecrypted=true");
-#endif
 
     /* Obsolete. */
     libbalsa_conf_get_bool_with_default("RequestDispositionNotification=false",
@@ -1475,9 +1471,7 @@ config_save(void)
     libbalsa_conf_set_string("ComposeHeaders", balsa_app.compose_headers);
     libbalsa_conf_set_bool("ExternEditorEditHeaders", balsa_app.edit_headers);
     libbalsa_conf_set_string("QuoteString", balsa_app.quote_str);
-#ifdef HAVE_GPGME
     libbalsa_conf_set_bool("WarnReplyDecrypted", balsa_app.warn_reply_decrypted);
-#endif
 
     libbalsa_conf_pop_group();
 
@@ -1802,10 +1796,8 @@ config_load_mailbox_view(const gchar * url)
     if (libbalsa_conf_has_key("Position"))
         view->position = libbalsa_conf_get_int("Position");
 
-#ifdef HAVE_GPGME
     if (libbalsa_conf_has_key("CryptoMode"))
         view->gpg_chk_mode = libbalsa_conf_get_int("CryptoMode");
-#endif
 
     if (libbalsa_conf_has_key("Total"))
         view->total = libbalsa_conf_get_int("Total");
@@ -1861,10 +1853,8 @@ config_save_mailbox_view(const gchar * url, LibBalsaMailboxView * view)
         if (view->position   != libbalsa_mailbox_get_position(NULL))
             libbalsa_conf_set_int("Position", view->position);
     }
-#ifdef HAVE_GPGME
     if (view->gpg_chk_mode   != libbalsa_mailbox_get_crypto_mode(NULL))
 	libbalsa_conf_set_int("CryptoMode",  view->gpg_chk_mode);
-#endif
     /* To avoid accumulation of config entries with only message counts,
      * we save them only if used in this session. */
     if (view->used && view->mtime != 0) {

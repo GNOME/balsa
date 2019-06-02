@@ -31,9 +31,7 @@
 
 #include <gmime/gmime.h>
 
-#ifdef HAVE_GPGME
 #include "rfc3156.h"
-#endif
 
 #define MESSAGE_COPY_CONTENT 1
 #define LIBBALSA_TYPE_MESSAGE \
@@ -78,7 +76,6 @@ enum _LibBalsaMessageStatus {
 };
 
 
-#ifdef HAVE_GPGME
 typedef enum _LibBalsaMsgProtectState LibBalsaMsgProtectState;
 
 enum _LibBalsaMsgProtectState {
@@ -89,18 +86,15 @@ enum _LibBalsaMsgProtectState {
     LIBBALSA_MSG_PROTECT_SIGN_BAD,
     LIBBALSA_MSG_PROTECT_CRYPT
 };
-#endif
 
 typedef enum _LibBalsaMessageAttach LibBalsaMessageAttach;
 enum _LibBalsaMessageAttach {
     LIBBALSA_MESSAGE_ATTACH_ATTACH,
-#ifdef HAVE_GPGME
     LIBBALSA_MESSAGE_ATTACH_GOOD,
     LIBBALSA_MESSAGE_ATTACH_NOTRUST,
     LIBBALSA_MESSAGE_ATTACH_BAD,
     LIBBALSA_MESSAGE_ATTACH_SIGN,
     LIBBALSA_MESSAGE_ATTACH_ENCR,
-#endif
     LIBBALSA_MESSAGE_ATTACH_ICONS_NUM
 };
 
@@ -199,7 +193,6 @@ struct _LibBalsaMessage {
     /* message ID */
     gchar *message_id;
 
-#ifdef HAVE_GPGME
     /* GPG sign and/or encrypt message (sending) */
     guint gpg_mode;
 
@@ -211,7 +204,6 @@ struct _LibBalsaMessage {
 
     /* sender identity, required for choosing a forced GnuPG or S/MIME key */
     LibBalsaIdentity *ident;
-#endif
 
     /* request a DSN (sending) */
     gboolean request_dsn;
@@ -306,10 +298,8 @@ gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
 gboolean libbalsa_message_is_partial(LibBalsaMessage * message,
 				     gchar ** id);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
-#ifdef HAVE_GPGME
 gboolean libbalsa_message_is_pgp_signed(LibBalsaMessage * message);
 gboolean libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message);
-#endif
 
 const gchar* libbalsa_message_header_get_one(LibBalsaMessageHeaders* headers,
                                              const gchar *find);

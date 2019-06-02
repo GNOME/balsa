@@ -127,7 +127,6 @@ balsa_register_pixmaps(void)
 	{ BALSA_PIXMAP_NEXT_UNREAD,	"balsa-next-unread" },
 	{ BALSA_PIXMAP_NEXT_FLAGGED,	"balsa-next-flagged" },
 
-#ifdef HAVE_GPGME
 	/* crypto status icons, for both the structure view tree (24x24)
 	 * and the index (16x16) */
         { BALSA_PIXMAP_SIGN,            "balsa-signature-unknown" },
@@ -135,7 +134,6 @@ balsa_register_pixmaps(void)
 	{ BALSA_PIXMAP_SIGN_NOTRUST,    "balsa-signature-notrust" },
         { BALSA_PIXMAP_SIGN_BAD,        "balsa-signature-bad" },
         { BALSA_PIXMAP_ENCR,            "balsa-encrypted" },
-#endif
 
 	/* the following book icons aren't strictly necessary as Gnome provides
 	   them. However, this simplifies porting balsa if the Gnome libs
@@ -151,11 +149,9 @@ balsa_register_pixmaps(void)
 	{ BALSA_PIXMAP_SHOW_PREVIEW,	"balsa-preview" },
 	{ BALSA_PIXMAP_MARKED_NEW,	"balsa-marked-new" },
 	{ BALSA_PIXMAP_TRASH_EMPTY,	"balsa-trash-empty" },
-#ifdef HAVE_GPGME
 	{ BALSA_PIXMAP_GPG_SIGN,        "balsa-sign" },
 	{ BALSA_PIXMAP_GPG_ENCRYPT,     "balsa-encrypt" },
 	{ BALSA_PIXMAP_GPG_RECHECK,     "balsa-crypt-check" },
-#endif
 
 	/* mailbox icons (16x16) */
         { BALSA_PIXMAP_MBOX_IN,         "mail-inbox" },
@@ -210,16 +206,12 @@ balsa_register_pixbufs(GtkWidget * widget)
 	libbalsa_mailbox_set_trash_icon,   BALSA_PIXMAP_INFO_DELETED}, {
 	libbalsa_mailbox_set_flagged_icon, BALSA_PIXMAP_INFO_FLAGGED}, {
 	libbalsa_mailbox_set_replied_icon, BALSA_PIXMAP_INFO_REPLIED}, {
-	libbalsa_mailbox_set_attach_icon, BALSA_PIXMAP_INFO_ATTACHMENT},
-#ifdef HAVE_GPGME
-	{
+	libbalsa_mailbox_set_attach_icon, BALSA_PIXMAP_INFO_ATTACHMENT}, {
 	libbalsa_mailbox_set_good_icon, BALSA_PIXMAP_SIGN_GOOD}, {
 	libbalsa_mailbox_set_notrust_icon, BALSA_PIXMAP_SIGN_NOTRUST}, {
 	libbalsa_mailbox_set_bad_icon, BALSA_PIXMAP_SIGN_BAD}, {
 	libbalsa_mailbox_set_sign_icon, BALSA_PIXMAP_SIGN}, {
-	libbalsa_mailbox_set_encr_icon, BALSA_PIXMAP_ENCR},
-#endif
-        {
+	libbalsa_mailbox_set_encr_icon, BALSA_PIXMAP_ENCR}, {
         libbalsa_address_view_set_book_icon,  BALSA_PIXMAP_BOOK_RED}, {
         libbalsa_address_view_set_close_icon, "window-close-symbolic"}, {
         libbalsa_address_view_set_drop_down_icon, BALSA_PIXMAP_DROP_DOWN},

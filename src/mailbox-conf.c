@@ -66,9 +66,7 @@ struct _BalsaMailboxConfView {
     GtkWidget *identity_combo_box;
     GtkWidget *show_to;
     GtkWidget *subscribe;
-#ifdef HAVE_GPGME
     GtkWidget *chk_crypt;
-#endif
     GtkWidget *thread_messages;
     GtkWidget *subject_gather;
     LibBalsaMailbox *mailbox;
@@ -885,35 +883,30 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
     gtk_grid_attach(GTK_GRID(grid), widget, 1, row, 1, 1);
 
     if (callback)
-        g_signal_connect_swapped(widget, "changed", callback, window);
+    	g_signal_connect_swapped(widget, "changed", callback, window);
 
-#ifdef HAVE_GPGME
-    {
-	/* scope */
-        label =
-            libbalsa_create_grid_label(_("_Decrypt and check\n"
-                                         "signatures automatically:"),
-                                       grid, ++row);
-        if (size_group)
-            gtk_size_group_add_widget(size_group, label);
+    label =
+    	libbalsa_create_grid_label(_("_Decrypt and check\n"
+    		"signatures automatically:"),
+    		grid, ++row);
+    if (size_group)
+    	gtk_size_group_add_widget(size_group, label);
 
-        view_info->chk_crypt = gtk_combo_box_text_new();
-        gtk_label_set_mnemonic_widget(GTK_LABEL(label), view_info->chk_crypt);
-        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(view_info->chk_crypt), _("Never"));
-        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(view_info->chk_crypt), _("If Possible"));
-        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(view_info->chk_crypt), _("Always"));
-        gtk_combo_box_set_active(GTK_COMBO_BOX(view_info->chk_crypt),
-                                 libbalsa_mailbox_get_crypto_mode(mailbox));
-        if (mcw)
-            g_signal_connect(view_info->chk_crypt, "changed",
-                             G_CALLBACK(check_for_blank_fields), mcw);
-        if (callback)
-            g_signal_connect_swapped(view_info->chk_crypt, "changed",
-                                     callback, window);
-        gtk_widget_set_hexpand(view_info->chk_crypt, TRUE);
-	gtk_grid_attach(GTK_GRID(grid), view_info->chk_crypt, 1, row, 1, 1);
-    }
-#endif
+    view_info->chk_crypt = gtk_combo_box_text_new();
+    gtk_label_set_mnemonic_widget(GTK_LABEL(label), view_info->chk_crypt);
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(view_info->chk_crypt), _("Never"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(view_info->chk_crypt), _("If Possible"));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(view_info->chk_crypt), _("Always"));
+    gtk_combo_box_set_active(GTK_COMBO_BOX(view_info->chk_crypt),
+    	libbalsa_mailbox_get_crypto_mode(mailbox));
+    if (mcw)
+    	g_signal_connect(view_info->chk_crypt, "changed",
+    		G_CALLBACK(check_for_blank_fields), mcw);
+    if (callback)
+    	g_signal_connect_swapped(view_info->chk_crypt, "changed",
+    		callback, window);
+    gtk_widget_set_hexpand(view_info->chk_crypt, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), view_info->chk_crypt, 1, row, 1, 1);
 
     /* Show address check button */
     view_info->show_to =
@@ -1051,11 +1044,9 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
                                           (view_info->thread_messages));
     balsa_window_set_thread_messages(balsa_app.main_window, active);
 
-#ifdef HAVE_GPGME
     if (libbalsa_mailbox_set_crypto_mode(mailbox,
 					 gtk_combo_box_get_active(GTK_COMBO_BOX(view_info->chk_crypt))))
 	changed = TRUE;
-#endif
 
     if (!changed || !libbalsa_mailbox_get_open(mailbox))
 	return;

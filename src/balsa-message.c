@@ -2985,7 +2985,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 				 _("Detected a good signature"));
 	    break;
 	case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
-	    if (body->parts->next->sig_info->protocol == GPGME_PROTOCOL_CMS)
+	    if (g_mime_gpgme_sigstat_protocol(body->parts->next->sig_info) == GPGME_PROTOCOL_CMS)
 		libbalsa_information
 		    (LIBBALSA_INFORMATION_MESSAGE,
 		     _("Detected a good signature with insufficient "
@@ -2999,7 +2999,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 	case LIBBALSA_MSG_PROTECT_SIGN_BAD: {
 		gchar *status;
 
-		status = libbalsa_gpgme_sig_stat_to_gchar(body->parts->next->sig_info->status);
+		status = libbalsa_gpgme_sig_stat_to_gchar(g_mime_gpgme_sigstat_status(body->parts->next->sig_info));
 		libbalsa_information
 		(chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 		 LIBBALSA_INFORMATION_ERROR : LIBBALSA_INFORMATION_MESSAGE,
@@ -3110,7 +3110,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
     libbalsa_mailbox_unlock_store(body->message->mailbox);
 
     if (body->sig_info && sig_res == GPG_ERR_NO_ERROR) {
-        if ((body->sig_info->summary & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
+        if ((g_mime_gpgme_sigstat_summary(body->sig_info) & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
         	g_debug("%s: detected a good signature", __func__);
         } else {
             libbalsa_information

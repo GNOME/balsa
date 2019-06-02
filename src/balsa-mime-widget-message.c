@@ -838,7 +838,7 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
     GtkWidget *label;
 
     info_str = g_mime_gpgme_sigstat_info(siginfo, TRUE);
-    format = (siginfo->status == GPG_ERR_NO_ERROR) ? "<i>%s</i>" : "<b><i>%s</i></b>";
+    format = (g_mime_gpgme_sigstat_status(siginfo) == GPG_ERR_NO_ERROR) ? "<i>%s</i>" : "<b><i>%s</i></b>";
     msg = g_markup_printf_escaped(format, info_str);
     g_free(info_str);
 

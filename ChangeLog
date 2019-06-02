@@ -1,5 +1,20 @@
 2019-06-02  Albrecht Dreß  <albrecht.dress@arcor.de>
 
+	GMimeGpgmeSigstat: use G_DECLARE_FINAL_TYPE(), G_DEFINE_TYPE()
+
+	* libbalsa/gmime-gpgme-signature.ch: implement GMimeGpgmeSigstat
+	  using G_DECLARE_FINAL_TYPE() and G_DEFINE_TYPE();
+	  implement getter/setter functions
+	* libbalsa/body.c, libbalsa/gmime-multipart-crypt.c, libbalsa/rfc3156.c,
+	  src/balsa-message.c, src/balsa-mime-widget-crypto.c,
+	  src/balsa-mime-widget-message.c, src/balsa-print-object-header.c:
+	  use getter functions instead of accessing the object properties
+	* libbalsa/libbalsa-gpgme.c: use setter functions
+	  instead of manipulating the object propertiy directly
+	* libbalsa/libbalsa-gpgme-widgets.[ch]: key argument to libbalsa_gpgme_key() is const
+
+2019-06-02  Albrecht Dreß  <albrecht.dress@arcor.de>
+
 	Make GpgME/E2EE support a hard requirement
 
 	* INSTALL: ancient file, add pointer to README

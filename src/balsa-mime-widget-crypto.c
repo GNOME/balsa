@@ -95,14 +95,15 @@ GtkWidget *
 balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 				   const gchar * content_type)
 {
-    gchar *infostr;
+	gpgme_key_t key;
+	gchar *infostr;
     GtkWidget *expander;
     GtkWidget *vbox, *label;
     GtkWidget *signature_widget;
     gchar **lines;
 
     if (!mime_body->sig_info ||
-	mime_body->sig_info->status == GPG_ERR_NOT_SIGNED)
+    	g_mime_gpgme_sigstat_status(mime_body->sig_info) == GPG_ERR_NOT_SIGNED)
 	return NULL;
 
     infostr = g_mime_gpgme_sigstat_to_gchar(mime_body->sig_info, FALSE, balsa_app.date_string);
@@ -117,13 +118,14 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-    if (mime_body->sig_info->key != NULL) {
+    key = g_mime_gpgme_sigstat_key(mime_body->sig_info);
+    if (key != NULL) {
 		GtkWidget *key_widget;
 
-		key_widget = libbalsa_gpgme_key(mime_body->sig_info->key, mime_body->sig_info->fingerprint, 0U, FALSE);
+		key_widget = libbalsa_gpgme_key(key, g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info), 0U, FALSE);
 		gtk_box_pack_start(GTK_BOX(vbox), key_widget, FALSE, FALSE, 0);
     }
-    if (mime_body->sig_info->protocol == GPGME_PROTOCOL_OpenPGP) {
+    if (g_mime_gpgme_sigstat_protocol(mime_body->sig_info) == GPGME_PROTOCOL_OpenPGP) {
     	GtkWidget *hbox;
         GtkWidget *button;
 
@@ -131,11 +133,11 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_EXPAND);
         gtk_box_set_spacing(GTK_BOX(hbox), BMW_HBOX_SPACE);
         gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
-        if (mime_body->sig_info->status == GPG_ERR_NO_PUBKEY) {
+        if (g_mime_gpgme_sigstat_status(mime_body->sig_info) == GPG_ERR_NO_PUBKEY) {
 #ifdef ENABLE_AUTOCRYPT
         	GBytes *autocrypt_key;
 
-        	autocrypt_key = autocrypt_get_key(mime_body->sig_info->fingerprint, NULL);
+        	autocrypt_key = autocrypt_get_key(g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info), NULL);
         	if (autocrypt_key != NULL) {
         		button = gtk_button_new_with_mnemonic(_("_Import Autocrypt key"));
         		g_object_set_data_full(G_OBJECT(button), "autocrypt_key", autocrypt_key, (GDestroyNotify) g_bytes_unref);
@@ -149,7 +151,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         }
         g_signal_connect(G_OBJECT(button), "clicked",
                          G_CALLBACK(on_gpg_key_button),
-                         (gpointer) mime_body->sig_info->fingerprint);
+                         (gpointer) g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info));
         gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
     }
 

@@ -70,7 +70,7 @@ static gchar *create_subkey_type_str(gpgme_subkey_t subkey)
 
 /* documentation: see header file */
 GtkWidget *
-libbalsa_gpgme_key(gpgme_key_t           key,
+libbalsa_gpgme_key(const gpgme_key_t     key,
 	  	  	  	   const gchar          *fingerprint,
 	  	  	  	   lb_gpg_subkey_capa_t  subkey_capa,
 				   gboolean              expanded)

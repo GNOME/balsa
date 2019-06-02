@@ -366,7 +366,7 @@ balsa_print_object_header_crypto(GList *list, GtkPrintContext * context,
     GList *this_chunk;
 
     /* only if the body has an attached signature info */
-    if ((body->sig_info == NULL) || (body->sig_info->status == GPG_ERR_NOT_SIGNED)) {
+    if ((body->sig_info == NULL) || (g_mime_gpgme_sigstat_status(body->sig_info) == GPG_ERR_NOT_SIGNED)) {
     	return balsa_print_object_default(list, context, body, psetup);
     }
     

@@ -878,12 +878,13 @@ libbalsa_message_body_protect_state(const LibBalsaMessageBody *body)
 {
 	LibBalsaMsgProtectState state;
 
-	if ((body == NULL) || (body->sig_info == NULL) || (body->sig_info->status == GPG_ERR_NOT_SIGNED) ||
-		(body->sig_info->status == GPG_ERR_CANCELED)) {
+	if ((body == NULL) || (body->sig_info == NULL) ||
+		(g_mime_gpgme_sigstat_status(body->sig_info) == GPG_ERR_NOT_SIGNED) ||
+		(g_mime_gpgme_sigstat_status(body->sig_info) == GPG_ERR_CANCELED)) {
 		state = LIBBALSA_MSG_PROTECT_NONE;
-	} else if (body->sig_info->status != GPG_ERR_NO_ERROR) {
+	} else if (g_mime_gpgme_sigstat_status(body->sig_info) != GPG_ERR_NO_ERROR) {
 		state = LIBBALSA_MSG_PROTECT_SIGN_BAD;
-	} else if ((body->sig_info->summary & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
+	} else if ((g_mime_gpgme_sigstat_summary(body->sig_info) & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
 		state = LIBBALSA_MSG_PROTECT_SIGN_GOOD;
 	} else {
 		state = LIBBALSA_MSG_PROTECT_SIGN_NOTRUST;
@@ -911,7 +912,7 @@ libbalsa_message_body_multipart_signed(const LibBalsaMessageBody *body)
 		    (body->parts->next != NULL) &&				/* must have *two* child parts... */
 		    (body->parts->next->next == NULL) &&		/* ...but not more */
 		    (body->parts->next->sig_info != NULL) &&
-		    (body->parts->next->sig_info->status != GPG_ERR_NOT_SIGNED);
+		    (g_mime_gpgme_sigstat_status(body->parts->next->sig_info) != GPG_ERR_NOT_SIGNED);
 }
 
 
@@ -930,5 +931,5 @@ libbalsa_message_body_inline_signed(const LibBalsaMessageBody *body)
 {
 	return (body != NULL) &&
 			(body->sig_info != NULL) &&
-			(body->sig_info->status != GPG_ERR_NOT_SIGNED);
+			(g_mime_gpgme_sigstat_status(body->sig_info) != GPG_ERR_NOT_SIGNED);
 }

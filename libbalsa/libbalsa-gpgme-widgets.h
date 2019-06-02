@@ -57,7 +57,7 @@ typedef enum {
  * only).  Note that no information about the OpenPGP signatures of the UID's are included, as it is expensive to retrieve all
  * signatures of a key.
  */
-GtkWidget *libbalsa_gpgme_key(gpgme_key_t           key,
+GtkWidget *libbalsa_gpgme_key(const gpgme_key_t     key,
 							  const gchar          *fingerprint,
 							  lb_gpg_subkey_capa_t  subkey_capa,
 							  gboolean              expanded)

@@ -40,45 +40,33 @@
 #define G_LOG_DOMAIN "crypto"
 
 
-/* stuff for the signature status as returned by gpgme as an GObject */
-static GObjectClass *g_mime_gpgme_sigstat_parent_class = NULL;
+struct _GMimeGpgmeSigstat {
+    GObject parent;
 
-static void g_mime_gpgme_sigstat_class_init(GMimeGpgmeSigstatClass *
-					    klass);
-static void g_mime_gpgme_sigstat_finalize(GMimeGpgmeSigstat * self);
+    /* results form gpgme's verify operation */
+    gpgme_protocol_t protocol;
+    gpgme_sigsum_t summary;
+    gpgme_error_t status;
+    gpgme_validity_t validity;
+    gchar *fingerprint;
+    time_t sign_time;
+
+    /* information about the key used to create the signature */
+    gpgme_key_t key;
+};
+
+
+G_DEFINE_TYPE(GMimeGpgmeSigstat, g_mime_gpgme_sigstat, G_TYPE_OBJECT)
+
+
+/* stuff for the signature status as returned by gpgme as an GObject */
+static void g_mime_gpgme_sigstat_finalize(GObject *object);
 
 static gchar *cert_subject_cn_mail(const gchar *subject)
 	G_GNUC_WARN_UNUSED_RESULT;
 
 
 /* GMimeGpgmeSigstat related stuff */
-GType
-g_mime_gpgme_sigstat_get_type(void)
-{
-    static GType g_mime_gpgme_sigstat_type = 0;
-
-    if (!g_mime_gpgme_sigstat_type) {
-	static const GTypeInfo g_mime_gpgme_sigstat_info = {
-	    sizeof(GMimeGpgmeSigstatClass),	/* class_size */
-	    NULL,		/* base_init */
-	    NULL,		/* base_finalize */
-	    (GClassInitFunc) g_mime_gpgme_sigstat_class_init,	/* class_init */
-	    NULL,		/* class_finalize */
-	    NULL,		/* class_data */
-	    sizeof(GMimeGpgmeSigstat),	/* instance_size */
-	    0,			/* n_preallocs */
-	    NULL,	    /* instance_init */
-	    /* no value_table */
-	};
-
-	g_mime_gpgme_sigstat_type =
-	    g_type_register_static(G_TYPE_OBJECT, "GMimeGpgmeSigstat",
-				   &g_mime_gpgme_sigstat_info, 0);
-    }
-
-    return g_mime_gpgme_sigstat_type;
-}
-
 
 GMimeGpgmeSigstat *
 g_mime_gpgme_sigstat_new(gpgme_ctx_t ctx)
@@ -137,6 +125,14 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
 	return sig_stat;
 }
 
+void
+g_mime_gpgme_sigstat_set_status(GMimeGpgmeSigstat *sigstat,
+								gpgme_error_t      status)
+{
+    g_return_if_fail(GMIME_IS_GPGME_SIGSTAT(sigstat));
+    sigstat->status = status;
+}
+
 static inline void
 append_time_t(GString     *str,
 			  const gchar *format,
@@ -153,8 +149,8 @@ append_time_t(GString     *str,
 }
 
 gchar *
-g_mime_gpgme_sigstat_info(const GMimeGpgmeSigstat *info,
-						  gboolean                 with_signer)
+g_mime_gpgme_sigstat_info(GMimeGpgmeSigstat *info,
+						  gboolean           with_signer)
 {
 	gchar *signer_str = NULL;
 	gchar *status_str;
@@ -178,9 +174,9 @@ g_mime_gpgme_sigstat_info(const GMimeGpgmeSigstat *info,
 }
 
 gchar *
-g_mime_gpgme_sigstat_to_gchar(const GMimeGpgmeSigstat *info,
-							  gboolean                 full_details,
-				 	 	 	  const gchar             *date_string)
+g_mime_gpgme_sigstat_to_gchar( GMimeGpgmeSigstat *info,
+							  gboolean            full_details,
+				 	 	 	  const gchar        *date_string)
 {
     GString *msg;
     gchar *status_str;
@@ -217,7 +213,7 @@ g_mime_gpgme_sigstat_to_gchar(const GMimeGpgmeSigstat *info,
 
 
 gchar *
-g_mime_gpgme_sigstat_signer(const GMimeGpgmeSigstat *sigstat)
+g_mime_gpgme_sigstat_signer(GMimeGpgmeSigstat *sigstat)
 {
 	gchar *result = NULL;
 
@@ -250,26 +246,73 @@ g_mime_gpgme_sigstat_signer(const GMimeGpgmeSigstat *sigstat)
 }
 
 
+gpgme_protocol_t
+g_mime_gpgme_sigstat_protocol(GMimeGpgmeSigstat *sigstat)
+{
+	g_return_val_if_fail(GMIME_IS_GPGME_SIGSTAT(sigstat), GPGME_PROTOCOL_UNKNOWN);
+	return sigstat->protocol;
+}
+
+
+gpgme_error_t
+g_mime_gpgme_sigstat_status(GMimeGpgmeSigstat *sigstat)
+{
+	g_return_val_if_fail(GMIME_IS_GPGME_SIGSTAT(sigstat), GPG_ERR_GENERAL);
+	return sigstat->status;
+}
+
+
+gpgme_sigsum_t
+g_mime_gpgme_sigstat_summary(GMimeGpgmeSigstat *sigstat)
+{
+	g_return_val_if_fail(GMIME_IS_GPGME_SIGSTAT(sigstat), GPGME_SIGSUM_SYS_ERROR);
+	return sigstat->summary;
+}
+
+
+const gpgme_key_t
+g_mime_gpgme_sigstat_key(GMimeGpgmeSigstat *sigstat)
+{
+	g_return_val_if_fail(GMIME_IS_GPGME_SIGSTAT(sigstat), NULL);
+	return sigstat->key;
+}
+
+
+const gchar *
+g_mime_gpgme_sigstat_fingerprint(GMimeGpgmeSigstat *sigstat)
+{
+	g_return_val_if_fail(GMIME_IS_GPGME_SIGSTAT(sigstat), NULL);
+	return sigstat->fingerprint;
+}
+
+
 static void
 g_mime_gpgme_sigstat_class_init(GMimeGpgmeSigstatClass * klass)
 {
     GObjectClass *gobject_klass = G_OBJECT_CLASS(klass);
-    g_mime_gpgme_sigstat_parent_class = g_type_class_peek(G_TYPE_OBJECT);
 
-    gobject_klass->finalize =
-	(GObjectFinalizeFunc) g_mime_gpgme_sigstat_finalize;
+    gobject_klass->finalize = g_mime_gpgme_sigstat_finalize;
 }
 
 static void
-g_mime_gpgme_sigstat_finalize(GMimeGpgmeSigstat * self)
+g_mime_gpgme_sigstat_init(G_GNUC_UNUSED GMimeGpgmeSigstat *self)
 {
+	/* nothing to do */
+}
+
+static void
+g_mime_gpgme_sigstat_finalize(GObject *object)
+{
+	GMimeGpgmeSigstat *self = GMIME_GPGME_SIGSTAT(object);
+	const GObjectClass *parent_class = G_OBJECT_CLASS(g_mime_gpgme_sigstat_parent_class);
+
     g_free(self->fingerprint);
     self->fingerprint = NULL;
     if (self->key)
 	gpgme_key_unref(self->key);
     self->key = NULL;
 
-    g_mime_gpgme_sigstat_parent_class->finalize(G_OBJECT(self));
+    (*parent_class->finalize)(object);
 }
 
 static gchar *

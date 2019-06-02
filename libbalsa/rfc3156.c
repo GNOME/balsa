@@ -458,7 +458,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
     if (sig_state) {
-	if (sig_state->status != GPG_ERR_NOT_SIGNED)
+	if (g_mime_gpgme_sigstat_status(sig_state) != GPG_ERR_NOT_SIGNED)
 	    body->sig_info = sig_state;
 	else
 	    g_object_unref(G_OBJECT(sig_state));
@@ -545,7 +545,7 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 	    retval = GPG_ERR_GENERAL;
 	}
     } else
-	retval = result->status;
+	retval = g_mime_gpgme_sigstat_status(result);
 
     /* return the signature info if requested */
     if (result) {
@@ -601,13 +601,13 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 	    retval = GPG_ERR_GENERAL;
 	}
     } else {
-	if (result->status == GPG_ERR_NOT_SIGNED)
+	if (g_mime_gpgme_sigstat_status(result) == GPG_ERR_NOT_SIGNED)
 	    retval = GPG_ERR_NO_ERROR;
 	else
-	    retval = result->status;
+	    retval = g_mime_gpgme_sigstat_status(result);
 
 	/* return the signature info if requested */
-	if (sig_info && result->status != GPG_ERR_NOT_SIGNED)
+	if (sig_info && g_mime_gpgme_sigstat_status(result) != GPG_ERR_NOT_SIGNED)
 	    *sig_info = result;
 	else
 	    g_object_unref(G_OBJECT(result));

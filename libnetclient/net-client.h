@@ -25,31 +25,19 @@ G_BEGIN_DECLS
 
 
 #define NET_CLIENT_TYPE						(net_client_get_type())
-#define NET_CLIENT(obj)						(G_TYPE_CHECK_INSTANCE_CAST((obj), NET_CLIENT_TYPE, NetClient))
-#define NET_IS_CLIENT(obj)					(G_TYPE_CHECK_INSTANCE_TYPE((obj), NET_CLIENT_TYPE))
-#define NET_CLIENT_CLASS(klass)				(G_TYPE_CHECK_CLASS_CAST((klass), NET_CLIENT_TYPE, NetClientClass))
-#define NET_IS_CLIENT_CLASS(klass)			(G_TYPE_CHECK_CLASS_TYPE((klass), NET_CLIENT_TYPE))
-#define NET_CLIENT_GET_CLASS(obj)			(G_TYPE_INSTANCE_GET_CLASS((obj), NET_CLIENT_TYPE, NetClientClass))
+G_DECLARE_DERIVABLE_TYPE(NetClient, net_client, NET, CLIENT, GObject)
+
 
 #define NET_CLIENT_ERROR_QUARK				(g_quark_from_static_string("net-client"))
-
-
-typedef struct _NetClient NetClient;
-typedef struct _NetClientClass NetClientClass;
-typedef struct _NetClientPrivate NetClientPrivate;
-typedef enum _NetClientError NetClientError;
-typedef enum _NetClientCryptMode NetClientCryptMode;
-
-
-struct _NetClient {
-    GObject parent;
-    NetClientPrivate *priv;
-};
 
 
 struct _NetClientClass {
     GObjectClass parent;
 };
+
+
+typedef enum _NetClientError NetClientError;
+typedef enum _NetClientCryptMode NetClientCryptMode;
 
 
 /** @brief Encryption mode */
@@ -73,10 +61,6 @@ enum _NetClientError {
 	NET_CLIENT_ERROR_CERT_KEY_PASS,			/**< GnuTLS could not decrypt the user certificate's private key. */
 	NET_CLIENT_ERROR_GSSAPI					/**< A GSSAPI error occurred. */
 };
-
-
-GType net_client_get_type(void)
-	G_GNUC_CONST;
 
 
 /** @brief Create a new network client
@@ -115,7 +99,7 @@ gboolean net_client_configure(NetClient *client, const gchar *host_and_port, gui
  *
  * @note The function returns the value of @em host_and_port set by net_client_new() or net_client_configure().
  */
-const gchar *net_client_get_host(const NetClient *client);
+const gchar *net_client_get_host(NetClient *client);
 
 
 /** @brief Connect a network client
@@ -136,7 +120,7 @@ gboolean net_client_connect(NetClient *client, GError **error);
  * Shut down the connection.  Note that it is usually not necessary to call this function, as the connection will be shut down when
  * the client is destroyed by calling <tt>g_object_unref()</tt>.
  */
-void net_client_shutdown(const NetClient *client);
+void net_client_shutdown(NetClient *client);
 
 
 /** @brief Check if a network client is connected

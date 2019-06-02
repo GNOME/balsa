@@ -127,6 +127,7 @@ gint net_client_gss_auth_step(NetClientGssCtx *gss_ctx, const gchar *in_token, g
  *
  * Create the final token which has to be sent to the remote server to finalise the GSSAPI authentication process.
  */
+/*lint -ecall(9076,net_client_gss_auth_finish)		suppress false-positive re. [const] NetClientGssCtx* (FlexeLint 9.00L bug) */
 gchar *net_client_gss_auth_finish(const NetClientGssCtx *gss_ctx, const gchar *in_token, GError **error)
 	G_GNUC_WARN_UNUSED_RESULT;
 

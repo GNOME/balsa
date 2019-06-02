@@ -1,3 +1,18 @@
+2019-06-02  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	libnetclient: use G_DECLARE*
+
+	* libnetclient/net-client-pop.[ch]: use G_DECLARE_FINAL_TYPE(),
+	  and drop storing the private object data in a separate structure;
+	  • net_client_pop_get_capa(): enable pipelining only if included
+	    in the server's capabilities
+	* libnetclient/net-client-siobuf.[ch], libnetclient/net-client-smtp.[ch]:
+	  use G_DECLARE_FINAL_TYPE(), and drop storing the private object
+	  data in a separate structure
+	* libnetclient/net-client-utils.h: suppress Flexelint 9.00 false-positive
+	* libnetclient/net-client.[hc]: use G_DECLARE_DERIVABLE_TYPE();
+	  use net_client_get_instance_private() to access private data
+
 2019-05-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/imap/imap-commands.h: remove redundant declaration of

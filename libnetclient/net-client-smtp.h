@@ -23,18 +23,12 @@ G_BEGIN_DECLS
 
 
 #define NET_CLIENT_SMTP_TYPE				(net_client_smtp_get_type())
-#define NET_CLIENT_SMTP(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), NET_CLIENT_SMTP_TYPE, NetClientSmtp))
-#define NET_IS_CLIENT_SMTP(obj)				(G_TYPE_CHECK_INSTANCE_TYPE((obj), NET_CLIENT_SMTP_TYPE))
-#define NET_CLIENT_SMTP_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), NET_CLIENT_SMTP_TYPE, NetClientSmtpClass))
-#define NET_IS_CLIENT_SMTP_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE((klass), NET_CLIENT_SMTP_TYPE))
-#define NET_CLIENT_SMTP_GET_CLASS(obj)		(G_TYPE_INSTANCE_GET_CLASS((obj), NET_CLIENT_SMTP_TYPE, NetClientSmtpClass))
+G_DECLARE_FINAL_TYPE(NetClientSmtp, net_client_smtp, NET, CLIENT_SMTP, NetClient)
+
 
 #define NET_CLIENT_SMTP_ERROR_QUARK			(g_quark_from_static_string("net-client-smtp"))
 
 
-typedef struct _NetClientSmtp NetClientSmtp;
-typedef struct _NetClientSmtpClass NetClientSmtpClass;
-typedef struct _NetClientSmtpPrivate NetClientSmtpPrivate;
 typedef struct _NetClientSmtpMessage NetClientSmtpMessage;
 typedef enum _NetClientSmtpDsnMode NetClientSmtpDsnMode;
 
@@ -75,17 +69,6 @@ enum _NetClientSmtpError {
 /** @} */
 
 
-struct _NetClientSmtp {
-    NetClient parent;
-    NetClientSmtpPrivate *priv;
-};
-
-
-struct _NetClientSmtpClass {
-	NetClientClass parent;
-};
-
-
 /** @brief Delivery Status Notification mode
  *
  * See <a href="https://tools.ietf.org/html/rfc3461">RFC 3461</a> for a description of Delivery Status Notifications (DSNs).  The
@@ -114,10 +97,6 @@ enum _NetClientSmtpDsnMode {
  *       further relevant standards, e.g. by using <a href="http://spruce.sourceforge.net/gmime/">GMime</a>.
  */
 typedef gssize (*NetClientSmtpSendCb)(gchar *buffer, gsize count, gpointer user_data, GError **error);
-
-
-GType net_client_smtp_get_type(void)
-	G_GNUC_CONST;
 
 
 /** @brief Create a new SMTP network client

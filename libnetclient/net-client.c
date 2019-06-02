@@ -35,6 +35,8 @@
  *         GIOStream *tls_conn -- optional
  *            GOutputStream *ostream -- optionally compressed
  */
+typedef struct _NetClientPrivate NetClientPrivate;
+
 struct _NetClientPrivate {
 	gchar *host_and_port;
 	guint16 default_port;
@@ -67,18 +69,21 @@ NetClient *
 net_client_new(const gchar *host_and_port, guint16 default_port, gsize max_line_len)
 {
 	NetClient *client;
+	NetClientPrivate *priv;
 
 	g_return_val_if_fail(host_and_port != NULL, NULL);
 
 	client = NET_CLIENT(g_object_new(NET_CLIENT_TYPE, NULL));
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	priv = net_client_get_instance_private(client);
 
-	if (client->priv->sock == NULL) {
+	if (priv->sock == NULL) {
 		g_object_unref(G_OBJECT(client));
 		client = NULL;
 	} else {
-		client->priv->host_and_port = g_strdup(host_and_port);
-		client->priv->default_port = default_port;
-		client->priv->max_line_len = max_line_len;
+		priv->host_and_port = g_strdup(host_and_port);
+		priv->default_port = default_port;
+		priv->max_line_len = max_line_len;
 	}
 
 	return client;
@@ -88,12 +93,12 @@ net_client_new(const gchar *host_and_port, guint16 default_port, gsize max_line_
 gboolean
 net_client_configure(NetClient *client, const gchar *host_and_port, guint16 default_port, gsize max_line_len, GError **error)
 {
-	NetClientPrivate *priv;
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	NetClientPrivate *priv = net_client_get_instance_private(client);
 	gboolean result;
 
 	g_return_val_if_fail(NET_IS_CLIENT(client) && (host_and_port != NULL), FALSE);
 
-	priv = client->priv;
 	if (priv->plain_conn != NULL) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_CONNECTED, _("network client is already connected"));
 		result = FALSE;
@@ -109,13 +114,16 @@ net_client_configure(NetClient *client, const gchar *host_and_port, guint16 defa
 
 
 const gchar *
-net_client_get_host(const NetClient *client)
+net_client_get_host(NetClient *client)
 {
 	const gchar *result;
 
-	/*lint -e{9005}		cast'ing away const in the next statement is fine */
 	if (NET_IS_CLIENT(client)) {
-		result = client->priv->host_and_port;
+		const NetClientPrivate *priv;
+
+		/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+		priv = net_client_get_instance_private(client);
+		result = priv->host_and_port;
 	} else {
 		result = NULL;
 	}
@@ -127,11 +135,11 @@ gboolean
 net_client_connect(NetClient *client, GError **error)
 {
 	gboolean result = FALSE;
-	NetClientPrivate *priv;
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	NetClientPrivate *priv = net_client_get_instance_private(client);
 
 	g_return_val_if_fail(NET_IS_CLIENT(client), FALSE);
 
-	priv = client->priv;
 	if (priv->plain_conn != NULL) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_CONNECTED, _("network client is already connected"));
 	} else {
@@ -150,41 +158,46 @@ net_client_connect(NetClient *client, GError **error)
 
 
 void
-net_client_shutdown(const NetClient *client)
+net_client_shutdown(NetClient *client)
 {
 	if (NET_IS_CLIENT(client)) {
+		NetClientPrivate *priv;
+
+		/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+		priv = net_client_get_instance_private(client);
+
 		/* Note: we must unref the GDataInputStream, but the GOutputStream only if compression is active! */
-		if (client->priv->comp != NULL) {
+		if (priv->comp != NULL) {
 			/* Note: for some strange reason, GIO decides to send a 0x03 0x00 sequence when closing a compressed connection, before
 			 * sending the usual FIN, ACK TCP reply packet.  As the remote server does not expect the former (the connection has
 			 * already been closed on its side), it replies with with a RST TCP packet.  Unref'ing client->priv->ostream and
 			 * client->priv->comp /after/ all other components of the connection fixes the issue for unencrypted connections, but
 			 * throws a critical error for TLS.  Observed with gio 2.48.2 and 2.50.3, no idea how it can be fixed.
 			 * See also https://bugzilla.gnome.org/show_bug.cgi?id=795985. */
-			if (client->priv->ostream != NULL) {
-				g_object_unref(G_OBJECT(client->priv->ostream));
+			if (priv->ostream != NULL) {
+				g_object_unref(G_OBJECT(priv->ostream));
 			}
-			g_object_unref(G_OBJECT(client->priv->comp));
+			g_object_unref(G_OBJECT(priv->comp));
 		}
-		if (client->priv->decomp != NULL) {
-			g_object_unref(G_OBJECT(client->priv->decomp));
-			client->priv->decomp = NULL;
+		if (priv->decomp != NULL) {
+			g_object_unref(G_OBJECT(priv->decomp));
+			priv->decomp = NULL;
 		}
-		if (client->priv->comp_istream!= NULL) {
-			g_object_unref(G_OBJECT(client->priv->comp_istream));
-			client->priv->comp_istream = NULL;
+		if (priv->comp_istream!= NULL) {
+			g_object_unref(G_OBJECT(priv->comp_istream));
+			priv->comp_istream = NULL;
 		}
-		if (client->priv->istream != NULL) {
-			g_object_unref(G_OBJECT(client->priv->istream));
-			client->priv->istream = NULL;
+		if (priv->istream != NULL) {
+			g_object_unref(G_OBJECT(priv->istream));
+			priv->istream = NULL;
 		}
-		if (client->priv->tls_conn != NULL) {
-			g_object_unref(G_OBJECT(client->priv->tls_conn));
-			client->priv->tls_conn = NULL;
+		if (priv->tls_conn != NULL) {
+			g_object_unref(G_OBJECT(priv->tls_conn));
+			priv->tls_conn = NULL;
 		}
-		if (client->priv->plain_conn != NULL) {
-			g_object_unref(G_OBJECT(client->priv->plain_conn));
-			client->priv->plain_conn = NULL;
+		if (priv->plain_conn != NULL) {
+			g_object_unref(G_OBJECT(priv->plain_conn));
+			priv->plain_conn = NULL;
 		}
 	}
 }
@@ -195,8 +208,12 @@ net_client_is_connected(NetClient *client)
 {
 	gboolean result;
 
-	if (NET_IS_CLIENT(client) && (client->priv->plain_conn != NULL)) {
-		result = TRUE;
+	if (NET_IS_CLIENT(client)) {
+		const NetClientPrivate *priv;
+
+		/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+		priv = net_client_get_instance_private(client);
+		result = (priv->plain_conn != NULL);
 	} else {
 		result = FALSE;
 	}
@@ -210,8 +227,12 @@ net_client_is_encrypted(NetClient *client)
 {
 	gboolean result;
 
-	if (net_client_is_connected(client) && (client->priv->tls_conn != NULL)) {
-		result = TRUE;
+	if (net_client_is_connected(client)) {
+		const NetClientPrivate *priv;
+
+		/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+		priv = net_client_get_instance_private(client);
+		result = (priv->tls_conn != NULL);
 	} else {
 		result = FALSE;
 	}
@@ -223,24 +244,26 @@ net_client_is_encrypted(NetClient *client)
 gboolean
 net_client_read_line(NetClient *client, gchar **recv_line, GError **error)
 {
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	const NetClientPrivate *priv = net_client_get_instance_private(client);
 	gboolean result = FALSE;
 
 	g_return_val_if_fail(NET_IS_CLIENT(client), FALSE);
 
-	if (client->priv->istream == NULL) {
+	if (priv->istream == NULL) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_NOT_CONNECTED, _("network client is not connected"));
 	} else {
 		gchar *line_buf;
 		gsize length;
 		GError *read_err = NULL;
 
-		line_buf = g_data_input_stream_read_line(client->priv->istream, &length, NULL, &read_err);
+		line_buf = g_data_input_stream_read_line(priv->istream, &length, NULL, &read_err);
 		if (line_buf != NULL) {
 			/* check that the protocol-specific maximum line length is not exceeded */
-			if ((client->priv->max_line_len > 0U) && (length > client->priv->max_line_len)) {
+			if ((priv->max_line_len > 0U) && (length > priv->max_line_len)) {
 				g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_LINE_TOO_LONG,
 					_("reply length %lu exceeds the maximum allowed length %lu"),
-					(unsigned long) length, (unsigned long) client->priv->max_line_len);
+					(unsigned long) length, (unsigned long) priv->max_line_len);
 				g_free(line_buf);
 			} else {
 				g_debug("R '%s'", line_buf);
@@ -267,11 +290,13 @@ net_client_read_line(NetClient *client, gchar **recv_line, GError **error)
 gboolean
 net_client_write_buffer(NetClient *client, const gchar *buffer, gsize count, GError **error)
 {
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	const NetClientPrivate *priv = net_client_get_instance_private(client);
 	gboolean result;
 
 	g_return_val_if_fail(NET_IS_CLIENT(client) && (buffer != NULL) && (count > 0UL), FALSE);
 
-	if (client->priv->ostream == NULL) {
+	if (priv->ostream == NULL) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_NOT_CONNECTED, _("network client is not connected"));
 		result = FALSE;
 	} else {
@@ -282,9 +307,9 @@ net_client_write_buffer(NetClient *client, const gchar *buffer, gsize count, GEr
 		} else {
 			g_debug("W '%.*s'", (int) count, buffer);
 		}
-		result = g_output_stream_write_all(client->priv->ostream, buffer, count, &bytes_written, NULL, error);
+		result = g_output_stream_write_all(priv->ostream, buffer, count, &bytes_written, NULL, error);
 		if (result) {
-			result = g_output_stream_flush(client->priv->ostream, NULL, error);
+			result = g_output_stream_flush(priv->ostream, NULL, error);
 		}
 	}
 
@@ -295,6 +320,8 @@ net_client_write_buffer(NetClient *client, const gchar *buffer, gsize count, GEr
 gboolean
 net_client_vwrite_line(NetClient *client, const gchar *format, va_list args, GError **error)
 {
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	const NetClientPrivate *priv = net_client_get_instance_private(client);
 	gboolean result;
 	GString *buffer;
 
@@ -302,7 +329,7 @@ net_client_vwrite_line(NetClient *client, const gchar *format, va_list args, GEr
 
 	buffer = g_string_new(NULL);
 	g_string_vprintf(buffer, format, args);
-	if ((client->priv->max_line_len > 0U) && (buffer->len > client->priv->max_line_len)) {
+	if ((priv->max_line_len > 0U) && (buffer->len > priv->max_line_len)) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_LINE_TOO_LONG, _("line too long"));
 		result = FALSE;
 	} else {
@@ -357,6 +384,8 @@ net_client_execute(NetClient *client, gchar **response, const gchar *request_fmt
 gboolean
 net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **error)
 {
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	NetClientPrivate *priv = net_client_get_instance_private(client);
 	gboolean result = FALSE;
 	gnutls_x509_crt_t cert;
 	int res;
@@ -364,9 +393,9 @@ net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **
 	g_return_val_if_fail(NET_IS_CLIENT(client) && (pem_data != NULL), FALSE);
 
 	/* always free any existing certificate */
-	if (client->priv->certificate != NULL) {
-		g_object_unref(G_OBJECT(client->priv->certificate));
-		client->priv->certificate = NULL;
+	if (priv->certificate != NULL) {
+		g_object_unref(G_OBJECT(priv->certificate));
+		priv->certificate = NULL;
 	}
 
 	/* load the certificate */
@@ -440,8 +469,8 @@ net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **
 					}
 
 					if (res == GNUTLS_E_SUCCESS) {
-						client->priv->certificate = g_tls_certificate_new_from_pem(pem_buf, -1, error);
-						if (client->priv->certificate != NULL) {
+						priv->certificate = g_tls_certificate_new_from_pem(pem_buf, -1, error);
+						if (priv->certificate != NULL) {
 							result = TRUE;
 						}
 					}
@@ -485,32 +514,34 @@ net_client_set_cert_from_file(NetClient *client, const gchar *pem_path, GError *
 gboolean
 net_client_start_tls(NetClient *client, GError **error)
 {
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	NetClientPrivate *priv = net_client_get_instance_private(client);
 	gboolean result = FALSE;
 
 	g_return_val_if_fail(NET_IS_CLIENT(client), FALSE);
 
-	if (client->priv->plain_conn == NULL) {
+	if (priv->plain_conn == NULL) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_NOT_CONNECTED, _("not connected"));
-	} else if (client->priv->tls_conn != NULL) {
+	} else if (priv->tls_conn != NULL) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_TLS_ACTIVE, _("connection is already encrypted"));
 	} else {
-		client->priv->tls_conn = g_tls_client_connection_new(G_IO_STREAM(client->priv->plain_conn), NULL, error);
-		if (client->priv->tls_conn != NULL) {
-			if (client->priv->certificate != NULL) {
-				g_tls_connection_set_certificate(G_TLS_CONNECTION(client->priv->tls_conn), client->priv->certificate);
+		priv->tls_conn = g_tls_client_connection_new(G_IO_STREAM(priv->plain_conn), NULL, error);
+		if (priv->tls_conn != NULL) {
+			if (priv->certificate != NULL) {
+				g_tls_connection_set_certificate(G_TLS_CONNECTION(priv->tls_conn), priv->certificate);
 			}
-			(void) g_signal_connect(G_OBJECT(client->priv->tls_conn), "accept-certificate", G_CALLBACK(cert_accept_cb), client);
-			result = g_tls_connection_handshake(G_TLS_CONNECTION(client->priv->tls_conn), NULL, error);
+			(void) g_signal_connect(G_OBJECT(priv->tls_conn), "accept-certificate", G_CALLBACK(cert_accept_cb), client);
+			result = g_tls_connection_handshake(G_TLS_CONNECTION(priv->tls_conn), NULL, error);
 			if (result) {
-				g_filter_input_stream_set_close_base_stream(G_FILTER_INPUT_STREAM(client->priv->istream), FALSE);
-				g_object_unref(G_OBJECT(client->priv->istream));		/* unref the plain connection's stream */
-				client->priv->istream = g_data_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(client->priv->tls_conn)));
-				g_data_input_stream_set_newline_type(client->priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
-				client->priv->ostream = g_io_stream_get_output_stream(G_IO_STREAM(client->priv->tls_conn));
+				g_filter_input_stream_set_close_base_stream(G_FILTER_INPUT_STREAM(priv->istream), FALSE);
+				g_object_unref(G_OBJECT(priv->istream));		/* unref the plain connection's stream */
+				priv->istream = g_data_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(priv->tls_conn)));
+				g_data_input_stream_set_newline_type(priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
+				priv->ostream = g_io_stream_get_output_stream(G_IO_STREAM(priv->tls_conn));
 				g_debug("connection is encrypted");
 			} else {
-				g_object_unref(G_OBJECT(client->priv->tls_conn));
-				client->priv->tls_conn = NULL;
+				g_object_unref(G_OBJECT(priv->tls_conn));
+				priv->tls_conn = NULL;
 			}
 		}
 	}
@@ -522,34 +553,36 @@ net_client_start_tls(NetClient *client, GError **error)
 gboolean
 net_client_start_compression(NetClient *client, GError **error)
 {
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	NetClientPrivate *priv = net_client_get_instance_private(client);
 	gboolean result = FALSE;
 
 	g_return_val_if_fail(NET_IS_CLIENT(client), FALSE);
 
-	if (client->priv->plain_conn == NULL) {
+	if (priv->plain_conn == NULL) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_NOT_CONNECTED, _("not connected"));
-	} else if (client->priv->comp != NULL) {
+	} else if (priv->comp != NULL) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_COMP_ACTIVE, _("connection is already compressed"));
 	} else {
-		client->priv->comp = g_zlib_compressor_new(G_ZLIB_COMPRESSOR_FORMAT_RAW, -1);
-		client->priv->decomp = g_zlib_decompressor_new(G_ZLIB_COMPRESSOR_FORMAT_RAW);
+		priv->comp = g_zlib_compressor_new(G_ZLIB_COMPRESSOR_FORMAT_RAW, -1);
+		priv->decomp = g_zlib_decompressor_new(G_ZLIB_COMPRESSOR_FORMAT_RAW);
 
-		g_filter_input_stream_set_close_base_stream(G_FILTER_INPUT_STREAM(client->priv->istream), FALSE);
-		g_object_unref(client->priv->istream);
+		g_filter_input_stream_set_close_base_stream(G_FILTER_INPUT_STREAM(priv->istream), FALSE);
+		g_object_unref(priv->istream);
 
-		if (client->priv->tls_conn != NULL) {
-			client->priv->comp_istream =
-				g_converter_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(client->priv->tls_conn)),
-					G_CONVERTER(client->priv->decomp));
+		if (priv->tls_conn != NULL) {
+			priv->comp_istream =
+				g_converter_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(priv->tls_conn)),
+					G_CONVERTER(priv->decomp));
 		} else {
-			client->priv->comp_istream =
-				g_converter_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(client->priv->plain_conn)),
-					G_CONVERTER(client->priv->decomp));
+			priv->comp_istream =
+				g_converter_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(priv->plain_conn)),
+					G_CONVERTER(priv->decomp));
 		}
-		client->priv->istream = g_data_input_stream_new(client->priv->comp_istream);
-		g_data_input_stream_set_newline_type(client->priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
+		priv->istream = g_data_input_stream_new(priv->comp_istream);
+		g_data_input_stream_set_newline_type(priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
 
-		client->priv->ostream = g_converter_output_stream_new(client->priv->ostream, G_CONVERTER(client->priv->comp));
+		priv->ostream = g_converter_output_stream_new(priv->ostream, G_CONVERTER(priv->comp));
 		result = TRUE;
 		g_debug("connection is compressed");
 	}
@@ -561,9 +594,12 @@ net_client_start_compression(NetClient *client, GError **error)
 gboolean
 net_client_set_timeout(NetClient *client, guint timeout_secs)
 {
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	const NetClientPrivate *priv = net_client_get_instance_private(client);
+
 	g_return_val_if_fail(NET_IS_CLIENT(client), FALSE);
 
-	g_socket_client_set_timeout(client->priv->sock, timeout_secs);
+	g_socket_client_set_timeout(priv->sock, timeout_secs);
 	return TRUE;
 }
 
@@ -571,19 +607,25 @@ net_client_set_timeout(NetClient *client, guint timeout_secs)
 GSocket *
 net_client_get_socket(NetClient *client)
 {
-	g_return_val_if_fail(NET_IS_CLIENT(client) && (client->priv->plain_conn != NULL), NULL);
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	const NetClientPrivate *priv = net_client_get_instance_private(client);
 
-	return g_socket_connection_get_socket(client->priv->plain_conn);
+	g_return_val_if_fail(NET_IS_CLIENT(client) && (priv->plain_conn != NULL), NULL);
+
+	return g_socket_connection_get_socket(priv->plain_conn);
 }
 
 
 gboolean
 net_client_can_read(NetClient *client)
 {
-	g_return_val_if_fail(NET_IS_CLIENT(client) && (client->priv->plain_conn != NULL) && (client->priv->istream != NULL), FALSE);
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	const NetClientPrivate *priv = net_client_get_instance_private(client);
 
-	return (g_socket_condition_check(g_socket_connection_get_socket(client->priv->plain_conn), G_IO_IN) != 0) ||
-		(g_buffered_input_stream_get_available(G_BUFFERED_INPUT_STREAM(client->priv->istream)) > 0U);
+	g_return_val_if_fail(NET_IS_CLIENT(client) && (priv->plain_conn != NULL) && (priv->istream != NULL), FALSE);
+
+	return (g_socket_condition_check(g_socket_connection_get_socket(priv->plain_conn), G_IO_IN) != 0) ||
+		(g_buffered_input_stream_get_available(G_BUFFERED_INPUT_STREAM(priv->istream)) > 0U);
 }
 
 
@@ -606,10 +648,12 @@ net_client_class_init(NetClientClass *klass)
 static void
 net_client_init(NetClient *self)
 {
-	self->priv = net_client_get_instance_private(self);		/*lint !e9079 (MISRA C:2012 Rule 11.5) intended use of this function */
-	self->priv->sock = g_socket_client_new();
-	if (self->priv->sock != NULL) {
-		g_socket_client_set_timeout(self->priv->sock, 180U);
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	NetClientPrivate *priv = net_client_get_instance_private(self);
+
+	priv->sock = g_socket_client_new();
+	if (priv->sock != NULL) {
+		g_socket_client_set_timeout(priv->sock, 180U);
 	}
 }
 
@@ -617,24 +661,27 @@ net_client_init(NetClient *self)
 static void
 net_client_finalise(GObject *object)
 {
-	const NetClient *client = NET_CLIENT(object);
+	NetClient *client = NET_CLIENT(object);
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	NetClientPrivate *priv = net_client_get_instance_private(client);
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_parent_class);
 
 	net_client_shutdown(client);
-	if (client->priv->sock != NULL) {
-		g_object_unref(G_OBJECT(client->priv->sock));
-		client->priv->sock = NULL;
+	if (priv->sock != NULL) {
+		g_object_unref(G_OBJECT(priv->sock));
+		priv->sock = NULL;
 	}
-	if (client->priv->certificate != NULL) {
-		g_object_unref(G_OBJECT(client->priv->certificate));
-		client->priv->certificate = NULL;
+	if (priv->certificate != NULL) {
+		g_object_unref(G_OBJECT(priv->certificate));
+		priv->certificate = NULL;
 	}
-	g_debug("finalised connection to %s", client->priv->host_and_port);
-	g_free(client->priv->host_and_port);
+	g_debug("finalised connection to %s", priv->host_and_port);
+	g_free(priv->host_and_port);
 	(*parent_class->finalize)(object);
 }
 
 
+/*lint -e{715,818} */
 static gboolean
 cert_accept_cb(G_GNUC_UNUSED GTlsConnection *conn, GTlsCertificate *peer_cert, GTlsCertificateFlags errors, gpointer user_data)
 {

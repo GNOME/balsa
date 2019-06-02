@@ -23,18 +23,12 @@ G_BEGIN_DECLS
 
 
 #define NET_CLIENT_POP_TYPE					(net_client_pop_get_type())
-#define NET_CLIENT_POP(obj)					(G_TYPE_CHECK_INSTANCE_CAST((obj), NET_CLIENT_POP_TYPE, NetClientPop))
-#define NET_IS_CLIENT_POP(obj)				(G_TYPE_CHECK_INSTANCE_TYPE((obj), NET_CLIENT_POP_TYPE))
-#define NET_CLIENT_POP_CLASS(klass)			(G_TYPE_CHECK_CLASS_CAST((klass), NET_CLIENT_POP_TYPE, NetClientPopClass))
-#define NET_IS_CLIENT_POP_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE((klass), NET_CLIENT_POP_TYPE))
-#define NET_CLIENT_POP_GET_CLASS(obj)		(G_TYPE_INSTANCE_GET_CLASS((obj), NET_CLIENT_POP_TYPE, NetClientPopClass))
+G_DECLARE_FINAL_TYPE(NetClientPop, net_client_pop, NET, CLIENT_POP, NetClient)
+
 
 #define NET_CLIENT_POP_ERROR_QUARK			(g_quark_from_static_string("net-client-pop"))
 
 
-typedef struct _NetClientPop NetClientPop;
-typedef struct _NetClientPopClass NetClientPopClass;
-typedef struct _NetClientPopPrivate NetClientPopPrivate;
 typedef struct _NetClientPopMessage NetClientPopMessage;
 typedef struct _NetClientPopMessageInfo NetClientPopMessageInfo;
 
@@ -80,17 +74,6 @@ enum _NetClientPopError {
 /** @} */
 
 
-struct _NetClientPop {
-    NetClient parent;
-    NetClientPopPrivate *priv;
-};
-
-
-struct _NetClientPopClass {
-	NetClientClass parent;
-};
-
-
 /** @brief Message information
  *
  * This structure is returned in a GList by net_client_pop_list() and contains information about on message in the remote mailbox.
@@ -130,10 +113,6 @@ struct _NetClientPopMessageInfo {
  */
 typedef gboolean (*NetClientPopMsgCb)(const gchar *buffer, gssize count, gsize lines, const NetClientPopMessageInfo *info,
 									  gpointer user_data, GError **error);
-
-
-GType net_client_pop_get_type(void)
-	G_GNUC_CONST;
 
 
 /** @brief Create a new POP network client

@@ -19,7 +19,10 @@
 #include "net-client-pop.h"
 
 
-struct _NetClientPopPrivate {
+/*lint -esym(754,_NetClientPop::parent)	required field, not referenced directly */
+struct _NetClientPop {
+	NetClient parent;
+
 	NetClientCryptMode crypt_mode;
 	gchar *apop_banner;
 	guint auth_allowed[2];			/** 0: encrypted, 1: unencrypted */
@@ -44,7 +47,8 @@ struct _NetClientPopPrivate {
 /*lint -restore */
 
 
-G_DEFINE_TYPE_WITH_PRIVATE(NetClientPop, net_client_pop, NET_CLIENT_TYPE)
+/*lint -esym(528,net_client_pop_get_instance_private)		auto-generated function, not referenced */
+G_DEFINE_TYPE(NetClientPop, net_client_pop, NET_CLIENT_TYPE)
 
 
 static void net_client_pop_finalise(GObject *object);
@@ -82,8 +86,8 @@ net_client_pop_new(const gchar *host, guint16 port, NetClientCryptMode crypt_mod
 			g_object_unref(G_OBJECT(client));
 			client = NULL;
 		} else {
-			client->priv->crypt_mode = crypt_mode;
-			client->priv->use_pipelining = use_pipelining;
+			client->crypt_mode = crypt_mode;
+			client->use_pipelining = use_pipelining;
 		}
 	}
 
@@ -97,9 +101,9 @@ net_client_pop_allow_auth(NetClientPop *client, gboolean encrypted, guint allow_
 	/* paranoia check */
 	g_return_val_if_fail(NET_IS_CLIENT_POP(client), FALSE);
 	if (encrypted) {
-		client->priv->auth_allowed[0] = allow_auth;
+		client->auth_allowed[0] = allow_auth;
 	} else {
-		client->priv->auth_allowed[1] = allow_auth;
+		client->auth_allowed[1] = allow_auth;
 	}
 	return TRUE;
 }
@@ -117,7 +121,7 @@ net_client_pop_connect(NetClientPop *client, gchar **greeting, GError **error)
 
 	/* establish connection, and immediately switch to TLS if required */
 	result = net_client_connect(NET_CLIENT(client), error);
-	if (result && (client->priv->crypt_mode == NET_CLIENT_CRYPT_ENCRYPTED)) {
+	if (result && (client->crypt_mode == NET_CLIENT_CRYPT_ENCRYPTED)) {
 		result = net_client_start_tls(NET_CLIENT(client), error);
 	}
 
@@ -130,14 +134,15 @@ net_client_pop_connect(NetClientPop *client, gchar **greeting, GError **error)
 	if (result) {
 		const gchar *ang_open;
 
-		ang_open = strchr(server_msg, '<');		/*lint !e668 !e9034		server_msg cannot be NULL; accept char literal as int */
+		/*lint -e{668,9034}		server_msg cannot be NULL; accept char literal as int (MISRA C:2012 Rule 10.3) */
+		ang_open = strchr(server_msg, '<');
 		if (ang_open != NULL) {
 			const gchar *ang_close;
 
-			ang_close = strchr(ang_open, '>');	/*lint !e9034	accept char literal as int */
+			ang_close = strchr(ang_open, '>');	/*lint !e9034	accept char literal as int (MISRA C:2012 Rule 10.3) */
 			if (ang_close != NULL) {
 				/*lint -e{737,946,947,9029}	allowed exception according to MISRA Rules 18.2 and 18.3 */
-				client->priv->apop_banner = g_strndup(ang_open, (ang_close - ang_open) + 1U);
+				client->apop_banner = g_strndup(ang_open, (ang_close - ang_open) + 1U);
 				auth_supported = NET_CLIENT_POP_AUTH_APOP;
 			}
 		}
@@ -149,10 +154,10 @@ net_client_pop_connect(NetClientPop *client, gchar **greeting, GError **error)
 
 	/* perform STLS if required- note that some servers support STLS, but do not announce it.  So just try... */
 	if (result &&
-		((client->priv->crypt_mode == NET_CLIENT_CRYPT_STARTTLS) || (client->priv->crypt_mode == NET_CLIENT_CRYPT_STARTTLS_OPT))) {
+		((client->crypt_mode == NET_CLIENT_CRYPT_STARTTLS) || (client->crypt_mode == NET_CLIENT_CRYPT_STARTTLS_OPT))) {
 		result = net_client_pop_starttls(client, error);
 		if (!result) {
-			if (client->priv->crypt_mode == NET_CLIENT_CRYPT_STARTTLS_OPT) {
+			if (client->crypt_mode == NET_CLIENT_CRYPT_STARTTLS_OPT) {
 				result = TRUE;
 				g_clear_error(error);
 			}
@@ -183,7 +188,7 @@ net_client_pop_connect(NetClientPop *client, gchar **greeting, GError **error)
 				g_debug("passwordless authentication failed, retry w/ password: emit 'auth' signal for client %p", client);
 				g_clear_error(error);
 				g_free(auth_data);
-				g_signal_emit_by_name(client, "auth", TRUE, &auth_data);
+				g_signal_emit_by_name(client, "auth", TRUE, &auth_data);	/*lint !e730	passing a gboolean is intended here */
 				if ((auth_data != NULL) && (auth_data[0] != NULL)) {
 					result = net_client_pop_auth(client, auth_data[0], auth_data[1],
 						auth_supported & ~NET_CLIENT_POP_AUTH_NO_PWD, error);
@@ -275,12 +280,12 @@ net_client_pop_list(NetClientPop *client, GList **msg_list, gboolean with_uid, G
 	}
 
 	/* get all uid's if requested */
-	if (result && with_uid && client->priv->can_uidl && (*msg_list != NULL)) {
+	if (result && with_uid && client->can_uidl && (*msg_list != NULL)) {
 		result = net_client_pop_uidl(client, msg_list, error);
 	}
 
 	if (!result) {
-		/*lint -e{9074,9087}	accept sane pointer conversion */
+		/*lint -e{9074,9087}	accept sane pointer conversion (MISRA C:2012 Rules 11.1, 11.3) */
 		g_list_free_full(*msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
 	}
 
@@ -299,7 +304,7 @@ net_client_pop_retr(NetClientPop *client, GList *msg_list, NetClientPopMsgCb cal
 	g_return_val_if_fail(NET_IS_CLIENT_POP(client) && (msg_list != NULL) && (callback != NULL), FALSE);
 
 	/* pipelining: send all RETR commands */
-	pipelining = client->priv->can_pipelining && client->priv->use_pipelining;
+	pipelining = client->can_pipelining && client->use_pipelining;
 	if (pipelining) {
 		GString *retr_buf;
 
@@ -341,7 +346,7 @@ net_client_pop_dele(NetClientPop *client, GList *msg_list, GError **error)
 	g_return_val_if_fail(NET_IS_CLIENT_POP(client) && (msg_list != NULL), FALSE);
 
 	/* pipelining: send all DELE commands */
-	pipelining = client->priv->can_pipelining && client->priv->use_pipelining;
+	pipelining = client->can_pipelining && client->use_pipelining;
 	if (pipelining) {
 		GString *dele_buf;
 
@@ -394,16 +399,15 @@ net_client_pop_class_init(NetClientPopClass *klass)
 static void
 net_client_pop_init(NetClientPop *self)
 {
-	self->priv = net_client_pop_get_instance_private(self);		/*lint !e9079 (MISRA C:2012 Rule 11.5) intended use */
-	self->priv->auth_allowed[0] = NET_CLIENT_POP_AUTH_ALL;
-	self->priv->auth_allowed[1] = NET_CLIENT_POP_AUTH_SAFE;
+	self->auth_allowed[0] = NET_CLIENT_POP_AUTH_ALL;
+	self->auth_allowed[1] = NET_CLIENT_POP_AUTH_SAFE;
 }
 
 
 static void
 net_client_pop_finalise(GObject *object)
 {
-	const NetClientPop *client = NET_CLIENT_POP(object);
+	NetClientPop *client = NET_CLIENT_POP(object);
 	const GObjectClass *parent_class = G_OBJECT_CLASS(net_client_pop_parent_class);
 
 	/* send the 'QUIT' command - no need to evaluate the reply or check for errors */
@@ -411,7 +415,7 @@ net_client_pop_finalise(GObject *object)
 		(void) net_client_execute(NET_CLIENT(client), NULL, "QUIT", NULL);
 	}
 
-	g_free(client->priv->apop_banner);
+	g_free(client->apop_banner);
 	(*parent_class->finalize)(object);
 }
 
@@ -462,7 +466,7 @@ net_client_pop_execute(NetClientPop *client, const gchar *request_fmt, gchar **l
 	va_list args;
 	gboolean result;
 
-	va_start(args, error);		/*lint !e413	a NULL error argument is irrelevant here */
+	va_start(args, error);
 	result = net_client_vwrite_line(NET_CLIENT(client), request_fmt, args, error);
 	va_end(args);
 
@@ -495,9 +499,9 @@ net_client_pop_auth(NetClientPop *client, const gchar *user, const gchar *passwd
 	guint auth_mask;
 
 	if (net_client_is_encrypted(NET_CLIENT(client))) {
-		auth_mask = client->priv->auth_allowed[0] & auth_supported;
+		auth_mask = client->auth_allowed[0] & auth_supported;
 	} else {
-		auth_mask = client->priv->auth_allowed[1] & auth_supported;
+		auth_mask = client->auth_allowed[1] & auth_supported;
 	}
 
 	if (auth_mask == 0U) {
@@ -601,7 +605,7 @@ net_client_pop_auth_apop(NetClientPop *client, const gchar *user, const gchar *p
 	gchar *auth_buf;
 	gchar *md5_buf;
 
-	auth_buf = g_strconcat(client->priv->apop_banner, passwd, NULL);
+	auth_buf = g_strconcat(client->apop_banner, passwd, NULL);
 	md5_buf = g_compute_checksum_for_string(G_CHECKSUM_MD5, auth_buf, -1);
 	net_client_free_authstr(auth_buf);
 	result = net_client_pop_execute(client, "APOP %s %s", NULL, error, user, md5_buf);
@@ -683,7 +687,7 @@ net_client_pop_auth_gssapi(NetClientPop *client, const gchar *user, GError **err
 
 #else
 
-/*lint -e{715} -e{818} */
+/*lint -e{715,818} */
 static gboolean
 net_client_pop_auth_gssapi(NetClientPop G_GNUC_UNUSED *client, const gchar G_GNUC_UNUSED *user, GError G_GNUC_UNUSED **error)
 {
@@ -701,7 +705,7 @@ net_client_pop_execute_sasl(NetClientPop *client, const gchar *request_fmt, gcha
 	va_list args;
 	gboolean result;
 
-	va_start(args, error);		/*lint !e413	a NULL error argument is irrelevant here */
+	va_start(args, error);
 	result = net_client_vwrite_line(NET_CLIENT(client), request_fmt, args, error);
 	va_end(args);
 
@@ -734,7 +738,7 @@ net_client_pop_get_capa(NetClientPop *client, guint *auth_supported)
 
 	/* clear all capability flags except APOP and send the CAPA command */
 	*auth_supported = *auth_supported & NET_CLIENT_POP_AUTH_APOP;
-	client->priv->can_pipelining = FALSE;
+	client->can_pipelining = FALSE;
 	result = net_client_pop_execute(client, "CAPA", NULL, NULL);
 
 	/* evaluate the response */
@@ -772,9 +776,9 @@ net_client_pop_get_capa(NetClientPop *client, guint *auth_supported)
 				}
 				g_strfreev(auth);
 			} else if (strcmp(reply, "PIPELINING") == 0) {
-				client->priv->can_pipelining = TRUE;
+				client->can_pipelining = TRUE;
 			} else if (strcmp(reply, "UIDL") == 0) {
-				client->priv->can_uidl = TRUE;
+				client->can_uidl = TRUE;
 			} else {
 				/* ignore this capability (see MISRA C:2012, Rule 15.7) */
 			}
@@ -788,7 +792,6 @@ net_client_pop_get_capa(NetClientPop *client, guint *auth_supported)
 	if (*auth_supported == 0U) {
 		*auth_supported = NET_CLIENT_POP_AUTH_USER_PASS;
 	}
-	client->priv->can_pipelining = TRUE;
 }
 
 

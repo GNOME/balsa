@@ -23,33 +23,10 @@ G_BEGIN_DECLS
 
 
 #define NET_CLIENT_SIOBUF_TYPE				(net_client_siobuf_get_type())
-#define NET_CLIENT_SIOBUF(obj)				(G_TYPE_CHECK_INSTANCE_CAST((obj), NET_CLIENT_SIOBUF_TYPE, NetClientSioBuf))
-#define NET_IS_CLIENT_SIOBUF(obj)			(G_TYPE_CHECK_INSTANCE_TYPE((obj), NET_CLIENT_SIOBUF_TYPE))
-#define NET_CLIENT_SIOBUF_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST((klass), NET_CLIENT_SIOBUF_TYPE, NetClientSioBufClass))
-#define NET_IS_CLIENT_SIOBUF_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE((klass), NET_CLIENT_SIOBUF_TYPE))
-#define NET_CLIENT_SIOBUF_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS((obj), NET_CLIENT_SIOBUF_TYPE, NetClientSioBufClass))
+G_DECLARE_FINAL_TYPE(NetClientSioBuf, net_client_siobuf, NET, CLIENT_SIOBUF, NetClient)
+
 
 #define NET_CLIENT_SIOBUF_ERROR_QUARK		(g_quark_from_static_string("net-client-siobuf"))
-
-
-typedef struct _NetClientSioBuf NetClientSioBuf;
-typedef struct _NetClientSioBufClass NetClientSioBufClass;
-typedef struct _NetClientSioBufPrivate NetClientSioBufPrivate;
-
-
-struct _NetClientSioBuf {
-    NetClient parent;
-    NetClientSioBufPrivate *priv;
-};
-
-
-struct _NetClientSioBufClass {
-	NetClientClass parent;
-};
-
-
-GType net_client_siobuf_get_type(void)
-	G_GNUC_CONST;
 
 
 /** @brief Create a new SIOBUF network client

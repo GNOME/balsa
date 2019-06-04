@@ -92,16 +92,6 @@ completion_data_extract(CompletionData * data)
     return data->string;
 }
 
-gint
-address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
-{
-    g_return_val_if_fail(a != NULL, -1);
-    g_return_val_if_fail(b != NULL, 1);
-
-    return g_ascii_strcasecmp(libbalsa_address_get_full_name(a),
-                              libbalsa_address_get_full_name(b));
-}
-
 /*
  * A LibBalsaCompletionStrncmpFunc for matching words instead of the
  * whole string.

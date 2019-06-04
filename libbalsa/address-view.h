@@ -26,30 +26,13 @@
 #include <gmime/gmime.h>
 
 G_BEGIN_DECLS
-#define LIBBALSA_TYPE_ADDRESS_VIEW                              \
-    (libbalsa_address_view_get_type())
-#define LIBBALSA_ADDRESS_VIEW(obj)                              \
-    (G_TYPE_CHECK_INSTANCE_CAST((obj),                          \
-                                LIBBALSA_TYPE_ADDRESS_VIEW,     \
-                                LibBalsaAddressView))
-#define LIBBALSA_ADDRESS_VIEW_CLASS(klass)                      \
-    (G_TYPE_CHECK_CLASS_CAST((klass),                           \
-                             LIBBALSA_TYPE_ADDRESS_VIEW,        \
-                             LibBalsaAddressViewClass))
-#define LIBBALSA_IS_ADDRESS_VIEW(obj)                           \
-    (G_TYPE_CHECK_INSTANCE_TYPE((obj),                          \
-                                LIBBALSA_TYPE_ADDRESS_VIEW))
-#define LIBBALSA_IS_ADDRESS_VIEW_CLASS(klass)                   \
-    (G_TYPE_CHECK_CLASS_TYPE((klass),                           \
-                             LIBBALSA_TYPE_ADDRESS_VIEW))
-#define LIBBALSA_ADDRESS_VIEW_GET_CLASS(obj)                    \
-    (G_TYPE_INSTANCE_GET_CLASS((obj),                           \
-                               LIBBALSA_TYPE_ADDRESS_VIEW,      \
-                               LibBalsaAddressViewClass))
-typedef struct _LibBalsaAddressView LibBalsaAddressView;
-typedef struct _LibBalsaAddressViewClass LibBalsaAddressViewClass;
+#define LIBBALSA_TYPE_ADDRESS_VIEW (libbalsa_address_view_get_type())
 
-GType libbalsa_address_view_get_type(void) G_GNUC_CONST;
+G_DECLARE_FINAL_TYPE(LibBalsaAddressView,
+                     libbalsa_address_view,
+                     LIBBALSA,
+                     ADDRESS_VIEW,
+                     GtkTreeView)
 
 LibBalsaAddressView *libbalsa_address_view_new(const gchar * const *types,
                                                guint n_types,

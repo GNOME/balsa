@@ -1,3 +1,11 @@
+2019-06-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use G_DECLARE_FINAL_TYPE to declare LibBalsaAddressView
+
+	The object was already private.
+
+	* libbalsa/address-view.h:
+
 2019-06-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use G_DECLARE_FINAL_TYPE to declare LibBalsaAddress

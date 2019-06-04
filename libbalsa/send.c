@@ -1482,7 +1482,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
 
 #ifdef ENABLE_AUTOCRYPT
     /* add Autocrypt header if requested */
-    if (!postponing && (message->ident != NULL) && (message->ident->autocrypt_mode != AUTOCRYPT_DISABLE) &&
+    if (!postponing && (message->ident != NULL) &&
+        (libbalsa_identity_get_autocrypt_mode(message->ident) != AUTOCRYPT_DISABLE) &&
     	!autocrypt_ignore(g_mime_object_get_content_type(mime_root))) {
     	tmp = autocrypt_header(message->ident, error);
     	if (tmp == NULL) {
@@ -1695,27 +1696,33 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage  *message,
  * "From:" address list to let GpeME automagically select the proper key.
  */
 static const gchar *
-lb_send_from(LibBalsaMessage  *message,
-			 gpgme_protocol_t  protocol)
+lb_send_from(LibBalsaMessage * message, gpgme_protocol_t protocol)
 {
-	const gchar *from_id;
+    const gchar *from_id;
+    const gchar *key_id;
 
-	if ((protocol == GPGME_PROTOCOL_OpenPGP) &&
-		(message->ident->force_gpg_key_id != NULL) &&
-		(message->ident->force_gpg_key_id[0] != '\0')) {
-		from_id = message->ident->force_gpg_key_id;
-	} else if ((protocol == GPGME_PROTOCOL_CMS) &&
-		(message->ident->force_smime_key_id != NULL) &&
-		(message->ident->force_smime_key_id[0] != '\0')) {
-		from_id = message->ident->force_smime_key_id;
-	} else {
-		InternetAddress *ia = internet_address_list_get_address(message->headers->from, 0);
+    if ((protocol == GPGME_PROTOCOL_OpenPGP) &&
+        ((key_id =
+          libbalsa_identity_get_force_gpg_key_id(message->ident)) != NULL)
+        && (key_id[0] != '\0')) {
+        from_id = key_id;
+    } else if ((protocol == GPGME_PROTOCOL_CMS) &&
+               ((key_id =
+                 libbalsa_identity_get_force_smime_key_id(message->
+                                                          ident)) != NULL)
+               && (key_id[0] != '\0')) {
+        from_id = key_id;
+    } else {
+        InternetAddress *ia =
+            internet_address_list_get_address(message->headers->from, 0);
 
-		while (INTERNET_ADDRESS_IS_GROUP(ia)) {
-			ia = internet_address_list_get_address(((InternetAddressGroup *) ia)->members, 0);
-		}
-		from_id = ((InternetAddressMailbox *) ia)->addr;
-	}
+        while (INTERNET_ADDRESS_IS_GROUP(ia)) {
+            ia = internet_address_list_get_address(((InternetAddressGroup
+                                                     *) ia)->members, 0);
+        }
+
+        from_id = ((InternetAddressMailbox *) ia)->addr;
+    }
 
     return from_id;
 }

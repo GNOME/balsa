@@ -1,5 +1,66 @@
 2019-06-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use G_DECLARE_FINAL_TYPE to declare LibBalsaIdentity
+
+	Make the structure private, and provide and use the necessary
+	getters and setters.
+
+	* libbalsa/autocrypt.c (autocrypt_header):
+	* libbalsa/autocrypt.h:
+	* libbalsa/identity.c (libbalsa_identity_finalize),
+	(libbalsa_identity_new_with_name), (libbalsa_identity_set_address),
+	(libbalsa_identity_set_domain), (libbalsa_identity_get_signature),
+	(libbalsa_identity_get_sig_prepend),
+	(libbalsa_identity_get_sig_whenreply),
+	(libbalsa_identity_get_sig_whenforward),
+	(libbalsa_identity_get_sig_sending),
+	(libbalsa_identity_get_send_mp_alternative),
+	(libbalsa_identity_get_request_mdn),
+	(libbalsa_identity_get_request_dsn),
+	(libbalsa_identity_get_warn_send_plain),
+	(libbalsa_identity_get_always_trust),
+	(libbalsa_identity_get_gpg_sign),
+	(libbalsa_identity_get_gpg_encrypt),
+	(libbalsa_identity_get_sig_executable),
+	(libbalsa_identity_get_sig_separator),
+	(libbalsa_identity_get_crypt_protocol),
+	(libbalsa_identity_get_identity_name),
+	(libbalsa_identity_get_force_gpg_key_id),
+	(libbalsa_identity_get_force_smime_key_id),
+	(libbalsa_identity_get_replyto), (libbalsa_identity_get_bcc),
+	(libbalsa_identity_get_reply_string),
+	(libbalsa_identity_get_forward_string),
+	(libbalsa_identity_get_domain), (libbalsa_identity_get_face_path),
+	(libbalsa_identity_get_x_face_path),
+	(libbalsa_identity_get_signature_path),
+	(libbalsa_identity_get_address),
+	(libbalsa_identity_get_smtp_server),
+	(libbalsa_identity_get_autocrypt_mode):
+	* libbalsa/identity.h:
+	* libbalsa/send.c (libbalsa_message_create_mime_message),
+	(lb_send_from):
+	* src/balsa-message.c (handle_mdn_request), (create_mdn_reply),
+	(mdn_dialog_response), (autocrypt_in_use):
+	* src/balsa-mime-widget-message.c (extbody_send_mail):
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget),
+	(vevent_reply):
+	* src/mailbox-conf.c (mailbox_conf_view_check):
+	* src/save-restore.c (config_identity_load),
+	(config_identities_save):
+	* src/sendmsg-window.c (replace_identity_signature),
+	(update_bsmsg_identity), (create_email_entry),
+	(sw_insert_sig_activated), (generate_forwarded_subject),
+	(bsmsg_set_subject_from_body), (set_identity_from_mailbox),
+	(guess_identity_from_list), (setup_headers_from_identity),
+	(sw_cc_add_list), (insert_initial_sig), (bsmsg2message),
+	(check_suggest_encryption), (check_autocrypt_recommendation),
+	(send_message_handler), (bsmsg_update_gpg_ui_on_ident_change),
+	(sendmsg_window_new), (sendmsg_window_compose),
+	(sendmsg_window_reply), (sendmsg_window_reply_embedded),
+	(sendmsg_window_forward):
+
+2019-06-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use G_DECLARE_FINAL_TYPE to declare LibBalsaCellRendererButton
 
 	The object was already private.

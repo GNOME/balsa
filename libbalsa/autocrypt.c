@@ -264,17 +264,25 @@ autocrypt_from_message(LibBalsaMessage  *message,
 
 /* documentation: see header file */
 gchar *
-autocrypt_header(const LibBalsaIdentity *identity, GError **error)
+autocrypt_header(LibBalsaIdentity *identity, GError **error)
 {
 	const gchar *mailbox;
 	gchar *use_fpr = NULL;
 	gchar *result = NULL;
+        InternetAddress *ia;
+        const gchar *force_gpg_key_id;
+        AutocryptMode autocrypt_mode;
 
-	g_return_val_if_fail((identity != NULL) && (identity->autocrypt_mode != AUTOCRYPT_DISABLE), NULL);
-	mailbox = internet_address_mailbox_get_addr(INTERNET_ADDRESS_MAILBOX(identity->ia));
+	g_return_val_if_fail(identity != NULL, NULL);
+	autocrypt_mode = libbalsa_identity_get_autocrypt_mode(identity);
+	g_return_val_if_fail(autocrypt_mode != AUTOCRYPT_DISABLE, NULL);
+
+	ia = libbalsa_identity_get_address(identity);
+	mailbox = internet_address_mailbox_get_addr(INTERNET_ADDRESS_MAILBOX(ia));
 
 	/* no key fingerprint has been passed - try to find the fingerprint of a secret key matching the passed mailbox */
-	if ((identity->force_gpg_key_id == NULL) || (identity->force_gpg_key_id[0] == '\0')) {
+        force_gpg_key_id = libbalsa_identity_get_force_gpg_key_id(identity);
+	if ((force_gpg_key_id == NULL) || (force_gpg_key_id[0] == '\0')) {
 		gpgme_ctx_t ctx;
 
 		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
@@ -300,7 +308,7 @@ autocrypt_header(const LibBalsaIdentity *identity, GError **error)
 			g_debug("found fingerprint %s for '%s'", use_fpr, mailbox);
 		}
 	} else {
-		use_fpr = g_strdup(identity->force_gpg_key_id);
+		use_fpr = g_strdup(force_gpg_key_id);
 	}
 
 	if (use_fpr != NULL) {
@@ -314,7 +322,7 @@ autocrypt_header(const LibBalsaIdentity *identity, GError **error)
 
 			buffer = g_string_new(NULL);
 			g_string_append_printf(buffer, "addr=%s;", mailbox);
-			if (identity->autocrypt_mode == AUTOCRYPT_PREFER_ENCRYPT) {
+			if (autocrypt_mode == AUTOCRYPT_PREFER_ENCRYPT) {
 				g_string_append(buffer, "prefer-encrypt=mutual;");
 			}
 			g_string_append_printf(buffer, "keydata=%s", keydata);

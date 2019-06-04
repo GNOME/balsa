@@ -88,7 +88,7 @@ void autocrypt_from_message(LibBalsaMessage  *message,
  * minimalistic, depending upon the export capabilities of the gpg backend being used.  It is an error to call this function if the
  * Autocrypt mode of the passed identity is AUTOCRYPT_DISABLE.
  */
-gchar *autocrypt_header(const LibBalsaIdentity  *identity,
+gchar *autocrypt_header(LibBalsaIdentity  *identity,
 						GError        		   **error)
 	G_GNUC_WARN_UNUSED_RESULT;
 

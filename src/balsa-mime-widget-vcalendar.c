@@ -195,7 +195,8 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 
                 for (list = balsa_app.identities; list; list = list->next) {
                     LibBalsaIdentity *ident = list->data;
-                    if (libbalsa_ia_rfc2821_equal(ident->ia, ia)) {
+                    if (libbalsa_ia_rfc2821_equal(libbalsa_identity_get_address(ident),
+                                                  ia)) {
                         vevent_ident = ident;
                         break;
                     }
@@ -281,12 +282,14 @@ vevent_reply(GObject * button, GtkWidget * box)
     GError *error = NULL;
     LibBalsaMsgCreateResult result;
     LibBalsaIdentity *ident;
+    InternetAddress *ia;
 
     g_return_if_fail(event != NULL);
     rcpt = (gchar *) g_object_get_data(G_OBJECT(event), "ev:sender");
     g_return_if_fail(rcpt != NULL);
     ident = g_object_get_data(G_OBJECT(event), "ev:ident");
     g_return_if_fail(ident != NULL);
+    ia = libbalsa_identity_get_address(ident);
 
     /* make the button box insensitive... */
     gtk_widget_set_sensitive(box, FALSE);
@@ -294,7 +297,7 @@ vevent_reply(GObject * button, GtkWidget * box)
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
     message->headers->from = internet_address_list_new();
-    internet_address_list_add(message->headers->from, ident->ia);
+    internet_address_list_add(message->headers->from, ia);
     message->headers->to_list = internet_address_list_parse_string(rcpt);
     message->headers->date = time(NULL);
 
@@ -309,7 +312,7 @@ vevent_reply(GObject * button, GtkWidget * box)
     body = libbalsa_message_body_new(message);
     body->buffer =
 	libbalsa_vevent_reply(event,
-			      INTERNET_ADDRESS_MAILBOX(ident->ia)->addr,
+			      INTERNET_ADDRESS_MAILBOX(ia)->addr,
 			      pstat);
     body->charset = g_strdup("utf-8");
     body->content_type = g_strdup("text/calendar");
@@ -324,7 +327,7 @@ vevent_reply(GObject * button, GtkWidget * box)
 
     result = libbalsa_message_send(message, balsa_app.outbox, NULL,
 				   balsa_find_sentbox_by_url,
-				   ident->smtp_server,
+				   libbalsa_identity_get_smtp_server(ident),
 				   balsa_app.send_progress_dialog,
                                    GTK_WINDOW(gtk_widget_get_toplevel
                                               ((GtkWidget *) button)),

@@ -269,9 +269,7 @@ gpe_read_attr(void *arg, int argc, char **argv, char **names)
 static gchar *
 create_name(const gchar * first, const gchar * last)
 {
-    if ((first == NULL) && (last == NULL))
-	return NULL;
-    else if (first == NULL)
+    if (first == NULL) /* or if both are NULL */
 	return g_strdup(last);
     else if (last == NULL)
 	return g_strdup(first);

@@ -564,9 +564,7 @@ lbabl_get_internet_address(GList *addrs, LDAP *dir, LDAPMessage * e)
 static gchar *
 create_name(gchar * first, gchar * last)
 {
-    if ((first == NULL) && (last == NULL))
-	return NULL;
-    else if (first == NULL)
+    if (first == NULL) /* or if both are NULL */
 	return g_strdup(last);
     else if (last == NULL)
 	return g_strdup(first);

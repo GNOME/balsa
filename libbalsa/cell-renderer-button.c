@@ -30,10 +30,14 @@ enum {
     LAST_SIGNAL
 };
 
-static guint cell_button_signals[LAST_SIGNAL] = { 0 };
+struct _LibBalsaCellRendererButton {
+    GtkCellRendererPixbuf parent;
+};
 
 G_DEFINE_TYPE(LibBalsaCellRendererButton, libbalsa_cell_renderer_button,
               GTK_TYPE_CELL_RENDERER_PIXBUF)
+
+static guint cell_button_signals[LAST_SIGNAL] = { 0 };
 
 static gboolean
 libbalsa_cell_renderer_button_activate(GtkCellRenderer    * cell,

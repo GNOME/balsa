@@ -183,6 +183,7 @@ struct lbe_load_data {
     LibBalsaAddressBookLoadFunc callback;
     gpointer closure;
 };
+
 static void
 lbe_load_cb(const gchar *email, const gchar *name, void *data)
 {
@@ -190,14 +191,13 @@ lbe_load_cb(const gchar *email, const gchar *name, void *data)
     LibBalsaAddress *address = libbalsa_address_new();
 
     /* The extern database doesn't support Id's, sorry! */
-    address->nick_name = g_strdup(_("No-Id"));
-    address->address_list = g_list_append(address->address_list,
-                                          g_strdup(email));
-    
-    if (name) address->full_name = g_strdup(name);
-    else address->full_name = g_strdup(_("No-Name"));
+    libbalsa_address_set_nick_name(address, _("No-Id"));
+    libbalsa_address_add_addr(address, email);
+    libbalsa_address_set_full_name(address, name != NULL ? name : _("No-Name"));
+
     d->callback(d->ab, address, d->closure);
-    g_object_unref(G_OBJECT(address));
+
+    g_object_unref(address);
 }
 
 static LibBalsaABErr
@@ -271,7 +271,7 @@ parse_externq_file(LibBalsaAddressBookExternq *ab_externq,
 
 static LibBalsaABErr
 libbalsa_address_book_externq_add_address(LibBalsaAddressBook * ab,
-                                         LibBalsaAddress * new_address)
+                                          LibBalsaAddress * new_address)
 {
     gchar command[LINE_LEN];
     LibBalsaAddressBookExternq *ab_externq;
@@ -280,15 +280,21 @@ libbalsa_address_book_externq_add_address(LibBalsaAddressBook * ab,
 
     ab_externq = LIBBALSA_ADDRESS_BOOK_EXTERNQ(ab);
     if (ab_externq->save != NULL) {
-        g_snprintf(command, sizeof(command), "%s \"%s\" \"%s\" \"%s\"", 
-                   ab_externq->save, 
-                   (gchar *)g_list_first(new_address->address_list)->data, 
-                   new_address->full_name, "TODO");
-        
-        if( (gc = popen(command, "r")) == NULL)
+        GList *addr_list;
+        const gchar *full_name;
+
+        addr_list = libbalsa_address_get_addr_list(new_address);
+        full_name = libbalsa_address_get_full_name(new_address);
+
+        g_snprintf(command, sizeof(command), "%s \"%s\" \"%s\" \"%s\"",
+                   ab_externq->save,
+                   (gchar *) addr_list->data,
+                   full_name, "TODO");
+        if ((gc = popen(command, "r")) == NULL)
             return LBABERR_CANNOT_WRITE;
-        if(fclose(gc) != 0) 
+        if (fclose(gc) != 0)
             return LBABERR_CANNOT_WRITE;
+
         return LBABERR_OK;
     } else return LBABERR_CANNOT_WRITE;
 }

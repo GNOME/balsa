@@ -113,8 +113,6 @@ const gchar* libbalsa_address_book_strerror(LibBalsaAddressBook * ab,
 */
 GList *libbalsa_address_book_alias_complete(LibBalsaAddressBook * ab,
 					    const gchar *prefix);
-gboolean libbalsa_address_is_dist_list(LibBalsaAddressBook *ab,
-				       LibBalsaAddress *address);
 
 /*
  * Getters

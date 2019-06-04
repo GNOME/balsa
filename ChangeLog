@@ -1,3 +1,72 @@
+2019-06-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use G_DECLARE_FINAL_TYPE to declare LibBalsaAddress
+
+	Make the structure private, and provide and use the necessary
+	getters and setters.
+
+	* libbalsa/abook-completion.c (address_compare):
+	* libbalsa/address-book-extern.c (lbe_load_cb),
+	(libbalsa_address_book_externq_add_address):
+	* libbalsa/address-book-gpe.c (gpe_read_attr), (create_name),
+	(gpe_read_address):
+	* libbalsa/address-book-ldap.c
+	(libbalsa_address_book_ldap_get_address),
+	(libbalsa_address_book_ldap_add_address),
+	(libbalsa_address_book_ldap_remove_address),
+	(libbalsa_address_book_ldap_modify_address):
+	* libbalsa/address-book-ldif.c (build_name), (address_new_prefill),
+	(lbab_ldif_write_dn), (lbab_ldif_write_addresses),
+	(lbab_ldif_write_surname), (lbab_ldif_write_givenname),
+	(lbab_ldif_write_nickname), (lbab_ldif_write_organization):
+	* libbalsa/address-book-osmo.c (utf8_lba_strstr),
+	(libbalsa_address_book_osmo_alias_complete), (osmo_read_addresses):
+	* libbalsa/address-book-rubrica.c
+	(libbalsa_address_book_rubrica_load),
+	(libbalsa_address_book_rubrica_add_address),
+	(libbalsa_address_book_rubrica_modify_address),
+	(lbab_rubrica_load_xml), (lbab_insert_address_node),
+	(extract_cards):
+	* libbalsa/address-book-text.c (lbab_text_item_compare),
+	(lbab_text_load_file), (libbalsa_address_book_text_load):
+	* libbalsa/address-book-vcard.c (lbab_vcard_write_fn),
+	(lbab_vcard_write_n), (lbab_vcard_write_nickname),
+	(lbab_vcard_write_org), (lbab_vcard_write_addresses),
+	(libbalsa_address_book_vcard_parse_address):
+	* libbalsa/address-book.c:
+	* libbalsa/address-book.h:
+	* libbalsa/address.c (libbalsa_address_class_init),
+	(libbalsa_address_init), (libbalsa_address_finalize),
+	(libbalsa_address_new_from_vcard), (libbalsa_address_set_copy),
+	(libbalsa_address_to_gchar), (lba_get_name_or_mailbox),
+	(libbalsa_address_get_name_from_list),
+	(libbalsa_address_get_mailbox_from_list),
+	(libbalsa_address_n_mailboxes_in_list),
+	(libbalsa_address_set_edit_entries), (lba_addr_list_widget),
+	(addrlist_drag_received_cb), (libbalsa_address_get_edit_widget),
+	(libbalsa_address_new_from_edit_entries),
+	(libbalsa_address_compare), (libbalsa_address_get_full_name),
+	(libbalsa_address_get_first_name),
+	(libbalsa_address_get_last_name), (libbalsa_address_get_nick_name),
+	(libbalsa_address_get_organization), (libbalsa_address_get_addr),
+	(libbalsa_address_get_addr_list), (libbalsa_address_set_full_name),
+	(libbalsa_address_set_first_name),
+	(libbalsa_address_set_last_name), (libbalsa_address_set_nick_name),
+	(libbalsa_address_set_organization),
+	(libbalsa_address_set_addr_list), (libbalsa_address_add_addr):
+	* libbalsa/address.h:
+	* libbalsa/rfc2445.c (libbalsa_vevent_reply),
+	(cal_address_2445_to_lbaddress):
+	* libbalsa/rfc6350.c (rfc6350_parse_from_stream),
+	(rfc6350_eval_line):
+	* src/ab-main.c (bab_load_cb):
+	* src/ab-window.c (balsa_ab_window_load_cb):
+	* src/balsa-mime-widget-text.c (bm_widget_new_vcard):
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget):
+	* src/balsa-print-object-text.c (balsa_print_object_text_vcard):
+	* src/store-address.c (store_address_add_address),
+	(store_address_add_lbaddress):
+
 2019-06-02  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	GMimeGpgmeSigstat: use G_DECLARE_FINAL_TYPE(), G_DEFINE_TYPE()

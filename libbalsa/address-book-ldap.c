@@ -432,7 +432,7 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
 				       LDAPMessage * e)
 {
     LibBalsaAddressBookLdap *ab_ldap;
-    GList *email = NULL;
+    gchar *email = NULL;
     gchar *cn = NULL, *org = NULL, *uid = NULL;
     gchar *first = NULL, *last = NULL;
     LibBalsaAddress *address = NULL;
@@ -448,20 +448,27 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
 	/*
 	 * For each attribute, get the attribute name and values.
 	 */
-	if ((vals=ldap_get_values_len(ab_ldap->directory, e, attr)) != NULL) {
+	if ((vals = ldap_get_values_len(ab_ldap->directory, e, attr)) != NULL) {
 	    for (i = 0; vals[i] != NULL; i++) {
-		if ((g_ascii_strcasecmp(attr, "sn") == 0) && (!last))
-		    last = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
-		if ((g_ascii_strcasecmp(attr, "cn") == 0) && (!cn))
-		    cn = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
-		if ((g_ascii_strcasecmp(attr, "givenName") == 0) && (!first))
-		    first = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
-		if ((g_ascii_strcasecmp(attr, "o") == 0) && (!org))
-		    org = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
-		if ((g_ascii_strcasecmp(attr, "uid") == 0) && (!uid))
-		    uid = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
-		if (g_ascii_strcasecmp(attr, "mail") == 0)
-		    email = g_list_prepend(email, g_strndup(vals[i]->bv_val, vals[i]->bv_len));
+		if (g_ascii_strcasecmp(attr, "sn") == 0) {
+                    if (last == NULL)
+                        last = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
+                } else if (g_ascii_strcasecmp(attr, "cn") == 0) {
+                    if (cn == NULL)
+                        cn = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
+                } else if (g_ascii_strcasecmp(attr, "givenName") == 0) {
+                    if (first == NULL)
+                        first = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
+                } else if (g_ascii_strcasecmp(attr, "o") == 0) {
+                    if (org == NULL)
+                        org = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
+                } else if (g_ascii_strcasecmp(attr, "uid") == 0) {
+                    if (uid == NULL)
+                        uid = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
+                } else if (g_ascii_strcasecmp(attr, "mail") == 0) {
+                    if (email == NULL)
+                        email = g_strndup(vals[i]->bv_val, vals[i]->bv_len);
+                }
 	    }
 	    ldap_value_free_len(vals);
 	}
@@ -470,22 +477,34 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
     /*
      * Record will have e-mail (searched)
      */
-    if(email == NULL) email = g_list_prepend(email, g_strdup("none"));
-    g_return_val_if_fail(email != NULL, NULL);
+    if (email == NULL)
+        email = g_strdup("none");
 
     address = libbalsa_address_new();
-    if (cn)
-	address->full_name = cn;
-    else {
-	address->full_name = create_name(first, last);
-        if(!address->full_name)
-            address->full_name = g_strdup(_("No-Name"));
+    if (cn != NULL) {
+        libbalsa_address_set_full_name(address, cn);
+        g_free(cn);
+    } else {
+        gchar *full_name = create_name(first, last);
+
+        if (full_name != NULL) {
+            libbalsa_address_set_full_name(address, full_name);
+            g_free(full_name);
+        } else {
+            libbalsa_address_set_full_name(address, _("No-Name"));
+        }
     }
-    address->first_name = first;
-    address->last_name = last;
-    address->nick_name = uid;
-    address->organization = org;
-    address->address_list = email;
+
+    libbalsa_address_set_first_name(address, first);
+    g_free(first);
+    libbalsa_address_set_last_name(address, last);
+    g_free(last);
+    libbalsa_address_set_nick_name(address, uid);
+    g_free(uid);
+    libbalsa_address_set_organization(address, org);
+    g_free(org);
+    libbalsa_address_add_addr(address, email);
+    g_free(email);
 
     return address;
 }
@@ -557,7 +576,7 @@ create_name(gchar * first, gchar * last)
 
 #define SETMOD(mods,modarr,op,attr,strv,val) \
    do { (mods) = &(modarr); (modarr).mod_type=attr; (modarr).mod_op=op;\
-        (strv)[0]=(val); (modarr).mod_values=strv; \
+        (strv)[0]=(char*)(val); (modarr).mod_values=strv; \
       } while(0)
 
 static LibBalsaABErr
@@ -576,9 +595,12 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
     char *sn[]   = {NULL, NULL};
     char *mail[] = {NULL, NULL};
     LibBalsaAddressBookLdap *ab_ldap = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
+    const gchar *addr;
+    const gchar *item;
 
-    g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
-    g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
+    g_return_val_if_fail(address != NULL, LBABERR_CANNOT_WRITE);
+    addr = libbalsa_address_get_addr(address);
+    g_return_val_if_fail(addr != NULL, LBABERR_CANNOT_WRITE);
 
     if (ab_ldap->directory == NULL) {
         if(libbalsa_address_book_ldap_open_connection(ab_ldap) != LDAP_SUCCESS)
@@ -592,7 +614,7 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
     }
 
     dn = g_strdup_printf("mail=%s,%s",
-                         (char*)address->address_list->data,
+                         addr,
                          ab_ldap->priv_book_dn);
     mods[0] = &modarr[0];
     modarr[0].mod_op = LDAP_MOD_ADD;
@@ -600,26 +622,31 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
     modarr[0].mod_values = object_class_values;
     cnt = 1;
 
-    if(address->full_name) {
-        SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"cn",cn,address->full_name);
+    item = libbalsa_address_get_full_name(address);
+    if (item != NULL) {
+        SETMOD(mods[cnt], modarr[cnt], LDAP_MOD_ADD, "cn", cn, item);
         cnt++;
     }
-    if(address->first_name) {
-        SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"givenName",gn,
-               address->first_name);
+
+    item = libbalsa_address_get_first_name(address);
+    if (item != NULL) {
+        SETMOD(mods[cnt], modarr[cnt], LDAP_MOD_ADD, "givenName", gn, item);
         cnt++;
     }
-    if(address->last_name) {
-        SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"sn",sn,address->last_name);
+
+    item = libbalsa_address_get_last_name(address);
+    if (item != NULL) {
+        SETMOD(mods[cnt], modarr[cnt], LDAP_MOD_ADD, "sn", sn, item);
         cnt++;
     }
-    if(address->organization) {
-        SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"o",org,
-               address->organization);
+
+    item = libbalsa_address_get_organization(address);
+    if (item != NULL) {
+        SETMOD(mods[cnt], modarr[cnt], LDAP_MOD_ADD, "o", org, item);
         cnt++;
     }
-    SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_ADD,"mail",mail,
-               (char*)address->address_list->data);
+
+    SETMOD(mods[cnt], modarr[cnt], LDAP_MOD_ADD, "mail", mail, addr);
     cnt++;
     mods[cnt] = NULL;
 
@@ -655,11 +682,13 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
                                           LibBalsaAddress *address)
 {
     LibBalsaAddressBookLdap *ab_ldap = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
+    const gchar *addr;
     gchar *dn;
     int cnt, rc;
 
-    g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
-    g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
+    g_return_val_if_fail(address != NULL, LBABERR_CANNOT_WRITE);
+    addr = libbalsa_address_get_addr(address);
+    g_return_val_if_fail(addr != NULL, LBABERR_CANNOT_WRITE);
 
     if (ab_ldap->directory == NULL) {
         if( (rc=libbalsa_address_book_ldap_open_connection(ab_ldap))
@@ -668,7 +697,7 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
     }
 
     dn = g_strdup_printf("mail=%s,%s",
-                         (char*)address->address_list->data,
+                         addr,
                          ab_ldap->priv_book_dn);
     cnt = 0;
     do {
@@ -712,75 +741,88 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
     char *org[]  = {NULL, NULL};
     char *sn[]   = {NULL, NULL};
     LibBalsaAddressBookLdap *ab_ldap = LIBBALSA_ADDRESS_BOOK_LDAP(ab);
+    const gchar *addr;
+    const gchar *new_addr;
+    const gchar *item;
+    const gchar *new_item;
 
-    g_return_val_if_fail(address, LBABERR_CANNOT_WRITE);
-    g_return_val_if_fail(address->address_list, LBABERR_CANNOT_WRITE);
-    g_return_val_if_fail(newval->address_list, LBABERR_CANNOT_WRITE);
+    g_return_val_if_fail(address != NULL, LBABERR_CANNOT_WRITE);
+    addr = libbalsa_address_get_addr(address);
+    g_return_val_if_fail(addr != NULL, LBABERR_CANNOT_WRITE);
 
-    if(!STREQ(address->address_list->data,newval->address_list->data)) {
+    g_return_val_if_fail(newval != NULL, LBABERR_CANNOT_WRITE);
+    new_addr = libbalsa_address_get_addr(newval);
+    g_return_val_if_fail(new_addr != NULL, LBABERR_CANNOT_WRITE);
+
+    if(!STREQ(addr, new_addr)) {
         /* email address has changed, we have to remove old entry and
          * add a new one. */
-        if( (rc=libbalsa_address_book_ldap_add_address(ab, newval)) 
+        if ((rc = libbalsa_address_book_ldap_add_address(ab, newval))
             != LBABERR_OK)
             return rc;
         return libbalsa_address_book_ldap_remove_address(ab, address);
     }
-    /* the email address has not changed, continue with changing other 
+
+    /* the email address has not changed, continue with changing other
      * attributes. */
     if (ab_ldap->directory == NULL) {
-        if( (rc=libbalsa_address_book_ldap_open_connection(ab_ldap))
+        if ((rc = libbalsa_address_book_ldap_open_connection(ab_ldap))
 	    != LDAP_SUCCESS)
 	    return LBABERR_CANNOT_CONNECT;
     }
 
     dn = g_strdup_printf("mail=%s,%s",
-                         (char*)address->address_list->data,
+                         addr,
                          ab_ldap->priv_book_dn);
     cnt = 0;
 
-    if(!STREQ(address->full_name,newval->full_name)) {
-        if(newval->full_name)
-            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"cn",cn,
-                   newval->full_name);
+    item = libbalsa_address_get_full_name(address);
+    new_item = libbalsa_address_get_full_name(newval);
+    if (!STREQ(item, new_item)) {
+        if (new_item != NULL)
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"cn",cn, new_item);
         else
-            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"cn",cn,
-                   address->full_name);
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"cn",cn, item);
         cnt++;
     }
-    if(!STREQ(address->first_name,newval->first_name)) {
-        if(newval->first_name)
-            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"givenName",gn,
-                   newval->first_name);
+
+    item = libbalsa_address_get_first_name(address);
+    new_item = libbalsa_address_get_first_name(newval);
+    if (!STREQ(item, new_item)) {
+        if (new_item != NULL)
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"givenName",gn, new_item);
         else
-            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"givenName",gn,
-                   address->first_name);
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"givenName",gn, item);
         cnt++;
     }
-    if(!STREQ(address->last_name,newval->last_name)) {
-        if(newval->last_name)
-            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"sn",sn,
-                   newval->last_name);
+
+    item = libbalsa_address_get_last_name(address);
+    new_item = libbalsa_address_get_last_name(newval);
+    if (!STREQ(item, new_item)) {
+        if (new_item != NULL)
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"sn",sn, new_item);
         else
-            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"sn",sn,
-                   address->last_name);
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"sn",sn, item);
         cnt++;
     }
-    if(!STREQ(address->organization,newval->organization)) {
-        if(newval->organization)
-            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"o",
-                   org, newval->organization);
+
+    item = libbalsa_address_get_organization(address);
+    new_item = libbalsa_address_get_organization(newval);
+    if (!STREQ(item, new_item)) {
+        if (new_item != NULL)
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_REPLACE,"o", org, new_item);
         else
-            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"o",
-                   org, address->organization);
+            SETMOD(mods[cnt],modarr[cnt],LDAP_MOD_DELETE,"o", org, item);
         cnt++;
     }
     mods[cnt] = NULL;
 
-    if(cnt == 0) {
+    if (cnt == 0) {
         /* nothing to modify */
         g_free(dn);
         return LBABERR_OK;
     }
+
     cnt = 0;
     do {
         rc = ldap_modify_ext_s(ab_ldap->directory, dn, mods, NULL, NULL);

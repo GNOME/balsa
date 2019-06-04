@@ -117,7 +117,7 @@ balsa_ab_window_new(gboolean composing, GtkWindow* parent)
     GtkWidget *ret;
     BalsaAbWindow *ab;
     gint use_headerbar = 1;
-	const gchar *dialog_env;
+    const gchar *dialog_env;
 
     /* header bar configuration */
 	dialog_env = g_getenv("BALSA_DIALOG_HEADERBAR");
@@ -751,23 +751,28 @@ balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab,
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
-    GList *address_list;
+    GList *addr_list;
     gint count;
+    const gchar *full_name;
 
-    g_return_if_fail ( BALSA_IS_AB_WINDOW(ab));
-    g_return_if_fail ( LIBBALSA_IS_ADDRESS_BOOK(libbalsa_ab) );
+    g_return_if_fail(BALSA_IS_AB_WINDOW(ab));
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(libbalsa_ab));
 
-    if ( address == NULL )
+    if (address == NULL)
 	return;
 
+    full_name = libbalsa_address_get_full_name(address);
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(ab->address_list));
-    if ( libbalsa_address_is_dist_list(libbalsa_ab, address) ) {
+
+    addr_list = libbalsa_address_get_addr_list(address);
+    if (libbalsa_address_book_get_dist_list_mode(libbalsa_ab)
+        && addr_list != NULL && addr_list->next != NULL) {
         gchar *address_string = libbalsa_address_to_gchar(address, -1);
 
         gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
         /* GtkListStore refs address, and unrefs it when cleared  */
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                           LIST_COLUMN_NAME, address->full_name,
+                           LIST_COLUMN_NAME, full_name,
                            LIST_COLUMN_ADDRESS_STRING, address_string,
                            LIST_COLUMN_ADDRESS, address,
                            LIST_COLUMN_WHICH, -1,
@@ -775,23 +780,20 @@ balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab,
 
 	g_free(address_string);
     } else {
-	address_list = address->address_list;
-	count = 0;
-	while ( address_list ) {
+	for (count = 0, addr_list = libbalsa_address_get_addr_list(address);
+             addr_list != NULL;
+             ++count, addr_list = addr_list->next) {
             gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
             /* GtkListStore refs address once for each address in
              * the list, and unrefs it the same number of times when
              * cleared */
             gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-                               LIST_COLUMN_NAME, address->full_name,
+                               LIST_COLUMN_NAME, full_name,
                                LIST_COLUMN_ADDRESS_STRING,
-                               address_list->data,
+                               addr_list->data,
                                LIST_COLUMN_ADDRESS, address,
                                LIST_COLUMN_WHICH, count,
                                -1);
-
-	    address_list = g_list_next(address_list);
-	    count++;
 	}
     }
 }

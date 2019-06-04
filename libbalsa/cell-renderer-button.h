@@ -26,42 +26,16 @@
 
 
 G_BEGIN_DECLS
-#define LIBBALSA_TYPE_CELL_RENDERER_BUTTON                              \
-    (libbalsa_cell_renderer_button_get_type())
-#define LIBBALSA_CELL_RENDERER_BUTTON(obj)                              \
-    (G_TYPE_CHECK_INSTANCE_CAST((obj),                                  \
-                                LIBBALSA_TYPE_CELL_RENDERER_BUTTON,     \
-                                LibBalsaCellRendererButton))
-#define LIBBALSA_CELL_RENDERER_BUTTON_CLASS(klass)                      \
-    (G_TYPE_CHECK_CLASS_CAST((klass),                                   \
-                             LIBBALSA_TYPE_CELL_RENDERER_BUTTON,        \
-                             LibBalsaCellRendererButtonClass))
-#define LIBBALSA_IS_CELL_RENDERER_BUTTON(obj)                           \
-    (G_TYPE_CHECK_INSTANCE_TYPE((obj),                                  \
-                                LIBBALSA_TYPE_CELL_RENDERER_BUTTON))
-#define LIBBALSA_IS_CELL_RENDERER_BUTTON_CLASS(klass)                   \
-    (G_TYPE_CHECK_CLASS_TYPE((klass),                                   \
-                             LIBBALSA_TYPE_CELL_RENDERER_BUTTON))
-#define LIBBALSA_CELL_RENDERER_BUTTON_GET_CLASS(obj)                    \
-    (G_TYPE_INSTANCE_GET_CLASS((obj),                                   \
-                               LIBBALSA_TYPE_CELL_RENDERER_BUTTON,      \
-                               LibBalsaCellRendererButtonClass))
 
-typedef struct _LibBalsaCellRendererButton LibBalsaCellRendererButton;
-typedef struct _LibBalsaCellRendererButtonClass
-    LibBalsaCellRendererButtonClass;
+#define LIBBALSA_TYPE_CELL_RENDERER_BUTTON (libbalsa_cell_renderer_button_get_type())
 
-struct _LibBalsaCellRendererButton {
-    GtkCellRendererPixbuf parent;
-};
+G_DECLARE_FINAL_TYPE(LibBalsaCellRendererButton,
+                     libbalsa_cell_renderer_button,
+                     LIBBALSA,
+                     CELL_RENDERER_BUTTON,
+                     GtkCellRendererPixbuf)
 
-struct _LibBalsaCellRendererButtonClass {
-    GtkCellRendererPixbufClass parent_class;
-};
-
-GType            libbalsa_cell_renderer_button_get_type(void) G_GNUC_CONST;
 GtkCellRenderer *libbalsa_cell_renderer_button_new(void);
-
 
 G_END_DECLS
 #endif                          /* __LIBBALSA_CELL_RENDERER_BUTTON_H__ */

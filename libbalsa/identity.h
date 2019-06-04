@@ -71,9 +71,6 @@ GtkWidget * libbalsa_identity_combo_box(GList       * identities,
                                         GCallback     changed_cb,
                                         gpointer      changed_data);
 
-LibBalsaIdentity* libbalsa_identity_new_config(const gchar* name);
-void libbalsa_identity_save(LibBalsaIdentity* id, const gchar* prefix);
-
 /*
  * Getters
  */

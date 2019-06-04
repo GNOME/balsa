@@ -1,5 +1,17 @@
 2019-06-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Remove redundant declarations
+
+	and rename libbalsa_identity_new_config() to
+	libbalsa_identity_new_from_config().
+
+	* libbalsa/identity.c (libbalsa_identity_new_from_config):
+	* libbalsa/identity.h:
+	* src/save-restore.c (config_identity_load),
+	(config_identities_load):
+
+2019-06-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use G_DECLARE_FINAL_TYPE to declare LibBalsaIdentity
 
 	Make the structure private, and provide and use the necessary

@@ -88,8 +88,6 @@ struct _LibBalsaIdentity {
 };
 
 /* Forward references. */
-static void libbalsa_identity_class_init(LibBalsaIdentityClass* klass);
-static void libbalsa_identity_init(LibBalsaIdentity* ident);
 static void libbalsa_identity_finalize(GObject* object);
 
 G_DEFINE_TYPE(LibBalsaIdentity, libbalsa_identity, G_TYPE_OBJECT)
@@ -1879,12 +1877,12 @@ display_frame_set_path(GObject * dialog,
 }
 
 
-/* libbalsa_identity_new_config:
+/* libbalsa_identity_new_from_config:
    factory-type method creating new Identity object from given
    configuration data.
 */
 LibBalsaIdentity*
-libbalsa_identity_new_config(const gchar* name)
+libbalsa_identity_new_from_config(const gchar* name)
 {
     LibBalsaIdentity* ident;
     gchar *fname, *email;

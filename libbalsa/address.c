@@ -478,7 +478,9 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
 
                 g_free(name);
                 g_free(last_name);
+                last_name = NULL;
                 g_free(first_name);
+                first_name = NULL;
                 name = libbalsa_address_extract_name(line + 2,
                                                      &last_name, &first_name);
                 name = validate_vcard_string(name, charset);

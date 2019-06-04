@@ -44,10 +44,9 @@ completion_data_new(InternetAddress * ia, const gchar * nick_name)
 #endif
     CompletionData *ret;
 
-    ret = g_new0(CompletionData, 1);
+    ret = g_new(CompletionData, 1);
 
-    g_object_ref(ia);
-    ret->ia = ia;
+    ret->ia = g_object_ref(ia);
 
     string = g_string_new(nick_name);
     if (string->len > 0)

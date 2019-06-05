@@ -392,12 +392,16 @@ libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook * ab,
 const gchar *
 libbalsa_address_book_externq_get_load(LibBalsaAddressBookExternq * ab_externq)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_EXTERNQ(ab_externq), NULL);
+
     return ab_externq->load;
 }
 
 const gchar *
 libbalsa_address_book_externq_get_save(LibBalsaAddressBookExternq * ab_externq)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_EXTERNQ(ab_externq), NULL);
+
     return ab_externq->save;
 }
 
@@ -407,16 +411,20 @@ libbalsa_address_book_externq_get_save(LibBalsaAddressBookExternq * ab_externq)
 
 void
 libbalsa_address_book_externq_set_load(LibBalsaAddressBookExternq * ab_externq,
-                                      const gchar               * load)
+                                       const gchar                * load)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_EXTERNQ(ab_externq));
+
     g_free(ab_externq->load);
     ab_externq->load = g_strdup(load);
 }
 
 void
 libbalsa_address_book_externq_set_save(LibBalsaAddressBookExternq * ab_externq,
-                                      const gchar               * save)
+                                       const gchar                * save)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_EXTERNQ(ab_externq));
+
     g_free(ab_externq->save);
     ab_externq->save = g_strdup(save);
 }

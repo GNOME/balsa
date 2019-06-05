@@ -173,12 +173,9 @@ libbalsa_address_book_rubrica_load(LibBalsaAddressBook * ab,
     LibBalsaAddressBookRubrica *ab_rubrica =
 	LIBBALSA_ADDRESS_BOOK_RUBRICA(ab);
     LibBalsaAddressBookText *ab_text = LIBBALSA_ADDRESS_BOOK_TEXT(ab);
-    const gchar *path = libbalsa_address_book_text_get_path(ab_text);
     LibBalsaABErr load_res;
     gchar *filter_hi = NULL;
     GSList *list;
-
-    g_return_val_if_fail(path != NULL, LBABERR_CANNOT_READ);
 
     /* try to load the xml file if necessary */
     load_res = lbab_rubrica_load_xml(ab_rubrica, NULL);
@@ -715,8 +712,6 @@ extract_net(xmlNodePtr entry, GList ** mail_addrs)
 static gchar *
 xml_node_get_text(xmlNodePtr node)
 {
-    g_return_val_if_fail(node != NULL, NULL);
-
     if ((node = node->children) != NULL && node->type == XML_TEXT_NODE)
 	return g_strdup((const gchar *) node->content);
     else
@@ -728,8 +723,6 @@ static gchar *
 xml_node_get_attr(xmlNodePtr node, const xmlChar * attname)
 {
     xmlAttrPtr props;
-
-    g_return_val_if_fail(node != NULL, NULL);
 
     for (props = node->properties; props != NULL; props = props->next) {
 	if (props->type == XML_ATTRIBUTE_NODE

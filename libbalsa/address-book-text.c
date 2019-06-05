@@ -793,7 +793,7 @@ libbalsa_address_book_text_get_name_complete(LibBalsaAddressBookText * ab_text)
     LibBalsaAddressBookTextPrivate *priv =
         libbalsa_address_book_text_get_instance_private(ab_text);
 
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_TEXT(ab_text), 0);
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_TEXT(ab_text), NULL);
 
     return priv->name_complete;
 }

@@ -1064,36 +1064,48 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 const gchar *
 libbalsa_address_book_ldap_get_host(LibBalsaAddressBookLdap * ab_ldap)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap), NULL);
+
     return ab_ldap->host;
 }
 
 const gchar *
 libbalsa_address_book_ldap_get_base_dn(LibBalsaAddressBookLdap * ab_ldap)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap), NULL);
+
     return ab_ldap->base_dn;
 }
 
 const gchar *
 libbalsa_address_book_ldap_get_bind_dn(LibBalsaAddressBookLdap * ab_ldap)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap), NULL);
+
     return ab_ldap->bind_dn;
 }
 
 const gchar *
 libbalsa_address_book_ldap_get_passwd(LibBalsaAddressBookLdap * ab_ldap)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap), NULL);
+
     return ab_ldap->passwd;
 }
 
 const gchar *
 libbalsa_address_book_ldap_get_book_dn(LibBalsaAddressBookLdap * ab_ldap)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap), NULL);
+
     return ab_ldap->priv_book_dn;
 }
 
 gboolean
 libbalsa_address_book_ldap_get_enable_tls(LibBalsaAddressBookLdap * ab_ldap)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap), FALSE);
+
     return ab_ldap->enable_tls;
 }
 
@@ -1105,6 +1117,8 @@ void
 libbalsa_address_book_ldap_set_host(LibBalsaAddressBookLdap * ab_ldap,
                                     const gchar             * host)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap));
+
     g_free(ab_ldap->host);
     ab_ldap->host = g_strdup(host);
 }
@@ -1113,6 +1127,8 @@ void
 libbalsa_address_book_ldap_set_base_dn(LibBalsaAddressBookLdap * ab_ldap,
                                        const gchar             * base_dn)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap));
+
     g_free(ab_ldap->base_dn);
     ab_ldap->base_dn = g_strdup(base_dn);
 }
@@ -1121,6 +1137,8 @@ void
 libbalsa_address_book_ldap_set_bind_dn(LibBalsaAddressBookLdap * ab_ldap,
                                        const gchar             * bind_dn)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap));
+
     g_free(ab_ldap->bind_dn);
     ab_ldap->bind_dn = g_strdup(bind_dn);
 }
@@ -1129,6 +1147,8 @@ void
 libbalsa_address_book_ldap_set_passwd(LibBalsaAddressBookLdap * ab_ldap,
                                       const gchar             * passwd)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap));
+
     g_free(ab_ldap->passwd);
     ab_ldap->passwd = g_strdup(passwd);
 }
@@ -1137,6 +1157,8 @@ void
 libbalsa_address_book_ldap_set_book_dn(LibBalsaAddressBookLdap * ab_ldap,
                                        const gchar             * book_dn)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap));
+
     g_free(ab_ldap->priv_book_dn);
     ab_ldap->priv_book_dn = g_strdup(book_dn);
 }
@@ -1145,7 +1167,9 @@ void
 libbalsa_address_book_ldap_set_enable_tls(LibBalsaAddressBookLdap * ab_ldap,
                                           gboolean                  enable_tls)
 {
-    ab_ldap->enable_tls = enable_tls;
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab_ldap));
+
+    ab_ldap->enable_tls = !!enable_tls;
 }
 
 #endif				/*LDAP_ENABLED */

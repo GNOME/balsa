@@ -386,7 +386,7 @@ libbalsa_address_book_set_is_expensive(LibBalsaAddressBook *ab, gboolean is_expe
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
-    priv->is_expensive = is_expensive;
+    priv->is_expensive = !!is_expensive;
 }
 
 void
@@ -396,7 +396,7 @@ libbalsa_address_book_set_expand_aliases(LibBalsaAddressBook *ab, gboolean expan
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
-    priv->expand_aliases = expand_aliases;
+    priv->expand_aliases = !!expand_aliases;
 }
 
 void
@@ -406,6 +406,5 @@ libbalsa_address_book_set_dist_list_mode(LibBalsaAddressBook *ab, gboolean dist_
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab));
 
-    priv->dist_list_mode = dist_list_mode;
+    priv->dist_list_mode = !!dist_list_mode;
 }
-

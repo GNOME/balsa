@@ -1273,19 +1273,25 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
 }
 
 void
-libbalsa_address_view_set_book_icon(GdkPixbuf * book_icon)
+libbalsa_address_view_set_book_icon(GdkPixbuf * icon)
 {
-    lbav_book_icon = book_icon;
+    g_return_if_fail(GDK_IS_PIXBUF(icon));
+
+    lbav_book_icon = icon;
 }
 
 void
-libbalsa_address_view_set_close_icon(GdkPixbuf * close_icon)
+libbalsa_address_view_set_close_icon(GdkPixbuf * icon)
 {
-    lbav_close_icon = close_icon;
+    g_return_if_fail(GDK_IS_PIXBUF(icon));
+
+    lbav_close_icon = icon;
 }
 
 void
-libbalsa_address_view_set_drop_down_icon(GdkPixbuf * drop_down_icon)
+libbalsa_address_view_set_drop_down_icon(GdkPixbuf * icon)
 {
-    lbav_drop_down_icon = drop_down_icon;
+    g_return_if_fail(GDK_IS_PIXBUF(icon));
+
+    lbav_drop_down_icon = icon;
 }

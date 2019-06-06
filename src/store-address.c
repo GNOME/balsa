@@ -60,7 +60,7 @@ static void store_address_add_address(StoreAddressInfo * info,
                                       InternetAddress * address,
                                       InternetAddress * group);
 static void store_address_add_lbaddress(StoreAddressInfo * info,
-                                        const LibBalsaAddress *address);
+                                        LibBalsaAddress *address);
 static void store_address_add_list(StoreAddressInfo * info,
                                    const gchar * label,
 				   InternetAddressList * list);
@@ -120,7 +120,7 @@ balsa_store_address_from_messages(GList * messages)
 }
 
 void
-balsa_store_address(const LibBalsaAddress *address)
+balsa_store_address(LibBalsaAddress *address)
 {
     StoreAddressInfo *info = NULL;
 
@@ -411,7 +411,7 @@ store_address_add_address(StoreAddressInfo * info,
 
 static void
 store_address_add_lbaddress(StoreAddressInfo * info,
-                            const LibBalsaAddress *address)
+                            LibBalsaAddress *address)
 {
     gchar *label_text;
     GtkWidget **entries, *ew;

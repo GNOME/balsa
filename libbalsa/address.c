@@ -1107,7 +1107,7 @@ libbalsa_address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
  */
 
 const gchar *
-libbalsa_address_get_full_name(const LibBalsaAddress * address)
+libbalsa_address_get_full_name(LibBalsaAddress * address)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
@@ -1115,7 +1115,7 @@ libbalsa_address_get_full_name(const LibBalsaAddress * address)
 }
 
 const gchar *
-libbalsa_address_get_first_name(const LibBalsaAddress * address)
+libbalsa_address_get_first_name(LibBalsaAddress * address)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
@@ -1123,7 +1123,7 @@ libbalsa_address_get_first_name(const LibBalsaAddress * address)
 }
 
 const gchar *
-libbalsa_address_get_last_name(const LibBalsaAddress * address)
+libbalsa_address_get_last_name(LibBalsaAddress * address)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
@@ -1131,7 +1131,7 @@ libbalsa_address_get_last_name(const LibBalsaAddress * address)
 }
 
 const gchar *
-libbalsa_address_get_nick_name(const LibBalsaAddress * address)
+libbalsa_address_get_nick_name(LibBalsaAddress * address)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
@@ -1139,7 +1139,7 @@ libbalsa_address_get_nick_name(const LibBalsaAddress * address)
 }
 
 const gchar *
-libbalsa_address_get_organization(const LibBalsaAddress * address)
+libbalsa_address_get_organization(LibBalsaAddress * address)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
@@ -1147,7 +1147,7 @@ libbalsa_address_get_organization(const LibBalsaAddress * address)
 }
 
 const gchar *
-libbalsa_address_get_addr(const LibBalsaAddress * address)
+libbalsa_address_get_addr(LibBalsaAddress * address)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
@@ -1155,7 +1155,7 @@ libbalsa_address_get_addr(const LibBalsaAddress * address)
 }
 
 GList *
-libbalsa_address_get_addr_list(const LibBalsaAddress * address)
+libbalsa_address_get_addr_list(LibBalsaAddress * address)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 

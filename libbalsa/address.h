@@ -95,13 +95,13 @@ gint libbalsa_address_compare(LibBalsaAddress *a,
  * Getters
  */
 
-const gchar * libbalsa_address_get_full_name   (const LibBalsaAddress * address);
-const gchar * libbalsa_address_get_first_name  (const LibBalsaAddress * address);
-const gchar * libbalsa_address_get_last_name   (const LibBalsaAddress * address);
-const gchar * libbalsa_address_get_nick_name   (const LibBalsaAddress * address);
-const gchar * libbalsa_address_get_organization(const LibBalsaAddress * address);
-const gchar * libbalsa_address_get_addr        (const LibBalsaAddress * address);
-GList       * libbalsa_address_get_addr_list   (const LibBalsaAddress * address);
+const gchar * libbalsa_address_get_full_name   (LibBalsaAddress * address);
+const gchar * libbalsa_address_get_first_name  (LibBalsaAddress * address);
+const gchar * libbalsa_address_get_last_name   (LibBalsaAddress * address);
+const gchar * libbalsa_address_get_nick_name   (LibBalsaAddress * address);
+const gchar * libbalsa_address_get_organization(LibBalsaAddress * address);
+const gchar * libbalsa_address_get_addr        (LibBalsaAddress * address);
+GList       * libbalsa_address_get_addr_list   (LibBalsaAddress * address);
 
 /*
  * Setters

@@ -68,7 +68,7 @@ libbalsa_address_book_rubrica_modify_address(LibBalsaAddressBook * ab,
 
 static LibBalsaABErr lbab_rubrica_load_xml(LibBalsaAddressBookRubrica *
 					   ab_rubrica, xmlDocPtr * docptr);
-static void lbab_insert_address_node(const LibBalsaAddress * address,
+static void lbab_insert_address_node(LibBalsaAddress * address,
 				     xmlNodePtr parent);
 static gboolean lbab_rubrica_starts_from(const gchar * str,
 					 const gchar * filter_hi);
@@ -500,7 +500,7 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
 }
 
 static void
-lbab_insert_address_node(const LibBalsaAddress * address,
+lbab_insert_address_node(LibBalsaAddress * address,
 			 xmlNodePtr parent)
 {
     xmlNodePtr new_addr;

@@ -296,7 +296,8 @@ void
 libbalsa_completion_set_compare(LibBalsaCompletion          * cmp,
                                 LibBalsaCompletionStrncmpFunc strncmp_func)
 {
+    g_return_if_fail(cmp != NULL);
+    g_return_if_fail(strncmp_func != NULL);
+
     cmp->strncmp_func = strncmp_func;
 }
-
-#define __G_COMPLETION_C__

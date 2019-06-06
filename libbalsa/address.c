@@ -528,6 +528,9 @@ libbalsa_address_set_copy(LibBalsaAddress * dest, LibBalsaAddress * src)
 {
     GList *src_al, *dst_al;
 
+    g_return_if_fail(LIBBALSA_IS_ADDRESS(dest));
+    g_return_if_fail(LIBBALSA_IS_ADDRESS(src));
+
     if (dest == src)            /* safety check */
         return;
 
@@ -652,6 +655,8 @@ lba_get_name_or_mailbox(InternetAddressList * addr_list,
 const gchar *
 libbalsa_address_get_name_from_list(InternetAddressList *addr_list)
 {
+    g_return_val_if_fail(IS_INTERNET_ADDRESS_LIST(addr_list), NULL);
+
     return lba_get_name_or_mailbox(addr_list, TRUE, FALSE);
 }
 
@@ -659,6 +664,8 @@ libbalsa_address_get_name_from_list(InternetAddressList *addr_list)
 const gchar *
 libbalsa_address_get_mailbox_from_list(InternetAddressList *addr_list)
 {
+    g_return_val_if_fail(IS_INTERNET_ADDRESS_LIST(addr_list), NULL);
+
     return lba_get_name_or_mailbox(addr_list, FALSE, FALSE);
 }
 
@@ -694,7 +701,7 @@ libbalsa_address_n_mailboxes_in_list(InternetAddressList * addr_list)
     in entries with values from address
 */
 void
-libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
+libbalsa_address_set_edit_entries(LibBalsaAddress * address,
                                   GtkWidget **entries)
 {
     gchar *new_name = NULL;
@@ -706,6 +713,8 @@ libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
     gint cnt;
     GtkListStore *store;
     GtkTreeIter iter;
+
+    g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
 
     new_email = g_strdup(address
                          && address->addr_list
@@ -947,7 +956,7 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
 
 
 GtkWidget*
-libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
+libbalsa_address_get_edit_widget(LibBalsaAddress *address,
                                  GtkWidget **entries,
                                  GCallback changed_cb, gpointer changed_data)
 {
@@ -962,6 +971,8 @@ libbalsa_address_get_edit_widget(const LibBalsaAddress *address,
 
     GtkWidget *grid, *label, *lhs;
     gint cnt;
+
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
     grid = gtk_grid_new();
 #define HIG_PADDING 6
@@ -1085,8 +1096,8 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
 gint
 libbalsa_address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
 {
-    g_return_val_if_fail(a != NULL, -1);
-    g_return_val_if_fail(b != NULL, 1);
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(a), -1);
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(b), +1);
 
     return g_ascii_strcasecmp(a->full_name, b->full_name);
 }
@@ -1098,42 +1109,56 @@ libbalsa_address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
 const gchar *
 libbalsa_address_get_full_name(const LibBalsaAddress * address)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
     return address->full_name;
 }
 
 const gchar *
 libbalsa_address_get_first_name(const LibBalsaAddress * address)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
     return address->first_name;
 }
 
 const gchar *
 libbalsa_address_get_last_name(const LibBalsaAddress * address)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
     return address->last_name;
 }
 
 const gchar *
 libbalsa_address_get_nick_name(const LibBalsaAddress * address)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
     return address->nick_name;
 }
 
 const gchar *
 libbalsa_address_get_organization(const LibBalsaAddress * address)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
     return address->organization;
 }
 
 const gchar *
 libbalsa_address_get_addr(const LibBalsaAddress * address)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
     return address->addr_list != NULL ? address->addr_list->data : NULL;
 }
 
 GList *
 libbalsa_address_get_addr_list(const LibBalsaAddress * address)
 {
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
     return address->addr_list;
 }
 
@@ -1145,6 +1170,8 @@ void
 libbalsa_address_set_full_name(LibBalsaAddress * address,
                                const gchar     * full_name)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
+
     g_free(address->full_name);
     address->full_name = g_strdup(full_name);
 }
@@ -1153,6 +1180,8 @@ void
 libbalsa_address_set_first_name(LibBalsaAddress * address,
                                 const gchar     * first_name)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
+
     g_free(address->first_name);
     address->first_name = g_strdup(first_name);
 }
@@ -1161,6 +1190,8 @@ void
 libbalsa_address_set_last_name(LibBalsaAddress * address,
                                const gchar     * last_name)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
+
     g_free(address->last_name);
     address->last_name = g_strdup(last_name);
 }
@@ -1169,6 +1200,8 @@ void
 libbalsa_address_set_nick_name(LibBalsaAddress * address,
                                const gchar     * nick_name)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
+
     g_free(address->nick_name);
     address->nick_name = g_strdup(nick_name);
 }
@@ -1177,6 +1210,8 @@ void
 libbalsa_address_set_organization(LibBalsaAddress * address,
                                   const gchar     * organization)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
+
     g_free(address->organization);
     address->organization = g_strdup(organization);
 }
@@ -1185,12 +1220,17 @@ void
 libbalsa_address_set_addr_list(LibBalsaAddress * address,
                                GList           * addr_list)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
+
     g_list_free_full(address->addr_list, g_free);
     address->addr_list = addr_list;
 }
 
-void libbalsa_address_add_addr(LibBalsaAddress * address,
-                               const gchar     * addr)
+void
+libbalsa_address_add_addr(LibBalsaAddress * address,
+                          const gchar     * addr)
 {
+    g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
+
     address->addr_list = g_list_prepend(address->addr_list, g_strdup(addr));
 }

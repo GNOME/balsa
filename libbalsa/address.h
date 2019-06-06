@@ -63,7 +63,7 @@ gint libbalsa_address_n_mailboxes_in_list(InternetAddressList *
 /** libbalsa_address_set_edit_entries() initializes the GtkEntry widgets
     in entries with values from address
 */
-void libbalsa_address_set_edit_entries(const LibBalsaAddress * address,
+void libbalsa_address_set_edit_entries(LibBalsaAddress * address,
                                        GtkWidget ** entries);
 /** libbalsa_address_get_edit_widget() returns an widget adapted for a
     LibBalsaAddress edition, with initial values set if address is
@@ -79,7 +79,7 @@ enum {
 
 extern GtkTargetEntry libbalsa_address_target_list[2];
 
-GtkWidget *libbalsa_address_get_edit_widget(const LibBalsaAddress *addr,
+GtkWidget *libbalsa_address_get_edit_widget(LibBalsaAddress *addr,
                                             GtkWidget **entries,
                                             GCallback changed_cb,
                                             gpointer changed_data);

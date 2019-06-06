@@ -42,12 +42,6 @@
  * The class.
  */
 
-static GObjectClass* parent_class;
-
-struct _LibBalsaIdentityClass {
-    GObjectClass parent_class;
-};
-
 struct _LibBalsaIdentity {
     GObject object;
 
@@ -96,8 +90,6 @@ static void
 libbalsa_identity_class_init(LibBalsaIdentityClass* klass)
 {
     GObjectClass* object_class;
-
-    parent_class = g_type_class_peek_parent(klass);
 
     object_class = G_OBJECT_CLASS(klass);
     object_class->finalize = libbalsa_identity_finalize;

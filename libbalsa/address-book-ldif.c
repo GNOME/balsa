@@ -45,10 +45,6 @@ struct _LibBalsaAddressBookLdif {
     LibBalsaAddressBookText parent;
 };
 
-struct _LibBalsaAddressBookLdifClass {
-    LibBalsaAddressBookTextClass parent_class;
-};
-
 G_DEFINE_TYPE(LibBalsaAddressBookLdif, libbalsa_address_book_ldif,
               LIBBALSA_TYPE_ADDRESS_BOOK_TEXT)
 

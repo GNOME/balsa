@@ -52,10 +52,6 @@ struct _LibBalsaAddressBookVcard {
     LibBalsaAddressBookText parent;
 };
 
-struct _LibBalsaAddressBookVcardClass {
-    LibBalsaAddressBookTextClass parent_class;
-};
-
 G_DEFINE_TYPE(LibBalsaAddressBookVcard, libbalsa_address_book_vcard,
               LIBBALSA_TYPE_ADDRESS_BOOK_TEXT)
 

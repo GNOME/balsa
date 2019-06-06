@@ -85,10 +85,6 @@ static gboolean parse_externq_file(LibBalsaAddressBookExternq *ab_externq,
 static GList *libbalsa_address_book_externq_alias_complete(LibBalsaAddressBook *ab, 
                                                            const gchar * prefix);
 
-struct _LibBalsaAddressBookExternqClass {
-    LibBalsaAddressBookClass parent_class;
-};
-
 struct _LibBalsaAddressBookExternq {
     LibBalsaAddressBook parent;
 

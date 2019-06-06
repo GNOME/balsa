@@ -70,10 +70,6 @@ struct _LibBalsaAddressView {
     gchar *path_string;         /* ditto        */
 };
 
-struct _LibBalsaAddressViewClass {
-    GtkTreeViewClass parent_class;
-};
-
 /*
  *     GObject class boilerplate
  */

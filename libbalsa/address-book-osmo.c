@@ -67,10 +67,6 @@ struct _LibBalsaAddressBookOsmo {
 	GDBusProxy *proxy;
 };
 
-struct _LibBalsaAddressBookOsmoClass {
-	LibBalsaAddressBookClass parent_class;
-};
-
 G_DEFINE_TYPE(LibBalsaAddressBookOsmo, libbalsa_address_book_osmo, LIBBALSA_TYPE_ADDRESS_BOOK);
 
 

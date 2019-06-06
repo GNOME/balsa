@@ -127,10 +127,6 @@ struct _LibBalsaAddressBookLdap {
     LDAP *directory;
 };
 
-struct _LibBalsaAddressBookLdapClass {
-    LibBalsaAddressBookClass parent_class;
-};
-
 G_DEFINE_TYPE(LibBalsaAddressBookLdap, libbalsa_address_book_ldap,
         LIBBALSA_TYPE_ADDRESS_BOOK)
 

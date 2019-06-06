@@ -34,10 +34,6 @@ struct _GMimeFilterHeader {
 	gboolean drop_header;
 };
 
-struct _GMimeFilterHeaderClass {
-	GMimeFilterClass parent_class;
-};
-
 G_DEFINE_TYPE(GMimeFilterHeader, g_mime_filter_header, GMIME_TYPE_FILTER)
 
 

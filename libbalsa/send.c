@@ -635,9 +635,9 @@ lbs_check_reachable_cb(GObject  *object,
 	} else {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Cannot reach SMTP server %s (%s), any queued message will remain in %s."),
-							 libbalsa_smtp_server_get_name(smtp_server),
-							 LIBBALSA_SERVER(smtp_server)->host,
-							 send_info->outbox->name);
+                             libbalsa_smtp_server_get_name(smtp_server),
+                             libbalsa_server_get_host(LIBBALSA_SERVER(smtp_server)),
+                             send_info->outbox->name);
 	}
 
 	if (!thread_started) {
@@ -759,13 +759,17 @@ lbs_process_queue_msg(guint 		   msgno,
 static NetClientSmtp *
 lbs_process_queue_init_session(LibBalsaServer* server)
 {
+        NetClientCryptMode security;
+        const gchar *host;
 	NetClientSmtp* session;
 
-	if (server->security == NET_CLIENT_CRYPT_ENCRYPTED) {
-		session = net_client_smtp_new(server->host, 465U, server->security);
+        security = libbalsa_server_get_security(server);
+        host = libbalsa_server_get_host(server);
+	if (security == NET_CLIENT_CRYPT_ENCRYPTED) {
+		session = net_client_smtp_new(host, 465U, security);
 	} else {
 		// FIXME - submission (587) is the standard, but most isp's use 25...
-		session = net_client_smtp_new(server->host, 587U, server->security);
+		session = net_client_smtp_new(host, 587U, security);
 	}
 
 	/* connect signals */
@@ -773,12 +777,13 @@ lbs_process_queue_init_session(LibBalsaServer* server)
 	g_signal_connect(G_OBJECT(session), "auth", G_CALLBACK(libbalsa_server_get_auth), server);
 
 	/* load client certificate if configured */
-	if (server->client_cert) {
+	if (libbalsa_server_get_client_cert(server)) {
+                const gchar *cert_file = libbalsa_server_get_cert_file(server);
 		GError* error = NULL;
 
 		g_signal_connect(G_OBJECT(session), "cert-pass", G_CALLBACK(libbalsa_server_get_cert_pass), server);
-		if (!net_client_set_cert_from_file(NET_CLIENT(session), server->cert_file, &error)) {
-			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), server->cert_file,
+		if (!net_client_set_cert_from_file(NET_CLIENT(session), cert_file, &error)) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), cert_file,
 				error->message);
 			/* bad certificate private key password: clear it */
 			if (error->code == NET_CLIENT_ERROR_CERT_KEY_PASS) {

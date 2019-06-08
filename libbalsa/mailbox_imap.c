@@ -465,7 +465,8 @@ get_header_cache_path(LibBalsaMailboxImap *mimap)
     LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE(mimap)->server;
     gchar *cache_dir = get_cache_dir(TRUE); /* FIXME */
     gchar *header_file = g_strdup_printf("%s@%s-%s-%u-headers2",
-					 s->user, s->host,
+					 libbalsa_server_get_user(s),
+					 libbalsa_server_get_host(s),
 					 (mimap->path ? mimap->path : "INBOX"),
 					 mimap->uid_validity);
     gchar *encoded_path = libbalsa_urlencode(header_file);
@@ -490,7 +491,7 @@ get_cache_name_pair(LibBalsaMailboxImap* mailbox, const gchar *type,
 
     res[0] = get_cache_dir(is_persistent);
     fname = g_strdup_printf("%s@%s-%s-%u-%u-%s",
-                            s->user, s->host,
+                            libbalsa_server_get_user(s), libbalsa_server_get_host(s),
                             (mailbox->path ? mailbox->path : "INBOX"),
                             uid_validity, uid, type);
     res[1] = libbalsa_urlencode(fname);
@@ -1732,13 +1733,13 @@ libbalsa_mailbox_imap_reconnect(LibBalsaMailboxImap* mimap)
     if (mimap->handle &&
         imap_mbox_is_disconnected (mimap->handle)) {
         printf("Reconnecting %s (%u)\n",
-               LIBBALSA_MAILBOX_REMOTE_SERVER(mimap)->host,
+               libbalsa_server_get_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mimap)),
                (unsigned)time(NULL));
         if (imap_mbox_handle_reconnect
             (mimap->handle, &(LIBBALSA_MAILBOX(mimap)->readonly))
             == IMAP_SUCCESS)
             printf("Reconnected %s (%u)\n",
-                   LIBBALSA_MAILBOX_REMOTE_SERVER(mimap)->host,
+                   libbalsa_server_get_host(LIBBALSA_MAILBOX_REMOTE_SERVER(mimap)),
                    (unsigned)time(NULL));
     }
 }
@@ -1877,14 +1878,15 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox, GError **err)
 gchar *
 libbalsa_imap_url(LibBalsaServer * server, const gchar * path)
 {
-    gchar *enc = libbalsa_urlencode(server->user);
+    const gchar *user = libbalsa_server_get_user(server);
+    gchar *enc = libbalsa_urlencode(user);
     gchar *url = g_strdup_printf("imap%s://%s@%s/%s",
 #ifdef USE_SSL_TO_SET_IMAPS_IN_URL
                                  server->use_ssl ? "s" : "",
 #else
                                  "",
 #endif
-                                 enc, server->host,
+                                 enc, libbalsa_server_get_host(server),
                                  path ? path : "");
     g_free(enc);
 
@@ -2191,7 +2193,7 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
     }
     if(flags & LB_FETCH_RFC822_HEADERS) {
         g_assert(message->headers != NULL);
-        message->headers->user_hdrs = 
+        message->headers->user_hdrs =
             libbalsa_message_user_hdrs_from_gmime(message->mime_msg);
         message->has_all_headers = 1;
     }
@@ -2981,8 +2983,8 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
 	struct append_to_cache_data atcd;
 	gchar *cache_dir;
 
-	atcd.user = s->user;
-	atcd.host = s->host;
+	atcd.user = libbalsa_server_get_user(s);
+	atcd.host = libbalsa_server_get_host(s);
 	atcd.path = mimap->path ? mimap->path : "INBOX";
 	atcd.cache_dir = cache_dir = get_cache_dir(is_persistent);
 	atcd.curr_name = macd.outfiles;
@@ -3334,7 +3336,7 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 		libbalsa_imap_server_has_persistent_cache(is);
 	    gchar *dir_name = get_cache_dir(is_persistent);
 	    gchar *src_prefix = g_strdup_printf("%s@%s-%s-%u-",
-						s->user, s->host,
+						libbalsa_server_get_user(s), libbalsa_server_get_host(s),
 						(mimap->path 
 						 ? mimap->path : "INBOX"),
 						mimap->uid_validity);
@@ -3360,7 +3362,8 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 				g_build_filename(dir_name, filename, NULL);
 			    gchar *dst_prefix =
 				g_strdup_printf("%s@%s-%s-%u-%u%s",
-						s->user, s->host,
+						libbalsa_server_get_user(s),
+                                                libbalsa_server_get_host(s),
 						(dst_imap->path 
 						 ? dst_imap->path : "INBOX"),
 						uid_sequence.uid_validity,

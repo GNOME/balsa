@@ -505,7 +505,7 @@ libbalsa_scanner_imap_tree(LibBalsaServer  *server,
 		g_hash_table_unref(folders);
 	} else {
 		if (*error == NULL) {
-			g_set_error(error, LIBBALSA_SCANNER_ERROR, LIBBALSA_SCANNER_ERROR_IMAP, _("Could not connect to “%s”"), server->host);
+			g_set_error(error, LIBBALSA_SCANNER_ERROR, LIBBALSA_SCANNER_ERROR_IMAP, _("Could not connect to “%s”"), libbalsa_server_get_host(server));
 		}
 	}
 

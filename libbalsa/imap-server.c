@@ -131,16 +131,20 @@ libbalsa_imap_server_get_type(void)
 static void libbalsa_imap_server_set_username(LibBalsaServer * server,
                                               const gchar * name)
 {
-    if(server->host && name) { /* we have been initialized... */
+    const gchar *host;
+
+    host = libbalsa_server_get_host(server);
+
+    if (host != NULL && name != NULL) { /* we have been initialized... */
         LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
-        
+
         if (imap_server->key == NULL) {
-        	imap_server->key = g_strdup_printf("%s@%s", name, server->host);
+            imap_server->key = g_strdup_printf("%s@%s", name, host);
         }
         g_mutex_lock(&imap_servers_lock);
         g_hash_table_steal(imap_servers, imap_server->key);
         g_free(imap_server->key);
-        imap_server->key = g_strdup_printf("%s@%s", name, server->host);
+        imap_server->key = g_strdup_printf("%s@%s", name, host);
         g_hash_table_insert(imap_servers, imap_server->key, imap_server);
         g_mutex_unlock(&imap_servers_lock);
     }
@@ -148,20 +152,24 @@ static void libbalsa_imap_server_set_username(LibBalsaServer * server,
 }
 
 static void
-libbalsa_imap_server_set_host(LibBalsaServer     *server,
-                              const gchar        *host,
-							  NetClientCryptMode  security)
+libbalsa_imap_server_set_host(LibBalsaServer    *server,
+                              const gchar       *host,
+                              NetClientCryptMode security)
 {
-    if(server->user && host) { /* we have been initialized... */
+    const gchar *user;
+
+    user = libbalsa_server_get_user(server);
+
+    if (user != NULL && host != NULL) { /* we have been initialized... */
         LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
 
         if (imap_server->key == NULL) {
-        	imap_server->key = g_strdup_printf("%s@%s", server->user, host);
+            imap_server->key = g_strdup_printf("%s@%s", user, host);
         }
         g_mutex_lock(&imap_servers_lock);
         g_hash_table_steal(imap_servers, imap_server->key);
         g_free(imap_server->key);
-        imap_server->key = g_strdup_printf("%s@%s", server->user, host);
+        imap_server->key = g_strdup_printf("%s@%s", user, host);
         g_hash_table_insert(imap_servers, imap_server->key, imap_server);
         g_mutex_unlock(&imap_servers_lock);
     }
@@ -191,7 +199,7 @@ libbalsa_imap_server_class_init(LibBalsaImapServerClass * klass)
 static void
 libbalsa_imap_server_init(LibBalsaImapServer * imap_server)
 {
-    LIBBALSA_SERVER(imap_server)->protocol = "imap";
+    libbalsa_server_set_protocol(LIBBALSA_SERVER(imap_server), "imap");
     imap_server->key = NULL;
     g_mutex_init(&imap_server->lock);
     imap_server->max_connections = MAX_CONNECTIONS_PER_SERVER;
@@ -252,7 +260,7 @@ is_info_cb(ImapMboxHandle *h, ImapResponse rc, const gchar* str, void *arg)
     default:
         return;
     }
-    libbalsa_information(it, fmt, is->host, str);
+    libbalsa_information(it, fmt, libbalsa_server_get_host(is), str);
 }
 
 
@@ -274,8 +282,8 @@ lb_imap_server_info_new(LibBalsaServer *server)
     imap_handle_set_infocb(handle,    is_info_cb, server);
     imap_handle_set_authcb(handle, G_CALLBACK(libbalsa_server_get_auth), server);
     imap_handle_set_certcb(handle, G_CALLBACK(libbalsa_server_check_cert));
-    imap_handle_set_tls_mode(handle, server->security);
-    imap_handle_set_option(handle, IMAP_OPT_ANONYMOUS, server->try_anonymous);
+    imap_handle_set_tls_mode(handle, libbalsa_server_get_security(server));
+    imap_handle_set_option(handle, IMAP_OPT_ANONYMOUS, libbalsa_server_get_try_anonymous(server));
     imap_handle_set_option(handle, IMAP_OPT_CLIENT_SORT, TRUE);
     /* binary fetches change encoding and the checksums, and
        signatures, disable them if we ever consider verifying message
@@ -447,7 +455,7 @@ libbalsa_imap_server_new_from_config(void)
     g_free(user);
     g_free(host);
     server = LIBBALSA_SERVER(imap_server);
-    if (server->host == NULL) {
+    if (libbalsa_server_get_host(server) == NULL) {
         gint conn_limit;
 
         /* common server configs */
@@ -491,7 +499,7 @@ handle_connection_error(int rc, struct handle_info *info,
     case IMAP_CONNECT_FAILED:
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_NETWORK_ERROR,
-                    _("Cannot connect to %s"), server->host);
+                    _("Cannot connect to %s"), libbalsa_server_get_host(server));
         break;
     case IMAP_AUTH_CANCELLED:
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
@@ -561,7 +569,7 @@ libbalsa_imap_server_get_handle(LibBalsaImapServer *imap_server, GError **err)
         if(imap_mbox_is_disconnected(info->handle)) {
             ImapResult rc;
 
-            rc=imap_mbox_handle_connect(info->handle, server->host);
+            rc=imap_mbox_handle_connect(info->handle, libbalsa_server_get_host(server));
             if(rc != IMAP_SUCCESS) {
                 handle_connection_error(rc, info, server, err);
                 g_mutex_unlock(&imap_server->lock);
@@ -650,7 +658,7 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR,
                     _("Exceeded the number of connections per server %s"),
-                    server->host);
+                    libbalsa_server_get_host(server));
         g_mutex_unlock(&imap_server->lock);
         return NULL;
     }
@@ -658,7 +666,7 @@ libbalsa_imap_server_get_handle_with_user(LibBalsaImapServer *imap_server,
     if (imap_mbox_is_disconnected(info->handle)) {
         ImapResult rc;
 
-        rc=imap_mbox_handle_connect(info->handle, server->host);
+        rc=imap_mbox_handle_connect(info->handle, libbalsa_server_get_host(server));
         if(rc != IMAP_SUCCESS) {
             handle_connection_error(rc, info, server, err);
             g_mutex_unlock(&imap_server->lock);
@@ -909,7 +917,9 @@ libbalsa_imap_server_subscriptions(LibBalsaImapServer  *server,
 						_("subscribing to “%s” failed"), mailbox);
 					result = FALSE;
 				} else {
-					g_debug("subscribed to %s, '%s'", LIBBALSA_SERVER(server)->host, mailbox);
+					g_debug("subscribed to %s, '%s'",
+                                                libbalsa_server_get_host(LIBBALSA_SERVER(server)),
+                                                mailbox);
 				}
 			}
 		}
@@ -923,7 +933,9 @@ libbalsa_imap_server_subscriptions(LibBalsaImapServer  *server,
 						_("unsubscribing from “%s” failed"), mailbox);
 					result = FALSE;
 				} else {
-					g_debug("unsubscribed from %s, '%s'", LIBBALSA_SERVER(server)->host, mailbox);
+					g_debug("unsubscribed from %s, '%s'",
+                                                libbalsa_server_get_host(LIBBALSA_SERVER(server)),
+                                                mailbox);
 				}
 			}
 		}

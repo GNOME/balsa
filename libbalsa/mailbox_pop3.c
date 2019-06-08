@@ -129,6 +129,7 @@ libbalsa_mailbox_pop3_init(LibBalsaMailboxPop3 * mailbox)
     mailbox->filter_cmd = g_strdup("procmail -f -");
     remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
     remote->server = libbalsa_server_new();
+    libbalsa_server_set_protocol(remote->server, "pop3");
 }
 
 static void
@@ -466,15 +467,19 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 							  const gchar               *name,
 							  GList                    **msg_list)
 {
+        NetClientCryptMode security;
+        const gchar *host;
 	NetClientPop *pop;
 	GError *error = NULL;
 	guint allow_auth;
 
 	/* create the mailbox connection */
-	if (server->security == NET_CLIENT_CRYPT_ENCRYPTED) {
-		pop = net_client_pop_new(server->host, 995U, server->security, mbox->enable_pipe);
+        security = libbalsa_server_get_security(server);
+        host = libbalsa_server_get_host(server);
+	if (security == NET_CLIENT_CRYPT_ENCRYPTED) {
+		pop = net_client_pop_new(host, 995U, security, mbox->enable_pipe);
 	} else {
-		pop = net_client_pop_new(server->host, 110U, server->security, mbox->enable_pipe);
+		pop = net_client_pop_new(host, 110U, security, mbox->enable_pipe);
 	}
 	if (pop == NULL) {
 		return NULL;
@@ -491,10 +496,12 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	net_client_set_timeout(NET_CLIENT(pop), 60U);
 
 	/* load client certificate if configured */
-	if (server->client_cert) {
+	if (libbalsa_server_get_client_cert(server)) {
+                const gchar *cert_file = libbalsa_server_get_cert_file(server);
+
 		g_signal_connect(G_OBJECT(pop), "cert-pass", G_CALLBACK(libbalsa_server_get_cert_pass), server);
-		if (!net_client_set_cert_from_file(NET_CLIENT(pop), server->cert_file, &error)) {
-			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), server->cert_file,
+		if (!net_client_set_cert_from_file(NET_CLIENT(pop), cert_file, &error)) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), cert_file,
 				error->message);
 			/* bad certificate private key password: clear it */
 			if (error->code == NET_CLIENT_ERROR_CERT_KEY_PASS) {
@@ -511,9 +518,9 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(libbalsa_server_get_auth), server);
 
 	/* connect server */
-	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mbox), LIBBALSA_NTFY_INIT, INFINITY, _("Connecting %s…"), server->host);
+	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mbox), LIBBALSA_NTFY_INIT, INFINITY, _("Connecting %s…"), host);
 	if (!net_client_pop_connect(pop, NULL, &error)) {
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s: cannot connect %s: %s"), name, server->host,
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s: cannot connect %s: %s"), name, host,
 			error->message);
 		/* authentication failed: clear password */
 		if (error->code == NET_CLIENT_ERROR_POP_AUTHFAIL) {
@@ -553,7 +560,8 @@ update_msg_list(struct fetch_data         *fd,
 
 	/* load uid's if messages shall be left on the server */
 	if (!mbox->delete_from_server) {
-		uid_prefix = g_strconcat(server->user, "@", server->host, NULL);
+		uid_prefix = g_strconcat(libbalsa_server_get_user(server), "@",
+                                         libbalsa_server_get_host(server), NULL);
 		prefix_len = strlen(uid_prefix);
 		uids = mp_load_uids(uid_prefix);
 		*current_uids = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
@@ -685,7 +693,9 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 
 		/* store uid list */
 		if (result && !mbox->delete_from_server) {
-			gchar *uid_prefix = g_strconcat(server->user, "@", server->host, NULL);
+			gchar *uid_prefix =
+                            g_strconcat(libbalsa_server_get_user(server), "@",
+                                        libbalsa_server_get_host(server), NULL);
 
 			mp_save_uids(current_uids, uid_prefix, &err);
 			g_free(uid_prefix);

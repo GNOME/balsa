@@ -58,19 +58,34 @@ static const SecretSchema cert_pass_schema = {
 };
 #endif                          /* defined(HAVE_LIBSECRET) */
 
-static GObjectClass *parent_class = NULL;
-static void libbalsa_server_class_init(LibBalsaServerClass * klass);
-static void libbalsa_server_init(LibBalsaServer * server);
+typedef struct _LibBalsaServerPrivate LibBalsaServerPrivate;
+
+struct _LibBalsaServerPrivate {
+    const gchar *protocol; /**< type of the server: imap, pop3, or smtp. */
+    gchar *host;
+    gchar *user;
+    gchar *passwd;
+    NetClientCryptMode security;
+    gboolean client_cert;
+    gchar *cert_file;
+    gchar *cert_passphrase;
+    gboolean remember_passwd;
+    gboolean remember_cert_passphrase;
+    gboolean try_anonymous; /* user wants anonymous access */
+};
+
 static void libbalsa_server_finalize(GObject * object);
 
-static void libbalsa_server_real_set_username(LibBalsaServer * server,
-					      const gchar * username);
-static void libbalsa_server_real_set_host(LibBalsaServer     *server,
-					  	  	  	  	  	  const gchar        *host,
-										  NetClientCryptMode  security);
-static gchar *libbalsa_server_get_password(LibBalsaServer *server,
-										   gchar          *cert_subject);
+static void libbalsa_server_real_set_username(LibBalsaServer *server,
+					      const gchar    *username);
+static void libbalsa_server_real_set_host(LibBalsaServer    *server,
+                                          const gchar       *host,
+                                          NetClientCryptMode security);
+static gchar *lbs_get_password(LibBalsaServer *server,
+                                           gchar          *cert_subject);
 static gchar *libbalsa_free_password(gchar *password);
+
+G_DEFINE_TYPE_WITH_PRIVATE(LibBalsaServer, libbalsa_server, G_TYPE_OBJECT)
 
 enum {
     SET_USERNAME,
@@ -82,40 +97,12 @@ enum {
 
 static guint libbalsa_server_signals[LAST_SIGNAL];
 
-GType
-libbalsa_server_get_type(void)
-{
-    static GType server_type = 0;
-
-    if (!server_type) {
-        static const GTypeInfo server_info = {
-            sizeof(LibBalsaServerClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-            (GClassInitFunc) libbalsa_server_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-            sizeof(LibBalsaServer),
-            0,                  /* n_preallocs */
-            (GInstanceInitFunc) libbalsa_server_init
-        };
-
-        server_type =
-            g_type_register_static(G_TYPE_OBJECT, "LibBalsaServer",
-                                   &server_info, 0);
-    }
-
-    return server_type;
-}
-
 static void
 libbalsa_server_class_init(LibBalsaServerClass * klass)
 {
     GObjectClass *object_class;
 
     object_class = G_OBJECT_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     object_class->finalize = libbalsa_server_finalize;
 
@@ -163,33 +150,30 @@ libbalsa_server_class_init(LibBalsaServerClass * klass)
 static void
 libbalsa_server_init(LibBalsaServer * server)
 {
-    server->protocol = "pop3"; /* Is this a sane default value? */
-    server->host = NULL;
-    server->user = NULL;
-    server->passwd = NULL;
-    server->remember_passwd = TRUE;
-    server->security		= NET_CLIENT_CRYPT_STARTTLS;
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    priv->protocol = NULL;
+    priv->host = NULL;
+    priv->user = NULL;
+    priv->passwd = NULL;
+    priv->remember_passwd = TRUE;
+    priv->security		= NET_CLIENT_CRYPT_STARTTLS;
 }
 
 /* leave object in sane state (NULLified fields) */
 static void
 libbalsa_server_finalize(GObject * object)
 {
-    LibBalsaServer *server;
+    LibBalsaServer *server = LIBBALSA_SERVER(object);
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
 
-    g_return_if_fail(LIBBALSA_IS_SERVER(object));
+    g_free(priv->host);
+    g_free(priv->user);
+    g_free(priv->cert_file);
+    priv->passwd = libbalsa_free_password(priv->passwd);
+    priv->cert_passphrase = libbalsa_free_password(priv->cert_passphrase);
 
-    server = LIBBALSA_SERVER(object);
-
-    g_free(server->host);   server->host = NULL;
-    g_free(server->user);   server->user = NULL;
-    server->passwd = libbalsa_free_password(server->passwd);
-
-    g_free(server->cert_file);
-    server->cert_file = NULL;
-    server->cert_passphrase = libbalsa_free_password(server->cert_passphrase);
-
-    G_OBJECT_CLASS(parent_class)->finalize(object);
+    G_OBJECT_CLASS(libbalsa_server_parent_class)->finalize(object);
 }
 
 LibBalsaServer *
@@ -218,18 +202,19 @@ libbalsa_server_set_password(LibBalsaServer *server,
                              const gchar    *passwd,
 							 gboolean        for_cert)
 {
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
 	gchar **target;
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
     if (for_cert) {
-    	target = &server->cert_passphrase;
+        target = &priv->cert_passphrase;
     } else {
-    	target = &server->passwd;
+        target = &priv->passwd;
     }
 
     *target = libbalsa_free_password(*target);
     if ((passwd != NULL) && (passwd[0] != '\0')) {
-    	*target = g_strdup(passwd);
+        *target = g_strdup(passwd);
     }
 }
 
@@ -256,7 +241,7 @@ libbalsa_server_config_changed(LibBalsaServer * server)
 }
 
 static gchar *
-libbalsa_server_get_password(LibBalsaServer *server,
+lbs_get_password(LibBalsaServer *server,
 			     	 	 	 gchar          *cert_subject)
 {
     gchar *retval = NULL;
@@ -272,57 +257,56 @@ static void
 libbalsa_server_real_set_username(LibBalsaServer * server,
 				  const gchar * username)
 {
-    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
 
-    g_free(server->user);
-    server->user = g_strdup(username);
+    g_free(priv->user);
+    priv->user = g_strdup(username);
 }
 
 static void
 libbalsa_server_real_set_host(LibBalsaServer * server, const gchar * host,
 	NetClientCryptMode  security)
 {
-    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
 
-    g_free(server->host);
-    server->host = g_strdup(host);
-    server->security = security;
+    g_free(priv->host);
+    priv->host = g_strdup(host);
+    priv->security = security;
 }
 
 void
 libbalsa_server_load_security_config(LibBalsaServer *server)
 {
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
 	gboolean not_found;
 
-    g_return_if_fail(LIBBALSA_IS_SERVER(server));
-
-    server->security = libbalsa_conf_get_int_with_default("Security", &not_found);
+    priv->security = libbalsa_conf_get_int_with_default("Security", &not_found);
     if (not_found) {
-    	gboolean want_ssl;
+        gboolean want_ssl;
 
-    	g_debug("server %s@%s: no security config, try to read old settings", server->protocol, server->host);
-    	want_ssl = libbalsa_conf_get_bool_with_default("SSL", &not_found);
-    	if (want_ssl && !not_found) {
-    		server->security = NET_CLIENT_CRYPT_ENCRYPTED;
-    	} else {
-    		int want_tls;
+        g_debug("server %s@%s: no security config, try to read old settings", priv->protocol, priv->host);
+        want_ssl = libbalsa_conf_get_bool_with_default("SSL", &not_found);
+        if (want_ssl && !not_found) {
+        	priv->security = NET_CLIENT_CRYPT_ENCRYPTED;
+        } else {
+        	int want_tls;
 
-    		want_tls = libbalsa_conf_get_int_with_default("TLSMode", &not_found);
-    		if (not_found) {
-    			server->security = NET_CLIENT_CRYPT_STARTTLS;
-    		} else {
-    			switch (want_tls) {
-    			case 0:
-    				server->security = NET_CLIENT_CRYPT_NONE;
-    				break;
-    			case 1:
-    				server->security = NET_CLIENT_CRYPT_STARTTLS_OPT;
-    				break;
-    			default:
-    				server->security = NET_CLIENT_CRYPT_STARTTLS;
-    			}
-    		}
-    	}
+        	want_tls = libbalsa_conf_get_int_with_default("TLSMode", &not_found);
+        	if (not_found) {
+        		priv->security = NET_CLIENT_CRYPT_STARTTLS;
+        	} else {
+        		switch (want_tls) {
+        		case 0:
+        			priv->security = NET_CLIENT_CRYPT_NONE;
+        			break;
+        		case 1:
+        			priv->security = NET_CLIENT_CRYPT_STARTTLS_OPT;
+        			break;
+        		default:
+        			priv->security = NET_CLIENT_CRYPT_STARTTLS;
+        		}
+        	}
+        }
     }
 
 }
@@ -338,80 +322,83 @@ libbalsa_free_password(gchar *password)
 }
 
 static void
-store_password_libsecret(const LibBalsaServer *server,
+store_password_libsecret(LibBalsaServer *server,
 	    				 const gchar          *password,
 						 const SecretSchema   *schema)
 {
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
     GError *err = NULL;
 
     secret_password_store_sync(schema, NULL, _("Balsa passwords"), password, NULL, &err,
-    	"protocol", server->protocol,
-		"server",   server->host,
-		"user",     server->user,
+        "protocol", priv->protocol,
+		"server",   priv->host,
+		"user",     priv->user,
 		NULL);
     if (err != NULL) {
-    	g_info(_("Error storing password for %s@%s:%s: %s"), server->user, server->protocol, server->host, err->message);
+        g_info(_("Error storing password for %s@%s:%s: %s"), priv->user, priv->protocol, priv->host, err->message);
         g_error_free(err);
     } else {
-    	g_debug("stored password for %s@%s:%s in secret service", server->user, server->protocol, server->host);
+        g_debug("stored password for %s@%s:%s in secret service", priv->user, priv->protocol, priv->host);
     }
 }
 
 static gchar *
-load_password_libsecret(const LibBalsaServer *server,
+load_password_libsecret(LibBalsaServer *server,
 			  	  	    const gchar          *cfg_path,
 						const SecretSchema   *schema)
 {
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
     GError *err = NULL;
     gchar *password;
 
     password = secret_password_lookup_sync(schema, NULL, &err,
-    	"protocol", server->protocol,
-		"server",   server->host,
-		"user",     server->user,
+        "protocol", priv->protocol,
+		"server",   priv->host,
+		"user",     priv->user,
 		NULL);
     if (err != NULL) {
-        g_info(_("Error looking up password for %s@%s:%s: %s"), server->user, server->protocol, server->host, err->message);
+        g_info(_("Error looking up password for %s@%s:%s: %s"), priv->user, priv->protocol, priv->host, err->message);
         g_error_free(err);
 
         /* fall back to the private config file */
         password = libbalsa_conf_private_get_string(cfg_path, TRUE);
         if ((password != NULL) && (password[0] != '\0')) {
-        	g_info(_("loaded fallback password from private config file"));
-        	/* store a fallback password in the key ring */
-        	store_password_libsecret(server, password, schema);
+        g_info(_("loaded fallback password from private config file"));
+        /* store a fallback password in the key ring */
+        store_password_libsecret(server, password, schema);
             /* We could in principle clear the password in the config file here but we do not for the backward compatibility.
              * FIXME - Is this really the proper approach, as we leave the obfuscated password in the config file, and the user
              * relies on the message that the password is stored in the Secret Service only.  OTOH, there are better methods for
              * protecting the user's secrets, like full disk encryption. */
         }
     } else {
-    	g_debug("loaded password for %s@%s:%s from secret service", server->user, server->protocol, server->host);
+        g_debug("loaded password for %s@%s:%s from secret service", priv->user, priv->protocol, priv->host);
     }
 
     return password;
 }
 
 static void
-erase_password_libsecret(const LibBalsaServer *server,
+erase_password_libsecret(LibBalsaServer *server,
 						 const SecretSchema   *schema)
 {
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
     GError *err = NULL;
     gboolean removed;
 
     removed = secret_password_clear_sync(schema, NULL, &err,
-    	"protocol", server->protocol,
-		"server",   server->host,
-		"user",     server->user,
+        "protocol", priv->protocol,
+		"server",   priv->host,
+		"user",     priv->user,
 		NULL);
     if (err != NULL) {
-    	g_info("error erasing password for %s@%s:%s from secret service: %s", server->user, server->protocol, server->host,
-    		err->message);
-    	g_error_free(err);
+        g_info("error erasing password for %s@%s:%s from secret service: %s", priv->user, priv->protocol, priv->host,
+        	err->message);
+        g_error_free(err);
     } else if (removed) {
-    	g_debug("erased password for %s@%s:%s from secret service", server->user, server->protocol, server->host);
+        g_debug("erased password for %s@%s:%s from secret service", priv->user, priv->protocol, priv->host);
     } else {
-    	g_debug("no password erased for %s@%s:%s from secret service", server->user, server->protocol, server->host);
+        g_debug("no password erased for %s@%s:%s from secret service", priv->user, priv->protocol, priv->host);
     }
 }
 
@@ -436,55 +423,57 @@ libbalsa_free_password(gchar *password)
 void
 libbalsa_server_load_config(LibBalsaServer * server)
 {
-    server->host = libbalsa_conf_get_string("Server");
-    if ((server->host != NULL) && (strrchr(server->host, ':') == NULL)) {
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    priv->host = libbalsa_conf_get_string("Server");
+    if ((priv->host != NULL) && (strrchr(priv->host, ':') == NULL)) {
         gint port;
         gboolean d;
 
         port = libbalsa_conf_get_int_with_default("Port", &d);
         if (!d) {
-            gchar *newhost = g_strdup_printf("%s:%d", server->host, port);
+            gchar *newhost = g_strdup_printf("%s:%d", priv->host, port);
 
-            g_free(server->host);
-            server->host = newhost;
+            g_free(priv->host);
+            priv->host = newhost;
         }
     }
     libbalsa_server_load_security_config(server);
-    server->user = libbalsa_conf_private_get_string("Username", FALSE);
-    if (server->user == NULL) {
-    	server->user = g_strdup(g_get_user_name());
+    priv->user = libbalsa_conf_private_get_string("Username", FALSE);
+    if (priv->user == NULL) {
+        priv->user = g_strdup(g_get_user_name());
     }
 
-    server->try_anonymous = libbalsa_conf_get_bool("Anonymous=false");
-    server->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
+    priv->try_anonymous = libbalsa_conf_get_bool("Anonymous=false");
+    priv->remember_passwd = libbalsa_conf_get_bool("RememberPasswd=false");
 
-    server->passwd = libbalsa_free_password(server->passwd);
-    if (server->remember_passwd) {
+    priv->passwd = libbalsa_free_password(priv->passwd);
+    if (priv->remember_passwd) {
 #if defined(HAVE_LIBSECRET)
-    	server->passwd = load_password_libsecret(server, "Password", &server_schema);
+        priv->passwd = load_password_libsecret(server, "Password", &server_schema);
 #else
-    	server->passwd = libbalsa_conf_private_get_string("Password", TRUE);
+        priv->passwd = libbalsa_conf_private_get_string("Password", TRUE);
 #endif		/* HAVE_LIBSECRET */
-    	if ((server->passwd != NULL) && (server->passwd[0] == '\0')) {
-    		server->passwd = libbalsa_free_password(server->passwd);
-    	}
+        if ((priv->passwd != NULL) && (priv->passwd[0] == '\0')) {
+        	priv->passwd = libbalsa_free_password(priv->passwd);
+        }
     }
 
     /* client certificate stuff */
-    server->client_cert = libbalsa_conf_get_bool("NeedClientCert=false");
-    server->cert_file = libbalsa_conf_get_string("UserCertificateFile");
-    server->remember_cert_passphrase = libbalsa_conf_get_bool("RememberCertPasswd=false");
+    priv->client_cert = libbalsa_conf_get_bool("NeedClientCert=false");
+    priv->cert_file = libbalsa_conf_get_string("UserCertificateFile");
+    priv->remember_cert_passphrase = libbalsa_conf_get_bool("RememberCertPasswd=false");
 
-    server->cert_passphrase = libbalsa_free_password(server->cert_passphrase);
-    if (server->client_cert && server->remember_cert_passphrase) {
+    priv->cert_passphrase = libbalsa_free_password(priv->cert_passphrase);
+    if (priv->client_cert && priv->remember_cert_passphrase) {
 #if defined(HAVE_LIBSECRET)
-    	server->cert_passphrase = load_password_libsecret(server, "CertificatePassphrase", &cert_pass_schema);
+        priv->cert_passphrase = load_password_libsecret(server, "CertificatePassphrase", &cert_pass_schema);
 #else
-    	server->cert_passphrase = libbalsa_conf_private_get_string("CertificatePassphrase", TRUE);
+        priv->cert_passphrase = libbalsa_conf_private_get_string("CertificatePassphrase", TRUE);
 #endif		/* HAVE_LIBSECRET */
-    	if ((server->cert_passphrase != NULL) && (server->cert_passphrase[0] == '\0')) {
-    		server->cert_passphrase = libbalsa_free_password(server->cert_passphrase);
-    	}
+        if ((priv->cert_passphrase != NULL) && (priv->cert_passphrase[0] == '\0')) {
+        	priv->cert_passphrase = libbalsa_free_password(priv->cert_passphrase);
+        }
     }
 }
 
@@ -497,46 +486,48 @@ libbalsa_server_load_config(LibBalsaServer * server)
 void
 libbalsa_server_save_config(LibBalsaServer * server)
 {
-    libbalsa_conf_set_string("Server", server->host);
-    libbalsa_conf_private_set_string("Username", server->user, FALSE);
-    libbalsa_conf_set_bool("Anonymous",          server->try_anonymous);
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
 
-    if (server->remember_passwd && (server->passwd != NULL)) {
-    	libbalsa_conf_set_bool("RememberPasswd", TRUE);
+    libbalsa_conf_set_string("Server", priv->host);
+    libbalsa_conf_private_set_string("Username", priv->user, FALSE);
+    libbalsa_conf_set_bool("Anonymous",          priv->try_anonymous);
+
+    if (priv->remember_passwd && (priv->passwd != NULL)) {
+        libbalsa_conf_set_bool("RememberPasswd", TRUE);
 #if defined(HAVE_LIBSECRET)
-    	store_password_libsecret(server, server->passwd, &server_schema);
+        store_password_libsecret(server, priv->passwd, &server_schema);
 #else
-    	libbalsa_conf_private_set_string("Password", server->passwd, TRUE);
+        libbalsa_conf_private_set_string("Password", priv->passwd, TRUE);
 #endif
     } else {
-    	libbalsa_conf_set_bool("RememberPasswd", FALSE);
+        libbalsa_conf_set_bool("RememberPasswd", FALSE);
 #if defined(HAVE_LIBSECRET)
-    	erase_password_libsecret(server, &server_schema);
+        erase_password_libsecret(server, &server_schema);
 #endif		/* HAVE_LIBSECRET */
-    	libbalsa_conf_private_set_string("Password", NULL, TRUE);
+        libbalsa_conf_private_set_string("Password", NULL, TRUE);
     }
 
-    libbalsa_conf_set_bool("NeedClientCert", server->client_cert);
-    if (server->cert_file != NULL) {
-    	libbalsa_conf_set_string("UserCertificateFile", server->cert_file);
-    	if (server->remember_cert_passphrase && (server->cert_passphrase != NULL)) {
-    		libbalsa_conf_set_bool("RememberCertPasswd", TRUE);
+    libbalsa_conf_set_bool("NeedClientCert", priv->client_cert);
+    if (priv->cert_file != NULL) {
+        libbalsa_conf_set_string("UserCertificateFile", priv->cert_file);
+        if (priv->remember_cert_passphrase && (priv->cert_passphrase != NULL)) {
+        	libbalsa_conf_set_bool("RememberCertPasswd", TRUE);
 #if defined(HAVE_LIBSECRET)
-    		store_password_libsecret(server, server->cert_passphrase, &cert_pass_schema);
+        	store_password_libsecret(server, priv->cert_passphrase, &cert_pass_schema);
 #else
-    		libbalsa_conf_private_set_string("CertificatePassphrase", server->cert_passphrase, TRUE);
+        	libbalsa_conf_private_set_string("CertificatePassphrase", priv->cert_passphrase, TRUE);
 #endif
 
-    	} else {
-    		libbalsa_conf_set_bool("RememberCertPasswd", FALSE);
+        } else {
+        	libbalsa_conf_set_bool("RememberCertPasswd", FALSE);
 #if defined(HAVE_LIBSECRET)
-    		erase_password_libsecret(server, &cert_pass_schema);
+        	erase_password_libsecret(server, &cert_pass_schema);
 #endif		/* HAVE_LIBSECRET */
-    		libbalsa_conf_private_set_string("CertificatePassphrase", NULL, TRUE);
-    	}
+        	libbalsa_conf_private_set_string("CertificatePassphrase", NULL, TRUE);
+        }
     }
 
-    libbalsa_conf_set_int("Security", server->security);
+    libbalsa_conf_set_int("Security", priv->security);
 }
 
 /* Connect the server's "get-password" signal to the callback; if the
@@ -557,22 +548,23 @@ libbalsa_server_connect_signals(LibBalsaServer * server, GCallback cb,
 gchar **
 libbalsa_server_get_auth(NetClient *client,
 						 gboolean   need_passwd,
-         	 	 	 	 gpointer   user_data)
+         	 	 	 gpointer   user_data)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(user_data);
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
     gchar **result = NULL;
 
     g_debug("%s: %p %p: encrypted = %d", __func__, client, user_data,
             net_client_is_encrypted(client));
-    if (!server->try_anonymous || (strcmp(server->protocol, "imap") == 0)) {
+    if (!priv->try_anonymous || (strcmp(priv->protocol, "imap") == 0)) {
         result = g_new0(gchar *, 3U);
-        result[0] = g_strdup(server->user);
+        result[0] = g_strdup(priv->user);
         if (need_passwd) {
-        	if ((server->passwd != NULL) && (server->passwd[0] != '\0')) {
-        		result[1] = g_strdup(server->passwd);
-        	} else {
-        		result[1] = libbalsa_server_get_password(server, NULL);
-        	}
+        if ((priv->passwd != NULL) && (priv->passwd[0] != '\0')) {
+        	result[1] = g_strdup(priv->passwd);
+        } else {
+        	result[1] = lbs_get_password(server, NULL);
+        }
         }
     }
     return result;
@@ -581,7 +573,7 @@ libbalsa_server_get_auth(NetClient *client,
 
 gboolean
 libbalsa_server_check_cert(NetClient           *client,
-           	   	   	   	   GTlsCertificate     *peer_cert,
+           	   	   	   GTlsCertificate     *peer_cert,
 						   GTlsCertificateFlags errors,
 						   gpointer             user_data)
 {
@@ -595,12 +587,13 @@ libbalsa_server_get_cert_pass(NetClient *client,
 							  gpointer   user_data)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(user_data);
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
     gchar *result;
 
-    if ((server->cert_passphrase != NULL) && (server->cert_passphrase[0] != '\0')) {
-    	result = g_strdup(server->cert_passphrase);
+    if ((priv->cert_passphrase != NULL) && (priv->cert_passphrase[0] != '\0')) {
+        result = g_strdup(priv->cert_passphrase);
     } else {
-    	result = libbalsa_server_get_password(server, cert_subject);
+        result = lbs_get_password(server, cert_subject);
     }
 	return result;
 }
@@ -634,6 +627,7 @@ libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
                                     gpointer                   cb_data,
                                     GObject                  * source_object)
 {
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
     CanReachInfo *info;
     gchar *host;
     gchar *colon;
@@ -647,10 +641,10 @@ libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
 
     monitor = g_network_monitor_get_default();
 
-    host = g_strdup(server->host);
+    host = g_strdup(priv->host);
     colon = strchr(host, ':');
     if (colon != NULL) {
-    	colon[0] = '\0';
+        colon[0] = '\0';
     }
     address = g_network_address_new(host, 0);
     g_free(host);
@@ -665,4 +659,195 @@ libbalsa_server_test_can_reach(LibBalsaServer           * server,
                                gpointer                   cb_data)
 {
     libbalsa_server_test_can_reach_full(server, cb, cb_data, (GObject *) server);
+}
+
+/*
+ * Getters
+ */
+
+const gchar *
+libbalsa_server_get_host(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
+
+    return priv->host;
+}
+
+const gchar *
+libbalsa_server_get_user(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
+
+    return priv->user;
+}
+
+const gchar *
+libbalsa_server_get_cert_file(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
+
+    return priv->cert_file;
+}
+
+const gchar *
+libbalsa_server_get_protocol(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
+
+    return priv->protocol;
+}
+
+const gchar *
+libbalsa_server_get_password(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
+
+    return priv->passwd;
+}
+
+const gchar *
+libbalsa_server_get_cert_passphrase(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
+
+    return priv->cert_passphrase;
+}
+
+NetClientCryptMode
+libbalsa_server_get_security(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), (NetClientCryptMode) 0);
+
+    return priv->security;
+}
+
+gboolean
+libbalsa_server_get_try_anonymous(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), FALSE);
+
+    return priv->try_anonymous;
+}
+
+gboolean
+libbalsa_server_get_client_cert(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), FALSE);
+
+    return priv->client_cert;
+}
+
+gboolean
+libbalsa_server_get_remember_password(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), FALSE);
+
+    return priv->remember_passwd;
+}
+
+gboolean
+libbalsa_server_get_remember_cert_passphrase(LibBalsaServer *server)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_val_if_fail(LIBBALSA_IS_SERVER(server), FALSE);
+
+    return priv->remember_cert_passphrase;
+}
+
+/*
+ * Setters
+ */
+
+void
+libbalsa_server_set_protocol(LibBalsaServer *server, const gchar *protocol)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+    g_return_if_fail(priv->protocol == NULL);
+
+    /* We do not allocate a string for the protocol: */
+    priv->protocol = protocol;
+}
+
+void
+libbalsa_server_set_cert_file(LibBalsaServer *server, const gchar *cert_file)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+
+    g_free(priv->cert_file);
+    priv->cert_file = g_strdup(cert_file);
+}
+
+void
+libbalsa_server_set_security(LibBalsaServer *server, NetClientCryptMode security)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+
+    priv->security = security;
+}
+
+void
+libbalsa_server_set_try_anonymous(LibBalsaServer *server, gboolean try_anonymous)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+
+    priv->try_anonymous = try_anonymous;
+}
+
+void
+libbalsa_server_set_remember_password(LibBalsaServer *server, gboolean remember_password)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+
+    priv->remember_passwd = remember_password;
+}
+
+void
+libbalsa_server_set_client_cert(LibBalsaServer *server, gboolean client_cert)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+
+    priv->client_cert = client_cert;
+}
+
+void
+libbalsa_server_set_remember_cert_passphrase(LibBalsaServer *server, gboolean remember_cert_passphrase)
+{
+    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+
+    g_return_if_fail(LIBBALSA_IS_SERVER(server));
+
+    priv->remember_cert_passphrase = remember_cert_passphrase;
 }

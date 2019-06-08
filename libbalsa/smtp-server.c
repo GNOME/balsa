@@ -87,7 +87,7 @@ libbalsa_smtp_server_class_init(LibBalsaSmtpServerClass * klass)
 static void
 libbalsa_smtp_server_init(LibBalsaSmtpServer * smtp_server)
 {
-    LIBBALSA_SERVER(smtp_server)->protocol = "smtp";
+    libbalsa_server_set_protocol(LIBBALSA_SERVER(smtp_server), "smtp");
 }
 
 /* Class boilerplate */
@@ -137,7 +137,7 @@ libbalsa_smtp_server_new(void)
     smtp_server = g_object_new(LIBBALSA_TYPE_SMTP_SERVER, NULL);
 
     /* Change the default. */
-    LIBBALSA_SERVER(smtp_server)->remember_passwd = TRUE;
+    libbalsa_server_set_remember_password(LIBBALSA_SERVER(smtp_server), TRUE);
 
     return smtp_server;
 }

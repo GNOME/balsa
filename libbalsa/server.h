@@ -29,38 +29,13 @@
 #include "libbalsa.h"
 #include "net-client.h"
 
-#define LIBBALSA_TYPE_SERVER \
-    (libbalsa_server_get_type())
-#define LIBBALSA_SERVER(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST (obj, LIBBALSA_TYPE_SERVER, LibBalsaServer))
-#define LIBBALSA_SERVER_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST (klass, LIBBALSA_TYPE_SERVER, \
-                              LibBalsaServerClass))
-#define LIBBALSA_IS_SERVER(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE (obj, LIBBALSA_TYPE_SERVER))
-#define LIBBALSA_IS_SERVER_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE (klass, LIBBALSA_TYPE_SERVER))
+#define LIBBALSA_TYPE_SERVER (libbalsa_server_get_type())
 
-GType libbalsa_server_get_type(void);
-
-typedef struct _LibBalsaServerClass LibBalsaServerClass;
-
-
-struct _LibBalsaServer {
-    GObject object;
-    const gchar *protocol; /**< type of the server: imap, pop3, or smtp. */
-
-    gchar *host;
-    gchar *user;
-    gchar *passwd;
-    NetClientCryptMode security;
-    gboolean client_cert;
-    gchar *cert_file;
-    gchar *cert_passphrase;
-    gboolean remember_passwd;
-    gboolean remember_cert_passphrase;
-    gboolean try_anonymous; /* user wants anonymous access */
-};
+G_DECLARE_DERIVABLE_TYPE(LibBalsaServer,
+                         libbalsa_server,
+                         LIBBALSA,
+                         SERVER,
+                         GObject)
 
 struct _LibBalsaServerClass {
     GObjectClass parent_class;
@@ -114,5 +89,28 @@ void libbalsa_server_test_can_reach_full(LibBalsaServer           * server,
                                          LibBalsaCanReachCallback * cb,
                                          gpointer                   cb_data,
                                          GObject                  * source_object);
+
+/* Getters */
+const gchar * libbalsa_server_get_host(LibBalsaServer *server);
+const gchar * libbalsa_server_get_user(LibBalsaServer *server);
+const gchar * libbalsa_server_get_cert_file(LibBalsaServer *server);
+const gchar * libbalsa_server_get_protocol(LibBalsaServer *server);
+const gchar * libbalsa_server_get_password(LibBalsaServer *server);
+const gchar * libbalsa_server_get_cert_passphrase(LibBalsaServer *server);
+NetClientCryptMode libbalsa_server_get_security(LibBalsaServer *server);
+gboolean libbalsa_server_get_try_anonymous(LibBalsaServer *server);
+gboolean libbalsa_server_get_client_cert(LibBalsaServer *server);
+gboolean libbalsa_server_get_remember_password(LibBalsaServer *server);
+gboolean libbalsa_server_get_remember_cert_passphrase(LibBalsaServer *server);
+
+/* Setters */
+void libbalsa_server_set_protocol(LibBalsaServer *server, const gchar *protocol);
+void libbalsa_server_set_cert_file(LibBalsaServer *server, const gchar *cert_file);
+void libbalsa_server_set_security(LibBalsaServer *server, NetClientCryptMode security);
+void libbalsa_server_set_try_anonymous(LibBalsaServer *server, gboolean try_anonymous);
+void libbalsa_server_set_remember_password(LibBalsaServer *server, gboolean remember_password);
+void libbalsa_server_set_client_cert(LibBalsaServer *server, gboolean client_cert);
+void libbalsa_server_set_remember_cert_passphrase(LibBalsaServer *server,
+                                                  gboolean remember_cert_passphrase);
 
 #endif				/* __LIBBALSA_SERVER_H__ */

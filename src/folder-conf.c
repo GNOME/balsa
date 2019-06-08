@@ -849,7 +849,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     (void) libbalsa_create_grid_label(_("Host:"), grid, row);
     sdd->host_label =
         gtk_label_new(sdd->mbnode && sdd->mbnode->server
-                      ? sdd->mbnode->server->host : "");
+                      ? libbalsa_server_get_host(sdd->mbnode->server) : "");
     gtk_widget_set_halign(sdd->host_label, GTK_ALIGN_START);
     gtk_widget_set_hexpand(sdd->host_label, TRUE);
     gtk_grid_attach(GTK_GRID(grid), sdd->host_label, 1, row, 1, 1);

@@ -510,7 +510,7 @@ imap_dir_cb(BalsaMailboxNode* mb)
                              ? _("Scanning of %s failed: %s\n"
                                  "Check network connectivity.")
                              : _("Scanning of %s failed: %s"),
-                             mb->server->host,
+                             libbalsa_server_get_host(mb->server),
                              error->message);
         g_error_free(error);
         imap_scan_destroy_tree(&imap_tree);
@@ -602,8 +602,8 @@ balsa_mailbox_node_new_from_config(const gchar* group)
 
     folder->server = LIBBALSA_SERVER(libbalsa_imap_server_new_from_config());
 
-	g_debug("Server loaded, host: %s, security %d.", folder->server->host,
-		folder->server->security);
+	g_debug("Server loaded, host: %s, security %d.", libbalsa_server_get_host(folder->server),
+		libbalsa_server_get_security(folder->server));
     g_signal_connect_swapped(G_OBJECT(folder->server), "config-changed", 
                              G_CALLBACK(config_folder_update), folder);
     g_signal_connect(G_OBJECT(folder), "show-prop-dialog", 
@@ -1011,7 +1011,7 @@ balsa_mailbox_node_is_imap(const BalsaMailboxNode *mbnode)
 {
 	return (mbnode != NULL) &&
 		(mbnode->server != NULL) &&
-		(strcmp(mbnode->server->protocol, "imap") == 0);
+		(strcmp(libbalsa_server_get_protocol(mbnode->server), "imap") == 0);
 }
 
 GtkWidget *

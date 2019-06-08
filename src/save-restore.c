@@ -121,11 +121,13 @@ migrate_imap_mailboxes(const gchar *key, const gchar *value, gpointer data)
 		libbalsa_conf_pop_group();
 		mbnode = balsa_mailbox_node_new_from_config(key);
 	    if (mbnode != NULL) {
+                LibBalsaServer *server = mbnode->server;
 	    	gchar *folder_key;
 	    	gchar *oldname;
 
 	    	/* do not add the same folder multiple times */
-	    	folder_key = g_strconcat(mbnode->server->user, "@", mbnode->server->host, NULL);
+	    	folder_key = g_strconcat(libbalsa_server_get_user(server), "@",
+                                         libbalsa_server_get_host(server), NULL);
 	    	oldname = g_strdup(mbnode->name);
 	    	if (g_hash_table_contains(migrated, folder_key)) {
 	    		g_object_unref(mbnode);
@@ -133,7 +135,7 @@ migrate_imap_mailboxes(const gchar *key, const gchar *value, gpointer data)
 	    	} else {
 	    		g_hash_table_add(migrated, folder_key);
 		    	g_free(mbnode->name);
-		    	mbnode->name = g_strdup(mbnode->server->host);
+		    	mbnode->name = g_strdup(libbalsa_server_get_host(server));
 		    	balsa_mblist_mailbox_node_append(NULL, mbnode);
 
 		    	g_free(mbnode->config_prefix);

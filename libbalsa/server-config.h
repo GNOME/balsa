@@ -31,28 +31,14 @@
 #endif
 
 
-#define LIBBALSA_TYPE_SERVER_CFG 				(libbalsa_server_cfg_get_type())
-#define LIBBALSA_SERVER_CFG(obj) 				(G_TYPE_CHECK_INSTANCE_CAST(obj, LIBBALSA_TYPE_SERVER_CFG, LibBalsaServerCfg))
-#define LIBBALSA_SERVER_CFG_CLASS(klass) 		(G_TYPE_CHECK_CLASS_CAST(klass, LIBBALSA_TYPE_SERVER_CFG, LibBalsaServerCfgClass))
-#define LIBBALSA_IS_SERVER_CFG(obj) 			(G_TYPE_CHECK_INSTANCE_TYPE(obj, LIBBALSA_TYPE_SERVER_CFG))
-#define LIBBALSA_IS_SERVER_CFG_CLASS(klass)		(G_TYPE_CHECK_CLASS_TYPE(klass, LIBBALSA_TYPE_SERVER_CFG))
+#define LIBBALSA_TYPE_SERVER_CFG (libbalsa_server_cfg_get_type())
 
+G_DECLARE_FINAL_TYPE(LibBalsaServerCfg,
+                     libbalsa_server_cfg,
+                     LIBBALSA,
+                     SERVER_CFG,
+                     GtkNotebook)
 
-typedef struct _LibBalsaServerCfgClass LibBalsaServerCfgClass;
-typedef struct _LibBalsaServerCfg LibBalsaServerCfg;
-typedef struct _LibBalsaServerCfgPrivate LibBalsaServerCfgPrivate;
-
-struct _LibBalsaServerCfg {
-    GtkNotebook parent;
-    LibBalsaServerCfgPrivate *priv;
-};
-
-struct _LibBalsaServerCfgClass {
-    GtkNotebookClass parent;
-};
-
-
-GType libbalsa_server_cfg_get_type(void);
 
 /** @brief Create a new server configuration widget
  * @param server server data, must not be NULL

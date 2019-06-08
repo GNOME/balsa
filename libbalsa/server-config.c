@@ -27,7 +27,9 @@
 #include "server-config.h"
 
 
-struct _LibBalsaServerCfgPrivate {
+struct _LibBalsaServerCfg {
+        GtkNotebook parent;
+
 	/* "Basic" notebook page */
 	GtkWidget *basic_grid;			/* grid */
 	guint basic_rows;				/* count of rows */
@@ -51,7 +53,7 @@ struct _LibBalsaServerCfgPrivate {
 };
 
 
-G_DEFINE_TYPE_WITH_PRIVATE(LibBalsaServerCfg, libbalsa_server_cfg, GTK_TYPE_NOTEBOOK)
+G_DEFINE_TYPE(LibBalsaServerCfg, libbalsa_server_cfg, GTK_TYPE_NOTEBOOK)
 
 
 static GtkWidget *server_cfg_add_entry(GtkWidget *grid, guint row, const gchar *label, const gchar *value, GCallback callback,
@@ -85,85 +87,83 @@ LibBalsaServerCfg *
 libbalsa_server_cfg_new(LibBalsaServer *server, const gchar *name)
 {
 	LibBalsaServerCfg *server_cfg;
-	LibBalsaServerCfgPrivate *priv;
         const gchar *protocol;
         const gchar *cert_file;
 
 	g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
 
     server_cfg = LIBBALSA_SERVER_CFG(g_object_new(libbalsa_server_cfg_get_type(), NULL));
-    priv = server_cfg->priv;
 
     /* notebook page with basic options */
 #define HIG_PADDING 12
-    priv->basic_grid = libbalsa_create_grid();
-    priv->basic_rows = 0U;
+    server_cfg->basic_grid = libbalsa_create_grid();
+    server_cfg->basic_rows = 0U;
 
-    gtk_container_set_border_width(GTK_CONTAINER(priv->basic_grid), HIG_PADDING);
-    gtk_notebook_append_page(GTK_NOTEBOOK(server_cfg), priv->basic_grid, gtk_label_new_with_mnemonic(_("_Basic")));
+    gtk_container_set_border_width(GTK_CONTAINER(server_cfg->basic_grid), HIG_PADDING);
+    gtk_notebook_append_page(GTK_NOTEBOOK(server_cfg), server_cfg->basic_grid, gtk_label_new_with_mnemonic(_("_Basic")));
 
     /* server descriptive name */
-    priv->name = server_cfg_add_entry(priv->basic_grid, priv->basic_rows++, _("_Descriptive Name:"), name,
+    server_cfg->name = server_cfg_add_entry(server_cfg->basic_grid, server_cfg->basic_rows++, _("_Descriptive Name:"), name,
         G_CALLBACK(on_server_cfg_changed), server_cfg);
 
     /* host and port */
-    priv->host_port = server_cfg_add_entry(priv->basic_grid, priv->basic_rows++, _("_Server:"),
+    server_cfg->host_port = server_cfg_add_entry(server_cfg->basic_grid, server_cfg->basic_rows++, _("_Server:"),
                                            libbalsa_server_get_host(server),
                                            G_CALLBACK(on_server_cfg_changed), server_cfg);
 
     /* security settings */
-    priv->security = server_cfg_security_widget(server);
-    server_cfg_add_widget(priv->basic_grid, priv->basic_rows++, _("Se_curity:"), priv->security);
-    g_signal_connect(priv->security, "changed", G_CALLBACK(on_server_cfg_changed), server_cfg);
+    server_cfg->security = server_cfg_security_widget(server);
+    server_cfg_add_widget(server_cfg->basic_grid, server_cfg->basic_rows++, _("Se_curity:"), server_cfg->security);
+    g_signal_connect(server_cfg->security, "changed", G_CALLBACK(on_server_cfg_changed), server_cfg);
 
     /* check box for authentication or anonymous access - smtp and imap only */
     protocol = libbalsa_server_get_protocol(server);
     if ((strcmp(protocol, "smtp") == 0) || (strcmp(protocol, "imap") == 0)) {
-        priv->require_auth = server_cfg_add_check(priv->basic_grid, priv->basic_rows++,
+        server_cfg->require_auth = server_cfg_add_check(server_cfg->basic_grid, server_cfg->basic_rows++,
                                                   _("Server requires _authentication"),
                                                   !libbalsa_server_get_try_anonymous(server),
                                                   G_CALLBACK(on_server_cfg_changed), server_cfg);
     }
 
     /* user name and password */
-    priv->username = server_cfg_add_entry(priv->basic_grid, priv->basic_rows++, _("_User Name:"),
+    server_cfg->username = server_cfg_add_entry(server_cfg->basic_grid, server_cfg->basic_rows++, _("_User Name:"),
                                           libbalsa_server_get_user(server),
                                           G_CALLBACK(on_server_cfg_changed), server_cfg);
 
-    priv->password = server_cfg_add_entry(priv->basic_grid, priv->basic_rows++, _("_Pass Phrase:"),
+    server_cfg->password = server_cfg_add_entry(server_cfg->basic_grid, server_cfg->basic_rows++, _("_Pass Phrase:"),
                                           libbalsa_server_get_password(server),
         G_CALLBACK(on_server_cfg_changed), server_cfg);
-    g_object_set(G_OBJECT(priv->password), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
-    gtk_entry_set_visibility(GTK_ENTRY(priv->password), FALSE);
+    g_object_set(G_OBJECT(server_cfg->password), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
+    gtk_entry_set_visibility(GTK_ENTRY(server_cfg->password), FALSE);
 
-    priv->remember_pass = server_cfg_add_check(priv->basic_grid, priv->basic_rows++, remember_password_message[0],
+    server_cfg->remember_pass = server_cfg_add_check(server_cfg->basic_grid, server_cfg->basic_rows++, remember_password_message[0],
         libbalsa_server_get_remember_password(server), G_CALLBACK(on_server_cfg_changed), server_cfg);
 
     /* notebook page with advanced options */
-    priv->advanced_grid = libbalsa_create_grid();
-    priv->advanced_rows = 0U;
-    gtk_container_set_border_width(GTK_CONTAINER(priv->advanced_grid), HIG_PADDING);
-    gtk_notebook_append_page(GTK_NOTEBOOK(server_cfg), priv->advanced_grid, gtk_label_new_with_mnemonic(_("_Advanced")));
+    server_cfg->advanced_grid = libbalsa_create_grid();
+    server_cfg->advanced_rows = 0U;
+    gtk_container_set_border_width(GTK_CONTAINER(server_cfg->advanced_grid), HIG_PADDING);
+    gtk_notebook_append_page(GTK_NOTEBOOK(server_cfg), server_cfg->advanced_grid, gtk_label_new_with_mnemonic(_("_Advanced")));
 
     /* client certificate and passphrase */
-    priv->require_cert = server_cfg_add_check(priv->advanced_grid, priv->advanced_rows++, _("Server _requires client certificate"),
+    server_cfg->require_cert = server_cfg_add_check(server_cfg->advanced_grid, server_cfg->advanced_rows++, _("Server _requires client certificate"),
         libbalsa_server_get_client_cert(server), G_CALLBACK(on_server_cfg_changed), server_cfg);
 
-    priv->cert_file = gtk_file_chooser_button_new(_("Choose Client Certificate"), GTK_FILE_CHOOSER_ACTION_OPEN);
-    server_cfg_add_widget(priv->advanced_grid, priv->advanced_rows++, _("Certificate _File:"), priv->cert_file);
+    server_cfg->cert_file = gtk_file_chooser_button_new(_("Choose Client Certificate"), GTK_FILE_CHOOSER_ACTION_OPEN);
+    server_cfg_add_widget(server_cfg->advanced_grid, server_cfg->advanced_rows++, _("Certificate _File:"), server_cfg->cert_file);
 
     cert_file = libbalsa_server_get_cert_file(server);
     if (cert_file != NULL) {
-        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(priv->cert_file), cert_file);
+        gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(server_cfg->cert_file), cert_file);
     }
-    g_signal_connect(priv->cert_file, "file-set", G_CALLBACK(on_server_cfg_changed), server_cfg);
+    g_signal_connect(server_cfg->cert_file, "file-set", G_CALLBACK(on_server_cfg_changed), server_cfg);
 
-	priv->cert_pass = server_cfg_add_entry(priv->advanced_grid, priv->advanced_rows++, _("Certificate _Pass Phrase:"),
+	server_cfg->cert_pass = server_cfg_add_entry(server_cfg->advanced_grid, server_cfg->advanced_rows++, _("Certificate _Pass Phrase:"),
 		libbalsa_server_get_cert_passphrase(server), G_CALLBACK(on_server_cfg_changed), server_cfg);
-    g_object_set(G_OBJECT(priv->cert_pass), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
-    gtk_entry_set_visibility(GTK_ENTRY(priv->cert_pass), FALSE);
+    g_object_set(G_OBJECT(server_cfg->cert_pass), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
+    gtk_entry_set_visibility(GTK_ENTRY(server_cfg->cert_pass), FALSE);
 
-    priv->remember_cert_pass = server_cfg_add_check(priv->advanced_grid, priv->advanced_rows++, remember_password_message[1],
+    server_cfg->remember_cert_pass = server_cfg_add_check(server_cfg->advanced_grid, server_cfg->advanced_rows++, remember_password_message[1],
         libbalsa_server_get_remember_cert_passphrase(server), G_CALLBACK(on_server_cfg_changed), server_cfg);
 
     /* initially run the validity check */
@@ -177,7 +177,7 @@ gboolean
 libbalsa_server_cfg_valid(LibBalsaServerCfg *server_cfg)
 {
 	g_return_val_if_fail(LIBBALSA_IS_SERVER_CFG(server_cfg), FALSE);
-	return server_cfg->priv->cfg_valid;
+	return server_cfg->cfg_valid;
 }
 
 
@@ -186,15 +186,13 @@ libbalsa_server_cfg_add_check(LibBalsaServerCfg *server_cfg, gboolean basic, con
 	GCallback callback, gpointer cb_data)
 {
 	GtkWidget *new_check;
-	LibBalsaServerCfgPrivate *priv;
 
 	g_return_val_if_fail(LIBBALSA_IS_SERVER_CFG(server_cfg) && (label != NULL), NULL);
 
-	priv = server_cfg->priv;
 	if (basic) {
-		new_check = server_cfg_add_check(priv->basic_grid, priv->basic_rows++, label, initval, callback, cb_data);
+		new_check = server_cfg_add_check(server_cfg->basic_grid, server_cfg->basic_rows++, label, initval, callback, cb_data);
 	} else {
-		new_check = server_cfg_add_check(priv->advanced_grid, priv->advanced_rows++, label, initval, callback, cb_data);
+		new_check = server_cfg_add_check(server_cfg->advanced_grid, server_cfg->advanced_rows++, label, initval, callback, cb_data);
 	}
 	return new_check;
 }
@@ -205,15 +203,13 @@ libbalsa_server_cfg_add_entry(LibBalsaServerCfg *server_cfg, gboolean basic, con
 	GCallback callback, gpointer cb_data)
 {
 	GtkWidget *new_entry;
-	LibBalsaServerCfgPrivate *priv;
 
 	g_return_val_if_fail(LIBBALSA_IS_SERVER_CFG(server_cfg) && (label != NULL), NULL);
 
-	priv = server_cfg->priv;
 	if (basic) {
-		new_entry = server_cfg_add_entry(priv->basic_grid, priv->basic_rows++, label, initval, callback, cb_data);
+		new_entry = server_cfg_add_entry(server_cfg->basic_grid, server_cfg->basic_rows++, label, initval, callback, cb_data);
 	} else {
-		new_entry = server_cfg_add_entry(priv->advanced_grid, priv->advanced_rows++, label, initval, callback, cb_data);
+		new_entry = server_cfg_add_entry(server_cfg->advanced_grid, server_cfg->advanced_rows++, label, initval, callback, cb_data);
 	}
 	return new_entry;
 }
@@ -222,15 +218,13 @@ libbalsa_server_cfg_add_entry(LibBalsaServerCfg *server_cfg, gboolean basic, con
 void
 libbalsa_server_cfg_add_item(LibBalsaServerCfg *server_cfg, gboolean basic, const gchar *label, GtkWidget *widget)
 {
-	LibBalsaServerCfgPrivate *priv;
 
 	g_return_if_fail(LIBBALSA_IS_SERVER_CFG(server_cfg) && (label != NULL) && (widget != NULL));
 
-	priv = server_cfg->priv;
 	if (basic) {
-		server_cfg_add_widget(priv->basic_grid, priv->basic_rows++, label, widget);
+		server_cfg_add_widget(server_cfg->basic_grid, server_cfg->basic_rows++, label, widget);
 	} else {
-		server_cfg_add_widget(priv->advanced_grid, priv->advanced_rows++, label, widget);
+		server_cfg_add_widget(server_cfg->advanced_grid, server_cfg->advanced_rows++, label, widget);
 	}
 }
 
@@ -238,19 +232,17 @@ libbalsa_server_cfg_add_item(LibBalsaServerCfg *server_cfg, gboolean basic, cons
 void
 libbalsa_server_cfg_add_row(LibBalsaServerCfg *server_cfg, gboolean basic, GtkWidget *left, GtkWidget *right)
 {
-	LibBalsaServerCfgPrivate *priv;
 	GtkGrid *dest;
 	guint *dest_row;
 
 	g_return_if_fail(LIBBALSA_IS_SERVER_CFG(server_cfg) && (left != NULL));
 
-	priv = server_cfg->priv;
 	if (basic) {
-		dest = GTK_GRID(priv->basic_grid);
-		dest_row = &priv->basic_rows;
+		dest = GTK_GRID(server_cfg->basic_grid);
+		dest_row = &server_cfg->basic_rows;
 	} else {
-		dest = GTK_GRID(priv->advanced_grid);
-		dest_row = &priv->advanced_rows;
+		dest = GTK_GRID(server_cfg->advanced_grid);
+		dest_row = &server_cfg->advanced_rows;
 	}
 
 	if (right != NULL) {
@@ -267,7 +259,7 @@ const gchar *
 libbalsa_server_cfg_get_name(LibBalsaServerCfg *server_cfg)
 {
 	g_return_val_if_fail(LIBBALSA_IS_SERVER_CFG(server_cfg), FALSE);
-	return gtk_entry_get_text(GTK_ENTRY(server_cfg->priv->name));
+	return gtk_entry_get_text(GTK_ENTRY(server_cfg->name));
 }
 
 
@@ -275,36 +267,34 @@ libbalsa_server_cfg_get_name(LibBalsaServerCfg *server_cfg)
 void
 libbalsa_server_cfg_assign_server(LibBalsaServerCfg *server_cfg, LibBalsaServer *server)
 {
-	LibBalsaServerCfgPrivate *priv;
         gchar *cert_file;
 
 	g_return_if_fail(LIBBALSA_IS_SERVER_CFG(server_cfg) && LIBBALSA_IS_SERVER(server));
 
-	priv = server_cfg->priv;
 
 	/* host, post and security */
-    libbalsa_server_set_security(server, (NetClientCryptMode) (gtk_combo_box_get_active(GTK_COMBO_BOX(priv->security)) + 1));
-    libbalsa_server_set_host(server, gtk_entry_get_text(GTK_ENTRY(priv->host_port)), libbalsa_server_get_security(server));
+    libbalsa_server_set_security(server, (NetClientCryptMode) (gtk_combo_box_get_active(GTK_COMBO_BOX(server_cfg->security)) + 1));
+    libbalsa_server_set_host(server, gtk_entry_get_text(GTK_ENTRY(server_cfg->host_port)), libbalsa_server_get_security(server));
 
     /* authentication stuff */
-    if (priv->require_auth != NULL) {
-        libbalsa_server_set_try_anonymous(server, !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(priv->require_auth)));
+    if (server_cfg->require_auth != NULL) {
+        libbalsa_server_set_try_anonymous(server, !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->require_auth)));
     } else {
         libbalsa_server_set_try_anonymous(server, FALSE);
     }
-    libbalsa_server_set_username(server, gtk_entry_get_text(GTK_ENTRY(priv->username)));
-    libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(priv->password)), FALSE);
-    libbalsa_server_set_remember_password(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(priv->remember_pass)));
+    libbalsa_server_set_username(server, gtk_entry_get_text(GTK_ENTRY(server_cfg->username)));
+    libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(server_cfg->password)), FALSE);
+    libbalsa_server_set_remember_password(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->remember_pass)));
 
     /* client certificate */
-    libbalsa_server_set_client_cert(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(priv->require_cert)));
+    libbalsa_server_set_client_cert(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->require_cert)));
 
-    cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(priv->cert_file));
+    cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(server_cfg->cert_file));
     libbalsa_server_set_cert_file(server, cert_file);
     g_free(cert_file);
 
-    libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(priv->cert_pass)), TRUE);
-    libbalsa_server_set_remember_cert_passphrase(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(priv->remember_cert_pass)));
+    libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(server_cfg->cert_pass)), TRUE);
+    libbalsa_server_set_remember_cert_passphrase(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->remember_cert_pass)));
 }
 
 
@@ -319,7 +309,7 @@ libbalsa_server_cfg_class_init(LibBalsaServerCfgClass *klass)
 static void
 libbalsa_server_cfg_init(LibBalsaServerCfg *self)
 {
-	self->priv = libbalsa_server_cfg_get_instance_private(self);
+    /* Nothing to do */
 }
 
 
@@ -394,45 +384,44 @@ server_cfg_security_widget(LibBalsaServer *server)
 static void
 on_server_cfg_changed(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
 {
-	LibBalsaServerCfgPrivate *priv = server_cfg->priv;
 	gboolean sensitive;
 
 	/* valid configuration only if a name and a host have been given */
-	priv->cfg_valid = (*gtk_entry_get_text(GTK_ENTRY(priv->name)) != '\0') &&
-		(*gtk_entry_get_text(GTK_ENTRY(priv->host_port)) != '\0');
+	server_cfg->cfg_valid = (*gtk_entry_get_text(GTK_ENTRY(server_cfg->name)) != '\0') &&
+		(*gtk_entry_get_text(GTK_ENTRY(server_cfg->host_port)) != '\0');
 
 	/* user name/password only if authentication is required */
-	if (priv->require_auth != NULL) {
-		sensitive = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(priv->require_auth));
+	if (server_cfg->require_auth != NULL) {
+		sensitive = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->require_auth));
 	} else {
 		sensitive = TRUE;
 	}
-	gtk_widget_set_sensitive(priv->username, sensitive);
-	gtk_widget_set_sensitive(priv->password, sensitive);
-	gtk_widget_set_sensitive(priv->remember_pass, sensitive);
+	gtk_widget_set_sensitive(server_cfg->username, sensitive);
+	gtk_widget_set_sensitive(server_cfg->password, sensitive);
+	gtk_widget_set_sensitive(server_cfg->remember_pass, sensitive);
 
 	/* invalid configuration if authentication is required, but no user name given */
-	if (sensitive && (*gtk_entry_get_text(GTK_ENTRY(priv->username)) == '\0')) {
-		priv->cfg_valid = FALSE;
+	if (sensitive && (*gtk_entry_get_text(GTK_ENTRY(server_cfg->username)) == '\0')) {
+		server_cfg->cfg_valid = FALSE;
 	}
 
 	/* client certificate and passphrase stuff only if TLS/SSL is enabled */
-	sensitive = (NetClientCryptMode) (gtk_combo_box_get_active(GTK_COMBO_BOX(priv->security)) + 1) != NET_CLIENT_CRYPT_NONE;
-	gtk_widget_set_sensitive(priv->require_cert, sensitive);
+	sensitive = (NetClientCryptMode) (gtk_combo_box_get_active(GTK_COMBO_BOX(server_cfg->security)) + 1) != NET_CLIENT_CRYPT_NONE;
+	gtk_widget_set_sensitive(server_cfg->require_cert, sensitive);
 	if (sensitive) {
-		sensitive = sensitive && gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(priv->require_cert));
+		sensitive = sensitive && gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->require_cert));
 	}
 
-	gtk_widget_set_sensitive(priv->cert_file, sensitive);
-	gtk_widget_set_sensitive(priv->cert_pass, sensitive);
-	gtk_widget_set_sensitive(priv->remember_cert_pass, sensitive);
+	gtk_widget_set_sensitive(server_cfg->cert_file, sensitive);
+	gtk_widget_set_sensitive(server_cfg->cert_pass, sensitive);
+	gtk_widget_set_sensitive(server_cfg->remember_cert_pass, sensitive);
 
 	/* invalid configuration if a certificate is required, but no file name given */
 	if (sensitive) {
-		gchar *cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(priv->cert_file));
+		gchar *cert_file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(server_cfg->cert_file));
 
 		if ((cert_file == NULL) || (cert_file[0] == '\0')) {
-			priv->cfg_valid = FALSE;
+			server_cfg->cfg_valid = FALSE;
 		}
 		g_free(cert_file);
 	}

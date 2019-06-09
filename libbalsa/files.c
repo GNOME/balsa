@@ -119,7 +119,7 @@ libbalsa_icon_finder(GtkWidget         * widget,
     if (mime_type)
         content_type = mime_type;
     else if (for_file) {
-        content_type = libbalsa_vfs_get_mime_type(for_file);
+        content_type = libbalsa_vfs_get_mime_type((LibbalsaVfs *) for_file);
     } else
         content_type = "application/octet-stream";
 

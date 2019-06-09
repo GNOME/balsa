@@ -49,7 +49,9 @@
     "access::*"
 
 
-struct _LibbalsaVfsPriv {
+struct _LibbalsaVfs {
+    GObject parent_object;
+
     gchar * file_uri;
     gchar * file_utf8;
     gchar * folder_uri;
@@ -61,11 +63,6 @@ struct _LibbalsaVfsPriv {
 };
 
 
-static GObjectClass *libbalsa_vfs_parent_class = NULL;
-
-
-static void libbalsa_vfs_class_init(LibbalsaVfsClass * klass);
-static void libbalsa_vfs_init(LibbalsaVfs * self);
 static void libbalsa_vfs_finalize(LibbalsaVfs * self);
 
 
@@ -76,32 +73,7 @@ libbalsa_vfs_local_only(void)
 }
 
 
-GType
-libbalsa_vfs_get_type(void)
-{
-    static GType libbalsa_vfs_type = 0;
-
-    if (!libbalsa_vfs_type) {
-        static const GTypeInfo libbalsa_vfs_type_info = {
-            sizeof(LibbalsaVfsClass),     /* class_size */
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-            (GClassInitFunc) libbalsa_vfs_class_init,   /* class_init */
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-            sizeof(LibbalsaVfs),  /* instance_size */
-            0,                  /* n_preallocs */
-            (GInstanceInitFunc) libbalsa_vfs_init,      /* instance_init */
-            /* no value_table */
-        };
-
-        libbalsa_vfs_type =
-            g_type_register_static(G_TYPE_OBJECT, "LibbalsaVfs",
-                                   &libbalsa_vfs_type_info, 0);
-    }
-
-    return libbalsa_vfs_type;
-}
+G_DEFINE_TYPE(LibbalsaVfs, libbalsa_vfs, G_TYPE_OBJECT)
 
 
 static void
@@ -109,7 +81,6 @@ libbalsa_vfs_class_init(LibbalsaVfsClass * klass)
 {
     GObjectClass *gobject_klass = G_OBJECT_CLASS(klass);
 
-    libbalsa_vfs_parent_class = g_type_class_peek(G_TYPE_OBJECT);
     gobject_klass->finalize =
         (GObjectFinalizeFunc) libbalsa_vfs_finalize;
 }
@@ -118,32 +89,26 @@ libbalsa_vfs_class_init(LibbalsaVfsClass * klass)
 static void
 libbalsa_vfs_init(LibbalsaVfs * self)
 {
-    self->priv = NULL;
+    /* Nothing to do */
 }
 
 
 static void
 libbalsa_vfs_finalize(LibbalsaVfs * self)
 {
-    struct _LibbalsaVfsPriv * priv;
+    g_return_if_fail(LIBBALSA_IS_VFS(self));
 
-    g_return_if_fail(self != NULL);
-    priv = self->priv;
+    g_free(self->file_uri);
+    g_free(self->file_utf8);
+    g_free(self->folder_uri);
+    g_free(self->mime_type);
+    g_free(self->charset);
+    if (self->gio_gfile != NULL)
+        g_object_unref(self->gio_gfile);
+    if (self->info != NULL)
+        g_object_unref(self->info);
 
-    if (priv) {
-        g_free(priv->file_uri);
-        g_free(priv->file_utf8);
-        g_free(priv->folder_uri);
-        g_free(priv->mime_type);
-        g_free(priv->charset);
-        if (priv->gio_gfile)
-            g_object_unref(priv->gio_gfile);
-        if (priv->info)
-            g_object_unref(priv->info);
-        g_free(priv);
-    }
-
-    libbalsa_vfs_parent_class->finalize(G_OBJECT(self));
+    G_OBJECT_CLASS(libbalsa_vfs_parent_class)->finalize(G_OBJECT(self));
 }
 
 
@@ -159,18 +124,15 @@ libbalsa_vfs_new_from_uri(const gchar * uri)
 {
     LibbalsaVfs * retval;
 
-    g_return_val_if_fail(uri, NULL);
-    if (!(retval = libbalsa_vfs_new()))
+    g_return_val_if_fail(uri != NULL, NULL);
+
+    if ((retval = libbalsa_vfs_new()) == NULL)
         return NULL;
 
-    if (!(retval->priv = g_new0(struct _LibbalsaVfsPriv, 1))) {
-        g_object_unref(G_OBJECT(retval));
-        return NULL;
-    }
-    retval->priv->text_attr = (LibBalsaTextAttribute) -1;
+    retval->text_attr = (LibBalsaTextAttribute) -1;
 
-    retval->priv->file_uri = g_strdup(uri);
-    retval->priv->gio_gfile = g_file_new_for_uri(uri);
+    retval->file_uri = g_strdup(uri);
+    retval->gio_gfile = g_file_new_for_uri(uri);
 
     return retval;
 }
@@ -179,29 +141,29 @@ libbalsa_vfs_new_from_uri(const gchar * uri)
 /* create a new LibbalsaVfs object by appending text to the existing object
  * file (note: text is in utf8, not escaped) */
 LibbalsaVfs *
-libbalsa_vfs_append(const LibbalsaVfs * file, const gchar * text)
+libbalsa_vfs_append(LibbalsaVfs * file, const gchar * text)
 {
     gchar * p;
     gchar * q;
     LibbalsaVfs * retval;
 
-    g_return_val_if_fail(file, NULL);
-    g_return_val_if_fail(file->priv, NULL);
-    g_return_val_if_fail(file->priv->file_uri, NULL);
-    g_return_val_if_fail(text, NULL);
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), NULL);
+    g_return_val_if_fail(file->file_uri != NULL, NULL);
+    g_return_val_if_fail(text != NULL, NULL);
 
     /* fake an absolute file name which we can convert to an uri */
     p = g_strconcat("/", text, NULL);
     q = g_filename_to_uri(p, NULL, NULL);
     g_free(p);
-    if (!q)
+    if (q == NULL)
         return NULL;
 
     /* append to the existing uri and create the new object from it */
-    p = g_strconcat(file->priv->file_uri, q + 8, NULL);
+    p = g_strconcat(file->file_uri, q + 8, NULL);
     g_free(q);
     retval = libbalsa_vfs_new_from_uri(p);
     g_free(p);
+
     return retval;
 }
 
@@ -210,16 +172,15 @@ libbalsa_vfs_append(const LibbalsaVfs * file, const gchar * text)
  * object dir which describes a folder (note: filename is in utf8, not
  * escaped) */
 LibbalsaVfs *
-libbalsa_vfs_dir_append(const LibbalsaVfs * dir, const gchar * filename)
-{   
+libbalsa_vfs_dir_append(LibbalsaVfs * dir, const gchar * filename)
+{
     gchar * p;
     gchar * q;
     LibbalsaVfs * retval;
 
-    g_return_val_if_fail(dir, NULL);
-    g_return_val_if_fail(dir->priv, NULL);
-    g_return_val_if_fail(dir->priv->file_uri, NULL);
-    g_return_val_if_fail(filename, NULL);
+    g_return_val_if_fail(LIBBALSA_IS_VFS(dir), NULL);
+    g_return_val_if_fail(dir->file_uri != NULL, NULL);
+    g_return_val_if_fail(filename != NULL, NULL);
 
     /* fake an absolute file name which we can convert to an uri */
     p = g_strconcat("/", filename, NULL);
@@ -229,67 +190,60 @@ libbalsa_vfs_dir_append(const LibbalsaVfs * dir, const gchar * filename)
         return NULL;
 
     /* append to the existing uri and create the new object from it */
-    p = g_strconcat(dir->priv->file_uri, q + 7, NULL);
+    p = g_strconcat(dir->file_uri, q + 7, NULL);
     g_free(q);
     retval = libbalsa_vfs_new_from_uri(p);
     g_free(p);
+
     return retval;
 }
 
 
 /* return the text uri of the passed file, removing the last component */
 const gchar *
-libbalsa_vfs_get_folder(const LibbalsaVfs * file)
+libbalsa_vfs_get_folder(LibbalsaVfs * file)
 {
-    struct _LibbalsaVfsPriv * priv;
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), NULL);
+    g_return_val_if_fail(file->file_uri != NULL, NULL);
 
-    g_return_val_if_fail(file, NULL);
-    g_return_val_if_fail(file->priv, NULL);
-    priv = file->priv;
-    g_return_val_if_fail(priv->file_uri, NULL);
-
-    if (!priv->folder_uri) {
+    if (file->folder_uri == NULL) {
         gchar * p;
 
-        if ((priv->folder_uri = g_strdup(priv->file_uri)) &&
-            (p = g_utf8_strrchr(priv->folder_uri, -1, g_utf8_get_char("/"))))
+        if ((file->folder_uri = g_strdup(file->file_uri)) != NULL &&
+            (p = g_utf8_strrchr(file->folder_uri, -1, g_utf8_get_char("/"))) != NULL)
             *p = '\0';
     }
 
-    return priv->folder_uri;
+    return file->folder_uri;
 }
 
 
 /* return the text uri of the passed file */
 const gchar *
-libbalsa_vfs_get_uri(const LibbalsaVfs * file)
+libbalsa_vfs_get_uri(LibbalsaVfs * file)
 {
-    g_return_val_if_fail(file, NULL);
-    g_return_val_if_fail(file->priv, NULL);
-    g_return_val_if_fail(file->priv->file_uri, NULL);
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), NULL);
+    g_return_val_if_fail(file->file_uri != NULL, NULL);
 
-    return file->priv->file_uri;
+    return file->file_uri;
 }
 
 
 /* return the text uri of the passed file as utf8 string (%xx replaced) */
 const gchar *
-libbalsa_vfs_get_uri_utf8(const LibbalsaVfs * file)
+libbalsa_vfs_get_uri_utf8(LibbalsaVfs * file)
 {
-    struct _LibbalsaVfsPriv * priv;
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), NULL);
+    g_return_val_if_fail(file->file_uri != NULL, NULL);
 
-    g_return_val_if_fail(file, NULL);
-    g_return_val_if_fail(file->priv, NULL);
-    priv = file->priv;
-    g_return_val_if_fail(priv->file_uri, NULL);
-
-    if (!priv->file_utf8) {
+    if (file->file_utf8 == NULL) {
         gchar * p;
         gchar * q;
 
-        if (!(p = priv->file_utf8 = g_malloc(strlen(priv->file_uri) + 1)))
+        if ((p = file->file_utf8 = g_malloc(strlen(file->file_uri) + 1)) == NULL)
             return NULL;
-        q = priv->file_uri;
+
+        q = file->file_uri;
         while (*q != '\0') {
             if (*q == '%') {
                 if (g_ascii_isxdigit(q[1]) && g_ascii_isxdigit(q[2])) {
@@ -305,18 +259,18 @@ libbalsa_vfs_get_uri_utf8(const LibbalsaVfs * file)
         *p = '\0';
     }
 
-    return priv->file_utf8;
+    return file->file_utf8;
 }
 
 
 const gchar *
-libbalsa_vfs_get_basename_utf8(const LibbalsaVfs * file)
+libbalsa_vfs_get_basename_utf8(LibbalsaVfs * file)
 {
     const gchar * uri_utf8 = libbalsa_vfs_get_uri_utf8(file);
     const gchar * p;
 
-    if (uri_utf8 &&
-        (p = g_utf8_strrchr(uri_utf8, -1, g_utf8_get_char("/"))))
+    if (uri_utf8 != NULL &&
+        (p = g_utf8_strrchr(uri_utf8, -1, g_utf8_get_char("/"))) != NULL)
         return p + 1;
     else
         return NULL;
@@ -324,79 +278,67 @@ libbalsa_vfs_get_basename_utf8(const LibbalsaVfs * file)
 
 
 const gchar *
-libbalsa_vfs_get_mime_type(const LibbalsaVfs * file)
+libbalsa_vfs_get_mime_type(LibbalsaVfs * file)
 {
-    struct _LibbalsaVfsPriv * priv;
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), NULL);
+    g_return_val_if_fail(file->file_uri != NULL, NULL);
 
-    g_return_val_if_fail(file, NULL);
-    g_return_val_if_fail(file->priv, NULL);
-    priv = file->priv;
-    g_return_val_if_fail(priv->file_uri, NULL);
-
-    if (!priv->mime_type) {
+    if (file->mime_type == NULL) {
         /* use GIO to determine the mime type of the file */
-        g_return_val_if_fail(priv->gio_gfile, FALSE);
+        g_return_val_if_fail(file->gio_gfile != NULL, NULL);
 
-        if (!priv->info)
-            priv->info = 
-                g_file_query_info(priv->gio_gfile, GIO_INFO_ATTS,
+        if (file->info == NULL)
+            file->info =
+                g_file_query_info(file->gio_gfile, GIO_INFO_ATTS,
                                   G_FILE_QUERY_INFO_NONE, NULL, NULL);
-        if (priv->info)
-            priv->mime_type =
-                g_strdup(g_file_info_get_attribute_string(priv->info,
+        if (file->info != NULL)
+            file->mime_type =
+                g_strdup(g_file_info_get_attribute_string(file->info,
                                                           G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE));
 
         /* always fall back to application/octet-stream */
-        if (!priv->mime_type)
-            priv->mime_type = g_strdup("application/octet-stream");
+        if (file->mime_type == NULL)
+            file->mime_type = g_strdup("application/octet-stream");
     }
 
-    return priv->mime_type;
+    return file->mime_type;
 }
 
 
 const gchar *
-libbalsa_vfs_get_charset(const LibbalsaVfs * file)
+libbalsa_vfs_get_charset(LibbalsaVfs * file)
 {
-    struct _LibbalsaVfsPriv * priv;
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), NULL);
+    g_return_val_if_fail(file->file_uri != NULL, NULL);
 
-    g_return_val_if_fail(file, NULL);
-    g_return_val_if_fail(file->priv, NULL);
-    priv = file->priv;
-    g_return_val_if_fail(priv->file_uri, NULL);
-
-    if (!priv->charset && priv->text_attr == (LibBalsaTextAttribute) -1) {
+    if (file->charset == NULL && file->text_attr == (LibBalsaTextAttribute) -1) {
         libbalsa_vfs_get_text_attr(file);
 
-        if (!(priv->text_attr & LIBBALSA_TEXT_HI_BIT))
-            priv->charset = g_strdup("us-ascii");
-        else if (priv->text_attr & LIBBALSA_TEXT_HI_UTF8)
-            priv->charset = g_strdup("utf-8");
+        if ((file->text_attr & LIBBALSA_TEXT_HI_BIT) == 0)
+            file->charset = g_strdup("us-ascii");
+        else if ((file->text_attr & LIBBALSA_TEXT_HI_UTF8) != 0)
+            file->charset = g_strdup("utf-8");
     }
 
-    return priv->charset;
+    return file->charset;
 }
 
 
 LibBalsaTextAttribute
-libbalsa_vfs_get_text_attr(const LibbalsaVfs * file)
+libbalsa_vfs_get_text_attr(LibbalsaVfs * file)
 {
-    struct _LibbalsaVfsPriv * priv;
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), 0);
+    g_return_val_if_fail(file->file_uri != NULL, 0);
 
-    g_return_val_if_fail(file, 0);
-    g_return_val_if_fail(file->priv, 0);
-    priv = file->priv;
-    g_return_val_if_fail(priv->file_uri, 0);
-
-    if (priv->text_attr == (LibBalsaTextAttribute) -1) {
+    if (file->text_attr == (LibBalsaTextAttribute) -1) {
         GInputStream * stream;
 
         /* use GIO to determine the text attributes of the file */
-        g_return_val_if_fail(priv->gio_gfile, 0);
-        priv->text_attr = 0;
+        g_return_val_if_fail(file->gio_gfile != NULL, 0);
+        file->text_attr = 0;
 
         /* read and check - see libbalsa_text_attr_file() */
-        if ((stream = G_INPUT_STREAM(g_file_read(priv->gio_gfile, NULL, NULL))) != NULL) {
+        if ((stream = G_INPUT_STREAM(g_file_read(file->gio_gfile, NULL, NULL))) != NULL) {
             gchar buf[1024];
             gchar *new_chars = buf;
             gboolean has_esc = FALSE;
@@ -412,7 +354,7 @@ libbalsa_vfs_get_text_attr(const LibbalsaVfs * file)
                                                       NULL,
                                                       NULL)) > 0)) {
                 new_chars[bytes_read] = '\0';
-                
+
                 if (!has_esc || !has_hi_bit || !has_hi_ctrl) {
                     guchar * p;
 
@@ -445,39 +387,35 @@ libbalsa_vfs_get_text_attr(const LibbalsaVfs * file)
             g_object_unref(stream);
 
             if (has_esc)
-                priv->text_attr |= LIBBALSA_TEXT_ESC;
+                file->text_attr |= LIBBALSA_TEXT_ESC;
             if (has_hi_bit)
-                priv->text_attr |= LIBBALSA_TEXT_HI_BIT;
+                file->text_attr |= LIBBALSA_TEXT_HI_BIT;
             if (has_hi_ctrl)
-                priv->text_attr |= LIBBALSA_TEXT_HI_CTRL;
+                file->text_attr |= LIBBALSA_TEXT_HI_CTRL;
             if (is_utf8 && has_hi_bit)
-                priv->text_attr |= LIBBALSA_TEXT_HI_UTF8;
+                file->text_attr |= LIBBALSA_TEXT_HI_UTF8;
         }
     }
 
-    return priv->text_attr;
+    return file->text_attr;
 }
 
 
 guint64
-libbalsa_vfs_get_size(const LibbalsaVfs * file)
+libbalsa_vfs_get_size(LibbalsaVfs * file)
 {
-    struct _LibbalsaVfsPriv * priv;
-
-    g_return_val_if_fail(file, 0);
-    g_return_val_if_fail(file->priv, 0);
-    priv = file->priv;
-    g_return_val_if_fail(priv->file_uri, 0);
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), 0);
+    g_return_val_if_fail(file->file_uri != NULL, 0);
 
     /* use GIO to determine the size of the file */
-    g_return_val_if_fail(priv->gio_gfile, 0);
+    g_return_val_if_fail(file->gio_gfile != NULL, 0);
 
-    if (!priv->info)
-        priv->info = 
-            g_file_query_info(priv->gio_gfile, GIO_INFO_ATTS,
+    if (file->info == NULL)
+        file->info =
+            g_file_query_info(file->gio_gfile, GIO_INFO_ATTS,
                               G_FILE_QUERY_INFO_NONE, NULL, NULL);
-    if (priv->info)
-        return g_file_info_get_attribute_uint64(priv->info,
+    if (file->info != NULL)
+        return g_file_info_get_attribute_uint64(file->info,
                                                 G_FILE_ATTRIBUTE_STANDARD_SIZE);
 
     return 0;
@@ -487,21 +425,18 @@ libbalsa_vfs_get_size(const LibbalsaVfs * file)
 /* get a GMime stream for the passed file, either read-only or in
  * read-write mode */
 GMimeStream *
-libbalsa_vfs_create_stream(const LibbalsaVfs * file, mode_t mode, 
+libbalsa_vfs_create_stream(LibbalsaVfs * file, mode_t mode, 
                            gboolean rdwr, GError ** err)
 {
-    struct _LibbalsaVfsPriv * priv;
     GMimeStream *stream;
 
-    g_return_val_if_fail(file, NULL);
-    g_return_val_if_fail(file->priv, NULL);
-    priv = file->priv;
-    g_return_val_if_fail(priv->file_uri, NULL);
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), NULL);
+    g_return_val_if_fail(file->file_uri != NULL, NULL);
 
     /* use GIO to create a GMime stream */
-    g_return_val_if_fail(priv->gio_gfile, NULL);
+    g_return_val_if_fail(file->gio_gfile != NULL, NULL);
 
-    stream = g_mime_stream_gio_new(priv->gio_gfile);
+    stream = g_mime_stream_gio_new(file->gio_gfile);
     g_mime_stream_gio_set_owner((GMimeStreamGIO *) stream, FALSE);
 
     return stream;
@@ -510,56 +445,50 @@ libbalsa_vfs_create_stream(const LibbalsaVfs * file, mode_t mode,
 
 /* return TRUE if the passed file exists */
 gboolean
-libbalsa_vfs_file_exists(const LibbalsaVfs * file)
+libbalsa_vfs_file_exists(LibbalsaVfs * file)
 {
     gboolean result = FALSE;
-    struct _LibbalsaVfsPriv * priv;
 
-    g_return_val_if_fail(file, FALSE);
-    g_return_val_if_fail(file->priv, FALSE);
-    priv = file->priv;
-    g_return_val_if_fail(priv->file_uri, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), FALSE);
+    g_return_val_if_fail(file->file_uri != NULL, FALSE);
 
     /* use GIO to get the file's attributes - fails if the file does not exist */
-    g_return_val_if_fail(priv->gio_gfile, 0);
+    g_return_val_if_fail(file->gio_gfile != NULL, FALSE);
 
-    if (!priv->info)
-        priv->info = 
-            g_file_query_info(priv->gio_gfile, GIO_INFO_ATTS,
+    if (file->info == NULL)
+        file->info =
+            g_file_query_info(file->gio_gfile, GIO_INFO_ATTS,
                               G_FILE_QUERY_INFO_NONE, NULL, NULL);
-    result = priv->info != NULL;
+    result = file->info != NULL;
 
     return result;
 }
 
 
 gboolean
-libbalsa_vfs_is_regular_file(const LibbalsaVfs * file, GError **err)
+libbalsa_vfs_is_regular_file(LibbalsaVfs * file, GError **err)
 {
     gboolean result = FALSE;
-    struct _LibbalsaVfsPriv * priv;
 
-    g_return_val_if_fail(file, FALSE);
-    g_return_val_if_fail(file->priv, FALSE);
-    priv = file->priv;
-    g_return_val_if_fail(priv->file_uri, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), FALSE);
+    g_return_val_if_fail(file->file_uri != NULL, FALSE);
 
     /* use GIO to check if the file is a regular one which can be read */
-    g_return_val_if_fail(priv->gio_gfile, 0);
+    g_return_val_if_fail(file->gio_gfile != NULL, FALSE);
 
-    if (!priv->info)
-        priv->info = 
-            g_file_query_info(priv->gio_gfile, GIO_INFO_ATTS,
+    if (file->info == NULL)
+        file->info =
+            g_file_query_info(file->gio_gfile, GIO_INFO_ATTS,
                               G_FILE_QUERY_INFO_NONE, NULL, err);
-    if (priv->info) {
-        if (g_file_info_get_file_type(priv->info) != G_FILE_TYPE_REGULAR)
+    if (file->info != NULL) {
+        if (g_file_info_get_file_type(file->info) != G_FILE_TYPE_REGULAR)
             g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
                         _("not a regular file"));
-        else if (!g_file_info_get_attribute_boolean(priv->info,
+        else if (!g_file_info_get_attribute_boolean(file->info,
                                                     G_FILE_ATTRIBUTE_ACCESS_CAN_READ)) {
             /* the read flag may not be set for some remote file systems (like smb),
              * so try to actually open the file... */
-            GFileInputStream * stream = g_file_read(priv->gio_gfile, NULL, err);
+            GFileInputStream * stream = g_file_read(file->gio_gfile, NULL, err);
             if (stream) {
                 g_object_unref(stream);
                 result = TRUE;
@@ -574,19 +503,17 @@ libbalsa_vfs_is_regular_file(const LibbalsaVfs * file, GError **err)
 
 /* unlink the passed file, return 0 on success and -1 on error */
 gint
-libbalsa_vfs_file_unlink(const LibbalsaVfs * file, GError **err)
+libbalsa_vfs_file_unlink(LibbalsaVfs * file, GError **err)
 {
     gint result = -1;
-    struct _LibbalsaVfsPriv * priv;
 
-    g_return_val_if_fail(file, -1);
-    g_return_val_if_fail(file->priv, -1);
-    priv = file->priv;
-    g_return_val_if_fail(priv->file_uri, -1);
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), -1);
+    g_return_val_if_fail(file->file_uri != NULL, -1);
 
     /* use GIO to delete the file */
-    g_return_val_if_fail(priv->gio_gfile, -1);
-    if (g_file_delete(priv->gio_gfile, NULL, err))
+    g_return_val_if_fail(file->gio_gfile != NULL, -1);
+
+    if (g_file_delete(file->gio_gfile, NULL, err))
         result = 0;
 
     return result;
@@ -594,24 +521,26 @@ libbalsa_vfs_file_unlink(const LibbalsaVfs * file, GError **err)
 
 
 gboolean
-libbalsa_vfs_launch_app(const LibbalsaVfs * file, GObject * object, GError **err)
+libbalsa_vfs_launch_app(LibbalsaVfs * file, GObject * object, GError **err)
 {
     GAppInfo *app;
     GList * args;
     gboolean result;
 
-    g_return_val_if_fail(file != NULL, FALSE);
-    g_return_val_if_fail(object != NULL, FALSE);
+    g_return_val_if_fail(LIBBALSA_IS_VFS(file), FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
 
     app = G_APP_INFO(g_object_get_data(object, LIBBALSA_VFS_MIME_ACTION));
-    if (!app) {
+    if (app == NULL) {
         g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
                     _("Cannot launch, missing application"));
         return FALSE;
     }
-    args = g_list_prepend(NULL, file->priv->gio_gfile);
+
+    args = g_list_prepend(NULL, file->gio_gfile);
     result = g_app_info_launch(app, args, NULL, err);
     g_list_free(args);
+
     return result;
 }
 
@@ -625,7 +554,7 @@ libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody * mime_body,
     gboolean result;
 
     g_return_val_if_fail(mime_body != NULL, FALSE);
-    g_return_val_if_fail(object != NULL, FALSE);
+    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
 
     if (!libbalsa_message_body_save_temporary(mime_body, err))
         return FALSE;
@@ -633,7 +562,8 @@ libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody * mime_body,
     uri = g_filename_to_uri(mime_body->temp_filename, NULL, NULL);
     file = libbalsa_vfs_new_from_uri(uri);
     g_free(uri);
-    result = libbalsa_vfs_launch_app(file,object , err);
+
+    result = libbalsa_vfs_launch_app(file, object, err);
     g_object_unref(file);
 
     return result;
@@ -667,18 +597,17 @@ libbalsa_vfs_content_type_of_buffer(const guchar * buffer,
 }
 
 
-static void 
+static void
 gio_add_vfs_menu_item(GtkMenu * menu, GAppInfo *app, GCallback callback,
                       gpointer data)
 {
     gchar *menu_label =
         g_strdup_printf(_("Open with %s"), g_app_info_get_name(app));
     GtkWidget *menu_item = gtk_menu_item_new_with_label (menu_label);
-    
-    g_object_ref(G_OBJECT(app));
+
     g_object_set_data_full(G_OBJECT(menu_item), LIBBALSA_VFS_MIME_ACTION,
-			   app, g_object_unref);
-    g_signal_connect(G_OBJECT (menu_item), "activate", callback, data);
+                           g_object_ref(app), g_object_unref);
+    g_signal_connect(menu_item, "activate", callback, data);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
     g_free(menu_label);
 }
@@ -693,7 +622,7 @@ libbalsa_vfs_fill_menu_by_content_type(GtkMenu * menu,
     GList* list;
     GAppInfo *def_app;
     GList *app_list;
-    
+
     g_return_if_fail(data != NULL);
 
     if ((def_app = g_app_info_get_default_for_type(content_type, FALSE)))
@@ -709,10 +638,7 @@ libbalsa_vfs_fill_menu_by_content_type(GtkMenu * menu,
     }
     if (def_app)
         g_object_unref(def_app);
-    if (app_list) {
-        g_list_foreach(app_list, (GFunc) g_object_unref, NULL);
-        g_list_free(app_list);
-    }
+    g_list_free_full(app_list, g_object_unref);
 }
 
 GtkWidget *
@@ -724,11 +650,11 @@ libbalsa_vfs_mime_button(LibBalsaMessageBody * mime_body,
     gchar *msg;
     GAppInfo *app = g_app_info_get_default_for_type(content_type, FALSE);
 
-    if (app) {
+    if (app != NULL) {
 	msg = g_strdup_printf(_("Open _part with %s"), g_app_info_get_name(app));
 	button = gtk_button_new_with_mnemonic(msg);
 	g_object_set_data_full(G_OBJECT(button), LIBBALSA_VFS_MIME_ACTION,
-			       (gpointer) app, g_object_unref);
+			       app, g_object_unref);
 	g_free(msg);
 
 	g_signal_connect(G_OBJECT(button), "clicked",

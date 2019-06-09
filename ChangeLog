@@ -1,5 +1,29 @@
 2019-06-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use G_DECLARE_FINAL_TYPE to declare LibBalsaVfs
+
+	Make the object private, and move the members of
+	LibBalsaVfsPriv into LibBalsaVfs; as a final
+	type, it does not need a private struct.
+
+	* libbalsa/files.c (libbalsa_icon_finder):
+	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_class_init),
+	(libbalsa_vfs_init), (libbalsa_vfs_finalize),
+	(libbalsa_vfs_new_from_uri), (libbalsa_vfs_append),
+	(libbalsa_vfs_dir_append), (libbalsa_vfs_get_folder),
+	(libbalsa_vfs_get_uri), (libbalsa_vfs_get_uri_utf8),
+	(libbalsa_vfs_get_basename_utf8), (libbalsa_vfs_get_mime_type),
+	(libbalsa_vfs_get_charset), (libbalsa_vfs_get_text_attr),
+	(libbalsa_vfs_get_size), (libbalsa_vfs_create_stream),
+	(libbalsa_vfs_file_exists), (libbalsa_vfs_is_regular_file),
+	(libbalsa_vfs_file_unlink), (libbalsa_vfs_launch_app),
+	(libbalsa_vfs_launch_app_for_body), (gio_add_vfs_menu_item),
+	(libbalsa_vfs_fill_menu_by_content_type),
+	(libbalsa_vfs_mime_button):
+	* libbalsa/libbalsa-vfs.h:
+
+2019-06-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use G_DECLARE_FINAL_TYPE to declare LibBalsaServerCfg
 
 	Make the object private, and move the members of

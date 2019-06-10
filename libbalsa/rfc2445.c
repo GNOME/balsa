@@ -80,12 +80,8 @@ G_DEFINE_TYPE(LibBalsaVEvent, libbalsa_vevent, G_TYPE_OBJECT)
 #define RFC2445_RSVP            "RFC2445:RSVP"
 
 
-static void libbalsa_vcal_class_init(LibBalsaVCalClass *klass);
-static void libbalsa_vcal_init(LibBalsaVCal *self);
 static void libbalsa_vcal_finalize(GObject *self);
 
-static void libbalsa_vevent_class_init(LibBalsaVEventClass *klass);
-static void libbalsa_vevent_init(LibBalsaVEvent *self);
 static void libbalsa_vevent_finalize(GObject *self);
 
 static LibBalsaAddress *cal_address_2445_to_lbaddress(const gchar * uri,

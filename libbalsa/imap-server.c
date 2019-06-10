@@ -61,8 +61,6 @@ struct _LibBalsaImapServer {
     gboolean use_idle;  /**< IDLE will work: no dummy firewall on the way */
 };
 
-static void libbalsa_imap_server_class_init(LibBalsaImapServerClass * klass);
-static void libbalsa_imap_server_init(LibBalsaImapServer * server);
 static void libbalsa_imap_server_finalize(GObject * object);
 static gboolean connection_cleanup(gpointer ptr);
 

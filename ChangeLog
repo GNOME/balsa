@@ -1,5 +1,13 @@
 2019-06-10  Albrecht Dreß  <albrecht.dress@arcor.de>
 
+	Fix format string error
+
+	* src/sendmsg-window.c (sw_insert_sig_activated): fix a “format
+	  not a string literal and no format arguments” error (using
+	    gcc w/ -Werror=format-security).
+
+2019-06-10  Albrecht Dreß  <albrecht.dress@arcor.de>
+
 	Implement VCalendar stuff using G_*_TYPE()
 
 	* libbalsa/rfc2445.[ch]: implement LibBalsaVCal and LibBalsaVEvent

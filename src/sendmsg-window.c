@@ -3777,7 +3777,7 @@ sw_insert_sig_activated(GSimpleAction * action,
     } else if (error != NULL) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
-                                   error->message);
+                                   "%s", error->message);
         g_error_free(error);
     }
 }

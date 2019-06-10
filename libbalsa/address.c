@@ -117,6 +117,13 @@ libbalsa_address_new(void)
    [1] VCARD 1.2 specs: http://www.imc.org/pdi/vcard-21.txt
    [2] VCARD 3.0 specs, RFC 2426 (http://www.ietf.org/rfc/rfc2426.txt)
 */
+
+static gboolean
+is_real_name(const gchar *name)
+{
+    return name != NULL && name[0] != '\0';
+}
+
 gchar*
 libbalsa_address_extract_name(const gchar * string, gchar ** last_name,
                               gchar ** first_name)
@@ -136,30 +143,30 @@ libbalsa_address_extract_name(const gchar * string, gchar ** last_name,
         return NULL;
     }
 
-    if (fld[LAST] && *fld[LAST])
+    if (is_real_name(fld[LAST]))
         *last_name = g_strdup(fld[LAST]);
 
-    if (fld[FIRST] && *fld[FIRST])
-        *first_name = fld[MIDDLE] && *fld[MIDDLE] ?
+    if (is_real_name(fld[FIRST]))
+        *first_name = is_real_name(fld[MIDDLE]) ?
             g_strconcat(fld[FIRST], " ", fld[MIDDLE], NULL) :
             g_strdup(fld[FIRST]);
 
     name_arr = g_malloc((cpt + 1) * sizeof(gchar *));
 
     j = 0;
-    if (cpt > PREFIX && *fld[PREFIX] != '\0')
+    if (is_real_name(fld[PREFIX]))
 	name_arr[j++] = g_strdup(fld[PREFIX]);
 
-    if (cpt > FIRST && *fld[FIRST] != '\0')
+    if (is_real_name(fld[FIRST]))
 	name_arr[j++] = g_strdup(fld[FIRST]);
 
-    if (cpt > MIDDLE && *fld[MIDDLE] != '\0')
+    if (is_real_name(fld[MIDDLE]))
 	name_arr[j++] = g_strdup(fld[MIDDLE]);
 
-    if (cpt > LAST && *fld[LAST] != '\0')
+    if (is_real_name(fld[LAST]))
 	name_arr[j++] = g_strdup(fld[LAST]);
 
-    if (cpt > SUFFIX && *fld[SUFFIX] != '\0')
+    if (is_real_name(fld[SUFFIX]))
 	name_arr[j++] = g_strdup(fld[SUFFIX]);
 
     name_arr[j] = NULL;

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * VCalendar (RFC 2445) stuff
- * Copyright (C) 2009 Albrecht Dreß <albrecht.dress@arcor.de>
+ * Copyright (C) 2009-2019 Albrecht Dreß <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,8 +42,36 @@ typedef enum {
 } LibBalsaVCalRole;
 
 
-static GObjectClass *libbalsa_vcal_parent_class = NULL;
-static GObjectClass *libbalsa_vevent_parent_class = NULL;
+struct _LibBalsaVCal {
+    GObject parent;
+
+    /* method */
+    LibBalsaVCalMethod method;
+
+    /* linked list of VEVENT entries */
+    GList *vevent;
+};
+
+G_DEFINE_TYPE(LibBalsaVCal, libbalsa_vcal, G_TYPE_OBJECT)
+
+
+struct _LibBalsaVEvent {
+    GObject parent;
+
+    LibBalsaAddress *organizer;
+    GList *attendee;
+    time_t stamp;
+    time_t start;
+    gboolean start_date_only;
+    time_t end;
+    gboolean end_date_only;
+    gchar *uid;
+    gchar *summary;
+    gchar *location;
+    gchar *description;
+};
+
+G_DEFINE_TYPE(LibBalsaVEvent, libbalsa_vevent, G_TYPE_OBJECT)
 
 
 /* LibBalsaAddress extra object data */
@@ -52,13 +80,13 @@ static GObjectClass *libbalsa_vevent_parent_class = NULL;
 #define RFC2445_RSVP            "RFC2445:RSVP"
 
 
-static void libbalsa_vcal_class_init(LibBalsaVCalClass * klass);
-static void libbalsa_vcal_init(LibBalsaVCal * self);
-static void libbalsa_vcal_finalize(LibBalsaVCal * self);
+static void libbalsa_vcal_class_init(LibBalsaVCalClass *klass);
+static void libbalsa_vcal_init(LibBalsaVCal *self);
+static void libbalsa_vcal_finalize(GObject *self);
 
-static void libbalsa_vevent_class_init(LibBalsaVEventClass * klass);
-static void libbalsa_vevent_init(LibBalsaVEvent * self);
-static void libbalsa_vevent_finalize(LibBalsaVEvent * self);
+static void libbalsa_vevent_class_init(LibBalsaVEventClass *klass);
+static void libbalsa_vevent_init(LibBalsaVEvent *self);
+static void libbalsa_vevent_finalize(GObject *self);
 
 static LibBalsaAddress *cal_address_2445_to_lbaddress(const gchar * uri,
 						      gchar ** attributes,
@@ -97,46 +125,18 @@ static struct {
 
 
 /* --- VCal GObject stuff --- */
-GType
-libbalsa_vcal_get_type(void)
-{
-    static GType libbalsa_vcal_type = 0;
-
-    if (!libbalsa_vcal_type) {
-	static const GTypeInfo libbalsa_vcal_type_info = {
-	    sizeof(LibBalsaVCalClass),	/* class_size */
-	    NULL,		/* base_init */
-	    NULL,		/* base_finalize */
-	    (GClassInitFunc) libbalsa_vcal_class_init,	/* class_init */
-	    NULL,		/* class_finalize */
-	    NULL,		/* class_data */
-	    sizeof(LibBalsaVCal),	/* instance_size */
-	    0,			/* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_vcal_init,	/* instance_init */
-	    /* no value_table */
-	};
-
-	libbalsa_vcal_type =
-	    g_type_register_static(G_TYPE_OBJECT, "LibBalsaVCal",
-				   &libbalsa_vcal_type_info, 0);
-    }
-
-    return libbalsa_vcal_type;
-}
-
 
 static void
-libbalsa_vcal_class_init(LibBalsaVCalClass * klass)
+libbalsa_vcal_class_init(LibBalsaVCalClass *klass)
 {
     GObjectClass *gobject_klass = G_OBJECT_CLASS(klass);
 
-    libbalsa_vcal_parent_class = g_type_class_peek(G_TYPE_OBJECT);
-    gobject_klass->finalize = (GObjectFinalizeFunc) libbalsa_vcal_finalize;
+    gobject_klass->finalize = libbalsa_vcal_finalize;
 }
 
 
 static void
-libbalsa_vcal_init(LibBalsaVCal * self)
+libbalsa_vcal_init(LibBalsaVCal *self)
 {
     self->method = ITIP_UNKNOWN;
     self->vevent = NULL;
@@ -144,15 +144,17 @@ libbalsa_vcal_init(LibBalsaVCal * self)
 
 
 static void
-libbalsa_vcal_finalize(LibBalsaVCal * self)
+libbalsa_vcal_finalize(GObject *self)
 {
-    g_return_if_fail(self != NULL);
-    if (self->vevent) {
-	g_list_foreach(self->vevent, (GFunc) g_object_unref, NULL);
-	g_list_free(self->vevent);
+	LibBalsaVCal *vcal = LIBBALSA_VCAL(self);
+	const GObjectClass *parent_class = G_OBJECT_CLASS(libbalsa_vcal_parent_class);
+
+    if (vcal->vevent != NULL) {
+    	g_list_foreach(vcal->vevent, (GFunc) g_object_unref, NULL);
+    	g_list_free(vcal->vevent);
     }
 
-    libbalsa_vcal_parent_class->finalize(G_OBJECT(self));
+    (*parent_class->finalize)(self);
 }
 
 
@@ -164,69 +166,41 @@ libbalsa_vcal_new(void)
 
 
 /* --- VEvent GObject stuff --- */
-GType
-libbalsa_vevent_get_type(void)
-{
-    static GType libbalsa_vevent_type = 0;
-
-    if (!libbalsa_vevent_type) {
-	static const GTypeInfo libbalsa_vevent_type_info = {
-	    sizeof(LibBalsaVEventClass),	/* class_size */
-	    NULL,		/* base_init */
-	    NULL,		/* base_finalize */
-	    (GClassInitFunc) libbalsa_vevent_class_init,	/* class_init */
-	    NULL,		/* class_finalize */
-	    NULL,		/* class_data */
-	    sizeof(LibBalsaVEvent),	/* instance_size */
-	    0,			/* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_vevent_init,	/* instance_init */
-	    /* no value_table */
-	};
-
-	libbalsa_vevent_type =
-	    g_type_register_static(G_TYPE_OBJECT, "LibBalsaVEvent",
-				   &libbalsa_vevent_type_info, 0);
-    }
-
-    return libbalsa_vevent_type;
-}
-
-
 static void
 libbalsa_vevent_class_init(LibBalsaVEventClass * klass)
 {
     GObjectClass *gobject_klass = G_OBJECT_CLASS(klass);
 
-    libbalsa_vevent_parent_class = g_type_class_peek(G_TYPE_OBJECT);
-    gobject_klass->finalize =
-	(GObjectFinalizeFunc) libbalsa_vevent_finalize;
+    gobject_klass->finalize = libbalsa_vevent_finalize;
 }
 
 
 static void
-libbalsa_vevent_init(LibBalsaVEvent * self)
+libbalsa_vevent_init(LibBalsaVEvent *self)
 {
-    self->start = self->end = self->stamp = (time_t) - 1;
+    self->start = self->end = self->stamp = (time_t) (-1);
 }
 
 
 static void
-libbalsa_vevent_finalize(LibBalsaVEvent * self)
+libbalsa_vevent_finalize(GObject *self)
 {
-    g_return_if_fail(self != NULL);
+	LibBalsaVEvent *vevent = LIBBALSA_VEVENT(self);
+	const GObjectClass *parent_class = G_OBJECT_CLASS(libbalsa_vevent_parent_class);
 
-    if (self->organizer)
-	g_object_unref(self->organizer);
-    if (self->attendee) {
-	g_list_foreach(self->attendee, (GFunc) g_object_unref, NULL);
-	g_list_free(self->attendee);
-    }
-    g_free(self->uid);
-    g_free(self->summary);
-    g_free(self->location);
-    g_free(self->description);
+	if (vevent->organizer) {
+		g_object_unref(vevent->organizer);
+	}
+	if (vevent->attendee) {
+		g_list_foreach(vevent->attendee, (GFunc) g_object_unref, NULL);
+		g_list_free(vevent->attendee);
+	}
+	g_free(vevent->uid);
+	g_free(vevent->summary);
+	g_free(vevent->location);
+	g_free(vevent->description);
 
-    libbalsa_vevent_parent_class->finalize(G_OBJECT(self));
+	(*parent_class->finalize)(self);
 }
 
 
@@ -458,6 +432,102 @@ libbalsa_vcal_attendee_rsvp(LibBalsaAddress * person)
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(person), FALSE);
     return (gboolean) 
 	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(person), RFC2445_RSVP));
+}
+
+
+LibBalsaAddress *
+libbalsa_vevent_organizer(LibBalsaVEvent *event)
+{
+	g_return_val_if_fail(LIBBALSA_IS_VEVENT(event), NULL);
+	return event->organizer;
+}
+
+
+const gchar *
+libbalsa_vevent_summary(LibBalsaVEvent *event)
+{
+	g_return_val_if_fail(LIBBALSA_IS_VEVENT(event), NULL);
+	return event->summary;
+}
+
+
+const gchar *
+libbalsa_vevent_location(LibBalsaVEvent *event)
+{
+	g_return_val_if_fail(LIBBALSA_IS_VEVENT(event), NULL);
+	return event->location;
+}
+
+
+const gchar *
+libbalsa_vevent_description(LibBalsaVEvent *event)
+{
+	g_return_val_if_fail(LIBBALSA_IS_VEVENT(event), NULL);
+	return event->description;
+}
+
+
+time_t
+libbalsa_vevent_timestamp(LibBalsaVEvent *event, LibBalsaVEventTimestamp which)
+{
+	time_t result;
+
+	g_return_val_if_fail(LIBBALSA_IS_VEVENT(event) &&
+		(which >= VEVENT_DATETIME_STAMP) && (VEVENT_DATETIME_END), (time_t) -1);
+	switch (which) {
+	case VEVENT_DATETIME_STAMP:
+		result = event->stamp;
+		break;
+	case VEVENT_DATETIME_START:
+		result = event->start;
+		break;
+	case VEVENT_DATETIME_END:
+		result = event->end;
+		break;
+	default:
+		g_assert_not_reached();
+	}
+	return result;
+}
+
+
+gboolean
+libbalsa_vevent_timestamp_date_only(LibBalsaVEvent *event, LibBalsaVEventTimestamp which)
+{
+	gboolean result;
+
+	g_return_val_if_fail(LIBBALSA_IS_VEVENT(event) &&
+		(which >= VEVENT_DATETIME_STAMP) && (VEVENT_DATETIME_END), FALSE);
+	switch (which) {
+	case VEVENT_DATETIME_STAMP:
+		result = FALSE;
+		break;
+	case VEVENT_DATETIME_START:
+		result = event->start_date_only;
+		break;
+	case VEVENT_DATETIME_END:
+		result = event->end_date_only;
+		break;
+	default:
+		g_assert_not_reached();
+	}
+	return result;
+}
+
+
+guint
+libbalsa_vevent_attendees(LibBalsaVEvent *event)
+{
+	g_return_val_if_fail(LIBBALSA_IS_VEVENT(event), 0U);
+	return g_list_length(event->attendee);
+}
+
+
+LibBalsaAddress *
+libbalsa_vevent_attendee(LibBalsaVEvent *event, guint nth_attendee)
+{
+	g_return_val_if_fail(LIBBALSA_IS_VEVENT(event) && (nth_attendee < g_list_length(event->attendee)), NULL);
+	return (LibBalsaAddress *) g_list_nth_data(event->attendee, nth_attendee);
 }
 
 
@@ -705,22 +775,29 @@ vcal_str_to_method(const gchar * method)
 }
 
 
+LibBalsaVCalMethod
+libbalsa_vcal_method(LibBalsaVCal *vcal)
+{
+    g_return_val_if_fail(LIBBALSA_IS_VCAL(vcal) &&
+    	(vcal->method >= ITIP_UNKNOWN) && (vcal->method <= ITIP_CANCEL), ITIP_UNKNOWN);
+    return vcal->method;
+}
+
 /* return a rfc 2445 method as human-readable string */
 const gchar *
-libbalsa_vcal_method_to_str(LibBalsaVCalMethod method)
+libbalsa_vcal_method_str(LibBalsaVCal *vcal)
 {
-    static gchar *methods[] = {
-        N_("unknown"),
-	N_("Event Notification"),
-	N_("Event Request"),
-	N_("Reply to Event Request"),
-	N_("Event Cancellation"),
-    };
+	static gchar *methods[] = {
+		N_("unknown"),
+		N_("Event Notification"),
+		N_("Event Request"),
+		N_("Reply to Event Request"),
+		N_("Event Cancellation"),
+	};
 
-    g_return_val_if_fail(method >= ITIP_UNKNOWN && method <= ITIP_CANCEL,
-			 NULL);
-    return methods[(int) method];
-
+    g_return_val_if_fail(LIBBALSA_IS_VCAL(vcal) &&
+    	(vcal->method >= ITIP_UNKNOWN) && (vcal->method <= ITIP_CANCEL), NULL);
+    return methods[(int) vcal->method];
 }
 
 
@@ -777,6 +854,19 @@ libbalsa_vcal_part_stat_to_str(LibBalsaVCalPartStat pstat)
 
 }
 
+guint
+libbalsa_vcal_vevents(LibBalsaVCal *vcal)
+{
+	g_return_val_if_fail(LIBBALSA_IS_VCAL(vcal), 0U);
+	return g_list_length(vcal->vevent);
+}
+
+LibBalsaVEvent *
+libbalsa_vcal_vevent(LibBalsaVCal *vcal, guint nth_event)
+{
+	g_return_val_if_fail(LIBBALSA_IS_VCAL(vcal) && (nth_event < g_list_length(vcal->vevent)), NULL);
+	return (LibBalsaVEvent *) g_list_nth_data(vcal->vevent, nth_event);
+}
 
 /* convert the passed participant status string into the enumeration */
 static LibBalsaVCalPartStat

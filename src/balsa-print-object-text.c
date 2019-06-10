@@ -555,16 +555,18 @@ balsa_print_object_text_vcard(GList * list,
 	}								\
     } while(0)
 
-#define ADD_VCAL_DATE(buf, labwidth, layout, date, date_only, descr)	\
-    do {                                                                \
-        if (date != (time_t) -1) {                                      \
-            gchar * _dstr =                                             \
-                libbalsa_date_to_utf8(date,								\
-                	date_only ? "%x" : balsa_app.date_string);     		\
-            ADD_VCAL_FIELD(buf, labwidth, layout, _dstr, descr);        \
-            g_free(_dstr);                                              \
-        }                                                               \
-    } while (0)
+#define ADD_VCAL_DATE(buf, labwidth, layout, event, date_id, descr)					\
+	G_STMT_START {                                                                	\
+    	time_t _date = libbalsa_vevent_timestamp(event, date_id);					\
+        if (_date != (time_t) -1) {                                      			\
+        	gboolean _d_only = libbalsa_vevent_timestamp_date_only(event, date_id);	\
+            gchar * _dstr =                                             			\
+                libbalsa_date_to_utf8(_date,										\
+                	_d_only ? "%x" : balsa_app.date_string);     					\
+            ADD_VCAL_FIELD(buf, labwidth, layout, _dstr, descr);        			\
+            g_free(_dstr);                                              			\
+        }                                                               			\
+    } G_STMT_END
 
 #define ADD_VCAL_ADDRESS(buf, labwidth, layout, addr, descr)            \
     do {                                                                \
@@ -589,7 +591,7 @@ balsa_print_object_text_calendar(GList * list,
     PangoTabArray *tabs;
     GString *desc_buf;
     LibBalsaVCal * vcal_obj;
-    GList * this_ev;
+    guint event_no;
     guint first_page;
     GList *par_parts;
     GList *this_par_part;
@@ -641,44 +643,49 @@ balsa_print_object_text_calendar(GList * list,
     /* add fields from the events*/
     desc_buf = g_string_new("");
     pod->p_label_width = 0;
-    for (this_ev = vcal_obj->vevent; this_ev; this_ev = g_list_next(this_ev)) {
-        LibBalsaVEvent * event = (LibBalsaVEvent *) this_ev->data;
+    for (event_no = 0U; event_no < libbalsa_vcal_vevents(vcal_obj); event_no++) {
+        LibBalsaVEvent * event = libbalsa_vcal_vevent(vcal_obj, event_no);
+        const gchar *description;
+        guint attendees;
 
         if (desc_buf->len > 0)
             g_string_append_c(desc_buf, '\n');
         ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
-                       event->summary, _("Summary"));
+        	libbalsa_vevent_summary(event), _("Summary:"));
         ADD_VCAL_ADDRESS(desc_buf, pod->p_label_width, test_layout,
-                         event->organizer, _("Organizer"));
+        	libbalsa_vevent_organizer(event), _("Organizer:"));
         ADD_VCAL_DATE(desc_buf, pod->p_label_width, test_layout,
-                      event->start, event->start_date_only, _("Start"));
+                      event, VEVENT_DATETIME_STAMP, _("Created:"));
         ADD_VCAL_DATE(desc_buf, pod->p_label_width, test_layout,
-                      event->end, event->end_date_only, _("End"));
+                      event, VEVENT_DATETIME_START, _("Start:"));
+        ADD_VCAL_DATE(desc_buf, pod->p_label_width, test_layout,
+                      event, VEVENT_DATETIME_END, _("End:"));
         ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
-                       event->location, _("Location"));
-        if (event->attendee) {
-            GList * att = event->attendee;
+        	libbalsa_vevent_location(event), _("Location:"));
+        attendees = libbalsa_vevent_attendees(event);
+        if (attendees > 0U) {
             gchar * this_att;
+            guint n;
 
             this_att =
-                libbalsa_vcal_attendee_to_str(LIBBALSA_ADDRESS(att->data));
-            att = g_list_next(att);
+                libbalsa_vcal_attendee_to_str(libbalsa_vevent_attendee(event, 0U));
             ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
-                           this_att, att ? _("Attendees") : _("Attendee"));
+                           this_att, (attendees > 1U) ? _("Attendees:") : _("Attendee:"));
             g_free(this_att);
-            for (; att; att = g_list_next(att)) {
+            for (n = 1U; n < attendees; n++) {
                 this_att =
-                    libbalsa_vcal_attendee_to_str(LIBBALSA_ADDRESS(att->data));
+                    libbalsa_vcal_attendee_to_str(libbalsa_vevent_attendee(event, n));
                 g_string_append_printf(desc_buf, "\n\t%s", this_att);
                 g_free(this_att);
             }
         }
-        if (event->description) {
-            gchar ** desc_lines = g_strsplit(event->description, "\n", -1);
+        description = libbalsa_vevent_description(event);
+        if (description != NULL) {
+            gchar ** desc_lines = g_strsplit(description, "\n", -1);
             gint i;
 
             ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
-                           desc_lines[0], _("Description"));
+                           desc_lines[0], _("Description:"));
             for (i = 1; desc_lines[i]; i++)
                 g_string_append_printf(desc_buf, "\n\t%s", desc_lines[i]);
             g_strfreev(desc_lines);

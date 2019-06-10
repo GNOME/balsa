@@ -46,7 +46,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     BalsaMimeWidget *mw;
     GtkWidget *label;
     gchar *text;
-    GList *l;
+    guint event_no;
     LibBalsaMessage *lbm = bm->message;
     gboolean may_reply = FALSE;
     InternetAddress *sender = NULL;;
@@ -63,7 +63,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
 
     text = g_strdup_printf(_("This is an iTIP calendar “%s” message."),
-			   libbalsa_vcal_method_to_str(vcal_obj->method));
+			   libbalsa_vcal_method_str(vcal_obj));
     label = gtk_label_new(text);
     g_free(text);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
@@ -71,7 +71,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     gtk_container_add(GTK_CONTAINER(mw->widget), label);
 
     /* a reply may be created only for unread requests */
-    if ((vcal_obj->method == ITIP_REQUEST) &&
+    if ((libbalsa_vcal_method(vcal_obj) == ITIP_REQUEST) &&
 	LIBBALSA_MESSAGE_IS_UNREAD(lbm)) {
 	may_reply = TRUE;
 	if (lbm->headers) {
@@ -88,11 +88,11 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     }
 
     /* add events */
-    for (l = vcal_obj->vevent; l; l = g_list_next(l)) {
-	GtkWidget *event =
-	    balsa_vevent_widget((LibBalsaVEvent *) l->data, may_reply,
-				sender);
-	gtk_container_add(GTK_CONTAINER(mw->widget), event);
+    for (event_no = 0U; event_no < libbalsa_vcal_vevents(vcal_obj); event_no++) {
+    	GtkWidget *event;
+
+    	event = balsa_vevent_widget(libbalsa_vcal_vevent(vcal_obj, event_no), may_reply, sender);
+    	gtk_container_add(GTK_CONTAINER(mw->widget), event);
     }
 
     g_object_unref(vcal_obj);
@@ -118,16 +118,18 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
         }                                                               \
     } while (0)
 
-#define GRID_ATTACH_DATE(g,date,date_only,label)                        \
-    do {                                                                \
-        if (date != (time_t) -1) {                                      \
-            gchar * _dstr =                                             \
-                libbalsa_date_to_utf8(date, 							\
-                	date_only ? "%x" : balsa_app.date_string);     		\
-            GRID_ATTACH(g, _dstr, label);                               \
-            g_free(_dstr);                                              \
-        }                                                               \
-    } while (0)
+#define GRID_ATTACH_DATE(g,event,date_id,label)                        				\
+	G_STMT_START {                                                                	\
+    	time_t _date = libbalsa_vevent_timestamp(event, date_id);					\
+        if (_date != (time_t) -1) {                                     			\
+        	gboolean _d_only = libbalsa_vevent_timestamp_date_only(event, date_id);	\
+            gchar * _dstr =                                             			\
+                libbalsa_date_to_utf8(_date, 										\
+                	_d_only ? "%x" : balsa_app.date_string);     					\
+            GRID_ATTACH(g, _dstr, label);                               			\
+            g_free(_dstr);                                              			\
+        }                                                               			\
+    } G_STMT_END
 
 #define GRID_ATTACH_ADDRESS(g,addr,label)                               \
     do {                                                                \
@@ -165,21 +167,20 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
     GtkGrid *grid;
     int row = 0;
     LibBalsaIdentity *vevent_ident = NULL;
+    guint attendee;
+	GString *all_atts = NULL;
 
     grid = GTK_GRID(gtk_grid_new());
     gtk_grid_set_row_spacing(grid, 6);
     gtk_grid_set_column_spacing(grid, 12);
-    GRID_ATTACH(grid, event->summary, _("Summary:"));
-    GRID_ATTACH_ADDRESS(grid, event->organizer, _("Organizer:"));
-    GRID_ATTACH_DATE(grid, event->start, event->start_date_only, _("Start:"));
-    GRID_ATTACH_DATE(grid, event->end, event->end_date_only, _("End:"));
-    GRID_ATTACH(grid, event->location, _("Location:"));
-    if (event->attendee) {
-	GList *att;
-	GString *all_atts = NULL;
-
-	for (att = event->attendee; att; att = att->next) {
-	    LibBalsaAddress *lba = LIBBALSA_ADDRESS(att->data);
+    GRID_ATTACH(grid, libbalsa_vevent_summary(event), _("Summary:"));
+    GRID_ATTACH_ADDRESS(grid, libbalsa_vevent_organizer(event), _("Organizer:"));
+    GRID_ATTACH_DATE(grid, event, VEVENT_DATETIME_STAMP, _("Created:"));
+    GRID_ATTACH_DATE(grid, event, VEVENT_DATETIME_START, _("Start:"));
+    GRID_ATTACH_DATE(grid, event, VEVENT_DATETIME_END, _("End:"));
+    GRID_ATTACH(grid, libbalsa_vevent_location(event), _("Location:"));
+    for (attendee = 0U; attendee < libbalsa_vevent_attendees(event); attendee++) {
+	    LibBalsaAddress *lba = libbalsa_vevent_attendee(event, attendee);
 	    gchar *this_att = libbalsa_vcal_attendee_to_str(lba);
 
 	    if (all_atts)
@@ -204,12 +205,12 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 		g_object_unref(ia);
 	    }
 	}
+    if (all_atts != NULL) {
 	GRID_ATTACH(grid, all_atts->str,
-                    ngettext("Attendee:", "Attendees:",
-                             g_list_length(event->attendee)));
+                    ngettext("Attendee:", "Attendees:", libbalsa_vevent_attendees(event)));
 	g_string_free(all_atts, TRUE);
     }
-    GRID_ATTACH_TEXT(grid, event->description, _("Description:"));
+    GRID_ATTACH_TEXT(grid, libbalsa_vevent_description(event), _("Description:"));
 
     if (sender && vevent_ident) {
 	GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
@@ -277,6 +278,7 @@ vevent_reply(GObject * button, GtkWidget * box)
     gchar *rcpt;
     LibBalsaMessage *message;
     LibBalsaMessageBody *body;
+    const gchar *summary;
     gchar *dummy;
     gchar **params;
     GError *error = NULL;
@@ -302,8 +304,9 @@ vevent_reply(GObject * button, GtkWidget * box)
     message->headers->date = time(NULL);
 
     /* create the message subject */
+    summary = libbalsa_vevent_summary(event);
     dummy = g_strdup_printf("%s: %s",
-			    event->summary ? event->summary : _("iTIP Calendar Request"),
+			    (summary != NULL) ? summary : _("iTIP Calendar Request"),
 			    libbalsa_vcal_part_stat_to_str(pstat));
     libbalsa_message_set_subject(message, dummy);
     g_free(dummy);

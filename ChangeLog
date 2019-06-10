@@ -1,3 +1,17 @@
+2019-06-10  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Implement VCalendar stuff using G_*_TYPE()
+
+	* libbalsa/rfc2445.[ch]: implement LibBalsaVCal and LibBalsaVEvent
+	  using G_DECLARE_FINAL_TYPE() and G_DEFINE_TYPE(); make the data
+	  fields private; implement private member getters required for
+	  display and printing
+	* src/balsa-mime-widget-vcalendar.c: use new LibBalsaVCal and
+	  LibBalsaVEvent getters; add missing “Created” DTSTAMP item
+	* src/balsa-print-object-text.c: use new LibBalsaVCal and
+	  LibBalsaVEvent getters; add missing “Created” DTSTAMP item;
+	  use same labels as for screen display
+
 2019-06-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use G_DECLARE_FINAL_TYPE to declare LibBalsaVfs

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * VCalendar (RFC 2445) stuff
- * Copyright (C) 2009 Albrecht Dreß <albrecht.dress@arcor.de>
+ * Copyright (C) 2009-2019 Albrecht Dreß <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,27 +31,13 @@
 G_BEGIN_DECLS
 
 /* a VCalendar object description as GObject */
-#define LIBBALSA_TYPE_VCAL            (libbalsa_vcal_get_type())
-#define LIBBALSA_VCAL(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), LIBBALSA_TYPE_VCAL, LibBalsaVCal))
-#define LIBBALSA_VCAL_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), LIBBALSA_TYPE_VCAL, LibBalsaVCalClass))
-#define LIBBALSA_IS_VCAL(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), LIBBALSA_TYPE_VCAL))
-#define LIBBALSA_IS_VCAL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), LIBBALSA_TYPE_VCAL))
-#define LIBBALSA_VCAL_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), LIBBALSA_TYPE_VCAL, LibBalsaVCalClass))
-
-typedef struct _LibBalsaVCal LibBalsaVCal;
-typedef struct _LibBalsaVCalClass LibBalsaVCalClass;
+#define LIBBALSA_TYPE_VCAL			(libbalsa_vcal_get_type())
+G_DECLARE_FINAL_TYPE(LibBalsaVCal, libbalsa_vcal, LIBBALSA, VCAL, GObject)
 
 
 /* a VEvent object description as GObject */
-#define LIBBALSA_TYPE_VEVENT            (libbalsa_vevent_get_type())
-#define LIBBALSA_VEVENT(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), LIBBALSA_TYPE_VEVENT, LibBalsaVEvent))
-#define LIBBALSA_VEVENT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), LIBBALSA_TYPE_VEVENT, LibBalsaVEventClass))
-#define LIBBALSA_IS_VEVENT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), LIBBALSA_TYPE_VEVENT))
-#define LIBBALSA_IS_VEVENT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), LIBBALSA_TYPE_VEVENT))
-#define LIBBALSA_VEVENT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), LIBBALSA_TYPE_VEVENT, LibBalsaVEventClass))
-
-typedef struct _LibBalsaVEvent LibBalsaVEvent;
-typedef struct _LibBalsaVEventClass LibBalsaVEventClass;
+#define LIBBALSA_TYPE_VEVENT		(libbalsa_vevent_get_type())
+G_DECLARE_FINAL_TYPE(LibBalsaVEvent, libbalsa_vevent, LIBBALSA, VEVENT, GObject)
 
 
 /* methods as defined by RFC 2446 */
@@ -76,50 +62,16 @@ typedef enum {
     VCAL_PSTAT_IN_PROCESS
 } LibBalsaVCalPartStat;
 
-
-struct _LibBalsaVCal {
-    GObject parent;
-
-    /* method */
-    LibBalsaVCalMethod method;
-
-    /* linked list of VEVENT entries */
-    GList *vevent;
-};
+typedef enum {
+	VEVENT_DATETIME_STAMP,
+	VEVENT_DATETIME_START,
+	VEVENT_DATETIME_END
+} LibBalsaVEventTimestamp;
 
 
-struct _LibBalsaVEvent {
-    GObject parent;
-
-    LibBalsaAddress *organizer;
-    GList *attendee;
-    time_t stamp;
-    time_t start;
-    gboolean start_date_only;
-    time_t end;
-    gboolean end_date_only;
-    gchar *uid;
-    gchar *summary;
-    gchar *location;
-    gchar *description;
-};
-
-
-struct _LibBalsaVCalClass {
-    GObjectClass parent;
-};
-
-
-struct _LibBalsaVEventClass {
-    GObjectClass parent;
-};
-
-
-GType libbalsa_vcal_get_type(void);
 LibBalsaVCal *libbalsa_vcal_new(void);
 LibBalsaVCal *libbalsa_vcal_new_from_body(LibBalsaMessageBody * body);
 
-GType libbalsa_vevent_get_type(void);
 LibBalsaVEvent *libbalsa_vevent_new(void);
 gchar *libbalsa_vevent_reply(const LibBalsaVEvent * event,
 			     const gchar * sender,
@@ -127,8 +79,20 @@ gchar *libbalsa_vevent_reply(const LibBalsaVEvent * event,
 
 gchar *libbalsa_vcal_attendee_to_str(LibBalsaAddress * person);
 gboolean libbalsa_vcal_attendee_rsvp(LibBalsaAddress * person);
-const gchar *libbalsa_vcal_method_to_str(LibBalsaVCalMethod method);
+LibBalsaVCalMethod libbalsa_vcal_method(LibBalsaVCal *vcal);
+const gchar *libbalsa_vcal_method_str(LibBalsaVCal *vcal);
 const gchar *libbalsa_vcal_part_stat_to_str(LibBalsaVCalPartStat pstat);
+guint libbalsa_vcal_vevents(LibBalsaVCal *vcal);
+LibBalsaVEvent *libbalsa_vcal_vevent(LibBalsaVCal *vcal, guint nth_event);
+
+LibBalsaAddress *libbalsa_vevent_organizer(LibBalsaVEvent *event);
+const gchar *libbalsa_vevent_summary(LibBalsaVEvent *event);
+const gchar *libbalsa_vevent_location(LibBalsaVEvent *event);
+const gchar *libbalsa_vevent_description(LibBalsaVEvent *event);
+time_t libbalsa_vevent_timestamp(LibBalsaVEvent *event, LibBalsaVEventTimestamp which);
+gboolean libbalsa_vevent_timestamp_date_only(LibBalsaVEvent *event, LibBalsaVEventTimestamp which);
+guint libbalsa_vevent_attendees(LibBalsaVEvent *event);
+LibBalsaAddress *libbalsa_vevent_attendee(LibBalsaVEvent *event, guint nth_attendee);
 
 G_END_DECLS
 

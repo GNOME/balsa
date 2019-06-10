@@ -223,7 +223,6 @@ address_new_prefill(LibBalsaAddress * address, GList * address_list,
     full_name = build_name(fulln, libbalsa_address_get_first_name(address), surn);
     if (full_name != NULL) {
         libbalsa_address_set_full_name(address, full_name);
-        g_free(full_name);
     } else {
         libbalsa_address_set_full_name(address, _("No-Name"));
     }
@@ -243,6 +242,8 @@ address_new_prefill(LibBalsaAddress * address, GList * address_list,
         libbalsa_address_set_nick_name(address,
                                        full_name != NULL ? full_name : _("No-Id"));
     }
+
+    g_free(full_name);
 }
 
 /* Class methods */

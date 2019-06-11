@@ -580,7 +580,8 @@ AC_CHECK_FUNCS([ctime_r])
 if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
 	for option in -Wsign-compare -Wpointer-arith -Wnested-externs \
             -Wchar-subscripts -Wuninitialized -Wmissing-prototypes    \
-            -Wreturn-type -Wdeclaration-after-statement ; do
+            -Wreturn-type -Wdeclaration-after-statement \
+            -Wredundant-decls -Wshadow -Wformat-security ; do
                 SAVE_CFLAGS="$CFLAGS"
                 CFLAGS="$CFLAGS $option"
                 AC_MSG_CHECKING([whether gcc understands $option])

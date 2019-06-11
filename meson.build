@@ -499,6 +499,9 @@ if balsa_from_git
   args = compiler.get_supported_arguments([
     '-Werror',
     '-Wdeprecated-declarations',
+    '-Wredundant-decls',
+    '-Wshadow',
+    '-Wformat-security',
     '-DGMIME_DISABLE_DEPRECATED',
     '-O2',
     '-U_FORTIFY_SOURCE',

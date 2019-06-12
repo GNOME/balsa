@@ -502,6 +502,7 @@ if balsa_from_git
     '-Wredundant-decls',
     '-Wshadow',
     '-Wformat-security',
+    '-Wignored-qualifiers',
     '-DGMIME_DISABLE_DEPRECATED',
     '-O2',
     '-U_FORTIFY_SOURCE',

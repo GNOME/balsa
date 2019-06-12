@@ -270,7 +270,7 @@ g_mime_gpgme_sigstat_summary(GMimeGpgmeSigstat *sigstat)
 }
 
 
-const gpgme_key_t
+gpgme_key_t
 g_mime_gpgme_sigstat_key(GMimeGpgmeSigstat *sigstat)
 {
 	g_return_val_if_fail(GMIME_IS_GPGME_SIGSTAT(sigstat), NULL);

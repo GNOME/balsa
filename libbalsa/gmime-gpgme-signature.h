@@ -49,7 +49,7 @@ gchar *g_mime_gpgme_sigstat_signer(GMimeGpgmeSigstat *sigstat)
 gpgme_protocol_t g_mime_gpgme_sigstat_protocol(GMimeGpgmeSigstat *sigstat);
 gpgme_error_t g_mime_gpgme_sigstat_status(GMimeGpgmeSigstat *sigstat);
 gpgme_sigsum_t g_mime_gpgme_sigstat_summary(GMimeGpgmeSigstat *sigstat);
-const gpgme_key_t g_mime_gpgme_sigstat_key(GMimeGpgmeSigstat *sigstat);
+gpgme_key_t g_mime_gpgme_sigstat_key(GMimeGpgmeSigstat *sigstat);
 const gchar *g_mime_gpgme_sigstat_fingerprint(GMimeGpgmeSigstat *sigstat);
 
 gchar *libbalsa_cert_subject_readable(const gchar *subject)

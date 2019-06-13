@@ -75,7 +75,7 @@ completion_data_new(InternetAddress * ia, const gchar * nick_name)
  * Free a CompletionData
  */
 void
-completion_data_free(CompletionData * data)
+completion_data_free(CompletionData * data, gpointer unused G_GNUC_UNUSED)
 {
     g_object_unref(data->ia);
     g_free(data->string);

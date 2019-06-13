@@ -35,7 +35,7 @@ struct _CompletionData {
 
 CompletionData *completion_data_new(InternetAddress * ia,
                                     const gchar * nick_name);
-void completion_data_free(CompletionData * data);
+void completion_data_free(CompletionData * data, gpointer unused);
 gchar *completion_data_extract(CompletionData * data);
 gint strncmp_word(const gchar * s1, const gchar * s2, gsize n);
 

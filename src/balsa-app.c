@@ -439,8 +439,7 @@ balsa_app_destroy(void)
 {
     config_save();
 
-    g_list_foreach(balsa_app.address_book_list, (GFunc)g_object_unref, NULL);
-    g_list_free(balsa_app.address_book_list);
+    g_list_free_full(balsa_app.address_book_list, g_object_unref);
     balsa_app.address_book_list = NULL;
 
     /* now free filters */
@@ -449,21 +448,17 @@ balsa_app_destroy(void)
     g_slist_free(balsa_app.filters);
     balsa_app.filters = NULL;
 
-    g_list_foreach(balsa_app.identities, (GFunc)g_object_unref, NULL);
-    g_list_free(balsa_app.identities);
+    g_list_free_full(balsa_app.identities, g_object_unref);
     balsa_app.identities = NULL;
 
-    g_list_foreach(balsa_app.inbox_input, (GFunc)g_object_unref, NULL);
-    g_list_free(balsa_app.inbox_input);
+    g_list_free_full(balsa_app.inbox_input, g_object_unref);
     balsa_app.inbox_input = NULL;
 
 
-    g_list_foreach(balsa_app.folder_mru, (GFunc)g_free, NULL);
-    g_list_free(balsa_app.folder_mru);
+    g_list_free_full(balsa_app.folder_mru, g_free);
     balsa_app.folder_mru = NULL;
 
-    g_list_foreach(balsa_app.fcc_mru, (GFunc)g_free, NULL);
-    g_list_free(balsa_app.fcc_mru);
+    g_list_free_full(balsa_app.fcc_mru, g_free);
     balsa_app.fcc_mru = NULL;
 
 

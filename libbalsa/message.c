@@ -150,12 +150,10 @@ libbalsa_message_finalize(GObject * object)
     g_free(message->subj);
     message->subj = NULL;
 #endif
-    g_list_foreach(message->references, (GFunc) g_free, NULL);
-    g_list_free(message->references);
+    g_list_free_full(message->references, g_free);
     message->references = NULL;
 
-    g_list_foreach(message->in_reply_to, (GFunc) g_free, NULL);
-    g_list_free(message->in_reply_to);
+    g_list_free_full(message->in_reply_to, g_free);
     message->in_reply_to = NULL;
 
     g_free(message->message_id);
@@ -164,8 +162,7 @@ libbalsa_message_finalize(GObject * object)
     g_free(message->subtype);
     message->subtype = NULL;
 
-    g_list_foreach(message->parameters, (GFunc) g_strfreev, NULL);
-    g_list_free(message->parameters);
+    g_list_free_full(message->parameters, (GDestroyNotify) g_strfreev);
     message->parameters = NULL;
 
 

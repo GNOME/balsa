@@ -1831,8 +1831,7 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessage *message,
                                               always_trust,
                                               parent, error);
         }
-        g_list_foreach(encrypt_for, (GFunc) g_free, NULL);
-        g_list_free(encrypt_for);
+        g_list_free_full(encrypt_for, g_free);
         if (!result) {
             return LIBBALSA_MESSAGE_ENCRYPT_ERROR;
         }

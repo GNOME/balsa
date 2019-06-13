@@ -119,8 +119,7 @@ balsa_print_object_text_destroy(GObject * self)
 {
     BalsaPrintObjectText *po = BALSA_PRINT_OBJECT_TEXT(self);
 
-    g_list_foreach(po->attributes, (GFunc) g_free, NULL);
-    g_list_free(po->attributes);
+    g_list_free_full(po->attributes, g_free);
     g_free(po->text);
 
     G_OBJECT_CLASS(parent_class)->finalize(self);
@@ -309,8 +308,7 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
 	    this_par_part = g_list_next(this_par_part);
 	}
 	if (attr_list) {
-	    g_list_foreach(attr_list, (GFunc) g_free, NULL);
-	    g_list_free(attr_list);
+	    g_list_free_full(attr_list, g_free);
 	}
 	g_list_free(par_parts);
 	g_array_free(attr_offs, TRUE);

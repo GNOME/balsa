@@ -146,8 +146,7 @@ libbalsa_vcal_finalize(GObject *self)
 	const GObjectClass *parent_class = G_OBJECT_CLASS(libbalsa_vcal_parent_class);
 
     if (vcal->vevent != NULL) {
-    	g_list_foreach(vcal->vevent, (GFunc) g_object_unref, NULL);
-    	g_list_free(vcal->vevent);
+    	g_list_free_full(vcal->vevent, g_object_unref);
     }
 
     (*parent_class->finalize)(self);
@@ -188,8 +187,7 @@ libbalsa_vevent_finalize(GObject *self)
 		g_object_unref(vevent->organizer);
 	}
 	if (vevent->attendee) {
-		g_list_foreach(vevent->attendee, (GFunc) g_object_unref, NULL);
-		g_list_free(vevent->attendee);
+		g_list_free_full(vevent->attendee, g_object_unref);
 	}
 	g_free(vevent->uid);
 	g_free(vevent->summary);

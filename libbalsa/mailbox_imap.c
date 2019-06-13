@@ -335,8 +335,7 @@ libbalsa_mailbox_imap_finalize(GObject * object)
         mailbox->unread_update_id = 0;
     }
 
-    g_list_foreach(mailbox->acls, (GFunc)imap_user_acl_free, NULL);
-    g_list_free(mailbox->acls);
+    g_list_free_full(mailbox->acls, (GDestroyNotify) imap_user_acl_free);
 
     if (G_OBJECT_CLASS(parent_class)->finalize)
 	G_OBJECT_CLASS(parent_class)->finalize(object);

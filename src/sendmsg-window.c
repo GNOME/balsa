@@ -632,8 +632,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     g_free(bsmsg->fcc_url);
     g_free(bsmsg->in_reply_to);
     if(bsmsg->references) {
-        g_list_foreach(bsmsg->references, (GFunc) g_free, NULL);
-        g_list_free(bsmsg->references);
+        g_list_free_full(bsmsg->references, g_free);
         bsmsg->references = NULL;
     }
 
@@ -2075,8 +2074,7 @@ insert_selected_messages(BalsaSendmsg *bsmsg, QuoteType type)
             gtk_text_buffer_insert_at_cursor(buffer, body->str, body->len);
             g_string_free(body, TRUE);
 	}
-	g_list_foreach(l, (GFunc)g_object_unref, NULL);
-        g_list_free(l);
+	g_list_free_full(l, g_object_unref);
     }
 }
 
@@ -2114,8 +2112,7 @@ sw_attach_messages_activated(GSimpleAction * action,
                 break;
             }
 	}
-	g_list_foreach(l, (GFunc)g_object_unref, NULL);
-        g_list_free(l);
+	g_list_free_full(l, g_object_unref);
     }
 }
 
@@ -2810,8 +2807,7 @@ drag_data_quote(GtkWidget * widget,
             if (!find_file.found)
                 add_attachment(bsmsg, uri_list->data, FALSE, NULL);
         }
-        g_slist_foreach(uri_list, (GFunc) g_free, NULL);
-        g_slist_free(uri_list);
+        g_slist_free_full(uri_list, g_free);
     }
         break;
     case TARGET_EMAIL:
@@ -7093,8 +7089,7 @@ sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
                              in_reply_to, message_id);
         fill_body_from_part(bsmsg, part->embhdrs, message_id, references,
                             part->parts, QUOTE_ALL);
-        g_list_foreach(references, (GFunc) g_free, NULL);
-        g_list_free(references);
+        g_list_free_full(references, g_free);
     }
 
     if (reply_type == SEND_REPLY_ALL)

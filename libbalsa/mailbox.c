@@ -450,8 +450,7 @@ libbalsa_mailbox_finalize(GObject * object)
     libbalsa_condition_unref(mailbox->persistent_view_filter);
     mailbox->persistent_view_filter = NULL;
 
-    g_slist_foreach(mailbox->filters, (GFunc) g_free, NULL);
-    g_slist_free(mailbox->filters);
+    g_slist_free_full(mailbox->filters, g_free);
     mailbox->filters = NULL;
     mailbox->filters_loaded = FALSE;
 

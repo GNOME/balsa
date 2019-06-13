@@ -763,8 +763,7 @@ lbav_focus_out_cb(GtkEntry * entry, GdkEventFocus * event,
                 gtk_cell_editable_editing_done(GTK_CELL_EDITABLE(entry));
                 g_free(the_addr);
             }
-            g_list_foreach(match, (GFunc) g_object_unref, NULL);
-            g_list_free(match);
+            g_list_free_full(match, g_object_unref);
         }
     }
 

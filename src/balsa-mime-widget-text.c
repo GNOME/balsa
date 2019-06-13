@@ -909,8 +909,7 @@ static void
 destroy_cite_bars(GList * cite_bars)
 {
     /* note: the widgets are destroyed by the text view */
-    g_list_foreach(cite_bars, (GFunc) g_free, NULL);
-    g_list_free(cite_bars);
+    g_list_free_full(cite_bars, g_free);
 }
 
 typedef struct {

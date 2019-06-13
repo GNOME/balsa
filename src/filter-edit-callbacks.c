@@ -1336,8 +1336,7 @@ update_filters_mailbox(GtkTreeModel * model, GtkTreePath * path,
 	return FALSE;
 
     /* First we free the filters list (which is now obsolete) */
-    g_slist_foreach(mailbox->filters, (GFunc) g_free, NULL);
-    g_slist_free(mailbox->filters);
+    g_slist_free_full(mailbox->filters, g_free);
     mailbox->filters = NULL;
     /* Second we replace old filters name by the new ones
      * Note : deleted filters are also removed */
@@ -1439,8 +1438,7 @@ void fe_destroy_window_cb(GtkWidget * widget,gpointer throwaway)
     new_filters_names=NULL;
 
     /* free all strings in fe_user_headers_list */
-    g_list_foreach(fe_user_headers_list,(GFunc)g_free,NULL);
-    g_list_free(fe_user_headers_list);
+    g_list_free_full(fe_user_headers_list, g_free);
     fe_user_headers_list = NULL;
 
     fe_already_open=FALSE;

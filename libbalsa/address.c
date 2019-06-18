@@ -296,9 +296,12 @@ vcard_strsplit(const gchar * string)
 	string_list = g_slist_prepend(string_list, g_strdup(remainder));
     }
 
-    str_array = g_new(gchar*, n + 1);
+    if (n < 5U) {
+    	str_array = g_new0(gchar*, 5U);
+    } else {
+    	str_array = g_new0(gchar*, n + 1);
+    }
 
-    str_array[n] = NULL;
     for (slist = string_list; slist; slist = slist->next) {
 	gchar * str = (gchar *) slist->data;
 	gchar * p;

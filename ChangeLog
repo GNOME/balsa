@@ -1,3 +1,10 @@
+2019-06-18  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Fix crash using incomplete VCard items
+
+	* libbalsa/address.c (vcard_strsplit): Ensure that the array
+	  contains always 5 items.
+
 2019-06-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Add -Wredundant-decls -Wshadow -Wformat-security compiler warnings

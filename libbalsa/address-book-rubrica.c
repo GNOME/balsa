@@ -319,8 +319,8 @@ libbalsa_address_book_rubrica_modify_address(LibBalsaAddressBook * ab,
     xmlDocPtr doc = NULL;
     xmlNodePtr root_element;
     xmlNodePtr card;
+    const gchar *full_name = libbalsa_address_get_full_name(address);
     LibBalsaABErr result;
-    gboolean found;
 
     /* try to load the current file */
     if ((result = lbab_rubrica_load_xml(ab_rubrica, &doc)) != LBABERR_OK)
@@ -332,19 +332,22 @@ libbalsa_address_book_rubrica_modify_address(LibBalsaAddressBook * ab,
 	xmlFreeDoc(doc);
 	return LBABERR_ADDRESS_NOT_FOUND;
     }
-    card = root_element->children;
-    found = FALSE;
-    while (card && !found) {
-	if (xmlStrcmp(card->name, CXMLCHARP("Card"))) {
-	    gchar *full_name = xml_node_get_attr(card, CXMLCHARP("name"));
 
-	    if (full_name) {
-		found = !g_ascii_strcasecmp(libbalsa_address_get_full_name(address), full_name);
-		g_free(full_name);
+    for (card = root_element->children; card != NULL; card = card->next) {
+	if (xmlStrcmp(card->name, CXMLCHARP("Card")) == 0) {
+	    gchar *name = xml_node_get_attr(card, CXMLCHARP("name"));
+
+	    if (name != NULL) {
+		gboolean found = g_ascii_strcasecmp(full_name, name) == 0;
+
+		g_free(name);
+                if (found)
+                    break;
 	    }
 	}
     }
-    if (!found) {
+
+    if (card == NULL) {
 	xmlFreeDoc(doc);
 	return LBABERR_ADDRESS_NOT_FOUND;
     }

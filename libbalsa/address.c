@@ -720,24 +720,22 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
     GtkListStore *store;
     GtkTreeIter iter;
 
-    g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
+    g_return_if_fail(address == NULL || LIBBALSA_IS_ADDRESS(address));
 
-    new_email = g_strdup(address
-                         && address->addr_list
-                         && address->addr_list->data ?
+    new_email = g_strdup(address != NULL
+                         && address->addr_list != NULL
+                         && address->addr_list->data != NULL ?
                          address->addr_list->data : "");
     /* initialize the organization... */
-    if (!address || address->organization == NULL)
-	new_organization = g_strdup("");
-    else
-	new_organization = g_strdup(address->organization);
+    new_organization = g_strdup(address != NULL
+                                && address->organization != NULL ?
+                                address->organization : "");
 
     /* if the message only contains an e-mail address */
-    if (!address || address->full_name == NULL)
+    if (address == NULL || address->full_name == NULL) {
 	new_name = g_strdup(new_email);
-    else {
+    } else {
         gchar **names;
-        g_assert(address);
 	/* make sure address->personal is not all whitespace */
 	new_name = g_strstrip(g_strdup(address->full_name));
 
@@ -753,7 +751,7 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
                                   ? address->first_name : names[0]);
 
 	    /* get last name */
-            if(address->last_name)
+            if(address->last_name != NULL)
                 last_name = g_strdup(address->last_name);
             else {
                 if (cnt == 1)
@@ -769,7 +767,7 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
 	first_name = g_strdup("");
     if (last_name == NULL)
 	last_name = g_strdup("");
-    if (!address || address->nick_name == NULL)
+    if (address == NULL || address->nick_name == NULL)
 	nick_name = g_strdup("");
     else
 	nick_name = g_strdup(address->nick_name);
@@ -784,10 +782,10 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
     store = GTK_LIST_STORE(gtk_tree_view_get_model
                            (GTK_TREE_VIEW(entries[EMAIL_ADDRESS])));
     gtk_list_store_clear(store);
-    if (address) {
+    if (address != NULL) {
         GList *list;
 
-        for (list = address->addr_list; list; list = list->next) {
+        for (list = address->addr_list; list != NULL; list = list->next) {
             gtk_list_store_append(store, &iter);
             gtk_list_store_set(store, &iter, 0, list->data, -1);
         }
@@ -978,7 +976,7 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
     GtkWidget *grid, *label, *lhs;
     gint cnt;
 
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+    g_return_val_if_fail(address == NULL || LIBBALSA_IS_ADDRESS(address), NULL);
 
     grid = gtk_grid_new();
 #define HIG_PADDING 6
@@ -1062,7 +1060,7 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
     gboolean valid;
     GtkTreeIter iter;
 
-    /* make sure gtk_tree_model looses focus, otherwise the list does
+    /* make sure gtk_tree_model loses focus, otherwise the list does
      * not get updated (gtk2-2.8.20) */
     gtk_widget_grab_focus(entries[FULL_NAME]);
     /* FIXME: This problem should be solved in the VCard
@@ -1072,7 +1070,7 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
 
     address = libbalsa_address_new();
     SET_FIELD(address->full_name,   entries[FULL_NAME]);
-    if (!address->full_name) {
+    if (address->full_name == NULL) {
         g_object_unref(address);
         return NULL;
     }
@@ -1087,8 +1085,12 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
         gchar *email;
 
         gtk_tree_model_get(model, &iter, 0, &email, -1);
-        if (email && *email)
-            list = g_list_prepend(list, email);
+        if (email != NULL) {
+            if (email[0] != '\0')
+                list = g_list_prepend(email);
+            else
+                g_free(email);
+        }
     }
     address->addr_list = g_list_reverse(list);
 

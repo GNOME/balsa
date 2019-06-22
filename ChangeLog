@@ -1,5 +1,11 @@
 2019-06-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Guard against null string.
+
+	* libbalsa/abook-completion.c (completion_data_new):
+
+2019-06-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Fix a thinko
 
 	* libbalsa/address.c (libbalsa_address_new_from_edit_entries):

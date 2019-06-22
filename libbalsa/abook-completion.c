@@ -62,8 +62,10 @@ completion_data_new(InternetAddress * ia, const gchar * nick_name)
 #ifdef CASE_INSENSITIVE_NAME
     string_n = g_utf8_normalize(string->str, -1, G_NORMALIZE_ALL);
     g_string_free(string, TRUE);
-    ret->string = g_utf8_casefold(string_n, -1);
-    g_free(string_n);
+    if (string_n != NULL) {
+        ret->string = g_utf8_casefold(string_n, -1);
+        g_free(string_n);
+    }
 #else
     ret->string = g_string_free(string, FALSE);
 #endif

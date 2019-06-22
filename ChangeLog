@@ -1,5 +1,11 @@
 2019-06-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Fix a thinko
+
+	* libbalsa/address.c (libbalsa_address_new_from_edit_entries):
+
+2019-06-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Allow address == NULL in libbalsa_address_set_edit_entries() and
 	libbalsa_address_get_edit_widget()
 

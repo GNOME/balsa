@@ -1087,7 +1087,7 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
         gtk_tree_model_get(model, &iter, 0, &email, -1);
         if (email != NULL) {
             if (email[0] != '\0')
-                list = g_list_prepend(email);
+                list = g_list_prepend(list, email);
             else
                 g_free(email);
         }

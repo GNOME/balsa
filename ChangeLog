@@ -1,5 +1,13 @@
 2019-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	address-book-rubrica: Do not crash if a card has multiple "Net"
+	sections.
+
+	* libbalsa/address-book-rubrica.c (extract_cards): Ignore all
+	but the first "Net" section.
+
+2019-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/address-book-rubrica.c
 	(libbalsa_address_book_rubrica_modify_address): Fix the search
 	for the card matching a given full-name.

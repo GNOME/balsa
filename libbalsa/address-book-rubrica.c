@@ -592,7 +592,8 @@ extract_cards(xmlNodePtr card)
 		    extract_work(children->children, &organization);
                     libbalsa_address_set_organization(address, organization);
                     g_free(organization);
-                } else if (!xmlStrcmp(children->name, CXMLCHARP("Net"))) {
+                } else if (!xmlStrcmp(children->name, CXMLCHARP("Net"))
+                           && address_list == NULL) {
 		    extract_net(children->children, &address_list);
                     libbalsa_address_set_addr_list(address, address_list);
                 }

@@ -717,6 +717,7 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
     gchar *last_name = NULL;
     gchar *nick_name = NULL;
     gint cnt;
+    GtkWidget *tree_view;
     GtkListStore *store;
     GtkTreeIter iter;
 
@@ -779,8 +780,8 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
     gtk_entry_set_text(GTK_ENTRY(entries[NICK_NAME]), nick_name);
     gtk_entry_set_text(GTK_ENTRY(entries[ORGANIZATION]), new_organization);
 
-    store = GTK_LIST_STORE(gtk_tree_view_get_model
-                           (GTK_TREE_VIEW(entries[EMAIL_ADDRESS])));
+    tree_view = gtk_bin_get_child(GTK_BIN(entries[EMAIL_ADDRESS]));
+    store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view)));
     gtk_list_store_clear(store);
     if (address != NULL) {
         GList *list;
@@ -842,6 +843,7 @@ lba_addr_list_widget(GCallback changed_cb, gpointer changed_data)
     GtkWidget *tree_view;
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
+    GtkWidget *frame;
 
     store = gtk_list_store_new(1, G_TYPE_STRING);
     tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
@@ -860,7 +862,11 @@ lba_addr_list_widget(GCallback changed_cb, gpointer changed_data)
                                                       "text", 0, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 
-    return tree_view;
+    frame = gtk_frame_new(NULL);
+    gtk_container_add(GTK_CONTAINER(frame), tree_view);
+    gtk_widget_show_all(frame);
+
+    return frame;
 }
 
 static void
@@ -992,22 +998,24 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
         if (cnt == EMAIL_ADDRESS) {
             GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
             GtkWidget *but = gtk_button_new_with_mnemonic(_("A_dd"));
+            GtkWidget *tree_view;
+
             entries[cnt] = lba_addr_list_widget(changed_cb, changed_data);
             gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 1);
             gtk_box_pack_start(GTK_BOX(box), but,   FALSE, FALSE, 1);
             lhs = box;
-            g_signal_connect(but, "clicked", G_CALLBACK(add_row),
-                             entries[cnt]);
+            tree_view = gtk_bin_get_child(GTK_BIN(entries[cnt]));
+            g_signal_connect(but, "clicked", G_CALLBACK(add_row), tree_view);
              gtk_drag_dest_set(entries[cnt],
                                GTK_DEST_DEFAULT_MOTION |
                                GTK_DEST_DEFAULT_HIGHLIGHT,
                                libbalsa_address_target_list,
                                2,              /* size of list */
                                GDK_ACTION_COPY);
-            g_signal_connect(G_OBJECT(entries[cnt]), "drag-data-received",
+            g_signal_connect(tree_view, "drag-data-received",
                              G_CALLBACK(addrlist_drag_received_cb), NULL);
-            g_signal_connect (G_OBJECT(entries[cnt]), "drag-drop",
-                              G_CALLBACK (addrlist_drag_drop_cb), NULL);
+            g_signal_connect(tree_view, "drag-drop",
+                             G_CALLBACK(addrlist_drag_drop_cb), NULL);
         } else {
             entries[cnt] = gtk_entry_new();
             if (changed_cb)
@@ -1033,8 +1041,8 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
     libbalsa_address_set_edit_entries(address, entries);
 
     if (changed_cb) {
-        GtkTreeModel *model =
-            gtk_tree_view_get_model(GTK_TREE_VIEW(entries[EMAIL_ADDRESS]));
+        GtkWidget *tree_view = gtk_bin_get_child(GTK_BIN(entries[EMAIL_ADDRESS]));
+        GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
         g_signal_connect_swapped(G_OBJECT(model), "row-inserted",
                                  changed_cb, changed_data);
         g_signal_connect_swapped(G_OBJECT(model), "row-changed",
@@ -1056,6 +1064,7 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
     LibBalsaAddress *address;
     char *p;
     GList *list = NULL;
+    GtkWidget *tree_view;
     GtkTreeModel *model;
     gboolean valid;
     GtkTreeIter iter;
@@ -1079,7 +1088,9 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
     SET_FIELD(address->nick_name,   entries[NICK_NAME]);
     SET_FIELD(address->organization,entries[ORGANIZATION]);
 
-    model = gtk_tree_view_get_model(GTK_TREE_VIEW(entries[EMAIL_ADDRESS]));
+
+    tree_view = gtk_bin_get_child(GTK_BIN(entries[EMAIL_ADDRESS]));
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
     for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
          valid = gtk_tree_model_iter_next(model, &iter)) {
         gchar *email;

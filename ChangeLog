@@ -1,5 +1,16 @@
 2019-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Address edit widget cosmetics
+
+	* libbalsa/address.c (lba_addr_list_widget): put the GtkTreeView
+	in a GtkFrame;
+	(libbalsa_address_set_edit_entries),
+	(libbalsa_address_get_edit_widget),
+	(libbalsa_address_new_from_edit_entries): use gtk_bin_get_child()
+	to get the GtkTreeView from the GtkFrame.
+
+2019-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	address-book-rubrica: Do not crash on bad card
 
 	Do not crash if a card has multiple "Net" sections

@@ -1,5 +1,15 @@
 2019-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	address-book-rubrica: Do not crash on bad card
+
+	Do not crash if a card has multiple "Net" sections
+
+	* libbalsa/address-book-rubrica.c (extract_cards): Call
+	libbalsa_address_set_addr_list() only once, even when a card has
+	multiple "Net" sections.
+
+2019-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/address-book-rubrica.c
 	(libbalsa_address_book_rubrica_modify_address): Fix the search
 	for the card matching a given full-name.

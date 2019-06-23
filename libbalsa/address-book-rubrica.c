@@ -594,16 +594,17 @@ extract_cards(xmlNodePtr card)
                     g_free(organization);
                 } else if (!xmlStrcmp(children->name, CXMLCHARP("Net"))) {
 		    extract_net(children->children, &address_list);
-                    libbalsa_address_set_addr_list(address, address_list);
                 }
 
 		children = children->next;
 	    }
 
-	    if (address_list != NULL)
+	    if (address_list != NULL) {
+                libbalsa_address_set_addr_list(address, address_list);
 		addrlist = g_slist_prepend(addrlist, address);
-	    else
+            } else {
 		g_object_unref(address);
+            }
 	}
 
 	card = card->next;

@@ -299,11 +299,11 @@ lbab_ldif_write_dn(FILE * stream, LibBalsaAddress * address)
 static void
 lbab_ldif_write_addresses(FILE * stream, LibBalsaAddress * address)
 {
-    GList *list;
+    guint n_addrs, n;
 
-    for (list = libbalsa_address_get_addr_list(address);
-         list != NULL; list = list->next) {
-        const gchar *mail = list->data;
+    n_addrs = libbalsa_address_get_n_addrs(address);
+    for (n = 0; n < n_addrs; ++n) {
+        const gchar *mail = libbalsa_address_get_nth_addr(address, n);
 
         if (mail != NULL && mail[0] != '\0') {
             gchar *value_spec = string_to_value_spec(mail);

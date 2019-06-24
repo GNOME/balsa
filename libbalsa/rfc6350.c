@@ -105,7 +105,7 @@ rfc6350_parse_from_stream(GDataInputStream *stream,
 
 	/* ignore items without an Email address, fill empty full name if necessary */
 	if (result != NULL) {
-		if (libbalsa_address_get_addr_list(result) == NULL) {
+		if (libbalsa_address_get_addr(result) == NULL) {
 			g_object_unref(result);
 			result = NULL;
 		} else if (libbalsa_address_get_full_name(result) == NULL) {

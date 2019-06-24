@@ -77,7 +77,7 @@ static GSList *extract_cards(xmlNodePtr card);
 static void extract_data(xmlNodePtr entry, gchar ** first_name,
 			 gchar ** last_name, gchar ** nick_name);
 static void extract_work(xmlNodePtr entry, gchar ** org);
-static gint extract_net(xmlNodePtr entry, LibBalsaAddress *address);
+static guint extract_net(xmlNodePtr entry, LibBalsaAddress *address);
 static gchar *xml_node_get_attr(xmlNodePtr node, const xmlChar * attname);
 static gchar *xml_node_get_text(xmlNodePtr node);
 
@@ -452,23 +452,24 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
     completion_list = NULL;
     for (list = libbalsa_address_book_text_get_item_list(ab_text); list != NULL; list = list->next) {
 	LibBalsaAddress *address = LIBBALSA_ADDRESS(list->data);
-        GList *addr_list;
+        guint n_addrs;
 
 	if (address == NULL)
 	    continue;
 
-        addr_list = libbalsa_address_get_addr_list(address);
+        n_addrs = libbalsa_address_get_n_addrs(address);
 	if (libbalsa_address_book_get_dist_list_mode(ab)
-            && addr_list != NULL && addr_list->next != NULL) {
+            && n_addrs > 1) {
 	    /* Create a group address. */
-            GList *l;
 	    InternetAddress *ia =
 		internet_address_group_new(libbalsa_address_get_full_name(address));
             InternetAddressGroup *group = (InternetAddressGroup *) ia;
+            guint n;
 
-	    for (l = addr_list; l != NULL; l = l->next) {
+	    for (n = 0; n < n_addrs; ++n) {
+                const gchar *addr = libbalsa_address_get_nth_addr(address, n);
 		InternetAddress *member =
-		    internet_address_mailbox_new(NULL, l->data);
+		    internet_address_mailbox_new(NULL, addr);
 		internet_address_group_add_member(group, member);
 		g_object_unref(member);
 	    }
@@ -477,11 +478,12 @@ lbab_rubrica_load_xml(LibBalsaAddressBookRubrica * ab_rubrica,
 	    g_object_unref(ia);
 	} else {
 	    /* Create name addresses. */
-	    GList *l;
+            guint n;
 
-	    for (l = addr_list; l != NULL; l = l->next) {
+	    for (n = 0; n < n_addrs; ++n) {
+                const gchar *addr = libbalsa_address_get_nth_addr(address, n);
 		InternetAddress *ia =
-		    internet_address_mailbox_new(libbalsa_address_get_full_name(address), l->data);
+		    internet_address_mailbox_new(libbalsa_address_get_full_name(address), addr);
 		cmp_data = completion_data_new(ia, libbalsa_address_get_nick_name(address));
 		completion_list =
 		    g_list_prepend(completion_list, cmp_data);
@@ -504,7 +506,8 @@ lbab_insert_address_node(LibBalsaAddress * address,
 {
     xmlNodePtr new_addr;
     xmlNodePtr new_data;
-    GList *l;
+    guint n_addrs;
+    guint n;
 
     /* create a new card */
     new_addr = xmlNewChild(parent, NULL, CXMLCHARP("Card"), NULL);
@@ -526,10 +529,13 @@ lbab_insert_address_node(LibBalsaAddress * address,
 
     /* create the Net section of the card */
     new_data = xmlNewChild(new_addr, NULL, CXMLCHARP("Net"), NULL);
-    for (l = libbalsa_address_get_addr_list(address); l != NULL; l = l->next) {
+
+    n_addrs = libbalsa_address_get_n_addrs(address);
+    for (n = 0; n < n_addrs; ++n) {
+        const gchar *addr = libbalsa_address_get_nth_addr(address, n);
 	xmlNodePtr new_mail =
 	    xmlNewChild(new_data, NULL, CXMLCHARP("Uri"),
-			CXMLCHARP(l->data));
+			CXMLCHARP(addr));
 	xmlNewProp(new_mail, CXMLCHARP("type"), CXMLCHARP("email"));
     }
 }
@@ -563,7 +569,7 @@ extract_cards(xmlNodePtr card)
 	    LibBalsaAddress *address = libbalsa_address_new();
 	    xmlNodePtr children;
             gchar *full_name;
-            gint n_addrs = 0;
+            guint n_addrs = 0;
 
             full_name = xml_node_get_attr(card, CXMLCHARP("name"));
 	    libbalsa_address_set_full_name(address, full_name);
@@ -688,10 +694,10 @@ extract_work(xmlNodePtr entry, gchar ** org)
 }
 
 
-static gint
+static guint
 extract_net(xmlNodePtr entry, LibBalsaAddress *address)
 {
-    gint n_addrs = 0;
+    guint n_addrs = 0;
 
     while (entry) {
 	gchar *uri_type = NULL;

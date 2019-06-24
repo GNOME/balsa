@@ -276,15 +276,15 @@ libbalsa_address_book_externq_add_address(LibBalsaAddressBook * ab,
 
     ab_externq = LIBBALSA_ADDRESS_BOOK_EXTERNQ(ab);
     if (ab_externq->save != NULL) {
-        GList *addr_list;
+        const gchar *addr;
         const gchar *full_name;
 
-        addr_list = libbalsa_address_get_addr_list(new_address);
+        addr      = libbalsa_address_get_addr(new_address);
         full_name = libbalsa_address_get_full_name(new_address);
 
         g_snprintf(command, sizeof(command), "%s \"%s\" \"%s\" \"%s\"",
                    ab_externq->save,
-                   (gchar *) addr_list->data,
+                   addr,
                    full_name, "TODO");
         if ((gc = popen(command, "r")) == NULL)
             return LBABERR_CANNOT_WRITE;

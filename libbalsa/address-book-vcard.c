@@ -164,11 +164,14 @@ lbab_vcard_write_org(FILE * stream, LibBalsaAddress * address)
 static void
 lbab_vcard_write_addresses(FILE * stream, LibBalsaAddress * address)
 {
-    GList *list;
+    guint n_addrs;
+    guint n;
 
-    for (list = libbalsa_address_get_addr_list(address);
-         list != NULL; list = list->next)
-        fprintf(stream, "EMAIL;INTERNET:%s\n", (gchar *) list->data);
+    n_addrs = libbalsa_address_get_n_addrs(address);
+    for (n = 0; n < n_addrs; ++n) {
+        const gchar *addr = libbalsa_address_get_nth_addr(address, n);
+        fprintf(stream, "EMAIL;INTERNET:%s\n", addr);
+    }
 }
 
 static void

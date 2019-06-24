@@ -299,7 +299,7 @@ gpe_read_address(void *arg, int argc, char **argv, char **names)
                        gpe_read_attr, address, NULL, uid);
 #endif                          /* HAVE_SQLITE3 */
 
-    if (libbalsa_address_get_addr_list(address) == NULL) {
+    if (libbalsa_address_get_addr(address) == NULL) {
         /* entry without address: ignore! */
         g_object_unref(address);
         return 0;
@@ -728,9 +728,9 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
     struct gpe_completion_closure *gc = arg;
     LibBalsaAddress *address = libbalsa_address_new();
     InternetAddress *ia;
-    GList *addr_list;
-    GList *l;
     guint uid = atoi(argv[0]);
+    guint n_addrs;
+    guint n;
 #ifdef HAVE_SQLITE3
     gchar *sql;
 
@@ -747,8 +747,8 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
                        gpe_read_attr, address, NULL, uid);
 #endif                          /* HAVE_SQLITE3 */
 
-    addr_list = libbalsa_address_get_addr_list(address);
-    if (addr_list == NULL) {
+    n_addrs = libbalsa_address_get_n_addrs(address);
+    if (n_addrs == 0) {
         /* entry without address: ignore! */
         g_object_unref(address);
         return 0;
@@ -766,9 +766,10 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
         g_free(full_name);
     }
 
-    for (l = addr_list; l != NULL; l = l->next) {
+    for (n = 0; n < n_addrs; ++n) {
+        const gchar *addr = libbalsa_address_get_nth_addr(address, n);
         const gchar *full_name = libbalsa_address_get_full_name(address);
-        ia = internet_address_mailbox_new(full_name, (gchar *) l->data);
+        ia = internet_address_mailbox_new(full_name, addr);
         gc->res = g_list_prepend(gc->res, ia);
     }
 

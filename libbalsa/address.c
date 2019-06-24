@@ -1173,12 +1173,20 @@ libbalsa_address_get_addr(LibBalsaAddress * address)
     return address->addr_list != NULL ? address->addr_list->data : NULL;
 }
 
-GList *
-libbalsa_address_get_addr_list(LibBalsaAddress * address)
+guint
+libbalsa_address_get_n_addrs(LibBalsaAddress * address)
+{
+    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), 0U);
+
+    return g_list_length(address->addr_list);
+}
+
+const gchar *
+libbalsa_address_get_nth_addr(LibBalsaAddress * address, guint n)
 {
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
 
-    return address->addr_list;
+    return (const gchar *) g_list_nth_data(address->addr_list, n);
 }
 
 /*

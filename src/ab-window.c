@@ -751,8 +751,7 @@ balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab,
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
-    GList *addr_list;
-    gint count;
+    guint n_addrs;
     const gchar *full_name;
 
     g_return_if_fail(BALSA_IS_AB_WINDOW(ab));
@@ -764,9 +763,9 @@ balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab,
     full_name = libbalsa_address_get_full_name(address);
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(ab->address_list));
 
-    addr_list = libbalsa_address_get_addr_list(address);
+    n_addrs = libbalsa_address_get_n_addrs(address);
     if (libbalsa_address_book_get_dist_list_mode(libbalsa_ab)
-        && addr_list != NULL && addr_list->next != NULL) {
+        && n_addrs > 1) {
         gchar *address_string = libbalsa_address_to_gchar(address, -1);
 
         gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
@@ -780,19 +779,20 @@ balsa_ab_window_load_cb(LibBalsaAddressBook *libbalsa_ab,
 
 	g_free(address_string);
     } else {
-	for (count = 0, addr_list = libbalsa_address_get_addr_list(address);
-             addr_list != NULL;
-             ++count, addr_list = addr_list->next) {
+        guint n;
+
+	for (n = 0; n < n_addrs; ++n) {
+            const gchar *addr = libbalsa_address_get_nth_addr(address, n);
+
             gtk_list_store_prepend(GTK_LIST_STORE(model), &iter);
             /* GtkListStore refs address once for each address in
              * the list, and unrefs it the same number of times when
              * cleared */
             gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                                LIST_COLUMN_NAME, full_name,
-                               LIST_COLUMN_ADDRESS_STRING,
-                               addr_list->data,
+                               LIST_COLUMN_ADDRESS_STRING, addr,
                                LIST_COLUMN_ADDRESS, address,
-                               LIST_COLUMN_WHICH, count,
+                               LIST_COLUMN_WHICH, n,
                                -1);
 	}
     }

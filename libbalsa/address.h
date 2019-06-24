@@ -101,7 +101,8 @@ const gchar * libbalsa_address_get_last_name   (LibBalsaAddress * address);
 const gchar * libbalsa_address_get_nick_name   (LibBalsaAddress * address);
 const gchar * libbalsa_address_get_organization(LibBalsaAddress * address);
 const gchar * libbalsa_address_get_addr        (LibBalsaAddress * address);
-GList       * libbalsa_address_get_addr_list   (LibBalsaAddress * address);
+guint         libbalsa_address_get_n_addrs     (LibBalsaAddress * address);
+const gchar * libbalsa_address_get_nth_addr    (LibBalsaAddress * address, guint n);
 
 /*
  * Setters

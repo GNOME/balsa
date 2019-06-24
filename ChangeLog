@@ -1,3 +1,27 @@
+2019-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	address: Remove libbalsa_address_get_addr_list()
+
+	Second and final step in keeping address->addr_list private.
+
+	* libbalsa/address.c (libbalsa_address_get_n_addrs),
+	(libbalsa_address_get_nth_addr): new functions to provide access
+	  to the addr-list;
+	* libbalsa/address-book-extern.c
+	(libbalsa_address_book_externq_add_address):
+	* libbalsa/address-book-gpe.c (gpe_read_address):
+	* libbalsa/address-book-ldif.c (lbab_ldif_write_addresses):
+	* libbalsa/address-book-osmo.c
+	(libbalsa_address_book_osmo_alias_complete):
+	* libbalsa/address-book-rubrica.c (lbab_rubrica_load_xml),
+	(lbab_insert_address_node), (extract_cards), (extract_net):
+	* libbalsa/address-book-text.c (lbab_text_load_file):
+	* libbalsa/address-book-vcard.c (lbab_vcard_write_addresses):
+	* libbalsa/address.h:
+	* libbalsa/rfc6350.c (rfc6350_parse_from_stream):
+	* src/ab-main.c (bab_load_cb):
+	* src/ab-window.c (balsa_ab_window_load_cb): Use them.
+
 2019-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	address: Remove libbalsa_address_set_addr_list()

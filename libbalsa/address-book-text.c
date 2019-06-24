@@ -332,22 +332,23 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
 #if MAKE_GROUP_BY_ORGANIZATION
         gchar **groups, **group;
 #endif                          /* MAKE_GROUP_BY_ORGANIZATION */
-        GList *addr_list;
+        guint n_addrs;
 
         if (address == NULL)
             continue;
 
-        addr_list = libbalsa_address_get_addr_list(address);
+        n_addrs = libbalsa_address_get_n_addrs(address);
 	if (libbalsa_address_book_get_dist_list_mode(ab)
-            && addr_list != NULL && addr_list->next != NULL) {
+            && n_addrs > 1) {
             /* Create a group address. */
             InternetAddress *ia =
                 internet_address_group_new(libbalsa_address_get_full_name(address));
-            GList *l;
+            guint n;
 
-            for (l = addr_list; l != NULL; l = l->next) {
+            for (n = 0; n < n_addrs; ++n) {
+                const gchar *addr = libbalsa_address_get_nth_addr(address, n);
                 InternetAddress *member =
-                    internet_address_mailbox_new(NULL, l->data);
+                    internet_address_mailbox_new(NULL, addr);
                 internet_address_group_add_member((InternetAddressGroup *)ia, member);
                 g_object_unref(member);
             }
@@ -356,12 +357,13 @@ lbab_text_load_file(LibBalsaAddressBookText * ab_text, FILE * stream)
             g_object_unref(ia);
         } else {
             /* Create name addresses. */
-            GList *l;
+            guint n;
 
-            for (l = addr_list; l != NULL; l = l->next) {
+            for (n = 0; n < n_addrs; ++n) {
+                const gchar *addr = libbalsa_address_get_nth_addr(address, n);
                 InternetAddress *ia =
                     internet_address_mailbox_new(libbalsa_address_get_full_name(address),
-                                                 l->data);
+                                                 addr);
                 cmp_data =
                     completion_data_new(ia, libbalsa_address_get_nick_name(address));
                 completion_list =

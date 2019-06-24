@@ -246,20 +246,21 @@ libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
 		utf8_filter = g_utf8_casefold(prefix, -1);
 		for (p = addresses; p != NULL; p = p->next) {
 			LibBalsaAddress *this_addr = LIBBALSA_ADDRESS(p->data);
-			GList *this_mail;
 			gboolean names_match;
+                        guint n_addrs;
+                        guint n;
 
 			names_match = utf8_lba_strstr(this_addr, utf8_filter);
-			for (this_mail = libbalsa_address_get_addr_list(this_addr);
-                             this_mail != NULL; this_mail = this_mail->next) {
-				const gchar *mail_addr = (gchar *) this_mail->data;
+                        n_addrs = libbalsa_address_get_n_addrs(this_addr);
+			for (n = 0; n < n_addrs; ++n) {
+				const gchar *mail_addr =
+                                    libbalsa_address_get_nth_addr(this_addr, n);
 
 				if (names_match || (strstr(mail_addr, prefix) != NULL)) {
                                         const gchar *full_name;
 					InternetAddress *addr;
 
-                                        full_name =
-                                            libbalsa_address_get_full_name(this_addr),
+                                        full_name = libbalsa_address_get_full_name(this_addr);
 					g_debug("%s: found %s <%s>", __func__,
                                                 full_name, mail_addr);
 					addr = internet_address_mailbox_new(full_name,

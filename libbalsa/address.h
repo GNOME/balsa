@@ -117,8 +117,6 @@ void libbalsa_address_set_nick_name   (LibBalsaAddress * address,
                                        const gchar     * nick_name);
 void libbalsa_address_set_organization(LibBalsaAddress * address,
                                        const gchar     * organization);
-void libbalsa_address_set_addr_list   (LibBalsaAddress * address,
-                                       GList           * addr_list);
 void libbalsa_address_add_addr        (LibBalsaAddress * address,
                                        const gchar     * addr);
 

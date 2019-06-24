@@ -202,9 +202,12 @@ address_new_prefill(LibBalsaAddress * address, GList * address_list,
                     gchar * nickn, gchar * givenn, gchar * surn,
                     gchar * fulln, gchar * org)
 {
+    GList *list;
     gchar *full_name;
 
-    libbalsa_address_set_addr_list(address, address_list);
+    for (list = address_list; list != NULL; list = list->next)
+        libbalsa_address_add_addr(address, (const gchar *) list->data);
+    g_list_free_full(address_list, g_free);
 
     if (givenn != NULL) {
         libbalsa_address_set_first_name(address, givenn);

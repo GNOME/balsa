@@ -1236,16 +1236,6 @@ libbalsa_address_set_organization(LibBalsaAddress * address,
 }
 
 void
-libbalsa_address_set_addr_list(LibBalsaAddress * address,
-                               GList           * addr_list)
-{
-    g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
-
-    g_list_free_full(address->addr_list, g_free);
-    address->addr_list = addr_list;
-}
-
-void
 libbalsa_address_add_addr(LibBalsaAddress * address,
                           const gchar     * addr)
 {

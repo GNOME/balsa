@@ -235,6 +235,8 @@ libbalsa_address_book_vcard_parse_address(FILE * stream,
                     res = lbab_vcard_write_end(stream_out);
                 }
                 if (address != NULL) {
+                    GList *list;
+
                     if (full_name != NULL)
                         libbalsa_address_set_full_name(address, full_name);
                     else if (name != NULL)
@@ -248,8 +250,10 @@ libbalsa_address_book_vcard_parse_address(FILE * stream,
                     libbalsa_address_set_first_name(address, first_name);
                     libbalsa_address_set_nick_name(address, nick_name);
                     libbalsa_address_set_organization(address, org);
-                    libbalsa_address_set_addr_list(address,
-                                                   g_list_reverse(addr_list));
+
+                    for (list = addr_list; list != NULL; list=list->next)
+                        libbalsa_address_add_addr(address, (const gchar *) list->data);
+                    g_list_free_full(addr_list, g_free);
 
                     res = LBABERR_OK;
                     g_free(full_name);

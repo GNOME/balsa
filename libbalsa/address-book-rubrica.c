@@ -77,7 +77,7 @@ static GSList *extract_cards(xmlNodePtr card);
 static void extract_data(xmlNodePtr entry, gchar ** first_name,
 			 gchar ** last_name, gchar ** nick_name);
 static void extract_work(xmlNodePtr entry, gchar ** org);
-static void extract_net(xmlNodePtr entry, GList ** mail_addrs);
+static gint extract_net(xmlNodePtr entry, LibBalsaAddress *address);
 static gchar *xml_node_get_attr(xmlNodePtr node, const xmlChar * attname);
 static gchar *xml_node_get_text(xmlNodePtr node);
 
@@ -563,7 +563,7 @@ extract_cards(xmlNodePtr card)
 	    LibBalsaAddress *address = libbalsa_address_new();
 	    xmlNodePtr children;
             gchar *full_name;
-            GList *address_list = NULL;
+            gint n_addrs = 0;
 
             full_name = xml_node_get_attr(card, CXMLCHARP("name"));
 	    libbalsa_address_set_full_name(address, full_name);
@@ -593,18 +593,16 @@ extract_cards(xmlNodePtr card)
                     libbalsa_address_set_organization(address, organization);
                     g_free(organization);
                 } else if (!xmlStrcmp(children->name, CXMLCHARP("Net"))) {
-		    extract_net(children->children, &address_list);
+                    n_addrs += extract_net(children->children, address);
                 }
 
 		children = children->next;
 	    }
 
-	    if (address_list != NULL) {
-                libbalsa_address_set_addr_list(address, address_list);
+	    if (n_addrs > 0)
 		addrlist = g_slist_prepend(addrlist, address);
-            } else {
+            else
 		g_object_unref(address);
-            }
 	}
 
 	card = card->next;
@@ -690,9 +688,11 @@ extract_work(xmlNodePtr entry, gchar ** org)
 }
 
 
-static void
-extract_net(xmlNodePtr entry, GList ** mail_addrs)
+static gint
+extract_net(xmlNodePtr entry, LibBalsaAddress *address)
 {
+    gint n_addrs = 0;
+
     while (entry) {
 	gchar *uri_type = NULL;
 	gchar *mail_addr;
@@ -700,12 +700,17 @@ extract_net(xmlNodePtr entry, GList ** mail_addrs)
 	if (!xmlStrcmp(entry->name, CXMLCHARP("Uri"))
 	    && g_strcmp0(uri_type = xml_node_get_attr(entry, CXMLCHARP("type")),
                          "email") == 0
-	    && (mail_addr = xml_node_get_text(entry)) != NULL)
-	    *mail_addrs = g_list_prepend(*mail_addrs, mail_addr);
+	    && (mail_addr = xml_node_get_text(entry)) != NULL) {
+            libbalsa_address_add_addr(address, mail_addr);
+            g_free(mail_addr);
+            ++n_addrs;
+        }
 	g_free(uri_type);
 
 	entry = entry->next;
     }
+
+    return n_addrs;
 }
 
 

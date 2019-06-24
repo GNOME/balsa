@@ -1,3 +1,18 @@
+2019-06-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	address: Remove libbalsa_address_set_addr_list()
+
+	Step 1 in keeping address->addr_list private.
+
+	* libbalsa/address-book-ldif.c (address_new_prefill): use
+	libbalsa_address_add_addr() instead;
+	* libbalsa/address-book-rubrica.c (extract_cards),
+	(extract_net): ditto;
+	* libbalsa/address-book-vcard.c
+	(libbalsa_address_book_vcard_parse_address): ditto;
+	* libbalsa/address.c: remove it;
+	* libbalsa/address.h: ditto.
+
 2019-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Address edit widget cosmetics

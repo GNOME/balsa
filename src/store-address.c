@@ -388,12 +388,12 @@ store_address_add_address(StoreAddressInfo * info,
             InternetAddress *member_address =
                 internet_address_list_get_address(members, j);
             if (INTERNET_ADDRESS_IS_MAILBOX(member_address))
-                libbalsa_address_add_addr
+                libbalsa_address_append_addr
                     (address, INTERNET_ADDRESS_MAILBOX(member_address)->addr);
         }
-        libbalsa_address_add_addr(address, INTERNET_ADDRESS_MAILBOX(ia)->addr);
+        libbalsa_address_append_addr(address, INTERNET_ADDRESS_MAILBOX(ia)->addr);
     } else {
-        libbalsa_address_add_addr(address, INTERNET_ADDRESS_MAILBOX(ia)->addr);
+        libbalsa_address_append_addr(address, INTERNET_ADDRESS_MAILBOX(ia)->addr);
     }
     ew = libbalsa_address_get_edit_widget(address, entries, NULL, NULL);
     g_object_unref(address);

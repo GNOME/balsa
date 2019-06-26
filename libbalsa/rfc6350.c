@@ -295,7 +295,7 @@ rfc6350_eval_line(gchar			  *line,
 				g_strfreev(n_items);
 			} else if (g_ascii_strcasecmp(name, "EMAIL") == 0) {
 				rfc6350_unescape(value);
-                                libbalsa_address_add_addr(address, value);
+                                libbalsa_address_append_addr(address, value);
 			} else {
 				/* ignore any other items */
 			}

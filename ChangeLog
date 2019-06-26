@@ -1,3 +1,25 @@
+2019-06-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	address: rename add to append
+
+	to make sure that addrs are in the same order as in the
+	address-book, for address-books that support multiple addrs per
+	address.
+
+	* libbalsa/address-book-extern.c (lbe_load_cb):
+	* libbalsa/address-book-gpe.c (gpe_read_attr):
+	* libbalsa/address-book-ldap.c
+	(libbalsa_address_book_ldap_get_address):
+	* libbalsa/address-book-ldif.c (address_new_prefill):
+	* libbalsa/address-book-rubrica.c (extract_net):
+	* libbalsa/address-book-vcard.c
+	(libbalsa_address_book_vcard_parse_address):
+	* libbalsa/address.c (libbalsa_address_append_addr):
+	* libbalsa/address.h:
+	* libbalsa/rfc2445.c (cal_address_2445_to_lbaddress):
+	* libbalsa/rfc6350.c (rfc6350_eval_line):
+	* src/store-address.c (store_address_add_address):
+
 2019-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	address: Remove libbalsa_address_get_addr_list()

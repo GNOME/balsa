@@ -707,7 +707,7 @@ extract_net(xmlNodePtr entry, LibBalsaAddress *address)
 	    && g_strcmp0(uri_type = xml_node_get_attr(entry, CXMLCHARP("type")),
                          "email") == 0
 	    && (mail_addr = xml_node_get_text(entry)) != NULL) {
-            libbalsa_address_add_addr(address, mail_addr);
+            libbalsa_address_append_addr(address, mail_addr);
             g_free(mail_addr);
             ++n_addrs;
         }

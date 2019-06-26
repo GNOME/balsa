@@ -499,7 +499,7 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
     g_free(uid);
     libbalsa_address_set_organization(address, org);
     g_free(org);
-    libbalsa_address_add_addr(address, email);
+    libbalsa_address_append_addr(address, email);
     g_free(email);
 
     return address;

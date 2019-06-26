@@ -254,8 +254,9 @@ libbalsa_address_book_vcard_parse_address(FILE * stream,
                     libbalsa_address_set_nick_name(address, nick_name);
                     libbalsa_address_set_organization(address, org);
 
-                    for (list = addr_list; list != NULL; list=list->next)
-                        libbalsa_address_add_addr(address, (const gchar *) list->data);
+                    addr_list = g_list_reverse(addr_list);
+                    for (list = addr_list; list != NULL; list = list->next)
+                        libbalsa_address_append_addr(address, (const gchar *) list->data);
                     g_list_free_full(addr_list, g_free);
 
                     res = LBABERR_OK;

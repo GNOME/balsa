@@ -206,7 +206,7 @@ address_new_prefill(LibBalsaAddress * address, GList * address_list,
     gchar *full_name;
 
     for (list = address_list; list != NULL; list = list->next)
-        libbalsa_address_add_addr(address, (const gchar *) list->data);
+        libbalsa_address_append_addr(address, (const gchar *) list->data);
     g_list_free_full(address_list, g_free);
 
     if (givenn != NULL) {

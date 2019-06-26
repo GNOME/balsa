@@ -714,7 +714,7 @@ cal_address_2445_to_lbaddress(const gchar * uri, gchar ** attributes,
 	return NULL;
 
     retval = libbalsa_address_new();
-    libbalsa_address_add_addr(retval, uri + 7);
+    libbalsa_address_append_addr(retval, uri + 7);
     if (!is_organizer)
 	g_object_set_data(G_OBJECT(retval), RFC2445_ROLE,
 			  LB_ROLE2PTR(VCAL_ROLE_REQ_PART));

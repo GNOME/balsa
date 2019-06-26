@@ -245,9 +245,9 @@ gpe_read_attr(void *arg, int argc, char **argv, char **names)
                libbalsa_address_get_organization(address) == NULL) {
         libbalsa_address_set_organization(address, argv[1]);
     } else if (g_ascii_strcasecmp(argv[0], "HOME.EMAIL") == 0) {
-        libbalsa_address_add_addr(address, argv[1]);
+        libbalsa_address_append_addr(address, argv[1]);
     } else if (g_ascii_strcasecmp(argv[0], "WORK.EMAIL") == 0) {
-        libbalsa_address_add_addr(address, argv[1]);
+        libbalsa_address_append_addr(address, argv[1]);
     }
 
     return 0;

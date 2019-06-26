@@ -188,7 +188,7 @@ lbe_load_cb(const gchar *email, const gchar *name, void *data)
 
     /* The extern database doesn't support Id's, sorry! */
     libbalsa_address_set_nick_name(address, _("No-Id"));
-    libbalsa_address_add_addr(address, email);
+    libbalsa_address_append_addr(address, email);
     libbalsa_address_set_full_name(address, name != NULL ? name : _("No-Name"));
 
     d->callback(d->ab, address, d->closure);

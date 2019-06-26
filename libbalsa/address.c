@@ -1244,10 +1244,13 @@ libbalsa_address_set_organization(LibBalsaAddress * address,
 }
 
 void
-libbalsa_address_add_addr(LibBalsaAddress * address,
-                          const gchar     * addr)
+libbalsa_address_append_addr(LibBalsaAddress * address,
+                             const gchar     * addr)
 {
     g_return_if_fail(LIBBALSA_IS_ADDRESS(address));
 
-    address->addr_list = g_list_prepend(address->addr_list, g_strdup(addr));
+    /* Append to keep the order the same as in an address book;
+     * prepend would be more efficient if addresses had many addrs, but
+     * then how would we keep the address order? */
+    address->addr_list = g_list_append(address->addr_list, g_strdup(addr));
 }

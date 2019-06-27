@@ -730,7 +730,8 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
     InternetAddress *ia;
     guint uid = atoi(argv[0]);
     guint n_addrs;
-    gchar *full_name;
+    const gchar *full_name;
+    gchar *free_me = NULL;
     guint n;
 #ifdef HAVE_SQLITE3
     gchar *sql;
@@ -762,7 +763,7 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
 
         first_name = libbalsa_address_get_first_name(address);
         last_name  = libbalsa_address_get_last_name(address);
-        full_name  = create_name(first_name, last_name);
+        full_name  = free_me = create_name(first_name, last_name);
         libbalsa_address_set_full_name(address, full_name);
     }
 
@@ -772,7 +773,7 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
         gc->res = g_list_prepend(gc->res, ia);
     }
 
-    g_free(full_name);
+    g_free(free_me);
     g_object_unref(address);
 
     return 0;

@@ -730,6 +730,7 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
     InternetAddress *ia;
     guint uid = atoi(argv[0]);
     guint n_addrs;
+    gchar *full_name;
     guint n;
 #ifdef HAVE_SQLITE3
     gchar *sql;
@@ -754,25 +755,24 @@ gpe_read_completion(void *arg, int argc, char **argv, char **names)
         return 0;
     }
 
-    if (libbalsa_address_get_full_name(address) == NULL) {
+    full_name = libbalsa_address_get_full_name(address);
+    if (full_name == NULL) {
         const gchar *first_name;
         const gchar *last_name;
-        gchar *full_name;
 
         first_name = libbalsa_address_get_first_name(address);
         last_name  = libbalsa_address_get_last_name(address);
         full_name  = create_name(first_name, last_name);
         libbalsa_address_set_full_name(address, full_name);
-        g_free(full_name);
     }
 
     for (n = 0; n < n_addrs; ++n) {
         const gchar *addr = libbalsa_address_get_nth_addr(address, n);
-        const gchar *full_name = libbalsa_address_get_full_name(address);
         ia = internet_address_mailbox_new(full_name, addr);
         gc->res = g_list_prepend(gc->res, ia);
     }
 
+    g_free(full_name);
     g_object_unref(address);
 
     return 0;

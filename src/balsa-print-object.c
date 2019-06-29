@@ -35,54 +35,31 @@
 #include "balsa-print-object-html.h"
 
 
+typedef struct {
+    gint on_page;
+    guint depth;
+
+    BalsaPrintRect rect;
+} BalsaPrintObjectPrivate;
+
+G_DEFINE_TYPE_WITH_PRIVATE(BalsaPrintObject, balsa_print_object, G_TYPE_OBJECT)
+
+
 /* object related functions */
-static void balsa_print_object_init(GTypeInstance * instance,
-				    gpointer g_class);
-static void balsa_print_object_class_init(BalsaPrintObjectClass * klass);
 static void balsa_print_object_destroy(GObject * object);
 
 
-static GObjectClass *parent_class = NULL;
-
-
-GType
-balsa_print_object_get_type()
-{
-    static GType balsa_print_object_type = 0;
-
-    if (!balsa_print_object_type) {
-	static const GTypeInfo balsa_print_object_info = {
-	    sizeof(BalsaPrintObjectClass),
-	    NULL,		/* base_init */
-	    NULL,		/* base_finalize */
-	    (GClassInitFunc) balsa_print_object_class_init,
-	    NULL,		/* class_finalize */
-	    NULL,		/* class_data */
-	    sizeof(BalsaPrintObject),
-	    0,			/* n_preallocs */
-	    (GInstanceInitFunc) balsa_print_object_init
-	};
-
-	balsa_print_object_type =
-	    g_type_register_static(G_TYPE_OBJECT, "BalsaPrintObject",
-				   &balsa_print_object_info, 0);
-    }
-
-    return balsa_print_object_type;
-}
-
-
 static void
-balsa_print_object_init(GTypeInstance * instance, gpointer g_class)
+balsa_print_object_init(BalsaPrintObject *self)
 {
-    BalsaPrintObject *self = (BalsaPrintObject *) instance;
+	BalsaPrintObjectPrivate *priv = balsa_print_object_get_instance_private(self);
 
-    self->on_page = 0;
-    self->depth = 0;
-    self->c_at_x = 0.0;
-    self->c_at_y = 0.0;
-    self->c_width = 0.0;
-    self->c_height = 0.0;
+	priv->on_page = 0;
+	priv->depth = 0;
+	priv->rect.c_at_x = 0.0;
+	priv->rect.c_at_y = 0.0;
+	priv->rect.c_width = 0.0;
+	priv->rect.c_height = 0.0;
 }
 
 
@@ -91,7 +68,6 @@ balsa_print_object_class_init(BalsaPrintObjectClass * klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-    parent_class = g_type_class_ref(G_TYPE_OBJECT);
     object_class->finalize = balsa_print_object_destroy;
     klass->draw = balsa_print_object_draw;
 }
@@ -175,38 +151,94 @@ void
 balsa_print_object_draw(BalsaPrintObject * self, GtkPrintContext * context,
 			cairo_t * cairo_ctx)
 {
+	BalsaPrintObjectPrivate *priv = balsa_print_object_get_instance_private(self);
     guint level;
+
+    g_return_if_fail(BALSA_IS_PRINT_OBJECT(self) && (context != NULL) && (cairo_ctx != NULL));
 
     BALSA_PRINT_OBJECT_CLASS(G_OBJECT_GET_CLASS(self))->draw(self, context, cairo_ctx);
 
     /* print borders if the depth is > 0 */
-    if (self->depth == 0)
+    if (priv->depth == 0)
 	return;
 
     /* print the requested number of border lines */
     cairo_save(cairo_ctx);
     cairo_set_line_width(cairo_ctx, 0.25);
     cairo_new_path(cairo_ctx);
-    for (level = self->depth; level; level--) {
-	gdouble level_sep = level * C_LABEL_SEP;
+    for (level = priv->depth; level > 0U; level--) {
+    	gdouble level_sep = level * C_LABEL_SEP;
+    	BalsaPrintRect *rect = &priv->rect;
 
-	cairo_move_to(cairo_ctx, self->c_at_x - level_sep, self->c_at_y);
-	cairo_line_to(cairo_ctx, self->c_at_x - level_sep,
-		      self->c_at_y + self->c_height);
-	cairo_move_to(cairo_ctx, self->c_at_x + self->c_width + level_sep,
-		      self->c_at_y);
-	cairo_line_to(cairo_ctx, self->c_at_x + self->c_width + level_sep,
-		      self->c_at_y + self->c_height);
+    	cairo_move_to(cairo_ctx, rect->c_at_x - level_sep, rect->c_at_y);
+    	cairo_line_to(cairo_ctx, rect->c_at_x - level_sep, rect->c_at_y + rect->c_height);
+    	cairo_move_to(cairo_ctx, rect->c_at_x + rect->c_width + level_sep, rect->c_at_y);
+    	cairo_line_to(cairo_ctx, rect->c_at_x + rect->c_width + level_sep, rect->c_at_y + rect->c_height);
     }
     cairo_stroke(cairo_ctx);
     cairo_restore(cairo_ctx);
 }
 
 
-static void
-balsa_print_object_destroy(GObject * object)
+gint
+balsa_print_object_get_page(BalsaPrintObject *self)
 {
-    parent_class->finalize(object);
+	BalsaPrintObjectPrivate *priv = balsa_print_object_get_instance_private(self);
+
+	g_return_val_if_fail(BALSA_IS_PRINT_OBJECT(self), -1);
+	return priv->on_page;
+}
+
+
+const BalsaPrintRect *
+balsa_print_object_get_rect(BalsaPrintObject *self)
+{
+	BalsaPrintObjectPrivate *priv = balsa_print_object_get_instance_private(self);
+
+	g_return_val_if_fail(BALSA_IS_PRINT_OBJECT(self), NULL);
+	return &priv->rect;
+}
+
+
+void
+balsa_print_object_set_page_depth(BalsaPrintObject *self,
+								  gint              page,
+								  guint             depth)
+{
+	BalsaPrintObjectPrivate *priv = balsa_print_object_get_instance_private(self);
+
+	g_return_if_fail(BALSA_IS_PRINT_OBJECT(self));
+	priv->depth = depth;
+	priv->on_page = page;
+}
+
+
+void
+balsa_print_object_set_rect(BalsaPrintObject     *self,
+							const BalsaPrintRect *rect)
+{
+	BalsaPrintObjectPrivate *priv = balsa_print_object_get_instance_private(self);
+
+	g_return_if_fail(BALSA_IS_PRINT_OBJECT(self));
+	memcpy(&priv->rect, rect, sizeof(BalsaPrintRect));
+}
+
+
+void
+balsa_print_object_set_height(BalsaPrintObject *self,
+							  gdouble           height)
+{
+	BalsaPrintObjectPrivate *priv = balsa_print_object_get_instance_private(self);
+
+	g_return_if_fail(BALSA_IS_PRINT_OBJECT(self));
+	priv->rect.c_height = height;
+}
+
+
+static void
+balsa_print_object_destroy(GObject *object)
+{
+    G_OBJECT_CLASS(balsa_print_object_parent_class)->finalize(object);
 }
 
 

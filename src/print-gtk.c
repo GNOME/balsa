@@ -425,7 +425,7 @@ draw_page(GtkPrintOperation * operation, GtkPrintContext * context,
     while (p) {
 	BalsaPrintObject *po = BALSA_PRINT_OBJECT(p->data);
 
-	if (po->on_page == page_nr)
+	if (balsa_print_object_get_page(po) == page_nr)
 	    balsa_print_object_draw(po, context, cairo_ctx);
 
 	p = g_list_next(p);

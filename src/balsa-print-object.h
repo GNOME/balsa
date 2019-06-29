@@ -53,6 +53,14 @@ typedef struct {
 } BalsaPrintSetup;
 
 
+typedef struct {
+    gdouble c_at_x;
+    gdouble c_at_y;
+    gdouble c_width;
+    gdouble c_height;
+} BalsaPrintRect;
+
+
 #define P_TO_C(x)               ((gdouble)(x) / (gdouble)PANGO_SCALE)
 #define C_TO_P(x)               ((gdouble)(x) * (gdouble)PANGO_SCALE)
 
@@ -73,51 +81,36 @@ GList *split_for_layout(PangoLayout * layout, const gchar * text,
 
 /*  == print object base class stuff ==  */
 
-#define BALSA_TYPE_PRINT_OBJECT			\
-    (balsa_print_object_get_type())
-#define BALSA_PRINT_OBJECT(obj)						\
-    G_TYPE_CHECK_INSTANCE_CAST(obj, BALSA_TYPE_PRINT_OBJECT, BalsaPrintObject)
-#define BALSA_PRINT_OBJECT_CLASS(klass)					\
-    G_TYPE_CHECK_CLASS_CAST(klass, BALSA_TYPE_PRINT_OBJECT, BalsaPrintObjectClass)
-#define BALSA_IS_PRINT_OBJECT(obj)			\
-    G_TYPE_CHECK_INSTANCE_TYPE(obj, BALSA_TYPE_PRINT_OBJECT)
-
-
-typedef struct _BalsaPrintObjectClass BalsaPrintObjectClass;
-typedef struct _BalsaPrintObject BalsaPrintObject;
-
-
-struct _BalsaPrintObject {
-    GObject parent;
-
-    gint on_page;
-    guint depth;
-
-    gdouble c_at_x;
-    gdouble c_at_y;
-    gdouble c_width;
-    gdouble c_height;
-};
+#define BALSA_TYPE_PRINT_OBJECT		balsa_print_object_get_type()
+G_DECLARE_DERIVABLE_TYPE(BalsaPrintObject, balsa_print_object, BALSA, PRINT_OBJECT, GObject)
 
 
 struct _BalsaPrintObjectClass {
     GObjectClass parent;
 
-    void (*draw) (BalsaPrintObject * self, GtkPrintContext * context,
-		  cairo_t * cairo_ctx);
+    void (*draw) (BalsaPrintObject *self, GtkPrintContext *context, cairo_t *cairo_ctx);
 };
 
 
-GType balsa_print_object_get_type(void);
-GList *balsa_print_objects_append_from_body(GList * list,
-					    GtkPrintContext * context,
-					    LibBalsaMessageBody *
-					    mime_body,
-					    BalsaPrintSetup * psetup);
-void balsa_print_object_draw(BalsaPrintObject * self,
-			     GtkPrintContext * context,
-			     cairo_t * cairo_ctx);
+GList *balsa_print_objects_append_from_body(GList               *list,
+					    					GtkPrintContext     *context,
+											LibBalsaMessageBody *mime_body,
+											BalsaPrintSetup     *psetup)
+	G_GNUC_WARN_UNUSED_RESULT;
+void balsa_print_object_draw(BalsaPrintObject *self,
+			     	 	 	 GtkPrintContext  *context,
+							 cairo_t          *cairo_ctx);
 
+gint balsa_print_object_get_page(BalsaPrintObject *self);
+const BalsaPrintRect *balsa_print_object_get_rect(BalsaPrintObject *self);
+
+void balsa_print_object_set_page_depth(BalsaPrintObject *self,
+								 	   gint              page,
+								       guint             depth);
+void balsa_print_object_set_rect(BalsaPrintObject     *self,
+								 const BalsaPrintRect *rect);
+void balsa_print_object_set_height(BalsaPrintObject *self,
+								   gdouble           height);
 
 G_END_DECLS
 

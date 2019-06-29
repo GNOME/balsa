@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2016 Stuart Parmenter and others
+ * Copyright (C) 1997-2019 Stuart Parmenter and others
  * Written by (C) Albrecht Dreß <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
@@ -48,9 +48,6 @@ typedef struct {
 
 
 /* object related functions */
-static void balsa_print_object_text_class_init(BalsaPrintObjectTextClass * klass);
-static void balsa_print_object_text_init(GTypeInstance * instance,
-					 gpointer g_class);
 static void balsa_print_object_text_destroy(GObject * self);
 
 static void balsa_print_object_text_draw(BalsaPrintObject * self,
@@ -63,54 +60,32 @@ static GList * phrase_highlight(const gchar * buffer, gunichar tag_char,
 				PhraseType tag_type, GList * phrase_list);
 
 
-static BalsaPrintObjectClass *parent_class = NULL;
+struct _BalsaPrintObjectText {
+    BalsaPrintObject parent;
+
+    gint p_label_width;
+    gchar *text;
+    guint cite_level;
+    GList *attributes;
+};
 
 
-GType
-balsa_print_object_text_get_type()
-{
-    static GType balsa_print_object_text_type = 0;
-
-    if (!balsa_print_object_text_type) {
-	static const GTypeInfo balsa_print_object_text_info = {
-	    sizeof(BalsaPrintObjectTextClass),
-	    NULL,		/* base_init */
-	    NULL,		/* base_finalize */
-	    (GClassInitFunc) balsa_print_object_text_class_init,
-	    NULL,		/* class_finalize */
-	    NULL,		/* class_data */
-	    sizeof(BalsaPrintObjectText),
-	    0,			/* n_preallocs */
-	    (GInstanceInitFunc) balsa_print_object_text_init
-	};
-
-	balsa_print_object_text_type =
-	    g_type_register_static(BALSA_TYPE_PRINT_OBJECT,
-				   "BalsaPrintObjectText",
-				   &balsa_print_object_text_info, 0);
-    }
-
-    return balsa_print_object_text_type;
-}
+G_DEFINE_TYPE(BalsaPrintObjectText, balsa_print_object_text, BALSA_TYPE_PRINT_OBJECT)
 
 
 static void
-balsa_print_object_text_class_init(BalsaPrintObjectTextClass * klass)
+balsa_print_object_text_class_init(BalsaPrintObjectTextClass *klass)
 {
-    parent_class = g_type_class_ref(BALSA_TYPE_PRINT_OBJECT);
-    BALSA_PRINT_OBJECT_CLASS(klass)->draw =
-	balsa_print_object_text_draw;
+    BALSA_PRINT_OBJECT_CLASS(klass)->draw =	balsa_print_object_text_draw;
     G_OBJECT_CLASS(klass)->finalize = balsa_print_object_text_destroy;
 }
 
 
 static void
-balsa_print_object_text_init(GTypeInstance * instance, gpointer g_class)
+balsa_print_object_text_init(BalsaPrintObjectText *self)
 {
-    BalsaPrintObjectText *po = BALSA_PRINT_OBJECT_TEXT(instance);
-
-    po->text = NULL;
-    po->attributes = NULL;
+	self->text = NULL;
+	self->attributes = NULL;
 }
 
 
@@ -122,7 +97,7 @@ balsa_print_object_text_destroy(GObject * self)
     g_list_free_full(po->attributes, g_free);
     g_free(po->text);
 
-    G_OBJECT_CLASS(parent_class)->finalize(self);
+    G_OBJECT_CLASS(balsa_print_object_text_parent_class)->finalize(self);
 }
 
 /* prepare a text/plain part, which gets
@@ -137,8 +112,7 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
     GRegex *rex;
     gchar *textbuf;
     PangoFontDescription *font;
-    gdouble c_at_x;
-    gdouble c_use_width;
+    BalsaPrintRect rect;
     guint first_page;
     gchar * par_start;
     gchar * eol;
@@ -149,39 +123,38 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
 	return balsa_print_object_default(list, context, body, psetup);
 
     /* start on new page if less than 2 lines can be printed */
-    if (psetup->c_y_pos + 2 * P_TO_C(psetup->p_body_font_height) >
-	psetup->c_height) {
-	psetup->c_y_pos = 0;
-	psetup->page_count++;
+    if (psetup->c_y_pos + 2 * P_TO_C(psetup->p_body_font_height) > psetup->c_height) {
+    	psetup->c_y_pos = 0;
+    	psetup->page_count++;
     }
-    c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
-    c_use_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
+    rect.c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
+    rect.c_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
+    rect.c_height = -1.0;	/* height is calculated when the object is drawn */
 
     /* copy the text body to a buffer */
-    if (body->buffer)
-	textbuf = g_strdup(body->buffer);
-    else
-	libbalsa_message_body_get_content(body, &textbuf, NULL);
+    if (body->buffer != NULL) {
+    	textbuf = g_strdup(body->buffer);
+    } else {
+    	libbalsa_message_body_get_content(body, &textbuf, NULL);
+    }
 
     /* fake an empty buffer if textbuf is NULL */
-    if (!textbuf)
-	textbuf = g_strdup("");
+    if (textbuf == NULL) {
+    	textbuf = g_strdup("");
+    }
 
     /* be sure the we have correct utf-8 stuff here... */
     libbalsa_utf8_sanitize(&textbuf, balsa_app.convert_unknown_8bit, NULL);
 
     /* apply flowed if requested */
     if (libbalsa_message_body_is_flowed(body)) {
-	GString *flowed;
+    	GString *flowed;
 
-	flowed =
-	    libbalsa_process_text_rfc2646(textbuf, G_MAXINT, FALSE, FALSE,
-					  FALSE,
-					  libbalsa_message_body_is_delsp
-					  (body));
-	g_free(textbuf);
-	textbuf = flowed->str;
-	g_string_free(flowed, FALSE);
+    	flowed = libbalsa_process_text_rfc2646(textbuf, G_MAXINT, FALSE, FALSE,
+    					FALSE, libbalsa_message_body_is_delsp(body));
+    	g_free(textbuf);
+    	textbuf = flowed->str;
+    	g_string_free(flowed, FALSE);
     }
 
     /* get the font */
@@ -192,126 +165,113 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
     eol = strchr(par_start, '\n');
     par_len = eol ? eol - par_start : (gint) strlen(par_start);
     while (*par_start) {
-	GString *level_buf;
-	guint curr_level;
-	guint cite_level;
-	GList *par_parts;
-	GList *this_par_part;
-	GList *attr_list;
-	PangoLayout *layout;
-	PangoAttrList *pango_attr_list;
-	GArray *attr_offs;
-	gdouble c_at_y;
+    	GString *level_buf;
+    	guint curr_level;
+    	guint cite_level;
+    	GList *par_parts;
+    	GList *this_par_part;
+    	GList *attr_list;
+    	PangoLayout *layout;
+    	PangoAttrList *pango_attr_list;
+    	GArray *attr_offs;
+    	gdouble c_at_y;
 
-	level_buf = NULL;
-	curr_level = 0;		/* just to make the compiler happy */
-	do {
-	    gchar *thispar;
-	    guint cite_idx;
+    	level_buf = NULL;
+    	curr_level = 0;		/* just to make the compiler happy */
+    	do {
+    		gchar *thispar;
+    		guint cite_idx;
 
-	    thispar = g_strndup(par_start, par_len);
+    		thispar = g_strndup(par_start, par_len);
 
-	    /* get the cite level and strip off the prefix */
-	    if (libbalsa_match_regex(thispar, rex, &cite_level, &cite_idx))
-            {
-		gchar *new;
+    		/* get the cite level and strip off the prefix */
+    		if (libbalsa_match_regex(thispar, rex, &cite_level, &cite_idx))
+    		{
+    			gchar *new;
 
-		new = thispar + cite_idx;
-		if (g_unichar_isspace(g_utf8_get_char(new)))
-		    new = g_utf8_next_char(new);
-		new = g_strdup(new);
-		g_free(thispar);
-		thispar = new;
-	    }
+    			new = thispar + cite_idx;
+    			if (g_unichar_isspace(g_utf8_get_char(new)))
+    				new = g_utf8_next_char(new);
+    			new = g_strdup(new);
+    			g_free(thispar);
+    			thispar = new;
+    		}
 
-	    /* glue paragraphs with the same cite level together */
-	    if (!level_buf || (curr_level == cite_level)) {
-		if (!level_buf) {
-		    level_buf = g_string_new(thispar);
-		    curr_level = cite_level;
-		} else {
-		    level_buf = g_string_append_c(level_buf, '\n');
-		    level_buf = g_string_append(level_buf, thispar);
-		}
+    		/* glue paragraphs with the same cite level together */
+    		if (!level_buf || (curr_level == cite_level)) {
+    			if (!level_buf) {
+    				level_buf = g_string_new(thispar);
+    				curr_level = cite_level;
+    			} else {
+    				level_buf = g_string_append_c(level_buf, '\n');
+    				level_buf = g_string_append(level_buf, thispar);
+    			}
 
-		par_start = eol ? eol + 1 : par_start + par_len;
-		eol = strchr(par_start, '\n');
-		par_len = eol ? eol - par_start : (gint) strlen(par_start);
-	    }
+    			par_start = eol ? eol + 1 : par_start + par_len;
+    			eol = strchr(par_start, '\n');
+    			par_len = eol ? eol - par_start : (gint) strlen(par_start);
+    		}
 
-	    g_free(thispar);
-	} while (*par_start && (curr_level == cite_level));
-	
-	/* configure the layout so we can use Pango to split the text into pages */
-	layout = gtk_print_context_create_pango_layout(context);
-	pango_layout_set_font_description(layout, font);
-	pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
-	pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
+    		g_free(thispar);
+    	} while (*par_start && (curr_level == cite_level));
 
-	/* leave place for the citation bars */
-	pango_layout_set_width(layout,
-			       C_TO_P(c_use_width - curr_level * C_LABEL_SEP));
+    	/* configure the layout so we can use Pango to split the text into pages */
+    	layout = gtk_print_context_create_pango_layout(context);
+    	pango_layout_set_font_description(layout, font);
+    	pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
+    	pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
 
-	/* highlight structured phrases if requested */
-	if (balsa_app.print_highlight_phrases) {
-	    attr_list =
-		phrase_highlight(level_buf->str, '*', PHRASE_BF, NULL);
-	    attr_list =
-		phrase_highlight(level_buf->str, '/', PHRASE_EM, attr_list);
-	    attr_list =
-		phrase_highlight(level_buf->str, '_', PHRASE_UL, attr_list);
-	} else
-	    attr_list = NULL;
+    	/* leave place for the citation bars */
+    	pango_layout_set_width(layout, C_TO_P(rect.c_width - curr_level * C_LABEL_SEP));
 
-	/* start on new page if less than one line can be printed */
-	if (psetup->c_y_pos + P_TO_C(psetup->p_body_font_height) >
-	    psetup->c_height) {
-	    psetup->c_y_pos = 0;
-	    psetup->page_count++;
-	}
+    	/* highlight structured phrases if requested */
+    	if (balsa_app.print_highlight_phrases) {
+    		attr_list = phrase_highlight(level_buf->str, '*', PHRASE_BF, NULL);
+    		attr_list = phrase_highlight(level_buf->str, '/', PHRASE_EM, attr_list);
+    		attr_list = phrase_highlight(level_buf->str, '_', PHRASE_UL, attr_list);
+    	} else {
+    		attr_list = NULL;
+    	}
 
-	/* split paragraph if necessary */
-	pango_attr_list = phrase_list_to_pango(attr_list);
-	first_page = psetup->page_count - 1;
-	c_at_y = psetup->c_y_pos;
-	par_parts =
-	    split_for_layout(layout, level_buf->str, pango_attr_list,
-			     psetup, FALSE, &attr_offs);
-	if (pango_attr_list)
-	    pango_attr_list_unref(pango_attr_list);
-	g_object_unref(G_OBJECT(layout));
-	g_string_free(level_buf, TRUE);
+    	/* start on new page if less than one line can be printed */
+    	if (psetup->c_y_pos + P_TO_C(psetup->p_body_font_height) > psetup->c_height) {
+    		psetup->c_y_pos = 0;
+    		psetup->page_count++;
+    	}
 
-	/* each part is a new text object */
-	this_par_part = par_parts;
-	while (this_par_part) {
-	    BalsaPrintObjectText *pot;
+    	/* split paragraph if necessary */
+    	pango_attr_list = phrase_list_to_pango(attr_list);
+    	first_page = psetup->page_count - 1;
+    	c_at_y = psetup->c_y_pos;
+    	par_parts = split_for_layout(layout, level_buf->str, pango_attr_list, psetup, FALSE, &attr_offs);
+    	if (pango_attr_list != NULL) {
+    		pango_attr_list_unref(pango_attr_list);
+    	}
+    	g_object_unref(G_OBJECT(layout));
+    	g_string_free(level_buf, TRUE);
 
-	    pot = g_object_new(BALSA_TYPE_PRINT_OBJECT_TEXT, NULL);
-	    g_assert(pot != NULL);
-	    BALSA_PRINT_OBJECT(pot)->on_page = first_page++;
-	    BALSA_PRINT_OBJECT(pot)->c_at_x = c_at_x;
-	    BALSA_PRINT_OBJECT(pot)->c_at_y = psetup->c_y0 + c_at_y;
-	    BALSA_PRINT_OBJECT(pot)->depth = psetup->curr_depth;
-	    c_at_y = 0.0;
-	    BALSA_PRINT_OBJECT(pot)->c_width = c_use_width;
-	    /* note: height is calculated when the object is drawn */
-	    pot->text = (gchar *) this_par_part->data;
-	    pot->cite_level = curr_level;
-	    pot->attributes =
-		collect_attrs(attr_list,
-			      g_array_index(attr_offs, guint, 0),
-			      strlen(pot->text));
+    	/* each part is a new text object */
+    	for (this_par_part = par_parts; this_par_part != NULL; this_par_part = this_par_part->next) {
+    		BalsaPrintObjectText *pot;
 
-	    list = g_list_append(list, pot);
-	    g_array_remove_index(attr_offs, 0);
-	    this_par_part = g_list_next(this_par_part);
-	}
-	if (attr_list) {
-	    g_list_free_full(attr_list, g_free);
-	}
-	g_list_free(par_parts);
-	g_array_free(attr_offs, TRUE);
+    		pot = g_object_new(BALSA_TYPE_PRINT_OBJECT_TEXT, NULL);
+    		g_assert(pot != NULL);
+    		balsa_print_object_set_page_depth(BALSA_PRINT_OBJECT(pot), first_page++, psetup->curr_depth);
+    		rect.c_at_y = psetup->c_y0 + c_at_y;
+    		balsa_print_object_set_rect(BALSA_PRINT_OBJECT(pot), &rect);
+    		c_at_y = 0.0;
+    		pot->text = (gchar *) this_par_part->data;
+    		pot->cite_level = curr_level;
+    		pot->attributes = collect_attrs(attr_list, g_array_index(attr_offs, guint, 0), strlen(pot->text));
+
+    		list = g_list_append(list, pot);
+    		g_array_remove_index(attr_offs, 0);
+    	}
+    	if (attr_list) {
+    		g_list_free_full(attr_list, g_free);
+    	}
+    	g_list_free(par_parts);
+    	g_array_free(attr_offs, TRUE);
     }
 
     /* clean up */
@@ -331,8 +291,7 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
 {
     gchar *textbuf;
     PangoFontDescription *font;
-    gdouble c_at_x;
-    gdouble c_use_width;
+    BalsaPrintRect rect;
     guint first_page;
     GList *par_parts;
     GList *this_par_part;
@@ -340,13 +299,13 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
     gdouble c_at_y;
 
     /* start on new page if less than 2 lines can be printed */
-    if (psetup->c_y_pos + 2 * P_TO_C(psetup->p_body_font_height) >
-	psetup->c_height) {
-	psetup->c_y_pos = 0;
-	psetup->page_count++;
+    if (psetup->c_y_pos + 2 * P_TO_C(psetup->p_body_font_height) > psetup->c_height) {
+    	psetup->c_y_pos = 0;
+    	psetup->page_count++;
     }
-    c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
-    c_use_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
+    rect.c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
+    rect.c_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
+    rect.c_height = -1.0;	/* height is calculated when the object is drawn */
 
     /* copy the text body to a buffer */
     if (body->buffer)
@@ -369,7 +328,7 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
     pango_layout_set_font_description(layout, font);
     pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
     pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
-    pango_layout_set_width(layout, C_TO_P(c_use_width));
+    pango_layout_set_width(layout, C_TO_P(rect.c_width));
 
     /* split paragraph if necessary */
     first_page = psetup->page_count - 1;
@@ -380,31 +339,49 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
     g_free(textbuf);
 
     /* each part is a new text object */
-    this_par_part = par_parts;
-    while (this_par_part) {
-	BalsaPrintObjectText *pot;
+    for (this_par_part = par_parts; this_par_part != NULL; this_par_part = this_par_part->next) {
+    	BalsaPrintObjectText *pot;
 
-	pot = g_object_new(BALSA_TYPE_PRINT_OBJECT_TEXT, NULL);
-	g_assert(pot != NULL);
-	BALSA_PRINT_OBJECT(pot)->on_page = first_page++;
-	BALSA_PRINT_OBJECT(pot)->c_at_x = c_at_x;
-	BALSA_PRINT_OBJECT(pot)->c_at_y = psetup->c_y0 + c_at_y;
-	BALSA_PRINT_OBJECT(pot)->depth = psetup->curr_depth;
-	c_at_y = 0.0;
-	BALSA_PRINT_OBJECT(pot)->c_width = c_use_width;
-	/* note: height is calculated when the object is drawn */
-	pot->text = (gchar *) this_par_part->data;
-	pot->cite_level = 0;
-	pot->attributes = NULL;
+    	pot = g_object_new(BALSA_TYPE_PRINT_OBJECT_TEXT, NULL);
+    	g_assert(pot != NULL);
+    	balsa_print_object_set_page_depth(BALSA_PRINT_OBJECT(pot), first_page++, psetup->curr_depth);
+    	rect.c_at_y = psetup->c_y0 + c_at_y;
+    	balsa_print_object_set_rect(BALSA_PRINT_OBJECT(pot), &rect);
+    	c_at_y = 0.0;
 
-	list = g_list_append(list, pot);
-	this_par_part = g_list_next(this_par_part);
+    	pot->text = (gchar *) this_par_part->data;
+    	pot->cite_level = 0;
+    	pot->attributes = NULL;
+
+    	list = g_list_append(list, pot);
     }
     g_list_free(par_parts);
 
     return list;
 }
 
+static GdkPixbuf *
+get_icon(const gchar         *icon_name,
+		 LibBalsaMessageBody *body)
+{
+    gint width;
+    gint height;
+    GdkPixbuf *pixbuf;
+
+    if (!gtk_icon_size_lookup(GTK_ICON_SIZE_DND, &width, &height)) {
+        width = 16;
+    }
+
+    pixbuf = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), icon_name, width, GTK_ICON_LOOKUP_FORCE_SIZE, NULL);
+    if (pixbuf == NULL) {
+    	gchar *conttype = libbalsa_message_body_get_mime_type(body);
+
+    	pixbuf = libbalsa_icon_finder(NULL, conttype, NULL, NULL, GTK_ICON_SIZE_DND);
+    	g_free(conttype);
+    }
+
+    return pixbuf;
+}
 
 /* note: a vcard is an icon plus a series of labels/text, so this function actually
  * returns a BalsaPrintObjectDefault... */
@@ -422,120 +399,67 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
     } while(0)
 
 GList *
-balsa_print_object_text_vcard(GList * list,
-			      GtkPrintContext * context,
-			      LibBalsaMessageBody * body,
-			      BalsaPrintSetup * psetup)
+balsa_print_object_text_vcard(GList               *list,
+			      	  	  	  GtkPrintContext     *context,
+							  LibBalsaMessageBody *body,
+							  BalsaPrintSetup     *psetup)
 {
-    BalsaPrintObjectDefault *pod;
-    BalsaPrintObject *po;
+    GdkPixbuf *pixbuf;
     PangoFontDescription *header_font;
     PangoLayout *test_layout;
-    PangoTabArray *tabs;
     GString *desc_buf;
-    gdouble c_max_height;
+    gint p_label_width;
     LibBalsaAddress * address = NULL;
     gchar *textbuf;
+    GList *result;
+
+    g_return_val_if_fail((context != NULL) && (body != NULL) && (psetup != NULL), list);
 
     /* check if we can create an address from the body and fall back to default if 
-    * this fails */
-    if (body->buffer)
-	textbuf = g_strdup(body->buffer);
-    else
-	libbalsa_message_body_get_content(body, &textbuf, NULL);
-    if (textbuf)
-        address = libbalsa_address_new_from_vcard(textbuf, body->charset);
+     * this fails */
+    if (body->buffer != NULL) {
+    	textbuf = g_strdup(body->buffer);
+    } else {
+    	libbalsa_message_body_get_content(body, &textbuf, NULL);
+    }
+    if (textbuf != NULL) {
+    	address = libbalsa_address_new_from_vcard(textbuf, body->charset);
+    }
     if (address == NULL) {
-	g_free(textbuf);
-	return balsa_print_object_text(list, context, body, psetup);
+    	g_free(textbuf);
+    	return balsa_print_object_text(list, context, body, psetup);
     }
 
-    /* proceed with the address information */
-    pod = g_object_new(BALSA_TYPE_PRINT_OBJECT_DEFAULT, NULL);
-    g_assert(pod != NULL);
-    po = BALSA_PRINT_OBJECT(pod);
-
-    /* create the part */
-    po->depth = psetup->curr_depth;
-    po->c_width =
-	psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
-
-    /* get the stock contacts icon or the mime type icon on fail */
-    pod->pixbuf =
-	gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
-				 BALSA_PIXMAP_IDENTITY, 48,
-				 GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
-    if (!pod->pixbuf) {
-	gchar *conttype = libbalsa_message_body_get_mime_type(body);
-
-	pod->pixbuf = libbalsa_icon_finder(NULL, conttype, NULL, NULL,
-                                           GTK_ICON_SIZE_DND);
-    }
-    pod->c_image_width = gdk_pixbuf_get_width(pod->pixbuf);
-    pod->c_image_height = gdk_pixbuf_get_height(pod->pixbuf);
-
+    /* get the identity icon or the mime type icon on fail */
+    pixbuf = get_icon("x-office-address-book", body);
 
     /* create a layout for calculating the maximum label width */
-    header_font =
-	pango_font_description_from_string(balsa_app.print_header_font);
+    header_font = pango_font_description_from_string(balsa_app.print_header_font);
     test_layout = gtk_print_context_create_pango_layout(context);
     pango_layout_set_font_description(test_layout, header_font);
     pango_font_description_free(header_font);
 
     /* add fields from the address */
     desc_buf = g_string_new("");
-    pod->p_label_width = 0;
-    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-		    libbalsa_address_get_full_name(address),    _("Full Name"));
-    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-		    libbalsa_address_get_nick_name(address),    _("Nick Name"));
-    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-		    libbalsa_address_get_first_name(address),   _("First Name"));
-    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-		    libbalsa_address_get_last_name(address),    _("Last Name"));
-    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-		    libbalsa_address_get_organization(address), _("Organization"));
-    ADD_VCARD_FIELD(desc_buf, pod->p_label_width, test_layout,
-                    libbalsa_address_get_addr(address),         _("Email Address"));
-
+    p_label_width = 0;
+    ADD_VCARD_FIELD(desc_buf, p_label_width, test_layout, libbalsa_address_get_full_name(address), _("Full Name"));
+    ADD_VCARD_FIELD(desc_buf, p_label_width, test_layout, libbalsa_address_get_nick_name(address), _("Nick Name"));
+    ADD_VCARD_FIELD(desc_buf, p_label_width, test_layout, libbalsa_address_get_first_name(address), _("First Name"));
+    ADD_VCARD_FIELD(desc_buf, p_label_width, test_layout, libbalsa_address_get_last_name(address), _("Last Name"));
+    ADD_VCARD_FIELD(desc_buf, p_label_width, test_layout, libbalsa_address_get_organization(address), _("Organization"));
+    ADD_VCARD_FIELD(desc_buf, p_label_width, test_layout, libbalsa_address_get_addr(address), _("Email Address"));
     g_object_unref(address);
 
     /* add a small space between label and value */
-    pod->p_label_width += C_TO_P(C_LABEL_SEP);
+    p_label_width += C_TO_P(C_LABEL_SEP);
 
-    /* configure the layout so we can calculate the text height */
-    pango_layout_set_indent(test_layout, -pod->p_label_width);
-    tabs =
-	pango_tab_array_new_with_positions(1, FALSE, PANGO_TAB_LEFT,
-					   pod->p_label_width);
-    pango_layout_set_tabs(test_layout, tabs);
-    pango_tab_array_free(tabs);
-    pango_layout_set_width(test_layout,
-			   C_TO_P(po->c_width -
-				  4 * C_LABEL_SEP - pod->c_image_width));
-    pango_layout_set_alignment(test_layout, PANGO_ALIGN_LEFT);
-    pod->c_text_height =
-	P_TO_C(p_string_height_from_layout(test_layout, desc_buf->str));
-    pod->description = g_string_free(desc_buf, FALSE);
+    /* create the part and clean up */
+    textbuf = g_string_free(desc_buf, FALSE);
+    result = balsa_print_object_default_full(list, context, pixbuf, textbuf, p_label_width, psetup);
+    g_object_unref(pixbuf);
+    g_free(textbuf);
 
-    /* check if we should move to the next page */
-    c_max_height = MAX(pod->c_text_height, pod->c_image_height);
-    if (psetup->c_y_pos + c_max_height > psetup->c_height) {
-	psetup->c_y_pos = 0;
-	psetup->page_count++;
-    }
-
-    /* remember the extent */
-    po->on_page = psetup->page_count - 1;
-    po->c_at_x = psetup->c_x0 + po->depth * C_LABEL_SEP;
-    po->c_at_y = psetup->c_y0 + psetup->c_y_pos;
-    po->c_width = psetup->c_width - 2 * po->depth * C_LABEL_SEP;
-    po->c_height = c_max_height;
-
-    /* adjust the y position */
-    psetup->c_y_pos += c_max_height;
-
-    return g_list_append(list, po);
+    return result;
 }
 
 
@@ -577,182 +501,90 @@ balsa_print_object_text_vcard(GList * list,
 
 
 GList *
-balsa_print_object_text_calendar(GList * list,
-                                 GtkPrintContext * context,
-                                 LibBalsaMessageBody * body,
-                                 BalsaPrintSetup * psetup)
+balsa_print_object_text_calendar(GList               *list,
+                                 GtkPrintContext     *context,
+                                 LibBalsaMessageBody *body,
+                                 BalsaPrintSetup     *psetup)
 {
-    BalsaPrintObjectDefault *pod;
-    BalsaPrintObject *po;
+    LibBalsaVCal *vcal_obj;
+    GdkPixbuf *pixbuf;
     PangoFontDescription *header_font;
     PangoLayout *test_layout;
-    PangoTabArray *tabs;
     GString *desc_buf;
-    LibBalsaVCal * vcal_obj;
+    gint p_label_width;
+    gchar *textbuf;
     guint event_no;
-    guint first_page;
-    GList *par_parts;
-    GList *this_par_part;
-    gdouble c_at_y;
 
-    /* check if we can evaluate the body as calendar object and fall back
-     * to text if not */
-    if (!(vcal_obj = libbalsa_vcal_new_from_body(body)))
-	return balsa_print_object_text(list, context, body, psetup);
+    g_return_val_if_fail((context != NULL) && (body != NULL) && (psetup != NULL), list);
 
-    /* proceed with the address information */
-    pod = g_object_new(BALSA_TYPE_PRINT_OBJECT_DEFAULT, NULL);
-    g_assert(pod != NULL);
-    po = BALSA_PRINT_OBJECT(pod);
-
-    /* create the part */
-    po->depth = psetup->curr_depth;
-    po->c_width =
-	psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
+    /* check if we can evaluate the body as calendar object and fall back to text if not */
+    vcal_obj = libbalsa_vcal_new_from_body(body);
+    if (vcal_obj == NULL) {
+    	return balsa_print_object_text(list, context, body, psetup);
+    }
 
     /* get the stock calendar icon or the mime type icon on fail */
-    pod->pixbuf =
-	gtk_icon_theme_load_icon(gtk_icon_theme_get_default(),
-				 "x-office-calendar", 48,
-				 GTK_ICON_LOOKUP_USE_BUILTIN, NULL);
-    if (!pod->pixbuf) {
-	gchar *conttype = libbalsa_message_body_get_mime_type(body);
+    pixbuf = get_icon("x-office-calendar", body);
 
-	pod->pixbuf = libbalsa_icon_finder(NULL, conttype, NULL, NULL,
-                                           GTK_ICON_SIZE_DND);
-    }
-    pod->c_image_width = gdk_pixbuf_get_width(pod->pixbuf);
-    pod->c_image_height = gdk_pixbuf_get_height(pod->pixbuf);
-
-    /* move to the next page if the icon doesn't fit */
-    if (psetup->c_y_pos + pod->c_image_height > psetup->c_height) {
-	psetup->c_y_pos = 0;
-	psetup->page_count++;
-    }
-
-    /* create a layout for calculating the maximum label width and for splitting
-     * the body (if necessary) */
-    header_font =
-	pango_font_description_from_string(balsa_app.print_header_font);
+    /* create a layout for calculating the maximum label width */
+    header_font = pango_font_description_from_string(balsa_app.print_header_font);
     test_layout = gtk_print_context_create_pango_layout(context);
     pango_layout_set_font_description(test_layout, header_font);
     pango_font_description_free(header_font);
 
     /* add fields from the events*/
     desc_buf = g_string_new("");
-    pod->p_label_width = 0;
+    p_label_width = 0;
     for (event_no = 0U; event_no < libbalsa_vcal_vevents(vcal_obj); event_no++) {
-        LibBalsaVEvent * event = libbalsa_vcal_vevent(vcal_obj, event_no);
+        LibBalsaVEvent *event = libbalsa_vcal_vevent(vcal_obj, event_no);
         const gchar *description;
         guint attendees;
 
-        if (desc_buf->len > 0)
+        if (desc_buf->len > 0) {
             g_string_append_c(desc_buf, '\n');
-        ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
-        	libbalsa_vevent_summary(event), _("Summary:"));
-        ADD_VCAL_ADDRESS(desc_buf, pod->p_label_width, test_layout,
-        	libbalsa_vevent_organizer(event), _("Organizer:"));
-        ADD_VCAL_DATE(desc_buf, pod->p_label_width, test_layout,
-                      event, VEVENT_DATETIME_STAMP, _("Created:"));
-        ADD_VCAL_DATE(desc_buf, pod->p_label_width, test_layout,
-                      event, VEVENT_DATETIME_START, _("Start:"));
-        ADD_VCAL_DATE(desc_buf, pod->p_label_width, test_layout,
-                      event, VEVENT_DATETIME_END, _("End:"));
-        ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
-        	libbalsa_vevent_location(event), _("Location:"));
+        }
+        ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, libbalsa_vevent_summary(event), _("Summary:"));
+        ADD_VCAL_ADDRESS(desc_buf, p_label_width, test_layout, libbalsa_vevent_organizer(event), _("Organizer:"));
+        ADD_VCAL_DATE(desc_buf, p_label_width, test_layout, event, VEVENT_DATETIME_STAMP, _("Created:"));
+        ADD_VCAL_DATE(desc_buf, p_label_width, test_layout, event, VEVENT_DATETIME_START, _("Start:"));
+        ADD_VCAL_DATE(desc_buf, p_label_width, test_layout, event, VEVENT_DATETIME_END, _("End:"));
+        ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, libbalsa_vevent_location(event), _("Location:"));
         attendees = libbalsa_vevent_attendees(event);
         if (attendees > 0U) {
-            gchar * this_att;
+            gchar *this_att;
             guint n;
 
-            this_att =
-                libbalsa_vcal_attendee_to_str(libbalsa_vevent_attendee(event, 0U));
-            ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
-                           this_att, (attendees > 1U) ? _("Attendees:") : _("Attendee:"));
+            this_att = libbalsa_vcal_attendee_to_str(libbalsa_vevent_attendee(event, 0U));
+            ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, this_att, (attendees > 1U) ? _("Attendees:") : _("Attendee:"));
             g_free(this_att);
             for (n = 1U; n < attendees; n++) {
-                this_att =
-                    libbalsa_vcal_attendee_to_str(libbalsa_vevent_attendee(event, n));
+                this_att = libbalsa_vcal_attendee_to_str(libbalsa_vevent_attendee(event, n));
                 g_string_append_printf(desc_buf, "\n\t%s", this_att);
                 g_free(this_att);
             }
         }
         description = libbalsa_vevent_description(event);
         if (description != NULL) {
-            gchar ** desc_lines = g_strsplit(description, "\n", -1);
+            gchar **desc_lines = g_strsplit(description, "\n", -1);
             gint i;
 
-            ADD_VCAL_FIELD(desc_buf, pod->p_label_width, test_layout,
-                           desc_lines[0], _("Description:"));
-            for (i = 1; desc_lines[i]; i++)
+            ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, desc_lines[0], _("Description:"));
+            for (i = 1; desc_lines[i]; i++) {
                 g_string_append_printf(desc_buf, "\n\t%s", desc_lines[i]);
+            }
             g_strfreev(desc_lines);
         }
     }
     g_object_unref(vcal_obj);
 
     /* add a small space between label and value */
-    pod->p_label_width += C_TO_P(C_LABEL_SEP);
+    p_label_width += C_TO_P(C_LABEL_SEP);
 
-    /* configure the layout so we can split the text */
-    pango_layout_set_indent(test_layout, -pod->p_label_width);
-    tabs =
-	pango_tab_array_new_with_positions(1, FALSE, PANGO_TAB_LEFT,
-					   pod->p_label_width);
-    pango_layout_set_tabs(test_layout, tabs);
-    pango_tab_array_free(tabs);
-    pango_layout_set_width(test_layout,
-			   C_TO_P(po->c_width -
-				  4 * C_LABEL_SEP - pod->c_image_width));
-    pango_layout_set_alignment(test_layout, PANGO_ALIGN_LEFT);
-
-    /* split paragraph if necessary */
-    first_page = psetup->page_count - 1;
-    c_at_y = psetup->c_y_pos;
-    par_parts =
-        split_for_layout(test_layout, desc_buf->str, NULL, psetup, TRUE, NULL);
-    g_string_free(desc_buf, TRUE);
-
-    /* set the parameters of the first part */
-    pod->description = (gchar *) par_parts->data;
-    pod->c_text_height =
-	P_TO_C(p_string_height_from_layout(test_layout, pod->description));
-    po->on_page = first_page++;
-    po->c_at_x = psetup->c_x0 + po->depth * C_LABEL_SEP;
-    po->c_at_y = psetup->c_y0 + c_at_y;
-    po->c_height = MAX(pod->c_image_height, pod->c_text_height);
-    list = g_list_append(list, pod);
-
-    /* add more parts */
-    for (this_par_part = g_list_next(par_parts); this_par_part;
-         this_par_part = g_list_next(this_par_part)) {
-        BalsaPrintObjectDefault * new_pod;
-        BalsaPrintObject *new_po;
-        
-        /* create a new object */
-        new_pod = g_object_new(BALSA_TYPE_PRINT_OBJECT_DEFAULT, NULL);
-        g_assert(new_pod != NULL);
-        new_po = BALSA_PRINT_OBJECT(new_pod);
-
-        /* fill data */
-        new_pod->p_label_width = pod->p_label_width;
-        new_pod->c_image_width = pod->c_image_width;
-        new_pod->description = (gchar *) this_par_part->data;
-        new_pod->c_text_height =
-            P_TO_C(p_string_height_from_layout(test_layout, new_pod->description));
-        new_po->on_page = first_page++;
-        new_po->c_at_x = psetup->c_x0 + po->depth * C_LABEL_SEP;
-        new_po->c_at_y = psetup->c_y0;
-        new_po->c_height = new_pod->c_text_height;
-        new_po->depth = psetup->curr_depth;
-        new_po->c_width =
-            psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
-        
-        /* append */
-        list = g_list_append(list, new_pod);
-    }
-    g_list_free(par_parts);
-    g_object_unref(G_OBJECT(test_layout));
+    /* create the part and clean up */
+    textbuf = g_string_free(desc_buf, FALSE);
+    list = balsa_print_object_default_full(list, context, pixbuf, textbuf, p_label_width, psetup);
+    g_object_unref(pixbuf);
+    g_free(textbuf);
 
     return list;
 }
@@ -764,12 +596,14 @@ balsa_print_object_text_draw(BalsaPrintObject * self,
 			     cairo_t * cairo_ctx)
 {
     BalsaPrintObjectText *po;
+    const BalsaPrintRect *rect;
     PangoFontDescription *font;
     gint p_height;
     PangoLayout *layout;
     PangoAttrList *attr_list;
 
     po = BALSA_PRINT_OBJECT_TEXT(self);
+    rect = balsa_print_object_get_rect(self);
     g_assert(po != NULL);
 
     /* prepare */
@@ -777,8 +611,7 @@ balsa_print_object_text_draw(BalsaPrintObject * self,
     layout = gtk_print_context_create_pango_layout(context);
     pango_layout_set_font_description(layout, font);
     pango_font_description_free(font);
-    pango_layout_set_width(layout,
-			   C_TO_P(self->c_width - po->cite_level * C_LABEL_SEP));
+    pango_layout_set_width(layout, C_TO_P(rect->c_width - po->cite_level * C_LABEL_SEP));
     pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
     pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
     pango_layout_set_text(layout, po->text, -1);
@@ -798,8 +631,7 @@ balsa_print_object_text_draw(BalsaPrintObject * self,
 				 balsa_app.quoted_color[k].blue);
 	}
     }
-    cairo_move_to(cairo_ctx, self->c_at_x + po->cite_level * C_LABEL_SEP,
-		  self->c_at_y);
+    cairo_move_to(cairo_ctx, rect->c_at_x + po->cite_level * C_LABEL_SEP, rect->c_at_y);
     pango_cairo_show_layout(cairo_ctx, layout);
     g_object_unref(G_OBJECT(layout));
     if (po->cite_level > 0) {
@@ -808,16 +640,16 @@ balsa_print_object_text_draw(BalsaPrintObject * self,
 	cairo_new_path(cairo_ctx);
 	cairo_set_line_width(cairo_ctx, 1.0);
 	for (n = 0; n < po->cite_level; n++) {
-	    gdouble c_xpos = self->c_at_x + 0.5 + n * C_LABEL_SEP;
+	    gdouble c_xpos = rect->c_at_x + 0.5 + n * C_LABEL_SEP;
 
-	    cairo_move_to(cairo_ctx, c_xpos, self->c_at_y);
-	    cairo_line_to(cairo_ctx, c_xpos, self->c_at_y + P_TO_C(p_height));
+	    cairo_move_to(cairo_ctx, c_xpos, rect->c_at_y);
+	    cairo_line_to(cairo_ctx, c_xpos, rect->c_at_y + P_TO_C(p_height));
 	}
 	cairo_stroke(cairo_ctx);
 	cairo_restore(cairo_ctx);
     }
 
-    self->c_height = P_TO_C(p_height);	/* needed to properly print borders */
+    balsa_print_object_set_height(self, P_TO_C(p_height));	/* needed to properly print borders */
 }
 
 

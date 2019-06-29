@@ -38,39 +38,15 @@
 
 G_BEGIN_DECLS
 
-#define BALSA_TYPE_PRINT_OBJECT_HTML			\
-	(balsa_print_object_html_get_type())
-#define BALSA_PRINT_OBJECT_HTML(obj)			\
-	G_TYPE_CHECK_INSTANCE_CAST(obj, BALSA_TYPE_PRINT_OBJECT_HTML, BalsaPrintObjectHtml)
-#define BALSA_PRINT_OBJECT_HTML_CLASS(klass)	\
-	G_TYPE_CHECK_CLASS_CAST(klass, BALSA_TYPE_PRINT_OBJECT_HTML, BalsaPrintObjectHtmlClass)
-#define BALSA_IS_PRINT_OBJECT_HTML(obj)			\
-	G_TYPE_CHECK_INSTANCE_TYPE(obj, BALSA_TYPE_PRINT_OBJECT_HTML)
+#define BALSA_TYPE_PRINT_OBJECT_HTML	balsa_print_object_html_get_type()
+G_DECLARE_FINAL_TYPE(BalsaPrintObjectHtml, balsa_print_object_html, BALSA_PRINT, OBJECT_HTML, BalsaPrintObject)
 
 
-typedef struct _BalsaPrintObjectHtmlClass BalsaPrintObjectHtmlClass;
-typedef struct _BalsaPrintObjectHtml BalsaPrintObjectHtml;
-
-
-struct _BalsaPrintObjectHtml {
-    BalsaPrintObject parent;
-
-    cairo_surface_t *html_surface;
-    gdouble c_y_offs;
-    gdouble scale;
-};
-
-
-struct _BalsaPrintObjectHtmlClass {
-    BalsaPrintObjectClass parent;
-};
-
-
-GType balsa_print_object_html_get_type(void);
-GList *balsa_print_object_html(GList *list,
-				GtkPrintContext *context,
-				LibBalsaMessageBody *body,
-				BalsaPrintSetup *psetup);
+GList *balsa_print_object_html(GList               *list,
+							   GtkPrintContext     *context,
+							   LibBalsaMessageBody *body,
+							   BalsaPrintSetup     *psetup)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 
 G_END_DECLS

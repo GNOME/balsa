@@ -27,6 +27,15 @@
 #include "html.h"
 
 
+struct _BalsaPrintObjectHtml {
+    BalsaPrintObject parent;
+
+    cairo_surface_t *html_surface;
+    gdouble c_y_offs;
+    gdouble scale;
+};
+
+
 G_DEFINE_TYPE(BalsaPrintObjectHtml, balsa_print_object_html, BALSA_TYPE_PRINT_OBJECT)
 
 
@@ -40,7 +49,6 @@ static void balsa_print_object_html_draw(BalsaPrintObject *self,
 static void
 balsa_print_object_html_class_init(BalsaPrintObjectHtmlClass *klass)
 {
-	balsa_print_object_html_parent_class = g_type_class_ref(BALSA_TYPE_PRINT_OBJECT);
     BALSA_PRINT_OBJECT_CLASS(klass)->draw = balsa_print_object_html_draw;
     G_OBJECT_CLASS(klass)->finalize = balsa_print_object_html_destroy;
 }
@@ -76,7 +84,6 @@ balsa_print_object_html(GList 				*list,
 	BalsaPrintObjectHtml *poh;
     BalsaPrintObject *po;
     gdouble surface_width;
-    gdouble surface_height;
     gdouble height_left;
     gdouble chunk_y_offs;
     gdouble c_use_width;
@@ -98,37 +105,38 @@ balsa_print_object_html(GList 				*list,
     } else {
     	scale = 1.0;
     }
-    surface_height = (gdouble) cairo_image_surface_get_height(html_surface) * scale;
+    height_left = (gdouble) cairo_image_surface_get_height(html_surface) * scale;
 
     /* split the surface into parts fitting on pages */
-    height_left = surface_height;
     chunk_y_offs = 0.0;
     do {
+    	BalsaPrintRect rect;
+
         /* create the part */
         poh = g_object_new(BALSA_TYPE_PRINT_OBJECT_HTML, NULL);
         g_assert(poh != NULL);
         po = BALSA_PRINT_OBJECT(poh);
-        po->depth = psetup->curr_depth;
         poh->html_surface = cairo_surface_reference(html_surface);
         poh->scale = scale;
         poh->c_y_offs = chunk_y_offs;
 
         /* extent */
-        po->on_page = psetup->page_count - 1;
-        po->c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
-        po->c_at_y = psetup->c_y0 + psetup->c_y_pos;
-        po->c_width = surface_width;
+        balsa_print_object_set_page_depth(po, psetup->page_count - 1, psetup->curr_depth);
+        rect.c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
+        rect.c_at_y = psetup->c_y0 + psetup->c_y_pos;
+        rect.c_width = surface_width;
         if (psetup->c_y_pos + height_left > psetup->c_height) {
-        	po->c_height = psetup->c_height - psetup->c_y_pos;
-        	chunk_y_offs += po->c_height;
-        	height_left -= po->c_height;
+        	rect.c_height = psetup->c_height - psetup->c_y_pos;
+        	chunk_y_offs += rect.c_height;
+        	height_left -= rect.c_height;
         	psetup->c_y_pos = 0.0;
         	psetup->page_count++;
         } else {
-        	po->c_height = height_left;
+        	rect.c_height = height_left;
         	psetup->c_y_pos += height_left;
         	height_left = 0.0;
         }
+        balsa_print_object_set_rect(po, &rect);
         list = g_list_append(list, po);
     } while (height_left > 0.0);
 
@@ -145,18 +153,20 @@ balsa_print_object_html_draw(BalsaPrintObject *self,
 							 cairo_t 		  *cairo_ctx)
 {
 	BalsaPrintObjectHtml *poh;
+	const BalsaPrintRect *rect;
     cairo_pattern_t *pattern;
     cairo_matrix_t matrix;
 
     /* prepare */
     poh = BALSA_PRINT_OBJECT_HTML(self);
+    rect = balsa_print_object_get_rect(self);
     g_assert(poh != NULL);
 
     /* save current state */
     cairo_save(cairo_ctx);
 
     /* set surface */
-    cairo_set_source_surface(cairo_ctx, poh->html_surface, self->c_at_x, self->c_at_y);
+    cairo_set_source_surface(cairo_ctx, poh->html_surface, rect->c_at_x, rect->c_at_y);
 
     /* scale */
     pattern = cairo_get_source(cairo_ctx);
@@ -169,10 +179,10 @@ balsa_print_object_html_draw(BalsaPrintObject *self,
 
     /* clip around the chunk */
     cairo_new_path(cairo_ctx);
-    cairo_move_to(cairo_ctx, self->c_at_x, self->c_at_y);
-    cairo_line_to(cairo_ctx, self->c_at_x + self->c_width, self->c_at_y);
-    cairo_line_to(cairo_ctx, self->c_at_x + self->c_width, self->c_at_y + self->c_height);
-    cairo_line_to(cairo_ctx, self->c_at_x, self->c_at_y + self->c_height);
+    cairo_move_to(cairo_ctx, rect->c_at_x, rect->c_at_y);
+    cairo_line_to(cairo_ctx, rect->c_at_x + rect->c_width, rect->c_at_y);
+    cairo_line_to(cairo_ctx, rect->c_at_x + rect->c_width, rect->c_at_y + rect->c_height);
+    cairo_line_to(cairo_ctx, rect->c_at_x, rect->c_at_y + rect->c_height);
     cairo_close_path(cairo_ctx);
     cairo_clip(cairo_ctx);
 

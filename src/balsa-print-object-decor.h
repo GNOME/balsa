@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2016 Stuart Parmenter and others
- * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
+ * Copyright (C) 1997-2019 Stuart Parmenter and others
+ * Written by (C) Albrecht Dre√ü <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,42 +24,20 @@
 
 G_BEGIN_DECLS
 
-#define BALSA_TYPE_PRINT_OBJECT_DECOR	\
-    (balsa_print_object_decor_get_type())
-#define BALSA_PRINT_OBJECT_DECOR(obj)				\
-    G_TYPE_CHECK_INSTANCE_CAST(obj, BALSA_TYPE_PRINT_OBJECT_DECOR, BalsaPrintObjectDecor)
-#define BALSA_PRINT_OBJECT_DECOR_CLASS(klass)			\
-    G_TYPE_CHECK_CLASS_CAST(klass, BALSA_TYPE_PRINT_OBJECT_DECOR, BalsaPrintObjectDecorClass)
-#define BALSA_IS_PRINT_OBJECT_DECOR(obj)			\
-    G_TYPE_CHECK_INSTANCE_TYPE(obj, BALSA_TYPE_PRINT_OBJECT_DECOR)
-
-typedef struct _BalsaPrintObjectDecorClass BalsaPrintObjectDecorClass;
-typedef struct _BalsaPrintObjectDecor BalsaPrintObjectDecor;
-
-typedef enum {
-    BALSA_PRINT_DECOR_FRAME_BEGIN,
-    BALSA_PRINT_DECOR_FRAME_END,
-    BALSA_PRINT_DECOR_SEPARATOR
-} BalsaPrintDecorType;
-
-struct _BalsaPrintObjectDecor {
-    BalsaPrintObject parent;
-
-    BalsaPrintDecorType mode;
-    gchar * label;
-};
+#define BALSA_TYPE_PRINT_OBJECT_DECOR	balsa_print_object_decor_get_type()
+G_DECLARE_FINAL_TYPE(BalsaPrintObjectDecor, balsa_print_object_decor, BALSA_PRINT, OBJECT_DECOR, BalsaPrintObject)
 
 
-struct _BalsaPrintObjectDecorClass {
-    BalsaPrintObjectClass parent;
-};
-
-
-GType balsa_print_object_decor_get_type(void);
-GList *balsa_print_object_separator(GList * list, BalsaPrintSetup * psetup);
-GList *balsa_print_object_frame_begin(GList * list, const gchar * label,
-				      BalsaPrintSetup * psetup);
-GList *balsa_print_object_frame_end(GList * list, BalsaPrintSetup * psetup);
+GList *balsa_print_object_separator(GList           *list,
+									BalsaPrintSetup *psetup)
+	G_GNUC_WARN_UNUSED_RESULT;
+GList *balsa_print_object_frame_begin(GList           *list,
+									  const gchar     *label,
+									  BalsaPrintSetup *psetup)
+	G_GNUC_WARN_UNUSED_RESULT;
+GList *balsa_print_object_frame_end(GList           *list,
+									BalsaPrintSetup *psetup)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 
 G_END_DECLS

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2016 Stuart Parmenter and others
- * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
+ * Copyright (C) 1997-2019 Stuart Parmenter and others
+ * Written by (C) Albrecht Dre√ü <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,42 +24,24 @@
 
 G_BEGIN_DECLS
 
-#define BALSA_TYPE_PRINT_OBJECT_DEFAULT	\
-    (balsa_print_object_default_get_type())
-#define BALSA_PRINT_OBJECT_DEFAULT(obj)				\
-    G_TYPE_CHECK_INSTANCE_CAST(obj, BALSA_TYPE_PRINT_OBJECT_DEFAULT, BalsaPrintObjectDefault)
-#define BALSA_PRINT_OBJECT_DEFAULT_CLASS(klass)			\
-    G_TYPE_CHECK_CLASS_CAST(klass, BALSA_TYPE_PRINT_OBJECT_DEFAULT, BalsaPrintObjectDefaultClass)
-#define BALSA_IS_PRINT_OBJECT_DEFAULT(obj)			\
-    G_TYPE_CHECK_INSTANCE_TYPE(obj, BALSA_TYPE_PRINT_OBJECT_DEFAULT)
+#define BALSA_TYPE_PRINT_OBJECT_DEFAULT	balsa_print_object_default_get_type()
+G_DECLARE_FINAL_TYPE(BalsaPrintObjectDefault, balsa_print_object_default, BALSA_PRINT, OBJECT_DEFAULT, BalsaPrintObject)
 
 
-typedef struct _BalsaPrintObjectDefaultClass BalsaPrintObjectDefaultClass;
-typedef struct _BalsaPrintObjectDefault BalsaPrintObjectDefault;
+GList *balsa_print_object_default(GList               *list,
+								  GtkPrintContext     *context,
+								  LibBalsaMessageBody *body,
+								  BalsaPrintSetup     *psetup)
+	G_GNUC_WARN_UNUSED_RESULT;
 
-
-struct _BalsaPrintObjectDefault {
-    BalsaPrintObject parent;
-
-    gint p_label_width;
-    gdouble c_image_width;
-    gdouble c_image_height;
-    gdouble c_text_height;
-    gchar *description;
-    GdkPixbuf *pixbuf;
-};
-
-
-struct _BalsaPrintObjectDefaultClass {
-    BalsaPrintObjectClass parent;
-};
-
-
-GType balsa_print_object_default_get_type(void);
-GList *balsa_print_object_default(GList * list,
-				  GtkPrintContext *context,
-				  LibBalsaMessageBody *body,
-				  BalsaPrintSetup *psetup);
+/* note: adds a reference to the passed pixbuf */
+GList *balsa_print_object_default_full(GList           *list,
+		  	  	  	  	  	  	  	   GtkPrintContext *context,
+									   GdkPixbuf       *pixbuf,
+									   const gchar     *description,
+									   gint             p_label_width,
+									   BalsaPrintSetup *psetup)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 
 G_END_DECLS

@@ -1,5 +1,67 @@
 2019-06-29  Albrecht Dreß  <albrecht.dress@arcor.de>
 
+	Migrate print objects to new scheme
+
+	Migrate the various print objects to the modern GObject scheme
+	using G_DECLARE_*_TYPE() and G_DEFINE_TYPE().
+
+	The main difficulty was the elimination of the direct access to
+	the internal fields of BalsaPrintObject, i.e. the surrounding
+	rectangle of the respective object, the page number and the
+	logical depth.	I added setters/getters for this purpose, which
+	required some refactoring in the derived classes.  However,
+	IMO the result is actually cleaner…
+
+	* src/balsa-print-object-decor.c
+	(balsa_print_object_decor_class_init),
+	(balsa_print_object_decor_init),
+	(balsa_print_object_decor_destroy), (decor_new_real),
+	(balsa_print_object_frame_begin), (bpo_decor_print_separator),
+	(bpo_decor_print_frame_end), (bpo_decor_print_frame_begin),
+	(balsa_print_object_decor_draw):
+	* src/balsa-print-object-decor.h:
+	* src/balsa-print-object-default.c
+	(balsa_print_object_default_class_init),
+	(balsa_print_object_default_init),
+	(balsa_print_object_default_destroy), (balsa_print_object_default),
+	(balsa_print_object_default_full),
+	(balsa_print_object_default_draw):
+	* src/balsa-print-object-default.h:
+	* src/balsa-print-object-header.c
+	(balsa_print_object_header_class_init),
+	(balsa_print_object_header_init),
+	(balsa_print_object_header_destroy),
+	(balsa_print_object_header_new_real),
+	(balsa_print_object_header_crypto),
+	(balsa_print_object_header_draw):
+	* src/balsa-print-object-header.h:
+	* src/balsa-print-object-html.c
+	(balsa_print_object_html_class_init), (balsa_print_object_html),
+	(balsa_print_object_html_draw):
+	* src/balsa-print-object-html.h:
+	* src/balsa-print-object-image.c
+	(balsa_print_object_image_class_init),
+	(balsa_print_object_image_init),
+	(balsa_print_object_image_destroy), (balsa_print_object_image),
+	(balsa_print_object_image_draw):
+	* src/balsa-print-object-image.h:
+	* src/balsa-print-object-text.c
+	(balsa_print_object_text_class_init),
+	(balsa_print_object_text_init), (balsa_print_object_text_destroy),
+	(balsa_print_object_text_plain), (balsa_print_object_text),
+	(get_icon), (balsa_print_object_text_vcard),
+	(balsa_print_object_text_calendar), (balsa_print_object_text_draw):
+	* src/balsa-print-object-text.h:
+	* src/balsa-print-object.c (balsa_print_object_init),
+	(balsa_print_object_class_init), (balsa_print_object_draw),
+	(balsa_print_object_get_page), (balsa_print_object_get_rect),
+	(balsa_print_object_set_page_depth), (balsa_print_object_set_rect),
+	(balsa_print_object_set_height), (balsa_print_object_destroy):
+	* src/balsa-print-object.h:
+	* src/print-gtk.c (draw_page):
+
+2019-06-29  Albrecht Dreß  <albrecht.dress@arcor.de>
+
 	Fix build error on Buster
 	One last pair of redundant declarations…
 

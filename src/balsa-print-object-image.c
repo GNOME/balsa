@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2016 Stuart Parmenter and others
- * Written by (C) Albrecht Dreﬂ <albrecht.dress@arcor.de> 2007
+ * Copyright (C) 1997-2019 Stuart Parmenter and others
+ * Written by (C) Albrecht Dre√ü <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +25,20 @@
 
 #include <gtk/gtk.h>
 
+
+struct _BalsaPrintObjectImage {
+    BalsaPrintObject parent;
+
+    GdkPixbuf *pixbuf;
+    gdouble c_img_offs;
+    gdouble scale;
+};
+
+
+G_DEFINE_TYPE(BalsaPrintObjectImage, balsa_print_object_image, BALSA_TYPE_PRINT_OBJECT)
+
+
 /* object related functions */
-static void
-balsa_print_object_image_class_init(BalsaPrintObjectImageClass * klass);
-static void balsa_print_object_image_init (GTypeInstance *instance,
-					   gpointer g_class);
 static void balsa_print_object_image_destroy(GObject * self);
 
 static void balsa_print_object_image_draw(BalsaPrintObject * self,
@@ -37,54 +46,19 @@ static void balsa_print_object_image_draw(BalsaPrintObject * self,
 					  cairo_t * cairo_ctx);
 
 
-static BalsaPrintObjectClass *parent_class = NULL;
-
-
-GType
-balsa_print_object_image_get_type()
-{
-    static GType balsa_print_object_image_type = 0;
-
-    if (!balsa_print_object_image_type) {
-	static const GTypeInfo balsa_print_object_image_info = {
-	    sizeof(BalsaPrintObjectImageClass),
-	    NULL,		/* base_init */
-	    NULL,		/* base_finalize */
-	    (GClassInitFunc) balsa_print_object_image_class_init,
-	    NULL,		/* class_finalize */
-	    NULL,		/* class_data */
-	    sizeof(BalsaPrintObjectImage),
-	    0,			/* n_preallocs */
-	    (GInstanceInitFunc) balsa_print_object_image_init
-	};
-
-	balsa_print_object_image_type =
-	    g_type_register_static(BALSA_TYPE_PRINT_OBJECT,
-				   "BalsaPrintObjectImage",
-				   &balsa_print_object_image_info, 0);
-    }
-
-    return balsa_print_object_image_type;
-}
-
-
 static void
 balsa_print_object_image_class_init(BalsaPrintObjectImageClass * klass)
 {
-    parent_class = g_type_class_ref(BALSA_TYPE_PRINT_OBJECT);
-    BALSA_PRINT_OBJECT_CLASS(klass)->draw =
-	balsa_print_object_image_draw;
+    BALSA_PRINT_OBJECT_CLASS(klass)->draw =	balsa_print_object_image_draw;
     G_OBJECT_CLASS(klass)->finalize = balsa_print_object_image_destroy;
 }
 
 
 static void
-balsa_print_object_image_init(GTypeInstance * instance, gpointer g_class)
+balsa_print_object_image_init(BalsaPrintObjectImage *self)
 {
-    BalsaPrintObjectImage *po = BALSA_PRINT_OBJECT_IMAGE(instance);
-
-    po->pixbuf = NULL;
-    po->scale = 1.0;
+    self->pixbuf = NULL;
+    self->scale = 1.0;
 }
 
 
@@ -93,10 +67,10 @@ balsa_print_object_image_destroy(GObject * self)
 {
     BalsaPrintObjectImage *po = BALSA_PRINT_OBJECT_IMAGE(self);
 
-    if (po->pixbuf)
-	g_object_unref(po->pixbuf);
-
-    G_OBJECT_CLASS(parent_class)->finalize(self);
+    if (po->pixbuf != NULL) {
+    	g_object_unref(po->pixbuf);
+    }
+    G_OBJECT_CLASS(balsa_print_object_image_parent_class)->finalize(self);
 }
 
 
@@ -106,11 +80,10 @@ balsa_print_object_image(GList * list, GtkPrintContext *context,
 {
     BalsaPrintObjectImage *poi;
     BalsaPrintObject *po;
+    BalsaPrintRect rect;
     GdkPixbuf *pixbuf;
     GError *err = NULL;
     gdouble c_use_width;
-    gdouble c_img_width;
-    gdouble c_img_height;
 
     /* check if we can handle the image */
     pixbuf = libbalsa_message_body_get_pixbuf(body, &err);
@@ -127,44 +100,43 @@ balsa_print_object_image(GList * list, GtkPrintContext *context,
     poi = g_object_new(BALSA_TYPE_PRINT_OBJECT_IMAGE, NULL);
     g_assert(poi != NULL);
     po = BALSA_PRINT_OBJECT(poi);
-    po->depth = psetup->curr_depth;
     poi->pixbuf = pixbuf;
     c_use_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
-    c_img_width = gdk_pixbuf_get_width(pixbuf);
-    c_img_height = gdk_pixbuf_get_height(pixbuf);
+    rect.c_width = gdk_pixbuf_get_width(pixbuf);
+    rect.c_height = gdk_pixbuf_get_height(pixbuf);
     poi->scale = 1.0;
 
     /* check if we should scale the width */
-    if (c_img_width > c_use_width) {
-	poi->scale = c_use_width / c_img_width;
-	c_img_height *= poi->scale;
-	c_img_width = c_use_width;
+    if (rect.c_width > c_use_width) {
+    	poi->scale = c_use_width / rect.c_width;
+    	rect.c_height *= poi->scale;
+    	rect.c_width = c_use_width;
     }
 
     /* check if the image is too high for one full page */
-    if (c_img_height > psetup->c_height) {
-	gdouble hscale = psetup->c_height / c_img_height;
-	poi->scale *= hscale;
-	c_img_width *= hscale;
-	c_img_height = psetup->c_height;
+    if (rect.c_height > psetup->c_height) {
+    	gdouble hscale = psetup->c_height / rect.c_height;
+
+    	poi->scale *= hscale;
+    	rect.c_width *= hscale;
+    	rect.c_height = psetup->c_height;
     }
 
     /* check if we should move to the next page */
-    if (psetup->c_y_pos + c_img_height > psetup->c_height) {
-	psetup->c_y_pos = 0;
-	psetup->page_count++;
+    if (psetup->c_y_pos + rect.c_height > psetup->c_height) {
+    	psetup->c_y_pos = 0;
+    	psetup->page_count++;
     }
 
     /* remember the extent */
-    po->on_page = psetup->page_count - 1;
-    po->c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
-    po->c_at_y = psetup->c_y0 + psetup->c_y_pos;
-    po->c_width = c_img_width;
-    poi->c_img_offs = 0.5 * (c_use_width - c_img_width);
-    po->c_height = c_img_height;
+    balsa_print_object_set_page_depth(po, psetup->page_count - 1, psetup->curr_depth);
+    rect.c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
+    rect.c_at_y = psetup->c_y0 + psetup->c_y_pos;
+    poi->c_img_offs = 0.5 * (c_use_width - rect.c_width);
+    balsa_print_object_set_rect(po, &rect);
 
     /* adjust the y position */
-    psetup->c_y_pos += c_img_height;
+    psetup->c_y_pos += rect.c_height;
 
     return g_list_append(list, po);
 }
@@ -176,12 +148,14 @@ balsa_print_object_image_draw(BalsaPrintObject * self,
 			      cairo_t * cairo_ctx)
 {
     BalsaPrintObjectImage *poi;
+	const BalsaPrintRect *rect;
 
     /* prepare */
     poi = BALSA_PRINT_OBJECT_IMAGE(self);
+    rect = balsa_print_object_get_rect(self);
     g_assert(poi != NULL);
 
     /* print the image */
-    cairo_print_pixbuf(cairo_ctx, poi->pixbuf, self->c_at_x + poi->c_img_offs,
-		       self->c_at_y, poi->scale);
+    cairo_print_pixbuf(cairo_ctx, poi->pixbuf, rect->c_at_x + poi->c_img_offs,
+    		rect->c_at_y, poi->scale);
 }

@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2016 Stuart Parmenter and others
+ * Copyright (C) 1997-2019 Stuart Parmenter and others
  * Written by (C) Albrecht Dreß <albrecht.dress@arcor.de> 2007
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,10 +29,21 @@
 #include "balsa-print-object-default.h"
 #include "libbalsa-gpgme.h"
 
+
+struct _BalsaPrintObjectHeader {
+    BalsaPrintObject parent;
+
+    gint p_label_width;
+    gint p_layout_width;
+    gchar *headers;
+    GdkPixbuf *face;
+};
+
+
+G_DEFINE_TYPE(BalsaPrintObjectHeader, balsa_print_object_header, BALSA_TYPE_PRINT_OBJECT)
+
+
 /* object related functions */
-static void balsa_print_object_header_class_init(BalsaPrintObjectHeaderClass * klass);
-static void balsa_print_object_header_init(GTypeInstance * instance,
-					    gpointer g_class);
 static void balsa_print_object_header_destroy(GObject * self);
 
 static void balsa_print_object_header_draw(BalsaPrintObject * self,
@@ -50,53 +61,18 @@ static void header_add_list(PangoLayout * layout, GString * header_buf,
 			    gboolean print_all_headers);
 
 
-static BalsaPrintObjectClass *parent_class = NULL;
-
-
-GType
-balsa_print_object_header_get_type()
-{
-    static GType balsa_print_object_header_type = 0;
-
-    if (!balsa_print_object_header_type) {
-	static const GTypeInfo balsa_print_object_header_info = {
-	    sizeof(BalsaPrintObjectHeaderClass),
-	    NULL,		/* base_init */
-	    NULL,		/* base_finalize */
-	    (GClassInitFunc) balsa_print_object_header_class_init,
-	    NULL,		/* class_finalize */
-	    NULL,		/* class_data */
-	    sizeof(BalsaPrintObjectHeader),
-	    0,			/* n_preallocs */
-	    (GInstanceInitFunc) balsa_print_object_header_init
-	};
-
-	balsa_print_object_header_type =
-	    g_type_register_static(BALSA_TYPE_PRINT_OBJECT,
-				   "BalsaPrintObjectHeader",
-				   &balsa_print_object_header_info, 0);
-    }
-
-    return balsa_print_object_header_type;
-}
-
-
 static void
 balsa_print_object_header_class_init(BalsaPrintObjectHeaderClass * klass)
 {
-    parent_class = g_type_class_ref(BALSA_TYPE_PRINT_OBJECT);
-    BALSA_PRINT_OBJECT_CLASS(klass)->draw =
-	balsa_print_object_header_draw;
+    BALSA_PRINT_OBJECT_CLASS(klass)->draw = balsa_print_object_header_draw;
     G_OBJECT_CLASS(klass)->finalize = balsa_print_object_header_destroy;
 }
 
 
 static void
-balsa_print_object_header_init(GTypeInstance * instance, gpointer g_class)
+balsa_print_object_header_init(BalsaPrintObjectHeader *self)
 {
-    BalsaPrintObjectHeader *po = BALSA_PRINT_OBJECT_HEADER(instance);
-
-    po->headers = NULL;
+    self->headers = NULL;
 }
 
 
@@ -106,10 +82,10 @@ balsa_print_object_header_destroy(GObject * self)
     BalsaPrintObjectHeader *po = BALSA_PRINT_OBJECT_HEADER(self);
 
     g_free(po->headers);
-    if (po->face)
-	g_object_unref(po->face);
-
-    G_OBJECT_CLASS(parent_class)->finalize(self);
+    if (po->face) {
+    	g_object_unref(po->face);
+    }
+    G_OBJECT_CLASS(balsa_print_object_header_parent_class)->finalize(self);
 }
 
 static GList *
@@ -128,8 +104,7 @@ balsa_print_object_header_new_real(GList * list,
     PangoTabArray *tabs;
     GString *header_buf;
     PangoLayout *test_layout;
-    gdouble c_use_width;
-    gdouble c_at_x;
+    BalsaPrintRect rect;
     gdouble c_at_y;
     GList *chunks;
     GList *this_chunk;
@@ -241,31 +216,29 @@ balsa_print_object_header_new_real(GList * list,
     /* strip the trailing '\n' */
     header_buf = g_string_truncate(header_buf, header_buf->len - 1);
 
-    /* check if we have a face */
-    c_use_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
-    if (face) {
-	p_layout_width = C_TO_P(c_use_width - gdk_pixbuf_get_width(face) - C_LABEL_SEP);
-	c_face_height = gdk_pixbuf_get_height(face);
+    /* check if we have a face pixbuf */
+    rect.c_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
+    if (face != NULL) {
+    	p_layout_width = C_TO_P(rect.c_width - gdk_pixbuf_get_width(face) - C_LABEL_SEP);
+    	c_face_height = gdk_pixbuf_get_height(face);
     } else {
-	p_layout_width = C_TO_P(c_use_width);
-	c_face_height = 0;
+    	p_layout_width = C_TO_P(rect.c_width);
+    	c_face_height = 0.0;
     }
 
     /* start on new page if less than 2 header lines can be printed or if
      * the face doesn't fit */
     if (psetup->c_y_pos + 2 * P_TO_C(psetup->p_hdr_font_height) > psetup->c_height ||
-	psetup->c_y_pos + c_face_height > psetup->c_height) {
-	psetup->c_y_pos = 0;
-	psetup->page_count++;
+    		psetup->c_y_pos + c_face_height > psetup->c_height) {
+    	psetup->c_y_pos = 0;
+    	psetup->page_count++;
     }
     first_page = psetup->page_count - 1;
     c_at_y = psetup->c_y_pos;
 
     /* configure the layout so we can use Pango to split the text into pages */
     pango_layout_set_indent(test_layout, -p_label_width);
-    tabs =
-	pango_tab_array_new_with_positions(1, FALSE, PANGO_TAB_LEFT,
-					   p_label_width);
+    tabs = pango_tab_array_new_with_positions(1, FALSE, PANGO_TAB_LEFT, p_label_width);
     pango_layout_set_tabs(test_layout, tabs);
     pango_tab_array_free(tabs);
     pango_layout_set_width(test_layout, p_layout_width);
@@ -273,47 +246,43 @@ balsa_print_object_header_new_real(GList * list,
     pango_layout_set_alignment(test_layout, PANGO_ALIGN_LEFT);
 
     /* split the headers into a list fitting on one or more pages */
-    chunks =
-	split_for_layout(test_layout, header_buf->str, NULL, psetup, TRUE,
-			 NULL);
+    chunks = split_for_layout(test_layout, header_buf->str, NULL, psetup, TRUE, NULL);
     g_string_free(header_buf, TRUE);
 
     /* create a list of objects */
-    this_chunk = chunks;
-    c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
-    while (this_chunk) {
-	BalsaPrintObjectHeader *po;
+    rect.c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;	/* fixed for all chunks */
+    rect.c_height = -1.0;	/* note: height is calculated when the object is drawn */
+    for (this_chunk = chunks; this_chunk != NULL; this_chunk = this_chunk->next) {
+    	BalsaPrintObjectHeader *po;
 
-	po = g_object_new(BALSA_TYPE_PRINT_OBJECT_HEADER, NULL);
-	g_assert(po != NULL);
-	BALSA_PRINT_OBJECT(po)->on_page = first_page++;
-	BALSA_PRINT_OBJECT(po)->c_at_x = c_at_x;
-	BALSA_PRINT_OBJECT(po)->c_at_y = psetup->c_y0 + c_at_y;
-	BALSA_PRINT_OBJECT(po)->depth = psetup->curr_depth;
-	c_at_y = 0.0;
-	BALSA_PRINT_OBJECT(po)->c_width = c_use_width;
-	/* note: height is calculated when the object is drawn */
-	po->headers = (gchar *) this_chunk->data;
-	po->p_label_width = p_label_width;
-	po->p_layout_width = p_layout_width;
-	if (face) {
-	    po->face = face;
-	    if (!this_chunk->next) {
-		gint p_height;
+    	po = g_object_new(BALSA_TYPE_PRINT_OBJECT_HEADER, NULL);
+    	g_assert(po != NULL);
+    	balsa_print_object_set_page_depth(BALSA_PRINT_OBJECT(po), first_page++, psetup->curr_depth);
+    	rect.c_at_y = psetup->c_y0 + c_at_y;
+    	balsa_print_object_set_rect(BALSA_PRINT_OBJECT(po), &rect);
+    	c_at_y = 0.0;
 
-		/* verify that the image is not higher than the headers
-		 * if there is a next part, we checked before that the
-		 * image fits */
-		pango_layout_set_text(test_layout, po->headers, -1);
-		pango_layout_get_size(test_layout, NULL, &p_height);
-		if (c_face_height > P_TO_C(p_height))
-		    psetup->c_y_pos += c_face_height - P_TO_C(p_height);
-	    }
-	    face = NULL;
-	}
-	list = g_list_append(list, po);
+    	/* note: height is calculated when the object is drawn */
+    	po->headers = (gchar *) this_chunk->data;
+    	po->p_label_width = p_label_width;
+    	po->p_layout_width = p_layout_width;
+    	if (face != NULL) {
+    		po->face = face;
+    		if (this_chunk->next == NULL) {
+    			gint p_height;
 
-	this_chunk = g_list_next(this_chunk);
+    			/* verify that the image is not higher than the headers
+    			 * if there is a next part, we checked before that the
+    			 * image fits */
+    			pango_layout_set_text(test_layout, po->headers, -1);
+    			pango_layout_get_size(test_layout, NULL, &p_height);
+    			if (c_face_height > P_TO_C(p_height)) {
+    				psetup->c_y_pos += c_face_height - P_TO_C(p_height);
+    			}
+    		}
+    		face = NULL;
+    	}
+    	list = g_list_append(list, po);
     }
     g_list_free(chunks);
     g_object_unref(G_OBJECT(test_layout));
@@ -351,80 +320,75 @@ balsa_print_object_header_from_body(GList *list,
 
 
 GList *
-balsa_print_object_header_crypto(GList *list, GtkPrintContext * context,
-				 LibBalsaMessageBody * body,
-				 BalsaPrintSetup * psetup)
+balsa_print_object_header_crypto(GList 				 *list,
+								 GtkPrintContext     *context,
+								 LibBalsaMessageBody *body,
+								 BalsaPrintSetup     *psetup)
 {
-    gint first_page;
-    gdouble c_at_x;
-    gdouble c_at_y;
-    gdouble c_use_width;
-    PangoFontDescription *header_font;
-    PangoLayout *test_layout;
-    gchar *textbuf;
-    GList *chunks;
-    GList *this_chunk;
+	gint first_page;
+	BalsaPrintRect rect;
+	gdouble c_at_y;
+	PangoFontDescription *header_font;
+	PangoLayout *test_layout;
+	gchar *textbuf;
+	GList *chunks;
+	GList *this_chunk;
 
-    /* only if the body has an attached signature info */
-    if ((body->sig_info == NULL) || (g_mime_gpgme_sigstat_status(body->sig_info) == GPG_ERR_NOT_SIGNED)) {
-    	return balsa_print_object_default(list, context, body, psetup);
-    }
-    
-    /* start on new page if less than 2 header lines can be printed */
-    if (psetup->c_y_pos + 2 * P_TO_C(psetup->p_hdr_font_height) >
-	psetup->c_height) {
-	psetup->c_y_pos = 0;
-	psetup->page_count++;
-    }
-    first_page = psetup->page_count - 1;
-    c_at_y = psetup->c_y_pos;
-    c_use_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
+	/* only if the body has an attached signature info */
+	if ((body->sig_info == NULL) || (g_mime_gpgme_sigstat_status(body->sig_info) == GPG_ERR_NOT_SIGNED)) {
+		return balsa_print_object_default(list, context, body, psetup);
+	}
 
-    /* create a layout for wrapping */
-    header_font =
-	pango_font_description_from_string(balsa_app.print_header_font);
-    test_layout = gtk_print_context_create_pango_layout(context);
-    pango_layout_set_font_description(test_layout, header_font);
-    pango_font_description_free(header_font);
+	/* start on new page if less than 2 header lines can be printed */
+	if (psetup->c_y_pos + 2 * P_TO_C(psetup->p_hdr_font_height) > psetup->c_height) {
+		psetup->c_y_pos = 0;
+		psetup->page_count++;
+	}
+	first_page = psetup->page_count - 1;
+	c_at_y = psetup->c_y_pos;
+	rect.c_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;
 
-    /* create a buffer with the signature info */
-    textbuf = g_mime_gpgme_sigstat_to_gchar(body->sig_info, TRUE, balsa_app.date_string);
+	/* create a layout for wrapping */
+	header_font = pango_font_description_from_string(balsa_app.print_header_font);
+	test_layout = gtk_print_context_create_pango_layout(context);
+	pango_layout_set_font_description(test_layout, header_font);
+	pango_font_description_free(header_font);
 
-    /* configure the layout so we can use Pango to split the text into pages */
-    pango_layout_set_width(test_layout, C_TO_P(c_use_width));
-    pango_layout_set_wrap(test_layout, PANGO_WRAP_WORD_CHAR);
-    pango_layout_set_alignment(test_layout, PANGO_ALIGN_LEFT);
+	/* create a buffer with the signature info */
+	textbuf = g_mime_gpgme_sigstat_to_gchar(body->sig_info, TRUE, balsa_app.date_string);
 
-    /* split the headers into a list fitting on one or more pages */
-    chunks = split_for_layout(test_layout, textbuf, NULL, psetup, FALSE, NULL);
-    g_object_unref(G_OBJECT(test_layout));
-    g_free(textbuf);
+	/* configure the layout so we can use Pango to split the text into pages */
+	pango_layout_set_width(test_layout, C_TO_P(rect.c_width));
+	pango_layout_set_wrap(test_layout, PANGO_WRAP_WORD_CHAR);
+	pango_layout_set_alignment(test_layout, PANGO_ALIGN_LEFT);
 
-    /* create a list of objects */
-    this_chunk = chunks;
-    c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
-    while (this_chunk) {
-	BalsaPrintObjectHeader *po;
+	/* split the headers into a list fitting on one or more pages */
+	chunks = split_for_layout(test_layout, textbuf, NULL, psetup, FALSE, NULL);
+	g_object_unref(G_OBJECT(test_layout));
+	g_free(textbuf);
 
-	po = g_object_new(BALSA_TYPE_PRINT_OBJECT_HEADER, NULL);
-	g_assert(po != NULL);
-	BALSA_PRINT_OBJECT(po)->on_page = first_page++;
-	BALSA_PRINT_OBJECT(po)->c_at_x = c_at_x;
-	BALSA_PRINT_OBJECT(po)->c_at_y = psetup->c_y0 + c_at_y;
-	BALSA_PRINT_OBJECT(po)->depth = psetup->curr_depth;
-	c_at_y = 0.0;
-	BALSA_PRINT_OBJECT(po)->c_width = c_use_width;
-	/* note: height is calculated when the object is drawn */
-	po->headers = (gchar *) this_chunk->data;
-	po->p_label_width = 0;
-	po->p_layout_width = C_TO_P(c_use_width);
-	list = g_list_append(list, po);
+	/* create a list of objects */
+	rect.c_at_x = psetup->c_x0 + psetup->curr_depth * C_LABEL_SEP;
+    rect.c_height = -1.0;	/* note: height is calculated when the object is drawn */
+	for (this_chunk = chunks; this_chunk != NULL; this_chunk = this_chunk->next) {
+		BalsaPrintObjectHeader *po;
 
-	this_chunk = g_list_next(this_chunk);
-    }
-    g_list_free(chunks);
+		po = g_object_new(BALSA_TYPE_PRINT_OBJECT_HEADER, NULL);
+		g_assert(po != NULL);
+		balsa_print_object_set_page_depth(BALSA_PRINT_OBJECT(po), first_page++, psetup->curr_depth);
+		rect.c_at_y = psetup->c_y0 + c_at_y;
+		balsa_print_object_set_rect(BALSA_PRINT_OBJECT(po), &rect);
+		c_at_y = 0.0;
 
-    return list;
+		/* note: height is calculated when the object is drawn */
+		po->headers = (gchar *) this_chunk->data;
+		po->p_label_width = 0;
+		po->p_layout_width = C_TO_P(rect.c_width);
+		list = g_list_append(list, po);
+	}
+	g_list_free(chunks);
+
+	return list;
 }
 
 
@@ -434,50 +398,57 @@ balsa_print_object_header_draw(BalsaPrintObject * self,
 				cairo_t * cairo_ctx)
 {
     BalsaPrintObjectHeader *po;
+    const BalsaPrintRect *rect;
     PangoLayout *layout;
     PangoFontDescription *font;
     gint p_height;
+    gdouble c_height;
 
     po = BALSA_PRINT_OBJECT_HEADER(self);
+    rect = balsa_print_object_get_rect(self);
     g_assert(po != NULL);
 
     font = pango_font_description_from_string(balsa_app.print_header_font);
     layout = gtk_print_context_create_pango_layout(context);
     pango_layout_set_font_description(layout, font);
     pango_font_description_free(font);
-    if (po->p_label_width) {
-	PangoTabArray *tabs;
-	
-	pango_layout_set_indent(layout, -po->p_label_width);
-	tabs = pango_tab_array_new_with_positions(1, FALSE, PANGO_TAB_LEFT,
-						  po->p_label_width);
-	pango_layout_set_tabs(layout, tabs);
-	pango_tab_array_free(tabs);
+    if (po->p_label_width > 0) {
+    	PangoTabArray *tabs;
+
+    	pango_layout_set_indent(layout, -po->p_label_width);
+    	tabs = pango_tab_array_new_with_positions(1, FALSE, PANGO_TAB_LEFT,
+    			po->p_label_width);
+    	pango_layout_set_tabs(layout, tabs);
+    	pango_tab_array_free(tabs);
     }
     pango_layout_set_width(layout, po->p_layout_width);
     pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
     pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
     pango_layout_set_text(layout, po->headers, -1);
     pango_layout_get_size(layout, NULL, &p_height);
-    self->c_height = P_TO_C(p_height);	/* needed to properly print borders */
-    cairo_move_to(cairo_ctx, self->c_at_x, self->c_at_y);
+    c_height = P_TO_C(p_height);	/* needed to properly print borders */
+    cairo_move_to(cairo_ctx, rect->c_at_x, rect->c_at_y);
     pango_cairo_show_layout(cairo_ctx, layout);
     g_object_unref(G_OBJECT(layout));
 
     /* print a face image */
-    if (po->face) {
-	gdouble c_face_h;
-	gdouble c_face_w;
+    if (po->face != NULL) {
+    	gdouble c_face_h;
+    	gdouble c_face_w;
 
-	c_face_h = gdk_pixbuf_get_height(po->face);
-	c_face_w = gdk_pixbuf_get_width(po->face);
+    	c_face_h = gdk_pixbuf_get_height(po->face);
+    	c_face_w = gdk_pixbuf_get_width(po->face);
 
-	cairo_print_pixbuf(cairo_ctx, po->face,
-			   self->c_at_x + self->c_width - c_face_w,
-			   self->c_at_y, 1.0);
-	if (c_face_h > self->c_height)
-	    self->c_height = c_face_h;
+    	cairo_print_pixbuf(cairo_ctx, po->face,
+    			rect->c_at_x + rect->c_width - c_face_w,
+				rect->c_at_y, 1.0);
+    	if (c_face_h > c_height) {
+    		c_height = c_face_h;
+    	}
     }
+
+    /* update object height to the calculated value */
+    balsa_print_object_set_height(self, c_height);
 }
 
 

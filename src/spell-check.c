@@ -93,8 +93,6 @@ enum {
 
 
 /* initialization stuff */
-static void balsa_spell_check_class_init(BalsaSpellCheckClass *);
-static void balsa_spell_check_init(BalsaSpellCheck *);
 static void spch_set_property(GObject * object, guint prop_id,
                               const GValue * value, GParamSpec * pspec);
 static void spch_get_property(GObject * object, guint prop_id,

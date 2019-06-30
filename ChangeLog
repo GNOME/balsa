@@ -1,3 +1,20 @@
+2019-06-30  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Small LDAP address book improvements
+
+	* libbalsa/address-book-ldap.c:
+	  • implement helpers ldap_connection_get_uri(), ldap_connection_is_ldaps()
+	    and ldap_use_config_value();
+	  • libbalsa_address_book_ldap_open_connection(): use ldap_use_config_value()
+	    for the server uri; do not attempt to run STARTTLS for a
+	    ldaps connection--print warning instead;
+	  • libbalsa_address_book_set_status(),
+	    libbalsa_address_book_ldap_alias_complete(): use ldap_use_config_value()
+	    for the base DN;
+	  • use libbalsa_information() or g_debug() & friends with log domain “ab-ldap”
+	    for messaging
+	* src/address-book-config.c: fix misleading label in create_ldap_dialog()
+
 2019-06-29  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Migrate print objects to new scheme

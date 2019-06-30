@@ -500,7 +500,7 @@ create_ldap_dialog(AddressBookConfig * abc)
                                    libbalsa_address_book_get_name(LIBBALSA_ADDRESS_BOOK(ab)) : name,
 				   label);
 
-    label = libbalsa_create_grid_label(_("_Host Name"), grid, 1);
+    label = libbalsa_create_grid_label(_("_LDAP Server URI"), grid, 1);
     abc->ab_specific.ldap.host = 
 	libbalsa_create_grid_entry(grid, NULL, NULL, 1, 
 		     ab ? libbalsa_address_book_ldap_get_host(ab) : host, label);

@@ -53,7 +53,13 @@
 #include "libbalsa-conf.h"
 #include <glib/gi18n.h>
 
-static const int DEBUG_LDAP = 0;
+
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "ab-ldap"
+
+
 /* don't search when prefix has length shorter than LDAP_MIN_LEN */
 static const unsigned ABL_MIN_LEN=2;
 static const int ABL_SIZE_LIMIT = 5000;       /* full list   */
@@ -244,11 +250,11 @@ abl_interaction(unsigned flags, sasl_interact_t *interact,
     case SASL_CB_USER:   
     case SASL_CB_NOECHOPROMPT:
     case SASL_CB_ECHOPROMPT:  
-        printf("unhandled SASL request %d.\n", interact->id);
+        g_warning("unhandled SASL request %d", interact->id);
         return LDAP_INAVAILABLE;
     }
 
-    interact->result = ab_ldap->passwd;;
+    interact->result = ab_ldap->passwd;
     interact->len = interact->result ? strlen(interact->result) : 0;
     return LDAP_SUCCESS;
 }
@@ -259,7 +265,7 @@ int abl_interact(LDAP *ld, unsigned flags, void* defaults, void *interact )
     if( ld == NULL ) return LDAP_PARAM_ERROR;
 
     if (flags == LDAP_SASL_INTERACTIVE) {
-        fputs( _("SASL Interaction\n"), stderr );
+        g_debug("SASL Interaction");
     }
 
     while( interact->id != SASL_CB_LIST_END ) {
@@ -273,6 +279,51 @@ int abl_interact(LDAP *ld, unsigned flags, void* defaults, void *interact )
 }
 #endif
 
+
+/* note: free the returned value by calling ldap_memfree() */
+static gchar *
+ldap_connection_get_uri(LDAP *ldap)
+{
+	gchar *conn_uri;
+	int res;
+
+	res = ldap_get_option(ldap, LDAP_OPT_URI, &conn_uri);
+	if (res != LDAP_OPT_SUCCESS) {
+		ldap_memfree(conn_uri);
+		conn_uri = NULL;
+	}
+	return conn_uri;
+}
+
+
+static gboolean
+ldap_connection_is_ldaps(LDAP *ldap)
+{
+	gchar *conn_uri;
+	gboolean result = FALSE;
+
+	conn_uri = ldap_connection_get_uri(ldap);
+	if (conn_uri != NULL) {
+		result = (g_ascii_strncasecmp(conn_uri, "ldaps://", 8U) == 0);
+		ldap_memfree(conn_uri);
+	}
+	return result;
+}
+
+
+static inline const gchar *
+ldap_use_config_value(const gchar *item)
+{
+	/* if the URI or BASE entries from /etc/ldap/ldap.conf, $HOME/ldaprc, $HOME/.ldaprc or $CWD/ldaprc shall be used, they must
+	 * be given as NULL to the openldap functions, not as empty string. */
+	if ((item == NULL) || (item[0] == '\0')) {
+		return NULL;
+	} else {
+		return item;
+	}
+}
+
+
 static int
 libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab_ldap)
 {
@@ -281,9 +332,7 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab_ldap)
     gboolean v3_enabled;
     LibBalsaAddressBook *ab = LIBBALSA_ADDRESS_BOOK(ab_ldap);
 
-    g_return_val_if_fail(ab_ldap->host != NULL, FALSE);
-
-    ldap_initialize(&ab_ldap->directory, ab_ldap->host);
+    ldap_initialize(&ab_ldap->directory, ldap_use_config_value(ab_ldap->host));
     if (ab_ldap->directory == NULL) { /* very unlikely... */
         libbalsa_address_book_set_status(ab, _("Host not found"));
 	return LDAP_SERVER_DOWN;
@@ -292,17 +341,34 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab_ldap)
     v3_enabled = 
         ldap_set_option(ab_ldap->directory, LDAP_OPT_PROTOCOL_VERSION, &version)
        == LDAP_OPT_SUCCESS;
-    if(!v3_enabled) printf("Too old LDAP server - interaction may fail.\n");
-    if(v3_enabled && ab_ldap->enable_tls) {
+    if (!v3_enabled) {
+    	gchar *uri;
+
+    	uri = ldap_connection_get_uri(ab_ldap->directory);
+    	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+    			_("The LDAP server “%s” does not support LDAPv3, interaction may fail."), uri);
+    	ldap_memfree(uri);
+    }
+
+    if (v3_enabled && ab_ldap->enable_tls) {
 #ifdef HAVE_LDAP_TLS
-        /* turn TLS on  but what if we have SSL already on? */
-        result = ldap_start_tls_s(ab_ldap->directory, NULL, NULL);
-        if(result != LDAP_SUCCESS) {
-            ldap_unbind_ext(ab_ldap->directory, NULL, NULL);
-            ab_ldap->directory = NULL;
-            libbalsa_address_book_set_status(ab, ldap_err2string(result));
-            return result;
-        }
+    	if (ldap_connection_is_ldaps(ab_ldap->directory)) {
+        	gchar *uri;
+
+        	uri = ldap_connection_get_uri(ab_ldap->directory);
+    		g_message("LDAP address book '%s', URI '%s', uses TLS, ignore STARTTLS option",
+    				libbalsa_address_book_get_name(ab), uri);
+        	ldap_memfree(uri);
+    	} else {
+    		/* turn TLS on */
+    		result = ldap_start_tls_s(ab_ldap->directory, NULL, NULL);
+    		if (result != LDAP_SUCCESS) {
+    			ldap_unbind_ext(ab_ldap->directory, NULL, NULL);
+    			ab_ldap->directory = NULL;
+    			libbalsa_address_book_set_status(ab, ldap_err2string(result));
+    			return result;
+    		}
+    	}
 #else /* HAVE_LDAP_TLS */
      libbalsa_address_book_set_status(ab,
                                       _("TLS requested but not compiled in"));
@@ -382,10 +448,10 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
                               "(|(cn=%s*)(sn=%s*)(mail=%s*@*)))",
                               filter, filter, filter)
             : g_strdup("(&(objectClass=organizationalPerson)(mail=*))");
-	if(DEBUG_LDAP)
-	    g_print("Send LDAP request: %s (basedn=%s)\n", ldap_filter,
+	    g_debug("Send LDAP request: %s (basedn=%s)", ldap_filter,
 		    ab_ldap->base_dn);
-        if(ldap_search_ext(ab_ldap->directory, ab_ldap->base_dn,
+        if(ldap_search_ext(ab_ldap->directory,
+        		           ldap_use_config_value(ab_ldap->base_dn),
                            LDAP_SCOPE_SUBTREE, 
                            ldap_filter, book_attrs, 0, NULL, NULL,
                            NULL, ABL_SIZE_LIMIT, &msgid) != LDAP_SUCCESS) {
@@ -662,7 +728,7 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
 	}
         /* fall through */
         default:
-            fprintf(stderr, "ldap_add for dn=“%s” failed[0x%x]: %s\n",
+            g_warning("ldap_add for dn=“%s” failed[0x%x]: %s",
                     dn, rc, ldap_err2string(rc));
         }
     } while(cnt++<1);
@@ -707,7 +773,7 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
 	    }
             /* fall through */
         default:
-            fprintf(stderr, "ldap_delete for dn=“%s” failed[0x%x]: %s\n",
+            g_warning("ldap_delete for dn=“%s” failed[0x%x]: %s",
                     dn, rc, ldap_err2string(rc));
         }
     } while(cnt++<1);
@@ -831,7 +897,7 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
 	    }
             /* fall through */
         default:
-            fprintf(stderr, "ldap_modify for dn=“%s” failed[0x%x]: %s\n",
+            g_warning("ldap_modify for dn=“%s” failed[0x%x]: %s",
                     dn, rc, ldap_err2string(rc));
         }
     } while(cnt++<1);
@@ -1009,13 +1075,12 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 			     ldap, ldap, ldap);
     g_free(ldap);
     result = NULL;
-    rc = ldap_search_ext_s(ab_ldap->directory, ab_ldap->base_dn,
+    rc = ldap_search_ext_s(ab_ldap->directory, ldap_use_config_value(ab_ldap->base_dn),
                            LDAP_SCOPE_SUBTREE, filter, complete_attrs, 0, 
                            NULL, NULL, &timeout, ABL_SIZE_LIMIT_LOOKUP,
                            &result);
-    if(DEBUG_LDAP)
-        g_print("Sent LDAP request: %s (basedn=%s) res=0x%x\n", 
-                filter, ab_ldap->base_dn, rc);
+    g_debug("Sent LDAP request: %s (basedn=%s) res=0x%x",
+    		filter, ab_ldap->base_dn, rc);
     g_free(filter);
     switch (rc) {
     case LDAP_SUCCESS:
@@ -1032,20 +1097,27 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 	 * Particularly SIZELIMIT can be nasty on big directories.
 	 */
 	break;
-    case LDAP_SERVER_DOWN:
+    case LDAP_SERVER_DOWN: {
+    	gchar *uri;
+
+    	uri = ldap_connection_get_uri(ab_ldap->directory);
         libbalsa_address_book_ldap_close_connection(ab_ldap);
-        g_print("Server down. Next attempt will try to reconnect.\n");
+        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+        		_("LDAP server %s down, next attempt will try to reconnect."),
+				uri);
+        ldap_memfree(uri);
+    }
         break;
     default:
 	/*
 	 * Until we know for sure, complain about all other errors.
 	 */
-	fprintf(stderr, "alias_complete::ldap_search_st: %s\n",
+	g_warning("alias_complete::ldap_search_st: %s",
                 ldap_err2string(rc));
 	break;
     }
 
-    /* printf("ldap_alias_complete:: result=%p\n", result); */
+    g_debug("ldap_alias_complete:: result=%p", result);
     if(result) ldap_msgfree(result);
 
     if(res) res = g_list_reverse(res);

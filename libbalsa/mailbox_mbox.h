@@ -21,23 +21,15 @@
 #ifndef __LIBBALSA_MAILBOX_MBOX_H__
 #define __LIBBALSA_MAILBOX_MBOX_H__
 
-#define LIBBALSA_TYPE_MAILBOX_MBOX \
-    (libbalsa_mailbox_mbox_get_type())
-#define LIBBALSA_MAILBOX_MBOX(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_MBOX, \
-                                 LibBalsaMailboxMbox))
-#define LIBBALSA_MAILBOX_MBOX_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX_MBOX, \
-                              LibBalsaMailboxMboxClass))
-#define LIBBALSA_IS_MAILBOX_MBOX(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_MBOX))
-#define LIBBALSA_IS_MAILBOX_MBOX_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_MBOX))
+#define LIBBALSA_TYPE_MAILBOX_MBOX libbalsa_mailbox_mbox_get_type()
 
-typedef struct _LibBalsaMailboxMbox LibBalsaMailboxMbox;
-typedef struct _LibBalsaMailboxMboxClass LibBalsaMailboxMboxClass;
+G_DECLARE_FINAL_TYPE(LibBalsaMailboxMbox,
+                     libbalsa_mailbox_mbox,
+                     LIBBALSA,
+                     MAILBOX_MBOX,
+                     LibBalsaMailboxLocal)
 
-GType libbalsa_mailbox_mbox_get_type(void);
 LibBalsaMailbox *libbalsa_mailbox_mbox_new(const gchar * path,
                                            gboolean      create);
+
 #endif

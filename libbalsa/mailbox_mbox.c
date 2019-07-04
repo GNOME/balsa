@@ -61,10 +61,6 @@ struct message_info {
 #define FLAGS_REALLY_DIFFER(orig_flags, flags) \
     ((((orig_flags) ^ (flags)) & LIBBALSA_MESSAGE_FLAGS_REAL) != 0)
 
-static LibBalsaMailboxLocalClass *parent_class = NULL;
-
-static void libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass *klass);
-static void libbalsa_mailbox_mbox_init(LibBalsaMailboxMbox * mailbox);
 static void libbalsa_mailbox_mbox_dispose(GObject * object);
 
 static GMimeStream *libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox *
@@ -109,31 +105,9 @@ struct _LibBalsaMailboxMbox {
     gboolean messages_info_changed;
 };
 
-GType libbalsa_mailbox_mbox_get_type(void)
-{
-    static GType mailbox_type = 0;
-
-    if (!mailbox_type) {
-	static const GTypeInfo mailbox_info = {
-	    sizeof(LibBalsaMailboxMboxClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_mailbox_mbox_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaMailboxMbox),
-            0,                  /* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_mailbox_mbox_init
-	};
-
-	mailbox_type =
-	    g_type_register_static(LIBBALSA_TYPE_MAILBOX_LOCAL,
-	                           "LibBalsaMailboxMbox",
-                                   &mailbox_info, 0);
-    }
-
-    return mailbox_type;
-}
+G_DEFINE_TYPE(LibBalsaMailboxMbox,
+              libbalsa_mailbox_mbox,
+              LIBBALSA_TYPE_MAILBOX_LOCAL)
 
 static void
 libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
@@ -145,8 +119,6 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
     object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
     libbalsa_mailbox_local_class = LIBBALSA_MAILBOX_LOCAL_CLASS(klass);
-
-    parent_class = g_type_class_peek_parent(klass);
 
     libbalsa_mailbox_class->get_message_stream =
 	libbalsa_mailbox_mbox_get_message_stream;
@@ -182,15 +154,16 @@ libbalsa_mailbox_mbox_init(LibBalsaMailboxMbox * mbox)
 static void
 libbalsa_mailbox_mbox_dispose(GObject * object)
 {
-    if(MAILBOX_OPEN(LIBBALSA_MAILBOX(object)))
-	libbalsa_mailbox_mbox_close_mailbox(LIBBALSA_MAILBOX(object), FALSE);
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(object);
+
+    if (MAILBOX_OPEN(mailbox))
+	libbalsa_mailbox_mbox_close_mailbox(mailbox, FALSE);
+    G_OBJECT_CLASS(libbalsa_mailbox_mbox_parent_class)->dispose(object);
 }
 
 static gint
 lbm_mbox_check_files(const gchar * path, gboolean create)
 {
-    g_return_val_if_fail(path != NULL, -1);
-
     if (access(path, F_OK) == 0) {
         /* File exists. Check if it is an mbox... */
         if (libbalsa_mailbox_type_from_path(path) !=
@@ -291,8 +264,6 @@ libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox * mailbox,
     LibBalsaMailboxMbox *mbox;
     struct message_info *msg_info;
 
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MBOX(mailbox), NULL);
-
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     msg_info = message_info_from_msgno(mbox, msgno);
 
@@ -307,14 +278,12 @@ libbalsa_mailbox_mbox_get_message_stream(LibBalsaMailbox * mailbox,
 static void
 libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox)
 {
-    g_return_if_fail (LIBBALSA_IS_MAILBOX_MBOX(mailbox));
-
     if ( unlink(libbalsa_mailbox_local_get_path(mailbox)) == -1 )
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
 			     _("Could not remove %s:\n%s"), 
 			     libbalsa_mailbox_local_get_path(mailbox), 
 			     strerror(errno));
-    LIBBALSA_MAILBOX_LOCAL_CLASS(parent_class)->remove_files(mailbox);
+    LIBBALSA_MAILBOX_LOCAL_CLASS(libbalsa_mailbox_mbox_parent_class)->remove_files(mailbox);
 }
 
 static int mbox_lock(LibBalsaMailbox * mailbox, GMimeStream *stream)
@@ -1125,8 +1094,8 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
     if (mbox->msgno_2_msg_info->len != len)
         libbalsa_mailbox_changed(mailbox);
 
-    if (LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox)
-        LIBBALSA_MAILBOX_CLASS(parent_class)->close_mailbox(mailbox,
+    if (LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mbox_parent_class)->close_mailbox)
+        LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mbox_parent_class)->close_mailbox(mailbox,
                                                             expunge);
 
     /* Now it's safe to close the stream and free the message info. */
@@ -1766,7 +1735,7 @@ libbalsa_mailbox_mbox_fetch_message_structure(LibBalsaMailbox * mailbox,
     if (!message->mime_msg)
 	message->mime_msg = lbm_mbox_get_mime_message(mailbox, message->msgno);
 
-    return LIBBALSA_MAILBOX_CLASS(parent_class)->
+    return LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mbox_parent_class)->
         fetch_message_structure(mailbox, message, flags);
 }
 

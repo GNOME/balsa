@@ -21,37 +21,14 @@
 #ifndef __LIBBALSA_MAILBOX_MAILDIR_H__
 #define __LIBBALSA_MAILBOX_MAILDIR_H__
 
-#define LIBBALSA_TYPE_MAILBOX_MAILDIR \
-    (libbalsa_mailbox_maildir_get_type())
-#define LIBBALSA_MAILBOX_MAILDIR(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_MAILDIR, \
-                                 LibBalsaMailboxMaildir))
-#define LIBBALSA_MAILBOX_MAILDIR_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX_MAILDIR, \
-                              LibBalsaMailboxMaildirClass))
-#define LIBBALSA_IS_MAILBOX_MAILDIR(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_MAILDIR))
-#define LIBBALSA_IS_MAILBOX_MAILDIR_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE ((klass), LIBBALSA_TYPE_MAILBOX_MAILDIR))
+#define LIBBALSA_TYPE_MAILBOX_MAILDIR libbalsa_mailbox_maildir_get_type()
 
-typedef struct _LibBalsaMailboxMaildir LibBalsaMailboxMaildir;
-typedef struct _LibBalsaMailboxMaildirClass LibBalsaMailboxMaildirClass;
+G_DECLARE_FINAL_TYPE(LibBalsaMailboxMaildir,
+                     libbalsa_mailbox_maildir,
+                     LIBBALSA,
+                     MAILBOX_MAILDIR,
+                     LibBalsaMailboxLocal)
 
-struct _LibBalsaMailboxMaildir {
-    LibBalsaMailboxLocal parent;
-
-    GHashTable* messages_info;
-    GPtrArray* msgno_2_msg_info;
-    gchar *curdir;
-    gchar *newdir;
-    gchar *tmpdir;
-};
-
-struct _LibBalsaMailboxMaildirClass {
-    LibBalsaMailboxLocalClass klass;
-};
-
-GType libbalsa_mailbox_maildir_get_type(void);
 LibBalsaMailbox *libbalsa_mailbox_maildir_new(const gchar * path,
                                               gboolean      create);
 

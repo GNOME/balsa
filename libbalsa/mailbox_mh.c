@@ -48,8 +48,6 @@ struct message_info {
 
 #define REAL_FLAGS(flags) (flags & LIBBALSA_MESSAGE_FLAGS_REAL)
 
-static void libbalsa_mailbox_mh_class_init(LibBalsaMailboxMhClass *klass);
-static void libbalsa_mailbox_mh_init(LibBalsaMailboxMh * mailbox);
 static void libbalsa_mailbox_mh_finalize(GObject * object);
 static void libbalsa_mailbox_mh_load_config(LibBalsaMailbox * mailbox,
                                             const gchar * prefix);

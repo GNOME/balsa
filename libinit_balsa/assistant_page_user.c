@@ -200,12 +200,17 @@ create_pop3_mbx(const gchar *name, const gchar* host, gint security,
     LibBalsaMailboxPop3 *pop = libbalsa_mailbox_pop3_new();
     LibBalsaMailbox *mbx   = LIBBALSA_MAILBOX(pop);
     LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(pop);
+    gchar *mailbox_name;
 
     libbalsa_server_set_username(server, login);
     libbalsa_server_set_password(server, passwd, FALSE);
     libbalsa_server_set_host(server, host, security);
     libbalsa_server_set_remember_password(server, remember);
-    mbx->name               = g_strdup(name && *name ? name : host);
+
+    mailbox_name = g_strdup(name && *name ? name : host);
+    libbalsa_mailbox_set_name(mbx, mailbox_name);
+    g_free(mailbox_name);
+
     pop->check              = TRUE;
     pop->disable_apop       = FALSE;
     pop->delete_from_server = TRUE;

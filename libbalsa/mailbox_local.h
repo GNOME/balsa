@@ -101,8 +101,8 @@ gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 void libbalsa_mailbox_local_set_threading_info(LibBalsaMailboxLocal *
                                                local);
 
-#define libbalsa_mailbox_local_get_path(mbox) \
-	((const gchar *) (LIBBALSA_MAILBOX(mbox))->url+7)
+#define libbalsa_mailbox_local_get_path(local) \
+	(libbalsa_mailbox_get_url((LibBalsaMailbox*)local)+7)
 
 void libbalsa_mailbox_local_load_messages(LibBalsaMailbox * mailbox,
 					  guint last_msgno);

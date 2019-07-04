@@ -320,7 +320,7 @@ mw_set_buttons_sensitive(MessageWindow * mw)
     enable = index && balsa_index_previous_msgno(index, current_msgno) > 0;
     mw_set_enabled(mw, "previous-message", enable);
 
-    enable = index && index->mailbox_node->mailbox->unread_messages > 0;
+    enable = index && libbalsa_mailbox_get_unread_messages(index->mailbox_node->mailbox) > 0;
     mw_set_enabled(mw, "next-unread", enable);
 
     enable = index
@@ -845,7 +845,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 
     g_signal_connect(G_OBJECT(window), "destroy",
 		     G_CALLBACK(destroy_message_window), mw);
-    
+
     mw->bindex = balsa_find_index_by_mailbox(mailbox);
     g_object_weak_ref(G_OBJECT(mw->bindex), mw_bindex_closed_cb, mw);
     g_signal_connect_swapped(G_OBJECT(mw->bindex), "index-changed",
@@ -863,14 +863,14 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
                           &move_menu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(move_menu), submenu);
 
-    if (mailbox->readonly) {
+    if (libbalsa_mailbox_get_readonly(mailbox)) {
 	gtk_widget_set_sensitive(move_menu, FALSE);
 	mw_disable_trash(mw);
     }
     if (mailbox == balsa_app.trash)
 	mw_disable_trash(mw);
     mw->bmessage = balsa_message_new();
-    
+
     gtk_box_pack_start(GTK_BOX(vbox), mw->bmessage, TRUE, TRUE, 0);
     gtk_widget_show(vbox);
 

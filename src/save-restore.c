@@ -74,10 +74,16 @@ static inline gboolean is_special_name(const gchar *name);
     g_strdup(BALSA_MAILBOX_NODE(mn)->config_prefix) : \
     config_get_unused_group(FOLDER_SECTION_PREFIX)
 
-#define mailbox_section_path(mbox) \
-    LIBBALSA_MAILBOX(mbox)->config_prefix ? \
-    g_strdup(LIBBALSA_MAILBOX(mbox)->config_prefix) : \
-    config_get_unused_group(MAILBOX_SECTION_PREFIX)
+static gchar *
+mailbox_section_path(LibBalsaMailbox * mailbox)
+{
+    const gchar *config_prefix =
+        libbalsa_mailbox_get_config_prefix(mailbox);
+
+    return config_prefix != NULL ?
+        g_strdup(config_prefix) :
+        config_get_unused_group(MAILBOX_SECTION_PREFIX);
+}
 
 static gchar *
 address_book_section_path(LibBalsaAddressBook *address_book)
@@ -273,17 +279,19 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
     default:
 	return;
     }
-    if ((old_mailbox = *special)) {
-        *special = NULL;
-        g_free(old_mailbox->config_prefix);
-        old_mailbox->config_prefix = NULL;
+    if ((old_mailbox = *special) != NULL) {
+        gchar *basename;
 
-        g_free(old_mailbox->name);
-        old_mailbox->name = g_path_get_basename(old_mailbox->url);
+        *special = NULL;
+        libbalsa_mailbox_set_config_prefix(old_mailbox, NULL);
+
+        basename = g_path_get_basename(libbalsa_mailbox_get_url(old_mailbox));
+        libbalsa_mailbox_set_name(old_mailbox, basename);
+        g_free(basename);
 
         if (!LIBBALSA_IS_MAILBOX_LOCAL(old_mailbox)
             || !libbalsa_path_is_below_dir(libbalsa_mailbox_local_get_path
-                                           (old_mailbox),
+                                           ((LibBalsaMailboxLocal *) old_mailbox),
                                            balsa_app.local_mail_directory))
             config_mailbox_add(old_mailbox, NULL);
 
@@ -295,8 +303,7 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 	g_object_unref(mbnode);
     }
     config_mailbox_delete(mailbox);
-    g_free(mailbox->name);
-    mailbox->name = g_strdup(specialNames[which]);
+    libbalsa_mailbox_set_name(mailbox, specialNames[which]);
     config_mailbox_add(mailbox, specialNames[which]);
 
     *special = mailbox;
@@ -309,7 +316,8 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 
     switch(which) {
     case SPECIAL_SENT: 
-	balsa_mblist_mru_add(&balsa_app.fcc_mru, mailbox->url); break;
+	balsa_mblist_mru_add(&balsa_app.fcc_mru, libbalsa_mailbox_get_url(mailbox));
+        break;
     case SPECIAL_TRASH:
         libbalsa_filters_set_trash(balsa_app.trash); break;
     default: break;
@@ -390,7 +398,8 @@ gint config_folder_add(BalsaMailboxNode * mbnode, const char *key_arg)
 }				/* config_mailbox_add */
 
 /* removes from the configuration only */
-gint config_mailbox_delete(const LibBalsaMailbox * mailbox)
+gint
+config_mailbox_delete(LibBalsaMailbox * mailbox)
 {
     gchar *tmp;			/* the key in the mailbox section name */
     gint res;
@@ -488,7 +497,7 @@ config_mailbox_init(const gchar * prefix)
 	    special = &balsa_app.inbox;
 	else if (strcmp(OUTBOX_NAME, key) == 0) {
 	    special = &balsa_app.outbox;
-            mailbox->no_reassemble = TRUE;
+            libbalsa_mailbox_set_no_reassemble(mailbox, TRUE);
         } else if (strcmp(SENTBOX_NAME, key) == 0)
 	    special = &balsa_app.sentbox;
 	else if (strcmp(DRAFTS_NAME, key) == 0)
@@ -1982,11 +1991,15 @@ config_filters_save(void)
 void
 config_mailbox_filters_save(LibBalsaMailbox * mbox)
 {
+    const gchar *url;
     gchar * tmp;
 
-    g_return_if_fail(mbox);
-    tmp = mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
-    if (!mbox->filters) {
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mbox));
+
+    url = libbalsa_mailbox_get_url(mbox);
+    tmp = mailbox_filters_section_lookup(url !=NULL ? url :
+                                         libbalsa_mailbox_get_name(mbox));
+    if (libbalsa_mailbox_get_filters(mbox) == NULL) {
 	if (tmp) {
 	    libbalsa_conf_remove_group(tmp);
 	    g_free(tmp);
@@ -1998,7 +2011,7 @@ config_mailbox_filters_save(LibBalsaMailbox * mbox)
 	tmp=config_get_unused_group(MAILBOX_FILTERS_SECTION_PREFIX);
 	libbalsa_conf_push_group(tmp);
 	g_free(tmp);
-	libbalsa_conf_set_string(MAILBOX_FILTERS_URL_KEY,mbox->url);
+	libbalsa_conf_set_string(MAILBOX_FILTERS_URL_KEY, url);
     }
     else {
 	libbalsa_conf_push_group(tmp);

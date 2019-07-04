@@ -1030,6 +1030,7 @@ static void
 bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
 {
     struct update_mbox_data *umd;
+    LibBalsaMailboxState state;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
@@ -1046,8 +1047,9 @@ bmbl_mailbox_changed_cb(LibBalsaMailbox * mailbox, gpointer data)
         g_idle_add((GSourceFunc) update_mailbox_idle, umd);
     }
 
-    umd->notify = (mailbox->state == LB_MAILBOX_STATE_OPEN
-                   || mailbox->state == LB_MAILBOX_STATE_CLOSED);
+    state = libbalsa_mailbox_get_state(mailbox);
+    umd->notify = (state == LB_MAILBOX_STATE_OPEN
+                   || state == LB_MAILBOX_STATE_CLOSED);
 
     G_UNLOCK(mblist_update);
 }
@@ -1337,7 +1339,7 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 		? BALSA_PIXMAP_MBOX_TRAY_FULL
                 : BALSA_PIXMAP_MBOX_TRAY_EMPTY;
 
-            name = mailbox->name;
+            name = libbalsa_mailbox_get_name(mailbox);
 
             /* Make sure the show column is set before showing the
              * mailbox in the list. */
@@ -1480,12 +1482,14 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
           mailbox == balsa_app.draftbox || mailbox == balsa_app.trash)) {
         const gchar *icon;
         const gchar *name;
+        const gchar *mailbox_name;
         gchar *tmp = NULL;
         PangoWeight weight;
 
         /* Set the style appropriate for unread_messages; we do this
          * even if the state hasn't changed, because we might be
          * rerendering after hiding or showing the info columns. */
+        mailbox_name = libbalsa_mailbox_get_name(mailbox);
         if (unread_messages > 0) {
             gboolean display_info;
 
@@ -1495,16 +1499,16 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
                                            (G_OBJECT(model),
                                             BALSA_MBLIST_DISPLAY_INFO));
             name = (!display_info && total_messages >= 0) ?
-                (tmp = g_strdup_printf("%s (%d)", mailbox->name,
+                (tmp = g_strdup_printf("%s (%d)", mailbox_name,
                                       unread_messages))
-                : mailbox->name;
+                : mailbox_name;
 
             weight = PANGO_WEIGHT_BOLD;
             mbnode->style |= MBNODE_STYLE_NEW_MAIL;
         } else {
             icon = (mailbox == balsa_app.inbox) ?
                 BALSA_PIXMAP_MBOX_IN : BALSA_PIXMAP_MBOX_TRAY_EMPTY;
-            name = mailbox->name;
+            name = mailbox_name;
             weight = PANGO_WEIGHT_NORMAL;
             mbnode->style &= ~MBNODE_STYLE_NEW_MAIL;
         }
@@ -1751,7 +1755,7 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
         if (mailbox || (allow_empty && !*url)) {
             mru = bmbl_mru_new(url_list, user_func, user_data, url);
             item =
-                gtk_menu_item_new_with_label(mailbox ? mailbox->name : "");
+                gtk_menu_item_new_with_label(mailbox ? libbalsa_mailbox_get_name(mailbox) : "");
             gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
             g_signal_connect_data(item, "activate",
                                   G_CALLBACK(bmbl_mru_activate_cb), mru,
@@ -1948,7 +1952,7 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
         model = gtk_tree_view_get_model(tree_view);
         gtk_tree_model_get_iter(model, &iter, path);
         gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
-        ((BalsaMBListMRUEntry *) data)->url = g_strdup(mbnode->mailbox->url);
+        ((BalsaMBListMRUEntry *) data)->url = g_strdup(libbalsa_mailbox_get_url(mbnode->mailbox));
 	g_object_unref(mbnode);
         bmbl_mru_activate_cb(NULL, data);
 
@@ -1982,7 +1986,7 @@ bmbl_mru_activated_cb(GtkTreeView * tree_view, GtkTreePath * path,
 
     if (mbnode->mailbox) {
         ((BalsaMBListMRUEntry *) data)->url =
-            g_strdup(mbnode->mailbox->url);
+            g_strdup(libbalsa_mailbox_get_url(mbnode->mailbox));
         bmbl_mru_activate_cb(NULL, data);
 
         gtk_dialog_response(GTK_DIALOG

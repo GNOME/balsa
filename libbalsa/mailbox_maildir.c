@@ -264,7 +264,7 @@ libbalsa_mailbox_maildir_new(const gchar * path, gboolean create)
 
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_MAILDIR, NULL);
 
-    mailbox->is_directory = TRUE;
+    libbalsa_mailbox_set_is_directory(mailbox, TRUE);
 
     if (libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mailbox),
                                         path, create) != 0) {
@@ -326,8 +326,10 @@ static void
 lbm_maildir_remove_files(LibBalsaMailboxLocal *mailbox)
 {
     const gchar* path;
+
     g_return_if_fail(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
-    path = libbalsa_mailbox_local_get_path(mailbox);
+
+    path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
     g_print("DELETE MAILDIR\n");
 
     if (!libbalsa_delete_directory_contents(path)) {
@@ -386,6 +388,7 @@ static LibBalsaMessageFlag parse_filename(const gchar *subdir,
 static void lbm_maildir_parse(LibBalsaMailboxMaildir * mdir,
                               const gchar *subdir, guint * fileno)
 {
+    const gchar *local_path;
     gchar *path;
     GDir *dir;
     GHashTable *messages_info;
@@ -396,8 +399,8 @@ static void lbm_maildir_parse(LibBalsaMailboxMaildir * mdir,
     LibBalsaMessageFlag flags;
     LibBalsaMailbox *mailbox = (LibBalsaMailbox *) mdir;
 
-    path = g_build_filename(libbalsa_mailbox_local_get_path(mailbox),
-			    subdir, NULL);
+    local_path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
+    path = g_build_filename(local_path, subdir, NULL);
     dir = g_dir_open(path, 0, NULL);
     g_free(path);
     if (dir == NULL)
@@ -477,7 +480,7 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox, GError **err)
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox), FALSE);
 
     mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
 
     if (stat(path, &st) == -1) {
 	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
@@ -492,16 +495,17 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox, GError **err)
     if (stat(mdir->tmpdir, &st) != -1)
 	libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
 
-    mailbox->readonly = 
+    libbalsa_mailbox_set_readonly(mailbox,
 	!(access(mdir->curdir, W_OK) == 0 &&
           access(mdir->newdir, W_OK) == 0 &&
-          access(mdir->tmpdir, W_OK) == 0);
+          access(mdir->tmpdir, W_OK) == 0));
 
-    mailbox->unread_messages = 0;
+    libbalsa_mailbox_clear_unread_messages(mailbox);
     lbm_maildir_parse_subdirs(mdir);
 #ifdef DEBUG
     g_print(_("%s: Opening %s Refcount: %d\n"),
-	    "LibBalsaMailboxMaildir", mailbox->name, mailbox->open_ref);
+	    "LibBalsaMailboxMaildir", libbalsa_mailbox_get_name(mailbox),
+            libbalsa_mailbox_get_open_ref(mailbox));
 #endif
     return TRUE;
 }
@@ -570,7 +574,7 @@ libbalsa_mailbox_maildir_check(LibBalsaMailbox * mailbox)
     }
 
     /* Was any message removed? */
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
     renumber = mdir->msgno_2_msg_info->len + 1;
     for (msgno = 1; msgno <= mdir->msgno_2_msg_info->len; ) {
 	gchar *filename;
@@ -748,7 +752,7 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
      * record mtime of dirs
      */
     LibBalsaMailboxMaildir *mdir = LIBBALSA_MAILBOX_MAILDIR(mailbox);
-    const gchar *path = libbalsa_mailbox_local_get_path(mailbox);
+    const gchar *path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
     GSList *removed_list = NULL;
     gboolean ok = TRUE;
     GSList *l;
@@ -771,7 +775,7 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    continue;
 	}
 
-	if (mailbox->state == LB_MAILBOX_STATE_CLOSING)
+	if (libbalsa_mailbox_get_state(mailbox) == LB_MAILBOX_STATE_CLOSING)
 	    msg_info->local_info.flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
 	if (((msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_RECENT)
              && strcmp(msg_info->subdir, "new") != 0)
@@ -813,7 +817,7 @@ libbalsa_mailbox_maildir_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
         /* Reparse, to get the fileno entries right. */
         lbm_maildir_parse_subdirs(mdir);
-        mailbox->msg_tree_changed = TRUE;
+        libbalsa_mailbox_set_msg_tree_changed(mailbox, TRUE);
 
         if (stat(mdir->tmpdir, &st) == 0)
             libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);

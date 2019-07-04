@@ -47,7 +47,7 @@ void config_defclient_save(void);
 
 gchar *mailbox_get_pkey(const LibBalsaMailbox * mbox);
 gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg);
-gint config_mailbox_delete(const LibBalsaMailbox * mailbox);
+gint config_mailbox_delete(LibBalsaMailbox * mailbox);
 gint config_mailbox_update(LibBalsaMailbox * mailbox);
 
 gint config_folder_add(BalsaMailboxNode * mbnode, const char *key_arg);

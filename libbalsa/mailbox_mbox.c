@@ -223,7 +223,7 @@ libbalsa_mailbox_mbox_new(const gchar * path, gboolean create)
 
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_MBOX, NULL);
 
-    mailbox->is_directory = FALSE;
+    libbalsa_mailbox_set_is_directory(mailbox, FALSE);
 
     if (libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mailbox),
                                         path, create) != 0) {
@@ -319,14 +319,16 @@ libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox)
 
 static int mbox_lock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 {
-    const gchar *path = libbalsa_mailbox_local_get_path(mailbox);
+    const gchar *path =
+        libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mailbox));
     int fd = GMIME_STREAM_FS(stream)->fd;
     return libbalsa_lock_file(path, fd, FALSE, TRUE, 1);
 }
 
 static void mbox_unlock(LibBalsaMailbox * mailbox, GMimeStream *stream)
 {
-    const gchar *path = libbalsa_mailbox_local_get_path(mailbox);
+    const gchar *path =
+        libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mailbox));
     int fd = GMIME_STREAM_FS(stream)->fd;
     libbalsa_unlock_file(path, fd, 1);
 }
@@ -679,11 +681,12 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
     LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     struct stat st;
     const gchar* path;
+    gboolean readonly;
     int fd;
     GMimeStream *gmime_stream;
     time_t t0;
 
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mailbox));
 
     if (stat(path, &st) == -1) {
 	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
@@ -691,8 +694,9 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 	return FALSE;
     }
 
-    mailbox->readonly = access (path, W_OK);
-    fd = open(path, mailbox->readonly ? O_RDONLY : O_RDWR);
+    readonly = access (path, W_OK);
+    libbalsa_mailbox_set_readonly(mailbox, readonly);
+    fd = open(path, readonly ? O_RDONLY : O_RDWR);
     if (fd == -1) {
 	g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_OPEN_ERROR,
 		    _("Cannot open mailbox."));
@@ -730,7 +734,7 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
     mbox->msgno_2_msg_info =
         g_ptr_array_new_with_free_func((GDestroyNotify) free_message_info);
 
-    mailbox->unread_messages = 0;
+    libbalsa_mailbox_clear_unread_messages(mailbox);
     time(&t0);
 
     if (st.st_size > 0) {
@@ -979,7 +983,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     g_assert(LIBBALSA_IS_MAILBOX_MBOX(mailbox));
 
     mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mailbox));
     if (mbox->gmime_stream ?
         fstat(GMIME_STREAM_FS(mbox->gmime_stream)->fd, &st) :
         stat(path, &st)) {
@@ -1076,7 +1080,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 
         if ((msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_NEW)
             && !(msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_DELETED))
-            --mailbox->unread_messages;
+            libbalsa_mailbox_add_to_unread_messages(mailbox, -1);
 
 	/* We must drop the mime-stream lock to call
 	 * libbalsa_mailbox_local_msgno_removed(), as it will grab the
@@ -1432,7 +1436,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	return TRUE;
     mbox_stream = mbox->gmime_stream;
 
-    path = libbalsa_mailbox_local_get_path(mailbox);
+    path = libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mailbox));
 
     /* lock mailbox file */
     if (mbox_lock(mailbox, mbox_stream) != 0)
@@ -1457,7 +1461,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     for (i = j = 0; i < messages; i++)
     {
 	msg_info = message_info_from_msgno(mbox, i + 1);
-	if (mailbox->state == LB_MAILBOX_STATE_CLOSING)
+	if (libbalsa_mailbox_get_state(mailbox) == LB_MAILBOX_STATE_CLOSING)
 	    msg_info->local_info.flags &= ~LIBBALSA_MESSAGE_FLAG_RECENT;
 	if (expunge && (msg_info->local_info.flags & LIBBALSA_MESSAGE_FLAG_DELETED))
 	    break;
@@ -1643,7 +1647,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     unlink(tempfile); /* remove partial copy of the mailbox */
     g_free(tempfile);
 
-    if (mailbox->state == LB_MAILBOX_STATE_CLOSING) {
+    if (libbalsa_mailbox_get_state(mailbox) == LB_MAILBOX_STATE_CLOSING) {
 	/* Just shorten the msg_info array. */
 	for (j = first; j < mbox->msgno_2_msg_info->len; ) {
 	    msg_info = message_info_from_msgno(mbox, j + 1);

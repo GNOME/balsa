@@ -97,9 +97,12 @@ mailbox_filters_section_lookup(const gchar * name)
 void
 config_mailbox_filters_load(LibBalsaMailbox * mbox)
 {
+    const gchar *url;
     gchar * group;
 
-    group = mailbox_filters_section_lookup(mbox->url ? mbox->url : mbox->name);
+    url = libbalsa_mailbox_get_url(mbox);
+    group = mailbox_filters_section_lookup(url != NULL ? url :
+                                           libbalsa_mailbox_get_name(mbox));
     if (group) {
 	libbalsa_conf_push_group(group);
 	g_free(group);

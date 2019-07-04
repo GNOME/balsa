@@ -148,11 +148,11 @@ libbalsa_mailbox_pop3_finalize(GObject * object)
 LibBalsaMailboxPop3*
 libbalsa_mailbox_pop3_new(void)
 {
-    LibBalsaMailboxPop3 *mailbox;
+    LibBalsaMailboxPop3 *mailbox_pop3;
 
-    mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_POP3, NULL);
+    mailbox_pop3 = g_object_new(LIBBALSA_TYPE_MAILBOX_POP3, NULL);
 
-    return mailbox;
+    return mailbox_pop3;
 }
 
 
@@ -431,16 +431,26 @@ message_cb(const gchar                    *buffer,
 
 		notify_progress(fd);
 		if (fd->filter_path == NULL) {
-			GError *add_err = NULL;
+                    GError *add_err = NULL;
+                    LibBalsaMailbox *mailbox;
+                    LibBalsaMailbox *inbox;
+
+                    mailbox = fd->mailbox;
+                    inbox = LIBBALSA_MAILBOX_POP3(mailbox)->inbox;
 
 		    g_mime_stream_reset(fd->handler->mbx_stream);
-		    result = libbalsa_mailbox_add_message(LIBBALSA_MAILBOX_POP3(fd->mailbox)->inbox, fd->handler->mbx_stream,
-		    	LIBBALSA_MESSAGE_FLAG_NEW | LIBBALSA_MESSAGE_FLAG_RECENT, &add_err);
+		    result =
+                        libbalsa_mailbox_add_message(inbox, fd->handler->mbx_stream,
+                                                     LIBBALSA_MESSAGE_FLAG_NEW |
+                                                     LIBBALSA_MESSAGE_FLAG_RECENT,
+                                                     &add_err);
 		    if (!result) {
 		        libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("Error appending message %d from %s to %s: %s"),
-		        	info->id, fd->mailbox->name, LIBBALSA_MAILBOX_POP3(fd->mailbox)->inbox->name,
-					(add_err != NULL) ? add_err->message : "?");
-		        g_error_free(add_err);
+		        	info->id,
+                                libbalsa_mailbox_get_name(mailbox),
+                                libbalsa_mailbox_get_name(inbox),
+                                add_err != NULL ? add_err->message : "?");
+		        g_clear_error(&add_err);
 		    }
 		}
 
@@ -462,11 +472,12 @@ message_cb(const gchar                    *buffer,
 
 
 static NetClientPop *
-libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
-							  const LibBalsaMailboxPop3 *mbox,
-							  const gchar               *name,
-							  GList                    **msg_list)
+libbalsa_mailbox_pop3_startup(LibBalsaServer      *server,
+                              LibBalsaMailboxPop3 *mailbox_pop3,
+                              const gchar         *name,
+                              GList              **msg_list)
 {
+        LibBalsaMailbox *mailbox = (LibBalsaMailbox *) mailbox_pop3;
         NetClientCryptMode security;
         const gchar *host;
 	NetClientPop *pop;
@@ -477,9 +488,9 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
         security = libbalsa_server_get_security(server);
         host = libbalsa_server_get_host(server);
 	if (security == NET_CLIENT_CRYPT_ENCRYPTED) {
-		pop = net_client_pop_new(host, 995U, security, mbox->enable_pipe);
+		pop = net_client_pop_new(host, 995U, security, mailbox_pop3->enable_pipe);
 	} else {
-		pop = net_client_pop_new(host, 110U, security, mbox->enable_pipe);
+		pop = net_client_pop_new(host, 110U, security, mailbox_pop3->enable_pipe);
 	}
 	if (pop == NULL) {
 		return NULL;
@@ -488,7 +499,7 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	/* configure the mailbox connection; allow all (including plain text) auth methods even for unencrypted connections so using
 	 * e.g. popfile on localhost is possible, i.e. the user is responsible for choosing a proper security mode */
 	allow_auth = NET_CLIENT_POP_AUTH_ALL;
-	if (mbox->disable_apop) {
+	if (mailbox_pop3->disable_apop) {
 		allow_auth &= ~NET_CLIENT_POP_AUTH_APOP;
 	}
 	net_client_pop_allow_auth(pop, TRUE, allow_auth);
@@ -518,7 +529,7 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(libbalsa_server_get_auth), server);
 
 	/* connect server */
-	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mbox), LIBBALSA_NTFY_INIT, INFINITY, _("Connecting %s…"), host);
+	libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_INIT, INFINITY, _("Connecting %s…"), host);
 	if (!net_client_pop_connect(pop, NULL, &error)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s: cannot connect %s: %s"), name, host,
 			error->message);
@@ -533,8 +544,8 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 	}
 
 	/* load message list */
-	libbalsa_mailbox_progress_notify(LIBBALSA_MAILBOX(mbox), LIBBALSA_NTFY_UPDATE, INFINITY, _("List messages…"));
-	if (!net_client_pop_list(pop, msg_list, !mbox->delete_from_server, &error)) {
+	libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_UPDATE, INFINITY, _("List messages…"));
+	if (!net_client_pop_list(pop, msg_list, !mailbox_pop3->delete_from_server, &error)) {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s error: %s"), name, error->message);
 		g_error_free(error);
 		net_client_shutdown(NET_CLIENT(pop));
@@ -548,10 +559,10 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer            *server,
 
 static GList *
 update_msg_list(struct fetch_data         *fd,
-				const LibBalsaMailboxPop3 *mbox,
-				GHashTable               **current_uids,
-				LibBalsaServer            *server,
-				GList                     *msg_list)
+                const LibBalsaMailboxPop3 *mailbox_pop3,
+                GHashTable               **current_uids,
+                LibBalsaServer            *server,
+                GList                     *msg_list)
 {
 	GHashTable *uids = NULL;
 	gchar *uid_prefix = NULL;
@@ -559,7 +570,7 @@ update_msg_list(struct fetch_data         *fd,
 	GList *p;
 
 	/* load uid's if messages shall be left on the server */
-	if (!mbox->delete_from_server) {
+	if (!mailbox_pop3->delete_from_server) {
 		uid_prefix = g_strconcat(libbalsa_server_get_user(server), "@",
                                          libbalsa_server_get_host(server), NULL);
 		prefix_len = strlen(uid_prefix);
@@ -577,7 +588,8 @@ update_msg_list(struct fetch_data         *fd,
 		GList* next = p->next;
 
 		/* check for oversized message */
-		if ((mbox->msg_size_limit > 0) && (msg_info->size >= (gsize) mbox->msg_size_limit)) {
+		if ((mailbox_pop3->msg_size_limit > 0) &&
+                        (msg_info->size >= (gsize) mailbox_pop3->msg_size_limit)) {
 			gchar *size_str;
 
 			size_str = libbalsa_size_to_gchar(msg_info->size);
@@ -588,7 +600,7 @@ update_msg_list(struct fetch_data         *fd,
 		}
 
 		/* check if we already know this message */
-		if (!skip && !mbox->delete_from_server) {
+		if (!skip && !mailbox_pop3->delete_from_server) {
 			gchar *full_uid = g_strconcat(uid_prefix, " ", msg_info->uid, NULL);
 
 			g_hash_table_insert(*current_uids, full_uid, GINT_TO_POINTER(1));
@@ -609,7 +621,7 @@ update_msg_list(struct fetch_data         *fd,
 	}
 
 	/* copy all keys /not/ starting with the prefix from the old to the current hash table, and drop the old table */
-	if (!mbox->delete_from_server && (msg_list != NULL)) {
+	if (!mailbox_pop3->delete_from_server && (msg_list != NULL)) {
 		GHashTableIter iter;
 		gpointer key;
 
@@ -633,19 +645,20 @@ update_msg_list(struct fetch_data         *fd,
 static void
 libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 {
-	LibBalsaMailboxPop3 *mbox = LIBBALSA_MAILBOX_POP3(mailbox);
+	LibBalsaMailboxPop3 *mailbox_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
 	LibBalsaServer *server;
 	NetClientPop *pop;
 	GList *msg_list;
 
-	if (!mbox->check || (mbox->inbox == NULL)) {
+	if (!mailbox_pop3->check || (mailbox_pop3->inbox == NULL)) {
 		return;
 	}
 
-	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mbox);
+	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox_pop3);
 
 	/* open the mailbox connection and get the messages list (note: initiates the progress dialogue) */
-	pop = libbalsa_mailbox_pop3_startup(server, mbox, mailbox->name, &msg_list);
+	pop = libbalsa_mailbox_pop3_startup(server, mailbox_pop3,
+                                            libbalsa_mailbox_get_name(mailbox), &msg_list);
 
 	/* proceed on success only */
 	if (pop != NULL) {
@@ -661,7 +674,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 		/* nothing to do if no messages are on the server */
 		if (msg_list != NULL) {
 			/* load uid's if messages shall be left on the server */
-			msg_list = update_msg_list(&fd, mbox, &current_uids, server, msg_list);
+			msg_list = update_msg_list(&fd, mailbox_pop3, &current_uids,
+                                                   server, msg_list);
 		}
 
 		/* download messages unless the list is empty */
@@ -673,13 +687,13 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 				ngettext("%lu new message (%s)", "%lu new messages (%s)", fd.total_messages),
 				(unsigned long) fd.total_messages, fd.total_size_msg);
 
-			if (mbox->filter) {
-				fd.filter_path = mbox->filter_cmd;
+			if (mailbox_pop3->filter) {
+				fd.filter_path = mailbox_pop3->filter_cmd;
 			}
 
 			if (result) {
 				result = net_client_pop_retr(pop, msg_list, message_cb, &fd, &err);
-				if (result && mbox->delete_from_server) {
+				if (result && mailbox_pop3->delete_from_server) {
 					libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_UPDATE, INFINITY,
 						_("Deleting messages on server…"));
 					result = net_client_pop_dele(pop, msg_list, &err);
@@ -692,7 +706,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 		}
 
 		/* store uid list */
-		if (result && !mbox->delete_from_server) {
+		if (result && !mailbox_pop3->delete_from_server) {
 			gchar *uid_prefix =
                             g_strconcat(libbalsa_server_get_user(server), "@",
                                         libbalsa_server_get_host(server), NULL);
@@ -776,18 +790,18 @@ void
 libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
                                 LibBalsaMailbox *inbox)
 {
-    LibBalsaMailboxPop3 *pop;
+    LibBalsaMailboxPop3 *mailbox_pop3;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox));
 
-    pop = LIBBALSA_MAILBOX_POP3(mailbox);
+    mailbox_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
 
-	pop->inbox=inbox;
+	mailbox_pop3->inbox=inbox;
 }
 
 void
-libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPop3 *pop,
+libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPop3 *mailbox_pop3,
                                          gint sz_limit)
 {
-    pop->msg_size_limit = sz_limit;
+    mailbox_pop3->msg_size_limit = sz_limit;
 }

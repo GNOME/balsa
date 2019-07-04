@@ -1,3 +1,214 @@
+2019-07-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use G_DECLARE_DERIVABLE_TYPE to declare LibBalsaMailbox
+
+	and provide and use the necessary getters and setters.
+
+	Also move mailbox locking to a GRecMutex in the
+	LibBalsaMailboxPrivate structure, instead of our home-brewed
+	lock.
+
+	* libbalsa/filter-file.c (libbalsa_mailbox_filters_load_config),
+	(libbalsa_mailbox_filters_save_config):
+	* libbalsa/libbalsa.c:
+	* libbalsa/mailbox-filter.c (config_mailbox_filters_load):
+	* libbalsa/mailbox.c (libbalsa_mailbox_class_init),
+	(libbalsa_mailbox_init), (libbalsa_mailbox_dispose),
+	(get_from_field), (libbalsa_mailbox_index_entry_clear),
+	(libbalsa_mailbox_index_set_flags), (libbalsa_mailbox_finalize),
+	(libbalsa_mailbox_free_mindex), (libbalsa_mailbox_open),
+	(libbalsa_mailbox_is_open), (libbalsa_mailbox_close),
+	(libbalsa_mailbox_set_unread_messages_flag),
+	(libbalsa_mailbox_check), (lbm_changed_idle_cb),
+	(lbm_changed_schedule_idle), (libbalsa_mailbox_changed),
+	(lbm_run_filters_on_reception_idle_cb),
+	(libbalsa_mailbox_run_filters_on_reception),
+	(libbalsa_mailbox_save_config),
+	(libbalsa_mailbox_real_messages_copy),
+	(libbalsa_mailbox_real_sort), (libbalsa_mailbox_real_save_config),
+	(libbalsa_mailbox_real_load_config),
+	(libbalsa_mailbox_type_from_path), (lbm_node_has_unseen_child),
+	(lbm_msgno_changed_expunged_cb), (lbm_msgno_row_changed),
+	(lbm_msgnos_changed_idle_cb), (lbm_msgno_changed),
+	(libbalsa_mailbox_msgno_changed), (lbm_need_threading_idle_cb),
+	(libbalsa_mailbox_msgno_inserted),
+	(libbalsa_mailbox_msgno_filt_in), (libbalsa_mailbox_msgno_removed),
+	(libbalsa_mailbox_msgno_filt_out), (lbm_msgno_filt_check),
+	(libbalsa_mailbox_msgno_filt_check),
+	(libbalsa_mailbox_search_iter_view), (libbalsa_mailbox_msgno_find),
+	(libbalsa_mailbox_sync_storage), (lbm_cache_message),
+	(libbalsa_mailbox_get_message),
+	(libbalsa_mailbox_messages_change_flags),
+	(libbalsa_mailbox_set_view_filter),
+	(libbalsa_mailbox_make_view_filter_persistent),
+	(libbalsa_mailbox_real_can_do), (lbm_check_and_sort),
+	(lbm_set_threading), (libbalsa_mailbox_view_free), (lbm_get_view),
+	(libbalsa_mailbox_set_identity_name),
+	(libbalsa_mailbox_set_threading_type),
+	(libbalsa_mailbox_set_subject_gather),
+	(libbalsa_mailbox_set_sort_type),
+	(libbalsa_mailbox_set_sort_field), (libbalsa_mailbox_set_show),
+	(libbalsa_mailbox_set_subscribe), (libbalsa_mailbox_set_exposed),
+	(libbalsa_mailbox_set_open), (libbalsa_mailbox_set_filter),
+	(libbalsa_mailbox_set_crypto_mode), (libbalsa_mailbox_set_unread),
+	(libbalsa_mailbox_set_total), (libbalsa_mailbox_set_mtime),
+	(libbalsa_mailbox_set_position),
+	(libbalsa_mailbox_get_identity_name),
+	(libbalsa_mailbox_get_threading_type),
+	(libbalsa_mailbox_get_subject_gather),
+	(libbalsa_mailbox_get_sort_type),
+	(libbalsa_mailbox_get_sort_field), (libbalsa_mailbox_get_show),
+	(libbalsa_mailbox_get_subscribe), (libbalsa_mailbox_get_exposed),
+	(libbalsa_mailbox_get_open), (libbalsa_mailbox_get_filter),
+	(libbalsa_mailbox_get_crypto_mode), (libbalsa_mailbox_get_unread),
+	(libbalsa_mailbox_get_total), (libbalsa_mailbox_get_mtime),
+	(libbalsa_mailbox_get_position), (mailbox_model_init),
+	(mailbox_model_get_flags), (mailbox_model_get_n_columns),
+	(mailbox_model_get_column_type), (mailbox_model_get_iter),
+	(mailbox_model_get_path_helper), (mailbox_model_get_path),
+	(lbm_get_index_entry_expunged_cb), (lbm_get_index_entry_real),
+	(lbm_get_index_entry), (mailbox_model_get_value),
+	(mailbox_model_iter_next), (mailbox_model_iter_children),
+	(mailbox_model_iter_has_child), (mailbox_model_iter_n_children),
+	(mailbox_model_iter_nth_child), (mailbox_model_iter_parent),
+	(mailbox_drag_source_init), (mailbox_row_draggable),
+	(mailbox_drag_data_delete), (mailbox_drag_data_get),
+	(mailbox_sortable_init), (mailbox_compare_from),
+	(mailbox_compare_subject), (mailbox_compare_date),
+	(mailbox_get_thread_date_traverse_func), (mailbox_get_thread_date),
+	(mailbox_compare_thread_date), (mailbox_compare_size),
+	(mailbox_compare_func), (lbm_has_valid_index_entry), (lbm_sort),
+	(mailbox_get_sort_column_id), (mailbox_set_sort_column_id),
+	(mailbox_set_sort_func), (mailbox_set_default_sort_func),
+	(mailbox_has_default_sort_func),
+	(libbalsa_mailbox_unlink_and_prepend), (lbm_update_msg_tree),
+	(lbm_set_msg_tree), (libbalsa_mailbox_set_msg_tree),
+	(lbm_try_reassemble), (libbalsa_mailbox_try_reassemble),
+	(libbalsa_mailbox_msgno_get_status),
+	(libbalsa_mailbox_msgno_get_subject),
+	(libbalsa_mailbox_msgno_update_attach), (lbm_check_idle),
+	(lbm_queue_check), (libbalsa_mailbox_search_iter_step),
+	(libbalsa_mailbox_can_move_duplicates),
+	(libbalsa_mailbox_move_duplicates), (libbalsa_mailbox_lock_store),
+	(libbalsa_mailbox_unlock_store), (libbalsa_mailbox_cache_message),
+	(lbm_set_color), (libbalsa_mailbox_set_foreground),
+	(libbalsa_mailbox_set_background),
+	(libbalsa_mailbox_test_can_reach), (libbalsa_mailbox_get_filters),
+	(libbalsa_mailbox_get_name), (libbalsa_mailbox_get_url),
+	(libbalsa_mailbox_get_unread_messages),
+	(libbalsa_mailbox_get_first_unread),
+	(libbalsa_mailbox_get_view_filter),
+	(libbalsa_mailbox_get_msg_tree),
+	(libbalsa_mailbox_get_msg_tree_changed),
+	(libbalsa_mailbox_get_state), (libbalsa_mailbox_get_index_entry),
+	(libbalsa_mailbox_get_view), (libbalsa_mailbox_get_stamp),
+	(libbalsa_mailbox_get_open_ref), (libbalsa_mailbox_get_readonly),
+	(libbalsa_mailbox_get_config_prefix),
+	(libbalsa_mailbox_get_has_unread_messages),
+	(libbalsa_mailbox_clear_unread_messages),
+	(libbalsa_mailbox_set_filters), (libbalsa_mailbox_set_url),
+	(libbalsa_mailbox_set_first_unread),
+	(libbalsa_mailbox_set_msg_tree_changed),
+	(libbalsa_mailbox_set_is_directory),
+	(libbalsa_mailbox_set_readonly),
+	(libbalsa_mailbox_set_no_reassemble), (libbalsa_mailbox_set_name),
+	(libbalsa_mailbox_set_view),
+	(libbalsa_mailbox_set_has_unread_messages),
+	(libbalsa_mailbox_set_config_prefix),
+	(libbalsa_mailbox_add_to_unread_messages), (libbalsa_lock_mailbox),
+	(libbalsa_unlock_mailbox):
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_imap.c (message_info_from_msgno),
+	(libbalsa_mailbox_imap_init), (libbalsa_mailbox_imap_finalize),
+	(libbalsa_mailbox_imap_update_url), (mi_get_imsg),
+	(idle_unread_update_cb), (imap_exists_idle),
+	(libbalsa_mailbox_imap_get_selected_handle), (lbm_imap_get_unseen),
+	(libbalsa_mailbox_imap_open),
+	(libbalsa_mailbox_imap_get_matchings),
+	(libbalsa_mailbox_imap_load_config),
+	(libbalsa_mailbox_imap_force_disconnect),
+	(libbalsa_mailbox_imap_reconnect), (lbmi_get_imap_sort_key),
+	(libbalsa_mailbox_imap_set_threading), (lbmi_compare_func),
+	(libbalsa_mailbox_imap_sort):
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_init),
+	(libbalsa_mailbox_local_set_path),
+	(libbalsa_mailbox_local_load_message),
+	(libbalsa_mailbox_local_load_config), (lbm_local_save_tree),
+	(lbm_local_restore_tree), (lbm_local_save_tree_real),
+	(libbalsa_mailbox_local_close_mailbox), (message_match_real),
+	(lbml_load_messages_idle_cb), (lbml_set_threading),
+	(libbalsa_mailbox_local_set_threading),
+	(lbm_local_update_view_filter),
+	(libbalsa_mailbox_local_prepare_threading), (lbml_info_setup),
+	(lbml_thread_messages), (lbml_unthread_message),
+	(lbml_threading_flat), (lbm_local_sync_real),
+	(libbalsa_mailbox_local_messages_change_flags):
+	* libbalsa/mailbox_local.h:
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_new),
+	(lbm_maildir_remove_files), (lbm_maildir_parse),
+	(libbalsa_mailbox_maildir_open), (libbalsa_mailbox_maildir_check),
+	(libbalsa_mailbox_maildir_sync):
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_new), (mbox_lock),
+	(mbox_unlock), (libbalsa_mailbox_mbox_open),
+	(libbalsa_mailbox_mbox_check), (libbalsa_mailbox_mbox_sync):
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_new),
+	(lbm_mh_parse_mailbox), (libbalsa_mailbox_mh_open),
+	(libbalsa_mailbox_mh_check), (libbalsa_mailbox_mh_sync):
+	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_new),
+	(message_cb), (libbalsa_mailbox_pop3_startup), (update_msg_list),
+	(libbalsa_mailbox_pop3_check), (libbalsa_mailbox_pop3_set_inbox),
+	(libbalsa_mailbox_pop3_set_msg_size_limit):
+	* libbalsa/message.c (libbalsa_message_change_flags):
+	* libbalsa/send.c (lbs_message_queue_real),
+	(lbs_check_reachable_cb), (balsa_send_message_success):
+	* libinit_balsa/assistant_page_directory.c (unconditional_mailbox):
+	* libinit_balsa/assistant_page_user.c (create_pop3_mbx):
+	* src/balsa-app.c (find_url), (balsa_get_short_mailbox_name),
+	(ba_remove_children_mailbox_nodes):
+	* src/balsa-index.c (bndx_scroll_on_open_idle),
+	(bndx_mailbox_row_inserted_cb), (bndx_mailbox_changed_idle),
+	(bndx_do_popup), (balsa_index_transfer), (balsa_index_expunge):
+	* src/balsa-mblist.c (bmbl_mailbox_changed_cb),
+	(bmbl_store_redraw_mbnode), (bmbl_node_style), (bmbl_mru_menu),
+	(bmbl_mru_selected_cb), (bmbl_mru_activated_cb):
+	* src/balsa-message.c (balsa_message_set),
+	(balsa_message_copy_part):
+	* src/filter-edit-callbacks.c (update_filters_mailbox):
+	* src/filter-run-callbacks.c (save_filters),
+	(fr_apply_selected_pressed_func), (fr_apply_selected_pressed),
+	(fr_apply_now_pressed), (fr_add_pressed_func):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_new),
+	(filters_run_dialog):
+	* src/folder-conf.c (browse_button_cb),
+	(folder_conf_imap_sub_node):
+	* src/mailbox-conf.c (mailbox_conf_delete), (update_pop_mailbox),
+	(mailbox_conf_update), (mailbox_conf_add),
+	(local_mailbox_dialog_cb), (create_local_mailbox_dialog),
+	(create_pop_mailbox_dialog), (mailbox_conf_view_check):
+	* src/mailbox-node.c (balsa_mailbox_node_dispose),
+	(load_mailbox_view), (imap_scan_attach_mailbox),
+	(balsa_mailbox_node_new_from_mailbox),
+	(balsa_mailbox_local_append), (bmbn_scan_children_idle),
+	(remove_special_mailbox_by_url), (add_local_mailbox):
+	* src/main-window.c (bw_enable_mailbox_menus),
+	(bw_enable_message_menus), (bw_notebook_label_new),
+	(balsa_window_real_open_mbnode), (bw_check_mailbox_progress_cb),
+	(bw_check_mailbox_list), (check_new_messages_count),
+	(bw_mailbox_check), (bw_notebook_switch_page_cb),
+	(balsa_window_set_statusbar), (balsa_window_next_unread):
+	* src/main.c (initial_open_unread_mailboxes), (initial_open_inbox),
+	(balsa_get_stats), (scan_mailboxes_idle_cb), (periodic_expunge_cb):
+	* src/message-window.c (mw_set_buttons_sensitive),
+	(message_window_new):
+	* src/pref-manager.c (update_view_defaults), (add_other_server),
+	(update_mail_servers):
+	* src/save-restore.c (mailbox_section_path),
+	(config_mailbox_set_as_special), (config_mailbox_delete),
+	(config_mailbox_init), (config_mailbox_filters_save):
+	* src/save-restore.h:
+	* src/sendmsg-window.c (sw_delete_draft), (create_info_pane),
+	(send_message_handler):
+
 2019-06-30  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Small LDAP address book improvements

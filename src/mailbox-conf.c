@@ -484,14 +484,14 @@ check_for_blank_fields(GtkWidget G_GNUC_UNUSED *widget,
 static void
 update_pop_mailbox(MailboxConfWindow *mcw)
 {
-	LibBalsaMailboxPop3 *pop3;
+	LibBalsaMailboxPOP3 *mailbox_pop3;
 	LibBalsaMailbox *mailbox;
 	LibBalsaServer *server;
         gchar *name;
 
-	pop3 = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
-	server = LIBBALSA_MAILBOX_REMOTE_SERVER(pop3);
-        mailbox = (LibBalsaMailbox *) pop3;
+	mailbox_pop3 = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
+	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox_pop3);
+        mailbox = (LibBalsaMailbox *) mailbox_pop3;
 
 	/* basic data */
 	name = g_strdup(libbalsa_server_cfg_get_name(mcw->mb_data.pop3.server_cfg));
@@ -501,15 +501,15 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 	libbalsa_server_cfg_assign_server(mcw->mb_data.pop3.server_cfg, server);
 	libbalsa_server_config_changed(server);
 
-	pop3->check = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check));
-	pop3->delete_from_server = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON (mcw->mb_data.pop3.delete_from_server));
-	pop3->filter = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter));
-	g_free(pop3->filter_cmd);
-	pop3->filter_cmd = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd)));
+	mailbox_pop3->check = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check));
+	mailbox_pop3->delete_from_server = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON (mcw->mb_data.pop3.delete_from_server));
+	mailbox_pop3->filter = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter));
+	g_free(mailbox_pop3->filter_cmd);
+	mailbox_pop3->filter_cmd = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd)));
 
 	/* advanced settings */
-	pop3->disable_apop = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop));
-	pop3->enable_pipe = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe));
+	mailbox_pop3->disable_apop = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop));
+	mailbox_pop3->enable_pipe = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe));
 }
 
 /* conf_update_mailbox:
@@ -782,7 +782,7 @@ static GtkWidget *
 create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 {
 	LibBalsaMailbox *mailbox = mcw->mailbox;
-    LibBalsaMailboxPop3 *pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
+    LibBalsaMailboxPOP3 *mailbox_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
 
 	mcw->window = GTK_DIALOG(gtk_dialog_new_with_buttons(_("Remote Mailbox Configurator"),
         GTK_WINDOW(balsa_app.main_window),
@@ -802,25 +802,25 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 
     /* toggle for deletion from server */
     mcw->mb_data.pop3.delete_from_server = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE,
-    	_("_Delete messages from server after download"), pop3->delete_from_server, NULL, NULL);
+    	_("_Delete messages from server after download"), mailbox_pop3->delete_from_server, NULL, NULL);
 
     /* toggle for check */
     mcw->mb_data.pop3.check = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE, _("_Enable check for new mail"),
-    	pop3->check, NULL, NULL);
+    	mailbox_pop3->check, NULL, NULL);
 
     /* Procmail */
     mcw->mb_data.pop3.filter = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE,
-    	_("_Filter messages through procmail"), pop3->filter, G_CALLBACK(check_for_blank_fields), mcw);
+    	_("_Filter messages through procmail"), mailbox_pop3->filter, G_CALLBACK(check_for_blank_fields), mcw);
     mcw->mb_data.pop3.filter_cmd = libbalsa_server_cfg_add_entry(mcw->mb_data.pop3.server_cfg, TRUE, _("Fi_lter Command:"),
-    	pop3->filter_cmd, G_CALLBACK(check_for_blank_fields), mcw);
+    	mailbox_pop3->filter_cmd, G_CALLBACK(check_for_blank_fields), mcw);
 
     /* advanced - toggle for apop */
     mcw->mb_data.pop3.disable_apop = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, FALSE, _("Disable _APOP"),
-    	pop3->disable_apop, NULL, NULL);
+    	mailbox_pop3->disable_apop, NULL, NULL);
 
     /* toggle for enabling pipeling */
     mcw->mb_data.pop3.enable_pipe = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, FALSE, _("Overlap commands"),
-    	pop3->enable_pipe, NULL, NULL);
+    	mailbox_pop3->enable_pipe, NULL, NULL);
 
     /* initially call the check */
     check_for_blank_fields(NULL, mcw);

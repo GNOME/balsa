@@ -1,3 +1,39 @@
+2019-07-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox-remote: declare it derivable
+
+	Use G_DECLARE_DERIVABLE_TYPE to declare LibBalsaMailboxRemote
+	and provide libbalsa_mailbox_remote_get_server().
+
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_class_init),
+	(libbalsa_mailbox_imap_dispose), (libbalsa_mailbox_imap_finalize),
+	(get_header_cache_path), (get_cache_name_pair),
+	(libbalsa_mailbox_imap_close), (libbalsa_mailbox_imap_save_config),
+	(libbalsa_mailbox_imap_load_config),
+	(libbalsa_mailbox_imap_add_messages),
+	(libbalsa_mailbox_imap_messages_copy):
+	* libbalsa/mailbox_imap.h:
+	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_class_init),
+	(libbalsa_mailbox_pop3_init), (libbalsa_mailbox_pop3_finalize),
+	(libbalsa_mailbox_pop3_new), (libbalsa_mailbox_pop3_open),
+	(libbalsa_mailbox_pop3_startup), (update_msg_list),
+	(libbalsa_mailbox_pop3_check), (libbalsa_mailbox_pop3_save_config),
+	(libbalsa_mailbox_pop3_load_config),
+	(libbalsa_mailbox_pop3_set_inbox),
+	(libbalsa_mailbox_pop3_set_msg_size_limit):
+	* libbalsa/mailbox_pop3.h:
+	* libbalsa/mailbox_remote.c (libbalsa_mailbox_remote_class_init),
+	(libbalsa_mailbox_remote_init), (libbalsa_mailbox_remote_dispose),
+	(libbalsa_mailbox_remote_test_can_reach),
+	(libbalsa_mailbox_remote_set_server),
+	(libbalsa_mailbox_remote_get_server):
+	* libbalsa/mailbox_remote.h:
+	* libinit_balsa/assistant_page_user.c (create_pop3_mbx),
+	(create_imap_mbx):
+	* src/mailbox-conf.c (update_pop_mailbox),
+	(create_pop_mailbox_dialog):
+	* src/main-window.c (bw_check_mailbox_list):
+
 2019-07-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox-mh: Declare it final

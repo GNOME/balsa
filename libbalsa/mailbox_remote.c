@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2016 Stuart Parmenter and others,
+ * Copyright (C) 1997-2019 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,55 +25,52 @@
 #include "libbalsa.h"
 #include "server.h"
 
-static void libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass *
-					       klass);
-static void libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * mailbox);
+static void libbalsa_mailbox_remote_dispose(GObject * object);
 static void libbalsa_mailbox_remote_test_can_reach(LibBalsaMailbox          * mailbox,
                                                    LibBalsaCanReachCallback * cb,
                                                    gpointer                   cb_data);
 
-GType
-libbalsa_mailbox_remote_get_type(void)
-{
-    static GType mailbox_type = 0;
+typedef struct _LibBalsaMailboxRemotePrivate LibBalsaMailboxRemotePrivate;
+struct _LibBalsaMailboxRemotePrivate {
+    LibBalsaServer *server;
+};
 
-    if (!mailbox_type) {
-	static const GTypeInfo mailbox_info = {
-	    sizeof(LibBalsaMailboxClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-	    (GClassInitFunc) libbalsa_mailbox_remote_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-	    sizeof(LibBalsaMailbox),
-            0,                  /* n_preallocs */
-	    (GInstanceInitFunc) libbalsa_mailbox_remote_init
-	};
-
-	mailbox_type =
-	    g_type_register_static(LIBBALSA_TYPE_MAILBOX,
-	                           "LibBalsaMailboxRemote",
-                                   &mailbox_info, 0);
-    }
-
-    return mailbox_type;
-}
+G_DEFINE_TYPE_WITH_PRIVATE(LibBalsaMailboxRemote,
+                           libbalsa_mailbox_remote,
+                           LIBBALSA_TYPE_MAILBOX)
 
 static void
 libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass * klass)
 {
+    GObjectClass *object_class;
     LibBalsaMailboxClass *libbalsa_mailbox_class;
 
+    object_class = G_OBJECT_CLASS(klass);
     libbalsa_mailbox_class = LIBBALSA_MAILBOX_CLASS(klass);
+
+    object_class->dispose = libbalsa_mailbox_remote_dispose;
 
     libbalsa_mailbox_class->test_can_reach =
         libbalsa_mailbox_remote_test_can_reach;
 }
 
 static void
-libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * mailbox)
+libbalsa_mailbox_remote_init(LibBalsaMailboxRemote * remote)
 {
-    mailbox->server = NULL;
+    LibBalsaMailboxRemotePrivate *priv =
+        libbalsa_mailbox_remote_get_instance_private(remote);
+
+    priv->server = NULL;
+}
+
+static void
+libbalsa_mailbox_remote_dispose(GObject * object)
+{
+    LibBalsaMailboxRemote *remote = (LibBalsaMailboxRemote *) object;
+    LibBalsaMailboxRemotePrivate *priv =
+        libbalsa_mailbox_remote_get_instance_private(remote);
+
+    g_clear_object(&priv->server);
 }
 
 /* Test whether a mailbox is reachable */
@@ -83,16 +80,35 @@ libbalsa_mailbox_remote_test_can_reach(LibBalsaMailbox          * mailbox,
                                        LibBalsaCanReachCallback * cb,
                                        gpointer                   cb_data)
 {
-    libbalsa_server_test_can_reach_full(LIBBALSA_MAILBOX_REMOTE(mailbox)->server,
+    LibBalsaMailboxRemote *remote = LIBBALSA_MAILBOX_REMOTE(mailbox);
+    LibBalsaMailboxRemotePrivate *priv =
+        libbalsa_mailbox_remote_get_instance_private(remote);
+
+    libbalsa_server_test_can_reach_full(priv->server,
                                         cb, cb_data, (GObject *) mailbox);
 }
 
-/* Public method */
+/* Public methods */
 
-void 
-libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote *m, LibBalsaServer *s)
+void
+libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote *remote, LibBalsaServer *server)
 {
-    if(m->server) g_object_unref(G_OBJECT(m->server));
-    m->server = s;
-    if(s) g_object_ref(G_OBJECT(s));
+    LibBalsaMailboxRemotePrivate *priv =
+        libbalsa_mailbox_remote_get_instance_private(remote);
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_REMOTE(remote));
+    g_return_if_fail(server == NULL || LIBBALSA_IS_SERVER(server));
+
+    g_set_object(&priv->server, server);
+}
+
+LibBalsaServer *
+libbalsa_mailbox_remote_get_server(LibBalsaMailboxRemote *remote)
+{
+    LibBalsaMailboxRemotePrivate *priv =
+        libbalsa_mailbox_remote_get_instance_private(remote);
+
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_REMOTE(remote), NULL);
+
+    return priv->server;
 }

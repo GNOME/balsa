@@ -197,9 +197,9 @@ create_pop3_mbx(const gchar *name, const gchar* host, gint security,
                 const gchar *login, const gchar *passwd,
                 gboolean remember)
 {
-    LibBalsaMailboxPop3 *pop = libbalsa_mailbox_pop3_new();
-    LibBalsaMailbox *mbx   = LIBBALSA_MAILBOX(pop);
-    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(pop);
+    LibBalsaMailboxPOP3 *mailbox_pop3 = libbalsa_mailbox_pop3_new();
+    LibBalsaMailbox *mailbox          = LIBBALSA_MAILBOX(mailbox_pop3);
+    LibBalsaServer *server            = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
     gchar *mailbox_name;
 
     libbalsa_server_set_username(server, login);
@@ -207,17 +207,17 @@ create_pop3_mbx(const gchar *name, const gchar* host, gint security,
     libbalsa_server_set_host(server, host, security);
     libbalsa_server_set_remember_password(server, remember);
 
-    mailbox_name = g_strdup(name && *name ? name : host);
-    libbalsa_mailbox_set_name(mbx, mailbox_name);
+    mailbox_name = g_strdup(name != NULL && name[0] != '\0' ? name : host);
+    libbalsa_mailbox_set_name(mailbox, mailbox_name);
     g_free(mailbox_name);
 
-    pop->check              = TRUE;
-    pop->disable_apop       = FALSE;
-    pop->delete_from_server = TRUE;
-    pop->filter             = FALSE;
-    pop->filter_cmd         = g_strdup("procmail -f -");
-    
-    return mbx;
+    mailbox_pop3->check              = TRUE;
+    mailbox_pop3->disable_apop       = FALSE;
+    mailbox_pop3->delete_from_server = TRUE;
+    mailbox_pop3->filter             = FALSE;
+    mailbox_pop3->filter_cmd         = g_strdup("procmail -f -");
+
+    return mailbox;
 }
 
 static void
@@ -233,7 +233,7 @@ create_imap_mbx(const gchar *name, const gchar* host, NetClientCryptMode securit
     libbalsa_server_set_host(server, host, security);
     libbalsa_server_set_remember_password(server, remember);
     mbnode = balsa_mailbox_node_new_imap_folder(server, NULL);
-    mbnode->name = g_strdup(name && *name ? name : host);
+    mbnode->name = g_strdup(name != NULL && name[0] != '\0' ? name : host);
 
     config_folder_add(mbnode, NULL);
     /* memory leak? */

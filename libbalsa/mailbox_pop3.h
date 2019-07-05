@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2016 Stuart Parmenter and others,
+ * Copyright (C) 1997-2019 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,10 +25,10 @@
     (libbalsa_mailbox_pop3_get_type())
 #define LIBBALSA_MAILBOX_POP3(obj) \
     (G_TYPE_CHECK_INSTANCE_CAST ((obj), LIBBALSA_TYPE_MAILBOX_POP3, \
-                                 LibBalsaMailboxPop3))
+                                 LibBalsaMailboxPOP3))
 #define LIBBALSA_MAILBOX_POP3_CLASS(klass) \
     (G_TYPE_CHECK_CLASS_CAST ((klass), LIBBALSA_TYPE_MAILBOX_POP3, \
-                              LibBalsaMailboxPop3Class))
+                              LibBalsaMailboxPOP3Class))
 #define LIBBALSA_IS_MAILBOX_POP3(obj) \
     (G_TYPE_CHECK_INSTANCE_TYPE ((obj), LIBBALSA_TYPE_MAILBOX_POP3))
 #define LIBBALSA_IS_MAILBOX_POP3_CLASS(klass) \
@@ -36,10 +36,10 @@
 
 GType libbalsa_mailbox_pop3_get_type(void);
 
-typedef struct _LibBalsaMailboxPop3 LibBalsaMailboxPop3;
-typedef struct _LibBalsaMailboxPop3Class LibBalsaMailboxPop3Class;
+typedef struct _LibBalsaMailboxPOP3 LibBalsaMailboxPOP3;
+typedef struct _LibBalsaMailboxPOP3Class LibBalsaMailboxPOP3Class;
 
-struct _LibBalsaMailboxPop3 {
+struct _LibBalsaMailboxPOP3 {
     LibBalsaMailboxRemote mailbox;
 
     gboolean check;
@@ -53,10 +53,10 @@ struct _LibBalsaMailboxPop3 {
     gboolean enable_pipe;  /* ditto */
 };
 
-LibBalsaMailboxPop3 *libbalsa_mailbox_pop3_new(void);
+LibBalsaMailboxPOP3 *libbalsa_mailbox_pop3_new(void);
 void libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
                                      LibBalsaMailbox *inbox);
-void libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPop3 *mailbox,
+void libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPOP3 *mailbox,
                                               gint sz_limit);
 
 #endif				/* __LIBBALSA_MAILBOX_POP3_H__ */

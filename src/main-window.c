@@ -3238,7 +3238,7 @@ bw_check_mailbox_list(struct check_messages_thread_info *info, GList *mailbox_li
 
     for ( ; mailbox_list; mailbox_list = mailbox_list->next) {
         LibBalsaMailbox *mailbox = BALSA_MAILBOX_NODE(mailbox_list->data)->mailbox;
-        LibBalsaMailboxPop3 *pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
+        LibBalsaMailboxPOP3 *pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
         bw_pop_mbox_t *bw_pop_mbox;
 
         bw_pop_mbox = g_malloc0(sizeof(bw_pop_mbox_t));

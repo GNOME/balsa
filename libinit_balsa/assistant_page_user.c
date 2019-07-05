@@ -211,11 +211,11 @@ create_pop3_mbx(const gchar *name, const gchar* host, gint security,
     libbalsa_mailbox_set_name(mailbox, mailbox_name);
     g_free(mailbox_name);
 
-    mailbox_pop3->check              = TRUE;
-    mailbox_pop3->disable_apop       = FALSE;
-    mailbox_pop3->delete_from_server = TRUE;
-    mailbox_pop3->filter             = FALSE;
-    mailbox_pop3->filter_cmd         = g_strdup("procmail -f -");
+    libbalsa_mailbox_pop3_set_check(mailbox_pop3, TRUE);
+    libbalsa_mailbox_pop3_set_disable_apop(mailbox_pop3, FALSE);
+    libbalsa_mailbox_pop3_set_delete_from_server(mailbox_pop3, TRUE);
+    libbalsa_mailbox_pop3_set_filter(mailbox_pop3, FALSE);
+    libbalsa_mailbox_pop3_set_filter_cmd(mailbox_pop3, "procmail -f -");
 
     return mailbox;
 }

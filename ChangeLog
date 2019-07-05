@@ -1,5 +1,31 @@
 2019-07-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox-pop3: Declare it final
+
+	Use G_DECLARE_FINAL_TYPE to declare LibBalsaMailboxPOP3, make it
+	private, and provide necessary getters and setters.
+
+	* libbalsa/mailbox_pop3.c
+	(libbalsa_mailbox_pop3_get_delete_from_server),
+	(libbalsa_mailbox_pop3_get_check),
+	(libbalsa_mailbox_pop3_get_filter),
+	(libbalsa_mailbox_pop3_get_filter_cmd),
+	(libbalsa_mailbox_pop3_get_disable_apop),
+	(libbalsa_mailbox_pop3_get_enable_pipe),
+	(libbalsa_mailbox_pop3_set_msg_size_limit),
+	(libbalsa_mailbox_pop3_set_check),
+	(libbalsa_mailbox_pop3_set_disable_apop),
+	(libbalsa_mailbox_pop3_set_delete_from_server),
+	(libbalsa_mailbox_pop3_set_filter),
+	(libbalsa_mailbox_pop3_set_filter_cmd),
+	(libbalsa_mailbox_pop3_set_enable_pipe):
+	* libbalsa/mailbox_pop3.h:
+	* libinit_balsa/assistant_page_user.c (create_pop3_mbx):
+	* src/mailbox-conf.c (update_pop_mailbox),
+	(create_pop_mailbox_dialog):
+
+2019-07-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox-imap: Declare it final
 
 	Use G_DECLARE_FINAL_TYPE to declare LibBalsaMailboxImap

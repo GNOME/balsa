@@ -501,15 +501,14 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 	libbalsa_server_cfg_assign_server(mcw->mb_data.pop3.server_cfg, server);
 	libbalsa_server_config_changed(server);
 
-	mailbox_pop3->check = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check));
-	mailbox_pop3->delete_from_server = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON (mcw->mb_data.pop3.delete_from_server));
-	mailbox_pop3->filter = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter));
-	g_free(mailbox_pop3->filter_cmd);
-	mailbox_pop3->filter_cmd = g_strdup(gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd)));
+	libbalsa_mailbox_pop3_set_check(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check)));
+	libbalsa_mailbox_pop3_set_delete_from_server(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON (mcw->mb_data.pop3.delete_from_server)));
+	libbalsa_mailbox_pop3_set_filter(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter)));
+	libbalsa_mailbox_pop3_set_filter_cmd(mailbox_pop3, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd)));
 
 	/* advanced settings */
-	mailbox_pop3->disable_apop = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop));
-	mailbox_pop3->enable_pipe = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe));
+	libbalsa_mailbox_pop3_set_disable_apop(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop)));
+	libbalsa_mailbox_pop3_set_enable_pipe(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe)));
 }
 
 /* conf_update_mailbox:
@@ -802,25 +801,25 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 
     /* toggle for deletion from server */
     mcw->mb_data.pop3.delete_from_server = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE,
-    	_("_Delete messages from server after download"), mailbox_pop3->delete_from_server, NULL, NULL);
+    	_("_Delete messages from server after download"), libbalsa_mailbox_pop3_get_delete_from_server(mailbox_pop3), NULL, NULL);
 
     /* toggle for check */
     mcw->mb_data.pop3.check = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE, _("_Enable check for new mail"),
-    	mailbox_pop3->check, NULL, NULL);
+    	libbalsa_mailbox_pop3_get_check(mailbox_pop3), NULL, NULL);
 
     /* Procmail */
     mcw->mb_data.pop3.filter = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE,
-    	_("_Filter messages through procmail"), mailbox_pop3->filter, G_CALLBACK(check_for_blank_fields), mcw);
+    	_("_Filter messages through procmail"), libbalsa_mailbox_pop3_get_filter(mailbox_pop3), G_CALLBACK(check_for_blank_fields), mcw);
     mcw->mb_data.pop3.filter_cmd = libbalsa_server_cfg_add_entry(mcw->mb_data.pop3.server_cfg, TRUE, _("Fi_lter Command:"),
-    	mailbox_pop3->filter_cmd, G_CALLBACK(check_for_blank_fields), mcw);
+    	libbalsa_mailbox_pop3_get_filter_cmd(mailbox_pop3), G_CALLBACK(check_for_blank_fields), mcw);
 
     /* advanced - toggle for apop */
     mcw->mb_data.pop3.disable_apop = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, FALSE, _("Disable _APOP"),
-    	mailbox_pop3->disable_apop, NULL, NULL);
+    	libbalsa_mailbox_pop3_get_disable_apop(mailbox_pop3), NULL, NULL);
 
     /* toggle for enabling pipeling */
     mcw->mb_data.pop3.enable_pipe = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, FALSE, _("Overlap commands"),
-    	mailbox_pop3->enable_pipe, NULL, NULL);
+    	libbalsa_mailbox_pop3_get_enable_pipe(mailbox_pop3), NULL, NULL);
 
     /* initially call the check */
     check_for_blank_fields(NULL, mcw);

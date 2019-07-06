@@ -2433,10 +2433,9 @@ libbalsa_mailbox_set_identity_name(LibBalsaMailbox * mailbox,
 
 void
 libbalsa_mailbox_set_threading_type(LibBalsaMailbox * mailbox,
-				 LibBalsaMailboxThreadingType
-				 threading_type)
+                                    LibBalsaMailboxThreadingType threading_type)
 {
-    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+    LibBalsaMailboxView *view;
 
     g_return_if_fail(mailbox == NULL || LIBBALSA_IS_MAILBOX(mailbox));
     view = lbm_get_view(mailbox);
@@ -2452,7 +2451,7 @@ void
 libbalsa_mailbox_set_subject_gather(LibBalsaMailbox * mailbox,
                                     gboolean          subject_gather)
 {
-    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+    LibBalsaMailboxView *view;
 
     g_return_if_fail(mailbox == NULL || LIBBALSA_IS_MAILBOX(mailbox));
     view = lbm_get_view(mailbox);
@@ -2468,7 +2467,7 @@ void
 libbalsa_mailbox_set_sort_type(LibBalsaMailbox * mailbox,
 			    LibBalsaMailboxSortType sort_type)
 {
-    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+    LibBalsaMailboxView *view;
 
     g_return_if_fail(mailbox == NULL || LIBBALSA_IS_MAILBOX(mailbox));
     view = lbm_get_view(mailbox);
@@ -2484,7 +2483,7 @@ void
 libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
 			     LibBalsaMailboxSortFields sort_field)
 {
-    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+    LibBalsaMailboxView *view;
 
     g_return_if_fail(mailbox == NULL || LIBBALSA_IS_MAILBOX(mailbox));
     view = lbm_get_view(mailbox);
@@ -2500,7 +2499,7 @@ libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
 gboolean
 libbalsa_mailbox_set_show(LibBalsaMailbox * mailbox, LibBalsaMailboxShow show)
 {
-    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+    LibBalsaMailboxView *view;
 
     g_return_val_if_fail(mailbox == NULL || LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     view = lbm_get_view(mailbox);
@@ -2520,7 +2519,7 @@ gboolean
 libbalsa_mailbox_set_subscribe(LibBalsaMailbox * mailbox,
                                LibBalsaMailboxSubscribe subscribe)
 {
-    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+    LibBalsaMailboxView *view;
 
     g_return_val_if_fail(mailbox == NULL || LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     view = lbm_get_view(mailbox);
@@ -2539,7 +2538,7 @@ libbalsa_mailbox_set_subscribe(LibBalsaMailbox * mailbox,
 void
 libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox, gboolean exposed)
 {
-    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+    LibBalsaMailboxView *view;
 
     g_return_if_fail(mailbox == NULL || LIBBALSA_IS_MAILBOX(mailbox));
     view = lbm_get_view(mailbox);
@@ -2554,7 +2553,7 @@ libbalsa_mailbox_set_exposed(LibBalsaMailbox * mailbox, gboolean exposed)
 void
 libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open)
 {
-    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+    LibBalsaMailboxView *view;
 
     g_return_if_fail(mailbox == NULL || LIBBALSA_IS_MAILBOX(mailbox));
     view = lbm_get_view(mailbox);
@@ -2572,7 +2571,7 @@ libbalsa_mailbox_set_open(LibBalsaMailbox * mailbox, gboolean open)
 void
 libbalsa_mailbox_set_filter(LibBalsaMailbox * mailbox, gint filter)
 {
-    LibBalsaMailboxView *view = lbm_get_view(mailbox);
+    LibBalsaMailboxView *view;
 
     g_return_if_fail(mailbox == NULL || LIBBALSA_IS_MAILBOX(mailbox));
     view = lbm_get_view(mailbox);

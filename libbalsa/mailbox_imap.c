@@ -957,9 +957,7 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap,
     LibBalsaImapServer *imap_server;
     ImapResponse rc;
     unsigned uidval;
-    gboolean readonly;
-
-    g_return_val_if_fail(LIBBALSA_MAILBOX_IMAP(mimap), NULL);
+    gboolean readonly = FALSE;
 
     server = LIBBALSA_MAILBOX_REMOTE_SERVER(mimap);
     if (!LIBBALSA_IS_IMAP_SERVER(server))

@@ -1,5 +1,20 @@
 2019-07-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Fix some scan-build reports
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_set_threading_type),
+	(libbalsa_mailbox_set_subject_gather),
+	(libbalsa_mailbox_set_sort_type),
+	(libbalsa_mailbox_set_sort_field), (libbalsa_mailbox_set_show),
+	(libbalsa_mailbox_set_subscribe), (libbalsa_mailbox_set_exposed),
+	(libbalsa_mailbox_set_open), (libbalsa_mailbox_set_filter):
+	remove a dead store;
+	* libbalsa/mailbox_imap.c
+	(libbalsa_mailbox_imap_get_selected_handle): initialize readonly
+	to FALSE.
+
+2019-07-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox-{remote,imap}: Simplify dispose() methods
 
 	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_dispose): the

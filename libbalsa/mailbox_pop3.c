@@ -784,38 +784,50 @@ libbalsa_mailbox_pop3_set_inbox(LibBalsaMailbox *mailbox,
 gboolean
 libbalsa_mailbox_pop3_get_delete_from_server(LibBalsaMailboxPOP3 *mailbox_pop3)
 {
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3), FALSE);
+
     return mailbox_pop3->delete_from_server;
 }
 
 gboolean
 libbalsa_mailbox_pop3_get_check(LibBalsaMailboxPOP3 *mailbox_pop3)
 {
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3), FALSE);
+
     return mailbox_pop3->check;
 }
 
 gboolean
 libbalsa_mailbox_pop3_get_filter(LibBalsaMailboxPOP3 *mailbox_pop3)
 {
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3), FALSE);
+
     return mailbox_pop3->filter;
 }
 
 const gchar *
 libbalsa_mailbox_pop3_get_filter_cmd(LibBalsaMailboxPOP3 *mailbox_pop3)
 {
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3), NULL);
+
     return mailbox_pop3->filter_cmd;
 }
 
 gboolean
 libbalsa_mailbox_pop3_get_disable_apop(LibBalsaMailboxPOP3 *mailbox_pop3)
 {
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3), FALSE);
+
     return mailbox_pop3->disable_apop;
 }
 
 gboolean
 libbalsa_mailbox_pop3_get_enable_pipe(LibBalsaMailboxPOP3 *mailbox_pop3)
 {
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3), FALSE);
+
     return mailbox_pop3->enable_pipe;
- }
+}
 
 /*
  * Setters
@@ -825,6 +837,8 @@ void
 libbalsa_mailbox_pop3_set_msg_size_limit(LibBalsaMailboxPOP3 *mailbox_pop3,
                                          gint sz_limit)
 {
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3));
+
     mailbox_pop3->msg_size_limit = sz_limit;
 }
 
@@ -832,6 +846,8 @@ void
 libbalsa_mailbox_pop3_set_check(LibBalsaMailboxPOP3 *mailbox_pop3,
                                 gboolean check)
 {
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3));
+
     mailbox_pop3->check = check;
 }
 
@@ -839,6 +855,8 @@ void
 libbalsa_mailbox_pop3_set_disable_apop(LibBalsaMailboxPOP3 *mailbox_pop3,
                                        gboolean disable_apop)
 {
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3));
+
     mailbox_pop3->disable_apop = disable_apop;
 }
 
@@ -846,6 +864,8 @@ void
 libbalsa_mailbox_pop3_set_delete_from_server(LibBalsaMailboxPOP3 *mailbox_pop3,
                                              gboolean delete_from_server)
 {
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3));
+
     mailbox_pop3->delete_from_server = delete_from_server;
 }
 
@@ -853,6 +873,8 @@ void
 libbalsa_mailbox_pop3_set_filter(LibBalsaMailboxPOP3 *mailbox_pop3,
                                  gboolean filter)
 {
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3));
+
     mailbox_pop3->filter = filter;
 }
 
@@ -860,13 +882,17 @@ void
 libbalsa_mailbox_pop3_set_filter_cmd(LibBalsaMailboxPOP3 *mailbox_pop3,
                                      const gchar * filter_cmd)
 {
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3));
+
     g_free(mailbox_pop3->filter_cmd);
     mailbox_pop3->filter_cmd = g_strdup(filter_cmd);
 }
 
 void
 libbalsa_mailbox_pop3_set_enable_pipe(LibBalsaMailboxPOP3 *mailbox_pop3,
-                                             gboolean enable_pipe)
+                                      gboolean enable_pipe)
 {
+    g_return_if_fail(LIBBALSA_IS_MAILBOX_POP3(mailbox_pop3));
+
     mailbox_pop3->enable_pipe = enable_pipe;
 }

@@ -273,29 +273,19 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     mailbox->disconnected = FALSE;
 }
 
-/* libbalsa_mailbox_imap_finalize:
-   NOTE: we have to close mailbox ourselves without waiting for
-   LibBalsaMailbox::finalize because we want to destroy server as well,
-   and close requires server for proper operation.  
-*/
 static void
 libbalsa_mailbox_imap_dispose(GObject * object)
 {
     LibBalsaMailboxImap *mimap;
-    LibBalsaMailboxRemote *remote;
     LibBalsaServer *server;
 
     mimap = LIBBALSA_MAILBOX_IMAP(object);
-
-    g_assert(libbalsa_mailbox_get_open_ref(LIBBALSA_MAILBOX(mimap)) == 0);
-
-    remote = LIBBALSA_MAILBOX_REMOTE(object);
-    server = libbalsa_mailbox_remote_get_server(remote);
+    server = LIBBALSA_MAILBOX_REMOTE_SERVER(object);
     if (server != NULL) {
         g_signal_handlers_disconnect_matched(server,
                                              G_SIGNAL_MATCH_DATA, 0,
                                              (GQuark) 0, NULL, NULL,
-                                             remote);
+                                             mimap);
     }
 
     if (mimap->unread_update_id != 0) {

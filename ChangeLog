@@ -1,3 +1,14 @@
+2019-07-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox-{remote,imap}: Simplify dispose() methods
+
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_dispose): the
+	  server will be destroyed in the parent-class (LibBalsaMailboxRemote)
+	  method;
+	* libbalsa/mailbox_remote.c (libbalsa_mailbox_remote_dispose):
+	  chain up to the parent-class (LibBalsaMailbox) method, to make
+	  sure the mailbox is closed, before destroying the server.
+
 2019-07-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox-pop3: Declare it final

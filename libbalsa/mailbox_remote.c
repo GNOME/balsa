@@ -70,6 +70,10 @@ libbalsa_mailbox_remote_dispose(GObject * object)
     LibBalsaMailboxRemotePrivate *priv =
         libbalsa_mailbox_remote_get_instance_private(remote);
 
+    /* This will close the mailbox, if it is still open: */
+    G_OBJECT_CLASS(libbalsa_mailbox_remote_parent_class)->dispose(object);
+
+    /* Now it is safe to unref the server: */
     g_clear_object(&priv->server);
 }
 

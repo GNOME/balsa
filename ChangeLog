@@ -1,3 +1,8 @@
+2019-07-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_messages_copy):
+	Fix some bad logic from commit 2d54e175561c9e382701d63ed8dde4746959559b
+
 2019-07-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix some scan-build reports

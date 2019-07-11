@@ -3286,13 +3286,10 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
 				    LibBalsaMailbox * dest, GError **err)
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    LibBalsaMailboxRemote *remote = LIBBALSA_MAILBOX_REMOTE(mimap);
-    LibBalsaServer *server = libbalsa_mailbox_remote_get_server(remote);
-    LibBalsaMailboxImap *mimap_dest = LIBBALSA_MAILBOX_IMAP(dest);
-    LibBalsaMailboxRemote *remote_dest = LIBBALSA_MAILBOX_REMOTE(mimap_dest);
-    LibBalsaServer *server_dest = libbalsa_mailbox_remote_get_server(remote_dest);
+    LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mimap);
 
-    if (server == server_dest) {
+    if (LIBBALSA_IS_MAILBOX_IMAP(dest) && LIBBALSA_MAILBOX_REMOTE_SERVER(dest) == server) {
+        LibBalsaMailboxImap *mimap_dest = (LibBalsaMailboxImap *) dest;
         gboolean ret;
 	ImapMboxHandle *handle = mimap->handle;
 	ImapSequence uid_sequence;

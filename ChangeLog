@@ -1,5 +1,28 @@
 2019-07-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Rename LIBBALSA_MAILBOX_REMOTE_SERVER() to
+	LIBBALSA_MAILBOX_REMOTE_GET_SERVER()
+
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_dispose),
+	(libbalsa_mailbox_imap_update_url), (clean_cache),
+	(libbalsa_mailbox_imap_get_handle),
+	(libbalsa_mailbox_imap_get_selected_handle), (lbm_imap_check),
+	(libbalsa_mailbox_imap_save_config),
+	(libbalsa_mailbox_imap_reconnect),
+	(libbalsa_mailbox_imap_fetch_structure),
+	(libbalsa_mailbox_imap_messages_copy):
+	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_check),
+	(libbalsa_mailbox_pop3_save_config),
+	(libbalsa_mailbox_pop3_load_config):
+	* libbalsa/mailbox_remote.h:
+	* libinit_balsa/assistant_page_directory.c (unconditional_mailbox):
+	* libinit_balsa/assistant_page_user.c (create_pop3_mbx):
+	* src/mailbox-conf.c (update_pop_mailbox),
+	(create_pop_mailbox_dialog):
+	* src/save-restore.c (config_mailbox_init):
+
+2019-07-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_messages_copy):
 	Fix some bad logic from commit 2d54e175561c9e382701d63ed8dde4746959559b
 

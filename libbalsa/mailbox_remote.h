@@ -43,7 +43,7 @@ struct _LibBalsaMailboxRemoteClass {
 
 LibBalsaServer *libbalsa_mailbox_remote_get_server(LibBalsaMailboxRemote *remote);
 /* Macro to avoid casts: */
-#define LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox) \
+#define LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox) \
     libbalsa_mailbox_remote_get_server(LIBBALSA_MAILBOX_REMOTE(mailbox))
 
 void libbalsa_mailbox_remote_set_server(LibBalsaMailboxRemote *remote,

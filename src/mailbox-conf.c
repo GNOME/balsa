@@ -490,7 +490,7 @@ update_pop_mailbox(MailboxConfWindow *mcw)
         gchar *name;
 
 	mailbox_pop3 = LIBBALSA_MAILBOX_POP3(mcw->mailbox);
-	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox_pop3);
+	server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox_pop3);
         mailbox = (LibBalsaMailbox *) mailbox_pop3;
 
 	/* basic data */
@@ -794,7 +794,7 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 #endif
 
     mcw->mb_data.pop3.server_cfg =
-        libbalsa_server_cfg_new(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox),
+        libbalsa_server_cfg_new(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox),
                                 libbalsa_mailbox_get_name(mailbox));
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(mcw->window))), GTK_WIDGET(mcw->mb_data.pop3.server_cfg));
     g_signal_connect(mcw->mb_data.pop3.server_cfg, "changed", G_CALLBACK(check_for_blank_fields), mcw);

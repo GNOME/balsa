@@ -476,7 +476,7 @@ config_mailbox_init(const gchar * prefix)
     if (mailbox == NULL)
 	return FALSE;
     if (LIBBALSA_IS_MAILBOX_REMOTE(mailbox)) {
-	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+	LibBalsaServer *server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
         libbalsa_server_connect_signals(server,
                                         G_CALLBACK(ask_password), NULL);
 	g_signal_connect_swapped(server, "config-changed",

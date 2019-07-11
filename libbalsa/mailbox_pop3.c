@@ -633,7 +633,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 		return;
 	}
 
-	server = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox_pop3);
+	server = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox_pop3);
 
 	/* open the mailbox connection and get the messages list (note: initiates the progress dialogue) */
 	pop = libbalsa_mailbox_pop3_startup(server, mailbox_pop3,
@@ -719,7 +719,7 @@ libbalsa_mailbox_pop3_save_config(LibBalsaMailbox * mailbox,
 {
     LibBalsaMailboxPOP3 *mailbox_pop3;
 
-    libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
+    libbalsa_server_save_config(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox));
 
     mailbox_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
 
@@ -744,7 +744,7 @@ libbalsa_mailbox_pop3_load_config(LibBalsaMailbox * mailbox,
 
     mailbox_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
 
-    libbalsa_server_load_config(LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox));
+    libbalsa_server_load_config(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox));
 
     mailbox_pop3->check = libbalsa_conf_get_bool("Check=false");
     mailbox_pop3->delete_from_server = libbalsa_conf_get_bool("Delete=false");

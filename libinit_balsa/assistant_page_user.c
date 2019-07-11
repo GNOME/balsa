@@ -199,7 +199,7 @@ create_pop3_mbx(const gchar *name, const gchar* host, gint security,
 {
     LibBalsaMailboxPOP3 *mailbox_pop3 = libbalsa_mailbox_pop3_new();
     LibBalsaMailbox *mailbox          = LIBBALSA_MAILBOX(mailbox_pop3);
-    LibBalsaServer *server            = LIBBALSA_MAILBOX_REMOTE_SERVER(mailbox);
+    LibBalsaServer *server            = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
     gchar *mailbox_name;
 
     libbalsa_server_set_username(server, login);

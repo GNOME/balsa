@@ -338,6 +338,7 @@ gboolean
 libbalsa_body_check_signature(LibBalsaMessageBody * body,
 			      gpgme_protocol_t protocol)
 {
+    LibBalsaMailbox *mailbox;
     GError *error = NULL;
     GMimeGpgmeSigstat *result;
 
@@ -359,7 +360,8 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 	g_object_unref(G_OBJECT(body->parts->next->sig_info));
 
     /* verify the signature */
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+    mailbox = libbalsa_message_get_mailbox(body->message);
+    libbalsa_mailbox_lock_store(mailbox);
     result = g_mime_gpgme_mps_verify(GMIME_MULTIPART_SIGNED(body->mime_part), &error);
     if (!result) {
 	if (error) {
@@ -373,7 +375,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     }
 
     body->parts->next->sig_info = result;
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(mailbox);
     return TRUE;
 }
 
@@ -386,6 +388,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
 LibBalsaMessageBody *
 libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkWindow *parent)
 {
+    LibBalsaMailbox *mailbox;
     GMimeObject *mime_obj = NULL;
     GError *error = NULL;
     LibBalsaMessage *message;
@@ -418,7 +421,8 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     		smime_encrypted = body->was_encrypted;
     }
 
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+    mailbox = libbalsa_message_get_mailbox(body->message);
+    libbalsa_mailbox_lock_store(mailbox);
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
     	mime_obj =
     		g_mime_gpgme_mpe_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
@@ -428,7 +432,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     		g_mime_application_pkcs7_decrypt_verify(GMIME_PART(body->mime_part),
     			&sig_state, parent, &error);
     }
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(mailbox);
 
     /* check the result */
     if (mime_obj == NULL) {
@@ -454,7 +458,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     	body->was_encrypted = smime_encrypted;
     }
     if (body->was_encrypted)
-        body->message->prot_state = LIBBALSA_MSG_PROTECT_CRYPT;
+        libbalsa_message_set_protect_state(body->message, LIBBALSA_MSG_PROTECT_CRYPT);
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
     if (sig_state) {

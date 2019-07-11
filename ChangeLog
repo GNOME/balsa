@@ -1,5 +1,150 @@
 2019-07-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	message: Declare it final
+
+	Use G_DECLARE_FINAL_TYPE to declare LibBalsaMessage, make it
+	private, and provide necessary getters and setters.
+
+	* libbalsa/autocrypt.c (autocrypt_from_message):
+	* libbalsa/body.c (libbalsa_message_body_set_text_rfc822headers),
+	(libbalsa_message_body_get_part_stream),
+	(libbalsa_message_body_get_message_part_stream),
+	(libbalsa_message_body_get_stream),
+	(libbalsa_message_body_get_content),
+	(libbalsa_message_body_get_pixbuf),
+	(libbalsa_message_body_save_stream):
+	* libbalsa/filter.c (libbalsa_condition_matches),
+	(libbalsa_condition_can_match):
+	* libbalsa/mailbox.c (get_from_field),
+	(lbm_index_entry_populate_from_msg),
+	(libbalsa_mailbox_real_release_message),
+	(libbalsa_mailbox_release_message),
+	(libbalsa_mailbox_set_msg_headers),
+	(libbalsa_mailbox_get_message_part), (lbm_get_mime_msg),
+	(lbm_try_reassemble):
+	* libbalsa/mailbox_imap.c (lbimap_update_flags), (imap_flags_cb),
+	(imap_expunge_cb), (free_messages_info),
+	(libbalsa_mailbox_imap_load_envelope),
+	(libbalsa_mailbox_imap_get_message), (get_struct_from_cache),
+	(libbalsa_mailbox_imap_fetch_structure),
+	(libbalsa_mailbox_imap_fetch_headers), (get_section_for),
+	(lbm_imap_get_msg_part_from_cache):
+	* libbalsa/mailbox_local.c (lbm_local_get_message_with_msg_info),
+	(message_match_real), (libbalsa_mailbox_local_cache_message),
+	(libbalsa_mailbox_local_fetch_structure),
+	(libbalsa_mailbox_local_fetch_headers),
+	(libbalsa_mailbox_local_messages_change_flags):
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_check),
+	(free_message_info), (libbalsa_mailbox_maildir_sync),
+	(libbalsa_mailbox_maildir_fetch_message_structure):
+	* libbalsa/mailbox_mbox.c (parse_mailbox), (free_message_info),
+	(libbalsa_mailbox_mbox_sync),
+	(libbalsa_mailbox_mbox_fetch_message_structure),
+	(lbm_mbox_add_message):
+	* libbalsa/mailbox_mh.c (lbm_mh_free_message_info),
+	(libbalsa_mailbox_mh_check), (libbalsa_mailbox_mh_sync),
+	(libbalsa_mailbox_mh_fetch_message_structure):
+	* libbalsa/message.c (libbalsa_message_class_init),
+	(libbalsa_message_dispose), (libbalsa_message_finalize),
+	(lb_message_headers_extra_destroy),
+	(libbalsa_message_headers_destroy),
+	(libbalsa_message_body_charset),
+	(libbalsa_message_header_get_helper),
+	(libbalsa_message_find_user_hdr),
+	(libbalsa_message_header_get_one),
+	(libbalsa_message_header_get_all),
+	(libbalsa_message_get_user_header),
+	(libbalsa_message_set_user_header), (prepend_header_misc),
+	(libbalsa_message_user_hdrs_from_gmime),
+	(libbalsa_message_get_part_by_id), (libbalsa_message_save),
+	(libbalsa_message_get_attach_icon), (libbalsa_message_reply),
+	(libbalsa_message_body_ref), (libbalsa_message_body_unref),
+	(libbalsa_message_is_multipart), (libbalsa_message_is_partial),
+	(has_attached_part), (libbalsa_message_has_attachment),
+	(libbalsa_message_get_subject), (libbalsa_message_get_lines),
+	(libbalsa_message_get_length), (lb_message_recipients),
+	(lb_message_headers_basic_from_gmime),
+	(lb_message_headers_extra_from_gmime),
+	(libbalsa_message_init_from_gmime),
+	(libbalsa_message_refs_for_threading), (references_decode),
+	(libbalsa_message_set_references_from_string),
+	(libbalsa_message_set_in_reply_to_from_string), (lbmsg_set_header),
+	(lb_message_set_headers_from_string),
+	(libbalsa_message_load_envelope_from_stream),
+	(libbalsa_message_load_envelope), (libbalsa_message_stream),
+	(libbalsa_message_copy), (libbalsa_message_set_subject),
+	(libbalsa_message_set_subject_from_header),
+	(libbalsa_message_get_tempdir), (libbalsa_message_get_mailbox),
+	(libbalsa_message_get_headers), (libbalsa_message_get_body_list),
+	(libbalsa_message_get_mime_message), (libbalsa_message_get_flags),
+	(libbalsa_message_get_message_id), (libbalsa_message_get_msgno),
+	(libbalsa_message_get_has_all_headers),
+	(libbalsa_message_get_sender), (libbalsa_message_get_request_dsn),
+	(libbalsa_message_get_references), (libbalsa_message_get_identity),
+	(libbalsa_message_get_parameters), (libbalsa_message_get_subtype),
+	(libbalsa_message_get_gpg_mode),
+	(libbalsa_message_get_in_reply_to),
+	(libbalsa_message_get_attach_pubkey),
+	(libbalsa_message_get_protect_state),
+	(libbalsa_message_get_body_ref), (libbalsa_message_set_flags),
+	(libbalsa_message_set_mailbox), (libbalsa_message_set_msgno),
+	(libbalsa_message_set_has_all_headers),
+	(libbalsa_message_set_length), (libbalsa_message_set_mime_message),
+	(libbalsa_message_set_sender), (libbalsa_message_set_message_id),
+	(libbalsa_message_set_protect_state),
+	(libbalsa_message_set_request_dsn), (libbalsa_message_set_subtype),
+	(libbalsa_message_set_body_list),
+	(libbalsa_message_set_references),
+	(libbalsa_message_set_in_reply_to),
+	(libbalsa_message_set_gpg_mode),
+	(libbalsa_message_set_attach_pubkey),
+	(libbalsa_message_set_identity), (libbalsa_message_add_parameters):
+	* libbalsa/message.h:
+	* libbalsa/rfc3156.c (libbalsa_body_check_signature),
+	(libbalsa_body_decrypt):
+	* libbalsa/send.c (lbs_message_queue_real),
+	(lbs_process_queue_msg), (balsa_send_message_success),
+	(balsa_send_message_error), (balsa_send_message_real),
+	(message_add_references), (libbalsa_message_create_mime_message),
+	(libbalsa_message_postpone), (libbalsa_create_msg),
+	(libbalsa_fill_msg_queue_item_from_queu), (lb_send_from),
+	(libbalsa_create_rfc2440_buffer), (do_multipart_crypto):
+	* libbalsa/source-viewer.c (lsv_escape_change_state),
+	(libbalsa_show_message_source):
+	* src/balsa-message.c (balsa_message_set),
+	(balsa_message_set_displayed_headers), (balsa_message_set_wrap),
+	(display_headers), (display_content), (handle_mdn_request),
+	(create_mdn_reply), (balsa_message_scan_signatures),
+	(libbalsa_msg_try_decrypt), (libbalsa_msg_part_2440),
+	(balsa_message_perform_crypto), (message_recheck_crypto_cb):
+	* src/balsa-mime-widget-message.c (extbody_send_mail):
+	* src/balsa-mime-widget-text.c (check_text_encoding):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar), (vevent_reply):
+	* src/balsa-mime-widget.c (balsa_mime_widget_new_unknown):
+	* src/balsa-print-object-header.c
+	(balsa_print_object_header_from_message):
+	* src/main-window.c (bw_index_changed_cb):
+	* src/message-window.c (message_window_idle_handler),
+	(mw_set_buttons_sensitive), (mw_expunged_cb), (mw_reply_activated),
+	(mw_reply_all_activated), (mw_reply_group_activated),
+	(mw_forward_attached_activated), (mw_forward_inline_activated),
+	(mw_forward_default_activated):
+	* src/print-gtk.c (begin_print):
+	* src/sendmsg-window.c (sw_delete_draft),
+	(balsa_sendmsg_destroy_handler), (update_bsmsg_identity),
+	(create_info_pane), (continue_body), (message_part_get_subject),
+	(quote_message_body), (fill_body_from_message),
+	(bsmsg_set_subject_from_body), (sw_save_draft),
+	(setup_headers_from_message), (set_identity_from_mailbox),
+	(guess_identity), (bsm_prepare_for_setup), (bsm_finish_setup),
+	(bsmsg2message), (check_autocrypt_recommendation),
+	(send_message_handler), (sendmsg_window_reply),
+	(sendmsg_window_forward), (sendmsg_window_continue):
+	* src/store-address.c (store_address_note_frame):
+
+2019-07-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Rename LIBBALSA_MAILBOX_REMOTE_SERVER() to
 	LIBBALSA_MAILBOX_REMOTE_GET_SERVER()
 

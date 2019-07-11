@@ -327,6 +327,7 @@ static void
 extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
 {
     LibBalsaMessage *message;
+    LibBalsaMessageHeaders *headers;
     LibBalsaMessageBody *body;
     gchar *data;
     GError *err = NULL;
@@ -334,8 +335,9 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
 
     /* create a message */
     message = libbalsa_message_new();
-    message->headers->from = internet_address_list_new();
-    internet_address_list_add(message->headers->from,
+    headers = libbalsa_message_get_headers(message);
+    headers->from = internet_address_list_new();
+    internet_address_list_add(headers->from,
                               libbalsa_identity_get_address(balsa_app.current_ident));
 
     data = libbalsa_message_body_get_parameter(mime_body, "subject");
@@ -345,7 +347,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     }
 
     data = libbalsa_message_body_get_parameter(mime_body, "server");
-    message->headers->to_list = internet_address_list_parse_string(data);
+    headers->to_list = internet_address_list_parse_string(data);
     g_free(data);
 
     /* the original body my have some data to be returned as commands... */

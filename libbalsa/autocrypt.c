@@ -201,41 +201,46 @@ autocrypt_from_message(LibBalsaMessage  *message,
 {
 	const gchar *from_addr;
 	AutocryptData *autocrypt;
+        LibBalsaMessageHeaders *headers;
 
-	g_return_if_fail(LIBBALSA_IS_MESSAGE(message) && (message->headers != NULL) && (message->headers->from != NULL) &&
-		(message->headers->content_type != NULL) && (autocrypt_db != NULL));
+	g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+        headers = libbalsa_message_get_headers(message);
+	g_return_if_fail(headers != NULL);
+	g_return_if_fail(headers->from != NULL);
+	g_return_if_fail(headers->content_type != NULL);
+	g_return_if_fail(autocrypt_db != NULL);
 
 	// FIXME - we should ignore spam - how can we detect it?
 
 	/* check for content types which shall be ignored
 	 * Note: see Autocrypt Level 1 standard, section 2.3 (https://autocrypt.org/level1.html#updating-autocrypt-peer-state) for
 	 *       details about this and the following checks which may result in completely ignoring the message. */
-	if (autocrypt_ignore(message->headers->content_type)) {
-		g_debug("ignore %s/%s", g_mime_content_type_get_media_type(message->headers->content_type),
-			g_mime_content_type_get_media_subtype(message->headers->content_type));
+	if (autocrypt_ignore(headers->content_type)) {
+		g_debug("ignore %s/%s", g_mime_content_type_get_media_type(headers->content_type),
+			g_mime_content_type_get_media_subtype(headers->content_type));
 		return;
 	}
 
 	/* check for exactly one From: mailbox address - others shall be ignored */
-	if ((internet_address_list_length(message->headers->from) != 1) ||
-		!INTERNET_ADDRESS_IS_MAILBOX(internet_address_list_get_address(message->headers->from, 0))) {
+	if ((internet_address_list_length(headers->from) != 1) ||
+		!INTERNET_ADDRESS_IS_MAILBOX(internet_address_list_get_address(headers->from, 0))) {
 		g_debug("require exactly one From: address, ignored");
 		return;
 	}
 
 	/* ignore messages without a Date: header or with a date in the future */
-	if ((message->headers->date == 0) || (message->headers->date > time(NULL))) {
+	if ((headers->date == 0) || (headers->date > time(NULL))) {
 		g_debug("no Date: header or value in the future, ignored");
 		return;
 	}
 
 	/* get the From: address (is a mailbox, checked above) */
 	from_addr =
-		internet_address_mailbox_get_addr(INTERNET_ADDRESS_MAILBOX(internet_address_list_get_address(message->headers->from, 0)));
-	g_debug("message from '%s', date %ld", from_addr, message->headers->date);
+		internet_address_mailbox_get_addr(INTERNET_ADDRESS_MAILBOX(internet_address_list_get_address(headers->from, 0)));
+	g_debug("message from '%s', date %ld", from_addr, headers->date);
 
 	/* scan for Autocrypt headers */
-	autocrypt = scan_autocrypt_headers(message->headers->user_hdrs, from_addr);
+	autocrypt = scan_autocrypt_headers(headers->user_hdrs, from_addr);
 
     /* update the database */
     G_LOCK(db_mutex);
@@ -244,19 +249,19 @@ autocrypt_from_message(LibBalsaMessage  *message,
 
     	db_info = autocrypt_user_info(autocrypt->addr, error);
     	if (db_info != NULL) {
-    		if (message->headers->date > db_info->ac_timestamp) {
-        		add_or_update_user_info(autocrypt, message->headers->date, TRUE, error);
+    		if (headers->date > db_info->ac_timestamp) {
+        		add_or_update_user_info(autocrypt, headers->date, TRUE, error);
     		} else {
     			g_info("message timestamp %ld not newer than autocrypt db timestamp %ld, ignore message",
-    				(long) message->headers->date, (long) db_info->ac_timestamp);
+    				(long) headers->date, (long) db_info->ac_timestamp);
     		}
     		autocrypt_free(db_info);
     	} else {
-    		add_or_update_user_info(autocrypt, message->headers->date, FALSE, error);
+    		add_or_update_user_info(autocrypt, headers->date, FALSE, error);
     	}
     	autocrypt_free(autocrypt);
     } else {
-    	update_last_seen(from_addr, message->headers->date, error);
+    	update_last_seen(from_addr, headers->date, error);
     }
     G_UNLOCK(db_mutex);
 }

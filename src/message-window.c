@@ -116,7 +116,9 @@ message_window_idle_handler(MessageWindow * mw)
     mw->idle_handler_id = 0;
 
     msg = BALSA_MESSAGE(mw->bmessage);
-    if (!balsa_message_set(msg, mw->message->mailbox, mw->message->msgno)) {
+    if (!balsa_message_set(msg,
+                           libbalsa_message_get_mailbox(mw->message),
+                           libbalsa_message_get_msgno(mw->message))) {
         gtk_widget_destroy(mw->window);
         return FALSE;
     }
@@ -304,9 +306,9 @@ mw_menubar_foreach(GtkWidget *widget, gpointer data)
 static void
 mw_set_buttons_sensitive(MessageWindow * mw)
 {
-    LibBalsaMailbox *mailbox = mw->message->mailbox;
+    LibBalsaMailbox *mailbox = libbalsa_message_get_mailbox(mw->message);
     BalsaIndex *index = mw->bindex;
-    guint current_msgno = mw->message->msgno;
+    guint current_msgno = libbalsa_message_get_msgno(mw->message);
     gboolean enable;
 
     if (!mailbox) {
@@ -387,7 +389,7 @@ destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 static void
 mw_expunged_cb(LibBalsaMailbox * mailbox, guint msgno, MessageWindow * mw)
 {
-    if (mw->message && (guint) mw->message->msgno == msgno)
+    if (mw->message != NULL && (guint) libbalsa_message_get_msgno(mw->message) == msgno)
         gtk_widget_destroy(mw->window);
 }
 
@@ -399,7 +401,8 @@ mw_reply_activated(GSimpleAction * action, GVariant * parameter,
 
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_reply(mw->message->mailbox, mw->message->msgno,
+    sendmsg_window_reply(libbalsa_message_get_mailbox(mw->message),
+                         libbalsa_message_get_msgno(mw->message),
                          SEND_REPLY);
 }
 
@@ -411,7 +414,8 @@ mw_reply_all_activated(GSimpleAction * action, GVariant * parameter,
 
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_reply(mw->message->mailbox, mw->message->msgno,
+    sendmsg_window_reply(libbalsa_message_get_mailbox(mw->message),
+                         libbalsa_message_get_msgno(mw->message),
                          SEND_REPLY_ALL);
 }
 
@@ -423,7 +427,8 @@ mw_reply_group_activated(GSimpleAction * action, GVariant * parameter,
 
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_reply(mw->message->mailbox, mw->message->msgno,
+    sendmsg_window_reply(libbalsa_message_get_mailbox(mw->message),
+                         libbalsa_message_get_msgno(mw->message),
                          SEND_REPLY_GROUP);
 }
 
@@ -435,7 +440,9 @@ mw_forward_attached_activated(GSimpleAction * action, GVariant * parameter,
 
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_forward(mw->message->mailbox, mw->message->msgno, TRUE);
+    sendmsg_window_forward(libbalsa_message_get_mailbox(mw->message),
+                           libbalsa_message_get_msgno(mw->message),
+                           TRUE);
 }
 
 static void
@@ -446,7 +453,8 @@ mw_forward_inline_activated(GSimpleAction * action, GVariant * parameter,
 
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_forward(mw->message->mailbox, mw->message->msgno,
+    sendmsg_window_forward(libbalsa_message_get_mailbox(mw->message),
+                           libbalsa_message_get_msgno(mw->message),
                            FALSE);
 }
 
@@ -459,7 +467,8 @@ mw_forward_default_activated(GSimpleAction * action, GVariant * parameter,
 
     g_return_if_fail(mw != NULL);
 
-    sendmsg_window_forward(mw->message->mailbox, mw->message->msgno,
+    sendmsg_window_forward(libbalsa_message_get_mailbox(mw->message),
+                           libbalsa_message(get_msgno(mw->message),
                            balsa_app.forward_attached);
 }
 #endif
@@ -548,10 +557,10 @@ mw_set_selected(MessageWindow * mw, void (*select_func) (BalsaIndex *))
     LibBalsaMessage *message;
     MessageWindow *tmp;
 
-    balsa_index_set_next_msgno(mw->bindex, mw->message->msgno);
+    balsa_index_set_next_msgno(mw->bindex, libbalsa_message_get_msgno(mw->message));
     select_func(mw->bindex);
     msgno = balsa_index_get_next_msgno(mw->bindex);
-    message = libbalsa_mailbox_get_message(mw->message->mailbox, msgno);
+    message = libbalsa_mailbox_get_message(libbalsa_message_get_mailbox(mw->message), msgno);
     if (!message)
         return;
 
@@ -574,16 +583,18 @@ static void
 message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
 {
     GArray *messages;
+    guint msgno;
     LibBalsaMessage *original = mw->message;
 
     g_return_if_fail(mailbox != NULL);
 
     /* Transferring to same mailbox? */
-    if (mw->message->mailbox == mailbox)
+    if (libbalsa_message_get_mailbox(mw->message) == mailbox)
         return;
 
     messages = g_array_new(FALSE, FALSE, sizeof(guint));
-    g_array_append_val(messages, mw->message->msgno);
+    msgno = libbalsa_message_get_msgno(mw->message);
+    g_array_append_val(messages, msgno);
 
     if (balsa_app.mw_action_after_move == NEXT_UNREAD)
         /* Try selecting the next unread message. */
@@ -720,7 +731,7 @@ mw_select_part_cb(BalsaMessage * bm, gpointer data)
 
     /* set window title */
     if (bm && bm->message) {
-        from = internet_address_list_to_string(bm->message->headers->from,
+        from = internet_address_list_to_string(libbalsa_message_get_headers(bm->message)->from,
                                                FALSE);
         title = g_strdup_printf(_("Message from %s: %s"), from,
                                 LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));

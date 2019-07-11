@@ -1145,6 +1145,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
     BalsaPartInfo *info;
     gboolean has_focus;
     LibBalsaMessage *message;
+    LibBalsaMsgProtectState prot_state;
 
     g_return_val_if_fail(bm != NULL, FALSE);
     has_focus = bm->focus_state != BALSA_MESSAGE_FOCUS_STATE_NO;
@@ -1186,7 +1187,8 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
 	balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not access message %u "
                             "in mailbox “%s”."),
-			  (unsigned int) message->msgno, libbalsa_mailbox_get_name(mailbox));
+			  (guint) libbalsa_message_get_msgno(message),
+                          libbalsa_mailbox_get_name(mailbox));
         return FALSE;
     }
 
@@ -1194,16 +1196,17 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
 				 libbalsa_mailbox_get_crypto_mode(mailbox),
 				 FALSE, 1);
     /* calculate the signature summary state if not set earlier */
-    if(message->prot_state == LIBBALSA_MSG_PROTECT_NONE) {
-        LibBalsaMsgProtectState prot_state =
-            balsa_message_scan_signatures(message->body_list, message);
+    prot_state = libbalsa_message_get_protect_state(message);
+    if (prot_state == LIBBALSA_MSG_PROTECT_NONE) {
+        LibBalsaMsgProtectState new_prot_state =
+            balsa_message_scan_signatures(libbalsa_message_get_body_list(message), message);
         /* update the icon if necessary */
-        if (message->prot_state != prot_state)
-            message->prot_state = prot_state;
+        if (prot_state != new_prot_state)
+            libbalsa_message_set_protect_state(message, new_prot_state);
     }
 
     /* may update the icon */
-    libbalsa_mailbox_msgno_update_attach(mailbox, message->msgno, message);
+    libbalsa_mailbox_msgno_update_attach(mailbox, libbalsa_message_get_msgno(message), message);
 
     display_headers(bm);
     display_content(bm);
@@ -1221,7 +1224,7 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
      * present.
      *
      */
-    if (is_new && message->headers->dispnotify_to) {
+    if (is_new && (libbalsa_message_get_headers(message)->dispnotify_to != NULL)) {
         handle_mdn_request (balsa_get_parent_window(GTK_WIDGET(bm)), message);
     }
 
@@ -1253,8 +1256,9 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
      * emit read message
      */
     if (is_new && !libbalsa_mailbox_get_readonly(mailbox))
-        libbalsa_mailbox_msgno_change_flags(mailbox, message->msgno, 0,
-                                            LIBBALSA_MESSAGE_FLAG_NEW);
+        libbalsa_mailbox_msgno_change_flags(mailbox,
+                                            libbalsa_message_get_msgno(message),
+                                            0, LIBBALSA_MESSAGE_FLAG_NEW);
 
     /* restore keyboard focus to the content, if it was there before */
     if (has_focus)
@@ -1304,10 +1308,11 @@ balsa_message_set_displayed_headers(BalsaMessage * bmessage,
 
     bmessage->shown_headers = sh;
 
-    if (bmessage->message) {
-        if(sh == HEADERS_ALL)
-            libbalsa_mailbox_set_msg_headers(bmessage->message->mailbox,
+    if (bmessage->message != NULL) {
+        if (sh == HEADERS_ALL) {
+            libbalsa_mailbox_set_msg_headers(libbalsa_message_get_mailbox(bmessage->message),
                                              bmessage->message);
+        }
         display_headers(bmessage);
         gtk_tree_model_foreach
             (gtk_tree_view_get_model(GTK_TREE_VIEW(bmessage->treeview)),
@@ -1331,9 +1336,11 @@ balsa_message_set_wrap(BalsaMessage * bm, gboolean wrap)
     bm->wrap_text = wrap;
 
     /* This is easier than reformating all the widgets... */
-    if (bm->message) {
+    if (bm->message != NULL) {
         LibBalsaMessage *msg = bm->message;
-        balsa_message_set(bm, msg->mailbox, msg->msgno);
+        balsa_message_set(bm,
+                          libbalsa_message_get_mailbox(msg),
+                          libbalsa_message_get_msgno(msg));
     }
 }
 
@@ -1342,8 +1349,8 @@ static void
 display_headers(BalsaMessage * bm)
 {
     balsa_mime_widget_message_set_headers_d(bm, bm->bm_widget,
-                                            bm->message->headers,
-                                            bm->message->body_list,
+                                            libbalsa_message_get_headers(bm->message),
+                                            libbalsa_message_get_body_list(bm->message),
                                             LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
 }
 
@@ -1629,7 +1636,7 @@ display_content(BalsaMessage * bm)
 	g_object_unref(bm->parts_popup);
     bm->parts_popup = gtk_menu_new();
     g_object_ref_sink(bm->parts_popup);
-    display_parts(bm, bm->message->body_list, NULL, NULL);
+    display_parts(bm, libbalsa_message_get_body_list(bm->message), NULL, NULL);
     if (bm->info_count > 1) {
  	gtk_widget_show_all(bm->parts_popup);
  	gtk_widget_show_all
@@ -2406,8 +2413,9 @@ bm_get_mailbox(InternetAddressList * list)
 static void
 handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
 {
+    LibBalsaMessageHeaders *headers;
     gboolean suspicious;
-    InternetAddressList *use_from;
+    InternetAddressList *use_from = NULL;
     InternetAddressList *list;
     InternetAddress *from, *dn;
     BalsaMDNReply action;
@@ -2415,24 +2423,34 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
     LibBalsaIdentity *mdn_ident = NULL;
     gint i, len;
 
+    headers = libbalsa_message_get_headers(message);
+
     /* Check if the dispnotify_to address is equal to the (in this order,
        if present) reply_to, from or sender address. */
-    if (message->headers->reply_to)
-        use_from = message->headers->reply_to;
-    else if (message->headers->from)
-        use_from = message->headers->from;
-    else if (message->sender)
-        use_from = message->sender;
-    else
-        use_from = NULL;
+    if (headers != NULL) {
+        if (headers->reply_to != NULL) {
+            use_from = headers->reply_to;
+        } else if (headers->from != NULL) {
+            use_from = headers->from;
+        }
+    }
+    if (use_from == NULL) {
+        InternetAddressList *sender;
+
+        sender = libbalsa_message_get_sender(message);
+        if (sender != NULL)
+            use_from = sender;
+        else
+            use_from = NULL;
+    }
     /* note: neither Disposition-Notification-To: nor Reply-To:, From: or
        Sender: may be address groups */
     from = use_from ? internet_address_list_get_address (use_from, 0) : NULL;
-    dn = internet_address_list_get_address (message->headers->dispnotify_to, 0);
+    dn = internet_address_list_get_address (headers->dispnotify_to, 0);
     suspicious = !libbalsa_ia_rfc2821_equal(dn, from);
 
     /* Try to find "my" identity first in the to, then in the cc list */
-    list = message->headers->to_list;
+    list = headers->to_list;
     len = list ? internet_address_list_length(list) : 0;
     for (i = 0; i < len && !mdn_ident; i++) {
         GList * id_list;
@@ -2448,7 +2466,7 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
         }
     }
 
-    list = message->headers->cc_list;
+    list = headers->cc_list;
     for (i = 0; i < len && !mdn_ident; i++) {
         GList * id_list;
 
@@ -2487,7 +2505,7 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
         gchar *reply_to;
         sender = from ? internet_address_to_string (from, FALSE) : NULL;
         reply_to =
-            internet_address_list_to_string (message->headers->dispnotify_to,
+            internet_address_list_to_string (headers->dispnotify_to,
 		                             FALSE);
         gtk_widget_show_all (create_mdn_dialog (parent, sender, reply_to, mdn,
                                                 mdn_ident));
@@ -2517,6 +2535,8 @@ static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
                                           gboolean manual)
 {
     LibBalsaMessage *message;
+    LibBalsaMessageHeaders *headers;
+    LibBalsaMessageHeaders *for_msg_headers;
     LibBalsaMessageBody *body;
     gchar *date, *dummy;
     GString *report;
@@ -2526,27 +2546,28 @@ static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
 
     /* create a message with the header set from the incoming message */
     message = libbalsa_message_new();
-    message->headers->from = internet_address_list_new();
-    internet_address_list_add(message->headers->from,
+    headers = libbalsa_message_get_headers(message);
+    headers->from = internet_address_list_new();
+    internet_address_list_add(headers->from,
                               libbalsa_identity_get_address(balsa_app.current_ident));
-    message->headers->date = time(NULL);
+    headers->date = time(NULL);
     libbalsa_message_set_subject(message, "Message Disposition Notification");
-    message->headers->to_list = internet_address_list_new ();
-    internet_address_list_append(message->headers->to_list,
-                                 for_msg->headers->dispnotify_to);
+    headers->to_list = internet_address_list_new ();
+    for_msg_headers = libbalsa_message_get_headers(for_msg);
+    internet_address_list_append(headers->to_list, for_msg_headers->dispnotify_to);
 
     /* RFC 2298 requests this mime type... */
-    message->subtype = g_strdup("report");
+    libbalsa_message_set_subtype(message, "report");
     params = g_new(gchar *, 3);
     params[0] = g_strdup("report-type");
     params[1] = g_strdup("disposition-notification");
     params[2] = NULL;
-    message->parameters = g_list_prepend(message->parameters, params);
+    libbalsa_message_add_parameters(message, params);
 
     /* the first part of the body is an informational note */
     body = libbalsa_message_body_new(message);
     date = libbalsa_message_date_to_utf8(for_msg, balsa_app.date_string);
-    dummy = internet_address_list_to_string(for_msg->headers->to_list, FALSE);
+    dummy = internet_address_list_to_string(for_msg_headers->to_list, FALSE);
     body->buffer = g_strdup_printf(
         "The message sent on %s to %s with subject “%s” has been displayed.\n"
         "There is no guarantee that the message has been read or understood.\n\n",
@@ -2576,18 +2597,18 @@ static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
                            INTERNET_ADDRESS_MAILBOX
                            (libbalsa_identity_get_address
                             (balsa_app.current_ident))->addr);
-    if (for_msg->message_id)
+    if (libbalsa_message_get_message_id(for_msg) != NULL)
         g_string_append_printf(report, "Original-Message-ID: <%s>\n",
-                               for_msg->message_id);
+                               libbalsa_message_get_message_id(for_msg));
     g_string_append_printf(report,
 			   "Disposition: %s-action/MDN-sent-%sly; displayed",
 			   manual ? "manual" : "automatic",
 			   manual ? "manual" : "automatical");
-    body->buffer = report->str;
-    g_string_free(report, FALSE);
+    body->buffer = g_string_free(report, FALSE);
     body->content_type = g_strdup("message/disposition-notification");
     body->charset = g_strdup ("US-ASCII");
     libbalsa_message_append_part(message, body);
+
     return message;
 }
 
@@ -2706,7 +2727,7 @@ balsa_message_scan_signatures(LibBalsaMessageBody *body,
 {
     LibBalsaMsgProtectState result = LIBBALSA_MSG_PROTECT_NONE;
 
-    g_return_val_if_fail(message->headers != NULL, result);
+    g_return_val_if_fail(libbalsa_message_get_headers(message) != NULL, result);
 
     while (body) {
 	LibBalsaMsgProtectState this_part_state =
@@ -2818,7 +2839,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	 * adds an extra ref) leads to a crash if we have both the encrypted and
 	 * the unencrypted version open as the body chain of the first one will be
 	 * unref'd. */
-	if (message->body_ref > chk_crypto->max_ref) {
+	if (libbalsa_message_get_body_ref(message) > chk_crypto->max_ref) {
 	    if (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS) {
 		libbalsa_information
 		    (LIBBALSA_INFORMATION_ERROR,
@@ -3034,6 +3055,7 @@ static void
 libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		       chk_crypto_t * chk_crypto)
 {
+    LibBalsaMailbox *mailbox;
     gpgme_error_t sig_res;
     GMimePartRfc2440Mode rfc2440mode;
 
@@ -3064,9 +3086,11 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
     /* check if this is a RFC2440 part */
     if (!GMIME_IS_PART(body->mime_part))
 	return;
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+
+    mailbox = libbalsa_message_get_mailbox(body->message);
+    libbalsa_mailbox_lock_store(mailbox);
     rfc2440mode = g_mime_part_check_rfc2440(GMIME_PART(body->mime_part));
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(mailbox);
 
     /* if not, or if we have more than one instance of this message open, eject
        (see remark for libbalsa_msg_try_decrypt above) - remember that
@@ -3074,7 +3098,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
        (i.e. RFC2440 stuff removed) one! */
     if (rfc2440mode == GMIME_PART_RFC2440_NONE)
 	return;
-    if (message->body_ref > chk_crypto->max_ref) {
+    if (libbalsa_message_get_body_ref(message) > chk_crypto->max_ref) {
 	if (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS) {
             libbalsa_information
                 (LIBBALSA_INFORMATION_ERROR, "%s\n%s",
@@ -3093,7 +3117,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
     }
 
     /* do the rfc2440 stuff */
-    libbalsa_mailbox_lock_store(body->message->mailbox);
+    libbalsa_mailbox_lock_store(mailbox);
     if (rfc2440mode == GMIME_PART_RFC2440_SIGNED)
         sig_res =
             libbalsa_rfc2440_verify(GMIME_PART(body->mime_part),
@@ -3111,7 +3135,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	    body->charset = NULL;
 	}
     }
-    libbalsa_mailbox_unlock_store(body->message->mailbox);
+    libbalsa_mailbox_unlock_store(mailbox);
 
     if (body->sig_info && sig_res == GPG_ERR_NO_ERROR) {
         if ((g_mime_gpgme_sigstat_summary(body->sig_info) & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
@@ -3196,9 +3220,11 @@ balsa_message_perform_crypto(LibBalsaMessage * message,
 			     LibBalsaChkCryptoMode chk_mode,
 			     gboolean no_mp_signed, guint max_ref)
 {
+    LibBalsaMessageBody *body_list;
     chk_crypto_t chk_crypto;
 
-    if (!message->body_list)
+    body_list = libbalsa_message_get_body_list(message);
+    if (body_list == NULL)
 	return;
 
     /* check if the user requested to ignore any crypto stuff */
@@ -3209,15 +3235,15 @@ balsa_message_perform_crypto(LibBalsaMessage * message,
     chk_crypto.chk_mode = chk_mode;
     chk_crypto.no_mp_signed = no_mp_signed;
     chk_crypto.max_ref = max_ref;
-    chk_crypto.sender = balsa_message_sender_to_gchar(message->headers->from, -1);
+    chk_crypto.sender =
+        balsa_message_sender_to_gchar(libbalsa_message_get_headers(message)->from, -1);
     chk_crypto.subject = g_strdup(LIBBALSA_MESSAGE_GET_SUBJECT(message));
     libbalsa_utf8_sanitize(&chk_crypto.subject, balsa_app.convert_unknown_8bit,
 			   NULL);
 
     /* do the real work */
-    message->body_list =
-	libbalsa_msg_perform_crypto_real(message, message->body_list,
-					 &chk_crypto);
+    body_list = libbalsa_msg_perform_crypto_real(message, body_list, &chk_crypto);
+    libbalsa_message_set_body_list(message, body_list);
 
     /* clean up */
     g_free(chk_crypto.subject);
@@ -3234,6 +3260,7 @@ balsa_message_perform_crypto(LibBalsaMessage * message,
 static void
 message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
 {
+    LibBalsaMessageBody *body_list;
     LibBalsaMsgProtectState prot_state;
     LibBalsaMessage * message;
     GtkTreeIter iter;
@@ -3258,16 +3285,16 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
     balsa_message_perform_crypto(message, LB_MAILBOX_CHK_CRYPT_ALWAYS, FALSE, 2);
 
     /* calculate the signature summary state */
-    prot_state =
-        balsa_message_scan_signatures(message->body_list, message);
+    body_list = libbalsa_message_get_body_list(message);
+    prot_state = balsa_message_scan_signatures(body_list, message);
 
     /* update the icon if necessary */
-    if (message->prot_state != prot_state)
-        message->prot_state = prot_state;
+    libbalsa_message_set_protect_state(message, prot_state);
 
     /* may update the icon */
-    libbalsa_mailbox_msgno_update_attach(bm->message->mailbox,
-					 bm->message->msgno, bm->message);
+    libbalsa_mailbox_msgno_update_attach(libbalsa_message_get_mailbox(bm->message),
+					 libbalsa_message_get_msgno(bm->message),
+                                         bm->message);
 
     display_headers(bm);
     display_content(bm);

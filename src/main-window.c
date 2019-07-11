@@ -4179,6 +4179,7 @@ bw_index_changed_cb(GtkWidget * widget, gpointer data)
 {
     BalsaWindow *window = data;
     BalsaIndex *index;
+    LibBalsaMessage *message;
     guint current_msgno;
 
     if (widget != window->current_index)
@@ -4188,8 +4189,8 @@ bw_index_changed_cb(GtkWidget * widget, gpointer data)
     bw_enable_message_menus(window, index->current_msgno);
     bw_enable_mailbox_menus(window, index);
 
-    current_msgno = BALSA_MESSAGE(window->preview)->message ?
-        BALSA_MESSAGE(window->preview)->message->msgno : 0;
+    message = BALSA_MESSAGE(window->preview)->message;
+    current_msgno = message != NULL ? libbalsa_message_get_msgno(message) : 0;
 
     if (current_msgno != index->current_msgno)
         bw_idle_replace(window, index);

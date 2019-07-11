@@ -276,6 +276,7 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
     gchar *subject;
     gchar *date;
     GString *footer_string;
+    InternetAddressList *from_list;
 
     /* initialise the context */
     page_setup = gtk_print_context_get_page_setup(context);
@@ -340,9 +341,9 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
     	g_free(date);
     }
 
-    if (pdata->message->headers->from) {
-	gchar *from =
-	    internet_address_list_to_string(pdata->message->headers->from, FALSE);
+    from_list = libbalsa_message_get_headers(pdata->message)->from;
+    if (from_list != NULL) {
+	gchar *from = internet_address_list_to_string(from_list, FALSE);
 
 	libbalsa_utf8_sanitize(&from, balsa_app.convert_unknown_8bit,
 			       NULL);
@@ -388,7 +389,7 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
     /* add the mime bodies */
     pdata->print_parts = 
 	scan_body(pdata->print_parts, context, &pdata->setup,
-		  pdata->message->body_list, FALSE);
+		  libbalsa_message_get_body_list(pdata->message), FALSE);
 
     /* done */
     gtk_print_operation_set_n_pages(operation, pdata->setup.page_count);

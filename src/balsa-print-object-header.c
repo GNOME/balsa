@@ -299,9 +299,9 @@ balsa_print_object_header_from_message(GList *list,
 				       BalsaPrintSetup * psetup)
 {
     return balsa_print_object_header_new_real(list, context,
-					      message->body_list,
-					      message->headers, subject,
-					      psetup, FALSE);
+					      libbalsa_message_get_body_list(message),
+					      libbalsa_message_get_headers(message),
+                                              subject, psetup, FALSE);
 }
 
 

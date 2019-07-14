@@ -1,3 +1,9 @@
+2019-07-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-message: Pass message headers to disposition-notify handler
+
+	* src/balsa-message.c (balsa_message_set), (handle_mdn_request):
+
 2019-07-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	message: Declare it final

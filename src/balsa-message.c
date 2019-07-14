@@ -137,7 +137,8 @@ static void part_create_menu (BalsaPartInfo* info);
 static GtkNotebookClass *parent_class = NULL;
 
 /* stuff needed for sending Message Disposition Notifications */
-static void handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message);
+static void handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message,
+                               LibBalsaMessageHeaders *headers);
 static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
                                           LibBalsaMessage *for_msg,
                                           gboolean manual);
@@ -1224,8 +1225,11 @@ balsa_message_set(BalsaMessage * bm, LibBalsaMailbox * mailbox, guint msgno)
      * present.
      *
      */
-    if (is_new && (libbalsa_message_get_headers(message)->dispnotify_to != NULL)) {
-        handle_mdn_request (balsa_get_parent_window(GTK_WIDGET(bm)), message);
+    if (is_new) {
+        LibBalsaMessageHeaders *headers = libbalsa_message_get_headers(message);
+
+        if (headers != NULL && headers->dispnotify_to != NULL)
+            handle_mdn_request(balsa_get_parent_window(GTK_WIDGET(bm)), message, headers);
     }
 
 #ifdef ENABLE_AUTOCRYPT
@@ -2411,9 +2415,10 @@ bm_get_mailbox(InternetAddressList * list)
 }
 
 static void
-handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
+handle_mdn_request(GtkWindow *parent,
+                   LibBalsaMessage *message,
+                   LibBalsaMessageHeaders *headers)
 {
-    LibBalsaMessageHeaders *headers;
     gboolean suspicious;
     InternetAddressList *use_from = NULL;
     InternetAddressList *list;
@@ -2423,16 +2428,12 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
     LibBalsaIdentity *mdn_ident = NULL;
     gint i, len;
 
-    headers = libbalsa_message_get_headers(message);
-
     /* Check if the dispnotify_to address is equal to the (in this order,
        if present) reply_to, from or sender address. */
-    if (headers != NULL) {
-        if (headers->reply_to != NULL) {
-            use_from = headers->reply_to;
-        } else if (headers->from != NULL) {
-            use_from = headers->from;
-        }
+    if (headers->reply_to != NULL) {
+        use_from = headers->reply_to;
+    } else if (headers->from != NULL) {
+        use_from = headers->from;
     }
     if (use_from == NULL) {
         InternetAddressList *sender;
@@ -2446,7 +2447,7 @@ handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message)
     /* note: neither Disposition-Notification-To: nor Reply-To:, From: or
        Sender: may be address groups */
     from = use_from ? internet_address_list_get_address (use_from, 0) : NULL;
-    dn = internet_address_list_get_address (headers->dispnotify_to, 0);
+    dn = internet_address_list_get_address(headers->dispnotify_to, 0);
     suspicious = !libbalsa_ia_rfc2821_equal(dn, from);
 
     /* Try to find "my" identity first in the to, then in the cc list */

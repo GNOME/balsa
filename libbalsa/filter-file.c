@@ -130,6 +130,7 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 		LibBalsaMailboxFilter *mf = g_new(LibBalsaMailboxFilter, 1);
 
 		mf->actual_filter = fil;
+                mf->when = FILTER_WHEN_NEVER; /* 0 */
 		filters = g_slist_prepend(filters, mf);
 	    }
 	    else

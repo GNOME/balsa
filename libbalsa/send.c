@@ -455,6 +455,8 @@ lbs_message_queue_real(LibBalsaMessage    *message,
         mime_msgs =
             g_mime_message_partial_split_message(mime_msg, big_message,
                                                  &nparts);
+
+        g_object_ref(mime_msg);
         rc = TRUE;
         for (i = 0; i < nparts; ++i) {
             if (nparts > 1) {
@@ -476,6 +478,7 @@ lbs_message_queue_real(LibBalsaMessage    *message,
         g_free(mime_msgs);
         /* Restore message's original mime_msg: */
         libbalsa_message_set_mime_message(message, mime_msg);
+        g_object_unref(mime_msg);
     } else {
         rc = libbalsa_message_copy(message, outbox, error);
     }

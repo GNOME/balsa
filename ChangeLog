@@ -1,3 +1,17 @@
+2019-07-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix some Valgrind-detected issues
+
+	* libbalsa/filter-file.c (libbalsa_mailbox_filters_load_config):
+	initialize LibBalsaMailboxFilter::when;
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize): clear the
+	GRecMutex;
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_load_envelope):
+	do not leak an InternetAddressList;
+	(get_struct_from_cache): do not leak GMimeMessage;
+	* libbalsa/send.c (lbs_message_queue_real): ref the GMimeMessage
+	to preserve it, and then unref it.
+
 2019-07-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-message: Pass message headers to disposition-notify handler

@@ -27,31 +27,15 @@
 
 #include <gmime/gmime-stream-fs.h>
 
-#define LIBBALSA_TYPE_MIME_STREAM_SHARED                           \
-    (libbalsa_mime_stream_shared_get_type ())
-#define LIBBALSA_MIME_STREAM_SHARED(obj)                           \
-    (G_TYPE_CHECK_INSTANCE_CAST((obj),                             \
-                                LIBBALSA_TYPE_MIME_STREAM_SHARED,  \
-                                LibBalsaMimeStreamShared))
-#define LIBBALSA_MIME_STREAM_SHARED_CLASS(klass)                   \
-    (G_TYPE_CHECK_CLASS_CAST((klass),                              \
-                             LIBBALSA_TYPE_MIME_STREAM_SHARED,     \
-                             LibBalsaMimeStreamSharedClass))
-#define LIBBALSA_IS_MIME_STREAM_SHARED(obj)                        \
-    (G_TYPE_CHECK_INSTANCE_TYPE((obj),                             \
-                                LIBBALSA_TYPE_MIME_STREAM_SHARED))
-#define LIBBALSA_IS_MIME_STREAM_SHARED_CLASS(klass)                \
-    (G_TYPE_CHECK_CLASS_TYPE((klass),                              \
-                             LIBBALSA_TYPE_MIME_STREAM_SHARED))
-#define LIBBALSA_MIME_STREAM_SHARED_GET_CLASS(obj)                 \
-    (G_TYPE_INSTANCE_GET_CLASS((obj),                              \
-                               LIBBALSA_TYPE_MIME_STREAM_SHARED,   \
-                               LibBalsaMimeStreamSharedClass))
+#define LIBBALSA_TYPE_MIME_STREAM_SHARED libbalsa_mime_stream_shared_get_type()
 
-typedef struct _LibBalsaMimeStreamShared      LibBalsaMimeStreamShared;
-typedef struct _LibBalsaMimeStreamSharedClass LibBalsaMimeStreamSharedClass;
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GMimeStreamFs, g_object_unref)
 
-GType libbalsa_mime_stream_shared_get_type(void);
+G_DECLARE_FINAL_TYPE(LibBalsaMimeStreamShared,
+                     libbalsa_mime_stream_shared,
+                     LIBBALSA,
+                     MIME_STREAM_SHARED,
+                     GMimeStreamFs);
 
 GMimeStream *libbalsa_mime_stream_shared_new(int fd);
 

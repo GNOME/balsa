@@ -1,3 +1,23 @@
+2019-07-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-stream-shared: Use modern macros to declare and define.
+
+	* libbalsa/mime-stream-shared.c: Use G_DEFINE_TYPE();
+	(libbalsa_mime_stream_shared_class_init): do not handle
+	parent_class;
+	(libbalsa_mime_stream_shared_init): new stub, required by
+	G_DEFINE_TYPE();
+	(lbmss_lock_new): do not ref-count locks;
+	(lbmss_finalize): use GMimeStreamFs::owner to decide when to
+	free the lock;
+	(lbmss_stream_read), (lbmss_stream_write),
+	(lbmss_stream_reset), (lbmss_stream_seek),
+	(lbmss_stream_substream), (libbalsa_mime_stream_shared_new):
+	parent class stuff;
+	(libbalsa_mime_stream_shared_lock),
+	(libbalsa_mime_stream_shared_unlock): cosmetics;
+	* libbalsa/mime-stream-shared.h: Use G_DECLARE_FINAL_TYPE().
+
 2019-07-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix some Valgrind-detected issues

@@ -1,3 +1,8 @@
+2019-07-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/gmime-part-rfc2440.c (g_mime_part_check_rfc2440): use
+	g_str_has_prefix() instead of strncmp().
+
 2019-07-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mime-stream-shared: Use modern macros to declare and define.

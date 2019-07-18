@@ -56,6 +56,11 @@ g_mime_part_check_rfc2440(GMimePart * part)
     ssize_t slen;
     gchar buf[RFC2440_BUF_LEN];
     GMimePartRfc2440Mode retval = GMIME_PART_RFC2440_NONE;
+    static const char begin_pgp_message[]        = "-----BEGIN PGP MESSAGE-----";
+    static const char end_pgp_message[]          = "-----END PGP MESSAGE-----";
+    static const char begin_pgp_signed_message[] = "-----BEGIN PGP SIGNED MESSAGE-----";
+    static const char begin_pgp_signature[]      = "-----BEGIN PGP SIGNATURE-----";
+    static const char end_pgp_signature[]        = "-----END PGP SIGNATURE-----";
 
     /* try to get the content stream */
     wrapper = g_mime_part_get_content_object(part);
@@ -72,35 +77,35 @@ g_mime_part_check_rfc2440(GMimePart * part)
 	g_mime_stream_read(stream, buf, slen);
 	buf[slen] = '\0';
 
-	if (!strncmp(buf, "-----BEGIN PGP MESSAGE-----", 27) &&
-	    strstr(buf, "-----END PGP MESSAGE-----"))
+	if (g_str_has_prefix(buf, begin_pgp_message) &&
+	    strstr(buf, end_pgp_message) != NULL) {
 	    retval = GMIME_PART_RFC2440_ENCRYPTED;
-	else if (!strncmp(buf, "-----BEGIN PGP SIGNED MESSAGE-----", 34)) {
+        } else if (g_str_has_prefix(buf, begin_pgp_signed_message)) {
 	    gchar *p1, *p2;
 
-	    p1 = strstr(buf, "-----BEGIN PGP SIGNATURE-----");
-	    p2 = strstr(buf, "-----END PGP SIGNATURE-----");
-	    if (p1 && p2 && p2 > p1)
+	    p1 = strstr(buf, begin_pgp_signature);
+	    p2 = strstr(buf, end_pgp_signature);
+	    if (p1 != NULL && p2 != NULL && p2 > p1)
 		retval = GMIME_PART_RFC2440_SIGNED;
 	}
     } else {
 	/* check if the beginning of the stream matches */
-	g_mime_stream_read(stream, buf, 34);
+	g_mime_stream_read(stream, buf, strlen(begin_pgp_signed_message));
 	g_mime_stream_seek(stream, 1 - RFC2440_BUF_LEN,
 			   GMIME_STREAM_SEEK_END);
-	if (!strncmp(buf, "-----BEGIN PGP MESSAGE-----", 27)) {
+	if (g_str_has_prefix(buf, begin_pgp_message)) {
 	    g_mime_stream_read(stream, buf, RFC2440_BUF_LEN - 1);
 	    buf[RFC2440_BUF_LEN - 1] = '\0';
-	    if (strstr(buf, "-----END PGP MESSAGE-----"))
+	    if (strstr(buf, end_pgp_message) != NULL)
 		retval = GMIME_PART_RFC2440_ENCRYPTED;
-	} else if (!strncmp(buf, "-----BEGIN PGP SIGNED MESSAGE-----", 34)) {
+	} else if (g_str_has_prefix(buf, begin_pgp_signed_message)) {
 	    gchar *p1, *p2;
 
 	    g_mime_stream_read(stream, buf, RFC2440_BUF_LEN - 1);
 	    buf[RFC2440_BUF_LEN - 1] = '\0';
-	    p1 = strstr(buf, "-----BEGIN PGP SIGNATURE-----");
-	    p2 = strstr(buf, "-----END PGP SIGNATURE-----");
-	    if (p1 && p2 && p2 > p1)
+	    p1 = strstr(buf, begin_pgp_signature);
+	    p2 = strstr(buf, end_pgp_signature);
+	    if (p1 != NULL && p2 != NULL && p2 > p1)
 		retval = GMIME_PART_RFC2440_SIGNED;
 	}
     }

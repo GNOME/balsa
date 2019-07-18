@@ -1,5 +1,12 @@
 2019-07-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-cite-bar: Declare it final
+
+	* src/balsa-cite-bar.c: Copyright update;
+	* src/balsa-cite-bar.h: use G_DECLARE_FINAL_TYPE().
+
+2019-07-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	ab-window: Use modern macros to declare and define.
 
 	* src/ab-window.c: use G_DEFINE_TYPE();

@@ -1,5 +1,11 @@
 2019-07-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/mailbox_maildir.c
+	(libbalsa_mailbox_maildir_fetch_message_structure): do not unref
+	a NULL GMimeMessage.
+
+2019-07-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/gmime-part-rfc2440.c (g_mime_part_check_rfc2440): use
 	g_str_has_prefix() instead of strncmp().
 

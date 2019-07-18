@@ -837,7 +837,8 @@ libbalsa_mailbox_maildir_fetch_message_structure(LibBalsaMailbox * mailbox,
 						    msg_info->subdir,
 						    msg_info->filename);
         libbalsa_message_set_mime_message(message, mime_message);
-        g_object_unref(mime_message);
+        if (mime_message != NULL)
+            g_object_unref(mime_message);
     }
 
     return LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_maildir_parent_class)->

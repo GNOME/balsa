@@ -138,7 +138,7 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 				     _("Invalid filters %s for mailbox %s"),
                                      filters_names[i], libbalsa_mailbox_get_name(mbox));
 	}
-	libbalsa_mailbox_set_filters(mbox, g_slist_reverse(filters));
+	filters = g_slist_reverse(filters);
     }
     g_strfreev(filters_names);
 
@@ -159,6 +159,7 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 	    }
 	}
 	g_strfreev(filters_names);
+	libbalsa_mailbox_set_filters(mbox, filters);
     }
     filter_errno=FILTER_NOERR;
 }

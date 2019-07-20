@@ -1,3 +1,8 @@
+2019-07-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/filter-file.c (libbalsa_mailbox_filters_load_config):
+	Fix loading filters.
+
 2019-07-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-cite-bar: Declare it final

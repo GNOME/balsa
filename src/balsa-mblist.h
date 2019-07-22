@@ -23,35 +23,9 @@
 #include <gtk/gtk.h>
 #include "mailbox-node.h"
 
-#define BALSA_TYPE_MBLIST          (balsa_mblist_get_type ())
-#define BALSA_MBLIST(obj)          G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_MBLIST, BalsaMBList)
-#define BALSA_MBLIST_CLASS(klass)  G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_MBLIST, BalsaMBListClass)
-#define BALSA_IS_MBLIST(obj)       G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_MBLIST)
+#define BALSA_TYPE_MBLIST (balsa_mblist_get_type ())
 
-typedef struct _BalsaMBList BalsaMBList;
-typedef struct _BalsaMBListClass BalsaMBListClass;
-
-struct _BalsaMBList {
-    GtkTreeView tree_view;
-
-    /* shall the number of messages be displayed ? */
-    gboolean display_info;
-    /* signal handler id */
-    gulong toggled_handler_id;
-
-    /* to set sort order in an idle callback */
-    gint  sort_column_id;
-    guint sort_idle_id;
-};
-
-struct _BalsaMBListClass {
-    GtkTreeViewClass parent_class;
-
-    void (*has_unread_mailbox)(BalsaMBList * mblist,
-                               gboolean has_unread_mailbox);
-};
-
-GType balsa_mblist_get_type(void);
+G_DECLARE_FINAL_TYPE(BalsaMBList, balsa_mblist, BALSA, MBLIST, GtkTreeView)
 
 GtkWidget *balsa_mblist_new(void);
 

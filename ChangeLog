@@ -1,5 +1,15 @@
 2019-07-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-mblist: Use modern macros to declare and define.
+
+	Make BalsaMBList opaque; no accessors needed.
+
+	* src/balsa-mblist.c (balsa_mblist_class_init), (bmbl_drag_motion),
+	(balsa_mblist_init):
+	* src/balsa-mblist.h:
+
+2019-07-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	balsa-index: Another convenience function
 
 	* src/balsa-index.c (balsa_index_get_last_use_time): another

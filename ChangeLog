@@ -1,3 +1,10 @@
+2019-07-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	send.c: Fix the build
+
+	* libbalsa/send.c (libbalsa_message_create_mime_message):
+	LibBalsaIdentity *identity is used only in an autocrypt build.
+
 2019-07-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-index: Add a convenience function

@@ -1229,7 +1229,9 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     GList *list;
     gboolean attach_pubkey = FALSE;
     GtkWindow *parent = g_object_get_data(G_OBJECT(message), "parent-window");
+#ifdef ENABLE_AUTOCRYPT
     LibBalsaIdentity *identity;
+#endif /* ENABLE_AUTOCRYPT */
 
     /* attach the public key only if we send the message, not if we just postpone it */
     if (!postponing &&

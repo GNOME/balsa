@@ -150,15 +150,10 @@ gboolean balsa_index_get_prev_message(BalsaIndex *bindex);
 const gchar * balsa_index_get_filter_string(BalsaIndex *bindex);
 
 /*
- * Setter
- */
-
-void balsa_index_set_last_use_time(BalsaIndex *bindex);
-
-/*
  * Convenience
  */
 
+void balsa_index_set_last_use_time(BalsaIndex *bindex);
 LibBalsaMailbox * balsa_index_get_mailbox(BalsaIndex *bindex);
 
 #define BALSA_INDEX_VIEW_ON_OPEN "balsa-index-view-on-open"

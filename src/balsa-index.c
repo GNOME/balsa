@@ -2886,7 +2886,7 @@ balsa_index_get_filter_string(BalsaIndex *bindex)
 }
 
 /*
- * Setter
+ * Convenience
  */
 
 void
@@ -2897,10 +2897,6 @@ balsa_index_set_last_use_time(BalsaIndex *bindex)
     if (bindex->mailbox_node != NULL)
         time(&bindex->mailbox_node->last_use);
 }
-
-/*
- * Convenience
- */
 
 LibBalsaMailbox *
 balsa_index_get_mailbox(BalsaIndex *bindex)

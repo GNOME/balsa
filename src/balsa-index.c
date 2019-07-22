@@ -2894,7 +2894,8 @@ balsa_index_set_last_use_time(BalsaIndex *bindex)
 {
     g_return_if_fail(BALSA_IS_INDEX(bindex));
 
-    time(&bindex->mailbox_node->last_use);
+    if (bindex->mailbox_node != NULL)
+        time(&bindex->mailbox_node->last_use);
 }
 
 /*

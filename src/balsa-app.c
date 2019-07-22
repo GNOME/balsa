@@ -884,18 +884,22 @@ BalsaIndex*
 balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
 {
     GtkWidget *page;
-    GtkWidget *index;
+    GtkWidget *child;
     guint i;
-    g_return_val_if_fail(balsa_app.notebook, NULL);
+
+    g_return_val_if_fail(GTK_IS_NOTEBOOK(balsa_app.notebook), NULL);
 
     for (i = 0;
-	 (page =
-	  gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
+	 (page = gtk_notebook_get_nth_page((GtkNotebook *) balsa_app.notebook, i)) != NULL;
 	 i++) {
-        index = gtk_bin_get_child(GTK_BIN(page));
-	if (index && BALSA_INDEX(index)->mailbox_node
-            && BALSA_INDEX(index)->mailbox_node->mailbox == mailbox)
-	    return BALSA_INDEX(index);
+        child = gtk_bin_get_child(GTK_BIN(page));
+	if (child != NULL) {
+            BalsaIndex *bindex = BALSA_INDEX(child);
+            BalsaMailboxNode *mailbox_node = balsa_index_get_mailbox_node(bindex);
+
+            if (mailbox_node != NULL && mailbox_node->mailbox == mailbox)
+                return bindex;
+        }
     }
 
     /* didn't find a matching mailbox */

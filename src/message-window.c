@@ -306,12 +306,13 @@ mw_menubar_foreach(GtkWidget *widget, gpointer data)
 static void
 mw_set_buttons_sensitive(MessageWindow * mw)
 {
-    LibBalsaMailbox *mailbox = libbalsa_message_get_mailbox(mw->message);
+    LibBalsaMailbox *mailbox;
     BalsaIndex *index = mw->bindex;
     guint current_msgno = libbalsa_message_get_msgno(mw->message);
     gboolean enable;
 
-    if (!mailbox) {
+    mailbox = libbalsa_message_get_mailbox(mw->message);
+    if (mailbox == NULL) {
         gtk_widget_destroy(mw->window);
         return;
     }
@@ -322,12 +323,12 @@ mw_set_buttons_sensitive(MessageWindow * mw)
     enable = index && balsa_index_previous_msgno(index, current_msgno) > 0;
     mw_set_enabled(mw, "previous-message", enable);
 
-    enable = index && libbalsa_mailbox_get_unread_messages(index->mailbox_node->mailbox) > 0;
+    mailbox = index != NULL ? balsa_index_get_mailbox_node(index)->mailbox : NULL;
+
+    enable = mailbox != NULL && libbalsa_mailbox_get_unread_messages(mailbox) > 0;
     mw_set_enabled(mw, "next-unread", enable);
 
-    enable = index
-        && libbalsa_mailbox_total_messages(index->mailbox_node->mailbox) >
-        0;
+    enable = mailbox != NULL && libbalsa_mailbox_total_messages(mailbox) > 0;
     mw_set_enabled(mw, "next-flagged", enable);
 }
 

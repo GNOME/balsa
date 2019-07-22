@@ -1,3 +1,36 @@
+2019-07-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-index: Use modern macros to declare and define.
+
+	Make BalsaIndex opaque, and provide necessary accessors.
+
+	* src/balsa-index.c: use G_DEFINE_TYPE to define BalsaIndex;
+	(balsa_index_class_init), (bndx_destroy),
+	(balsa_index_init), (balsa_index_select_thread),
+	(balsa_index_get_mailbox_node), (balsa_index_get_current_msgno),
+	(balsa_index_get_filter_no), (balsa_index_get_next_message),
+	(balsa_index_get_prev_message), (balsa_index_get_filter_string),
+	(balsa_index_set_last_use_time):
+	* src/balsa-index.h: use G_DECLARE_FINAL_TYPE;
+	* src/balsa-app.c (balsa_find_index_by_mailbox):
+	* src/balsa-mblist.c (bmbl_tree_expand), (bmbl_drag_cb),
+	(bmbl_open_mailbox), (bmbl_update_mailbox):
+	* src/main-window.c (continue_activated), (print_activated),
+	(reset_filter_activated), (mailbox_close_activated),
+	(select_filters_activated), (remove_duplicates_activated),
+	(threading_change_state), (bw_enable_mailbox_menus),
+	(balsa_window_update_book_menus), (bw_enable_message_menus),
+	(balsa_window_set_thread_messages),
+	(balsa_window_real_close_mbnode), (bw_close_mailbox_on_timer),
+	(bw_find_real), (bw_hide_changed_set_view_filter),
+	(bw_reset_filter), (bw_notebook_switch_page_cb),
+	(bw_index_changed_cb), (bw_idle_cb),
+	(bw_notebook_drag_received_cb), (bw_notebook_page_notify_cb),
+	(balsa_window_next_unread):
+	* src/message-window.c (mw_set_buttons_sensitive):
+	* src/sendmsg-window.c (attachments_add), (drag_data_quote): use
+	the accessors.
+
 2019-07-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/filter-file.c (libbalsa_mailbox_filters_load_config):

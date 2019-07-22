@@ -550,8 +550,8 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
 	GtkWidget *current_index =
 	    balsa_window_find_current_index(balsa_app.main_window);
 	LibBalsaMailbox *current_mailbox =
-	    current_index ?
-	    BALSA_INDEX(current_index)->mailbox_node->mailbox :
+	    current_index != NULL ?
+	    balsa_index_get_mailbox_node(BALSA_INDEX(current_index))->mailbox :
 	    NULL;
 	gboolean first_mailbox = TRUE;
 
@@ -840,7 +840,7 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
         return;
     }
 
-    orig_mailbox = orig_index->mailbox_node->mailbox;
+    orig_mailbox = balsa_index_get_mailbox_node(orig_index)->mailbox;
 
     /* find the node and mailbox */
 
@@ -1137,30 +1137,29 @@ static void
 bmbl_open_mailbox(LibBalsaMailbox * mailbox, gboolean set_current)
 {
     int i;
-    GtkWidget *index;
+    GtkWidget *bindex;
     BalsaMailboxNode *mbnode;
 
     mbnode = balsa_find_mailbox(mailbox);
-    if (!mbnode) {
+    if (mbnode == NULL) {
         g_warning(_("Failed to find mailbox"));
         return;
     }
 
-    index = balsa_window_find_current_index(balsa_app.main_window);
+    bindex = balsa_window_find_current_index(balsa_app.main_window);
 
     /* If we currently have a page open, update the time last visited */
-    if (index) {
-	time(&BALSA_INDEX(index)->mailbox_node->last_use);
-    }
+    if (bindex != NULL)
+        balsa_index_set_last_use_time(BALSA_INDEX(index));
 
     i = balsa_find_notebook_page_num(mailbox);
     if (i != -1) {
         if (set_current) {
             gtk_notebook_set_current_page(GTK_NOTEBOOK(balsa_app.notebook),
                                           i);
-            index = balsa_window_find_current_index(balsa_app.main_window);
-            time(&BALSA_INDEX(index)->mailbox_node->last_use);
-            balsa_index_set_column_widths(BALSA_INDEX(index));
+            bindex = balsa_window_find_current_index(balsa_app.main_window);
+            balsa_index_set_last_use_time(BALSA_INDEX(bindex));
+            balsa_index_set_column_widths(BALSA_INDEX(bindex));
         }
     } else { /* page with mailbox not found, open it */
         balsa_window_open_mbnode(balsa_app.main_window, mbnode,
@@ -1434,7 +1433,8 @@ bmbl_update_mailbox(GtkTreeStore * store, LibBalsaMailbox * mailbox)
     bmbl_node_style(model, &iter);
 
     bindex = balsa_window_find_current_index(balsa_app.main_window);
-    if (!bindex || mailbox != BALSA_INDEX(bindex)->mailbox_node->mailbox)
+    if (bindex == NULL ||
+        mailbox != balsa_index_get_mailbox_node(BALSA_INDEX(bindex))->mailbox)
         return;
 
     balsa_window_set_statusbar(balsa_app.main_window, mailbox);

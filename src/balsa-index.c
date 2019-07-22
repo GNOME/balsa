@@ -60,8 +60,6 @@
 
 
 /* gtk widget */
-static void bndx_class_init(BalsaIndexClass * klass);
-static void bndx_instance_init(BalsaIndex * index);
 static void bndx_destroy(GObject * obj);
 static gboolean bndx_popup_menu(GtkWidget * widget);
 
@@ -142,38 +140,44 @@ static void bndx_select_row(BalsaIndex * index, GtkTreePath * path);
 /* Other callbacks. */
 static void bndx_store_address(gpointer data);
 
-static GtkTreeViewClass *parent_class = NULL;
+struct _BalsaIndex {
+    GtkTreeView tree_view;
+
+    /* the popup menu and some items we need to refer to */
+    GtkWidget *popup_menu;
+    GtkWidget *delete_item;
+    GtkWidget *undelete_item;
+    GtkWidget *move_to_trash_item;
+    GtkWidget *toggle_item;
+    GtkWidget *move_to_item;
+
+    BalsaMailboxNode* mailbox_node;
+    guint current_msgno;
+    guint next_msgno;
+	gboolean current_message_is_deleted:1;
+    gboolean prev_message:1;
+    gboolean next_message:1;
+    gboolean has_selection_changed_idle:1;
+    gboolean has_mailbox_changed_idle:1;
+    gboolean collapsing:1;
+    int    filter_no;
+    gchar *filter_string; /* Quick view filter string, if any */
+
+    /* signal handler ids */
+    gulong row_expanded_id;
+    gulong row_collapsed_id;
+    gulong selection_changed_id;
+
+	LibBalsaMailboxSearchIter *search_iter;
+    BalsaIndexWidthPreference width_preference;
+};
 
 /* Class type. */
-GType
-balsa_index_get_type(void)
-{
-    static GType balsa_index_type = 0;
-
-    if (!balsa_index_type) {
-        static const GTypeInfo balsa_index_info = {
-            sizeof(BalsaIndexClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-            (GClassInitFunc) bndx_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-            sizeof(BalsaIndex),
-            0,                  /* n_preallocs */
-            (GInstanceInitFunc) bndx_instance_init
-        };
-
-        balsa_index_type =
-            g_type_register_static(GTK_TYPE_TREE_VIEW,
-                                   "BalsaIndex", &balsa_index_info, 0);
-    }
-
-    return balsa_index_type;
-}
+G_DEFINE_TYPE(BalsaIndex, balsa_index, GTK_TYPE_TREE_VIEW)
 
 /* BalsaIndex class init method. */
 static void
-bndx_class_init(BalsaIndexClass * klass)
+balsa_index_class_init(BalsaIndexClass * klass)
 {
     GObjectClass *object_class;
     GtkWidgetClass *widget_class;
@@ -181,21 +185,17 @@ bndx_class_init(BalsaIndexClass * klass)
     object_class = (GObjectClass *) klass;
     widget_class = (GtkWidgetClass *) klass;
 
-    parent_class = g_type_class_peek_parent(klass);
-
     balsa_index_signals[INDEX_CHANGED] =
         g_signal_new("index-changed",
                      G_TYPE_FROM_CLASS(object_class),
 		     G_SIGNAL_RUN_FIRST,
-                     G_STRUCT_OFFSET(BalsaIndexClass,
-                                     index_changed),
+                     0,
                      NULL, NULL,
 		     NULL,
                      G_TYPE_NONE, 0);
 
     object_class->dispose = bndx_destroy;
     widget_class->popup_menu = bndx_popup_menu;
-    klass->index_changed = NULL;
 }
 
 /* Object class destroy method. */
@@ -246,8 +246,7 @@ bndx_destroy(GObject * obj)
 
     g_free(index->filter_string); index->filter_string = NULL;
 
-    if (G_OBJECT_CLASS(parent_class)->dispose)
-        (*G_OBJECT_CLASS(parent_class)->dispose) (obj);
+    G_OBJECT_CLASS(balsa_index_parent_class)->dispose(obj);
 }
 
 /* Widget class popup menu method. */
@@ -296,7 +295,7 @@ bndx_string_width(const gchar * text)
 /* BalsaIndex instance init method; no tree store is set on the tree
  * view--that's handled later, when the view is populated. */
 static void
-bndx_instance_init(BalsaIndex * index)
+balsa_index_init(BalsaIndex * index)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
@@ -2832,4 +2831,68 @@ balsa_index_select_thread(BalsaIndex * bindex)
         }
     } while (valid
              && gtk_tree_model_iter_parent(model, &next_iter, &iter));
+}
+
+/*
+ * Getters
+ */
+
+BalsaMailboxNode *
+balsa_index_get_mailbox_node(BalsaIndex *bindex)
+{
+    g_return_val_if_fail(BALSA_IS_INDEX(bindex), NULL);
+
+    return bindex->mailbox_node;
+}
+
+guint
+balsa_index_get_current_msgno(BalsaIndex *bindex)
+{
+    g_return_val_if_fail(BALSA_IS_INDEX(bindex), 0);
+
+    return bindex->current_msgno;
+}
+
+gint
+balsa_index_get_filter_no(BalsaIndex *bindex)
+{
+    g_return_val_if_fail(BALSA_IS_INDEX(bindex), 0);
+
+    return bindex->filter_no;
+}
+
+gboolean
+balsa_index_get_next_message(BalsaIndex *bindex)
+{
+    g_return_val_if_fail(BALSA_IS_INDEX(bindex), 0);
+
+    return bindex->next_message;
+}
+
+gboolean
+balsa_index_get_prev_message(BalsaIndex *bindex)
+{
+    g_return_val_if_fail(BALSA_IS_INDEX(bindex), 0);
+
+    return bindex->prev_message;
+}
+
+const gchar *
+balsa_index_get_filter_string(BalsaIndex *bindex)
+{
+    g_return_val_if_fail(BALSA_IS_INDEX(bindex), NULL);
+
+    return bindex->filter_string;
+}
+
+/*
+ * Setter
+ */
+
+void
+balsa_index_set_last_use_time(BalsaIndex *bindex)
+{
+    g_return_if_fail(BALSA_IS_INDEX(bindex));
+
+    time(&bindex->mailbox_node->last_use);
 }

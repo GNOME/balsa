@@ -26,58 +26,13 @@
 
 G_BEGIN_DECLS
 
-    GType balsa_index_get_type(void);
+#define BALSA_TYPE_INDEX (balsa_index_get_type ())
 
-#define BALSA_TYPE_INDEX          (balsa_index_get_type ())
-#define BALSA_INDEX(obj)          (G_TYPE_CHECK_INSTANCE_CAST (obj, BALSA_TYPE_INDEX, BalsaIndex))
-#define BALSA_INDEX_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST (klass, BALSA_TYPE_INDEX, BalsaIndexClass))
-#define BALSA_IS_INDEX(obj)       (G_TYPE_CHECK_INSTANCE_TYPE (obj, BALSA_TYPE_INDEX))
-#define BALSA_IS_INDEX_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE (klass, BALSA_TYPE_INDEX))
-
+G_DECLARE_FINAL_TYPE(BalsaIndex, balsa_index, BALSA, INDEX, GtkTreeView)
 
     typedef enum { BALSA_INDEX_WIDE, BALSA_INDEX_NARROW }
         BalsaIndexWidthPreference;
 
-    typedef struct _BalsaIndex BalsaIndex;
-    typedef struct _BalsaIndexClass BalsaIndexClass;
-
-    struct _BalsaIndex {
-        GtkTreeView tree_view;
-        
-        /* the popup menu and some items we need to refer to */
-        GtkWidget *popup_menu;
-        GtkWidget *delete_item;
-        GtkWidget *undelete_item;
-        GtkWidget *move_to_trash_item;
-        GtkWidget *toggle_item;
-        GtkWidget *move_to_item;
-
-        BalsaMailboxNode* mailbox_node;
-        guint current_msgno;
-        guint next_msgno;
-	gboolean current_message_is_deleted:1;
-        gboolean prev_message:1;
-        gboolean next_message:1;
-        gboolean has_selection_changed_idle:1;
-        gboolean has_mailbox_changed_idle:1;
-        gboolean collapsing:1;
-        int    filter_no;
-        gchar *filter_string; /* Quick view filter string, if any */
-
-        /* signal handler ids */
-        gulong row_expanded_id;
-        gulong row_collapsed_id;
-        gulong selection_changed_id;
-
-	LibBalsaMailboxSearchIter *search_iter;
-        BalsaIndexWidthPreference width_preference;
-    };
-
-    struct _BalsaIndexClass {
-	GtkTreeViewClass parent_class;
-
-        void (*index_changed) (BalsaIndex* bindex);
-    };
 
 /* tree model columns */
     enum {
@@ -182,6 +137,23 @@ G_BEGIN_DECLS
 
     /* Count of selected messages. */
     gint balsa_index_count_selected_messages(BalsaIndex * bindex);
+
+/*
+ * Getters
+ */
+
+BalsaMailboxNode * balsa_index_get_mailbox_node(BalsaIndex *bindex);
+guint balsa_index_get_current_msgno(BalsaIndex *bindex);
+gint balsa_index_get_filter_no(BalsaIndex *bindex);
+gboolean balsa_index_get_next_message(BalsaIndex *bindex);
+gboolean balsa_index_get_prev_message(BalsaIndex *bindex);
+const gchar * balsa_index_get_filter_string(BalsaIndex *bindex);
+
+/*
+ * Setter
+ */
+
+void balsa_index_set_last_use_time(BalsaIndex *bindex);
 
 #define BALSA_INDEX_VIEW_ON_OPEN "balsa-index-view-on-open"
 

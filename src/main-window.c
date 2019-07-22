@@ -1026,7 +1026,7 @@ continue_activated(GSimpleAction * action,
     bindex = balsa_window_find_current_index(window);
 
     if (bindex != NULL &&
-        balsa_index_get_mailbox_node(BALSA_INDEX(bindex))->mailbox == balsa_app.draftbox)
+        balsa_index_get_mailbox(BALSA_INDEX(bindex)) == balsa_app.draftbox)
         balsa_message_continue(BALSA_INDEX(bindex));
     else
         balsa_mblist_open_mailbox(balsa_app.draftbox);
@@ -1095,7 +1095,7 @@ print_activated(GSimpleAction * action,
     current_msgno = balsa_index_get_current_msgno(bindex);
     if (current_msgno > 0) {
         LibBalsaMessage *message =
-            libbalsa_mailbox_get_message(balsa_index_get_mailbox_node(bindex)->mailbox,
+            libbalsa_mailbox_get_message(balsa_index_get_mailbox(bindex),
                                          current_msgno);
 
         if (message == NULL)
@@ -1368,12 +1368,11 @@ mailbox_close_activated(GSimpleAction * action,
                         gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
-    GtkWidget *index;
+    GtkWidget *bindex;
 
-    index = balsa_window_find_current_index(window);
-    if (index)
-        balsa_mblist_close_mailbox(balsa_index_get_mailbox_node(BALSA_INDEX(index))->
-                                   mailbox);
+    bindex = balsa_window_find_current_index(window);
+    if (bindex != NULL)
+        balsa_mblist_close_mailbox(balsa_index_get_mailbox(BALSA_INDEX(bindex)));
 }
 
 static void
@@ -1396,7 +1395,7 @@ select_filters_activated(GSimpleAction * action,
 
     index = balsa_window_find_current_index(window);
     if (index)
-        filters_run_dialog(balsa_index_get_mailbox_node(BALSA_INDEX(index))->mailbox,
+        filters_run_dialog(balsa_index_get_mailbox(BALSA_INDEX(index)),
                            GTK_WINDOW(balsa_app.main_window));
     else
 	/* FIXME : Perhaps should we be able to apply filters on folders (ie recurse on all mailboxes in it),
@@ -1417,7 +1416,7 @@ remove_duplicates_activated(GSimpleAction * action,
     index = balsa_window_find_current_index(window);
     if (index) {
         LibBalsaMailbox *mailbox =
-            balsa_index_get_mailbox_node(BALSA_INDEX(index))->mailbox;
+            balsa_index_get_mailbox(BALSA_INDEX(index));
         GError *err = NULL;
         gint dup_count =
             libbalsa_mailbox_move_duplicates(mailbox, NULL, &err);
@@ -1877,7 +1876,6 @@ threading_change_state(GSimpleAction * action,
     BalsaWindow *window = BALSA_WINDOW(user_data);
     GtkWidget *index;
     gboolean thread_messages;
-    BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
 
     thread_messages = g_variant_get_boolean(state);
@@ -1888,8 +1886,8 @@ threading_change_state(GSimpleAction * action,
     /* bw->current_index may have been destroyed and cleared during
      * set-threading: */
     index = balsa_window_find_current_index(window);
-    if (index && (mbnode = balsa_index_get_mailbox_node(BALSA_INDEX(index)))
-        && (mailbox = mbnode->mailbox))
+    if (index != NULL &&
+        (mailbox = balsa_index_get_mailbox(BALSA_INDEX(index))) != NULL)
         bw_enable_expand_collapse(window, mailbox);
 
     g_simple_action_set_state(action, state);
@@ -2490,7 +2488,7 @@ bw_enable_message_menus(BalsaWindow * window, guint msgno)
                            G_N_ELEMENTS(message_actions), enable);
 
     enable_mod =
-        (enable && !libbalsa_mailbox_get_readonly(balsa_index_get_mailbox_node(bindex)->mailbox));
+        (enable && !libbalsa_mailbox_get_readonly(balsa_index_get_mailbox(bindex)));
     bw_actions_set_enabled(window, modify_message_actions,
                            G_N_ELEMENTS(modify_message_actions),
                            enable_mod);
@@ -2621,14 +2619,12 @@ void
 balsa_window_set_thread_messages(BalsaWindow * window, gboolean thread_messages)
 {
     GtkWidget *index;
-    BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
 
     bw_action_set_boolean(window, "threading", thread_messages);
 
     if ((index = balsa_window_find_current_index(window)) != NULL
-        && (mbnode = balsa_index_get_mailbox_node(BALSA_INDEX(index))) != NULL
-        && (mailbox = mbnode->mailbox) != NULL)
+        && (mailbox = balsa_index_get_mailbox(BALSA_INDEX(index))) != NULL)
         bw_enable_expand_collapse(window, mailbox);
 }
 
@@ -3048,11 +3044,12 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
 
     index = balsa_window_find_current_index(window);
     mailbox = g_new(LibBalsaMailbox *, 1);
-    if (index) {
-	*mailbox = balsa_index_get_mailbox_node(BALSA_INDEX(index))-> mailbox;
+    if (index != NULL) {
+	*mailbox = balsa_index_get_mailbox(BALSA_INDEX(index));
 	g_object_add_weak_pointer(G_OBJECT(*mailbox), (gpointer *) mailbox);
-    } else
+    } else {
 	*mailbox = NULL;
+    }
     g_idle_add((GSourceFunc) bw_focus_idle, mailbox);
 }
 
@@ -3906,7 +3903,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 
         if(ok == FIND_RESPONSE_FILTER) {
             LibBalsaMailbox *mailbox =
-                balsa_index_get_mailbox_node(BALSA_INDEX(bindex))->mailbox;
+                balsa_index_get_mailbox(BALSA_INDEX(bindex));
             LibBalsaCondition *filter, *res;
             filter = bw_get_view_filter(window);
             res = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
@@ -3976,7 +3973,7 @@ bw_hide_changed_set_view_filter(BalsaWindow * window)
     if(!index)
         return;
 
-    mailbox = balsa_index_get_mailbox_node(BALSA_INDEX(index))->mailbox;
+    mailbox = balsa_index_get_mailbox(BALSA_INDEX(index));
     /* Store the new filter mask in the mailbox view before we set the
      * view filter; rethreading triggers bw_set_filter_menu,
      * which retrieves the mask from the mailbox view, and we want it to
@@ -4146,9 +4143,9 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     g_object_add_weak_pointer(G_OBJECT(index),
 			      (gpointer *) &window->current_index);
     /* Note when this mailbox was exposed, for use in auto-expunge. */
-    time(&balsa_index_get_mailbox_node(index)->last_use);
+    balsa_index_set_last_use_time(index);
 
-    mailbox = balsa_index_get_mailbox_node(index)->mailbox;
+    mailbox = balsa_index_get_mailbox(index);
     if (libbalsa_mailbox_get_name(mailbox)) {
         if (libbalsa_mailbox_get_readonly(mailbox)) {
             title =
@@ -4250,7 +4247,7 @@ bw_idle_cb(BalsaWindow * window)
     index = (BalsaIndex *) window->current_index;
     if (index)
         balsa_message_set(BALSA_MESSAGE(window->preview),
-                          balsa_index_get_mailbox_node(index)->mailbox,
+                          balsa_index_get_mailbox(index),
                           balsa_index_get_current_msgno(index));
     else
         balsa_message_set(BALSA_MESSAGE(window->preview), NULL, 0);
@@ -4358,14 +4355,14 @@ bw_notebook_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
         return;
     }
 
-    orig_mailbox = balsa_index_get_mailbox_node(orig_index)->mailbox;
+    orig_mailbox = balsa_index_get_mailbox(orig_index);
 
     index = bw_notebook_find_page (GTK_NOTEBOOK(widget), x, y);
 
     if (index == NULL)
         return;
 
-    mailbox = balsa_index_get_mailbox_node(index)->mailbox;
+    mailbox = balsa_index_get_mailbox(index);
 
     if (mailbox != NULL && mailbox != orig_mailbox)
         balsa_index_transfer(orig_index, selected, mailbox,
@@ -4402,7 +4399,7 @@ bw_notebook_page_notify_cb(GtkWidget  *widget,
         LibBalsaMailbox *mailbox;
         gint page_num;
 
-        mailbox = balsa_index_get_mailbox_node(BALSA_INDEX(child))->mailbox;
+        mailbox = balsa_index_get_mailbox(BALSA_INDEX(child));
         page_num = gtk_notebook_page_num(notebook, widget);
         libbalsa_mailbox_set_position(mailbox, page_num);
     }
@@ -4765,7 +4762,7 @@ balsa_window_next_unread(BalsaWindow * window)
 {
     BalsaIndex *index =
         BALSA_INDEX(balsa_window_find_current_index(window));
-    LibBalsaMailbox *mailbox = index ? balsa_index_get_mailbox_node(index)->mailbox : NULL;
+    LibBalsaMailbox *mailbox = index ? balsa_index_get_mailbox(index): NULL;
 
     if (libbalsa_mailbox_get_unread(mailbox) > 0) {
         if (!balsa_index_select_next_unread(index)) {

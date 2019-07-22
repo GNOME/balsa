@@ -887,6 +887,7 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     GtkWidget *child;
     guint i;
 
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
     g_return_val_if_fail(GTK_IS_NOTEBOOK(balsa_app.notebook), NULL);
 
     for (i = 0;
@@ -895,9 +896,9 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
         child = gtk_bin_get_child(GTK_BIN(page));
 	if (child != NULL) {
             BalsaIndex *bindex = BALSA_INDEX(child);
-            BalsaMailboxNode *mailbox_node = balsa_index_get_mailbox_node(bindex);
+            LibBalsaMailbox *this_mailbox = balsa_index_get_mailbox(bindex);
 
-            if (mailbox_node != NULL && mailbox_node->mailbox == mailbox)
+            if (this_mailbox == mailbox)
                 return bindex;
         }
     }

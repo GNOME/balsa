@@ -1,5 +1,27 @@
 2019-07-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-index: Add a convenience function
+	balsa_index_get_mailbox().
+
+	* src/balsa-index.c (balsa_index_get_mailbox): define it;
+	* src/balsa-index.h: declare it;
+	* src/balsa-app.c (balsa_find_index_by_mailbox):
+	* src/balsa-mblist.c (bmbl_tree_expand), (bmbl_drag_cb),
+	(bmbl_update_mailbox):
+	* src/main-window.c (continue_activated), (print_activated),
+	(mailbox_close_activated), (select_filters_activated),
+	(remove_duplicates_activated), (threading_change_state),
+	(bw_enable_message_menus), (balsa_window_set_thread_messages),
+	(balsa_window_real_close_mbnode), (bw_find_real),
+	(bw_hide_changed_set_view_filter), (bw_notebook_switch_page_cb),
+	(bw_idle_cb), (bw_notebook_drag_received_cb),
+	(bw_notebook_page_notify_cb), (balsa_window_next_unread):
+	* src/message-window.c (mw_set_buttons_sensitive):
+	* src/sendmsg-window.c (attachments_add), (drag_data_quote): use
+	it.
+
+2019-07-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	balsa-index: Use modern macros to declare and define.
 
 	Make BalsaIndex opaque, and provide necessary accessors.

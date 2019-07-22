@@ -551,7 +551,7 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
 	    balsa_window_find_current_index(balsa_app.main_window);
 	LibBalsaMailbox *current_mailbox =
 	    current_index != NULL ?
-	    balsa_index_get_mailbox_node(BALSA_INDEX(current_index))->mailbox :
+	    balsa_index_get_mailbox(BALSA_INDEX(current_index)):
 	    NULL;
 	gboolean first_mailbox = TRUE;
 
@@ -840,7 +840,7 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
         return;
     }
 
-    orig_mailbox = balsa_index_get_mailbox_node(orig_index)->mailbox;
+    orig_mailbox = balsa_index_get_mailbox(orig_index);
 
     /* find the node and mailbox */
 
@@ -1434,7 +1434,7 @@ bmbl_update_mailbox(GtkTreeStore * store, LibBalsaMailbox * mailbox)
 
     bindex = balsa_window_find_current_index(balsa_app.main_window);
     if (bindex == NULL ||
-        mailbox != balsa_index_get_mailbox_node(BALSA_INDEX(bindex))->mailbox)
+        mailbox != balsa_index_get_mailbox(BALSA_INDEX(bindex)))
         return;
 
     balsa_window_set_statusbar(balsa_app.main_window, mailbox);

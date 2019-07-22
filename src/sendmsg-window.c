@@ -2206,7 +2206,7 @@ attachments_add(GtkWidget * widget,
     if (info == TARGET_MESSAGES) {
 	BalsaIndex *index =
             *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
-	LibBalsaMailbox *mailbox = balsa_index_get_mailbox_node(index)->mailbox;
+	LibBalsaMailbox *mailbox = balsa_index_get_mailbox(index);
         GArray *selected = balsa_index_selected_msgnos_new(index);
 	guint i;
 
@@ -2784,7 +2784,7 @@ drag_data_quote(GtkWidget * widget,
     case TARGET_MESSAGES:
 	index =
             *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
-	mailbox = balsa_index_get_mailbox_node(index)->mailbox;
+	mailbox = balsa_index_get_mailbox(index);
         selected = balsa_index_selected_msgnos_new(index);
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
 

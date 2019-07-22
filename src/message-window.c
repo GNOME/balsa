@@ -323,7 +323,7 @@ mw_set_buttons_sensitive(MessageWindow * mw)
     enable = index && balsa_index_previous_msgno(index, current_msgno) > 0;
     mw_set_enabled(mw, "previous-message", enable);
 
-    mailbox = index != NULL ? balsa_index_get_mailbox_node(index)->mailbox : NULL;
+    mailbox = index != NULL ? balsa_index_get_mailbox(index): NULL;
 
     enable = mailbox != NULL && libbalsa_mailbox_get_unread_messages(mailbox) > 0;
     mw_set_enabled(mw, "next-unread", enable);

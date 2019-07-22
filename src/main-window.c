@@ -3089,7 +3089,7 @@ bw_close_mailbox_on_timer(BalsaWindow * window)
             continue;
 
         if (balsa_app.close_mailbox_auto &&
-            (delta_time = current_time - balsa_index_get_mailbox_node(index)->last_use) >
+            (delta_time = current_time - balsa_index_get_last_use(index)) >
             balsa_app.close_mailbox_timeout) {
             if (balsa_app.debug)
                 fprintf(stderr, "Closing Page %d unused for %d s\n",

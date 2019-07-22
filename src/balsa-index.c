@@ -2898,6 +2898,14 @@ balsa_index_set_last_use_time(BalsaIndex *bindex)
         time(&bindex->mailbox_node->last_use);
 }
 
+time_t
+balsa_index_get_last_use_time(BalsaIndex *bindex)
+{
+    g_return_val_if_fail(BALSA_IS_INDEX(bindex), 0);
+
+    return bindex->mailbox_node != NULL ? bindex->mailbox_node->last_use : 0;
+}
+
 LibBalsaMailbox *
 balsa_index_get_mailbox(BalsaIndex *bindex)
 {

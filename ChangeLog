@@ -1,5 +1,14 @@
 2019-07-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-index: Another convenience function
+
+	* src/balsa-index.c (balsa_index_get_last_use_time): another
+	convenience function;
+	* src/balsa-index.h: declare it;
+	* src/main-window.c (bw_close_mailbox_on_timer): use it.
+
+2019-07-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	send.c: Fix the build
 
 	* libbalsa/send.c (libbalsa_message_create_mime_message):

@@ -154,6 +154,7 @@ const gchar * balsa_index_get_filter_string(BalsaIndex *bindex);
  */
 
 void balsa_index_set_last_use_time(BalsaIndex *bindex);
+time_t balsa_index_get_last_use_time(BalsaIndex *bindex);
 LibBalsaMailbox * balsa_index_get_mailbox(BalsaIndex *bindex);
 
 #define BALSA_INDEX_VIEW_ON_OPEN "balsa-index-view-on-open"

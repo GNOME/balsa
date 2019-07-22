@@ -1150,7 +1150,7 @@ bmbl_open_mailbox(LibBalsaMailbox * mailbox, gboolean set_current)
 
     /* If we currently have a page open, update the time last visited */
     if (bindex != NULL)
-        balsa_index_set_last_use_time(BALSA_INDEX(index));
+        balsa_index_set_last_use_time(BALSA_INDEX(bindex));
 
     i = balsa_find_notebook_page_num(mailbox);
     if (i != -1) {

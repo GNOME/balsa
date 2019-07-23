@@ -4196,7 +4196,7 @@ bw_index_changed_cb(GtkWidget * widget, gpointer data)
     bw_enable_message_menus(window, balsa_index_get_current_msgno(index));
     bw_enable_mailbox_menus(window, index);
 
-    message = BALSA_MESSAGE(window->preview)->message;
+    message = balsa_message_get_message(BALSA_MESSAGE(window->preview));
     current_msgno = message != NULL ? libbalsa_message_get_msgno(message) : 0;
 
     if (current_msgno != balsa_index_get_current_msgno(index))
@@ -4211,7 +4211,7 @@ bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
         /* Skip if the window is being destroyed: */
         if (window->preview != NULL) {
             window->set_message_id = g_idle_add((GSourceFunc) bw_idle_cb, window);
-            if (BALSA_MESSAGE(window->preview)->message != NULL)
+            if (balsa_message_get_message(BALSA_MESSAGE(window->preview)) != NULL)
                 gtk_widget_hide(window->preview);
         }
     }

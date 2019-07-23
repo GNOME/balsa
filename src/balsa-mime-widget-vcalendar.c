@@ -47,7 +47,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     GtkWidget *label;
     gchar *text;
     guint event_no;
-    LibBalsaMessage *lbm = bm->message;
+    LibBalsaMessage *lbm = balsa_message_get_message(bm);
     gboolean may_reply = FALSE;
     InternetAddress *sender = NULL;;
 

@@ -1,5 +1,36 @@
 2019-07-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-message: Use modern macros to declare and define.
+
+	Make BalsaMessage opaque, and provide and use necessary accessors.
+
+	* src/balsa-message.c (balsa_part_info_class_init),
+	(balsa_message_class_init), (balsa_message_destroy),
+	(balsa_part_info_init), (balsa_part_info_new),
+	(balsa_part_info_dispose), (balsa_part_info_finalize),
+	(balsa_message_get_wrap_text), (balsa_message_get_focus_state),
+	(balsa_message_get_scroll), (balsa_message_get_bm_widget),
+	(balsa_message_get_message), (balsa_message_get_shown_headers),
+	(balsa_message_get_face_box), (balsa_message_get_tree_view),
+	(balsa_message_set_focus_state), (balsa_message_set_face_box):
+	* src/balsa-message.h:
+	* src/balsa-mime-widget-callbacks.c (scroll_change),
+	(balsa_mime_widget_key_press_event),
+	(balsa_mime_widget_limit_focus), (balsa_mime_widget_unlimit_focus):
+	* src/balsa-mime-widget-message.c (balsa_mime_widget_new_message),
+	(bm_header_widget_new), (add_header_address_list),
+	(bmw_message_set_headers_d),
+	(balsa_mime_widget_message_set_headers),
+	(balsa_mime_widget_message_set_headers_d):
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(check_text_encoding):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar):
+	* src/main-window.c (bw_index_changed_cb), (bw_idle_replace):
+	* src/message-window.c (mw_set_part_buttons_sensitive):
+
+2019-07-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	balsa-mblist: Use modern macros to declare and define.
 
 	Make BalsaMBList opaque; no accessors needed.

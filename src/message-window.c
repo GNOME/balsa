@@ -99,7 +99,7 @@ mw_set_active(MessageWindow * mw,
 static void
 mw_set_part_buttons_sensitive(MessageWindow * mw, BalsaMessage * msg)
 {
-    if (!msg || !msg->treeview)
+    if (msg == NULL || balsa_message_get_tree_view(msg) == NULL)
 	return;
 
     mw_set_enabled(mw, "next-part",
@@ -731,14 +731,18 @@ mw_select_part_cb(BalsaMessage * bm, gpointer data)
 #endif                          /* HAVE_HTML_WIDGET */
 
     /* set window title */
-    if (bm && bm->message) {
-        from = internet_address_list_to_string(libbalsa_message_get_headers(bm->message)->from,
-                                               FALSE);
-        title = g_strdup_printf(_("Message from %s: %s"), from,
-                                LIBBALSA_MESSAGE_GET_SUBJECT(bm->message));
-        g_free(from);
-        gtk_window_set_title(GTK_WINDOW(mw->window), title);
-        g_free(title);
+    if (bm != NULL) {
+        LibBalsaMessage *message = balsa_message_get_message(bm);
+
+        if (message != NULL) {
+            from = internet_address_list_to_string(libbalsa_message_get_headers(message)->from,
+                                                   FALSE);
+            title = g_strdup_printf(_("Message from %s: %s"), from,
+                                    LIBBALSA_MESSAGE_GET_SUBJECT(message));
+            g_free(from);
+            gtk_window_set_title(GTK_WINDOW(mw->window), title);
+            g_free(title);
+        }
     }
 
     mw_set_part_buttons_sensitive(mw, bm);

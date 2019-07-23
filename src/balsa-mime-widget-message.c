@@ -136,7 +136,7 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	gtk_box_pack_start(GTK_BOX(mw->container), emb_hdrs, FALSE, FALSE, 0);
 
         bmw_message_set_headers(bm, mw, mime_body,
-                                bm->shown_headers == HEADERS_ALL);
+                                balsa_message_get_shown_headers(bm) == HEADERS_ALL);
     } else if (!g_ascii_strcasecmp("text/rfc822-headers", content_type)) {
 	mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 	mw->widget = gtk_frame_new(_("message headers"));
@@ -507,11 +507,13 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area),
                               GTK_BUTTONBOX_START);
 #endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
-    if (!bm->face_box) {
-        bm->face_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-        gtk_container_add(GTK_CONTAINER(action_area), bm->face_box);
+    if (balsa_message_get_face_box(bm) == NULL) {
+        GtkWidget *face_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+
+        balsa_message_set_face_box(bm, face_box);
+        gtk_container_add(GTK_CONTAINER(action_area), face_box);
         gtk_button_box_set_child_non_homogeneous(GTK_BUTTON_BOX(action_area),
-                                                 bm->face_box, TRUE);
+                                                 face_box, TRUE);
     }
 
     if (buttons) {
@@ -664,7 +666,7 @@ add_header_address_list(BalsaMessage * bm, GtkGrid * grid,
     if (list == NULL || internet_address_list_length(list) == 0)
 	return;
 
-    if (!(bm->shown_headers == HEADERS_ALL ||
+    if (!(balsa_message_get_shown_headers(bm) == HEADERS_ALL ||
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
 	return;
 
@@ -716,13 +718,11 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
         return;
     }
 
-    if (bm->shown_headers == HEADERS_NONE) {
+    if (balsa_message_get_shown_headers(bm) == HEADERS_NONE) {
         g_signal_connect(G_OBJECT(widget), "realize",
                          G_CALLBACK(gtk_widget_hide), NULL);
 	return;
     }
-
-    bm->tab_position = 0;
 
     add_header_gchar(grid, "subject", _("Subject:"), subject,
                      show_all_headers);
@@ -814,7 +814,7 @@ balsa_mime_widget_message_set_headers(BalsaMessage        * bm,
                                       LibBalsaMessageBody * part)
 {
     bmw_message_set_headers(bm, mw, part,
-                            bm->shown_headers == HEADERS_ALL);
+                            balsa_message_get_shown_headers(bm) == HEADERS_ALL);
 }
 
 void
@@ -825,7 +825,7 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage           * bm,
                                         const gchar            * subject)
 {
     bmw_message_set_headers_d(bm, mw, headers, part, subject,
-                              bm->shown_headers == HEADERS_ALL);
+                              balsa_message_get_shown_headers(bm) == HEADERS_ALL);
 }
 
 /*

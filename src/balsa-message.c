@@ -76,7 +76,7 @@ enum {
     NUM_COLUMNS
 };
 
-typedef struct _BalsaPartInfoClass BalsaPartInfoClass;
+G_DECLARE_FINAL_TYPE(BalsaPartInfo, balsa_part_info, BALSA, PART_INFO, GObject)
 
 struct _BalsaPartInfo {
     GObject parent_object;
@@ -93,25 +93,11 @@ struct _BalsaPartInfo {
     GtkTreePath *path;
 };
 
-struct _BalsaPartInfoClass {
-    GObjectClass parent_class;
-};
-
-static GType balsa_part_info_get_type();
-
-#define TYPE_BALSA_PART_INFO          \
-        (balsa_part_info_get_type ())
-#define BALSA_PART_INFO(obj)          \
-        (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_BALSA_PART_INFO, BalsaPartInfo))
-#define IS_BALSA_PART_INFO(obj)       \
-        (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_BALSA_PART_INFO))
+#define TYPE_BALSA_PART_INFO (balsa_part_info_get_type())
 
 static gint balsa_message_signals[LAST_SIGNAL];
 
 /* widget */
-static void balsa_message_class_init(BalsaMessageClass * klass);
-static void balsa_message_init(BalsaMessage * bm);
-
 static void balsa_message_destroy(GObject * object);
 
 static void display_headers(BalsaMessage * bm);
@@ -134,8 +120,6 @@ static void part_context_save_all_cb(GtkWidget * menu_item, GList * info_list);
 static void part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list);
 static void part_create_menu (BalsaPartInfo* info);
 
-static GtkNotebookClass *parent_class = NULL;
-
 /* stuff needed for sending Message Disposition Notifications */
 static void handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message,
                                LibBalsaMessageHeaders *headers);
@@ -149,9 +133,9 @@ static GtkWidget* create_mdn_dialog (GtkWindow *parent, gchar *sender,
 static void mdn_dialog_response(GtkWidget * dialog, gint response,
                                 gpointer user_data);
 
-static void balsa_part_info_init(GObject *object, gpointer data);
 static BalsaPartInfo* balsa_part_info_new(LibBalsaMessageBody* body);
-static void balsa_part_info_free(GObject * object);
+static void balsa_part_info_dispose(GObject * object);
+static void balsa_part_info_finalize(GObject * object);
 
 static LibBalsaMsgProtectState balsa_message_scan_signatures(LibBalsaMessageBody *body,
 							     LibBalsaMessage * message);
@@ -164,63 +148,67 @@ static void message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm);
 static inline gboolean autocrypt_in_use(void);
 #endif
 
+G_DEFINE_TYPE(BalsaPartInfo, balsa_part_info, G_TYPE_OBJECT)
+
 static void
 balsa_part_info_class_init(BalsaPartInfoClass *klass)
 {
     GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-    object_class->finalize = balsa_part_info_free;
+    object_class->dispose = balsa_part_info_dispose;
+    object_class->finalize = balsa_part_info_finalize;
 }
 
-static GType
-balsa_part_info_get_type()
-{
-    static GType balsa_part_info_type = 0 ;
+struct _BalsaMessage {
+        GtkBox parent;
 
-    if (!balsa_part_info_type) {
-        static const GTypeInfo balsa_part_info_info =
-            {
-                sizeof (BalsaPartInfoClass),
-                (GBaseInitFunc) NULL,
-                (GBaseFinalizeFunc) NULL,
-                (GClassInitFunc) balsa_part_info_class_init,
-                (GClassFinalizeFunc) NULL,
-                NULL,
-                sizeof(BalsaPartInfo),
-                0,
-                (GInstanceInitFunc) balsa_part_info_init
-            };
-        balsa_part_info_type =
-           g_type_register_static (G_TYPE_OBJECT, "BalsaPartInfo",
-                                   &balsa_part_info_info, 0);
-    }
-    return balsa_part_info_type;
-}
+        GtkWidget *stack;
+        GtkWidget *switcher;
 
-GType
-balsa_message_get_type()
-{
-    static GType balsa_message_type = 0;
+        /* Top-level MIME widget */
+        BalsaMimeWidget *bm_widget;
 
-    if (!balsa_message_type) {
-        static const GTypeInfo balsa_message_info = {
-            sizeof(BalsaMessageClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-            (GClassInitFunc) balsa_message_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-            sizeof(BalsaMessage),
-            0,                  /* n_preallocs */
-            (GInstanceInitFunc) balsa_message_init
-        };
+	/* header-related information */
+	ShownHeaders shown_headers;
 
-        balsa_message_type =
-        	g_type_register_static(GTK_TYPE_BOX, "BalsaMessage", &balsa_message_info, 0);
-    }
+	/* Widgets to hold content */
+	GtkWidget *scroll;
 
-    return balsa_message_type;
-}
+        /* Widget to hold structure tree */
+        GtkWidget *treeview;
+        gint info_count;
+        GList *save_all_list;
+        GtkWidget *save_all_popup;
+
+	gboolean wrap_text;
+
+        BalsaPartInfo *current_part;
+        GtkWidget *parts_popup;
+        gboolean force_inline;
+
+	LibBalsaMessage *message;
+
+        BalsaMessageFocusState focus_state;
+
+        /* Find-in-message stuff */
+        GtkWidget  *find_bar;
+        GtkWidget  *find_entry;
+        GtkWidget  *find_next;
+        GtkWidget  *find_prev;
+        GtkWidget  *find_sep;
+        GtkWidget  *find_label;
+        GtkTextIter find_iter;
+        gboolean    find_forward;
+
+        /* Widget to hold Faces */
+        GtkWidget *face_box;
+
+#ifdef HAVE_HTML_WIDGET
+        gpointer html_find_info;
+#endif				/* HAVE_HTML_WIDGET */
+};
+
+G_DEFINE_TYPE(BalsaMessage, balsa_message, GTK_TYPE_BOX)
 
 static void
 balsa_message_class_init(BalsaMessageClass * klass)
@@ -233,17 +221,12 @@ balsa_message_class_init(BalsaMessageClass * klass)
         g_signal_new("select-part",
                      G_TYPE_FROM_CLASS(object_class),
                      G_SIGNAL_RUN_FIRST,
-                     G_STRUCT_OFFSET(BalsaMessageClass, select_part),
+                     0,
                      NULL, NULL,
                      NULL,
                      G_TYPE_NONE, 0);
 
     object_class->dispose = balsa_message_destroy;
-
-    parent_class = g_type_class_peek_parent(klass);
-
-    klass->select_part = NULL;
-
 }
 
 /* Helpers for balsa_message_init. */
@@ -838,15 +821,9 @@ balsa_message_destroy(GObject * object)
     g_list_free(bm->save_all_list);
     bm->save_all_list = NULL;
 
-    if (bm->save_all_popup) {
-        g_object_unref(bm->save_all_popup);
-	bm->save_all_popup = NULL;
-    }
-
-    if (bm->parts_popup) {
-	g_object_unref(bm->parts_popup);
-	bm->parts_popup = NULL;
-    }
+    g_clear_object(&bm->save_all_popup);
+    g_clear_object(&bm->parts_popup);
+    g_clear_object(&bm->bm_widget);
 
 #ifdef HAVE_HTML_WIDGET
     if (bm->html_find_info) {
@@ -855,13 +832,7 @@ balsa_message_destroy(GObject * object)
     }
 #endif                          /* HAVE_HTML_WIDGET */
 
-    if (bm->bm_widget) {
-	g_object_unref(bm->bm_widget);
-	bm->bm_widget = NULL;
-    }
-
-    if (G_OBJECT_CLASS(parent_class)->dispose)
-        (*G_OBJECT_CLASS(parent_class)->dispose) (object);
+    G_OBJECT_CLASS(balsa_message_parent_class)->dispose(object);
 }
 
 GtkWidget *
@@ -1727,12 +1698,9 @@ part_create_menu (BalsaPartInfo* info)
     g_free (content_type);
 }
 
-
 static void
-balsa_part_info_init(GObject *object, gpointer data)
+balsa_part_info_init(BalsaPartInfo *info)
 {
-    BalsaPartInfo * info = BALSA_PART_INFO(object);
-
     info->body = NULL;
     info->mime_widget = NULL;
     info->popup_menu = NULL;
@@ -1743,31 +1711,31 @@ static BalsaPartInfo*
 balsa_part_info_new(LibBalsaMessageBody* body)
 {
     BalsaPartInfo * info = g_object_new(TYPE_BALSA_PART_INFO, NULL);
+
     info->body = body;
+
     return info;
 }
 
 static void
-balsa_part_info_free(GObject * object)
+balsa_part_info_dispose(GObject * object)
 {
-    BalsaPartInfo * info;
-    GObjectClass *part_info_parent_class;
+    BalsaPartInfo *info = (BalsaPartInfo *) object;
 
-    g_return_if_fail(object != NULL);
-    g_return_if_fail(IS_BALSA_PART_INFO(object));
-    info = BALSA_PART_INFO(object);
+    g_clear_object(&info->mime_widget);
+    g_clear_object(&info->popup_menu);
 
-    if (info->mime_widget) {
-	g_object_unref(G_OBJECT(info->mime_widget));
-	info->mime_widget = NULL;
-    }
-    if (info->popup_menu)
-        g_object_unref(info->popup_menu);
+    G_OBJECT_CLASS(balsa_part_info_parent_class)->dispose(object);
+}
+
+static void
+balsa_part_info_finalize(GObject * object)
+{
+    BalsaPartInfo *info = (BalsaPartInfo *) object;
 
     gtk_tree_path_free(info->path);
 
-    part_info_parent_class = g_type_class_peek_parent(G_OBJECT_GET_CLASS(object));
-    part_info_parent_class->finalize(object);
+    G_OBJECT_CLASS(balsa_part_info_parent_class)->finalize(object);
 }
 
 static void
@@ -3381,3 +3349,93 @@ autocrypt_in_use(void)
 	return result;
 }
 #endif
+
+/*
+ * Getters
+ */
+
+gboolean
+balsa_message_get_wrap_text(BalsaMessage *bm)
+{
+    g_return_val_if_fail(BALSA_IS_MESSAGE(bm), FALSE);
+
+    return bm->wrap_text;
+}
+
+BalsaMessageFocusState
+balsa_message_get_focus_state(BalsaMessage *bm)
+{
+    g_return_val_if_fail(BALSA_IS_MESSAGE(bm), 0);
+
+    return bm->focus_state;
+}
+
+GtkScrolledWindow *
+balsa_message_get_scroll(BalsaMessage *bm)
+{
+    g_return_val_if_fail(BALSA_IS_MESSAGE(bm), NULL);
+
+    return GTK_SCROLLED_WINDOW(bm->scroll);
+}
+
+BalsaMimeWidget *
+balsa_message_get_bm_widget(BalsaMessage *bm)
+{
+    g_return_val_if_fail(BALSA_IS_MESSAGE(bm), NULL);
+
+    return bm->bm_widget;
+}
+
+LibBalsaMessage *
+balsa_message_get_message(BalsaMessage *bm)
+{
+    g_return_val_if_fail(BALSA_IS_MESSAGE(bm), NULL);
+
+    return bm->message;
+}
+
+ShownHeaders
+balsa_message_get_shown_headers(BalsaMessage *bm)
+{
+    g_return_val_if_fail(BALSA_IS_MESSAGE(bm), 0);
+
+    return bm->shown_headers;
+}
+
+GtkWidget *
+balsa_message_get_face_box(BalsaMessage *bm)
+{
+    g_return_val_if_fail(BALSA_IS_MESSAGE(bm), NULL);
+
+    return bm->face_box;
+}
+
+GtkWidget *
+balsa_message_get_tree_view(BalsaMessage *bm)
+{
+    g_return_val_if_fail(BALSA_IS_MESSAGE(bm), NULL);
+
+    return bm->treeview;
+}
+
+/*
+ * Setters
+ */
+
+void
+balsa_message_set_focus_state(BalsaMessage *bm,
+                              BalsaMessageFocusState focus_state)
+{
+    g_return_if_fail(BALSA_IS_MESSAGE(bm));
+
+    bm->focus_state = focus_state;
+}
+
+void
+balsa_message_set_face_box(BalsaMessage *bm,
+                           GtkWidget * face_box)
+{
+    g_return_if_fail(BALSA_IS_MESSAGE(bm));
+
+    g_set_object(&bm->face_box, face_box);
+}

@@ -824,6 +824,7 @@ balsa_message_destroy(GObject * object)
     g_clear_object(&bm->save_all_popup);
     g_clear_object(&bm->parts_popup);
     g_clear_object(&bm->bm_widget);
+    g_clear_object(&bm->face_box);
 
 #ifdef HAVE_HTML_WIDGET
     if (bm->html_find_info) {

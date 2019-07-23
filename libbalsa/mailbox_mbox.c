@@ -1090,6 +1090,9 @@ libbalsa_mailbox_mbox_close_mailbox(LibBalsaMailbox * mailbox,
     LibBalsaMailboxMbox *mbox = LIBBALSA_MAILBOX_MBOX(mailbox);
     guint len;
 
+    if (mbox->msgno_2_msg_info == NULL)
+        return;
+
     len = mbox->msgno_2_msg_info->len;
     libbalsa_mailbox_mbox_sync(mailbox, expunge);
     if (mbox->msgno_2_msg_info->len != len)

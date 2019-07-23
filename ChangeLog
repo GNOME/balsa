@@ -1,5 +1,20 @@
 2019-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Cleanup after using G_DECLARE_FINAL_TYPE()
+
+	* libbalsa/mailbox_imap.c: drop redundant class struct
+	declaration;
+	* libbalsa/mailbox_maildir.c: ditto;
+	* libbalsa/mailbox_mbox.c: ditto;
+	* libbalsa/mailbox_mh.c: ditto;
+	* libbalsa/mailbox_pop3.c: ditto;
+	* libbalsa/message.c: ditto;
+	* src/ab-window.c: ditto;
+	* src/balsa-cite-bar.c: ditto; drop parant_class variable;
+	  (balsa_cite_bar_class_init): no more parent_class.
+
+2019-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/libbalsa-gpgme-widgets.c (create_uid_str): Do not
 	leak an empty string.
 

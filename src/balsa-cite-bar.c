@@ -31,10 +31,6 @@ struct _BalsaCiteBar {
     gint space;
 };
 
-struct _BalsaCiteBarClass {
-    GtkWidgetClass parent_class;
-};
-
 static void balsa_cite_bar_get_preferred_width (GtkWidget * widget,
                                                 gint      * minimum_width,
                                                 gint      * natural_width);
@@ -46,16 +42,12 @@ static gboolean balsa_cite_bar_draw            (GtkWidget * widget,
 
 G_DEFINE_TYPE(BalsaCiteBar, balsa_cite_bar, GTK_TYPE_WIDGET)
 
-static GtkWidgetClass *parent_class = NULL;
-
 static void
 balsa_cite_bar_class_init(BalsaCiteBarClass * class)
 {
     GtkWidgetClass *widget_class;
 
     widget_class = (GtkWidgetClass *) class;
-
-    parent_class = g_type_class_peek_parent(class);
 
     widget_class->get_preferred_width  = balsa_cite_bar_get_preferred_width;
     widget_class->get_preferred_height = balsa_cite_bar_get_preferred_height;

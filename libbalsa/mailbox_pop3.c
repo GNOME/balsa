@@ -41,12 +41,6 @@ enum {
     LAST_SIGNAL
 };
 
-struct _LibBalsaMailboxPOP3Class {
-    LibBalsaMailboxRemoteClass klass;
-
-    void (*config_changed) (LibBalsaMailboxPOP3 *mailbox_pop3);
-};
-
 struct _LibBalsaMailboxPOP3 {
     LibBalsaMailboxRemote mailbox;
 

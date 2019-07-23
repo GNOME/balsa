@@ -82,10 +82,6 @@ struct _LibBalsaMailboxImap {
     gboolean disconnected;
 };
 
-struct _LibBalsaMailboxImapClass {
-    LibBalsaMailboxRemoteClass klass;
-};
-
 struct message_info {
     LibBalsaMessage *message;
     LibBalsaMessageFlag user_flags;

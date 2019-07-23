@@ -92,10 +92,6 @@ struct _LibBalsaMailboxMh {
     guint last_fileno;
 };
 
-struct _LibBalsaMailboxMhClass {
-    LibBalsaMailboxLocalClass klass;
-};
-
 G_DEFINE_TYPE(LibBalsaMailboxMh,
               libbalsa_mailbox_mh,
               LIBBALSA_TYPE_MAILBOX_LOCAL)

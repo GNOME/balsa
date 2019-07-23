@@ -92,10 +92,6 @@ libbalsa_mailbox_mbox_total_messages(LibBalsaMailbox * mailbox);
 static void libbalsa_mailbox_mbox_lock_store(LibBalsaMailbox * mailbox,
                                              gboolean lock);
 
-struct _LibBalsaMailboxMboxClass {
-    LibBalsaMailboxLocalClass klass;
-};
-
 struct _LibBalsaMailboxMbox {
     LibBalsaMailboxLocal parent;
 

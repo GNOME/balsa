@@ -111,10 +111,6 @@ struct _LibBalsaMailboxMaildir {
     gchar *tmpdir;
 };
 
-struct _LibBalsaMailboxMaildirClass {
-    LibBalsaMailboxLocalClass klass;
-};
-
 G_DEFINE_TYPE(LibBalsaMailboxMaildir,
               libbalsa_mailbox_maildir,
               LIBBALSA_TYPE_MAILBOX_LOCAL)

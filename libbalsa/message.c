@@ -53,16 +53,6 @@
 static void libbalsa_message_dispose(GObject * object);
 static void libbalsa_message_finalize(GObject * object);
 
-struct _LibBalsaMessageClass {
-    GObjectClass parent_class;
-
-    /* deal with flags being set/unset */
-    /* Signal: */
-    void (*status_changed) (LibBalsaMessage    *message,
-                            LibBalsaMessageFlag flag,
-                            gboolean);
-};
-
 struct _LibBalsaMessage {
     GObject object;
 

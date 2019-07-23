@@ -1,5 +1,10 @@
 2019-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	* libbalsa/libbalsa-gpgme-widgets.c (create_uid_str): Do not
+	leak an empty string.
+
+2019-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* src/balsa-message.c (balsa_message_destroy): Do not leak
 	BalsaMessage::face_box.
 

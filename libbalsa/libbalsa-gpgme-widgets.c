@@ -489,12 +489,12 @@ create_uid_str(const gpgme_user_id_t uid, gboolean *warn)
 	if (uid_status[0] != '\0') {
 		result = g_strdup_printf("%s (%s)", uid_readable, uid_status);
 		g_free(uid_readable);
-		g_free(uid_status);
 		do_warn = TRUE;
 	} else {
 		result = uid_readable;
 		do_warn = FALSE;
 	}
+        g_free(uid_status);
 
 	if (warn != NULL) {
 		*warn = do_warn;

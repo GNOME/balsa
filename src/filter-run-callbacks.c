@@ -29,7 +29,11 @@
 
 #include "mailbox-filter.h"
 #include "filter-funcs.h"
+
+#define OK_TO_INCLUDE_FILTER_RUN_H
 #include "filter-run.h"
+#undef OK_TO_INCLUDE_FILTER_RUN_H
+
 #include "balsa-app.h"
 #include "save-restore.h"
 

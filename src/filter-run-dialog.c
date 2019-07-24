@@ -25,7 +25,11 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include "balsa-app.h"
+
+#define OK_TO_INCLUDE_FILTER_RUN_H
 #include "filter-run.h"
+#undef OK_TO_INCLUDE_FILTER_RUN_H
+
 #include "mailbox-filter.h"
 #include "save-restore.h"
 #include "filter-funcs.h"

@@ -23,6 +23,10 @@
  * Variables and definitions for the filter edit dialog
  */
 
+#ifndef OK_TO_INCLUDE_FILTER_RUN_H
+# error "filter-run.h is private to the filter-run modules"
+#endif
+
 #ifndef __FILTER_RUN_H__
 #define __FILTER_RUN_H__
 

@@ -1,5 +1,13 @@
 2019-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	filter-run: Make filter-run.h private
+
+	* src/filter-run-callbacks.c: define OK_TO_INCLUDE_FILTER_RUN_H;
+	* src/filter-run-dialog.c: ditto;
+	* src/filter-run.h: error if it is not defined.
+
+2019-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Cleanup after using G_DECLARE_FINAL_TYPE()
 
 	* libbalsa/mailbox_imap.c: drop redundant class struct

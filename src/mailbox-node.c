@@ -650,19 +650,20 @@ balsa_mailbox_node_new_imap_folder(LibBalsaServer* s, const char*p)
 void
 balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode* mn)
 {
-    if (mn)
-        g_signal_emit(G_OBJECT(mn),
-                      balsa_mailbox_node_signals[SHOW_PROP_DIALOG], 0);
+    if (mn != NULL)
+        g_signal_emit(mn, balsa_mailbox_node_signals[SHOW_PROP_DIALOG], 0);
 }
 
 void
 balsa_mailbox_node_append_subtree(BalsaMailboxNode * mn)
 {
-    g_signal_emit(G_OBJECT(mn),
-		  balsa_mailbox_node_signals[APPEND_SUBTREE], 0);
+    if (!mn->scanned) {
+        g_signal_emit(mn, balsa_mailbox_node_signals[APPEND_SUBTREE], 0);
+        mn->scanned = TRUE;
+    }
 }
 
-void 
+void
 balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data)
 {
     balsa_mailbox_node_show_prop_dialog((BalsaMailboxNode*)data);
@@ -675,15 +676,13 @@ balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data)
 void
 balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* group)
 {
-    g_signal_emit(G_OBJECT(mn),
-		  balsa_mailbox_node_signals[LOAD_CONFIG], 0, group);
+    g_signal_emit(mn, balsa_mailbox_node_signals[LOAD_CONFIG], 0, group);
 }
 
 void
 balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* group)
 {
-    g_signal_emit(G_OBJECT(mn),
-		  balsa_mailbox_node_signals[SAVE_CONFIG], 0, group);
+    g_signal_emit(mn, balsa_mailbox_node_signals[SAVE_CONFIG], 0, group);
 }
 
 /* ---------------------------------------------------------------------
@@ -1482,14 +1481,6 @@ balsa_mailbox_node_set_subscribed(BalsaMailboxNode * mbnode, guint subscribed)
     mbnode->subscribed = !!subscribed;
 }
 
-void
-balsa_mailbox_node_set_scanned(BalsaMailboxNode * mbnode, guint scanned)
-{
-    g_return_if_fail(BALSA_IS_MAILBOX_NODE(mbnode));
-
-    mbnode->scanned = !!scanned;
-}
-
 /*
  * Getters
  */
@@ -1548,14 +1539,6 @@ balsa_mailbox_node_get_subscribed(BalsaMailboxNode * mbnode)
     g_return_val_if_fail(BALSA_IS_MAILBOX_NODE(mbnode), 0);
 
     return mbnode->subscribed;
-}
-
-guint
-balsa_mailbox_node_get_scanned(BalsaMailboxNode * mbnode)
-{
-    g_return_val_if_fail(BALSA_IS_MAILBOX_NODE(mbnode), FALSE);
-
-    return mbnode->scanned;
 }
 
 guint

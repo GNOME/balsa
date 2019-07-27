@@ -88,7 +88,6 @@ void balsa_mailbox_node_change_style(BalsaMailboxNode * mbnode,
                                      BalsaMailboxNodeStyle set,
                                      BalsaMailboxNodeStyle clear);
 void balsa_mailbox_node_set_subscribed(BalsaMailboxNode * mbnode, guint subscribed);
-void balsa_mailbox_node_set_scanned(BalsaMailboxNode * mbnode, guint scanned);
 void balsa_mailbox_node_set_list_inbox(BalsaMailboxNode * mbnode, guint list_inbox);
 
 /*
@@ -103,7 +102,6 @@ const gchar * balsa_mailbox_node_get_config_prefix(BalsaMailboxNode * mbnode);
 time_t balsa_mailbox_node_get_last_use_time(BalsaMailboxNode * mbnode);
 BalsaMailboxNodeStyle balsa_mailbox_node_get_style(BalsaMailboxNode * mbnode);
 guint balsa_mailbox_node_get_subscribed(BalsaMailboxNode * mbnode);
-guint balsa_mailbox_node_get_scanned(BalsaMailboxNode * mbnode);
 guint balsa_mailbox_node_get_list_inbox(BalsaMailboxNode * mbnode);
 gint balsa_mailbox_node_get_delim(BalsaMailboxNode * mbnode);
 

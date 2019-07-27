@@ -2277,11 +2277,9 @@ balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,
         GtkTreePath *parent_path =
             gtk_tree_model_get_path(model, parent_iter);
         if (gtk_tree_view_row_expanded(GTK_TREE_VIEW(balsa_app.mblist),
-                                       parent_path)
-            && !balsa_mailbox_node_get_scanned(mbnode)) {
+                                       parent_path)) {
             /* Check this node for children. */
             balsa_mailbox_node_append_subtree(mbnode);
-            balsa_mailbox_node_set_scanned(mbnode, TRUE);
         }
         gtk_tree_path_free(parent_path);
     }

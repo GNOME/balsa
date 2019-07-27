@@ -1,3 +1,15 @@
+2019-07-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox-node: Do not give access to BalsaMailboxNode:scanned
+
+	We can do all the checking in mailbox-node.c.
+
+	* src/mailbox-node.c (balsa_mailbox_node_append_subtree): check
+	whether the mbnode has been scanned;
+	* src/mailbox-node.h: drop accessors;
+	* src/balsa-mblist.c (balsa_mblist_mailbox_node_append): no need
+	to check whether the mbnode has been scanned.
+
 2019-07-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-mailbox-node: Use modern macros to declare and define.

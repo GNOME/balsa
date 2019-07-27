@@ -1462,7 +1462,7 @@ bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter)
 
     gtk_tree_model_get(model, iter, MBNODE_COLUMN, &mbnode, -1);
     if (mbnode == NULL ||
-        (mailbox = balsa_mailbox_node_get_mailbox(mbnode)) != NULL)
+        (mailbox = balsa_mailbox_node_get_mailbox(mbnode)) == NULL)
         return;
 
     unread_messages = libbalsa_mailbox_get_unread(mailbox);

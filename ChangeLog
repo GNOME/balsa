@@ -1,5 +1,12 @@
 2019-07-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	address-book-config: Do not leak structures
+
+	* src/address-book-config.c (balsa_address_book_config_new),
+	(balsa_address_book_config_new_from_type):
+
+2019-07-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox-node: Do not give access to BalsaMailboxNode:scanned
 
 	We can do all the checking in mailbox-node.c.

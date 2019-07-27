@@ -117,7 +117,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
     }
 
     abc = g_new0(AddressBookConfig, 1);
-    g_object_set_data(G_OBJECT(address_book), "balsa-abc", abc);
+    g_object_set_data_full(G_OBJECT(address_book), "balsa-abc", abc, g_free);
     abc->address_book = address_book;
     abc->callback = callback;
     abc->type = G_TYPE_FROM_INSTANCE(address_book);
@@ -141,6 +141,7 @@ balsa_address_book_config_new_from_type(GType type,
     abc->callback = callback;
     abc->type = type;
     abc->window = create_dialog_from_type(abc);
+    g_object_weak_ref(G_OBJECT(abc->window), (GWeakNotify) g_free, abc);
 
     gtk_widget_show_all(GTK_WIDGET(abc->window));
 }

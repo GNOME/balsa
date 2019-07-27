@@ -1,3 +1,78 @@
+2019-07-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-mailbox-node: Use modern macros to declare and define.
+
+	* src/mailbox-node.h: declare BalsaMailboxNode final;
+	* src/mailbox-node.c: use G_DEFINE_TYPE();
+	(balsa_mailbox_node_class_init),
+	(balsa_mailbox_node_init), (get_parent_folder_name),
+	(add_imap_entry), (handle_imap_path), (mark_imap_path),
+	(balsa_mailbox_node_set_dir), (balsa_mailbox_node_set_name),
+	(balsa_mailbox_node_set_config_prefix),
+	(balsa_mailbox_node_set_last_use_time),
+	(balsa_mailbox_node_change_style): adapt;
+	(balsa_mailbox_node_set_list_inbox),
+	(balsa_mailbox_node_set_subscribed),
+	(balsa_mailbox_node_set_scanned), (balsa_mailbox_node_get_mailbox),
+	(balsa_mailbox_node_get_name),
+	(balsa_mailbox_node_get_config_prefix),
+	(balsa_mailbox_node_get_last_use_time),
+	(balsa_mailbox_node_get_server), (balsa_mailbox_node_get_style),
+	(balsa_mailbox_node_get_subscribed),
+	(balsa_mailbox_node_get_scanned),
+	(balsa_mailbox_node_get_list_inbox),
+	(balsa_mailbox_node_get_delim), (balsa_mailbox_node_get_dir),
+	(balsa_mailbox_node_get_parent): new functions;
+	* libbalsa/folder-scanners.h:
+	* libinit_balsa/assistant_page_user.c (create_imap_mbx):
+	* src/balsa-app.c (find_mailbox), (find_path), (find_url),
+	(balsa_find_mailbox_by_url), (balsa_get_short_mailbox_name),
+	(balsa_find_iter_by_data_func), (ba_remove_children_mailbox_nodes),
+	(balsa_remove_children_mailbox_nodes):
+	* src/balsa-index.c (bndx_destroy), (bndx_selection_changed_idle),
+	(bndx_selection_changed), (bndx_find_current_msgno),
+	(bndx_scroll_on_open_idle), (balsa_index_load_mailbox_node),
+	(bndx_search_iter), (bndx_search_iter_and_select),
+	(bndx_mailbox_changed_idle), (balsa_index_selected_msgnos_new),
+	(balsa_index_selected_msgnos_free), (bndx_view_source),
+	(bndx_compose_foreach), (bndx_compose_from_list), (bndx_do_delete),
+	(balsa_message_move_to_trash), (balsa_find_notebook_page_num),
+	(balsa_index_toggle_flag), (bi_toggle_deleted_cb), (mru_menu_cb),
+	(bndx_do_popup), (balsa_index_set_thread_messages),
+	(balsa_index_set_view_filter), (balsa_index_transfer),
+	(balsa_index_expunge), (bndx_next_msgno), (balsa_index_pipe),
+	(balsa_index_select_thread), (balsa_index_set_last_use_time),
+	(balsa_index_get_last_use_time), (balsa_index_get_mailbox):
+	* src/balsa-mblist.c (bmbl_selection_func), (bmbl_tree_expand),
+	(bmbl_tree_collapse_helper), (bmbl_tree_collapse),
+	(bmbl_row_compare), (bmbl_drag_cb), (bmbl_select_mailbox),
+	(bmbl_row_activated_cb), (bmbl_find_all_unread_mboxes_func),
+	(get_lru_descendant), (bmbl_real_disconnect_mbnode_signals),
+	(bmbl_store_redraw_mbnode), (bmbl_node_style),
+	(bmbl_mru_selected_cb), (bmbl_mru_activated_cb),
+	(balsa_mblist_mailbox_node_append):
+	* src/filter-edit-callbacks.c (update_filters_mailbox):
+	* src/folder-conf.c (folder_conf_clicked_ok),
+	(folder_conf_imap_subscriptions), (folder_conf_imap_node),
+	(validate_sub_folder), (browse_button_cb),
+	(subfolder_conf_clicked_ok), (folder_conf_imap_sub_node),
+	(folder_conf_delete), (folder_conf_add_imap_sub_cb):
+	* src/mailbox-conf.c (mailbox_conf_delete_cb),
+	(mailbox_conf_delete), (run_mailbox_conf), (mailbox_conf_edit):
+	* src/main-window.c (bw_enable_mailbox_menus),
+	(bw_notebook_label_new), (bw_real_open_mbnode_idle_cb),
+	(bw_real_open_mbnode_thread), (balsa_window_real_open_mbnode),
+	(balsa_window_real_close_mbnode), (bw_check_mailbox_list),
+	(bw_add_mbox_to_checklist), (mw_mbox_change_connection_status),
+	(bw_change_connection_status_idle), (balsa_window_update_tab):
+	* src/main.c (periodic_expunge_cb):
+	* src/pref-manager.c (add_other_server), (server_del_cb),
+	(update_mail_servers):
+	* src/save-restore.c (folder_section_path),
+	(migrate_imap_mailboxes), (config_folder_delete),
+	(config_folder_init):
+	* src/save-restore.h: use them.
+
 2019-07-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	filter-run: Make filter-run.h private

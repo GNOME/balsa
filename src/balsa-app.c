@@ -610,7 +610,7 @@ find_mailbox(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
     BalsaMailboxNode *mbnode;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
-    if (mbnode->mailbox == bf->data) {
+    if (balsa_mailbox_node_get_mailbox(mbnode) == bf->data) {
 	bf->mbnode = mbnode;
 	return TRUE;
     }
@@ -648,8 +648,8 @@ find_path(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
     BalsaMailboxNode *mbnode;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
-    if (mbnode->server == bf->server &&
-        g_strcmp0(mbnode->dir, bf->data) == 0) {
+    if (balsa_mailbox_node_get_server(mbnode) == bf->server &&
+        g_strcmp0(balsa_mailbox_node_get_dir(mbnode), bf->data) == 0) {
 	bf->mbnode = mbnode;
 	return TRUE;
     }
@@ -680,7 +680,7 @@ find_url(GtkTreeModel * model, GtkTreePath * path, GtkTreeIter * iter,
     LibBalsaMailbox *mailbox;
 
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
-    if ((mailbox = mbnode->mailbox) != NULL &&
+    if ((mailbox = balsa_mailbox_node_get_mailbox(mbnode)) != NULL &&
         strcmp(libbalsa_mailbox_get_url(mailbox), bf->data) == 0) {
         bf->mbnode = mbnode;
         return TRUE;
@@ -730,7 +730,7 @@ balsa_find_mailbox_by_url(const gchar * url)
     LibBalsaMailbox *mailbox = NULL;
 
     if ((mbnode = balsa_find_url(url))) {
-	mailbox = mbnode->mailbox;
+	mailbox = balsa_mailbox_node_get_mailbox(mbnode);
 	g_object_unref(mbnode);
     }
     return mailbox;
@@ -747,20 +747,26 @@ gchar*
 balsa_get_short_mailbox_name(const gchar *url)
 {
     BalsaMailboxNode *mbnode;
-    gchar *short_name;
+    gchar *short_name = NULL;
 
-    if ((mbnode = balsa_find_url(url)) != NULL && mbnode->mailbox != NULL) {
-        const gchar *name = libbalsa_mailbox_get_name(mbnode->mailbox);
+    if ((mbnode = balsa_find_url(url)) != NULL) {
+        LibBalsaMailbox *mailbox = balsa_mailbox_node_get_mailbox(mbnode);
 
-        if (mbnode->server) {
-            short_name = g_strconcat(libbalsa_server_get_host(mbnode->server), ":",
+        if (mailbox != NULL) {
+            const gchar *name = libbalsa_mailbox_get_name(mailbox);
+            LibBalsaServer *server = balsa_mailbox_node_get_server(mbnode);
+
+            if (server != NULL) {
+                short_name = g_strconcat(libbalsa_server_get_host(server), ":",
                                      name, NULL);
-        } else {
-            short_name = g_strdup(name);
+            } else {
+                short_name = g_strdup(name);
+            }
         }
-    } else {
-        short_name = g_strdup(url);
     }
+
+    if (short_name == NULL)
+        short_name = g_strdup(url);
 
     return short_name;
 }
@@ -781,7 +787,7 @@ balsa_find_iter_by_data_func(GtkTreeModel * model, GtkTreePath * path,
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     if(!mbnode)
         return FALSE;
-    if (mbnode == bf->data || mbnode->mailbox == bf->data) {
+    if (mbnode == bf->data || balsa_mailbox_node_get_mailbox(mbnode) == bf->data) {
 	*bf->iter = *iter;
 	bf->found = TRUE;
     }
@@ -828,9 +834,12 @@ ba_remove_children_mailbox_nodes(GtkTreeModel * model, GtkTreeIter * parent,
 	return;
 
     do {
+        LibBalsaMailbox *mailbox;
+
 	gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
-	if (mbnode->parent) {
-	    LibBalsaMailbox *mailbox = mbnode->mailbox;
+	mailbox = balsa_mailbox_node_get_mailbox(mbnode);
+
+	if (balsa_mailbox_node_get_parent(mbnode) != NULL) {
 	    if (mailbox == balsa_app.inbox
 		|| mailbox == balsa_app.outbox
 		|| mailbox == balsa_app.sentbox
@@ -844,8 +853,10 @@ ba_remove_children_mailbox_nodes(GtkTreeModel * model, GtkTreeIter * parent,
 		gtk_tree_store_remove(balsa_app.mblist_tree_store, &iter);
 	} else {
 	    printf("sparing %s %s\n",
-		   mbnode->mailbox ? "mailbox" : "folder ",
-		   mbnode->mailbox ? libbalsa_mailbox_get_name(mbnode->mailbox) : mbnode->name);
+		   mailbox != NULL ? "mailbox" : "folder ",
+		   mailbox != NULL ?
+                   libbalsa_mailbox_get_name(mailbox) :
+                   balsa_mailbox_node_get_name(mbnode));
 	    valid = gtk_tree_model_iter_next(model, &iter);
 	}
 	g_object_unref(mbnode);
@@ -860,9 +871,13 @@ balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode)
     GtkTreeIter *iter = NULL;
     GSList *specials = NULL, *l;
 
-    if (balsa_app.debug)
-	printf("Destroying children of %p %s\n",
-	       mbnode, mbnode && mbnode->name ? mbnode->name : "");
+    if (balsa_app.debug) {
+        const gchar *name;
+
+	printf("Destroying children of %p %s\n", mbnode,
+               (mbnode != NULL &&
+                (name = balsa_mailbox_node_get_name(mbnode)) != NULL) ? name : "");
+    }
 
     if (mbnode && balsa_find_iter_by_data(&parent, mbnode))
 	iter = &parent;

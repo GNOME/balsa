@@ -332,7 +332,8 @@ periodic_expunge_cb(void)
     GSList *list = NULL, *l;
 
     /* should we enforce expunging now and then? Perhaps not... */
-    if(!balsa_app.expunge_auto) return TRUE;
+    if (!balsa_app.expunge_auto)
+        return TRUE;
 
     libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                          _("Compressing mail folders…"));
@@ -340,13 +341,15 @@ periodic_expunge_cb(void)
 			   (GtkTreeModelForeachFunc)mbnode_expunge_func,
 			   &list);
 
-    for (l = list; l; l = l->next) {
+    for (l = list; l != NULL; l = l->next) {
         BalsaMailboxNode *mbnode = l->data;
-        if (mbnode->mailbox && libbalsa_mailbox_is_open(mbnode->mailbox)
-            && !libbalsa_mailbox_get_readonly(mbnode->mailbox)) {
+        LibBalsaMailbox *mailbox = balsa_mailbox_node_get_mailbox(mbnode);
+
+        if (mailbox != NULL && libbalsa_mailbox_is_open(mailbox) &&
+            !libbalsa_mailbox_get_readonly(mailbox)) {
             time_t tm = time(NULL);
-            if (tm-mbnode->last_use > balsa_app.expunge_timeout)
-                libbalsa_mailbox_sync_storage(mbnode->mailbox, TRUE);
+            if (tm - balsa_mailbox_node_get_last_use_time(mbnode) > balsa_app.expunge_timeout)
+                libbalsa_mailbox_sync_storage(mailbox, TRUE);
         }
         g_object_unref(mbnode);
     }

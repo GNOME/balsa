@@ -51,7 +51,7 @@ gint config_mailbox_delete(LibBalsaMailbox * mailbox);
 gint config_mailbox_update(LibBalsaMailbox * mailbox);
 
 gint config_folder_add(BalsaMailboxNode * mbnode, const char *key_arg);
-gint config_folder_delete(const BalsaMailboxNode * mbnode);
+gint config_folder_delete(BalsaMailboxNode * mbnode);
 gint config_folder_update(BalsaMailboxNode * mbnode);
 
 void config_address_book_save(LibBalsaAddressBook * ab);

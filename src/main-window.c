@@ -2405,7 +2405,7 @@ bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
     enable = (index != NULL);
     if (enable) {
         mbnode = balsa_index_get_mailbox_node(index);
-        mailbox = mbnode->mailbox;
+        mailbox = balsa_mailbox_node_get_mailbox(mbnode);
     }
     bw_action_set_enabled(window, "mailbox-expunge",
     /* cppcheck-suppress nullPointer */
@@ -2737,7 +2737,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
 
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 4);
 
-    lab = gtk_label_new(libbalsa_mailbox_get_name(mbnode->mailbox));
+    lab = gtk_label_new(libbalsa_mailbox_get_name(balsa_mailbox_node_get_mailbox(mbnode)));
     gtk_widget_set_name(lab, "balsa-notebook-tab-label");
 
     /* Try to make text not bold: */
@@ -2756,8 +2756,8 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     g_object_unref(css_provider);
 
     bw_notebook_label_style(GTK_LABEL(lab),
-                            libbalsa_mailbox_get_unread(mbnode->mailbox) > 0);
-    g_signal_connect_object(mbnode->mailbox, "changed",
+                            libbalsa_mailbox_get_unread(balsa_mailbox_node_get_mailbox(mbnode)) > 0);
+    g_signal_connect_object(balsa_mailbox_node_get_mailbox(mbnode), "changed",
                             G_CALLBACK(bw_mailbox_changed), lab, 0);
     gtk_box_pack_start(GTK_BOX(box), lab, TRUE, TRUE, 0);
 
@@ -2782,7 +2782,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
 
     gtk_widget_show_all(box);
 
-    gtk_widget_set_tooltip_text(box, libbalsa_mailbox_get_url(mbnode->mailbox));
+    gtk_widget_set_tooltip_text(box, libbalsa_mailbox_get_url(balsa_mailbox_node_get_mailbox(mbnode)));
     return box;
 }
 
@@ -2805,7 +2805,7 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     BalsaIndex        *index   = info->index;
     BalsaMailboxNode  *mbnode  = info->mbnode;
     BalsaWindow       *window  = info->window;
-    LibBalsaMailbox   *mailbox = mbnode->mailbox;
+    LibBalsaMailbox   *mailbox = balsa_mailbox_node_get_mailbox(mbnode);
     GtkWidget         *label;
     GtkWidget         *scroll;
     gint               page_num;
@@ -2884,7 +2884,7 @@ bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info)
 {
     static GMutex open_lock;
     gint try_cnt;
-    LibBalsaMailbox *mailbox = info->mbnode->mailbox;
+    LibBalsaMailbox *mailbox = balsa_mailbox_node_get_mailbox(info->mbnode);
     GError *err = NULL;
     gboolean successp;
 
@@ -2948,7 +2948,7 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
     GThread *open_thread;
     BalsaWindowRealOpenMbnodeInfo *info;
 
-    if (bw_is_open_mailbox(mailbox = mbnode->mailbox))
+    if (bw_is_open_mailbox(mailbox = balsa_mailbox_node_get_mailbox(mbnode)))
         return;
 
     index = BALSA_INDEX(balsa_index_new());
@@ -3004,13 +3004,13 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
     gint i;
     LibBalsaMailbox **mailbox;
 
-    g_return_if_fail(mbnode->mailbox);
+    g_return_if_fail(balsa_mailbox_node_get_mailbox(mbnode));
 
-    i = balsa_find_notebook_page_num(mbnode->mailbox);
+    i = balsa_find_notebook_page_num(balsa_mailbox_node_get_mailbox(mbnode));
 
     if (i != -1) {
         gtk_notebook_remove_page(GTK_NOTEBOOK(window->notebook), i);
-        bw_unregister_open_mailbox(mbnode->mailbox);
+        bw_unregister_open_mailbox(balsa_mailbox_node_get_mailbox(mbnode));
 
         /* If this is the last notebook page clear the message preview
            and the status bar */
@@ -3242,7 +3242,7 @@ bw_check_mailbox_list(struct check_messages_thread_info *info, GList *mailbox_li
     }
 
     for ( ; mailbox_list; mailbox_list = mailbox_list->next) {
-        LibBalsaMailbox *mailbox = BALSA_MAILBOX_NODE(mailbox_list->data)->mailbox;
+        LibBalsaMailbox *mailbox = balsa_mailbox_node_get_mailbox(mailbox_list->data);
         LibBalsaMailboxPOP3 *pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
         bw_pop_mbox_t *bw_pop_mbox;
 
@@ -3276,9 +3276,9 @@ bw_add_mbox_to_checklist(GtkTreeModel * model, GtkTreePath * path,
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     g_return_val_if_fail(mbnode, FALSE);
 
-    if ((mailbox = mbnode->mailbox)) {	/* mailbox, not a folder */
+    if ((mailbox = balsa_mailbox_node_get_mailbox(mbnode))) {	/* mailbox, not a folder */
 	if (!LIBBALSA_IS_MAILBOX_IMAP(mailbox) ||
-	    bw_imap_check_test(mbnode->dir ? mbnode->dir :
+	    bw_imap_check_test(balsa_mailbox_node_get_dir(mbnode) ? balsa_mailbox_node_get_dir(mbnode) :
 			    libbalsa_mailbox_imap_get_path
 			    (LIBBALSA_MAILBOX_IMAP(mailbox))))
 	    *list = g_slist_prepend(*list, g_object_ref(mailbox));
@@ -3589,9 +3589,9 @@ mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     g_return_val_if_fail(mbnode, FALSE);
 
-    if ((mailbox = mbnode->mailbox)) {  /* mailbox, not a folder */
+    if ((mailbox = balsa_mailbox_node_get_mailbox(mbnode))) {  /* mailbox, not a folder */
         if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) &&
-            bw_imap_check_test(mbnode->dir ? mbnode->dir :
+            bw_imap_check_test(balsa_mailbox_node_get_dir(mbnode) ? balsa_mailbox_node_get_dir(mbnode) :
                                libbalsa_mailbox_imap_get_path(LIBBALSA_MAILBOX_IMAP(mailbox)))) {
             libbalsa_mailbox_test_can_reach(g_object_ref(mailbox),
                                             mw_mbox_can_reach_cb, NULL);
@@ -3645,7 +3645,7 @@ bw_change_connection_status_idle(gpointer user_data)
         return FALSE;
     if ((mbnode = balsa_app.inbox_input->data) == NULL)
         return FALSE;
-    if ((mailbox = mbnode->mailbox) == NULL)
+    if ((mailbox = balsa_mailbox_node_get_mailbox(mbnode)) == NULL)
         return FALSE;
 
     libbalsa_mailbox_test_can_reach(mailbox, bw_change_connection_status_can_reach_cb,
@@ -4652,7 +4652,7 @@ update_view_menu(BalsaWindow * window)
 void
 balsa_window_update_tab(BalsaMailboxNode * mbnode)
 {
-    gint i = balsa_find_notebook_page_num(mbnode->mailbox);
+    gint i = balsa_find_notebook_page_num(balsa_mailbox_node_get_mailbox(mbnode));
     if (i != -1) {
 	GtkWidget *page =
 	    gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i);

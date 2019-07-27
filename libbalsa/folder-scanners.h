@@ -31,7 +31,7 @@ typedef gpointer LocalHandler(gpointer root, const char *d_name,
 typedef gboolean ImapCheck(const char *fn, LibBalsaServer * server,
                            guint depth);
 typedef void ImapMark(const char *fn, gpointer data);
-typedef void ImapHandler(const char *fn, char delim, gint noselect,
+typedef void ImapHandler(const char *fn, gint delim, gint noselect,
 			 gint marked, gint noscan, gpointer data);
 
 /* read_dir used by mailbox-node append-subtree callback */

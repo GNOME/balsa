@@ -981,18 +981,18 @@ add_other_server(BalsaMailboxNode * mbnode, GtkTreeModel * model)
     const gchar *name = NULL;
     gboolean append = FALSE;
 
-    if (mbnode) {
-        LibBalsaMailbox *mailbox = mbnode->mailbox;
-        if (mailbox) {
+    if (mbnode != NULL) {
+        LibBalsaMailbox *mailbox = balsa_mailbox_node_get_mailbox(mbnode);
+        if (mailbox != NULL) {
             if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
                 protocol = "IMAP";
                 name = libbalsa_mailbox_get_name(mailbox);
                 append = TRUE;
             }
         } else
-            if (LIBBALSA_IS_IMAP_SERVER(mbnode->server)) {
+            if (LIBBALSA_IS_IMAP_SERVER(balsa_mailbox_node_get_server(mbnode))) {
             protocol = "IMAP";
-            name = mbnode->name;
+            name = balsa_mailbox_node_get_name(mbnode);
             append = TRUE;
         }
         if (append) {
@@ -1737,7 +1737,7 @@ server_del_cb(GtkTreeView * tree_view)
     gtk_tree_model_get(model, &iter, MS_DATA_COLUMN, &mbnode, -1);
     g_return_if_fail(mbnode);
 
-    if (mbnode->mailbox)
+    if (balsa_mailbox_node_get_mailbox(mbnode) != NULL)
 	mailbox_conf_delete(mbnode);
     else
 	folder_conf_delete(mbnode);
@@ -3582,11 +3582,15 @@ update_mail_servers(void)
 
     gtk_list_store_clear(GTK_LIST_STORE(model));
     for (list = balsa_app.inbox_input; list; list = list->next) {
+        LibBalsaMailbox *mailbox;
+
         if (!(mbnode = list->data))
             continue;
-        if (LIBBALSA_IS_MAILBOX_POP3(mbnode->mailbox))
+
+        mailbox = balsa_mailbox_node_get_mailbox(mbnode);
+        if (LIBBALSA_IS_MAILBOX_POP3(mailbox))
             protocol = "POP3";
-        else if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
+        else if (LIBBALSA_IS_MAILBOX_IMAP(mailbox))
             protocol = "IMAP";
         else
             protocol = _("Unknown");
@@ -3594,7 +3598,8 @@ update_mail_servers(void)
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
         gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                            MS_PROT_COLUMN, protocol,
-                           MS_NAME_COLUMN, libbalsa_mailbox_get_name(mbnode->mailbox),
+                           MS_NAME_COLUMN,
+                           libbalsa_mailbox_get_name(mailbox),
                            MS_DATA_COLUMN, mbnode, -1);
     }
     /*

@@ -69,11 +69,6 @@ static void config_filters_load(void);
 
 static inline gboolean is_special_name(const gchar *name);
 
-#define folder_section_path(mn) \
-    BALSA_MAILBOX_NODE(mn)->config_prefix ? \
-    g_strdup(BALSA_MAILBOX_NODE(mn)->config_prefix) : \
-    config_get_unused_group(FOLDER_SECTION_PREFIX)
-
 static gchar *
 mailbox_section_path(LibBalsaMailbox * mailbox)
 {
@@ -83,6 +78,17 @@ mailbox_section_path(LibBalsaMailbox * mailbox)
     return config_prefix != NULL ?
         g_strdup(config_prefix) :
         config_get_unused_group(MAILBOX_SECTION_PREFIX);
+}
+
+static gchar *
+folder_section_path(BalsaMailboxNode * mbnode)
+{
+    const gchar *config_prefix =
+        balsa_mailbox_node_get_config_prefix(mbnode);
+
+    return config_prefix != NULL ?
+        g_strdup(config_prefix) :
+        config_get_unused_group(FOLDER_SECTION_PREFIX);
 }
 
 static gchar *
@@ -127,26 +133,32 @@ migrate_imap_mailboxes(const gchar *key, const gchar *value, gpointer data)
 		libbalsa_conf_pop_group();
 		mbnode = balsa_mailbox_node_new_from_config(key);
 	    if (mbnode != NULL) {
-                LibBalsaServer *server = mbnode->server;
+                LibBalsaServer *server = balsa_mailbox_node_get_server(mbnode);
 	    	gchar *folder_key;
 	    	gchar *oldname;
 
 	    	/* do not add the same folder multiple times */
 	    	folder_key = g_strconcat(libbalsa_server_get_user(server), "@",
                                          libbalsa_server_get_host(server), NULL);
-	    	oldname = g_strdup(mbnode->name);
+	    	oldname = g_strdup(balsa_mailbox_node_get_name(mbnode));
 	    	if (g_hash_table_contains(migrated, folder_key)) {
 	    		g_object_unref(mbnode);
 	    		g_free(folder_key);
 	    	} else {
+                        gchar *tmp;
+
 	    		g_hash_table_add(migrated, folder_key);
-		    	g_free(mbnode->name);
-		    	mbnode->name = g_strdup(libbalsa_server_get_host(server));
+		    	balsa_mailbox_node_set_name(mbnode, libbalsa_server_get_host(server));
 		    	balsa_mblist_mailbox_node_append(NULL, mbnode);
 
-		    	g_free(mbnode->config_prefix);
-		    	mbnode->config_prefix = config_get_unused_group(FOLDER_SECTION_PREFIX);
-		    	g_signal_connect_swapped(mbnode->server, "config-changed", G_CALLBACK(config_folder_update), mbnode);
+		    	tmp =  config_get_unused_group(FOLDER_SECTION_PREFIX);
+		    	balsa_mailbox_node_set_config_prefix(mbnode, tmp);
+                        g_free(tmp);
+
+		    	g_signal_connect_swapped(balsa_mailbox_node_get_server(mbnode),
+                                                 "config-changed",
+                                                 G_CALLBACK(config_folder_update),
+                                                 mbnode);
 	    	}
 
 	    	if (!is_special_name(value)) {
@@ -412,7 +424,7 @@ config_mailbox_delete(LibBalsaMailbox * mailbox)
 }				/* config_mailbox_delete */
 
 gint
-config_folder_delete(const BalsaMailboxNode * mbnode)
+config_folder_delete(BalsaMailboxNode * mbnode)
 {
     gchar *tmp;			/* the key in the mailbox section name */
     gint res;
@@ -537,7 +549,8 @@ config_folder_init(const gchar * prefix)
     g_return_val_if_fail(prefix != NULL, FALSE);
 
     if( (folder = balsa_mailbox_node_new_from_config(prefix)) ) {
-	g_signal_connect_swapped(folder->server, "config-changed",
+	g_signal_connect_swapped(balsa_mailbox_node_get_server(folder),
+                                 "config-changed",
                                  G_CALLBACK(config_folder_update),
 				 folder);
 	balsa_mblist_mailbox_node_append(NULL, folder);

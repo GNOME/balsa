@@ -470,7 +470,7 @@ imap_dir_cb(BalsaMailboxNode* mb)
     if (!balsa_app.main_window)
         return;
 
-    statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+    statusbar = balsa_window_get_statusbar(balsa_app.main_window);
     context_id = gtk_statusbar_get_context_id(statusbar, "MailboxNode imap");
 
     if(restore_children_from_cache(mb))

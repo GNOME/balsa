@@ -185,7 +185,48 @@ static void bw_reset_filter(BalsaWindow * bw);
    proponents of GNOME2 dumbify approach (OK, I am bit unfair here).
 */
 
-G_DEFINE_TYPE (BalsaWindow, balsa_window, GTK_TYPE_APPLICATION_WINDOW)
+typedef struct _BalsaWindowPrivate BalsaWindowPrivate;
+
+struct _BalsaWindowPrivate {
+    GtkApplicationWindow window;
+
+    GtkWidget *toolbar;
+    GtkWidget *sos_bar;
+    GtkWidget *bottom_bar;
+    GtkWidget *progress_bar;
+    GtkWidget *statusbar;
+    GtkWidget *mblist;
+    GtkWidget *sos_entry;       /* SenderOrSubject filter entry */
+    GtkWidget *notebook;
+    GtkWidget *preview;		/* message is child */
+    GtkWidget *paned_master;
+    GtkWidget *paned_slave;
+    GtkWidget *current_index;
+    GtkWidget *filter_choice;
+    GtkWidget *vbox;
+    GtkWidget *content;
+
+    guint set_message_id;
+
+    /* Progress bar stuff: */
+    BalsaWindowProgress progress_type;
+    guint activity_handler;
+    guint activity_counter;
+    GSList *activity_messages;
+
+#ifdef HAVE_NOTIFY
+    NotifyNotification *new_mail_note;
+#else                          /* HAVE_NOTIFY */
+    gboolean new_mail_notification_sent;
+#endif                         /* HAVE_NOTIFY */
+
+    /* Support GNetworkMonitor: */
+    gboolean network_available;
+    time_t last_check_time;
+    guint network_changed_source_id;
+};
+
+G_DEFINE_TYPE_WITH_PRIVATE(BalsaWindow, balsa_window, GTK_TYPE_APPLICATION_WINDOW)
 
 static guint window_signals[LAST_SIGNAL] = { 0 };
 
@@ -236,16 +277,17 @@ bw_network_changed_cb(GNetworkMonitor * monitor,
                       gboolean          available,
                       gpointer          user_data)
 {
-    BalsaWindow *window = user_data;
+    BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    if (window->network_available != available) {
-        window->network_available = available;
+    if (priv->network_available != available) {
+        priv->network_available = available;
         print_network_status(available);
     }
 
-    if (window->network_changed_source_id == 0) {
+    if (priv->network_changed_source_id == 0) {
         /* Wait 2 seconds or so to let the network stabilize */
-        window->network_changed_source_id =
+        priv->network_changed_source_id =
             g_timeout_add_seconds(2, bw_change_connection_status_idle, window);
     }
 }
@@ -253,15 +295,16 @@ bw_network_changed_cb(GNetworkMonitor * monitor,
 static void
 balsa_window_init(BalsaWindow * window)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GNetworkMonitor *monitor;
 
     monitor = g_network_monitor_get_default();
-    window->network_available =
+    priv->network_available =
         g_network_monitor_get_network_available(monitor);
-    print_network_status(window->network_available);
+    print_network_status(priv->network_available);
     g_signal_connect(monitor, "network-changed",
                      G_CALLBACK(bw_network_changed_cb), window);
-    window->last_check_time = 0;
+    priv->last_check_time = 0;
 }
 
 static gboolean
@@ -311,10 +354,13 @@ bw_frame(GtkWidget * widget)
    Otherwise, typing eg. 'c' would open the draftbox instead of
    actually insert the 'c' character in the entry. */
 static gboolean
-bw_pass_to_filter(BalsaWindow *bw, GdkEventKey *event, gpointer data)
+bw_pass_to_filter(BalsaWindow *window, GdkEventKey *event, gpointer data)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     gboolean res = FALSE;
-    g_signal_emit_by_name(bw->sos_entry, "key_press_event", event, &res, data);
+
+    g_signal_emit_by_name(priv->sos_entry, "key_press_event", event, &res, data);
+
     return res;
 }
 static gboolean
@@ -352,11 +398,12 @@ bw_set_view_filter(BalsaWindow * bw, gint filter_no, GtkWidget * entry)
 static void
 bw_filter_entry_activate(GtkWidget * entry, GtkWidget * button)
 {
-    BalsaWindow *bw = balsa_app.main_window;
+    BalsaWindow *window = balsa_app.main_window;
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     int filter_no =
-        gtk_combo_box_get_active(GTK_COMBO_BOX(bw->filter_choice));
+        gtk_combo_box_get_active(GTK_COMBO_BOX(priv->filter_choice));
 
-    bw_set_view_filter(bw, filter_no, entry);
+    bw_set_view_filter(window, filter_no, entry);
     gtk_widget_set_sensitive(button, FALSE);
 }
 
@@ -475,6 +522,7 @@ bw_sos_icon_release(GtkEntry            *entry,
 static GtkWidget*
 bw_create_index_widget(BalsaWindow *bw)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(bw);
     GtkWidget *vbox, *button;
     unsigned i;
 
@@ -484,52 +532,52 @@ bw_create_index_widget(BalsaWindow *bw)
         view_filters_translated = TRUE;
     }
 
-    bw->sos_bar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    priv->sos_bar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
 
-    bw->filter_choice = gtk_combo_box_text_new();
-    gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->filter_choice,
+    priv->filter_choice = gtk_combo_box_text_new();
+    gtk_box_pack_start(GTK_BOX(priv->sos_bar), priv->filter_choice,
                        FALSE, FALSE, 0);
     for(i=0; i<G_N_ELEMENTS(view_filters); i++)
-        gtk_combo_box_text_insert_text(GTK_COMBO_BOX_TEXT(bw->filter_choice),
+        gtk_combo_box_text_insert_text(GTK_COMBO_BOX_TEXT(priv->filter_choice),
                                        i, view_filters[i].str);
-    gtk_combo_box_set_active(GTK_COMBO_BOX(bw->filter_choice), 0);
-    gtk_widget_show(bw->filter_choice);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(priv->filter_choice), 0);
+    gtk_widget_show(priv->filter_choice);
 
-    bw->sos_entry = gtk_search_entry_new();
-    /* gtk_label_set_mnemonic_widget(GTK_LABEL(bw->filter_choice),
-       bw->sos_entry); */
-    g_signal_connect(G_OBJECT(bw->sos_entry), "focus_in_event",
+    priv->sos_entry = gtk_search_entry_new();
+    /* gtk_label_set_mnemonic_widget(GTK_LABEL(priv->filter_choice),
+       priv->sos_entry); */
+    g_signal_connect(G_OBJECT(priv->sos_entry), "focus_in_event",
                      G_CALLBACK(bw_enable_filter), bw);
-    g_signal_connect(G_OBJECT(bw->sos_entry), "focus_out_event",
+    g_signal_connect(G_OBJECT(priv->sos_entry), "focus_out_event",
                      G_CALLBACK(bw_disable_filter), bw);
 
     button = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(button),
                       gtk_image_new_from_icon_name("gtk-ok",
                                                     GTK_ICON_SIZE_BUTTON));
-    g_signal_connect(bw->sos_entry, "icon-release",
+    g_signal_connect(priv->sos_entry, "icon-release",
                      G_CALLBACK(bw_sos_icon_release), button);
 
-    gtk_box_pack_start(GTK_BOX(bw->sos_bar), bw->sos_entry, TRUE, TRUE, 0);
-    gtk_widget_show(bw->sos_entry);
+    gtk_box_pack_start(GTK_BOX(priv->sos_bar), priv->sos_entry, TRUE, TRUE, 0);
+    gtk_widget_show(priv->sos_entry);
 
-    gtk_box_pack_start(GTK_BOX(bw->sos_bar), button, FALSE, FALSE, 0);
-    g_signal_connect(G_OBJECT(bw->sos_entry), "activate",
+    gtk_box_pack_start(GTK_BOX(priv->sos_bar), button, FALSE, FALSE, 0);
+    g_signal_connect(G_OBJECT(priv->sos_entry), "activate",
                      G_CALLBACK(bw_filter_entry_activate),
                      button);
     g_signal_connect_swapped(G_OBJECT(button), "clicked",
                              G_CALLBACK(bw_filter_entry_activate),
-                             bw->sos_entry);
-    g_signal_connect(G_OBJECT(bw->sos_entry), "changed",
+                             priv->sos_entry);
+    g_signal_connect(G_OBJECT(priv->sos_entry), "changed",
                              G_CALLBACK(bw_filter_entry_changed),
                              button);
-    g_signal_connect(G_OBJECT(bw->filter_choice), "changed",
+    g_signal_connect(G_OBJECT(priv->filter_choice), "changed",
                      G_CALLBACK(bw_filter_entry_changed), button);
     gtk_widget_show_all(button);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_widget_show(bw->sos_bar);
-    gtk_box_pack_start(GTK_BOX(vbox), bw->sos_bar, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(vbox), bw->notebook, TRUE, TRUE, 0);
+    gtk_widget_show(priv->sos_bar);
+    gtk_box_pack_start(GTK_BOX(vbox), priv->sos_bar, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(vbox), priv->notebook, TRUE, TRUE, 0);
 
     gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_show(vbox);
@@ -539,67 +587,68 @@ bw_create_index_widget(BalsaWindow *bw)
 static void
 bw_set_panes(BalsaWindow * window)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GtkWidget *index_widget = bw_create_index_widget(window);
     GtkWidget *bindex;
     BalsaIndexWidthPreference width_preference;
 
     switch (balsa_app.layout_type) {
     case LAYOUT_WIDE_MSG:
-	window->paned_master = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
-	window->paned_slave  = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-        if (window->content)
-            gtk_container_remove(GTK_CONTAINER(window->vbox),
-                                 window->content);
-        window->content = window->paned_master;
-        gtk_box_pack_start(GTK_BOX(window->vbox), window->content,
+	priv->paned_master = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+	priv->paned_slave  = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+        if (priv->content)
+            gtk_container_remove(GTK_CONTAINER(priv->vbox),
+                                 priv->content);
+        priv->content = priv->paned_master;
+        gtk_box_pack_start(GTK_BOX(priv->vbox), priv->content,
                            TRUE, TRUE, 0);
-	gtk_paned_pack1(GTK_PANED(window->paned_slave),
-			bw_frame(window->mblist), TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(window->paned_slave),
+	gtk_paned_pack1(GTK_PANED(priv->paned_slave),
+			bw_frame(priv->mblist), TRUE, TRUE);
+        gtk_paned_pack2(GTK_PANED(priv->paned_slave),
 			bw_frame(index_widget), TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(window->paned_master),
-			window->paned_slave, TRUE, TRUE);
-	gtk_paned_pack2(GTK_PANED(window->paned_master),
-			bw_frame(window->preview), TRUE, TRUE);
+        gtk_paned_pack1(GTK_PANED(priv->paned_master),
+			priv->paned_slave, TRUE, TRUE);
+	gtk_paned_pack2(GTK_PANED(priv->paned_master),
+			bw_frame(priv->preview), TRUE, TRUE);
         width_preference = BALSA_INDEX_WIDE;
 	break;
     case LAYOUT_WIDE_SCREEN:
-	window->paned_master = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-	window->paned_slave  = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-        if (window->content)
-            gtk_container_remove(GTK_CONTAINER(window->vbox),
-                                 window->content);
-        window->content = window->paned_master;
-        gtk_box_pack_start(GTK_BOX(window->vbox), window->content,
+	priv->paned_master = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	priv->paned_slave  = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+        if (priv->content)
+            gtk_container_remove(GTK_CONTAINER(priv->vbox),
+                                 priv->content);
+        priv->content = priv->paned_master;
+        gtk_box_pack_start(GTK_BOX(priv->vbox), priv->content,
                            TRUE, TRUE, 0);
-	gtk_paned_pack1(GTK_PANED(window->paned_master),
-                        bw_frame(window->mblist), TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(window->paned_master), window->paned_slave,
+	gtk_paned_pack1(GTK_PANED(priv->paned_master),
+                        bw_frame(priv->mblist), TRUE, TRUE);
+        gtk_paned_pack2(GTK_PANED(priv->paned_master), priv->paned_slave,
                         TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(window->paned_slave),
+        gtk_paned_pack1(GTK_PANED(priv->paned_slave),
                         bw_frame(index_widget), TRUE, FALSE);
-	gtk_paned_pack2(GTK_PANED(window->paned_slave),
-                        bw_frame(window->preview), TRUE, TRUE);
+	gtk_paned_pack2(GTK_PANED(priv->paned_slave),
+                        bw_frame(priv->preview), TRUE, TRUE);
         width_preference = BALSA_INDEX_NARROW;
 	break;
     case LAYOUT_DEFAULT:
     default:
-	window->paned_master = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-	window->paned_slave  = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
-        if (window->content)
-            gtk_container_remove(GTK_CONTAINER(window->vbox),
-                                 window->content);
-        window->content = window->paned_master;
-        gtk_box_pack_start(GTK_BOX(window->vbox), window->content,
+	priv->paned_master = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	priv->paned_slave  = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+        if (priv->content)
+            gtk_container_remove(GTK_CONTAINER(priv->vbox),
+                                 priv->content);
+        priv->content = priv->paned_master;
+        gtk_box_pack_start(GTK_BOX(priv->vbox), priv->content,
                            TRUE, TRUE, 0);
-	gtk_paned_pack1(GTK_PANED(window->paned_master),
-                        bw_frame(window->mblist), TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(window->paned_master), window->paned_slave,
+	gtk_paned_pack1(GTK_PANED(priv->paned_master),
+                        bw_frame(priv->mblist), TRUE, TRUE);
+        gtk_paned_pack2(GTK_PANED(priv->paned_master), priv->paned_slave,
                         TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(window->paned_slave),
+        gtk_paned_pack1(GTK_PANED(priv->paned_slave),
                         bw_frame(index_widget), TRUE, TRUE);
-	gtk_paned_pack2(GTK_PANED(window->paned_slave),
-                        bw_frame(window->preview), TRUE, TRUE);
+	gtk_paned_pack2(GTK_PANED(priv->paned_slave),
+                        bw_frame(priv->preview), TRUE, TRUE);
         width_preference = BALSA_INDEX_WIDE;
     }
     if ( (bindex=balsa_window_find_current_index(window)) != NULL)
@@ -675,14 +724,15 @@ bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
 
     if (gtk_window_is_active(gtk_window)) {
         BalsaWindow *window = BALSA_WINDOW(gobject);
+        BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-        if (window->new_mail_notification_sent) {
+        if (priv->new_mail_notification_sent) {
             GtkApplication *application = gtk_window_get_application(gtk_window);
 
             g_application_withdraw_notification(G_APPLICATION(application),
                                                 NEW_MAIL_NOTIFICATION);
 
-            window->new_mail_notification_sent = FALSE;
+            priv->new_mail_notification_sent = FALSE;
         }
         gtk_window_set_urgency_hint(gtk_window, FALSE);
     }
@@ -759,12 +809,13 @@ bw_action_set_enabled(BalsaWindow * window,
                       const gchar * action_name,
                       gboolean      enabled)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GAction *action;
 
     g_assert(window != NULL);
 
     /* Is the window being destroyed? */
-    if (window->preview == NULL)
+    if (priv->preview == NULL)
         return;
 
     action = bw_get_action(window, action_name);
@@ -1180,9 +1231,10 @@ find_in_message_activated(GSimpleAction * action,
                           gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     if (balsa_app.previewpane)
-        balsa_message_find_in_message(BALSA_MESSAGE(window->preview));
+        balsa_message_find_in_message(BALSA_MESSAGE(priv->preview));
 }
 
 static void
@@ -1232,7 +1284,8 @@ zoom_in_activated(GSimpleAction * action,
                   gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
-    GtkWidget *bm = window->preview;
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+    GtkWidget *bm = priv->preview;
 
     balsa_message_zoom(BALSA_MESSAGE(bm), 1);
 }
@@ -1243,7 +1296,8 @@ zoom_out_activated(GSimpleAction * action,
                    gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
-    GtkWidget *bm = window->preview;
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+    GtkWidget *bm = priv->preview;
 
     balsa_message_zoom(BALSA_MESSAGE(bm), -1);
 }
@@ -1254,7 +1308,8 @@ zoom_normal_activated(GSimpleAction * action,
                       gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
-    GtkWidget *bm = window->preview;
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+    GtkWidget *bm = priv->preview;
 
     balsa_message_zoom(BALSA_MESSAGE(bm), 0);
 }
@@ -1312,13 +1367,14 @@ reset_filter_activated(GSimpleAction * action,
                        gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GtkWidget *index;
 
     /* do it by resetting the sos filder */
-    gtk_entry_set_text(GTK_ENTRY(window->sos_entry), "");
+    gtk_entry_set_text(GTK_ENTRY(priv->sos_entry), "");
     index = balsa_window_find_current_index(window);
     bw_set_view_filter(window, balsa_index_get_filter_no(BALSA_INDEX(index)),
-                       window->sos_entry);
+                       priv->sos_entry);
 }
 
 static void
@@ -1506,8 +1562,9 @@ next_part_activated(GSimpleAction * action,
                     gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    balsa_message_next_part(BALSA_MESSAGE(window->preview));
+    balsa_message_next_part(BALSA_MESSAGE(priv->preview));
 }
 
 static void
@@ -1516,8 +1573,9 @@ previous_part_activated(GSimpleAction * action,
                         gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    balsa_message_previous_part(BALSA_MESSAGE(window->preview));
+    balsa_message_previous_part(BALSA_MESSAGE(priv->preview));
 }
 
 static void
@@ -1526,8 +1584,9 @@ save_part_activated(GSimpleAction * action,
                     gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    balsa_message_save_current_part(BALSA_MESSAGE(window->preview));
+    balsa_message_save_current_part(BALSA_MESSAGE(priv->preview));
 }
 
 static void
@@ -1560,8 +1619,9 @@ copy_message_activated(GSimpleAction * action,
                        gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    if (balsa_message_grab_focus(BALSA_MESSAGE(window->preview)))
+    if (balsa_message_grab_focus(BALSA_MESSAGE(priv->preview)))
         copy_activated(action, parameter, user_data);
 }
 
@@ -1571,8 +1631,9 @@ select_text_activated(GSimpleAction * action,
                        gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    if (balsa_message_grab_focus(BALSA_MESSAGE(window->preview)))
+    if (balsa_message_grab_focus(BALSA_MESSAGE(priv->preview)))
 	balsa_window_select_all(user_data);
 }
 
@@ -1669,9 +1730,10 @@ show_mailbox_tabs_change_state(GSimpleAction * action,
                                gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     balsa_app.show_notebook_tabs = g_variant_get_boolean(state);
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook),
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(priv->notebook),
                                balsa_app.show_notebook_tabs);
     g_simple_action_set_state(action, state);
 }
@@ -1682,9 +1744,10 @@ show_toolbar_change_state(GSimpleAction * action,
                           gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     bw_show_or_hide_widget(action, state, &balsa_app.show_main_toolbar,
-                           window->toolbar);
+                           priv->toolbar);
 }
 
 static void
@@ -1693,9 +1756,10 @@ show_statusbar_change_state(GSimpleAction * action,
                             gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     bw_show_or_hide_widget(action, state, &balsa_app.show_statusbar,
-                           window->bottom_bar);
+                           priv->bottom_bar);
 }
 
 static void
@@ -1704,9 +1768,10 @@ show_sos_bar_change_state(GSimpleAction * action,
                           gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     bw_show_or_hide_widget(action, state, &balsa_app.show_sos_bar,
-                           window->sos_bar);
+                           priv->sos_bar);
 }
 
 static void
@@ -1715,10 +1780,11 @@ wrap_change_state(GSimpleAction * action,
                   gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     balsa_app.browse_wrap = g_variant_get_boolean(state);
 
-    balsa_message_set_wrap(BALSA_MESSAGE(window->preview),
+    balsa_message_set_wrap(BALSA_MESSAGE(priv->preview),
                            balsa_app.browse_wrap);
     refresh_preferences_manager();
 
@@ -1735,10 +1801,11 @@ show_all_headers_change_state(GSimpleAction * action,
                               gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     balsa_app.show_all_headers = g_variant_get_boolean(state);
 
-    balsa_message_set_displayed_headers(BALSA_MESSAGE(window->preview),
+    balsa_message_set_displayed_headers(BALSA_MESSAGE(priv->preview),
                                         balsa_app.show_all_headers ?
                                         HEADERS_ALL :
                                         balsa_app.shown_headers);
@@ -1844,6 +1911,7 @@ header_change_state(GSimpleAction * action,
                     gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     const gchar *value;
     ShownHeaders sh;
 
@@ -1862,7 +1930,7 @@ header_change_state(GSimpleAction * action,
 
     balsa_app.shown_headers = sh;
     bw_reset_show_all_headers(window);
-    balsa_message_set_displayed_headers(BALSA_MESSAGE(window->preview),
+    balsa_message_set_displayed_headers(BALSA_MESSAGE(priv->preview),
                                         sh);
 
     g_simple_action_set_state(action, state);
@@ -1883,7 +1951,7 @@ threading_change_state(GSimpleAction * action,
     index = balsa_window_find_current_index(window);
     balsa_index_set_thread_messages(BALSA_INDEX(index), thread_messages);
 
-    /* bw->current_index may have been destroyed and cleared during
+    /* priv->current_index may have been destroyed and cleared during
      * set-threading: */
     index = balsa_window_find_current_index(window);
     if (index != NULL &&
@@ -2061,9 +2129,10 @@ bw_alt_n_cb(GtkAccelGroup * accel_group,
             GdkModifierType modifier,
             gpointer        user_data)
 {
-    BalsaWindow *window = user_data;
+    BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    gtk_notebook_set_current_page(GTK_NOTEBOOK(window->notebook),
+    gtk_notebook_set_current_page(GTK_NOTEBOOK(priv->notebook),
                                   keyval - GDK_KEY_1);
 }
 
@@ -2151,6 +2220,7 @@ GtkWidget *
 balsa_window_new(GtkApplication *application)
 {
     BalsaWindow *window;
+    BalsaWindowPrivate *priv;
     BalsaToolbarModel *model;
     GtkWidget *hbox;
     static const gchar *const header_targets[] =
@@ -2168,6 +2238,7 @@ balsa_window_new(GtkApplication *application)
     window = g_object_new(BALSA_TYPE_WINDOW,
                           "application", application,
                           NULL);
+    priv = balsa_window_get_instance_private(window);
 
     /* Set up the GMenu structures */
     bw_set_menus(window);
@@ -2175,33 +2246,33 @@ balsa_window_new(GtkApplication *application)
     /* Set up <alt>n key bindings */
     bw_set_alt_bindings(window);
 
-    window->vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_widget_show(window->vbox);
-    gtk_container_add(GTK_CONTAINER(window), window->vbox);
+    priv->vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_show(priv->vbox);
+    gtk_container_add(GTK_CONTAINER(window), priv->vbox);
 
     gtk_window_set_title(GTK_WINDOW(window), "Balsa");
     balsa_register_pixbufs(GTK_WIDGET(window));
 
     model = balsa_window_get_toolbar_model();
 
-    window->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
-    gtk_box_pack_start(GTK_BOX(window->vbox), window->toolbar,
+    priv->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
+    gtk_box_pack_start(GTK_BOX(priv->vbox), priv->toolbar,
                        FALSE, FALSE, 0);
 
-    window->bottom_bar = hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_box_pack_end(GTK_BOX(window->vbox), hbox, FALSE, FALSE, 0);
+    priv->bottom_bar = hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+    gtk_box_pack_end(GTK_BOX(priv->vbox), hbox, FALSE, FALSE, 0);
 
-    window->progress_bar = gtk_progress_bar_new();
-    g_object_add_weak_pointer(G_OBJECT(window->progress_bar),
-                              (gpointer *) &window->progress_bar);
-    gtk_widget_set_valign(window->progress_bar, GTK_ALIGN_CENTER);
-    gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(window->progress_bar),
+    priv->progress_bar = gtk_progress_bar_new();
+    g_object_add_weak_pointer(G_OBJECT(priv->progress_bar),
+                              (gpointer *) &priv->progress_bar);
+    gtk_widget_set_valign(priv->progress_bar, GTK_ALIGN_CENTER);
+    gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(priv->progress_bar),
                                     0.01);
-    gtk_box_pack_start(GTK_BOX(hbox), window->progress_bar, FALSE, FALSE,
+    gtk_box_pack_start(GTK_BOX(hbox), priv->progress_bar, FALSE, FALSE,
                        0);
 
-    window->statusbar = gtk_statusbar_new();
-    gtk_box_pack_start(GTK_BOX(hbox), window->statusbar, TRUE, TRUE, 0);
+    priv->statusbar = gtk_statusbar_new();
+    gtk_box_pack_start(GTK_BOX(hbox), priv->statusbar, TRUE, TRUE, 0);
     gtk_widget_show_all(hbox);
 
 #if 0
@@ -2211,28 +2282,28 @@ balsa_window_new(GtkApplication *application)
 
     geometry_manager_attach(GTK_WINDOW(window), "MainWindow");
 
-    window->notebook = gtk_notebook_new();
-    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(window->notebook),
+    priv->notebook = gtk_notebook_new();
+    gtk_notebook_set_show_tabs(GTK_NOTEBOOK(priv->notebook),
                                balsa_app.show_notebook_tabs);
-    gtk_notebook_set_show_border (GTK_NOTEBOOK(window->notebook), FALSE);
-    gtk_notebook_set_scrollable (GTK_NOTEBOOK (window->notebook), TRUE);
-    g_signal_connect(G_OBJECT(window->notebook), "switch_page",
+    gtk_notebook_set_show_border (GTK_NOTEBOOK(priv->notebook), FALSE);
+    gtk_notebook_set_scrollable (GTK_NOTEBOOK (priv->notebook), TRUE);
+    g_signal_connect(G_OBJECT(priv->notebook), "switch_page",
                      G_CALLBACK(bw_notebook_switch_page_cb), window);
-    gtk_drag_dest_set (GTK_WIDGET (window->notebook), GTK_DEST_DEFAULT_ALL,
+    gtk_drag_dest_set (GTK_WIDGET (priv->notebook), GTK_DEST_DEFAULT_ALL,
                        notebook_drop_types, NUM_DROP_TYPES,
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
-    g_signal_connect(G_OBJECT (window->notebook), "drag-data-received",
+    g_signal_connect(G_OBJECT (priv->notebook), "drag-data-received",
                      G_CALLBACK (bw_notebook_drag_received_cb), NULL);
-    g_signal_connect(G_OBJECT (window->notebook), "drag-motion",
+    g_signal_connect(G_OBJECT (priv->notebook), "drag-motion",
                      G_CALLBACK (bw_notebook_drag_motion_cb), NULL);
-    balsa_app.notebook = window->notebook;
-    g_object_add_weak_pointer(G_OBJECT(window->notebook),
+    balsa_app.notebook = priv->notebook;
+    g_object_add_weak_pointer(G_OBJECT(priv->notebook),
 			      (gpointer *) &balsa_app.notebook);
 
-    window->preview = balsa_message_new();
-    gtk_widget_hide(window->preview);
+    priv->preview = balsa_message_new();
+    gtk_widget_hide(priv->preview);
 
-    g_signal_connect(G_OBJECT(window->preview), "select-part",
+    g_signal_connect(G_OBJECT(priv->preview), "select-part",
                      G_CALLBACK(bw_select_part_cb), window);
 
     /* XXX */
@@ -2241,13 +2312,11 @@ balsa_window_new(GtkApplication *application)
 
     g_object_get(G_OBJECT(balsa_app.mblist), "hadjustment", &hadj,
                  "vadjustment", &vadj, NULL);
-    window->mblist = gtk_scrolled_window_new(hadj, vadj);
-    g_object_unref(hadj);
-    g_object_unref(vadj);
+    priv->mblist = gtk_scrolled_window_new(hadj, vadj);
 
-    gtk_container_add(GTK_CONTAINER(window->mblist),
+    gtk_container_add(GTK_CONTAINER(priv->mblist),
                       GTK_WIDGET(balsa_app.mblist));
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(window->mblist),
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(priv->mblist),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     g_signal_connect_swapped(balsa_app.mblist, "has-unread-mailbox",
 		             G_CALLBACK(bw_enable_next_unread), window);
@@ -2260,24 +2329,24 @@ balsa_window_new(GtkApplication *application)
                           balsa_app.show_mblist);
 
     if (balsa_app.show_mblist) {
-        gtk_widget_show(window->mblist);
-        gtk_paned_set_position(GTK_PANED(window->paned_master),
+        gtk_widget_show(priv->mblist);
+        gtk_paned_set_position(GTK_PANED(priv->paned_master),
                                balsa_app.mblist_width);
     } else {
-        gtk_paned_set_position(GTK_PANED(window->paned_master), 0);
+        gtk_paned_set_position(GTK_PANED(priv->paned_master), 0);
     }
 
     /*PKGW: do it this way, without the usizes. */
     if (balsa_app.previewpane)
-        gtk_paned_set_position(GTK_PANED(window->paned_slave),
+        gtk_paned_set_position(GTK_PANED(priv->paned_slave),
                                balsa_app.notebook_height);
     else
         /* Set it to something really high */
-        gtk_paned_set_position(GTK_PANED(window->paned_slave), G_MAXINT);
+        gtk_paned_set_position(GTK_PANED(priv->paned_slave), G_MAXINT);
 
-    gtk_widget_show(window->paned_slave);
-    gtk_widget_show(window->paned_master);
-    gtk_widget_show(window->notebook);
+    gtk_widget_show(priv->paned_slave);
+    gtk_widget_show(priv->paned_master);
+    gtk_widget_show(priv->notebook);
 
     /* set the toolbar style */
     balsa_window_refresh(window);
@@ -2334,18 +2403,20 @@ balsa_window_new(GtkApplication *application)
 gboolean
 balsa_window_fix_paned(BalsaWindow *window)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+
     if (balsa_app.show_mblist) {
-        gtk_paned_set_position(GTK_PANED(window->paned_master),
+        gtk_paned_set_position(GTK_PANED(priv->paned_master),
                                balsa_app.mblist_width);
     }
     if (balsa_app.previewpane) {
-        gtk_paned_set_position(GTK_PANED(window->paned_slave),
+        gtk_paned_set_position(GTK_PANED(priv->paned_slave),
                                balsa_app.notebook_height);
     }
 
-    g_signal_connect(window->paned_master, "notify::position",
+    g_signal_connect(priv->paned_master, "notify::position",
                      G_CALLBACK(bw_master_position_cb), NULL);
-    g_signal_connect(window->paned_slave, "notify::position",
+    g_signal_connect(priv->paned_slave, "notify::position",
                      G_CALLBACK(bw_slave_position_cb), NULL);
 
     return FALSE;
@@ -2438,13 +2509,14 @@ bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
 void
 balsa_window_update_book_menus(BalsaWindow * window)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     gboolean enabled = balsa_app.address_book_list != NULL;
 
     bw_action_set_enabled(window, "address-book",  enabled);
 
-    if (enabled && window->current_index != NULL) {
+    if (enabled && priv->current_index != NULL) {
         guint current_msgno =
-            balsa_index_get_current_msgno(BALSA_INDEX(window->current_index));
+            balsa_index_get_current_msgno(BALSA_INDEX(priv->current_index));
         enabled = current_msgno > 0;
     }
     bw_action_set_enabled(window, "store-address", enabled);
@@ -2457,9 +2529,9 @@ balsa_window_update_book_menus(BalsaWindow * window)
 static void
 bw_enable_message_menus(BalsaWindow * window, guint msgno)
 {
-    gboolean enable, enable_mod, enable_store;
-    BalsaIndex *bindex = BALSA_INDEX(window->current_index);
-    gboolean enable_reply_group;
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+    gboolean enable, enable_mod, enable_store, enable_reply_group;
+    BalsaIndex *bindex = BALSA_INDEX(priv->current_index);
 
     enable = (msgno != 0 && bindex != NULL);
     bw_actions_set_enabled(window, current_message_actions,
@@ -2607,7 +2679,8 @@ balsa_window_enable_continue(BalsaWindow * window)
 static void
 bw_enable_part_menu_items(BalsaWindow * window)
 {
-    BalsaMessage *msg = window ? BALSA_MESSAGE(window->preview) : NULL;
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+    BalsaMessage *msg = window ? BALSA_MESSAGE(priv->preview) : NULL;
 
     bw_action_set_enabled(window, "next-part",
                           balsa_message_has_next_part(msg));
@@ -2805,6 +2878,7 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     BalsaIndex        *index   = info->index;
     BalsaMailboxNode  *mbnode  = info->mbnode;
     BalsaWindow       *window  = info->window;
+    BalsaWindowPrivate *priv   = balsa_window_get_instance_private(window);
     LibBalsaMailbox   *mailbox = balsa_mailbox_node_get_mailbox(mbnode);
     GtkWidget         *label;
     GtkWidget         *scroll;
@@ -2849,15 +2923,15 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(index));
     gtk_widget_show(scroll);
     g_signal_connect(scroll, "child-notify::position",
-                     G_CALLBACK(bw_notebook_page_notify_cb), window->notebook);
-    page_num = gtk_notebook_append_page(GTK_NOTEBOOK(window->notebook),
+                     G_CALLBACK(bw_notebook_page_notify_cb), priv->notebook);
+    page_num = gtk_notebook_append_page(GTK_NOTEBOOK(priv->notebook),
                                         scroll, label);
-    gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(window->notebook),
+    gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(priv->notebook),
                                      scroll, TRUE);
 
     if (info->set_current)
         /* change the page to the newly selected notebook item */
-        gtk_notebook_set_current_page(GTK_NOTEBOOK(window->notebook),
+        gtk_notebook_set_current_page(GTK_NOTEBOOK(priv->notebook),
                                       page_num);
 
     bw_register_open_mailbox(mailbox);
@@ -3000,6 +3074,7 @@ static void
 balsa_window_real_close_mbnode(BalsaWindow * window,
                                BalsaMailboxNode * mbnode)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GtkWidget *index = NULL;
     gint i;
     LibBalsaMailbox **mailbox;
@@ -3009,7 +3084,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
     i = balsa_find_notebook_page_num(balsa_mailbox_node_get_mailbox(mbnode));
 
     if (i != -1) {
-        gtk_notebook_remove_page(GTK_NOTEBOOK(window->notebook), i);
+        gtk_notebook_remove_page(GTK_NOTEBOOK(priv->notebook), i);
         bw_unregister_open_mailbox(balsa_mailbox_node_get_mailbox(mbnode));
 
         /* If this is the last notebook page clear the message preview
@@ -3023,7 +3098,7 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             gtk_window_set_title(GTK_WINDOW(window), "Balsa");
             bw_idle_replace(window, NULL);
 
-            statusbar = GTK_STATUSBAR(window->statusbar);
+            statusbar = GTK_STATUSBAR(priv->statusbar);
             context_id = gtk_statusbar_get_context_id(statusbar, "BalsaWindow mailbox");
             gtk_statusbar_pop(statusbar, context_id);
             gtk_statusbar_push(statusbar, context_id, "Mailbox closed");
@@ -3031,11 +3106,11 @@ balsa_window_real_close_mbnode(BalsaWindow * window,
             /* Disable menus */
             bw_enable_mailbox_menus(window, NULL);
             bw_enable_message_menus(window, 0);
-	    if (window->current_index)
-		g_object_remove_weak_pointer(G_OBJECT(window->current_index),
+	    if (priv->current_index)
+		g_object_remove_weak_pointer(G_OBJECT(priv->current_index),
 					     (gpointer *)
-					     &window->current_index);
-            window->current_index = NULL;
+					     &priv->current_index);
+            priv->current_index = NULL;
 
             /* Just in case... */
             g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, NULL);
@@ -3106,17 +3181,17 @@ bw_close_mailbox_on_timer(BalsaWindow * window)
 static void
 balsa_window_destroy(GObject * object)
 {
-    BalsaWindow *window;
+    BalsaWindow *window = BALSA_WINDOW(object);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    window = BALSA_WINDOW(object);
     bw_idle_remove(window);
     /* The preview window seems to get finalized without notification;
      * we no longer need it, so we just drop our pointer: */
-    window->preview = NULL;
+    priv->preview = NULL;
 
-    if (window->network_changed_source_id != 0) {
-        g_source_remove(window->network_changed_source_id);
-        window->network_changed_source_id = 0;
+    if (priv->network_changed_source_id != 0) {
+        g_source_remove(priv->network_changed_source_id);
+        priv->network_changed_source_id = 0;
     }
 
     balsa_app.in_destruction = TRUE;
@@ -3132,6 +3207,7 @@ balsa_window_destroy(GObject * object)
 void
 balsa_window_refresh(BalsaWindow * window)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GtkWidget *index;
     BalsaIndex *bindex;
 
@@ -3148,12 +3224,12 @@ balsa_window_refresh(BalsaWindow * window)
     }
     if (balsa_app.previewpane) {
         bw_idle_replace(window, bindex);
-	gtk_paned_set_position(GTK_PANED(window->paned_slave),
+	gtk_paned_set_position(GTK_PANED(priv->paned_slave),
                                 balsa_app.notebook_height);
     } else {
 	/* Set the height to something really big (those new hi-res
 	   screens and all :) */
-	gtk_paned_set_position(GTK_PANED(window->paned_slave), G_MAXINT);
+	gtk_paned_set_position(GTK_PANED(priv->paned_slave), G_MAXINT);
     }
 }
 
@@ -3235,10 +3311,13 @@ bw_check_mailbox_done(bw_pop_mbox_t *bw_pop_mbox)
 static void
 bw_check_mailbox_list(struct check_messages_thread_info *info, GList *mailbox_list)
 {
-	GList *check_mbx = NULL;
+    GList *check_mbx = NULL;
 
-    if ((info->window != NULL) && !info->window->network_available) {
-        return;
+    if (info->window != NULL) {
+        BalsaWindowPrivate *priv = balsa_window_get_instance_private(info->window);
+
+        if (!priv->network_available)
+            return;
     }
 
     for ( ; mailbox_list; mailbox_list = mailbox_list->next) {
@@ -3424,9 +3503,13 @@ bw_mailbox_check(LibBalsaMailbox * mailbox, struct check_messages_thread_info *i
 
     g_debug("checking mailbox %s", libbalsa_mailbox_get_name(mailbox));
     if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
-    	if ((info->window != NULL) && !info->window->network_available) {
-    		return;
-    	}
+    	if (info->window != NULL) {
+            BalsaWindowPrivate *priv =
+                balsa_window_get_instance_private(info->window);
+
+            if (!priv->network_available)
+                return;
+        }
 
     	if (info->with_progress_dialog) {
     		libbalsa_progress_dialog_update(&progress_dialog, _("Mailboxes"), FALSE, INFINITY,
@@ -3482,11 +3565,13 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
 
     g_atomic_int_inc(&checking_mail);
 
-    if (info->window) {
+    if (info->window != NULL) {
+        BalsaWindowPrivate *priv = balsa_window_get_instance_private(info->window);
+
         g_idle_add((GSourceFunc) bw_check_messages_thread_idle_cb,
                    g_object_ref(info->window));
-        if (info->window->network_available)
-            time(&info->window->last_check_time);
+        if (priv->network_available)
+            time(&priv->last_check_time);
         g_object_unref(info->window);
     }
 
@@ -3519,6 +3604,8 @@ static void
 bw_display_new_mail_notification(int num_new, int has_new)
 {
     GtkWindow *window = GTK_WINDOW(balsa_app.main_window);
+    BalsaWindowPrivate *priv =
+        balsa_window_get_instance_private(balsa_app.main_window);
     static gint num_total = 0;
     gchar *msg = NULL;
     static GNotification *notification;
@@ -3543,13 +3630,13 @@ bw_display_new_mail_notification(int num_new, int has_new)
         g_once_init_leave(&notification, tmp);
     }
 
-    if (balsa_app.main_window->new_mail_notification_sent) {
+    if (priv->new_mail_notification_sent) {
         /* the user didn't acknowledge the last info, so we'll
          * accumulate the count */
         num_total += num_new;
     } else {
         num_total = num_new;
-        balsa_app.main_window->new_mail_notification_sent = TRUE;
+        priv->new_mail_notification_sent = TRUE;
     }
 
     msg = bw_get_new_message_notification_string(num_new, num_total);
@@ -3608,10 +3695,11 @@ bw_change_connection_status_can_reach_cb(GObject * object,
                                          gboolean  can_reach,
                                          gpointer  user_data)
 {
-    BalsaWindow *window = user_data;
+    BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     if (can_reach &&
-        difftime(time(NULL), window->last_check_time) >
+        difftime(time(NULL), priv->last_check_time) >
         balsa_app.check_mail_timer * 60) {
         /* Check the mail now, and reset the timer */
         bw_check_new_messages(window);
@@ -3623,17 +3711,18 @@ bw_change_connection_status_can_reach_cb(GObject * object,
 static gboolean
 bw_change_connection_status_idle(gpointer user_data)
 {
-    BalsaWindow *window = user_data;
+    BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
 
-    window->network_changed_source_id = 0;
+    priv->network_changed_source_id = 0;
 
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
                            (GtkTreeModelForeachFunc)
                            mw_mbox_change_connection_status, NULL);
 
-    if (!window->network_available)
+    if (!priv->network_available)
         return FALSE;
 
     /* GLib timeouts are now triggered by g_get_monotonic_time(),
@@ -3657,9 +3746,11 @@ bw_change_connection_status_idle(gpointer user_data)
 GtkWidget *
 balsa_window_find_current_index(BalsaWindow * window)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+
     g_return_val_if_fail(window != NULL, NULL);
 
-    return window->current_index;
+    return priv->current_index;
 }
 
 static GtkToggleButton*
@@ -3935,6 +4026,7 @@ bw_mailbox_tab_close_cb(GtkWidget * widget, gpointer data)
 static LibBalsaCondition*
 bw_get_view_filter(BalsaWindow *window)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     LibBalsaCondition *filter, *flag_filter;
     gint i;
 
@@ -3942,9 +4034,9 @@ bw_get_view_filter(BalsaWindow *window)
 
     /* add string filter on top of that */
 
-    i = gtk_combo_box_get_active(GTK_COMBO_BOX(window->filter_choice));
+    i = gtk_combo_box_get_active(GTK_COMBO_BOX(priv->filter_choice));
     if (i >= 0) {
-        const gchar *str = gtk_entry_get_text(GTK_ENTRY(window->sos_entry));
+        const gchar *str = gtk_entry_get_text(GTK_ENTRY(priv->sos_entry));
         g_assert(((guint) i) < G_N_ELEMENTS(view_filters));
         filter = view_filters[i].filter(str);
     } else filter = NULL;
@@ -3997,13 +4089,14 @@ bw_hide_changed_set_view_filter(BalsaWindow * window)
 }
 
 static void
-bw_reset_filter(BalsaWindow * bw)
+bw_reset_filter(BalsaWindow * window)
 {
-    BalsaIndex *bindex = BALSA_INDEX(balsa_window_find_current_index(bw));
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+    BalsaIndex *bindex = BALSA_INDEX(balsa_window_find_current_index(window));
 
     /* do it by resetting the sos filder */
-    gtk_entry_set_text(GTK_ENTRY(bw->sos_entry), "");
-    bw_set_view_filter(bw, balsa_index_get_filter_no(bindex), bw->sos_entry);
+    gtk_entry_set_text(GTK_ENTRY(priv->sos_entry), "");
+    bw_set_view_filter(window, balsa_index_get_filter_no(bindex), priv->sos_entry);
 }
 
 /* empty_trash:
@@ -4047,21 +4140,22 @@ empty_trash(BalsaWindow * window)
 }
 
 static void
-bw_show_mbtree(BalsaWindow * bw)
+bw_show_mbtree(BalsaWindow * window)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GtkWidget *parent;
 
-    parent = gtk_widget_get_ancestor(bw->mblist, GTK_TYPE_PANED);
+    parent = gtk_widget_get_ancestor(priv->mblist, GTK_TYPE_PANED);
     while (gtk_orientable_get_orientation(GTK_ORIENTABLE(parent)) !=
            GTK_ORIENTATION_HORIZONTAL) {
         parent = gtk_widget_get_ancestor(parent, GTK_TYPE_PANED);
     }
 
     if (balsa_app.show_mblist) {
-        gtk_widget_show(bw->mblist);
+        gtk_widget_show(priv->mblist);
         gtk_paned_set_position(GTK_PANED(parent), balsa_app.mblist_width);
     } else {
-        gtk_widget_hide(bw->mblist);
+        gtk_widget_hide(priv->mblist);
         gtk_paned_set_position(GTK_PANED(parent), 0);
     }
 }
@@ -4069,32 +4163,33 @@ bw_show_mbtree(BalsaWindow * bw)
 void
 balsa_change_window_layout(BalsaWindow *window)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    g_object_ref(window->notebook);
-    g_object_ref(window->mblist);
-    g_object_ref(window->preview);
+    g_object_ref(priv->notebook);
+    g_object_ref(priv->mblist);
+    g_object_ref(priv->preview);
 
     gtk_container_remove(GTK_CONTAINER
-                         (gtk_widget_get_parent(window->notebook)),
-                         window->notebook);
+                         (gtk_widget_get_parent(priv->notebook)),
+                         priv->notebook);
     gtk_container_remove(GTK_CONTAINER
-                         (gtk_widget_get_parent(window->mblist)),
-                         window->mblist);
+                         (gtk_widget_get_parent(priv->mblist)),
+                         priv->mblist);
     gtk_container_remove(GTK_CONTAINER
-                         (gtk_widget_get_parent(window->preview)),
-                         window->preview);
+                         (gtk_widget_get_parent(priv->preview)),
+                         priv->preview);
 
     bw_set_panes(window);
 
-    g_object_unref(window->notebook);
-    g_object_unref(window->mblist);
-    g_object_unref(window->preview);
+    g_object_unref(priv->notebook);
+    g_object_unref(priv->mblist);
+    g_object_unref(priv->preview);
 
-    gtk_paned_set_position(GTK_PANED(window->paned_master),
+    gtk_paned_set_position(GTK_PANED(priv->paned_master),
                            balsa_app.show_mblist ?
                            balsa_app.mblist_width : 0);
-    gtk_widget_show(window->paned_slave);
-    gtk_widget_show(window->paned_master);
+    gtk_widget_show(priv->paned_slave);
+    gtk_widget_show(priv->paned_master);
 
 }
 
@@ -4118,18 +4213,19 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
                         gpointer data)
 {
     BalsaWindow *window = BALSA_WINDOW(data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GtkWidget *page;
     BalsaIndex *index;
     LibBalsaMailbox *mailbox;
     gchar *title;
     const gchar *filter_string;
 
-    if (window->current_index) {
-	g_object_remove_weak_pointer(G_OBJECT(window->current_index),
-				     (gpointer *) &window->current_index);
+    if (priv->current_index) {
+	g_object_remove_weak_pointer(G_OBJECT(priv->current_index),
+				     (gpointer *) &priv->current_index);
 	/* Note when this mailbox was hidden, for use in auto-closing. */
-        balsa_index_set_last_use_time(BALSA_INDEX(window->current_index));
-        window->current_index = NULL;
+        balsa_index_set_last_use_time(BALSA_INDEX(priv->current_index));
+        priv->current_index = NULL;
     }
 
     if (!balsa_app.mblist_tree_store)
@@ -4139,9 +4235,9 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(notebook), page_num);
     index = BALSA_INDEX(gtk_bin_get_child(GTK_BIN(page)));
 
-    window->current_index = GTK_WIDGET(index);
+    priv->current_index = GTK_WIDGET(index);
     g_object_add_weak_pointer(G_OBJECT(index),
-			      (gpointer *) &window->current_index);
+			      (gpointer *) &priv->current_index);
     /* Note when this mailbox was exposed, for use in auto-expunge. */
     balsa_index_set_last_use_time(index);
 
@@ -4165,9 +4261,9 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
     bw_enable_mailbox_menus(window, index);
 
     filter_string = balsa_index_get_filter_string(index);
-    gtk_entry_set_text(GTK_ENTRY(window->sos_entry),
+    gtk_entry_set_text(GTK_ENTRY(priv->sos_entry),
                        filter_string != NULL ? filter_string : "");
-    gtk_combo_box_set_active(GTK_COMBO_BOX(window->filter_choice),
+    gtk_combo_box_set_active(GTK_COMBO_BOX(priv->filter_choice),
                              balsa_index_get_filter_no(index));
 
     balsa_mblist_focus_mailbox(balsa_app.mblist, mailbox);
@@ -4182,21 +4278,22 @@ bw_notebook_switch_page_cb(GtkWidget * notebook,
 }
 
 static void
-bw_index_changed_cb(GtkWidget * widget, gpointer data)
+bw_index_changed_cb(GtkWidget * widget, gpointer user_data)
 {
-    BalsaWindow *window = data;
+    BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     BalsaIndex *index;
     LibBalsaMessage *message;
     guint current_msgno;
 
-    if (widget != window->current_index)
+    if (widget != priv->current_index)
         return;
 
     index = BALSA_INDEX(widget);
     bw_enable_message_menus(window, balsa_index_get_current_msgno(index));
     bw_enable_mailbox_menus(window, index);
 
-    message = balsa_message_get_message(BALSA_MESSAGE(window->preview));
+    message = balsa_message_get_message(BALSA_MESSAGE(priv->preview));
     current_msgno = message != NULL ? libbalsa_message_get_msgno(message) : 0;
 
     if (current_msgno != balsa_index_get_current_msgno(index))
@@ -4206,13 +4303,15 @@ bw_index_changed_cb(GtkWidget * widget, gpointer data)
 static void
 bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+
     if (balsa_app.previewpane) {
         bw_idle_remove(window);
         /* Skip if the window is being destroyed: */
-        if (window->preview != NULL) {
-            window->set_message_id = g_idle_add((GSourceFunc) bw_idle_cb, window);
-            if (balsa_message_get_message(BALSA_MESSAGE(window->preview)) != NULL)
-                gtk_widget_hide(window->preview);
+        if (priv->preview != NULL) {
+            priv->set_message_id = g_idle_add((GSourceFunc) bw_idle_cb, window);
+            if (balsa_message_get_message(BALSA_MESSAGE(priv->preview)) != NULL)
+                gtk_widget_hide(priv->preview);
         }
     }
 }
@@ -4220,9 +4319,11 @@ bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
 static void
 bw_idle_remove(BalsaWindow * window)
 {
-    if (window->set_message_id) {
-        g_source_remove(window->set_message_id);
-        window->set_message_id = 0;
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+
+    if (priv->set_message_id) {
+        g_source_remove(priv->set_message_id);
+        priv->set_message_id = 0;
     }
 }
 
@@ -4232,9 +4333,10 @@ static volatile gboolean bw_idle_cb_active = FALSE;
 static gboolean
 bw_idle_cb(BalsaWindow * window)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     BalsaIndex *index;
 
-    if (window->set_message_id == 0) {
+    if (priv->set_message_id == 0) {
         return FALSE;
     }
     if (bw_idle_cb_active) {
@@ -4242,15 +4344,15 @@ bw_idle_cb(BalsaWindow * window)
     }
     bw_idle_cb_active = TRUE;
 
-    window->set_message_id = 0;
+    priv->set_message_id = 0;
 
-    index = (BalsaIndex *) window->current_index;
+    index = (BalsaIndex *) priv->current_index;
     if (index)
-        balsa_message_set(BALSA_MESSAGE(window->preview),
+        balsa_message_set(BALSA_MESSAGE(priv->preview),
                           balsa_index_get_mailbox(index),
                           balsa_index_get_current_msgno(index));
     else
-        balsa_message_set(BALSA_MESSAGE(window->preview), NULL, 0);
+        balsa_message_set(BALSA_MESSAGE(priv->preview), NULL, 0);
 
     index = g_object_get_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS);
     if (index) {
@@ -4416,12 +4518,14 @@ static gboolean
 bw_progress_timeout(gpointer user_data)
 {
     BalsaWindow *window = *(BalsaWindow **) user_data;
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     if (balsa_app.show_statusbar
         && window != NULL
-        && window->progress_bar != NULL
-        && window->progress_type == BALSA_PROGRESS_ACTIVITY)
-        gtk_progress_bar_pulse(GTK_PROGRESS_BAR(window->progress_bar));
+        && priv->progress_bar != NULL
+        && priv->progress_type == BALSA_PROGRESS_ACTIVITY) {
+        gtk_progress_bar_pulse(GTK_PROGRESS_BAR(priv->progress_bar));
+    }
 
     /* return true so it continues to be called */
     return window != NULL;
@@ -4462,23 +4566,17 @@ bw_update_progress_bar(BalsaWindow *window,
 {
     /* Update the display in an idle callback, in case we were called in
      * a sub-thread.*/
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     BalsaWindowSetupProgressInfo *info;
 
     info = g_new(BalsaWindowSetupProgressInfo, 1);
-    info->progress_bar = GTK_PROGRESS_BAR(g_object_ref(window->progress_bar));
+    info->progress_bar = GTK_PROGRESS_BAR(g_object_ref(priv->progress_bar));
     info->set_text = set_text;
     info->text = g_strdup(text);
     info->set_fraction = set_fraction;
     info->fraction = fraction;
 
     g_idle_add((GSourceFunc) bw_update_progress_bar_idle_cb, info);
-}
-
-static void
-bw_progress_bar_set_text(BalsaWindow *window,
-                         const gchar *text)
-{
-    bw_update_progress_bar(window, TRUE, text, FALSE, 0.0);
 }
 
 static void
@@ -4498,9 +4596,10 @@ bw_progress_bar_set_fraction(BalsaWindow *window,
 void
 balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     static BalsaWindow *window_save = NULL;
 
-    if (window->progress_bar == NULL)
+    if (priv->progress_bar == NULL)
         return;
 
     if (!window_save) {
@@ -4509,21 +4608,22 @@ balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
                                   (gpointer *) &window_save);
     }
 
-    if (window->activity_handler == 0) {
+    if (priv->activity_handler == 0)
         /* add a timeout to make the activity bar move */
-        window->activity_handler =
-            g_timeout_add(50, bw_progress_timeout, &window_save);
-    }
+        priv->activity_handler =
+            g_timeout_add(50, (GSourceFunc) bw_progress_timeout,
+                          &window_save);
 
     /* increment the reference counter */
-    ++window->activity_counter;
-    if (window->progress_type == BALSA_PROGRESS_NONE)
-        window->progress_type = BALSA_PROGRESS_ACTIVITY;
+    ++priv->activity_counter;
+    if (priv->progress_type == BALSA_PROGRESS_NONE)
+        priv->progress_type = BALSA_PROGRESS_ACTIVITY;
 
-    if (window->progress_type == BALSA_PROGRESS_ACTIVITY)
-        bw_progress_bar_set_text(window, message);
-    window->activity_messages =
-        g_slist_prepend(window->activity_messages, g_strdup(message));
+    if (priv->progress_type == BALSA_PROGRESS_ACTIVITY)
+        gtk_progress_bar_set_text(GTK_PROGRESS_BAR(priv->progress_bar),
+                                  message);
+    priv->activity_messages =
+        g_slist_prepend(priv->activity_messages, g_strdup(message));
 }
 
 
@@ -4536,33 +4636,34 @@ balsa_window_increase_activity(BalsaWindow * window, const gchar * message)
 void
 balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GSList *link;
     gboolean set_text = FALSE;
     const gchar *new_message = NULL;
     gboolean clear_fraction = FALSE;
 
-    if (window->progress_bar == NULL)
+    if (priv->progress_bar == NULL)
         return;
 
-    link = g_slist_find_custom(window->activity_messages, message,
+    link = g_slist_find_custom(priv->activity_messages, message,
                                (GCompareFunc) strcmp);
     g_free(link->data);
-    window->activity_messages =
-        g_slist_delete_link(window->activity_messages, link);
+    priv->activity_messages =
+        g_slist_delete_link(priv->activity_messages, link);
 
-    if (window->progress_type == BALSA_PROGRESS_ACTIVITY) {
+    if (priv->progress_type == BALSA_PROGRESS_ACTIVITY) {
         set_text = TRUE;
-        if (window->activity_messages != NULL)
-            new_message = window->activity_messages->data;
+        if (priv->activity_messages != NULL)
+            new_message = priv->activity_messages->data;
     }
 
     /* decrement the counter if positive */
-    if (window->activity_counter > 0 && --window->activity_counter == 0) {
+    if (priv->activity_counter > 0 && --priv->activity_counter == 0) {
         /* clear the bar and make it available for others to use */
-        g_source_remove(window->activity_handler);
-        window->activity_handler = 0;
-        if (window->progress_type == BALSA_PROGRESS_ACTIVITY) {
-            window->progress_type = BALSA_PROGRESS_NONE;
+        g_source_remove(priv->activity_handler);
+        priv->activity_handler = 0;
+        if (priv->progress_type == BALSA_PROGRESS_ACTIVITY) {
+            priv->progress_type = BALSA_PROGRESS_NONE;
             clear_fraction = TRUE;
         }
     }
@@ -4589,16 +4690,18 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
 gboolean
 balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
 {
-    if (window->progress_bar == NULL)
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+
+    if (priv->progress_bar == NULL)
         return FALSE;
 
     if (text != NULL) {
         /* make sure the progress bar is currently unused */
-        if (window->progress_type == BALSA_PROGRESS_INCREMENT)
+        if (priv->progress_type == BALSA_PROGRESS_INCREMENT)
             return FALSE;
-        window->progress_type = BALSA_PROGRESS_INCREMENT;
+        priv->progress_type = BALSA_PROGRESS_INCREMENT;
     } else
-        window->progress_type = BALSA_PROGRESS_NONE;
+        priv->progress_type = BALSA_PROGRESS_NONE;
 
     bw_update_progress_bar(window, TRUE, text, TRUE, 0.0);
 
@@ -4620,11 +4723,13 @@ void
 balsa_window_increment_progress(BalsaWindow * window, gdouble fraction,
                                 gboolean flush)
 {
-    if (window->progress_bar == NULL)
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+
+    if (priv->progress_bar == NULL)
         return;
 
     /* make sure the progress bar is being incremented */
-    if (window->progress_type != BALSA_PROGRESS_INCREMENT)
+    if (priv->progress_type != BALSA_PROGRESS_INCREMENT)
         return;
 
     bw_progress_bar_set_fraction(window, fraction);
@@ -4709,6 +4814,7 @@ balsa_window_select_all(GtkWindow * window)
 void
 balsa_window_set_statusbar(BalsaWindow * window, LibBalsaMailbox * mailbox)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     gint total_messages = libbalsa_mailbox_total_messages(mailbox);
     gint unread_messages = libbalsa_mailbox_get_unread_messages(mailbox);
     gint hidden_messages;
@@ -4746,7 +4852,7 @@ balsa_window_set_statusbar(BalsaWindow * window, LibBalsaMailbox * mailbox)
                                    hidden_messages);
     }
 
-    statusbar = GTK_STATUSBAR(window->statusbar);
+    statusbar = GTK_STATUSBAR(priv->statusbar);
     context_id =
         gtk_statusbar_get_context_id(statusbar, "BalsaMBList message");
     gtk_statusbar_pop(statusbar, context_id);
@@ -4810,4 +4916,16 @@ balsa_window_next_unread(BalsaWindow * window)
         g_object_set_data(G_OBJECT(mailbox),
                           BALSA_INDEX_VIEW_ON_OPEN, GINT_TO_POINTER(TRUE));
     return TRUE;
+}
+
+/*
+ * Getter
+ */
+
+GtkStatusbar *
+balsa_window_get_statusbar(BalsaWindow * window)
+{
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+
+    return (GtkStatusbar *) priv->statusbar;
 }

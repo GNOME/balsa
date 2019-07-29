@@ -289,7 +289,7 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
         GtkStatusbar *statusbar;
         guint context_id;
 
-        statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+        statusbar = balsa_window_get_statusbar(balsa_app.main_window);
         context_id = gtk_statusbar_get_context_id(statusbar, "Information list");
         gtk_statusbar_pop(statusbar, context_id);
 
@@ -308,7 +308,7 @@ status_bar_refresh(gpointer data)
         GtkStatusbar *statusbar;
         guint context_id;
 
-        statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+        statusbar = balsa_window_get_statusbar(balsa_app.main_window);
         context_id = gtk_statusbar_get_context_id(statusbar, "Information bar");
         gtk_statusbar_pop(statusbar, context_id);
     }
@@ -329,7 +329,7 @@ balsa_information_bar(GtkWindow *parent, LibBalsaInformationType type,
     if (!balsa_app.main_window)
         return;
 
-    statusbar = GTK_STATUSBAR(balsa_app.main_window->statusbar);
+    statusbar = balsa_window_get_statusbar(balsa_app.main_window);
     context_id = gtk_statusbar_get_context_id(statusbar, "Information bar");
 
     /* First clear any current message. */

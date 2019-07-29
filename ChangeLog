@@ -1,3 +1,46 @@
+2019-07-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	main-window: declare it derivable
+
+	Put the details in BalsaWindowPrivate, and provide accessors.
+
+	* src/balsa-mime-widget-text.c (statusbar_pop), (handle_url),
+	(bm_widget_on_url):
+	* src/information-dialog.c (balsa_information_list),
+	(status_bar_refresh), (balsa_information_bar):
+	* src/mailbox-node.c (imap_dir_cb):
+	* src/main-window.c (bw_network_changed_cb), (balsa_window_init),
+	(bw_pass_to_filter), (bw_filter_entry_activate),
+	(bw_create_index_widget), (bw_set_panes), (bw_is_active_notify),
+	(bw_action_set_enabled), (find_in_message_activated),
+	(zoom_in_activated), (zoom_out_activated), (zoom_normal_activated),
+	(reset_filter_activated), (next_part_activated),
+	(previous_part_activated), (save_part_activated),
+	(copy_message_activated), (select_text_activated),
+	(show_mailbox_tabs_change_state), (show_toolbar_change_state),
+	(show_statusbar_change_state), (show_sos_bar_change_state),
+	(wrap_change_state), (show_all_headers_change_state),
+	(header_change_state), (threading_change_state), (bw_alt_n_cb),
+	(balsa_window_new), (balsa_window_fix_paned),
+	(balsa_window_update_book_menus), (bw_enable_message_menus),
+	(bw_enable_part_menu_items), (bw_real_open_mbnode_idle_cb),
+	(balsa_window_real_close_mbnode), (balsa_window_destroy),
+	(balsa_window_refresh), (bw_check_mailbox_list),
+	(bw_mailbox_check), (bw_check_messages_thread),
+	(bw_display_new_mail_notification),
+	(bw_change_connection_status_can_reach_cb),
+	(bw_change_connection_status_idle),
+	(balsa_window_find_current_index), (bw_get_view_filter),
+	(bw_reset_filter), (bw_show_mbtree), (balsa_change_window_layout),
+	(bw_notebook_switch_page_cb), (bw_index_changed_cb),
+	(bw_idle_replace), (bw_idle_remove), (bw_idle_cb),
+	(bw_progress_timeout), (bw_update_progress_bar),
+	(balsa_window_increase_activity), (balsa_window_decrease_activity),
+	(balsa_window_setup_progress), (balsa_window_increment_progress),
+	(balsa_window_set_statusbar), (balsa_window_next_unread),
+	(balsa_window_get_statusbar):
+	* src/main-window.h:
+
 2019-07-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	address-book-config: Do not leak structures

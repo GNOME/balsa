@@ -614,6 +614,18 @@ date_time_2445_to_time_t(const gchar *date_time, const gchar *modifier, gboolean
     /* must be yyyymmddThhmmssZ? */
     if (((len == 15) || ((len == 16) && (date_time[15] == 'Z'))) &&
     	(date_time[8] == 'T')) {
+#if GLIB_CHECK_VERSION(2, 56, 0)
+        GDateTime *datetime;
+
+        datetime = g_date_time_new_from_iso8601(date_time, NULL);
+        if (datetime != NULL) {
+            the_time = g_date_time_to_unix(datetime);
+            if (date_only != NULL) {
+                *date_only = FALSE;
+            }
+            g_date_time_unref(datetime);
+        }
+#else /* GLIB_CHECK_VERSION(2, 56, 0) */
         GTimeVal timeval;
 
         /* the rfc2445 date-time is a special case of an iso8901 date/time value... */
@@ -623,6 +635,7 @@ date_time_2445_to_time_t(const gchar *date_time, const gchar *modifier, gboolean
         		*date_only = FALSE;
         	}
         }
+#endif /* GLIB_CHECK_VERSION(2, 56, 0) */
     } else if ((modifier!= NULL) && (g_ascii_strcasecmp(modifier, "VALUE=DATE") == 0) && (len == 8)) {
     	struct tm tm;
 

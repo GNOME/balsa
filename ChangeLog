@@ -1,5 +1,13 @@
 2019-07-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Use parent-class set by G_DEFINE_TYPE instead of our own
+	variable
+
+	* src/mailbox-node.c (balsa_mailbox_node_class_init),
+	(balsa_mailbox_node_dispose), (balsa_mailbox_node_finalize):
+
+2019-07-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	rfc2445: Use GDateTime instead of GTimeVal, which is deprecated
 	in glib version 2.62.
 

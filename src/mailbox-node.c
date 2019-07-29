@@ -41,7 +41,6 @@
    Folders can additionally scan associated directory or IMAP server to
    retrieve their tree of mailboxes.
 */
-static GObjectClass *parent_class = NULL;
 
 typedef struct imap_scan_item_ imap_scan_item;
 struct imap_scan_item_ {
@@ -116,8 +115,6 @@ balsa_mailbox_node_class_init(BalsaMailboxNodeClass * klass)
 {
     GObjectClass *object_class;
 
-    parent_class = g_type_class_peek_parent(klass);
-
     object_class = G_OBJECT_CLASS(klass);
 
     balsa_mailbox_node_signals[SAVE_CONFIG] =
@@ -187,7 +184,7 @@ balsa_mailbox_node_dispose(GObject * object)
 	mn->mailbox = NULL;
     }
 
-    G_OBJECT_CLASS(parent_class)->dispose(object);
+    G_OBJECT_CLASS(balsa_mailbox_node_parent_class)->dispose(object);
 }
 
 static void
@@ -210,7 +207,7 @@ balsa_mailbox_node_finalize(GObject * object)
 	mn->server = NULL;
     }
 
-    G_OBJECT_CLASS(parent_class)->finalize(G_OBJECT(object));
+    G_OBJECT_CLASS(balsa_mailbox_node_parent_class)->finalize(G_OBJECT(object));
 }
 
 static void

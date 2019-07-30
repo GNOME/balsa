@@ -1,3 +1,12 @@
+2019-07-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	sendmsg-window: Use modern macros to declare and define
+	BalsaAttachInfo
+
+	* src/sendmsg-window.c (balsa_attach_info_class_init),
+	(balsa_attach_info_init), (balsa_attach_info_new),
+	(balsa_attach_info_finalize), (sw_attachment_list):
+
 2019-07-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use parent-class set by G_DEFINE_TYPE instead of our own

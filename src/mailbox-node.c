@@ -80,8 +80,6 @@ static gint check_imap_path(const char *fn, LibBalsaServer * server,
 static void mark_imap_path(const gchar * fn, gpointer data);
 
 enum {
-    SAVE_CONFIG,
-    LOAD_CONFIG,
     SHOW_PROP_DIALOG,
     APPEND_SUBTREE,
     LAST_SIGNAL
@@ -117,20 +115,6 @@ balsa_mailbox_node_class_init(BalsaMailboxNodeClass * klass)
 
     object_class = G_OBJECT_CLASS(klass);
 
-    balsa_mailbox_node_signals[SAVE_CONFIG] =
-	g_signal_new("save-config",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_FIRST,
-                     0, NULL, NULL, NULL,
-		     G_TYPE_NONE, 1,
-	             G_TYPE_POINTER);
-    balsa_mailbox_node_signals[LOAD_CONFIG] =
-	g_signal_new("load-config",
-                     G_TYPE_FROM_CLASS(object_class),
-                     G_SIGNAL_RUN_FIRST,
-                     0, NULL, NULL, NULL,
-		     G_TYPE_NONE, 1,
-	             G_TYPE_POINTER);
     balsa_mailbox_node_signals[SHOW_PROP_DIALOG] =
 	g_signal_new("show-prop-dialog",
                      G_TYPE_FROM_CLASS(object_class),
@@ -159,11 +143,6 @@ balsa_mailbox_node_init(BalsaMailboxNode * mn)
     mn->config_prefix = NULL;
     mn->subscribed = FALSE;
     mn->scanned = FALSE;
-
-    g_signal_connect(mn, "save-config",
-                     G_CALLBACK(balsa_mailbox_node_real_save_config), NULL);
-    g_signal_connect(mn, "load-config",
-                     G_CALLBACK(balsa_mailbox_node_real_load_config), NULL);
 }
 
 static void
@@ -673,13 +652,13 @@ balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data)
 void
 balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* group)
 {
-    g_signal_emit(mn, balsa_mailbox_node_signals[LOAD_CONFIG], 0, group);
+    balsa_mailbox_node_real_load_config(mn, group);
 }
 
 void
 balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* group)
 {
-    g_signal_emit(mn, balsa_mailbox_node_signals[SAVE_CONFIG], 0, group);
+    balsa_mailbox_node_real_save_config(mn, group);
 }
 
 /* ---------------------------------------------------------------------

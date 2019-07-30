@@ -1,5 +1,14 @@
 2019-07-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox-node: Scrap the "load-config" and "save-config" signals.
+	No one needed to connect to them.
+
+	* src/mailbox-node.c (balsa_mailbox_node_class_init),
+	(balsa_mailbox_node_init), (balsa_mailbox_node_load_config),
+	(balsa_mailbox_node_save_config):
+
+2019-07-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	sendmsg-window: Use modern macros to declare and define
 	BalsaAttachInfo
 

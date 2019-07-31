@@ -1,5 +1,18 @@
 2019-07-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	folder-conf: Refactor dialog data strucures
+
+	* src/folder-conf.c (folder_conf_destroy_common_data),
+	(folder_conf_response), (validate_folder),
+	(imap_update_subscriptions), (folder_conf_clicked_ok),
+	(on_subscription_toggled), (create_imap_folder_dialog),
+	(folder_conf_imap_subscriptions), (folder_data_subscribed_toggled),
+	(folder_conf_imap_node), (validate_sub_folder), (browse_button_cb),
+	(subfolder_conf_clicked_ok), (folder_conf_imap_sub_node),
+	(folder_conf_delete):
+
+2019-07-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox-node: Scrap the "load-config" and "save-config" signals.
 	No one needed to connect to them.
 

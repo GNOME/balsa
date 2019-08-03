@@ -29,6 +29,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 
 #include "libbalsa.h"
 #include "libbalsa_private.h"
@@ -1008,6 +1009,26 @@ balsa_send_message_error(MessageQueueItem *mqi,
 		error->message);
 }
 
+static void
+balsa_send_message_syslog(const gchar            *smtp_server,
+						  const MessageQueueItem *mqi,
+						  gboolean                result,
+						  const gchar            *server_response,
+						  const GError           *server_error)
+{
+	GString *syslog_msg;
+
+	syslog_msg = g_string_new(NULL);
+	g_string_append_printf(syslog_msg, "[%d:%s] SMTP=%s Message-ID=%s", (int) getpid(), g_get_user_name(), smtp_server,
+		libbalsa_message_get_message_id(mqi->orig));
+	if (result) {
+		syslog(LOG_MAIL | LOG_INFO, "%s Result='%s'", syslog_msg->str, server_response);
+	} else {
+		syslog(LOG_MAIL | LOG_NOTICE, "%s Error='%s'", syslog_msg->str,
+				(server_error != NULL) ? server_error->message : "unknown");
+	}
+}
+
 static gpointer
 balsa_send_message_real(SendMessageInfo *info)
 {
@@ -1036,6 +1057,7 @@ balsa_send_message_real(SendMessageInfo *info)
         for (this_msg = info->items; this_msg != NULL; this_msg = this_msg->next) {
             MessageQueueItem *mqi = (MessageQueueItem *) this_msg->data;
             gboolean send_res;
+            gchar *server_reply = NULL;
             LibBalsaMailbox *mailbox;
 
             mailbox = mqi->orig != NULL ? libbalsa_message_get_mailbox(mqi->orig) : NULL;
@@ -1043,7 +1065,9 @@ balsa_send_message_real(SendMessageInfo *info)
             info->curr_msg++;
             g_debug("%s: %u/%u mqi = %p", __func__, info->msg_count, info->curr_msg, mqi);
             /* send the message */
-            send_res = net_client_smtp_send_msg(info->session, mqi->smtp_msg, &error);
+            send_res = net_client_smtp_send_msg(info->session, mqi->smtp_msg, &server_reply, &error);
+            balsa_send_message_syslog(net_client_get_host(NET_CLIENT(info->session)), mqi, send_res, server_reply, error);
+            g_free(server_reply);
 
             g_mutex_lock(&send_messages_lock);
             if (mailbox != NULL) {

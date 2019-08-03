@@ -1,3 +1,19 @@
+2019-08-03  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	SMTP logging
+
+	See
+	<URL:https://mail.gnome.org/archives/balsa-list/2019-July/msg00005.html>
+
+	When Balsa sends a message to a local or remote SMTP server,
+	a feedback is given only on failure.  However, sometimes it is necessary
+	to trace sent messages on the SMTP server.
+
+	* libbalsa/send.c: new function balsa_send_message_syslog(),
+	  changed API of net_client_smtp_send_msg();
+	* libnetclient/net-client-smtp.[ch]: extend API of net_client_smtp_send_msg()
+	  for optionally passing the final SMTP server reply.
+
 2019-08-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox-imap: Clear search filter when mailbox is closed

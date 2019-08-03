@@ -197,7 +197,7 @@ net_client_smtp_can_dsn(NetClientSmtp *client)
 
 
 gboolean
-net_client_smtp_send_msg(NetClientSmtp *client, const NetClientSmtpMessage *message, GError **error)
+net_client_smtp_send_msg(NetClientSmtp *client, const NetClientSmtpMessage *message, gchar **server_stat, GError **error)
 {
 	NetClient *netclient;
 	gboolean result;
@@ -267,7 +267,7 @@ net_client_smtp_send_msg(NetClientSmtp *client, const NetClientSmtpMessage *mess
 
 	if (result) {
 		(void) net_client_set_timeout(netclient, 10U * 60U);	/* RFC 5321, Sect 4.5.3.2.6.: 10 minutes timeout */
-		result = net_client_smtp_read_reply(client, -1, NULL, error);
+		result = net_client_smtp_read_reply(client, -1, server_stat, error);
 		client->data_state = FALSE;
 	}
 

@@ -161,12 +161,13 @@ gboolean net_client_smtp_can_dsn(NetClientSmtp *client);
  *
  * @param client connected SMTP network client object
  * @param message message data
+ * @param server_stat filled with the final server response on success, may be NULL
  * @param error filled with error information if the connection fails
  * @return TRUE on success or FALSE if sending the message failed
  *
  * Send the passed SMTP message to the connected SMTP server.
  */
-gboolean net_client_smtp_send_msg(NetClientSmtp *client, const NetClientSmtpMessage *message, GError **error);
+gboolean net_client_smtp_send_msg(NetClientSmtp *client, const NetClientSmtpMessage *message, gchar **server_stat, GError **error);
 
 
 /** @brief Create a SMTP message

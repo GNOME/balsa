@@ -1173,6 +1173,8 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
     free_messages_info(mimap);
     libbalsa_mailbox_imap_release_handle(mimap);
     mimap->sort_field = -1;	/* Invalidate. */
+
+    libbalsa_mailbox_set_view_filter(mailbox, NULL, FALSE);
 }
 
 static FILE*

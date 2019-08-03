@@ -1,3 +1,13 @@
+2019-08-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox-imap: Clear search filter when mailbox is closed
+
+	See
+	<URL:https://mail.gnome.org/archives/balsa-list/2019-July/msg00006.html>
+
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_close): unref
+	search filter.
+
 2019-07-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	folder-conf: Refactor dialog data strucures

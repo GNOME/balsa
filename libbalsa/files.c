@@ -134,7 +134,7 @@ libbalsa_icon_finder(GtkWidget         * widget,
             gint i;
             GStrv icon_names;
 
-            g_object_get(G_OBJECT(icon), "names", &icon_names, NULL);
+            g_object_get(icon, "names", &icon_names, NULL);
 
             if (icon_names != NULL) {
                 for (i = 0; pixbuf == NULL && icon_names[i] != NULL; i++) {

@@ -178,7 +178,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 	    if (GTK_IS_LAYOUT(mw->widget)) {
                 GtkAdjustment *vadj;
 
-                g_object_get(G_OBJECT(mw->widget), "vadjustment", &vadj,
+                g_object_get(mw->widget, "vadjustment", &vadj,
                              NULL);
 		g_signal_connect(vadj, "changed",
 				 G_CALLBACK(vadj_change_cb), mw->widget);

@@ -375,7 +375,7 @@ libbalsa_is_cert_known(GTlsCertificate      *cert,
 			gchar *pem_data;
 			FILE *fd;
 
-			g_object_get(G_OBJECT(cert), "certificate-pem", &pem_data, NULL);
+			g_object_get(cert, "certificate-pem", &pem_data, NULL);
 			fd = fopen(cert_file, "a");
 			if (fd != NULL) {
 				fputs(pem_data, fd);
@@ -429,7 +429,7 @@ ask_cert_real(void *data)
                                          _("_Reject"), GTK_RESPONSE_CANCEL,
                                          NULL);
     gtk_window_set_role(GTK_WINDOW(dialog), "tls_cert_dialog");
-    g_object_get(G_OBJECT(acd->certificate), "certificate", &cert_der, NULL);
+    g_object_get(acd->certificate, "certificate", &cert_der, NULL);
     gcr_cert = gcr_simple_certificate_new(cert_der->data, cert_der->len);
     g_byte_array_unref(cert_der);
     cert_widget = GTK_WIDGET(gcr_certificate_widget_new(gcr_cert));
@@ -478,7 +478,7 @@ get_gnutls_cert(GTlsCertificate *cert)
     if (gnutls_res == GNUTLS_E_SUCCESS) {
     	GByteArray *cert_der;
 
-    	g_object_get(G_OBJECT(cert), "certificate", &cert_der, NULL);
+        g_object_get(cert, "certificate", &cert_der, NULL);
     	if (cert_der != NULL) {
     		gnutls_datum_t data;
 

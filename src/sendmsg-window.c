@@ -2633,7 +2633,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     /* column for type icon */
     renderer = gtk_cell_renderer_pixbuf_new();
-    g_object_set(G_OBJECT(renderer), "xalign", 0.0, NULL);
+    g_object_set(renderer, "xalign", 0.0, NULL);
     gtk_tree_view_insert_column_with_attributes(view,
 						-1, NULL, renderer,
 						"pixbuf", ATTACH_ICON_COLUMN,
@@ -2641,7 +2641,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     /* column for the mime type */
     renderer = gtk_cell_renderer_text_new();
-    g_object_set(G_OBJECT(renderer), "xalign", 0.0, NULL);
+    g_object_set(renderer, "xalign", 0.0, NULL);
     gtk_tree_view_insert_column_with_attributes(view,
 						-1, _("Type"), renderer,
 						"text",	ATTACH_TYPE_COLUMN,
@@ -2649,7 +2649,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     /* column for the attachment mode */
     renderer = gtk_cell_renderer_text_new();
-    g_object_set(G_OBJECT(renderer), "xalign", 0.0, NULL);
+    g_object_set(renderer, "xalign", 0.0, NULL);
     column = gtk_tree_view_column_new_with_attributes(_("Mode"), renderer,
 						      "text", ATTACH_MODE_COLUMN,
 						      NULL);
@@ -2660,7 +2660,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     /* column for the attachment size */
     renderer = gtk_cell_renderer_text_new();
-    g_object_set(G_OBJECT(renderer), "xalign", 1.0, NULL);
+    g_object_set(renderer, "xalign", 1.0, NULL);
     column = gtk_tree_view_column_new_with_attributes(_("Size"), renderer,
 						      "text", ATTACH_SIZE_COLUMN,
 						      NULL);
@@ -2671,7 +2671,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     /* column for the file type/description */
     renderer = gtk_cell_renderer_text_new();
-    g_object_set(G_OBJECT(renderer), "xalign", 0.0, NULL);
+    g_object_set(renderer, "xalign", 0.0, NULL);
     gtk_tree_view_insert_column_with_attributes(view,
 						-1, _("Description"), renderer,
 						"text", ATTACH_DESC_COLUMN,
@@ -2803,7 +2803,7 @@ sw_can_undo_cb(GtkSourceBuffer * source_buffer, GParamSpec *arg1,
 {
     gboolean can_undo;
 
-    g_object_get(G_OBJECT(source_buffer), "can-undo", &can_undo, NULL);
+    g_object_get(source_buffer, "can-undo", &can_undo, NULL);
     sw_action_set_enabled(bsmsg, "undo", can_undo);
 }
 
@@ -2813,7 +2813,7 @@ sw_can_redo_cb(GtkSourceBuffer * source_buffer, GParamSpec *arg1,
 {
     gboolean can_redo;
 
-    g_object_get(G_OBJECT(source_buffer), "can-redo", &can_redo, NULL);
+    g_object_get(source_buffer, "can-redo", &can_redo, NULL);
     sw_action_set_enabled(bsmsg, "redo", can_redo);
 }
 

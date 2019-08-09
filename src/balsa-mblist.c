@@ -409,7 +409,7 @@ balsa_mblist_init(BalsaMBList * mblist)
     g_signal_connect(G_OBJECT(tree_view), "row-collapsed",
                      G_CALLBACK(bmbl_tree_collapse), NULL);
 
-    g_object_set(G_OBJECT(mblist),
+    g_object_set(mblist,
                  "show_content_info",
                  balsa_app.mblist_show_mb_content_info,
                  NULL);

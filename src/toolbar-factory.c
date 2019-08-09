@@ -530,7 +530,7 @@ tm_populate(GtkWidget * toolbar, BalsaToolbarModel * model)
                 (type = g_action_get_state_type(action)) &&
                 g_variant_type_equal(type, G_VARIANT_TYPE_BOOLEAN)) {
                 item = gtk_toggle_tool_button_new();
-                g_object_set(G_OBJECT(item), "icon-widget", icon,
+                g_object_set(item, "icon-widget", icon,
                              "label", entry->action, NULL);
             } else {
                 item = gtk_tool_button_new(icon, entry->action);

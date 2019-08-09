@@ -133,7 +133,7 @@ libbalsa_server_cfg_new(LibBalsaServer *server, const gchar *name)
     server_cfg->password = server_cfg_add_entry(server_cfg->basic_grid, server_cfg->basic_rows++, _("_Pass Phrase:"),
                                           libbalsa_server_get_password(server),
         G_CALLBACK(on_server_cfg_changed), server_cfg);
-    g_object_set(G_OBJECT(server_cfg->password), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
+    g_object_set(server_cfg->password, "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
     gtk_entry_set_visibility(GTK_ENTRY(server_cfg->password), FALSE);
 
     server_cfg->remember_pass = server_cfg_add_check(server_cfg->basic_grid, server_cfg->basic_rows++, remember_password_message[0],
@@ -160,7 +160,7 @@ libbalsa_server_cfg_new(LibBalsaServer *server, const gchar *name)
 
 	server_cfg->cert_pass = server_cfg_add_entry(server_cfg->advanced_grid, server_cfg->advanced_rows++, _("Certificate _Pass Phrase:"),
 		libbalsa_server_get_cert_passphrase(server), G_CALLBACK(on_server_cfg_changed), server_cfg);
-    g_object_set(G_OBJECT(server_cfg->cert_pass), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
+    g_object_set(server_cfg->cert_pass, "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
     gtk_entry_set_visibility(GTK_ENTRY(server_cfg->cert_pass), FALSE);
 
     server_cfg->remember_cert_pass = server_cfg_add_check(server_cfg->advanced_grid, server_cfg->advanced_rows++, remember_password_message[1],

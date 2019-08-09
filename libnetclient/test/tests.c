@@ -218,7 +218,7 @@ check_cert(NetClient *client, GTlsCertificate *peer_cert, GTlsCertificateFlags e
 	gchar *hash;
 	GByteArray *cert_der = NULL;
 
-	g_object_get(G_OBJECT(peer_cert), "certificate", &cert_der, NULL);
+	g_object_get(peer_cert, "certificate", &cert_der, NULL);
 	hash = g_compute_checksum_for_data(G_CHECKSUM_SHA256, cert_der->data, cert_der->len);
 	g_byte_array_unref(cert_der);
 	g_message("%s(%p, %p, %x, %p) -> fp(sha256) = %s", __func__, client, peer_cert, errors, user_data, hash);

@@ -177,7 +177,7 @@ ask_password_real(LibBalsaServer * server, const gchar *cert_subject)
 
     label = libbalsa_create_grid_label(_("Password:"), grid, 1);
     entry = libbalsa_create_grid_entry(grid, NULL, NULL, 1, NULL, label);
-    g_object_set(G_OBJECT(entry), "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
+    g_object_set(entry, "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
     gtk_widget_grab_focus(entry);

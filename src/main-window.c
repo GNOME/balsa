@@ -2310,7 +2310,7 @@ balsa_window_new(GtkApplication *application)
     balsa_app.mblist =  BALSA_MBLIST(balsa_mblist_new());
     gtk_widget_show(GTK_WIDGET(balsa_app.mblist));
 
-    g_object_get(G_OBJECT(balsa_app.mblist), "hadjustment", &hadj,
+    g_object_get(balsa_app.mblist, "hadjustment", &hadj,
                  "vadjustment", &vadj, NULL);
     priv->mblist = gtk_scrolled_window_new(hadj, vadj);
 

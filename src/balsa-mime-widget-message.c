@@ -143,7 +143,7 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	mw->header_widget = bm_header_widget_new(bm, NULL);
         gtk_widget_set_valign(mw->header_widget, GTK_ALIGN_START);
         gtk_widget_set_vexpand(mw->header_widget, FALSE);
-        g_object_set(G_OBJECT(mw->header_widget), "margin", 5, NULL);
+        g_object_set(mw->header_widget, "margin", 5, NULL);
 	gtk_container_add(GTK_CONTAINER(mw->widget), mw->header_widget);
 	bmw_message_set_headers(bm, mw, mime_body, TRUE);
     }

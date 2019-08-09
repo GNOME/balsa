@@ -753,7 +753,7 @@ balsa_message_init(BalsaMessage * bm)
 
     /* column for the part number */
     renderer = gtk_cell_renderer_text_new ();
-    g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
+    g_object_set (renderer, "xalign", 0.0, NULL);
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (bm->treeview),
                                                  -1, NULL,
                                                  renderer, "text",
@@ -762,7 +762,7 @@ balsa_message_init(BalsaMessage * bm)
 
     /* column for type icon */
     renderer = gtk_cell_renderer_pixbuf_new ();
-    g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
+    g_object_set (renderer, "xalign", 0.0, NULL);
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (bm->treeview),
                                                  -1, NULL,
                                                  renderer, "pixbuf",
@@ -771,7 +771,7 @@ balsa_message_init(BalsaMessage * bm)
 
     /* column for mime type */
     renderer = gtk_cell_renderer_text_new ();
-    g_object_set (G_OBJECT (renderer), "xalign", 0.0, NULL);
+    g_object_set (renderer, "xalign", 0.0, NULL);
     gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (bm->treeview),
                                                  -1, NULL,
                                                  renderer, "text",

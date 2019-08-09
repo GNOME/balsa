@@ -1,3 +1,28 @@
+2019-08-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	In calls to g_object_[gs]et(), do not cast object using
+	G_OBJECT(object).
+
+	The argument is a gpointer, so the cast is redundant.
+
+	* libbalsa/files.c (libbalsa_icon_finder):
+	* libbalsa/libbalsa.c (libbalsa_is_cert_known), (ask_cert_real),
+	(get_gnutls_cert):
+	* libbalsa/mime.c (get_quote_tag):
+	* libbalsa/server-config.c (libbalsa_server_cfg_new):
+	* libnetclient/test/tests.c (check_cert):
+	* src/balsa-app.c (ask_password_real):
+	* src/balsa-mblist.c (balsa_mblist_init):
+	* src/balsa-message.c (balsa_message_init):
+	* src/balsa-mime-widget-message.c (balsa_mime_widget_new_message):
+	* src/balsa-mime-widget-text.c (structured_phrases_toggle):
+	* src/balsa-mime-widget.c (balsa_mime_widget_new):
+	* src/main-window.c (balsa_window_new):
+	* src/pref-manager.c (apply_prefs):
+	* src/sendmsg-window.c (sw_attachment_list), (sw_can_undo_cb),
+	(sw_can_redo_cb):
+	* src/toolbar-factory.c (tm_populate):
+
 2019-08-03  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	SMTP logging

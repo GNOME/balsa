@@ -427,15 +427,15 @@ structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
 	return;
 
     if ((tag = gtk_text_tag_table_lookup(table, "hp-bold")))
-	g_object_set(G_OBJECT(tag), "weight",
+	g_object_set(tag, "weight",
 		     new_hl ? PANGO_WEIGHT_BOLD : PANGO_WEIGHT_NORMAL,
 		     NULL);
     if ((tag = gtk_text_tag_table_lookup(table, "hp-underline")))
-	g_object_set(G_OBJECT(tag), "underline",
+	g_object_set(tag, "underline",
 		     new_hl ? PANGO_UNDERLINE_SINGLE : PANGO_UNDERLINE_NONE,
 		     NULL);
     if ((tag = gtk_text_tag_table_lookup(table, "hp-italic")))
-	g_object_set(G_OBJECT(tag), "style",
+	g_object_set(tag, "style",
 		     new_hl ? PANGO_STYLE_ITALIC : PANGO_STYLE_NORMAL,
 		     NULL);
 

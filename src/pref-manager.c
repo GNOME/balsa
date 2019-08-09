@@ -442,7 +442,7 @@ apply_prefs(GtkDialog * pbox)
                                      (pui->mblist_show_mb_content_info))) {
         balsa_app.mblist_show_mb_content_info =
             !balsa_app.mblist_show_mb_content_info;
-        g_object_set(G_OBJECT(balsa_app.mblist), "show_content_info",
+        g_object_set(balsa_app.mblist, "show_content_info",
                      balsa_app.mblist_show_mb_content_info, NULL);
     }
 

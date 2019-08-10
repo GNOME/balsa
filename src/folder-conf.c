@@ -331,10 +331,10 @@ create_imap_folder_dialog(LibBalsaServer  *server,
 			libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                              _("Cannot list IMAP folders: %s"),
                                              error->message);
-			g_clear_error(&error);
+			g_error_free(error);
 			return NULL;
 		} else {
-			g_object_ref(G_OBJECT(*store));
+			g_object_ref(store);
 		}
 	}
 

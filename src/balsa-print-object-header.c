@@ -182,8 +182,7 @@ balsa_print_object_header_new_real(GList * list,
 		g_error_free(err);
 
 	    if (f_widget) {
-		face = gtk_image_get_pixbuf(GTK_IMAGE(f_widget));
-		g_object_ref(G_OBJECT(face));
+		face = g_object_ref(gtk_image_get_pixbuf(GTK_IMAGE(f_widget)));
 		gtk_widget_destroy(f_widget);
 	    }
 	}

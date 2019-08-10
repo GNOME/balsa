@@ -5923,7 +5923,7 @@ sw_buffer_swap(BalsaSendmsg * bsmsg, gboolean undo)
 #endif                          /* HAVE_GTKSPELL */
 
     sw_buffer_signals_disconnect(bsmsg);
-    g_object_ref(G_OBJECT(buffer));
+    g_object_ref(buffer);
     gtk_text_view_set_buffer(GTK_TEXT_VIEW(bsmsg->text), bsmsg->buffer2);
 #if HAVE_GTKSPELL
     if (had_spell)

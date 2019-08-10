@@ -742,7 +742,7 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
     print = gtk_print_operation_new();
     g_assert(print != NULL);
 
-    g_object_ref(G_OBJECT(msg));
+    g_object_ref(msg);
 
     gtk_print_operation_set_n_pages(print, 1);
     gtk_print_operation_set_unit(print, GTK_UNIT_POINTS);

@@ -1,3 +1,21 @@
+2019-08-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	In calls to g_object_ref(), do not cast object using
+	G_OBJECT(object).
+
+	The macro now casts the return value to the type of the
+	argument, so casting away its actual type is unhelpful.
+
+	* libbalsa/mailbox_imap.c (imap_exists_cb):
+	* libbalsa/rfc3156.c (libbalsa_sign_encrypt_mime_object):
+	* libbalsa/send.c (libbalsa_fill_msg_queue_item_from_queu):
+	* src/balsa-message.c (message_recheck_crypto_cb):
+	* src/balsa-print-object-header.c
+	(balsa_print_object_header_new_real):
+	* src/folder-conf.c (create_imap_folder_dialog):
+	* src/print-gtk.c (message_print):
+	* src/sendmsg-window.c (sw_buffer_swap):
+
 2019-08-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	In calls to g_object_[gs]et(), do not cast object using

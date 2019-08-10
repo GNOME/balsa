@@ -306,8 +306,7 @@ libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
 	return FALSE;
 
     /* we want to be able to restore */
-    signed_object = *content;
-    g_object_ref(G_OBJECT(signed_object));
+    signed_object = g_object_ref(*content);
 
     if (!libbalsa_sign_mime_object(&signed_object, rfc822_signer, protocol,
 				   parent, error))

@@ -1754,7 +1754,7 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage  *message,
         g_mime_stream_reset(mqi->stream);
         g_object_unref(G_OBJECT(msg_stream));
 
-        g_object_ref(G_OBJECT(mqi->orig));
+        g_object_ref(mqi->orig);
         result = LIBBALSA_MESSAGE_CREATE_OK;
     }
 

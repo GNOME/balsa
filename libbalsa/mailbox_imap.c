@@ -872,8 +872,7 @@ imap_exists_idle(gpointer data)
 static void
 imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
 {
-    g_object_ref(G_OBJECT(mimap));
-    g_idle_add(imap_exists_idle, mimap);
+    g_idle_add(imap_exists_idle, g_object_ref(mimap));
 }
 
 static void

@@ -3237,17 +3237,13 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
     BalsaPartInfo * info;
     gboolean has_focus = bm->focus_state != BALSA_MESSAGE_FOCUS_STATE_NO;
 
-    g_return_if_fail(bm != NULL);
-
-    message = bm->message;
-    g_return_if_fail(message != NULL);
+    message = g_object_ref(bm->message);
 
     select_part(bm, NULL);
     balsa_message_clear_tree(bm);
 
-    g_object_ref(G_OBJECT(message));
     if (!libbalsa_message_body_ref(message, TRUE, TRUE)) {
-	g_object_unref(G_OBJECT(message));
+	g_object_unref(message);
         return;
     }
 

@@ -864,7 +864,7 @@ imap_exists_idle(gpointer data)
     }
 
     libbalsa_unlock_mailbox(mailbox);
-    g_object_unref(G_OBJECT(mailbox));
+    g_object_unref(mailbox);
 
     return FALSE;
 }
@@ -2060,7 +2060,7 @@ libbalsa_mailbox_imap_get_message(LibBalsaMailbox * mailbox, guint msgno)
 		g_free(id);
 	    }
 	} else
-            g_object_unref(G_OBJECT(message));
+            g_object_unref(message);
     }
     if (msg_info->message)
 	g_object_ref(msg_info->message); /* we want to keep one copy */

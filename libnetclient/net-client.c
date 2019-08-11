@@ -78,7 +78,7 @@ net_client_new(const gchar *host_and_port, guint16 default_port, gsize max_line_
 	priv = net_client_get_instance_private(client);
 
 	if (priv->sock == NULL) {
-		g_object_unref(G_OBJECT(client));
+		g_object_unref(client);
 		client = NULL;
 	} else {
 		priv->host_and_port = g_strdup(host_and_port);
@@ -175,28 +175,28 @@ net_client_shutdown(NetClient *client)
 			 * throws a critical error for TLS.  Observed with gio 2.48.2 and 2.50.3, no idea how it can be fixed.
 			 * See also https://bugzilla.gnome.org/show_bug.cgi?id=795985. */
 			if (priv->ostream != NULL) {
-				g_object_unref(G_OBJECT(priv->ostream));
+				g_object_unref(priv->ostream);
 			}
-			g_object_unref(G_OBJECT(priv->comp));
+			g_object_unref(priv->comp);
 		}
 		if (priv->decomp != NULL) {
-			g_object_unref(G_OBJECT(priv->decomp));
+			g_object_unref(priv->decomp);
 			priv->decomp = NULL;
 		}
 		if (priv->comp_istream!= NULL) {
-			g_object_unref(G_OBJECT(priv->comp_istream));
+			g_object_unref(priv->comp_istream);
 			priv->comp_istream = NULL;
 		}
 		if (priv->istream != NULL) {
-			g_object_unref(G_OBJECT(priv->istream));
+			g_object_unref(priv->istream);
 			priv->istream = NULL;
 		}
 		if (priv->tls_conn != NULL) {
-			g_object_unref(G_OBJECT(priv->tls_conn));
+			g_object_unref(priv->tls_conn);
 			priv->tls_conn = NULL;
 		}
 		if (priv->plain_conn != NULL) {
-			g_object_unref(G_OBJECT(priv->plain_conn));
+			g_object_unref(priv->plain_conn);
 			priv->plain_conn = NULL;
 		}
 	}
@@ -394,7 +394,7 @@ net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **
 
 	/* always free any existing certificate */
 	if (priv->certificate != NULL) {
-		g_object_unref(G_OBJECT(priv->certificate));
+		g_object_unref(priv->certificate);
 		priv->certificate = NULL;
 	}
 
@@ -506,7 +506,7 @@ net_client_set_cert_from_file(NetClient *client, const gchar *pem_path, GError *
 		result = net_client_set_cert_from_pem(client, pem_buf, error);
 		g_free(pem_buf);
 	}
-	g_object_unref(G_OBJECT(pem_file));
+	g_object_unref(pem_file);
 	return result;
 }
 
@@ -534,13 +534,13 @@ net_client_start_tls(NetClient *client, GError **error)
 			result = g_tls_connection_handshake(G_TLS_CONNECTION(priv->tls_conn), NULL, error);
 			if (result) {
 				g_filter_input_stream_set_close_base_stream(G_FILTER_INPUT_STREAM(priv->istream), FALSE);
-				g_object_unref(G_OBJECT(priv->istream));		/* unref the plain connection's stream */
+				g_object_unref(priv->istream);		/* unref the plain connection's stream */
 				priv->istream = g_data_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(priv->tls_conn)));
 				g_data_input_stream_set_newline_type(priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
 				priv->ostream = g_io_stream_get_output_stream(G_IO_STREAM(priv->tls_conn));
 				g_debug("connection is encrypted");
 			} else {
-				g_object_unref(G_OBJECT(priv->tls_conn));
+				g_object_unref(priv->tls_conn);
 				priv->tls_conn = NULL;
 			}
 		}
@@ -668,11 +668,11 @@ net_client_finalise(GObject *object)
 
 	net_client_shutdown(client);
 	if (priv->sock != NULL) {
-		g_object_unref(G_OBJECT(priv->sock));
+		g_object_unref(priv->sock);
 		priv->sock = NULL;
 	}
 	if (priv->certificate != NULL) {
-		g_object_unref(G_OBJECT(priv->certificate));
+		g_object_unref(priv->certificate);
 		priv->certificate = NULL;
 	}
 	g_debug("finalised connection to %s", priv->host_and_port);

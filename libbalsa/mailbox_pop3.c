@@ -324,7 +324,7 @@ pop_handler_close(pop_handler_t *handler,
 			result = FALSE;
 		}
 	} else {
-		g_object_unref(G_OBJECT(handler->mbx_stream));
+		g_object_unref(handler->mbx_stream);
 	}
 	g_free(handler->path);
 	g_free(handler);
@@ -492,7 +492,7 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer      *server,
 				libbalsa_server_set_password(server, NULL, TRUE);
 			}
 			g_error_free(error);
-			g_object_unref(G_OBJECT(pop));
+			g_object_unref(pop);
 			return NULL;
 		}
 	}
@@ -512,7 +512,7 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer      *server,
 		}
 		g_error_free(error);
 		net_client_shutdown(NET_CLIENT(pop));
-		g_object_unref(G_OBJECT(pop));
+		g_object_unref(pop);
 		return NULL;
 	}
 
@@ -522,7 +522,7 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer      *server,
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s error: %s"), name, error->message);
 		g_error_free(error);
 		net_client_shutdown(NET_CLIENT(pop));
-		g_object_unref(G_OBJECT(pop));
+		g_object_unref(pop);
 		pop = NULL;
 	}
 
@@ -700,7 +700,7 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 		}
 
 		/* done - clean up */
-		g_object_unref(G_OBJECT(pop));
+		g_object_unref(pop);
 	}
 
 	libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_FINISHED, 1.0, _("Finished"));

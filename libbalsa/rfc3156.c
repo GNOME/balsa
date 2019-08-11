@@ -218,7 +218,7 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
 	return FALSE;
     }
 
-    g_object_unref(G_OBJECT(*content));
+    g_object_unref(*content);
     *content = GMIME_OBJECT(mps);
     return TRUE;
 }
@@ -272,7 +272,7 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     if (!result) {
 	g_object_unref(encrypted_obj);
     } else {
-    g_object_unref(G_OBJECT(*content));
+    g_object_unref(*content);
     *content = GMIME_OBJECT(encrypted_obj);
     }
     return result;
@@ -314,10 +314,10 @@ libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
 
     if (!libbalsa_encrypt_mime_object(&signed_object, rfc822_for, protocol,
 				      always_trust, parent, error)) {
-	g_object_unref(G_OBJECT(signed_object));
+	g_object_unref(signed_object);
 	return FALSE;
     }
-    g_object_unref(G_OBJECT(*content));
+    g_object_unref(*content);
     *content = signed_object;
 
     return TRUE;
@@ -356,7 +356,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
             (GMIME_MULTIPART(body->mime_part)) < 2))
         return FALSE;
     if (body->parts->next->sig_info)
-	g_object_unref(G_OBJECT(body->parts->next->sig_info));
+	g_object_unref(body->parts->next->sig_info);
 
     /* verify the signature */
     mailbox = libbalsa_message_get_mailbox(body->message);
@@ -464,7 +464,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
 	if (g_mime_gpgme_sigstat_status(sig_state) != GPG_ERR_NOT_SIGNED)
 	    body->sig_info = sig_state;
 	else
-	    g_object_unref(G_OBJECT(sig_state));
+	    g_object_unref(sig_state);
     }
 
     return body;
@@ -555,7 +555,7 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 	if (sig_info)
 	    *sig_info = result;
 	else
-	    g_object_unref(G_OBJECT(result));
+	    g_object_unref(result);
     }
     return retval;
 }
@@ -613,7 +613,7 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 	if (sig_info && g_mime_gpgme_sigstat_status(result) != GPG_ERR_NOT_SIGNED)
 	    *sig_info = result;
 	else
-	    g_object_unref(G_OBJECT(result));
+	    g_object_unref(result);
     }
 
     return retval;

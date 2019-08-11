@@ -494,7 +494,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     sqlite3_reset(query[5]);
 
     /* set up the tree view */
-    g_object_unref(G_OBJECT(model));
+    g_object_unref(model);
 
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(_("Mailbox"), renderer, "text", 0, NULL);

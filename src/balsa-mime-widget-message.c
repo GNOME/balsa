@@ -388,7 +388,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
 			     _("Sending the external body request failed: %s"),
 			     err ? err->message : "?");
     g_error_free(err);
-    g_object_unref(G_OBJECT(message));
+    g_object_unref(message);
 }
 
 

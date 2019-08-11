@@ -747,7 +747,7 @@ balsa_message_init(BalsaMessage * bm)
                      G_CALLBACK(tree_button_press_cb), bm);
     g_signal_connect(bm->treeview, "popup-menu",
                      G_CALLBACK(tree_menu_popup_key_cb), bm);
-    g_object_unref (G_OBJECT (model));
+    g_object_unref(model);
     gtk_tree_selection_set_mode (selection, GTK_SELECTION_MULTIPLE);
     gtk_tree_view_set_headers_visible (GTK_TREE_VIEW (bm->treeview), FALSE);
 
@@ -1266,7 +1266,7 @@ balsa_message_set_embedded_hdr(GtkTreeModel * model, GtkTreePath * path,
                                                     info->body->embhdrs,
                                                     info->body->parts,
                                                     info->body->embhdrs->subject);
-	g_object_unref(G_OBJECT(info));
+	g_object_unref(info);
     }
 
     return FALSE;
@@ -1531,7 +1531,7 @@ display_part(BalsaMessage * bm, LibBalsaMessageBody * body,
     }
 
     if (content_icon)
-	g_object_unref(G_OBJECT(content_icon));
+	g_object_unref(content_icon);
     g_free(content_desc);
     g_free(content_type);
 }
@@ -2496,7 +2496,7 @@ handle_mdn_request(GtkWindow *parent,
 				 _("Sending the disposition notification failed: %s"),
 				 error ? error->message : "?");
 	g_error_free(error);
-        g_object_unref(G_OBJECT(mdn));
+        g_object_unref(mdn);
     }
 }
 
@@ -2643,8 +2643,8 @@ mdn_dialog_response(GtkWidget * dialog, gint response, gpointer user_data)
         if (error)
             g_error_free(error);
     }
-    g_object_unref(G_OBJECT(send_msg));
-    g_object_unref(G_OBJECT(mdn_ident));
+    g_object_unref(send_msg);
+    g_object_unref(mdn_ident);
     gtk_widget_destroy(dialog);
 }
 
@@ -3274,7 +3274,7 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
     if (!gtk_tree_model_get_iter_first (gtk_tree_view_get_model(GTK_TREE_VIEW(bm->treeview)),
                                         &iter)) {
 	libbalsa_message_body_unref(message);
-	g_object_unref(G_OBJECT(message));
+	g_object_unref(message);
         return;
     }
 
@@ -3290,7 +3290,7 @@ message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * bm)
         balsa_message_grab_focus(bm);
 
     libbalsa_message_body_unref(message);
-    g_object_unref(G_OBJECT(message));
+    g_object_unref(message);
 }
 
 

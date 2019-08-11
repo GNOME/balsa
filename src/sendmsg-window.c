@@ -358,7 +358,7 @@ balsa_attach_info_finalize(GObject * object)
     if (info->popup_menu)
         gtk_widget_destroy(info->popup_menu);
     if (info->file_uri)
-        g_object_unref(G_OBJECT(info->file_uri));
+        g_object_unref(info->file_uri);
     g_free(info->force_mime_type);
     g_free(info->charset);
     libbalsa_message_headers_destroy(info->headers);
@@ -578,7 +578,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 	    libbalsa_mailbox_close(mailbox,
 		    /* Respect pref setting: */
 				   balsa_app.expunge_on_close);
-	g_object_unref(G_OBJECT(bsmsg->parent_message));
+	g_object_unref(bsmsg->parent_message);
         bsmsg->parent_message = NULL;
     }
 
@@ -592,7 +592,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 	    libbalsa_mailbox_close(mailbox,
 		    /* Respect pref setting: */
 				   balsa_app.expunge_on_close);
-	g_object_unref(G_OBJECT(bsmsg->draft_message));
+	g_object_unref(bsmsg->draft_message);
         bsmsg->draft_message = NULL;
     }
 
@@ -3545,7 +3545,7 @@ collect_for_quote(BalsaSendmsg        * bsmsg,
     }
 
     /* clean up */
-    g_object_unref(G_OBJECT(tree_store));
+    g_object_unref(tree_store);
     libbalsa_message_body_unref(message);
     return q_body;
 }
@@ -3932,7 +3932,7 @@ sw_save_draft(BalsaSendmsg * bsmsg)
 		    /* Respect pref setting: */
 				   balsa_app.expunge_on_close);
         }
-	g_object_unref(G_OBJECT(bsmsg->draft_message));
+	g_object_unref(bsmsg->draft_message);
     }
     bsmsg->state = SENDMSG_STATE_CLEAN;
 
@@ -5530,7 +5530,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
         sw_delete_draft(bsmsg);
     }
 
-    g_object_unref(G_OBJECT(message));
+    g_object_unref(message);
 
     if (result != LIBBALSA_MESSAGE_CREATE_OK) {
         const char *msg;
@@ -5662,7 +5662,7 @@ message_postpone(BalsaSendmsg * bsmsg)
 	g_clear_error(&error);
     }
 
-    g_object_unref(G_OBJECT(message));
+    g_object_unref(message);
     return successp;
 }
 

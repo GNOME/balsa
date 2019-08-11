@@ -82,7 +82,7 @@ balsa_mime_widget_new_pgpkey(BalsaMessage        *bm,
             balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not process GnuPG keys: %s"),
                               err ? err->message : "Unknown error");
             g_clear_error(&err);
-            g_object_unref(G_OBJECT(mw));
+            g_object_unref(mw);
             mw = NULL;
 		}
     	g_free(body_buf);

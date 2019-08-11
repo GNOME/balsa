@@ -433,7 +433,7 @@ ask_cert_real(void *data)
     gcr_cert = gcr_simple_certificate_new(cert_der->data, cert_der->len);
     g_byte_array_unref(cert_der);
     cert_widget = GTK_WIDGET(gcr_certificate_widget_new(gcr_cert));
-    g_object_unref(G_OBJECT(gcr_cert));
+    g_object_unref(gcr_cert);
 
     str = g_string_new("");
     g_string_printf(str, _("<big><b>Authenticity of this certificate "

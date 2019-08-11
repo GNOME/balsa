@@ -912,7 +912,7 @@ config_global_load(void)
 
     /* ... Printing */
     if (balsa_app.page_setup)
-	g_object_unref(G_OBJECT(balsa_app.page_setup));
+	g_object_unref(balsa_app.page_setup);
     balsa_app.page_setup = restore_gtk_page_setup();
     balsa_app.margin_left = libbalsa_conf_get_double("LeftMargin");
     balsa_app.margin_top = libbalsa_conf_get_double("TopMargin");

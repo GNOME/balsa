@@ -238,7 +238,7 @@ balsa_print_object_default_full(GList           *list,
         list = g_list_append(list, new_pod);
     }
     g_list_free(par_parts);
-    g_object_unref(G_OBJECT(test_layout));
+    g_object_unref(test_layout);
 
     return list;
 }

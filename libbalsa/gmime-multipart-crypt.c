@@ -444,7 +444,7 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
     g_return_val_if_fail(GMIME_IS_MULTIPART_ENCRYPTED(mpe), NULL);
 
     if (signature && *signature) {
-	g_object_unref(G_OBJECT(*signature));
+	g_object_unref(*signature);
 	*signature = NULL;
     }
 
@@ -530,7 +530,7 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 	g_set_error(err, GMIME_ERROR, GMIME_ERROR_PARSE_ERROR, "%s",
 		    _
 		    ("Cannot decrypt multipart/encrypted part: failed to parse decrypted content"));
-	g_object_unref(G_OBJECT(sigstat));
+	g_object_unref(sigstat);
 	return NULL;
     }
 
@@ -540,7 +540,7 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 	if (g_mime_gpgme_sigstat_status(sigstat) != GPG_ERR_NOT_SIGNED)
 	    *signature = sigstat;
 	else
-	    g_object_unref(G_OBJECT(sigstat));
+	    g_object_unref(sigstat);
     }
 
     return decrypted;

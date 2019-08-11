@@ -247,7 +247,7 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
     	if (pango_attr_list != NULL) {
     		pango_attr_list_unref(pango_attr_list);
     	}
-    	g_object_unref(G_OBJECT(layout));
+    	g_object_unref(layout);
     	g_string_free(level_buf, TRUE);
 
     	/* each part is a new text object */
@@ -334,7 +334,7 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
     first_page = psetup->page_count - 1;
     c_at_y = psetup->c_y_pos;
     par_parts = split_for_layout(layout, textbuf, NULL, psetup, FALSE, NULL);
-    g_object_unref(G_OBJECT(layout));
+    g_object_unref(layout);
     pango_font_description_free(font);
     g_free(textbuf);
 
@@ -633,7 +633,7 @@ balsa_print_object_text_draw(BalsaPrintObject * self,
     }
     cairo_move_to(cairo_ctx, rect->c_at_x + po->cite_level * C_LABEL_SEP, rect->c_at_y);
     pango_cairo_show_layout(cairo_ctx, layout);
-    g_object_unref(G_OBJECT(layout));
+    g_object_unref(layout);
     if (po->cite_level > 0) {
 	guint n;
 

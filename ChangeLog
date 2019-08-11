@@ -1,5 +1,64 @@
 2019-08-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	In calls to g_object_unref(), do not cast object using
+	G_OBJECT(object).
+
+	The argument is a gpointer, so the cast is redundant.
+
+	* libbalsa/autocrypt.c (autocrypt_db_dialog_run):
+	* libbalsa/body.c (libbalsa_message_body_free):
+	* libbalsa/gmime-multipart-crypt.c (g_mime_gpgme_mpe_decrypt):
+	* libbalsa/html.c (html2text):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key):
+	* libbalsa/libbalsa.c (ask_cert_real):
+	* libbalsa/mailbox_imap.c (imap_exists_idle),
+	(libbalsa_mailbox_imap_get_message):
+	* libbalsa/mailbox_pop3.c (pop_handler_close),
+	(libbalsa_mailbox_pop3_startup), (libbalsa_mailbox_pop3_check):
+	* libbalsa/rfc3156.c (libbalsa_sign_mime_object),
+	(libbalsa_encrypt_mime_object),
+	(libbalsa_sign_encrypt_mime_object),
+	(libbalsa_body_check_signature), (libbalsa_body_decrypt),
+	(libbalsa_rfc2440_verify), (libbalsa_rfc2440_decrypt):
+	* libbalsa/send.c (msg_queue_item_destroy),
+	(send_message_info_destroy), (add_mime_body_plain),
+	(balsa_send_message_real), (libbalsa_message_create_mime_message),
+	(libbalsa_fill_msg_queue_item_from_queu):
+	* libnetclient/net-client-pop.c (net_client_pop_new):
+	* libnetclient/net-client-siobuf.c (net_client_siobuf_new):
+	* libnetclient/net-client-smtp.c (net_client_smtp_new):
+	* libnetclient/net-client.c (net_client_new),
+	(net_client_shutdown), (net_client_set_cert_from_pem),
+	(net_client_set_cert_from_file), (net_client_start_tls),
+	(net_client_finalise):
+	* src/ab-window.c (balsa_ab_window_get_recipients),
+	(balsa_ab_window_swap_real), (balsa_ab_window_activate_address):
+	* src/balsa-message.c (balsa_message_init),
+	(balsa_message_set_embedded_hdr), (display_part),
+	(handle_mdn_request), (mdn_dialog_response),
+	(message_recheck_crypto_cb):
+	* src/balsa-mime-widget-crypto.c (balsa_mime_widget_new_pgpkey):
+	* src/balsa-mime-widget-message.c (extbody_send_mail):
+	* src/balsa-mime-widget-vcalendar.c (vevent_reply):
+	* src/balsa-print-object-decor.c (bpo_decor_print_frame_begin):
+	* src/balsa-print-object-default.c
+	(balsa_print_object_default_full):
+	* src/balsa-print-object-header.c
+	(balsa_print_object_header_new_real),
+	(balsa_print_object_header_crypto),
+	(balsa_print_object_header_draw):
+	* src/balsa-print-object-text.c (balsa_print_object_text_plain),
+	(balsa_print_object_text), (balsa_print_object_text_draw):
+	* src/mailbox-conf.c (mailbox_conf_add):
+	* src/print-gtk.c (print_header_footer), (begin_print),
+	(message_print_page_setup), (message_print):
+	* src/save-restore.c (config_global_load):
+	* src/sendmsg-window.c (balsa_attach_info_finalize),
+	(balsa_sendmsg_destroy_handler), (collect_for_quote),
+	(sw_save_draft), (send_message_handler), (message_postpone):
+
+2019-08-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	In calls to g_object_ref(), do not cast object using
 	G_OBJECT(object).
 

@@ -122,9 +122,9 @@ html2text(gchar ** text, gsize len)
             g_free(html2text[pathidx]);
         }
         g_output_stream_close(ostream, NULL, NULL);
-        g_object_unref(G_OBJECT(stream));
+        g_object_unref(stream);
         g_file_delete(html_data, NULL, NULL);
-        g_object_unref(G_OBJECT(html_data));
+        g_object_unref(html_data);
     }
     if (err != NULL) {
         libbalsa_information(LIBBALSA_INFORMATION_ERROR,

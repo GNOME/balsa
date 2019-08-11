@@ -216,7 +216,7 @@ bpo_decor_print_frame_begin(cairo_t              *cairo_ctx,
 		cairo_line_to(cairo_ctx, rect->c_at_x + C_LABEL_SEP, c_y_hor_line);
 		cairo_move_to(cairo_ctx, rect->c_at_x + 1.5 * C_LABEL_SEP, c_y_hor_line - 0.5 * P_TO_C(p_label_height));
 		pango_cairo_show_layout(cairo_ctx, layout);
-		g_object_unref(G_OBJECT(layout));
+		g_object_unref(layout);
 		cairo_move_to(cairo_ctx, rect->c_at_x + 2.0 * C_LABEL_SEP + P_TO_C(p_label_width), c_y_hor_line);
 		cairo_line_to(cairo_ctx, rect->c_at_x + rect->c_width, c_y_hor_line);
 	} else {

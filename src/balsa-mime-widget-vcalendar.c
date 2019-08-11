@@ -349,5 +349,5 @@ vevent_reply(GObject * button, GtkWidget * box)
 			     error ? error->message : "?");
     if (error)
 	g_error_free(error);
-    g_object_unref(G_OBJECT(message));
+    g_object_unref(message);
 }

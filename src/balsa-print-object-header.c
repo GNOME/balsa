@@ -284,7 +284,7 @@ balsa_print_object_header_new_real(GList * list,
     	list = g_list_append(list, po);
     }
     g_list_free(chunks);
-    g_object_unref(G_OBJECT(test_layout));
+    g_object_unref(test_layout);
 
     return list;
 }
@@ -363,7 +363,7 @@ balsa_print_object_header_crypto(GList 				 *list,
 
 	/* split the headers into a list fitting on one or more pages */
 	chunks = split_for_layout(test_layout, textbuf, NULL, psetup, FALSE, NULL);
-	g_object_unref(G_OBJECT(test_layout));
+	g_object_unref(test_layout);
 	g_free(textbuf);
 
 	/* create a list of objects */
@@ -428,7 +428,7 @@ balsa_print_object_header_draw(BalsaPrintObject * self,
     c_height = P_TO_C(p_height);	/* needed to properly print borders */
     cairo_move_to(cairo_ctx, rect->c_at_x, rect->c_at_y);
     pango_cairo_show_layout(cairo_ctx, layout);
-    g_object_unref(G_OBJECT(layout));
+    g_object_unref(layout);
 
     /* print a face image */
     if (po->face != NULL) {

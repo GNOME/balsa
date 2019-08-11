@@ -464,7 +464,7 @@ balsa_ab_window_get_recipients(BalsaAbWindow * ab)
                            LIST_COLUMN_ADDRESS, &address,
                            LIST_COLUMN_WHICH, &which_multiple, -1);
         text = libbalsa_address_to_gchar(address, which_multiple);
-	g_object_unref(G_OBJECT(address));
+	g_object_unref(address);
         if (text) {
             if (str->len > 0)
                 g_string_append(str, ", ");
@@ -533,7 +533,7 @@ balsa_ab_window_swap_real(GtkTreeModel * model, GtkTreePath * path,
      * already reffed it, so it won't be finalized, even if there
      * were no other outstanding refs. */
     gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
-    g_object_unref(G_OBJECT(address));
+    g_object_unref(address);
     g_free(name);
     g_free(address_string);
 }
@@ -611,7 +611,7 @@ balsa_ab_window_activate_address(GtkTreeView * view,
                            LIST_COLUMN_ADDRESS, &address,
                            LIST_COLUMN_WHICH, &which_multiple, -1);
         addr = libbalsa_address_to_gchar(address, which_multiple);
-	g_object_unref(G_OBJECT(address));
+	g_object_unref(address);
         snd = sendmsg_window_compose_with_address(addr);
         g_free(addr);
 

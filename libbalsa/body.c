@@ -85,7 +85,7 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     g_free(body->charset);
 
     if (body->sig_info)
-	g_object_unref(G_OBJECT(body->sig_info));
+	g_object_unref(body->sig_info);
 
     libbalsa_message_body_free(body->next);
     libbalsa_message_body_free(body->parts);

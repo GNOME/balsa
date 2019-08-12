@@ -193,7 +193,7 @@ libbalsa_server_set_username(LibBalsaServer * server,
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-    g_signal_emit(G_OBJECT(server),
+    g_signal_emit(server,
 		  libbalsa_server_signals[SET_USERNAME], 0, username);
 }
 
@@ -225,7 +225,7 @@ libbalsa_server_set_host(LibBalsaServer * server, const gchar * host,
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-    g_signal_emit(G_OBJECT(server), libbalsa_server_signals[SET_HOST],
+    g_signal_emit(server, libbalsa_server_signals[SET_HOST],
 		  0, host, security);
 
 }
@@ -236,7 +236,7 @@ libbalsa_server_config_changed(LibBalsaServer * server)
     g_return_if_fail(server != NULL);
     g_return_if_fail(LIBBALSA_IS_SERVER(server));
 
-    g_signal_emit(G_OBJECT(server), libbalsa_server_signals[CONFIG_CHANGED],
+    g_signal_emit(server, libbalsa_server_signals[CONFIG_CHANGED],
                   0);
 }
 
@@ -249,7 +249,7 @@ lbs_get_password(LibBalsaServer *server,
     g_return_val_if_fail(server != NULL, NULL);
     g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
 
-    g_signal_emit(G_OBJECT(server), libbalsa_server_signals[GET_PASSWORD], 0, cert_subject, &retval);
+    g_signal_emit(server, libbalsa_server_signals[GET_PASSWORD], 0, cert_subject, &retval);
     return retval;
 }
 

@@ -205,10 +205,10 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	       )
 	libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 
-    g_signal_connect(G_OBJECT(mw->widget), "key_press_event",
+    g_signal_connect(mw->widget, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event),
 		     (gpointer) bm);
-    g_signal_connect(G_OBJECT(mw->widget), "populate-popup",
+    g_signal_connect(mw->widget, "populate-popup",
 		     G_CALLBACK(text_view_populate_popup),
 		     (gpointer)mime_body);
 
@@ -219,16 +219,16 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
                                   is_text_plain);
 
     prepare_url_offsets(buffer, url_list);
-    g_signal_connect_after(G_OBJECT(mw->widget), "realize",
+    g_signal_connect_after(mw->widget, "realize",
 			   G_CALLBACK(fix_text_widget), url_list);
     if (url_list) {
-	g_signal_connect(G_OBJECT(mw->widget), "button_press_event",
+	g_signal_connect(mw->widget, "button_press_event",
 			 G_CALLBACK(store_button_coords), NULL);
-	g_signal_connect(G_OBJECT(mw->widget), "button_release_event",
+	g_signal_connect(mw->widget, "button_release_event",
 			 G_CALLBACK(check_call_url), url_list);
-	g_signal_connect(G_OBJECT(mw->widget), "motion-notify-event",
+	g_signal_connect(mw->widget, "motion-notify-event",
 			 G_CALLBACK(check_over_url), url_list);
-	g_signal_connect(G_OBJECT(mw->widget), "leave-notify-event",
+	g_signal_connect(mw->widget, "leave-notify-event",
 			 G_CALLBACK(check_over_url), url_list);
 	g_object_set_data_full(G_OBJECT(mw->widget), "url-list", url_list,
 			       (GDestroyNotify)free_url_list);
@@ -512,17 +512,17 @@ text_view_url_popup(GtkTextView *textview, GtkMenu *menu)
                           (GtkCallback)gtk_widget_destroy, NULL);
 
     menu_item = gtk_menu_item_new_with_label (_("Copy link"));
-    g_signal_connect (G_OBJECT (menu_item), "activate",
+    g_signal_connect (menu_item, "activate",
                       G_CALLBACK (url_copy_cb), (gpointer)url);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
     menu_item = gtk_menu_item_new_with_label (_("Open link"));
-    g_signal_connect (G_OBJECT (menu_item), "activate",
+    g_signal_connect (menu_item, "activate",
                       G_CALLBACK (url_open_cb), (gpointer)url);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
     menu_item = gtk_menu_item_new_with_label (_("Send link…"));
-    g_signal_connect (G_OBJECT (menu_item), "activate",
+    g_signal_connect (menu_item, "activate",
                       G_CALLBACK (url_send_cb), (gpointer)url);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
@@ -553,7 +553,7 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
 					   (gpointer)mime_body);
 
     menu_item = gtk_menu_item_new_with_label (_("Save…"));
-    g_signal_connect (G_OBJECT (menu_item), "activate",
+    g_signal_connect (menu_item, "activate",
                       G_CALLBACK (balsa_mime_widget_ctx_menu_save), (gpointer)mime_body);
     gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
 
@@ -565,7 +565,7 @@ text_view_populate_popup(GtkTextView *textview, GtkMenu *menu,
 	menu_item = gtk_check_menu_item_new_with_label (_("Highlight structured phrases"));
 	gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menu_item),
 					phrase_hl == PHRASE_HIGHLIGHT_ON);
-	g_signal_connect (G_OBJECT (menu_item), "toggled",
+	g_signal_connect (menu_item, "toggled",
 			  G_CALLBACK (structured_phrases_toggle),
 			  (gpointer)textview);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), menu_item);
@@ -1061,17 +1061,17 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
 
     menuitem = gtk_menu_item_new_with_label(_("Zoom In"));
-    g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+    g_signal_connect_swapped(menuitem, "activate",
                              G_CALLBACK(bm_zoom_in), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem = gtk_menu_item_new_with_label(_("Zoom Out"));
-    g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+    g_signal_connect_swapped(menuitem, "activate",
                              G_CALLBACK(bm_zoom_out), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem = gtk_menu_item_new_with_label(_("Zoom 100%"));
-    g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+    g_signal_connect_swapped(menuitem, "activate",
                              G_CALLBACK(bm_zoom_reset), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
@@ -1080,7 +1080,7 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
 
     if (libbalsa_html_can_select(html)) {
         menuitem = gtk_menu_item_new_with_mnemonic(_("Select _All"));
-        g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+        g_signal_connect_swapped(menuitem, "activate",
                                  G_CALLBACK(bm_select_all_cb), html);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
@@ -1094,7 +1094,7 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
                                            mime_body);
 
     menuitem = gtk_menu_item_new_with_label(_("Save…"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
                      G_CALLBACK(balsa_mime_widget_ctx_menu_save),
                      mime_body);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
@@ -1103,7 +1103,7 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem = gtk_menu_item_new_with_label(_("Print…"));
-    g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+    g_signal_connect_swapped(menuitem, "activate",
                              G_CALLBACK(libbalsa_html_print), html);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     gtk_widget_set_sensitive(menuitem, libbalsa_html_can_print(html));
@@ -1433,7 +1433,7 @@ fill_text_buf_cited(GtkWidget *widget, const gchar *text_body,
         g_object_set_data_full(G_OBJECT(widget), "cite-bars", cite_bars_list,
                                (GDestroyNotify) destroy_cite_bars);
         g_object_set_data(G_OBJECT(widget), "cite-margin", GINT_TO_POINTER(margin));
-        g_signal_connect_after(G_OBJECT(widget), "draw",
+        g_signal_connect_after(widget, "draw",
                                G_CALLBACK(draw_cite_bars), cite_bars_list);
     }
 

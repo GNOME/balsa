@@ -483,7 +483,7 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer      *server,
 	if (libbalsa_server_get_client_cert(server)) {
                 const gchar *cert_file = libbalsa_server_get_cert_file(server);
 
-		g_signal_connect(G_OBJECT(pop), "cert-pass", G_CALLBACK(libbalsa_server_get_cert_pass), server);
+		g_signal_connect(pop, "cert-pass", G_CALLBACK(libbalsa_server_get_cert_pass), server);
 		if (!net_client_set_cert_from_file(NET_CLIENT(pop), cert_file, &error)) {
 			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), cert_file,
 				error->message);
@@ -498,8 +498,8 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer      *server,
 	}
 
 	/* connect signals */
-	g_signal_connect(G_OBJECT(pop), "cert-check", G_CALLBACK(libbalsa_server_check_cert), pop);
-	g_signal_connect(G_OBJECT(pop), "auth", G_CALLBACK(libbalsa_server_get_auth), server);
+	g_signal_connect(pop, "cert-check", G_CALLBACK(libbalsa_server_check_cert), pop);
+	g_signal_connect(pop, "auth", G_CALLBACK(libbalsa_server_get_auth), server);
 
 	/* connect server */
 	libbalsa_mailbox_progress_notify(mailbox, LIBBALSA_NTFY_INIT, INFINITY, _("Connecting %s…"), host);

@@ -112,9 +112,9 @@ filters_export_dialog(GtkWindow * parent)
         gtk_tree_selection_select_iter(selection, &iter);
     }
 
-    g_signal_connect(G_OBJECT(fex_window), "response",
+    g_signal_connect(fex_window, "response",
                      G_CALLBACK(fex_dialog_response), list);
-    g_signal_connect(G_OBJECT(fex_window), "destroy",
+    g_signal_connect(fex_window, "destroy",
 		     G_CALLBACK(fex_destroy_window_cb), NULL);
 
     gtk_widget_show_all(GTK_WIDGET(fex_window));

@@ -687,7 +687,7 @@ libbalsa_mailbox_progress_notify(LibBalsaMailbox       *mailbox,
     } else {
     	full_msg = NULL;
     }
-    g_signal_emit(G_OBJECT(mailbox), libbalsa_mailbox_signals[PROGRESS_NOTIFY], 0, (gint) action, fraction, full_msg);
+    g_signal_emit(mailbox, libbalsa_mailbox_signals[PROGRESS_NOTIFY], 0, (gint) action, fraction, full_msg);
 	g_free(full_msg);
 }
 

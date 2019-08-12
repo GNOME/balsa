@@ -59,7 +59,7 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
     no = gtk_radio_button_new_with_mnemonic_from_widget(GTK_RADIO_BUTTON(yes),
                                                          _("_No"));    
 
-    g_signal_connect(G_OBJECT(yes), "toggled",
+    g_signal_connect(yes, "toggled",
                        G_CALLBACK(balsa_druid_page_defclient_toggle),
                        defclient);
 

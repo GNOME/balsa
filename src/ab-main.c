@@ -740,9 +740,9 @@ bab_window_list_new(void)
     g_object_unref(store);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
-    g_signal_connect(G_OBJECT(selection), "changed",
+    g_signal_connect(selection, "changed",
                      G_CALLBACK(list_selection_changed_cb), NULL);
-    g_signal_connect(G_OBJECT(tree), "row-activated",
+    g_signal_connect(tree, "row-activated",
                      G_CALLBACK(list_row_activated_cb), NULL);
 
     renderer = gtk_cell_renderer_text_new();
@@ -758,7 +758,7 @@ bab_window_list_new(void)
                         GDK_BUTTON1_MASK,
                         libbalsa_address_target_list, 2,
                         GDK_ACTION_COPY);
-    g_signal_connect(G_OBJECT(tree), "drag-data-get",
+    g_signal_connect(tree, "drag-data-get",
                      G_CALLBACK(addrlist_drag_get_cb), NULL);
 
     renderer = gtk_cell_renderer_text_new();
@@ -852,17 +852,17 @@ bab_get_edit_button_box(struct ABMainWindow *abmw)
     gtk_container_add(GTK_CONTAINER(box),
                       abmw->apply_button =
                       gtk_button_new_with_mnemonic(_("_Apply")));
-    g_signal_connect(G_OBJECT(abmw->apply_button), "clicked",
+    g_signal_connect(abmw->apply_button, "clicked",
                      G_CALLBACK(apply_button_cb), (gpointer) NULL);
     gtk_container_add(GTK_CONTAINER(box),
                       abmw->remove_button =
                       gtk_button_new_with_mnemonic(_("_Remove")));
-    g_signal_connect(G_OBJECT(abmw->remove_button), "clicked",
+    g_signal_connect(abmw->remove_button, "clicked",
                      G_CALLBACK(remove_button_cb), (gpointer) NULL);
     gtk_container_add(GTK_CONTAINER(box),
                       abmw->cancel_button =
                       gtk_button_new_with_mnemonic(_("_Cancel")));
-    g_signal_connect(G_OBJECT(abmw->cancel_button), "clicked",
+    g_signal_connect(abmw->cancel_button, "clicked",
                      G_CALLBACK(cancel_button_cb), abmw);
     return box;
 }
@@ -903,13 +903,13 @@ bab_get_filter_box(void)
                                                    GTK_ICON_SIZE_BUTTON));
     gtk_box_pack_start(GTK_BOX(search_hbox), button, FALSE, FALSE, 1);
 
-    g_signal_connect(G_OBJECT(find_entry), "activate",
+    g_signal_connect(find_entry, "activate",
                      G_CALLBACK(bab_filter_entry_activate),
                      button);
-    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+    g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(bab_filter_entry_activate),
                              find_entry);
-    g_signal_connect(G_OBJECT(find_entry), "changed",
+    g_signal_connect(find_entry, "changed",
                              G_CALLBACK(bab_filter_entry_changed),
                              button);
     return search_hbox;
@@ -979,7 +979,7 @@ bab_window_new(GtkApplication * application)
 			     gtk_label_new(_("Edit")));
 
     /*
-    g_signal_connect(G_OBJECT(find_entry), "changed",
+    g_signal_connect(find_entry, "changed",
 		     G_CALLBACK(balsa_ab_window_find), ab);
     */
     g_signal_connect(wnd, "key-press-event",
@@ -1140,9 +1140,9 @@ main(int argc, char *argv[])
 
     ab_window = bab_window_new(application);
 
-    g_signal_connect(G_OBJECT(ab_window), "destroy",
+    g_signal_connect(ab_window, "destroy",
                      G_CALLBACK(bab_cleanup), NULL);
-    g_signal_connect(G_OBJECT(ab_window), "delete-event",
+    g_signal_connect(ab_window, "delete-event",
                      G_CALLBACK(bab_delete_ok), NULL);
     bab_set_intial_address_book(ab, ab_window);
 

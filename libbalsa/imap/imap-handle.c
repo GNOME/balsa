@@ -718,8 +718,8 @@ imap_mbox_connect(ImapMboxHandle* handle)
 
   handle->sio = net_client_siobuf_new(handle->host,
 	  handle->tls_mode == NET_CLIENT_CRYPT_ENCRYPTED ? 993 : 143);
-  g_signal_connect(G_OBJECT(handle->sio), "auth", handle->auth_cb, handle->auth_arg);
-  g_signal_connect(G_OBJECT(handle->sio), "cert-check", handle->cert_cb, handle->sio);
+  g_signal_connect(handle->sio, "auth", handle->auth_cb, handle->auth_arg);
+  g_signal_connect(handle->sio, "cert-check", handle->cert_cb, handle->sio);
   /* FIXME - client certificate? */
   if (!net_client_connect(NET_CLIENT(handle->sio), &error)) {
 	imap_mbox_handle_set_msg(handle, _("Connecting %s failed: %s"), handle->host, error_safe(error));
@@ -867,7 +867,7 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
 
   g_mutex_lock(&handle->mutex);
   /* FIXME: block other list response signals here? */
-  handler_id = g_signal_connect(G_OBJECT(handle), "list-response",
+  handler_id = g_signal_connect(handle, "list-response",
 				G_CALLBACK(get_delim),
 				&delim);
 
@@ -876,7 +876,7 @@ imap_mbox_handle_get_delim(ImapMboxHandle* handle,
   g_free(mbx7);
   imap_cmd_exec(handle, cmd); /* ignore return code.. */
   g_free(cmd);
-  g_signal_handler_disconnect(G_OBJECT(handle), handler_id);
+  g_signal_handler_disconnect(handle, handler_id);
   g_mutex_unlock(&handle->mutex);
   return delim;
 
@@ -2485,7 +2485,7 @@ ir_list_lsub(ImapMboxHandle *h, ImapHandleSignal signal)
   s = imap_get_astring(h->sio, &c);
   mbx = imap_mailbox_to_utf8(s);
   rc = ir_check_crlf(h, c);
-  g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[signal],
+  g_signal_emit(h, imap_mbox_handle_signals[signal],
                 0, delim, flags, mbx);
   g_free(s);
   g_free(mbx);
@@ -2656,7 +2656,7 @@ ir_exists(ImapMboxHandle *h, unsigned seqno)
   imap_mbox_resize_cache(h, seqno);
   mbox_view_resize(&h->mbox_view, old_exists, seqno);
 
-  g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[EXISTS_NOTIFY], 0);
+  g_signal_emit(h, imap_mbox_handle_signals[EXISTS_NOTIFY], 0);
                 
   return rc;
 }
@@ -2673,7 +2673,7 @@ static ImapResponse
 ir_expunge(ImapMboxHandle *h, unsigned seqno)
 {
   ImapResponse rc = ir_check_crlf(h, sio_getc(h->sio));
-  g_signal_emit(G_OBJECT(h), imap_mbox_handle_signals[EXPUNGE_NOTIFY],
+  g_signal_emit(h, imap_mbox_handle_signals[EXPUNGE_NOTIFY],
 		0, seqno);
   
   g_array_remove_index(h->flag_cache, seqno-1);

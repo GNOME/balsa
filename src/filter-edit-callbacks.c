@@ -924,7 +924,7 @@ add_button(GtkWidget *grid, const char *label, int col,
     GtkWidget* button = gtk_button_new_with_mnemonic(label);
     gtk_widget_set_hexpand(button, TRUE);
     gtk_grid_attach(GTK_GRID(grid), button, col, 4, 1, 1);
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
                      action,
                      GINT_TO_POINTER(p));
 }
@@ -934,7 +934,7 @@ add_check(GtkWidget *grid, const char *label, int col, int row)
     GtkWidget* res = gtk_check_button_new_with_mnemonic(label);
     gtk_widget_set_hexpand(res, TRUE);
     gtk_grid_attach(GTK_GRID(grid), res, col, row, 1, 1);
-    g_signal_connect(G_OBJECT(res), "toggled",
+    g_signal_connect(res, "toggled",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
     return res;
 }
@@ -969,14 +969,14 @@ get_field_frame(void)
         gtk_check_button_new_with_mnemonic(_("_User header:"));
     gtk_widget_set_hexpand(fe_matching_fields_us_head, TRUE);
     gtk_grid_attach(GTK_GRID(grid), fe_matching_fields_us_head, 0, 3, 1, 1);
-    g_signal_connect(G_OBJECT(fe_matching_fields_us_head), "toggled",
+    g_signal_connect(fe_matching_fields_us_head, "toggled",
                      G_CALLBACK(fe_match_field_user_header_cb), NULL);
 
     fe_user_header = gtk_combo_box_text_new_with_entry();
     for (list = fe_user_headers_list; list; list = list->next)
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(fe_user_header),
                                        list->data);
-    g_signal_connect(G_OBJECT(fe_user_header), "changed",
+    g_signal_connect(fe_user_header, "changed",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
     gtk_widget_set_hexpand(fe_user_header, TRUE);
     gtk_grid_attach(GTK_GRID(grid), fe_user_header, 1, 3, 1, 1);
@@ -1020,7 +1020,7 @@ build_type_notebook()
     gtk_widget_set_hexpand(fe_type_simple_label, TRUE);
     gtk_grid_attach(GTK_GRID(grid), fe_type_simple_label, 0, 0, 1, 1);
     fe_type_simple_entry = gtk_entry_new();
-    g_signal_connect(G_OBJECT(fe_type_simple_entry), "changed",
+    g_signal_connect(fe_type_simple_entry, "changed",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
     gtk_widget_set_hexpand(fe_type_simple_entry, TRUE);
     gtk_grid_attach(GTK_GRID(grid), fe_type_simple_entry, 0, 1, 1, 1);
@@ -1028,7 +1028,7 @@ build_type_notebook()
 				  fe_type_simple_entry);
 
     button = gtk_button_new_with_mnemonic(_("Contain/Does _Not Contain"));
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
     gtk_widget_set_hexpand(button, TRUE);
     gtk_grid_attach(GTK_GRID(grid), button, 0, 2, 1, 1);
@@ -1076,15 +1076,15 @@ build_type_notebook()
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
     button = gtk_button_new_with_mnemonic(_("A_dd"));
     gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_add_pressed), NULL);
     fe_regex_remove_button = gtk_button_new_with_mnemonic(_("_Remove"));
     gtk_box_pack_start(GTK_BOX(box), fe_regex_remove_button, TRUE, TRUE, 0);
-    g_signal_connect(G_OBJECT(fe_regex_remove_button), "clicked",
+    g_signal_connect(fe_regex_remove_button, "clicked",
                      G_CALLBACK(fe_remove_pressed), NULL);
     button = gtk_button_new_with_mnemonic(_("One _Matches/None Matches"));
     gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
 
     fe_type_regex_entry = gtk_entry_new();
@@ -1112,18 +1112,18 @@ build_type_notebook()
     gtk_grid_attach(GTK_GRID(page), fe_type_date_label, 0, 0, 2, 1);
     fe_type_date_low_entry = gtk_entry_new();
     gtk_widget_set_hexpand(fe_type_date_low_entry, TRUE);
-    g_signal_connect(G_OBJECT(fe_type_date_low_entry), "changed",
+    g_signal_connect(fe_type_date_low_entry, "changed",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
     gtk_grid_attach(GTK_GRID(page), fe_type_date_low_entry, 0, 1, 1, 1);
     fe_type_date_high_entry = gtk_entry_new();
     gtk_widget_set_hexpand(fe_type_date_high_entry, TRUE);
-    g_signal_connect(G_OBJECT(fe_type_date_high_entry), "changed",
+    g_signal_connect(fe_type_date_high_entry, "changed",
                      G_CALLBACK(fe_condition_changed_cb), NULL);
     gtk_grid_attach(GTK_GRID(page), fe_type_date_high_entry, 1, 1, 1, 1);
 
     button = gtk_button_new_with_label(_("Inside/outside the date interval"));
     gtk_widget_set_hexpand(button, TRUE);
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
     gtk_grid_attach(GTK_GRID(page), button, 0, 2, 2, 1);
 
@@ -1164,7 +1164,7 @@ build_type_notebook()
         }
     button = gtk_button_new_with_label(_("Match when one flag is set/when no flag is set"));
     gtk_widget_set_hexpand(button, TRUE);
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
     gtk_grid_attach(GTK_GRID(page),
                      button,
@@ -1253,7 +1253,7 @@ fe_edit_condition(GtkWidget * throwaway,gpointer is_new_cnd)
         g_object_add_weak_pointer(G_OBJECT(condition_dialog),
                                   (gpointer *) &condition_dialog);
 
-        g_signal_connect(G_OBJECT(condition_dialog), "response",
+        g_signal_connect(condition_dialog, "response",
                          G_CALLBACK(condition_dialog_response), NULL);
         /* Now we build the dialog*/
         build_condition_dialog(condition_dialog);

@@ -421,11 +421,11 @@ libbalsa_scanner_imap_dir(gpointer rnode, LibBalsaServer * server,
  					     g_free, NULL);
 
     list_handler_id =
-        g_signal_connect(G_OBJECT(handle), "list-response",
+        g_signal_connect(handle, "list-response",
                          G_CALLBACK(libbalsa_imap_list_cb),
                          (gpointer) & state);
     lsub_handler_id = subscribed ?
-        g_signal_connect(G_OBJECT(handle), "lsub-response",
+        g_signal_connect(handle, "lsub-response",
                          G_CALLBACK(libbalsa_imap_lsub_cb),
                          (gpointer) & state) : 0;
 
@@ -443,9 +443,9 @@ libbalsa_scanner_imap_dir(gpointer rnode, LibBalsaServer * server,
                          check_imap_path, &i, error);
     g_hash_table_destroy(state.subfolders);
 
-    g_signal_handler_disconnect(G_OBJECT(handle), list_handler_id);
+    g_signal_handler_disconnect(handle, list_handler_id);
     if (lsub_handler_id)
-        g_signal_handler_disconnect(G_OBJECT(handle), lsub_handler_id);
+        g_signal_handler_disconnect(handle, lsub_handler_id);
     libbalsa_imap_server_release_handle(LIBBALSA_IMAP_SERVER(server), handle);
 }
 
@@ -569,15 +569,15 @@ imap_tree_scan(scan_data_t *scan_data,
 {
 	gulong list_handler_id;
 
-	list_handler_id = g_signal_connect(G_OBJECT(scan_data->handle), "list-response", G_CALLBACK(imap_tree_scan_list_cb), folders);
+	list_handler_id = g_signal_connect(scan_data->handle, "list-response", G_CALLBACK(imap_tree_scan_list_cb), folders);
 	imap_mbox_list(scan_data->handle, list_path);
-	g_signal_handler_disconnect(G_OBJECT(scan_data->handle), list_handler_id);
+	g_signal_handler_disconnect(scan_data->handle, list_handler_id);
 
 	if (scan_data->subscriptions) {
 		list_handler_id =
-			g_signal_connect(G_OBJECT(scan_data->handle), "lsub-response", G_CALLBACK(imap_tree_scan_lsub_cb), folders);
+			g_signal_connect(scan_data->handle, "lsub-response", G_CALLBACK(imap_tree_scan_lsub_cb), folders);
 		imap_mbox_lsub(scan_data->handle, list_path);
-		g_signal_handler_disconnect(G_OBJECT(scan_data->handle), list_handler_id);
+		g_signal_handler_disconnect(scan_data->handle, list_handler_id);
 	}
 
 	g_hash_table_foreach(folders, (GHFunc) imap_tree_scan_children, scan_data);

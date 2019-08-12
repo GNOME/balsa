@@ -246,7 +246,7 @@ pm_combo_box_new(void)
 
     g_object_set_data_full(G_OBJECT(combo_box), PM_COMBO_BOX_INFO, info,
                            (GDestroyNotify) pm_combo_box_info_free);
-    g_signal_connect(G_OBJECT(combo_box), "changed",
+    g_signal_connect(combo_box, "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     return combo_box;
@@ -1050,7 +1050,7 @@ create_pref_option_menu(const gchar * names[], gint size, gint * index)
     gint i;
 
     combo_box = pm_combo_box_new();
-    g_signal_connect(G_OBJECT(combo_box), "changed",
+    g_signal_connect(combo_box, "changed",
                      G_CALLBACK(option_menu_cb), index);
 
     for (i = 0; i < size; i++)
@@ -1712,11 +1712,11 @@ server_add_menu_widget(void)
 
     menu = gtk_menu_new();
     menuitem = gtk_menu_item_new_with_label(_("Remote POP3 mailbox…"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
                      G_CALLBACK(pop3_add_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     menuitem = gtk_menu_item_new_with_label(_("Remote IMAP folder…"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
 		     G_CALLBACK(folder_conf_add_imap_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
@@ -2009,7 +2009,7 @@ pm_grid_add_remote_mailbox_servers_group(GtkWidget * grid_widget)
 
     gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
 
-    g_signal_connect(G_OBJECT(pui->mail_servers), "row-activated",
+    g_signal_connect(pui->mail_servers, "row-activated",
                      G_CALLBACK(server_edit_cb), NULL);
 
     pm_grid_attach(grid, scrolledwindow, 1, ++row, 1, 1);
@@ -2097,7 +2097,7 @@ pm_grid_add_outgoing_mail_group(GtkWidget * grid_widget)
 
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
 
-    g_signal_connect(G_OBJECT(pui->smtp_servers), "row-activated",
+    g_signal_connect(pui->smtp_servers, "row-activated",
                      G_CALLBACK(smtp_server_edit_cb), NULL);
 
     pm_grid_attach(grid, scrolled_window, 1, ++row, 1, 1);
@@ -3364,31 +3364,31 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_dialog_set_response_sensitive(GTK_DIALOG(property_box),
                                       GTK_RESPONSE_APPLY, FALSE);
 
-    g_signal_connect(G_OBJECT(pui->recv_progress_dlg), "toggled",
+    g_signal_connect(pui->recv_progress_dlg, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->send_progress_dlg), "toggled",
+    g_signal_connect(pui->send_progress_dlg, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->previewpane), "toggled",
+    g_signal_connect(pui->previewpane, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->layout_type), "changed",
+    g_signal_connect(pui->layout_type, "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->view_message_on_open), "toggled",
+    g_signal_connect(pui->view_message_on_open, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->ask_before_select), "toggled",
+    g_signal_connect(pui->ask_before_select, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->pgdownmod), "toggled",
+    g_signal_connect(pui->pgdownmod, "toggled",
                      G_CALLBACK(pgdown_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->pgdown_percent), "changed",
+    g_signal_connect(pui->pgdown_percent, "changed",
                      G_CALLBACK(pgdown_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->debug), "toggled",
+    g_signal_connect(pui->debug, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->mblist_show_mb_content_info), "toggled",
+    g_signal_connect(pui->mblist_show_mb_content_info, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 #if !(HAVE_GSPELL || HAVE_GTKSPELL)
-    g_signal_connect(G_OBJECT(pui->spell_check_sig), "toggled",
+    g_signal_connect(pui->spell_check_sig, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->spell_check_quoted), "toggled",
+    g_signal_connect(pui->spell_check_quoted, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 #endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
 
@@ -3397,149 +3397,149 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_idle_add_full(G_PRIORITY_LOW,
                     (GSourceFunc) open_preferences_manager_idle,
                     NULL, NULL);
-    g_signal_connect(G_OBJECT(pui->check_mail_auto), "toggled",
+    g_signal_connect(pui->check_mail_auto, "toggled",
                      G_CALLBACK(timer_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->check_mail_minutes), "changed",
+    g_signal_connect(pui->check_mail_minutes, "changed",
                      G_CALLBACK(timer_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->quiet_background_check), "toggled",
+    g_signal_connect(pui->quiet_background_check, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->msg_size_limit), "changed",
+    g_signal_connect(pui->msg_size_limit, "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->check_imap), "toggled",
+    g_signal_connect(pui->check_imap, "toggled",
                      G_CALLBACK(imap_toggled_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->check_imap_inbox), "toggled",
+    g_signal_connect(pui->check_imap_inbox, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->notify_new_mail_dialog), "toggled",
+    g_signal_connect(pui->notify_new_mail_dialog, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->notify_new_mail_sound), "toggled",
+    g_signal_connect(pui->notify_new_mail_sound, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->notify_new_mail_icon), "toggled",
+    g_signal_connect(pui->notify_new_mail_icon, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->close_mailbox_auto), "toggled",
+    g_signal_connect(pui->close_mailbox_auto, "toggled",
                      G_CALLBACK(mailbox_close_timer_modified_cb),
                      property_box);
-    g_signal_connect(G_OBJECT(pui->close_mailbox_minutes), "changed",
+    g_signal_connect(pui->close_mailbox_minutes, "changed",
                      G_CALLBACK(mailbox_close_timer_modified_cb),
                      property_box);
 
-    g_signal_connect(G_OBJECT(pui->hide_deleted), "toggled",
+    g_signal_connect(pui->hide_deleted, "toggled",
                      G_CALLBACK(filter_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->expunge_on_close), "toggled",
+    g_signal_connect(pui->expunge_on_close, "toggled",
                      G_CALLBACK(expunge_on_close_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->expunge_auto), "toggled",
+    g_signal_connect(pui->expunge_auto, "toggled",
                      G_CALLBACK(expunge_auto_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->expunge_minutes), "changed",
+    g_signal_connect(pui->expunge_minutes, "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->browse_wrap), "toggled",
+    g_signal_connect(pui->browse_wrap, "toggled",
                      G_CALLBACK(browse_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->browse_wrap_length), "changed",
+    g_signal_connect(pui->browse_wrap_length, "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->wordwrap), "toggled",
+    g_signal_connect(pui->wordwrap, "toggled",
                      G_CALLBACK(wrap_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->wraplength), "changed",
+    g_signal_connect(pui->wraplength, "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->always_queue_sent_mail), "toggled",
+    g_signal_connect(pui->always_queue_sent_mail, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->send_mail_auto), "toggled",
+    g_signal_connect(pui->send_mail_auto, "toggled",
                      G_CALLBACK(send_timer_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->send_mail_minutes), "changed",
+    g_signal_connect(pui->send_mail_minutes, "changed",
                      G_CALLBACK(send_timer_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->copy_to_sentbox), "toggled",
+    g_signal_connect(pui->copy_to_sentbox, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->autoquote), "toggled",
+    g_signal_connect(pui->autoquote, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->reply_include_html_parts), "toggled",
+    g_signal_connect(pui->reply_include_html_parts, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->forward_attached), "toggled",
+    g_signal_connect(pui->forward_attached, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* external editor */
-    g_signal_connect(G_OBJECT(pui->edit_headers), "toggled",
+    g_signal_connect(pui->edit_headers, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* arp */
-    g_signal_connect(G_OBJECT(pui->quote_str), "changed",
+    g_signal_connect(pui->quote_str, "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->mark_quoted), "toggled",
+    g_signal_connect(pui->mark_quoted, "toggled",
                      G_CALLBACK(mark_quoted_modified_cb),
                      property_box);
-    g_signal_connect(G_OBJECT(pui->quote_pattern), "changed",
+    g_signal_connect(pui->quote_pattern, "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* multipart/alternative */
-    g_signal_connect(G_OBJECT(pui->display_alt_plain), "toggled",
+    g_signal_connect(pui->display_alt_plain, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* convert 8-bit text with no charset header */
-    g_signal_connect(G_OBJECT(pui->convert_unknown_8bit_codeset),
+    g_signal_connect(pui->convert_unknown_8bit_codeset,
                      "changed", G_CALLBACK(properties_modified_cb),
                      property_box);
 
     /* message font */
-    g_signal_connect(G_OBJECT(pui->use_system_fonts), "toggled",
+    g_signal_connect(pui->use_system_fonts, "toggled",
                      G_CALLBACK(use_system_fonts_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->message_font_button), "font-set",
+    g_signal_connect(pui->message_font_button, "font-set",
                      G_CALLBACK(font_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->subject_font_button), "font-set",
+    g_signal_connect(pui->subject_font_button, "font-set",
                      G_CALLBACK(font_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->use_default_font_size), "toggled",
+    g_signal_connect(pui->use_default_font_size, "toggled",
                      G_CALLBACK(default_font_size_cb), property_box);
 
 
-    g_signal_connect(G_OBJECT(pui->open_inbox_upon_startup), "toggled",
+    g_signal_connect(pui->open_inbox_upon_startup, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->check_mail_upon_startup), "toggled",
+    g_signal_connect(pui->check_mail_upon_startup, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->remember_open_mboxes), "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(G_OBJECT(pui->local_scan_depth), "changed",
-                     G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->imap_scan_depth), "changed",
+    g_signal_connect(pui->remember_open_mboxes, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->empty_trash), "toggled",
+    g_signal_connect(pui->local_scan_depth, "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+    g_signal_connect(pui->imap_scan_depth, "changed",
+                     G_CALLBACK(properties_modified_cb), property_box);
+
+    g_signal_connect(pui->empty_trash, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* threading */
-    g_signal_connect(G_OBJECT(pui->thread_messages_check), "toggled",
+    g_signal_connect(pui->thread_messages_check, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
-    g_signal_connect(G_OBJECT(pui->tree_expand_check), "toggled",
+    g_signal_connect(pui->tree_expand_check, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
 
     /* Date format */
-    g_signal_connect(G_OBJECT(pui->date_format), "changed",
+    g_signal_connect(pui->date_format, "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* Selected headers */
-    g_signal_connect(G_OBJECT(pui->selected_headers), "changed",
+    g_signal_connect(pui->selected_headers, "changed",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* Colour */
     for (i = 0; i < MAX_QUOTED_COLOR; i++)
-        g_signal_connect(G_OBJECT(pui->quoted_color[i]), "released",
+        g_signal_connect(pui->quoted_color[i], "released",
                          G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(G_OBJECT(pui->url_color), "released",
+    g_signal_connect(pui->url_color, "released",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* handling of message parts with 8-bit chars without codeset headers */
     for (i = 0; i < NUM_CONVERT_8BIT_MODES; i++)
-        g_signal_connect(G_OBJECT(pui->convert_unknown_8bit[i]), "toggled",
+        g_signal_connect(pui->convert_unknown_8bit[i], "toggled",
                          G_CALLBACK(convert_8bit_cb), property_box);
 
     /* Gnome Property Box Signals */
-    g_signal_connect(G_OBJECT(property_box), "response",
+    g_signal_connect(property_box, "response",
                      G_CALLBACK(response_cb), NULL);
 
     gtk_widget_show_all(GTK_WIDGET(property_box));

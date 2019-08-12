@@ -230,7 +230,7 @@ imap_mbox_select_unlocked(ImapMboxHandle* handle, const char *mbox,
 
     imap_mbox_resize_cache(handle, 0);
     mbox_view_dispose(&handle->mbox_view);
-    g_signal_emit_by_name(G_OBJECT(handle), "exists-notify");
+    g_signal_emit_by_name(handle, "exists-notify");
   }
 
   return rc;

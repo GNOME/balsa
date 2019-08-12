@@ -258,7 +258,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     g_object_set_data(G_OBJECT(selection), "dialog", dialog);
     g_object_set_data(G_OBJECT(selection), "first", GUINT_TO_POINTER(1));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
-    g_signal_connect(G_OBJECT(selection), "changed",
+    g_signal_connect(selection, "changed",
 		     G_CALLBACK(key_selection_changed_cb), &use_key);
 
     /* add the keys */

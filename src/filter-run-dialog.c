@@ -212,7 +212,7 @@ selected_filters_new(BalsaFilterRunDialog *p)
     renderer = gtk_cell_renderer_toggle_new();
     g_object_set_data(G_OBJECT(renderer), BALSA_FILTER_KEY,
                       GINT_TO_POINTER(INCOMING_COLUMN));
-    g_signal_connect(G_OBJECT(renderer), "toggled",
+    g_signal_connect(renderer, "toggled",
                      G_CALLBACK(selected_list_toggled), p);
     column = gtk_tree_view_column_new_with_attributes(_("On reception"),
                                                       renderer,
@@ -224,7 +224,7 @@ selected_filters_new(BalsaFilterRunDialog *p)
     renderer = gtk_cell_renderer_toggle_new();
     g_object_set_data(G_OBJECT(renderer), BALSA_FILTER_KEY,
                       GINT_TO_POINTER(CLOSING_COLUMN));
-    g_signal_connect(G_OBJECT(renderer), "toggled",
+    g_signal_connect(renderer, "toggled",
                      G_CALLBACK(selected_list_toggled), p);
     column = gtk_tree_view_column_new_with_attributes(_("On exit"),
                                                       renderer,
@@ -300,9 +300,9 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
                            _("_Help"), GTK_RESPONSE_HELP,
                            NULL);
 
-    g_signal_connect(G_OBJECT(p), "response",
+    g_signal_connect(p, "response",
                      G_CALLBACK(fr_dialog_response), NULL);
-    g_signal_connect(G_OBJECT(p), "destroy",
+    g_signal_connect(p, "destroy",
                      G_CALLBACK(fr_destroy_window_cb), NULL);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
@@ -316,7 +316,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     p->available_filters =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
                                  NULL, TRUE);
-    g_signal_connect(G_OBJECT(p->available_filters), "row-activated",
+    g_signal_connect(p->available_filters, "row-activated",
                      G_CALLBACK(available_list_activated), p);
 
     selection = gtk_tree_view_get_selection(p->available_filters);
@@ -341,7 +341,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     p->apply_selected_button = button =
             gtk_button_new_with_mnemonic(_("_Apply Selected"));
     gtk_widget_set_sensitive(button, FALSE);
-    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+    g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(fr_apply_selected_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
@@ -357,7 +357,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_widget_set_tooltip_text(button,
                                 _("Add selected filter to mailbox"));
     gtk_widget_set_sensitive(button, FALSE);
-    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+    g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(fr_add_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
@@ -367,7 +367,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_widget_set_tooltip_text(button,
                                 _("Remove selected filter from mailbox"));
     gtk_widget_set_sensitive(button, FALSE);
-    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+    g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(fr_remove_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
@@ -383,7 +383,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
                                    GTK_POLICY_AUTOMATIC);
 
     p->selected_filters = selected_filters_new(p);
-    g_signal_connect(G_OBJECT(p->selected_filters), "row-activated",
+    g_signal_connect(p->selected_filters, "row-activated",
                      G_CALLBACK(selected_list_activated), p);
 
     selection = gtk_tree_view_get_selection(p->selected_filters);
@@ -408,7 +408,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_set_tooltip_text(button,
                                 _("Move selected filter up"));
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
 		     G_CALLBACK(fr_up_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* down button */
@@ -418,14 +418,14 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_set_tooltip_text(button,
                                 _("Move selected filter down"));
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
 		     G_CALLBACK(fr_down_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     p->apply_now_button = button =
             gtk_button_new_with_mnemonic(_("A_pply Now!"));
     gtk_widget_set_sensitive(button, FALSE);
-    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+    g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(fr_apply_now_pressed), G_OBJECT(p));
     gtk_container_add(GTK_CONTAINER(bbox), button);
 

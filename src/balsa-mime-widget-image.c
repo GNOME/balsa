@@ -98,7 +98,7 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     mw = (BalsaMimeWidget *) mwi;
 
     mw->widget = gtk_event_box_new();
-    g_signal_connect(G_OBJECT(mw->widget), "button-press-event",
+    g_signal_connect(mw->widget, "button-press-event",
                      G_CALLBACK(balsa_image_button_press_cb), data);
 
     image = gtk_image_new_from_icon_name("image-missing",

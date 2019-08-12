@@ -376,10 +376,10 @@ imap_scan_attach_mailbox(BalsaMailboxNode * mbnode, imap_scan_item * isi)
 
     /* If the mailbox was added from the config file, it is already
      * connected to "show-prop-dialog". */
-    if (!g_signal_has_handler_pending(G_OBJECT(mbnode),
+    if (!g_signal_has_handler_pending(mbnode,
                                       balsa_mailbox_node_signals
                                       [SHOW_PROP_DIALOG], 0, FALSE))
-	g_signal_connect(G_OBJECT(mbnode), "show-prop-dialog",
+	g_signal_connect(mbnode, "show-prop-dialog",
                          G_CALLBACK(folder_conf_imap_sub_node), NULL);
     if (LIBBALSA_IS_MAILBOX_IMAP(mbnode->mailbox))
         /* it already has a mailbox */
@@ -518,7 +518,7 @@ balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox * mb)
     mbn = BALSA_MAILBOX_NODE(balsa_mailbox_node_new());
     mbn->mailbox = mb;
     load_mailbox_view(mbn);
-    g_signal_connect(G_OBJECT(mbn), "show-prop-dialog", 
+    g_signal_connect(mbn, "show-prop-dialog", 
 		     G_CALLBACK(mailbox_conf_edit), NULL);
     if (LIBBALSA_IS_MAILBOX_MH(mb) || LIBBALSA_IS_MAILBOX_MAILDIR(mb)) {
 	/* Mh and Maildir mailboxes are directories, and may be nested,
@@ -526,7 +526,7 @@ balsa_mailbox_node_new_from_mailbox(LibBalsaMailbox * mb)
 	mbn->name =
             g_strdup(libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mb));
 	mbn->dir = g_strdup(mbn->name);
-	g_signal_connect(G_OBJECT(mbn), "append-subtree", 
+	g_signal_connect(mbn, "append-subtree", 
                          G_CALLBACK(read_dir_cb), NULL);
     }
     return mbn;
@@ -541,9 +541,9 @@ balsa_mailbox_node_new_from_dir(const gchar* dir)
 
     mbn->name = g_strdup(dir);
     mbn->dir  = g_strdup(dir);
-    g_signal_connect(G_OBJECT(mbn), "show-prop-dialog", 
+    g_signal_connect(mbn, "show-prop-dialog", 
 		     G_CALLBACK(dir_conf_edit), NULL);
-    g_signal_connect(G_OBJECT(mbn), "append-subtree", 
+    g_signal_connect(mbn, "append-subtree", 
 		     G_CALLBACK(read_dir_cb), NULL);
     return mbn;
 }
@@ -568,11 +568,11 @@ balsa_mailbox_node_new_from_config(const gchar* group)
 
 	g_debug("Server loaded, host: %s, security %d.", libbalsa_server_get_host(folder->server),
 		libbalsa_server_get_security(folder->server));
-    g_signal_connect_swapped(G_OBJECT(folder->server), "config-changed", 
+    g_signal_connect_swapped(folder->server, "config-changed", 
                              G_CALLBACK(config_folder_update), folder);
-    g_signal_connect(G_OBJECT(folder), "show-prop-dialog", 
+    g_signal_connect(folder, "show-prop-dialog", 
 		     G_CALLBACK(folder_conf_imap_node), NULL);
-    g_signal_connect(G_OBJECT(folder), "append-subtree", 
+    g_signal_connect(folder, "append-subtree", 
 		     G_CALLBACK(imap_dir_cb), NULL);
     libbalsa_server_connect_signals(folder->server,
                                     G_CALLBACK(ask_password), NULL);
@@ -606,7 +606,7 @@ balsa_mailbox_node_new_imap_node(LibBalsaServer* s, const char*p)
 
     folder->server = s;
     folder->dir = g_strdup(p);
-    g_signal_connect(G_OBJECT(folder), "append-subtree", 
+    g_signal_connect(folder, "append-subtree", 
 		     G_CALLBACK(imap_dir_cb), NULL);
 
     return folder;
@@ -618,7 +618,7 @@ balsa_mailbox_node_new_imap_folder(LibBalsaServer* s, const char*p)
     BalsaMailboxNode * folder = balsa_mailbox_node_new_imap_node(s, p);
     g_assert(s);
 
-    g_signal_connect(G_OBJECT(folder), "show-prop-dialog", 
+    g_signal_connect(folder, "show-prop-dialog", 
 		     G_CALLBACK(folder_conf_imap_node), NULL);
     return folder;
 }
@@ -869,7 +869,7 @@ add_menu_entry(GtkWidget * menu, const gchar * label, GCallback cb,
 	: gtk_separator_menu_item_new();
 
     if (cb)
-	g_signal_connect(G_OBJECT(menuitem), "activate",
+	g_signal_connect(menuitem, "activate",
 			 G_CALLBACK(cb), mbnode);
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
@@ -992,7 +992,7 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
 
     menu = gtk_menu_new();
     /* it's a single-use menu, so we must destroy it when we're done */
-    g_signal_connect(G_OBJECT(menu), "selection-done",
+    g_signal_connect(menu, "selection-done",
                      G_CALLBACK(gtk_widget_destroy), NULL);
 
     submenu = gtk_menu_new();
@@ -1026,13 +1026,13 @@ balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
     /* If we didn't click on a mailbox node then there is only one option. */
     add_menu_entry(menu, NULL, NULL, NULL);
 
-    if (g_signal_has_handler_pending(G_OBJECT(mbnode),
+    if (g_signal_has_handler_pending(mbnode,
                                      balsa_mailbox_node_signals
                                      [SHOW_PROP_DIALOG], 0, FALSE))
         add_menu_entry(menu, _("_Properties…"),
                        G_CALLBACK(mb_conf_cb), mbnode);
 
-    if (g_signal_has_handler_pending(G_OBJECT(mbnode),
+    if (g_signal_has_handler_pending(mbnode,
 		                     balsa_mailbox_node_signals
 				     [APPEND_SUBTREE], 0, FALSE))
 	add_menu_entry(menu, _("_Rescan"),

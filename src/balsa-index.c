@@ -593,7 +593,7 @@ bndx_selection_changed(GtkTreeSelection * selection, BalsaIndex * index)
             gtk_tree_path_free(path);
 
             if (!update_preview) {
-                g_signal_emit(G_OBJECT(index), balsa_index_signals[INDEX_CHANGED], 0);
+                g_signal_emit(index, balsa_index_signals[INDEX_CHANGED], 0);
                 return;
             }
         }
@@ -665,7 +665,7 @@ bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
         BalsaSendmsg *sm =
             sendmsg_window_continue(mailbox, msgno);
         if (sm)
-            g_signal_connect(G_OBJECT(sm->window), "destroy",
+            g_signal_connect(sm->window, "destroy",
                              G_CALLBACK(sendmsg_window_destroy_cb), NULL);
     } else
         message_window_new(mailbox, msgno);
@@ -1548,7 +1548,7 @@ bndx_compose_foreach(BalsaIndex * index, SendType send_type)
         }
 
         if (sm != NULL) {
-            g_signal_connect(G_OBJECT(sm->window), "destroy",
+            g_signal_connect(sm->window, "destroy",
                              G_CALLBACK(sendmsg_window_destroy_cb), NULL);
         } else if (send_type == SEND_REPLY_GROUP) {
             ++skipped;
@@ -1607,7 +1607,7 @@ bndx_compose_from_list(BalsaIndex * index, SendType send_type)
                                      selected, send_type);
 
     balsa_index_selected_msgnos_free(index, selected);
-    g_signal_connect(G_OBJECT(sm->window), "destroy",
+    g_signal_connect(sm->window, "destroy",
                      G_CALLBACK(sendmsg_window_destroy_cb), NULL);
 }
 
@@ -2011,7 +2011,7 @@ create_stock_menu_item(GtkWidget * menu, const gchar * label, GCallback cb,
 {
     GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic(label);
 
-    g_signal_connect_swapped(G_OBJECT(menuitem), "activate",
+    g_signal_connect_swapped(menuitem, "activate",
                              G_CALLBACK(cb), data);
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
@@ -2210,7 +2210,7 @@ bndx_changed_find_row(BalsaIndex * index)
         index->prev_message = FALSE;
     }
 
-    g_signal_emit(G_OBJECT(index), balsa_index_signals[INDEX_CHANGED], 0);
+    g_signal_emit(index, balsa_index_signals[INDEX_CHANGED], 0);
 }
 
 /* Make the actual selection,

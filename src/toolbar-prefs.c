@@ -146,7 +146,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 #endif
     g_object_add_weak_pointer(G_OBJECT(customize_widget),
                               (gpointer *) & customize_widget);
-    g_signal_connect(G_OBJECT(customize_widget), "response",
+    g_signal_connect(customize_widget, "response",
                      G_CALLBACK(tp_dialog_response_cb), NULL);
 
     notebook = gtk_notebook_new();
@@ -204,7 +204,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
         gtk_check_button_new_with_mnemonic(_("_Wrap button labels"));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(wrap_button),
                                  balsa_app.toolbar_wrap_button_text);
-    g_signal_connect(G_OBJECT(wrap_button), "toggled",
+    g_signal_connect(wrap_button, "toggled",
                      G_CALLBACK(wrap_toggled_cb), notebook);
     gtk_box_pack_start(GTK_BOX(option_box), wrap_button, FALSE, FALSE, 0);
 
@@ -542,30 +542,30 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     gtk_container_add(GTK_CONTAINER(destination_scroll), page->current);
 
     /* UI signals */
-    g_signal_connect(G_OBJECT(page->available), "row-activated",
+    g_signal_connect(page->available, "row-activated",
                      G_CALLBACK(available_row_activated_cb), page);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(page->available));
-    g_signal_connect(G_OBJECT(selection), "changed",
+    g_signal_connect(selection, "changed",
 		       G_CALLBACK(available_selection_changed_cb), page);
 
-    g_signal_connect(G_OBJECT(page->current), "row-activated",
+    g_signal_connect(page->current, "row-activated",
                      G_CALLBACK(current_row_activated_cb), page);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(page->current));
-    g_signal_connect(G_OBJECT(selection), "changed",
+    g_signal_connect(selection, "changed",
 		       G_CALLBACK(current_selection_changed_cb), page);
 
-    g_signal_connect(G_OBJECT(page->add_button), "clicked",
+    g_signal_connect(page->add_button, "clicked",
 		       G_CALLBACK(add_button_cb), page);
-    g_signal_connect(G_OBJECT(page->remove_button), "clicked",
+    g_signal_connect(page->remove_button, "clicked",
 		       G_CALLBACK(remove_button_cb), page);
-    g_signal_connect(G_OBJECT(page->forward_button), "clicked",
+    g_signal_connect(page->forward_button, "clicked",
 		       G_CALLBACK(forward_button_cb), page);
-    g_signal_connect(G_OBJECT(page->back_button), "clicked",
+    g_signal_connect(page->back_button, "clicked",
 		       G_CALLBACK(back_button_cb), page);
 
-    g_signal_connect(G_OBJECT(page->standard_button), "clicked",
+    g_signal_connect(page->standard_button, "clicked",
 		       G_CALLBACK(standard_button_cb), page);
-    g_signal_connect(G_OBJECT(style_button), "clicked",
+    g_signal_connect(style_button, "clicked",
 		       G_CALLBACK(style_button_cb), page);
 
     gtk_widget_set_sensitive(page->add_button, FALSE);

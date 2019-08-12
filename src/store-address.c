@@ -114,7 +114,7 @@ balsa_store_address_from_messages(GList * messages)
                           (GWeakNotify) store_address_weak_notify, info);
     }
 
-    g_signal_connect(G_OBJECT(info->dialog), "response",
+    g_signal_connect(info->dialog, "response",
                      G_CALLBACK(store_address_response), info);
     gtk_widget_show(GTK_WIDGET(info->dialog));
 }
@@ -132,7 +132,7 @@ balsa_store_address(LibBalsaAddress *address)
 
     store_address_add_lbaddress(info, address);
 
-    g_signal_connect(G_OBJECT(info->dialog), "response",
+    g_signal_connect(info->dialog, "response",
                      G_CALLBACK(store_address_response), info);
     gtk_widget_show_all(GTK_WIDGET(info->dialog));
 }

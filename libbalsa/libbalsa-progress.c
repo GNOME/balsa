@@ -185,8 +185,8 @@ libbalsa_progress_dialog_ensure_real(ProgressDialog *progress_dialog,
         hints.max_height = -1;
         gtk_window_set_geometry_hints(GTK_WINDOW(progress_dialog->dialog), NULL, &hints, GDK_HINT_MIN_SIZE + GDK_HINT_MAX_SIZE);
         gtk_window_set_resizable(GTK_WINDOW(progress_dialog->dialog), FALSE);
-        g_signal_connect(G_OBJECT(progress_dialog->dialog), "response", G_CALLBACK(progress_dialog_response_cb), NULL);
-        g_signal_connect(G_OBJECT(progress_dialog->dialog), "destroy", G_CALLBACK(progress_dialog_destroy_cb), progress_dialog);
+        g_signal_connect(progress_dialog->dialog, "response", G_CALLBACK(progress_dialog_response_cb), NULL);
+        g_signal_connect(progress_dialog->dialog, "destroy", G_CALLBACK(progress_dialog_destroy_cb), progress_dialog);
 
     	content_box = gtk_dialog_get_content_area(GTK_DIALOG(progress_dialog->dialog));
     	gtk_box_set_spacing(GTK_BOX(content_box), 6);
@@ -299,7 +299,7 @@ create_progress_widget(const gchar *progress_id)
 	gtk_revealer_set_reveal_child(GTK_REVEALER(widget_data->revealer), FALSE);
 	gtk_widget_set_name(widget_data->revealer, progress_id);
 	g_object_set_data_full(G_OBJECT(widget_data->revealer), "data", widget_data, g_free);
-    g_signal_connect(G_OBJECT(widget_data->revealer), "destroy", G_CALLBACK(progress_data_destroy_cb), widget_data);
+    g_signal_connect(widget_data->revealer, "destroy", G_CALLBACK(progress_data_destroy_cb), widget_data);
 
 	box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
 	gtk_container_add(GTK_CONTAINER(widget_data->revealer), box);

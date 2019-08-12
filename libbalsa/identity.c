@@ -967,7 +967,7 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
                      G_CALLBACK(md_name_changed), tree);
 
     path = g_object_get_data(G_OBJECT(dialog), "identity-sigpath");
-    g_signal_connect(g_object_get_data(G_OBJECT(path),
+    g_signal_connect(g_object_get_data(path,
                                        LIBBALSA_IDENTITY_CHECK),
                      "toggled",
                      G_CALLBACK(md_sig_path_changed_cb), dialog);

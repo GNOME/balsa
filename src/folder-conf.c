@@ -225,7 +225,7 @@ folder_conf_clicked_ok(FolderDialogData * folder_data)
     BalsaMailboxNode *mbnode = folder_data->common_data.mbnode;
 
     if (mbnode == NULL) {
-        g_signal_connect(G_OBJECT(folder_data->server), "get-password",
+        g_signal_connect(folder_data->server, "get-password",
                          G_CALLBACK(ask_password), NULL);
     }
 
@@ -545,7 +545,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
                                     mn ? GTK_RESPONSE_OK 
                                     : GTK_RESPONSE_CANCEL);
 
-    g_signal_connect(G_OBJECT(folder_data->common_data.dialog), "response",
+    g_signal_connect(folder_data->common_data.dialog, "response",
                      G_CALLBACK(folder_conf_response), folder_data);
 }
 
@@ -905,7 +905,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     gtk_entry_set_text(GTK_ENTRY(sub_folder_data->parent_folder), sub_folder_data->old_parent);
 
     button = gtk_button_new_with_mnemonic(_("_Browse…"));
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
 		     G_CALLBACK(browse_button_cb), (gpointer) sub_folder_data);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
@@ -1028,7 +1028,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 
     gtk_widget_grab_focus(sub_folder_data->folder_name);
 
-    g_signal_connect(G_OBJECT(sub_folder_data->common_data.dialog), "response",
+    g_signal_connect(sub_folder_data->common_data.dialog, "response",
                      G_CALLBACK(folder_conf_response), sub_folder_data);
     gtk_dialog_set_response_sensitive(GTK_DIALOG(sub_folder_data->common_data.dialog),
                                       GTK_RESPONSE_OK, FALSE);

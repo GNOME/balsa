@@ -636,10 +636,10 @@ message_prefs_widget(GtkPrintOperation * operation,
 			   gtk_page_setup_get_page_height(pg_setup, GTK_UNIT_POINTS), 
 			   balsa_app.margin_bottom,
 			   GTK_GRID(grid), 1);
-    g_signal_connect(G_OBJECT(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_top))),
+    g_signal_connect(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_top)),
 		     "value-changed", G_CALLBACK(check_margins),
 		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_bottom)));
-    g_signal_connect(G_OBJECT(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_bottom))),
+    g_signal_connect(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_bottom)),
 		     "value-changed", G_CALLBACK(check_margins),
 		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_top)));
     print_prefs->margin_left =
@@ -654,10 +654,10 @@ message_prefs_widget(GtkPrintOperation * operation,
 			   gtk_page_setup_get_page_width(pg_setup, GTK_UNIT_POINTS), 
 			   balsa_app.margin_right,
 			   GTK_GRID(grid), 3);
-    g_signal_connect(G_OBJECT(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_left))),
+    g_signal_connect(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_left)),
 		     "value-changed", G_CALLBACK(check_margins),
 		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_right)));
-    g_signal_connect(G_OBJECT(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_right))),
+    g_signal_connect(gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_right)),
 		     "value-changed", G_CALLBACK(check_margins),
 		     gtk_spin_button_get_adjustment(GTK_SPIN_BUTTON(print_prefs->margin_left)));
 

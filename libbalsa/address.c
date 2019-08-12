@@ -1043,11 +1043,11 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
     if (changed_cb) {
         GtkWidget *tree_view = gtk_bin_get_child(GTK_BIN(entries[EMAIL_ADDRESS]));
         GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
-        g_signal_connect_swapped(G_OBJECT(model), "row-inserted",
+        g_signal_connect_swapped(model, "row-inserted",
                                  changed_cb, changed_data);
-        g_signal_connect_swapped(G_OBJECT(model), "row-changed",
+        g_signal_connect_swapped(model, "row-changed",
                                  changed_cb, changed_data);
-        g_signal_connect_swapped(G_OBJECT(model), "row-deleted",
+        g_signal_connect_swapped(model, "row-deleted",
                                  changed_cb, changed_data);
     }
     return grid;

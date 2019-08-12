@@ -530,7 +530,7 @@ net_client_start_tls(NetClient *client, GError **error)
 			if (priv->certificate != NULL) {
 				g_tls_connection_set_certificate(G_TLS_CONNECTION(priv->tls_conn), priv->certificate);
 			}
-			(void) g_signal_connect(G_OBJECT(priv->tls_conn), "accept-certificate", G_CALLBACK(cert_accept_cb), client);
+			(void) g_signal_connect(priv->tls_conn, "accept-certificate", G_CALLBACK(cert_accept_cb), client);
 			result = g_tls_connection_handshake(G_TLS_CONNECTION(priv->tls_conn), NULL, error);
 			if (result) {
 				g_filter_input_stream_set_close_base_stream(G_FILTER_INPUT_STREAM(priv->istream), FALSE);

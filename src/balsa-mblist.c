@@ -404,9 +404,9 @@ balsa_mblist_init(BalsaMBList * mblist)
                                            bmbl_selection_func, NULL,
                                            NULL);
 
-    g_signal_connect_after(G_OBJECT(tree_view), "row-expanded",
+    g_signal_connect_after(tree_view, "row-expanded",
                            G_CALLBACK(bmbl_tree_expand), NULL);
-    g_signal_connect(G_OBJECT(tree_view), "row-collapsed",
+    g_signal_connect(tree_view, "row-collapsed",
                      G_CALLBACK(bmbl_tree_collapse), NULL);
 
     g_object_set(mblist,
@@ -1255,9 +1255,9 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
 {
     GtkTreeSelection *selection;
 
-    g_signal_connect(G_OBJECT(mblist), "button_press_event",
+    g_signal_connect(mblist, "button_press_event",
                      G_CALLBACK(bmbl_button_press_cb), NULL);
-    g_signal_connect_after(G_OBJECT(mblist), "size-allocate",
+    g_signal_connect_after(mblist, "size-allocate",
                            G_CALLBACK(bmbl_column_resize), NULL);
     gtk_tree_view_enable_model_drag_dest(GTK_TREE_VIEW(mblist),
                                          bmbl_drop_types,
@@ -1265,13 +1265,13 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
                                          GDK_ACTION_DEFAULT |
                                          GDK_ACTION_COPY |
                                          GDK_ACTION_MOVE);
-    g_signal_connect(G_OBJECT(mblist), "drag-data-received",
+    g_signal_connect(mblist, "drag-data-received",
                      G_CALLBACK(bmbl_drag_cb), NULL);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
-    g_signal_connect(G_OBJECT(selection), "changed",
+    g_signal_connect(selection, "changed",
                      G_CALLBACK(bmbl_select_mailbox), NULL);
-    g_signal_connect(G_OBJECT(mblist), "row-activated",
+    g_signal_connect(mblist, "row-activated",
                      G_CALLBACK(bmbl_row_activated_cb), NULL);
 }
 
@@ -1353,7 +1353,7 @@ bmbl_store_redraw_mbnode(GtkTreeIter * iter, BalsaMailboxNode * mbnode)
 	if (!mailbox_changed_signal)
 	    mailbox_changed_signal =
 		g_signal_lookup("changed", LIBBALSA_TYPE_MAILBOX);
-	if (!g_signal_has_handler_pending(G_OBJECT(mailbox),
+	if (!g_signal_has_handler_pending(mailbox,
                                           mailbox_changed_signal, 0, TRUE)) {
 	    /* Now we have a mailbox: */
 	    g_signal_connect(mailbox, "changed",
@@ -2166,7 +2166,7 @@ balsa_mblist_mru_option_menu(GtkWindow * window, GList ** url_list)
     g_object_set_data_full(G_OBJECT(combo_box), "mro", mro,
                            (GDestroyNotify) bmbl_mru_combo_box_destroy_cb);
     bmbl_mru_combo_box_setup(GTK_COMBO_BOX(combo_box));
-    g_signal_connect(G_OBJECT(combo_box), "changed",
+    g_signal_connect(combo_box, "changed",
                      G_CALLBACK(bmbl_mru_combo_box_changed), mro);
 
     return combo_box;

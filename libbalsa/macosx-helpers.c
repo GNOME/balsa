@@ -37,7 +37,7 @@ void
 libbalsa_macosx_menu(GtkWidget *window, GtkMenuShell *menubar)
 {
     g_object_set_data(G_OBJECT(window), "osx-menubar", menubar);
-    g_signal_connect(G_OBJECT(window), "focus-in-event",
+    g_signal_connect(window, "focus-in-event",
 		     G_CALLBACK(update_osx_menubar), window);
 }
 
@@ -46,7 +46,7 @@ void
 libbalsa_macosx_menu_for_parent(GtkWidget *window, GtkWindow *parent)
 {
     if(parent)
-	g_signal_connect(G_OBJECT(window), "focus-in-event",
+	g_signal_connect(window, "focus-in-event",
 			 G_CALLBACK(update_osx_menubar), parent);
     else
 	g_message("called %s for widget %p with NULL parent", __func__, window);

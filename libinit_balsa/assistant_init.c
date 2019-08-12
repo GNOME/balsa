@@ -91,7 +91,7 @@ balsa_initdruid_apply(GtkAssistant * druid)
         g_list_prepend(balsa_app.address_book_list, ab);
     balsa_app.default_address_book = ab;
 
-    g_signal_handlers_disconnect_by_func(G_OBJECT(druid),
+    g_signal_handlers_disconnect_by_func(druid,
                                          G_CALLBACK(exit), NULL);
     libbalsa_conf_push_group("Notifications");
     libbalsa_conf_set_bool("GtkUIManager", TRUE);
@@ -107,9 +107,9 @@ balsa_initdruid(GtkAssistant * assistant)
     g_return_if_fail(assistant != NULL);
     g_return_if_fail(GTK_IS_ASSISTANT(assistant));
 
-    g_signal_connect(G_OBJECT(assistant), "cancel",
+    g_signal_connect(assistant, "cancel",
                      G_CALLBACK(balsa_initdruid_cancel), NULL);
-    g_signal_connect(G_OBJECT(assistant), "close",
+    g_signal_connect(assistant, "close",
                      G_CALLBACK(balsa_initdruid_apply), NULL);
 
     balsa_druid_page_welcome(assistant);

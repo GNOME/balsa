@@ -1093,7 +1093,7 @@ libbalsa_filter_list_new(gboolean with_data, const gchar * title,
     selection = gtk_tree_view_get_selection(view);
     gtk_tree_selection_set_mode(selection, mode);
     if (selection_changed_cb)
-        g_signal_connect(G_OBJECT(selection), "changed",
+        g_signal_connect(selection, "changed",
                          selection_changed_cb, NULL);
 
     if (sorted) {

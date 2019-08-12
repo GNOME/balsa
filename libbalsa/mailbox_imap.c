@@ -999,10 +999,10 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap,
     }
 
     imap_handle_set_flagscb(mimap->handle, (ImapFlagsCb)imap_flags_cb, mimap);
-    g_signal_connect(G_OBJECT(mimap->handle),
+    g_signal_connect(mimap->handle,
                      "exists-notify", G_CALLBACK(imap_exists_cb),
                      mimap);
-    g_signal_connect(G_OBJECT(mimap->handle),
+    g_signal_connect(mimap->handle,
                      "expunge-notify", G_CALLBACK(imap_expunge_cb),
                      mimap);
     mimap->handle_refs = 1;
@@ -1295,13 +1295,13 @@ lbm_imap_check(LibBalsaMailbox * mailbox)
         info.marked = FALSE;
 
         g_object_ref(handle);
-        id = g_signal_connect(G_OBJECT(handle), "list-response",
+        id = g_signal_connect(handle, "list-response",
                               G_CALLBACK(lbm_imap_list_cb), &info);
 
         if (imap_mbox_list(handle, mimap->path) != IMR_OK)
             info.marked = FALSE;
 
-        g_signal_handler_disconnect(G_OBJECT(handle), id);
+        g_signal_handler_disconnect(handle, id);
         g_object_unref(handle);
         libbalsa_mailbox_imap_release_handle(mimap);
 

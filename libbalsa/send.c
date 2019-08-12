@@ -788,15 +788,15 @@ lbs_process_queue_init_session(LibBalsaServer* server)
 	}
 
 	/* connect signals */
-	g_signal_connect(G_OBJECT(session), "cert-check", G_CALLBACK(libbalsa_server_check_cert), session);
-	g_signal_connect(G_OBJECT(session), "auth", G_CALLBACK(libbalsa_server_get_auth), server);
+	g_signal_connect(session, "cert-check", G_CALLBACK(libbalsa_server_check_cert), session);
+	g_signal_connect(session, "auth", G_CALLBACK(libbalsa_server_get_auth), server);
 
 	/* load client certificate if configured */
 	if (libbalsa_server_get_client_cert(server)) {
                 const gchar *cert_file = libbalsa_server_get_cert_file(server);
 		GError* error = NULL;
 
-		g_signal_connect(G_OBJECT(session), "cert-pass", G_CALLBACK(libbalsa_server_get_cert_pass), server);
+		g_signal_connect(session, "cert-pass", G_CALLBACK(libbalsa_server_get_cert_pass), server);
 		if (!net_client_set_cert_from_file(NET_CLIENT(session), cert_file, &error)) {
 			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot load certificate file %s: %s"), cert_file,
 				error->message);

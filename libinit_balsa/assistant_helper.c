@@ -67,7 +67,7 @@ balsa_init_add_grid_entry(GtkGrid * grid, guint num, const gchar * ltext,
     gtk_grid_attach(grid, e, 1, num + 1, 1, 1);
     (*dest) = e;
     if(ed) {
-        g_signal_connect(G_OBJECT(e), "changed",
+        g_signal_connect(e, "changed",
                          G_CALLBACK(entry_changed_cb), ed);
         ed->num = ed->master->numentries++;
         ed->druid = druid;

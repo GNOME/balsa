@@ -164,7 +164,7 @@ fe_build_option_menu(option_list options[], gint num, GCallback func,
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
     if (func)
-	g_signal_connect(G_OBJECT(combo_box), "changed", func, cb_data);
+	g_signal_connect(combo_box, "changed", func, cb_data);
     g_object_set_data_full(G_OBJECT(combo_box), BALSA_FE_COMBO_BOX_INFO,
                            info, (GDestroyNotify) fe_combo_box_info_free);
 
@@ -223,12 +223,12 @@ build_left_side(void)
     /* new button */
     /* Translators: button "New" filter */
     fe_new_button = gtk_button_new_with_mnemonic(C_("filter", "_New"));
-    g_signal_connect(G_OBJECT(fe_new_button), "clicked",
+    g_signal_connect(fe_new_button, "clicked",
 		     G_CALLBACK(fe_new_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_new_button);
     /* delete button */
     fe_delete_button = gtk_button_new_with_mnemonic(("_Delete"));
-    g_signal_connect(G_OBJECT(fe_delete_button), "clicked",
+    g_signal_connect(fe_delete_button, "clicked",
 		     G_CALLBACK(fe_delete_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);
     gtk_widget_set_sensitive(fe_delete_button, FALSE);
@@ -299,7 +299,7 @@ build_match_page()
     fe_conditions_list =
         libbalsa_filter_list_new(TRUE, NULL, GTK_SELECTION_BROWSE, NULL,
                                  FALSE);
-    g_signal_connect(G_OBJECT(fe_conditions_list), "row-activated",
+    g_signal_connect(fe_conditions_list, "row-activated",
                      G_CALLBACK(fe_conditions_row_activated), NULL);
 
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(fe_conditions_list));
@@ -310,17 +310,17 @@ build_match_page()
     fe_condition_edit_button = gtk_button_new_with_mnemonic(_("_Edit"));
     gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
     gtk_container_add(GTK_CONTAINER(box), fe_condition_edit_button);
-    g_signal_connect(G_OBJECT(fe_condition_edit_button), "clicked",
+    g_signal_connect(fe_condition_edit_button, "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(0));
     /* Translators: button "New" filter match */
     button = gtk_button_new_with_mnemonic(C_("filter match", "Ne_w"));
     gtk_container_add(GTK_CONTAINER(box), button);
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(1));
     fe_condition_delete_button = gtk_button_new_with_mnemonic(_("_Remove"));
     gtk_widget_set_sensitive(fe_condition_delete_button,FALSE);
     gtk_container_add(GTK_CONTAINER(box), fe_condition_delete_button);
-    g_signal_connect(G_OBJECT(fe_condition_delete_button), "clicked",
+    g_signal_connect(fe_condition_delete_button, "clicked",
 		     G_CALLBACK(fe_condition_remove_pressed), NULL);
 
     return page;
@@ -412,9 +412,9 @@ build_action_page(GtkWindow * window)
     /* fe_sound_entry is initially sensitive, so to be consistent
      * we must make fe_sound_button active */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button), TRUE);
-    g_signal_connect(G_OBJECT(fe_sound_button), "toggled",
+    g_signal_connect(fe_sound_button, "toggled",
                      G_CALLBACK(fe_button_toggled), fe_sound_entry);
-    g_signal_connect(G_OBJECT(dialog), "response",
+    g_signal_connect(dialog, "response",
                      G_CALLBACK(fe_sound_response), NULL);
 
     fe_popup_button = gtk_check_button_new_with_label(_("Pop-up text:"));
@@ -428,9 +428,9 @@ build_action_page(GtkWindow * window)
     /* fe_popup_entry is initially sensitive, so to be consistent
      * we must make fe_popup_button active */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_popup_button), TRUE);
-    g_signal_connect(G_OBJECT(fe_popup_button), "toggled",
+    g_signal_connect(fe_popup_button, "toggled",
                      G_CALLBACK(fe_button_toggled), fe_popup_entry);
-    g_signal_connect(G_OBJECT(fe_popup_entry), "changed",
+    g_signal_connect(fe_popup_entry, "changed",
                      G_CALLBACK(fe_action_changed), NULL);
 
     /* The action area */
@@ -457,7 +457,7 @@ build_action_page(GtkWindow * window)
     */
     fe_mailboxes = balsa_mblist_mru_option_menu(window,
 						&balsa_app.folder_mru);
-    g_signal_connect(G_OBJECT(fe_mailboxes), "changed",
+    g_signal_connect(fe_mailboxes, "changed",
                      G_CALLBACK(fe_action_changed), NULL);
     gtk_box_pack_start(GTK_BOX(box), fe_mailboxes, TRUE, FALSE, 1);
 
@@ -498,12 +498,12 @@ build_right_side(GtkWindow * window)
     gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 0);
 
     fe_apply_button = gtk_button_new_with_mnemonic(_("_Apply"));
-    g_signal_connect(G_OBJECT(fe_apply_button), "clicked",
+    g_signal_connect(fe_apply_button, "clicked",
 		     G_CALLBACK(fe_apply_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_apply_button);
 
     fe_revert_button = gtk_button_new_with_mnemonic(_("Re_vert"));
-    g_signal_connect(G_OBJECT(fe_revert_button), "clicked",
+    g_signal_connect(fe_revert_button, "clicked",
 		     G_CALLBACK(fe_revert_pressed), NULL);
     gtk_container_add(GTK_CONTAINER(bbox), fe_revert_button);
     gtk_widget_set_sensitive(fe_apply_button, FALSE);
@@ -575,9 +575,9 @@ filters_edit_dialog(GtkWindow * parent)
                                             _("_Help"), GTK_RESPONSE_HELP,
 					    NULL);
 
-    g_signal_connect(G_OBJECT(fe_window), "response",
+    g_signal_connect(fe_window, "response",
                      G_CALLBACK(fe_dialog_response), NULL);
-    g_signal_connect(G_OBJECT(fe_window), "destroy",
+    g_signal_connect(fe_window, "destroy",
 	             G_CALLBACK(fe_destroy_window_cb), NULL);
 
     gtk_window_set_role(GTK_WINDOW (fe_window), "filter-edit");

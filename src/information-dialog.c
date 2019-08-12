@@ -267,7 +267,7 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 	information_list = balsa_information_list_new();
 	gtk_container_add(GTK_CONTAINER(scrolled_window),
 			  information_list);
-        g_signal_connect(G_OBJECT(information_dialog), "response",
+        g_signal_connect(information_dialog, "response",
                          G_CALLBACK(balsa_information_list_response_cb),
                          information_list);
 

@@ -1,3 +1,113 @@
+2019-08-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	In calls to g_signal*(), do not cast object using
+	G_OBJECT(object).
+
+	The argument is a gpointer, so the cast is redundant.
+
+	* libbalsa/address.c (libbalsa_address_get_edit_widget):
+	* libbalsa/filter-funcs.c (libbalsa_filter_list_new):
+	* libbalsa/folder-scanners.c (libbalsa_scanner_imap_dir),
+	(imap_tree_scan):
+	* libbalsa/identity.c (setup_ident_frame):
+	* libbalsa/imap/imap-commands.c (imap_mbox_select_unlocked):
+	* libbalsa/imap/imap-handle.c (imap_mbox_connect),
+	(imap_mbox_handle_get_delim), (ir_list_lsub), (ir_exists),
+	(ir_expunge):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key):
+	* libbalsa/libbalsa-progress.c
+	(libbalsa_progress_dialog_ensure_real), (create_progress_widget):
+	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_mime_button):
+	* libbalsa/macosx-helpers.c (libbalsa_macosx_menu),
+	(libbalsa_macosx_menu_for_parent):
+	* libbalsa/mailbox.c (libbalsa_mailbox_progress_notify):
+	* libbalsa/mailbox_imap.c
+	(libbalsa_mailbox_imap_get_selected_handle), (lbm_imap_check):
+	* libbalsa/mailbox_pop3.c (libbalsa_mailbox_pop3_startup):
+	* libbalsa/send.c (lbs_process_queue_init_session):
+	* libbalsa/server.c (libbalsa_server_set_username),
+	(libbalsa_server_set_host), (libbalsa_server_config_changed),
+	(lbs_get_password):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* libinit_balsa/assistant_helper.c (balsa_init_add_grid_entry):
+	* libinit_balsa/assistant_init.c (balsa_initdruid_apply),
+	(balsa_initdruid):
+	* libinit_balsa/assistant_page_defclient.c
+	(balsa_druid_page_defclient_init):
+	* libinit_balsa/assistant_page_directory.c
+	(balsa_druid_page_directory_init):
+	* libinit_balsa/assistant_page_user.c (balsa_druid_page_user):
+	* libnetclient/net-client.c (net_client_start_tls):
+	* libnetclient/test/tests.c (test_basic_crypt), (test_smtp),
+	(test_pop3):
+	* src/ab-main.c (bab_window_list_new), (bab_get_edit_button_box),
+	(bab_get_filter_box), (bab_window_new), (main):
+	* src/ab-window.c (balsa_ab_window_list), (balsa_ab_window_init),
+	(balsa_ab_window_menu_changed):
+	* src/address-book-config.c (create_local_dialog),
+	(create_generic_dialog), (create_osmo_dialog),
+	(balsa_address_book_add_menu):
+	* src/balsa-index.c (bndx_selection_changed), (bndx_row_activated),
+	(bndx_compose_foreach), (bndx_compose_from_list),
+	(create_stock_menu_item), (bndx_changed_find_row):
+	* src/balsa-mblist.c (balsa_mblist_init),
+	(balsa_mblist_default_signal_bindings), (bmbl_store_redraw_mbnode),
+	(balsa_mblist_mru_option_menu):
+	* src/balsa-message.c (bm_header_tl_buttons), (balsa_message_init),
+	(tree_mult_selection_popup), (add_to_attachments_popup),
+	(add_toggle_inline_menu_item), (part_create_menu), (select_part),
+	(create_mdn_dialog):
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget), (create_import_keys_widget):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-message.c (bmw_message_extbody_url),
+	(bmw_message_extbody_mail), (bm_header_extend_popup),
+	(bmw_message_set_headers_d):
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(text_view_url_popup), (text_view_populate_popup),
+	(bmwt_populate_popup_menu), (fill_text_buf_cited):
+	* src/balsa-mime-widget-vcalendar.c (balsa_vevent_widget):
+	* src/balsa-mime-widget.c (balsa_mime_widget_new),
+	(balsa_mime_widget_new_unknown):
+	* src/filter-edit-callbacks.c (add_button), (add_check),
+	(get_field_frame), (build_type_notebook), (fe_edit_condition):
+	* src/filter-edit-dialog.c (fe_build_option_menu),
+	(build_left_side), (build_match_page), (build_action_page),
+	(build_right_side), (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/filter-run-dialog.c (selected_filters_new),
+	(balsa_filter_run_dialog_init):
+	* src/folder-conf.c (folder_conf_clicked_ok),
+	(folder_conf_imap_node), (folder_conf_imap_sub_node):
+	* src/information-dialog.c (balsa_information_list):
+	* src/mailbox-conf.c (run_mailbox_conf),
+	(create_local_mailbox_dialog):
+	* src/mailbox-node.c (imap_scan_attach_mailbox),
+	(balsa_mailbox_node_new_from_mailbox),
+	(balsa_mailbox_node_new_from_dir),
+	(balsa_mailbox_node_new_from_config),
+	(balsa_mailbox_node_new_imap_node),
+	(balsa_mailbox_node_new_imap_folder), (add_menu_entry),
+	(balsa_mailbox_node_get_context_menu):
+	* src/main-window.c (bw_enable_filter), (bw_disable_filter),
+	(bw_create_index_widget), (new_message_activated),
+	(balsa_window_new), (bw_check_mailbox_list), (bw_find_real):
+	* src/message-window.c (destroy_message_window):
+	* src/pref-manager.c (pm_combo_box_new), (create_pref_option_menu),
+	(server_add_menu_widget),
+	(pm_grid_add_remote_mailbox_servers_group),
+	(pm_grid_add_outgoing_mail_group), (open_preferences_manager):
+	* src/print-gtk.c (message_prefs_widget):
+	* src/sendmsg-window.c (address_book_cb),
+	(balsa_sendmsg_destroy_handler), (sw_get_user_codeset),
+	(add_attachment), (add_urlref_attachment), (sw_attach_dialog),
+	(create_info_pane), (sw_attachment_list), (create_text_area),
+	(create_lang_menu), (sendmsg_window_set_field),
+	(sw_include_file_activated), (sendmsg_window_new):
+	* src/store-address.c (balsa_store_address_from_messages),
+	(balsa_store_address):
+	* src/toolbar-prefs.c (customize_dialog_cb), (create_toolbar_page):
+
 2019-08-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	In calls to g_object_unref(), do not cast object using

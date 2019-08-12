@@ -270,7 +270,7 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
                                           utf8name);
         g_free(utf8name);
     }
-    g_signal_connect(G_OBJECT(dialog), "response",
+    g_signal_connect(dialog, "response",
                      G_CALLBACK(edit_book_response), abc);
 
     return dialog;
@@ -352,7 +352,7 @@ create_generic_dialog(AddressBookConfig * abc, const gchar * type)
     gtk_container_set_border_width(GTK_CONTAINER
                                    (gtk_dialog_get_content_area
                                     (GTK_DIALOG(dialog))), 12);
-    g_signal_connect(G_OBJECT(dialog), "response",
+    g_signal_connect(dialog, "response",
                      G_CALLBACK(edit_book_response), abc);
 
     return dialog;
@@ -405,7 +405,7 @@ create_osmo_dialog(AddressBookConfig *abc)
     abc->name_entry =
         libbalsa_create_grid_entry(grid, NULL, NULL, 0, name, label);
     add_radio_buttons(grid, 1, abc);
-    g_signal_connect(G_OBJECT(dialog), "response",
+    g_signal_connect(dialog, "response",
                      G_CALLBACK(edit_book_response), abc);
 
     return dialog;
@@ -941,45 +941,45 @@ balsa_address_book_add_menu(BalsaAddressBookCallback callback,
 
     menuitem =
         gtk_menu_item_new_with_label(_("vCard Address Book (GnomeCard)"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
                      G_CALLBACK(add_vcard_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem =
         gtk_menu_item_new_with_label(_("External query (a program)"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
                      G_CALLBACK(add_externq_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem = gtk_menu_item_new_with_label(_("LDIF Address Book"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
                      G_CALLBACK(add_ldif_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
 #ifdef ENABLE_LDAP
     menuitem = gtk_menu_item_new_with_label(_("LDAP Address Book"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
                      G_CALLBACK(add_ldap_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 #endif /* ENABLE_LDAP */
 
 #ifdef HAVE_SQLITE
     menuitem = gtk_menu_item_new_with_label(_("GPE Address Book"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
                      G_CALLBACK(add_gpe_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 #endif /* HAVE_SQLITE */
 
 #ifdef HAVE_RUBRICA
     menuitem = gtk_menu_item_new_with_label(_("Rubrica2 Address Book"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
                      G_CALLBACK(add_rubrica_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 #endif /* HAVE_RUBRICA */
 
 #ifdef HAVE_OSMO
     menuitem = gtk_menu_item_new_with_label(_("Osmo Address Book"));
-    g_signal_connect(G_OBJECT(menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
                      G_CALLBACK(add_osmo_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 #endif

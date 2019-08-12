@@ -411,7 +411,7 @@ address_book_cb(LibBalsaAddressView * address_view,
 
     ab = balsa_ab_window_new(TRUE, GTK_WINDOW(bsmsg->window));
     gtk_window_set_destroy_with_parent(GTK_WINDOW(ab), TRUE);
-    g_signal_connect(G_OBJECT(ab), "response",
+    g_signal_connect(ab, "response",
                      G_CALLBACK(address_book_response), address_view);
     row_ref_copy = gtk_tree_row_reference_copy(row_ref);
     g_object_set_data_full(G_OBJECT(ab), BALSA_SENDMSG_ROW_REF_KEY,
@@ -561,9 +561,9 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     g_assert(bsmsg != NULL);
 
     if (balsa_app.main_window) {
-        g_signal_handler_disconnect(G_OBJECT(balsa_app.main_window),
+        g_signal_handler_disconnect(balsa_app.main_window,
                                     bsmsg->delete_sig_id);
-        g_signal_handler_disconnect(G_OBJECT(balsa_app.main_window),
+        g_signal_handler_disconnect(balsa_app.main_window,
                                     bsmsg->identities_changed_id);
         g_object_weak_unref(G_OBJECT(balsa_app.main_window),
                             (GWeakNotify) gtk_widget_destroy, bsmsg->window);
@@ -1551,7 +1551,7 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
                                        "application/octet-stream");
         gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), 0);
-        g_signal_connect(G_OBJECT(combo_box), "changed",
+        g_signal_connect(combo_box, "changed",
                          G_CALLBACK(sw_charset_combo_box_changed),
                          charset_button);
         gtk_box_pack_start(GTK_BOX(hbox), combo_box, TRUE, TRUE, 0);
@@ -1775,7 +1775,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
                                            [LIBBALSA_ATTACH_AS_INLINE]));
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
 			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_INLINE));
-	g_signal_connect(G_OBJECT(menu_item), "activate",
+	g_signal_connect(menu_item, "activate",
 			 G_CALLBACK(change_attach_mode),
 			 (gpointer)attach_data);
 	gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
@@ -1790,7 +1790,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 	gtk_widget_set_sensitive(menu_item, FALSE);
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
 			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_ATTACHMENT));
-	g_signal_connect(G_OBJECT(menu_item), "activate",
+	g_signal_connect(menu_item, "activate",
 			 G_CALLBACK(change_attach_mode),
 			 (gpointer)attach_data);
 	gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
@@ -1804,7 +1804,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
                                            [LIBBALSA_ATTACH_AS_EXTBODY]));
 	g_object_set_data(G_OBJECT(menu_item), "new-mode",
 			  GINT_TO_POINTER(LIBBALSA_ATTACH_AS_EXTBODY));
-	g_signal_connect(G_OBJECT(menu_item), "activate",
+	g_signal_connect(menu_item, "activate",
 			 G_CALLBACK(change_attach_mode),
 			 (gpointer)attach_data);
 	gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
@@ -1814,7 +1814,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     /* an attachment can be removed */
     menu_item =
 	gtk_menu_item_new_with_label(_("Remove"));
-    g_signal_connect(G_OBJECT (menu_item), "activate",
+    g_signal_connect(menu_item, "activate",
 		     G_CALLBACK(remove_attachment),
 		     (gpointer)attach_data);
     gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
@@ -1887,7 +1887,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     attach_data->popup_menu = gtk_menu_new();
     menu_item =
 	gtk_menu_item_new_with_label(_("Remove"));
-    g_signal_connect(G_OBJECT (menu_item), "activate",
+    g_signal_connect(menu_item, "activate",
 		     G_CALLBACK(remove_attachment),
 		     (gpointer)attach_data);
     gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
@@ -1899,7 +1899,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
 			  gtk_separator_menu_item_new());
     menu_item =
 	gtk_menu_item_new_with_label(_("Open…"));
-    g_signal_connect(G_OBJECT (menu_item), "activate",
+    g_signal_connect(menu_item, "activate",
 		     G_CALLBACK(on_open_url_cb),
 		     (gpointer)attach_data);
     gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
@@ -1984,7 +1984,7 @@ sw_attach_dialog(BalsaSendmsg * bsmsg)
     if (balsa_app.attach_dir)
 	gtk_file_chooser_set_current_folder_uri(fc, balsa_app.attach_dir);
 
-    g_signal_connect(G_OBJECT(fc), "response",
+    g_signal_connect(fc, "response",
 		     G_CALLBACK(attach_dialog_response), bsmsg);
 
     gtk_widget_show(fsw);
@@ -2551,7 +2551,7 @@ create_info_pane(BalsaSendmsg * bsmsg)
     /* Subject: */
     create_string_entry(bsmsg, grid, _("S_ubject:"), ++row,
                         bsmsg->subject);
-    g_signal_connect_swapped(G_OBJECT(bsmsg->subject[1]), "changed",
+    g_signal_connect_swapped(bsmsg->subject[1], "changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
     /* Reply To: */
@@ -2684,7 +2684,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     g_signal_connect(view, "button_press_event",
                      G_CALLBACK(attachment_button_press_cb), NULL);
 
-    g_signal_connect(G_OBJECT(bsmsg->window), "drag_data_received",
+    g_signal_connect(bsmsg->window, "drag_data_received",
 		     G_CALLBACK(attachments_add), bsmsg);
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->window), GTK_DEST_DEFAULT_ALL,
 		      drop_types, G_N_ELEMENTS(drop_types),
@@ -2870,9 +2870,9 @@ create_text_area(BalsaSendmsg * bsmsg)
 
     buffer = gtk_text_view_get_buffer(text_view);
 #ifdef HAVE_GTKSOURCEVIEW
-    g_signal_connect(G_OBJECT(buffer), "notify::can-undo",
+    g_signal_connect(buffer, "notify::can-undo",
                      G_CALLBACK(sw_can_undo_cb), bsmsg);
-    g_signal_connect(G_OBJECT(buffer), "notify::can-redo",
+    g_signal_connect(buffer, "notify::can-redo",
                      G_CALLBACK(sw_can_redo_cb), bsmsg);
 #else                           /* HAVE_GTKSOURCEVIEW */
     bsmsg->buffer2 =
@@ -2900,7 +2900,7 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
     				   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
     gtk_container_add(GTK_CONTAINER(scroll), bsmsg->text);
-    g_signal_connect(G_OBJECT(bsmsg->text), "drag_data_received",
+    g_signal_connect(bsmsg->text, "drag_data_received",
 		     G_CALLBACK(drag_data_quote), bsmsg);
     /* GTK_DEST_DEFAULT_ALL in drag_set would trigger bug 150141 */
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->text), 0,
@@ -4217,7 +4217,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
                                                       locales[i].
                                                       lang_name);
             group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
-            g_signal_connect(G_OBJECT(w), "activate",
+            g_signal_connect(w, "activate",
                              G_CALLBACK(lang_set_cb), bsmsg);
             g_object_set_data_full(G_OBJECT(w), BALSA_LANGUAGE_MENU_LANG,
                                    g_strdup(locales[i].locale), g_free);
@@ -4246,7 +4246,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 
             w = gtk_radio_menu_item_new_with_label(group, lang);
             group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
-            g_signal_connect(G_OBJECT(w), "activate",
+            g_signal_connect(w, "activate",
                              G_CALLBACK(lang_set_cb), bsmsg);
             g_object_set_data_full(G_OBJECT(w), BALSA_LANGUAGE_MENU_LANG,
                                    g_strdup(lang), g_free);
@@ -4683,7 +4683,7 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
 #endif
             g_object_set_data(G_OBJECT(bsmsg->window),
                               "balsa-sendmsg-window-url-bcc", dialog);
-            g_signal_connect(G_OBJECT(dialog), "response",
+            g_signal_connect(dialog, "response",
                              G_CALLBACK(gtk_widget_destroy), NULL);
             gtk_widget_show_all(dialog);
         }
@@ -4817,7 +4817,7 @@ sw_include_file_activated(GSimpleAction * action,
         gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
                                             (file_selector),
                                             balsa_app.attach_dir);
-    g_signal_connect(G_OBJECT(file_selector), "response",
+    g_signal_connect(file_selector, "response",
                      G_CALLBACK(insert_file_response), bsmsg);
 
     /* Display that dialog */
@@ -6883,9 +6883,9 @@ sendmsg_window_new()
 
     bsmsg->draft_message = NULL;
     bsmsg->parent_message = NULL;
-    g_signal_connect(G_OBJECT(window), "delete-event",
+    g_signal_connect(window, "delete-event",
 		     G_CALLBACK(delete_event_cb), bsmsg);
-    g_signal_connect(G_OBJECT(window), "destroy",
+    g_signal_connect(window, "destroy",
 		     G_CALLBACK(destroy_event_cb), bsmsg);
     /* If any compose windows are open when Balsa is closed, we want
      * them also to be closed. */
@@ -6984,7 +6984,7 @@ sendmsg_window_new()
     bsmsg->update_config = TRUE;
 
     bsmsg->delete_sig_id =
-	g_signal_connect(G_OBJECT(balsa_app.main_window), "delete-event",
+	g_signal_connect(balsa_app.main_window, "delete-event",
 			 G_CALLBACK(delete_event_cb), bsmsg);
 
     setup_headers_from_identity(bsmsg, bsmsg->ident);

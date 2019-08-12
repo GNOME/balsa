@@ -166,7 +166,7 @@ balsa_druid_page_user(GtkAssistant * druid)
     gtk_assistant_set_page_title(druid, user->page, _("User Settings"));
     balsa_druid_page_user_init(user, user->page, druid);
 
-    g_signal_connect(G_OBJECT(druid), "prepare",
+    g_signal_connect(druid, "prepare",
                      G_CALLBACK(balsa_druid_page_user_prepare),
                      user);
     g_object_weak_ref(G_OBJECT(druid), (GWeakNotify)g_free, user);

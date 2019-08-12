@@ -239,7 +239,7 @@ bmw_message_extbody_url(LibBalsaMessageBody * mime_body,
 		       BMW_BUTTON_PACK_SPACE);
     g_object_set_data_full(G_OBJECT(button), "call_url", url,
 			   (GDestroyNotify) g_free);
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
 		     G_CALLBACK(extbody_call_url), NULL);
 
     return mw;
@@ -286,7 +286,7 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
 				     ("Se_nd message to obtain this part"));
     gtk_box_pack_start(GTK_BOX(mw->widget), button, FALSE, FALSE,
 		       BMW_BUTTON_PACK_SPACE);
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
 		     G_CALLBACK(extbody_send_mail), (gpointer) mime_body);
 
 
@@ -439,7 +439,7 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), separator);
     gtk_widget_show(separator);
     menu_item = gtk_menu_item_new_with_label(_("Reply…"));
-    g_signal_connect(G_OBJECT(menu_item), "activate",
+    g_signal_connect(menu_item, "activate",
                      G_CALLBACK(bm_header_ctx_menu_reply),
                      arg);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
@@ -719,7 +719,7 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
     }
 
     if (balsa_message_get_shown_headers(bm) == HEADERS_NONE) {
-        g_signal_connect(G_OBJECT(widget), "realize",
+        g_signal_connect(widget, "realize",
                          G_CALLBACK(gtk_widget_hide), NULL);
 	return;
     }

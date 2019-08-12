@@ -141,7 +141,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         	if (autocrypt_key != NULL) {
         		button = gtk_button_new_with_mnemonic(_("_Import Autocrypt key"));
         		g_object_set_data_full(G_OBJECT(button), "autocrypt_key", autocrypt_key, (GDestroyNotify) g_bytes_unref);
-        		g_signal_connect(G_OBJECT(button), "clicked", G_CALLBACK(on_key_import_button), NULL);
+        		g_signal_connect(button, "clicked", G_CALLBACK(on_key_import_button), NULL);
         		gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
         	}
 #endif
@@ -149,7 +149,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         } else {
             button = gtk_button_new_with_mnemonic(_("_Search key server for updates of this key"));
         }
-        g_signal_connect(G_OBJECT(button), "clicked",
+        g_signal_connect(button, "clicked",
                          G_CALLBACK(on_gpg_key_button),
                          (gpointer) g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info));
         gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
@@ -337,7 +337,7 @@ create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
 
 						import_btn = gtk_button_new_with_label(_("Import key into the local key ring"));
 						g_object_set_data_full(G_OBJECT(import_btn), "keydata", key_ascii, (GDestroyNotify) g_free);
-						g_signal_connect(G_OBJECT(import_btn), "clicked", (GCallback) on_key_import_button, NULL);
+						g_signal_connect(import_btn, "clicked", (GCallback) on_key_import_button, NULL);
 						gtk_box_pack_start(box, import_btn, FALSE, FALSE, 0);
 
 						if (item->next != NULL) {

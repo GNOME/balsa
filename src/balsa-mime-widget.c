@@ -153,10 +153,10 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
 
     if (mw) {
 	if (mw->widget) {
-	    g_signal_connect(G_OBJECT(mw->widget), "focus_in_event",
+	    g_signal_connect(mw->widget, "focus_in_event",
 			     G_CALLBACK(balsa_mime_widget_limit_focus),
 			     (gpointer) bm);
-	    g_signal_connect(G_OBJECT(mw->widget), "focus_out_event",
+	    g_signal_connect(mw->widget, "focus_out_event",
 			     G_CALLBACK(balsa_mime_widget_unlimit_focus),
 			     (gpointer) bm);
 	    if (mime_body->sig_info &&
@@ -288,7 +288,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 
     button = gtk_button_new_with_mnemonic(_("S_ave part"));
     gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-    g_signal_connect(G_OBJECT(button), "clicked",
+    g_signal_connect(button, "clicked",
 		     G_CALLBACK(balsa_mime_widget_ctx_menu_save),
 		     (gpointer) mime_body);
 

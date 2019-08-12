@@ -366,14 +366,14 @@ bw_pass_to_filter(BalsaWindow *window, GdkEventKey *event, gpointer data)
 static gboolean
 bw_enable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
 {
-    g_signal_connect(G_OBJECT(data), "key_press_event",
+    g_signal_connect(data, "key_press_event",
                      G_CALLBACK(bw_pass_to_filter), NULL);
     return FALSE;
 }
 static gboolean
 bw_disable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
 {
-    g_signal_handlers_disconnect_by_func(G_OBJECT(data),
+    g_signal_handlers_disconnect_by_func(data,
                                          G_CALLBACK(bw_pass_to_filter),
                                          NULL);
     return FALSE;
@@ -546,9 +546,9 @@ bw_create_index_widget(BalsaWindow *bw)
     priv->sos_entry = gtk_search_entry_new();
     /* gtk_label_set_mnemonic_widget(GTK_LABEL(priv->filter_choice),
        priv->sos_entry); */
-    g_signal_connect(G_OBJECT(priv->sos_entry), "focus_in_event",
+    g_signal_connect(priv->sos_entry, "focus_in_event",
                      G_CALLBACK(bw_enable_filter), bw);
-    g_signal_connect(G_OBJECT(priv->sos_entry), "focus_out_event",
+    g_signal_connect(priv->sos_entry, "focus_out_event",
                      G_CALLBACK(bw_disable_filter), bw);
 
     button = gtk_button_new();
@@ -562,16 +562,16 @@ bw_create_index_widget(BalsaWindow *bw)
     gtk_widget_show(priv->sos_entry);
 
     gtk_box_pack_start(GTK_BOX(priv->sos_bar), button, FALSE, FALSE, 0);
-    g_signal_connect(G_OBJECT(priv->sos_entry), "activate",
+    g_signal_connect(priv->sos_entry, "activate",
                      G_CALLBACK(bw_filter_entry_activate),
                      button);
-    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+    g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(bw_filter_entry_activate),
                              priv->sos_entry);
-    g_signal_connect(G_OBJECT(priv->sos_entry), "changed",
+    g_signal_connect(priv->sos_entry, "changed",
                              G_CALLBACK(bw_filter_entry_changed),
                              button);
-    g_signal_connect(G_OBJECT(priv->filter_choice), "changed",
+    g_signal_connect(priv->filter_choice, "changed",
                      G_CALLBACK(bw_filter_entry_changed), button);
     gtk_widget_show_all(button);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -874,7 +874,7 @@ new_message_activated(GSimpleAction * action,
 
     smwindow = sendmsg_window_compose();
 
-    g_signal_connect(G_OBJECT(smwindow->window), "destroy",
+    g_signal_connect(smwindow->window, "destroy",
                      G_CALLBACK(bw_send_msg_window_destroy_cb), user_data);
 }
 
@@ -2287,14 +2287,14 @@ balsa_window_new(GtkApplication *application)
                                balsa_app.show_notebook_tabs);
     gtk_notebook_set_show_border (GTK_NOTEBOOK(priv->notebook), FALSE);
     gtk_notebook_set_scrollable (GTK_NOTEBOOK (priv->notebook), TRUE);
-    g_signal_connect(G_OBJECT(priv->notebook), "switch_page",
+    g_signal_connect(priv->notebook, "switch_page",
                      G_CALLBACK(bw_notebook_switch_page_cb), window);
     gtk_drag_dest_set (GTK_WIDGET (priv->notebook), GTK_DEST_DEFAULT_ALL,
                        notebook_drop_types, NUM_DROP_TYPES,
                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
-    g_signal_connect(G_OBJECT (priv->notebook), "drag-data-received",
+    g_signal_connect(priv->notebook, "drag-data-received",
                      G_CALLBACK (bw_notebook_drag_received_cb), NULL);
-    g_signal_connect(G_OBJECT (priv->notebook), "drag-motion",
+    g_signal_connect(priv->notebook, "drag-motion",
                      G_CALLBACK (bw_notebook_drag_motion_cb), NULL);
     balsa_app.notebook = priv->notebook;
     g_object_add_weak_pointer(G_OBJECT(priv->notebook),
@@ -2303,7 +2303,7 @@ balsa_window_new(GtkApplication *application)
     priv->preview = balsa_message_new();
     gtk_widget_hide(priv->preview);
 
-    g_signal_connect(G_OBJECT(priv->preview), "select-part",
+    g_signal_connect(priv->preview, "select-part",
                      G_CALLBACK(bw_select_part_cb), window);
 
     /* XXX */
@@ -3331,7 +3331,7 @@ bw_check_mailbox_list(struct check_messages_thread_info *info, GList *mailbox_li
         libbalsa_mailbox_pop3_set_msg_size_limit(pop3, balsa_app.msg_size_limit * 1024);
         if (info->with_progress_dialog) {
         	bw_pop_mbox->notify =
-        		g_signal_connect(G_OBJECT(mailbox), "progress-notify", G_CALLBACK(bw_check_mailbox_progress_cb), mailbox);
+        		g_signal_connect(mailbox, "progress-notify", G_CALLBACK(bw_check_mailbox_progress_cb), mailbox);
         }
         bw_pop_mbox->thread = g_thread_new(NULL, (GThreadFunc) bw_check_mailbox, mailbox);
         g_debug("launched thread %p for checking POP3 mailbox %s", bw_pop_mbox->thread, libbalsa_mailbox_get_name(mailbox));
@@ -3859,12 +3859,12 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
 	gtk_container_set_border_width(GTK_CONTAINER(box), 6);
 	button = gtk_button_new_with_mnemonic(_("_Apply"));
-	g_signal_connect(G_OBJECT(button), "clicked",
+	g_signal_connect(button, "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_FILTER));
 	gtk_container_add(GTK_CONTAINER(box), button);
 	button = gtk_button_new_with_mnemonic(_("_Clear"));
-	g_signal_connect(G_OBJECT(button), "clicked",
+	g_signal_connect(button, "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_RESET));
 	gtk_container_add(GTK_CONTAINER(box), button);
@@ -3895,7 +3895,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_box_pack_start(GTK_BOX(box), w, TRUE, TRUE, 0);
 
 	button = gtk_button_new_with_mnemonic(_("_OK"));
-	g_signal_connect(G_OBJECT(button), "clicked",
+	g_signal_connect(button, "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(GTK_RESPONSE_OK));
         gtk_widget_set_valign(button, GTK_ALIGN_CENTER);

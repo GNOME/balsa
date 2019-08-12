@@ -200,7 +200,7 @@ balsa_ab_window_list(BalsaAbWindow * ab, GCallback row_activated_cb)
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
 
     gtk_widget_show(tree);
-    g_signal_connect(G_OBJECT(tree), "row-activated", row_activated_cb,
+    g_signal_connect(tree, "row-activated", row_activated_cb,
                      ab);
     return tree;
 }
@@ -242,7 +242,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     g_return_if_fail(balsa_app.address_book_list);
     gtk_window_set_title(GTK_WINDOW(ab), _("Address Book"));
 
-    g_signal_connect(G_OBJECT(ab), "response",
+    g_signal_connect(ab, "response",
 		     G_CALLBACK(balsa_ab_window_response_cb), NULL);
 
     vbox = gtk_dialog_get_content_area(GTK_DIALOG(ab));
@@ -296,7 +296,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     ab->filter_entry = gtk_entry_new();
     gtk_widget_show(ab->filter_entry);
     gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), ab->filter_entry);
-    g_signal_connect(G_OBJECT(ab->filter_entry), "changed",
+    g_signal_connect(ab->filter_entry, "changed",
 		     G_CALLBACK(balsa_ab_window_find), ab);
 
     /* Pack the find stuff into the grid */
@@ -332,7 +332,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_widget_show(GTK_WIDGET(w));
 
     w = gtk_button_new_with_mnemonic(_("_Re-import"));
-    g_signal_connect(G_OBJECT(w), "clicked",
+    g_signal_connect(w, "clicked",
                      G_CALLBACK(balsa_ab_window_reload),
 		       ab);
     gtk_container_add(GTK_CONTAINER(hbox), w);
@@ -352,7 +352,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
                                       GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     gtk_widget_show(w);
-    g_signal_connect(G_OBJECT(w), "clicked",
+    g_signal_connect(w, "clicked",
 		     G_CALLBACK(balsa_ab_window_move_to_recipient_list),
 		       ab);
 
@@ -360,7 +360,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
                                       GTK_ICON_SIZE_BUTTON);
     gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
     gtk_widget_show(w);
-    g_signal_connect(G_OBJECT(w), "clicked",
+    g_signal_connect(w, "clicked",
 		     G_CALLBACK(balsa_ab_window_remove_from_recipient_list),
 		       ab);
 
@@ -394,7 +394,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	 _("a distribution list"));
     gtk_widget_show(ab->dist_address_mode_radio);
     ab->toggle_handler_id =
-        g_signal_connect(G_OBJECT(ab->single_address_mode_radio),
+        g_signal_connect(ab->single_address_mode_radio,
                          "toggled",
                          G_CALLBACK(balsa_ab_window_dist_mode_toggled),
                          ab);
@@ -884,7 +884,7 @@ balsa_ab_window_menu_changed(GtkWidget * widget, BalsaAbWindow *ab)
 
     ab->current_address_book = addr;
 
-    g_signal_handler_block(G_OBJECT(ab->single_address_mode_radio),
+    g_signal_handler_block(ab->single_address_mode_radio,
 			   ab->toggle_handler_id);
     if (libbalsa_address_book_get_dist_list_mode(ab->current_address_book))
 	gtk_toggle_button_set_active(
@@ -892,7 +892,7 @@ balsa_ab_window_menu_changed(GtkWidget * widget, BalsaAbWindow *ab)
     else
 	gtk_toggle_button_set_active(
 	    GTK_TOGGLE_BUTTON(ab->single_address_mode_radio), TRUE);
-    g_signal_handler_unblock(G_OBJECT(ab->single_address_mode_radio),
+    g_signal_handler_unblock(ab->single_address_mode_radio,
 			     ab->toggle_handler_id);
 
     balsa_ab_window_load(ab);

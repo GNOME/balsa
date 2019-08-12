@@ -307,7 +307,7 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
 
     gtk_box_pack_end(GTK_BOX(page), verify_button(dir), FALSE, FALSE, 0);
 
-    g_signal_connect(G_OBJECT(druid), "prepare",
+    g_signal_connect(druid, "prepare",
                      G_CALLBACK(balsa_druid_page_directory_prepare),
                      dir);
     dir->my_num = 98765;

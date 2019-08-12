@@ -264,10 +264,10 @@ bm_header_tl_buttons(BalsaMessage * bm)
                                       GTK_ICON_SIZE_BUTTON);
     gtk_widget_set_tooltip_text(button,
 			        _("Check cryptographic signature"));
-    g_signal_connect(G_OBJECT(button), "focus_in_event",
+    g_signal_connect(button, "focus_in_event",
 		     G_CALLBACK(balsa_mime_widget_limit_focus),
 		     (gpointer) bm);
-    g_signal_connect(G_OBJECT(button), "focus_out_event",
+    g_signal_connect(button, "focus_out_event",
 		     G_CALLBACK(balsa_mime_widget_unlimit_focus),
 		     (gpointer) bm);
     gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
@@ -280,10 +280,10 @@ bm_header_tl_buttons(BalsaMessage * bm)
                                       GTK_ICON_SIZE_BUTTON);
     gtk_widget_set_tooltip_text(button,
 			        _("Select message part to display"));
-    g_signal_connect(G_OBJECT(button), "focus_in_event",
+    g_signal_connect(button, "focus_in_event",
 		     G_CALLBACK(balsa_mime_widget_limit_focus),
 		     (gpointer) bm);
-    g_signal_connect(G_OBJECT(button), "focus_out_event",
+    g_signal_connect(button, "focus_out_event",
 		     G_CALLBACK(balsa_mime_widget_unlimit_focus),
 		     (gpointer) bm);
     gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
@@ -719,10 +719,10 @@ balsa_message_init(BalsaMessage * bm)
     g_free(buttons);
 
     /* Widget to hold message */
-    g_signal_connect(G_OBJECT(bm->bm_widget->widget), "focus_in_event",
+    g_signal_connect(bm->bm_widget->widget, "focus_in_event",
                      G_CALLBACK(balsa_mime_widget_limit_focus),
                      (gpointer) bm);
-    g_signal_connect(G_OBJECT(bm->bm_widget->widget), "focus_out_event",
+    g_signal_connect(bm->bm_widget->widget, "focus_out_event",
                      G_CALLBACK(balsa_mime_widget_unlimit_focus),
 		     (gpointer) bm);
 
@@ -976,14 +976,14 @@ tree_mult_selection_popup(BalsaMessage * bm, GdkEventButton * event,
         menu_item =
             gtk_menu_item_new_with_label (_("Save selected as…"));
         gtk_widget_show(menu_item);
-        g_signal_connect (G_OBJECT (menu_item), "activate",
+        g_signal_connect (menu_item, "activate",
                           G_CALLBACK (part_context_save_all_cb),
                           (gpointer) bm->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (bm->save_all_popup), menu_item);
         menu_item =
             gtk_menu_item_new_with_label (_("Save selected to folder…"));
         gtk_widget_show(menu_item);
-        g_signal_connect (G_OBJECT (menu_item), "activate",
+        g_signal_connect (menu_item, "activate",
                           G_CALLBACK (part_context_dump_all_cb),
                           (gpointer) bm->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (bm->save_all_popup), menu_item);
@@ -1379,7 +1379,7 @@ add_to_attachments_popup(GtkMenuShell * menu, const gchar * item,
     GtkWidget * menuitem = gtk_menu_item_new_with_label (item);
 
     g_object_set_data(G_OBJECT(menuitem), "balsa-message", bm);
-    g_signal_connect(G_OBJECT (menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
 		     G_CALLBACK (atattchments_menu_cb),
 		     (gpointer) info);
     gtk_menu_shell_append(menu, menuitem);
@@ -1407,7 +1407,7 @@ add_toggle_inline_menu_item(GtkMenuShell * menu, BalsaMessage * bm,
 	gtk_check_menu_item_new_with_label (_("force inline for all parts"));
 
     g_object_set_data(G_OBJECT(menuitem), "balsa-message", bm);
-    g_signal_connect(G_OBJECT (menuitem), "activate",
+    g_signal_connect(menuitem, "activate",
 		     G_CALLBACK (toggle_all_inline_cb),
 		     (gpointer) info);
     gtk_menu_shell_append(menu, menuitem);
@@ -1676,7 +1676,7 @@ part_create_menu (BalsaPartInfo* info)
 					   (gpointer)info->body);
 
     menu_item = gtk_menu_item_new_with_mnemonic (_("_Save…"));
-    g_signal_connect (G_OBJECT (menu_item), "activate",
+    g_signal_connect (menu_item, "activate",
                       G_CALLBACK (balsa_mime_widget_ctx_menu_save), (gpointer) info->body);
     gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);
 
@@ -2287,7 +2287,7 @@ select_part(BalsaMessage * bm, BalsaPartInfo *info)
     body = add_part(bm, info, bm->bm_widget->container);
     bm->current_part = part_info_from_body(bm, body);
 
-    g_signal_emit(G_OBJECT(bm), balsa_message_signals[SELECT_PART], 0);
+    g_signal_emit(bm, balsa_message_signals[SELECT_PART], 0);
 
     if (body != NULL) {
         GtkScrolledWindow *scroll = GTK_SCROLLED_WINDOW(bm->scroll);
@@ -2607,7 +2607,7 @@ create_mdn_dialog(GtkWindow *parent, gchar * sender, gchar * mdn_to_address,
     g_object_set_data(G_OBJECT(mdn_dialog), "balsa-send-msg", send_msg);
     g_object_set_data(G_OBJECT(mdn_dialog), "mdn-ident",
                       g_object_ref(mdn_ident));
-    g_signal_connect(G_OBJECT(mdn_dialog), "response",
+    g_signal_connect(mdn_dialog, "response",
                      G_CALLBACK(mdn_dialog_response), NULL);
 
     return mdn_dialog;

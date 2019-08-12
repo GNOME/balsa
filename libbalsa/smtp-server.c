@@ -342,7 +342,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
 #endif
     g_object_weak_ref(G_OBJECT(dialog),
 		    (GWeakNotify) smtp_server_weak_notify, sdi);
-    g_signal_connect(G_OBJECT(dialog), "response",
+    g_signal_connect(dialog, "response",
                      G_CALLBACK(smtp_server_response), sdi);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog),
                                     GTK_RESPONSE_CANCEL);

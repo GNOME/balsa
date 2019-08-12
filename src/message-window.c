@@ -362,7 +362,7 @@ destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 {
     if (mw->bindex) {           /* BalsaIndex still exists */
         g_object_weak_unref(G_OBJECT(mw->bindex), mw_bindex_closed_cb, mw);
-        g_signal_handlers_disconnect_matched(G_OBJECT(mw->bindex),
+        g_signal_handlers_disconnect_matched(mw->bindex,
                                              G_SIGNAL_MATCH_DATA, 0, 0,
                                              NULL, NULL, mw);
         mw->bindex = NULL;
@@ -370,14 +370,14 @@ destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 
     if (mw->mailbox) {
         g_object_remove_weak_pointer(G_OBJECT(mw->mailbox), (gpointer *) &mw->mailbox);
-        g_signal_handlers_disconnect_matched(G_OBJECT(mw->mailbox),
+        g_signal_handlers_disconnect_matched(mw->mailbox,
                                              G_SIGNAL_MATCH_DATA, 0, 0,
                                              NULL, NULL, mw);
         mw->mailbox = NULL;
     }
 
     if (mw->bmessage)
-        g_signal_handlers_disconnect_matched(G_OBJECT(mw->bmessage),
+        g_signal_handlers_disconnect_matched(mw->bmessage,
                                              G_SIGNAL_MATCH_DATA, 0, 0,
                                              NULL, NULL, mw);
 
@@ -859,12 +859,12 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 
     gtk_window_set_role(GTK_WINDOW(window), "message");
 
-    g_signal_connect(G_OBJECT(window), "destroy",
+    g_signal_connect(window, "destroy",
 		     G_CALLBACK(destroy_message_window), mw);
 
     mw->bindex = balsa_find_index_by_mailbox(mailbox);
     g_object_weak_ref(G_OBJECT(mw->bindex), mw_bindex_closed_cb, mw);
-    g_signal_connect_swapped(G_OBJECT(mw->bindex), "index-changed",
+    g_signal_connect_swapped(mw->bindex, "index-changed",
 			     G_CALLBACK(mw_set_buttons_sensitive), mw);
 
     mw->mailbox = mailbox;

@@ -379,7 +379,7 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GType mailbox_type,
                                     update ? GTK_RESPONSE_CANCEL :
                                     MCW_RESPONSE);
 
-    g_signal_connect(G_OBJECT(mcw->window), "response", 
+    g_signal_connect(mcw->window, "response", 
                      G_CALLBACK(conf_response_cb), mcw);
     gtk_widget_show_all(GTK_WIDGET(mcw->window));
 
@@ -749,7 +749,7 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
     } else {
         gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), balsa_app.local_mail_directory);
     }
-    g_signal_connect(G_OBJECT(dialog), "selection-changed",
+    g_signal_connect(dialog, "selection-changed",
                      G_CALLBACK(local_mailbox_dialog_cb), mcw);
 
     size_group = libbalsa_create_size_group(dialog);
@@ -768,7 +768,7 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 
     balsa_get_entry(dialog, &entry);
     if (entry)
-	g_signal_connect(G_OBJECT(entry), "changed",
+	g_signal_connect(entry, "changed",
                          G_CALLBACK(local_mailbox_dialog_cb), mcw);
 
     mcw->view_info =

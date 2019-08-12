@@ -657,7 +657,7 @@ libbalsa_vfs_mime_button(LibBalsaMessageBody * mime_body,
 			       app, g_object_unref);
 	g_free(msg);
 
-	g_signal_connect(G_OBJECT(button), "clicked",
+	g_signal_connect(button, "clicked",
                          callback, data);
     }
 

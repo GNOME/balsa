@@ -249,7 +249,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
                                (GDestroyNotify) g_object_unref);
 	g_object_set_data(G_OBJECT(button), "mode",
 			  GINT_TO_POINTER(VCAL_PSTAT_ACCEPTED));
-	g_signal_connect(G_OBJECT(button), "clicked",
+	g_signal_connect(button, "clicked",
 			 G_CALLBACK(vevent_reply), bbox);
 	gtk_container_add(GTK_CONTAINER(bbox), button);
 
@@ -257,7 +257,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	g_object_set_data(G_OBJECT(button), "event", event);
 	g_object_set_data(G_OBJECT(button), "mode",
 			  GINT_TO_POINTER(VCAL_PSTAT_TENTATIVE));
-	g_signal_connect(G_OBJECT(button), "clicked",
+	g_signal_connect(button, "clicked",
 			 G_CALLBACK(vevent_reply), bbox);
 	gtk_container_add(GTK_CONTAINER(bbox), button);
 
@@ -265,7 +265,7 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	g_object_set_data(G_OBJECT(button), "event", event);
 	g_object_set_data(G_OBJECT(button), "mode",
 			  GINT_TO_POINTER(VCAL_PSTAT_DECLINED));
-	g_signal_connect(G_OBJECT(button), "clicked",
+	g_signal_connect(button, "clicked",
 			 G_CALLBACK(vevent_reply), bbox);
 	gtk_container_add(GTK_CONTAINER(bbox), button);
 

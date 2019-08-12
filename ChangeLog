@@ -1,3 +1,12 @@
+2019-08-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	In calls to g_signal_connect_swapped(), do not cast data using
+	G_OBJECT(data).
+
+	The argument is a gpointer, so the cast is redundant.
+
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init):
+
 2019-08-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	In calls to g_signal*(), do not cast object using

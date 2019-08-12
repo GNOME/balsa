@@ -358,7 +358,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
                                 _("Add selected filter to mailbox"));
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(button, "clicked",
-                             G_CALLBACK(fr_add_pressed), G_OBJECT(p));
+                             G_CALLBACK(fr_add_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
     p->remove_button = button =
@@ -368,7 +368,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
                                 _("Remove selected filter from mailbox"));
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(button, "clicked",
-                             G_CALLBACK(fr_remove_pressed), G_OBJECT(p));
+                             G_CALLBACK(fr_remove_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     gtk_box_pack_start(GTK_BOX(hbox),bbox, FALSE, FALSE, 6);
@@ -426,7 +426,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
             gtk_button_new_with_mnemonic(_("A_pply Now!"));
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(button, "clicked",
-                             G_CALLBACK(fr_apply_now_pressed), G_OBJECT(p));
+                             G_CALLBACK(fr_apply_now_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     p->filters_modified = FALSE;

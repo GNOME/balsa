@@ -1,5 +1,12 @@
 2019-08-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Unref structure members in a dispose method
+
+	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_class_init),
+	(libbalsa_vfs_dispose), (libbalsa_vfs_finalize):
+
+2019-08-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	In calls to g_signal_connect_swapped(), do not cast data using
 	G_OBJECT(data).
 

@@ -1,5 +1,11 @@
 2019-08-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Drop redundant dynamic cast
+
+	* src/mailbox-node.c (balsa_mailbox_node_finalize):
+
+2019-08-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Unref structure members in a dispose method
 
 	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_class_init),

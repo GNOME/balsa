@@ -186,7 +186,7 @@ balsa_mailbox_node_finalize(GObject * object)
 	mn->server = NULL;
     }
 
-    G_OBJECT_CLASS(balsa_mailbox_node_parent_class)->finalize(G_OBJECT(object));
+    G_OBJECT_CLASS(balsa_mailbox_node_parent_class)->finalize(object);
 }
 
 static void

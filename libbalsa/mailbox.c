@@ -146,6 +146,8 @@ struct _LibBalsaMailboxPrivate {
 
     /* Whether to reassemble a message from its parts. */
     gboolean no_reassemble;
+    /* Message ids to reassemble */
+    GSList *reassemble_ids;
 
     /* Whether the tree has been changed since some event. */
     gboolean msg_tree_changed;
@@ -4330,24 +4332,21 @@ lbm_try_reassemble(LibBalsaMailbox * mailbox, const gchar * id)
     libbalsa_progress_set_text(&progress, NULL, 0);
 }
 
-#define LBM_TRY_REASSEMBLE_IDS "libbalsa-mailbox-try-reassemble-ids"
-
 static gboolean
 lbm_try_reassemble_idle(LibBalsaMailbox * mailbox)
 {
-    GSList *id, *ids;
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+    GSList *id;
 
     /* Make sure the thread that detected a message/partial has
      * completed. */
     libbalsa_lock_mailbox(mailbox);
 
-    ids = g_object_get_data(G_OBJECT(mailbox), LBM_TRY_REASSEMBLE_IDS);
-    for (id = ids; id; id = id->next)
+    for (id = priv->reassemble_ids; id != NULL; id = id->next)
         lbm_try_reassemble(mailbox, id->data);
 
-    g_slist_foreach(ids, (GFunc) g_free, NULL);
-    g_slist_free(ids);
-    g_object_set_data(G_OBJECT(mailbox), LBM_TRY_REASSEMBLE_IDS, NULL);
+    g_slist_free_full(priv->reassemble_ids, g_free);
+    priv->reassemble_ids = NULL;
 
     libbalsa_unlock_mailbox(mailbox);
 
@@ -4361,21 +4360,15 @@ libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,
                                 const gchar * id)
 {
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
-    GSList *ids;
 
     if (priv->no_reassemble)
         return;
 
-    ids = g_object_get_data(G_OBJECT(mailbox), LBM_TRY_REASSEMBLE_IDS);
-    if (!ids) {
-        g_object_ref(mailbox);
-        g_idle_add((GSourceFunc) lbm_try_reassemble_idle, mailbox);
-    }
+    if (priv->reassemble_ids == NULL)
+        g_idle_add((GSourceFunc) lbm_try_reassemble_idle, g_object_ref(mailbox));
 
-    if (!g_slist_find_custom(ids, id, (GCompareFunc) strcmp)) {
-        ids = g_slist_prepend(ids, g_strdup(id));
-        g_object_set_data(G_OBJECT(mailbox), LBM_TRY_REASSEMBLE_IDS, ids);
-    }
+    if (g_slist_find_custom(priv->reassemble_ids, id, (GCompareFunc) strcmp) == NULL)
+        priv->reassemble_ids = g_slist_prepend(priv->reassemble_ids, g_strdup(id));
 }
 
 /* Use "message-expunged" signal to update an array of msgnos. */

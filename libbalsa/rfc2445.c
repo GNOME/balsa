@@ -75,9 +75,12 @@ G_DEFINE_TYPE(LibBalsaVEvent, libbalsa_vevent, G_TYPE_OBJECT)
 
 
 /* LibBalsaAddress extra object data */
-#define RFC2445_ROLE            "RFC2445:Role"
-#define RFC2445_PARTSTAT        "RFC2445:PartStat"
-#define RFC2445_RSVP            "RFC2445:RSVP"
+typedef struct {
+    LibBalsaVCalRole role;
+    LibBalsaVCalPartStat part_stat;
+    gboolean rsvp;
+} LibBalsaVCalInfo;
+#define RFC2445_INFO            "RFC2445:Info"
 
 
 static void libbalsa_vcal_finalize(GObject *self);
@@ -99,11 +102,6 @@ static LibBalsaVCalMethod vcal_str_to_method(const gchar * method);
 static LibBalsaVCalRole vcal_str_to_role(const gchar * role);
 static LibBalsaVCalPartStat vcal_str_to_part_stat(const gchar * pstat);
 
-
-#define LB_ROLE2PTR(r)      GINT_TO_POINTER((gint) (r))
-#define LB_PSTAT2PTR(r)     GINT_TO_POINTER((gint) (r))
-#define LB_PTR2ROLE(p)      ((LibBalsaVCalRole) GPOINTER_TO_INT(p))
-#define LB_PTR2PSTAT(p)     ((LibBalsaVCalPartStat) GPOINTER_TO_INT(p))
 
 static struct {
     gchar *str_2445;
@@ -392,27 +390,23 @@ libbalsa_vcal_attendee_to_str(LibBalsaAddress * person)
 {
     GString *retval;
     gchar *str;
-    LibBalsaVCalRole role;
-    LibBalsaVCalPartStat pstat;
+    LibBalsaVCalInfo *info;
 
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(person), NULL);
 
     retval = g_string_new("");
 
-    role = LB_PTR2ROLE(g_object_get_data(G_OBJECT(person),
-                                         RFC2445_ROLE));
-    if (role != VCAL_ROLE_UNKNOWN)
-	g_string_printf(retval, "%s ", vcal_role_to_str(role));
+    info = g_object_get_data(G_OBJECT(person), RFC2445_INFO);
+    if (info->role != VCAL_ROLE_UNKNOWN)
+	g_string_printf(retval, "%s ", vcal_role_to_str(info->role));
 
     str = libbalsa_address_to_gchar(person, -1);
     retval = g_string_append(retval, str);
     g_free(str);
 
-    pstat = LB_PTR2PSTAT(g_object_get_data(G_OBJECT(person),
-                                           RFC2445_PARTSTAT));
-    if (pstat != VCAL_PSTAT_UNKNOWN)
+    if (info->part_stat != VCAL_PSTAT_UNKNOWN)
 	g_string_append_printf(retval, " (%s)",
-			       libbalsa_vcal_part_stat_to_str(pstat));
+			       libbalsa_vcal_part_stat_to_str(info->part_stat));
 
     return g_string_free(retval, FALSE);
 }
@@ -423,9 +417,13 @@ libbalsa_vcal_attendee_to_str(LibBalsaAddress * person)
 gboolean
 libbalsa_vcal_attendee_rsvp(LibBalsaAddress * person)
 {
+    LibBalsaVCalInfo *info;
+
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(person), FALSE);
-    return (gboolean) 
-	GPOINTER_TO_INT(g_object_get_data(G_OBJECT(person), RFC2445_RSVP));
+
+    info = g_object_get_data(G_OBJECT(person), RFC2445_INFO);
+
+    return info->rsvp;
 }
 
 
@@ -721,6 +719,7 @@ cal_address_2445_to_lbaddress(const gchar * uri, gchar ** attributes,
 			      gboolean is_organizer)
 {
     LibBalsaAddress *retval;
+    LibBalsaVCalInfo *info;
 
     /* must be a mailto: uri */
     if (g_ascii_strncasecmp("mailto:", uri, 7))
@@ -728,9 +727,12 @@ cal_address_2445_to_lbaddress(const gchar * uri, gchar ** attributes,
 
     retval = libbalsa_address_new();
     libbalsa_address_append_addr(retval, uri + 7);
+
+    info = g_new0(LibBalsaVCalInfo, 1);
+    g_object_set_data_full(G_OBJECT(retval), RFC2445_INFO, info, g_free);
+
     if (!is_organizer)
-	g_object_set_data(G_OBJECT(retval), RFC2445_ROLE,
-			  LB_ROLE2PTR(VCAL_ROLE_REQ_PART));
+        info->role = VCAL_ROLE_REQ_PART;
 
     if (attributes) {
 	int n;
@@ -741,16 +743,14 @@ cal_address_2445_to_lbaddress(const gchar * uri, gchar ** attributes,
 	    if (!g_ascii_strncasecmp(the_attr, "CN=", 3))
 		libbalsa_address_set_full_name(retval, the_attr + 3);
 	    else if (!g_ascii_strncasecmp(the_attr, "ROLE=", 5))
-		g_object_set_data(G_OBJECT(retval), RFC2445_ROLE,
-				  LB_ROLE2PTR(vcal_str_to_role(the_attr + 5)));
+		info->role = vcal_str_to_role(the_attr + 5);
 	    else if (!g_ascii_strncasecmp(the_attr, "PARTSTAT=", 9))
-		g_object_set_data(G_OBJECT(retval), RFC2445_PARTSTAT,
-				  LB_PSTAT2PTR(vcal_str_to_part_stat(the_attr + 9)));
+		info->part_stat = vcal_str_to_part_stat(the_attr + 9);
 	    else if (!g_ascii_strncasecmp(the_attr, "RSVP=", 5))
-		g_object_set_data(G_OBJECT(retval), RFC2445_RSVP,
-				  GINT_TO_POINTER(! g_ascii_strcasecmp(the_attr + 5, "TRUE")));
+		info->rsvp = g_ascii_strcasecmp(the_attr + 5, "TRUE") == 0;
 	}
     }
+
     return retval;
 }
 

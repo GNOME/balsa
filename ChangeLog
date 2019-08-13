@@ -1,3 +1,11 @@
+2019-08-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	rfc 2445: Set a struct as GObject-data instead of three separate
+	items.
+
+	* libbalsa/rfc2445.c (libbalsa_vcal_attendee_to_str),
+	(libbalsa_vcal_attendee_rsvp), (cal_address_2445_to_lbaddress):
+
 2019-08-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox-imap: Store cache-manager in the object instead of

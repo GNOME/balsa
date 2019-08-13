@@ -80,6 +80,7 @@ struct _LibBalsaMailboxImap {
     GList *acls;            /* RFC 4314 acl's */
 
     gboolean disconnected;
+    struct ImapCacheManager *icm;
 };
 
 struct message_info {
@@ -174,6 +175,8 @@ static gboolean libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox *
 
 static void server_host_settings_changed_cb(LibBalsaServer * server,
 					    LibBalsaMailbox * mailbox);
+static void imap_cache_manager_free(struct ImapCacheManager *icm);
+
 
 static struct message_info *message_info_from_msgno(
 						  LibBalsaMailboxImap * mimap,
@@ -300,6 +303,8 @@ libbalsa_mailbox_imap_finalize(GObject * object)
     g_free(mimap->path);
     g_array_free(mimap->sort_ranks, TRUE);
     g_list_free_full(mimap->acls, (GDestroyNotify) imap_user_acl_free);
+    if (mimap->icm != NULL)
+        imap_cache_manager_free(mimap->icm);
 
     G_OBJECT_CLASS(libbalsa_mailbox_imap_parent_class)->finalize(object);
 }
@@ -547,9 +552,8 @@ clean_cache(LibBalsaMailbox* mailbox)
  
     return TRUE;
 }
-struct ImapCacheManager;
+
 static struct ImapCacheManager*imap_cache_manager_new_from_file(const char *header_cache_path);
-static void imap_cache_manager_free(struct ImapCacheManager *icm);
 static struct ImapCacheManager *icm_store_cached_data(ImapMboxHandle *h);
 static void icm_restore_from_cache(ImapMboxHandle *h,
                                    struct ImapCacheManager *icm);
@@ -1051,8 +1055,6 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
     LibBalsaMailboxImap *mimap;
     unsigned i;
     guint total_messages;
-    struct ImapCacheManager *icm;
-    gboolean from_file = FALSE;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_IMAP(mailbox), FALSE);
 
@@ -1077,19 +1079,15 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
 	g_array_append_val(mimap->messages_info, a);
 	g_ptr_array_add(mimap->msgids, NULL);
     }
-    icm = g_object_get_data(G_OBJECT(mailbox), "cache-manager");
-    if(!icm) { /* Try restoring from file... */
+    if (mimap->icm == NULL) { /* Try restoring from file... */
 	gchar *header_cache_path = get_header_cache_path(mimap);
-	icm = imap_cache_manager_new_from_file(header_cache_path);
+	mimap->icm = imap_cache_manager_new_from_file(header_cache_path);
 	g_free(header_cache_path);
-        from_file = TRUE;
     }
-    if (icm) {
-        icm_restore_from_cache(mimap->handle, icm);
-        if (from_file)
-            imap_cache_manager_free(icm);
-        else
-            g_object_set_data(G_OBJECT(mailbox), "cache-manager", NULL);
+    if (mimap->icm != NULL) {
+        icm_restore_from_cache(mimap->handle, mimap->icm);
+        imap_cache_manager_free(mimap->icm);
+        mimap->icm = NULL;
     }
 
     libbalsa_mailbox_set_first_unread(mailbox,
@@ -1142,11 +1140,9 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
     LibBalsaImapServer *imap_server = LIBBALSA_IMAP_SERVER(server);
     gboolean is_persistent = libbalsa_imap_server_has_persistent_cache(imap_server);
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    struct ImapCacheManager *icm = icm_store_cached_data(mimap->handle);
 
     mimap->opened = FALSE;
-    g_object_set_data_full(G_OBJECT(mailbox), "cache-manager", icm,
-                           (GDestroyNotify) imap_cache_manager_free);
+    mimap->icm = icm_store_cached_data(mimap->handle);
 
     /* we do not attempt to reconnect here */
     if (expunge) {
@@ -1163,7 +1159,7 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
 	/* Implement only for persistent. Cache dir is shared for all
 	   non-persistent caches. */
 	gchar *header_file = get_header_cache_path(mimap);
-	icm_save_to_file(icm, header_file);
+	icm_save_to_file(mimap->icm, header_file);
 	g_free(header_file);
     }
     clean_cache(mailbox);

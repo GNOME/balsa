@@ -1,5 +1,13 @@
 2019-08-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox-imap: Store cache-manager in the object instead of
+	using GObject-data.
+
+	* libbalsa/mailbox_imap.c (libbalsa_mailbox_imap_finalize),
+	(libbalsa_mailbox_imap_open), (libbalsa_mailbox_imap_close):
+
+2019-08-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox: Store message-partial ids in the object instead of
 	using GObject-data.
 

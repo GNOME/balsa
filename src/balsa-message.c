@@ -206,6 +206,8 @@ struct _BalsaMessage {
 #ifdef HAVE_HTML_WIDGET
         gpointer html_find_info;
 #endif				/* HAVE_HTML_WIDGET */
+
+        GtkWidget *attach_button;
 };
 
 G_DEFINE_TYPE(BalsaMessage, balsa_message, GTK_TYPE_BOX)
@@ -230,9 +232,6 @@ balsa_message_class_init(BalsaMessageClass * klass)
 }
 
 /* Helpers for balsa_message_init. */
-#define BALSA_MESSAGE_ATTACH_BTN "balsa-message-attach-btn"
-#define bm_header_widget_att_button(balsa_message) \
-    g_object_get_data(G_OBJECT(balsa_message), BALSA_MESSAGE_ATTACH_BTN)
 
 static void
 balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * bm)
@@ -275,7 +274,7 @@ bm_header_tl_buttons(BalsaMessage * bm)
 		     G_CALLBACK(message_recheck_crypto_cb), bm);
     g_ptr_array_add(array, button);
 
-    button =
+    bm->attach_button = button =
         gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_ATTACHMENT),
                                       GTK_ICON_SIZE_BUTTON);
     gtk_widget_set_tooltip_text(button,
@@ -291,7 +290,6 @@ bm_header_tl_buttons(BalsaMessage * bm)
 		     G_CALLBACK(balsa_headers_attachments_popup), bm);
     g_signal_connect(button, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
-    g_object_set_data(G_OBJECT(bm), BALSA_MESSAGE_ATTACH_BTN, button);
     g_ptr_array_add(array, button);
 
     g_ptr_array_add(array, NULL);
@@ -1293,13 +1291,11 @@ balsa_message_set_displayed_headers(BalsaMessage * bmessage,
         gtk_tree_model_foreach
             (gtk_tree_view_get_model(GTK_TREE_VIEW(bmessage->treeview)),
              balsa_message_set_embedded_hdr, bmessage);
-	if (bm_header_widget_att_button(bmessage)) {
+	if (bmessage->attach_button != NULL) {
 	    if (bmessage->info_count > 1)
-		gtk_widget_show_all
-		    (GTK_WIDGET(bm_header_widget_att_button(bmessage)));
+		gtk_widget_show_all(bmessage->attach_button);
 	    else
-		gtk_widget_hide
-		    (GTK_WIDGET(bm_header_widget_att_button(bmessage)));
+		gtk_widget_hide(bmessage->attach_button);
 	}
     }
 }
@@ -1615,11 +1611,10 @@ display_content(BalsaMessage * bm)
     display_parts(bm, libbalsa_message_get_body_list(bm->message), NULL, NULL);
     if (bm->info_count > 1) {
  	gtk_widget_show_all(bm->parts_popup);
- 	gtk_widget_show_all
-	    (GTK_WIDGET(bm_header_widget_att_button(bm)));
-    } else
- 	gtk_widget_hide
-	    (GTK_WIDGET(bm_header_widget_att_button(bm)));
+ 	gtk_widget_show_all(bm->attach_button);
+    } else {
+ 	gtk_widget_hide(bm->attach_button);
+    }
     display_face(bm);
     gtk_tree_view_columns_autosize(GTK_TREE_VIEW(bm->treeview));
     gtk_tree_view_expand_all(GTK_TREE_VIEW(bm->treeview));

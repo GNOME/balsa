@@ -1,3 +1,11 @@
+2019-08-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-message: Add the attach-button to the struct instead of
+	using GObject-data
+
+	* src/balsa-message.c (bm_header_tl_buttons),
+	(balsa_message_set_displayed_headers), (display_content):
+
 2019-08-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	rfc 2445: Set a struct as GObject-data instead of three separate

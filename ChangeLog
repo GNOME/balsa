@@ -1,5 +1,42 @@
 2019-08-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-message: Use "balsa_message" consistntly as its
+	identifier, and use "bm_" consistently as the prefix for static
+	functions.
+
+	* src/balsa-message.c (balsa_headers_attachments_popup),
+	(bm_header_tl_buttons), (bm_on_set_style), (bm_find_set_status),
+	(bm_find_scroll_to_rectangle), (bm_find_scroll_to_selection),
+	(bm_find_cb), (bm_find_entry_changed_cb), (bm_find_again),
+	(bm_find_bar_new), (bm_find_pass_to_entry),
+	(bm_disable_find_entry), (balsa_message_init),
+	(balsa_message_destroy), (balsa_message_new),
+	(tree_activate_row_cb), (tree_mult_selection_popup),
+	(tree_menu_popup_key_cb), (tree_button_press_cb), (bm_clear_tree),
+	(balsa_message_set), (balsa_message_save_current_part),
+	(bm_set_embedded_hdr), (balsa_message_set_displayed_headers),
+	(balsa_message_set_wrap), (display_headers), (part_info_init),
+	(atattchments_menu_cb), (add_to_attachments_popup),
+	(toggle_all_inline_cb), (add_toggle_inline_menu_item),
+	(display_part), (display_parts), (display_face), (display_content),
+	(bm_next_part_info), (balsa_message_next_part),
+	(balsa_message_has_next_part), (bm_previous_part_info),
+	(balsa_message_previous_part), (balsa_message_has_previous_part),
+	(part_info_from_body), (add_body), (add_multipart_digest),
+	(add_multipart_mixed), (add_multipart), (add_part),
+	(hide_all_parts), (select_part),
+	(balsa_message_current_part_widget), (balsa_message_can_select),
+	(balsa_message_grab_focus), (balsa_message_can_zoom),
+	(balsa_message_zoom), (bm_scan_signatures),
+	(message_recheck_crypto_cb), (balsa_message_find_in_message),
+	(balsa_message_get_wrap_text), (balsa_message_get_focus_state),
+	(balsa_message_get_scroll), (balsa_message_get_bm_widget),
+	(balsa_message_get_message), (balsa_message_get_shown_headers),
+	(balsa_message_get_face_box), (balsa_message_get_tree_view),
+	(balsa_message_set_focus_state), (balsa_message_set_face_box):
+
+2019-08-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	balsa-message: Add the attach-button to the struct instead of
 	using GObject-data
 

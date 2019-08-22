@@ -862,10 +862,9 @@ static void
 imap_mbox_handle_finalize(GObject* gobject)
 {
   ImapMboxHandle* handle = IMAP_MBOX_HANDLE(gobject);
-  g_return_if_fail(handle);
 
   g_mutex_lock(&handle->mutex);
-  if(handle->state != IMHS_DISCONNECTED) {
+  if (handle->state != IMHS_DISCONNECTED) {
     handle->doing_logout = TRUE;
     imap_cmd_exec(handle, "LOGOUT");
   }
@@ -876,7 +875,7 @@ imap_mbox_handle_finalize(GObject* gobject)
 
   g_list_foreach(handle->cmd_info, (GFunc)g_free, NULL);
   g_list_free(handle->cmd_info);
-  g_hash_table_destroy(handle->status_resps); handle->status_resps = NULL;
+  g_hash_table_destroy(handle->status_resps);
 
   if (handle->thread_root != NULL)
       g_node_destroy(handle->thread_root);

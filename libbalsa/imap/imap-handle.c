@@ -43,31 +43,7 @@
 
 #define IDLE_TIMEOUT 30
 
-#define LIT_TYPE_HANDLE \
-    (imap_mbox_handle_get_type())
-#define IMAP_MBOX_HANDLE(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST(obj, LIT_TYPE_HANDLE, ImapMboxHandle))
-#define IMAP_MBOX_HANDLE_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST(klass, LIT_TYPE_HANDLE, \
-                             ImapMboxHandleClass))
-#define LIT_IS_HANDLE(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE(obj, LIT_TYPE_HANDLE))
-#define LIT_IS_HANDLE_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE(klass, LIT_TYPE_HANDLE))
-
 #define error_safe(e)	(((e != NULL) && ((e)->message != NULL)) ? (e)->message : _("unknown"))
-
-struct _ImapMboxHandleClass {
-  GObjectClass parent_class;
-  /* Signal */
-  void (*fetch_response)(ImapMboxHandle* handle);
-  void (*list_response)(ImapMboxHandle* handle, int delim,
-                        ImapMboxFlags flags, const gchar* mbox);
-  void (*lsub_response)(ImapMboxHandle* handle, int delim,
-                        ImapMboxFlags flags, const gchar* mbox);
-  void (*expunge_notify)(ImapMboxHandle* handle, int seqno);
-  void (*exists_notify)(ImapMboxHandle* handle);
-};
 
 enum _ImapHandleSignal {
   FETCH_RESPONSE,
@@ -79,12 +55,8 @@ enum _ImapHandleSignal {
 };
 typedef enum _ImapHandleSignal ImapHandleSignal;
 
-static GObjectClass *parent_class = NULL;
 static guint imap_mbox_handle_signals[LAST_SIGNAL] = { 0 };
-
-static void imap_mbox_handle_init(ImapMboxHandle *handle);
-static void imap_mbox_handle_class_init(ImapMboxHandleClass * klass);
-static void imap_mbox_handle_finalize(GObject* handle);
+static void imap_mbox_handle_finalize(GObject* gobject);
 
 static ImapResult imap_mbox_connect(ImapMboxHandle* handle);
 
@@ -97,50 +69,36 @@ static gboolean async_process(GSocket      *source,
 			  	  	  	  	  GIOCondition  condition,
 							  gpointer      data);
 
-static GType
-imap_mbox_handle_get_type()
-{
-  static GType imap_mbox_handle_type = 0;
+G_DECLARE_FINAL_TYPE(ImapMboxHandle,
+                     imap_mbox_handle,
+                     IMAP,
+                     MBOX_HANDLE,
+                     GObject)
 
-  if(!imap_mbox_handle_type) {
-    static const GTypeInfo imap_mbox_handle_info = {
-      sizeof(ImapMboxHandleClass),
-      NULL,               /* base_init */
-      NULL,               /* base_finalize */
-      (GClassInitFunc) imap_mbox_handle_class_init,
-      NULL,               /* class_finalize */
-      NULL,               /* class_data */
-      sizeof(ImapMboxHandle),
-      0,                  /* n_preallocs */
-      (GInstanceInitFunc) imap_mbox_handle_init
-    };
-    imap_mbox_handle_type =
-      g_type_register_static(G_TYPE_OBJECT, "ImapMboxHandle",
-                             &imap_mbox_handle_info, 0);
-  }
-  return imap_mbox_handle_type;
-}
+G_DEFINE_TYPE(ImapMboxHandle, imap_mbox_handle, G_TYPE_OBJECT)
 
 static void
 imap_mbox_handle_init(ImapMboxHandle *handle)
 {
+  handle->timeout = -1;
+  handle->flag_cache=  g_array_new(FALSE, TRUE, sizeof(ImapFlagCache));
+  handle->status_resps = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                               NULL, NULL);
+  handle->state = IMHS_DISCONNECTED;
+  handle->tls_mode = NET_CLIENT_CRYPT_STARTTLS;
+  handle->idle_state = IDLE_INACTIVE;
+  handle->enable_idle = 1;
+
+#ifdef G_OBJECT_NEEDS_TO_BE_INITIALIZED
   handle->host   = NULL;
   handle->mbox   = NULL;
-  handle->timeout = -1;
-  handle->state  = IMHS_DISCONNECTED;
   handle->has_capabilities = FALSE;
   handle->exists = 0;
   handle->recent = 0;
   handle->last_msg = NULL;
   handle->msg_cache = NULL;
-  handle->flag_cache=  g_array_new(FALSE, TRUE, sizeof(ImapFlagCache));
   handle->doing_logout = FALSE;
-  handle->tls_mode = NET_CLIENT_CRYPT_STARTTLS;
-  handle->idle_state = IDLE_INACTIVE;
   handle->cmd_info = NULL;
-  handle->status_resps = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                               NULL, NULL);
-
   handle->info_cb  = NULL;
   handle->info_arg = NULL;
   handle->auth_cb = NULL;
@@ -149,10 +107,10 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
   handle->op_cancelled = 0;
   handle->enable_anonymous = 0;
   handle->enable_client_sort = 0;
-  handle->enable_binary    = 0;
-  handle->enable_idle      = 1;
-
+  handle->enable_binary = 0;
   handle->has_rights = 0;
+#endif /* G_OBJECT_NEEDS_TO_BE_INITIALIZED */
+
   mbox_view_init(&handle->mbox_view);
 
   g_mutex_init(&handle->mutex);
@@ -163,21 +121,18 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS(klass);
   
-  parent_class = g_type_class_peek_parent(klass);
   imap_mbox_handle_signals[FETCH_RESPONSE] = 
     g_signal_new("fetch-response",
                  G_TYPE_FROM_CLASS(object_class),
                  G_SIGNAL_RUN_FIRST,
-                 G_STRUCT_OFFSET(ImapMboxHandleClass, fetch_response),
-                 NULL, NULL,
+                 0, NULL, NULL,
                  NULL, G_TYPE_NONE, 0);
 
   imap_mbox_handle_signals[LIST_RESPONSE] = 
     g_signal_new("list-response",
                  G_TYPE_FROM_CLASS(object_class),
                  G_SIGNAL_RUN_FIRST,
-                 G_STRUCT_OFFSET(ImapMboxHandleClass, list_response),
-                 NULL, NULL,
+                 0, NULL, NULL,
                  NULL, G_TYPE_NONE, 3,
                  G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
 
@@ -185,8 +140,7 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
     g_signal_new("lsub-response",
                  G_TYPE_FROM_CLASS(object_class),
                  G_SIGNAL_RUN_FIRST,
-                 G_STRUCT_OFFSET(ImapMboxHandleClass, lsub_response),
-                 NULL, NULL,
+                 0, NULL, NULL,
                  NULL, G_TYPE_NONE, 3,
                  G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
 
@@ -194,8 +148,7 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
     g_signal_new("expunge-notify",
                  G_TYPE_FROM_CLASS(object_class),
                  G_SIGNAL_RUN_FIRST,
-                 G_STRUCT_OFFSET(ImapMboxHandleClass, expunge_notify),
-                 NULL, NULL,
+                 0, NULL, NULL,
                  NULL, G_TYPE_NONE, 1,
 		 G_TYPE_INT);
 
@@ -203,8 +156,7 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
     g_signal_new("exists-notify",
                  G_TYPE_FROM_CLASS(object_class),
                  G_SIGNAL_RUN_FIRST,
-                 G_STRUCT_OFFSET(ImapMboxHandleClass, exists_notify),
-                 NULL, NULL,
+                 0, NULL, NULL,
                  NULL, G_TYPE_NONE, 0);
 
   object_class->finalize = imap_mbox_handle_finalize;
@@ -213,8 +165,7 @@ imap_mbox_handle_class_init(ImapMboxHandleClass * klass)
 ImapMboxHandle*
 imap_mbox_handle_new(void)
 {
-  ImapMboxHandle *handle = g_object_new(LIT_TYPE_HANDLE, NULL);
-  return handle;
+  return g_object_new(imap_mbox_handle_get_type(), NULL);
 }
 
 void
@@ -919,31 +870,29 @@ imap_mbox_handle_finalize(GObject* gobject)
     imap_cmd_exec(handle, "LOGOUT");
   }
   imap_handle_disconnect(handle);
-  g_free(handle->host);    handle->host   = NULL;
-  g_free(handle->mbox);    handle->mbox   = NULL;
-  g_free(handle->last_msg);handle->last_msg = NULL;
+  g_free(handle->host);
+  g_free(handle->mbox);
+  g_free(handle->last_msg);
 
   g_list_foreach(handle->cmd_info, (GFunc)g_free, NULL);
-  g_list_free(handle->cmd_info); handle->cmd_info = NULL;
+  g_list_free(handle->cmd_info);
   g_hash_table_destroy(handle->status_resps); handle->status_resps = NULL;
 
-  if (handle->thread_root != NULL) {
+  if (handle->thread_root != NULL)
       g_node_destroy(handle->thread_root);
-      handle->thread_root = NULL;
-  }
 
   mbox_view_dispose(&handle->mbox_view);
   imap_mbox_resize_cache(handle, 0);
-  g_free(handle->msg_cache); handle->msg_cache = NULL;
-  g_array_free(handle->flag_cache, TRUE); handle->flag_cache = NULL;
+  g_free(handle->msg_cache);
+  g_array_free(handle->flag_cache, TRUE);
   g_list_foreach(handle->acls, (GFunc)imap_user_acl_free, NULL);
-  g_list_free(handle->acls); handle->acls = NULL;
-  g_free(handle->quota_root); handle->quota_root = NULL;
+  g_list_free(handle->acls);
+  g_free(handle->quota_root);
 
   g_mutex_unlock(&handle->mutex);
   g_mutex_clear(&handle->mutex);
 
-  G_OBJECT_CLASS(parent_class)->finalize(gobject);  
+  G_OBJECT_CLASS(imap_mbox_handle_parent_class)->finalize(gobject);
 }
 
 typedef void (*ImapTasklet)(ImapMboxHandle*, void*);

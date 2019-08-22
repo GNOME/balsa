@@ -1,3 +1,12 @@
+2019-08-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	imap-handle: Use modern macros to declare and define ImapMboxHandle
+
+	* libbalsa/imap/imap-handle.c (imap_mbox_handle_init),
+	(imap_mbox_handle_class_init), (imap_mbox_handle_new),
+	(imap_mbox_handle_finalize):
+	* libbalsa/imap/imap-handle.h:
+
 2019-08-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-message: Use "balsa_message" consistntly as its

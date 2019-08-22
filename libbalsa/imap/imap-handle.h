@@ -78,7 +78,7 @@ typedef enum
   IMCAP_STARTTLS,		/* RFC 2595: STARTTLS */
   IMCAP_SORT,                   /* SORT and THREAD described at: */
   IMCAP_THREAD_ORDEREDSUBJECT,  /* RFC 5256 */
-  IMCAP_THREAD_REFERENCES,      
+  IMCAP_THREAD_REFERENCES,
   IMCAP_UIDPLUS,                /* RFC 4315 */
   IMCAP_UNSELECT,               /* RFC 3691 */
   IMCAP_FETCHBODY,              /* basic imap implemented correctly by
@@ -95,7 +95,6 @@ typedef enum {
   IMAP_OPT_COMPRESS,    /**< enable COMPRESS */
 }  ImapOption;
 
-typedef struct _ImapMboxHandleClass ImapMboxHandleClass;
 typedef void (*LBIResponseCallback)(ImapMboxHandle *h, const char* response,
                                     void *data);
 

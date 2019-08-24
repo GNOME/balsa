@@ -4783,7 +4783,7 @@ insert_file_response(GtkWidget    *selector,
             balsa_app.attach_dir = gtk_file_chooser_get_current_folder(fc);
     	} else {
     		balsa_information_parented(GTK_WINDOW(bsmsg->window),
-    			LIBBALSA_INFORMATION_WARNING, _("Cannot not read the file “%s”: %s"), fname, error->message);
+    			LIBBALSA_INFORMATION_WARNING, _("Cannot read the file “%s”: %s"), fname, error->message);
     		g_error_free(error);
     	}
 

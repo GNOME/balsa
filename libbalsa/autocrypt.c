@@ -879,7 +879,8 @@ add_or_update_user_info(const AutocryptData *user_info, time_t date_header, gboo
 		(sqlite3_bind_int64(query[query_idx], 5, user_info->expires) != SQLITE_OK) ||
 		(sqlite3_bind_int(query[query_idx], 6, user_info->prefer_encrypt) != SQLITE_OK) ||
 		(sqlite3_step(query[query_idx]) != SQLITE_DONE)) {
-		g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1, _("%s user “%s” failed: %s"), update ? _("update") : _("insert"),
+		g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1,
+                        update ? _("update user “%s” failed: %s") : _("insert user “%s” failed: %s"),
 			user_info->addr, sqlite3_errmsg(autocrypt_db));
 	} else {
 		g_debug("%s user '%s': %d", update ? "updated" : "inserted", user_info->addr, sqlite3_changes(autocrypt_db));

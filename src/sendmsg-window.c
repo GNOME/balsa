@@ -5373,7 +5373,7 @@ check_autocrypt_recommendation(BalsaSendmsg *bsmsg)
     		default_choice = GTK_RESPONSE_NO;
     		tmp_msg = g_strconcat(message,
     			_("\nHowever, encryption is discouraged as the Autocrypt status indicates that "
-    			  "some recipients <i>might</i> no be able to read the message."), NULL);
+    			  "some recipients <i>might</i> not be able to read the message."), NULL);
     		g_free(message);
     		message = tmp_msg;
     	}

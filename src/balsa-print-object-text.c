@@ -555,7 +555,8 @@ balsa_print_object_text_calendar(GList               *list,
             guint n;
 
             this_att = libbalsa_vcal_attendee_to_str(libbalsa_vevent_attendee(event, 0U));
-            ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, this_att, (attendees > 1U) ? _("Attendees:") : _("Attendee:"));
+            ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, this_att,
+                           ngettext("Attendee:", "Attendees:", attendees));
             g_free(this_att);
             for (n = 1U; n < attendees; n++) {
                 this_att = libbalsa_vcal_attendee_to_str(libbalsa_vevent_attendee(event, n));

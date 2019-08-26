@@ -1,3 +1,9 @@
+2019-08-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-print-object-text.c
+	(balsa_print_object_text_calendar): Use ngettext() for plural
+	forms of strings.
+
 2019-08-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	imap-handle: Use modern macros to declare and define ImapMboxHandle

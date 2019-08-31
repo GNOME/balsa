@@ -1,3 +1,40 @@
+2019-08-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget: Declare BalsaMimeWidget derivable
+
+	Make the struct private, and provide accessors for the widget,
+	container, and header_widget members.
+
+	* src/balsa-message.c (bm_find_scroll_to_rectangle),
+	(bm_find_entry_changed_cb), (bm_find_again), (balsa_message_init),
+	(add_part), (gtk_tree_hide_func), (hide_all_parts), (select_part),
+	(balsa_message_current_part_widget), (balsa_message_can_select),
+	(balsa_message_grab_focus), (balsa_message_can_zoom),
+	(balsa_message_zoom), (balsa_message_find_in_message):
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_limit_focus), (balsa_mime_widget_unlimit_focus):
+	* src/balsa-mime-widget-crypto.c (balsa_mime_widget_new_signature),
+	(balsa_mime_widget_new_pgpkey):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-message.c (balsa_mime_widget_new_message),
+	(bmw_message_extbody_url), (bmw_message_extbody_mail),
+	(balsa_mime_widget_new_message_tl), (bmw_message_set_headers_d),
+	(bmw_message_set_headers):
+	* src/balsa-mime-widget-multipart.c
+	(balsa_mime_widget_new_multipart):
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(bm_widget_new_html), (bm_widget_new_vcard):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar):
+	* src/balsa-mime-widget.c (balsa_mime_widget_init),
+	(balsa_mime_widget_class_init), (balsa_mime_widget_new),
+	(balsa_mime_widget_new_unknown), (vadj_change_cb),
+	(balsa_mime_widget_get_widget), (balsa_mime_widget_get_container),
+	(balsa_mime_widget_get_header_widget),
+	(balsa_mime_widget_set_widget), (balsa_mime_widget_set_container),
+	(balsa_mime_widget_set_header_widget):
+	* src/balsa-mime-widget.h:
+
 2019-08-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-print-object-text.c

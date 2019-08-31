@@ -133,7 +133,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     GList *url_list = NULL;
     GError *err = NULL;
     gboolean is_text_plain;
-
+    GtkWidget *widget;
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
@@ -175,24 +175,25 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
     /* create the mime object and the text/source view widget */
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    mw->widget = create_text_widget(content_type);
+    widget = create_text_widget(content_type);
+    balsa_mime_widget_set_widget(mw, widget);
 
     /* configure text or source view */
-    gtk_text_view_set_editable(GTK_TEXT_VIEW(mw->widget), FALSE);
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(widget), FALSE);
 #if GTK_CHECK_VERSION(3, 23, 1)
-    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget),  BALSA_LEFT_MARGIN);
-    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), BALSA_RIGHT_MARGIN);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(widget),  BALSA_LEFT_MARGIN);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(widget), BALSA_RIGHT_MARGIN);
 #else  /* GTK_CHECK_VERSION(3, 23, 1) */
-    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(mw->widget), 0);
-    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(mw->widget), 0);
-    gtk_widget_set_margin_start(mw->widget, BALSA_LEFT_MARGIN);
-    gtk_widget_set_margin_end(mw->widget, BALSA_RIGHT_MARGIN);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(widget), 0);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(widget), 0);
+    gtk_widget_set_margin_start(widget, BALSA_LEFT_MARGIN);
+    gtk_widget_set_margin_end(widget, BALSA_RIGHT_MARGIN);
 #endif /* GTK_CHECK_VERSION(3, 23, 1) */
-    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(mw->widget), GTK_WRAP_WORD_CHAR);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(widget), GTK_WRAP_WORD_CHAR);
 
     /* set the message font */
     if (!balsa_app.use_system_fonts)
-        bm_modify_font_from_string(mw->widget, balsa_app.message_font);
+        bm_modify_font_from_string(widget, balsa_app.message_font);
 
     if (libbalsa_message_body_is_flowed(mime_body)) {
 	/* Parse, but don't wrap. */
@@ -200,43 +201,43 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	ptr = libbalsa_wrap_rfc2646(ptr, G_MAXINT, FALSE, TRUE, delsp);
     } else if (balsa_message_get_wrap_text(bm)
 #if HAVE_GTKSOURCEVIEW
-	       && !GTK_SOURCE_IS_VIEW(mw->widget)
+	       && !GTK_SOURCE_IS_VIEW(widget)
 #endif
 	       )
 	libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 
-    g_signal_connect(mw->widget, "key_press_event",
+    g_signal_connect(widget, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event),
 		     (gpointer) bm);
-    g_signal_connect(mw->widget, "populate-popup",
+    g_signal_connect(widget, "populate-popup",
 		     G_CALLBACK(text_view_populate_popup),
 		     (gpointer)mime_body);
 
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(mw->widget));
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
 
-    url_list = fill_text_buf_cited(mw->widget, ptr,
+    url_list = fill_text_buf_cited(widget, ptr,
                                    libbalsa_message_body_is_flowed(mime_body),
                                   is_text_plain);
 
     prepare_url_offsets(buffer, url_list);
-    g_signal_connect_after(mw->widget, "realize",
+    g_signal_connect_after(widget, "realize",
 			   G_CALLBACK(fix_text_widget), url_list);
     if (url_list) {
-	g_signal_connect(mw->widget, "button_press_event",
+	g_signal_connect(widget, "button_press_event",
 			 G_CALLBACK(store_button_coords), NULL);
-	g_signal_connect(mw->widget, "button_release_event",
+	g_signal_connect(widget, "button_release_event",
 			 G_CALLBACK(check_call_url), url_list);
-	g_signal_connect(mw->widget, "motion-notify-event",
+	g_signal_connect(widget, "motion-notify-event",
 			 G_CALLBACK(check_over_url), url_list);
-	g_signal_connect(mw->widget, "leave-notify-event",
+	g_signal_connect(widget, "leave-notify-event",
 			 G_CALLBACK(check_over_url), url_list);
-	g_object_set_data_full(G_OBJECT(mw->widget), "url-list", url_list,
+	g_object_set_data_full(G_OBJECT(widget), "url-list", url_list,
 			       (GDestroyNotify)free_url_list);
     }
 
     if (is_text_plain) {
 	/* plain-text highlighting */
-	g_object_set_data(G_OBJECT(mw->widget), "phrase-highlight",
+	g_object_set_data(G_OBJECT(widget), "phrase-highlight",
 			  GINT_TO_POINTER(PHRASE_HIGHLIGHT_ON));
 	phrase_highlight(buffer, "hp-bold", '*', "weight", PANGO_WEIGHT_BOLD);
 	phrase_highlight(buffer, "hp-underline", '_', "underline", PANGO_UNDERLINE_SINGLE);
@@ -244,7 +245,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     }
 
     /* size allocation may not be correct, so we'll check back later */
-    balsa_mime_widget_schedule_resize(mw->widget);
+    balsa_mime_widget_schedule_resize(widget);
     
     g_free(ptr);
 
@@ -1182,24 +1183,28 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 {
     BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     GtkWidget *widget;
+    GtkWidget *popup_menu;
 
-    mw->widget =
+    widget =
         libbalsa_html_new(mime_body,
                           (LibBalsaHtmlCallback) bm_widget_on_url,
                           (LibBalsaHtmlCallback) handle_url);
-    g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
+    balsa_mime_widget_set_widget(mw, widget);
 
-    g_signal_connect(libbalsa_html_get_view_widget(mw->widget),
+    g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);
+
+    g_signal_connect(libbalsa_html_get_view_widget(widget),
                      "key_press_event",
                      G_CALLBACK(balsa_mime_widget_key_press_event), bm);
-    if ((widget = libbalsa_html_popup_menu_widget(mw->widget))) {
-        g_object_set_data(G_OBJECT(widget), "balsa-message", bm);
-        g_signal_connect(widget, "populate-popup",
-                         G_CALLBACK(bmwt_populate_popup_cb), mw->widget);
+
+    if ((popup_menu = libbalsa_html_popup_menu_widget(widget)) != NULL) {
+        g_object_set_data(G_OBJECT(popup_menu), "balsa-message", bm);
+        g_signal_connect(popup_menu, "populate-popup",
+                         G_CALLBACK(bmwt_populate_popup_cb), widget);
     } else {
-        g_signal_connect(mw->widget, "button-press-event",
+        g_signal_connect(widget, "button-press-event",
                          G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
-        g_signal_connect(mw->widget, "popup-menu",
+        g_signal_connect(widget, "popup-menu",
                          G_CALLBACK(balsa_gtk_html_popup), bm);
     }
 
@@ -1226,6 +1231,7 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
     BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     LibBalsaAddress *address;
     GtkGrid *grid;
+    GtkWidget *widget;
     GtkWidget *w;
     int row = 1;
 
@@ -1235,8 +1241,9 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
     if (address == NULL)
         return NULL;
 
-    mw->widget = gtk_grid_new();
-    grid = (GtkGrid*)mw->widget;
+    widget = gtk_grid_new();
+    balsa_mime_widget_set_widget(mw, widget);
+    grid = (GtkGrid *) widget;
     gtk_grid_set_row_spacing(grid, 6);
     gtk_grid_set_column_spacing(grid, 12);
 
@@ -1253,7 +1260,8 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
     GRID_ATTACH(grid, libbalsa_address_get_organization(address), _("Organization:"));
     GRID_ATTACH(grid, libbalsa_address_get_addr(address),         _("Email Address:"));
 
-    g_object_set_data(G_OBJECT(mw->widget), "mime-body", mime_body);
+    g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);
+
     return mw;
 }
 

@@ -1,3 +1,11 @@
+2019-09-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-image: Declare BalsaMimeWidgetImage final
+
+	It was already private, so no accessors are needed.
+
+	* src/balsa-mime-widget-image.h:
+
 2019-08-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mime-widget: Declare BalsaMimeWidget derivable

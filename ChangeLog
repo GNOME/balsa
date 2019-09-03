@@ -1,5 +1,18 @@
 2019-09-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mime-widget-image: Simplify resizing
+
+	Catch the size-allocate signal only for BalsaMimeWidgetImage
+	widgets.
+
+	* src/balsa-message.c (balsa_message_init):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_image_init),
+	(balsa_mime_widget_image_dispose), (img_check_size),
+	(img_size_allocate_cb), (balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-image.h:
+
+2019-09-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mime-widget-image: Declare BalsaMimeWidgetImage final
 
 	It was already private, so no accessors are needed.

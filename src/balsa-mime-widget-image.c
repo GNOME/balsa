@@ -32,11 +32,10 @@
  * GObject class definitions
  */
 struct _BalsaMimeWidgetImage {
-    BalsaMimeWidget  parent;
-};
+    BalsaMimeWidget  parent_object;
 
-struct _BalsaMimeWidgetImageClass {
-    BalsaMimeWidgetClass parent;
+    guint img_check_size_id;
+    GdkPixbuf *pixbuf;
 };
 
 G_DEFINE_TYPE(BalsaMimeWidgetImage,
@@ -46,12 +45,24 @@ G_DEFINE_TYPE(BalsaMimeWidgetImage,
 static void
 balsa_mime_widget_image_init(BalsaMimeWidgetImage * mwi)
 {
+#ifdef G_OBJECT_NEEDS_INITIALZING
+    mwi->img_check_size_id = 0;
+    mwi->pixbuf = NULL;
+#endif /* G_OBJECT_NEEDS_INITIALZING */
 }
 
 static void
-balsa_mime_widget_image_dispose(GObject * obj)
+balsa_mime_widget_image_dispose(GObject * object)
 {
-    G_OBJECT_CLASS(balsa_mime_widget_image_parent_class)->dispose(obj);
+    BalsaMimeWidgetImage *mwi = BALSA_MIME_WIDGET_IMAGE(object);
+
+    if (mwi->img_check_size_id > 0) {
+        g_source_remove(mwi->img_check_size_id);
+        mwi->img_check_size_id = 0;
+    }
+    g_clear_object(&mwi->pixbuf);
+
+    G_OBJECT_CLASS(balsa_mime_widget_image_parent_class)->dispose(object);
 }
 
 static void
@@ -61,13 +72,99 @@ balsa_mime_widget_image_class_init(BalsaMimeWidgetImageClass * klass)
 
     object_class->dispose = balsa_mime_widget_image_dispose;
 }
+
 /*
- * End of GObject class definitions
+ * Callbacks
  */
 
-static gboolean balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
-					    GtkMenu * menu);
-static gboolean img_check_size(GtkImage ** widget_p);
+static gboolean
+img_check_size(BalsaMimeWidgetImage * mwi)
+{
+    GtkWidget *widget;
+    GtkImage *image;
+    GtkWidget *viewport;
+    gint orig_width;
+    GdkPixbuf *pixbuf;
+    gint curr_w, dst_w;
+    GtkAllocation allocation;
+
+    mwi->img_check_size_id = 0;
+
+    widget = balsa_mime_widget_get_widget((BalsaMimeWidget *) mwi);
+    viewport = gtk_widget_get_ancestor(widget, GTK_TYPE_VIEWPORT);
+    if (viewport == NULL) {
+        return G_SOURCE_REMOVE;
+    }
+
+    pixbuf = mwi->pixbuf;
+    if (pixbuf == NULL) {
+        return G_SOURCE_REMOVE;
+    }
+
+    orig_width = gdk_pixbuf_get_width(pixbuf);
+    if (orig_width <= 0) {
+        return G_SOURCE_REMOVE;
+    }
+
+    image = GTK_IMAGE(gtk_bin_get_child(GTK_BIN(widget)));
+    if (gtk_image_get_storage_type(image) == GTK_IMAGE_PIXBUF)
+        curr_w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(image));
+    else
+        curr_w = 0;
+
+
+    gtk_widget_get_allocation(viewport, &allocation);
+    dst_w = allocation.width;
+    gtk_widget_get_allocation(gtk_bin_get_child(GTK_BIN(viewport)),
+                              &allocation);
+    dst_w -= allocation.width;
+    gtk_widget_get_allocation(gtk_widget_get_parent(widget),
+                              &allocation);
+    dst_w += allocation.width;
+    dst_w -= 16;                /* Magic number? */
+    dst_w = CLAMP(dst_w, 32, orig_width);
+
+    if (dst_w != curr_w) {
+	GdkPixbuf *scaled_pixbuf;
+	gint dst_h;
+
+	dst_h = (gfloat)dst_w / (gfloat)orig_width * gdk_pixbuf_get_height(pixbuf);
+	scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, dst_w, dst_h,
+						GDK_INTERP_BILINEAR);
+        gtk_image_set_from_pixbuf(image, scaled_pixbuf);
+	g_object_unref(scaled_pixbuf);
+    }
+
+    return G_SOURCE_REMOVE;
+}
+
+static gboolean
+balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
+                            GtkMenu * menu)
+{
+    if (gdk_event_triggers_context_menu((GdkEvent *) event)) {
+#if GTK_CHECK_VERSION(3, 22, 0)
+        gtk_menu_popup_at_pointer(menu, (GdkEvent *) event);
+#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
+        gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
+                       event->button, event->time);
+#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
+        return TRUE;
+    } else
+        return FALSE;
+}
+
+static void
+img_size_allocate_cb(BalsaMimeWidgetImage *mwi)
+{
+    if (mwi->pixbuf != NULL && mwi->img_check_size_id == 0) {
+        mwi->img_check_size_id = g_idle_add((GSourceFunc) img_check_size, mwi);
+    }
+}
+
+/*
+ * Public method
+ */
 
 BalsaMimeWidget *
 balsa_mime_widget_new_image(BalsaMessage * bm,
@@ -96,6 +193,8 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     }
 
     mwi = g_object_new(BALSA_TYPE_MIME_WIDGET_IMAGE, NULL);
+    mwi->pixbuf = pixbuf;
+
     mw = (BalsaMimeWidget *) mwi;
 
     widget = gtk_event_box_new();
@@ -106,125 +205,9 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
 
     image = gtk_image_new_from_icon_name("image-missing",
                                          GTK_ICON_SIZE_BUTTON);
-    g_object_set_data(G_OBJECT(image), "orig-width",
-		      GINT_TO_POINTER(gdk_pixbuf_get_width(pixbuf)));
-    g_object_set_data(G_OBJECT(image), "mime-body", mime_body);
-    g_object_unref(pixbuf);
+    g_signal_connect_swapped(image, "size-allocate",
+                             G_CALLBACK(img_size_allocate_cb), mwi);
     gtk_container_add(GTK_CONTAINER(widget), image);
 
     return mw;
-}
-
-
-void
-balsa_mime_widget_image_resize_all(GtkWidget * widget, gpointer user_data)
-{
-    if (GTK_IS_CONTAINER(widget))
-        gtk_container_foreach(GTK_CONTAINER(widget),
-			      balsa_mime_widget_image_resize_all, NULL);
-    else if (GTK_IS_IMAGE(widget) &&
-             g_object_get_data(G_OBJECT(widget), "orig-width") &&
-             g_object_get_data(G_OBJECT(widget), "mime-body") &&
-             !GPOINTER_TO_INT(g_object_get_data
-                              (G_OBJECT(widget), "check_size_sched"))) {
-        GtkWidget **widget_p = g_new(GtkWidget *, 1);
-        g_object_set_data(G_OBJECT(widget), "check_size_sched",
-                          GINT_TO_POINTER(TRUE));
-        *widget_p = widget;
-        g_object_add_weak_pointer(G_OBJECT(widget), (gpointer *) widget_p);
-        g_idle_add((GSourceFunc) img_check_size, widget_p);
-    }
-}
-
-
-static gboolean
-balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
-                            GtkMenu * menu)
-{
-    if (gdk_event_triggers_context_menu((GdkEvent *) event)) {
-#if GTK_CHECK_VERSION(3, 22, 0)
-        gtk_menu_popup_at_pointer(menu, (GdkEvent *) event);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-        gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
-                       event->button, event->time);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
-        return TRUE;
-    } else
-        return FALSE;
-}
-
-static gboolean
-img_check_size(GtkImage ** widget_p)
-{
-    GtkImage *widget;
-    GtkWidget *viewport;
-    gint orig_width;
-    LibBalsaMessageBody * mime_body;
-    gint curr_w, dst_w;
-    GtkAllocation allocation;
-
-    widget = *widget_p;
-    if (!widget) {
-        g_free(widget_p);
-	return FALSE;
-    }
-    g_object_remove_weak_pointer(G_OBJECT(widget), (gpointer *) widget_p);
-    g_free(widget_p);
-
-    viewport = gtk_widget_get_ancestor(GTK_WIDGET(widget), GTK_TYPE_VIEWPORT);
-    orig_width = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(widget),
-                                                        "orig-width"));
-    mime_body = (LibBalsaMessageBody *)g_object_get_data(G_OBJECT(widget), "mime-body");
-
-    g_object_set_data(G_OBJECT(widget), "check_size_sched",
-                      GINT_TO_POINTER(FALSE));
-    g_warn_if_fail(viewport && mime_body && orig_width > 0);
-    if (!(viewport && mime_body && orig_width > 0)) {
-        return FALSE;
-    }
-
-    if (gtk_image_get_storage_type(widget) == GTK_IMAGE_PIXBUF)
-	curr_w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(widget));
-    else
-	curr_w = 0;
-
-    gtk_widget_get_allocation(viewport, &allocation);
-    dst_w = allocation.width;
-    gtk_widget_get_allocation(gtk_bin_get_child(GTK_BIN(viewport)),
-                              &allocation);
-    dst_w -= allocation.width;
-    gtk_widget_get_allocation(gtk_widget_get_parent(GTK_WIDGET(widget)),
-                              &allocation);
-    dst_w += allocation.width;
-    dst_w -= 16;                /* Magic number? */
-
-    if (dst_w < 32)
-	dst_w = 32;
-    if (dst_w > orig_width)
-	dst_w = orig_width;
-    if (dst_w != curr_w) {
-	GdkPixbuf *pixbuf, *scaled_pixbuf;
-	GError *load_err = NULL;
-	gint dst_h;
-
-	pixbuf = libbalsa_message_body_get_pixbuf(mime_body, &load_err);
-        if (!pixbuf) {
-	    if (load_err) {
-		balsa_information(LIBBALSA_INFORMATION_ERROR,
-			          _("Error loading attached image: %s\n"),
-			          load_err->message);
-		g_error_free(load_err);
-	    }
-	    return FALSE;
-	}
-	dst_h = (gfloat)dst_w /
-	    (gfloat)orig_width * gdk_pixbuf_get_height(pixbuf);
-	scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, dst_w, dst_h,
-						GDK_INTERP_BILINEAR);
-	g_object_unref(pixbuf);
-	gtk_image_set_from_pixbuf(widget, scaled_pixbuf);
-	g_object_unref(scaled_pixbuf);
-    }
-
-    return FALSE;
 }

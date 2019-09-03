@@ -316,13 +316,6 @@ bm_on_set_style(GtkWidget * widget,
 }
 #endif
 
-static void
-on_content_size_alloc(GtkWidget * widget, GtkAllocation * allocation,
-		      gpointer user_data)
-{
-    gtk_container_foreach (GTK_CONTAINER(widget), balsa_mime_widget_image_resize_all, NULL);
-}
-
 /*
  * Callbacks and helpers for the find bar.
  */
@@ -709,8 +702,6 @@ balsa_message_init(BalsaMessage * balsa_message)
     g_signal_connect(scroll, "key_press_event",
 		     G_CALLBACK(balsa_mime_widget_key_press_event), balsa_message);
     gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
-    g_signal_connect(balsa_message->scroll, "size-allocate",
-		     G_CALLBACK(on_content_size_alloc), NULL);
 
     /* Widget to hold headers */
     buttons = bm_header_tl_buttons(balsa_message);

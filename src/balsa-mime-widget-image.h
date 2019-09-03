@@ -44,7 +44,6 @@ G_DECLARE_FINAL_TYPE(BalsaMimeWidgetImage,
 BalsaMimeWidget *balsa_mime_widget_new_image(BalsaMessage * bm,
 					     LibBalsaMessageBody * mime_body,
 					     const gchar * content_type, gpointer data);
-void balsa_mime_widget_image_resize_all(GtkWidget * widget, gpointer user_data);
 
 
 G_END_DECLS

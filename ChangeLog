@@ -1,3 +1,23 @@
+2019-09-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-text: Subclass BalsaMimeWidget
+
+	Make it a class with useful info in the struct, instead of
+	extensively using GObject data.
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_text_finalize),
+	(balsa_mime_widget_text_class_init), (balsa_mime_widget_text_init),
+	(balsa_mime_widget_new_text), (create_text_widget),
+	(fix_text_widget), (structured_phrases_toggle),
+	(text_view_url_popup), (text_view_populate_popup),
+	(store_button_coords), (check_over_url), (prepare_url_offsets),
+	(url_found_cb), (check_call_url), (find_url), (handle_url),
+	(free_url), (draw_cite_bar_real), (draw_cite_bars),
+	(balsa_gtk_html_popup), (balsa_gtk_html_button_press_cb),
+	(bm_widget_new_vcard), (check_text_encoding),
+	(fill_text_buf_cited):
+	* src/balsa-mime-widget-text.h:
+
 2019-09-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mime-widget-image: Simplify resizing

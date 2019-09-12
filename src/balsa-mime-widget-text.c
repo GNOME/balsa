@@ -1,11 +1,11 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright(C) 1997-2016 Stuart Parmenter and others,
+ * Copyright (C) 1997-2019 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or(at your option)
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *  
  * This program is distributed in the hope that it will be useful,
@@ -215,7 +215,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     if (g_ascii_strcasecmp(content_type, "text/x-vcard") == 0 ||
         g_ascii_strcasecmp(content_type, "text/directory") == 0) {
         mw = bm_widget_new_vcard(bm, mime_body, ptr, alloced);
-        if (mw) {
+        if (mw != NULL) {
             g_free(ptr);
             return mw;
         }
@@ -228,6 +228,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
     /* create the mime object and the text/source view widget */
     mwt = g_object_new(BALSA_TYPE_MIME_WIDGET_TEXT, NULL);
+    mwt->mime_body = mime_body;
     mwt->text_widget = widget = create_text_widget(content_type);
     text_view = GTK_TEXT_VIEW(widget);
 
@@ -259,26 +260,19 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	       )
 	libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
 
+    fill_text_buf_cited(mwt, widget, ptr,
+                        libbalsa_message_body_is_flowed(mime_body),
+                        is_text_plain);
+    g_free(ptr);
+
     g_signal_connect(widget, "key_press_event",
                      G_CALLBACK(balsa_mime_widget_key_press_event),
                     (gpointer) bm);
     g_signal_connect(widget, "populate-popup",
-                     G_CALLBACK(text_view_populate_popup),
-                    (gpointer)mime_body);
-
-    mwt->mime_body = mime_body;
-    g_signal_connect(widget, "populate-popup",
 		     G_CALLBACK(text_view_populate_popup), mwt);
-
-    buffer = gtk_text_view_get_buffer(text_view);
-
-    fill_text_buf_cited(mwt, widget, ptr,
-                        libbalsa_message_body_is_flowed(mime_body),
-                        is_text_plain);
-
-    prepare_url_offsets(buffer, mwt->url_list);
     g_signal_connect_after(widget, "realize",
 			   G_CALLBACK(fix_text_widget), mwt);
+
     if (mwt->url_list != NULL) {
         g_signal_connect(widget, "button_press_event",
                          G_CALLBACK(store_button_coords), NULL);
@@ -290,6 +284,9 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
                          G_CALLBACK(check_over_url), mwt);
     }
 
+    buffer = gtk_text_view_get_buffer(text_view);
+    prepare_url_offsets(buffer, mwt->url_list);
+
     if (is_text_plain) {
 	/* plain-text highlighting */
         mwt->phrase_hl = PHRASE_HIGHLIGHT_ON;
@@ -297,8 +294,6 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 	phrase_highlight(buffer, "hp-underline", '_', "underline", PANGO_UNDERLINE_SINGLE);
 	phrase_highlight(buffer, "hp-italic", '/', "style", PANGO_STYLE_ITALIC);
     }
-
-    g_free(ptr);
 
     mw = (BalsaMimeWidget *) mwt;
     balsa_mime_widget_set_widget(mw, widget);
@@ -569,6 +564,7 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
     gtk_widget_hide(GTK_WIDGET(menu));
     gtk_container_foreach(GTK_CONTAINER(menu),
                          (GtkCallback) gtk_widget_hide, NULL);
+
     if (text_view_url_popup(widget, menu, mwt->current_url))
 	return;
 
@@ -595,6 +591,8 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
                          G_CALLBACK(structured_phrases_toggle), mwt);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
     }
+
+    gtk_widget_show_all(GTK_WIDGET(menu));
 }
 
 

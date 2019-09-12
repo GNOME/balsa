@@ -1,3 +1,11 @@
+2019-09-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-text: Actually show the context menu
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text):
+	drop an obsolete signal connection;
+	(text_view_populate_popup): show the popup menu.
+
 2019-09-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mime-widget-text: Subclass BalsaMimeWidget

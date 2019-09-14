@@ -1112,6 +1112,7 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
                              G_CALLBACK(libbalsa_html_print), html);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     gtk_widget_set_sensitive(menuitem, libbalsa_html_can_print(html));
+    gtk_widget_show_all(GTK_WIDGET(menu));
 }
 
 static gboolean
@@ -1162,7 +1163,6 @@ bmwt_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
     gtk_container_foreach(GTK_CONTAINER(menu),
                          (GtkCallback) gtk_widget_destroy, NULL);
     bmwt_populate_popup_menu(bm, html, menu);
-    gtk_widget_show_all(GTK_WIDGET(menu));
 }
 
 static BalsaMimeWidget *

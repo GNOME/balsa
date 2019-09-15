@@ -1,3 +1,36 @@
+2019-09-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget: subclass GtkBox instead of GObject
+
+	This makes BalsaMimeWidget inherit from GtkBox, so it is
+	actually a widget. A subclass that used to create a vertical
+	GtkBox can use the BalsaMimeWidget itself. Other subclasses can
+	add their custom widget to the BalsaMimeWidget.
+
+	* src/balsa-message.c (bm_find_scroll_to_rectangle),
+	(bm_find_entry_changed_cb), (bm_find_again), (balsa_message_init),
+	(balsa_message_destroy), (part_info_init), (add_part),
+	(gtk_tree_hide_func), (balsa_message_current_part_widget),
+	(balsa_message_can_select), (balsa_message_grab_focus),
+	(balsa_message_can_zoom), (balsa_message_zoom),
+	(balsa_message_find_in_message):
+	* src/balsa-mime-widget-crypto.c (balsa_mime_widget_new_signature),
+	(balsa_mime_widget_new_pgpkey):
+	* src/balsa-mime-widget-image.c (img_check_size),
+	(balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-message.c (balsa_mime_widget_new_message),
+	(bmw_message_extbody_url), (bmw_message_extbody_mail),
+	(balsa_mime_widget_new_message_tl):
+	* src/balsa-mime-widget-multipart.c
+	(balsa_mime_widget_new_multipart):
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(bm_widget_new_html), (bm_widget_new_vcard):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar):
+	* src/balsa-mime-widget.c (balsa_mime_widget_init),
+	(balsa_mime_widget_new), (balsa_mime_widget_new_unknown):
+	* src/balsa-mime-widget.h:
+
 2019-09-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mime-widget-text: Actually show the context menu

@@ -36,6 +36,7 @@ struct _BalsaMimeWidgetImage {
 
     guint img_check_size_id;
     GdkPixbuf *pixbuf;
+    GtkWidget *image;
 };
 
 G_DEFINE_TYPE(BalsaMimeWidgetImage,
@@ -90,7 +91,7 @@ img_check_size(BalsaMimeWidgetImage * mwi)
 
     mwi->img_check_size_id = 0;
 
-    widget = balsa_mime_widget_get_widget((BalsaMimeWidget *) mwi);
+    widget = GTK_WIDGET(mwi);
     viewport = gtk_widget_get_ancestor(widget, GTK_TYPE_VIEWPORT);
     if (viewport == NULL) {
         return G_SOURCE_REMOVE;
@@ -106,7 +107,7 @@ img_check_size(BalsaMimeWidgetImage * mwi)
         return G_SOURCE_REMOVE;
     }
 
-    image = GTK_IMAGE(gtk_bin_get_child(GTK_BIN(widget)));
+    image = GTK_IMAGE(mwi->image);
     if (gtk_image_get_storage_type(image) == GTK_IMAGE_PIXBUF)
         curr_w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(image));
     else
@@ -198,13 +199,13 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     mw = (BalsaMimeWidget *) mwi;
 
     widget = gtk_event_box_new();
-    balsa_mime_widget_set_widget(mw, widget);
+    gtk_container_add(GTK_CONTAINER(mw), widget);
 
     g_signal_connect(widget, "button-press-event",
                      G_CALLBACK(balsa_image_button_press_cb), data);
 
-    image = gtk_image_new_from_icon_name("image-missing",
-                                         GTK_ICON_SIZE_BUTTON);
+    mwi->image = image = gtk_image_new_from_icon_name("image-missing",
+                                                      GTK_ICON_SIZE_BUTTON);
     g_signal_connect_swapped(image, "size-allocate",
                              G_CALLBACK(img_size_allocate_cb), mwi);
     gtk_container_add(GTK_CONTAINER(widget), image);

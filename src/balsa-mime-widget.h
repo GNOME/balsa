@@ -40,12 +40,12 @@ G_BEGIN_DECLS
  */
 
 struct _BalsaMimeWidgetClass {
-    GObjectClass parent;
+    GtkBoxClass parent_class;
 };
 
 #define BALSA_TYPE_MIME_WIDGET balsa_mime_widget_get_type()
 
-G_DECLARE_DERIVABLE_TYPE(BalsaMimeWidget, balsa_mime_widget, BALSA, MIME_WIDGET, GObject)
+G_DECLARE_DERIVABLE_TYPE(BalsaMimeWidget, balsa_mime_widget, BALSA, MIME_WIDGET, GtkBox)
 
 /*
  * Method definitions.
@@ -60,7 +60,6 @@ void balsa_mime_widget_schedule_resize(GtkWidget * widget);
  * Getters
  */
 
-GtkWidget *balsa_mime_widget_get_widget       (BalsaMimeWidget * mw);
 GtkWidget *balsa_mime_widget_get_container    (BalsaMimeWidget * mw);
 GtkWidget *balsa_mime_widget_get_header_widget(BalsaMimeWidget * mw);
 
@@ -68,7 +67,6 @@ GtkWidget *balsa_mime_widget_get_header_widget(BalsaMimeWidget * mw);
  * Setters
  */
 
-void balsa_mime_widget_set_widget       (BalsaMimeWidget * mw, GtkWidget * widget);
 void balsa_mime_widget_set_container    (BalsaMimeWidget * mw, GtkWidget * widget);
 void balsa_mime_widget_set_header_widget(BalsaMimeWidget * mw, GtkWidget * widget);
 

@@ -296,7 +296,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     }
 
     mw = (BalsaMimeWidget *) mwt;
-    balsa_mime_widget_set_widget(mw, widget);
+    gtk_container_add(GTK_CONTAINER(mw), widget);
 
     return mw;
 }
@@ -1176,7 +1176,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
         libbalsa_html_new(mime_body,
                          (LibBalsaHtmlCallback) bm_widget_on_url,
                          (LibBalsaHtmlCallback) handle_url);
-    balsa_mime_widget_set_widget(mw, widget);
+    gtk_container_add(GTK_CONTAINER(mw), widget);
 
     g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);
 
@@ -1231,7 +1231,7 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     widget = gtk_grid_new();
     g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);
-    balsa_mime_widget_set_widget(mw, widget);
+    gtk_container_add(GTK_CONTAINER(mw), widget);
 
     grid = (GtkGrid *) widget;
     gtk_grid_set_row_spacing(grid, 6);

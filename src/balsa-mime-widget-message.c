@@ -128,7 +128,7 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
 	widget = gtk_frame_new(NULL);
-        balsa_mime_widget_set_widget(mw, widget);
+        gtk_container_add(GTK_CONTAINER(mw), widget);
 
 	container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
         balsa_mime_widget_set_container(mw, container);
@@ -151,7 +151,7 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 	mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
 	widget = gtk_frame_new(_("message headers"));
-        balsa_mime_widget_set_widget(mw, widget);
+        gtk_container_add(GTK_CONTAINER(mw), widget);
 
 	header_widget = bm_header_widget_new(bm, NULL);
         balsa_mime_widget_set_header_widget(mw, header_widget);
@@ -177,7 +177,6 @@ bmw_message_extbody_url(LibBalsaMessageBody * mime_body,
     GString *msg = NULL;
     gchar *url;
     BalsaMimeWidget *mw;
-    GtkWidget *widget;
 
     if (url_type == RFC2046_EXTBODY_LOCALFILE) {
 	url = libbalsa_message_body_get_parameter(mime_body, "name");
@@ -242,18 +241,15 @@ bmw_message_extbody_url(LibBalsaMessageBody * mime_body,
     /* now create & return the widget... */
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
-    widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
-    balsa_mime_widget_set_widget(mw, widget);
-
-    gtk_container_set_border_width(GTK_CONTAINER(widget),
+    gtk_container_set_border_width(GTK_CONTAINER(mw),
 				   BMW_CONTAINER_BORDER);
 
-    gtk_box_pack_start(GTK_BOX(widget), gtk_label_new(msg->str), FALSE,
+    gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg->str), FALSE,
 		       FALSE, 0);
     g_string_free(msg, TRUE);
 
     button = gtk_button_new_with_label(url);
-    gtk_box_pack_start(GTK_BOX(widget), button, FALSE, FALSE,
+    gtk_box_pack_start(GTK_BOX(mw), button, FALSE, FALSE,
 		       BMW_BUTTON_PACK_SPACE);
     g_object_set_data_full(G_OBJECT(button), "call_url", url,
 			   (GDestroyNotify) g_free);
@@ -271,7 +267,6 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
     GString *msg = NULL;
     gchar *mail_subject, *mail_site;
     BalsaMimeWidget *mw;
-    GtkWidget *widget;
 
     mail_site = libbalsa_message_body_get_parameter(mime_body, "server");
 
@@ -292,20 +287,17 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
     /* now create & return the widget... */
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
-    widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
-    balsa_mime_widget_set_widget(mw, widget);
-
-    gtk_container_set_border_width(GTK_CONTAINER(widget),
+    gtk_container_set_border_width(GTK_CONTAINER(mw),
 				   BMW_CONTAINER_BORDER);
 
-    gtk_box_pack_start(GTK_BOX(widget), gtk_label_new(msg->str), FALSE,
+    gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg->str), FALSE,
 		       FALSE, 0);
     g_string_free(msg, TRUE);
 
     button =
 	gtk_button_new_with_mnemonic(_
 				     ("Se_nd message to obtain this part"));
-    gtk_box_pack_start(GTK_BOX(widget), button, FALSE, FALSE,
+    gtk_box_pack_start(GTK_BOX(mw), button, FALSE, FALSE,
 		       BMW_BUTTON_PACK_SPACE);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(extbody_send_mail), (gpointer) mime_body);
@@ -420,26 +412,22 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm,
                                  GtkWidget * const * tl_buttons)
 {
     BalsaMimeWidget *mw;
-    GtkWidget *widget;
     GtkWidget *headers;
     GtkWidget *container;
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
-    widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
-    balsa_mime_widget_set_widget(mw, widget);
-
-    gtk_container_set_border_width(GTK_CONTAINER(widget), BMW_MESSAGE_PADDING);
+    gtk_container_set_border_width(GTK_CONTAINER(mw), BMW_MESSAGE_PADDING);
 
     headers = bm_header_widget_new(bm, tl_buttons);
     balsa_mime_widget_set_header_widget(mw, headers);
 
-    gtk_box_pack_start(GTK_BOX(widget), headers, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(mw), headers, FALSE, FALSE, 0);
 
     container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
     balsa_mime_widget_set_container(mw, container);
 
-    gtk_box_pack_start(GTK_BOX(widget), container, TRUE, TRUE,
+    gtk_box_pack_start(GTK_BOX(mw), container, TRUE, TRUE,
 		       BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
 
     return mw;

@@ -1,5 +1,13 @@
 2019-09-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	ab-main: Use GMenu API instead of GtkBuilder
+
+	* src/ab-main.c (bab_cleanup), (set_address_book_menu_items),
+	(file_delete_activated):
+	* ui/ab-main.ui: no need for place-holder
+
+2019-09-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	address-book-config: Do not crash
 
 	* src/address-book-config.c (edit_book_response): destroy the

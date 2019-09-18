@@ -68,12 +68,14 @@ struct ABMainWindow {
     LibBalsaAddress *displayed_address;
 
     GMenu *file_menu;
+    GMenu *books_menu;
 } contacts_app;
 
 
 static void
 bab_cleanup(void)
 {
+    g_object_unref(contacts_app.books_menu);
     gtk_main_quit();
 }
 
@@ -256,63 +258,47 @@ address_changed_cb(struct ABMainWindow *aw)
 static void
 set_address_book_menu_items(void)
 {
-    GString *string;
     GList *l;
     guint pos;
-    gchar *s;
-    GtkBuilder *builder;
-    GMenuModel *menu_model;
+    GMenu *menu = contacts_app.books_menu;
 
-    pos = g_menu_model_get_n_items(G_MENU_MODEL (contacts_app.file_menu));
-    g_menu_remove(contacts_app.file_menu, --pos);
+    if (menu == NULL) {
+        contacts_app.books_menu = menu = g_menu_new();
+        g_menu_append_section(contacts_app.file_menu, NULL, G_MENU_MODEL(menu));
+    } else {
+        g_menu_remove_all(menu);
+    }
 
     pos = 0;
-    string = g_string_new(NULL);
-    g_string_append(string, "<interface>");
-    g_string_append(string, "<menu id='address-book-menu'>");
-    g_string_append(string, "<section>");
-    for (l = contacts_app.address_book_list; l; l = l->next) {
+    for (l = contacts_app.address_book_list; l != NULL; l = l->next) {
         LibBalsaAddressBook *address_book = l->data;
+        const gchar *name;
+        gchar *label;
+        gchar *detailed_action;
+        gchar *accel;
+        GMenuItem *item;
 
-        if (!address_book)
+        if (address_book == NULL)
             continue;
 
-        g_string_append(string, "<item>");
+        name = libbalsa_address_book_get_name(address_book);
 
-        g_string_append(string, "<attribute name='label'>");
-        g_string_append_printf(string, "_%d:%s", ++pos,
-                               libbalsa_address_book_get_name(address_book));
-        g_string_append(string, "</attribute>");
+        label = g_strdup_printf("_%d:%s", ++pos, name);
+        detailed_action = g_strdup_printf("win.address-book::%s", name);
+        item = g_menu_item_new(label, detailed_action);
+        g_free(detailed_action);
+        g_free(label);
 
-        g_string_append(string, "<attribute name='action'>");
-        g_string_append(string, "win.address-book");
-        g_string_append(string, "</attribute>");
+        accel = g_strdup_printf("<Primary>%d", pos);
+        g_menu_item_set_attribute(item, "accel", "s", accel);
+        g_free(accel);
 
-        g_string_append(string, "<attribute name='target'>");
-        g_string_append(string, libbalsa_address_book_get_name(address_book));
-        g_string_append(string, "</attribute>");
-
-        g_string_append(string, "<attribute name='accel'>");
-        g_string_append_printf(string, "&lt;Primary&gt;%d", pos);
-        g_string_append(string, "</attribute>");
-
-        g_string_append(string, "</item>");
+        g_menu_append_item(menu, item);
+        g_object_unref(item);
     }
-    g_string_append(string, "</section>");
-    g_string_append(string, "</menu>");
-    g_string_append(string, "</interface>");
-    s = g_string_free(string, FALSE);
 
-    builder = gtk_builder_new_from_string(s, -1);
-    g_free(s);
-
-    menu_model =
-        G_MENU_MODEL(gtk_builder_get_object(builder, "address-book-menu"));
-    g_menu_append_section(contacts_app.file_menu, NULL, menu_model);
     libbalsa_window_set_accels(GTK_APPLICATION_WINDOW(contacts_app.window),
-                               menu_model);
-
-    g_object_unref(builder);
+                               G_MENU_MODEL(menu));
 }
 
 static gboolean
@@ -452,8 +438,8 @@ file_delete_activated(GSimpleAction * action,
     const gchar *config_prefix;
     GList *list;
 
-    if (!(address_book = contacts_app.address_book)
-        || !g_list_next(contacts_app.address_book_list))
+    if ((address_book = contacts_app.address_book) == NULL
+        || contacts_app.address_book_list->next == NULL)
         return;
 
     config_prefix = libbalsa_address_book_get_config_prefix(address_book);

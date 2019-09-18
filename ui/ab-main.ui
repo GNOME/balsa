@@ -57,9 +57,6 @@
                     <attribute name='action'>win.file-quit</attribute>
                 </item>
             </section>
-            <section>
-                <!-- Placeholder for the address books section -->
-            </section>
         </submenu>
         <submenu>
             <attribute name='label' translatable='yes'>_Entry</attribute>

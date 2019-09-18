@@ -163,9 +163,10 @@ edit_book_response(GtkWidget * dialog, gint response,
         break;
     }
 
-    gtk_widget_destroy(dialog);
     if (abc->address_book)
         g_object_set_data(G_OBJECT(abc->address_book), "balsa-abc", NULL);
+
+    gtk_widget_destroy(dialog);
 }
 
 /* Radio buttons */

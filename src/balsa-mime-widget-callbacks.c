@@ -276,9 +276,11 @@ balsa_mime_widget_limit_focus(GtkWidget     *widget,
                               GdkEventFocus *event,
                               BalsaMessage  *bm)
 {
+    GtkWidget *container = balsa_mime_widget_get_container(balsa_message_get_bm_widget(bm));
+
     /* Disable can_focus on other message parts so that TAB does not
      * attempt to move the focus on them. */
-    bmw_set_can_focus(balsa_message_get_bm_widget(bm)->container, GINT_TO_POINTER(FALSE));
+    bmw_set_can_focus(container, GINT_TO_POINTER(FALSE));
     gtk_widget_set_can_focus(widget, TRUE);
 
     if (balsa_message_get_focus_state(bm) == BALSA_MESSAGE_FOCUS_STATE_NO)
@@ -293,7 +295,9 @@ balsa_mime_widget_unlimit_focus(GtkWidget     *widget,
                                 GdkEventFocus *event,
                                 BalsaMessage  *bm)
 {
-    bmw_set_can_focus(balsa_message_get_bm_widget(bm)->container, GINT_TO_POINTER(TRUE));
+    GtkWidget *container = balsa_mime_widget_get_container(balsa_message_get_bm_widget(bm));
+
+    bmw_set_can_focus(container, GINT_TO_POINTER(TRUE));
 
     if (balsa_message_get_message(bm) != NULL) {
         BalsaMessageFocusState focus_state = balsa_message_get_focus_state(bm);

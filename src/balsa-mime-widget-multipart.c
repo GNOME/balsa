@@ -34,19 +34,29 @@ balsa_mime_widget_new_multipart(BalsaMessage * bm,
 				const gchar * content_type, gpointer data)
 {
     BalsaMimeWidget *mw;
+    GtkWidget *widget;
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    mw->widget = mw->container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
+    gtk_box_set_spacing(GTK_BOX(mw), BMW_MESSAGE_PADDING);
 
-    if (!g_ascii_strcasecmp("multipart/signed", content_type) &&
-	mime_body->parts && mime_body->parts->next &&
-	mime_body->parts->next->sig_info)
-	mw->widget = 
-	    balsa_mime_widget_crypto_frame(mime_body->parts->next, mw->widget,
+    widget = GTK_WIDGET(mw);
+
+    if (g_ascii_strcasecmp("multipart/signed", content_type) == 0 &&
+	mime_body->parts != NULL &&
+        mime_body->parts->next != NULL &&
+	mime_body->parts->next->sig_info != NULL) {
+        GtkWidget *crypto_frame =
+	    balsa_mime_widget_crypto_frame(mime_body->parts->next, widget,
 					   mime_body->was_encrypted, FALSE, NULL);
+
+        mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+        gtk_container_add(GTK_CONTAINER(mw), crypto_frame);
+    }
+
+    balsa_mime_widget_set_container(mw, widget);
 
     return mw;
 }

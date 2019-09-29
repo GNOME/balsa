@@ -46,13 +46,14 @@ balsa_mime_widget_new_signature(BalsaMessage * bm,
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
-    
-    if (!mime_body->sig_info)
+
+    if (mime_body->sig_info == NULL)
 	return NULL;
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    mw->widget = balsa_mime_widget_signature_widget(mime_body, content_type);
-    
+    gtk_container_add(GTK_CONTAINER(mw),
+                      balsa_mime_widget_signature_widget(mime_body, content_type));
+
     return mw;
 }
 
@@ -65,7 +66,7 @@ balsa_mime_widget_new_pgpkey(BalsaMessage        *bm,
     gssize body_size;
     gchar *body_buf = NULL;
     GError *err = NULL;
-	BalsaMimeWidget *mw = NULL;
+    BalsaMimeWidget *mw = NULL;
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
@@ -76,15 +77,14 @@ balsa_mime_widget_new_pgpkey(BalsaMessage        *bm,
                           err ? err->message : "Unknown error");
         g_clear_error(&err);
     } else {
-		mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-		mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
-		if (!create_import_keys_widget(GTK_BOX(mw->widget), body_buf, &err)) {
+        mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+        if (!create_import_keys_widget(GTK_BOX(mw), body_buf, &err)) {
             balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not process GnuPG keys: %s"),
                               err ? err->message : "Unknown error");
             g_clear_error(&err);
             g_object_unref(mw);
             mw = NULL;
-		}
+        }
     	g_free(body_buf);
     }
 

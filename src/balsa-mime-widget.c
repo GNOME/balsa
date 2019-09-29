@@ -36,11 +36,6 @@
 #include "balsa-mime-widget.h"
 
 
-/* object related functions */
-static void balsa_mime_widget_init (GTypeInstance *instance, gpointer g_class);
-static void balsa_mime_widget_class_init(BalsaMimeWidgetClass * klass);
-
-
 /* fall-back widget (unknown/unsupported mime type) */
 static BalsaMimeWidget *balsa_mime_widget_new_unknown(BalsaMessage * bm,
 						      LibBalsaMessageBody *
@@ -50,51 +45,34 @@ static BalsaMimeWidget *balsa_mime_widget_new_unknown(BalsaMessage * bm,
 
 static void vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget);
 
+typedef struct {
+    /* container widget if more sub-parts can be added */
+    GtkWidget *container;
 
-static GObjectClass *parent_class = NULL;
+    /* headers */
+    GtkWidget *header_widget;
+} BalsaMimeWidgetPrivate;
 
-
-GType
-balsa_mime_widget_get_type()
-{
-    static GType balsa_mime_widget_type = 0;
-
-    if (!balsa_mime_widget_type) {
-        static const GTypeInfo balsa_mime_widget_info = {
-            sizeof(BalsaMimeWidgetClass),
-            NULL,               /* base_init */
-            NULL,               /* base_finalize */
-            (GClassInitFunc) balsa_mime_widget_class_init,
-            NULL,               /* class_finalize */
-            NULL,               /* class_data */
-            sizeof(BalsaMimeWidget),
-            0,                  /* n_preallocs */
-            (GInstanceInitFunc) balsa_mime_widget_init
-        };
-
-        balsa_mime_widget_type =
-            g_type_register_static(G_TYPE_OBJECT, "BalsaMimeWidget",
-                                   &balsa_mime_widget_info, 0);
-    }
-
-    return balsa_mime_widget_type;
-}
-
+G_DEFINE_TYPE_WITH_PRIVATE(BalsaMimeWidget, balsa_mime_widget, GTK_TYPE_BOX)
 
 static void
-balsa_mime_widget_init (GTypeInstance *instance, gpointer g_class)
+balsa_mime_widget_init(BalsaMimeWidget *self)
 {
-  BalsaMimeWidget *self = (BalsaMimeWidget *)instance;
+#ifdef G_OBJECT_NEEDS_TO_BE_INITIALIZED
+    BalsaMimeWidgetPrivate *priv = balsa_mime_widget_get_instance_private(self);
 
-  self->widget = NULL;
-  self->container = NULL;
+    priv->container = NULL;
+    priv->header_widget = NULL;
+#endif /* G_OBJECT_NEEDS_TO_BE_INITIALIZED */
+    g_object_set(self,
+                 "orientation", GTK_ORIENTATION_VERTICAL,
+                 "spacing", BMW_VBOX_SPACE,
+                 NULL);
 }
-
 
 static void
 balsa_mime_widget_class_init(BalsaMimeWidgetClass * klass)
 {
-    parent_class = g_type_class_ref(G_TYPE_OBJECT);
 }
 
 
@@ -148,47 +126,56 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
     if (delegate->handler)
 	mw = (delegate->handler) (bm, mime_body, content_type, data);
     /* fall back to default if no handler is present */
-    if (!mw)
+    if (mw == NULL)
 	mw = balsa_mime_widget_new_unknown(bm, mime_body, content_type);
 
-    if (mw) {
-	if (mw->widget) {
-	    g_signal_connect(mw->widget, "focus_in_event",
-			     G_CALLBACK(balsa_mime_widget_limit_focus),
-			     (gpointer) bm);
-	    g_signal_connect(mw->widget, "focus_out_event",
-			     G_CALLBACK(balsa_mime_widget_unlimit_focus),
-			     (gpointer) bm);
-	    if (mime_body->sig_info &&
-		g_ascii_strcasecmp("application/pgp-signature", content_type) &&
-		g_ascii_strcasecmp("application/pkcs7-signature", content_type) &&
-		g_ascii_strcasecmp("application/x-pkcs7-signature", content_type)) {
-		GtkWidget * signature =
-		    balsa_mime_widget_signature_widget(mime_body, content_type);
-		mw->widget = balsa_mime_widget_crypto_frame(mime_body, mw->widget,
-							    mime_body->was_encrypted,
-							    FALSE, signature);
-	    } else if (mime_body->was_encrypted &&
-		       g_ascii_strcasecmp("multipart/signed", content_type)) {
-		mw->widget = balsa_mime_widget_crypto_frame(mime_body, mw->widget,
-							    TRUE, TRUE, NULL);
-	    }
-            g_object_ref_sink(mw->widget);
+    g_signal_connect(mw, "focus_in_event",
+                     G_CALLBACK(balsa_mime_widget_limit_focus), bm);
+    g_signal_connect(mw, "focus_out_event",
+                     G_CALLBACK(balsa_mime_widget_unlimit_focus), bm);
+    if (mime_body->sig_info != NULL &&
+        g_ascii_strcasecmp("application/pgp-signature", content_type) != 0 &&
+        g_ascii_strcasecmp("application/pkcs7-signature", content_type) != 0 &&
+        g_ascii_strcasecmp("application/x-pkcs7-signature", content_type) != 0) {
+        GtkWidget *signature = balsa_mime_widget_signature_widget(mime_body, content_type);
+        GtkWidget *crypto_frame =
+            balsa_mime_widget_crypto_frame(mime_body, GTK_WIDGET(mw),
+                                           mime_body->was_encrypted,
+                                           FALSE, signature);
+        BalsaMimeWidgetPrivate *priv;
+        GtkWidget *container;
 
-	    if (GTK_IS_LAYOUT(mw->widget)) {
-                GtkAdjustment *vadj;
+        priv = balsa_mime_widget_get_instance_private(mw);
+        container = priv->container;
+        mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+        gtk_container_add(GTK_CONTAINER(mw), crypto_frame);
+        priv = balsa_mime_widget_get_instance_private(mw);
+        priv->container = container;
+    } else if (mime_body->was_encrypted &&
+               g_ascii_strcasecmp("multipart/signed", content_type) != 0) {
+        GtkWidget *crypto_frame =
+            balsa_mime_widget_crypto_frame(mime_body, GTK_WIDGET(mw), TRUE, TRUE, NULL);
+        BalsaMimeWidgetPrivate *priv;
+        GtkWidget *container;
 
-                g_object_get(mw->widget, "vadjustment", &vadj,
-                             NULL);
-		g_signal_connect(vadj, "changed",
-				 G_CALLBACK(vadj_change_cb), mw->widget);
-                g_object_unref(vadj);
-            }
-
-            gtk_widget_show_all(mw->widget);
-	}
+        priv = balsa_mime_widget_get_instance_private(mw);
+        container = priv->container;
+        mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+        gtk_container_add(GTK_CONTAINER(mw), crypto_frame);
+        priv = balsa_mime_widget_get_instance_private(mw);
+        priv->container = container;
     }
     g_free(content_type);
+
+    if (GTK_IS_LAYOUT(mw)) {
+        GtkAdjustment *vadj;
+
+        g_object_get(mw, "vadjustment", &vadj, NULL);
+        g_signal_connect(vadj, "changed", G_CALLBACK(vadj_change_cb), mw);
+        g_object_unref(vadj);
+    }
+
+    gtk_widget_show_all(GTK_WIDGET(mw));
 
     return mw;
 }
@@ -207,16 +194,16 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     BalsaMimeWidget *mw;
     gchar *use_content_type;
 
-    g_return_val_if_fail(mime_body, NULL);
+    g_return_val_if_fail(mime_body != NULL, NULL);
+
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
-    mw->widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_VBOX_SPACE);
-    gtk_container_set_border_width(GTK_CONTAINER(mw->widget),
+    gtk_container_set_border_width(GTK_CONTAINER(mw),
 				   BMW_CONTAINER_BORDER);
 
     if (mime_body->filename) {
 	msg = g_strdup_printf(_("File name: %s"), mime_body->filename);
-	gtk_box_pack_start(GTK_BOX(mw->widget), gtk_label_new(msg), FALSE,
+	gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg), FALSE,
 			   FALSE, 0);
 	g_free(msg);
     }
@@ -271,7 +258,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     msg_label = gtk_label_new(msg);
     g_free(msg);
     gtk_label_set_ellipsize(GTK_LABEL(msg_label), PANGO_ELLIPSIZE_END);
-    gtk_box_pack_start(GTK_BOX(mw->widget), msg_label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(mw), msg_label, FALSE, FALSE, 0);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
     gtk_box_set_homogeneous(GTK_BOX(hbox), TRUE);
@@ -280,7 +267,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
                                            (gpointer) mime_body)))
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
     else
-	gtk_box_pack_start(GTK_BOX(mw->widget),
+	gtk_box_pack_start(GTK_BOX(mw),
 			   gtk_label_new(_("No open or view action "
 					   "defined for this content type")),
 			   FALSE, FALSE, 0);
@@ -292,7 +279,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 		     G_CALLBACK(balsa_mime_widget_ctx_menu_save),
 		     (gpointer) mime_body);
 
-    gtk_box_pack_start(GTK_BOX(mw->widget), hbox, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(mw), hbox, FALSE, FALSE, 0);
 
     return mw;
 }
@@ -342,4 +329,57 @@ vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
     if (resize_idle_id) 
         g_source_remove(resize_idle_id);
     balsa_mime_widget_schedule_resize(widget);
+}
+
+/*
+ * Getters
+ */
+
+GtkWidget *
+balsa_mime_widget_get_container(BalsaMimeWidget * mw)
+{
+    BalsaMimeWidgetPrivate *priv =
+        balsa_mime_widget_get_instance_private(mw);
+
+    g_return_val_if_fail(BALSA_IS_MIME_WIDGET(mw), NULL);
+
+    return priv->container;
+}
+
+GtkWidget *
+balsa_mime_widget_get_header_widget(BalsaMimeWidget * mw)
+{
+    BalsaMimeWidgetPrivate *priv =
+        balsa_mime_widget_get_instance_private(mw);
+
+    g_return_val_if_fail(BALSA_IS_MIME_WIDGET(mw), NULL);
+
+    return priv->header_widget;
+}
+
+/*
+ * Setters
+ */
+
+void
+balsa_mime_widget_set_container(BalsaMimeWidget * mw, GtkWidget * widget)
+{
+    BalsaMimeWidgetPrivate *priv =
+        balsa_mime_widget_get_instance_private(mw);
+
+    g_return_if_fail(BALSA_IS_MIME_WIDGET(mw));
+
+    priv->container = widget;
+}
+
+void
+balsa_mime_widget_set_header_widget(BalsaMimeWidget * mw,
+                                    GtkWidget * widget)
+{
+    BalsaMimeWidgetPrivate *priv =
+        balsa_mime_widget_get_instance_private(mw);
+
+    g_return_if_fail(BALSA_IS_MIME_WIDGET(mw));
+
+    priv->header_widget = widget;
 }

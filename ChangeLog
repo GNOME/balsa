@@ -14,6 +14,134 @@
 	dialog as the last step; otherwise the struct is freed before we
 	use it.
 
+2019-09-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget: subclass GtkBox instead of GObject
+
+	This makes BalsaMimeWidget inherit from GtkBox, so it is
+	actually a widget. A subclass that used to create a vertical
+	GtkBox can use the BalsaMimeWidget itself. Other subclasses can
+	add their custom widget to the BalsaMimeWidget.
+
+	* src/balsa-message.c (bm_find_scroll_to_rectangle),
+	(bm_find_entry_changed_cb), (bm_find_again), (balsa_message_init),
+	(balsa_message_destroy), (part_info_init), (add_part),
+	(gtk_tree_hide_func), (balsa_message_current_part_widget),
+	(balsa_message_can_select), (balsa_message_grab_focus),
+	(balsa_message_can_zoom), (balsa_message_zoom),
+	(balsa_message_find_in_message):
+	* src/balsa-mime-widget-crypto.c (balsa_mime_widget_new_signature),
+	(balsa_mime_widget_new_pgpkey):
+	* src/balsa-mime-widget-image.c (img_check_size),
+	(balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-message.c (balsa_mime_widget_new_message),
+	(bmw_message_extbody_url), (bmw_message_extbody_mail),
+	(balsa_mime_widget_new_message_tl):
+	* src/balsa-mime-widget-multipart.c
+	(balsa_mime_widget_new_multipart):
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(bm_widget_new_html), (bm_widget_new_vcard):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar):
+	* src/balsa-mime-widget.c (balsa_mime_widget_init),
+	(balsa_mime_widget_new), (balsa_mime_widget_new_unknown):
+	* src/balsa-mime-widget.h:
+
+2019-09-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-text: Actually show the context menu
+
+	This time, the HTML widget's context menu.
+
+	* src/balsa-mime-widget-text.c (bmwt_populate_popup_menu),
+	(bmwt_populate_popup_cb):
+
+2019-09-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-text: Actually show the context menu
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text):
+	drop an obsolete signal connection;
+	(text_view_populate_popup): show the popup menu.
+
+2019-09-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-text: Subclass BalsaMimeWidget
+
+	Make it a class with useful info in the struct, instead of
+	extensively using GObject data.
+
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_text_finalize),
+	(balsa_mime_widget_text_class_init), (balsa_mime_widget_text_init),
+	(balsa_mime_widget_new_text), (create_text_widget),
+	(fix_text_widget), (structured_phrases_toggle),
+	(text_view_url_popup), (text_view_populate_popup),
+	(store_button_coords), (check_over_url), (prepare_url_offsets),
+	(url_found_cb), (check_call_url), (find_url), (handle_url),
+	(free_url), (draw_cite_bar_real), (draw_cite_bars),
+	(balsa_gtk_html_popup), (balsa_gtk_html_button_press_cb),
+	(bm_widget_new_vcard), (check_text_encoding),
+	(fill_text_buf_cited):
+	* src/balsa-mime-widget-text.h:
+
+2019-09-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-image: Simplify resizing
+
+	Catch the size-allocate signal only for BalsaMimeWidgetImage
+	widgets.
+
+	* src/balsa-message.c (balsa_message_init):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_image_init),
+	(balsa_mime_widget_image_dispose), (img_check_size),
+	(img_size_allocate_cb), (balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-image.h:
+
+2019-09-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-image: Declare BalsaMimeWidgetImage final
+
+	It was already private, so no accessors are needed.
+
+	* src/balsa-mime-widget-image.h:
+
+2019-08-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget: Declare BalsaMimeWidget derivable
+
+	Make the struct private, and provide accessors for the widget,
+	container, and header_widget members.
+
+	* src/balsa-message.c (bm_find_scroll_to_rectangle),
+	(bm_find_entry_changed_cb), (bm_find_again), (balsa_message_init),
+	(add_part), (gtk_tree_hide_func), (hide_all_parts), (select_part),
+	(balsa_message_current_part_widget), (balsa_message_can_select),
+	(balsa_message_grab_focus), (balsa_message_can_zoom),
+	(balsa_message_zoom), (balsa_message_find_in_message):
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_limit_focus), (balsa_mime_widget_unlimit_focus):
+	* src/balsa-mime-widget-crypto.c (balsa_mime_widget_new_signature),
+	(balsa_mime_widget_new_pgpkey):
+	* src/balsa-mime-widget-image.c (balsa_mime_widget_new_image):
+	* src/balsa-mime-widget-message.c (balsa_mime_widget_new_message),
+	(bmw_message_extbody_url), (bmw_message_extbody_mail),
+	(balsa_mime_widget_new_message_tl), (bmw_message_set_headers_d),
+	(bmw_message_set_headers):
+	* src/balsa-mime-widget-multipart.c
+	(balsa_mime_widget_new_multipart):
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(bm_widget_new_html), (bm_widget_new_vcard):
+	* src/balsa-mime-widget-vcalendar.c
+	(balsa_mime_widget_new_vcalendar):
+	* src/balsa-mime-widget.c (balsa_mime_widget_init),
+	(balsa_mime_widget_class_init), (balsa_mime_widget_new),
+	(balsa_mime_widget_new_unknown), (vadj_change_cb),
+	(balsa_mime_widget_get_widget), (balsa_mime_widget_get_container),
+	(balsa_mime_widget_get_header_widget),
+	(balsa_mime_widget_set_widget), (balsa_mime_widget_set_container),
+	(balsa_mime_widget_set_header_widget):
+	* src/balsa-mime-widget.h:
+
 2019-08-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-print-object-text.c

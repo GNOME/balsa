@@ -505,6 +505,7 @@ if balsa_from_git
     '-Wdeprecated-declarations',
     '-Wredundant-decls',
     '-Wshadow',
+    '-Wformat',
     '-Wformat-security',
     '-Wignored-qualifiers',
     '-DGMIME_DISABLE_DEPRECATED',

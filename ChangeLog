@@ -1,5 +1,12 @@
 2019-10-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Build: we need -Wformat for -Wformat-security to be effective
+
+	* configure.ac:
+	* meson.build:
+
+2019-10-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Build: GTimeVal, used in GtkSourceView-3, is deprecated in glib
 	version 2.62; we will use GtkSourceView-4 if available, which
 	doesn't use GTimeVal, or otherwise continue to use GtkSourceView-3

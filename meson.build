@@ -384,10 +384,14 @@ endif # compface != 'false'
 # GtkSourceView configuration
 #
 if gtksourceview
-  gsv_dep = dependency('gtksourceview-3.0', version : '>= 3.2.0')
-  conf.set('HAVE_GTKSOURCEVIEW', 1,
-    description : 'Defined when GtkSourceView-3 can be used.')
+  gsv_dep = dependency('gtksourceview-4', required : false)
+  if not gsv_dep.found()
+    gsv_dep = dependency('gtksourceview-3.0', version : '>= 3.2.0')
+    add_global_arguments('-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_48', language : 'c')
+  endif # not gsv_dep.found()
   balsa_deps += gsv_dep
+  conf.set('HAVE_GTKSOURCEVIEW', 1,
+    description : 'Defined when GtkSourceView-3 or 4 can be used.')
 endif # gtksourceview
 
 # libcanberra configuration

@@ -469,8 +469,12 @@ fi
 # GtkSourceView configuration
 #
 if test x$with_gtksourceview != xno; then
-    PKG_CHECK_MODULES(GTKSOURCEVIEW, [ gtksourceview-3.0 >= 3.2.0 ])
-    AC_DEFINE(HAVE_GTKSOURCEVIEW,1,[Defined when GtkSourceView-3 can be used.])
+    PKG_CHECK_MODULES([GTKSOURCEVIEW], [ gtksourceview-4 ], [],
+                      [
+                       PKG_CHECK_MODULES([GTKSOURCEVIEW], [ gtksourceview-3.0 >= 3.2.0 ])
+                       BALSA_CFLAGS="$BALSA_CFLAGS -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_48"
+                      ])
+    AC_DEFINE(HAVE_GTKSOURCEVIEW,1,[Defined when GtkSourceView-3 or 4 can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $GTKSOURCEVIEW_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $GTKSOURCEVIEW_LIBS"
 fi

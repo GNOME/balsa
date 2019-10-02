@@ -1,3 +1,14 @@
+2019-10-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Build: GTimeVal, used in GtkSourceView-3, is deprecated in glib
+	version 2.62; we will use GtkSourceView-4 if available, which
+	doesn't use GTimeVal, or otherwise continue to use GtkSourceView-3
+	with -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_48 to suppress the
+	deprecation warning.
+
+	* configure.ac:
+	* meson.build:
+
 2019-09-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	ab-main: Use GMenu API instead of GtkBuilder

@@ -1686,6 +1686,24 @@
 	(lbh_get_web_view): if the widget is not a WebKitWebView but is
 	a GtkContainer, look at all its descendants for a WebKitWebView.
 
+2019-10-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use GtkPopover for the "Add" button options for Remote mailbox
+	servers and Address books, for the type of server or address
+	book, respectively.
+
+	* src/address-book-config.c (add_vcard_cb), (add_externq_cb),
+	(add_ldif_cb), (add_ldap_cb), (add_gpe_cb), (add_rubrica_cb),
+	(add_osmo_cb), (balsa_address_book_add_menu): create a
+	GMenuModel instead of a GtkMenu;
+	* src/address-book-config.h: corresponding API;
+	* src/pref-manager.c (add_menu_cb), (pop3_add_cb),
+	(imap_add_cb): make them GAction callbacks;
+	(server_add_menu_model): create a GMenuModel instead of a GtkMenu;
+	(pm_grid_add_address_books_group): use the GMenuModel to
+	populate a GtkPopover;
+	(pm_grid_add_remote_mailbox_servers_group): ditto.
+
 2019-10-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Build: we need -Wformat for -Wformat-security to be effective

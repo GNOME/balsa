@@ -1638,10 +1638,7 @@ address_book_set_default_cb(GtkTreeView * tree_view)
 static void
 add_menu_cb(GtkWidget * menu, GtkWidget * widget)
 {
-    gtk_widget_show_all(menu);
-    gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(widget),
-                             GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_NORTH_WEST,
-                             NULL);
+    gtk_popover_popup(GTK_POPOVER(menu));
 }
 
 static void
@@ -1672,28 +1669,46 @@ address_book_delete_cb(GtkTreeView * tree_view)
 }
 
 static void
-pop3_add_cb(void)
+pop3_add_cb(GSimpleAction *action,
+            GVariant      *parameter,
+            gpointer       user_data)
 {
     mailbox_conf_new(LIBBALSA_TYPE_MAILBOX_POP3);
 }
 
-static GtkWidget *
-server_add_menu_widget(void)
+static void
+imap_add_cb(GSimpleAction *action,
+            GVariant      *parameter,
+            gpointer       user_data)
 {
-    GtkWidget *menu;
-    GtkWidget *menuitem;
+    folder_conf_add_imap_cb(NULL, NULL);
+}
 
-    menu = gtk_menu_new();
-    menuitem = gtk_menu_item_new_with_label(_("Remote POP3 mailbox…"));
-    g_signal_connect(menuitem, "activate",
-                     G_CALLBACK(pop3_add_cb), NULL);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    menuitem = gtk_menu_item_new_with_label(_("Remote IMAP folder…"));
-    g_signal_connect(menuitem, "activate",
-		     G_CALLBACK(folder_conf_add_imap_cb), NULL);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+static GMenuModel *
+server_add_menu_model(GtkWidget *parent)
+{
+    GSimpleActionGroup *simple;
+    GMenu *menu;
+    static const GActionEntry pref_manager_entries[] = {
+        {"add-pop3", pop3_add_cb},
+        {"add-imap", imap_add_cb}
+    };
 
-    return menu;
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    pref_manager_entries,
+                                    G_N_ELEMENTS(pref_manager_entries),
+                                    NULL);
+    gtk_widget_insert_action_group(GTK_WIDGET(parent),
+                                   "pref-manager",
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+
+    menu = g_menu_new();
+    g_menu_append(menu, _("Remote POP3 mailbox…"), "pref-manager.add-pop3");
+    g_menu_append(menu, _("Remote IMAP folder…"), "pref-manager.add-imap");
+
+    return G_MENU_MODEL(menu);
 }
 
 static void
@@ -1947,7 +1962,9 @@ pm_grid_add_remote_mailbox_servers_group(GtkWidget * grid_widget)
     GtkListStore *store;
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
+    GMenuModel *menu_model;
     GtkWidget *server_add_menu;
+    GtkWidget *button;
 
     pm_grid_attach(grid, pm_group_label(_("Remote mailbox servers")), 0, row, 3, 1);
 
@@ -1989,12 +2006,14 @@ pm_grid_add_remote_mailbox_servers_group(GtkWidget * grid_widget)
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, ROW_SPACING);
 
-    server_add_menu = server_add_menu_widget();
+    menu_model = server_add_menu_model(vbox);
+    server_add_menu = gtk_popover_new_from_model(NULL, menu_model);
     g_object_weak_ref(G_OBJECT(vbox), (GWeakNotify) g_object_unref,
-                      server_add_menu);
-    g_object_ref_sink(server_add_menu);
-    add_button_to_box(_("_Add"), G_CALLBACK(add_menu_cb),
-                      server_add_menu, vbox);
+                      menu_model);
+
+    button = add_button_to_box(_("_Add"), G_CALLBACK(add_menu_cb),
+                               server_add_menu, vbox);
+    gtk_popover_set_relative_to(GTK_POPOVER(server_add_menu), button);
 
     add_button_to_box(_("_Modify"), G_CALLBACK(server_edit_cb),
                       tree_view, vbox);
@@ -2694,8 +2713,10 @@ pm_grid_add_address_books_group(GtkWidget * grid_widget)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkWidget *scrolledwindow;
+    GMenuModel *menu_model;
     GtkWidget *address_book_add_menu;
     GtkWidget *vbox;
+    GtkWidget *button;
 
     pm_grid_attach(grid, pm_group_label(_("Address books")), 0, row, 3, 1);
 
@@ -2743,22 +2764,23 @@ pm_grid_add_address_books_group(GtkWidget * grid_widget)
                                 (GTK_TREE_VIEW(tree_view)),
                                 GTK_SELECTION_BROWSE);
 
-    g_signal_connect(tree_view, "row-activated", 
+    g_signal_connect(tree_view, "row-activated",
                      G_CALLBACK(address_book_edit_cb), NULL);
 
     gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
 
-    address_book_add_menu =
-        balsa_address_book_add_menu(address_book_change,
-                                    GTK_WINDOW(property_box));
-    g_object_weak_ref(G_OBJECT(grid), (GWeakNotify) g_object_unref,
-                      address_book_add_menu);
-    g_object_ref_sink(address_book_add_menu);
+    menu_model = balsa_address_book_add_menu(address_book_change,
+                                             GTK_WINDOW(property_box));
+    address_book_add_menu = gtk_popover_new_from_model(NULL, menu_model);
+    g_object_weak_ref(G_OBJECT(address_book_add_menu),
+                      (GWeakNotify) g_object_unref, menu_model);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
-    add_button_to_box(_("_Add"),
-                      G_CALLBACK(add_menu_cb),
-                      address_book_add_menu, vbox);
+
+    button = add_button_to_box(_("_Add"),
+                               G_CALLBACK(add_menu_cb),
+                               address_book_add_menu, vbox);
+    gtk_popover_set_relative_to(GTK_POPOVER(address_book_add_menu), button);
 
     add_button_to_box(_("_Modify"),
                       G_CALLBACK(address_book_edit_cb),
@@ -2766,7 +2788,7 @@ pm_grid_add_address_books_group(GtkWidget * grid_widget)
     add_button_to_box(_("_Delete"),
                       G_CALLBACK(address_book_delete_cb),
                       tree_view, vbox);
-    add_button_to_box(_("_Set as default"), 
+    add_button_to_box(_("_Set as default"),
                       G_CALLBACK(address_book_set_default_cb),
                       tree_view, vbox);
     pm_grid_attach(grid, vbox, 2, row, 1, 1);

@@ -855,24 +855,36 @@ modify_book(AddressBookConfig * abc)
 /* Pref manager callbacks */
 
 static void
-add_vcard_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_vcard_cb(GSimpleAction *action,
+             GVariant      *parameter,
+             gpointer       user_data)
 {
+    AddressBookConfig *abc = user_data;
+
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
     abc->window = create_vcard_dialog(abc);
     gtk_widget_show_all(abc->window);
 }
 
 static void
-add_externq_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_externq_cb(GSimpleAction *action,
+               GVariant      *parameter,
+               gpointer       user_data)
 {
+    AddressBookConfig *abc = user_data;
+
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ;
     abc->window = create_externq_dialog(abc);
     gtk_widget_show_all(abc->window);
 }
 
 static void
-add_ldif_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_ldif_cb(GSimpleAction *action,
+            GVariant      *parameter,
+            gpointer       user_data)
 {
+    AddressBookConfig *abc = user_data;
+
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDIF;
     abc->window = create_ldif_dialog(abc);
     gtk_widget_show_all(abc->window);
@@ -880,8 +892,12 @@ add_ldif_cb(GtkWidget * widget, AddressBookConfig * abc)
 
 #ifdef ENABLE_LDAP
 static void
-add_ldap_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_ldap_cb(GSimpleAction *action,
+            GVariant      *parameter,
+            gpointer       user_data)
 {
+    AddressBookConfig *abc = user_data;
+
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
     abc->window = create_ldap_dialog(abc);
     gtk_widget_show_all(abc->window);
@@ -890,8 +906,12 @@ add_ldap_cb(GtkWidget * widget, AddressBookConfig * abc)
 
 #ifdef HAVE_SQLITE
 static void
-add_gpe_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_gpe_cb(GSimpleAction *action,
+           GVariant      *parameter,
+           gpointer       user_data)
 {
+    AddressBookConfig *abc = user_data;
+
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
     abc->window = create_gpe_dialog(abc);
     gtk_widget_show_all(abc->window);
@@ -900,8 +920,12 @@ add_gpe_cb(GtkWidget * widget, AddressBookConfig * abc)
 
 #ifdef HAVE_RUBRICA
 static void
-add_rubrica_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_rubrica_cb(GSimpleAction *action,
+               GVariant      *parameter,
+               gpointer       user_data)
 {
+    AddressBookConfig *abc = user_data;
+
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
     abc->window = create_rubrica_dialog(abc);
     gtk_widget_show_all(abc->window);
@@ -910,72 +934,78 @@ add_rubrica_cb(GtkWidget * widget, AddressBookConfig * abc)
 
 #ifdef HAVE_OSMO
 static void
-add_osmo_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_osmo_cb(GSimpleAction *action,
+            GVariant      *parameter,
+            gpointer       user_data)
 {
+    AddressBookConfig *abc = user_data;
+
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_OSMO;
     abc->window = create_osmo_dialog(abc);
     gtk_widget_show_all(abc->window);
 }
 #endif /* HAVE_OSMO */
 
-GtkWidget *
+GMenuModel *
 balsa_address_book_add_menu(BalsaAddressBookCallback callback,
-                            GtkWindow * parent)
+                            GtkWindow               *parent)
 {
-    GtkWidget *menu;
-    GtkWidget *menuitem;
     AddressBookConfig *abc;
+    GSimpleActionGroup *simple;
+    GMenu *menu;
+    static const GActionEntry address_book_entries[] = {
+        {"add-vcard", add_vcard_cb},
+        {"add-externq", add_externq_cb},
+        {"add-ldif", add_ldif_cb},
+#ifdef ENABLE_LDAP
+        {"add-ldap", add_ldap_cb},
+#endif /* ENABLE_LDAP */
+#ifdef HAVE_SQLITE
+        {"add-gpe", add_gpe_cb},
+#endif /* HAVE_SQLITE */
+#ifdef HAVE_RUBRICA
+        {"add-rubrica", add_rubrica_cb},
+#endif /* HAVE_RUBRICA */
+#ifdef HAVE_OSMO
+        {"add-osmo", add_osmo_cb},
+#endif /* HAVE_OSMO */
+    };
 
-    menu = gtk_menu_new();
     abc = g_new0(AddressBookConfig, 1);
     abc->callback = callback;
     abc->parent = parent;
-    g_object_weak_ref(G_OBJECT(menu), (GWeakNotify) g_free, abc);
+    g_object_weak_ref(G_OBJECT(parent), (GWeakNotify) g_free, abc);
 
-    menuitem =
-        gtk_menu_item_new_with_label(_("vCard Address Book (GnomeCard)"));
-    g_signal_connect(menuitem, "activate",
-                     G_CALLBACK(add_vcard_cb), abc);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    address_book_entries,
+                                    G_N_ELEMENTS(address_book_entries),
+                                    abc);
+    gtk_widget_insert_action_group(GTK_WIDGET(parent),
+                                   "address-book",
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
 
-    menuitem =
-        gtk_menu_item_new_with_label(_("External query (a program)"));
-    g_signal_connect(menuitem, "activate",
-                     G_CALLBACK(add_externq_cb), abc);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-
-    menuitem = gtk_menu_item_new_with_label(_("LDIF Address Book"));
-    g_signal_connect(menuitem, "activate",
-                     G_CALLBACK(add_ldif_cb), abc);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    menu = g_menu_new();
+    g_menu_append(menu, _("vCard Address Book (GnomeCard)"), "address-book.add-vcard");
+    g_menu_append(menu, _("External query (a program)"), "address-book.add-externq");
+    g_menu_append(menu, _("LDIF Address Book"), "address-book.add-ldif");
 
 #ifdef ENABLE_LDAP
-    menuitem = gtk_menu_item_new_with_label(_("LDAP Address Book"));
-    g_signal_connect(menuitem, "activate",
-                     G_CALLBACK(add_ldap_cb), abc);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    g_menu_append(menu, _("LDAP Address Book"), "address-book.add-ldap");
 #endif /* ENABLE_LDAP */
 
 #ifdef HAVE_SQLITE
-    menuitem = gtk_menu_item_new_with_label(_("GPE Address Book"));
-    g_signal_connect(menuitem, "activate",
-                     G_CALLBACK(add_gpe_cb), abc);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    g_menu_append(menu, _("GPE Address Book"), "address-book.add-gpe");
 #endif /* HAVE_SQLITE */
 
 #ifdef HAVE_RUBRICA
-    menuitem = gtk_menu_item_new_with_label(_("Rubrica2 Address Book"));
-    g_signal_connect(menuitem, "activate",
-                     G_CALLBACK(add_rubrica_cb), abc);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    g_menu_append(menu, _("Rubrica2 Address Book"), "address-book.add-rubrica");
 #endif /* HAVE_RUBRICA */
 
 #ifdef HAVE_OSMO
-    menuitem = gtk_menu_item_new_with_label(_("Osmo Address Book"));
-    g_signal_connect(menuitem, "activate",
-                     G_CALLBACK(add_osmo_cb), abc);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    g_menu_append(menu, _("Osmo Address Book"), "address-book.add-osmo");
 #endif
 
-    return menu;
+    return G_MENU_MODEL(menu);
 }

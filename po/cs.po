@@ -578,7 +578,7 @@ msgstr "Chyba při spouštění generátoru podpisů „%s“: %s"
 #: ../libbalsa/identity.c:245
 #, c-format
 msgid "Cannot read signature file “%s”: "
-msgstr "Nezdařilo se přečíst soubor s podpisem „%s“: %s"
+msgstr "Nezdařilo se přečíst soubor s podpisem „%s“: "
 
 #: ../libbalsa/identity.c:256
 #, c-format

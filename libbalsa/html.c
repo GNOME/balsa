@@ -771,7 +771,6 @@ libbalsa_html_new(LibBalsaMessageBody * body,
                      G_CALLBACK(lbh_context_menu_cb), info);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    g_object_set_data(G_OBJECT(vbox), "libbalsa-html-web-view", info->web_view);
     gtk_box_pack_end(GTK_BOX(vbox), GTK_WIDGET(info->web_view), TRUE, TRUE, 0);
 
     /* Simple check for possible resource requests: */
@@ -795,14 +794,33 @@ libbalsa_html_to_string(gchar ** text, size_t len)
 }
 
 /*
- * We may be passed either the WebKitWebView or its container:
+ * We may be passed either the WebKitWebView or a container:
  */
+
+static void
+lbh_get_web_view_helper(GtkWidget *widget, gpointer data)
+{
+    GtkWidget **child = data;
+
+    if (*child == NULL) {
+        if (WEBKIT_IS_WEB_VIEW(widget))
+            *child = widget;
+        else if (GTK_IS_CONTAINER(widget))
+            gtk_container_foreach((GtkContainer *) widget,
+                                  lbh_get_web_view_helper, data);
+    }
+}
+
 static gboolean
 lbh_get_web_view(GtkWidget * widget, WebKitWebView ** web_view)
 {
-    if (!WEBKIT_IS_WEB_VIEW(widget))
-        widget =
-            g_object_get_data(G_OBJECT(widget), "libbalsa-html-web-view");
+    if (!WEBKIT_IS_WEB_VIEW(widget)) {
+        GtkWidget *child = NULL;
+
+        lbh_get_web_view_helper(widget, &child);
+        if (child != NULL)
+            widget = child;
+    }
 
     *web_view = (WebKitWebView *) widget;
 

@@ -1,3 +1,11 @@
+2019-10-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	libbalsa-html: Look deeper to find the WebKitWebView
+
+	* libbalsa/html.c (libbalsa_html_new), (lbh_get_web_view_helper),
+	(lbh_get_web_view): if the widget is not a WebKitWebView but is
+	a GtkContainer, look at all its descendants for a WebKitWebView.
+
 2019-10-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Build: we need -Wformat for -Wformat-security to be effective

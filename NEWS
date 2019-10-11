@@ -1,3 +1,15 @@
+* Balsa-2.5.8 release. Release date 2019-10-11
+
+Change with respect to 2.5.7
+
+- i18n improvements.
+- improved display of HTML messages.
+- handling of calendar (vcal) attachments.
+- LDAP address book improvements / error handling.
+- message presentation refactoring.
+- GPGME is a hard requirement now.
+- misc bug fixes and code health updates.
+
 * Balsa-2.5.7 release. Release date 2019-05-25
 
 Changes with respect to 2.5.6 tag:

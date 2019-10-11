@@ -1,5 +1,5 @@
 project('balsa', 'c',
-        version         : '2.5.7',
+        version         : '2.5.8',
         meson_version   : '>= 0.43.0',
         default_options : 'sysconfdir=/etc')
 

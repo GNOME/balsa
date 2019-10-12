@@ -604,6 +604,7 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 	view = WEBKIT_WEB_VIEW(webkit_web_view_new());
     g_object_set_data_full(G_OBJECT(view), LIBBALSA_HTML_INFO, info, (GDestroyNotify) lbh_webkit_info_free);
     gtk_widget_set_size_request(GTK_WIDGET(view), width, height);
+    gtk_widget_set_vexpand(GTK_WIDGET(view), TRUE);
 
 	settings = webkit_web_view_get_settings(view);
     webkit_settings_set_enable_plugins(settings, FALSE);

@@ -2506,7 +2506,7 @@ msgstr "S'ha produït un error en mostrar l'ajuda del servidor: %s\n"
 
 #: ../libbalsa/smtp-server.c:466
 msgid "SMTP Server"
-msgstr "Servidor d'SMTP:"
+msgstr "Servidor d'SMTP"
 
 #: ../libbalsa/smtp-server.c:496 ../src/folder-conf.c:336
 #: ../src/mailbox-conf.c:1278 ../src/mailbox-conf.c:1391
@@ -4356,11 +4356,11 @@ msgstr "Heu de proporcionar com a mínim una expressió regular"
 
 #: ../src/filter-edit-callbacks.c:580
 msgid "Low date is incorrect"
-msgstr "La data inferior no és correcte"
+msgstr "La data inferior no és correcta"
 
 #: ../src/filter-edit-callbacks.c:591
 msgid "High date is incorrect"
-msgstr "La data superior no és correcte"
+msgstr "La data superior no és correcta"
 
 #: ../src/filter-edit-callbacks.c:599
 msgid "Low date is greater than high date"
@@ -4463,7 +4463,7 @@ msgstr "S'ha produït un error en mostrar l'ajuda del filtre: %s\n"
 
 #: ../src/filter-edit-callbacks.c:1714
 msgid "New filter"
-msgstr "Nou filtre"
+msgstr "Filtre nou"
 
 #: ../src/filter-edit-callbacks.c:1843
 msgid "No filter name specified."
@@ -6130,7 +6130,7 @@ msgstr "Color de l'enllaç"
 
 #: ../src/pref-manager.c:2587
 msgid "Hyperlink color"
-msgstr "Color de l'hiperenllaç"
+msgstr "Color de l'enllaç"
 
 #: ../src/pref-manager.c:2602 ../src/pref-manager.c:3217
 msgid "Format"
@@ -7394,7 +7394,7 @@ msgstr "Intercanvia"
 #: ../src/toolbar-factory.c:162 ../src/toolbar-factory.c:194
 #: ../ui/sendmsg-window.ui.h:7
 msgid "Queue"
-msgstr "Encua"
+msgstr "Posa a la cua"
 
 #: ../src/toolbar-factory.c:163
 msgid "Attach"

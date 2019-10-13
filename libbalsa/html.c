@@ -52,6 +52,9 @@
 /* zoom level for printing */
 #define HTML_PRINT_ZOOM			2.0
 
+/* LBH_NATURAL_SIZE means, well, to use a widget's natural width or height */
+#define LBH_NATURAL_SIZE (-1)
+
 
 /*
  * lbh_get_body_content
@@ -592,7 +595,6 @@ lbh_context_menu_cb(WebKitWebView       * web_view,
 static WebKitWebView *
 lbh_web_view_new(LibBalsaWebKitInfo *info,
 				 gint				 width,
-				 gint				 height,
 				 gboolean            auto_load_images)
 {
 	WebKitWebView *view;
@@ -603,7 +605,7 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
         info_for_cid = info;
 	view = WEBKIT_WEB_VIEW(webkit_web_view_new());
     g_object_set_data_full(G_OBJECT(view), LIBBALSA_HTML_INFO, info, (GDestroyNotify) lbh_webkit_info_free);
-    gtk_widget_set_size_request(GTK_WIDGET(view), width, height);
+    gtk_widget_set_size_request(GTK_WIDGET(view), width, LBH_NATURAL_SIZE);
     gtk_widget_set_vexpand(GTK_WIDGET(view), TRUE);
 
 	settings = webkit_web_view_get_settings(view);
@@ -694,8 +696,8 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
 	offline_window = gtk_offscreen_window_new();
 	render_width = (gint) (width * HTML_PRINT_DPI / 72.0);
 	g_debug("%s: request Cairo width %g, render width %d", __func__, width, render_width);
-    gtk_window_set_default_size(GTK_WINDOW(offline_window), render_width, 200);
-    view = lbh_web_view_new(info, render_width, 200, load_external_images || (have_src_cid && !have_src_oth));
+    gtk_window_set_default_size(GTK_WINDOW(offline_window), render_width, LBH_NATURAL_SIZE);
+    view = lbh_web_view_new(info, render_width, load_external_images || (have_src_cid && !have_src_oth));
     webkit_web_view_set_zoom_level(view, HTML_PRINT_ZOOM);			/* heuristic setting, any way to calculate it? */
     gtk_container_add(GTK_CONTAINER(offline_window), GTK_WIDGET(view));
     gtk_widget_show_all(offline_window);
@@ -764,7 +766,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     have_src_cid = g_regex_match_simple(CID_REGEX, text, G_REGEX_CASELESS, 0);
     have_src_oth = g_regex_match_simple(SRC_REGEX, text, G_REGEX_CASELESS, 0);
 
-    info->web_view = lbh_web_view_new(info, -1, 200, have_src_cid && !have_src_oth);
+    info->web_view = lbh_web_view_new(info, LBH_NATURAL_SIZE, have_src_cid && !have_src_oth);
 
     g_signal_connect(info->web_view, "mouse-target-changed",
                      G_CALLBACK(lbh_mouse_target_changed_cb), info);

@@ -1,3 +1,13 @@
+2019-10-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not use archaic 200px default height; now that we set
+	GtkWidget:vexpand to TRUE, the natural height works better.
+
+	* libbalsa/html.c: for cosmetics, define LBH_NATURAL_SIZE as -1;
+	(lbh_web_view_new): use it for the height;
+	(libbalsa_html_print_bitmap): ditto;
+	(libbalsa_html_new): use it for the width.
+
 2019-10-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/html.c (lbh_web_view_new): set v-expand on the

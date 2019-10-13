@@ -491,6 +491,15 @@ lbh_resource_load_started_cb(WebKitWebView     * web_view,
                      G_CALLBACK(lbh_resource_notify_response_cb), data);
 }
 
+static void
+lbh_load_changed_cb(WebKitWebView  *web_view,
+                    WebKitLoadEvent load_event,
+                    gpointer        user_data)
+{
+    if (load_event == WEBKIT_LOAD_FINISHED)
+        gtk_widget_queue_resize(GTK_WIDGET(web_view));
+}
+
 #if WEBKIT_CHECK_VERSION(2,20,0)
 /*
  * Callback for the "web-process-terminated" signal
@@ -635,6 +644,7 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 #endif
     g_signal_connect(view, "decide-policy", G_CALLBACK(lbh_decide_policy_cb), info);
     g_signal_connect(view, "resource-load-started", G_CALLBACK(lbh_resource_load_started_cb), info);
+    g_signal_connect(view, "load-changed", G_CALLBACK(lbh_load_changed_cb), info);
 
 	return view;
 }

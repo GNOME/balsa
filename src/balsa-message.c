@@ -2211,7 +2211,7 @@ add_part(BalsaMessage * balsa_message, BalsaPartInfo * info, GtkWidget * contain
     if (info->mime_widget == NULL)
 	part_info_init(balsa_message, info);
 
-    gtk_box_pack_start(GTK_BOX(container), GTK_WIDGET(info->mime_widget), TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(container), GTK_WIDGET(info->mime_widget), FALSE, TRUE, 0);
 
     info_container = balsa_mime_widget_get_container(info->mime_widget);
     body = add_multipart(balsa_message, info->body,

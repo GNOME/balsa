@@ -1,5 +1,16 @@
 2019-10-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	More efforts to get HTML parts to fill the pane
+
+	* libbalsa/html.c (lbh_web_view_new): connect to "load-changed"
+	signal;
+	(lbh_load_changed_cb): call-back for it; if the load has
+	finished, call gtk_widget_queue_resize();
+	* src/balsa-message.c (add_part): pack the widget with
+	expand=FALSE, so that an HTML part's v-expand takes precedence.
+
+2019-10-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Do not use archaic 200px default height; now that we set
 	GtkWidget:vexpand to TRUE, the natural height works better.
 

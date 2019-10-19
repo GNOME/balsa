@@ -1,3 +1,7 @@
+2019-10-19  Pawel Salek  <pawsa0@gmail.com>
+
+	* NEWS, configure.ac, meson.build: release balsa-2.5.9
+
 2019-10-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	More efforts to get HTML parts to fill the pane

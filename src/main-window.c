@@ -2494,9 +2494,10 @@ bw_enable_mailbox_menus(BalsaWindow * window, BalsaIndex * index)
                           libbalsa_mailbox_can_move_duplicates(mailbox));
 
     if (mailbox != NULL) {
-        balsa_window_set_thread_messages(window,
-                                         libbalsa_mailbox_get_threading_type(mailbox)
-                                         != LB_MAILBOX_THREADING_FLAT);
+        bw_action_set_boolean(window, "threading",
+                              libbalsa_mailbox_get_threading_type(mailbox) !=
+                              LB_MAILBOX_THREADING_FLAT);
+        bw_enable_expand_collapse(window, mailbox);
 	bw_set_filter_menu(window, libbalsa_mailbox_get_filter(mailbox));
     }
 
@@ -2686,19 +2687,6 @@ bw_enable_part_menu_items(BalsaWindow * window)
                           balsa_message_has_next_part(msg));
     bw_action_set_enabled(window, "previous-part",
                           balsa_message_has_previous_part(msg));
-}
-
-void
-balsa_window_set_thread_messages(BalsaWindow * window, gboolean thread_messages)
-{
-    GtkWidget *index;
-    LibBalsaMailbox *mailbox;
-
-    bw_action_set_boolean(window, "threading", thread_messages);
-
-    if ((index = balsa_window_find_current_index(window)) != NULL
-        && (mailbox = balsa_index_get_mailbox(BALSA_INDEX(index))) != NULL)
-        bw_enable_expand_collapse(window, mailbox);
 }
 
 static void

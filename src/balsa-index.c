@@ -2086,7 +2086,6 @@ balsa_index_set_thread_messages(BalsaIndex * index,
         return;
 
     libbalsa_mailbox_set_threading_type(mailbox, threading_type);
-    libbalsa_mailbox_set_threading(mailbox);
     balsa_index_update_tree(index, balsa_app.expand_tree);
 }
 

@@ -1,3 +1,30 @@
+2019-11-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix a mailbox-threading bug.
+
+	When adding a new mailbox, we used the UI to set its threading
+	type; unfortunately, the UI sets the threading on the currently
+	shown mailbox instead. Spotted when the new local mailbox should
+	have threading enabled, and the current mailbox is IMAP and
+	does not support threading.
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_set_threading_type): call
+	libbalsa_mailbox_set_threading() if the mailbox is non-NULL,
+	instead of making the caller do it;
+	* src/balsa-index.c (balsa_index_set_thread_messages): do not call
+	libbalsa_mailbox_set_threading();
+	* src/mailbox-conf.c: drop BalsaMailboxConfView:mailbox--no one
+	is now using it;
+	(mailbox_conf_view_new_full): no one is now using
+	BalsaMailboxConfView:mailbox;
+	(mailbox_conf_view_check): set the threading type directly on
+	the mailbox, instead of using the UI;
+	* src/main-window.c: drop balsa_window_set_thread_messages, as
+	it is no longer needed;
+	(bw_enable_mailbox_menus): include the guts of
+	balsa_window_set_thread_messages in-line;
+	* src/main-window.h: drop balsa_window_set_thread_messages.
+
 2019-10-19  Pawel Salek  <pawsa0@gmail.com>
 
 	* NEWS, configure.ac, meson.build: release balsa-2.5.9

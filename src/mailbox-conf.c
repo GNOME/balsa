@@ -69,7 +69,6 @@ struct _BalsaMailboxConfView {
     GtkWidget *chk_crypt;
     GtkWidget *thread_messages;
     GtkWidget *subject_gather;
-    LibBalsaMailbox *mailbox;
 };
 
 typedef struct _MailboxConfWindow MailboxConfWindow;
@@ -878,7 +877,6 @@ mailbox_conf_view_new_full(LibBalsaMailbox * mailbox,
 
     view_info = g_new(BalsaMailboxConfView, 1);
     g_object_weak_ref(G_OBJECT(window), (GWeakNotify) g_free, view_info);
-    view_info->mailbox = mailbox;
 
     label = libbalsa_create_grid_label(_("_Identity:"), grid, row);
     if (size_group)
@@ -1007,6 +1005,7 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
     GtkComboBox *combo_box;
     GtkTreeIter iter;
     gint active;
+    LibBalsaMailboxThreadingType threading_type;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
     if (view_info == NULL)	/* POP3 mailboxes do not have view_info */
@@ -1051,14 +1050,17 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 
     active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                           (view_info->subject_gather));
-    libbalsa_mailbox_set_subject_gather(view_info->mailbox, active);
+    libbalsa_mailbox_set_subject_gather(mailbox, active);
+    threading_type = active ? LB_MAILBOX_THREADING_JWZ : LB_MAILBOX_THREADING_SIMPLE;
 
     active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                           (view_info->thread_messages));
-    balsa_window_set_thread_messages(balsa_app.main_window, active);
+    /* Set the threading type directly, not through the UI: */
+    libbalsa_mailbox_set_threading_type(mailbox,
+                                        active ? threading_type : LB_MAILBOX_THREADING_FLAT);
 
-    if (libbalsa_mailbox_set_crypto_mode(mailbox,
-					 gtk_combo_box_get_active(GTK_COMBO_BOX(view_info->chk_crypt))))
+    active = gtk_combo_box_get_active(GTK_COMBO_BOX(view_info->chk_crypt));
+    if (libbalsa_mailbox_set_crypto_mode(mailbox, active))
 	changed = TRUE;
 
     if (!changed || !libbalsa_mailbox_get_open(mailbox))

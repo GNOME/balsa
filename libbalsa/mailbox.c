@@ -2423,8 +2423,10 @@ libbalsa_mailbox_set_threading_type(LibBalsaMailbox * mailbox,
 
     if (view->threading_type != threading_type) {
 	view->threading_type = threading_type;
-	if (mailbox)
+	if (mailbox != NULL) {
 	    view->in_sync = 0;
+            libbalsa_mailbox_set_threading(mailbox);
+        }
     }
 }
 

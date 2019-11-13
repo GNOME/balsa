@@ -196,7 +196,10 @@ if html_widget == 'webkit2'
       conf.set('HTML2TEXT_UCOPT', 1,
         description : 'Defined when HTML2TEXT accepts the --unicode-snob option.')
     endif
-    run_command('rm', '-f', conftest_htm)
+    # With meson version 0.52, the following run_command() makes ninja
+    # go into an endless loop, so we'll skip it, and just leave
+    # conftest.htm in the current build dir:
+    # run_command('rm', '-f', conftest_htm)
   else
     message('You cannot properly quote html-only messags.')
   endif

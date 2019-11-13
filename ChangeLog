@@ -1,3 +1,12 @@
+2019-11-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	meson.build: Do not enter endless loop
+
+	* meson.build:  With meson version 0.52,
+	  "run_command('rm', '-f', conftest_htm)" makes ninja go into
+	  an endless loop, so we'll skip it, and just leave conftest.htm
+	  in the current build dir.
+
 2019-11-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Fix a mailbox-threading bug.

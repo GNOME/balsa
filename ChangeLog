@@ -1,5 +1,12 @@
 2019-11-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	meson.build: Use dependency()'s capabilities
+
+	* meson.build: dependency() can find gpgme's configuration, (it's
+	  not limited to pkg-config) so we do not need the custom code.
+
+2019-11-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	meson.build: Use meson's "optimization" option
 
 	And avoid a warning from ninja.

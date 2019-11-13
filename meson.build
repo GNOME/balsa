@@ -134,6 +134,7 @@ gmime_dep   = dependency('gmime-2.6')
 gio_dep     = dependency('gio-2.0')
 gthread_dep = dependency('gthread-2.0')
 gnutls_dep  = dependency('gnutls', version : '>= 3.0')
+gpgme_dep   = dependency('gpgme', version : '>= 1.6.0')
 fribidi_dep = dependency('fribidi')
 
 # Dependencies for balsa
@@ -143,6 +144,7 @@ balsa_deps = [glib_dep,
               gio_dep,
               gthread_dep,
               gnutls_dep,
+              gpgme_dep,
               fribidi_dep]
 
 # Dependencies for balsa_ab:
@@ -207,34 +209,6 @@ if html_widget == 'webkit2'
   conf.set('HAVE_HTML_WIDGET', 1,
     description : 'Defined when an HTML widget can be used.')
   balsa_deps += html_dep
-endif
-
-# GPGME detection.
-
-gpgmecfg_program = find_program('gpgme-config', required : true)
-gpgmecfg = gpgmecfg_program.path()
-
-gpgmever = run_command(gpgmecfg, '--version').stdout().strip()
-if gpgmever.version_compare('< 1.6.0')
-  gpgmecfg   = 'false'
-  error('Sorry, you need at least gpgme version 1.6.0')
-else
-  if gpgmever.version_compare('< 1.8.0')
-    gpgme_libs = run_command(gpgmecfg, '--thread=pthread', '--libs')
-  else
-    gpgme_libs = run_command(gpgmecfg, '--libs')
-  endif
-  if gpgme_libs.returncode() != 0
-    error('*** Your gpgme installation does not support threads.')
-  endif
-
-  gpgme_cflags = run_command(gpgmecfg, '--cflags')
-  gpgme_cflags = gpgme_cflags.stdout().strip().split()
-  gpgme_libs   = gpgme_libs.stdout().strip().split()
-
-  gpgme_dep = declare_dependency(compile_args : gpgme_cflags, link_args : gpgme_libs)
-  balsa_deps += gpgme_dep
-  gpgmecfg = 'true'
 endif
 
 # Autocrypt

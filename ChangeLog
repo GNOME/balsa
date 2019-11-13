@@ -1,5 +1,14 @@
 2019-11-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	meson.build: Use meson's "optimization" option
+
+	And avoid a warning from ninja.
+
+	* meson.build: Use meson's "optimization" option instead of the
+	  "-O2" compiler flag.
+
+2019-11-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	meson.build: Do not enter endless loop
 
 	* meson.build:  With meson version 0.52,

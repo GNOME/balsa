@@ -43,15 +43,9 @@
 #include <gtksourceview/gtksource.h>
 #endif
 
-#if HAVE_GCR
-#define GCR_API_SUBJECT_TO_CHANGE
-#include <gcr/gcr.h>
-#else
-#include <gnutls/x509.h>
-#endif
-
 #include "misc.h"
 #include "missing.h"
+#include "x509-cert-widget.h"
 #include <glib/gi18n.h>
 
 static GThread *main_thread_id;
@@ -268,11 +262,11 @@ static gboolean
 ask_idle(gpointer data)
 {
     AskData* ad = (AskData*)data;
-    printf("ask_idle: ENTER %p\n", data);
+    g_debug("ask_idle: ENTER %p", data);
     ad->res = (ad->cb)(ad->arg);
     ad->done = TRUE;
     g_cond_signal(&ad->condvar);
-    printf("ask_idle: LEAVE %p\n", data);
+    g_debug("ask_idle: LEAVE %p", data);
     return FALSE;
 }
 
@@ -287,11 +281,11 @@ libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
 
     if (!libbalsa_am_i_subthread()) {
         int ret;
-        printf("Main thread asks the following question.\n");
+        g_debug("main thread asks the following question");
         ret = cb(arg);
         return ret;
     }
-    printf("Side thread asks the following question.\n");
+    g_debug("side thread asks the following question");
     g_mutex_init(&ad.lock);
     g_cond_init(&ad.condvar);
     ad.cb  = cb;
@@ -406,7 +400,6 @@ struct AskCertData {
     const char *explanation;
 };
 
-#if HAVE_GCR
 
 static int
 ask_cert_real(void *data)
@@ -416,9 +409,14 @@ ask_cert_real(void *data)
     GtkWidget *cert_widget;
     GString *str;
     unsigned i;
-    GByteArray *cert_der;
-    GcrCertificate *gcr_cert;
     GtkWidget *label;
+
+    /* never accept if the certificate is broken, resulting in a NULL widget */
+    cert_widget = x509_cert_chain_tls(acd->certificate); // x509_cert_widget_from_cert(acd->certificate);
+    if (cert_widget == NULL) {
+    	// FIXME - message?
+    	return CERT_ACCEPT_NO;
+    }
 
     dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"),
                                          NULL, /* FIXME: NULL parent */
@@ -429,11 +427,6 @@ ask_cert_real(void *data)
                                          _("_Reject"), GTK_RESPONSE_CANCEL,
                                          NULL);
     gtk_window_set_role(GTK_WINDOW(dialog), "tls_cert_dialog");
-    g_object_get(acd->certificate, "certificate", &cert_der, NULL);
-    gcr_cert = gcr_simple_certificate_new(cert_der->data, cert_der->len);
-    g_byte_array_unref(cert_der);
-    cert_widget = GTK_WIDGET(gcr_certificate_widget_new(gcr_cert));
-    g_object_unref(gcr_cert);
 
     str = g_string_new("");
     g_string_printf(str, _("<big><b>Authenticity of this certificate "
@@ -448,7 +441,7 @@ ask_cert_real(void *data)
     gtk_widget_show(label);
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                        cert_widget, TRUE, TRUE, 1);
-    gtk_widget_show(cert_widget);
+    gtk_widget_show_all(cert_widget);
 
     switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
     case 0:
@@ -466,161 +459,6 @@ ask_cert_real(void *data)
     return i;
 }
 
-#else
-
-static gnutls_x509_crt_t G_GNUC_WARN_UNUSED_RESULT
-get_gnutls_cert(GTlsCertificate *cert)
-{
-	gnutls_x509_crt_t res_crt;
-    int gnutls_res;
-
-    gnutls_res = gnutls_x509_crt_init(&res_crt);
-    if (gnutls_res == GNUTLS_E_SUCCESS) {
-    	GByteArray *cert_der;
-
-        g_object_get(cert, "certificate", &cert_der, NULL);
-    	if (cert_der != NULL) {
-    		gnutls_datum_t data;
-
-    		data.data = cert_der->data;
-    		data.size = cert_der->len;
-    		gnutls_res = gnutls_x509_crt_import(res_crt, &data, GNUTLS_X509_FMT_DER);
-    		if (gnutls_res != GNUTLS_E_SUCCESS) {
-    			gnutls_x509_crt_deinit(res_crt);
-    			res_crt = NULL;
-    		}
-    		g_byte_array_unref(cert_der);
-    	}
-    } else {
-    	res_crt = NULL;
-    }
-    return res_crt;
-}
-
-static gchar * G_GNUC_WARN_UNUSED_RESULT
-gnutls_get_dn(gnutls_x509_crt_t cert, int (*load_fn)(gnutls_x509_crt_t cert, char *buf, size_t *buf_size))
-{
-    size_t buf_size;
-    gchar *str_buf;
-
-    buf_size = 0U;
-    (void) load_fn(cert, NULL, &buf_size);
-    str_buf = g_malloc0(buf_size + 1U);
-    if (load_fn(cert, str_buf, &buf_size) != GNUTLS_E_SUCCESS) {
-    	g_free(str_buf);
-    	str_buf = NULL;
-    } else {
-    	libbalsa_utf8_sanitize(&str_buf, TRUE, NULL);
-    }
-    return str_buf;
-}
-
-static gchar * G_GNUC_WARN_UNUSED_RESULT
-x509_fingerprint(gnutls_x509_crt_t cert)
-{
-    size_t buf_size;
-    guint8 sha1_buf[20];
-    gchar *str_buf;
-    gint n;
-
-    buf_size = 20U;
-    g_message("%d", gnutls_x509_crt_get_fingerprint(cert, GNUTLS_DIG_SHA1, sha1_buf, &buf_size));
-    str_buf = g_malloc0(61U);
-    for (n = 0; n < 20; n++) {
-    	sprintf(&str_buf[3 * n], "%02x:", sha1_buf[n]);
-    }
-    str_buf[59] = '\0';
-    return str_buf;
-}
-
-static int
-ask_cert_real(void *data)
-{
-    struct AskCertData *acd = (struct AskCertData*)data;
-    gnutls_x509_crt_t cert;
-    gchar *name, *c, *valid_from, *valid_until;
-    GtkWidget* dialog, *label;
-    unsigned i;
-    GString* str;
-
-    cert = get_gnutls_cert(acd->certificate);
-    if (cert == NULL) {
-    	g_warning("%s: unable to create gnutls cert", __func__);
-    	return CERT_ACCEPT_NO;
-    }
-
-    str = g_string_new("");
-    g_string_printf(str, _("Authenticity of this certificate "
-                           "could not be verified.\n"
-                           "<b>Reason:</b> %s\n"
-                           "<b>This certificate belongs to:</b>\n"),
-                    acd->explanation);
-
-    name = gnutls_get_dn(cert, gnutls_x509_crt_get_dn);
-    g_string_append(str, name);
-    g_free(name);
-
-    g_string_append(str, _("\n<b>This certificate was issued by:</b>\n"));
-    name = gnutls_get_dn(cert, gnutls_x509_crt_get_issuer_dn);
-    g_string_append_printf(str, "%s\n", name);
-    g_free(name);
-
-    name = x509_fingerprint(cert);
-    valid_from  = libbalsa_date_to_utf8(gnutls_x509_crt_get_activation_time(cert), "%x %X");
-    valid_until = libbalsa_date_to_utf8(gnutls_x509_crt_get_expiration_time(cert), "%x %X");
-    g_string_append_printf(str, _("<b>This certificate is valid</b>\n"
-    							  "from %s\n"
-    							  "to %s\n"
-                         		  "<b>Fingerprint:</b> %s"),
-                        	valid_from, valid_until, name);
-    g_free(name);
-    g_free(valid_from);
-    g_free(valid_until);
-    gnutls_x509_crt_deinit(cert);
-
-    /* This string uses markup, so we must replace "&" with "&amp;" */
-    c = str->str;
-    while ((c = strchr(c, '&'))) {
-        gssize pos;
-
-        pos = (c - str->str) + 1;
-        g_string_insert(str, pos, "amp;");
-        c = str->str + pos;
-    }
-
-    dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"),
-                                         NULL, /* FIXME: NULL parent */
-                                         GTK_DIALOG_MODAL |
-                                         libbalsa_dialog_flags(),
-                                         _("_Accept Once"), 0,
-                                         _("Accept & _Save"), 1,
-                                         _("_Reject"), GTK_RESPONSE_CANCEL, 
-                                         NULL);
-    gtk_window_set_role(GTK_WINDOW(dialog), "tls_cert_dialog");
-    label = gtk_label_new(str->str);
-    g_string_free(str, TRUE);
-    gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-    gtk_box_pack_start(GTK_BOX
-                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       label, TRUE, TRUE, 1);
-    gtk_widget_show(label);
-
-    switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
-    case 0: i = CERT_ACCEPT_SESSION; break;
-    case 1: i = CERT_ACCEPT_PERMANENT; break;
-    case GTK_RESPONSE_CANCEL:
-    default: i=CERT_ACCEPT_NO; break;
-    }
-    gtk_widget_destroy(dialog);
-    /* Process some events to let the window disappear:
-     * not really necessary but helps with debugging. */
-   while(gtk_events_pending()) 
-        gtk_main_iteration_do(FALSE);
-    g_debug("%s returns %u", __func__, i);
-    return i;
-}
-
-#endif	/* HAVE_GCR */
 
 static int
 libbalsa_ask_for_cert_acceptance(GTlsCertificate      *cert,

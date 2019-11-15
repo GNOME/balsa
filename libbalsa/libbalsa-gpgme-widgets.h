@@ -56,6 +56,9 @@ typedef enum {
  * Create a widget containing most information about the key, including all UID's, all requested subkeys and the issuer (S/MIME
  * only).  Note that no information about the OpenPGP signatures of the UID's are included, as it is expensive to retrieve all
  * signatures of a key.
+ *
+ * If a S/MIME issuer certificate is available, the widget includes a button for displaying the certificate chain in a modal
+ * dialogue.
  */
 GtkWidget *libbalsa_gpgme_key(const gpgme_key_t     key,
 							  const gchar          *fingerprint,

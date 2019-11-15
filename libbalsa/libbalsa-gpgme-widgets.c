@@ -25,6 +25,7 @@
 #include <glib/gi18n.h>
 
 #include "geometry-manager.h"
+#include "x509-cert-widget.h"
 #include "rfc3156.h"
 
 
@@ -66,6 +67,8 @@ static gchar *create_purpose_str(gboolean can_sign,
 	G_GNUC_WARN_UNUSED_RESULT;
 static gchar *create_subkey_type_str(gpgme_subkey_t subkey)
 	G_GNUC_WARN_UNUSED_RESULT;
+static void smime_show_chain(GtkWidget              *button,
+							 gpointer G_GNUC_UNUSED  user_data);
 
 
 /* documentation: see header file */
@@ -158,7 +161,15 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 			issuer_row = create_key_grid_row(GTK_GRID(issuer_grid), issuer_row, _("Serial number:"), key->issuer_serial, FALSE);
 		}
 		if (key->chain_id != NULL) {
-			(void) create_key_grid_row(GTK_GRID(issuer_grid), issuer_row, _("Chain ID:"), key->chain_id, FALSE);
+			GtkWidget *chain_btn;
+
+			issuer_row = create_key_grid_row(GTK_GRID(issuer_grid), issuer_row, _("Chain ID:"), key->chain_id, FALSE);
+
+			/* add button to show the full chain - copy the fingerprint as the key may be unref'ed... */
+			chain_btn = gtk_button_new_with_label(_("view certificate chain…"));
+			g_object_set_data_full(G_OBJECT(chain_btn), "certid", g_strdup(fingerprint), g_free);
+			g_signal_connect(chain_btn, "clicked", G_CALLBACK(smime_show_chain), NULL);
+			gtk_grid_attach(GTK_GRID(issuer_grid), chain_btn, 0, issuer_row, 2, 1);
 		}
 	}
 
@@ -730,4 +741,34 @@ create_subkey_type_str(gpgme_subkey_t subkey)
 	}
 
 	return g_string_free(type_str, FALSE);
+}
+
+
+/** \brief Show the S/MIME certificate chain
+ *
+ * \param button button triggering the dialogue
+ * \param user_data callback user data, unused
+ *
+ * Show a modal dialogue with the certification chain of the certificate identified by the fingerprint attached as "certid" to
+ * the passed button.
+ */
+static void
+smime_show_chain(GtkWidget *button, gpointer G_GNUC_UNUSED user_data)
+{
+	GtkWidget *vbox;
+	GtkWidget *dialog;
+	GtkWidget *chain;
+
+	dialog = gtk_dialog_new_with_buttons("Certificate Chain",
+		GTK_WINDOW(gtk_widget_get_toplevel(button)),
+		GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+		_("_Close"), GTK_RESPONSE_CLOSE, NULL);
+	geometry_manager_attach(GTK_WINDOW(dialog), "CertChain");
+	chain = x509_cert_chain_smime(g_object_get_data(G_OBJECT(button), "certid"));
+	vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+	gtk_box_pack_start(GTK_BOX(vbox), chain, TRUE, TRUE, 6);
+
+	gtk_widget_show_all(vbox);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
 }

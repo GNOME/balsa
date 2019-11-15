@@ -1,3 +1,50 @@
+2019-11-14  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Display S/MIME and TLS certificate chains
+
+	The patch addresses the following:
+
+	S/MIME signatures:
+	Currently, Balsa shows the certificate data and the issuer's
+	name, serial and chain id.  It is not possible to view the entire
+	certification chain.
+	The patch adds a button to the issuer section of a S/MIME
+	signature, which opens a new dialogue, showing the certification
+	tree in the upper and the details of the selected certificate in
+	the lower part.  I.e. it is now possible to inspect/verify the
+	whole tree, up to the root certificate.  If you have any S/MIME
+	signed messages in a mailbox, you can simply test this feature.
+
+	TLS:
+	When opening an encrypted SMTP, POP3 or IMAP connection, balsa
+	shows a dialogue with the untrusted certificate, asking whether
+	the user accepts or rejects it.
+	With the patch, if the untrusted certificate is not self-signed
+	and the issuer certificate(s) can be loaded, the whole chain
+	is displayed as above for inspection.  For testing, you
+	could temporarily disable the trust for your provider's root
+	certificate, which should pop up the modified dialogue.
+
+	* libbalsa/Makefile.am, libbalsa/meson.build: add new source and header file
+	* libbalsa/libbalsa-gpgme-widgets.[ch]: add button to S/MIME
+	signature widget; implement button callback for displaying the
+	certificate chain
+	* libbalsa/libbalsa.c: replace printf() by g_debug()
+	calls in ask_idle() and libbalsa_ask(); use new api for
+	creating certificate (chain) widget; delete stuff shifted to
+	x509-cert-widget.[ch]
+	* libbalsa/x509-cert-widget.[ch]: implement two functions for
+	creating a certificate (chain) widget either from the S/MIME
+	certificate fingerprint, or from a GTlsCertificate.  If the
+	passed certificate is self-signed or if the issuer cannot
+	be determined, the function returns a widget containing the
+	certificate information.  Otherwise, the returned widget is a
+	vertical GtkBox, containing the certificate chain tree view in
+	the upper and a GtkStack in the lower part.  The latter displays
+	the certificate selected in the tree view.
+	* src/save-restore.c: add certificate chain dialogue to the
+	geometry manager
+
 2019-11-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	meson.build: Use dependency()'s capabilities

@@ -130,6 +130,7 @@ gboolean libbalsa_message_body_is_delsp(LibBalsaMessageBody * body);
 LibBalsaMessageBody *libbalsa_message_body_get_by_id(LibBalsaMessageBody *
                                                      body,
                                                      const gchar * id);
+LibBalsaMessageBody *libbalsa_message_body_mp_related_root(LibBalsaMessageBody *body);
 
 LibBalsaMsgProtectState libbalsa_message_body_protect_state(const LibBalsaMessageBody *body);
 gboolean libbalsa_message_body_multipart_signed(const LibBalsaMessageBody *body);

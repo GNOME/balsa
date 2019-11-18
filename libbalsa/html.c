@@ -703,6 +703,7 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
     have_src_oth = g_regex_match_simple(SRC_REGEX, text, G_REGEX_CASELESS, 0);
 
     info = g_new0(LibBalsaWebKitInfo, 1);
+    info->body = body;
 	offline_window = gtk_offscreen_window_new();
 	render_width = (gint) (width * HTML_PRINT_DPI / 72.0);
 	g_debug("%s: request Cairo width %g, render width %d", __func__, width, render_width);

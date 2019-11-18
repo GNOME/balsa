@@ -1,3 +1,16 @@
+2019-11-17  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Fix handling of Multipart/Related
+
+	* libbalsa/body.[ch]: implement a new helper function
+	  libbalsa_message_body_mp_related_root() returning the root object
+	  of a multipart/related;
+	* libbalsa/html.c: pass the HTML body to the Webkit callbacks
+	  when printing;
+	* src/balsa-message.c: use the new helper for fetching the
+	  multipart/related root object;
+	* src/print-gtk.c: properly handle multipart/related
+
 2019-11-14  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Display S/MIME and TLS certificate chains

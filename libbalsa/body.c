@@ -886,6 +886,47 @@ libbalsa_message_body_get_by_id(LibBalsaMessageBody * body,
     return libbalsa_message_body_get_by_id(body->next, id);
 }
 
+/** @brief Find the root object of a multipart/related
+ *
+ * @param body multipart/related body
+ * @return the root part
+ *
+ * A multipart/related (typical case: a HTML with inlined images) @em may have a "start" Content-Type parameter, indicating the
+ * Content-ID of the part containing the "root" of the compound object.  If the parameter is missing, the root object is the very
+ * first child of the container (see RFC 2387, Sect. 3.2).
+ *
+ * RFC 2387, Sect. 3.1 defines that the multipart/related @em must have a "type" parameter, giving the Content-Type of the root
+ * object, but in practice it is often omitted.
+ */
+LibBalsaMessageBody *
+libbalsa_message_body_mp_related_root(LibBalsaMessageBody *body)
+{
+	gchar *conttype;
+	LibBalsaMessageBody *root_body = NULL;
+
+    /* note: checking for a non-NULL body and for the proper content-type is somewhat paranoid... */
+    g_return_val_if_fail(body != NULL, NULL);
+
+    conttype = libbalsa_message_body_get_mime_type(body);
+    if (strcmp(conttype, "multipart/related") == 0) {
+		gchar *start_cont_id;
+
+		/* get the "start" parameter, and identify matching child */
+		start_cont_id = libbalsa_message_body_get_parameter(body, "start");
+		if ((start_cont_id != NULL) && (body->parts != NULL)) {
+			root_body = libbalsa_message_body_get_by_id(body->parts, start_cont_id);
+		}
+		g_free(start_cont_id);
+
+		/* fall back to first child if either the parameter is missing or if the child cannot be identified */
+		if (root_body == NULL) {
+			root_body = body->parts;
+		}
+    }
+    g_free(conttype);
+    return root_body;
+}
+
 LibBalsaMsgProtectState
 libbalsa_message_body_protect_state(const LibBalsaMessageBody *body)
 {

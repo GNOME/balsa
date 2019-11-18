@@ -242,6 +242,11 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 
 			print_part = find_alt_part(body->parts, psetup->print_alt_html);
 			bpo_list = print_single_part(bpo_list, context, psetup, print_part, no_first_sep, add_signature);
+		} else if (g_ascii_strcasecmp(conttype, "multipart/related") == 0) {
+			/* catch the case of a RFC 2387 multipart/related, typically a text/html with images which are enclosed in the
+			 * "related" container */
+			bpo_list = print_single_part(bpo_list, context, psetup, libbalsa_message_body_mp_related_root(body), no_first_sep,
+				add_signature);
 		} else {
 			bpo_list = scan_body(bpo_list, context, psetup, body->parts, no_first_sep);
 		}

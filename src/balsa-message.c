@@ -2176,9 +2176,8 @@ add_multipart(BalsaMessage *balsa_message, LibBalsaMessageBody *body,
     type=g_mime_content_type_new_from_string(body->content_type);
 
     if (g_mime_content_type_is_type(type, "multipart", "related")) {
-        /* FIXME: more processing required see RFC1872 */
-        /* Add the first part */
-        body = add_body(balsa_message, body->parts, container);
+        /* add the compound object root part */
+        body = add_body(balsa_message, libbalsa_message_body_mp_related_root(body), container);
     } else if (g_mime_content_type_is_type(type, "multipart", "alternative")) {
             /* Add the most suitable part. */
         body = add_body(balsa_message, preferred_part(body->parts), container);

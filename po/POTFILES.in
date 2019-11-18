@@ -58,6 +58,7 @@ libbalsa/server.c
 libbalsa/server-config.c
 libbalsa/smtp-server.c
 libbalsa/source-viewer.c
+libbalsa/x509-cert-widget.c
 libinit_balsa/assistant_helper.c
 libinit_balsa/assistant_init.c
 libinit_balsa/assistant_page_defclient.c

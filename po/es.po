@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2019-11-15 00:56+0000\n"
-"PO-Revision-Date: 2019-11-15 13:05+0100\n"
+"POT-Creation-Date: 2019-11-18 13:32+0000\n"
+"PO-Revision-Date: 2019-11-19 10:04+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Spanish - Spain <gnome-es-list@gnome.org>\n"
 "Language: es_ES\n"
@@ -1275,7 +1275,7 @@ msgstr "Su configuración de Balsa ahora se guarda en «~/.balsa/config»."
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: ../libbalsa/libbalsa-gpgme.c:188 ../src/balsa-message.c:2948
+#: ../libbalsa/libbalsa-gpgme.c:188 ../src/balsa-message.c:2947
 msgid "S/MIME"
 msgstr "S/MIME"
 
@@ -1674,7 +1674,6 @@ msgstr "ID de cadena:"
 # libmutt/imap/imap_ssl.c:523
 #. add button to show the full chain - copy the fingerprint as the key may be unref'ed...
 #: ../libbalsa/libbalsa-gpgme-widgets.c:169
-#| msgid "the certificate has expired"
 msgid "view certificate chain…"
 msgstr "ver la cadena de certificados…"
 
@@ -2926,6 +2925,54 @@ msgstr "Fuente del mensaje"
 msgid "Error adding from %s: %s\n"
 msgstr "Error al desde %s: %s\n"
 
+# libmutt/imap/imap_ssl.c:481
+# libmutt/imap/imap_ssl.c:481
+#: ../libbalsa/x509-cert-widget.c:275
+#, c-format
+#| msgid ""
+#| "\n"
+#| "Key fingerprint: %s"
+msgid "fingerprint %s"
+msgstr "huella %s"
+
+#: ../libbalsa/x509-cert-widget.c:276
+#, c-format
+#| msgid "Cannot find a key with fingerprint %s on the key server."
+msgid "cannot load key with fingerprint %s: %s"
+msgstr "no se puede cargar la clave cuya huella es %s: %s"
+
+# libmutt/imap/imap_ssl.c:462
+# libmutt/imap/imap_ssl.c:462
+#: ../libbalsa/x509-cert-widget.c:477
+msgid ""
+"\n"
+"<b>This certificate was issued by:</b>\n"
+msgstr ""
+"\n"
+"<b>Este certificado lo ha emitido:</b>\n"
+
+#: ../libbalsa/x509-cert-widget.c:486
+#, c-format
+#| msgid ""
+#| "<b>This certificate is valid</b>\n"
+#| "from %s\n"
+#| "to %s\n"
+#| "<b>Fingerprint:</b> %s"
+msgid ""
+"<b>This certificate is valid</b>\n"
+"from %s\n"
+"to %s\n"
+"<b>Fingerprint:</b>\n"
+"SHA1: %s\n"
+"SHA256: %s"
+msgstr ""
+"<b>Este certificado es válido</b>\n"
+"de %s\n"
+"a %s\n"
+"<b>Huella:</b>\n"
+"SHA1: %s\n"
+"SHA256: %s"
+
 # libinit_balsa/helper.c:142
 # libinit_balsa/helper.c:142
 #: ../libinit_balsa/assistant_helper.c:177
@@ -4130,12 +4177,12 @@ msgstr "No se pudo guardar %s: %s"
 
 # src/filter-edit-dialog.c:626
 # src/filter-edit-dialog.c:538
-#: ../src/balsa-message.c:2488 ../src/balsa-message.c:2633
+#: ../src/balsa-message.c:2487 ../src/balsa-message.c:2632
 #, c-format
 msgid "Sending the disposition notification failed: %s"
 msgstr "El envío de la notificación de entrega ha fallado: %s"
 
-#: ../src/balsa-message.c:2588
+#: ../src/balsa-message.c:2587
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -4148,11 +4195,11 @@ msgstr ""
 
 # src/sendmsg-window.c:1129
 # src/sendmsg-window.c:1180
-#: ../src/balsa-message.c:2598
+#: ../src/balsa-message.c:2597
 msgid "Reply to MDN?"
 msgstr "¿Quiere enviar un MDN?"
 
-#: ../src/balsa-message.c:2808
+#: ../src/balsa-message.c:2807
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -4163,18 +4210,18 @@ msgstr ""
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
-#: ../src/balsa-message.c:2829 ../src/balsa-message.c:2914
-#: ../src/balsa-message.c:3041
+#: ../src/balsa-message.c:2828 ../src/balsa-message.c:2913
+#: ../src/balsa-message.c:3040
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Ha fallado al analizar una parte del mensaje: %s"
 
-#: ../src/balsa-message.c:2830 ../src/balsa-message.c:2915
-#: ../src/balsa-message.c:3042
+#: ../src/balsa-message.c:2829 ../src/balsa-message.c:2914
+#: ../src/balsa-message.c:3041
 msgid "Possible disk space problem."
 msgstr "Posible problema de espacio en el disco."
 
-#: ../src/balsa-message.c:2844
+#: ../src/balsa-message.c:2843
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains an encrypted part, but its "
@@ -4183,7 +4230,7 @@ msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada, "
 "pero la estructura no es válida."
 
-#: ../src/balsa-message.c:2852
+#: ../src/balsa-message.c:2851
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a PGP encrypted part, but "
@@ -4192,7 +4239,7 @@ msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada, "
 "pero este protocolo criptográfico no está disponible."
 
-#: ../src/balsa-message.c:2865
+#: ../src/balsa-message.c:2864
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a S/MIME encrypted part, "
@@ -4201,7 +4248,7 @@ msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte cifrada S/"
 "MIME, pero este protocolo criptográfico no está disponible."
 
-#: ../src/balsa-message.c:2932
+#: ../src/balsa-message.c:2931
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a signed part, but its "
@@ -4211,7 +4258,7 @@ msgstr ""
 "pero su estructura no es válida. La firma, si es que hay alguna, no se puede "
 "comprobar."
 
-#: ../src/balsa-message.c:2945
+#: ../src/balsa-message.c:2944
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a %s signed part, but this "
@@ -4220,29 +4267,29 @@ msgstr ""
 "El mensaje enviado por %s con el asunto «%s» contiene una parte %s firmada, "
 "pero este protocolo criptográfico no está disponible."
 
-#: ../src/balsa-message.c:2948
+#: ../src/balsa-message.c:2947
 msgid "PGP"
 msgstr "PGP"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
-#: ../src/balsa-message.c:2972
+#: ../src/balsa-message.c:2971
 msgid "Detected a good signature"
 msgstr "Se detectó una firma buena"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
-#: ../src/balsa-message.c:2978
+#: ../src/balsa-message.c:2977
 msgid "Detected a good signature with insufficient validity"
 msgstr "Se detectó una firma buena con validez insuficiente"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
-#: ../src/balsa-message.c:2983 ../src/balsa-message.c:3108
+#: ../src/balsa-message.c:2982 ../src/balsa-message.c:3107
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Se detectó una firma buena con validez/confianza insuficiente"
 
-#: ../src/balsa-message.c:2993 ../src/balsa-message.c:3117
+#: ../src/balsa-message.c:2992 ../src/balsa-message.c:3116
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” "
@@ -4253,7 +4300,7 @@ msgstr ""
 "devolvió:\n"
 "%s"
 
-#: ../src/balsa-message.c:3006
+#: ../src/balsa-message.c:3005
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” failed "
@@ -4262,14 +4309,14 @@ msgstr ""
 "La comprobación de la firma del mensaje enviado por %s con el asunto «%s» "
 "falló con un error."
 
-#: ../src/balsa-message.c:3068
+#: ../src/balsa-message.c:3067
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 msgstr ""
 "No se puede descifrar porque este mensaje se está mostrando más de una vez."
 
-#: ../src/balsa-message.c:3070
+#: ../src/balsa-message.c:3069
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -4277,7 +4324,7 @@ msgstr ""
 "No se comprobar la firma y eliminar la armadura de OpenPGP porque este "
 "mensaje se está mostrando más de una vez."
 
-#: ../src/balsa-message.c:3073
+#: ../src/balsa-message.c:3072
 msgid "Please close the other instances of this message and try again."
 msgstr "Cierre las otras instancias de este mensaje e inténtelo de nuevo."
 
@@ -6641,7 +6688,7 @@ msgid "Expand threads on open"
 msgstr "Expandir conversaciones al abrir"
 
 #. fonts
-#: ../src/pref-manager.c:2450 ../src/print-gtk.c:587
+#: ../src/pref-manager.c:2450 ../src/print-gtk.c:592
 msgid "Fonts"
 msgstr "Tipografías"
 
@@ -6692,7 +6739,7 @@ msgstr "Ajustar el texto en"
 msgid "Display of multipart/alternative parts"
 msgstr "Mostrar partes Multipart/Alternative"
 
-#: ../src/pref-manager.c:2550 ../src/print-gtk.c:609
+#: ../src/pref-manager.c:2550 ../src/print-gtk.c:614
 msgid "Prefer text/plain over HTML"
 msgstr "Preferir text/plain antes que HTML"
 
@@ -6939,7 +6986,7 @@ msgstr "Ordenar y separar en conversaciones"
 
 # src/main-window.c:421
 # src/main-window.c:428
-#: ../src/pref-manager.c:3204 ../src/print-gtk.c:579
+#: ../src/pref-manager.c:3204 ../src/print-gtk.c:584
 msgid "Message"
 msgstr "Mensaje"
 
@@ -6968,7 +7015,7 @@ msgstr "Ortografía"
 msgid "Start-up"
 msgstr "Inicio"
 
-#: ../src/print-gtk.c:94 ../src/print-gtk.c:302
+#: ../src/print-gtk.c:94 ../src/print-gtk.c:307
 #, c-format
 msgid "Page %d of %d"
 msgstr "Página %d de %d"
@@ -6985,7 +7032,7 @@ msgstr "Firmado"
 msgid "Encrypted"
 msgstr "Cifrado"
 
-#: ../src/print-gtk.c:409
+#: ../src/print-gtk.c:414
 #, c-format
 msgid "Cannot print page %d because the document has only %d page."
 msgid_plural "Cannot print page %d because the document has only %d pages."
@@ -7002,74 +7049,74 @@ msgstr[1] ""
 #. * Do *not* translate it to "predefinito:mm", if it
 #. * it isn't default:mm or default:inch it will not work
 #.
-#: ../src/print-gtk.c:447
+#: ../src/print-gtk.c:452
 msgid "default:mm"
 msgstr "default:mm"
 
-#: ../src/print-gtk.c:503
+#: ../src/print-gtk.c:508
 msgid "inch"
 msgstr "pulgadas"
 
-#: ../src/print-gtk.c:510
+#: ../src/print-gtk.c:515
 msgid "mm"
 msgstr "mm"
 
-#: ../src/print-gtk.c:589
+#: ../src/print-gtk.c:594
 msgid "_Header Font:"
 msgstr "Tipografía de _cabecera:"
 
-#: ../src/print-gtk.c:590
+#: ../src/print-gtk.c:595
 msgid "B_ody Font:"
 msgstr "Tipografía del c_uerpo:"
 
-#: ../src/print-gtk.c:591
+#: ../src/print-gtk.c:596
 msgid "_Footer Font:"
 msgstr "Tipografía del _pie de página:"
 
 #. syntax highlighting
 #. treatment of HTML messages and parts
-#: ../src/print-gtk.c:594 ../src/print-gtk.c:607
+#: ../src/print-gtk.c:599 ../src/print-gtk.c:612
 msgid "Highlighting"
 msgstr "Resaltado"
 
-#: ../src/print-gtk.c:597
+#: ../src/print-gtk.c:602
 msgid "Highlight _cited text"
 msgstr "Texto resaltado _citado"
 
-#: ../src/print-gtk.c:601
+#: ../src/print-gtk.c:606
 msgid "Highlight _structured phrases"
 msgstr "Resaltar frases _estructuradas"
 
-#: ../src/print-gtk.c:613
+#: ../src/print-gtk.c:618
 msgid "Download images from remote servers (may be dangerous)"
 msgstr "Descargar imágenes de servidores remotos (puede ser peligroso)"
 
 #. margins
-#: ../src/print-gtk.c:624
+#: ../src/print-gtk.c:629
 msgid "Margins"
 msgstr "Márgenes"
 
 # src/sendmsg-window.c:222
 # src/sendmsg-window.c:226
-#: ../src/print-gtk.c:628
+#: ../src/print-gtk.c:633
 msgid "_Top"
 msgstr "_Arriba"
 
-#: ../src/print-gtk.c:634
+#: ../src/print-gtk.c:639
 msgid "_Bottom"
 msgstr "A_bajo"
 
-#: ../src/print-gtk.c:646
+#: ../src/print-gtk.c:651
 msgid "_Left"
 msgstr "_Izquierda"
 
-#: ../src/print-gtk.c:652
+#: ../src/print-gtk.c:657
 msgid "_Right"
 msgstr "_Derecha"
 
 # src/message-window.c:120
 # src/message-window.c:114
-#: ../src/print-gtk.c:784
+#: ../src/print-gtk.c:789
 #, c-format
 msgid "Error printing message: %s"
 msgstr "Error al imprimir el mensaje: %s"
@@ -8306,26 +8353,6 @@ msgstr "Bajar el elemento seleccionado"
 #~ "La autenticidad de este certificado no pudo ser verificada.\n"
 #~ "<b>Razón:</b> %s\n"
 #~ "<b>Este certificado pertenece a:</b>\n"
-
-# libmutt/imap/imap_ssl.c:462
-# libmutt/imap/imap_ssl.c:462
-#~ msgid ""
-#~ "\n"
-#~ "<b>This certificate was issued by:</b>\n"
-#~ msgstr ""
-#~ "\n"
-#~ "<b>Este certificado lo ha emitido:</b>\n"
-
-#~ msgid ""
-#~ "<b>This certificate is valid</b>\n"
-#~ "from %s\n"
-#~ "to %s\n"
-#~ "<b>Fingerprint:</b> %s"
-#~ msgstr ""
-#~ "<b>Este certificado es válido</b>\n"
-#~ "de %s\n"
-#~ "a %s\n"
-#~ "<b>Huella:</b> %s"
 
 # src/main-window.c:259
 # src/main-window.c:262

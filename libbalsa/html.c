@@ -570,8 +570,8 @@ lbh_cid_cb(WebKitURISchemeRequest * request,
             mime_type = libbalsa_message_body_get_mime_type(body);
             webkit_uri_scheme_request_finish(request, stream, len,
                                              mime_type);
-            g_object_unref(stream);
             g_free(mime_type);
+            g_object_unref(stream);
         }
     }
 }
@@ -1181,11 +1181,11 @@ libbalsa_html_filter(LibBalsaHTMLType html_type, gchar ** text, guint len)
 LibBalsaHTMLType
 libbalsa_html_type(const gchar * mime_type)
 {
-    if (!strcmp(mime_type, "text/html"))
+    if (strcmp(mime_type, "text/html") == 0)
 	return LIBBALSA_HTML_TYPE_HTML;
-    if (!strcmp(mime_type, "text/enriched"))
+    if (strcmp(mime_type, "text/enriched") == 0)
 	return LIBBALSA_HTML_TYPE_ENRICHED;
-    if (!strcmp(mime_type, "text/richtext"))
+    if (strcmp(mime_type, "text/richtext") == 0)
 	return LIBBALSA_HTML_TYPE_RICHTEXT;
     return LIBBALSA_HTML_TYPE_NONE;
 }
@@ -1195,7 +1195,7 @@ libbalsa_html_type(const gchar * mime_type)
 LibBalsaHTMLType
 libbalsa_html_type(const gchar * mime_type)
 {
-    if (!strcmp(mime_type, "text/html"))
+    if (strcmp(mime_type, "text/html") == 0)
 	return LIBBALSA_HTML_TYPE_HTML;
     return LIBBALSA_HTML_TYPE_NONE;
 }

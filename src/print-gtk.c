@@ -138,14 +138,14 @@ find_alt_part(LibBalsaMessageBody *parts,
 		gchar *mime_type;
 		
 		mime_type = libbalsa_message_body_get_mime_type(use_part);
-		if ((g_ascii_strncasecmp(mime_type, "multipart/", 10U) == 0) && (use_part->parts != NULL)) {
+		if ((strncmp(mime_type, "multipart/", 10U) == 0) && (use_part->parts != NULL)) {
 			/* consider the first child of a multipart */
 			g_free(mime_type);
 			mime_type = libbalsa_message_body_get_mime_type(use_part->parts);
 		}
 
-		if (((g_ascii_strcasecmp(mime_type, "text/plain") == 0) && !print_alt_html) ||
-			((g_ascii_strcasecmp(mime_type, "text/html") == 0) && print_alt_html)) {
+		if (((strcmp(mime_type, "text/plain") == 0) && !print_alt_html) ||
+			((strcmp(mime_type, "text/html") == 0) && print_alt_html)) {
 			g_free(mime_type);
 			return use_part;
 		}
@@ -211,9 +211,9 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 
 	conttype = libbalsa_message_body_get_mime_type(body);
 	add_signature = body->sig_info &&
-	    g_ascii_strcasecmp(conttype, "application/pgp-signature") &&
-	    g_ascii_strcasecmp(conttype, "application/pkcs7-signature") &&
-	    g_ascii_strcasecmp(conttype, "application/x-pkcs7-signature");
+	    strcmp(conttype, "application/pgp-signature") != 0 &&
+	    strcmp(conttype, "application/pkcs7-signature") != 0 &&
+	    strcmp(conttype, "application/x-pkcs7-signature") != 0;
 
 	is_mp_signed = libbalsa_message_body_multipart_signed(body);
 	if (is_mp_signed || (!add_signature && body->was_encrypted)) {

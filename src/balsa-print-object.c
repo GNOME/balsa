@@ -137,9 +137,9 @@ balsa_print_objects_append_from_body(GList * list,
     for (n = 0;
          pr_handlers[n].type &&
              ((pr_handlers[n].use_len == -1 &&
-               g_ascii_strcasecmp(pr_handlers[n].type, conttype)) ||
+               strcmp(pr_handlers[n].type, conttype) != 0) ||
               (pr_handlers[n].use_len > 0 &&
-               g_ascii_strncasecmp(pr_handlers[n].type, conttype, pr_handlers[n].use_len)));
+               strncmp(pr_handlers[n].type, conttype, pr_handlers[n].use_len) != 0));
          n++);
     result = pr_handlers[n].handler(list, context, mime_body, psetup);
     g_free(conttype);

@@ -250,9 +250,8 @@ libbalsa_message_body_set_parts(LibBalsaMessageBody * body)
 	gchar *mime_type;
 
 	mime_type = libbalsa_message_body_get_mime_type(body);
-	if (strcmp(mime_type, "text/rfc822-headers") == 0) {
+	if (strcmp(mime_type, "text/rfc822-headers") == 0)
 	    libbalsa_message_body_set_text_rfc822headers(body);
-	}
 	g_free(mime_type);
     }
 
@@ -691,9 +690,9 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 
 #define ENABLE_WORKAROUND_FOR_IE_NON_IANA_MIME_TYPE TRUE
 #if ENABLE_WORKAROUND_FOR_IE_NON_IANA_MIME_TYPE
-    if (!loader
-        && (!g_ascii_strcasecmp(mime_type, "image/pjpeg")
-            || !g_ascii_strcasecmp(mime_type, "image/jpg"))) {
+    if (loader == NULL
+        && (strcmp(mime_type, "image/pjpeg") == 0 ||
+            strcmp(mime_type, "image/jpg") == 0)) {
         g_clear_error(err);
         loader = gdk_pixbuf_loader_new_with_mime_type("image/jpeg", err);
     }
@@ -829,11 +828,11 @@ libbalsa_message_body_is_flowed(LibBalsaMessageBody * body)
     gboolean flowed = FALSE;
 
     content_type = libbalsa_message_body_get_mime_type(body);
-    if (g_ascii_strcasecmp(content_type, "text/plain") == 0) {
+    if (strcmp(content_type, "text/plain") == 0) {
 	gchar *format =
 	    libbalsa_message_body_get_parameter(body, "format");
 
-	if (format) {
+	if (format != NULL) {
 	    flowed = (g_ascii_strcasecmp(format, "flowed") == 0);
 	    g_free(format);
 	}

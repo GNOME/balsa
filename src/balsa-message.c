@@ -1333,15 +1333,15 @@ part_info_init(BalsaMessage * balsa_message, BalsaPartInfo * info)
 static inline gchar *
 mpart_content_name(const gchar *content_type)
 {
-    if (g_ascii_strcasecmp(content_type, "multipart/mixed") == 0)
+    if (strcmp(content_type, "multipart/mixed") == 0)
         return g_strdup(_("mixed parts"));
-    else if (g_ascii_strcasecmp(content_type, "multipart/alternative") == 0)
+    else if (strcmp(content_type, "multipart/alternative") == 0)
         return g_strdup(_("alternative parts"));
-    else if (g_ascii_strcasecmp(content_type, "multipart/signed") == 0)
+    else if (strcmp(content_type, "multipart/signed") == 0)
         return g_strdup(_("signed parts"));
-    else if (g_ascii_strcasecmp(content_type, "multipart/encrypted") == 0)
+    else if (strcmp(content_type, "multipart/encrypted") == 0)
         return g_strdup(_("encrypted parts"));
-    else if (g_ascii_strcasecmp(content_type, "message/rfc822") == 0)
+    else if (strcmp(content_type, "message/rfc822") == 0)
         return g_strdup(_("RFC822 message"));
     else
         return g_strdup_printf(_("“%s” parts"),
@@ -1419,16 +1419,16 @@ display_part(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
     content_desc = libbalsa_vfs_content_description(content_type);
 
     if(!is_multipart ||
-       g_ascii_strcasecmp(content_type, "message/rfc822")==0 ||
-       g_ascii_strcasecmp(content_type, "multipart/signed")==0 ||
-       g_ascii_strcasecmp(content_type, "multipart/encrypted")==0 ||
-       g_ascii_strcasecmp(content_type, "multipart/mixed")==0 ||
-       g_ascii_strcasecmp(content_type, "multipart/alternative")==0) {
+       strcmp(content_type, "message/rfc822") == 0 ||
+       strcmp(content_type, "multipart/signed") == 0 ||
+       strcmp(content_type, "multipart/encrypted") == 0 ||
+       strcmp(content_type, "multipart/mixed") == 0 ||
+       strcmp(content_type, "multipart/alternative") == 0) {
 
         info = balsa_part_info_new(body);
         balsa_message->info_count++;
 
-        if (g_ascii_strcasecmp(content_type, "message/rfc822") == 0 &&
+        if (strcmp(content_type, "message/rfc822") == 0 &&
             body->embhdrs) {
             gchar *from = balsa_message_sender_to_gchar(body->embhdrs->from, 0);
             gchar *subj = g_strdup(body->embhdrs->subject);
@@ -1667,7 +1667,7 @@ part_create_menu (BalsaPartInfo* info)
                       G_CALLBACK (balsa_mime_widget_ctx_menu_save), (gpointer) info->body);
     gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);
 
-    if (g_ascii_strcasecmp(content_type, "message/rfc822") == 0) {
+    if (strcmp(content_type, "message/rfc822") == 0) {
         GtkWidget *submenu;
 
         menu_item =
@@ -2020,7 +2020,7 @@ libbalsa_can_display(LibBalsaMessageBody *part)
     if (!balsa_app.display_alt_plain &&
 	libbalsa_html_type(content_type))
 	res = TRUE;
-    else if(g_ascii_strcasecmp(content_type, "multipart/related") == 0 &&
+    else if(strcmp(content_type, "multipart/related") == 0 &&
 	    part->parts)
 	res = libbalsa_can_display(part->parts);
     g_free(content_type);
@@ -2051,8 +2051,8 @@ preferred_part(LibBalsaMessageBody *parts)
 
         content_type = libbalsa_message_body_get_mime_type(body);
 
-        if (g_ascii_strcasecmp(content_type, "text/plain") == 0 ||
-            g_ascii_strcasecmp(content_type, "text/calendar") == 0)
+        if (strcmp(content_type, "text/plain") == 0 ||
+            strcmp(content_type, "text/calendar") == 0)
             preferred = body;
 #ifdef HAVE_HTML_WIDGET
         else if (libbalsa_can_display(body))
@@ -2742,9 +2742,9 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
         return icon;
 
     if (*icon_title &&
-	g_ascii_strcasecmp(content_type, "application/pgp-signature") &&
-	g_ascii_strcasecmp(content_type, "application/pkcs7-signature") &&
-	g_ascii_strcasecmp(content_type, "application/x-pkcs7-signature")) {
+	strcmp(content_type, "application/pgp-signature") != 0 &&
+	strcmp(content_type, "application/pkcs7-signature") != 0 &&
+	strcmp(content_type, "application/x-pkcs7-signature") != 0) {
     	gchar *info_str;
 
     	info_str = g_mime_gpgme_sigstat_info(body->sig_info, TRUE);
@@ -2791,9 +2791,9 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
        weird cases where such parts are nested, so do it in a loop. */
     this_body = body;
     mime_type = libbalsa_message_body_get_mime_type(this_body);
-    while (!g_ascii_strcasecmp(mime_type, "multipart/encrypted") ||
-	   !g_ascii_strcasecmp(mime_type, "application/pkcs7-mime") ||
-	   !g_ascii_strcasecmp(mime_type, "application/x-pkcs7-mime")) {
+    while (strcmp(mime_type, "multipart/encrypted") == 0 ||
+	   strcmp(mime_type, "application/pkcs7-mime") == 0 ||
+	   strcmp(mime_type, "application/x-pkcs7-mime") == 0) {
 	gint encrres;
 
 	/* FIXME: not checking for body_ref > 1 (or > 2 when re-checking, which
@@ -3139,7 +3139,7 @@ libbalsa_msg_perform_crypto_real(LibBalsaMessage * message,
 
     /* Check for multipart/signed and check the signature. */
     mime_type = libbalsa_message_body_get_mime_type(body);
-    if (!g_ascii_strcasecmp(mime_type, "multipart/signed"))
+    if (strcmp(mime_type, "multipart/signed") == 0)
 	libbalsa_msg_try_mp_signed(message, body, chk_crypto);
     g_free(mime_type);
 
@@ -3150,10 +3150,10 @@ libbalsa_msg_perform_crypto_real(LibBalsaMessage * message,
     while (chk_body) {
 	mime_type = libbalsa_message_body_get_mime_type(chk_body);
 
-	if (g_ascii_strcasecmp(mime_type, "application/octet-stream") &&
-	    g_ascii_strcasecmp(mime_type, "application/pkcs7-signature") &&
-	    g_ascii_strcasecmp(mime_type, "application/x-pkcs7-signature") &&
-	    g_ascii_strcasecmp(mime_type, "application/pgp-signature"))
+	if (strcmp(mime_type, "application/octet-stream") != 0 &&
+	    strcmp(mime_type, "application/pkcs7-signature") != 0 &&
+	    strcmp(mime_type, "application/x-pkcs7-signature") != 0 &&
+	    strcmp(mime_type, "application/pgp-signature") != 0)
 	    libbalsa_msg_part_2440(message, chk_body, chk_crypto);
 	g_free(mime_type);
 

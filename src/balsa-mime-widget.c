@@ -117,10 +117,9 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
     delegate = mime_delegate;
     while (delegate->handler &&
 	   ((delegate->wildcard &&
-	     g_ascii_strncasecmp(delegate->mime_type, content_type,
-				 strlen(delegate->mime_type))) ||
-	    (!delegate->wildcard &&
-	     g_ascii_strcasecmp(delegate->mime_type, content_type))))
+	     strncmp(delegate->mime_type, content_type, strlen(delegate->mime_type)) != 0) ||
+            (!delegate->wildcard &&
+	     strcmp(delegate->mime_type, content_type) != 0)))
 	delegate++;
 
     if (delegate->handler)
@@ -134,9 +133,9 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
     g_signal_connect(mw, "focus_out_event",
                      G_CALLBACK(balsa_mime_widget_unlimit_focus), bm);
     if (mime_body->sig_info != NULL &&
-        g_ascii_strcasecmp("application/pgp-signature", content_type) != 0 &&
-        g_ascii_strcasecmp("application/pkcs7-signature", content_type) != 0 &&
-        g_ascii_strcasecmp("application/x-pkcs7-signature", content_type) != 0) {
+        strcmp("application/pgp-signature", content_type) != 0 &&
+        strcmp("application/pkcs7-signature", content_type) != 0 &&
+        strcmp("application/x-pkcs7-signature", content_type) != 0) {
         GtkWidget *signature = balsa_mime_widget_signature_widget(mime_body, content_type);
         GtkWidget *crypto_frame =
             balsa_mime_widget_crypto_frame(mime_body, GTK_WIDGET(mw),
@@ -152,7 +151,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
         priv = balsa_mime_widget_get_instance_private(mw);
         priv->container = container;
     } else if (mime_body->was_encrypted &&
-               g_ascii_strcasecmp("multipart/signed", content_type) != 0) {
+               strcmp("multipart/signed", content_type) != 0) {
         GtkWidget *crypto_frame =
             balsa_mime_widget_crypto_frame(mime_body, GTK_WIDGET(mw), TRUE, TRUE, NULL);
         BalsaMimeWidgetPrivate *priv;

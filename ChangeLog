@@ -1,3 +1,20 @@
+2019-11-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	libbalsa_message_body_get_mime_type() is guaranteed to return a
+	lower case string, so we can safely use strcmp().
+
+	* libbalsa/body.c (libbalsa_message_body_set_parts),
+	(libbalsa_message_body_get_pixbuf),
+	(libbalsa_message_body_is_flowed):
+	* libbalsa/html.c (lbh_cid_cb), (libbalsa_html_type):
+	* src/balsa-message.c (mpart_content_name), (display_part),
+	(part_create_menu), (libbalsa_can_display), (preferred_part),
+	(get_crypto_content_icon), (libbalsa_msg_try_decrypt),
+	(libbalsa_msg_perform_crypto_real):
+	* src/balsa-mime-widget.c (balsa_mime_widget_new):
+	* src/balsa-print-object.c (balsa_print_objects_append_from_body):
+	* src/print-gtk.c (find_alt_part), (scan_body):
+
 2019-11-17  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Fix handling of Multipart/Related

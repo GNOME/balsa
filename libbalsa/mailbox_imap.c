@@ -2848,9 +2848,7 @@ multi_append_cb(char * buf, size_t buflen,
 
 	tmpstream = g_mime_stream_filter_new(stream);
 
-	crlffilter =
-	    g_mime_filter_crlf_new(TRUE,
-				   FALSE);
+        crlffilter = g_mime_filter_dos2unix_new(TRUE);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
 	g_object_unref(crlffilter);
 

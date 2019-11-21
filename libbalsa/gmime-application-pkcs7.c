@@ -88,7 +88,7 @@ g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
 
     stream = g_mime_stream_mem_new();
     filtered_stream = g_mime_stream_filter_new(stream);
-    crlf_filter = g_mime_filter_crlf_new(FALSE, FALSE);
+    crlf_filter = g_mime_filter_dos2unix_new(FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
 			     crlf_filter);
     g_object_unref(crlf_filter);
@@ -156,7 +156,7 @@ g_mime_application_pkcs7_encrypt(GMimePart * pkcs7, GMimeObject * content,
     stream = g_mime_stream_mem_new();
     filtered_stream = g_mime_stream_filter_new(stream);
 	
-    crlf_filter = g_mime_filter_crlf_new(TRUE, FALSE);
+    crlf_filter = g_mime_filter_unix2dos_new(FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
 			     crlf_filter);
     g_object_unref(crlf_filter);

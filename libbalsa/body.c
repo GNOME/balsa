@@ -746,7 +746,8 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
         g_mime_stream_reset(stream);
 
         if (filter_crlf) {
-            GMimeFilter *filter = g_mime_filter_crlf_new(FALSE, FALSE);
+            GMimeFilter *filter = g_mime_filter_dos2unix_new(FALSE);
+
             stream =
                 libbalsa_message_body_stream_add_filter(stream, filter);
         }

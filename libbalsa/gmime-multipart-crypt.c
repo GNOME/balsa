@@ -132,7 +132,7 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
 
     /* Note: see rfc2015 or rfc3156, section 5.1 */
     filtered = g_mime_stream_filter_new(stream);
-    filter = g_mime_filter_crlf_new(TRUE, FALSE);
+    filter = g_mime_filter_unix2dos_new(FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered), filter);
     g_object_unref(filter);
 
@@ -277,7 +277,7 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
     filtered_stream = g_mime_stream_filter_new(stream);
 
     /* Note: see rfc2015 or rfc3156, section 5.1 */
-    crlf_filter = g_mime_filter_crlf_new(TRUE, FALSE);
+    crlf_filter = g_mime_filter_unix2dos_new(FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
 			     crlf_filter);
     g_object_unref(crlf_filter);
@@ -328,7 +328,7 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
     stream = g_mime_stream_mem_new();
     filtered_stream = g_mime_stream_filter_new(stream);
 
-    crlf_filter = g_mime_filter_crlf_new(TRUE, FALSE);
+    crlf_filter = g_mime_filter_unix2dos_new(FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
 			     crlf_filter);
     g_object_unref(crlf_filter);
@@ -498,7 +498,7 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 
     stream = g_mime_stream_mem_new();
     filtered_stream = g_mime_stream_filter_new(stream);
-    crlf_filter = g_mime_filter_crlf_new(FALSE, FALSE);
+    crlf_filter = g_mime_filter_dos2unix_new(FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
 			     crlf_filter);
     g_object_unref(crlf_filter);

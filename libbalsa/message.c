@@ -1440,7 +1440,7 @@ libbalsa_message_stream(LibBalsaMessage *message)
 
 
     mime_stream = g_mime_stream_mem_new();
-    g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg),
+    g_mime_object_write_to_stream(GMIME_OBJECT(message->mime_msg), NULL,
                                   mime_stream);
     g_mime_stream_reset(mime_stream);
 

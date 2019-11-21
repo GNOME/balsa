@@ -483,7 +483,7 @@ libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
     gchar *mime_type = NULL;
     const gchar *charset;
 
-    wrapper = g_mime_part_get_content_object(GMIME_PART(body->mime_part));
+    wrapper = g_mime_part_get_content(GMIME_PART(body->mime_part));
     if (!wrapper) {
         /* part is incomplete. */
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
@@ -563,7 +563,7 @@ libbalsa_message_body_get_message_part_stream(LibBalsaMessageBody * body,
     mailbox = libbalsa_message_get_mailbox(body->message);
     libbalsa_mailbox_lock_store(mailbox);
     bytes_written =
-        g_mime_object_write_to_stream(GMIME_OBJECT(msg), stream);
+        g_mime_object_write_to_stream(GMIME_OBJECT(msg), NULL, stream);
     libbalsa_mailbox_unlock_store(mailbox);
     printf("Written %ld bytes of embedded message\n",
            (long) bytes_written);
@@ -756,7 +756,7 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
         g_object_unref(stream);
     } else
         /* body->mime_part is neither a GMimePart nor a GMimeMessagePart. */
-        len = g_mime_object_write_to_stream(body->mime_part, dest);
+        len = g_mime_object_write_to_stream(body->mime_part, NULL, dest);
 
     libbalsa_mailbox_unlock_store(mailbox);
     g_object_unref(dest);

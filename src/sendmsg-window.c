@@ -814,7 +814,7 @@ sw_edit_activated(GSimpleAction * action,
             InternetAddressList *list =
                 libbalsa_address_view_get_list(bsmsg->recipient_view,
                                                address_types[type]);
-            gchar *addr_string = internet_address_list_to_string(list, FALSE);
+            gchar *addr_string = internet_address_list_to_string(list, NULL, FALSE);
             g_object_unref(list);
             fprintf(tmp, "%s %s\n", _(address_types[type]), addr_string);
             g_free(addr_string);
@@ -1733,7 +1733,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 	    utf8name = g_strdup(_("forwarded message"));
 	else {
             gchar *tmp =
-                internet_address_list_to_string(attach_data->headers->from,
+                internet_address_list_to_string(attach_data->headers->from, NULL,
                                                 FALSE);
 	    utf8name = g_strdup_printf(_("Message from %s, subject: “%s”"),
 				       tmp,
@@ -3597,7 +3597,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 
 	if (headers->from) {
 	    gchar *from =
-		internet_address_list_to_string(headers->from,
+		internet_address_list_to_string(headers->from, NULL,
 			                        FALSE);
 	    g_string_append_printf(body, "%s %s\n", _("From:"), from);
 	    g_free(from);
@@ -3605,7 +3605,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 
 	if (internet_address_list_length(headers->to_list) > 0) {
 	    gchar *to_list =
-		internet_address_list_to_string(headers->to_list,
+		internet_address_list_to_string(headers->to_list, NULL,
 			                        FALSE);
 	    g_string_append_printf(body, "%s %s\n", _("To:"), to_list);
 	    g_free(to_list);
@@ -3613,7 +3613,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 
 	if (internet_address_list_length(headers->cc_list) > 0) {
 	    gchar *cc_list =
-		internet_address_list_to_string(headers->cc_list,
+		internet_address_list_to_string(headers->cc_list, NULL,
 			                        FALSE);
 	    g_string_append_printf(body, "%s %s\n", _("CC:"), cc_list);
 	    g_free(cc_list);
@@ -6665,7 +6665,7 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
     }
 
     list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
-    to_string = internet_address_list_to_string(list, FALSE);
+    to_string = internet_address_list_to_string(list, NULL, FALSE);
     g_object_unref(list);
 
     title = g_strdup_printf(title_format, to_string ? to_string : "",

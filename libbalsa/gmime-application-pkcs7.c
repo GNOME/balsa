@@ -177,7 +177,7 @@ g_mime_application_pkcs7_encrypt(GMimePart * pkcs7, GMimeObject * content,
     wrapper = g_mime_data_wrapper_new();
     g_mime_data_wrapper_set_stream(wrapper, ciphertext);
     g_object_unref(ciphertext);
-    g_mime_part_set_content_object(GMIME_PART(pkcs7), wrapper);
+    g_mime_part_set_content(GMIME_PART(pkcs7), wrapper);
     g_mime_part_set_filename(GMIME_PART(pkcs7), "smime.p7m");
     g_mime_part_set_content_encoding(GMIME_PART(pkcs7),
 				     GMIME_CONTENT_ENCODING_BASE64);

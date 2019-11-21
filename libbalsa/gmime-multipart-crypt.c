@@ -181,7 +181,7 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
 
     wrapper = g_mime_data_wrapper_new();
     g_mime_data_wrapper_set_stream(wrapper, sigstream);
-    g_mime_part_set_content_object(signature, wrapper);
+    g_mime_part_set_content(signature, wrapper);
     g_object_unref(sigstream);
     g_object_unref(wrapper);
 
@@ -364,7 +364,7 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
     wrapper =
 	g_mime_data_wrapper_new_with_stream(stream,
 					    GMIME_CONTENT_ENCODING_7BIT);
-    g_mime_part_set_content_object(version_part, wrapper);
+    g_mime_part_set_content(version_part, wrapper);
     g_object_unref(wrapper);
     g_object_unref(stream);
 
@@ -376,7 +376,7 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
     wrapper =
 	g_mime_data_wrapper_new_with_stream(ciphertext,
 					    GMIME_CONTENT_ENCODING_7BIT);
-    g_mime_part_set_content_object(encrypted_part, wrapper);
+    g_mime_part_set_content(encrypted_part, wrapper);
     g_object_unref(ciphertext);
     g_object_unref(wrapper);
 

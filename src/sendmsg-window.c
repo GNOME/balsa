@@ -478,7 +478,7 @@ delete_handler(BalsaSendmsg * bsmsg)
     if (ia) {
         tmp = ia->name;
         if (!tmp || !*tmp)
-            tmp = free_me = internet_address_to_string(ia, FALSE);
+            tmp = free_me = internet_address_to_string(ia, NULL, FALSE);
     }
     if (!tmp || !*tmp)
         tmp = _("(No name)");

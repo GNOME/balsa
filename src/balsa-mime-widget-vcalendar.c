@@ -254,7 +254,7 @@ balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_repl
 
 	/* add the callback data to the event object */
 	g_object_set_data_full(G_OBJECT(event), "ev:sender",
-			       internet_address_to_string(sender, FALSE),
+			       internet_address_to_string(sender, NULL, FALSE),
 			       (GDestroyNotify) g_free);
         g_object_set_data_full(G_OBJECT(event), "ev:ident",
                                g_object_ref(vevent_ident),

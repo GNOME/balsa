@@ -1050,7 +1050,7 @@ balsa_message_sender_to_gchar(InternetAddressList * list, gint which)
     if (!list)
 	return g_strdup(_("(No sender)"));
     if (which < 0)
-	return internet_address_list_to_string(list, FALSE);
+	return internet_address_list_to_string(list, NULL, FALSE);
     ia = internet_address_list_get_address (list, which);
     return internet_address_to_string(ia, NULL, FALSE);
 }
@@ -2434,7 +2434,7 @@ handle_mdn_request(GtkWindow *parent,
         gchar *reply_to;
         sender = from ? internet_address_to_string(from, NULL, FALSE) : NULL;
         reply_to =
-            internet_address_list_to_string (headers->dispnotify_to,
+            internet_address_list_to_string (headers->dispnotify_to, NULL,
 		                             FALSE);
         gtk_widget_show_all (create_mdn_dialog (parent, sender, reply_to, mdn,
                                                 mdn_ident));
@@ -2496,7 +2496,7 @@ static LibBalsaMessage *create_mdn_reply (const LibBalsaIdentity *mdn_ident,
     /* the first part of the body is an informational note */
     body = libbalsa_message_body_new(message);
     date = libbalsa_message_date_to_utf8(for_msg, balsa_app.date_string);
-    dummy = internet_address_list_to_string(for_msg_headers->to_list, FALSE);
+    dummy = internet_address_list_to_string(for_msg_headers->to_list, NULL, FALSE);
     body->buffer = g_strdup_printf(
         "The message sent on %s to %s with subject “%s” has been displayed.\n"
         "There is no guarantee that the message has been read or understood.\n\n",

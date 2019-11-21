@@ -750,7 +750,7 @@ mw_select_part_cb(BalsaMessage * bm, gpointer data)
         LibBalsaMessage *message = balsa_message_get_message(bm);
 
         if (message != NULL) {
-            from = internet_address_list_to_string(libbalsa_message_get_headers(message)->from,
+            from = internet_address_list_to_string(libbalsa_message_get_headers(message)->from, NULL,
                                                    FALSE);
             title = g_strdup_printf(_("Message from %s: %s"), from,
                                     LIBBALSA_MESSAGE_GET_SUBJECT(message));

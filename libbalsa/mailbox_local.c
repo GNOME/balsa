@@ -878,7 +878,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
             headers = libbalsa_message_get_headers(message);
             if (headers->to_list != NULL) {
                 gchar *str =
-                    internet_address_list_to_string(headers->to_list, FALSE);
+                    internet_address_list_to_string(headers->to_list, NULL, FALSE);
                 match =
                     libbalsa_utf8_strstr(str, cond->match.string.string);
                 g_free(str);
@@ -907,7 +907,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
             headers = libbalsa_message_get_headers(message);
             if (headers->cc_list != NULL) {
                 gchar *str =
-                    internet_address_list_to_string(headers->cc_list, FALSE);
+                    internet_address_list_to_string(headers->cc_list, NULL, FALSE);
                 match =
                     libbalsa_utf8_strstr(str, cond->match.string.string);
                 g_free(str);
@@ -1030,7 +1030,7 @@ lbm_local_cache_message(LibBalsaMailboxLocal * local,
 
     headers = libbalsa_message_get_headers(message);
     if (headers->from != NULL)
-        info->sender = internet_address_list_to_string(headers->from, FALSE);
+        info->sender = internet_address_list_to_string(headers->from, NULL, FALSE);
     if (info->sender == NULL)
         info->sender = g_strdup("");
 

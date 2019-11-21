@@ -306,7 +306,7 @@ vevent_reply(GObject * button, GtkWidget * box)
     headers = libbalsa_message_get_headers(message);
     headers->from = internet_address_list_new();
     internet_address_list_add(headers->from, ia);
-    headers->to_list = internet_address_list_parse_string(rcpt);
+    headers->to_list = internet_address_list_parse(libbalsa_parser_options(), rcpt);
     headers->date = time(NULL);
 
     /* create the message subject */

@@ -1211,3 +1211,19 @@ libbalsa_font_string_to_css(const gchar * font_string,
     return g_string_free(string, FALSE);
 #endif                          /* !GTK_CHECK_VERSION(3, 22,0) */
 }
+
+static GMimeParserOptions *parser_options;
+
+void
+libbalsa_parser_options_init(void)
+{
+    parser_options = g_mime_parser_options_new();
+    g_mime_parser_options_set_rfc2047_compliance_mode(parser_options,
+                                                      GMIME_RFC_COMPLIANCE_LOOSE);
+}
+
+GMimeParserOptions *
+libbalsa_parser_options(void)
+{
+    return parser_options;
+}

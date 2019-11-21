@@ -991,7 +991,7 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
     g_return_if_fail(mime_msg != NULL);
 
     if (headers->from == NULL)
-        headers->from = internet_address_list_parse_string(mime_msg->from);
+        headers->from = internet_address_list_parse(libbalsa_parser_options(), mime_msg->from);
 
     if (headers->date == 0)
         g_mime_message_get_date(mime_msg, &headers->date, NULL);
@@ -1029,12 +1029,12 @@ lb_message_headers_extra_from_gmime(LibBalsaMessageHeaders *headers,
 
     if (headers->reply_to == NULL) {
         headers->reply_to =
-            internet_address_list_parse_string(mime_msg->reply_to);
+            internet_address_list_parse(libbalsa_parser_options(), mime_msg->reply_to);
     }
 
     if (headers->dispnotify_to == NULL) {
         headers->dispnotify_to =
-            internet_address_list_parse_string(g_mime_object_get_header
+            internet_address_list_parse(libbalsa_parser_options(), g_mime_object_get_header
                                                    (GMIME_OBJECT(mime_msg),
                                                    "Disposition-Notification-To"));
     }
@@ -1235,10 +1235,10 @@ lbmsg_set_header(LibBalsaMessage *message,
         message->headers->date = g_mime_utils_header_decode_date(value, NULL);
     } else if ((message->headers->from == NULL) &&
                (g_ascii_strcasecmp(name, "From") == 0)) {
-        message->headers->from = internet_address_list_parse_string(value);
+        message->headers->from = internet_address_list_parse(libbalsa_parser_options(), value);
     } else if ((message->headers->to_list == NULL) &&
                (g_ascii_strcasecmp(name, "To") == 0)) {
-        message->headers->to_list = internet_address_list_parse_string(value);
+        message->headers->to_list = internet_address_list_parse(libbalsa_parser_options(), value);
     } else if (g_ascii_strcasecmp(name, "In-Reply-To") == 0) {
         libbalsa_message_set_in_reply_to_from_string(message, value);
     } else if ((message->message_id == NULL) &&
@@ -1251,7 +1251,7 @@ lbmsg_set_header(LibBalsaMessage *message,
         message->headers->content_type = g_mime_content_type_new_from_string(value);
     } else if ((message->headers->dispnotify_to == NULL) &&
                (g_ascii_strcasecmp(name, "Disposition-Notification-To") == 0)) {
-        message->headers->dispnotify_to = internet_address_list_parse_string(value);
+        message->headers->dispnotify_to = internet_address_list_parse(libbalsa_parser_options(), value);
     } else
 #ifdef MESSAGE_COPY_CONTENT
     if (g_ascii_strcasecmp(name, "Content-Length") == 0) {

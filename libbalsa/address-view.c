@@ -419,7 +419,8 @@ static gboolean
 lbav_add_from_string(LibBalsaAddressView * address_view,
                      GtkTreeIter * iter, const gchar * string)
 {
-    InternetAddressList *list = internet_address_list_parse_string(string);
+    InternetAddressList *list = internet_address_list_parse(libbalsa_parser_options(), string);
+
     gboolean retval = FALSE;
 
     if (list) {
@@ -1255,7 +1256,7 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
 
         if (this_type == type) {
             InternetAddressList *tmp_list =
-                internet_address_list_parse_string(name);
+                internet_address_list_parse(libbalsa_parser_options(), name);
             if (tmp_list) {
                 internet_address_list_append(address_list, tmp_list);
                 g_object_unref(tmp_list);

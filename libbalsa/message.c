@@ -1016,7 +1016,7 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
         gchar *str;
         g_return_if_fail(headers->content_type == NULL);
         content_type          = g_mime_object_get_content_type(mime_msg->mime_part);
-        str                   = g_mime_content_type_to_string(content_type);
+        str                   = g_mime_content_type_get_mime_type(content_type);
         headers->content_type = g_mime_content_type_new_from_string(str);
         g_free(str);
     }

@@ -227,7 +227,7 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
 						 "charset", "US-ASCII");
     }
 
-    g_mime_part_set_content_object(part, wrapper);
+    g_mime_part_set_content(part, wrapper);
     g_object_unref(cipherstream);
     g_object_unref(wrapper);
 
@@ -276,7 +276,7 @@ g_mime_part_rfc2440_verify(GMimePart * part, GError ** err)
     if (result && g_mime_stream_length(plainstream) > 0) {
 	wrapper = g_mime_data_wrapper_new();
 	g_mime_data_wrapper_set_stream(wrapper, plainstream);
-	g_mime_part_set_content_object(GMIME_PART(part), wrapper);
+	g_mime_part_set_content(GMIME_PART(part), wrapper);
 	g_object_unref(wrapper);
     }
     g_object_unref(plainstream);
@@ -346,7 +346,7 @@ g_mime_part_rfc2440_decrypt(GMimePart * part, GtkWindow * parent,
 	out_stream = g_mime_stream_mem_new();
 	wrapper = g_mime_data_wrapper_new();
 	g_mime_data_wrapper_set_stream(wrapper, out_stream);
-	g_mime_part_set_content_object(part, wrapper);
+	g_mime_part_set_content(part, wrapper);
         g_object_unref(wrapper);
 	g_mime_stream_reset(filter_stream);
 	g_mime_stream_write_to_stream(filter_stream, out_stream);

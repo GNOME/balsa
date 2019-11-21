@@ -32,6 +32,7 @@
 #include <glib/gi18n.h>
 #include <glib.h>
 #include <gtk/gtk.h>
+#include "libbalsa.h"
 #include "libbalsa-gpgme.h"
 #include "gmime-multipart-crypt.h"
 

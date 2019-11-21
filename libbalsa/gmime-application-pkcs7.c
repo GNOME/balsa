@@ -23,19 +23,11 @@
 
 #include <string.h>
 
-#include <gmime/gmime-stream-filter.h>
-#include <gmime/gmime-filter-crlf.h>
-#include <gmime/gmime-filter-from.h>
-#include <gmime/gmime-filter-basic.h>
-#include <gmime/gmime-stream-mem.h>
-#include <gmime/gmime-parser.h>
-#include <gmime/gmime-message-part.h>
-#include <gmime/gmime-multipart.h>
-#include <gmime/gmime-multipart-signed.h>
-#include <gmime/gmime-multipart-encrypted.h>
+#include <gmime/gmime.h>
 #include "libbalsa-gpgme.h"
 #include "gmime-application-pkcs7.h"
 #include <glib/gi18n.h>
+#include "misc.h"
 
 
 #ifdef G_LOG_DOMAIN
@@ -119,7 +111,7 @@ g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
     g_mime_parser_init_with_stream(parser, stream);
     g_object_unref(stream);
 
-    decrypted = g_mime_parser_construct_part(parser);
+    decrypted = g_mime_parser_construct_part(parser, libbalsa_parser_options());
     g_object_unref(parser);
 
     if (decrypted)

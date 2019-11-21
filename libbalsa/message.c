@@ -1017,7 +1017,7 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
         g_return_if_fail(headers->content_type == NULL);
         content_type          = g_mime_object_get_content_type(mime_msg->mime_part);
         str                   = g_mime_content_type_get_mime_type(content_type);
-        headers->content_type = g_mime_content_type_new_from_string(str);
+        headers->content_type = g_mime_content_type_parse(libbalsa_parser_options(), str);
         g_free(str);
     }
 }
@@ -1253,7 +1253,7 @@ lbmsg_set_header(LibBalsaMessage *message,
         libbalsa_message_set_references_from_string(message, value);
     } else if ((message->headers->content_type == NULL) &&
                (g_ascii_strcasecmp(name, "Content-Type") == 0)) {
-        message->headers->content_type = g_mime_content_type_new_from_string(value);
+        message->headers->content_type = g_mime_content_type_parse(libbalsa_parser_options(), value);
     } else if ((message->headers->dispnotify_to == NULL) &&
                (g_ascii_strcasecmp(name, "Disposition-Notification-To") == 0)) {
         message->headers->dispnotify_to = internet_address_list_parse(libbalsa_parser_options(), value);

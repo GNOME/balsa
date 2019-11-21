@@ -68,7 +68,7 @@ body_is_type(LibBalsaMessageBody * body, const gchar * type,
 	retval = g_mime_content_type_is_type(content_type, type, sub_type);
     } else {
 	GMimeContentType *content_type =
-	    g_mime_content_type_new_from_string(body->content_type);
+	    g_mime_content_type_parse(libbalsa_parser_options(), body->content_type);
 	retval = g_mime_content_type_is_type(content_type, type, sub_type);
 	g_object_unref(content_type);
     }

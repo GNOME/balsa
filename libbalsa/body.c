@@ -304,7 +304,7 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 	type = g_mime_object_get_content_type(body->mime_part);
 	res = g_strdup(g_mime_content_type_get_parameter(type, param));
     } else if (body->content_type) {
-	type = g_mime_content_type_new_from_string(body->content_type);
+	type = g_mime_content_type_parse(libbalsa_parser_options(), body->content_type);
 	res = g_strdup(g_mime_content_type_get_parameter(type, param));
 	g_object_unref(type);
     }

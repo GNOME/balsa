@@ -1358,7 +1358,7 @@ libbalsa_message_load_envelope_from_stream(LibBalsaMessage *message,
     gmime_stream_filter =
         g_mime_stream_filter_new(gmime_stream);
 
-    gmime_filter_crlf = g_mime_filter_unix2dos(FALSE);
+    gmime_filter_crlf = g_mime_filter_dos2unix_new(FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(gmime_stream_filter),
                              gmime_filter_crlf);
     g_object_unref(gmime_filter_crlf);

@@ -1632,7 +1632,7 @@ get_fwd_mail_headers(const gchar *mailfile)
     /* parse the file */
     parser = g_mime_parser_new();
     g_mime_parser_init_with_stream(parser, stream);
-    message = g_mime_parser_construct_message (parser);
+    message = g_mime_parser_construct_message (parser, libbalsa_parser_options());
     g_object_unref (parser);
     g_object_unref(stream);
     close(fd);

@@ -453,7 +453,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
         off_t offset;
 
         msg_info.status = msg_info.x_status = msg_info.mime_version = -1;
-        mime_message   = g_mime_parser_construct_message(gmime_parser);
+        mime_message   = g_mime_parser_construct_message(gmime_parser, libbalsa_parser_options());
         if (mime_message == NULL) {
             /* Skip to the next message, if any */
             GMimeStream *mbox_stream;
@@ -1122,7 +1122,7 @@ lbm_mbox_get_mime_message(LibBalsaMailbox * mailbox,
     libbalsa_mime_stream_shared_lock(stream);
     parser = g_mime_parser_new_with_stream(stream);
 
-    mime_message = g_mime_parser_construct_message(parser);
+    mime_message = g_mime_parser_construct_message(parser, libbalsa_parser_options());
     g_object_unref(parser);
     libbalsa_mime_stream_shared_unlock(stream);
     g_object_unref(stream);
@@ -1670,7 +1670,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    libbalsa_message_set_msgno(msg_info->local_info.message, j + 1);
 
 	msg_info->status = msg_info->x_status = msg_info->mime_version = -1;
-	mime_msg = g_mime_parser_construct_message(gmime_parser);
+	mime_msg = g_mime_parser_construct_message(gmime_parser, libbalsa_parser_options());
         if (!mime_msg)
             /* Try to recover */
             continue;
@@ -1823,7 +1823,7 @@ lbm_mbox_armored_object(GMimeStream * stream)
     GMimeObject *object;
 
     parser = g_mime_parser_new_with_stream(stream);
-    object = GMIME_OBJECT(g_mime_parser_construct_message(parser));
+    object = GMIME_OBJECT(g_mime_parser_construct_message(parser), libbalsa_parser_options());
     g_object_unref(parser);
     g_mime_object_encode(object, GMIME_ENCODING_CONSTRAINT_7BIT);
 

@@ -230,7 +230,7 @@ libbalsa_message_body_set_text_rfc822headers(LibBalsaMessageBody *body)
 	g_mime_stream_reset(headers);
 	parser = g_mime_parser_new_with_stream(headers);
 	g_object_unref(headers);
-	dummy_msg = g_mime_parser_construct_message(parser);
+	dummy_msg = g_mime_parser_construct_message(parser, libbalsa_parser_options());
 	g_object_unref(parser);
 
 	body->embhdrs = libbalsa_message_body_extract_embedded_headers(dummy_msg);

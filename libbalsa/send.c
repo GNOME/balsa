@@ -270,7 +270,7 @@ lbs_set_content(GMimePart *mime_part,
                                             GMIME_CONTENT_ENCODING_DEFAULT);
     g_object_unref(stream);
 
-    g_mime_part_set_content_object(mime_part, wrapper);
+    g_mime_part_set_content(mime_part, wrapper);
     g_object_unref(wrapper);
 }
 
@@ -341,7 +341,7 @@ add_mime_body_plain(LibBalsaMessageBody     *body,
                                                 GMIME_CONTENT_ENCODING_DEFAULT);
         g_object_unref(stream);
 
-        g_mime_part_set_content_object(mime_part, wrapper);
+        g_mime_part_set_content(mime_part, wrapper);
         g_object_unref(wrapper);
     } else {
         lbs_set_content(mime_part, body->buffer);
@@ -1400,7 +1400,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
                 content = g_mime_data_wrapper_new_with_stream(stream,
                                                               GMIME_CONTENT_ENCODING_DEFAULT);
                 g_object_unref(stream);
-                g_mime_part_set_content_object(GMIME_PART(mime_part),
+                g_mime_part_set_content(GMIME_PART(mime_part),
                                                content);
                 g_object_unref(content);
             }
@@ -1832,7 +1832,7 @@ lb_create_pubkey_part(LibBalsaMessage  *message,
 	    wrapper = g_mime_data_wrapper_new();
 	    g_mime_data_wrapper_set_stream(wrapper, stream);
 	    g_object_unref(stream);
-	    g_mime_part_set_content_object(mime_part, wrapper);
+	    g_mime_part_set_content(mime_part, wrapper);
 	    g_object_unref(wrapper);
 	}
 

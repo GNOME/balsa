@@ -1084,7 +1084,7 @@ balsa_message_sender_to_gchar(InternetAddressList * list, gint which)
     if (which < 0)
 	return internet_address_list_to_string(list, FALSE);
     ia = internet_address_list_get_address (list, which);
-    return internet_address_to_string(ia, FALSE);
+    return internet_address_to_string(ia, NULL, FALSE);
 }
 
 static void
@@ -2464,7 +2464,7 @@ handle_mdn_request(GtkWindow *parent,
     if (action == BALSA_MDN_REPLY_ASKME) {
         gchar *sender;
         gchar *reply_to;
-        sender = from ? internet_address_to_string (from, FALSE) : NULL;
+        sender = from ? internet_address_to_string(from, NULL, FALSE) : NULL;
         reply_to =
             internet_address_list_to_string (headers->dispnotify_to,
 		                             FALSE);

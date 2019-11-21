@@ -220,7 +220,7 @@ lbav_append_addresses(LibBalsaAddressView * address_view,
 
     for (; match; match = match->next) {
         InternetAddress *ia = match->data;
-        name = internet_address_to_string(ia, FALSE);
+        name = internet_address_to_string(ia, NULL, FALSE);
         gtk_list_store_append(store, &iter);
         gtk_list_store_set(store, &iter, COMPLETION_NAME_COL, name, -1);
         g_free(name);
@@ -392,7 +392,7 @@ lbav_add_from_list(LibBalsaAddressView * address_view,
 
     for (i = 0; i < internet_address_list_length(list); i++) {
         InternetAddress *ia = internet_address_list_get_address(list, i);
-        gchar *name = internet_address_to_string(ia, FALSE);
+        gchar *name = internet_address_to_string(ia, NULL, FALSE);
 
         libbalsa_utf8_sanitize(&name, address_view->fallback, NULL);
         lbav_clean_text(name);
@@ -750,8 +750,8 @@ lbav_focus_out_cb(GtkEntry * entry, GdkEventFocus * event,
         if (match) {
             if (!match->next) {
                 gchar *the_addr =
-                    internet_address_to_string((InternetAddress *) match->
-                                               data, FALSE);
+                    internet_address_to_string((InternetAddress *) match->data,
+                                                NULL, FALSE);
 
                 g_signal_handlers_block_by_func(entry,
                                                 lbav_entry_changed_cb,

@@ -1096,7 +1096,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
         bcc_list =
             libbalsa_address_view_get_list(bsmsg->recipient_view, "BCC:");
 
-        ident_list = internet_address_list_parse_string(addr);
+        ident_list = internet_address_list_parse(libbalsa_parser_options(), addr);
         if (ident_list) {
             /* Remove any Bcc addresses that came from the old identity
              * from the list. */
@@ -1126,7 +1126,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
         /* Add the new Bcc addresses, if any: */
         addr = libbalsa_identity_get_bcc(ident);
-        ident_list = internet_address_list_parse_string(addr);
+        ident_list = internet_address_list_parse(libbalsa_parser_options(), addr);
         if (ident_list) {
             internet_address_list_append(bcc_list, ident_list);
             g_object_unref(ident_list);

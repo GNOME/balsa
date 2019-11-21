@@ -360,7 +360,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     }
 
     data = libbalsa_message_body_get_parameter(mime_body, "server");
-    headers->to_list = internet_address_list_parse_string(data);
+    headers->to_list = internet_address_list_parse(libbalsa_parser_options(), data);
     g_free(data);
 
     /* the original body my have some data to be returned as commands... */

@@ -337,7 +337,7 @@ g_mime_part_rfc2440_decrypt(GMimePart * part, GtkWindow * parent,
 
 	/* strip crlf off encrypted stuff coming from Winbloze crap */
 	filter_stream = g_mime_stream_filter_new(plainstream);
-	filter = g_mime_filter_crlf_new(FALSE, FALSE);
+	filter = g_mime_filter_dos2unix_new(FALSE);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream),
 				 filter);
 	g_object_unref(filter);

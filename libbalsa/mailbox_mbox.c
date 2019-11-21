@@ -1879,7 +1879,7 @@ lbm_mbox_add_message(LibBalsaMailboxLocal * local,
     ctime_r(&(headers->date), date_string);
 
     sender = headers->from != NULL ?
-        internet_address_list_to_string(headers->from, FALSE) :
+        internet_address_list_to_string(headers->from, NULL, FALSE) :
 	g_strdup("none");
 
     g_object_unref(message);

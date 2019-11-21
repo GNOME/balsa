@@ -1484,14 +1484,14 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
 
     headers = libbalsa_message_get_headers(message);
     if (headers->from != NULL) {
-        tmp = internet_address_list_to_string(headers->from, TRUE);
+        tmp = internet_address_list_to_string(headers->from, NULL, TRUE);
         if (tmp != NULL) {
             g_mime_message_set_sender(mime_message, tmp);
             g_free(tmp);
         }
     }
     if (headers->reply_to != NULL) {
-        tmp = internet_address_list_to_string(headers->reply_to, TRUE);
+        tmp = internet_address_list_to_string(headers->reply_to, NULL, TRUE);
         if (tmp != NULL) {
             g_mime_message_set_reply_to(mime_message, tmp);
             g_free(tmp);
@@ -1527,7 +1527,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     }
 
     if (headers->dispnotify_to != NULL) {
-        tmp = internet_address_list_to_string(headers->dispnotify_to, TRUE);
+        tmp = internet_address_list_to_string(headers->dispnotify_to, NULL, TRUE);
         if (tmp != NULL) {
             g_mime_object_append_header(GMIME_OBJECT(mime_message),
                                         "Disposition-Notification-To", tmp);

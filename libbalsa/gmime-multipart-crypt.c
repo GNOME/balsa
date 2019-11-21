@@ -125,7 +125,7 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered), filter);
     g_object_unref(filter);
 
-    g_mime_object_write_to_stream(content, filtered);
+    g_mime_object_write_to_stream(content, NULL, filtered);
     g_mime_stream_flush(filtered);
     g_object_unref(filtered);
     g_mime_stream_reset(stream);
@@ -282,13 +282,13 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
 			     crlf_filter);
     g_object_unref(crlf_filter);
 
-    g_mime_object_write_to_stream(content, filtered_stream);
+    g_mime_object_write_to_stream(content, NULL, filtered_stream);
     g_mime_stream_flush(filtered_stream);
     g_object_unref(filtered_stream);
     g_mime_stream_reset(stream);
 
     /* get the signature stream */
-    wrapper = g_mime_part_get_content_object(GMIME_PART(signature));
+    wrapper = g_mime_part_get_content(GMIME_PART(signature));
 
     /* a s/mime signature is always encoded, a pgp signature shouldn't,
      * but there exist implementations which encode it... */
@@ -333,7 +333,7 @@ g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
 			     crlf_filter);
     g_object_unref(crlf_filter);
 
-    g_mime_object_write_to_stream(content, filtered_stream);
+    g_mime_object_write_to_stream(content, NULL, filtered_stream);
     g_mime_stream_flush(filtered_stream);
     g_object_unref(filtered_stream);
 
@@ -492,7 +492,7 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
     }
 
     /* get the ciphertext stream */
-    wrapper = g_mime_part_get_content_object(GMIME_PART(encrypted));
+    wrapper = g_mime_part_get_content(GMIME_PART(encrypted));
     ciphertext = g_mime_data_wrapper_get_decoded_stream(wrapper);
     g_mime_stream_reset(ciphertext);
 

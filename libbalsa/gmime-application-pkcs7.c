@@ -80,7 +80,7 @@ g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
     }
 
     /* get the ciphertext stream */
-    wrapper = g_mime_part_get_content_object(GMIME_PART(pkcs7));
+    wrapper = g_mime_part_get_content(GMIME_PART(pkcs7));
     g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
     ciphertext = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, ciphertext);
@@ -161,7 +161,7 @@ g_mime_application_pkcs7_encrypt(GMimePart * pkcs7, GMimeObject * content,
 			     crlf_filter);
     g_object_unref(crlf_filter);
 	
-    g_mime_object_write_to_stream(content, filtered_stream);
+    g_mime_object_write_to_stream(content, NULL, filtered_stream);
     g_mime_stream_flush(filtered_stream);
     g_object_unref(filtered_stream);
 	

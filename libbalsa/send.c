@@ -1724,7 +1724,7 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage  *message,
 
         msg_stream = g_mime_stream_mem_new();
         libbalsa_mailbox_lock_store(mailbox);
-        g_mime_object_write_to_stream(GMIME_OBJECT(libbalsa_message_get_mime_message(message)), msg_stream);
+        g_mime_object_write_to_stream(GMIME_OBJECT(libbalsa_message_get_mime_message(message)), NULL, msg_stream);
         libbalsa_mailbox_unlock_store(mailbox);
         g_mime_stream_reset(msg_stream);
     } else {

@@ -63,7 +63,7 @@ g_mime_part_check_rfc2440(GMimePart * part)
     static const char end_pgp_signature[]        = "-----END PGP SIGNATURE-----";
 
     /* try to get the content stream */
-    wrapper = g_mime_part_get_content_object(part);
+    wrapper = g_mime_part_get_content(part);
     g_return_val_if_fail(wrapper, GMIME_PART_RFC2440_NONE);
 
     stream = g_mime_data_wrapper_get_stream(wrapper);
@@ -147,7 +147,7 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
     g_return_val_if_fail(recipients != NULL || sign_userid != NULL, FALSE);
 
     /* get the raw content */
-    wrapper = g_mime_part_get_content_object(part);
+    wrapper = g_mime_part_get_content(part);
     g_return_val_if_fail(wrapper, FALSE); /* Incomplete part. */
     stream = g_mime_data_wrapper_get_stream(wrapper);
     g_mime_stream_reset(stream);
@@ -252,7 +252,7 @@ g_mime_part_rfc2440_verify(GMimePart * part, GError ** err)
     g_return_val_if_fail(GMIME_IS_PART(part), NULL);
 
     /* get the raw content */
-    wrapper = g_mime_part_get_content_object(GMIME_PART(part));
+    wrapper = g_mime_part_get_content(GMIME_PART(part));
     g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
@@ -307,7 +307,7 @@ g_mime_part_rfc2440_decrypt(GMimePart * part, GtkWindow * parent,
     g_return_val_if_fail(GMIME_IS_PART(part), NULL);
 
     /* get the raw content */
-    wrapper = g_mime_part_get_content_object(part);
+    wrapper = g_mime_part_get_content(part);
     g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);

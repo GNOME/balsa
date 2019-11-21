@@ -2174,7 +2174,7 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         g_object_unref(fstream);
 
         g_mime_parser_set_scan_from(mime_parser, FALSE);
-        mime_msg = g_mime_parser_construct_message(mime_parser);
+        mime_msg = g_mime_parser_construct_message(mime_parser, libbalsa_parser_options());
         g_object_unref(mime_parser);
 
         libbalsa_message_set_mime_message(message, mime_msg);

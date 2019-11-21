@@ -258,7 +258,7 @@ g_mime_gpgme_mps_verify(GMimeMultipartSigned * mps, GError ** error)
 				  GMIME_MULTIPART_SIGNED_SIGNATURE);
 
     /* make sure the protocol matches the signature content-type */
-    content_type = g_mime_content_type_to_string(signature->content_type);
+    content_type = g_mime_content_type_get_mime_type(signature->content_type);
     if (g_ascii_strcasecmp(content_type, protocol) != 0) {
 	g_set_error(error, GMIME_ERROR, GMIME_ERROR_PARSE_ERROR, "%s",
 		    _
@@ -468,7 +468,7 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 				  GMIME_MULTIPART_ENCRYPTED_VERSION);
 
     /* make sure the protocol matches the version part's content-type */
-    content_type = g_mime_content_type_to_string(version->content_type);
+    content_type = g_mime_content_type_get_mime_type(version->content_type);
     if (g_ascii_strcasecmp(content_type, protocol) != 0) {
 	g_set_error(err, GMIME_ERROR, GMIME_ERROR_PROTOCOL_ERROR, "%s",
 		    _

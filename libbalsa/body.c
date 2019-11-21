@@ -167,7 +167,7 @@ libbalsa_message_body_set_types(LibBalsaMessageBody * body)
     else body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
 
     g_free(body->content_type);
-    body->content_type = g_mime_content_type_to_string(type);
+    body->content_type = g_mime_content_type_get_mime_type(type);
 }
 
 static LibBalsaMessageBody **

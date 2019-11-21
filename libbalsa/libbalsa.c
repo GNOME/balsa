@@ -67,16 +67,8 @@ libbalsa_init(void)
 {
     main_thread_id = g_thread_self();
 
-    g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
-
-    GMIME_TYPE_DATA_WRAPPER;
-    GMIME_TYPE_FILTER;
-    GMIME_TYPE_FILTER_CRLF;
-    GMIME_TYPE_PARSER;
-    GMIME_TYPE_STREAM;
-    GMIME_TYPE_STREAM_BUFFER;
-    GMIME_TYPE_STREAM_MEM;
-    GMIME_TYPE_STREAM_NULL;
+    g_mime_init(); /* Registers all GMime types */
+    libbalsa_parser_options_init();
 
     /* Register our types to avoid possible race conditions. See
        output of "valgrind --tool=helgrind --log-file=balsa.log balsa"

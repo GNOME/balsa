@@ -2166,7 +2166,7 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         fstream = g_mime_stream_filter_new(stream);
         g_object_unref(stream);
 
-        filter = g_mime_filter_crlf_new(FALSE, FALSE);
+        filter = g_mime_filter_unix2dos(FALSE);
         g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
         g_object_unref(filter);
 
@@ -2723,9 +2723,7 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
 
 	tmpstream = g_mime_stream_filter_new(stream);
 
-	crlffilter =
-	    g_mime_filter_crlf_new(TRUE,
-				   FALSE);
+	crlffilter = g_mime_filter_unix2dos(FALSE);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
 	g_object_unref(crlffilter);
 

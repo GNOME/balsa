@@ -2113,7 +2113,7 @@ add_multipart_mixed(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
         retval = add_body(balsa_message, body, container);
         for (body = body->next; body; body = body->next) {
 	    GMimeContentType *type =
-		g_mime_content_type_new_from_string(body->content_type);
+		g_mime_content_type_parse(libbalsa_parser_options(), body->content_type);
 
             if (libbalsa_message_body_is_inline(body) ||
 		balsa_message->force_inline ||
@@ -2141,7 +2141,7 @@ add_multipart(BalsaMessage *balsa_message, LibBalsaMessageBody *body,
     if (!body->parts)
 	return body;
 
-    type=g_mime_content_type_new_from_string(body->content_type);
+    type = g_mime_content_type_parse(libbalsa_parser_options(), body->content_type);
 
     if (g_mime_content_type_is_type(type, "multipart", "related")) {
         /* add the compound object root part */

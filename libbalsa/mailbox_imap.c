@@ -2567,7 +2567,7 @@ lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
 
     if (!part->mime_part) {
         GMimeContentType *type =
-            g_mime_content_type_new_from_string(part->content_type);
+            g_mime_content_type_parse(libbalsa_parser_options(), part->content_type);
         if (g_mime_content_type_is_type(type, "multipart", "*")) {
             if (g_mime_content_type_is_type(type, "multipart", "signed"))
                 part->mime_part =

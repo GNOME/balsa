@@ -501,7 +501,7 @@ prepend_header_misc(GList      *res,
     return
         g_list_prepend(res,
                        libbalsa_create_hdr_pair(name,
-                                                g_mime_utils_header_decode_text(value)));
+                                                g_mime_utils_header_decode_text(libbalsa_parser_options(), value)));
 }
 
 /* 
@@ -565,7 +565,7 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
             g_list_prepend(res,
                            libbalsa_create_hdr_pair
                                ("In-Reply-To",
-                               g_mime_utils_header_decode_text(value)));
+                               g_mime_utils_header_decode_text(libbalsa_parser_options(), value)));
     }
 
     hdrlist = g_mime_object_get_header_list (GMIME_OBJECT(message));
@@ -993,8 +993,13 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
     if (headers->from == NULL)
         headers->from = internet_address_list_parse(libbalsa_parser_options(), mime_msg->from);
 
-    if (headers->date == 0)
-        g_mime_message_get_date(mime_msg, &headers->date, NULL);
+    if (headers->date == 0) {
+        GDateTime *datetime;
+
+        datetime = g_mime_message_get_date(mime_msg);
+        headers->date = g_date_time_to_unix(datetime);
+        g_date_time_unref(datetime);
+    }
 
     if (headers->to_list == NULL) {
         headers->to_list =
@@ -1471,7 +1476,7 @@ libbalsa_message_set_subject_from_header(LibBalsaMessage *message,
 
     if (header) {
         gchar *subject =
-            g_mime_utils_header_decode_text(header);
+            g_mime_utils_header_decode_text(libbalsa_parser_options(), header);
         libbalsa_message_set_subject(message, subject);
         g_free(subject);
     }

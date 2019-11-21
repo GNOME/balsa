@@ -1838,7 +1838,7 @@ lbm_mbox_armored_stream(GMimeStream * stream)
     
     fstream = g_mime_stream_filter_new(stream);
 
-    filter = g_mime_filter_unix2dos(FALSE);
+    filter = g_mime_filter_dos2unix_new(FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
     g_object_unref(filter);
 

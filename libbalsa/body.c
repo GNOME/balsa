@@ -103,7 +103,7 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
 {
     LibBalsaMessageHeaders *ehdr;
     const char *subj;
-    int offset;
+    GDateTime *datetime;
 
     ehdr = g_new0(LibBalsaMessageHeaders, 1);
 
@@ -113,11 +113,14 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
     subj = g_mime_message_get_subject(msg);
     if (subj) {
 	ehdr->subject =
-	    g_mime_utils_header_decode_text(subj);
+	    g_mime_utils_header_decode_text(libbalsa_parser_options(), subj);
 	libbalsa_utf8_sanitize(&ehdr->subject, TRUE, NULL);
-    } else 
+    } else
 	ehdr->subject = g_strdup(_("(No subject)"));
-    g_mime_message_get_date(msg, &ehdr->date, &offset);
+
+    datetime = g_mime_message_get_date(msg);
+    ehdr->date = g_date_time_to_unix(datetime);
+    g_date_time_unref(datetime);
 
     return ehdr;
 }

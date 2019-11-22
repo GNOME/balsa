@@ -987,120 +987,117 @@ libbalsa_message_get_no(LibBalsaMessage* msg)
 }
 
 
-#endif /* MESSAGE_COPY_CONTENT */
+#endif
 
 /* Populate headers from mime_msg, but only the members that are needed
  * all the time. */
-static InternetAddressList *
-lb_message_recipients(GMimeMessage      *message,
-                      GMimeRecipientType type)
-{
-    const InternetAddressList *list;
-    InternetAddressList *copy = NULL;
 
-    if ((list = g_mime_message_get_recipients (message, type))) {
-        copy = internet_address_list_new ();
-        internet_address_list_append (copy, (InternetAddressList *) list);
+static InternetAddressList *
+lb_message_address_list_ref(InternetAddressList * list)
+{
+    if (list != NULL && internet_address_list_length(list) > 0) {
+        return g_object_ref(list);
     }
 
-    return copy;
+    return NULL;
 }
 
+static InternetAddressList *
+lb_message_recipients(GMimeMessage   * message,
+                      GMimeAddressType type)
+{
+    return lb_message_address_list_ref(g_mime_message_get_addresses(message, type));
+}
 
 static void
 lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
-                                    GMimeMessage           *mime_msg)
+				    GMimeMessage *mime_msg)
 {
-    g_return_if_fail(headers);
-    g_return_if_fail(mime_msg != NULL);
-
-    if (headers->from == NULL)
-        headers->from = internet_address_list_parse(libbalsa_parser_options(), mime_msg->from);
+    if (headers->from == NULL) {
+        headers->from =
+            lb_message_address_list_ref(g_mime_message_get_from(mime_msg));
+    }
 
     if (headers->date == 0) {
         GDateTime *datetime;
 
         datetime = g_mime_message_get_date(mime_msg);
         headers->date = g_date_time_to_unix(datetime);
-        g_date_time_unref(datetime);
     }
 
-    if (headers->to_list == NULL) {
+    if (headers->to_list == NULL)
         headers->to_list =
-            lb_message_recipients(mime_msg, GMIME_RECIPIENT_TYPE_TO);
-    }
+            lb_message_recipients(mime_msg, GMIME_ADDRESS_TYPE_TO);
 
     if (headers->content_type == NULL) {
-        /* If we could:
-         * headers->content_type =
-         *     g_mime_content_type_copy
-         *         (g_mime_object_get_content_type(mime_msg->mime_part));
-         */
-        GMimeContentType *content_type;
-        gchar *str;
-        g_return_if_fail(headers->content_type == NULL);
-        content_type          = g_mime_object_get_content_type(mime_msg->mime_part);
-        str                   = g_mime_content_type_get_mime_type(content_type);
-        headers->content_type = g_mime_content_type_parse(libbalsa_parser_options(), str);
-        g_free(str);
+	/* If we could:
+	 * headers->content_type =
+	 *     g_mime_content_type_copy
+	 *         (g_mime_object_get_content_type(mime_msg->mime_part));
+	 */
+	GMimeContentType *content_type;
+	gchar *str;
+
+	content_type = g_mime_object_get_content_type(mime_msg->mime_part);
+	str = g_mime_content_type_get_mime_type(content_type);
+	headers->content_type = g_mime_content_type_parse(libbalsa_parser_options(), str);
+	g_free(str);
     }
 }
-
 
 /* Populate headers from mime_msg, but only the members not handled in
  * lb_message_headers_basic_from_gmime. */
 static void
 lb_message_headers_extra_from_gmime(LibBalsaMessageHeaders *headers,
-                                    GMimeMessage           *mime_msg)
+				    GMimeMessage *mime_msg)
 {
     g_return_if_fail(headers);
     g_return_if_fail(mime_msg != NULL);
 
     if (headers->reply_to == NULL) {
         headers->reply_to =
-            internet_address_list_parse(libbalsa_parser_options(), mime_msg->reply_to);
+            lb_message_address_list_ref(g_mime_message_get_reply_to(mime_msg));
     }
 
     if (headers->dispnotify_to == NULL) {
-        headers->dispnotify_to =
-            internet_address_list_parse(libbalsa_parser_options(), g_mime_object_get_header
-                                                   (GMIME_OBJECT(mime_msg),
-                                                   "Disposition-Notification-To"));
+        const gchar *value =
+            g_mime_object_get_header(GMIME_OBJECT(mime_msg), "Disposition-Notification-To");
+
+        if (value != NULL)
+            headers->dispnotify_to =
+                internet_address_list_parse(libbalsa_parser_options(), value);
     }
 
     if (headers->cc_list == NULL) {
         headers->cc_list =
-            lb_message_recipients(mime_msg, GMIME_RECIPIENT_TYPE_CC);
+            lb_message_recipients(mime_msg, GMIME_ADDRESS_TYPE_CC);
     }
 
     if (headers->bcc_list == NULL) {
         headers->bcc_list =
-            lb_message_recipients(mime_msg, GMIME_RECIPIENT_TYPE_BCC);
+            lb_message_recipients(mime_msg, GMIME_ADDRESS_TYPE_BCC);
     }
 
     /* Get fcc from message */
-    if (headers->fcc_url == NULL) {
-        headers->fcc_url =
-            g_strdup(g_mime_object_get_header(GMIME_OBJECT(mime_msg), "X-Balsa-Fcc"));
-    }
+    if (!headers->fcc_url)
+	headers->fcc_url =
+	    g_strdup(g_mime_object_get_header(GMIME_OBJECT(mime_msg), "X-Balsa-Fcc"));
 }
-
 
 /* Populate headers from the info in mime_msg. */
 void
 libbalsa_message_headers_from_gmime(LibBalsaMessageHeaders *headers,
-                                    GMimeMessage           *mime_msg)
+				    GMimeMessage *mime_msg)
 {
     lb_message_headers_basic_from_gmime(headers, mime_msg);
     lb_message_headers_extra_from_gmime(headers, mime_msg);
 }
 
-
 /* Populate message and message->headers from the info in mime_msg,
  * but only the members that are needed all the time. */
 void
-libbalsa_message_init_from_gmime(LibBalsaMessage *message,
-                                 GMimeMessage    *mime_msg)
+libbalsa_message_init_from_gmime(LibBalsaMessage * message,
+				 GMimeMessage *mime_msg)
 {
     const gchar *header;
 

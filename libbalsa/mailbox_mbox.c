@@ -1808,10 +1808,10 @@ static void update_message_status_headers(GMimeMessage *message,
     /* Create headers with spaces in place of flags, if necessary, so we
      * can later update them in place. */
     lbm_mbox_status_hdr(flags, 2, new_header);
-    g_mime_object_set_header(GMIME_OBJECT(message), "Status", new_header->str);
+    g_mime_object_set_header(GMIME_OBJECT(message), "Status", new_header->str, NULL);
     g_string_truncate(new_header, 0);
     lbm_mbox_x_status_hdr(flags, 3, new_header);
-    g_mime_object_set_header(GMIME_OBJECT(message), "X-Status", new_header->str);
+    g_mime_object_set_header(GMIME_OBJECT(message), "X-Status", new_header->str, NULL);
     g_string_free(new_header, TRUE);
 }
 

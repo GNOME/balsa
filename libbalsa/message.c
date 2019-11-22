@@ -520,38 +520,38 @@ GList *
 libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
 {
     GMimeHeaderList *hdrlist;
-    GMimeHeaderIter iter;
+    gint count;
+    gint i;
     GList *res = NULL;
     const char *value;
 
     g_return_val_if_fail(message != NULL, NULL);
 
     value = g_mime_message_get_message_id(message);
-    if (value) {
-        res = g_list_prepend(res, libbalsa_create_hdr_pair("Message-ID",
-                                                           g_strdup_printf("<%s>", value)));
-    }
+    if (value)
+	res = g_list_prepend(res, libbalsa_create_hdr_pair("Message-ID",
+					  g_strdup_printf("<%s>", value)));
 
     /* FIXME: This duplicates References headers since they are
        already present in LibBalsaMessage::references field.  FWIW,
        mailbox driver does not copy references to user_headers.
-     */
+    */
     value = g_mime_object_get_header(GMIME_OBJECT(message), "References");
     if (value) {
 #if BALSA_NEEDS_SEPARATE_USER_HEADERS
-        GMimeReferences *references, *reference;
-        reference = references = g_mime_references_decode(value);
-        while (reference) {
-            res =
-                g_list_prepend(res,
-                               libbalsa_create_hdr_pair("References",
-                                                        g_strdup_printf
-                                                            ("<%s>",
-                                                            reference->
-                                                            msgid)));
-            reference = reference->next;
-        }
-        g_mime_references_clear(&references);
+	GMimeReferences *references, *reference;
+	reference = references = g_mime_references_decode(value);
+	while (reference) {
+	    res =
+		g_list_prepend(res,
+			       libbalsa_create_hdr_pair("References",
+							g_strdup_printf
+							("<%s>",
+							 reference->
+							 msgid)));
+	    reference = reference->next;
+	}
+	g_mime_references_clear(&references);
 #else
         res = g_list_prepend(res,
                              libbalsa_create_hdr_pair("References",
@@ -569,12 +569,14 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
     }
 
     hdrlist = g_mime_object_get_header_list (GMIME_OBJECT(message));
-    if (g_mime_header_list_get_iter (hdrlist, &iter)) {
-        do {
-            res = prepend_header_misc(res,
-                                      g_mime_header_iter_get_name (&iter),
-                                      g_mime_header_iter_get_value (&iter));
-        } while (g_mime_header_iter_next (&iter));
+    count = g_mime_header_list_get_count(hdrlist);
+    for (i = 0; i < count; i++) {
+        GMimeHeader *header;
+
+        header = g_mime_header_list_get_header_at(hdrlist, i);
+        res = prepend_header_misc(res,
+                                  g_mime_header_get_name(header),
+                                  g_mime_header_get_value(header));
     }
 
     return g_list_reverse(res);

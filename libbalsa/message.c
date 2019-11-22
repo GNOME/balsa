@@ -539,11 +539,11 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
        mailbox driver does not copy references to user_headers.
     */
     value = g_mime_object_get_header(GMIME_OBJECT(message), "References");
-    if (value) {
+    if (value != NULL) {
 #if BALSA_NEEDS_SEPARATE_USER_HEADERS
 	GMimeReferences *references, *reference;
-	reference = references = g_mime_references_decode(value);
-	while (reference) {
+	references = g_mime_references_parse(NULL, value);
+	for (reference = references; reference != NULL; reference = reference->next) {
 	    res =
 		g_list_prepend(res,
 			       libbalsa_create_hdr_pair("References",
@@ -551,7 +551,6 @@ libbalsa_message_user_hdrs_from_gmime(GMimeMessage * message)
 							("<%s>",
 							 reference->
 							 msgid)));
-	    reference = reference->next;
 	}
 	g_mime_references_clear(&references);
 #else

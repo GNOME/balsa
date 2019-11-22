@@ -1234,7 +1234,7 @@ lbmsg_set_header(LibBalsaMessage *message,
          * appropriate GMime decoder. */
         gchar *tmp = g_strdup(value);
         libbalsa_utf8_sanitize(&tmp, TRUE, NULL);
-        val = g_mime_utils_header_encode_text(NULL, tmp);
+        val = g_mime_utils_header_encode_text(NULL, tmp, NULL);
         g_free(tmp);
 #ifdef DEBUG
         g_print("%s: non-ascii “%s” header “%s” encoded as “%s”\n",

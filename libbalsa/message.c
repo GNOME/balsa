@@ -1253,7 +1253,11 @@ lbmsg_set_header(LibBalsaMessage *message,
         libbalsa_message_set_subject_from_header(message, value);
 #endif /* MESSAGE_COPY_CONTENT */
     } else if (g_ascii_strcasecmp(name, "Date") == 0) {
-        message->headers->date = g_mime_utils_header_decode_date(value, NULL);
+        GDateTime *datetime;
+
+        datetime = g_mime_utils_header_decode_date(value);
+        message->headers->date = g_date_time_to_unix(datetime);
+        g_date_time_unref(datetime);
     } else if ((message->headers->from == NULL) &&
                (g_ascii_strcasecmp(name, "From") == 0)) {
         message->headers->from = internet_address_list_parse(libbalsa_parser_options(), value);

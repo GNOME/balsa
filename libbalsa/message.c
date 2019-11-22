@@ -987,7 +987,7 @@ libbalsa_message_get_no(LibBalsaMessage* msg)
 }
 
 
-#endif
+#endif /* MESSAGE_COPY_CONTENT */
 
 /* Populate headers from mime_msg, but only the members that are needed
  * all the time. */
@@ -1011,7 +1011,7 @@ lb_message_recipients(GMimeMessage   * message,
 
 static void
 lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
-				    GMimeMessage *mime_msg)
+                                    GMimeMessage           *mime_msg)
 {
     if (headers->from == NULL) {
         headers->from =
@@ -1023,6 +1023,7 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
 
         datetime = g_mime_message_get_date(mime_msg);
         headers->date = g_date_time_to_unix(datetime);
+        g_date_time_unref(datetime);
     }
 
     if (headers->to_list == NULL)
@@ -1030,18 +1031,18 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
             lb_message_recipients(mime_msg, GMIME_ADDRESS_TYPE_TO);
 
     if (headers->content_type == NULL) {
-	/* If we could:
-	 * headers->content_type =
-	 *     g_mime_content_type_copy
-	 *         (g_mime_object_get_content_type(mime_msg->mime_part));
-	 */
-	GMimeContentType *content_type;
-	gchar *str;
+        /* If we could:
+         * headers->content_type =
+         *     g_mime_content_type_copy
+         *         (g_mime_object_get_content_type(mime_msg->mime_part));
+         */
+        GMimeContentType *content_type;
+        gchar *str;
 
-	content_type = g_mime_object_get_content_type(mime_msg->mime_part);
-	str = g_mime_content_type_get_mime_type(content_type);
-	headers->content_type = g_mime_content_type_parse(libbalsa_parser_options(), str);
-	g_free(str);
+        content_type = g_mime_object_get_content_type(mime_msg->mime_part);
+        str = g_mime_content_type_get_mime_type(content_type);
+        headers->content_type = g_mime_content_type_parse(libbalsa_parser_options(), str);
+        g_free(str);
     }
 }
 
@@ -1049,11 +1050,8 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
  * lb_message_headers_basic_from_gmime. */
 static void
 lb_message_headers_extra_from_gmime(LibBalsaMessageHeaders *headers,
-				    GMimeMessage *mime_msg)
+                                    GMimeMessage           *mime_msg)
 {
-    g_return_if_fail(headers);
-    g_return_if_fail(mime_msg != NULL);
-
     if (headers->reply_to == NULL) {
         headers->reply_to =
             lb_message_address_list_ref(g_mime_message_get_reply_to(mime_msg));
@@ -1079,9 +1077,10 @@ lb_message_headers_extra_from_gmime(LibBalsaMessageHeaders *headers,
     }
 
     /* Get fcc from message */
-    if (!headers->fcc_url)
+    if (headers->fcc_url == NULL) {
 	headers->fcc_url =
 	    g_strdup(g_mime_object_get_header(GMIME_OBJECT(mime_msg), "X-Balsa-Fcc"));
+    }
 }
 
 /* Populate headers from the info in mime_msg. */

@@ -1821,7 +1821,7 @@ lbm_mbox_armored_object(GMimeStream * stream)
     GMimeObject *object;
 
     parser = g_mime_parser_new_with_stream(stream);
-    object = GMIME_OBJECT(g_mime_parser_construct_message(parser), libbalsa_parser_options());
+    object = GMIME_OBJECT(g_mime_parser_construct_message(parser, libbalsa_parser_options()));
     g_object_unref(parser);
     g_mime_object_encode(object, GMIME_ENCODING_CONSTRAINT_7BIT);
 
@@ -1943,7 +1943,7 @@ lbm_mbox_add_message(LibBalsaMailboxLocal * local,
         retval = lbm_mbox_newline(dest);
     if (retval < 0
         || g_mime_stream_write_string(dest, from) < (gint) strlen(from)
-	|| g_mime_object_write_to_stream(armored_object, armored_dest) < 0) {
+	|| g_mime_object_write_to_stream(armored_object, NULL, armored_dest) < 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR, _("Data copy error"));
 	retval = -1;

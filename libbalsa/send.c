@@ -1248,7 +1248,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     GMimeMessage *mime_message;
     LibBalsaMessageBody *body;
     LibBalsaMessageHeaders *headers;
-    InternetAddressList *ia_list;
     gchar *tmp;
     GList *list;
     gboolean attach_pubkey = FALSE;
@@ -1256,6 +1255,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
 #ifdef ENABLE_AUTOCRYPT
     LibBalsaIdentity *identity;
 #endif /* ENABLE_AUTOCRYPT */
+    GDateTime *datetime;
 
     /* attach the public key only if we send the message, not if we just postpone it */
     if (!postponing &&
@@ -1486,13 +1486,17 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     headers = libbalsa_message_get_headers(message);
 
     if (headers->from != NULL) {
-        ia_list = g_mime_message_get_from(mime_message);
-        internet_address_list_append(ia_list, headers->from);
+        InternetAddressList *from;
+
+        from = g_mime_message_get_from(mime_message);
+        internet_address_list_append(from, headers->from);
     }
 
     if (headers->reply_to != NULL) {
-        ia_list = g_mime_message_get_reply_to(mime_message);
-        internet_address_list_append(ia_list, headers->from);
+        InternetAddressList *reply_to;
+
+        reply_to = g_mime_message_get_reply_to(mime_message);
+        internet_address_list_append(reply_to, headers->reply_to);
     }
 
     if (LIBBALSA_MESSAGE_GET_SUBJECT(message)) {
@@ -1500,27 +1504,29 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
                                    LIBBALSA_MESSAGE_GET_SUBJECT(message), NULL);
     }
 
-    g_mime_message_set_date(mime_message, headers->date, get_tz_offset(headers->date));
+    datetime = g_date_time_new_from_unix_local(headers->date);
+    g_mime_message_set_date(mime_message, datetime);
+    g_date_time_unref(datetime);
 
-    if ((ia_list = headers->to_list) != NULL) {
-        InternetAddressList *recipients =
-            g_mime_message_get_recipients(mime_message,
-                                          GMIME_RECIPIENT_TYPE_TO);
-        internet_address_list_append(recipients, ia_list);
+    if (headers->to_list != NULL) {
+        InternetAddressList *addresses =
+            g_mime_message_get_addresses(mime_message,
+                                          GMIME_ADDRESS_TYPE_TO);
+        internet_address_list_append(addresses, headers->to_list);
     }
 
-    if ((ia_list = headers->cc_list) != NULL) {
-        InternetAddressList *recipients =
-            g_mime_message_get_recipients(mime_message,
-                                          GMIME_RECIPIENT_TYPE_CC);
-        internet_address_list_append(recipients, ia_list);
+    if (headers->cc_list != NULL) {
+        InternetAddressList *addresses =
+            g_mime_message_get_addresses(mime_message,
+                                          GMIME_ADDRESS_TYPE_CC);
+        internet_address_list_append(addresses, headers->cc_list);
     }
 
-    if ((ia_list = headers->bcc_list) != NULL) {
-        InternetAddressList *recipients =
-            g_mime_message_get_recipients(mime_message,
-                                          GMIME_RECIPIENT_TYPE_BCC);
-        internet_address_list_append(recipients, ia_list);
+    if (headers->bcc_list != NULL) {
+        InternetAddressList *addresses =
+            g_mime_message_get_addresses(mime_message,
+                                          GMIME_ADDRESS_TYPE_BCC);
+        internet_address_list_append(addresses, headers->bcc_list);
     }
 
     if (headers->dispnotify_to != NULL) {

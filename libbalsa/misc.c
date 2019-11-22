@@ -265,7 +265,8 @@ libbalsa_mktempdir (char **s)
 }
 
 /* libbalsa_set_fallback_codeset: sets the codeset for incorrectly
- * encoded characters. */
+ * encoded characters.
+ * Returns the previous codeset. */
 static LibBalsaCodeset sanitize_fallback_codeset = WEST_EUROPE;
 LibBalsaCodeset
 libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
@@ -277,9 +278,10 @@ libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
         NULL
     };
 
-    g_mime_set_user_charsets(charsets);
+    g_mime_parser_options_set_fallback_charsets(libbalsa_parser_options(), charsets);
 
     sanitize_fallback_codeset = codeset;
+
     return ret;
 }
     

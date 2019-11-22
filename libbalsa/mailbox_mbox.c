@@ -472,7 +472,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
         msg_info.start = g_mime_parser_get_mbox_marker_offset(gmime_parser);
         msg_info.end   = g_mime_parser_tell(gmime_parser);
         if (msg_info.end <= msg_info.start
-            || !(from = g_mime_parser_get_from(gmime_parser))) {
+            || !(from = g_mime_parser_get_mbox_marker(gmime_parser))) {
 	    g_object_unref(mime_message);
             continue;
 	}
@@ -1639,7 +1639,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	return FALSE;
     }
     gmime_parser = g_mime_parser_new_with_stream(mbox_stream);
-    g_mime_parser_set_scan_from(gmime_parser, TRUE);
+    g_mime_parser_set_format(gmime_parser, GMIME_FORMAT_MESSAGE);
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
                                    "^Status|^X-Status|^MIME-Version",
@@ -1672,7 +1672,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
         if (!mime_msg)
             /* Try to recover */
             continue;
-        msg_info.start = g_mime_parser_get_mbox_marker_offset(gmime_parser);
+        msg_info->start = g_mime_parser_get_mbox_marker_offset(gmime_parser);
 
 	/* Make sure we don't have offsets for any encapsulated headers. */
 	if (!g_mime_object_get_header(GMIME_OBJECT(mime_msg), "Status"))
@@ -1682,7 +1682,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	if (!g_mime_object_get_header(GMIME_OBJECT(mime_msg), "MIME-Version"))
 	    msg_info->mime_version = -1;
 
-	from = g_mime_parser_get_from(gmime_parser);
+	from = g_mime_parser_get_mbox_marker(gmime_parser);
         if (!from) {
             /* Try to recover */
             g_object_unref(mime_msg);

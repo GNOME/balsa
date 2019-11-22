@@ -1484,19 +1484,15 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     message_add_references(message, mime_message);
 
     headers = libbalsa_message_get_headers(message);
+
     if (headers->from != NULL) {
-        tmp = internet_address_list_to_string(headers->from, NULL, TRUE);
-        if (tmp != NULL) {
-            g_mime_message_set_sender(mime_message, tmp);
-            g_free(tmp);
-        }
+        ia_list = g_mime_message_get_from(mime_message);
+        internet_address_list_append(ia_list, headers->from);
     }
+
     if (headers->reply_to != NULL) {
-        tmp = internet_address_list_to_string(headers->reply_to, NULL, TRUE);
-        if (tmp != NULL) {
-            g_mime_message_set_reply_to(mime_message, tmp);
-            g_free(tmp);
-        }
+        ia_list = g_mime_message_get_reply_to(mime_message);
+        internet_address_list_append(ia_list, headers->from);
     }
 
     if (LIBBALSA_MESSAGE_GET_SUBJECT(message)) {

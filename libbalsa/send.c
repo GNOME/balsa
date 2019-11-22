@@ -1287,7 +1287,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
             if (body->attach_mode == LIBBALSA_ATTACH_AS_EXTBODY) {
                 GMimeContentType *content_type =
                     g_mime_content_type_new("message", "external-body");
-                mime_part = g_mime_object_new_type("message", "external-body");
+                mime_part = g_mime_object_new_type(libbalsa_parser_options,
+                                                   "message", "external-body");
                 g_mime_object_set_content_type(mime_part, content_type);
                 g_mime_part_set_content_encoding(GMIME_PART(mime_part),
                                                  GMIME_CONTENT_ENCODING_7BIT);

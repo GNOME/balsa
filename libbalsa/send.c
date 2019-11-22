@@ -1497,7 +1497,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
 
     if (LIBBALSA_MESSAGE_GET_SUBJECT(message)) {
         g_mime_message_set_subject(mime_message,
-                                   LIBBALSA_MESSAGE_GET_SUBJECT(message));
+                                   LIBBALSA_MESSAGE_GET_SUBJECT(message), NULL);
     }
 
     g_mime_message_set_date(mime_message, headers->date, get_tz_offset(headers->date));

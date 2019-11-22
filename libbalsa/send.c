@@ -1533,7 +1533,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
         tmp = internet_address_list_to_string(headers->dispnotify_to, NULL, TRUE);
         if (tmp != NULL) {
             g_mime_object_append_header(GMIME_OBJECT(mime_message),
-                                        "Disposition-Notification-To", tmp);
+                                        "Disposition-Notification-To", tmp, NULL);
             g_free(tmp);
         }
     }
@@ -1541,14 +1541,14 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     for (list = headers->user_hdrs; list; list = list->next) {
         gchar **pair = list->data;
         g_strchug(pair[1]);
-        g_mime_object_append_header(GMIME_OBJECT(mime_message), pair[0], pair[1]);
+        g_mime_object_append_header(GMIME_OBJECT(mime_message), pair[0], pair[1], NULL);
 #if DEBUG_USER_HEADERS
         printf("adding header '%s:%s'\n", pair[0], pair[1]);
 #endif
     }
 
     tmp = g_strdup_printf("Balsa %s", VERSION);
-    g_mime_object_append_header(GMIME_OBJECT(mime_message), "X-Mailer", tmp);
+    g_mime_object_append_header(GMIME_OBJECT(mime_message), "X-Mailer", tmp, NULL);
     g_free(tmp);
 
 #ifdef ENABLE_AUTOCRYPT
@@ -1561,7 +1561,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     		g_object_unref(mime_message);
     		return LIBBALSA_MESSAGE_CREATE_ERROR;
     	}
-    	g_mime_object_append_header(GMIME_OBJECT(mime_message), "Autocrypt", tmp);
+    	g_mime_object_append_header(GMIME_OBJECT(mime_message), "Autocrypt", tmp, NULL);
     	g_free(tmp);
     }
 #endif

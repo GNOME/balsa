@@ -2082,7 +2082,7 @@ libbalsa_mailbox_local_get_mime_message(LibBalsaMailbox * mailbox,
 	return NULL;
 
     mime_parser = g_mime_parser_new_with_stream(mime_stream);
-    g_mime_parser_set_scan_from(mime_parser, FALSE);
+    g_mime_parser_set_format(mime_parser, GMIME_FORMAT_MESSAGE);
     mime_message = g_mime_parser_construct_message(mime_parser, libbalsa_parser_options());
 
     g_object_unref(mime_parser);

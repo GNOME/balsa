@@ -1220,24 +1220,6 @@ parse_content_type(const char *content_type)
 }
 
 
-/* get_tz_offset() returns tz offset in RFC 5322 format ([-]hhmm) */
-static gint
-get_tz_offset(time_t t)
-{
-    GTimeZone *local_tz;
-    gint interval;
-    gint32 offset;
-    gint hours;
-
-    local_tz = g_time_zone_new_local();
-    interval = g_time_zone_find_interval(local_tz, G_TIME_TYPE_UNIVERSAL, t);
-    offset = g_time_zone_get_offset(local_tz, interval);
-    g_time_zone_unref(local_tz);
-    hours = offset / 3600;
-    return (hours * 100) + ((offset - (hours * 3600)) / 60);
-}
-
-
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage *message,
                                      gboolean         flow,

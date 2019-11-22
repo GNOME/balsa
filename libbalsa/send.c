@@ -440,12 +440,12 @@ lbs_message_queue_real(LibBalsaMessage    *message,
     mime_msg = libbalsa_message_get_mime_message(message);
     if (fccbox != NULL) {
         g_mime_object_set_header(GMIME_OBJECT(mime_msg), "X-Balsa-Fcc",
-                                 libbalsa_mailbox_get_url(fccbox));
+                                 libbalsa_mailbox_get_url(fccbox), NULL);
     }
     g_mime_object_set_header(GMIME_OBJECT(mime_msg), "X-Balsa-DSN",
-                             libbalsa_message_get_request_dsn(message) ? "1" : "0");
+                             libbalsa_message_get_request_dsn(message) ? "1" : "0", NULL);
     g_mime_object_set_header(GMIME_OBJECT(mime_msg), "X-Balsa-SmtpServer",
-                             libbalsa_smtp_server_get_name(smtp_server));
+                             libbalsa_smtp_server_get_name(smtp_server), NULL);
 
     big_message = libbalsa_smtp_server_get_big_message(smtp_server);
     if (big_message > 0) {
@@ -1166,14 +1166,14 @@ message_add_references(LibBalsaMessage *message,
             }
             g_string_append_printf(str, "<%s>", (gchar *) list->data);
         } while ((list = list->next) != NULL);
-        g_mime_object_set_header(GMIME_OBJECT(msg), "References", str->str);
+        g_mime_object_set_header(GMIME_OBJECT(msg), "References", str->str, NULL);
         g_string_free(str, TRUE);
     }
 
     list = libbalsa_message_get_in_reply_to(message);
     if (list != NULL) {
         /* There's no specific header function for In-Reply-To */
-        g_mime_object_set_header(GMIME_OBJECT(msg), "In-Reply-To", list->data);
+        g_mime_object_set_header(GMIME_OBJECT(msg), "In-Reply-To", list->data, NULL);
     }
 }
 
@@ -1595,8 +1595,8 @@ libbalsa_message_postpone(LibBalsaMessage *message,
         gint i;
 
         for (i = 0; extra_headers[i] && extra_headers[i + 1]; i += 2) {
-            g_mime_object_set_header(GMIME_OBJECT(libbalsa_message_get_mime_message(message)), extra_headers[i],
-                                     extra_headers[i + 1]);
+            g_mime_object_set_header(GMIME_OBJECT(libbalsa_message_get_mime_message(message)),
+                                     extra_headers[i], extra_headers[i + 1], NULL);
         }
     }
 

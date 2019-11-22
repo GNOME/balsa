@@ -1139,9 +1139,8 @@ libbalsa_message_refs_for_threading(LibBalsaMessage *message)
 
     g_return_val_if_fail(message != NULL, NULL);
 
-    if (message->in_reply_to && message->in_reply_to->next)
+    if (message->in_reply_to != NULL && message->in_reply_to->next != NULL)
         return NULL;
-
 
     tmp = g_list_copy(message->references);
 
@@ -1153,63 +1152,61 @@ libbalsa_message_refs_for_threading(LibBalsaMessage *message)
         foo = g_list_find_custom(tmp, message->in_reply_to->data,
                                  (GCompareFunc) strcmp);
 
-        if (foo) {
-            tmp = g_list_remove_link(tmp, foo);
-            g_list_free_1(foo);
-        }
+        if (foo != NULL)
+            tmp = g_list_delete_link(tmp, foo);
         tmp = g_list_append(tmp, message->in_reply_to->data);
     }
 
-    for (foo = tmp; foo; foo = foo->next) {
+    for (foo = tmp; foo != NULL; foo = foo->next)
         foo->data = g_strdup((gchar *) foo->data);
-    }
 
     return tmp;
 }
 
-
 static GList *
-references_decode(const gchar *str)
+references_decode(const gchar * str)
 {
-    GMimeReferences *references, *reference;
+    GMimeReferences *references;
     GList *list = NULL;
+    gint length;
+    gint i;
 
-    reference = references = g_mime_references_decode(str);
-    while (reference) {
-        list      = g_list_prepend(list, g_strdup(reference->msgid));
-        reference = reference->next;
+    references = g_mime_references_parse(NULL, str);
+    length = g_mime_references_length(references);
+    for (i = 0; i < length; i++) {
+        const gchar *message_id;
+
+        message_id = g_mime_references_get_message_id(references, i);
+        list = g_list_prepend(list, g_strdup(message_id));
     }
-    g_mime_references_clear(&references);
+    g_mime_references_free(references);
 
     return g_list_reverse(list);
 }
 
-
 void
-libbalsa_message_set_references_from_string(LibBalsaMessage *message,
-                                            const gchar     *str)
+libbalsa_message_set_references_from_string(LibBalsaMessage * message,
+                                            const gchar     * str)
 {
     /* Empty references are acceptable but require no action. Similarly,
-       if references were set already, there is not reason to set them
-       again - they are immutable anyway. */
+     * if references were set already, there is no reason to set them
+     * again - they are immutable anyway. */
     if (message->references == NULL && str != NULL)
         message->references = references_decode(str);
 }
 
-
 void
-libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage *message,
-                                             const gchar     *str)
+libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,
+                                             const gchar     * str)
 {
     if (message->in_reply_to == NULL && str != NULL) {
         /* FIXME for Balsa's old non-compliant header */
         gchar *p = strrchr(str, ';');
-        p                    = p ? g_strndup(str, p - str) : g_strdup(str);
+        p = p ? g_strndup(str, p - str) : g_strdup(str);
         message->in_reply_to = references_decode(p);
         g_free(p);
     }
 }
-
 
 /* set a header, if (all) or if it's needed all the time:
  *   headers->from

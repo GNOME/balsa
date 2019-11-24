@@ -1021,8 +1021,10 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
         GDateTime *datetime;
 
         datetime = g_mime_message_get_date(mime_msg);
-        headers->date = g_date_time_to_unix(datetime);
-        g_date_time_unref(datetime);
+        if (datetime != NULL) {
+            headers->date = g_date_time_to_unix(datetime);
+            g_date_time_unref(datetime);
+        }
     }
 
     if (headers->to_list == NULL)
@@ -1256,8 +1258,10 @@ lbmsg_set_header(LibBalsaMessage *message,
         GDateTime *datetime;
 
         datetime = g_mime_utils_header_decode_date(value);
-        message->headers->date = g_date_time_to_unix(datetime);
-        g_date_time_unref(datetime);
+        if (datetime != NULL) {
+            message->headers->date = g_date_time_to_unix(datetime);
+            g_date_time_unref(datetime);
+        }
     } else if ((message->headers->from == NULL) &&
                (g_ascii_strcasecmp(name, "From") == 0)) {
         message->headers->from = internet_address_list_parse(libbalsa_parser_options(), value);

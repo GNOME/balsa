@@ -1728,7 +1728,7 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage  *message,
         g_object_unref(filter);
 
         /* add CRLF */
-        filter = g_mime_filter_dos2unix_new(TRUE);
+        filter = g_mime_filter_unix2dos_new(FALSE);
         g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
         g_object_unref(filter);
 

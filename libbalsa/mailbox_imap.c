@@ -2723,7 +2723,7 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
 
 	tmpstream = g_mime_stream_filter_new(stream);
 
-	crlffilter = g_mime_filter_dos2unix_new(FALSE);
+	crlffilter = g_mime_filter_dos2unix_new(TRUE);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
 	g_object_unref(crlffilter);
 

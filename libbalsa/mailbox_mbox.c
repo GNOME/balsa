@@ -434,7 +434,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     unsigned msgno = mbox->msgno_2_msg_info->len;
 
     gmime_parser = g_mime_parser_new_with_stream(mbox->gmime_stream);
-    g_mime_parser_set_format(gmime_parser, GMIME_FORMAT_MESSAGE);
+    g_mime_parser_set_format(gmime_parser, GMIME_FORMAT_MBOX);
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
                                    "^Status|^X-Status|^MIME-Version",
@@ -1639,7 +1639,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	return FALSE;
     }
     gmime_parser = g_mime_parser_new_with_stream(mbox_stream);
-    g_mime_parser_set_format(gmime_parser, GMIME_FORMAT_MESSAGE);
+    g_mime_parser_set_format(gmime_parser, GMIME_FORMAT_MBOX);
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
                                    "^Status|^X-Status|^MIME-Version",

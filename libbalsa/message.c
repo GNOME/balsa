@@ -1021,10 +1021,8 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
         GDateTime *datetime;
 
         datetime = g_mime_message_get_date(mime_msg);
-        if (datetime != NULL) {
+        if (datetime != NULL)
             headers->date = g_date_time_to_unix(datetime);
-            g_date_time_unref(datetime);
-        }
     }
 
     if (headers->to_list == NULL)

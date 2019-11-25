@@ -119,10 +119,8 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
 	ehdr->subject = g_strdup(_("(No subject)"));
 
     datetime = g_mime_message_get_date(msg);
-    if (datetime != NULL) {
+    if (datetime != NULL)
         ehdr->date = g_date_time_to_unix(datetime);
-        g_date_time_unref(datetime);
-    }
 
     return ehdr;
 }

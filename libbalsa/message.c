@@ -1227,6 +1227,7 @@ lbmsg_set_header(LibBalsaMessage *message,
                  gboolean         all)
 {
     gchar *val = NULL;
+    LibBalsaMessageHeaders *headers = message->headers;
 
     if (libbalsa_text_attr_string(value)) {
         /* Broken header: force it to utf8 using Balsa's fallback
@@ -1257,15 +1258,15 @@ lbmsg_set_header(LibBalsaMessage *message,
 
         datetime = g_mime_utils_header_decode_date(value);
         if (datetime != NULL) {
-            message->headers->date = g_date_time_to_unix(datetime);
+            headers->date = g_date_time_to_unix(datetime);
             g_date_time_unref(datetime);
         }
-    } else if ((message->headers->from == NULL) &&
+    } else if ((headers->from == NULL) &&
                (g_ascii_strcasecmp(name, "From") == 0)) {
-        message->headers->from = internet_address_list_parse(libbalsa_parser_options(), value);
-    } else if ((message->headers->to_list == NULL) &&
+        headers->from = internet_address_list_parse(libbalsa_parser_options(), value);
+    } else if ((headers->to_list == NULL) &&
                (g_ascii_strcasecmp(name, "To") == 0)) {
-        message->headers->to_list = internet_address_list_parse(libbalsa_parser_options(), value);
+        headers->to_list = internet_address_list_parse(libbalsa_parser_options(), value);
     } else if (g_ascii_strcasecmp(name, "In-Reply-To") == 0) {
         libbalsa_message_set_in_reply_to_from_string(message, value);
     } else if ((message->message_id == NULL) &&
@@ -1273,12 +1274,12 @@ lbmsg_set_header(LibBalsaMessage *message,
         message->message_id = g_mime_utils_decode_message_id(value);
     } else if (g_ascii_strcasecmp(name, "References") == 0) {
         libbalsa_message_set_references_from_string(message, value);
-    } else if ((message->headers->content_type == NULL) &&
+    } else if ((headers->content_type == NULL) &&
                (g_ascii_strcasecmp(name, "Content-Type") == 0)) {
-        message->headers->content_type = g_mime_content_type_parse(libbalsa_parser_options(), value);
-    } else if ((message->headers->dispnotify_to == NULL) &&
+        headers->content_type = g_mime_content_type_parse(libbalsa_parser_options(), value);
+    } else if ((headers->dispnotify_to == NULL) &&
                (g_ascii_strcasecmp(name, "Disposition-Notification-To") == 0)) {
-        message->headers->dispnotify_to = internet_address_list_parse(libbalsa_parser_options(), value);
+        headers->dispnotify_to = internet_address_list_parse(libbalsa_parser_options(), value);
     } else
 #ifdef MESSAGE_COPY_CONTENT
     if (g_ascii_strcasecmp(name, "Content-Length") == 0) {
@@ -1286,8 +1287,8 @@ lbmsg_set_header(LibBalsaMessage *message,
     } else
 #endif /* MESSAGE_COPY_CONTENT */
     if (all) {
-        message->headers->user_hdrs =
-            g_list_prepend(message->headers->user_hdrs,
+        headers->user_hdrs =
+            g_list_prepend(headers->user_hdrs,
                            libbalsa_create_hdr_pair(name, g_strdup(value)));
     }
 

@@ -173,6 +173,7 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
 
     /* construct the content part */
     parser = g_mime_parser_new_with_stream(stream);
+    g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
     content = g_mime_parser_construct_part(parser, libbalsa_parser_options());
     g_object_unref(stream);
     g_object_unref(parser);
@@ -520,8 +521,8 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
     g_object_unref(ciphertext);
 
     g_mime_stream_reset(stream);
-    parser = g_mime_parser_new();
-    g_mime_parser_init_with_stream(parser, stream);
+    parser = g_mime_parser_new_with_stream(stream);
+    g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
     g_object_unref(stream);
 
     decrypted = g_mime_parser_construct_part(parser, libbalsa_parser_options());

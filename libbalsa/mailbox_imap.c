@@ -2171,6 +2171,7 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         g_object_unref(filter);
 
         mime_parser = g_mime_parser_new_with_stream(fstream);
+        g_mime_parser_set_format(mime_parser, GMIME_FORMAT_MESSAGE);
         g_object_unref(fstream);
 
         g_mime_parser_set_format(mime_parser, GMIME_FORMAT_MESSAGE);
@@ -2543,6 +2544,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * message,
     {
         GMimeParser *parser =  
             g_mime_parser_new_with_stream (partstream);
+        g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
         part->mime_part = g_mime_parser_construct_part (parser, libbalsa_parser_options());
         g_object_unref (parser);
     }

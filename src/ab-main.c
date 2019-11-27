@@ -1021,11 +1021,16 @@ static void
 bab_set_intial_address_book(LibBalsaAddressBook * ab,
                             GtkWidget           * window)
 {
-    GAction *action;
+    if (ab != NULL) {
+        GAction *action;
 
-    action =
-        g_action_map_lookup_action(G_ACTION_MAP(window), "address-book");
-    g_action_change_state(action, g_variant_new_string(libbalsa_address_book_get_name(ab)));
+        action =
+            g_action_map_lookup_action(G_ACTION_MAP(window),
+                                       "address-book");
+        g_action_change_state(action,
+                              g_variant_new_string
+                              (libbalsa_address_book_get_name(ab)));
+    }
 }
 
 GtkDialogFlags
@@ -1120,9 +1125,14 @@ main(int argc, char *argv[])
     libbalsa_conf_pop_group();
     libbalsa_conf_foreach_group(ADDRESS_BOOK_SECTION_PREFIX,
                                 bab_config_init, NULL);
-    ab = contacts_app.default_address_book ?
-        contacts_app.default_address_book :
-        contacts_app.address_book_list->data;
+    if (contacts_app.address_book_list == NULL) {
+        /* No address books found--why did we launch the editor? */
+        ab = NULL;
+    } else {
+        ab = contacts_app.default_address_book ?
+            contacts_app.default_address_book :
+            contacts_app.address_book_list->data;
+    }
 
     ab_window = bab_window_new(application);
 

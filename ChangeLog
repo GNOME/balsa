@@ -1,3 +1,11 @@
+2019-11-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Address book editor: do not crash if no address books are
+	available for editing.
+
+	* src/ab-main.c (bab_set_intial_address_book), (main): check for
+	NULL address book list.
+
 2019-11-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	libbalsa_message_body_get_mime_type() is guaranteed to return a

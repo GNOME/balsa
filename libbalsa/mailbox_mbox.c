@@ -1119,6 +1119,7 @@ lbm_mbox_get_mime_message(LibBalsaMailbox * mailbox,
 	return NULL;
     libbalsa_mime_stream_shared_lock(stream);
     parser = g_mime_parser_new_with_stream(stream);
+    g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
 
     mime_message = g_mime_parser_construct_message(parser, libbalsa_parser_options());
     g_object_unref(parser);
@@ -1821,6 +1822,7 @@ lbm_mbox_armored_object(GMimeStream * stream)
     GMimeObject *object;
 
     parser = g_mime_parser_new_with_stream(stream);
+    g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
     object = GMIME_OBJECT(g_mime_parser_construct_message(parser, libbalsa_parser_options()));
     g_object_unref(parser);
     g_mime_object_encode(object, GMIME_ENCODING_CONSTRAINT_7BIT);

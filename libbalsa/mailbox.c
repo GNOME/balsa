@@ -4247,6 +4247,7 @@ lbm_get_mime_msg(LibBalsaMailbox * mailbox, LibBalsaMessage *message)
                                                      libbalsa_message_get_msgno(message),
 						     TRUE);
         parser = g_mime_parser_new_with_stream(stream);
+        g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
         g_object_unref(stream);
         mime_msg = g_mime_parser_construct_message(parser, libbalsa_parser_options());
         g_object_unref(parser);

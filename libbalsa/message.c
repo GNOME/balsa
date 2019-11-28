@@ -276,6 +276,13 @@ libbalsa_message_headers_destroy(LibBalsaMessageHeaders *headers)
 
     lb_message_headers_extra_destroy(headers);
 
+#if defined ENABLE_AUTOCRYPT
+    if (headers->autocrypt_hdr != NULL) {
+    	g_object_unref(headers->autocrypt_hdr);
+    	headers->autocrypt_hdr = NULL;
+}
+#endif
+
     g_free(headers);
 }
 
@@ -1089,6 +1096,16 @@ libbalsa_message_headers_from_gmime(LibBalsaMessageHeaders *headers,
 {
     lb_message_headers_basic_from_gmime(headers, mime_msg);
     lb_message_headers_extra_from_gmime(headers, mime_msg);
+#if defined ENABLE_AUTOCRYPT
+    if (headers->autocrypt_hdr == NULL) {
+    	GDateTime *reftime;
+
+    	/* set the reference date far in the future so we can ignore messages w/o Date: header */
+    	reftime = g_date_time_new_from_unix_utc(time(NULL) + (365 * 24 * 60 * 60));
+    	headers->autocrypt_hdr = g_mime_message_get_autocrypt_header(mime_msg, reftime);
+    	g_date_time_unref(reftime);
+    }
+#endif
 }
 
 /* Populate message and message->headers from the info in mime_msg,

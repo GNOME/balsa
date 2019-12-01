@@ -133,13 +133,13 @@ gboolean
 autocrypt_init(GError **error)
 {
 	static const gchar * const prepare_statements[NUM_QUERIES] = {
-		"SELECT * FROM autocrypt WHERE LOWER(addr) = ?",
-		"INSERT INTO autocrypt VALUES (?1, ?2, ?2, ?3, ?4, ?5, ?6)",
+		"SELECT * FROM autocrypt WHERE addr = LOWER(?)",
+		"INSERT INTO autocrypt VALUES (LOWER(?1), ?2, ?2, ?3, ?4, ?5, ?6)",
 		"UPDATE autocrypt SET last_seen = MAX(?2, last_seen), ac_timestamp = ?2, pubkey = ?3, fingerprint = ?4,"
-		" expires = ?5, prefer_encrypt = ?6 WHERE addr = ?1",
-		"UPDATE autocrypt SET last_seen = ?2 WHERE addr = ?1 AND last_seen < ?2 AND ac_timestamp < ?2",
+		" expires = ?5, prefer_encrypt = ?6 WHERE addr = LOWER(?1)",
+		"UPDATE autocrypt SET last_seen = ?2 WHERE addr = LOWER(?1) AND last_seen < ?2 AND ac_timestamp < ?2",
 		"SELECT pubkey FROM autocrypt WHERE fingerprint LIKE ?",
-		"SELECT addr, last_seen, ac_timestamp, prefer_encrypt, pubkey FROM autocrypt ORDER BY LOWER(addr) ASC"
+		"SELECT addr, last_seen, ac_timestamp, prefer_encrypt, pubkey FROM autocrypt ORDER BY addr ASC"
 	};
 	gboolean result;
 

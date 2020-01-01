@@ -5012,7 +5012,7 @@ msgid ""
 "it from remote server."
 msgstr ""
 "Aquesta carpeta no està emmagatzemada a la configuració. Encara es desconeix "
-"com suprimir-la del servidor remot. "
+"com suprimir-la del servidor remot."
 
 #: ../src/folder-conf.c:1012
 #, fuzzy, c-format
@@ -5627,7 +5627,7 @@ msgstr[1] "Heu rebut %d missatges nous."
 
 #: ../src/main-window.c:3645
 msgid "You have new mail."
-msgstr "Heu rebut un missatge nou."
+msgstr "Heu rebut correu nou."
 
 #: ../src/main-window.c:3713 ../src/main-window.c:3748
 msgid "Balsa: New mail"

@@ -1,3 +1,16 @@
+2020-01-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-index: Store idle handler ids
+
+	and use them to remove the corresponding sources at dispose
+	time, instead of taking a strong reference to the BalsaIndex and
+	then testing whether it is the last reference.
+
+	* src/balsa-index.c (bndx_destroy), (bndx_selection_changed_idle),
+	(bndx_selection_changed), (bndx_scroll_on_open_idle),
+	(balsa_index_scroll_on_open), (bndx_queue_draw_idle),
+	(bndx_mailbox_changed_idle), (bndx_mailbox_changed_cb):
+
 2019-11-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Address book editor: do not crash if no address books are

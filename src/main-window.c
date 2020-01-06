@@ -3171,6 +3171,7 @@ balsa_window_destroy(GObject * object)
 {
     BalsaWindow *window = BALSA_WINDOW(object);
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+    GNetworkMonitor *monitor;
 
     bw_idle_remove(window);
     /* The preview window seems to get finalized without notification;
@@ -3181,6 +3182,11 @@ balsa_window_destroy(GObject * object)
         g_source_remove(priv->network_changed_source_id);
         priv->network_changed_source_id = 0;
     }
+
+    monitor = g_network_monitor_get_default();
+    g_signal_handlers_disconnect_by_func(monitor,
+                                         G_CALLBACK(bw_network_changed_cb),
+                                         NULL);
 
     balsa_app.in_destruction = TRUE;
     G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);

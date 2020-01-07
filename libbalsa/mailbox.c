@@ -102,20 +102,18 @@ static void  mailbox_sortable_init(GtkTreeSortableIface *iface);
 
 typedef struct _LibBalsaMailboxPrivate LibBalsaMailboxPrivate;
 struct _LibBalsaMailboxPrivate {
-    gint stamp; /* used to determine iterators' validity. Increased on each
-                 * modification of mailbox. */
-    
+    GRecMutex rec_mutex;
+
     gchar *config_prefix;       /* unique string identifying mailbox */
                                 /* in the config file                */
     gchar *name;                /* displayed name for a special mailbox; */
                                 /* Isn't it a GUI thing?                 */
     gchar *url; /* Unique resource locator, file://, imap:// etc */
-    guint open_ref;
-    
-    GRecMutex rec_mutex;
 
-    gboolean is_directory;
-    gboolean readonly;
+    gint stamp; /* used to determine iterators' validity. Increased on each
+                 * modification of mailbox. */
+    
+    guint open_ref;
 
     GPtrArray *mindex;  /* the basic message index used for index
                          * displaying/columns of GtkTreeModel interface
@@ -128,29 +126,20 @@ struct _LibBalsaMailboxPrivate {
                                                 * filter that will persist 
                                                 * to the next time the
                                                 * mailbox is opened */
-    gboolean view_filter_pending;  /* a view filter has been set
-                                    * but the view has not been updated */
 
     /* info fields */
-    gboolean has_unread_messages;
     glong unread_messages; /* number of unread messages in the mailbox */
     unsigned first_unread; /* set to 0 if there is no unread present.
                             * used for automatical scrolling down on opening.
                             */
     /* Associated filters (struct mailbox_filter) */
     GSList * filters;
-    gboolean filters_loaded;
 
     LibBalsaMailboxView *view;
     LibBalsaMailboxState state;
 
-    /* Whether to reassemble a message from its parts. */
-    gboolean no_reassemble;
     /* Message ids to reassemble */
     GSList *reassemble_ids;
-
-    /* Whether the tree has been changed since some event. */
-    gboolean msg_tree_changed;
 
     /* Array of msgnos that need to be displayed. */
     GArray *msgnos_pending;
@@ -162,9 +151,21 @@ struct _LibBalsaMailboxPrivate {
     guint need_threading_idle_id;
     guint run_filters_idle_id;
 
+    gboolean is_directory : 1;
+    gboolean readonly : 1;
+    gboolean view_filter_pending : 1;  /* a view filter has been set
+                                        * but the view has not been updated */
+    /* info fields */
+    gboolean has_unread_messages : 1;
+    /* Associated filters (struct mailbox_filter) */
+    gboolean filters_loaded : 1;
+    /* Whether to reassemble a message from its parts. */
+    gboolean no_reassemble : 1;
+    /* Whether the tree has been changed since some event. */
+    gboolean msg_tree_changed : 1;
     /* Whether messages have been loaded and threaded. */
-    gboolean messages_loaded;
-    gboolean messages_threaded;
+    gboolean messages_loaded : 1;
+    gboolean messages_threaded : 1;
 };
 
 G_DEFINE_TYPE_WITH_CODE(LibBalsaMailbox,
@@ -4932,7 +4933,7 @@ libbalsa_mailbox_set_msg_tree_changed(LibBalsaMailbox * mailbox, gboolean change
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    priv->msg_tree_changed = changed;
+    priv->msg_tree_changed = !!changed;
 }
 
 void
@@ -4942,7 +4943,7 @@ libbalsa_mailbox_set_is_directory(LibBalsaMailbox * mailbox, gboolean is_directo
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    priv->is_directory = is_directory;
+    priv->is_directory = !!is_directory;
 }
 
 void
@@ -4952,7 +4953,7 @@ libbalsa_mailbox_set_readonly(LibBalsaMailbox * mailbox, gboolean readonly)
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    priv->readonly = readonly;
+    priv->readonly = !!readonly;
 }
 
 void
@@ -4962,7 +4963,7 @@ libbalsa_mailbox_set_no_reassemble(LibBalsaMailbox * mailbox, gboolean no_reasse
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    priv->no_reassemble = no_reassemble;
+    priv->no_reassemble = !!no_reassemble;
 }
 
 void
@@ -4995,7 +4996,7 @@ libbalsa_mailbox_set_has_unread_messages(LibBalsaMailbox * mailbox,
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    priv->has_unread_messages = has_unread_messages;
+    priv->has_unread_messages = !!has_unread_messages;
 }
 
 void
@@ -5006,7 +5007,7 @@ libbalsa_mailbox_set_messages_loaded(LibBalsaMailbox * mailbox,
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    priv->messages_loaded = messages_loaded;
+    priv->messages_loaded = !!messages_loaded;
 }
 
 void
@@ -5017,7 +5018,7 @@ libbalsa_mailbox_set_messages_threaded(LibBalsaMailbox * mailbox,
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    priv->messages_threaded = messages_threaded;
+    priv->messages_threaded = !!messages_threaded;
 }
 
 void

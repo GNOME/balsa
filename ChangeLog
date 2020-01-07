@@ -1,5 +1,22 @@
 2020-01-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	libbalsa-mailbox: Pack booleans in contiguous 1-bit fields
+
+	It saves run-time storage, and also reduces binary code size (at
+	least on x-86-64, with gcc -O2).
+	Small differences in both cases!
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_set_msg_tree_changed),
+	(libbalsa_mailbox_set_is_directory),
+	(libbalsa_mailbox_set_readonly),
+	(libbalsa_mailbox_set_no_reassemble),
+	(libbalsa_mailbox_set_has_unread_messages),
+	(libbalsa_mailbox_set_messages_loaded),
+	(libbalsa_mailbox_set_messages_threaded): Make sure that
+	gboolean arguments really are boolean.
+
+2020-01-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Fix expand-on-open
 
 	See https://mail.gnome.org/archives/balsa-list/2019-August/msg00008.html

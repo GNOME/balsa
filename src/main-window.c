@@ -2874,6 +2874,11 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     gint               page_num;
     LibBalsaCondition *filter;
 
+    /* Avoid recursive entry: */
+    if (info->opening)
+        return FALSE;
+    info->opening = TRUE;
+
     if (window == NULL) {
         g_free(info->message);
         g_object_unref(g_object_ref_sink(index));
@@ -2882,11 +2887,6 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
         g_free(info);
         return FALSE;
     }
-
-    /* Avoid recursive entry: */
-    if (info->opening)
-        return FALSE;
-    info->opening = TRUE;
 
     balsa_window_decrease_activity(window, info->message);
     g_object_remove_weak_pointer(G_OBJECT(window),

@@ -1,3 +1,17 @@
+2020-01-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	main-window: Avoid recursive entry
+
+	to an idle callback. It happens because of a call to
+	libbalsa_progress_set_fraction(), which then results in a call
+	to gtk_main_iteration_do(); the current event is apparently
+	still in the queue, so it gets re-entered.
+
+	The progress indicator needs to be rethought!
+
+	* src/main-window.c (bw_real_open_mbnode_idle_cb),
+	(balsa_window_real_open_mbnode):
+
 2020-01-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	libbalsa-mailbox: Pack booleans in contiguous 1-bit fields

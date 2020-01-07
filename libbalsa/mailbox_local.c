@@ -1079,6 +1079,7 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
             libbalsa_mailbox_local_cache_message(local, msgno,
                                                  msg_info->message);
     }
+    libbalsa_mailbox_set_messages_loaded(mailbox, TRUE);
 
     if (new_messages > 0) {
 	libbalsa_mailbox_run_filters_on_reception(mailbox);
@@ -1087,6 +1088,7 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
     }
 
     libbalsa_unlock_mailbox(mailbox);
+
     return FALSE;
 }
 
@@ -1145,6 +1147,9 @@ lbml_set_threading(LibBalsaMailbox * mailbox,
         lbml_threading_flat(mailbox);
         break;
     }
+
+    if (libbalsa_mailbox_get_messages_loaded(mailbox))
+        libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
 }
 
 typedef struct {

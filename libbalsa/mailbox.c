@@ -161,6 +161,10 @@ struct _LibBalsaMailboxPrivate {
     guint queue_check_idle_id;
     guint need_threading_idle_id;
     guint run_filters_idle_id;
+
+    /* Whether messages have been loaded and threaded. */
+    gboolean messages_loaded;
+    gboolean messages_threaded;
 };
 
 G_DEFINE_TYPE_WITH_CODE(LibBalsaMailbox,
@@ -646,6 +650,8 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
         libbalsa_mailbox_free_mindex(mailbox);
         priv->stamp++;
 	priv->state = LB_MAILBOX_STATE_CLOSED;
+        priv->messages_loaded = FALSE;
+        priv->messages_threaded = FALSE;
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -2310,6 +2316,7 @@ lbm_set_threading(LibBalsaMailbox * mailbox)
 
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
                                                        priv->view->threading_type);
+
     if (libbalsa_am_i_subthread()) {
         g_idle_add((GSourceFunc) lbm_set_threading_idle_cb, g_object_ref(mailbox));
     } else {
@@ -4851,6 +4858,26 @@ libbalsa_mailbox_get_has_unread_messages(LibBalsaMailbox * mailbox)
     return priv->has_unread_messages;
 }
 
+gboolean
+libbalsa_mailbox_get_messages_loaded(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+
+    return priv->messages_loaded;
+}
+
+gboolean
+libbalsa_mailbox_get_messages_threaded(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+
+    return priv->messages_threaded;
+}
+
 /*
  * Setters
  */
@@ -4969,6 +4996,28 @@ libbalsa_mailbox_set_has_unread_messages(LibBalsaMailbox * mailbox,
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     priv->has_unread_messages = has_unread_messages;
+}
+
+void
+libbalsa_mailbox_set_messages_loaded(LibBalsaMailbox * mailbox,
+                                     gboolean messages_loaded)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    priv->messages_loaded = messages_loaded;
+}
+
+void
+libbalsa_mailbox_set_messages_threaded(LibBalsaMailbox * mailbox,
+                                       gboolean messages_threaded)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
+
+    priv->messages_threaded = messages_threaded;
 }
 
 void

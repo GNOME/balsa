@@ -817,10 +817,17 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
     GtkTreePath *path;
     gpointer view_on_open;
 
-    bindex->scroll_on_open_idle_id = 0;
+    mailbox = balsa_mailbox_node_get_mailbox(bindex->mailbox_node);
+
+    if (!libbalsa_mailbox_get_messages_threaded(mailbox))
+        return TRUE; /* G_SOURCE_CONTINUE */
 
     balsa_index_update_tree(bindex, balsa_app.expand_tree);
-    mailbox = balsa_mailbox_node_get_mailbox(bindex->mailbox_node);
+
+    /* From here on, we return only G_SOURCE_REMOVE, so we should clear
+     * the id: */
+    bindex->scroll_on_open_idle_id = 0;
+
     first_unread = libbalsa_mailbox_get_first_unread(mailbox);
     if (first_unread > 0) {
 	unsigned msgno = first_unread;
@@ -871,9 +878,11 @@ balsa_index_scroll_on_open(BalsaIndex * bindex)
 {
     /* Scroll in an idle handler, because the mailbox is perhaps being
      * opened in its own idle handler. */
+    /* Actually use a 10 millisecond timeout, bacause the handler will
+     * reschedule itself until messages are loaded and threaded. */
     if (bindex->scroll_on_open_idle_id == 0) {
         bindex->scroll_on_open_idle_id =
-            g_idle_add((GSourceFunc) bndx_scroll_on_open_idle, bindex);
+            g_timeout_add(10, (GSourceFunc) bndx_scroll_on_open_idle, bindex);
     }
 }
 

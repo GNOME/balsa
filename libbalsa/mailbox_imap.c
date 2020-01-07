@@ -3206,6 +3206,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
     imap_search_key_free(filter);
 
     libbalsa_mailbox_set_msg_tree(mailbox, new_tree);
+    libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
 }
 
 static void

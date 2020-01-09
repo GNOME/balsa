@@ -1,5 +1,13 @@
 2020-01-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	main-window: Really disconnect from a network monitor signal
+
+	* src/main-window.c (balsa_window_init): store the network
+	monitor's "network-changed" signal handler id;
+	(balsa_window_destroy): use it to disconnect the handler.
+
+2020-01-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox: when closing a mailbox, remove the source of any
 	pending run-filters-on-reception idle callback.
 

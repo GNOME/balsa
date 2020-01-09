@@ -224,6 +224,7 @@ struct _BalsaWindowPrivate {
     gboolean network_available;
     time_t last_check_time;
     guint network_changed_source_id;
+    gulong network_changed_handler_id;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE(BalsaWindow, balsa_window, GTK_TYPE_APPLICATION_WINDOW)
@@ -302,8 +303,9 @@ balsa_window_init(BalsaWindow * window)
     priv->network_available =
         g_network_monitor_get_network_available(monitor);
     print_network_status(priv->network_available);
-    g_signal_connect(monitor, "network-changed",
-                     G_CALLBACK(bw_network_changed_cb), window);
+    priv->network_changed_handler_id =
+        g_signal_connect(monitor, "network-changed",
+                         G_CALLBACK(bw_network_changed_cb), window);
     priv->last_check_time = 0;
 }
 
@@ -3178,7 +3180,6 @@ balsa_window_destroy(GObject * object)
 {
     BalsaWindow *window = BALSA_WINDOW(object);
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
-    GNetworkMonitor *monitor;
 
     bw_idle_remove(window);
     /* The preview window seems to get finalized without notification;
@@ -3190,10 +3191,11 @@ balsa_window_destroy(GObject * object)
         priv->network_changed_source_id = 0;
     }
 
-    monitor = g_network_monitor_get_default();
-    g_signal_handlers_disconnect_by_func(monitor,
-                                         G_CALLBACK(bw_network_changed_cb),
-                                         NULL);
+    if (priv->network_changed_handler_id != 0) {
+        GNetworkMonitor *monitor = g_network_monitor_get_default();
+        g_signal_handler_disconnect(monitor, priv->network_changed_handler_id);
+        priv->network_changed_handler_id = 0;
+    }
 
     balsa_app.in_destruction = TRUE;
     G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);

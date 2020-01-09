@@ -1,5 +1,15 @@
 2020-01-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox: when closing a mailbox, remove the source of any
+	pending run-filters-on-reception idle callback.
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_close): remove the
+	source, if any;
+	(libbalsa_mailbox_run_filters_on_reception): check that no
+	callback is pending.
+
+2020-01-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	balsa-index: minor cleanup
 
 	* src/balsa-index.c (bndx_scroll_on_open_idle): rename 'total'

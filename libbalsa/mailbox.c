@@ -653,6 +653,11 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
 	priv->state = LB_MAILBOX_STATE_CLOSED;
         priv->messages_loaded = FALSE;
         priv->messages_threaded = FALSE;
+
+        if (priv->run_filters_idle_id != 0) {
+            g_source_remove(priv->run_filters_idle_id);
+            priv->run_filters_idle_id = 0;
+        }
     }
 
     libbalsa_unlock_mailbox(mailbox);
@@ -940,8 +945,10 @@ libbalsa_mailbox_run_filters_on_reception(LibBalsaMailbox * mailbox)
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
-    priv->run_filters_idle_id =
-        g_idle_add((GSourceFunc) lbm_run_filters_on_reception_idle_cb, mailbox);
+    if (priv->run_filters_idle_id == 0) {
+        priv->run_filters_idle_id =
+            g_idle_add((GSourceFunc) lbm_run_filters_on_reception_idle_cb, mailbox);
+    }
 }
 
 void

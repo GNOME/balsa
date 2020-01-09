@@ -1377,21 +1377,9 @@ bndx_queue_draw_idle(gpointer data)
 static gboolean
 bndx_mailbox_changed_idle(BalsaIndex * bindex)
 {
-    LibBalsaMailbox *mailbox;
-    guint first_unread;
     GtkTreePath *path;
 
     bindex->mailbox_changed_idle_id = 0;
-
-    mailbox = balsa_mailbox_node_get_mailbox(bindex->mailbox_node);
-    first_unread = libbalsa_mailbox_get_first_unread(mailbox);
-    if (first_unread > 0
-        && libbalsa_mailbox_msgno_find(mailbox, first_unread,
-                                       &path, NULL)) {
-        bndx_expand_to_row(bindex, path);
-        gtk_tree_path_free(path);
-        libbalsa_mailbox_set_first_unread(mailbox, 0);
-    }
 
     if (bndx_find_current_msgno(bindex, &path, NULL)) {
         /* The thread containing the current message may have been
@@ -1407,7 +1395,7 @@ bndx_mailbox_changed_idle(BalsaIndex * bindex)
             g_idle_add((GSourceFunc) bndx_queue_draw_idle, bindex);
     }
 
-    return FALSE;
+    return G_SOURCE_REMOVE;
 }
 
 static void

@@ -1,3 +1,14 @@
+2020-01-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-index: do not scroll to first-unread message when
+	LibBalsaMailbox::changed signal is received.
+
+	It is not needed, and it blocks scroll-on-open from scrolling to
+	the first-unread message.
+
+	* src/balsa-index.c (bndx_mailbox_changed_idle): do not clear
+	LibBalsaMailbox:first_unread; and do not scroll to it, either.
+
 2020-01-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	main-window: Avoid recursive entry

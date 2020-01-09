@@ -839,11 +839,11 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
            alternative which is to scroll to the most recently
            delivered does not feel natural when other sorting order is
            used */
-        int total = gtk_tree_model_iter_n_children
-            (GTK_TREE_MODEL(mailbox), NULL);
-        if(total == 0)
+        gint n_children =
+            gtk_tree_model_iter_n_children(GTK_TREE_MODEL(mailbox), NULL);
+        if (n_children == 0)
             return FALSE;
-        path = gtk_tree_path_new_from_indices(total - 1, -1);
+        path = gtk_tree_path_new_from_indices(n_children - 1, -1);
     }
 
     bndx_expand_to_row(bindex, path);
@@ -2752,16 +2752,12 @@ balsa_index_ensure_visible(BalsaIndex * index)
             model = gtk_tree_view_get_model(tree_view);
             n_children = gtk_tree_model_iter_n_children(model, NULL);
 
-            if (n_children > 0) {
-                GtkTreeIter iter;
-                gtk_tree_model_iter_nth_child(model, &iter, NULL,
-                                              --n_children);
-                path = gtk_tree_model_get_path(model, &iter);
-            }
+            if (n_children > 0)
+                path = gtk_tree_path_new_from_indices(n_children - 1, -1);
         }
     }
 
-    if (path) {
+    if (path != NULL) {
         gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
         gtk_tree_path_free(path);
     }

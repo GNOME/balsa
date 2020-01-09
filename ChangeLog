@@ -1,5 +1,12 @@
 2020-01-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	libbalsa/x509-cert-widget: keep scan-build happy
+
+	* libbalsa/x509-cert-widget.c (x509_cert_chain_smime): keep
+	  scan-build happy by checking for NULL chain.
+
+2020-01-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	balsa-index: do not scroll to first-unread message when
 	LibBalsaMailbox::changed signal is received.
 

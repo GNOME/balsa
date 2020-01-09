@@ -120,12 +120,14 @@ x509_cert_chain_smime(const gchar *fingerprint)
 			chain = g_list_prepend(chain, cert_data_smime(ctx, &keyid));
 		}
 		gpgme_release(ctx);
-		if (chain->next != NULL) {
-			widget = create_chain_widget(chain);
-		} else {
-			widget = ((cert_data_t *) chain->data)->widget;
-		}
-		g_list_free_full(chain, (GDestroyNotify) cert_data_free);
+                if (chain != NULL) {
+			if (chain->next != NULL) {
+				widget = create_chain_widget(chain);
+			} else {
+				widget = ((cert_data_t *) chain->data)->widget;
+			}
+			g_list_free_full(chain, (GDestroyNotify) cert_data_free);
+                }
 	}
 
 	return widget;

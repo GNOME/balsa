@@ -917,11 +917,15 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
         for (msgno = 1; msgno <= total; msgno++) {
             if (libbalsa_mailbox_message_match(mailbox, msgno, search_iter))
                 g_array_append_val(msgnos, msgno);
-            if (use_progress)
+            if (use_progress) {
                 libbalsa_progress_set_fraction(&progress,
                                                ((gdouble) ++progress_count)
                                                /
                                                ((gdouble) progress_total));
+                /* mailbox could have been closed during set-fraction */
+                if (priv->state != LB_MAILBOX_STATE_OPEN)
+                    break;
+            }
         }
         libbalsa_mailbox_search_iter_unref(search_iter);
 

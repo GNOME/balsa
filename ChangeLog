@@ -1,5 +1,12 @@
 2020-01-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox: Check whether the mailbox was closed during
+	set-fraction, while running filters on reception.
+
+	* libbalsa/mailbox.c (lbm_run_filters_on_reception_idle_cb):
+
+2020-01-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	main-window: Really disconnect from a network monitor signal
 
 	* src/main-window.c (balsa_window_init): store the network

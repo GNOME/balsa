@@ -1,5 +1,11 @@
 2020-01-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox: Check for finalized mailbox
+
+	* libbalsa/mailbox.c (lbm_changed_idle_cb):
+
+2020-01-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox-local: Check for error return value
 
 	* libbalsa/mailbox_local.c

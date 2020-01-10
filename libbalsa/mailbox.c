@@ -842,6 +842,8 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
     guint total;
     guint progress_total;
     LibBalsaProgress progress;
+    gboolean is_mailbox = TRUE;
+    gboolean is_open = TRUE;
 
     libbalsa_lock_mailbox(mailbox);
 
@@ -923,21 +925,34 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
                                                /
                                                ((gdouble) progress_total));
                 /* mailbox could have been closed during set-fraction */
-                if (priv->state != LB_MAILBOX_STATE_OPEN)
+                if (!LIBBALSA_IS_MAILBOX(mailbox))
+                    is_open = is_mailbox = FALSE;
+                else if (!LIBBALSA_MAILBOX_OPEN(mailbox))
+                    is_open = FALSE;
+
+                if (!is_open)
                     break;
             }
         }
         libbalsa_mailbox_search_iter_unref(search_iter);
 
-        libbalsa_mailbox_register_msgnos(mailbox, msgnos);
-        libbalsa_filter_mailbox_messages(filter, mailbox, msgnos);
-        libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
+        if (is_open) {
+            libbalsa_mailbox_register_msgnos(mailbox, msgnos);
+            libbalsa_filter_mailbox_messages(filter, mailbox, msgnos);
+            libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
+        }
+
         g_array_free(msgnos, TRUE);
+
+        if (!is_open)
+            break;
     }
     libbalsa_progress_set_text(&progress, NULL, 0);
 
     g_slist_free(filters);
-    libbalsa_unlock_mailbox(mailbox);
+
+    if (is_mailbox)
+        libbalsa_unlock_mailbox(mailbox);
 
     return FALSE;
 }

@@ -1,3 +1,12 @@
+2020-01-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Guard against mailbox being closed or finalized during a call to
+	libbalsa_progress_set_fraction().
+
+	* libbalsa/mailbox.c (lbm_run_filters_on_reception_idle_cb):
+	* libbalsa/mailbox_local.c (lbm_local_update_view_filter),
+	(libbalsa_mailbox_local_prepare_threading):
+
 2020-01-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox: Check whether the mailbox was closed during

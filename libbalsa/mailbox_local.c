@@ -1270,13 +1270,15 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
                                           FALSE);
         libbalsa_progress_set_fraction(&progress, ((gdouble) msgno) /
                                        ((gdouble) total));
+        if (!LIBBALSA_IS_MAILBOX(mailbox) || !MAILBOX_OPEN(mailbox))
+            break;
     }
     libbalsa_progress_set_text(&progress, NULL, 0);
     libbalsa_mailbox_search_iter_unref(iter_view);
 
     /* If this is not a flags-only filter, the new mailbox tree is
      * temporary, so we don't want to save it. */
-    if (is_flag_only)
+    if (is_flag_only && LIBBALSA_IS_MAILBOX(mailbox))
         lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }
 
@@ -1360,7 +1362,7 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
             libbalsa_progress_set_fraction(&progress,
                                            ((gdouble) msgno) /
                                            ((gdouble) (total - start)));
-            if (!MAILBOX_OPEN(mailbox)) {
+            if (!LIBBALSA_IS_MAILBOX(mailbox) || !MAILBOX_OPEN(mailbox)) {
                 /* Mailbox was closed during set-fraction. */
                 retval = FALSE;
                 break;
@@ -1380,7 +1382,9 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
                 g_idle_add((GSourceFunc) lbm_local_thread_idle, local);
         }
     }
-    libbalsa_unlock_mailbox(mailbox);
+
+    if (LIBBALSA_IS_MAILBOX(mailbox))
+        libbalsa_unlock_mailbox(mailbox);
 
     return retval;
 }

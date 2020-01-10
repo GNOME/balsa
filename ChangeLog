@@ -1,5 +1,15 @@
 2020-01-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox-local: Check for error return value
+
+	* libbalsa/mailbox_local.c
+	(libbalsa_mailbox_local_set_threading): check the value returned
+	by libbalsa_mailbox_prepare_threading(); if it is FALSE, the
+	operation failed, perhaps because the mailbox was closed or
+	finalized, so just quit.
+
+2020-01-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Guard against mailbox being closed or finalized during a call to
 	libbalsa_progress_set_fraction().
 

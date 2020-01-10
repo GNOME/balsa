@@ -1183,6 +1183,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
         gboolean natural = (thread_type == LB_MAILBOX_THREADING_FLAT
                             && libbalsa_mailbox_get_sort_field(mailbox) ==
                             LB_MAILBOX_SORT_NO);
+        gboolean ok = TRUE;
 
         libbalsa_mailbox_set_msg_tree(mailbox, g_node_new(NULL));
         if (!lbm_local_restore_tree(local, &total)) {
@@ -1193,20 +1194,25 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
         libbalsa_mailbox_set_msg_tree_changed(mailbox, FALSE);
 
         if (total < libbalsa_mailbox_total_messages(mailbox)) {
-            if (!natural)
+            if (!natural) {
                 /* Get message info for all messages that weren't restored,
                  * so we can thread and sort them correctly before the
                  * mailbox is displayed. */
-                libbalsa_mailbox_prepare_threading(mailbox, total);
-            libbalsa_mailbox_local_load_messages(mailbox, total);
+                ok = libbalsa_mailbox_prepare_threading(mailbox, total);
+            }
+            if (ok)
+                libbalsa_mailbox_local_load_messages(mailbox, total);
+            else
+                return; /* Something bad happened */
         }
 
 #if defined(DEBUG_LOADING_AND_THREADING)
         printf("after load messages: time=%lu\n", (unsigned long) time(NULL));
 #endif
-        if (natural)
+        if (natural) {
             /* No need to thread. */
             return;
+        }
     }
 
     if (libbalsa_am_i_subthread()) {

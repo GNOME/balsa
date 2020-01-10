@@ -927,7 +927,7 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
                 /* mailbox could have been closed during set-fraction */
                 if (!LIBBALSA_IS_MAILBOX(mailbox))
                     is_open = is_mailbox = FALSE;
-                else if (!LIBBALSA_MAILBOX_OPEN(mailbox))
+                else if (!MAILBOX_OPEN(mailbox))
                     is_open = FALSE;
 
                 if (!is_open)

@@ -4803,7 +4803,7 @@ libbalsa_mailbox_get_msg_tree_changed(LibBalsaMailbox * mailbox)
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    return priv->msg_tree_changed;
+    return priv->msg_tree_changed != 0;
 }
 
 LibBalsaMailboxState
@@ -4863,7 +4863,7 @@ libbalsa_mailbox_get_readonly(LibBalsaMailbox * mailbox)
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    return priv->readonly;
+    return priv->readonly != 0;
 }
 
 const gchar *
@@ -4883,7 +4883,7 @@ libbalsa_mailbox_get_has_unread_messages(LibBalsaMailbox * mailbox)
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    return priv->has_unread_messages;
+    return priv->has_unread_messages != 0;
 }
 
 gboolean
@@ -4893,7 +4893,7 @@ libbalsa_mailbox_get_messages_loaded(LibBalsaMailbox * mailbox)
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    return priv->messages_loaded;
+    return priv->messages_loaded != 0;
 }
 
 gboolean
@@ -4903,7 +4903,7 @@ libbalsa_mailbox_get_messages_threaded(LibBalsaMailbox * mailbox)
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
 
-    return priv->messages_threaded;
+    return priv->messages_threaded != 0;
 }
 
 /*

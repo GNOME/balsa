@@ -1133,9 +1133,6 @@ static void
 lbml_set_threading(LibBalsaMailbox * mailbox,
                    LibBalsaMailboxThreadingType thread_type)
 {
-    if (libbalsa_mailbox_get_msg_tree(mailbox) == NULL)
-        return;
-
     switch (thread_type) {
     case LB_MAILBOX_THREADING_JWZ:
         lbml_thread_messages(mailbox, TRUE);
@@ -1148,8 +1145,7 @@ lbml_set_threading(LibBalsaMailbox * mailbox,
         break;
     }
 
-    if (libbalsa_mailbox_get_messages_loaded(mailbox))
-        libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
+    libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
 }
 
 typedef struct {
@@ -1160,6 +1156,12 @@ typedef struct {
 static gboolean
 lbml_set_threading_idle_cb(LbmlSetThreadingInfo * info)
 {
+    if (libbalsa_mailbox_get_msg_tree(info->mailbox) == NULL)
+        return G_SOURCE_REMOVE;
+
+    if (!libbalsa_mailbox_get_messages_loaded(info->mailbox))
+        return G_SOURCE_CONTINUE;
+
     lbml_set_threading(info->mailbox, info->thread_type);
     g_object_unref(info->mailbox);
     g_free(info);
@@ -1215,16 +1217,15 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
         }
     }
 
-    if (libbalsa_am_i_subthread()) {
+    { /* Scope */
         LbmlSetThreadingInfo *info;
 
         info = g_new(LbmlSetThreadingInfo, 1);
         info->mailbox = g_object_ref(mailbox);
         info->thread_type = thread_type;
         g_idle_add((GSourceFunc) lbml_set_threading_idle_cb, info);
-    } else {
-        lbml_set_threading(mailbox, thread_type);
     }
+
 #if defined(DEBUG_LOADING_AND_THREADING)
     printf("after threading time=%lu\n", (unsigned long) time(NULL));
 #endif
@@ -1276,15 +1277,13 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
                                           FALSE);
         libbalsa_progress_set_fraction(&progress, ((gdouble) msgno) /
                                        ((gdouble) total));
-        if (!LIBBALSA_IS_MAILBOX(mailbox) || !MAILBOX_OPEN(mailbox))
-            break;
     }
     libbalsa_progress_set_text(&progress, NULL, 0);
     libbalsa_mailbox_search_iter_unref(iter_view);
 
     /* If this is not a flags-only filter, the new mailbox tree is
      * temporary, so we don't want to save it. */
-    if (is_flag_only && LIBBALSA_IS_MAILBOX(mailbox))
+    if (is_flag_only)
         lbm_local_queue_save_tree(LIBBALSA_MAILBOX_LOCAL(mailbox));
 }
 
@@ -1352,7 +1351,6 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
     gchar *text;
     guint total;
     LibBalsaProgress progress = LIBBALSA_PROGRESS_INIT;
-    gboolean retval = TRUE;
 
     libbalsa_lock_mailbox(mailbox);
     libbalsa_mailbox_local_set_threading_info(local);
@@ -1368,17 +1366,12 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
             libbalsa_progress_set_fraction(&progress,
                                            ((gdouble) msgno) /
                                            ((gdouble) (total - start)));
-            if (!LIBBALSA_IS_MAILBOX(mailbox) || !MAILBOX_OPEN(mailbox)) {
-                /* Mailbox was closed during set-fraction. */
-                retval = FALSE;
-                break;
-            }
         }
     }
 
     libbalsa_progress_set_text(&progress, NULL, 0);
 
-    if (retval && need_thread && !priv->thread_id) {
+    if (need_thread && !priv->thread_id) {
         if (libbalsa_mailbox_get_threading_type(mailbox) !=
             LB_MAILBOX_THREADING_FLAT
             || libbalsa_mailbox_get_sort_field(mailbox) !=
@@ -1389,10 +1382,9 @@ libbalsa_mailbox_local_prepare_threading(LibBalsaMailbox * mailbox,
         }
     }
 
-    if (LIBBALSA_IS_MAILBOX(mailbox))
-        libbalsa_unlock_mailbox(mailbox);
+    libbalsa_unlock_mailbox(mailbox);
 
-    return retval;
+    return TRUE;
 }
 
 /* fetch message structure method: all local mailboxes have their own

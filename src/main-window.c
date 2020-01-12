@@ -4582,13 +4582,6 @@ bw_update_progress_bar(BalsaWindow *window,
     g_idle_add((GSourceFunc) bw_update_progress_bar_idle_cb, info);
 }
 
-static void
-bw_progress_bar_set_fraction(BalsaWindow *window,
-                             gdouble      fraction)
-{
-    bw_update_progress_bar(window, FALSE, NULL, TRUE, fraction);
-}
-
 /* balsa_window_increase_activity
  *
  * Calling this causes this to the progress bar of the window to
@@ -4711,7 +4704,7 @@ balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
     return TRUE;
 }
 
-/* balsa_window_increment_progress
+/* balsa_window_progress_bar_set_fraction
  *
  * If the progress bar has been initialized using
  * balsa_window_setup_progress, this function increments the
@@ -4723,8 +4716,7 @@ balsa_window_setup_progress(BalsaWindow * window, const gchar * text)
  * main thread from processing events.
  **/
 void
-balsa_window_increment_progress(BalsaWindow * window, gdouble fraction,
-                                gboolean flush)
+balsa_window_progress_bar_set_fraction(BalsaWindow * window, gdouble fraction)
 {
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
@@ -4735,11 +4727,7 @@ balsa_window_increment_progress(BalsaWindow * window, gdouble fraction,
     if (priv->progress_type != BALSA_PROGRESS_INCREMENT)
         return;
 
-    bw_progress_bar_set_fraction(window, fraction);
-
-    if (flush)
-        while (gtk_events_pending())
-            gtk_main_iteration_do(FALSE);
+    bw_update_progress_bar(window, FALSE, NULL, TRUE, fraction);
 }
 
 /*

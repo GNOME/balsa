@@ -416,8 +416,7 @@ balsa_progress_set_fraction(LibBalsaProgress * progress, gdouble fraction)
     min_fraction  += LIBBALSA_PROGRESS_MIN_UPDATE_STEP;
 
     if (balsa_app.main_window)
-        balsa_window_increment_progress(balsa_app.main_window, fraction,
-                                        !libbalsa_am_i_subthread());
+        balsa_window_progress_bar_set_fraction(balsa_app.main_window, fraction);
 }
 
 static void

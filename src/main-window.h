@@ -102,8 +102,8 @@ gboolean balsa_window_next_unread(BalsaWindow * window);
 gboolean balsa_window_setup_progress(BalsaWindow * window,
                                      const gchar * text);
 void balsa_window_clear_progress(BalsaWindow* window);
-void balsa_window_increment_progress(BalsaWindow * window,
-                                     gdouble fraction, gboolean flush);
+void balsa_window_progress_bar_set_fraction(BalsaWindow * window,
+                                            gdouble       fraction);
 void balsa_window_increase_activity(BalsaWindow * window,
                                     const gchar * message);
 void balsa_window_decrease_activity(BalsaWindow * window,

@@ -1,3 +1,41 @@
+2020-01-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Stop using gtk_main_iteration_do()
+
+	Stop using gtk_main_iteration_do() to make the progress bar
+	update. It caused all sorts of side effects by processing other events
+	while the one needed the progress indicator was held up. Several
+	hacky guards against bad consequences can be dropped.
+
+	The progress bar is now not updated in the UI if it is used to
+	indicate progress in a task that is executed in the main thread.
+	A task that takes long enough to need it most likely needs to be
+	carried out in a thread, anyway, and should be re-implemented as
+	such.
+
+	Scroll-on-open apparently depended on some of the less bad
+	consequences, and to make it work again the order of execution
+	of idle handlers for:
+	• message loading;
+	• message threading;
+	• optional thread expansion;
+	has to be managed.
+
+	* libbalsa/mailbox.c (lbm_changed_idle_cb),
+	(lbm_run_filters_on_reception_idle_cb): drop the guards;
+	* libbalsa/mailbox_local.c (lbml_set_threading),
+	(lbml_set_threading_idle_cb),
+	(libbalsa_mailbox_local_set_threading),
+	(lbm_local_update_view_filter),
+	(libbalsa_mailbox_local_prepare_threading): drop guards, and
+	manage order of execution;
+	* src/balsa-index.c (balsa_index_init), (bndx_scroll_on_open_idle),
+	(balsa_index_scroll_on_open): manage order of execution;
+	* src/main-window.c (balsa_window_progress_bar_set_fraction):
+	this was misleadingly named;
+	* src/main-window.h: rename it;
+	* src/main.c (balsa_progress_set_fraction): use the new name.
+
 2020-01-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox: Check for finalized mailbox

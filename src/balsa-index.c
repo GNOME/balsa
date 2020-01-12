@@ -174,6 +174,8 @@ struct _BalsaIndex {
 
     LibBalsaMailboxSearchIter *search_iter;
     BalsaIndexWidthPreference width_preference;
+
+    gboolean expanded;
 };
 
 /* Class type. */
@@ -484,7 +486,6 @@ balsa_index_init(BalsaIndex * index)
                      G_CALLBACK(bndx_drag_cb), NULL);
 
     balsa_index_set_column_widths(index);
-    gtk_widget_show_all (GTK_WIDGET(index));
 }
 
 /* Callbacks used by bndx_instance_init. */
@@ -822,7 +823,11 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
     if (!libbalsa_mailbox_get_messages_threaded(mailbox))
         return TRUE; /* G_SOURCE_CONTINUE */
 
-    balsa_index_update_tree(bindex, balsa_app.expand_tree);
+    if (balsa_app.expand_tree && !bindex->expanded) {
+        gtk_tree_view_expand_all(tree_view);
+        bindex->expanded = TRUE;
+        return TRUE; /* G_SOURCE_CONTINUE */
+    }
 
     /* From here on, we return only G_SOURCE_REMOVE, so we should clear
      * the id: */
@@ -855,9 +860,9 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
 
     if (gtk_tree_view_get_model(tree_view)) {
         if ((view_on_open && GPOINTER_TO_INT(view_on_open))
-            || balsa_app.view_message_on_open)
+            || balsa_app.view_message_on_open) {
             bndx_select_row(bindex, path);
-        else {
+        } else {
             GtkTreeSelection *selection;
             gulong changed_id = bindex->selection_changed_id;
 
@@ -869,6 +874,7 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
         }
     }
     gtk_tree_path_free(path);
+    gtk_widget_show(GTK_WIDGET(bindex));
 
     return FALSE;
 }
@@ -878,11 +884,11 @@ balsa_index_scroll_on_open(BalsaIndex * bindex)
 {
     /* Scroll in an idle handler, because the mailbox is perhaps being
      * opened in its own idle handler. */
-    /* Actually use a 10 millisecond timeout, bacause the handler will
+    /* Actually use a 500 millisecond timeout, bacause the handler will
      * reschedule itself until messages are loaded and threaded. */
     if (bindex->scroll_on_open_idle_id == 0) {
         bindex->scroll_on_open_idle_id =
-            g_timeout_add(10, (GSourceFunc) bndx_scroll_on_open_idle, bindex);
+            g_timeout_add(500, (GSourceFunc) bndx_scroll_on_open_idle, bindex);
     }
 }
 

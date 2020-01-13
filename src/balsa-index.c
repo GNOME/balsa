@@ -824,7 +824,9 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
     if (!libbalsa_mailbox_get_messages_threaded(mailbox))
         return TRUE; /* G_SOURCE_CONTINUE */
 
-    if (balsa_app.expand_tree && !bindex->expanded) {
+    if (balsa_app.expand_tree &&
+        libbalsa_mailbox_get_threading_type(mailbox) != LB_MAILBOX_THREADING_FLAT &&
+        !bindex->expanded) {
         gtk_tree_view_expand_all(tree_view);
         bindex->expanded = TRUE;
         return TRUE; /* G_SOURCE_CONTINUE */
@@ -838,8 +840,10 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
     if (first_unread > 0) {
 	unsigned msgno = first_unread;
         libbalsa_mailbox_set_first_unread(mailbox, 0);
-        if (!libbalsa_mailbox_msgno_find(mailbox, msgno, &path, NULL))
+        if (!libbalsa_mailbox_msgno_find(mailbox, msgno, &path, NULL)) {
+            gtk_widget_show(GTK_WIDGET(bindex));
             return FALSE; /* Oops! */
+        }
     } else {
         /* we want to scroll to the last one in current order. The
            alternative which is to scroll to the most recently
@@ -847,8 +851,10 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
            used */
         gint n_children =
             gtk_tree_model_iter_n_children(GTK_TREE_MODEL(mailbox), NULL);
-        if (n_children == 0)
+        if (n_children == 0) {
+            gtk_widget_show(GTK_WIDGET(bindex));
             return FALSE;
+        }
         path = gtk_tree_path_new_from_indices(n_children - 1, -1);
     }
 

@@ -1156,13 +1156,13 @@ typedef struct {
 static gboolean
 lbml_set_threading_idle_cb(LbmlSetThreadingInfo * info)
 {
-    if (libbalsa_mailbox_get_msg_tree(info->mailbox) == NULL)
-        return G_SOURCE_REMOVE;
+    if (libbalsa_mailbox_get_msg_tree(info->mailbox) != NULL) {
+        if (!libbalsa_mailbox_get_messages_loaded(info->mailbox))
+            return G_SOURCE_CONTINUE;
 
-    if (!libbalsa_mailbox_get_messages_loaded(info->mailbox))
-        return G_SOURCE_CONTINUE;
+        lbml_set_threading(info->mailbox, info->thread_type);
+    }
 
-    lbml_set_threading(info->mailbox, info->thread_type);
     g_object_unref(info->mailbox);
     g_free(info);
 
@@ -1185,10 +1185,11 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
         gboolean natural = (thread_type == LB_MAILBOX_THREADING_FLAT
                             && libbalsa_mailbox_get_sort_field(mailbox) ==
                             LB_MAILBOX_SORT_NO);
-        gboolean ok = TRUE;
 
         libbalsa_mailbox_set_msg_tree(mailbox, g_node_new(NULL));
-        if (!lbm_local_restore_tree(local, &total)) {
+        if (lbm_local_restore_tree(local, &total)) {
+            libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
+        } else {
             /* Bad or no cache file: start over. */
             libbalsa_mailbox_set_msg_tree(mailbox, g_node_new(NULL));
             total = 0;
@@ -1196,16 +1197,17 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
         libbalsa_mailbox_set_msg_tree_changed(mailbox, FALSE);
 
         if (total < libbalsa_mailbox_total_messages(mailbox)) {
+            gboolean ok = TRUE;
+
             if (!natural) {
                 /* Get message info for all messages that weren't restored,
                  * so we can thread and sort them correctly before the
                  * mailbox is displayed. */
                 ok = libbalsa_mailbox_prepare_threading(mailbox, total);
             }
-            if (ok)
-                libbalsa_mailbox_local_load_messages(mailbox, total);
-            else
+            if (!ok)
                 return; /* Something bad happened */
+            libbalsa_mailbox_local_load_messages(mailbox, total);
         }
 
 #if defined(DEBUG_LOADING_AND_THREADING)

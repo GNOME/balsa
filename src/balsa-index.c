@@ -154,10 +154,13 @@ struct _BalsaIndex {
     BalsaMailboxNode* mailbox_node;
     guint current_msgno;
     guint next_msgno;
+
     gboolean current_message_is_deleted:1;
     gboolean prev_message:1;
     gboolean next_message:1;
     gboolean collapsing:1;
+    gboolean expanded:1;
+
     int    filter_no;
     gchar *filter_string; /* Quick view filter string, if any */
 
@@ -174,8 +177,6 @@ struct _BalsaIndex {
 
     LibBalsaMailboxSearchIter *search_iter;
     BalsaIndexWidthPreference width_preference;
-
-    gboolean expanded;
 };
 
 /* Class type. */

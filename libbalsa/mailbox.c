@@ -845,6 +845,12 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
 
     libbalsa_lock_mailbox(mailbox);
 
+    if (priv->mindex == NULL) {
+        libbalsa_unlock_mailbox(mailbox);
+        /* Try again later */
+        return TRUE;
+    }
+
     priv->run_filters_idle_id = 0;
 
     if (!priv->filters_loaded) {

@@ -838,9 +838,8 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
 
     first_unread = libbalsa_mailbox_get_first_unread(mailbox);
     if (first_unread > 0) {
-	unsigned msgno = first_unread;
         libbalsa_mailbox_set_first_unread(mailbox, 0);
-        if (!libbalsa_mailbox_msgno_find(mailbox, msgno, &path, NULL)) {
+        if (!libbalsa_mailbox_msgno_find(mailbox, first_unread, &path, NULL)) {
             gtk_widget_show(GTK_WIDGET(bindex));
             return FALSE; /* Oops! */
         }
@@ -865,21 +864,20 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
         g_object_get_data(G_OBJECT(mailbox), BALSA_INDEX_VIEW_ON_OPEN);
     g_object_set_data(G_OBJECT(mailbox), BALSA_INDEX_VIEW_ON_OPEN, NULL);
 
-    if (gtk_tree_view_get_model(tree_view)) {
-        if ((view_on_open && GPOINTER_TO_INT(view_on_open))
-            || balsa_app.view_message_on_open) {
-            bndx_select_row(bindex, path);
-        } else {
-            GtkTreeSelection *selection;
-            gulong changed_id = bindex->selection_changed_id;
+    if ((view_on_open && GPOINTER_TO_INT(view_on_open))
+        || balsa_app.view_message_on_open) {
+        bndx_select_row(bindex, path);
+    } else {
+        GtkTreeSelection *selection;
+        gulong changed_id = bindex->selection_changed_id;
 
-            selection = gtk_tree_view_get_selection(tree_view);
-            g_signal_handler_block(selection, changed_id);
-            gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
-            gtk_tree_selection_unselect_all(selection);
-            g_signal_handler_unblock(selection, changed_id);
-        }
+        selection = gtk_tree_view_get_selection(tree_view);
+        g_signal_handler_block(selection, changed_id);
+        gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
+        gtk_tree_selection_unselect_all(selection);
+        g_signal_handler_unblock(selection, changed_id);
     }
+
     gtk_tree_path_free(path);
     gtk_widget_show(GTK_WIDGET(bindex));
 
@@ -891,11 +889,13 @@ balsa_index_scroll_on_open(BalsaIndex * bindex)
 {
     /* Scroll in an idle handler, because the mailbox is perhaps being
      * opened in its own idle handler. */
-    /* Actually use a 500 millisecond timeout, bacause the handler will
-     * reschedule itself until messages are loaded and threaded. */
+    /* Use low priority, so that GtkTreeView's layout idle handlers get
+     * to finish the layout first. */
     if (bindex->scroll_on_open_idle_id == 0) {
         bindex->scroll_on_open_idle_id =
-            g_timeout_add(500, (GSourceFunc) bndx_scroll_on_open_idle, bindex);
+            g_idle_add_full(G_PRIORITY_LOW,
+                            (GSourceFunc) bndx_scroll_on_open_idle,
+                            bindex, NULL);
     }
 }
 

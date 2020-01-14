@@ -1,3 +1,13 @@
+2020-01-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-index: Use a low priority idle handler instead of a
+	timeout to schedule scroll-on-open. That's enough to let
+	GtkTreeView do its layout work before the scroll-on-open handler
+	gets called.
+
+	* src/balsa-index.c (bndx_scroll_on_open_idle),
+	(balsa_index_scroll_on_open):
+
 2020-01-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Stop using gtk_main_iteration_do()

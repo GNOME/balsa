@@ -1,3 +1,20 @@
+2020-01-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Move some more code to a thread
+
+	* src/balsa-index.c (bndx_scroll_on_open_idle): reschedule if
+	the tree-view does not yet have a model;
+	(balsa_index_scroll_on_open): do not bother scrolling if the
+	mailbox is not showing any messages;
+	(bndx_load_mailbox_node_idle): new idle handler for doing the
+	Gtk-related part of the load;
+	(balsa_index_load_mailbox_node): move the Gtk-related part of
+	the load to the new idle handler.
+	* src/main-window.c (bw_real_open_mbnode_idle_cb),
+	(bw_real_open_mbnode_thread): move the call to
+	balsa_index_load_mailbox_node() from the idle handler back to
+	the thread.
+
 2020-01-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-index: Use a low priority idle handler instead of a

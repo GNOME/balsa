@@ -819,6 +819,10 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
     GtkTreePath *path;
     gpointer view_on_open;
 
+    /* Make sure the tree-view has a model: */
+    if (gtk_tree_view_get_model(tree_view) == NULL)
+        return TRUE; /* G_SOURCE_CONTINUE */
+
     mailbox = balsa_mailbox_node_get_mailbox(bindex->mailbox_node);
 
     if (!libbalsa_mailbox_get_messages_threaded(mailbox))
@@ -850,10 +854,6 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
            used */
         gint n_children =
             gtk_tree_model_iter_n_children(GTK_TREE_MODEL(mailbox), NULL);
-        if (n_children == 0) {
-            gtk_widget_show(GTK_WIDGET(bindex));
-            return FALSE;
-        }
         path = gtk_tree_path_new_from_indices(n_children - 1, -1);
     }
 
@@ -887,15 +887,25 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
 void
 balsa_index_scroll_on_open(BalsaIndex * bindex)
 {
-    /* Scroll in an idle handler, because the mailbox is perhaps being
-     * opened in its own idle handler. */
-    /* Use low priority, so that GtkTreeView's layout idle handlers get
-     * to finish the layout first. */
-    if (bindex->scroll_on_open_idle_id == 0) {
-        bindex->scroll_on_open_idle_id =
-            g_idle_add_full(G_PRIORITY_LOW,
-                            (GSourceFunc) bndx_scroll_on_open_idle,
-                            bindex, NULL);
+    LibBalsaMailbox *mailbox;
+    GtkTreeIter iter;
+
+    mailbox = balsa_mailbox_node_get_mailbox(bindex->mailbox_node);
+
+    if (!gtk_tree_model_get_iter_first(GTK_TREE_MODEL(mailbox), &iter)) {
+        /* Empty view */
+        gtk_widget_show(GTK_WIDGET(bindex));
+    } else {
+        /* Scroll in an idle handler, because the mailbox is perhaps being
+         * opened in its own idle handler. */
+        /* Use low priority, so that GtkTreeView's layout idle handlers get
+         * to finish the layout first. */
+        if (bindex->scroll_on_open_idle_id == 0) {
+            bindex->scroll_on_open_idle_id =
+                g_idle_add_full(G_PRIORITY_LOW,
+                                (GSourceFunc) bndx_scroll_on_open_idle,
+                                bindex, NULL);
+        }
     }
 }
 
@@ -978,15 +988,41 @@ bndx_mailbox_message_expunged_cb(LibBalsaMailbox * mailbox, guint msgno,
  * balsa_mailbox_node_get_mailbox(mbnode) is already open
  */
 
+static gboolean
+bndx_load_mailbox_node_idle(BalsaIndex *bindex)
+{
+    LibBalsaMailbox *mailbox;
+    GtkTreeView *tree_view;
+
+    mailbox = balsa_mailbox_node_get_mailbox(bindex->mailbox_node);
+    tree_view = GTK_TREE_VIEW(bindex);
+
+    /*
+     * rename "from" column to "to" for outgoing mail
+     */
+    if (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO) {
+        GtkTreeViewColumn *column =
+	    gtk_tree_view_get_column(tree_view, LB_MBOX_FROM_COL);
+        bindex->filter_no = 1; /* FIXME: this is hack! */
+        gtk_tree_view_column_set_title(column, _("To"));
+    }
+
+    /* Set the tree store */
+    gtk_tree_view_set_model(tree_view, GTK_TREE_MODEL(mailbox));
+
+    g_object_unref(bindex);
+
+    return G_SOURCE_REMOVE;
+}
+
 gboolean
-balsa_index_load_mailbox_node(BalsaIndex * index,
+balsa_index_load_mailbox_node(BalsaIndex * bindex,
                               BalsaMailboxNode* mbnode)
 {
-    GtkTreeView *tree_view;
     LibBalsaMailbox *mailbox;
 
-    g_return_val_if_fail(BALSA_IS_INDEX(index), TRUE);
-    g_return_val_if_fail(index->mailbox_node == NULL, TRUE);
+    g_return_val_if_fail(BALSA_IS_INDEX(bindex), TRUE);
+    g_return_val_if_fail(bindex->mailbox_node == NULL, TRUE);
     g_return_val_if_fail(BALSA_IS_MAILBOX_NODE(mbnode), TRUE);
 
     mailbox = balsa_mailbox_node_get_mailbox(mbnode);
@@ -995,41 +1031,28 @@ balsa_index_load_mailbox_node(BalsaIndex * index,
     /*
      * set the new mailbox
      */
-    index->mailbox_node = mbnode;
+    bindex->mailbox_node = mbnode;
     g_object_weak_ref(G_OBJECT(mbnode),
-                      (GWeakNotify) bndx_mbnode_weak_notify, index);
-    /*
-     * rename "from" column to "to" for outgoing mail
-     */
-    tree_view = GTK_TREE_VIEW(index);
-    if (libbalsa_mailbox_get_show(mailbox) == LB_MAILBOX_SHOW_TO) {
-        GtkTreeViewColumn *column =
-	    gtk_tree_view_get_column(tree_view, LB_MBOX_FROM_COL);
-        index->filter_no = 1; /* FIXME: this is hack! */
-        gtk_tree_view_column_set_title(column, _("To"));
-    }
-
+                      (GWeakNotify) bndx_mbnode_weak_notify, bindex);
     g_signal_connect(mailbox, "changed",
-                     G_CALLBACK(bndx_mailbox_changed_cb), index);
+                     G_CALLBACK(bndx_mailbox_changed_cb), bindex);
     g_signal_connect(mailbox, "row-inserted",
-                     G_CALLBACK(bndx_mailbox_row_inserted_cb), index);
+                     G_CALLBACK(bndx_mailbox_row_inserted_cb), bindex);
     g_signal_connect(mailbox, "message-expunged",
-                     G_CALLBACK(bndx_mailbox_message_expunged_cb), index);
-
-    /* Set the tree store */
-#ifndef GTK2_FETCHES_ONLY_VISIBLE_CELLS
-    g_object_set_data(G_OBJECT(mailbox), "tree-view", tree_view);
-#endif
-    gtk_tree_view_set_model(tree_view, GTK_TREE_MODEL(mailbox));
+                     G_CALLBACK(bndx_mailbox_message_expunged_cb), bindex);
 
     /* Create a search-iter for SEARCH UNDELETED. */
     if (!cond_undeleted)
         cond_undeleted =
             libbalsa_condition_new_flag_enum(TRUE,
                                              LIBBALSA_MESSAGE_FLAG_DELETED);
-    index->search_iter = libbalsa_mailbox_search_iter_new(cond_undeleted);
+    bindex->search_iter = libbalsa_mailbox_search_iter_new(cond_undeleted);
     /* Note when this mailbox was opened, for use in auto-closing. */
-    balsa_mailbox_node_set_last_use_time(index->mailbox_node);
+    balsa_mailbox_node_set_last_use_time(bindex->mailbox_node);
+
+    /* In case we are called in a thread, use an idle handler to
+     * complete the loading: */
+    g_idle_add((GSourceFunc) bndx_load_mailbox_node_idle, g_object_ref(bindex));
 
     return FALSE;
 }

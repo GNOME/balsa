@@ -2860,7 +2860,6 @@ typedef struct {
     gchar            *message;
     gboolean          set_current;
     GApplication     *application;
-    gboolean          opening;
 } BalsaWindowRealOpenMbnodeInfo;
 
 static gboolean
@@ -2875,11 +2874,6 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     GtkWidget         *scroll;
     gint               page_num;
     LibBalsaCondition *filter;
-
-    /* Avoid recursive entry: */
-    if (info->opening)
-        return FALSE;
-    info->opening = TRUE;
 
     if (window == NULL) {
         g_free(info->message);
@@ -3039,7 +3033,6 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
     info->set_current = set_current;
     info->index = index;
     info->message = message;
-    info->opening = FALSE;
 
     info->application = G_APPLICATION(gtk_window_get_application(GTK_WINDOW(window)));
     g_application_hold(info->application);

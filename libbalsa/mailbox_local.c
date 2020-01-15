@@ -1188,6 +1188,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 
         libbalsa_mailbox_set_msg_tree(mailbox, g_node_new(NULL));
         if (lbm_local_restore_tree(local, &total)) {
+            libbalsa_mailbox_set_messages_loaded(mailbox, TRUE);
             libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
         } else {
             /* Bad or no cache file: start over. */

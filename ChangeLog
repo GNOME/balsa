@@ -1,5 +1,13 @@
 2020-01-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox-local: Set messages-loaded
+
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_set_threading):
+	set messages-loaded when the message tree is successfully restored
+	from the cache.
+
+2020-01-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Fix a few bugs
 
 	* libbalsa/mailbox_local.c

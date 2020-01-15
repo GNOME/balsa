@@ -854,6 +854,12 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
            used */
         gint n_children =
             gtk_tree_model_iter_n_children(GTK_TREE_MODEL(mailbox), NULL);
+
+        if (n_children == 0) {
+            gtk_widget_show(GTK_WIDGET(bindex));
+            return FALSE;
+        }
+
         path = gtk_tree_path_new_from_indices(n_children - 1, -1);
     }
 
@@ -887,25 +893,15 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
 void
 balsa_index_scroll_on_open(BalsaIndex * bindex)
 {
-    LibBalsaMailbox *mailbox;
-    GtkTreeIter iter;
-
-    mailbox = balsa_mailbox_node_get_mailbox(bindex->mailbox_node);
-
-    if (!gtk_tree_model_get_iter_first(GTK_TREE_MODEL(mailbox), &iter)) {
-        /* Empty view */
-        gtk_widget_show(GTK_WIDGET(bindex));
-    } else {
-        /* Scroll in an idle handler, because the mailbox is perhaps being
-         * opened in its own idle handler. */
-        /* Use low priority, so that GtkTreeView's layout idle handlers get
-         * to finish the layout first. */
-        if (bindex->scroll_on_open_idle_id == 0) {
-            bindex->scroll_on_open_idle_id =
-                g_idle_add_full(G_PRIORITY_LOW,
-                                (GSourceFunc) bndx_scroll_on_open_idle,
-                                bindex, NULL);
-        }
+    /* Scroll in an idle handler, because the mailbox is perhaps being
+     * opened in its own idle handler. */
+    /* Use low priority, so that GtkTreeView's layout idle handlers get
+     * to finish the layout first. */
+    if (bindex->scroll_on_open_idle_id == 0) {
+        bindex->scroll_on_open_idle_id =
+            g_idle_add_full(G_PRIORITY_LOW,
+                            (GSourceFunc) bndx_scroll_on_open_idle,
+                            bindex, NULL);
     }
 }
 

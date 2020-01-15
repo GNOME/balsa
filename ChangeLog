@@ -1,3 +1,19 @@
+2020-01-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix a few bugs
+
+	* libbalsa/mailbox_local.c
+	(libbalsa_mailbox_local_set_threading): thread messages only if
+	there are some; otherwise just set messages-threaded;
+	* src/balsa-index.c (bndx_scroll_on_open_idle): if the mailbox
+	is empty, just show it and return;
+	(balsa_index_scroll_on_open): do not special case an empty
+	mailbox;
+	* src/main-window.c (bw_real_open_mbnode_idle_cb),
+	(balsa_window_real_open_mbnode): register open mailbox earlier,
+	to avoid a race with an idle handler;
+	(bw_real_open_mbnode_thread): add a warning.
+
 2020-01-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Move some more code to a thread

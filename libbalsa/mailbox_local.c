@@ -662,7 +662,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
                 /* Check one level higher. */
                 sibling = parent;
                 parent = parent->parent;
-                if (parent != NULL) {
+                if (parent == NULL) {
                     /* We got to the root without finding the parent. */
                     libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
                                          _("Cache file for mailbox %s "

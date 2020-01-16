@@ -1,3 +1,21 @@
+2020-01-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Revert 90ee8bcc82d8ebdae0bd286212c21d1138531658
+
+	Moving code to the mailbox-opening thread resulted in calls to
+	Gtk from the thread; moving those calls to an idle handler in
+	the main thread got things out of order. We need a more radical
+	refactoring to get more work done in threads.
+
+	This commit reverses the changes in commit
+	90ee8bcc82d8ebdae0bd286212c21d1138531658, while keeping the
+	later fixes.
+
+	* src/balsa-index.c (bndx_scroll_on_open_idle),
+	(balsa_index_load_mailbox_node):
+	* src/main-window.c (bw_real_open_mbnode_idle_cb),
+	(bw_real_open_mbnode_thread):
+
 2020-01-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox-local: Set messages-loaded

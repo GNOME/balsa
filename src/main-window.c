@@ -2889,6 +2889,16 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
                                  (gpointer *) &info->window);
     g_free(info->message);
 
+    if (balsa_find_notebook_page_num(mailbox) >= 0) {
+        g_object_unref(g_object_ref_sink(index));
+        g_object_unref(mbnode);
+        g_application_release(info->application);
+        g_free(info);
+        return FALSE;
+    }
+
+    balsa_index_load_mailbox_node(index, mbnode);
+
     g_signal_connect(index, "index-changed",
                      G_CALLBACK(bw_index_changed_cb), window);
 
@@ -2913,6 +2923,8 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
         /* change the page to the newly selected notebook item */
         gtk_notebook_set_current_page(GTK_NOTEBOOK(priv->notebook),
                                       page_num);
+
+    libbalsa_mailbox_set_threading(mailbox);
 
     filter =
         bw_get_condition_from_int(libbalsa_mailbox_get_filter(mailbox));
@@ -2967,14 +2979,7 @@ bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info)
     } while(try_cnt++<3);
 
     if (successp) {
-        if (balsa_find_notebook_page_num(mailbox) < 0) {
-            balsa_index_load_mailbox_node(info->index, info->mbnode);
-            libbalsa_mailbox_set_threading(mailbox);
-            g_idle_add((GSourceFunc) bw_real_open_mbnode_idle_cb, info);
-        } else {
-            g_warning("%s mailbox \"%s\" is already in the notebook",
-                      __func__, libbalsa_mailbox_get_name(mailbox));
-        }
+        g_idle_add((GSourceFunc) bw_real_open_mbnode_idle_cb, info);
     } else {
         libbalsa_information(
             LIBBALSA_INFORMATION_ERROR,

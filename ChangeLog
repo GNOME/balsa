@@ -1,5 +1,15 @@
 2020-01-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-index: Use gtk_tree_view_expand_to_path()
+
+	instead of reimplementing it.
+
+	* src/balsa-index.c (bndx_selection_changed_idle),
+	(bndx_scroll_on_open_idle), (bndx_mailbox_row_inserted_idle),
+	(bndx_expand_to_row_and_select), (bndx_mailbox_changed_idle):
+
+2020-01-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Revert 90ee8bcc82d8ebdae0bd286212c21d1138531658
 
 	Moving code to the mailbox-opening thread resulted in calls to

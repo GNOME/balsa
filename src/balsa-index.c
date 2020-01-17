@@ -134,6 +134,7 @@ static gint balsa_index_signals[LAST_SIGNAL] = {
 };
 
 /* General helpers. */
+static void bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path);
 static void bndx_select_row(BalsaIndex * index, GtkTreePath * path);
 
 /* Other callbacks. */
@@ -533,7 +534,7 @@ bndx_selection_changed_idle(BalsaIndex * bindex)
             msgno = 0;
         else {
             if (!gtk_tree_selection_path_is_selected(selection, path)) {
-                gtk_tree_view_expand_to_path(GTK_TREE_VIEW(bindex), path);
+                bndx_expand_to_row(bindex, path);
                 bndx_select_row(bindex, path);
             }
             gtk_tree_path_free(path);
@@ -856,7 +857,7 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
         path = gtk_tree_path_new_from_indices(n_children - 1, -1);
     }
 
-    gtk_tree_view_expand_to_path(GTK_TREE_VIEW(bindex), path);
+    bndx_expand_to_row(bindex, path);
     gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
 
     view_on_open =
@@ -914,7 +915,7 @@ bndx_mailbox_row_inserted_idle(struct bndx_mailbox_row_inserted_info *info)
     GtkTreePath *path;
     if (libbalsa_mailbox_msgno_find(info->mailbox, info->msgno,
                                     &path, NULL)) {
-        gtk_tree_view_expand_to_path(GTK_TREE_VIEW(info->index), path);
+        bndx_expand_to_row(info->index, path);
         gtk_tree_path_free(path);
     }
     g_object_unref(info->mailbox);
@@ -1324,7 +1325,7 @@ bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter)
     GtkTreePath *path;
 
     path = gtk_tree_model_get_path(model, iter);
-    gtk_tree_view_expand_to_path(GTK_TREE_VIEW(index), path);
+    bndx_expand_to_row(index, path);
     bndx_select_row(index, path);
     gtk_tree_path_free(path);
 }
@@ -1396,7 +1397,7 @@ bndx_mailbox_changed_idle(BalsaIndex * bindex)
     if (bndx_find_current_msgno(bindex, &path, NULL)) {
         /* The thread containing the current message may have been
          * collapsed by rethreading; re-expand it. */
-        gtk_tree_view_expand_to_path(GTK_TREE_VIEW(bindex), path);
+        bndx_expand_to_row(bindex, path);
         gtk_tree_path_free(path);
     }
 
@@ -2040,6 +2041,23 @@ sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data)
     balsa_window_enable_continue(balsa_app.main_window);
 }
 
+static gboolean
+bndx_update_tree_idle(BalsaIndex *bindex)
+{
+    GtkTreeIter iter;
+
+    if (bndx_find_current_msgno(bindex, NULL, &iter))
+        bndx_expand_to_row_and_select(bindex, &iter);
+    else
+        balsa_index_ensure_visible(bindex);
+
+    bndx_changed_find_row(bindex);
+
+    g_object_unref(bindex);
+
+    return G_SOURCE_REMOVE;
+}
+
 void
 balsa_index_update_tree(BalsaIndex * index, gboolean expand)
 /* Remarks: In the "collapse" case, we still expand current thread to the
@@ -2047,7 +2065,6 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
 	    approach would be to change preview, e.g. to top of thread. */
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    GtkTreeIter iter;
 
     if (expand) {
         g_signal_handler_block(index, index->row_expanded_id);
@@ -2064,12 +2081,7 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
      * overhead is slight
      * select is needed in both cases, as a previous collapse could have
      * deselected the current message */
-    if (bndx_find_current_msgno(index, NULL, &iter))
-        bndx_expand_to_row_and_select(index, &iter);
-    else
-        balsa_index_ensure_visible(index);
-
-    bndx_changed_find_row(index);
+    g_idle_add((GSourceFunc) bndx_update_tree_idle, g_object_ref(index));
 }
 
 /* balsa_index_set_thread_messages: public method. */
@@ -2177,6 +2189,20 @@ balsa_index_transfer(BalsaIndex *index, GArray * msgnos,
 }
 
 /* General helpers. */
+static void
+bndx_expand_to_row(BalsaIndex * bindex, GtkTreePath * path)
+{
+    gint depth = gtk_tree_path_get_depth(path);
+
+    if (depth > 1) {
+        gint *indices = gtk_tree_path_get_indices(path);
+        gint last_index = indices[depth - 1];
+
+        gtk_tree_path_up(path);
+        gtk_tree_view_expand_to_path(GTK_TREE_VIEW(bindex), path);
+        gtk_tree_path_append_index(path, last_index);
+    }
+}
 
 static void
 bndx_changed_find_row(BalsaIndex * index)

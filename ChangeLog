@@ -1,3 +1,30 @@
+2020-01-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-index: improve expand and collapse
+
+	If a message is being viewed, it should still be visible after
+	View:Expand-all (Ctrl e) or View:Collapse-all (Ctrl l). This
+	commit achieves that for Expand-all, and mostly for
+	Collapse-all.
+
+	Only mostly: if the viewed message is near the bottom of the
+	message index, Collapse-all may leave it a few rows below the current
+	view of the message index. Unfortunately, if the current sort
+	order puts the latest threads at the bottom, those are the most
+	likely to be viewed!
+
+	* src/balsa-index.c (bndx_selection_changed_idle),
+	(bndx_scroll_on_open_idle), (bndx_mailbox_row_inserted_idle),
+	(bndx_expand_to_row_and_select), (bndx_mailbox_changed_idle):
+	actually, gtk_tree_view_expand_to_path() doesn't do what we want: it
+	expands to the row, and the row itself, so we use it instead on
+	the parent of the row, using bndx_expand_to_row() again;
+	(bndx_update_tree_idle), (balsa_index_update_tree): do the
+	re-expansion in an idle handler, after the tree-view's layout
+	has settled down;
+	(bndx_expand_to_row): restore it, but using
+	gtk_tree_view_expand_to_path() to expand to the row's parent.
+
 2020-01-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-index: Use gtk_tree_view_expand_to_path()

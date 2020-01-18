@@ -177,6 +177,9 @@ struct _BalsaIndex {
 
     LibBalsaMailboxSearchIter *search_iter;
     BalsaIndexWidthPreference width_preference;
+
+    /* Ephemeral: used by bndx-expand-to-row-and-select */
+    GtkTreeRowReference *reference;
 };
 
 /* Class type. */
@@ -1318,6 +1321,23 @@ balsa_index_get_next_msgno(BalsaIndex * bindex)
  *
  * Note: iter must be valid; it isn't checked here.
  */
+
+static gboolean
+bndx_expand_to_row_and_select_idle(BalsaIndex *bindex)
+{
+    GtkTreePath *path;
+
+    path = gtk_tree_row_reference_get_path(bindex->reference);
+    gtk_tree_row_reference_free(bindex->reference);
+
+    bndx_select_row(bindex, path);
+    gtk_tree_path_free(path);
+
+    g_object_unref(bindex);
+
+    return G_SOURCE_REMOVE;
+}
+
 static void
 bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter)
 {
@@ -1326,8 +1346,11 @@ bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter)
 
     path = gtk_tree_model_get_path(model, iter);
     bndx_expand_to_row(index, path);
-    bndx_select_row(index, path);
+
+    index->reference = gtk_tree_row_reference_new(model, path);
     gtk_tree_path_free(path);
+
+    g_idle_add((GSourceFunc) bndx_expand_to_row_and_select_idle, g_object_ref(index));
 }
 
 /* End of select message interfaces. */

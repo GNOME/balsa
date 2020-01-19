@@ -1,3 +1,19 @@
+2020-01-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-index: Simplify managing idle handlers
+
+	* src/balsa-index.c (bndx_destroy): use
+	g_source_remove_by_user_data() instead of saving ids;
+	(balsa_index_scroll_on_open), (bndx_scroll_on_open_idle),
+	(bndx_mailbox_changed_idle), (bndx_queue_draw_idle):
+	we do not save the id;
+	(bndx_mailbox_row_inserted_cb), (bndx_mailbox_row_inserted_idle):
+	store the msgno in the BalsaIndex, instead of allocating a new
+	structure;
+	(bndx_expand_to_row_and_select), (bndx_expand_to_row_and_select_idle),
+	(bndx_update_tree_idle), (balsa_index_update_tree):
+	we do not need to add a reference to the BalsaIndex.
+
 2020-01-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-index: Fix the "mostly" part of the previous commit, by

@@ -171,15 +171,14 @@ struct _BalsaIndex {
 
     /* Idle handler ids */
     guint selection_changed_idle_id;
-    guint scroll_on_open_idle_id;
-    guint queue_draw_idle_id;
     guint mailbox_changed_idle_id;
 
     LibBalsaMailboxSearchIter *search_iter;
     BalsaIndexWidthPreference width_preference;
 
-    /* Ephemeral: used by bndx-expand-to-row-and-select */
+    /* Ephemera: used by idle handlers */
     GtkTreeRowReference *reference;
+    guint row_inserted_msgno;
 };
 
 /* Class type. */
@@ -259,20 +258,14 @@ bndx_destroy(GObject * obj)
         bindex->selection_changed_idle_id = 0;
     }
 
-    if (bindex->scroll_on_open_idle_id != 0) {
-        g_source_remove(bindex->scroll_on_open_idle_id);
-        bindex->scroll_on_open_idle_id = 0;
-    }
-
-    if (bindex->queue_draw_idle_id != 0) {
-        g_source_remove(bindex->queue_draw_idle_id);
-        bindex->queue_draw_idle_id = 0;
-    }
-
     if (bindex->mailbox_changed_idle_id != 0) {
         g_source_remove(bindex->mailbox_changed_idle_id);
         bindex->mailbox_changed_idle_id = 0;
     }
+
+    /* Clean up any other idle handler sources */
+    while (g_source_remove_by_user_data(bindex))
+        /* Nothing */ ;
 
     g_free(bindex->filter_string);
     bindex->filter_string = NULL;
@@ -835,10 +828,6 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
         return TRUE; /* G_SOURCE_CONTINUE */
     }
 
-    /* From here on, we return only G_SOURCE_REMOVE, so we should clear
-     * the id: */
-    bindex->scroll_on_open_idle_id = 0;
-
     first_unread = libbalsa_mailbox_get_first_unread(mailbox);
     if (first_unread > 0) {
         libbalsa_mailbox_set_first_unread(mailbox, 0);
@@ -894,50 +883,36 @@ balsa_index_scroll_on_open(BalsaIndex * bindex)
      * opened in its own idle handler. */
     /* Use low priority, so that GtkTreeView's layout idle handlers get
      * to finish the layout first. */
-    if (bindex->scroll_on_open_idle_id == 0) {
-        bindex->scroll_on_open_idle_id =
-            g_idle_add_full(G_PRIORITY_LOW,
-                            (GSourceFunc) bndx_scroll_on_open_idle,
-                            bindex, NULL);
-    }
+    g_idle_add_full(G_PRIORITY_LOW, (GSourceFunc) bndx_scroll_on_open_idle, bindex, NULL);
 }
 
 static LibBalsaCondition *cond_undeleted;
 
 /* Callback for the mailbox's "row-inserted" signal; queue an idle
  * handler to expand the thread. */
-struct bndx_mailbox_row_inserted_info {
-    LibBalsaMailbox *mailbox;
-    guint msgno;
-    BalsaIndex *index;
-};
 
 static gboolean
-bndx_mailbox_row_inserted_idle(struct bndx_mailbox_row_inserted_info *info)
+bndx_mailbox_row_inserted_idle(BalsaIndex *bindex)
 {
+    GtkTreeView *tree_view = GTK_TREE_VIEW(bindex);
+    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(model);
     GtkTreePath *path;
-    if (libbalsa_mailbox_msgno_find(info->mailbox, info->msgno,
-                                    &path, NULL)) {
-        bndx_expand_to_row(info->index, path);
+
+    if (libbalsa_mailbox_msgno_find(mailbox, bindex->row_inserted_msgno, &path, NULL)) {
+        bndx_expand_to_row(bindex, path);
         gtk_tree_path_free(path);
     }
-    g_object_unref(info->mailbox);
-    g_object_unref(info->index);
-    g_free(info);
-    return FALSE;
+
+    return G_SOURCE_REMOVE;
 }
 
 static void
 bndx_mailbox_row_inserted_cb(LibBalsaMailbox * mailbox, GtkTreePath * path,
-                             GtkTreeIter * iter, BalsaIndex * index)
+                             GtkTreeIter * iter, BalsaIndex * bindex)
 {
-    guint msgno;
-
     if (libbalsa_mailbox_get_state(mailbox) != LB_MAILBOX_STATE_OPEN)
         return;
-
-    gtk_tree_model_get(GTK_TREE_MODEL(mailbox), iter,
-                       LB_MBOX_MSGNO_COL, &msgno, -1);
 
     if (balsa_app.expand_tree
 #ifdef BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE
@@ -946,18 +921,13 @@ bndx_mailbox_row_inserted_cb(LibBalsaMailbox * mailbox, GtkTreePath * path,
                                                 LIBBALSA_MESSAGE_FLAG_UNREAD,
                                                 0))
 #endif /* BALSA_EXPAND_TO_NEW_UNREAD_MESSAGE */
-        )
-    {
-	struct bndx_mailbox_row_inserted_info *info =
-	    g_new(struct bndx_mailbox_row_inserted_info, 1);
-	info->mailbox = mailbox;
-	g_object_ref(mailbox);
-	info->index = index;
-	g_object_ref(index);
-	info->msgno = msgno;
-	g_idle_add_full(G_PRIORITY_LOW, /* to run after threading */
-		        (GSourceFunc) bndx_mailbox_row_inserted_idle,
-			info, NULL);
+        ) {
+        gtk_tree_model_get(GTK_TREE_MODEL(mailbox), iter,
+                           LB_MBOX_MSGNO_COL, &bindex->row_inserted_msgno, -1);
+
+        g_idle_add_full(G_PRIORITY_LOW, /* to run after threading */
+                        (GSourceFunc) bndx_mailbox_row_inserted_idle,
+                        bindex, NULL);
     }
 }
 
@@ -1333,8 +1303,6 @@ bndx_expand_to_row_and_select_idle(BalsaIndex *bindex)
     bndx_select_row(bindex, path);
     gtk_tree_path_free(path);
 
-    g_object_unref(bindex);
-
     return G_SOURCE_REMOVE;
 }
 
@@ -1350,7 +1318,7 @@ bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter)
     index->reference = gtk_tree_row_reference_new(model, path);
     gtk_tree_path_free(path);
 
-    g_idle_add((GSourceFunc) bndx_expand_to_row_and_select_idle, g_object_ref(index));
+    g_idle_add((GSourceFunc) bndx_expand_to_row_and_select_idle, index);
 }
 
 /* End of select message interfaces. */
@@ -1403,8 +1371,6 @@ bndx_queue_draw_idle(gpointer data)
 {
     BalsaIndex *bindex = data;
 
-    bindex->queue_draw_idle_id = 0;
-
     gtk_widget_queue_draw(GTK_WIDGET(bindex));
 
     return G_SOURCE_REMOVE;
@@ -1426,10 +1392,7 @@ bndx_mailbox_changed_idle(BalsaIndex * bindex)
 
     bndx_changed_find_row(bindex);
 
-    if (bindex->queue_draw_idle_id == 0) {
-        bindex->queue_draw_idle_id =
-            g_idle_add((GSourceFunc) bndx_queue_draw_idle, bindex);
-    }
+    g_idle_add((GSourceFunc) bndx_queue_draw_idle, bindex);
 
     return G_SOURCE_REMOVE;
 }
@@ -2076,8 +2039,6 @@ bndx_update_tree_idle(BalsaIndex *bindex)
 
     bndx_changed_find_row(bindex);
 
-    g_object_unref(bindex);
-
     return G_SOURCE_REMOVE;
 }
 
@@ -2104,7 +2065,7 @@ balsa_index_update_tree(BalsaIndex * index, gboolean expand)
      * overhead is slight
      * select is needed in both cases, as a previous collapse could have
      * deselected the current message */
-    g_idle_add((GSourceFunc) bndx_update_tree_idle, g_object_ref(index));
+    g_idle_add((GSourceFunc) bndx_update_tree_idle, index);
 }
 
 /* balsa_index_set_thread_messages: public method. */

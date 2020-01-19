@@ -1,3 +1,10 @@
+2020-01-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-index: improve ensure-visible
+
+	* src/balsa-index.c (balsa_index_ensure_visible): if either a
+	message is selected or has the focus, scroll to it.
+
 2020-01-19  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	* README: fix package requirements

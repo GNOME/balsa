@@ -2737,26 +2737,31 @@ balsa_index_ensure_visible(BalsaIndex * index)
     if (!bndx_find_current_msgno(index, &path, NULL)) {
         /* Current message not displayed, make sure that something
            else is... */
-        gtk_tree_view_get_visible_rect(tree_view, &rect);
-        gtk_tree_view_convert_tree_to_widget_coords(tree_view,
-                                                    rect.x, rect.y,
-                                                    &rect.x, &rect.y);
+        /* Was the cursor set? */
+        gtk_tree_view_get_cursor(tree_view, &path, NULL);
+        if (path == NULL) {
+            /* No */
+            gtk_tree_view_get_visible_rect(tree_view, &rect);
+            gtk_tree_view_convert_tree_to_widget_coords(tree_view,
+                                                        rect.x, rect.y,
+                                                        &rect.x, &rect.y);
 
-        if (gtk_tree_view_get_path_at_pos(tree_view, rect.x, rect.y, &path,
-                                          NULL, NULL, NULL)) {
-            /* We have a message in the view, so we do nothing. */
-            gtk_tree_path_free(path);
-            path = NULL;
-        } else {
-            /* Scroll to the last message. */
-            GtkTreeModel *model;
-            gint n_children;
+            if (gtk_tree_view_get_path_at_pos(tree_view, rect.x, rect.y, &path,
+                                              NULL, NULL, NULL)) {
+                /* We have a message in the view, so we do nothing. */
+                gtk_tree_path_free(path);
+                path = NULL;
+            } else {
+                /* Scroll to the last message. */
+                GtkTreeModel *model;
+                gint n_children;
 
-            model = gtk_tree_view_get_model(tree_view);
-            n_children = gtk_tree_model_iter_n_children(model, NULL);
+                model = gtk_tree_view_get_model(tree_view);
+                n_children = gtk_tree_model_iter_n_children(model, NULL);
 
-            if (n_children > 0)
-                path = gtk_tree_path_new_from_indices(n_children - 1, -1);
+                if (n_children > 0)
+                    path = gtk_tree_path_new_from_indices(n_children - 1, -1);
+            }
         }
     }
 

@@ -131,29 +131,29 @@ static LibBalsaMessageBody *
 find_alt_part(LibBalsaMessageBody *parts,
 			  gboolean			   print_alt_html)
 {
-	LibBalsaMessageBody *use_part;
+	LibBalsaMessageBody *part;
+	LibBalsaMessageBody *use_part = parts;		/* fallback: print 1st alternative part */
 
 	/* scan the parts */
-	for (use_part = parts; use_part != NULL; use_part = use_part->next) {
+	for (part = parts; part != NULL; part = part->next) {
 		gchar *mime_type;
 		
-		mime_type = libbalsa_message_body_get_mime_type(use_part);
-		if ((strncmp(mime_type, "multipart/", 10U) == 0) && (use_part->parts != NULL)) {
+		mime_type = libbalsa_message_body_get_mime_type(part);
+		if ((strncmp(mime_type, "multipart/", 10U) == 0) && (part->parts != NULL)) {
 			/* consider the first child of a multipart */
 			g_free(mime_type);
-			mime_type = libbalsa_message_body_get_mime_type(use_part->parts);
+			mime_type = libbalsa_message_body_get_mime_type(part->parts);
 		}
 
-		if (((strcmp(mime_type, "text/plain") == 0) && !print_alt_html) ||
+		if ((strcmp(mime_type, "text/calendar") == 0) ||
+			((strcmp(mime_type, "text/plain") == 0) && !print_alt_html) ||
 			((strcmp(mime_type, "text/html") == 0) && print_alt_html)) {
-			g_free(mime_type);
-			return use_part;
+			use_part = part;
 		}
 		g_free(mime_type);
 	}
 	
-	/* nothing found, fall back to the first part in the chain */
-	return parts;
+	return use_part;
 }
 
 

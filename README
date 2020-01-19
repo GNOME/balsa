@@ -3,7 +3,7 @@ Balsa E-Mail Client 2.5.x
 
 See ChangeLog for the list of the recent changes and NEWS for highlights.
 
-Copyright (C) 1997-2019 Stuart Parmenter and others
+Copyright (C) 1997-2020 Stuart Parmenter and others
 
 See 'COPYING' for licence information.
 
@@ -39,12 +39,15 @@ should run './configure --help' to get an idea of them. More
 complete descriptions are here.
 
 Basically, Balsa requires
-- glib-2.0 >= 2.40.0
-- gtk+-3.0 >= 3.10.0
+- glib-2.0 >= 2.48.0
+- gtk+-3.0 >= 3.18.0
 - gmime-2.6
 - gio-2.0
 - gthread-2.0
+- gnutls >= 3.0
 - gpgme >= 1.6.0
+- libical >= 3.0.0
+- fribidi
 
 --disable-more-warnings
 	Balsa by default is very sensitive to compilation warnings

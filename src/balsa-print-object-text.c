@@ -458,6 +458,7 @@ balsa_print_object_text_vcard(GList               *list,
     result = balsa_print_object_default_full(list, context, pixbuf, textbuf, p_label_width, psetup);
     g_object_unref(pixbuf);
     g_free(textbuf);
+    g_object_unref(test_layout);
 
     return result;
 }
@@ -477,17 +478,13 @@ balsa_print_object_text_vcard(GList               *list,
 	}								\
     } while(0)
 
-#define ADD_VCAL_DATE(buf, labwidth, layout, event, date_id, descr)					\
-	G_STMT_START {                                                                	\
-    	time_t _date = libbalsa_vevent_timestamp(event, date_id);					\
-        if (_date != (time_t) -1) {                                      			\
-        	gboolean _d_only = libbalsa_vevent_timestamp_date_only(event, date_id);	\
-            gchar * _dstr =                                             			\
-                libbalsa_date_to_utf8(_date,										\
-                	_d_only ? "%x" : balsa_app.date_string);     					\
-            ADD_VCAL_FIELD(buf, labwidth, layout, _dstr, descr);        			\
-            g_free(_dstr);                                              			\
-        }                                                               			\
+#define ADD_VCAL_DATE(buf, labwidth, layout, event, date_id, descr)						\
+	G_STMT_START {                                                                		\
+    	gchar *_dstr = libbalsa_vevent_time_str(event, date_id, balsa_app.date_string);	\
+        if (_dstr != NULL) {                                      						\
+            ADD_VCAL_FIELD(buf, labwidth, layout, _dstr, descr);        				\
+            g_free(_dstr);                                              				\
+        }                                                               				\
     } G_STMT_END
 
 #define ADD_VCAL_ADDRESS(buf, labwidth, layout, addr, descr)            \
@@ -533,22 +530,39 @@ balsa_print_object_text_calendar(GList               *list,
     pango_font_description_free(header_font);
 
     /* add fields from the events*/
-    desc_buf = g_string_new("");
+    desc_buf = g_string_new(NULL);
+    g_string_append_printf(desc_buf, _("This is an iTIP calendar “%s” message."), libbalsa_vcal_method_str(vcal_obj));
     p_label_width = 0;
-    for (event_no = 0U; event_no < libbalsa_vcal_vevents(vcal_obj); event_no++) {
+    for (event_no = 0U; event_no < libbalsa_vcal_vevent_count(vcal_obj); event_no++) {
         LibBalsaVEvent *event = libbalsa_vcal_vevent(vcal_obj, event_no);
+        gchar *buffer;
         const gchar *description;
         guint attendees;
 
-        if (desc_buf->len > 0) {
-            g_string_append_c(desc_buf, '\n');
-        }
+        g_string_append_c(desc_buf, '\n');
         ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, libbalsa_vevent_summary(event), _("Summary:"));
+        if (libbalsa_vevent_status(event) != ICAL_STATUS_NONE) {
+        	ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, libbalsa_vevent_status_str(event), _("Status:"));
+        }
         ADD_VCAL_ADDRESS(desc_buf, p_label_width, test_layout, libbalsa_vevent_organizer(event), _("Organizer:"));
         ADD_VCAL_DATE(desc_buf, p_label_width, test_layout, event, VEVENT_DATETIME_STAMP, _("Created:"));
         ADD_VCAL_DATE(desc_buf, p_label_width, test_layout, event, VEVENT_DATETIME_START, _("Start:"));
         ADD_VCAL_DATE(desc_buf, p_label_width, test_layout, event, VEVENT_DATETIME_END, _("End:"));
+
+        buffer = libbalsa_vevent_duration_str(event);
+        if (buffer != NULL) {
+        	ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, buffer, _("Duration:"));
+        	g_free(buffer);
+        }
+
+        buffer = libbalsa_vevent_recurrence_str(event, balsa_app.date_string);
+        if (buffer != NULL) {
+        	ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, buffer, _("Recurrence:"));
+        	g_free(buffer);
+        }
+
         ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, libbalsa_vevent_location(event), _("Location:"));
+
         attendees = libbalsa_vevent_attendees(event);
         if (attendees > 0U) {
             gchar *this_att;
@@ -564,6 +578,7 @@ balsa_print_object_text_calendar(GList               *list,
                 g_free(this_att);
             }
         }
+
         description = libbalsa_vevent_description(event);
         if (description != NULL) {
             gchar **desc_lines = g_strsplit(description, "\n", -1);
@@ -574,6 +589,21 @@ balsa_print_object_text_calendar(GList               *list,
                 g_string_append_printf(desc_buf, "\n\t%s", desc_lines[i]);
             }
             g_strfreev(desc_lines);
+        }
+
+        if (libbalsa_vevent_category_count(event) > 0U) {
+        	gchar **cat_lines;
+            gint i;
+
+            buffer = libbalsa_vevent_category_str(event);
+        	cat_lines = g_strsplit(buffer, "\n", -1);
+        	g_free(buffer);
+        	ADD_VCAL_FIELD(desc_buf, p_label_width, test_layout, cat_lines[0],
+        		ngettext("Category:", "Categories:", libbalsa_vevent_category_count(event)));
+            for (i = 1; cat_lines[i]; i++) {
+                g_string_append_printf(desc_buf, "\n\t%s", cat_lines[i]);
+            }
+            g_strfreev(cat_lines);
         }
     }
     g_object_unref(vcal_obj);
@@ -586,6 +616,7 @@ balsa_print_object_text_calendar(GList               *list,
     list = balsa_print_object_default_full(list, context, pixbuf, textbuf, p_label_width, psetup);
     g_object_unref(pixbuf);
     g_free(textbuf);
+    g_object_unref(test_layout);
 
     return list;
 }

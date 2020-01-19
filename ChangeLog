@@ -1,3 +1,16 @@
+2020-01-19  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	* README: fix package requirements
+	* configure.ac, meson.build: require libical >= 3.0.0 (note:
+	  not tested for Meson builds)
+	* libbalsa/rfc2445.[ch]: mostly re-written, using the libical
+	  parser and data types
+	* src/balsa-mime-widget-vcalendar.c: add additional event items;
+	  use the new rfc2445.h api
+	* src/balsa-print-object-text.c: fix two pango test layout memory
+	  leaks; add additional event items; use the new rfc2445.h api
+	* src/print-gtk.c: fix part selection for printing text/calendar
+
 2020-01-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-index: Simplify managing idle handlers

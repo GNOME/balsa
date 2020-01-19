@@ -270,6 +270,11 @@ bndx_destroy(GObject * obj)
     g_free(bindex->filter_string);
     bindex->filter_string = NULL;
 
+    if (bindex->reference != NULL) {
+        gtk_tree_row_reference_free(bindex->reference);
+        bindex->reference = NULL;
+    }
+
     G_OBJECT_CLASS(balsa_index_parent_class)->dispose(obj);
 }
 
@@ -1299,6 +1304,7 @@ bndx_expand_to_row_and_select_idle(BalsaIndex *bindex)
 
     path = gtk_tree_row_reference_get_path(bindex->reference);
     gtk_tree_row_reference_free(bindex->reference);
+    bindex->reference = NULL;
 
     bndx_select_row(bindex, path);
     gtk_tree_path_free(path);

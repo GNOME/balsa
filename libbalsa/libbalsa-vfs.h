@@ -74,10 +74,9 @@ gboolean libbalsa_vfs_launch_app(LibbalsaVfs * file,
 gboolean libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody * mime_body,
                                           GObject * object,
                                           GError **err);
-void libbalsa_vfs_fill_menu_by_content_type(GtkMenu * menu,
+void libbalsa_vfs_fill_menu_by_content_type(GMenu       * menu,
                                             const gchar * content_type,
-                                            GCallback callback,
-                                            gpointer data);
+                                            const gchar * action);
 GtkWidget * libbalsa_vfs_mime_button(LibBalsaMessageBody * mime_body,
                                      const gchar * content_type,
                                      GCallback callback,

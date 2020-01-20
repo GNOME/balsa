@@ -607,47 +607,50 @@ libbalsa_vfs_content_type_of_buffer(const guchar * buffer,
 
 
 static void
-gio_add_vfs_menu_item(GtkMenu * menu, GAppInfo *app, GCallback callback,
-                      gpointer data)
+gio_add_vfs_menu_item(GMenu       *menu,
+                      GAppInfo    *app,
+                      const gchar *action)
 {
-    gchar *menu_label =
-        g_strdup_printf(_("Open with %s"), g_app_info_get_name(app));
-    GtkWidget *menu_item = gtk_menu_item_new_with_label (menu_label);
+    gchar *menu_label;
+    GMenuItem *menu_item;
+
+    menu_label = g_strdup_printf(_("Open with %s"), g_app_info_get_name(app));
+    menu_item = g_menu_item_new(menu_label, action);
+    g_free(menu_label);
 
     g_object_set_data_full(G_OBJECT(menu_item), LIBBALSA_VFS_MIME_ACTION,
                            g_object_ref(app), g_object_unref);
-    g_signal_connect(menu_item, "activate", callback, data);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-    g_free(menu_label);
+
+    g_menu_append_item(menu, menu_item);
 }
 
 
 /* fill the passed menu with vfs items */
 void
-libbalsa_vfs_fill_menu_by_content_type(GtkMenu * menu,
-				       const gchar * content_type,
-				       GCallback callback, gpointer data)
+libbalsa_vfs_fill_menu_by_content_type(GMenu       *menu,
+                                       const gchar *content_type,
+                                       const gchar *action)
 {
     GList* list;
     GAppInfo *def_app;
     GList *app_list;
 
-    g_return_if_fail(data != NULL);
-
-    if ((def_app = g_app_info_get_default_for_type(content_type, FALSE)))
-        gio_add_vfs_menu_item(menu, def_app, callback, data);
+    def_app = g_app_info_get_default_for_type(content_type, FALSE);
+    if (def_app != NULL)
+        gio_add_vfs_menu_item(menu, def_app, action);
 
     app_list = g_app_info_get_all_for_type(content_type);
-    for (list = app_list; list; list = g_list_next(list)) {
+    for (list = app_list; list != NULL; list = list->next) {
         GAppInfo *app = G_APP_INFO(list->data);
 
-        if (app && g_app_info_should_show(app) &&
-            (!def_app || !g_app_info_equal(app, def_app)))
-            gio_add_vfs_menu_item(menu, app, callback, data);
+        if (app != NULL && g_app_info_should_show(app) &&
+            (def_app == NULL || !g_app_info_equal(app, def_app)))
+            gio_add_vfs_menu_item(menu, app, action);
     }
-    if (def_app)
-        g_object_unref(def_app);
     g_list_free_full(app_list, g_object_unref);
+
+    if (def_app != NULL)
+        g_object_unref(def_app);
 }
 
 GtkWidget *

@@ -530,17 +530,26 @@ libbalsa_vfs_file_unlink(LibbalsaVfs * file, GError **err)
 
 
 gboolean
-libbalsa_vfs_launch_app(LibbalsaVfs * file, GObject * object, GError **err)
+libbalsa_vfs_launch_app(LibbalsaVfs * file, const gchar *app_name, GError **err)
 {
+    GList *app_list;
+    GList *list;
     GAppInfo *app;
     GList * args;
     gboolean result;
 
     g_return_val_if_fail(LIBBALSA_IS_VFS(file), FALSE);
-    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
+    g_return_val_if_fail(app_name != NULL, FALSE);
 
-    app = G_APP_INFO(g_object_get_data(object, LIBBALSA_VFS_MIME_ACTION));
-    if (app == NULL) {
+    app_list = g_app_info_get_all();
+    for (list = app_list; list != NULL; list = list->next) {
+        app = G_APP_INFO(list->data);
+        if (strcmp(app_name, g_app_info_get_name(app)) == 0)
+            break;
+    }
+    g_list_free_full(app_list, g_object_unref);
+
+    if (list == NULL) {
         g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
                     _("Cannot launch, missing application"));
         return FALSE;
@@ -556,14 +565,14 @@ libbalsa_vfs_launch_app(LibbalsaVfs * file, GObject * object, GError **err)
 
 gboolean
 libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody * mime_body,
-                                 GObject * object, GError **err)
+                                 const gchar *app_name, GError **err)
 {
     gchar *uri;
     LibbalsaVfs * file;
     gboolean result;
 
     g_return_val_if_fail(mime_body != NULL, FALSE);
-    g_return_val_if_fail(G_IS_OBJECT(object), FALSE);
+    g_return_val_if_fail(app_name != NULL, FALSE);
 
     if (!libbalsa_message_body_save_temporary(mime_body, err))
         return FALSE;
@@ -572,7 +581,7 @@ libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody * mime_body,
     file = libbalsa_vfs_new_from_uri(uri);
     g_free(uri);
 
-    result = libbalsa_vfs_launch_app(file, object, err);
+    result = libbalsa_vfs_launch_app(file, app_name, err);
     g_object_unref(file);
 
     return result;
@@ -611,15 +620,17 @@ gio_add_vfs_menu_item(GMenu       *menu,
                       GAppInfo    *app,
                       const gchar *action)
 {
+    const gchar *name;
     gchar *menu_label;
     GMenuItem *menu_item;
 
-    menu_label = g_strdup_printf(_("Open with %s"), g_app_info_get_name(app));
-    menu_item = g_menu_item_new(menu_label, action);
+    name = g_app_info_get_name(app);
+
+    menu_label = g_strdup_printf(_("Open with %s"), name);
+    menu_item = g_menu_item_new(menu_label, NULL);
     g_free(menu_label);
 
-    g_object_set_data_full(G_OBJECT(menu_item), LIBBALSA_VFS_MIME_ACTION,
-                           g_object_ref(app), g_object_unref);
+    g_menu_item_set_action_and_target(menu_item, action, "s", name);
 
     g_menu_append_item(menu, menu_item);
 }

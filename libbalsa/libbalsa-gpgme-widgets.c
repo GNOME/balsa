@@ -162,12 +162,18 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 		}
 		if (key->chain_id != NULL) {
 			GtkWidget *chain_btn;
+			gchar *chain_fpr;
 
 			issuer_row = create_key_grid_row(GTK_GRID(issuer_grid), issuer_row, _("Chain ID:"), key->chain_id, FALSE);
 
 			/* add button to show the full chain - copy the fingerprint as the key may be unref'ed... */
 			chain_btn = gtk_button_new_with_label(_("view certificate chain…"));
-			g_object_set_data_full(G_OBJECT(chain_btn), "certid", g_strdup(fingerprint), g_free);
+			if (fingerprint != NULL) {
+				chain_fpr = g_strdup(fingerprint);
+			} else {
+				chain_fpr = (key->subkeys != NULL) ? g_strdup(key->subkeys->fpr) : NULL;
+			}
+			g_object_set_data_full(G_OBJECT(chain_btn), "certid", chain_fpr, g_free);
 			g_signal_connect(chain_btn, "clicked", G_CALLBACK(smime_show_chain), NULL);
 			gtk_grid_attach(GTK_GRID(issuer_grid), chain_btn, 0, issuer_row, 2, 1);
 		}

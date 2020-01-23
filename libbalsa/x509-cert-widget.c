@@ -108,28 +108,31 @@ x509_cert_chain_smime(const gchar *fingerprint)
 	gpgme_ctx_t ctx;
 	GtkWidget *widget = NULL;
 
-	g_return_val_if_fail(fingerprint != NULL, NULL);
+	if (fingerprint != NULL) {
+		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_CMS, NULL, NULL, NULL);
+		if (ctx != NULL) {
+			GList *chain = NULL;
+			gchar *keyid;
 
-	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_CMS, NULL, NULL, NULL);
-	if (ctx != NULL) {
-		GList *chain = NULL;
-		gchar *keyid;
-
-		keyid = g_strdup(fingerprint);
-		while (keyid != NULL) {
-			chain = g_list_prepend(chain, cert_data_smime(ctx, &keyid));
-		}
-		gpgme_release(ctx);
-                if (chain != NULL) {
-			if (chain->next != NULL) {
-				widget = create_chain_widget(chain);
-			} else {
-				widget = ((cert_data_t *) chain->data)->widget;
+			keyid = g_strdup(fingerprint);
+			while (keyid != NULL) {
+				chain = g_list_prepend(chain, cert_data_smime(ctx, &keyid));
 			}
-			g_list_free_full(chain, (GDestroyNotify) cert_data_free);
-                }
+			gpgme_release(ctx);
+			if (chain != NULL) {
+				if (chain->next != NULL) {
+					widget = create_chain_widget(chain);
+				} else {
+					widget = ((cert_data_t *) chain->data)->widget;
+				}
+				g_list_free_full(chain, (GDestroyNotify) cert_data_free);
+			}
+		}
 	}
 
+	if (widget == NULL) {
+		widget = gtk_label_new(_("Broken key, cannot identify certificate chain."));
+	}
 	return widget;
 }
 

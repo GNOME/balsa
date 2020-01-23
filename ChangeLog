@@ -1,3 +1,12 @@
+2020-01-23  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Bug fix: S/MIME cert chain broken in identity key selection
+
+	* libbalsa/libbalsa-gpgme-widgets.c: libbalsa_gpgme_key(): fall back
+	  to the cert fingerprint for cb smime_show_chain() if the passed one is NULL
+	* libbalsa/x509-cert-widget.c: x509_cert_chain_smime(): display message
+	  if the cert fingerprint is NULL, requires a litte refactoring
+
 2020-01-19  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-index: improve ensure-visible

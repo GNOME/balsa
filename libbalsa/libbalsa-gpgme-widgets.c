@@ -108,6 +108,7 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 			label = gtk_label_new(_("User ID:"));
 		}
 		gtk_widget_set_halign(label, GTK_ALIGN_START);
+		gtk_label_set_yalign(GTK_LABEL(label), 0.0F);
 		gtk_grid_attach(GTK_GRID(key_data), label, 0, row, 1, 1);
 
 		gtk_grid_attach(GTK_GRID(key_data), create_key_uid_widget(key->uids), 1, row++, 1, 1);
@@ -541,6 +542,7 @@ create_key_grid_row(GtkGrid     *grid,
 
 	label = gtk_label_new(key);
 	gtk_widget_set_halign(label, GTK_ALIGN_START);
+	gtk_label_set_yalign(GTK_LABEL(label), 0.0F);
 	gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
 
 	label = create_key_label_with_warn(value, warn);
@@ -610,6 +612,7 @@ create_key_label_with_warn(const gchar *text,
 		gtk_widget_set_hexpand(label, TRUE);
 		gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 		gtk_label_set_selectable(GTK_LABEL(label), TRUE);
+		gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
 		gtk_box_pack_start(GTK_BOX(result), label, FALSE, TRUE, 0U);
 	} else {
 		result = gtk_label_new(text);
@@ -617,6 +620,7 @@ create_key_label_with_warn(const gchar *text,
 		gtk_widget_set_hexpand(result, TRUE);
 		gtk_label_set_selectable(GTK_LABEL(result), TRUE);
 		gtk_label_set_line_wrap(GTK_LABEL(result), TRUE);
+		gtk_label_set_xalign(GTK_LABEL(result), 0.0F);
 	}
 
 	return result;

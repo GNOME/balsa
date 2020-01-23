@@ -868,6 +868,8 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
     gtk_label_set_markup(GTK_LABEL(label), msg);
     g_free(msg);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
     gtk_widget_show(label);
 
     gtk_grid_attach_next_to(grid, label, NULL, GTK_POS_BOTTOM, 2, 1);

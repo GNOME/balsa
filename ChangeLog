@@ -1,5 +1,17 @@
 2020-01-23  Albrecht Dreß  <albrecht.dress@arcor.de>
 
+	Crypto eye candies
+
+	* libbalsa/libbalsa-gpgme-widgets.c: improve xalign and yalign properties
+	  of labels in signature and key details widgets
+	* src/balsa-mime-widget-crypto.c: balsa_mime_widget_signature_widget:
+	  wrap/align signature status in expander label;
+	  balsa_mime_widget_crypto_frame: add tooltips to padlock icons
+	* src/balsa-mime-widget-message.c: add_header_sigstate:
+	  wrap/align signature status in headers box
+
+2020-01-23  Albrecht Dreß  <albrecht.dress@arcor.de>
+
 	Bug fix: S/MIME cert chain broken in identity key selection
 
 	* libbalsa/libbalsa-gpgme-widgets.c: libbalsa_gpgme_key(): fall back

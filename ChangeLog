@@ -1,3 +1,12 @@
+2020-01-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Header eye candy
+
+	Albrecht's suggestion!
+
+	* src/balsa-mime-widget-message.c (add_header_gchar): improve
+	xalign property of header value labels.
+
 2020-01-23  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Crypto eye candies

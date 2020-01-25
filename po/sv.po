@@ -1,5 +1,5 @@
 # Swedish messages for balsa.
-# Copyright © 1999-2019 Free Software Foundation, Inc.
+# Copyright © 1999-2020 Free Software Foundation, Inc.
 # Martin Norbäck <d95mback@dtek.chalmers.se>, 1999, 2000.
 # Andreas Hyden <a.hyden@cyberpoint.se>, 2000.
 # Richard Hult <rhult@codefactory.se>, 1999, 2000.
@@ -7,14 +7,14 @@
 # Patrik Wallström <pawal@blipp.com>, 2002.
 # Daniel Nylander <po@danielnylander.se>, 2006, 2007, 2008, 2009, 2010.
 # Josef Andersson <l10nl18nsweja@gmail.com>, 2017, 2018.
-# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2018, 2019.
+# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2018, 2019, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2019-11-18 13:32+0000\n"
-"PO-Revision-Date: 2019-12-22 17:22+0100\n"
+"POT-Creation-Date: 2020-01-23 19:57+0000\n"
+"PO-Revision-Date: 2020-01-25 12:37+0100\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -113,7 +113,7 @@ msgid "Cannot find address in address book"
 msgstr "Det går inte att hitta adressen i adressboken"
 
 #: ../libbalsa/address-book.c:308 ../src/main-window.c:2987
-#: ../src/main-window.c:4107 ../src/sendmsg-window.c:3919
+#: ../src/main-window.c:4114 ../src/sendmsg-window.c:3919
 msgid "Unknown error"
 msgstr "Okänt fel"
 
@@ -187,19 +187,19 @@ msgstr "_E-postadress:"
 msgid "A_dd"
 msgstr "L_ägg till"
 
-#: ../libbalsa/address-view.c:156 ../src/balsa-mime-widget-message.c:766
+#: ../libbalsa/address-view.c:156 ../src/balsa-mime-widget-message.c:767
 #: ../src/balsa-print-object-header.c:146 ../src/sendmsg-window.c:689
 #: ../src/sendmsg-window.c:3614
 msgid "To:"
 msgstr "Till:"
 
-#: ../libbalsa/address-view.c:157 ../src/balsa-mime-widget-message.c:768
+#: ../libbalsa/address-view.c:157 ../src/balsa-mime-widget-message.c:769
 #: ../src/balsa-print-object-header.c:148 ../src/sendmsg-window.c:689
 #: ../src/sendmsg-window.c:3622
 msgid "CC:"
 msgstr "Kopia:"
 
-#: ../libbalsa/address-view.c:158 ../src/balsa-mime-widget-message.c:770
+#: ../libbalsa/address-view.c:158 ../src/balsa-mime-widget-message.c:771
 #: ../src/balsa-print-object-header.c:150 ../src/sendmsg-window.c:689
 msgid "BCC:"
 msgstr "BCC:"
@@ -233,9 +233,9 @@ msgid "Autocrypt database"
 msgstr "Autocrypt-databas"
 
 #: ../libbalsa/autocrypt.c:441 ../libbalsa/html.c:424
-#: ../libbalsa/identity.c:1665 ../libbalsa/libbalsa-gpgme-widgets.c:765
+#: ../libbalsa/identity.c:1665 ../libbalsa/libbalsa-gpgme-widgets.c:775
 #: ../src/ab-window.c:148 ../src/folder-conf.c:346 ../src/mailbox-node.c:1050
-#: ../src/main-window.c:3790 ../src/toolbar-prefs.c:141
+#: ../src/main-window.c:3797 ../src/toolbar-prefs.c:141
 msgid "_Close"
 msgstr "S_täng"
 
@@ -269,17 +269,17 @@ msgstr "”update” av användaren ”%s” misslyckades: %s"
 msgid "insert user “%s” failed: %s"
 msgstr "”insert” av användaren ”%s” misslyckades: %s"
 
-#: ../libbalsa/body.c:118 ../libbalsa/mailbox_local.c:1863
+#: ../libbalsa/body.c:118 ../libbalsa/mailbox_local.c:1876
 #: ../libbalsa/message.c:913 ../libbalsa/message.c:930
 msgid "(No subject)"
 msgstr "(Inget ämne)"
 
-#: ../libbalsa/body.c:388 ../libbalsa/body.c:435
+#: ../libbalsa/body.c:387 ../libbalsa/body.c:434
 #, c-format
 msgid "Failed to create output stream"
 msgstr "Misslyckades med att skapa utdataström"
 
-#: ../libbalsa/body.c:572
+#: ../libbalsa/body.c:571
 #, c-format
 msgid "Could not read embedded message"
 msgstr "Kunde inte läsa inbäddad meddelande"
@@ -335,15 +335,15 @@ msgid "Invalid filters %s for mailbox %s"
 msgstr "Ogiltiga filter %s för postlådan %s"
 
 #. FIXME: this is hack!
-#: ../libbalsa/filter-funcs.c:381 ../src/balsa-index.c:981
+#: ../libbalsa/filter-funcs.c:381 ../src/balsa-index.c:987
 msgid "To"
 msgstr "Till"
 
-#: ../libbalsa/filter-funcs.c:382 ../src/balsa-index.c:348
+#: ../libbalsa/filter-funcs.c:382 ../src/balsa-index.c:377
 msgid "From"
 msgstr "Från"
 
-#: ../libbalsa/filter-funcs.c:383 ../src/balsa-index.c:364
+#: ../libbalsa/filter-funcs.c:383 ../src/balsa-index.c:393
 #: ../src/pref-manager.c:218
 msgid "Subject"
 msgstr "Ämne"
@@ -408,8 +408,8 @@ msgid "Failed to decrypt MIME part: parse error"
 msgstr "Misslyckades att dekryptera MIME-del: tolkningsfel"
 
 #: ../libbalsa/gmime-gpgme-signature.c:147
-#: ../libbalsa/libbalsa-gpgme-widgets.c:350
-#: ../libbalsa/libbalsa-gpgme-widgets.c:670 ../libbalsa/rfc3156.c:693
+#: ../libbalsa/libbalsa-gpgme-widgets.c:357
+#: ../libbalsa/libbalsa-gpgme-widgets.c:680 ../libbalsa/rfc3156.c:693
 #: ../src/address-book-config.c:200
 msgid "never"
 msgstr "aldrig"
@@ -457,10 +457,10 @@ msgstr ""
 "Nyckelfingeravtryck: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:237 ../libbalsa/imap/imap-handle.c:46
-#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc2445.c:110
-#: ../libbalsa/rfc2445.c:798 ../libbalsa/rfc2445.c:816
-#: ../libbalsa/rfc3156.c:689 ../src/folder-conf.c:422
-#: ../src/sendmsg-window.c:5345
+#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc2445.c:415
+#: ../libbalsa/rfc2445.c:444 ../libbalsa/rfc2445.c:467
+#: ../libbalsa/rfc2445.c:1095 ../libbalsa/rfc3156.c:689
+#: ../src/folder-conf.c:422 ../src/sendmsg-window.c:5345
 msgid "unknown"
 msgstr "okänd"
 
@@ -551,8 +551,8 @@ msgid "_Download images"
 msgstr "_Hämta bilder"
 
 #. should "re" be localized ?
-#: ../libbalsa/identity.c:109 ../libbalsa/mailbox_local.c:1986
-#: ../libbalsa/mailbox_local.c:1988 ../src/sendmsg-window.c:3867
+#: ../libbalsa/identity.c:109 ../libbalsa/mailbox_local.c:1999
+#: ../libbalsa/mailbox_local.c:2001 ../src/sendmsg-window.c:3867
 #: ../src/sendmsg-window.c:3869
 msgid "Re:"
 msgstr "Sv:"
@@ -590,7 +590,7 @@ msgstr "Signaturen i ”%s” är inte en UTF-8-text."
 #: ../libbalsa/libbalsa-gpgme-cb.c:355 ../libbalsa/smtp-server.c:337
 #: ../src/ab-main.c:850 ../src/ab-window.c:141 ../src/address-book-config.c:240
 #: ../src/address-book-config.c:346 ../src/address-book-config.c:392
-#: ../src/balsa-app.c:94 ../src/balsa-app.c:163 ../src/balsa-index.c:2689
+#: ../src/balsa-app.c:94 ../src/balsa-app.c:163 ../src/balsa-index.c:2695
 #: ../src/balsa-mblist.c:1885 ../src/balsa-message.c:1757
 #: ../src/balsa-mime-widget-callbacks.c:85 ../src/filter-edit-callbacks.c:1247
 #: ../src/filter-edit-dialog.c:404 ../src/filter-edit-dialog.c:574
@@ -613,7 +613,7 @@ msgstr "_Avbryt"
 #: ../src/balsa-message.c:1758 ../src/balsa-mime-widget-callbacks.c:86
 #: ../src/filter-edit-callbacks.c:1246 ../src/filter-edit-dialog.c:573
 #: ../src/filter-export-dialog.c:79 ../src/filter-run-dialog.c:298
-#: ../src/folder-conf.c:353 ../src/main-window.c:3885
+#: ../src/folder-conf.c:353 ../src/main-window.c:3892
 #: ../src/pref-manager.c:3287 ../src/sendmsg-window.c:1519
 #: ../src/sendmsg-window.c:1973 ../src/sendmsg-window.c:3367
 #: ../src/sendmsg-window.c:4809 ../src/store-address.c:209
@@ -831,7 +831,7 @@ msgstr "Hantera identiteter"
 #: ../src/address-book-config.c:390 ../src/filter-edit-callbacks.c:1248
 #: ../src/filter-edit-dialog.c:575 ../src/filter-export-dialog.c:81
 #: ../src/filter-run-dialog.c:300 ../src/folder-conf.c:481
-#: ../src/folder-conf.c:855 ../src/main-window.c:3789
+#: ../src/folder-conf.c:855 ../src/main-window.c:3796
 #: ../src/pref-manager.c:3290 ../src/toolbar-prefs.c:142
 msgid "_Help"
 msgstr "_Hjälp"
@@ -847,7 +847,7 @@ msgstr "_Ny"
 msgid "_Remove"
 msgstr "_Ta bort"
 
-#: ../libbalsa/identity.c:2048 ../libbalsa/libbalsa-gpgme-widgets.c:471
+#: ../libbalsa/identity.c:2048 ../libbalsa/libbalsa-gpgme-widgets.c:478
 msgid "disabled"
 msgstr "inaktiverad"
 
@@ -1351,170 +1351,172 @@ msgid "The existing key in the key ring was not changed."
 msgstr "Den befintliga nyckeln i nyckelringen ändrades inte."
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:95
-#: ../libbalsa/libbalsa-gpgme-widgets.c:246
+#: ../libbalsa/libbalsa-gpgme-widgets.c:253
 msgid "Key status:"
 msgstr "Nyckelstatus:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:101
 #: ../libbalsa/libbalsa-gpgme-widgets.c:108
-#: ../libbalsa/libbalsa-gpgme-widgets.c:252
-#: ../libbalsa/libbalsa-gpgme-widgets.c:260
+#: ../libbalsa/libbalsa-gpgme-widgets.c:259
+#: ../libbalsa/libbalsa-gpgme-widgets.c:267
 msgid "User ID:"
 msgstr "Användar-ID:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:101
-#: ../libbalsa/libbalsa-gpgme-widgets.c:252
+#: ../libbalsa/libbalsa-gpgme-widgets.c:259
 msgid "None"
 msgstr "Ingen"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:106
-#: ../libbalsa/libbalsa-gpgme-widgets.c:258
+#: ../libbalsa/libbalsa-gpgme-widgets.c:265
 msgid "Primary user ID:"
 msgstr "Primär användar-ID:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:118
-#: ../libbalsa/libbalsa-gpgme-widgets.c:267
+#: ../libbalsa/libbalsa-gpgme-widgets.c:119
+#: ../libbalsa/libbalsa-gpgme-widgets.c:274
 msgid "Key owner trust:"
 msgstr "Tillit för nyckelägaren:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:128
-#: ../libbalsa/libbalsa-gpgme-widgets.c:274
+#: ../libbalsa/libbalsa-gpgme-widgets.c:129
+#: ../libbalsa/libbalsa-gpgme-widgets.c:281
 msgid "Additional User IDs"
 msgstr "Ytterligare användar-ID:n"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:146
-#: ../libbalsa/libbalsa-gpgme-widgets.c:286
+#: ../libbalsa/libbalsa-gpgme-widgets.c:147
+#: ../libbalsa/libbalsa-gpgme-widgets.c:293
 msgid "Issuer"
 msgstr "Utgivare"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:157
-#: ../libbalsa/libbalsa-gpgme-widgets.c:292
+#: ../libbalsa/libbalsa-gpgme-widgets.c:158
+#: ../libbalsa/libbalsa-gpgme-widgets.c:299
 msgid "Name:"
 msgstr "Namn:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:161
-#: ../libbalsa/libbalsa-gpgme-widgets.c:296
+#: ../libbalsa/libbalsa-gpgme-widgets.c:162
+#: ../libbalsa/libbalsa-gpgme-widgets.c:303
 msgid "Serial number:"
 msgstr "Serienummer:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:166
-#: ../libbalsa/libbalsa-gpgme-widgets.c:299
+#: ../libbalsa/libbalsa-gpgme-widgets.c:168
+#: ../libbalsa/libbalsa-gpgme-widgets.c:306
 msgid "Chain ID:"
 msgstr "Kedje-ID:"
 
 #. add button to show the full chain - copy the fingerprint as the key may be unref'ed...
-#: ../libbalsa/libbalsa-gpgme-widgets.c:169
+#: ../libbalsa/libbalsa-gpgme-widgets.c:171
 msgid "view certificate chain…"
 msgstr "visa certifikatkedja…"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:184
-#: ../libbalsa/libbalsa-gpgme-widgets.c:308
+#: ../libbalsa/libbalsa-gpgme-widgets.c:191
+#: ../libbalsa/libbalsa-gpgme-widgets.c:315
 msgid "Subkey used"
 msgstr "Undernyckel använd"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:193
+#: ../libbalsa/libbalsa-gpgme-widgets.c:200
 #, c-format
 msgid "Subkeys (%s only)"
 msgstr "Undernycklar (endast %s)"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:198
+#: ../libbalsa/libbalsa-gpgme-widgets.c:205
 msgid "Subkeys"
 msgstr "Undernycklar"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:322
-#: ../libbalsa/libbalsa-gpgme-widgets.c:642
+#: ../libbalsa/libbalsa-gpgme-widgets.c:329
+#: ../libbalsa/libbalsa-gpgme-widgets.c:652
+#: ../src/balsa-mime-widget-vcalendar.c:188
+#: ../src/balsa-print-object-text.c:545
 msgid "Status:"
 msgstr "Status:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:326
-#: ../libbalsa/libbalsa-gpgme-widgets.c:646
+#: ../libbalsa/libbalsa-gpgme-widgets.c:333
+#: ../libbalsa/libbalsa-gpgme-widgets.c:656
 msgid "Fingerprint:"
 msgstr "Fingeravtryck:"
 
 #. add type and filename (if available)
-#: ../libbalsa/libbalsa-gpgme-widgets.c:329
-#: ../libbalsa/libbalsa-gpgme-widgets.c:649
+#: ../libbalsa/libbalsa-gpgme-widgets.c:336
+#: ../libbalsa/libbalsa-gpgme-widgets.c:659
 #: ../src/balsa-print-object-default.c:112
 #: ../src/balsa-print-object-default.c:115
 #: ../src/balsa-print-object-default.c:118
 msgid "Type:"
 msgstr "Typ:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:335
-#: ../libbalsa/libbalsa-gpgme-widgets.c:655
+#: ../libbalsa/libbalsa-gpgme-widgets.c:342
+#: ../libbalsa/libbalsa-gpgme-widgets.c:665
 msgid "Capabilities:"
 msgstr "Förmågor:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:340
-#: ../libbalsa/libbalsa-gpgme-widgets.c:660
+#: ../libbalsa/libbalsa-gpgme-widgets.c:347
+#: ../libbalsa/libbalsa-gpgme-widgets.c:670
 msgid "invalid timestamp"
 msgstr "ogiltig tidsstämpel"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:342
-#: ../libbalsa/libbalsa-gpgme-widgets.c:662
+#: ../libbalsa/libbalsa-gpgme-widgets.c:349
+#: ../libbalsa/libbalsa-gpgme-widgets.c:672
 msgid "not available"
 msgstr "ej tillgänglig"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:346
-#: ../libbalsa/libbalsa-gpgme-widgets.c:666
-#: ../src/balsa-mime-widget-vcalendar.c:183
+#: ../libbalsa/libbalsa-gpgme-widgets.c:353
+#: ../libbalsa/libbalsa-gpgme-widgets.c:676
+#: ../src/balsa-mime-widget-vcalendar.c:191
 #: ../src/balsa-print-object-text.c:548
 msgid "Created:"
 msgstr "Skapad:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:354
-#: ../libbalsa/libbalsa-gpgme-widgets.c:674
+#: ../libbalsa/libbalsa-gpgme-widgets.c:361
+#: ../libbalsa/libbalsa-gpgme-widgets.c:684
 msgid "Expires:"
 msgstr "Utgår:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:386 ../src/toolbar-factory.c:142
+#: ../libbalsa/libbalsa-gpgme-widgets.c:393 ../src/toolbar-factory.c:142
 msgid "Close"
 msgstr "Stäng"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:390
+#: ../libbalsa/libbalsa-gpgme-widgets.c:397
 msgid "No"
 msgstr "Nej"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:390
+#: ../libbalsa/libbalsa-gpgme-widgets.c:397
 msgid "Yes"
 msgstr "Ja"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:465
+#: ../libbalsa/libbalsa-gpgme-widgets.c:472
 msgid "revoked"
 msgstr "återkallad"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:468
+#: ../libbalsa/libbalsa-gpgme-widgets.c:475
 msgid "expired"
 msgstr "utgången"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:474
+#: ../libbalsa/libbalsa-gpgme-widgets.c:481
 msgid "invalid"
 msgstr "ogiltig"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:704
+#: ../libbalsa/libbalsa-gpgme-widgets.c:714
 msgid "sign"
 msgstr "signera"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:707
+#: ../libbalsa/libbalsa-gpgme-widgets.c:717
 msgid "encrypt"
 msgstr "kryptera"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:710
+#: ../libbalsa/libbalsa-gpgme-widgets.c:720
 msgid "certify"
 msgstr "certifiera"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:713
+#: ../libbalsa/libbalsa-gpgme-widgets.c:723
 msgid "authenticate"
 msgstr "autentisera"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:734
+#: ../libbalsa/libbalsa-gpgme-widgets.c:744
 #, c-format
 msgid "%u bit"
 msgid_plural "%u bits"
 msgstr[0] "%u bit"
 msgstr[1] "%u bitar"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:740
+#: ../libbalsa/libbalsa-gpgme-widgets.c:750
 #, c-format
 msgid " curve “%s”"
 msgstr " kurvan ”%s”"
@@ -1543,65 +1545,65 @@ msgstr "Öppna med %s"
 msgid "Open _part with %s"
 msgstr "Öppna _del med %s"
 
-#: ../libbalsa/mailbox.c:514
+#: ../libbalsa/mailbox.c:519
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "Det går inte att läsa in postlådan %s"
 
-#: ../libbalsa/mailbox.c:521
+#: ../libbalsa/mailbox.c:526
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "Det finns ingen sådan postlådetyp: %s"
 
-#: ../libbalsa/mailbox.c:538
+#: ../libbalsa/mailbox.c:543
 #, c-format
 msgid "Bad local mailbox path “%s”"
 msgstr "Felaktig lokal postlådesökväg ”%s”"
 
-#: ../libbalsa/mailbox.c:548
+#: ../libbalsa/mailbox.c:553
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "Kunde inte skapa en postlåda av typen %s"
 
-#: ../libbalsa/mailbox.c:877
+#: ../libbalsa/mailbox.c:895
 #, c-format
 msgid "Applying filter rules to %s"
 msgstr "Verkställer filterregler på %s"
 
-#: ../libbalsa/mailbox.c:1046
+#: ../libbalsa/mailbox.c:1072
 #, c-format
 msgid "Copying from %s to %s"
 msgstr "Kopierar från %s till %s"
 
-#: ../libbalsa/mailbox.c:1984
+#: ../libbalsa/mailbox.c:2010
 #, c-format
 msgid "libbalsa_mailbox_get_message: mailbox %s is closed"
 msgstr "libbalsa_mailbox_get_message: postlådan %s är stängd"
 
-#: ../libbalsa/mailbox.c:2193
+#: ../libbalsa/mailbox.c:2219
 #, c-format
 msgid "Removing messages from source mailbox failed"
 msgstr "Borttagning av meddelanden från källpostlådan misslyckades"
 
-#: ../libbalsa/mailbox.c:3169
+#: ../libbalsa/mailbox.c:3196
 msgid "from unknown"
 msgstr "från okänd"
 
-#: ../libbalsa/mailbox.c:3171
+#: ../libbalsa/mailbox.c:3198
 msgid "Loading…"
 msgstr "Läser in…"
 
 # Osäker på denna.
-#: ../libbalsa/mailbox.c:4221
+#: ../libbalsa/mailbox.c:4248
 #, c-format
 msgid "Searching %s for partial messages"
 msgstr "Söker i %s efter ej kompletta meddelanden"
 
-#: ../libbalsa/mailbox.c:4311
+#: ../libbalsa/mailbox.c:4338
 msgid "Reconstructing message"
 msgstr "Rekonstruerar meddelande"
 
-#: ../libbalsa/mailbox.c:4580
+#: ../libbalsa/mailbox.c:4607
 #, c-format
 msgid "Finding duplicate messages in source mailbox failed"
 msgstr "Sökning efter dubblettmeddelanden i källpostlådan misslyckades"
@@ -1713,22 +1715,22 @@ msgstr "Misslyckades med att läsa cachefilen %s: %s"
 msgid "Cache file for mailbox %s will be repaired"
 msgstr "Cachefil för postlådan %s kommer att repareras"
 
-#: ../libbalsa/mailbox_local.c:1256
+#: ../libbalsa/mailbox_local.c:1274
 #, c-format
 msgid "Filtering %s"
 msgstr "Filtrerar %s"
 
-#: ../libbalsa/mailbox_local.c:1347
+#: ../libbalsa/mailbox_local.c:1364
 #, c-format
 msgid "Preparing %s"
 msgstr "Förbereder %s"
 
-#: ../libbalsa/mailbox_local.c:2100
+#: ../libbalsa/mailbox_local.c:2113
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Öppnande av %s misslyckades. Felnummer = %d, "
 
-#: ../libbalsa/mailbox_local.c:2123
+#: ../libbalsa/mailbox_local.c:2136
 #, c-format
 msgid "Failed to sync mailbox “%s”"
 msgstr "Misslyckades med att synkronisera postlådan ”%s”"
@@ -2058,63 +2060,334 @@ msgstr "Väntar på flock-lås… %d"
 msgid "LDAP Directory for %s"
 msgstr "LDAP-katalog för %s"
 
-#: ../libbalsa/rfc2445.c:111
-msgid "needs action"
-msgstr "kräver åtgärd"
+#: ../libbalsa/rfc2445.c:364
+msgid "week"
+msgid_plural "weeks"
+msgstr[0] "vecka"
+msgstr[1] "veckor"
 
-#: ../libbalsa/rfc2445.c:112
-msgid "accepted"
-msgstr "accepterad"
+#: ../libbalsa/rfc2445.c:371 ../libbalsa/rfc2445.c:696
+#: ../libbalsa/rfc2445.c:700 ../libbalsa/rfc2445.c:743
+msgid "day"
+msgid_plural "days"
+msgstr[0] "dag"
+msgstr[1] "dagar"
 
-#: ../libbalsa/rfc2445.c:113
-msgid "declined"
-msgstr "nekad"
+#: ../libbalsa/rfc2445.c:378
+msgid "hour"
+msgid_plural "hours"
+msgstr[0] "timme"
+msgstr[1] "timmar"
 
-#: ../libbalsa/rfc2445.c:114
-msgid "tentatively accepted"
-msgstr "preliminärt accepterad"
+#: ../libbalsa/rfc2445.c:385
+msgid "minute"
+msgid_plural "minutes"
+msgstr[0] "minut"
+msgstr[1] "minuter"
 
-#: ../libbalsa/rfc2445.c:115
-msgid "delegated"
-msgstr "delegerad"
+#: ../libbalsa/rfc2445.c:392
+msgid "second"
+msgid_plural "seconds"
+msgstr[0] "sekund"
+msgstr[1] "sekunder"
 
-#: ../libbalsa/rfc2445.c:116
-msgid "completed"
-msgstr "färdig"
+#: ../libbalsa/rfc2445.c:416
+msgid "event is tentative"
+msgstr "händelse är preliminär"
 
-#: ../libbalsa/rfc2445.c:117
-msgid "in process"
-msgstr "pågår"
+#: ../libbalsa/rfc2445.c:417
+msgid "event is definite"
+msgstr "händelse är slutgiltig"
 
-#: ../libbalsa/rfc2445.c:799
+#: ../libbalsa/rfc2445.c:418
+msgid "event was cancelled"
+msgstr "händelse avbröts"
+
+#: ../libbalsa/rfc2445.c:445
 msgid "Event Notification"
 msgstr "Händelsenotifiering"
 
-#: ../libbalsa/rfc2445.c:800
+#: ../libbalsa/rfc2445.c:446
 msgid "Event Request"
 msgstr "Händelsebegäran"
 
-#: ../libbalsa/rfc2445.c:801
+#: ../libbalsa/rfc2445.c:447
 msgid "Reply to Event Request"
 msgstr "Svara på händelsebegäran"
 
-#: ../libbalsa/rfc2445.c:802
+#: ../libbalsa/rfc2445.c:448
 msgid "Event Cancellation"
 msgstr "Avbryt händelse"
 
-#: ../libbalsa/rfc2445.c:817
+#: ../libbalsa/rfc2445.c:468
+msgid "needs action"
+msgstr "kräver åtgärd"
+
+#: ../libbalsa/rfc2445.c:469
+msgid "accepted"
+msgstr "accepterad"
+
+#: ../libbalsa/rfc2445.c:470
+msgid "declined"
+msgstr "nekad"
+
+#: ../libbalsa/rfc2445.c:471
+msgid "tentatively accepted"
+msgstr "preliminärt accepterad"
+
+#: ../libbalsa/rfc2445.c:472
+msgid "delegated"
+msgstr "delegerad"
+
+#: ../libbalsa/rfc2445.c:515
+msgid "Sunday"
+msgstr "söndag"
+
+#: ../libbalsa/rfc2445.c:515
+msgid "Monday"
+msgstr "måndag"
+
+#: ../libbalsa/rfc2445.c:515
+msgid "Tuesday"
+msgstr "tisdag"
+
+#: ../libbalsa/rfc2445.c:515
+msgid "Wednesday"
+msgstr "onsdag"
+
+#: ../libbalsa/rfc2445.c:515
+msgid "Thursday"
+msgstr "torsdag"
+
+#: ../libbalsa/rfc2445.c:515
+msgid "Friday"
+msgstr "fredag"
+
+#: ../libbalsa/rfc2445.c:515
+msgid "Saturday"
+msgstr "lördag"
+
+#: ../libbalsa/rfc2445.c:546
+msgid "every weekday"
+msgstr "varje vardag"
+
+#: ../libbalsa/rfc2445.c:548
+msgid "every day"
+msgstr "varje dag"
+
+#: ../libbalsa/rfc2445.c:550
+#, c-format
+msgid "every %d days"
+msgstr "var %d dag"
+
+#: ../libbalsa/rfc2445.c:565
+msgid "every "
+msgstr "varje "
+
+#: ../libbalsa/rfc2445.c:567
+#, c-format
+msgid "every %d weeks on "
+msgstr "var %d vecka på "
+
+#: ../libbalsa/rfc2445.c:574 ../libbalsa/rfc2445.c:676
+#, c-format
+msgid " and %s"
+msgstr " och %s"
+
+#: ../libbalsa/rfc2445.c:579
+msgid "every week"
+msgstr "varje vecka"
+
+#: ../libbalsa/rfc2445.c:581
+#, c-format
+msgid "every %d weeks"
+msgstr "var %d vecka"
+
+#: ../libbalsa/rfc2445.c:592
+msgid "the last"
+msgstr "den sista"
+
+#: ../libbalsa/rfc2445.c:599
+#, c-format
+msgid "%dst"
+msgstr "%d:a"
+
+#: ../libbalsa/rfc2445.c:602
+#, c-format
+msgid "%dnd"
+msgstr "%d:a"
+
+#: ../libbalsa/rfc2445.c:605
+#, c-format
+msgid "%drd"
+msgstr "%d:e"
+
+#: ../libbalsa/rfc2445.c:608
+#, c-format
+msgid "%dth"
+msgstr "%d:e"
+
+#: ../libbalsa/rfc2445.c:626
+msgid "every day of every month"
+msgstr "varje dag i varje månad"
+
+#: ../libbalsa/rfc2445.c:628
+#, c-format
+msgid "every day of the month every %d months"
+msgstr "varje dag i månaden var %d månad"
+
+#. currently we don't support yearly rules with more than one BYDAY element or exactly 7 elements with all the weekdays
+#. * (the "every day" case)
+#: ../libbalsa/rfc2445.c:643 ../libbalsa/rfc2445.c:687
+#: ../libbalsa/rfc2445.c:724 ../libbalsa/rfc2445.c:786
+#: ../libbalsa/rfc2445.c:791 ../libbalsa/rfc2445.c:794
+msgid "rule too complex"
+msgstr "regeln är för komplex"
+
+#: ../libbalsa/rfc2445.c:649
+#, c-format
+msgid "every %s"
+msgstr "varje %s"
+
+#: ../libbalsa/rfc2445.c:693
+msgid " and "
+msgstr " och "
+
+#: ../libbalsa/rfc2445.c:704
+msgid " of every month"
+msgstr " i varje månad"
+
+#: ../libbalsa/rfc2445.c:706
+#, c-format
+msgid " of every %d months"
+msgstr " i var %d månad"
+
+#: ../libbalsa/rfc2445.c:717
+msgid "January"
+msgstr "januari"
+
+#: ../libbalsa/rfc2445.c:717
+msgid "February"
+msgstr "februari"
+
+#: ../libbalsa/rfc2445.c:717
+msgid "March"
+msgstr "mars"
+
+#: ../libbalsa/rfc2445.c:717
+msgid "April"
+msgstr "april"
+
+#: ../libbalsa/rfc2445.c:717
+msgid "May"
+msgstr "maj"
+
+#: ../libbalsa/rfc2445.c:717
+msgid "June"
+msgstr "juni"
+
+#: ../libbalsa/rfc2445.c:718
+msgid "July"
+msgstr "juli"
+
+#: ../libbalsa/rfc2445.c:718
+msgid "August"
+msgstr "augusti"
+
+#: ../libbalsa/rfc2445.c:718
+msgid "September"
+msgstr "september"
+
+#: ../libbalsa/rfc2445.c:718
+msgid "October"
+msgstr "oktober"
+
+#: ../libbalsa/rfc2445.c:718
+msgid "November"
+msgstr "november"
+
+#: ../libbalsa/rfc2445.c:718
+msgid "December"
+msgstr "december"
+
+#: ../libbalsa/rfc2445.c:746
+#, fuzzy, c-format
+msgid "every %s %s"
+msgstr "varje %s %s"
+
+#: ../libbalsa/rfc2445.c:748
+#, fuzzy, c-format
+msgid "every %d years on %s %s"
+msgstr "var %d år den %s %s"
+
+#: ../libbalsa/rfc2445.c:758
+#, c-format
+msgid "every day of %s"
+msgstr "varje dag i %s"
+
+#: ../libbalsa/rfc2445.c:760
+#, c-format
+msgid "every %d years every day of %s"
+msgstr "var %d år varje dag i %s"
+
+#: ../libbalsa/rfc2445.c:770
+#, c-format
+msgid "every %s of %s"
+msgstr "varje %s i %s"
+
+#: ../libbalsa/rfc2445.c:772
+#, c-format
+msgid "every %d years on every %s of %s"
+msgstr "var %d år på varje %s i %s"
+
+#: ../libbalsa/rfc2445.c:780
+#, fuzzy, c-format
+msgid "the %s of every %s"
+msgstr "%s varje %s"
+
+#: ../libbalsa/rfc2445.c:782
+#, fuzzy, c-format
+msgid "every %d years on the %s of %s"
+msgstr "var %d år på %s av %s"
+
+#: ../libbalsa/rfc2445.c:813
+msgid "secondly"
+msgstr "varje sekund"
+
+#: ../libbalsa/rfc2445.c:816
+msgid "minutely"
+msgstr "varje minut"
+
+#: ../libbalsa/rfc2445.c:819
+msgid "hourly"
+msgstr "varje timme"
+
+#: ../libbalsa/rfc2445.c:840
+msgid "occurrence"
+msgstr "förekomst"
+
+#: ../libbalsa/rfc2445.c:840
+msgid "occurrences"
+msgstr "förekomster"
+
+#: ../libbalsa/rfc2445.c:845
+#, c-format
+msgid " until %s"
+msgstr " till %s"
+
+#: ../libbalsa/rfc2445.c:1096
 msgid "chair"
 msgstr "ansvarig"
 
-#: ../libbalsa/rfc2445.c:818
+#: ../libbalsa/rfc2445.c:1097
 msgid "required participant"
 msgstr "nödvändig deltagare"
 
-#: ../libbalsa/rfc2445.c:819
+#: ../libbalsa/rfc2445.c:1098
 msgid "optional participant"
 msgstr "valfri deltagare"
 
-#: ../libbalsa/rfc2445.c:820
+#: ../libbalsa/rfc2445.c:1099
 msgid "non-participant, information only"
 msgstr "icke-deltagare, endast för information"
 
@@ -2355,7 +2628,7 @@ msgstr "_Kom ihåg lösenfras för certifikat i Secret Service"
 
 #: ../libbalsa/server-config.c:80
 msgid "_Remember user password"
-msgstr "_Kom ihåg användarlösenord:"
+msgstr "_Kom ihåg användarlösenord"
 
 #: ../libbalsa/server-config.c:81
 msgid "_Remember certificate pass phrase"
@@ -2456,23 +2729,28 @@ msgstr "Postlådan stängd"
 msgid "Message Source"
 msgstr "Meddelandekällkod"
 
-#: ../libbalsa/source-viewer.c:230 ../src/main-window.c:2107
+#: ../libbalsa/source-viewer.c:230 ../src/main-window.c:2109
 #: ../src/message-window.c:840
 #, c-format
 msgid "Error adding from %s: %s\n"
 msgstr "Fel vid tillägg från %s: %s\n"
 
-#: ../libbalsa/x509-cert-widget.c:275
+#: ../libbalsa/x509-cert-widget.c:134
+#, fuzzy
+msgid "Broken key, cannot identify certificate chain."
+msgstr "Felaktig nyckel, det går inte att identifiera certifikatkedja."
+
+#: ../libbalsa/x509-cert-widget.c:280
 #, c-format
 msgid "fingerprint %s"
 msgstr "fingeravtryck %s"
 
-#: ../libbalsa/x509-cert-widget.c:276
+#: ../libbalsa/x509-cert-widget.c:281
 #, c-format
 msgid "cannot load key with fingerprint %s: %s"
 msgstr "det går inte att läsa in nyckeln med fingeravtryck %s: %s"
 
-#: ../libbalsa/x509-cert-widget.c:477
+#: ../libbalsa/x509-cert-widget.c:482
 msgid ""
 "\n"
 "<b>This certificate was issued by:</b>\n"
@@ -2480,7 +2758,7 @@ msgstr ""
 "\n"
 "<b>Detta certifikat utfärdades av:</b>\n"
 
-#: ../libbalsa/x509-cert-widget.c:486
+#: ../libbalsa/x509-cert-widget.c:491
 #, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
@@ -2912,7 +3190,7 @@ msgstr "_Adress"
 
 #: ../src/ab-main.c:840 ../src/address-book-config.c:229
 #: ../src/address-book-config.c:335 ../src/address-book-config.c:379
-#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3849
+#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3856
 #: ../src/pref-manager.c:3288
 msgid "_Apply"
 msgstr "_Verkställ"
@@ -3078,8 +3356,8 @@ msgstr "Aktivera _TLS"
 msgid "GPE Address Book"
 msgstr "GPE-adressbok"
 
-#: ../src/address-book-config.c:611 ../src/main-window.c:999
-#: ../src/main-window.c:3962
+#: ../src/address-book-config.c:611 ../src/main-window.c:1001
+#: ../src/main-window.c:3969
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Fel vid visning av hjälp: %s\n"
@@ -3149,135 +3427,135 @@ msgstr "Lösenord:"
 msgid "Couldn’t open mailbox “%s”"
 msgstr "Kunde inte öppna postlådan ”%s”"
 
-#: ../src/balsa-index.c:381 ../src/pref-manager.c:219
+#: ../src/balsa-index.c:410 ../src/pref-manager.c:219
 msgid "Date"
 msgstr "Datum"
 
-#: ../src/balsa-index.c:396 ../src/pref-manager.c:220
+#: ../src/balsa-index.c:425 ../src/pref-manager.c:220
 #: ../src/sendmsg-window.c:2664
 msgid "Size"
 msgstr "Storlek"
 
-#: ../src/balsa-index.c:1563
+#: ../src/balsa-index.c:1571
 #, c-format
 msgid "Reply to Group: %d message is not from a mailing list."
 msgid_plural "Reply to Group: %d messages are not from a mailing list."
 msgstr[0] "Svara grupp: %d meddelande är inte från en sändlista."
 msgstr[1] "Svara grupp: %d meddelanden är inte från en sändlista."
 
-#: ../src/balsa-index.c:1664
+#: ../src/balsa-index.c:1672
 #, c-format
 msgid "Move to Trash failed: %s"
 msgstr "Flyttning till papperskorg misslyckades: %s"
 
-#: ../src/balsa-index.c:1824
+#: ../src/balsa-index.c:1832
 msgid "_Reply…"
 msgstr "_Svara…"
 
-#: ../src/balsa-index.c:1826
+#: ../src/balsa-index.c:1834
 msgid "Reply To _All…"
 msgstr "Svara _alla…"
 
-#: ../src/balsa-index.c:1828
+#: ../src/balsa-index.c:1836
 msgid "Reply To _Group…"
 msgstr "Svara _grupp…"
 
-#: ../src/balsa-index.c:1830
+#: ../src/balsa-index.c:1838
 msgid "_Forward Attached…"
 msgstr "_Vidarebefordra bifogad…"
 
-#: ../src/balsa-index.c:1832
+#: ../src/balsa-index.c:1840
 msgid "Forward _Inline…"
 msgstr "Vidarebefordra _infogat…"
 
-#: ../src/balsa-index.c:1834
+#: ../src/balsa-index.c:1842
 msgid "_Pipe through…"
 msgstr "Kör genom _rör…"
 
-#: ../src/balsa-index.c:1836
+#: ../src/balsa-index.c:1844
 msgid "_Store Address…"
 msgstr "_Lagra adress…"
 
-#: ../src/balsa-index.c:1850 ../src/mailbox-node.c:1042
+#: ../src/balsa-index.c:1858 ../src/mailbox-node.c:1042
 #: ../src/mailbox-node.c:1058 ../src/pref-manager.c:2028
 #: ../src/pref-manager.c:2113 ../src/pref-manager.c:2793
 msgid "_Delete"
 msgstr "_Ta bort"
 
-#: ../src/balsa-index.c:1854
+#: ../src/balsa-index.c:1862
 msgid "_Undelete"
 msgstr "_Återskapa"
 
-#: ../src/balsa-index.c:1858
+#: ../src/balsa-index.c:1866
 msgid "Move To _Trash"
 msgstr "Flytta till _papperskorgen"
 
-#: ../src/balsa-index.c:1862
+#: ../src/balsa-index.c:1870
 msgid "T_oggle"
 msgstr "Vä_xla"
 
-#: ../src/balsa-index.c:1865
+#: ../src/balsa-index.c:1873
 msgid "_Flagged"
 msgstr "_Flaggad"
 
-#: ../src/balsa-index.c:1868
+#: ../src/balsa-index.c:1876
 msgid "_Unread"
 msgstr "_Olästa"
 
-#: ../src/balsa-index.c:1876
+#: ../src/balsa-index.c:1884
 msgid "_Move to"
 msgstr "_Flytta till"
 
-#: ../src/balsa-index.c:1883
+#: ../src/balsa-index.c:1891
 msgid "_View Source"
 msgstr "_Visa källa"
 
-#: ../src/balsa-index.c:2144
+#: ../src/balsa-index.c:2161
 #, c-format
 msgid "Failed to copy %d message to mailbox “%s”: %s"
 msgid_plural "Failed to copy %d messages to mailbox “%s”: %s"
 msgstr[0] "Misslyckades med att kopiera %d meddelande till postlådan ”%s”: %s"
 msgstr[1] "Misslyckades med att kopiera %d meddelanden till postlådan ”%s”: %s"
 
-#: ../src/balsa-index.c:2156
+#: ../src/balsa-index.c:2173
 #, c-format
 msgid "Copied to “%s”."
 msgstr "Kopierad till ”%s”."
 
-#: ../src/balsa-index.c:2157
+#: ../src/balsa-index.c:2174
 #, c-format
 msgid "Moved to “%s”."
 msgstr "Flyttad till ”%s”."
 
-#: ../src/balsa-index.c:2259
+#: ../src/balsa-index.c:2265
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Ändring av postlådan %s misslyckades."
 
-#: ../src/balsa-index.c:2368
+#: ../src/balsa-index.c:2374
 #, c-format
 msgid "Cannot process the message: %s"
 msgstr "Kan inte behandla meddelandet: %s"
 
-#: ../src/balsa-index.c:2484
+#: ../src/balsa-index.c:2490
 #, c-format
 msgid "Cannot access message %u to pass to %s"
 msgstr "Kunde inte komma åt meddelande %u för att skicka till %s"
 
-#: ../src/balsa-index.c:2511
+#: ../src/balsa-index.c:2517
 #, c-format
 msgid "Cannot read message %u to pass to %s"
 msgstr "Kan inte läsa meddelande %u för att skicka till %s"
 
-#: ../src/balsa-index.c:2684
+#: ../src/balsa-index.c:2690
 msgid "Pipe message through a program"
 msgstr "Kör meddelandet genom ett program"
 
-#: ../src/balsa-index.c:2688
+#: ../src/balsa-index.c:2694
 msgid "_Run"
 msgstr "_Kör"
 
-#: ../src/balsa-index.c:2700
+#: ../src/balsa-index.c:2706
 msgid "Specify the program to run:"
 msgstr "Ange det program som ska köras:"
 
@@ -3350,7 +3628,7 @@ msgstr "(Ingen avsändare)"
 msgid "Could not access message %u in mailbox “%s”."
 msgstr "Kunde inte komma åt meddelandet %u i postlådan ”%s”."
 
-#: ../src/balsa-message.c:1203 ../src/main.c:543
+#: ../src/balsa-message.c:1203 ../src/main.c:542
 #, c-format
 msgid "Autocrypt error: %s"
 msgstr "Autocrypt-fel: %s"
@@ -3587,32 +3865,32 @@ msgstr ""
 msgid "Please close the other instances of this message and try again."
 msgstr "Stäng de andra instanserna av det här meddelandet och försök igen."
 
-#: ../src/balsa-mime-widget.c:205 ../src/balsa-mime-widget-message.c:189
+#: ../src/balsa-mime-widget.c:204 ../src/balsa-mime-widget-message.c:189
 #: ../src/balsa-mime-widget-message.c:235
 #, c-format
 msgid "File name: %s"
 msgstr "Filnamn: %s"
 
-#: ../src/balsa-mime-widget.c:221
+#: ../src/balsa-mime-widget.c:220
 #, c-format
 msgid "Error reading message part: %s"
 msgstr "Fel vid läsning av meddelandedel: %s"
 
-#: ../src/balsa-mime-widget.c:253
+#: ../src/balsa-mime-widget.c:252
 #, c-format
 msgid "Type: %s (%s)"
 msgstr "Typ: %s (%s)"
 
-#: ../src/balsa-mime-widget.c:257
+#: ../src/balsa-mime-widget.c:256
 #, c-format
 msgid "Content Type: %s"
 msgstr "Innehållstyp: %s"
 
-#: ../src/balsa-mime-widget.c:271
+#: ../src/balsa-mime-widget.c:270
 msgid "No open or view action defined for this content type"
 msgstr "Inga öppna- eller visa-åtgärder är definierade för denna innehållstyp"
 
-#: ../src/balsa-mime-widget.c:276
+#: ../src/balsa-mime-widget.c:275
 msgid "S_ave part"
 msgstr "Spa_ra del"
 
@@ -3662,7 +3940,31 @@ msgstr "_Sök på nyckelserver efter denna nyckel"
 msgid "_Search key server for updates of this key"
 msgstr "_Sök på nyckelserver efter uppdateringar för denna nyckel"
 
-#: ../src/balsa-mime-widget-crypto.c:286
+#: ../src/balsa-mime-widget-crypto.c:194
+msgid "decrypted"
+msgstr "dekrypterad"
+
+#: ../src/balsa-mime-widget-crypto.c:207
+#, fuzzy
+msgid "trusted signature"
+msgstr "betrodd signatur"
+
+#: ../src/balsa-mime-widget-crypto.c:210
+#, fuzzy
+#| msgid "_Execute signature"
+msgid "low trust signature"
+msgstr "_Exekvera signatur"
+
+#: ../src/balsa-mime-widget-crypto.c:213
+#, fuzzy
+msgid "bad signature"
+msgstr "dålig signatur"
+
+#: ../src/balsa-mime-widget-crypto.c:216
+msgid "unknown signature status"
+msgstr "okänd signaturstatus"
+
+#: ../src/balsa-mime-widget-crypto.c:302
 #, c-format
 msgid ""
 "Import GnuPG key:\n"
@@ -3671,20 +3973,20 @@ msgstr ""
 "Importera GnuPG-nyckel:\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:293
+#: ../src/balsa-mime-widget-crypto.c:309
 #, c-format
 msgid "Error importing key data: %s"
 msgstr "Fel vid import av nyckeldata: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:293 ../src/sendmsg-window.c:1693
+#: ../src/balsa-mime-widget-crypto.c:309 ../src/sendmsg-window.c:1693
 msgid "unknown error"
 msgstr "okänt fel"
 
-#: ../src/balsa-mime-widget-crypto.c:330
+#: ../src/balsa-mime-widget-crypto.c:346
 msgid "(imported)"
 msgstr "(importerad)"
 
-#: ../src/balsa-mime-widget-crypto.c:338
+#: ../src/balsa-mime-widget-crypto.c:354
 msgid "Import key into the local key ring"
 msgstr "Importera nyckeln till den lokala nyckelringen"
 
@@ -3773,42 +4075,42 @@ msgid "Reply…"
 msgstr "Svara…"
 
 #. Gmail sometimes fails to do that.
-#: ../src/balsa-mime-widget-message.c:732
+#: ../src/balsa-mime-widget-message.c:733
 msgid "Error:"
 msgstr "Fel:"
 
-#: ../src/balsa-mime-widget-message.c:733
+#: ../src/balsa-mime-widget-message.c:734
 msgid "IMAP server did not report message structure"
 msgstr "IMAP-servern rapporterade inte meddelandestrukturen"
 
-#: ../src/balsa-mime-widget-message.c:744
+#: ../src/balsa-mime-widget-message.c:745
 #: ../src/balsa-print-object-header.c:131 ../src/sendmsg-window.c:718
 #: ../src/sendmsg-window.c:720 ../src/sendmsg-window.c:811
 #: ../src/sendmsg-window.c:3599 ../src/sendmsg-window.c:5146
 msgid "Subject:"
 msgstr "Ämne:"
 
-#: ../src/balsa-mime-widget-message.c:749
+#: ../src/balsa-mime-widget-message.c:750
 #: ../src/balsa-print-object-header.c:139 ../src/sendmsg-window.c:3595
 msgid "Date:"
 msgstr "Datum:"
 
 #. addresses
-#: ../src/balsa-mime-widget-message.c:755
+#: ../src/balsa-mime-widget-message.c:756
 #: ../src/balsa-print-object-header.c:144 ../src/sendmsg-window.c:3606
 msgid "From:"
 msgstr "Från:"
 
-#: ../src/balsa-mime-widget-message.c:762
+#: ../src/balsa-mime-widget-message.c:763
 msgid "Reply-To:"
 msgstr "Svara-till:"
 
-#: ../src/balsa-mime-widget-message.c:775
+#: ../src/balsa-mime-widget-message.c:776
 #: ../src/balsa-print-object-header.c:152
 msgid "FCC:"
 msgstr "FCC:"
 
-#: ../src/balsa-mime-widget-message.c:783
+#: ../src/balsa-mime-widget-message.c:784
 #: ../src/balsa-print-object-header.c:155
 msgid "Disposition-Notification-To:"
 msgstr "Dispositionsbekräftelse-till:"
@@ -3896,69 +4198,87 @@ msgstr ""
 "men inget huvud som beskriver den teckenkodning som använts (konverterade "
 "till %s)"
 
-#: ../src/balsa-mime-widget-vcalendar.c:64
+#: ../src/balsa-mime-widget-vcalendar.c:65 ../src/balsa-print-object-text.c:534
 #, c-format
 msgid "This is an iTIP calendar “%s” message."
 msgstr "Det här är ett iTIP-kalender ”%s”-meddelande."
 
-#: ../src/balsa-mime-widget-vcalendar.c:181
-#: ../src/balsa-print-object-text.c:546
+#: ../src/balsa-mime-widget-vcalendar.c:186
+#: ../src/balsa-print-object-text.c:543
 msgid "Summary:"
 msgstr "Sammandrag:"
 
-#: ../src/balsa-mime-widget-vcalendar.c:182
+#: ../src/balsa-mime-widget-vcalendar.c:190
 #: ../src/balsa-print-object-text.c:547
 msgid "Organizer:"
 msgstr "Organisatör:"
 
-#: ../src/balsa-mime-widget-vcalendar.c:184
+#: ../src/balsa-mime-widget-vcalendar.c:192
 #: ../src/balsa-print-object-text.c:549
 msgid "Start:"
 msgstr "Start:"
 
-#: ../src/balsa-mime-widget-vcalendar.c:185
+#: ../src/balsa-mime-widget-vcalendar.c:193
 #: ../src/balsa-print-object-text.c:550
 msgid "End:"
 msgstr "Slut:"
 
-#: ../src/balsa-mime-widget-vcalendar.c:186
-#: ../src/balsa-print-object-text.c:551
+#: ../src/balsa-mime-widget-vcalendar.c:197
+#: ../src/balsa-print-object-text.c:554
+#, fuzzy
+msgid "Duration:"
+msgstr "Längd:"
+
+#: ../src/balsa-mime-widget-vcalendar.c:203
+#: ../src/balsa-print-object-text.c:560
+msgid "Recurrence:"
+msgstr "Upprepning:"
+
+#: ../src/balsa-mime-widget-vcalendar.c:207
+#: ../src/balsa-print-object-text.c:564
 msgid "Location:"
 msgstr "Plats:"
 
-#: ../src/balsa-mime-widget-vcalendar.c:215
-#: ../src/balsa-print-object-text.c:559
+#: ../src/balsa-mime-widget-vcalendar.c:236
+#: ../src/balsa-print-object-text.c:573
 msgid "Attendee:"
 msgid_plural "Attendees:"
 msgstr[0] "Deltagare:"
 msgstr[1] "Deltagare:"
 
-#: ../src/balsa-mime-widget-vcalendar.c:218
-#: ../src/balsa-print-object-text.c:572
+#: ../src/balsa-mime-widget-vcalendar.c:244
+#: ../src/balsa-print-object-text.c:602
+msgid "Category:"
+msgid_plural "Categories:"
+msgstr[0] "Kategori:"
+msgstr[1] "Kategorier:"
+
+#: ../src/balsa-mime-widget-vcalendar.c:248
+#: ../src/balsa-print-object-text.c:587
 msgid "Description:"
 msgstr "Beskrivning:"
 
-#: ../src/balsa-mime-widget-vcalendar.c:238
+#: ../src/balsa-mime-widget-vcalendar.c:268
 msgid "The sender asks you for a reply to this request:"
 msgstr "Avsändaren frågar dig om ett svar på denna begäran:"
 
-#: ../src/balsa-mime-widget-vcalendar.c:245
+#: ../src/balsa-mime-widget-vcalendar.c:275
 msgid "Accept"
 msgstr "Acceptera"
 
-#: ../src/balsa-mime-widget-vcalendar.c:254
+#: ../src/balsa-mime-widget-vcalendar.c:284
 msgid "Accept tentatively"
 msgstr "Acceptera preliminärt"
 
-#: ../src/balsa-mime-widget-vcalendar.c:262
+#: ../src/balsa-mime-widget-vcalendar.c:292
 msgid "Decline"
 msgstr "Neka"
 
-#: ../src/balsa-mime-widget-vcalendar.c:315
+#: ../src/balsa-mime-widget-vcalendar.c:345
 msgid "iTIP Calendar Request"
 msgstr "iTIP-kalenderbegäran"
 
-#: ../src/balsa-mime-widget-vcalendar.c:346
+#: ../src/balsa-mime-widget-vcalendar.c:377
 #, c-format
 msgid "Sending the iTIP calendar reply failed: %s"
 msgstr "Sändning av iTIP-kalendersvar misslyckades: %s"
@@ -4065,15 +4385,15 @@ msgstr "_Alla"
 msgid "C_lear"
 msgstr "T_öm"
 
-#: ../src/filter-edit-callbacks.c:963 ../src/main-window.c:3833
+#: ../src/filter-edit-callbacks.c:963 ../src/main-window.c:3840
 msgid "_Body"
 msgstr "_Meddelandetext"
 
-#: ../src/filter-edit-callbacks.c:964 ../src/main-window.c:3834
+#: ../src/filter-edit-callbacks.c:964 ../src/main-window.c:3841
 msgid "_To:"
 msgstr "_Till:"
 
-#: ../src/filter-edit-callbacks.c:965 ../src/main-window.c:3835
+#: ../src/filter-edit-callbacks.c:965 ../src/main-window.c:3842
 msgid "_From:"
 msgstr "_Från:"
 
@@ -4081,7 +4401,7 @@ msgstr "_Från:"
 msgid "_Subject"
 msgstr "_Ärende"
 
-#: ../src/filter-edit-callbacks.c:967 ../src/main-window.c:3837
+#: ../src/filter-edit-callbacks.c:967 ../src/main-window.c:3844
 msgid "_CC:"
 msgstr "_Kopia:"
 
@@ -4678,7 +4998,7 @@ msgstr ""
 msgid "Information — Balsa"
 msgstr "Information — Balsa"
 
-#: ../src/information-dialog.c:235 ../src/main-window.c:3854
+#: ../src/information-dialog.c:235 ../src/main-window.c:3861
 msgid "_Clear"
 msgstr "T_öm"
 
@@ -5003,47 +5323,47 @@ msgstr "Papperskorg"
 msgid "Compressing mail folders…"
 msgstr "Komprimerar postmappar…"
 
-#: ../src/main.c:643
+#: ../src/main.c:642
 msgid "Get new mail on start-up"
 msgstr "Hämta ny post vid uppstart"
 
-#: ../src/main.c:645
+#: ../src/main.c:644
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Skriv nytt meddelande till EPOST@ADRESS"
 
-#: ../src/main.c:647
+#: ../src/main.c:646
 msgid "Attach file at URI"
 msgstr "Bifoga fil på URI"
 
-#: ../src/main.c:650
+#: ../src/main.c:649
 msgid "Opens MAILBOXNAME"
 msgstr "Öppnar POSTLÅDENAMN"
 
-#: ../src/main.c:650
+#: ../src/main.c:649
 msgid "MAILBOXNAME"
 msgstr "POSTLÅDENAMN"
 
-#: ../src/main.c:653
+#: ../src/main.c:652
 msgid "Opens first unread mailbox"
 msgstr "Öppnar första olästa postlådan"
 
-#: ../src/main.c:656
+#: ../src/main.c:655
 msgid "Opens default Inbox on start-up"
 msgstr "Öppnar standardinkorgen vid uppstart"
 
-#: ../src/main.c:659
+#: ../src/main.c:658
 msgid "Prints number unread and unsent messages"
 msgstr "Skriv ut antalet olästa och ej skickade meddelanden"
 
-#: ../src/main.c:660
+#: ../src/main.c:659
 msgid "Show help options"
 msgstr "Visa hjälpalternativ"
 
-#: ../src/main.c:661
+#: ../src/main.c:660
 msgid "Show version"
 msgstr "Visa version"
 
-#: ../src/main-window.c:322
+#: ../src/main-window.c:324
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
@@ -5051,31 +5371,31 @@ msgstr ""
 "Balsa skickar ett meddelande nu.\n"
 "Avbryt skickande?"
 
-#: ../src/main-window.c:496
+#: ../src/main-window.c:498
 msgid "Subject or Sender Contains:"
 msgstr "Ämne eller Avsändare innehåller:"
 
-#: ../src/main-window.c:497
+#: ../src/main-window.c:499
 msgid "Subject or Recipient Contains:"
 msgstr "Ämne eller Mottagare innehåller:"
 
-#: ../src/main-window.c:498
+#: ../src/main-window.c:500
 msgid "Subject Contains:"
 msgstr "Ämne innehåller:"
 
-#: ../src/main-window.c:499
+#: ../src/main-window.c:501
 msgid "Body Contains:"
 msgstr "Meddelandetexten innehåller:"
 
-#: ../src/main-window.c:500
+#: ../src/main-window.c:502
 msgid "Older than (days):"
 msgstr "Äldre än (dagar):"
 
-#: ../src/main-window.c:501
+#: ../src/main-window.c:503
 msgid "Old at most (days):"
 msgstr "Som äldst (dagar):"
 
-#: ../src/main-window.c:1024
+#: ../src/main-window.c:1026
 msgid "translator-credits"
 msgstr ""
 "Daniel Nylander\n"
@@ -5090,36 +5410,36 @@ msgstr ""
 "Skicka synpunkter på översättningen till\n"
 "tp-sv@listor.tp-sv.se"
 
-#: ../src/main-window.c:1035
+#: ../src/main-window.c:1037
 msgid "The Balsa email client is part of the GNOME desktop environment."
 msgstr "E-postklienten Balsa är en del av skrivbordsmiljön GNOME."
 
 #. license ?
-#: ../src/main-window.c:1040
+#: ../src/main-window.c:1042
 msgid "About Balsa"
 msgstr "Om Balsa"
 
-#: ../src/main-window.c:1062
+#: ../src/main-window.c:1064
 msgid "Balsa closes files and connections. Please wait…"
 msgstr "Balsa stänger filer och anslutningar. Var god vänta…"
 
-#: ../src/main-window.c:1461
+#: ../src/main-window.c:1463
 msgid "You can apply filters only on mailbox\n"
 msgstr "Du kan endast tillämpa filter på postlåda\n"
 
-#: ../src/main-window.c:1481
+#: ../src/main-window.c:1483
 #, c-format
 msgid "Removing duplicates failed: %s"
 msgstr "Borttagning av dubbletter misslyckades: %s"
 
-#: ../src/main-window.c:1487
+#: ../src/main-window.c:1489
 #, c-format
 msgid "Removed %d duplicate"
 msgid_plural "Removed %d duplicates"
 msgstr[0] "Tog bort %d dubblett"
 msgstr[1] "Tog bort %d dubbletter"
 
-#: ../src/main-window.c:1492
+#: ../src/main-window.c:1494
 msgid "No duplicates found"
 msgstr "Inga dubbletter hittades"
 
@@ -5132,127 +5452,127 @@ msgstr ""
 "Kunde inte öppna postlådan!\n"
 "%s."
 
-#: ../src/main-window.c:3022
+#: ../src/main-window.c:3023
 #, c-format
 msgid "Opening %s"
 msgstr "Öppnar %s"
 
-#: ../src/main-window.c:3267 ../src/main-window.c:3420
-#: ../src/main-window.c:3541 ../src/main-window.c:3551
+#: ../src/main-window.c:3274 ../src/main-window.c:3427
+#: ../src/main-window.c:3548 ../src/main-window.c:3558
 msgid "Checking Mail…"
 msgstr "Kontrollerar e-post…"
 
-#: ../src/main-window.c:3503 ../src/main-window.c:3508
-#: ../src/main-window.c:3541 ../src/main-window.c:3546
+#: ../src/main-window.c:3510 ../src/main-window.c:3515
+#: ../src/main-window.c:3548 ../src/main-window.c:3553
 msgid "Mailboxes"
 msgstr "Postlådor"
 
-#: ../src/main-window.c:3504
+#: ../src/main-window.c:3511
 #, c-format
 msgid "IMAP mailbox: %s"
 msgstr "IMAP-postlåda: %s"
 
-#: ../src/main-window.c:3509
+#: ../src/main-window.c:3516
 #, c-format
 msgid "Local mailbox: %s"
 msgstr "Lokal postlåda: %s"
 
-#: ../src/main-window.c:3582
+#: ../src/main-window.c:3589
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] "Du har fått %d nytt meddelande."
 msgstr[1] "Du har fått %d nya meddelanden."
 
-#: ../src/main-window.c:3585
+#: ../src/main-window.c:3592
 msgid "You have new mail."
 msgstr "Du har ny e-post."
 
-#: ../src/main-window.c:3785
+#: ../src/main-window.c:3792
 msgid "Search mailbox"
 msgstr "Sök i postlåda"
 
-#: ../src/main-window.c:3811
+#: ../src/main-window.c:3818
 msgid "_Search for:"
 msgstr "_Sök efter:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: ../src/main-window.c:3824
+#: ../src/main-window.c:3831
 msgid "In:"
 msgstr "I:"
 
-#: ../src/main-window.c:3836
+#: ../src/main-window.c:3843
 msgid "S_ubject"
 msgstr "_Ämne"
 
 #. Frame with Apply and Clear buttons
-#: ../src/main-window.c:3841
+#: ../src/main-window.c:3848
 msgid "Show only matching messages"
 msgstr "Visa endast matchande meddelanden"
 
 #. Frame with OK button
-#: ../src/main-window.c:3862
+#: ../src/main-window.c:3869
 msgid "Open next matching message"
 msgstr "Öppna nästa matchande meddelande"
 
-#: ../src/main-window.c:3874
+#: ../src/main-window.c:3881
 msgid "_Reverse search"
 msgstr "_Omvänd sökning"
 
-#: ../src/main-window.c:3879
+#: ../src/main-window.c:3886
 msgid "_Wrap around"
 msgstr "_Radbryt"
 
-#: ../src/main-window.c:4105
+#: ../src/main-window.c:4112
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "Kunde inte öppna papperskorg: %s"
 
-#: ../src/main-window.c:4236
+#: ../src/main-window.c:4243
 #, c-format
 msgid "Balsa: %s (read-only)"
 msgstr "Balsa: %s (skrivskyddad)"
 
-#: ../src/main-window.c:4238
+#: ../src/main-window.c:4245
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
 #. xgettext: this is the first part of the message
 #. * "Shown mailbox: %s with %d messages, %d new, %d hidden".
-#: ../src/main-window.c:4819
+#: ../src/main-window.c:4814
 #, c-format
 msgid "Shown mailbox: %s "
 msgstr "Visad postlåda: %s "
 
-#: ../src/main-window.c:4824
+#: ../src/main-window.c:4819
 #, c-format
 msgid "with %d message"
 msgid_plural "with %d messages"
 msgstr[0] "med %d meddelande"
 msgstr[1] "med %d meddelanden"
 
-#: ../src/main-window.c:4831
+#: ../src/main-window.c:4826
 #, c-format
 msgid ", %d new"
 msgid_plural ", %d new"
 msgstr[0] ", %d nytt"
 msgstr[1] ", %d nya"
 
-#: ../src/main-window.c:4838
+#: ../src/main-window.c:4833
 #, c-format
 msgid ", %d hidden"
 msgid_plural ", %d hidden"
 msgstr[0] ", %d dold"
 msgstr[1] ", %d dolda"
 
-#: ../src/main-window.c:4883
+#: ../src/main-window.c:4878
 #, c-format
 msgid "The next unread message is in %s"
 msgstr "Nästa olästa meddelande finns i %s"
 
-#: ../src/main-window.c:4890
+#: ../src/main-window.c:4885
 #, c-format
 msgid "Do you want to select %s?"
 msgstr "Vill du välja %s?"
@@ -7043,6 +7363,12 @@ msgstr "Lägg till valt objekt till verktygsfältet"
 msgid "Move selected item down"
 msgstr "Flytta markerat objekt nedåt"
 
+#~ msgid "completed"
+#~ msgstr "färdig"
+
+#~ msgid "in process"
+#~ msgstr "pågår"
+
 #~ msgid "SASL Interaction\n"
 #~ msgstr "SASL-interagering\n"
 
@@ -7483,9 +7809,6 @@ msgstr "Flytta markerat objekt nedåt"
 
 #~ msgid "_Anonymous access"
 #~ msgstr "_Anonym åtkomst"
-
-#~ msgid "%s on %s"
-#~ msgstr "%s på %s"
 
 #~ msgid "POP3 over SSL (POP3S)"
 #~ msgstr "POP3 över SSL (POP3S)"

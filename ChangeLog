@@ -1,3 +1,14 @@
+2020-01-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox: Always use the idle callback to sort after changing the
+	threading; save the handler id, to remove the source at finalize
+	time instead of taking a ref on the mailbox.
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_finalize): remove the
+	source, if the handler id has been stored and not cleared;
+	(lbm_set_threading_idle_cb), (lbm_set_threading): clear and
+	store, respectively, the handler id.
+
 2020-01-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Header eye candy

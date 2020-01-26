@@ -150,6 +150,7 @@ struct _LibBalsaMailboxPrivate {
     guint queue_check_idle_id;
     guint need_threading_idle_id;
     guint run_filters_idle_id;
+    guint set_threading_idle_id;
 
     gboolean is_directory : 1;
     gboolean readonly : 1;
@@ -498,6 +499,9 @@ libbalsa_mailbox_finalize(GObject * object)
 
     if (priv->run_filters_idle_id != 0)
         g_source_remove(priv->run_filters_idle_id);
+
+    if (priv->set_threading_idle_id != 0)
+        g_source_remove(priv->set_threading_idle_id);
 
     G_OBJECT_CLASS(libbalsa_mailbox_parent_class)->finalize(object);
 }
@@ -2320,8 +2324,11 @@ lbm_check_and_sort(LibBalsaMailbox * mailbox)
 static gboolean
 lbm_set_threading_idle_cb(LibBalsaMailbox * mailbox)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
     lbm_check_and_sort(mailbox);
-    g_object_unref(mailbox);
+
+    priv->set_threading_idle_id = 0;
 
     return G_SOURCE_REMOVE;
 }
@@ -2337,10 +2344,9 @@ lbm_set_threading(LibBalsaMailbox * mailbox)
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
                                                        priv->view->threading_type);
 
-    if (libbalsa_am_i_subthread()) {
-        g_idle_add((GSourceFunc) lbm_set_threading_idle_cb, g_object_ref(mailbox));
-    } else {
-        lbm_check_and_sort(mailbox);
+    if (priv->set_threading_idle_id == 0) {
+        priv->set_threading_idle_id =
+            g_idle_add((GSourceFunc) lbm_set_threading_idle_cb, mailbox);
     }
 
     return TRUE;

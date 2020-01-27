@@ -1150,6 +1150,10 @@ typedef struct {
 static gboolean
 lbml_set_threading_idle_cb(LbmlSetThreadingInfo * info)
 {
+    LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(info->mailbox);
+    LibBalsaMailboxLocalPrivate *priv =
+        libbalsa_mailbox_local_get_instance_private(local);
+
     libbalsa_lock_mailbox(info->mailbox);
 
     if (libbalsa_mailbox_get_msg_tree(info->mailbox) != NULL) {
@@ -1162,6 +1166,7 @@ lbml_set_threading_idle_cb(LbmlSetThreadingInfo * info)
         lbml_set_threading(info->mailbox, info->thread_type);
     }
 
+    priv->set_threading_id = 0;
     libbalsa_unlock_mailbox(info->mailbox);
     g_free(info);
 

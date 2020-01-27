@@ -1260,14 +1260,9 @@ pm_group_label(const gchar * text)
     GtkWidget *label;
     gchar *markup;
 
-    label = gtk_label_new(NULL);
-
     markup = g_strdup_printf("<b>%s</b>", text);
-    gtk_label_set_markup(GTK_LABEL(label), markup);
+    label = libbalsa_create_wrap_label(markup, TRUE);
     g_free(markup);
-
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
 
     return label;
 }
@@ -1298,11 +1293,8 @@ pm_grid_attach_label(GtkGrid     * grid,
 {
     GtkWidget *label;
 
-    label = gtk_label_new(text);
-    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    label = libbalsa_create_wrap_label(text, FALSE);
     gtk_label_set_max_width_chars(GTK_LABEL(label), BALSA_MAX_WIDTH_CHARS);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
 
     pm_grid_attach(grid, label, left, top, width, height);
 

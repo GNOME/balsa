@@ -361,9 +361,7 @@ create_imap_folder_dialog(LibBalsaServer  *server,
 	gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
 	gtk_widget_set_vexpand(vbox, TRUE);
 
-	label = gtk_label_new(message);
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-	gtk_widget_set_halign(label, GTK_ALIGN_START);
+	label = libbalsa_create_wrap_label(message, FALSE);
 	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 
 	scrolled_wind = gtk_scrolled_window_new(NULL,NULL);

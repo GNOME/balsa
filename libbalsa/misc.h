@@ -143,6 +143,8 @@ GtkWidget *libbalsa_create_grid_entry(GtkWidget * grid, GCallback func,
 GtkWidget *libbalsa_create_grid_check(const gchar * label, GtkWidget * grid,
                                       gint row, gboolean initval);
 GtkSizeGroup *libbalsa_create_size_group(GtkWidget * chooser);
+GtkWidget *libbalsa_create_wrap_label(const gchar *text,
+									  gboolean     markup);
 
 void libbalsa_assure_balsa_dir(void);
 gchar *libbalsa_guess_ldap_base(void);

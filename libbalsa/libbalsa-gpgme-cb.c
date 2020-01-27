@@ -229,9 +229,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     	default:
     		g_assert_not_reached();
    	}
-    label = gtk_label_new(prompt);
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    label = libbalsa_create_wrap_label(prompt, FALSE);
     g_free(prompt);
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 

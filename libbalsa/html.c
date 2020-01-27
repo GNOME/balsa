@@ -429,8 +429,7 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
                                    (gtk_info_bar_get_action_area
                                     (info_bar)), GTK_ORIENTATION_VERTICAL);
 
-    label = gtk_label_new(_(text));
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    label = libbalsa_create_wrap_label(text, FALSE);
 
     content_area = gtk_info_bar_get_content_area(info_bar);
     gtk_container_add(GTK_CONTAINER(content_area), label);

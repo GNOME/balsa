@@ -630,7 +630,7 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
         libbalsa_utf8_sanitize(&sanitized,
                                balsa_app.convert_unknown_8bit, NULL);
         g_strdelimit(sanitized, "\r\n", ' ');
-        value_label = gtk_label_new(sanitized);
+        value_label = libbalsa_create_wrap_label(sanitized, FALSE);
         g_free(sanitized);
 
         gtk_widget_set_name(value_label, BALSA_MESSAGE_HEADER);
@@ -638,11 +638,8 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
                                        GTK_STYLE_PROVIDER(css_provider),
                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-        gtk_label_set_line_wrap(GTK_LABEL(value_label), TRUE);
         gtk_label_set_line_wrap_mode(GTK_LABEL(value_label), PANGO_WRAP_WORD_CHAR);
         gtk_label_set_selectable(GTK_LABEL(value_label), TRUE);
-        gtk_label_set_xalign(GTK_LABEL(value_label), 0.0F);
-        gtk_widget_set_halign(value_label, GTK_ALIGN_START);
         gtk_widget_set_hexpand(value_label, TRUE);
 
         expander = gtk_expander_new(NULL);
@@ -865,12 +862,8 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
     msg = g_markup_printf_escaped(format, info_str);
     g_free(info_str);
 
-    label = gtk_label_new(NULL);
-    gtk_label_set_markup(GTK_LABEL(label), msg);
+    label = libbalsa_create_wrap_label(msg, TRUE);
     g_free(msg);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
     gtk_widget_show(label);
 
     gtk_grid_attach_next_to(grid, label, NULL, GTK_POS_BOTTOM, 2, 1);

@@ -476,9 +476,9 @@ add_font_button(const gchar * text, const gchar * font, GtkGrid * grid,
     GtkWidget *font_button;
 
     label = gtk_label_new_with_mnemonic(text);
-    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
     gtk_grid_attach(grid, label, 1, row, 1, 1);
 
     font_button = gtk_font_button_new_with_font(font);
@@ -499,9 +499,9 @@ add_margin_spinbtn(const gchar * text, gdouble min, gdouble max, gdouble dflt,
     const gchar *unit;
 
     label = gtk_label_new_with_mnemonic(text);
-    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
+    gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
     gtk_grid_attach(grid, label, 1, row, 1, 1);
 
     if (get_default_user_units() == GTK_UNIT_INCH) {
@@ -524,8 +524,6 @@ add_margin_spinbtn(const gchar * text, gdouble min, gdouble max, gdouble dflt,
     gtk_grid_attach(grid, spinbtn, 2, row, 1, 1);
 
     label = gtk_label_new(unit);
-    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(grid, label, 3, row, 1, 1);
 
@@ -554,12 +552,9 @@ create_options_group(const gchar *label_str, GtkWidget *parent_grid, gint parent
     group = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_grid_attach(GTK_GRID(parent_grid), group, parent_col, parent_row, parent_width, 1);
 
-    label = gtk_label_new(NULL);
     markup = g_strdup_printf("<b>%s</b>", label_str);
-    gtk_label_set_markup(GTK_LABEL(label), markup);
+    label = libbalsa_create_wrap_label(markup, TRUE);
     g_free(markup);
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
 
 	grid = gtk_grid_new();

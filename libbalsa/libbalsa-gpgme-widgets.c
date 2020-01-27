@@ -423,14 +423,11 @@ libbalsa_key_dialog(GtkWindow            *parent,
 		gtk_label_set_markup(GTK_LABEL(label), markup);
 		g_free(markup);
 		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-		gtk_label_set_line_wrap(GTK_LABEL(label), FALSE);
 	}
 
 	if (message2 != NULL) {
-		label = gtk_label_new(message2);
-		gtk_widget_set_halign(label, GTK_ALIGN_START);
+		label = libbalsa_create_wrap_label(message2, FALSE);
 		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-		gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 	}
 
 	scrolledw = gtk_scrolled_window_new(NULL, NULL);
@@ -605,22 +602,15 @@ create_key_label_with_warn(const gchar *text,
 		icon = gtk_image_new_from_icon_name("gtk-dialog-warning", GTK_ICON_SIZE_MENU);
 		gtk_box_pack_start(GTK_BOX(result), icon, FALSE, FALSE, 0U);
 		buf = g_markup_printf_escaped("<span fgcolor=\"red\">%s</span>", text);
-		label = gtk_label_new(NULL);
-		gtk_label_set_markup(GTK_LABEL(label), buf);
+		label = libbalsa_create_wrap_label(buf, TRUE);
 		g_free(buf);
-		gtk_widget_set_halign(label, GTK_ALIGN_START);
 		gtk_widget_set_hexpand(label, TRUE);
-		gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 		gtk_label_set_selectable(GTK_LABEL(label), TRUE);
-		gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
 		gtk_box_pack_start(GTK_BOX(result), label, FALSE, TRUE, 0U);
 	} else {
-		result = gtk_label_new(text);
-		gtk_widget_set_halign(result, GTK_ALIGN_START);
+		result = libbalsa_create_wrap_label(text, FALSE);
 		gtk_widget_set_hexpand(result, TRUE);
 		gtk_label_set_selectable(GTK_LABEL(result), TRUE);
-		gtk_label_set_line_wrap(GTK_LABEL(result), TRUE);
-		gtk_label_set_xalign(GTK_LABEL(result), 0.0F);
 	}
 
 	return result;

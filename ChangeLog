@@ -1,3 +1,22 @@
+2020-01-27  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Unify wrapped label creation
+
+	* libbalsa/misc.[ch]: add new helper libbalsa_create_wrap_label()
+	  for creating a label with word wrap and with or without markup;
+	  libbalsa_create_grid_label(): add missing xalign
+	* libbalsa/html.c, libbalsa/libbalsa-gpgme-cb.c,
+	  libbalsa/libbalsa-gpgme-widgets.c,
+	  src/balsa-mime-widget-message.c, src/balsa-mime-widget-text.c,
+	  src/balsa-mime-widget-vcalendar.c, src/folder-conf.c,
+	  src/sendmsg-window.c: use libbalsa_create_wrap_label()
+	* src/pref-manager.c: use libbalsa_create_wrap_label(); remove
+	  redundant calls to set default value
+	* src/print-gtk.c: add_font_button(), add_margin_spinbtn(): add
+	  missing xalign, remove default justify; add_margin_spinbtn():
+	  do not wrap the (short) units string; create_options_group():
+	  use libbalsa_create_wrap_label()
+
 2020-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox-local: Drop a redundant auxiliary structure

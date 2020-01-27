@@ -3372,10 +3372,8 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
 #endif
     geometry_manager_attach(GTK_WINDOW(dialog), "SelectReplyParts");
 
-    label = gtk_label_new(_("Select the parts of the message"
-                            " which shall be quoted in the reply"));
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
+    label = libbalsa_create_wrap_label(_("Select the parts of the message"
+                            " which shall be quoted in the reply"), FALSE);
     gtk_widget_set_valign(label, GTK_ALIGN_START);
 
     image = gtk_image_new_from_icon_name("dialog-question",
@@ -3397,20 +3395,19 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
 
     	if (stats->decrypted != stats->parts) {
     		warning = gtk_label_new(NULL);
-    		gtk_label_set_markup(GTK_LABEL(warning),
+    		warning = libbalsa_create_wrap_label(
     			_("<b>Warning:</b> The original message contains an abnormal "
     			  "mixture of encrypted and unencrypted parts. This "
     			  "<i>might</i> indicate an attack.\nDouble-check the contents "
-    			  "of the reply before sending."));
+    			  "of the reply before sending."), TRUE);
     		gtk_tree_model_foreach(GTK_TREE_MODEL(tree_store), unselect_decrypted, NULL);
     	} else  {
-    		warning = gtk_label_new(_("You reply to an encrypted message. The reply will contain "
+    		warning = libbalsa_create_wrap_label(
+    			_("You reply to an encrypted message. The reply will contain "
     			  "the decrypted contents of the original message.\n"
     			  "Consider to encrypt the reply, and verify that you do not "
-    			  "unintentionally leak sensitive information."));
+    			  "unintentionally leak sensitive information."), FALSE);
     	}
-        gtk_label_set_line_wrap(GTK_LABEL(warning), TRUE);
-        gtk_widget_set_halign(warning, GTK_ALIGN_START);
         gtk_widget_set_valign(warning, GTK_ALIGN_START);
         gtk_box_pack_start(GTK_BOX(vbox), warning, FALSE, FALSE, 0);
     }
@@ -5132,12 +5129,9 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     text_str = g_strdup_printf("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
 			       _("You did not specify a subject for this message"),
 			       _("If you would like to provide one, enter it below."));
-    label = gtk_label_new (text_str);
+    label = libbalsa_create_wrap_label(text_str, TRUE);
     g_free(text_str);
     gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
-    gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-    gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_valign(label, GTK_ALIGN_START);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);

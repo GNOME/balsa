@@ -904,8 +904,36 @@ libbalsa_create_grid_label(const gchar * text, GtkWidget * grid, gint row)
     label = gtk_label_new_with_mnemonic(text);
     gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
+	gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
 
     gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
+
+    return label;
+}
+
+/** \brief Create a properly aligned label with line wrap
+ *
+ * \param text label text
+ * \param markup TRUE if the label text contains markup
+ * \return the new label widget
+ *
+ * Create a new label, enable word wrap, and set set xalign property.
+ */
+GtkWidget *
+libbalsa_create_wrap_label(const gchar *text,
+						   gboolean     markup)
+{
+    GtkWidget *label;
+
+    if (markup) {
+    	label = gtk_label_new(NULL);
+    	gtk_label_set_markup(GTK_LABEL(label), text);
+    } else {
+    	label = gtk_label_new(text);
+    }
+
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
 
     return label;
 }

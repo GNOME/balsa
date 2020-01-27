@@ -120,9 +120,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
             gtk_widget_set_halign(lbl, GTK_ALIGN_START);                \
             gtk_widget_set_valign(lbl, GTK_ALIGN_START);                \
             gtk_grid_attach(g, lbl, 0, row, 1, 1);                      \
-            lbl = gtk_label_new(str);                                   \
-            gtk_label_set_line_wrap(GTK_LABEL(lbl), TRUE);              \
-            gtk_widget_set_halign(lbl, GTK_ALIGN_START);                \
+            lbl = libbalsa_create_wrap_label(str, FALSE);				\
             gtk_widget_set_valign(lbl, GTK_ALIGN_START);                \
             gtk_widget_set_hexpand(lbl, TRUE);                          \
             gtk_widget_set_vexpand(lbl, TRUE);                          \

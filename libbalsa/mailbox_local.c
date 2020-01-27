@@ -1142,33 +1142,28 @@ lbml_set_threading(LibBalsaMailbox * mailbox,
     libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
 }
 
-typedef struct {
-    LibBalsaMailbox *mailbox;
-    LibBalsaMailboxThreadingType thread_type;
-} LbmlSetThreadingInfo;
-
 static gboolean
-lbml_set_threading_idle_cb(LbmlSetThreadingInfo * info)
+lbml_set_threading_idle_cb(LibBalsaMailboxLocal *local)
 {
-    LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(info->mailbox);
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(local);
     LibBalsaMailboxLocalPrivate *priv =
         libbalsa_mailbox_local_get_instance_private(local);
 
-    libbalsa_lock_mailbox(info->mailbox);
+    libbalsa_lock_mailbox(mailbox);
 
-    if (libbalsa_mailbox_get_msg_tree(info->mailbox) != NULL) {
-        if (!libbalsa_mailbox_get_messages_loaded(info->mailbox)) {
-            libbalsa_unlock_mailbox(info->mailbox);
+    if (libbalsa_mailbox_get_msg_tree(mailbox) != NULL) {
+        if (!libbalsa_mailbox_get_messages_loaded(mailbox)) {
+            libbalsa_unlock_mailbox(mailbox);
 
             return G_SOURCE_CONTINUE;
         }
 
-        lbml_set_threading(info->mailbox, info->thread_type);
+        lbml_set_threading(mailbox, libbalsa_mailbox_get_threading_type(mailbox));
     }
 
     priv->set_threading_id = 0;
-    libbalsa_unlock_mailbox(info->mailbox);
-    g_free(info);
+
+    libbalsa_unlock_mailbox(mailbox);
 
     return G_SOURCE_REMOVE;
 }
@@ -1230,13 +1225,8 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
         /* Nothing to thread, but we must set the flag. */
         libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
     } else if (priv->set_threading_id == 0) {
-        LbmlSetThreadingInfo *info;
-
-        info = g_new(LbmlSetThreadingInfo, 1);
-        info->mailbox = mailbox;
-        info->thread_type = thread_type;
         priv->set_threading_id =
-            g_idle_add((GSourceFunc) lbml_set_threading_idle_cb, info);
+            g_idle_add((GSourceFunc) lbml_set_threading_idle_cb, mailbox);
     }
 
 #if defined(DEBUG_LOADING_AND_THREADING)

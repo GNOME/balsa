@@ -1,5 +1,13 @@
 2020-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox-local: Drop a redundant auxiliary structure
+
+	* libbalsa/mailbox_local.c (lbml_set_threading_idle_cb),
+	(libbalsa_mailbox_local_set_threading): Drop
+	LbmlSetThreadingInfo, it's redundant; just pass the mailbox.
+
+2020-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox-local: Lock the mailbox in idle callbacks
 
 	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_finalize): no

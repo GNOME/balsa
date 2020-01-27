@@ -1,3 +1,10 @@
+2020-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox: Lock the mailbox in idle callbacks
+
+	* libbalsa/mailbox.c (lbm_msgno_filt_check_idle_cb),
+	(lbm_set_threading_idle_cb):
+
 2020-01-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox: Always use the idle callback to sort after changing the

@@ -1679,9 +1679,11 @@ typedef struct {
 static gboolean
 lbm_msgno_filt_check_idle_cb(LibBalsaMailboxMsgnoFiltCheckInfo * info)
 {
+    libbalsa_lock_mailbox(info->mailbox);
     if (MAILBOX_OPEN(info->mailbox))
         lbm_msgno_filt_check(info->mailbox, info->seqno, info->search_iter,
                              info->hold_selected);
+    libbalsa_unlock_mailbox(info->mailbox);
 
     g_object_unref(info->mailbox);
     libbalsa_mailbox_search_iter_unref(info->search_iter);
@@ -2326,9 +2328,11 @@ lbm_set_threading_idle_cb(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 
+    libbalsa_lock_mailbox(mailbox);
     lbm_check_and_sort(mailbox);
 
     priv->set_threading_idle_id = 0;
+    libbalsa_unlock_mailbox(mailbox);
 
     return G_SOURCE_REMOVE;
 }

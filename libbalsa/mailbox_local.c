@@ -47,6 +47,7 @@ struct _LibBalsaMailboxLocalPrivate {
     guint thread_id;    /* id of the idle mailbox thread job */
     guint save_tree_id; /* id of the idle mailbox save-tree job */
     guint load_messages_id; /* id of the idle load-messages job */
+    guint set_threading_id; /* id of the idle set-threading job */
     guint msgno;            /* where to start loading messages */
     GPtrArray *threading_info;
     LibBalsaMailboxLocalPool message_pool[LBML_POOL_SIZE];
@@ -382,35 +383,28 @@ libbalsa_mailbox_local_finalize(GObject * object)
     LibBalsaMailboxLocalPrivate *priv =
         libbalsa_mailbox_local_get_instance_private(local);
 
-    if (priv->sync_id != 0) {
+    if (priv->sync_id != 0)
         g_source_remove(priv->sync_id);
-        priv->sync_id = 0;
-    }
 
-    if (priv->thread_id != 0) {
+    if (priv->thread_id != 0)
         g_source_remove(priv->thread_id);
-        priv->thread_id = 0;
-    }
 
-    if (priv->save_tree_id != 0) {
+    if (priv->save_tree_id != 0)
         g_source_remove(priv->save_tree_id);
-        priv->save_tree_id = 0;
-    }
 
     if (priv->threading_info != NULL) {
 	/* The memory owned by priv->threading_info was freed on closing,
 	 * so we free only the array itself. */
 	g_ptr_array_free(priv->threading_info, TRUE);
-	priv->threading_info = NULL;
     }
 
-    if (priv->load_messages_id != 0) {
+    if (priv->load_messages_id != 0)
         g_source_remove(priv->load_messages_id);
-        priv->load_messages_id = 0;
-    }
 
-    if (G_OBJECT_CLASS(libbalsa_mailbox_local_parent_class)->finalize)
-	G_OBJECT_CLASS(libbalsa_mailbox_local_parent_class)->finalize(object);
+    if (priv->set_threading_id != 0)
+        g_source_remove(priv->set_threading_id);
+
+    G_OBJECT_CLASS(libbalsa_mailbox_local_parent_class)->finalize(object);
 }
 
 static void lbm_local_queue_save_tree(LibBalsaMailboxLocal * local);
@@ -1156,14 +1150,19 @@ typedef struct {
 static gboolean
 lbml_set_threading_idle_cb(LbmlSetThreadingInfo * info)
 {
+    libbalsa_lock_mailbox(info->mailbox);
+
     if (libbalsa_mailbox_get_msg_tree(info->mailbox) != NULL) {
-        if (!libbalsa_mailbox_get_messages_loaded(info->mailbox))
+        if (!libbalsa_mailbox_get_messages_loaded(info->mailbox)) {
+            libbalsa_unlock_mailbox(info->mailbox);
+
             return G_SOURCE_CONTINUE;
+        }
 
         lbml_set_threading(info->mailbox, info->thread_type);
     }
 
-    g_object_unref(info->mailbox);
+    libbalsa_unlock_mailbox(info->mailbox);
     g_free(info);
 
     return G_SOURCE_REMOVE;
@@ -1175,6 +1174,8 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
                                      thread_type)
 {
     LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
+    LibBalsaMailboxLocalPrivate *priv =
+        libbalsa_mailbox_local_get_instance_private(local);
 
     libbalsa_mailbox_local_set_threading_info(local);
 #if defined(DEBUG_LOADING_AND_THREADING)
@@ -1223,13 +1224,14 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
     if (libbalsa_mailbox_total_messages(mailbox) == 0) {
         /* Nothing to thread, but we must set the flag. */
         libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
-    } else {
+    } else if (priv->set_threading_id == 0) {
         LbmlSetThreadingInfo *info;
 
         info = g_new(LbmlSetThreadingInfo, 1);
-        info->mailbox = g_object_ref(mailbox);
+        info->mailbox = mailbox;
         info->thread_type = thread_type;
-        g_idle_add((GSourceFunc) lbml_set_threading_idle_cb, info);
+        priv->set_threading_id =
+            g_idle_add((GSourceFunc) lbml_set_threading_idle_cb, info);
     }
 
 #if defined(DEBUG_LOADING_AND_THREADING)

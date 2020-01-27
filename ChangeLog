@@ -1,5 +1,16 @@
 2020-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox-local: Lock the mailbox in idle callbacks
+
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_finalize): no
+	need to clear pointers and hendler ids in a finalize() method;
+	(lbml_set_threading_idle_cb): lock and unlock the mailbox; no
+	need to unref the mailbox; clear the handler id;
+	(libbalsa_mailbox_local_set_threading): store the handler id,
+	and do not ref the mailbox.
+
+2020-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox: Lock the mailbox in idle callbacks
 
 	* libbalsa/mailbox.c (lbm_msgno_filt_check_idle_cb),

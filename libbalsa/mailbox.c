@@ -1405,8 +1405,12 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
     GtkTreeIter iter;
     GtkTreePath *path;
 
-    if (!priv->msg_tree)
+    libbalsa_lock_mailbox(mailbox);
+
+    if (priv->msg_tree == NULL) {
+        libbalsa_unlock_mailbox(mailbox);
         return;
+    }
 #undef SANITY_CHECK
 #ifdef SANITY_CHECK
     g_return_if_fail(!g_node_find(priv->msg_tree,
@@ -1428,14 +1432,13 @@ libbalsa_mailbox_msgno_inserted(LibBalsaMailbox *mailbox, guint seqno,
         gtk_tree_path_free(path);
     }
 
-    libbalsa_lock_mailbox(mailbox);
     if (priv->need_threading_idle_id == 0) {
         priv->need_threading_idle_id =
             g_idle_add((GSourceFunc) lbm_need_threading_idle_cb, mailbox);
     }
-    libbalsa_unlock_mailbox(mailbox);
 
     priv->msg_tree_changed = TRUE;
+    libbalsa_unlock_mailbox(mailbox);
 }
 
 static void

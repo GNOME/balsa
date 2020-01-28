@@ -1,3 +1,9 @@
+2020-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_msgno_inserted): lock the
+	mailbox from start to finish, not just to access the private
+	structure.
+
 2020-01-27  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Unify wrapped label creation

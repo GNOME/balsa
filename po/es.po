@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2020-01-23 19:57+0000\n"
-"PO-Revision-Date: 2020-01-24 12:34+0100\n"
+"POT-Creation-Date: 2020-01-26 19:43+0000\n"
+"PO-Revision-Date: 2020-01-28 15:29+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Spanish - Spain <gnome-es-list@gnome.org>\n"
 "Language: es_ES\n"
@@ -295,6 +295,8 @@ msgstr "Base de datos de Autocrypt"
 #: ../libbalsa/identity.c:1665 ../libbalsa/libbalsa-gpgme-widgets.c:775
 #: ../src/ab-window.c:148 ../src/folder-conf.c:346 ../src/mailbox-node.c:1050
 #: ../src/main-window.c:3797 ../src/toolbar-prefs.c:141
+#: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
+#: ../ui/sendmsg-window.ui.h:12 ../ui/source-viewer.ui.h:2
 msgid "_Close"
 msgstr "_Cerrar"
 
@@ -1021,7 +1023,8 @@ msgstr "Gestionar identidades"
 #: ../src/filter-edit-dialog.c:575 ../src/filter-export-dialog.c:81
 #: ../src/filter-run-dialog.c:300 ../src/folder-conf.c:481
 #: ../src/folder-conf.c:855 ../src/main-window.c:3796
-#: ../src/pref-manager.c:3290 ../src/toolbar-prefs.c:142
+#: ../src/pref-manager.c:3290 ../src/toolbar-prefs.c:142 ../ui/ab-main.ui.h:16
+#: ../ui/main-window.ui.h:88
 msgid "_Help"
 msgstr "Ay_uda"
 
@@ -4097,7 +4100,8 @@ msgstr "Ha fallado el envío a la papelera: %s"
 
 # src/main-window.c:295 src/message-window.c:107
 # src/main-window.c:301 src/message-window.c:103
-#: ../src/balsa-index.c:1832
+#: ../src/balsa-index.c:1832 ../ui/main-window.ui.h:68
+#: ../ui/message-window.ui.h:21
 msgid "_Reply…"
 msgstr "_Responder…"
 
@@ -4115,23 +4119,25 @@ msgstr "Responder al _grupo…"
 
 # src/main-window.c:310 src/message-window.c:120
 # src/main-window.c:315 src/message-window.c:114
-#: ../src/balsa-index.c:1838
+#: ../src/balsa-index.c:1838 ../ui/main-window.ui.h:71
+#: ../ui/message-window.ui.h:24
 msgid "_Forward Attached…"
 msgstr "_Reenviar adjunto…"
 
 # src/balsa-index-page.c:486
 # src/balsa-index-page.c:534
-#: ../src/balsa-index.c:1840
+#: ../src/balsa-index.c:1840 ../ui/main-window.ui.h:72
+#: ../ui/message-window.ui.h:25
 msgid "Forward _Inline…"
 msgstr "Reenviar _en línea…"
 
-#: ../src/balsa-index.c:1842
+#: ../src/balsa-index.c:1842 ../ui/main-window.ui.h:73
 msgid "_Pipe through…"
 msgstr "_Filtrar a través de…"
 
 # src/main-window.c:360
 # src/main-window.c:360
-#: ../src/balsa-index.c:1844
+#: ../src/balsa-index.c:1844 ../ui/main-window.ui.h:82
 msgid "_Store Address…"
 msgstr "_Almacenar dirección…"
 
@@ -4139,7 +4145,8 @@ msgstr "_Almacenar dirección…"
 # src/main-window.c:341
 #: ../src/balsa-index.c:1858 ../src/mailbox-node.c:1042
 #: ../src/mailbox-node.c:1058 ../src/pref-manager.c:2028
-#: ../src/pref-manager.c:2113 ../src/pref-manager.c:2793
+#: ../src/pref-manager.c:2113 ../src/pref-manager.c:2793 ../ui/ab-main.ui.h:11
+#: ../ui/main-window.ui.h:61
 msgid "_Delete"
 msgstr "_Eliminar"
 
@@ -4161,7 +4168,7 @@ msgstr "_Conmutar"
 
 # src/main-window.c:352
 # src/main-window.c:353
-#: ../src/balsa-index.c:1873
+#: ../src/balsa-index.c:1873 ../ui/main-window.ui.h:55
 msgid "_Flagged"
 msgstr "_Marcado"
 
@@ -4704,35 +4711,30 @@ msgid "_Search key server for updates of this key"
 msgstr "_Buscar un servidor de claves para actualizaciones de esta clave"
 
 #: ../src/balsa-mime-widget-crypto.c:194
-#| msgid "decrypted: "
 msgid "decrypted"
 msgstr "descifrado"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
 #: ../src/balsa-mime-widget-crypto.c:207
-#| msgid "_Execute signature"
 msgid "trusted signature"
 msgstr "firma de confianza"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
 #: ../src/balsa-mime-widget-crypto.c:210
-#| msgid "_Execute signature"
 msgid "low trust signature"
 msgstr "firma de poca confianza"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
 #: ../src/balsa-mime-widget-crypto.c:213
-#| msgid " signature: %s"
 msgid "bad signature"
 msgstr "firma errónea"
 
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
 #: ../src/balsa-mime-widget-crypto.c:216
-#| msgid " signature: %s"
 msgid "unknown signature status"
 msgstr "estado de la firma desconocido"
 
@@ -4966,7 +4968,8 @@ msgstr "Ampliación 100%"
 
 # src/sendmsg-window.c:191
 # src/sendmsg-window.c:196
-#: ../src/balsa-mime-widget-text.c:1087
+#: ../src/balsa-mime-widget-text.c:1087 ../ui/main-window.ui.h:21
+#: ../ui/message-window.ui.h:7 ../ui/sendmsg-window.ui.h:19
 msgid "Select _All"
 msgstr "Seleccionar _todo"
 
@@ -5452,7 +5455,9 @@ msgstr "Operación entre condiciones:"
 
 # src/main-window.c:389
 # src/main-window.c:386
-#: ../src/filter-edit-dialog.c:310
+#: ../src/filter-edit-dialog.c:310 ../ui/main-window.ui.h:19
+#: ../ui/message-window.ui.h:5 ../ui/sendmsg-window.ui.h:13
+#: ../ui/source-viewer.ui.h:3
 msgid "_Edit"
 msgstr "_Editar"
 
@@ -6655,7 +6660,7 @@ msgstr "¿Quiere seleccionar %s?"
 
 # src/filter-edit-dialog.c:425 src/sendmsg-window.c:514
 # src/filter-edit-dialog.c:384 src/sendmsg-window.c:543
-#: ../src/message-window.c:302
+#: ../src/message-window.c:302 ../ui/message-window.ui.h:19
 msgid "M_ove"
 msgstr "M_over"
 
@@ -6779,7 +6784,7 @@ msgstr "Buzón POP3 remoto…"
 
 # src/pref-manager.c:1162
 # src/pref-manager.c:1298
-#: ../src/pref-manager.c:1718
+#: ../src/pref-manager.c:1718 ../ui/main-window.ui.h:7
 msgid "Remote IMAP folder…"
 msgstr "Carpeta IMAP remota…"
 
@@ -8226,7 +8231,7 @@ msgstr "Reenviar mensaje a %s: %s"
 msgid "New message to %s: %s"
 msgstr "Mensaje nuevo a %s: %s"
 
-#: ../src/sendmsg-window.c:6834
+#: ../src/sendmsg-window.c:6834 ../ui/sendmsg-window.ui.h:33
 msgid "_Language"
 msgstr "_Idioma"
 
@@ -8464,7 +8469,7 @@ msgstr ""
 "Papelera/\n"
 "Borrar"
 
-#: ../src/toolbar-factory.c:131
+#: ../src/toolbar-factory.c:131 ../ui/sendmsg-window.ui.h:8
 msgid "Postpone"
 msgstr "Posponer"
 
@@ -8482,7 +8487,7 @@ msgstr ""
 
 # src/address-book.c:477
 # src/address-book.c:523
-#: ../src/toolbar-factory.c:134
+#: ../src/toolbar-factory.c:134 ../ui/sendmsg-window.ui.h:6
 msgid "Send"
 msgstr "Enviar"
 
@@ -8495,6 +8500,7 @@ msgid "Exchange"
 msgstr "Intercambiar"
 
 #: ../src/toolbar-factory.c:137 ../src/toolbar-factory.c:166
+#: ../ui/sendmsg-window.ui.h:7
 msgid "Queue"
 msgstr "Encolar"
 
@@ -8558,11 +8564,11 @@ msgstr "Cifrar"
 
 # src/balsa-mblist.c:218
 # src/balsa-mblist.c:218
-#: ../src/toolbar-factory.c:150
+#: ../src/toolbar-factory.c:150 ../ui/sendmsg-window.ui.h:14
 msgid "Undo"
 msgstr "Deshacer"
 
-#: ../src/toolbar-factory.c:151
+#: ../src/toolbar-factory.c:151 ../ui/sendmsg-window.ui.h:15
 msgid "Redo"
 msgstr "Rehacer"
 
@@ -8677,6 +8683,624 @@ msgstr "Añadir el elemento seleccionado a la barra de herramientas"
 msgid "Move selected item down"
 msgstr "Bajar el elemento seleccionado"
 
+# src/main-window.c:259
+# src/main-window.c:262
+#: ../ui/ab-main.ui.h:1 ../ui/main-window.ui.h:1 ../ui/message-window.ui.h:1
+#: ../ui/sendmsg-window.ui.h:1 ../ui/source-viewer.ui.h:1
+msgid "_File"
+msgstr "_Archivo"
+
+# src/main-window.c:191
+# src/main-window.c:196
+#. Translators: main menu item - New address book
+#: ../ui/ab-main.ui.h:3
+msgctxt "address book"
+msgid "_New"
+msgstr "_Nuevo"
+
+# src/address-book-config.c:240
+# src/address-book-config.c:265
+#: ../ui/ab-main.ui.h:4
+msgid "_VCard Address Book (GnomeCard)"
+msgstr "Libreta de direcciones _VCard (GnomeCard)"
+
+#: ../ui/ab-main.ui.h:5
+msgid "_External query (a program)"
+msgstr "_Petición externa (un programa)"
+
+# src/address-book-config.c:256
+# src/address-book-config.c:283
+#: ../ui/ab-main.ui.h:6
+msgid "_LDIF Address Book"
+msgstr "Libreta de direcciones _LDIF"
+
+# src/address-book-config.c:256
+# src/address-book-config.c:283
+#: ../ui/ab-main.ui.h:7
+msgid "_LDAP Address Book"
+msgstr "Libreta de direcciones _LDAP"
+
+# src/address-book.c:369
+# src/address-book.c:394
+#: ../ui/ab-main.ui.h:8
+msgid "_GPE Address Book"
+msgstr "Libreta de direcciones _GPE"
+
+# src/address-book.c:369
+# src/address-book.c:394
+#: ../ui/ab-main.ui.h:9
+msgid "_Rubrica Address Book"
+msgstr "Libreta de direcciones de _Rúbrica"
+
+# src/mblist-window.c:450
+# src/mblist-window.c:473
+#: ../ui/ab-main.ui.h:10 ../ui/main-window.ui.h:60
+msgid "_Properties"
+msgstr "_Propiedades"
+
+#: ../ui/ab-main.ui.h:12 ../ui/main-window.ui.h:18
+msgid "_Quit"
+msgstr "_Salir"
+
+#: ../ui/ab-main.ui.h:13
+msgid "_Entry"
+msgstr "_Entrada"
+
+# src/pref-manager.c:234 src/pref-manager.c:867
+# src/pref-manager.c:236 src/pref-manager.c:992
+#: ../ui/ab-main.ui.h:14
+msgid "_New Entry"
+msgstr "Entrada _nueva"
+
+# src/main-window.c:338
+# src/main-window.c:341
+#: ../ui/ab-main.ui.h:15
+msgid "_Delete Entry"
+msgstr "_Borrar entrada"
+
+#: ../ui/ab-main.ui.h:17
+msgid "_About"
+msgstr "Acerca _de"
+
+# src/main-window.c:191
+# src/main-window.c:196
+#. Translators: window menu item - New message or mailbox
+#: ../ui/main-window.ui.h:3
+msgctxt "window menu"
+msgid "_New"
+msgstr "_Nuevo"
+
+# src/mailbox-conf.c:718
+# src/mailbox-conf.c:793
+#: ../ui/main-window.ui.h:4
+msgid "Local mbox mailbox…"
+msgstr "Buzón mbox local…"
+
+# src/mailbox-conf.c:718
+# src/mailbox-conf.c:793
+#: ../ui/main-window.ui.h:5
+msgid "Local Maildir mailbox…"
+msgstr "Buzón Maildir local…"
+
+# src/mailbox-conf.c:718
+# src/mailbox-conf.c:793
+#: ../ui/main-window.ui.h:6
+msgid "Local MH mailbox…"
+msgstr "Buzón MH local…"
+
+# libmutt/mbox.c:1066
+#: ../ui/main-window.ui.h:8
+msgid "Remote IMAP subfolder…"
+msgstr "Subcarpeta IMAP remota…"
+
+# libmutt/imap/util.c:43
+# libmutt/imap/util.c:43
+#: ../ui/main-window.ui.h:9
+msgid "_Continue"
+msgstr "_Continuar"
+
+#: ../ui/main-window.ui.h:10
+msgid "_Get New Mail"
+msgstr "_Obtener correo nuevo"
+
+#: ../ui/main-window.ui.h:11
+msgid "_Send Queued Mail"
+msgstr "_Enviar correos encolados"
+
+#: ../ui/main-window.ui.h:12
+msgid "Send and _Receive Mail"
+msgstr "Enviar y _recibir correo"
+
+#: ../ui/main-window.ui.h:13 ../ui/message-window.ui.h:2
+msgid "Page _Setup"
+msgstr "Configuración de _página"
+
+#: ../ui/main-window.ui.h:14 ../ui/message-window.ui.h:3
+#: ../ui/sendmsg-window.ui.h:11
+msgid "_Print…"
+msgstr "_Imprimir…"
+
+# src/address-book.c:369
+# src/address-book.c:394
+#: ../ui/main-window.ui.h:15
+msgid "_Address Book"
+msgstr "_Libreta de direcciones"
+
+#: ../ui/main-window.ui.h:16
+msgid "A_utocrypt Database"
+msgstr "Base de datos de A_utocrypt"
+
+# libinit_balsa/balsa-druid-page-directory.gob:60
+# libinit_balsa/balsa-druid-page-directory.gob:60
+#: ../ui/main-window.ui.h:17
+msgid "Empty _Trash"
+msgstr "Vaciar _papelera"
+
+# src/filter-edit-dialog.c:313
+# src/filter-edit-dialog.c:296
+#: ../ui/main-window.ui.h:20 ../ui/message-window.ui.h:6
+#: ../ui/sendmsg-window.ui.h:17 ../ui/source-viewer.ui.h:4
+msgid "_Copy"
+msgstr "_Copiar"
+
+# src/mailbox-conf.c:822 src/mailbox-conf.c:882
+# src/mailbox-conf.c:899 src/mailbox-conf.c:957
+#: ../ui/main-window.ui.h:22
+msgid "Select _Thread"
+msgstr "Seleccionar con_versación"
+
+#: ../ui/main-window.ui.h:23
+msgid "_Find"
+msgstr "_Buscar"
+
+#: ../ui/main-window.ui.h:24
+msgid "Find Ne_xt"
+msgstr "Buscar _siguiente"
+
+# libmutt/mx.c:1065
+# libmutt/mx.c:1065
+#: ../ui/main-window.ui.h:25 ../ui/message-window.ui.h:8
+msgid "Find in _Message"
+msgstr "Buscar en el _mensaje"
+
+# src/main-window.c:259
+# src/main-window.c:262
+#: ../ui/main-window.ui.h:26
+msgid "F_ilters…"
+msgstr "F_iltros…"
+
+#: ../ui/main-window.ui.h:27
+msgid "_Export Filters…"
+msgstr "_Exportar filtros…"
+
+#: ../ui/main-window.ui.h:28
+#| msgid "References:"
+msgid "_Preferences"
+msgstr "_Preferencias"
+
+# libinit_balsa/balsa-druid-page-user.gob:104
+# libinit_balsa/balsa-druid-page-user.gob:104
+#: ../ui/main-window.ui.h:29
+msgid "_Settings…"
+msgstr "_Configuración…"
+
+#: ../ui/main-window.ui.h:30
+msgid "_Toolbars…"
+msgstr "_Barras de herramientas…"
+
+# src/main-window.c:259
+# src/main-window.c:262
+#: ../ui/main-window.ui.h:31
+msgid "_Identities…"
+msgstr "_Identidades…"
+
+# src/main-window.c:191
+# src/main-window.c:196
+#: ../ui/main-window.ui.h:32 ../ui/message-window.ui.h:9
+#: ../ui/source-viewer.ui.h:6
+msgid "_View"
+msgstr "_Ver"
+
+# src/pref-manager.c:1087
+# src/pref-manager.c:1218
+#: ../ui/main-window.ui.h:33
+msgid "_Show Mailbox Tree"
+msgstr "Mo_strar árbol de buzones"
+
+# src/mailbox-conf.c:786 src/mailbox-conf.c:810 src/mailbox-conf.c:870
+# src/mailbox-conf.c:862 src/mailbox-conf.c:887 src/mailbox-conf.c:945
+#: ../ui/main-window.ui.h:34
+msgid "Show Mailbox _Tabs"
+msgstr "Mostrar _solapas del buzón"
+
+#: ../ui/main-window.ui.h:35 ../ui/message-window.ui.h:10
+#: ../ui/sendmsg-window.ui.h:28
+msgid "Show Too_lbar"
+msgstr "Mostrar barra de _herramientas"
+
+#: ../ui/main-window.ui.h:36
+msgid "Show St_atus Bar"
+msgstr "Mostrar barra de _estado"
+
+#: ../ui/main-window.ui.h:37
+msgid "Show _Index Filter"
+msgstr "Mostrar filtro índ_ice"
+
+#: ../ui/main-window.ui.h:38 ../ui/message-window.ui.h:11
+msgid "_Wrap"
+msgstr "_Auto-ajuste"
+
+# src/main-window.c:267 src/message-window.c:61
+# src/main-window.c:269
+#: ../ui/main-window.ui.h:39 ../ui/message-window.ui.h:12
+msgid "_No Headers"
+msgstr "_Sin cabeceras"
+
+#: ../ui/main-window.ui.h:40 ../ui/message-window.ui.h:13
+msgid "S_elected Headers"
+msgstr "Cabeceras s_eleccionadas"
+
+#: ../ui/main-window.ui.h:41 ../ui/message-window.ui.h:14
+msgid "All _Headers"
+msgstr "Todas las _cabeceras"
+
+# libmutt/mx.c:1065
+# libmutt/mx.c:1065
+#: ../ui/main-window.ui.h:42
+msgid "Th_read messages"
+msgstr "Mensajes en conve_rsaciones"
+
+#: ../ui/main-window.ui.h:43
+msgid "E_xpand All"
+msgstr "E_xpandir todo"
+
+#: ../ui/main-window.ui.h:44
+msgid "_Collapse All"
+msgstr "_Contraer todo"
+
+#: ../ui/main-window.ui.h:45 ../ui/message-window.ui.h:15
+msgid "Zoom _In"
+msgstr "_Ampliar"
+
+#: ../ui/main-window.ui.h:46 ../ui/message-window.ui.h:16
+msgid "Zoom _Out"
+msgstr "_Reducir"
+
+#: ../ui/main-window.ui.h:48 ../ui/message-window.ui.h:18
+#, no-c-format
+msgid "Zoom _100%"
+msgstr "Ampliación al _100%"
+
+# src/balsa-mblist.c:218 src/mailbox-conf.c:950
+# src/balsa-mblist.c:218 src/mailbox-conf.c:1023
+#: ../ui/main-window.ui.h:49
+msgid "Mail_box"
+msgstr "_Buzón"
+
+# libmutt/mx.c:1065
+# libmutt/mx.c:1065
+#: ../ui/main-window.ui.h:50
+msgid "_Hide Messages"
+msgstr "_Ocultar mensajes"
+
+# src/main-window.c:338
+# src/main-window.c:341
+#: ../ui/main-window.ui.h:51
+msgid "_Deleted"
+msgstr "_Borrado"
+
+# src/balsa-index-page.c:492 src/filter-edit-dialog.c:228
+# src/main-window.c:435 src/mblist-window.c:452 src/pref-manager.c:1112
+# src/pref-manager.c:2027
+# src/balsa-index-page.c:542 src/filter-edit-dialog.c:224
+# src/main-window.c:442 src/mblist-window.c:475 src/pref-manager.c:1243
+# src/pref-manager.c:2253
+#: ../ui/main-window.ui.h:52
+msgid "Un_deleted"
+msgstr "R_ecuperado"
+
+#: ../ui/main-window.ui.h:53
+msgid "_Read"
+msgstr "_Leído"
+
+# src/balsa-mblist.c:218
+# src/balsa-mblist.c:218
+#: ../ui/main-window.ui.h:54
+msgid "Un_read"
+msgstr "_No leído"
+
+# src/main-window.c:352
+# src/main-window.c:353
+#: ../ui/main-window.ui.h:56
+msgid "Un_flagged"
+msgstr "_Desmarcado"
+
+# src/balsa-mblist.c:218
+# src/balsa-mblist.c:218
+#: ../ui/main-window.ui.h:57
+msgid "_Answered"
+msgstr "_Respondido"
+
+# src/mailbox-conf.c:827 src/mailbox-conf.c:886
+# src/mailbox-conf.c:904 src/mailbox-conf.c:961
+#: ../ui/main-window.ui.h:58
+msgid "Un_answered"
+msgstr "_No contestado"
+
+# src/filter-edit-dialog.c:783
+# src/filter-edit-dialog.c:693
+#: ../ui/main-window.ui.h:59
+msgid "_Reset Filter"
+msgstr "Restablecer _filtro"
+
+# src/filter-edit-dialog.c:783
+# src/filter-edit-dialog.c:693
+#: ../ui/main-window.ui.h:62
+msgid "Select _Filters…"
+msgstr "Seleccionar _filtros…"
+
+# src/pref-manager.c:1058
+# src/pref-manager.c:1188
+#: ../ui/main-window.ui.h:63
+msgid "_Remove Duplicates"
+msgstr "_Eliminar duplicados"
+
+# libmutt/mx.c:1065
+# libmutt/mx.c:1065
+#: ../ui/main-window.ui.h:64
+msgid "E_xpunge Deleted Messages"
+msgstr "_Purgar los mensajes borrados"
+
+# src/main-window.c:421
+# src/main-window.c:428
+#: ../ui/main-window.ui.h:66 ../ui/message-window.ui.h:20
+msgid "_Message"
+msgstr "_Mensaje"
+
+# src/main-window.c:191
+# src/main-window.c:196
+#: ../ui/main-window.ui.h:67
+msgid "_New…"
+msgstr "_Nueva…"
+
+# src/main-window.c:302 src/message-window.c:113
+# src/main-window.c:308
+#: ../ui/main-window.ui.h:69 ../ui/message-window.ui.h:22
+msgid "Reply to _All…"
+msgstr "Responder a _todos…"
+
+# src/main-window.c:302 src/message-window.c:113
+# src/main-window.c:308
+#: ../ui/main-window.ui.h:70 ../ui/message-window.ui.h:23
+msgid "Reply to _Group…"
+msgstr "Responder al _grupo…"
+
+#: ../ui/main-window.ui.h:74 ../ui/message-window.ui.h:26
+msgid "_Next Part"
+msgstr "_Siguiente parte"
+
+#: ../ui/main-window.ui.h:75 ../ui/message-window.ui.h:27
+msgid "_Previous Part"
+msgstr "_Anterior parte"
+
+#: ../ui/main-window.ui.h:76 ../ui/message-window.ui.h:28
+msgid "Save Current Part…"
+msgstr "Guardar parte actual…"
+
+#: ../ui/main-window.ui.h:77 ../ui/message-window.ui.h:29
+msgid "_View Source…"
+msgstr "_Ver fuente…"
+
+# src/sendmsg-window.c:191
+# src/sendmsg-window.c:196
+#: ../ui/main-window.ui.h:78 ../ui/source-viewer.ui.h:5
+msgid "_Select Text"
+msgstr "_Seleccionar texto"
+
+# src/balsa-index-page.c:495
+# src/balsa-index-page.c:546
+#: ../ui/main-window.ui.h:79 ../ui/message-window.ui.h:34
+msgid "_Move to Trash"
+msgstr "_Mover a la papelera"
+
+#: ../ui/main-window.ui.h:80
+msgid "_Toggle Flag"
+msgstr "_Conmutar marca"
+
+# src/main-window.c:191
+# src/main-window.c:196
+#: ../ui/main-window.ui.h:81
+msgid "_New"
+msgstr "_Nuevo"
+
+# src/sendmsg-window.c:222
+# src/sendmsg-window.c:226
+#: ../ui/main-window.ui.h:83
+msgid "_Go"
+msgstr "_Ir"
+
+#: ../ui/main-window.ui.h:84 ../ui/message-window.ui.h:30
+msgid "Next Message"
+msgstr "Mensaje siguiente"
+
+#: ../ui/main-window.ui.h:85 ../ui/message-window.ui.h:31
+msgid "Previous Message"
+msgstr "Mensaje anterior"
+
+#: ../ui/main-window.ui.h:86 ../ui/message-window.ui.h:32
+msgid "Next Unread Message"
+msgstr "Siguiente mensaje no leído"
+
+#: ../ui/main-window.ui.h:87 ../ui/message-window.ui.h:33
+msgid "Next Flagged Message"
+msgstr "Siguiente mensaje marcado"
+
+# src/main-window.c:444
+# src/main-window.c:451
+#: ../ui/main-window.ui.h:89
+msgid "_Contents"
+msgstr "Índ_ice"
+
+# src/filter-edit-dialog.c:783
+# src/filter-edit-dialog.c:693
+#: ../ui/main-window.ui.h:90
+msgid "_About Balsa"
+msgstr "_Acerca de Balsa"
+
+#: ../ui/sendmsg-window.ui.h:2
+msgid "_Include File…"
+msgstr "_Incluir archivo…"
+
+# src/main-window.c:310 src/message-window.c:120
+# src/main-window.c:315 src/message-window.c:114
+#: ../ui/sendmsg-window.ui.h:3
+msgid "_Attach File…"
+msgstr "_Adjuntar archivo…"
+
+#: ../ui/sendmsg-window.ui.h:4
+msgid "I_nclude Messages…"
+msgstr "I_ncluir mensajes…"
+
+#: ../ui/sendmsg-window.ui.h:5
+msgid "Attach _Messages…"
+msgstr "Adjuntar _mensajes…"
+
+# src/balsa-message.c:1247
+# src/balsa-message.c:1417
+#: ../ui/sendmsg-window.ui.h:9
+msgid "_Save"
+msgstr "_Guardar"
+
+#: ../ui/sendmsg-window.ui.h:10
+msgid "Page S_etup"
+msgstr "Configuración de p_ágina"
+
+#: ../ui/sendmsg-window.ui.h:16
+msgid "Cu_t"
+msgstr "Cor_tar"
+
+#: ../ui/sendmsg-window.ui.h:18
+msgid "_Paste"
+msgstr "_Pegar"
+
+# src/filter-edit-dialog.c:313
+# src/filter-edit-dialog.c:296
+#: ../ui/sendmsg-window.ui.h:20
+msgid "_Wrap Body"
+msgstr "_Ajustar cuerpo"
+
+# src/sendmsg-window.c:191
+# src/sendmsg-window.c:196
+#: ../ui/sendmsg-window.ui.h:21
+msgid "_Reflow Selected Text"
+msgstr "_Refluir texto seleccionado"
+
+# src/sendmsg-window.c:1434
+# src/sendmsg-window.c:1483
+#: ../ui/sendmsg-window.ui.h:22
+msgid "Insert Si_gnature"
+msgstr "Incl_uir firma"
+
+#: ../ui/sendmsg-window.ui.h:23
+msgid "_Quote Message(s)"
+msgstr "_Citar mensaje(s)"
+
+#: ../ui/sendmsg-window.ui.h:24
+msgid "C_heck Spelling"
+msgstr "Comprobar _ortografía"
+
+# src/pref-manager.c:234 src/pref-manager.c:867
+# src/pref-manager.c:236 src/pref-manager.c:992
+#: ../ui/sendmsg-window.ui.h:25
+msgid "Select _Identity…"
+msgstr "Seleccionar la _identidad…"
+
+#: ../ui/sendmsg-window.ui.h:26
+msgid "Edit with GNOME-Editor"
+msgstr "Editar con el editor de Gnome"
+
+#: ../ui/sendmsg-window.ui.h:27
+msgid "_Show"
+msgstr "_Mostrar"
+
+# src/balsa-message.c:569 src/filter-edit-dialog.c:337 src/print.c:336
+# src/sendmsg-window.c:835
+# src/balsa-message.c:633 src/filter-edit-dialog.c:316 src/print.c:348
+# src/sendmsg-window.c:867
+#: ../ui/sendmsg-window.ui.h:29
+msgid "F_rom"
+msgstr "_De"
+
+#: ../ui/sendmsg-window.ui.h:30
+msgid "Rec_ipients"
+msgstr "Dest_inatarios"
+
+# src/sendmsg-window.c:885
+# src/sendmsg-window.c:928
+#: ../ui/sendmsg-window.ui.h:31
+msgid "R_eply To"
+msgstr "R_esponder a"
+
+# src/balsa-message.c:578
+# src/balsa-message.c:642
+#: ../ui/sendmsg-window.ui.h:32
+msgid "F_cc"
+msgstr "R_cc"
+
+# src/mblist-window.c:446
+# src/mblist-window.c:469
+#: ../ui/sendmsg-window.ui.h:34
+msgid "_Options"
+msgstr "_Opciones"
+
+# src/filter-edit-dialog.c:626
+# src/filter-edit-dialog.c:538
+#: ../ui/sendmsg-window.ui.h:35
+msgid "_Request Disposition Notification"
+msgstr "_Solicitar notificación de entrega"
+
+# src/filter-edit-dialog.c:626
+# src/filter-edit-dialog.c:538
+#: ../ui/sendmsg-window.ui.h:36
+msgid "_Request Delivery Status Notification"
+msgstr "_Solicitar notificación de estado de entrega"
+
+#: ../ui/sendmsg-window.ui.h:37
+msgid "_Format = Flowed"
+msgstr "_Format = Flowed"
+
+#: ../ui/sendmsg-window.ui.h:38
+msgid "Send as plain text and _HTML"
+msgstr "Enviar como texto plano y _HTML"
+
+#: ../ui/sendmsg-window.ui.h:39
+msgid "_Sign Message"
+msgstr "_Firmar mensaje"
+
+#: ../ui/sendmsg-window.ui.h:40
+msgid "_Encrypt Message"
+msgstr "_Cifrar mensaje"
+
+#: ../ui/sendmsg-window.ui.h:41
+msgid "GnuPG uses _MIME mode"
+msgstr "GnuPG usa el _modo MIME"
+
+#: ../ui/sendmsg-window.ui.h:42
+msgid "GnuPG uses old _OpenPGP mode"
+msgstr "GnuPG usa el modo antiguo _OpenPGP"
+
+#: ../ui/sendmsg-window.ui.h:43
+msgid "S/MIME mode (_GpgSM)"
+msgstr "Modo _S/MIME (_GpgSM)"
+
+#: ../ui/sendmsg-window.ui.h:44
+msgid "Attach GnuPG _Public Key"
+msgstr "Adjuntar la clave pública GnuPG"
+
+#: ../ui/source-viewer.ui.h:7
+msgid "_Escape Special Characters"
+msgstr "_Caracteres especiales de escape"
+
 #~ msgid "completed"
 #~ msgstr "completado"
 
@@ -8691,493 +9315,6 @@ msgstr "Bajar el elemento seleccionado"
 #~ "La autenticidad de este certificado no pudo ser verificada.\n"
 #~ "<b>Razón:</b> %s\n"
 #~ "<b>Este certificado pertenece a:</b>\n"
-
-# src/main-window.c:259
-# src/main-window.c:262
-#~ msgid "_File"
-#~ msgstr "_Archivo"
-
-# src/main-window.c:191
-# src/main-window.c:196
-#~ msgctxt "address book"
-#~ msgid "_New"
-#~ msgstr "_Nuevo"
-
-# src/address-book-config.c:240
-# src/address-book-config.c:265
-#~ msgid "_VCard Address Book (GnomeCard)"
-#~ msgstr "Libreta de direcciones _VCard (GnomeCard)"
-
-#~ msgid "_External query (a program)"
-#~ msgstr "_Petición externa (un programa)"
-
-# src/address-book-config.c:256
-# src/address-book-config.c:283
-#~ msgid "_LDIF Address Book"
-#~ msgstr "Libreta de direcciones _LDIF"
-
-# src/address-book-config.c:256
-# src/address-book-config.c:283
-#~ msgid "_LDAP Address Book"
-#~ msgstr "Libreta de direcciones _LDAP"
-
-# src/address-book.c:369
-# src/address-book.c:394
-#~ msgid "_GPE Address Book"
-#~ msgstr "Libreta de direcciones _GPE"
-
-# src/address-book.c:369
-# src/address-book.c:394
-#~ msgid "_Rubrica Address Book"
-#~ msgstr "Libreta de direcciones de _Rúbrica"
-
-# src/mblist-window.c:450
-# src/mblist-window.c:473
-#~ msgid "_Properties"
-#~ msgstr "_Propiedades"
-
-#~ msgid "_Quit"
-#~ msgstr "_Salir"
-
-#~ msgid "_Entry"
-#~ msgstr "_Entrada"
-
-# src/pref-manager.c:234 src/pref-manager.c:867
-# src/pref-manager.c:236 src/pref-manager.c:992
-#~ msgid "_New Entry"
-#~ msgstr "Entrada _nueva"
-
-# src/main-window.c:338
-# src/main-window.c:341
-#~ msgid "_Delete Entry"
-#~ msgstr "_Borrar entrada"
-
-#~ msgid "_About"
-#~ msgstr "Acerca _de"
-
-# src/main-window.c:191
-# src/main-window.c:196
-#~ msgctxt "window menu"
-#~ msgid "_New"
-#~ msgstr "_Nuevo"
-
-# src/mailbox-conf.c:718
-# src/mailbox-conf.c:793
-#~ msgid "Local mbox mailbox…"
-#~ msgstr "Buzón mbox local…"
-
-# src/mailbox-conf.c:718
-# src/mailbox-conf.c:793
-#~ msgid "Local Maildir mailbox…"
-#~ msgstr "Buzón Maildir local…"
-
-# src/mailbox-conf.c:718
-# src/mailbox-conf.c:793
-#~ msgid "Local MH mailbox…"
-#~ msgstr "Buzón MH local…"
-
-# libmutt/mbox.c:1066
-#~ msgid "Remote IMAP subfolder…"
-#~ msgstr "Subcarpeta IMAP remota…"
-
-# libmutt/imap/util.c:43
-# libmutt/imap/util.c:43
-#~ msgid "_Continue"
-#~ msgstr "_Continuar"
-
-#~ msgid "_Get New Mail"
-#~ msgstr "_Obtener correo nuevo"
-
-#~ msgid "_Send Queued Mail"
-#~ msgstr "_Enviar correos encolados"
-
-#~ msgid "Send and _Receive Mail"
-#~ msgstr "Enviar y _recibir correo"
-
-#~ msgid "Page _Setup"
-#~ msgstr "Configuración de _página"
-
-#~ msgid "_Print…"
-#~ msgstr "_Imprimir…"
-
-# src/address-book.c:369
-# src/address-book.c:394
-#~ msgid "_Address Book"
-#~ msgstr "_Libreta de direcciones"
-
-#~ msgid "A_utocrypt Database"
-#~ msgstr "Base de datos de A_utocrypt"
-
-# libinit_balsa/balsa-druid-page-directory.gob:60
-# libinit_balsa/balsa-druid-page-directory.gob:60
-#~ msgid "Empty _Trash"
-#~ msgstr "Vaciar _papelera"
-
-# src/filter-edit-dialog.c:313
-# src/filter-edit-dialog.c:296
-#~ msgid "_Copy"
-#~ msgstr "_Copiar"
-
-# src/mailbox-conf.c:822 src/mailbox-conf.c:882
-# src/mailbox-conf.c:899 src/mailbox-conf.c:957
-#~ msgid "Select _Thread"
-#~ msgstr "Seleccionar con_versación"
-
-#~ msgid "_Find"
-#~ msgstr "_Buscar"
-
-#~ msgid "Find Ne_xt"
-#~ msgstr "Buscar _siguiente"
-
-# libmutt/mx.c:1065
-# libmutt/mx.c:1065
-#~ msgid "Find in _Message"
-#~ msgstr "Buscar en el _mensaje"
-
-# src/main-window.c:259
-# src/main-window.c:262
-#~ msgid "F_ilters…"
-#~ msgstr "F_iltros…"
-
-#~ msgid "_Export Filters…"
-#~ msgstr "_Exportar filtros…"
-
-# libinit_balsa/balsa-druid-page-user.gob:104
-# libinit_balsa/balsa-druid-page-user.gob:104
-#~ msgid "_Settings…"
-#~ msgstr "_Configuración…"
-
-#~ msgid "_Toolbars…"
-#~ msgstr "_Barras de herramientas…"
-
-# src/main-window.c:259
-# src/main-window.c:262
-#~ msgid "_Identities…"
-#~ msgstr "_Identidades…"
-
-# src/main-window.c:191
-# src/main-window.c:196
-#~ msgid "_View"
-#~ msgstr "_Ver"
-
-# src/pref-manager.c:1087
-# src/pref-manager.c:1218
-#~ msgid "_Show Mailbox Tree"
-#~ msgstr "Mo_strar árbol de buzones"
-
-# src/mailbox-conf.c:786 src/mailbox-conf.c:810 src/mailbox-conf.c:870
-# src/mailbox-conf.c:862 src/mailbox-conf.c:887 src/mailbox-conf.c:945
-#~ msgid "Show Mailbox _Tabs"
-#~ msgstr "Mostrar _solapas del buzón"
-
-#~ msgid "Show Too_lbar"
-#~ msgstr "Mostrar barra de _herramientas"
-
-#~ msgid "Show St_atus Bar"
-#~ msgstr "Mostrar barra de _estado"
-
-#~ msgid "Show _Index Filter"
-#~ msgstr "Mostrar filtro índ_ice"
-
-#~ msgid "_Wrap"
-#~ msgstr "_Auto-ajuste"
-
-# src/main-window.c:267 src/message-window.c:61
-# src/main-window.c:269
-#~ msgid "_No Headers"
-#~ msgstr "_Sin cabeceras"
-
-#~ msgid "S_elected Headers"
-#~ msgstr "Cabeceras s_eleccionadas"
-
-#~ msgid "All _Headers"
-#~ msgstr "Todas las _cabeceras"
-
-# libmutt/mx.c:1065
-# libmutt/mx.c:1065
-#~ msgid "Th_read messages"
-#~ msgstr "Mensajes en conve_rsaciones"
-
-#~ msgid "E_xpand All"
-#~ msgstr "E_xpandir todo"
-
-#~ msgid "_Collapse All"
-#~ msgstr "_Contraer todo"
-
-#~ msgid "Zoom _In"
-#~ msgstr "_Ampliar"
-
-#~ msgid "Zoom _Out"
-#~ msgstr "_Reducir"
-
-#~ msgid "Zoom _100%"
-#~ msgstr "Ampliación al _100%"
-
-# src/balsa-mblist.c:218 src/mailbox-conf.c:950
-# src/balsa-mblist.c:218 src/mailbox-conf.c:1023
-#~ msgid "Mail_box"
-#~ msgstr "_Buzón"
-
-# libmutt/mx.c:1065
-# libmutt/mx.c:1065
-#~ msgid "_Hide Messages"
-#~ msgstr "_Ocultar mensajes"
-
-# src/main-window.c:338
-# src/main-window.c:341
-#~ msgid "_Deleted"
-#~ msgstr "_Borrado"
-
-# src/balsa-index-page.c:492 src/filter-edit-dialog.c:228
-# src/main-window.c:435 src/mblist-window.c:452 src/pref-manager.c:1112
-# src/pref-manager.c:2027
-# src/balsa-index-page.c:542 src/filter-edit-dialog.c:224
-# src/main-window.c:442 src/mblist-window.c:475 src/pref-manager.c:1243
-# src/pref-manager.c:2253
-#~ msgid "Un_deleted"
-#~ msgstr "R_ecuperado"
-
-#~ msgid "_Read"
-#~ msgstr "_Leído"
-
-# src/balsa-mblist.c:218
-# src/balsa-mblist.c:218
-#~ msgid "Un_read"
-#~ msgstr "_No leído"
-
-# src/main-window.c:352
-# src/main-window.c:353
-#~ msgid "Un_flagged"
-#~ msgstr "_Desmarcado"
-
-# src/balsa-mblist.c:218
-# src/balsa-mblist.c:218
-#~ msgid "_Answered"
-#~ msgstr "_Respondido"
-
-# src/mailbox-conf.c:827 src/mailbox-conf.c:886
-# src/mailbox-conf.c:904 src/mailbox-conf.c:961
-#~ msgid "Un_answered"
-#~ msgstr "_No contestado"
-
-# src/filter-edit-dialog.c:783
-# src/filter-edit-dialog.c:693
-#~ msgid "_Reset Filter"
-#~ msgstr "Restablecer _filtro"
-
-# src/filter-edit-dialog.c:783
-# src/filter-edit-dialog.c:693
-#~ msgid "Select _Filters…"
-#~ msgstr "Seleccionar _filtros…"
-
-# src/pref-manager.c:1058
-# src/pref-manager.c:1188
-#~ msgid "_Remove Duplicates"
-#~ msgstr "_Eliminar duplicados"
-
-# libmutt/mx.c:1065
-# libmutt/mx.c:1065
-#~ msgid "E_xpunge Deleted Messages"
-#~ msgstr "_Purgar los mensajes borrados"
-
-# src/main-window.c:421
-# src/main-window.c:428
-#~ msgid "_Message"
-#~ msgstr "_Mensaje"
-
-# src/main-window.c:191
-# src/main-window.c:196
-#~ msgid "_New…"
-#~ msgstr "_Nueva…"
-
-# src/main-window.c:302 src/message-window.c:113
-# src/main-window.c:308
-#~ msgid "Reply to _All…"
-#~ msgstr "Responder a _todos…"
-
-# src/main-window.c:302 src/message-window.c:113
-# src/main-window.c:308
-#~ msgid "Reply to _Group…"
-#~ msgstr "Responder al _grupo…"
-
-#~ msgid "_Next Part"
-#~ msgstr "_Siguiente parte"
-
-#~ msgid "_Previous Part"
-#~ msgstr "_Anterior parte"
-
-#~ msgid "Save Current Part…"
-#~ msgstr "Guardar parte actual…"
-
-#~ msgid "_View Source…"
-#~ msgstr "_Ver fuente…"
-
-# src/sendmsg-window.c:191
-# src/sendmsg-window.c:196
-#~ msgid "_Select Text"
-#~ msgstr "_Seleccionar texto"
-
-# src/balsa-index-page.c:495
-# src/balsa-index-page.c:546
-#~ msgid "_Move to Trash"
-#~ msgstr "_Mover a la papelera"
-
-#~ msgid "_Toggle Flag"
-#~ msgstr "_Conmutar marca"
-
-# src/main-window.c:191
-# src/main-window.c:196
-#~ msgid "_New"
-#~ msgstr "_Nuevo"
-
-# src/sendmsg-window.c:222
-# src/sendmsg-window.c:226
-#~ msgid "_Go"
-#~ msgstr "_Ir"
-
-#~ msgid "Next Message"
-#~ msgstr "Mensaje siguiente"
-
-#~ msgid "Previous Message"
-#~ msgstr "Mensaje anterior"
-
-#~ msgid "Next Unread Message"
-#~ msgstr "Siguiente mensaje no leído"
-
-#~ msgid "Next Flagged Message"
-#~ msgstr "Siguiente mensaje marcado"
-
-# src/main-window.c:444
-# src/main-window.c:451
-#~ msgid "_Contents"
-#~ msgstr "Índ_ice"
-
-# src/filter-edit-dialog.c:783
-# src/filter-edit-dialog.c:693
-#~ msgid "_About Balsa"
-#~ msgstr "_Acerca de Balsa"
-
-#~ msgid "_Include File…"
-#~ msgstr "_Incluir archivo…"
-
-# src/main-window.c:310 src/message-window.c:120
-# src/main-window.c:315 src/message-window.c:114
-#~ msgid "_Attach File…"
-#~ msgstr "_Adjuntar archivo…"
-
-#~ msgid "I_nclude Messages…"
-#~ msgstr "I_ncluir mensajes…"
-
-#~ msgid "Attach _Messages…"
-#~ msgstr "Adjuntar _mensajes…"
-
-# src/balsa-message.c:1247
-# src/balsa-message.c:1417
-#~ msgid "_Save"
-#~ msgstr "_Guardar"
-
-#~ msgid "Page S_etup"
-#~ msgstr "Configuración de p_ágina"
-
-#~ msgid "Cu_t"
-#~ msgstr "Cor_tar"
-
-#~ msgid "_Paste"
-#~ msgstr "_Pegar"
-
-# src/filter-edit-dialog.c:313
-# src/filter-edit-dialog.c:296
-#~ msgid "_Wrap Body"
-#~ msgstr "_Ajustar cuerpo"
-
-# src/sendmsg-window.c:191
-# src/sendmsg-window.c:196
-#~ msgid "_Reflow Selected Text"
-#~ msgstr "_Refluir texto seleccionado"
-
-# src/sendmsg-window.c:1434
-# src/sendmsg-window.c:1483
-#~ msgid "Insert Si_gnature"
-#~ msgstr "Incl_uir firma"
-
-#~ msgid "_Quote Message(s)"
-#~ msgstr "_Citar mensaje(s)"
-
-#~ msgid "C_heck Spelling"
-#~ msgstr "Comprobar _ortografía"
-
-# src/pref-manager.c:234 src/pref-manager.c:867
-# src/pref-manager.c:236 src/pref-manager.c:992
-#~ msgid "Select _Identity…"
-#~ msgstr "Seleccionar la _identidad…"
-
-#~ msgid "Edit with GNOME-Editor"
-#~ msgstr "Editar con el editor de Gnome"
-
-#~ msgid "_Show"
-#~ msgstr "_Mostrar"
-
-# src/balsa-message.c:569 src/filter-edit-dialog.c:337 src/print.c:336
-# src/sendmsg-window.c:835
-# src/balsa-message.c:633 src/filter-edit-dialog.c:316 src/print.c:348
-# src/sendmsg-window.c:867
-#~ msgid "F_rom"
-#~ msgstr "_De"
-
-#~ msgid "Rec_ipients"
-#~ msgstr "Dest_inatarios"
-
-# src/sendmsg-window.c:885
-# src/sendmsg-window.c:928
-#~ msgid "R_eply To"
-#~ msgstr "R_esponder a"
-
-# src/balsa-message.c:578
-# src/balsa-message.c:642
-#~ msgid "F_cc"
-#~ msgstr "R_cc"
-
-# src/mblist-window.c:446
-# src/mblist-window.c:469
-#~ msgid "_Options"
-#~ msgstr "_Opciones"
-
-# src/filter-edit-dialog.c:626
-# src/filter-edit-dialog.c:538
-#~ msgid "_Request Disposition Notification"
-#~ msgstr "_Solicitar notificación de entrega"
-
-# src/filter-edit-dialog.c:626
-# src/filter-edit-dialog.c:538
-#~ msgid "_Request Delivery Status Notification"
-#~ msgstr "_Solicitar notificación de estado de entrega"
-
-#~ msgid "_Format = Flowed"
-#~ msgstr "_Format = Flowed"
-
-#~ msgid "Send as plain text and _HTML"
-#~ msgstr "Enviar como texto plano y _HTML"
-
-#~ msgid "_Sign Message"
-#~ msgstr "_Firmar mensaje"
-
-#~ msgid "_Encrypt Message"
-#~ msgstr "_Cifrar mensaje"
-
-#~ msgid "GnuPG uses _MIME mode"
-#~ msgstr "GnuPG usa el _modo MIME"
-
-#~ msgid "GnuPG uses old _OpenPGP mode"
-#~ msgstr "GnuPG usa el modo antiguo _OpenPGP"
-
-#~ msgid "S/MIME mode (_GpgSM)"
-#~ msgstr "Modo _S/MIME (_GpgSM)"
-
-#~ msgid "Attach GnuPG _Public Key"
-#~ msgstr "Adjuntar la clave pública GnuPG"
-
-#~ msgid "_Escape Special Characters"
-#~ msgstr "_Caracteres especiales de escape"
 
 # src/address-book-config.c:132 src/mailbox-conf.c:301 src/mailbox-conf.c:925
 # src/address-book-config.c:134 src/mailbox-conf.c:287

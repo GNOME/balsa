@@ -1,3 +1,20 @@
+2020-01-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox-local: Improve threading
+
+	* libbalsa/mailbox_local.c
+	(lbm_local_cache_message),
+	(libbalsa_mailbox_local_cache_message): Add a guard to the
+	public method, and an unguarded static version; schedule
+	rethreading if we have new threading info;
+	(message_match_real), (lbml_load_messages_idle_cb),
+	(lbm_local_prepare_msgno): use the static version;
+	(lbm_local_get_message_with_msg_info): cache the threading info;
+	(libbalsa_mailbox_local_set_threading): pass local instead of
+	mailbox to lbml_set_threading_idle_cb (cosmetic);
+	(libbalsa_mailbox_local_load_messages): set messages-loaded to
+	FALSE before loading them.
+
 2020-01-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/mailbox.c (libbalsa_mailbox_msgno_inserted): lock the

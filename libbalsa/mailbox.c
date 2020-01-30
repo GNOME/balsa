@@ -164,8 +164,7 @@ struct _LibBalsaMailboxPrivate {
     gboolean no_reassemble : 1;
     /* Whether the tree has been changed since some event. */
     gboolean msg_tree_changed : 1;
-    /* Whether messages have been loaded and threaded. */
-    gboolean messages_loaded : 1;
+    /* Whether messages have been threaded. */
     gboolean messages_threaded : 1;
 };
 
@@ -655,7 +654,6 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
         libbalsa_mailbox_free_mindex(mailbox);
         priv->stamp++;
 	priv->state = LB_MAILBOX_STATE_CLOSED;
-        priv->messages_loaded = FALSE;
         priv->messages_threaded = FALSE;
 
         if (priv->run_filters_idle_id != 0) {
@@ -4892,16 +4890,6 @@ libbalsa_mailbox_get_has_unread_messages(LibBalsaMailbox * mailbox)
 }
 
 gboolean
-libbalsa_mailbox_get_messages_loaded(LibBalsaMailbox * mailbox)
-{
-    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
-
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-
-    return priv->messages_loaded != 0;
-}
-
-gboolean
 libbalsa_mailbox_get_messages_threaded(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
@@ -5029,17 +5017,6 @@ libbalsa_mailbox_set_has_unread_messages(LibBalsaMailbox * mailbox,
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     priv->has_unread_messages = !!has_unread_messages;
-}
-
-void
-libbalsa_mailbox_set_messages_loaded(LibBalsaMailbox * mailbox,
-                                     gboolean messages_loaded)
-{
-    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
-
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-    priv->messages_loaded = !!messages_loaded;
 }
 
 void

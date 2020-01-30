@@ -619,7 +619,6 @@ guint libbalsa_mailbox_get_open_ref(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_readonly(LibBalsaMailbox * mailbox);
 const gchar * libbalsa_mailbox_get_config_prefix(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_has_unread_messages(LibBalsaMailbox * mailbox);
-gboolean libbalsa_mailbox_get_messages_loaded(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_messages_threaded(LibBalsaMailbox * mailbox);
 
 /*
@@ -638,8 +637,6 @@ void libbalsa_mailbox_set_name(LibBalsaMailbox * mailbox, const gchar * name);
 void libbalsa_mailbox_set_view(LibBalsaMailbox * mailbox, LibBalsaMailboxView * view);
 void libbalsa_mailbox_set_has_unread_messages(LibBalsaMailbox * mailbox,
                                               gboolean has_unread_messages);
-void libbalsa_mailbox_set_messages_loaded(LibBalsaMailbox * mailbox,
-                                          gboolean messages_loaded);
 void libbalsa_mailbox_set_messages_threaded(LibBalsaMailbox * mailbox,
                                           gboolean messages_threaded);
 void libbalsa_mailbox_set_config_prefix(LibBalsaMailbox * mailbox,

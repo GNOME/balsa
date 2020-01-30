@@ -52,6 +52,7 @@ struct _LibBalsaMailboxLocalPrivate {
     GPtrArray *threading_info;
     LibBalsaMailboxLocalPool message_pool[LBML_POOL_SIZE];
     guint pool_seqno;
+    gboolean messages_loaded;
 };
 
 static void libbalsa_mailbox_local_finalize(GObject * object);
@@ -789,6 +790,8 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
     }
     priv->pool_seqno = 0;
 
+    priv->messages_loaded = FALSE;
+
     if (LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_local_parent_class)->close_mailbox)
         LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_local_parent_class)->close_mailbox(mailbox,
                                                             expunge);
@@ -1092,7 +1095,7 @@ lbml_load_messages_idle_cb(LibBalsaMailbox * mailbox)
 	if (msg_info->message)
             lbm_local_cache_message(local, msgno, msg_info->message);
     }
-    libbalsa_mailbox_set_messages_loaded(mailbox, TRUE);
+    priv->messages_loaded = TRUE;
 
     if (new_messages > 0) {
 	libbalsa_mailbox_run_filters_on_reception(mailbox);
@@ -1116,7 +1119,7 @@ libbalsa_mailbox_local_load_messages(LibBalsaMailbox *mailbox,
     g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(mailbox));
 
     libbalsa_lock_mailbox(mailbox);
-    libbalsa_mailbox_set_messages_loaded(mailbox, FALSE);
+    priv->messages_loaded = FALSE;
     if (!priv->load_messages_id) {
         priv->msgno = msgno;
         priv->load_messages_id =
@@ -1172,7 +1175,7 @@ lbml_set_threading_idle_cb(LibBalsaMailboxLocal *local)
     libbalsa_lock_mailbox(mailbox);
 
     if (libbalsa_mailbox_get_msg_tree(mailbox) != NULL) {
-        if (!libbalsa_mailbox_get_messages_loaded(mailbox)) {
+        if (!priv->messages_loaded) {
             libbalsa_unlock_mailbox(mailbox);
 
             return G_SOURCE_CONTINUE;
@@ -1209,7 +1212,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 
         libbalsa_mailbox_set_msg_tree(mailbox, g_node_new(NULL));
         if (lbm_local_restore_tree(local, &total)) {
-            libbalsa_mailbox_set_messages_loaded(mailbox, TRUE);
+            priv->messages_loaded = TRUE;
             libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
         } else {
             /* Bad or no cache file: start over. */

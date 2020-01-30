@@ -1,5 +1,20 @@
 2020-01-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Move messages-loaded from LibBalsaMailbox to LibBalsaMailboxLocal
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_close),
+	(libbalsa_mailbox_set_has_unread_messages): drop the getter and
+	setter;
+	* libbalsa/mailbox.h: ditto;
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_close_mailbox),
+	(lbml_load_messages_idle_cb),
+	(libbalsa_mailbox_local_load_messages),
+	(lbml_set_threading_idle_cb),
+	(libbalsa_mailbox_local_set_threading): add and use
+	LibBalsaMailboxLocalPrivate:messages_loaded.
+
+2020-01-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox-local: Improve threading
 
 	* libbalsa/mailbox_local.c

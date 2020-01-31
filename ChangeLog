@@ -1,3 +1,19 @@
+2020-01-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox-local: Fetch threading info when needed
+
+	Add missing_info and missing_parent members to ThreadingInfo,
+	and use them to decide when complete rethreading is needed.
+
+	* libbalsa/mailbox_local.c (lbml_info_setup): initialize them to
+	FALSE;
+	(lbml_thread_messages): if both are TRUE, we must fetch
+	threading info for all messages, in case the parent is present
+	but has not been seen;
+	(lbml_set_parent): set missing_info if the info is missing;
+	(lbml_find_parent): set missing_paarent if the message has
+	references but no parent was found.
+
 2020-01-30  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Move messages-loaded from LibBalsaMailbox to LibBalsaMailboxLocal

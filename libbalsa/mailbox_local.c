@@ -1499,7 +1499,8 @@ struct _ThreadingInfo {
     GNode *root;
     GHashTable *id_table;
     GHashTable *subject_table;
-    LibBalsaMailboxThreadingType type;
+    gboolean missing_info;
+    gboolean missing_parent;
 };
 typedef struct _ThreadingInfo ThreadingInfo;
 
@@ -1525,6 +1526,8 @@ lbml_info_setup(LibBalsaMailbox * mailbox, ThreadingInfo * ti)
     ti->root = g_node_new(libbalsa_mailbox_get_msg_tree(mailbox));
     ti->id_table = g_hash_table_new(g_str_hash, g_str_equal);
     ti->subject_table = NULL;
+    ti->missing_info = FALSE;
+    ti->missing_parent = FALSE;
 }
 
 static void
@@ -1577,6 +1580,12 @@ lbml_thread_messages(LibBalsaMailbox * mailbox, gboolean subject_gather)
 #endif				/* MAKE_EMPTY_CONTAINER_FOR_MISSING_PARENT */
 
     lbml_info_free(&ti);
+
+    if (ti.missing_parent && ti.missing_info) {
+        /* We need to completely rethread.
+         * If any new info is found, a rethreading will be scheduled. */
+        libbalsa_mailbox_prepare_threading(mailbox, 0);
+    }
 }
 
 static LibBalsaMailboxLocalInfo *
@@ -1625,8 +1634,11 @@ lbml_set_parent(GNode * msg_node, ThreadingInfo * ti)
 
     info = lbml_get_info(msg_node, ti);
 
-    if (!info) /* FIXME assert this? */
+    if (info == NULL) {
+        /* We may not need the info; just note that it is missing. */
+        ti->missing_info = TRUE;
 	return FALSE;
+    }
 
     node = lbml_insert_node(msg_node, info, ti);
 
@@ -1699,13 +1711,16 @@ lbml_find_parent(LibBalsaMailboxLocalInfo * info, ThreadingInfo * ti)
     GNode *parent = ti->root;
     GList *reference;
     GHashTable *id_table = ti->id_table;
+    gboolean has_real_parent = FALSE;
 
     for (reference = info->refs_for_threading; reference;
 	 reference = reference->next) {
 	gchar *id = reference->data;
 	GNode *foo = g_hash_table_lookup(id_table, id);
 
-	if (foo == NULL) {
+	if (foo != NULL) {
+            has_real_parent = TRUE;
+        } else {
 	    foo = g_node_new(NULL);
 	    g_hash_table_insert(id_table, id, foo);
 	}
@@ -1717,6 +1732,13 @@ lbml_find_parent(LibBalsaMailboxLocalInfo * info, ThreadingInfo * ti)
 
 	parent = foo;
     }
+
+    if (info->refs_for_threading != NULL && !has_real_parent) {
+        /* This message appears to have a parent, but we did not find
+         * it. */
+        ti->missing_parent = TRUE;
+    }
+
     return parent;
 }
 

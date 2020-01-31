@@ -1,5 +1,29 @@
 2020-01-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Message threading cleanup
+
+	Remove duplicate idle handler, and make
+	libbalsa_mailbox_local_set_threading_info() private.
+
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_init),
+	(libbalsa_mailbox_local_finalize),
+	(libbalsa_mailbox_local_close_mailbox): drop thread_id, and use
+	set_threading_id instead;
+	(message_match_real): add test for msgno > 0;
+	(lbm_local_set_threading_info): renamed from
+	libbalsa_mailbox_local_set_threading_info now that it is
+	private;
+	(libbalsa_mailbox_local_set_threading): use the new name;
+	(lbm_local_prepare_msgno): declare it void; no gboolean return
+	value is needed;
+	(libbalsa_mailbox_local_prepare_threading): drop the idle
+	handler;
+	* libbalsa/mailbox_local.h:
+	libbalsa_mailbox_local_set_threading_info() is now private;
+	* libbalsa/mailbox_mbox.c (parse_mailbox): do not call it.
+
+2020-01-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox-local: Fetch threading info when needed
 
 	Add missing_info and missing_parent members to ThreadingInfo,

@@ -443,7 +443,6 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
                                    "^Status|^X-Status|^MIME-Version",
 				   lbm_mbox_header_cb, &msg_info_p);
 
-    libbalsa_mailbox_local_set_threading_info(local);
     msg_info.local_info.message = NULL;
     msg_info.local_info.loaded  = FALSE;
     while (!g_mime_parser_eos(gmime_parser)) {

@@ -67,8 +67,6 @@ LibBalsaMailbox *libbalsa_mailbox_local_new(const gchar * path,
                                             gboolean      create);
 gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 				     const gchar * path, gboolean create);
-void libbalsa_mailbox_local_set_threading_info(LibBalsaMailboxLocal *
-                                               local);
 
 #define libbalsa_mailbox_local_get_path(local) \
 	(libbalsa_mailbox_get_url((LibBalsaMailbox*)local)+7)

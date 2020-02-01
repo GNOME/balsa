@@ -2313,24 +2313,22 @@ libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
 
 static void lbm_sort(LibBalsaMailbox * mailbox, GNode * parent);
 
-static void
-lbm_check_and_sort(LibBalsaMailbox * mailbox)
-{
-    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
-
-    if (priv->msg_tree)
-        lbm_sort(mailbox, priv->msg_tree);
-
-    libbalsa_mailbox_changed(mailbox);
-}
-
 static gboolean
 lbm_set_threading_idle_cb(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 
     libbalsa_lock_mailbox(mailbox);
-    lbm_check_and_sort(mailbox);
+
+    if (!priv->messages_threaded) {
+        libbalsa_unlock_mailbox(mailbox);
+        return G_SOURCE_CONTINUE;
+    }
+
+    if (priv->msg_tree != NULL)
+        lbm_sort(mailbox, priv->msg_tree);
+
+    libbalsa_mailbox_changed(mailbox);
 
     priv->set_threading_idle_id = 0;
     libbalsa_unlock_mailbox(mailbox);

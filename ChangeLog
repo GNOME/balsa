@@ -1,3 +1,12 @@
+2020-02-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox: Do not sort until messages are threaded.
+
+	* libbalsa/mailbox.c (lbm_set_threading_idle_cb): if threading
+	is not complete, reschedule the handler; also drop
+	lbm_check_and_sort()--it did not check, and sorting can be done
+	in line.
+
 2020-01-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Message threading cleanup

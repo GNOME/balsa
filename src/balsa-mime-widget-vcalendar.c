@@ -31,9 +31,10 @@
 #include "balsa-mime-widget-callbacks.h"
 
 
-static GtkWidget *balsa_vevent_widget(LibBalsaVEvent * event,
-				      gboolean may_reply,
-				      InternetAddress * sender);
+static GtkWidget *balsa_vevent_widget(LibBalsaVEvent  *event,
+									  LibBalsaVCal    *vcal,
+									  gboolean         may_reply,
+									  InternetAddress *sender);
 static void vevent_reply(GObject * button, GtkWidget * box);
 
 
@@ -103,7 +104,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
 
     	frame = gtk_frame_new(NULL);
         gtk_container_add(GTK_CONTAINER(mw), frame);
-    	event = balsa_vevent_widget(libbalsa_vcal_vevent(vcal_obj, event_no), may_reply, sender);
+    	event = balsa_vevent_widget(libbalsa_vcal_vevent(vcal_obj, event_no), vcal_obj, may_reply, sender);
         gtk_container_set_border_width(GTK_CONTAINER(event), 6U);
     	gtk_container_add(GTK_CONTAINER(frame), event);
     }
@@ -168,8 +169,8 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     } while (0)
 
 static GtkWidget *
-balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
-		    InternetAddress * sender)
+balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_reply,
+		    InternetAddress *sender)
 {
     GtkGrid *grid;
     int row = 0;
@@ -252,7 +253,6 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	GtkWidget *button;
 
 	/* add the callback data to the event object */
-	g_object_ref(event);
 	g_object_set_data_full(G_OBJECT(event), "ev:sender",
 			       internet_address_to_string(sender, FALSE),
 			       (GDestroyNotify) g_free);
@@ -271,8 +271,12 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	gtk_container_add(GTK_CONTAINER(box), bbox);
 
 	button = gtk_button_new_with_label(_("Accept"));
-	g_object_set_data_full(G_OBJECT(button), "event", event,
-                               (GDestroyNotify) g_object_unref);
+	g_object_set_data(G_OBJECT(button), "event", event);
+
+	/* Note: we must ref the full VCal object here as time zone information is stored in it.  Only ref'ing the event would thus
+	 * lead to a segfault when a reply message is actually created. */
+	g_object_set_data_full(G_OBJECT(button), "vcal", g_object_ref(vcal),
+		(GDestroyNotify) g_object_unref);
 	g_object_set_data(G_OBJECT(button), "mode",
 			  GINT_TO_POINTER(ICAL_PARTSTAT_ACCEPTED));
 	g_signal_connect(button, "clicked",
@@ -300,6 +304,22 @@ balsa_vevent_widget(LibBalsaVEvent * event, gboolean may_reply,
 	return GTK_WIDGET(grid);
 }
 
+#define BUFFER_APPEND(b, l, s)							\
+	G_STMT_START {										\
+		if (s != NULL) {								\
+			g_string_append_printf(b, "%s %s\n", l, s);	\
+		}												\
+    } G_STMT_END
+
+#define BUFFER_APPEND_DATE(b, l, e, i)											\
+	G_STMT_START {																\
+    	gchar *_dstr = libbalsa_vevent_time_str(e, i, balsa_app.date_string);	\
+    	if (_dstr != NULL) {													\
+    		BUFFER_APPEND(b, l, _dstr);											\
+            g_free(_dstr);                                         				\
+        }                                                          				\
+    } G_STMT_END
+
 static void
 vevent_reply(GObject * button, GtkWidget * box)
 {
@@ -312,8 +332,8 @@ vevent_reply(GObject * button, GtkWidget * box)
     LibBalsaMessageHeaders *headers;
     LibBalsaMessageBody *body;
     const gchar *summary;
+    GString *textbuf;
     gchar *dummy;
-    gchar **params;
     GError *error = NULL;
     LibBalsaMsgCreateResult result;
     LibBalsaIdentity *ident;
@@ -344,26 +364,38 @@ vevent_reply(GObject * button, GtkWidget * box)
 			    libbalsa_vcal_part_stat_to_str(pstat));
     libbalsa_message_set_subject(message, dummy);
     g_free(dummy);
+    libbalsa_message_set_subtype(message, "alternative");
 
-    /* the only message part is the calendar object */
+    /* add an informational text part */
     body = libbalsa_message_body_new(message);
-    body->buffer =
-	libbalsa_vevent_reply(event,
-			      INTERNET_ADDRESS_MAILBOX(ia)->addr,
-			      pstat);
-    if (body->buffer == NULL) return;
     body->charset = g_strdup("utf-8");
-    body->content_type = g_strdup("text/calendar");
+    body->content_type = NULL;
+    textbuf = g_string_new(NULL);
+    g_string_append_printf(textbuf, _("%s %s the following iTIP calendar request:\n\n"),
+    	internet_address_get_name(ia), libbalsa_vcal_part_stat_to_str(pstat));
+    BUFFER_APPEND(textbuf, _("Summary:"), libbalsa_vevent_summary(event));
+    BUFFER_APPEND_DATE(textbuf, _("Start:"), event, VEVENT_DATETIME_START);
+    BUFFER_APPEND_DATE(textbuf, _("End:"), event, VEVENT_DATETIME_END);
+    BUFFER_APPEND(textbuf, _("Location:"), libbalsa_vevent_location(event));
+    BUFFER_APPEND(textbuf, _("Description:"), libbalsa_vevent_description(event));
+    body->buffer = g_string_free(textbuf, FALSE);
+    if (balsa_app.wordwrap) {
+        libbalsa_wrap_string(body->buffer, balsa_app.wraplength);
+    }
     libbalsa_message_append_part(message, body);
 
-    /* set the text/calendar parameters */
-    params = g_new(gchar *, 3);
-    params[0] = g_strdup("method");
-    params[1] = g_strdup("reply");
-    params[2] = NULL;
-    libbalsa_message_add_parameters(message, params);
+    /* the next message part is the calendar object */
+    body = libbalsa_message_body_new(message);
+    body->buffer = libbalsa_vevent_reply(event, INTERNET_ADDRESS_MAILBOX(ia)->addr, pstat);
+    if (body->buffer == NULL) {
+    	g_object_unref(message);
+    	return;
+    }
+    body->charset = g_strdup("utf-8");
+    body->content_type = g_strdup("text/calendar; method=reply");
+    libbalsa_message_append_part(message, body);
 
-    result = libbalsa_message_send(message, balsa_app.outbox, NULL,
+    result = libbalsa_message_send(message, balsa_app.outbox, balsa_app.sentbox,
 				   balsa_find_sentbox_by_url,
 				   libbalsa_identity_get_smtp_server(ident),
 				   balsa_app.send_progress_dialog,

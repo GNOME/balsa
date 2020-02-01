@@ -860,6 +860,9 @@ libbalsa_vevent_recurrence_str(LibBalsaVEvent *event, const gchar *format_str)
  * According to RFC 5546, Sect. 3.2.3., the REPLY shall include the following components and properties:
  * METHOD: MUST be REPLY
  * VEVENT: ATTENDEE, DTSTAMP, ORGANIZER, RECURRENCE-ID (if present in the request), UID, SEQUENCE (if present in the request)
+ *
+ * However, M$ Outlook/Exchange is broken and does not process these standard-compliant parts correctly.  The trivial fix is to add
+ * several optional fields (I did not figure out which are needed to work around the issue, so we just add them all...).
  */
 gchar *
 libbalsa_vevent_reply(const LibBalsaVEvent   *event,
@@ -920,6 +923,27 @@ libbalsa_vevent_reply(const LibBalsaVEvent   *event,
     /* add SEQUENCE (if present) */
     if (event->sequence > 0) {
     	icalcomponent_add_property(ev_data, icalproperty_new_sequence(event->sequence));
+    }
+
+    /* the following fields are *optional* in a reply according to RFC 5546, Sect. 3.2.3, but are apparently required by broken
+     * software like Exchange/Outlook */
+    if (icaltime_is_null_time(event->start) == 0) {
+    	icalcomponent_add_property(ev_data, icalproperty_new_dtstart(event->start));
+    }
+    if (icaltime_is_null_time(event->end) == 0) {
+    	icalcomponent_add_property(ev_data, icalproperty_new_dtend(event->end));
+    }
+    if (event->summary != NULL) {
+    	icalcomponent_add_property(ev_data, icalproperty_new_summary(event->summary));
+    }
+    if (event->description != NULL) {
+    	icalcomponent_add_property(ev_data, icalproperty_new_description(event->description));
+    }
+    if (event->status != ICAL_STATUS_NONE) {
+    	icalcomponent_add_property(ev_data, icalproperty_new_status(event->status));
+    }
+    if (event->location != NULL) {
+    	icalcomponent_add_property(ev_data, icalproperty_new_location(event->location));
     }
 
     reply_str = icalcomponent_as_ical_string(reply);

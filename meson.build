@@ -136,7 +136,7 @@ gthread_dep = dependency('gthread-2.0')
 gnutls_dep  = dependency('gnutls', version : '>= 3.0')
 gpgme_dep   = dependency('gpgme', version : '>= 1.6.0')
 fribidi_dep = dependency('fribidi')
-libical_dep = dependency('libical', version : '>= 3.0.0')
+libical_dep = dependency('libical', version : '>= 2.0.0')
 
 # Dependencies for balsa
 balsa_deps = [glib_dep,

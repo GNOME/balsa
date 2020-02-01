@@ -1,3 +1,16 @@
+2020-02-01  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	[Patch] ical improvements
+
+	* README, configure.ac, meson.build: require libical >= 2.0.0 instead of 3.0.0
+	* libbalsa/rfc2445.c: libbalsa_vevent_reply(): add several
+	optional fields to the “REPLY” message as to work around a M$
+	Exchange/Outlook bug
+	* src/balsa-mime-widget-vcalendar.c: balsa_vevent_widget():
+	ref the VCal object containing the time zone data if we show
+	the buttons for sending a reply; vevent_reply(): construct he
+	reply as multipart/alternative, store it the the sentbox
+
 2020-02-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox: Remove another idle handler when closing the mailbox

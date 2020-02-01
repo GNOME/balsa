@@ -46,7 +46,7 @@ Basically, Balsa requires
 - gthread-2.0
 - gnutls >= 3.0
 - gpgme >= 1.6.0
-- libical >= 3.0.0
+- libical >= 2.0.0
 - fribidi
 
 --disable-more-warnings

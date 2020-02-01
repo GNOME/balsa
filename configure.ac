@@ -230,7 +230,7 @@ gio-2.0
 gthread-2.0
 gnutls >= 3.0
 fribidi
-libical >= 3.0.0
+libical >= 2.0.0
 ])
 
 PKG_CHECK_MODULES(BALSA_AB, [

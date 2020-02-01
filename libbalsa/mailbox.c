@@ -654,6 +654,11 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
         libbalsa_mailbox_free_mindex(mailbox);
         priv->stamp++;
 	priv->state = LB_MAILBOX_STATE_CLOSED;
+
+        if (priv->set_threading_idle_id != 0) {
+            g_source_remove(priv->set_threading_idle_id);
+            priv->set_threading_idle_id = 0;
+        }
         priv->messages_threaded = FALSE;
 
         if (priv->run_filters_idle_id != 0) {

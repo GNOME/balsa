@@ -1,5 +1,12 @@
 2020-02-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox: Remove another idle handler when closing the mailbox
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_close): remove the idle
+	handler for sorting the mailbox.
+
+2020-02-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox: Do not sort until messages are threaded.
 
 	* libbalsa/mailbox.c (lbm_set_threading_idle_cb): if threading

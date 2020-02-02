@@ -1,3 +1,9 @@
+2020-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Add a file that's needed in the autotools build to the repository
+
+	* config.h.in:
+
 2020-02-02  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Build tools: Remove test for libresolv

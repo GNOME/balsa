@@ -602,6 +602,7 @@ libbalsa_mailbox_open(LibBalsaMailbox * mailbox, GError **err)
 
 	saved_state = priv->state;
 	priv->state = LB_MAILBOX_STATE_OPENING;
+        priv->messages_threaded = FALSE;
         retval =
             LIBBALSA_MAILBOX_GET_CLASS(mailbox)->open_mailbox(mailbox, err);
         if(retval) {
@@ -659,7 +660,6 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
             g_source_remove(priv->set_threading_idle_id);
             priv->set_threading_idle_id = 0;
         }
-        priv->messages_threaded = FALSE;
 
         if (priv->run_filters_idle_id != 0) {
             g_source_remove(priv->run_filters_idle_id);

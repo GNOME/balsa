@@ -1,5 +1,13 @@
 2020-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox: Reset messages-threaded in the open method instead of
+	the close method.
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_open),
+	(libbalsa_mailbox_close):
+
+2020-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Build: Do not check for getaddrinfo
 
 	* .gitignore: don't ignore config.h.in;

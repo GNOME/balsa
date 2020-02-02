@@ -478,14 +478,6 @@ if balsa_from_git
   add_global_arguments(args, language : 'c')
 endif # balsa_from_git
 
-#####################################################################
-# Extra functions.
-#####################################################################
-
-conf.set('HAVE_GETADDRINFO',
-  compiler.has_function('getaddrinfo') ? 1 : 0,
-  description : 'Define to 1 if you have the ‘getaddrinfo’ function.')
-
 ###########################################################################
 # Remember our prefixes
 ###########################################################################

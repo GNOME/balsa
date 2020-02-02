@@ -1,5 +1,13 @@
 2020-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Build: Do not check for getaddrinfo
+
+	* .gitignore: don't ignore config.h.in;
+	* configure.ac: do not check for getaddrinfo;
+	* meson.build: ditto.
+
+2020-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Add a file that's needed in the autotools build to the repository
 
 	* config.h.in:

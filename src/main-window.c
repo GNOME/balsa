@@ -115,7 +115,6 @@ static gboolean bw_close_mailbox_on_timer(BalsaWindow * window);
 
 static void bw_index_changed_cb(GtkWidget * widget, gpointer data);
 static void bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex);
-static void bw_idle_remove(BalsaWindow * window);
 static gboolean bw_idle_cb(BalsaWindow * window);
 
 
@@ -3173,10 +3172,14 @@ balsa_window_destroy(GObject * object)
     BalsaWindow *window = BALSA_WINDOW(object);
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    bw_idle_remove(window);
     /* The preview window seems to get finalized without notification;
      * we no longer need it, so we just drop our pointer: */
     priv->preview = NULL;
+
+    if (priv->set_message_id != 0) {
+        g_source_remove(priv->set_message_id);
+        priv->set_message_id = 0;
+    }
 
     if (priv->network_changed_source_id != 0) {
         g_source_remove(priv->network_changed_source_id);
@@ -4281,6 +4284,9 @@ bw_index_changed_cb(GtkWidget * widget, gpointer user_data)
     LibBalsaMessage *message;
     guint current_msgno;
 
+    if (priv->preview == NULL)
+        return;
+
     if (widget != priv->current_index)
         return;
 
@@ -4300,8 +4306,12 @@ bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
 {
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
+    if (priv->set_message_id != 0) {
+        g_source_remove(priv->set_message_id);
+        priv->set_message_id = 0;
+    }
+
     if (balsa_app.previewpane) {
-        bw_idle_remove(window);
         /* Skip if the window is being destroyed: */
         if (priv->preview != NULL) {
             priv->set_message_id = g_idle_add((GSourceFunc) bw_idle_cb, window);
@@ -4311,33 +4321,11 @@ bw_idle_replace(BalsaWindow * window, BalsaIndex * bindex)
     }
 }
 
-static void
-bw_idle_remove(BalsaWindow * window)
-{
-    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
-
-    if (priv->set_message_id) {
-        g_source_remove(priv->set_message_id);
-        priv->set_message_id = 0;
-    }
-}
-
-
-static volatile gboolean bw_idle_cb_active = FALSE;
-
 static gboolean
 bw_idle_cb(BalsaWindow * window)
 {
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     BalsaIndex *index;
-
-    if (priv->set_message_id == 0) {
-        return FALSE;
-    }
-    if (bw_idle_cb_active) {
-	return TRUE;
-    }
-    bw_idle_cb_active = TRUE;
 
     priv->set_message_id = 0;
 
@@ -4354,8 +4342,6 @@ bw_idle_cb(BalsaWindow * window)
         gtk_widget_grab_focus(GTK_WIDGET(index));
         g_object_set_data(G_OBJECT(window), BALSA_INDEX_GRAB_FOCUS, NULL);
     }
-
-    bw_idle_cb_active = FALSE;
 
     return FALSE;
 }

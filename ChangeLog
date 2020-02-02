@@ -1,5 +1,15 @@
 2020-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	main-window: Simplify and make more robust
+
+	* src/main-window.c (balsa_window_destroy): bw_idle_remove() has
+	been removed, so remove the GSource directly;
+	(bw_idle_replace): ditto;
+	(bw_idle_cb): scrap some useless tests;
+	(bw_index_changed_cb): check that priv->preview is non-NULL.
+
+2020-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox: Reset messages-threaded in the open method instead of
 	the close method.
 

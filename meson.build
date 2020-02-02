@@ -159,22 +159,6 @@ libnetclient_deps = [glib_dep,
                      gio_dep,
                      gnutls_dep]
 
-# Check whether res_init is available
-result = compiler.has_function('res_init', prefix : '#include <resolv.h>')
-if not result
-  result = compiler.has_function('res_init',
-                                 prefix : '#include <resolv.h>',
-                                 args   : '-lresolv')
-  if result
-    add_global_link_arguments('-lresolv')
-  endif
-endif
-
-if result
-  conf.set('HAVE_RES_INIT', 1,
-    description : 'Defined when res_init is available.')
-endif
-
 # ##########################################################################
 # Check versions
 # ##########################################################################

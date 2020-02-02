@@ -1,3 +1,10 @@
+2020-02-02  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Build tools: Remove test for libresolv
+
+	* configure.ac:
+	* meson.build:
+
 2020-02-01  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	[Patch] ical improvements

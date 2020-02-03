@@ -200,7 +200,7 @@ balsa_get_stats(long *unread, long *unsent)
         *unread = libbalsa_mailbox_get_unread_messages(balsa_app.inbox);
         libbalsa_mailbox_close(balsa_app.inbox, FALSE);
     } else *unread = -1;
-    if(balsa_app.draftbox && libbalsa_mailbox_open(balsa_app.outbox, NULL)){
+    if (balsa_app.outbox && libbalsa_mailbox_open(balsa_app.outbox, NULL)){
         *unsent = libbalsa_mailbox_total_messages(balsa_app.outbox);
         libbalsa_mailbox_close(balsa_app.outbox, FALSE);
     } else *unsent = -1;

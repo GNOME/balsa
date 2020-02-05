@@ -1016,8 +1016,8 @@ lbm_local_cache_message(LibBalsaMailboxLocal * local,
     if (!priv->threading_info)
         return;
 
-    while (priv->threading_info->len < msgno)
-        g_ptr_array_add(priv->threading_info, NULL);
+    if (priv->threading_info->len < msgno)
+        g_ptr_array_set_size(priv->threading_info, msgno);
     entry = &g_ptr_array_index(priv->threading_info, msgno - 1);
 
     if (*entry)

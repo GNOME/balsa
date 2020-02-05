@@ -363,8 +363,10 @@ static LibBalsaMessageFlag parse_filename(const gchar *subdir,
     return flags;
 }
 
-static void lbm_maildir_parse(LibBalsaMailboxMaildir * mdir,
-                              const gchar *subdir, guint * fileno)
+static void
+lbm_maildir_parse(LibBalsaMailboxMaildir *mdir,
+                  const gchar            *subdir,
+                  guint                  *fileno)
 {
     const gchar *local_path;
     gchar *path;

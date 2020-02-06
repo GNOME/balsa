@@ -738,7 +738,6 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
     LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mailbox);
     LibBalsaMailboxLocalPrivate *priv =
         libbalsa_mailbox_local_get_instance_private(local);
-    guint i;
     LibBalsaMailboxLocalPool *item;
 
     if(priv->sync_id) {
@@ -765,13 +764,12 @@ libbalsa_mailbox_local_close_mailbox(LibBalsaMailbox * mailbox,
     lbm_local_save_tree(local);
 
     if (priv->threading_info) {
+        guint msgno;
 	/* Free the memory owned by priv->threading_info, but neither
 	 * free nor truncate the array. */
-        for (i = priv->threading_info->len; i > 0;) {
-            gpointer *entry =
-                &g_ptr_array_index(priv->threading_info, --i);
-            lbm_local_free_info(*entry);
-            *entry = NULL;
+        for (msgno = priv->threading_info->len; msgno > 0; --msgno) {
+            lbm_local_free_info(g_ptr_array_index(priv->threading_info, msgno - 1));
+            g_ptr_array_index(priv->threading_info, msgno - 1) = NULL;
         }
     }
 
@@ -1006,34 +1004,34 @@ lbm_local_cache_message(LibBalsaMailboxLocal * local,
 {
     LibBalsaMailboxLocalPrivate *priv =
         libbalsa_mailbox_local_get_instance_private(local);
-    gpointer *entry;
     LibBalsaMailboxLocalInfo *info;
     LibBalsaMessageHeaders *headers;
 
     libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(local), msgno,
                                    message);
 
-    if (!priv->threading_info)
+    if (priv->threading_info == NULL)
         return;
 
     if (priv->threading_info->len < msgno)
         g_ptr_array_set_size(priv->threading_info, msgno);
-    entry = &g_ptr_array_index(priv->threading_info, msgno - 1);
 
-    if (*entry)
+    if (g_ptr_array_index(priv->threading_info, msgno - 1) != NULL)
         return;
 
-    *entry = info = g_new(LibBalsaMailboxLocalInfo, 1);
+    info = g_new(LibBalsaMailboxLocalInfo, 1);
     info->message_id = g_strdup(libbalsa_message_get_message_id(message));
     info->refs_for_threading =
         libbalsa_message_refs_for_threading(message);
-
     info->sender = NULL;
+
     headers = libbalsa_message_get_headers(message);
     if (headers->from != NULL)
         info->sender = internet_address_list_to_string(headers->from, FALSE);
     if (info->sender == NULL)
         info->sender = g_strdup("");
+
+    g_ptr_array_index(priv->threading_info, msgno - 1) = info;
 
     /* Rethread with the new info */
     if (priv->set_threading_id == 0) {

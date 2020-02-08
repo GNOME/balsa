@@ -150,7 +150,7 @@ struct _LibBalsaMailboxPrivate {
     guint queue_check_idle_id;
     guint need_threading_idle_id;
     guint run_filters_idle_id;
-    guint set_threading_idle_id;
+    guint sort_idle_id;
 
     gboolean is_directory : 1;
     gboolean readonly : 1;
@@ -499,8 +499,8 @@ libbalsa_mailbox_finalize(GObject * object)
     if (priv->run_filters_idle_id != 0)
         g_source_remove(priv->run_filters_idle_id);
 
-    if (priv->set_threading_idle_id != 0)
-        g_source_remove(priv->set_threading_idle_id);
+    if (priv->sort_idle_id != 0)
+        g_source_remove(priv->sort_idle_id);
 
     G_OBJECT_CLASS(libbalsa_mailbox_parent_class)->finalize(object);
 }
@@ -656,9 +656,9 @@ libbalsa_mailbox_close(LibBalsaMailbox * mailbox, gboolean expunge)
         priv->stamp++;
 	priv->state = LB_MAILBOX_STATE_CLOSED;
 
-        if (priv->set_threading_idle_id != 0) {
-            g_source_remove(priv->set_threading_idle_id);
-            priv->set_threading_idle_id = 0;
+        if (priv->sort_idle_id != 0) {
+            g_source_remove(priv->sort_idle_id);
+            priv->sort_idle_id = 0;
         }
 
         if (priv->run_filters_idle_id != 0) {
@@ -1987,24 +1987,37 @@ libbalsa_mailbox_sync_storage(LibBalsaMailbox * mailbox, gboolean expunge)
     return retval;
 }
 
+static gboolean lbm_sort_idle_cb(LibBalsaMailbox * mailbox);
+
 static void
 lbm_cache_message(LibBalsaMailbox * mailbox, guint msgno,
                   LibBalsaMessage * message)
 {
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     LibBalsaMailboxIndexEntry *entry;
+    gboolean need_sort;
 
     if (priv->mindex->len < msgno)
         g_ptr_array_set_size(priv->mindex, msgno);
 
     entry = g_ptr_array_index(priv->mindex, msgno - 1);
 
-    if (!entry) {
+    need_sort = TRUE;
+    if (entry == NULL) {
         g_ptr_array_index(priv->mindex, msgno - 1) =
             entry = g_new(LibBalsaMailboxIndexEntry, 1);
         lbm_index_entry_populate_from_msg(entry, message);
-    } else if (entry->idle_pending)
+    } else if (entry->idle_pending) {
         lbm_index_entry_populate_from_msg(entry, message);
+    } else {
+        need_sort = FALSE;
+    }
+
+    if (need_sort && priv->sort_idle_id == 0) {
+        priv->sort_idle_id =
+            g_idle_add_full(G_PRIORITY_LOW, (GSourceFunc) lbm_sort_idle_cb,
+                            mailbox, NULL);
+    }
 }
 
 LibBalsaMessage *
@@ -2319,7 +2332,7 @@ libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
 static void lbm_sort(LibBalsaMailbox * mailbox, GNode * parent);
 
 static gboolean
-lbm_set_threading_idle_cb(LibBalsaMailbox * mailbox)
+lbm_sort_idle_cb(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 
@@ -2335,7 +2348,7 @@ lbm_set_threading_idle_cb(LibBalsaMailbox * mailbox)
 
     libbalsa_mailbox_changed(mailbox);
 
-    priv->set_threading_idle_id = 0;
+    priv->sort_idle_id = 0;
     libbalsa_unlock_mailbox(mailbox);
 
     return G_SOURCE_REMOVE;
@@ -2352,10 +2365,8 @@ lbm_set_threading(LibBalsaMailbox * mailbox)
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
                                                        priv->view->threading_type);
 
-    if (priv->set_threading_idle_id == 0) {
-        priv->set_threading_idle_id =
-            g_idle_add((GSourceFunc) lbm_set_threading_idle_cb, mailbox);
-    }
+    if (priv->sort_idle_id == 0)
+        priv->sort_idle_id = g_idle_add((GSourceFunc) lbm_sort_idle_cb, mailbox);
 
     return TRUE;
 }

@@ -1,3 +1,16 @@
+2020-02-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox: Sort when new details about a message are found
+
+	* libbalsa/mailbox.c (lbm_cache_message): if we get new
+	information about the message, queue rethreading;
+	(libbalsa_mailbox_finalize),
+	(libbalsa_mailbox_close),
+	(lbm_sort_idle_cb),
+	(lbm_set_threading): rename
+	LibBalsaMailboxPrivate:set_threading_idle_id to
+	lbm_sort_idle_cb.
+
 2020-02-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	main-window: Simplify and make more robust

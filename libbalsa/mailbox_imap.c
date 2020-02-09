@@ -1298,8 +1298,8 @@ lbm_imap_check(LibBalsaMailbox * mailbox)
             info.marked = FALSE;
 
         g_signal_handler_disconnect(handle, id);
-        g_object_unref(handle);
         libbalsa_mailbox_imap_release_handle(mimap);
+        g_object_unref(handle);
 
         return info.marked;
     }

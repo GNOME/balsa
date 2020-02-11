@@ -294,8 +294,12 @@ libbalsa_mailbox_dispose(GObject * object)
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(object);
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 
-    while (priv->open_ref > 0)
-        libbalsa_mailbox_close(mailbox, FALSE);
+    if (priv->open_ref != 0) {
+        g_warning("%s %s open_ref (%d) != 0", __func__, priv->name, priv->open_ref);
+
+        while (priv->open_ref > 0)
+            libbalsa_mailbox_close(mailbox, FALSE);
+    }
 
     G_OBJECT_CLASS(libbalsa_mailbox_parent_class)->dispose(object);
 }

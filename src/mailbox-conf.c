@@ -32,7 +32,7 @@
    file, not that he/she wants to use another file. User can use "Set
    as Inbox" etc to achieve this goal.
    See thread:
-   http://mail.gnome.org/archives/balsa-list/2002-June/msg00044.html
+   https://mail.gnome.org/archives/balsa-list/2002-June/msg00044.html
 
    The mailbox_name field is displayed only for special mailboxes
    and POP3 mailboxes.

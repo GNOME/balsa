@@ -14,7 +14,7 @@
 <!ENTITY GnuPG
     '<app xmlns="http://projectmallard.org/1.0/">GnuPG</app>'>
 <!ENTITY balsalist
-    "http://mail.gnome.org/mailman/listinfo/balsa-list">
+    "https://mail.gnome.org/mailman/listinfo/balsa-list">
 <!ENTITY IMAP
     '<link xmlns="http://projectmallard.org/1.0/"
            xref ="glossary#imap">IMAP</link>'>

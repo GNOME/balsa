@@ -10451,7 +10451,7 @@ environment variable BALSA_DIALOG_HEADERBAR is 0.
 2012-04-16  Peter Bloomfield
 
 	Revert previous commit; fixes
-	<URL:http://mail.gnome.org/archives/balsa-list/2012-April/msg00003.html>
+	<URL:https://mail.gnome.org/archives/balsa-list/2012-April/msg00003.html>
 	from Ildar Mulyukov
 
 	* src/balsa-app.c (balsa_app_init):
@@ -10556,7 +10556,7 @@ environment variable BALSA_DIALOG_HEADERBAR is 0.
 2011-12-17  Peter Bloomfield
 
 	* src/main-window.c: build --without-nm; thanks to Jack
-	<URL:http://mail.gnome.org/archives/balsa-list/2011-December/msg00013.html>.
+	<URL:https://mail.gnome.org/archives/balsa-list/2011-December/msg00013.html>.
 
 2011-12-17  Peter Bloomfield
 
@@ -10700,7 +10700,7 @@ environment variable BALSA_DIALOG_HEADERBAR is 0.
 
 	* src/balsa-app.c (open_mailboxes_idle_cb): select first
 	command-line mailbox; see discussion at
-	http://mail.gnome.org/archives/balsa-list/2011-October/msg00010.html
+	https://mail.gnome.org/archives/balsa-list/2011-October/msg00010.html
 
 2011-10-21  Peter Bloomfield
 
@@ -10998,7 +10998,7 @@ environment variable BALSA_DIALOG_HEADERBAR is 0.
 	* src/main-window.c: call gtk_container_resize_children after
 	adding the notebook page for a newly opened mailbox; should not
 	be necessary, but seems to fix
-	<URL:http://mail.gnome.org/archives/balsa-list/2011-August/msg00017.html>.
+	<URL:https://mail.gnome.org/archives/balsa-list/2011-August/msg00017.html>.
 
 2011-08-30  Peter Bloomfield
 
@@ -11151,13 +11151,13 @@ environment variable BALSA_DIALOG_HEADERBAR is 0.
 	(sw_combo_box_changed), (create_from_entry): move selected
 	identity to the front of
 	balsa_app.identities; see
-	<URL:http://mail.gnome.org/archives/balsa-list/2011-May/msg00025.html>
+	<URL:https://mail.gnome.org/archives/balsa-list/2011-May/msg00025.html>
 	(Carlos Franke).
 
 2011-06-01  Peter Bloomfield
 
 	Respond to
-	<URL:http://mail.gnome.org/archives/balsa-list/2011-May/msg00023.html>
+	<URL:https://mail.gnome.org/archives/balsa-list/2011-May/msg00023.html>
 
 	* src/sendmsg-window.c (setup_headers_from_message): make the
 	blank line in the recipient widget not a Bcc: line;
@@ -11174,7 +11174,7 @@ environment variable BALSA_DIALOG_HEADERBAR is 0.
 
 	* src/main.c (balsa_handle_automation_options): do not send
 	ACTIVATE when asked for status; see
-	http://mail.gnome.org/archives/balsa-list/2011-May/msg00015.html
+	https://mail.gnome.org/archives/balsa-list/2011-May/msg00015.html
 
 2011-04-16  Peter Bloomfield
 
@@ -11653,7 +11653,7 @@ environment variable BALSA_DIALOG_HEADERBAR is 0.
 
 	* src/balsa-message.c (bm_next_part_info): look for next part
 	above current part, if necessary; fixes
-	http://mail.gnome.org/archives/balsa-list/2010-November/msg00003.html
+	https://mail.gnome.org/archives/balsa-list/2010-November/msg00003.html
 
 2010-11-07  Peter Bloomfield
 
@@ -12912,7 +12912,7 @@ environment variable BALSA_DIALOG_HEADERBAR is 0.
 
 	* src/toolbar-factory.c (tm_do_popup_menu): do not crash when
 	default is "text beside items"; fixes
-	http://mail.gnome.org/archives/balsa-list/2009-September/msg00045.html
+	https://mail.gnome.org/archives/balsa-list/2009-September/msg00045.html
 
 2009-09-28  Laurent Coudeur <laurentc iol ie>
 
@@ -13920,7 +13920,7 @@ environment variable BALSA_DIALOG_HEADERBAR is 0.
 
 	Fix BUG - threading view and selecting, reported by Mario
 	Mikocevic <mario.mikocevic t-com hr>
-	(http://mail.gnome.org/archives/balsa-list/2009-January/msg00015.html)
+	(https://mail.gnome.org/archives/balsa-list/2009-January/msg00015.html)
 
 	* src/balsa-index.h: new boolean BalsaIndex::collapsing.
 	* src/balsa-index.c:

@@ -11,3 +11,4 @@ Type=Application
 StartupNotify=true
 Categories=@TOOLKIT_CATEGORIES@Network;Email;
 X-GNOME-UsesNotifications=true
+Keywords=Mail;E-mail;Email;IMAP

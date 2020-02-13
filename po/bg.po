@@ -3893,7 +3893,7 @@ msgstr ""
 "Клиентът за е-поща Balsa е част от настолната среда GNOME.  Подробности за "
 "Balsa могат да бъдат намерени на https://pawsa.fedorapeople.org/balsa/\n"
 "\n"
-"Ако искате да съобщите грешки, моля направете го на: http://bugs.gnome.org/"
+"Ако искате да съобщите грешки, моля направете го на: https://gitlab.gnome.org/GNOME/balsa/issues"
 
 #: ../src/main-window.c:2681 ../src/main-window.c:2694
 msgid "Checking Mail..."

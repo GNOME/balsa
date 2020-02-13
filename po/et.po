@@ -3921,8 +3921,7 @@ msgstr ""
 "Balsa e-posti lugeja on osa GNOME tÃ¶Ã¶laua keskkonnast. Teavet Balsa kohta "
 "leiate aadressil http://www.balsa.net/\n"
 "\n"
-"Kui teil on vaja teatada vigadest, kasutage selleks palun aadressi http://"
-"bugs.gnome.org/"
+"Kui teil on vaja teatada vigadest, kasutage selleks palun aadressi https://gitlab.gnome.org/GNOME/balsa/issues"
 
 #: ../src/main-window.c:2682 ../src/main-window.c:2695
 msgid "Checking Mail..."

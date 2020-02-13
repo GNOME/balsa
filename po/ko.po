@@ -4041,7 +4041,7 @@ msgid ""
 msgstr ""
 "발사 편지 프로그램은 그놈 데스크탑 환경의 한 부분입니다.  발사에 대한 정보는 "
 "http://www.balsa.net/에서 찾을 수 있습니다.\n"
-"버그 레포트가 필요하시면 http://bugs.gnome.org/에서 해주세요"
+"버그 레포트가 필요하시면 https://gitlab.gnome.org/GNOME/balsa/issues에서 해주세요"
 
 #: ../src/main-window.c:2682 ../src/main-window.c:2695
 #, fuzzy

@@ -4630,7 +4630,7 @@ msgstr ""
 "Ο πελάτης ηλ. ταχυδρομείου Balsa είναι μέρος του περιβάλλοντος εργασίας "
 "GNOME.  Πληροφορίες για το Balsa υπάρχουν στο http://www.balsa.net/\n"
 "\n"
-"Παρακαλώ αναφέρατε τυχόν σφάλματα στο: http://bugs.gnome.org/"
+"Παρακαλώ αναφέρατε τυχόν σφάλματα στο: https://gitlab.gnome.org/GNOME/balsa/issues"
 
 #
 #: ../src/main-window.c:2812 ../src/main-window.c:2825

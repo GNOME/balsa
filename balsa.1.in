@@ -150,7 +150,7 @@ https://pawsa.fedorapeople.org/balsa\fR
 .SH SUGGESTIONS AND BUG REPORTS
 Any bugs found in Balsa can be reported through
   the Balsa Developer mailing list at \fBbalsa-list@gnome.org \fR,
-  or the online bug-tracking system at \fBhttp://bugzilla.gnome.org/ \fR.
+  or the online bug-tracking system at \fBhttps://gitlab.gnome.org/GNOME/balsa/issues \fR.
 .RS 0
 .RE
 See https://pawsa.fedorapeople.org/balsa/bugs.html for more information on reporting Balsa bugs.

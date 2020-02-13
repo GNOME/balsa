@@ -4029,7 +4029,7 @@ msgstr ""
 "Balsa poçt tə'minatı GNOME masa üstü mühidinin bir parçasıdır .Balsa ilə "
 "əlaqəli mə'lumata \"http://www.balsa.net/\" ünvanından yetişə bilərsiniz.\n"
 "\n"
-"Xəta raportları göndərmək üçün, xahiş edirik \"http://bugs.gnome.org/\" "
+"Xəta raportları göndərmək üçün, xahiş edirik \"https://gitlab.gnome.org/GNOME/balsa/issues\" "
 "ünvanına gedin."
 
 #: ../src/main-window.c:2682 ../src/main-window.c:2695

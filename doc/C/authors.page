@@ -67,7 +67,7 @@ id="authors">
   &Balsa;
   <link href="https://pawsa.fedorapeople.org/balsa/">Web page</link>. Please send
   all comments, suggestions, and bug reports to the
-  <link href="http://bugs.gnome.org/">GNOME bug tracking
+  <link href="https://gitlab.gnome.org/GNOME/balsa/issues">GNOME bug tracking
   database</link>. Instructions for submitting bug reports can be
   found on-line at
   <link href="https://pawsa.fedorapeople.org/balsa/bugs.html">

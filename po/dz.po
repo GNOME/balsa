@@ -4285,11 +4285,11 @@ msgstr "སྐད་བསྒྱུར་པའི་-ངོ་བསྟོད�
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  Information on Balsa can be found at https://pawsa.fedorapeople.org/balsa/\n"
 "\n"
-"If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
+"If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 msgstr ""
 "བཱལ་ས་གློག་འཕྲིན་ཞབས་ཏོག་སྤྱོད་མི་འདི་  ཇི་ནོམ་ཌེཀསི་ཊོཔ་མཐའ་འཁོར་གྱི་ཆ་ཤས་ཨིན།  བཱལ་སའི་བརྡ་དོན་འདི་ https://pawsa.fedorapeople.org/balsa/ གུ་ཐོབ་ཚུགས།\n"
 "\n"
-"ཁྱོད་ཀྱིས་རྐྱེན་ཚུ་སྙན་ཞུ་འབད་ནི་ཨིན་པ་ཅིན་   http://bugzilla.gnome.org/ ལུ་འབད་གནང་:"
+"ཁྱོད་ཀྱིས་རྐྱེན་ཚུ་སྙན་ཞུ་འབད་ནི་ཨིན་པ་ཅིན་   https://gitlab.gnome.org/GNOME/balsa/issues ལུ་འབད་གནང་:"
 
 #: ../src/main-window.c:2844
 #: ../src/main-window.c:2857

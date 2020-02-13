@@ -3820,7 +3820,7 @@ msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at https://pawsa.fedorapeople.org/balsa/\n"
 "\n"
-"If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
+"If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 msgstr ""
 
 #: ../src/main-window.c:2682 ../src/main-window.c:2695

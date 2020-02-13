@@ -10828,12 +10828,12 @@ msgstr "_Caracteres especiales de escape"
 #~ "The Balsa email client is part of the GNOME desktop environment.  "
 #~ "Information on Balsa can be found at https://pawsa.fedorapeople.org/balsa/\n"
 #~ "\n"
-#~ "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
+#~ "If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 #~ msgstr ""
 #~ "El cliente de correo-e Balsa es parte del entorno de escritorio GNOME.  "
 #~ "Puede encontrar información de Balsa en https://pawsa.fedorapeople.org/balsa/\n"
 #~ "\n"
-#~ "Si necesita informar de errores, hágalo en http://bugzilla.gnome.org/"
+#~ "Si necesita informar de errores, hágalo en https://gitlab.gnome.org/GNOME/balsa/issues"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474

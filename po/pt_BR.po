@@ -1108,7 +1108,7 @@ msgstr "falha na assinatura"
 # Marquei como aproximada porque estou na dúvida entre:
 # a. apenas assinar e criptografar estão definidas pela RFC 2440; ou
 # b. apenas a RFC 2440 define ao mesmo tempo assinar e criptografar.
-# Esperando a resolução de http://bugzilla.gnome.org/show_bug.cgi?id=566415
+# Esperando a resolução de https://bugzilla.gnome.org/show_bug.cgi?id=566415
 #: ../libbalsa/libbalsa-gpgme.c:574
 #, c-format
 msgid "combined signing and encryption is defined only for RFC 2440"
@@ -8664,13 +8664,12 @@ msgstr "Move o item selecionado para baixo"
 #~ "The Balsa email client is part of the GNOME desktop environment.  "
 #~ "Information on Balsa can be found at https://pawsa.fedorapeople.org/balsa/\n"
 #~ "\n"
-#~ "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
+#~ "If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 #~ msgstr ""
 #~ "O cliente de e-mail Balsa é parte do GNOME. Informações sobre o Balsa "
 #~ "podem ser encontradas em https://pawsa.fedorapeople.org/balsa/\n"
 #~ "\n"
-#~ "Se você precisar relatar erros, por favor faça-o em: http://bugzilla."
-#~ "gnome.org/"
+#~ "Se você precisar relatar erros, por favor faça-o em: https://gitlab.gnome.org/GNOME/balsa/issues"
 
 #~ msgid "N_o Headers"
 #~ msgstr "_Sem cabeçalhos"

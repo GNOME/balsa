@@ -4062,12 +4062,12 @@ msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
 "Information on Balsa can be found at https://pawsa.fedorapeople.org/balsa/\n"
 "\n"
-"If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
+"If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 msgstr ""
 "Программа для электронной почты Balsa является частью рабочей среды GNOME. "
 "Подробное описание Balsa можно найти по адресу http://www.balsa.net/\n"
 "\n"
-"Сообщить об обнаруженных ошибках можно по адресу http://bugzilla.gnome.org"
+"Сообщить об обнаруженных ошибках можно по адресу https://gitlab.gnome.org/GNOME/balsa/issues"
 
 #: ../src/main-window.c:2682 ../src/main-window.c:2695
 #, fuzzy

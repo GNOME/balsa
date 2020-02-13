@@ -219,10 +219,10 @@ content2reply(LibBalsaMessageBody * root, gchar * reply_prefix_str,
  * so this doesn't change the content.
  * */
 /* Updated 2003 to implement DelSp=Yes as in
- * http://www.ietf.org/internet-drafts/draft-gellens-format-bis-01.txt
+ * https://www.ietf.org/internet-drafts/draft-gellens-format-bis-01.txt
  */
 /* Now documented in RFC 3676:
- * http://www.ietf.org/rfc/rfc3676.txt
+ * https://www.ietf.org/rfc/rfc3676.txt
  * or
  * http://www.faqs.org/rfcs/rfc3676.html
  */

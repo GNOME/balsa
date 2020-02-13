@@ -115,7 +115,7 @@ libbalsa_address_new(void)
    VCARD code attempts to obey published documentation:
 
    [1] VCARD 1.2 specs: http://www.imc.org/pdi/vcard-21.txt
-   [2] VCARD 3.0 specs, RFC 2426 (http://www.ietf.org/rfc/rfc2426.txt)
+   [2] VCARD 3.0 specs, RFC 2426 (https://www.ietf.org/rfc/rfc2426.txt)
 */
 
 static gboolean

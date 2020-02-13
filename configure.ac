@@ -159,7 +159,7 @@ AC_CHECK_MEMBERS([struct utsname.domainname],[],[],[[#include<sys/utsname.h>]])
 
 # pkg-config
 #
-AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+PKG_PROG_PKG_CONFIG
 
 # glib-compile-resources
 #

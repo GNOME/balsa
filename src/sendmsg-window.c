@@ -5043,7 +5043,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
      * text/plain part to display the text/html part; the latter is
      * encoded as UTF-8 by add_mime_body_plain (send.c), so we'll use
      * the same encoding for the text/plain part.
-     * http://bugzilla.gnome.org/show_bug.cgi?id=580704 */
+     * https://bugzilla.gnome.org/show_bug.cgi?id=580704 */
     body->charset =
         g_strdup(bsmsg->send_mp_alt ?
                  "UTF-8" : sw_required_charset(bsmsg, body->buffer));

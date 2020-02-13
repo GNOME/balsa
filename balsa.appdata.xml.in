@@ -17,6 +17,6 @@
         </ul>
         <_p>and the proverbial much, much more.</_p>
     </description>
-    <url type="homepage">http://pawsa.fedorapeople.org/balsa/</url>
+    <url type="homepage">https://pawsa.fedorapeople.org/balsa/</url>
     <updatecontact>balsa-list_at_gnome.org</updatecontact>
 </component>

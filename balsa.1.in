@@ -144,8 +144,8 @@ This feature is useful for debugging IMAP problems.
 .RE
 .SH WEBSITE
 Balsa's website is \fI
-.UR http://balsa.gnome.org
-http://balsa.gnome.org\fR
+.UR https://pawsa.fedorapeople.org/balsa
+https://pawsa.fedorapeople.org/balsa\fR
 
 .SH SUGGESTIONS AND BUG REPORTS
 Any bugs found in Balsa can be reported through
@@ -153,7 +153,7 @@ Any bugs found in Balsa can be reported through
   or the online bug-tracking system at \fBhttp://bugzilla.gnome.org/ \fR.
 .RS 0
 .RE
-See http://balsa.gnome.org/bugs.html for more information on reporting Balsa bugs.
+See https://pawsa.fedorapeople.org/balsa/bugs.html for more information on reporting Balsa bugs.
 
 Before reporting bugs, please check to see if the bug is mentioned 
 in the FAQ's or the mailing list archive \fI

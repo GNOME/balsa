@@ -4419,11 +4419,11 @@ msgstr "Laurent Dhima <laurenti@alblinux.net>"
 #, fuzzy
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://balsa.gnome.org/\n"
+"Information on Balsa can be found at https://pawsa.fedorapeople.org/balsa/\n"
 "\n"
 "If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
 msgstr ""
-"Balsa është nga GNOME Informacione në Balsahttp://balsa.gnome.org/ jhttp://"
+"Balsa është nga GNOME Informacione në Balsahttps://pawsa.fedorapeople.org/balsa/ jhttp://"
 "bugzilla.gnome.org/"
 
 #: ../src/main-window.c:2612 ../src/main-window.c:2625

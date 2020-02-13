@@ -2380,7 +2380,7 @@ pipe_in_watch(GIOChannel *channel, GIOCondition condition, gpointer data)
 	    pipe->chars_written += chars_written;
 	    break;
 	case G_IO_STATUS_EOF:
-	    printf("pipe_in::write_chars receieved premature EOF %s\n",
+	    printf("pipe_in::write_chars received premature EOF %s\n",
 		   error ? error->message : "unknown");
 	    pipe_data_destroy(pipe);
 	    return FALSE;

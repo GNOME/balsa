@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *  
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 /** @file imap_tst.c tests some IMAP capabilities. It is very useful
     for stress-testing the imap part of balsa. */

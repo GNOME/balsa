@@ -4065,7 +4065,7 @@ msgid ""
 "If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 msgstr ""
 "Программа для электронной почты Balsa является частью рабочей среды GNOME. "
-"Подробное описание Balsa можно найти по адресу http://www.balsa.net/\n"
+"Подробное описание Balsa можно найти по адресу https://pawsa.fedorapeople.org/balsa/\n"
 "\n"
 "Сообщить об обнаруженных ошибках можно по адресу https://gitlab.gnome.org/GNOME/balsa/issues"
 

@@ -8868,7 +8868,7 @@ msgstr "Flytta markerat objekt nedåt"
 #~ "If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 #~ msgstr ""
 #~ "Balsa är en e-postklient som är en del av GNOME. Information om Balsa kan "
-#~ "du hitta på http://www.balsa.net/\n"
+#~ "du hitta på https://pawsa.fedorapeople.org/balsa/\n"
 #~ "\n"
 #~ "Om du vill rapportera fel kan du göra det på: https://gitlab.gnome.org/GNOME/balsa/issues"
 

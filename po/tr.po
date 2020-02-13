@@ -7888,7 +7888,7 @@ msgstr "Seçimi klasöre kaydet..."
 #~ "If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 #~ msgstr ""
 #~ "Balsa posta istemcisi GNOME masaüstü ortamının bir parçasıdır.  Balsa ile "
-#~ "ilgili bilgilere http://www.balsa.net/ adresinden ulaşılabilir.\n"
+#~ "ilgili bilgilere https://pawsa.fedorapeople.org/balsa/ adresinden ulaşılabilir.\n"
 #~ "\n"
 #~ "Hata raporlarını lütfen https://gitlab.gnome.org/GNOME/balsa/issues adresine gönderiniz."
 

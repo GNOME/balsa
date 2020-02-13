@@ -7931,7 +7931,7 @@ msgstr "向下"
 #~ "If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 #~ msgstr ""
 #~ "Balsa 邮件客户程序是 GNOME 桌面环境的一部分。关于 Balsa 的信息可以访问 "
-#~ "http://www.balsa.net\n"
+#~ "https://pawsa.fedorapeople.org/balsa/\n"
 #~ "\n"
 #~ "如果您要报告软件的问题，请访问https://gitlab.gnome.org/GNOME/balsa/issues"
 

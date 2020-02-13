@@ -4628,7 +4628,7 @@ msgid ""
 "If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 msgstr ""
 "Ο πελάτης ηλ. ταχυδρομείου Balsa είναι μέρος του περιβάλλοντος εργασίας "
-"GNOME.  Πληροφορίες για το Balsa υπάρχουν στο http://www.balsa.net/\n"
+"GNOME.  Πληροφορίες για το Balsa υπάρχουν στο https://pawsa.fedorapeople.org/balsa/\n"
 "\n"
 "Παρακαλώ αναφέρατε τυχόν σφάλματα στο: https://gitlab.gnome.org/GNOME/balsa/issues"
 

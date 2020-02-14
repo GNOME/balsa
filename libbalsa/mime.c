@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *  
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -219,10 +219,10 @@ content2reply(LibBalsaMessageBody * root, gchar * reply_prefix_str,
  * so this doesn't change the content.
  * */
 /* Updated 2003 to implement DelSp=Yes as in
- * http://www.ietf.org/internet-drafts/draft-gellens-format-bis-01.txt
+ * https://www.ietf.org/internet-drafts/draft-gellens-format-bis-01.txt
  */
 /* Now documented in RFC 3676:
- * http://www.ietf.org/rfc/rfc3676.txt
+ * https://www.ietf.org/rfc/rfc3676.txt
  * or
  * http://www.faqs.org/rfcs/rfc3676.html
  */

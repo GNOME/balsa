@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *  
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 /* imap_quote_string: quote string according to IMAP rules:
  *   surround string with quotes, escape " and \ with \ */

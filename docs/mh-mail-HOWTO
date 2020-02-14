@@ -43,7 +43,7 @@ mails:
 Obviously balsa identifies MH mail folders by the existence of a file
 ".mh_sequences" in these folders. If, for example, the Emacs mh-mail
 package has been used before balsa, then there is no problem. However,
-I use a system called MEW (http://www.mew.org) which lets me see mail
+I use a system called MEW (https://www.mew.org) which lets me see mail
 with Japanese characters using Emacs/Mule. Mew doesn't create files
 ".mh_sequences" (but rather files ".mew-cache"). Therefore I had to
 create (touch) files ".mh_sequences" in each MH folder. Concerning

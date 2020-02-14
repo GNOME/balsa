@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -115,7 +115,7 @@ libbalsa_address_new(void)
    VCARD code attempts to obey published documentation:
 
    [1] VCARD 1.2 specs: http://www.imc.org/pdi/vcard-21.txt
-   [2] VCARD 3.0 specs, RFC 2426 (http://www.ietf.org/rfc/rfc2426.txt)
+   [2] VCARD 3.0 specs, RFC 2426 (https://www.ietf.org/rfc/rfc2426.txt)
 */
 
 static gboolean

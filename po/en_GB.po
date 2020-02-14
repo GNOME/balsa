@@ -4666,14 +4666,14 @@ msgstr "translator-credits"
 #: ../src/main-window.c:2552 ../src/main-window.c:2579
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://balsa.gnome.org/\n"
+"Information on Balsa can be found at https://pawsa.fedorapeople.org/balsa/\n"
 "\n"
-"If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
+"If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 msgstr ""
 "The Balsa e-mail client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://balsa.gnome.org/\n"
+"Information on Balsa can be found at https://pawsa.fedorapeople.org/balsa/\n"
 "\n"
-"If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
+"If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 
 #: ../src/main-window.c:2683 ../src/main-window.c:2696
 msgid "Checking Mail..."

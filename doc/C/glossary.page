@@ -57,7 +57,7 @@ id="glossary">
       <title>MDA</title>
       <p>An acronym for “Mail Delivery Agent”, this type of program
       is also known as a Local Delivery Agent (LDA). It is
-      responsible for delivering the mail recieved for someone on a
+      responsible for delivering the mail received for someone on a
       machine to the mail folder of that person. &procmail; is
       an example of this type of program, although many
       <link xref="glossary#mta">MTA</link>'s have their own

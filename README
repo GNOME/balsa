@@ -17,7 +17,7 @@ Authors:
 
 Website:
 -------
-	http://pawsa.fedorapeople.org/balsa/
+	https://pawsa.fedorapeople.org/balsa/
 
 
 Description:
@@ -201,7 +201,7 @@ Mailbox locking:
         Balsa uses flock+dotfile for mailbox file locking. It does not
 use fcntl (although it can be enabled) since this locking method is
 very fragile and often not portable (see for example
-http://www.washington.edu/pine/tech-notes/low-level.html#locking).
+https://web.pa.msu.edu/reference/pine-tech-notes/low-level.html#locking).
 
         Make sure that your spool directory has drwxrwxrwt (01777) access
 privileges. Presently, dotfile locking requires this unconditionally

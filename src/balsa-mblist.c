@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -790,7 +790,7 @@ bmbl_column_resize(GtkWidget * widget,
 
 /* bmbl_drag_cb
  *
- * Description: This is the drag_data_recieved signal handler for the
+ * Description: This is the drag_data_received signal handler for the
  * BalsaMBList.  It retrieves the source BalsaIndex and transfers the
  * index's selected messages to the target
  * mailbox.  Depending on what key is held down when the message(s)

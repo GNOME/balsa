@@ -4022,14 +4022,14 @@ msgstr ""
 #: ../src/main-window.c:2551 ../src/main-window.c:2578
 msgid ""
 "The Balsa email client is part of the GNOME desktop environment.  "
-"Information on Balsa can be found at http://balsa.gnome.org/\n"
+"Information on Balsa can be found at https://pawsa.fedorapeople.org/balsa/\n"
 "\n"
-"If you need to report bugs, please do so at: http://bugzilla.gnome.org/"
+"If you need to report bugs, please do so at: https://gitlab.gnome.org/GNOME/balsa/issues"
 msgstr ""
 "Balsa poçt tə'minatı GNOME masa üstü mühidinin bir parçasıdır .Balsa ilə "
-"əlaqəli mə'lumata \"http://www.balsa.net/\" ünvanından yetişə bilərsiniz.\n"
+"əlaqəli mə'lumata \"https://pawsa.fedorapeople.org/balsa/\" ünvanından yetişə bilərsiniz.\n"
 "\n"
-"Xəta raportları göndərmək üçün, xahiş edirik \"http://bugs.gnome.org/\" "
+"Xəta raportları göndərmək üçün, xahiş edirik \"https://gitlab.gnome.org/GNOME/balsa/issues\" "
 "ünvanına gedin."
 
 #: ../src/main-window.c:2682 ../src/main-window.c:2695

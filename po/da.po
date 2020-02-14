@@ -39,7 +39,7 @@
 #
 # Anbefaler at bevare "multipart/..." jf. klids ordliste, da det er
 # rfc-udtryk som normalt ikke oversættes. Den tyske har tilsvarende bevaret rfc-udtrykkene:
-# http://git.gnome.org/browse/balsa/commit/?id=3f5e994fdcbb2a2fad1534cfa4d5c9d86298cf35
+# https://gitlab.gnome.org/GNOME/balsa/commit/3f5e994fdcbb2a2fad1534cfa4d5c9d86298cf35
 #
 msgid ""
 msgstr ""

@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  *  
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+ * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -187,7 +187,7 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
 	rfc2440header =
 	    g_strdup_printf("-----BEGIN PGP MESSAGE-----\nCharset: %s\n"
 			    "Comment: created by Balsa " BALSA_VERSION
-			    " (http://balsa.gnome.org)", charset);
+			    " (https://pawsa.fedorapeople.org/balsa)", charset);
 	g_byte_array_remove_range(cipherdata, 0, 27);
 	g_byte_array_prepend(cipherdata, (guint8 *) rfc2440header,
 			     strlen(rfc2440header));

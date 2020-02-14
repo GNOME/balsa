@@ -3072,7 +3072,7 @@ msgid "MDA"
 msgstr "MDA"
 
 #: C/balsa.xml:5006(para)
-msgid "An acronym for \"Mail Delivery Agent\", this type of program is also known as a Local Delivery Agent (LDA). It is responsible for delivering the mail recieved for someone on a machine to the mail folder of that person. <application>procmail</application> is an example of this type of program, although many <glossterm linkend=\"glossary-mta\">MTA</glossterm>'s have their own MDA implementations."
+msgid "An acronym for \"Mail Delivery Agent\", this type of program is also known as a Local Delivery Agent (LDA). It is responsible for delivering the mail received for someone on a machine to the mail folder of that person. <application>procmail</application> is an example of this type of program, although many <glossterm linkend=\"glossary-mta\">MTA</glossterm>'s have their own MDA implementations."
 msgstr "Akronim za \"Agent dostavljanja pošte\", ta vrsta programa je poznana tudi kot agent krajevnega dostavljanja (LDA). Odgovoren je za dostavljanje prejete pošte za nekoga na računalniku v poštno mapo te osebe. Primer takšnega programa je <application>procmail</application>, vendar ima več  <glossterm linkend=\"glossary-mta\">MTA</glossterm>-jev svoje izvedbe MDA."
 
 #: C/balsa.xml:5019(glossterm)

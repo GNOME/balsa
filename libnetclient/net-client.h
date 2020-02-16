@@ -1,9 +1,9 @@
 /* NetClient - simple line-based network client library
  *
- * Copyright (C) Albrecht Dreß <mailto:albrecht.dress@arcor.de> 2017
+ * Copyright (C) Albrecht Dreß <mailto:albrecht.dress@arcor.de> 2017 - 2020
  *
  * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+ * as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
@@ -307,9 +307,9 @@ gboolean net_client_can_read(NetClient *client);
  * The module net-client-siobuf.h implements some functions for replacing the @em siobuf in Balsa's libbalsa/imap module.
  *
  * \author Written by Albrecht Dreß mailto:albrecht.dress@arcor.de
- * \copyright Copyright &copy; Albrecht Dreß 2017<br/>
+ * \copyright Copyright &copy; Albrecht Dreß 2017 - 2020<br/>
  * This library is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as
- * published bythe Free Software Foundation, either version 3 of the License, or (at your option) any later version.<br/>
+ * published bythe Free Software Foundation, either version 2 of the License, or (at your option) any later version.<br/>
  * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.<br/>
  * You should have received a copy of the GNU General Public License along with this library.  If not, see

@@ -9,11 +9,11 @@
 #   to deflate compression
 # - 'DISCONNECT' in the received string causes the connection to be closed
 # 
-# Copyright (C) Albrecht Dreß <mailto:albrecht.dress@arcor.de> 2017
+# Copyright (C) Albrecht Dreß <mailto:albrecht.dress@arcor.de> 2017 - 2020
 #
 # This script is free software; you can redistribute it and/or modify it under
 # the terms of the GNU Lesser General Public License as published by the Free
-# Software Foundation; either version 3 of the License, or (at your option)
+# Software Foundation; either version 2 of the License, or (at your option)
 # any later version.
 #
 # This script is distributed in the hope that it will be useful, but WITHOUT

@@ -1,3 +1,15 @@
+2020-02-16  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	imap-handle: Do not crash on PREAUTH greeting
+
+	when it hasn't resulted in storing last-message.
+
+	* libbalsa/imap/imap-handle.c (imap_mbox_connect): do not
+	dereference NULL ImapHandle:last_msg;
+	(ir_preauth): parse PREAUTH greeting the same as OK.
+
+	Fixes https://gitlab.gnome.org/GNOME/balsa/issues/23
+
 2020-02-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox: Sort when new details about a message are found

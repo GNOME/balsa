@@ -699,7 +699,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
     imap_handle_disconnect(handle);
     return IMAP_PROTOCOL_ERROR;
   }
-  handle->can_fetch_body = 
+  handle->can_fetch_body = (handle->last_msg != NULL) &&
     (strncmp(handle->last_msg, "Microsoft Exchange", 18) != 0);
   if((handle->tls_mode == NET_CLIENT_CRYPT_ENCRYPTED) ||
 	 (handle->tls_mode == NET_CLIENT_CRYPT_NONE)) {
@@ -2344,9 +2344,13 @@ ir_bad(ImapMboxHandle *h)
 static ImapResponse
 ir_preauth(ImapMboxHandle *h)
 {
-  if(imap_mbox_handle_get_state(h) == IMHS_CONNECTED)
-    imap_mbox_handle_set_state(h, IMHS_AUTHENTICATED);
-  return IMR_OK;
+	ImapResponse resp;
+
+	resp = ir_ok(h);
+	if ((resp == IMR_OK) && (imap_mbox_handle_get_state(h) == IMHS_CONNECTED)) {
+		imap_mbox_handle_set_state(h, IMHS_AUTHENTICATED);
+	}
+	return resp;
 }
 
 /* ir_bye:

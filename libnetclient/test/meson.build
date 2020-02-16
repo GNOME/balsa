@@ -22,6 +22,7 @@ if libnetclient_test
   test_compile_dep = declare_dependency(compile_args : test_flags,
                                         link_args    : link_arg)
   test_executable  = executable('tests', 'tests.c',
+                                c_args              : '-DG_LOG_DOMAIN="libnetclient"',
                                 include_directories : [top_include, libnetclient_include],
                                 link_with           : libnetclient_a,
                                 dependencies        : libnetclient_deps + [test_compile_dep],

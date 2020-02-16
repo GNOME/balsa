@@ -1,12 +1,11 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
  *
- * Copyright (C) 1997-2016 Stuart Parmenter and others,
- *                         See the file AUTHORS for a list.
+ * Copyright (C) 1997-2020; See the file AUTHORS for a list.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at
+ * the Free Software Foundation, either version 2 of the License, or (at
  * your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but

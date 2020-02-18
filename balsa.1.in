@@ -161,8 +161,8 @@ See the AUTHORS file included with Balsa, probably at
 \fB/usr/share/doc/balsa-@VERSION@/AUTHORS \fR.
 
 .SH FILES
-\fB ~/.gnome2/balsa                   \fRBalsa's preferences file.
-\fB ~/.gnome2_private/balsa           \fRBalsa's POP and IMAP passwords file.
+\fB ~/.balsa/config                   \fRBalsa's preferences file.
+\fB ~/.balsa/config-private           \fRBalsa's POP and IMAP passwords file.
 \fB /etc/sound/events/balsa.soundlist \fRsystem-wide configuration file
 
 .SH SEE ALSO

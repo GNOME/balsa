@@ -1,9 +1,10 @@
-.TH Balsa 1 "February 2020" "Version @VERSION@" "Gnome Manpage"
+.TH Balsa 1 "03 January 2003" "Version @VERSION@" "Gnome Manpage"
 .SH NAME
  Balsa \- the GNOME email client.
+
 .SH DESCRIPTION
 You can use Balsa to fetch, read, write and send e-mails.
-.PP
+
 It supports
   * local mailboxes in maildir, mbox and/or mh format,
   * nested mailboxes,
@@ -12,152 +13,195 @@ It supports
   * GnuPG/GPG encryption, LDAP, Kerberos and SSL,
   * MIME (view images, save parts),
   * multiple character sets,
-  * vCard, GPE, and other address book formats,
-  * printing and spell-checking.
-.PP
+  * GPE address book,
+  * printing and spell-checking.  
+  
 Balsa is an integral part of the GNOME desktop environment, but it can
-also be used standalone though it may print some error messages then.
-.PP
-For help on using Balsa, see the documentation in its help menu.
-.PP
+  also be used standalone though it may print some error messages then.
+
+For help on using Balsa, see the documentation in its help menu using
+  Yelp Gnome 2 help/documentation browser.
+
 This man page tells about the options of the '\fBbalsa\fR' command,
-which is used to start Balsa.
+  which is used to start Balsa.
+.RS 0
+.RE
+Most of these options let you tell Balsa that when it starts
+  it should immediately open a mailbox, or the composer ,
+  and things like that.
+.RS 0
+.RE
+There is also an option to debug POP connections.
 .PP
-Most of these options let you tell Balsa that when it starts it should
-immediately open a mailbox, or the composer, and things like that.
-.PP
-There is also an option to debug POP and IMAP connections.
-.PP
-When you start Balsa from the command line, not only can you use the
-command line options described below, any error messages are printed to
-that terminal too (whether you execute that command in the background
-or not).
-.PP
+When you start Balsa from the command line of an (x)terminal,
+  not only can you use the command line options described below,
+  any error messages are printed to that terminal too
+  (whether you execute that command in the background or not).
+
 .SH SYNTAX
-\fBbalsa \fR[  \fB\-h \fR| \fB\-\-help                               \fR]
-\fR      \fR[  \fB\-v \fR| \fB\-\-version                            \fR]
+\fBbalsa \fR[  \fB\   \fR  \fB\-\-help                               \fR]
+\fR      \fR[  \fB\   \fR  \fB\-\-version                            \fR]
 \fR      \fR[  \fB\-c \fR| \fB\-\-check-mail                         \fR]
 \fR      \fR[( \fB\-m \fR| \fB\-\-compose=\fR)\fIemail-address             \fR]
 \fR      \fR[( \fB\-a \fR| \fB\-\-attach=\fR)\fIfilename                   \fR]
 \fR      \fR[( \fB\-o \fR| \fB\-\-open\-mailbox=)\fImailbox\fR[\fI:mailbox\fR]... ]
 \fR      \fR[  \fB\-u \fR| \fB\-\-open\-unread\-mailbox                \fR]
-\fR      \fR[  \fB\-i \fR| \fB\-\-open\-inbox                         \fR]
+\fR      \fR[  \fB\-d \fR| \fB\-\-debug\-pop                          \fR]
+\fR      \fR[  \fB\-D \fR| \fB\-\-debug\-imap                         \fR]
 .SH OPTIONS
 .PP
-\fB\-?\fR, \fB\-h\fR, \fB\-\-help\fR
-.RS
-Displays a message describing command line syntax of Balsa, giving many
-more options than are presented in this man page;
-Balsa exits immediately after that.
-.PP
-Some of these options work (and thus should be in this man page) for
-example --display, others may not - for example --disable-crash-dialog
-which is provided by GNOME GUI Library.
+\fB\-? \fR, \fB\-\-help\fR
+.RS 7
+Displays a message describing command line syntax of Balsa,
+  giving many more options than are presented in this man page;
+  Balsa exits immediately after that.
+.RS 0
 .RE
+Some of these options work (and thus should be in this man page)
+  for example --display ,
+  others may not -
+  for example --disable-crash-dialog which is provided by GNOME GUI
+Library.  
+.RS 0
+.RE
+
 .PP
-\fB\-v\fR, \fB\-\-version\fR
-.RS
+\fB\-\-version\fR
+.RS 7
 Balsa prints its version and exits.
 .RE
-.PP
-\fB\-c\fR, \fB\-\-check-mail\fR
-.RS
+
+.PP 
+\fB\-c \fR, \fB\-\-check-mail\fR
+.RS 7
 Balsa starts and checks for new mail immediately.
 .RE
+
 .PP
-\fB\-i\fR, \fB\-\-open-inbox
-.RS
+\fB\-i \fR, \fB\-\-open-inbox
+.RS 7
 Balsa starts and opens the Inbox.
 .RE
+
 .PP
-\fB\-m \fIemail-address\fR, \fB\-\-compose=\fIemail-address\fR
-.RS
-When invoked with this option, Balsa will open its email-composer for
-a new message with the specified address in the To: field.
-.PP
-The email-address parameter can be specified as user@host,
-e.g. \fBbalsa-list@gnome.org\fR, or in URL format,
-e.g. \fB"Balsa List <balsa-list@gnome.org>"\fR.
-.PP
-Balsa also serves as the mailto protocol handler.
+\fB\-m \fIemail-address \fR, \fB\-\-compose=\fIemail-address\fR
+.RS 7
+When invoked with this option,
+  Balsa will open its email-composer for a new message
+  with the specified address in the To: field.
+.RS 0
+.RE
+The email-address parameter can be specified
+  as user@host, e.g. \fBbalsa-list@gnome.org \fR,
+  or in URL format, e.g. \fB"Balsa List <balsa-list@gnome.org>" \fR.
+.RS 0
+.RE
+You can use Balsa as mailto protocol handler
+  by, in the URL handlers section of the GNOME control center,
+  setting the mailto protocol command to : \fBbalsa -m "%s"\fR
 .RE
 .PP
-\fB\-a \fIFILENAME\fR, \fB\-\-attach=\fIFILENAME\fR
-.RS
-When invoked with this option, Balsa will open its email-composer for
-a new message with the specified file already attached to the message.
-.PP
+\fB\-a \fIFILENAME \fR, \fB\-\-attach=\fIFILENAME\fR
+.RS 7
+When invoked with this option,
+  Balsa will open its email-composer for a new message
+  with the specified file already attached to the message.
+.RS 0
+.RE
 Example : \fBbalsa -a ~/balsa-new.1.gz\fR
 .RE
 .PP
 \fB\-o \fIMAILBOX\fR, \fB\-\-open-mailbox=\fIMAILBOX\fR...
-.RS
-This makes \FIBalsa\FR start and open the specified mailbox.
-The mailbox should be specified by its full URL.
-.PP
+.RS 7
+This makes \FIBalsa\FR start and open the specified mailbox. The
+mailbox should be specified by its full URL.
+.RS 0
+.RE
 Example : \fBbalsa -o imap://user@mail.example.com/INBOX\fR
 \fBbalsa -o file:///var/mail/user\fR
 .RE
 .PP
-\fB\-u\fR, \fB\-\-open-unread-mailbox\fR
-.RS
+\fB\-u \fR, \fB\-\-open-unread-mailbox\fR
+.RS 7
 Open all mailboxes that may contain unread messages.
+.RE
+.PP
+\fB\-d \fR, \fB\-\-debug-pop\fR
+.RS 7
+Makes Balsa print the POP3 communication to stderr,
+  including the full text of every message.
+.RS 0
+.RE
+The former can be useful for debugging POP3 connections.
+.RE
+.PP
+\fB\-D \fR, \fB\-\-debug-imap\fR
+.RS 7
+Makes Balsa print the IMAP communication to stderr.
+.RS 0
+.RE
+This feature is useful for debugging IMAP problems.
 .RE
 .SH WEBSITE
 Balsa's website is \fI
 .UR https://pawsa.fedorapeople.org/balsa
-https://pawsa.fedorapeople.org/balsa\fR.
-.PP
+https://pawsa.fedorapeople.org/balsa\fR
+
 .SH SUGGESTIONS AND BUG REPORTS
 Any bugs found in Balsa can be reported through
-the Balsa Developer mailing list at \fBbalsa-list@gnome.org\fR,
-or by opening an issue at \fBhttps://gitlab.gnome.org/GNOME/balsa/issues\fR.
-.PP
-See https://pawsa.fedorapeople.org/balsa/bugs.html for more information
-on reporting Balsa bugs.
-.PP
-Before reporting bugs, please check to see if the bug is mentioned in
-the FAQ's or the mailing list archive \fI
+  the Balsa Developer mailing list at \fBbalsa-list@gnome.org \fR,
+  or the online bug-tracking system at \fBhttps://gitlab.gnome.org/GNOME/balsa/issues \fR.
+.RS 0
+.RE
+See https://pawsa.fedorapeople.org/balsa/bugs.html for more information on reporting Balsa bugs.
+
+Before reporting bugs, please check to see if the bug is mentioned 
+in the FAQ's or the mailing list archive \fI
 .UR https://mail.gnome.org/mailman/listinfo/balsa-list
 https://mail.gnome.org/mailman/listinfo/balsa-list\fR
-.PP
+
 When reporting Balsa bugs, it is important to include
   * a reliable way to reproduce the bug,
-  * version number of Balsa (as well as Gtk and GNOME),
+  * version number of Balsa (as well as GTK and GNOME),
   * OS name and version,
   * any relevant hardware specs.
-.PP
+
 If a bug is causing a crash, it is very useful if a stack trace can be
 provided.
-.PP
+.RS 0
+.RE
 And of course, patches to rectify the bug are even better.
-.PP
+
 .SH AUTHORS
 See the AUTHORS file included with Balsa, probably at
 \fB/usr/share/doc/balsa-@VERSION@/AUTHORS \fR.
-.PP
+
 .SH FILES
-\fB ~/.balsa/config                   \fRBalsa's preferences file.
-\fB ~/.balsa/config-private           \fRBalsa's POP and IMAP passwords file.
+\fB ~/.gnome2/balsa                   \fRBalsa's preferences file.
+\fB ~/.gnome2_private/balsa           \fRBalsa's POP and IMAP passwords file.
 \fB /etc/sound/events/balsa.soundlist \fRsystem-wide configuration file
-.PP
+
 .SH SEE ALSO
-Package names given in parentheses are Debian package names.
-.PP
+Package names given in parenthesis are Debian package names.
+
 \fBmailcap  \fR(5) - metamail capabilities file (package: mime-support)
-.PP
+.RS 0
+.RE
 \fBmetamail \fR(1) - infrastructure for mailcap-based multimedia mail
                                           (package: metamail)
-.PP
+.RS 0
+.RE
 \fBsendmail \fR(8) - a Mail Transfer Agent      (package: exim4-daemon-light)
-.PP
+.RS 0
+.RE
 \fByelp     \fR(1) - browse Gnome documentation (package: yelp)
-.PP
+.RS 0
+.RE
 \fBGNOME    \fR(1) - modern desktop environment (package: gnome-bin)
-.PP
+
 .SH COPYRIGHT
-(c) 1997-2020 Stuart Parmenter and others; see AUTHORS for a list of people.
-.PP
-This is free software; see the source for copying conditions.
-There is NO warranty;
-not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+(c) 1997-2003 Stuart Parmenter and others, see AUTHORS for a list of people.
+
+This is free software; see the source for copying conditions.  There
+is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.

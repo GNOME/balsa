@@ -48,8 +48,6 @@ When you start Balsa from the command line of an (x)terminal,
 \fR      \fR[  \fB\-u \fR| \fB\-\-open\-unread\-mailbox                \fR]
 \fR      \fR[  \fB\-u \fR| \fB\-\-open\-inbox                         \fR]
 \fR      \fR[  \fB\-u \fR| \fB\-\-get\-stats                          \fR]
-\fR      \fR[  \fB\-d \fR| \fB\-\-debug\-pop                          \fR]
-\fR      \fR[  \fB\-D \fR| \fB\-\-debug\-imap                         \fR]
 .SH OPTIONS
 .PP
 \fB\-? \fR, \fB\-\-help\fR
@@ -128,22 +126,6 @@ Example : \fBbalsa -o imap://user@mail.example.com/INBOX\fR
 Open all mailboxes that may contain unread messages.
 .RE
 .PP
-\fB\-d \fR, \fB\-\-debug-pop\fR
-.RS 7
-Makes Balsa print the POP3 communication to stderr,
-  including the full text of every message.
-.RS 0
-.RE
-The former can be useful for debugging POP3 connections.
-.RE
-.PP
-\fB\-D \fR, \fB\-\-debug-imap\fR
-.RS 7
-Makes Balsa print the IMAP communication to stderr.
-.RS 0
-.RE
-This feature is useful for debugging IMAP problems.
-.RE
 .SH WEBSITE
 Balsa's website is \fI
 .UR https://pawsa.fedorapeople.org/balsa

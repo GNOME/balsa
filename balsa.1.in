@@ -41,13 +41,13 @@ When you start Balsa from the command line of an (x)terminal,
 .SH SYNTAX
 \fBbalsa \fR[  \fB\   \fR  \fB\-\-help                               \fR]
 \fR      \fR[  \fB\   \fR  \fB\-\-version                            \fR]
-\fR      \fR[  \fB\-c \fR| \fB\-\-check-mail                         \fR]
+\fR      \fR[  \fB\-c \fR| \fB\-\-checkmail                          \fR]
 \fR      \fR[( \fB\-m \fR| \fB\-\-compose=\fR)\fIemail-address             \fR]
 \fR      \fR[( \fB\-a \fR| \fB\-\-attach=\fR)\fIfilename                   \fR]
 \fR      \fR[( \fB\-o \fR| \fB\-\-open\-mailbox=)\fImailbox\fR[\fI:mailbox\fR]... ]
 \fR      \fR[  \fB\-u \fR| \fB\-\-open\-unread\-mailbox                \fR]
-\fR      \fR[  \fB\-d \fR| \fB\-\-debug\-pop                          \fR]
-\fR      \fR[  \fB\-D \fR| \fB\-\-debug\-imap                         \fR]
+\fR      \fR[  \fB\-u \fR| \fB\-\-open\-inbox                         \fR]
+\fR      \fR[  \fB\-u \fR| \fB\-\-get\-stats                          \fR]
 .SH OPTIONS
 .PP
 \fB\-? \fR, \fB\-\-help\fR
@@ -126,22 +126,6 @@ Example : \fBbalsa -o imap://user@mail.example.com/INBOX\fR
 Open all mailboxes that may contain unread messages.
 .RE
 .PP
-\fB\-d \fR, \fB\-\-debug-pop\fR
-.RS 7
-Makes Balsa print the POP3 communication to stderr,
-  including the full text of every message.
-.RS 0
-.RE
-The former can be useful for debugging POP3 connections.
-.RE
-.PP
-\fB\-D \fR, \fB\-\-debug-imap\fR
-.RS 7
-Makes Balsa print the IMAP communication to stderr.
-.RS 0
-.RE
-This feature is useful for debugging IMAP problems.
-.RE
 .SH WEBSITE
 Balsa's website is \fI
 .UR https://pawsa.fedorapeople.org/balsa
@@ -177,8 +161,8 @@ See the AUTHORS file included with Balsa, probably at
 \fB/usr/share/doc/balsa-@VERSION@/AUTHORS \fR.
 
 .SH FILES
-\fB ~/.gnome2/balsa                   \fRBalsa's preferences file.
-\fB ~/.gnome2_private/balsa           \fRBalsa's POP and IMAP passwords file.
+\fB ~/.balsa/config                   \fRBalsa's preferences file.
+\fB ~/.balsa/config-private           \fRBalsa's POP and IMAP passwords file.
 \fB /etc/sound/events/balsa.soundlist \fRsystem-wide configuration file
 
 .SH SEE ALSO
@@ -200,7 +184,7 @@ Package names given in parenthesis are Debian package names.
 \fBGNOME    \fR(1) - modern desktop environment (package: gnome-bin)
 
 .SH COPYRIGHT
-(c) 1997-2003 Stuart Parmenter and others, see AUTHORS for a list of people.
+(c) 1997-2020 Stuart Parmenter and others, see AUTHORS for a list of people.
 
 This is free software; see the source for copying conditions.  There
 is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A

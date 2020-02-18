@@ -3394,7 +3394,6 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
     	GtkWidget *warning;
 
     	if (stats->decrypted != stats->parts) {
-    		warning = gtk_label_new(NULL);
     		warning = libbalsa_create_wrap_label(
     			_("<b>Warning:</b> The original message contains an abnormal "
     			  "mixture of encrypted and unencrypted parts. This "

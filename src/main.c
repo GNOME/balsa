@@ -637,7 +637,7 @@ parse_options(int                       argc,
     static gboolean version;
     static gchar **remaining_args;
     static GOptionEntry option_entries[] = {
-        {"checkmail", 'c', 0, G_OPTION_ARG_NONE,
+        {"check-mail", 'c', 0, G_OPTION_ARG_NONE,
          &(cmd_check_mail_on_startup),
          N_("Get new mail on start-up"), NULL},
         {"compose", 'm', 0, G_OPTION_ARG_STRING, &(opt_compose_email),

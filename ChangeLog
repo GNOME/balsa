@@ -1,5 +1,13 @@
 2020-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Man-page cleanup
+
+	* balsa.1.in: update;
+	* src/main.c (parse_options): revert the "--checkmail" option to
+	its traditional "--check-mail".
+
+2020-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use a GThreadPool to open mailboxes
 
 	* src/balsa-index.c

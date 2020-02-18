@@ -41,7 +41,7 @@ When you start Balsa from the command line of an (x)terminal,
 .SH SYNTAX
 \fBbalsa \fR[  \fB\   \fR  \fB\-\-help                               \fR]
 \fR      \fR[  \fB\   \fR  \fB\-\-version                            \fR]
-\fR      \fR[  \fB\-c \fR| \fB\-\-check-mail                         \fR]
+\fR      \fR[  \fB\-c \fR| \fB\-\-checkmail                          \fR]
 \fR      \fR[( \fB\-m \fR| \fB\-\-compose=\fR)\fIemail-address             \fR]
 \fR      \fR[( \fB\-a \fR| \fB\-\-attach=\fR)\fIfilename                   \fR]
 \fR      \fR[( \fB\-o \fR| \fB\-\-open\-mailbox=)\fImailbox\fR[\fI:mailbox\fR]... ]

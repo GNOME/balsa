@@ -1,3 +1,31 @@
+2020-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use a GThreadPool to open mailboxes
+
+	* src/balsa-index.c
+	  (balsa_index_set_mailbox_node): new function, called in a thread;
+	  (balsa_index_load_mailbox_node): mailbox-node has already been set;
+	* src/balsa-index.h: export balsa_index_set_mailbox_node;
+	* src/main-window.c
+	  (balsa_window_class_init): rename destroy to dispose;
+	  (balsa_window_init): create the GThreadPool, and a GPtrArray
+	    to hold the task info structures;
+	  (balsa_window_new): make priv->preview a weak pointer;
+	  (bw_real_open_mbnode_idle_cb): we no longer need to guard
+	    against being called after the main window has been
+	    destroyed;
+	  (bw_open_mbnode_info_free): a new cleanup function to be
+	    passed to g_idle_add_full();
+	  (bw_real_open_mbnode_thread): GThreadPool manages the GThread
+	    instances, so we no longer need a GMutex; we no longer need
+	    to guard against being called after the main window has been
+	    destroyed;
+	  (balsa_window_real_open_mbnode): push the task to the thread
+	    pool instead of creating a new GThread;
+	  (balsa_window_dispose): free the thread pool and the pointer
+	    array;
+	  (bw_add_mbox_to_checklist): cosmetics.
+
 2020-02-16  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	imap-handle: Do not crash on PREAUTH greeting

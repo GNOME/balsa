@@ -56,8 +56,9 @@ G_DECLARE_FINAL_TYPE(BalsaIndex, balsa_index, BALSA, INDEX, GtkTreeView)
 
 /* sets the mail stream; if it's a new stream, then it's 
  * contents is loaded into the index */
-    gboolean balsa_index_load_mailbox_node(BalsaIndex * bindex,
-                                           BalsaMailboxNode * mbnode);
+    void balsa_index_set_mailbox_node(BalsaIndex       * bindex,
+                                      BalsaMailboxNode * mbnode);
+    void balsa_index_load_mailbox_node(BalsaIndex * bindex);
     void balsa_index_set_width_preference(BalsaIndex *bindex,
                                           BalsaIndexWidthPreference pref);
     void balsa_index_scroll_on_open(BalsaIndex *index);

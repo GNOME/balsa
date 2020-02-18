@@ -951,31 +951,38 @@ bndx_mailbox_message_expunged_cb(LibBalsaMailbox * mailbox, guint msgno,
         --bindex->next_msgno;
 }
 
-/* balsa_index_load_mailbox_node:
+/* balsa_index_set_mailbox_node:
  *
+ * Called in a thread, so do not call Gtk;
  * balsa_mailbox_node_get_mailbox(mbnode) is already open
  */
-
-gboolean
-balsa_index_load_mailbox_node(BalsaIndex * index,
-                              BalsaMailboxNode* mbnode)
+void
+balsa_index_set_mailbox_node(BalsaIndex * bindex,
+                             BalsaMailboxNode* mbnode)
 {
-    GtkTreeView *tree_view;
-    LibBalsaMailbox *mailbox;
-
-    g_return_val_if_fail(BALSA_IS_INDEX(index), TRUE);
-    g_return_val_if_fail(index->mailbox_node == NULL, TRUE);
-    g_return_val_if_fail(BALSA_IS_MAILBOX_NODE(mbnode), TRUE);
-
-    mailbox = balsa_mailbox_node_get_mailbox(mbnode);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), TRUE);
+    g_return_if_fail(BALSA_IS_INDEX(bindex));
+    g_return_if_fail(bindex->mailbox_node == NULL);
+    g_return_if_fail(BALSA_IS_MAILBOX_NODE(mbnode));
 
     /*
      * set the new mailbox
      */
-    index->mailbox_node = mbnode;
+    bindex->mailbox_node = mbnode;
     g_object_weak_ref(G_OBJECT(mbnode),
-                      (GWeakNotify) bndx_mbnode_weak_notify, index);
+                      (GWeakNotify) bndx_mbnode_weak_notify, bindex);
+}
+
+
+void
+balsa_index_load_mailbox_node(BalsaIndex * index)
+{
+    LibBalsaMailbox *mailbox;
+    GtkTreeView *tree_view;
+
+    g_return_if_fail(BALSA_IS_INDEX(index));
+
+    mailbox = balsa_mailbox_node_get_mailbox(index->mailbox_node);
+
     /*
      * rename "from" column to "to" for outgoing mail
      */
@@ -1008,8 +1015,6 @@ balsa_index_load_mailbox_node(BalsaIndex * index,
     index->search_iter = libbalsa_mailbox_search_iter_new(cond_undeleted);
     /* Note when this mailbox was opened, for use in auto-closing. */
     balsa_mailbox_node_set_last_use_time(index->mailbox_node);
-
-    return FALSE;
 }
 
 void

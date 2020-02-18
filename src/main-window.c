@@ -109,7 +109,7 @@ static void balsa_window_real_open_mbnode(BalsaWindow *window,
                                           gboolean set_current);
 static void balsa_window_real_close_mbnode(BalsaWindow *window,
 					   BalsaMailboxNode *mbnode);
-static void balsa_window_destroy(GObject * object);
+static void balsa_window_dispose(GObject * object);
 
 static gboolean bw_close_mailbox_on_timer(BalsaWindow * window);
 
@@ -176,6 +176,8 @@ static void bw_notebook_page_notify_cb(GtkWidget  *child,
 static GtkWidget *bw_notebook_label_new (BalsaMailboxNode* mbnode);
 static void bw_reset_filter(BalsaWindow * bw);
 
+typedef struct _BalsaWindowRealOpenMbnodeInfo BalsaWindowRealOpenMbnodeInfo;
+static void bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info);
 
 /* ===================================================================
    Balsa menus. Touchpad has some simplified menus which do not
@@ -224,6 +226,9 @@ struct _BalsaWindowPrivate {
     time_t last_check_time;
     guint network_changed_source_id;
     gulong network_changed_handler_id;
+
+    GThreadPool *open_mbnode_thread_pool;
+    GPtrArray *open_mbnode_info_array;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE(BalsaWindow, balsa_window, GTK_TYPE_APPLICATION_WINDOW)
@@ -246,7 +251,7 @@ balsa_window_class_init(BalsaWindowClass * klass)
                      NULL, NULL,
                      NULL, G_TYPE_NONE, 0);
 
-    object_class->dispose = balsa_window_destroy;
+    object_class->dispose = balsa_window_dispose;
 
     klass->open_mbnode  = balsa_window_real_open_mbnode;
     klass->close_mbnode = balsa_window_real_close_mbnode;
@@ -306,6 +311,11 @@ balsa_window_init(BalsaWindow * window)
         g_signal_connect(monitor, "network-changed",
                          G_CALLBACK(bw_network_changed_cb), window);
     priv->last_check_time = 0;
+    priv->open_mbnode_thread_pool =
+        g_thread_pool_new((GFunc) bw_real_open_mbnode_thread, NULL,
+                          1 /* g_get_num_processors()? */, FALSE, NULL);
+    priv->open_mbnode_info_array =
+        g_ptr_array_new_with_free_func((GDestroyNotify) g_idle_remove_by_data);
 }
 
 static gboolean
@@ -2302,6 +2312,8 @@ balsa_window_new(GtkApplication *application)
 			      (gpointer *) &balsa_app.notebook);
 
     priv->preview = balsa_message_new();
+    g_object_add_weak_pointer(G_OBJECT(priv->preview),
+                              (gpointer *) &priv->preview);
     gtk_widget_hide(priv->preview);
 
     g_signal_connect(priv->preview, "select-part",
@@ -2852,14 +2864,14 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
  * balsa_window_real_open_mbnode
  */
 
-typedef struct {
+struct _BalsaWindowRealOpenMbnodeInfo
+{
     BalsaIndex       *index;
     BalsaMailboxNode *mbnode;
     BalsaWindow      *window;
     gchar            *message;
     gboolean          set_current;
-    GApplication     *application;
-} BalsaWindowRealOpenMbnodeInfo;
+};
 
 static gboolean
 bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
@@ -2874,37 +2886,21 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     gint               page_num;
     LibBalsaCondition *filter;
 
-    if (window == NULL) {
-        g_free(info->message);
-        g_object_unref(g_object_ref_sink(index));
-        g_object_unref(mbnode);
-        g_application_release(info->application);
-        g_free(info);
+    if (mbnode == NULL)
         return FALSE;
-    }
 
     balsa_window_decrease_activity(window, info->message);
-    g_object_remove_weak_pointer(G_OBJECT(window),
-                                 (gpointer *) &info->window);
+
     g_free(info->message);
+    info->message = NULL;
 
-    if (balsa_find_notebook_page_num(mailbox) >= 0) {
-        g_object_unref(g_object_ref_sink(index));
-        g_object_unref(mbnode);
-        g_application_release(info->application);
-        g_free(info);
-        return FALSE;
-    }
-
-    balsa_index_load_mailbox_node(index, mbnode);
+    balsa_index_load_mailbox_node(index);
 
     g_signal_connect(index, "index-changed",
                      G_CALLBACK(bw_index_changed_cb), window);
 
     label = bw_notebook_label_new(mbnode);
-    g_object_unref(mbnode);
 
-    /* store for easy access */
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
@@ -2918,10 +2914,11 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(priv->notebook),
                                      scroll, TRUE);
 
-    if (info->set_current)
+    if (info->set_current) {
         /* change the page to the newly selected notebook item */
         gtk_notebook_set_current_page(GTK_NOTEBOOK(priv->notebook),
                                       page_num);
+    }
 
     libbalsa_mailbox_set_threading(mailbox);
 
@@ -2934,42 +2931,33 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
      * without being shown first. */
     balsa_index_scroll_on_open(index);
 
-    g_application_release(info->application);
-    g_free(info);
+    g_ptr_array_remove_fast(priv->open_mbnode_info_array, info);
 
     return FALSE;
 }
 
 static void
+bw_open_mbnode_info_free(BalsaWindowRealOpenMbnodeInfo * info)
+{
+    g_free(info->message);
+    g_object_unref(g_object_ref_sink(info->index));
+    if (info->mbnode != NULL)
+        g_object_remove_weak_pointer(G_OBJECT(info->mbnode), (gpointer *) &info->mbnode);
+    g_free(info);
+}
+
+static void
 bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info)
 {
-    static GMutex open_lock;
     gint try_cnt;
     LibBalsaMailbox *mailbox = balsa_mailbox_node_get_mailbox(info->mbnode);
     GError *err = NULL;
     gboolean successp;
 
-    /* Use a mutex to ensure we open only one mailbox at a time */
-    g_mutex_lock(&open_lock);
-
-    if (info->window == NULL) {
-        g_application_release(info->application);
-        g_free(info);
-        g_mutex_unlock(&open_lock);
-        return;
-    }
-
     try_cnt = 0;
     do {
         g_clear_error(&err);
         successp = libbalsa_mailbox_open(mailbox, &err);
-
-        if (info->window == NULL) {
-            g_application_release(info->application);
-            g_free(info);
-            g_mutex_unlock(&open_lock);
-            return;
-        }
 
         if(successp) break;
         if(err && err->code != LIBBALSA_MAILBOX_TOOMANYOPEN_ERROR)
@@ -2977,25 +2965,23 @@ bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info)
         balsa_mblist_close_lru_peer_mbx(balsa_app.mblist, mailbox);
     } while(try_cnt++<3);
 
-    if (successp) {
-        g_idle_add((GSourceFunc) bw_real_open_mbnode_idle_cb, info);
+    if (successp && balsa_find_notebook_page_num(mailbox) < 0) {
+        BalsaWindowPrivate *priv =
+            balsa_window_get_instance_private(info->window);
+
+        g_ptr_array_add(priv->open_mbnode_info_array, info);
+        balsa_index_set_mailbox_node(info->index, info->mbnode);
+        g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
+                        (GSourceFunc) bw_real_open_mbnode_idle_cb, info,
+                        (GDestroyNotify) bw_open_mbnode_info_free);
     } else {
         libbalsa_information(
             LIBBALSA_INFORMATION_ERROR,
             _("Unable to Open Mailbox!\n%s."),
 	    err ? err->message : _("Unknown error"));
-        if (info->window) {
-            balsa_window_decrease_activity(info->window, info->message);
-            g_object_remove_weak_pointer(G_OBJECT(info->window),
-                                         (gpointer *) &info->window);
-        }
-        g_free(info->message);
-        g_object_unref(g_object_ref_sink(info->index));
-        g_object_unref(info->mbnode);
-        g_application_release(info->application);
-        g_free(info);
+        balsa_window_decrease_activity(info->window, info->message);
+        bw_open_mbnode_info_free(info);
     }
-    g_mutex_unlock(&open_lock);
 }
 
 static void
@@ -3003,10 +2989,10 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
                               BalsaMailboxNode * mbnode,
                               gboolean set_current)
 {
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     BalsaIndex * index;
     gchar *message;
     LibBalsaMailbox *mailbox;
-    GThread *open_thread;
     BalsaWindowRealOpenMbnodeInfo *info;
 
     if (bw_is_open_mailbox(mailbox = balsa_mailbox_node_get_mailbox(mbnode)))
@@ -3024,22 +3010,15 @@ balsa_window_real_open_mbnode(BalsaWindow * window,
 
     info = g_new(BalsaWindowRealOpenMbnodeInfo, 1);
 
-    info->window = window;
-    g_object_add_weak_pointer(G_OBJECT(window), (gpointer *) &info->window);
+    info->mbnode = mbnode;
+    g_object_add_weak_pointer(G_OBJECT(mbnode), (gpointer *) &info->mbnode);
 
-    info->mbnode = g_object_ref(mbnode);
+    info->window = window;
     info->set_current = set_current;
     info->index = index;
     info->message = message;
 
-    info->application = G_APPLICATION(gtk_window_get_application(GTK_WINDOW(window)));
-    g_application_hold(info->application);
-
-    open_thread =
-    	g_thread_new("bw_real_open_mbnode_thread",
-    				 (GThreadFunc) bw_real_open_mbnode_thread,
-					 info);
-    g_thread_unref(open_thread);
+    g_thread_pool_push(priv->open_mbnode_thread_pool, info, NULL);
 }
 
 /* balsa_window_real_close_mbnode:
@@ -3167,14 +3146,15 @@ bw_close_mailbox_on_timer(BalsaWindow * window)
 }
 
 static void
-balsa_window_destroy(GObject * object)
+balsa_window_dispose(GObject * object)
 {
     BalsaWindow *window = BALSA_WINDOW(object);
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
-    /* The preview window seems to get finalized without notification;
-     * we no longer need it, so we just drop our pointer: */
-    priv->preview = NULL;
+    if (priv->preview != NULL) {
+        g_object_remove_weak_pointer(G_OBJECT(priv->preview), (gpointer *) &priv->preview);
+        priv->preview = NULL;
+    }
 
     if (priv->set_message_id != 0) {
         g_source_remove(priv->set_message_id);
@@ -3192,12 +3172,23 @@ balsa_window_destroy(GObject * object)
         priv->network_changed_handler_id = 0;
     }
 
+    if (priv->open_mbnode_thread_pool != NULL) {
+        g_thread_pool_free(priv->open_mbnode_thread_pool,
+                           TRUE /* pool should shut down immediately */,
+                           TRUE /* wait for all tasks to be finished */);
+        priv->open_mbnode_thread_pool = NULL;
+    }
+
+    if (priv->open_mbnode_info_array != NULL) {
+        g_ptr_array_free(priv->open_mbnode_info_array, TRUE);
+        priv->open_mbnode_info_array = NULL;
+    }
+
     balsa_app.in_destruction = TRUE;
     G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
 
     balsa_unregister_pixmaps();
 }
-
 
 /*
  * refresh data in the main window
@@ -3357,9 +3348,11 @@ bw_add_mbox_to_checklist(GtkTreeModel * model, GtkTreePath * path,
 	if (!LIBBALSA_IS_MAILBOX_IMAP(mailbox) ||
 	    bw_imap_check_test(balsa_mailbox_node_get_dir(mbnode) ? balsa_mailbox_node_get_dir(mbnode) :
 			    libbalsa_mailbox_imap_get_path
-			    (LIBBALSA_MAILBOX_IMAP(mailbox))))
-	    *list = g_slist_prepend(*list, g_object_ref(mailbox));
+			    (LIBBALSA_MAILBOX_IMAP(mailbox)))) {
+            *list = g_slist_prepend(*list, g_object_ref(mailbox));
+        }
     }
+
     g_object_unref(mbnode);
 
     return FALSE;

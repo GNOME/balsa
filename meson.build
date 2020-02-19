@@ -1,6 +1,6 @@
 project('balsa', 'c',
         version         : '2.5.9',
-        meson_version   : '>= 0.43.0',
+        meson_version   : '>= 0.50.0',
         default_options : ['sysconfdir=/etc', 'optimization=2'])
 
 # if meson is used not in a git source tree, use project version:
@@ -532,11 +532,16 @@ endif # libnetclient_test
 # Output
 #####################################################################
 
-output_files = ['balsa.1', 'balsa.spec']
+file = 'balsa.1'
+configure_file(input         : file + '.in',
+               output        : file,
+               configuration : conf,
+               install       : true,
+               install_dir   : join_paths(get_option('datadir'),
+                                          'man/man1'))
 
-foreach file : output_files
-  configure_file(input : file + '.in', output : file, configuration : conf)
-endforeach
+file = 'balsa.spec'
+configure_file(input : file + '.in', output : file, configuration : conf)
 
 # config.h
 configure_file(output : 'config.h', configuration : conf)

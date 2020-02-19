@@ -35,7 +35,7 @@ any error messages are printed to that terminal too
 .SH SYNTAX
 \fBbalsa \fR[  \fB\-h \fR| \fB\-\-help                               \fR]
 \fR      \fR[  \fB\-v \fR| \fB\-\-version                            \fR]
-\fR      \fR[  \fB\-c \fR| \fB\-\-checkmail                          \fR]
+\fR      \fR[  \fB\-c \fR| \fB\-\-check\-mail                         \fR]
 \fR      \fR[  \fB\-i \fR| \fB\-\-open\-inbox                         \fR]
 \fR      \fR[( \fB\-m \fR| \fB\-\-compose=\fR)\fIemail-address             \fR]
 \fR      \fR[( \fB\-a \fR| \fB\-\-attach=\fR)\fIfilename                   \fR]

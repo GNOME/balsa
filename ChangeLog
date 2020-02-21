@@ -1,3 +1,27 @@
+2020-02-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	main: Behave as documented
+
+	The man page says that Balsa exits immediately if given
+	--version, --help, or --get-stats, so it should.
+
+	Also, if it is given more than one of those options, it should
+	respond to all of them.
+
+	* src/main.c
+	  (config_init): is no longer called with a boolean argument;
+	  (balsa_startup_cb): do not use cmd_get_stats, it has not been set;
+	  (balsa_shutdown_cb): go through the shut-down process only if
+	    the main window has been created; it does not get created
+	    when Balsa exits immediately after responding to those
+	    options;
+	  (parse_options): respond to both --help and --version, if
+	    requested;
+	  (balsa_command_line_cb): activate Balsa only if not exiting
+	    immediately;
+	  (balsa_get_stats): coding style;
+	  (scan_mailboxes_idle_cb): ditto.
+
 2020-02-18  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use a GThreadPool to open mailboxes

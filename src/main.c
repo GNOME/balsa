@@ -134,9 +134,9 @@ check_special_mailboxes(void)
 }
 
 static void
-config_init(gboolean check_only)
+config_init(void)
 {
-    while(!config_load() && !check_only) {
+    while (!config_load()) {
 	balsa_init_begin();
         config_defclient_save();
     }
@@ -193,17 +193,21 @@ initial_open_inbox()
 static void
 balsa_get_stats(long *unread, long *unsent)
 {
-
     if (balsa_app.inbox && libbalsa_mailbox_open(balsa_app.inbox, NULL)) {
         /* set threading type to load messages */
         libbalsa_mailbox_set_threading(balsa_app.inbox);
         *unread = libbalsa_mailbox_get_unread_messages(balsa_app.inbox);
         libbalsa_mailbox_close(balsa_app.inbox, FALSE);
-    } else *unread = -1;
+    } else {
+        *unread = -1;
+    }
+
     if (balsa_app.outbox && libbalsa_mailbox_open(balsa_app.outbox, NULL)){
         *unsent = libbalsa_mailbox_total_messages(balsa_app.outbox);
         libbalsa_mailbox_close(balsa_app.outbox, FALSE);
-    } else *unsent = -1;
+    } else {
+        *unsent = -1;
+    }
 }
 
 static gboolean
@@ -299,7 +303,7 @@ scan_mailboxes_idle_cb()
                                                             FALSE));
     }
 
-    if(cmd_get_stats) {
+    if (cmd_get_stats) {
         long unread, unsent;
         balsa_get_stats(&unread, &unsent);
         printf("Unread: %ld Unsent: %ld\n", unread, unsent);
@@ -544,21 +548,10 @@ balsa_startup_cb(GApplication *application,
     }
 #endif
 
-    /* checking for valid config files */
-    config_init(cmd_get_stats);
-
     default_icon = balsa_pixmap_finder("balsa_icon.png");
-    if(default_icon) { /* may be NULL for developer installations */
+    if (default_icon) { /* may be NULL for developer installations */
         gtk_window_set_default_icon_from_file(default_icon, NULL);
         g_free(default_icon);
-    }
-
-    if (cmd_get_stats) {
-        long unread, unsent;
-        balsa_get_stats(&unread, &unsent);
-        printf("Unread: %ld Unsent: %ld\n", unread, unsent);
-        g_application_quit(G_APPLICATION(balsa_app.application));
-        return;
     }
 
     balsa_app.has_openpgp =
@@ -572,6 +565,9 @@ balsa_startup_cb(GApplication *application,
 static void
 balsa_shutdown_cb(void)
 {
+    if (balsa_app.main_window == NULL)
+        return;
+
     balsa_app_destroy();
 
     libbalsa_conf_drop_all();
@@ -696,24 +692,28 @@ parse_options(int                       argc,
         g_error_free(error);
     }
 
-    if (!rc) {
+    if (rc) {
+        if (help) {
+            gchar *text;
+
+            text = g_option_context_get_help(context, FALSE, NULL);
+            g_application_command_line_print(command_line, "%s", text);
+            g_free(text);
+            status = 2;
+        }
+
+        if (version) {
+            g_application_command_line_print(command_line,
+                                             "Balsa email client %s\n",
+                                             BALSA_VERSION);
+            status = 2;
+        }
+    } else {
         /* Some other bad option */
         g_application_command_line_printerr(command_line, "%s\n",
                                             error->message);
         g_error_free(error);
         status = 1;
-    } else if (help) {
-        gchar *text;
-
-        text = g_option_context_get_help(context, FALSE, NULL);
-        g_application_command_line_print(command_line, "%s", text);
-        g_free(text);
-        status = 2;
-    } else if (version) {
-        g_application_command_line_print(command_line,
-                                         "Balsa email client %s\n",
-                                         BALSA_VERSION);
-        status = 2;
     }
 
     if (remaining_args != NULL) {
@@ -767,8 +767,8 @@ handle_remote(int argc, char **argv,
 
 static int
 balsa_command_line_cb(GApplication            * application,
-                GApplicationCommandLine * command_line,
-                gpointer                  user_data)
+                      GApplicationCommandLine * command_line,
+                      gpointer                  user_data)
 {
     gchar **args, **argv;
     gint argc;
@@ -783,16 +783,27 @@ balsa_command_line_cb(GApplication            * application,
     /* The signal is emitted when the GApplication is run, but is always
      * handled by the primary instance of Balsa. */
     status = parse_options(argc, argv, command_line);
-    if (status == 0) {
+    if (status == 0 || status == 2) {
         if (g_application_command_line_get_is_remote(command_line)) {
             /* A remote instance caused the emission; skip start-up, just
              * handle the command line. */
             handle_remote(argc, argv, command_line);
         } else {
-            g_application_activate(application);
+            if (cmd_get_stats) {
+                long unread, unsent;
+
+                balsa_app.inbox = libbalsa_mailbox_new_from_config("mailbox-Inbox", FALSE);
+                balsa_app.outbox = libbalsa_mailbox_new_from_config("mailbox-Outbox", FALSE);
+                balsa_get_stats(&unread, &unsent);
+                printf("Unread: %ld Unsent: %ld\n", unread, unsent);
+            } else if (status == 0) {
+                /* checking for valid config files */
+                config_init();
+                g_application_activate(application);
+            }
         }
-    } else if (status == 2) /* handled a "help" or "version" request */
         status = 0;
+    }
 
     g_free(argv);
     g_strfreev(args);

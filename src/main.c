@@ -749,6 +749,8 @@ balsa_command_line_cb(GApplication            * application,
             libbalsa_mailbox_new_from_config("mailbox-Outbox", FALSE);
         balsa_get_stats(&unread, &unsent);
         printf("Unread: %ld Unsent: %ld\n", unread, unsent);
+        g_object_unref(balsa_app.outbox);
+        g_object_unref(balsa_app.inbox);
     } else {
         /* checking for valid config files */
         config_init();

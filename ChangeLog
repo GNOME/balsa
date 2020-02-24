@@ -1,3 +1,18 @@
+2020-02-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	main: Use non-copying GVariant formats
+
+	Since
+	https://gitlab.gnome.org/GNOME/glib/-/commit/325f1e3eb54d3969d3be104481fa1097ffa37d7b,
+	the GApplication docs recommend using non-copying variant formats.
+
+	* src/main.c
+	  (balsa_check_open_mailboxes): use g_free(), not g_strfreev(),
+	    to free cmd_line_open_mailboxes, because it is now a shallow copy;
+	  (scan_mailboxes_idle_cb): ditto;
+	  (balsa_check_open_compose_window): ditto opt_attach_list;
+	  (parse_options): ditto remaining_args; use the non-copying formats.
+
 2020-02-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	main: Parse command line arguments in the local instance
@@ -8,14 +23,14 @@
 	  (parse_options): use the GVariantDict instead of parsing the
 	    command-line arguments;
 	  (scan_mailboxes_idle_cb): coding style;
-	(balsa_handle_local_options_cb): new function for handling
-	  command line options that do not need to be passed to the
-	  primary instance (currently just "--version");
-	(balsa_command_line_cb):  use the GVariantDict instead of parsing
-	  the command-line arguments;
-	(main): use g_application_add_main_option_entries() and connect
-	  to the "handle-local-options" signal.
-	(handle_remote): coding style;
+	  (balsa_handle_local_options_cb): new function for handling
+	    command line options that do not need to be passed to the
+	    primary instance (currently just "--version");
+	  (balsa_command_line_cb):  use the GVariantDict instead of parsing
+	    the command-line arguments;
+	  (main): use g_application_add_main_option_entries() and connect
+	    to the "handle-local-options" signal.
+	  (handle_remote): coding style;
 
 2020-02-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 

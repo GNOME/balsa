@@ -224,7 +224,7 @@ balsa_check_open_mailboxes(void)
     gchar **urls;
 
     join = g_strjoinv(";", cmd_line_open_mailboxes);
-    g_strfreev(cmd_line_open_mailboxes);
+    g_free(cmd_line_open_mailboxes); /* It was a shallow copy. */
     cmd_line_open_mailboxes = NULL;
 
     urls = g_strsplit(join, ";", 20);
@@ -275,7 +275,7 @@ scan_mailboxes_idle_cb()
         gchar **p;
 
         join = g_strjoinv(";", cmd_line_open_mailboxes);
-        g_strfreev(cmd_line_open_mailboxes);
+        g_free(cmd_line_open_mailboxes); /* It was a shallow copy. */
         cmd_line_open_mailboxes = NULL;
 
         urls = g_strsplit(join, ";", 20);
@@ -455,7 +455,7 @@ balsa_check_open_compose_window(void)
         if (opt_attach_list != NULL) {
             for (attach = opt_attach_list; *attach; ++attach)
                 add_attachment(snd, *attach, FALSE, NULL);
-            g_strfreev(opt_attach_list);
+            g_free(opt_attach_list); /* It was a shallow copy. */
             opt_attach_list = NULL;
         }
 
@@ -660,13 +660,13 @@ parse_options(GApplicationCommandLine * cmdline)
     if (!g_variant_dict_lookup(dict, "compose", "&s", &opt_compose_email))
         opt_compose_email = NULL;
 
-    if (!g_variant_dict_lookup(dict, "attach", "^aay", &opt_attach_list))
+    if (!g_variant_dict_lookup(dict, "attach", "^a&ay", &opt_attach_list))
         opt_attach_list = NULL;
 
-    if (!g_variant_dict_lookup(dict, "open-mailbox", "^as", &cmd_line_open_mailboxes))
+    if (!g_variant_dict_lookup(dict, "open-mailbox", "^a&s", &cmd_line_open_mailboxes))
         cmd_line_open_mailboxes = NULL;
 
-    if (!g_variant_dict_lookup(dict, G_OPTION_REMAINING, "^aay", &remaining_args))
+    if (!g_variant_dict_lookup(dict, G_OPTION_REMAINING, "^a&ay", &remaining_args))
         remaining_args = NULL;
 
     if (remaining_args != NULL) {
@@ -677,7 +677,7 @@ parse_options(GApplicationCommandLine * cmdline)
             /* process remaining_args[i] here */
             /* we do nothing for now */
         }
-        g_strfreev(remaining_args);
+        g_free(remaining_args); /* It was a shallow copy. */
         remaining_args = NULL;
     }
 }

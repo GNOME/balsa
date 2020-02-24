@@ -564,7 +564,7 @@ balsa_startup_cb(GApplication *application,
 static void
 balsa_shutdown_cb(void)
 {
-    if (balsa_app.main_window == NULL)
+    if (cmd_get_stats)
         return;
 
     balsa_app_destroy();

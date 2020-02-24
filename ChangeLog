@@ -1,5 +1,14 @@
 2020-02-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	main: Save the config files
+
+	* src/main.c (balsa_shutdown_cb): the only case where Balsa must
+	  not go through the shutdown procedure is when it is called
+	  with the -s/--get-stats option; in that case, nothing has been
+	  set up, and balsa-app-destroy would cause all sorts of havoc.
+
+2020-02-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	main: Use non-copying GVariant formats
 
 	Since

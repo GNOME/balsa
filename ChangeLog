@@ -1,3 +1,22 @@
+2020-02-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	main: Parse command line arguments in the local instance
+
+	* src/main.c
+	  (balsa_check_open_compose_window): opt_compose_email must not
+	    be free'd; coding style;
+	  (parse_options): use the GVariantDict instead of parsing the
+	    command-line arguments;
+	  (scan_mailboxes_idle_cb): coding style;
+	(balsa_handle_local_options_cb): new function for handling
+	  command line options that do not need to be passed to the
+	  primary instance (currently just "--version");
+	(balsa_command_line_cb):  use the GVariantDict instead of parsing
+	  the command-line arguments;
+	(main): use g_application_add_main_option_entries() and connect
+	  to the "handle-local-options" signal.
+	(handle_remote): coding style;
+
 2020-02-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	main: Behave as documented

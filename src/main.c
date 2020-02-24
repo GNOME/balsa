@@ -66,7 +66,7 @@ static gboolean cmd_check_mail_on_startup,
 /* opt_attach_list: list of attachments */
 static gchar **opt_attach_list = NULL;
 /* opt_compose_email: To: field for the compose window */
-static gchar *opt_compose_email = NULL;
+static const gchar *opt_compose_email = NULL;
 
 static void
 accel_map_load(void)
@@ -269,7 +269,7 @@ scan_mailboxes_idle_cb()
         g_list_free(gl);
     }
 
-    if (cmd_line_open_mailboxes) {
+    if (cmd_line_open_mailboxes != NULL) {
         gchar *join;
         gchar **urls;
         gchar **p;
@@ -437,23 +437,22 @@ balsa_progress_set_activity(gboolean set, const gchar * text)
 static gboolean
 balsa_check_open_compose_window(void)
 {
-    if (opt_compose_email || opt_attach_list) {
+    if (opt_compose_email != NULL || opt_attach_list != NULL) {
         BalsaSendmsg *snd;
         gchar **attach;
 
         snd = sendmsg_window_compose();
         snd->quit_on_close = FALSE;
 
-        if (opt_compose_email) {
+        if (opt_compose_email != NULL) {
             if (g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)
                 sendmsg_window_process_url(snd, opt_compose_email + 7, TRUE);
             else
                 sendmsg_window_set_field(snd, "to", opt_compose_email, TRUE);
-            g_free(opt_compose_email);
             opt_compose_email = NULL;
         }
 
-        if (opt_attach_list) {
+        if (opt_attach_list != NULL) {
             for (attach = opt_attach_list; *attach; ++attach)
                 add_attachment(snd, *attach, FALSE, NULL);
             g_strfreev(opt_attach_list);
@@ -624,97 +623,51 @@ balsa_activate_cb(GApplication *application,
 /*
  * Parse command line options
  */
-static gint
-parse_options(int                       argc,
-              char                   ** argv,
-              GApplicationCommandLine * command_line)
+static GOptionEntry option_entries[] = {
+    {"check-mail", 'c', 0, G_OPTION_ARG_NONE, NULL,
+        N_("Get new mail on start-up"), NULL},
+    {"compose", 'm', 0, G_OPTION_ARG_STRING, NULL,
+        N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
+    {"attach", 'a', 0, G_OPTION_ARG_FILENAME_ARRAY, NULL,
+        N_("Attach file at URI"), "URI"},
+    {"open-mailbox", 'o', 0, G_OPTION_ARG_STRING_ARRAY, NULL,
+        N_("Opens MAILBOXNAME"), N_("MAILBOXNAME")},
+    {"open-unread-mailbox", 'u', 0, G_OPTION_ARG_NONE, NULL,
+        N_("Opens first unread mailbox"), NULL},
+    {"open-inbox", 'i', 0, G_OPTION_ARG_NONE, NULL,
+        N_("Opens default Inbox on start-up"), NULL},
+    {"get-stats", 's', 0, G_OPTION_ARG_NONE, NULL,
+        N_("Prints number unread and unsent messages"), NULL},
+    {"version", 'v', 0, G_OPTION_ARG_NONE, NULL,
+        N_("Show version"), NULL},
+    /* last but not least a special option that collects filenames */
+    {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, NULL,
+        "Special option that collects any remaining arguments for us"},
+    {NULL}
+};
+
+static void
+parse_options(GApplicationCommandLine * cmdline)
 {
-    static gboolean help;
-    static gboolean version;
-    static gchar **remaining_args;
-    static GOptionEntry option_entries[] = {
-        {"check-mail", 'c', 0, G_OPTION_ARG_NONE,
-         &(cmd_check_mail_on_startup),
-         N_("Get new mail on start-up"), NULL},
-        {"compose", 'm', 0, G_OPTION_ARG_STRING, &(opt_compose_email),
-         N_("Compose a new email to EMAIL@ADDRESS"), "EMAIL@ADDRESS"},
-        {"attach", 'a', 0, G_OPTION_ARG_FILENAME_ARRAY, &(opt_attach_list),
-         N_("Attach file at URI"), "URI"},
-        {"open-mailbox", 'o', 0, G_OPTION_ARG_STRING_ARRAY,
-         &(cmd_line_open_mailboxes),
-         N_("Opens MAILBOXNAME"), N_("MAILBOXNAME")},
-        {"open-unread-mailbox", 'u', 0, G_OPTION_ARG_NONE,
-         &(cmd_open_unread_mailbox),
-         N_("Opens first unread mailbox"), NULL},
-        {"open-inbox", 'i', 0, G_OPTION_ARG_NONE,
-         &(cmd_open_inbox),
-         N_("Opens default Inbox on start-up"), NULL},
-        {"get-stats", 's', 0, G_OPTION_ARG_NONE,
-         &(cmd_get_stats),
-         N_("Prints number unread and unsent messages"), NULL},
-        {"help", 'h', 0, G_OPTION_ARG_NONE, &help, N_("Show help options"), NULL},
-        {"version", 'v', 0, G_OPTION_ARG_NONE, &version, N_("Show version"), NULL},
-        /* last but not least a special option that collects filenames */
-        {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY,
-         &remaining_args,
-         "Special option that collects any remaining arguments for us"},
-        {NULL}
-    };
-    GOptionContext *context;
-    gboolean rc;
-    GError *error;
-    gint status = 0;
+    GVariantDict *dict = g_application_command_line_get_options_dict(cmdline);
+    gchar **remaining_args;
 
-    context = g_option_context_new(NULL);
-    g_option_context_add_main_entries(context, option_entries, NULL);
+    cmd_check_mail_on_startup = g_variant_dict_contains(dict, "check-mail");
+    cmd_open_unread_mailbox = g_variant_dict_contains(dict, "open-unread-mailbox");
+    cmd_open_inbox = g_variant_dict_contains(dict, "open-inbox");
+    cmd_get_stats = g_variant_dict_contains(dict, "get-stats");
 
-    /* Disable the built-in help-handling of GOptionContext, since it
-     * calls exit() after printing help, which is not what we want to
-     * happen in the primary instance. */
-    g_option_context_set_help_enabled(context, FALSE);
+    if (!g_variant_dict_lookup(dict, "compose", "&s", &opt_compose_email))
+        opt_compose_email = NULL;
 
-    cmd_check_mail_on_startup = FALSE;
-    cmd_get_stats = FALSE;
-    cmd_open_unread_mailbox = FALSE;
-    cmd_open_inbox = FALSE;
-    help = FALSE;
-    version = FALSE;
-    remaining_args = NULL;
-    error = NULL;
+    if (!g_variant_dict_lookup(dict, "attach", "^aay", &opt_attach_list))
+        opt_attach_list = NULL;
 
-    rc = g_option_context_parse(context, &argc, &argv, &error);
-    /* We offer the usual --help and -h as help options, but we should
-     * also support the legacy "-?".
-     * If we got an error, we check to see if it was caused by -?,
-     * and if so, honor it: */
-    if (!rc && strcmp(*++argv, "-?") == 0) {
-        rc = help = TRUE;
-        g_error_free(error);
-    }
+    if (!g_variant_dict_lookup(dict, "open-mailbox", "^as", &cmd_line_open_mailboxes))
+        cmd_line_open_mailboxes = NULL;
 
-    if (rc) {
-        if (help) {
-            gchar *text;
-
-            text = g_option_context_get_help(context, FALSE, NULL);
-            g_application_command_line_print(command_line, "%s", text);
-            g_free(text);
-            status = 2;
-        }
-
-        if (version) {
-            g_application_command_line_print(command_line,
-                                             "Balsa email client %s\n",
-                                             BALSA_VERSION);
-            status = 2;
-        }
-    } else {
-        /* Some other bad option */
-        g_application_command_line_printerr(command_line, "%s\n",
-                                            error->message);
-        g_error_free(error);
-        status = 1;
-    }
+    if (!g_variant_dict_lookup(dict, G_OPTION_REMAINING, "^aay", &remaining_args))
+        remaining_args = NULL;
 
     if (remaining_args != NULL) {
         gint i, num_args;
@@ -727,15 +680,10 @@ parse_options(int                       argc,
         g_strfreev(remaining_args);
         remaining_args = NULL;
     }
-
-    g_option_context_free(context);
-
-    return status;
 }
 
 static void
-handle_remote(int argc, char **argv,
-              GApplicationCommandLine * command_line)
+handle_remote(GApplicationCommandLine * command_line)
 {
     if (cmd_get_stats) {
         glong unread, unsent;
@@ -754,7 +702,7 @@ handle_remote(int argc, char **argv,
         if (cmd_open_inbox)
             initial_open_inbox();
 
-        if (cmd_line_open_mailboxes)
+        if (cmd_line_open_mailboxes != NULL)
             balsa_check_open_mailboxes();
 
         if (!balsa_check_open_compose_window()) {
@@ -765,50 +713,49 @@ handle_remote(int argc, char **argv,
     }
 }
 
+static gint
+balsa_handle_local_options_cb(GApplication *application,
+                              GVariantDict *options,
+                              gpointer      user_data)
+{
+    if (g_variant_dict_contains(options, "version")) {
+        g_print("Balsa email client %s\n", BALSA_VERSION);
+
+        return 0;
+    }
+
+    return -1;
+}
+
 static int
 balsa_command_line_cb(GApplication            * application,
                       GApplicationCommandLine * command_line,
                       gpointer                  user_data)
 {
-    gchar **args, **argv;
-    gint argc;
-    int status;
-
-    args = g_application_command_line_get_arguments(command_line, &argc);
-    /* We have to make an extra copy of the array, since
-     * g_option_context_parse() assumes that it can remove strings from
-     * the array without freeing them. */
-    argv = g_memdup(args, (argc + 1) * sizeof(gchar *));
-
     /* The signal is emitted when the GApplication is run, but is always
      * handled by the primary instance of Balsa. */
-    status = parse_options(argc, argv, command_line);
-    if (status == 0 || status == 2) {
-        if (g_application_command_line_get_is_remote(command_line)) {
-            /* A remote instance caused the emission; skip start-up, just
-             * handle the command line. */
-            handle_remote(argc, argv, command_line);
-        } else {
-            if (cmd_get_stats) {
-                long unread, unsent;
+    parse_options(command_line);
 
-                balsa_app.inbox = libbalsa_mailbox_new_from_config("mailbox-Inbox", FALSE);
-                balsa_app.outbox = libbalsa_mailbox_new_from_config("mailbox-Outbox", FALSE);
-                balsa_get_stats(&unread, &unsent);
-                printf("Unread: %ld Unsent: %ld\n", unread, unsent);
-            } else if (status == 0) {
-                /* checking for valid config files */
-                config_init();
-                g_application_activate(application);
-            }
-        }
-        status = 0;
+    if (g_application_command_line_get_is_remote(command_line)) {
+        /* A remote instance caused the emission; skip start-up, just
+         * handle the command line. */
+        handle_remote(command_line);
+    } else if (cmd_get_stats) {
+        long unread, unsent;
+
+        balsa_app.inbox =
+            libbalsa_mailbox_new_from_config("mailbox-Inbox", FALSE);
+        balsa_app.outbox =
+            libbalsa_mailbox_new_from_config("mailbox-Outbox", FALSE);
+        balsa_get_stats(&unread, &unsent);
+        printf("Unread: %ld Unsent: %ld\n", unread, unsent);
+    } else {
+        /* checking for valid config files */
+        config_init();
+        g_application_activate(application);
     }
 
-    g_free(argv);
-    g_strfreev(args);
-
-    return status;
+    return 0;
 }
 
 int
@@ -821,7 +768,10 @@ main(int argc, char **argv)
         gtk_application_new("org.desktop.Balsa",
                             G_APPLICATION_HANDLES_COMMAND_LINE);
     g_object_set(application, "register-session", TRUE, NULL);
+    g_application_add_main_option_entries(G_APPLICATION(application), option_entries);
 
+    g_signal_connect(application, "handle-local-options",
+                     G_CALLBACK(balsa_handle_local_options_cb), NULL);
     g_signal_connect(application, "command-line",
                      G_CALLBACK(balsa_command_line_cb), NULL);
     g_signal_connect(application, "startup",

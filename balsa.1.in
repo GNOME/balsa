@@ -44,17 +44,11 @@ any error messages are printed to that terminal too
 \fR      \fR[  \fB\-s \fR| \fB\-\-get\-stats                          \fR]
 .SH OPTIONS
 .PP
-\fB\-?\fR, \fB\-h\fR, \fB\-\-help\fR
+\fB\-h\fR, \fB\-\-help\fR
 .RS
 Displays a message describing command line syntax of Balsa,
 giving many more options than are presented in this man page;
 Balsa exits immediately after that.
-.PP
-Some of these options work (and thus should be in this man page)
-for example --display,
-others may not -
-for example --disable-crash-dialog which is provided by GNOME GUI
-Library.
 .RE
 .PP
 \fB\-v\fR, \fB\-\-version\fR

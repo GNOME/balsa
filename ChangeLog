@@ -1,3 +1,12 @@
+2020-02-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use g_print() instead of g_printerr()
+
+	to print network status.
+	Fixes https://gitlab.gnome.org/GNOME/balsa/issues/29.
+
+	* src/main-window.c (print_network_status):
+
 2020-02-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	main: Save the config files

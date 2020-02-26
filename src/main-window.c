@@ -271,9 +271,9 @@ print_network_status(gboolean available)
     datetime_string = g_date_time_format(datetime, "%c");
     g_date_time_unref(datetime);
 
-    g_printerr("Network is %s (%s)\n",
-               available ? "available  " : "unavailable",
-               datetime_string);
+    g_print("Network is %s (%s)\n",
+            available ? "available  " : "unavailable",
+            datetime_string);
     g_free(datetime_string);
 }
 

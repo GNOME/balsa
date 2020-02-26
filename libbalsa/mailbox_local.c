@@ -1007,11 +1007,13 @@ lbm_local_cache_message(LibBalsaMailboxLocal * local,
     LibBalsaMailboxLocalInfo *info;
     LibBalsaMessageHeaders *headers;
 
-    libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(local), msgno,
-                                   message);
-
+    /* If we are not preparing the mailbox for viewing, there is nothing
+     * to do. */
     if (priv->threading_info == NULL)
         return;
+
+    libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(local), msgno,
+                                   message);
 
     if (priv->threading_info->len < msgno)
         g_ptr_array_set_size(priv->threading_info, msgno);

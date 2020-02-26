@@ -1,5 +1,13 @@
 2020-02-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox-local: Do not pass message to LibBalsaMailbox
+
+	for caching, when we're not preparing a threaded view.
+
+	* libbalsa/mailbox_local.c (lbm_local_cache_message):
+
+2020-02-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Use g_print() instead of g_printerr()
 
 	to print network status.

@@ -670,7 +670,7 @@ msgid ""
 "<b>This certificate belongs to:</b>\n"
 msgstr ""
 "Non foi posíbel verificar a autenticidade deste ficheiro.\n"
-"b>Razón:</b> %s\n"
+"<b>Razón:</b> %s\n"
 "<b>Este certificado pertence a:</b>\n"
 
 #: ../libbalsa/libbalsa.c:556

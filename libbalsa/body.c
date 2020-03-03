@@ -33,6 +33,7 @@
 #include "libbalsa-vfs.h"
 #include "misc.h"
 #include <glib/gi18n.h>
+#include "gmime-part-rfc2440.h"
 #include "libbalsa-gpgme.h"
 
 LibBalsaMessageBody *
@@ -972,7 +973,7 @@ libbalsa_message_body_multipart_signed(const LibBalsaMessageBody *body)
 /** \brief Check if a body is signed inline with a valid signature
  *
  * \param body message body (part)
- * \return TRUE if the body is an inlined singed part, fFALSE if not
+ * \return TRUE if the body is an inlined singed part, FALSE if not
  *
  * The body is a valid inlined signed part if has a \ref GMimeGpgmeSigstat which is not \ref GPG_ERR_NOT_SIGNED.  This applies to
  * - RFC 4880 message parts,
@@ -985,4 +986,48 @@ libbalsa_message_body_inline_signed(const LibBalsaMessageBody *body)
 	return (body != NULL) &&
 			(body->sig_info != NULL) &&
 			(g_mime_gpgme_sigstat_status(body->sig_info) != GPG_ERR_NOT_SIGNED);
+}
+
+
+/** \brief Check if a body contains any crypto content
+ *
+ * \param body message body
+ * \return TRUE if any crypto content has been found
+ *
+ * Return if the passed body chain or any of its children contains any crypto content which may be either decrypted or rechecked.
+ * This includes PGP/MIME (RFC 3156) and S/MIME (RFC 8551) parts as well as RFC 4880 signed or encrypted text/... bodies.
+ */
+gboolean
+libbalsa_message_body_has_crypto_content(const LibBalsaMessageBody *body)
+{
+	gboolean result;
+
+	/* check if we have a signature info */
+	result = (body->sig_info != NULL);
+
+	/* check for signed or encrypted content-type */
+	if (!result && (body->content_type != NULL)) {
+		if ((g_ascii_strcasecmp(body->content_type, "multipart/signed") == 0) ||
+			(g_ascii_strcasecmp(body->content_type, "multipart/encrypted") == 0) ||
+			(g_ascii_strcasecmp(body->content_type, "application/pkcs7-mime") == 0) ||
+			(g_ascii_strcasecmp(body->content_type, "application/x-pkcs7-mime") == 0)) {
+			result = TRUE;
+		}
+	}
+
+	/* check if a text/... body is RFC 4880 signed or encrypted */
+	if (!result && (body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_TEXT) && (GMIME_IS_PART(body->mime_part)) &&
+		(g_mime_part_check_rfc2440(GMIME_PART(body->mime_part)) != GMIME_PART_RFC2440_NONE)) {
+		result = TRUE;
+	}
+
+	/* check children and parts */
+	if (!result && (body->parts != NULL)) {
+		result = libbalsa_message_body_has_crypto_content(body->parts);
+	}
+	if (!result && (body->next != NULL)) {
+		result = libbalsa_message_body_has_crypto_content(body->next);
+	}
+
+	return result;
 }

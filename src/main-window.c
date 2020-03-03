@@ -701,6 +701,7 @@ static const BalsaToolbarEntry main_toolbar_extras[] = {
     { "mailbox-close",     "window-close-symbolic"     },
     { "mailbox-select-all", BALSA_PIXMAP_MARK_ALL      },
     { "show-all-headers",   BALSA_PIXMAP_SHOW_HEADERS  },
+	{ "recheck-crypt",      BALSA_PIXMAP_GPG_RECHECK   },
     { "reset-filter",      "gtk-cancel"                },
     { "show-preview-pane",  BALSA_PIXMAP_SHOW_PREVIEW  },
     { "mailbox-expunge",   "edit-clear"                },
@@ -1625,6 +1626,17 @@ view_source_activated(GSimpleAction * action,
 }
 
 static void
+recheck_crypt_activated(GSimpleAction * action,
+    					GVariant      * parameter,
+						gpointer        user_data)
+{
+    BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+
+	balsa_message_recheck_crypto(BALSA_MESSAGE(priv->preview));
+}
+
+static void
 copy_message_activated(GSimpleAction * action,
                        GVariant      * parameter,
                        gpointer        user_data)
@@ -2072,6 +2084,7 @@ bw_add_win_action_entries(GActionMap * action_map)
         {"previous-part",         previous_part_activated},
         {"save-part",             save_part_activated},
         {"view-source",           view_source_activated},
+		{"recheck-crypt",		  recheck_crypt_activated},
         {"copy-message",          copy_message_activated},
         {"select-text",           select_text_activated},
         {"move-to-trash",         move_to_trash_activated},
@@ -2695,11 +2708,15 @@ bw_enable_part_menu_items(BalsaWindow * window)
 {
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     BalsaMessage *msg = window ? BALSA_MESSAGE(priv->preview) : NULL;
+	LibBalsaMessage *lbmessage;
 
     bw_action_set_enabled(window, "next-part",
                           balsa_message_has_next_part(msg));
     bw_action_set_enabled(window, "previous-part",
                           balsa_message_has_previous_part(msg));
+    lbmessage = (msg != NULL) ? balsa_message_get_message(msg) : NULL;
+    bw_action_set_enabled(window, "recheck-crypt",
+    	(lbmessage != NULL) ? libbalsa_message_has_crypto_content(lbmessage) : FALSE);
 }
 
 static void

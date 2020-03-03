@@ -166,6 +166,12 @@
           <attribute name="action">win.view-source</attribute>
           <attribute name="accel">&lt;Primary&gt;u</attribute>
         </item>
+        <item>
+          <attribute name="label"
+            translatable="yes">Decrypt and check signatures</attribute>
+          <attribute name="action">win.recheck-crypt</attribute>
+          <attribute name="accel">&lt;Primary&gt;d</attribute>
+        </item>
       </section>
       <section>
         <item>

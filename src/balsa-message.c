@@ -142,7 +142,6 @@ static LibBalsaMsgProtectState bm_scan_signatures(LibBalsaMessageBody *body,
 static GdkPixbuf * get_crypto_content_icon(LibBalsaMessageBody * body,
 					   const gchar * content_type,
 					   gchar ** icon_title);
-static void message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * balsa_message);
 
 #ifdef ENABLE_AUTOCRYPT
 static inline gboolean autocrypt_in_use(void);
@@ -250,6 +249,9 @@ balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * balsa_message
 }
 
 
+/* Note: this function returns a NULL-terminated array of buttons for a top-level headers widget.  Currently, we return just a
+ * single item (the button for showing the menu for switching between attachments) so we /could/ change the return type to
+ * GtkWidget *. */
 static GtkWidget **
 bm_header_tl_buttons(BalsaMessage * balsa_message)
 {
@@ -257,22 +259,6 @@ bm_header_tl_buttons(BalsaMessage * balsa_message)
     GtkWidget *button;
 
     array = g_ptr_array_new();
-
-    button =
-        gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_GPG_RECHECK),
-                                      GTK_ICON_SIZE_BUTTON);
-    gtk_widget_set_tooltip_text(button,
-			        _("Check cryptographic signature"));
-    g_signal_connect(button, "focus_in_event",
-		     G_CALLBACK(balsa_mime_widget_limit_focus),
-		     (gpointer) balsa_message);
-    g_signal_connect(button, "focus_out_event",
-		     G_CALLBACK(balsa_mime_widget_unlimit_focus),
-		     (gpointer) balsa_message);
-    gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
-    g_signal_connect(button, "clicked",
-		     G_CALLBACK(message_recheck_crypto_cb), balsa_message);
-    g_ptr_array_add(array, button);
 
     balsa_message->attach_button = button =
         gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_ATTACHMENT),
@@ -297,24 +283,6 @@ bm_header_tl_buttons(BalsaMessage * balsa_message)
     return (GtkWidget **) g_ptr_array_free(array, FALSE);
 }
 
-
-#if !GTK_CHECK_VERSION(3, 15, 0)
-/* Callback for the "style-updated" signal; set the message background to
- * match the base color of the content in the tree-view. */
-static void
-bm_on_set_style(GtkWidget * widget,
-	        BalsaMessage * balsa_message)
-{
-    GtkStyleContext *context;
-    GdkRGBA rgba;
-
-    context = gtk_widget_get_style_context(balsa_message->treeview);
-    gtk_style_context_get_background_color(context, GTK_STATE_FLAG_NORMAL,
-                                           &rgba);
-    gtk_widget_override_background_color(balsa_message->scroll,
-                                         GTK_STATE_FLAG_NORMAL, &rgba);
-}
-#endif
 
 /*
  * Callbacks and helpers for the find bar.
@@ -3213,13 +3181,13 @@ balsa_message_perform_crypto(LibBalsaMessage * message,
 
 
 /*
- * Callback for the "Check Crypto" button in the message's top-level headers.
+ * Recheck crypto status of a message.
  * It works roughly like balsa_message_set, but with less overhead and with
  * "check always" mode. Note that this routine adds a temporary reference to
  * the message.
  */
-static void
-message_recheck_crypto_cb(GtkWidget * button, BalsaMessage * balsa_message)
+void
+balsa_message_recheck_crypto(BalsaMessage *balsa_message)
 {
     LibBalsaMessageBody *body_list;
     LibBalsaMsgProtectState prot_state;

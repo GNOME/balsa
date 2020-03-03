@@ -135,6 +135,7 @@ LibBalsaMessageBody *libbalsa_message_body_mp_related_root(LibBalsaMessageBody *
 LibBalsaMsgProtectState libbalsa_message_body_protect_state(const LibBalsaMessageBody *body);
 gboolean libbalsa_message_body_multipart_signed(const LibBalsaMessageBody *body);
 gboolean libbalsa_message_body_inline_signed(const LibBalsaMessageBody *body);
+gboolean libbalsa_message_body_has_crypto_content(const LibBalsaMessageBody *body);
 
 
 #endif				/* __LIBBALSA_BODY_H__ */

@@ -26,6 +26,7 @@
 #include <gtk/gtk.h>
 #include <gmime/gmime.h>
 #include "libbalsa-gpgme.h"
+#include "mime-stream-shared.h"
 #include "gmime-part-rfc2440.h"
 
 
@@ -70,6 +71,9 @@ g_mime_part_check_rfc2440(GMimePart * part)
     if (!stream || (slen = g_mime_stream_length(stream)) < 0)
 	return retval;
 
+    /* note: the following is a noop if the stream is not a shared stream */
+    libbalsa_mime_stream_shared_lock(stream);
+
     g_mime_stream_reset(stream);
 
     /* check if the complete stream fits in the buffer */
@@ -109,6 +113,8 @@ g_mime_part_check_rfc2440(GMimePart * part)
 		retval = GMIME_PART_RFC2440_SIGNED;
 	}
     }
+
+    libbalsa_mime_stream_shared_unlock(stream);
 
     return retval;
 }

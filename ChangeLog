@@ -1,3 +1,33 @@
+2020-03-03  Albrecht Dreß  <albrecht.dress@arcor.de>
+
+	Move recheck crypto button to menu, toolbar
+
+	* libbalsa/body.[ch]:
+	  • add new function libbalsa_message_body_has_crypto_content()
+	    which recursively checks if a LibBalsaMessageBody contains any
+	    not yet decrypted or any signed content which may be rechecked
+	  • fix comment typo
+	* libbalsa/gmime-part-rfc2440.c: g_mime_part_check_rfc2440()
+	    make sure to lock/unlock a shared stream
+	* libbalsa/message.[ch]:
+	  • rename libbalsa_message_is_pgp_(signed|encrypted)()
+	    to libbalsa_message_is_(signed|encrypted)(), do not export them,
+	    and detect S/MIME (RFC 8551) content
+	  • add and export libbalsa_message_has_crypto_content() to check
+	    if a message contains any not yet decrypted or any signed content
+	    which may be rechecked
+	* src/balsa-message.[ch]:
+	  • remove recheck crypto button from bm_header_tl_buttons()
+	  • rename message_recheck_crypto_cb() to balsa_message_recheck_crypto()
+	    and export it
+	  • remove ancient code relevant for Gtk+-3.0 < 3.15.0 only
+	* src/main-window.c, src/message-window.c:
+	  • add “recheck crypto” button to extra toolbar items
+	  • add recheck crypto callback, and connect it to the menu item
+	  • appropriately disable/enable menu item and button
+	* src/toolbar-factory.c: register “Recheck cryptography” button
+	* ui/main-window.ui, ui/message-window.ui: add menu item to the ui
+
 2020-02-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox-local: Do not pass message to LibBalsaMailbox

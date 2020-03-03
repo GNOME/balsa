@@ -143,6 +143,7 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_MARKED_NEW,    N_("Toggle\nnew"),     FALSE},
     {BALSA_PIXMAP_MARK_ALL,      N_("Mark all"),        FALSE},
     {BALSA_PIXMAP_SHOW_HEADERS,  N_("All\nheaders"),    FALSE},
+	{BALSA_PIXMAP_GPG_RECHECK,   N_("Recheck\ncryptography"), FALSE},
     {"gtk-cancel",           N_("Reset\nFilter"),   FALSE},
     {BALSA_PIXMAP_SHOW_PREVIEW,  N_("Message Preview"),     FALSE},
     {BALSA_PIXMAP_GPG_SIGN,      N_("Sign"),            FALSE},

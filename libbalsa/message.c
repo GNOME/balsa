@@ -52,6 +52,8 @@
 
 static void libbalsa_message_dispose(GObject * object);
 static void libbalsa_message_finalize(GObject * object);
+static gboolean libbalsa_message_is_signed(LibBalsaMessage * message);
+static gboolean libbalsa_message_is_encrypted(LibBalsaMessage * message);
 
 struct _LibBalsaMessage {
     GObject object;
@@ -632,10 +634,10 @@ libbalsa_message_get_attach_icon(LibBalsaMessage * message)
 {
     LibBalsaMessageAttach attach_icon;
 
-    if (libbalsa_message_is_pgp_encrypted(message)) {
+    if (libbalsa_message_is_encrypted(message)) {
 	attach_icon = LIBBALSA_MESSAGE_ATTACH_ENCR;
     } else if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE ||
-	libbalsa_message_is_pgp_signed(message)) {
+	libbalsa_message_is_signed(message)) {
 	switch (message->prot_state) {
 	case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
 	    attach_icon = LIBBALSA_MESSAGE_ATTACH_GOOD;
@@ -843,24 +845,44 @@ libbalsa_message_has_attachment(LibBalsaMessage *message)
     }
  }
 
-gboolean
-libbalsa_message_is_pgp_signed(LibBalsaMessage * message)
+static gboolean
+libbalsa_message_is_signed(LibBalsaMessage * message)
 {
+	gboolean is_signed = FALSE;
+
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    return message->headers->content_type ?
-	g_mime_content_type_is_type(message->headers->content_type,
-				    "multipart", "signed") : FALSE;
+    if (message->headers->content_type != NULL) {
+    	GMimeContentType *ct = message->headers->content_type; /* convenience pointer */
+
+    	if (g_mime_content_type_is_type(ct, "multipart", "signed") ||
+    		((g_mime_content_type_is_type(ct, "application", "pkcs7-mime") ||
+    		  g_mime_content_type_is_type(ct, "application", "x-pkcs7-mime")) &&
+    		 g_ascii_strcasecmp(g_mime_content_type_get_parameter(ct,"smime-type" ), "signed-data") == 0)) {
+    		is_signed = TRUE;
+    	}
+    }
+    return is_signed;
 }
 
-gboolean
-libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message)
+static gboolean
+libbalsa_message_is_encrypted(LibBalsaMessage * message)
 {
+	gboolean encrypted = FALSE;
+
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    return message->headers->content_type ?
-	g_mime_content_type_is_type(message->headers->content_type,
-				    "multipart", "encrypted") : FALSE;
+    if (message->headers->content_type != NULL) {
+    	GMimeContentType *ct = message->headers->content_type; /* convenience pointer */
+
+    	if (g_mime_content_type_is_type(ct, "multipart", "encrypted") ||
+    		((g_mime_content_type_is_type(ct, "application", "pkcs7-mime") ||
+    		  g_mime_content_type_is_type(ct, "application", "x-pkcs7-mime")) &&
+    		 g_ascii_strcasecmp(g_mime_content_type_get_parameter(ct,"smime-type" ), "enveloped-data") == 0)) {
+    		encrypted = TRUE;
+    	}
+    }
+    return encrypted;
 }
 
 void
@@ -1664,6 +1686,15 @@ libbalsa_message_get_protect_state(LibBalsaMessage *message)
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), 0);
 
     return message->prot_state;
+}
+
+
+gboolean
+libbalsa_message_has_crypto_content(LibBalsaMessage *message)
+{
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
+
+    return libbalsa_message_body_has_crypto_content(message->body_list);
 }
 
 

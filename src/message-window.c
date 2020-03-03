@@ -99,13 +99,18 @@ mw_set_active(MessageWindow * mw,
 static void
 mw_set_part_buttons_sensitive(MessageWindow * mw, BalsaMessage * msg)
 {
-    if (msg == NULL || balsa_message_get_tree_view(msg) == NULL)
+	LibBalsaMessage *lbmsg;
+
+	if (msg == NULL || balsa_message_get_tree_view(msg) == NULL)
 	return;
 
     mw_set_enabled(mw, "next-part",
                    balsa_message_has_next_part(msg));
     mw_set_enabled(mw, "previous-part",
                    balsa_message_has_previous_part(msg));
+    lbmsg = balsa_message_get_message(msg);
+    mw_set_enabled(mw, "recheck-crypt",
+    	(lbmsg != NULL) ? libbalsa_message_has_crypto_content(lbmsg) : FALSE);
 }
 
 static gboolean
@@ -159,7 +164,8 @@ static const BalsaToolbarEntry message_toolbar_extras[] = {
     { "next-flagged",     BALSA_PIXMAP_NEXT_FLAGGED  },
     { "previous-part",    BALSA_PIXMAP_PREVIOUS_PART },
     { "close",           "window-close-symbolic"     },
-    { "show-all-headers", BALSA_PIXMAP_SHOW_HEADERS  }
+    { "show-all-headers", BALSA_PIXMAP_SHOW_HEADERS  },
+	{ "recheck-crypt",    BALSA_PIXMAP_GPG_RECHECK   },
 };
 
 /* Create the toolbar model for the message window's toolbar.
@@ -512,6 +518,15 @@ mw_view_source_activated(GSimpleAction * action, GVariant * parameter,
 }
 
 static void
+mw_recheck_crypt_activated(GSimpleAction * action,
+    					   GVariant      * parameter,
+						   gpointer        data)
+{
+    MessageWindow *mw = (MessageWindow *) data;
+	balsa_message_recheck_crypto(BALSA_MESSAGE(mw->bmessage));
+}
+
+static void
 mw_close_activated(GSimpleAction * action, GVariant * parameter,
                    gpointer data)
 {
@@ -779,6 +794,7 @@ static GActionEntry win_entries[] = {
     {"previous-part",         mw_previous_part_activated},
     {"save-part",             mw_save_part_activated},
     {"view-source",           mw_view_source_activated},
+	{"recheck-crypt",		  mw_recheck_crypt_activated},
     {"select-text",           mw_select_text_activated},
     {"move-to-trash",         mw_move_to_trash_activated},
     /* Only a toolbar button: */

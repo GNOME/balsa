@@ -203,8 +203,6 @@ gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
 gboolean libbalsa_message_is_partial(LibBalsaMessage * message,
 				     gchar ** id);
 gboolean libbalsa_message_has_attachment(LibBalsaMessage * message);
-gboolean libbalsa_message_is_pgp_signed(LibBalsaMessage * message);
-gboolean libbalsa_message_is_pgp_encrypted(LibBalsaMessage * message);
 
 const gchar* libbalsa_message_header_get_one(LibBalsaMessageHeaders* headers,
                                              const gchar *find);
@@ -284,6 +282,7 @@ GList                  *libbalsa_message_get_in_reply_to(LibBalsaMessage *messag
 gboolean                libbalsa_message_get_attach_pubkey(LibBalsaMessage *message);
 LibBalsaMsgProtectState libbalsa_message_get_protect_state(LibBalsaMessage *message);
 guint                   libbalsa_message_get_body_ref(LibBalsaMessage *message);
+gboolean				libbalsa_message_has_crypto_content(LibBalsaMessage *message);
 
 /*
  * Setters

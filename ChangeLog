@@ -1,3 +1,11 @@
+2020-03-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox-local: Do not pass message to LibBalsaMailbox
+
+	in a case not covered by commit d95c3a90b2478e9dcd18d50ba0bf4efd3a10f64b
+
+	* libbalsa/mailbox_local.c (lbm_local_cache_message):
+
 2020-03-03  Albrecht Dreß  <albrecht.dress@arcor.de>
 
 	Move recheck crypto button to menu, toolbar

@@ -1012,9 +1012,6 @@ lbm_local_cache_message(LibBalsaMailboxLocal * local,
     if (priv->threading_info == NULL)
         return;
 
-    libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(local), msgno,
-                                   message);
-
     if (priv->threading_info->len < msgno)
         g_ptr_array_set_size(priv->threading_info, msgno);
 
@@ -1040,6 +1037,9 @@ lbm_local_cache_message(LibBalsaMailboxLocal * local,
         priv->set_threading_id =
             g_idle_add((GSourceFunc) lbml_set_threading_idle_cb, local);
     }
+
+    libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(local), msgno,
+                                   message);
 }
 
 void

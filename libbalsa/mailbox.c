@@ -2001,6 +2001,10 @@ lbm_cache_message(LibBalsaMailbox * mailbox, guint msgno,
     LibBalsaMailboxIndexEntry *entry;
     gboolean need_sort;
 
+    /* Do we need to cache the message info? */
+    if (priv->view == NULL || priv->view->position < 0)
+        return;
+
     if (priv->mindex->len < msgno)
         g_ptr_array_set_size(priv->mindex, msgno);
 

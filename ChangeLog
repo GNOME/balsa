@@ -1,3 +1,10 @@
+2020-03-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox: Do not cache message info if the mailbox is not being
+	viewed.
+
+	* libbalsa/mailbox.c (lbm_cache_message):
+
 2020-03-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox-local: Do not pass message to LibBalsaMailbox

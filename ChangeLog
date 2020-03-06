@@ -1,5 +1,19 @@
 2020-03-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mailbox: Make cache-message a class method
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_class_init),
+	(lbm_cache_message), (libbalsa_mailbox_get_message),
+	(libbalsa_mailbox_real_cache_message),
+	(libbalsa_mailbox_cache_message):
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_class_init),
+	(lbm_local_cache_message), (libbalsa_mailbox_local_cache_message):
+	* libbalsa/mailbox_local.h:
+	* libbalsa/mailbox_mbox.c (parse_mailbox):
+
+2020-03-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mailbox: Guard against out-of-bounds access to a GPtrArray
 
 	* libbalsa/mailbox.c (mailbox_compare_func),

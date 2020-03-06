@@ -61,6 +61,9 @@ static gboolean libbalsa_mailbox_real_close_backend (LibBalsaMailbox *
                                                      mailbox);
 static void libbalsa_mailbox_real_lock_store(LibBalsaMailbox * mailbox,
                                              gboolean lock);
+static void libbalsa_mailbox_real_cache_message(LibBalsaMailbox * mailbox,
+                                                guint msgno,
+                                                LibBalsaMessage * message);
 
 /* SIGNALS MEANINGS :
    - CHANGED: notification signal sent by the mailbox to allow the
@@ -256,6 +259,7 @@ libbalsa_mailbox_class_init(LibBalsaMailboxClass * klass)
     klass->duplicate_msgnos = NULL;
     klass->lock_store  = libbalsa_mailbox_real_lock_store;
     klass->test_can_reach = NULL;
+    klass->cache_message = libbalsa_mailbox_real_cache_message;
 }
 
 static void
@@ -2006,7 +2010,7 @@ lbm_cache_message(LibBalsaMailbox * mailbox, guint msgno,
     gboolean need_sort;
 
     /* Do we need to cache the message info? */
-    if (priv->view == NULL || priv->view->position < 0)
+    if (priv->mindex == NULL || priv->view == NULL || priv->view->position < 0)
         return;
 
     if (priv->mindex->len < msgno)
@@ -2058,7 +2062,7 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
 
     message = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->get_message(mailbox,
                                                                msgno);
-    if (message && priv->mindex)
+    if (message != NULL)
         /* Cache the message info, if we do not already have it. */
         lbm_cache_message(mailbox, msgno, message);
 
@@ -4676,20 +4680,22 @@ libbalsa_mailbox_unlock_store(LibBalsaMailbox * mailbox)
         LIBBALSA_MAILBOX_GET_CLASS(mailbox)->lock_store(mailbox, FALSE);
 }
 
+static void
+libbalsa_mailbox_real_cache_message(LibBalsaMailbox * mailbox, guint msgno,
+                                    LibBalsaMessage * message)
+{
+    lbm_cache_message(mailbox, msgno, message);
+}
+
 void
 libbalsa_mailbox_cache_message(LibBalsaMailbox * mailbox, guint msgno,
                                LibBalsaMessage * message)
 {
-    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
-
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-    if (!priv->mindex)
-        return;
     g_return_if_fail(msgno > 0);
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    lbm_cache_message(mailbox, msgno, message);
+    LIBBALSA_MAILBOX_GET_CLASS(mailbox)->cache_message(mailbox, msgno, message);
 }
 
 static void

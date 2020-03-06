@@ -258,6 +258,9 @@ struct _LibBalsaMailboxClass {
     void (*test_can_reach) (LibBalsaMailbox          * mailbox,
                             LibBalsaCanReachCallback * cb,
                             gpointer                   cb_data);
+    void (*cache_message) (LibBalsaMailbox *mailbox,
+                           guint            msgno,
+                           LibBalsaMessage *message);
 };
 
 LibBalsaMailbox *libbalsa_mailbox_new_from_config(const gchar *prefix,

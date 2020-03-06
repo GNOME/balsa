@@ -132,7 +132,7 @@ libbalsa_mailbox_mbox_class_init(LibBalsaMailboxMboxClass * klass)
     libbalsa_mailbox_class->lock_store = libbalsa_mailbox_mbox_lock_store;
 
     libbalsa_mailbox_local_class->check_files  = lbm_mbox_check_files;
-    libbalsa_mailbox_local_class->remove_files = 
+    libbalsa_mailbox_local_class->remove_files =
 	libbalsa_mailbox_mbox_remove_files;
 
     libbalsa_mailbox_local_class->get_info = lbm_mbox_get_info;
@@ -430,7 +430,6 @@ static LibBalsaMessage *lbm_mbox_message_new(GMimeMessage * mime_message,
 static void
 parse_mailbox(LibBalsaMailboxMbox * mbox)
 {
-    LibBalsaMailboxLocal *local = LIBBALSA_MAILBOX_LOCAL(mbox);
     GMimeParser *gmime_parser;
     struct message_info msg_info;
     struct message_info * msg_info_p = &msg_info;
@@ -515,7 +514,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 	 * holding the lock. */
         offset = g_mime_stream_tell(mbox->gmime_stream);
         libbalsa_mime_stream_shared_unlock(mbox->gmime_stream);
-        libbalsa_mailbox_local_cache_message(local, msgno, msg);
+        libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(mbox), msgno, msg);
         libbalsa_mime_stream_shared_lock(mbox->gmime_stream);
         g_mime_stream_seek(mbox->gmime_stream, offset, GMIME_STREAM_SEEK_SET);
 

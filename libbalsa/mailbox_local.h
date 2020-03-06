@@ -73,9 +73,6 @@ gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 
 void libbalsa_mailbox_local_load_messages(LibBalsaMailbox * mailbox,
 					  guint last_msgno);
-void libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
-                                          guint msgno,
-                                          LibBalsaMessage * message);
 void libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox * mailbox,
 					  guint msgno);
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);

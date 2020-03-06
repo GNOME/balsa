@@ -119,10 +119,13 @@ static gboolean libbalsa_mailbox_local_msgno_has_flags(LibBalsaMailbox *
 static void libbalsa_mailbox_local_test_can_reach(LibBalsaMailbox          * mailbox,
                                                   LibBalsaCanReachCallback * cb,
                                                   gpointer                   cb_data);
-static void lbm_local_cache_message(LibBalsaMailboxLocal * local,
-                                    guint                  msgno,
-                                    LibBalsaMessage      * message);
+static gboolean lbm_local_cache_message(LibBalsaMailboxLocal * local,
+                                        guint                  msgno,
+                                        LibBalsaMessage      * message);
 static gboolean lbml_set_threading_idle_cb(LibBalsaMailboxLocal *local);
+static void libbalsa_mailbox_local_cache_message(LibBalsaMailbox * mailbox,
+                                                 guint             msgno,
+                                                 LibBalsaMessage * message);
 
 /* LibBalsaMailboxLocal class method: */
 static void lbm_local_real_remove_files(LibBalsaMailboxLocal * local);
@@ -177,6 +180,9 @@ libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)
         libbalsa_mailbox_local_duplicate_msgnos;
     libbalsa_mailbox_class->test_can_reach =
         libbalsa_mailbox_local_test_can_reach;
+    libbalsa_mailbox_class->cache_message =
+        libbalsa_mailbox_local_cache_message;
+
     klass->check_files  = NULL;
     klass->set_path     = NULL;
     klass->remove_files = lbm_local_real_remove_files;
@@ -988,16 +994,12 @@ libbalsa_mailbox_local_message_match(LibBalsaMailbox * mailbox,
 
 /*
  * libbalsa_mailbox_local_cache_message
- * private 
- * PS: called by mail_progress_notify_cb:
- * loads incrementally new messages, if any.
- *  Mailbox lock MUST BE HELD before calling this function.
  *
  *  Caches the message-id, references, and sender,
  *  and passes the message to libbalsa_mailbox_cache_message for caching
  *  other info.
  */
-static void
+static gboolean
 lbm_local_cache_message(LibBalsaMailboxLocal * local,
                         guint msgno,
                         LibBalsaMessage * message)
@@ -1010,13 +1012,13 @@ lbm_local_cache_message(LibBalsaMailboxLocal * local,
     /* If we are not preparing the mailbox for viewing, there is nothing
      * to do. */
     if (priv->threading_info == NULL)
-        return;
+        return FALSE;
 
     if (priv->threading_info->len < msgno)
         g_ptr_array_set_size(priv->threading_info, msgno);
 
     if (g_ptr_array_index(priv->threading_info, msgno - 1) != NULL)
-        return;
+        return FALSE;
 
     info = g_new(LibBalsaMailboxLocalInfo, 1);
     info->message_id = g_strdup(libbalsa_message_get_message_id(message));
@@ -1038,19 +1040,19 @@ lbm_local_cache_message(LibBalsaMailboxLocal * local,
             g_idle_add((GSourceFunc) lbml_set_threading_idle_cb, local);
     }
 
-    libbalsa_mailbox_cache_message(LIBBALSA_MAILBOX(local), msgno,
-                                   message);
+    return TRUE;
 }
 
-void
-libbalsa_mailbox_local_cache_message(LibBalsaMailboxLocal * local,
-                                     guint msgno,
+static void
+libbalsa_mailbox_local_cache_message(LibBalsaMailbox * mailbox,
+                                     guint             msgno,
                                      LibBalsaMessage * message)
 {
-    g_return_if_fail(LIBBALSA_IS_MAILBOX_LOCAL(local));
-
-    if (message != NULL)
-        lbm_local_cache_message(local, msgno, message);
+    if (message != NULL &&
+        lbm_local_cache_message(LIBBALSA_MAILBOX_LOCAL(mailbox), msgno, message)) {
+        LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_local_parent_class)->
+            cache_message(mailbox, msgno, message);
+    }
 }
 
 static gboolean

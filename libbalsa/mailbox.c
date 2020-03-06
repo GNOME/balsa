@@ -168,6 +168,10 @@ struct _LibBalsaMailboxPrivate {
     gboolean messages_threaded : 1;
 };
 
+#define LBM_GET_INDEX_ENTRY(priv, msgno) \
+    ((LibBalsaMailboxIndexEntry *) (((msgno) <= (priv)->mindex->len) ? \
+     g_ptr_array_index((priv)->mindex, (msgno) - 1) : NULL))
+
 G_DEFINE_TYPE_WITH_CODE(LibBalsaMailbox,
                         libbalsa_mailbox,
                         G_TYPE_OBJECT,
@@ -3673,8 +3677,8 @@ mailbox_compare_func(const SortTuple * a,
 	LibBalsaMailboxIndexEntry *message_a;
 	LibBalsaMailboxIndexEntry *message_b;
 
-	message_a = g_ptr_array_index(priv->mindex, msgno_a - 1);
-	message_b = g_ptr_array_index(priv->mindex, msgno_b - 1);
+	message_a = LBM_GET_INDEX_ENTRY(priv, msgno_a);
+	message_b = LBM_GET_INDEX_ENTRY(priv, msgno_b);
 
 	if (!(VALID_ENTRY(message_a) && VALID_ENTRY(message_b)))
 	    return 0;
@@ -4473,8 +4477,8 @@ LibBalsaMessageStatus
 libbalsa_mailbox_msgno_get_status(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
-    LibBalsaMailboxIndexEntry *entry =
-        g_ptr_array_index(priv->mindex, msgno - 1);
+    LibBalsaMailboxIndexEntry *entry = LBM_GET_INDEX_ENTRY(priv, msgno);
+
     return VALID_ENTRY(entry) ?
         entry->status_icon : LIBBALSA_MESSAGE_STATUS_ICONS_NUM;
 }
@@ -4483,8 +4487,8 @@ const gchar *
 libbalsa_mailbox_msgno_get_subject(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
-    LibBalsaMailboxIndexEntry *entry =
-        g_ptr_array_index(priv->mindex, msgno - 1);
+    LibBalsaMailboxIndexEntry *entry = LBM_GET_INDEX_ENTRY(priv, msgno);
+
     return VALID_ENTRY(entry) ? entry->subject : NULL;
 }
 
@@ -4848,7 +4852,7 @@ libbalsa_mailbox_get_index_entry(LibBalsaMailbox * mailbox, guint msgno)
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
 
-    return (LibBalsaMailboxIndexEntry *) g_ptr_array_index(priv->mindex, msgno - 1);
+    return LBM_GET_INDEX_ENTRY(priv, msgno);
 }
 
 LibBalsaMailboxView *

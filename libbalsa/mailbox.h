@@ -632,7 +632,6 @@ void libbalsa_mailbox_set_filters(LibBalsaMailbox * mailbox, GSList * filters);
 void libbalsa_mailbox_set_url(LibBalsaMailbox * mailbox, const gchar * url);
 void libbalsa_mailbox_set_first_unread(LibBalsaMailbox * mailbox, guint first);
 void libbalsa_mailbox_set_msg_tree_changed(LibBalsaMailbox * mailbox, gboolean changed);
-void libbalsa_mailbox_set_is_directory(LibBalsaMailbox * mailbox, gboolean is_directory);
 void libbalsa_mailbox_set_readonly(LibBalsaMailbox * mailbox, gboolean readonly);
 void libbalsa_mailbox_set_no_reassemble(LibBalsaMailbox * mailbox,
                                         gboolean no_reassemble);

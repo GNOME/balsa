@@ -243,8 +243,6 @@ libbalsa_mailbox_maildir_new(const gchar * path, gboolean create)
 
     mailbox = g_object_new(LIBBALSA_TYPE_MAILBOX_MAILDIR, NULL);
 
-    libbalsa_mailbox_set_is_directory(mailbox, TRUE);
-
     if (libbalsa_mailbox_local_set_path(LIBBALSA_MAILBOX_LOCAL(mailbox),
                                         path, create) != 0) {
         g_object_unref(mailbox);

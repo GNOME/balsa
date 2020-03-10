@@ -47,7 +47,6 @@ struct _LibBalsaMailboxLocalPrivate {
     guint save_tree_id; /* id of the idle mailbox save-tree job */
     guint load_messages_id; /* id of the idle load-messages job */
     guint set_threading_id; /* id of the idle set-threading job */
-    guint msgno;            /* where to start loading messages */
     GPtrArray *threading_info;
     LibBalsaMailboxLocalPool message_pool[LBML_POOL_SIZE];
     guint pool_seqno;

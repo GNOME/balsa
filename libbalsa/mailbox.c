@@ -155,7 +155,6 @@ struct _LibBalsaMailboxPrivate {
     guint run_filters_idle_id;
     guint sort_idle_id;
 
-    gboolean is_directory : 1;
     gboolean readonly : 1;
     gboolean view_filter_pending : 1;  /* a view filter has been set
                                         * but the view has not been updated */
@@ -268,7 +267,6 @@ libbalsa_mailbox_init(LibBalsaMailbox * mailbox)
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 
     g_rec_mutex_init(&priv->rec_mutex);
-    priv->is_directory = FALSE;
 
     priv->config_prefix = NULL;
     priv->name = NULL;
@@ -4986,16 +4984,6 @@ libbalsa_mailbox_set_msg_tree_changed(LibBalsaMailbox * mailbox, gboolean change
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     priv->msg_tree_changed = !!changed;
-}
-
-void
-libbalsa_mailbox_set_is_directory(LibBalsaMailbox * mailbox, gboolean is_directory)
-{
-    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
-
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
-
-    priv->is_directory = !!is_directory;
 }
 
 void

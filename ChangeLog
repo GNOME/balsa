@@ -1,3 +1,16 @@
+2020-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Drop LibBalsaMailbox:is_directory
+
+	It was a write-only flag.
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_init),
+	(libbalsa_mailbox_set_msg_tree_changed):
+	* libbalsa/mailbox.h:
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_new):
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_new):
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_new):
+
 2020-03-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox: Make cache-message a class method

@@ -11,6 +11,19 @@
 	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_new):
 	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_new):
 
+2020-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Remove libbalsa_mailbox_local_load_messages from the API, and
+	replace it with LibBalsaMailbox::check virtual method.
+
+	* libbalsa/mailbox_local.c (libbalsa_mailbox_local_class_init),
+	(lbml_load_messages_idle_cb), (libbalsa_mailbox_local_check),
+	(libbalsa_mailbox_local_set_threading):
+	* libbalsa/mailbox_local.h:
+	* libbalsa/mailbox_maildir.c (libbalsa_mailbox_maildir_check):
+	* libbalsa/mailbox_mbox.c (libbalsa_mailbox_mbox_check):
+	* libbalsa/mailbox_mh.c (libbalsa_mailbox_mh_check):
+
 2020-03-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox: Make cache-message a class method

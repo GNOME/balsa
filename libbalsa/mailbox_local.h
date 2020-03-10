@@ -71,8 +71,6 @@ gint libbalsa_mailbox_local_set_path(LibBalsaMailboxLocal * mailbox,
 #define libbalsa_mailbox_local_get_path(local) \
 	(libbalsa_mailbox_get_url((LibBalsaMailbox*)local)+7)
 
-void libbalsa_mailbox_local_load_messages(LibBalsaMailbox * mailbox,
-					  guint last_msgno);
 void libbalsa_mailbox_local_msgno_removed(LibBalsaMailbox * mailbox,
 					  guint msgno);
 void libbalsa_mailbox_local_remove_files(LibBalsaMailboxLocal *mailbox);

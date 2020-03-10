@@ -1072,7 +1072,9 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 #endif
     libbalsa_mime_stream_shared_unlock(mbox_stream);
     mbox_unlock(mailbox, mbox_stream);
-    libbalsa_mailbox_local_load_messages(mailbox, msgno);
+
+    if (LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mbox_parent_class)->check != NULL)
+        LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mbox_parent_class)->check(mailbox);
 }
 
 static void

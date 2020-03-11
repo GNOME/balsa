@@ -381,7 +381,7 @@ endif # igemacint
 if libsecret
   secret_dep = dependency('libsecret-1', required : false)
   if not secret_dep.found()
-    error('You asked to link to libsecret, but the development tool is not installed')
+    error('You asked to link to libsecret, but the development files are not installed')
   endif
   conf.set('HAVE_LIBSECRET', 1,
     description : 'Defined when libsecret can be used.')

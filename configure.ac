@@ -124,8 +124,8 @@ AC_ARG_WITH([sqlite],
 
 AC_ARG_WITH(libsecret,
    AC_HELP_STRING([--with-libsecret],
-                  [Link to libsecret instead of gnome-keyring (default=no)]),
-                  [with_libsecret=$withval],[with_libsecret=no])
+                  [Use libsecret to store credentials (default=yes)]),
+                  [with_libsecret=$withval],[with_libsecret=yes])
 
 AC_ARG_WITH(gcr,
    AC_HELP_STRING([--with-gcr],
@@ -496,14 +496,15 @@ fi
 AC_MSG_CHECKING([whether to configure for libsecret])
 if test x$with_libsecret != xno; then
     AC_MSG_RESULT([yes])
-    PKG_CHECK_MODULES(LIBSECRET, [ libsecret-1 ], [],
-                      AC_MSG_ERROR([[You asked to link to libsecret, but
-                                    the development tool is not installed]]))
+    PKG_CHECK_MODULES(LIBSECRET, [ libsecret-1 ])
     AC_DEFINE(HAVE_LIBSECRET,1,[Defined when libsecret can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $LIBSECRET_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $LIBSECRET_LIBS"
 else
     AC_MSG_RESULT([no])
+    AC_MSG_WARN([libsecret support is disabled. Balsa will store the
+		the obfuscated passwords in ~/.balsa/config-private,
+		which is usually not what you want.])
 fi
 
 dnl #####################################################################

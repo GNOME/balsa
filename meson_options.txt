@@ -77,8 +77,8 @@ option('sqlite',
 
 option('libsecret',
   type        : 'boolean',
-  value       : false,
-  description : 'Link to libsecret (default=false)')
+  value       : true,
+  description : 'Link to libsecret (default=true)')
 
 option('gcr',
   type        : 'boolean',

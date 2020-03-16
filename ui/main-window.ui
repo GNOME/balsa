@@ -451,7 +451,7 @@
           <attribute name="label"
             translatable="yes">Decrypt and check signatures</attribute>
           <attribute name="action">win.recheck-crypt</attribute>
-          <attribute name="accel">&lt;Primary&gt;d</attribute>
+          <attribute name="accel">&lt;Primary&gt;y</attribute>
         </item>
       </section>
       <section>

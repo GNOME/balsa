@@ -674,9 +674,10 @@ libbalsa_mailbox_mh_check(LibBalsaMailbox * mailbox)
 	    libbalsa_message_set_msgno(msg_info->local_info.message, msgno);
     }
 
-    msgno = mh->msgno_2_msg_info->len;
     lbm_mh_parse_both(mh);
-    libbalsa_mailbox_local_load_messages(mailbox, msgno);
+
+    if (LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mh_parent_class)->check != NULL)
+        LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_mh_parent_class)->check(mailbox);
 }
 
 static void

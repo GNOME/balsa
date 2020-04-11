@@ -1,18 +1,6 @@
-2020-04-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
-
-	Resolve some scan-build warnings
-
-	* libbalsa/address-book-gpe.c:
-	* libbalsa/address-book-ldap.c (libbalsa_address_book_ldap_load),
-	(libbalsa_address_book_ldap_remove_address),
-	(libbalsa_address_book_ldap_modify_address),
-	(libbalsa_address_book_ldap_alias_complete):
-	* libbalsa/imap/imap-handle.c (ir_envelope):
-	* src/ab-main.c (file_delete_activated):
-
 2020-04-11  Pawel Salek  <pawsa0@gmail.com>
 
-	* NEWS, configure.ac, meson.build: release balsa-2.5.10
+	* NEWS, configure.ac, meson.build: release balsa-2.6.0
 
 2020-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 

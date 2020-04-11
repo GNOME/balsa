@@ -1,3 +1,7 @@
+* Balsa-2.6.0 release. Release date 2020-04-11
+
+This release switches to gmime3 library for MIME processing.
+
 * Balsa-2.5.9 release. Release date 2019-10-19
 
 - fix HTML message layout issues.

@@ -1,3 +1,7 @@
+2020-04-11  Pawel Salek  <pawsa0@gmail.com>
+
+	* NEWS, configure.ac, meson.build: release balsa-2.6.0
+
 2020-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Drop LibBalsaMailbox:is_directory

@@ -462,7 +462,7 @@ file_delete_activated(GSimpleAction * action,
     if (!list)
         return;
 
-    contacts_app.address_book = list->data;
+    contacts_app.address_book = address_book;
     set_address_book_menu_items();
 }
 

@@ -3081,7 +3081,15 @@ ir_envelope(NetClientSioBuf *sio, ImapEnvelope *env)
 
   date = imap_get_nstring(sio);
   if(date) {
-    if(env) env->date = g_mime_utils_header_decode_date(date, NULL);
+    if (env != NULL) {
+      GDateTime *header_date;
+
+      header_date = g_mime_utils_header_decode_date(date);
+      if (header_date != NULL) {
+        env->date = (time_t) g_date_time_to_unix(header_date);
+        g_date_time_unref(header_date);
+      }
+    }
     g_free(date);
   }
   if(sio_getc(sio) != ' ') return IMR_PROTOCOL;

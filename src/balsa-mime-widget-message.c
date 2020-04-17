@@ -360,7 +360,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     }
 
     data = libbalsa_message_body_get_parameter(mime_body, "server");
-    headers->to_list = internet_address_list_parse_string(data);
+    headers->to_list = internet_address_list_parse(libbalsa_parser_options(), data);
     g_free(data);
 
     /* the original body my have some data to be returned as commands... */
@@ -685,7 +685,7 @@ add_header_address_list(BalsaMessage * bm, GtkGrid * grid,
 	  libbalsa_find_word(header, balsa_app.selected_headers)))
 	return;
 
-    value = internet_address_list_to_string(list, FALSE);
+    value = internet_address_list_to_string(list, NULL, FALSE);
 
     add_header_gchar(grid, header, label, value, show_all_headers);
 
@@ -749,14 +749,14 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 
     if (headers->from) {
 	gchar *from =
-	    internet_address_list_to_string(headers->from, FALSE);
+	    internet_address_list_to_string(headers->from, NULL, FALSE);
 	add_header_gchar(grid, "from", _("From:"), from, show_all_headers);
 	g_free(from);
     }
 
     if (headers->reply_to) {
 	gchar *reply_to =
-	    internet_address_list_to_string(headers->reply_to, FALSE);
+	    internet_address_list_to_string(headers->reply_to, NULL, FALSE);
 	add_header_gchar(grid, "reply-to", _("Reply-To:"), reply_to,
                          show_all_headers);
 	g_free(reply_to);
@@ -776,7 +776,7 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 
     if (headers->dispnotify_to) {
 	gchar *mdn_to =
-	    internet_address_list_to_string(headers->dispnotify_to, FALSE);
+	    internet_address_list_to_string(headers->dispnotify_to, NULL, FALSE);
 	add_header_gchar(grid, "disposition-notification-to",
 			 _("Disposition-Notification-To:"), mdn_to,
                          show_all_headers);

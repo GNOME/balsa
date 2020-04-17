@@ -270,7 +270,7 @@ lbs_set_content(GMimePart *mime_part,
                                             GMIME_CONTENT_ENCODING_DEFAULT);
     g_object_unref(stream);
 
-    g_mime_part_set_content_object(mime_part, wrapper);
+    g_mime_part_set_content(mime_part, wrapper);
     g_object_unref(wrapper);
 }
 
@@ -341,7 +341,7 @@ add_mime_body_plain(LibBalsaMessageBody     *body,
                                                 GMIME_CONTENT_ENCODING_DEFAULT);
         g_object_unref(stream);
 
-        g_mime_part_set_content_object(mime_part, wrapper);
+        g_mime_part_set_content(mime_part, wrapper);
         g_object_unref(wrapper);
     } else {
         lbs_set_content(mime_part, body->buffer);
@@ -440,12 +440,12 @@ lbs_message_queue_real(LibBalsaMessage    *message,
     mime_msg = libbalsa_message_get_mime_message(message);
     if (fccbox != NULL) {
         g_mime_object_set_header(GMIME_OBJECT(mime_msg), "X-Balsa-Fcc",
-                                 libbalsa_mailbox_get_url(fccbox));
+                                 libbalsa_mailbox_get_url(fccbox), NULL);
     }
     g_mime_object_set_header(GMIME_OBJECT(mime_msg), "X-Balsa-DSN",
-                             libbalsa_message_get_request_dsn(message) ? "1" : "0");
+                             libbalsa_message_get_request_dsn(message) ? "1" : "0", NULL);
     g_mime_object_set_header(GMIME_OBJECT(mime_msg), "X-Balsa-SmtpServer",
-                             libbalsa_smtp_server_get_name(smtp_server));
+                             libbalsa_smtp_server_get_name(smtp_server), NULL);
 
     big_message = libbalsa_smtp_server_get_big_message(smtp_server);
     if (big_message > 0) {
@@ -1166,14 +1166,14 @@ message_add_references(LibBalsaMessage *message,
             }
             g_string_append_printf(str, "<%s>", (gchar *) list->data);
         } while ((list = list->next) != NULL);
-        g_mime_object_set_header(GMIME_OBJECT(msg), "References", str->str);
+        g_mime_object_set_header(GMIME_OBJECT(msg), "References", str->str, NULL);
         g_string_free(str, TRUE);
     }
 
     list = libbalsa_message_get_in_reply_to(message);
     if (list != NULL) {
         /* There's no specific header function for In-Reply-To */
-        g_mime_object_set_header(GMIME_OBJECT(msg), "In-Reply-To", list->data);
+        g_mime_object_set_header(GMIME_OBJECT(msg), "In-Reply-To", list->data, NULL);
     }
 }
 
@@ -1220,24 +1220,6 @@ parse_content_type(const char *content_type)
 }
 
 
-/* get_tz_offset() returns tz offset in RFC 5322 format ([-]hhmm) */
-static gint
-get_tz_offset(time_t t)
-{
-    GTimeZone *local_tz;
-    gint interval;
-    gint32 offset;
-    gint hours;
-
-    local_tz = g_time_zone_new_local();
-    interval = g_time_zone_find_interval(local_tz, G_TIME_TYPE_UNIVERSAL, t);
-    offset = g_time_zone_get_offset(local_tz, interval);
-    g_time_zone_unref(local_tz);
-    hours = offset / 3600;
-    return (hours * 100) + ((offset - (hours * 3600)) / 60);
-}
-
-
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage *message,
                                      gboolean         flow,
@@ -1248,7 +1230,6 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     GMimeMessage *mime_message;
     LibBalsaMessageBody *body;
     LibBalsaMessageHeaders *headers;
-    InternetAddressList *ia_list;
     gchar *tmp;
     GList *list;
     gboolean attach_pubkey = FALSE;
@@ -1256,6 +1237,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
 #ifdef ENABLE_AUTOCRYPT
     LibBalsaIdentity *identity;
 #endif /* ENABLE_AUTOCRYPT */
+    GDateTime *datetime;
 
     /* attach the public key only if we send the message, not if we just postpone it */
     if (!postponing &&
@@ -1287,7 +1269,8 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
             if (body->attach_mode == LIBBALSA_ATTACH_AS_EXTBODY) {
                 GMimeContentType *content_type =
                     g_mime_content_type_new("message", "external-body");
-                mime_part = g_mime_object_new_type("message", "external-body");
+                mime_part = g_mime_object_new_type(libbalsa_parser_options(),
+                                                   "message", "external-body");
                 g_mime_object_set_content_type(mime_part, content_type);
                 g_mime_part_set_content_encoding(GMIME_PART(mime_part),
                                                  GMIME_CONTENT_ENCODING_7BIT);
@@ -1330,8 +1313,9 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
                     return LIBBALSA_MESSAGE_CREATE_ERROR;
                 }
                 parser = g_mime_parser_new_with_stream(stream);
+                g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
                 g_object_unref(stream);
-                mime_msg = g_mime_parser_construct_message(parser);
+                mime_msg = g_mime_parser_construct_message(parser, libbalsa_parser_options());
                 g_object_unref(parser);
                 mime_part =
                     GMIME_OBJECT(g_mime_message_part_new_with_message
@@ -1400,7 +1384,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
                 content = g_mime_data_wrapper_new_with_stream(stream,
                                                               GMIME_CONTENT_ENCODING_DEFAULT);
                 g_object_unref(stream);
-                g_mime_part_set_content_object(GMIME_PART(mime_part),
+                g_mime_part_set_content(GMIME_PART(mime_part),
                                                content);
                 g_object_unref(content);
             }
@@ -1483,54 +1467,56 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     message_add_references(message, mime_message);
 
     headers = libbalsa_message_get_headers(message);
+
     if (headers->from != NULL) {
-        tmp = internet_address_list_to_string(headers->from, TRUE);
-        if (tmp != NULL) {
-            g_mime_message_set_sender(mime_message, tmp);
-            g_free(tmp);
-        }
+        InternetAddressList *from;
+
+        from = g_mime_message_get_from(mime_message);
+        internet_address_list_append(from, headers->from);
     }
+
     if (headers->reply_to != NULL) {
-        tmp = internet_address_list_to_string(headers->reply_to, TRUE);
-        if (tmp != NULL) {
-            g_mime_message_set_reply_to(mime_message, tmp);
-            g_free(tmp);
-        }
+        InternetAddressList *reply_to;
+
+        reply_to = g_mime_message_get_reply_to(mime_message);
+        internet_address_list_append(reply_to, headers->reply_to);
     }
 
     if (LIBBALSA_MESSAGE_GET_SUBJECT(message)) {
         g_mime_message_set_subject(mime_message,
-                                   LIBBALSA_MESSAGE_GET_SUBJECT(message));
+                                   LIBBALSA_MESSAGE_GET_SUBJECT(message), NULL);
     }
 
-    g_mime_message_set_date(mime_message, headers->date, get_tz_offset(headers->date));
+    datetime = g_date_time_new_from_unix_local(headers->date);
+    g_mime_message_set_date(mime_message, datetime);
+    g_date_time_unref(datetime);
 
-    if ((ia_list = headers->to_list) != NULL) {
-        InternetAddressList *recipients =
-            g_mime_message_get_recipients(mime_message,
-                                          GMIME_RECIPIENT_TYPE_TO);
-        internet_address_list_append(recipients, ia_list);
+    if (headers->to_list != NULL) {
+        InternetAddressList *addresses =
+            g_mime_message_get_addresses(mime_message,
+                                          GMIME_ADDRESS_TYPE_TO);
+        internet_address_list_append(addresses, headers->to_list);
     }
 
-    if ((ia_list = headers->cc_list) != NULL) {
-        InternetAddressList *recipients =
-            g_mime_message_get_recipients(mime_message,
-                                          GMIME_RECIPIENT_TYPE_CC);
-        internet_address_list_append(recipients, ia_list);
+    if (headers->cc_list != NULL) {
+        InternetAddressList *addresses =
+            g_mime_message_get_addresses(mime_message,
+                                          GMIME_ADDRESS_TYPE_CC);
+        internet_address_list_append(addresses, headers->cc_list);
     }
 
-    if ((ia_list = headers->bcc_list) != NULL) {
-        InternetAddressList *recipients =
-            g_mime_message_get_recipients(mime_message,
-                                          GMIME_RECIPIENT_TYPE_BCC);
-        internet_address_list_append(recipients, ia_list);
+    if (headers->bcc_list != NULL) {
+        InternetAddressList *addresses =
+            g_mime_message_get_addresses(mime_message,
+                                          GMIME_ADDRESS_TYPE_BCC);
+        internet_address_list_append(addresses, headers->bcc_list);
     }
 
     if (headers->dispnotify_to != NULL) {
-        tmp = internet_address_list_to_string(headers->dispnotify_to, TRUE);
+        tmp = internet_address_list_to_string(headers->dispnotify_to, NULL, TRUE);
         if (tmp != NULL) {
             g_mime_object_append_header(GMIME_OBJECT(mime_message),
-                                        "Disposition-Notification-To", tmp);
+                                        "Disposition-Notification-To", tmp, NULL);
             g_free(tmp);
         }
     }
@@ -1538,14 +1524,14 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     for (list = headers->user_hdrs; list; list = list->next) {
         gchar **pair = list->data;
         g_strchug(pair[1]);
-        g_mime_object_append_header(GMIME_OBJECT(mime_message), pair[0], pair[1]);
+        g_mime_object_append_header(GMIME_OBJECT(mime_message), pair[0], pair[1], NULL);
 #if DEBUG_USER_HEADERS
         printf("adding header '%s:%s'\n", pair[0], pair[1]);
 #endif
     }
 
     tmp = g_strdup_printf("Balsa %s", VERSION);
-    g_mime_object_append_header(GMIME_OBJECT(mime_message), "X-Mailer", tmp);
+    g_mime_object_append_header(GMIME_OBJECT(mime_message), "X-Mailer", tmp, NULL);
     g_free(tmp);
 
 #ifdef ENABLE_AUTOCRYPT
@@ -1558,7 +1544,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     		g_object_unref(mime_message);
     		return LIBBALSA_MESSAGE_CREATE_ERROR;
     	}
-    	g_mime_object_append_header(GMIME_OBJECT(mime_message), "Autocrypt", tmp);
+    	g_mime_object_append_header(GMIME_OBJECT(mime_message), "Autocrypt", tmp, NULL);
     	g_free(tmp);
     }
 #endif
@@ -1595,8 +1581,8 @@ libbalsa_message_postpone(LibBalsaMessage *message,
         gint i;
 
         for (i = 0; extra_headers[i] && extra_headers[i + 1]; i += 2) {
-            g_mime_object_set_header(GMIME_OBJECT(libbalsa_message_get_mime_message(message)), extra_headers[i],
-                                     extra_headers[i + 1]);
+            g_mime_object_set_header(GMIME_OBJECT(libbalsa_message_get_mime_message(message)),
+                                     extra_headers[i], extra_headers[i + 1], NULL);
         }
     }
 
@@ -1724,7 +1710,7 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage  *message,
 
         msg_stream = g_mime_stream_mem_new();
         libbalsa_mailbox_lock_store(mailbox);
-        g_mime_object_write_to_stream(GMIME_OBJECT(libbalsa_message_get_mime_message(message)), msg_stream);
+        g_mime_object_write_to_stream(GMIME_OBJECT(libbalsa_message_get_mime_message(message)), NULL, msg_stream);
         libbalsa_mailbox_unlock_store(mailbox);
         g_mime_stream_reset(msg_stream);
     } else {
@@ -1742,8 +1728,13 @@ libbalsa_fill_msg_queue_item_from_queu(LibBalsaMessage  *message,
         g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
         g_object_unref(filter);
 
-        /* add CRLF, encode dot */
-        filter = g_mime_filter_crlf_new(TRUE, TRUE);
+        /* add CRLF */
+        filter = g_mime_filter_unix2dos_new(FALSE);
+        g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
+        g_object_unref(filter);
+
+        /* encode dot */
+        filter = g_mime_filter_smtp_data_new();
         g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream), filter);
         g_object_unref(filter);
 
@@ -1827,7 +1818,7 @@ lb_create_pubkey_part(LibBalsaMessage  *message,
 	    wrapper = g_mime_data_wrapper_new();
 	    g_mime_data_wrapper_set_stream(wrapper, stream);
 	    g_object_unref(stream);
-	    g_mime_part_set_content_object(mime_part, wrapper);
+	    g_mime_part_set_content(mime_part, wrapper);
 	    g_object_unref(wrapper);
 	}
 

@@ -319,7 +319,7 @@ test_basic_crypt(void)
 	g_clear_error(&error);
 	sput_fail_unless(net_client_set_cert_from_file(basic, "cert_u.pem", NULL) == TRUE, "load cert file w/ plain key ok");
 	sput_fail_unless(net_client_connect(basic, NULL) == TRUE, "connect ok");
-	sput_fail_unless(net_client_start_tls(basic, NULL) == TRUE, "start tls: ok");
+	sput_fail_unless(net_client_start_tls(basic, &error) == TRUE, "start tls: ok");
 	sput_fail_unless(net_client_is_encrypted(basic) == TRUE, "encrypted");
 	g_object_unref(basic);
 
@@ -447,15 +447,15 @@ test_smtp(void)
 	sput_fail_unless(net_client_smtp_can_dsn(NULL) == FALSE, "NULL client: no dsn");
 	sput_fail_unless(net_client_smtp_can_dsn(smtp) == TRUE, "inetsim: can dsn");
 
-	sput_fail_unless(net_client_smtp_send_msg(NULL, msg, NULL) == FALSE, "send msg, NULL client");
-	sput_fail_unless(net_client_smtp_send_msg(smtp, NULL, NULL) == FALSE, "send msg, NULL message");
-	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == FALSE, "send msg: error, no sender");
+	sput_fail_unless(net_client_smtp_send_msg(NULL, msg, NULL, NULL) == FALSE, "send msg, NULL client");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, NULL, NULL, NULL) == FALSE, "send msg, NULL message");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL, NULL) == FALSE, "send msg: error, no sender");
 	sput_fail_unless(net_client_smtp_msg_set_sender(msg, "some@sender.com") == TRUE, "set sender ok");
 	sput_fail_unless(net_client_smtp_msg_set_sender(msg, "me@here.com") == TRUE, "replace sender ok");
-	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == FALSE, "send msg: error, no recipient");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL, NULL) == FALSE, "send msg: error, no recipient");
 	sput_fail_unless(net_client_smtp_msg_add_recipient(msg, "you@there.com", NET_CLIENT_SMTP_DSN_NEVER)  == TRUE,
 		"add recipient ok (no dsn)");
-	op_res = net_client_smtp_send_msg(smtp, msg, &error);
+	op_res = net_client_smtp_send_msg(smtp, msg, NULL, &error);
 	sput_fail_unless((op_res == FALSE) && (error->code == NET_CLIENT_ERROR_SMTP_PERMANENT), "send failed: not authenticated");
 	g_clear_error(&error);
 	g_object_unref(smtp);
@@ -488,7 +488,7 @@ test_smtp(void)
 	g_signal_connect(smtp, "auth", G_CALLBACK(get_auth), smtp);
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");
 	msg_buf.sim_error = TRUE;
-	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == FALSE, "send msg: error in callback");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL, NULL) == FALSE, "send msg: error in callback");
 	msg_buf.sim_error = FALSE;
 	g_object_unref(smtp);
 
@@ -498,7 +498,7 @@ test_smtp(void)
 	sput_fail_unless(net_client_smtp_allow_auth(smtp, FALSE, NET_CLIENT_SMTP_AUTH_PLAIN) == TRUE, "force auth meth PLAIN");
 	g_signal_connect(smtp, "auth", G_CALLBACK(get_auth), smtp);
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");
-	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == TRUE, "send msg: success");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL, NULL) == TRUE, "send msg: success");
 	g_object_unref(smtp);
 
 	// STARTTLS required, LOGIN auth
@@ -510,7 +510,7 @@ test_smtp(void)
 	g_signal_connect(smtp, "cert-check", G_CALLBACK(check_cert), NULL);
 	g_signal_connect(smtp, "auth", G_CALLBACK(get_auth), smtp);
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");
-	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == TRUE, "send msg: success");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL, NULL) == TRUE, "send msg: success");
 	g_object_unref(smtp);
 
 	// STARTTLS optional, CRAM-MD5 auth
@@ -523,7 +523,7 @@ test_smtp(void)
 	g_signal_connect(smtp, "auth", G_CALLBACK(get_auth), smtp);
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");
 	sput_fail_unless(net_client_smtp_msg_set_dsn_opts(msg, "20170113212711.19833@here.com", FALSE) == TRUE, "dsn: envid, headers");
-	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == TRUE, "send msg: success");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL, NULL) == TRUE, "send msg: success");
 	g_object_unref(smtp);
 
 	// STARTTLS, CRAM-SHA1 auth
@@ -535,7 +535,7 @@ test_smtp(void)
 	g_signal_connect(smtp, "auth", G_CALLBACK(get_auth), smtp);
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");
 	sput_fail_unless(net_client_smtp_msg_set_dsn_opts(msg, NULL, TRUE) == TRUE, "dsn: no envid, message");
-	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == TRUE, "send msg: success");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL, NULL) == TRUE, "send msg: success");
 	g_object_unref(smtp);
 
 	// STARTTLS, auto select auth
@@ -547,7 +547,7 @@ test_smtp(void)
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");
 	sput_fail_unless(net_client_smtp_msg_set_dsn_opts(msg, "20170113212711.19833@here.com", TRUE) == TRUE,
 		"dsn: envid, message");
-	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == TRUE, "send msg: success");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL, NULL) == TRUE, "send msg: success");
 	g_object_unref(smtp);
 
 	// SSL, auto select auth
@@ -559,7 +559,7 @@ test_smtp(void)
 	sput_fail_unless(net_client_smtp_connect(smtp, NULL, NULL) == TRUE, "connect: success");
 	sput_fail_unless(net_client_smtp_msg_set_dsn_opts(msg, "20170113212711.19833@here.com", TRUE) == TRUE,
 		"dsn: envid, message");
-	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL) == TRUE, "send msg: success");
+	sput_fail_unless(net_client_smtp_send_msg(smtp, msg, NULL, NULL) == TRUE, "send msg: success");
 	g_object_unref(smtp);
 
 	net_client_smtp_msg_free(NULL);
@@ -776,7 +776,7 @@ test_pop3(void)
 	g_message("message count: %u", g_list_length(msg_list));
 	if (msg_list != NULL) {
 		sput_fail_unless(net_client_pop_retr(pop, msg_list, msg_cb, NULL, NULL) == TRUE, "retr ok");
-		sput_fail_unless(net_client_pop_dele(pop, NULL,NULL) == FALSE, "dele w/o message list");
+		sput_fail_unless(net_client_pop_dele(pop, NULL, NULL) == FALSE, "dele w/o message list");
 		sput_fail_unless(net_client_pop_dele(pop, msg_list, NULL) == TRUE, "dele ok");
 		g_list_free_full(msg_list, (GDestroyNotify) net_client_pop_msg_info_free);
 	}

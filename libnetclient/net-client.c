@@ -43,6 +43,7 @@ struct _NetClientPrivate {
 	gsize max_line_len;
 
 	GSocketClient *sock;
+	GSocketConnectable *remote_address;
 	GSocketConnection *plain_conn;
 	GIOStream *tls_conn;
 	GDataInputStream *istream;
@@ -143,13 +144,19 @@ net_client_connect(NetClient *client, GError **error)
 	if (priv->plain_conn != NULL) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_CONNECTED, _("network client is already connected"));
 	} else {
-		priv->plain_conn = g_socket_client_connect_to_host(priv->sock, priv->host_and_port, priv->default_port, NULL, error);
-		if (priv->plain_conn != NULL) {
-			g_debug("connected to %s", priv->host_and_port);
-			priv->istream = g_data_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(priv->plain_conn)));
-			g_data_input_stream_set_newline_type(priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
-			priv->ostream = g_io_stream_get_output_stream(G_IO_STREAM(priv->plain_conn));
-			result = TRUE;
+		priv->remote_address = g_network_address_parse(priv->host_and_port, priv->default_port, error);
+		if (priv->remote_address != NULL) {
+			priv->plain_conn = g_socket_client_connect(priv->sock, priv->remote_address, NULL, error);
+			if (priv->plain_conn != NULL) {
+				g_debug("connected to %s", priv->host_and_port);
+				priv->istream = g_data_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(priv->plain_conn)));
+				g_data_input_stream_set_newline_type(priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
+				priv->ostream = g_io_stream_get_output_stream(G_IO_STREAM(priv->plain_conn));
+				result = TRUE;
+			} else {
+				g_object_unref(priv->remote_address);
+				priv->remote_address = NULL;
+			}
 		}
 	}
 
@@ -198,6 +205,10 @@ net_client_shutdown(NetClient *client)
 		if (priv->plain_conn != NULL) {
 			g_object_unref(priv->plain_conn);
 			priv->plain_conn = NULL;
+		}
+		if (priv->remote_address != NULL) {
+			g_object_unref(priv->remote_address);
+			priv->remote_address = NULL;
 		}
 	}
 }
@@ -525,7 +536,7 @@ net_client_start_tls(NetClient *client, GError **error)
 	} else if (priv->tls_conn != NULL) {
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_TLS_ACTIVE, _("connection is already encrypted"));
 	} else {
-		priv->tls_conn = g_tls_client_connection_new(G_IO_STREAM(priv->plain_conn), NULL, error);
+		priv->tls_conn = g_tls_client_connection_new(G_IO_STREAM(priv->plain_conn), priv->remote_address, error);
 		if (priv->tls_conn != NULL) {
 			if (priv->certificate != NULL) {
 				g_tls_connection_set_certificate(G_TLS_CONNECTION(priv->tls_conn), priv->certificate);

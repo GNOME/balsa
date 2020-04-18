@@ -15,3 +15,18 @@
    fun:g_type_register_static
 }
 
+{
+   dl_init
+   Memcheck:Leak
+   match-leak-kinds:all
+   ...
+   fun:_dl_init
+}
+
+{
+   g_type_class_ref
+   Memcheck:Leak
+   match-leak-kinds:all
+   ...
+   fun:g_type_class_ref
+}

@@ -25,6 +25,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
+#include "application-helpers.h"
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "send.h"
@@ -425,8 +426,6 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm,
 }
 
 
-/* Callback for the "realized" signal; set header frame and text base
- * color when first realized. */
 #define BALSA_MESSAGE_GRID "balsa-message-grid"
 #define bm_header_widget_get_grid(header_widget) \
     g_object_get_data(G_OBJECT(header_widget), BALSA_MESSAGE_GRID)
@@ -439,8 +438,24 @@ bm_header_ctx_menu_reply(GtkWidget * menu_item,
 }
 
 static void
+copy_change_state(GSimpleAction *action,
+                  GVariant      *parameter,
+                  gpointer       user_data)
+{
+    const gchar *url = g_variant_get_string(parameter, NULL);
+    LibBalsaMessageBody *part = user_data;
+
+    balsa_message_copy_part(url, part);
+}
+
+static void
 bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
 {
+    GSimpleActionGroup *simple;
+    static const GActionEntry header_popup_entries[] = {
+        {"copy", libbalsa_radio_activated, "s", "''", copy_change_state},
+    };
+    GMenu *mru_menu;
     GtkWidget *menu_item, *submenu;
     GtkWidget *separator = gtk_separator_menu_item_new();
 
@@ -453,16 +468,26 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
     gtk_widget_show(menu_item);
 
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    header_popup_entries,
+                                    G_N_ELEMENTS(header_popup_entries),
+                                    arg);
+    gtk_widget_insert_action_group(widget,
+                                   "header-popup",
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+
+    mru_menu =
+        balsa_mblist_mru_menu(GTK_WINDOW(gtk_widget_get_toplevel(widget)),
+                              &balsa_app.folder_mru, "header-popup.copy");
+    submenu = gtk_menu_new_from_model(G_MENU_MODEL(mru_menu));
+    g_object_unref(mru_menu);
 
     menu_item = gtk_menu_item_new_with_mnemonic(_("_Copy to folder…"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
     gtk_widget_show(menu_item);
 
-    submenu =
-        balsa_mblist_mru_menu(GTK_WINDOW
-                              (gtk_widget_get_toplevel(widget)),
-                              &balsa_app.folder_mru,
-                              G_CALLBACK(balsa_message_copy_part), arg);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item),
                               submenu);
     gtk_widget_show_all(submenu);

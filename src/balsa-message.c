@@ -28,6 +28,7 @@
 #include <ctype.h>
 #include <sys/utsname.h>
 
+#include "application-helpers.h"
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "mime.h"
@@ -122,7 +123,7 @@ static void tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
 static void part_info_init(BalsaMessage * balsa_message, BalsaPartInfo * info);
 static void part_context_save_all_cb(GtkWidget * menu_item, GList * info_list);
 static void part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list);
-static void part_create_menu (BalsaPartInfo* info);
+static void part_create_menu (BalsaMessage *balsa_message, BalsaPartInfo* info);
 
 /* stuff needed for sending Message Disposition Notifications */
 static void handle_mdn_request(GtkWindow *parent, LibBalsaMessage *message,
@@ -932,16 +933,8 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
     selected = g_list_length(balsa_message->save_all_list);
     if (selected == 1) {
         BalsaPartInfo *info = BALSA_PART_INFO(balsa_message->save_all_list->data);
-        if (info->popup_menu) {
-            if (event != NULL) {
-                gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu), event);
-            } else {
-                gtk_menu_popup_at_widget(GTK_MENU(info->popup_menu),
-                                         GTK_WIDGET(balsa_message),
-                                         GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
-                                         NULL);
-            }
-        }
+        if (info->popup_menu != NULL)
+            gtk_popover_popup(GTK_POPOVER(info->popup_menu));
         g_list_free(balsa_message->save_all_list);
         balsa_message->save_all_list = NULL;
     } else if (selected > 1) {
@@ -1034,11 +1027,9 @@ tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
                                      FALSE);
             if (gtk_tree_model_get_iter (model, &iter, path)) {
                 gtk_tree_model_get(model, &iter, PART_INFO_COLUMN, &info, -1);
-                if (info) {
-                    if (info->popup_menu) {
-                        gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu),
-                                                  (GdkEvent *) event);
-                    }
+                if (info != NULL) {
+                    if (info->popup_menu != NULL)
+                        gtk_popover_popup(GTK_POPOVER(info->popup_menu));
                     g_object_unref(info);
                 }
             }
@@ -1305,10 +1296,6 @@ display_headers(BalsaMessage * balsa_message)
 static void
 part_info_init(BalsaMessage * balsa_message, BalsaPartInfo * info)
 {
-    g_return_if_fail(balsa_message != NULL);
-    g_return_if_fail(info != NULL);
-    g_return_if_fail(info->body != NULL);
-
     info->mime_widget =
         g_object_ref_sink(balsa_mime_widget_new(balsa_message, info->body, info->popup_menu));
 }
@@ -1465,7 +1452,7 @@ display_part(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
 	    g_free(menu_label);
 	}
 
-        part_create_menu (info);
+        part_create_menu(balsa_message, info);
         info->path = gtk_tree_model_get_path(model, iter);
 
         /* add to the tree view */
@@ -1626,7 +1613,43 @@ balsa_message_copy_part(const gchar *url, LibBalsaMessageBody *part)
 }
 
 static void
-part_create_menu (BalsaPartInfo* info)
+save_cb(GSimpleAction *action,
+        GVariant      *parameter,
+        gpointer       user_data)
+{
+    BalsaPartInfo *info = user_data;
+
+    balsa_mime_widget_ctx_menu_save(GTK_WIDGET(info->mime_widget), info->body);
+}
+
+static void
+open_with_change_state(GSimpleAction *action,
+                       GVariant      *parameter,
+                       gpointer       user_data)
+{
+    const gchar *app = g_variant_get_string(parameter, NULL);
+    BalsaPartInfo *info = user_data;
+
+    balsa_mime_widget_ctx_menu_cb(app, info->body);
+
+    g_simple_action_set_state(action, parameter);
+}
+
+static void
+copy_part_change_state(GSimpleAction *action,
+                       GVariant      *parameter,
+                       gpointer       user_data)
+{
+    const gchar *url = g_variant_get_string(parameter, NULL);
+    BalsaPartInfo *info = user_data;
+
+    balsa_message_copy_part(url, info->body);
+
+    g_simple_action_set_state(action, parameter);
+}
+
+static void
+part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
 /* Remarks: Will add items in the following order:
             1) Default application according to GnomeVFS.
             2) GNOME MIME/GnomeVFS key values that don't match default
@@ -1634,40 +1657,48 @@ part_create_menu (BalsaPartInfo* info)
             3) GnomeVFS shortlist applications, with the default one (sometimes
                included on shortlist, sometimes not) excluded. */
 {
-    GtkWidget* menu_item;
-    gchar* content_type;
+    GSimpleActionGroup *simple;
+    static const GActionEntry part_menu_entries[] = {
+        {"save", save_cb},
+        {"open-with", libbalsa_radio_activated, "s", "''", open_with_change_state},
+        {"copy-part", libbalsa_radio_activated, "s", "''", copy_part_change_state}
+    };
+    GMenu *menu;
+    gchar *content_type;
 
-    info->popup_menu = gtk_menu_new ();
-    g_object_ref_sink(info->popup_menu);
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    part_menu_entries,
+                                    G_N_ELEMENTS(part_menu_entries),
+                                    info);
+    gtk_widget_insert_action_group(GTK_WIDGET(balsa_message),
+                                   "part-menu",
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+
+    menu = g_menu_new();
 
     content_type = libbalsa_message_body_get_mime_type (info->body);
-    libbalsa_vfs_fill_menu_by_content_type(GTK_MENU(info->popup_menu),
+    libbalsa_vfs_fill_menu_by_content_type(menu,
 					   content_type,
-					   G_CALLBACK (balsa_mime_widget_ctx_menu_cb),
-					   (gpointer)info->body);
+                                           "part-menu.open-with");
 
-    menu_item = gtk_menu_item_new_with_mnemonic (_("_Save…"));
-    g_signal_connect (menu_item, "activate",
-                      G_CALLBACK (balsa_mime_widget_ctx_menu_save), (gpointer) info->body);
-    gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);
+    g_menu_append(menu, _("Save…"), "part-menu.save");
 
     if (strcmp(content_type, "message/rfc822") == 0) {
-        GtkWidget *submenu;
-
-        menu_item =
-            gtk_menu_item_new_with_mnemonic(_("_Copy to folder…"));
-        gtk_menu_shell_append(GTK_MENU_SHELL(info->popup_menu), menu_item);
+        GMenu *submenu;
 
         submenu =
-            balsa_mblist_mru_menu(GTK_WINDOW(gtk_widget_get_toplevel(info->popup_menu)),
-                                  &balsa_app.folder_mru,
-                                  G_CALLBACK(balsa_message_copy_part),
-                                  info->body);
-        gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), submenu);
+            balsa_mblist_mru_menu(GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(balsa_message))),
+                                  &balsa_app.folder_mru, "part-menu.copy-part");
+
+        g_menu_append_submenu(menu, _("_Copy to folder…"), G_MENU_MODEL(submenu));
     }
 
-    gtk_widget_show_all (info->popup_menu);
-    g_free (content_type);
+    g_free(content_type);
+
+    info->popup_menu =
+        gtk_popover_new_from_model(GTK_WIDGET(info->mime_widget), G_MENU_MODEL(menu));
 }
 
 static void
@@ -1695,7 +1726,6 @@ balsa_part_info_dispose(GObject * object)
     BalsaPartInfo *info = (BalsaPartInfo *) object;
 
     g_clear_object(&info->mime_widget);
-    g_clear_object(&info->popup_menu);
 
     G_OBJECT_CLASS(balsa_part_info_parent_class)->dispose(object);
 }

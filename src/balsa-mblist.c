@@ -1667,26 +1667,14 @@ struct _BalsaMBListMRUEntry {
     GCallback user_func;
     gpointer user_data;
     gchar *url;
-    GCallback setup_cb;
 };
 typedef struct _BalsaMBListMRUEntry BalsaMBListMRUEntry;
 
 /* The callback that's passed in must fit this prototype, although it's
  * cast as a GCallback */
 typedef void (*MRUCallback) (gchar * url, gpointer user_data);
-/* Callback used internally for letting the option menu know that the
- * option menu needs to be set up */
-typedef void (*MRUSetup) (gpointer user_data);
 
 /* Forward references */
-static GtkWidget *bmbl_mru_menu(GtkWindow * window, GList ** url_list,
-                                GCallback user_func, gpointer user_data,
-                                gboolean allow_empty, GCallback setup_cb);
-static BalsaMBListMRUEntry *bmbl_mru_new(GList ** url_list,
-                                         GCallback user_func,
-                                         gpointer user_data,
-                                         gchar * url);
-static void bmbl_mru_free(BalsaMBListMRUEntry * mru);
 static void bmbl_mru_activate_cb(GtkWidget * widget, gpointer data);
 static void bmbl_mru_show_tree(GtkWidget * widget, gpointer data);
 static void bmbl_mru_selected_cb(GtkTreeSelection * selection,
@@ -1701,111 +1689,54 @@ static void bmbl_mru_activated_cb(GtkTreeView * tree_view,
  *
  * window:      parent window for the `Other...' dialog;
  * url_list:    pointer to a list of urls;
- * user_func:   called when an item is selected, with the url and
- *              the user_data as arguments;
- * user_data:   passed to the user_func callback.
+ * action:      the action to be taken on selecting an item
  *
- * Returns a pointer to a GtkMenu.
+ * Returns a pointer to a GMenu.
  *
  * Takes a list of urls and creates a menu with an entry for each one
  * that resolves to a mailbox, labeled with the mailbox name, with a
- * last entry that pops up the whole mailbox tree. When an item is
- * clicked, user_func is called with the url and user_data as
- * arguments, and the url_list is updated.
+ * last entry that pops up the whole mailbox tree.
  */
-GtkWidget *
-balsa_mblist_mru_menu(GtkWindow * window, GList ** url_list,
-                      GCallback user_func, gpointer user_data)
+GMenu *
+balsa_mblist_mru_menu(GtkWindow * window,
+                      GList ** url_list,
+                      const gchar *action)
 {
-    g_return_val_if_fail(url_list != NULL, NULL);
-    return bmbl_mru_menu(window, url_list, user_func, user_data, FALSE,
-                         NULL);
-}
-
-/*
- * bmbl_mru_menu:
- *
- * window, url_list, user_func, user_data:
- *              as for balsa_mblist_mru_menu;
- * allow_empty: if TRUE, a list with an empty url
- *              will be allowed into the menu;
- * setup_cb:    called when the tree has been displayed, to allow the
- *              display to be reset.
- *
- * Returns the GtkMenu.
- */
-static GtkWidget *
-bmbl_mru_menu(GtkWindow * window, GList ** url_list,
-              GCallback user_func, gpointer user_data,
-              gboolean allow_empty, GCallback setup_cb)
-{
-    GtkWidget *menu = gtk_menu_new();
-    GtkWidget *item;
+    GMenu *menu;
+    GMenu *other_menu;
     GList *list;
-    BalsaMBListMRUEntry *mru;
+    GMenuItem *other_item;
 
-    for (list = *url_list; list; list = g_list_next(list)) {
+    g_return_val_if_fail(GTK_IS_WINDOW(window), NULL);
+    g_return_val_if_fail(url_list != NULL, NULL);
+    g_return_val_if_fail(action != NULL, NULL);
+
+    menu = g_menu_new();
+    for (list = *url_list; list != NULL; list = list->next) {
         gchar *url = list->data;
         LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
 
-        if (mailbox || (allow_empty && !*url)) {
-            mru = bmbl_mru_new(url_list, user_func, user_data, url);
-            item =
-                gtk_menu_item_new_with_label(mailbox ? libbalsa_mailbox_get_name(mailbox) : "");
-            gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-            g_signal_connect_data(item, "activate",
-                                  G_CALLBACK(bmbl_mru_activate_cb), mru,
-                                  (GClosureNotify) bmbl_mru_free,
-                                  (GConnectFlags) 0);
+        if (mailbox != NULL) {
+            const gchar *name = libbalsa_mailbox_get_name(mailbox);
+            GMenuItem *item;
+
+            item = g_menu_item_new(name, NULL);
+            g_menu_item_set_action_and_target(item, action, "s", url);
+            g_menu_append_item(menu, item);
+            g_object_unref(item);
         }
     }
 
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu),
-                          gtk_separator_menu_item_new());
+    other_item = g_menu_item_new(_("_Other…"), NULL);
+    g_menu_item_set_action_and_target(other_item, action, "s", "");
+    other_menu = g_menu_new();
+    g_menu_append_item(other_menu, other_item);
+    g_object_unref(other_item);
 
-    mru = bmbl_mru_new(url_list, user_func, user_data, NULL);
-    mru->window = window;
-    mru->setup_cb = setup_cb;
-    item = gtk_menu_item_new_with_mnemonic(_("_Other…"));
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-    g_signal_connect_data(item, "activate",
-                          G_CALLBACK(bmbl_mru_show_tree), mru,
-                          (GClosureNotify) g_free, (GConnectFlags) 0);
-
-    gtk_widget_show_all(menu);
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(other_menu));
+    g_object_unref(other_menu);
 
     return menu;
-}
-
-/*
- * bmbl_mru_new:
- *
- * url_list, user_func, user_data:
- *              as for balsa_mblist_mru_menu;
- * url:         url of a mailbox.
- *
- * Returns a newly allocated BalsaMBListMRUEntry structure, initialized
- * with the data.
- */
-static BalsaMBListMRUEntry *
-bmbl_mru_new(GList ** url_list, GCallback user_func, gpointer user_data,
-             gchar * url)
-{
-    BalsaMBListMRUEntry *mru = g_new(BalsaMBListMRUEntry, 1);
-
-    mru->url_list = url_list;
-    mru->user_func = user_func;
-    mru->user_data = user_data;
-    mru->url = g_strdup(url);
-
-    return mru;
-}
-
-static void
-bmbl_mru_free(BalsaMBListMRUEntry * mru)
-{
-    g_free(mru->url);
-    g_free(mru);
 }
 
 /*
@@ -1904,8 +1835,6 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
 
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
-    if (mru->setup_cb)
-        ((MRUSetup) mru->setup_cb) (mru->user_data);
 }
 
 /*
@@ -2110,7 +2039,6 @@ bmbl_mru_combo_box_changed(GtkComboBox * combo_box,
     mru.window = mro->window;
     mru.url_list = mro->url_list;
     mru.user_func = NULL;
-    mru.setup_cb = NULL;
     mru.user_data = combo_box;
     mru.url = NULL;
     bmbl_mru_show_tree(NULL, &mru);

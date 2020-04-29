@@ -46,6 +46,7 @@
 #include "sendmsg-window.h"
 #include "store-address.h"
 
+#include "application-helpers.h"
 #include "filter-funcs.h"
 #include "misc.h"
 #include <glib/gi18n.h>
@@ -1945,21 +1946,6 @@ bi_toggle_new_cb(gpointer user_data)
                             LIBBALSA_MESSAGE_FLAG_NEW);
 }
 
-
-static void
-mru_menu_cb(const gchar * url, BalsaIndex * index)
-{
-    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
-
-    g_return_if_fail(mailbox != NULL);
-
-    if (balsa_mailbox_node_get_mailbox(index->mailbox_node) != mailbox) {
-        GArray *selected = balsa_index_selected_msgnos_new(index);
-        balsa_index_transfer(index, selected, mailbox, FALSE);
-        balsa_index_selected_msgnos_free(index, selected);
-    }
-}
-
 /*
  * bndx_popup_menu_create: create the popup menu at init time
  */
@@ -2047,6 +2033,22 @@ bndx_popup_menu_create(BalsaIndex * index)
  */
 
 static void
+move_to_change_state(GSimpleAction *action,
+                     GVariant      *parameter,
+                     gpointer       user_data)
+{
+    BalsaIndex *index = user_data;
+    const gchar *url = g_variant_get_string(parameter, NULL);
+    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
+
+    if (balsa_mailbox_node_get_mailbox(index->mailbox_node) != mailbox) {
+        GArray *selected = balsa_index_selected_msgnos_new(index);
+        balsa_index_transfer(index, selected, mailbox, FALSE);
+        balsa_index_selected_msgnos_free(index, selected);
+    }
+}
+
+static void
 bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
 {
     GtkWidget *menu = index->popup_menu;
@@ -2059,6 +2061,11 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     GArray *selected = balsa_index_selected_msgnos_new(index);
     guint i;
     gboolean readonly;
+    GSimpleActionGroup *simple;
+    static const GActionEntry bndx_popup_entries[] = {
+        {"move-to", libbalsa_radio_activated, "s", "''", move_to_change_state},
+    };
+    GMenu *mru_menu;
 
     g_debug("%s:%s", __FILE__, __func__);
 
@@ -2093,11 +2100,21 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     gtk_widget_set_sensitive(index->move_to_item,
                              any && !readonly);
 
-    submenu =
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    bndx_popup_entries,
+                                    G_N_ELEMENTS(bndx_popup_entries),
+                                    index);
+    gtk_widget_insert_action_group(menu, "bndx-popup", G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+
+    mru_menu =
         balsa_mblist_mru_menu(GTK_WINDOW
                               (gtk_widget_get_toplevel(GTK_WIDGET(index))),
-                              &balsa_app.folder_mru,
-                              G_CALLBACK(mru_menu_cb), index);
+                              &balsa_app.folder_mru, "bndx-popup.move-to");
+    submenu = gtk_menu_new_from_model(G_MENU_MODEL(mru_menu));
+    g_object_unref(mru_menu);
+
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(index->move_to_item),
                               submenu);
 

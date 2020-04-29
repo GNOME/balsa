@@ -37,16 +37,15 @@
 
 
 void
-balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item,
-			      LibBalsaMessageBody * mime_body)
+balsa_mime_widget_ctx_menu_cb(const gchar         *app,
+			      LibBalsaMessageBody *mime_body)
 {
     GError *err = NULL;
     gboolean result;
 
     g_return_if_fail(mime_body != NULL);
-    result = libbalsa_vfs_launch_app_for_body(mime_body,
-                                              G_OBJECT(menu_item),
-                                              &err);
+
+    result = libbalsa_vfs_launch_app_for_body(mime_body, app, &err);
     if (!result)
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not launch application: %s"),

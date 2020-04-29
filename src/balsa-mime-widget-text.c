@@ -22,6 +22,7 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "balsa-mime-widget-text.h"
 
+#include "application-helpers.h"
 #include <string.h>
 #include <stdlib.h>
 #include "balsa-app.h"
@@ -601,11 +602,28 @@ text_view_url_popup(GtkWidget *widget, GtkMenu *menu, message_url_t *url)
 }
 
 static void
+open_with_change_state(GSimpleAction *action,
+                       GVariant      *parameter,
+                       gpointer       user_data)
+{
+    const gchar *app = g_variant_get_string(parameter, NULL);
+    LibBalsaMessageBody *part = user_data;
+
+    balsa_mime_widget_ctx_menu_cb(app, part);
+}
+
+static void
 text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
                          gpointer user_data)
 {
     BalsaMimeWidgetText *mwt = user_data;
     GtkWidget *menu_item;
+    GSimpleActionGroup *simple;
+    static const GActionEntry text_view_popup_entries[] = {
+        {"open-with", libbalsa_radio_activated, "s", "''", open_with_change_state},
+    };
+    GMenu *open_menu;
+    GtkWidget *submenu;
 
     gtk_widget_hide(GTK_WIDGET(menu));
     gtk_container_foreach(GTK_CONTAINER(menu),
@@ -618,9 +636,27 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
                           (GtkCallback) gtk_widget_destroy_insensitive, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu),
 			  gtk_separator_menu_item_new());
-    libbalsa_vfs_fill_menu_by_content_type(menu, "text/plain",
-					   G_CALLBACK(balsa_mime_widget_ctx_menu_cb),
-					  (gpointer)mwt->mime_body);
+
+    /* Set up the "open-with" action: */
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    text_view_popup_entries,
+                                    G_N_ELEMENTS(text_view_popup_entries),
+                                    mwt->mime_body);
+    gtk_widget_insert_action_group(GTK_WIDGET(menu),
+                                   "text-view-popup",
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+
+    open_menu = g_menu_new();
+    libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/plain",
+                                           "text-view-popup.open-with");
+    submenu = gtk_menu_new_from_model(G_MENU_MODEL(open_menu));
+    g_object_unref(open_menu);
+
+    menu_item = gtk_menu_item_new_with_label(_("Open…"));
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), submenu);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 
     menu_item = gtk_menu_item_new_with_label(_("Save…"));
     g_signal_connect(menu_item, "activate",
@@ -1110,6 +1146,12 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
 {
     GtkWidget *menuitem;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
+    GSimpleActionGroup *simple;
+    static const GActionEntry text_view_popup_entries[] = {
+        {"open-with", libbalsa_radio_activated, "s", "''", open_with_change_state},
+    };
+    GMenu *open_menu;
+    GtkWidget *submenu;
 
     menuitem = gtk_menu_item_new_with_label(_("Zoom In"));
     g_signal_connect_swapped(menuitem, "activate",
@@ -1139,10 +1181,26 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     }
 
-    libbalsa_vfs_fill_menu_by_content_type(GTK_MENU(menu), "text/html",
-                                           G_CALLBACK
-                                          (balsa_mime_widget_ctx_menu_cb),
-                                           mime_body);
+    /* Set up the "open-with" action: */
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    text_view_popup_entries,
+                                    G_N_ELEMENTS(text_view_popup_entries),
+                                    mime_body);
+    gtk_widget_insert_action_group(GTK_WIDGET(menu),
+                                   "text-view-popup",
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+
+    open_menu = g_menu_new();
+    libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/plain",
+                                           "text-view-popup.open-with");
+    submenu = gtk_menu_new_from_model(G_MENU_MODEL(open_menu));
+    g_object_unref(open_menu);
+
+    menuitem = gtk_menu_item_new_with_label(_("Open…"));
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem = gtk_menu_item_new_with_label(_("Save…"));
     g_signal_connect(menuitem, "activate",

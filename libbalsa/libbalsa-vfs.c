@@ -534,7 +534,7 @@ libbalsa_vfs_launch_app(LibbalsaVfs * file, const gchar *app_name, GError **err)
 {
     GList *app_list;
     GList *list;
-    GAppInfo *app;
+    GAppInfo *app = NULL;
     GList * args;
     gboolean result;
 
@@ -543,13 +543,15 @@ libbalsa_vfs_launch_app(LibbalsaVfs * file, const gchar *app_name, GError **err)
 
     app_list = g_app_info_get_all();
     for (list = app_list; list != NULL; list = list->next) {
-        app = G_APP_INFO(list->data);
-        if (strcmp(app_name, g_app_info_get_name(app)) == 0)
+        GAppInfo *this_app = G_APP_INFO(list->data);
+        if (strcmp(app_name, g_app_info_get_name(this_app)) == 0) {
+            app = g_object_ref(this_app);
             break;
+        }
     }
     g_list_free_full(app_list, g_object_unref);
 
-    if (list == NULL) {
+    if (app == NULL) {
         g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
                     _("Cannot launch, missing application"));
         return FALSE;
@@ -558,6 +560,7 @@ libbalsa_vfs_launch_app(LibbalsaVfs * file, const gchar *app_name, GError **err)
     args = g_list_prepend(NULL, file->gio_gfile);
     result = g_app_info_launch(app, args, NULL, err);
     g_list_free(args);
+    g_object_unref(app);
 
     return result;
 }

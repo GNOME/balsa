@@ -50,8 +50,9 @@ BalsaMailboxNode *balsa_mblist_get_selected_node(BalsaMBList * mblist);
 BalsaMailboxNode *balsa_mblist_get_node_by_mailbox(BalsaMBList * mblist,
                                                    LibBalsaMailbox *
                                                    mailbox);
-GtkWidget *balsa_mblist_mru_menu(GtkWindow * window, GList ** url_list,
-                                 GCallback user_func, gpointer user_data);
+GMenu *balsa_mblist_mru_menu(GtkWindow * window,
+                             GList ** url_list,
+                             const gchar *action);
 void balsa_mblist_mru_add(GList ** url_list, const gchar * url);
 void balsa_mblist_mru_drop(GList ** url_list, const gchar * url);
 GtkWidget *balsa_mblist_mru_option_menu(GtkWindow * window, 

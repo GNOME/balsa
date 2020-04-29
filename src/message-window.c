@@ -602,8 +602,6 @@ message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
     guint msgno;
     LibBalsaMessage *original = mw->message;
 
-    g_return_if_fail(mailbox != NULL);
-
     /* Transferring to same mailbox? */
     if (libbalsa_message_get_mailbox(mw->message) == mailbox)
         return;
@@ -626,15 +624,6 @@ message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
         /* Either action-after-move was CLOSE, or we failed to select
          * another message; either way, we close the window. */
         gtk_widget_destroy(mw->window);
-}
-
-static void
-mw_mru_menu_cb(gchar * url, gpointer data)
-{
-    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
-    MessageWindow *mw = data;
-
-    message_window_move_message(mw, mailbox);
 }
 
 static void
@@ -805,6 +794,18 @@ message_window_add_action_entries(GActionMap * action_map)
                                     G_N_ELEMENTS(win_entries), action_map);
 }
 
+static void
+move_to_change_state(GSimpleAction *action,
+                     GVariant      *parameter,
+                     gpointer       user_data)
+{
+    MessageWindow *mw = user_data;
+    const gchar *url = g_variant_get_string(parameter, NULL);
+    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
+
+    message_window_move_message(mw, mailbox);
+}
+
 void
 message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 {
@@ -820,6 +821,11 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
         { "none", "selected", "all" };
     const gchar resource_path[] = "/org/desktop/Balsa/message-window.ui";
     GAction *action;
+    GSimpleActionGroup *simple;
+    static const GActionEntry message_window_entries[] = {
+        {"move-to", libbalsa_radio_activated, "s", "''", move_to_change_state},
+    };
+    GMenu *mru_menu;
 
     if (!mailbox || !msgno)
 	return;
@@ -884,9 +890,23 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     g_signal_connect(mailbox, "message_expunged",
                      G_CALLBACK(mw_expunged_cb), mw);
 
-    submenu = balsa_mblist_mru_menu(GTK_WINDOW(window),
-                                    &balsa_app.folder_mru,
-                                    G_CALLBACK(mw_mru_menu_cb), mw);
+    /* Set up the "move-to" action */
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    message_window_entries,
+                                    G_N_ELEMENTS(message_window_entries),
+                                    mw);
+    gtk_widget_insert_action_group(GTK_WIDGET(mw->window),
+                                   "message-window",
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+
+    mru_menu =
+        balsa_mblist_mru_menu(GTK_WINDOW(window),
+                              &balsa_app.folder_mru, "message-window.move-to");
+    submenu = gtk_menu_new_from_model(G_MENU_MODEL(mru_menu));
+    g_object_unref(mru_menu);
+
     gtk_container_foreach(GTK_CONTAINER(menubar), mw_menubar_foreach,
                           &move_menu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(move_menu), submenu);

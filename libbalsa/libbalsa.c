@@ -397,7 +397,7 @@ libbalsa_is_cert_known(GTlsCertificate      *cert,
 */
 struct AskCertData {
     GTlsCertificate *certificate;
-    const char *explanation;
+    gchar *explanation;
 };
 
 
@@ -412,9 +412,9 @@ ask_cert_real(void *data)
     GtkWidget *label;
 
     /* never accept if the certificate is broken, resulting in a NULL widget */
-    cert_widget = x509_cert_chain_tls(acd->certificate); // x509_cert_widget_from_cert(acd->certificate);
+    cert_widget = x509_cert_chain_tls(acd->certificate);
     if (cert_widget == NULL) {
-    	// FIXME - message?
+    	libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("broken TLS certificate"));
     	return CERT_ACCEPT_NO;
     }
 
@@ -456,6 +456,7 @@ ask_cert_real(void *data)
     	break;
     }
     gtk_widget_destroy(dialog);
+    g_free(acd->explanation);
     return i;
 }
 
@@ -465,21 +466,30 @@ libbalsa_ask_for_cert_acceptance(GTlsCertificate      *cert,
 								 GTlsCertificateFlags  errors)
 {
     struct AskCertData acd;
+    static const gchar *reason_msg[] = {
+		N_("the signing certificate authority is not known"),
+		N_("the certificate does not match the expected identity of the site that it was retrieved from"),
+		N_("the certificate’s activation time is still in the future"),
+		N_("the certificate has expired"),
+		N_("the certificate has been revoked"),
+		N_("the certificate’s algorithm is considered insecure"),
+		N_("an error occurred validating the certificate")
+    };
+    GString *exp_buf = g_string_new(NULL);
+    gsize n;
+
     acd.certificate = cert;
-    if ((errors & G_TLS_CERTIFICATE_UNKNOWN_CA) == G_TLS_CERTIFICATE_UNKNOWN_CA) {
-    	acd.explanation = _("the signing certificate authority is not known");
-    } else if ((errors & G_TLS_CERTIFICATE_BAD_IDENTITY) == G_TLS_CERTIFICATE_BAD_IDENTITY) {
-    	acd.explanation = _("the certificate does not match the expected identity of the site that it was retrieved from");
-    } else if ((errors & G_TLS_CERTIFICATE_NOT_ACTIVATED) == G_TLS_CERTIFICATE_NOT_ACTIVATED) {
-    	acd.explanation = _("the certificate’s activation time is still in the future");
-    } else if ((errors & G_TLS_CERTIFICATE_EXPIRED) == G_TLS_CERTIFICATE_EXPIRED) {
-    	acd.explanation = _("the certificate has expired");
-    } else if ((errors & G_TLS_CERTIFICATE_REVOKED) == G_TLS_CERTIFICATE_REVOKED) {
-    	acd.explanation = _("the certificate has been revoked ");
-    } else if ((errors & G_TLS_CERTIFICATE_INSECURE) == G_TLS_CERTIFICATE_INSECURE) {
-    	acd.explanation = _("the certificate’s algorithm is considered insecure");
+    for (n = 0U; n < G_N_ELEMENTS(reason_msg); n++) {
+    	if ((errors & (1U << n)) != 0U) {
+    		g_string_append_printf(exp_buf, "\n\342\200\242 %s", reason_msg[n]);
+    	}
+    }
+
+    if (exp_buf->len > 0U) {
+    	acd.explanation = g_string_free(exp_buf, FALSE);
     } else {
-    	acd.explanation = _("an error occurred validating the certificate");
+    	g_string_free(exp_buf, TRUE);
+    	acd.explanation = g_strdup_printf(_("unknown certificate validation error %u"), (unsigned) errors);
     }
     return libbalsa_ask(ask_cert_real, &acd);
 }

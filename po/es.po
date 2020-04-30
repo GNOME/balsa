@@ -15,15 +15,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa.HEAD\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2020-03-03 19:36+0000\n"
-"PO-Revision-Date: 2020-03-04 16:43+0100\n"
+"POT-Creation-Date: 2020-04-29 20:07+0000\n"
+"PO-Revision-Date: 2020-04-30 11:30+0200\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Spanish - Spain <gnome-es-list@gnome.org>\n"
 "Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Gtranslator 3.34.0\n"
+"X-Generator: Gtranslator 3.36.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../balsa.appdata.xml.in.h:1
@@ -148,7 +148,7 @@ msgstr "Sin Id"
 # libbalsa/address-book-ldap.c:317 libbalsa/address-book-vcard.c:183
 # libbalsa/address-book-ldap.c:329 libbalsa/address-book-vcard.c:201
 #: ../libbalsa/address-book-extern.c:192 ../libbalsa/address-book-extern.c:356
-#: ../libbalsa/address-book-ldap.c:556 ../libbalsa/address-book-ldif.c:192
+#: ../libbalsa/address-book-ldap.c:555 ../libbalsa/address-book-ldif.c:192
 #: ../libbalsa/address-book-ldif.c:230 ../libbalsa/address-book-ldif.c:273
 #: ../libbalsa/address-book-ldif.c:277 ../libbalsa/address-book-vcard.c:143
 #: ../libbalsa/address-book-vcard.c:250 ../libbalsa/address.c:409
@@ -174,11 +174,11 @@ msgstr "Se pidió TLS pero no hay soporte TLS compilado"
 
 # libbalsa/address-book.c:163
 # libbalsa/address-book.c:170
-#: ../libbalsa/address-book-ldap.c:672
+#: ../libbalsa/address-book-ldap.c:671
 msgid "Undefined location of user address book"
 msgstr "Ubicación indefinida de la libreta de direcciones del usuario"
 
-#: ../libbalsa/address-book-ldap.c:1106
+#: ../libbalsa/address-book-ldap.c:1102
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr "El servidor LDAP %s está caído, se intentará volver a conectar."
@@ -265,12 +265,12 @@ msgstr "Cco:"
 msgid "Reply To:"
 msgstr "Responder a:"
 
-#: ../libbalsa/autocrypt.c:179
+#: ../libbalsa/autocrypt.c:180
 #, c-format
 msgid "cannot initialise Autocrypt database “%s”: %s"
 msgstr "no se puede leer inicializar la base de datos de Autocrypt «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:311
+#: ../libbalsa/autocrypt.c:306
 #, c-format
 msgid ""
 "No usable private key for “%s” found! Please create a key or disable "
@@ -279,19 +279,19 @@ msgstr ""
 "No se ha encontrado una clave privada que se pueda usar para «%s». Cree una "
 "clave o desactive Autocrypt."
 
-#: ../libbalsa/autocrypt.c:379 ../libbalsa/autocrypt.c:387
-#: ../libbalsa/autocrypt.c:851 ../libbalsa/autocrypt.c:857
+#: ../libbalsa/autocrypt.c:373 ../libbalsa/autocrypt.c:381
+#: ../libbalsa/autocrypt.c:648 ../libbalsa/autocrypt.c:654
 #, c-format
 msgid "error reading Autocrypt data for “%s”: %s"
 msgstr "error al ejecutar los datos de Autocrypt para «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:440
+#: ../libbalsa/autocrypt.c:434
 msgid "Autocrypt database"
 msgstr "Base de datos de Autocrypt"
 
 # src/main-window.c:399
 # src/main-window.c:401
-#: ../libbalsa/autocrypt.c:441 ../libbalsa/html.c:424
+#: ../libbalsa/autocrypt.c:435 ../libbalsa/html.c:424
 #: ../libbalsa/identity.c:1665 ../libbalsa/libbalsa-gpgme-widgets.c:765
 #: ../src/ab-window.c:148 ../src/folder-conf.c:346 ../src/mailbox-node.c:1050
 #: ../src/main-window.c:3810 ../src/toolbar-prefs.c:141
@@ -300,68 +300,68 @@ msgstr "Base de datos de Autocrypt"
 msgid "_Close"
 msgstr "_Cerrar"
 
-#: ../libbalsa/autocrypt.c:447 ../libbalsa/libbalsa-gpgme-cb.c:236
+#: ../libbalsa/autocrypt.c:441 ../libbalsa/libbalsa-gpgme-cb.c:236
 msgid "Double-click key to show details"
 msgstr "Pulse dos veces sobre la clave para mostrar los detalles"
 
 # src/balsa-mblist.c:218 src/mailbox-conf.c:950
 # src/balsa-mblist.c:218 src/mailbox-conf.c:1023
-#: ../libbalsa/autocrypt.c:500 ../src/balsa-mblist.c:328
+#: ../libbalsa/autocrypt.c:494 ../src/balsa-mblist.c:328
 msgid "Mailbox"
 msgstr "Buzón"
 
 # src/address-book-config.c:351
 # src/address-book-config.c:381
-#: ../libbalsa/autocrypt.c:505
+#: ../libbalsa/autocrypt.c:499
 msgid "Last seen"
 msgstr "Visto por última vez"
 
 # libmutt/mx.c:1375
 # libmutt/mx.c:1375
-#: ../libbalsa/autocrypt.c:510
+#: ../libbalsa/autocrypt.c:504
 msgid "Last Autocrypt message"
 msgstr "Último mensaje de Autocrypt"
 
-#: ../libbalsa/autocrypt.c:515
+#: ../libbalsa/autocrypt.c:509
 msgid "Prefer encryption"
 msgstr "Cifrado preferido"
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
-#: ../libbalsa/autocrypt.c:883 ../libbalsa/autocrypt.c:898
+#: ../libbalsa/autocrypt.c:742 ../libbalsa/autocrypt.c:762
 #, c-format
 msgid "update user “%s” failed: %s"
 msgstr "falló al actualizar el usuario «%s»: %s"
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
-#: ../libbalsa/autocrypt.c:883
+#: ../libbalsa/autocrypt.c:742
 #, c-format
 msgid "insert user “%s” failed: %s"
 msgstr "falló al insertar el usuario «%s»: %s"
 
 # src/balsa-index.c:304 src/filter-edit-dialog.c:349
 # src/balsa-index.c:297 src/filter-edit-dialog.c:326
-#: ../libbalsa/body.c:119 ../libbalsa/mailbox_local.c:1872
-#: ../libbalsa/message.c:935 ../libbalsa/message.c:952
+#: ../libbalsa/body.c:119 ../libbalsa/mailbox_local.c:1875
+#: ../libbalsa/message.c:943 ../libbalsa/message.c:960
 msgid "(No subject)"
 msgstr "(Sin asunto)"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/body.c:388 ../libbalsa/body.c:435
+#: ../libbalsa/body.c:392 ../libbalsa/body.c:439
 #, c-format
 msgid "Failed to create output stream"
 msgstr "No se pudo crear el flujo de salida"
 
 # src/balsa-message.c:651
 # src/balsa-message.c:713
-#: ../libbalsa/body.c:572
+#: ../libbalsa/body.c:576
 #, c-format
 msgid "Could not read embedded message"
 msgstr "No se pudo leer el mensaje empotrado"
 
-#: ../libbalsa/filter.c:127 ../libbalsa/mailbox_local.c:858
+#: ../libbalsa/filter.c:127 ../libbalsa/mailbox_local.c:866
 msgid "Unable to load message body to match filter"
 msgstr "No se pudo cargar el cuerpo del mensaje que coincida con el filtro"
 
@@ -518,7 +518,7 @@ msgstr "O"
 msgid "Could not connect to “%s”"
 msgstr "No se pudo conectar a «%s»"
 
-#: ../libbalsa/gmime-application-pkcs7.c:129
+#: ../libbalsa/gmime-application-pkcs7.c:121
 #, c-format
 msgid "Failed to decrypt MIME part: parse error"
 msgstr "Fallo al descifrar la parte MIME: error de parseo"
@@ -590,18 +590,18 @@ msgstr ""
 msgid "unknown"
 msgstr "desconocido"
 
-#: ../libbalsa/gmime-multipart-crypt.c:228
+#: ../libbalsa/gmime-multipart-crypt.c:230
 msgid "Cannot verify multipart/signed part due to missing subparts."
 msgstr ""
 "No se puede descifrar la parte multipart/encrypted porque faltan las "
 "subpartes."
 
-#: ../libbalsa/gmime-multipart-crypt.c:252
+#: ../libbalsa/gmime-multipart-crypt.c:254
 #, c-format
 msgid "unsupported protocol “%s”"
 msgstr "Protocolo «%s» no soportado"
 
-#: ../libbalsa/gmime-multipart-crypt.c:265
+#: ../libbalsa/gmime-multipart-crypt.c:267
 msgid ""
 "Cannot verify multipart/signed part: signature content-type does not match "
 "protocol."
@@ -609,7 +609,7 @@ msgstr ""
 "No se puede descifrar la parte multipart/encrypted: la firma del tipo de "
 "contenido no coincide con el protocolo."
 
-#: ../libbalsa/gmime-multipart-crypt.c:461
+#: ../libbalsa/gmime-multipart-crypt.c:463
 #, c-format
 msgid ""
 "Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
@@ -618,11 +618,11 @@ msgstr ""
 "No se puede descifrar la parte multipart/encrypted: protocolo de cifrado "
 "«%s» no soportado."
 
-#: ../libbalsa/gmime-multipart-crypt.c:462
+#: ../libbalsa/gmime-multipart-crypt.c:464
 msgid "(none)"
 msgstr "(nada)"
 
-#: ../libbalsa/gmime-multipart-crypt.c:475
+#: ../libbalsa/gmime-multipart-crypt.c:477
 msgid ""
 "Cannot decrypt multipart/encrypted part: content-type does not match "
 "protocol."
@@ -630,13 +630,13 @@ msgstr ""
 "No se puede descifrar la parte multipart/encrypted: el tipo de contenido no "
 "coincide con el protocolo."
 
-#: ../libbalsa/gmime-multipart-crypt.c:490
+#: ../libbalsa/gmime-multipart-crypt.c:492
 msgid "Cannot decrypt multipart/encrypted part: unexpected content type"
 msgstr ""
 "No se puede descifrar la parte multipart/encrypted: tipo de contenido no "
 "esperado"
 
-#: ../libbalsa/gmime-multipart-crypt.c:532
+#: ../libbalsa/gmime-multipart-crypt.c:534
 msgid ""
 "Cannot decrypt multipart/encrypted part: failed to parse decrypted content"
 msgstr ""
@@ -682,8 +682,8 @@ msgid "_Download images"
 msgstr "_Descargar imágenes"
 
 #. should "re" be localized ?
-#: ../libbalsa/identity.c:109 ../libbalsa/mailbox_local.c:1995
-#: ../libbalsa/mailbox_local.c:1997 ../src/sendmsg-window.c:3863
+#: ../libbalsa/identity.c:109 ../libbalsa/mailbox_local.c:1998
+#: ../libbalsa/mailbox_local.c:2000 ../src/sendmsg-window.c:3863
 #: ../src/sendmsg-window.c:3865
 msgid "Re:"
 msgstr "Re:"
@@ -1182,25 +1182,30 @@ msgstr "falló al suscribirse a «%s»"
 msgid "unsubscribing from “%s” failed"
 msgstr "falló al cancelar la suscripción de «%s»"
 
-#: ../libbalsa/libbalsa.c:421
+#: ../libbalsa/libbalsa.c:409
+#| msgid "SSL/TLS certificate"
+msgid "broken TLS certificate"
+msgstr "Certificado TLS roto"
+
+#: ../libbalsa/libbalsa.c:413
 msgid "SSL/TLS certificate"
 msgstr "Certificado SSL/TLS"
 
-#: ../libbalsa/libbalsa.c:425
+#: ../libbalsa/libbalsa.c:417
 msgid "_Accept Once"
 msgstr "_Aceptar una vez"
 
-#: ../libbalsa/libbalsa.c:426
+#: ../libbalsa/libbalsa.c:418
 msgid "Accept & _Save"
 msgstr "Acepta_r y guardar"
 
 # src/sendmsg-window.c:224
 # src/sendmsg-window.c:228
-#: ../libbalsa/libbalsa.c:427
+#: ../libbalsa/libbalsa.c:419
 msgid "_Reject"
 msgstr "_Rechazar"
 
-#: ../libbalsa/libbalsa.c:432
+#: ../libbalsa/libbalsa.c:424
 #, c-format
 msgid ""
 "<big><b>Authenticity of this certificate could not be verified.</b></big>\n"
@@ -1209,11 +1214,11 @@ msgstr ""
 "<big><b>No se pudo verificar la autenticidad de este certificado.</b></big>\n"
 "Razón: %s"
 
-#: ../libbalsa/libbalsa.c:470
+#: ../libbalsa/libbalsa.c:462
 msgid "the signing certificate authority is not known"
 msgstr "la autoridad de firma del certificado es desconocida"
 
-#: ../libbalsa/libbalsa.c:472
+#: ../libbalsa/libbalsa.c:463
 msgid ""
 "the certificate does not match the expected identity of the site that it was "
 "retrieved from"
@@ -1221,49 +1226,55 @@ msgstr ""
 "el certificado no coincide con la identidad del sitio esperada del que se "
 "obtuvo"
 
-#: ../libbalsa/libbalsa.c:474
+#: ../libbalsa/libbalsa.c:464
 msgid "the certificate’s activation time is still in the future"
 msgstr "la fecha de activación del certificado todavía está en el futuro"
 
 # libmutt/imap/imap_ssl.c:523
 # libmutt/imap/imap_ssl.c:523
-#: ../libbalsa/libbalsa.c:476
+#: ../libbalsa/libbalsa.c:465
 msgid "the certificate has expired"
 msgstr "el certificado ha caducado"
 
-#: ../libbalsa/libbalsa.c:478
-msgid "the certificate has been revoked "
+#: ../libbalsa/libbalsa.c:466
+#| msgid "the certificate has been revoked "
+msgid "the certificate has been revoked"
 msgstr "el certificado se ha revocado"
 
-#: ../libbalsa/libbalsa.c:480
+#: ../libbalsa/libbalsa.c:467
 msgid "the certificate’s algorithm is considered insecure"
 msgstr "el algoritmo del certificado se considera no seguro"
 
 # src/sendmsg-window.c:1694
 # src/sendmsg-window.c:1749
-#: ../libbalsa/libbalsa.c:482
+#: ../libbalsa/libbalsa.c:468
 msgid "an error occurred validating the certificate"
 msgstr "ha ocurrido un error al validar el certificado"
 
-#: ../libbalsa/libbalsa.c:561
+#: ../libbalsa/libbalsa.c:484
+#, c-format
+msgid "unknown certificate validation error %u"
+msgstr "error %u desconocido de validación del certificado"
+
+#: ../libbalsa/libbalsa.c:563
 #, c-format
 msgid "No image data"
 msgstr "Sin datos de imagen"
 
 # libmutt/imap/imap_ssl.c:297
 # libmutt/imap/imap_ssl.c:297
-#: ../libbalsa/libbalsa.c:595
+#: ../libbalsa/libbalsa.c:597
 #, c-format
 msgid "Invalid input format"
 msgstr "Formato de entrada no válido"
 
-#: ../libbalsa/libbalsa.c:599
+#: ../libbalsa/libbalsa.c:601
 #, c-format
 msgid "Internal buffer overrun"
 msgstr "Sobrepasado el búfer interno"
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/libbalsa.c:616
+#: ../libbalsa/libbalsa.c:618
 #, c-format
 msgid "Bad X-Face data"
 msgstr "Datos X-Face erróneos"
@@ -1845,82 +1856,82 @@ msgstr "Ver par_te con %s"
 
 # libbalsa/mailbox.c:262
 # libbalsa/mailbox.c:275
-#: ../libbalsa/mailbox.c:526
+#: ../libbalsa/mailbox.c:532
 #, c-format
 msgid "Cannot load mailbox %s"
 msgstr "No se puede cargar el buzón %s"
 
 # libbalsa/mailbox.c:268
 # libbalsa/mailbox.c:282
-#: ../libbalsa/mailbox.c:533
+#: ../libbalsa/mailbox.c:539
 #, c-format
 msgid "No such mailbox type: %s"
 msgstr "No existe ese tipo de buzón: %s"
 
 # libbalsa/mailbox.c:262
 # libbalsa/mailbox.c:275
-#: ../libbalsa/mailbox.c:550
+#: ../libbalsa/mailbox.c:556
 #, c-format
 msgid "Bad local mailbox path “%s”"
 msgstr "Ruta errónea al buzón local «%s»"
 
 # libbalsa/mailbox.c:275
 # libbalsa/mailbox.c:290
-#: ../libbalsa/mailbox.c:560
+#: ../libbalsa/mailbox.c:566
 #, c-format
 msgid "Could not create a mailbox of type %s"
 msgstr "No se pudo crear un buzón del tipo %s"
 
-#: ../libbalsa/mailbox.c:906
+#: ../libbalsa/mailbox.c:912
 #, c-format
 msgid "Applying filter rules to %s"
 msgstr "Aplicando reglas de filtrado a: %s"
 
 # libmutt/mx.c:848
 # libmutt/mx.c:848
-#: ../libbalsa/mailbox.c:1083
+#: ../libbalsa/mailbox.c:1089
 #, c-format
 msgid "Copying from %s to %s"
 msgstr "Copiando de %s a %s"
 
-#: ../libbalsa/mailbox.c:2039
+#: ../libbalsa/mailbox.c:2049
 #, c-format
 msgid "libbalsa_mailbox_get_message: mailbox %s is closed"
 msgstr "libbalsa_mailbox_get_message: el buzón %s está cerrado"
 
 # src/main-window.c:403
 # src/main-window.c:406
-#: ../libbalsa/mailbox.c:2248
+#: ../libbalsa/mailbox.c:2258
 #, c-format
 msgid "Removing messages from source mailbox failed"
 msgstr "Ha fallado la eliminación de los mensajes del buzón de origen"
 
 # libmutt/imap/imap_ssl.c:254
 # libmutt/imap/imap_ssl.c:254
-#: ../libbalsa/mailbox.c:3225
+#: ../libbalsa/mailbox.c:3235
 msgid "from unknown"
 msgstr "desde desconocido"
 
 # src/main-window.c:177
 # src/main-window.c:184
-#: ../libbalsa/mailbox.c:3227
+#: ../libbalsa/mailbox.c:3237
 msgid "Loading…"
 msgstr "Cargando…"
 
-#: ../libbalsa/mailbox.c:4277
+#: ../libbalsa/mailbox.c:4288
 #, c-format
 msgid "Searching %s for partial messages"
 msgstr "Buscando %s para mensajes parciales"
 
 # libmutt/mx.c:1375
 # libmutt/mx.c:1375
-#: ../libbalsa/mailbox.c:4367
+#: ../libbalsa/mailbox.c:4378
 msgid "Reconstructing message"
 msgstr "Reconstruyendo el mensaje"
 
 # src/main-window.c:403
 # src/main-window.c:406
-#: ../libbalsa/mailbox.c:4636
+#: ../libbalsa/mailbox.c:4647
 #, c-format
 msgid "Finding duplicate messages in source mailbox failed"
 msgstr "Ha fallado la búsqueda de mensajes duplicados en el buzón de origen"
@@ -1956,8 +1967,8 @@ msgstr ""
 
 # libbalsa/mailbox_pop3.c:184
 # libbalsa/mailbox_pop3.c:198
-#: ../libbalsa/mailbox_imap.c:1103 ../libbalsa/mailbox_maildir.c:486
-#: ../libbalsa/mailbox_mbox.c:713 ../libbalsa/mailbox_mh.c:521
+#: ../libbalsa/mailbox_imap.c:1103 ../libbalsa/mailbox_maildir.c:484
+#: ../libbalsa/mailbox_mbox.c:710 ../libbalsa/mailbox_mh.c:519
 #, c-format
 msgid "%s: Opening %s Refcount: %d\n"
 msgstr "%s: Abriendo %s Conteo de ref: %d\n"
@@ -1986,82 +1997,82 @@ msgstr "No se encontró ruta para el buzón «%s», usando «%s»"
 msgid "Cannot get IMAP handle"
 msgstr "No se encontró el gestor de IMAP"
 
-#: ../libbalsa/mailbox_imap.c:2430 ../libbalsa/mailbox_imap.c:2493
+#: ../libbalsa/mailbox_imap.c:2431 ../libbalsa/mailbox_imap.c:2494
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr "Error al bajar un mensaje del servidor IMAP: %s"
 
-#: ../libbalsa/mailbox_imap.c:2465
+#: ../libbalsa/mailbox_imap.c:2466
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Descargando %u KiB"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/mailbox_imap.c:2506
+#: ../libbalsa/mailbox_imap.c:2507
 #, c-format
 msgid "Cannot create temporary file"
 msgstr "No se pudo crear el archivo temporal"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/mailbox_imap.c:2530
+#: ../libbalsa/mailbox_imap.c:2531
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "No se pudo escribir en el archivo temporal %s"
 
-#: ../libbalsa/mailbox_imap.c:2759 ../libbalsa/mailbox_imap.c:2878
+#: ../libbalsa/mailbox_imap.c:2759 ../libbalsa/mailbox_imap.c:2876
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Subiendo %ld KiB"
 
-#: ../libbalsa/mailbox_imap.c:3181
+#: ../libbalsa/mailbox_imap.c:3179
 msgid "Server-side threading not supported."
 msgstr "Los hilos de conversación en el lado del servidor no están soportados."
 
 # libmutt/mbox.c:712
-#: ../libbalsa/mailbox_local.c:560
+#: ../libbalsa/mailbox_local.c:568
 #, c-format
 msgid "Failed to save cache file “%s”: %s."
 msgstr "Falló al guardar el archivo de caché «%s»: %s."
 
-#: ../libbalsa/mailbox_local.c:596
+#: ../libbalsa/mailbox_local.c:604
 #, c-format
 msgid "Cache file for mailbox %s will be created"
 msgstr "El archivo de caché para el buzón %s será creado"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/mailbox_local.c:605
+#: ../libbalsa/mailbox_local.c:613
 #, c-format
 msgid "Failed to read cache file %s: %s"
 msgstr "Falló al leer el archivo de caché %s: %s"
 
-#: ../libbalsa/mailbox_local.c:623 ../libbalsa/mailbox_local.c:640
-#: ../libbalsa/mailbox_local.c:663
+#: ../libbalsa/mailbox_local.c:631 ../libbalsa/mailbox_local.c:648
+#: ../libbalsa/mailbox_local.c:671
 #, c-format
 msgid "Cache file for mailbox %s will be repaired"
 msgstr "El archivo de cache para el buzón %s será reparado"
 
 # src/main-window.c:259
 # src/main-window.c:262
-#: ../libbalsa/mailbox_local.c:1289
+#: ../libbalsa/mailbox_local.c:1292
 #, c-format
 msgid "Filtering %s"
 msgstr "Filtrando %s"
 
-#: ../libbalsa/mailbox_local.c:1352
+#: ../libbalsa/mailbox_local.c:1355
 #, c-format
 msgid "Preparing %s"
 msgstr "Preparando %s"
 
-#: ../libbalsa/mailbox_local.c:2109
+#: ../libbalsa/mailbox_local.c:2112
 #, c-format
 msgid "Open of %s failed. Errno = %d, "
 msgstr "Falló la apertura de %s. Nº de error = %d, "
 
 # libmutt/mbox.c:712
-#: ../libbalsa/mailbox_local.c:2132
+#: ../libbalsa/mailbox_local.c:2135
 #, c-format
 msgid "Failed to sync mailbox “%s”"
 msgstr "Falló al sincronizar buzón «%s»"
@@ -2090,7 +2101,7 @@ msgstr "No se pudo crear un Maildir en %s (%s)"
 
 # src/sendmsg-window.c:1403
 # src/sendmsg-window.c:1454
-#: ../libbalsa/mailbox_maildir.c:315 ../libbalsa/mailbox_mh.c:269
+#: ../libbalsa/mailbox_maildir.c:313 ../libbalsa/mailbox_mh.c:267
 #, c-format
 msgid ""
 "Could not remove contents of %s:\n"
@@ -2101,8 +2112,8 @@ msgstr ""
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
-#: ../libbalsa/mailbox_maildir.c:321 ../libbalsa/mailbox_mbox.c:279
-#: ../libbalsa/mailbox_mh.c:275
+#: ../libbalsa/mailbox_maildir.c:319 ../libbalsa/mailbox_mbox.c:277
+#: ../libbalsa/mailbox_mh.c:273
 #, c-format
 msgid ""
 "Could not remove %s:\n"
@@ -2113,14 +2124,14 @@ msgstr ""
 
 # src/pref-manager.c:1087
 # src/pref-manager.c:1218
-#: ../libbalsa/mailbox_maildir.c:467 ../libbalsa/mailbox_mbox.c:658
-#: ../libbalsa/mailbox_mh.c:504
+#: ../libbalsa/mailbox_maildir.c:465 ../libbalsa/mailbox_mbox.c:655
+#: ../libbalsa/mailbox_mh.c:502
 #, c-format
 msgid "Mailbox does not exist."
 msgstr "El buzón no existe."
 
-#: ../libbalsa/mailbox_maildir.c:915 ../libbalsa/mailbox_mbox.c:1950
-#: ../libbalsa/mailbox_mh.c:1091
+#: ../libbalsa/mailbox_maildir.c:912 ../libbalsa/mailbox_mbox.c:1950
+#: ../libbalsa/mailbox_mh.c:1089
 #, c-format
 msgid "Data copy error"
 msgstr "Error al copiar datos"
@@ -2134,19 +2145,19 @@ msgstr "El buzón %s no parece ser no es un buzón mbox válido."
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/mailbox_mbox.c:384
+#: ../libbalsa/mailbox_mbox.c:382
 #, c-format
 msgid "Could not write file %s: %s"
 msgstr "No se pudo crear escribir el archivo %s: %s"
 
 # src/balsa-message.c:1316
 # src/balsa-message.c:1474
-#: ../libbalsa/mailbox_mbox.c:396
+#: ../libbalsa/mailbox_mbox.c:394
 #, c-format
 msgid "Failed to create temporary file “%s”: %s"
 msgstr "Falló al crear el archivo temporal «%s»: %s"
 
-#: ../libbalsa/mailbox_mbox.c:408
+#: ../libbalsa/mailbox_mbox.c:406
 #, c-format
 msgid "Failed to save cache file “%s”: %s. New version saved as “%s”"
 msgstr ""
@@ -2155,28 +2166,28 @@ msgstr ""
 
 # src/balsa-message.c:301
 # src/balsa-message.c:331
-#: ../libbalsa/mailbox_mbox.c:416
+#: ../libbalsa/mailbox_mbox.c:414
 #, c-format
 msgid "Could not unlink file %s: %s"
 msgstr "No se pudo desenlazar el archivo %s: %s"
 
 # libbalsa/mailbox.c:262
 # libbalsa/mailbox.c:275
-#: ../libbalsa/mailbox_mbox.c:667
+#: ../libbalsa/mailbox_mbox.c:664
 #, c-format
 msgid "Cannot open mailbox."
 msgstr "No se puede abrir el buzón."
 
 # src/pref-manager.c:1087
 # src/pref-manager.c:1218
-#: ../libbalsa/mailbox_mbox.c:679
+#: ../libbalsa/mailbox_mbox.c:676
 #, c-format
 msgid "Mailbox is not in mbox format."
 msgstr "El buzón no está en formato mbox."
 
 # libbalsa/mailbox.c:262
 # libbalsa/mailbox.c:275
-#: ../libbalsa/mailbox_mbox.c:687
+#: ../libbalsa/mailbox_mbox.c:684
 #, c-format
 msgid "Cannot lock mailbox."
 msgstr "No se puede bloquear el buzón."
@@ -2225,14 +2236,14 @@ msgstr "No se pudo crear una estructura MH en %s (%s)"
 
 # libmutt/mx.c:1375
 # libmutt/mx.c:1375
-#: ../libbalsa/mailbox_mh.c:1072
+#: ../libbalsa/mailbox_mh.c:1071
 #, c-format
 msgid "Cannot create message"
 msgstr "No se puede crear el mensaje"
 
 # src/main-window.c:421
 # src/main-window.c:428
-#: ../libbalsa/mailbox_mh.c:1116
+#: ../libbalsa/mailbox_mh.c:1114
 #, c-format
 msgid "Message rename error"
 msgstr "Error al renombrar el mensaje"
@@ -2345,123 +2356,123 @@ msgstr "Error POP3: %s"
 msgid "Finished"
 msgstr "Terminado"
 
-#: ../libbalsa/message.c:679
+#: ../libbalsa/message.c:687
 #, c-format
 msgid "Mailbox (%s) is read-only: cannot change flags."
 msgstr "El buzón (%s) es de sólo lectura. No se pueden cambiar las marcas."
 
-#: ../libbalsa/misc.c:382
+#: ../libbalsa/misc.c:384
 msgid "West European"
 msgstr "Europeo occidental"
 
-#: ../libbalsa/misc.c:384 ../libbalsa/misc.c:418
+#: ../libbalsa/misc.c:386 ../libbalsa/misc.c:420
 msgid "East European"
 msgstr "Europeo oriental"
 
-#: ../libbalsa/misc.c:386
+#: ../libbalsa/misc.c:388
 msgid "South European"
 msgstr "Europeo del sur"
 
-#: ../libbalsa/misc.c:388
+#: ../libbalsa/misc.c:390
 msgid "North European"
 msgstr "Europeo del norte"
 
-#: ../libbalsa/misc.c:390 ../libbalsa/misc.c:420
+#: ../libbalsa/misc.c:392 ../libbalsa/misc.c:422
 msgid "Cyrillic"
 msgstr "Cirílico"
 
-#: ../libbalsa/misc.c:392 ../libbalsa/misc.c:426
+#: ../libbalsa/misc.c:394 ../libbalsa/misc.c:428
 msgid "Arabic"
 msgstr "Árabe"
 
-#: ../libbalsa/misc.c:394 ../libbalsa/misc.c:422
+#: ../libbalsa/misc.c:396 ../libbalsa/misc.c:424
 msgid "Greek"
 msgstr "Griego"
 
-#: ../libbalsa/misc.c:396 ../libbalsa/misc.c:424
+#: ../libbalsa/misc.c:398 ../libbalsa/misc.c:426
 msgid "Hebrew"
 msgstr "Hebreo"
 
 # libinit_balsa/balsa-druid-page-directory.gob:60
 # libinit_balsa/balsa-druid-page-directory.gob:60
-#: ../libbalsa/misc.c:398
+#: ../libbalsa/misc.c:400
 msgid "Turkish"
 msgstr "Turco"
 
-#: ../libbalsa/misc.c:400
+#: ../libbalsa/misc.c:402
 msgid "Nordic"
 msgstr "Nórdico"
 
-#: ../libbalsa/misc.c:402
+#: ../libbalsa/misc.c:404
 msgid "Thai"
 msgstr "Tailandés"
 
-#: ../libbalsa/misc.c:404 ../libbalsa/misc.c:428
+#: ../libbalsa/misc.c:406 ../libbalsa/misc.c:430
 msgid "Baltic"
 msgstr "Báltico"
 
-#: ../libbalsa/misc.c:406
+#: ../libbalsa/misc.c:408
 msgid "Celtic"
 msgstr "Celta"
 
-#: ../libbalsa/misc.c:408
+#: ../libbalsa/misc.c:410
 msgid "West European (euro)"
 msgstr "Europeo occidental (euro)"
 
-#: ../libbalsa/misc.c:410
+#: ../libbalsa/misc.c:412
 msgid "Russian"
 msgstr "Ruso"
 
-#: ../libbalsa/misc.c:412
+#: ../libbalsa/misc.c:414
 msgid "Ukrainian"
 msgstr "Ucraniano"
 
-#: ../libbalsa/misc.c:414
+#: ../libbalsa/misc.c:416
 msgid "Japanese"
 msgstr "Japonés"
 
-#: ../libbalsa/misc.c:416
+#: ../libbalsa/misc.c:418
 msgid "Korean"
 msgstr "Coreano"
 
 # libmutt/mbox.c:1028
-#: ../libbalsa/misc.c:609
+#: ../libbalsa/misc.c:611
 #, c-format
 msgid "Cannot open %s: %s"
 msgstr "No se pudo abrir %s: %s"
 
-#: ../libbalsa/misc.c:618
+#: ../libbalsa/misc.c:620
 #, c-format
 msgid "Cannot open %s: is a symbolic link"
 msgstr "No se puede abrir %s: es un enlace simbólico"
 
 # libmutt/mx.c:189
 # libmutt/mx.c:189
-#: ../libbalsa/misc.c:745
+#: ../libbalsa/misc.c:747
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "¡Expiró el tiempo para hacer el bloqueo fcntl!"
 
 # libmutt/mx.c:195
 # libmutt/mx.c:195
-#: ../libbalsa/misc.c:752
+#: ../libbalsa/misc.c:754
 #, c-format
 msgid "Waiting for fcntl lock… %d"
 msgstr "Esperando el bloqueo fcntl… %d"
 
 # libmutt/mx.c:223
 # libmutt/mx.c:223
-#: ../libbalsa/misc.c:780
+#: ../libbalsa/misc.c:782
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "¡Expiró el tiempo de espera cuando se intentaba el bloqueo flock!"
 
 # libmutt/mx.c:230
 # libmutt/mx.c:230
-#: ../libbalsa/misc.c:787
+#: ../libbalsa/misc.c:789
 #, c-format
 msgid "Waiting for flock attempt… %d"
 msgstr "Esperando para intentar el bloqueo flock… %d"
 
-#: ../libbalsa/misc.c:1092
+#: ../libbalsa/misc.c:1094
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Directorio LDAP para %s"
@@ -3017,19 +3028,19 @@ msgstr[1] "Enviados %u mensajes a %s"
 
 # libmutt/mx.c:1375
 # libmutt/mx.c:1375
-#: ../libbalsa/send.c:1320 ../libbalsa/send.c:1387
+#: ../libbalsa/send.c:1303 ../libbalsa/send.c:1371
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "No se puede leer %s: %s"
 
 # libmutt/mx.c:1375
 # libmutt/mx.c:1375
-#: ../libbalsa/send.c:1323 ../libbalsa/send.c:1390
+#: ../libbalsa/send.c:1306 ../libbalsa/send.c:1374
 #, c-format
 msgid "Cannot read %s"
 msgstr "No se puede leer %s"
 
-#: ../libbalsa/send.c:1354
+#: ../libbalsa/send.c:1338
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -3037,7 +3048,7 @@ msgstr ""
 "No puedo determinar el conjunto de caracteres para el archivo de texto «%s»; "
 "enviando como tipo MIME «%s»"
 
-#: ../libbalsa/send.c:1877 ../libbalsa/send.c:1975
+#: ../libbalsa/send.c:1868 ../libbalsa/send.c:1966
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Este mensaje no se cifrará para el Cco: destinatario."
@@ -3569,70 +3580,70 @@ msgstr ""
 "• o su administrador de red en su lugar de trabajo/estudio/similar quizá "
 "haya configurado su equipo para conectarse a la red."
 
-#: ../libnetclient/net-client.c:103 ../libnetclient/net-client.c:144
+#: ../libnetclient/net-client.c:104 ../libnetclient/net-client.c:145
 #, c-format
 msgid "network client is already connected"
 msgstr "el cliente de red ya está conectado"
 
-#: ../libnetclient/net-client.c:254 ../libnetclient/net-client.c:300
+#: ../libnetclient/net-client.c:265 ../libnetclient/net-client.c:311
 #, c-format
 msgid "network client is not connected"
 msgstr "el cliente de red no está conectado"
 
-#: ../libnetclient/net-client.c:265
+#: ../libnetclient/net-client.c:276
 #, c-format
 msgid "reply length %lu exceeds the maximum allowed length %lu"
 msgstr "la longitud %lu de la respuesta supera la el máximo %lu permitido"
 
-#: ../libnetclient/net-client.c:281
+#: ../libnetclient/net-client.c:292
 #, c-format
 msgid "connection lost"
 msgstr "conexión perdida"
 
-#: ../libnetclient/net-client.c:333
+#: ../libnetclient/net-client.c:344
 #, c-format
 msgid "line too long"
 msgstr "línea demasiado larga"
 
 # src/message-window.c:120
 # src/message-window.c:114
-#: ../libnetclient/net-client.c:404
+#: ../libnetclient/net-client.c:415
 #, c-format
 msgid "error initializing certificate: %s"
 msgstr "error al inicializar el certificado: %s"
 
 # src/sendmsg-window.c:1694
 # src/sendmsg-window.c:1749
-#: ../libnetclient/net-client.c:414
+#: ../libnetclient/net-client.c:425
 #, c-format
 msgid "error loading certificate: %s"
 msgstr "error al cargar el certificado: %s"
 
 # src/message-window.c:120
 # src/message-window.c:114
-#: ../libnetclient/net-client.c:422
+#: ../libnetclient/net-client.c:433
 #, c-format
 msgid "error initializing key: %s"
 msgstr "error al inicializar la clave: %s"
 
 # src/sendmsg-window.c:1694
 # src/sendmsg-window.c:1749
-#: ../libnetclient/net-client.c:482
+#: ../libnetclient/net-client.c:493
 #, c-format
 msgid "error loading key: %s"
 msgstr "error al cargar la clave: %s"
 
-#: ../libnetclient/net-client.c:524 ../libnetclient/net-client.c:563
+#: ../libnetclient/net-client.c:535 ../libnetclient/net-client.c:574
 #, c-format
 msgid "not connected"
 msgstr "no conectado"
 
-#: ../libnetclient/net-client.c:526
+#: ../libnetclient/net-client.c:537
 #, c-format
 msgid "connection is already encrypted"
 msgstr "la conexión ya está cifrada"
 
-#: ../libnetclient/net-client.c:565
+#: ../libnetclient/net-client.c:576
 #, c-format
 msgid "connection is already compressed"
 msgstr "la conexión ya está comprimida"
@@ -8547,7 +8558,6 @@ msgstr ""
 # src/pref-manager.c:237 src/pref-manager.c:949 src/pref-manager.c:1027
 # src/pref-manager.c:1838
 #: ../src/toolbar-factory.c:146
-#| msgid "Check cryptographic signature"
 msgid ""
 "Recheck\n"
 "cryptography"
@@ -9106,9 +9116,6 @@ msgid "_View Source…"
 msgstr "_Ver fuente…"
 
 #: ../ui/main-window.ui.h:78 ../ui/message-window.ui.h:30
-#| msgid ""
-#| "_Decrypt and check\n"
-#| "signatures automatically:"
 msgid "Decrypt and check signatures"
 msgstr "Descifrar y comprobar firmas"
 

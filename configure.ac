@@ -8,9 +8,9 @@ dnl ###########################################################################
 dnl Boilerplace and versioning
 dnl ###########################################################################
 
-# if autoconf is used not in a git source tree, use version=2.5.10
+# if autoconf is used not in a git source tree, use version=2.6.0
 AC_INIT([balsa],
-        m4_esyscmd([test -d .git && echo -n `git describe --tags` || echo -n 2.5.10]),
+        m4_esyscmd([test -d .git && echo -n `git describe --tags` || echo -n 2.6.0]),
         [])
 
 AM_INIT_AUTOMAKE

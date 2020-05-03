@@ -1139,7 +1139,8 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
                                  GTK_WIDGET(bm),
                                  GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                  NULL);
-    g_clear_object(&current_event);
+    if (current_event != NULL)
+        gdk_event_free(current_event);
 
     return TRUE;
 }

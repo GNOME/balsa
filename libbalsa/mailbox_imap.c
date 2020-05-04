@@ -57,6 +57,11 @@
 
 #include <glib/gi18n.h>
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "mbox-imap"
+
 #define ENABLE_CLIENT_SIDE_SORT 1
 
 struct _LibBalsaMailboxImap {
@@ -185,9 +190,9 @@ static struct message_info *message_info_from_msgno(
     struct message_info *msg_info;
 
     if (msgno > mimap->messages_info->len) {
-        printf("%s %s msgno %d > messages_info len %d\n", __func__,
-               libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mimap)), msgno,
-               mimap->messages_info->len);
+        g_debug("%s msgno %d > messages_info len %d",
+                libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mimap)), msgno,
+                mimap->messages_info->len);
         msg_info = NULL;
     } else
         msg_info =
@@ -529,7 +534,7 @@ clean_dir(const char *dir_name, off_t cache_size)
         struct file_info *fi = (struct file_info*)(lst->data);
         sz += fi->size;
         if(sz>cache_size) {
-            /* printf("removing %s\n", fi->name); */
+            g_debug("removing %s", fi->name);
             unlink(fi->name);
         }
         g_free(fi->name);
@@ -826,8 +831,8 @@ imap_exists_idle(gpointer data)
                - the only sensible scenario is that the connection was
                severed. Still, we need to recover from this somehow... -
                We invalidate all the cache now. */
-            printf("%s: expunge ignored? Had %u messages and now only %u. "
-                   "Bug in the program or broken connection\n",
+            g_debug("%s: expunge ignored? Had %u messages and now only %u. "
+            		"Bug in the program or broken connection",
                    __func__, mimap->messages_info->len, cnt);
             for(i=0; i<mimap->messages_info->len; i++) {
                 gchar *msgid;
@@ -1099,11 +1104,9 @@ libbalsa_mailbox_imap_open(LibBalsaMailbox * mailbox, GError **err)
     else
 	mimap->search_stamp = libbalsa_mailbox_get_stamp(mailbox);
 
-#ifdef DEBUG
-    g_print(_("%s: Opening %s Refcount: %d\n"),
-	    "LibBalsaMailboxImap", libbalsa_mailbox_get_name(mailbox),
+    g_debug("%s: Opening %s Refcount: %d",
+	    __func__, libbalsa_mailbox_get_name(mailbox),
             libbalsa_mailbox_get_open_ref(mailbox));
-#endif
     return TRUE;
 }
 
@@ -1201,7 +1204,7 @@ get_cache_stream(LibBalsaMailboxImap *mimap, guint uid, gboolean peek)
 	    ferr = ferror(cache);
             fclose(cache);
 	    if(ferr || rc != IMR_OK) {
-		printf("Error fetching RFC822 message, removing cache.\n");
+		g_debug("Error fetching RFC822 message, removing cache.");
 		unlink(path);
 	    }
         }
@@ -1320,7 +1323,7 @@ libbalsa_mailbox_imap_check(LibBalsaMailbox * mailbox)
     if (LIBBALSA_MAILBOX_IMAP(mailbox)->handle)
 	libbalsa_mailbox_imap_noop(LIBBALSA_MAILBOX_IMAP(mailbox));
     else
-	g_warning("mailbox has open_ref>0 but no handle!\n");
+	g_warning("mailbox has open_ref>0 but no handle!");
 }
 
 /* Search iters */
@@ -1540,7 +1543,7 @@ imap_matched(unsigned uid, ImapSearchData* data)
     if(m) 
         g_hash_table_insert(data->res, m, m);
     else
-        printf("Could not find UID: %u in message list\n", uid);
+        g_debug("Could not find UID: %u in message list", uid);
 }
 
 /* Gets the messages matching the conditions via the IMAP search command
@@ -1573,7 +1576,7 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
                 g_hash_table_insert(cbdata->uids,
 				    GUINT_TO_POINTER(imsg->uid), m);
             } else
-                g_warning("Msg %d out of range\n", m->msgno);
+                g_warning("Msg %d out of range", m->msgno);
 	}
 #else	
         g_warning("Search results ignored. Fixme!");
@@ -1590,10 +1593,8 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 	g_hash_table_destroy(cbdata->res);
 	cbdata->res = NULL;
 	*err = TRUE;
-	libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-			     _("IMAP SEARCH command failed for mailbox %s\n"
-			       "falling back to default searching method"),
-                             libbalsa_mailbox_get_url(LIBBALSA_MAILBOX(mbox)));
+	g_debug("IMAP SEARCH command failed for mailbox %s, falling back to default searching method",
+		libbalsa_mailbox_get_url(LIBBALSA_MAILBOX(mbox)));
     }
 
     result = cbdata->res;
@@ -1703,9 +1704,9 @@ libbalsa_mailbox_imap_force_disconnect(LibBalsaMailboxImap* mimap)
 
     if (mimap->handle) {/* we do not attempt to reconnect here */
         const gchar *name = libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mimap));
-        printf("Disconnecting %s (%u)\n", name, (unsigned)time(NULL));
+        g_debug("Disconnecting %s (%u)", name, (unsigned)time(NULL));
         imap_handle_force_disconnect(mimap->handle);
-        printf("Disconnected %s (%u)\n", name, (unsigned)time(NULL));
+        g_debug("Disconnected %s (%u)", name, (unsigned)time(NULL));
     }
 }
 
@@ -1718,13 +1719,13 @@ libbalsa_mailbox_imap_reconnect(LibBalsaMailboxImap* mimap)
         imap_mbox_is_disconnected (mimap->handle)) {
         gboolean readonly;
 
-        printf("Reconnecting %s (%u)\n",
-               libbalsa_server_get_host(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap)),
-               (unsigned)time(NULL));
+        g_debug("Reconnecting %s (%u)",
+                libbalsa_server_get_host(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap)),
+                (unsigned)time(NULL));
         if (imap_mbox_handle_reconnect(mimap->handle, &readonly) == IMAP_SUCCESS) {
-            printf("Reconnected %s (%u)\n",
-                   libbalsa_server_get_host(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap)),
-                   (unsigned)time(NULL));
+        	g_debug("Reconnected %s (%u)",
+                    libbalsa_server_get_host(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap)),
+                    (unsigned)time(NULL));
         }
         libbalsa_mailbox_set_readonly(LIBBALSA_MAILBOX(mimap), readonly);
     }
@@ -1999,7 +2000,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
 
     if(!imsg || !imsg->envelope) {/* Connection severed and and restore
                                    *  failed - deal with it! */
-        fprintf(stderr, "load_envelope failed!\n");
+        g_debug("load_envelope failed!");
         return FALSE;
     }
 
@@ -2338,7 +2339,7 @@ print_structure(LibBalsaMessageBody *part, LibBalsaMessageBody* m, int ind)
     int j,i=1;
     while(part) {
         for(j=0; j<ind; j++) putchar(' ');
-        printf("%d: %s%s\n", i++, t[part->body_type],
+        g_debug("%d: %s%s", i++, t[part->body_type],
                part == m ? " <--" : "");
         if(part->parts)
             print_structure(part->parts, m, ind+2);
@@ -2357,7 +2358,7 @@ get_section_for(LibBalsaMessage *message, LibBalsaMessageBody *part)
 	parent = parent->parts;
 
     if (!is_child_of(parent, part, section, TRUE)) {
-        g_warning("Internal error, part %p not found in message %p.\n",
+        g_warning("Internal error, part %p not found in message %p.",
                   part, message);
         g_string_free(section, TRUE);
 
@@ -2374,9 +2375,8 @@ append_str(unsigned seqno, const char *buf, size_t buflen, void *arg)
     struct part_data *dt = (struct part_data*)arg;
 
     if(dt->pos + buflen > dt->body->octets) {
-        /* 
-        fprintf(stderr, "IMAP server sends too much data but we just "
-                "reallocate the block.\n"); */
+        g_debug("IMAP server sends too much data but we just "
+                "reallocate the block.");
 	dt->body->octets = dt->pos + buflen;
 	dt->block = g_realloc(dt->block, dt->body->octets);
     }
@@ -2455,7 +2455,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * message,
                body structures but still try refetching the
                message. This can be simulated by randomly
                disconnecting from the IMAP server. */
-            fprintf(stderr, "Cannot find data for section %s\n", section);
+            g_debug("Cannot find data for section %s", section);
             g_strfreev(pair);
             return FALSE;
         }
@@ -2487,7 +2487,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * message,
                                        section, FALSE, ifbo, append_str, &dt));
         libbalsa_unlock_mailbox(mailbox);
         if(rc != IMR_OK) {
-            fprintf(stderr, "Error fetching imap message no %lu section %s\n",
+            g_debug("Error fetching imap message no %ld section %s",
                     msgno, section);
             g_set_error(err,
                         LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
@@ -2681,10 +2681,9 @@ libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *mailbox)
 	}
     }
     g_hash_table_destroy(dupes);
-    printf("total elements: %d\n", res->len);
+    g_debug("total elements: %u", res->len);
     for(i=0; i<res->len; i++)
-	printf("%u ", GPOINTER_TO_UINT(g_array_index(res, unsigned, i)));
-    puts("");
+	g_debug("  %u", GPOINTER_TO_UINT(g_array_index(res, unsigned, i)));
     return res;
 }
 
@@ -3465,7 +3464,7 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
 	return NULL;
     }
     if(fread(&i, sizeof(i), 1, f) != 1) {
-	printf("Could not read cache table size.\n");
+	g_debug("Could not read cache table size.");
         fclose(f);
 	return NULL;
     }
@@ -3475,7 +3474,7 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
        fread(&icm->uidnext,     sizeof(uint32_t), 1, f) != 1 ||
        fread(&icm->exists,      sizeof(uint32_t), 1, f) != 1) {
 	imap_cache_manager_free(icm);
-	printf("Couldn't read cache - aborting…\n");
+	g_debug("Couldn't read cache - aborting…");
         fclose(f);
 	return NULL;
     }
@@ -3535,7 +3534,7 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
     exists  = imap_mbox_handle_get_exists(h);
     uidnext = imap_mbox_handle_get_uidnext(h);
     if(icm->uidvalidity != uidvalidity) {
-        printf("Different validities old: %u new: %u - cache invalidated\n",
+    	g_debug("Different validities old: %u new: %u - cache invalidated",
                icm->uidvalidity, uidvalidity);
         return;
     }
@@ -3549,16 +3548,16 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
                                            sizeof(uint32_t), icm->exists);
         ImapSearchKey *k;
         unsigned lo = icm->uidmap->len+1, hi = 0;
-        /* printf("UIDSYNC:Searching range [1:%u]\n", icm->uidmap->len); */
+        g_debug("UIDSYNC:Searching range [1:%u]", icm->uidmap->len);
         for(i=1; i<=icm->uidmap->len; i++)
             if(g_array_index(icm->uidmap, uint32_t, i-1)) {lo=i; break; }
         for(i=icm->uidmap->len; i>=lo; i--)
             if(g_array_index(icm->uidmap, uint32_t, i-1)) {hi=i; break; }
 
         k = imap_search_key_new_range(FALSE, FALSE, lo, hi);
-        /* printf("UIDSYNC: Old vs new: exists: %u %u uidnext: %u %u "
-               "- syncing uid map for msgno [%u:%u].\n",
-               icm->exists, exists, icm->uidnext, uidnext, lo, hi); */
+        g_debug("UIDSYNC: Old vs new: exists: %u %u uidnext: %u %u "
+               "- syncing uid map for msgno [%u:%u].",
+               icm->exists, exists, icm->uidnext, uidnext, lo, hi);
         if(k) {
             uidmap->len = lo-1;
             rc = imap_search_exec(h, TRUE, k, set_uid, uidmap);
@@ -3569,7 +3568,7 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
             return;
         }
         g_array_free(icm->uidmap, TRUE); icm->uidmap = uidmap;
-        /* printf("New uidmap has length: %u\n", icm->uidmap->len); */
+        g_debug("New uidmap has length: %u", icm->uidmap->len);
     }
     /* One way or another, we have a valid uid->seqno map now;
      * The mailbox data can be resynced easily. */

@@ -1064,8 +1064,7 @@ copy_iterator(LibBalsaMessageFlag *flags, GMimeStream **stream, void * arg)
     /* Copy stream */
     *stream = libbalsa_mailbox_get_message_stream(mailbox, msgno, TRUE);
     if(!*stream) {
-	printf("Connection broken for message %u\n",
-	       (unsigned)msgno);
+	g_warning("Connection broken for message %u", msgno);
 	return FALSE;
     }
 
@@ -1308,11 +1307,8 @@ lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
     if (!priv->msgnos_changed)
         return FALSE;
 
-#define DEBUG FALSE
-#if DEBUG
-    g_print("%s %s %d requested\n", __func__, priv->name,
+    g_debug("%s %s %d requested", __func__, priv->name,
             priv->msgnos_changed->len);
-#endif
 
     g_mutex_lock(&msgnos_changed_lock);
     for (i = 0; i < priv->msgnos_changed->len; i++) {
@@ -1322,19 +1318,15 @@ lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
         if (!MAILBOX_OPEN(mailbox))
             break;
 
-#if DEBUG
-        g_print("%s %s msgno %d\n", __func__, priv->name, msgno);
-#endif
+        g_debug("%s %s msgno %d", __func__, priv->name, msgno);
         g_mutex_unlock(&msgnos_changed_lock);
         iter.user_data = NULL;
         lbm_msgno_row_changed(mailbox, msgno, &iter);
         g_mutex_lock(&msgnos_changed_lock);
     }
 
-#if DEBUG
-    g_print("%s %s %d processed\n", __func__, priv->name,
+    g_debug("%s %s %d processed", __func__, priv->name,
             priv->msgnos_changed->len);
-#endif
     priv->msgnos_changed->len = 0;
     g_mutex_unlock(&msgnos_changed_lock);
 
@@ -2054,7 +2046,7 @@ libbalsa_mailbox_get_message(LibBalsaMailbox * mailbox, guint msgno)
     libbalsa_lock_mailbox(mailbox);
 
     if (!MAILBOX_OPEN(mailbox)) {
-        g_message(_("libbalsa_mailbox_get_message: mailbox %s is closed"),
+        g_debug("libbalsa_mailbox_get_message: mailbox %s is closed",
                   priv->name);
         libbalsa_unlock_mailbox(mailbox);
         return NULL;
@@ -3122,10 +3114,8 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     guint i;
 
-#if DEBUG
-    g_print("%s %s %d requested\n", __func__, priv->name,
+    g_debug("%s %s %d requested", __func__, priv->name,
             priv->msgnos_pending->len);
-#endif
     g_mutex_lock(&get_index_entry_lock);
     for (i = 0; i < priv->msgnos_pending->len; i++) {
         guint msgno = g_array_index(priv->msgnos_pending, guint, i);
@@ -3134,9 +3124,7 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
         if (!MAILBOX_OPEN(mailbox))
             break;
 
-#if DEBUG
-        g_print("%s %s msgno %d\n", __func__, priv->name, msgno);
-#endif
+        g_debug("%s %s msgno %d", __func__, priv->name, msgno);
         g_mutex_unlock(&get_index_entry_lock);
         if ((message = libbalsa_mailbox_get_message(mailbox, msgno)))
             /* get-message has cached the message info, so we just unref
@@ -3145,10 +3133,8 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
         g_mutex_lock(&get_index_entry_lock);
     }
 
-#if DEBUG
-    g_print("%s %s %d processed\n", __func__, priv->name,
+    g_debug("%s %s %d processed", __func__, priv->name,
             priv->msgnos_pending->len);
-#endif
     priv->msgnos_pending->len = 0;
     g_mutex_unlock(&get_index_entry_lock);
 
@@ -3986,7 +3972,7 @@ mailbox_set_sort_func(GtkTreeSortable * sortable,
                    GtkTreeIterCompareFunc func,
                    gpointer data, GDestroyNotify destroy)
 {
-    g_warning("%s called but not implemented.\n", __func__);
+    g_warning("%s called but not implemented.", __func__);
 }
 
 static void
@@ -3994,7 +3980,7 @@ mailbox_set_default_sort_func(GtkTreeSortable * sortable,
                            GtkTreeIterCompareFunc func,
                            gpointer data, GDestroyNotify destroy)
 {
-    g_warning("%s called but not implemented.\n", __func__);
+    g_warning("%s called but not implemented.", __func__);
 }
 
 /* called from gtk-tree-view-column */

@@ -36,6 +36,11 @@
 #include <glib/gi18n.h>
 #include "rfc6350.h"
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "address-book"
+
 
 /* for the time being, osmo svn rev. 1099 accepts only reading via DBus, not writing new or modified records */
 #undef OSMO_CAN_WRITE
@@ -232,7 +237,7 @@ libbalsa_address_book_osmo_alias_complete(LibBalsaAddressBook *ab,
 	g_debug("%s: filter for %s", __func__, prefix);
 	addresses = osmo_read_addresses(ab_osmo, prefix, &error);
 	if (error != NULL) {
-		g_warning("%s: cannot read contacts from Osmo: %s", __func__, error->message);
+		libbalsa_address_book_set_status(ab, error->message);
 		g_error_free(error);
 	} else {
 		GList *p;

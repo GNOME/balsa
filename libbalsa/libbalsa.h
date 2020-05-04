@@ -136,8 +136,6 @@ void libbalsa_certs_destroy(void);
 
 GThread *libbalsa_get_main_thread(void);
 gboolean libbalsa_am_i_subthread(void);
-void libbalsa_message(const char *fmt, ...)
-	G_GNUC_PRINTF(1, 2);
 
 typedef enum {
     LIBBALSA_PROGRESS_NO = 0,

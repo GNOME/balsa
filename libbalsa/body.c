@@ -566,7 +566,7 @@ libbalsa_message_body_get_message_part_stream(LibBalsaMessageBody * body,
     bytes_written =
         g_mime_object_write_to_stream(GMIME_OBJECT(msg), NULL, stream);
     libbalsa_mailbox_unlock_store(mailbox);
-    printf("Written %ld bytes of embedded message\n",
+    g_debug("Written %ld bytes of embedded message",
            (long) bytes_written);
 
     if (bytes_written < 0) {

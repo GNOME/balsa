@@ -147,7 +147,7 @@ mailboxes_init(gboolean check_only)
 {
     check_special_mailboxes();
     if (!balsa_app.inbox && !check_only) {
-	g_warning("*** error loading mailboxes\n");
+	g_warning("*** error loading mailboxes");
 	balsa_init_begin();
         config_defclient_save();
 	return;
@@ -169,7 +169,7 @@ initial_open_unread_mailboxes()
         for (l = gl; l; l = l->next) {
             LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(l->data);
 
-            printf("opening %s..\n", libbalsa_mailbox_get_name(mailbox));
+            g_debug("opening %s..", libbalsa_mailbox_get_name(mailbox));
             balsa_mblist_open_mailbox(mailbox);
         }
         g_list_free(gl);
@@ -184,7 +184,7 @@ initial_open_inbox()
     if (!balsa_app.inbox)
 	return FALSE;
 
-    printf("opening %s..\n", libbalsa_mailbox_get_name(balsa_app.inbox));
+    g_debug("opening %s..", libbalsa_mailbox_get_name(balsa_app.inbox));
     balsa_mblist_open_mailbox_hidden(balsa_app.inbox);
 
     return FALSE;
@@ -306,7 +306,7 @@ scan_mailboxes_idle_cb()
     if (cmd_get_stats) {
         long unread, unsent;
         balsa_get_stats(&unread, &unsent);
-        printf("Unread: %ld Unsent: %ld\n", unread, unsent);
+        g_debug("Unread: %ld Unsent: %ld", unread, unsent);
     }
 
     return FALSE;
@@ -339,8 +339,8 @@ periodic_expunge_cb(void)
     if (!balsa_app.expunge_auto)
         return TRUE;
 
-    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                         _("Compressing mail folders…"));
+    balsa_information(LIBBALSA_INFORMATION_DEBUG,
+    	_("Compressing mail folders…"));
     gtk_tree_model_foreach(GTK_TREE_MODEL(balsa_app.mblist_tree_store),
 			   (GtkTreeModelForeachFunc)mbnode_expunge_func,
 			   &list);
@@ -719,7 +719,7 @@ balsa_handle_local_options_cb(GApplication *application,
                               gpointer      user_data)
 {
     if (g_variant_dict_contains(options, "version")) {
-        g_print("Balsa email client %s\n", BALSA_VERSION);
+        g_message("Balsa email client %s", BALSA_VERSION);
 
         return 0;
     }
@@ -748,7 +748,7 @@ balsa_command_line_cb(GApplication            * application,
         balsa_app.outbox =
             libbalsa_mailbox_new_from_config("mailbox-Outbox", FALSE);
         balsa_get_stats(&unread, &unsent);
-        printf("Unread: %ld Unsent: %ld\n", unread, unsent);
+        g_debug("Unread: %ld Unsent: %ld", unread, unsent);
         g_object_unref(balsa_app.outbox);
         g_object_unref(balsa_app.inbox);
     } else {

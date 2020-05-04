@@ -315,7 +315,7 @@ async_process_real(ImapMboxHandle *h)
 		if (h->idle_state == IDLE_RESPONSE_PENDING) {
 			int c;
 			if(rc != IMR_RESPOND) {
-				g_message("%s: expected IMR_RESPOND but got %d", __func__, rc);
+				g_debug("%s: expected IMR_RESPOND but got %d", __func__, rc);
 				imap_handle_disconnect(h);
 				return G_SOURCE_REMOVE;
 			}
@@ -694,7 +694,7 @@ imap_mbox_connect(ImapMboxHandle* handle)
 
   handle->state = IMHS_CONNECTED;
   if ( (resp=imap_cmd_step(handle, 0)) != IMR_UNTAGGED) {
-    g_message("imap_mbox_connect:unexpected initial response(%d): %s",
+    g_debug("imap_mbox_connect:unexpected initial response(%d): %s",
 	      resp, handle->last_msg);
     imap_handle_disconnect(handle);
     return IMAP_PROTOCOL_ERROR;
@@ -1835,20 +1835,16 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
        executing. We store the response in the hash table so that we
        can provide a proper response when somebody asks. */
   ci = cmdi_find_by_no(handle->cmd_info, cmdno);
-#ifdef DEBUG
   if(lastcmd != cmdno)
     g_debug("Looking for %x and encountered response to %x (%p)",
            lastcmd, cmdno, ci);
-#endif
   if(ci) {
     if(ci->complete_cb && !ci->complete_cb(handle, ci->cb_data)) {
       ci->rc = rc;
       ci->completed = 1;
       g_debug("Cmd %x marked as completed with rc=%d", cmdno, rc);
     } else {
-#ifdef DEBUG
       g_debug("CmdInfo for cmd %x removed", cmdno);
-#endif
       handle->cmd_info = g_list_remove(handle->cmd_info, ci);
       g_free(ci);
     }
@@ -3844,8 +3840,8 @@ ir_body_section(NetClientSioBuf *sio, unsigned seqno,
   if(i>0 && isalpha(buf[i])) /* we have \[[.0-9]something] */
     body_type = IMAP_BODY_TYPE_HEADER;
 
-  if(c != ']') { puts("] expected"); return IMR_PROTOCOL; }
-  if(sio_getc(sio) != ' ') { puts("space expected"); return IMR_PROTOCOL;}
+  if(c != ']') { g_debug("] expected"); return IMR_PROTOCOL; }
+  if(sio_getc(sio) != ' ') { g_debug("space expected"); return IMR_PROTOCOL;}
   bs = imap_get_binary_string(sio);
   if(bs) {
     if(bs->str && body_cb)

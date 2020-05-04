@@ -182,7 +182,7 @@ bab_set_address_book(LibBalsaAddressBook * ab,
          libbalsa_address_book_load(ab, filter,
                                     (LibBalsaAddressBookLoadFunc)
                                     bab_load_cb, model)) != LBABERR_OK) {
-        printf("error loading address book from %s: %d\n", libbalsa_address_book_get_name(ab),
+        g_warning("error loading address book from %s: %d", libbalsa_address_book_get_name(ab),
                ab_err);
     }
 
@@ -586,7 +586,7 @@ get_main_menu(GtkApplication * application)
         contacts_app.file_menu =
             G_MENU(gtk_builder_get_object(builder, "file-menu"));
     } else {
-        g_print("%s error: %s\n", __func__, err->message);
+        g_critical("%s error: %s", __func__, err->message);
         g_error_free(err);
     }
     g_object_unref(builder);
@@ -658,7 +658,7 @@ list_row_activated_cb(GtkTreeView *tree, gpointer data)
     address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
     if (address) {
         ab_set_edit_widget(address, TRUE);
-	printf("Switch page..\n");
+	g_debug("Switch page");
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(contacts_app.notebook), 1);
     } else
         ab_clear_edit_widget();
@@ -694,9 +694,9 @@ addrlist_drag_get_cb(GtkWidget* widget, GdkDragContext* drag_context,
                                sizeof(LibBalsaAddress*));
         break;
     case LIBBALSA_ADDRESS_TRG_STRING:
-        g_print("Text/plain cannot be sent.\n");
+        g_warning("Text/plain cannot be sent.");
         break;
-    default: g_print("Do not know what to do!\n");
+    default: g_debug("Do not know what to do!");
     }
 }
 
@@ -1103,11 +1103,14 @@ main(int argc, char *argv[])
     LibBalsaAddressBook *ab;
     GtkWidget *ab_window;
     GList *l;
+    GError *error = NULL;
 
     application =
         gtk_application_new("org.desktop.BalsaAb", G_APPLICATION_FLAGS_NONE);
-    if (!g_application_register(G_APPLICATION(application), NULL, NULL))
-        g_message("Could not register address book editor");
+    if (!g_application_register(G_APPLICATION(application), NULL, &error)) {
+        g_warning("Could not register address book editor: %s", error->message);
+        g_error_free(error);
+    }
     if (g_application_get_is_remote(G_APPLICATION(application))) {
         g_object_unref(application);
         return 1;

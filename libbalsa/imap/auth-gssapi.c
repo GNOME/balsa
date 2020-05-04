@@ -159,7 +159,6 @@ imap_auth_gssapi(ImapMboxHandle* handle)
 	g_strfreev(auth_data);
 
     if (error != NULL) {
-    	g_message("%s: %s", __func__, error->message);
     	imap_mbox_handle_set_msg(handle, _("GSSAPI authentication failed: %s"), error->message);
     	g_error_free(error);
     }

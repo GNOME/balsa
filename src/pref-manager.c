@@ -106,7 +106,6 @@ typedef struct _PropertyUI {
     GtkWidget *pgdownmod;
     GtkWidget *pgdown_percent;
     GtkWidget *view_allheaders;
-    GtkWidget *debug;           /* enable/disable debugging */
     GtkWidget *empty_trash;
     GtkWidget *recv_progress_dlg;
     GtkWidget *send_progress_dlg;
@@ -304,7 +303,7 @@ pm_selection_changed(GtkTreeSelection * selection, gpointer user_data)
         gtk_stack_set_visible_child(stack, child);
         g_object_unref(child);
     } else {
-        g_print("%s no child\n", G_STRLOC);
+        g_warning("%s no child", G_STRLOC);
     }
 }
 
@@ -414,8 +413,6 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.recv_progress_dialog = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->recv_progress_dlg));
     balsa_app.send_progress_dialog = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->send_progress_dlg));
 
-    balsa_app.debug =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->debug));
     balsa_app.previewpane =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->previewpane));
 
@@ -696,8 +693,6 @@ set_prefs(void)
     gtk_widget_set_sensitive(pui->pgdown_percent,
                              gtk_toggle_button_get_active
                              (GTK_TOGGLE_BUTTON(pui->pgdownmod)));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->debug),
-                                 balsa_app.debug);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->mblist_show_mb_content_info),
@@ -2892,8 +2887,6 @@ pm_grid_add_misc_group(GtkWidget * grid_widget)
 
     pm_grid_attach(grid, pm_group_label(_("Miscellaneous")), 0, row, 3, 1);
 
-    pui->debug =
-        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Debug"));
     pui->empty_trash =
         pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Empty trash on exit"));
 
@@ -3372,8 +3365,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                      G_CALLBACK(pgdown_modified_cb), property_box);
     g_signal_connect(pui->pgdown_percent, "changed",
                      G_CALLBACK(pgdown_modified_cb), property_box);
-    g_signal_connect(pui->debug, "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
 
     g_signal_connect(pui->mblist_show_mb_content_info, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);

@@ -1129,7 +1129,7 @@ bmbl_open_mailbox(LibBalsaMailbox * mailbox, gboolean set_current)
 
     mbnode = balsa_find_mailbox(mailbox);
     if (mbnode == NULL) {
-        g_warning(_("Failed to find mailbox"));
+        g_warning("Failed to find mailbox");
         return;
     }
 
@@ -1178,7 +1178,7 @@ balsa_mblist_close_mailbox(LibBalsaMailbox * mailbox)
 
     mbnode = balsa_find_mailbox(mailbox);
     if (!mbnode)  {
-        g_warning(_("Failed to find mailbox"));
+        g_warning("Failed to find mailbox");
         return;
     }
 

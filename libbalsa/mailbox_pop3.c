@@ -37,6 +37,11 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "mbox-pop3"
+
 enum {
     LAST_SIGNAL
 };
@@ -136,7 +141,7 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox, GError **err)
 {
     /* FIXME: it should never be called. */
 
-    g_print("Opened a POP3 mailbox!\n");
+    g_debug("Opened a POP3 mailbox!");
 
     return TRUE;
 }

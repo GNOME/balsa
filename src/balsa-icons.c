@@ -28,18 +28,11 @@
 #include "mailbox.h"
 #include "address-view.h"
 
-/* comment out the next line to suppress info about loading images */
-#if 0
-#define BICONS_VERBOSE
-#endif
 
-#ifdef BICONS_VERBOSE
-#  define BICONS_LOG(...)   g_message(__VA_ARGS__)
-#  define BICONS_ERR(...)   g_warning(__VA_ARGS__)
-#else
-#  define BICONS_LOG(...)
-#  define BICONS_ERR(...)
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
 #endif
+#define G_LOG_DOMAIN "icons"
 
 
 #define BALSA_PIXMAP_SIZES     2
@@ -69,7 +62,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, const balsa_pixmap_t *bpixmap)
         { "folder-drag-accept", "document-open"},
 	{ NULL, NULL } };
 
-    BICONS_LOG("loading icon %s (stock id %s)", bpixmap->name,
+    g_debug("loading icon %s (stock id %s)", bpixmap->name,
 	       bpixmap->stock_id);
 
     /* check if the icon theme knows the icon and try to fall back to an
@@ -79,22 +72,22 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, const balsa_pixmap_t *bpixmap)
 	while (fb->def_id && g_strcmp0(fb->def_id, bpixmap->stock_id) != 0)
 	    fb++;
 	if (!fb->def_id) {
-	    BICONS_LOG("No GTK or custom icon for %s\n", bpixmap);
+		g_debug("No GTK or custom icon for %s", bpixmap->stock_id);
 	    return;
 	}
 	if (fb->def_id) {
 	    use_id = fb->fb_id;
-            BICONS_LOG("\t(%s not found, fall back to %s)",
+	    g_debug("\t(%s not found, fall back to %s)",
                        bpixmap->stock_id, use_id);
         } else {
-	    BICONS_ERR("icon %s unknown, no fallback", bpixmap->stock_id);
+	    g_debug("icon %s unknown, no fallback", bpixmap->stock_id);
 	    use_id = "image-missing";
 	}
     } else {
 	use_id = bpixmap->stock_id;
     }
 
-    BICONS_LOG("\tuse_id %s", use_id);
+    g_debug("\tuse_id %s", use_id);
     g_hash_table_insert(balsa_icon_table, g_strdup(bpixmap->name),
                         g_strdup(use_id));
 }
@@ -233,7 +226,7 @@ balsa_register_pixbufs(GtkWidget * widget)
             gtk_icon_theme_load_icon(icon_theme, use_id, width,
                                      GTK_ICON_LOOKUP_USE_BUILTIN, &err);
         if (err) {
-            g_print("%s %s size %d err %s\n", __func__, use_id,
+            g_warning("%s %s size %d err %s", __func__, use_id,
                     width, err->message);
             g_clear_error(&err);
         } else {

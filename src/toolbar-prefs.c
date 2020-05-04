@@ -36,12 +36,6 @@
 #  include "macosx-helpers.h"
 #endif
 
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-/* Uncomment the next line to check for invalid action names */
-/* #define BALSA_TOOLBAR_DEBUG_ACTIONS */
 
 /* Enumeration for GtkTreeModel columns. */
 enum {
@@ -94,11 +88,7 @@ static GtkWidget *create_toolbar_page(BalsaToolbarModel * model,
 static GtkWidget *tp_list_new(void);
 static gboolean tp_list_iter_is_first(GtkWidget * list, GtkTreeIter * iter);
 static gboolean tp_list_iter_is_last(GtkWidget * list, GtkTreeIter * iter);
-#ifndef BALSA_TOOLBAR_DEBUG_ACTIONS
 static void tp_page_refresh_available(ToolbarPage * page);
-#else /* BALSA_TOOLBAR_DEBUG_ACTIONS */
-static void tp_page_refresh_available(ToolbarPage * page, GActionMap * map);
-#endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */
 static void tp_page_refresh_current(ToolbarPage * page);
 static void tp_page_refresh_preview(ToolbarPage * page);
 static void tp_page_swap_rows(ToolbarPage * page, gboolean forward);
@@ -106,7 +96,6 @@ static void tp_page_add_selected(ToolbarPage * page);
 static void tp_page_remove_selected(ToolbarPage * page);
 static void tp_store_set(GtkListStore * store, GtkTreeIter * iter,
                          gint item);
-static void replace_nl_with_space(char* str);
 
 /* Public methods. */
 
@@ -162,9 +151,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     model = balsa_window_get_toolbar_model();
     group = g_simple_action_group_new();
     balsa_window_add_action_entries(G_ACTION_MAP(group));
-#ifdef BALSA_TOOLBAR_DEBUG_ACTIONS
-    g_print("main window\n");
-#endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */
+    g_debug("%s: main window", __func__);
     child = create_toolbar_page(model, G_ACTION_MAP(group));
     g_object_unref(group);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
@@ -173,9 +160,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     model = sendmsg_window_get_toolbar_model();
     group = g_simple_action_group_new();
     sendmsg_window_add_action_entries(G_ACTION_MAP(group));
-#ifdef BALSA_TOOLBAR_DEBUG_ACTIONS
-    g_print("compose window\n");
-#endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */
+    g_debug("%s: compose window", __func__);
     child = create_toolbar_page(model, G_ACTION_MAP(group));
     g_object_unref(group);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
@@ -184,9 +169,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     model = message_window_get_toolbar_model();
     group = g_simple_action_group_new();
     message_window_add_action_entries(G_ACTION_MAP(group));
-#ifdef BALSA_TOOLBAR_DEBUG_ACTIONS
-    g_print("message window\n");
-#endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */
+    g_debug("%s: message window", __func__);
     child = create_toolbar_page(model, G_ACTION_MAP(group));
     g_object_unref(group);
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
@@ -292,11 +275,7 @@ standard_button_cb(GtkWidget *widget, ToolbarPage * page)
 {
     balsa_toolbar_model_clear(page->model);
     gtk_widget_set_sensitive(page->standard_button, FALSE);
-#ifndef BALSA_TOOLBAR_DEBUG_ACTIONS
     tp_page_refresh_available(page);
-#else /* BALSA_TOOLBAR_DEBUG_ACTIONS */
-    tp_page_refresh_available(page, NULL);
-#endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */
     tp_page_refresh_current(page);
     balsa_toolbar_model_changed(page->model);
 }
@@ -575,11 +554,7 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     gtk_widget_set_sensitive(page->standard_button,
                              !balsa_toolbar_model_is_standard(model));
 
-#ifndef BALSA_TOOLBAR_DEBUG_ACTIONS
     tp_page_refresh_available(page);
-#else /* BALSA_TOOLBAR_DEBUG_ACTIONS */
-    tp_page_refresh_available(page, map);
-#endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */
     tp_page_refresh_current(page);
 
     return outer_box;
@@ -600,11 +575,7 @@ tp_find_icon(GArray * array, const gchar * icon)
 }
 
 static void
-#ifndef BALSA_TOOLBAR_DEBUG_ACTIONS
 tp_page_refresh_available(ToolbarPage * page)
-#else /* BALSA_TOOLBAR_DEBUG_ACTIONS */
-tp_page_refresh_available(ToolbarPage * page, GActionMap * map)
-#endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */
 {
     GtkTreeSelection *selection =
         gtk_tree_view_get_selection(GTK_TREE_VIEW(page->available));
@@ -625,17 +596,6 @@ tp_page_refresh_available(ToolbarPage * page, GActionMap * map)
     gtk_list_store_clear(GTK_LIST_STORE(model));
 
     for (item = 0; item < toolbar_button_count; item++) {
-#ifdef BALSA_TOOLBAR_DEBUG_ACTIONS
-        if (map) {
-            if (item > 0) {
-                gchar *action;
-
-                action = g_hash_table_lookup(legal, toolbar_buttons[item].pixmap_id);
-                if (action && !g_action_map_lookup_action(map, action))
-                    g_print("undefined action: “%s”\n", action);
-            }
-        }
-#endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */
         if (item > 0
             && (!g_hash_table_lookup(legal,
                                      toolbar_buttons[item].pixmap_id)
@@ -838,7 +798,7 @@ tp_store_set(GtkListStore * store, GtkTreeIter * iter, gint item)
     gchar *text;
 
     text = g_strdup(balsa_toolbar_button_text(item));
-    replace_nl_with_space(text);
+    g_strdelimit(text, "\n", ' ');
 
     if (item > 0) {
         const gchar *icon_id;
@@ -895,11 +855,7 @@ tp_page_add_selected(ToolbarPage * page)
 
     gtk_widget_set_sensitive(page->standard_button, TRUE);
     tp_page_refresh_preview(page);
-#ifndef BALSA_TOOLBAR_DEBUG_ACTIONS
     tp_page_refresh_available(page);
-#else /* BALSA_TOOLBAR_DEBUG_ACTIONS */
-    tp_page_refresh_available(page, NULL);
-#endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */
     balsa_toolbar_model_changed(page->model);
 }
 
@@ -930,22 +886,6 @@ tp_page_remove_selected(ToolbarPage * page)
 
     gtk_widget_set_sensitive(page->standard_button, TRUE);
     tp_page_refresh_preview(page);
-#ifndef BALSA_TOOLBAR_DEBUG_ACTIONS
     tp_page_refresh_available(page);
-#else /* BALSA_TOOLBAR_DEBUG_ACTIONS */
-    tp_page_refresh_available(page, NULL);
-#endif /* BALSA_TOOLBAR_DEBUG_ACTIONS */
     balsa_toolbar_model_changed(page->model);
-}
-
-/* Unwrap text.
- */
-static void
-replace_nl_with_space(char* str)
-{
-    while(*str) {
-	if(*str == '\n')
-	    *str=' ';
-	str++;
-    }
 }

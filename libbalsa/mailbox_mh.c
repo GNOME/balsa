@@ -40,6 +40,11 @@
 #include "mime-stream-shared.h"
 #include <glib/gi18n.h>
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "mbox-mh"
+
 struct message_info {
     LibBalsaMailboxLocalMessageInfo local_info;
     LibBalsaMessageFlag orig_flags;     /* Has only real flags */
@@ -158,7 +163,7 @@ lbm_mh_check_files(const gchar * path, gboolean create)
         if (mkdir(path, S_IRWXU)) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Could not create MH directory at %s (%s)"),
-                                 path, strerror(errno));
+                                 path, g_strerror(errno));
             return -1;
         }
 
@@ -170,7 +175,7 @@ lbm_mh_check_files(const gchar * path, gboolean create)
             libbalsa_information
                 (LIBBALSA_INFORMATION_WARNING,
                  _("Could not create MH structure at %s (%s)"),
-                 path, strerror(errno));
+                 path, g_strerror(errno));
             rmdir(path);
             return -1;
         } else
@@ -264,14 +269,14 @@ lbm_mh_remove_files(LibBalsaMailboxLocal *mailbox)
 
     if (!libbalsa_delete_directory_contents(path)) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("Could not remove contents of %s:\n%s"),
-			     path, strerror(errno));
+			     _("Could not remove contents of %s: %s"),
+			     path, g_strerror(errno));
 	return;
     }
     if ( rmdir(path) == -1 ) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("Could not remove %s:\n%s"),
-			     path, strerror(errno));
+			     _("Could not remove %s: %s"),
+			     path, g_strerror(errno));
     }
     LIBBALSA_MAILBOX_LOCAL_CLASS(libbalsa_mailbox_mh_parent_class)->remove_files(mailbox);
 }
@@ -377,7 +382,7 @@ lbm_mh_set_flag(LibBalsaMailboxMh * mh, guint fileno, LibBalsaMessageFlag flag)
     msg_info = g_hash_table_lookup(mh->messages_info, GINT_TO_POINTER(fileno));
 
     if (!msg_info) {
-	g_print("MH sequence info for nonexistent message %d\n", fileno);
+	g_debug("MH sequence info for nonexistent message %d", fileno);
 	return;
     }
 
@@ -515,10 +520,8 @@ libbalsa_mailbox_mh_open(LibBalsaMailbox * mailbox, GError **err)
     libbalsa_mailbox_clear_unread_messages(mailbox);
     lbm_mh_parse_both(mh);
 
-#ifdef DEBUG
-    g_print(_("%s: Opening %s Refcount: %d\n"),
-	    "LibBalsaMailboxMh", mailbox->name, mailbox->open_ref);
-#endif
+    g_debug("%s: Opening %s Refcount: %u",
+	    __func__, libbalsa_mailbox_get_name(mailbox), libbalsa_mailbox_get_open_ref(mailbox));
     return TRUE;
 }
 
@@ -884,9 +887,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	g_object_unref(recent.line);
         if (sequences_fd >= 0)
             libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
-#ifdef DEBUG
-        g_print("MH sync “%s”: cannot open temp file.\n", path);
-#endif
+        g_warning("MH sync “%s”: cannot open temp file.", path);
 	return retval;
     }
     temp_stream = g_mime_stream_fs_new(fd);
@@ -932,9 +933,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	g_object_unref(recent.line);
         if (sequences_fd >= 0)
             libbalsa_unlock_file(sequences_filename, sequences_fd, 1);
-#ifdef DEBUG
-        g_print("MH sync “%s”: error finishing sequences line.\n", path);
-#endif
+        g_warning("MH sync “%s”: error finishing sequences line.", path);
 	return retval;
     }
 
@@ -946,10 +945,8 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
     /* rename tempfile to '.mh_sequences' */
     retval = (libbalsa_safe_rename(name_used, sequences_filename) != -1);
-#ifdef DEBUG
     if (!retval)
-        g_print("MH sync “%s”: error renaming sequences file.\n", path);
-#endif
+        g_warning("MH sync “%s”: error renaming sequences file.", path);
     if (!retval)
 	unlink (name_used);
 

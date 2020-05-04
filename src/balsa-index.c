@@ -1957,7 +1957,7 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
     guint i;
     gboolean readonly;
 
-    BALSA_DEBUG();
+    g_debug("%s:%s", __FILE__, __func__);
 
     mailbox = balsa_mailbox_node_get_mailbox(index->mailbox_node);
     for (i = 0; i < selected->len; i++) {
@@ -2356,10 +2356,10 @@ pipe_in_watch(GIOChannel *channel, GIOCondition condition, gpointer data)
 
     if ((condition & (G_IO_HUP | G_IO_ERR)) != 0) {
         if ((condition & G_IO_HUP) != 0) {
-            fprintf(stderr, "pipe_in_watch: broken pipe. Aborts writing.\n");
+            g_warning("%s: broken pipe. Aborts writing.", __func__);
         }
         if ((condition & G_IO_ERR) != 0) {
-            fprintf(stderr, "pipe_in_watch encountered error. Aborts writing.\n");
+        	g_warning("%s: encountered error. Aborts writing.", __func__);
         }
 	pipe_data_destroy(pipe);
         return FALSE;
@@ -2385,12 +2385,12 @@ pipe_in_watch(GIOChannel *channel, GIOCondition condition, gpointer data)
 	    pipe->chars_written += chars_written;
 	    break;
 	case G_IO_STATUS_EOF:
-	    printf("pipe_in::write_chars received premature EOF %s\n",
+		g_warning("%s::write_chars received premature EOF %s", __func__,
 		   error ? error->message : "unknown");
 	    pipe_data_destroy(pipe);
 	    return FALSE;
 	case G_IO_STATUS_AGAIN:
-	    printf("pipe_in::write_chars again?\n");
+	    g_debug("pipe_in::write_chars again?");
 	    break;
 	}
     }
@@ -2421,7 +2421,7 @@ pipe_out_watch(GIOChannel *channel, GIOCondition condition, gpointer data)
 	switch(status) {
 	case G_IO_STATUS_ERROR:
 	    pipe_data_destroy(pipe);
-	    fprintf(stderr, "Reading characters from pipe failed: %s\n",
+	    g_warning("Reading characters from pipe failed: %s",
 		    error ? error->message : "unknown");
 	    g_clear_error(&error);
 	    return FALSE;
@@ -2432,7 +2432,7 @@ pipe_out_watch(GIOChannel *channel, GIOCondition condition, gpointer data)
 	    /* if(fwrite(buf, 1, bytes_read, stdout) != bytes_read); */
 	    break;
 	case G_IO_STATUS_EOF:
-	    printf("pipe_out got EOF\n");
+	    g_debug("pipe_out got EOF");
 	    pipe_data_destroy(pipe);
 	    g_clear_error(&error);
 	    return FALSE;
@@ -2450,8 +2450,7 @@ pipe_out_watch(GIOChannel *channel, GIOCondition condition, gpointer data)
     }
 
     if ( (condition & G_IO_ERR) == G_IO_ERR) {
-	fprintf(stderr,
-		"pipe_out_watch encountered error…\n");
+	g_warning("%s: encountered error…", __func__);
 	pipe_data_destroy(pipe);
 	return FALSE;
     }
@@ -2498,7 +2497,7 @@ bndx_pipe_queue_last(struct BndxPipeQueue *queue)
     }
 
     if(queue->msgnos->len == 0 && !stream) {
-	printf("Piping finished. Destroying the context.\n");
+	g_debug("Piping finished. Destroying the context.");
 	libbalsa_mailbox_unregister_msgnos(queue->mailbox, queue->msgnos);
 	libbalsa_mailbox_close(queue->mailbox, FALSE);
 	g_array_free(queue->msgnos, TRUE);
@@ -2561,7 +2560,7 @@ bndx_pipe_queue_last(struct BndxPipeQueue *queue)
 	g_io_channel_set_close_on_unref(pipe->out_channel, TRUE);
 	g_io_channel_set_close_on_unref(pipe->err_channel, TRUE);
     } else {
-	printf("Could not spawn pipe %s : %s\n", queue->pipe_cmd,
+	g_warning("Could not spawn pipe %s : %s", queue->pipe_cmd,
 	       error ? error->message : "unknown");
 	g_clear_error(&error);
 	g_free(pipe->message);

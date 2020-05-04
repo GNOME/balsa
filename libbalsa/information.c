@@ -43,7 +43,6 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
 {
     gchar *msg;
     const gchar *icon_str;
-    GIcon *icon;
     gboolean send;
 
     if (notification == NULL)
@@ -66,9 +65,13 @@ libbalsa_information_varg(GtkWindow *parent, LibBalsaInformationType type,
         break;
     }
 
-    icon = g_themed_icon_new(icon_str);
-    g_notification_set_icon(notification, icon);
-    g_object_unref(icon);
+    if (icon_str != NULL) {
+        GIcon *icon;
+
+    	icon = g_themed_icon_new(icon_str);
+    	g_notification_set_icon(notification, icon);
+    	g_object_unref(icon);
+    }
 
     msg = g_strdup_vprintf(fmt, ap);
     g_notification_set_body(notification, msg);
@@ -91,9 +94,6 @@ libbalsa_information(LibBalsaInformationType type,
 {
     va_list va_args;
 
-#ifndef DEBUG
-    if (type == LIBBALSA_INFORMATION_DEBUG) return;
-#endif
     va_start(va_args, fmt);
     libbalsa_information_varg(NULL, type, fmt, va_args);
     va_end(va_args);

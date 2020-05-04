@@ -57,7 +57,7 @@
 #ifdef G_LOG_DOMAIN
 #  undef G_LOG_DOMAIN
 #endif
-#define G_LOG_DOMAIN "ab-ldap"
+#define G_LOG_DOMAIN "address-book"
 
 
 /* don't search when prefix has length shorter than LDAP_MIN_LEN */
@@ -250,7 +250,7 @@ abl_interaction(unsigned flags, sasl_interact_t *interact,
     case SASL_CB_USER:   
     case SASL_CB_NOECHOPROMPT:
     case SASL_CB_ECHOPROMPT:  
-        g_warning("unhandled SASL request %d", interact->id);
+        g_debug("unhandled SASL request %d", interact->id);
         return LDAP_INAVAILABLE;
     }
 
@@ -356,7 +356,7 @@ libbalsa_address_book_ldap_open_connection(LibBalsaAddressBookLdap * ab_ldap)
         	gchar *uri;
 
         	uri = ldap_connection_get_uri(ab_ldap->directory);
-    		g_message("LDAP address book '%s', URI '%s', uses TLS, ignore STARTTLS option",
+    		g_debug("LDAP address book '%s', URI '%s', uses TLS, ignore STARTTLS option",
     				libbalsa_address_book_get_name(ab), uri);
         	ldap_memfree(uri);
     	} else {
@@ -441,7 +441,6 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
          * we use the asynchronous lookup to fetch the results in chunks
          * in case we exceed administrative limits.
          */ 
-        /* g_print("Performing full lookup…\n"); */
         ldap_filter = filter 
             ? g_strdup_printf("(&(objectClass=organizationalPerson)(mail=*)"
                               "(|(cn=%s*)(sn=%s*)(mail=%s*@*)))",
@@ -727,7 +726,7 @@ libbalsa_address_book_ldap_add_address(LibBalsaAddressBook *ab,
 	}
         /* fall through */
         default:
-            g_warning("ldap_add for dn=“%s” failed[0x%x]: %s",
+            g_debug("ldap_add for dn=“%s” failed[0x%x]: %s",
                     dn, rc, ldap_err2string(rc));
         }
     } while(cnt++<1);
@@ -771,7 +770,7 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
 	    }
             /* fall through */
         default:
-            g_warning("ldap_delete for dn=“%s” failed[0x%x]: %s",
+            g_debug("ldap_delete for dn=“%s” failed[0x%x]: %s",
                     dn, rc, ldap_err2string(rc));
         }
     } while(cnt++<1);
@@ -894,7 +893,7 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
 	    }
             /* fall through */
         default:
-            g_warning("ldap_modify for dn=“%s” failed[0x%x]: %s",
+            g_debug("ldap_modify for dn=“%s” failed[0x%x]: %s",
                     dn, rc, ldap_err2string(rc));
         }
     } while(cnt++<1);
@@ -1108,7 +1107,7 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 	/*
 	 * Until we know for sure, complain about all other errors.
 	 */
-	g_warning("alias_complete::ldap_search_st: %s",
+	g_debug("alias_complete::ldap_search_st: %s",
                 ldap_err2string(rc));
 	break;
     }

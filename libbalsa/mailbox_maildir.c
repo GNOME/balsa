@@ -37,6 +37,11 @@
 #include "mime-stream-shared.h"
 #include <glib/gi18n.h>
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "mbox-maildir"
+
 struct message_info {
     LibBalsaMailboxLocalMessageInfo local_info;
     LibBalsaMessageFlag orig_flags;     /* Has only real flags */
@@ -177,7 +182,7 @@ lbm_maildir_check_files(const gchar * path, gboolean create)
         if (mkdir(path, S_IRWXU)) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Could not create a Maildir directory at %s (%s)"),
-                                 path, strerror(errno));
+                                 path, g_strerror(errno));
             return -1;
         }
 
@@ -185,7 +190,7 @@ lbm_maildir_check_files(const gchar * path, gboolean create)
         if (mkdir(tmp, S_IRWXU)) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Could not create a Maildir at %s (%s)"),
-                                 path, strerror(errno));
+                                 path, g_strerror(errno));
             rmdir(path);
             return -1;
         }
@@ -194,7 +199,7 @@ lbm_maildir_check_files(const gchar * path, gboolean create)
         if (mkdir(tmp, S_IRWXU)) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Could not create a Maildir at %s (%s)"),
-                                 path, strerror(errno));
+                                 path, g_strerror(errno));
             snprintf(tmp, sizeof(tmp), "%s/cur", path);
             rmdir(tmp);
             rmdir(path);
@@ -205,7 +210,7 @@ lbm_maildir_check_files(const gchar * path, gboolean create)
         if (mkdir(tmp, S_IRWXU)) {
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Could not create a Maildir at %s (%s)"),
-                                 path, strerror(errno));
+                                 path, g_strerror(errno));
             snprintf(tmp, sizeof(tmp), "%s/cur", path);
             rmdir(tmp);
             snprintf(tmp, sizeof(tmp), "%s/new", path);
@@ -306,18 +311,18 @@ lbm_maildir_remove_files(LibBalsaMailboxLocal *mailbox)
     g_return_if_fail(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
 
     path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
-    g_print("DELETE MAILDIR\n");
+    g_debug("DELETE MAILDIR");
 
     if (!libbalsa_delete_directory_contents(path)) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("Could not remove contents of %s:\n%s"),
-			     path, strerror(errno));
+			     path, g_strerror(errno));
 	return;
     }
     if ( rmdir(path) == -1 ) {
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
 			     _("Could not remove %s:\n%s"),
-			     path, strerror(errno));
+			     path, g_strerror(errno));
     }
     LIBBALSA_MAILBOX_LOCAL_CLASS(libbalsa_mailbox_maildir_parent_class)->remove_files(mailbox);
 }
@@ -404,11 +409,8 @@ lbm_maildir_parse(LibBalsaMailboxMaildir *mdir,
 	    g_free(msg_info->filename);
 	    msg_info->filename = g_strdup(filename);
 	    if (FLAGS_REALLY_DIFFER(msg_info->orig_flags, flags)) {
-#undef DEBUG /* #define DEBUG TRUE */
-#ifdef DEBUG
-		g_message("Message flags for “%s” changed\n",
+		g_debug("Message flags for “%s” changed",
                           msg_info->key);
-#endif
 		msg_info->orig_flags = flags;
 	    }
 	} else {
@@ -480,11 +482,9 @@ libbalsa_mailbox_maildir_open(LibBalsaMailbox * mailbox, GError **err)
 
     libbalsa_mailbox_clear_unread_messages(mailbox);
     lbm_maildir_parse_subdirs(mdir);
-#ifdef DEBUG
-    g_print(_("%s: Opening %s Refcount: %d\n"),
-	    "LibBalsaMailboxMaildir", libbalsa_mailbox_get_name(mailbox),
+    g_debug("%s: Opening %s Refcount: %d",
+	    __func__, libbalsa_mailbox_get_name(mailbox),
             libbalsa_mailbox_get_open_ref(mailbox));
-#endif
     return TRUE;
 }
 
@@ -689,9 +689,7 @@ maildir_sync_add(struct message_info *msg_info, const gchar * path)
         g_build_filename(path, msg_info->subdir, msg_info->filename, NULL);
     if (strcmp(orig, new)) {
         while (g_file_test(new, G_FILE_TEST_EXISTS)) {
-#ifdef DEBUG
-	    g_message("File “%s” exists, requesting new key.\n", new);
-#endif
+	    g_debug("File “%s” exists, requesting new key.", new);
             g_free(msg_info->key);
             msg_info->key = lbm_mdir_get_key();
             g_free(filename);
@@ -704,10 +702,8 @@ maildir_sync_add(struct message_info *msg_info, const gchar * path)
 	if (rename(orig, new) >= 0) /* FIXME: change to safe_rename??? */
 	    msg_info->subdir = subdir;
 	else {
-#ifdef DEBUG
-            g_message("Rename “%s” “%s”: %s\n", orig, new,
+            g_debug("Rename “%s” “%s”: %s", orig, new,
                       g_strerror(errno));
-#endif
 	    retval = FALSE;
 	}
     }

@@ -117,14 +117,4 @@ void balsa_window_set_statusbar(BalsaWindow     * window,
 
 GtkStatusbar * balsa_window_get_statusbar(BalsaWindow * window);
 
-#if defined(__FILE__) && defined(__LINE__)
-# ifdef __FUNCTION__
-#  define BALSA_DEBUG_MSG(message)  if (balsa_app.debug)  fprintf(stderr, "[%lu] %12s | %4d | %30s: %s\n", (unsigned long) time(NULL), __FILE__, __LINE__, __FUNCTION__, message)
-#  define BALSA_DEBUG() if (balsa_app.debug) fprintf (stderr, "[%lu] %12s | %4d | %30s\n", (unsigned long) time(NULL), __FILE__, __LINE__, __FUNCTION__)
-# else
-#  define BALSA_DEBUG_MSG(message)  if (balsa_app.debug)  fprintf(stderr, "[%lu] %12s | %4d: %s\n", (unsigned long) time(NULL), __FILE__, __LINE__, message)
-#  define BALSA_DEBUG() if (balsa_app.debug)  fprintf(stderr, "[%lu] %12s | %4d\n", (unsigned long) time(NULL), __FILE__, __LINE__)
-# endif
-#endif
-
 #endif				/* __MAIN_WINDOW_H__ */

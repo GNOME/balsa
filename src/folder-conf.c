@@ -669,8 +669,7 @@ subfolder_conf_clicked_ok(SubfolderDialogData * sub_folder_data)
 
     parent = gtk_editable_get_chars(GTK_EDITABLE(sub_folder_data->parent_folder), 0, -1);
     folder = gtk_editable_get_chars(GTK_EDITABLE(sub_folder_data->folder_name), 0, -1);
-    if (balsa_app.debug)
-	g_print("sub_folder_data->old_parent=%s\nsub_folder_data->old_folder=%s\n",
+	g_debug("sub_folder_data->old_parent=%s; sub_folder_data->old_folder=%s",
 		sub_folder_data->old_parent, sub_folder_data->old_folder);
 
     if (sub_folder_data->common_data.mbnode) {
@@ -746,7 +745,7 @@ folder, parent);
                         balsa_mailbox_node_rescan(mbnode);
 			g_object_unref(mbnode);
 		    } else
-                        printf("Parent not found!?\n");
+                        g_debug("Parent not found!?");
                 } else if (sub_folder_data->old_parent != NULL
                            && g_str_has_prefix(parent, sub_folder_data->old_parent)) {
                     /* moved it down the tree */

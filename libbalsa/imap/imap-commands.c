@@ -502,8 +502,8 @@ append_commit(ImapMboxHandle *handle, unsigned cmdno, ImapSequence *uid_seq)
       uid_seq->uid_validity = handle->uidplus.dst_uid_validity;
       uid_seq->ranges = handle->uidplus.dst;
     } else if(uid_seq->uid_validity != handle->uidplus.dst_uid_validity) {
-      printf("The IMAP server keeps changing UID validity, "
-	     "ignoring UIDPLUS response (%u -> %u)\n",
+      g_debug("The IMAP server keeps changing UID validity, "
+	     "ignoring UIDPLUS response (%u -> %u)",
 	     uid_seq->uid_validity, handle->uidplus.dst_uid_validity);
       uid_seq->uid_validity = handle->uidplus.dst_uid_validity;
       g_list_free(uid_seq->ranges);
@@ -1858,8 +1858,8 @@ imap_mbox_sort_msgno_client(ImapMboxHandle *handle, ImapSortKey key,
   if(fetch_cnt>0) {
     ImapResponse rc;
     qsort(seqno_to_fetch, fetch_cnt, sizeof(unsigned), comp_unsigned);
-    printf("Should the client side sorting code "
-           "be sorry about your bandwidth usage?\n");
+    g_debug("Should the client side sorting code "
+           "be sorry about your bandwidth usage?");
     rc = imap_mbox_handle_fetch_set_unlocked(handle, seqno_to_fetch,
 					     fetch_cnt, fetch_type);
     if(rc != IMR_OK)

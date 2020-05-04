@@ -1615,8 +1615,9 @@ help_ident_cb(GtkWidget * widget)
 #endif /* GTK_CHECK_VERSION(3, 22, 0) */
 
     if (err) {
-        g_print(_("Error displaying help for identities: %s\n"),
-                err->message);
+    	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+    		_("Error displaying help for identities: %s"),
+			err->message);
         g_error_free(err);
     }
 }

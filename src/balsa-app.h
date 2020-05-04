@@ -255,7 +255,6 @@ extern struct BalsaApplication {
 
     gboolean empty_trash_on_exit;
     gboolean previewpane;
-    gboolean debug;
 
     /* Source viewer */
     gboolean source_escape_specials;

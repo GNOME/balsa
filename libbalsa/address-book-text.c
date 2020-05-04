@@ -44,6 +44,13 @@
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
 
+
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "address-book"
+
+
 static void
 libbalsa_address_book_text_finalize(GObject * object);
 
@@ -440,10 +447,8 @@ lbab_text_open_temp(LibBalsaAddressBookText * ab_text, gchar ** path,
     *path = g_strconcat(priv->path, ".tmp", NULL);
     *stream = fopen(*path, "w");
     if (*stream == NULL) {
-#if DEBUG
-        g_message("Failed to open temporary address book file “%s”\n"
-                  " changes not saved", *path);
-#endif                          /* DEBUG */
+    	libbalsa_address_book_set_status(LIBBALSA_ADDRESS_BOOK(ab_text), g_strerror(errno));
+        g_debug("Failed to open temporary address book file “%s”, changes not saved", *path);
         g_free(*path);
         *path = NULL;
         return LBABERR_CANNOT_WRITE;
@@ -460,20 +465,15 @@ lbab_text_close_temp(LibBalsaAddressBookText * ab_text, const gchar * path)
 
     if (unlink(priv->path) < 0
         && g_file_error_from_errno(errno) != G_FILE_ERROR_NOENT) {
-#if DEBUG
-        g_message("Failed to unlink address book file “%s”\n"
-                  " new address book file saved as “%s”", priv->path,
-                  path);
-        perror("TEXT");
-#endif                          /* DEBUG */
+    	libbalsa_address_book_set_status(LIBBALSA_ADDRESS_BOOK(ab_text), g_strerror(errno));
+    	g_debug("Failed to unlink address book file “%s” new address book file saved as “%s”. Error: %s",
+        	priv->path, path, g_strerror(errno));
         return LBABERR_CANNOT_WRITE;
     }
 
     if (rename(path, priv->path) < 0) {
-#if DEBUG
-        g_message("Failed to rename temporary address book file “%s”\n",
-                  path);
-#endif                          /* DEBUG */
+    	libbalsa_address_book_set_status(LIBBALSA_ADDRESS_BOOK(ab_text), g_strerror(errno));
+    	g_debug("Failed to rename temporary address book file “%s”", path);
         return LBABERR_CANNOT_WRITE;
     }
 
@@ -669,11 +669,10 @@ libbalsa_address_book_text_modify_address(LibBalsaAddressBook * ab,
 
     if (res == LBABERR_OK)
         res = lbab_text_close_temp(ab_text, path);
-#if DEBUG
-    else
-        g_message("Failed to write to temporary address book file “%s”\n"
-                  " changes not saved", path);
-#endif                          /* DEBUG */
+    else {
+    	libbalsa_address_book_set_status(ab, g_strerror(errno));
+        g_debug("Failed to write to temporary address book file “%s”, changes not saved", path);
+    }
     g_free(path);
 
     /* Invalidate the time stamp, so the book will be reloaded. */

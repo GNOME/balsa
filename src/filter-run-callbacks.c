@@ -292,9 +292,7 @@ fr_add_pressed_func(GtkTreeModel * model, GtkTreePath * path,
         GtkTreeIter sel_iter;
 
         mf->actual_filter = fil;
-#if DEBUG
-        printf("fr_add_presed adds fil=%p\n", fil);
-#endif
+        g_debug("%s adds fil=%p", __func__, fil);
         mf->when = FILTER_WHEN_NEVER;
         gtk_list_store_append(GTK_LIST_STORE(sel_model), &sel_iter);
         gtk_list_store_set(GTK_LIST_STORE(sel_model), &sel_iter,

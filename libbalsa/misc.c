@@ -328,7 +328,7 @@ libbalsa_utf8_sanitize(gchar **text, gboolean fallback,
 		*target = use_enc;
 	    return FALSE;
 	}
-	g_message("conversion %s -> utf8 failed: %s", use_enc,
+	g_debug("conversion %s -> utf8 failed: %s", use_enc,
                   conv_error->message);
 	g_error_free(conv_error);
     }
@@ -724,11 +724,11 @@ libbalsa_lock_file (const char *path, int fd, int excl, int dot, int timeout)
     while (fcntl (fd, F_SETLK, &lck) == -1)
 	{
 	    struct stat sb;
-	    g_print("%s(): fcntl errno %d.\n", __FUNCTION__, errno);
+	    g_debug("%s(): fcntl errno %d.", __func__, errno);
     if (errno != EAGAIN && errno != EACCES)
 	{
 	    libbalsa_information
-		(LIBBALSA_INFORMATION_DEBUG, "fcntl failed, errno=%d.", errno);
+		(LIBBALSA_INFORMATION_MESSAGE, _("fcntl failed: %s."), g_strerror(errno));
 	    return -1;
 	}
  
@@ -764,7 +764,7 @@ while (flock (fd, (excl ? LOCK_EX : LOCK_SH) | LOCK_NB) == -1)
     struct stat sb;
     if (errno != EWOULDBLOCK)
 	{
-	    libbalsa_message ("flock: %s", strerror(errno));
+	    libbalsa_information(LIBBALSA_INFORMATION_WARNING, "flock: %s", g_strerror(errno));
 	    r = -1;
 	    break;
 	}
@@ -779,14 +779,16 @@ while (flock (fd, (excl ? LOCK_EX : LOCK_SH) | LOCK_NB) == -1)
     if (prev_sb.st_size == sb.st_size && ++count >= (timeout?MAXLOCKATTEMPT:0))
 	{
 	    if (timeout)
-		libbalsa_message (_("Timeout exceeded while attempting flock lock!"));
+	    	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+	    		_("Timeout exceeded while attempting flock lock!"));
 	    r = -1;
 	    break;
 	}
  
     prev_sb = sb;
  
-    libbalsa_message (_("Waiting for flock attempt… %d"), ++attempt);
+    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+    	_("Waiting for flock attempt… %d"), ++attempt);
     sleep (1);
 }
 #endif /* USE_FLOCK */

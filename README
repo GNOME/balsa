@@ -240,7 +240,18 @@ following custom domains are implemented in Balsa:
 - imap: IMAP server interaction.  Warning: the output may contain
         plain-text passwords.
 - crypto: GnuPG and S/MIME crypto operations
+- autocrypt: Autocrypt operations
 - html: HTML rendering with webkit2
+- address-book: address book backend operations (GPE, LDAP, …)
+- icons: 
+- mbox-imap: IMAP mailbox operations
+- mbox-local: local mailbox operations
+- mbox-maildir: Maildir mailbox operations
+- mbox-mbox: MBox mailbox operations
+- mbox-mh: MH mailbox operations
+- mbox-pop3: POP3 mailbox operations
+- send: message transmission
+- spell-check: internal spell checker
 
 
 Reporting Bugs:

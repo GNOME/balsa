@@ -3201,6 +3201,11 @@ balsa_window_dispose(GObject * object)
         priv->open_mbnode_info_array = NULL;
     }
 
+    if (priv->activity_messages != NULL) {
+        g_slist_free_full(priv->activity_messages, g_free);
+        priv->activity_messages = NULL;
+    }
+
     balsa_app.in_destruction = TRUE;
     G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
 

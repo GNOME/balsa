@@ -85,6 +85,8 @@ struct _LibBalsaMessageBody {
 
     LibBalsaMessageBody *next;	/* Next part in the message */
     LibBalsaMessageBody *parts;	/* The parts of a multipart or message/rfc822 message */
+
+    gpointer user_data;         /* Place to temporarily hold other data */
 };
 
 LibBalsaMessageBody *libbalsa_message_body_new(LibBalsaMessage * message);

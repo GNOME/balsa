@@ -2037,14 +2037,19 @@ move_to_change_state(GSimpleAction *action,
                      GVariant      *parameter,
                      gpointer       user_data)
 {
-    BalsaIndex *index = user_data;
-    const gchar *url = g_variant_get_string(parameter, NULL);
-    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
+    BalsaIndex *bindex = user_data;
+    LibBalsaMailbox *mailbox;
 
-    if (balsa_mailbox_node_get_mailbox(index->mailbox_node) != mailbox) {
-        GArray *selected = balsa_index_selected_msgnos_new(index);
-        balsa_index_transfer(index, selected, mailbox, FALSE);
-        balsa_index_selected_msgnos_free(index, selected);
+    mailbox =
+        balsa_mblist_mru_get_mailbox_from_variant(parameter, GTK_WIDGET(bindex));
+
+    if (mailbox != NULL) {
+        balsa_mblist_mru_add(&balsa_app.folder_mru, libbalsa_mailbox_get_url(mailbox));
+        if (mailbox != balsa_mailbox_node_get_mailbox(bindex->mailbox_node)) {
+            GArray *selected = balsa_index_selected_msgnos_new(bindex);
+            balsa_index_transfer(bindex, selected, mailbox, FALSE);
+            balsa_index_selected_msgnos_free(bindex, selected);
+        }
     }
 }
 
@@ -2109,9 +2114,7 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     g_object_unref(simple);
 
     mru_menu =
-        balsa_mblist_mru_menu(GTK_WINDOW
-                              (gtk_widget_get_toplevel(GTK_WIDGET(index))),
-                              &balsa_app.folder_mru, "bndx-popup.move-to");
+        balsa_mblist_mru_menu(&balsa_app.folder_mru, "bndx-popup.move-to");
     submenu = gtk_menu_new_from_model(G_MENU_MODEL(mru_menu));
     g_object_unref(mru_menu);
 

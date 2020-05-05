@@ -351,8 +351,6 @@ balsa_attach_info_finalize(GObject * object)
     }
 
     /* clean up memory */
-    if (info->popup_menu)
-        gtk_widget_destroy(info->popup_menu);
     if (info->file_uri)
         g_object_unref(info->file_uri);
     g_free(info->force_mime_type);
@@ -1671,6 +1669,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
         {"launch-app", libbalsa_radio_activated, "s", "''", attachment_menu_vfs_cb}
     };
     GMenu *menu;
+    GMenu *section;
 
     g_debug("Trying to attach '%s'", filename);
     if (!(file_uri = libbalsa_vfs_new_from_uri(filename))) {
@@ -1810,7 +1809,10 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     }
 
     /* an attachment can be removed */
-    g_menu_append(menu, _("Remove"), "attachment.remove");
+    section = g_menu_new();
+    g_menu_append(section, _("Remove"), "attachment.remove");
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
 
     /* Insert another separator */
     menu_item = gtk_separator_menu_item_new();
@@ -1819,8 +1821,11 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     /* add the usual vfs menu so the user can inspect what (s)he actually
        attached... (only for non-message attachments) */
     if (!is_fwd_message) {
-	libbalsa_vfs_fill_menu_by_content_type(menu, content_type,
+        section = g_menu_new();
+        libbalsa_vfs_fill_menu_by_content_type(section, content_type,
                                                "attachment.launch-app");
+        g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+        g_object_unref(section);
     }
 
     attach_data->popup_menu =

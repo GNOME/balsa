@@ -1687,7 +1687,6 @@ static void bmbl_mru_activated_cb(GtkTreeView * tree_view,
 /*
  * balsa_mblist_mru_menu:
  *
- * window:      parent window for the `Other...' dialog;
  * url_list:    pointer to a list of urls;
  * action:      the action to be taken on selecting an item
  *
@@ -1698,8 +1697,7 @@ static void bmbl_mru_activated_cb(GtkTreeView * tree_view,
  * last entry that pops up the whole mailbox tree.
  */
 GMenu *
-balsa_mblist_mru_menu(GtkWindow * window,
-                      GList ** url_list,
+balsa_mblist_mru_menu(GList ** url_list,
                       const gchar *action)
 {
     GMenu *menu;
@@ -1707,7 +1705,6 @@ balsa_mblist_mru_menu(GtkWindow * window,
     GList *list;
     GMenuItem *other_item;
 
-    g_return_val_if_fail(GTK_IS_WINDOW(window), NULL);
     g_return_val_if_fail(url_list != NULL, NULL);
     g_return_val_if_fail(action != NULL, NULL);
 
@@ -2235,4 +2232,190 @@ balsa_mblist_mailbox_node_redraw(BalsaMailboxNode * mbnode)
     if (balsa_find_iter_by_data(&iter, mbnode))
 	bmbl_store_redraw_mbnode(&iter, mbnode);
     balsa_window_update_tab(mbnode);
+}
+
+/*
+ * balsa_mblist_choose_mailbox
+ *
+ * Pops up a GtkDialog with a BalsaMBList.
+ * Returns the mailbox that the user selects
+ */
+
+/*
+ * bmbl_choose_mailbox_activated_cb:
+ *
+ * Callback for the "row-activated" signal of the GtkTreeView in the
+ * BalsaMBList object. This permits keyboard selection of a mailbox.
+ */
+static void
+bmbl_choose_mailbox_row_activated(GtkTreeView       *tree_view,
+                                  GtkTreePath       *path,
+                                  GtkTreeViewColumn *column,
+                                  gpointer           data)
+{
+    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    GtkTreeIter iter;
+    BalsaMailboxNode *mbnode;
+    LibBalsaMailbox **mailbox = data;
+
+    gtk_tree_model_get_iter(model, &iter, path);
+    gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
+    *mailbox = balsa_mailbox_node_get_mailbox(mbnode);
+    g_object_unref(mbnode);
+
+    gtk_dialog_response(GTK_DIALOG
+                        (gtk_widget_get_ancestor
+                        (GTK_WIDGET(tree_view), GTK_TYPE_DIALOG)),
+                        GTK_RESPONSE_OK);
+}
+
+/*
+ * bmbl_choose_mailbox_selected_cb:
+ *
+ * Callback for the "changed" signal of the GtkTreeSelection in the
+ * BalsaMBList object. This permits one-click selection of a mailbox.
+ */
+static void
+bmbl_choose_mailbox_selected_cb(GtkTreeSelection * selection,
+                                gpointer           data)
+{
+    GdkEvent *event;
+    GtkTreeView *tree_view;
+    GtkTreePath *path;
+    LibBalsaMailbox **mailbox = data;
+
+    *mailbox = NULL;
+
+    event = gtk_get_current_event();
+    if (event == NULL)
+        return;
+
+    tree_view = gtk_tree_selection_get_tree_view(selection);
+    if (event->type != GDK_BUTTON_PRESS ||
+        !gtk_tree_view_get_path_at_pos(tree_view, event->button.x,
+                                       event->button.y, &path,
+                                       NULL, NULL, NULL)) {
+        gtk_tree_selection_unselect_all(selection);
+        gdk_event_free(event);
+        return;
+    }
+
+    if (gtk_tree_selection_path_is_selected(selection, path)) {
+        GtkTreeModel *model;
+        GtkTreeIter iter;
+        BalsaMailboxNode *mbnode;
+
+        model = gtk_tree_view_get_model(tree_view);
+        gtk_tree_model_get_iter(model, &iter, path);
+        gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
+        *mailbox = balsa_mailbox_node_get_mailbox(mbnode);
+	g_object_unref(mbnode);
+
+        gtk_dialog_response(GTK_DIALOG
+                            (gtk_widget_get_ancestor
+                             (GTK_WIDGET(tree_view), GTK_TYPE_DIALOG)),
+                            GTK_RESPONSE_OK);
+    }
+
+    gtk_tree_path_free(path);
+    gdk_event_free(event);
+}
+
+static LibBalsaMailbox *
+bmbl_choose_mailbox(GtkWidget *widget)
+{
+    GtkWidget *mblist;
+    LibBalsaMailbox *mailbox;
+    GtkTreeSelection *selection;
+    GtkWidget *scroll;
+    GtkWidget *dialog;
+
+    mblist = balsa_mblist_new();
+    g_signal_connect(mblist, "row-activated",
+                     G_CALLBACK(bmbl_choose_mailbox_row_activated), &mailbox);
+
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
+    g_signal_connect(selection, "changed",
+                     G_CALLBACK(bmbl_choose_mailbox_selected_cb), &mailbox);
+
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
+                                   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(scroll), mblist);
+    gtk_widget_show_all(scroll);
+
+    dialog =
+        gtk_dialog_new_with_buttons(_("Choose destination folder"),
+                                    GTK_WINDOW(gtk_widget_get_toplevel(widget)),
+                                    GTK_DIALOG_MODAL |
+                                    libbalsa_dialog_flags(),
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    NULL);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, window);
+#endif
+    gtk_box_pack_start(GTK_BOX
+                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
+                      scroll, TRUE, TRUE, 0);
+
+    g_signal_connect(dialog, "size-allocate",
+                     G_CALLBACK(bmbl_mru_size_allocate_cb), NULL);
+    gtk_window_set_default_size(GTK_WINDOW(dialog),
+                                balsa_app.mru_tree_width,
+                                balsa_app.mru_tree_height);
+
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+
+    return mailbox;
+}
+
+/*
+ * balsa_mblist_mru_get_url_from_variant,
+ * balsa_mblist_mru_get_mailbox_from_variant:
+ *
+ * Helpers for "_change_state" actions of mru_menus
+ *
+ * Get the url from the GVariant parameter. If it is an empty string,
+ * the user selected "Other...", so we must pop up the mailbox list dialog
+ * and let the user choose the mailbox. That dialog can be canceled,
+ * returning a NULL mailbox, so we must be careful; the caller must be
+ * prepared for the return of an empty url string or a NULL mailbox,
+ * respectively.
+ */
+
+const gchar *
+balsa_mblist_mru_get_url_from_variant(GVariant *parameter, GtkWidget *widget)
+{
+    const gchar *url;
+
+    url = g_variant_get_string(parameter, NULL);
+
+    if (url[0] == '\0') {
+        LibBalsaMailbox *mailbox;
+
+        mailbox = bmbl_choose_mailbox(widget);
+
+        if (mailbox != NULL)
+            url = libbalsa_mailbox_get_url(mailbox);
+    }
+
+    return url;
+}
+
+LibBalsaMailbox *
+balsa_mblist_mru_get_mailbox_from_variant(GVariant *parameter, GtkWidget *widget)
+{
+    LibBalsaMailbox *mailbox;
+    const gchar *url;
+
+    url = g_variant_get_string(parameter, NULL);
+
+    if (url[0] == '\0')
+        mailbox = bmbl_choose_mailbox(widget);
+    else
+        mailbox = balsa_find_mailbox_by_url(url);
+
+    return mailbox;
 }

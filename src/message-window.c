@@ -804,10 +804,14 @@ move_to_change_state(GSimpleAction *action,
                      gpointer       user_data)
 {
     MessageWindow *mw = user_data;
-    const gchar *url = g_variant_get_string(parameter, NULL);
-    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
+    LibBalsaMailbox *mailbox;
 
-    message_window_move_message(mw, mailbox);
+    mailbox = balsa_mblist_mru_get_mailbox_from_variant(parameter, mw->window);
+
+    if (mailbox != NULL) {
+        balsa_mblist_mru_add(&balsa_app.folder_mru, libbalsa_mailbox_get_url(mailbox));
+        message_window_move_message(mw, mailbox);
+    }
 }
 
 void
@@ -906,8 +910,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     g_object_unref(simple);
 
     mru_menu =
-        balsa_mblist_mru_menu(GTK_WINDOW(window),
-                              &balsa_app.folder_mru, "message-window.move-to");
+        balsa_mblist_mru_menu(&balsa_app.folder_mru, "message-window.move-to");
     submenu = gtk_menu_new_from_model(G_MENU_MODEL(mru_menu));
     g_object_unref(mru_menu);
 

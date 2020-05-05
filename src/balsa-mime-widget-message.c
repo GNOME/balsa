@@ -442,15 +442,20 @@ copy_change_state(GSimpleAction *action,
                   GVariant      *parameter,
                   gpointer       user_data)
 {
-    const gchar *url = g_variant_get_string(parameter, NULL);
     LibBalsaMessageBody *part = user_data;
+    const gchar *url =
+        balsa_mblist_mru_get_url_from_variant(parameter, part->user_data);
 
-    balsa_message_copy_part(url, part);
+    if (url[0] != '\0') {
+        balsa_mblist_mru_add(&balsa_app.folder_mru, url);
+        balsa_message_copy_part(url, part);
+    }
 }
 
 static void
 bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
 {
+    LibBalsaMessageBody *part = arg;
     GSimpleActionGroup *simple;
     static const GActionEntry header_popup_entries[] = {
         {"copy", libbalsa_radio_activated, "s", "''", copy_change_state},
@@ -459,12 +464,14 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
     GtkWidget *menu_item, *submenu;
     GtkWidget *separator = gtk_separator_menu_item_new();
 
+    part->user_data = widget;
+
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), separator);
     gtk_widget_show(separator);
     menu_item = gtk_menu_item_new_with_label(_("Reply…"));
     g_signal_connect(menu_item, "activate",
                      G_CALLBACK(bm_header_ctx_menu_reply),
-                     arg);
+                     part);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
     gtk_widget_show(menu_item);
 
@@ -472,15 +479,14 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
     g_action_map_add_action_entries(G_ACTION_MAP(simple),
                                     header_popup_entries,
                                     G_N_ELEMENTS(header_popup_entries),
-                                    arg);
+                                    part);
     gtk_widget_insert_action_group(widget,
                                    "header-popup",
                                    G_ACTION_GROUP(simple));
     g_object_unref(simple);
 
     mru_menu =
-        balsa_mblist_mru_menu(GTK_WINDOW(gtk_widget_get_toplevel(widget)),
-                              &balsa_app.folder_mru, "header-popup.copy");
+        balsa_mblist_mru_menu(&balsa_app.folder_mru, "header-popup.copy");
     submenu = gtk_menu_new_from_model(G_MENU_MODEL(mru_menu));
     g_object_unref(mru_menu);
 

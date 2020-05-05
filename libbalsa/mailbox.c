@@ -37,6 +37,11 @@
 #include "libbalsa_private.h"
 #include <glib/gi18n.h>
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "mailbox"
+
 /* Class functions */
 static void libbalsa_mailbox_dispose(GObject * object);
 static void libbalsa_mailbox_finalize(GObject * object);

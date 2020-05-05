@@ -1640,10 +1640,15 @@ copy_part_change_state(GSimpleAction *action,
                        GVariant      *parameter,
                        gpointer       user_data)
 {
-    const gchar *url = g_variant_get_string(parameter, NULL);
     BalsaPartInfo *info = user_data;
+    const gchar *url;
 
-    balsa_message_copy_part(url, info->body);
+    url = balsa_mblist_mru_get_url_from_variant(parameter, info->popup_menu);
+
+    if (url[0] != '\0') {
+        balsa_mblist_mru_add(&balsa_app.folder_mru, url);
+        balsa_message_copy_part(url, info->body);
+    }
 
     g_simple_action_set_state(action, parameter);
 }
@@ -1689,8 +1694,7 @@ part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
         GMenu *submenu;
 
         submenu =
-            balsa_mblist_mru_menu(GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(balsa_message))),
-                                  &balsa_app.folder_mru, "part-menu.copy-part");
+            balsa_mblist_mru_menu(&balsa_app.folder_mru, "part-menu.copy-part");
 
         g_menu_append_submenu(menu, _("_Copy to folder…"), G_MENU_MODEL(submenu));
     }

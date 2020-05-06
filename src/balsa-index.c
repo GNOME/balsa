@@ -118,11 +118,8 @@ static void bndx_drag_cb(GtkWidget* widget,
                          gpointer user_data);
 
 /* Popup menu */
-static GtkWidget* bndx_popup_menu_create(BalsaIndex * index);
-static void bndx_do_popup(BalsaIndex * index, const GdkEvent *event);
-static GtkWidget *create_stock_menu_item(GtkWidget * menu,
-                                         const gchar * label,
-                                         GCallback cb, gpointer data);
+static void bndx_popup_menu_create(BalsaIndex * index);
+static void bndx_do_popup(BalsaIndex * index);
 
 static void sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data);
 
@@ -140,19 +137,13 @@ static gint balsa_index_signals[LAST_SIGNAL] = {
 static void bndx_expand_to_row(BalsaIndex * index, GtkTreePath * path);
 static void bndx_select_row(BalsaIndex * index, GtkTreePath * path);
 
-/* Other callbacks. */
-static void bndx_store_address(gpointer data);
-
 struct _BalsaIndex {
     GtkTreeView tree_view;
 
-    /* the popup menu and some items we need to refer to */
-    GtkWidget *popup_menu;
-    GtkWidget *delete_item;
-    GtkWidget *undelete_item;
-    GtkWidget *move_to_trash_item;
-    GtkWidget *toggle_item;
-    GtkWidget *move_to_item;
+    /* the popup menu */
+    GMenu *popup_menu;
+    GtkWidget *popup_popover;
+    gint move_position;
 
     BalsaMailboxNode* mailbox_node;
     guint current_msgno;
@@ -278,6 +269,11 @@ bndx_destroy(GObject * obj)
         bindex->reference = NULL;
     }
 
+    if (bindex->popup_menu != NULL) {
+        g_object_unref(bindex->popup_menu);
+        bindex->popup_menu = NULL;
+    }
+
     G_OBJECT_CLASS(balsa_index_parent_class)->dispose(obj);
 }
 
@@ -285,7 +281,7 @@ bndx_destroy(GObject * obj)
 static gboolean
 bndx_popup_menu(GtkWidget * widget)
 {
-    bndx_do_popup(BALSA_INDEX(widget), NULL);
+    bndx_do_popup(BALSA_INDEX(widget));
     return TRUE;
 }
 
@@ -449,8 +445,7 @@ balsa_index_init(BalsaIndex * index)
 
     /* Initialize some other members */
     index->mailbox_node = NULL;
-    index->popup_menu = bndx_popup_menu_create(index);
-    g_object_ref_sink(index->popup_menu);
+    bndx_popup_menu_create(index);
 
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
 
@@ -663,7 +658,7 @@ bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press_gesture,
         gtk_tree_path_free(path);
     }
 
-    bndx_do_popup(bindex, event);
+    bndx_do_popup(bindex);
 }
 
 static void
@@ -1483,9 +1478,11 @@ balsa_index_selected_msgnos_free(BalsaIndex * index, GArray * msgnos)
 }
 
 static void
-bndx_view_source(gpointer data)
+view_source_activated(GSimpleAction *action,
+                      GVariant      *parameter,
+                      gpointer       user_data)
 {
-    BalsaIndex *index = BALSA_INDEX(data);
+    BalsaIndex *index = BALSA_INDEX(user_data);
     LibBalsaMailbox *mailbox = balsa_mailbox_node_get_mailbox(index->mailbox_node);
     guint i;
     GArray *selected = balsa_index_selected_msgnos_new(index);
@@ -1506,10 +1503,13 @@ bndx_view_source(gpointer data)
 }
 
 static void
-bndx_store_address(gpointer data)
+store_address_activated(GSimpleAction *action,
+                        GVariant      *parameter,
+                        gpointer       user_data)
 {
-    GList *messages = balsa_index_selected_list(BALSA_INDEX(data));
+    GList *messages;
 
+    messages = balsa_index_selected_list(BALSA_INDEX(user_data));
     balsa_store_address_from_messages(messages);
     g_list_free_full(messages, g_object_unref);
 }
@@ -1783,8 +1783,72 @@ balsa_index_toggle_flag(BalsaIndex* index, LibBalsaMessageFlag flag)
 	balsa_mailbox_node_set_last_use_time(index->mailbox_node);
 }
 
+/*
+ * Reply actions
+ */
+
 static void
-bi_toggle_deleted_cb(gpointer user_data, GtkWidget * widget)
+reply_activated(GSimpleAction *action,
+                GVariant      *parameter,
+                gpointer       user_data)
+{
+    balsa_message_reply(user_data);
+}
+
+static void
+reply_to_all_activated(GSimpleAction *action,
+                       GVariant      *parameter,
+                       gpointer       user_data)
+{
+    balsa_message_replytoall(user_data);
+}
+
+static void
+reply_to_group_activated(GSimpleAction *action,
+                         GVariant      *parameter,
+                         gpointer       user_data)
+{
+    balsa_message_replytogroup(user_data);
+}
+
+/*
+ * Forwarding actions
+ */
+
+static void
+forward_attached_activated(GSimpleAction *action,
+                           GVariant      *parameter,
+                           gpointer       user_data)
+{
+    balsa_message_forward_attached(user_data);
+}
+
+static void
+forward_inline_activated(GSimpleAction *action,
+                         GVariant      *parameter,
+                         gpointer       user_data)
+{
+    balsa_message_forward_inline(user_data);
+}
+
+/*
+ * Pipe messages through a program
+ */
+
+static void
+pipe_activated(GSimpleAction *action,
+               GVariant      *parameter,
+               gpointer       user_data)
+{
+    balsa_index_pipe(user_data);
+}
+
+/*
+ * Delete and undelete actions
+ */
+
+static void
+bi_toggle_deleted(gpointer user_data, gboolean undelete)
 {
     BalsaIndex *index;
     GArray *selected;
@@ -1795,7 +1859,7 @@ bi_toggle_deleted_cb(gpointer user_data, GtkWidget * widget)
     balsa_index_toggle_flag(index, LIBBALSA_MESSAGE_FLAG_DELETED);
 
     selected = balsa_index_selected_msgnos_new(index);
-    if (widget == index->undelete_item && selected->len > 0) {
+    if (undelete && selected->len > 0) {
 	LibBalsaMailbox *mailbox = balsa_mailbox_node_get_mailbox(index->mailbox_node);
         guint msgno = g_array_index(selected, guint, 0);
         if (libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
@@ -1807,111 +1871,51 @@ bi_toggle_deleted_cb(gpointer user_data, GtkWidget * widget)
     balsa_index_selected_msgnos_free(index, selected);
 }
 
-/* This function toggles the FLAGGED attribute of a list of messages
- */
 static void
-bi_toggle_flagged_cb(gpointer user_data)
+delete_activated(GSimpleAction *action,
+                 GVariant      *parameter,
+                 gpointer       user_data)
 {
-    g_return_if_fail(user_data != NULL);
+    bi_toggle_deleted(user_data, FALSE);
+}
 
+static void
+undelete_activated(GSimpleAction *action,
+                   GVariant      *parameter,
+                   gpointer       user_data)
+{
+    bi_toggle_deleted(user_data, TRUE);
+}
+
+static void
+move_to_trash_activated(GSimpleAction *action,
+                        GVariant      *parameter,
+                        gpointer       user_data)
+{
+    balsa_message_move_to_trash(user_data);
+}
+
+/*
+ * toggle the FLAGGED or NEW attribute of a list of messages
+ */
+
+static void
+toggle_flagged_activated(GSimpleAction *action,
+                         GVariant      *parameter,
+                         gpointer       user_data)
+{
     balsa_index_toggle_flag(BALSA_INDEX(user_data),
                             LIBBALSA_MESSAGE_FLAG_FLAGGED);
 }
 
 static void
-bi_toggle_new_cb(gpointer user_data)
+toggle_unread_activated(GSimpleAction *action,
+                        GVariant      *parameter,
+                        gpointer       user_data)
 {
-    g_return_if_fail(user_data != NULL);
-
     balsa_index_toggle_flag(BALSA_INDEX(user_data),
                             LIBBALSA_MESSAGE_FLAG_NEW);
 }
-
-/*
- * bndx_popup_menu_create: create the popup menu at init time
- */
-static GtkWidget *
-bndx_popup_menu_create(BalsaIndex * index)
-{
-    static const struct {       /* this is a invariable part of */
-        const char *icon, *label;       /* the context message menu.    */
-        GCallback func;
-    } entries[] = {
-        {
-        BALSA_PIXMAP_REPLY, N_("_Reply…"),
-                G_CALLBACK(balsa_message_reply)}, {
-        BALSA_PIXMAP_REPLY_ALL, N_("Reply To _All…"),
-                G_CALLBACK(balsa_message_replytoall)}, {
-        BALSA_PIXMAP_REPLY_GROUP, N_("Reply To _Group…"),
-                G_CALLBACK(balsa_message_replytogroup)}, {
-        BALSA_PIXMAP_FORWARD, N_("_Forward Attached…"),
-                G_CALLBACK(balsa_message_forward_attached)}, {
-        BALSA_PIXMAP_FORWARD, N_("Forward _Inline…"),
-                G_CALLBACK(balsa_message_forward_inline)}, {
-        NULL,                 N_("_Pipe through…"),
-                G_CALLBACK(balsa_index_pipe)}, {
-        BALSA_PIXMAP_BOOK_RED, N_("_Store Address…"),
-                G_CALLBACK(bndx_store_address)}};
-    GtkWidget *menu, *menuitem, *submenu;
-    unsigned i;
-
-    menu = gtk_menu_new();
-
-    for (i = 0; i < G_N_ELEMENTS(entries); i++)
-        create_stock_menu_item(menu, _(entries[i].label),
-                               entries[i].func, index);
-
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu),
-                          gtk_separator_menu_item_new());
-    index->delete_item =
-        create_stock_menu_item(menu, _("_Delete"),
-                               G_CALLBACK(bi_toggle_deleted_cb),
-                               index);
-    index->undelete_item =
-        create_stock_menu_item(menu, _("_Undelete"),
-                               G_CALLBACK(bi_toggle_deleted_cb),
-                               index);
-    index->move_to_trash_item =
-        create_stock_menu_item(menu, _("Move To _Trash"),
-                               G_CALLBACK
-                               (balsa_message_move_to_trash), index);
-
-    menuitem = gtk_menu_item_new_with_mnemonic(_("T_oggle"));
-    index->toggle_item = menuitem;
-    submenu = gtk_menu_new();
-    create_stock_menu_item(submenu, _("_Flagged"),
-                           G_CALLBACK(bi_toggle_flagged_cb),
-                           index);
-    create_stock_menu_item(submenu, _("_Unread"),
-                           G_CALLBACK(bi_toggle_new_cb),
-                           index);
-
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
-
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-
-    menuitem = gtk_menu_item_new_with_mnemonic(_("_Move to"));
-    index->move_to_item = menuitem;
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-
-
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu),
-                          gtk_separator_menu_item_new());
-    create_stock_menu_item(menu, _("_View Source"),
-                           G_CALLBACK(bndx_view_source),
-                           index);
-
-    return menu;
-}
-
-/* bndx_do_popup: common code for the popup menu;
- * set sensitivity of menuitems on the popup
- * menu, and populate the mru submenu
- */
-
-/* If the menu is popped up in response to a keystroke, center it
- * below the headers of the tree-view.
- */
 
 static void
 move_to_change_state(GSimpleAction *action,
@@ -1934,27 +1938,121 @@ move_to_change_state(GSimpleAction *action,
     }
 }
 
+/*
+ * bndx_popup_menu_create: create the popup menu and popover at init time
+ */
 static void
-bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
+bndx_popup_menu_create(BalsaIndex * bindex)
 {
-    GtkWidget *menu = index->popup_menu;
-    GtkWidget *submenu;
+    GSimpleActionGroup *simple;
+    static const GActionEntry entries[] = {
+        {"reply",            reply_activated},
+        {"reply-to-all",     reply_to_all_activated},
+        {"reply-to-group",   reply_to_group_activated},
+        {"forward-attached", forward_attached_activated},
+        {"forward-inline",   forward_inline_activated},
+        {"pipe",             pipe_activated},
+        {"store-address",    store_address_activated},
+        {"delete",           delete_activated},
+        {"undelete",         undelete_activated},
+        {"trash",            move_to_trash_activated},
+        {"toggle-flagged",   toggle_flagged_activated},
+        {"toggle-unread",    toggle_unread_activated},
+        {"view-source",      view_source_activated},
+        {"move-to",          libbalsa_radio_activated,
+            "s", "''", move_to_change_state}
+    };
+    GMenu *menu, *section, *submenu;
+
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    entries,
+                                    G_N_ELEMENTS(entries),
+                                    bindex);
+    gtk_widget_insert_action_group(GTK_WIDGET(bindex), "popup", G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+
+    menu = g_menu_new();
+
+    /* this is an invariable part of the context message menu. */
+    g_menu_append(menu, _("_Reply…"),            "popup.reply");
+    g_menu_append(menu, _("Reply To _All…"),     "popup.reply-to-all");
+    g_menu_append(menu, _("Reply To _Group…"),   "popup.reply-to-group");
+    g_menu_append(menu, _("_Forward Attached…"), "popup.forward-attached");
+    g_menu_append(menu, _("Forward _Inline…"),   "popup.forward-inline");
+    g_menu_append(menu, _("_Pipe through…"),     "popup.pipe");
+    g_menu_append(menu, _("_Store Address…"),    "popup.store-address");
+
+    /* items that are insensitive for a read-only mailbox */
+    section = g_menu_new();
+
+    g_menu_append(section, _("_Delete"),        "popup.delete");
+    g_menu_append(section, _("_Undelete"),      "popup.undelete");
+    g_menu_append(section, _("Move To _Trash"), "popup.trash");
+
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
+
+    /* Toggle items */
+    submenu = g_menu_new();
+
+    g_menu_append(submenu, _("_Flagged"), "popup.toggle-flagged");
+    g_menu_append(submenu, _("_Unread"),  "popup.toggle-unread");
+
+    g_menu_append_submenu(menu, _("T_oggle"), G_MENU_MODEL(submenu));
+    g_object_unref(submenu);
+
+    /* Move-to submenu */
+    bindex->move_position = g_menu_model_get_n_items(G_MENU_MODEL(menu));
+    g_menu_append(menu, _("_Move to"), NULL);    /* place holder */
+
+    /* View source */
+    section = g_menu_new();
+    g_menu_append(section, _("_View Source"), "popup.view-source");
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
+
+    bindex->popup_popover = gtk_popover_new_from_model(GTK_WIDGET(bindex), G_MENU_MODEL(menu));
+    bindex->popup_menu = menu;
+}
+
+/* bndx_do_popup: common code for the popup menu;
+ * set sensitivity of menuitems on the popup
+ * menu, and populate the mru submenu
+ */
+
+static void
+bndx_action_set_enabled(BalsaIndex  *bindex,
+                        const gchar *prefix,
+                        const gchar *action_name,
+                        gboolean     enabled)
+{
+    GActionGroup *action_group;
+    GActionMap *action_map;
+    GAction *action;
+
+    action_group = gtk_widget_get_action_group(GTK_WIDGET(bindex), prefix);
+    action_map = G_ACTION_MAP(action_group);
+    action = g_action_map_lookup_action(action_map, action_name);
+    g_simple_action_set_enabled(G_SIMPLE_ACTION(action), enabled);
+}
+
+static void
+bndx_do_popup(BalsaIndex * index)
+{
     LibBalsaMailbox* mailbox;
-    GList *list, *l;
     gboolean any;
     gboolean any_deleted = FALSE;
     gboolean any_not_deleted = FALSE;
     GArray *selected = balsa_index_selected_msgnos_new(index);
     guint i;
     gboolean readonly;
-    GSimpleActionGroup *simple;
-    static const GActionEntry bndx_popup_entries[] = {
-        {"move-to", libbalsa_radio_activated, "s", "''", move_to_change_state},
-    };
     GMenu *mru_menu;
+    GMenuItem *item;
 
     g_debug("%s:%s", __FILE__, __func__);
 
+    /* Set actions enabled */
     mailbox = balsa_mailbox_node_get_mailbox(index->mailbox_node);
     for (i = 0; i < selected->len; i++) {
         guint msgno = g_array_index(selected, guint, i);
@@ -1968,64 +2066,40 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     any = selected->len > 0;
     balsa_index_selected_msgnos_free(index, selected);
 
-    l = gtk_container_get_children(GTK_CONTAINER(menu));
-    for (list = l; list; list = list->next)
-        gtk_widget_set_sensitive(GTK_WIDGET(list->data), any);
-    g_list_free(l);
+    bndx_action_set_enabled(index, "popup", "reply", any);
+    bndx_action_set_enabled(index, "popup", "reply-to-all", any);
+    bndx_action_set_enabled(index, "popup", "reply-to-group", any);
+    bndx_action_set_enabled(index, "popup", "forward-attached", any);
+    bndx_action_set_enabled(index, "popup", "forward-inline", any);
+    bndx_action_set_enabled(index, "popup", "pipe", any);
+    bndx_action_set_enabled(index, "popup", "store-address", any);
+    bndx_action_set_enabled(index, "popup", "view-source", any);
 
     readonly = libbalsa_mailbox_get_readonly(mailbox);
-    gtk_widget_set_sensitive(index->delete_item,
-                             any_not_deleted && !readonly);
-    gtk_widget_set_sensitive(index->undelete_item,
-                             any_deleted && !readonly);
-    gtk_widget_set_sensitive(index->move_to_trash_item,
-                             any && mailbox != balsa_app.trash
-                             && !readonly);
-    gtk_widget_set_sensitive(index->toggle_item,
-                             any && !readonly);
-    gtk_widget_set_sensitive(index->move_to_item,
-                             any && !readonly);
 
-    simple = g_simple_action_group_new();
-    g_action_map_add_action_entries(G_ACTION_MAP(simple),
-                                    bndx_popup_entries,
-                                    G_N_ELEMENTS(bndx_popup_entries),
-                                    index);
-    gtk_widget_insert_action_group(menu, "bndx-popup", G_ACTION_GROUP(simple));
-    g_object_unref(simple);
+    bndx_action_set_enabled(index, "popup", "delete", any_not_deleted && !readonly);
+    bndx_action_set_enabled(index, "popup", "undelete", any_deleted && !readonly);
+    bndx_action_set_enabled(index, "popup", "trash", any && !readonly && mailbox != balsa_app.trash);
+    bndx_action_set_enabled(index, "popup", "toggle-flagged", any && !readonly);
+    bndx_action_set_enabled(index, "popup", "toggle-unread", any && !readonly);
+
+    /* The move-to submenu */
+    item = g_menu_item_new_from_model(G_MENU_MODEL(index->popup_menu),
+                                      index->move_position);
 
     mru_menu =
-        balsa_mblist_mru_menu(&balsa_app.folder_mru, "bndx-popup.move-to");
-    submenu = gtk_menu_new_from_model(G_MENU_MODEL(mru_menu));
+        balsa_mblist_mru_menu(&balsa_app.folder_mru, "popup.move-to");
+    g_menu_item_set_submenu(item, G_MENU_MODEL(mru_menu));
     g_object_unref(mru_menu);
 
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(index->move_to_item),
-                              submenu);
+    /* Replace the existing item */
+    g_menu_remove(index->popup_menu, index->move_position);
+    g_menu_insert_item(index->popup_menu, index->move_position, item);
 
-    gtk_widget_show_all(menu);
-
-    if (event != NULL) {
-        gtk_menu_popup_at_pointer(GTK_MENU(menu), event);
-    } else {
-        gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(index),
-                                 GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
-                                 NULL);
-    }
+    gtk_popover_popup(GTK_POPOVER(index->popup_popover));
 }
 
-static GtkWidget *
-create_stock_menu_item(GtkWidget * menu, const gchar * label, GCallback cb,
-		       gpointer data)
-{
-    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic(label);
-
-    g_signal_connect_swapped(menuitem, "activate",
-                             G_CALLBACK(cb), data);
-
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-
-    return menuitem;
-}
+/* End of popup stuff */
 
 static void
 sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data)

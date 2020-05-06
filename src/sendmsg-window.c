@@ -1833,7 +1833,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     }
 
     attach_data->popup_menu =
-        gtk_popover_new_from_model(bsmsg->text, G_MENU_MODEL(menu));
+        gtk_popover_new_from_model(bsmsg->tree_view, G_MENU_MODEL(menu));
     g_object_unref(menu);
 
     /* append to the list store */

@@ -1,3 +1,8 @@
+2020-05-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/sendmsg-window.c (add_attachment): Insert separators
+	  between logically distinct sections of the popup menu.
+
 2020-04-11  Pawel Salek  <pawsa0@gmail.com>
 
 	* NEWS, configure.ac, meson.build: release balsa-2.6.0

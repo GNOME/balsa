@@ -1811,6 +1811,12 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 			      menu_item);
     }
 
+    if (can_inline || !is_a_temp_file) {
+        /* Need a separator */
+        menu_item = gtk_separator_menu_item_new();
+        gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu), menu_item);
+    }
+
     /* an attachment can be removed */
     menu_item =
 	gtk_menu_item_new_with_label(_("Remove"));
@@ -1819,6 +1825,10 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 		     (gpointer)attach_data);
     gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
 			  menu_item);
+
+    /* Insert another separator */
+    menu_item = gtk_separator_menu_item_new();
+    gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu), menu_item);
 
     /* add the usual vfs menu so the user can inspect what (s)he actually
        attached... (only for non-message attachments) */

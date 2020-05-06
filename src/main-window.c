@@ -4631,7 +4631,7 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
     const gchar *new_message = NULL;
     gboolean clear_fraction = FALSE;
 
-    if (priv->progress_bar == NULL)
+    if (priv->progress_bar == NULL || priv->activity_messages == NULL)
         return;
 
     link = g_slist_find_custom(priv->activity_messages, message,

@@ -1936,6 +1936,8 @@ move_to_change_state(GSimpleAction *action,
             balsa_index_selected_msgnos_free(bindex, selected);
         }
     }
+
+    gtk_popover_popdown(GTK_POPOVER(bindex->popup_popover));
 }
 
 /*
@@ -2012,8 +2014,9 @@ bndx_popup_menu_create(BalsaIndex * bindex)
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
-    bindex->popup_popover = gtk_popover_new_from_model(GTK_WIDGET(bindex), G_MENU_MODEL(menu));
     bindex->popup_menu = menu;
+    bindex->popup_popover = gtk_popover_new_from_model(GTK_WIDGET(bindex), G_MENU_MODEL(menu));
+    gtk_popover_set_position(GTK_POPOVER(bindex->popup_popover), GTK_POS_RIGHT);
 }
 
 /* bndx_do_popup: common code for the popup menu;
@@ -2049,6 +2052,7 @@ bndx_do_popup(BalsaIndex * index)
     gboolean readonly;
     GMenu *mru_menu;
     GMenuItem *item;
+    GtkAllocation allocation;
 
     g_debug("%s:%s", __FILE__, __func__);
 
@@ -2082,6 +2086,7 @@ bndx_do_popup(BalsaIndex * index)
     bndx_action_set_enabled(index, "popup", "trash", any && !readonly && mailbox != balsa_app.trash);
     bndx_action_set_enabled(index, "popup", "toggle-flagged", any && !readonly);
     bndx_action_set_enabled(index, "popup", "toggle-unread", any && !readonly);
+    bndx_action_set_enabled(index, "popup", "move-to", any && !readonly);
 
     /* The move-to submenu */
     item = g_menu_item_new_from_model(G_MENU_MODEL(index->popup_menu),
@@ -2092,9 +2097,23 @@ bndx_do_popup(BalsaIndex * index)
     g_menu_item_set_submenu(item, G_MENU_MODEL(mru_menu));
     g_object_unref(mru_menu);
 
-    /* Replace the existing item */
+    /* Replace the existing submenu */
     g_menu_remove(index->popup_menu, index->move_position);
     g_menu_insert_item(index->popup_menu, index->move_position, item);
+
+    gtk_widget_get_allocation(GTK_WIDGET(index), &allocation);
+    if (event != NULL) {
+        /* Pop up to the right of the pointer */
+        allocation.width = event->x;
+    } else {
+        /* Pop up to the right of the "From" column */
+        allocation.width = balsa_app.index_num_width +
+                           balsa_app.index_status_width +
+                           balsa_app.index_attachment_width +
+                           balsa_app.index_from_width;
+    }
+    gtk_popover_set_pointing_to(GTK_POPOVER(index->popup_popover),
+                                (GdkRectangle *) &allocation);
 
     gtk_popover_popup(GTK_POPOVER(index->popup_popover));
 }

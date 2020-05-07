@@ -1358,11 +1358,7 @@ change_attach_mode(GSimpleAction *action,
 	result = gtk_dialog_run(GTK_DIALOG(extbody_dialog));
 	gtk_widget_destroy(extbody_dialog);
 	if (result != GTK_RESPONSE_YES) {
-#if GTK_CHECK_VERSION(3, 22, 0)
             gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-            gtk_widget_hide(info->popup_menu);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
 	    return;
         }
@@ -1373,11 +1369,7 @@ change_attach_mode(GSimpleAction *action,
     gtk_list_store_set(GTK_LIST_STORE(model), &iter, ATTACH_MODE_COLUMN,
 		       info->mode, -1);
 
-#if GTK_CHECK_VERSION(3, 22, 0)
     gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-    gtk_widget_hide(info->popup_menu);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 
     g_simple_action_set_state(action, parameter);
 }
@@ -1401,11 +1393,7 @@ attachment_menu_vfs_cb(GSimpleAction *action,
                           err ? err->message : "Unknown error");
     g_clear_error(&err);
 
-#if GTK_CHECK_VERSION(3, 22, 0)
     gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-    gtk_widget_hide(info->popup_menu);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
 }
 
 

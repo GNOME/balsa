@@ -235,7 +235,7 @@ libical >= 2.0.0
 
 PKG_CHECK_MODULES(BALSA_AB, [
    glib-2.0
-   gtk+-3.0
+   gtk+-3.0 >= 3.22.0
    gmime-3.0 >= 3.2.6
 ])
 

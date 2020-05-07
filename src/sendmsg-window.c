@@ -2440,8 +2440,18 @@ attachment_button_press_cb(GtkGestureMultiPress *multi_press,
 
 	    gtk_tree_model_get(model, &iter, ATTACH_INFO_COLUMN, &attach_info, -1);
 	    if (attach_info != NULL) {
-		if (attach_info->popup_menu != NULL)
+		if (attach_info->popup_menu != NULL) {
+                    GdkRectangle rectangle;
+
+                    /* Pop up above the pointer */
+                    rectangle.x = (gint) x;
+                    rectangle.width = 0;
+                    rectangle.y = (gint) y;
+                    rectangle.height = 0;
+                    gtk_popover_set_pointing_to(GTK_POPOVER(attach_info->popup_menu),
+                                                &rectangle);
                     gtk_popover_popup(GTK_POPOVER(attach_info->popup_menu));
+                }
 		g_object_unref(attach_info);
 	    }
         }

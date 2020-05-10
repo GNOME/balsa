@@ -429,12 +429,13 @@ libbalsa_address_book_ldap_load(LibBalsaAddressBook * ab,
     /*
      * Connect to the server.
      */
-    for (attempt = 0; attempt < 2; attempt++) {
+    for(attempt=0; attempt<2; attempt++) {
         if (ab_ldap->directory == NULL) {
-            if (libbalsa_address_book_ldap_open_connection(ab_ldap) != LDAP_SUCCESS)
+            if ((rc=libbalsa_address_book_ldap_open_connection(ab_ldap))
+                != LDAP_SUCCESS)
                 return LBABERR_CANNOT_CONNECT;
         }
-
+        
         /* 
          * Attempt to search for e-mail addresses. It returns success 
          * or failure, but not all the matches. 
@@ -750,7 +751,8 @@ libbalsa_address_book_ldap_remove_address(LibBalsaAddressBook *ab,
     g_return_val_if_fail(addr != NULL, LBABERR_CANNOT_WRITE);
 
     if (ab_ldap->directory == NULL) {
-        if (libbalsa_address_book_ldap_open_connection(ab_ldap) != LDAP_SUCCESS)
+        if( (rc=libbalsa_address_book_ldap_open_connection(ab_ldap))
+	    != LDAP_SUCCESS)
 	    return LBABERR_CANNOT_CONNECT;
     }
 
@@ -824,7 +826,8 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
     /* the email address has not changed, continue with changing other
      * attributes. */
     if (ab_ldap->directory == NULL) {
-        if (libbalsa_address_book_ldap_open_connection(ab_ldap) != LDAP_SUCCESS)
+        if ((rc = libbalsa_address_book_ldap_open_connection(ab_ldap))
+	    != LDAP_SUCCESS)
 	    return LBABERR_CANNOT_CONNECT;
     }
 
@@ -1056,7 +1059,8 @@ libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
         return NULL;
 
     if (ab_ldap->directory == NULL) {
-        if (libbalsa_address_book_ldap_open_connection(ab_ldap) != LDAP_SUCCESS)
+        if( (rc=libbalsa_address_book_ldap_open_connection(ab_ldap))
+	    != LDAP_SUCCESS)
 	    return NULL;
     }
 

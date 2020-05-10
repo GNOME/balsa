@@ -144,11 +144,6 @@ struct _LibBalsaMessageHeaders {
 
     /* other headers */
     GList *user_hdrs;
-
-#if defined ENABLE_AUTOCRYPT
-    /* received Autocrypt header */
-    GMimeAutocryptHeader *autocrypt_hdr;
-#endif
 };
 
 /** FREE_HEADER_LIST() frees user_hdrs */

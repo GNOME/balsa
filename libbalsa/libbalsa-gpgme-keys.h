@@ -120,15 +120,15 @@ gchar *libbalsa_gpgme_export_key(gpgme_ctx_t   ctx,
  * \param fingerprint key fingerprint, may be NULL
  * \param mailbox key uid
  * \param error filled with error information on error
- * \return a newly allocated buffer containing the key on success, NULL on error
+ * \return a newly allocated string containing the BASE64-encoded key on success, NULL on error
  *
  * Export the minimal key for using it in a Autocrypt: header.  If specified, the key is selected by the passed fingerprint,
  * otherwise the first key matching the passed mailbox is used.  Depending on the gpg backend version, all other uid's and all
  * subkeys which are not required are stripped.
  */
-GBytes *libbalsa_gpgme_export_autocrypt_key(const gchar  *fingerprint,
-										    const gchar  *mailbox,
-										    GError      **error)
+gchar *libbalsa_gpgme_export_autocrypt_key(const gchar  *fingerprint,
+										   const gchar  *mailbox,
+										   GError      **error)
 	G_GNUC_WARN_UNUSED_RESULT;
 
 /** \brief Import an ASCII-armoured key

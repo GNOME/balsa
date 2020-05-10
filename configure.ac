@@ -8,9 +8,9 @@ dnl ###########################################################################
 dnl Boilerplace and versioning
 dnl ###########################################################################
 
-# if autoconf is used not in a git source tree, use version=2.6.0
+# if autoconf is used not in a git source tree, use version=2.5.10
 AC_INIT([balsa],
-        m4_esyscmd([test -d .git && echo -n `git describe --tags` || echo -n 2.6.0]),
+        m4_esyscmd([test -d .git && echo -n `git describe --tags` || echo -n 2.5.10]),
         [])
 
 AM_INIT_AUTOMAKE
@@ -225,7 +225,7 @@ dnl #####################################################################
 PKG_CHECK_MODULES(BALSA, [
 glib-2.0 >= 2.48.0
 gtk+-3.0 >= 3.18.0
-gmime-3.0 >= 3.2.6
+gmime-2.6
 gio-2.0
 gthread-2.0
 gnutls >= 3.0
@@ -236,7 +236,7 @@ libical >= 2.0.0
 PKG_CHECK_MODULES(BALSA_AB, [
    glib-2.0
    gtk+-3.0
-   gmime-3.0 >= 3.2.6
+   gmime-2.6
 ])
 
 PKG_CHECK_MODULES(LIBNETCLIENT, [

@@ -91,24 +91,23 @@ enum {
 };
 
 
-typedef struct {
-	gconstpointer keydata;
-	gsize keysize;
-	gchar *fingerprint;
-	gint64 expires;
-} ac_key_data_t;
-
-
 static void autocrypt_close(void);
-static gboolean extract_ac_keydata(GMimeAutocryptHeader  *autocrypt_header,
-								   ac_key_data_t         *dest,
-								   GError               **error);
-static void add_or_update_user_info(GMimeAutocryptHeader    *autocrypt_header,
-									const ac_key_data_t     *ac_key_data,
-									gboolean                 update,
-									GError                  **error);
-static void update_last_seen(GMimeAutocryptHeader  *autocrypt_header,
-							 GError      		  **error);
+static AutocryptData *scan_autocrypt_headers(GList * const  header_list,
+											 const gchar   *from_addr)
+	G_GNUC_WARN_UNUSED_RESULT;
+static AutocryptData *parse_autocrypt_header(const gchar *value)
+	G_GNUC_WARN_UNUSED_RESULT;
+static gboolean eval_autocrypt_attr(const gchar   *attr,
+									const gchar   *value,
+									gboolean      *seen,
+									AutocryptData *target);
+static void add_or_update_user_info(const AutocryptData  *user_info,
+									time_t                date_header,
+									gboolean              update,
+									GError              **error);
+static void update_last_seen(const gchar  *addr,
+							 time_t        date_header,
+							 GError      **error);
 static AutocryptData *autocrypt_user_info(const gchar  *mailbox,
 										  GError      **error)
 	G_GNUC_WARN_UNUSED_RESULT;
@@ -133,13 +132,13 @@ gboolean
 autocrypt_init(GError **error)
 {
 	static const gchar * const prepare_statements[NUM_QUERIES] = {
-		"SELECT * FROM autocrypt WHERE addr = LOWER(?)",
-		"INSERT INTO autocrypt VALUES (LOWER(?1), ?2, ?2, ?3, ?4, ?5, ?6)",
+		"SELECT * FROM autocrypt WHERE LOWER(addr) = ?",
+		"INSERT INTO autocrypt VALUES (?1, ?2, ?2, ?3, ?4, ?5, ?6)",
 		"UPDATE autocrypt SET last_seen = MAX(?2, last_seen), ac_timestamp = ?2, pubkey = ?3, fingerprint = ?4,"
-		" expires = ?5, prefer_encrypt = ?6 WHERE addr = LOWER(?1)",
-		"UPDATE autocrypt SET last_seen = ?2 WHERE addr = LOWER(?1) AND last_seen < ?2 AND ac_timestamp < ?2",
+		" expires = ?5, prefer_encrypt = ?6 WHERE addr = ?1",
+		"UPDATE autocrypt SET last_seen = ?2 WHERE addr = ?1 AND last_seen < ?2 AND ac_timestamp < ?2",
 		"SELECT pubkey FROM autocrypt WHERE fingerprint LIKE ?",
-		"SELECT addr, last_seen, ac_timestamp, prefer_encrypt, pubkey FROM autocrypt ORDER BY addr ASC"
+		"SELECT addr, last_seen, ac_timestamp, prefer_encrypt, pubkey FROM autocrypt ORDER BY LOWER(addr) ASC"
 	};
 	gboolean result;
 
@@ -200,21 +199,16 @@ void
 autocrypt_from_message(LibBalsaMessage  *message,
 					   GError          **error)
 {
-	LibBalsaMessageHeaders *headers;
-	ac_key_data_t ac_key_data;
-	time_t ac_header_time;
+	const gchar *from_addr;
+	AutocryptData *autocrypt;
+        LibBalsaMessageHeaders *headers;
 
 	g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-	headers = libbalsa_message_get_headers(message);
+        headers = libbalsa_message_get_headers(message);
 	g_return_if_fail(headers != NULL);
+	g_return_if_fail(headers->from != NULL);
+	g_return_if_fail(headers->content_type != NULL);
 	g_return_if_fail(autocrypt_db != NULL);
-
-	/* return silently if there is no gmime autocrypt header
-	 * note that it will *always* contain a valid sender address and effective date if it exists, so there is no need to validate
-	 * the data returned from the g_mime_autocrypt_header_get_* accessor functions, except for the key data */
-	if (headers->autocrypt_hdr == NULL) {
-		return;
-	}
 
 	// FIXME - we should ignore spam - how can we detect it?
 
@@ -227,36 +221,47 @@ autocrypt_from_message(LibBalsaMessage  *message,
 		return;
 	}
 
-    /* ignore messages without a Date: header or with a date in the future */
-	ac_header_time = g_date_time_to_unix(g_mime_autocrypt_header_get_effective_date(headers->autocrypt_hdr));
-    if (ac_header_time > time(NULL)) {
-    	g_debug("no Date: header or value in the future, ignored");
-    	return;
-    }
+	/* check for exactly one From: mailbox address - others shall be ignored */
+	if ((internet_address_list_length(headers->from) != 1) ||
+		!INTERNET_ADDRESS_IS_MAILBOX(internet_address_list_get_address(headers->from, 0))) {
+		g_debug("require exactly one From: address, ignored");
+		return;
+	}
+
+	/* ignore messages without a Date: header or with a date in the future */
+	if ((headers->date == 0) || (headers->date > time(NULL))) {
+		g_debug("no Date: header or value in the future, ignored");
+		return;
+	}
+
+	/* get the From: address (is a mailbox, checked above) */
+	from_addr =
+		internet_address_mailbox_get_addr(INTERNET_ADDRESS_MAILBOX(internet_address_list_get_address(headers->from, 0)));
+	g_debug("message from '%s', date %ld", from_addr, headers->date);
+
+	/* scan for Autocrypt headers */
+	autocrypt = scan_autocrypt_headers(headers->user_hdrs, from_addr);
 
     /* update the database */
     G_LOCK(db_mutex);
-    if (extract_ac_keydata(headers->autocrypt_hdr, &ac_key_data, error)) {
+    if (autocrypt != NULL) {
     	AutocryptData *db_info;
 
-    	db_info = autocrypt_user_info(g_mime_autocrypt_header_get_address_as_string(headers->autocrypt_hdr), error);
+    	db_info = autocrypt_user_info(autocrypt->addr, error);
     	if (db_info != NULL) {
-    		if (ac_header_time > db_info->ac_timestamp) {
-    			add_or_update_user_info(headers->autocrypt_hdr, &ac_key_data, TRUE, error);
+    		if (headers->date > db_info->ac_timestamp) {
+        		add_or_update_user_info(autocrypt, headers->date, TRUE, error);
     		} else {
     			g_info("message timestamp %ld not newer than autocrypt db timestamp %ld, ignore message",
     				(long) headers->date, (long) db_info->ac_timestamp);
     		}
     		autocrypt_free(db_info);
     	} else {
-    		add_or_update_user_info(headers->autocrypt_hdr, &ac_key_data, FALSE, error);
+    		add_or_update_user_info(autocrypt, headers->date, FALSE, error);
     	}
-    	g_free(ac_key_data.fingerprint);
+    	autocrypt_free(autocrypt);
     } else {
-    	/* note: we update the last seen db field if there is no key (i.e. the message did not contain an Autocrypt: header) *and*
-    	 * if the key data is broken, or gpgme failed to handle it for some other reason.  We /might/ want to distinguish between
-    	 * these two cases. */
-        update_last_seen(headers->autocrypt_hdr, error);
+    	update_last_seen(from_addr, headers->date, error);
     }
     G_UNLOCK(db_mutex);
 }
@@ -269,9 +274,9 @@ autocrypt_header(LibBalsaIdentity *identity, GError **error)
 	const gchar *mailbox;
 	gchar *use_fpr = NULL;
 	gchar *result = NULL;
-	InternetAddress *ia;
-	const gchar *force_gpg_key_id;
-	AutocryptMode autocrypt_mode;
+        InternetAddress *ia;
+        const gchar *force_gpg_key_id;
+        AutocryptMode autocrypt_mode;
 
 	g_return_val_if_fail(identity != NULL, NULL);
 	autocrypt_mode = libbalsa_identity_get_autocrypt_mode(identity);
@@ -281,7 +286,7 @@ autocrypt_header(LibBalsaIdentity *identity, GError **error)
 	mailbox = internet_address_mailbox_get_addr(INTERNET_ADDRESS_MAILBOX(ia));
 
 	/* no key fingerprint has been passed - try to find the fingerprint of a secret key matching the passed mailbox */
-	force_gpg_key_id = libbalsa_identity_get_force_gpg_key_id(identity);
+        force_gpg_key_id = libbalsa_identity_get_force_gpg_key_id(identity);
 	if ((force_gpg_key_id == NULL) || (force_gpg_key_id[0] == '\0')) {
 		gpgme_ctx_t ctx;
 
@@ -312,24 +317,25 @@ autocrypt_header(LibBalsaIdentity *identity, GError **error)
 	}
 
 	if (use_fpr != NULL) {
-		GBytes *keydata;
+		gchar *keydata;
 
 		keydata = libbalsa_gpgme_export_autocrypt_key(use_fpr, mailbox, error);
 		g_free(use_fpr);
 		if (keydata != NULL) {
-			GMimeAutocryptHeader *header;
+			GString *buffer;
+			gssize ins_fws;
 
-			header = g_mime_autocrypt_header_new();
-			g_mime_autocrypt_header_set_address_from_string(header, mailbox);
+			buffer = g_string_new(NULL);
+			g_string_append_printf(buffer, "addr=%s;", mailbox);
 			if (autocrypt_mode == AUTOCRYPT_PREFER_ENCRYPT) {
-				g_mime_autocrypt_header_set_prefer_encrypt(header, GMIME_AUTOCRYPT_PREFER_ENCRYPT_MUTUAL);
-			} else {
-				g_mime_autocrypt_header_set_prefer_encrypt(header, GMIME_AUTOCRYPT_PREFER_ENCRYPT_NONE);
+				g_string_append(buffer, "prefer-encrypt=mutual;");
 			}
-			g_mime_autocrypt_header_set_keydata(header, keydata);
-			g_bytes_unref(keydata);
-			result = g_mime_autocrypt_header_to_string(header, FALSE);
-			g_object_unref(header);
+			g_string_append_printf(buffer, "keydata=%s", keydata);
+			for (ins_fws = 66; ins_fws < (gssize) buffer->len; ins_fws += 78) {
+				g_string_insert(buffer, ins_fws, "\n\t");
+			}
+			result = g_string_free(buffer, FALSE);
+			g_free(keydata);
 		}
 	}
 
@@ -621,6 +627,203 @@ autocrypt_close(void)
 }
 
 
+/** \brief Extract Autocrypt data from message headers
+ *
+ * \param header_list list of headers pointing to gchar** (name, value) pairs
+ * \param from_addr sender mailbox extracted from the From: header
+ * \return the data extracted from the Autocrypt header, or NULL if no valid data is present
+ *
+ * The following rules apply according to the Autocrypt Level 1 standard:
+ * - invalid Autocrypt headers are just discarded, but checking for more Autocrypt headers continues (see section 2.1 <em>The
+ *   Autocrypt Header</em>, https://autocrypt.org/level1.html#the-autocrypt-header);
+ * - if the \em addr attribute of an otherwise valid Autocrypt header does not match the mailbox extracted from the From: message
+ *   header, the Autocrypt header shall be treated as being invalid and discarded (see section 2.1);
+ * - if more than one valid Autocrypt header is present, \em all Autocrypt headers shall be discarded (see section 2.3 <em>Updating
+ *   Autocrypt Peer State</em>, https://autocrypt.org/level1.html#updating-autocrypt-peer-state);
+ *
+ * Thus, this function returns a newly allocated Autocrypt data structure iff the passed headers list contains exactly \em one valid
+ * Autocrypt header.
+ */
+static AutocryptData *
+scan_autocrypt_headers(GList * const header_list, const gchar *from_addr)
+{
+	GList *header;
+	AutocryptData *result = NULL;
+
+	for (header = header_list; header != NULL; header = header->next) {
+		const gchar **header_parts = (const gchar **) header->data;
+
+		if ((g_ascii_strcasecmp(header_parts[0], "Autocrypt") == 0) && (header_parts[1] != NULL)) {
+			AutocryptData *new_data;
+
+			new_data = parse_autocrypt_header(header_parts[1]);
+			if (new_data != NULL) {
+				if (result == NULL) {
+			    	if (g_ascii_strcasecmp(new_data->addr, from_addr) != 0) {
+			    		g_info("Autocrypt header for '%s' in message from '%s', ignore header", new_data->addr, from_addr);
+			    		autocrypt_free(new_data);
+			    	} else {
+			    		result = new_data;
+			    	}
+				} else {
+					g_info("more than one valid Autocrypt header");
+					autocrypt_free(result);
+					autocrypt_free(new_data);
+					return NULL;
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+
+static AutocryptData *
+parse_autocrypt_header(const gchar *value)
+{
+	gchar **attributes;
+	gboolean attr_seen[3] = { FALSE, FALSE, FALSE };
+	AutocryptData *new_data;
+	gint n;
+	gboolean broken;
+
+	new_data = g_new0(AutocryptData, 1U);
+	attributes = g_strsplit(value, ";", -1);
+	if (attributes == NULL) {
+		g_info("empty Autocrypt header");
+		broken = TRUE;
+	} else {
+		broken = FALSE;
+	}
+
+	for (n = 0; !broken && (attributes[n] != NULL); n++) {
+		gchar **items;
+
+		items = g_strsplit(attributes[n], "=", 2);
+		if ((items == NULL) || (items[0] == NULL) || (items[1] == NULL)) {
+			g_info("bad Autocrypt header attribute");
+			broken = TRUE;
+		} else {
+			broken = !eval_autocrypt_attr(g_strstrip(items[0]), g_strstrip(items[1]), attr_seen, new_data);
+		}
+		g_strfreev(items);
+	}
+	g_strfreev(attributes);
+
+	if (!broken) {
+		if (!attr_seen[0] || !attr_seen[2]) {
+			g_info("missing mandatory Autocrypt header attribute");
+			broken = TRUE;
+		}
+	}
+
+	/* try to import the key into a temporary context */
+	if (!broken) {
+		gboolean success = FALSE;
+		gpgme_ctx_t ctx;
+
+		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, NULL);
+		if (ctx != NULL) {
+			gchar *temp_dir = NULL;
+
+			if (!libbalsa_mktempdir(&temp_dir)) {
+				g_warning("Failed to create a temporary folder");
+			} else {
+				GList *keys = NULL;
+				GError *error = NULL;
+				guint bad_keys = 0U;
+
+				success = libbalsa_gpgme_ctx_set_home(ctx, temp_dir, &error) &&
+					libbalsa_gpgme_import_bin_key(ctx, new_data->keydata, NULL, &error) &&
+					libbalsa_gpgme_list_keys(ctx, &keys, &bad_keys, NULL, FALSE, FALSE, FALSE, &error);
+				if (success && (keys != NULL) && (keys->next == NULL)) {
+					gpgme_key_t key = (gpgme_key_t) keys->data;
+
+					if ((key != NULL) && (key->subkeys != NULL)) {
+						new_data->fingerprint = g_strdup(key->subkeys->fpr);
+						new_data->expires = key->subkeys->expires;
+					}
+				} else {
+					g_warning("Failed to import or list key data for '%s': %s (%u keys, %u bad)", new_data->addr,
+						(error != NULL) ? error->message : "unknown", (keys != NULL) ? g_list_length(keys) : 0U, bad_keys);
+				}
+				g_clear_error(&error);
+
+				g_list_free_full(keys, (GDestroyNotify) gpgme_key_release);
+				libbalsa_delete_directory_contents(temp_dir);
+				g_rmdir(temp_dir);
+			}
+
+			gpgme_release(ctx);
+		}
+	}
+
+	/* check if a broken header has been detected, or if importing the key failed */
+	if (broken || (new_data->fingerprint == NULL)) {
+		autocrypt_free(new_data);
+		new_data = NULL;
+	} else {
+		g_debug("valid Autocrypt header for '%s', prefer encrypt %d, key fingerprint %s", new_data->addr, new_data->prefer_encrypt,
+			new_data->fingerprint);
+	}
+
+	return new_data;
+}
+
+
+static gboolean
+eval_autocrypt_attr(const gchar *attr, const gchar *value, gboolean *seen, AutocryptData *target)
+{
+	gboolean result = FALSE;
+
+	if (seen[2]) {
+		g_info("broken Autocrypt header, extra attribute after keydata");
+	} else if (strcmp(attr, "addr") == 0) {
+		if (seen[0]) {
+			g_info("duplicated Autocrypt header attribute 'addr'");
+		} else {
+			seen[0] = TRUE;
+			/* note: not exactly the canonicalisation as required by the Autocrypt standard, but should work in all practical use
+			 * cases... */
+			target->addr = g_ascii_strdown(value, -1);
+			result = TRUE;
+		}
+	} else if (strcmp(attr, "prefer-encrypt") == 0) {
+		if (seen[1]) {
+			g_info("duplicated Autocrypt header attribute 'addr'");
+		} else {
+			seen[1] = TRUE;
+			if (strcmp(value, "mutual") == 0) {
+				target->prefer_encrypt = TRUE;
+				result = TRUE;
+			} else {
+				g_info("bad value '%s' for Autocrypt header attribute 'prefer-encrypt'", value);
+			}
+		}
+	} else if (strcmp(attr, "keydata") == 0) {
+		guchar *data;
+		gsize len;
+
+		seen[2] = TRUE;
+		data = g_base64_decode(value, &len);
+		if (data == NULL) {
+			g_info("invalid keydata in Autocrypt header");
+		} else {
+			target->keydata = g_bytes_new_take(data, len);
+			result = TRUE;
+		}
+	} else if (attr[0] == '_') {
+		g_debug("ignoring non-critical Autocrypt header attribute '%s'", attr);
+		result = TRUE;		/* note that this is no error */
+	} else {
+		g_info("unexpected Autocrypt header attribute '%s'", attr);
+	}
+
+	return result;
+}
+
+
 static AutocryptData *
 autocrypt_user_info(const gchar *mailbox, GError **error)
 {
@@ -660,102 +863,35 @@ autocrypt_user_info(const gchar *mailbox, GError **error)
 }
 
 
-static gboolean
-extract_ac_keydata(GMimeAutocryptHeader *autocrypt_header, ac_key_data_t *dest, GError **error)
-{
-	GBytes *keydata;
-	gboolean success = FALSE;
-
-	keydata = g_mime_autocrypt_header_get_keydata(autocrypt_header);
-	if (keydata) {
-		gpgme_ctx_t ctx;
-
-		dest->keydata = g_bytes_get_data(keydata, &dest->keysize);
-
-		/* try to import the key into a temporary context: validate, get fingerprint and expiry date */
-		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, NULL);
-		if (ctx != NULL) {
-			gchar *temp_dir = NULL;
-
-			if (!libbalsa_mktempdir(&temp_dir)) {
-				g_warning("Failed to create a temporary folder");
-			} else {
-				GList *keys = NULL;
-				GError *gpg_error = NULL;
-				guint bad_keys = 0U;
-
-				success = libbalsa_gpgme_ctx_set_home(ctx, temp_dir, &gpg_error) &&
-					libbalsa_gpgme_import_bin_key(ctx, keydata, NULL, &gpg_error) &&
-					libbalsa_gpgme_list_keys(ctx, &keys, &bad_keys, NULL, FALSE, FALSE, FALSE, &gpg_error);
-				if (success && (keys != NULL) && (keys->next == NULL)) {
-					gpgme_key_t key = (gpgme_key_t) keys->data;
-
-					if ((key != NULL) && (key->subkeys != NULL)) {
-						dest->fingerprint = g_strdup(key->subkeys->fpr);
-						dest->expires = key->subkeys->expires;
-					}
-				} else {
-					g_warning("Failed to import or list key data for '%s': %s (%u keys, %u bad)",
-						g_mime_autocrypt_header_get_address_as_string(autocrypt_header),
-						(gpg_error != NULL) ? gpg_error->message : "unknown", (keys != NULL) ? g_list_length(keys) : 0U, bad_keys);
-				}
-				g_clear_error(&gpg_error);
-
-				g_list_free_full(keys, (GDestroyNotify) gpgme_key_release);
-				libbalsa_delete_directory_contents(temp_dir);
-				g_rmdir(temp_dir);
-			}
-
-			gpgme_release(ctx);
-		}
-	}
-
-	return success;
-}
-
-
 static void
-add_or_update_user_info(GMimeAutocryptHeader *autocrypt_header, const ac_key_data_t *ac_key_data, gboolean update, GError **error)
+add_or_update_user_info(const AutocryptData *user_info, time_t date_header, gboolean update, GError **error)
 {
 	guint query_idx;
-	const gchar *addr;
-	gint64 date_header;
-	gint prefer_encrypt;
+	gconstpointer keyvalue;
+	gsize keysize;
 
 	query_idx = update ? 2 : 1;
-
-	addr = g_mime_autocrypt_header_get_address_as_string(autocrypt_header);
-	date_header = g_date_time_to_unix(g_mime_autocrypt_header_get_effective_date(autocrypt_header));
-	if (g_mime_autocrypt_header_get_prefer_encrypt(autocrypt_header) == GMIME_AUTOCRYPT_PREFER_ENCRYPT_MUTUAL) {
-		prefer_encrypt = (gint) AUTOCRYPT_PREFER_ENCRYPT;
-	} else {
-		prefer_encrypt = (gint) AUTOCRYPT_NOPREFERENCE;
-	}
-
-	if ((sqlite3_bind_text(query[query_idx], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
+	keyvalue = g_bytes_get_data(user_info->keydata, &keysize);
+	if ((sqlite3_bind_text(query[query_idx], 1, user_info->addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 		(sqlite3_bind_int64(query[query_idx], 2, date_header) != SQLITE_OK) ||
-		(sqlite3_bind_blob(query[query_idx], 3, ac_key_data->keydata, ac_key_data->keysize, SQLITE_STATIC) != SQLITE_OK) ||
-		(sqlite3_bind_text(query[query_idx], 4, ac_key_data->fingerprint, -1, SQLITE_STATIC) != SQLITE_OK) ||
-		(sqlite3_bind_int64(query[query_idx], 5, ac_key_data->expires) != SQLITE_OK) ||
-		(sqlite3_bind_int(query[query_idx], 6, prefer_encrypt) != SQLITE_OK) ||
+		(sqlite3_bind_blob(query[query_idx], 3, keyvalue, keysize, SQLITE_STATIC) != SQLITE_OK) ||
+		(sqlite3_bind_text(query[query_idx], 4, user_info->fingerprint, -1, SQLITE_STATIC) != SQLITE_OK) ||
+		(sqlite3_bind_int64(query[query_idx], 5, user_info->expires) != SQLITE_OK) ||
+		(sqlite3_bind_int(query[query_idx], 6, user_info->prefer_encrypt) != SQLITE_OK) ||
 		(sqlite3_step(query[query_idx]) != SQLITE_DONE)) {
-		g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1, update ? _("update user “%s” failed: %s") : _("insert user “%s” failed: %s"),
-			addr, sqlite3_errmsg(autocrypt_db));
+		g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1,
+                        update ? _("update user “%s” failed: %s") : _("insert user “%s” failed: %s"),
+			user_info->addr, sqlite3_errmsg(autocrypt_db));
 	} else {
-		g_debug("%s user '%s': %d", update ? "updated" : "inserted", addr, sqlite3_changes(autocrypt_db));
+		g_debug("%s user '%s': %d", update ? "updated" : "inserted", user_info->addr, sqlite3_changes(autocrypt_db));
 	}
 	sqlite3_reset(query[query_idx]);
 }
 
 
 static void
-update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
+update_last_seen(const gchar *addr, time_t date_header, GError **error)
 {
-	const gchar *addr;
-	time_t date_header;
-
-	addr = g_mime_autocrypt_header_get_address_as_string(autocrypt_header);
-	date_header = g_date_time_to_unix(g_mime_autocrypt_header_get_effective_date(autocrypt_header));
 	if ((sqlite3_bind_text(query[3], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 		(sqlite3_bind_int64(query[3], 2, date_header) != SQLITE_OK) ||
 		(sqlite3_step(query[3]) != SQLITE_DONE)) {

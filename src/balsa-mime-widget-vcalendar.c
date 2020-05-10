@@ -254,7 +254,7 @@ balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_repl
 
 	/* add the callback data to the event object */
 	g_object_set_data_full(G_OBJECT(event), "ev:sender",
-			       internet_address_to_string(sender, NULL, FALSE),
+			       internet_address_to_string(sender, FALSE),
 			       (GDestroyNotify) g_free);
         g_object_set_data_full(G_OBJECT(event), "ev:ident",
                                g_object_ref(vevent_ident),
@@ -354,7 +354,7 @@ vevent_reply(GObject * button, GtkWidget * box)
     headers = libbalsa_message_get_headers(message);
     headers->from = internet_address_list_new();
     internet_address_list_add(headers->from, ia);
-    headers->to_list = internet_address_list_parse(libbalsa_parser_options(), rcpt);
+    headers->to_list = internet_address_list_parse_string(rcpt);
     headers->date = time(NULL);
 
     /* create the message subject */

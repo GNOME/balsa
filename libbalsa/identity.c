@@ -2197,7 +2197,7 @@ libbalsa_identity_combo_box(GList       * identities,
         GtkTreeIter iter;
 
         ident = list->data;
-        from = internet_address_to_string(ident->ia, NULL, FALSE);
+        from = internet_address_to_string(ident->ia, FALSE);
 	name = g_strconcat("(", ident->identity_name, ")", NULL);
 
         gtk_list_store_append(store, &iter);

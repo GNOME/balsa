@@ -478,7 +478,7 @@ delete_handler(BalsaSendmsg * bsmsg)
     if (ia) {
         tmp = ia->name;
         if (!tmp || !*tmp)
-            tmp = free_me = internet_address_to_string(ia, NULL, FALSE);
+            tmp = free_me = internet_address_to_string(ia, FALSE);
     }
     if (!tmp || !*tmp)
         tmp = _("(No name)");
@@ -814,7 +814,7 @@ sw_edit_activated(GSimpleAction * action,
             InternetAddressList *list =
                 libbalsa_address_view_get_list(bsmsg->recipient_view,
                                                address_types[type]);
-            gchar *addr_string = internet_address_list_to_string(list, NULL, FALSE);
+            gchar *addr_string = internet_address_list_to_string(list, FALSE);
             g_object_unref(list);
             fprintf(tmp, "%s %s\n", _(address_types[type]), addr_string);
             g_free(addr_string);
@@ -1096,7 +1096,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
         bcc_list =
             libbalsa_address_view_get_list(bsmsg->recipient_view, "BCC:");
 
-        ident_list = internet_address_list_parse(libbalsa_parser_options(), addr);
+        ident_list = internet_address_list_parse_string(addr);
         if (ident_list) {
             /* Remove any Bcc addresses that came from the old identity
              * from the list. */
@@ -1126,7 +1126,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
         /* Add the new Bcc addresses, if any: */
         addr = libbalsa_identity_get_bcc(ident);
-        ident_list = internet_address_list_parse(libbalsa_parser_options(), addr);
+        ident_list = internet_address_list_parse_string(addr);
         if (ident_list) {
             internet_address_list_append(bcc_list, ident_list);
             g_object_unref(ident_list);
@@ -1630,9 +1630,9 @@ get_fwd_mail_headers(const gchar *mailfile)
     }
 
     /* parse the file */
-    parser = g_mime_parser_new_with_stream(stream);
-    g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
-    message = g_mime_parser_construct_message (parser, libbalsa_parser_options());
+    parser = g_mime_parser_new();
+    g_mime_parser_init_with_stream(parser, stream);
+    message = g_mime_parser_construct_message (parser);
     g_object_unref (parser);
     g_object_unref(stream);
     close(fd);
@@ -1646,7 +1646,7 @@ get_fwd_mail_headers(const gchar *mailfile)
 	if (!subject)
 	    headers->subject = g_strdup(_("(no subject)"));
 	else
-	    headers->subject = g_mime_utils_header_decode_text(libbalsa_parser_options(), subject);
+	    headers->subject = g_mime_utils_header_decode_text(subject);
     }
     libbalsa_utf8_sanitize(&headers->subject,
 			   balsa_app.convert_unknown_8bit,
@@ -1733,7 +1733,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 	    utf8name = g_strdup(_("forwarded message"));
 	else {
             gchar *tmp =
-                internet_address_list_to_string(attach_data->headers->from, NULL,
+                internet_address_list_to_string(attach_data->headers->from,
                                                 FALSE);
 	    utf8name = g_strdup_printf(_("Message from %s, subject: “%s”"),
 				       tmp,
@@ -1811,12 +1811,6 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 			      menu_item);
     }
 
-    if (can_inline || !is_a_temp_file) {
-        /* Need a separator */
-        menu_item = gtk_separator_menu_item_new();
-        gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu), menu_item);
-    }
-
     /* an attachment can be removed */
     menu_item =
 	gtk_menu_item_new_with_label(_("Remove"));
@@ -1825,10 +1819,6 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 		     (gpointer)attach_data);
     gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu),
 			  menu_item);
-
-    /* Insert another separator */
-    menu_item = gtk_separator_menu_item_new();
-    gtk_menu_shell_append(GTK_MENU_SHELL(attach_data->popup_menu), menu_item);
 
     /* add the usual vfs menu so the user can inspect what (s)he actually
        attached... (only for non-message attachments) */
@@ -3607,7 +3597,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 
 	if (headers->from) {
 	    gchar *from =
-		internet_address_list_to_string(headers->from, NULL,
+		internet_address_list_to_string(headers->from,
 			                        FALSE);
 	    g_string_append_printf(body, "%s %s\n", _("From:"), from);
 	    g_free(from);
@@ -3615,7 +3605,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 
 	if (internet_address_list_length(headers->to_list) > 0) {
 	    gchar *to_list =
-		internet_address_list_to_string(headers->to_list, NULL,
+		internet_address_list_to_string(headers->to_list,
 			                        FALSE);
 	    g_string_append_printf(body, "%s %s\n", _("To:"), to_list);
 	    g_free(to_list);
@@ -3623,7 +3613,7 @@ quote_body(BalsaSendmsg * bsmsg, LibBalsaMessageHeaders *headers,
 
 	if (internet_address_list_length(headers->cc_list) > 0) {
 	    gchar *cc_list =
-		internet_address_list_to_string(headers->cc_list, NULL,
+		internet_address_list_to_string(headers->cc_list,
 			                        FALSE);
 	    g_string_append_printf(body, "%s %s\n", _("CC:"), cc_list);
 	    g_free(cc_list);
@@ -6675,7 +6665,7 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
     }
 
     list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
-    to_string = internet_address_list_to_string(list, NULL, FALSE);
+    to_string = internet_address_list_to_string(list, FALSE);
     g_object_unref(list);
 
     title = g_strdup_printf(title_format, to_string ? to_string : "",

@@ -630,7 +630,8 @@ libbalsa_address_book_gpe_modify_address(LibBalsaAddressBook *ab,
 
     /* do the real work here */
 #ifdef HAVE_SQLITE3
-    if (sqlite3_exec(ab_gpe->db, "begin transaction", NULL, NULL, &err) != SQLITE_OK) {
+    if ((r = sqlite3_exec(ab_gpe->db, "begin transaction",
+                          NULL, NULL, &err)) != SQLITE_OK) {
         libbalsa_address_book_set_status(ab, err);
         sqlite3_free(err);              /* failed, so soon!? */
         return LBABERR_CANNOT_WRITE;

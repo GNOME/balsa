@@ -462,7 +462,7 @@ file_delete_activated(GSimpleAction * action,
     if (!list)
         return;
 
-    contacts_app.address_book = address_book;
+    contacts_app.address_book = list->data;
     set_address_book_menu_items();
 }
 
@@ -1116,8 +1116,7 @@ main(int argc, char *argv[])
 
     bab_init();
     balsa_ab_setup_libbalsa_notification((GApplication *) application);
-    g_mime_init();
-    libbalsa_parser_options_init();
+    g_mime_init(GMIME_ENABLE_RFC2047_WORKAROUNDS);
 
     /* load address book data */
     libbalsa_conf_push_group("Globals");

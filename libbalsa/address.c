@@ -565,7 +565,7 @@ rfc2822_mailbox(const gchar * full_name, const gchar * address)
     gchar *new_str;
 
     ia = internet_address_mailbox_new(full_name, address);
-    new_str = internet_address_to_string(ia, NULL, FALSE);
+    new_str = internet_address_to_string(ia, FALSE);
     g_object_unref(ia);
 
     return new_str;
@@ -585,7 +585,7 @@ rfc2822_group(const gchar *full_name, GList *addr_list)
 	internet_address_group_add_member(INTERNET_ADDRESS_GROUP(ia), member);
 	g_object_unref(member);
     }
-    res = internet_address_to_string(ia, NULL, FALSE);
+    res = internet_address_to_string(ia, FALSE);
     g_object_unref(ia);
 
     return res;

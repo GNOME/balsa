@@ -1074,7 +1074,8 @@ lbm_mh_add_message(LibBalsaMailboxLocal * local,
     }
     out_stream = g_mime_stream_fs_new(fd);
 
-    crlffilter = g_mime_filter_dos2unix_new(FALSE);
+    crlffilter = g_mime_filter_crlf_new(FALSE,
+                                        FALSE);
     in_stream = g_mime_stream_filter_new(stream);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(in_stream), crlffilter);
     g_object_unref(crlffilter);

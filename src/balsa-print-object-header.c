@@ -492,7 +492,7 @@ header_add_list(PangoLayout * layout, GString * header_buf,
 	  balsa_app.shown_headers == HEADERS_ALL ||
 	  libbalsa_find_word(field_id, balsa_app.selected_headers)) ||
         !values ||
-        !(_value = internet_address_list_to_string(values, NULL, FALSE)))
+        !(_value = internet_address_list_to_string(values, FALSE)))
 	return;
 
     p_width = p_string_width_from_layout(layout, label);

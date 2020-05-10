@@ -434,7 +434,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
     unsigned msgno = mbox->msgno_2_msg_info->len;
 
     gmime_parser = g_mime_parser_new_with_stream(mbox->gmime_stream);
-    g_mime_parser_set_format(gmime_parser, GMIME_FORMAT_MBOX);
+    g_mime_parser_set_scan_from(gmime_parser, TRUE);
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
                                    "^Status|^X-Status|^MIME-Version",
@@ -449,7 +449,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
         off_t offset;
 
         msg_info.status = msg_info.x_status = msg_info.mime_version = -1;
-        mime_message   = g_mime_parser_construct_message(gmime_parser, libbalsa_parser_options());
+        mime_message   = g_mime_parser_construct_message(gmime_parser);
         if (mime_message == NULL) {
             /* Skip to the next message, if any */
             GMimeStream *mbox_stream;
@@ -469,10 +469,10 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
             g_mime_parser_init_with_stream(gmime_parser, mbox_stream);
             continue;
         }
-        msg_info.start = g_mime_parser_get_mbox_marker_offset(gmime_parser);
+        msg_info.start = g_mime_parser_get_from_offset(gmime_parser);
         msg_info.end   = g_mime_parser_tell(gmime_parser);
         if (msg_info.end <= msg_info.start
-            || !(from = g_mime_parser_get_mbox_marker(gmime_parser))) {
+            || !(from = g_mime_parser_get_from(gmime_parser))) {
 	    g_object_unref(mime_message);
             continue;
 	}
@@ -1119,9 +1119,8 @@ lbm_mbox_get_mime_message(LibBalsaMailbox * mailbox,
 	return NULL;
     libbalsa_mime_stream_shared_lock(stream);
     parser = g_mime_parser_new_with_stream(stream);
-    g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
 
-    mime_message = g_mime_parser_construct_message(parser, libbalsa_parser_options());
+    mime_message = g_mime_parser_construct_message(parser);
     g_object_unref(parser);
     libbalsa_mime_stream_shared_unlock(stream);
     g_object_unref(stream);
@@ -1640,7 +1639,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	return FALSE;
     }
     gmime_parser = g_mime_parser_new_with_stream(mbox_stream);
-    g_mime_parser_set_format(gmime_parser, GMIME_FORMAT_MBOX);
+    g_mime_parser_set_scan_from(gmime_parser, TRUE);
     g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
                                    "^Status|^X-Status|^MIME-Version",
@@ -1669,11 +1668,11 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    libbalsa_message_set_msgno(msg_info->local_info.message, j + 1);
 
 	msg_info->status = msg_info->x_status = msg_info->mime_version = -1;
-	mime_msg = g_mime_parser_construct_message(gmime_parser, libbalsa_parser_options());
+	mime_msg = g_mime_parser_construct_message(gmime_parser);
         if (!mime_msg)
             /* Try to recover */
             continue;
-        msg_info->start = g_mime_parser_get_mbox_marker_offset(gmime_parser);
+        msg_info->start = g_mime_parser_get_from_offset(gmime_parser);
 
 	/* Make sure we don't have offsets for any encapsulated headers. */
 	if (!g_mime_object_get_header(GMIME_OBJECT(mime_msg), "Status"))
@@ -1683,7 +1682,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	if (!g_mime_object_get_header(GMIME_OBJECT(mime_msg), "MIME-Version"))
 	    msg_info->mime_version = -1;
 
-	from = g_mime_parser_get_mbox_marker(gmime_parser);
+	from = g_mime_parser_get_from(gmime_parser);
         if (!from) {
             /* Try to recover */
             g_object_unref(mime_msg);
@@ -1807,10 +1806,10 @@ static void update_message_status_headers(GMimeMessage *message,
     /* Create headers with spaces in place of flags, if necessary, so we
      * can later update them in place. */
     lbm_mbox_status_hdr(flags, 2, new_header);
-    g_mime_object_set_header(GMIME_OBJECT(message), "Status", new_header->str, NULL);
+    g_mime_object_set_header(GMIME_OBJECT(message), "Status", new_header->str);
     g_string_truncate(new_header, 0);
     lbm_mbox_x_status_hdr(flags, 3, new_header);
-    g_mime_object_set_header(GMIME_OBJECT(message), "X-Status", new_header->str, NULL);
+    g_mime_object_set_header(GMIME_OBJECT(message), "X-Status", new_header->str);
     g_string_free(new_header, TRUE);
 }
 
@@ -1822,8 +1821,7 @@ lbm_mbox_armored_object(GMimeStream * stream)
     GMimeObject *object;
 
     parser = g_mime_parser_new_with_stream(stream);
-    g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
-    object = GMIME_OBJECT(g_mime_parser_construct_message(parser, libbalsa_parser_options()));
+    object = GMIME_OBJECT(g_mime_parser_construct_message(parser));
     g_object_unref(parser);
     g_mime_object_encode(object, GMIME_ENCODING_CONSTRAINT_7BIT);
 
@@ -1838,7 +1836,8 @@ lbm_mbox_armored_stream(GMimeStream * stream)
     
     fstream = g_mime_stream_filter_new(stream);
 
-    filter = g_mime_filter_dos2unix_new(FALSE);
+    filter = g_mime_filter_crlf_new(FALSE,
+				    FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
     g_object_unref(filter);
 
@@ -1879,7 +1878,7 @@ lbm_mbox_add_message(LibBalsaMailboxLocal * local,
     ctime_r(&(headers->date), date_string);
 
     sender = headers->from != NULL ?
-        internet_address_list_to_string(headers->from, NULL, FALSE) :
+        internet_address_list_to_string(headers->from, FALSE) :
 	g_strdup("none");
 
     g_object_unref(message);
@@ -1945,7 +1944,7 @@ lbm_mbox_add_message(LibBalsaMailboxLocal * local,
         retval = lbm_mbox_newline(dest);
     if (retval < 0
         || g_mime_stream_write_string(dest, from) < (gint) strlen(from)
-	|| g_mime_object_write_to_stream(armored_object, NULL, armored_dest) < 0) {
+	|| g_mime_object_write_to_stream(armored_object, armored_dest) < 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
                     LIBBALSA_MAILBOX_APPEND_ERROR, _("Data copy error"));
 	retval = -1;

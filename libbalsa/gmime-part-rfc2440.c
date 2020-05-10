@@ -64,7 +64,7 @@ g_mime_part_check_rfc2440(GMimePart * part)
     static const char end_pgp_signature[]        = "-----END PGP SIGNATURE-----";
 
     /* try to get the content stream */
-    wrapper = g_mime_part_get_content(part);
+    wrapper = g_mime_part_get_content_object(part);
     g_return_val_if_fail(wrapper, GMIME_PART_RFC2440_NONE);
 
     stream = g_mime_data_wrapper_get_stream(wrapper);
@@ -153,7 +153,7 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
     g_return_val_if_fail(recipients != NULL || sign_userid != NULL, FALSE);
 
     /* get the raw content */
-    wrapper = g_mime_part_get_content(part);
+    wrapper = g_mime_part_get_content_object(part);
     g_return_val_if_fail(wrapper, FALSE); /* Incomplete part. */
     stream = g_mime_data_wrapper_get_stream(wrapper);
     g_mime_stream_reset(stream);
@@ -227,7 +227,7 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
 						 "charset", "US-ASCII");
     }
 
-    g_mime_part_set_content(part, wrapper);
+    g_mime_part_set_content_object(part, wrapper);
     g_object_unref(cipherstream);
     g_object_unref(wrapper);
 
@@ -258,7 +258,7 @@ g_mime_part_rfc2440_verify(GMimePart * part, GError ** err)
     g_return_val_if_fail(GMIME_IS_PART(part), NULL);
 
     /* get the raw content */
-    wrapper = g_mime_part_get_content(GMIME_PART(part));
+    wrapper = g_mime_part_get_content_object(GMIME_PART(part));
     g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
@@ -276,7 +276,7 @@ g_mime_part_rfc2440_verify(GMimePart * part, GError ** err)
     if (result && g_mime_stream_length(plainstream) > 0) {
 	wrapper = g_mime_data_wrapper_new();
 	g_mime_data_wrapper_set_stream(wrapper, plainstream);
-	g_mime_part_set_content(GMIME_PART(part), wrapper);
+	g_mime_part_set_content_object(GMIME_PART(part), wrapper);
 	g_object_unref(wrapper);
     }
     g_object_unref(plainstream);
@@ -313,7 +313,7 @@ g_mime_part_rfc2440_decrypt(GMimePart * part, GtkWindow * parent,
     g_return_val_if_fail(GMIME_IS_PART(part), NULL);
 
     /* get the raw content */
-    wrapper = g_mime_part_get_content(part);
+    wrapper = g_mime_part_get_content_object(part);
     g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
     stream = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, stream);
@@ -337,7 +337,7 @@ g_mime_part_rfc2440_decrypt(GMimePart * part, GtkWindow * parent,
 
 	/* strip crlf off encrypted stuff coming from Winbloze crap */
 	filter_stream = g_mime_stream_filter_new(plainstream);
-	filter = g_mime_filter_dos2unix_new(FALSE);
+	filter = g_mime_filter_crlf_new(FALSE, FALSE);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(filter_stream),
 				 filter);
 	g_object_unref(filter);
@@ -346,7 +346,7 @@ g_mime_part_rfc2440_decrypt(GMimePart * part, GtkWindow * parent,
 	out_stream = g_mime_stream_mem_new();
 	wrapper = g_mime_data_wrapper_new();
 	g_mime_data_wrapper_set_stream(wrapper, out_stream);
-	g_mime_part_set_content(part, wrapper);
+	g_mime_part_set_content_object(part, wrapper);
         g_object_unref(wrapper);
 	g_mime_stream_reset(filter_stream);
 	g_mime_stream_write_to_stream(filter_stream, out_stream);

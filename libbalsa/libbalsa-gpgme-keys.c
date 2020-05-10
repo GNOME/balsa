@@ -271,13 +271,13 @@ libbalsa_gpgme_export_key(gpgme_ctx_t   ctx,
 
 
 /* documentation: see header file */
-GBytes *
+gchar *
 libbalsa_gpgme_export_autocrypt_key(const gchar *fingerprint, const gchar *mailbox, GError **error)
 {
 	gchar *export_args[10] = { "", "--export", "--export-options", "export-minimal,no-export-attributes",
 		NULL, NULL, NULL, NULL, NULL, NULL };
 	gpgme_ctx_t ctx;
-	GBytes *result = NULL;
+	gchar *result = NULL;
 
 	g_return_val_if_fail((fingerprint != NULL) && (mailbox != NULL), NULL);
 
@@ -323,7 +323,7 @@ libbalsa_gpgme_export_autocrypt_key(const gchar *fingerprint, const gchar *mailb
 				if ((keydata == NULL) || (keysize == 0U)) {
 					g_set_error(error, GPGME_ERROR_QUARK, -1, _("cannot export minimal key for “%s”"), mailbox);
 				} else {
-					result = g_bytes_new(keydata, keysize);
+					result = g_base64_encode(keydata, keysize);
 				}
 				gpgme_free(keydata);
 			}

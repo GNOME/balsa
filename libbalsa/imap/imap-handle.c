@@ -3081,39 +3081,31 @@ ir_envelope(NetClientSioBuf *sio, ImapEnvelope *env)
 
   date = imap_get_nstring(sio);
   if(date) {
-    if (env != NULL) {
-      GDateTime *header_date;
-
-      header_date = g_mime_utils_header_decode_date(date);
-      if (header_date != NULL) {
-        env->date = (time_t) g_date_time_to_unix(header_date);
-        g_date_time_unref(header_date);
-      }
-    }
+    if(env) env->date = g_mime_utils_header_decode_date(date, NULL);
     g_free(date);
   }
-  if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
+  if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   str = imap_get_nstring(sio);
   if(env) env->subject = str; else g_free(str);
-  if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
+  if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   if(imap_get_addr_list(sio, env ? &env->from : NULL) != IMR_OK)
     return IMR_PROTOCOL;
-  if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
+  if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   if(imap_get_addr_list(sio, env ? &env->sender : NULL) != IMR_OK)
     return IMR_PROTOCOL;
-  if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
+  if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   if(imap_get_addr_list(sio, env ? &env->replyto : NULL) != IMR_OK)
     return IMR_PROTOCOL;
-  if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
+  if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   if(imap_get_addr_list(sio, env ? &env->to : NULL) != IMR_OK)
     return IMR_PROTOCOL;
-  if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
+  if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   if(imap_get_addr_list(sio, env ? &env->cc : NULL) != IMR_OK)
     return IMR_PROTOCOL;
-  if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
+  if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   if(imap_get_addr_list(sio, env ? &env->bcc : NULL) != IMR_OK)
     return IMR_PROTOCOL;
-  if(sio_getc(sio) != ' ') return IMR_PROTOCOL;
+  if( (c=sio_getc(sio)) != ' ') return IMR_PROTOCOL;
   str = imap_get_nstring(sio);
   if(env) env->in_reply_to = str; else g_free(str);
   if( (c=sio_getc(sio)) != ' ') { g_debug("c=%c",c); return IMR_PROTOCOL;}

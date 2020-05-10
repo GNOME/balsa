@@ -103,7 +103,7 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
 {
     LibBalsaMessageHeaders *ehdr;
     const char *subj;
-    GDateTime *datetime;
+    int offset;
 
     ehdr = g_new0(LibBalsaMessageHeaders, 1);
 
@@ -113,14 +113,11 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
     subj = g_mime_message_get_subject(msg);
     if (subj) {
 	ehdr->subject =
-	    g_mime_utils_header_decode_text(libbalsa_parser_options(), subj);
+	    g_mime_utils_header_decode_text(subj);
 	libbalsa_utf8_sanitize(&ehdr->subject, TRUE, NULL);
-    } else
+    } else 
 	ehdr->subject = g_strdup(_("(No subject)"));
-
-    datetime = g_mime_message_get_date(msg);
-    if (datetime != NULL)
-        ehdr->date = g_date_time_to_unix(datetime);
+    g_mime_message_get_date(msg, &ehdr->date, &offset);
 
     return ehdr;
 }
@@ -167,7 +164,7 @@ libbalsa_message_body_set_types(LibBalsaMessageBody * body)
     else body->body_type = LIBBALSA_MESSAGE_BODY_TYPE_OTHER;
 
     g_free(body->content_type);
-    body->content_type = g_mime_content_type_get_mime_type(type);
+    body->content_type = g_mime_content_type_to_string(type);
 }
 
 static LibBalsaMessageBody **
@@ -230,9 +227,8 @@ libbalsa_message_body_set_text_rfc822headers(LibBalsaMessageBody *body)
 
 	g_mime_stream_reset(headers);
 	parser = g_mime_parser_new_with_stream(headers);
-        g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
 	g_object_unref(headers);
-	dummy_msg = g_mime_parser_construct_message(parser, libbalsa_parser_options());
+	dummy_msg = g_mime_parser_construct_message(parser);
 	g_object_unref(parser);
 
 	body->embhdrs = libbalsa_message_body_extract_embedded_headers(dummy_msg);
@@ -306,7 +302,7 @@ libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
 	type = g_mime_object_get_content_type(body->mime_part);
 	res = g_strdup(g_mime_content_type_get_parameter(type, param));
     } else if (body->content_type) {
-	type = g_mime_content_type_parse(libbalsa_parser_options(), body->content_type);
+	type = g_mime_content_type_new_from_string(body->content_type);
 	res = g_strdup(g_mime_content_type_get_parameter(type, param));
 	g_object_unref(type);
     }
@@ -484,7 +480,7 @@ libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
     gchar *mime_type = NULL;
     const gchar *charset;
 
-    wrapper = g_mime_part_get_content(GMIME_PART(body->mime_part));
+    wrapper = g_mime_part_get_content_object(GMIME_PART(body->mime_part));
     if (!wrapper) {
         /* part is incomplete. */
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
@@ -564,7 +560,7 @@ libbalsa_message_body_get_message_part_stream(LibBalsaMessageBody * body,
     mailbox = libbalsa_message_get_mailbox(body->message);
     libbalsa_mailbox_lock_store(mailbox);
     bytes_written =
-        g_mime_object_write_to_stream(GMIME_OBJECT(msg), NULL, stream);
+        g_mime_object_write_to_stream(GMIME_OBJECT(msg), stream);
     libbalsa_mailbox_unlock_store(mailbox);
     printf("Written %ld bytes of embedded message\n",
            (long) bytes_written);
@@ -748,8 +744,7 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
         g_mime_stream_reset(stream);
 
         if (filter_crlf) {
-            GMimeFilter *filter = g_mime_filter_dos2unix_new(FALSE);
-
+            GMimeFilter *filter = g_mime_filter_crlf_new(FALSE, FALSE);
             stream =
                 libbalsa_message_body_stream_add_filter(stream, filter);
         }
@@ -758,7 +753,7 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
         g_object_unref(stream);
     } else
         /* body->mime_part is neither a GMimePart nor a GMimeMessagePart. */
-        len = g_mime_object_write_to_stream(body->mime_part, NULL, dest);
+        len = g_mime_object_write_to_stream(body->mime_part, dest);
 
     libbalsa_mailbox_unlock_store(mailbox);
     g_object_unref(dest);

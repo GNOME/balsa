@@ -265,8 +265,7 @@ libbalsa_mktempdir (char **s)
 }
 
 /* libbalsa_set_fallback_codeset: sets the codeset for incorrectly
- * encoded characters.
- * Returns the previous codeset. */
+ * encoded characters. */
 static LibBalsaCodeset sanitize_fallback_codeset = WEST_EUROPE;
 LibBalsaCodeset
 libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
@@ -278,10 +277,9 @@ libbalsa_set_fallback_codeset(LibBalsaCodeset codeset)
         NULL
     };
 
-    g_mime_parser_options_set_fallback_charsets(libbalsa_parser_options(), charsets);
+    g_mime_set_user_charsets(charsets);
 
     sanitize_fallback_codeset = codeset;
-
     return ret;
 }
     
@@ -1240,20 +1238,4 @@ libbalsa_font_string_to_css(const gchar * font_string,
 
     return g_string_free(string, FALSE);
 #endif                          /* !GTK_CHECK_VERSION(3, 22,0) */
-}
-
-static GMimeParserOptions *parser_options;
-
-void
-libbalsa_parser_options_init(void)
-{
-    parser_options = g_mime_parser_options_new();
-    g_mime_parser_options_set_rfc2047_compliance_mode(parser_options,
-                                                      GMIME_RFC_COMPLIANCE_LOOSE);
-}
-
-GMimeParserOptions *
-libbalsa_parser_options(void)
-{
-    return parser_options;
 }

@@ -23,11 +23,19 @@
 
 #include <string.h>
 
-#include <gmime/gmime.h>
+#include <gmime/gmime-stream-filter.h>
+#include <gmime/gmime-filter-crlf.h>
+#include <gmime/gmime-filter-from.h>
+#include <gmime/gmime-filter-basic.h>
+#include <gmime/gmime-stream-mem.h>
+#include <gmime/gmime-parser.h>
+#include <gmime/gmime-message-part.h>
+#include <gmime/gmime-multipart.h>
+#include <gmime/gmime-multipart-signed.h>
+#include <gmime/gmime-multipart-encrypted.h>
 #include "libbalsa-gpgme.h"
 #include "gmime-application-pkcs7.h"
 #include <glib/gi18n.h>
-#include "misc.h"
 
 
 #ifdef G_LOG_DOMAIN
@@ -72,7 +80,7 @@ g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
     }
 
     /* get the ciphertext stream */
-    wrapper = g_mime_part_get_content(GMIME_PART(pkcs7));
+    wrapper = g_mime_part_get_content_object(GMIME_PART(pkcs7));
     g_return_val_if_fail(wrapper, NULL); /* Incomplete part. */
     ciphertext = g_mime_stream_mem_new();
     g_mime_data_wrapper_write_to_stream(wrapper, ciphertext);
@@ -80,7 +88,7 @@ g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
 
     stream = g_mime_stream_mem_new();
     filtered_stream = g_mime_stream_filter_new(stream);
-    crlf_filter = g_mime_filter_dos2unix_new(FALSE);
+    crlf_filter = g_mime_filter_crlf_new(FALSE, FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
 			     crlf_filter);
     g_object_unref(crlf_filter);
@@ -107,11 +115,11 @@ g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
     g_object_unref(ciphertext);
 
     g_mime_stream_reset(stream);
-    parser = g_mime_parser_new_with_stream(stream);
-    g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
+    parser = g_mime_parser_new();
+    g_mime_parser_init_with_stream(parser, stream);
     g_object_unref(stream);
 
-    decrypted = g_mime_parser_construct_part(parser, libbalsa_parser_options());
+    decrypted = g_mime_parser_construct_part(parser);
     g_object_unref(parser);
 
     if (decrypted)
@@ -148,12 +156,12 @@ g_mime_application_pkcs7_encrypt(GMimePart * pkcs7, GMimeObject * content,
     stream = g_mime_stream_mem_new();
     filtered_stream = g_mime_stream_filter_new(stream);
 	
-    crlf_filter = g_mime_filter_unix2dos_new(FALSE);
+    crlf_filter = g_mime_filter_crlf_new(TRUE, FALSE);
     g_mime_stream_filter_add(GMIME_STREAM_FILTER(filtered_stream),
 			     crlf_filter);
     g_object_unref(crlf_filter);
 	
-    g_mime_object_write_to_stream(content, NULL, filtered_stream);
+    g_mime_object_write_to_stream(content, filtered_stream);
     g_mime_stream_flush(filtered_stream);
     g_object_unref(filtered_stream);
 	
@@ -177,7 +185,7 @@ g_mime_application_pkcs7_encrypt(GMimePart * pkcs7, GMimeObject * content,
     wrapper = g_mime_data_wrapper_new();
     g_mime_data_wrapper_set_stream(wrapper, ciphertext);
     g_object_unref(ciphertext);
-    g_mime_part_set_content(GMIME_PART(pkcs7), wrapper);
+    g_mime_part_set_content_object(GMIME_PART(pkcs7), wrapper);
     g_mime_part_set_filename(GMIME_PART(pkcs7), "smime.p7m");
     g_mime_part_set_content_encoding(GMIME_PART(pkcs7),
 				     GMIME_CONTENT_ENCODING_BASE64);

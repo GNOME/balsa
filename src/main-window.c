@@ -3201,11 +3201,6 @@ balsa_window_dispose(GObject * object)
         priv->open_mbnode_info_array = NULL;
     }
 
-    if (priv->activity_messages != NULL) {
-        g_slist_free_full(priv->activity_messages, g_free);
-        priv->activity_messages = NULL;
-    }
-
     balsa_app.in_destruction = TRUE;
     G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
 
@@ -4631,7 +4626,7 @@ balsa_window_decrease_activity(BalsaWindow * window, const gchar * message)
     const gchar *new_message = NULL;
     gboolean clear_fraction = FALSE;
 
-    if (priv->progress_bar == NULL || priv->activity_messages == NULL)
+    if (priv->progress_bar == NULL)
         return;
 
     link = g_slist_find_custom(priv->activity_messages, message,

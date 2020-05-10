@@ -1899,11 +1899,11 @@ libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 static InternetAddress*
 imap_address_to_gmime_mailbox(ImapAddress *addr)
 {
-    gchar *tmp = g_mime_utils_header_decode_text(libbalsa_parser_options(), addr->addr_spec);
+    gchar *tmp = g_mime_utils_header_decode_text(addr->addr_spec);
     InternetAddress *address = internet_address_mailbox_new(NULL, tmp);
     g_free(tmp);
     if (addr->name) {
-        tmp = g_mime_utils_header_decode_text(libbalsa_parser_options(), addr->name);
+        tmp = g_mime_utils_header_decode_text(addr->name);
         internet_address_set_name(address, tmp);
         g_free(tmp);
     }
@@ -1930,7 +1930,7 @@ internet_address_new_list_from_imap_address(ImapAddress *list,
                 /* Group head */
                 ImapAddress *imap_addr = NULL;
                 InternetAddressList *l;
-                gchar *tmp = g_mime_utils_header_decode_text(libbalsa_parser_options(), list->name);
+                gchar *tmp = g_mime_utils_header_decode_text(list->name);
                 addr = internet_address_group_new(tmp);
                 g_free(tmp);
                 l = internet_address_new_list_from_imap_address(list->next,
@@ -1980,7 +1980,7 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
 
     if(is_embedded) {
         headers->subject =
-            g_mime_utils_header_decode_text(libbalsa_parser_options(), envelope->subject);
+            g_mime_utils_header_decode_text(envelope->subject);
         libbalsa_utf8_sanitize(&headers->subject, TRUE, NULL);
     }
 }
@@ -2114,7 +2114,7 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     if(!str) str = imap_body_get_param(imap_body, "name");
     if(str) {
         lbbody->filename  =
-	    g_mime_utils_header_decode_text(libbalsa_parser_options(), str);
+	    g_mime_utils_header_decode_text(str);
         libbalsa_utf8_sanitize(&lbbody->filename, TRUE, NULL);
     }
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));
@@ -2166,16 +2166,15 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         fstream = g_mime_stream_filter_new(stream);
         g_object_unref(stream);
 
-        filter = g_mime_filter_dos2unix_new(FALSE);
+        filter = g_mime_filter_crlf_new(FALSE, FALSE);
         g_mime_stream_filter_add(GMIME_STREAM_FILTER(fstream), filter);
         g_object_unref(filter);
 
         mime_parser = g_mime_parser_new_with_stream(fstream);
-        g_mime_parser_set_format(mime_parser, GMIME_FORMAT_MESSAGE);
         g_object_unref(fstream);
 
-        g_mime_parser_set_format(mime_parser, GMIME_FORMAT_MESSAGE);
-        mime_msg = g_mime_parser_construct_message(mime_parser, libbalsa_parser_options());
+        g_mime_parser_set_scan_from(mime_parser, FALSE);
+        mime_msg = g_mime_parser_construct_message(mime_parser);
         g_object_unref(mime_parser);
 
         libbalsa_message_set_mime_message(message, mime_msg);
@@ -2544,8 +2543,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * message,
     {
         GMimeParser *parser =  
             g_mime_parser_new_with_stream (partstream);
-        g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
-        part->mime_part = g_mime_parser_construct_part (parser, libbalsa_parser_options());
+        part->mime_part = g_mime_parser_construct_part (parser);
         g_object_unref (parser);
     }
     g_object_unref (partstream);
@@ -2569,7 +2567,7 @@ lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
 
     if (!part->mime_part) {
         GMimeContentType *type =
-            g_mime_content_type_parse(libbalsa_parser_options(), part->content_type);
+            g_mime_content_type_new_from_string(part->content_type);
         if (g_mime_content_type_is_type(type, "multipart", "*")) {
             if (g_mime_content_type_is_type(type, "multipart", "signed"))
                 part->mime_part =
@@ -2725,7 +2723,9 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
 
 	tmpstream = g_mime_stream_filter_new(stream);
 
-	crlffilter = g_mime_filter_unix2dos_new(FALSE);
+	crlffilter =
+	    g_mime_filter_crlf_new(TRUE,
+				   FALSE);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
 	g_object_unref(crlffilter);
 
@@ -2848,7 +2848,9 @@ multi_append_cb(char * buf, size_t buflen,
 
 	tmpstream = g_mime_stream_filter_new(stream);
 
-        crlffilter = g_mime_filter_unix2dos_new(FALSE);
+	crlffilter =
+	    g_mime_filter_crlf_new(TRUE,
+				   FALSE);
 	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
 	g_object_unref(crlffilter);
 

@@ -1,6 +1,14 @@
-* Balsa-2.6.0 release. Release date 2020-04-11
+* Balsa-2.5.11 release. Release date 2020-05-10
 
-This release switches to gmime3 library for MIME processing.
+- fix TLS server identity verification.
+
+* Balsa-2.5.10 release. Release date 2020-04-11
+
+- set message threading correctly on new mailboxes.
+- display S/MIME and TLS certificate chains
+- improve handling of multipart/related message parts
+- display text/calendar parts using ical library
+- multiple bug fixes and code cleanups; remove obsolete command line options.
 
 * Balsa-2.5.9 release. Release date 2019-10-19
 

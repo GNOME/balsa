@@ -2221,7 +2221,7 @@ bndx_do_popup(BalsaIndex * index)
     g_menu_insert_item(index->popup_menu, index->move_position, item);
 
     gtk_widget_get_allocation(GTK_WIDGET(index), &allocation);
-    if (event != NULL) {
+    if (event != NULL && gdk_event_triggers_context_menu((GdkEvent *) event)) {
         /* Pop up to the right of the pointer */
         allocation.width = event->x;
     } else {

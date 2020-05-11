@@ -1522,42 +1522,42 @@ static void
 display_face(BalsaMessage * balsa_message)
 {
     GtkWidget *face_box;
-    const gchar *face, *x_face = NULL;
-    GError *err = NULL;
-    GtkWidget *image;
 
     face_box = balsa_message->face_box;
     gtk_widget_hide(face_box);
     gtk_container_foreach(GTK_CONTAINER(face_box),
                           (GtkCallback) gtk_widget_destroy, NULL);
 
-    if (!balsa_message->message
-        || !((face = libbalsa_message_get_user_header(balsa_message->message, "Face"))
-             || (x_face =
-                 libbalsa_message_get_user_header(balsa_message->message,
-                                                  "X-Face")))) {
-        return;
-    }
+    if (balsa_message->message != NULL) {
+        const gchar *face;
+        GError *err = NULL;
+        GtkWidget *image = NULL;
 
-    if (face)
-        image = libbalsa_get_image_from_face_header(face, &err);
-    else {
+        face = libbalsa_message_get_user_header(balsa_message->message, "Face");
+        if (face != NULL) {
+            image = libbalsa_get_image_from_face_header(face, &err);
+        } else {
 #if HAVE_COMPFACE
-        image = libbalsa_get_image_from_x_face_header(x_face, &err);
-#else                           /* HAVE_COMPFACE */
-        return;
-#endif                          /* HAVE_COMPFACE */
-    }
-    if (err) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                /* Translators: please do not translate Face. */
-                          _("Error loading Face: %s"), err->message);
-        g_error_free(err);
-        return;
-    }
+            const gchar *x_face;
 
-    gtk_box_pack_start(GTK_BOX(face_box), image, FALSE, FALSE, 0);
-    gtk_widget_show_all(face_box);
+            x_face = libbalsa_message_get_user_header(balsa_message->message, "X-Face");
+            if (x_face != NULL)
+                image = libbalsa_get_image_from_x_face_header(x_face, &err);
+#endif                          /* HAVE_COMPFACE */
+        }
+
+        if (err != NULL) {
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+                    /* Translators: please do not translate Face. */
+                              _("Error loading Face: %s"), err->message);
+            g_error_free(err);
+        }
+
+        if (image != NULL) {
+            gtk_box_pack_start(GTK_BOX(face_box), image, FALSE, FALSE, 0);
+            gtk_widget_show_all(face_box);
+        }
+    }
 }
 
 static void

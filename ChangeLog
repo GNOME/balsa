@@ -1,3 +1,8 @@
+2020-05-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* src/balsa-message.c (display_face): Fix a scan-build report
+	  when building with compface = false.
+
 2020-05-10  Pawel Salek  <pawsa0@gmail.com>
 
 	* NEWS, configure.ac, meson.build: release balsa-2.6.1

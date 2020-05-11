@@ -719,7 +719,7 @@ balsa_handle_local_options_cb(GApplication *application,
                               gpointer      user_data)
 {
     if (g_variant_dict_contains(options, "version")) {
-        g_message("Balsa email client %s", BALSA_VERSION);
+        g_print("Balsa email client %s\n", BALSA_VERSION);
 
         return 0;
     }
@@ -748,7 +748,7 @@ balsa_command_line_cb(GApplication            * application,
         balsa_app.outbox =
             libbalsa_mailbox_new_from_config("mailbox-Outbox", FALSE);
         balsa_get_stats(&unread, &unsent);
-        g_debug("Unread: %ld Unsent: %ld", unread, unsent);
+        g_print("Unread: %ld Unsent: %ld\n", unread, unsent);
         g_object_unref(balsa_app.outbox);
         g_object_unref(balsa_app.inbox);
     } else {

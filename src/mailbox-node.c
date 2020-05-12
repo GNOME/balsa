@@ -89,6 +89,7 @@ static guint balsa_mailbox_node_signals[LAST_SIGNAL];
 
 struct _BalsaMailboxNode {
     GObject object;
+
     BalsaMailboxNode *parent; /* NULL for root-level folders & mailboxes */
     LibBalsaMailbox *mailbox; /* != NULL for leaves only */
     gchar *name;       /* used for folders, i.e. when mailbox == NULL */
@@ -100,6 +101,9 @@ struct _BalsaMailboxNode {
     LibBalsaServer * server; /* Used only by remote; is referenced */
     int delim; /* IMAP delimiter so that we do not need to check it
 		 * too often. */
+
+    GtkWidget *context_menu;
+    GtkWidget *relative_to;
 
     unsigned subscribed:1;     /* Used only by remote */
     unsigned list_inbox:1;     /* Used only by remote */
@@ -857,82 +861,61 @@ bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
 /* ---------------------------------------------------------------------
  * Context menu, helpers, and callbacks.
  * --------------------------------------------------------------------- */
-static void
-add_menu_entry(GtkWidget * menu, const gchar * label, GCallback cb,
-	       BalsaMailboxNode * mbnode)
+
+gboolean
+balsa_mailbox_node_is_imap(const BalsaMailboxNode *mbnode)
 {
-    GtkWidget *menuitem;
-
-    menuitem = label ? gtk_menu_item_new_with_mnemonic(label)
-	: gtk_separator_menu_item_new();
-
-    if (cb)
-	g_signal_connect(menuitem, "activate",
-			 G_CALLBACK(cb), mbnode);
-
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    gtk_widget_show(menuitem);
+    return (mbnode != NULL) &&
+            (mbnode->server != NULL) &&
+            (strcmp(libbalsa_server_get_protocol(mbnode->server), "imap") == 0);
 }
 
 static void
-mb_open_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
+add_mbox_activated(GSimpleAction *action,
+                   GVariant      *parameter,
+                   gpointer       user_data)
 {
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    balsa_mblist_open_mailbox(mbnode->mailbox);
+    mailbox_conf_add_mbox_cb(NULL, user_data);
 }
 
 static void
-mb_close_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
+add_maildir_activated(GSimpleAction *action,
+                      GVariant      *parameter,
+                      gpointer       user_data)
 {
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    balsa_window_close_mbnode(balsa_app.main_window, mbnode);
+    mailbox_conf_add_maildir_cb(NULL, user_data);
 }
 
 static void
-mb_conf_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
+add_mh_activated(GSimpleAction *action,
+                 GVariant      *parameter,
+                 gpointer       user_data)
 {
-    balsa_mailbox_node_show_prop_dialog(mbnode);
+    mailbox_conf_add_mh_cb(NULL, user_data);
 }
 
 static void
-mb_del_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
+add_imap_folder_activated(GSimpleAction *action,
+                          GVariant      *parameter,
+                          gpointer       user_data)
 {
-    if(mbnode->mailbox)
-	mailbox_conf_delete(mbnode);
-    else folder_conf_delete(mbnode);
+    folder_conf_add_imap_cb(NULL, user_data);
 }
 
 static void
-mb_inbox_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
+add_imap_subfolder_activated(GSimpleAction *action,
+                             GVariant      *parameter,
+                             gpointer       user_data)
 {
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_INBOX);
+    folder_conf_add_imap_sub_cb(NULL, user_data);
 }
 
 static void
-mb_sentbox_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
+rescan_activated(GSimpleAction *action,
+                 GVariant      *parameter,
+                 gpointer       user_data)
 {
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_SENT);
-}
-
-static void
-mb_trash_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
-{
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_TRASH);
-}
-
-static void
-mb_draftbox_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
-{
-    g_return_if_fail(LIBBALSA_IS_MAILBOX(mbnode->mailbox));
-    config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_DRAFT);
-}
-
-static void
-mb_rescan_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
-{
+    BalsaMailboxNode *mbnode = user_data;
     gchar *current_mailbox_url;
     GPtrArray *url_array;
 
@@ -949,133 +932,287 @@ mb_rescan_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 }
 
 static void
-mb_filter_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
+show_properties_activated(GSimpleAction *action,
+                          GVariant      *parameter,
+                          gpointer       user_data)
 {
-    if (mbnode->mailbox)
-        filters_run_dialog(mbnode->mailbox,
-                           GTK_WINDOW(balsa_app.main_window));
-    else
-	/* FIXME : Perhaps should we be able to apply filters on
-	   folders (ie recurse on all mailboxes in it), but there are
-	   problems of infinite recursion (when one mailbox being
-	   filtered is also the destination of the filter action (eg a
-	   copy)). So let's see that later :) */
-    	libbalsa_information_parented(GTK_WINDOW(balsa_app.main_window),
-    		LIBBALSA_INFORMATION_MESSAGE, _("You can apply filters only on mailbox"));
+    BalsaMailboxNode *mbnode = user_data;
+
+    balsa_mailbox_node_show_prop_dialog(mbnode);
 }
 
 static void
-mb_empty_trash_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
+delete_activated(GSimpleAction *action,
+                 GVariant      *parameter,
+                 gpointer       user_data)
+{
+    BalsaMailboxNode *mbnode = user_data;
+
+    if (mbnode->mailbox != NULL)
+        mailbox_conf_delete(mbnode);
+    else
+        folder_conf_delete(mbnode);
+}
+
+static void
+context_menu_set_enabled(BalsaMailboxNode *mbnode)
+{
+    gboolean is_open;
+    GActionGroup *action_group;
+    GActionMap *action_map;
+    GAction *action;
+
+    action_group = gtk_widget_get_action_group(mbnode->relative_to, "mbnode");
+    action_map = G_ACTION_MAP(action_group);
+
+    is_open = MAILBOX_OPEN(mbnode->mailbox);
+
+    action = g_action_map_lookup_action(action_map, "open");
+    g_simple_action_set_enabled(G_SIMPLE_ACTION(action), !is_open);
+
+    action = g_action_map_lookup_action(action_map, "close");
+    g_simple_action_set_enabled(G_SIMPLE_ACTION(action), is_open);
+}
+
+static void
+open_activated(GSimpleAction *action,
+               GVariant      *parameter,
+               gpointer       user_data)
+{
+    BalsaMailboxNode *mbnode = user_data;
+
+    balsa_mblist_open_mailbox(mbnode->mailbox);
+    context_menu_set_enabled(mbnode);
+}
+
+static void
+close_activated(GSimpleAction *action,
+                GVariant      *parameter,
+                gpointer       user_data)
+{
+    BalsaMailboxNode *mbnode = user_data;
+
+    balsa_window_close_mbnode(balsa_app.main_window, mbnode);
+    context_menu_set_enabled(mbnode);
+}
+
+static void
+mark_as_inbox_activated(GSimpleAction *action,
+                        GVariant      *parameter,
+                        gpointer       user_data)
+{
+    BalsaMailboxNode *mbnode = user_data;
+
+    config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_INBOX);
+}
+
+static void
+mark_as_sentbox_activated(GSimpleAction *action,
+                          GVariant      *parameter,
+                          gpointer       user_data)
+{
+    BalsaMailboxNode *mbnode = user_data;
+
+    config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_SENT);
+}
+
+static void
+mark_as_trash_activated(GSimpleAction *action,
+                        GVariant      *parameter,
+                        gpointer       user_data)
+{
+    BalsaMailboxNode *mbnode = user_data;
+
+    config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_TRASH);
+}
+
+static void
+mark_as_draftbox_activated(GSimpleAction *action,
+                           GVariant      *parameter,
+                           gpointer       user_data)
+{
+    BalsaMailboxNode *mbnode = user_data;
+
+    config_mailbox_set_as_special(mbnode->mailbox, SPECIAL_DRAFT);
+}
+
+static void
+empty_trash_activated(GSimpleAction *action,
+                      GVariant      *parameter,
+                      gpointer       user_data)
 {
     empty_trash(balsa_app.main_window);
 }
 
-gboolean
-balsa_mailbox_node_is_imap(const BalsaMailboxNode *mbnode)
+static void
+filters_activated(GSimpleAction *action,
+                  GVariant      *parameter,
+                  gpointer       user_data)
 {
-	return (mbnode != NULL) &&
-		(mbnode->server != NULL) &&
-		(strcmp(libbalsa_server_get_protocol(mbnode->server), "imap") == 0);
+    BalsaMailboxNode *mbnode = user_data;
+
+    if (mbnode->mailbox != NULL) {
+        filters_run_dialog(mbnode->mailbox,
+                           GTK_WINDOW(balsa_app.main_window));
+    } else {
+        /* FIXME : Perhaps should we be able to apply filters on
+           folders (ie recurse on all mailboxes in it), but there are
+           problems of infinite recursion (when one mailbox being
+           filtered is also the destination of the filter action (eg a
+           copy)). So let's see that later :) */
+        g_print("You can apply filters only on mailbox\n");
+    }
+}
+
+static GtkWidget *
+create_context_menu(BalsaMailboxNode *mbnode,
+                    GtkWidget        *relative_to)
+{
+    static const GActionEntry entries[] = {
+        {"add-mbox", add_mbox_activated},
+        {"add-maildir", add_maildir_activated},
+        {"add-mh", add_mh_activated},
+        {"add-imap-folder", add_imap_folder_activated},
+        {"add-imap-subfolder", add_imap_subfolder_activated},
+        {"rescan", rescan_activated},
+        {"show-properties", show_properties_activated},
+        {"delete", delete_activated},
+        {"open", open_activated},
+        {"close", close_activated},
+        {"mark-as-inbox", mark_as_inbox_activated},
+        {"mark-as-sentbox", mark_as_sentbox_activated},
+        {"mark-as-trash", mark_as_trash_activated},
+        {"mark-as-draftbox", mark_as_draftbox_activated},
+        {"empty-trash", empty_trash_activated},
+        {"filters", filters_activated},
+    };
+    GSimpleActionGroup *simple;
+    GMenu *menu;
+    GMenu *submenu;
+    GMenu *section;
+    LibBalsaMailbox *mailbox;
+    gboolean special;
+    GtkWidget *context_menu;
+
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    entries,
+                                    G_N_ELEMENTS(entries),
+                                    mbnode);
+    gtk_widget_insert_action_group(GTK_WIDGET(relative_to),
+                                   "mbnode",
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+
+    menu = g_menu_new();
+
+    /* "New" submenu */
+    submenu = g_menu_new();
+    g_menu_append(submenu, _("Local _mbox mailbox…"), "mbnode.add-mbox");
+    g_menu_append(submenu, _("Local Mail_dir mailbox…"), "mbnode.add-maildir");
+    g_menu_append(submenu, _("Local M_H mailbox…"), "mbnode.add-mh");
+
+    section = g_menu_new();
+    g_menu_append(section, _("Remote IMAP _folder…"), "mbnode.add-imap-folder");
+
+    if (balsa_mailbox_node_is_imap(mbnode))
+        g_menu_append(section, _("Remote IMAP _subfolder…"), "mbnode.add-imap-subfolder");
+
+    g_menu_append_section(submenu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
+
+    /* Translators: popup menu item "New" mailbox or folder */
+    g_menu_append_submenu(menu, C_("mailbox", "_New"), G_MENU_MODEL(submenu));
+    g_object_unref(submenu);
+
+    section = g_menu_new();
+    if (mbnode == NULL) {/* clicked on the empty space */
+        g_menu_append(section, _("_Rescan"), "mbnode.rescan");
+    } else {
+        mbnode->relative_to = relative_to;
+
+        /* If we didn't click on a mailbox node then there is only one option. */
+        if (g_signal_has_handler_pending(mbnode,
+                                         balsa_mailbox_node_signals
+                                         [SHOW_PROP_DIALOG], 0, FALSE))
+            g_menu_append(section, _("_Properties…"), "mbnode.show-properties");
+
+        if (g_signal_has_handler_pending(mbnode,
+                                         balsa_mailbox_node_signals[APPEND_SUBTREE],
+                                         0, FALSE))
+            g_menu_append(section, _("_Rescan"), "mbnode.rescan");
+
+        if (mbnode->config_prefix != NULL)
+            g_menu_append(section, _("_Delete"), "mbnode.delete");
+
+        if ((mailbox = mbnode->mailbox) != NULL) {
+            g_menu_append(section, _("_Open"), "mbnode.open");
+            g_menu_append(section, _("_Close"), "mbnode.close");
+            context_menu_set_enabled(mbnode);
+
+            special = (   mailbox == balsa_app.inbox
+                       || mailbox == balsa_app.sentbox
+                       || mailbox == balsa_app.draftbox
+                       || mailbox == balsa_app.outbox
+                       || mailbox == balsa_app.trash);
+            if (!special && !mbnode->config_prefix)
+                g_menu_append(section, _("_Delete"), "mbnode.delete");
+
+            if (!special) {
+                g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+                g_object_unref(section);
+                section = g_menu_new();
+
+                g_menu_append(section, _("Mark as _Inbox"), "mbnode.mark-as-inbox");
+                g_menu_append(section, _("_Mark as Sentbox"), "mbnode.mark-as-sentbox");
+                g_menu_append(section, _("Mark as _Trash"), "mbnode.mark-as-trash");
+                g_menu_append(section, _("Mark as D_raftbox"), "mbnode.mark-as-draftbox");
+            } else if (mailbox == balsa_app.trash) {
+                g_menu_append(section, _("_Empty trash"), "mbnode.empty-trash");
+            }
+
+            /* FIXME : No test on mailbox type is made yet, should we ? */
+            g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+            g_object_unref(section);
+            section = g_menu_new();
+
+            g_menu_append(section, _("_Edit/Apply filters"), "mbnode.filters");
+                           // G_CALLBACK(mb_filter_cb), mbnode);
+        }
+    }
+
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
+
+    context_menu = gtk_popover_new_from_model(relative_to, G_MENU_MODEL(menu));
+    g_object_unref(menu);
+
+    return context_menu;
 }
 
 GtkWidget *
-balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode)
+balsa_mailbox_node_get_context_menu(BalsaMailboxNode *mbnode,
+                                    GtkWidget        *relative_to)
 {
-    GtkWidget *menu;
-    GtkWidget *submenu;
-    GtkWidget *menuitem;
-    LibBalsaMailbox *mailbox;
-    gboolean special;
+    GtkWidget *context_menu;
 
-    /*  g_return_val_if_fail(mailbox != NULL, NULL); */
+    if (mbnode == NULL) {
+        static GtkWidget *null_context_menu;
 
-    menu = gtk_menu_new();
-    /* it's a single-use menu, so we must destroy it when we're done */
-    g_signal_connect(menu, "selection-done",
-                     G_CALLBACK(gtk_widget_destroy), NULL);
-
-    submenu = gtk_menu_new();
-    add_menu_entry(submenu, _("Local _mbox mailbox…"),  
-		   G_CALLBACK(mailbox_conf_add_mbox_cb), NULL);
-    add_menu_entry(submenu, _("Local Mail_dir mailbox…"), 
-		   G_CALLBACK(mailbox_conf_add_maildir_cb), NULL);
-    add_menu_entry(submenu, _("Local M_H mailbox…"),
-		   G_CALLBACK(mailbox_conf_add_mh_cb), NULL);
-    add_menu_entry(submenu, NULL, NULL, mbnode);
-    add_menu_entry(submenu, _("Remote IMAP _folder…"), 
-		   G_CALLBACK(folder_conf_add_imap_cb), NULL);
-    if (balsa_mailbox_node_is_imap(mbnode)) {
-    	add_menu_entry(submenu, _("Remote IMAP _subfolder…"),
-		   G_CALLBACK(folder_conf_add_imap_sub_cb), mbnode);
+        if (null_context_menu == NULL) {
+            null_context_menu =
+                create_context_menu(NULL, relative_to);
+        }
+        context_menu = null_context_menu;
+    } else {
+        if (mbnode->context_menu == NULL) {
+            mbnode->context_menu =
+                create_context_menu(mbnode, relative_to);
+        }
+        context_menu = mbnode->context_menu;
     }
-    gtk_widget_show(submenu);
-    
-    /* Translators: popup menu item "New" mailbox or folder */
-    menuitem = gtk_menu_item_new_with_mnemonic(C_("mailbox", "_New"));
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
-    gtk_widget_show(menuitem);
-    
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    
-    if(mbnode == NULL) {/* clicked on the empty space */
-        add_menu_entry(menu, _("_Rescan"), G_CALLBACK(mb_rescan_cb), 
-                       NULL);
-	return menu;
-    }
-    /* If we didn't click on a mailbox node then there is only one option. */
-    add_menu_entry(menu, NULL, NULL, NULL);
 
-    if (g_signal_has_handler_pending(mbnode,
-                                     balsa_mailbox_node_signals
-                                     [SHOW_PROP_DIALOG], 0, FALSE))
-        add_menu_entry(menu, _("_Properties…"),
-                       G_CALLBACK(mb_conf_cb), mbnode);
-
-    if (g_signal_has_handler_pending(mbnode,
-		                     balsa_mailbox_node_signals
-				     [APPEND_SUBTREE], 0, FALSE))
-	add_menu_entry(menu, _("_Rescan"),
-		       G_CALLBACK(mb_rescan_cb), mbnode);
-
-    if (mbnode->config_prefix)
-	add_menu_entry(menu, _("_Delete"), G_CALLBACK(mb_del_cb),  mbnode);
-
-    if (!(mailbox = mbnode->mailbox))
-        return menu;
-
-    if (!MAILBOX_OPEN(mailbox))
-        add_menu_entry(menu, _("_Open"),  G_CALLBACK(mb_open_cb),  mbnode);
-    else
-        add_menu_entry(menu, _("_Close"), G_CALLBACK(mb_close_cb), mbnode);
-
-    special = (   mailbox == balsa_app.inbox
-               || mailbox == balsa_app.sentbox
-               || mailbox == balsa_app.draftbox
-               || mailbox == balsa_app.outbox
-               || mailbox == balsa_app.trash);
-    if (!special && !mbnode->config_prefix)
-	add_menu_entry(menu, _("_Delete"), G_CALLBACK(mb_del_cb),  mbnode);
-
-    if (!special) {
-        add_menu_entry(menu, NULL, NULL, NULL);
-        add_menu_entry(menu, _("Mark as _Inbox"),    
-                       G_CALLBACK(mb_inbox_cb),    mbnode);
-        add_menu_entry(menu, _("_Mark as Sentbox"), 
-                       G_CALLBACK(mb_sentbox_cb),  mbnode);
-        add_menu_entry(menu, _("Mark as _Trash"),    
-                       G_CALLBACK(mb_trash_cb),    mbnode);
-        add_menu_entry(menu, _("Mark as D_raftbox"),
-                       G_CALLBACK(mb_draftbox_cb), mbnode);
-    } else if (mailbox == balsa_app.trash)
-        add_menu_entry(menu, _("_Empty trash"),    
-                       G_CALLBACK(mb_empty_trash_cb), mbnode);
-
-    /* FIXME : No test on mailbox type is made yet, should we ? */
-    add_menu_entry(menu, NULL, NULL, NULL);
-    add_menu_entry(menu, _("_Edit/Apply filters"), 
-                   G_CALLBACK(mb_filter_cb), mbnode);
-
-    return menu;
+    return context_menu;
 }
 
 /* ---------------------------------------------------------------------

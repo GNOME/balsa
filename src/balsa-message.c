@@ -1757,8 +1757,10 @@ display_content(BalsaMessage * balsa_message)
 
     balsa_message->parts_menu = g_menu_new();
 
+    /* Detach any existing popup: */
     if (balsa_message->parts_popup != NULL)
-	g_object_unref(balsa_message->parts_popup);
+	gtk_popover_set_relative_to(GTK_POPOVER(balsa_message->parts_popup), NULL);
+
     balsa_message->parts_popup =
         gtk_popover_new_from_model(balsa_message->attach_button,
                                    G_MENU_MODEL(balsa_message->parts_menu));

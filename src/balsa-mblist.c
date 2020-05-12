@@ -737,18 +737,22 @@ bmbl_do_popup(GtkTreeView    *tree_view,
         gtk_tree_path_free(path);
     }
 
-    menu = balsa_mailbox_node_get_context_menu(mbnode);
-    g_object_ref(menu);
-    g_object_ref_sink(menu);
-    if (event)
-        gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent *) event);
-    else
-        gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(tree_view),
-                                 GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
-                                 NULL);
-    g_object_unref(menu);
+    menu = balsa_mailbox_node_get_context_menu(mbnode, GTK_WIDGET(tree_view));
 
-    if (mbnode)
+    if (event != NULL && gdk_event_triggers_context_menu((GdkEvent *) event)) {
+        GdkRectangle rectangle;
+
+        /* Pop up above the pointer */
+        rectangle.x = event->x;
+        rectangle.width = 0;
+        rectangle.y = event->y;
+        rectangle.height = 0;
+        gtk_popover_set_pointing_to(GTK_POPOVER(menu), &rectangle);
+    }
+
+    gtk_popover_popup(GTK_POPOVER(menu));
+
+    if (mbnode != NULL)
 	g_object_unref(mbnode);
 }
 

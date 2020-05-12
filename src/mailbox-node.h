@@ -58,7 +58,8 @@ BalsaMailboxNode *balsa_mailbox_node_new_imap_folder(LibBalsaServer* s,
 						     const char*p);
 BalsaMailboxNode *balsa_mailbox_node_new_from_config(const gchar* prefix);
 
-GtkWidget *balsa_mailbox_node_get_context_menu(BalsaMailboxNode * mbnode);
+GtkWidget *balsa_mailbox_node_get_context_menu(BalsaMailboxNode *mbnode,
+                                               GtkWidget        *relative_to);
 void balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_append_subtree(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* prefix);

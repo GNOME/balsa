@@ -244,11 +244,6 @@ bndx_destroy(GObject * obj)
         bindex->search_iter = NULL;
     }
 
-    if (bindex->popup_menu) {
-        g_object_unref(bindex->popup_menu);
-        bindex->popup_menu = NULL;
-    }
-
     if (bindex->selection_changed_idle_id != 0) {
         g_source_remove(bindex->selection_changed_idle_id);
         bindex->selection_changed_idle_id = 0;
@@ -2219,6 +2214,7 @@ bndx_do_popup(BalsaIndex * index)
     /* Replace the existing submenu */
     g_menu_remove(index->popup_menu, index->move_position);
     g_menu_insert_item(index->popup_menu, index->move_position, item);
+    g_object_unref(item);
 
     gtk_widget_get_allocation(GTK_WIDGET(index), &allocation);
     if (event != NULL && gdk_event_triggers_context_menu((GdkEvent *) event)) {

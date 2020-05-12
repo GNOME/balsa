@@ -1051,15 +1051,8 @@ libbalsa_html_get_selection_bounds(GtkWidget    * widget,
 }
 
 /*
- * Get the WebKitWebView widget from the container; we need to connect
- * to its "populate-popup" signal.
+ * Get the view widget
  */
-GtkWidget *
-libbalsa_html_popup_menu_widget(GtkWidget * widget)
-{
-    return NULL;
-}
-
 GtkWidget *
 libbalsa_html_get_view_widget(GtkWidget * widget)
 {

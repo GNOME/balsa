@@ -1210,7 +1210,7 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
     g_object_unref(simple);
 
     open_menu = g_menu_new();
-    libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/plain",
+    libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/html",
                                            "text-view-popup.open-with");
     submenu = gtk_menu_new_from_model(G_MENU_MODEL(open_menu));
     g_object_unref(open_menu);
@@ -1285,39 +1285,12 @@ bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
     return TRUE;
 }
 
-static void
-bmwt_html_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
-                             gint                  n_press,
-                             gdouble               x,
-                             gdouble               y,
-                             gpointer              user_data)
+static gboolean
+balsa_gtk_html_button_press_cb(GtkWidget * html, GdkEventButton * event,
+                               BalsaMessage * bm)
 {
-    GtkGesture *gesture;
-    const GdkEvent *event;
-    BalsaMessage *bm = user_data;
-
-    gesture = GTK_GESTURE(multi_press);
-    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
-
-    if (gdk_event_triggers_context_menu(event)) {
-        GtkWidget *html;
-
-        html = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture));
-        bmwt_html_popup_context_menu(html, bm);
-    }
-}
-
-static void
-bmwt_html_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
-{
-    BalsaMessage *bm =
-        g_object_get_data(G_OBJECT(widget), "balsa-message");
-    GtkWidget *html = data;
-
-    /* Remove WebKitWebView's items--they're irrelevant and confusing */
-    gtk_container_foreach(GTK_CONTAINER(menu),
-                         (GtkCallback) gtk_widget_destroy, NULL);
-    bmwt_html_populate_popup_menu(bm, html, menu);
+    return(gdk_event_triggers_context_menu((GdkEvent *) event)
+           ? balsa_gtk_html_popup(html, bm) : GDK_EVENT_PROPAGATE);
 }
 
 static BalsaMimeWidget *
@@ -1326,7 +1299,6 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
     BalsaMimeWidgetText *mwt = g_object_new(BALSA_TYPE_MIME_WIDGET_TEXT, NULL);
     InternetAddressList *from;
     GtkWidget *widget;
-    GtkWidget *popup_menu;
     GtkEventController *key_controller;
 
     from = libbalsa_message_get_headers(balsa_message_get_message(bm))->from;
@@ -1343,21 +1315,10 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
     g_signal_connect(key_controller, "key-pressed",
 		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
 
-    if ((popup_menu = libbalsa_html_popup_menu_widget(widget)) != NULL) {
-        g_object_set_data(G_OBJECT(popup_menu), "balsa-message", bm);
-        g_signal_connect(popup_menu, "populate-popup",
-                         G_CALLBACK(bmwt_html_populate_popup_cb), widget);
-    } else {
-        GtkGesture *gesture;
-
-        gesture = gtk_gesture_multi_press_new(widget);
-        gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-        g_signal_connect(gesture, "pressed",
-                         G_CALLBACK(bmwt_html_gesture_pressed_cb), bm);
-
-        g_signal_connect(widget, "popup-menu",
-                         G_CALLBACK(bmwt_html_popup_context_menu), bm);
-    }
+    g_signal_connect(widget, "button-press-event",
+                     G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
+    g_signal_connect(widget, "popup-menu",
+                     G_CALLBACK(balsa_gtk_html_popup), bm);
 
     return (BalsaMimeWidget *) mwt;
 }

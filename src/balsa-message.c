@@ -2781,7 +2781,6 @@ balsa_message_zoom(BalsaMessage * balsa_message, gint in_out)
                      GINT_TO_POINTER(zoom));
 
      libbalsa_html_zoom(GTK_WIDGET(balsa_message->current_part->mime_widget), in_out);
-
 }
 #endif /* HAVE_HTML_WIDGET */
 

@@ -623,6 +623,10 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
     GMenu *open_menu;
     GtkWidget *submenu;
 
+    /* GtkTextView's populate-popup signal handler is supposed to check: */
+    if (!GTK_IS_MENU(menu))
+        return;
+
     gtk_widget_hide(GTK_WIDGET(menu));
     gtk_container_foreach(GTK_CONTAINER(menu),
                          (GtkCallback) gtk_widget_hide, NULL);
@@ -1113,119 +1117,179 @@ bm_widget_on_url(const gchar *url)
 }
 
 #ifdef HAVE_HTML_WIDGET
+
+/*
+ * Context menu
+ */
+
 static void
-bmwt_html_zoom_in(BalsaMessage * bm)
+zoom_in_activated(GSimpleAction *action,
+                  GVariant      *parameter,
+                  gpointer       user_data)
 {
+    GtkWidget *html = user_data;
+    BalsaMessage *bm = g_object_get_data(G_OBJECT(html), "bm");
+
     balsa_message_zoom(bm, 1);
 }
 
 static void
-bmwt_html_zoom_out(BalsaMessage * bm)
+zoom_out_activated(GSimpleAction *action,
+                   GVariant      *parameter,
+                   gpointer       user_data)
 {
+    GtkWidget *html = user_data;
+    BalsaMessage *bm = g_object_get_data(G_OBJECT(html), "bm");
+
     balsa_message_zoom(bm, -1);
 }
 
 static void
-bmwt_html_zoom_reset(BalsaMessage * bm)
+zoom_reset_activated(GSimpleAction *action,
+                     GVariant      *parameter,
+                     gpointer       user_data)
 {
+    GtkWidget *html = user_data;
+    BalsaMessage *bm = g_object_get_data(G_OBJECT(html), "bm");
+
     balsa_message_zoom(bm, 0);
 }
 
 static void
-bmwt_html_select_all_cb(GtkWidget * html)
+select_all_activated(GSimpleAction *action,
+                     GVariant      *parameter,
+                     gpointer       user_data)
 {
+    GtkWidget *html = user_data;
+
     libbalsa_html_select_all(html);
 }
 
 static void
-bmwt_html_populate_popup_menu(BalsaMessage * bm,
-                              GtkWidget    * html,
-                              GtkMenu      * menu)
+html_open_with_change_state(GSimpleAction *action,
+                            GVariant      *parameter,
+                            gpointer       user_data)
 {
-    GtkWidget *menuitem;
+    GtkWidget *html = user_data;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
+    GtkPopover *popover = g_object_get_data(G_OBJECT(html), "popover");
+
+    open_with_change_state(action, parameter, mime_body);
+
+    gtk_popover_popdown(popover);
+}
+
+static void
+save_activated(GSimpleAction *action,
+               GVariant      *parameter,
+               gpointer       user_data)
+{
+    GtkWidget *html = user_data;
+    gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
+
+    balsa_mime_widget_ctx_menu_save(html, mime_body);
+}
+
+static void
+print_activated(GSimpleAction *action,
+                GVariant      *parameter,
+                gpointer       user_data)
+{
+    GtkWidget *html = user_data;
+
+    libbalsa_html_print(html);
+}
+
+static void
+bmwt_populate_popup_menu(BalsaMessage * bm,
+                         GtkWidget    * html,
+                         GMenu        * menu)
+{
     GSimpleActionGroup *simple;
     static const GActionEntry text_view_popup_entries[] = {
-        {"open-with", libbalsa_radio_activated, "s", "''", open_with_change_state},
+        {"zoom-in", zoom_in_activated},
+        {"zoom-out", zoom_out_activated},
+        {"zoom-reset", zoom_reset_activated},
+        {"select-all", select_all_activated},
+        {"open-with", libbalsa_radio_activated, "s", "''", html_open_with_change_state},
+        {"save", save_activated},
+        {"print", print_activated}
     };
+    GAction *print_action;
     GMenu *open_menu;
-    GtkWidget *submenu;
+    GMenu *section;
 
-    menuitem = gtk_menu_item_new_with_label(_("Zoom In"));
-    g_signal_connect_swapped(menuitem, "activate",
-                             G_CALLBACK(bmwt_html_zoom_in), bm);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-
-    menuitem = gtk_menu_item_new_with_label(_("Zoom Out"));
-    g_signal_connect_swapped(menuitem, "activate",
-                             G_CALLBACK(bmwt_html_zoom_out), bm);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-
-    menuitem = gtk_menu_item_new_with_label(_("Zoom 100%"));
-    g_signal_connect_swapped(menuitem, "activate",
-                             G_CALLBACK(bmwt_html_zoom_reset), bm);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-
-    menuitem = gtk_separator_menu_item_new();
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-
-    if (libbalsa_html_can_select(html)) {
-        menuitem = gtk_menu_item_new_with_mnemonic(_("Select _All"));
-        g_signal_connect_swapped(menuitem, "activate",
-                                 G_CALLBACK(bmwt_html_select_all_cb), html);
-        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-
-        menuitem = gtk_separator_menu_item_new();
-        gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    }
-
-    /* Set up the "open-with" action: */
+    /* Set up the actions: */
     simple = g_simple_action_group_new();
     g_action_map_add_action_entries(G_ACTION_MAP(simple),
                                     text_view_popup_entries,
                                     G_N_ELEMENTS(text_view_popup_entries),
-                                    mime_body);
-    gtk_widget_insert_action_group(GTK_WIDGET(menu),
+                                    html);
+    gtk_widget_insert_action_group(GTK_WIDGET(html),
                                    "text-view-popup",
                                    G_ACTION_GROUP(simple));
+
+    print_action = g_action_map_lookup_action(G_ACTION_MAP(simple), "print");
     g_object_unref(simple);
+
+    section = g_menu_new();
+
+    g_menu_append(section, _("Zoom In"), "text-view-popup.zoom-in");
+    g_menu_append(section, _("Zoom Out"), "text-view-popup.zoom-out");
+    g_menu_append(section, _("Zoom 100%"), "text-view-popup.zoom-reset");
+
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
+
+    if (libbalsa_html_can_select(html)) {
+        section = g_menu_new();
+        g_menu_append(section, _("Select _All"), "text-view-popup.select-all");
+        g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+        g_object_unref(section);
+    }
+
+    section = g_menu_new();
 
     open_menu = g_menu_new();
     libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/html",
                                            "text-view-popup.open-with");
-    submenu = gtk_menu_new_from_model(G_MENU_MODEL(open_menu));
+
+    g_menu_append_submenu(section, _("Open…"), G_MENU_MODEL(open_menu));
     g_object_unref(open_menu);
 
-    menuitem = gtk_menu_item_new_with_label(_("Open…"));
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    g_menu_append(section, _("Save…"), "text-view-popup.save");
 
-    menuitem = gtk_menu_item_new_with_label(_("Save…"));
-    g_signal_connect(menuitem, "activate",
-                     G_CALLBACK(balsa_mime_widget_ctx_menu_save),
-                     mime_body);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
 
-    menuitem = gtk_separator_menu_item_new();
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    section = g_menu_new();
 
-    menuitem = gtk_menu_item_new_with_label(_("Print…"));
-    g_signal_connect_swapped(menuitem, "activate",
-                             G_CALLBACK(libbalsa_html_print), html);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    gtk_widget_set_sensitive(menuitem, libbalsa_html_can_print(html));
-    gtk_widget_show_all(GTK_WIDGET(menu));
+    g_menu_append(section, _("Print…"), "text-view-popup.print");
+    g_simple_action_set_enabled(G_SIMPLE_ACTION(print_action),
+                                libbalsa_html_can_print(html));
+
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
+
+    g_object_set_data(G_OBJECT(html), "bm", bm);
 }
 
 static gboolean
 bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
 {
-    GtkWidget *menu;
+    GtkWidget *popover;
     const GdkEvent *event;
     GdkEvent *current_event = NULL;
 
-    menu = gtk_menu_new();
-    bmwt_html_populate_popup_menu(bm, html, GTK_MENU(menu));
+    popover = g_object_get_data(G_OBJECT(html), "popover");
+    if (popover == NULL) {
+        GMenu *menu;
+
+        menu = g_menu_new();
+        bmwt_populate_popup_menu(bm, html, menu);
+        popover = gtk_popover_new_from_model(html, G_MENU_MODEL(menu));
+        g_object_set_data(G_OBJECT(html), "popover", popover);
+    }
 
     /* In WebKit2, the context menu signal is asynchronous, so the
      * GdkEvent is no longer current; instead it is preserved and passed
@@ -1233,14 +1297,19 @@ bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
     event = g_object_get_data(G_OBJECT(html), LIBBALSA_HTML_POPUP_EVENT);
     if (event == NULL)
         event = current_event = gtk_get_current_event();
-    if (event != NULL)
-        gtk_menu_popup_at_pointer(GTK_MENU(menu),
-                                 (GdkEvent *) event);
-    else
-        gtk_menu_popup_at_widget(GTK_MENU(menu),
-                                 GTK_WIDGET(bm),
-                                 GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
-                                 NULL);
+
+    if (event != NULL && gdk_event_triggers_context_menu(event)) {
+        GdkRectangle rectangle;
+
+        /* Pop up above the pointer */
+        rectangle.x = event->button.x;
+        rectangle.width = 0;
+        rectangle.y = event->button.y;
+        rectangle.height = 0;
+        gtk_popover_set_pointing_to(GTK_POPOVER(popover), &rectangle);
+    }
+    gtk_popover_popup(GTK_POPOVER(popover));
+
     if (current_event != NULL)
         gdk_event_free(current_event);
 

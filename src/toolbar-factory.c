@@ -623,6 +623,7 @@ tm_remove_underscore(const gchar * text)
     return r;
 }
 
+
 static gboolean
 tm_popup_context_menu_cb(GtkWidget    * toolbar,
                          gint           x,

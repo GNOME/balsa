@@ -499,7 +499,6 @@ lbh_load_changed_cb(WebKitWebView  *web_view,
         gtk_widget_queue_resize(GTK_WIDGET(web_view));
 }
 
-#if WEBKIT_CHECK_VERSION(2,20,0)
 /*
  * Callback for the "web-process-terminated" signal
  */
@@ -525,20 +524,6 @@ lbh_web_process_terminated_cb(WebKitWebView                     *web_view,
 	g_warning("webkit process terminated abnormally: %s", reason_str);
 	info->webprocess_error = TRUE;
 }
-#else
-/*
- * Callback for the "web-process-crashed" signal
- */
-static gboolean
-lbh_web_process_crashed_cb(WebKitWebView          *web_view,
-                           gpointer 			   data)
-{
-    LibBalsaWebKitInfo *info = (LibBalsaWebKitInfo *) data;
-    g_debug("%s", __func__);
-	info->webprocess_error = TRUE;
-    return FALSE;
-}
-#endif
 
 /*
  * WebKitURISchemeRequestCallback for "cid:" URIs
@@ -636,11 +621,7 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
         g_debug("%s_ registered “cid:” scheme", __func__);
 	}
 
-#if WEBKIT_CHECK_VERSION(2,20,0)
 	g_signal_connect(view, "web-process-terminated", G_CALLBACK(lbh_web_process_terminated_cb), info);
-#else
-	g_signal_connect(view, "web-process-crashed", G_CALLBACK(lbh_web_process_crashed_cb), info);
-#endif
     g_signal_connect(view, "decide-policy", G_CALLBACK(lbh_decide_policy_cb), info);
     g_signal_connect(view, "resource-load-started", G_CALLBACK(lbh_resource_load_started_cb), info);
     g_signal_connect(view, "load-changed", G_CALLBACK(lbh_load_changed_cb), info);

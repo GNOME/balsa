@@ -1,3 +1,39 @@
+2020-05-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Bump required versions as discussed in
+	https://mail.gnome.org/archives/balsa-list/2020-May/msg00010.html
+	and remove corresponding conditional compilation directives.
+
+	* configure.ac:
+	* libbalsa/html.c (lbh_web_process_terminated_cb),
+	(lbh_web_view_new):
+	* libbalsa/identity.c (help_ident_cb):
+	* libbalsa/mime.c (is_in_url):
+	* libbalsa/misc.c (libbalsa_font_string_to_css):
+	* libbalsa/smtp-server.c (smtp_server_response):
+	* meson.build:
+	* src/address-book-config.c (help_button_cb):
+	* src/balsa-index.c (bndx_do_popup):
+	* src/balsa-mblist.c (bmbl_do_popup):
+	* src/balsa-message.c (balsa_headers_attachments_popup),
+	(tree_mult_selection_popup), (tree_button_press_cb):
+	* src/balsa-mime-widget-image.c (balsa_image_button_press_cb):
+	* src/balsa-mime-widget-message.c (extbody_call_url):
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	(handle_url):
+	* src/filter-edit-callbacks.c (condition_dialog_response),
+	(fe_dialog_response):
+	* src/filter-run-callbacks.c (fr_dialog_response):
+	* src/folder-conf.c (folder_conf_response):
+	* src/main-window.c (help_activated), (bw_notebook_label_new),
+	(bw_find_real):
+	* src/pref-manager.c (balsa_help_pbox_display), (add_menu_cb):
+	* src/sendmsg-window.c (on_open_url_cb),
+	(attachment_button_press_cb), (attachment_popup_cb),
+	(create_text_area), (create_lang_menu):
+	* src/toolbar-factory.c (tm_popup_context_menu_cb):
+	* src/toolbar-prefs.c (tp_dialog_response_cb):
+
 2020-05-11  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* src/balsa-message.c (display_face): Fix a scan-build report

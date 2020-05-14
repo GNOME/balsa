@@ -1156,12 +1156,6 @@ gchar *
 libbalsa_font_string_to_css(const gchar * font_string,
                             const gchar * name)
 {
-#if !GTK_CHECK_VERSION(3, 22,0)
-    g_return_val_if_fail(font_string != NULL, NULL);
-    g_return_val_if_fail(name != NULL, NULL);
-
-    return g_strconcat("#", name, " {font:", font_string, "}", NULL);
-#else                           /* !GTK_CHECK_VERSION(3, 22,0) */
     PangoFontDescription *desc;
     PangoFontMask mask;
     GString *string;
@@ -1239,7 +1233,6 @@ libbalsa_font_string_to_css(const gchar * font_string,
     pango_font_description_free(desc);
 
     return g_string_free(string, FALSE);
-#endif                          /* !GTK_CHECK_VERSION(3, 22,0) */
 }
 
 static GMimeParserOptions *parser_options;

@@ -224,7 +224,7 @@ dnl #####################################################################
 
 PKG_CHECK_MODULES(BALSA, [
 glib-2.0 >= 2.48.0
-gtk+-3.0 >= 3.18.0
+gtk+-3.0 >= 3.24.0
 gmime-3.0 >= 3.2.6
 gio-2.0
 gthread-2.0
@@ -260,7 +260,7 @@ AC_MSG_CHECKING(whether to use an HTML widget)
 case "$use_html_widget" in
     webkit2)
         AC_MSG_RESULT([$use_html_widget])
-        PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.0 ])
+        PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.0 >= 2.28.0 ])
         AC_PATH_PROGS(HTML2TEXT,
                       [python-html2text  \
                        html2markdown     \
@@ -299,48 +299,10 @@ fi
 
 
 # GPGME detection.
-# We don't use the std macro AM_PATH_GPGME here to avoid dependencies.
-AC_PATH_PROG(gpgmecfg, gpgme-config, no)
-if test "$gpgmecfg" = no; then
-	AC_MSG_ERROR([gpgme-config program not found.])
-fi
-AC_MSG_CHECKING([gpgme library version])
-gpgmever=`$gpgmecfg --version`
-AC_MSG_RESULT($gpgmever)
-gpgme_ve=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
-gpgme_ma=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
-gpgme_mi=`echo $gpgmever|sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
-if test $gpgme_ve -lt 1; then
-	gpgmecfg=no
-fi
-if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 6 \) ; then
-	gpgmecfg=no
-fi
-if test x"$gpgmecfg" != xno ; then
-    if test \( $gpgme_ve -eq 1 \) -a \( $gpgme_ma -lt 8 \) ; then
-		BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --thread=pthread --libs`"
-		if test x"$?" != x0 ; then
-			AC_MSG_ERROR([*** Your gpgme installation does not support threads.])
-		fi
-	else
-		BALSA_LIBS="$BALSA_LIBS `$gpgmecfg --libs`"
-	fi
-	BALSA_CFLAGS="$BALSA_CFLAGS `$gpgmecfg --cflags`"
-else
-	AC_MSG_ERROR([sorry, you need at least gpgme version 1.6.0])
-fi
-
-# Autocrypt support
-AC_MSG_CHECKING(whether to build with Autocrypt support)
-if test x"$autocrypt" != xno ; then
-	AC_MSG_RESULT([yes])
-	PKG_CHECK_MODULES(AUTOCRYPT, [sqlite3])
-	AC_DEFINE(ENABLE_AUTOCRYPT,1,[If defined, enable Autocrypt support])
-	BALSA_CFLAGS="$BALSA_CFLAGS $AUTOCRYPT_CFLAGS"
-	BALSA_LIBS="$BALSA_LIBS $AUTOCRYPT_LIBS"
-else
-	AC_MSG_RESULT([no])
-fi
+#
+PKG_CHECK_MODULES(GPGME, [ gpgme >= 1.8.0 ])
+BALSA_CFLAGS="$BALSA_CFLAGS $GPGME_CFLAGS"
+BALSA_LIBS="$BALSA_LIBS $GPGME_LIBS"
 
 # OpenLDAP configuration.
 #
@@ -450,12 +412,8 @@ fi
 # GtkSourceView configuration
 #
 if test x$with_gtksourceview != xno; then
-    PKG_CHECK_MODULES([GTKSOURCEVIEW], [ gtksourceview-4 ], [],
-                      [
-                       PKG_CHECK_MODULES([GTKSOURCEVIEW], [ gtksourceview-3.0 >= 3.2.0 ])
-                       BALSA_CFLAGS="$BALSA_CFLAGS -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_48"
-                      ])
-    AC_DEFINE(HAVE_GTKSOURCEVIEW,1,[Defined when GtkSourceView-3 or 4 can be used.])
+    PKG_CHECK_MODULES([GTKSOURCEVIEW], [ gtksourceview-4 ])
+    AC_DEFINE(HAVE_GTKSOURCEVIEW,1,[Defined when GtkSourceView-4 can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $GTKSOURCEVIEW_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $GTKSOURCEVIEW_LIBS"
 fi
@@ -517,22 +475,12 @@ AC_MSG_CHECKING(whether to use an external spell checker)
 case "$use_spell_checker" in
     gspell)
     AC_MSG_RESULT([configure gspell])
-    PKG_CHECK_MODULES(SPELL, [ gspell-1 ])
+    PKG_CHECK_MODULES(SPELL, [ gspell-1 >= 1.6.0 ])
     AC_DEFINE(HAVE_GSPELL,1,[Defined when Gspell can be used.])
-    if $PKG_CONFIG --atleast-version=1.1.2 gspell-1; then
-        AC_DEFINE(HAVE_GSPELL_1_2,1,[Defined when Gspell API is version 1.2.])
-    fi
     ;;
     gtkspell)
-    if $PKG_CONFIG --atleast-version=3.0.3 gtkspell3-3.0; then
-        AC_MSG_RESULT([gtkspell version >= 3.0.3])
-        PKG_CHECK_MODULES(SPELL, [ gtkspell3-3.0 ])
-        AC_DEFINE(HAVE_GTKSPELL_3_0_3,1,[Defined when GtkSpell version
-                                         is at least 3.0.3.])
-    else
-        AC_MSG_RESULT([gtkspell version < 3.0.3])
-        PKG_CHECK_MODULES(SPELL, [ gtkspell3-3.0 enchant ])
-    fi
+    AC_MSG_RESULT([configure gtkspell])
+    PKG_CHECK_MODULES(SPELL, [ gtkspell3-3.0 >= 3.0.9 ])
     AC_DEFINE(HAVE_GTKSPELL,1,[Defined when GtkSpell can be used.])
     ;;
     internal)

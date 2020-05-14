@@ -128,15 +128,15 @@ conf.set('TOOLKIT_CATEGORIES', TOOLKIT_CATEGORIES)
 # #####################################################################
 
 # Dependencies for balsa and balsa_ab:
-glib_dep    = dependency('glib-2.0', version : '>= 2.48.0')
-gtk_dep     = dependency('gtk+-3.0', version : '>= 3.18.0')
-gmime_dep   = dependency('gmime-3.0', version : '>= 3.2.6')
-gio_dep     = dependency('gio-2.0')
-gthread_dep = dependency('gthread-2.0')
-gnutls_dep  = dependency('gnutls', version : '>= 3.0')
-gpgme_dep   = dependency('gpgme', version : '>= 1.6.0')
-fribidi_dep = dependency('fribidi')
-libical_dep = dependency('libical', version : '>= 2.0.0')
+glib_dep    = dependency('glib-2.0',  version : '>= 2.48.0')
+gtk_dep     = dependency('gtk+-3.0',  version : '>= 3.24.0')
+gmime_dep   = dependency('gmime-3.0', version : '>= 3.2.6' )
+gio_dep     = dependency('gio-2.0'                         )
+gthread_dep = dependency('gthread-2.0'                     )
+gnutls_dep  = dependency('gnutls',    version : '>= 3.0'   )
+gpgme_dep   = dependency('gpgme',     version : '>= 1.8.0' )
+fribidi_dep = dependency('fribidi'                         )
+libical_dep = dependency('libical',   version : '>= 2.0.0' )
 
 # Dependencies for balsa
 balsa_deps = [glib_dep,
@@ -166,7 +166,7 @@ libnetclient_deps = [glib_dep,
 # HTML widget
 #
 if html_widget == 'webkit2'
-  html_dep = dependency('webkit2gtk-4.0')
+  html_dep = dependency('webkit2gtk-4.0', version : '>= 2.28.0')
 
   html2text = find_program('python-html2text',
                            'html2markdown',
@@ -347,14 +347,10 @@ endif # compface != 'false'
 # GtkSourceView configuration
 #
 if gtksourceview
-  gsv_dep = dependency('gtksourceview-4', required : false)
-  if not gsv_dep.found()
-    gsv_dep = dependency('gtksourceview-3.0', version : '>= 3.2.0')
-    add_global_arguments('-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_48', language : 'c')
-  endif # not gsv_dep.found()
+  gsv_dep = dependency('gtksourceview-4')
   balsa_deps += gsv_dep
   conf.set('HAVE_GTKSOURCEVIEW', 1,
-    description : 'Defined when GtkSourceView-3 or 4 can be used.')
+    description : 'Defined when GtkSourceView-4 can be used.')
 endif # gtksourceview
 
 # libcanberra configuration
@@ -395,22 +391,11 @@ endif # libsecret
 # Spell check detection.
 #
 if spell_checker == 'gspell'
-  spell_dep = dependency('gspell-1')
+  spell_dep = dependency('gspell-1', version : '>= 1.6.0')
   conf.set('HAVE_GSPELL', 1,
     description : 'Defined when Gspell can be used.')
-  if spell_dep.version().version_compare('>= 1.1.2')
-    conf.set('HAVE_GSPELL_1_2', 1,
-      description : 'Defined when Gspell API is version 1.2.')
-  endif
 elif spell_checker == 'gtkspell'
-  spell_dep = dependency('gtkspell3-3.0')
-  if spell_dep.version().version_compare('>= 3.0.3')
-    conf.set('HAVE_GTKSPELL_3_0_3', 1,
-      description : 'Defined when GtkSpell version is at least 3.0.3.')
-  else
-    enchant_dep = dependency('enchant')
-    spell_dep = [spell_dep, enchant_dep]
-  endif
+  spell_dep = dependency('gtkspell3-3.0', version : '>= 3.0.9')
   conf.set('HAVE_GTKSPELL', 1,
     description : 'Defined when GtkSpell can be used.')
 elif spell_checker == 'internal'

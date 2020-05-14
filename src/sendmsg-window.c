@@ -67,14 +67,12 @@
 #include "macosx-helpers.h"
 #include "geometry-manager.h"
 
-#if !HAVE_GSPELL && !HAVE_GTKSPELL_3_0_3
-#include <enchant/enchant.h>
-#endif                          /* HAVE_GTKSPELL_3_0_3 */
 #if HAVE_GTKSPELL
-#include "gtkspell/gtkspell.h"
+#include <gtkspell/gtkspell.h>
 #elif HAVE_GSPELL
-#include "gspell/gspell.h"
+#include <gspell/gspell.h>
 #else                           /* HAVE_GTKSPELL */
+#include <enchant/enchant.h>
 #include "spell-check.h"
 #endif                          /* HAVE_GTKSPELL */
 #if HAVE_GTKSOURCEVIEW
@@ -104,9 +102,9 @@ static void bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
                                                 LibBalsaIdentity *new_ident);
 static void bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode);
 
-#if !HAVE_GSPELL && !HAVE_GTKSPELL_3_0_3
+#if !HAVE_GSPELL && !HAVE_GTKSPELL
 static void sw_spell_check_weak_notify(BalsaSendmsg * bsmsg);
-#endif                          /* HAVE_GTKSPELL */
+#endif                          /* !HAVE_GSPELL && !HAVE_GTKSPELL */
 
 static void address_book_cb(LibBalsaAddressView * address_view,
                             GtkTreeRowReference * row_ref,
@@ -1422,11 +1420,7 @@ attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 static void
 on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
 {
-#if GTK_CHECK_VERSION(3, 22, 0)
     GtkWidget *toplevel;
-#else /* GTK_CHECK_VERSION(3, 22, 0) */
-    GdkScreen *screen;
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     GError *err = NULL;
     const gchar * uri;
 
@@ -1435,16 +1429,11 @@ on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     g_return_if_fail(uri != NULL);
 
     g_message("open URL %s", uri);
-#if GTK_CHECK_VERSION(3, 22, 0)
     toplevel = gtk_widget_get_toplevel(GTK_WIDGET(menu_item));
     if (gtk_widget_is_toplevel(toplevel)) {
         gtk_show_uri_on_window(GTK_WINDOW(toplevel), uri,
                                gtk_get_current_event_time(), &err);
     }
-#else  /* GTK_CHECK_VERSION(3, 22, 0) */
-    screen = gtk_widget_get_screen(menu_item);
-    gtk_show_uri(screen, uri, gtk_get_current_event_time(), &err);
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
     if (err) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
 			  _("Error showing %s: %s\n"),
@@ -2441,13 +2430,8 @@ attachment_button_press_cb(GtkWidget * widget, GdkEventButton * event,
 	    gtk_tree_model_get(model, &iter, ATTACH_INFO_COLUMN, &attach_info, -1);
 	    if (attach_info) {
 		if (attach_info->popup_menu) {
-#if GTK_CHECK_VERSION(3, 22, 0)
                     gtk_menu_popup_at_pointer(GTK_MENU(attach_info->popup_menu),
                                               (GdkEvent *) event);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-		    gtk_menu_popup(GTK_MENU(attach_info->popup_menu), NULL, NULL,
-				   NULL, NULL, event->button, event->time);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
                 }
 		g_object_unref(attach_info);
 	    }
@@ -2473,15 +2457,10 @@ attachment_popup_cb(GtkWidget *widget, gpointer user_data)
     gtk_tree_model_get(model, &iter, ATTACH_INFO_COLUMN, &attach_info, -1);
     if (attach_info) {
 	if (attach_info->popup_menu) {
-#if GTK_CHECK_VERSION(3, 22, 0)
             gtk_menu_popup_at_widget(GTK_MENU(attach_info->popup_menu),
                                      GTK_WIDGET(widget),
                                      GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                      NULL);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-	gtk_menu_popup(GTK_MENU(attach_info->popup_menu), NULL, NULL, NULL,
-		       NULL, 0, gtk_get_current_event_time());
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
         }
 	g_object_unref(attach_info);
     }
@@ -2837,9 +2816,7 @@ create_text_area(BalsaSendmsg * bsmsg)
 #if HAVE_GSPELL
     GspellTextBuffer *gspell_buffer;
     GspellChecker *checker;
-#if HAVE_GSPELL_1_2
     GspellTextView *gspell_view;
-#endif                          /* HAVE_GSPELL_1_2 */
 #endif                          /* HAVE_GSPELL */
     GtkWidget *scroll;
 
@@ -2849,15 +2826,8 @@ create_text_area(BalsaSendmsg * bsmsg)
     bsmsg->text = gtk_text_view_new();
 #endif                          /* HAVE_GTKSOURCEVIEW */
     text_view = GTK_TEXT_VIEW(bsmsg->text);
-#if GTK_CHECK_VERSION(3, 23, 1)
     gtk_text_view_set_left_margin(text_view, 2);
     gtk_text_view_set_right_margin(text_view, 2);
-#else  /* GTK_CHECK_VERSION(3, 23, 1) */
-    gtk_text_view_set_left_margin(text_view, 0);
-    gtk_text_view_set_right_margin(text_view, 0);
-    gtk_widget_set_margin_start(bsmsg->text, 2);
-    gtk_widget_set_margin_end(bsmsg->text, 2);
-#endif /* GTK_CHECK_VERSION(3, 23, 1) */
 
     /* set the message font */
     if (!balsa_app.use_system_fonts) {
@@ -2899,10 +2869,8 @@ create_text_area(BalsaSendmsg * bsmsg)
         gspell_text_buffer_set_spell_checker(gspell_buffer, checker);
         g_object_unref(checker);
 
-#if HAVE_GSPELL_1_2
         gspell_view = gspell_text_view_get_from_gtk_text_view(text_view);
         gspell_text_view_set_enable_language_menu(gspell_view, TRUE);
-#endif                          /* HAVE_GSPELL_1_2 */
     }
 #endif                          /* HAVE_GSPELL */
 
@@ -4141,7 +4109,7 @@ comp_send_locales(const void* a, const void* b)
    in which case spell-checking must be disabled.
 */
 #define BALSA_LANGUAGE_MENU_LANG "balsa-language-menu-lang"
-#if !HAVE_GSPELL && !HAVE_GTKSPELL_3_0_3
+#if !HAVE_GSPELL && !HAVE_GTKSPELL
 static void
 sw_broker_cb(const gchar * lang_tag,
              const gchar * provider_name,
@@ -4154,7 +4122,7 @@ sw_broker_cb(const gchar * lang_tag,
     *lang_list = g_list_insert_sorted(*lang_list, g_strdup(lang_tag),
                                       (GCompareFunc) strcmp);
 }
-#endif                          /* HAVE_GTKSPELL_3_0_3 */
+#endif                          /* !HAVE_GSPELL && !HAVE_GTKSPELL */
 
 static const gchar *
 create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
@@ -4168,22 +4136,22 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 #else
     GList *lang_list, *l;
 #endif                          /* HAVE_GSPELL */
-#if !HAVE_GSPELL && !HAVE_GTKSPELL_3_0_3
+#if !HAVE_GSPELL && !HAVE_GTKSPELL_
     EnchantBroker *broker;
-#endif                          /* HAVE_GTKSPELL_3_0_3 */
+#endif                          /* !HAVE_GSPELL && !HAVE_GTKSPELL */
     const gchar *preferred_lang;
     GtkWidget *active_item = NULL;
 
-#if HAVE_GTKSPELL_3_0_3
+#if HAVE_GTKSPELL
     lang_list = gtk_spell_checker_get_language_list();
 #elif HAVE_GSPELL
     lang_list = gspell_language_get_available();
-#else                           /* HAVE_GTKSPELL_3_0_3 */
+#else                           /* HAVE_GTKSPELL */
     broker = enchant_broker_init();
     lang_list = NULL;
     enchant_broker_list_dicts(broker, sw_broker_cb, &lang_list);
     enchant_broker_free(broker);
-#endif                          /* HAVE_GTKSPELL_3_0_3 */
+#endif                          /* HAVE_GTKSPELL */
 
     if (lang_list == NULL) {
         return NULL;

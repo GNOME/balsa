@@ -236,15 +236,10 @@ static void
 balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * balsa_message)
 {
     if (balsa_message->parts_popup) {
-#if GTK_CHECK_VERSION(3, 22, 0)
         gtk_menu_popup_at_widget(GTK_MENU(balsa_message->parts_popup),
                                  GTK_WIDGET(balsa_message),
                                  GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                  NULL);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-	gtk_menu_popup(GTK_MENU(balsa_message->parts_popup), NULL, NULL, NULL, NULL, 0,
-		       gtk_get_current_event_time());
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     }
 }
 
@@ -905,7 +900,6 @@ tree_mult_selection_popup(BalsaMessage * balsa_message, GdkEventButton * event,
     if (selected == 1) {
         BalsaPartInfo *info = BALSA_PART_INFO(balsa_message->save_all_list->data);
         if (info->popup_menu) {
-#if GTK_CHECK_VERSION(3, 22, 0)
             if (event)
                 gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu),
                                           (GdkEvent *) event);
@@ -914,14 +908,6 @@ tree_mult_selection_popup(BalsaMessage * balsa_message, GdkEventButton * event,
                                          GTK_WIDGET(balsa_message),
                                          GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                          NULL);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-            if (event)
-                gtk_menu_popup(GTK_MENU(info->popup_menu), NULL, NULL, NULL,
-                               NULL, event->button, event->time);
-            else
-                gtk_menu_popup(GTK_MENU(info->popup_menu), NULL, NULL, NULL,
-                               NULL, 0, gtk_get_current_event_time());
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
         }
         g_list_free(balsa_message->save_all_list);
         balsa_message->save_all_list = NULL;
@@ -944,7 +930,6 @@ tree_mult_selection_popup(BalsaMessage * balsa_message, GdkEventButton * event,
                           G_CALLBACK (part_context_dump_all_cb),
                           (gpointer) balsa_message->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (balsa_message->save_all_popup), menu_item);
-#if GTK_CHECK_VERSION(3, 22, 0)
         if (event)
             gtk_menu_popup_at_pointer(GTK_MENU(balsa_message->save_all_popup),
                                       (GdkEvent *) event);
@@ -953,14 +938,6 @@ tree_mult_selection_popup(BalsaMessage * balsa_message, GdkEventButton * event,
                                      GTK_WIDGET(balsa_message),
                                      GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                      NULL);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-        if (event)
-            gtk_menu_popup(GTK_MENU(balsa_message->save_all_popup), NULL, NULL, NULL,
-                           NULL, event->button, event->time);
-        else
-            gtk_menu_popup(GTK_MENU(balsa_message->save_all_popup), NULL, NULL, NULL,
-                           NULL, 0, gtk_get_current_event_time());
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
     }
 }
 
@@ -1013,13 +990,8 @@ tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
                 gtk_tree_model_get(model, &iter, PART_INFO_COLUMN, &info, -1);
                 if (info) {
                     if (info->popup_menu) {
-#if GTK_CHECK_VERSION(3, 22, 0)
                         gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu),
                                                   (GdkEvent *) event);
-#else                           /*GTK_CHECK_VERSION(3, 22, 0) */
-                        gtk_menu_popup(GTK_MENU(info->popup_menu), NULL, NULL,
-                                       NULL, NULL, event->button, event->time);
-#endif                          /*GTK_CHECK_VERSION(3, 22, 0) */
                     }
                     g_object_unref(info);
                 }

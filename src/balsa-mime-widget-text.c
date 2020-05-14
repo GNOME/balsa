@@ -234,15 +234,8 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
     /* configure text or source view */
     gtk_text_view_set_editable(text_view, FALSE);
-#if GTK_CHECK_VERSION(3, 23, 1)
     gtk_text_view_set_left_margin(text_view,  BALSA_LEFT_MARGIN);
     gtk_text_view_set_right_margin(text_view, BALSA_RIGHT_MARGIN);
-#else  /* GTK_CHECK_VERSION(3, 23, 1) */
-    gtk_text_view_set_left_margin(text_view, 0);
-    gtk_text_view_set_right_margin(text_view, 0);
-    gtk_widget_set_margin_start(widget, BALSA_LEFT_MARGIN);
-    gtk_widget_set_margin_end(widget, BALSA_RIGHT_MARGIN);
-#endif /* GTK_CHECK_VERSION(3, 23, 1) */
     gtk_text_view_set_wrap_mode(text_view, GTK_WRAP_WORD_CHAR);
 
     /* set the message font */
@@ -814,9 +807,6 @@ handle_url(const gchar * url)
         GtkStatusbar *statusbar;
         guint context_id;
         gchar *notice = g_strdup_printf(_("Calling URL %s…"), url);
-#if !GTK_CHECK_VERSION(3, 22, 0)
-        GdkScreen *screen;
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
         GError *err = NULL;
 
         statusbar = balsa_window_get_statusbar(balsa_app.main_window);
@@ -826,13 +816,8 @@ handle_url(const gchar * url)
         gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
-#if GTK_CHECK_VERSION(3, 22, 0)
         gtk_show_uri_on_window(GTK_WINDOW(balsa_app.main_window), url,
                                gtk_get_current_event_time(), &err);
-#else  /* GTK_CHECK_VERSION(3, 22, 0) */
-        screen = gtk_widget_get_screen(GTK_WIDGET(balsa_app.main_window));
-        gtk_show_uri(screen, url, gtk_get_current_event_time(), &err);
-#endif /* GTK_CHECK_VERSION(3, 22, 0) */
 
         if (err != NULL) {
             balsa_information(LIBBALSA_INFORMATION_WARNING,

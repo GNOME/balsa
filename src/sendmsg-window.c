@@ -164,8 +164,6 @@ static GtkTargetEntry email_field_drop_types[] = {
     { "text/plain", 0, TARGET_STRING }
 };
 
-static void lang_set_cb(GtkWidget *widget, BalsaSendmsg *bsmsg);
-
 static void bsmsg_set_subject_from_body(BalsaSendmsg * bsmsg,
                                         LibBalsaMessageBody * body,
                                         LibBalsaIdentity * ident);
@@ -4115,7 +4113,6 @@ comp_send_locales(const void* a, const void* b)
    returns NULL if no dictionaries were found,
    in which case spell-checking must be disabled.
 */
-#define BALSA_LANGUAGE_MENU_LANG "balsa-language-menu-lang"
 #if !HAVE_GSPELL && !HAVE_GTKSPELL
 static void
 sw_broker_cb(const gchar * lang_tag,
@@ -4131,13 +4128,35 @@ sw_broker_cb(const gchar * lang_tag,
 }
 #endif                          /* !HAVE_GSPELL && !HAVE_GTKSPELL */
 
+static void
+sw_set_language_change_state(GSimpleAction  * action,
+                             GVariant       * state,
+                             gpointer         data)
+{
+    BalsaSendmsg *bsmsg = data;
+    const gchar *lang;
+
+    lang = g_variant_get_string(state, NULL);
+    set_locale(bsmsg, lang);
+    g_free(balsa_app.spell_check_lang);
+    balsa_app.spell_check_lang = g_strdup(lang);
+#if HAVE_GSPELL || HAVE_GTKSPELL
+    sw_action_set_active(bsmsg, "spell-check", TRUE);
+#endif                          /* HAVE_GTKSPELL */
+
+    g_simple_action_set_state(action, state);
+}
+
 static const gchar *
 create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 {
+    GSimpleActionGroup *simple;
+    static const GActionEntry entries[] = {
+        {"set", libbalsa_radio_activated, "s", "''", sw_set_language_change_state}
+    };
     guint i;
     GtkWidget *langs;
     static gboolean locales_sorted = FALSE;
-    GSList *group = NULL;
 #if HAVE_GSPELL
     const GList *lang_list, *l;
 #else
@@ -4147,7 +4166,8 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     EnchantBroker *broker;
 #endif                          /* !HAVE_GSPELL && !HAVE_GTKSPELL */
     const gchar *preferred_lang;
-    GtkWidget *active_item = NULL;
+    const gchar *active_lang = NULL;
+    GMenu *menu;
 
 #if HAVE_GTKSPELL
     lang_list = gtk_spell_checker_get_language_list();
@@ -4164,6 +4184,18 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
         return NULL;
     }
 
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    entries,
+                                    G_N_ELEMENTS(entries),
+                                    bsmsg);
+    bsmsg->set_language_action =
+        g_action_map_lookup_action(G_ACTION_MAP(simple), "set");
+    gtk_widget_insert_action_group(bsmsg->window,
+                                   "language",
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+
     if (!locales_sorted) {
         for (i = 0; i < G_N_ELEMENTS(locales); i++)
             locales[i].lang_name = _(locales[i].lang_name);
@@ -4176,7 +4208,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     preferred_lang = balsa_app.spell_check_lang ?
         balsa_app.spell_check_lang : setlocale(LC_CTYPE, NULL);
 
-    langs = gtk_menu_new();
+    menu = g_menu_new();
     for (i = 0; i < G_N_ELEMENTS(locales); i++) {
         gconstpointer found;
 
@@ -4192,21 +4224,16 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
                                    (GCompareFunc) strcmp);
 #endif                          /* HAVE_GSPELL */
         if (found != NULL) {
-            GtkWidget *w;
+            GMenuItem *item;
 
-            w = gtk_radio_menu_item_new_with_mnemonic(group,
-                                                      locales[i].
-                                                      lang_name);
-            group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
-            g_signal_connect(w, "activate",
-                             G_CALLBACK(lang_set_cb), bsmsg);
-            g_object_set_data_full(G_OBJECT(w), BALSA_LANGUAGE_MENU_LANG,
-                                   g_strdup(locales[i].locale), g_free);
-            gtk_widget_show(w);
-            gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
+            item = g_menu_item_new(locales[i].lang_name, NULL);
+            g_menu_item_set_action_and_target(item, "language.set",
+                                              "s", locales[i].locale);
+            g_menu_append_item(menu, item);
 
-            if (!active_item || strcmp(preferred_lang, locales[i].locale) == 0)
-                active_item = w;
+            if (active_lang == NULL ||
+                strcmp(preferred_lang, locales[i].locale) == 0)
+                active_lang = locales[i].locale;
         }
     }
 
@@ -4223,32 +4250,30 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 
         j = find_locale_index_by_locale(lang);
         if (j < 0 || strcmp(lang, locales[j].locale) != 0) {
-            GtkWidget *w;
+            GMenuItem *item;
 
-            w = gtk_radio_menu_item_new_with_label(group, lang);
-            group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(w));
-            g_signal_connect(w, "activate",
-                             G_CALLBACK(lang_set_cb), bsmsg);
-            g_object_set_data_full(G_OBJECT(w), BALSA_LANGUAGE_MENU_LANG,
-                                   g_strdup(lang), g_free);
-            gtk_widget_show(w);
-            gtk_menu_shell_append(GTK_MENU_SHELL(langs), w);
+            item = g_menu_item_new(lang, NULL);
+            g_menu_item_set_action_and_target(item, "language.set", "s", lang);
+            g_menu_append_item(menu, item);
+            g_object_unref(item);
 
-            if (!active_item || strcmp(preferred_lang, lang) == 0)
-                active_item = w;
+            if (active_lang == NULL || strcmp(preferred_lang, lang) == 0)
+                active_lang = lang;
         }
     }
 #if !HAVE_GSPELL
     g_list_free_full(lang_list, (GDestroyNotify) g_free);
 #endif                          /* HAVE_GSPELL */
 
-    g_signal_handlers_block_by_func(active_item, lang_set_cb, bsmsg);
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(active_item), TRUE);
-    g_signal_handlers_unblock_by_func(active_item, lang_set_cb, bsmsg);
+    g_action_change_state(bsmsg->set_language_action, g_variant_new_string(active_lang));
+
+    langs = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+    g_object_unref(menu);
+
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(parent), langs);
     gtk_widget_show(parent);
 
-    return g_object_get_data(G_OBJECT(active_item), BALSA_LANGUAGE_MENU_LANG);
+    return active_lang;
 }
 
 /* Standard buttons; "" means a separator. */
@@ -5819,26 +5844,7 @@ sw_spell_language_changed_cb(GtkSpellChecker * spell,
     GtkWidget *langs;
     GList *list, *children;
 
-    langs = gtk_menu_item_get_submenu(GTK_MENU_ITEM
-                                      (bsmsg->current_language_menu));
-    children = gtk_container_get_children(GTK_CONTAINER(langs));
-
-    for (list = children; list; list = list->next) {
-        GtkCheckMenuItem *menu_item = list->data;
-        const gchar *lang;
-
-        lang = g_object_get_data(G_OBJECT(menu_item),
-                                 BALSA_LANGUAGE_MENU_LANG);
-        if (strcmp(lang, new_lang) == 0) {
-            g_signal_handlers_block_by_func(menu_item, lang_set_cb, bsmsg);
-            gtk_check_menu_item_set_active(menu_item, TRUE);
-            g_signal_handlers_unblock_by_func(menu_item, lang_set_cb,
-                                              bsmsg);
-            break;
-        }
-    }
-
-    g_list_free(children);
+    g_action_change_state(bsmsg->set_language_action, g_variant_new_string(new_lang));
 
     g_free(bsmsg->spell_check_lang);
     bsmsg->spell_check_lang = g_strdup(new_lang);
@@ -6331,7 +6337,7 @@ set_locale(BalsaSendmsg * bsmsg, const gchar * locale)
         const GspellLanguage *language;
 
         language = gspell_language_lookup(locale);
-        if (language != NULL) {
+        if (bsmsg->text != NULL && language != NULL) {
             GtkTextBuffer *buffer;
             GspellTextBuffer *gspell_buffer;
             GspellChecker *checker;
@@ -6367,14 +6373,18 @@ sw_spell_check_change_state(GSimpleAction * action,
 {
     BalsaSendmsg *bsmsg = data;
 #if HAVE_GSPELL
-    GtkTextView *text_view;
-    GspellTextView *gspell_view;
 
     balsa_app.spell_check_active = g_variant_get_boolean(state);
-    text_view = GTK_TEXT_VIEW(bsmsg->text);
-    gspell_view = gspell_text_view_get_from_gtk_text_view(text_view);
-    gspell_text_view_set_inline_spell_checking(gspell_view,
-                                               balsa_app.spell_check_active);
+
+    if (bsmsg->text != NULL) {
+        GtkTextView *text_view;
+        GspellTextView *gspell_view;
+
+        text_view = GTK_TEXT_VIEW(bsmsg->text);
+        gspell_view = gspell_text_view_get_from_gtk_text_view(text_view);
+        gspell_text_view_set_inline_spell_checking(gspell_view,
+                                                   balsa_app.spell_check_active);
+    }
 #elif HAVE_GTKSPELL
 
     if ((balsa_app.spell_check_active = g_variant_get_boolean(state)))
@@ -6435,22 +6445,6 @@ sw_spell_check_weak_notify(BalsaSendmsg * bsmsg)
     sw_buffer_signals_connect(bsmsg);
 }
 #endif                          /* HAVE_GTKSPELL */
-
-static void
-lang_set_cb(GtkWidget * w, BalsaSendmsg * bsmsg)
-{
-    if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w))) {
-        const gchar *lang;
-
-        lang = g_object_get_data(G_OBJECT(w), BALSA_LANGUAGE_MENU_LANG);
-        set_locale(bsmsg, lang);
-        g_free(balsa_app.spell_check_lang);
-        balsa_app.spell_check_lang = g_strdup(lang);
-#if HAVE_GSPELL || HAVE_GTKSPELL
-        sw_action_set_active(bsmsg, "spell-check", TRUE);
-#endif                          /* HAVE_GTKSPELL */
-    }
-}
 
 /* sendmsg_window_new_from_list:
  * like sendmsg_window_new, but takes a GList of messages, instead of a
@@ -6891,6 +6885,7 @@ sendmsg_window_new()
     /*
      * Set up the spell-checker language menu
      */
+    bsmsg->text = NULL;
     gtk_container_foreach(GTK_CONTAINER(menubar), sw_menubar_foreach,
                           &bsmsg->current_language_menu);
     current_locale = create_lang_menu(bsmsg->current_language_menu, bsmsg);
@@ -7191,22 +7186,8 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
         sw_action_set_active(bsmsg, "request-dsn", atoi(postpone_hdr) != 0);
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-Lang"))) {
-        GtkWidget *langs =
-            gtk_menu_item_get_submenu(GTK_MENU_ITEM
-                                      (bsmsg->current_language_menu));
-        GList *children =
-            gtk_container_get_children(GTK_CONTAINER(langs));
-        set_locale(bsmsg, postpone_hdr);
-        for (list = children; list; list = list->next) {
-            GtkCheckMenuItem *menu_item = list->data;
-            const gchar *lang;
-
-            lang = g_object_get_data(G_OBJECT(menu_item),
-                                     BALSA_LANGUAGE_MENU_LANG);
-            if (strcmp(lang, postpone_hdr) == 0)
-                gtk_check_menu_item_set_active(menu_item, TRUE);
-        }
-        g_list_free(children);
+        g_action_change_state(bsmsg->set_language_action,
+                              g_variant_new_string(postpone_hdr));
     }
     if ((postpone_hdr =
          libbalsa_message_get_user_header(message, "X-Balsa-Format")))

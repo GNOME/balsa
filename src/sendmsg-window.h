@@ -71,6 +71,7 @@ G_BEGIN_DECLS
 	/* language selection related data */
 	gchar *spell_check_lang;
 	GtkWidget *current_language_menu;
+        GAction *set_language_action;
 	/* identity related data */
 	LibBalsaIdentity* ident;
         /* fcc mailbox */

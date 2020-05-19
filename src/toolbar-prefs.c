@@ -45,8 +45,6 @@ enum {
     TP_N_COLUMNS
 };
 
-static GtkWidget *customize_widget;
-
 /* Structure associated with each notebook page. */
 typedef struct ToolbarPage_ ToolbarPage;
 struct ToolbarPage_ {
@@ -102,18 +100,18 @@ static void tp_store_set(GtkListStore * store, GtkTreeIter * iter,
 /* create the toolbar-customization dialog
  */
 void
-customize_dialog_cb(GtkWidget * widget, gpointer data)
+balsa_toolbar_customize(GtkWindow * active_window, BalsaToolbarType type)
 {
     GtkWidget *notebook;
     GtkWidget *child;
     GtkWidget *option_frame;
     GtkWidget *option_box;
     GtkWidget *wrap_button;
-    GtkWidget *active_window = data;
-    BalsaToolbarType   type;
     BalsaToolbarModel *model;
     GSimpleActionGroup *group;
     GtkWidget *content_area;
+
+    static GtkWidget *customize_widget;
 
     /* There can only be one */
     if (customize_widget) {
@@ -124,14 +122,14 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 
     customize_widget =
         gtk_dialog_new_with_buttons(_("Customize Toolbars"),
-                                    GTK_WINDOW(active_window),
+                                    active_window,
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
                                     libbalsa_dialog_flags(),
                                     _("_Close"), GTK_RESPONSE_CLOSE,
                                     _("_Help"),  GTK_RESPONSE_HELP,
                                     NULL);
 #if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(customize_widget, GTK_WINDOW(active_window));
+    libbalsa_macosx_menu_for_parent(customize_widget, active_window);
 #endif
     g_object_add_weak_pointer(G_OBJECT(customize_widget),
                               (gpointer *) & customize_widget);
@@ -195,9 +193,6 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 
     /* Now that the pages are shown, we can switch to the page
      * corresponding to the toolbar that the user clicked on. */
-    type =
-        GPOINTER_TO_INT(g_object_get_data
-                        (G_OBJECT(widget), BALSA_TOOLBAR_MODEL_TYPE));
     gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), type);
 }
 
@@ -669,9 +664,10 @@ tp_page_refresh_preview(ToolbarPage * page)
         gint item;
 
         gtk_tree_model_get(model, &iter, TP_ITEM_COLUMN, &item, -1);
-        if (item >= 0 && item < toolbar_button_count)
+        if (item >= 0 && item < toolbar_button_count) {
             balsa_toolbar_model_append_icon(page->model,
                                             toolbar_buttons[item].pixmap_id);
+        }
     }
 }
 

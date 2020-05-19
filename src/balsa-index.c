@@ -1972,13 +1972,18 @@ bndx_popup_menu_create(BalsaIndex * bindex)
     menu = g_menu_new();
 
     /* this is an invariable part of the context message menu. */
-    g_menu_append(menu, _("_Reply…"),            "popup.reply");
-    g_menu_append(menu, _("Reply To _All…"),     "popup.reply-to-all");
-    g_menu_append(menu, _("Reply To _Group…"),   "popup.reply-to-group");
-    g_menu_append(menu, _("_Forward Attached…"), "popup.forward-attached");
-    g_menu_append(menu, _("Forward _Inline…"),   "popup.forward-inline");
-    g_menu_append(menu, _("_Pipe through…"),     "popup.pipe");
-    g_menu_append(menu, _("_Store Address…"),    "popup.store-address");
+    section = g_menu_new();
+
+    g_menu_append(section, _("_Reply…"),            "popup.reply");
+    g_menu_append(section, _("Reply To _All…"),     "popup.reply-to-all");
+    g_menu_append(section, _("Reply To _Group…"),   "popup.reply-to-group");
+    g_menu_append(section, _("_Forward Attached…"), "popup.forward-attached");
+    g_menu_append(section, _("Forward _Inline…"),   "popup.forward-inline");
+    g_menu_append(section, _("_Pipe through…"),     "popup.pipe");
+    g_menu_append(section, _("_Store Address…"),    "popup.store-address");
+
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
 
     /* items that are insensitive for a read-only mailbox */
     section = g_menu_new();

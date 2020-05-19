@@ -636,6 +636,7 @@ gio_add_vfs_menu_item(GMenu       *menu,
     g_menu_item_set_action_and_target(menu_item, action, "s", name);
 
     g_menu_append_item(menu, menu_item);
+    g_object_unref(menu_item);
 }
 
 

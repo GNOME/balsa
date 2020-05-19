@@ -678,6 +678,8 @@ lbav_completion_match_selected_cb(GtkEntryCompletion * completion,
     g_signal_handlers_unblock_by_func(entry, lbav_entry_changed_cb,
                                       address_view);
 
+    g_free(name);
+
     return TRUE;
 }
 

@@ -1705,37 +1705,43 @@ balsa_mblist_mru_menu(GList ** url_list,
                       const gchar *action)
 {
     GMenu *menu;
-    GMenu *other_menu;
+    GMenu *section;
     GList *list;
-    GMenuItem *other_item;
+    GMenuItem *item;
 
     g_return_val_if_fail(url_list != NULL, NULL);
     g_return_val_if_fail(action != NULL, NULL);
 
     menu = g_menu_new();
+
+    section = g_menu_new();
+
     for (list = *url_list; list != NULL; list = list->next) {
         gchar *url = list->data;
         LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
 
         if (mailbox != NULL) {
             const gchar *name = libbalsa_mailbox_get_name(mailbox);
-            GMenuItem *item;
 
             item = g_menu_item_new(name, NULL);
             g_menu_item_set_action_and_target(item, action, "s", url);
-            g_menu_append_item(menu, item);
+            g_menu_append_item(section, item);
             g_object_unref(item);
         }
     }
 
-    other_item = g_menu_item_new(_("_Other…"), NULL);
-    g_menu_item_set_action_and_target(other_item, action, "s", "");
-    other_menu = g_menu_new();
-    g_menu_append_item(other_menu, other_item);
-    g_object_unref(other_item);
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
 
-    g_menu_append_section(menu, NULL, G_MENU_MODEL(other_menu));
-    g_object_unref(other_menu);
+    section = g_menu_new();
+
+    item = g_menu_item_new(_("_Other…"), NULL);
+    g_menu_item_set_action_and_target(item, action, "s", "");
+    g_menu_append_item(section, item);
+    g_object_unref(item);
+
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
 
     return menu;
 }

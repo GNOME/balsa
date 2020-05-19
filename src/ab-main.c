@@ -274,7 +274,6 @@ set_address_book_menu_items(void)
         LibBalsaAddressBook *address_book = l->data;
         const gchar *name;
         gchar *label;
-        gchar *detailed_action;
         gchar *accel;
         GMenuItem *item;
 
@@ -284,10 +283,10 @@ set_address_book_menu_items(void)
         name = libbalsa_address_book_get_name(address_book);
 
         label = g_strdup_printf("_%d:%s", ++pos, name);
-        detailed_action = g_strdup_printf("win.address-book::%s", name);
-        item = g_menu_item_new(label, detailed_action);
-        g_free(detailed_action);
+        item = g_menu_item_new(label, NULL);
         g_free(label);
+
+        g_menu_item_set_action_and_target(item, "win.address-book", "s", name);
 
         accel = g_strdup_printf("<Primary>%d", pos);
         g_menu_item_set_attribute(item, "accel", "s", accel);

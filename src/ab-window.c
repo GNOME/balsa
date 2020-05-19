@@ -899,24 +899,33 @@ balsa_ab_window_menu_changed(GtkWidget * widget, BalsaAbWindow *ab)
 }
 
 /*
-  Compare two rows in a clist.
-*/
+ *  Compare two rows in a GtkTreeView.
+ */
 static gint
 balsa_ab_window_compare_entries(GtkTreeModel * model,
-                                   GtkTreeIter * iter1,
-                                   GtkTreeIter * iter2,
-                                   gpointer data)
+                                GtkTreeIter * iter1,
+                                GtkTreeIter * iter2,
+                                gpointer data)
 {
     gchar *c1 = NULL;
     gchar *c2 = NULL;
+    gint retval;
 
     gtk_tree_model_get(model, iter1, LIST_COLUMN_NAME, &c1, -1);
     gtk_tree_model_get(model, iter2, LIST_COLUMN_NAME, &c2, -1);
 
-    if (c1 == NULL || c2 == NULL)
-	return 0;
+    /* Non-obvious logic, copied from g_strcmp0 */
+    if (c1 == NULL)
+	retval = -(c1 != c2);
+    else if (c2 == NULL)
+	retval = (c1 != c2);
+    else
+        retval = g_ascii_strcasecmp(c1, c2);
 
-    return g_ascii_strcasecmp(c1, c2);
+    g_free(c1);
+    g_free(c2);
+
+    return retval;
 }
 
 /* balsa_ab_window_response_cb:

@@ -420,6 +420,7 @@ sd_response_cb(GtkWidget * dialog, gint response, SelectDialogInfo * sdi)
 
             gtk_tree_model_get(model, &iter, IDENT_COLUMN, &identity, -1);
             sdi->update(sdi->data, identity);
+            g_object_unref(identity);
         }
     }
 

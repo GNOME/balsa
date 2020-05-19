@@ -31,10 +31,7 @@ G_DECLARE_FINAL_TYPE(BalsaToolbarModel,
                      TOOLBAR_MODEL,
                      GObject);
 
-typedef void (*BalsaToolbarFunc) (GtkWidget *, gpointer);
-#define BALSA_TOOLBAR_FUNC(f) ((BalsaToolbarFunc) (f))
-
-typedef struct t_button_data {
+typedef struct {
     char *pixmap_id;            /* not translatable */
     char *button_text;          /* translatable */
     gboolean is_important;      /* whether to show beside icon */
@@ -47,12 +44,6 @@ typedef struct {
     gchar *action;
     gchar *icon;
 } BalsaToolbarEntry;
-
-typedef enum {
-    BALSA_TOOLBAR_TYPE_MAIN_WINDOW,
-    BALSA_TOOLBAR_TYPE_COMPOSE_WINDOW,
-    BALSA_TOOLBAR_TYPE_MESSAGE_WINDOW
-} BalsaToolbarType;
 
 void update_all_toolbars(void);
 

@@ -22,10 +22,14 @@
 
 #include <gtk/gtk.h>
 
+typedef enum {
+    BALSA_TOOLBAR_TYPE_MAIN_WINDOW,
+    BALSA_TOOLBAR_TYPE_COMPOSE_WINDOW,
+    BALSA_TOOLBAR_TYPE_MESSAGE_WINDOW
+} BalsaToolbarType;
+
 int get_toolbar_button_index(const char *id);
 
-void customize_dialog_cb(GtkWidget *, gpointer);
-
-#define BALSA_TOOLBAR_MODEL_TYPE "balsa-toolbar-model-type"
+void balsa_toolbar_customize(GtkWindow * window, BalsaToolbarType type);
 
 #endif

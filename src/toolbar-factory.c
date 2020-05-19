@@ -25,6 +25,7 @@
 #include <string.h>
 #include <glib/gi18n.h>
 
+#include "application-helpers.h"
 #include "balsa-app.h"
 #include "balsa-icons.h"
 #include "main-window.h"
@@ -454,11 +455,13 @@ tm_set_tool_item_label(GtkToolItem * tool_item, const gchar * stock_id,
 
 static GtkToolbarStyle tm_default_style(void);
 
-static const struct {
+typedef struct {
     const gchar *text;
     const gchar *config_name;
     GtkToolbarStyle style;
-} tm_toolbar_options[] = {
+} ToolbarOption;
+
+static const ToolbarOption tm_toolbar_options[] = {
     {N_("Text Be_low Icons"),           "both",       GTK_TOOLBAR_BOTH},
     {N_("Priority Text Be_side Icons"), "both-horiz", GTK_TOOLBAR_BOTH_HORIZ},
     {NULL,                              "both_horiz", GTK_TOOLBAR_BOTH_HORIZ},
@@ -479,11 +482,14 @@ tm_default_style(void)
     if (str) {
         guint i;
 
-        for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++)
-            if (strcmp(tm_toolbar_options[i].config_name, str) == 0) {
-                default_style = tm_toolbar_options[i].style;
+        for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++) {
+            const ToolbarOption *option = &tm_toolbar_options[i];
+
+            if (strcmp(option->config_name, str) == 0) {
+                default_style = option->style;
                 break;
             }
+        }
         g_free(str);
     }
     g_object_unref(settings);
@@ -567,7 +573,8 @@ tm_changed_cb(BalsaToolbarModel * model, GtkWidget * toolbar)
 
 typedef struct {
     BalsaToolbarModel *model;
-    GtkWidget         *menu;
+    GtkWidget         *toolbar;
+    GtkWidget         *popup_menu;
 } toolbar_info;
 
 static void
@@ -575,39 +582,6 @@ tm_toolbar_weak_notify(toolbar_info * info, GtkWidget * toolbar)
 {
     g_signal_handlers_disconnect_by_data(info->model, toolbar);
     g_free(info);
-}
-
-#define BALSA_TOOLBAR_STYLE "balsa-toolbar-style"
-static void
-menu_item_toggled_cb(GtkCheckMenuItem * item, toolbar_info * info)
-{
-    if (gtk_check_menu_item_get_active(item)) {
-        info->model->style =
-            GPOINTER_TO_INT(g_object_get_data
-                            (G_OBJECT(item), BALSA_TOOLBAR_STYLE));
-        balsa_toolbar_model_changed(info->model);
-        if (info->menu)
-            gtk_menu_shell_deactivate(GTK_MENU_SHELL(info->menu));
-    }
-}
-
-/* We want to destroy the popup menu after handling the "toggled"
- * signal; the "deactivate" signal is apparently emitted before
- * "toggled", so we have to use an idle callback. */
-static gboolean
-tm_popup_idle_cb(GtkWidget *menu)
-{
-    gtk_widget_destroy(menu);
-    return FALSE;
-}
-
-static void
-tm_popup_deactivated_cb(GtkWidget * menu, toolbar_info * info)
-{
-    if (info->menu) {
-        g_idle_add((GSourceFunc) tm_popup_idle_cb, menu);
-        info->menu = NULL;
-    }
 }
 
 static gchar *
@@ -623,6 +597,38 @@ tm_remove_underscore(const gchar * text)
     return r;
 }
 
+static void
+tm_set_style_changed(GSimpleAction *action,
+                     GVariant      *parameter,
+                     gpointer       user_data)
+{
+    toolbar_info *info = user_data;
+    GtkToolbarStyle style;
+
+    style = g_variant_get_int32(parameter);
+    if (info->model->style != style) {
+        info->model->style = style;
+        balsa_toolbar_model_changed(info->model);
+    }
+
+    if (info->popup_menu != NULL)
+        gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
+
+    g_simple_action_set_state(action, parameter);
+}
+
+static void
+tm_customize_activated(GSimpleAction *action,
+                       GVariant      *parameter,
+                       gpointer       user_data)
+{
+    toolbar_info *info = user_data;
+    GtkWidget *toplevel;
+
+    toplevel = gtk_widget_get_toplevel(info->toolbar);
+    balsa_toolbar_customize(GTK_WINDOW(toplevel), info->model->type);
+}
+
 
 static gboolean
 tm_popup_context_menu_cb(GtkWidget    * toolbar,
@@ -631,113 +637,130 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
                          gint           button,
                          toolbar_info * info)
 {
-    GtkWidget *menu;
+    GSimpleActionGroup *simple;
+    static const char namespace[] = "toolbar";
+    static const GActionEntry entries[] = {
+        {"set-style", libbalsa_radio_activated, "i", "-1", tm_set_style_changed},
+        {"customize", tm_customize_activated}
+    };
+    GAction *set_style_action;
+    GMenu *menu;
+    GMenu *section;
     guint i;
-    GSList *group = NULL;
     GtkToolbarStyle default_style;
-    GdkEvent *event;
+    GtkWidget *popup_menu;
 
-    if (info->menu != NULL)
-        return FALSE;
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    entries,
+                                    G_N_ELEMENTS(entries),
+                                    info);
+    set_style_action = g_action_map_lookup_action(G_ACTION_MAP(simple), "set-style");
+    gtk_widget_insert_action_group(toolbar, namespace, G_ACTION_GROUP(simple));
+    g_object_unref(simple);
 
-    info->menu = menu = gtk_menu_new();
-    g_signal_connect(menu, "deactivate",
-                     G_CALLBACK(tm_popup_deactivated_cb), info);
+    menu = g_menu_new();
 
     /* ... add menu items ... */
-    for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++) {
-        GtkWidget *item;
+    section = g_menu_new();
 
-        if (!tm_toolbar_options[i].text)
+    for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++) {
+        const ToolbarOption *option = &tm_toolbar_options[i];
+        GMenuItem *item;
+
+        if (option->text == NULL)
             continue;
 
-        item =
-            gtk_radio_menu_item_new_with_mnemonic(group,
-                                                  _(tm_toolbar_options[i].
-                                                    text));
-        group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
-
-        if (tm_toolbar_options[i].style == info->model->style)
-            gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item),
-                                           TRUE);
-
-        gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-        g_object_set_data(G_OBJECT(item), BALSA_TOOLBAR_STYLE,
-                          GINT_TO_POINTER(tm_toolbar_options[i].style));
-        g_signal_connect(item, "toggled", G_CALLBACK(menu_item_toggled_cb),
-                         info);
+        item = g_menu_item_new(_(option->text), NULL);
+        g_menu_item_set_action_and_target(item, "set-style", "i", option->style);
+        g_menu_append_item(section, item);
+        g_object_unref(item);
     }
+    g_action_change_state(set_style_action, g_variant_new_int32(info->model->style));
+
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
 
     default_style = tm_default_style();
 
     for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++) {
+        const ToolbarOption *option = &tm_toolbar_options[i];
 
-        if (!tm_toolbar_options[i].text)
+        if (option->text == NULL)
             continue;
 
-        if (tm_toolbar_options[i].style == default_style) {
+        if (option->style == default_style) {
             gchar *option_text, *text;
-            GtkWidget *item;
+            GMenuItem *item;
 
-            gtk_menu_shell_append(GTK_MENU_SHELL(menu),
-                                  gtk_separator_menu_item_new());
+            section = g_menu_new();
 
-            option_text =
-                tm_remove_underscore(_(tm_toolbar_options[i].text));
+            option_text = tm_remove_underscore(_(option->text));
             text =
                 g_strdup_printf(_("Use Desktop _Default (%s)"),
                                 option_text);
             g_free(option_text);
 
-            item = gtk_radio_menu_item_new_with_mnemonic(group, text);
+            item = g_menu_item_new(text, NULL);
             g_free(text);
 
-            if (info->model->style == (GtkToolbarStyle) (-1))
-                gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM
-                                               (item), TRUE);
-            gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-            g_object_set_data(G_OBJECT(item), BALSA_TOOLBAR_STYLE,
-                              GINT_TO_POINTER(-1));
-            g_signal_connect(item, "toggled",
-                             G_CALLBACK(menu_item_toggled_cb), info);
+            g_menu_item_set_action_and_target(item, "set-style", "i", -1);
+
+            g_menu_append_item(section, item);
+            g_object_unref(item);
+
+            g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+            g_object_unref(section);
         }
     }
 
     if (gtk_widget_is_sensitive(toolbar)) {
         /* This is a real toolbar, not the template from the
          * toolbar-prefs dialog. */
-        GtkWidget *item;
+        section = g_menu_new();
 
-        gtk_menu_shell_append(GTK_MENU_SHELL(menu),
-                              gtk_separator_menu_item_new());
-        item =
-            gtk_menu_item_new_with_mnemonic(_("_Customize Toolbars…"));
-        g_signal_connect(item, "activate", G_CALLBACK(customize_dialog_cb),
-                         gtk_widget_get_toplevel(toolbar));
-        gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+        g_menu_append(section, _("_Customize Toolbars…"), "customize");
 
-        /* Pass the model type to the customize widget, so that it can
-         * show the appropriate notebook page. */
-        g_object_set_data(G_OBJECT(item), BALSA_TOOLBAR_MODEL_TYPE,
-                          GINT_TO_POINTER(info->model->type));
+        g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+        g_object_unref(section);
     }
 
-    gtk_widget_show_all(menu);
-    gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
+    popup_menu = gtk_popover_new(toolbar);
+    gtk_popover_bind_model(GTK_POPOVER(popup_menu), G_MENU_MODEL(menu), namespace);
+    g_object_unref(menu);
+    info->popup_menu = popup_menu;
 
-    event = gtk_get_current_event();
-    if (event != NULL && gdk_event_get_event_type(event) == GDK_BUTTON_PRESS) {
-        gtk_menu_popup_at_pointer(GTK_MENU(menu), event);
-    } else {
-        gtk_menu_popup_at_widget(GTK_MENU(menu),
-                                 GTK_WIDGET(toolbar),
-                                 GDK_GRAVITY_NORTH,
-                                 GDK_GRAVITY_SOUTH,
-                                 NULL);
+    if (button != -1) {
+        /* We are called with (x, y) coordinates, but they are
+         * "relative to the root of the screen", and we want them
+         * "relative to the window". */
+        GdkEvent *event;
+        gdouble x_win, y_win;
+
+        event = gtk_get_current_event();
+
+        if (event != NULL &&
+            gdk_event_triggers_context_menu(event) &&
+            gdk_event_get_coords(event, &x_win, &y_win)) {
+            GdkRectangle rectangle;
+
+            /* Pop up above the pointer */
+            rectangle.x = (gint) x_win;
+            rectangle.width = 0;
+            rectangle.y = (gint) y_win;
+            rectangle.height = 0;
+            gtk_popover_set_pointing_to(GTK_POPOVER(popup_menu), &rectangle);
+        }
+
+        if (event != NULL)
+            gdk_event_free(event);
     }
 
-    if (event != NULL)
-        gdk_event_free(event);
+    /* Apparently, the popover is insensitive if the toolbar is
+     * insensitive, but we always want it to be sensitive. */
+    gtk_widget_set_sensitive(popup_menu, TRUE);
+
+    gtk_popover_popup(GTK_POPOVER(popup_menu));
 
     return TRUE;
 }
@@ -745,18 +768,18 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
 GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
                              GActionMap        * action_map)
 {
-    toolbar_info *info;
     GtkWidget *toolbar;
-
-    info = g_new(toolbar_info, 1);
-    info->model = model;
-    info->menu = NULL;
+    toolbar_info *info;
 
     toolbar = gtk_toolbar_new();
     g_object_set_data_full(G_OBJECT(toolbar), BALSA_TOOLBAR_ACTION_MAP,
                            g_object_ref(action_map),
                            (GDestroyNotify) g_object_unref);
     tm_populate(toolbar, model);
+
+    info = g_new0(toolbar_info, 1);
+    info->model = model;
+    info->toolbar = toolbar;
 
     g_signal_connect(model, "changed", G_CALLBACK(tm_changed_cb), toolbar);
     g_object_weak_ref(G_OBJECT(toolbar),

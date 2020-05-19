@@ -922,7 +922,9 @@ toolbars_activated(GSimpleAction * action,
                    GVariant      * parameter,
                    gpointer        user_data)
 {
-    customize_dialog_cb(user_data, user_data);
+    GtkWindow *window = GTK_WINDOW(user_data);
+
+    balsa_toolbar_customize(window, BALSA_TOOLBAR_TYPE_MAIN_WINDOW);
 }
 
 static void

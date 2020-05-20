@@ -4297,7 +4297,7 @@ sendmsg_window_get_toolbar_model(void)
 static void
 bsmsg_identities_changed_cb(BalsaSendmsg * bsmsg)
 {
-    sw_action_set_enabled(bsmsg, "SelectIdentity",
+    sw_action_set_enabled(bsmsg, "select-ident",
                      balsa_app.identities->next != NULL);
 }
 

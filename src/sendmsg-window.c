@@ -618,7 +618,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     g_object_unref(bsmsg->buffer2);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
-    if (g_list_find(balsa_app.identities, bsmsg->ident)) {
+    if (g_list_find(balsa_app.identities, bsmsg->ident) != NULL) {
         /* Move the current identity to the start of the list */
         balsa_app.identities =
             g_list_remove(balsa_app.identities, bsmsg->ident);

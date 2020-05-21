@@ -618,11 +618,17 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     g_object_unref(bsmsg->buffer2);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
-    /* Move the current identity to the start of the list */
-    balsa_app.identities = g_list_remove(balsa_app.identities,
-                                         bsmsg->ident);
-    balsa_app.identities = g_list_prepend(balsa_app.identities,
-                                          bsmsg->ident);
+    if (g_list_find(balsa_app.identities, bsmsg->ident)) {
+        /* Move the current identity to the start of the list */
+        balsa_app.identities =
+            g_list_remove(balsa_app.identities, bsmsg->ident);
+        balsa_app.identities =
+            g_list_prepend(balsa_app.identities, bsmsg->ident);
+    } else {
+        /* The identity was removed from balsa_app.identities, and
+         * probably destroyed, so we'll just drop the pointer. */
+        bsmsg->ident = NULL;
+    }
 
     g_free(bsmsg->spell_check_lang);
     bsmsg->spell_check_lang = NULL;

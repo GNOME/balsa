@@ -119,7 +119,7 @@ static void bndx_drag_cb(GtkWidget* widget,
 
 /* Popup menu */
 static void bndx_popup_menu_create(BalsaIndex * index);
-static void bndx_do_popup(BalsaIndex * index);
+static void bndx_do_popup(BalsaIndex * index, const GdkEvent *event);
 
 static void sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data);
 
@@ -276,7 +276,7 @@ bndx_destroy(GObject * obj)
 static gboolean
 bndx_popup_menu(GtkWidget * widget)
 {
-    bndx_do_popup(BALSA_INDEX(widget));
+    bndx_do_popup(BALSA_INDEX(widget), NULL);
     return TRUE;
 }
 
@@ -653,7 +653,7 @@ bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press_gesture,
         gtk_tree_path_free(path);
     }
 
-    bndx_do_popup(bindex);
+    bndx_do_popup(bindex, event);
 }
 
 static void
@@ -2016,7 +2016,7 @@ bndx_popup_menu_create(BalsaIndex * bindex)
 
     bindex->popup_menu = menu;
     bindex->popup_popover = gtk_popover_new_from_model(GTK_WIDGET(bindex), G_MENU_MODEL(menu));
-    gtk_popover_set_position(GTK_POPOVER(bindex->popup_popover), GTK_POS_RIGHT);
+    gtk_popover_set_position(GTK_POPOVER(bindex->popup_popover), GTK_POS_BOTTOM);
 }
 
 /* bndx_do_popup: common code for the popup menu;
@@ -2041,7 +2041,7 @@ bndx_action_set_enabled(BalsaIndex  *bindex,
 }
 
 static void
-bndx_do_popup(BalsaIndex * index)
+bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
 {
     LibBalsaMailbox* mailbox;
     gboolean any;
@@ -2053,6 +2053,7 @@ bndx_do_popup(BalsaIndex * index)
     GMenu *mru_menu;
     GMenuItem *item;
     GtkAllocation allocation;
+    gdouble x, y;
 
     g_debug("%s:%s", __FILE__, __func__);
 
@@ -2102,18 +2103,20 @@ bndx_do_popup(BalsaIndex * index)
     g_menu_insert_item(index->popup_menu, index->move_position, item);
     g_object_unref(item);
 
-    gtk_widget_get_allocation(GTK_WIDGET(index), &allocation);
-    if (event != NULL && gdk_event_triggers_context_menu((GdkEvent *) event)) {
+    if (event != NULL &&
+        gdk_event_triggers_context_menu(event) &&
+        gdk_event_get_coords(event, &x, &y)) {
         /* Pop up to the right of the pointer */
         gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(index),
-                                                          (gint) event->x,
-                                                          (gint) event->y,
+                                                          (gint) x,
+                                                          (gint) y,
                                                           &allocation.x,
                                                           &allocation.y);
         allocation.width = 0;
         allocation.height = 0;
     } else {
         /* Pop up to the right of the "From" column */
+        gtk_widget_get_allocation(GTK_WIDGET(index), &allocation);
         allocation.width = balsa_app.index_num_width +
                            balsa_app.index_status_width +
                            balsa_app.index_attachment_width +

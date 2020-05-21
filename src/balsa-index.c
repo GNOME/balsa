@@ -2224,7 +2224,13 @@ bndx_do_popup(BalsaIndex * index)
     gtk_widget_get_allocation(GTK_WIDGET(index), &allocation);
     if (event != NULL && gdk_event_triggers_context_menu((GdkEvent *) event)) {
         /* Pop up to the right of the pointer */
-        allocation.width = event->x;
+        gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(index),
+                                                          (gint) event->x,
+                                                          (gint) event->y,
+                                                          &allocation.x,
+                                                          &allocation.y);
+        allocation.width = 0;
+        allocation.height = 0;
     } else {
         /* Pop up to the right of the "From" column */
         allocation.width = balsa_app.index_num_width +

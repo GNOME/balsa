@@ -27,9 +27,6 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "address-book-ldif.h"
 
-#include <ctype.h>
-#include <string.h>
-
 #include <glib/gi18n.h>
 
 static LibBalsaABErr

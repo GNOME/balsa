@@ -32,17 +32,11 @@
 
 #if HAVE_RUBRICA
 
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <string.h>
-#include <unistd.h>
-#include <libxml/parser.h>
 #include <libxml/tree.h>
-#include "libbalsa-conf.h"
 #include "abook-completion.h"
 #include "misc.h"
-#include <glib/gi18n.h>
 
 
 static LibBalsaABErr libbalsa_address_book_rubrica_load(LibBalsaAddressBook

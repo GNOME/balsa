@@ -28,8 +28,6 @@
 #ifndef __LIBBALSA_ADDRESS_BOOK_TEXT_H__
 #define __LIBBALSA_ADDRESS_BOOK_TEXT_H__
 
-#include <time.h>
-#include <stdio.h>
 #include "address-book.h"
 #include "completion.h"
 

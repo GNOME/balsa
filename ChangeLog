@@ -1,3 +1,22 @@
+2020-05-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	address-book and subclasses: Clean up #includes
+
+	* libbalsa/address-book-extern.c:
+	* libbalsa/address-book-extern.h:
+	* libbalsa/address-book-gpe.c:
+	* libbalsa/address-book-gpe.h:
+	* libbalsa/address-book-ldap.c:
+	* libbalsa/address-book-ldap.h:
+	* libbalsa/address-book-ldif.c:
+	* libbalsa/address-book-osmo.c:
+	* libbalsa/address-book-osmo.h:
+	* libbalsa/address-book-rubrica.c:
+	* libbalsa/address-book-text.c:
+	* libbalsa/address-book-text.h:
+	* libbalsa/address-book-vcard.c:
+	* libbalsa/address-book.c:
+
 2020-05-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	compose window: BalsaSendmsg:ident may be destroyed while the

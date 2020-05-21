@@ -39,16 +39,12 @@
 #include "address-book-ldap.h"
 
 #include <glib.h>
-#include <sys/time.h>
-#include <string.h>
-#include <lber.h>
 #include <ldap.h>
 
 #ifdef HAVE_CYRUS_SASL
 #include <sasl.h>
 #endif
 
-#include "address-book.h"
 #include "information.h"
 #include "libbalsa-conf.h"
 #include <glib/gi18n.h>

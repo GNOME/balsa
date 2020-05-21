@@ -31,12 +31,6 @@
 
 #ifdef HAVE_SQLITE
 
-#ifdef HAVE_SQLITE3
-#include <sqlite3.h>
-#else                           /* HAVE_SQLITE3 */
-#include <sqlite.h>
-#endif                          /* HAVE_SQLITE3 */
-
 #include "address-book.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK_GPE (libbalsa_address_book_gpe_get_type())

@@ -31,15 +31,10 @@
 #endif                          /* HAVE_CONFIG_H */
 
 #if defined(HAVE_OSMO)
-
-#include <string.h>
-#include <glib.h>
-#include <gio/gio.h>
-#include <glib/gi18n.h>
-
-#include "address-book.h"
-#include "rfc6350.h"
 #include "address-book-osmo.h"
+
+#include <glib/gi18n.h>
+#include "rfc6350.h"
 
 
 /* for the time being, osmo svn rev. 1099 accepts only reading via DBus, not writing new or modified records */

@@ -28,7 +28,6 @@
 #ifndef LIBBALSA_ADDRESS_BOOK_OSMO_H__
 #define LIBBALSA_ADDRESS_BOOK_OSMO_H__
 
-#include <gio/gio.h>
 #include "address-book.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK_OSMO (libbalsa_address_book_osmo_get_type())
@@ -42,4 +41,4 @@ G_DECLARE_FINAL_TYPE(LibBalsaAddressBookOsmo,
 LibBalsaAddressBook *libbalsa_address_book_osmo_new(const gchar *name);
 
 
-#endif              /* __LIBBALSA_ADDRESS_BOOK_LDAP_H__ */
+#endif              /* __LIBBALSA_ADDRESS_BOOK_OSMO_H__ */

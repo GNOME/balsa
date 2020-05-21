@@ -25,9 +25,6 @@
 #ifndef __LIBBALSA_ADDRESS_BOOK_LDAP_H__
 #define __LIBBALSA_ADDRESS_BOOK_LDAP_H__
 
-#include <lber.h>
-#include <ldap.h>
-
 #include "address-book.h"
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK_LDAP (libbalsa_address_book_ldap_get_type())

@@ -31,13 +31,10 @@
 #include "address-book-text.h"
 
 #include <sys/stat.h>
-#include <string.h>
-#include <unistd.h>
 
 #include "abook-completion.h"
 #include "libbalsa-conf.h"
 #include "misc.h"
-#include <glib/gi18n.h>
 
 /* FIXME: Perhaps the whole thing could be rewritten to use a g_scanner ?? */
 

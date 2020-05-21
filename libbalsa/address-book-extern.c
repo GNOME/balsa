@@ -42,13 +42,7 @@
 #define _POSIX_C_SOURCE 2
 #include "address-book-extern.h"
 
-#include <stdio.h>
-#include <sys/stat.h>
-
-#include "address-book.h"
 #include "libbalsa-conf.h"
-#include "information.h"
-#include "abook-completion.h"
 #include <glib/gi18n.h>
 
 /* FIXME: Arbitrary constant */

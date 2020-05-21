@@ -26,7 +26,6 @@
 #define __LIBBALSA_ADDRESS_BOOK_EXTERN_H__
 
 #include "address-book.h"
-#include <time.h>
 
 #define LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ (libbalsa_address_book_externq_get_type())
 G_DECLARE_FINAL_TYPE(LibBalsaAddressBookExternq, libbalsa_address_book_externq,

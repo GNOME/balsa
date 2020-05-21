@@ -23,7 +23,7 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "address-book.h"
 
-#include <gtk/gtk.h>
+#include <glib.h>
 #include <glib/gi18n.h>
 
 #include "libbalsa-conf.h"

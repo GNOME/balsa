@@ -174,16 +174,16 @@ struct _LibBalsaMailboxPrivate {
     ((LibBalsaMailboxIndexEntry *) (((msgno) <= (priv)->mindex->len) ? \
      g_ptr_array_index((priv)->mindex, (msgno) - 1) : NULL))
 
-G_DEFINE_TYPE_WITH_CODE(LibBalsaMailbox,
-                        libbalsa_mailbox,
-                        G_TYPE_OBJECT,
-                        G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_MODEL,
-                                              mailbox_model_init)
-                        G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_DRAG_SOURCE,
-                                              mailbox_drag_source_init)
-                        G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_SORTABLE,
-                                              mailbox_sortable_init)
-                        G_ADD_PRIVATE(LibBalsaMailbox)
+G_DEFINE_ABSTRACT_TYPE_WITH_CODE(LibBalsaMailbox,
+                                 libbalsa_mailbox,
+                                 G_TYPE_OBJECT,
+                                 G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_MODEL,
+                                                       mailbox_model_init)
+                                 G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_DRAG_SOURCE,
+                                                       mailbox_drag_source_init)
+                                 G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_SORTABLE,
+                                                       mailbox_sortable_init)
+                                 G_ADD_PRIVATE(LibBalsaMailbox)
                        )
 
 static void

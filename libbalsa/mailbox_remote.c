@@ -35,9 +35,9 @@ struct _LibBalsaMailboxRemotePrivate {
     LibBalsaServer *server;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE(LibBalsaMailboxRemote,
-                           libbalsa_mailbox_remote,
-                           LIBBALSA_TYPE_MAILBOX)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE(LibBalsaMailboxRemote,
+                                    libbalsa_mailbox_remote,
+                                    LIBBALSA_TYPE_MAILBOX)
 
 static void
 libbalsa_mailbox_remote_class_init(LibBalsaMailboxRemoteClass * klass)

@@ -130,8 +130,8 @@ static void libbalsa_mailbox_local_check(LibBalsaMailbox *mailbox);
 /* LibBalsaMailboxLocal class method: */
 static void lbm_local_real_remove_files(LibBalsaMailboxLocal * local);
 
-G_DEFINE_TYPE_WITH_PRIVATE(LibBalsaMailboxLocal, libbalsa_mailbox_local,
-                           LIBBALSA_TYPE_MAILBOX)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE(LibBalsaMailboxLocal, libbalsa_mailbox_local,
+                                    LIBBALSA_TYPE_MAILBOX)
 
 static void
 libbalsa_mailbox_local_class_init(LibBalsaMailboxLocalClass * klass)

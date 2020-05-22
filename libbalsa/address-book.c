@@ -51,7 +51,7 @@ static void libbalsa_address_book_real_load_config(LibBalsaAddressBook *
 						   ab,
 						   const gchar * group);
 
-G_DEFINE_TYPE_WITH_PRIVATE(LibBalsaAddressBook, libbalsa_address_book, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE(LibBalsaAddressBook, libbalsa_address_book, G_TYPE_OBJECT)
 
 static void
 libbalsa_address_book_class_init(LibBalsaAddressBookClass * klass)

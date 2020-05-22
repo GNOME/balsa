@@ -82,7 +82,7 @@ typedef struct {
     LibBalsaCompletion *name_complete;
 } LibBalsaAddressBookTextPrivate;
 
-G_DEFINE_TYPE_WITH_PRIVATE(LibBalsaAddressBookText, libbalsa_address_book_text,
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE(LibBalsaAddressBookText, libbalsa_address_book_text,
         LIBBALSA_TYPE_ADDRESS_BOOK)
 
 typedef struct {

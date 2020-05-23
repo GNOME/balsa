@@ -42,7 +42,7 @@ typedef struct {
     BalsaPrintRect rect;
 } BalsaPrintObjectPrivate;
 
-G_DEFINE_TYPE_WITH_PRIVATE(BalsaPrintObject, balsa_print_object, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE(BalsaPrintObject, balsa_print_object, G_TYPE_OBJECT)
 
 
 /* object related functions */

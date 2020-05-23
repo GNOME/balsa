@@ -590,12 +590,13 @@ lbav_entry_changed_cb(GtkEntry * entry, LibBalsaAddressView * address_view)
  */
 static gboolean
 lbav_key_pressed_cb(GtkEntry * entry,
-                    GdkEventKey * event,
+                    const GdkEvent * event,
                     LibBalsaAddressView * address_view)
 {
+    guint keyval;
     GtkEntryCompletion *completion;
 
-    if (event->keyval != GDK_KEY_Escape)
+    if (!gdk_event_get_keyval(event, &keyval) || keyval != GDK_KEY_Escape)
         return FALSE;
 
     if (address_view->last_was_escape) {
@@ -933,20 +934,23 @@ lbav_selection_changed_cb(GtkTreeSelection * selection,
 {
     GdkEvent *event = gtk_get_current_event();
 
-    if (event) {
-        if (event->type == GDK_BUTTON_PRESS) {
-            GdkEventButton *event_button = (GdkEventButton *) event;
-            GtkTreeView *tree_view = (GtkTreeView *) address_view;
+    if (event == NULL)
+        return;
 
-            if (event_button->window ==
-                gtk_tree_view_get_bin_window(tree_view)) {
+    if (gdk_event_get_event_type(event) == GDK_BUTTON_PRESS) {
+        GtkTreeView *tree_view = (GtkTreeView *) address_view;
+
+        if (gdk_event_get_window(event) ==
+            gtk_tree_view_get_bin_window(tree_view)) {
+            gdouble x_win, y_win;
+
+            if (gdk_event_get_coords(event, &x_win, &y_win)) {
                 gint x, y;
                 GtkTreePath *path;
                 GtkTreeViewColumn *column;
 
                 gtk_tree_view_convert_widget_to_bin_window_coords
-                    (tree_view, (gint) event_button->x,
-                     (gint) event_button->y, &x, &y);
+                    (tree_view, (gint) x_win, (gint) y_win, &x, &y);
 
                 if (gtk_tree_view_get_path_at_pos
                     (tree_view, x, y, &path, &column, NULL, NULL)) {
@@ -955,8 +959,9 @@ lbav_selection_changed_cb(GtkTreeSelection * selection,
                 }
             }
         }
-        gdk_event_free(event);
     }
+
+    gdk_event_free(event);
 }
 
 /*

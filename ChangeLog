@@ -1,5 +1,13 @@
 2020-05-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	autocrypt: Stop using direct access to GdkEvent structs
+
+	Use GdkEvent getters instead of directly accessing fields.
+
+	* libbalsa/autocrypt.c (key_button_event_press_cb):
+
+2020-05-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	address-view: Stop using direct access to GdkEvent structs
 
 	Use GdkEvent getters instead of directly accessing fields.

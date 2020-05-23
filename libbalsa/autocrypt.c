@@ -118,9 +118,9 @@ static AutocryptRecommend autocrypt_check_ia_list(gpgme_ctx_t           gpgme_ct
 												  time_t                ref_time,
 												  GList               **missing_keys,
 												  GError              **error);
-static gboolean key_button_event_press_cb(GtkWidget      *widget,
-						 				  GdkEventButton *event,
-										  gpointer        data);
+static gboolean key_button_event_press_cb(GtkWidget *widget,
+                                          GdkEvent  *event,
+                                          gpointer   data);
 
 
 static sqlite3 *autocrypt_db = NULL;
@@ -768,22 +768,24 @@ update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
 
 
 static gboolean
-key_button_event_press_cb(GtkWidget      *widget,
-						  GdkEventButton *event,
-						  gpointer        data)
+key_button_event_press_cb(GtkWidget *widget,
+                          GdkEvent  *event,
+                          gpointer   data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    gdouble x, y;
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreePath *path;
     GtkTreeIter iter;
     GtkTreeModel *model;
 
-    g_return_val_if_fail(event != NULL, FALSE);
-    if ((event->type != GDK_2BUTTON_PRESS) || event->window != gtk_tree_view_get_bin_window(tree_view)) {
+    if ((gdk_event_get_event_type(event) != GDK_2BUTTON_PRESS) ||
+        (gdk_event_get_window(event) != gtk_tree_view_get_bin_window(tree_view)) ||
+        !gdk_event_get_coords(event, &x, &y)) {
         return FALSE;
     }
 
-    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y, &path, NULL, NULL, NULL)) {
+    if (gtk_tree_view_get_path_at_pos(tree_view, x, y, &path, NULL, NULL, NULL)) {
         if (!gtk_tree_selection_path_is_selected(selection, path)) {
             gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
             gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);

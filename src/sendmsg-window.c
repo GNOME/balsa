@@ -4142,7 +4142,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 #else
     GList *lang_list, *l;
 #endif                          /* HAVE_GSPELL */
-#if !HAVE_GSPELL && !HAVE_GTKSPELL_
+#if !HAVE_GSPELL && !HAVE_GTKSPELL
     EnchantBroker *broker;
 #endif                          /* !HAVE_GSPELL && !HAVE_GTKSPELL */
     const gchar *preferred_lang;

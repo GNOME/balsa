@@ -1,5 +1,13 @@
 2020-05-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	address-view: Connect to "notify::has-focus" signal instead of
+	"focus-out-event".
+
+	* libbalsa/address-view.c (lbav_notify_has_focus_cb),
+	(lbav_row_editing_cb):
+
+2020-05-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	compose window: Hold a reference to identity
 
 	It is possible for BalsaSendmsg:ident to be unreffed by the

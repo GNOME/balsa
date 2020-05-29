@@ -1,3 +1,17 @@
+2020-05-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	compose window: Hold a reference to identity
+
+	It is possible for BalsaSendmsg:ident to be unreffed by the
+	identity configuration editor; it is only a minor inconvenience,
+	but we can make it more robust by holding a reference.
+
+	* src/sendmsg-window.c (update_bsmsg_identity),
+	  (set_identity_from_mailbox), (guess_identity_from_list),
+	  (sendmsg_window_new): manage the reference;
+	  (balsa_sendmsg_destroy_handler): ditto; also do not bother to
+	    clear members of BalsaSendmsg, as it is about to be deallocated.
+
 2020-05-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	autocrypt: Stop using direct access to GdkEvent structs

@@ -548,8 +548,11 @@ destroy_event_cb(GtkWidget * widget, gpointer data)
 }
 
 /* the balsa_sendmsg destructor; copies first the shown headers setting
-   to the balsa_app structure.
-*/
+ * to the balsa_app structure. The BalsaSendmsg is deallocated after
+ * freeing up all resources, so we do not clear its members; if it were
+ * to become a GObject::dispose method, we would need to be more
+ * careful, to protect against repeated calls.
+ */
 #define BALSA_SENDMSG_WINDOW_KEY "balsa-sendmsg-window-key"
 static void
 balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
@@ -577,7 +580,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 		    /* Respect pref setting: */
 				   balsa_app.expunge_on_close);
 	g_object_unref(bsmsg->parent_message);
-        bsmsg->parent_message = NULL;
     }
 
     if (bsmsg->draft_message != NULL) {
@@ -591,7 +593,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 		    /* Respect pref setting: */
 				   balsa_app.expunge_on_close);
 	g_object_unref(bsmsg->draft_message);
-        bsmsg->draft_message = NULL;
     }
 
     if (balsa_app.debug)
@@ -600,19 +601,14 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     quit_on_close = bsmsg->quit_on_close;
     g_free(bsmsg->fcc_url);
     g_free(bsmsg->in_reply_to);
-    if(bsmsg->references) {
-        g_list_free_full(bsmsg->references, g_free);
-        bsmsg->references = NULL;
-    }
+    g_list_free_full(bsmsg->references, g_free);
 
 #if !(HAVE_GSPELL || HAVE_GTKSPELL)
     if (bsmsg->spell_checker)
         gtk_widget_destroy(bsmsg->spell_checker);
 #endif                          /* HAVE_GTKSPELL */
-    if (bsmsg->autosave_timeout_id) {
+    if (bsmsg->autosave_timeout_id != 0)
         g_source_remove(bsmsg->autosave_timeout_id);
-        bsmsg->autosave_timeout_id = 0;
-    }
 
 #if !HAVE_GTKSOURCEVIEW
     g_object_unref(bsmsg->buffer2);
@@ -624,14 +620,11 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
             g_list_remove(balsa_app.identities, bsmsg->ident);
         balsa_app.identities =
             g_list_prepend(balsa_app.identities, bsmsg->ident);
-    } else {
-        /* The identity was removed from balsa_app.identities, and
-         * probably destroyed, so we'll just drop the pointer. */
-        bsmsg->ident = NULL;
+
     }
+    g_object_unref(bsmsg->ident);
 
     g_free(bsmsg->spell_check_lang);
-    bsmsg->spell_check_lang = NULL;
 
     g_free(bsmsg);
 
@@ -1042,6 +1035,7 @@ sw_action_get_active(BalsaSendmsg * bsmsg,
  * Change the specified BalsaSendmsg current identity, and update the
  * corresponding fields.
  * */
+
 static void
 update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 {
@@ -1193,7 +1187,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
     /* switch identities in bsmsg here so we can use read_signature
      * again */
-    bsmsg->ident = ident;
+    g_set_object(&bsmsg->ident, ident);
     if ( (reply_type && libbalsa_identity_get_sig_whenreply(ident))
          || (forward_type && libbalsa_identity_get_sig_whenforward(ident))
          || (bsmsg->type == SEND_NORMAL && libbalsa_identity_get_sig_sending(ident)))
@@ -3994,7 +3988,7 @@ set_identity_from_mailbox(BalsaSendmsg *bsmsg, LibBalsaMessage *message)
         const gchar *name = libbalsa_identity_get_identity_name(ident);
 
         if (g_ascii_strcasecmp(name, identity) == 0) {
-            bsmsg->ident = ident;
+            g_set_object(&bsmsg->ident, ident);
             return TRUE;
         }
     }
@@ -4038,7 +4032,7 @@ guess_identity_from_list(BalsaSendmsg * bsmsg, InternetAddressList * list,
                 LibBalsaIdentity *ident = LIBBALSA_IDENTITY(l->data);
                 if (libbalsa_ia_rfc2821_equal(libbalsa_identity_get_address(ident),
                                               ia)) {
-                    bsmsg->ident = ident;
+                    g_set_object(&bsmsg->ident, ident);
                     return TRUE;
                 }
             }
@@ -6834,7 +6828,9 @@ sendmsg_window_new()
     bsmsg->spell_check_lang = NULL;
     bsmsg->fcc_url  = NULL;
     bsmsg->insert_mark = NULL;
-    bsmsg->ident = balsa_app.current_ident;
+
+    bsmsg->ident = g_object_ref(balsa_app.current_ident);
+
     bsmsg->update_config = FALSE;
     bsmsg->quit_on_close = FALSE;
     bsmsg->state = SENDMSG_STATE_CLEAN;

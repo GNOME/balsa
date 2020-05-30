@@ -1,5 +1,14 @@
 2020-05-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	autocrypt: Connect to the "pressed" signal of a
+	GtkGestureMultiPress instead of the "button_press_event" widget
+	signal.
+
+	* libbalsa/autocrypt.c (autocrypt_db_dialog_run),
+	(gesture_pressed_cb):
+
+2020-05-29  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	address-view: Connect to "notify::has-focus" signal instead of
 	"focus-out-event".
 

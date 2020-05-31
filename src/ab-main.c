@@ -900,12 +900,21 @@ bab_get_filter_box(void)
                              button);
     return search_hbox;
 }
+
 static gboolean
-ew_key_pressed(GtkEntry * entry, GdkEventKey * event, struct ABMainWindow *abmw)
+ew_key_pressed(GtkEventControllerKey *controller,
+               guint                  keyval,
+               guint                  keycode,
+               GdkModifierType        state,
+               gpointer               user_data)
 {
-    if (event->keyval != GDK_KEY_Escape)
+    struct ABMainWindow *abmw = user_data;
+
+    if (keyval != GDK_KEY_Escape)
 	return FALSE;
+
     gtk_button_clicked(GTK_BUTTON(abmw->cancel_button));
+
     return TRUE;
 }
 
@@ -917,6 +926,7 @@ bab_window_new(GtkApplication * application)
     GtkWidget *scroll;
     GtkWidget *browse_widget;
     GtkWidget *edit_widget;
+    GtkEventController *key_controller;
 
     contacts_app.window =
         GTK_WINDOW(wnd = gtk_application_window_new(application));
@@ -968,19 +978,16 @@ bab_window_new(GtkApplication * application)
     g_signal_connect(find_entry, "changed",
 		     G_CALLBACK(balsa_ab_window_find), ab);
     */
-    g_signal_connect(wnd, "key-press-event",
+    key_controller = gtk_event_controller_key_new(wnd);
+    g_signal_connect(key_controller, "key-pressed",
 		     G_CALLBACK(ew_key_pressed), &contacts_app);
+
     gtk_window_set_default_size(GTK_WINDOW(wnd), 500, 400);
 
     gtk_widget_show_all(wnd);
     return wnd;
 }
 
-static gboolean
-bab_delete_ok(void)
-{
-    return FALSE;
-}
 /* -------------------------- main --------------------------------- */
 static void
 ab_warning(const char *fmt, ...)
@@ -1139,8 +1146,6 @@ main(int argc, char *argv[])
 
     g_signal_connect(ab_window, "destroy",
                      G_CALLBACK(bab_cleanup), NULL);
-    g_signal_connect(ab_window, "delete-event",
-                     G_CALLBACK(bab_delete_ok), NULL);
     bab_set_intial_address_book(ab, ab_window);
 
     /* session management */

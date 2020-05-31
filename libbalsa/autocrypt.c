@@ -117,9 +117,10 @@ static AutocryptRecommend autocrypt_check_ia_list(gpgme_ctx_t           gpgme_ct
 												  time_t                ref_time,
 												  GList               **missing_keys,
 												  GError              **error);
-static gboolean key_button_event_press_cb(GtkWidget      *widget,
-						 				  GdkEventButton *event,
-										  gpointer        data);
+static void row_activated_cb(GtkTreeView       *tree_view,
+                             GtkTreePath       *path,
+                             GtkTreeViewColumn *column,
+                             gpointer           user_data);
 
 
 static sqlite3 *autocrypt_db = NULL;
@@ -460,7 +461,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 		G_TYPE_POINTER);											/* key */
 
     tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
-    g_signal_connect(tree_view, "button_press_event", G_CALLBACK(key_button_event_press_cb), dialog);
+    g_signal_connect(tree_view, "row-activated", G_CALLBACK(row_activated_cb), dialog);
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
@@ -903,32 +904,18 @@ update_last_seen(const gchar *addr, time_t date_header, GError **error)
 }
 
 
-static gboolean
-key_button_event_press_cb(GtkWidget      *widget,
-						  GdkEventButton *event,
-						  gpointer        data)
+static void
+row_activated_cb(GtkTreeView       *tree_view,
+                 GtkTreePath       *path,
+                 GtkTreeViewColumn *column,
+                 gpointer           data)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
-    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
-    GtkTreePath *path;
     GtkTreeIter iter;
     GtkTreeModel *model;
 
-    g_return_val_if_fail(event != NULL, FALSE);
-    if ((event->type != GDK_2BUTTON_PRESS) || event->window != gtk_tree_view_get_bin_window(tree_view)) {
-        return FALSE;
-    }
-
-    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y, &path, NULL, NULL, NULL)) {
-        if (!gtk_tree_selection_path_is_selected(selection, path)) {
-            gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
-            gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
-        }
-        gtk_tree_path_free(path);
-    }
-
     /* note: silently ignore all errors below... */
-    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+    model = gtk_tree_view_get_model(tree_view);
+    if (gtk_tree_model_get_iter(model, &iter, path)) {
 		gpgme_ctx_t ctx;
 
 		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, NULL);
@@ -960,8 +947,6 @@ key_button_event_press_cb(GtkWidget      *widget,
 			gpgme_release(ctx);
 		}
     }
-
-    return TRUE;
 }
 
 #endif  /* ENABLE_AUTOCRYPT */

@@ -1,5 +1,14 @@
 2020-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-index: Connect to the "pressed" signal of a
+	GtkGestureMultiPress instead of the "button-press-event" widget
+	signal.
+
+	* src/balsa-index.c (balsa_index_init), (bndx_gesture_pressed_cb),
+	(bndx_do_popup):
+
+2020-05-31  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	ab-main: Connect to the "key-pressed" signal of a
 	GtkEventControllerKey instead of the "key-press-event" widget
 	signal.

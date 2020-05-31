@@ -79,9 +79,11 @@ static void bndx_mailbox_changed_cb(LibBalsaMailbox * mailbox,
 /* GtkTree* callbacks */
 static void bndx_selection_changed(GtkTreeSelection * selection,
                                    BalsaIndex * index);
-static gboolean bndx_button_event_press_cb(GtkWidget * tree_view,
-                                           GdkEventButton * event,
-                                           gpointer data);
+static void bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press_gesture,
+                                    gint                  n_press,
+                                    gdouble               x,
+                                    gdouble               y,
+                                    gpointer              user_data);
 static void bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
                                GtkTreeViewColumn * column,
                                gpointer user_data);
@@ -116,7 +118,7 @@ static void bndx_drag_cb(GtkWidget* widget,
 
 /* Popup menu */
 static GtkWidget* bndx_popup_menu_create(BalsaIndex * index);
-static void bndx_do_popup(BalsaIndex * index, GdkEventButton * event);
+static void bndx_do_popup(BalsaIndex * index, const GdkEvent *event);
 static GtkWidget *create_stock_menu_item(GtkWidget * menu,
                                          const gchar * label,
                                          GCallback cb, gpointer data);
@@ -330,6 +332,7 @@ balsa_index_init(BalsaIndex * index)
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
+    GtkGesture *gesture;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
     gtk_tree_view_set_fixed_height_mode(tree_view, TRUE);
@@ -458,8 +461,11 @@ balsa_index_init(BalsaIndex * index)
 
     /* we want to handle button presses to pop up context menus if
      * necessary */
-    g_signal_connect(tree_view, "button_press_event",
-		     G_CALLBACK(bndx_button_event_press_cb), NULL);
+    gesture = gtk_gesture_multi_press_new(GTK_WIDGET(index));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_signal_connect(gesture, "pressed",
+                     G_CALLBACK(bndx_gesture_pressed_cb), index);
+
     g_signal_connect(tree_view, "row-activated",
 		     G_CALLBACK(bndx_row_activated), NULL);
 
@@ -614,37 +620,50 @@ bndx_selection_changed(GtkTreeSelection * selection, BalsaIndex * bindex)
     }
 }
 
-static gboolean
-bndx_button_event_press_cb(GtkWidget * widget, GdkEventButton * event,
-                           gpointer data)
+static void
+bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press_gesture,
+                        gint                  n_press,
+                        gdouble               x,
+                        gdouble               y,
+                        gpointer              user_data)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    BalsaIndex *bindex = user_data;
+    GtkTreeView *tree_view = GTK_TREE_VIEW(bindex);
+    GtkGesture *gesture;
+    GdkEventSequence *sequence;
+    const GdkEvent *event;
+    gint bx;
+    gint by;
     GtkTreePath *path;
-    BalsaIndex *index = BALSA_INDEX(widget);
 
-    g_return_val_if_fail(event, FALSE);
+    gesture  = GTK_GESTURE(multi_press_gesture);
+    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press_gesture));
+    event    = gtk_gesture_get_last_event(gesture, sequence);
+
     if (!gdk_event_triggers_context_menu((GdkEvent *) event)
-        || event->window != gtk_tree_view_get_bin_window(tree_view))
-        return FALSE;
+        || gdk_event_get_window(event) != gtk_tree_view_get_bin_window(tree_view))
+        return;
+
+    gtk_gesture_set_sequence_state(gesture, sequence, GTK_EVENT_SEQUENCE_CLAIMED);
+
+    gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (gint) x, (gint) y,
+                                                      &bx, &by);
 
     /* pop up the context menu:
      * - if the clicked-on message is already selected, don't change
      *   the selection;
      * - if it isn't, select it (cancelling any previous selection)
      * - then create and show the menu */
-    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y,
-                                      &path, NULL, NULL, NULL)) {
+    if (gtk_tree_view_get_path_at_pos(tree_view, bx, by, &path, NULL, NULL, NULL)) {
         GtkTreeSelection *selection =
             gtk_tree_view_get_selection(tree_view);
 
         if (!gtk_tree_selection_path_is_selected(selection, path))
-            bndx_select_row(index, path);
+            bndx_select_row(bindex, path);
         gtk_tree_path_free(path);
     }
 
-    bndx_do_popup(index, event);
-
-    return TRUE;
+    bndx_do_popup(bindex, event);
 }
 
 static void
@@ -1910,7 +1929,7 @@ bndx_popup_menu_create(BalsaIndex * index)
  */
 
 static void
-bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
+bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
 {
     GtkWidget *menu = index->popup_menu;
     GtkWidget *submenu;
@@ -1966,12 +1985,13 @@ bndx_do_popup(BalsaIndex * index, GdkEventButton * event)
 
     gtk_widget_show_all(menu);
 
-    if (event)
-        gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent *) event);
-    else
+    if (event != NULL) {
+        gtk_menu_popup_at_pointer(GTK_MENU(menu), event);
+    } else {
         gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(index),
                                  GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                  NULL);
+    }
 }
 
 static GtkWidget *

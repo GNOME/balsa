@@ -259,7 +259,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
                         is_text_plain);
     g_free(ptr);
 
-    key_controller = gtk_event_controller_key_new(libbalsa_html_get_view_widget(widget));
+    key_controller = gtk_event_controller_key_new(widget);
     g_signal_connect(key_controller, "key-pressed",
 		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
 

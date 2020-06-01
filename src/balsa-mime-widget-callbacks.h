@@ -35,8 +35,10 @@ gboolean balsa_mime_widget_key_pressed(GtkEventControllerKey *controller,
                                        guint                  keycode,
                                        GdkModifierType        state,
                                        gpointer               user_data);
-gint balsa_mime_widget_limit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm);
-gint balsa_mime_widget_unlimit_focus(GtkWidget * widget, GdkEventFocus * event, BalsaMessage * bm);
+void balsa_mime_widget_limit_focus(GtkEventControllerKey *key_controller,
+                                   gpointer               user_data);
+void balsa_mime_widget_unlimit_focus(GtkEventControllerKey *key_controller,
+                                     gpointer               user_data);
 
 
 G_END_DECLS

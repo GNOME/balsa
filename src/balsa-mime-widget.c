@@ -108,6 +108,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
     BalsaMimeWidget *mw = NULL;
     gchar *content_type;
     mime_delegate_t *delegate;
+    GtkEventController *key_controller;
 
     g_return_val_if_fail(bm != NULL, NULL);
     g_return_val_if_fail(mime_body != NULL, NULL);
@@ -128,9 +129,10 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
     if (mw == NULL)
 	mw = balsa_mime_widget_new_unknown(bm, mime_body, content_type);
 
-    g_signal_connect(mw, "focus_in_event",
+    key_controller = gtk_event_controller_key_new(GTK_WIDGET(mw));
+    g_signal_connect(key_controller, "focus-in",
                      G_CALLBACK(balsa_mime_widget_limit_focus), bm);
-    g_signal_connect(mw, "focus_out_event",
+    g_signal_connect(key_controller, "focus-out",
                      G_CALLBACK(balsa_mime_widget_unlimit_focus), bm);
     if (mime_body->sig_info != NULL &&
         strcmp("application/pgp-signature", content_type) != 0 &&

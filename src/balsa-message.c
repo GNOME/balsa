@@ -261,12 +261,12 @@ bm_header_tl_buttons(BalsaMessage * balsa_message)
                                       GTK_ICON_SIZE_BUTTON);
     gtk_widget_set_tooltip_text(button,
 			        _("Select message part to display"));
-    g_signal_connect(button, "focus_in_event",
-		     G_CALLBACK(balsa_mime_widget_limit_focus),
-		     (gpointer) balsa_message);
-    g_signal_connect(button, "focus_out_event",
-		     G_CALLBACK(balsa_mime_widget_unlimit_focus),
-		     (gpointer) balsa_message);
+
+    key_controller = gtk_event_controller_key_new(button);
+    g_signal_connect(key_controller, "focus-in",
+		     G_CALLBACK(balsa_mime_widget_limit_focus), balsa_message);
+    g_signal_connect(key_controller, "focus-out",
+		     G_CALLBACK(balsa_mime_widget_unlimit_focus), balsa_message);
     gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(balsa_headers_attachments_popup), balsa_message);
@@ -680,12 +680,11 @@ balsa_message_init(BalsaMessage * balsa_message)
     g_free(buttons);
 
     /* Widget to hold message */
-    g_signal_connect(GTK_WIDGET(balsa_message->bm_widget), "focus_in_event",
-                     G_CALLBACK(balsa_mime_widget_limit_focus),
-                     (gpointer) balsa_message);
-    g_signal_connect(GTK_WIDGET(balsa_message->bm_widget), "focus_out_event",
-                     G_CALLBACK(balsa_mime_widget_unlimit_focus),
-		     (gpointer) balsa_message);
+    key_controller = gtk_event_controller_key_new(GTK_WIDGET(balsa_message->bm_widget));
+    g_signal_connect(key_controller, "focus-in",
+                     G_CALLBACK(balsa_mime_widget_limit_focus), balsa_message);
+    g_signal_connect(key_controller, "focus-out",
+                     G_CALLBACK(balsa_mime_widget_unlimit_focus), balsa_message);
 
     /* If we do not add the widget to a viewport, GtkContainer would
      * provide one, but it would also set it up to scroll on grab-focus,

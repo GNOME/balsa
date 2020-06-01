@@ -481,6 +481,7 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 #endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     GtkWidget *action_area;
     GtkWidget *widget;
+    GtkEventController *key_controller;
 
     grid = gtk_grid_new();
     gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
@@ -490,8 +491,10 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 		     G_CALLBACK(balsa_mime_widget_limit_focus), bm);
     g_signal_connect(grid, "focus_out_event",
 		     G_CALLBACK(balsa_mime_widget_unlimit_focus), bm);
-    g_signal_connect(grid, "key_press_event",
-		     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
+
+    key_controller = gtk_event_controller_key_new(grid);
+    g_signal_connect(key_controller, "key-pressed",
+		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
 
 #ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);

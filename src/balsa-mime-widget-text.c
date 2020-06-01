@@ -187,6 +187,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     gboolean is_text_plain;
     GtkWidget *widget;
     GtkTextView *text_view;
+    GtkEventController *key_controller;
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
@@ -258,9 +259,10 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
                         is_text_plain);
     g_free(ptr);
 
-    g_signal_connect(widget, "key_press_event",
-                     G_CALLBACK(balsa_mime_widget_key_press_event),
-                    (gpointer) bm);
+    key_controller = gtk_event_controller_key_new(libbalsa_html_get_view_widget(widget));
+    g_signal_connect(key_controller, "key-pressed",
+		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
+
     g_signal_connect(widget, "populate-popup",
 		     G_CALLBACK(text_view_populate_popup), mwt);
     g_signal_connect_after(widget, "realize",
@@ -1157,6 +1159,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
     BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     GtkWidget *widget;
     GtkWidget *popup_menu;
+    GtkEventController *key_controller;
 
     widget =
         libbalsa_html_new(mime_body,
@@ -1166,9 +1169,9 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 
     g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);
 
-    g_signal_connect(libbalsa_html_get_view_widget(widget),
-                     "key_press_event",
-                     G_CALLBACK(balsa_mime_widget_key_press_event), bm);
+    key_controller = gtk_event_controller_key_new(libbalsa_html_get_view_widget(widget));
+    g_signal_connect(key_controller, "key-pressed",
+		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
 
     if ((popup_menu = libbalsa_html_popup_menu_widget(widget)) != NULL) {
         g_object_set_data(G_OBJECT(popup_menu), "balsa-message", bm);

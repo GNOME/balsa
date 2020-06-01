@@ -252,6 +252,7 @@ bm_header_tl_buttons(BalsaMessage * balsa_message)
 {
     GPtrArray *array;
     GtkWidget *button;
+    GtkEventController *key_controller;
 
     array = g_ptr_array_new();
 
@@ -269,8 +270,11 @@ bm_header_tl_buttons(BalsaMessage * balsa_message)
     gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(balsa_headers_attachments_popup), balsa_message);
-    g_signal_connect(button, "key_press_event",
-		     G_CALLBACK(balsa_mime_widget_key_press_event), balsa_message);
+
+    key_controller = gtk_event_controller_key_new(button);
+    g_signal_connect(key_controller, "key-pressed",
+		     G_CALLBACK(balsa_mime_widget_key_pressed), balsa_message);
+
     g_ptr_array_add(array, button);
 
     g_ptr_array_add(array, NULL);
@@ -642,6 +646,7 @@ balsa_message_init(BalsaMessage * balsa_message)
     GtkTreeStore *model;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
+    GtkEventController *key_controller;
 
     balsa_message->switcher = gtk_stack_switcher_new();
     gtk_box_pack_start(GTK_BOX(balsa_message), balsa_message->switcher, FALSE, FALSE, 0);
@@ -662,8 +667,11 @@ balsa_message_init(BalsaMessage * balsa_message)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
-    g_signal_connect(scroll, "key_press_event",
-		     G_CALLBACK(balsa_mime_widget_key_press_event), balsa_message);
+
+    key_controller = gtk_event_controller_key_new(scroll);
+    g_signal_connect(key_controller, "key-pressed",
+		     G_CALLBACK(balsa_mime_widget_key_pressed), balsa_message);
+
     gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
 
     /* Widget to hold headers */

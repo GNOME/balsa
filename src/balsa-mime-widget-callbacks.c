@@ -193,10 +193,14 @@ scroll_change(GtkAdjustment * adj, gint diff, BalsaMessage * bm)
     gtk_adjustment_set_value(adj, MIN(value, upper));
 }
 
-gint
-balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
-				  BalsaMessage * bm)
+gboolean
+balsa_mime_widget_key_pressed(GtkEventControllerKey *controller,
+                              guint                  keyval,
+                              guint                  keycode,
+                              GdkModifierType        state,
+                              gpointer               user_data)
 {
+    BalsaMessage *bm = user_data;
     GtkAdjustment *adj;
     int page_adjust;
 
@@ -207,7 +211,7 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
         (gtk_adjustment_get_page_size(adj) * balsa_app.pgdown_percent) /
         100 : gtk_adjustment_get_page_increment(adj);
 
-    switch (event->keyval) {
+    switch (keyval) {
     case GDK_KEY_Up:
         scroll_change(adj, -gtk_adjustment_get_step_increment(adj), NULL);
         break;
@@ -221,19 +225,19 @@ balsa_mime_widget_key_press_event(GtkWidget * widget, GdkEventKey * event,
         scroll_change(adj, page_adjust, NULL);
         break;
     case GDK_KEY_Home:
-        if (event->state & GDK_CONTROL_MASK)
+        if (state & GDK_CONTROL_MASK)
             scroll_change(adj, -gtk_adjustment_get_value(adj), NULL);
         else
             return FALSE;
         break;
     case GDK_KEY_End:
-        if (event->state & GDK_CONTROL_MASK)
+        if (state & GDK_CONTROL_MASK)
             scroll_change(adj, gtk_adjustment_get_upper(adj), NULL);
         else
             return FALSE;
         break;
     case GDK_KEY_F10:
-        if (event->state & GDK_SHIFT_MASK) {
+        if (state & GDK_SHIFT_MASK) {
 	    GtkWidget *current_widget = balsa_message_current_part_widget(bm);
 
 	    if (current_widget) {

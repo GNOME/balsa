@@ -1,5 +1,19 @@
 2020-06-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Various: Connect to the "key-pressed" signal of a
+	GtkEventControllerKey instead of the "key-press-event" widget
+	signal.
+
+	* src/balsa-message.c (bm_header_tl_buttons), (balsa_message_init):
+	* src/balsa-mime-widget-message.c (bm_header_widget_new):
+	* src/balsa-mime-widget-text.c (balsa_mime_widget_new_text),
+	  (bm_widget_new_html):
+	* src/balsa-mime-widget-callbacks.c
+	  (balsa_mime_widget_key_pressed): rename and new signature;
+	* src/balsa-mime-widget-callbacks.h: ditto.
+
+2020-06-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	balsa-mblist: Connect to the "pressed" signal of a
 	GtkGestureMultiPress instead of the "button-press-event" widget
 	signal.

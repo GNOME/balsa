@@ -640,7 +640,7 @@ bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press_gesture,
     sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press_gesture));
     event    = gtk_gesture_get_last_event(gesture, sequence);
 
-    if (!gdk_event_triggers_context_menu((GdkEvent *) event)
+    if (!gdk_event_triggers_context_menu(event)
         || gdk_event_get_window(event) != gtk_tree_view_get_bin_window(tree_view))
         return;
 

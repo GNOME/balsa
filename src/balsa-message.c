@@ -112,8 +112,11 @@ static void select_part(BalsaMessage * balsa_message, BalsaPartInfo *info);
 static void tree_activate_row_cb(GtkTreeView *treeview, GtkTreePath *arg1,
                                  GtkTreeViewColumn *arg2, gpointer user_data);
 static gboolean tree_menu_popup_key_cb(GtkWidget *widget, gpointer user_data);
-static gboolean tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
-                                     gpointer data);
+static void tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
+                                 gint                  n_press,
+                                 gdouble               x,
+                                 gdouble               y,
+                                 gpointer              user_data);
 
 static void part_info_init(BalsaMessage * balsa_message, BalsaPartInfo * info);
 static void part_context_save_all_cb(GtkWidget * menu_item, GList * info_list);
@@ -647,6 +650,7 @@ balsa_message_init(BalsaMessage * balsa_message)
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
     GtkEventController *key_controller;
+    GtkGesture *gesture;
 
     balsa_message->switcher = gtk_stack_switcher_new();
     gtk_box_pack_start(GTK_BOX(balsa_message), balsa_message->switcher, FALSE, FALSE, 0);
@@ -703,8 +707,12 @@ balsa_message_init(BalsaMessage * balsa_message)
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW (balsa_message->treeview));
     g_signal_connect(balsa_message->treeview, "row-activated",
                      G_CALLBACK(tree_activate_row_cb), balsa_message);
-    g_signal_connect(balsa_message->treeview, "button_press_event",
+
+    gesture = gtk_gesture_multi_press_new(balsa_message->treeview);
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_signal_connect(gesture, "pressed",
                      G_CALLBACK(tree_button_press_cb), balsa_message);
+
     g_signal_connect(balsa_message->treeview, "popup-menu",
                      G_CALLBACK(tree_menu_popup_key_cb), balsa_message);
     g_object_unref(model);
@@ -883,8 +891,9 @@ collect_selected_info(GtkTreeModel * model, GtkTreePath * path,
 }
 
 static void
-tree_mult_selection_popup(BalsaMessage * balsa_message, GdkEventButton * event,
-                          GtkTreeSelection * selection)
+tree_mult_selection_popup(BalsaMessage     *balsa_message,
+                          const GdkEvent   *event,
+                          GtkTreeSelection *selection)
 {
     gint selected;
 
@@ -907,14 +916,14 @@ tree_mult_selection_popup(BalsaMessage * balsa_message, GdkEventButton * event,
     if (selected == 1) {
         BalsaPartInfo *info = BALSA_PART_INFO(balsa_message->save_all_list->data);
         if (info->popup_menu) {
-            if (event)
-                gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu),
-                                          (GdkEvent *) event);
-            else
+            if (event != NULL) {
+                gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu), event);
+            } else {
                 gtk_menu_popup_at_widget(GTK_MENU(info->popup_menu),
                                          GTK_WIDGET(balsa_message),
                                          GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                          NULL);
+            }
         }
         g_list_free(balsa_message->save_all_list);
         balsa_message->save_all_list = NULL;
@@ -937,14 +946,14 @@ tree_mult_selection_popup(BalsaMessage * balsa_message, GdkEventButton * event,
                           G_CALLBACK (part_context_dump_all_cb),
                           (gpointer) balsa_message->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (balsa_message->save_all_popup), menu_item);
-        if (event)
-            gtk_menu_popup_at_pointer(GTK_MENU(balsa_message->save_all_popup),
-                                      (GdkEvent *) event);
-        else
+        if (event != NULL) {
+            gtk_menu_popup_at_pointer(GTK_MENU(balsa_message->save_all_popup), event);
+        } else {
             gtk_menu_popup_at_widget(GTK_MENU(balsa_message->save_all_popup),
                                      GTK_WIDGET(balsa_message),
                                      GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                      NULL);
+        }
     }
 }
 
@@ -959,19 +968,35 @@ tree_menu_popup_key_cb(GtkWidget *widget, gpointer user_data)
     return TRUE;
 }
 
-static gboolean
-tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
-                     gpointer data)
+static void
+tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
+                     gint                  n_press,
+                     gdouble               x,
+                     gdouble               y,
+                     gpointer              user_data)
 {
-    BalsaMessage * balsa_message = (BalsaMessage *)data;
+    BalsaMessage *balsa_message = (BalsaMessage *) user_data;
+    GtkWidget *widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(multi_press_gesture));
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreePath *path;
+    GtkGesture *gesture;
+    GdkEventSequence *sequence;
+    const GdkEvent *event;
+    gint bx;
+    gint by;
 
-    g_return_val_if_fail(balsa_message, FALSE);
-    g_return_val_if_fail(event, FALSE);
-    if (!gdk_event_triggers_context_menu((GdkEvent *) event)
-        || event->window != gtk_tree_view_get_bin_window(tree_view))
-        return FALSE;
+    gesture  = GTK_GESTURE(multi_press_gesture);
+    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press_gesture));
+    event    = gtk_gesture_get_last_event(gesture, sequence);
+
+    if (!gdk_event_triggers_context_menu(event) ||
+        gdk_event_get_window(event) != gtk_tree_view_get_bin_window(tree_view))
+        return;
+
+    gtk_gesture_set_sequence_state(gesture, sequence, GTK_EVENT_SEQUENCE_CLAIMED);
+
+    gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (gint) x, (gint) y,
+                                                      &bx, &by);
 
     /* If the part which received the click is already selected, don't change
      * the selection and check if more than on part is selected. Pop up the
@@ -979,12 +1004,11 @@ tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
      * If the receiving part is not selected, select (only) this part and pop
      * up its menu.
      */
-    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y,
+    if (gtk_tree_view_get_path_at_pos(tree_view, bx, by,
                                       &path, NULL, NULL, NULL)) {
         GtkTreeIter iter;
-        GtkTreeSelection * selection =
-            gtk_tree_view_get_selection(tree_view);
-        GtkTreeModel * model = gtk_tree_view_get_model(tree_view);
+        GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+        GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
 
         if (!gtk_tree_selection_path_is_selected(selection, path)) {
             BalsaPartInfo *info = NULL;
@@ -1007,8 +1031,6 @@ tree_button_press_cb(GtkWidget * widget, GdkEventButton * event,
             tree_mult_selection_popup(balsa_message, event, selection);
         gtk_tree_path_free(path);
     }
-
-    return TRUE;
 }
 
 /* balsa_message_set:

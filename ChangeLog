@@ -1,5 +1,14 @@
 2020-06-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-message: Connect to the "pressed" signal of a
+	GtkGestureMultiPress instead of the "button-press-event" widget
+	signal.
+
+	* src/balsa-message.c (balsa_message_init),
+	(tree_mult_selection_popup), (tree_button_press_cb):
+
+2020-06-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Various: Connect to the "focus-{in,out}" signals of a
 	GtkEventControllerKey instead of the "focus-{in,out}-event" widget
 	signals.

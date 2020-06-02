@@ -465,6 +465,7 @@ balsa_index_init(BalsaIndex * index)
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
     g_signal_connect(gesture, "pressed",
                      G_CALLBACK(bndx_gesture_pressed_cb), index);
+    gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture), GTK_PHASE_CAPTURE);
 
     g_signal_connect(tree_view, "row-activated",
 		     G_CALLBACK(bndx_row_activated), NULL);
@@ -643,8 +644,6 @@ bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press_gesture,
     if (!gdk_event_triggers_context_menu(event)
         || gdk_event_get_window(event) != gtk_tree_view_get_bin_window(tree_view))
         return;
-
-    gtk_gesture_set_sequence_state(gesture, sequence, GTK_EVENT_SEQUENCE_CLAIMED);
 
     gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (gint) x, (gint) y,
                                                       &bx, &by);

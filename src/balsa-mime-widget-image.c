@@ -139,16 +139,26 @@ img_check_size(BalsaMimeWidgetImage * mwi)
     return G_SOURCE_REMOVE;
 }
 
-static gboolean
-balsa_image_button_press_cb(GtkWidget * widget, GdkEventButton * event,
-                            GtkMenu * menu)
+static void
+balsa_image_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
+                            gint                  n_press,
+                            gdouble               x,
+                            gdouble               y,
+                            gpointer              user_data)
 {
-    if (gdk_event_triggers_context_menu((GdkEvent *) event)) {
-        gtk_menu_popup_at_pointer(menu, (GdkEvent *) event);
-        return TRUE;
-    }
+    GtkMenu *menu = user_data;
+    GtkGesture *gesture;
+    GdkEventSequence *sequence;
+    const GdkEvent *event;
 
-    return FALSE;
+    gesture  = GTK_GESTURE(multi_press_gesture);
+    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press_gesture));
+    event    = gtk_gesture_get_last_event(gesture, sequence);
+
+    if (gdk_event_triggers_context_menu(event)) {
+        gtk_menu_popup_at_pointer(menu, event);
+        gtk_gesture_set_sequence_state(gesture, sequence, GTK_EVENT_SEQUENCE_CLAIMED);
+    }
 }
 
 static void
@@ -174,6 +184,7 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     BalsaMimeWidgetImage *mwi;
     BalsaMimeWidget *mw;
     GtkWidget *widget;
+    GtkGesture *gesture;
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
@@ -197,7 +208,9 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     widget = gtk_event_box_new();
     gtk_container_add(GTK_CONTAINER(mw), widget);
 
-    g_signal_connect(widget, "button-press-event",
+    gesture = gtk_gesture_multi_press_new(widget);
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_signal_connect(gesture, "pressed",
                      G_CALLBACK(balsa_image_button_press_cb), data);
 
     mwi->image = image = gtk_image_new_from_icon_name("image-missing",

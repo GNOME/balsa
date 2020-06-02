@@ -1,3 +1,12 @@
+2020-06-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-image: Connect to the "pressed" signal of a
+	GtkGestureMultiPress instead of the "button-press-event" widget
+	signal.
+
+	* src/balsa-mime-widget-image.c (balsa_image_button_press_cb),
+	(balsa_mime_widget_new_image):
+
 2020-06-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-message: Connect to the "pressed" signal of a

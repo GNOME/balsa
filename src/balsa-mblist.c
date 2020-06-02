@@ -727,6 +727,7 @@ bmbl_do_popup(GtkTreeView    *tree_view,
 {
     BalsaMailboxNode *mbnode = NULL;
     GtkWidget *menu;
+    gdouble x, y;
 
     if (path) {
         GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
@@ -739,13 +740,16 @@ bmbl_do_popup(GtkTreeView    *tree_view,
 
     menu = balsa_mailbox_node_get_context_menu(mbnode, GTK_WIDGET(tree_view));
 
-    if (event != NULL && gdk_event_triggers_context_menu((GdkEvent *) event)) {
+
+    if (event != NULL &&
+        gdk_event_triggers_context_menu(event) &&
+        gdk_event_get_coords(event, &x, &y)) {
         GdkRectangle rectangle;
 
         /* Pop up above the pointer */
-        rectangle.x = event->x;
+        rectangle.x = (int) x;
         rectangle.width = 0;
-        rectangle.y = event->y;
+        rectangle.y = (int) y;
         rectangle.height = 0;
         gtk_popover_set_pointing_to(GTK_POPOVER(menu), &rectangle);
     }

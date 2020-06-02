@@ -1119,6 +1119,7 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
                           GtkTreeSelection *selection)
 {
     gint selected;
+    GtkWidget *popup_menu = NULL;
 
     /* destroy left-over select list and popup... */
     g_list_free(balsa_message->save_all_list);
@@ -1134,35 +1135,31 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
     selected = g_list_length(balsa_message->save_all_list);
     if (selected == 1) {
         BalsaPartInfo *info = BALSA_PART_INFO(balsa_message->save_all_list->data);
-        if (info->popup_menu != NULL) {
-            if (event != NULL && gdk_event_triggers_context_menu((GdkEvent *) event)) {
-                GdkRectangle rectangle;
 
-                /* Pop up above the pointer */
-                rectangle.x = event->x;
-                rectangle.width = 0;
-                rectangle.y = event->y;
-                rectangle.height = 0;
-                gtk_popover_set_pointing_to(GTK_POPOVER(info->popup_menu), &rectangle);
-            }
-
-            gtk_popover_popup(GTK_POPOVER(info->popup_menu));
-        }
+        popup_menu = info->popup_menu;
         g_list_free(balsa_message->save_all_list);
         balsa_message->save_all_list = NULL;
     } else if (selected > 1) {
-        if (event != NULL && gdk_event_triggers_context_menu((GdkEvent *) event)) {
+        popup_menu = balsa_message->save_all_popup;
+    }
+
+    if (popup_menu != NULL) {
+        gdouble x, y;
+
+        if (event != NULL &&
+            gdk_event_triggers_context_menu(event) &&
+            gdk_event_get_coords(event, &x, &y)) {
             GdkRectangle rectangle;
 
             /* Pop up above the pointer */
-            rectangle.x = event->x;
+            rectangle.x = (int) x;
             rectangle.width = 0;
-            rectangle.y = event->y;
+            rectangle.y = (int) y;
             rectangle.height = 0;
-            gtk_popover_set_pointing_to(GTK_POPOVER(balsa_message->save_all_popup), &rectangle);
+            gtk_popover_set_pointing_to(GTK_POPOVER(popup_menu), &rectangle);
         }
 
-        gtk_popover_popup(GTK_POPOVER(balsa_message->save_all_popup));
+        gtk_popover_popup(GTK_POPOVER(popup_menu));
     }
 }
 
@@ -1171,7 +1168,6 @@ tree_menu_popup_key_cb(GtkWidget *widget, gpointer user_data)
 {
     BalsaMessage * balsa_message = (BalsaMessage *)user_data;
 
-    g_return_val_if_fail(balsa_message, FALSE);
     tree_mult_selection_popup(balsa_message, NULL,
                               gtk_tree_view_get_selection(GTK_TREE_VIEW(widget)));
     return TRUE;
@@ -1231,9 +1227,9 @@ tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
                         GdkRectangle rectangle;
 
                         /* Pop up above the pointer */
-                        rectangle.x = event->x;
+                        rectangle.x = (int) x;
                         rectangle.width = 0;
-                        rectangle.y = event->y;
+                        rectangle.y = (int) y;
                         rectangle.height = 0;
                         gtk_popover_set_pointing_to(GTK_POPOVER(info->popup_menu),
                                                     &rectangle);

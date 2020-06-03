@@ -1189,13 +1189,27 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
     return TRUE;
 }
 
-static gboolean
-balsa_gtk_html_button_press_cb(GtkWidget * html, GdkEventButton * event,
-                               BalsaMessage * bm)
- {
-    return(gdk_event_triggers_context_menu((GdkEvent *) event)
-            ? balsa_gtk_html_popup(html, bm) : GDK_EVENT_PROPAGATE);
- }
+static void
+mwt_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
+                       gint                  n_press,
+                       gdouble               x,
+                       gdouble               y,
+                       gpointer              user_data)
+{
+    GtkGesture *gesture;
+    const GdkEvent *event;
+    BalsaMessage *bm = user_data;
+
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+
+    if (gdk_event_triggers_context_menu(event)) {
+        GtkWidget *html;
+
+        html = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture));
+        balsa_gtk_html_popup(html, bm);
+    }
+}
 
 static void
 bmwt_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
@@ -1235,8 +1249,13 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
         g_signal_connect(popup_menu, "populate-popup",
                          G_CALLBACK(bmwt_populate_popup_cb), widget);
     } else {
-        g_signal_connect(widget, "button-press-event",
-                         G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
+        GtkGesture *gesture;
+
+        gesture = gtk_gesture_multi_press_new(widget);
+        gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+        g_signal_connect(gesture, "pressed",
+                         G_CALLBACK(mwt_gesture_pressed_cb), bm);
+
         g_signal_connect(widget, "popup-menu",
                          G_CALLBACK(balsa_gtk_html_popup), bm);
     }

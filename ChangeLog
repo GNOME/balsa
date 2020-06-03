@@ -1,5 +1,16 @@
 2020-06-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mime-widget-text: Connect to the "pressed" signal of a
+	GtkGestureMultiPress instead of the "button-press-event" widget
+	signal.
+
+	The HTML part context menu was the last user of an event signal.
+
+	* src/balsa-mime-widget-text.c (mwt_gesture_pressed_cb),
+	(bm_widget_new_html):
+
+2020-06-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mime-widget-text: Use event-controllers instead of connecting to
 	event signals.
 

@@ -1,3 +1,15 @@
+2020-06-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-text: Use event-controllers instead of connecting to
+	event signals.
+
+	* src/balsa-mime-widget-text.c
+	  (mwt_controller_motion_cb), (mwt_controller_leave_cb):
+	    GtkEventControllerMotion callbacks;
+	  (balsa_mime_widget_new_text): use event-controllers instead of connecting
+	    to event signals;
+	  (store_button_coords), (check_over_url), (check_call_url): new API.
+
 2020-06-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mime-widget-image: Connect to the "pressed" signal of a

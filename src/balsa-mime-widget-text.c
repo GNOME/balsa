@@ -91,13 +91,22 @@ static GdkCursor *url_cursor_normal = NULL;
 static GdkCursor *url_cursor_over_url = NULL;
 
 
-static gboolean store_button_coords(GtkWidget * widget, GdkEventButton * event, gpointer data);
-static gboolean check_over_url(GtkWidget * widget, GdkEventMotion * event, gpointer user_data);
+static void store_button_coords(GtkGestureMultiPress *multi_press,
+                                gint                  n_press,
+                                gdouble               x,
+                                gdouble               y,
+                                gpointer              user_data);
+static void check_over_url(BalsaMimeWidgetText * mwt,
+                           message_url_t       * url);
 static void pointer_over_url(GtkWidget * widget, message_url_t * url, gboolean set);
 static void prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list);
 static void url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
                          const gchar * buf, guint len, gpointer data);
-static gboolean check_call_url(GtkWidget * widget, GdkEventButton * event, gpointer user_data);
+static void check_call_url(GtkGestureMultiPress *multi_press,
+                           gint                  n_press,
+                           gdouble               x,
+                           gdouble               y,
+                           gpointer              user_data);
 static message_url_t * find_url(BalsaMimeWidgetText *mwt,
                                 gint                 x,
                                 gint                 y);
@@ -171,6 +180,40 @@ balsa_mime_widget_text_init(BalsaMimeWidgetText * self)
 
 /*
  * End of class definition
+ */
+
+/*
+ * Callbacks
+ */
+
+static void
+mwt_controller_motion_cb(GtkEventControllerMotion * motion,
+                         gdouble                    x,
+                         gdouble                    y,
+                         gpointer                   user_data)
+{
+    BalsaMimeWidgetText *mwt = user_data;
+    message_url_t *url;
+
+    url = find_url(mwt, (gint) x, (gint) y);
+    check_over_url(mwt, url);
+}
+
+static void
+mwt_controller_leave_cb(GtkEventControllerMotion * motion,
+                        gdouble                    x,
+                        gdouble                    y,
+                        GdkCrossingMode            mode,
+                        GdkNotifyType              detail,
+                        gpointer                   user_data)
+{
+    BalsaMimeWidgetText *mwt = user_data;
+
+    check_over_url(mwt, NULL);
+}
+
+/*
+ * Public method
  */
 
 BalsaMimeWidget *
@@ -269,14 +312,20 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 			   G_CALLBACK(fix_text_widget), mwt);
 
     if (mwt->url_list != NULL) {
-        g_signal_connect(widget, "button_press_event",
+        GtkGesture *gesture;
+        GtkEventController *motion_controller;
+
+        gesture = gtk_gesture_multi_press_new(widget);
+        g_signal_connect(gesture, "pressed",
                          G_CALLBACK(store_button_coords), NULL);
-        g_signal_connect(widget, "button_release_event",
-                         G_CALLBACK(check_call_url), mwt);
-        g_signal_connect(widget, "motion-notify-event",
-                         G_CALLBACK(check_over_url), mwt);
-        g_signal_connect(widget, "leave-notify-event",
-                         G_CALLBACK(check_over_url), mwt);
+        g_signal_connect(gesture, "released",
+                G_CALLBACK(check_call_url), mwt);
+
+        motion_controller = gtk_event_controller_motion_new(widget);
+        g_signal_connect(motion_controller, "motion",
+                         G_CALLBACK(mwt_controller_motion_cb), mwt);
+        g_signal_connect(motion_controller, "leave",
+                         G_CALLBACK(mwt_controller_leave_cb), mwt);
     }
 
     buffer = gtk_text_view_get_buffer(text_view);
@@ -593,37 +642,42 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
 
 /* -- URL related stuff -- */
 
-static gboolean
-store_button_coords(GtkWidget * widget, GdkEventButton * event, gpointer data)
+static void
+store_button_coords(GtkGestureMultiPress *multi_press,
+                    gint                  n_press,
+                    gdouble               x,
+                    gdouble               y,
+                    gpointer              user_data)
 {
-    if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
-        stored_x = event->x;
-        stored_y = event->y;
-        stored_mask = event->state;
-        /* compare only shift, ctrl, and mod1-mod5 */
-        stored_mask &= STORED_MASK_BITS;
-    }
+    GtkGesture *gesture;
+    const GdkEvent *event;
+    GdkModifierType state;
 
-    return GDK_EVENT_PROPAGATE;
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+
+    stored_x = (gint) x;
+    stored_y = (gint) y;
+
+    if (gdk_event_get_state(event, &state)) {
+        /* compare only shift, ctrl, and mod1-mod5 */
+        state &= STORED_MASK_BITS;
+        stored_mask = state;
+    }
 }
 
 /* check if we are over an url and change the cursor in this case */
-static gboolean
-check_over_url(GtkWidget * widget, GdkEventMotion * event, gpointer user_data)
+static void
+check_over_url(BalsaMimeWidgetText * mwt,
+               message_url_t       * url)
 {
-    BalsaMimeWidgetText *mwt = user_data;
     static gboolean was_over_url = FALSE;
+    GtkWidget *widget;
     GdkWindow *window;
-    message_url_t *url;
 
+    widget = mwt->text_widget;
     window = gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
                                       GTK_TEXT_WINDOW_TEXT);
-
-    if (event->type == GDK_LEAVE_NOTIFY) {
-        url = NULL;
-    } else {
-        url = find_url(mwt, (gint) event->x, (gint) event->y);
-    }
 
     if (url != NULL) {
         if (url_cursor_normal == NULL || url_cursor_over_url == NULL) {
@@ -650,8 +704,6 @@ check_over_url(GtkWidget * widget, GdkEventMotion * event, gpointer user_data)
     }
 
     mwt->current_url = url;
-
-    return GDK_EVENT_PROPAGATE;
 }
 
 
@@ -727,28 +779,33 @@ url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
 
 /* if the mouse button was released over an URL, and the mouse hasn't
  * moved since the button was pressed, try to call the URL */
-static gboolean
-check_call_url(GtkWidget * widget, GdkEventButton * event, gpointer user_data)
+static void
+check_call_url(GtkGestureMultiPress *multi_press,
+               gint                  n_press,
+               gdouble               x,
+               gdouble               y,
+               gpointer              user_data)
 {
     BalsaMimeWidgetText *mwt = user_data;
-    gint x, y;
+    GtkGesture *gesture;
+    const GdkEvent *event;
+    GdkModifierType state;
 
-    if (event->type != GDK_BUTTON_RELEASE || event->button != 1)
-        return GDK_EVENT_PROPAGATE;
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
 
-    x = event->x;
-    y = event->y;
+    if (event == NULL || !gdk_event_get_state(event, &state))
+        return;
+
     /* 2-pixel motion tolerance */
-    if (abs(x - stored_x) <= 2 && abs(y - stored_y) <= 2
-        && (event->state & STORED_MASK_BITS) == stored_mask) {
+    if (abs((int) x - stored_x) <= 2 && abs((int) y - stored_y) <= 2
+        && (state & STORED_MASK_BITS) == stored_mask) {
         message_url_t *url;
 
         url = find_url(mwt, x, y);
         if (url != NULL)
             handle_url(url->url);
     }
-
-    return GDK_EVENT_PROPAGATE;
 }
 
 /* find_url:

@@ -1,5 +1,16 @@
 2020-06-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	main-window: Connect to "notify::focus" signal instead of the
+	"focus-in" and "focus-out" widget signals.
+
+	And use the focus status to block the window's accelerator keys
+	when the search entry has the keyboard focus.
+
+	* src/main-window.c (bw_check_filter), (bw_create_index_widget),
+	(bw_add_win_action_entries), (bw_set_menus), (balsa_window_new):
+
+2020-06-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	application-helpers: Add the capability to block accels
 
 	* libbalsa/application-helpers.c

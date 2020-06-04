@@ -359,35 +359,19 @@ bw_frame(GtkWidget * widget)
     gtk_widget_show(frame);
     return frame;
 }
-/* Filter entry widget creation code. We must carefully pass the typed
-   characters FIRST to the entry widget and only if the widget did not
-   process them, pass them further to main window, menu etc.
-   Otherwise, typing eg. 'c' would open the draftbox instead of
-   actually insert the 'c' character in the entry. */
-static gboolean
-bw_pass_to_filter(BalsaWindow *window, GdkEventKey *event, gpointer data)
-{
-    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
-    gboolean res = FALSE;
+/*
+ * Filter entry widget creation code. Block accelerator keys.
+ * Otherwise, typing eg. 'c' would open the draftbox instead of
+ * actually insert the 'c' character in the entry.
+ */
 
-    g_signal_emit_by_name(priv->sos_entry, "key_press_event", event, &res, data);
+static void
+bw_check_filter(GtkWidget *widget, GParamSpec *pspec, gpointer user_data)
+{
+    BalsaWindow *window = BALSA_WINDOW(user_data);
 
-    return res;
-}
-static gboolean
-bw_enable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
-{
-    g_signal_connect(data, "key_press_event",
-                     G_CALLBACK(bw_pass_to_filter), NULL);
-    return FALSE;
-}
-static gboolean
-bw_disable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
-{
-    g_signal_handlers_disconnect_by_func(data,
-                                         G_CALLBACK(bw_pass_to_filter),
-                                         NULL);
-    return FALSE;
+    libbalsa_window_block_accels((GtkApplicationWindow *) window,
+                                 gtk_widget_has_focus(widget));
 }
 
 static void
@@ -557,10 +541,9 @@ bw_create_index_widget(BalsaWindow *bw)
     priv->sos_entry = gtk_search_entry_new();
     /* gtk_label_set_mnemonic_widget(GTK_LABEL(priv->filter_choice),
        priv->sos_entry); */
-    g_signal_connect(priv->sos_entry, "focus_in_event",
-                     G_CALLBACK(bw_enable_filter), bw);
-    g_signal_connect(priv->sos_entry, "focus_out_event",
-                     G_CALLBACK(bw_disable_filter), bw);
+
+    g_signal_connect(priv->sos_entry, "notify::has-focus",
+                     G_CALLBACK(bw_check_filter), bw);
 
     button = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(button),
@@ -1979,118 +1962,118 @@ threading_change_state(GSimpleAction * action,
  * End of callbacks
  */
 
+static GActionEntry win_entries[] = {
+    {"new-message",           new_message_activated},
+    {"new-mbox",              new_mbox_activated},
+    {"new-maildir",           new_maildir_activated},
+    {"new-mh",                new_mh_activated},
+    {"new-imap-folder",       new_imap_folder_activated},
+    {"new-imap-subfolder",    new_imap_subfolder_activated},
+    {"continue",              continue_activated},
+    {"get-new-mail",          get_new_mail_activated},
+    {"send-queued-mail",      send_queued_mail_activated},
+    {"send-and-receive-mail", send_and_receive_mail_activated},
+    {"page-setup",            page_setup_activated},
+    {"print",                 print_activated},
+    {"address-book",          address_book_activated},
+#ifdef ENABLE_AUTOCRYPT
+    {"autocrypt-db",          autocrypt_db_activated},
+#endif
+    {"settings",              settings_activated},
+    {"toolbars",              toolbars_activated},
+    {"identities",            identities_activated},
+    {"help",                  help_activated},
+    {"about",                 about_activated},
+    {"quit",                  quit_activated},
+    {"copy",                  copy_activated},
+    {"select-all",            select_all_activated},
+    {"select-thread",         select_thread_activated},
+    {"find",                  find_activated},
+    {"find-next",             find_next_activated},
+    {"find-in-message",       find_in_message_activated},
+    {"filters",               filters_activated},
+    {"export-filters",        export_filters_activated},
+    {"show-mailbox-tree",     libbalsa_toggle_activated, NULL, "false",
+                              show_mailbox_tree_change_state},
+    {"show-mailbox-tabs",     libbalsa_toggle_activated, NULL, "false",
+                              show_mailbox_tabs_change_state},
+    {"show-toolbar",          libbalsa_toggle_activated, NULL, "false",
+                              show_toolbar_change_state},
+    {"show-statusbar",        libbalsa_toggle_activated, NULL, "false",
+                              show_statusbar_change_state},
+    {"show-sos-bar",          libbalsa_toggle_activated, NULL, "false",
+                              show_sos_bar_change_state},
+    {"wrap",                  libbalsa_toggle_activated, NULL, "false",
+                              wrap_change_state},
+    {"headers",               libbalsa_radio_activated, "s", "'none'",
+                              header_change_state},
+    {"threading",             libbalsa_toggle_activated, NULL, "false",
+                              threading_change_state},
+    {"expand-all",            expand_all_activated},
+    {"collapse-all",          collapse_all_activated},
+#ifdef HAVE_HTML_WIDGET
+    {"zoom-in",               zoom_in_activated},
+    {"zoom-out",              zoom_out_activated},
+    {"zoom-normal",           zoom_normal_activated},
+#endif				/* HAVE_HTML_WIDGET */
+    {"next-message",          next_message_activated},
+    {"previous-message",      previous_message_activated},
+    {"next-unread",           next_unread_activated},
+    {"next-flagged",          next_flagged_activated},
+    {"hide-deleted",          libbalsa_toggle_activated, NULL, "false",
+                              hide_change_state},
+    {"hide-undeleted",        libbalsa_toggle_activated, NULL, "false",
+                              hide_change_state},
+    {"hide-read",             libbalsa_toggle_activated, NULL, "false",
+                              hide_change_state},
+    {"hide-unread",           libbalsa_toggle_activated, NULL, "false",
+                              hide_change_state},
+    {"hide-flagged",          libbalsa_toggle_activated, NULL, "false",
+                              hide_change_state},
+    {"hide-unflagged",        libbalsa_toggle_activated, NULL, "false",
+                              hide_change_state},
+    {"hide-answered",         libbalsa_toggle_activated, NULL, "false",
+                              hide_change_state},
+    {"hide-unanswered",       libbalsa_toggle_activated, NULL, "false",
+                              hide_change_state},
+    {"reset-filter",          reset_filter_activated},
+    {"mailbox-select-all",    mailbox_select_all_activated},
+    {"mailbox-edit",          mailbox_edit_activated},
+    {"mailbox-delete",        mailbox_delete_activated},
+    {"mailbox-expunge",       mailbox_expunge_activated},
+    {"mailbox-close",         mailbox_close_activated},
+    {"empty-trash",           empty_trash_activated},
+    {"select-filters",        select_filters_activated},
+    {"remove-duplicates",     remove_duplicates_activated},
+    {"reply",                 reply_activated},
+    {"reply-all",             reply_all_activated},
+    {"reply-group",           reply_group_activated},
+    {"forward-attached",      forward_attached_activated},
+    {"forward-inline",        forward_inline_activated},
+    {"pipe",                  pipe_activated},
+    {"next-part",             next_part_activated},
+    {"previous-part",         previous_part_activated},
+    {"save-part",             save_part_activated},
+    {"view-source",           view_source_activated},
+    {"recheck-crypt",         recheck_crypt_activated},
+    {"copy-message",          copy_message_activated},
+    {"select-text",           select_text_activated},
+    {"move-to-trash",         move_to_trash_activated},
+    {"toggle-flagged",        toggle_flagged_activated},
+    {"toggle-deleted",        toggle_deleted_activated},
+    {"toggle-new",            toggle_new_activated},
+    {"toggle-answered",       toggle_answered_activated},
+    {"store-address",         store_address_activated},
+    /* toolbar actions that are not in any menu: */
+    {"show-all-headers",      libbalsa_toggle_activated, NULL, "false",
+                              show_all_headers_change_state},
+    {"show-preview-pane",     libbalsa_toggle_activated, NULL, "true",
+                              show_preview_pane_change_state},
+};
+
 static void
 bw_add_win_action_entries(GActionMap * action_map)
 {
-    static GActionEntry win_entries[] = {
-        {"new-message",           new_message_activated},
-        {"new-mbox",              new_mbox_activated},
-        {"new-maildir",           new_maildir_activated},
-        {"new-mh",                new_mh_activated},
-        {"new-imap-folder",       new_imap_folder_activated},
-        {"new-imap-subfolder",    new_imap_subfolder_activated},
-        {"continue",              continue_activated},
-        {"get-new-mail",          get_new_mail_activated},
-        {"send-queued-mail",      send_queued_mail_activated},
-        {"send-and-receive-mail", send_and_receive_mail_activated},
-        {"page-setup",            page_setup_activated},
-        {"print",                 print_activated},
-        {"address-book",          address_book_activated},
-#ifdef ENABLE_AUTOCRYPT
-        {"autocrypt-db",          autocrypt_db_activated},
-#endif
-        {"settings",              settings_activated},
-        {"toolbars",              toolbars_activated},
-        {"identities",            identities_activated},
-        {"help",                  help_activated},
-        {"about",                 about_activated},
-        {"quit",                  quit_activated},
-        {"copy",                  copy_activated},
-        {"select-all",            select_all_activated},
-        {"select-thread",         select_thread_activated},
-        {"find",                  find_activated},
-        {"find-next",             find_next_activated},
-        {"find-in-message",       find_in_message_activated},
-        {"filters",               filters_activated},
-        {"export-filters",        export_filters_activated},
-        {"show-mailbox-tree",     libbalsa_toggle_activated, NULL, "false",
-                                  show_mailbox_tree_change_state},
-        {"show-mailbox-tabs",     libbalsa_toggle_activated, NULL, "false",
-                                  show_mailbox_tabs_change_state},
-        {"show-toolbar",          libbalsa_toggle_activated, NULL, "false",
-                                  show_toolbar_change_state},
-        {"show-statusbar",        libbalsa_toggle_activated, NULL, "false",
-                                  show_statusbar_change_state},
-        {"show-sos-bar",          libbalsa_toggle_activated, NULL, "false",
-                                  show_sos_bar_change_state},
-        {"wrap",                  libbalsa_toggle_activated, NULL, "false",
-                                  wrap_change_state},
-        {"headers",               libbalsa_radio_activated, "s", "'none'",
-                                  header_change_state},
-        {"threading",             libbalsa_toggle_activated, NULL, "false",
-                                  threading_change_state},
-        {"expand-all",            expand_all_activated},
-        {"collapse-all",          collapse_all_activated},
-#ifdef HAVE_HTML_WIDGET
-        {"zoom-in",               zoom_in_activated},
-        {"zoom-out",              zoom_out_activated},
-        {"zoom-normal",           zoom_normal_activated},
-#endif				/* HAVE_HTML_WIDGET */
-        {"next-message",          next_message_activated},
-        {"previous-message",      previous_message_activated},
-        {"next-unread",           next_unread_activated},
-        {"next-flagged",          next_flagged_activated},
-        {"hide-deleted",          libbalsa_toggle_activated, NULL, "false",
-                                  hide_change_state},
-        {"hide-undeleted",        libbalsa_toggle_activated, NULL, "false",
-                                  hide_change_state},
-        {"hide-read",             libbalsa_toggle_activated, NULL, "false",
-                                  hide_change_state},
-        {"hide-unread",           libbalsa_toggle_activated, NULL, "false",
-                                  hide_change_state},
-        {"hide-flagged",          libbalsa_toggle_activated, NULL, "false",
-                                  hide_change_state},
-        {"hide-unflagged",        libbalsa_toggle_activated, NULL, "false",
-                                  hide_change_state},
-        {"hide-answered",         libbalsa_toggle_activated, NULL, "false",
-                                  hide_change_state},
-        {"hide-unanswered",       libbalsa_toggle_activated, NULL, "false",
-                                  hide_change_state},
-        {"reset-filter",          reset_filter_activated},
-        {"mailbox-select-all",    mailbox_select_all_activated},
-        {"mailbox-edit",          mailbox_edit_activated},
-        {"mailbox-delete",        mailbox_delete_activated},
-        {"mailbox-expunge",       mailbox_expunge_activated},
-        {"mailbox-close",         mailbox_close_activated},
-        {"empty-trash",           empty_trash_activated},
-        {"select-filters",        select_filters_activated},
-        {"remove-duplicates",     remove_duplicates_activated},
-        {"reply",                 reply_activated},
-        {"reply-all",             reply_all_activated},
-        {"reply-group",           reply_group_activated},
-        {"forward-attached",      forward_attached_activated},
-        {"forward-inline",        forward_inline_activated},
-        {"pipe",                  pipe_activated},
-        {"next-part",             next_part_activated},
-        {"previous-part",         previous_part_activated},
-        {"save-part",             save_part_activated},
-        {"view-source",           view_source_activated},
-		{"recheck-crypt",		  recheck_crypt_activated},
-        {"copy-message",          copy_message_activated},
-        {"select-text",           select_text_activated},
-        {"move-to-trash",         move_to_trash_activated},
-        {"toggle-flagged",        toggle_flagged_activated},
-        {"toggle-deleted",        toggle_deleted_activated},
-        {"toggle-new",            toggle_new_activated},
-        {"toggle-answered",       toggle_answered_activated},
-        {"store-address",         store_address_activated},
-        /* toolbar actions that are not in any menu: */
-        {"show-all-headers",      libbalsa_toggle_activated, NULL, "false",
-                                  show_all_headers_change_state},
-        {"show-preview-pane",     libbalsa_toggle_activated, NULL, "true",
-                                  show_preview_pane_change_state},
-    };
-
     g_action_map_add_action_entries(action_map, win_entries,
                                     G_N_ELEMENTS(win_entries), action_map);
 }
@@ -2104,26 +2087,27 @@ balsa_window_add_action_entries(GActionMap * action_map)
 static void
 bw_set_menus(BalsaWindow * window)
 {
-    GtkApplication *application = gtk_window_get_application(GTK_WINDOW(window));
-    GtkBuilder *builder;
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     const gchar resource_path[] = "/org/desktop/Balsa/main-window.ui";
-    GError *err = NULL;
+    GError *error = NULL;
+    GtkWidget *menubar;
 
-    bw_add_win_action_entries(G_ACTION_MAP(window));
-
-    builder = gtk_builder_new();
-    if (gtk_builder_add_from_resource(builder, resource_path, &err)) {
-        gtk_application_set_menubar(application,
-                                    G_MENU_MODEL(gtk_builder_get_object
-                                                 (builder, "menubar")));
-    } else {
-        g_print("%s error: %s\n", __func__, err->message);
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Error adding from %s: %s\n"), resource_path,
-                          err->message);
-        g_error_free(err);
+    menubar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
+                                           win_entries,
+                                           G_N_ELEMENTS(win_entries),
+                                           resource_path, &error, window);
+    if (error) {
+        g_print("%s %s\n", __func__, error->message);
+        g_error_free(error);
+        return;
     }
-    g_object_unref(builder);
+    gtk_widget_show(menubar);
+
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
+#else
+    gtk_box_pack_start(GTK_BOX(priv->vbox), menubar, FALSE, FALSE, 0);
+#endif
 }
 
 /*
@@ -2255,15 +2239,15 @@ balsa_window_new(GtkApplication *application)
                           NULL);
     priv = balsa_window_get_instance_private(window);
 
+    priv->vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_show(priv->vbox);
+    gtk_container_add(GTK_CONTAINER(window), priv->vbox);
+
     /* Set up the GMenu structures */
     bw_set_menus(window);
 
     /* Set up <alt>n key bindings */
     bw_set_alt_bindings(window);
-
-    priv->vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_widget_show(priv->vbox);
-    gtk_container_add(GTK_CONTAINER(window), priv->vbox);
 
     gtk_window_set_title(GTK_WINDOW(window), "Balsa");
     balsa_register_pixbufs(GTK_WIDGET(window));

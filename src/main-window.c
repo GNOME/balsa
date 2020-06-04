@@ -374,22 +374,20 @@ bw_pass_to_filter(BalsaWindow *window, GdkEventKey *event, gpointer data)
 
     return res;
 }
-
-static void
-bw_enable_filter(GtkEventControllerKey *eventcontrollerkey,
-                 gpointer               user_data)
+static gboolean
+bw_enable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
 {
-    g_signal_connect(user_data, "key_press_event",
+    g_signal_connect(data, "key_press_event",
                      G_CALLBACK(bw_pass_to_filter), NULL);
+    return FALSE;
 }
-
-static void
-bw_disable_filter(GtkEventControllerKey *eventcontrollerkey,
-                  gpointer               user_data)
+static gboolean
+bw_disable_filter(GtkWidget *widget, GdkEventFocus *event, gpointer data)
 {
-    g_signal_handlers_disconnect_by_func(user_data,
+    g_signal_handlers_disconnect_by_func(data,
                                          G_CALLBACK(bw_pass_to_filter),
                                          NULL);
+    return FALSE;
 }
 
 static void
@@ -538,7 +536,6 @@ bw_create_index_widget(BalsaWindow *bw)
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(bw);
     GtkWidget *vbox, *button;
     unsigned i;
-    GtkEventController *key_controller;
 
     if(!view_filters_translated) {
         for(i=0; i<G_N_ELEMENTS(view_filters); i++)
@@ -560,10 +557,9 @@ bw_create_index_widget(BalsaWindow *bw)
     priv->sos_entry = gtk_search_entry_new();
     /* gtk_label_set_mnemonic_widget(GTK_LABEL(priv->filter_choice),
        priv->sos_entry); */
-    key_controller = gtk_event_controller_key_new(priv->sos_entry);
-    g_signal_connect(key_controller, "focus-in",
+    g_signal_connect(priv->sos_entry, "focus_in_event",
                      G_CALLBACK(bw_enable_filter), bw);
-    g_signal_connect(key_controller, "focus-out",
+    g_signal_connect(priv->sos_entry, "focus_out_event",
                      G_CALLBACK(bw_disable_filter), bw);
 
     button = gtk_button_new();

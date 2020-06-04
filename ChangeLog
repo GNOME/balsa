@@ -1,17 +1,5 @@
 2020-06-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
-	main-window: Connect to the "focus-{in,out}" signals of a
-	GtkEventControllerKey instead of the "focus-{in,out}-event" widget
-	signals.
-
-	This is preparation for GTK4, but will still need to be changed
-	to use GtkEventControllerFocus in that distant future.
-
-	* src/main-window.c (bw_enable_filter), (bw_disable_filter),
-	(bw_create_index_widget):
-
-2020-06-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
-
 	mime-widget-text: Connect to the "pressed" signal of a
 	GtkGestureMultiPress instead of the "button-press-event" widget
 	signal.

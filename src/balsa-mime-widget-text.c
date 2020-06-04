@@ -1331,6 +1331,7 @@ bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
     GtkWidget *popover;
     const GdkEvent *event;
     GdkEvent *current_event = NULL;
+    gdouble x, y;
 
     popover = g_object_get_data(G_OBJECT(html), "popover");
     if (popover == NULL) {
@@ -1338,7 +1339,7 @@ bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
 
         menu = g_menu_new();
         bmwt_populate_popup_menu(bm, html, menu);
-        popover = gtk_popover_new_from_model(html, G_MENU_MODEL(menu));
+        popover = gtk_popover_new_from_model(libbalsa_html_get_view_widget(html), G_MENU_MODEL(menu));
         g_object_set_data(G_OBJECT(html), "popover", popover);
     }
 
@@ -1349,13 +1350,15 @@ bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
     if (event == NULL)
         event = current_event = gtk_get_current_event();
 
-    if (event != NULL && gdk_event_triggers_context_menu(event)) {
+    if (event != NULL &&
+        gdk_event_triggers_context_menu(event) &&
+        gdk_event_get_coords(event, &x, &y)) {
         GdkRectangle rectangle;
 
         /* Pop up above the pointer */
-        rectangle.x = event->button.x;
+        rectangle.x = (gint) x;
         rectangle.width = 0;
-        rectangle.y = event->button.y;
+        rectangle.y = (gint) y;
         rectangle.height = 0;
         gtk_popover_set_pointing_to(GTK_POPOVER(popover), &rectangle);
     }
@@ -1367,12 +1370,24 @@ bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
     return TRUE;
 }
 
-static gboolean
-balsa_gtk_html_button_press_cb(GtkWidget * html, GdkEventButton * event,
-                               BalsaMessage * bm)
+static void
+balsa_gtk_html_button_press_cb(GtkGestureMultiPress *multi_press,
+                               gint                  n_press,
+                               gdouble               x,
+                               gdouble               y,
+                               gpointer              user_data)
 {
-    return(gdk_event_triggers_context_menu((GdkEvent *) event)
-           ? balsa_gtk_html_popup(html, bm) : GDK_EVENT_PROPAGATE);
+    BalsaMessage *bm = user_data;
+    GtkGesture *gesture;
+    const GdkEvent *event;
+
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+
+    if (gdk_event_triggers_context_menu(event)) {
+        GtkWidget *html = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture));
+        balsa_gtk_html_popup(html, bm) ;
+    }
 }
 
 static BalsaMimeWidget *
@@ -1382,6 +1397,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
     InternetAddressList *from;
     GtkWidget *widget;
     GtkEventController *key_controller;
+    GtkGesture *gesture;
 
     from = libbalsa_message_get_headers(balsa_message_get_message(bm))->from;
     mwt->text_widget = widget =
@@ -1397,8 +1413,11 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
     g_signal_connect(key_controller, "key-pressed",
 		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
 
-    g_signal_connect(widget, "button-press-event",
+    gesture = gtk_gesture_multi_press_new(libbalsa_html_get_view_widget(widget));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_signal_connect(gesture, "pressed",
                      G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
+
     g_signal_connect(widget, "popup-menu",
                      G_CALLBACK(balsa_gtk_html_popup), bm);
 

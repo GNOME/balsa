@@ -40,6 +40,8 @@ GtkWidget *libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
 
 void libbalsa_window_set_accels        (GtkApplicationWindow * window,
                                         GMenuModel           * menu_model);
+void libbalsa_window_block_accels      (GtkApplicationWindow * window,
+                                        gboolean               block);
 
 void libbalsa_window_add_accelerator   (GtkApplicationWindow * window,
                                         const gchar          * accel,

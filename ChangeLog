@@ -1,3 +1,12 @@
+2020-06-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	application-helpers: Add the capability to block accels
+
+	* libbalsa/application-helpers.c
+	  (accel_activate): check whether they are blocked;
+	  (libbalsa_window_block_accels): new function;
+	* libbalsa/application-helpers.h: ditto.
+
 2020-06-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mime-widget-text: Connect to the "pressed" signal of a

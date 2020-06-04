@@ -49,6 +49,11 @@ accel_activate(GtkAccelGroup * accel_group,
                gpointer        user_data)
 {
     AccelInfo *info = user_data;
+    gboolean block_accels;
+
+    block_accels = GPOINTER_TO_INT(g_object_get_data(acceleratable, "block-accels"));
+    if (block_accels)
+        return FALSE;
 
     g_action_activate(info->action, info->parameter);
 
@@ -214,6 +219,13 @@ libbalsa_window_set_accels(GtkApplicationWindow * window,
     accel_group = get_accel_group(menu_model, G_ACTION_MAP(window));
     gtk_window_add_accel_group(GTK_WINDOW(window), accel_group);
     g_object_unref(accel_group);
+}
+
+void
+libbalsa_window_block_accels(GtkApplicationWindow * window,
+                             gboolean               block)
+{
+    g_object_set_data(G_OBJECT(window), "block-accels", GINT_TO_POINTER(!!block));
 }
 
 /*

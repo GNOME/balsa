@@ -1125,9 +1125,9 @@ bm_widget_on_url(const gchar *url)
  */
 
 static void
-zoom_in_activated(GSimpleAction *action,
-                  GVariant      *parameter,
-                  gpointer       user_data)
+bmwt_html_zoom_in_activated(GSimpleAction *action,
+                            GVariant      *parameter,
+                            gpointer       user_data)
 {
     GtkWidget *html = user_data;
     BalsaMessage *bm = g_object_get_data(G_OBJECT(html), "bm");
@@ -1136,9 +1136,9 @@ zoom_in_activated(GSimpleAction *action,
 }
 
 static void
-zoom_out_activated(GSimpleAction *action,
-                   GVariant      *parameter,
-                   gpointer       user_data)
+bmwt_html_zoom_out_activated(GSimpleAction *action,
+                             GVariant      *parameter,
+                             gpointer       user_data)
 {
     GtkWidget *html = user_data;
     BalsaMessage *bm = g_object_get_data(G_OBJECT(html), "bm");
@@ -1147,9 +1147,9 @@ zoom_out_activated(GSimpleAction *action,
 }
 
 static void
-zoom_reset_activated(GSimpleAction *action,
-                     GVariant      *parameter,
-                     gpointer       user_data)
+bmwt_html_zoom_reset_activated(GSimpleAction *action,
+                               GVariant      *parameter,
+                               gpointer       user_data)
 {
     GtkWidget *html = user_data;
     BalsaMessage *bm = g_object_get_data(G_OBJECT(html), "bm");
@@ -1158,9 +1158,9 @@ zoom_reset_activated(GSimpleAction *action,
 }
 
 static void
-select_all_activated(GSimpleAction *action,
-                     GVariant      *parameter,
-                     gpointer       user_data)
+bmwt_html_select_all_activated(GSimpleAction *action,
+                               GVariant      *parameter,
+                               gpointer       user_data)
 {
     GtkWidget *html = user_data;
 
@@ -1168,9 +1168,9 @@ select_all_activated(GSimpleAction *action,
 }
 
 static void
-html_open_with_change_state(GSimpleAction *action,
-                            GVariant      *parameter,
-                            gpointer       user_data)
+bmwt_html_open_with_change_state(GSimpleAction *action,
+                                 GVariant      *parameter,
+                                 gpointer       user_data)
 {
     GtkWidget *html = user_data;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
@@ -1182,9 +1182,9 @@ html_open_with_change_state(GSimpleAction *action,
 }
 
 static void
-save_activated(GSimpleAction *action,
-               GVariant      *parameter,
-               gpointer       user_data)
+bmwt_html_save_activated(GSimpleAction *action,
+                         GVariant      *parameter,
+                         gpointer       user_data)
 {
     GtkWidget *html = user_data;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
@@ -1193,9 +1193,9 @@ save_activated(GSimpleAction *action,
 }
 
 static void
-print_activated(GSimpleAction *action,
-                GVariant      *parameter,
-                gpointer       user_data)
+bmwt_html_print_activated(GSimpleAction *action,
+                          GVariant      *parameter,
+                          gpointer       user_data)
 {
     GtkWidget *html = user_data;
 
@@ -1203,19 +1203,19 @@ print_activated(GSimpleAction *action,
 }
 
 static void
-bmwt_populate_popup_menu(BalsaMessage * bm,
-                         GtkWidget    * html,
-                         GMenu        * menu)
+bmwt_html_populate_popup_menu(BalsaMessage * bm,
+                              GtkWidget    * html,
+                              GMenu        * menu)
 {
     GSimpleActionGroup *simple;
     static const GActionEntry text_view_popup_entries[] = {
-        {"zoom-in", zoom_in_activated},
-        {"zoom-out", zoom_out_activated},
-        {"zoom-reset", zoom_reset_activated},
-        {"select-all", select_all_activated},
-        {"open-with", libbalsa_radio_activated, "s", "''", html_open_with_change_state},
-        {"save", save_activated},
-        {"print", print_activated}
+        {"zoom-in", bmwt_html_zoom_in_activated},
+        {"zoom-out", bmwt_html_zoom_out_activated},
+        {"zoom-reset", bmwt_html_zoom_reset_activated},
+        {"select-all", bmwt_html_select_all_activated},
+        {"open-with", libbalsa_radio_activated, "s", "''", bmwt_html_open_with_change_state},
+        {"save", bmwt_html_save_activated},
+        {"print", bmwt_html_print_activated}
     };
     GAction *print_action;
     GMenu *open_menu;
@@ -1277,7 +1277,8 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
 }
 
 static gboolean
-bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
+bmwt_html_popup_context_menu(GtkWidget    *html,
+                             BalsaMessage *bm)
 {
     GtkWidget *popover;
     const GdkEvent *event;
@@ -1289,7 +1290,7 @@ bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
         GMenu *menu;
 
         menu = g_menu_new();
-        bmwt_populate_popup_menu(bm, html, menu);
+        bmwt_html_populate_popup_menu(bm, html, menu);
         popover = gtk_popover_new_from_model(libbalsa_html_get_view_widget(html), G_MENU_MODEL(menu));
         g_object_set_data(G_OBJECT(html), "popover", popover);
     }
@@ -1322,11 +1323,11 @@ bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
 }
 
 static void
-balsa_gtk_html_button_press_cb(GtkGestureMultiPress *multi_press,
-                               gint                  n_press,
-                               gdouble               x,
-                               gdouble               y,
-                               gpointer              user_data)
+bmwt_html_button_press_cb(GtkGestureMultiPress *multi_press,
+                          gint                  n_press,
+                          gdouble               x,
+                          gdouble               y,
+                          gpointer              user_data)
 {
     BalsaMessage *bm = user_data;
     GtkGesture *gesture;
@@ -1337,7 +1338,7 @@ balsa_gtk_html_button_press_cb(GtkGestureMultiPress *multi_press,
 
     if (gdk_event_triggers_context_menu(event)) {
         GtkWidget *html = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture));
-        balsa_gtk_html_popup(html, bm) ;
+        bmwt_html_popup_context_menu(html, bm) ;
     }
 }
 
@@ -1364,10 +1365,10 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
     gesture = gtk_gesture_multi_press_new(libbalsa_html_get_view_widget(widget));
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
     g_signal_connect(gesture, "pressed",
-                     G_CALLBACK(balsa_gtk_html_button_press_cb), bm);
+                     G_CALLBACK(bmwt_html_button_press_cb), bm);
 
     g_signal_connect(widget, "popup-menu",
-                     G_CALLBACK(balsa_gtk_html_popup), bm);
+                     G_CALLBACK(bmwt_html_popup_context_menu), bm);
 
     return (BalsaMimeWidget *) mwt;
 }

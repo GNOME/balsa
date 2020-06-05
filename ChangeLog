@@ -1,3 +1,15 @@
+2020-06-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-text: Use bmwt_html_ prefix
+
+	for all HTML-related functions.
+
+	* src/balsa-mime-widget-text.c (bmwt_html_zoom_in),
+	(bmwt_html_zoom_out), (bmwt_html_zoom_reset),
+	(bmwt_html_select_all_cb), (bmwt_html_populate_popup_menu),
+	(bmwt_html_popup_context_menu), (bmwt_html_gesture_pressed_cb),
+	(bmwt_html_populate_popup_cb), (bm_widget_new_html):
+
 2020-06-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	main-window: Connect to "notify::focus" signal instead of the

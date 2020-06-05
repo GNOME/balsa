@@ -1078,50 +1078,50 @@ bm_widget_on_url(const gchar *url)
 
 #ifdef HAVE_HTML_WIDGET
 static void
-bm_zoom_in(BalsaMessage * bm)
+bmwt_html_zoom_in(BalsaMessage * bm)
 {
     balsa_message_zoom(bm, 1);
 }
 
 static void
-bm_zoom_out(BalsaMessage * bm)
+bmwt_html_zoom_out(BalsaMessage * bm)
 {
     balsa_message_zoom(bm, -1);
 }
 
 static void
-bm_zoom_reset(BalsaMessage * bm)
+bmwt_html_zoom_reset(BalsaMessage * bm)
 {
     balsa_message_zoom(bm, 0);
 }
 
 static void
-bm_select_all_cb(GtkWidget * html)
+bmwt_html_select_all_cb(GtkWidget * html)
 {
     libbalsa_html_select_all(html);
 }
 
 static void
-bmwt_populate_popup_menu(BalsaMessage * bm,
-                         GtkWidget    * html,
-                         GtkMenu      * menu)
+bmwt_html_populate_popup_menu(BalsaMessage * bm,
+                              GtkWidget    * html,
+                              GtkMenu      * menu)
 {
     GtkWidget *menuitem;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
 
     menuitem = gtk_menu_item_new_with_label(_("Zoom In"));
     g_signal_connect_swapped(menuitem, "activate",
-                             G_CALLBACK(bm_zoom_in), bm);
+                             G_CALLBACK(bmwt_html_zoom_in), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem = gtk_menu_item_new_with_label(_("Zoom Out"));
     g_signal_connect_swapped(menuitem, "activate",
-                             G_CALLBACK(bm_zoom_out), bm);
+                             G_CALLBACK(bmwt_html_zoom_out), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem = gtk_menu_item_new_with_label(_("Zoom 100%"));
     g_signal_connect_swapped(menuitem, "activate",
-                             G_CALLBACK(bm_zoom_reset), bm);
+                             G_CALLBACK(bmwt_html_zoom_reset), bm);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     menuitem = gtk_separator_menu_item_new();
@@ -1130,7 +1130,7 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
     if (libbalsa_html_can_select(html)) {
         menuitem = gtk_menu_item_new_with_mnemonic(_("Select _All"));
         g_signal_connect_swapped(menuitem, "activate",
-                                 G_CALLBACK(bm_select_all_cb), html);
+                                 G_CALLBACK(bmwt_html_select_all_cb), html);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
         menuitem = gtk_separator_menu_item_new();
@@ -1160,14 +1160,14 @@ bmwt_populate_popup_menu(BalsaMessage * bm,
 }
 
 static gboolean
-balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
+bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
 {
     GtkWidget *menu;
     const GdkEvent *event;
     GdkEvent *current_event = NULL;
 
     menu = gtk_menu_new();
-    bmwt_populate_popup_menu(bm, html, GTK_MENU(menu));
+    bmwt_html_populate_popup_menu(bm, html, GTK_MENU(menu));
 
     /* In WebKit2, the context menu signal is asynchronous, so the
      * GdkEvent is no longer current; instead it is preserved and passed
@@ -1190,11 +1190,11 @@ balsa_gtk_html_popup(GtkWidget * html, BalsaMessage * bm)
 }
 
 static void
-mwt_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
-                       gint                  n_press,
-                       gdouble               x,
-                       gdouble               y,
-                       gpointer              user_data)
+bmwt_html_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
+                             gint                  n_press,
+                             gdouble               x,
+                             gdouble               y,
+                             gpointer              user_data)
 {
     GtkGesture *gesture;
     const GdkEvent *event;
@@ -1207,12 +1207,12 @@ mwt_gesture_pressed_cb(GtkGestureMultiPress *multi_press,
         GtkWidget *html;
 
         html = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture));
-        balsa_gtk_html_popup(html, bm);
+        bmwt_html_popup_context_menu(html, bm);
     }
 }
 
 static void
-bmwt_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
+bmwt_html_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
 {
     BalsaMessage *bm =
         g_object_get_data(G_OBJECT(widget), "balsa-message");
@@ -1221,7 +1221,7 @@ bmwt_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
     /* Remove WebKitWebView's items--they're irrelevant and confusing */
     gtk_container_foreach(GTK_CONTAINER(menu),
                          (GtkCallback) gtk_widget_destroy, NULL);
-    bmwt_populate_popup_menu(bm, html, menu);
+    bmwt_html_populate_popup_menu(bm, html, menu);
 }
 
 static BalsaMimeWidget *
@@ -1247,17 +1247,17 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
     if ((popup_menu = libbalsa_html_popup_menu_widget(widget)) != NULL) {
         g_object_set_data(G_OBJECT(popup_menu), "balsa-message", bm);
         g_signal_connect(popup_menu, "populate-popup",
-                         G_CALLBACK(bmwt_populate_popup_cb), widget);
+                         G_CALLBACK(bmwt_html_populate_popup_cb), widget);
     } else {
         GtkGesture *gesture;
 
         gesture = gtk_gesture_multi_press_new(widget);
         gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
         g_signal_connect(gesture, "pressed",
-                         G_CALLBACK(mwt_gesture_pressed_cb), bm);
+                         G_CALLBACK(bmwt_html_gesture_pressed_cb), bm);
 
         g_signal_connect(widget, "popup-menu",
-                         G_CALLBACK(balsa_gtk_html_popup), bm);
+                         G_CALLBACK(bmwt_html_popup_context_menu), bm);
     }
 
     return mw;

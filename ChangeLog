@@ -1,5 +1,14 @@
 2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	toolbar-factory: Stop using direct access to GdkEvent structs
+
+	Use gdk_event_get_event_type instead of directly accessing
+	event->type.
+
+	* src/toolbar-factory.c (tm_popup_context_menu_cb):
+
+2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Find in message: Make it work again
 
 	* src/balsa-mime-widget-text.c

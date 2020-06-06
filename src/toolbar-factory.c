@@ -726,7 +726,7 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
     gtk_menu_attach_to_widget(GTK_MENU(menu), toolbar, NULL);
 
     event = gtk_get_current_event();
-    if (event != NULL && event->type == GDK_BUTTON_PRESS) {
+    if (event != NULL && gdk_event_get_event_type(event) == GDK_BUTTON_PRESS) {
         gtk_menu_popup_at_pointer(GTK_MENU(menu), event);
     } else {
         gtk_menu_popup_at_widget(GTK_MENU(menu),

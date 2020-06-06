@@ -1290,15 +1290,13 @@ remove_attachment(GSimpleAction *action,
 
     /* make sure we got the right element */
     gtk_tree_model_get(model, &iter, ATTACH_INFO_COLUMN, &test_info, -1);
-    if (test_info != info) {
-	if (test_info)
-	    g_object_unref(test_info);
-	return;
-    }
-    g_object_unref(test_info);
 
-    /* remove the attachment */
-    gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+    if (test_info == info) {
+        /* remove the attachment */
+        gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+    }
+
+    g_object_unref(test_info);
 }
 
 /* change attachment mode - right mouse button callback */
@@ -1656,6 +1654,8 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     };
     GMenu *menu;
     GMenu *section;
+    static int attachment_number = 0;
+    gchar *attachment_namespace;
 
     g_debug("Trying to attach '%s'", filename);
     if (!(file_uri = libbalsa_vfs_new_from_uri(filename))) {
@@ -1751,8 +1751,9 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
                                     G_N_ELEMENTS(attachment_entries),
                                     attach_data);
 
+    attachment_namespace = g_strdup_printf("attachment-%d", ++attachment_number);
     gtk_widget_insert_action_group(bsmsg->window,
-                                   "attachment",
+                                   attachment_namespace,
                                    G_ACTION_GROUP(simple));
     g_object_unref(simple);
 
@@ -1762,7 +1763,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     if (can_inline) {
         GMenuItem *menu_item =
             g_menu_item_new(_(attach_modes[LIBBALSA_ATTACH_AS_INLINE]), NULL);
-        g_menu_item_set_action_and_target(menu_item, "attachment.new-mode", "i",
+        g_menu_item_set_action_and_target(menu_item, "new-mode", "i",
                                           LIBBALSA_ATTACH_AS_INLINE);
         g_menu_append_item(menu, menu_item);
         g_object_unref(menu_item);
@@ -1772,7 +1773,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     if (can_inline || !is_a_temp_file) {
         GMenuItem *menu_item =
             g_menu_item_new(_(attach_modes[LIBBALSA_ATTACH_AS_ATTACHMENT]), NULL);
-        g_menu_item_set_action_and_target(menu_item, "attachment.new-mode", "i",
+        g_menu_item_set_action_and_target(menu_item, "new-mode", "i",
                                           LIBBALSA_ATTACH_AS_ATTACHMENT);
         g_menu_append_item(menu, menu_item);
         g_object_unref(menu_item);
@@ -1782,7 +1783,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     if (!is_a_temp_file) {
         GMenuItem *menu_item =
             g_menu_item_new(_(attach_modes[LIBBALSA_ATTACH_AS_EXTBODY]), NULL);
-        g_menu_item_set_action_and_target(menu_item, "attachment.new-mode", "i",
+        g_menu_item_set_action_and_target(menu_item, "new-mode", "i",
                                           LIBBALSA_ATTACH_AS_EXTBODY);
         g_menu_append_item(menu, menu_item);
         g_object_unref(menu_item);
@@ -1790,7 +1791,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 
     /* an attachment can be removed */
     section = g_menu_new();
-    g_menu_append(section, _("Remove"), "attachment.remove");
+    g_menu_append(section, _("Remove"), "remove");
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
@@ -1798,15 +1799,17 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
        attached... (only for non-message attachments) */
     if (!is_fwd_message) {
         section = g_menu_new();
-        libbalsa_vfs_fill_menu_by_content_type(section, content_type,
-                                               "attachment.launch-app");
+        libbalsa_vfs_fill_menu_by_content_type(section, content_type, "launch-app");
         g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
         g_object_unref(section);
     }
 
-    attach_data->popup_menu =
-        gtk_popover_new_from_model(bsmsg->tree_view, G_MENU_MODEL(menu));
+    attach_data->popup_menu = gtk_popover_new(bsmsg->tree_view);
+    gtk_popover_bind_model(GTK_POPOVER(attach_data->popup_menu),
+                           G_MENU_MODEL(menu),
+                           attachment_namespace);
     g_object_unref(menu);
+    g_free(attachment_namespace);
 
     /* append to the list store */
     content_desc =libbalsa_vfs_content_description(content_type);

@@ -869,7 +869,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
 
     gtk_widget_set_vexpand(GTK_WIDGET(info->web_view), TRUE);
     gtk_widget_set_valign(GTK_WIDGET(info->web_view), GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), GTK_WIDGET(info->web_view));
+    gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(info->web_view), FALSE, FALSE, 0);
 
     webkit_web_view_load_html(info->web_view, text, NULL);
     g_free(text);

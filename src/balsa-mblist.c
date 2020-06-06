@@ -867,8 +867,10 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
     GtkTreeModel *model =
         gtk_tree_view_get_model(tree_view);
     GtkTreePath *path;
+    guint button;
+    gdouble x_win, y_win;
 
-    if (!event) {
+    if (event == NULL) {
 	GtkTreeIter iter;
 
 	if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
@@ -886,20 +888,23 @@ bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
 	g_signal_handlers_block_by_func(selection, bmbl_select_mailbox, NULL);
 	gtk_tree_selection_unselect_all(selection);
 	g_signal_handlers_unblock_by_func(selection, bmbl_select_mailbox, NULL);
-        return;
-    }
-    if (event->type != GDK_BUTTON_PRESS
-            /* keyboard navigation */
-        || event->button.button != 1
-            /* soft select */
-        || event->button.window != gtk_tree_view_get_bin_window(tree_view)
-            /* click on a different widget */ ) {
-        gdk_event_free(event);
+
         return;
     }
 
-    if (!gtk_tree_view_get_path_at_pos(tree_view, event->button.x,
-                                       event->button.y, &path,
+    if (gdk_event_get_event_type(event) != GDK_BUTTON_PRESS
+            /* keyboard navigation */
+        || !gdk_event_get_button(event, &button) || button != 1
+            /* soft select */
+        || gdk_event_get_window(event) != gtk_tree_view_get_bin_window(tree_view)
+            /* click on a different widget */ ) {
+        gdk_event_free(event);
+
+        return;
+    }
+
+    if (!gdk_event_get_coords(event, &x_win, &y_win) ||
+        !gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win, &path,
                                        NULL, NULL, NULL)) {
         /* GtkTreeView selects the first node in the tree when the
          * widget first gets the focus, whether it's a keyboard event or
@@ -1916,19 +1921,25 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
 {
     GdkEvent *event;
     GtkTreeView *tree_view;
+    gdouble x_win, y_win;
     GtkTreePath *path;
 
     if (!data)
         return;
 
     event = gtk_get_current_event();
-    if (!event)
+    if (event == NULL)
         return;
 
+    if (gdk_event_get_event_type(event) != GDK_BUTTON_PRESS ||
+        !gdk_event_get_coords(event, &x_win, &y_win)) {
+        gdk_event_free(event);
+        return;
+    }
+
     tree_view = gtk_tree_selection_get_tree_view(selection);
-    if (event->type != GDK_BUTTON_PRESS ||
-        !gtk_tree_view_get_path_at_pos(tree_view, event->button.x,
-                                       event->button.y, &path,
+
+    if (!gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win, &path,
                                        NULL, NULL, NULL)) {
         gtk_tree_selection_unselect_all(selection);
         gdk_event_free(event);

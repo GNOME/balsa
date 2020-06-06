@@ -2401,19 +2401,31 @@ create_from_entry(GtkWidget * grid, BalsaSendmsg * bsmsg)
     create_email_or_string_entry(bsmsg, grid, _("F_rom:"), 0, bsmsg->from);
 }
 
-static gboolean
-attachment_button_press_cb(GtkWidget * widget, GdkEventButton * event,
-			   gpointer data)
+static void
+attachment_button_press_cb(GtkGestureMultiPress *multi_press,
+                           gint                  n_press,
+                           gdouble               x,
+                           gdouble               y,
+                           gpointer              user_data)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    GtkTreeView *tree_view = user_data;
+    GtkGesture *gesture;
+    const GdkEvent *event;
     GtkTreePath *path;
+    gint bx, by;
 
-    g_return_val_if_fail(event, FALSE);
-    if (!gdk_event_triggers_context_menu((GdkEvent *) event)
-        || event->window != gtk_tree_view_get_bin_window(tree_view))
-        return FALSE;
+    gesture = GTK_GESTURE(multi_press);
+    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
 
-    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y,
+    if (!gdk_event_triggers_context_menu(event) ||
+        gdk_event_get_window(event) != gtk_tree_view_get_bin_window(tree_view)) {
+        return;
+    }
+
+    gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (gint) x, (gint) y,
+                                                      &bx, &by);
+
+    if (gtk_tree_view_get_path_at_pos(tree_view, bx, by,
                                       &path, NULL, NULL, NULL)) {
         GtkTreeIter iter;
         GtkTreeSelection * selection =
@@ -2438,8 +2450,6 @@ attachment_button_press_cb(GtkWidget * widget, GdkEventButton * event,
         }
         gtk_tree_path_free(path);
     }
-
-    return TRUE;
 }
 
 
@@ -2588,6 +2598,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     GtkTreeView *view;
     GtkTreeViewColumn *column;
     GtkWidget *frame;
+    GtkGesture *gesture;
 
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
@@ -2670,8 +2681,11 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 				GTK_SELECTION_SINGLE);
     g_signal_connect(view, "popup-menu",
                      G_CALLBACK(attachment_popup_cb), NULL);
-    g_signal_connect(view, "button_press_event",
-                     G_CALLBACK(attachment_button_press_cb), NULL);
+
+    gesture = gtk_gesture_multi_press_new(tree_view);
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_signal_connect(gesture, "pressed",
+                     G_CALLBACK(attachment_button_press_cb), view);
 
     g_signal_connect(bsmsg->window, "drag_data_received",
 		     G_CALLBACK(attachments_add), bsmsg);

@@ -1,3 +1,12 @@
+2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	compose window: Connect to the "pressed" signal of a
+	GtkGestureMultiPress instead of the "button-press-event" widget
+	signal.
+
+	* src/sendmsg-window.c (attachment_button_press_cb),
+	(sw_attachment_list):
+
 2020-06-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mime-widget-text: Use bmwt_html_ prefix

@@ -441,12 +441,15 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     gtk_widget_set_vexpand (vbox, TRUE);
     label = gtk_label_new(_("Double-click key to show details"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+    gtk_widget_set_valign(label, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(vbox), label);
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrolled_window), GTK_SHADOW_ETCHED_IN);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(scrolled_window, TRUE);
+    gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(vbox), scrolled_window);
 
     model = gtk_list_store_new(AC_DB_VIEW_COLUMNS, G_TYPE_STRING,	/* address */
     	G_TYPE_STRING,												/* formatted last seen timestamp */

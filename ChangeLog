@@ -739,6 +739,14 @@
 
 2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Various: Stop using GtkBox padding, fill and expand child properties
+
+	* libbalsa/address.c (libbalsa_address_get_edit_widget):
+	* libbalsa/autocrypt.c (autocrypt_db_dialog_run):
+	* libbalsa/html.c (libbalsa_html_new):
+
+2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	balsa-message: Do not crash
 
 	if the message part is changed while the find-in-message bar is

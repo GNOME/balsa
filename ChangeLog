@@ -766,6 +766,14 @@
 
 2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	mblist: Stop using direct access to GdkEvent structs
+
+	Use GdkEvent getters instead of directly accessing fields.
+
+	* src/balsa-mblist.c (bmbl_select_mailbox), (bmbl_mru_selected_cb):
+
+2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	compose window: Connect to the "pressed" signal of a
 	GtkGestureMultiPress instead of the "button-press-event" widget
 	signal.

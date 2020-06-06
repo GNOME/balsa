@@ -419,6 +419,10 @@
 
 	* src/balsa-mblist.c (bmbl_select_mailbox), (bmbl_mru_selected_cb):
 
+	compose-window: Use a separate action-group for each attachment
+
+	* src/sendmsg-window.c (remove_attachment), (add_attachment):
+
 2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	compose window: Connect to the "pressed" signal of a

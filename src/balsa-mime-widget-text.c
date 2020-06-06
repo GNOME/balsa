@@ -1498,3 +1498,11 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
     if (rex != NULL)
         g_regex_unref(rex);
 }
+
+GtkWidget *
+balsa_mime_widget_text_get_text_widget(BalsaMimeWidgetText *mime_widget_text)
+{
+    g_return_val_if_fail(BALSA_IS_MIME_WIDGET_TEXT(mime_widget_text), NULL);
+
+    return mime_widget_text->text_widget;
+}

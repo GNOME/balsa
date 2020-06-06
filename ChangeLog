@@ -1,5 +1,16 @@
 2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Find in message: Make it work again
+
+	* src/balsa-mime-widget-text.c
+	(balsa_mime_widget_text_get_text_widget): new getter;
+	* src/balsa-mime-widget-text.h: ditto;
+	* src/balsa-message.c (bm_find_entry_changed_cb), (bm_find_again),
+	(bm_find_pass_to_entry), (balsa_message_find_in_message): use it
+	to get the real text widget (GtkTextView, GtkSourceView).
+
+2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	mblist: Stop using direct access to GdkEvent structs
 
 	Use GdkEvent getters instead of directly accessing fields.

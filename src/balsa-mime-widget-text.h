@@ -47,6 +47,7 @@ BalsaMimeWidget *balsa_mime_widget_new_text(BalsaMessage        *bm,
                                             const gchar         *content_type,
                                             gpointer             data);
 
+GtkWidget *balsa_mime_widget_text_get_text_widget(BalsaMimeWidgetText * mime_widget_text);
 
 G_END_DECLS
 

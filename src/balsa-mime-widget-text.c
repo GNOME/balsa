@@ -1227,16 +1227,16 @@ bmwt_html_populate_popup_cb(GtkWidget * widget, GtkMenu * menu, gpointer data)
 static BalsaMimeWidget *
 bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 {
-    BalsaMimeWidget *mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
+    BalsaMimeWidgetText *mwt = g_object_new(BALSA_TYPE_MIME_WIDGET_TEXT, NULL);
     GtkWidget *widget;
     GtkWidget *popup_menu;
     GtkEventController *key_controller;
 
-    widget =
+    mwt->text_widget = widget =
         libbalsa_html_new(mime_body,
                          (LibBalsaHtmlCallback) bm_widget_on_url,
                          (LibBalsaHtmlCallback) handle_url);
-    gtk_container_add(GTK_CONTAINER(mw), widget);
+    gtk_container_add(GTK_CONTAINER(mwt), widget);
 
     g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);
 
@@ -1260,7 +1260,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
                          G_CALLBACK(bmwt_html_popup_context_menu), bm);
     }
 
-    return mw;
+    return (BalsaMimeWidget *) mwt;
 }
 #endif /* defined HAVE_HTML_WIDGET */
 
@@ -1497,4 +1497,12 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
 
     if (rex != NULL)
         g_regex_unref(rex);
+}
+
+GtkWidget *
+balsa_mime_widget_text_get_text_widget(BalsaMimeWidgetText *mime_widget_text)
+{
+    g_return_val_if_fail(BALSA_IS_MIME_WIDGET_TEXT(mime_widget_text), NULL);
+
+    return mime_widget_text->text_widget;
 }

@@ -38,6 +38,7 @@
 #include "balsa-mime-widget-callbacks.h"
 #include "balsa-mime-widget-message.h"
 #include "balsa-mime-widget-image.h"
+#include "balsa-mime-widget-text.h"
 #include "balsa-mime-widget-crypto.h"
 #include "libbalsa-gpgme.h"
 #include "autocrypt.h"
@@ -417,7 +418,8 @@ bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
 {
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(editable));
     BalsaMessage *balsa_message = data;
-    GtkWidget *widget = GTK_WIDGET(balsa_message->current_part->mime_widget);
+    BalsaMimeWidget *mime_widget = balsa_message->current_part->mime_widget;
+    GtkWidget *widget = balsa_mime_widget_text_get_text_widget(BALSA_MIME_WIDGET_TEXT(mime_widget));
     gboolean found = FALSE;
 
     if (GTK_IS_TEXT_VIEW(widget)) {
@@ -477,7 +479,8 @@ static void
 bm_find_again(BalsaMessage * balsa_message, gboolean find_forward)
 {
     const gchar *text = gtk_entry_get_text(GTK_ENTRY(balsa_message->find_entry));
-    GtkWidget *widget = GTK_WIDGET(balsa_message->current_part->mime_widget);
+    BalsaMimeWidget *mime_widget = balsa_message->current_part->mime_widget;
+    GtkWidget *widget = balsa_mime_widget_text_get_text_widget(BALSA_MIME_WIDGET_TEXT(mime_widget));
     gboolean found;
 
     balsa_message->find_forward = find_forward;
@@ -597,19 +600,25 @@ bm_find_bar_new(BalsaMessage * balsa_message)
 static void bm_disable_find_entry(BalsaMessage * balsa_message);
 
 static gboolean
-bm_find_pass_to_entry(BalsaMessage * balsa_message, GdkEventKey * event)
+bm_find_pass_to_entry(BalsaMessage * balsa_message, GdkEvent * event)
 {
+    guint keyval;
+    GdkModifierType state;
     gboolean res = TRUE;
 
-    switch (event->keyval) {
+    if (!gdk_event_get_keyval(event, &keyval))
+        return FALSE;
+
+    switch (keyval) {
     case GDK_KEY_Escape:
     case GDK_KEY_Return:
     case GDK_KEY_KP_Enter:
         bm_disable_find_entry(balsa_message);
         return res;
     case GDK_KEY_g:
-        if ((event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) ==
-            GDK_CONTROL_MASK && gtk_widget_get_sensitive(balsa_message->find_next)) {
+        if (gdk_event_get_state(event, &state) &&
+            (state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) == GDK_CONTROL_MASK &&
+            gtk_widget_get_sensitive(balsa_message->find_next)) {
             bm_find_again(balsa_message, balsa_message->find_forward);
             return res;
         }
@@ -3260,13 +3269,18 @@ balsa_message_recheck_crypto(BalsaMessage *balsa_message)
 void
 balsa_message_find_in_message(BalsaMessage * balsa_message)
 {
+    BalsaMimeWidget *mime_widget;
     GtkWidget *w;
 
     if (balsa_message->current_part == NULL ||
         balsa_message->current_part->mime_widget == NULL)
         return;
 
-    w = GTK_WIDGET(balsa_message->current_part->mime_widget);
+    mime_widget = balsa_message->current_part->mime_widget;
+    if (!BALSA_IS_MIME_WIDGET_TEXT(mime_widget))
+        return;
+
+    w = balsa_mime_widget_text_get_text_widget((BalsaMimeWidgetText *) mime_widget);
     if (GTK_IS_TEXT_VIEW(w)
 #ifdef HAVE_HTML_WIDGET
         || libbalsa_html_can_search(w)

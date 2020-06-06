@@ -1,5 +1,14 @@
 2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-message: Do not crash
+
+	if the message part is changed while the find-in-message bar is
+	active.
+
+	* src/balsa-message.c (bm_find_entry_changed_cb):
+
+2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	toolbar-factory: Stop using direct access to GdkEvent structs
 
 	Use gdk_event_get_event_type instead of directly accessing

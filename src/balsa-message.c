@@ -416,13 +416,20 @@ bm_find_cb(const gchar * text, gboolean found, gpointer data)
 static void
 bm_find_entry_changed_cb(GtkEditable * editable, gpointer data)
 {
-    const gchar *text = gtk_entry_get_text(GTK_ENTRY(editable));
     BalsaMessage *balsa_message = data;
-    BalsaMimeWidget *mime_widget = balsa_message->current_part->mime_widget;
-    GtkWidget *widget = balsa_mime_widget_text_get_text_widget(BALSA_MIME_WIDGET_TEXT(mime_widget));
-    gboolean found = FALSE;
+    const gchar *text;
+    BalsaMimeWidget *mime_widget;
+    GtkWidget *widget;
+
+    if (balsa_message->current_part == NULL)
+        return;
+
+    mime_widget = balsa_message->current_part->mime_widget;
+    widget = balsa_mime_widget_text_get_text_widget(BALSA_MIME_WIDGET_TEXT(mime_widget));
+    text = gtk_entry_get_text(GTK_ENTRY(editable));
 
     if (GTK_IS_TEXT_VIEW(widget)) {
+        gboolean found = FALSE;
         GtkTextView *text_view = GTK_TEXT_VIEW(widget);
         GtkTextBuffer *buffer = gtk_text_view_get_buffer(text_view);
         GtkTextIter match_begin, match_end;

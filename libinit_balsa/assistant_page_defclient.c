@@ -45,6 +45,7 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
 {
     GtkLabel *label;
     GtkWidget *yes, *no;
+    GtkWidget *widget;
 
     defclient->default_client = 1;
     balsa_app.default_client = defclient->default_client;
@@ -57,15 +58,29 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
 
     yes = gtk_radio_button_new_with_mnemonic(NULL, _("_Yes"));
     no = gtk_radio_button_new_with_mnemonic_from_widget(GTK_RADIO_BUTTON(yes),
-                                                         _("_No"));    
+                                                         _("_No"));
 
     g_signal_connect(yes, "toggled",
                        G_CALLBACK(balsa_druid_page_defclient_toggle),
                        defclient);
 
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label), TRUE, TRUE, 8);
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(yes),   TRUE, TRUE, 2);
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(no),    TRUE, TRUE, 2);
+    widget = GTK_WIDGET(label);
+    gtk_widget_set_vexpand(widget, TRUE);
+    gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
+    gtk_widget_set_margin_top(widget, 8);
+    gtk_box_pack_start(GTK_BOX(page), widget, FALSE, FALSE, 0);
+
+    widget = GTK_WIDGET(yes);
+    gtk_widget_set_vexpand(widget, TRUE);
+    gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
+    gtk_widget_set_margin_top(widget, 2);
+    gtk_box_pack_start(GTK_BOX(page), widget, FALSE, FALSE, 0);
+
+    widget = GTK_WIDGET(no);
+    gtk_widget_set_vexpand(widget, TRUE);
+    gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
+    gtk_widget_set_margin_top(widget, 2);
+    gtk_box_pack_start(GTK_BOX(page), widget, FALSE, FALSE, 0);
 
     return;
 }

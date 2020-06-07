@@ -403,9 +403,7 @@ libbalsa_key_dialog(GtkWindow            *parent,
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
-        gtk_widget_set_hexpand(hbox, TRUE);
         gtk_widget_set_vexpand(hbox, TRUE);
-        gtk_widget_set_halign(hbox, GTK_ALIGN_FILL);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
 	gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), hbox, FALSE, FALSE, 0);
 	gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
@@ -644,7 +642,8 @@ create_subkey_widget(gpgme_subkey_t subkey)
 
 	subkey_grid = gtk_grid_new();
 	gtk_grid_set_column_spacing(GTK_GRID(subkey_grid), 6);
-        g_object_set(subkey_grid, "margin", 2, NULL);
+        gtk_widget_set_margin_top(subkey_grid, 2);
+        gtk_widget_set_margin_bottom(subkey_grid, 2);
 
 	/* print a warning for a bad subkey status */
 	details_str = create_status_str(subkey->expired != 0U, subkey->revoked != 0U, subkey->disabled != 0U, subkey->invalid != 0U);
@@ -778,7 +777,8 @@ smime_show_chain(GtkWidget *button, gpointer G_GNUC_UNUSED user_data)
 	vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
         gtk_widget_set_vexpand(chain, TRUE);
         gtk_widget_set_valign(chain, GTK_ALIGN_FILL);
-        g_object_set(chain, "margin", 6, NULL);
+        gtk_widget_set_margin_top(chain, 6);
+        gtk_widget_set_margin_bottom(chain, 6);
 	gtk_box_pack_start(GTK_BOX(vbox), chain, FALSE, FALSE, 0);
 
 	gtk_widget_show_all(vbox);

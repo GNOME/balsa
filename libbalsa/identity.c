@@ -384,9 +384,7 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     identity_list_update_real(GTK_TREE_VIEW(tree), identities, initial_id);
 
     frame = gtk_frame_new(NULL);
-    gtk_widget_set_hexpand(frame, TRUE);
     gtk_widget_set_vexpand(frame, TRUE);
-    gtk_widget_set_halign(frame, GTK_ALIGN_FILL);
     gtk_widget_set_valign(frame, GTK_ALIGN_FILL);
     gtk_box_pack_start(GTK_BOX
                        (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
@@ -1677,9 +1675,7 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
                                     IDENTITY_RESPONSE_CLOSE);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, padding);
-    gtk_widget_set_hexpand(hbox, TRUE);
     gtk_widget_set_vexpand(hbox, TRUE);
-    gtk_widget_set_halign(hbox, GTK_ALIGN_FILL);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
     gtk_box_pack_start(GTK_BOX
                        (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),

@@ -1004,7 +1004,9 @@ build_type_notebook()
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     g_object_set(box, "margin", 5, NULL);
-    gtk_box_pack_start(GTK_BOX(box), grid, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(grid, TRUE);
+    gtk_widget_set_valign(grid, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(box), grid, FALSE, FALSE, 0);
 
     fe_type_simple_label = 
 	gtk_label_new_with_mnemonic(_("One of the specified f_ields contains"));
@@ -1034,7 +1036,9 @@ build_type_notebook()
 
 #if REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED
     page = gtk_table_new(5, 6, FALSE);
-    gtk_box_pack_start(GTK_BOX(box), page, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(page, TRUE);
+    gtk_widget_set_valign(page, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(box), page, FALSE, FALSE, 0);
 
     fe_type_regex_label = 
         gtk_label_new_with_mnemonic(_("_One of the regular expressions matches"));

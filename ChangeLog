@@ -604,6 +604,12 @@
 
 	Various: Stop using GtkBox padding, fill and expand child properties
 
+	* src/filter-edit-callbacks.c (build_type_notebook):
+
+2020-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Stop using GtkBox padding, fill and expand child properties
+
 	* src/ab-main.c (bab_get_filter_box), (bab_window_new):
 	* src/ab-window.c (balsa_ab_window_init):
 	* src/balsa-mblist.c (bmbl_mru_show_tree):

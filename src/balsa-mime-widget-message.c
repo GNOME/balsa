@@ -245,13 +245,13 @@ bmw_message_extbody_url(LibBalsaMessageBody * mime_body,
     gtk_container_set_border_width(GTK_CONTAINER(mw),
 				   BMW_CONTAINER_BORDER);
 
-    gtk_container_add(GTK_CONTAINER(mw), gtk_label_new(msg->str));
+    gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg->str), FALSE, FALSE, 0);
     g_string_free(msg, TRUE);
 
     button = gtk_button_new_with_label(url);
     gtk_widget_set_margin_top(button, BMW_BUTTON_PACK_SPACE);
     gtk_widget_set_margin_bottom(button, BMW_BUTTON_PACK_SPACE);
-    gtk_container_add(GTK_CONTAINER(mw), button);
+    gtk_box_pack_start(GTK_BOX(mw), button, FALSE, FALSE, 0);
 
     g_object_set_data_full(G_OBJECT(button), "call_url", url,
 			   (GDestroyNotify) g_free);
@@ -292,7 +292,7 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
     gtk_container_set_border_width(GTK_CONTAINER(mw),
 				   BMW_CONTAINER_BORDER);
 
-    gtk_container_add(GTK_CONTAINER(mw), gtk_label_new(msg->str));
+    gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg->str), FALSE, FALSE, 0);
     g_string_free(msg, TRUE);
 
     button =
@@ -300,7 +300,7 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
 				     ("Se_nd message to obtain this part"));
     gtk_widget_set_margin_top(button, BMW_BUTTON_PACK_SPACE);
     gtk_widget_set_margin_bottom(button, BMW_BUTTON_PACK_SPACE);
-    gtk_container_add(GTK_CONTAINER(mw), button);
+    gtk_box_pack_start(GTK_BOX(mw), button, FALSE, FALSE, 0);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(extbody_send_mail), (gpointer) mime_body);
 
@@ -424,7 +424,7 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm,
     gtk_widget_set_valign(container, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(container, BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
     gtk_widget_set_margin_bottom(container, BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
-    gtk_container_add(GTK_CONTAINER(mw), container);
+    gtk_box_pack_start(GTK_BOX(mw), container, FALSE, FALSE, 0);
 
     return mw;
 }
@@ -526,6 +526,18 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     g_signal_connect(key_controller, "key-pressed",
 		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
 
+#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), grid);
+    gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
+
+    action_area = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
+    gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area),
+                              GTK_BUTTONBOX_START);
+
+    gtk_widget_set_valign(action_area, GTK_ALIGN_FILL);
+    gtk_box_pack_end(GTK_BOX(hbox), action_area, FALSE, FALSE, 0);
+#else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     info_bar_widget = gtk_info_bar_new();
     info_bar = GTK_INFO_BAR(info_bar_widget);
 

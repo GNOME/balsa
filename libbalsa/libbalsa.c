@@ -419,16 +419,16 @@ ask_cert_real(void *data)
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-    g_object_set(label, "margin", 1, NULL);
+    gtk_widget_set_margin_top(label, 1);
+    gtk_widget_set_margin_bottom(label, 1);
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                        label, FALSE, FALSE, 0);
     gtk_widget_show(label);
 
-    gtk_widget_set_hexpand(cert_widget, TRUE);
     gtk_widget_set_vexpand(cert_widget, TRUE);
-    gtk_widget_set_halign(cert_widget, GTK_ALIGN_FILL);
     gtk_widget_set_valign(cert_widget, GTK_ALIGN_FILL);
-    g_object_set(cert_widget, "margin", 1, NULL);
+    gtk_widget_set_margin_top(cert_widget, 1);
+    gtk_widget_set_margin_bottom(cert_widget, 1);
     gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                        cert_widget, FALSE, FALSE, 0);
     gtk_widget_show_all(cert_widget);

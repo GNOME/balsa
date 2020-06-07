@@ -741,6 +741,20 @@
 
 	Various: Stop using GtkBox padding, fill and expand child properties
 
+	* libbalsa/address.c (libbalsa_address_get_edit_widget):
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(libbalsa_identity_config_dialog):
+	* libbalsa/libbalsa-gpgme-widgets.c (libbalsa_key_dialog),
+	(create_subkey_widget), (smime_show_chain):
+	* libbalsa/libbalsa.c (ask_cert_real):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* libbalsa/source-viewer.c (libbalsa_show_message_source):
+	* libbalsa/x509-cert-widget.c (create_chain_widget):
+
+2020-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Stop using GtkBox padding, fill and expand child properties
+
 	* libbalsa/identity.c (libbalsa_identity_select_dialog),
 	(libbalsa_identity_config_dialog):
 	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key):

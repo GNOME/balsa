@@ -285,7 +285,9 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
-    gtk_box_pack_start(GTK_BOX(vbox), grid, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(grid, TRUE);
+    gtk_widget_set_valign(grid, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(vbox), grid, FALSE, FALSE, 0);
     gtk_widget_show(grid);
 
     /* -- grid column 1 -- */
@@ -303,7 +305,9 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     box2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 1);
     gtk_grid_attach(GTK_GRID(grid), box2, 0, 0, 1, 1);
     gtk_box_pack_start(GTK_BOX(box2), find_label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box2), ab->filter_entry, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(ab->filter_entry, TRUE);
+    gtk_widget_set_valign(ab->filter_entry, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(box2), ab->filter_entry, FALSE, FALSE, 0);
     gtk_widget_show(GTK_WIDGET(box2));
 
 
@@ -350,7 +354,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     w = gtk_button_new_from_icon_name("go-next-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
-    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
+    gtk_widget_set_vexpand(w, TRUE);
+    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, FALSE, FALSE, 0);
     gtk_widget_show(w);
     g_signal_connect(w, "clicked",
 		     G_CALLBACK(balsa_ab_window_move_to_recipient_list),
@@ -358,7 +363,8 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
     w = gtk_button_new_from_icon_name("go-previous-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
-    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, TRUE, FALSE, 0);
+    gtk_widget_set_vexpand(w, TRUE);
+    gtk_box_pack_start(GTK_BOX(ab->arrow_box), w, FALSE, FALSE, 0);
     gtk_widget_show(w);
     g_signal_connect(w, "clicked",
 		     G_CALLBACK(balsa_ab_window_remove_from_recipient_list),
@@ -382,9 +388,6 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_widget_set_size_request(ab->send_to_list, 300, 250);
 
     /* mode switching stuff */
-    frame = gtk_frame_new(_("Treat multiple addresses as:"));
-    gtk_widget_show(frame);
-
     ab->single_address_mode_radio = gtk_radio_button_new_with_label
 	(NULL, _("alternative addresses for the same person"));
     gtk_widget_show(ab->single_address_mode_radio);
@@ -407,13 +410,24 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     /* Pack them into a box  */
     box2 = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
     gtk_box_set_homogeneous(GTK_BOX(box2), TRUE);
-    gtk_container_add(GTK_CONTAINER(frame), box2);
-    gtk_box_pack_start(GTK_BOX(box2), ab->single_address_mode_radio,
-		       FALSE, FALSE, 1);
-    gtk_box_pack_start(GTK_BOX(box2), ab->dist_address_mode_radio,
-		       FALSE, FALSE, 1);
+
+    gtk_widget_set_margin_top(ab->single_address_mode_radio, 1);
+    gtk_widget_set_margin_bottom(ab->single_address_mode_radio, 1);
+    gtk_box_pack_start(GTK_BOX(box2), ab->single_address_mode_radio, FALSE, FALSE, 0);
+
+    gtk_widget_set_margin_top(ab->dist_address_mode_radio, 1);
+    gtk_widget_set_margin_bottom(ab->dist_address_mode_radio, 1);
+    gtk_box_pack_start(GTK_BOX(box2), ab->dist_address_mode_radio, FALSE, FALSE, 0);
+
     gtk_widget_show(box2);
-    gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 1);
+
+    frame = gtk_frame_new(_("Treat multiple addresses as:"));
+    gtk_container_add(GTK_CONTAINER(frame), box2);
+    gtk_widget_show(frame);
+
+    gtk_widget_set_margin_top(frame, 1);
+    gtk_widget_set_margin_bottom(frame, 1);
+    gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 0);
 
     gtk_widget_grab_focus(ab->filter_entry);
 }

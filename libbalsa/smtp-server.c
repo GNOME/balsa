@@ -352,7 +352,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     sdi->big_message = gtk_spin_button_new_with_range(0.1, 100, 0.1);
     gtk_widget_set_hexpand(sdi->big_message, TRUE);
     gtk_widget_set_halign(sdi->big_message, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), sdi->big_message);
+    gtk_box_pack_start(GTK_BOX(hbox), sdi->big_message, FALSE, FALSE, 0);
     label = gtk_label_new(_("MB"));
     gtk_container_add(GTK_CONTAINER(hbox), label);
     if (smtp_server->big_message > 0) {

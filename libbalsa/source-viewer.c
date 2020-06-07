@@ -236,15 +236,15 @@ libbalsa_show_message_source(GtkApplication  * application,
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu(window, GTK_MENU_SHELL(menu_bar));
 #else
+    gtk_widget_set_valign(menu_bar, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(menu_bar, 1);
     gtk_widget_set_margin_bottom(menu_bar, 1);
-    gtk_container_add(GTK_CONTAINER(vbox), menu_bar);
+    gtk_box_pack_start(GTK_BOX(vbox), menu_bar, FALSE, FALSE, 0);
 #endif
 
     gtk_widget_set_vexpand(interior, TRUE);
     gtk_widget_set_valign(interior, GTK_ALIGN_FILL);
-    g_object_set(interior, "margin", 2, NULL);
-    gtk_container_add(GTK_CONTAINER(vbox), interior);
+    gtk_box_pack_start(GTK_BOX(vbox), interior, FALSE, FALSE, 0);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);

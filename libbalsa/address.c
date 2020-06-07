@@ -986,9 +986,11 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
             GtkWidget *tree_view;
 
             entries[cnt] = lba_addr_list_widget(changed_cb, changed_data);
-            g_object_set(label, "margin", 1, NULL);
+            gtk_widget_set_margin_top(label, 1);
+            gtk_widget_set_margin_bottom(label, 1);
             gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
-            g_object_set(but, "margin", 1, NULL);
+            gtk_widget_set_margin_top(but, 1);
+            gtk_widget_set_margin_bottom(but, 1);
             gtk_box_pack_start(GTK_BOX(box), but,   FALSE, FALSE, 0);
             lhs = box;
             tree_view = gtk_frame_get_child(GTK_FRAME(entries[cnt]));

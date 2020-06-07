@@ -550,8 +550,7 @@ bm_find_bar_new(BalsaMessage * balsa_message)
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Find:")),
-                       FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Find:")), FALSE, FALSE, 0);
     balsa_message->find_entry = gtk_search_entry_new();
     g_signal_connect(balsa_message->find_entry, "search-changed",
                      G_CALLBACK(bm_find_entry_changed_cb), balsa_message);
@@ -891,7 +890,10 @@ balsa_message_init(BalsaMessage * balsa_message)
     gtk_stack_set_transition_type(stack,
                                   GTK_STACK_TRANSITION_TYPE_SLIDE_UP_DOWN);
     gtk_stack_switcher_set_stack(GTK_STACK_SWITCHER(balsa_message->switcher), stack);
-    gtk_box_pack_start(GTK_BOX(balsa_message), balsa_message->stack, TRUE, TRUE, 0);
+
+    gtk_widget_set_vexpand(balsa_message->stack, TRUE);
+    gtk_widget_set_valign(balsa_message->stack, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(balsa_message), balsa_message->stack);
 
     /* Box to hold the scrolled window and the find bar */
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -907,7 +909,9 @@ balsa_message_init(BalsaMessage * balsa_message)
     g_signal_connect(key_controller, "key-pressed",
 		     G_CALLBACK(balsa_mime_widget_key_pressed), balsa_message);
 
-    gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(scroll, TRUE);
+    gtk_widget_set_valign(scroll, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(vbox), scroll);
 
     /* Widget to hold headers */
     buttons = bm_header_tl_buttons(balsa_message);
@@ -2299,7 +2303,8 @@ add_part(BalsaMessage * balsa_message, BalsaPartInfo * info, GtkWidget * contain
     if (info->mime_widget == NULL)
 	part_info_init(balsa_message, info);
 
-    gtk_box_pack_start(GTK_BOX(container), GTK_WIDGET(info->mime_widget), FALSE, TRUE, 0);
+    gtk_widget_set_valign(GTK_WIDGET(info->mime_widget), TRUE);
+    gtk_box_pack_start(GTK_BOX(container), GTK_WIDGET(info->mime_widget), FALSE, FALSE, 0);
 
     info_container = balsa_mime_widget_get_container(info->mime_widget);
     body = add_multipart(balsa_message, info->body,

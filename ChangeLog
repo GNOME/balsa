@@ -209,6 +209,22 @@
 
 	Various: Stop using GtkBox padding, fill and expand child properties
 
+	* src/ab-main.c (bab_get_filter_box), (bab_window_new):
+	* src/ab-window.c (balsa_ab_window_init):
+	* src/balsa-mblist.c (bmbl_mru_show_tree):
+	* src/balsa-message.c (bm_find_bar_new), (balsa_message_init),
+	(add_part):
+	* src/balsa-mime-widget-crypto.c
+	(balsa_mime_widget_signature_widget), (create_import_keys_widget):
+	* src/balsa-mime-widget-message.c (bmw_message_extbody_url),
+	(bmw_message_extbody_mail), (balsa_mime_widget_new_message_tl),
+	(bm_header_widget_new):
+	* src/balsa-mime-widget.c (balsa_mime_widget_new_unknown):
+
+2020-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Stop using GtkBox padding, fill and expand child properties
+
 	* libinit_balsa/assistant_page_defclient.c
 	(balsa_druid_page_defclient_init):
 	* libinit_balsa/assistant_page_directory.c

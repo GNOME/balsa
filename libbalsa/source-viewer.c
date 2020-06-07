@@ -244,7 +244,8 @@ libbalsa_show_message_source(GtkApplication  * application,
 
     gtk_widget_set_vexpand(interior, TRUE);
     gtk_widget_set_valign(interior, GTK_ALIGN_FILL);
-    gtk_box_pack_start(GTK_BOX(vbox), interior, FALSE, FALSE, 0);
+    g_object_set(interior, "margin", 2, NULL);
+    gtk_container_add(GTK_CONTAINER(vbox), interior);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);

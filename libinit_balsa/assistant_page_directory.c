@@ -301,9 +301,8 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
         g_free(preset);
     }
 
-    gtk_widget_set_vexpand(GTK_WIDGET(grid), TRUE);
     gtk_widget_set_valign(GTK_WIDGET(grid), GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(grid));
+    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(grid), FALSE, FALSE, 0);
     gtk_widget_show_all(GTK_WIDGET(grid));
 
     gtk_container_add(GTK_CONTAINER(page), verify_button(dir));

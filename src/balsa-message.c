@@ -550,7 +550,7 @@ bm_find_bar_new(BalsaMessage * balsa_message)
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_container_add(GTK_CONTAINER(hbox), gtk_label_new(_("Find:")));
+    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Find:")), FALSE, FALSE, 0);
     balsa_message->find_entry = gtk_search_entry_new();
     g_signal_connect(balsa_message->find_entry, "search-changed",
                      G_CALLBACK(bm_find_entry_changed_cb), balsa_message);
@@ -2303,7 +2303,8 @@ add_part(BalsaMessage * balsa_message, BalsaPartInfo * info, GtkWidget * contain
     if (info->mime_widget == NULL)
 	part_info_init(balsa_message, info);
 
-    gtk_container_add(GTK_CONTAINER(container), GTK_WIDGET(info->mime_widget));
+    gtk_widget_set_valign(GTK_WIDGET(info->mime_widget), TRUE);
+    gtk_box_pack_start(GTK_BOX(container), GTK_WIDGET(info->mime_widget), FALSE, FALSE, 0);
 
     info_container = balsa_mime_widget_get_container(info->mime_widget);
     body = add_multipart(balsa_message, info->body,

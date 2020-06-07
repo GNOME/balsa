@@ -130,11 +130,13 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     	GtkWidget *hbox;
         GtkWidget *button;
 
-        hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
+        hbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+        gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_EXPAND);
+        gtk_box_set_spacing(GTK_BOX(hbox), BMW_HBOX_SPACE);
+
         gtk_widget_set_vexpand(hbox, TRUE);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-        gtk_container_add(GTK_CONTAINER(vbox), hbox);
-
+        gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
         if (g_mime_gpgme_sigstat_status(mime_body->sig_info) == GPG_ERR_NO_PUBKEY) {
 #ifdef ENABLE_AUTOCRYPT
         	GBytes *autocrypt_key;
@@ -162,6 +164,10 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         g_signal_connect(button, "clicked",
                          G_CALLBACK(on_gpg_key_button),
                          (gpointer) g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info));
+
+        gtk_widget_set_hexpand(button, TRUE);
+        gtk_widget_set_halign(button, GTK_ALIGN_FILL);
+        gtk_container_add(GTK_CONTAINER(hbox), button);
     }
 
     /* Hack alert: if we omit the box below and use the expander as signature widget
@@ -372,7 +378,7 @@ create_import_keys_widget(BalsaMimeWidget *mw, const gchar *key_buf, GError **er
                                                                               BMW_VBOX_SPACE);
                                                     gtk_widget_set_margin_bottom(separator,
                                                                                  BMW_VBOX_SPACE);
-                                                    gtk_container_add(GTK_CONTAINER(mw), separator);
+                                                    gtk_box_pack_start(box, separator, FALSE, FALSE, 0);
 						}
 					}
 				}

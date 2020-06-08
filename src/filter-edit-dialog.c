@@ -219,7 +219,7 @@ build_left_side(void)
     /* new and delete buttons */
     bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 
-    gtk_container_add(GTK_CONTAINER(vbox), bbox);
+    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
 
     /* new button */
     /* Translators: button "New" filter */
@@ -284,7 +284,7 @@ build_match_page()
                      G_CALLBACK(fe_action_changed), NULL);
     gtk_widget_set_margin_top(fe_op_codes_option_menu, 2);
     gtk_widget_set_margin_bottom(fe_op_codes_option_menu, 2);
-    gtk_container_add(GTK_CONTAINER(box), fe_op_codes_option_menu);
+    gtk_box_pack_start(GTK_BOX(box), fe_op_codes_option_menu, FALSE, FALSE, 0);
 
     /* list of conditions defining how this filter matches */
 
@@ -595,11 +595,15 @@ filters_edit_dialog(GtkWindow * parent)
 
     /* main hbox */
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, FILTER_EDIT_PADDING);
-    gtk_widget_set_vexpand(hbox, TRUE);
-    gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_widget_set_margin_top(hbox, FILTER_EDIT_PADDING);
-    gtk_widget_set_margin_bottom(hbox, FILTER_EDIT_PADDING);
-    gtk_container_add(GTK_CONTAINER(content_area), hbox);
+    gtk_widget_set_hexpand(hbox, TRUE);
+    gtk_widget_set_halign(hbox, GTK_ALIGN_FILL);
+    gtk_widget_set_margin_start(hbox, FILTER_EDIT_PADDING);
+    gtk_widget_set_margin_end(hbox, FILTER_EDIT_PADDING);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(fe_window))), hbox);
+
+    gtk_widget_set_margin_start(piece, FILTER_EDIT_PADDING);
+    gtk_widget_set_margin_end(piece, FILTER_EDIT_PADDING);
+    gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE, 0);
 
     gtk_widget_set_hexpand(piece, FALSE);
     gtk_widget_set_margin_start(piece, FILTER_EDIT_PADDING);
@@ -616,7 +620,7 @@ filters_edit_dialog(GtkWindow * parent)
     gtk_widget_set_halign(fe_right_page, GTK_ALIGN_FILL);
     gtk_widget_set_margin_start(fe_right_page, FILTER_EDIT_PADDING);
     gtk_widget_set_margin_end(fe_right_page, FILTER_EDIT_PADDING);
-    gtk_container_add(GTK_CONTAINER(hbox), fe_right_page);
+    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, FALSE, FALSE, 0);
 
     fe_user_headers_list = NULL;
 

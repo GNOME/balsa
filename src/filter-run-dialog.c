@@ -312,12 +312,12 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     gtk_widget_set_vexpand(hbox, TRUE);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(content_area), hbox);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(p))), hbox);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
 
     p->available_filters =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
@@ -340,10 +340,12 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_container_add(GTK_CONTAINER(vbox), sw);
 
     /* To keep a consistent look, make a button box for a single button. */
-    bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
+    bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_set_spacing(GTK_BOX(bbox), 2);
+    gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
     gtk_widget_set_margin_top(bbox, 2);
     gtk_widget_set_margin_bottom(bbox, 2);
-    gtk_container_add(GTK_CONTAINER(vbox), bbox);
+    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
 
     /* "Apply selected" button */
     p->apply_selected_button = button =
@@ -388,7 +390,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox),vbox);
+    gtk_box_pack_start(GTK_BOX(hbox),vbox, FALSE, FALSE, 0);
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
@@ -414,7 +416,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     gtk_widget_set_margin_top(bbox, 2);
     gtk_widget_set_margin_bottom(bbox, 2);
-    gtk_container_add(GTK_CONTAINER(vbox), bbox);
+    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
 
     /* up button */
     p->move_up_button = button =

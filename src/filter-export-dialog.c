@@ -98,7 +98,7 @@ filters_export_dialog(GtkWindow * parent)
     gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(sw, 2);
     gtk_widget_set_margin_bottom(sw, 2);
-    gtk_container_add(GTK_CONTAINER(content_area), sw);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(fex_window))), sw);
 
     /* Populate the list of filters */
 

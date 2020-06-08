@@ -1069,16 +1069,25 @@ build_type_notebook()
                      box,
                      0, 5, 4, 5,
                      GTK_FILL | GTK_SHRINK | GTK_EXPAND, GTK_SHRINK, 2, 2);
+
     button = gtk_button_new_with_mnemonic(_("A_dd"));
-    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_widget_set_halign(button, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
     g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_add_pressed), NULL);
+
     fe_regex_remove_button = gtk_button_new_with_mnemonic(_("_Remove"));
-    gtk_box_pack_start(GTK_BOX(box), fe_regex_remove_button, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(fe_regex_remove_button, TRUE);
+    gtk_widget_set_halign(fe_regex_remove_button, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(box), fe_regex_remove_button, FALSE, FALSE, 0);
     g_signal_connect(fe_regex_remove_button, "clicked",
                      G_CALLBACK(fe_remove_pressed), NULL);
+
     button = gtk_button_new_with_mnemonic(_("One _Matches/None Matches"));
-    gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_widget_set_halign(button, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
     g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
 
@@ -1090,7 +1099,9 @@ build_type_notebook()
 #else                   /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
     msg = _("Filtering using regular expressions is not yet implemented.");
     label = gtk_label_new(msg);
-    gtk_box_pack_start(GTK_BOX(box), label, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(label, TRUE);
+    gtk_widget_set_halign(label, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
 #endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
     /* The date page of the notebook */
@@ -1176,21 +1187,35 @@ void build_condition_dialog(GtkWidget * condition_dialog)
     /* builds the toggle buttons to specify fields concerned by the
      * conditions of the filter */
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+
     label = gtk_label_new_with_mnemonic(_("Search T_ype:"));
-    gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 5);
-    fe_search_option_menu = 
+    gtk_widget_set_margin_start(label, 5);
+    gtk_widget_set_margin_end(label, 5);
+    gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
+
+    fe_search_option_menu =
         fe_build_option_menu(fe_search_type, G_N_ELEMENTS(fe_search_type),
                              G_CALLBACK(fe_typesmenu_cb), field_frame);
-    gtk_box_pack_start(GTK_BOX(box), fe_search_option_menu, FALSE, FALSE, 5);
+    gtk_widget_set_margin_start(fe_search_option_menu, 5);
+    gtk_widget_set_margin_end(fe_search_option_menu, 5);
+    gtk_box_pack_start(GTK_BOX(box), fe_search_option_menu, FALSE, FALSE, 0);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), fe_search_option_menu);
 
     content_box =
         GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(condition_dialog)));
-    gtk_box_pack_start(content_box, box, FALSE, FALSE, 2);
-    gtk_box_pack_start(content_box, field_frame, FALSE, FALSE, 2);
+
+    gtk_widget_set_margin_top(box, 2);
+    gtk_widget_set_margin_bottom(box, 2);
+    gtk_box_pack_start(content_box, box, FALSE, FALSE, 0);
+
+    gtk_widget_set_margin_top(field_frame, 2);
+    gtk_widget_set_margin_bottom(field_frame, 2);
+    gtk_box_pack_start(content_box, field_frame, FALSE, FALSE, 0);
 
     build_type_notebook();
-    gtk_box_pack_start(content_box, fe_type_notebook, FALSE, FALSE, 2);
+    gtk_widget_set_margin_top(fe_type_notebook, 2);
+    gtk_widget_set_margin_bottom(fe_type_notebook, 2);
+    gtk_box_pack_start(content_box, fe_type_notebook, FALSE, FALSE, 0);
 }
 
 /*

@@ -599,6 +599,15 @@
 	values;
 	* src/filter-run-dialog.c (balsa_filter_run_dialog_new): call
 	prepare-threading to get ready for filtering.
+	Various: Stop using GtkBox padding, fill and expand child properties
+
+	* src/filter-edit-callbacks.c (build_type_notebook),
+	(build_condition_dialog):
+	* src/filter-edit-dialog.c (build_left_side), (build_match_page),
+	(build_action_page), (build_right_side), (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/filter-run-dialog.c (available_list_selection_changed),
+	(selected_list_selection_changed), (balsa_filter_run_dialog_init):
 
 2020-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
 

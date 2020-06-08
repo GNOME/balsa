@@ -90,11 +90,13 @@ filters_export_dialog(GtkWindow * parent)
     list =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
                                  NULL, TRUE);
-
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(list));
-    gtk_box_pack_start(GTK_BOX
-                       (gtk_dialog_get_content_area(GTK_DIALOG(fex_window))),
-                       sw, TRUE, TRUE, 2);
+
+    gtk_widget_set_vexpand(sw, TRUE);
+    gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
+    gtk_widget_set_margin_top(sw, 2);
+    gtk_widget_set_margin_bottom(sw, 2);
+    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(fex_window))), sw);
 
     /* Populate the list of filters */
 

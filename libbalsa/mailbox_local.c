@@ -846,6 +846,8 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
         lbm_local_cache_message(local, msgno, message);
         entry = libbalsa_mailbox_get_index_entry(mailbox, msgno);
         info  = g_ptr_array_index(priv->threading_info, msgno - 1);
+        if (entry == NULL || info == NULL)
+            return FALSE;
     }
 
     if (entry->idle_pending)

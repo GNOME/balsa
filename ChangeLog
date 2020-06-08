@@ -1,3 +1,13 @@
+2020-06-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Do not crash when selecting "Apply selected" when the mailbox is
+	not being viewed in the main window.
+
+	* libbalsa/mailbox_local.c (message_match_real): check for NULL
+	values;
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_new): call
+	prepare-threading to get ready for filtering.
+
 2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-message: Do not crash

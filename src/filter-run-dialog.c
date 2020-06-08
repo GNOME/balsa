@@ -171,6 +171,7 @@ balsa_filter_run_dialog_new(LibBalsaMailbox *mbox,
     /* We set the dialog title */
     p->mbox = mbox;
     libbalsa_mailbox_open(p->mbox, NULL);
+    libbalsa_mailbox_prepare_threading(p->mbox, 0);
     dialog_title = g_strconcat(_("Filters of Mailbox: "),
                                libbalsa_mailbox_get_name(p->mbox), NULL);
     gtk_window_set_title(GTK_WINDOW(p), dialog_title);

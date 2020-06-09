@@ -899,7 +899,9 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 	mw_disable_trash(mw);
     mw->bmessage = balsa_message_new();
 
-    gtk_box_pack_start(GTK_BOX(vbox), mw->bmessage, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(mw->bmessage, TRUE);
+    gtk_widget_set_valign(mw->bmessage, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(vbox), mw->bmessage);
     gtk_widget_show(vbox);
 
     g_signal_connect(mw->bmessage, "select-part",

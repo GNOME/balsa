@@ -832,8 +832,12 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
     gboolean is_refed = FALSE;
     LibBalsaMailboxIndexEntry *entry =
         libbalsa_mailbox_get_index_entry(mailbox, msgno);
-    LibBalsaMailboxLocalInfo *info =
-        msgno > 0 && msgno <= priv->threading_info->len ?
+    LibBalsaMailboxLocalInfo *info;
+
+    if (priv->threading_info == NULL)
+        return FALSE;
+
+    info = (msgno > 0 && msgno <= priv->threading_info->len) ?
         g_ptr_array_index(priv->threading_info, msgno - 1) : NULL;
 
     /* We may be able to match the msgno from info cached in entry or

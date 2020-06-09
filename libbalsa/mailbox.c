@@ -168,6 +168,8 @@ struct _LibBalsaMailboxPrivate {
     gboolean msg_tree_changed : 1;
     /* Whether messages have been threaded. */
     gboolean messages_threaded : 1;
+    /* Whether a message should be cached. */
+    gboolean must_cache_message : 1;
 };
 
 #define LBM_GET_INDEX_ENTRY(priv, msgno) \
@@ -811,6 +813,7 @@ libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
                                guint msgno,
                                LibBalsaMailboxSearchIter * search_iter)
 {
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     gboolean match;
 
     g_return_val_if_fail(mailbox != NULL, FALSE);
@@ -822,9 +825,11 @@ libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
                                         mailbox, msgno, &match))
         return match;
 
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match(mailbox,
-                                                              msgno,
-                                                              search_iter);
+    priv->must_cache_message = TRUE;
+    match = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match(mailbox, msgno, search_iter);
+    priv->must_cache_message = FALSE;
+
+    return match;
 }
 
 gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox  *mailbox,
@@ -2008,7 +2013,10 @@ lbm_cache_message(LibBalsaMailbox * mailbox, guint msgno,
     gboolean need_sort;
 
     /* Do we need to cache the message info? */
-    if (priv->mindex == NULL || priv->view == NULL || priv->view->position < 0)
+    if (priv->mindex == NULL)
+        return;
+
+    if ((priv->view == NULL || priv->view->position < 0) && !priv->must_cache_message)
         return;
 
     if (priv->mindex->len < msgno)

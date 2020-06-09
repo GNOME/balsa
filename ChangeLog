@@ -1,3 +1,17 @@
+2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: restore filtering in a mailbox that is not currently
+	being viewed.
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_message_match),
+	(lbm_cache_message): make sure we cache message info when we need it
+	for matching;
+	* libbalsa/mailbox_local.c (message_match_real): guard against
+	NULL threading-info;
+	* src/filter-run-dialog.c (available_list_selection_changed),
+	(selected_list_selection_changed): no need to disable the
+	"Apply" buttons when the mailbox is not being viewed.
+
 2020-06-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	filter-run-dialog: Disable "Apply selected" and "Apply now" when

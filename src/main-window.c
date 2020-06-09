@@ -2847,9 +2847,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
                             libbalsa_mailbox_get_unread(balsa_mailbox_node_get_mailbox(mbnode)) > 0);
     g_signal_connect_object(balsa_mailbox_node_get_mailbox(mbnode), "changed",
                             G_CALLBACK(bw_mailbox_changed), lab, 0);
-    gtk_widget_set_hexpand(lab, TRUE);
-    gtk_widget_set_halign(lab, GTK_ALIGN_FILL);
-    gtk_box_pack_start(GTK_BOX(box), lab, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(box), lab);
 
     but = gtk_button_new();
     gtk_widget_set_focus_on_click(but, FALSE);

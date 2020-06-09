@@ -569,6 +569,16 @@
 
 	Various: Stop using GtkBox padding, fill and expand child properties
 
+	* src/main-window.c (bw_notebook_label_new): use container-add
+	instead of box-pack, to avoid ridiculously wide tabs;
+	* src/sendmsg-window.c (sw_get_user_codeset),
+	(quote_parts_select_dlg), (subject_not_empty),
+	(sendmsg_window_new):
+
+2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Stop using GtkBox padding, fill and expand child properties
+
 	* src/message-window.c:
 
 2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>

@@ -218,21 +218,13 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 				/* if the signature is invalid, the fingerprint only the end of the subkey's fingerprint */
 				offs = strlen(subkey->fpr) - fingerprint_len;
 				if (strcmp(fingerprint, &subkey->fpr[offs]) == 0) {
-                                    GtkWidget *subkey_widget = create_subkey_widget(subkey);
-
-                                    gtk_widget_set_margin_top(subkey_widget, 2);
-                                    gtk_widget_set_margin_bottom(subkey_widget, 2);
-                                    gtk_container_add(GTK_CONTAINER(subkey_box), subkey_widget);
+					gtk_box_pack_end(GTK_BOX(subkey_box), create_subkey_widget(subkey), FALSE, FALSE, 0);
 				}
 			} else if ((((subkey_capa & GPG_SUBKEY_CAP_SIGN) != 0U) && (subkey->can_sign != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_ENCRYPT) != 0U) && (subkey->can_encrypt != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_CERTIFY) != 0U) && (subkey->can_certify != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_AUTH) != 0U) && (subkey->can_authenticate != 0))) {
-                            GtkWidget *subkey_widget = create_subkey_widget(subkey);
-
-                            gtk_widget_set_margin_top(subkey_widget, 2);
-                            gtk_widget_set_margin_bottom(subkey_widget, 2);
-                            gtk_container_add(GTK_CONTAINER(subkey_box), subkey_widget);
+				gtk_box_pack_end(GTK_BOX(subkey_box), create_subkey_widget(subkey), FALSE, FALSE, 0);
 			} else {
 				/* do not print this subkey */
 			}
@@ -413,9 +405,11 @@ libbalsa_key_dialog(GtkWindow            *parent,
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
+        gtk_widget_set_hexpand(hbox, TRUE);
         gtk_widget_set_vexpand(hbox, TRUE);
+        gtk_widget_set_halign(hbox, GTK_ALIGN_FILL);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-	gtk_container_add(GTK_CONTAINER(content_area), hbox);
+	gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), hbox, FALSE, FALSE, 0);
 	gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
 
 	/* standard key icon; "application-certificate" would be an alternative... */
@@ -426,7 +420,7 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
         gtk_widget_set_hexpand(vbox, TRUE);
         gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-	gtk_container_add(GTK_CONTAINER(hbox), vbox);
+	gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
 	gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
 
 	if (message1 != NULL) {
@@ -447,8 +441,6 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	scrolledw = gtk_scrolled_window_new(NULL, NULL);
         gtk_widget_set_vexpand(scrolledw, TRUE);
         gtk_widget_set_valign(scrolledw, GTK_ALIGN_FILL);
-        gtk_widget_set_margin_top(scrolledw, 6);
-        gtk_widget_set_margin_bottom(scrolledw, 6);
 	gtk_container_add(GTK_CONTAINER(vbox), scrolledw);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledw), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scrolledw), 120);
@@ -625,7 +617,7 @@ create_key_label_with_warn(const gchar *text,
 		gtk_label_set_selectable(GTK_LABEL(label), TRUE);
 		gtk_widget_set_hexpand(label, TRUE);
                 gtk_widget_set_halign(label, GTK_ALIGN_FILL);
-		gtk_container_add(GTK_CONTAINER(result), label);
+		gtk_box_pack_start(GTK_BOX(result), label, FALSE, FALSE, 0U);
 	} else {
 		result = libbalsa_create_wrap_label(text, FALSE);
 		gtk_widget_set_hexpand(result, TRUE);
@@ -654,8 +646,7 @@ create_subkey_widget(gpgme_subkey_t subkey)
 
 	subkey_grid = gtk_grid_new();
 	gtk_grid_set_column_spacing(GTK_GRID(subkey_grid), 6);
-        gtk_widget_set_margin_top(subkey_grid, 2);
-        gtk_widget_set_margin_bottom(subkey_grid, 2);
+        g_object_set(subkey_grid, "margin", 2, NULL);
 
 	/* print a warning for a bad subkey status */
 	details_str = create_status_str(subkey->expired != 0U, subkey->revoked != 0U, subkey->disabled != 0U, subkey->invalid != 0U);
@@ -789,9 +780,8 @@ smime_show_chain(GtkWidget *button, gpointer G_GNUC_UNUSED user_data)
 	vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
         gtk_widget_set_vexpand(chain, TRUE);
         gtk_widget_set_valign(chain, GTK_ALIGN_FILL);
-        gtk_widget_set_margin_top(chain, 6);
-        gtk_widget_set_margin_bottom(chain, 6);
-	gtk_container_add(GTK_CONTAINER(vbox), chain);
+        g_object_set(chain, "margin", 6, NULL);
+	gtk_box_pack_start(GTK_BOX(vbox), chain, FALSE, FALSE, 0);
 
 	gtk_widget_show_all(vbox);
 	gtk_dialog_run(GTK_DIALOG(dialog));

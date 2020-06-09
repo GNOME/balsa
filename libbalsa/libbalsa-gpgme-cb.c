@@ -219,11 +219,13 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
    	}
     label = libbalsa_create_wrap_label(prompt, FALSE);
     g_free(prompt);
-    gtk_container_add(GTK_CONTAINER(vbox), label);
+    gtk_widget_set_valign(label, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
 
     label = gtk_label_new(_("Double-click key to show details"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_container_add(GTK_CONTAINER(vbox), label);
+    gtk_widget_set_valign(label, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW

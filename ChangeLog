@@ -723,6 +723,18 @@
 	* libbalsa/autocrypt.c (autocrypt_db_dialog_run):
 	* libbalsa/html.c (libbalsa_html_new):
 
+2020-06-07  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Stop using GtkBox padding, fill and expand child properties
+
+	* libbalsa/identity.c (libbalsa_identity_select_dialog),
+	(libbalsa_identity_config_dialog):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key):
+	* libbalsa/libbalsa-gpgme-widgets.c (libbalsa_gpgme_key),
+	(libbalsa_key_dialog), (create_key_label_with_warn),
+	(create_subkey_widget), (smime_show_chain):
+	* libbalsa/libbalsa.c (ask_cert_real):
+
 2020-06-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Various: Stop using GtkBox padding, fill and expand child properties

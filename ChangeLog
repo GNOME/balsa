@@ -1,5 +1,16 @@
 2020-06-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	filter-run-dialog: Disable "Apply selected" and "Apply now" when
+	the mailbox is not currently being viewed in the main window. It
+	no longer crashes, because of the previous commit, but it does
+	not actually carry out any filters, so the user should see the
+	option as disabled.
+
+	* src/filter-run-dialog.c (available_list_selection_changed),
+	(selected_list_selection_changed):
+
+2020-06-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Do not crash when selecting "Apply selected" when the mailbox is
 	not being viewed in the main window.
 

@@ -248,9 +248,12 @@ available_list_selection_changed(GtkTreeSelection *selection,
 {
     BalsaFilterRunDialog *p = user_data;
     gboolean selected;
+    gboolean viewing;
 
     selected = gtk_tree_selection_count_selected_rows(selection) > 0;
-    gtk_widget_set_sensitive(p->apply_selected_button, selected);
+    viewing = balsa_find_notebook_page_num(p->mbox) >= 0;
+
+    gtk_widget_set_sensitive(p->apply_selected_button, selected && viewing);
     gtk_widget_set_sensitive(p->add_button, selected);
 }
 
@@ -261,9 +264,12 @@ selected_list_selection_changed(GtkTreeSelection *selection,
 {
     BalsaFilterRunDialog *p = user_data;
     gboolean selected;
+    gboolean viewing;
 
     selected = gtk_tree_selection_count_selected_rows(selection) > 0;
-    gtk_widget_set_sensitive(p->apply_now_button, selected);
+    viewing = balsa_find_notebook_page_num(p->mbox) >= 0;
+
+    gtk_widget_set_sensitive(p->apply_now_button, selected && viewing);
     gtk_widget_set_sensitive(p->remove_button, selected);
     gtk_widget_set_sensitive(p->move_up_button, selected);
     gtk_widget_set_sensitive(p->move_down_button, selected);

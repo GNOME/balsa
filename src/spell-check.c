@@ -319,7 +319,9 @@ balsa_spell_check_init(BalsaSpellCheck *spell_check)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(box, sw, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(sw, TRUE);
+    gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(box), sw);
 
     /* setup suggestion list */
     store  = gtk_list_store_new(1, G_TYPE_STRING);

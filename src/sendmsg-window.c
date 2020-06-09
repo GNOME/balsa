@@ -1518,8 +1518,17 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
 
     g_free(msg);
     content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
-    gtk_box_pack_start(content_box, info, FALSE, TRUE, 5);
-    gtk_box_pack_start(content_box, charset_button, TRUE, TRUE, 5);
+
+    gtk_widget_set_margin_top(info, 5);
+    gtk_widget_set_margin_bottom(info, 5);
+    gtk_container_add(GTK_CONTAINER(content_box), info);
+
+    gtk_widget_set_vexpand(charset_button, TRUE);
+    gtk_widget_set_valign(charset_button, GTK_ALIGN_FILL);
+    gtk_widget_set_margin_top(charset_button, 5);
+    gtk_widget_set_margin_bottom(charset_button, 5);
+    gtk_container_add(GTK_CONTAINER(content_box), charset_button);
+
     gtk_widget_show(info);
     gtk_widget_show(charset_button);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
@@ -1529,8 +1538,16 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
         GtkWidget *hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
         combo_box = gtk_combo_box_text_new();
 
-        gtk_box_pack_start(content_box, hbox, TRUE, TRUE, 5);
-        gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 0);
+        gtk_widget_set_vexpand(hbox, TRUE);
+        gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
+        gtk_widget_set_margin_top(hbox, 5);
+        gtk_widget_set_margin_bottom(hbox, 5);
+        gtk_container_add(GTK_CONTAINER(content_box), hbox);
+
+        gtk_widget_set_hexpand(label, TRUE);
+        gtk_widget_set_halign(label, GTK_ALIGN_FILL);
+        gtk_container_add(GTK_CONTAINER(hbox), label);
+
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
                                        mime_type);
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
@@ -1539,7 +1556,11 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
         g_signal_connect(combo_box, "changed",
                          G_CALLBACK(sw_charset_combo_box_changed),
                          charset_button);
-        gtk_box_pack_start(GTK_BOX(hbox), combo_box, TRUE, TRUE, 0);
+
+        gtk_widget_set_hexpand(combo_box, TRUE);
+        gtk_widget_set_halign(combo_box, GTK_ALIGN_FILL);
+        gtk_container_add(GTK_CONTAINER(hbox), combo_box);
+
         gtk_widget_show_all(hbox);
     }
 
@@ -3366,9 +3387,15 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
 
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+
+    gtk_widget_set_hexpand(vbox, TRUE);
+    gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+
     content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
-    gtk_box_pack_start(content_box, hbox, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(hbox, TRUE);
+    gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
+    gtk_box_pack_start(content_box, hbox, FALSE, FALSE, 0);
 
     if (stats->decrypted > 0U) {
     	GtkWidget *warning;
@@ -3400,7 +3427,9 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(GTK_BOX(vbox), scroll, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(scroll, TRUE);
+    gtk_widget_set_valign(scroll, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(vbox), scroll);
 
     /* add the tree view */
     tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(tree_store));
@@ -5092,7 +5121,9 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     dialog_vbox = gtk_dialog_get_content_area(GTK_DIALOG(no_subj_dialog));
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-    gtk_box_pack_start (GTK_BOX (dialog_vbox), hbox, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(hbox, TRUE);
+    gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(dialog_vbox), hbox, FALSE, FALSE, 0);
     gtk_container_set_border_width (GTK_CONTAINER (hbox), 6);
 
     image = gtk_image_new_from_icon_name("dialog-question",
@@ -5101,7 +5132,9 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     gtk_widget_set_valign(image, GTK_ALIGN_START);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-    gtk_box_pack_start (GTK_BOX (hbox), vbox, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(vbox, TRUE);
+    gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
 
     text_str = g_strdup_printf("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
 			       _("You did not specify a subject for this message"),
@@ -5119,7 +5152,10 @@ subject_not_empty(BalsaSendmsg * bsmsg)
 
     subj_entry = gtk_entry_new ();
     gtk_entry_set_text(GTK_ENTRY(subj_entry), _("(no subject)"));
-    gtk_box_pack_start (GTK_BOX (hbox), subj_entry, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(subj_entry, TRUE);
+    gtk_widget_set_halign(subj_entry, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(hbox), subj_entry);
+
     gtk_entry_set_activates_default (GTK_ENTRY (subj_entry), TRUE);
     gtk_dialog_set_default_response(GTK_DIALOG (no_subj_dialog),
                                     GTK_RESPONSE_OK);
@@ -6910,7 +6946,9 @@ sendmsg_window_new()
     /* Paned window for the addresses at the top, and the content at the
      * bottom: */
     bsmsg->paned = paned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
-    gtk_box_pack_start(GTK_BOX(main_box), paned, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(paned, TRUE);
+    gtk_widget_set_valign(paned, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(main_box), paned);
     gtk_widget_show(paned);
 
     /* create the top portion with the to, from, etc in it */

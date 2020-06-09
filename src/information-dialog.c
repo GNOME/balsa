@@ -256,10 +256,14 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 				       (scrolled_window),
 				       GTK_POLICY_AUTOMATIC,
 				       GTK_POLICY_AUTOMATIC);
-        gtk_box_pack_start(GTK_BOX
+        gtk_widget_set_vexpand(scrolled_window, TRUE);
+        gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
+        gtk_widget_set_margin_top(scrolled_window, 1);
+        gtk_widget_set_margin_bottom(scrolled_window, 1);
+        gtk_container_add(GTK_CONTAINER
                            (gtk_dialog_get_content_area
                             (GTK_DIALOG(information_dialog))),
-                           scrolled_window, TRUE, TRUE, 1);
+                           scrolled_window);
 	gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 6);
 	gtk_widget_show(scrolled_window);
 

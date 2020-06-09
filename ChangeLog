@@ -351,6 +351,15 @@
 
 	Various: Stop using GtkBox padding, fill and expand child properties
 
+	* src/spell-check.c (balsa_spell_check_init):
+	* src/store-address.c (store_address_dialog),
+	(store_address_book_frame):
+	* src/toolbar-prefs.c (customize_dialog_cb), (create_toolbar_page):
+
+2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Stop using GtkBox padding, fill and expand child properties
+
 	* src/main-window.c (bw_notebook_label_new): use container-add
 	instead of box-pack, to avoid ridiculously wide tabs;
 	* src/sendmsg-window.c (sw_get_user_codeset),

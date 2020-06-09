@@ -1499,7 +1499,7 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
 #endif
 
     g_free(msg);
-    content_box = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
 
     gtk_widget_set_margin_top(info, 5);
     gtk_widget_set_margin_bottom(info, 5);
@@ -3380,17 +3380,17 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
 
-    gtk_container_add(GTK_CONTAINER(vbox), label);
-    gtk_container_add(GTK_CONTAINER(hbox), image);
+    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
 
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
 
-    content_box = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
     gtk_widget_set_vexpand(hbox, TRUE);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(content_box), hbox);
+    gtk_box_pack_start(content_box, hbox, FALSE, FALSE, 0);
 
     if (stats->decrypted > 0U) {
     	GtkWidget *warning;
@@ -5147,7 +5147,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_widget_set_vexpand(hbox, TRUE);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(dialog_vbox), hbox);
+    gtk_box_pack_start(GTK_BOX(dialog_vbox), hbox, FALSE, FALSE, 0);
     gtk_container_set_border_width (GTK_CONTAINER (hbox), 6);
 
     image = gtk_image_new_from_icon_name("dialog-question",
@@ -5158,7 +5158,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
 
     text_str = g_strdup_printf("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
 			       _("You did not specify a subject for this message"),

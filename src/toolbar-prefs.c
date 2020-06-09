@@ -141,7 +141,9 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     notebook = gtk_notebook_new();
     content_area =
         gtk_dialog_get_content_area(GTK_DIALOG(customize_widget));
-    gtk_box_pack_start(GTK_BOX(content_area), notebook, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(notebook, TRUE);
+    gtk_widget_set_valign(notebook, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(content_area), notebook);
 
     gtk_window_set_role(GTK_WINDOW(customize_widget), "customize");
     gtk_window_set_default_size(GTK_WINDOW(customize_widget), 600, 440);
@@ -392,7 +394,7 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     /* Preview display */
     toolbar_frame=gtk_frame_new(_("Preview"));
     gtk_container_set_border_width(GTK_CONTAINER(toolbar_frame), 5);
-    gtk_box_pack_start(GTK_BOX(outer_box), toolbar_frame, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(outer_box), toolbar_frame);
 
     toolbar_ctlbox=gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
     gtk_container_add(GTK_CONTAINER(toolbar_frame), toolbar_ctlbox);
@@ -408,9 +410,7 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
 				   GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_NEVER);
 
-    gtk_box_pack_start(GTK_BOX(toolbar_ctlbox), toolbar_scroll,
-                       TRUE, TRUE, 0);
-
+    gtk_container_add(GTK_CONTAINER(toolbar_ctlbox), toolbar_scroll);
     gtk_container_add(GTK_CONTAINER(toolbar_scroll), page->toolbar);
 
     /* Button box */
@@ -433,7 +433,9 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     lower_ctlbox=gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_container_set_border_width(GTK_CONTAINER(lower_ctlbox), 5);
 
-    gtk_box_pack_start(GTK_BOX(outer_box), lower_ctlbox, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(lower_ctlbox, TRUE);
+    gtk_widget_set_valign(lower_ctlbox, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(outer_box), lower_ctlbox);
 
     /* A list to show the available items */
     list_scroll=gtk_scrolled_window_new(NULL, NULL);

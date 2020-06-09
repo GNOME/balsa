@@ -227,7 +227,10 @@ store_address_dialog(StoreAddressInfo * info)
 
     frame = store_address_note_frame(info);
     gtk_widget_show_all(frame);
-    gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
+
+    gtk_widget_set_vexpand(frame, TRUE);
+    gtk_widget_set_valign(frame, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(vbox), frame);
 
     return dialog;
 }
@@ -313,7 +316,9 @@ store_address_book_frame(StoreAddressInfo * info)
     }
     gtk_combo_box_set_active(GTK_COMBO_BOX(combo_box), default_ab_offset);
 
-    gtk_box_pack_start(GTK_BOX(hbox), combo_box, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(combo_box, TRUE);
+    gtk_widget_set_valign(combo_box, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(hbox), combo_box);
 
     return hbox;
 }

@@ -407,7 +407,7 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
         gtk_widget_set_vexpand(hbox, TRUE);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-	gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), hbox, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(content_area), hbox, FALSE, FALSE, 0);
 	gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
 
 	/* standard key icon; "application-certificate" would be an alternative... */

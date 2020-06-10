@@ -312,7 +312,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     gtk_widget_set_vexpand(hbox, TRUE);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(p))), hbox);
+    gtk_container_add(GTK_CONTAINER(content_area), hbox);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_widget_set_hexpand(vbox, TRUE);

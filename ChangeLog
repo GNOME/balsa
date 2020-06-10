@@ -551,20 +551,6 @@
 	* libbalsa/libbalsa-gpgme-cb.c (row_activated_cb),
 	(lb_gpgme_select_key):
 
-	Use a BALSA_USE_POPOVER=0 environment variable to switch from
-	GtkPopover back to GtkMenu.
-
-	* libbalsa/libbalsa.c (libbalsa_use_popover):
-	* libbalsa/libbalsa.h:
-	* src/balsa-index.c (move_to_change_state),
-	(bndx_popup_menu_create), (bndx_do_popup):
-	* src/balsa-mblist.c (bmbl_do_popup):
-	* src/balsa-message.c (balsa_headers_attachments_popup),
-	(balsa_message_init), (tree_mult_selection_popup),
-	(tree_button_press_cb), (display_content),
-	(open_with_change_state), (copy_part_change_state),
-	(part_create_menu):
-
 2020-06-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Various: Stop using GtkBox padding, fill and expand child properties
@@ -593,39 +579,6 @@
 	new box in priv->vbox to hold the panes; that way, we can
 	rearrange the components without disturbing the other widgets in
 	priv->vbox.
-
-2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
-
-	Various: Stop using GtkBox padding, fill and expand child properties
-
-	* src/spell-check.c (balsa_spell_check_init):
-	* src/store-address.c (store_address_dialog),
-	(store_address_book_frame):
-	* src/toolbar-prefs.c (customize_dialog_cb), (create_toolbar_page):
-
-2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
-
-	Various: Stop using GtkBox padding, fill and expand child properties
-
-	* src/main-window.c (bw_notebook_label_new): use container-add
-	instead of box-pack, to avoid ridiculously wide tabs;
-	* src/sendmsg-window.c (sw_get_user_codeset),
-	(quote_parts_select_dlg), (subject_not_empty),
-	(sendmsg_window_new):
-
-2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
-
-	Various: Stop using GtkBox padding, fill and expand child properties
-
-	* src/message-window.c:
-
-2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
-
-	Various: Stop using GtkBox padding, fill and expand child properties
-
-	* src/information-dialog.c (balsa_information_list):
-	* src/main-window.c (bw_create_index_widget), (bw_set_panes),
-	(balsa_window_new), (bw_notebook_label_new), (bw_find_real):
 
 2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 

@@ -599,7 +599,7 @@ filters_edit_dialog(GtkWindow * parent)
     gtk_widget_set_halign(hbox, GTK_ALIGN_FILL);
     gtk_widget_set_margin_start(hbox, FILTER_EDIT_PADDING);
     gtk_widget_set_margin_end(hbox, FILTER_EDIT_PADDING);
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(fe_window))), hbox);
+    gtk_container_add(GTK_CONTAINER(content_area), hbox);
 
     gtk_widget_set_margin_start(piece, FILTER_EDIT_PADDING);
     gtk_widget_set_margin_end(piece, FILTER_EDIT_PADDING);

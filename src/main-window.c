@@ -654,8 +654,21 @@ bw_set_panes(BalsaWindow * window)
 
         priv->mblist_parent = priv->paned_parent;
         priv->notebook_parent = NULL;
-        priv->mblist_parent = priv->paned_parent;
-        priv->notebook_parent = priv->paned_child;
+
+	gtk_paned_pack1(GTK_PANED(priv->paned_parent),
+                        bw_frame(priv->mblist), TRUE, TRUE);
+        gtk_paned_pack2(GTK_PANED(priv->paned_parent), priv->paned_child,
+                        TRUE, TRUE);
+        gtk_paned_pack1(GTK_PANED(priv->paned_child),
+                        bw_frame(index_widget), TRUE, FALSE);
+	gtk_paned_pack2(GTK_PANED(priv->paned_child),
+                        bw_frame(priv->preview), TRUE, TRUE);
+        width_preference = BALSA_INDEX_NARROW;
+	break;
+    case LAYOUT_DEFAULT:
+    default:
+	priv->paned_parent = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	priv->paned_child  = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 
 	gtk_paned_pack1(GTK_PANED(priv->paned_parent),
                         bw_frame(priv->mblist), TRUE, TRUE);
@@ -2283,8 +2296,14 @@ balsa_window_new(GtkApplication *application)
     priv->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
     gtk_box_pack_start(GTK_BOX(priv->vbox), priv->toolbar, FALSE, FALSE, 0);
 
+    priv->content_area = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_show(priv->content_area);
+    gtk_widget_set_vexpand(priv->content_area, TRUE);
+    gtk_widget_set_valign(priv->content_area, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(priv->vbox), priv->content_area);
+
     priv->bottom_bar = hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_container_add(GTK_CONTAINER(priv->vbox), hbox);
+    gtk_box_pack_start(GTK_BOX(priv->vbox), hbox, FALSE, FALSE, 0);
 
     priv->progress_bar = gtk_progress_bar_new();
     g_object_add_weak_pointer(G_OBJECT(priv->progress_bar),

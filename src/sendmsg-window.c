@@ -3472,6 +3472,7 @@ static void
 show_decrypted_warning(GtkWindow *parent)
 {
 	GtkWidget *dialog;
+	GtkWidget *message_area;
 	GtkWidget *remind_btn;
 
 	dialog = gtk_message_dialog_new(parent,
@@ -3482,11 +3483,12 @@ show_decrypted_warning(GtkWindow *parent)
 		  "the decrypted contents of the original message.\n"
 		  "Consider to encrypt the reply, and verify that you do not "
 		  "unintentionally leak sensitive information."));
+        message_area = gtk_message_dialog_get_message_area(GTK_MESSAGE_DIALOG(dialog));
+
 	remind_btn = gtk_check_button_new_with_label(_("Do not remind me again."));
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(remind_btn), FALSE);
 	gtk_widget_show(remind_btn);
-	gtk_box_pack_end(GTK_BOX(gtk_message_dialog_get_message_area(GTK_MESSAGE_DIALOG(dialog))),
-		remind_btn, FALSE, FALSE, 0);
+	gtk_box_pack_end(GTK_BOX(message_area), remind_btn, FALSE, FALSE, 0);
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	balsa_app.warn_reply_decrypted = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(remind_btn));
 	gtk_widget_destroy(dialog);

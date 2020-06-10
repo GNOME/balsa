@@ -780,6 +780,7 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 static GtkWidget *
 create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 {
+    GtkWidget *content_area;
 	LibBalsaMailbox *mailbox = mcw->mailbox;
     LibBalsaMailboxPOP3 *mailbox_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
 
@@ -789,6 +790,7 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
         mcw->ok_button_name, MCW_RESPONSE,
 		_("_Cancel"), GTK_RESPONSE_CANCEL,
         NULL));
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(mcw->window));
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(mcw->window, GTK_WINDOW(balsa_app.main_window));
 #endif
@@ -796,7 +798,7 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
     mcw->mb_data.pop3.server_cfg =
         libbalsa_server_cfg_new(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox),
                                 libbalsa_mailbox_get_name(mailbox));
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(mcw->window))), GTK_WIDGET(mcw->mb_data.pop3.server_cfg));
+    gtk_container_add(GTK_CONTAINER(content_area), GTK_WIDGET(mcw->mb_data.pop3.server_cfg));
     g_signal_connect(mcw->mb_data.pop3.server_cfg, "changed", G_CALLBACK(check_for_blank_fields), mcw);
 
     /* toggle for deletion from server */

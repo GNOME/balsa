@@ -299,6 +299,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
     struct smtp_server_dialog_info *sdi;
     GtkWidget *dialog;
+    GtkWidget *content_area;
     GtkWidget *label, *hbox;
 
     /* Show only one dialog at a time. */
@@ -327,6 +328,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Help"),   GTK_RESPONSE_HELP,
                                     NULL);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
@@ -340,7 +342,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                       FALSE);
 
     sdi->notebook = libbalsa_server_cfg_new(server, smtp_server->name);
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), GTK_WIDGET(sdi->notebook));
+    gtk_container_add(GTK_CONTAINER(content_area), GTK_WIDGET(sdi->notebook));
 
 #define HIG_PADDING 12
 

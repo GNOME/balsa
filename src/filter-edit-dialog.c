@@ -560,6 +560,7 @@ fe_collect_user_headers(LibBalsaCondition * condition)
 void
 filters_edit_dialog(GtkWindow * parent)
 {
+    GtkWidget *content_area;
     GtkWidget *hbox;
     GtkWidget *piece;
     LibBalsaFilter * cpfil,* fil;
@@ -590,6 +591,7 @@ filters_edit_dialog(GtkWindow * parent)
                                             _("_Cancel"), GTK_RESPONSE_CANCEL,
                                             _("_Help"), GTK_RESPONSE_HELP,
 					    NULL);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(fe_window));
 
     g_signal_connect(fe_window, "response",
                      G_CALLBACK(fe_dialog_response), NULL);
@@ -606,7 +608,7 @@ filters_edit_dialog(GtkWindow * parent)
     gtk_widget_set_halign(hbox, GTK_ALIGN_FILL);
     gtk_widget_set_margin_start(hbox, FILTER_EDIT_PADDING);
     gtk_widget_set_margin_end(hbox, FILTER_EDIT_PADDING);
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(fe_window))), hbox);
+    gtk_container_add(GTK_CONTAINER(content_area), hbox);
 
     gtk_widget_set_margin_start(piece, FILTER_EDIT_PADDING);
     gtk_widget_set_margin_end(piece, FILTER_EDIT_PADDING);

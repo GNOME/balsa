@@ -170,6 +170,35 @@
 	* libbalsa/libbalsa-gpgme-cb.c (row_activated_cb),
 	(lb_gpgme_select_key):
 
+2020-06-10  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Stop using GtkBox padding, fill and expand child properties
+
+	Also clarify access to GtkDialog areas.
+
+	* libbalsa/autocrypt.c (autocrypt_db_dialog_run):
+	* libbalsa/libbalsa-gpgme-cb.c (lb_gpgme_select_key),
+	(get_passphrase_real):
+	* libbalsa/libbalsa-gpgme-widgets.c (libbalsa_key_dialog):
+	* libbalsa/libbalsa.c (ask_cert_real):
+	* libbalsa/smtp-server.c (libbalsa_smtp_server_dialog):
+	* src/balsa-mblist.c (bmbl_mru_show_tree):
+	* src/balsa-mime-widget-message.c (bm_header_widget_new):
+	* src/filter-edit-dialog.c (filters_edit_dialog):
+	* src/filter-export-dialog.c (filters_export_dialog):
+	* src/filter-run-dialog.c (balsa_filter_run_dialog_init):
+	* src/folder-conf.c (create_imap_folder_dialog),
+	(folder_conf_imap_node), (subfolder_conf_clicked_ok),
+	(folder_conf_imap_sub_node), (folder_conf_add_imap_sub_cb):
+	* src/mailbox-conf.c (create_pop_mailbox_dialog):
+	* src/sendmsg-window.c (show_decrypted_warning):
+	* src/toolbar-prefs.c (create_toolbar_page):
+
+	* src/main-window.c (bw_set_panes), (balsa_window_new): put a
+	new box in priv->vbox to hold the panes; that way, we can
+	rearrange the components without disturbing the other widgets in
+	priv->vbox.
+
 2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Various: Stop using GtkBox padding, fill and expand child properties

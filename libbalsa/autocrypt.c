@@ -422,6 +422,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 {
 	GtkWidget *dialog;
 	GtkWidget *vbox;
+    GtkWidget *content_area;
     GtkWidget *label;
     GtkWidget *scrolled_window;
     GtkWidget *tree_view;
@@ -435,10 +436,12 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 	dialog = gtk_dialog_new_with_buttons(_("Autocrypt database"), parent,
 		GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), _("_Close"), GTK_RESPONSE_CLOSE, NULL);
 	geometry_manager_attach(GTK_WINDOW(dialog), "AutocryptDB");
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
-    gtk_widget_set_vexpand (vbox, TRUE);
+    gtk_widget_set_vexpand(vbox, TRUE);
+    gtk_container_add(GTK_CONTAINER(content_area), vbox);
+
     label = gtk_label_new(_("Double-click key to show details"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_valign(label, GTK_ALIGN_FILL);

@@ -378,6 +378,7 @@ libbalsa_key_dialog(GtkWindow            *parent,
 					const gchar          *message2)
 {
 	GtkWidget *dialog;
+	GtkWidget *content_area;
 	GtkWidget *hbox;
 	GtkWidget *icon;
 	GtkWidget *vbox;
@@ -400,12 +401,13 @@ libbalsa_key_dialog(GtkWindow            *parent,
 		g_error("%s: buttons type %d not yet implemented", __func__, buttons);
 	}
 	geometry_manager_attach(GTK_WINDOW(dialog), "KeyDialog");
+	content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
         gtk_widget_set_vexpand(hbox, TRUE);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-	gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), hbox, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(content_area), hbox, FALSE, FALSE, 0);
 	gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
 
 	/* standard key icon; "application-certificate" would be an alternative... */

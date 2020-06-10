@@ -526,18 +526,6 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     g_signal_connect(key_controller, "key-pressed",
 		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
 
-#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(hbox), grid);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
-
-    action_area = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area),
-                              GTK_BUTTONBOX_START);
-
-    gtk_widget_set_valign(action_area, GTK_ALIGN_FILL);
-    gtk_box_pack_end(GTK_BOX(hbox), action_area, FALSE, FALSE, 0);
-#else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     info_bar_widget = gtk_info_bar_new();
     info_bar = GTK_INFO_BAR(info_bar_widget);
 

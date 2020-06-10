@@ -162,6 +162,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
 		    gpgme_protocol_t protocol, GtkWindow * parent)
 {
     GtkWidget *dialog;
+    GtkWidget *content_area;
     GtkWidget *vbox;
     GtkWidget *label;
     GtkWidget *scrolled_window;
@@ -186,14 +187,14 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
     gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK, FALSE);
 	geometry_manager_attach(GTK_WINDOW(dialog), "KeyList");
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
+
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_widget_set_vexpand (vbox, TRUE);
-    gtk_container_add(GTK_CONTAINER
-		      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-		      vbox);
+    gtk_container_add(GTK_CONTAINER(content_area), vbox);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
     switch (mode) {
     	case LB_SELECT_PRIVATE_KEY:
@@ -304,7 +305,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
     g_signal_connect(tree_view, "row-activated", G_CALLBACK(row_activated_cb), dialog);
 
-    gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
+    gtk_widget_show_all(content_area);
 
     if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK) {
     	use_key = NULL;
@@ -357,6 +358,7 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
 {
     static GdkPixbuf *padlock_keyhole = NULL;
     GtkWidget *dialog, *entry, *vbox, *hbox;
+    GtkWidget *content_area;
     gchar *prompt, *passwd;
 
     /* FIXME: create dialog according to the Gnome HIG */
@@ -366,14 +368,14 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
                                          _("_OK"),     GTK_RESPONSE_OK,
                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
                                          NULL);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, parent);
 #endif
+
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 12);
-    gtk_container_add(GTK_CONTAINER
-		      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-		      hbox);
+    gtk_container_add(GTK_CONTAINER(content_area), hbox);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_container_add(GTK_CONTAINER(hbox), vbox);
@@ -400,7 +402,7 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
     entry = gtk_entry_new();
     gtk_container_add(GTK_CONTAINER(vbox), entry);
 
-    gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
+    gtk_widget_show_all(content_area);
     gtk_entry_set_width_chars(GTK_ENTRY(entry), 40);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
 

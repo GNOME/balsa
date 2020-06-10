@@ -504,7 +504,10 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     gtk_box_pack_start(GTK_BOX(button_box), page->forward_button, FALSE, FALSE, 0);
 
     /* Pack destination list */
-    gtk_box_pack_start(GTK_BOX(lower_ctlbox), destination_frame, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(destination_frame, TRUE);
+    gtk_widget_set_halign(destination_frame, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(lower_ctlbox), destination_frame);
+
     gtk_container_add(GTK_CONTAINER(destination_frame), destination_scroll);
     gtk_container_add(GTK_CONTAINER(destination_scroll), page->current);
 

@@ -1121,8 +1121,6 @@ config_global_load(void)
 
      balsa_app.open_inbox_upon_startup =
 	libbalsa_conf_get_bool("OpenInboxOnStartup=false");
-    /* debugging enabled */
-    balsa_app.debug = libbalsa_conf_get_bool("Debug=false");
 
     balsa_app.close_mailbox_auto = libbalsa_conf_get_bool("AutoCloseMailbox=true");
     /* timeouts in minutes in config file for backwards compat */
@@ -1507,7 +1505,6 @@ config_save(void)
 
     libbalsa_conf_set_bool("OpenInboxOnStartup", 
                           balsa_app.open_inbox_upon_startup);
-    libbalsa_conf_set_bool("Debug", balsa_app.debug);
 
     libbalsa_conf_set_bool("AutoCloseMailbox", balsa_app.close_mailbox_auto);
     libbalsa_conf_set_int("AutoCloseMailboxTimeout", balsa_app.close_mailbox_timeout/60);
@@ -1930,8 +1927,10 @@ config_filter_load(const gchar * key, const gchar * value, gpointer data)
     long int dummy;
 
     dummy = strtol(value, &endptr, 10);
-    if (dummy == LONG_MIN || dummy == LONG_MAX)
-        g_message("Value is too large");
+    if (dummy == LONG_MIN || dummy == LONG_MAX) {
+        g_warning("%s: Value %ld is too large", __func__, dummy);
+        return FALSE;
+    }
     if (*endptr) {              /* Bad format. */
         libbalsa_conf_remove_group(key);
         return FALSE;
@@ -1982,7 +1981,7 @@ config_filters_save(void)
 	fil = (LibBalsaFilter*)(list->data);
 	i=snprintf(tmp,tmp_len,"%d",nb++);
         if (i >= tmp_len)
-            g_message("Group name was truncated");
+            g_warning("Group name was truncated");
 	libbalsa_conf_push_group(buffer);
 	libbalsa_filter_save_config(fil);
 	libbalsa_conf_pop_group();
@@ -1992,7 +1991,7 @@ config_filters_save(void)
     while (TRUE) {
 	i=snprintf(tmp,tmp_len,"%d",nb++);
         if (i >= tmp_len)
-            g_message("Group name was truncated");
+            g_warning("Group name was truncated");
 	if (libbalsa_conf_has_group(buffer)) {
 	    libbalsa_conf_remove_group(buffer);
 	}

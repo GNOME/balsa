@@ -817,11 +817,9 @@ has_attached_part(LibBalsaMessageBody *body)
     LibBalsaMessageBody *lbbody;
     /* the condition matches the one used in add_multipart_mixed() */
     for (lbbody = body; lbbody; lbbody = lbbody->next) {
-        /* printf("part %s has disposition %s\n",
-               lbbody->content_type, lbbody->content_dsp); */
+        g_debug("part %s has disposition %s", lbbody->content_type, lbbody->content_dsp);
         if (!libbalsa_message_body_is_multipart(lbbody) &&
             !libbalsa_message_body_is_inline(lbbody)) {
-            /* puts("Attachment found!"); */
             return TRUE;
         }
 
@@ -1254,10 +1252,8 @@ lbmsg_set_header(LibBalsaMessage *message,
         libbalsa_utf8_sanitize(&tmp, TRUE, NULL);
         val = g_mime_utils_header_encode_text(NULL, tmp, NULL);
         g_free(tmp);
-#ifdef DEBUG
-        g_print("%s: non-ascii “%s” header “%s” encoded as “%s”\n",
+        g_debug("%s: non-ascii “%s” header “%s” encoded as “%s”",
                 __func__, name, value, val);
-#endif /* DEBUG */
         value = val;
     }
 

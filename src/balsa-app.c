@@ -318,7 +318,6 @@ balsa_app_init(void)
     balsa_app.check_mail_auto = TRUE;
     balsa_app.check_mail_timer = 10;
 
-    balsa_app.debug = FALSE;
     balsa_app.previewpane = TRUE;
     balsa_app.pgdownmod = FALSE;
     balsa_app.pgdown_percent = 50;
@@ -462,7 +461,7 @@ balsa_app_destroy(void)
     balsa_app.fcc_mru = NULL;
 
 
-    if(balsa_app.debug) g_print("balsa_app: Finished cleaning up.\n");
+    g_debug("balsa_app: Finished cleaning up.");
 }
 
 static gboolean
@@ -470,8 +469,7 @@ check_new_messages_auto_cb(gpointer data)
 {
     check_new_messages_real(balsa_app.main_window, TRUE);
 
-    if (balsa_app.debug)
-        fprintf(stderr, "Auto-checked for new messages…\n");
+    g_debug("Auto-checked for new messages…");
 
     /*  preserver timer */
     return TRUE;
@@ -520,9 +518,7 @@ open_mailbox_by_url(const gchar * url, gboolean hidden)
     LibBalsaMailbox *mailbox;
 
     mailbox = balsa_find_mailbox_by_url(url);
-    if (balsa_app.debug)
-        fprintf(stderr, "balsa_open_mailbox_list: opening %s => %p..\n",
-                url, mailbox);
+    g_debug("balsa_open_mailbox_list: opening %s => %p.", url, mailbox);
     if (mailbox) {
         if (hidden)
             balsa_mblist_open_mailbox_hidden(mailbox);
@@ -852,7 +848,7 @@ ba_remove_children_mailbox_nodes(GtkTreeModel * model, GtkTreeIter * parent,
 	    valid =
 		gtk_tree_store_remove(balsa_app.mblist_tree_store, &iter);
 	} else {
-	    printf("sparing %s %s\n",
+	    g_debug("sparing %s %s",
 		   mailbox != NULL ? "mailbox" : "folder ",
 		   mailbox != NULL ?
                    libbalsa_mailbox_get_name(mailbox) :
@@ -870,14 +866,11 @@ balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode)
     GtkTreeIter parent;
     GtkTreeIter *iter = NULL;
     GSList *specials = NULL, *l;
+    const gchar *name;
 
-    if (balsa_app.debug) {
-        const gchar *name;
-
-	printf("Destroying children of %p %s\n", mbnode,
+	g_debug("Destroying children of %p %s", mbnode,
                (mbnode != NULL &&
                 (name = balsa_mailbox_node_get_name(mbnode)) != NULL) ? name : "");
-    }
 
     if (mbnode && balsa_find_iter_by_data(&parent, mbnode))
 	iter = &parent;

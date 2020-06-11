@@ -3,7 +3,7 @@
  *  
  * Helper functions for managing the IGE Mac Integration stuff
  *
- * Copyright (C) 2004 Albrecht Dreﬂ <albrecht.dress@arcor.de>
+ * Copyright (C) 2004 Albrecht Dre√ü <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ libbalsa_macosx_menu_for_parent(GtkWidget *window, GtkWindow *parent)
 	g_signal_connect(window, "focus-in-event",
 			 G_CALLBACK(update_osx_menubar), parent);
     else
-	g_message("called %s for widget %p with NULL parent", __func__, window);
+	g_debug("called %s for widget %p with NULL parent", __func__, window);
 }
 
 

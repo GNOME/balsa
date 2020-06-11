@@ -335,8 +335,7 @@ balsa_attach_info_finalize(GObject * object)
         gchar * folder_name;
 
         /* unlink the file */
-	if (balsa_app.debug)
-	    fprintf (stderr, "%s:%s: unlink `%s'\n", __FILE__, __FUNCTION__,
+	g_debug("%s:%s: unlink `%s'", __FILE__, __func__,
 		     libbalsa_vfs_get_uri_utf8(info->file_uri));
 	libbalsa_vfs_file_unlink(info->file_uri, NULL);
 
@@ -344,8 +343,7 @@ balsa_attach_info_finalize(GObject * object)
         folder_name = g_filename_from_uri(libbalsa_vfs_get_folder(info->file_uri),
                                           NULL, NULL);
         if (folder_name) {
-            if (balsa_app.debug)
-                fprintf (stderr, "%s:%s: rmdir `%s'\n", __FILE__, __FUNCTION__,
+            g_debug("%s:%s: rmdir `%s'", __FILE__, __func__,
                          folder_name);
             g_rmdir(folder_name);
             g_free(folder_name);
@@ -465,8 +463,7 @@ delete_handler(BalsaSendmsg * bsmsg)
     gint reply;
     GtkWidget *d;
 
-    if (balsa_app.debug)
-        printf("%s\n", __func__);
+    g_debug("%s", __func__);
 
     if (bsmsg->state == SENDMSG_STATE_CLEAN)
         return FALSE;
@@ -530,12 +527,12 @@ sw_close_activated(GSimpleAction * action,
 {
     BalsaSendmsg *bsmsg = data;
 
-    BALSA_DEBUG_MSG("close_window_cb: start\n");
+    g_debug("close_window_cb: start");
     g_object_set_data(G_OBJECT(bsmsg->window), "destroying",
                       GINT_TO_POINTER(TRUE));
     if(!delete_handler(bsmsg))
 	gtk_widget_destroy(bsmsg->window);
-    BALSA_DEBUG_MSG("close_window_cb: end\n");
+    g_debug("close_window_cb: end");
 }
 
 static gint
@@ -569,7 +566,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
         g_object_weak_unref(G_OBJECT(balsa_app.main_window),
                             (GWeakNotify) gtk_widget_destroy, bsmsg->window);
     }
-    if(balsa_app.debug) g_message("balsa_sendmsg_destroy()_handler: Start.");
+    g_debug("balsa_sendmsg_destroy()_handler: Start.");
 
     if (bsmsg->parent_message != NULL) {
         LibBalsaMailbox *mailbox;
@@ -595,8 +592,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 	g_object_unref(bsmsg->draft_message);
     }
 
-    if (balsa_app.debug)
-	printf("balsa_sendmsg_destroy_handler: Freeing bsmsg\n");
+    g_debug("balsa_sendmsg_destroy_handler: Freeing bsmsg");
     gtk_widget_destroy(bsmsg->window);
     quit_on_close = bsmsg->quit_on_close;
     g_free(bsmsg->fcc_url);
@@ -632,7 +628,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
         libbalsa_wait_for_sending_thread(-1);
 	gtk_main_quit();
     }
-    if(balsa_app.debug) g_message("balsa_sendmsg_destroy(): Stop.");
+    g_debug("balsa_sendmsg_destroy(): Stop.");
 }
 
 /* language menu helper functions */
@@ -948,7 +944,7 @@ sw_get_action(BalsaSendmsg * bsmsg, const gchar * action_name)
     action = g_action_map_lookup_action(G_ACTION_MAP(bsmsg->window),
                                         action_name);
     if (!action)
-        g_print("%s %s not found\n", __func__, action_name);
+        g_warning("%s %s not found", __func__, action_name);
 
     return action;
 }
@@ -1428,7 +1424,7 @@ on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     uri = libbalsa_vfs_get_uri(info->file_uri);
     g_return_if_fail(uri != NULL);
 
-    g_message("open URL %s", uri);
+    g_debug("open URL %s", uri);
     toplevel = gtk_widget_get_toplevel(GTK_WIDGET(menu_item));
     if (gtk_widget_is_toplevel(toplevel)) {
         gtk_show_uri_on_window(GTK_WINDOW(toplevel), uri,
@@ -1666,8 +1662,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     GtkWidget *menu_item;
     gchar *content_desc;
 
-    if (balsa_app.debug)
-	fprintf(stderr, "Trying to attach '%s'\n", filename);
+    g_debug("Trying to attach '%s'", filename);
     if (!(file_uri = libbalsa_vfs_new_from_uri(filename))) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
@@ -1860,8 +1855,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     GdkPixbuf * pixbuf;
     GtkWidget *menu_item;
 
-    if (balsa_app.debug)
-	fprintf(stderr, "Trying to attach '%s'\n", url);
+    g_debug("Trying to attach '%s'", url);
 
     /* get the pixbuf for the attachment's content type */
     pixbuf =
@@ -2160,8 +2154,7 @@ attachments_add(GtkWidget * widget,
 {
     gboolean drag_result = TRUE;
 
-    if (balsa_app.debug)
-        printf("attachments_add: info %d\n", info);
+    g_debug("attachments_add: info %d", info);
     if (info == TARGET_MESSAGES) {
 	BalsaIndex *index =
             *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
@@ -2217,11 +2210,6 @@ to_add(GtkWidget * widget,
 {
     gboolean drag_result = FALSE;
 
-#ifdef DEBUG
-    /* This leaks the name: */
-    g_print("%s atom name %s\n", __func__,
-            gdk_atom_name(gtk_selection_data_get_target(selection_data)));
-#endif
     if (info == TARGET_STRING) {
         const gchar *address;
 
@@ -4713,7 +4701,7 @@ do_insert_string_select_ch(BalsaSendmsg* bsmsg, GtkTextBuffer *buffer,
         if (info->win && (attr & LIBBALSA_TEXT_HI_CTRL))
             charset = info->win;
 
-        g_print("Trying charset: %s\n", charset);
+        g_debug("Trying charset: %s", charset);
         if (sw_can_convert(string, len, "UTF-8", charset, &s)) {
             gtk_text_buffer_insert_at_cursor(buffer, s, -1);
             g_free(s);
@@ -6279,7 +6267,7 @@ sw_gpg_mode_change_state(GSimpleAction  * action,
     else if (strcmp(mode, "smime") == 0)
         rfc_flag = LIBBALSA_PROTECT_SMIMEV3;
     else {
-        g_print("%s unknown mode “%s”\n", __func__, mode);
+        g_warning("%s unknown mode “%s”", __func__, mode);
         return;
     }
 
@@ -6885,7 +6873,7 @@ sendmsg_window_new()
                                            G_N_ELEMENTS(win_entries),
                                            resource_path, &error, bsmsg);
     if (error) {
-        g_print("%s %s\n", __func__, error->message);
+        g_warning("%s %s", __func__, error->message);
         g_error_free(error);
         return NULL;
     }
@@ -7032,7 +7020,7 @@ sendmsg_window_reply(LibBalsaMailbox * mailbox, guint msgno,
     case SEND_REPLY_ALL:
         bsmsg = sendmsg_window_new();
         bsmsg->type = reply_type;       break;
-    default: printf("reply_type: %d\n", reply_type); g_assert_not_reached();
+    default: g_error("reply_type: %d", reply_type);
     }
     bsmsg->parent_message = message;
     set_identity(bsmsg, message);
@@ -7077,7 +7065,7 @@ sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
     case SEND_REPLY_ALL:
     case SEND_REPLY_GROUP:
         bsmsg->type = reply_type;       break;
-    default: printf("reply_type: %d\n", reply_type); g_assert_not_reached();
+    default: g_error("reply_type: %d", reply_type);
     }
     bsm_prepare_for_setup(g_object_ref(part->message));
     headers = part->embhdrs;

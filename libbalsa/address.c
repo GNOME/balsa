@@ -645,7 +645,7 @@ lba_get_name_or_mailbox(InternetAddressList * addr_list,
             retval = INTERNET_ADDRESS_MAILBOX (ia)->addr;
         else {
             if (in_group)
-                g_message("Ignoring nested group address");
+                g_debug("Ignoring nested group address");
             else
                 retval = lba_get_name_or_mailbox(INTERNET_ADDRESS_GROUP(ia)->members,
 			get_name, TRUE);
@@ -899,7 +899,7 @@ addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
     gboolean dnd_success = FALSE;
     LibBalsaAddress *addr;
 
-    printf("drag_received:\n");
+    g_debug("drag_received");
     /* Deal with what we are given from source */
     if(selection_data
        && gtk_selection_data_get_length(selection_data) >= 0) {
@@ -908,7 +908,7 @@ addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
             addr = *(LibBalsaAddress **)
                 gtk_selection_data_get_data(selection_data);
             if (addr != NULL && addr->addr_list != NULL) {
-                g_print ("string: %s\n", (gchar*)addr->addr_list->data);
+                g_debug("string: %s", (gchar*)addr->addr_list->data);
                 gtk_list_store_insert_with_values(GTK_LIST_STORE(model),
                                                   &iter, 99999,
                                                   0,
@@ -918,14 +918,14 @@ addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
             }
             break;
         case LIBBALSA_ADDRESS_TRG_STRING:
-            g_print("text/plain target not implemented.\n");
+            g_debug("text/plain target not implemented");
             break;
-        default: g_print ("nothing good");
+        default: g_debug("nothing good");
         }
     }
 
     if (!dnd_success)
-        g_print ("DnD data transfer failed!\n");
+    	g_warning("DnD data transfer failed!");
 
     gtk_drag_finish(context, dnd_success, FALSE, time);
 }
@@ -949,7 +949,7 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
         (g_list_nth_data (targets, LIBBALSA_ADDRESS_TRG_ADDRESS));
 
       /* Request the data from the source. */
-      printf("drag_drop requests target=%p\n", target_type);
+      g_debug("drag_drop requests target=%p", target_type);
       gtk_drag_get_data
         (
          widget,         /* will receive 'drag-data-received' signal */

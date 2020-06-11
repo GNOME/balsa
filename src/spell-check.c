@@ -35,6 +35,12 @@
 
 #define BALSA_SPELL_CHECK_PADDING 6
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "spell-check"
+
+
 /* the basic structures */
 struct _BalsaSpellCheck {
     GtkWindow window;
@@ -623,9 +629,7 @@ balsa_spell_check_start(BalsaSpellCheck *spell_check)
                                  &start, &end);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
-    if (balsa_app.debug)
-        balsa_information(LIBBALSA_INFORMATION_DEBUG,
-                          "BalsaSpellCheck: Start\n");
+    g_debug("start");
 
     /*
      * compile the quoted-text regular expression (note:
@@ -741,9 +745,7 @@ balsa_spell_check_learn(BalsaSpellCheck *spell_check,
         gtk_text_buffer_get_text(buffer, &spell_check->start_iter,
                                  &spell_check->end_iter, FALSE);
 
-    if (balsa_app.debug)
-        balsa_information(LIBBALSA_INFORMATION_DEBUG,
-                          "BalsaSpellCheck: Learn %s\n", word);
+    g_debug("learn %s", word);
 
     if (learn_type == SESSION_DICT)
         enchant_dict_add_to_session(spell_check->dict, word, -1);
@@ -794,11 +796,7 @@ balsa_spell_check_fix(BalsaSpellCheck *spell_check,
         return;
     }
 
-    if (balsa_app.debug) {
-        balsa_information(LIBBALSA_INFORMATION_DEBUG,
-                          "BalsaSpellCheck: Replace %s with %s\n",
-                          old_word, new_word);
-    }
+    g_debug("replace %s with %s", old_word, new_word);
 
     switch_word(spell_check, new_word);
 
@@ -903,9 +901,7 @@ spch_finish(BalsaSpellCheck *spell_check,
         spell_check->broker = NULL;
     }
 
-    if (balsa_app.debug)
-        balsa_information(LIBBALSA_INFORMATION_DEBUG,
-                          "BalsaSpellCheck: Finished\n");
+    g_debug("finished");
 
     gtk_widget_destroy((GtkWidget *) spell_check);
 }
@@ -960,9 +956,7 @@ check_word(BalsaSpellCheck *spell_check)
     if (word) {
         gint enchant_check;
 
-        if (balsa_app.debug)
-            balsa_information(LIBBALSA_INFORMATION_DEBUG,
-                              "BalsaSpellCheck: Check %s", word);
+        g_debug("check %s…", word);
 
         enchant_check = enchant_dict_check(spell_check->dict, word, -1);
 
@@ -978,17 +972,13 @@ check_word(BalsaSpellCheck *spell_check)
     if (!correct) {
         gsize n_suggs;
 
-        if (balsa_app.debug)
-            balsa_information(LIBBALSA_INFORMATION_DEBUG,
-                              " …incorrect.\n");
+        g_debug(" …incorrect.");
 
         spell_check->suggestions =
             enchant_dict_suggest(spell_check->dict, word, -1, &n_suggs);
         setup_suggestions(spell_check, n_suggs);
     } else {
-        if (balsa_app.debug)
-            balsa_information(LIBBALSA_INFORMATION_DEBUG,
-                              " …correct.\n");
+    	g_debug(" …correct.");
     }
 
     g_free(word);

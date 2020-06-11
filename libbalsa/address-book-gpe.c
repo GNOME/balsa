@@ -31,6 +31,11 @@
 
 #if defined(HAVE_SQLITE)
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "address-book"
+
 #include "address-book-gpe.h"
 
 #ifdef HAVE_SQLITE3
@@ -176,7 +181,7 @@ libbalsa_address_book_gpe_open_db(LibBalsaAddressBookGpe * ab_gpe)
     g_free(dir);
 
     if (sqlite3_open(name, &ab_gpe->db) != SQLITE_OK) {
-        printf("Cannot open “%s”: %s\n", name, sqlite3_errmsg(ab_gpe->db));
+    	libbalsa_address_book_set_status(LIBBALSA_ADDRESS_BOOK(ab_gpe), sqlite3_errmsg(ab_gpe->db));
         g_free(name);
         sqlite3_close(ab_gpe->db);
         ab_gpe->db = NULL;
@@ -194,7 +199,7 @@ libbalsa_address_book_gpe_open_db(LibBalsaAddressBookGpe * ab_gpe)
     ab_gpe->db = sqlite_open(name, 0, &errmsg);
     g_free(name);
     if(ab_gpe->db == NULL) {
-        printf("Cannot open: %s\n", errmsg);
+    	libbalsa_address_book_set_status(LIBBALSA_ADDRESS_BOOK(ab_gpe), errmsg);
         free(errmsg);
         return 0;
     }
@@ -388,7 +393,6 @@ libbalsa_address_book_gpe_load(LibBalsaAddressBook * ab,
 #endif                          /* HAVE_SQLITE3 */
 
     if(r != SQLITE_OK) {
-        printf("r=%d err=%s\n", r, err);
         libbalsa_address_book_set_status(ab, err);
 #ifdef HAVE_SQLITE3
         sqlite3_free(err);
@@ -816,7 +820,7 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
                          "select distinct urn from contacts_urn",
                          gpe_read_completion, &gcc, &err);
     if(err) {
-        printf("r=%d err=%s\n", r, err);
+        g_debug("r=%d err=%s", r, err);
         sqlite3_free(err);
     }
 #else                           /* HAVE_SQLITE3 */
@@ -828,7 +832,7 @@ libbalsa_address_book_gpe_alias_complete(LibBalsaAddressBook * ab,
         r = sqlite_exec(ab_gpe->db, "select distinct urn from contacts_urn",
                         gpe_read_completion, &gcc, &err);
     if(err) {
-        printf("r=%d err=%s\n", r, err);
+    	g_debug("r=%d err=%s", r, err);
         free(err);
     }
 #endif                          /* HAVE_SQLITE3 */

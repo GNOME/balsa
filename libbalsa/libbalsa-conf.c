@@ -52,7 +52,6 @@ static gchar * libbalsa_rot(const gchar * pass)
 	G_GNUC_WARN_UNUSED_RESULT;
 
 #define BALSA_KEY_FILE "config"
-#define DEBUG FALSE
 #define LBC_KEY_FILE(priv) \
     ((priv) ? lbc_conf_priv.key_file : lbc_conf.key_file)
 #define LBC_CHANGED(priv) \
@@ -65,9 +64,7 @@ lbc_readfile(const gchar * filename)
     gchar **split;
 
     if (!g_file_get_contents(filename, &buf, NULL, NULL)) {
-#if DEBUG
-        g_message("Failed to read “%s”\n", filename);
-#endif                          /* DEBUG */
+        g_debug("Failed to read “%s”", filename);
         return NULL;
     }
 
@@ -114,10 +111,8 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
 
         old_path =
             g_build_filename(g_get_home_dir(), old_dir, "balsa", NULL);
-#if DEBUG
-        g_message("Could not load config from “%s”:\n %s\n"
+        g_debug("Could not load config from “%s”: %s;"
                   " trying “%s”", conf->path, error->message, old_path);
-#endif                          /* DEBUG */
         g_clear_error(&error);
 
         key_file_text = lbc_readfile(old_path);
@@ -132,11 +127,9 @@ lbc_init(LibBalsaConf * conf, const gchar * filename,
             g_key_file_set_list_separator(conf->key_file, ';');
         }
         if (key_file_text == NULL || error != NULL) {
-#if DEBUG
-            g_message("Could not load key file from file “%s”: %s",
+            g_debug("Could not load key file from file “%s”: %s",
                       old_path,
                       error ? error->message : g_strerror(errno));
-#endif                          /* DEBUG */
             g_clear_error(&error);
             warn = FALSE;
         }
@@ -529,10 +522,8 @@ lbc_sync(LibBalsaConf * conf)
 
     buf = g_key_file_to_data(conf->key_file, &len, &error);
     if (error) {
-#if DEBUG
-        g_message("Failed to sync config file “%s”: %s\n"
+        g_warning("Failed to sync config file “%s”: %s;"
                   " changes not saved", conf->path, error->message);
-#endif                          /* DEBUG */
         g_error_free(error);
         g_free(buf);
         return;
@@ -541,16 +532,12 @@ lbc_sync(LibBalsaConf * conf)
     conf->mtime = time(NULL);
     if (!g_file_set_contents(conf->path, buf, len, &error)) {
         if (error) {
-#if DEBUG
-            g_message("Failed to rewrite config file “%s”: %s\n"
+        	g_warning("Failed to rewrite config file “%s”: %s;"
                       " changes not saved", conf->path, error->message);
-#endif                          /* DEBUG */
             g_error_free(error);
-#if DEBUG
         } else {
-                g_message("Failed to rewrite config file “%s”;"
+        	g_warning("Failed to rewrite config file “%s”;"
                           " changes not saved", conf->path);
-#endif                          /* DEBUG */
         }
     } else if (conf->private) {
         g_chmod(conf->path, 0600);
@@ -566,9 +553,7 @@ void
 libbalsa_conf_sync(void)
 {
     G_LOCK(lbc_sync_idle_id);
-#if DEBUG
-    g_print("%s id %d, will be cleared\n", __func__, lbc_sync_idle_id);
-#endif                          /* DEBUG */
+    g_debug("%s id %d, will be cleared", __func__, lbc_sync_idle_id);
     if (lbc_sync_idle_id) {
         g_source_remove(lbc_sync_idle_id);
         lbc_sync_idle_id = 0;
@@ -592,15 +577,11 @@ void
 libbalsa_conf_queue_sync(void)
 {
     G_LOCK(lbc_sync_idle_id);
-#if DEBUG
-    g_print("%s id %d, will be set if zero\n", __func__, lbc_sync_idle_id);
-#endif                          /* DEBUG */
+    g_debug("%s id %d, will be set if zero", __func__, lbc_sync_idle_id);
     if (!lbc_sync_idle_id)
         lbc_sync_idle_id =
             g_idle_add((GSourceFunc) libbalsa_conf_sync_idle_cb, NULL);
-#if DEBUG
-    g_print("%s id now %d\n", __func__, lbc_sync_idle_id);
-#endif                          /* DEBUG */
+    g_debug("%s id now %d", __func__, lbc_sync_idle_id);
     G_UNLOCK(lbc_sync_idle_id);
 }
 

@@ -544,7 +544,7 @@ mailbox_conf_update(MailboxConfWindow *mcw)
             if (i != 0) {
                 balsa_information(LIBBALSA_INFORMATION_WARNING,
                                   _("Rename of %s to %s failed:\n%s"),
-                                  path, filename, strerror(i));
+                                  path, filename, g_strerror(i));
                 g_free(filename);
 		g_free(path);
                 return;
@@ -661,7 +661,7 @@ create_dialog(MailboxConfWindow *mcw)
 	} else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3)) {
 		return create_pop_mailbox_dialog(mcw);
 	} else {
-		g_warning("Unknown mailbox type: %s\n", g_type_name(mcw->mailbox_type));
+		g_warning("Unknown mailbox type: %s", g_type_name(mcw->mailbox_type));
 		return NULL;
 	}
 }

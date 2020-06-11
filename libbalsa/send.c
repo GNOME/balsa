@@ -49,6 +49,11 @@
 
 #include <glib/gi18n.h>
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "send"
+
 typedef struct _MessageQueueItem MessageQueueItem;
 typedef struct _SendMessageInfo SendMessageInfo;
 
@@ -296,7 +301,7 @@ add_mime_body_plain(LibBalsaMessageBody     *body,
         gchar *type, *subtype;
 
         /* FIXME: test sending with different mime types */
-        g_message("path active");
+        g_debug("path active");
         type = g_strdup (body->content_type);
         if ((subtype = strchr (type, '/')) != NULL) {
             *subtype++ = 0;
@@ -401,9 +406,9 @@ static void
 dump_queue(const char *msg)
 {
     MessageQueueItem *mqi = message_queue;
-    printf("dumping message queue at %s:\n", msg);
+    g_debug("dumping message queue at %s:", msg);
     while (mqi) {
-        printf("item: %p\n", mqi);
+        g_debug("item: %p", mqi);
         mqi = mqi->next_message;
     }
 }
@@ -907,7 +912,7 @@ libbalsa_process_queue(LibBalsaMailbox     *outbox,
 			}
 		} else {
 			update_send_timer(TRUE);
-			g_message("%s: no messages pending", __func__);
+			g_debug("%s: no messages pending", __func__);
 		}
 
 		libbalsa_mailbox_close(outbox, FALSE);
@@ -1073,7 +1078,7 @@ balsa_send_message_real(SendMessageInfo *info)
             if (mailbox != NULL) {
                 libbalsa_message_change_flags(mqi->orig, 0, LIBBALSA_MESSAGE_FLAG_FLAGGED);
             } else {
-                g_message("mqi: %p mqi->orig: %p mailbox: %p\n",
+                g_debug("mqi: %p mqi->orig: %p mailbox: %p",
                           mqi, mqi->orig, mailbox);
             }
 
@@ -1525,9 +1530,7 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
         gchar **pair = list->data;
         g_strchug(pair[1]);
         g_mime_object_append_header(GMIME_OBJECT(mime_message), pair[0], pair[1], NULL);
-#if DEBUG_USER_HEADERS
-        printf("adding header '%s:%s'\n", pair[0], pair[1]);
-#endif
+        g_debug("adding header '%s:%s'", pair[0], pair[1]);
     }
 
     tmp = g_strdup_printf("Balsa %s", VERSION);

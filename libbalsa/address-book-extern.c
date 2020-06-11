@@ -45,6 +45,11 @@
 #include "libbalsa-conf.h"
 #include <glib/gi18n.h>
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "address-book"
+
 /* FIXME: Arbitrary constant */
 #define LINE_LEN 256
 #define LINE_LEN_STR "256"
@@ -235,9 +240,7 @@ parse_externq_file(LibBalsaAddressBookExternq *ab_externq,
 
     if (fgets(string, sizeof(string), gc)) {
     /* The first line should be junk, just debug output */
-#ifdef DEBUG
-        printf("%s\n", string);
-#endif
+        g_debug("%s", string);
     }  /* FIXME check error */
 	
     while (fgets(string, sizeof(string), gc)) {
@@ -245,13 +248,9 @@ parse_externq_file(LibBalsaAddressBookExternq *ab_externq,
                              "%" LINE_LEN_STR "[^\t]"
                              "%" LINE_LEN_STR "[^\n]",
                              email, name, tmp);
-#ifdef DEBUG
-        printf("%s =>%i\n", string, i);
-#endif
+        g_debug("%s =>%i", string, i);
         if(i<2) continue;
-#ifdef DEBUG
-        printf("%s,%s,%s\n",email,name,tmp);
-#endif
+        g_debug("%s,%s,%s",email,name,tmp);
         cb(email, name, data);
     }
     pclose(gc);

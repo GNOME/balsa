@@ -44,7 +44,11 @@
 
 #include <glib/gi18n.h>
 
-/* #define DEBUG_SEEK TRUE */
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "mbox-mbox"
+
 
 struct message_info {
     LibBalsaMailboxLocalMessageInfo local_info;
@@ -173,9 +177,9 @@ lbm_mbox_check_files(const gchar * path, gboolean create)
         gint fd;
 
         if ((fd = creat(path, S_IRUSR | S_IWUSR)) == -1) {
-            g_warning("An error:\n%s\n occurred while trying to "
-                      "create the mailbox “%s”\n",
-                      strerror(errno), path);
+            g_warning("error “%s” occurred while trying to "
+                      "create the mailbox “%s”",
+					  g_strerror(errno), path);
             return -1;
         } else
             close(fd);
@@ -218,10 +222,8 @@ lbm_mbox_stream_seek_to_message(GMimeStream * stream, off_t offset)
         if (nread == sizeof buffer)
             --nread;
         buffer[nread] = 0;
-#if DEBUG_SEEK
-        g_print("%s at %ld failed: read %ld chars, saw “%s”\n", __func__,
+        g_debug("%s at %ld failed: read %ld chars, saw “%s”", __func__,
                 (long) offset, (long) nread, buffer);
-#endif
     }
 
     g_mime_stream_seek(stream, offset, GMIME_STREAM_SEEK_SET);
@@ -274,9 +276,9 @@ libbalsa_mailbox_mbox_remove_files(LibBalsaMailboxLocal *mailbox)
 {
     if ( unlink(libbalsa_mailbox_local_get_path(mailbox)) == -1 )
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR, 
-			     _("Could not remove %s:\n%s"), 
+			     _("Could not remove %s: %s"), 
 			     libbalsa_mailbox_local_get_path(mailbox), 
-			     strerror(errno));
+				 g_strerror(errno));
     LIBBALSA_MAILBOX_LOCAL_CLASS(libbalsa_mailbox_mbox_parent_class)->remove_files(mailbox);
 }
 
@@ -393,7 +395,7 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Failed to create temporary file "
                                    "“%s”: %s"), template,
-                                 strerror(errno));
+                                 g_strerror(errno));
             g_free(template);
             g_free(filename);
             g_array_free(messages_info, TRUE);
@@ -405,21 +407,19 @@ lbm_mbox_save(LibBalsaMailboxMbox * mbox)
             libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                                  _("Failed to save cache file “%s”: %s. "
                                    "New version saved as “%s”"),
-                                 filename, strerror(errno), template);
+                                 filename, g_strerror(errno), template);
         g_free(template);
 #endif                          /* !defined(__APPLE__) */
         g_array_free(messages_info, TRUE);
     } else if (unlink(filename) < 0)
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Could not unlink file %s: %s"),
-                             filename, strerror(errno));
+                             filename, g_strerror(errno));
 
     g_free(filename);
-#ifdef DEBUG
-    g_print("%s:    %s    saved %d messages\n", __func__, 
-            LIBBALSA_MAILBOX(mbox)->name,
+    g_debug("%s:    %s    saved %d messages", __func__,
+            libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mbox)),
             mbox->msgno_2_msg_info->len);
-#endif
 }
 
 static LibBalsaMessage *lbm_mbox_message_new(GMimeMessage * mime_message,
@@ -551,11 +551,9 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
         return;
     }
 
-#ifdef DEBUG
-    g_print("%s: %s file has %zd messages\n", __func__,
-            LIBBALSA_MAILBOX(mbox)->name,
+    g_debug("%s: %s file has %zd messages", __func__,
+            libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mbox)),
             length / sizeof(struct message_info));
-#endif
 
     msg_info = (struct message_info *) contents;
 
@@ -587,11 +585,9 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
                         g_memdup(msg_info, sizeof *msg_info));
     } while (++msg_info < (struct message_info *) (contents + length));
 
-#ifdef DEBUG
-    g_print("%s: %s restored %zd messages\n", __func__,
-            LIBBALSA_MAILBOX(mbox)->name,
+    g_debug("%s: %s restored %zd messages", __func__,
+            libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mbox)),
             msg_info - (struct message_info *) contents);
-#endif
 
     mbox_stream = mbox->gmime_stream;
     libbalsa_mime_stream_shared_lock(mbox_stream);
@@ -686,10 +682,8 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
     }
 
     mbox->size = st.st_size;
-#if DEBUG_SEEK
-    g_print("%s %s set size from stat %d\n", __func__, mailbox->name,
+    g_debug("%s %s set size from stat %ld", __func__, libbalsa_mailbox_get_name(mailbox),
             mbox->size);
-#endif
     libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
     mbox->gmime_stream = gmime_stream;
 
@@ -706,10 +700,9 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 
     mbox_unlock(mailbox, gmime_stream);
     libbalsa_mime_stream_shared_unlock(gmime_stream);
-#ifdef DEBUG
-    g_print(_("%s: Opening %s Refcount: %d\n"),
-	    "LibBalsaMailboxMbox", mailbox->name, mailbox->open_ref);
-#endif
+    g_debug("%s: Opening %s Refcount: %u",
+	    __func__, libbalsa_mailbox_get_name(mailbox),
+		libbalsa_mailbox_get_open_ref(mailbox));
     return TRUE;
 }
 
@@ -958,10 +951,8 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	/* First check--just cache the mtime and size. */
         libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
 	mbox->size = st.st_size;
-#if DEBUG_SEEK
-        g_print("%s %s set size from stat %d\n", __func__, mailbox->name,
+        g_debug("%s %s set size from stat %ld", __func__, libbalsa_mailbox_get_name(mailbox),
                 mbox->size);
-#endif
 	return;
     }
     if (st.st_mtime == mtime && st.st_size == mbox->size)
@@ -975,10 +966,8 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 								 path));
 	/* Cache the file size, so we don't check the next time. */
 	mbox->size = st.st_size;
-#if DEBUG_SEEK
-        g_print("%s %s set size from stat %d\n", __func__, mailbox->name,
+        g_debug("%s %s set size from stat %ld", __func__, libbalsa_mailbox_get_name(mailbox),
                 mbox->size);
-#endif
 	return;
     }
 
@@ -1033,9 +1022,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	     * the first new message--start parsing here. */
             break;
 
-#if DEBUG_SEEK
-        g_print(" backing up over message %d\n", msgno);
-#endif
+        g_debug(" backing up over message %d", msgno);
 	/* Back up over this message and try again. */
         msg_info = message_info_from_msgno(mbox, msgno);
         start = msg_info->start;
@@ -1060,16 +1047,12 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     }
     if(msgno == 0)
         g_mime_stream_seek(mbox_stream, 0, GMIME_STREAM_SEEK_SET);
-#ifdef DEBUG
-    g_print("%s: start parsing at msgno %d of %d\n", __func__, msgno,
+    g_debug("%s: start parsing at msgno %d of %d", __func__, msgno,
             mbox->msgno_2_msg_info->len);
-#endif
     parse_mailbox(mbox);
     mbox->size = g_mime_stream_tell(mbox_stream);
-#if DEBUG_SEEK
-    g_print("%s %s set size from tell %d\n", __func__, mailbox->name,
+    g_debug("%s %s set size from tell %ld", __func__, libbalsa_mailbox_get_name(mailbox),
             mbox->size);
-#endif
     libbalsa_mime_stream_shared_unlock(mbox_stream);
     mbox_unlock(mailbox, mbox_stream);
 
@@ -1458,7 +1441,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	    utime(path, &utimebuf);
 	}
 	if (g_mime_stream_flush(mbox_stream) < 0)
-	    g_warning("can't flush mailbox stream\n");
+	    g_warning("can't flush mailbox stream");
 	if (fstat(GMIME_STREAM_FS(mbox_stream)->fd, &st))
 	    g_warning("can't stat “%s”", path);
 	else
@@ -1546,7 +1529,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
     if (i < messages) {
 	/* We broke on an error. */
-	g_warning("error making temporary copy\n");
+	g_warning("error making temporary copy");
 	g_object_unref(temp_stream);
 	unlink(tempfile);
 	g_free(tempfile);
@@ -1557,7 +1540,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     g_mime_stream_set_bounds(mbox_stream, 0, -1);
     if (g_mime_stream_flush(temp_stream) == -1)
     {
-	g_warning("can't flush temporary copy\n");
+	g_warning("can't flush temporary copy");
 	g_object_unref(temp_stream);
 	unlink(tempfile);
 	g_free(tempfile);
@@ -1568,15 +1551,13 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     save_failed = TRUE;
     libbalsa_mime_stream_shared_lock(mbox_stream);
     if (g_mime_stream_reset(temp_stream) == -1) {
-        g_warning("mbox_sync: can't rewind temporary copy.\n");
+        g_warning("mbox_sync: can't rewind temporary copy.");
     } else if (!lbm_mbox_stream_seek_to_message(mbox_stream, offset))
-        g_warning("mbox_sync: message not in expected position.\n");
+        g_warning("mbox_sync: message not in expected position.");
     else if (g_mime_stream_write_to_stream(temp_stream, mbox_stream) != -1) {
         mbox->size = g_mime_stream_tell(mbox_stream);
-#if DEBUG_SEEK
-        g_print("%s %s set size from tell %d\n", __func__, mailbox->name,
+        g_debug("%s %s set size from tell %ld", __func__, libbalsa_mailbox_get_name(mailbox),
                 mbox->size);
-#endif
         if (ftruncate(GMIME_STREAM_FS(mbox_stream)->fd, mbox->size) == 0)
             save_failed = FALSE;
     }

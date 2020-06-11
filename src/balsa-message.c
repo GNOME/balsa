@@ -1757,7 +1757,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
             gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dump_dialog));
         LibbalsaVfs * dir_uri;
 
-        g_message("store to URI: %s", dir_name);
+        g_debug("store to URI: %s", dir_name);
         if (!(dir_uri = libbalsa_vfs_new_from_uri(dir_name)))
             balsa_information(LIBBALSA_INFORMATION_ERROR,
                               _("Could not create URI for %s"),
@@ -1790,7 +1790,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 		save_uri = libbalsa_vfs_dir_append(dir_uri, p);
 		g_free(p);
 	    }
-            g_message("store to file: %s", libbalsa_vfs_get_uri_utf8(save_uri));
+            g_debug("store to file: %s", libbalsa_vfs_get_uri_utf8(save_uri));
 
 	    /* don't overwrite existing files, append (1), (2), ... instead */
 	    if (libbalsa_vfs_file_exists(save_uri)) {
@@ -1807,7 +1807,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 		} while (libbalsa_vfs_file_exists(save_uri));
 		g_object_unref(base_uri);
 	    }
-            g_message("store to file: %s", libbalsa_vfs_get_uri_utf8(save_uri));
+            g_debug("store to file: %s", libbalsa_vfs_get_uri_utf8(save_uri));
 
 	    /* try to save the file */
             result =
@@ -2951,8 +2951,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
     if (body->parts->next->sig_info) {
 	switch (libbalsa_message_body_protect_state(body->parts->next)) {
 	case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
-	    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-				 _("Detected a good signature"));
+	    g_debug("Detected a good signature");
 	    break;
 	case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
 	    if (g_mime_gpgme_sigstat_protocol(body->parts->next->sig_info) == GPGME_PROTOCOL_CMS)

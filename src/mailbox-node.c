@@ -794,7 +794,7 @@ balsa_mailbox_node_scan_children(BalsaMailboxNode * mbnode)
 	    g_object_unref(mn);
         }
     } else
-        g_print("balsa_mailbox_node_scan_children: didn't find mbnode.\n");
+        g_warning("balsa_mailbox_node_scan_children: didn't find mbnode.");
 
     if (list && !g_object_get_data(G_OBJECT(mbnode),
                                    BALSA_MAILBOX_NODE_LIST_KEY)) {
@@ -838,10 +838,11 @@ bmbn_scan_children_idle(BalsaMailboxNode ** mbnode)
                 libbalsa_mailbox_set_has_unread_messages
                     (mn->mailbox, has_unread_messages);
             mn->scanned = TRUE;
-        } else if (balsa_app.debug)
-            g_print("%s: %s “%s” was already scanned\n", __func__,
+        } else {
+            g_debug("%s: %s “%s” was already scanned", __func__,
                     mn->mailbox ? "mailbox" : "folder",
                     mn->mailbox ? libbalsa_mailbox_get_name(mn->mailbox) : mn->name);
+        }
         g_object_remove_weak_pointer(G_OBJECT(mn), & l->data);
     }
     g_slist_free(list);
@@ -962,7 +963,8 @@ mb_filter_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 	   problems of infinite recursion (when one mailbox being
 	   filtered is also the destination of the filter action (eg a
 	   copy)). So let's see that later :) */
-	g_print("You can apply filters only on mailbox\n");
+    	libbalsa_information_parented(GTK_WINDOW(balsa_app.main_window),
+    		LIBBALSA_INFORMATION_MESSAGE, _("You can apply filters only on mailbox"));
 }
 
 static void
@@ -1172,8 +1174,7 @@ add_local_mailbox(BalsaMailboxNode *root, const gchar * name,
 	
 	mbnode = balsa_mailbox_node_new_from_mailbox(mailbox);
 	
-	if (balsa_app.debug)
-	    g_print(_("Local mailbox %s loaded as: %s\n"),
+	    g_debug("Local mailbox %s loaded as: %s",
 		    libbalsa_mailbox_get_name(mailbox),
 		    g_type_name(G_OBJECT_TYPE(mailbox)));
         if (balsa_app.check_mail_upon_startup
@@ -1203,8 +1204,7 @@ add_local_folder(BalsaMailboxNode * root, const char *d_name,
     mbnode = balsa_mailbox_node_new_from_dir(path);
     mbnode->parent = root;
     balsa_mblist_mailbox_node_append(root, mbnode);
-    if (balsa_app.debug)
-	g_print(_("Local folder %s\n"), path);
+	g_debug("Local folder %s", path);
 
     return mbnode;
 }

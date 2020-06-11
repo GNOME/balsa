@@ -36,6 +36,11 @@
 #include "misc.h"
 #include <glib/gi18n.h>
 
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "mbox-local"
+
 typedef struct _LibBalsaMailboxLocalPrivate LibBalsaMailboxLocalPrivate;
 struct _LibBalsaMailboxLocalPrivate {
     guint sync_id;  /* id of the idle mailbox sync job  */
@@ -214,13 +219,13 @@ libbalsa_mailbox_local_new(const gchar * path, gboolean create)
     else if(magic_type == LIBBALSA_TYPE_MAILBOX_MAILDIR)
 	return libbalsa_mailbox_maildir_new(path, create);
     else if(magic_type == LIBBALSA_TYPE_MAILBOX_IMAP) {
-        g_warning("IMAP path given as a path to local mailbox.\n");
+        g_warning("IMAP path given as a path to local mailbox.");
         return NULL;
     } else {		/* mailbox non-existent or unreadable */
 	if(create)
 	    return libbalsa_mailbox_mbox_new(path, TRUE);
         else {
-            g_warning("Unknown mailbox type\n");
+            g_warning("Unknown mailbox type");
             return NULL;
         }
     }
@@ -600,9 +605,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
         /* No error, but we return FALSE so the caller can grab all the
          * message info needed to rethread from scratch. */
         if (libbalsa_mailbox_total_messages(mailbox) > 0)
-            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
-                                 _("Cache file for mailbox %s "
-                                   "will be created"), name);
+            g_debug("Cache file for mailbox %s will be created", name);
         g_free(filename);
         g_free(name);
         return FALSE;
@@ -627,7 +630,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
         /* Total must be > 0 (no file is created for empty tree). */
         || info->value.total == 0
         || info->value.total > libbalsa_mailbox_total_messages(mailbox)) {
-        libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+        libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
                              _("Cache file for mailbox %s "
                                "will be repaired"), name);
         g_free(contents);
@@ -644,7 +647,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
         LibBalsaMailboxLocalMessageInfo *msg_info;
         if (info->msgno == 0 || info->msgno > *total
             || seen[info->msgno - 1]) {
-            libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
                                  _("Cache file for mailbox %s "
                                    "will be repaired"), name);
             g_free(seen);
@@ -667,7 +670,7 @@ lbm_local_restore_tree(LibBalsaMailboxLocal * local, guint * total)
                 parent = parent->parent;
                 if (parent == NULL) {
                     /* We got to the root without finding the parent. */
-                    libbalsa_information(LIBBALSA_INFORMATION_DEBUG,
+                    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
                                          _("Cache file for mailbox %s "
                                            "will be repaired"), name);
                     g_free(seen);
@@ -1205,9 +1208,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
         libbalsa_mailbox_local_get_instance_private(local);
 
     lbm_local_set_threading_info(local);
-#if defined(DEBUG_LOADING_AND_THREADING)
-    printf("before load_messages: time=%lu\n", (unsigned long) time(NULL));
-#endif
+    g_debug("before load_messages: time=%lu", (unsigned long) time(NULL));
     if (libbalsa_mailbox_get_msg_tree(mailbox) == NULL) {   /* first reference */
         guint total = 0;
         gboolean natural = (thread_type == LB_MAILBOX_THREADING_FLAT
@@ -1239,9 +1240,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
             libbalsa_mailbox_local_check(mailbox);
         }
 
-#if defined(DEBUG_LOADING_AND_THREADING)
-        printf("after load messages: time=%lu\n", (unsigned long) time(NULL));
-#endif
+        g_debug("after load messages: time=%lu", (unsigned long) time(NULL));
         if (natural) {
             /* No need to thread. */
             return;
@@ -1256,9 +1255,7 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
             g_idle_add((GSourceFunc) lbml_set_threading_idle_cb, local);
     }
 
-#if defined(DEBUG_LOADING_AND_THREADING)
-    printf("after threading time=%lu\n", (unsigned long) time(NULL));
-#endif
+    g_debug("after threading time=%lu", (unsigned long) time(NULL));
 
     lbm_local_queue_save_tree(local);
 }

@@ -370,7 +370,7 @@ balsa_toolbar_model_append_icon(BalsaToolbarModel * model,
         entry.icon   = g_strdup(real_button);
         g_array_append_val(model->current, entry);
     } else
-        g_warning(_("Unknown toolbar icon “%s”"), icon);
+        g_warning("Unknown toolbar icon “%s”", icon);
 }
 
 /* Remove all icons from the BalsaToolbarModel.

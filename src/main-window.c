@@ -271,7 +271,7 @@ print_network_status(gboolean available)
     datetime_string = g_date_time_format(datetime, "%c");
     g_date_time_unref(datetime);
 
-    g_print("Network is %s (%s)\n",
+    g_debug("Network is %s (%s)",
             available ? "available  " : "unavailable",
             datetime_string);
     g_free(datetime_string);
@@ -756,7 +756,7 @@ bw_get_action(BalsaWindow * window,
         action = g_action_map_lookup_action(action_map, action_name);
     }
     if (!action)
-        g_print("%s action “%s” not found\n", __func__, action_name);
+        g_warning("%s action “%s” not found", __func__, action_name);
 
     return action;
 }
@@ -1921,7 +1921,7 @@ header_change_state(GSimpleAction * action,
     else if (strcmp(value, "all") == 0)
         sh = HEADERS_ALL;
     else {
-        g_print("%s unknown value “%s”\n", __func__, value);
+        g_warning("%s unknown value “%s”", __func__, value);
         return;
     }
 
@@ -2096,8 +2096,8 @@ bw_set_menus(BalsaWindow * window)
                                            win_entries,
                                            G_N_ELEMENTS(win_entries),
                                            resource_path, &error, window);
-    if (error) {
-        g_print("%s %s\n", __func__, error->message);
+    if (error != NULL) {
+        g_warning("%s error: %s", __func__, error->message);
         g_error_free(error);
         return;
     }
@@ -2814,7 +2814,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
                                            "font-weight:normal;"
                                          "}",
                                          -1, NULL))
-        g_print("Could not load label CSS data.\n");
+        g_warning("Could not load label CSS data.");
 
     gtk_style_context_add_provider(gtk_widget_get_style_context(lab) ,
                                    GTK_STYLE_PROVIDER(css_provider),
@@ -3121,9 +3121,7 @@ bw_close_mailbox_on_timer(BalsaWindow * window)
         if (balsa_app.close_mailbox_auto &&
             (delta_time = current_time - balsa_index_get_last_use_time(index)) >
             balsa_app.close_mailbox_timeout) {
-            if (balsa_app.debug)
-                fprintf(stderr, "Closing Page %d unused for %d s\n",
-                        i, delta_time);
+            g_debug("Closing Page %d unused for %d s", i, delta_time);
             balsa_window_real_close_mbnode(window, balsa_index_get_mailbox_node(index));
             if (i < c)
                 c--;

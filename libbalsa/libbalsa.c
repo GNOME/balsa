@@ -52,17 +52,6 @@ static GThread *main_thread_id;
 
 
 void
-libbalsa_message(const char *fmt, ...)
-{
-    va_list va_args;
-
-    va_start(va_args, fmt);
-    libbalsa_information_varg(NULL, LIBBALSA_INFORMATION_MESSAGE,
-                              fmt, va_args);
-    va_end(va_args);
-}
-
-void
 libbalsa_init(void)
 {
     main_thread_id = g_thread_self();

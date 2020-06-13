@@ -239,8 +239,16 @@ balsa_message_class_init(BalsaMessageClass * klass)
 static void
 balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * balsa_message)
 {
-    if (balsa_message->parts_popup != NULL)
-        gtk_popover_popup(GTK_POPOVER(balsa_message->parts_popup));
+    if (balsa_message->parts_popup != NULL) {
+        if (libbalsa_use_popover()) {
+            gtk_popover_popup(GTK_POPOVER(balsa_message->parts_popup));
+        } else {
+            gtk_menu_popup_at_widget(GTK_MENU(balsa_message->parts_popup),
+                                     GTK_WIDGET(balsa_message),
+                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                     NULL);
+        }
+    }
 }
 
 
@@ -993,8 +1001,12 @@ balsa_message_init(BalsaMessage * balsa_message)
                   "message-menu.save-selected");
     g_menu_append(menu, _("Save selected to folder…"),
                   "message-menu.save-selected-to-folder");
-    balsa_message->save_all_popup =
-        gtk_popover_new_from_model(balsa_message->treeview, G_MENU_MODEL(menu));
+    if (libbalsa_use_popover()) {
+        balsa_message->save_all_popup =
+            gtk_popover_new_from_model(balsa_message->treeview, G_MENU_MODEL(menu));
+    } else {
+        balsa_message->save_all_popup = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+    }
     g_object_unref(menu);
 
     gtk_widget_show_all(GTK_WIDGET(balsa_message));
@@ -1143,7 +1155,10 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
         popup_menu = balsa_message->save_all_popup;
     }
 
-    if (popup_menu != NULL) {
+    if (popup_menu == NULL)
+        return;
+
+    if (libbalsa_use_popover()) {
         gdouble x, y;
 
         if (event != NULL &&
@@ -1160,6 +1175,15 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
         }
 
         gtk_popover_popup(GTK_POPOVER(popup_menu));
+    } else {
+        if (event != NULL) {
+            gtk_menu_popup_at_pointer(GTK_MENU(balsa_message->save_all_popup), event);
+        } else {
+            gtk_menu_popup_at_widget(GTK_MENU(balsa_message->save_all_popup),
+                                     GTK_WIDGET(balsa_message),
+                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                     NULL);
+        }
     }
 }
 
@@ -1224,17 +1248,21 @@ tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
                 gtk_tree_model_get(model, &iter, PART_INFO_COLUMN, &info, -1);
                 if (info != NULL) {
                     if (info->popup_menu != NULL) {
-                        GdkRectangle rectangle;
+                        if (libbalsa_use_popover()) {
+                            GdkRectangle rectangle;
 
-                        /* Pop up above the pointer */
-                        rectangle.x = (int) x;
-                        rectangle.width = 0;
-                        rectangle.y = (int) y;
-                        rectangle.height = 0;
-                        gtk_popover_set_pointing_to(GTK_POPOVER(info->popup_menu),
-                                                    &rectangle);
+                            /* Pop up above the pointer */
+                            rectangle.x = (int) x;
+                            rectangle.width = 0;
+                            rectangle.y = (int) y;
+                            rectangle.height = 0;
+                            gtk_popover_set_pointing_to(GTK_POPOVER(info->popup_menu),
+                                                        &rectangle);
 
-                        gtk_popover_popup(GTK_POPOVER(info->popup_menu));
+                            gtk_popover_popup(GTK_POPOVER(info->popup_menu));
+                        } else {
+                            gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu), event);
+                        }
                     }
                     g_object_unref(info);
                 }
@@ -1753,13 +1781,22 @@ display_content(BalsaMessage * balsa_message)
 
     balsa_message->parts_menu = g_menu_new();
 
-    /* Detach any existing popup: */
-    if (balsa_message->parts_popup != NULL)
-	gtk_popover_set_relative_to(GTK_POPOVER(balsa_message->parts_popup), NULL);
+    if (libbalsa_use_popover()) {
+        /* Detach any existing popup: */
+        if (balsa_message->parts_popup != NULL)
+            gtk_popover_set_relative_to(GTK_POPOVER(balsa_message->parts_popup), NULL);
 
-    balsa_message->parts_popup =
-        gtk_popover_new_from_model(balsa_message->attach_button,
-                                   G_MENU_MODEL(balsa_message->parts_menu));
+        balsa_message->parts_popup =
+            gtk_popover_new_from_model(balsa_message->attach_button,
+                                       G_MENU_MODEL(balsa_message->parts_menu));
+    } else {
+        if (balsa_message->parts_popup)
+            g_object_unref(balsa_message->parts_popup);
+
+        balsa_message->parts_popup =
+            gtk_menu_new_from_model(G_MENU_MODEL(balsa_message->parts_menu));
+        g_object_ref_sink(balsa_message->parts_popup);
+    }
 
     /* Populate the parts-menu */
     display_parts(balsa_message, libbalsa_message_get_body_list(balsa_message->message), NULL, NULL);
@@ -1825,7 +1862,8 @@ open_with_change_state(GSimpleAction *action,
     balsa_mime_widget_ctx_menu_cb(app, info->body);
 
     g_simple_action_set_state(action, parameter);
-    gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
+    if (libbalsa_use_popover())
+        gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
 }
 
 static void
@@ -1844,7 +1882,8 @@ copy_part_change_state(GSimpleAction *action,
     }
 
     g_simple_action_set_state(action, parameter);
-    gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
+    if (libbalsa_use_popover())
+        gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
 }
 
 static void
@@ -1904,8 +1943,13 @@ part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
     g_free(content_type);
     g_free(prefix);
 
-    info->popup_menu =
-        gtk_popover_new_from_model(balsa_message->treeview, G_MENU_MODEL(menu));
+    if (libbalsa_use_popover()) {
+        info->popup_menu =
+            gtk_popover_new_from_model(balsa_message->treeview, G_MENU_MODEL(menu));
+    } else {
+        info->popup_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+    }
+
     g_object_unref(menu);
 }
 

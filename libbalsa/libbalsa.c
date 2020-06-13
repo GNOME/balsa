@@ -745,3 +745,21 @@ libbalsa_dialog_flags(void)
 {
 	return libbalsa_use_headerbar() ? GTK_DIALOG_USE_HEADER_BAR : (GtkDialogFlags) 0;
 }
+
+gboolean
+libbalsa_use_popover(void)
+{
+	static gboolean use_popover = TRUE;
+	static gint check_done = 0;
+
+	if (g_atomic_int_get(&check_done) == 0) {
+		const gchar *popover_env;
+
+		popover_env = g_getenv("BALSA_USE_POPOVER");
+		if ((popover_env != NULL) && (atoi(popover_env) == 0)) {
+			use_popover = FALSE;
+		}
+		g_atomic_int_set(&check_done, 1);
+	}
+	return use_popover;
+}

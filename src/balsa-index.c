@@ -142,7 +142,7 @@ struct _BalsaIndex {
 
     /* the popup menu */
     GMenu *popup_menu;
-    GtkWidget *popup_popover;
+    GtkWidget *popup_widget;
     gint move_position;
 
     BalsaMailboxNode* mailbox_node;
@@ -2051,7 +2051,8 @@ move_to_change_state(GSimpleAction *action,
         }
     }
 
-    gtk_popover_popdown(GTK_POPOVER(bindex->popup_popover));
+    if (libbalsa_use_popover())
+        gtk_popover_popdown(GTK_POPOVER(bindex->popup_widget));
 }
 
 /*
@@ -2134,8 +2135,12 @@ bndx_popup_menu_create(BalsaIndex * bindex)
     g_object_unref(section);
 
     bindex->popup_menu = menu;
-    bindex->popup_popover = gtk_popover_new_from_model(GTK_WIDGET(bindex), G_MENU_MODEL(menu));
-    gtk_popover_set_position(GTK_POPOVER(bindex->popup_popover), GTK_POS_BOTTOM);
+    if (libbalsa_use_popover()) {
+        bindex->popup_widget = gtk_popover_new_from_model(GTK_WIDGET(bindex), G_MENU_MODEL(menu));
+        gtk_popover_set_position(GTK_POPOVER(bindex->popup_widget), GTK_POS_BOTTOM);
+    } else {
+        bindex->popup_widget = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+    }
 }
 
 /* bndx_do_popup: common code for the popup menu;
@@ -2222,29 +2227,39 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     g_menu_insert_item(index->popup_menu, index->move_position, item);
     g_object_unref(item);
 
-    if (event != NULL &&
-        gdk_event_triggers_context_menu(event) &&
-        gdk_event_get_coords(event, &x, &y)) {
-        /* Pop up to the right of the pointer */
-        gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(index),
-                                                          (gint) x,
-                                                          (gint) y,
-                                                          &allocation.x,
-                                                          &allocation.y);
-        allocation.width = 0;
-        allocation.height = 0;
-    } else {
-        /* Pop up to the right of the "From" column */
-        gtk_widget_get_allocation(GTK_WIDGET(index), &allocation);
-        allocation.width = balsa_app.index_num_width +
-                           balsa_app.index_status_width +
-                           balsa_app.index_attachment_width +
-                           balsa_app.index_from_width;
-    }
-    gtk_popover_set_pointing_to(GTK_POPOVER(index->popup_popover),
-                                (GdkRectangle *) &allocation);
+    if (libbalsa_use_popover()) {
+        if (event != NULL &&
+            gdk_event_triggers_context_menu(event) &&
+            gdk_event_get_coords(event, &x, &y)) {
+            /* Pop up to the right of the pointer */
+            gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(index),
+                                                              (gint) x,
+                                                              (gint) y,
+                                                              &allocation.x,
+                                                              &allocation.y);
+            allocation.width = 0;
+            allocation.height = 0;
+        } else {
+            /* Pop up to the right of the "From" column */
+            gtk_widget_get_allocation(GTK_WIDGET(index), &allocation);
+            allocation.width = balsa_app.index_num_width +
+                               balsa_app.index_status_width +
+                               balsa_app.index_attachment_width +
+                               balsa_app.index_from_width;
+        }
+        gtk_popover_set_pointing_to(GTK_POPOVER(index->popup_widget),
+                                    (GdkRectangle *) &allocation);
 
-    gtk_popover_popup(GTK_POPOVER(index->popup_popover));
+        gtk_popover_popup(GTK_POPOVER(index->popup_widget));
+    } else {
+        if (event != NULL) {
+            gtk_menu_popup_at_pointer(GTK_MENU(index->popup_widget), event);
+        } else {
+            gtk_menu_popup_at_widget(GTK_MENU(index->popup_widget), GTK_WIDGET(index),
+                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                     NULL);
+        }
+    }
 }
 
 /* End of popup stuff */

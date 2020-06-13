@@ -866,7 +866,7 @@ libbalsa_vevent_recurrence_str(LibBalsaVEvent *event, const gchar *format_str)
  */
 gchar *
 libbalsa_vevent_reply(const LibBalsaVEvent   *event,
-					  const gchar            *sender,
+					  InternetAddress        *sender,
 					  icalparameter_partstat  new_stat)
 {
 	icalcomponent *reply;
@@ -892,9 +892,10 @@ libbalsa_vevent_reply(const LibBalsaVEvent   *event,
     icalcomponent_add_component(reply, ev_data);
 
     /* add ATTENDEE */
-    buf = g_strconcat("mailto:", sender, NULL);
+    buf = g_strconcat("mailto:", internet_address_mailbox_get_addr(INTERNET_ADDRESS_MAILBOX(sender)), NULL);
     prop = icalproperty_new_attendee(buf);
     g_free(buf);
+    icalproperty_add_parameter(prop, icalparameter_new_cn(internet_address_get_name(sender)));
     icalproperty_add_parameter(prop, icalparameter_new_partstat(new_stat));
     icalcomponent_add_property(ev_data, prop);
 
@@ -902,12 +903,12 @@ libbalsa_vevent_reply(const LibBalsaVEvent   *event,
     icalcomponent_add_property(ev_data, icalproperty_new_dtstamp(icaltime_current_time_with_zone(NULL)));
 
     /* add ORGANIZER - /should/ be present */
-    if (event->organizer != NULL) {
-        const gchar *addr = libbalsa_address_get_addr(event->organizer);
-
-        if (addr != NULL) {
-        	icalcomponent_add_property(ev_data, icalproperty_new_organizer(addr));
+    if ((event->organizer != NULL) && (libbalsa_address_get_addr(event->organizer) != NULL)) {
+    	prop = icalproperty_new_organizer(libbalsa_address_get_addr(event->organizer));
+    	if (libbalsa_address_get_full_name(event->organizer) != NULL) {
+    		icalproperty_add_parameter(prop, icalparameter_new_cn(libbalsa_address_get_full_name(event->organizer)));
         }
+    	icalcomponent_add_property(ev_data, prop);
     }
 
     /* add RECURRENCE-ID (if present) */

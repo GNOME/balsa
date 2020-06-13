@@ -386,7 +386,7 @@ vevent_reply(GObject * button, GtkWidget * box)
 
     /* the next message part is the calendar object */
     body = libbalsa_message_body_new(message);
-    body->buffer = libbalsa_vevent_reply(event, INTERNET_ADDRESS_MAILBOX(ia)->addr, pstat);
+    body->buffer = libbalsa_vevent_reply(event, ia, pstat);
     if (body->buffer == NULL) {
     	g_object_unref(message);
     	return;

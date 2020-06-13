@@ -1,3 +1,13 @@
+2020-06-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Use GtkTreeView's "row-activated" signal instead of
+	connecting to "button-press-event".
+
+	* libbalsa/autocrypt.c (autocrypt_db_dialog_run),
+	(row_activated_cb):
+	* libbalsa/libbalsa-gpgme-cb.c (row_activated_cb),
+	(lb_gpgme_select_key):
+
 2020-06-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Various: restore filtering in a mailbox that is not currently

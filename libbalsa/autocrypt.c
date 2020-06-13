@@ -118,11 +118,10 @@ static AutocryptRecommend autocrypt_check_ia_list(gpgme_ctx_t           gpgme_ct
 												  time_t                ref_time,
 												  GList               **missing_keys,
 												  GError              **error);
-static void gesture_pressed_cb(GtkGestureMultiPress *gesture,
-                               gint                  n_press,
-                               gdouble               x,
-                               gdouble               y,
-                               gpointer              user_data);
+static void row_activated_cb(GtkTreeView       *tree_view,
+                             GtkTreePath       *path,
+                             GtkTreeViewColumn *column,
+                             gpointer           user_data);
 
 
 static sqlite3 *autocrypt_db = NULL;
@@ -432,7 +431,6 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 	GtkTreeViewColumn *column;
     GList *keys = NULL;
 	int sqlite_res;
-    GtkGesture *gesture;
 
 	dialog = gtk_dialog_new_with_buttons(_("Autocrypt database"), parent,
 		GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), _("_Close"), GTK_RESPONSE_CLOSE, NULL);
@@ -458,8 +456,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 
     tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
 
-    gesture = gtk_gesture_multi_press_new(tree_view);
-    g_signal_connect(gesture, "pressed", G_CALLBACK(gesture_pressed_cb), dialog);
+    g_signal_connect(tree_view, "row-activated", G_CALLBACK(row_activated_cb), dialog);
 
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
@@ -774,32 +771,17 @@ update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
 
 
 static void
-gesture_pressed_cb(GtkGestureMultiPress *gesture,
-                   gint                  n_press,
-                   gdouble               x,
-                   gdouble               y,
-                   gpointer              data)
+row_activated_cb(GtkTreeView       *tree_view,
+                 GtkTreePath       *path,
+                 GtkTreeViewColumn *column,
+                 gpointer           user_data)
 {
-    GtkWidget *widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture));
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
-    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
-    GtkTreePath *path;
-    GtkTreeIter iter;
     GtkTreeModel *model;
-
-    if (n_press != 2)
-        return;
-
-    if (gtk_tree_view_get_path_at_pos(tree_view, x, y, &path, NULL, NULL, NULL)) {
-        if (!gtk_tree_selection_path_is_selected(selection, path)) {
-            gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
-            gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
-        }
-        gtk_tree_path_free(path);
-    }
+    GtkTreeIter iter;
 
     /* note: silently ignore all errors below... */
-    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+    model = gtk_tree_view_get_model(tree_view);
+    if (gtk_tree_model_get_iter(model, &iter, path)) {
 		gpgme_ctx_t ctx;
 
 		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, NULL);
@@ -816,9 +798,10 @@ gesture_pressed_cb(GtkGestureMultiPress *gesture,
 					libbalsa_gpgme_import_bin_key(ctx, key, NULL, NULL) &&
 					libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, TRUE, NULL);
 				if (success && (keys != NULL)) {
+			    	GtkWindow *window = user_data;
 			    	GtkWidget *dialog;
 
-			    	dialog = libbalsa_key_dialog(GTK_WINDOW(data), GTK_BUTTONS_CLOSE, (gpgme_key_t) keys->data, GPG_SUBKEY_CAP_ALL,
+			    	dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, (gpgme_key_t) keys->data, GPG_SUBKEY_CAP_ALL,
 			    		NULL, NULL);
 			    	(void) gtk_dialog_run(GTK_DIALOG(dialog));
 			    	gtk_widget_destroy(dialog);

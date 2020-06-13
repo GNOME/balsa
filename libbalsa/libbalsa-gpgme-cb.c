@@ -132,41 +132,26 @@ lb_gpgme_passphrase(void *hook, const gchar * uid_hint,
 }
 
 
-static gboolean
-key_button_event_press_cb(GtkWidget      *widget,
-						  GdkEventButton *event,
-						  gpointer        data)
+static void
+row_activated_cb(GtkTreeView       *tree_view,
+                 GtkTreePath       *path,
+                 GtkTreeViewColumn *column,
+                 gpointer           user_data)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
-    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
-    GtkTreePath *path;
     GtkTreeIter iter;
     GtkTreeModel *model;
 
-    g_return_val_if_fail(event != NULL, FALSE);
-    if ((event->type != GDK_2BUTTON_PRESS) || event->window != gtk_tree_view_get_bin_window(tree_view)) {
-        return FALSE;
-    }
-
-    if (gtk_tree_view_get_path_at_pos(tree_view, event->x, event->y, &path, NULL, NULL, NULL)) {
-        if (!gtk_tree_selection_path_is_selected(selection, path)) {
-            gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
-            gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
-        }
-        gtk_tree_path_free(path);
-    }
-
-    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+    model = gtk_tree_view_get_model(tree_view);
+    if (gtk_tree_model_get_iter(model, &iter, path)) {
     	gpgme_key_t key;
+        GtkWindow *window = user_data;
     	GtkWidget *dialog;
 
-		gtk_tree_model_get(model, &iter, GPG_KEY_PTR_COLUMN, &key, -1);
-		dialog = libbalsa_key_dialog(GTK_WINDOW(data), GTK_BUTTONS_CLOSE, key, GPG_SUBKEY_CAP_ALL, NULL, NULL);
-		(void) gtk_dialog_run(GTK_DIALOG(dialog));
-		gtk_widget_destroy(dialog);
+        gtk_tree_model_get(model, &iter, GPG_KEY_PTR_COLUMN, &key, -1);
+        dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, key, GPG_SUBKEY_CAP_ALL, NULL, NULL);
+        (void) gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
     }
-
-    return TRUE;
 }
 
 
@@ -288,7 +273,7 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
 	gtk_tree_view_column_set_resizable(column, TRUE);
 
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
-    g_signal_connect(tree_view, "button_press_event", G_CALLBACK(key_button_event_press_cb), dialog);
+    g_signal_connect(tree_view, "row-activated", G_CALLBACK(row_activated_cb), dialog);
 
     gtk_widget_show_all(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
 

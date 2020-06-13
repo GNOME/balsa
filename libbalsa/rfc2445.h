@@ -51,7 +51,7 @@ typedef enum {
 LibBalsaVCal *libbalsa_vcal_new_from_body(LibBalsaMessageBody * body);
 
 gchar *libbalsa_vevent_reply(const LibBalsaVEvent   *event,
-			     	 	 	 const gchar            *sender,
+							 InternetAddress        *sender,
 							 icalparameter_partstat  new_stat);
 
 gchar *libbalsa_vcal_attendee_to_str(LibBalsaAddress *person);

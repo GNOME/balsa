@@ -740,21 +740,32 @@ bmbl_do_popup(GtkTreeView    *tree_view,
 
     menu = balsa_mailbox_node_get_context_menu(mbnode, GTK_WIDGET(tree_view));
 
+    if (libbalsa_use_popover()) {
+        if (event != NULL &&
+            gdk_event_triggers_context_menu(event) &&
+            gdk_event_get_coords(event, &x, &y)) {
+            GdkRectangle rectangle;
 
-    if (event != NULL &&
-        gdk_event_triggers_context_menu(event) &&
-        gdk_event_get_coords(event, &x, &y)) {
-        GdkRectangle rectangle;
+            /* Pop up above the pointer */
+            rectangle.x = (int) x;
+            rectangle.width = 0;
+            rectangle.y = (int) y;
+            rectangle.height = 0;
+            gtk_popover_set_pointing_to(GTK_POPOVER(menu), &rectangle);
+        }
 
-        /* Pop up above the pointer */
-        rectangle.x = (int) x;
-        rectangle.width = 0;
-        rectangle.y = (int) y;
-        rectangle.height = 0;
-        gtk_popover_set_pointing_to(GTK_POPOVER(menu), &rectangle);
+        gtk_popover_popup(GTK_POPOVER(menu));
+    } else {
+        g_object_ref(menu);
+        g_object_ref_sink(menu);
+        if (event)
+            gtk_menu_popup_at_pointer(GTK_MENU(menu), (GdkEvent *) event);
+        else
+            gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(tree_view),
+                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                     NULL);
+        g_object_unref(menu);
     }
-
-    gtk_popover_popup(GTK_POPOVER(menu));
 
     if (mbnode != NULL)
 	g_object_unref(mbnode);

@@ -1174,11 +1174,13 @@ bmwt_html_open_with_change_state(GSimpleAction *action,
 {
     GtkWidget *html = user_data;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
-    GtkPopover *popover = g_object_get_data(G_OBJECT(html), "popover");
 
     open_with_change_state(action, parameter, mime_body);
 
-    gtk_popover_popdown(popover);
+    if (libbalsa_use_popover()) {
+        GtkPopover *popover = g_object_get_data(G_OBJECT(html), "popup-menu");
+        gtk_popover_popdown(popover);
+    }
 }
 
 static void
@@ -1280,19 +1282,26 @@ static gboolean
 bmwt_html_popup_context_menu(GtkWidget    *html,
                              BalsaMessage *bm)
 {
-    GtkWidget *popover;
+    GtkWidget *popup_menu;
     const GdkEvent *event;
     GdkEvent *current_event = NULL;
     gdouble x, y;
 
-    popover = g_object_get_data(G_OBJECT(html), "popover");
-    if (popover == NULL) {
+    popup_menu = g_object_get_data(G_OBJECT(html), "popup-menu");
+    if (popup_menu == NULL) {
         GMenu *menu;
 
         menu = g_menu_new();
         bmwt_html_populate_popup_menu(bm, html, menu);
-        popover = gtk_popover_new_from_model(libbalsa_html_get_view_widget(html), G_MENU_MODEL(menu));
-        g_object_set_data(G_OBJECT(html), "popover", popover);
+
+        if (libbalsa_use_popover()) {
+            popup_menu = gtk_popover_new_from_model(libbalsa_html_get_view_widget(html),
+                                                    G_MENU_MODEL(menu));
+        } else {
+            popup_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+        }
+
+        g_object_set_data(G_OBJECT(html), "popup-menu", popup_menu);
     }
 
     /* In WebKit2, the context menu signal is asynchronous, so the
@@ -1302,19 +1311,30 @@ bmwt_html_popup_context_menu(GtkWidget    *html,
     if (event == NULL)
         event = current_event = gtk_get_current_event();
 
-    if (event != NULL &&
-        gdk_event_triggers_context_menu(event) &&
-        gdk_event_get_coords(event, &x, &y)) {
-        GdkRectangle rectangle;
+    if (libbalsa_use_popover()) {
+        if (event != NULL &&
+            gdk_event_triggers_context_menu(event) &&
+            gdk_event_get_coords(event, &x, &y)) {
+            GdkRectangle rectangle;
 
-        /* Pop up above the pointer */
-        rectangle.x = (gint) x;
-        rectangle.width = 0;
-        rectangle.y = (gint) y;
-        rectangle.height = 0;
-        gtk_popover_set_pointing_to(GTK_POPOVER(popover), &rectangle);
+            /* Pop up above the pointer */
+            rectangle.x = (gint) x;
+            rectangle.width = 0;
+            rectangle.y = (gint) y;
+            rectangle.height = 0;
+            gtk_popover_set_pointing_to(GTK_POPOVER(popup_menu), &rectangle);
+        }
+        gtk_popover_popup(GTK_POPOVER(popup_menu));
+    } else {
+        if (event != NULL)
+            gtk_menu_popup_at_pointer(GTK_MENU(popup_menu),
+                                     (GdkEvent *) event);
+        else
+            gtk_menu_popup_at_widget(GTK_MENU(popup_menu),
+                                     GTK_WIDGET(bm),
+                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                     NULL);
     }
-    gtk_popover_popup(GTK_POPOVER(popover));
 
     if (current_event != NULL)
         gdk_event_free(current_event);

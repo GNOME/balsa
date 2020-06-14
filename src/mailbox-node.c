@@ -1184,7 +1184,10 @@ create_context_menu(BalsaMailboxNode *mbnode,
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
-    context_menu = gtk_popover_new_from_model(relative_to, G_MENU_MODEL(menu));
+    if (libbalsa_use_popover())
+        context_menu = gtk_popover_new_from_model(relative_to, G_MENU_MODEL(menu));
+    else
+        context_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
     g_object_unref(menu);
 
     return context_menu;

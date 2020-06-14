@@ -1311,6 +1311,10 @@ change_attach_mode(GSimpleAction *action,
     GtkTreeModel *model;
     GtkTreeSelection *selection;
     BalsaAttachInfo *test_info;
+    gint result = GTK_RESPONSE_YES;
+
+    if (new_mode == info->mode)
+        return;
 
     /* get the selected element */
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(info->bm->tree_view));
@@ -1327,9 +1331,8 @@ change_attach_mode(GSimpleAction *action,
     g_object_unref(test_info);
 
     /* verify that the user *really* wants to attach as reference */
-    if (info->mode != new_mode && new_mode == LIBBALSA_ATTACH_AS_EXTBODY) {
+    if (new_mode == LIBBALSA_ATTACH_AS_EXTBODY) {
 	GtkWidget *extbody_dialog, *parent;
-	gint result;
 
 	parent = gtk_widget_get_toplevel(info->bm->window);
 	extbody_dialog =
@@ -1353,21 +1356,17 @@ change_attach_mode(GSimpleAction *action,
 			     _("Attach as Reference?"));
 	result = gtk_dialog_run(GTK_DIALOG(extbody_dialog));
 	gtk_widget_destroy(extbody_dialog);
-	if (result != GTK_RESPONSE_YES) {
-            gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
-
-	    return;
-        }
     }
 
-    /* change the attachment mode */
-    info->mode = new_mode;
-    gtk_list_store_set(GTK_LIST_STORE(model), &iter, ATTACH_MODE_COLUMN,
-		       info->mode, -1);
+    if (result == GTK_RESPONSE_YES) {
+        /* change the attachment mode */
+        info->mode = new_mode;
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter, ATTACH_MODE_COLUMN, info->mode, -1);
+        g_simple_action_set_state(action, parameter);
+    }
 
-    gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
-
-    g_simple_action_set_state(action, parameter);
+    if (libbalsa_use_popover())
+        gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
 }
 
 
@@ -1389,7 +1388,8 @@ attachment_menu_vfs_cb(GSimpleAction *action,
                           err ? err->message : "Unknown error");
     g_clear_error(&err);
 
-    gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
+    if (libbalsa_use_popover())
+        gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
 }
 
 
@@ -1804,10 +1804,19 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
         g_object_unref(section);
     }
 
-    attach_data->popup_menu = gtk_popover_new(bsmsg->tree_view);
-    gtk_popover_bind_model(GTK_POPOVER(attach_data->popup_menu),
-                           G_MENU_MODEL(menu),
-                           attachment_namespace);
+    if (libbalsa_use_popover()) {
+        attach_data->popup_menu = gtk_popover_new(bsmsg->tree_view);
+        gtk_popover_bind_model(GTK_POPOVER(attach_data->popup_menu),
+                               G_MENU_MODEL(menu),
+                               attachment_namespace);
+    } else {
+        attach_data->popup_menu = gtk_menu_new();
+        gtk_menu_shell_bind_model(GTK_MENU_SHELL(attach_data->popup_menu),
+                                  G_MENU_MODEL(menu),
+                                  attachment_namespace,
+                                  TRUE);
+    }
+
     g_object_unref(menu);
     g_free(attachment_namespace);
 
@@ -1892,10 +1901,14 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, const gchar *url)
     g_menu_append_section(menu, NULL, G_MENU_MODEL(open_menu));
     g_object_unref(open_menu);
 
-    attach_data->popup_menu =
-        gtk_popover_new_from_model(bsmsg->window, G_MENU_MODEL(menu));
+    if (libbalsa_use_popover()) {
+        attach_data->popup_menu =
+            gtk_popover_new_from_model(bsmsg->window, G_MENU_MODEL(menu));
+    } else {
+        attach_data->popup_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+        gtk_widget_show_all(attach_data->popup_menu);
+    }
     g_object_unref(menu);
-    gtk_widget_show_all(attach_data->popup_menu);
 
     /* append to the list store */
     gtk_list_store_set(GTK_LIST_STORE(model), &iter,
@@ -2403,16 +2416,20 @@ attachment_button_press_cb(GtkGestureMultiPress *multi_press,
 	    gtk_tree_model_get(model, &iter, ATTACH_INFO_COLUMN, &attach_info, -1);
 	    if (attach_info != NULL) {
 		if (attach_info->popup_menu != NULL) {
-                    GdkRectangle rectangle;
+                    if (libbalsa_use_popover()) {
+                        GdkRectangle rectangle;
 
-                    /* Pop up above the pointer */
-                    rectangle.x = (gint) x;
-                    rectangle.width = 0;
-                    rectangle.y = (gint) y;
-                    rectangle.height = 0;
-                    gtk_popover_set_pointing_to(GTK_POPOVER(attach_info->popup_menu),
-                                                &rectangle);
-                    gtk_popover_popup(GTK_POPOVER(attach_info->popup_menu));
+                        /* Pop up above the pointer */
+                        rectangle.x = (gint) x;
+                        rectangle.width = 0;
+                        rectangle.y = (gint) y;
+                        rectangle.height = 0;
+                        gtk_popover_set_pointing_to(GTK_POPOVER(attach_info->popup_menu),
+                                                    &rectangle);
+                        gtk_popover_popup(GTK_POPOVER(attach_info->popup_menu));
+                    } else {
+                        gtk_menu_popup_at_pointer(GTK_MENU(attach_info->popup_menu), event);
+                    }
                 }
 		g_object_unref(attach_info);
 	    }
@@ -2435,8 +2452,16 @@ attachment_popup_cb(GtkWidget *widget, gpointer user_data)
 
     gtk_tree_model_get(model, &iter, ATTACH_INFO_COLUMN, &attach_info, -1);
     if (attach_info != NULL) {
-	if (attach_info->popup_menu != NULL)
-            gtk_popover_popup(GTK_POPOVER(attach_info->popup_menu));
+	if (attach_info->popup_menu != NULL) {
+            if (libbalsa_use_popover()) {
+                gtk_popover_popup(GTK_POPOVER(attach_info->popup_menu));
+            } else {
+                gtk_menu_popup_at_widget(GTK_MENU(attach_info->popup_menu),
+                                         GTK_WIDGET(widget),
+                                         GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                         NULL);
+            }
+        }
 	g_object_unref(attach_info);
     }
 

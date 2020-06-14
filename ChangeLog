@@ -337,6 +337,32 @@
 
 	* src/main.c (balsa_startup_cb):
 
+2020-06-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Use a BALSA_USE_POPOVER=0 environment variable to switch from
+	GtkPopover back to GtkMenu.
+
+	This completes the adaptation to BALSA_USE_POPOVER, but with all
+	the changes in-place. Still TODO is pulling it all into libbalsa
+	with wrappers.
+
+	But...the GtkMenu versions don't actually work!! All actions are
+	insensitive. So this may well all finish up being worthless.
+
+	* src/balsa-mime-widget-image.c (balsa_image_button_press_cb):
+	* src/balsa-mime-widget-text.c (bmwt_html_open_with_change_state),
+	(bmwt_html_popup_context_menu):
+	* src/mailbox-node.c (create_context_menu):
+	* src/pref-manager.c (add_button_to_box), (add_menu_cb),
+	(pm_grid_add_remote_mailbox_servers_group),
+	(pm_grid_add_address_books_group):
+	* src/sendmsg-window.c (change_attach_mode),
+	(attachment_menu_vfs_cb), (add_attachment),
+	(add_urlref_attachment), (attachment_button_press_cb),
+	(attachment_popup_cb):
+	* src/toolbar-factory.c (tm_set_style_changed),
+	(tm_popup_context_menu_cb):
+
 2020-06-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Various: Use GtkTreeView's "row-activated" signal instead of

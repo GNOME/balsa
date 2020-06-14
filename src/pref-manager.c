@@ -1013,6 +1013,9 @@ add_button_to_box(const gchar * label, GCallback cb, gpointer cb_data,
     g_signal_connect_swapped(button, "clicked", cb, cb_data);
     gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
 
+    if (GTK_IS_POPOVER(cb_data))
+        gtk_popover_set_relative_to(cb_data, button);
+
     return button;
 }
 
@@ -1639,7 +1642,14 @@ address_book_set_default_cb(GtkTreeView * tree_view)
 static void
 add_menu_cb(GtkWidget * menu, GtkWidget * widget)
 {
-    gtk_popover_popup(GTK_POPOVER(menu));
+    if (libbalsa_use_popover()) {
+        gtk_popover_popup(GTK_POPOVER(menu));
+    } else {
+        gtk_widget_show_all(menu);
+        gtk_menu_popup_at_widget(GTK_MENU(menu), GTK_WIDGET(widget),
+                                 GDK_GRAVITY_NORTH_WEST, GDK_GRAVITY_NORTH_WEST,
+                                 NULL);
+    }
 }
 
 static void
@@ -1965,7 +1975,6 @@ pm_grid_add_remote_mailbox_servers_group(GtkWidget * grid_widget)
     GtkTreeViewColumn *column;
     GMenuModel *menu_model;
     GtkWidget *server_add_menu;
-    GtkWidget *button;
 
     pm_grid_attach(grid, pm_group_label(_("Remote mailbox servers")), 0, row, 3, 1);
 
@@ -2008,14 +2017,13 @@ pm_grid_add_remote_mailbox_servers_group(GtkWidget * grid_widget)
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, ROW_SPACING);
 
     menu_model = server_add_menu_model(vbox);
-    server_add_menu = gtk_popover_new_from_model(NULL, menu_model);
-    g_object_weak_ref(G_OBJECT(vbox), (GWeakNotify) g_object_unref,
-                      menu_model);
+    if (libbalsa_use_popover())
+        server_add_menu = gtk_popover_new_from_model(NULL, menu_model);
+    else
+        server_add_menu = gtk_menu_new_from_model(menu_model);
 
-    button = add_button_to_box(_("_Add"), G_CALLBACK(add_menu_cb),
-                               server_add_menu, vbox);
-    gtk_popover_set_relative_to(GTK_POPOVER(server_add_menu), button);
-
+    add_button_to_box(_("_Add"), G_CALLBACK(add_menu_cb),
+                      server_add_menu, vbox);
     add_button_to_box(_("_Modify"), G_CALLBACK(server_edit_cb),
                       tree_view, vbox);
     add_button_to_box(_("_Delete"), G_CALLBACK(server_del_cb),
@@ -2760,7 +2768,6 @@ pm_grid_add_address_books_group(GtkWidget * grid_widget)
     GMenuModel *menu_model;
     GtkWidget *address_book_add_menu;
     GtkWidget *vbox;
-    GtkWidget *button;
 
     pm_grid_attach(grid, pm_group_label(_("Address books")), 0, row, 3, 1);
 
@@ -2815,17 +2822,16 @@ pm_grid_add_address_books_group(GtkWidget * grid_widget)
 
     menu_model = balsa_address_book_add_menu(address_book_change,
                                              GTK_WINDOW(property_box));
-    address_book_add_menu = gtk_popover_new_from_model(NULL, menu_model);
-    g_object_weak_ref(G_OBJECT(address_book_add_menu),
-                      (GWeakNotify) g_object_unref, menu_model);
+    if (libbalsa_use_popover())
+        address_book_add_menu = gtk_popover_new_from_model(NULL, menu_model);
+    else
+        address_book_add_menu = gtk_menu_new_from_model(menu_model);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
 
-    button = add_button_to_box(_("_Add"),
-                               G_CALLBACK(add_menu_cb),
-                               address_book_add_menu, vbox);
-    gtk_popover_set_relative_to(GTK_POPOVER(address_book_add_menu), button);
-
+    add_button_to_box(_("_Add"),
+                      G_CALLBACK(add_menu_cb),
+                      address_book_add_menu, vbox);
     add_button_to_box(_("_Modify"),
                       G_CALLBACK(address_book_edit_cb),
                       tree_view, vbox);

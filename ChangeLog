@@ -339,6 +339,21 @@
 
 2020-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Various: Make GtkMenu versions work.
+
+	Each menu needs to be attached to a widget, which both handles
+	destruction and gives access to the necessary action group.
+
+	* src/balsa-index.c (bndx_popup_menu_create):
+	* src/balsa-message.c (balsa_message_init), (display_content),
+	(part_create_menu):
+	* src/balsa-mime-widget-text.c (bmwt_html_popup_context_menu):
+	* src/mailbox-node.c (create_context_menu):
+	* src/sendmsg-window.c (add_attachment), (add_urlref_attachment):
+	* src/toolbar-factory.c (tm_popup_context_menu_cb):
+
+2020-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	pref-manager: Use GtkMenuButton to pop-up "Add" menus
 
 	* src/pref-manager.c (add_button_to_box): no longer used for

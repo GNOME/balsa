@@ -252,6 +252,16 @@
 
 	* src/main.c (balsa_startup_cb):
 
+2020-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	pref-manager: Use GtkMenuButton to pop-up "Add" menus
+
+	* src/pref-manager.c (add_button_to_box): no longer used for
+	pop-up menus;
+	(add_menu_button_to_box): new function;
+	(pm_grid_add_remote_mailbox_servers_group),
+	(pm_grid_add_address_books_group): use it.
+
 2020-06-14  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Use a BALSA_USE_POPOVER=0 environment variable to switch from

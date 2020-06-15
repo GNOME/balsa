@@ -1237,7 +1237,8 @@ bmwt_html_print_activated(GSimpleAction *action,
 static void
 bmwt_html_populate_popup_menu(BalsaMessage * bm,
                               GtkWidget    * html,
-                              GMenu        * menu)
+                              GMenu        * menu,
+                              const gchar  * namespace)
 {
     GSimpleActionGroup *simple;
     static const GActionEntry text_view_popup_entries[] = {
@@ -1263,7 +1264,7 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
                                     G_N_ELEMENTS(text_view_popup_entries),
                                     html);
     gtk_widget_insert_action_group(GTK_WIDGET(html),
-                                   "text-view-popup",
+                                   namespace,
                                    G_ACTION_GROUP(simple));
 
     print_action = g_action_map_lookup_action(G_ACTION_MAP(simple), "print");
@@ -1271,16 +1272,16 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
 
     section = g_menu_new();
 
-    g_menu_append(section, _("Zoom In"), "text-view-popup.zoom-in");
-    g_menu_append(section, _("Zoom Out"), "text-view-popup.zoom-out");
-    g_menu_append(section, _("Zoom 100%"), "text-view-popup.zoom-reset");
+    g_menu_append(section, _("Zoom In"), "zoom-in");
+    g_menu_append(section, _("Zoom Out"), "zoom-out");
+    g_menu_append(section, _("Zoom 100%"), "zoom-reset");
 
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
     if (libbalsa_html_can_select(html)) {
         section = g_menu_new();
-        g_menu_append(section, _("Select _All"), "text-view-popup.select-all");
+        g_menu_append(section, _("Select _All"), "select-all");
         g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
         g_object_unref(section);
     }
@@ -1289,19 +1290,19 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
 
     open_menu = g_menu_new();
     libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/html",
-                                           "text-view-popup.open-with");
+                                           "open-with");
 
     g_menu_append_submenu(section, _("Open…"), G_MENU_MODEL(open_menu));
     g_object_unref(open_menu);
 
-    g_menu_append(section, _("Save…"), "text-view-popup.save");
+    g_menu_append(section, _("Save…"), "save");
 
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
     section = g_menu_new();
 
-    g_menu_append(section, _("Print…"), "text-view-popup.print");
+    g_menu_append(section, _("Print…"), "print");
     g_simple_action_set_enabled(G_SIMPLE_ACTION(print_action),
                                 libbalsa_html_can_print(html));
 
@@ -1331,29 +1332,24 @@ static gboolean
 bmwt_html_popup_context_menu(GtkWidget    *html,
                              BalsaMessage *bm)
 {
-    GtkWidget *popup_menu;
+    GtkWidget *popup_widget;
     const GdkEvent *event;
     GdkEvent *current_event = NULL;
     gdouble x, y;
 
-    popup_menu = g_object_get_data(G_OBJECT(html), "popup-menu");
-    if (popup_menu == NULL) {
+    popup_widget = g_object_get_data(G_OBJECT(html), "popup-widget");
+    if (popup_widget == NULL) {
         GMenu *menu;
 
         menu = g_menu_new();
-        bmwt_html_populate_popup_menu(bm, html, menu);
+        bmwt_html_populate_popup_menu(bm, html, menu, "text-view-popup");
 
-        if (libbalsa_use_popover()) {
-            popup_menu = gtk_popover_new_from_model(libbalsa_html_get_view_widget(html),
-                                                    G_MENU_MODEL(menu));
-        } else {
-            popup_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
-            gtk_menu_attach_to_widget(GTK_MENU(popup_menu),
-                                      libbalsa_html_get_view_widget(html),
-                                      NULL);
-        }
+        popup_widget = libbalsa_popup_widget_new(libbalsa_html_get_view_widget(html),
+                                               G_MENU_MODEL(menu),
+                                               "text-view-popup");
+        g_object_unref(menu);
 
-        g_object_set_data(G_OBJECT(html), "popup-menu", popup_menu);
+        g_object_set_data(G_OBJECT(html), "popup-widget", popup_widget);
     }
 
     /* In WebKit2, the context menu signal is asynchronous, so the
@@ -1374,15 +1370,15 @@ bmwt_html_popup_context_menu(GtkWidget    *html,
             rectangle.width = 0;
             rectangle.y = (gint) y;
             rectangle.height = 0;
-            gtk_popover_set_pointing_to(GTK_POPOVER(popup_menu), &rectangle);
+            gtk_popover_set_pointing_to(GTK_POPOVER(popup_widget), &rectangle);
         }
-        gtk_popover_popup(GTK_POPOVER(popup_menu));
+        gtk_popover_popup(GTK_POPOVER(popup_widget));
     } else {
         if (event != NULL)
-            gtk_menu_popup_at_pointer(GTK_MENU(popup_menu),
+            gtk_menu_popup_at_pointer(GTK_MENU(popup_widget),
                                      (GdkEvent *) event);
         else
-            gtk_menu_popup_at_widget(GTK_MENU(popup_menu),
+            gtk_menu_popup_at_widget(GTK_MENU(popup_widget),
                                      GTK_WIDGET(bm),
                                      GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                      NULL);

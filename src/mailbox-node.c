@@ -1108,15 +1108,15 @@ create_context_menu(BalsaMailboxNode *mbnode,
 
     /* "New" submenu */
     submenu = g_menu_new();
-    g_menu_append(submenu, _("Local _mbox mailbox…"), "mbnode.add-mbox");
-    g_menu_append(submenu, _("Local Mail_dir mailbox…"), "mbnode.add-maildir");
-    g_menu_append(submenu, _("Local M_H mailbox…"), "mbnode.add-mh");
+    g_menu_append(submenu, _("Local _mbox mailbox…"), "add-mbox");
+    g_menu_append(submenu, _("Local Mail_dir mailbox…"), "add-maildir");
+    g_menu_append(submenu, _("Local M_H mailbox…"), "add-mh");
 
     section = g_menu_new();
-    g_menu_append(section, _("Remote IMAP _folder…"), "mbnode.add-imap-folder");
+    g_menu_append(section, _("Remote IMAP _folder…"), "add-imap-folder");
 
     if (balsa_mailbox_node_is_imap(mbnode))
-        g_menu_append(section, _("Remote IMAP _subfolder…"), "mbnode.add-imap-subfolder");
+        g_menu_append(section, _("Remote IMAP _subfolder…"), "add-imap-subfolder");
 
     g_menu_append_section(submenu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
@@ -1127,7 +1127,7 @@ create_context_menu(BalsaMailboxNode *mbnode,
 
     section = g_menu_new();
     if (mbnode == NULL) {/* clicked on the empty space */
-        g_menu_append(section, _("_Rescan"), "mbnode.rescan");
+        g_menu_append(section, _("_Rescan"), "rescan");
     } else {
         mbnode->relative_to = relative_to;
 
@@ -1135,19 +1135,19 @@ create_context_menu(BalsaMailboxNode *mbnode,
         if (g_signal_has_handler_pending(mbnode,
                                          balsa_mailbox_node_signals
                                          [SHOW_PROP_DIALOG], 0, FALSE))
-            g_menu_append(section, _("_Properties…"), "mbnode.show-properties");
+            g_menu_append(section, _("_Properties…"), "show-properties");
 
         if (g_signal_has_handler_pending(mbnode,
                                          balsa_mailbox_node_signals[APPEND_SUBTREE],
                                          0, FALSE))
-            g_menu_append(section, _("_Rescan"), "mbnode.rescan");
+            g_menu_append(section, _("_Rescan"), "rescan");
 
         if (mbnode->config_prefix != NULL)
-            g_menu_append(section, _("_Delete"), "mbnode.delete");
+            g_menu_append(section, _("_Delete"), "delete");
 
         if ((mailbox = mbnode->mailbox) != NULL) {
-            g_menu_append(section, _("_Open"), "mbnode.open");
-            g_menu_append(section, _("_Close"), "mbnode.close");
+            g_menu_append(section, _("_Open"), "open");
+            g_menu_append(section, _("_Close"), "close");
             context_menu_set_enabled(mbnode);
 
             special = (   mailbox == balsa_app.inbox
@@ -1156,19 +1156,19 @@ create_context_menu(BalsaMailboxNode *mbnode,
                        || mailbox == balsa_app.outbox
                        || mailbox == balsa_app.trash);
             if (!special && !mbnode->config_prefix)
-                g_menu_append(section, _("_Delete"), "mbnode.delete");
+                g_menu_append(section, _("_Delete"), "delete");
 
             if (!special) {
                 g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
                 g_object_unref(section);
                 section = g_menu_new();
 
-                g_menu_append(section, _("Mark as _Inbox"), "mbnode.mark-as-inbox");
-                g_menu_append(section, _("_Mark as Sentbox"), "mbnode.mark-as-sentbox");
-                g_menu_append(section, _("Mark as _Trash"), "mbnode.mark-as-trash");
-                g_menu_append(section, _("Mark as D_raftbox"), "mbnode.mark-as-draftbox");
+                g_menu_append(section, _("Mark as _Inbox"), "mark-as-inbox");
+                g_menu_append(section, _("_Mark as Sentbox"), "mark-as-sentbox");
+                g_menu_append(section, _("Mark as _Trash"), "mark-as-trash");
+                g_menu_append(section, _("Mark as D_raftbox"), "mark-as-draftbox");
             } else if (mailbox == balsa_app.trash) {
-                g_menu_append(section, _("_Empty trash"), "mbnode.empty-trash");
+                g_menu_append(section, _("_Empty trash"), "empty-trash");
             }
 
             /* FIXME : No test on mailbox type is made yet, should we ? */
@@ -1176,20 +1176,14 @@ create_context_menu(BalsaMailboxNode *mbnode,
             g_object_unref(section);
             section = g_menu_new();
 
-            g_menu_append(section, _("_Edit/Apply filters"), "mbnode.filters");
-                           // G_CALLBACK(mb_filter_cb), mbnode);
+            g_menu_append(section, _("_Edit/Apply filters"), "filters");
         }
     }
 
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
-    if (libbalsa_use_popover()) {
-        context_menu = gtk_popover_new_from_model(relative_to, G_MENU_MODEL(menu));
-    } else {
-        context_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
-        gtk_menu_attach_to_widget(GTK_MENU(context_menu), relative_to, NULL);
-    }
+    context_menu = libbalsa_popup_widget_new(relative_to, G_MENU_MODEL(menu), "mbnode");
     g_object_unref(menu);
 
     return context_menu;

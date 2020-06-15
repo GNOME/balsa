@@ -187,6 +187,9 @@ gboolean libbalsa_use_headerbar(void);
 GtkDialogFlags libbalsa_dialog_flags(void);
 
 gboolean libbalsa_use_popover(void);
+GtkWidget *libbalsa_popup_widget_new(GtkWidget   *relative_to,
+                                     GMenuModel  *model,
+                                     const gchar *action_namespace);
 
 #if HAVE_GTKSOURCEVIEW
 GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases);

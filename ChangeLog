@@ -254,6 +254,27 @@
 
 2020-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Various: Implement libbalsa_popup_widget_new() as a wrapper for
+	creating either a GtkPopover or a GtkMenu, and use it.
+
+	* libbalsa/libbalsa.c (libbalsa_use_popover),
+	(libbalsa_popup_widget_new):
+	* libbalsa/libbalsa.h:
+	* src/balsa-index.c (bndx_popup_menu_create), (bndx_do_popup):
+	* src/balsa-message.c (balsa_message_init),
+	(tree_mult_selection_popup), (tree_button_press_cb),
+	(part_info_init), (add_to_attachments_popup),
+	(add_toggle_inline_menu_item), (display_content),
+	(open_with_change_state), (copy_part_change_state),
+	(part_create_menu), (balsa_part_info_init):
+	* src/balsa-mime-widget-text.c (bmwt_html_populate_popup_menu),
+	(bmwt_html_popup_context_menu):
+	* src/mailbox-node.c (create_context_menu):
+	* src/sendmsg-window.c (add_attachment), (add_urlref_attachment):
+	* src/toolbar-factory.c (tm_popup_context_menu_cb):
+
+2020-06-15  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Various: Make GtkMenu versions work.
 
 	Each menu needs to be attached to a widget, which both handles

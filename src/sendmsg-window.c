@@ -1804,19 +1804,8 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
         g_object_unref(section);
     }
 
-    if (libbalsa_use_popover()) {
-        attach_data->popup_menu = gtk_popover_new(bsmsg->tree_view);
-        gtk_popover_bind_model(GTK_POPOVER(attach_data->popup_menu),
-                               G_MENU_MODEL(menu),
-                               attachment_namespace);
-    } else {
-        attach_data->popup_menu = gtk_menu_new();
-        gtk_menu_shell_bind_model(GTK_MENU_SHELL(attach_data->popup_menu),
-                                  G_MENU_MODEL(menu),
-                                  attachment_namespace,
-                                  TRUE);
-        gtk_menu_attach_to_widget(GTK_MENU(attach_data->popup_menu), bsmsg->tree_view, NULL);
-    }
+    attach_data->popup_menu =
+        libbalsa_popup_widget_new(bsmsg->tree_view, G_MENU_MODEL(menu), attachment_namespace);
 
     g_object_unref(menu);
     g_free(attachment_namespace);
@@ -1856,7 +1845,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, const gchar *url)
         {"open", libbalsa_radio_activated, "s", "''", on_open_url_cb}
     };
     GMenu *menu;
-    GMenu *open_menu;
+    GMenu *section;
 
     g_debug("Trying to attach '%s'", url);
 
@@ -1892,23 +1881,23 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, const gchar *url)
     g_object_unref(simple);
 
     menu = g_menu_new();
-    g_menu_append(menu, _("Remove"), "urlref-attachment.remove");
+
+    section = g_menu_new();
+    g_menu_append(section, _("Remove"), "remove");
+
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
 
     /* add a separator and the usual vfs menu so the user can inspect what
        (s)he actually attached... (only for non-message attachments) */
-    open_menu = g_menu_new();
-    g_menu_append(open_menu, _("Open…"), "urlref-attachment.open");
+    section = g_menu_new();
+    g_menu_append(section, _("Open…"), "open");
 
-    g_menu_append_section(menu, NULL, G_MENU_MODEL(open_menu));
-    g_object_unref(open_menu);
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+    g_object_unref(section);
 
-    if (libbalsa_use_popover()) {
-        attach_data->popup_menu =
-            gtk_popover_new_from_model(bsmsg->window, G_MENU_MODEL(menu));
-    } else {
-        attach_data->popup_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
-        gtk_menu_attach_to_widget(GTK_MENU(attach_data->popup_menu), bsmsg->window, NULL);
-    }
+    attach_data->popup_menu =
+        libbalsa_popup_widget_new(bsmsg->window, G_MENU_MODEL(menu), "urlref-attachment");
     g_object_unref(menu);
 
     /* append to the list store */

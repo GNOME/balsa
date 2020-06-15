@@ -746,6 +746,13 @@ libbalsa_dialog_flags(void)
 	return libbalsa_use_headerbar() ? GTK_DIALOG_USE_HEADER_BAR : (GtkDialogFlags) 0;
 }
 
+/*
+ * Helpers for using GtkPopover or GtkMenu for context menus
+ */
+
+/*
+ * Look for the BALSA_USE_POPOVER environment variable
+ */
 gboolean
 libbalsa_use_popover(void)
 {
@@ -762,4 +769,27 @@ libbalsa_use_popover(void)
 		g_atomic_int_set(&check_done, 1);
 	}
 	return use_popover;
+}
+
+/*
+ * Construct either a GtkPopover or a GtkMenu, according to the
+ * environment variable
+ */
+GtkWidget *
+libbalsa_popup_widget_new(GtkWidget   *relative_to,
+                          GMenuModel  *model,
+                          const gchar *action_namespace)
+{
+    GtkWidget *popup_widget;
+
+    if (libbalsa_use_popover()) {
+        popup_widget = gtk_popover_new(relative_to);
+        gtk_popover_bind_model(GTK_POPOVER(popup_widget), model, action_namespace);
+    } else {
+        popup_widget = gtk_menu_new();
+        gtk_menu_attach_to_widget(GTK_MENU(popup_widget), relative_to, NULL);
+        gtk_menu_shell_bind_model(GTK_MENU_SHELL(popup_widget), model, action_namespace, TRUE);
+    }
+
+    return popup_widget;
 }

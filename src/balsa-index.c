@@ -2094,13 +2094,13 @@ bndx_popup_menu_create(BalsaIndex * bindex)
     /* this is an invariable part of the context message menu. */
     section = g_menu_new();
 
-    g_menu_append(section, _("_Reply…"),            "popup.reply");
-    g_menu_append(section, _("Reply To _All…"),     "popup.reply-to-all");
-    g_menu_append(section, _("Reply To _Group…"),   "popup.reply-to-group");
-    g_menu_append(section, _("_Forward Attached…"), "popup.forward-attached");
-    g_menu_append(section, _("Forward _Inline…"),   "popup.forward-inline");
-    g_menu_append(section, _("_Pipe through…"),     "popup.pipe");
-    g_menu_append(section, _("_Store Address…"),    "popup.store-address");
+    g_menu_append(section, _("_Reply…"),            "reply");
+    g_menu_append(section, _("Reply To _All…"),     "reply-to-all");
+    g_menu_append(section, _("Reply To _Group…"),   "reply-to-group");
+    g_menu_append(section, _("_Forward Attached…"), "forward-attached");
+    g_menu_append(section, _("Forward _Inline…"),   "forward-inline");
+    g_menu_append(section, _("_Pipe through…"),     "pipe");
+    g_menu_append(section, _("_Store Address…"),    "store-address");
 
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
@@ -2108,9 +2108,9 @@ bndx_popup_menu_create(BalsaIndex * bindex)
     /* items that are insensitive for a read-only mailbox */
     section = g_menu_new();
 
-    g_menu_append(section, _("_Delete"),        "popup.delete");
-    g_menu_append(section, _("_Undelete"),      "popup.undelete");
-    g_menu_append(section, _("Move To _Trash"), "popup.trash");
+    g_menu_append(section, _("_Delete"),        "delete");
+    g_menu_append(section, _("_Undelete"),      "undelete");
+    g_menu_append(section, _("Move To _Trash"), "trash");
 
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
@@ -2118,8 +2118,8 @@ bndx_popup_menu_create(BalsaIndex * bindex)
     /* Toggle items */
     submenu = g_menu_new();
 
-    g_menu_append(submenu, _("_Flagged"), "popup.toggle-flagged");
-    g_menu_append(submenu, _("_Unread"),  "popup.toggle-unread");
+    g_menu_append(submenu, _("_Flagged"), "toggle-flagged");
+    g_menu_append(submenu, _("_Unread"),  "toggle-unread");
 
     g_menu_append_submenu(menu, _("T_oggle"), G_MENU_MODEL(submenu));
     g_object_unref(submenu);
@@ -2130,18 +2130,15 @@ bndx_popup_menu_create(BalsaIndex * bindex)
 
     /* View source */
     section = g_menu_new();
-    g_menu_append(section, _("_View Source"), "popup.view-source");
+    g_menu_append(section, _("_View Source"), "view-source");
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
     bindex->popup_menu = menu;
-    if (libbalsa_use_popover()) {
-        bindex->popup_widget = gtk_popover_new_from_model(GTK_WIDGET(bindex), G_MENU_MODEL(menu));
+    bindex->popup_widget =
+        libbalsa_popup_widget_new(GTK_WIDGET(bindex), G_MENU_MODEL(menu), "popup");
+    if (libbalsa_use_popover())
         gtk_popover_set_position(GTK_POPOVER(bindex->popup_widget), GTK_POS_BOTTOM);
-    } else {
-        bindex->popup_widget = gtk_menu_new_from_model(G_MENU_MODEL(menu));
-        gtk_menu_attach_to_widget(GTK_MENU(bindex->popup_widget), GTK_WIDGET(bindex), NULL);
-    }
 }
 
 /* bndx_do_popup: common code for the popup menu;
@@ -2218,8 +2215,7 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     item = g_menu_item_new_from_model(G_MENU_MODEL(index->popup_menu),
                                       index->move_position);
 
-    mru_menu =
-        balsa_mblist_mru_menu(&balsa_app.folder_mru, "popup.move-to");
+    mru_menu = balsa_mblist_mru_menu(&balsa_app.folder_mru, "move-to");
     g_menu_item_set_submenu(item, G_MENU_MODEL(mru_menu));
     g_object_unref(mru_menu);
 

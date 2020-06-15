@@ -670,7 +670,6 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
                          toolbar_info * info)
 {
     GSimpleActionGroup *simple;
-    static const char namespace[] = "toolbar";
     static const GActionEntry entries[] = {
         {"set-style", libbalsa_radio_activated, "i", "-1", tm_set_style_changed},
         {"customize", tm_customize_activated}
@@ -689,7 +688,7 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
                                     G_N_ELEMENTS(entries),
                                     info);
     set_style_action = g_action_map_lookup_action(G_ACTION_MAP(simple), "set-style");
-    gtk_widget_insert_action_group(toolbar, namespace, G_ACTION_GROUP(simple));
+    gtk_widget_insert_action_group(toolbar, "toolbar", G_ACTION_GROUP(simple));
     g_object_unref(simple);
 
     menu = g_menu_new();
@@ -758,14 +757,7 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
         g_object_unref(section);
     }
 
-    if (libbalsa_use_popover()) {
-        popup_menu = gtk_popover_new(toolbar);
-        gtk_popover_bind_model(GTK_POPOVER(popup_menu), G_MENU_MODEL(menu), namespace);
-    } else {
-        popup_menu = gtk_menu_new();
-        gtk_menu_shell_bind_model(GTK_MENU_SHELL(popup_menu), G_MENU_MODEL(menu), namespace, TRUE);
-        gtk_menu_attach_to_widget(GTK_MENU(popup_menu), toolbar, NULL);
-    }
+    popup_menu = libbalsa_popup_widget_new(toolbar, G_MENU_MODEL(menu), "toolbar");
 
     g_object_unref(menu);
     info->popup_menu = popup_menu;

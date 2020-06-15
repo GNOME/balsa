@@ -89,7 +89,7 @@ struct _BalsaPartInfo {
     BalsaMimeWidget *mime_widget;
 
     /* The contect menu; referenced */
-    GtkWidget *popup_menu;
+    GtkWidget *popup_widget;
 
     /* the path in the tree view */
     GtkTreePath *path;
@@ -997,19 +997,10 @@ balsa_message_init(BalsaMessage * balsa_message)
 
     /* The context menu that is popped up when more than one part is selected */
     menu = g_menu_new();
-    g_menu_append(menu, _("Save selected as…"),
-                  "message-menu.save-selected");
-    g_menu_append(menu, _("Save selected to folder…"),
-                  "message-menu.save-selected-to-folder");
-    if (libbalsa_use_popover()) {
-        balsa_message->save_all_popup =
-            gtk_popover_new_from_model(balsa_message->treeview, G_MENU_MODEL(menu));
-    } else {
-        balsa_message->save_all_popup = gtk_menu_new_from_model(G_MENU_MODEL(menu));
-        gtk_menu_attach_to_widget(GTK_MENU(balsa_message->save_all_popup),
-                                  balsa_message->treeview,
-                                  NULL);
-    }
+    g_menu_append(menu, _("Save selected as…"), "save-selected");
+    g_menu_append(menu, _("Save selected to folder…"), "save-selected-to-folder");
+    balsa_message->save_all_popup =
+        libbalsa_popup_widget_new(balsa_message->treeview, G_MENU_MODEL(menu), "message-menu");
     g_object_unref(menu);
 
     gtk_widget_show_all(GTK_WIDGET(balsa_message));
@@ -1134,7 +1125,7 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
                           GtkTreeSelection *selection)
 {
     gint selected;
-    GtkWidget *popup_menu = NULL;
+    GtkWidget *popup_widget = NULL;
 
     /* destroy left-over select list and popup... */
     g_list_free(balsa_message->save_all_list);
@@ -1151,14 +1142,14 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
     if (selected == 1) {
         BalsaPartInfo *info = BALSA_PART_INFO(balsa_message->save_all_list->data);
 
-        popup_menu = info->popup_menu;
+        popup_widget = info->popup_widget;
         g_list_free(balsa_message->save_all_list);
         balsa_message->save_all_list = NULL;
     } else if (selected > 1) {
-        popup_menu = balsa_message->save_all_popup;
+        popup_widget = balsa_message->save_all_popup;
     }
 
-    if (popup_menu == NULL)
+    if (popup_widget == NULL)
         return;
 
     if (libbalsa_use_popover()) {
@@ -1174,10 +1165,10 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
             rectangle.width = 0;
             rectangle.y = (int) y;
             rectangle.height = 0;
-            gtk_popover_set_pointing_to(GTK_POPOVER(popup_menu), &rectangle);
+            gtk_popover_set_pointing_to(GTK_POPOVER(popup_widget), &rectangle);
         }
 
-        gtk_popover_popup(GTK_POPOVER(popup_menu));
+        gtk_popover_popup(GTK_POPOVER(popup_widget));
     } else {
         if (event != NULL) {
             gtk_menu_popup_at_pointer(GTK_MENU(balsa_message->save_all_popup), event);
@@ -1250,7 +1241,7 @@ tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
             if (gtk_tree_model_get_iter (model, &iter, path)) {
                 gtk_tree_model_get(model, &iter, PART_INFO_COLUMN, &info, -1);
                 if (info != NULL) {
-                    if (info->popup_menu != NULL) {
+                    if (info->popup_widget != NULL) {
                         if (libbalsa_use_popover()) {
                             GdkRectangle rectangle;
 
@@ -1259,12 +1250,12 @@ tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
                             rectangle.width = 0;
                             rectangle.y = (int) y;
                             rectangle.height = 0;
-                            gtk_popover_set_pointing_to(GTK_POPOVER(info->popup_menu),
+                            gtk_popover_set_pointing_to(GTK_POPOVER(info->popup_widget),
                                                         &rectangle);
 
-                            gtk_popover_popup(GTK_POPOVER(info->popup_menu));
+                            gtk_popover_popup(GTK_POPOVER(info->popup_widget));
                         } else {
-                            gtk_menu_popup_at_pointer(GTK_MENU(info->popup_menu), event);
+                            gtk_menu_popup_at_pointer(GTK_MENU(info->popup_widget), event);
                         }
                     }
                     g_object_unref(info);
@@ -1535,7 +1526,7 @@ static void
 part_info_init(BalsaMessage * balsa_message, BalsaPartInfo * info)
 {
     info->mime_widget =
-        g_object_ref_sink(balsa_mime_widget_new(balsa_message, info->body, info->popup_menu));
+        g_object_ref_sink(balsa_mime_widget_new(balsa_message, info->body, info->popup_widget));
 }
 
 
@@ -1567,7 +1558,7 @@ add_to_attachments_popup(GMenu *menu, const gchar *label,
     item = g_menu_item_new(label, NULL);
 
     path = gtk_tree_path_to_string(info->path);
-    g_menu_item_set_action_and_target(item, "message-menu.show-part", "s", path);
+    g_menu_item_set_action_and_target(item, "show-part", "s", path);
     g_free(path);
 
     g_menu_append_item(menu, item);
@@ -1577,7 +1568,7 @@ add_to_attachments_popup(GMenu *menu, const gchar *label,
 static void
 add_toggle_inline_menu_item(GMenu *menu, BalsaMessage *balsa_message)
 {
-    g_menu_append(menu, _("force inline for all parts"), "message-menu.toggle-all-inline");
+    g_menu_append(menu, _("force inline for all parts"), "toggle-all-inline");
 
     /* Clear force-inline to be consistent with initial FALSE state of
      * check-menu-item. */
@@ -1788,17 +1779,11 @@ display_content(BalsaMessage * balsa_message)
         /* Detach any existing popup: */
         if (balsa_message->parts_popup != NULL)
             gtk_popover_set_relative_to(GTK_POPOVER(balsa_message->parts_popup), NULL);
-
-        balsa_message->parts_popup =
-            gtk_popover_new_from_model(balsa_message->attach_button,
-                                       G_MENU_MODEL(balsa_message->parts_menu));
-    } else {
-        balsa_message->parts_popup =
-            gtk_menu_new_from_model(G_MENU_MODEL(balsa_message->parts_menu));
-        gtk_menu_attach_to_widget(GTK_MENU(balsa_message->parts_popup),
-                                  balsa_message->attach_button,
-                                  NULL);
     }
+
+    balsa_message->parts_popup = libbalsa_popup_widget_new(balsa_message->attach_button,
+                                                           G_MENU_MODEL(balsa_message->parts_menu),
+                                                           "message-menu");
 
     /* Populate the parts-menu */
     display_parts(balsa_message, libbalsa_message_get_body_list(balsa_message->message), NULL, NULL);
@@ -1865,7 +1850,7 @@ open_with_change_state(GSimpleAction *action,
 
     g_simple_action_set_state(action, parameter);
     if (libbalsa_use_popover())
-        gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
+        gtk_popover_popdown(GTK_POPOVER(info->popup_widget));
 }
 
 static void
@@ -1876,7 +1861,7 @@ copy_part_change_state(GSimpleAction *action,
     BalsaPartInfo *info = user_data;
     const gchar *url;
 
-    url = balsa_mblist_mru_get_url_from_variant(parameter, info->popup_menu);
+    url = balsa_mblist_mru_get_url_from_variant(parameter, info->popup_widget);
 
     if (url[0] != '\0') {
         balsa_mblist_mru_add(&balsa_app.folder_mru, url);
@@ -1885,7 +1870,7 @@ copy_part_change_state(GSimpleAction *action,
 
     g_simple_action_set_state(action, parameter);
     if (libbalsa_use_popover())
-        gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
+        gtk_popover_popdown(GTK_POPOVER(info->popup_widget));
 }
 
 static void
@@ -1898,7 +1883,7 @@ part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
                included on shortlist, sometimes not) excluded. */
 {
     static int menu_number;
-    gchar *prefix;
+    gchar *namespace;
     GSimpleActionGroup *simple;
     static const GActionEntry entries[] = {
         {"save", save_activated},
@@ -1906,10 +1891,9 @@ part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
         {"copy-part", libbalsa_radio_activated, "s", "''", copy_part_change_state}
     };
     GMenu *menu;
-    gchar *action;
     gchar *content_type;
 
-    prefix = g_strdup_printf("menu-%d", ++menu_number);
+    namespace = g_strdup_printf("menu-%d", ++menu_number);
 
     simple = g_simple_action_group_new();
     g_action_map_add_action_entries(G_ACTION_MAP(simple),
@@ -1917,43 +1901,29 @@ part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
                                     G_N_ELEMENTS(entries),
                                     info);
     gtk_widget_insert_action_group(GTK_WIDGET(balsa_message),
-                                   prefix,
+                                   namespace,
                                    G_ACTION_GROUP(simple));
     g_object_unref(simple);
 
     menu = g_menu_new();
 
     content_type = libbalsa_message_body_get_mime_type (info->body);
-    action = g_strconcat(prefix, ".open-with", NULL);
-    libbalsa_vfs_fill_menu_by_content_type(menu, content_type, action);
-    g_free(action);
+    libbalsa_vfs_fill_menu_by_content_type(menu, content_type, "open-with");
 
-    action = g_strconcat(prefix, ".save", NULL);
-    g_menu_append(menu, _("Save…"), action);
-    g_free(action);
+    g_menu_append(menu, _("Save…"), "save");
 
     if (strcmp(content_type, "message/rfc822") == 0) {
         GMenu *submenu;
 
-        action = g_strconcat(prefix, ".copy-part", NULL);
-        submenu = balsa_mblist_mru_menu(&balsa_app.folder_mru, action);
-        g_free(action);
-
+        submenu = balsa_mblist_mru_menu(&balsa_app.folder_mru, "copy-part");
         g_menu_append_submenu(menu, _("_Copy to folder…"), G_MENU_MODEL(submenu));
     }
-
     g_free(content_type);
-    g_free(prefix);
 
-    if (libbalsa_use_popover()) {
-        info->popup_menu =
-            gtk_popover_new_from_model(balsa_message->treeview, G_MENU_MODEL(menu));
-    } else {
-        info->popup_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
-        gtk_menu_attach_to_widget(GTK_MENU(info->popup_menu), balsa_message->treeview, NULL);
-    }
-
+    info->popup_widget =
+        libbalsa_popup_widget_new(balsa_message->treeview, G_MENU_MODEL(menu), namespace);
     g_object_unref(menu);
+    g_free(namespace);
 }
 
 static void
@@ -1961,7 +1931,7 @@ balsa_part_info_init(BalsaPartInfo *info)
 {
     info->body = NULL;
     info->mime_widget = NULL;
-    info->popup_menu = NULL;
+    info->popup_widget = NULL;
     info->path = NULL;
 }
 

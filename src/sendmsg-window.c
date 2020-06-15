@@ -1815,6 +1815,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
                                   G_MENU_MODEL(menu),
                                   attachment_namespace,
                                   TRUE);
+        gtk_menu_attach_to_widget(GTK_MENU(attach_data->popup_menu), bsmsg->tree_view, NULL);
     }
 
     g_object_unref(menu);
@@ -1906,7 +1907,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, const gchar *url)
             gtk_popover_new_from_model(bsmsg->window, G_MENU_MODEL(menu));
     } else {
         attach_data->popup_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
-        gtk_widget_show_all(attach_data->popup_menu);
+        gtk_menu_attach_to_widget(GTK_MENU(attach_data->popup_menu), bsmsg->window, NULL);
     }
     g_object_unref(menu);
 

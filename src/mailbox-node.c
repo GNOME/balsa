@@ -1184,10 +1184,12 @@ create_context_menu(BalsaMailboxNode *mbnode,
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
-    if (libbalsa_use_popover())
+    if (libbalsa_use_popover()) {
         context_menu = gtk_popover_new_from_model(relative_to, G_MENU_MODEL(menu));
-    else
+    } else {
         context_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+        gtk_menu_attach_to_widget(GTK_MENU(context_menu), relative_to, NULL);
+    }
     g_object_unref(menu);
 
     return context_menu;

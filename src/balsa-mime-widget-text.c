@@ -1299,6 +1299,9 @@ bmwt_html_popup_context_menu(GtkWidget    *html,
                                                     G_MENU_MODEL(menu));
         } else {
             popup_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+            gtk_menu_attach_to_widget(GTK_MENU(popup_menu),
+                                      libbalsa_html_get_view_widget(html),
+                                      NULL);
         }
 
         g_object_set_data(G_OBJECT(html), "popup-menu", popup_menu);

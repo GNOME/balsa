@@ -733,6 +733,7 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
     } else {
         popup_menu = gtk_menu_new();
         gtk_menu_shell_bind_model(GTK_MENU_SHELL(popup_menu), G_MENU_MODEL(menu), namespace, TRUE);
+        gtk_menu_attach_to_widget(GTK_MENU(popup_menu), toolbar, NULL);
     }
 
     g_object_unref(menu);

@@ -1006,6 +1006,9 @@ balsa_message_init(BalsaMessage * balsa_message)
             gtk_popover_new_from_model(balsa_message->treeview, G_MENU_MODEL(menu));
     } else {
         balsa_message->save_all_popup = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+        gtk_menu_attach_to_widget(GTK_MENU(balsa_message->save_all_popup),
+                                  balsa_message->treeview,
+                                  NULL);
     }
     g_object_unref(menu);
 
@@ -1790,12 +1793,11 @@ display_content(BalsaMessage * balsa_message)
             gtk_popover_new_from_model(balsa_message->attach_button,
                                        G_MENU_MODEL(balsa_message->parts_menu));
     } else {
-        if (balsa_message->parts_popup)
-            g_object_unref(balsa_message->parts_popup);
-
         balsa_message->parts_popup =
             gtk_menu_new_from_model(G_MENU_MODEL(balsa_message->parts_menu));
-        g_object_ref_sink(balsa_message->parts_popup);
+        gtk_menu_attach_to_widget(GTK_MENU(balsa_message->parts_popup),
+                                  balsa_message->attach_button,
+                                  NULL);
     }
 
     /* Populate the parts-menu */
@@ -1948,6 +1950,7 @@ part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
             gtk_popover_new_from_model(balsa_message->treeview, G_MENU_MODEL(menu));
     } else {
         info->popup_menu = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+        gtk_menu_attach_to_widget(GTK_MENU(info->popup_menu), balsa_message->treeview, NULL);
     }
 
     g_object_unref(menu);

@@ -2140,6 +2140,7 @@ bndx_popup_menu_create(BalsaIndex * bindex)
         gtk_popover_set_position(GTK_POPOVER(bindex->popup_widget), GTK_POS_BOTTOM);
     } else {
         bindex->popup_widget = gtk_menu_new_from_model(G_MENU_MODEL(menu));
+        gtk_menu_attach_to_widget(GTK_MENU(bindex->popup_widget), GTK_WIDGET(bindex), NULL);
     }
 }
 

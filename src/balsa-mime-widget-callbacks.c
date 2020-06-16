@@ -37,8 +37,8 @@
 
 
 void
-balsa_mime_widget_ctx_menu_cb(const gchar         *app,
-			      LibBalsaMessageBody *mime_body)
+balsa_mime_widget_ctx_menu_launch_app(const gchar         *app,
+                                      LibBalsaMessageBody *mime_body)
 {
     GError *err = NULL;
     gboolean result;
@@ -53,6 +53,16 @@ balsa_mime_widget_ctx_menu_cb(const gchar         *app,
     g_clear_error(&err);
 }
 
+void
+balsa_mime_widget_ctx_menu_cb(GtkWidget *button,
+                              gpointer   user_data)
+{
+    LibBalsaMessageBody *mime_body = user_data;
+    const gchar *app;
+
+    app = g_object_get_data(G_OBJECT(button), LIBBALSA_VFS_MIME_ACTION);
+    balsa_mime_widget_ctx_menu_launch_app(app, mime_body);
+}
 
 /** Pops up a "save part" dialog for a message part.
 

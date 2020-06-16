@@ -337,6 +337,19 @@
 
 	* src/main.c (balsa_startup_cb):
 
+	Various: Actually launch the default app
+
+	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_mime_button):
+	* libbalsa/libbalsa-vfs.h:
+	* src/balsa-message.c (open_with_change_state):
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_launch_app),
+	(balsa_mime_widget_ctx_menu_cb):
+	* src/balsa-mime-widget-callbacks.h:
+	* src/balsa-mime-widget-text.c (open_with_change_state):
+
+2020-06-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Various: Check GTK_IS_POPOVER() instead of
 	libbalsa_use_popover() when popping down a popover.
 

@@ -642,9 +642,8 @@ tm_set_style_changed(GSimpleAction *action,
         balsa_toolbar_model_changed(info->model);
     }
 
-    if (info->popup_menu != NULL)
-        if (libbalsa_use_popover())
-            gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
+    if (GTK_IS_POPOVER(info->popup_menu))
+        gtk_popover_popdown((GtkPopover *) info->popup_menu);
 
     g_simple_action_set_state(action, parameter);
 }

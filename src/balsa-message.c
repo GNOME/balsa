@@ -1849,8 +1849,8 @@ open_with_change_state(GSimpleAction *action,
     balsa_mime_widget_ctx_menu_cb(app, info->body);
 
     g_simple_action_set_state(action, parameter);
-    if (libbalsa_use_popover())
-        gtk_popover_popdown(GTK_POPOVER(info->popup_widget));
+    if (GTK_IS_POPOVER(info->popup_widget))
+        gtk_popover_popdown((GtkPopover *) info->popup_widget);
 }
 
 static void
@@ -1869,8 +1869,8 @@ copy_part_change_state(GSimpleAction *action,
     }
 
     g_simple_action_set_state(action, parameter);
-    if (libbalsa_use_popover())
-        gtk_popover_popdown(GTK_POPOVER(info->popup_widget));
+    if (GTK_IS_POPOVER(info->popup_widget))
+        gtk_popover_popdown((GtkPopover *) info->popup_widget);
 }
 
 static void

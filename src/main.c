@@ -54,6 +54,7 @@
 
 #include "libbalsa-gpgme.h"
 #include "libbalsa-gpgme-cb.h"
+#include <webkit2/webkit2.h>
 
 /* We need separate variable for storing command line requests to check the
    mail because such selection cannot be stored in balsa_app and later
@@ -508,6 +509,9 @@ balsa_startup_cb(GApplication *application,
 #ifdef ENABLE_AUTOCRYPT
     GError *error = NULL;
 #endif
+
+    /* https://gitlab.gnome.org/GNOME/Initiatives/-/wikis/Sandbox-all-the-WebKit! */
+    webkit_web_context_set_sandbox_enabled(webkit_web_context_get_default(), TRUE);
 
 #ifdef ENABLE_NLS
     /* Initialize the i18n stuff */

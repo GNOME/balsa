@@ -2051,8 +2051,8 @@ move_to_change_state(GSimpleAction *action,
         }
     }
 
-    if (libbalsa_use_popover())
-        gtk_popover_popdown(GTK_POPOVER(bindex->popup_widget));
+    if (GTK_IS_POPOVER(bindex->popup_widget))
+        gtk_popover_popdown((GtkPopover *) bindex->popup_widget);
 }
 
 /*

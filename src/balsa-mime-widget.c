@@ -263,7 +263,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
     gtk_box_set_homogeneous(GTK_BOX(hbox), TRUE);
-    if ((button = libbalsa_vfs_mime_button(mime_body, use_content_type,
+    if ((button = libbalsa_vfs_mime_button(use_content_type,
                                            G_CALLBACK(balsa_mime_widget_ctx_menu_cb),
                                            (gpointer) mime_body)))
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);

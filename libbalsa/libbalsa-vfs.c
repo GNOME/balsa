@@ -40,8 +40,6 @@
 #define LIBBALSA_VFS_ERROR_QUARK (g_quark_from_static_string("libbalsa-vfs"))
 
 
-#define LIBBALSA_VFS_MIME_ACTION "mime_action"
-
 #define GIO_INFO_ATTS                           \
     G_FILE_ATTRIBUTE_STANDARD_TYPE ","          \
     G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE ","  \
@@ -678,14 +676,17 @@ libbalsa_vfs_mime_button(LibBalsaMessageBody * mime_body,
     GAppInfo *app = g_app_info_get_default_for_type(content_type, FALSE);
 
     if (app != NULL) {
-	msg = g_strdup_printf(_("Open _part with %s"), g_app_info_get_name(app));
+        const gchar *app_name;
+
+	app_name = g_app_info_get_name(app);
+	msg = g_strdup_printf(_("Open _part with %s"), app_name);
 	button = gtk_button_new_with_mnemonic(msg);
-	g_object_set_data_full(G_OBJECT(button), LIBBALSA_VFS_MIME_ACTION,
-			       app, g_object_unref);
 	g_free(msg);
 
-	g_signal_connect(button, "clicked",
-                         callback, data);
+	g_object_set_data_full(G_OBJECT(button), LIBBALSA_VFS_MIME_ACTION,
+			       g_strdup(app_name), g_free);
+
+	g_signal_connect(button, "clicked", callback, data);
     }
 
     return button;

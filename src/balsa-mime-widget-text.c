@@ -609,7 +609,7 @@ open_with_change_state(GSimpleAction *action,
     const gchar *app = g_variant_get_string(parameter, NULL);
     LibBalsaMessageBody *part = user_data;
 
-    balsa_mime_widget_ctx_menu_cb(app, part);
+    balsa_mime_widget_ctx_menu_launch_app(app, part);
 }
 
 static void

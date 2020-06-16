@@ -1846,7 +1846,7 @@ open_with_change_state(GSimpleAction *action,
     const gchar *app = g_variant_get_string(parameter, NULL);
     BalsaPartInfo *info = user_data;
 
-    balsa_mime_widget_ctx_menu_cb(app, info->body);
+    balsa_mime_widget_ctx_menu_launch_app(app, info->body);
 
     g_simple_action_set_state(action, parameter);
     if (GTK_IS_POPOVER(info->popup_widget))

@@ -31,6 +31,7 @@
 
 G_BEGIN_DECLS
 
+#define LIBBALSA_VFS_MIME_ACTION "mime-action"
 
 /* a vfs file description as GObject */
 #define LIBBALSA_TYPE_VFS (libbalsa_vfs_get_type())

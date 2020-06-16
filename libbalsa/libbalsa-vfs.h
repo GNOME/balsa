@@ -78,10 +78,9 @@ gboolean libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody *mime_body,
 void libbalsa_vfs_fill_menu_by_content_type(GMenu       *menu,
                                             const gchar *content_type,
                                             const gchar *action);
-GtkWidget * libbalsa_vfs_mime_button(LibBalsaMessageBody * mime_body,
-                                     const gchar * content_type,
-                                     GCallback callback,
-                                     gpointer data);
+GtkWidget * libbalsa_vfs_mime_button(const gchar * content_type,
+                                     GCallback     callback,
+                                     gpointer      data);
 
 /* content type helpers */
 gchar * libbalsa_vfs_content_description(const gchar * mime_type);

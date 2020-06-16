@@ -667,9 +667,7 @@ libbalsa_vfs_fill_menu_by_content_type(GMenu       *menu,
 }
 
 GtkWidget *
-libbalsa_vfs_mime_button(LibBalsaMessageBody * mime_body,
-                         const gchar * content_type,
-                         GCallback callback, gpointer data)
+libbalsa_vfs_mime_button(const gchar * content_type, GCallback callback, gpointer data)
 {
     GtkWidget *button = NULL;
     gchar *msg;

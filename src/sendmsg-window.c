@@ -1365,8 +1365,8 @@ change_attach_mode(GSimpleAction *action,
         g_simple_action_set_state(action, parameter);
     }
 
-    if (libbalsa_use_popover())
-        gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
+    if (GTK_IS_POPOVER(info->popup_menu))
+        gtk_popover_popdown((GtkPopover *) info->popup_menu);
 }
 
 
@@ -1388,8 +1388,8 @@ attachment_menu_vfs_cb(GSimpleAction *action,
                           err ? err->message : "Unknown error");
     g_clear_error(&err);
 
-    if (libbalsa_use_popover())
-        gtk_popover_popdown(GTK_POPOVER(info->popup_menu));
+    if (GTK_IS_POPOVER(info->popup_menu))
+        gtk_popover_popdown((GtkPopover *) info->popup_menu);
 }
 
 

@@ -2405,22 +2405,8 @@ attachment_button_press_cb(GtkGestureMultiPress *multi_press,
 
 	    gtk_tree_model_get(model, &iter, ATTACH_INFO_COLUMN, &attach_info, -1);
 	    if (attach_info != NULL) {
-		if (attach_info->popup_menu != NULL) {
-                    if (libbalsa_use_popover()) {
-                        GdkRectangle rectangle;
-
-                        /* Pop up above the pointer */
-                        rectangle.x = (gint) x;
-                        rectangle.width = 0;
-                        rectangle.y = (gint) y;
-                        rectangle.height = 0;
-                        gtk_popover_set_pointing_to(GTK_POPOVER(attach_info->popup_menu),
-                                                    &rectangle);
-                        gtk_popover_popup(GTK_POPOVER(attach_info->popup_menu));
-                    } else {
-                        gtk_menu_popup_at_pointer(GTK_MENU(attach_info->popup_menu), event);
-                    }
-                }
+		if (attach_info->popup_menu != NULL)
+                    libbalsa_popup_widget_popup(attach_info->popup_menu, event, NULL);
 		g_object_unref(attach_info);
 	    }
         }

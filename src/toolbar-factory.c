@@ -732,43 +732,7 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
 
     event = gtk_get_current_event();
 
-    if (libbalsa_use_popover()) {
-        if (button != -1) {
-            /* We are called with (x, y) coordinates, but they are
-             * "relative to the root of the screen", and we want them
-             * "relative to the window". */
-            gdouble x_win, y_win;
-
-            if (event != NULL &&
-                gdk_event_triggers_context_menu(event) &&
-                gdk_event_get_coords(event, &x_win, &y_win)) {
-                GdkRectangle rectangle;
-
-                /* Pop up above the pointer */
-                rectangle.x = (gint) x_win;
-                rectangle.width = 0;
-                rectangle.y = (gint) y_win;
-                rectangle.height = 0;
-                gtk_popover_set_pointing_to(GTK_POPOVER(popup_menu), &rectangle);
-            }
-        }
-
-        /* Apparently, the popover is insensitive if the toolbar is
-         * insensitive, but we always want it to be sensitive. */
-        gtk_widget_set_sensitive(popup_menu, TRUE);
-
-        gtk_popover_popup(GTK_POPOVER(popup_menu));
-    } else {
-        if (event != NULL && gdk_event_get_event_type(event) == GDK_BUTTON_PRESS) {
-            gtk_menu_popup_at_pointer(GTK_MENU(popup_menu), event);
-        } else {
-            gtk_menu_popup_at_widget(GTK_MENU(popup_menu),
-                                     GTK_WIDGET(toolbar),
-                                     GDK_GRAVITY_NORTH,
-                                     GDK_GRAVITY_SOUTH,
-                                     NULL);
-        }
-    }
+    libbalsa_popup_widget_popup(popup_menu, event, toolbar);
 
     if (event != NULL)
         gdk_event_free(event);

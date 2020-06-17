@@ -155,13 +155,7 @@ balsa_image_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
     sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press_gesture));
     event    = gtk_gesture_get_last_event(gesture, sequence);
 
-    if (gdk_event_triggers_context_menu(event)) {
-        if (libbalsa_use_popover())
-            gtk_popover_popup(GTK_POPOVER(menu));
-        else
-            gtk_menu_popup_at_pointer(GTK_MENU(menu), event);
-        gtk_gesture_set_sequence_state(gesture, sequence, GTK_EVENT_SEQUENCE_CLAIMED);
-    }
+    libbalsa_popup_widget_popup(menu, event, NULL);
 }
 
 static void

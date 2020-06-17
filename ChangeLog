@@ -329,6 +329,22 @@
 
 	* src/balsa-mime-widget-text.c (text_view_url_popup):
 
+2020-06-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Implement libbalsa_popup_widget_popup() as a wrapper for
+	popping up either a GtkPopover or a GtkMenu, and use it.
+
+	* libbalsa/libbalsa.c (libbalsa_popup_widget_popup):
+	* libbalsa/libbalsa.h:
+	* src/balsa-index.c (bndx_do_popup):
+	* src/balsa-mblist.c (bmbl_do_popup):
+	* src/balsa-message.c (tree_mult_selection_popup),
+	(tree_button_press_cb):
+	* src/balsa-mime-widget-image.c (balsa_image_button_press_cb):
+	* src/balsa-mime-widget-text.c (bmwt_html_popup_context_menu):
+	* src/sendmsg-window.c (attachment_button_press_cb):
+	* src/toolbar-factory.c (tm_popup_context_menu_cb):
+
 2020-06-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	main: Sandbox all the webkit

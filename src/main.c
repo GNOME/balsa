@@ -54,7 +54,17 @@
 
 #include "libbalsa-gpgme.h"
 #include "libbalsa-gpgme-cb.h"
+
+#ifdef HAVE_HTML_WIDGET
+#include <gtk/gtk.h>
+#if defined(GTK_DISABLE_DEPRECATED)
+#define GtkAction GAction
 #include <webkit2/webkit2.h>
+#undef GtkAction
+#else  /* defined(GTK_DISABLE_DEPRECATED) */
+#include <webkit2/webkit2.h>
+#endif /* defined(GTK_DISABLE_DEPRECATED) */
+#endif /* HAVE_HTML_WIDGET */
 
 /* We need separate variable for storing command line requests to check the
    mail because such selection cannot be stored in balsa_app and later
@@ -510,8 +520,10 @@ balsa_startup_cb(GApplication *application,
     GError *error = NULL;
 #endif
 
+#ifdef HAVE_HTML_WIDGET
     /* https://gitlab.gnome.org/GNOME/Initiatives/-/wikis/Sandbox-all-the-WebKit! */
     webkit_web_context_set_sandbox_enabled(webkit_web_context_get_default(), TRUE);
+#endif
 
 #ifdef ENABLE_NLS
     /* Initialize the i18n stuff */

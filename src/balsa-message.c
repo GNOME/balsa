@@ -1171,9 +1171,9 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
         gtk_popover_popup(GTK_POPOVER(popup_widget));
     } else {
         if (event != NULL) {
-            gtk_menu_popup_at_pointer(GTK_MENU(balsa_message->save_all_popup), event);
+            gtk_menu_popup_at_pointer(GTK_MENU(popup_widget), event);
         } else {
-            gtk_menu_popup_at_widget(GTK_MENU(balsa_message->save_all_popup),
+            gtk_menu_popup_at_widget(GTK_MENU(popup_widget),
                                      GTK_WIDGET(balsa_message),
                                      GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                      NULL);

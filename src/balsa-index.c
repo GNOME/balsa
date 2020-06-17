@@ -2174,8 +2174,6 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     gboolean readonly;
     GMenu *mru_menu;
     GMenuItem *item;
-    GtkAllocation allocation;
-    gdouble x, y;
 
     g_debug("%s:%s", __FILE__, __func__);
 
@@ -2224,39 +2222,7 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     g_menu_insert_item(index->popup_menu, index->move_position, item);
     g_object_unref(item);
 
-    if (libbalsa_use_popover()) {
-        if (event != NULL &&
-            gdk_event_triggers_context_menu(event) &&
-            gdk_event_get_coords(event, &x, &y)) {
-            /* Pop up to the right of the pointer */
-            gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(index),
-                                                              (gint) x,
-                                                              (gint) y,
-                                                              &allocation.x,
-                                                              &allocation.y);
-            allocation.width = 0;
-            allocation.height = 0;
-        } else {
-            /* Pop up to the right of the "From" column */
-            gtk_widget_get_allocation(GTK_WIDGET(index), &allocation);
-            allocation.width = balsa_app.index_num_width +
-                               balsa_app.index_status_width +
-                               balsa_app.index_attachment_width +
-                               balsa_app.index_from_width;
-        }
-        gtk_popover_set_pointing_to(GTK_POPOVER(index->popup_widget),
-                                    (GdkRectangle *) &allocation);
-
-        gtk_popover_popup(GTK_POPOVER(index->popup_widget));
-    } else {
-        if (event != NULL) {
-            gtk_menu_popup_at_pointer(GTK_MENU(index->popup_widget), event);
-        } else {
-            gtk_menu_popup_at_widget(GTK_MENU(index->popup_widget), GTK_WIDGET(index),
-                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
-                                     NULL);
-        }
-    }
+    libbalsa_popup_widget_popup(index->popup_widget, event, GTK_WIDGET(index));
 }
 
 /* End of popup stuff */

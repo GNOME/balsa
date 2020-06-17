@@ -1335,7 +1335,6 @@ bmwt_html_popup_context_menu(GtkWidget    *html,
     GtkWidget *popup_widget;
     const GdkEvent *event;
     GdkEvent *current_event = NULL;
-    gdouble x, y;
 
     popup_widget = g_object_get_data(G_OBJECT(html), "popup-widget");
     if (popup_widget == NULL) {
@@ -1359,30 +1358,7 @@ bmwt_html_popup_context_menu(GtkWidget    *html,
     if (event == NULL)
         event = current_event = gtk_get_current_event();
 
-    if (libbalsa_use_popover()) {
-        if (event != NULL &&
-            gdk_event_triggers_context_menu(event) &&
-            gdk_event_get_coords(event, &x, &y)) {
-            GdkRectangle rectangle;
-
-            /* Pop up above the pointer */
-            rectangle.x = (gint) x;
-            rectangle.width = 0;
-            rectangle.y = (gint) y;
-            rectangle.height = 0;
-            gtk_popover_set_pointing_to(GTK_POPOVER(popup_widget), &rectangle);
-        }
-        gtk_popover_popup(GTK_POPOVER(popup_widget));
-    } else {
-        if (event != NULL)
-            gtk_menu_popup_at_pointer(GTK_MENU(popup_widget),
-                                     (GdkEvent *) event);
-        else
-            gtk_menu_popup_at_widget(GTK_MENU(popup_widget),
-                                     GTK_WIDGET(bm),
-                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
-                                     NULL);
-    }
+    libbalsa_popup_widget_popup(popup_widget, event, GTK_WIDGET(bm));
 
     if (current_event != NULL)
         gdk_event_free(current_event);

@@ -794,3 +794,57 @@ libbalsa_popup_widget_new(GtkWidget   *relative_to,
 
     return popup_widget;
 }
+
+/*
+ * Pop up a widget
+ */
+void
+libbalsa_popup_widget_popup(GtkWidget      *popup_widget,
+                            const GdkEvent *event,
+                            GtkWidget      *widget)
+{
+    g_return_if_fail(GTK_IS_POPOVER(popup_widget) || GTK_IS_MENU(popup_widget));
+    g_return_if_fail(widget == NULL || GTK_IS_WIDGET(widget));
+
+    if (libbalsa_use_popover()) {
+        GtkPopover *popover = GTK_POPOVER(popup_widget);
+        gdouble x, y;
+        GdkRectangle rectangle;
+
+        if (event != NULL &&
+            gdk_event_triggers_context_menu(event) &&
+            gdk_event_get_coords(event, &x, &y)) {
+            /* Pop up to the right of the pointer */
+            if (GTK_IS_TREE_VIEW(widget)) {
+                gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(widget),
+                                                                  (gint) x,
+                                                                  (gint) y,
+                                                                  &rectangle.x,
+                                                                  &rectangle.y);
+            } else {
+                rectangle.x = (gint) x;
+                rectangle.y = (gint) y;
+            }
+        } else {
+            /* Pop up centered on widget */
+            gtk_widget_get_allocation(widget, (GtkAllocation *) &rectangle);
+            rectangle.x += rectangle.width / 2;
+            rectangle.y += rectangle.height / 2;
+        }
+        rectangle.width = 0;
+        rectangle.height = 0;
+
+        gtk_popover_set_pointing_to(popover, &rectangle);
+        gtk_popover_popup(popover);
+    } else {
+        GtkMenu *menu = GTK_MENU(popup_widget);
+
+        if (event != NULL && gdk_event_triggers_context_menu(event)) {
+            gtk_menu_popup_at_pointer(menu, event);
+        } else {
+            gtk_menu_popup_at_widget(menu, widget,
+                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
+                                     NULL);
+        }
+    }
+}

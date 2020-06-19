@@ -733,6 +733,7 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
     event = gtk_get_current_event();
 
     libbalsa_popup_widget_popup(popup_menu, event, toolbar);
+    gtk_widget_set_sensitive(popup_menu, TRUE);
 
     if (event != NULL)
         gdk_event_free(event);

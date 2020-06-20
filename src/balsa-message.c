@@ -241,7 +241,7 @@ balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * balsa_message
 {
     if (balsa_message->parts_popup) {
         gtk_menu_popup_at_widget(GTK_MENU(balsa_message->parts_popup),
-                                 GTK_WIDGET(balsa_message),
+                                 GTK_WIDGET(balsa_message->attach_button),
                                  GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                  NULL);
     }

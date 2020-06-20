@@ -813,6 +813,9 @@ toggle_all_inline_change_state(GSimpleAction *action,
         g_object_unref(info);
     }
 
+    if (GTK_IS_POPOVER(balsa_message->parts_popup))
+        gtk_popover_popdown((GtkPopover *) balsa_message->parts_popup);
+
     g_simple_action_set_state(G_SIMPLE_ACTION(action), parameter);
 }
 
@@ -837,6 +840,9 @@ show_part_change_state(GSimpleAction *action,
         select_part(balsa_message, info);
         g_object_unref(info);
     }
+
+    if (GTK_IS_POPOVER(balsa_message->parts_popup))
+        gtk_popover_popdown((GtkPopover *) balsa_message->parts_popup);
 
     g_simple_action_set_state(G_SIMPLE_ACTION(action), parameter);
 }

@@ -814,25 +814,36 @@ libbalsa_popup_widget_popup(GtkWidget      *popup_widget,
         if (event != NULL &&
             gdk_event_triggers_context_menu(event) &&
             gdk_event_get_coords(event, &x, &y)) {
-            /* Pop up to the right of the pointer */
             if (GTK_IS_TREE_VIEW(widget)) {
                 gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(widget),
                                                                   (gint) x,
                                                                   (gint) y,
                                                                   &rectangle.x,
                                                                   &rectangle.y);
+                rectangle.width = 0;
+                rectangle.height = 0;
+            } else if (GTK_IS_TOOLBAR(widget)) {
+                gdouble x_root;
+
+                gdk_event_get_root_coords(event, &x_root, NULL);
+                rectangle.x = (gint) x_root;
+                rectangle.y = (gint) y;
+                rectangle.width = 5;
+                rectangle.height = 5;
             } else {
                 rectangle.x = (gint) x;
                 rectangle.y = (gint) y;
+                rectangle.width = 0;
+                rectangle.height = 0;
             }
         } else {
             /* Pop up centered on widget */
             gtk_widget_get_allocation(widget, (GtkAllocation *) &rectangle);
             rectangle.x += rectangle.width / 2;
             rectangle.y += rectangle.height / 2;
+            rectangle.width = 0;
+            rectangle.height = 0;
         }
-        rectangle.width = 0;
-        rectangle.height = 0;
 
         gtk_popover_set_pointing_to(popover, &rectangle);
         gtk_popover_popup(popover);

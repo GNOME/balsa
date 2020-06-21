@@ -207,6 +207,12 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
 
     gesture = gtk_gesture_multi_press_new(widget);
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+
+    if (GTK_IS_POPOVER(data)) {
+        GtkPopover *popover = data;
+        gtk_popover_set_relative_to(popover, widget);
+    }
+
     g_signal_connect(gesture, "pressed",
                      G_CALLBACK(balsa_image_button_press_cb), data);
 

@@ -806,13 +806,15 @@ libbalsa_popup_widget_popup(GtkWidget      *popup_widget,
     g_return_if_fail(GTK_IS_POPOVER(popup_widget) || GTK_IS_MENU(popup_widget));
     g_return_if_fail(widget == NULL || GTK_IS_WIDGET(widget));
 
+    if (event != NULL && !gdk_event_triggers_context_menu(event))
+        return;
+
     if (libbalsa_use_popover()) {
         GtkPopover *popover = GTK_POPOVER(popup_widget);
         gdouble x, y;
         GdkRectangle rectangle;
 
         if (event != NULL &&
-            gdk_event_triggers_context_menu(event) &&
             gdk_event_get_coords(event, &x, &y)) {
             if (GTK_IS_TREE_VIEW(widget)) {
                 gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(widget),
@@ -850,7 +852,7 @@ libbalsa_popup_widget_popup(GtkWidget      *popup_widget,
     } else {
         GtkMenu *menu = GTK_MENU(popup_widget);
 
-        if (event != NULL && gdk_event_triggers_context_menu(event)) {
+        if (event != NULL) {
             gtk_menu_popup_at_pointer(menu, event);
         } else {
             gtk_menu_popup_at_widget(menu, widget,

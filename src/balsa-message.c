@@ -211,6 +211,7 @@ struct _BalsaMessage {
 #endif				/* HAVE_HTML_WIDGET */
 
         GtkWidget *attach_button;
+        GAction   *toggle_all_inline_action;
 };
 
 G_DEFINE_TYPE(BalsaMessage, balsa_message, GTK_TYPE_BOX)
@@ -876,6 +877,9 @@ balsa_message_init(BalsaMessage * balsa_message)
                                     entries,
                                     G_N_ELEMENTS(entries),
                                     balsa_message);
+    balsa_message->toggle_all_inline_action =
+        g_action_map_lookup_action(G_ACTION_MAP(simple), "toggle-all-inline");
+
     gtk_widget_insert_action_group(GTK_WIDGET(balsa_message),
                                    "message-menu",
                                    G_ACTION_GROUP(simple));
@@ -1753,6 +1757,11 @@ display_content(BalsaMessage * balsa_message)
     /* Populate the parts-menu */
     display_parts(balsa_message, libbalsa_message_get_body_list(balsa_message->message), NULL, NULL);
     g_clear_object(&balsa_message->parts_menu);
+
+    /* GAction retains its state when switching messages, so we must
+     * return the all-inline toggle to FALSE: */
+    g_simple_action_set_state(G_SIMPLE_ACTION(balsa_message->toggle_all_inline_action),
+                              g_variant_new_boolean(FALSE));
 
     if (balsa_message->info_count > 1) {
  	gtk_widget_show_all(balsa_message->attach_button);

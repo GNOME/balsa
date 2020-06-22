@@ -800,31 +800,31 @@ libbalsa_popup_widget_new(GtkWidget   *relative_to,
  */
 void
 libbalsa_popup_widget_popup(GtkWidget      *popup_widget,
-                            const GdkEvent *event,
-                            GtkWidget      *widget)
+                            const GdkEvent *event)
 {
     g_return_if_fail(GTK_IS_POPOVER(popup_widget) || GTK_IS_MENU(popup_widget));
-    g_return_if_fail(widget == NULL || GTK_IS_WIDGET(widget));
 
     if (event != NULL && !gdk_event_triggers_context_menu(event))
         return;
 
     if (libbalsa_use_popover()) {
         GtkPopover *popover = GTK_POPOVER(popup_widget);
+        GtkWidget *relative_to = gtk_popover_get_relative_to(popover);
         gdouble x, y;
-        GdkRectangle rectangle;
 
         if (event != NULL &&
             gdk_event_get_coords(event, &x, &y)) {
-            if (GTK_IS_TREE_VIEW(widget)) {
-                gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(widget),
+            GdkRectangle rectangle;
+
+            if (GTK_IS_TREE_VIEW(relative_to)) {
+                gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(relative_to),
                                                                   (gint) x,
                                                                   (gint) y,
                                                                   &rectangle.x,
                                                                   &rectangle.y);
                 rectangle.width = 0;
                 rectangle.height = 0;
-            } else if (GTK_IS_TOOLBAR(widget)) {
+            } else if (GTK_IS_TOOLBAR(relative_to)) {
                 gdouble x_root;
 
                 gdk_event_get_root_coords(event, &x_root, NULL);
@@ -838,16 +838,9 @@ libbalsa_popup_widget_popup(GtkWidget      *popup_widget,
                 rectangle.width = 0;
                 rectangle.height = 0;
             }
-        } else {
-            /* Pop up centered on widget */
-            gtk_widget_get_allocation(widget, (GtkAllocation *) &rectangle);
-            rectangle.x += rectangle.width / 2;
-            rectangle.y += rectangle.height / 2;
-            rectangle.width = 0;
-            rectangle.height = 0;
+            gtk_popover_set_pointing_to(popover, &rectangle);
         }
 
-        gtk_popover_set_pointing_to(popover, &rectangle);
         gtk_popover_popup(popover);
     } else {
         GtkMenu *menu = GTK_MENU(popup_widget);
@@ -855,7 +848,9 @@ libbalsa_popup_widget_popup(GtkWidget      *popup_widget,
         if (event != NULL) {
             gtk_menu_popup_at_pointer(menu, event);
         } else {
-            gtk_menu_popup_at_widget(menu, widget,
+            GtkWidget *attach_widget = gtk_menu_get_attach_widget(menu);
+
+            gtk_menu_popup_at_widget(menu, attach_widget,
                                      GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
                                      NULL);
         }

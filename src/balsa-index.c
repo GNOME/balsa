@@ -2137,8 +2137,6 @@ bndx_popup_menu_create(BalsaIndex * bindex)
     bindex->popup_menu = menu;
     bindex->popup_widget =
         libbalsa_popup_widget_new(GTK_WIDGET(bindex), G_MENU_MODEL(menu), "popup");
-    if (libbalsa_use_popover())
-        gtk_popover_set_position(GTK_POPOVER(bindex->popup_widget), GTK_POS_BOTTOM);
 }
 
 /* bndx_do_popup: common code for the popup menu;
@@ -2222,7 +2220,7 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     g_menu_insert_item(index->popup_menu, index->move_position, item);
     g_object_unref(item);
 
-    libbalsa_popup_widget_popup(index->popup_widget, event, GTK_WIDGET(index));
+    libbalsa_popup_widget_popup(index->popup_widget, event);
 }
 
 /* End of popup stuff */

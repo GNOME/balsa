@@ -1358,7 +1358,7 @@ bmwt_html_popup_context_menu(GtkWidget    *html,
     if (event == NULL)
         event = current_event = gtk_get_current_event();
 
-    libbalsa_popup_widget_popup(popup_widget, event, GTK_WIDGET(bm));
+    libbalsa_popup_widget_popup(popup_widget, event);
 
     if (current_event != NULL)
         gdk_event_free(current_event);

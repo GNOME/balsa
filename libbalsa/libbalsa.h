@@ -191,8 +191,7 @@ GtkWidget *libbalsa_popup_widget_new  (GtkWidget      *relative_to,
                                        GMenuModel     *model,
                                        const gchar    *action_namespace);
 void       libbalsa_popup_widget_popup(GtkWidget      *popup_widget,
-                                       const GdkEvent *event,
-                                       GtkWidget      *widget);
+                                       const GdkEvent *event);
 
 #if HAVE_GTKSOURCEVIEW
 GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases);

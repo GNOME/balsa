@@ -739,7 +739,7 @@ bmbl_do_popup(GtkTreeView    *tree_view,
 
     menu = balsa_mailbox_node_get_context_menu(mbnode, GTK_WIDGET(tree_view));
 
-    libbalsa_popup_widget_popup(menu, event, GTK_WIDGET(tree_view));
+    libbalsa_popup_widget_popup(menu, event);
 
     if (mbnode != NULL)
 	g_object_unref(mbnode);

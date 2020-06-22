@@ -1174,13 +1174,12 @@ bmwt_html_open_with_change_state(GSimpleAction *action,
 {
     GtkWidget *html = user_data;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
+    GtkWidget *popup_widget = g_object_get_data(G_OBJECT(html), "popup-widget");
 
     open_with_change_state(action, parameter, mime_body);
 
-    if (libbalsa_use_popover()) {
-        GtkPopover *popover = g_object_get_data(G_OBJECT(html), "popup-widget");
-        gtk_popover_popdown(popover);
-    }
+    if (GTK_IS_POPOVER(popup_widget))
+        gtk_popover_popdown((GtkPopover *) popup_widget);
 }
 
 static void

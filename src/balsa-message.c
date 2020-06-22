@@ -240,16 +240,8 @@ balsa_message_class_init(BalsaMessageClass * klass)
 static void
 balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * balsa_message)
 {
-    if (balsa_message->parts_popup != NULL) {
-        if (libbalsa_use_popover()) {
-            gtk_popover_popup(GTK_POPOVER(balsa_message->parts_popup));
-        } else {
-            gtk_menu_popup_at_widget(GTK_MENU(balsa_message->parts_popup),
-                                     GTK_WIDGET(balsa_message->attach_button),
-                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
-                                     NULL);
-        }
-    }
+    if (balsa_message->parts_popup != NULL)
+        libbalsa_popup_widget_popup(balsa_message->parts_popup, NULL);
 }
 
 
@@ -1159,10 +1151,8 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
         popup_widget = balsa_message->save_all_popup;
     }
 
-    if (popup_widget == NULL)
-        return;
-
-    libbalsa_popup_widget_popup(popup_widget, event, GTK_WIDGET(balsa_message));
+    if (popup_widget != NULL)
+        libbalsa_popup_widget_popup(popup_widget, event);
 }
 
 static gboolean
@@ -1226,7 +1216,7 @@ tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
                 gtk_tree_model_get(model, &iter, PART_INFO_COLUMN, &info, -1);
                 if (info != NULL) {
                     if (info->popup_widget != NULL)
-                        libbalsa_popup_widget_popup(info->popup_widget, event, NULL);
+                        libbalsa_popup_widget_popup(info->popup_widget, event);
                     g_object_unref(info);
                 }
             }
@@ -1743,12 +1733,6 @@ display_content(BalsaMessage * balsa_message)
     bm_clear_tree(balsa_message);
 
     balsa_message->parts_menu = g_menu_new();
-
-    if (libbalsa_use_popover()) {
-        /* Detach any existing popup: */
-        if (balsa_message->parts_popup != NULL)
-            gtk_popover_set_relative_to(GTK_POPOVER(balsa_message->parts_popup), NULL);
-    }
 
     balsa_message->parts_popup = libbalsa_popup_widget_new(balsa_message->attach_button,
                                                            G_MENU_MODEL(balsa_message->parts_menu),

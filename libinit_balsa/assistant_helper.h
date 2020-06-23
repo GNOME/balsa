@@ -23,26 +23,25 @@
 #include <gtk/gtk.h>
 
 typedef struct EntryData_s EntryData;
-typedef struct EntryMaster_s EntryMaster;
+typedef struct EntryController_s EntryController;
 
 struct EntryData_s {
     GtkAssistant *druid;
     GtkWidget    *page;
     guint num;
-    EntryMaster *master;
+    EntryController *controller;
 };
 
 #define ENTRY_DATA_INIT { NULL, 0 }
 
-struct EntryMaster_s {
+struct EntryController_s {
     guint32 setbits;
     guint32 numentries;
     guint32 donemask;
 };
 
-#define ENTRY_MASTER_INIT { 0, 0, 0 }
-#define ENTRY_MASTER_P_DONE( ep ) ( ((ep)->setbits & (ep)->donemask) == (ep)->donemask )
-#define ENTRY_MASTER_DONE( e ) ( ((e).setbits & (e).donemask) == (e).donemask )
+#define ENTRY_CONTROLLER_INIT { 0, 0, 0 }
+#define ENTRY_CONTROLLER_DONE( e ) ( ((e)->setbits & (e)->donemask) == (e)->donemask )
 
 GtkWidget *balsa_init_add_grid_entry(GtkGrid * grid, guint num,
                                      const gchar * ltext,

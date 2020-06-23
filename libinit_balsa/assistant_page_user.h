@@ -46,7 +46,7 @@ G_BEGIN_DECLS
         GtkWidget *name;
         GtkWidget *email;
         GtkWidget *localmaildir;
-        EntryMaster emaster;
+        EntryController econtroller;
         EntryData ed0;
         EntryData ed1;
         EntryData ed2;

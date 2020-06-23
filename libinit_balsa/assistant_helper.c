@@ -69,13 +69,13 @@ balsa_init_add_grid_entry(GtkGrid * grid, guint num, const gchar * ltext,
     if(ed) {
         g_signal_connect(e, "changed",
                          G_CALLBACK(entry_changed_cb), ed);
-        ed->num = ed->master->numentries++;
+        ed->num = ed->controller->numentries++;
         ed->druid = druid;
         ed->page = page;
         if (etext && etext[0] != '\0')
-            ed->master->setbits |= (1 << num);
+            ed->controller->setbits |= (1 << num);
 
-        ed->master->donemask = (ed->master->donemask << 1) | 1;
+        ed->controller->donemask = (ed->controller->donemask << 1) | 1;
     }
     gtk_entry_set_text(GTK_ENTRY(e), etext);
     return e;
@@ -87,9 +87,9 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
     g_assert(ed != NULL);
 
     if (gtk_entry_get_text_length(entry)) {
-        ed->master->setbits |= (1 << ed->num);
+        ed->controller->setbits |= (1 << ed->num);
     } else {
-        ed->master->setbits &= ~(1 << ed->num);
+        ed->controller->setbits &= ~(1 << ed->num);
     }
 
     /* The stuff below is only when we are displayed... which is not
@@ -100,7 +100,7 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
 
     if (GTK_IS_ASSISTANT(ed->druid)) {
         /* Don't let them continue unless all entries have something. */
-        if (ENTRY_MASTER_P_DONE(ed->master)) {
+        if (ENTRY_CONTROLLER_DONE(ed->controller)) {
             gtk_assistant_set_page_complete(ed->druid, ed->page, TRUE);
         } else {
             gtk_assistant_set_page_complete(ed->druid, ed->page, FALSE);

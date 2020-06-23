@@ -77,14 +77,14 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     gchar *preset;
     int row = 0;
 
-    user->emaster.setbits = 0;
-    user->emaster.numentries = 0;
-    user->emaster.donemask = 0;
-    user->ed0.master = &(user->emaster);
-    user->ed1.master = &(user->emaster);
-    user->ed2.master = &(user->emaster);
-    user->ed3.master = &(user->emaster);
-    user->ed4.master = &(user->emaster);
+    user->econtroller.setbits = 0;
+    user->econtroller.numentries = 0;
+    user->econtroller.donemask = 0;
+    user->ed0.controller = &(user->econtroller);
+    user->ed1.controller = &(user->econtroller);
+    user->ed2.controller = &(user->econtroller);
+    user->ed3.controller = &(user->econtroller);
+    user->ed4.controller = &(user->econtroller);
     label = GTK_LABEL(gtk_label_new(_(header2)));
     gtk_label_set_line_wrap(label, TRUE);
     gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label), FALSE, TRUE, 0);
@@ -186,7 +186,7 @@ balsa_druid_page_user_prepare(GtkAssistant * druid, GtkWidget * page,
 
     /* Don't let them continue unless all entries have something. */
     gtk_assistant_set_page_complete(druid, page,
-                                    ENTRY_MASTER_DONE(user->emaster));
+                                    ENTRY_CONTROLLER_DONE(&user->econtroller));
 
     gtk_widget_grab_focus(user->incoming_srv);
     user->need_set = TRUE;

@@ -212,6 +212,7 @@ struct _BalsaMessage {
 
         GtkWidget *attach_button;
         GAction   *toggle_all_inline_action;
+        GAction   *show_part_action;
 };
 
 G_DEFINE_TYPE(BalsaMessage, balsa_message, GTK_TYPE_BOX)
@@ -784,6 +785,11 @@ toggle_all_inline_change_state(GSimpleAction *action,
 
     balsa_message->force_inline = g_variant_get_boolean(parameter);
 
+    /* If we are forcing in-line, clear all the parts;
+     * otherwise, set "complete message". */
+    g_simple_action_set_state(G_SIMPLE_ACTION(balsa_message->show_part_action),
+                              g_variant_new_string(balsa_message->force_inline ? "" : "0"));
+
     gtk_stack_set_visible_child_name(GTK_STACK(balsa_message->stack), "content");
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(balsa_message->treeview));
@@ -811,6 +817,10 @@ show_part_change_state(GSimpleAction *action,
     GtkTreeModel *model;
     GtkTreeIter iter;
     BalsaPartInfo *info;
+
+    /* Make sure force-inline is cleared */
+    g_simple_action_set_state(G_SIMPLE_ACTION(balsa_message->toggle_all_inline_action),
+                              g_variant_new_boolean(FALSE));
 
     gtk_stack_set_visible_child_name(GTK_STACK(balsa_message->stack), "content");
 
@@ -860,6 +870,8 @@ balsa_message_init(BalsaMessage * balsa_message)
                                     balsa_message);
     balsa_message->toggle_all_inline_action =
         g_action_map_lookup_action(G_ACTION_MAP(simple), "toggle-all-inline");
+    balsa_message->show_part_action =
+        g_action_map_lookup_action(G_ACTION_MAP(simple), "show-part");
 
     gtk_widget_insert_action_group(GTK_WIDGET(balsa_message),
                                    "message-menu",
@@ -1741,9 +1753,11 @@ display_content(BalsaMessage * balsa_message)
     g_clear_object(&balsa_message->parts_menu);
 
     /* GAction retains its state when switching messages, so we must
-     * return the all-inline toggle to FALSE: */
+     * return the all-inline toggle to FALSE and clear any show-part: */
     g_simple_action_set_state(G_SIMPLE_ACTION(balsa_message->toggle_all_inline_action),
                               g_variant_new_boolean(FALSE));
+    g_simple_action_set_state(G_SIMPLE_ACTION(balsa_message->show_part_action),
+                              g_variant_new_string(""));
 
     if (balsa_message->info_count > 1) {
  	gtk_widget_show_all(balsa_message->attach_button);
@@ -2227,8 +2241,9 @@ add_multipart_mixed(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
 		g_mime_content_type_is_type(type, "application", "pgp-signature") ||
 		(balsa_app.has_smime &&
 		 (g_mime_content_type_is_type(type, "application", "pkcs7-signature") ||
-		  g_mime_content_type_is_type(type, "application", "x-pkcs7-signature"))))
+		  g_mime_content_type_is_type(type, "application", "x-pkcs7-signature")))) {
                 add_body(balsa_message, body, container);
+            }
 	    g_object_unref(type);
         }
     }

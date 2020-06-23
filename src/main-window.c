@@ -147,9 +147,9 @@ static void bw_select_part_cb(BalsaMessage * bm, gpointer data);
 static void bw_find_real(BalsaWindow * window, BalsaIndex * bindex,
                          gboolean again);
 
-static void bw_slave_position_cb(GtkPaned   * paned_slave,
-                                 GParamSpec * pspec,
-                                 gpointer     user_data);
+static void bw_paned_child_position_cb(GtkPaned   * paned_child,
+                                       GParamSpec * pspec,
+                                       gpointer     user_data);
 
 static void bw_notebook_switch_page_cb(GtkWidget * notebook,
                                        void * page,
@@ -200,8 +200,8 @@ struct _BalsaWindowPrivate {
     GtkWidget *sos_entry;       /* SenderOrSubject filter entry */
     GtkWidget *notebook;
     GtkWidget *preview;		/* message is child */
-    GtkWidget *paned_master;
-    GtkWidget *paned_slave;
+    GtkWidget *paned_parent;
+    GtkWidget *paned_child;
     GtkWidget *current_index;
     GtkWidget *filter_choice;
     GtkWidget *vbox;
@@ -342,13 +342,13 @@ bw_delete_cb(GtkWidget* main_window)
 }
 
 static void
-bw_master_position_cb(GtkPaned   * paned_master,
-                      GParamSpec * pspec,
-                      gpointer     user_data)
+bw_paned_parent_position_cb(GtkPaned   * paned_parent,
+                            GParamSpec * pspec,
+                            gpointer     user_data)
 {
     if (balsa_app.show_mblist)
         balsa_app.mblist_width = /* FIXME: this makes some assumptions... */
-            gtk_paned_get_position(paned_master);
+            gtk_paned_get_position(paned_parent);
 }
 
 static GtkWidget *
@@ -588,60 +588,60 @@ bw_set_panes(BalsaWindow * window)
 
     switch (balsa_app.layout_type) {
     case LAYOUT_WIDE_MSG:
-	priv->paned_master = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
-	priv->paned_slave  = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	priv->paned_parent = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+	priv->paned_child  = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
         if (priv->content)
             gtk_container_remove(GTK_CONTAINER(priv->vbox),
                                  priv->content);
-        priv->content = priv->paned_master;
+        priv->content = priv->paned_parent;
         gtk_box_pack_start(GTK_BOX(priv->vbox), priv->content,
                            TRUE, TRUE, 0);
-	gtk_paned_pack1(GTK_PANED(priv->paned_slave),
+	gtk_paned_pack1(GTK_PANED(priv->paned_child),
 			bw_frame(priv->mblist), TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(priv->paned_slave),
+        gtk_paned_pack2(GTK_PANED(priv->paned_child),
 			bw_frame(index_widget), TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(priv->paned_master),
-			priv->paned_slave, TRUE, TRUE);
-	gtk_paned_pack2(GTK_PANED(priv->paned_master),
+        gtk_paned_pack1(GTK_PANED(priv->paned_parent),
+			priv->paned_child, TRUE, TRUE);
+	gtk_paned_pack2(GTK_PANED(priv->paned_parent),
 			bw_frame(priv->preview), TRUE, TRUE);
         width_preference = BALSA_INDEX_WIDE;
 	break;
     case LAYOUT_WIDE_SCREEN:
-	priv->paned_master = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-	priv->paned_slave  = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	priv->paned_parent = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	priv->paned_child  = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
         if (priv->content)
             gtk_container_remove(GTK_CONTAINER(priv->vbox),
                                  priv->content);
-        priv->content = priv->paned_master;
+        priv->content = priv->paned_parent;
         gtk_box_pack_start(GTK_BOX(priv->vbox), priv->content,
                            TRUE, TRUE, 0);
-	gtk_paned_pack1(GTK_PANED(priv->paned_master),
+	gtk_paned_pack1(GTK_PANED(priv->paned_parent),
                         bw_frame(priv->mblist), TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(priv->paned_master), priv->paned_slave,
+        gtk_paned_pack2(GTK_PANED(priv->paned_parent), priv->paned_child,
                         TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(priv->paned_slave),
+        gtk_paned_pack1(GTK_PANED(priv->paned_child),
                         bw_frame(index_widget), TRUE, FALSE);
-	gtk_paned_pack2(GTK_PANED(priv->paned_slave),
+	gtk_paned_pack2(GTK_PANED(priv->paned_child),
                         bw_frame(priv->preview), TRUE, TRUE);
         width_preference = BALSA_INDEX_NARROW;
 	break;
     case LAYOUT_DEFAULT:
     default:
-	priv->paned_master = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-	priv->paned_slave  = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+	priv->paned_parent = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+	priv->paned_child  = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
         if (priv->content)
             gtk_container_remove(GTK_CONTAINER(priv->vbox),
                                  priv->content);
-        priv->content = priv->paned_master;
+        priv->content = priv->paned_parent;
         gtk_box_pack_start(GTK_BOX(priv->vbox), priv->content,
                            TRUE, TRUE, 0);
-	gtk_paned_pack1(GTK_PANED(priv->paned_master),
+	gtk_paned_pack1(GTK_PANED(priv->paned_parent),
                         bw_frame(priv->mblist), TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(priv->paned_master), priv->paned_slave,
+        gtk_paned_pack2(GTK_PANED(priv->paned_parent), priv->paned_child,
                         TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(priv->paned_slave),
+        gtk_paned_pack1(GTK_PANED(priv->paned_child),
                         bw_frame(index_widget), TRUE, TRUE);
-	gtk_paned_pack2(GTK_PANED(priv->paned_slave),
+	gtk_paned_pack2(GTK_PANED(priv->paned_child),
                         bw_frame(priv->preview), TRUE, TRUE);
         width_preference = BALSA_INDEX_WIDE;
     }
@@ -2331,22 +2331,22 @@ balsa_window_new(GtkApplication *application)
 
     if (balsa_app.show_mblist) {
         gtk_widget_show(priv->mblist);
-        gtk_paned_set_position(GTK_PANED(priv->paned_master),
+        gtk_paned_set_position(GTK_PANED(priv->paned_parent),
                                balsa_app.mblist_width);
     } else {
-        gtk_paned_set_position(GTK_PANED(priv->paned_master), 0);
+        gtk_paned_set_position(GTK_PANED(priv->paned_parent), 0);
     }
 
     /*PKGW: do it this way, without the usizes. */
     if (balsa_app.previewpane)
-        gtk_paned_set_position(GTK_PANED(priv->paned_slave),
+        gtk_paned_set_position(GTK_PANED(priv->paned_child),
                                balsa_app.notebook_height);
     else
         /* Set it to something really high */
-        gtk_paned_set_position(GTK_PANED(priv->paned_slave), G_MAXINT);
+        gtk_paned_set_position(GTK_PANED(priv->paned_child), G_MAXINT);
 
-    gtk_widget_show(priv->paned_slave);
-    gtk_widget_show(priv->paned_master);
+    gtk_widget_show(priv->paned_child);
+    gtk_widget_show(priv->paned_parent);
     gtk_widget_show(priv->notebook);
 
     /* set the toolbar style */
@@ -2407,18 +2407,18 @@ balsa_window_fix_paned(BalsaWindow *window)
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     if (balsa_app.show_mblist) {
-        gtk_paned_set_position(GTK_PANED(priv->paned_master),
+        gtk_paned_set_position(GTK_PANED(priv->paned_parent),
                                balsa_app.mblist_width);
     }
     if (balsa_app.previewpane) {
-        gtk_paned_set_position(GTK_PANED(priv->paned_slave),
+        gtk_paned_set_position(GTK_PANED(priv->paned_child),
                                balsa_app.notebook_height);
     }
 
-    g_signal_connect(priv->paned_master, "notify::position",
-                     G_CALLBACK(bw_master_position_cb), NULL);
-    g_signal_connect(priv->paned_slave, "notify::position",
-                     G_CALLBACK(bw_slave_position_cb), NULL);
+    g_signal_connect(priv->paned_parent, "notify::position",
+                     G_CALLBACK(bw_paned_parent_position_cb), NULL);
+    g_signal_connect(priv->paned_child, "notify::position",
+                     G_CALLBACK(bw_paned_child_position_cb), NULL);
 
     return FALSE;
 }
@@ -3204,12 +3204,12 @@ balsa_window_refresh(BalsaWindow * window)
     }
     if (balsa_app.previewpane) {
         bw_idle_replace(window, bindex);
-	gtk_paned_set_position(GTK_PANED(priv->paned_slave),
+	gtk_paned_set_position(GTK_PANED(priv->paned_child),
                                 balsa_app.notebook_height);
     } else {
 	/* Set the height to something really big (those new hi-res
 	   screens and all :) */
-	gtk_paned_set_position(GTK_PANED(priv->paned_slave), G_MAXINT);
+	gtk_paned_set_position(GTK_PANED(priv->paned_child), G_MAXINT);
     }
 }
 
@@ -4158,23 +4158,22 @@ balsa_change_window_layout(BalsaWindow *window)
     g_object_unref(priv->mblist);
     g_object_unref(priv->preview);
 
-    gtk_paned_set_position(GTK_PANED(priv->paned_master),
+    gtk_paned_set_position(GTK_PANED(priv->paned_parent),
                            balsa_app.show_mblist ?
                            balsa_app.mblist_width : 0);
-    gtk_widget_show(priv->paned_slave);
-    gtk_widget_show(priv->paned_master);
+    gtk_widget_show(priv->paned_child);
+    gtk_widget_show(priv->paned_parent);
 
 }
 
 /* PKGW: remember when they change the position of the vpaned. */
 static void
-bw_slave_position_cb(GtkPaned   * paned_slave,
-                     GParamSpec * pspec,
-                     gpointer     user_data)
+bw_paned_child_position_cb(GtkPaned   * paned_child,
+                           GParamSpec * pspec,
+                           gpointer     user_data)
 {
     if (balsa_app.previewpane)
-        balsa_app.notebook_height =
-            gtk_paned_get_position(paned_slave);
+        balsa_app.notebook_height = gtk_paned_get_position(paned_child);
 }
 
 /* When page is switched we change the preview window and the selected

@@ -456,7 +456,11 @@ if balsa_from_git
     '-Wformat',
     '-Wformat-security',
     '-Wignored-qualifiers',
+    '-DGDK_DISABLE_DEPRECATED',
     '-DGMIME_DISABLE_DEPRECATED',
+    '-DGTK_DISABLE_DEPRECATED',
+    '-DNM_DISABLE_DEPRECATED',
+    '-DPANGO_DISABLE_DEPRECATED',
     '-U_FORTIFY_SOURCE',
     '-D_FORTIFY_SOURCE=2',
   ])

@@ -2320,31 +2320,31 @@ libbalsa_mailbox_local_duplicate_msgnos(LibBalsaMailbox * mailbox)
 
     for (i = 0; i < priv->threading_info->len; i++) {
         LibBalsaMailboxLocalInfo *info;
-        gpointer tmp;
-        guint master, msgno = i + 1;
+        gpointer prev;
+        guint msgno = i + 1;
 
-        if (libbalsa_mailbox_msgno_has_flags
-            (mailbox, msgno, LIBBALSA_MESSAGE_FLAG_DELETED, 0))
+        if (libbalsa_mailbox_msgno_has_flags(mailbox, msgno, LIBBALSA_MESSAGE_FLAG_DELETED, 0))
             continue;
 
         info = g_ptr_array_index(priv->threading_info, i);
-        if (!info || !info->message_id)
+        if (info == NULL || info->message_id == NULL)
             continue;
 
-        tmp = g_hash_table_lookup(table, info->message_id);
-        master = tmp ? GPOINTER_TO_UINT(tmp) : 0;
-        if (!master ||
-            libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
-                                             LIBBALSA_MESSAGE_FLAG_REPLIED,
-                                             0)) {
-            g_hash_table_insert(table, info->message_id,
-                                GUINT_TO_POINTER(msgno));
-            msgno = master;
-        }
-
-        if (msgno)
+        prev = g_hash_table_lookup(table, info->message_id);
+        if (prev == NULL) {
+            /* First message with this message-id */
+            g_hash_table_insert(table, info->message_id, GUINT_TO_POINTER(msgno));
+        } else {
+            if (libbalsa_mailbox_msgno_has_flags(mailbox, msgno, LIBBALSA_MESSAGE_FLAG_REPLIED, 0)) {
+                /* This message has been replied to, so we keep this one
+                 * and mark the previous one as duplicate. */
+                g_hash_table_insert(table, info->message_id, GUINT_TO_POINTER(msgno));
+                msgno = GPOINTER_TO_UINT(prev);
+            }
             g_array_append_val(msgnos, msgno);
+        }
     }
+
     g_hash_table_destroy(table);
 
     return msgnos;

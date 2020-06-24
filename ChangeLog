@@ -365,6 +365,13 @@
 	* src/sendmsg-window.c (attachment_button_press_cb):
 	* src/toolbar-factory.c (tm_popup_context_menu_cb):
 
+2020-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mime-widget-text: Actually pop up the context menu when
+	right-clicking on an URL.
+
+	* src/balsa-mime-widget-text.c (text_view_url_popup):
+
 2020-06-16  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	main: Sandbox all the webkit

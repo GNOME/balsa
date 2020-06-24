@@ -111,8 +111,10 @@ static LibBalsaMessageBody *add_multipart(BalsaMessage * balsa_message,
                                           LibBalsaMessageBody * parent,
                                           GtkWidget * container);
 static void select_part(BalsaMessage * balsa_message, BalsaPartInfo *info);
-static void tree_activate_row_cb(GtkTreeView *treeview, GtkTreePath *arg1,
-                                 GtkTreeViewColumn *arg2, gpointer user_data);
+static void tree_activate_row_cb(GtkTreeView       *tree_view,
+                                 GtkTreePath       *path,
+                                 GtkTreeViewColumn *column,
+                                 gpointer           user_data);
 static gboolean tree_menu_popup_key_cb(GtkWidget *widget, gpointer user_data);
 static void tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
                                  gint                  n_press,
@@ -1075,37 +1077,16 @@ tree_next_valid_part_info(GtkTreeModel * model, GtkTreeIter * iter)
 }
 
 static void
-tree_activate_row_cb(GtkTreeView *treeview, GtkTreePath *arg1,
-                     GtkTreeViewColumn *arg2, gpointer user_data)
+tree_activate_row_cb(GtkTreeView       *tree_view,
+                     GtkTreePath       *path,
+                     GtkTreeViewColumn *column,
+                     gpointer           user_data)
 {
-    BalsaMessage * balsa_message = (BalsaMessage *)user_data;
-    GtkTreeModel * model = gtk_tree_view_get_model(treeview);
-    GtkTreeIter sel_iter;
-    BalsaPartInfo *info = NULL;
+    BalsaMessage *balsa_message = user_data;
+    gchar *path_string;
 
-    g_return_if_fail(balsa_message);
-
-    /* get the info of the activated part */
-    if (!gtk_tree_model_get_iter(model, &sel_iter, arg1))
-        return;
-    gtk_tree_model_get(model, &sel_iter, PART_INFO_COLUMN, &info, -1);
-
-    /* if it's not displayable (== no info), get the next one... */
-    if (!info) {
-        info = tree_next_valid_part_info(model, &sel_iter);
-
-        if (!info) {
-            gtk_tree_model_get_iter_first(model, &sel_iter);
-            gtk_tree_model_get(model, &sel_iter, PART_INFO_COLUMN, &info, -1);
-            if (!info)
-                info = tree_next_valid_part_info(model, &sel_iter);
-        }
-    }
-
-    gtk_stack_set_visible_child_name(GTK_STACK(balsa_message->stack), "content");
-    select_part(balsa_message, info);
-    if (info)
-        g_object_unref(info);
+    path_string = gtk_tree_path_to_string(path);
+    g_action_change_state(balsa_message->show_part_action, g_variant_new_take_string(path_string));
 }
 
 static void
@@ -1139,7 +1120,7 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
                                         collect_selected_info,
                                         &balsa_message->save_all_list);
 
-    /* For a single part, display it's popup, for multiple parts a "save all"
+    /* For a single part, display its popup, for multiple parts a "save all"
      * popup. If nothing with an info block is selected, do nothing */
     selected = g_list_length(balsa_message->save_all_list);
     if (selected == 1) {
@@ -1536,8 +1517,11 @@ add_toggle_inline_menu_item(GMenu *menu, BalsaMessage *balsa_message)
 }
 
 static void
-display_part(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
-             GtkTreeModel * model, GtkTreeIter * iter, gchar * part_id)
+display_part(BalsaMessage        *balsa_message,
+             LibBalsaMessageBody *body,
+             GtkTreeModel        *model,
+             GtkTreeIter         *iter,
+             const gchar         *part_id)
 {
     BalsaPartInfo *info = NULL;
     gchar *content_type = libbalsa_message_body_get_mime_type(body);
@@ -1572,7 +1556,7 @@ display_part(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
             g_free(subj);
         } else if (is_multipart) {
             icon_title = mpart_content_name(content_type);
-	    if (!strcmp(part_id, "1")) {
+	    if (strcmp(part_id, "1") == 0) {
                 GMenu *section;
 
                 add_toggle_inline_menu_item(balsa_message->parts_menu, balsa_message);
@@ -1601,8 +1585,7 @@ display_part(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
 	    /* this should neither be a message nor multipart, so add it to the
 	       attachments popup */
 	    menu_label =
-		g_strdup_printf(_("part %s: %s (file %s)"), part_id,
-				content_desc, filename);
+		g_strdup_printf(_("part %s: %s (file %s)"), part_id, content_desc, filename);
 	    add_to_attachments_popup(balsa_message->parts_menu,
 				     menu_label, balsa_message, info);
 	    g_free(menu_label);
@@ -1611,8 +1594,7 @@ display_part(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
 	    gchar * menu_label;
 
             icon_title = g_strdup_printf("%s", content_desc);
-	    menu_label =
-		g_strdup_printf(_("part %s: %s"), part_id, content_desc);
+	    menu_label = g_strdup_printf(_("part %s: %s"), part_id, content_desc);
 	    add_to_attachments_popup(balsa_message->parts_menu,
 				     menu_label, balsa_message, info);
 	    g_free(menu_label);
@@ -1661,27 +1643,30 @@ display_part(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
 }
 
 static void
-display_parts(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
-              GtkTreeIter * parent, gchar * prefix)
+display_parts(BalsaMessage        *balsa_message,
+              LibBalsaMessageBody *body,
+              GtkTreeIter         *parent,
+              const gchar         *prefix)
 {
-    GtkTreeModel *model =
-        gtk_tree_view_get_model(GTK_TREE_VIEW(balsa_message->treeview));
+    GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(balsa_message->treeview));
     GtkTreeIter iter;
     gint part_in_level = 1;
 
-    while (body) {
+    while (body != NULL) {
 	gchar * part_id;
 
-	if (prefix)
+	if (prefix != NULL)
 	    part_id = g_strdup_printf("%s.%d", prefix, part_in_level);
 	else
 	    part_id = g_strdup_printf("%d", part_in_level);
+
         gtk_tree_store_append(GTK_TREE_STORE(model), &iter, parent);
         display_part(balsa_message, body, model, &iter, part_id);
         display_parts(balsa_message, body->parts, &iter, part_id);
+	g_free(part_id);
+
         body = body->next;
 	part_in_level++;
-	g_free(part_id);
     }
 }
 
@@ -1753,11 +1738,12 @@ display_content(BalsaMessage * balsa_message)
     g_clear_object(&balsa_message->parts_menu);
 
     /* GAction retains its state when switching messages, so we must
-     * return the all-inline toggle to FALSE and clear any show-part: */
+     * return the all-inline toggle to FALSE and set the part to
+     * "complete message" (path is "0") */
     g_simple_action_set_state(G_SIMPLE_ACTION(balsa_message->toggle_all_inline_action),
                               g_variant_new_boolean(FALSE));
     g_simple_action_set_state(G_SIMPLE_ACTION(balsa_message->show_part_action),
-                              g_variant_new_string(""));
+                              g_variant_new_string("0"));
 
     if (balsa_message->info_count > 1) {
  	gtk_widget_show_all(balsa_message->attach_button);

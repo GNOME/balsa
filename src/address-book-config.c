@@ -945,14 +945,13 @@ add_osmo_cb(GSimpleAction *action,
 }
 #endif /* HAVE_OSMO */
 
-GMenuModel *
-balsa_address_book_add_menu(BalsaAddressBookCallback callback,
-                            GtkWindow               *parent)
+static void
+add_actions(GtkWidget   *widget,
+            const gchar *action_namespace,
+            gpointer     user_data)
 {
-    AddressBookConfig *abc;
     GSimpleActionGroup *simple;
-    GMenu *menu;
-    static const GActionEntry address_book_entries[] = {
+    static const GActionEntry entries[] = {
         {"add-vcard", add_vcard_cb},
         {"add-externq", add_externq_cb},
         {"add-ldif", add_ldif_cb},
@@ -970,20 +969,30 @@ balsa_address_book_add_menu(BalsaAddressBookCallback callback,
 #endif /* HAVE_OSMO */
     };
 
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    entries,
+                                    G_N_ELEMENTS(entries),
+                                    user_data);
+    gtk_widget_insert_action_group(widget,
+                                   action_namespace,
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+}
+
+GMenuModel *
+balsa_address_book_add_menu(BalsaAddressBookCallback callback,
+                            GtkWindow               *parent)
+{
+    AddressBookConfig *abc;
+    GMenu *menu;
+
     abc = g_new0(AddressBookConfig, 1);
     abc->callback = callback;
     abc->parent = parent;
     g_object_weak_ref(G_OBJECT(parent), (GWeakNotify) g_free, abc);
 
-    simple = g_simple_action_group_new();
-    g_action_map_add_action_entries(G_ACTION_MAP(simple),
-                                    address_book_entries,
-                                    G_N_ELEMENTS(address_book_entries),
-                                    abc);
-    gtk_widget_insert_action_group(GTK_WIDGET(parent),
-                                   "address-book",
-                                   G_ACTION_GROUP(simple));
-    g_object_unref(simple);
+    add_actions(GTK_WIDGET(parent), "address-book", abc);
 
     menu = g_menu_new();
     g_menu_append(menu, _("vCard Address Book (GnomeCard)"), "address-book.add-vcard");

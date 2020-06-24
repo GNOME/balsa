@@ -595,6 +595,8 @@ text_view_url_popup(GtkWidget *widget, GtkMenu *menu, message_url_t *url)
                       G_CALLBACK(url_send_cb), (gpointer)url);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 
+    gtk_widget_show_all(GTK_WIDGET(menu));
+
     return TRUE;
 }
 

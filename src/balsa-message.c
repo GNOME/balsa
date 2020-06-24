@@ -842,7 +842,8 @@ show_part_change_state(GSimpleAction *action,
 }
 
 static void
-balsa_message_init(BalsaMessage * balsa_message)
+balsa_message_add_actions(BalsaMessage *balsa_message,
+                          const gchar  *action_namespace)
 {
     GSimpleActionGroup *simple;
     static const GActionEntry entries[] = {
@@ -853,6 +854,25 @@ balsa_message_init(BalsaMessage * balsa_message)
         {"show-part",               libbalsa_radio_activated, "s", "''",
                                     show_part_change_state},
     };
+
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    entries, G_N_ELEMENTS(entries),
+                                    balsa_message);
+    balsa_message->toggle_all_inline_action =
+        g_action_map_lookup_action(G_ACTION_MAP(simple), "toggle-all-inline");
+    balsa_message->show_part_action =
+        g_action_map_lookup_action(G_ACTION_MAP(simple), "show-part");
+
+    gtk_widget_insert_action_group(GTK_WIDGET(balsa_message),
+                                   action_namespace,
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+}
+
+static void
+balsa_message_init(BalsaMessage * balsa_message)
+{
     GtkStack  *stack;
     GtkWidget *vbox;
     GtkWidget *scroll;
@@ -864,21 +884,6 @@ balsa_message_init(BalsaMessage * balsa_message)
     GtkEventController *key_controller;
     GtkGesture *gesture;
     GMenu *menu;
-
-    simple = g_simple_action_group_new();
-    g_action_map_add_action_entries(G_ACTION_MAP(simple),
-                                    entries,
-                                    G_N_ELEMENTS(entries),
-                                    balsa_message);
-    balsa_message->toggle_all_inline_action =
-        g_action_map_lookup_action(G_ACTION_MAP(simple), "toggle-all-inline");
-    balsa_message->show_part_action =
-        g_action_map_lookup_action(G_ACTION_MAP(simple), "show-part");
-
-    gtk_widget_insert_action_group(GTK_WIDGET(balsa_message),
-                                   "message-menu",
-                                   G_ACTION_GROUP(simple));
-    g_object_unref(simple);
 
     balsa_message->switcher = gtk_stack_switcher_new();
     gtk_box_pack_start(GTK_BOX(balsa_message), balsa_message->switcher, FALSE, FALSE, 0);
@@ -1001,6 +1006,8 @@ balsa_message_init(BalsaMessage * balsa_message)
     gtk_box_pack_start(GTK_BOX(vbox), balsa_message->find_bar, FALSE, FALSE, 0);
 
     /* The context menu that is popped up when more than one part is selected */
+    balsa_message_add_actions(balsa_message, "message-menu");
+
     menu = g_menu_new();
     g_menu_append(menu, _("Save selected as…"), "save-selected");
     g_menu_append(menu, _("Save selected to folder…"), "save-selected-to-folder");
@@ -1830,6 +1837,28 @@ copy_part_change_state(GSimpleAction *action,
 }
 
 static void
+part_add_actions(BalsaMessage *balsa_message,
+                 const gchar  *action_namespace,
+                 gpointer      user_data)
+{
+    GSimpleActionGroup *simple;
+    static const GActionEntry entries[] = {
+        {"save", save_activated},
+        {"open-with", libbalsa_radio_activated, "s", "''", open_with_change_state},
+        {"copy-part", libbalsa_radio_activated, "s", "''", copy_part_change_state}
+    };
+
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    entries, G_N_ELEMENTS(entries),
+                                    user_data);
+    gtk_widget_insert_action_group(GTK_WIDGET(balsa_message),
+                                   action_namespace,
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+}
+
+static void
 part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
 /* Remarks: Will add items in the following order:
             1) Default application according to GnomeVFS.
@@ -1840,26 +1869,12 @@ part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
 {
     static int menu_number;
     gchar *namespace;
-    GSimpleActionGroup *simple;
-    static const GActionEntry entries[] = {
-        {"save", save_activated},
-        {"open-with", libbalsa_radio_activated, "s", "''", open_with_change_state},
-        {"copy-part", libbalsa_radio_activated, "s", "''", copy_part_change_state}
-    };
     GMenu *menu;
     gchar *content_type;
 
     namespace = g_strdup_printf("menu-%d", ++menu_number);
 
-    simple = g_simple_action_group_new();
-    g_action_map_add_action_entries(G_ACTION_MAP(simple),
-                                    entries,
-                                    G_N_ELEMENTS(entries),
-                                    info);
-    gtk_widget_insert_action_group(GTK_WIDGET(balsa_message),
-                                   namespace,
-                                   G_ACTION_GROUP(simple));
-    g_object_unref(simple);
+    part_add_actions(balsa_message, namespace, info);
 
     menu = g_menu_new();
 

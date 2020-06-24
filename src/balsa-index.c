@@ -2059,7 +2059,8 @@ move_to_change_state(GSimpleAction *action,
  * bndx_popup_menu_create: create the popup menu and popover at init time
  */
 static void
-bndx_popup_menu_create(BalsaIndex * bindex)
+bndx_add_actions(BalsaIndex  *bindex,
+                 const gchar *action_namespace)
 {
     GSimpleActionGroup *simple;
     static const GActionEntry entries[] = {
@@ -2076,18 +2077,21 @@ bndx_popup_menu_create(BalsaIndex * bindex)
         {"toggle-flagged",   toggle_flagged_activated},
         {"toggle-unread",    toggle_unread_activated},
         {"view-source",      view_source_activated},
-        {"move-to",          libbalsa_radio_activated,
-            "s", "''", move_to_change_state}
+        {"move-to",          libbalsa_radio_activated, "s", "''", move_to_change_state}
     };
-    GMenu *menu, *section, *submenu;
 
     simple = g_simple_action_group_new();
-    g_action_map_add_action_entries(G_ACTION_MAP(simple),
-                                    entries,
-                                    G_N_ELEMENTS(entries),
-                                    bindex);
-    gtk_widget_insert_action_group(GTK_WIDGET(bindex), "popup", G_ACTION_GROUP(simple));
+    g_action_map_add_action_entries(G_ACTION_MAP(simple), entries, G_N_ELEMENTS(entries), bindex);
+    gtk_widget_insert_action_group(GTK_WIDGET(bindex), action_namespace, G_ACTION_GROUP(simple));
     g_object_unref(simple);
+}
+
+static void
+bndx_popup_menu_create(BalsaIndex * bindex)
+{
+    GMenu *menu, *section, *submenu;
+
+    bndx_add_actions(bindex, "popup");
 
     menu = g_menu_new();
 

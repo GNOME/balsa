@@ -1802,16 +1802,19 @@ save_activated(GSimpleAction *action,
 }
 
 static void
-open_with_change_state(GSimpleAction *action,
-                       GVariant      *parameter,
-                       gpointer       user_data)
+open_with_activated(GSimpleAction *action,
+                    GVariant      *parameter,
+                    gpointer       user_data)
 {
-    const gchar *app = g_variant_get_string(parameter, NULL);
     BalsaPartInfo *info = user_data;
+    const gchar *action_name;
+    GAppInfo *app;
+
+    action_name = g_action_get_name(G_ACTION(action));
+    app = g_object_get_data(user_data, action_name);
 
     balsa_mime_widget_ctx_menu_launch_app(app, info->body);
 
-    g_simple_action_set_state(action, parameter);
     if (GTK_IS_POPOVER(info->popup_widget))
         gtk_popover_popdown((GtkPopover *) info->popup_widget);
 }
@@ -1836,15 +1839,13 @@ copy_part_change_state(GSimpleAction *action,
         gtk_popover_popdown((GtkPopover *) info->popup_widget);
 }
 
-static void
+static GSimpleActionGroup *
 part_add_actions(BalsaMessage *balsa_message,
-                 const gchar  *action_namespace,
                  gpointer      user_data)
 {
     GSimpleActionGroup *simple;
     static const GActionEntry entries[] = {
         {"save", save_activated},
-        {"open-with", libbalsa_radio_activated, "s", "''", open_with_change_state},
         {"copy-part", libbalsa_radio_activated, "s", "''", copy_part_change_state}
     };
 
@@ -1852,10 +1853,7 @@ part_add_actions(BalsaMessage *balsa_message,
     g_action_map_add_action_entries(G_ACTION_MAP(simple),
                                     entries, G_N_ELEMENTS(entries),
                                     user_data);
-    gtk_widget_insert_action_group(GTK_WIDGET(balsa_message),
-                                   action_namespace,
-                                   G_ACTION_GROUP(simple));
-    g_object_unref(simple);
+    return simple;
 }
 
 static void
@@ -1867,19 +1865,24 @@ part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
             3) GnomeVFS shortlist applications, with the default one (sometimes
                included on shortlist, sometimes not) excluded. */
 {
-    static int menu_number;
-    gchar *namespace;
     GMenu *menu;
     gchar *content_type;
-
-    namespace = g_strdup_printf("menu-%d", ++menu_number);
-
-    part_add_actions(balsa_message, namespace, info);
+    GSimpleActionGroup *simple;
+    static int menu_number;
+    gchar *namespace;
 
     menu = g_menu_new();
-
     content_type = libbalsa_message_body_get_mime_type (info->body);
-    libbalsa_vfs_fill_menu_by_content_type(menu, content_type, "open-with");
+    simple = part_add_actions(balsa_message, info);
+
+    libbalsa_vfs_fill_menu_by_content_type(menu, content_type,
+                                           G_ACTION_MAP(simple), NULL,
+                                           G_CALLBACK(open_with_activated),
+                                           G_OBJECT(info));
+
+    namespace = g_strdup_printf("menu-%d", ++menu_number);
+    gtk_widget_insert_action_group(GTK_WIDGET(balsa_message), namespace, G_ACTION_GROUP(simple));
+    g_object_unref(simple);
 
     g_menu_append(menu, _("Save…"), "save");
 

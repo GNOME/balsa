@@ -27,8 +27,8 @@
 G_BEGIN_DECLS
 
 
-void balsa_mime_widget_ctx_menu_launch_app(const gchar         * app,
-                                           LibBalsaMessageBody * mime_body);
+void balsa_mime_widget_ctx_menu_launch_app(GAppInfo            *app,
+                                           LibBalsaMessageBody *mime_body);
 void balsa_mime_widget_ctx_menu_cb(GtkWidget * button,
                                    gpointer    user_data);
 void balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,

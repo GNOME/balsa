@@ -37,7 +37,7 @@
 
 
 void
-balsa_mime_widget_ctx_menu_launch_app(const gchar         *app,
+balsa_mime_widget_ctx_menu_launch_app(GAppInfo            *app,
                                       LibBalsaMessageBody *mime_body)
 {
     GError *err = NULL;
@@ -58,7 +58,7 @@ balsa_mime_widget_ctx_menu_cb(GtkWidget *button,
                               gpointer   user_data)
 {
     LibBalsaMessageBody *mime_body = user_data;
-    const gchar *app;
+    GAppInfo *app;
 
     app = g_object_get_data(G_OBJECT(button), LIBBALSA_VFS_MIME_ACTION);
     balsa_mime_widget_ctx_menu_launch_app(app, mime_body);

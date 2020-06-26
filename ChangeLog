@@ -311,23 +311,29 @@
 
 	* src/sendmsg-window.c (attachments_add), (drag_data_quote):
 
-2020-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+2020-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
-	compose-window: Make the "Open" option on the urlref-attachment
-	context menu work.
+	Various: Fill the open-with menus with stateless GMenuItems, so
+	that they are rendered without radio buttons.
 
-	* src/sendmsg-window.cs
-	  (on_open_url_cb): Get the top-level window from the compose
-	  window; getting it from the menu-item leads to a Wayland
-	  error;
-	  (add_urlref_attachment): Populate BalsaAttachInfo:file_uri.
+	Instead, pass the GAppInfo as GObject data on a convenient
+	object.
 
-2020-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
-
-	mime-widget-text: Actually pop up the context menu when
-	right-clicking on an URL.
-
-	* src/balsa-mime-widget-text.c (text_view_url_popup):
+	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_launch_app),
+	(libbalsa_vfs_launch_app_for_body), (gio_add_vfs_menu_item),
+	(libbalsa_vfs_fill_menu_by_content_type),
+	(libbalsa_vfs_mime_button):
+	* libbalsa/libbalsa-vfs.h:
+	* src/balsa-message.c (open_with_activated), (part_add_actions),
+	(part_create_menu):
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_launch_app),
+	(balsa_mime_widget_ctx_menu_cb):
+	* src/balsa-mime-widget-callbacks.h:
+	* src/balsa-mime-widget-text.c (open_with_activated),
+	(text_view_populate_popup), (bmwt_html_open_with_activated),
+	(bmwt_html_populate_popup_menu), (bmwt_html_button_press_cb):
+	* src/sendmsg-window.c (attachment_menu_vfs_cb), (add_attachment):
 
 2020-06-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 

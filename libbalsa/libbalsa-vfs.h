@@ -70,14 +70,17 @@ gint libbalsa_vfs_file_unlink(LibbalsaVfs * file,
 
 /* application launch helpers */
 gboolean libbalsa_vfs_launch_app(LibbalsaVfs *file,
-                                 const gchar *app_name,
+                                 GAppInfo    *app,
                                  GError     **err);
 gboolean libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody *mime_body,
-                                          const gchar         *app_name,
+                                          GAppInfo            *app,
                                           GError             **err);
 void libbalsa_vfs_fill_menu_by_content_type(GMenu       *menu,
                                             const gchar *content_type,
-                                            const gchar *action);
+                                            GActionMap  *action_map,
+                                            const gchar *action_namespace,
+                                            GCallback    callback,
+                                            GObject     *object);
 GtkWidget * libbalsa_vfs_mime_button(const gchar * content_type,
                                      GCallback     callback,
                                      gpointer      data);

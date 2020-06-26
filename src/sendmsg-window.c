@@ -1376,10 +1376,14 @@ attachment_menu_vfs_cb(GSimpleAction *action,
                        GVariant      *parameter,
                        gpointer       user_data)
 {
-    const gchar *app = g_variant_get_string(parameter, NULL);
     BalsaAttachInfo *info = user_data;
+    const gchar *action_name;
+    GAppInfo *app;
     GError *err = NULL;
     gboolean result;
+
+    action_name = g_action_get_name(G_ACTION(action));
+    app = g_object_get_data(user_data, action_name);
 
     result = libbalsa_vfs_launch_app(info->file_uri, app, &err);
     if (!result)
@@ -1649,8 +1653,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     GSimpleActionGroup *simple;
     static GActionEntry attachment_entries[] = {
         {"new-mode", libbalsa_radio_activated, "i", "1", change_attach_mode},
-        {"remove", remove_attachment},
-        {"launch-app", libbalsa_radio_activated, "s", "''", attachment_menu_vfs_cb}
+        {"remove", remove_attachment}
     };
     GMenu *menu;
     GMenu *section;
@@ -1755,7 +1758,6 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     gtk_widget_insert_action_group(bsmsg->window,
                                    attachment_namespace,
                                    G_ACTION_GROUP(simple));
-    g_object_unref(simple);
 
     menu = g_menu_new();
 
@@ -1799,10 +1801,14 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
        attached... (only for non-message attachments) */
     if (!is_fwd_message) {
         section = g_menu_new();
-        libbalsa_vfs_fill_menu_by_content_type(section, content_type, "launch-app");
+        libbalsa_vfs_fill_menu_by_content_type(section, content_type,
+                                               G_ACTION_MAP(simple), NULL,
+                                               G_CALLBACK(attachment_menu_vfs_cb),
+                                               G_OBJECT(attach_data));
         g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
         g_object_unref(section);
     }
+    g_object_unref(simple);
 
     attach_data->popup_menu =
         libbalsa_popup_widget_new(bsmsg->tree_view, G_MENU_MODEL(menu), attachment_namespace);

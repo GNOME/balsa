@@ -226,6 +226,27 @@
 
 	* src/sendmsg-window.c (attachments_add), (drag_data_quote):
 
+2020-06-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Fill the move-to/copy-to menus with stateless GMenuItems,
+	so that they are rendered without radio buttons.
+
+	Instead, pass the URL as GObject data on a convenient
+	object.
+
+	* src/balsa-index.c (move_to_activated), (bndx_add_actions),
+	(bndx_popup_menu_create), (bndx_do_popup):
+	* src/balsa-mblist.c (bmbl_add_action), (balsa_mblist_mru_menu),
+	(balsa_mblist_mru_get_url),
+	(balsa_mblist_mru_get_mailbox_from_url):
+	* src/balsa-mblist.h:
+	* src/balsa-message.c (copy_part_activated), (part_add_actions),
+	(part_create_menu):
+	* src/balsa-mime-widget-message.c (copy_activated),
+	(bm_header_extend_popup):
+	* src/message-window.c (move_to_activated), (message_window_new):
+	* src/sendmsg-window.c (add_urlref_attachment):
+
 2020-06-26  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Various: Fill the open-with menus with stateless GMenuItems, so

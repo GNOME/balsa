@@ -795,16 +795,22 @@ message_window_add_action_entries(GActionMap * action_map)
 }
 
 static void
-move_to_change_state(GSimpleAction *action,
-                     GVariant      *parameter,
-                     gpointer       user_data)
+move_to_activated(GSimpleAction *action,
+                  GVariant      *parameter,
+                  gpointer       user_data)
 {
-    MessageWindow *mw = user_data;
+    GtkWidget *window = user_data;
+    const gchar *action_name;
+    const gchar *url;
     LibBalsaMailbox *mailbox;
 
-    mailbox = balsa_mblist_mru_get_mailbox_from_variant(parameter, mw->window);
+    action_name = g_action_get_name(G_ACTION(action));
+    url = g_object_get_data(G_OBJECT(window), action_name);
+    mailbox = balsa_mblist_mru_get_mailbox_from_url(url, window);
 
     if (mailbox != NULL) {
+        MessageWindow *mw = g_object_get_data(G_OBJECT(window), "mw");
+
         balsa_mblist_mru_add(&balsa_app.folder_mru, libbalsa_mailbox_get_url(mailbox));
         message_window_move_message(mw, mailbox);
     }
@@ -826,9 +832,6 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     const gchar resource_path[] = "/org/desktop/Balsa/message-window.ui";
     GAction *action;
     GSimpleActionGroup *simple;
-    static const GActionEntry message_window_entries[] = {
-        {"move-to", libbalsa_radio_activated, "s", "''", move_to_change_state},
-    };
     GMenu *mru_menu;
 
     if (!mailbox || !msgno)
@@ -896,17 +899,16 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 
     /* Set up the "move-to" action */
     simple = g_simple_action_group_new();
-    g_action_map_add_action_entries(G_ACTION_MAP(simple),
-                                    message_window_entries,
-                                    G_N_ELEMENTS(message_window_entries),
-                                    mw);
+    g_object_set_data(G_OBJECT(mw->window), "mw", mw);
+    mru_menu = balsa_mblist_mru_menu(&balsa_app.folder_mru,
+                                     G_ACTION_MAP(simple), TRUE,
+                                     "message-window",
+                                     G_CALLBACK(move_to_activated), mw->window);
     gtk_widget_insert_action_group(GTK_WIDGET(mw->window),
                                    "message-window",
                                    G_ACTION_GROUP(simple));
     g_object_unref(simple);
 
-    mru_menu =
-        balsa_mblist_mru_menu(&balsa_app.folder_mru, "message-window.move-to");
     submenu = gtk_menu_new_from_model(G_MENU_MODEL(mru_menu));
     g_object_unref(mru_menu);
 

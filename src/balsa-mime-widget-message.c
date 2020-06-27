@@ -438,15 +438,20 @@ bm_header_ctx_menu_reply(GtkWidget * menu_item,
 }
 
 static void
-copy_change_state(GSimpleAction *action,
-                  GVariant      *parameter,
-                  gpointer       user_data)
+copy_activated(GSimpleAction *action,
+               GVariant      *parameter,
+               gpointer       user_data)
 {
-    LibBalsaMessageBody *part = user_data;
-    const gchar *url =
-        balsa_mblist_mru_get_url_from_variant(parameter, part->user_data);
+    LibBalsaMessageBody *part = g_object_get_data(user_data, "part");
+    GtkWidget *widget = user_data;
+    const gchar *action_name;
+    const gchar *url;
 
-    if (url[0] != '\0') {
+    action_name = g_action_get_name(G_ACTION(action));
+    url = g_object_get_data(G_OBJECT(widget), action_name);
+    url = balsa_mblist_mru_get_url(url, widget);
+
+    if (url != NULL) {
         balsa_mblist_mru_add(&balsa_app.folder_mru, url);
         balsa_message_copy_part(url, part);
     }
@@ -457,9 +462,6 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
 {
     LibBalsaMessageBody *part = arg;
     GSimpleActionGroup *simple;
-    static const GActionEntry header_popup_entries[] = {
-        {"copy", libbalsa_radio_activated, "s", "''", copy_change_state},
-    };
     GMenu *mru_menu;
     GtkWidget *menu_item, *submenu;
     GtkWidget *separator = gtk_separator_menu_item_new();
@@ -476,17 +478,15 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
     gtk_widget_show(menu_item);
 
     simple = g_simple_action_group_new();
-    g_action_map_add_action_entries(G_ACTION_MAP(simple),
-                                    header_popup_entries,
-                                    G_N_ELEMENTS(header_popup_entries),
-                                    part);
+    g_object_set_data(G_OBJECT(part->user_data), "part", part);
+    mru_menu = balsa_mblist_mru_menu(&balsa_app.folder_mru, G_ACTION_MAP(simple),
+                                     TRUE, "header-popup",
+                                     G_CALLBACK(copy_activated), part->user_data);
     gtk_widget_insert_action_group(widget,
                                    "header-popup",
                                    G_ACTION_GROUP(simple));
     g_object_unref(simple);
 
-    mru_menu =
-        balsa_mblist_mru_menu(&balsa_app.folder_mru, "header-popup.copy");
     submenu = gtk_menu_new_from_model(G_MENU_MODEL(mru_menu));
     g_object_unref(mru_menu);
 

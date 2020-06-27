@@ -1689,17 +1689,63 @@ static void bmbl_mru_activated_cb(GtkTreeView * tree_view,
  * that resolves to a mailbox, labeled with the mailbox name, with a
  * last entry that pops up the whole mailbox tree.
  */
+
+static void
+bmbl_add_action(GMenu       *section,
+                const gchar *url,
+                GActionMap  *action_map,
+                gboolean     action_enabled,
+                const gchar *action_namespace,
+                const gchar *label,
+                GCallback    callback,
+                gpointer     user_data)
+{
+    gchar *action_name;
+    gchar *p;
+    GSimpleAction *action;
+
+    action_name = g_strstrip(g_strdup(url));
+
+    /* Make the action name valid. */
+    for (p = action_name; *p != '\0'; p++) {
+        if (!g_ascii_isalnum(*p))
+            *p = '-';
+    }
+
+    action = g_simple_action_new(action_name, NULL);
+    g_signal_connect(action, "activate", callback, user_data);
+    g_simple_action_set_enabled(action, action_enabled),
+    g_action_map_add_action(action_map, G_ACTION(action));
+    g_object_unref(action);
+
+    g_object_set_data_full(user_data, action_name, g_strdup(url), g_free);
+
+    if (action_namespace != NULL) {
+        gchar *prefixed_action_name;
+
+        prefixed_action_name = g_strdup_printf("%s.%s", action_namespace, action_name);
+        g_free(action_name);
+        action_name = prefixed_action_name;
+    }
+
+    g_menu_append(section, label, action_name);
+    g_free(action_name);
+}
+
 GMenu *
-balsa_mblist_mru_menu(GList ** url_list,
-                      const gchar *action)
+balsa_mblist_mru_menu(GList      **url_list,
+                      GActionMap  *action_map,
+                      gboolean     action_enabled,
+                      const gchar *action_namespace,
+                      GCallback    callback,
+                      gpointer     user_data)
 {
     GMenu *menu;
     GMenu *section;
     GList *list;
-    GMenuItem *item;
 
     g_return_val_if_fail(url_list != NULL, NULL);
-    g_return_val_if_fail(action != NULL, NULL);
+    g_return_val_if_fail(G_IS_ACTION_MAP(action_map), NULL);
 
     menu = g_menu_new();
 
@@ -1710,25 +1756,18 @@ balsa_mblist_mru_menu(GList ** url_list,
         LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
 
         if (mailbox != NULL) {
-            const gchar *name = libbalsa_mailbox_get_name(mailbox);
-
-            item = g_menu_item_new(name, NULL);
-            g_menu_item_set_action_and_target(item, action, "s", url);
-            g_menu_append_item(section, item);
-            g_object_unref(item);
+            bmbl_add_action(section, url, action_map, action_enabled, action_namespace,
+                            libbalsa_mailbox_get_name(mailbox), callback, user_data);
         }
     }
 
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
+    /* Other… section */
     section = g_menu_new();
-
-    item = g_menu_item_new(_("_Other…"), NULL);
-    g_menu_item_set_action_and_target(item, action, "s", "");
-    g_menu_append_item(section, item);
-    g_object_unref(item);
-
+    bmbl_add_action(section, "-", action_map, action_enabled, action_namespace,
+                    _("_Other…"), callback, user_data);
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
@@ -2371,47 +2410,39 @@ bmbl_choose_mailbox(GtkWidget *widget)
 }
 
 /*
- * balsa_mblist_mru_get_url_from_variant,
- * balsa_mblist_mru_get_mailbox_from_variant:
+ * balsa_mblist_mru_get_url,
+ * balsa_mblist_mru_get_mailbox_from_url:
  *
  * Helpers for "_change_state" actions of mru_menus
  *
- * Get the url from the GVariant parameter. If it is an empty string,
+ * Get the url from the GVariant parameter. If it is "-",
  * the user selected "Other...", so we must pop up the mailbox list dialog
  * and let the user choose the mailbox. That dialog can be canceled,
  * returning a NULL mailbox, so we must be careful; the caller must be
- * prepared for the return of an empty url string or a NULL mailbox,
+ * prepared for the return of a NULL url or mailbox,
  * respectively.
  */
 
 const gchar *
-balsa_mblist_mru_get_url_from_variant(GVariant *parameter, GtkWidget *widget)
+balsa_mblist_mru_get_url(const gchar *url, GtkWidget *widget)
 {
-    const gchar *url;
-
-    url = g_variant_get_string(parameter, NULL);
-
-    if (url[0] == '\0') {
+    if (url[0] == '-' && url[1] == '\0') {
         LibBalsaMailbox *mailbox;
 
         mailbox = bmbl_choose_mailbox(widget);
 
-        if (mailbox != NULL)
-            url = libbalsa_mailbox_get_url(mailbox);
+        url = mailbox != NULL ? libbalsa_mailbox_get_url(mailbox) : NULL;
     }
 
     return url;
 }
 
 LibBalsaMailbox *
-balsa_mblist_mru_get_mailbox_from_variant(GVariant *parameter, GtkWidget *widget)
+balsa_mblist_mru_get_mailbox_from_url(const gchar *url, GtkWidget *widget)
 {
     LibBalsaMailbox *mailbox;
-    const gchar *url;
 
-    url = g_variant_get_string(parameter, NULL);
-
-    if (url[0] == '\0')
+    if (url[0] == '-' && url[1] == '\0')
         mailbox = bmbl_choose_mailbox(widget);
     else
         mailbox = balsa_find_mailbox_by_url(url);

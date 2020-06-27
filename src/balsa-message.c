@@ -1820,23 +1820,22 @@ open_with_activated(GSimpleAction *action,
 }
 
 static void
-copy_part_change_state(GSimpleAction *action,
-                       GVariant      *parameter,
-                       gpointer       user_data)
+copy_part_activated(GSimpleAction *action,
+                    GVariant      *parameter,
+                    gpointer       user_data)
 {
     BalsaPartInfo *info = user_data;
+    const gchar *action_name;
     const gchar *url;
 
-    url = balsa_mblist_mru_get_url_from_variant(parameter, info->popup_widget);
+    action_name = g_action_get_name(G_ACTION(action));
+    url = g_object_get_data(G_OBJECT(info), action_name);
+    url = balsa_mblist_mru_get_url(url, info->popup_widget);
 
-    if (url[0] != '\0') {
+    if (url != NULL) {
         balsa_mblist_mru_add(&balsa_app.folder_mru, url);
         balsa_message_copy_part(url, info->body);
     }
-
-    g_simple_action_set_state(action, parameter);
-    if (GTK_IS_POPOVER(info->popup_widget))
-        gtk_popover_popdown((GtkPopover *) info->popup_widget);
 }
 
 static GSimpleActionGroup *
@@ -1845,8 +1844,7 @@ part_add_actions(BalsaMessage *balsa_message,
 {
     GSimpleActionGroup *simple;
     static const GActionEntry entries[] = {
-        {"save", save_activated},
-        {"copy-part", libbalsa_radio_activated, "s", "''", copy_part_change_state}
+        {"save", save_activated}
     };
 
     simple = g_simple_action_group_new();
@@ -1882,16 +1880,18 @@ part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
 
     namespace = g_strdup_printf("menu-%d", ++menu_number);
     gtk_widget_insert_action_group(GTK_WIDGET(balsa_message), namespace, G_ACTION_GROUP(simple));
-    g_object_unref(simple);
 
     g_menu_append(menu, _("Save…"), "save");
 
     if (strcmp(content_type, "message/rfc822") == 0) {
         GMenu *submenu;
 
-        submenu = balsa_mblist_mru_menu(&balsa_app.folder_mru, "copy-part");
+        submenu = balsa_mblist_mru_menu(&balsa_app.folder_mru, G_ACTION_MAP(simple),
+                                        TRUE, NULL,
+                                        G_CALLBACK(copy_part_activated), info);
         g_menu_append_submenu(menu, _("_Copy to folder…"), G_MENU_MODEL(submenu));
     }
+    g_object_unref(simple);
     g_free(content_type);
 
     info->popup_widget =

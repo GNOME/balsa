@@ -2032,15 +2032,18 @@ toggle_unread_activated(GSimpleAction *action,
 }
 
 static void
-move_to_change_state(GSimpleAction *action,
-                     GVariant      *parameter,
-                     gpointer       user_data)
+move_to_activated(GSimpleAction *action,
+                  GVariant      *parameter,
+                  gpointer       user_data)
 {
     BalsaIndex *bindex = user_data;
+    const gchar *action_name;
+    const gchar *url;
     LibBalsaMailbox *mailbox;
 
-    mailbox =
-        balsa_mblist_mru_get_mailbox_from_variant(parameter, GTK_WIDGET(bindex));
+    action_name = g_action_get_name(G_ACTION(action));
+    url = g_object_get_data(G_OBJECT(bindex), action_name);
+    mailbox = balsa_mblist_mru_get_mailbox_from_url(url, GTK_WIDGET(bindex));
 
     if (mailbox != NULL) {
         balsa_mblist_mru_add(&balsa_app.folder_mru, libbalsa_mailbox_get_url(mailbox));
@@ -2050,9 +2053,6 @@ move_to_change_state(GSimpleAction *action,
             balsa_index_selected_msgnos_free(bindex, selected);
         }
     }
-
-    if (GTK_IS_POPOVER(bindex->popup_widget))
-        gtk_popover_popdown((GtkPopover *) bindex->popup_widget);
 }
 
 /*
@@ -2076,8 +2076,7 @@ bndx_add_actions(BalsaIndex  *bindex,
         {"trash",            move_to_trash_activated},
         {"toggle-flagged",   toggle_flagged_activated},
         {"toggle-unread",    toggle_unread_activated},
-        {"view-source",      view_source_activated},
-        {"move-to",          libbalsa_radio_activated, "s", "''", move_to_change_state}
+        {"view-source",      view_source_activated}
     };
 
     simple = g_simple_action_group_new();
@@ -2122,7 +2121,7 @@ bndx_popup_menu_create(BalsaIndex * bindex)
     /* Toggle items */
     submenu = g_menu_new();
 
-    g_menu_append(submenu, _("_Flagged"), "toggle-flagged");
+    g_menu_append(submenu, _("_Flagged"), "toggle-lagged");
     g_menu_append(submenu, _("_Unread"),  "toggle-unread");
 
     g_menu_append_submenu(menu, _("T_oggle"), G_MENU_MODEL(submenu));
@@ -2211,13 +2210,16 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     bndx_action_set_enabled(index, "popup", "trash", any && !readonly && mailbox != balsa_app.trash);
     bndx_action_set_enabled(index, "popup", "toggle-flagged", any && !readonly);
     bndx_action_set_enabled(index, "popup", "toggle-unread", any && !readonly);
-    bndx_action_set_enabled(index, "popup", "move-to", any && !readonly);
 
     /* The move-to submenu */
     item = g_menu_item_new_from_model(G_MENU_MODEL(index->popup_menu),
                                       index->move_position);
 
-    mru_menu = balsa_mblist_mru_menu(&balsa_app.folder_mru, "move-to");
+    mru_menu = balsa_mblist_mru_menu(&balsa_app.folder_mru,
+                                     G_ACTION_MAP(gtk_widget_get_action_group(GTK_WIDGET(index),
+                                                                              "popup")),
+                                     any && !readonly, NULL,
+                                     G_CALLBACK(move_to_activated), index);
     g_menu_item_set_submenu(item, G_MENU_MODEL(mru_menu));
     g_object_unref(mru_menu);
 

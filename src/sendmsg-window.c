@@ -1848,7 +1848,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, const gchar *url)
     GSimpleActionGroup *simple;
     static GActionEntry attachment_entries[] = {
         {"remove", remove_attachment},
-        {"open", libbalsa_radio_activated, "s", "''", on_open_url_cb}
+        {"open", on_open_url_cb}
     };
     GMenu *menu;
     GMenu *section;
@@ -1903,7 +1903,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, const gchar *url)
     g_object_unref(section);
 
     attach_data->popup_menu =
-        libbalsa_popup_widget_new(bsmsg->window, G_MENU_MODEL(menu), "urlref-attachment");
+        libbalsa_popup_widget_new(bsmsg->tree_view, G_MENU_MODEL(menu), "urlref-attachment");
     g_object_unref(menu);
 
     /* append to the list store */

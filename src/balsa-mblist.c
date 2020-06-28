@@ -2414,16 +2414,15 @@ bmbl_choose_mailbox(GtkWidget *widget)
 
 /*
  * balsa_mblist_mru_get_url,
- * balsa_mblist_mru_get_mailbox_from_url:
+ * balsa_mblist_mru_get_mailbox:
  *
  * Helpers for "_change_state" actions of mru_menus
  *
- * Get the url from the GVariant parameter. If it is "-",
+ * Get the url as GObject data from the object parameter. If it is NULL,
  * the user selected "Other...", so we must pop up the mailbox list dialog
  * and let the user choose the mailbox. That dialog can be canceled,
  * returning a NULL mailbox, so we must be careful; the caller must be
- * prepared for the return of a NULL url or mailbox,
- * respectively.
+ * prepared for the return of a NULL url or mailbox, respectively.
  */
 
 const gchar *

@@ -59,10 +59,12 @@ GMenu * balsa_mblist_mru_menu(GList      **url_list,
                               gpointer     user_data);
 void balsa_mblist_mru_add(GList ** url_list, const gchar * url);
 void balsa_mblist_mru_drop(GList ** url_list, const gchar * url);
-const gchar     *balsa_mblist_mru_get_url             (const gchar *url,
-                                                       GtkWidget   *widget);
-LibBalsaMailbox *balsa_mblist_mru_get_mailbox_from_url(const gchar *url,
-                                                       GtkWidget   *widget);
+const gchar     *balsa_mblist_mru_get_url    (GSimpleAction *action,
+                                              GtkWidget     *widget,
+                                              GObject       *object);
+LibBalsaMailbox *balsa_mblist_mru_get_mailbox(GSimpleAction *action,
+                                              GtkWidget     *widget,
+                                              GObject       *object);
 
 GtkWidget *balsa_mblist_mru_option_menu(GtkWindow * window, 
                                         GList ** url_list);

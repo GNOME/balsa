@@ -1425,7 +1425,7 @@ on_open_url_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     g_return_if_fail(uri != NULL);
 
     g_debug("open URL %s", uri);
-    toplevel = gtk_widget_get_toplevel(GTK_WIDGET(menu_item));
+    toplevel = gtk_widget_get_toplevel(info->bm->window);
     if (gtk_widget_is_toplevel(toplevel)) {
         gtk_show_uri_on_window(GTK_WINDOW(toplevel), uri,
                                gtk_get_current_event_time(), &err);
@@ -1875,6 +1875,7 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
     attach_data->force_mime_type = g_strdup("message/external-body");
     attach_data->delete_on_destroy = FALSE;
     attach_data->mode = LIBBALSA_ATTACH_AS_EXTBODY;
+    attach_data->file_uri = libbalsa_vfs_new_from_uri(url);
 
     /* build the attachment's popup menu - may only be removed */
     attach_data->popup_menu = gtk_menu_new();

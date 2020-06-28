@@ -1,3 +1,14 @@
+2020-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	compose-window: Make the "Open" option on the urlref-attachment
+	context menu work.
+
+	* src/sendmsg-window.cs
+	  (on_open_url_cb): Get the top-level window from the compose
+	  window; getting it from the menu-item leads to a Wayland
+	  error;
+	  (add_urlref_attachment): Populate BalsaAttachInfo:file_uri.
+
 2020-06-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mime-widget-text: Actually pop up the context menu when

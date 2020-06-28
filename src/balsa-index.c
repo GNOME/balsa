@@ -2037,13 +2037,9 @@ move_to_activated(GSimpleAction *action,
                   gpointer       user_data)
 {
     BalsaIndex *bindex = user_data;
-    const gchar *action_name;
-    const gchar *url;
     LibBalsaMailbox *mailbox;
 
-    action_name = g_action_get_name(G_ACTION(action));
-    url = g_object_get_data(G_OBJECT(bindex), action_name);
-    mailbox = balsa_mblist_mru_get_mailbox_from_url(url, GTK_WIDGET(bindex));
+    mailbox = balsa_mblist_mru_get_mailbox(action, GTK_WIDGET(bindex), user_data);
 
     if (mailbox != NULL) {
         balsa_mblist_mru_add(&balsa_app.folder_mru, libbalsa_mailbox_get_url(mailbox));

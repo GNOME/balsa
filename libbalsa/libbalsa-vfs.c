@@ -534,6 +534,7 @@ libbalsa_vfs_launch_app(LibbalsaVfs * file, GAppInfo *app, GError **err)
     gboolean result;
 
     g_return_val_if_fail(LIBBALSA_IS_VFS(file), FALSE);
+    g_return_val_if_fail(app == NULL || G_IS_APP_INFO(app), FALSE);
 
     if (app == NULL) {
         g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
@@ -559,6 +560,7 @@ libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody *mime_body,
     gboolean result;
 
     g_return_val_if_fail(mime_body != NULL, FALSE);
+    g_return_val_if_fail(app == NULL || G_IS_APP_INFO(app), FALSE);
 
     if (!libbalsa_message_body_save_temporary(mime_body, err))
         return FALSE;
@@ -661,6 +663,10 @@ libbalsa_vfs_fill_menu_by_content_type(GMenu       *menu,
     GList* list;
     GAppInfo *def_app;
     GList *app_list;
+
+    g_return_if_fail(G_IS_MENU(menu));
+    g_return_if_fail(G_IS_ACTION_MAP(action_map));
+    g_return_if_fail(G_IS_OBJECT(object));
 
     def_app = g_app_info_get_default_for_type(content_type, FALSE);
     if (def_app != NULL)

@@ -1825,12 +1825,9 @@ copy_part_activated(GSimpleAction *action,
                     gpointer       user_data)
 {
     BalsaPartInfo *info = user_data;
-    const gchar *action_name;
     const gchar *url;
 
-    action_name = g_action_get_name(G_ACTION(action));
-    url = g_object_get_data(G_OBJECT(info), action_name);
-    url = balsa_mblist_mru_get_url(url, info->popup_widget);
+    url = balsa_mblist_mru_get_url(action, info->popup_widget, user_data);
 
     if (url != NULL) {
         balsa_mblist_mru_add(&balsa_app.folder_mru, url);

@@ -444,12 +444,9 @@ copy_activated(GSimpleAction *action,
 {
     LibBalsaMessageBody *part = g_object_get_data(user_data, "part");
     GtkWidget *widget = user_data;
-    const gchar *action_name;
     const gchar *url;
 
-    action_name = g_action_get_name(G_ACTION(action));
-    url = g_object_get_data(G_OBJECT(widget), action_name);
-    url = balsa_mblist_mru_get_url(url, widget);
+    url = balsa_mblist_mru_get_url(action, widget, user_data);
 
     if (url != NULL) {
         balsa_mblist_mru_add(&balsa_app.folder_mru, url);

@@ -1690,6 +1690,8 @@ static void bmbl_mru_activated_cb(GtkTreeView * tree_view,
  * last entry that pops up the whole mailbox tree.
  */
 
+#define BALSA_MBLIST_MRU_MENU_OTHER "-"
+
 static void
 bmbl_add_action(GMenu       *section,
                 const gchar *url,
@@ -1718,7 +1720,8 @@ bmbl_add_action(GMenu       *section,
     g_action_map_add_action(action_map, G_ACTION(action));
     g_object_unref(action);
 
-    g_object_set_data_full(user_data, action_name, g_strdup(url), g_free);
+    if (strcmp(url, BALSA_MBLIST_MRU_MENU_OTHER) != 0)
+        g_object_set_data_full(user_data, action_name, g_strdup(url), g_free);
 
     if (action_namespace != NULL) {
         gchar *prefixed_action_name;
@@ -1766,8 +1769,8 @@ balsa_mblist_mru_menu(GList      **url_list,
 
     /* Other… section */
     section = g_menu_new();
-    bmbl_add_action(section, "-", action_map, action_enabled, action_namespace,
-                    _("_Other…"), callback, user_data);
+    bmbl_add_action(section, BALSA_MBLIST_MRU_MENU_OTHER, action_map, action_enabled,
+                    action_namespace, _("_Other…"), callback, user_data);
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
 
@@ -2424,9 +2427,15 @@ bmbl_choose_mailbox(GtkWidget *widget)
  */
 
 const gchar *
-balsa_mblist_mru_get_url(const gchar *url, GtkWidget *widget)
+balsa_mblist_mru_get_url(GSimpleAction *action, GtkWidget *widget, GObject *object)
 {
-    if (url[0] == '-' && url[1] == '\0') {
+    const gchar *action_name;
+    const gchar *url;
+
+    action_name = g_action_get_name(G_ACTION(action));
+    url = g_object_get_data(object, action_name);
+
+    if (url == NULL) {
         LibBalsaMailbox *mailbox;
 
         mailbox = bmbl_choose_mailbox(widget);
@@ -2438,14 +2447,16 @@ balsa_mblist_mru_get_url(const gchar *url, GtkWidget *widget)
 }
 
 LibBalsaMailbox *
-balsa_mblist_mru_get_mailbox_from_url(const gchar *url, GtkWidget *widget)
+balsa_mblist_mru_get_mailbox(GSimpleAction *action, GtkWidget *widget, GObject *object)
 {
+    const gchar *action_name;
+    const gchar *url;
     LibBalsaMailbox *mailbox;
 
-    if (url[0] == '-' && url[1] == '\0')
-        mailbox = bmbl_choose_mailbox(widget);
-    else
-        mailbox = balsa_find_mailbox_by_url(url);
+    action_name = g_action_get_name(G_ACTION(action));
+    url = g_object_get_data(object, action_name);
+
+    mailbox = url == NULL ? bmbl_choose_mailbox(widget) : balsa_find_mailbox_by_url(url);
 
     return mailbox;
 }

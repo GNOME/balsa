@@ -97,7 +97,7 @@ gchar *autocrypt_header(LibBalsaIdentity  *identity,
  * \param content_type message content type
  * \return TRUE if the media type shall be ignored
  *
- * The standard requests that multipart/report shall be ignored.  This function also blacklists text/calendar which is not required
+ * The standard requests that multipart/report shall be ignored.  This function also blocks text/calendar which is not required
  * by the standard (see https://lists.mayfirst.org/pipermail/autocrypt/2018-November/000441.html for a discussion).
  */
 gboolean autocrypt_ignore(GMimeContentType *content_type);

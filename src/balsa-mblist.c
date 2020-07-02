@@ -2431,7 +2431,11 @@ balsa_mblist_mru_get_url(GSimpleAction *action, GtkWidget *widget, GObject *obje
     const gchar *action_name;
     const gchar *url;
 
-    action_name = g_action_get_name(G_ACTION(action));
+    g_return_val_if_fail(G_IS_ACTION(action), NULL);
+    g_return_val_if_fail(GTK_IS_WIDGET(widget), NULL);
+    g_return_val_if_fail(G_IS_OBJECT(object), NULL);
+
+    action_name = g_action_get_name((GAction *) action);
     url = g_object_get_data(object, action_name);
 
     if (url == NULL) {
@@ -2452,7 +2456,11 @@ balsa_mblist_mru_get_mailbox(GSimpleAction *action, GtkWidget *widget, GObject *
     const gchar *url;
     LibBalsaMailbox *mailbox;
 
-    action_name = g_action_get_name(G_ACTION(action));
+    g_return_val_if_fail(G_IS_ACTION(action), NULL);
+    g_return_val_if_fail(GTK_IS_WIDGET(widget), NULL);
+    g_return_val_if_fail(G_IS_OBJECT(object), NULL);
+
+    action_name = g_action_get_name((GAction *) action);
     url = g_object_get_data(object, action_name);
 
     mailbox = url == NULL ? bmbl_choose_mailbox(widget) : balsa_find_mailbox_by_url(url);

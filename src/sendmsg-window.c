@@ -2083,31 +2083,6 @@ sw_attach_messages_activated(GSimpleAction * action,
 
 
 /* attachments_add - attachments field D&D callback */
-static GSList*
-uri2gslist(const char *uri_list)
-{
-  GSList *list = NULL;
-
-  while (*uri_list) {
-    char	*linebreak = strchr(uri_list, 13);
-    int	length;
-
-    if (!linebreak || linebreak[1] != '\n')
-        return list;
-
-    length = linebreak - uri_list;
-
-    if (length && uri_list[0] != '#') {
-	gchar *this_uri = g_strndup(uri_list, length);
-
-	if (this_uri)
-	    list = g_slist_append(list, this_uri);
-      }
-
-    uri_list = linebreak + 2;
-  }
-  return list;
-}
 
 /* Helper: check if the passed parameter contains a valid RFC 2396 URI (leading
  * & trailing whitespaces allowed). Return a newly allocated string with the
@@ -2179,14 +2154,12 @@ attachments_add(GtkWidget * widget,
         }
         balsa_index_selected_msgnos_free(index, selected);
     } else if (info == TARGET_URI_LIST) {
-        GSList *uri_list =
-            uri2gslist((gchar *)
-                       gtk_selection_data_get_data(selection_data));
-        for (; uri_list; uri_list = g_slist_next(uri_list)) {
-	    add_attachment(bsmsg, uri_list->data, FALSE, NULL);
-            g_free(uri_list->data);
-        }
-        g_slist_free(uri_list);
+        gchar **uris, **uri;
+
+        uris = gtk_selection_data_get_uris(selection_data);
+        for (uri = uris; uri != NULL; ++uri)
+	    add_attachment(bsmsg, *uri, FALSE, NULL);
+        g_strfreev(uris);
     } else if( info == TARGET_STRING) {
 	gchar *url =
             rfc2396_uri((gchar *)
@@ -2757,24 +2730,23 @@ drag_data_quote(GtkWidget * widget,
         balsa_index_selected_msgnos_free(index, selected);
         break;
     case TARGET_URI_LIST: {
-        GSList *uri_list =
-            uri2gslist((gchar *)
-                       gtk_selection_data_get_data(selection_data));
-        for (; uri_list; uri_list = g_slist_next(uri_list)) {
+        gchar **uris, **uri;
+
+        uris = gtk_selection_data_get_uris(selection_data);
+
+        for (uri = uris; uri != NULL; ++uri) {
             /* Since current GtkTextView gets this signal twice for
              * every action (#150141) we need to check for duplicates,
              * which is a good idea anyway. */
-	    has_file_attached_t find_file;
+	    has_file_attached_t find_file = {*uri, FALSE};
 
-	    find_file.name = uri_list->data;
-	    find_file.found = FALSE;
             if (bsmsg->tree_view)
                 gtk_tree_model_foreach(BALSA_MSG_ATTACH_MODEL(bsmsg),
                                        has_file_attached, &find_file);
             if (!find_file.found)
-                add_attachment(bsmsg, uri_list->data, FALSE, NULL);
+                add_attachment(bsmsg, *uri, FALSE, NULL);
         }
-        g_slist_free_full(uri_list, g_free);
+        g_strfreev(uris);
     }
         break;
     case TARGET_EMAIL:

@@ -1,3 +1,10 @@
+2020-07-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	compose-window: Use gtk_selection_data_get_uris() instead of our
+	own code.
+
+	* src/sendmsg-window.c (attachments_add), (drag_data_quote):
+
 2020-06-28  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	compose-window: Make the "Open" option on the urlref-attachment

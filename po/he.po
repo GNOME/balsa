@@ -5089,7 +5089,7 @@ msgstr "הגופן זמין להדפסה"
 #: ../src/print.c:1553
 #, c-format
 msgid "Font <b>not</b> available for printing. Closest: %s"
-msgstr "הגופן </b>אינו</b> זמין להדפסה.  הקרוב ביותר הוא׃ %s"
+msgstr "הגופן <b>אינו</b> זמין להדפסה.  הקרוב ביותר הוא׃ %s"
 
 #: ../src/print.c:1566
 msgid "Select Font"

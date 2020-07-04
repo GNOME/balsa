@@ -1843,11 +1843,10 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
 }
 
 /* add_urlref_attachment:
-   adds given url as reference to the to the list.
-   frees url.
-*/
+ * adds given url as reference to the to the list.
+ */
 static gboolean
-add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
+add_urlref_attachment(BalsaSendmsg * bsmsg, const gchar *url)
 {
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -1911,7 +1910,6 @@ add_urlref_attachment(BalsaSendmsg * bsmsg, gchar *url)
 		       -1);
     g_object_unref(attach_data);
     g_object_unref(pixbuf);
-    g_free(url);
 
     return TRUE;
 }
@@ -2165,11 +2163,14 @@ attachments_add(GtkWidget * widget,
             rfc2396_uri((gchar *)
                         gtk_selection_data_get_data(selection_data));
 
-	if (url)
+	if (url != NULL) {
 	    add_urlref_attachment(bsmsg, url);
-	else
+            g_free(url);
+        } else {
 	    drag_result = FALSE;
+        }
     }
+
     gtk_drag_finish(context, drag_result, FALSE, time);
 }
 
@@ -2901,75 +2902,101 @@ sw_can_convert(const gchar * string, gssize len,
    their original names and then attached again.
    NOTE that rbdy == NULL if message has no text parts.
 */
+
+static void
+add_file_attachment(BalsaSendmsg        *bsmsg,
+                    LibBalsaMessageBody *body,
+                    const gchar         *body_type)
+{
+    gchar *name, *tmp_file_name;
+    GError *err = NULL;
+    gboolean res = FALSE;
+
+    if (body->filename != NULL) {
+        gchar *tempdir;
+
+        libbalsa_mktempdir(&tempdir);
+        name = g_build_filename(tempdir, body->filename, NULL);
+        g_free(tempdir);
+
+        res = libbalsa_message_body_save(body, name,
+                                         LIBBALSA_MESSAGE_BODY_SAFE,
+                                         FALSE, &err);
+    } else {
+        int fd;
+
+        if ((fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL)) > 0) {
+            GMimeStream * tmp_stream;
+
+            if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
+                res = libbalsa_message_body_save_stream(body, tmp_stream, FALSE, &err);
+            else
+                close(fd);
+        }
+    }
+
+    if (!res) {
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_ERROR,
+                                   _("Could not save attachment: %s"),
+                                   err ? err->message : "Unknown error");
+        g_clear_error(&err);
+        /* FIXME: do not try any further? */
+    }
+
+    tmp_file_name = g_filename_to_uri(name, NULL, NULL);
+    g_free(name);
+
+    add_attachment(bsmsg, tmp_file_name, TRUE, body_type);
+    g_free(tmp_file_name);
+}
+
 static void
 continue_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 {
     LibBalsaMessageBody *body;
 
     body = libbalsa_message_get_body_list(message);
-    if (body) {
-	if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART)
-	    body = body->parts;
-	/* if the first part is of type text/plain with a NULL filename, it
-	   was the message... */
-	if (body && !body->filename) {
-	    GString *rbdy;
-	    gchar *body_type = libbalsa_message_body_get_mime_type(body);
-            gint llen = -1;
-            GtkTextBuffer *buffer =
-                gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
-            if (bsmsg->flow && libbalsa_message_body_is_flowed(body))
-                llen = balsa_app.wraplength;
-	    if (!strcmp(body_type, "text/plain") &&
-		(rbdy = process_mime_part(message, body, NULL, llen, FALSE,
-                                          bsmsg->flow))) {
-                gtk_text_buffer_insert_at_cursor(buffer, rbdy->str, rbdy->len);
-		g_string_free(rbdy, TRUE);
-	    }
-	    g_free(body_type);
-	    body = body->next;
-	}
-	while (body) {
-	    gchar *name, *body_type, *tmp_file_name;
-            GError *err = NULL;
-            gboolean res = FALSE;
+    if (body == NULL)
+        return;
 
-	    if (body->filename) {
-		libbalsa_mktempdir(&tmp_file_name);
-		name = g_strdup_printf("%s/%s", tmp_file_name, body->filename);
-		g_free(tmp_file_name);
-		res = libbalsa_message_body_save(body, name,
-                                                 LIBBALSA_MESSAGE_BODY_SAFE,
-                                                 FALSE, &err);
-	    } else {
-                int fd;
+    if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART)
+        body = body->parts;
 
-		if ((fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL)) > 0) {
-                    GMimeStream * tmp_stream;
+    /* if the first part is of type text/plain with a NULL filename, it
+       was the message... */
+    if (body != NULL && body->filename == NULL) {
+        GString *rbdy;
+        gchar *body_type = libbalsa_message_body_get_mime_type(body);
+        gint llen = -1;
 
-                    if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
-                        res = libbalsa_message_body_save_stream(body, tmp_stream, FALSE, &err);
-                    else
-                        close(fd);
-                }
-	    }
-            if(!res) {
-                balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                           LIBBALSA_INFORMATION_ERROR,
-                                           _("Could not save attachment: %s"),
-                                           err ? err->message : "Unknown error");
-                g_clear_error(&err);
-                /* FIXME: do not try any further? */
-            }
-	    body_type = libbalsa_message_body_get_mime_type(body);
-            tmp_file_name = g_filename_to_uri(name, NULL, NULL);
-            g_free(name);
-	    add_attachment(bsmsg, tmp_file_name, TRUE, body_type);
-	    g_free(body_type);
-	    g_free(tmp_file_name);
-	    body = body->next;
-	}
+        if (bsmsg->flow && libbalsa_message_body_is_flowed(body))
+            llen = balsa_app.wraplength;
+
+        if (strcmp(body_type, "text/plain") == 0 &&
+            (rbdy = process_mime_part(message, body, NULL, llen, FALSE,
+                                      bsmsg->flow)) != NULL) {
+            GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+
+            gtk_text_buffer_insert_at_cursor(buffer, rbdy->str, rbdy->len);
+            g_string_free(rbdy, TRUE);
+        }
+
+        g_free(body_type);
+        body = body->next;
+    }
+
+    while (body != NULL) {
+        gchar *body_type = libbalsa_message_body_get_mime_type(body);
+
+        if (strcmp(body_type, "message/external-body") == 0)
+            add_urlref_attachment(bsmsg, body->filename);
+        else
+            add_file_attachment(bsmsg, body, body_type);
+
+        g_free(body_type);
+        body = body->next;
     }
 }
 

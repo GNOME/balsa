@@ -1,3 +1,14 @@
+2020-07-04  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	compose-window: Handle attachments of type
+	"message/external-body" when continuing a draft message.
+
+	* src/sendmsg-window.c (add_urlref_attachment): do not free the
+	    URL string;
+	  (attachments_add): free it here;
+	  (add_file_attachment): new helper;
+	  (continue_body): use it.
+
 2020-07-03  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	compose-window: Use gtk_selection_data_get_uris() instead of our

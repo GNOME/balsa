@@ -1,5 +1,19 @@
 2020-07-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	body: If a part with content-type "message/external-body" has
+	access-type URL, use its URL parameter as the filename, instead
+	of g_mime_part_get_filename(), so that the previous commit can
+	work.
+
+	* libbalsa/body.c (libbalsa_message_body_set_filename): get the
+	  "access-type" parameter; if it is non-NULL and equals
+	  "URL", get the "URL" parameter and use it as the part's
+	  filename; we do not need to verify that the content-type is
+	  "message/external-body", as the "access-type" parameter is
+	  NULL for any other content-type.
+
+2020-07-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	compose-window: Attachments of type "message/external-body" must
 	have a filename, because libbalsa_message_create_mime_message()
 	uses it to distinguish access-type=URL from

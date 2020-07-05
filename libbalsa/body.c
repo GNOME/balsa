@@ -135,11 +135,20 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
 static void
 libbalsa_message_body_set_filename(LibBalsaMessageBody * body)
 {
-    if (GMIME_IS_PART(body->mime_part)) {
-	g_free(body->filename);
-	body->filename =
-	    g_strdup(g_mime_part_get_filename(GMIME_PART(body->mime_part)));
-    }
+    gchar *access_type;
+    gchar *filename = NULL;
+
+    access_type = libbalsa_message_body_get_parameter(body, "access-type");
+
+    if (g_strcmp0(access_type, "URL") == 0)
+        filename = libbalsa_message_body_get_parameter(body, "URL");
+    else if (GMIME_IS_PART(body->mime_part))
+	filename = g_strdup(g_mime_part_get_filename((GMimePart *) body->mime_part));
+
+    g_free(access_type);
+
+    g_free(body->filename);
+    body->filename = filename;
 }
 
 static void

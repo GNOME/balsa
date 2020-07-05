@@ -4863,11 +4863,9 @@ attachment2message(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter,
 
     /* create the attachment */
     body = libbalsa_message_body_new(message);
-    body->file_uri = attachment->file_uri;
-    if (attachment->file_uri)
-        g_object_ref(attachment->file_uri);
-    else
-        body->filename = g_strdup(attachment->uri_ref);
+    if (attachment->file_uri != NULL)
+        body->file_uri = g_object_ref(attachment->file_uri);
+    body->filename = g_strdup(attachment->uri_ref);
     body->content_type = g_strdup(attachment->force_mime_type);
     body->charset = g_strdup(attachment->charset);
     body->attach_mode = attachment->mode;

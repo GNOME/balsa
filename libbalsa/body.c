@@ -140,7 +140,7 @@ libbalsa_message_body_set_filename(LibBalsaMessageBody * body)
 
     access_type = libbalsa_message_body_get_parameter(body, "access-type");
 
-    if (g_strcmp0(access_type, "URL") == 0)
+    if (access_type != NULL && g_ascii_strcasecmp(access_type, "URL") == 0)
         filename = libbalsa_message_body_get_parameter(body, "URL");
     else if (GMIME_IS_PART(body->mime_part))
 	filename = g_strdup(g_mime_part_get_filename((GMimePart *) body->mime_part));

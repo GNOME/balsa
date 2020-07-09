@@ -304,6 +304,18 @@ PKG_CHECK_MODULES(GPGME, [ gpgme >= 1.8.0 ])
 BALSA_CFLAGS="$BALSA_CFLAGS $GPGME_CFLAGS"
 BALSA_LIBS="$BALSA_LIBS $GPGME_LIBS"
 
+# Autocrypt support
+AC_MSG_CHECKING(whether to build with Autocrypt support)
+if test x"$autocrypt" != xno ; then
+	AC_MSG_RESULT([yes])
+	PKG_CHECK_MODULES(AUTOCRYPT, [sqlite3])
+	AC_DEFINE(ENABLE_AUTOCRYPT,1,[If defined, enable Autocrypt support])
+	BALSA_CFLAGS="$BALSA_CFLAGS $AUTOCRYPT_CFLAGS"
+	BALSA_LIBS="$BALSA_LIBS $AUTOCRYPT_LIBS"
+else
+	AC_MSG_RESULT([no])
+fi
+
 # OpenLDAP configuration.
 #
 AC_MSG_CHECKING(whether to use LDAP)

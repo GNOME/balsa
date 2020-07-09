@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2020-06-11 18:13+0000\n"
-"PO-Revision-Date: 2020-06-12 07:37+0300\n"
+"POT-Creation-Date: 2020-07-09 16:48+0000\n"
+"PO-Revision-Date: 2020-07-09 20:18+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -209,12 +209,12 @@ msgstr "При_х.копія:"
 msgid "Reply To:"
 msgstr "Відповідати до:"
 
-#: ../libbalsa/autocrypt.c:182
+#: ../libbalsa/autocrypt.c:181
 #, c-format
 msgid "cannot initialise Autocrypt database “%s”: %s"
 msgstr "не вдалося ініціалізувати базу даних автошифрування «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:308
+#: ../libbalsa/autocrypt.c:307
 #, c-format
 msgid ""
 "No usable private key for “%s” found! Please create a key or disable "
@@ -223,18 +223,18 @@ msgstr ""
 "Не знайдено придатного до використання закритого ключа для «%s»! Будь ласка, "
 "створіть такий ключ або вимкніть автоматичне шифрування."
 
-#: ../libbalsa/autocrypt.c:375 ../libbalsa/autocrypt.c:383
-#: ../libbalsa/autocrypt.c:654 ../libbalsa/autocrypt.c:660
+#: ../libbalsa/autocrypt.c:374 ../libbalsa/autocrypt.c:382
+#: ../libbalsa/autocrypt.c:651 ../libbalsa/autocrypt.c:657
 #, c-format
 msgid "error reading Autocrypt data for “%s”: %s"
 msgstr ""
 "помилка під час спроби прочитати дані автоматичного шифрування для «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:437
+#: ../libbalsa/autocrypt.c:435
 msgid "Autocrypt database"
 msgstr "База даних автошифрування"
 
-#: ../libbalsa/autocrypt.c:438 ../libbalsa/html.c:424
+#: ../libbalsa/autocrypt.c:436 ../libbalsa/html.c:424
 #: ../libbalsa/identity.c:1658 ../libbalsa/libbalsa-gpgme-widgets.c:765
 #: ../src/ab-window.c:148 ../src/folder-conf.c:337 ../src/mailbox-node.c:1052
 #: ../src/main-window.c:3784 ../src/toolbar-prefs.c:130
@@ -243,32 +243,32 @@ msgstr "База даних автошифрування"
 msgid "_Close"
 msgstr "_Закрити"
 
-#: ../libbalsa/autocrypt.c:444 ../libbalsa/libbalsa-gpgme-cb.c:236
+#: ../libbalsa/autocrypt.c:442 ../libbalsa/libbalsa-gpgme-cb.c:223
 msgid "Double-click key to show details"
 msgstr "Двічі клацніть на ключі, щоб переглянути подробиці"
 
-#: ../libbalsa/autocrypt.c:500 ../src/balsa-mblist.c:326
+#: ../libbalsa/autocrypt.c:497 ../src/balsa-mblist.c:326
 msgid "Mailbox"
 msgstr "Скринька"
 
-#: ../libbalsa/autocrypt.c:505
+#: ../libbalsa/autocrypt.c:502
 msgid "Last seen"
 msgstr "Востаннє бачили"
 
-#: ../libbalsa/autocrypt.c:510
+#: ../libbalsa/autocrypt.c:507
 msgid "Last Autocrypt message"
 msgstr "Останнє автозашифроване повідомлення"
 
-#: ../libbalsa/autocrypt.c:515
+#: ../libbalsa/autocrypt.c:512
 msgid "Prefer encryption"
 msgstr "Перевага шифрування"
 
-#: ../libbalsa/autocrypt.c:748 ../libbalsa/autocrypt.c:768
+#: ../libbalsa/autocrypt.c:745 ../libbalsa/autocrypt.c:765
 #, c-format
 msgid "update user “%s” failed: %s"
 msgstr "не вдалося оновити запис користувача «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:748
+#: ../libbalsa/autocrypt.c:745
 #, c-format
 msgid "insert user “%s” failed: %s"
 msgstr "не вдалося вставити користувача «%s»: %s"
@@ -278,12 +278,12 @@ msgstr "не вдалося вставити користувача «%s»: %s"
 msgid "(No subject)"
 msgstr "(Без теми)"
 
-#: ../libbalsa/body.c:392 ../libbalsa/body.c:439
+#: ../libbalsa/body.c:401 ../libbalsa/body.c:448
 #, c-format
 msgid "Failed to create output stream"
 msgstr "Не вдалося створити потік виведення даних"
 
-#: ../libbalsa/body.c:576
+#: ../libbalsa/body.c:585
 #, c-format
 msgid "Could not read embedded message"
 msgstr "Не вдалося прочитати вбудоване повідомлення"
@@ -463,8 +463,8 @@ msgstr ""
 #: ../libbalsa/gmime-gpgme-signature.c:237 ../libbalsa/imap/imap-handle.c:46
 #: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc2445.c:415
 #: ../libbalsa/rfc2445.c:444 ../libbalsa/rfc2445.c:467
-#: ../libbalsa/rfc2445.c:1119 ../libbalsa/rfc3156.c:689
-#: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5318
+#: ../libbalsa/rfc2445.c:1120 ../libbalsa/rfc3156.c:689
+#: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5316
 msgid "unknown"
 msgstr "невідомо"
 
@@ -590,8 +590,8 @@ msgstr "Не вдалося прочитати файл підпису «%s»: "
 msgid "Signature in “%s” is not a UTF-8 text."
 msgstr "Підпис у «%s» не є текстом у кодуванні UTF-8."
 
-#: ../libbalsa/identity.c:368 ../libbalsa/libbalsa-gpgme-cb.c:197
-#: ../libbalsa/libbalsa-gpgme-cb.c:353 ../libbalsa/smtp-server.c:327
+#: ../libbalsa/identity.c:368 ../libbalsa/libbalsa-gpgme-cb.c:184
+#: ../libbalsa/libbalsa-gpgme-cb.c:363 ../libbalsa/smtp-server.c:327
 #: ../src/ab-main.c:850 ../src/ab-window.c:141 ../src/address-book-config.c:240
 #: ../src/address-book-config.c:346 ../src/address-book-config.c:392
 #: ../src/balsa-app.c:94 ../src/balsa-app.c:163 ../src/balsa-index.c:2674
@@ -604,22 +604,22 @@ msgstr "Підпис у «%s» не є текстом у кодуванні UTF-
 #: ../src/mailbox-conf.c:229 ../src/mailbox-conf.c:245
 #: ../src/mailbox-conf.c:733 ../src/mailbox-conf.c:790
 #: ../src/pref-manager.c:3260 ../src/sendmsg-window.c:494
-#: ../src/sendmsg-window.c:1505 ../src/sendmsg-window.c:1965
+#: ../src/sendmsg-window.c:1505 ../src/sendmsg-window.c:1964
 #: ../src/sendmsg-window.c:3348 ../src/sendmsg-window.c:4784
-#: ../src/sendmsg-window.c:5087 ../src/sendmsg-window.c:5173
+#: ../src/sendmsg-window.c:5085 ../src/sendmsg-window.c:5171
 #: ../src/spell-check.c:395 ../src/store-address.c:208
 msgid "_Cancel"
 msgstr "_Скасувати"
 
-#: ../libbalsa/identity.c:369 ../libbalsa/libbalsa-gpgme-cb.c:196
-#: ../libbalsa/libbalsa-gpgme-cb.c:352 ../libbalsa/smtp-server.c:326
+#: ../libbalsa/identity.c:369 ../libbalsa/libbalsa-gpgme-cb.c:183
+#: ../libbalsa/libbalsa-gpgme-cb.c:362 ../libbalsa/smtp-server.c:326
 #: ../src/ab-window.c:140 ../src/balsa-app.c:95 ../src/balsa-app.c:162
 #: ../src/balsa-message.c:1742 ../src/balsa-mime-widget-callbacks.c:86
 #: ../src/filter-edit-callbacks.c:1237 ../src/filter-edit-dialog.c:573
 #: ../src/filter-export-dialog.c:79 ../src/filter-run-dialog.c:299
 #: ../src/folder-conf.c:344 ../src/main-window.c:3876
 #: ../src/pref-manager.c:3258 ../src/sendmsg-window.c:1504
-#: ../src/sendmsg-window.c:1966 ../src/sendmsg-window.c:3347
+#: ../src/sendmsg-window.c:1965 ../src/sendmsg-window.c:3347
 #: ../src/sendmsg-window.c:4785 ../src/store-address.c:209
 msgid "_OK"
 msgstr "_Гаразд"
@@ -827,7 +827,6 @@ msgstr "Дійсно бажаєте вилучити вказаний профі
 
 #: ../libbalsa/identity.c:1611
 #, c-format
-#| msgid "Error displaying help for identities: %s\n"
 msgid "Error displaying help for identities: %s"
 msgstr "Помилка відображення довідки про профіль: %s"
 
@@ -1155,21 +1154,21 @@ msgid "Insufficient key validity"
 msgstr "Недостатня чинність ключа"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/libbalsa-gpgme-cb.c:192
+#: ../libbalsa/libbalsa-gpgme-cb.c:179
 msgid "Select key"
 msgstr "Виберіть ключ"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:214
+#: ../libbalsa/libbalsa-gpgme-cb.c:201
 #, c-format
 msgid "Select the private key for the signer “%s”"
 msgstr "Виберіть закритий ключ для підписувача «%s»"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:219
+#: ../libbalsa/libbalsa-gpgme-cb.c:206
 #, c-format
 msgid "Select the public key for the recipient “%s”"
 msgstr "Виберіть відкритий ключ отримувача «%s»"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:224
+#: ../libbalsa/libbalsa-gpgme-cb.c:211
 #, c-format
 msgid ""
 "There seems to be no public key for recipient “%s” in your key ring.\n"
@@ -1181,12 +1180,22 @@ msgstr ""
 "Якщо ви впевнені, що отримувач є власником іншого ключа, виберіть його зі "
 "списку."
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:284
+#: ../libbalsa/libbalsa-gpgme-cb.c:280
 msgid "User ID"
 msgstr "Ід. користувача"
 
+#: ../libbalsa/libbalsa-gpgme-cb.c:287 ../src/balsa-index.c:428
+#: ../src/pref-manager.c:219 ../src/sendmsg-window.c:2627
+msgid "Size"
+msgstr "Розмір"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:294
+#| msgid "Created:"
+msgid "Created"
+msgstr "Створено"
+
 #. create the dialog
-#: ../libbalsa/libbalsa-gpgme-cb.c:317
+#: ../libbalsa/libbalsa-gpgme-cb.c:327
 #, c-format
 msgid ""
 "The owner trust for this key is “%s” only.\n"
@@ -1195,16 +1204,16 @@ msgstr ""
 "Довіра до власника цього ключа є лише «%s».\n"
 "Скористатися цим ключем попри це?"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:319
+#: ../libbalsa/libbalsa-gpgme-cb.c:329
 msgid "Insufficient key owner trust"
 msgstr "Недостатня довіра до власника ключа"
 
 #. FIXME: create dialog according to the Gnome HIG
-#: ../libbalsa/libbalsa-gpgme-cb.c:349
+#: ../libbalsa/libbalsa-gpgme-cb.c:359
 msgid "Enter Passphrase"
 msgstr "Введіть пароль"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:377
+#: ../libbalsa/libbalsa-gpgme-cb.c:387
 #, c-format
 msgid ""
 "%s\n"
@@ -1217,7 +1226,7 @@ msgstr ""
 "\n"
 "Ключ: %s"
 
-#: ../libbalsa/libbalsa-gpgme-cb.c:382
+#: ../libbalsa/libbalsa-gpgme-cb.c:392
 #, c-format
 msgid ""
 "%s\n"
@@ -1816,9 +1825,6 @@ msgstr "Поштова скринька «%s» не схожа на скринь
 
 #: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:278
 #, c-format
-#| msgid ""
-#| "Could not remove %s:\n"
-#| "%s"
 msgid "Could not remove %s: %s"
 msgstr "Не вдалося вилучити %s: %s"
 
@@ -1889,9 +1895,6 @@ msgstr "Не вдалося створити структуру MH на %s (%s)"
 
 #: ../libbalsa/mailbox_mh.c:272
 #, c-format
-#| msgid ""
-#| "Could not remove contents of %s:\n"
-#| "%s"
 msgid "Could not remove contents of %s: %s"
 msgstr "Не вдалося вилучити вміст %s: %s"
 
@@ -2085,7 +2088,6 @@ msgstr "Не вдалося відкрити %s: це символічне по�
 
 #: ../libbalsa/misc.c:731
 #, c-format
-#| msgid "Send failed: %s"
 msgid "fcntl failed: %s."
 msgstr "Помилка fcntl: %s."
 
@@ -2437,19 +2439,19 @@ msgstr "випадки"
 msgid " until %s"
 msgstr " до %s"
 
-#: ../libbalsa/rfc2445.c:1120
+#: ../libbalsa/rfc2445.c:1121
 msgid "chair"
 msgstr "голова"
 
-#: ../libbalsa/rfc2445.c:1121
+#: ../libbalsa/rfc2445.c:1122
 msgid "required participant"
 msgstr "обов'язковий учасник"
 
-#: ../libbalsa/rfc2445.c:1122
+#: ../libbalsa/rfc2445.c:1123
 msgid "optional participant"
 msgstr "необов'язковий учасник"
 
-#: ../libbalsa/rfc2445.c:1123
+#: ../libbalsa/rfc2445.c:1124
 msgid "non-participant, information only"
 msgstr "не є учасником, лише інформація"
 
@@ -3501,11 +3503,6 @@ msgstr "Не вдалося відкрити поштову скриньку «%
 msgid "Date"
 msgstr "Дата"
 
-#: ../src/balsa-index.c:428 ../src/pref-manager.c:219
-#: ../src/sendmsg-window.c:2652
-msgid "Size"
-msgstr "Розмір"
-
 #: ../src/balsa-index.c:1594
 #, c-format
 msgid "Reply to Group: %d message is not from a mailing list."
@@ -3703,7 +3700,7 @@ msgstr "(Немає відправника)"
 msgid "Could not access message %u in mailbox “%s”."
 msgstr "Не вдалося отримати доступ до повідомлення %u у поштовій скриньці «%s»"
 
-#: ../src/balsa-message.c:1187 ../src/main.c:545
+#: ../src/balsa-message.c:1187 ../src/main.c:561
 #, c-format
 msgid "Autocrypt error: %s"
 msgstr "Помилка автошифрування: %s"
@@ -4119,7 +4116,7 @@ msgstr "Тема: %s\n"
 msgid "Se_nd message to obtain this part"
 msgstr "Надіс_лати повідомлення для отримання цієї частини"
 
-#: ../src/balsa-mime-widget-message.c:325 ../src/balsa-mime-widget-text.c:883
+#: ../src/balsa-mime-widget-message.c:325 ../src/balsa-mime-widget-text.c:885
 #: ../src/sendmsg-window.c:1435
 #, c-format
 msgid "Error showing %s: %s\n"
@@ -4151,7 +4148,7 @@ msgstr "Сервер IMAP не повідомив про структуру по
 #: ../src/balsa-mime-widget-message.c:735
 #: ../src/balsa-print-object-header.c:131 ../src/sendmsg-window.c:711
 #: ../src/sendmsg-window.c:713 ../src/sendmsg-window.c:804
-#: ../src/sendmsg-window.c:3575 ../src/sendmsg-window.c:5119
+#: ../src/sendmsg-window.c:3575 ../src/sendmsg-window.c:5117
 msgid "Subject:"
 msgstr "Тема:"
 
@@ -4192,69 +4189,69 @@ msgstr "Відкрити посилання"
 msgid "Send link…"
 msgstr "Надіслати посилання…"
 
-#: ../src/balsa-mime-widget-text.c:623 ../src/balsa-mime-widget-text.c:1145
+#: ../src/balsa-mime-widget-text.c:625 ../src/balsa-mime-widget-text.c:1147
 msgid "Save…"
 msgstr "Зберегти…"
 
-#: ../src/balsa-mime-widget-text.c:631
+#: ../src/balsa-mime-widget-text.c:633
 msgid "Highlight structured phrases"
 msgstr "Підсвітити складені фрази"
 
-#: ../src/balsa-mime-widget-text.c:868
+#: ../src/balsa-mime-widget-text.c:870
 #, c-format
 msgid "Calling URL %s…"
 msgstr "Викликаємо адресу %s…"
 
-#: ../src/balsa-mime-widget-text.c:1112
+#: ../src/balsa-mime-widget-text.c:1114
 msgid "Zoom In"
 msgstr "Збільшити"
 
-#: ../src/balsa-mime-widget-text.c:1117
+#: ../src/balsa-mime-widget-text.c:1119
 msgid "Zoom Out"
 msgstr "Зменшити"
 
-#: ../src/balsa-mime-widget-text.c:1122
+#: ../src/balsa-mime-widget-text.c:1124
 msgid "Zoom 100%"
 msgstr "Масштаб 100%"
 
-#: ../src/balsa-mime-widget-text.c:1131 ../ui/main-window.ui.h:21
+#: ../src/balsa-mime-widget-text.c:1133 ../ui/main-window.ui.h:21
 #: ../ui/message-window.ui.h:7 ../ui/sendmsg-window.ui.h:19
 msgid "Select _All"
 msgstr "Вибрати _все"
 
-#: ../src/balsa-mime-widget-text.c:1154
+#: ../src/balsa-mime-widget-text.c:1156
 msgid "Print…"
 msgstr "Надрукувати…"
 
-#: ../src/balsa-mime-widget-text.c:1303
+#: ../src/balsa-mime-widget-text.c:1305
 msgid "S_tore Address"
 msgstr "З_берегти адресу"
 
-#: ../src/balsa-mime-widget-text.c:1309
+#: ../src/balsa-mime-widget-text.c:1311
 msgid "Full Name:"
 msgstr "Повне ім'я:"
 
-#: ../src/balsa-mime-widget-text.c:1310
+#: ../src/balsa-mime-widget-text.c:1312
 msgid "Nick Name:"
 msgstr "Псевдонім:"
 
-#: ../src/balsa-mime-widget-text.c:1311
+#: ../src/balsa-mime-widget-text.c:1313
 msgid "First Name:"
 msgstr "Ім'я:"
 
-#: ../src/balsa-mime-widget-text.c:1312
+#: ../src/balsa-mime-widget-text.c:1314
 msgid "Last Name:"
 msgstr "Прізвище:"
 
-#: ../src/balsa-mime-widget-text.c:1313
+#: ../src/balsa-mime-widget-text.c:1315
 msgid "Organization:"
 msgstr "Організація:"
 
-#: ../src/balsa-mime-widget-text.c:1314
+#: ../src/balsa-mime-widget-text.c:1316
 msgid "Email Address:"
 msgstr "Електронна адреса:"
 
-#: ../src/balsa-mime-widget-text.c:1342
+#: ../src/balsa-mime-widget-text.c:1344
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains 8-bit characters, but no "
@@ -5312,7 +5309,6 @@ msgid "Scanning of %s failed: %s"
 msgstr "Помилка сканування %s: %s"
 
 #: ../src/mailbox-node.c:967
-#| msgid "You can apply filters only on mailbox\n"
 msgid "You can apply filters only on mailbox"
 msgstr "Застосовувати фільтри модна лише на поштову скриньку"
 
@@ -5380,69 +5376,69 @@ msgstr "_Редагувати/Застосувати фільтри"
 msgid "The path “%s” does not lead to a mailbox."
 msgstr "Шлях «%s» не вказує на поштову скриньку."
 
-#: ../src/main.c:106 ../src/main.c:111 ../src/main.c:117 ../src/main.c:123
-#: ../src/main.c:129
+#: ../src/main.c:117 ../src/main.c:122 ../src/main.c:128 ../src/main.c:134
+#: ../src/main.c:140
 #, c-format
 msgid "Balsa cannot open your “%s” mailbox."
 msgstr "Balsa не вдалося відкрити вашу поштову скриньку «%s»."
 
-#: ../src/main.c:106
+#: ../src/main.c:117
 msgid "Inbox"
 msgstr "Вхідні"
 
-#: ../src/main.c:112
+#: ../src/main.c:123
 msgid "Outbox"
 msgstr "Вихідні"
 
-#: ../src/main.c:118
+#: ../src/main.c:129
 msgid "Sentbox"
 msgstr "Надіслані"
 
-#: ../src/main.c:124
+#: ../src/main.c:135
 msgid "Draftbox"
 msgstr "Чернетки"
 
-#: ../src/main.c:129
+#: ../src/main.c:140
 msgid "Trash"
 msgstr "Смітник"
 
-#: ../src/main.c:343
+#: ../src/main.c:354
 msgid "Compressing mail folders…"
 msgstr "Стискання поштової теки…"
 
-#: ../src/main.c:628
+#: ../src/main.c:644
 msgid "Get new mail on start-up"
 msgstr "Отримувати нову пошту при запуску"
 
-#: ../src/main.c:630
+#: ../src/main.c:646
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Скласти нове повідомлення до ЕЛПОШТА@АДРЕСА"
 
-#: ../src/main.c:632
+#: ../src/main.c:648
 msgid "Attach file at URI"
 msgstr "Долучити файл за вказаною адресою"
 
-#: ../src/main.c:634
+#: ../src/main.c:650
 msgid "Opens MAILBOXNAME"
 msgstr "Відкрити НАЗВА_ПОШТОВОЇ_СКРИНЬКИ"
 
-#: ../src/main.c:634
+#: ../src/main.c:650
 msgid "MAILBOXNAME"
 msgstr "НАЗВА_ПОШТОВОЇ_СКРИНЬКИ"
 
-#: ../src/main.c:636
+#: ../src/main.c:652
 msgid "Opens first unread mailbox"
 msgstr "Відкрити першу непрочитану поштову скриньку"
 
-#: ../src/main.c:638
+#: ../src/main.c:654
 msgid "Opens default Inbox on start-up"
 msgstr "Відкриває типову теку «Вхідні» після запуску"
 
-#: ../src/main.c:640
+#: ../src/main.c:656
 msgid "Prints number unread and unsent messages"
 msgstr "Виводить кількість непрочитаних та не відправлених повідомлень"
 
-#: ../src/main.c:642
+#: ../src/main.c:658
 msgid "Show version"
 msgstr "Показати версію"
 
@@ -5612,24 +5608,24 @@ msgstr "Пере_нос"
 msgid "Could not open trash: %s"
 msgstr "Не вдалося відкрити смітник: %s"
 
-#: ../src/main-window.c:4221
+#: ../src/main-window.c:4220
 #, c-format
 msgid "Balsa: %s (read-only)"
 msgstr "Balsa: %s (лише читання)"
 
-#: ../src/main-window.c:4223
+#: ../src/main-window.c:4222
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
 #. xgettext: this is the first part of the message
 #. * "Shown mailbox: %s with %d messages, %d new, %d hidden".
-#: ../src/main-window.c:4775
+#: ../src/main-window.c:4774
 #, c-format
 msgid "Shown mailbox: %s "
 msgstr "Показано поштову скриньку: %s "
 
-#: ../src/main-window.c:4780
+#: ../src/main-window.c:4779
 #, c-format
 msgid "with %d message"
 msgid_plural "with %d messages"
@@ -5638,7 +5634,7 @@ msgstr[1] "з %d повідомленнями"
 msgstr[2] "з %d повідомленнями"
 msgstr[3] "з одним повідомленням"
 
-#: ../src/main-window.c:4787
+#: ../src/main-window.c:4786
 #, c-format
 msgid ", %d new"
 msgid_plural ", %d new"
@@ -5647,7 +5643,7 @@ msgstr[1] ", %d нових"
 msgstr[2] ", %d нових"
 msgstr[3] ", одне нове"
 
-#: ../src/main-window.c:4794
+#: ../src/main-window.c:4793
 #, c-format
 msgid ", %d hidden"
 msgid_plural ", %d hidden"
@@ -5656,12 +5652,12 @@ msgstr[1] ", %d прихованих"
 msgstr[2] ", %d прихованих"
 msgstr[3] ", одне приховане"
 
-#: ../src/main-window.c:4839
+#: ../src/main-window.c:4838
 #, c-format
 msgid "The next unread message is in %s"
 msgstr "Наступне непрочитане повідомлення перебуває у %s"
 
-#: ../src/main-window.c:4846
+#: ../src/main-window.c:4845
 #, c-format
 msgid "Do you want to select %s?"
 msgstr "Хочете вибрати %s?"
@@ -5774,7 +5770,7 @@ msgid "Remote mailbox servers"
 msgstr "Віддалені сервери поштових скриньок"
 
 #: ../src/pref-manager.c:1969 ../src/pref-manager.c:2720
-#: ../src/sendmsg-window.c:2634
+#: ../src/sendmsg-window.c:2609
 msgid "Type"
 msgstr "Тип"
 
@@ -6638,7 +6634,7 @@ msgstr "Долучити як тип MIME:"
 msgid "Character set for file %s changed from “%s” to “%s”."
 msgstr "Набір символів для файла %s змінено з «%s» на «%s»."
 
-#: ../src/sendmsg-window.c:1632 ../src/sendmsg-window.c:5123
+#: ../src/sendmsg-window.c:1632 ../src/sendmsg-window.c:5121
 msgid "(no subject)"
 msgstr "(без теми)"
 
@@ -6668,12 +6664,12 @@ msgstr "Відкрити…"
 msgid "(URL)"
 msgstr "(Адреса)"
 
-#: ../src/sendmsg-window.c:1962
+#: ../src/sendmsg-window.c:1961
 msgid "Attach file"
 msgstr "Долучити файл"
 
-#: ../src/sendmsg-window.c:2074 ../src/sendmsg-window.c:2175
-#: ../src/sendmsg-window.c:7116
+#: ../src/sendmsg-window.c:2073 ../src/sendmsg-window.c:2149
+#: ../src/sendmsg-window.c:7114
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -6681,33 +6677,33 @@ msgstr ""
 "Помилка при долученні.\n"
 "Можлива причина: не вистачає простору для тимчасового файлу"
 
-#: ../src/sendmsg-window.c:2389
+#: ../src/sendmsg-window.c:2364
 msgid "F_rom:"
 msgstr "_Від:"
 
 #. Subject:
-#: ../src/sendmsg-window.c:2539
+#: ../src/sendmsg-window.c:2514
 msgid "S_ubject:"
 msgstr "_Тема:"
 
-#: ../src/sendmsg-window.c:2570
+#: ../src/sendmsg-window.c:2545
 msgid "F_CC:"
 msgstr "F_CC:"
 
 #. Attachment list
-#: ../src/sendmsg-window.c:2597
+#: ../src/sendmsg-window.c:2572
 msgid "_Attachments:"
 msgstr "До_лучення:"
 
-#: ../src/sendmsg-window.c:2641
+#: ../src/sendmsg-window.c:2616
 msgid "Mode"
 msgstr "Режим"
 
-#: ../src/sendmsg-window.c:2664
+#: ../src/sendmsg-window.c:2639
 msgid "Description"
 msgstr "Опис"
 
-#: ../src/sendmsg-window.c:2987
+#: ../src/sendmsg-window.c:2941
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Не вдалося зберегти долучення: %s"
@@ -6869,46 +6865,46 @@ msgid "Include file"
 msgstr "Включити файл"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4970
+#: ../src/sendmsg-window.c:4968
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Не вдалося завантажити файл заголовка Face %s: %s"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4973
+#: ../src/sendmsg-window.c:4971
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Не вдалося завантажити файл заголовка X-Face %s: %s"
 
-#: ../src/sendmsg-window.c:5083
+#: ../src/sendmsg-window.c:5081
 msgid "No Subject"
 msgstr "Без теми"
 
-#: ../src/sendmsg-window.c:5088
+#: ../src/sendmsg-window.c:5086
 msgid "_Send"
 msgstr "_Надіслати"
 
-#: ../src/sendmsg-window.c:5109
+#: ../src/sendmsg-window.c:5107
 msgid "You did not specify a subject for this message"
 msgstr "Ви не вказали тему цього повідомлення"
 
-#: ../src/sendmsg-window.c:5110
+#: ../src/sendmsg-window.c:5108
 msgid "If you would like to provide one, enter it below."
 msgstr "Якщо ви хочете вказати тему, введіть її нижче."
 
-#: ../src/sendmsg-window.c:5168
+#: ../src/sendmsg-window.c:5166
 msgid "Message could be encrypted"
 msgstr "Можливо, повідомлення зашифровано"
 
-#: ../src/sendmsg-window.c:5171
+#: ../src/sendmsg-window.c:5169
 msgid "Send _encrypted"
 msgstr "Надіслати за_шифрованим"
 
-#: ../src/sendmsg-window.c:5172
+#: ../src/sendmsg-window.c:5170
 msgid "Send _unencrypted"
 msgstr "Надіслати _без шифрування"
 
-#: ../src/sendmsg-window.c:5242 ../src/sendmsg-window.c:5330
+#: ../src/sendmsg-window.c:5240 ../src/sendmsg-window.c:5328
 #, c-format
 msgid ""
 "You did not select encryption for this message, although %s public keys are "
@@ -6919,12 +6915,12 @@ msgstr ""
 "відкриті ключі %s для усіх отримувачів. Щоб захистити вас, повідомлення може "
 "бути зашифровано %s."
 
-#: ../src/sendmsg-window.c:5317
+#: ../src/sendmsg-window.c:5315
 #, c-format
 msgid "error checking Autocrypt keys: %s"
 msgstr "помилка під час спроби перевірити ключі автоматичного шифрування: %s"
 
-#: ../src/sendmsg-window.c:5348
+#: ../src/sendmsg-window.c:5346
 msgid ""
 "\n"
 "However, encryption is discouraged as the Autocrypt status indicates that "
@@ -6935,7 +6931,7 @@ msgstr ""
 "шифрування вказує на те, що деякі з отримувачів, <i>можливо</i>, не зможуть "
 "прочитати повідомлення."
 
-#: ../src/sendmsg-window.c:5361
+#: ../src/sendmsg-window.c:5359
 #, c-format
 msgid ""
 "<i>Note:</i> choosing encryption will import %u key from the Autocrypt "
@@ -6956,16 +6952,16 @@ msgstr[3] ""
 "<i>Зауваження:</i> вибір шифрування призведе до імпортування одногоключа з "
 "бази даних автоматичного шифрування до зв'язки ключів GnuPG."
 
-#: ../src/sendmsg-window.c:5386
+#: ../src/sendmsg-window.c:5384
 #, c-format
 msgid "Cannot import Autocrypt keys: %s"
 msgstr "Не вдалося імпортувати ключі автоматичного шифрування: %s"
 
-#: ../src/sendmsg-window.c:5446
+#: ../src/sendmsg-window.c:5444
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "Ви вибрали для цього повідомлення режим захисту OpenPGP.\n"
 
-#: ../src/sendmsg-window.c:5451
+#: ../src/sendmsg-window.c:5449
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
@@ -6973,13 +6969,13 @@ msgstr ""
 "Текст повідомлення буде надіслано як звичайний текст і як HTML, але "
 "підписано буде лише частину повідомлення зі звичайним текстом.\n"
 
-#: ../src/sendmsg-window.c:5456
+#: ../src/sendmsg-window.c:5454
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr ""
 "Повідомлення містить долучення, які не може бути підписано або зашифровано.\n"
 
-#: ../src/sendmsg-window.c:5460
+#: ../src/sendmsg-window.c:5458
 msgid ""
 "You should select MIME mode if the complete message shall be protected. Do "
 "you really want to proceed?"
@@ -6987,36 +6983,36 @@ msgstr ""
 "Для захисту усього повідомлення слід вибрати режим MIME. Бажаєте "
 "продовжувати?"
 
-#: ../src/sendmsg-window.c:5483
+#: ../src/sendmsg-window.c:5481
 #, c-format
 msgid "sending message with GPG mode %d"
 msgstr "надсилання повідомлення у режимі GPG %d"
 
-#: ../src/sendmsg-window.c:5513
+#: ../src/sendmsg-window.c:5511
 msgid "Message could not be created"
 msgstr "Повідомлення не можу бути створене."
 
-#: ../src/sendmsg-window.c:5515
+#: ../src/sendmsg-window.c:5513
 msgid "Message could not be queued in outbox"
 msgstr "Повідомлення не можу бути долучено до теки Вихідні"
 
-#: ../src/sendmsg-window.c:5517
+#: ../src/sendmsg-window.c:5515
 msgid "Message could not be saved in sentbox"
 msgstr "Повідомлення не можу бути збережене у теці Надіслані"
 
-#: ../src/sendmsg-window.c:5519
+#: ../src/sendmsg-window.c:5517
 msgid "Message could not be sent"
 msgstr "Повідомлення не можу бути надіслане"
 
-#: ../src/sendmsg-window.c:5521
+#: ../src/sendmsg-window.c:5519
 msgid "Message could not be signed"
 msgstr "Не вдалося підписати повідомлення"
 
-#: ../src/sendmsg-window.c:5523
+#: ../src/sendmsg-window.c:5521
 msgid "Message could not be encrypted"
 msgstr "Не вдалося зашифрувати повідомлення"
 
-#: ../src/sendmsg-window.c:5528
+#: ../src/sendmsg-window.c:5526
 #, c-format
 msgid ""
 "Send failed: %s\n"
@@ -7025,45 +7021,45 @@ msgstr ""
 "Помилка надсилання: %s\n"
 "%s"
 
-#: ../src/sendmsg-window.c:5534
+#: ../src/sendmsg-window.c:5532
 #, c-format
 msgid "Send failed: %s"
 msgstr "Помилка надсилання: %s"
 
-#: ../src/sendmsg-window.c:5633
+#: ../src/sendmsg-window.c:5631
 #, c-format
 msgid "Could not postpone message: %s"
 msgstr "Не вдалося відкласти повідомлення: %s"
 
-#: ../src/sendmsg-window.c:5654
+#: ../src/sendmsg-window.c:5652
 msgid "Message postponed."
 msgstr "Повідомленні відстрочене."
 
-#: ../src/sendmsg-window.c:5659
+#: ../src/sendmsg-window.c:5657
 msgid "Could not postpone message."
 msgstr "Не вдалося відстрочити повідомлення."
 
-#: ../src/sendmsg-window.c:5871
+#: ../src/sendmsg-window.c:5869
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Помилка під час спроби запустити перевірку правопису: %s"
 
-#: ../src/sendmsg-window.c:6634
+#: ../src/sendmsg-window.c:6632
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Відповідь до %s: %s"
 
-#: ../src/sendmsg-window.c:6639
+#: ../src/sendmsg-window.c:6637
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Переслане повідомлення до %s: %s"
 
-#: ../src/sendmsg-window.c:6643
+#: ../src/sendmsg-window.c:6641
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Нове повідомлення до %s: %s"
 
-#: ../src/sendmsg-window.c:6807 ../ui/sendmsg-window.ui.h:33
+#: ../src/sendmsg-window.c:6805 ../ui/sendmsg-window.ui.h:33
 msgid "_Language"
 msgstr "_Мова"
 
@@ -7953,37 +7949,3 @@ msgstr "Долучити _відкритий ключ GnuPG"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Екранувати спеціальні символи"
-
-#~ msgid "libbalsa_mailbox_get_message: mailbox %s is closed"
-#~ msgstr "libbalsa_mailbox_get_message: поштову скриньку %s закрито"
-
-#~ msgid "%s: Opening %s Refcount: %d\n"
-#~ msgstr "%s: Відкривається %s Посилань: %d\n"
-
-#~ msgid ""
-#~ "IMAP SEARCH command failed for mailbox %s\n"
-#~ "falling back to default searching method"
-#~ msgstr ""
-#~ "Помилка виконання команди IMAP SEARCH для поштової скриньки %s\n"
-#~ "переключено на типовий метод пошуку"
-
-#~ msgid "Cache file for mailbox %s will be created"
-#~ msgstr "Файл кешу для поштової скриньки %s буде створено"
-
-#~ msgid "Failed to find mailbox"
-#~ msgstr "Не вдалося знайти поштову скриньку"
-
-#~ msgid "Detected a good signature"
-#~ msgstr "Виявлено якісний підпис"
-
-#~ msgid "Local mailbox %s loaded as: %s\n"
-#~ msgstr "Локальна скринька %s завантажена як: %s\n"
-
-#~ msgid "Local folder %s\n"
-#~ msgstr "Локальна тека %s\n"
-
-#~ msgid "Debug"
-#~ msgstr "Налагодження"
-
-#~ msgid "Unknown toolbar icon “%s”"
-#~ msgstr "Невідома піктограма панелі інструментів «%s»"

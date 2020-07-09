@@ -406,6 +406,10 @@ tokenize_subject(const gchar *subject,
 				}
 				libbalsa_utf8_sanitize(&result[n + 1], TRUE, NULL);
 			}
+
+			if ((result[n] != NULL) && (result[n + 1] == NULL)) {
+				libbalsa_utf8_sanitize(&result[n], TRUE, NULL);
+			}
 		}
 	}
 

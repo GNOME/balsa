@@ -50,6 +50,8 @@
 /* stuff to get a key fingerprint from a selection list */
 enum {
     GPG_KEY_USER_ID_COLUMN = 0,
+    GPG_KEY_BITS_COLUMN,
+    GPG_KEY_CREATED_COLUMN,
     GPG_KEY_PTR_COLUMN,
     GPG_KEY_NUM_COLUMNS
 };
@@ -231,6 +233,8 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
 
     model = gtk_list_store_new(GPG_KEY_NUM_COLUMNS, G_TYPE_STRING,	/* user ID */
+			       G_TYPE_STRING,	/* key bits */
+			       G_TYPE_STRING,	/* creation date */
 			       G_TYPE_POINTER);	/* key */
     sortable = GTK_TREE_SORTABLE(model);
     gtk_tree_sortable_set_sort_func(sortable, 0, sort_iter_cmp_fn, NULL, NULL);
@@ -249,15 +253,23 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     	gpgme_key_t key = (gpgme_key_t) keys->data;
 
     	/* simply add the primary uid -- the user can show the full key details */
-    	if ((key->uids != NULL) && (key->uids->uid != NULL)) {
+    	if ((key->uids != NULL) && (key->uids->uid != NULL) && (key->subkeys != NULL)) {
     		gchar *uid_info;
+    		gchar *bits;
+    		gchar *created;
 
     		uid_info = libbalsa_cert_subject_readable(key->uids->uid);
+    		bits = g_strdup_printf("%u", key->subkeys->length);
+    		created = libbalsa_date_to_utf8(key->subkeys->timestamp, "%x %X");
     		gtk_list_store_append(model, &iter);
     		gtk_list_store_set(model, &iter,
     			GPG_KEY_USER_ID_COLUMN, uid_info,
+				GPG_KEY_BITS_COLUMN, bits,
+				GPG_KEY_CREATED_COLUMN, created,
 				GPG_KEY_PTR_COLUMN, key, -1);
     		g_free(uid_info);
+    		g_free(bits);
+    		g_free(created);
     	}
     	keys = g_list_next(keys);
     }
@@ -265,12 +277,25 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     g_object_unref(model);
 
 	renderer = gtk_cell_renderer_text_new();
-	column =
-	    gtk_tree_view_column_new_with_attributes(_("User ID"),
-						     renderer, "text", 0,
-						     NULL);
+	column = gtk_tree_view_column_new_with_attributes(_("User ID"), renderer,
+		"text", GPG_KEY_USER_ID_COLUMN, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 	gtk_tree_view_column_set_resizable(column, TRUE);
+
+	renderer = gtk_cell_renderer_text_new();
+    g_object_set(renderer, "xalign", 1.0, NULL);
+	column = gtk_tree_view_column_new_with_attributes(_("Size"), renderer,
+		"text", GPG_KEY_BITS_COLUMN, NULL);
+    gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+	gtk_tree_view_column_set_resizable(column, FALSE);
+
+	renderer = gtk_cell_renderer_text_new();
+	column = gtk_tree_view_column_new_with_attributes(_("Created"), renderer,
+		"text", GPG_KEY_CREATED_COLUMN, NULL);
+    gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_FIXED);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+	gtk_tree_view_column_set_resizable(column, FALSE);
 
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
     g_signal_connect(tree_view, "row-activated", G_CALLBACK(row_activated_cb), dialog);

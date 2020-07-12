@@ -670,7 +670,7 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
 {
     GSimpleActionGroup *simple;
     static const GActionEntry entries[] = {
-        {"set-style", libbalsa_radio_activated, "i", "-1", tm_set_style_changed},
+        {"set-style", NULL, "i", "-1", tm_set_style_changed},
         {"customize", tm_customize_activated}
     };
     GAction *set_style_action;

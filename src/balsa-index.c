@@ -2117,7 +2117,7 @@ bndx_popup_menu_create(BalsaIndex * bindex)
     /* Toggle items */
     submenu = g_menu_new();
 
-    g_menu_append(submenu, _("_Flagged"), "toggle-lagged");
+    g_menu_append(submenu, _("_Flagged"), "toggle-flagged");
     g_menu_append(submenu, _("_Unread"),  "toggle-unread");
 
     g_menu_append_submenu(menu, _("T_oggle"), G_MENU_MODEL(submenu));

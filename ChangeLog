@@ -1,3 +1,22 @@
+2020-07-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Drop libbalsa_{radio,toggle}_activated
+
+	https://developer.gnome.org/gio/stable/GActionMap.html#GActionEntry:
+	Since GLib 2.40, [activate] can be NULL for stateful actions,
+	in which case the default handler is used. For boolean-stated
+	actions with no parameter, this is a toggle. For other state
+	types (and parameter type equal to the state type) this will be a
+	function that just calls change_state…
+
+	* libbalsa/application-helpers.c (libbalsa_window_add_accelerator):
+	* libbalsa/application-helpers.h:
+	* libbalsa/source-viewer.c (libbalsa_show_message_source):
+	* src/ab-main.c (get_main_menu):
+	* src/main-window.c:
+	* src/message-window.c:
+	* src/sendmsg-window.c:
+
 2020-07-05  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	body: If a part with content-type "message/external-body" has

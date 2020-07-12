@@ -152,12 +152,11 @@ lsv_escape_change_state(GSimpleAction * action,
     g_simple_action_set_state(action, state);
 }
 
-static GActionEntry win_entries[] = {
-    {"lsv-close",  lsv_close_activated},
-    {"lsv-copy",   lsv_copy_activated},
-    {"lsv-select", lsv_select_activated},
-    {"lsv-escape", libbalsa_toggle_activated, NULL, "false",
-        lsv_escape_change_state}
+static GActionEntry entries[] = {
+    {"close",  lsv_close_activated},
+    {"copy",   lsv_copy_activated},
+    {"select", lsv_select_activated},
+    {"escape", NULL, NULL, "false", lsv_escape_change_state}
 };
 
 static void
@@ -222,8 +221,8 @@ libbalsa_show_message_source(GtkApplication  * application,
     geometry_manager_attach(GTK_WINDOW(window), "SourceView");
 
     menu_bar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
-                                            win_entries,
-                                            G_N_ELEMENTS(win_entries),
+                                            entries,
+                                            G_N_ELEMENTS(entries),
                                             resource_path, &err, window);
     if (!menu_bar) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -253,8 +252,7 @@ libbalsa_show_message_source(GtkApplication  * application,
 
     gtk_widget_show_all(window);
 
-    escape_action =
-        g_action_map_lookup_action(G_ACTION_MAP(window), "lsv-escape");
+    escape_action = g_action_map_lookup_action(G_ACTION_MAP(window), "escape");
     lsv_escape_change_state(G_SIMPLE_ACTION(escape_action),
                             g_variant_new_boolean(*escape_specials),
                             window);

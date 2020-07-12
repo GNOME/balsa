@@ -571,8 +571,7 @@ get_main_menu(GtkApplication * application)
         {"entry-new",           entry_new_activated},
         {"entry-delete",        entry_delete_activated},
         {"help-about",          help_about_activated},
-        {"address-book",        libbalsa_radio_activated, "s", "''",
-            address_book_change_state},
+        {"address-book",        NULL, "s", "''", address_book_change_state},
     };
     GtkBuilder *builder;
     const gchar resource_path[] = "/org/desktop/BalsaAb/ab-main.ui";

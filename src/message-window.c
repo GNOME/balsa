@@ -770,12 +770,9 @@ static GActionEntry win_entries[] = {
     {"close",                 mw_close_activated},
     {"select-all",            mw_select_text_activated},
     {"find-in-message",       mw_find_in_message_activated},
-    {"show-toolbar",          libbalsa_toggle_activated, NULL, "false",
-                              mw_show_toolbar_change_state},
-    {"wrap",                  libbalsa_toggle_activated, NULL, "false",
-                              mw_wrap_change_state},
-    {"headers",               libbalsa_radio_activated, "s", "'none'",
-                              mw_header_change_state},
+    {"show-toolbar",          NULL, NULL, "false", mw_show_toolbar_change_state},
+    {"wrap",                  NULL, NULL, "false", mw_wrap_change_state},
+    {"headers",               NULL, "s", "'none'", mw_header_change_state},
 #ifdef HAVE_HTML_WIDGET
     {"zoom-in",               mw_zoom_in_activated},
     {"zoom-out",              mw_zoom_out_activated},
@@ -798,8 +795,7 @@ static GActionEntry win_entries[] = {
     {"select-text",           mw_select_text_activated},
     {"move-to-trash",         mw_move_to_trash_activated},
     /* Only a toolbar button: */
-    {"show-all-headers",      libbalsa_toggle_activated, NULL, "false",
-                              mw_show_all_headers_change_state}
+    {"show-all-headers",      NULL, NULL, "false", mw_show_all_headers_change_state}
 };
 
 void

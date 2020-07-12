@@ -849,10 +849,8 @@ balsa_message_add_actions(BalsaMessage *balsa_message,
     static const GActionEntry entries[] = {
         {"save-selected",           save_selected_activated},
         {"save-selected-to-folder", save_selected_to_folder_activated},
-        {"toggle-all-inline",       libbalsa_toggle_activated, NULL, "false",
-                                    toggle_all_inline_change_state},
-        {"show-part",               libbalsa_radio_activated, "s", "''",
-                                    show_part_change_state},
+        {"toggle-all-inline",       NULL, NULL, "false", toggle_all_inline_change_state},
+        {"show-part",               NULL, "s", "''", show_part_change_state},
     };
 
     simple = g_simple_action_group_new();

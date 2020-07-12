@@ -1652,7 +1652,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     gchar *content_desc;
     GSimpleActionGroup *simple;
     static GActionEntry attachment_entries[] = {
-        {"new-mode", libbalsa_radio_activated, "i", "1", change_attach_mode},
+        {"new-mode", NULL, "i", "1", change_attach_mode},
         {"remove", remove_attachment}
     };
     GMenu *menu;
@@ -4150,7 +4150,7 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
 {
     GSimpleActionGroup *simple;
     static const GActionEntry entries[] = {
-        {"set", libbalsa_radio_activated, "s", "''", sw_set_language_change_state}
+        {"set", NULL, "s", "''", sw_set_language_change_state}
     };
     guint i;
     GtkWidget *langs;

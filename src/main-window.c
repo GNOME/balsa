@@ -215,11 +215,7 @@ struct _BalsaWindowPrivate {
     guint activity_counter;
     GSList *activity_messages;
 
-#ifdef HAVE_NOTIFY
-    NotifyNotification *new_mail_note;
-#else                          /* HAVE_NOTIFY */
     gboolean new_mail_notification_sent;
-#endif                         /* HAVE_NOTIFY */
 
     /* Support GNetworkMonitor: */
     gboolean network_available;
@@ -3544,22 +3540,36 @@ bw_check_messages_thread(struct check_messages_thread_info *info)
 }
 
 
-/** Returns properly formatted string informing the user about the
-    amount of the new mail.
-    @param num_new if larger than zero informs that the total number
-    of messages is known and trusted.
-    @param num_total says how many actually new messages are in the
-    mailbox.
-*/
-static gchar*
-bw_get_new_message_notification_string(int num_new, int num_total)
+/* note: see https://gitlab.gnome.org/GNOME/balsa/-/issues/39 for the reason of the implementation */
+typedef struct {
+	GNotification *notification;
+	GApplication *application;
+	guint timeout_id;
+	gint num_new;
+	gint num_total;
+} notify_ctx_t;
+
+
+static gboolean
+bw_display_new_mail_notification_real(notify_ctx_t *ctx)
 {
-    return num_new > 0 ?
-	g_strdup_printf(ngettext("You have received %d new message.",
-				 "You have received %d new messages.",
-				 num_total), num_total) :
-	g_strdup(_("You have new mail."));
+	gchar *msg;
+
+	if (ctx->num_new > 0) {
+		msg = g_strdup_printf(ngettext("You have received %d new message.",
+			 	 	 	 	 	 	   "You have received %d new messages.",
+									   ctx-> num_total),
+			ctx->num_total);
+	} else {
+		msg = g_strdup(_("You have new mail."));
+	}
+    g_notification_set_body(ctx->notification, msg);
+    g_free(msg);
+    g_application_send_notification(ctx->application, NEW_MAIL_NOTIFICATION, ctx->notification);
+    ctx->timeout_id = 0U;
+	return FALSE;
 }
+
 
 /** Informs the user that new mail arrived. num_new is the number of
     the recently arrived messsages.
@@ -3567,49 +3577,62 @@ bw_get_new_message_notification_string(int num_new, int num_total)
 static void
 bw_display_new_mail_notification(int num_new, int has_new)
 {
+	static notify_ctx_t notify_ctx;
     GtkWindow *window = GTK_WINDOW(balsa_app.main_window);
     BalsaWindowPrivate *priv =
         balsa_window_get_instance_private(balsa_app.main_window);
-    static gint num_total = 0;
-    gchar *msg = NULL;
-    static GNotification *notification;
-    GtkApplication *application;
+
+    /* remove a running notification timeout task */
+    if (notify_ctx.timeout_id > 0U) {
+    	g_source_remove(notify_ctx.timeout_id);
+    	notify_ctx.timeout_id = 0U;
+    }
 
     if (!balsa_app.notify_new_mail_dialog)
         return;
 
     if (gtk_window_is_active(window))
         return;
-    else
-        gtk_window_set_urgency_hint(window, TRUE);
 
-    if (g_once_init_enter(&notification)) {
+    gtk_window_set_urgency_hint(window, TRUE);
+
+    if (g_once_init_enter(&notify_ctx.notification)) {
+    	gchar *balsa_icon;
         GNotification *tmp;
-        GIcon *icon;
+        GIcon *icon = NULL;
 
         tmp = g_notification_new("Balsa");
-        icon = g_themed_icon_new("dialog-information");
+        balsa_icon = balsa_pixmap_finder("balsa_icon.png");
+        if (balsa_icon != NULL) {
+        	GFile * icon_file;
+
+        	icon_file = g_file_new_for_path(balsa_icon);
+        	g_free(balsa_icon);
+        	icon = g_file_icon_new(icon_file);
+        	g_object_unref(icon_file);
+        }
+
+        if (icon == NULL) {
+        	icon = g_themed_icon_new("dialog-information");
+        }
+
         g_notification_set_icon(tmp, icon);
         g_object_unref(icon);
-        g_once_init_leave(&notification, tmp);
+        notify_ctx.application = G_APPLICATION(gtk_window_get_application(window));
+        g_once_init_leave(&notify_ctx.notification, tmp);
     }
 
     if (priv->new_mail_notification_sent) {
         /* the user didn't acknowledge the last info, so we'll
          * accumulate the count */
-        num_total += num_new;
+    	notify_ctx.num_total += num_new;
     } else {
-        num_total = num_new;
+    	notify_ctx.num_total = num_new;
         priv->new_mail_notification_sent = TRUE;
     }
+    notify_ctx.num_new = num_new;
 
-    msg = bw_get_new_message_notification_string(num_new, num_total);
-    g_notification_set_body(notification, msg);
-    g_free(msg);
-
-    application = gtk_window_get_application(window);
-    g_application_send_notification(G_APPLICATION(application),
-                                    NEW_MAIL_NOTIFICATION, notification);
+    notify_ctx.timeout_id = g_timeout_add(500, (GSourceFunc) bw_display_new_mail_notification_real, &notify_ctx);
 }
 
 /*Callback to create or disconnect an IMAP mbox. */

@@ -302,9 +302,9 @@ bi_apply_other_column_settings(GtkTreeViewColumn *column,
 #endif
 }
 
-/* Width of a string in pixels for the default font. */
-static gint
-bndx_string_width(const gchar * text)
+/* Height and width of a string in pixels for the default font. */
+static GtkAllocation
+bndx_string_extent(const gchar * text)
 {
     GtkWidget *label;
     GtkWidget *window;
@@ -320,7 +320,7 @@ bndx_string_width(const gchar * text)
     gtk_widget_get_allocation(window, &allocation);
     gtk_widget_destroy(window);
 
-    return allocation.width;
+    return allocation;
 }
 
 /* BalsaIndex instance init method; no tree store is set on the tree
@@ -333,13 +333,28 @@ balsa_index_init(BalsaIndex * index)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkGesture *gesture;
+    gint height;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
     gtk_tree_view_set_fixed_height_mode(tree_view, TRUE);
+
+    /* hack: calculate the fixed cell renderer height as to work around the automatic calculation being confused by bold and/or
+     * italics: round to 1.25 times the height of a utf8 char with ascender and descender; be sure to fit the Menu size icon */
+    height = (gint) (bndx_string_extent("<b>▓</b>").height * 1.25F + 0.5F);
+    {
+    	gint icon_height;
+
+    	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, NULL, &icon_height);
+    	height = MAX(height, icon_height);
+    }
+    g_debug("%s: force cell height %d", __func__, height);
+#else
+    height = -1:		/* automatic calculation */
 #endif
 
     /* Index column */
     renderer = gtk_cell_renderer_text_new();
+    gtk_cell_renderer_set_fixed_size(renderer, -1, height);
     column = gtk_tree_view_column_new_with_attributes
         ("#", renderer,
          "text",           LB_MBOX_MSGNO_COL,
@@ -354,6 +369,7 @@ balsa_index_init(BalsaIndex * index)
 
     /* Status icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
+    gtk_cell_renderer_set_fixed_size(renderer, -1, height);
     column = gtk_tree_view_column_new_with_attributes
         ("S", renderer,
          "pixbuf",              LB_MBOX_MARKED_COL,
@@ -365,6 +381,7 @@ balsa_index_init(BalsaIndex * index)
 
     /* Attachment icon column */
     renderer = gtk_cell_renderer_pixbuf_new();
+    gtk_cell_renderer_set_fixed_size(renderer, -1, height);
     column = gtk_tree_view_column_new_with_attributes
         ("A", renderer,
          "pixbuf",              LB_MBOX_ATTACH_COL,
@@ -376,6 +393,7 @@ balsa_index_init(BalsaIndex * index)
 
     /* From/To column */
     renderer = gtk_cell_renderer_text_new();
+    gtk_cell_renderer_set_fixed_size(renderer, -1, height);
     column = gtk_tree_view_column_new_with_attributes
         (_("From"), renderer,
          "text",           LB_MBOX_FROM_COL,
@@ -392,6 +410,7 @@ balsa_index_init(BalsaIndex * index)
 
     /* Subject column--contains tree expanders */
     renderer = gtk_cell_renderer_text_new();
+    gtk_cell_renderer_set_fixed_size(renderer, -1, height);
     column = gtk_tree_view_column_new_with_attributes
         (_("Subject"), renderer,
          "text",           LB_MBOX_SUBJECT_COL,
@@ -409,6 +428,7 @@ balsa_index_init(BalsaIndex * index)
 
     /* Date column */
     renderer = gtk_cell_renderer_text_new();
+    gtk_cell_renderer_set_fixed_size(renderer, -1, height);
     column = gtk_tree_view_column_new_with_attributes
         (_("Date"), renderer,
          "text",           LB_MBOX_DATE_COL,
@@ -430,8 +450,7 @@ balsa_index_init(BalsaIndex * index)
     g_object_set(renderer, "xalign", 1.0, NULL);
     /* get a better guess: */
     gtk_cell_renderer_set_fixed_size(renderer,
-                                     bndx_string_width("<b>99.9M</b>"),
-                                     -1);
+    	bndx_string_extent("<b>99.9M</b>").width, height);
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes
         (column, renderer,
@@ -1362,7 +1381,7 @@ balsa_index_set_column_widths(BalsaIndex * index)
     /* so that fixed width works properly */
     gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
                                          (tree_view, LB_MBOX_MSGNO_COL),
-                                         bndx_string_width("00000"));
+										 bndx_string_extent("00000").width);
 #endif
     /* I have no idea why we must add 5 pixels to the icon width - otherwise,
        the icon will be clipped... */

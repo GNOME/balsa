@@ -6,7 +6,7 @@
         <item>
           <attribute name="label"
             translatable="yes">_Close</attribute>
-          <attribute name="action">win.lsv-close</attribute>
+          <attribute name="action">win.close</attribute>
           <attribute name="accel">&lt;Primary&gt;w</attribute>
         </item>
       </section>
@@ -17,7 +17,7 @@
         <item>
           <attribute name="label"
             translatable="yes">_Copy</attribute>
-          <attribute name="action">win.lsv-copy</attribute>
+          <attribute name="action">win.copy</attribute>
           <attribute name="accel">&lt;Primary&gt;c</attribute>
         </item>
       </section>
@@ -25,7 +25,7 @@
         <item>
           <attribute name="label"
             translatable="yes">_Select Text</attribute>
-          <attribute name="action">win.lsv-select</attribute>
+          <attribute name="action">win.select</attribute>
           <attribute name="accel">&lt;Primary&gt;a</attribute>
         </item>
       </section>
@@ -36,7 +36,7 @@
         <item>
           <attribute name="label"
             translatable="yes">_Escape Special Characters</attribute>
-          <attribute name="action">win.lsv-escape</attribute>
+          <attribute name="action">win.escape</attribute>
         </item>
       </section>
     </submenu>

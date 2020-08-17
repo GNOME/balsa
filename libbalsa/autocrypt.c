@@ -485,7 +485,6 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     gtk_widget_set_vexpand(vbox, TRUE);
     label = gtk_label_new(_("Double-click key to show details"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_widget_set_valign(label, GTK_ALIGN_FILL);
     gtk_container_add(GTK_CONTAINER(vbox), label);
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);

@@ -2305,7 +2305,8 @@ balsa_get_parent_window(GtkWidget * widget)
 gboolean
 balsa_message_can_select(BalsaMessage * balsa_message)
 {
-    GtkWidget *w;
+    BalsaMimeWidget *mime_widget;
+    GtkWidget *widget;
 
     g_return_val_if_fail(balsa_message != NULL, FALSE);
 
@@ -2313,10 +2314,12 @@ balsa_message_can_select(BalsaMessage * balsa_message)
         || balsa_message->current_part->mime_widget == NULL)
         return FALSE;
 
-    w = GTK_WIDGET(balsa_message->current_part->mime_widget);
-    return GTK_IS_EDITABLE(w) || GTK_IS_TEXT_VIEW(w)
+    mime_widget = balsa_message->current_part->mime_widget;
+    widget = balsa_mime_widget_text_get_text_widget(BALSA_MIME_WIDGET_TEXT(mime_widget));
+
+    return GTK_IS_EDITABLE(widget) || GTK_IS_TEXT_VIEW(widget)
 #ifdef    HAVE_HTML_WIDGET
-        || libbalsa_html_can_select(w)
+        || libbalsa_html_can_select(widget)
 #endif /* HAVE_HTML_WIDGET */
         ;
 }

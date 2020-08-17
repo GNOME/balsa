@@ -1,3 +1,14 @@
+2020-08-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-message: Restore text copy
+
+	Edit:Copy has been broken for a while, because
+	BalsaMimeWidgetText is now a container, not the actual text
+	widget.
+
+	* src/balsa-message.c (balsa_message_can_select): Check the
+	mime-widget's text-widget, not the mime-widget itself.
+
 2020-07-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Various: Drop libbalsa_{radio,toggle}_activated

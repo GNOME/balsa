@@ -2308,13 +2308,15 @@ balsa_message_can_select(BalsaMessage * balsa_message)
     BalsaMimeWidget *mime_widget;
     GtkWidget *widget;
 
-    g_return_val_if_fail(balsa_message != NULL, FALSE);
+    g_return_val_if_fail(BALSA_IS_MESSAGE(balsa_message), FALSE);
 
-    if (balsa_message->current_part == NULL
-        || balsa_message->current_part->mime_widget == NULL)
+    if (balsa_message->current_part == NULL)
         return FALSE;
 
     mime_widget = balsa_message->current_part->mime_widget;
+    if (!BALSA_IS_MIME_WIDGET_TEXT(mime_widget))
+        return FALSE;
+
     widget = balsa_mime_widget_text_get_text_widget(BALSA_MIME_WIDGET_TEXT(mime_widget));
 
     return GTK_IS_EDITABLE(widget) || GTK_IS_TEXT_VIEW(widget)

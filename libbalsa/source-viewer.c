@@ -236,7 +236,6 @@ libbalsa_show_message_source(GtkApplication  * application,
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu(window, GTK_MENU_SHELL(menu_bar));
 #else
-    gtk_widget_set_valign(menu_bar, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(menu_bar, 1);
     gtk_widget_set_margin_bottom(menu_bar, 1);
     gtk_box_pack_start(GTK_BOX(vbox), menu_bar, FALSE, FALSE, 0);

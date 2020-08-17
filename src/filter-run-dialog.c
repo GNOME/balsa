@@ -380,7 +380,9 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
                              G_CALLBACK(fr_remove_pressed), p);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
-    gtk_box_pack_start(GTK_BOX(hbox),bbox, FALSE, FALSE, 6);
+    gtk_widget_set_margin_start(bbox, 6);
+    gtk_widget_set_margin_end(bbox, 6);
+    gtk_box_pack_start(GTK_BOX(hbox), bbox, FALSE, FALSE, 0);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
 

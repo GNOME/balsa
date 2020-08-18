@@ -744,9 +744,6 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
 	if (*new_name != '\0') {
 	    names = g_strsplit(new_name, " ", 0);
 
-	    for (cnt=0; names[cnt]; cnt++)
-		;
-
 	    /* get first name */
 	    first_name = g_strdup(address->first_name
                                   ? address->first_name : names[0]);
@@ -755,10 +752,11 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
             if(address->last_name != NULL)
                 last_name = g_strdup(address->last_name);
             else {
-                if (cnt == 1)
+                guint n_names = g_strv_length(names);
+                if (n_names == 1)
                     last_name = g_strdup("");
                 else
-                    last_name = g_strdup(names[cnt - 1]);
+                    last_name = g_strdup(names[n_names - 1]);
             }
 	    g_strfreev(names);
 	}

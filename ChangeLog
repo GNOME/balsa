@@ -1,3 +1,17 @@
+2020-08-20  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Fix some more mailbox-opening issues
+
+	* libbalsa/mailbox.c (libbalsa_mailbox_get_has_sort_pending):
+	  new function;
+	* libbalsa/mailbox.h: declare it;
+	* src/balsa-index.c (bndx_scroll_on_open_idle): use it;
+	* src/main-window.c (bw_real_open_mbnode_idle_cb): show the
+	  BalsaIndex widget here, instead of in the scroll-on-open idle
+	  handler
+	(balsa_window_next_unread): balsa_index_select_next_unread()
+	  finds the next unread message even if it is hidden.
+
 2020-08-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-message: Restore text copy

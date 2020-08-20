@@ -2895,6 +2895,7 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
 
     /* scroll may select the message and GtkTreeView does not like selecting
      * without being shown first. */
+    gtk_widget_show(GTK_WIDGET(index));
     balsa_index_scroll_on_open(index);
 
     g_ptr_array_remove_fast(priv->open_mbnode_info_array, info);
@@ -4819,12 +4820,8 @@ balsa_window_next_unread(BalsaWindow * window)
     LibBalsaMailbox *mailbox = index ? balsa_index_get_mailbox(index): NULL;
 
     if (libbalsa_mailbox_get_unread(mailbox) > 0) {
-        if (!balsa_index_select_next_unread(index)) {
-            /* All unread messages must be hidden; we assume that the
-             * user wants to see them, and try again. */
-            bw_reset_filter(window);
-            balsa_index_select_next_unread(index);
-        }
+        balsa_index_select_next_unread(index);
+
         return FALSE;
     }
 

@@ -4929,6 +4929,16 @@ libbalsa_mailbox_get_messages_threaded(LibBalsaMailbox * mailbox)
     return priv->messages_threaded != 0;
 }
 
+gboolean
+libbalsa_mailbox_get_has_sort_pending(LibBalsaMailbox * mailbox)
+{
+    LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
+
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+
+    return priv->sort_idle_id != 0;
+}
+
 /*
  * Setters
  */

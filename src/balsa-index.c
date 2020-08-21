@@ -2724,23 +2724,28 @@ balsa_index_pipe(BalsaIndex * index)
  * filter, even though the view does contain messages.  We prefer to
  * scroll to either the current message. If this one is unavailable -
  * to the last message in the view, if any. */
-void
-balsa_index_ensure_visible(BalsaIndex * index)
+static gboolean
+bndx_ensure_visible_idle(gpointer user_data)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    GdkRectangle rect;
+    BalsaIndex *bindex = user_data;
+    GtkTreeView *tree_view = GTK_TREE_VIEW(bindex);
+    GtkTreeModel *model;
     GtkTreePath *path = NULL;
 
-    if (!gtk_widget_get_window(GTK_WIDGET(tree_view)))
-        return;
+    model = gtk_tree_view_get_model(tree_view);
 
-    if (!bndx_find_current_msgno(index, &path, NULL)) {
+    if (libbalsa_mailbox_get_has_sort_pending(LIBBALSA_MAILBOX(model)))
+        return G_SOURCE_CONTINUE;
+
+    if (!bndx_find_current_msgno(bindex, &path, NULL)) {
         /* Current message not displayed, make sure that something
            else is... */
         /* Was the cursor set? */
         gtk_tree_view_get_cursor(tree_view, &path, NULL);
         if (path == NULL) {
             /* No */
+            GdkRectangle rect;
+
             gtk_tree_view_get_visible_rect(tree_view, &rect);
             gtk_tree_view_convert_tree_to_widget_coords(tree_view,
                                                         rect.x, rect.y,
@@ -2753,10 +2758,8 @@ balsa_index_ensure_visible(BalsaIndex * index)
                 path = NULL;
             } else {
                 /* Scroll to the last message. */
-                GtkTreeModel *model;
                 gint n_children;
 
-                model = gtk_tree_view_get_model(tree_view);
                 n_children = gtk_tree_model_iter_n_children(model, NULL);
 
                 if (n_children > 0)
@@ -2769,6 +2772,18 @@ balsa_index_ensure_visible(BalsaIndex * index)
         gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
         gtk_tree_path_free(path);
     }
+
+    g_object_unref(bindex);
+
+    return G_SOURCE_REMOVE;
+}
+
+void
+balsa_index_ensure_visible(BalsaIndex * bindex)
+{
+    g_return_if_fail(BALSA_IS_INDEX(bindex));
+
+    g_idle_add_full(G_PRIORITY_LOW, bndx_ensure_visible_idle, g_object_ref(bindex), NULL);
 }
 
 void

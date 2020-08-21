@@ -623,7 +623,7 @@ gboolean libbalsa_mailbox_get_readonly(LibBalsaMailbox * mailbox);
 const gchar * libbalsa_mailbox_get_config_prefix(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_has_unread_messages(LibBalsaMailbox * mailbox);
 gboolean libbalsa_mailbox_get_messages_threaded(LibBalsaMailbox * mailbox);
-gboolean libbalsa_mailbox_get_has_sort_pending(LibBalsaMailbox * mailbox);
+gboolean libbalsa_mailbox_has_sort_pending(LibBalsaMailbox * mailbox);
 
 /*
  * Setters

@@ -862,7 +862,7 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
     if (!libbalsa_mailbox_get_messages_threaded(mailbox))
         return TRUE; /* G_SOURCE_CONTINUE */
 
-    if (libbalsa_mailbox_get_has_sort_pending(mailbox))
+    if (libbalsa_mailbox_has_sort_pending(mailbox))
         return TRUE; /* G_SOURCE_CONTINUE */
 
     if (balsa_app.expand_tree &&
@@ -2734,7 +2734,7 @@ bndx_ensure_visible_idle(gpointer user_data)
 
     model = gtk_tree_view_get_model(tree_view);
 
-    if (libbalsa_mailbox_get_has_sort_pending(LIBBALSA_MAILBOX(model)))
+    if (libbalsa_mailbox_has_sort_pending(LIBBALSA_MAILBOX(model)))
         return G_SOURCE_CONTINUE;
 
     if (!bndx_find_current_msgno(bindex, &path, NULL)) {

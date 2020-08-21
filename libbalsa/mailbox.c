@@ -4929,8 +4929,9 @@ libbalsa_mailbox_get_messages_threaded(LibBalsaMailbox * mailbox)
     return priv->messages_threaded != 0;
 }
 
+/* Not exactly a getter: */
 gboolean
-libbalsa_mailbox_get_has_sort_pending(LibBalsaMailbox * mailbox)
+libbalsa_mailbox_has_sort_pending(LibBalsaMailbox * mailbox)
 {
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
 

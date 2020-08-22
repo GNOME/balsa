@@ -174,6 +174,7 @@ struct _BalsaIndex {
     /* Idle handler ids */
     guint selection_changed_idle_id;
     guint mailbox_changed_idle_id;
+    guint scroll_to_row_idle_id;
 
     LibBalsaMailboxSearchIter *search_iter;
     BalsaIndexWidthPreference width_preference;
@@ -263,6 +264,11 @@ bndx_destroy(GObject * obj)
     if (bindex->mailbox_changed_idle_id != 0) {
         g_source_remove(bindex->mailbox_changed_idle_id);
         bindex->mailbox_changed_idle_id = 0;
+    }
+
+    if (bindex->scroll_to_row_idle_id != 0) {
+        g_source_remove(bindex->scroll_to_row_idle_id);
+        bindex->scroll_to_row_idle_id = 0;
     }
 
     /* Clean up any other idle handler sources */
@@ -849,6 +855,43 @@ balsa_index_new(void)
  */
 
 static gboolean
+bndx_scroll_to_row_idle(gpointer user_data)
+{
+    BalsaIndex *bindex = user_data;
+    GtkTreeView *tree_view = GTK_TREE_VIEW(bindex);
+    GtkTreePath *path;
+
+    path = gtk_tree_row_reference_get_path(bindex->reference);
+    gtk_tree_row_reference_free(bindex->reference);
+    bindex->reference = NULL;
+
+    gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
+    gtk_tree_path_free(path);
+
+    bindex->scroll_to_row_idle_id = 0;
+
+    return G_SOURCE_REMOVE;
+}
+
+static void
+bndx_scroll_to_row(BalsaIndex *bindex, GtkTreePath *path)
+{
+    GtkTreeModel *model;
+
+    if (bindex->reference != NULL)
+        gtk_tree_row_reference_free(bindex->reference);
+
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(bindex));
+    bindex->reference = gtk_tree_row_reference_new(model, path);
+
+    if (bindex->scroll_to_row_idle_id == 0) {
+        bindex->scroll_to_row_idle_id =
+            g_idle_add_full(G_PRIORITY_LOW + 10, /* lower than low! */
+                            bndx_scroll_to_row_idle, bindex, NULL);
+    }
+}
+
+static gboolean
 bndx_scroll_on_open_idle(BalsaIndex *bindex)
 {
     LibBalsaMailbox *mailbox;
@@ -895,7 +938,7 @@ bndx_scroll_on_open_idle(BalsaIndex *bindex)
     }
 
     bndx_expand_to_row(bindex, path);
-    gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
+    bndx_scroll_to_row(bindex, path);
 
     view_on_open =
         g_object_get_data(G_OBJECT(mailbox), BALSA_INDEX_VIEW_ON_OPEN);
@@ -2228,7 +2271,7 @@ bndx_select_row(BalsaIndex * index, GtkTreePath * path)
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
 
     gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
-    gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
+    bndx_scroll_to_row(index, path);
 }
 
 /* Check that all parents are expanded. */
@@ -2769,7 +2812,7 @@ bndx_ensure_visible_idle(gpointer user_data)
     }
 
     if (path != NULL) {
-        gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
+        bndx_scroll_to_row(bindex, path);
         gtk_tree_path_free(path);
     }
 

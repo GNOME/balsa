@@ -267,7 +267,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
                                            (gpointer) mime_body))) {
         gtk_widget_set_hexpand(button, TRUE);
         gtk_widget_set_halign(button, GTK_ALIGN_FILL);
-	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+        gtk_container_add(GTK_CONTAINER(hbox), button);
     } else {
 	gtk_box_pack_start(GTK_BOX(mw),
 			   gtk_label_new(_("No open or view action "
@@ -279,7 +279,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     button = gtk_button_new_with_mnemonic(_("S_ave part"));
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, GTK_ALIGN_FILL);
-    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), button);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(balsa_mime_widget_ctx_menu_save),
 		     (gpointer) mime_body);

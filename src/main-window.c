@@ -2316,7 +2316,7 @@ balsa_window_new(GtkApplication *application)
     priv->statusbar = gtk_statusbar_new();
     gtk_widget_set_hexpand(priv->statusbar, TRUE);
     gtk_widget_set_halign(priv->statusbar, GTK_ALIGN_FILL);
-    gtk_box_pack_start(GTK_BOX(hbox), priv->statusbar, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), priv->statusbar);
     gtk_widget_show_all(hbox);
 
 #if 0

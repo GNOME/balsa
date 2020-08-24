@@ -615,7 +615,7 @@ create_key_label_with_warn(const gchar *text,
 		gtk_label_set_selectable(GTK_LABEL(label), TRUE);
 		gtk_widget_set_hexpand(label, TRUE);
                 gtk_widget_set_halign(label, GTK_ALIGN_FILL);
-		gtk_box_pack_start(GTK_BOX(result), label, FALSE, FALSE, 0U);
+		gtk_container_add(GTK_CONTAINER(result), label);
 	} else {
 		result = libbalsa_create_wrap_label(text, FALSE);
 		gtk_widget_set_hexpand(result, TRUE);

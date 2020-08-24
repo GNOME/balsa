@@ -599,7 +599,7 @@ create_key_label_with_warn(const gchar *text,
 		gchar *buf;
 
 		result = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-		icon = gtk_image_new_from_icon_name("gtk-dialog-warning", GTK_ICON_SIZE_MENU);
+		icon = gtk_image_new_from_icon_name("dialog-warning", GTK_ICON_SIZE_MENU);
 		gtk_box_pack_start(GTK_BOX(result), icon, FALSE, FALSE, 0U);
 		buf = g_markup_printf_escaped("<span fgcolor=\"red\">%s</span>", text);
 		label = libbalsa_create_wrap_label(buf, TRUE);

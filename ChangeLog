@@ -1,3 +1,9 @@
+2020-08-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/libbalsa-gpgme-widgets.c
+	(create_key_label_with_warn): the warning icon is (now?)
+	"dialog-warning", not "gtk-dialog-warning".
+
 2020-08-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-index: scroll to row in another idle handler

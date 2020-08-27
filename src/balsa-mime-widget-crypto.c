@@ -136,7 +136,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 
         gtk_widget_set_vexpand(hbox, TRUE);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-        gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
+        gtk_container_add(GTK_CONTAINER(vbox), hbox);
         if (g_mime_gpgme_sigstat_status(mime_body->sig_info) == GPG_ERR_NO_PUBKEY) {
 #ifdef ENABLE_AUTOCRYPT
         	GBytes *autocrypt_key;
@@ -378,7 +378,7 @@ create_import_keys_widget(BalsaMimeWidget *mw, const gchar *key_buf, GError **er
                                                                               BMW_VBOX_SPACE);
                                                     gtk_widget_set_margin_bottom(separator,
                                                                                  BMW_VBOX_SPACE);
-                                                    gtk_box_pack_start(box, separator, FALSE, FALSE, 0);
+                                                    gtk_container_add(GTK_CONTAINER(mw), separator);
 						}
 					}
 				}

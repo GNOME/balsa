@@ -355,7 +355,7 @@ create_imap_folder_dialog(LibBalsaServer  *server,
 	gtk_widget_set_vexpand(vbox, TRUE);
 
 	label = libbalsa_create_wrap_label(message, FALSE);
-	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(vbox), label);
 
 	scrolled_wind = gtk_scrolled_window_new(NULL,NULL);
 	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrolled_wind),
@@ -915,7 +915,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     gtk_widget_set_hexpand(sub_folder_data->parent_folder, TRUE);
     gtk_widget_set_halign(sub_folder_data->parent_folder, GTK_ALIGN_FILL);
     gtk_container_add(GTK_CONTAINER(hbox), sub_folder_data->parent_folder);
-    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), button);
 
     gtk_widget_set_hexpand(hbox, TRUE);
     gtk_grid_attach(GTK_GRID(grid), hbox, 1, row, 1, 1);

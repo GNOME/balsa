@@ -204,7 +204,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 
     if (mime_body->filename) {
 	msg = g_strdup_printf(_("File name: %s"), mime_body->filename);
-	gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg), FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(mw), gtk_label_new(msg));
 	g_free(msg);
     }
 
@@ -269,10 +269,9 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
         gtk_widget_set_halign(button, GTK_ALIGN_FILL);
         gtk_container_add(GTK_CONTAINER(hbox), button);
     } else {
-	gtk_box_pack_start(GTK_BOX(mw),
+	gtk_container_add(GTK_CONTAINER(mw),
 			   gtk_label_new(_("No open or view action "
-					   "defined for this content type")),
-			   FALSE, FALSE, 0);
+					   "defined for this content type")));
     }
     g_free(use_content_type);
 

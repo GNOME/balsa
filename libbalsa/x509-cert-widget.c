@@ -185,7 +185,7 @@ create_chain_widget(GList *cert_list)
         gtk_widget_set_valign(stack, GTK_ALIGN_FILL);
         gtk_widget_set_margin_top(stack, 6U);
         gtk_widget_set_margin_bottom(stack, 6U);
-	gtk_box_pack_start(GTK_BOX(vbox), stack, FALSE, FALSE, 0U);
+	gtk_container_add(GTK_CONTAINER(vbox), stack);
 	g_signal_connect(tree_view, "row-activated", G_CALLBACK(cert_selected_cb), stack);
 
 	is_root = TRUE;

@@ -571,7 +571,7 @@ bw_create_index_widget(BalsaWindow *bw)
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_show(priv->sos_bar);
-    gtk_box_pack_start(GTK_BOX(vbox), priv->sos_bar, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), priv->sos_bar);
 
     gtk_widget_set_vexpand(priv->notebook, TRUE);
     gtk_widget_set_valign(priv->notebook, GTK_ALIGN_FILL);
@@ -2294,7 +2294,7 @@ balsa_window_new(GtkApplication *application)
     model = balsa_window_get_toolbar_model();
 
     priv->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
-    gtk_box_pack_start(GTK_BOX(priv->vbox), priv->toolbar, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(priv->vbox), priv->toolbar);
 
     priv->content_area = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_show(priv->content_area);
@@ -2303,7 +2303,7 @@ balsa_window_new(GtkApplication *application)
     gtk_container_add(GTK_CONTAINER(priv->vbox), priv->content_area);
 
     priv->bottom_bar = hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_box_pack_start(GTK_BOX(priv->vbox), hbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(priv->vbox), hbox);
 
     priv->progress_bar = gtk_progress_bar_new();
     g_object_add_weak_pointer(G_OBJECT(priv->progress_bar),
@@ -2311,7 +2311,7 @@ balsa_window_new(GtkApplication *application)
     gtk_widget_set_valign(priv->progress_bar, GTK_ALIGN_CENTER);
     gtk_progress_bar_set_pulse_step(GTK_PROGRESS_BAR(priv->progress_bar),
                                     0.01);
-    gtk_box_pack_start(GTK_BOX(hbox), priv->progress_bar, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), priv->progress_bar);
 
     priv->statusbar = gtk_statusbar_new();
     gtk_widget_set_hexpand(priv->statusbar, TRUE);
@@ -3866,7 +3866,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 
         gtk_widget_set_margin_top(page, 2);
         gtk_widget_set_margin_bottom(page, 2);
-	gtk_box_pack_start(GTK_BOX(vbox), page, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(vbox), page);
 
 	/* builds the toggle buttons to specify fields concerned by
          * the search. */
@@ -3879,7 +3879,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 
         gtk_widget_set_margin_top(frame, 2);
         gtk_widget_set_margin_bottom(frame, 2);
-	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(vbox), frame);
 
 	grid = gtk_grid_new();
         gtk_grid_set_column_homogeneous(GTK_GRID(grid), TRUE);
@@ -3897,7 +3897,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 
         gtk_widget_set_margin_top(frame, 2);
         gtk_widget_set_margin_bottom(frame, 2);
-	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(vbox), frame);
 
 	/* Button box */
 	box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -3919,7 +3919,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 
         gtk_widget_set_margin_top(frame, 2);
         gtk_widget_set_margin_bottom(frame, 2);
-	gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(vbox), frame);
 
 	/* Reverse and Wrap checkboxes */
 	box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
@@ -3937,7 +3937,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 
         gtk_widget_set_vexpand(reverse_button, TRUE);
         gtk_widget_set_valign(reverse_button, GTK_ALIGN_FILL);
-	gtk_box_pack_start(GTK_BOX(w), reverse_button, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(w), reverse_button);
 
 	wrap_button =
             gtk_check_button_new_with_mnemonic(_("_Wrap around"));
@@ -3946,11 +3946,11 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 
         gtk_widget_set_vexpand(wrap_button, TRUE);
         gtk_widget_set_valign(wrap_button, GTK_ALIGN_FILL);
-	gtk_box_pack_start(GTK_BOX(w), wrap_button, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(w), wrap_button);
 
         gtk_widget_set_hexpand(w, TRUE);
         gtk_widget_set_halign(w, GTK_ALIGN_FILL);
-	gtk_box_pack_start(GTK_BOX(box), w, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(box), w);
 
 	button = gtk_button_new_with_mnemonic(_("_OK"));
 	g_signal_connect(button, "clicked",

@@ -238,7 +238,7 @@ libbalsa_show_message_source(GtkApplication  * application,
 #else
     gtk_widget_set_margin_top(menu_bar, 1);
     gtk_widget_set_margin_bottom(menu_bar, 1);
-    gtk_box_pack_start(GTK_BOX(vbox), menu_bar, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), menu_bar);
 #endif
 
     gtk_widget_set_vexpand(interior, TRUE);

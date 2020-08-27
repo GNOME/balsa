@@ -550,7 +550,7 @@ bm_find_bar_new(BalsaMessage * balsa_message)
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Find:")), FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), gtk_label_new(_("Find:")));
     balsa_message->find_entry = gtk_search_entry_new();
     g_signal_connect(balsa_message->find_entry, "search-changed",
                      G_CALLBACK(bm_find_entry_changed_cb), balsa_message);
@@ -1006,16 +1006,6 @@ balsa_message_init(BalsaMessage * balsa_message)
     /* Find-in-message search bar, initially hidden. */
     balsa_message->find_bar = bm_find_bar_new(balsa_message);
     gtk_container_add(GTK_CONTAINER(vbox), balsa_message->find_bar);
-
-    /* The context menu that is popped up when more than one part is selected */
-    balsa_message_add_actions(balsa_message, "message-menu");
-
-    menu = g_menu_new();
-    g_menu_append(menu, _("Save selected as…"), "save-selected");
-    g_menu_append(menu, _("Save selected to folder…"), "save-selected-to-folder");
-    balsa_message->save_all_popup =
-        libbalsa_popup_widget_new(balsa_message->treeview, G_MENU_MODEL(menu), "message-menu");
-    g_object_unref(menu);
 
     gtk_widget_show_all(GTK_WIDGET(balsa_message));
 }
@@ -2303,7 +2293,7 @@ add_part(BalsaMessage * balsa_message, BalsaPartInfo * info, GtkWidget * contain
     if (info->mime_widget == NULL)
 	part_info_init(balsa_message, info);
 
-    gtk_box_pack_start(GTK_BOX(container), GTK_WIDGET(info->mime_widget), FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(container), GTK_WIDGET(info->mime_widget));
 
     info_container = balsa_mime_widget_get_container(info->mime_widget);
     body = add_multipart(balsa_message, info->body,

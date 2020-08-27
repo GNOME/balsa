@@ -222,7 +222,7 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 
                                     gtk_widget_set_margin_top(subkey_widget, 2);
                                     gtk_widget_set_margin_bottom(subkey_widget, 2);
-                                    gtk_box_pack_start(GTK_BOX(subkey_box), subkey_widget, FALSE, FALSE, 0);
+                                    gtk_container_add(GTK_CONTAINER(subkey_box), subkey_widget);
 				}
 			} else if ((((subkey_capa & GPG_SUBKEY_CAP_SIGN) != 0U) && (subkey->can_sign != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_ENCRYPT) != 0U) && (subkey->can_encrypt != 0)) ||
@@ -232,7 +232,7 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 
                             gtk_widget_set_margin_top(subkey_widget, 2);
                             gtk_widget_set_margin_bottom(subkey_widget, 2);
-                            gtk_box_pack_start(GTK_BOX(subkey_box), subkey_widget, FALSE, FALSE, 0);
+                            gtk_container_add(GTK_CONTAINER(subkey_box), subkey_widget);
 			} else {
 				/* do not print this subkey */
 			}
@@ -415,7 +415,7 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
         gtk_widget_set_vexpand(hbox, TRUE);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-	gtk_box_pack_start(GTK_BOX(content_area), hbox, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(content_area), hbox);
 	gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
 
 	/* standard key icon; "application-certificate" would be an alternative... */
@@ -426,7 +426,7 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
         gtk_widget_set_hexpand(vbox, TRUE);
         gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-	gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(hbox), vbox);
 	gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
 
 	if (message1 != NULL) {
@@ -791,7 +791,7 @@ smime_show_chain(GtkWidget *button, gpointer G_GNUC_UNUSED user_data)
         gtk_widget_set_valign(chain, GTK_ALIGN_FILL);
         gtk_widget_set_margin_top(chain, 6);
         gtk_widget_set_margin_bottom(chain, 6);
-	gtk_box_pack_start(GTK_BOX(vbox), chain, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(vbox), chain);
 
 	gtk_widget_show_all(vbox);
 	gtk_dialog_run(GTK_DIALOG(dialog));

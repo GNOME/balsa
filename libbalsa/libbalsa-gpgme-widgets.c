@@ -218,13 +218,21 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 				/* if the signature is invalid, the fingerprint only the end of the subkey's fingerprint */
 				offs = strlen(subkey->fpr) - fingerprint_len;
 				if (strcmp(fingerprint, &subkey->fpr[offs]) == 0) {
-					gtk_box_pack_end(GTK_BOX(subkey_box), create_subkey_widget(subkey), FALSE, FALSE, 0);
+                                    GtkWidget *subkey_widget = create_subkey_widget(subkey);
+
+                                    gtk_widget_set_margin_top(subkey_widget, 2);
+                                    gtk_widget_set_margin_bottom(subkey_widget, 2);
+                                    gtk_box_pack_start(GTK_BOX(subkey_box), subkey_widget, FALSE, FALSE, 0);
 				}
 			} else if ((((subkey_capa & GPG_SUBKEY_CAP_SIGN) != 0U) && (subkey->can_sign != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_ENCRYPT) != 0U) && (subkey->can_encrypt != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_CERTIFY) != 0U) && (subkey->can_certify != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_AUTH) != 0U) && (subkey->can_authenticate != 0))) {
-				gtk_box_pack_end(GTK_BOX(subkey_box), create_subkey_widget(subkey), FALSE, FALSE, 0);
+                            GtkWidget *subkey_widget = create_subkey_widget(subkey);
+
+                            gtk_widget_set_margin_top(subkey_widget, 2);
+                            gtk_widget_set_margin_bottom(subkey_widget, 2);
+                            gtk_box_pack_start(GTK_BOX(subkey_box), subkey_widget, FALSE, FALSE, 0);
 			} else {
 				/* do not print this subkey */
 			}
@@ -439,6 +447,8 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	scrolledw = gtk_scrolled_window_new(NULL, NULL);
         gtk_widget_set_vexpand(scrolledw, TRUE);
         gtk_widget_set_valign(scrolledw, GTK_ALIGN_FILL);
+        gtk_widget_set_margin_top(scrolledw, 6);
+        gtk_widget_set_margin_bottom(scrolledw, 6);
 	gtk_container_add(GTK_CONTAINER(vbox), scrolledw);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledw), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scrolledw), 120);

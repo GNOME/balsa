@@ -1011,7 +1011,7 @@ add_button_to_box(const gchar * label, GCallback cb, gpointer cb_data,
 {
     GtkWidget *button = gtk_button_new_with_mnemonic(label);
     g_signal_connect_swapped(button, "clicked", cb, cb_data);
-    gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(box), button);
 
     return button;
 }
@@ -2157,22 +2157,19 @@ pm_grid_add_checking_group(GtkWidget * grid_widget)
 
     label = gtk_label_new(_("When mail arrives:"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), label);
 
     pui->notify_new_mail_dialog =
         gtk_check_button_new_with_label(_("Display message"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_dialog,
-                       FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), pui->notify_new_mail_dialog);
 
     pui->notify_new_mail_sound =
         gtk_check_button_new_with_label(_("Play sound"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_sound,
-                       FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), pui->notify_new_mail_sound);
 
     pui->notify_new_mail_icon =
         gtk_check_button_new_with_label(_("Show icon"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_icon,
-                       FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), pui->notify_new_mail_icon);
 
     pm_grid_attach(grid, hbox, 1, ++row, 3, 1);
 

@@ -550,11 +550,11 @@ bm_find_bar_new(BalsaMessage * balsa_message)
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("Find:")), FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), gtk_label_new(_("Find:")));
     balsa_message->find_entry = gtk_search_entry_new();
     g_signal_connect(balsa_message->find_entry, "search-changed",
                      G_CALLBACK(bm_find_entry_changed_cb), balsa_message);
-    gtk_box_pack_start(GTK_BOX(hbox), balsa_message->find_entry, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), balsa_message->find_entry);
 
     tool_item = gtk_tool_item_new();
     gtk_container_add(GTK_CONTAINER(tool_item), hbox);
@@ -883,7 +883,7 @@ balsa_message_init(BalsaMessage * balsa_message)
     GMenu *menu;
 
     balsa_message->switcher = gtk_stack_switcher_new();
-    gtk_box_pack_start(GTK_BOX(balsa_message), balsa_message->switcher, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(balsa_message), balsa_message->switcher);
 
     balsa_message->stack = gtk_stack_new();
     stack = GTK_STACK(balsa_message->stack);
@@ -1005,7 +1005,7 @@ balsa_message_init(BalsaMessage * balsa_message)
 
     /* Find-in-message search bar, initially hidden. */
     balsa_message->find_bar = bm_find_bar_new(balsa_message);
-    gtk_box_pack_start(GTK_BOX(vbox), balsa_message->find_bar, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), balsa_message->find_bar);
 
     /* The context menu that is popped up when more than one part is selected */
     balsa_message_add_actions(balsa_message, "message-menu");
@@ -1716,7 +1716,7 @@ display_face(BalsaMessage * balsa_message)
         }
 
         if (image != NULL) {
-            gtk_box_pack_start(GTK_BOX(face_box), image, FALSE, FALSE, 0);
+            gtk_container_add(GTK_CONTAINER(face_box), image);
             gtk_widget_show_all(face_box);
         }
     }
@@ -2303,7 +2303,7 @@ add_part(BalsaMessage * balsa_message, BalsaPartInfo * info, GtkWidget * contain
     if (info->mime_widget == NULL)
 	part_info_init(balsa_message, info);
 
-    gtk_box_pack_start(GTK_BOX(container), GTK_WIDGET(info->mime_widget), FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(container), GTK_WIDGET(info->mime_widget));
 
     info_container = balsa_mime_widget_get_container(info->mime_widget);
     body = add_multipart(balsa_message, info->body,

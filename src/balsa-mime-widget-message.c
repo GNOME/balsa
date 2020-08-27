@@ -141,7 +141,7 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
         emb_hdrs = bm_header_widget_new(bm, NULL);
         balsa_mime_widget_set_header_widget(mw, emb_hdrs);
 
-	gtk_box_pack_start(GTK_BOX(container), emb_hdrs, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(container), emb_hdrs);
 
         bmw_message_set_headers(bm, mw, mime_body,
                                 balsa_message_get_shown_headers(bm) == HEADERS_ALL);
@@ -245,13 +245,13 @@ bmw_message_extbody_url(LibBalsaMessageBody * mime_body,
     gtk_container_set_border_width(GTK_CONTAINER(mw),
 				   BMW_CONTAINER_BORDER);
 
-    gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg->str), FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), gtk_label_new(msg->str));
     g_string_free(msg, TRUE);
 
     button = gtk_button_new_with_label(url);
     gtk_widget_set_margin_top(button, BMW_BUTTON_PACK_SPACE);
     gtk_widget_set_margin_bottom(button, BMW_BUTTON_PACK_SPACE);
-    gtk_box_pack_start(GTK_BOX(mw), button, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), button);
 
     g_object_set_data_full(G_OBJECT(button), "call_url", url,
 			   (GDestroyNotify) g_free);
@@ -292,7 +292,7 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
     gtk_container_set_border_width(GTK_CONTAINER(mw),
 				   BMW_CONTAINER_BORDER);
 
-    gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg->str), FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), gtk_label_new(msg->str));
     g_string_free(msg, TRUE);
 
     button =
@@ -300,7 +300,7 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
 				     ("Se_nd message to obtain this part"));
     gtk_widget_set_margin_top(button, BMW_BUTTON_PACK_SPACE);
     gtk_widget_set_margin_bottom(button, BMW_BUTTON_PACK_SPACE);
-    gtk_box_pack_start(GTK_BOX(mw), button, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), button);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(extbody_send_mail), (gpointer) mime_body);
 
@@ -415,7 +415,7 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm,
     headers = bm_header_widget_new(bm, tl_buttons);
     balsa_mime_widget_set_header_widget(mw, headers);
 
-    gtk_box_pack_start(GTK_BOX(mw), headers, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), headers);
 
     container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
     balsa_mime_widget_set_container(mw, container);
@@ -424,7 +424,7 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm,
     gtk_widget_set_valign(container, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(container, BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
     gtk_widget_set_margin_bottom(container, BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
-    gtk_box_pack_start(GTK_BOX(mw), container, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), container);
 
     return mw;
 }

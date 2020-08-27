@@ -863,13 +863,13 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     /* Simple check for possible resource requests: */
     if (have_src_oth && !auto_load_ext_content) {
         info->info_bar = lbh_info_bar(info);
-        gtk_box_pack_start(GTK_BOX(vbox), info->info_bar, FALSE, FALSE, 0);
+        gtk_container_add(GTK_CONTAINER(vbox), info->info_bar);
         g_debug("%s shows info_bar", __func__);
     }
 
     gtk_widget_set_vexpand(GTK_WIDGET(info->web_view), TRUE);
     gtk_widget_set_valign(GTK_WIDGET(info->web_view), GTK_ALIGN_FILL);
-    gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(info->web_view), FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), GTK_WIDGET(info->web_view));
 
     webkit_web_view_load_html(info->web_view, text, NULL);
     g_free(text);

@@ -219,11 +219,11 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
    	}
     label = libbalsa_create_wrap_label(prompt, FALSE);
     g_free(prompt);
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), label);
 
     label = gtk_label_new(_("Double-click key to show details"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), label);
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW
@@ -380,9 +380,7 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
     if (!padlock_keyhole)
 	padlock_keyhole =
 	    gdk_pixbuf_new_from_xpm_data(padlock_keyhole_xpm);
-    gtk_box_pack_start(GTK_BOX(vbox),
-		       gtk_image_new_from_pixbuf(padlock_keyhole), FALSE,
-		       FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), gtk_image_new_from_pixbuf(padlock_keyhole));
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_container_add(GTK_CONTAINER(hbox), vbox);
     if (prev_was_bad)

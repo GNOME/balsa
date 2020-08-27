@@ -222,7 +222,7 @@ build_left_side(void)
     gtk_box_set_spacing(GTK_BOX(bbox), 2);
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
 
-    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), bbox);
 
     /* new button */
     /* Translators: button "New" filter */
@@ -289,7 +289,7 @@ build_match_page()
                      G_CALLBACK(fe_action_changed), NULL);
     gtk_widget_set_margin_top(fe_op_codes_option_menu, 2);
     gtk_widget_set_margin_bottom(fe_op_codes_option_menu, 2);
-    gtk_box_pack_start(GTK_BOX(box), fe_op_codes_option_menu, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(box), fe_op_codes_option_menu);
 
     /* list of conditions defining how this filter matches */
 
@@ -390,7 +390,7 @@ build_action_page(GtkWindow * window)
     frame = gtk_frame_new(_("Notification:"));
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(page), frame);
     gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
 
     grid = gtk_grid_new();
@@ -442,7 +442,7 @@ build_action_page(GtkWindow * window)
     frame = gtk_frame_new(_("Action to perform:"));
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(page), frame);
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
@@ -511,7 +511,7 @@ build_right_side(GtkWindow * window)
 
     /* button box */
     bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(rightside), bbox);
 
     fe_apply_button = gtk_button_new_with_mnemonic(_("_Apply"));
     g_signal_connect(fe_apply_button, "clicked",
@@ -612,11 +612,10 @@ filters_edit_dialog(GtkWindow * parent)
 
     gtk_widget_set_margin_start(piece, FILTER_EDIT_PADDING);
     gtk_widget_set_margin_end(piece, FILTER_EDIT_PADDING);
-    gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), piece);
 
-    gtk_box_pack_start(GTK_BOX(hbox),
-                       gtk_separator_new(GTK_ORIENTATION_VERTICAL),
-                       FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox),
+                      gtk_separator_new(GTK_ORIENTATION_VERTICAL));
 
     fe_right_page = build_right_side(GTK_WINDOW(fe_window));
     gtk_widget_set_sensitive(fe_right_page, FALSE);
@@ -625,7 +624,7 @@ filters_edit_dialog(GtkWindow * parent)
     gtk_widget_set_halign(fe_right_page, GTK_ALIGN_FILL);
     gtk_widget_set_margin_start(fe_right_page, FILTER_EDIT_PADDING);
     gtk_widget_set_margin_end(fe_right_page, FILTER_EDIT_PADDING);
-    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), fe_right_page);
 
     fe_user_headers_list = NULL;
 

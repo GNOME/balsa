@@ -316,7 +316,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), vbox);
 
     p->available_filters =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
@@ -344,7 +344,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
     gtk_widget_set_margin_top(bbox, 2);
     gtk_widget_set_margin_bottom(bbox, 2);
-    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), bbox);
 
     /* "Apply selected" button */
     p->apply_selected_button = button =
@@ -382,13 +382,13 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     gtk_widget_set_margin_start(bbox, 6);
     gtk_widget_set_margin_end(bbox, 6);
-    gtk_box_pack_start(GTK_BOX(hbox), bbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), bbox);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
 
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_box_pack_start(GTK_BOX(hbox),vbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox),vbox);
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
@@ -416,7 +416,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     gtk_widget_set_margin_top(bbox, 2);
     gtk_widget_set_margin_bottom(bbox, 2);
-    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), bbox);
 
     /* up button */
     p->move_up_button = button =

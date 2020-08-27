@@ -409,7 +409,8 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     gtk_container_add(GTK_CONTAINER(toolbar_scroll), page->toolbar);
 
     /* Button box */
-    button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    button_box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    gtk_box_set_spacing(GTK_BOX(button_box), 5);
     gtk_container_add(GTK_CONTAINER(toolbar_ctlbox), button_box);
 
     /* Standard button */
@@ -459,9 +460,8 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     center_button_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_container_add(GTK_CONTAINER(lower_ctlbox), center_button_box);
 
-    button_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_widget_set_vexpand(button_box, TRUE);
-    gtk_widget_set_valign(button_box, GTK_ALIGN_CENTER);
+    gtk_container_add(GTK_CONTAINER(lower_ctlbox), center_button_box);
+
     gtk_container_add(GTK_CONTAINER(center_button_box), button_box);
 
     page->back_button =

@@ -204,7 +204,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 
     if (mime_body->filename) {
 	msg = g_strdup_printf(_("File name: %s"), mime_body->filename);
-	gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg), FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(mw), gtk_label_new(msg));
 	g_free(msg);
     }
 
@@ -258,7 +258,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     msg_label = gtk_label_new(msg);
     g_free(msg);
     gtk_label_set_ellipsize(GTK_LABEL(msg_label), PANGO_ELLIPSIZE_END);
-    gtk_box_pack_start(GTK_BOX(mw), msg_label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), msg_label);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
     gtk_box_set_homogeneous(GTK_BOX(hbox), TRUE);
@@ -269,10 +269,9 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
         gtk_widget_set_halign(button, GTK_ALIGN_FILL);
         gtk_container_add(GTK_CONTAINER(hbox), button);
     } else {
-	gtk_box_pack_start(GTK_BOX(mw),
+	gtk_container_add(GTK_CONTAINER(mw),
 			   gtk_label_new(_("No open or view action "
-					   "defined for this content type")),
-			   FALSE, FALSE, 0);
+					   "defined for this content type")));
     }
     g_free(use_content_type);
 
@@ -284,7 +283,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 		     G_CALLBACK(balsa_mime_widget_ctx_menu_save),
 		     (gpointer) mime_body);
 
-    gtk_box_pack_start(GTK_BOX(mw), hbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), hbox);
 
     return mw;
 }

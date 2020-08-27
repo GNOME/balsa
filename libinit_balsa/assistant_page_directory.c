@@ -306,7 +306,7 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
     gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(grid));
     gtk_widget_show_all(GTK_WIDGET(grid));
 
-    gtk_box_pack_end(GTK_BOX(page), verify_button(dir), FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(page), verify_button(dir));
 
     g_signal_connect(druid, "prepare",
                      G_CALLBACK(balsa_druid_page_directory_prepare),

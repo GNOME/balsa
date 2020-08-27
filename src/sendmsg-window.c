@@ -1510,14 +1510,14 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
          fname);
     GtkWidget *info = gtk_label_new(msg);
     GtkWidget *charset_button = libbalsa_charset_button_new();
-    GtkBox *content_box;
+    GtkWidget *content_box;
 
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
 #endif
 
     g_free(msg);
-    content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
+    content_box = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
     gtk_widget_set_margin_top(info, 5);
     gtk_widget_set_margin_bottom(info, 5);
@@ -3359,7 +3359,7 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
     GtkCellRenderer *renderer;
     GtkTreeIter iter;
     gboolean result;
-    GtkBox *content_box;
+    GtkWidget *content_box;
 
     dialog = gtk_dialog_new_with_buttons(_("Select parts for quotation"),
 					 parent,
@@ -3385,17 +3385,17 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
 
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), label);
+    gtk_container_add(GTK_CONTAINER(hbox), image);
 
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), vbox);
 
-    content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
+    content_box = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     gtk_widget_set_vexpand(hbox, TRUE);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_box_pack_start(content_box, hbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(content_box), hbox);
 
     if (stats->decrypted > 0U) {
     	GtkWidget *warning;
@@ -3415,12 +3415,12 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
     			  "unintentionally leak sensitive information."), FALSE);
     	}
         gtk_widget_set_valign(warning, GTK_ALIGN_START);
-        gtk_box_pack_start(GTK_BOX(vbox), warning, FALSE, FALSE, 0);
+        gtk_container_add(GTK_CONTAINER(vbox), warning);
     }
 
     gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
-    gtk_box_set_spacing(content_box, 14);
+    gtk_box_set_spacing(GTK_BOX(content_box), 14);
 
     /* scrolled window for the tree view */
     scroll = gtk_scrolled_window_new(NULL, NULL);
@@ -3493,7 +3493,7 @@ show_decrypted_warning(GtkWindow *parent)
 	remind_btn = gtk_check_button_new_with_label(_("Do not remind me again."));
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(remind_btn), FALSE);
 	gtk_widget_show(remind_btn);
-	gtk_box_pack_end(GTK_BOX(message_area), remind_btn, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(message_area), remind_btn);
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	balsa_app.warn_reply_decrypted = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(remind_btn));
 	gtk_widget_destroy(dialog);
@@ -5125,32 +5125,32 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_widget_set_vexpand(hbox, TRUE);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_box_pack_start(GTK_BOX(dialog_vbox), hbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(dialog_vbox), hbox);
     gtk_container_set_border_width (GTK_CONTAINER (hbox), 6);
 
     image = gtk_image_new_from_icon_name("dialog-question",
                                          GTK_ICON_SIZE_DIALOG);
-    gtk_box_pack_start (GTK_BOX (hbox), image, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER (hbox), image);
     gtk_widget_set_valign(image, GTK_ALIGN_START);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), vbox);
 
     text_str = g_strdup_printf("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
 			       _("You did not specify a subject for this message"),
 			       _("If you would like to provide one, enter it below."));
     label = libbalsa_create_wrap_label(text_str, TRUE);
     g_free(text_str);
-    gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER (vbox), label);
     gtk_widget_set_valign(label, GTK_ALIGN_START);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER (vbox), hbox);
 
     label = gtk_label_new (_("Subject:"));
-    gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER (hbox), label);
 
     subj_entry = gtk_entry_new ();
     gtk_entry_set_text(GTK_ENTRY(subj_entry), _("(no subject)"));
@@ -6902,7 +6902,7 @@ sendmsg_window_new()
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
 #else
-    gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(main_box), menubar);
 #endif
 
     /*
@@ -6917,8 +6917,7 @@ sendmsg_window_new()
 
     model = sendmsg_window_get_toolbar_model();
     bsmsg->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
-    gtk_box_pack_start(GTK_BOX(main_box), bsmsg->toolbar,
-                       FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(main_box), bsmsg->toolbar);
 
     bsmsg->flow = !balsa_app.wordwrap;
     sw_action_set_enabled(bsmsg, "reflow", bsmsg->flow);

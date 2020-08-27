@@ -68,18 +68,21 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
     gtk_widget_set_vexpand(widget, TRUE);
     gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(widget, 8);
+    gtk_widget_set_margin_bottom(widget, 8);
     gtk_box_pack_start(GTK_BOX(page), widget, FALSE, FALSE, 0);
 
     widget = GTK_WIDGET(yes);
     gtk_widget_set_vexpand(widget, TRUE);
     gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(widget, 2);
+    gtk_widget_set_margin_bottom(widget, 2);
     gtk_box_pack_start(GTK_BOX(page), widget, FALSE, FALSE, 0);
 
     widget = GTK_WIDGET(no);
     gtk_widget_set_vexpand(widget, TRUE);
     gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(widget, 2);
+    gtk_widget_set_margin_bottom(widget, 2);
     gtk_box_pack_start(GTK_BOX(page), widget, FALSE, FALSE, 0);
 
     return;

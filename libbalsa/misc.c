@@ -1252,3 +1252,51 @@ libbalsa_parser_options(void)
 {
     return parser_options;
 }
+
+/*
+ * libbalsa_button_box_button
+ *
+ * Create a button widget that can be added to a GtkBox with the same
+ * look as a regular button in a GtkButtonBox
+ *
+ * markup:     mnemonic text for the button;
+ * size_group: managed by the caller, to make buttons the same size;
+               could be created as gtk_size_group_new(GTK_SIZE_GROUP_BOTH),
+               to ensure common widths and heights;
+ * align:      how to align the button in its allocated space.
+ *
+ * To replace a GtkButtonBox with the default GTK_BUTTONBOX_EDGE style,
+ * align should be GTK_ALIGN_START for the first button, GTK_ALIGN_END
+ * for the last button, and GTK_ALIGN_CENTER for other buttons.
+ * To replace a GtkButtonBox with style GTK_BUTTONBOX_SPREAD,
+ * align should be GTK_ALIGN_CENTER for all buttons;
+ * To replace a GtkButtonBox with style GTK_BUTTONBOX_EXPAND,
+ * align should be GTK_ALIGN_FILL for all buttons.
+ */
+
+/* Margin to increase the width of the button, to approximate the look
+ * of a GtkButtonBox; may be a pixel or two too small: */
+#define LIBBALSA_LABEL_MARGIN 12
+
+GtkWidget *
+libbalsa_button_box_button(const gchar  *markup,
+                           GtkSizeGroup *size_group,
+                           GtkAlign      align)
+{
+    GtkWidget *label;
+    GtkWidget *button;
+
+    label = gtk_label_new(NULL);
+    gtk_label_set_markup_with_mnemonic(GTK_LABEL(label), markup);
+    gtk_widget_set_margin_start(label, LIBBALSA_LABEL_MARGIN);
+    gtk_widget_set_margin_end(label, LIBBALSA_LABEL_MARGIN);
+    gtk_widget_show(label);
+    gtk_size_group_add_widget(size_group, label);
+
+    button = gtk_button_new();
+    gtk_container_add(GTK_CONTAINER(button), label);
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_widget_set_halign(button, align);
+
+    return button;
+}

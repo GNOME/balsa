@@ -510,6 +510,7 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     GtkWidget *info_bar_widget;
     GtkInfoBar *info_bar;
     GtkWidget *content_area;
+    GtkWidget *vbox;
     GtkWidget *action_area;
     GtkWidget *widget;
     GtkEventController *key_controller;
@@ -536,10 +537,8 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     gtk_widget_set_vexpand(vbox, TRUE);
     gtk_widget_set_valign(vbox, GTK_ALIGN_START);
     action_area = gtk_info_bar_get_action_area(info_bar);
-    gtk_orientable_set_orientation(GTK_ORIENTABLE(action_area),
-                                   GTK_ORIENTATION_VERTICAL);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area),
-                              GTK_BUTTONBOX_START);
+    gtk_container_add(GTK_CONTAINER(action_area), vbox);
+
     if (balsa_message_get_face_box(bm) == NULL) {
         GtkWidget *face_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 

@@ -832,18 +832,23 @@ static GtkWidget*
 bab_get_edit_button_box(struct ABMainWindow *abmw)
 {
     GtkWidget *box;
+    GtkSizeGroup *size_group;
 
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    size_group = gtk_size_group_new(GTK_SIZE_GROUP_BOTH);
 
-    abmw->apply_button = libbalsa_add_mnemonic_button_to_box(_("_Apply"), box, GTK_ALIGN_START);
+    abmw->apply_button = libbalsa_button_box_button(_("_Apply"), size_group, GTK_ALIGN_START);
+    gtk_container_add(GTK_CONTAINER(box), abmw->apply_button);
     g_signal_connect(abmw->apply_button, "clicked",
                      G_CALLBACK(apply_button_cb), (gpointer) NULL);
 
-    abmw->remove_button = libbalsa_add_mnemonic_button_to_box(_("_Remove"), box, GTK_ALIGN_CENTER);
+    abmw->remove_button = libbalsa_button_box_button(_("_Remove"), size_group, GTK_ALIGN_CENTER);
+    gtk_container_add(GTK_CONTAINER(box), abmw->remove_button);
     g_signal_connect(abmw->remove_button, "clicked",
                      G_CALLBACK(remove_button_cb), (gpointer) NULL);
 
-    abmw->cancel_button = libbalsa_add_mnemonic_button_to_box(_("_Cancel"), box, GTK_ALIGN_END);
+    abmw->cancel_button = libbalsa_button_box_button(_("_Cancel"), size_group, GTK_ALIGN_END);
+    gtk_container_add(GTK_CONTAINER(box), abmw->cancel_button);
     g_signal_connect(abmw->cancel_button, "clicked",
                      G_CALLBACK(cancel_button_cb), abmw);
 

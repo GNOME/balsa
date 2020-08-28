@@ -236,6 +236,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	*box2,
 	*scrolled_window,
 	*frame;
+    GtkSizeGroup *size_group;
 
     ab->current_address_book = NULL;
 
@@ -328,11 +329,13 @@ balsa_ab_window_init(BalsaAbWindow *ab)
     gtk_grid_attach(GTK_GRID(grid), hbox, 0, 2, 1, 1);
     gtk_widget_show(GTK_WIDGET(hbox));
 
-    w = libbalsa_add_mnemonic_button_to_box(_("Run _Editor"), hbox, GTK_ALIGN_CENTER);
+    size_group = gtk_size_group_new(GTK_SIZE_GROUP_BOTH);
+
+    w = libbalsa_button_box_button(_("Run _Editor"), size_group, GTK_ALIGN_CENTER);
     g_signal_connect(w, "clicked",
                      G_CALLBACK(balsa_ab_window_run_editor), NULL);
 
-    w = libbalsa_add_mnemonic_button_to_box(_("_Re-import"), hbox, GTK_ALIGN_CENTER);
+    w = libbalsa_button_box_button(_("_Re-import"), size_group, GTK_ALIGN_CENTER);
     g_signal_connect(w, "clicked",
                      G_CALLBACK(balsa_ab_window_reload),
 		       ab);

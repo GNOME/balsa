@@ -510,6 +510,7 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     GtkWidget *info_bar_widget;
     GtkInfoBar *info_bar;
     GtkWidget *content_area;
+    GtkWidget *vbox;
     GtkWidget *action_area;
     GtkWidget *widget;
     GtkEventController *key_controller;
@@ -532,23 +533,22 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     content_area = gtk_info_bar_get_content_area(info_bar);
     gtk_container_add(GTK_CONTAINER(content_area), grid);
 
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
+    gtk_widget_set_vexpand(vbox, TRUE);
+    gtk_widget_set_valign(vbox, GTK_ALIGN_START);
     action_area = gtk_info_bar_get_action_area(info_bar);
-    gtk_orientable_set_orientation(GTK_ORIENTABLE(action_area),
-                                   GTK_ORIENTATION_VERTICAL);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area),
-                              GTK_BUTTONBOX_START);
+    gtk_container_add(GTK_CONTAINER(action_area), vbox);
+
     if (balsa_message_get_face_box(bm) == NULL) {
         GtkWidget *face_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
         balsa_message_set_face_box(bm, face_box);
-        gtk_container_add(GTK_CONTAINER(action_area), face_box);
-        gtk_button_box_set_child_non_homogeneous(GTK_BUTTON_BOX(action_area),
-                                                 face_box, TRUE);
+        gtk_container_add(GTK_CONTAINER(vbox), face_box);
     }
 
     if (buttons) {
         while (*buttons) {
-            gtk_container_add(GTK_CONTAINER(action_area), *buttons++);
+            gtk_container_add(GTK_CONTAINER(vbox), *buttons++);
         }
     }
 

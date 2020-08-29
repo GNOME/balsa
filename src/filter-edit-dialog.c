@@ -244,7 +244,6 @@ build_match_page()
     GtkWidget *page, *button;
     GtkWidget *label, *scroll;
     GtkWidget *box = NULL;
-    GtkSizeGroup *size_group;
 
     /* The notebook page */
     page = gtk_grid_new();
@@ -480,7 +479,6 @@ build_right_side(GtkWindow * window)
     GtkWidget *rightside;
     GtkWidget *notebook, *page;
     GtkWidget *bbox;
-    GtkSizeGroup *size_group;
 
     rightside = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
 

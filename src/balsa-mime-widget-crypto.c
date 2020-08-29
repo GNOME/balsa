@@ -131,7 +131,6 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     if (g_mime_gpgme_sigstat_protocol(mime_body->sig_info) == GPGME_PROTOCOL_OpenPGP) {
     	GtkWidget *hbox;
         GtkWidget *button;
-        GtkSizeGroup *size_group;
 
         hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
         gtk_widget_set_vexpand(hbox, TRUE);

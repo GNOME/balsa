@@ -236,7 +236,6 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 	*box2,
 	*scrolled_window,
 	*frame;
-    GtkSizeGroup *size_group;
 
     ab->current_address_book = NULL;
 

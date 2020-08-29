@@ -3906,18 +3906,16 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	gtk_container_add(GTK_CONTAINER(vbox), frame);
 
 	/* Button box */
-	box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+	box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(box), 6);
-	button = gtk_button_new_with_mnemonic(_("_Apply"));
+        button = libbalsa_add_button_to_box(_("_Apply"), box, GTK_ALIGN_START);
 	g_signal_connect(button, "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_FILTER));
-	gtk_container_add(GTK_CONTAINER(box), button);
-	button = gtk_button_new_with_mnemonic(_("_Clear"));
+        button = libbalsa_add_button_to_box(_("_Clear"), box, GTK_ALIGN_END);
 	g_signal_connect(button, "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_RESET));
-	gtk_container_add(GTK_CONTAINER(box), button);
 	gtk_container_add(GTK_CONTAINER(frame), box);
 
 	/* Frame with OK button */

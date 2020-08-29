@@ -1261,8 +1261,8 @@ libbalsa_parser_options(void)
  *
  * markup:     mnemonic text for the button;
  * size_group: managed by the caller, to make buttons the same size;
-               could be created as gtk_size_group_new(GTK_SIZE_GROUP_BOTH),
-               to ensure common widths and heights;
+ *             could be created as gtk_size_group_new(GTK_SIZE_GROUP_BOTH),
+ *             to ensure common widths and heights;
  * align:      how to align the button in its allocated space.
  *
  * To replace a GtkButtonBox with the default GTK_BUTTONBOX_EDGE style,
@@ -1272,6 +1272,9 @@ libbalsa_parser_options(void)
  * align should be GTK_ALIGN_CENTER for all buttons;
  * To replace a GtkButtonBox with style GTK_BUTTONBOX_EXPAND,
  * align should be GTK_ALIGN_FILL for all buttons.
+ *
+ * In the EDGE case with more than two buttons, and in the SPREAD case,
+ * the spacing is not identical to GtkButtonBox's.
  */
 
 /* Margin to increase the width of the button, to approximate the look

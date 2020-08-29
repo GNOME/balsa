@@ -129,14 +129,11 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     if (g_mime_gpgme_sigstat_protocol(mime_body->sig_info) == GPGME_PROTOCOL_OpenPGP) {
     	GtkWidget *hbox;
         GtkWidget *button;
-        GtkSizeGroup *size_group;
 
         hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
         gtk_widget_set_vexpand(hbox, TRUE);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
         gtk_container_add(GTK_CONTAINER(vbox), hbox);
-
-        size_group = gtk_size_group_new(GTK_SIZE_GROUP_BOTH);
 
         if (g_mime_gpgme_sigstat_status(mime_body->sig_info) == GPG_ERR_NO_PUBKEY) {
 #ifdef ENABLE_AUTOCRYPT
@@ -144,32 +141,27 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 
         	autocrypt_key = autocrypt_get_key(g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info), NULL);
         	if (autocrypt_key != NULL) {
-        		button = libbalsa_button_box_button(_("_Import Autocrypt key"),
-                                                            size_group, GTK_ALIGN_FILL);
+			button = libbalsa_add_button_to_box(_("_Import Autocrypt key"),
+                                                            hbox, GTK_ALIGN_FILL);
         		g_object_set_data_full(G_OBJECT(button), "autocrypt_key", autocrypt_key, (GDestroyNotify) g_bytes_unref);
         		g_signal_connect(button, "clicked", G_CALLBACK(on_key_import_button), NULL);
-<<<<<<< HEAD
         		gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
         	} else if (libbalsa_message_get_headers(mime_body->message)->autocrypt_hdr_present) {
         		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
         			_("The message contains an Autocrypt header, but it is either broken "
         			  "or the signature has been created using a different key."));
-=======
         		gtk_container_add(GTK_CONTAINER(hbox), button);
->>>>>>> 03c35ad3b (balsa-mime-widget-crypto: Stop using GtkButtonBox)
         	}
 #endif
-            button = libbalsa_button_box_button(_("_Search key server for this key"),
-                                                size_group, GTK_ALIGN_FILL);
+            button = libbalsa_add_button_to_box(_("_Search key server for this key"),
+                                                hbox, GTK_ALIGN_FILL);
         } else {
-            button = libbalsa_button_box_button(_("_Search key server for updates of this key"),
-                                                size_group, GTK_ALIGN_FILL);
+            button = libbalsa_add_button_to_box(_("_Search key server for updates of this key"),
+                                                hbox, GTK_ALIGN_FILL);
         }
         g_signal_connect(button, "clicked",
                          G_CALLBACK(on_gpg_key_button),
                          (gpointer) g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info));
-
-        gtk_container_add(GTK_CONTAINER(hbox), button);
     }
 
     /* Hack alert: if we omit the box below and use the expander as signature widget

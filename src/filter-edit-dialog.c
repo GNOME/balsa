@@ -180,7 +180,6 @@ static GtkWidget *
 build_left_side(void)
 {
     GtkWidget *vbox, *bbox;
-    GtkSizeGroup *size_group;
     GtkWidget *sw;
 
     /*
@@ -219,17 +218,16 @@ build_left_side(void)
 
     /* new and delete buttons */
     bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-    size_group = gtk_size_group_new(GTK_SIZE_GROUP_BOTH);
 
     gtk_container_add(GTK_CONTAINER(vbox), bbox);
 
     /* new button */
     /* Translators: button "New" filter */
-    fe_new_button = libbalsa_button_box_button(C_("filter", "_New"), size_group, GTK_ALIGN_CENTER);
+    fe_new_button = libbalsa_add_button_to_box(C_("filter", "_New"), bbox, GTK_ALIGN_CENTER);
     g_signal_connect(fe_new_button, "clicked",
 		     G_CALLBACK(fe_new_pressed), NULL);
     /* delete button */
-    fe_delete_button = libbalsa_button_box_button(("_Delete"), size_group, GTK_ALIGN_CENTER);
+    fe_delete_button = libbalsa_add_button_to_box(("_Delete"), bbox, GTK_ALIGN_CENTER);
     g_signal_connect(fe_delete_button, "clicked",
 		     G_CALLBACK(fe_delete_pressed), NULL);
     gtk_widget_set_sensitive(fe_delete_button, FALSE);
@@ -248,7 +246,6 @@ build_match_page()
     GtkWidget *page, *button;
     GtkWidget *label, *scroll;
     GtkWidget *box = NULL;
-    GtkSizeGroup *size_group;
 
     /* The notebook page */
     page = gtk_grid_new();
@@ -311,18 +308,15 @@ build_match_page()
     gtk_widget_set_hexpand(box, TRUE);
     gtk_grid_attach(GTK_GRID(page), box, 0, 3, 2, 1);
 
-    size_group = gtk_size_group_new(GTK_SIZE_GROUP_BOTH);
-
-    fe_condition_edit_button = libbalsa_button_box_button(_("_Edit"), size_group, GTK_ALIGN_START);
+    fe_condition_edit_button = libbalsa_add_button_to_box(_("_Edit"), box, GTK_ALIGN_START);
     gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
     g_signal_connect(fe_condition_edit_button, "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(0));
     /* Translators: button "New" filter match */
-    button = libbalsa_button_box_button(C_("filter match", "Ne_w"), size_group, GTK_ALIGN_CENTER);
-    gtk_container_add(GTK_CONTAINER(box), button);
+    button = libbalsa_add_button_to_box(C_("filter match", "Ne_w"), box, GTK_ALIGN_CENTER);
     g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(1));
-    fe_condition_delete_button = libbalsa_button_box_button(_("_Remove"), size_group, GTK_ALIGN_END);
+    fe_condition_delete_button = libbalsa_add_button_to_box(_("_Remove"), box, GTK_ALIGN_END);
     gtk_widget_set_sensitive(fe_condition_delete_button,FALSE);
     g_signal_connect(fe_condition_delete_button, "clicked",
 		     G_CALLBACK(fe_condition_remove_pressed), NULL);
@@ -491,7 +485,6 @@ build_right_side(GtkWindow * window)
     GtkWidget *rightside;
     GtkWidget *notebook, *page;
     GtkWidget *bbox;
-    GtkSizeGroup *size_group;
 
     rightside = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
 
@@ -513,13 +506,11 @@ build_right_side(GtkWindow * window)
     bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add(GTK_CONTAINER(rightside), bbox);
 
-    size_group = gtk_size_group_new(GTK_SIZE_GROUP_BOTH);
-
-    fe_apply_button = libbalsa_button_box_button(_("_Apply"), size_group, GTK_ALIGN_START);
+    fe_apply_button = libbalsa_add_button_to_box(_("_Apply"), bbox, GTK_ALIGN_START);
     g_signal_connect(fe_apply_button, "clicked",
 		     G_CALLBACK(fe_apply_pressed), NULL);
 
-    fe_revert_button = libbalsa_button_box_button(_("Re_vert"), size_group, GTK_ALIGN_END);
+    fe_revert_button = libbalsa_add_button_to_box(_("Re_vert"), bbox, GTK_ALIGN_END);
     g_signal_connect(fe_revert_button, "clicked",
 		     G_CALLBACK(fe_revert_pressed), NULL);
     gtk_widget_set_sensitive(fe_apply_button, FALSE);

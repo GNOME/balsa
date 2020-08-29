@@ -251,6 +251,7 @@ balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_repl
 	GtkWidget *label;
 	GtkWidget *bbox;
 	GtkWidget *button;
+        GtkSizeGroup *size_group;
 
 	/* add the callback data to the event object */
 	g_object_set_data_full(G_OBJECT(event), "ev:sender",
@@ -268,7 +269,9 @@ balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_repl
         bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	gtk_container_add(GTK_CONTAINER(box), bbox);
 
-        button = libbalsa_add_mnemonic_button_to_box(_("Accept"), bbox, GTK_ALIGN_CENTER);
+        size_group = gtk_size_group_new(GTK_SIZE_GROUP_BOTH);
+
+        button = libbalsa_button_box_button(_("Accept"), size_group, GTK_ALIGN_CENTER);
 	g_object_set_data(G_OBJECT(button), "event", event);
 
 	/* Note: we must ref the full VCal object here as time zone information is stored in it.  Only ref'ing the event would thus
@@ -280,14 +283,14 @@ balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_repl
 	g_signal_connect(button, "clicked",
 			 G_CALLBACK(vevent_reply), bbox);
 
-        button = libbalsa_add_mnemonic_button_to_box(_("Accept tentatively"), bbox, GTK_ALIGN_CENTER);
+        button = libbalsa_button_box_button(_("Accept tentatively"), size_group, GTK_ALIGN_CENTER);
 	g_object_set_data(G_OBJECT(button), "event", event);
 	g_object_set_data(G_OBJECT(button), "mode",
 			  GINT_TO_POINTER(ICAL_PARTSTAT_TENTATIVE));
 	g_signal_connect(button, "clicked",
 			 G_CALLBACK(vevent_reply), bbox);
 
-        button = libbalsa_add_mnemonic_button_to_box(_("Decline"), bbox, GTK_ALIGN_CENTER);
+        button = libbalsa_button_box_button(_("Decline"), size_group, GTK_ALIGN_CENTER);
 	g_object_set_data(G_OBJECT(button), "event", event);
 	g_object_set_data(G_OBJECT(button), "mode",
 			  GINT_TO_POINTER(ICAL_PARTSTAT_DECLINED));

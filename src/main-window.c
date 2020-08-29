@@ -3902,11 +3902,11 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	/* Button box */
 	box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(box), 6);
-        button = libbalsa_add_mnemonic_button_to_box(_("_Apply"), box, GTK_ALIGN_START);
+        button = libbalsa_add_button_to_box(_("_Apply"), box, GTK_ALIGN_START);
 	g_signal_connect(button, "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_FILTER));
-        button = libbalsa_add_mnemonic_button_to_box(_("_Clear"), box, GTK_ALIGN_END);
+        button = libbalsa_add_button_to_box(_("_Clear"), box, GTK_ALIGN_END);
 	g_signal_connect(button, "clicked",
 			 G_CALLBACK(bw_find_button_clicked),
 			 GINT_TO_POINTER(FIND_RESPONSE_RESET));

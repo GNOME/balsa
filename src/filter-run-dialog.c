@@ -340,16 +340,14 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_container_add(GTK_CONTAINER(vbox), sw);
 
     /* To keep a consistent look, make a button box for a single button. */
-    bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_box_set_spacing(GTK_BOX(bbox), 2);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
+    bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_widget_set_margin_top(bbox, 2);
     gtk_widget_set_margin_bottom(bbox, 2);
     gtk_container_add(GTK_CONTAINER(vbox), bbox);
 
     /* "Apply selected" button */
     p->apply_selected_button = button =
-            libbalsa_add_mnemonic_button_to_box(_("_Apply Selected"), bbox, GTK_ALIGN_CENTER);
+            libbalsa_add_button_to_box(_("_Apply Selected"), bbox, GTK_ALIGN_CENTER);
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(fr_apply_selected_pressed), p);

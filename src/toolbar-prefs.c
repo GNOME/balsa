@@ -414,10 +414,10 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
 
     /* Standard button */
     page->standard_button =
-        libbalsa_add_button_to_box(_("_Restore toolbar to standard buttons"), button_box, GTK_ALIGN_START);
+        libbalsa_add_mnemonic_button_to_box(_("_Restore toolbar to standard buttons"), button_box, GTK_ALIGN_START);
 
     /* Style button */
-    style_button = libbalsa_add_button_to_box(_("Toolbar _style…"), button_box, GTK_ALIGN_END);
+    style_button = libbalsa_add_mnemonic_button_to_box(_("Toolbar _style…"), button_box, GTK_ALIGN_END);
 
     /* Done with preview */
 

@@ -1283,8 +1283,8 @@ libbalsa_parser_options(void)
 
 GtkWidget *
 libbalsa_add_mnemonic_button_to_box(const gchar *markup,
-                           GtkWidget   *box,
-                           GtkAlign     align)
+                                    GtkWidget   *box,
+                                    GtkAlign     align)
 {
     GtkSizeGroup *size_group;
     GtkWidget *label;
@@ -1293,7 +1293,7 @@ libbalsa_add_mnemonic_button_to_box(const gchar *markup,
     size_group = g_object_get_data(G_OBJECT(box), LIBBALSA_SIZE_GROUP_KEY);
     if (size_group == NULL) {
         size_group = gtk_size_group_new(GTK_SIZE_GROUP_BOTH);
-        g_object_set_data(G_OBJECT(box), LIBBALSA_SIZE_GROUP_KEY, size_group);
+        g_object_set_data_full(G_OBJECT(box), LIBBALSA_SIZE_GROUP_KEY, size_group, g_object_unref);
     }
 
     label = gtk_label_new(NULL);

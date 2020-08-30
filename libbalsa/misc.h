@@ -164,8 +164,8 @@ void libbalsa_parser_options_init(void);
 GMimeParserOptions *libbalsa_parser_options(void);
 
 GtkWidget * libbalsa_add_mnemonic_button_to_box(const gchar *markup,
-                                       GtkWidget   *box,
-                                       GtkAlign     align);
+                                                GtkWidget   *box,
+                                                GtkAlign     align);
 
 
 #endif				/* __LIBBALSA_MISC_H__ */

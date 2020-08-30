@@ -141,7 +141,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
 
         	autocrypt_key = autocrypt_get_key(g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info), NULL);
         	if (autocrypt_key != NULL) {
-			button = libbalsa_add_button_to_box(_("_Import Autocrypt key"),
+			button = libbalsa_add_mnemonic_button_to_box(_("_Import Autocrypt key"),
                                                             hbox, GTK_ALIGN_FILL);
         		g_object_set_data_full(G_OBJECT(button), "autocrypt_key", autocrypt_key, (GDestroyNotify) g_bytes_unref);
         		g_signal_connect(button, "clicked", G_CALLBACK(on_key_import_button), NULL);
@@ -153,10 +153,10 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         		gtk_container_add(GTK_CONTAINER(hbox), button);
         	}
 #endif
-            button = libbalsa_add_button_to_box(_("_Search key server for this key"),
+            button = libbalsa_add_mnemonic_button_to_box(_("_Search key server for this key"),
                                                 hbox, GTK_ALIGN_FILL);
         } else {
-            button = libbalsa_add_button_to_box(_("_Search key server for updates of this key"),
+            button = libbalsa_add_mnemonic_button_to_box(_("_Search key server for updates of this key"),
                                                 hbox, GTK_ALIGN_FILL);
         }
         g_signal_connect(button, "clicked",

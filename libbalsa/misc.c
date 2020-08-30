@@ -1254,7 +1254,7 @@ libbalsa_parser_options(void)
 }
 
 /*
- * libbalsa_add_button_to_box
+ * libbalsa_add_mnemonic_button_to_box
  *
  * Create a button widget and add it to a GtkBox with the same
  * look as a regular button in a GtkButtonBox; returns the button.
@@ -1282,7 +1282,7 @@ libbalsa_parser_options(void)
 #define LIBBALSA_SIZE_GROUP_KEY "libbalsa-size-group-key"
 
 GtkWidget *
-libbalsa_add_button_to_box(const gchar *markup,
+libbalsa_add_mnemonic_button_to_box(const gchar *markup,
                            GtkWidget   *box,
                            GtkAlign     align)
 {

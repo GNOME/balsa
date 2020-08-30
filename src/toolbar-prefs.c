@@ -409,18 +409,15 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     gtk_container_add(GTK_CONTAINER(toolbar_scroll), page->toolbar);
 
     /* Button box */
-    button_box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_box_set_spacing(GTK_BOX(button_box), 5);
+    button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_container_add(GTK_CONTAINER(toolbar_ctlbox), button_box);
 
     /* Standard button */
     page->standard_button =
-        gtk_button_new_with_mnemonic(_("_Restore toolbar to standard buttons"));
-    gtk_container_add(GTK_CONTAINER(button_box), page->standard_button);
+        libbalsa_add_button_to_box(_("_Restore toolbar to standard buttons"), button_box, GTK_ALIGN_START);
 
     /* Style button */
-    style_button = gtk_button_new_with_mnemonic(_("Toolbar _style…"));
-    gtk_container_add(GTK_CONTAINER(button_box), style_button);
+    style_button = libbalsa_add_button_to_box(_("Toolbar _style…"), button_box, GTK_ALIGN_END);
 
     /* Done with preview */
 

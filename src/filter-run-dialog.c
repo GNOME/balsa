@@ -347,7 +347,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     /* "Apply selected" button */
     p->apply_selected_button = button =
-            libbalsa_add_button_to_box(_("_Apply Selected"), bbox, GTK_ALIGN_CENTER);
+            libbalsa_add_mnemonic_button_to_box(_("_Apply Selected"), bbox, GTK_ALIGN_CENTER);
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(fr_apply_selected_pressed), p);

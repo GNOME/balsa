@@ -271,10 +271,12 @@ lbav_ensure_blank_line_idle_cb(LibBalsaAddressView * address_view)
     gtk_tree_row_reference_free(address_view->focus_row);
     address_view->focus_row = NULL;
 
-    /* This will open the entry for editing */
-    gtk_tree_view_set_cursor(GTK_TREE_VIEW(address_view), focus_path,
-                             address_view->focus_column, TRUE);
-    gtk_tree_path_free(focus_path);
+    if (focus_path != NULL) {
+        /* This will open the entry for editing */
+        gtk_tree_view_set_cursor(GTK_TREE_VIEW(address_view), focus_path,
+                                 address_view->focus_column, TRUE);
+        gtk_tree_path_free(focus_path);
+    }
 
     address_view->focus_idle_id = 0;
 
@@ -1160,14 +1162,18 @@ libbalsa_address_view_add_to_row(LibBalsaAddressView * address_view,
     GtkTreePath *path;
     GtkTreeIter iter;
     guint type;
-    gboolean valid;
+    gboolean valid = FALSE;
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view));
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
+
     path = gtk_tree_row_reference_get_path(row_ref);
-    valid = gtk_tree_model_get_iter(model, &iter, path);
-    gtk_tree_path_free(path);
+    if (path != NULL) {
+        valid = gtk_tree_model_get_iter(model, &iter, path);
+        gtk_tree_path_free(path);
+    }
+
     if (!valid)
         return;
 

@@ -865,8 +865,10 @@ bndx_scroll_to_row_idle(gpointer user_data)
     gtk_tree_row_reference_free(bindex->reference);
     bindex->reference = NULL;
 
-    gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
-    gtk_tree_path_free(path);
+    if (path != NULL) {
+        gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
+        gtk_tree_path_free(path);
+    }
 
     bindex->scroll_to_row_idle_id = 0;
 
@@ -1393,8 +1395,10 @@ bndx_expand_to_row_and_select_idle(BalsaIndex *bindex)
     gtk_tree_row_reference_free(bindex->reference);
     bindex->reference = NULL;
 
-    bndx_select_row(bindex, path);
-    gtk_tree_path_free(path);
+    if (path != NULL) {
+        bndx_select_row(bindex, path);
+        gtk_tree_path_free(path);
+    }
 
     return G_SOURCE_REMOVE;
 }

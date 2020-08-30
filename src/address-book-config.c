@@ -400,7 +400,6 @@ create_osmo_dialog(AddressBookConfig *abc)
     grid = libbalsa_create_grid();
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     gtk_container_add(GTK_CONTAINER(content_area), grid);
-    gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), grid);
     label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
     gtk_size_group_add_widget(size_group, label);
     abc->name_entry =

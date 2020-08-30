@@ -835,15 +835,15 @@ bab_get_edit_button_box(struct ABMainWindow *abmw)
 
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 
-    abmw->apply_button = libbalsa_add_button_to_box(_("_Apply"), box, GTK_ALIGN_START);
+    abmw->apply_button = libbalsa_add_mnemonic_button_to_box(_("_Apply"), box, GTK_ALIGN_START);
     g_signal_connect(abmw->apply_button, "clicked",
                      G_CALLBACK(apply_button_cb), (gpointer) NULL);
 
-    abmw->remove_button = libbalsa_add_button_to_box(_("_Remove"), box, GTK_ALIGN_CENTER);
+    abmw->remove_button = libbalsa_add_mnemonic_button_to_box(_("_Remove"), box, GTK_ALIGN_CENTER);
     g_signal_connect(abmw->remove_button, "clicked",
                      G_CALLBACK(remove_button_cb), (gpointer) NULL);
 
-    abmw->cancel_button = libbalsa_add_button_to_box(_("_Cancel"), box, GTK_ALIGN_END);
+    abmw->cancel_button = libbalsa_add_mnemonic_button_to_box(_("_Cancel"), box, GTK_ALIGN_END);
     g_signal_connect(abmw->cancel_button, "clicked",
                      G_CALLBACK(cancel_button_cb), abmw);
 

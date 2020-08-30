@@ -163,7 +163,7 @@ gchar *libbalsa_font_string_to_css(const gchar * font_string, const gchar * name
 void libbalsa_parser_options_init(void);
 GMimeParserOptions *libbalsa_parser_options(void);
 
-GtkWidget * libbalsa_add_button_to_box(const gchar *markup,
+GtkWidget * libbalsa_add_mnemonic_button_to_box(const gchar *markup,
                                        GtkWidget   *box,
                                        GtkAlign     align);
 

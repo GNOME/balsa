@@ -175,6 +175,7 @@ struct _BalsaIndex {
     guint selection_changed_idle_id;
     guint mailbox_changed_idle_id;
     guint scroll_to_row_idle_id;
+    guint ensure_visible_idle_id;
 
     LibBalsaMailboxSearchIter *search_iter;
     BalsaIndexWidthPreference width_preference;
@@ -269,6 +270,11 @@ bndx_destroy(GObject * obj)
     if (bindex->scroll_to_row_idle_id != 0) {
         g_source_remove(bindex->scroll_to_row_idle_id);
         bindex->scroll_to_row_idle_id = 0;
+    }
+
+    if (bindex->ensure_visible_idle_id != 0) {
+        g_source_remove(bindex->ensure_visible_idle_id);
+        bindex->ensure_visible_idle_id = 0;
     }
 
     /* Clean up any other idle handler sources */
@@ -2820,7 +2826,7 @@ bndx_ensure_visible_idle(gpointer user_data)
         gtk_tree_path_free(path);
     }
 
-    g_object_unref(bindex);
+    bindex->ensure_visible_idle_id = 0;
 
     return G_SOURCE_REMOVE;
 }
@@ -2830,7 +2836,10 @@ balsa_index_ensure_visible(BalsaIndex * bindex)
 {
     g_return_if_fail(BALSA_IS_INDEX(bindex));
 
-    g_idle_add_full(G_PRIORITY_LOW, bndx_ensure_visible_idle, g_object_ref(bindex), NULL);
+    if (bindex->ensure_visible_idle_id == 0) {
+        bindex->ensure_visible_idle_id =
+            g_idle_add_full(G_PRIORITY_LOW, bndx_ensure_visible_idle, bindex, NULL);
+    }
 }
 
 void

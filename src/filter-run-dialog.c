@@ -453,6 +453,8 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_size_group_add_widget(size_group, button);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
+    g_object_unref(size_group);
+
     p->filters_modified = FALSE;
 }
 

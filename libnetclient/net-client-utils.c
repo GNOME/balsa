@@ -386,3 +386,21 @@ gss_error_string(OM_uint32 err_maj, OM_uint32 err_min)
 }
 
 #endif		/* HAVE_GSSAPI */
+
+
+#if defined(HAVE_OAUTH2)
+
+gchar *
+net_client_auth_oauth2_calc(const gchar *user, const gchar *access_token)
+{
+	gchar *buffer;
+	gchar *result;
+
+	g_return_val_if_fail((user != NULL) && (access_token != NULL), NULL);
+	buffer = g_strdup_printf("user=%s\001auth=Bearer %s\001\001", user, access_token);
+	result = g_base64_encode(buffer, strlen(buffer));
+	g_free(buffer);
+	return result;
+}
+
+#endif      /* HAVE_OAUTH2 */

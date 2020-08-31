@@ -54,7 +54,8 @@ enum _NetClientCryptMode {
 enum _NetClientAuthMode {
 	NET_CLIENT_AUTH_NONE_ANON = 1,			/**< No authentication (SMTP); anonymous authentication (RFC 4505 for POP3, IMAP). */
 	NET_CLIENT_AUTH_USER_PASS = 2,			/**< Authenticate with user name and password. */
-	NET_CLIENT_AUTH_KERBEROS = 4			/**< Authenticate with user name and Kerberos ticket. */
+	NET_CLIENT_AUTH_KERBEROS = 4,			/**< Authenticate with user name and Kerberos ticket. */
+	NET_CLIENT_AUTH_OAUTH2 = 8				/**< OAUTHBEARER authentication (RFC 7628). */
 };
 
 
@@ -110,6 +111,16 @@ gboolean net_client_configure(NetClient *client, const gchar *host_and_port, gui
  * @note The function returns the value of @em host_and_port set by net_client_new() or net_client_configure().
  */
 const gchar *net_client_get_host(NetClient *client);
+
+
+/** @brief Get the remote address of a connected network client
+ *
+ * @param client network client
+ * @return the remote address, or NULL if the client is not connected or on error
+ *
+ * @note The returned value is part of the passed network client object and shall not be modified or unref'ed.
+ */
+GNetworkAddress *net_client_get_remote_address(NetClient *client);
 
 
 /** @brief Connect a network client
@@ -344,9 +355,9 @@ gboolean net_client_can_read(NetClient *client);
  * - @anchor auth auth
  *   @code gchar **get_auth(NetClient *client, NetClientAuthMode mode, gpointer user_data) @endcode Authentication is required by
  *   the remote server.  The signal handler shall return a NULL-terminated array of strings, containing the user name in the first
- *   and the password (mode @ref NET_CLIENT_AUTH_USER_PASS) in the second element.  For @ref NET_CLIENT_AUTH_KERBEROS, no password
- *   is required.  In this case, the second element must be present in the reply, but it is ignored and should be NULL.  The
- *   strings are wiped and freed when they are not needed any more.
+ *   and the password (mode @ref NET_CLIENT_AUTH_USER_PASS) or the OAuth2 access token (@ref NET_CLIENT_AUTH_OAUTH2) in the second
+ *   element.  For @ref NET_CLIENT_AUTH_KERBEROS, no password is required.  In this case, the second element must be present in the
+ *   reply, but it is ignored and should be NULL.  The strings are wiped and freed when they are not needed any more.
  */
 
 

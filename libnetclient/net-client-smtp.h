@@ -127,8 +127,8 @@ gboolean net_client_smtp_set_auth_mode(NetClientSmtp *client, NetClientAuthMode 
  * information unless anonymous access has been configured by calling net_client_smtp_set_auth_mode().
  *
  * The function will try only @em one authentication method which is both supported by the server and enabled by calling
- * net_client_smtp_set_auth_mode().  The precedence is: no authentication, GSSAPI (Kerberos), user name and password.  For the
- * latter, the order is CRAM-SHA1, CRAM-MD5, PLAIN, or LOGIN.  It is up to the caller to ensure encryption or a connection to
+ * net_client_smtp_set_auth_mode().  The precedence is: no authentication, GSSAPI (Kerberos), OAuth2, user name and password.  For
+ * the latter, the order is CRAM-SHA1, CRAM-MD5, PLAIN, or LOGIN.  It is up to the caller to ensure encryption or a connection to
  * @c localhost if one of the plain text methods shall be used.
  *
  * In order to shut down a successfully established connection, just call <tt>g_object_unref()</tt> on the SMTP network client
@@ -236,6 +236,7 @@ void net_client_smtp_msg_free(NetClientSmtpMessage *smtp_msg);
  *   - PLAIN according to <a href="https://tools.ietf.org/html/rfc4616">RFC 4616</a>
  *   - LOGIN
  *   - GSSAPI according to <a href="https://tools.ietf.org/html/rfc4752">RFC 4752</a> (if configured with gssapi support)
+ *   - XOAUTH2 according to <a href="https://tools.ietf.org/html/rfc6749">RFC 6749</a> (if configured with OAuth2 support)
  * - STARTTLS encryption according to <a href="https://tools.ietf.org/html/rfc3207">RFC 3207</a>
  * - Delivery Status Notifications (DSNs) according to <a href="https://tools.ietf.org/html/rfc3461">RFC 3461</a>
  */

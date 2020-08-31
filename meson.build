@@ -54,6 +54,7 @@ systray       = get_option('systray')
 canberra      = get_option('canberra')
 compface      = get_option('compface')
 gss           = get_option('gss')
+oauth2        = get_option('oauth2')
 html_widget   = get_option('html-widget')
 gtksourceview = get_option('gtksourceview')
 spell_checker = get_option('spell-checker')
@@ -300,6 +301,18 @@ if gss
   balsa_deps        += krb5_dep
   libnetclient_deps += krb5_dep
 endif # gss
+
+# OAuth2 configuration
+#
+if oauth2
+  oauth2_dep = dependency('libsoup-2.4 json-glib-1.0')
+  if oauth2_dep.found()
+    conf.set('HAVE_GCR', 1,
+      description : 'Defined when OAuth2 is available')
+  endif
+  balsa_deps        += oauth2_dep
+  libnetclient_deps += oauth2_dep
+endif #oauth2
 
 # gcr configuration
 #

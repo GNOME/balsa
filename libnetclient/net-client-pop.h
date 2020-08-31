@@ -138,9 +138,9 @@ gboolean net_client_pop_set_auth_mode(NetClientPop *client, NetClientAuthMode au
  * information.  Simply ignore the signal for an unauthenticated connection.
  *
  * The function will try only @em one authentication method which is both supported by the server and enabled by calling
- * net_client_pop_set_auth_mode().  The precedence is: ANONYMOUS, GSSAPI (Kerberos), user name and password.  For the latter, the
- * order is CRAM-SHA1, CRAM-MD5, APOP, PLAIN, LOGIN or USER/PASS.  It is up to the caller to ensure encryption or a connection to
- * @c localhost if one of the plain text methods shall be used.
+ * net_client_pop_set_auth_mode().  The precedence is: ANONYMOUS, GSSAPI (Kerberos), OAuth2, user name and password.  For the
+ * latter, the order is CRAM-SHA1, CRAM-MD5, APOP, PLAIN, LOGIN or USER/PASS.  It is up to the caller to ensure encryption or a
+ * connection to @c localhost if one of the plain text methods shall be used.
  *
  * In order to shut down a successfully established connection, just call <tt>g_object_unref()</tt> on the POP network client
  * object.
@@ -228,9 +228,10 @@ void net_client_pop_msg_info_free(NetClientPopMessageInfo *info);
  * - support for <i>PIPELINING</i> and <i>UIDL</i> as defined by <a href="https://tools.ietf.org/html/rfc2449">RFC 2449</a>;
  * - <i>STLS</i> encryption as defined by <a href="https://tools.ietf.org/html/rfc2595">RFC 2595</a>;
  * - authentication using <i>APOP</i>, <i>USER/PASS</i> (both RFC 1939) or the SASL methods <i>ANONYMOUS</i>, <i>PLAIN</i>,
- *   <i>LOGIN</i>, <i>CRAM-MD5</i>, <i>CRAM-SHA1</i> and <i>GSSAPI</i> (see <a href="https://tools.ietf.org/html/rfc4752">RFC
- *   4752</a> depending upon the capabilities reported by the server.  Note that <i>GSSAPI</i> is available only if
- *   configured with the respective support.
+ *   <i>LOGIN</i>, <i>CRAM-MD5</i>, <i>CRAM-SHA1</i>, <i>GSSAPI</i> (see <a href="https://tools.ietf.org/html/rfc4752">RFC
+ *   4752</a> and <a href="https://tools.ietf.org/html/rfc5034">RFC 5034</a>) or <i>XOAUTH2</i> (<a
+ *   href="https://tools.ietf.org/html/rfc6749">RFC 6749</a>) depending upon the capabilities reported by the server.  Note that
+ *   <i>GSSAPI</i> and <i>XOAUTH2</i> are available only if configured with the respective support.
  */
 
 

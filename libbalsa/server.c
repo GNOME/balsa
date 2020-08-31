@@ -34,6 +34,7 @@
 #include "libbalsa_private.h"
 #include "libbalsa-conf.h"
 #include "net-client-utils.h"
+#include "oauth2.h"
 #include <glib/gi18n.h>
 
 
@@ -79,6 +80,9 @@ struct _LibBalsaServerPrivate {
     gboolean remember_passwd;
     gboolean remember_cert_passphrase;
     NetClientAuthMode auth_mode;
+#if defined(HAVE_OAUTH2)
+    LibBalsaOauth2 *oauth;
+#endif
 };
 
 static void libbalsa_server_finalize(GObject * object);
@@ -179,6 +183,11 @@ libbalsa_server_finalize(GObject * object)
     g_free(priv->cert_file);
     priv->passwd = libbalsa_free_password(priv->passwd);
     priv->cert_passphrase = libbalsa_free_password(priv->cert_passphrase);
+#if defined(HAVE_OAUTH2)
+    if (priv->oauth != NULL) {
+    	g_object_unref(priv->oauth);
+    }
+#endif
 
     G_OBJECT_CLASS(libbalsa_server_parent_class)->finalize(object);
 }
@@ -582,6 +591,24 @@ libbalsa_server_get_auth(NetClient         *client,
             break;
         case NET_CLIENT_AUTH_KERBEROS:
         	break;			/* only user name required */
+#if defined(HAVE_OAUTH2)
+        case NET_CLIENT_AUTH_OAUTH2: {
+        	GError *error = NULL;
+
+        	if (priv->oauth == NULL) {
+        		priv->oauth = libbalsa_oauth2_new(server, &error);
+        	}
+        	if (priv->oauth != NULL) {
+        		// FIXME - how to pass parent window?
+        		result[1] = libbalsa_oauth2_token(priv->oauth, NULL, &error);
+        	}
+        	if (error != NULL) {
+        		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("OAuth error: %s"), error->message);
+        		g_clear_error(&error);
+        	}
+        	break;
+        }
+#endif	/* defined(HAVE_OAUTH2) */
         default:
         	g_assert_not_reached();
         }

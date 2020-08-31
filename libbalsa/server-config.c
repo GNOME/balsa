@@ -432,6 +432,9 @@ server_cfg_auth_widget(LibBalsaServer *server)
 #if defined(HAVE_GSSAPI)
     gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo_box), "4", _("Kerberos (GSSAPI)"));
 #endif
+#if defined(HAVE_OAUTH2)
+    gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(combo_box), "8", _("OAuth2"));
+#endif
 
     snprintf(id_buf, sizeof(id_buf), "%d", (gint) libbalsa_server_get_auth_mode(server));
     gtk_combo_box_set_active_id(GTK_COMBO_BOX(combo_box), id_buf);
@@ -534,7 +537,10 @@ on_server_probe(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
 			crypt_str = _("no");
 		}
 
-		if ((probe_res.auth_mode & NET_CLIENT_AUTH_KERBEROS) != 0) {
+		if ((probe_res.auth_mode & NET_CLIENT_AUTH_OAUTH2) != 0) {
+			auth_str = _("OAuth2");
+			probe_res.auth_mode = NET_CLIENT_AUTH_OAUTH2;
+		} else if ((probe_res.auth_mode & NET_CLIENT_AUTH_KERBEROS) != 0) {
 			auth_str = _("Kerberos (GSSAPI)");
 			probe_res.auth_mode = NET_CLIENT_AUTH_KERBEROS;
 		} else if ((probe_res.auth_mode & NET_CLIENT_AUTH_USER_PASS) != 0) {

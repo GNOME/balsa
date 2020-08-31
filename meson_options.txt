@@ -38,6 +38,11 @@ option('gss',
   value       : false,
   description : 'Enable GSS (default=false)')
 
+option('oauth2',
+  type        : 'boolean',
+  value       : false,
+  description : 'Enable OAuth2 authentication (needs libsoup and json-glib, default=no)')
+
 option('html-widget',
   type        : 'combo',
   choices     : ['webkit2', 'no'],

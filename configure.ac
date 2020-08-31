@@ -85,6 +85,11 @@ AC_ARG_WITH(gss,
                   [Enable GSS (default=no)]),
                   [with_gss=$withval],[with_gss=no])
 
+AC_ARG_WITH(oauth2,
+   AC_HELP_STRING([--with-oauth2],
+                  [Enable OAuth2 authentication (needs libsoup and json-glib, default=no)]),
+                  [with_oauth2=$withval],[with_oauth2=no])
+
 AC_ARG_WITH(html-widget,
             AS_HELP_STRING([--with-html-widget=(no|webkit2)],
                            [select the HTML renderer (default webkit2)]),
@@ -402,6 +407,20 @@ if test "x$with_gss" != xno  ; then
    fi
 fi
 
+# OAuth2 configuration
+AC_MSG_CHECKING(whether to include OAuth2 support)
+if test "x$with_oauth2" != xno  ; then
+    PKG_CHECK_MODULES(OAUTH2, [libsoup-2.4 json-glib-1.0])
+    AC_DEFINE(HAVE_OAUTH2,1,[Defined when OAuth2 is available.])
+    BALSA_CFLAGS="$BALSA_CFLAGS $OAUTH2_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $OAUTH2_LIBS"
+    LIBNETCLIENT_CFLAGS="$LIBNETCLIENT_CFLAGS $OAUTH2_CFLAGS"
+    LIBNETCLIENT_LIBS="$LIBNETCLIENT_LIBS $OAUTH2_LIBS"
+else
+    AC_MSG_RESULT([no])
+fi
+
+
 # gcr configuration
 if test x$with_gcr != xno; then
     PKG_CHECK_MODULES(GCR, [ gcr-3 ])
@@ -660,6 +679,7 @@ echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
 echo "          GPE address book: $with_gpe"
 echo "            WebDAV support: $with_webdav"
+echo "            OAuth2 support: $with_oauth2"
 echo "             Spell checker: $use_spell_checker"
 echo "         Use GtkSourceView: $with_gtksourceview"
 echo "              Use Compface: $with_compface"

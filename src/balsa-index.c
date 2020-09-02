@@ -861,6 +861,44 @@ balsa_index_new(void)
  */
 
 static gboolean
+bndx_scroll_to_row_verify_timeout(gpointer user_data)
+{
+    BalsaIndex *bindex = user_data;
+    GtkTreeView *tree_view = GTK_TREE_VIEW(bindex);
+    GtkTreePath *path;
+
+    path = gtk_tree_row_reference_get_path(bindex->reference);
+
+    if (path != NULL) {
+        GdkRectangle visible_rect;
+        GdkRectangle row_rect;
+
+        gtk_tree_view_get_cell_area(tree_view, path, NULL, &row_rect);
+
+        gtk_tree_view_get_visible_rect(tree_view, &visible_rect);
+        gtk_tree_view_convert_tree_to_bin_window_coords(tree_view,
+                                                        visible_rect.x, visible_rect.y,
+                                                        &visible_rect.x, &visible_rect.y);
+
+        if (row_rect.y < visible_rect.y ||
+            row_rect.y + row_rect.height > visible_rect.y + visible_rect.height ) {
+            /* row is not completely visible, scroll and reschedule */
+            gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
+            gtk_tree_path_free(path);
+
+            return G_SOURCE_CONTINUE;
+        }
+        gtk_tree_path_free(path);
+    }
+
+    gtk_tree_row_reference_free(bindex->reference);
+    bindex->reference = NULL;
+    bindex->scroll_to_row_idle_id = 0;
+
+    return G_SOURCE_REMOVE;
+}
+
+static gboolean
 bndx_scroll_to_row_idle(gpointer user_data)
 {
     BalsaIndex *bindex = user_data;
@@ -868,14 +906,21 @@ bndx_scroll_to_row_idle(gpointer user_data)
     GtkTreePath *path;
 
     path = gtk_tree_row_reference_get_path(bindex->reference);
-    gtk_tree_row_reference_free(bindex->reference);
-    bindex->reference = NULL;
 
     if (path != NULL) {
         gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0, 0);
         gtk_tree_path_free(path);
+
+        if (gtk_widget_get_realized(GTK_WIDGET(tree_view))) {
+            bindex->scroll_to_row_idle_id =
+                g_timeout_add(100, bndx_scroll_to_row_verify_timeout, bindex);
+
+            return G_SOURCE_REMOVE;
+        }
     }
 
+    gtk_tree_row_reference_free(bindex->reference);
+    bindex->reference = NULL;
     bindex->scroll_to_row_idle_id = 0;
 
     return G_SOURCE_REMOVE;

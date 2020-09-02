@@ -1,3 +1,13 @@
+2020-09-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	balsa-index: add a timeout to verify that the scrolled-to row is
+	actually visible, and, if it isn't, to call scroll-to-row again
+
+	* src/balsa-index.c
+	  (bndx_scroll_to_row_verify_timeout): the timeout handler;
+	  (bndx_scroll_to_row_idle): if the tree-view is realized,
+	    schedule the timeout.
+
 2020-08-24  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	* libbalsa/libbalsa-gpgme-widgets.c

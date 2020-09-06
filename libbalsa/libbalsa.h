@@ -183,6 +183,12 @@ enum LibBalsaImageError {
 #endif                          /* HAVE_COMPFACE */
 };
 
+GQuark libbalsa_regex_error_quark(void);
+#define LIBBALSA_REGEX_ERROR libbalsa_regex_error_quark()
+enum LibBalsaRegexError {
+    LIBBALSA_REGEX_ERROR_COMPILE
+};
+
 gboolean libbalsa_use_headerbar(void);
 GtkDialogFlags libbalsa_dialog_flags(void);
 

@@ -722,6 +722,15 @@ libbalsa_image_error_quark(void)
     return quark;
 }
 
+GQuark
+libbalsa_regex_error_quark(void)
+{
+    static GQuark quark = 0;
+    if (quark == 0)
+        quark = g_quark_from_static_string("libbalsa-regex-error-quark");
+    return quark;
+}
+
 gboolean
 libbalsa_use_headerbar(void)
 {

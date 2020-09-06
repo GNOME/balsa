@@ -401,6 +401,6 @@ BalsaIndex* balsa_find_index_by_mailbox(LibBalsaMailbox* mailbox);
 
 void  balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode);
 
-GRegex *balsa_quote_regex_new(void);
+LibBalsaRegex *balsa_quote_regex_new(void);
 
 #endif				/* __BALSA_APP_H__ */

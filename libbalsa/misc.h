@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <gtk/gtk.h>
 #include <gmime/gmime.h>
+#include "regex.h"
 
 typedef enum _LibBalsaCodeset LibBalsaCodeset;
 
@@ -120,8 +121,8 @@ gboolean libbalsa_insert_with_url(GtkTextBuffer * buffer,
 				  guint len,
 				  GtkTextTag * tag,
 				  LibBalsaUrlInsertInfo *url_info);
-void libbalsa_unwrap_selection(GtkTextBuffer * buffer, GRegex * rex);
-gboolean libbalsa_match_regex(const gchar * line, GRegex * rex,
+void libbalsa_unwrap_selection(GtkTextBuffer * buffer, LibBalsaRegex * rex);
+gboolean libbalsa_match_regex(const gchar * line, LibBalsaRegex * rex,
 			      guint * count, guint * index);
 
 int libbalsa_safe_open (const char *path, int flags, mode_t mode, GError **err);

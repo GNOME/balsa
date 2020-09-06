@@ -1404,7 +1404,7 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
                     gboolean             is_flowed,
                     gboolean             is_plain)
 {
-    GRegex *rex = NULL;
+    LibBalsaRegex *rex = NULL;
     PangoContext *context = gtk_widget_get_pango_context(widget);
     PangoFontDescription *desc = pango_context_get_font_description(context);
     gdouble char_width;
@@ -1535,9 +1535,6 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
         g_signal_connect_after(widget, "draw",
                                G_CALLBACK(draw_cite_bars), mwt);
     }
-
-    if (rex != NULL)
-        g_regex_unref(rex);
 }
 
 GtkWidget *

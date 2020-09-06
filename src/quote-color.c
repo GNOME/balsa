@@ -39,16 +39,14 @@
  *   an integer saying how many levels deep.  
  * */
 guint
-is_a_quote(const gchar * str, GRegex * rex)
+is_a_quote(const gchar * str, LibBalsaRegex * rex)
 {
-    guint cnt;
+    guint count = 0;
 
     g_return_val_if_fail(rex != NULL, 0);
 
-    if (str == NULL)
-	return 0;
+    if (str != NULL)
+        libbalsa_match_regex(str, rex, &count, NULL);
 
-    libbalsa_match_regex(str, rex, &cnt, NULL);
-
-    return cnt;
+    return count;
 }

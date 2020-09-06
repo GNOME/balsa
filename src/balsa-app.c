@@ -915,21 +915,21 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     return NULL;
 }
 
-GRegex *
+LibBalsaRegex *
 balsa_quote_regex_new(void)
 {
-    static GRegex *regex  = NULL;
+    static LibBalsaRegex *regex  = NULL;
     static gchar  *string = NULL;
 
     if (g_strcmp0(string, balsa_app.quote_regex) != 0) {
         g_clear_pointer(&string, g_free);
-        g_clear_pointer(&regex, g_regex_unref);
+        g_clear_pointer(&regex, libbalsa_regex_free);
     }
 
     if (regex == NULL) {
         GError *err = NULL;
 
-        regex = g_regex_new(balsa_app.quote_regex, 0, 0, &err);
+        regex = libbalsa_regex_new(balsa_app.quote_regex, 0, &err);
         if (err) {
             g_warning("quote regex compilation failed: %s", err->message);
             g_error_free(err);
@@ -938,5 +938,5 @@ balsa_quote_regex_new(void)
         string = g_strdup(balsa_app.quote_regex);
     }
 
-    return g_regex_ref(regex);
+    return regex;
 }

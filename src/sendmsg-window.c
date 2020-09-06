@@ -6028,7 +6028,7 @@ sw_reflow_activated(GSimpleAction * action, GVariant * parameter, gpointer data)
     BalsaSendmsg *bsmsg = data;
     GtkTextView *text_view;
     GtkTextBuffer *buffer;
-    GRegex *rex;
+    LibBalsaRegex *rex;
 
     if (!bsmsg->flow)
 	return;
@@ -6050,8 +6050,6 @@ sw_reflow_activated(GSimpleAction * action, GVariant * parameter, gpointer data)
     gtk_text_view_scroll_to_mark(text_view,
 				 gtk_text_buffer_get_insert(buffer),
 				 0, FALSE, 0, 0);
-
-    g_regex_unref(rex);
 }
 
 /* To field "changed" signal callback. */

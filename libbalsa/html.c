@@ -693,8 +693,8 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
         return NULL;
     }
 
-    have_src_cid = g_regex_match_simple(CID_REGEX, text, G_REGEX_CASELESS, 0);
-    have_src_oth = g_regex_match_simple(SRC_REGEX, text, G_REGEX_CASELESS, 0);
+    have_src_cid = libbalsa_regex_match_simple(CID_REGEX, text, PCRE2_CASELESS, 0);
+    have_src_oth = libbalsa_regex_match_simple(SRC_REGEX, text, PCRE2_CASELESS, 0);
 
     info = g_new0(LibBalsaWebKitInfo, 1);
     info->body = body;
@@ -769,8 +769,8 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     info->hover_cb        = hover_cb;
     info->clicked_cb      = clicked_cb;
 
-    have_src_cid = g_regex_match_simple(CID_REGEX, text, G_REGEX_CASELESS, 0);
-    have_src_oth = g_regex_match_simple(SRC_REGEX, text, G_REGEX_CASELESS, 0);
+    have_src_cid = libbalsa_regex_match_simple(CID_REGEX, text, PCRE2_CASELESS, 0);
+    have_src_oth = libbalsa_regex_match_simple(SRC_REGEX, text, PCRE2_CASELESS, 0);
 
     info->web_view = lbh_web_view_new(info, LBH_NATURAL_SIZE,
     	auto_load_images || (have_src_cid && !have_src_oth));

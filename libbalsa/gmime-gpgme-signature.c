@@ -358,14 +358,14 @@ static gchar **
 tokenize_subject(const gchar *subject,
 				 gboolean     unescape)
 {
-	static GRegex *split_re = NULL;
+	static LibBalsaRegex *split_re = NULL;
 	static volatile guint initialized = 0U;
 	gchar **result;
 
 	/* create the reqular expression when called for teh first time */
 	if (g_atomic_int_or(&initialized, 1U) == 0U) {
 		/* split a DN string at unescaped ',' and '=' chars */
-		split_re = g_regex_new("(?<!\\\\)[,=]", 0, 0, NULL);
+		split_re = libbalsa_regex_new("(?<!\\\\)[,=]", 0, NULL);
 		g_assert(split_re != NULL);
 	}
 
@@ -380,7 +380,7 @@ tokenize_subject(const gchar *subject,
 		result[0] = g_strdup(subject);
 	} else {
 		/* split into (oid, value) pairs */
-		result = g_regex_split(split_re, subject, 0);
+		result = libbalsa_regex_split(split_re, subject, 0);
 		if (result != NULL) {
 			gint n;
 

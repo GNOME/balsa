@@ -25,10 +25,11 @@
 #endif
 
 #include <gtk/gtk.h>
+#include "regex.h"
 
 G_BEGIN_DECLS
 
-    extern guint is_a_quote(const gchar *, GRegex * rex);
+    extern guint is_a_quote(const gchar *, LibBalsaRegex * rex);
 
 G_END_DECLS
 

@@ -109,7 +109,7 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
 			      LibBalsaMessageBody * body,
 			      BalsaPrintSetup * psetup)
 {
-    GRegex *rex;
+    LibBalsaRegex *rex;
     gchar *textbuf;
     PangoFontDescription *font;
     BalsaPrintRect rect;
@@ -277,7 +277,7 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
     /* clean up */
     pango_font_description_free(font);
     g_free(textbuf);
-    g_regex_unref(rex);
+
     return list;
 }
 

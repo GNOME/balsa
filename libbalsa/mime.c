@@ -671,7 +671,7 @@ is_in_url(GtkTextIter * iter, gint offset, GtkTextTag * url_tag)
 static gboolean prescanner(const gchar * p, guint len);
 static void mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter,
                       GtkTextTag * tag, const gchar * p);
-static GRegex *get_url_reg(void);
+static LibBalsaRegex *get_url_reg(void);
 
 void
 libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
@@ -745,15 +745,15 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
 {
     const gchar *p = line;
     const gchar * const line_end = line + strlen(line);
-    GRegex *url_reg = get_url_reg();
-    GMatchInfo *url_match;
+    LibBalsaRegex *url_reg = get_url_reg();
+    LibBalsaMatchData *url_match;
     GtkTextIter start = *iter;
     GtkTextIter end = *iter;
 
-    while (g_regex_match(url_reg, p, 0, &url_match)) {
+    while (libbalsa_regex_match(url_reg, p, 0, &url_match)) {
         gint start_pos, end_pos;
 
-        if (g_match_info_fetch_pos(url_match, 0, &start_pos, &end_pos)) {
+        if (libbalsa_match_data_fetch_pos(url_match, 0, &start_pos, &end_pos)) {
             glong offset = g_utf8_pointer_to_offset(line, p + start_pos);
             gtk_text_iter_set_line_offset(&start, offset);
             offset = g_utf8_pointer_to_offset(line, p + end_pos);
@@ -764,9 +764,9 @@ mark_urls(GtkTextBuffer * buffer, GtkTextIter * iter, GtkTextTag * tag,
         }
         if (!prescanner(p, line_end - p))
             break;
-        g_match_info_free(url_match);
+        libbalsa_match_data_free(url_match);
     }
-    g_match_info_free(url_match);
+    libbalsa_match_data_free(url_match);
 }
 
 /*
@@ -825,19 +825,19 @@ prescanner(const gchar * s, guint len)
 }
 
 struct url_regex_info {
-    GRegex *url_reg;
+    LibBalsaRegex *url_reg;
     const gchar *str;
     const gchar *func;
     const gchar *msg;
 };
 
-static GRegex *
+static LibBalsaRegex *
 get_url_helper(struct url_regex_info *info)
 {
     if (!info->url_reg) {
         GError *err = NULL;
 
-        info->url_reg = g_regex_new(info->str, G_REGEX_CASELESS, 0, &err);
+        info->url_reg = libbalsa_regex_new(info->str, PCRE2_CASELESS, &err);
         if (err) {
             g_warning("%s %s: %s", info->func, info->msg, err->message);
             g_error_free(err);
@@ -847,7 +847,7 @@ get_url_helper(struct url_regex_info *info)
     return info->url_reg;
 }
 
-static GRegex *
+static LibBalsaRegex *
 get_url_reg(void)
 {
     static struct url_regex_info info = {
@@ -864,7 +864,7 @@ get_url_reg(void)
     return get_url_helper(&info);
 }
 
-static GRegex *
+static LibBalsaRegex *
 get_ml_url_reg(void)
 {
     static struct url_regex_info info = {
@@ -880,7 +880,7 @@ get_ml_url_reg(void)
     return get_url_helper(&info);
 }
 
-static GRegex *
+static LibBalsaRegex *
 get_ml_flowed_url_reg(void)
 {
     static struct url_regex_info info = {
@@ -905,8 +905,8 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
     GtkTextTag *url_tag = gtk_text_tag_table_lookup(table, "url");
     gboolean match;
     gint start_pos, end_pos;
-    GRegex *url_reg;
-    GMatchInfo *url_match;
+    LibBalsaRegex *url_reg;
+    LibBalsaMatchData *url_match;
     const gchar * const line_end = chars + len;
 
     gtk_text_buffer_get_iter_at_mark(buffer, &iter,
@@ -948,8 +948,8 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
     }
 
     url_reg = get_url_reg();
-    match = g_regex_match(url_reg, chars, 0, &url_match)
-        && g_match_info_fetch_pos(url_match, 0, &start_pos, &end_pos)
+    match = libbalsa_regex_match(url_reg, chars, 0, &url_match)
+        && libbalsa_match_data_fetch_pos(url_match, 0, &start_pos, &end_pos)
         && chars + start_pos < line_end;
 
     while (match) {
@@ -962,24 +962,24 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
         if ((start_pos > 0 && (chars[start_pos - 1] == '<')) ||
             (start_pos > 4 &&
              !g_ascii_strncasecmp(chars + start_pos - 5, "<URL:", 5))) {
-            GMatchInfo *ml_url_match;
+            LibBalsaMatchData *ml_url_match;
             gint ml_start_pos, ml_end_pos;
 
             /* if the input is flowed, we may see a space at
              * url_match.rm_eo - in this case the complete remainder
              * of the ml uri should be in the passed buffer... */
             if (url_info->buffer_is_flowed && chars[end_pos] == ' ') {
-                if (g_regex_match(get_ml_flowed_url_reg(), chars + end_pos,
+                if (libbalsa_regex_match(get_ml_flowed_url_reg(), chars + end_pos,
                                   0, &ml_url_match)
-                    && g_match_info_fetch_pos(ml_url_match, 0,
+                    && libbalsa_match_data_fetch_pos(ml_url_match, 0,
                                               &ml_start_pos, &ml_end_pos)
                     && ml_start_pos == 0)
                     end_pos += ml_end_pos - 1;
-                g_match_info_free(ml_url_match);
+                libbalsa_match_data_free(ml_url_match);
             } else if (chars[end_pos] != '>') {
-                if (g_regex_match(get_ml_url_reg(), chars + end_pos,
+                if (libbalsa_regex_match(get_ml_url_reg(), chars + end_pos,
                                   0, &ml_url_match)
-                    && g_match_info_fetch_pos(ml_url_match, 0,
+                    && libbalsa_match_data_fetch_pos(ml_url_match, 0,
                                               &ml_start_pos, NULL)
                     && ml_start_pos == 0) {
                     chars += start_pos;
@@ -987,7 +987,7 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
                         g_string_new_len(chars, line_end - chars);
                     g_string_append_c(url_info->ml_url_buffer, '\n');
                 }
-                g_match_info_free(ml_url_match);
+                libbalsa_match_data_free(ml_url_match);
                 if (url_info->ml_url_buffer)
                     return TRUE;
             }
@@ -1027,15 +1027,15 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 
         chars += end_pos;
         if (prescanner(chars, line_end - chars)) {
-            g_match_info_free(url_match);
-            match = g_regex_match(url_reg, chars, 0, &url_match)
-                && g_match_info_fetch_pos(url_match, 0, &start_pos,
+            libbalsa_match_data_free(url_match);
+            match = libbalsa_regex_match(url_reg, chars, 0, &url_match)
+                && libbalsa_match_data_fetch_pos(url_match, 0, &start_pos,
                                           &end_pos)
                 && chars + start_pos < line_end;
         } else
             match = FALSE;
     }
-    g_match_info_free(url_match);
+    libbalsa_match_data_free(url_match);
 
     gtk_text_buffer_insert_with_tags(buffer, &iter, chars,
                                      line_end - chars, tag, NULL);
@@ -1044,7 +1044,7 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 }
 
 void
-libbalsa_unwrap_selection(GtkTextBuffer * buffer, GRegex * rex)
+libbalsa_unwrap_selection(GtkTextBuffer * buffer, LibBalsaRegex * rex)
 {
     GtkTextIter start, end;
     gchar *line;
@@ -1116,24 +1116,24 @@ libbalsa_unwrap_selection(GtkTextBuffer * buffer, GRegex * rex)
 }
 
 gboolean
-libbalsa_match_regex(const gchar * line, GRegex * rex, guint * count,
+libbalsa_match_regex(const gchar * line, LibBalsaRegex * rex, guint * count,
                      guint * index)
 {
-    GMatchInfo *rm;
+    LibBalsaMatchData *rm;
     gint c;
     const gchar *p;
     gint end_pos;
 
     c = 0;
     for (p = line;
-         g_regex_match(rex, p, 0, &rm)
-         && g_match_info_fetch_pos(rm, 0, NULL, &end_pos)
+         libbalsa_regex_match(rex, p, 0, &rm)
+         && libbalsa_match_data_fetch_pos(rm, 0, NULL, &end_pos)
          && end_pos > 0;
          p += end_pos) {
         c++;
-        g_match_info_free(rm);
+        libbalsa_match_data_free(rm);
     }
-    g_match_info_free(rm);
+    libbalsa_match_data_free(rm);
 
     if (count)
         *count = c;
@@ -1148,8 +1148,8 @@ libbalsa_html_encode_hyperlinks(GString * paragraph)
 {
     GString * retval;
     gchar * p;
-    GRegex *url_reg = get_url_reg();
-    GMatchInfo *url_match;
+    LibBalsaRegex *url_reg = get_url_reg();
+    LibBalsaMatchData *url_match;
     gboolean match;
     gchar * markup;
 
@@ -1165,12 +1165,12 @@ libbalsa_html_encode_hyperlinks(GString * paragraph)
     retval = g_string_new("");
     p = paragraph->str;
 
-    match = g_regex_match(url_reg, p, 0, &url_match);
+    match = libbalsa_regex_match(url_reg, p, 0, &url_match);
 
     while (match) {
         gint start_pos, end_pos;
 
-        if (!g_match_info_fetch_pos(url_match, 0, &start_pos, &end_pos))
+        if (!libbalsa_match_data_fetch_pos(url_match, 0, &start_pos, &end_pos))
             break;
 
         /* add the url to the result */
@@ -1188,12 +1188,12 @@ libbalsa_html_encode_hyperlinks(GString * paragraph)
         /* find next (if any) */
         p += end_pos;
         if (prescanner(p, paragraph->len - (p - paragraph->str))) {
-            g_match_info_free(url_match);
-            match = g_regex_match(url_reg, p, 0, &url_match);
+            libbalsa_match_data_free(url_match);
+            match = libbalsa_regex_match(url_reg, p, 0, &url_match);
         } else
             match = FALSE;
     }
-    g_match_info_free(url_match);
+    libbalsa_match_data_free(url_match);
 
     /* copy remainder */
     if (*p != '\0') {

@@ -563,7 +563,7 @@ done_cb(GtkButton *button,
  * dictionary to do the checking.
  * */
 
-static GRegex *quoted_rex = NULL;
+static LibBalsaRegex *quoted_rex = NULL;
 
 void
 balsa_spell_check_start(BalsaSpellCheck *spell_check)
@@ -636,8 +636,6 @@ balsa_spell_check_start(BalsaSpellCheck *spell_check)
      * balsa_app.quote_regex may change, so compile it new every
      * time!)
      */
-    if (quoted_rex != NULL)
-        g_regex_unref(quoted_rex);
     quoted_rex = balsa_quote_regex_new();
 
     spell_check->end_iter = start;
@@ -845,7 +843,6 @@ balsa_spell_check_destroy(GObject *object)
     }
 
     g_clear_pointer(&spell_check->language_tag, g_free);
-    g_clear_pointer(&quoted_rex, g_regex_unref);
 
     if (G_OBJECT_CLASS(balsa_spell_check_parent_class)->dispose)
         (*G_OBJECT_CLASS(balsa_spell_check_parent_class)->

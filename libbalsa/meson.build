@@ -133,7 +133,9 @@ libbalsa_a_sources = [
   'geometry-manager.c',
   'geometry-manager.h',
   'x509-cert-widget.c',
-  'x509-cert-widget.h'
+  'x509-cert-widget.h',
+  'regex.c',
+  'regex.h'
 ]
 
 libimap_include = include_directories('imap')

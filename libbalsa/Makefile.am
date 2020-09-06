@@ -136,7 +136,9 @@ libbalsa_a_SOURCES = 		\
 	geometry-manager.c	\
 	geometry-manager.h	\
 	x509-cert-widget.c	\
-	x509-cert-widget.h
+	x509-cert-widget.h      \
+	regex.c                 \
+	regex.h
 
 
 EXTRA_DIST = 				\

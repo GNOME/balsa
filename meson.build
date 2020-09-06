@@ -137,6 +137,7 @@ gnutls_dep  = dependency('gnutls',    version : '>= 3.0'   )
 gpgme_dep   = dependency('gpgme',     version : '>= 1.8.0' )
 fribidi_dep = dependency('fribidi'                         )
 libical_dep = dependency('libical',   version : '>= 2.0.0' )
+pcre2_dep   = dependency('libpcre2-8'                      )
 
 # Dependencies for balsa
 balsa_deps = [glib_dep,
@@ -147,7 +148,8 @@ balsa_deps = [glib_dep,
               gnutls_dep,
               gpgme_dep,
               fribidi_dep,
-              libical_dep]
+              libical_dep,
+              pcre2_dep]
 
 # Dependencies for balsa_ab:
 balsa_ab_deps = [glib_dep,

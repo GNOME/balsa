@@ -259,7 +259,7 @@ libbalsa_regex_split(const LibBalsaRegex *regex,
 }
 
 /*
- * libbalsa_match_info_fetch_pos:
+ * libbalsa_match_data_fetch_pos:
  * match_data: LibBalsaMatchData structure
  * match_num: number of the sub expression
  * start_pos: pointer to location where to store the start position, or NULL

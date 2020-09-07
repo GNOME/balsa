@@ -37,5 +37,5 @@ imap_tst_sources = 'imap_tst.c'
 imap_tst = executable('imap_tst', imap_tst_sources,
                       link_with           : [libimap_a, libnetclient_a],
                       dependencies        : balsa_deps,
-                      include_directories : libnetclient_include,
+                      include_directories : [top_include, libnetclient_include],
                       install             : false)

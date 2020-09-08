@@ -73,6 +73,18 @@ libbalsa_regex_new(const gchar *pattern,
                     pattern, errorbuf);
     }
 
+    if (regex != NULL) {
+        errorcode = pcre2_jit_compile(regex, PCRE2_JIT_COMPLETE);
+        if (errorcode < 0) {
+            gchar errorbuf[120];
+
+            pcre2_get_error_message(errorcode, (PCRE2_UCHAR *) errorbuf, sizeof errorbuf);
+            g_set_error(error, LIBBALSA_REGEX_ERROR, LIBBALSA_REGEX_ERROR_JIT_COMPILE,
+                        "Error while JIT-compiling regular expression “%s”: %s",
+                        pattern, errorbuf);
+        }
+    }
+
     return regex;
 }
 

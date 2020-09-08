@@ -186,7 +186,8 @@ enum LibBalsaImageError {
 GQuark libbalsa_regex_error_quark(void);
 #define LIBBALSA_REGEX_ERROR libbalsa_regex_error_quark()
 enum LibBalsaRegexError {
-    LIBBALSA_REGEX_ERROR_COMPILE
+    LIBBALSA_REGEX_ERROR_COMPILE,
+    LIBBALSA_REGEX_ERROR_JIT_COMPILE
 };
 
 gboolean libbalsa_use_headerbar(void);

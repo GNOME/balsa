@@ -193,15 +193,16 @@ void net_client_gss_ctx_free(NetClientGssCtx *gss_ctx);
 /** @brief Calculate a OAuth2 authentication string
  *
  * @param user user name
+ * @param rfc7628mode indicates if RFC 7628 @c OAUTHBEARER instead of RFC 6749 XOAUTH2 mode shall be used
+ * @param client network client, required only if rfc7628mode is set
  * @param access_token access token
  * @return a newly allocated string containing the base64-encoded authentication
  *
- * This helper function calculates the the base64-encoded authentication string from the user name and the access token.  The caller
- * shall free the returned string when it is not needed any more.
- *
- * \sa <a href="https://developers.google.com/gmail/imap/xoauth2-protocol">Google Developers: OAuth 2.0 Mechanism</a>.
+ * This helper function calculates the the base64-encoded authentication string from the user name, host and port (RFC 7628
+ * @c OAUTHBEARER mode only), and the access token according to RFC 6749 or RFC 7628.  The caller shall free the returned string
+ * when it is not needed any more.
  */
-gchar *net_client_auth_oauth2_calc(const gchar *user, const gchar *access_token)
+gchar *net_client_auth_oauth2_calc(const gchar *user, gboolean rfc7628mode, NetClient *client, const gchar *access_token)
 	G_GNUC_MALLOC;
 
 #endif		/* HAVE_OAUTH2 */

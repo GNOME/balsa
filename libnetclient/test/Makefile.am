@@ -19,7 +19,7 @@ TESTFLAGS = -fprofile-arcs -ftest-coverage -g -Wno-error
 LCOVFLGS	= --rc lcov_branch_coverage=1
 GENHTMLFLGS	= --function-coverage --branch-coverage --num-spaces 4
 VALGRFLAGS  = --tool=memcheck --log-file=$@.vg --suppressions=valgrind.supp --leak-check=full --track-fds=yes \
-			  --child-silent-after-fork=yes
+			  --child-silent-after-fork=yes --num-callers=50
 
 CLEANFILES = *.gcda *.gcno *.covi *.vg tests
 

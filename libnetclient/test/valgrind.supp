@@ -16,6 +16,14 @@
 }
 
 {
+   g_type_add_interface_static
+   Memcheck:Leak
+   match-leak-kinds:all
+   ...
+   fun:g_type_add_interface_static
+}
+
+{
    dl_init
    Memcheck:Leak
    match-leak-kinds:all

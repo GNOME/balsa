@@ -1,0 +1,35 @@
+--- INetSim/POP3.pm.orig	2020-05-19 16:18:26.000000000 +0200
++++ INetSim/POP3.pm	2020-08-31 19:56:17.288527951 +0200
+@@ -28,7 +28,7 @@
+                    "SASL"           => 2,  # RFC 2449, 1734, 5034, 2195 ... (http://www.iana.org/assignments/sasl-mechanisms)
+                    "RESP-CODES"     => 1,  # RFC 2449
+                    "LOGIN-DELAY"    => 2,  # RFC 2449
+-                   "PIPELINING"     => 0,  # RFC 2449
++                   "PIPELINING"     => 1,  # RFC 2449
+                    "EXPIRE"         => 2,  # RFC 2449
+                    "UIDL"           => 1,  # RFC 1939, 2449
+                    "IMPLEMENTATION" => 2,  # RFC 2449
+@@ -295,6 +295,10 @@
+             $line =~ s/[\r\n\s\t]+\z//g;
+             alarm($self->{timeout});
+             $self->slog_("recv: $line");
++	    ### flush input buffer if pipelining is disabled
++	    if (!defined $POP3_CAPA{PIPELINING}) {
++		### FIXME - flush any pending input here
++	    }
+             ### Auth via USER/PASS
+             if ($line =~ /\AUSER(|([\s]+)(.*))\z/i && defined $POP3_CAPA{USER}) {
+                 $self->USER($3);
+@@ -1035,9 +1039,11 @@
+     my ($flag, $hash, $uid, $size, $header, $body) = $self->read_mail($args);
+     if (defined $flag && $flag) {
+         $self->send_("+OK", "Message follows ($size octets)");
++	# quote termination octet (RFC 1939, Sect. 3)
++	$body =~ s/\r\n\./\r\n../g;
+         print $client "$header\r\n$body";
+         $self->slog_("send: <(MESSAGE)>");
+-        print $client "\r\n.\r\n";
++        print $client ".\r\n";
+         $self->slog_("send: .");
+         $status{retrieved}++;
+     }

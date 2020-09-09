@@ -7,17 +7,22 @@ echo "echo server @ port 65000 as e_echo..."
 @SCREEN@ -d -m -S e_echo @abs_srcdir@/echoserver.py
 echo "GnuTLS server w/o client checking @ port 65001 as s_server1..."
 @SCREEN@ -d -m -S s_server1 \
-	@GTLSSRV@ -a --x509keyfile=cert_u.pem --x509certfile=cert_u.pem --echo -p 65001
+	@GTLSSRV@ --disable-client-cert \
+	--x509keyfile=cert_u.pem --x509certfile=cert_u.pem --priority="NORMAL:-VERS-TLS1.3" --echo --crlf -p 65001
 echo "GnuTLS server w/ client checking @ port 65002 as s_server2..."
 @SCREEN@ -d -m -S s_server2 \
-	@GTLSSRV@ -r --verify-client-cert --x509keyfile=cert_u.pem --x509certfile=cert_u.pem \
-	--x509cafile=ca_cert.pem --echo -p 65002
+	@GTLSSRV@ --require-client-cert --verify-client-cert --x509keyfile=cert_u.pem \
+	--x509certfile=cert_u.pem --x509cafile=ca_cert.pem --priority="NORMAL:-VERS-TLS1.3" --echo --crlf -p 65002
 @SCREEN@ -ls
 
 echo "inetsim (as root)..."
 @SUDO@ -s -- <<EOF
-rm -f debug.log main.log service.log report.*.txt
-@INETSIM@ --config inetsim.conf --report-dir . --log-dir .
+rm -rf inetsim-1 inetsim-2
+mkdir inetsim-1 inetsim-2
+@INETSIM@ --config inetsim-1.conf --pidfile=inetsim-1/pid --report-dir inetsim-1 --log-dir inetsim-1 &
+sleep 5
+@INETSIM@ --config inetsim-2.conf --pidfile=inetsim-2/pid --report-dir inetsim-2 --log-dir inetsim-2
+sleep 5
 chmod 666 debug.log main.log service.log report.*.txt
 EOF
 

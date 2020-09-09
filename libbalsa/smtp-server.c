@@ -44,6 +44,13 @@
 #define G_LOG_DOMAIN "libbalsa-server"
 
 
+
+#ifdef G_LOG_DOMAIN
+#  undef G_LOG_DOMAIN
+#endif
+#define G_LOG_DOMAIN "libbalsa-server"
+
+
 struct _LibBalsaSmtpServer {
     LibBalsaServer server;
 

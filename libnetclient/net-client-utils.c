@@ -391,14 +391,23 @@ gss_error_string(OM_uint32 err_maj, OM_uint32 err_min)
 #if defined(HAVE_OAUTH2)
 
 gchar *
-net_client_auth_oauth2_calc(const gchar *user, const gchar *access_token)
+net_client_auth_oauth2_calc(const gchar *user, gboolean rfc7628mode, NetClient *client, const gchar *access_token)
 {
 	gchar *buffer;
 	gchar *result;
+	GNetworkAddress *remote_address;
 
-	g_return_val_if_fail((user != NULL) && (access_token != NULL), NULL);
-	buffer = g_strdup_printf("user=%s\001auth=Bearer %s\001\001", user, access_token);
-	result = g_base64_encode(buffer, strlen(buffer));
+	g_return_val_if_fail((user != NULL) && (!rfc7628mode || (client != NULL)) && (access_token != NULL), NULL);
+	remote_address = net_client_get_remote_address(client);
+	g_return_val_if_fail(remote_address != NULL, NULL);
+	if (rfc7628mode) {
+		buffer = g_strdup_printf("n,a=%s,\001host=%s\001port=%hu\001auth=Bearer %s\001\001", user,
+			g_network_address_get_hostname(remote_address), g_network_address_get_port(remote_address), access_token);
+	} else {
+		buffer = g_strdup_printf("user=%s\001auth=Bearer %s\001\001", user, access_token);
+	}
+	g_debug("%s: '%s'", __func__, buffer);
+	result = g_base64_encode((const guchar *) buffer, strlen(buffer));
 	g_free(buffer);
 	return result;
 }

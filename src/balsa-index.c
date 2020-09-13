@@ -2039,7 +2039,8 @@ move_to_activated(GSimpleAction *action,
     BalsaIndex *bindex = user_data;
     LibBalsaMailbox *mailbox;
 
-    mailbox = balsa_mblist_mru_get_mailbox(action, GTK_WIDGET(bindex), user_data);
+    mailbox =
+        balsa_mblist_mru_get_mailbox_from_variant(parameter, GTK_WIDGET(bindex));
 
     if (mailbox != NULL) {
         balsa_mblist_mru_add(&balsa_app.folder_mru, libbalsa_mailbox_get_url(mailbox));
@@ -2049,6 +2050,9 @@ move_to_activated(GSimpleAction *action,
             balsa_index_selected_msgnos_free(bindex, selected);
         }
     }
+
+    if (GTK_IS_POPOVER(bindex->popup_widget))
+        gtk_popover_popdown((GtkPopover *) bindex->popup_widget);
 }
 
 /*
@@ -2072,7 +2076,8 @@ bndx_add_actions(BalsaIndex  *bindex,
         {"trash",            move_to_trash_activated},
         {"toggle-flagged",   toggle_flagged_activated},
         {"toggle-unread",    toggle_unread_activated},
-        {"view-source",      view_source_activated}
+        {"view-source",      view_source_activated},
+        {"move-to",          move_to_activated, "s"}
     };
 
     simple = g_simple_action_group_new();
@@ -2206,16 +2211,13 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     bndx_action_set_enabled(index, "popup", "trash", any && !readonly && mailbox != balsa_app.trash);
     bndx_action_set_enabled(index, "popup", "toggle-flagged", any && !readonly);
     bndx_action_set_enabled(index, "popup", "toggle-unread", any && !readonly);
+    bndx_action_set_enabled(index, "popup", "move-to", any && !readonly);
 
     /* The move-to submenu */
     item = g_menu_item_new_from_model(G_MENU_MODEL(index->popup_menu),
                                       index->move_position);
 
-    mru_menu = balsa_mblist_mru_menu(&balsa_app.folder_mru,
-                                     G_ACTION_MAP(gtk_widget_get_action_group(GTK_WIDGET(index),
-                                                                              "popup")),
-                                     any && !readonly, NULL,
-                                     G_CALLBACK(move_to_activated), index);
+    mru_menu = balsa_mblist_mru_menu(&balsa_app.folder_mru, "move-to");
     g_menu_item_set_submenu(item, G_MENU_MODEL(mru_menu));
     g_object_unref(mru_menu);
 

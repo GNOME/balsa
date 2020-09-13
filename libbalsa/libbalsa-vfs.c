@@ -528,13 +528,28 @@ libbalsa_vfs_file_unlink(LibbalsaVfs * file, GError **err)
 
 
 gboolean
-libbalsa_vfs_launch_app(LibbalsaVfs * file, GAppInfo *app, GError **err)
-{
+libbalsa_vfs_launch_app(LibbalsaVfs *file,
+                        const gchar *app_name,
+                        GError     **err)
+ {
+    GList *app_list;
+    GList *list;
+    GAppInfo *app = NULL;
     GList * args;
     gboolean result;
 
     g_return_val_if_fail(LIBBALSA_IS_VFS(file), FALSE);
-    g_return_val_if_fail(app == NULL || G_IS_APP_INFO(app), FALSE);
+    g_return_val_if_fail(app_name != NULL, FALSE);
+
+    app_list = g_app_info_get_all();
+    for (list = app_list; list != NULL; list = list->next) {
+        GAppInfo *this_app = G_APP_INFO(list->data);
+        if (strcmp(app_name, g_app_info_get_name(this_app)) == 0) {
+            app = g_object_ref(this_app);
+            break;
+        }
+    }
+    g_list_free_full(app_list, g_object_unref);
 
     if (app == NULL) {
         g_set_error(err, LIBBALSA_VFS_ERROR_QUARK, -1,
@@ -545,6 +560,7 @@ libbalsa_vfs_launch_app(LibbalsaVfs * file, GAppInfo *app, GError **err)
     args = g_list_prepend(NULL, file->gio_gfile);
     result = g_app_info_launch(app, args, NULL, err);
     g_list_free(args);
+    g_object_unref(app);
 
     return result;
 }
@@ -552,7 +568,7 @@ libbalsa_vfs_launch_app(LibbalsaVfs * file, GAppInfo *app, GError **err)
 
 gboolean
 libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody *mime_body,
-                                 GAppInfo            *app,
+                                 const gchar         *app_name,
                                  GError             **err)
 {
     gchar *uri;
@@ -560,7 +576,7 @@ libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody *mime_body,
     gboolean result;
 
     g_return_val_if_fail(mime_body != NULL, FALSE);
-    g_return_val_if_fail(app == NULL || G_IS_APP_INFO(app), FALSE);
+    g_return_val_if_fail(app_name != NULL, FALSE);
 
     if (!libbalsa_message_body_save_temporary(mime_body, err))
         return FALSE;
@@ -569,7 +585,7 @@ libbalsa_vfs_launch_app_for_body(LibBalsaMessageBody *mime_body,
     file = libbalsa_vfs_new_from_uri(uri);
     g_free(uri);
 
-    result = libbalsa_vfs_launch_app(file, app, err);
+    result = libbalsa_vfs_launch_app(file, app_name, err);
     g_object_unref(file);
 
     return result;
@@ -602,52 +618,26 @@ libbalsa_vfs_content_type_of_buffer(const guchar * buffer,
     return retval;
 }
 
-/*
- * GAppInfo support
- */
 
 static void
 gio_add_vfs_menu_item(GMenu       *menu,
                       GAppInfo    *app,
-                      GActionMap  *action_map,
-                      const gchar *action_namespace,
-                      GCallback    callback,
-                      GObject     *object)
+                      const gchar *action)
 {
-    const gchar *app_name;
+    const gchar *name;
     gchar *menu_label;
-    gchar *action_name;
-    gchar *p;
-    GSimpleAction *action;
+    GMenuItem *menu_item;
 
-    app_name = g_app_info_get_name(app);
+    name = g_app_info_get_name(app);
 
-    action_name = g_strstrip(g_strdup(app_name));
-
-    for (p = action_name; *p != '\0'; p++) {
-        if (!g_ascii_isalnum(*p))
-            *p = '-';
-    }
-
-    action = g_simple_action_new(action_name, NULL);
-    g_signal_connect(action, "activate", callback, object);
-    g_action_map_add_action(action_map, G_ACTION(action));
-    g_object_unref(action);
-
-    g_object_set_data_full(object, action_name, g_object_ref(app), g_object_unref);
-
-    if (action_namespace != NULL) {
-        gchar *prefixed_action_name;
-
-        prefixed_action_name = g_strdup_printf("%s.%s", action_namespace, action_name);
-        g_free(action_name);
-        action_name = prefixed_action_name;
-    }
-
-    menu_label = g_strdup_printf(_("Open with %s"), app_name);
-    g_menu_append(menu, menu_label, action_name);
+    menu_label = g_strdup_printf(_("Open with %s"), name);
+    menu_item = g_menu_item_new(menu_label, NULL);
     g_free(menu_label);
-    g_free(action_name);
+
+    g_menu_item_set_action_and_target_value(menu_item, action, g_variant_new_string(name));
+
+    g_menu_append_item(menu, menu_item);
+    g_object_unref(menu_item);
 }
 
 
@@ -655,22 +645,19 @@ gio_add_vfs_menu_item(GMenu       *menu,
 void
 libbalsa_vfs_fill_menu_by_content_type(GMenu       *menu,
                                        const gchar *content_type,
-                                       GActionMap  *action_map,
-                                       const gchar *action_namespace,
-                                       GCallback    callback,
-                                       GObject     *object)
+                                       const gchar *action)
 {
     GList* list;
     GAppInfo *def_app;
     GList *app_list;
 
     g_return_if_fail(G_IS_MENU(menu));
-    g_return_if_fail(G_IS_ACTION_MAP(action_map));
-    g_return_if_fail(G_IS_OBJECT(object));
+    g_return_if_fail(content_type != NULL);
+    g_return_if_fail(action != NULL);
 
     def_app = g_app_info_get_default_for_type(content_type, FALSE);
     if (def_app != NULL)
-        gio_add_vfs_menu_item(menu, def_app, action_map, action_namespace, callback, object);
+        gio_add_vfs_menu_item(menu, def_app, action);
 
     app_list = g_app_info_get_all_for_type(content_type);
     for (list = app_list; list != NULL; list = list->next) {
@@ -678,7 +665,7 @@ libbalsa_vfs_fill_menu_by_content_type(GMenu       *menu,
 
         if (app != NULL && g_app_info_should_show(app) &&
             (def_app == NULL || !g_app_info_equal(app, def_app)))
-            gio_add_vfs_menu_item(menu, app, action_map, action_namespace, callback, object);
+            gio_add_vfs_menu_item(menu, app, action);
     }
     g_list_free_full(app_list, g_object_unref);
 
@@ -702,7 +689,7 @@ libbalsa_vfs_mime_button(const gchar * content_type, GCallback callback, gpointe
 	g_free(msg);
 
 	g_object_set_data_full(G_OBJECT(button), LIBBALSA_VFS_MIME_ACTION,
-                               app, g_object_unref);
+			       g_strdup(app_name), g_free);
 
 	g_signal_connect(button, "clicked", callback, data);
     }

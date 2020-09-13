@@ -50,27 +50,19 @@ BalsaMailboxNode *balsa_mblist_get_selected_node(BalsaMBList * mblist);
 BalsaMailboxNode *balsa_mblist_get_node_by_mailbox(BalsaMBList * mblist,
                                                    LibBalsaMailbox *
                                                    mailbox);
-
-GMenu * balsa_mblist_mru_menu(GList      **url_list,
-                              GActionMap  *action_map,
-                              gboolean     action_enabled,
-                              const gchar *action_namespace,
-                              GCallback    callback,
-                              gpointer     user_data);
+GMenu *balsa_mblist_mru_menu(GList ** url_list,
+                             const gchar *action);
 void balsa_mblist_mru_add(GList ** url_list, const gchar * url);
 void balsa_mblist_mru_drop(GList ** url_list, const gchar * url);
-const gchar     *balsa_mblist_mru_get_url    (GSimpleAction *action,
-                                              GtkWidget     *widget,
-                                              GObject       *object);
-LibBalsaMailbox *balsa_mblist_mru_get_mailbox(GSimpleAction *action,
-                                              GtkWidget     *widget,
-                                              GObject       *object);
-
 GtkWidget *balsa_mblist_mru_option_menu(GtkWindow * window, 
                                         GList ** url_list);
 void balsa_mblist_mru_option_menu_set(GtkWidget * option_menu,
                                       const gchar * url);
 const gchar *balsa_mblist_mru_option_menu_get(GtkWidget * option_menu);
+const gchar *balsa_mblist_mru_get_url_from_variant(GVariant  *parameter,
+                                                   GtkWidget *widget);
+LibBalsaMailbox *balsa_mblist_mru_get_mailbox_from_variant(GVariant  *parameter,
+                                                           GtkWidget *widget);
 
 /* BalsaMailboxNode methods */
 void balsa_mblist_mailbox_node_append(BalsaMailboxNode * root,

@@ -606,15 +606,10 @@ open_with_activated(GSimpleAction *action,
                     GVariant      *parameter,
                     gpointer       user_data)
 {
-    BalsaMimeWidgetText *mwt = user_data;
-    LibBalsaMessageBody *part = mwt->mime_body;
-    const gchar *action_name;
-    GAppInfo *app;
+    const gchar *app_name = g_variant_get_string(parameter, NULL);
+    LibBalsaMessageBody *part = user_data;
 
-    action_name = g_action_get_name(G_ACTION(action));
-    app = g_object_get_data(user_data, action_name);
-
-    balsa_mime_widget_ctx_menu_launch_app(app, part);
+    balsa_mime_widget_ctx_menu_launch_app(app_name, part);
 }
 
 static void
@@ -624,6 +619,9 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
     BalsaMimeWidgetText *mwt = user_data;
     GtkWidget *menu_item;
     GSimpleActionGroup *simple;
+    static const GActionEntry text_view_popup_entries[] = {
+        {"open-with", open_with_activated, "s"}
+    };
     GMenu *open_menu;
     GtkWidget *submenu;
 
@@ -644,18 +642,18 @@ text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
 			  gtk_separator_menu_item_new());
 
     /* Set up the "open-with" action: */
-    open_menu = g_menu_new();
     simple = g_simple_action_group_new();
-    libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/plain",
-                                           G_ACTION_MAP(simple), "text-view-popup",
-                                           G_CALLBACK(open_with_activated),
-                                           G_OBJECT(mwt));
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    text_view_popup_entries,
+                                    G_N_ELEMENTS(text_view_popup_entries),
+                                    mwt->mime_body);
     gtk_widget_insert_action_group(GTK_WIDGET(menu),
                                    "text-view-popup",
                                    G_ACTION_GROUP(simple));
-
     g_object_unref(simple);
 
+    open_menu = g_menu_new();
+    libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/plain", "open-with");
     submenu = gtk_menu_new_from_model(G_MENU_MODEL(open_menu));
     g_object_unref(open_menu);
 
@@ -1175,13 +1173,12 @@ bmwt_html_open_with_activated(GSimpleAction *action,
 {
     GtkWidget *html = user_data;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
-    const gchar *action_name;
-    GAppInfo *app;
+    GtkWidget *popup_widget = g_object_get_data(G_OBJECT(html), "popup-widget");
 
-    action_name = g_action_get_name(G_ACTION(action));
-    app = g_object_get_data(user_data, action_name);
+    open_with_activated(action, parameter, mime_body);
 
-    balsa_mime_widget_ctx_menu_launch_app(app, mime_body);
+    if (GTK_IS_POPOVER(popup_widget))
+        gtk_popover_popdown((GtkPopover *) popup_widget);
 }
 
 static void
@@ -1217,6 +1214,7 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
         {"zoom-out", bmwt_html_zoom_out_activated},
         {"zoom-reset", bmwt_html_zoom_reset_activated},
         {"select-all", bmwt_html_select_all_activated},
+        {"open-with",  bmwt_html_open_with_activated, "s"},
         {"save", bmwt_html_save_activated},
         {"print", bmwt_html_print_activated}
     };
@@ -1235,6 +1233,7 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
                                    G_ACTION_GROUP(simple));
 
     print_action = g_action_map_lookup_action(G_ACTION_MAP(simple), "print");
+    g_object_unref(simple);
 
     section = g_menu_new();
 
@@ -1255,11 +1254,7 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
     section = g_menu_new();
 
     open_menu = g_menu_new();
-    libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/html",
-                                           G_ACTION_MAP(simple), NULL,
-                                           G_CALLBACK(bmwt_html_open_with_activated),
-                                           G_OBJECT(html));
-    g_object_unref(simple);
+    libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/html", "open-with");
 
     g_menu_append_submenu(section, _("Open…"), G_MENU_MODEL(open_menu));
     g_object_unref(open_menu);
@@ -1335,7 +1330,7 @@ bmwt_html_button_press_cb(GtkGestureMultiPress *multi_press,
 
     if (gdk_event_triggers_context_menu(event)) {
         GtkWidget *html = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(gesture));
-        bmwt_html_popup_context_menu(html, bm);
+        bmwt_html_popup_context_menu(html, bm) ;
     }
 }
 

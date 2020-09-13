@@ -37,7 +37,7 @@
 
 
 void
-balsa_mime_widget_ctx_menu_launch_app(GAppInfo            *app,
+balsa_mime_widget_ctx_menu_launch_app(const gchar         *app_name,
                                       LibBalsaMessageBody *mime_body)
 {
     GError *err = NULL;
@@ -45,7 +45,7 @@ balsa_mime_widget_ctx_menu_launch_app(GAppInfo            *app,
 
     g_return_if_fail(mime_body != NULL);
 
-    result = libbalsa_vfs_launch_app_for_body(mime_body, app, &err);
+    result = libbalsa_vfs_launch_app_for_body(mime_body, app_name, &err);
     if (!result)
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not launch application: %s"),
@@ -58,10 +58,10 @@ balsa_mime_widget_ctx_menu_cb(GtkWidget *button,
                               gpointer   user_data)
 {
     LibBalsaMessageBody *mime_body = user_data;
-    GAppInfo *app;
+    const gchar *app_name;
 
-    app = g_object_get_data(G_OBJECT(button), LIBBALSA_VFS_MIME_ACTION);
-    balsa_mime_widget_ctx_menu_launch_app(app, mime_body);
+    app_name = g_object_get_data(G_OBJECT(button), LIBBALSA_VFS_MIME_ACTION);
+    balsa_mime_widget_ctx_menu_launch_app(app_name, mime_body);
 }
 
 /** Pops up a "save part" dialog for a message part.

@@ -192,6 +192,43 @@
 	"activate-on-single-click" property to TRUE, instead of doing it
 	the hard way.
 
+2020-09-13  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Various: Use stateless GActions with targets instead of setting
+	GObject data on random objects.
+
+	If the GAction is given a non-NULL parameter type but no state
+	and no "change state" callback, it is rendered as stateless, and
+	the target can be retrieved from the GVariant parameter of the
+	"activated" callback. The target cannot be an arbitrary pointer,
+	and is in fact a string in all these cases:
+
+	* libbalsa/libbalsa-vfs.c (libbalsa_vfs_launch_app),
+	(libbalsa_vfs_launch_app_for_body), (gio_add_vfs_menu_item),
+	(libbalsa_vfs_fill_menu_by_content_type),
+	(libbalsa_vfs_mime_button):
+	* libbalsa/libbalsa-vfs.h:
+	* src/balsa-index.c (move_to_activated), (bndx_add_actions),
+	(bndx_do_popup):
+	* src/balsa-mblist.c (balsa_mblist_mru_menu),
+	(balsa_mblist_mru_get_url_from_variant),
+	(balsa_mblist_mru_get_mailbox_from_variant):
+	* src/balsa-mblist.h:
+	* src/balsa-message.c (open_with_activated), (copy_part_activated),
+	(part_add_actions), (part_create_menu):
+	* src/balsa-mime-widget-callbacks.c
+	(balsa_mime_widget_ctx_menu_launch_app),
+	(balsa_mime_widget_ctx_menu_cb):
+	* src/balsa-mime-widget-callbacks.h:
+	* src/balsa-mime-widget-message.c (copy_activated),
+	(bm_header_extend_popup):
+	* src/balsa-mime-widget-text.c (open_with_activated),
+	(text_view_populate_popup), (bmwt_html_open_with_activated),
+	(bmwt_html_populate_popup_menu), (bmwt_html_button_press_cb):
+	* src/message-window.c (move_to_activated), (message_window_new):
+	* src/sendmsg-window.c (launch_app_activated), (open_attachment),
+	(add_attachment), (add_urlref_attachment):
+
 2020-09-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-index: add a timeout to verify that the scrolled-to row is

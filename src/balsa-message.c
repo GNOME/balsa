@@ -1804,14 +1804,10 @@ open_with_activated(GSimpleAction *action,
                     GVariant      *parameter,
                     gpointer       user_data)
 {
+    const gchar *app_name = g_variant_get_string(parameter, NULL);
     BalsaPartInfo *info = user_data;
-    const gchar *action_name;
-    GAppInfo *app;
 
-    action_name = g_action_get_name(G_ACTION(action));
-    app = g_object_get_data(user_data, action_name);
-
-    balsa_mime_widget_ctx_menu_launch_app(app, info->body);
+    balsa_mime_widget_ctx_menu_launch_app(app_name, info->body);
 
     if (GTK_IS_POPOVER(info->popup_widget))
         gtk_popover_popdown((GtkPopover *) info->popup_widget);
@@ -1825,28 +1821,37 @@ copy_part_activated(GSimpleAction *action,
     BalsaPartInfo *info = user_data;
     const gchar *url;
 
-    url = balsa_mblist_mru_get_url(action, info->popup_widget, user_data);
+    url = balsa_mblist_mru_get_url_from_variant(parameter, info->popup_widget);
 
-    if (url != NULL) {
+    if (url[0] != '\0') {
         balsa_mblist_mru_add(&balsa_app.folder_mru, url);
         balsa_message_copy_part(url, info->body);
     }
+
+    if (GTK_IS_POPOVER(info->popup_widget))
+        gtk_popover_popdown((GtkPopover *) info->popup_widget);
 }
 
-static GSimpleActionGroup *
+static void
 part_add_actions(BalsaMessage *balsa_message,
+                 const gchar  *action_namespace,
                  gpointer      user_data)
 {
     GSimpleActionGroup *simple;
     static const GActionEntry entries[] = {
-        {"save", save_activated}
+        {"save", save_activated},
+        {"open-with", open_with_activated, "s"},
+        {"copy-part", copy_part_activated, "s"}
     };
 
     simple = g_simple_action_group_new();
     g_action_map_add_action_entries(G_ACTION_MAP(simple),
                                     entries, G_N_ELEMENTS(entries),
                                     user_data);
-    return simple;
+    gtk_widget_insert_action_group(GTK_WIDGET(balsa_message),
+                                   action_namespace,
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
 }
 
 static void
@@ -1858,35 +1863,28 @@ part_create_menu(BalsaMessage *balsa_message, BalsaPartInfo *info)
             3) GnomeVFS shortlist applications, with the default one (sometimes
                included on shortlist, sometimes not) excluded. */
 {
-    GMenu *menu;
-    gchar *content_type;
-    GSimpleActionGroup *simple;
     static int menu_number;
     gchar *namespace;
-
-    menu = g_menu_new();
-    content_type = libbalsa_message_body_get_mime_type (info->body);
-    simple = part_add_actions(balsa_message, info);
-
-    libbalsa_vfs_fill_menu_by_content_type(menu, content_type,
-                                           G_ACTION_MAP(simple), NULL,
-                                           G_CALLBACK(open_with_activated),
-                                           G_OBJECT(info));
+    GMenu *menu;
+    gchar *content_type;
 
     namespace = g_strdup_printf("menu-%d", ++menu_number);
-    gtk_widget_insert_action_group(GTK_WIDGET(balsa_message), namespace, G_ACTION_GROUP(simple));
+
+    part_add_actions(balsa_message, namespace, info);
+
+    menu = g_menu_new();
+
+    content_type = libbalsa_message_body_get_mime_type (info->body);
+    libbalsa_vfs_fill_menu_by_content_type(menu, content_type, "open-with");
 
     g_menu_append(menu, _("Save…"), "save");
 
     if (strcmp(content_type, "message/rfc822") == 0) {
         GMenu *submenu;
 
-        submenu = balsa_mblist_mru_menu(&balsa_app.folder_mru, G_ACTION_MAP(simple),
-                                        TRUE, NULL,
-                                        G_CALLBACK(copy_part_activated), info);
+        submenu = balsa_mblist_mru_menu(&balsa_app.folder_mru, "copy-part");
         g_menu_append_submenu(menu, _("_Copy to folder…"), G_MENU_MODEL(submenu));
     }
-    g_object_unref(simple);
     g_free(content_type);
 
     info->popup_widget =

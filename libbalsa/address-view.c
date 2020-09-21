@@ -252,7 +252,7 @@ lbav_entry_setup_matches(LibBalsaAddressView * address_view,
     const gchar *prefix;
     GList *match = NULL;
 
-    prefix = gtk_entry_get_text(entry);
+    prefix = gtk_editable_get_text(GTK_EDITABLE(entry));
     if (*prefix)
         match = lbav_get_matching_addresses(address_view, prefix, type);
     lbav_append_addresses(address_view, completion, match, prefix);
@@ -582,7 +582,7 @@ lbav_entry_changed_cb(GtkEntry * entry, LibBalsaAddressView * address_view)
 
     completion = gtk_entry_get_completion(entry);
 
-    if (gtk_widget_get_window(GTK_WIDGET(entry)))
+    if (gtk_widget_get_realized(GTK_WIDGET(entry)))
         lbav_entry_setup_matches(address_view, entry, completion,
                                  LIBBALSA_ADDRESS_VIEW_MATCH_FAST);
 }
@@ -592,13 +592,13 @@ lbav_entry_changed_cb(GtkEntry * entry, LibBalsaAddressView * address_view)
  */
 static gboolean
 lbav_key_pressed_cb(GtkEntry * entry,
-                    const GdkEvent * event,
+                    GdkEvent * event,
                     LibBalsaAddressView * address_view)
 {
     guint keyval;
     GtkEntryCompletion *completion;
 
-    if (!gdk_event_get_keyval(event, &keyval) || keyval != GDK_KEY_Escape)
+    if ((keyval = gdk_key_event_get_keyval(event)) != GDK_KEY_Escape)
         return FALSE;
 
     if (address_view->last_was_escape) {
@@ -677,7 +677,7 @@ lbav_completion_match_selected_cb(GtkEntryCompletion * completion,
     entry = gtk_entry_completion_get_entry(completion);
     g_signal_handlers_block_by_func(entry, lbav_entry_changed_cb,
                                     address_view);
-    gtk_entry_set_text(GTK_ENTRY(entry), name);
+    gtk_editable_set_text(GTK_EDITABLE(entry), name);
     g_signal_handlers_unblock_by_func(entry, lbav_entry_changed_cb,
                                       address_view);
 
@@ -730,7 +730,7 @@ static void
 lbav_editing_done(GtkCellEditable * cell_editable,
                   LibBalsaAddressView * address_view)
 {
-    const gchar *text = gtk_entry_get_text(GTK_ENTRY(cell_editable));
+    const gchar *text = gtk_editable_get_text(GTK_EDITABLE(cell_editable));
 
     lbav_set_text(address_view, text);
 }
@@ -752,7 +752,7 @@ lbav_notify_has_focus_cb(GtkEntry            *entry,
         return;
      }
 
-    the_entry = gtk_entry_get_text(entry);
+    the_entry = gtk_editable_get_text(GTK_EDITABLE(entry));
 
     if (the_entry != NULL && the_entry[0] != '\0') {
         GList *match;
@@ -770,7 +770,7 @@ lbav_notify_has_focus_cb(GtkEntry            *entry,
                 g_signal_handlers_block_by_func(entry,
                                                 lbav_entry_changed_cb,
                                                 address_view);
-                gtk_entry_set_text(entry, the_addr);
+                gtk_editable_set_text(GTK_EDITABLE(entry), the_addr);
                 g_signal_handlers_unblock_by_func(entry,
                                                   lbav_entry_changed_cb,
                                                   address_view);
@@ -924,17 +924,17 @@ lbav_sort_func(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
 
     /* Sort by type. */
     retval = type_a - type_b;
-    if (retval)
+    if (retval != 0)
         return retval;
 
     /* Within type, make sure a blank line sorts to the bottom. */
 
     gtk_tree_model_get(model, a, ADDRESS_NAME_COL, &name, -1);
-    is_blank_a = !name || !*name;
+    is_blank_a = (name == NULL) || (name[0] == '\0');
     g_free(name);
 
     gtk_tree_model_get(model, b, ADDRESS_NAME_COL, &name, -1);
-    is_blank_b = !name || !*name;
+    is_blank_b = (name == NULL) || (name[0] == '\0');
     g_free(name);
 
     return is_blank_a - is_blank_b;

@@ -129,7 +129,7 @@ conf.set('TOOLKIT_CATEGORIES', TOOLKIT_CATEGORIES)
 
 # Dependencies for balsa and balsa_ab:
 glib_dep    = dependency('glib-2.0',  version : '>= 2.48.0')
-gtk_dep     = dependency('gtk+-3.0',  version : '>= 3.24.0')
+gtk_dep     = dependency('gtk4'                            )
 gmime_dep   = dependency('gmime-3.0', version : '>= 3.2.6' )
 gio_dep     = dependency('gio-2.0'                         )
 gthread_dep = dependency('gthread-2.0'                     )

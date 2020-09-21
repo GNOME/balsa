@@ -755,13 +755,13 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
 	nick_name = g_strdup(address->nick_name);
 
     /* Full name must be set after first and last names. */
-    gtk_entry_set_text(GTK_ENTRY(entries[FIRST_NAME]), first_name);
-    gtk_entry_set_text(GTK_ENTRY(entries[LAST_NAME]), last_name);
-    gtk_entry_set_text(GTK_ENTRY(entries[FULL_NAME]), new_name);
-    gtk_entry_set_text(GTK_ENTRY(entries[NICK_NAME]), nick_name);
-    gtk_entry_set_text(GTK_ENTRY(entries[ORGANIZATION]), new_organization);
+    gtk_editable_set_text(GTK_EDITABLE(entries[FIRST_NAME]), first_name);
+    gtk_editable_set_text(GTK_EDITABLE(entries[LAST_NAME]), last_name);
+    gtk_editable_set_text(GTK_EDITABLE(entries[FULL_NAME]), new_name);
+    gtk_editable_set_text(GTK_EDITABLE(entries[NICK_NAME]), nick_name);
+    gtk_editable_set_text(GTK_EDITABLE(entries[ORGANIZATION]), new_organization);
 
-    tree_view = gtk_bin_get_child(GTK_BIN(entries[EMAIL_ADDRESS]));
+    tree_view = gtk_frame_get_child(GTK_FRAME(entries[EMAIL_ADDRESS]));
     store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view)));
     gtk_list_store_clear(store);
     if (address != NULL) {
@@ -797,12 +797,12 @@ libbalsa_address_set_edit_entries(LibBalsaAddress * address,
     and enumerated with LibBalsaAddressField constants
 */
 static void
-lba_entry_changed(GtkEntry * entry, GtkEntry ** entries)
+lba_entry_changed(GtkEntry * entry, GtkEditable ** entries)
 {
     gchar *full_name =
-        g_strconcat(gtk_entry_get_text(entries[FIRST_NAME]), " ",
-                    gtk_entry_get_text(entries[LAST_NAME]), NULL);
-    gtk_entry_set_text(entries[FULL_NAME], full_name);
+        g_strconcat(gtk_editable_get_text(entries[FIRST_NAME]), " ",
+                    gtk_editable_get_text(entries[LAST_NAME]), NULL);
+    gtk_editable_set_text(entries[FULL_NAME], full_name);
     g_free(full_name);
 }
 
@@ -844,8 +844,7 @@ lba_addr_list_widget(GCallback changed_cb, gpointer changed_data)
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 
     frame = gtk_frame_new(NULL);
-    gtk_container_add(GTK_CONTAINER(frame), tree_view);
-    gtk_widget_show_all(frame);
+    gtk_frame_set_child(GTK_FRAME(frame), tree_view);
 
     return frame;
 }
@@ -989,7 +988,7 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
             gtk_widget_set_margin_bottom(but, 1);
             gtk_container_add(GTK_CONTAINER(box), but);
             lhs = box;
-            tree_view = gtk_bin_get_child(GTK_BIN(entries[cnt]));
+            tree_view = gtk_frame_get_child(GTK_FRAME(entries[cnt]));
             g_signal_connect(but, "clicked", G_CALLBACK(add_row), tree_view);
              gtk_drag_dest_set(entries[cnt],
                                GTK_DEST_DEFAULT_MOTION |
@@ -1026,7 +1025,7 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
     libbalsa_address_set_edit_entries(address, entries);
 
     if (changed_cb) {
-        GtkWidget *tree_view = gtk_bin_get_child(GTK_BIN(entries[EMAIL_ADDRESS]));
+        GtkWidget *tree_view = gtk_frame_get_child(GTK_FRAME(entries[EMAIL_ADDRESS]));
         GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
         g_signal_connect_swapped(model, "row-inserted",
                                  changed_cb, changed_data);
@@ -1074,7 +1073,7 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
     SET_FIELD(address->organization,entries[ORGANIZATION]);
 
 
-    tree_view = gtk_bin_get_child(GTK_BIN(entries[EMAIL_ADDRESS]));
+    tree_view = gtk_frame_get_child(GTK_FRAME(entries[EMAIL_ADDRESS]));
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_view));
     for (valid = gtk_tree_model_get_iter_first(model, &iter); valid;
          valid = gtk_tree_model_iter_next(model, &iter)) {

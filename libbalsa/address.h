@@ -77,8 +77,6 @@ enum {
     LIBBALSA_ADDRESS_TRG_ADDRESS
 };
 
-extern GtkTargetEntry libbalsa_address_target_list[2];
-
 GtkWidget *libbalsa_address_get_edit_widget(LibBalsaAddress *addr,
                                             GtkWidget **entries,
                                             GCallback changed_cb,

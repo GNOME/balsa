@@ -54,7 +54,9 @@ struct _LibBalsaAddressView {
 
     gchar *domain;
 
+    GtkTreeViewColumn *button_column;
     GtkTreeViewColumn *type_column;
+    GtkTreeViewColumn *dropdown_column;
     GtkTreeViewColumn *focus_column;
     GtkCellRenderer   *renderer_combo;
 
@@ -833,22 +835,18 @@ lbav_row_editing_cb(GtkCellRenderer * renderer,
 }
 
 /*
- *     Callback for the button's "activated" signal
+ *     A button was clicked
  */
 static void
-lbav_button_activated_cb(LibBalsaCellRendererButton * button,
-                         const gchar * path_string,
-                         LibBalsaAddressView * address_view)
+lbav_button_activated(LibBalsaAddressView *address_view,
+                      GtkTreePath         *path)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(address_view);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    GtkTreePath *path;
     GtkTreeIter iter;
     GdkPixbuf *pixbuf;
 
-    path = gtk_tree_path_new_from_string(path_string);
     if (!gtk_tree_model_get_iter(model, &iter, path)) {
-        gtk_tree_path_free(path);
         return;
     }
 
@@ -875,28 +873,40 @@ lbav_button_activated_cb(LibBalsaCellRendererButton * button,
     }
 
     g_object_unref(pixbuf);
-    gtk_tree_path_free(path);
 }
 
 /*
- *     Callback for the drop_down's "activated" signal
- *
  *     Pop up the address type combo-box
  */
 static void
-lbav_drop_down_activated_cb(LibBalsaCellRendererButton * drop_down,
-                            const gchar * path_string,
-                            LibBalsaAddressView * address_view)
+lbav_dropdown_activated(LibBalsaAddressView *address_view,
+                        GtkTreePath         *path)
 {
-    GtkTreePath *path;
-
-    path = gtk_tree_path_new_from_string(path_string);
     gtk_tree_view_set_cursor_on_cell(GTK_TREE_VIEW(address_view),
                                      path,
                                      address_view->type_column,
                                      address_view->renderer_combo,
                                      TRUE);
-    gtk_tree_path_free(path);
+}
+
+/*
+ *     Callback for the address-view's "row-activated" signal
+ *
+ *     Depending on the clicked column, call either the button's handler
+ *     or the drop-down's handler
+ */
+static void
+lbav_row_activated_cb(GtkTreeView       *tree_view,
+                      GtkTreePath       *path,
+                      GtkTreeViewColumn *column,
+                      gpointer           user_data)
+{
+    LibBalsaAddressView *address_view = LIBBALSA_ADDRESS_VIEW(tree_view);
+
+    if (column == address_view->button_column)
+        lbav_button_activated(address_view, path);
+    else if (column == address_view->dropdown_column)
+        lbav_dropdown_activated(address_view, path);
 }
 
 /*
@@ -983,11 +993,11 @@ libbalsa_address_view_new(const gchar * const *types,
 
     tree_view = GTK_TREE_VIEW(address_view);
 
+    g_signal_connect(tree_view, "row-activated", G_CALLBACK(lbav_row_activated_cb), NULL);
+
     /* The button: */
-    column = gtk_tree_view_column_new();
-    renderer = libbalsa_cell_renderer_button_new();
-    g_signal_connect(renderer, "activated",
-                     G_CALLBACK(lbav_button_activated_cb), address_view);
+    address_view->button_column = column = gtk_tree_view_column_new();
+    renderer = gtk_cell_renderer_pixbuf_new();
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "pixbuf", ADDRESS_ICON_COL,
@@ -1027,12 +1037,12 @@ libbalsa_address_view_new(const gchar * const *types,
                                             "text", ADDRESS_TYPESTRING_COL,
                                             NULL);
 
+        gtk_tree_view_append_column(tree_view, column);
+
         /* Add a drop-down icon to indicate that this is in fact a
          * combo: */
-        renderer = libbalsa_cell_renderer_button_new();
-        g_signal_connect(renderer, "activated",
-                         G_CALLBACK(lbav_drop_down_activated_cb),
-                         address_view);
+        address_view->dropdown_column = column = gtk_tree_view_column_new();
+        renderer = gtk_cell_renderer_pixbuf_new();
         g_object_set(renderer, "pixbuf", lbav_drop_down_icon, NULL);
         gtk_tree_view_column_pack_start(column, renderer, FALSE);
 

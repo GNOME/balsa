@@ -1,5 +1,16 @@
 2020-09-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	Remove LibBalsaCellRendererButton
+
+	We only needed it to capture clicks, which we can do with
+	GtkTreeView's "row-activated" signal.
+
+	* libbalsa/cell-renderer-button.c: removed;
+	* libbalsa/cell-renderer-button.h: removed;
+	* libbalsa/address-view.c: use "row-activated" instead.
+
+2020-09-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	* libbalsa/address-view.c (libbalsa_address_view_new): Set
 	"activate-on-single-click" property to TRUE, instead of doing it
 	the hard way.

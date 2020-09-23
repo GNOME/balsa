@@ -1,3 +1,9 @@
+2020-09-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* libbalsa/address-view.c (libbalsa_address_view_new): Set
+	"activate-on-single-click" property to TRUE, instead of doing it
+	the hard way.
+
 2020-09-02  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-index: add a timeout to verify that the scrolled-to row is

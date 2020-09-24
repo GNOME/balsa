@@ -38,7 +38,6 @@
  * LibBalsa includes.
  */
 #include "address-book.h"
-#include "cell-renderer-button.h"
 #include "misc.h"
 
 struct _LibBalsaAddressView {

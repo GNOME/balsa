@@ -34,8 +34,6 @@ libbalsa_a_SOURCES = 		\
 	autocrypt.c				\
 	body.c			\
 	body.h			\
-	cell-renderer-button.c  \
-	cell-renderer-button.h  \
 	completion.c            \
 	completion.h            \
 	files.c			\

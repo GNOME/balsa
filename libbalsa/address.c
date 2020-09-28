@@ -863,6 +863,10 @@ add_row(GtkWidget*button, gpointer data)
     gtk_tree_path_free(path);
 }
 
+#if LIBBALSA_CAN_DRAG_ADDRESS
+The edit widget has gtk3 code to drag and drop a LibBalsaAddress on the email field.
+Where it is dragged from is not clear. Commenting it all out for now:
+
 GtkTargetEntry libbalsa_address_target_list[2] = {
     {"text/plain",           0, LIBBALSA_ADDRESS_TRG_STRING },
     {"x-application/x-addr", GTK_TARGET_SAME_APP,LIBBALSA_ADDRESS_TRG_ADDRESS}
@@ -943,6 +947,7 @@ addrlist_drag_drop_cb(GtkWidget *widget, GdkDragContext *context,
 
   return  is_valid_drop_site;
 }
+#endif                          /* LIBBALSA_CAN_DRAG_ADDRESS */
 
 
 GtkWidget*
@@ -968,7 +973,7 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
 #define HIG_PADDING 6
     gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
     gtk_grid_set_column_spacing(GTK_GRID(grid), HIG_PADDING);
-    gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
+    g_object_set(grid, "margin", HIG_PADDING, NULL);
 
     for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
         if (!labels[cnt])
@@ -983,14 +988,15 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
             entries[cnt] = lba_addr_list_widget(changed_cb, changed_data);
             gtk_widget_set_margin_top(label, 1);
             gtk_widget_set_margin_bottom(label, 1);
-            gtk_container_add(GTK_CONTAINER(box), label);
+            gtk_box_append(GTK_BOX(box), label);
             gtk_widget_set_margin_top(but, 1);
             gtk_widget_set_margin_bottom(but, 1);
-            gtk_container_add(GTK_CONTAINER(box), but);
+            gtk_box_append(GTK_BOX(box), but);
             lhs = box;
             tree_view = gtk_frame_get_child(GTK_FRAME(entries[cnt]));
             g_signal_connect(but, "clicked", G_CALLBACK(add_row), tree_view);
-             gtk_drag_dest_set(entries[cnt],
+#if LIBBALSA_CAN_DRAG_ADDRESS
+            gtk_drag_dest_set(entries[cnt],
                                GTK_DEST_DEFAULT_MOTION |
                                GTK_DEST_DEFAULT_HIGHLIGHT,
                                libbalsa_address_target_list,
@@ -1000,6 +1006,7 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
                              G_CALLBACK(addrlist_drag_received_cb), NULL);
             g_signal_connect(tree_view, "drag-drop",
                              G_CALLBACK(addrlist_drag_drop_cb), NULL);
+#endif                          /* LIBBALSA_CAN_DRAG_ADDRESS */
         } else {
             entries[cnt] = gtk_entry_new();
             if (changed_cb)

@@ -25,8 +25,9 @@ libbalsa_a_sources = [
   'address-view.h',
   'address.c',
   'address.h',
-  'application-helpers.c',
-  'application-helpers.h',
+  # These might be useful at some point, but for now they are toxic:
+  #'application-helpers.c',
+  #'application-helpers.h',
   'autocrypt.h',
   'autocrypt.c',
   'body.c',

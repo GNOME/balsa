@@ -72,10 +72,14 @@ void libbalsa_address_set_edit_entries(LibBalsaAddress * address,
     type TARGET_ADDRESS and TARGET_STRING.
 */
 
+#if LIBBALSA_CAN_DRAG_ADDRESS
 enum {
     LIBBALSA_ADDRESS_TRG_STRING,
     LIBBALSA_ADDRESS_TRG_ADDRESS
 };
+
+extern GtkTargetEntry libbalsa_address_target_list[2];
+#endif                          /* LIBBALSA_CAN_DRAG_ADDRESS */
 
 GtkWidget *libbalsa_address_get_edit_widget(LibBalsaAddress *addr,
                                             GtkWidget **entries,

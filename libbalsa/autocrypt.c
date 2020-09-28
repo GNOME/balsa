@@ -459,7 +459,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_vexpand(scrolled_window, TRUE);
     gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), scrolled_window);
+    gtk_box_append(GTK_BOX(vbox), scrolled_window);
 
     model = gtk_list_store_new(AC_DB_VIEW_COLUMNS, G_TYPE_STRING,	/* address */
     	G_TYPE_INT64,												/* last seen timestamp value (for sorting) */
@@ -477,7 +477,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture), GTK_PHASE_CAPTURE);
     g_signal_connect(tree_view, "popup-menu", G_CALLBACK(popup_menu_cb), NULL);
 
-    gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
+    gtk_box_append(GTK_BOX(scrolled_window), tree_view);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
 
@@ -538,14 +538,12 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 	column = gtk_tree_view_column_new_with_attributes(_("Prefer encryption"), renderer, "active", AC_PREFER_ENCRYPT_COLUMN, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 	gtk_tree_view_column_set_resizable(column, TRUE);
-	gtk_widget_show_all(vbox);
 
 	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(model), AC_ADDRESS_COLUMN, GTK_SORT_ASCENDING);
     g_object_unref(model);
 
-	(void) gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
-	g_list_free_full(keys, (GDestroyNotify) g_bytes_unref);
+        g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
+	gtk_widget_show(dialog);
 }
 
 

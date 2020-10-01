@@ -226,6 +226,20 @@ libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags)
     return icon;
 }
 
+/*
+ * libbalsa_ask
+ *
+ * Present some information to the user, and wait for a response; called
+ * in a subthread, which blocks until the user responds.
+ *
+ * cb   idle callback that presents the information, say in a GtkDialog
+ *      with a "response" signal handler that calls libbalsa_ask_done().
+ * arg  pointer to a structure containing the information to be
+ *      presented to the user; first member must be an AskData struct,
+ *      so that arg can be cast to (AskData *).
+ *
+ * Returns: the user response, as an int
+ */
 
 typedef struct {
     GMutex lock;
@@ -236,57 +250,50 @@ typedef struct {
     int res;
 } AskData;
 
-/* ask_cert_idle:
-   called in MT mode by the main thread.
- */
-static gboolean
-ask_idle(gpointer data)
+/* Called in the main thread */
+static void
+libbalsa_ask_done(int res, AskData *ad)
 {
-    AskData* ad = (AskData*)data;
-    g_debug("ask_idle: ENTER %p", data);
-    ad->res = (ad->cb)(ad->arg);
+    g_mutex_lock(&ad->lock);
+
+    ad->res = res;
     ad->done = TRUE;
     g_cond_signal(&ad->condvar);
-    g_debug("ask_idle: LEAVE %p", data);
-    return FALSE;
+
+    g_mutex_unlock(&ad->lock);
 }
 
-/* libbalsa_ask_mt:
-   executed with GDK UNLOCKED. see mailbox_imap_open() and
-   imap_dir_cb()/imap_folder_imap_dir().
-*/
+/* Called in the subthread */
 static int
 libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
 {
-    AskData ad;
+    AskData *ad = arg;
 
-    if (!libbalsa_am_i_subthread()) {
-        int ret;
-        g_debug("main thread asks the following question");
-        ret = cb(arg);
-        return ret;
-    }
-    g_debug("side thread asks the following question");
-    g_mutex_init(&ad.lock);
-    g_cond_init(&ad.condvar);
-    ad.cb  = cb;
-    ad.arg = arg;
-    ad.done = FALSE;
+    g_assert(libbalsa_am_i_subthread());
 
-    g_mutex_lock(&ad.lock);
-    g_idle_add(ask_idle, &ad);
-    while (!ad.done) {
-    	g_cond_wait(&ad.condvar, &ad.lock);
-    }
+    g_debug("%s: ENTER %p", G_STRFUNC, arg);
+    g_mutex_init(&ad->lock);
+    g_cond_init(&ad->condvar);
+    ad->done = FALSE;
 
-    g_cond_clear(&ad.condvar);
-    g_mutex_unlock(&ad.lock);
-    return ad.res;
+    g_mutex_lock(&ad->lock);
+    g_idle_add(cb, arg);
+
+    while (!ad->done)
+        g_cond_wait(&ad->condvar, &ad->lock);
+
+    g_cond_clear(&ad->condvar);
+    g_mutex_unlock(&ad->lock);
+    g_mutex_clear(&ad->lock);
+
+    g_debug("%s: LEAVE %p", G_STRFUNC, arg);
+
+    return ad->res;
 }
 
 
 static int libbalsa_ask_for_cert_acceptance(GTlsCertificate      *cert,
-											GTlsCertificateFlags  errors);
+                                            GTlsCertificateFlags  errors);
 
 static GList *accepted_certs = NULL; /* GTlsCertificate items accepted for this session */
 static GMutex certificate_lock;
@@ -294,7 +301,7 @@ static GMutex certificate_lock;
 void
 libbalsa_certs_destroy(void)
 {
-	g_mutex_lock(&certificate_lock);
+    g_mutex_lock(&certificate_lock);
     g_list_free_full(accepted_certs, g_object_unref);
     accepted_certs = NULL;
     g_mutex_unlock(&certificate_lock);
@@ -308,12 +315,14 @@ libbalsa_certs_destroy(void)
 
 gboolean
 libbalsa_is_cert_known(GTlsCertificate      *cert,
-					   GTlsCertificateFlags  errors)
+                       GTlsCertificateFlags  errors)
 {
 	gchar *cert_file;
 	GList *cert_db;
 	gboolean cert_ok;
 	GList *lst;
+
+        g_return_val_if_fail(libbalsa_am_i_subthread(), FALSE);
 
 	/* check the list of accepted certificates for this session */
 	g_mutex_lock(&certificate_lock);
@@ -376,20 +385,47 @@ libbalsa_is_cert_known(GTlsCertificate      *cert,
    TODO: check treading issues.
 
 */
+
 struct AskCertData {
+    AskData ad;
     GTlsCertificate *certificate;
     gchar *explanation;
 };
 
+static void
+ask_cert_real_response(GtkDialog *dialog,
+                       int        response,
+                       gpointer   user_data)
+{
+    struct AskCertData *acd = user_data;
+    int i;
 
-static int
+    switch (response) {
+    case 0:
+        i = CERT_ACCEPT_SESSION;
+        break;
+    case 1:
+        i = CERT_ACCEPT_PERMANENT;
+        break;
+    case GTK_RESPONSE_CANCEL:
+    default:
+        i = CERT_ACCEPT_NO;
+        break;
+    }
+
+    if (dialog != NULL)
+        gtk_widget_destroy(GTK_WIDGET(dialog));
+
+    libbalsa_ask_done(i, &acd->ad);
+}
+
+static gboolean
 ask_cert_real(void *data)
 {
     struct AskCertData *acd = (struct AskCertData*)data;
     GtkWidget *dialog;
     GtkWidget *cert_widget;
     GString *str;
-    unsigned i;
     GtkWidget *label;
     GtkWidget *content_area;
 
@@ -397,7 +433,8 @@ ask_cert_real(void *data)
     cert_widget = x509_cert_chain_tls(acd->certificate);
     if (cert_widget == NULL) {
     	libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("broken TLS certificate"));
-    	return CERT_ACCEPT_NO;
+        ask_cert_real_response(NULL, GTK_RESPONSE_CANCEL, acd);
+        return G_SOURCE_REMOVE;
     }
 
     dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"),
@@ -418,34 +455,22 @@ ask_cert_real(void *data)
                     acd->explanation);
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
+
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
     gtk_widget_set_margin_top(label, 1);
     gtk_widget_set_margin_bottom(label, 1);
     gtk_container_add(GTK_CONTAINER(content_area), label);
-    gtk_widget_show(label);
 
     gtk_widget_set_vexpand(cert_widget, TRUE);
     gtk_widget_set_valign(cert_widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(cert_widget, 1);
     gtk_widget_set_margin_bottom(cert_widget, 1);
     gtk_container_add(GTK_CONTAINER(content_area), cert_widget);
-    gtk_widget_show_all(cert_widget);
 
-    switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
-    case 0:
-    	i = CERT_ACCEPT_SESSION;
-    	break;
-    case 1:
-    	i = CERT_ACCEPT_PERMANENT;
-    	break;
-    case GTK_RESPONSE_CANCEL:
-    default:
-    	i = CERT_ACCEPT_NO;
-    	break;
-    }
-    gtk_widget_destroy(dialog);
-    g_free(acd->explanation);
-    return i;
+    g_signal_connect(dialog, "response", G_CALLBACK(ask_cert_real_response), acd);
+    gtk_widget_show_all(dialog);
+
+    return G_SOURCE_REMOVE;
 }
 
 
@@ -465,6 +490,7 @@ libbalsa_ask_for_cert_acceptance(GTlsCertificate      *cert,
     };
     GString *exp_buf = g_string_new(NULL);
     gsize n;
+    int retval;
 
     acd.certificate = cert;
     for (n = 0U; n < G_N_ELEMENTS(reason_msg); n++) {
@@ -479,7 +505,11 @@ libbalsa_ask_for_cert_acceptance(GTlsCertificate      *cert,
     	g_string_free(exp_buf, TRUE);
     	acd.explanation = g_strdup_printf(_("unknown certificate validation error %u"), (unsigned) errors);
     }
-    return libbalsa_ask(ask_cert_real, &acd);
+
+    retval = libbalsa_ask(ask_cert_real, &acd);
+    g_free(acd.explanation);
+
+    return retval;
 }
 
 

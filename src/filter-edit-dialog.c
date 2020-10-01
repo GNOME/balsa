@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
@@ -420,7 +420,7 @@ build_action_page(GtkWindow * window)
     gtk_grid_attach(GTK_GRID(grid), fe_popup_button, 0, 1, 1, 1);
     fe_popup_entry = gtk_entry_new();
     gtk_widget_set_hexpand(fe_popup_entry, TRUE);
-    gtk_entry_set_max_length(GTK_ENTRY(fe_popup_entry), 
+    gtk_entry_set_max_length(GTK_ENTRY(fe_popup_entry),
                              FILTER_EDIT_ENTRY_MAX_LENGTH);
     gtk_grid_attach(GTK_GRID(grid), fe_popup_entry, 1, 1, 1, 1);
     /* fe_popup_entry is initially sensitive, so to be consistent
@@ -570,7 +570,7 @@ filters_edit_dialog(GtkWindow * parent)
                                      gtk_get_current_event_time());
 	return;
     }
-    
+
     fe_already_open=TRUE;
 
     piece = build_left_side();
@@ -659,11 +659,11 @@ filters_edit_dialog(GtkWindow * parent)
 	fe_collect_user_headers(fil->condition);
 
 	cpfil->action=fil->action;
-	if (fil->action_string) 
-            cpfil->action_string=g_strdup(fil->action_string);	
+	if (fil->action_string)
+            cpfil->action_string=g_strdup(fil->action_string);
 
         gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-        gtk_list_store_set(GTK_LIST_STORE(model), &iter, 
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
                            0, cpfil->name, 1, cpfil, -1);
     }
 

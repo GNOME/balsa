@@ -427,6 +427,16 @@ autocrypt_recommendation(InternetAddressList *recipients, GList **missing_keys, 
 	return result;
 }
 
+static void
+main_dialog_response_cb(GtkDialog *dialog,
+                        int        response_id,
+                        gpointer   user_data)
+{
+    GList *keys = user_data;
+
+    g_list_free_full(keys, (GDestroyNotify) g_bytes_unref);
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+}
 
 /* documentation: see header file */
 void
@@ -810,68 +820,6 @@ update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
 	sqlite3_reset(query[3]);
 }
 
-
-/* callback: popup menu key in autocrypt database dialogue activated */
-static gboolean
-popup_menu_cb(GtkWidget *widget, gpointer G_GNUC_UNUSED user_data)
-{
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
-    GtkTreeModel *model;
-    GtkTreeSelection *selection;
-    GtkTreeIter iter;
-
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
-	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		GtkTreePath *path;
-
-		path = gtk_tree_model_get_path(model, &iter);
-		gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0.0, 0.0);
-		gtk_tree_path_free(path);
-		popup_menu_real(widget, NULL);
-	}
-
-	return TRUE;
-}
-
-
-/* callback: mouse click in autocrypt database dialogue activated */
-static void
-button_press_cb(GtkGestureMultiPress *multi_press_gesture, gint G_GNUC_UNUSED n_press, gdouble x, gdouble y,
-	gpointer G_GNUC_UNUSED user_data)
-{
-    GtkWidget *widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(multi_press_gesture));
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
-    GtkGesture *gesture;
-    GdkEventSequence *sequence;
-    const GdkEvent *event;
-
-    gesture = GTK_GESTURE(multi_press_gesture);
-    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press_gesture));
-    event = gtk_gesture_get_last_event(gesture, sequence);
-    if (gdk_event_triggers_context_menu(event) && (gdk_event_get_window(event) == gtk_tree_view_get_bin_window(tree_view))) {
-        gint bx;
-        gint by;
-        GtkTreePath *path;
-
-        gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (gint) x, (gint) y, &bx, &by);
-        if (gtk_tree_view_get_path_at_pos(tree_view, bx, by, &path, NULL, NULL, NULL)) {
-        	GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
-            GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-            GtkTreeIter iter;
-
-            gtk_tree_selection_unselect_all(selection);
-            gtk_tree_selection_select_path(selection, path);
-            gtk_tree_view_set_cursor(GTK_TREE_VIEW(tree_view), path, NULL, FALSE);
-            if (gtk_tree_model_get_iter(model, &iter, path)) {
-            	popup_menu_real(GTK_WIDGET(tree_view), event);
-            }
-            gtk_tree_path_free(path);
-        }
-    }
-}
-
-
-/* autocrypt database dialogue context menu */
 static void
 popup_menu_real(GtkWidget *widget, const GdkEvent *event)
 {

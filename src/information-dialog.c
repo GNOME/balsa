@@ -63,19 +63,26 @@ balsa_information_list_response_cb(GtkWidget * dialog, gint response,
     }
 }
 
-void
-balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
-                       const char *msg)
+struct balsa_information_info {
+    GtkWindow *parent;
+    LibBalsaInformationType type;
+    const char *msg;
+};
+
+static gboolean
+balsa_information_idle(gpointer user_data)
 {
+    struct balsa_information_info *info = user_data;
     BalsaInformationShow show;
-    gchar *show_msg;
+    char *show_msg;
 
-    if (!balsa_app.main_window)
-        return;
+    if (balsa_app.main_window == NULL)
+        return G_SOURCE_REMOVE;
 
-    show_msg = g_strdup(msg);
+    show_msg = g_strdup(info->msg);
     libbalsa_utf8_sanitize(&show_msg, balsa_app.convert_unknown_8bit, NULL);
-    switch (type) {
+
+    switch (info->type) {
     case LIBBALSA_INFORMATION_MESSAGE:
 	show = balsa_app.information_message;
 	break;
@@ -98,22 +105,40 @@ balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
     case BALSA_INFORMATION_SHOW_NONE:
 	break;
     case BALSA_INFORMATION_SHOW_DIALOG:
-	balsa_information_dialog(parent, type, show_msg);
+	balsa_information_dialog(info->parent, info->type, show_msg);
 	break;
     case BALSA_INFORMATION_SHOW_LIST:
-	balsa_information_list(parent, type, show_msg);
+	balsa_information_list(info->parent, info->type, show_msg);
 	break;
     case BALSA_INFORMATION_SHOW_BAR:
-	balsa_information_bar(parent, type, show_msg);
+	balsa_information_bar(info->parent, info->type, show_msg);
 	break;
     case BALSA_INFORMATION_SHOW_STDERR:
-	balsa_information_stderr(type, show_msg);
+	balsa_information_stderr(info->type, show_msg);
 	break;
     }
     g_free(show_msg);
 
-    if (type == LIBBALSA_INFORMATION_FATAL)
+    if (info->type == LIBBALSA_INFORMATION_FATAL)
 	gtk_main_quit();
+
+    g_free(info);
+
+    return G_SOURCE_REMOVE;
+}
+
+void
+balsa_information_real(GtkWindow *parent, LibBalsaInformationType type,
+                       const char *msg)
+{
+    struct balsa_information_info *info;
+
+    info = g_new(struct balsa_information_info, 1);
+    info->parent = parent;
+    info->type = type;
+    info->msg = msg;
+
+    g_idle_add(balsa_information_idle, info);
 }
 
 void
@@ -187,8 +212,8 @@ balsa_information_dialog(GtkWindow *parent, LibBalsaInformationType type,
     libbalsa_macosx_menu_for_parent(messagebox, GTK_WINDOW(parent));
 #endif
 
-    gtk_dialog_run(GTK_DIALOG(messagebox));
-    gtk_widget_destroy(messagebox);
+    g_signal_connect(messagebox, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+    gtk_widget_show(messagebox);
 }
 
 /* 

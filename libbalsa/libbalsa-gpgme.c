@@ -823,8 +823,9 @@ libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
 					GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
 					_("No private key for protocol %s is available for the signer “%s”"),
 					libbalsa_gpgme_protocol_name(protocol), name);
-				(void) gtk_dialog_run(GTK_DIALOG(dialog));
-				gtk_widget_destroy(dialog);
+
+				g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+				gtk_widget_show(dialog);
 			}
 		}
 	    gpgme_release(ctx);

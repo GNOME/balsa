@@ -103,7 +103,9 @@ G_BEGIN_DECLS
         GtkTextMark *insert_mark;
 
         GtkWidget *paned;
+
         gboolean ready_to_send;
+        gboolean queue_only;    /* Set when about to send */
     };
 
     BalsaSendmsg *sendmsg_window_compose(void);

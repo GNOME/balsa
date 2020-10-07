@@ -5459,29 +5459,90 @@ check_autocrypt_recommendation(BalsaSendmsg *bsmsg)
 
 
 /* "send message" menu and toolbar callback.
+ *
+ * Sending or queuing a message may require user interaction in the form
+ * of a response to some information. The process is carried out in a
+ * subthread, which can block pending the user's response, to avoid
+ * blocking the main thread.
  */
-static gint
-send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
+
+static struct {
+    GMutex lock;
+    GCond cond;
+    int choice;
+} send_message;
+
+static void
+send_message_thread_response(GtkDialog *dialog,
+                             int        response_id,
+                             gpointer   user_data)
 {
+    g_mutex_lock(&send_message.lock);
+    send_message.choice = response_id;
+    g_cond_signal(&send_message.cond);
+    g_mutex_unlock(&send_message.lock);
+
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
+typedef struct {
+    GtkWindow *window;
+    gboolean warn_mp;
+    gboolean warn_html_sign;
+} send_message_info;
+
+static gboolean
+send_message_thread_idle(gpointer user_data)
+{
+    send_message_info *info = user_data;
+    GtkWidget *dialog;
+    GString *string =
+        g_string_new(_("You selected OpenPGP security for this message.\n"));
+
+    if (info->warn_html_sign)
+        g_string_append(string,
+                        _("The message text will be sent as plain text and as "
+                          "HTML, but only the plain part can be signed.\n"));
+    if (info->warn_mp)
+        g_string_append(string,
+                        _("The message contains attachments, which cannot be "
+                          "signed or encrypted.\n"));
+    g_string_append(string,
+                    _("You should select MIME mode if the complete "
+                      "message shall be protected. Do you really want to proceed?"));
+    dialog =
+        gtk_message_dialog_new(info->window,
+                               GTK_DIALOG_DESTROY_WITH_PARENT |
+                               GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION,
+                               GTK_BUTTONS_OK_CANCEL, "%s", string->str);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, info->window);
+#endif
+    g_string_free(string, TRUE);
+    g_free(info);
+
+    g_signal_connect(dialog, "response", G_CALLBACK(send_message_thread_response), NULL);
+
+    return G_SOURCE_REMOVE;
+}
+
+static gpointer
+send_message_thread(gpointer data)
+{
+    BalsaSendmsg *bsmsg = data;
     LibBalsaMsgCreateResult result;
     LibBalsaMessage *message;
     LibBalsaMailbox *fcc;
     GtkTreeIter iter;
     GError * error = NULL;
 
-    if (!bsmsg->ready_to_send)
-	return FALSE;
-
-    if(!subject_not_empty(bsmsg))
-	return FALSE;
-
 #ifdef ENABLE_AUTOCRYPT
     if (!check_autocrypt_recommendation(bsmsg)) {
-    	return FALSE;
+        return NULL;
     }
 #else
     if (!check_suggest_encryption(bsmsg)) {
-    	return FALSE;
+        return NULL;
     }
 #endif /* ENABLE_AUTOCRYPT */
 
@@ -5496,40 +5557,23 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
             bsmsg->send_mp_alt;
 
         if (warn_mp || warn_html_sign) {
+            send_message_info *info;
             /* we are going to RFC2440 sign/encrypt a multipart, or to
              * RFC2440 sign a multipart/alternative... */
-            GtkWidget *dialog;
-            gint choice;
-            GString * string =
-                g_string_new(_("You selected OpenPGP security for this message.\n"));
+            info = g_new(send_message_info, 1);
+            info->window = GTK_WINDOW(bsmsg->window);
+            info->warn_mp = warn_mp;
+            info->warn_html_sign = warn_html_sign;
+            g_idle_add(send_message_thread_idle, info);
 
-            if (warn_html_sign)
-                string =
-                    g_string_append(string,
-                        _("The message text will be sent as plain text and as "
-                          "HTML, but only the plain part can be signed.\n"));
-            if (warn_mp)
-                string =
-                    g_string_append(string,
-                        _("The message contains attachments, which cannot be "
-                          "signed or encrypted.\n"));
-            string =
-                g_string_append(string,
-                    _("You should select MIME mode if the complete "
-                      "message shall be protected. Do you really want to proceed?"));
-            dialog = gtk_message_dialog_new
-                (GTK_WINDOW(bsmsg->window),
-                 GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
-                 GTK_MESSAGE_QUESTION,
-                 GTK_BUTTONS_OK_CANCEL, "%s", string->str);
-#if HAVE_MACOSX_DESKTOP
-	    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
-#endif
-            g_string_free(string, TRUE);
-            choice = gtk_dialog_run(GTK_DIALOG(dialog));
-            gtk_widget_destroy(dialog);
-            if (choice != GTK_RESPONSE_OK)
-                return FALSE;
+            g_mutex_lock(&send_message.lock);
+            send_message.choice = 0;
+            while (send_message.choice == 0)
+                g_cond_wait(&send_message.cond, &send_message.lock);
+            g_mutex_unlock(&send_message.lock);
+
+            if (send_message.choice != GTK_RESPONSE_OK)
+                return NULL;
         }
     }
 
@@ -5541,7 +5585,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                                _("sending message with GPG mode %d"),
                                libbalsa_message_get_gpg_mode(message));
 
-    if(queue_only)
+    if(bsmsg->queue_only)
 	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
 					libbalsa_identity_get_smtp_server(bsmsg->ident),
 					bsmsg->flow, &error);
@@ -5549,7 +5593,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
         result = libbalsa_message_send(message, balsa_app.outbox, fcc,
                                        balsa_find_sentbox_by_url,
 				       libbalsa_identity_get_smtp_server(bsmsg->ident),
-					   	   	   	   	   balsa_app.send_progress_dialog,
+                                       balsa_app.send_progress_dialog,
                                        GTK_WINDOW(balsa_app.main_window),
                                        bsmsg->flow, &error);
     if (result == LIBBALSA_MESSAGE_CREATE_OK) {
@@ -5591,12 +5635,27 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 				       LIBBALSA_INFORMATION_ERROR,
 				       _("Send failed: %s"), msg);
         }
-	return FALSE;
+	return NULL;
     }
 
     gtk_widget_destroy(bsmsg->window);
 
-    return TRUE;
+    return NULL;
+}
+
+static void
+send_message_handler(BalsaSendmsg * bsmsg)
+{
+    GThread *thread;
+
+    if (!bsmsg->ready_to_send)
+	return;
+
+    if(!subject_not_empty(bsmsg))
+	return;
+
+    thread = g_thread_new("send-message", send_message_thread, bsmsg);
+    g_thread_unref(thread);
 }
 
 
@@ -5606,7 +5665,8 @@ sw_toolbar_send_activated(GSimpleAction * action, GVariant * parameter, gpointer
 {
     BalsaSendmsg *bsmsg = data;
 
-    send_message_handler(bsmsg, balsa_app.always_queue_sent_mail);
+    bsmsg->queue_only = balsa_app.always_queue_sent_mail;
+    send_message_handler(bsmsg);
 }
 
 static void
@@ -5614,7 +5674,8 @@ sw_send_activated(GSimpleAction * action, GVariant * parameter, gpointer data)
 {
     BalsaSendmsg *bsmsg = data;
 
-    send_message_handler(bsmsg, FALSE);
+    bsmsg->queue_only = FALSE;
+    send_message_handler(bsmsg);
 }
 
 
@@ -5623,7 +5684,8 @@ sw_queue_activated(GSimpleAction * action, GVariant * parameter, gpointer data)
 {
     BalsaSendmsg *bsmsg = data;
 
-    send_message_handler(bsmsg, TRUE);
+    bsmsg->queue_only = TRUE;
+    send_message_handler(bsmsg);
 }
 
 static gboolean

@@ -1053,36 +1053,70 @@ ident_dialog_add_entry(GtkWidget * grid, gint row, GtkDialog * dialog,
         gtk_widget_grab_focus(entry);
 }
 
+typedef struct {
+    GObject *object;
+    const char *target;
+    char *keyid;
+    GError *error;
+} choose_key_info;
+
+static gboolean
+choose_key_thread_idle(gpointer data)
+{
+    choose_key_info *info = data;
+
+    if (info->keyid != NULL) {
+        display_frame_set_field(info->object, info->target, info->keyid);
+        g_free(info->keyid);
+    }
+
+    if (info->error != NULL) {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Error selecting key: %s"), info->error->message);
+        g_error_free(info->error);
+    }
+
+    g_object_unref(info->object);
+    g_free(info);
+
+    return G_SOURCE_REMOVE;
+}
+
+static gpointer
+choose_key_thread_func(gpointer data)
+{
+    choose_key_info *info = data;
+    gpgme_protocol_t protocol;
+    char *email;
+
+    protocol = (strcmp(info->target, "identity-keyid") == 0) ?
+        GPGME_PROTOCOL_OpenPGP : GPGME_PROTOCOL_CMS;
+    email = ident_dialog_get_text(info->object, "identity-address");
+
+    info->error = NULL;
+    info->keyid = libbalsa_gpgme_get_seckey(protocol, email, GTK_WINDOW(info->object), &info->error);
+    g_idle_add(choose_key_thread_idle, info);
+
+    return NULL;
+}
 
 static void
 choose_key(GtkButton *button, gpointer user_data)
 {
-	const gchar *target;
-	gpgme_protocol_t protocol;
-	gchar *email;
-	gchar *keyid;
-	GError *error = NULL;
+    GObject *object = user_data;
+    choose_key_info *info;
+    GThread *thread;
 
-	target = g_object_get_data(G_OBJECT(button), "target");
-	if (strcmp(target, "identity-keyid") == 0) {
-		protocol = GPGME_PROTOCOL_OpenPGP;
-	} else {
-		protocol = GPGME_PROTOCOL_CMS;
-	}
+    info = g_new(choose_key_info, 1);
+    info->object = g_object_ref(object);
+    info->target = g_object_get_data(G_OBJECT(button), "target");
 
-	email = ident_dialog_get_text(G_OBJECT(user_data), "identity-address");
-	keyid = libbalsa_gpgme_get_seckey(protocol, email, GTK_WINDOW(user_data), &error);
-	if (keyid != NULL) {
-		display_frame_set_field(G_OBJECT(user_data), target, keyid);
-		g_free(keyid);
-	}
-	if (error != NULL) {
-        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                             _("Error selecting key: %s"), error->message);
-        g_clear_error(&error);
-	}
+    /* Ask the user for a key in a subthread, because it blocks while
+     * the user chooses. */
+
+    thread = g_thread_new("choose-key", choose_key_thread_func, info);
+    g_thread_unref(thread);
 }
-
 
 /*
  * Add a GtkEntry to the given dialog with a label next to it

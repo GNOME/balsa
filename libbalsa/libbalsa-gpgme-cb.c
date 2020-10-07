@@ -151,16 +151,47 @@ row_activated_cb(GtkTreeView       *tree_view,
 
         gtk_tree_model_get(model, &iter, GPG_KEY_PTR_COLUMN, &key, -1);
         dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, key, GPG_SUBKEY_CAP_ALL, NULL, NULL);
-        g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
+        g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
         gtk_widget_show(dialog);
     }
 }
 
+static struct {
+    GMutex lock;
+    GCond cond;
+    gboolean done;
+} select_key;
 
-gpgme_key_t
-lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
-		    gpgme_protocol_t protocol, GtkWindow * parent)
+static void
+select_key_response(GtkDialog *dialog,
+                    int        response_id,
+                    gpointer   user_data)
 {
+    gpgme_key_t *use_key = user_data;
+
+    if (response_id != GTK_RESPONSE_OK)
+        *use_key = NULL;
+
+    g_mutex_lock(&select_key.lock);
+    select_key.done = TRUE;
+    g_cond_signal(&select_key.cond);
+    g_mutex_unlock(&select_key.lock);
+
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
+typedef struct {
+    const gchar     *user_name;
+    lb_key_sel_md_t  mode;
+    GList           *keys;
+    GtkWindow       *parent;
+    gpgme_key_t     *use_key;
+} select_key_info;
+
+static gboolean
+select_key_idle(gpointer user_data)
+{
+    select_key_info *info = user_data;
     GtkWidget *dialog;
     GtkWidget *content_area;
     GtkWidget *vbox;
@@ -168,17 +199,17 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     GtkWidget *scrolled_window;
     GtkWidget *tree_view;
     GtkListStore *model;
-	GtkTreeSortable *sortable;
+    GtkTreeSortable *sortable;
     GtkTreeSelection *selection;
     GtkTreeIter iter;
     gchar *prompt;
-    gpgme_key_t use_key = NULL;
-	GtkCellRenderer *renderer;
-	GtkTreeViewColumn *column;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GList *l;
 
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(_("Select key"),
-					 parent,
+					 info->parent,
 					 GTK_DIALOG_DESTROY_WITH_PARENT |
                                          libbalsa_dialog_flags(),
                                          _("_OK"),     GTK_RESPONSE_OK,
@@ -186,37 +217,39 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
                                          NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
     gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK, FALSE);
-	geometry_manager_attach(GTK_WINDOW(dialog), "KeyList");
+    geometry_manager_attach(GTK_WINDOW(dialog), "KeyList");
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 #if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
+    libbalsa_macosx_menu_for_parent(dialog, info->parent);
 #endif
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_widget_set_vexpand (vbox, TRUE);
     gtk_container_add(GTK_CONTAINER(content_area), vbox);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), 12);
-    switch (mode) {
+
+    switch (info->mode) {
     	case LB_SELECT_PRIVATE_KEY:
     		prompt =
     			g_strdup_printf(_("Select the private key for the signer “%s”"),
-    							user_name);
+    							info->user_name);
     		break;
     	case LB_SELECT_PUBLIC_KEY_USER:
     		prompt =
     			g_strdup_printf(_("Select the public key for the recipient “%s”"),
-                         		user_name);
+                         		info->user_name);
     		break;
     	case LB_SELECT_PUBLIC_KEY_ANY:
     		prompt =
     			g_strdup_printf(_("There seems to be no public key for recipient "
     	                          "“%s” in your key ring.\nIf you are sure that the "
     							  "recipient owns a different key, select it from "
-    							  "the list."), user_name);
+    							  "the list."), info->user_name);
     		break;
     	default:
     		g_assert_not_reached();
-   	}
+    }
+
     label = libbalsa_create_wrap_label(prompt, FALSE);
     g_free(prompt);
     gtk_container_add(GTK_CONTAINER(vbox), label);
@@ -249,11 +282,11 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     g_object_set_data(G_OBJECT(selection), "first", GUINT_TO_POINTER(1));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
     g_signal_connect(selection, "changed",
-		     G_CALLBACK(key_selection_changed_cb), &use_key);
+		     G_CALLBACK(key_selection_changed_cb), info->use_key);
 
     /* add the keys */
-    while (keys != NULL) {
-    	gpgme_key_t key = (gpgme_key_t) keys->data;
+    for (l = info->keys; l != NULL; l = l->next) {
+    	gpgme_key_t key = (gpgme_key_t) l->data;
 
     	/* simply add the primary uid -- the user can show the full key details */
     	if ((key->uids != NULL) && (key->uids->uid != NULL) && (key->subkeys != NULL)) {
@@ -274,7 +307,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     		g_free(bits);
     		g_free(created);
     	}
-    	keys = g_list_next(keys);
     }
 
     g_object_unref(model);
@@ -303,43 +335,112 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
     g_signal_connect(tree_view, "row-activated", G_CALLBACK(row_activated_cb), dialog);
 
-    gtk_widget_show_all(content_area);
+    g_signal_connect(dialog, "response", G_CALLBACK(select_key_response), info->use_key);
+    g_free(info);
+    gtk_widget_show_all(dialog);
 
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK) {
-    	use_key = NULL;
-    }
-    gtk_widget_destroy(dialog);
+    return G_SOURCE_REMOVE;
+}
+
+gpgme_key_t
+lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
+		    gpgme_protocol_t protocol, GtkWindow * parent)
+{
+    gpgme_key_t use_key = NULL;
+    select_key_info *info;
+
+    g_return_val_if_fail(libbalsa_am_i_subthread(), NULL);
+
+    info = g_new(select_key_info, 1);
+    info->user_name = user_name;
+    info->mode = mode;
+    info->keys = keys;
+    info->parent = parent;
+    info->use_key = &use_key;
+
+    g_idle_add(select_key_idle, info);
+
+    g_mutex_lock(&select_key.lock);
+    select_key.done = FALSE;
+    while (!select_key.done)
+        g_cond_wait(&select_key.cond, &select_key.lock);
+    g_mutex_unlock(&select_key.lock);
 
     return use_key;
 }
 
+static struct {
+    GMutex lock;
+    GCond cond;
+    int result;
+} accept_low_trust_key;
+
+static void
+accept_low_trust_key_response(GtkDialog *dialog,
+                              int        response_id,
+                              gpointer   user_data)
+{
+    g_mutex_lock(&accept_low_trust_key.lock);
+    accept_low_trust_key.result = response_id;
+    g_cond_signal(&accept_low_trust_key.cond);
+    g_mutex_unlock(&accept_low_trust_key.lock);
+
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
+typedef struct {
+    gpgme_key_t  key;
+    GtkWindow   *parent;
+} accept_low_trust_key_info;
+
+static gboolean
+accept_low_trust_key_idle(gpointer user_data)
+{
+    accept_low_trust_key_info *info = user_data;
+    GtkWidget *dialog;
+    char *message2;
+
+    /* create the dialog */
+    message2 = g_strdup_printf(_("The owner trust for this key is “%s” only.\nUse this key anyway?"),
+    	libbalsa_gpgme_validity_to_gchar_short(info->key->owner_trust));
+    dialog = libbalsa_key_dialog(info->parent, GTK_BUTTONS_YES_NO, info->key, GPG_SUBKEY_CAP_ENCRYPT, _("Insufficient key owner trust"),
+    	message2);
+    g_free(message2);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(dialog, info->parent);
+#endif
+
+    g_free(info);
+
+    /* ask the user */
+    g_signal_connect(dialog, "response", G_CALLBACK(accept_low_trust_key_response), NULL);
+    gtk_widget_show_all(dialog);
+
+    return G_SOURCE_REMOVE;
+}
 
 gboolean
 lb_gpgme_accept_low_trust_key(const gchar *user_name,
-				  	  	  	  gpgme_key_t  key,
-							  GtkWindow   *parent)
+                              gpgme_key_t  key,
+                              GtkWindow   *parent)
 {
-    GtkWidget *dialog;
-    gint result;
-    gchar *message2;
+    accept_low_trust_key_info *info;
 
     /* paranoia checks */
     g_return_val_if_fail((user_name != NULL) && (key != NULL), FALSE);
 
-    /* create the dialog */
-    message2 = g_strdup_printf(_("The owner trust for this key is “%s” only.\nUse this key anyway?"),
-    	libbalsa_gpgme_validity_to_gchar_short(key->owner_trust));
-    dialog = libbalsa_key_dialog(parent, GTK_BUTTONS_YES_NO, key, GPG_SUBKEY_CAP_ENCRYPT, _("Insufficient key owner trust"),
-    	message2);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
+    info = g_new(accept_low_trust_key_info, 1);
+    info->key = key;
+    info->parent = parent;
+    g_idle_add(accept_low_trust_key_idle, info);
 
-    /* ask the user */
-    result = gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
+    g_mutex_lock(&accept_low_trust_key.lock);
+    accept_low_trust_key.result = 0;
+    while (accept_low_trust_key.result == 0)
+        g_cond_wait(&accept_low_trust_key.cond, &accept_low_trust_key.lock);
+    g_mutex_unlock(&accept_low_trust_key.lock);
 
-    return result == GTK_RESPONSE_YES;
+    return accept_low_trust_key.result == GTK_RESPONSE_YES;
 }
 
 

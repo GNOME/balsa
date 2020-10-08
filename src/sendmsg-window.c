@@ -5466,44 +5466,44 @@ check_autocrypt_recommendation(BalsaSendmsg *bsmsg)
  * blocking the main thread.
  */
 
-static struct {
+typedef struct {
     GMutex lock;
     GCond cond;
     int choice;
-} send_message;
+    GtkWindow *window;
+    gboolean warn_mp;
+    gboolean warn_html_sign;
+} send_message_data;
 
 static void
 send_message_thread_response(GtkDialog *dialog,
                              int        response_id,
                              gpointer   user_data)
 {
-    g_mutex_lock(&send_message.lock);
-    send_message.choice = response_id;
-    g_cond_signal(&send_message.cond);
-    g_mutex_unlock(&send_message.lock);
+    send_message_data *data = user_data;
+
+    g_mutex_lock(&data->lock);
+    data->choice = response_id;
+    g_cond_signal(&data->cond);
+    g_mutex_unlock(&data->lock);
 
     gtk_widget_destroy(GTK_WIDGET(dialog));
 }
 
-typedef struct {
-    GtkWindow *window;
-    gboolean warn_mp;
-    gboolean warn_html_sign;
-} send_message_info;
 
 static gboolean
 send_message_thread_idle(gpointer user_data)
 {
-    send_message_info *info = user_data;
+    send_message_data *data = user_data;
     GtkWidget *dialog;
     GString *string =
         g_string_new(_("You selected OpenPGP security for this message.\n"));
 
-    if (info->warn_html_sign)
+    if (data->warn_html_sign)
         g_string_append(string,
                         _("The message text will be sent as plain text and as "
                           "HTML, but only the plain part can be signed.\n"));
-    if (info->warn_mp)
+    if (data->warn_mp)
         g_string_append(string,
                         _("The message contains attachments, which cannot be "
                           "signed or encrypted.\n"));
@@ -5511,17 +5511,17 @@ send_message_thread_idle(gpointer user_data)
                     _("You should select MIME mode if the complete "
                       "message shall be protected. Do you really want to proceed?"));
     dialog =
-        gtk_message_dialog_new(info->window,
+        gtk_message_dialog_new(data->window,
                                GTK_DIALOG_DESTROY_WITH_PARENT |
                                GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION,
                                GTK_BUTTONS_OK_CANCEL, "%s", string->str);
 #if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, info->window);
+    libbalsa_macosx_menu_for_parent(dialog, data->window);
 #endif
     g_string_free(string, TRUE);
-    g_free(info);
 
     g_signal_connect(dialog, "response", G_CALLBACK(send_message_thread_response), NULL);
+    gtk_widget_show(dialog);
 
     return G_SOURCE_REMOVE;
 }
@@ -5557,22 +5557,27 @@ send_message_thread(gpointer data)
             bsmsg->send_mp_alt;
 
         if (warn_mp || warn_html_sign) {
-            send_message_info *info;
+            send_message_data data;
             /* we are going to RFC2440 sign/encrypt a multipart, or to
              * RFC2440 sign a multipart/alternative... */
-            info = g_new(send_message_info, 1);
-            info->window = GTK_WINDOW(bsmsg->window);
-            info->warn_mp = warn_mp;
-            info->warn_html_sign = warn_html_sign;
+            data.window = GTK_WINDOW(bsmsg->window);
+            data.warn_mp = warn_mp;
+            data.warn_html_sign = warn_html_sign;
             g_idle_add(send_message_thread_idle, info);
 
-            g_mutex_lock(&send_message.lock);
-            send_message.choice = 0;
-            while (send_message.choice == 0)
-                g_cond_wait(&send_message.cond, &send_message.lock);
-            g_mutex_unlock(&send_message.lock);
+            g_mutex_init(&data.lock);
+            g_cond_init(&data.cond);
 
-            if (send_message.choice != GTK_RESPONSE_OK)
+            g_mutex_lock(&data.lock);
+            data.choice = 0;
+            while (data.choice == 0)
+                g_cond_wait(&data.cond, &data.lock);
+            g_mutex_unlock(&data.lock);
+
+            g_mutex_clear(&data.lock);
+            g_cond_clear(&data.cond);
+
+            if (data.choice != GTK_RESPONSE_OK)
                 return NULL;
         }
     }

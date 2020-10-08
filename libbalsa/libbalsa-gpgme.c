@@ -824,7 +824,7 @@ libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
 					_("No private key for protocol %s is available for the signer “%s”"),
 					libbalsa_gpgme_protocol_name(protocol), name);
 
-				g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+				g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
 				gtk_widget_show(dialog);
 			}
 		}

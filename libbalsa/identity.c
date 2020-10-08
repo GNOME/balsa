@@ -347,9 +347,9 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     /* Show only one dialog at a time. */
     sdi = g_object_get_data(G_OBJECT(parent),
                             LIBBALSA_IDENTITY_SELECT_DIALOG_KEY);
-    if (sdi) {
+    if (sdi != NULL) {
         gtk_window_present_with_time(GTK_WINDOW(sdi->dialog),
-                                     gtk_get_current_event_time());
+                                     GDK_CURRENT_TIME);
         return;
     }
 
@@ -386,13 +386,13 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     frame = gtk_frame_new(NULL);
     gtk_widget_set_vexpand(frame, TRUE);
     gtk_widget_set_valign(frame, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER
+    gtk_box_append(GTK_BOX
                        (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                        frame);
-    gtk_container_add(GTK_CONTAINER(frame), tree);
-    gtk_container_set_border_width(GTK_CONTAINER(frame), padding);
+    gtk_box_append(GTK_BOX(frame), tree);
+    g_object_set(frame, "amrgin", padding, NULL);
 
-    gtk_widget_show_all(dialog);
+    gtk_widget_show(dialog);
     gtk_widget_grab_focus(tree);
 }
 
@@ -400,10 +400,8 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
 static void
 sd_destroy_notify(SelectDialogInfo * sdi)
 {
-    if (sdi->idle_handler_id) {
+    if (sdi->idle_handler_id != 0)
         g_source_remove(sdi->idle_handler_id);
-        sdi->idle_handler_id = 0;
-    }
     g_free(sdi);
 }
 
@@ -433,7 +431,7 @@ sd_response_cb(GtkWidget * dialog, gint response, SelectDialogInfo * sdi)
                       LIBBALSA_IDENTITY_SELECT_DIALOG_KEY,
                       NULL);
 
-    gtk_widget_destroy(dialog);
+    gtk_window_destroy(GTK_WINDOW(dialog));
 }
 
 /* Helper for adding idles. */
@@ -465,10 +463,10 @@ typedef struct _IdentityDeleteInfo IdentityDeleteInfo;
 /* button actions */
 static gboolean close_cb(GObject * dialog);
 static void new_ident_cb(GtkTreeView * tree, GObject * dialog);
-static void delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog);
-static void delete_ident_response(GtkWidget * confirm, gint response,
+static void delete_ident_cb(GtkTreeView * tree, GtkWindow * dialog);
+static void delete_ident_response(GtkWindow * confirm, gint response,
                                   IdentityDeleteInfo * di);
-static void help_ident_cb(GtkWidget * widget);
+static void help_ident_cb(GtkWindow * window);
 
 static void set_default_ident_cb(GtkTreeView * tree, GtkTreePath * path,
                                  GtkTreeViewColumn * column,
@@ -523,9 +521,8 @@ static LibBalsaIdentity *get_selected_identity(GtkTreeView * tree);
 static void set_identity_name_in_tree(GtkTreeView * tree,
 				      LibBalsaIdentity * identity,
 				      const gchar * name);
-static void md_response_cb(GtkWidget * dialog, gint response,
-                           GtkTreeView * tree);
-static void md_name_changed(GtkEntry * name, GtkTreeView * tree);
+static void md_response_cb(GtkWindow * dialog, int response, GtkTreeView * tree);
+static void md_name_changed(GtkEditable * name, GtkTreeView * tree);
 
 static void ident_dialog_add_gpg_menu(GtkWidget * grid, gint row,
                                       GtkDialog * dialog,
@@ -639,8 +636,6 @@ libbalsa_identity_config_frame(GList** identities,
     GtkWidget* config_frame = gtk_frame_new(NULL);
     GtkWidget *tree;
 
-    gtk_container_set_border_width(GTK_CONTAINER(config_frame), 0);
-
     tree = libbalsa_identity_tree(G_CALLBACK(toggle_cb), dialog,
                                   _("Default"));
     g_signal_connect(tree, "row-activated",
@@ -650,7 +645,7 @@ libbalsa_identity_config_frame(GList** identities,
     g_object_set_data(G_OBJECT(tree), "callback", cb);
     g_object_set_data(G_OBJECT(tree), "cb-data",  data);
 
-    gtk_container_add(GTK_CONTAINER(config_frame), tree);
+    gtk_box_append(GTK_BOX(config_frame), tree);
 
     identity_list_update(GTK_TREE_VIEW(tree));
 
@@ -816,8 +811,8 @@ append_ident_notebook_page(GtkNotebook *notebook,
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     grid = libbalsa_create_grid();
-    gtk_container_set_border_width(GTK_CONTAINER(grid), padding);
-    gtk_container_add(GTK_CONTAINER(vbox), grid);
+    g_object_set(grid, "margin", padding, NULL);
+    gtk_box_append(GTK_BOX(vbox), grid);
     gtk_notebook_append_page(notebook, vbox, gtk_label_new(tab_label));
 
     return grid;
@@ -982,10 +977,10 @@ setup_ident_frame(GtkDialog * dialog, gboolean createp, gpointer tree,
 /* Callback for the "changed" signal of the name entry; updates the name
  * in the tree. */
 static void
-md_name_changed(GtkEntry * name, GtkTreeView * tree)
+md_name_changed(GtkEditable * name, GtkTreeView * tree)
 {
     set_identity_name_in_tree(tree, get_selected_identity(tree),
-			      gtk_entry_get_text(name));
+                              gtk_editable_get_text(name));
 }
 
 /*
@@ -1167,6 +1162,7 @@ md_face_path_changed(const gchar * filename, gboolean active,
     GError *err = NULL;
     GtkWidget *image;
     GtkWidget *face_box;
+    GtkWidget *child;
 
     face_box = g_object_get_data(G_OBJECT(data), path_info[type].box_key);
     if (!active) {
@@ -1205,17 +1201,18 @@ md_face_path_changed(const gchar * filename, gboolean active,
         return;
     }
 
-    if (type == LBI_PATH_TYPE_FACE)
+    if (type == LBI_PATH_TYPE_FACE) {
         image = libbalsa_get_image_from_face_header(content, &err);
 #if HAVE_COMPFACE
-    else if (type == LBI_PATH_TYPE_XFACE)
+    } else if (type == LBI_PATH_TYPE_XFACE) {
         image = libbalsa_get_image_from_x_face_header(content, &err);
 #endif                          /* HAVE_COMPFACE */
-    else {
+    } else {
         gtk_widget_hide(face_box);
         g_free(content);
         return;
     }
+
     if (err) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                 /* Translators: please do not translate Face. */
@@ -1225,10 +1222,14 @@ md_face_path_changed(const gchar * filename, gboolean active,
         return;
     }
 
-    gtk_container_foreach(GTK_CONTAINER(face_box),
-                          (GtkCallback) gtk_widget_destroy, NULL);
-    gtk_container_add(GTK_CONTAINER(face_box), image);
-    gtk_widget_show_all(face_box);
+    child = gtk_widget_get_first_child(face_box);
+    while (child != NULL) {
+        GtkWidget *this_child = child;
+        child = gtk_widget_get_next_sibling(child);
+        gtk_box_remove(GTK_BOX(face_box), this_child);
+    }
+    gtk_box_append(GTK_BOX(face_box), image);
+    gtk_widget_show(face_box);
 
     g_free(content);
 }
@@ -1266,13 +1267,17 @@ md_sig_path_changed_cb(GtkToggleButton *sig_button, GObject *dialog)
 static void
 file_chooser_cb(GtkWidget * chooser, gpointer data)
 {
+    GFile *file;
     gchar *filename;
     LibBalsaIdentityPathType type;
     GtkToggleButton *check;
     gboolean active;
 
-    filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
-    if (!filename || !*filename) {
+    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(chooser));
+    filename = g_file_get_path(file);
+    g_object_unref(file);
+
+    if (filename == NULL || filename[0] == '\0') {
         g_free(filename);
         return;
     }
@@ -1298,6 +1303,7 @@ ident_dialog_add_file_chooser_button(GtkWidget * grid, gint row,
 {
     GtkWidget *check;
     gchar *filename;
+    GFile *file;
     gchar *title;
     GtkWidget *button;
 
@@ -1311,9 +1317,11 @@ ident_dialog_add_file_chooser_button(GtkWidget * grid, gint row,
     button = gtk_file_chooser_button_new(title,
                                          GTK_FILE_CHOOSER_ACTION_OPEN);
     g_free(title);
-    gtk_file_chooser_set_show_hidden(GTK_FILE_CHOOSER(button), TRUE);
-    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(button), filename);
+
+    file = g_file_new_for_path(filename);
     g_free(filename);
+    gtk_file_chooser_set_file(GTK_FILE_CHOOSER(button), file, NULL);
+    g_object_unref(file);
 
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_vexpand(button, TRUE);
@@ -1339,10 +1347,10 @@ ident_dialog_add_boxes(GtkWidget * grid, gint row, GtkDialog * dialog,
     gtk_grid_attach(GTK_GRID(grid), hbox, 1, row, 1, 1);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     g_object_set_data(G_OBJECT(dialog), key1, vbox);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    gtk_box_append(GTK_BOX(hbox), vbox);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     g_object_set_data(G_OBJECT(dialog), key2, vbox);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    gtk_box_append(GTK_BOX(hbox), vbox);
 }
 
 /* set_identity_name_in_tree:
@@ -1514,16 +1522,22 @@ ident_dialog_get_bool(GObject* dialog, const gchar* key)
  * Get the path from a file chooser in the editing/creation dialog.  The
  * given key accesses the file chooser using object data.
  */
-static gchar *
-ident_dialog_get_path(GObject * dialog, const gchar * key)
+static char *
+ident_dialog_get_path(GObject * dialog, const char * key)
 {
     GtkWidget *chooser;
+    GFile *file;
+    char *path;
 
     chooser = g_object_get_data(dialog, key);
     if (!gtk_widget_get_sensitive(chooser))
         return NULL;
 
-    return gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
+    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(chooser));
+    path = g_file_get_path(file);
+    g_object_unref(file);
+
+    return path;
 }
 
 
@@ -1550,7 +1564,7 @@ set_default_ident_cb(GtkTreeView * tree, GtkTreePath * path,
  * and close the dialog.
  */
 static void
-identity_delete_selected(GtkTreeView * tree, GtkWidget * dialog)
+identity_delete_selected(GtkTreeView * tree, GtkWindow * dialog)
 {
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree);
     GtkTreeModel *model;
@@ -1590,10 +1604,10 @@ identity_delete_selected(GtkTreeView * tree, GtkWidget * dialog)
  */
 struct _IdentityDeleteInfo {
     GtkTreeView *tree;
-    GtkWidget *dialog;
+    GtkWindow *dialog;
 };
 static void
-delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
+delete_ident_cb(GtkTreeView * tree, GtkWindow * dialog)
 {
     LibBalsaIdentity* ident, **default_id;
     GtkWidget* confirm;
@@ -1602,14 +1616,14 @@ delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
     ident = get_selected_identity(tree);
     default_id = g_object_get_data(G_OBJECT(tree), "default-id");
     g_return_if_fail(ident != *default_id);
-    confirm = gtk_message_dialog_new(GTK_WINDOW(dialog),
+    confirm = gtk_message_dialog_new(dialog,
                                      GTK_DIALOG_DESTROY_WITH_PARENT,
                                      GTK_MESSAGE_QUESTION,
                                      GTK_BUTTONS_OK_CANCEL,
                                      _("Do you really want to delete"
                                        " the selected identity?"));
 #if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(confirm, GTK_WINDOW(dialog));
+    libbalsa_macosx_menu_for_parent(confirm, dialog);
 #endif
     di = g_new(IdentityDeleteInfo, 1);
     di->tree = tree;
@@ -1617,37 +1631,44 @@ delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
     g_signal_connect(confirm, "response",
                      G_CALLBACK(delete_ident_response), di);
     g_object_weak_ref(G_OBJECT(confirm), (GWeakNotify) g_free, di);
-    gtk_widget_set_sensitive(dialog, FALSE);
-    gtk_widget_show_all(confirm);
+    gtk_widget_set_sensitive(GTK_WIDGET(dialog), FALSE);
+    gtk_widget_show(confirm);
 }
 
 static void
-delete_ident_response(GtkWidget * confirm, gint response,
+delete_ident_response(GtkWindow * confirm, gint response,
                       IdentityDeleteInfo * di)
 {
-    if(response == GTK_RESPONSE_OK)
+    if (response == GTK_RESPONSE_OK)
         identity_delete_selected(di->tree, di->dialog);
-    gtk_widget_set_sensitive(di->dialog, TRUE);
-    gtk_widget_destroy(confirm);
+    gtk_widget_set_sensitive(GTK_WIDGET(di->dialog), TRUE);
+    gtk_window_destroy(confirm);
 }
 
 /*
  * Show the help file.
  */
 static void
-help_ident_cb(GtkWidget * widget)
+help_ident_finish(GObject      *source_object,
+                  GAsyncResult *result,
+                  gpointer      user_data)
 {
-    GError *err = NULL;
+    GtkWindow *parent = user_data;
+    GError *error = NULL;
 
-    gtk_show_uri_on_window(GTK_WINDOW(widget), "help:balsa/identities",
-                           gtk_get_current_event_time(), &err);
-
-    if (err) {
+    if (!gtk_show_uri_full_finish(parent, result, &error)) {
     	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
     		_("Error displaying help for identities: %s"),
-			err->message);
-        g_error_free(err);
+			error->message);
+        g_error_free(error);
     }
+}
+
+static void
+help_ident_cb(GtkWindow * parent)
+{
+    gtk_show_uri_full(parent, "help:balsa/identities",
+                      GDK_CURRENT_TIME, NULL, help_ident_finish, parent);
 }
 
 /* libbalsa_identity_config_dialog displays an identity management
@@ -1677,8 +1698,7 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
 
     /* Show only one dialog at a time. */
     if (dialog) {
-        gtk_window_present_with_time(GTK_WINDOW(dialog),
-                                     gtk_get_current_event_time());
+        gtk_window_present_with_time(GTK_WINDOW(dialog), GDK_CURRENT_TIME);
         return;
     }
 
@@ -1699,10 +1719,9 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
 
     frame = libbalsa_identity_config_frame(identities, default_id, dialog,
                                            changed_cb, parent);
-    tree = GTK_TREE_VIEW(gtk_bin_get_child(GTK_BIN(frame)));
+    tree = GTK_TREE_VIEW(gtk_frame_get_child(GTK_FRAME(frame)));
 
-    g_signal_connect(dialog, "response",
-                     G_CALLBACK(md_response_cb), tree);
+    g_signal_connect(dialog, "response", G_CALLBACK(md_response_cb), tree);
     g_object_set_data(G_OBJECT(dialog), "tree", tree);
     g_object_add_weak_pointer(G_OBJECT(dialog), (gpointer *) & dialog);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog),
@@ -1711,11 +1730,11 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, padding);
     gtk_widget_set_vexpand(hbox, TRUE);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER
+    gtk_box_append(GTK_BOX
                        (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                        hbox);
 
-    gtk_container_add(GTK_CONTAINER(hbox), frame);
+    gtk_box_append(GTK_BOX(hbox), frame);
 
     smtp_server_list = g_new(GSList *, 1);
     *smtp_server_list = g_slist_copy(smtp_servers);
@@ -1728,20 +1747,20 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
 
     gtk_widget_set_hexpand(display_frame, TRUE);
     gtk_widget_set_halign(display_frame, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), display_frame);
+    gtk_box_append(GTK_BOX(hbox), display_frame);
 
     select = gtk_tree_view_get_selection(tree);
     g_signal_connect(select, "changed",
                      G_CALLBACK(config_frame_button_select_cb), dialog);
     config_dialog_select(select, GTK_DIALOG(dialog));
 
-    gtk_widget_show_all(dialog);
+    gtk_widget_show(dialog);
     gtk_widget_grab_focus(GTK_WIDGET(tree));
 }
 
 /* Callback for the "response" signal of the dialog. */
 static void
-md_response_cb(GtkWidget * dialog, gint response, GtkTreeView * tree)
+md_response_cb(GtkWindow * dialog, int response, GtkTreeView * tree)
 {
     switch (response) {
     case IDENTITY_RESPONSE_CLOSE:
@@ -1761,7 +1780,7 @@ md_response_cb(GtkWidget * dialog, gint response, GtkTreeView * tree)
         break;
     }
 
-    gtk_widget_destroy(dialog);
+    gtk_window_destroy(dialog);
 }
 
 /* config_dialog_select
@@ -1865,9 +1884,9 @@ display_frame_set_field(GObject * dialog,
                         const gchar* key,
                         const gchar* value)
 {
-    GtkEntry *entry = g_object_get_data(dialog, key);
+    GtkEditable *entry = g_object_get_data(dialog, key);
 
-    gtk_entry_set_text(entry, value ? value : "");
+    gtk_editable_set_text(entry, value ? value : "");
 }
 
 static void
@@ -1881,20 +1900,24 @@ display_frame_set_boolean(GObject * dialog,
 }
 
 static void
-display_frame_set_path(GObject * dialog,
-                       const gchar* key,
-                       const gchar* value, gboolean use_chooser)
+display_frame_set_path(GObject *dialog,
+                       const char *key,
+                       const char *value,
+                       gboolean use_chooser)
 {
-    gboolean set = (value && *value);
+    gboolean set = (value != NULL && value[0] != '\0');
     GtkWidget *chooser = g_object_get_data(dialog, key);
     GtkToggleButton *check =
         g_object_get_data(G_OBJECT(chooser), LIBBALSA_IDENTITY_CHECK);
 
     if (set) {
-        if(use_chooser)
-            gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(chooser), value);
-        else
-            gtk_entry_set_text(GTK_ENTRY(chooser), value);
+        if (use_chooser) {
+            GFile *file = g_file_new_for_path(value);
+            gtk_file_chooser_set_file(GTK_FILE_CHOOSER(chooser), file, NULL);
+            g_object_unref(file);
+        } else {
+            gtk_editable_set_text(GTK_EDITABLE(chooser), value);
+        }
     }
     gtk_widget_set_sensitive(GTK_WIDGET(chooser), set);
     gtk_toggle_button_set_active(check, set);

@@ -414,7 +414,7 @@ ask_cert_real_response(GtkDialog *dialog,
     }
 
     if (dialog != NULL)
-        gtk_widget_destroy(GTK_WIDGET(dialog));
+        gtk_window_destroy(GTK_WINDOW(dialog));
 
     libbalsa_ask_done(i, &acd->ad);
 }
@@ -445,7 +445,6 @@ ask_cert_real(void *data)
                                          _("Accept & _Save"), 1,
                                          _("_Reject"), GTK_RESPONSE_CANCEL,
                                          NULL);
-    gtk_window_set_role(GTK_WINDOW(dialog), "tls_cert_dialog");
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
     str = g_string_new("");
@@ -459,13 +458,13 @@ ask_cert_real(void *data)
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
     gtk_widget_set_margin_top(label, 1);
     gtk_widget_set_margin_bottom(label, 1);
-    gtk_container_add(GTK_CONTAINER(content_area), label);
+    gtk_box_append(GTK_BOX(content_area), label);
 
     gtk_widget_set_vexpand(cert_widget, TRUE);
     gtk_widget_set_valign(cert_widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(cert_widget, 1);
     gtk_widget_set_margin_bottom(cert_widget, 1);
-    gtk_container_add(GTK_CONTAINER(content_area), cert_widget);
+    gtk_box_append(GTK_BOX(content_area), cert_widget);
 
     g_signal_connect(dialog, "response", G_CALLBACK(ask_cert_real_response), acd);
     gtk_widget_show_all(dialog);
@@ -784,50 +783,32 @@ libbalsa_dialog_flags(void)
 }
 
 /*
- * Helpers for using GtkPopover or GtkMenu for context menus
+ * Helpers for using GtkPopover for context menus
  */
 
 /*
- * Look for the BALSA_USE_POPOVER environment variable
- */
-gboolean
-libbalsa_use_popover(void)
-{
-    static gboolean use_popover = TRUE;
-    static gint check_done = 0;
-
-    if (g_atomic_int_get(&check_done) == 0) {
-        const gchar *popover_env;
-
-        popover_env = g_getenv("BALSA_USE_POPOVER");
-        if ((popover_env != NULL) && (atoi(popover_env) == 0))
-            use_popover = FALSE;
-
-        g_atomic_int_set(&check_done, 1);
-    }
-
-    return use_popover;
-}
-
-/*
- * Construct either a GtkPopover or a GtkMenu, according to the
- * environment variable
+ * Construct a GtkPopover
  */
 GtkWidget *
-libbalsa_popup_widget_new(GtkWidget   *relative_to,
-                          GMenuModel  *model,
-                          const gchar *action_namespace)
+libbalsa_popup_widget_new(GtkWidget  *parent,
+                          GMenuModel *model,
+                          const char *action_namespace)
 {
+    GMenu *menu;
+    GMenuItem *menu_item;
     GtkWidget *popup_widget;
 
-    if (libbalsa_use_popover()) {
-        popup_widget = gtk_popover_new(relative_to);
-        gtk_popover_bind_model(GTK_POPOVER(popup_widget), model, action_namespace);
-    } else {
-        popup_widget = gtk_menu_new();
-        gtk_menu_attach_to_widget(GTK_MENU(popup_widget), relative_to, NULL);
-        gtk_menu_shell_bind_model(GTK_MENU_SHELL(popup_widget), model, action_namespace, TRUE);
-    }
+    menu = g_menu_new();
+    menu_item = g_menu_item_new(NULL, NULL);
+    g_menu_item_set_attribute(menu_item, G_MENU_ATTRIBUTE_ACTION_NAMESPACE, "s", action_namespace);
+    g_menu_item_set_link(menu_item, G_MENU_LINK_SECTION, model);
+    g_menu_append_item(menu, menu_item);
+    g_object_unref(menu_item);
+
+    popup_widget = gtk_popover_menu_new_from_model_full(G_MENU_MODEL(menu), (GtkPopoverMenuFlags) 0);
+    g_object_unref(menu);
+
+    gtk_widget_set_parent(popup_widget, parent);
 
     return popup_widget;
 }
@@ -836,66 +817,39 @@ libbalsa_popup_widget_new(GtkWidget   *relative_to,
  * Pop up a widget
  */
 void
-libbalsa_popup_widget_popup(GtkWidget      *popup_widget,
-                            const GdkEvent *event)
+libbalsa_popup_widget_popup(GtkWidget *popup_widget,
+                            GdkEvent  *event)
 {
-    g_return_if_fail(GTK_IS_POPOVER(popup_widget) || GTK_IS_MENU(popup_widget));
+    GtkPopover *popover = (GtkPopover *) popup_widget;
+    GtkWidget *parent;
+    double x, y;
+    GdkRectangle rectangle;
+
+    g_return_if_fail(GTK_IS_POPOVER(popover));
 
     if (event != NULL && !gdk_event_triggers_context_menu(event))
         return;
 
-    if (libbalsa_use_popover()) {
-        GtkPopover *popover = GTK_POPOVER(popup_widget);
-        GtkWidget *relative_to = gtk_popover_get_relative_to(popover);
-        gdouble x, y;
-        GdkRectangle rectangle;
+    parent = gtk_widget_get_parent(popup_widget);
 
-        if (event != NULL &&
-            gdk_event_get_coords(event, &x, &y)) {
-
-            if (GTK_IS_TREE_VIEW(relative_to)) {
-                gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(relative_to),
-                                                                  (gint) x,
-                                                                  (gint) y,
-                                                                  &rectangle.x,
-                                                                  &rectangle.y);
-                rectangle.width = 0;
-                rectangle.height = 0;
-            } else if (GTK_IS_TOOLBAR(relative_to)) {
-                gdouble x_root;
-
-                gdk_event_get_root_coords(event, &x_root, NULL);
-                rectangle.x = (gint) x_root;
-                rectangle.y = (gint) y;
-                rectangle.width = 5;
-                rectangle.height = 5;
-            } else {
-                rectangle.x = (gint) x;
-                rectangle.y = (gint) y;
-                rectangle.width = 0;
-                rectangle.height = 0;
-            }
+    if (event != NULL && gdk_event_get_position(event, &x, &y)) {
+        if (GTK_IS_TREE_VIEW(parent)) {
+            gtk_tree_view_convert_bin_window_to_widget_coords(GTK_TREE_VIEW(parent),
+                                                              (int) x, (int) y,
+                                                              &rectangle.x, &rectangle.y);
         } else {
-            gtk_widget_get_allocation(relative_to, (GtkAllocation *) &rectangle);
-            rectangle.x += rectangle.width / 2;
-            rectangle.width = 0;
-            rectangle.y += rectangle.height / 2;
-            rectangle.height = 0;
+            rectangle.x = (int) x;
+            rectangle.y = (int) y;
         }
-
-        gtk_popover_set_pointing_to(popover, &rectangle);
-        gtk_popover_popup(popover);
     } else {
-        GtkMenu *menu = GTK_MENU(popup_widget);
-
-        if (event != NULL) {
-            gtk_menu_popup_at_pointer(menu, event);
-        } else {
-            GtkWidget *attach_widget = gtk_menu_get_attach_widget(menu);
-
-            gtk_menu_popup_at_widget(menu, attach_widget,
-                                     GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER,
-                                     NULL);
-        }
+        gtk_widget_get_allocation(parent, (GtkAllocation *) &rectangle);
+        rectangle.x += rectangle.width / 2;
+        rectangle.y += rectangle.height / 2;
     }
+
+    rectangle.width = 0;
+    rectangle.height = 0;
+
+    gtk_popover_set_pointing_to(popover, &rectangle);
+    gtk_popover_popup(popover);
 }

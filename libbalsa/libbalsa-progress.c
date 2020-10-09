@@ -63,14 +63,12 @@ static void libbalsa_progress_dialog_ensure_real(ProgressDialog *progress_dialog
 												 const gchar    *progress_id);
 static gboolean libbalsa_progress_dialog_create_cb(create_progress_dlg_t *dlg_data);
 
-static void progress_dialog_response_cb(GtkWidget *dialog,
-                            		    gint       response);
+static void progress_dialog_response_cb(GtkWindow *dialog,
+                                        int        response);
 static void progress_dialog_destroy_cb(GtkWidget G_GNUC_UNUSED *widget,
 									   ProgressDialog          *progress_dialog);
-static progress_widget_data_t *find_progress_data_by_name(GtkContainer *container,
-														  const gchar  *id);
-static GtkWidget *create_progress_widget(const gchar *progress_id)
-	G_GNUC_WARN_UNUSED_RESULT;
+static progress_widget_data_t *find_progress_data_by_name(GtkWidget *widget, const gchar  *id);
+static GtkWidget * create_progress_widget(const char *progress_id) G_GNUC_WARN_UNUSED_RESULT;
 static gboolean remove_progress_widget(progress_widget_data_t *progress_data);
 static void libbalsa_progress_dialog_update_real(ProgressDialog *progress_dialog,
 									 	 	 	 const gchar    *progress_id,
@@ -101,7 +99,7 @@ libbalsa_progress_dialog_ensure(ProgressDialog *progress_dialog,
 		dlgdata.id = progress_id;
 		dlgdata.done = FALSE;
 		g_cond_init(&dlgdata.cond);
-		gdk_threads_add_idle((GSourceFunc) libbalsa_progress_dialog_create_cb, &dlgdata);
+		g_idle_add((GSourceFunc) libbalsa_progress_dialog_create_cb, &dlgdata);
 
 		while (!dlgdata.done) {
 			g_cond_wait(&dlgdata.cond, &progress_dialog->mutex);
@@ -150,7 +148,7 @@ libbalsa_progress_dialog_update(ProgressDialog *progress_dialog,
 			update_data->finished = finished;
 			update_data->fraction = fraction;
 			update_data->message = real_msg;
-			gdk_threads_add_idle((GSourceFunc) libbalsa_progress_dialog_update_cb, update_data);
+			g_idle_add((GSourceFunc) libbalsa_progress_dialog_update_cb, update_data);
 		} else {
 			libbalsa_progress_dialog_update_real(progress_dialog, progress_id, finished, fraction, real_msg);
 			g_free(real_msg);
@@ -166,24 +164,16 @@ libbalsa_progress_dialog_update(ProgressDialog *progress_dialog,
 /* note: the mutex ProgressDialog::mutex is always locked when this function is called */
 static void
 libbalsa_progress_dialog_ensure_real(ProgressDialog *progress_dialog,
-								     const gchar    *dialog_title,
-								     GtkWindow      *parent,
-								     const gchar    *progress_id)
+                                     const char     *dialog_title,
+                                     GtkWindow      *parent,
+                                     const char     *progress_id)
 {
 	GtkWidget *content_box;
 	const progress_widget_data_t *progress_data;
 
     if (progress_dialog->dialog == NULL) {
-    	GdkGeometry hints;
-
     	progress_dialog->dialog = gtk_dialog_new_with_buttons(dialog_title, parent,
     		GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), _("_Hide"), GTK_RESPONSE_CLOSE, NULL);
-    	gtk_window_set_role(GTK_WINDOW(progress_dialog->dialog), "progress_dialog");
-        hints.min_width = PROGRESS_DIALOG_WIDTH;
-        hints.min_height = 1;
-        hints.max_width = PROGRESS_DIALOG_WIDTH;
-        hints.max_height = -1;
-        gtk_window_set_geometry_hints(GTK_WINDOW(progress_dialog->dialog), NULL, &hints, GDK_HINT_MIN_SIZE + GDK_HINT_MAX_SIZE);
         gtk_window_set_resizable(GTK_WINDOW(progress_dialog->dialog), FALSE);
         g_signal_connect(progress_dialog->dialog, "response", G_CALLBACK(progress_dialog_response_cb), NULL);
         g_signal_connect(progress_dialog->dialog, "destroy", G_CALLBACK(progress_dialog_destroy_cb), progress_dialog);
@@ -191,12 +181,12 @@ libbalsa_progress_dialog_ensure_real(ProgressDialog *progress_dialog,
     	content_box = gtk_dialog_get_content_area(GTK_DIALOG(progress_dialog->dialog));
     	gtk_box_set_spacing(GTK_BOX(content_box), 6);
 
-        gtk_widget_show_all(progress_dialog->dialog);
+        gtk_widget_show(progress_dialog->dialog);
     } else {
     	content_box = gtk_dialog_get_content_area(GTK_DIALOG(progress_dialog->dialog));
     }
 
-    progress_data = find_progress_data_by_name(GTK_CONTAINER(content_box), progress_id);
+    progress_data = find_progress_data_by_name(content_box, progress_id);
     if (progress_data != NULL) {
     	if (!gtk_revealer_get_child_revealed(GTK_REVEALER(progress_data->revealer))) {
     		gtk_revealer_set_reveal_child(GTK_REVEALER(progress_data->revealer), TRUE);
@@ -206,8 +196,8 @@ libbalsa_progress_dialog_ensure_real(ProgressDialog *progress_dialog,
 
     	progress_widget = create_progress_widget(progress_id);
     	gtk_revealer_set_reveal_child(GTK_REVEALER(progress_widget), TRUE);
-    	gtk_container_add(GTK_CONTAINER(content_box), progress_widget);
-    	gtk_widget_show_all(progress_widget);
+    	gtk_box_append(GTK_BOX(content_box), progress_widget);
+    	gtk_widget_show(progress_widget);
     }
 }
 
@@ -227,12 +217,11 @@ libbalsa_progress_dialog_create_cb(create_progress_dlg_t *dlg_data)
 
 
 static void
-progress_dialog_response_cb(GtkWidget *dialog,
-                            gint       response)
+progress_dialog_response_cb(GtkWindow *dialog,
+                            int        response)
 {
-    if (response == GTK_RESPONSE_CLOSE) {
-        gtk_widget_destroy(dialog);
-    }
+    if (response == GTK_RESPONSE_CLOSE)
+        gtk_window_destroy(dialog);
 }
 
 
@@ -262,31 +251,27 @@ progress_data_destroy_cb(GtkWidget G_GNUC_UNUSED *widget,
 
 
 static progress_widget_data_t *
-find_progress_data_by_name(GtkContainer *container,
-						   const gchar  *id)
+find_progress_data_by_name(GtkWidget  *widget,
+                           const char *id)
 {
-	GList *children;
-	GList *this_child;
-	progress_widget_data_t *data;
+    GtkWidget *child;
+    progress_widget_data_t *data = NULL;
 
-	children = gtk_container_get_children(container);
-	data = NULL;
-	this_child = children;
-	while ((data == NULL) && (this_child != NULL)) {
-		if (strcmp(gtk_widget_get_name(GTK_WIDGET(this_child->data)), id) == 0) {
-			data = g_object_get_data(G_OBJECT(this_child->data), "data");
-		} else {
-			this_child = this_child->next;
-		}
-	}
-	g_list_free(children);
+    for (child = gtk_widget_get_first_child(widget);
+         child != NULL;
+         child = gtk_widget_get_next_sibling(child)) {
+        if (strcmp(gtk_widget_get_name(child), id) == 0) {
+            data = g_object_get_data(G_OBJECT(child), "data");
+            break;
+        }
+    }
 
-	return data;
+    return data;
 }
 
 
 static GtkWidget *
-create_progress_widget(const gchar *progress_id)
+create_progress_widget(const char *progress_id)
 {
 	GtkWidget *box;
 	GtkWidget *label;
@@ -302,31 +287,19 @@ create_progress_widget(const gchar *progress_id)
     g_signal_connect(widget_data->revealer, "destroy", G_CALLBACK(progress_data_destroy_cb), widget_data);
 
 	box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
-	gtk_container_add(GTK_CONTAINER(widget_data->revealer), box);
+	gtk_revealer_set_child(GTK_REVEALER(widget_data->revealer), box);
 
 	label = gtk_label_new(progress_id);
-	gtk_container_add(GTK_CONTAINER(box), label);
+	gtk_box_append(GTK_BOX(box), label);
 
 	widget_data->label = gtk_label_new(" ");
-	gtk_label_set_line_wrap(GTK_LABEL(widget_data->label), TRUE);
-	gtk_container_add(GTK_CONTAINER(box), widget_data->label);
+	gtk_label_set_wrap(GTK_LABEL(widget_data->label), TRUE);
+	gtk_box_append(GTK_BOX(box), widget_data->label);
 
 	widget_data->progress = gtk_progress_bar_new();
-	gtk_container_add(GTK_CONTAINER(box), widget_data->progress);
+	gtk_box_append(GTK_BOX(box), widget_data->progress);
 
 	return widget_data->revealer;
-}
-
-
-static void
-count_revealers(GtkWidget *widget,
-                gpointer   data)
-{
-	guint *count = (guint *) data;
-
-	if (GTK_IS_REVEALER(widget)) {
-		*count += 1U;
-	}
 }
 
 
@@ -336,19 +309,26 @@ remove_progress_widget(progress_widget_data_t *progress_data)
 	GtkWidget *parent_dialog;
 	GtkWidget *content_box;
 	guint rev_children = 0U;
+        GtkWidget *child;
 
 	progress_data->fadeout_id = 0U;
-	parent_dialog = gtk_widget_get_toplevel(progress_data->revealer);
-	gtk_widget_destroy(progress_data->revealer);
+	parent_dialog = GTK_WIDGET(gtk_widget_get_root(progress_data->revealer));
+	gtk_widget_unparent(progress_data->revealer);
 
 	/* count the GtkRevealer children left, so we can just destroy the dialogue if there is none */
 	content_box = gtk_dialog_get_content_area(GTK_DIALOG(parent_dialog));
-	gtk_container_foreach(GTK_CONTAINER(content_box), count_revealers, &rev_children);
-	if (rev_children == 0U) {
-		gtk_widget_destroy(parent_dialog);
-	} else {
+        for (child = gtk_widget_get_first_child(content_box);
+             child != NULL;
+             child = gtk_widget_get_next_sibling(child)) {
+            if (GTK_IS_REVEALER(child))
+		++rev_children;
+        }
+
+	if (rev_children == 0U)
+		gtk_window_destroy(GTK_WINDOW(parent_dialog));
+	else
 		gtk_window_resize(GTK_WINDOW(parent_dialog), PROGRESS_DIALOG_WIDTH, 1);
-	}
+
 	return FALSE;
 }
 
@@ -384,7 +364,7 @@ libbalsa_progress_dialog_update_real(ProgressDialog *progress_dialog,
 		progress_widget_data_t *progress_data;
 
 		content_box = gtk_dialog_get_content_area(GTK_DIALOG(progress_dialog->dialog));
-		progress_data = find_progress_data_by_name(GTK_CONTAINER(content_box), progress_id);
+		progress_data = find_progress_data_by_name(content_box, progress_id);
 		if (progress_data != NULL) {
 			if (message != NULL) {
 				gtk_label_set_text(GTK_LABEL(progress_data->label), message);

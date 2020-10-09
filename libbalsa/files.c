@@ -43,13 +43,13 @@ static const gchar *permanent_prefixes[] = {
  * We ignore proper slashing of names. Ie, /prefix//splice//file won't be caught.
  */
 gchar *
-balsa_file_finder(const gchar  * filename,
-                  const gchar  * splice)
+balsa_file_finder(const char * filename,
+                  const char * splice)
 {
-    gchar *cat;
-    guint i;
+    char *cat;
+    unsigned i;
 
-    g_return_val_if_fail(filename, NULL);
+    g_return_val_if_fail(filename != NULL, NULL);
 
     if (splice == NULL)
 	splice = "";
@@ -74,47 +74,37 @@ balsa_file_finder(const gchar  * filename,
 }
 
 
-static GdkPixbuf *
-libbalsa_default_attachment_pixbuf(gint size)
+static GIcon *
+libbalsa_default_attachment_icon(void)
 {
-    char *icon;
-    GdkPixbuf *tmp, *retval;
+    char *path;
+    GFile *file;
+    GIcon *gicon;
 
-    icon = balsa_pixmap_finder ("attachment.png");
-    tmp = gdk_pixbuf_new_from_file(icon, NULL);
-    g_free(icon);
-    if (!tmp)
-        return NULL;
+    path = balsa_pixmap_finder("attachment.png");
+    file = g_file_new_for_path(path);
+    g_free(path);
 
-    retval = gdk_pixbuf_scale_simple(tmp, size, size, GDK_INTERP_BILINEAR);
-    g_object_unref(tmp);
+    gicon = g_file_icon_new(file);
+    g_object_unref(file);
 
-    return retval;
+    return gicon;
 }
 
 
 /* libbalsa_icon_finder:
- *   locate a suitable icon (pixmap graphic) based on 'mime-type' and/or
+ *   locate a suitable icon based on 'mime-type' and/or
  *   'filename', either of which can be NULL.  If both arguments are
  *   non-NULL, 'mime-type' has priority.  If both are NULL, the default
- *   'attachment.png' icon will be returned.  This function *MUST*
- *   return the complete path to the icon file.
+ *   'attachment.png' icon will be returned.
  */
-GdkPixbuf *
-libbalsa_icon_finder(GtkWidget         * widget,
-                     const char        * mime_type,
+GIcon *
+libbalsa_icon_finder(const char        * mime_type,
                      const LibbalsaVfs * for_file,
-                     gchar            ** used_type,
-                     GtkIconSize         size)
+                     char             ** used_type)
 {
     const gchar *content_type;
-    GdkPixbuf *pixbuf = NULL;
-    gint width, height;
-    GtkIconTheme *icon_theme;
-    GIcon *icon;
-
-    if (!gtk_icon_size_lookup(size, &width, &height))
-        width = 16;
+    GIcon *gicon;
 
     if (mime_type)
         content_type = mime_type;
@@ -123,38 +113,15 @@ libbalsa_icon_finder(GtkWidget         * widget,
     } else
         content_type = "application/octet-stream";
 
-    /* ask GIO for the icon */
-    if ((icon_theme = gtk_icon_theme_get_default()) == NULL)
-        return NULL;
+    gicon = g_content_type_get_icon(content_type);
 
-    icon = g_content_type_get_icon(content_type);
-
-    if (icon != NULL) {
-        if (G_IS_THEMED_ICON(icon)) {
-            gint i;
-            GStrv icon_names;
-
-            g_object_get(icon, "names", &icon_names, NULL);
-
-            if (icon_names != NULL) {
-                for (i = 0; pixbuf == NULL && icon_names[i] != NULL; i++) {
-                    pixbuf =
-                        gtk_icon_theme_load_icon(icon_theme, icon_names[i], width,
-                                                 GTK_ICON_LOOKUP_FORCE_SIZE, NULL);
-                }
-                g_strfreev(icon_names);
-            }
-        }
-        g_object_unref(icon);
-    }
-
-    if (pixbuf == NULL) {
-        /* load the default pixbuf */
-        pixbuf = libbalsa_default_attachment_pixbuf(width);
+    if (gicon == NULL) {
+        /* load the default icon */
+        gicon = libbalsa_default_attachment_icon();
     }
 
     if (used_type)
         *used_type = g_strdup(content_type);
 
-    return pixbuf;
+    return gicon;
 }

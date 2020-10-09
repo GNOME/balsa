@@ -906,9 +906,9 @@ libbalsa_create_grid_label(const gchar * text, GtkWidget * grid, gint row)
     GtkWidget *label;
 
     label = gtk_label_new_with_mnemonic(text);
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_set_wrap(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-	gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
+    gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
 
     gtk_grid_attach(GTK_GRID(grid), label, 0, row, 1, 1);
 
@@ -936,7 +936,7 @@ libbalsa_create_wrap_label(const gchar *text,
     	label = gtk_label_new(text);
     }
 
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+    gtk_label_set_wrap(GTK_LABEL(label), TRUE);
     gtk_label_set_xalign(GTK_LABEL(label), 0.0F);
 
     return label;
@@ -965,7 +965,7 @@ libbalsa_create_grid_check(const gchar * text, GtkWidget * grid, gint row,
 /* Create a text entry and add it to the table */
 GtkWidget *
 libbalsa_create_grid_entry(GtkWidget * grid, GCallback changed_func,
-                           gpointer data, gint row, const gchar * initval,
+                           gpointer data, int row, const char * initval,
                            GtkWidget * hotlabel)
 {
     GtkWidget *entry;
@@ -976,7 +976,7 @@ libbalsa_create_grid_entry(GtkWidget * grid, GCallback changed_func,
     gtk_grid_attach(GTK_GRID(grid), entry, 1, row, 1, 1);
 
     if (initval)
-        gtk_entry_set_text(GTK_ENTRY(entry), initval);
+        gtk_editable_set_text(GTK_EDITABLE(entry), initval);
 
     gtk_label_set_mnemonic_widget(GTK_LABEL(hotlabel), entry);
 
@@ -994,11 +994,17 @@ static void
 lb_create_size_group_func(GtkWidget * widget, gpointer data)
 {
     if (GTK_IS_LABEL(widget) &&
-        GTK_IS_GRID(gtk_widget_get_parent(widget)))
+        GTK_IS_GRID(gtk_widget_get_parent(widget))) {
         gtk_size_group_add_widget(GTK_SIZE_GROUP(data), widget);
-    else if (GTK_IS_CONTAINER(widget))
-        gtk_container_foreach(GTK_CONTAINER(widget),
-                              lb_create_size_group_func, data);
+    } else {
+        GtkWidget *child;
+
+        for (child = gtk_widget_get_first_child(widget);
+             child != NULL;
+             child = gtk_widget_get_next_sibling(child)) {
+            lb_create_size_group_func(child, data);
+        }
+    }
 }
 
 GtkSizeGroup *
@@ -1304,12 +1310,12 @@ libbalsa_add_mnemonic_button_to_box(const gchar *markup,
     gtk_size_group_add_widget(size_group, label);
 
     button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button), label);
+    gtk_box_append(GTK_BOX(button), label);
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, align);
     gtk_widget_show(button);
 
-    gtk_container_add(GTK_CONTAINER(box), button);
+    gtk_box_append(GTK_BOX(box), button);
 
     return button;
 }

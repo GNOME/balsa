@@ -3481,12 +3481,11 @@ void libbalsa_mailbox_set_encr_icon(const char *name)
  * =================================================================== */
 
 static gboolean mailbox_row_draggable(GtkTreeDragSource * drag_source,
-                                   GtkTreePath * path);
-static gboolean mailbox_drag_data_delete(GtkTreeDragSource * drag_source,
                                       GtkTreePath * path);
-static gboolean mailbox_drag_data_get(GtkTreeDragSource * drag_source,
-                                   GtkTreePath * path,
-                                   GtkSelectionData * selection_data);
+static gboolean mailbox_drag_data_delete(GtkTreeDragSource * drag_source,
+                                         GtkTreePath * path);
+static GdkContentProvider *mailbox_drag_data_get(GtkTreeDragSource * drag_source,
+                                                 GtkTreePath * path);
 
 static void
 mailbox_drag_source_init(GtkTreeDragSourceIface * iface)
@@ -3515,13 +3514,16 @@ mailbox_drag_data_delete(GtkTreeDragSource * drag_source, GtkTreePath * path)
     return FALSE;
 }
 
-static gboolean
-mailbox_drag_data_get(GtkTreeDragSource * drag_source, GtkTreePath * path,
-                   GtkSelectionData * selection_data)
+static GdkContentProvider *
+mailbox_drag_data_get(GtkTreeDragSource * drag_source, GtkTreePath * path)
 {
-    /* The "drag-data-get" callback passes the list of selected messages
-     * to the GtkSelectionData, so we don't. */
-    return FALSE;
+    /* Asks the #GtkTreeDragSource to return a #GdkContentProvider representing
+     * the row at @path. Should robustly handle a @path no
+     * longer found in the model!
+     *
+     * Returns: (nullable) (transfer full): a #GdkContentProvider for the
+     *    given @path or %NULL if none exists */
+    return NULL;
 }
 
 /* =================================================================== *

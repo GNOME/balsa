@@ -47,7 +47,7 @@ lsv_close_activated(GSimpleAction * action,
                     GVariant      * parameter,
                     gpointer        user_data)
 {
-    gtk_widget_destroy(GTK_WIDGET(user_data));
+    gtk_window_destroy(GTK_WINDOW(user_data));
 }
 
 static void

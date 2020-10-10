@@ -208,18 +208,18 @@ build_left_side(void)
                                  (fe_filters_list_selection_changed),
                                  TRUE);
 
-    gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(fe_filters_list));
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(sw), GTK_WIDGET(fe_filters_list));
 
     gtk_widget_set_vexpand(sw, TRUE);
     gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(sw, 2);
     gtk_widget_set_margin_bottom(sw, 2);
-    gtk_container_add(GTK_CONTAINER(vbox), sw);
+    gtk_box_append(GTK_BOX(vbox), sw);
 
     /* new and delete buttons */
     bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 
-    gtk_container_add(GTK_CONTAINER(vbox), bbox);
+    gtk_box_append(GTK_BOX(vbox), bbox);
 
     /* new button */
     /* Translators: button "New" filter */
@@ -284,11 +284,11 @@ build_match_page()
                      G_CALLBACK(fe_action_changed), NULL);
     gtk_widget_set_margin_top(fe_op_codes_option_menu, 2);
     gtk_widget_set_margin_bottom(fe_op_codes_option_menu, 2);
-    gtk_container_add(GTK_CONTAINER(box), fe_op_codes_option_menu);
+    gtk_box_append(GTK_BOX(box), fe_op_codes_option_menu);
 
     /* list of conditions defining how this filter matches */
 
-    scroll = gtk_scrolled_window_new(NULL, NULL);
+    scroll = gtk_scrolled_window_new();
     gtk_widget_set_hexpand(scroll, TRUE);
     gtk_widget_set_vexpand(scroll, TRUE);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
@@ -302,7 +302,7 @@ build_match_page()
     g_signal_connect(fe_conditions_list, "row-activated",
                      G_CALLBACK(fe_conditions_row_activated), NULL);
 
-    gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(fe_conditions_list));
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), GTK_WIDGET(fe_conditions_list));
 
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_widget_set_hexpand(box, TRUE);
@@ -381,15 +381,14 @@ build_action_page(GtkWindow * window)
     /* The notification area */
 
     frame = gtk_frame_new(_("Notification:"));
-    gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
-    gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_container_add(GTK_CONTAINER(page), frame);
-    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
+    gtk_frame_set_label_align(GTK_FRAME(frame), 0.0);
+    gtk_box_append(GTK_BOX(page), frame);
+    g_object_set(frame, "margin", 3, NULL);
 
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
     gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
-    gtk_container_add(GTK_CONTAINER(frame), grid);
+    gtk_frame_set_child(GTK_FRAME(frame), grid);
 
     /* Notification buttons */
     fe_sound_button = gtk_check_button_new_with_label(_("Play sound:"));
@@ -433,14 +432,13 @@ build_action_page(GtkWindow * window)
 
     /* The action area */
     frame = gtk_frame_new(_("Action to perform:"));
-    gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
-    gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_container_add(GTK_CONTAINER(page), frame);
+    gtk_frame_set_label_align(GTK_FRAME(frame), 0.0);
+    gtk_frame_set_child(GTK_FRAME(page), frame);
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
-    gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
-    gtk_container_add(GTK_CONTAINER(frame), box);
+    g_object_set(frame, "margin", 3, NULL);
+    gtk_frame_set_child(GTK_FRAME(frame), box);
 
     fe_action_option_menu =
         fe_build_option_menu(fe_actions, G_N_ELEMENTS(fe_actions),
@@ -448,7 +446,7 @@ build_action_page(GtkWindow * window)
     gtk_widget_set_vexpand(fe_action_option_menu, TRUE);
     gtk_widget_set_margin_top(fe_action_option_menu, 1);
     gtk_widget_set_margin_bottom(fe_action_option_menu, 1);
-    gtk_container_add(GTK_CONTAINER(box), fe_action_option_menu);
+    gtk_box_append(GTK_BOX(box), fe_action_option_menu);
 
     /* FIXME : we use the global mru folder list, perhaps we should use
        our own. We'll see this later, for now let's make something usable
@@ -462,13 +460,13 @@ build_action_page(GtkWindow * window)
     gtk_widget_set_vexpand(fe_mailboxes, TRUE);
     gtk_widget_set_margin_top(fe_mailboxes, 1);
     gtk_widget_set_margin_bottom(fe_mailboxes, 1);
-    gtk_container_add(GTK_CONTAINER(box), fe_mailboxes);
+    gtk_box_append(GTK_BOX(box), fe_mailboxes);
 
     fe_color_buttons = fe_make_color_buttons();
     gtk_widget_set_vexpand(fe_color_buttons, TRUE);
     gtk_widget_set_margin_top(fe_color_buttons, 1);
     gtk_widget_set_margin_bottom(fe_color_buttons, 1);
-    gtk_container_add(GTK_CONTAINER(box), fe_color_buttons);
+    gtk_box_append(GTK_BOX(box), fe_color_buttons);
 
     return page;
 }				/* end build_action_page() */
@@ -493,7 +491,7 @@ build_right_side(GtkWindow * window)
     gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_TOP);
     gtk_widget_set_vexpand(notebook, TRUE);
     gtk_widget_set_valign(notebook, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(rightside), notebook);
+    gtk_box_append(GTK_BOX(rightside), notebook);
 
     page = build_match_page();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
@@ -504,7 +502,7 @@ build_right_side(GtkWindow * window)
 
     /* button box */
     bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(rightside), bbox);
+    gtk_box_append(GTK_BOX(rightside), bbox);
 
     fe_apply_button = libbalsa_add_mnemonic_button_to_box(_("_Apply"), bbox, GTK_ALIGN_START);
     g_signal_connect(fe_apply_button, "clicked",
@@ -565,13 +563,10 @@ filters_edit_dialog(GtkWindow * parent)
                             "Close it before you can modify filters."));
 	return;
     }
-    if (fe_already_open) {
-	gtk_window_present_with_time(GTK_WINDOW(fe_window),
-                                     gtk_get_current_event_time());
-	return;
-    }
+    if (fe_already_open)
+	gtk_window_present_with_time(GTK_WINDOW(fe_window), GDK_CURRENT_TIME);
 
-    fe_already_open=TRUE;
+    fe_already_open = TRUE;
 
     piece = build_left_side();
 
@@ -589,7 +584,6 @@ filters_edit_dialog(GtkWindow * parent)
     g_signal_connect(fe_window, "destroy",
 	             G_CALLBACK(fe_destroy_window_cb), NULL);
 
-    gtk_window_set_role(GTK_WINDOW (fe_window), "filter-edit");
     gtk_dialog_set_response_sensitive(GTK_DIALOG(fe_window),
                                       GTK_RESPONSE_OK, FALSE);
 
@@ -599,15 +593,14 @@ filters_edit_dialog(GtkWindow * parent)
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(hbox, FILTER_EDIT_PADDING);
     gtk_widget_set_margin_bottom(hbox, FILTER_EDIT_PADDING);
-    gtk_container_add(GTK_CONTAINER(content_area), hbox);
+    gtk_box_append(GTK_BOX(content_area), hbox);
 
     gtk_widget_set_hexpand(piece, FALSE);
     gtk_widget_set_margin_start(piece, FILTER_EDIT_PADDING);
     gtk_widget_set_margin_end(piece, FILTER_EDIT_PADDING);
-    gtk_container_add(GTK_CONTAINER(hbox), piece);
+    gtk_box_append(GTK_BOX(hbox), piece);
 
-    gtk_container_add(GTK_CONTAINER(hbox),
-                      gtk_separator_new(GTK_ORIENTATION_VERTICAL));
+    gtk_box_append(GTK_BOX(hbox), gtk_separator_new(GTK_ORIENTATION_VERTICAL));
 
     fe_right_page = build_right_side(GTK_WINDOW(fe_window));
     gtk_widget_set_sensitive(fe_right_page, FALSE);
@@ -616,7 +609,7 @@ filters_edit_dialog(GtkWindow * parent)
     gtk_widget_set_halign(fe_right_page, GTK_ALIGN_FILL);
     gtk_widget_set_margin_start(fe_right_page, FILTER_EDIT_PADDING);
     gtk_widget_set_margin_end(fe_right_page, FILTER_EDIT_PADDING);
-    gtk_container_add(GTK_CONTAINER(hbox), fe_right_page);
+    gtk_box_append(GTK_BOX(hbox), fe_right_page);
 
     fe_user_headers_list = NULL;
 
@@ -669,11 +662,11 @@ filters_edit_dialog(GtkWindow * parent)
 
     if (filter_errno!=FILTER_NOERR) {
 	filter_perror(filter_strerror(filter_errno));
-	gtk_widget_destroy(GTK_WIDGET(fe_window));
+	gtk_window_destroy(GTK_WINDOW(fe_window));
 	return;
     }
 
-    gtk_widget_show_all(GTK_WIDGET(fe_window));
+    gtk_widget_show(GTK_WIDGET(fe_window));
     if (gtk_tree_model_get_iter_first(model, &iter)) {
         GtkTreeSelection *selection =
             gtk_tree_view_get_selection(fe_filters_list);

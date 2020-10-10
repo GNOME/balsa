@@ -55,16 +55,12 @@ lsv_copy_activated(GSimpleAction * action,
                    GVariant      * parameter,
                    gpointer        user_data)
 {
-    LibBalsaSourceViewerInfo *lsvi =
-        g_object_get_data(G_OBJECT(user_data), "lsvi");
+    LibBalsaSourceViewerInfo *lsvi = g_object_get_data(G_OBJECT(user_data), "lsvi");
     GtkTextView *text = GTK_TEXT_VIEW(lsvi->text);
     GtkTextBuffer *buffer = gtk_text_view_get_buffer(text);
-    GdkDisplay *display;
-    GtkClipboard *clipboard;
+    GdkClipboard *clipboard;
 
-    display = gtk_widget_get_display(GTK_WIDGET(text));
-    clipboard = gtk_clipboard_get_for_display(display, GDK_NONE);
-
+    clipboard = gtk_widget_get_clipboard(GTK_WIDGET(text));
     gtk_text_buffer_copy_clipboard(buffer, clipboard);
 }
 
@@ -198,7 +194,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     css = libbalsa_font_string_to_css(font, BALSA_SOURCE_VIEWER);
 
     css_provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+    gtk_css_provider_load_from_data(css_provider, css, -1);
     g_free(css);
 
     gtk_style_context_add_provider(gtk_widget_get_style_context(text) ,
@@ -209,15 +205,14 @@ libbalsa_show_message_source(GtkApplication  * application,
     gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
     gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD_CHAR);
 
-    interior = gtk_scrolled_window_new(NULL, NULL);
+    interior = gtk_scrolled_window_new();
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(interior),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_ALWAYS);
-    gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
+    gtk_box_append(GTK_BOX(interior), GTK_WIDGET(text));
 
     window = gtk_application_window_new(application);
     gtk_window_set_title(GTK_WINDOW(window), _("Message Source"));
-    gtk_window_set_role(GTK_WINDOW(window), "message-source");
     geometry_manager_attach(GTK_WINDOW(window), "SourceView");
 
     menu_bar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
@@ -238,14 +233,19 @@ libbalsa_show_message_source(GtkApplication  * application,
 #else
     gtk_widget_set_margin_top(menu_bar, 1);
     gtk_widget_set_margin_bottom(menu_bar, 1);
-    gtk_container_add(GTK_CONTAINER(vbox), menu_bar);
+    gtk_box_append(GTK_BOX(vbox), menu_bar);
 #endif
 
     gtk_widget_set_vexpand(interior, TRUE);
     gtk_widget_set_valign(interior, GTK_ALIGN_FILL);
-    g_object_set(interior, "margin", 2, NULL);
-    gtk_container_add(GTK_CONTAINER(vbox), interior);
-    gtk_container_add(GTK_CONTAINER(window), vbox);
+
+    gtk_widget_set_margin_top(interior, 2);
+    gtk_widget_set_margin_bottom(interior, 2);
+    gtk_widget_set_margin_start(interior, 2);
+    gtk_widget_set_margin_end(interior, 2);
+
+    gtk_box_append(GTK_BOX(vbox), interior);
+    gtk_box_append(GTK_BOX(window), vbox);
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);
     lsvi->msg = g_object_ref(msg);
@@ -255,7 +255,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     g_object_set_data_full(G_OBJECT(window), "lsvi", lsvi,
                            (GDestroyNotify) lsv_window_destroy_notify);
 
-    gtk_widget_show_all(window);
+    gtk_widget_show(window);
 
     escape_action = g_action_map_lookup_action(G_ACTION_MAP(window), "escape");
     lsv_escape_change_state(G_SIMPLE_ACTION(escape_action),

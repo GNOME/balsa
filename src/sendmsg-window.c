@@ -2249,7 +2249,12 @@ create_email_or_string_entry(BalsaSendmsg * bsmsg,
     arr[0] = gtk_label_new_with_mnemonic(label);
     gtk_label_set_mnemonic_widget(GTK_LABEL(arr[0]), mnemonic_widget);
     gtk_widget_set_halign(arr[0], GTK_ALIGN_START);
-    g_object_set(arr[0], "margin", GNOME_PAD_SMALL, NULL);
+
+    gtk_widget_set_margin_top(arr[0], GNOME_PAD_SMALL);
+    gtk_widget_set_margin_bottom(arr[0], GNOME_PAD_SMALL);
+    gtk_widget_set_margin_start(arr[0], GNOME_PAD_SMALL);
+    gtk_widget_set_margin_end(arr[0], GNOME_PAD_SMALL);
+
     gtk_grid_attach(GTK_GRID(grid), arr[0], 0, y_pos, 1, 1);
 
     if (!balsa_app.use_system_fonts) {
@@ -2587,7 +2592,12 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     /* Attachment list */
     label = gtk_label_new_with_mnemonic(_("_Attachments:"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    g_object_set(label, "margin", GNOME_PAD_SMALL, NULL);
+
+    gtk_widget_set_margin_top(label, GNOME_PAD_SMALL);
+    gtk_widget_set_margin_bottom(label, GNOME_PAD_SMALL);
+    gtk_widget_set_margin_start(label, GNOME_PAD_SMALL);
+    gtk_widget_set_margin_end(label, GNOME_PAD_SMALL);
+
     gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 1, 1);
 
     sw = gtk_scrolled_window_new(NULL, NULL);

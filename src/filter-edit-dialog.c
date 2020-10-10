@@ -251,7 +251,11 @@ build_match_page()
     page = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(page), 5);
     gtk_grid_set_column_spacing(GTK_GRID(page), 5);
-    g_object_set(page, "margin", 5, NULL);
+
+    gtk_widget_set_margin_top(page, 5);
+    gtk_widget_set_margin_bottom(page, 5);
+    gtk_widget_set_margin_start(page, 5);
+    gtk_widget_set_margin_end(page, 5);
 
     /* The name entry */
 
@@ -383,7 +387,11 @@ build_action_page(GtkWindow * window)
     frame = gtk_frame_new(_("Notification:"));
     gtk_frame_set_label_align(GTK_FRAME(frame), 0.0);
     gtk_box_append(GTK_BOX(page), frame);
-    g_object_set(frame, "margin", 3, NULL);
+
+    gtk_widget_set_margin_top(frame, 3);
+    gtk_widget_set_margin_bottom(frame, 3);
+    gtk_widget_set_margin_start(frame, 3);
+    gtk_widget_set_margin_end(frame, 3);
 
     grid = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
@@ -437,7 +445,12 @@ build_action_page(GtkWindow * window)
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
-    g_object_set(frame, "margin", 3, NULL);
+
+    gtk_widget_set_margin_top(frame, 3);
+    gtk_widget_set_margin_bottom(frame, 3);
+    gtk_widget_set_margin_start(frame, 3);
+    gtk_widget_set_margin_end(frame, 3);
+
     gtk_frame_set_child(GTK_FRAME(frame), box);
 
     fe_action_option_menu =

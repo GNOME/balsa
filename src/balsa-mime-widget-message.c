@@ -159,8 +159,13 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 
         gtk_widget_set_valign(header_widget, GTK_ALIGN_START);
         gtk_widget_set_vexpand(header_widget, FALSE);
-        g_object_set(header_widget, "margin", 5, NULL);
-	gtk_container_add(GTK_CONTAINER(widget), header_widget);
+
+        gtk_widget_set_margin_top(header_widget, 5);
+        gtk_widget_set_margin_bottom(header_widget, 5);
+        gtk_widget_set_margin_start(header_widget, 5);
+        gtk_widget_set_margin_end(header_widget, 5);
+
+	gtk_frame_set_child(GTK_FRAME(widget), header_widget);
 	bmw_message_set_headers(bm, mw, mime_body, TRUE);
     }
 

@@ -1003,7 +1003,12 @@ build_type_notebook()
     gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-    g_object_set(box, "margin", 5, NULL);
+
+    gtk_widget_set_margin_top(box, 5);
+    gtk_widget_set_margin_bottom(box, 5);
+    gtk_widget_set_margin_start(box, 5);
+    gtk_widget_set_margin_end(box, 5);
+
     gtk_widget_set_vexpand(grid, TRUE);
     gtk_widget_set_valign(grid, GTK_ALIGN_FILL);
     gtk_box_append(GTK_BOX(box), grid);
@@ -1030,7 +1035,10 @@ build_type_notebook()
 
     /* The regex page of the type notebook */
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-    g_object_set(box, "margin", 5, NULL);
+    gtk_widget_set_margin_top(box, 5);
+    gtk_widget_set_margin_bottom(box, 5);
+    gtk_widget_set_margin_start(box, 5);
+    gtk_widget_set_margin_end(box, 5);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), box, NULL);
 
@@ -1109,7 +1117,11 @@ build_type_notebook()
     page = gtk_grid_new();
     gtk_grid_set_row_spacing(GTK_GRID(page), 5);
     gtk_grid_set_column_spacing(GTK_GRID(page), 5);
-    g_object_set(page, "margin", 5, NULL);
+
+    gtk_widget_set_margin_top(page, 5);
+    gtk_widget_set_margin_bottom(page, 5);
+    gtk_widget_set_margin_start(page, 5);
+    gtk_widget_set_margin_end(page, 5);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
 
@@ -1141,7 +1153,11 @@ build_type_notebook()
     gtk_widget_set_vexpand(page, TRUE);
     gtk_grid_set_row_spacing(GTK_GRID(page), 5);
     gtk_grid_set_column_spacing(GTK_GRID(page), 5);
-    g_object_set(page, "margin", 5, NULL);
+
+    gtk_widget_set_margin_top(page, 5);
+    gtk_widget_set_margin_bottom(page, 5);
+    gtk_widget_set_margin_start(page, 5);
+    gtk_widget_set_margin_end(page, 5);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(fe_type_notebook), page, NULL);
     fe_type_flag_label =

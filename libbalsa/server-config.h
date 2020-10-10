@@ -37,7 +37,7 @@ G_DECLARE_FINAL_TYPE(LibBalsaServerCfg,
                      libbalsa_server_cfg,
                      LIBBALSA,
                      SERVER_CFG,
-                     GtkNotebook)
+                     GObject)
 
 
 /** @brief Create a new server configuration widget
@@ -123,6 +123,11 @@ const gchar *libbalsa_server_cfg_get_name(LibBalsaServerCfg *server_cfg);
  */
 void libbalsa_server_cfg_assign_server(LibBalsaServerCfg *server_cfg,
 									   LibBalsaServer    *server);
+
+/** @brief Get the server configuration's GtkNotebook
+ * @param server_cfg server configuration widget
+ */
+GtkWidget * libbalsa_server_cfg_get_notebook(LibBalsaServerCfg *server_cfg);
 
 
 #endif /* LIBBALSA_SERVER_CONFIG_H_ */

@@ -54,11 +54,11 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
         GTK_LABEL(gtk_label_new
                   (_("Use Balsa as default email client?")));
     gtk_label_set_justify(label, GTK_JUSTIFY_CENTER);
-    gtk_label_set_line_wrap(label, TRUE);
+    gtk_label_set_wrap(label, TRUE);
 
-    yes = gtk_radio_button_new_with_mnemonic(NULL, _("_Yes"));
-    no = gtk_radio_button_new_with_mnemonic_from_widget(GTK_RADIO_BUTTON(yes),
-                                                         _("_No"));
+    yes = gtk_toggle_button_new_with_mnemonic(_("_Yes"));
+    no  = gtk_toggle_button_new_with_mnemonic(_("_No"));
+    gtk_toggle_button_set_group(GTK_TOGGLE_BUTTON(no), GTK_TOGGLE_BUTTON(yes));
 
     g_signal_connect(yes, "toggled",
                        G_CALLBACK(balsa_druid_page_defclient_toggle),
@@ -69,21 +69,21 @@ balsa_druid_page_defclient_init(BalsaDruidPageDefclient * defclient,
     gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(widget, 8);
     gtk_widget_set_margin_bottom(widget, 8);
-    gtk_container_add(GTK_CONTAINER(page), widget);
+    gtk_box_append(GTK_BOX(page), widget);
 
     widget = GTK_WIDGET(yes);
     gtk_widget_set_vexpand(widget, TRUE);
     gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(widget, 2);
     gtk_widget_set_margin_bottom(widget, 2);
-    gtk_container_add(GTK_CONTAINER(page), widget);
+    gtk_box_append(GTK_BOX(page), widget);
 
     widget = GTK_WIDGET(no);
     gtk_widget_set_vexpand(widget, TRUE);
     gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(widget, 2);
     gtk_widget_set_margin_bottom(widget, 2);
-    gtk_container_add(GTK_CONTAINER(page), widget);
+    gtk_box_append(GTK_BOX(page), widget);
 
     return;
 }

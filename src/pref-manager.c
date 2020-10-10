@@ -1228,7 +1228,11 @@ pm_grid_new(void)
     gtk_grid_set_column_spacing((GtkGrid *) grid, COL_SPACING);
     gtk_grid_set_row_spacing((GtkGrid *) grid, ROW_SPACING);
     pm_grid_set_next_row(grid, 0);
-    g_object_set(grid, "margin", BORDER_WIDTH, NULL);
+
+    gtk_widget_set_margin_top(grid, BORDER_WIDTH);
+    gtk_widget_set_margin_bottom(grid, BORDER_WIDTH);
+    gtk_widget_set_margin_start(grid, BORDER_WIDTH);
+    gtk_widget_set_margin_end(grid, BORDER_WIDTH);
 
     return grid;
 }
@@ -3332,8 +3336,13 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                                GTK_TYPE_WIDGET  /* PM_CHILD_COL    */
             );
     pui->view = view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    g_object_set(view, "margin", BORDER_WIDTH, NULL);
-    gtk_container_add(GTK_CONTAINER(hbox), view);
+
+    gtk_widget_set_margin_top(view, BORDER_WIDTH);
+    gtk_widget_set_margin_bottom(view, BORDER_WIDTH);
+    gtk_widget_set_margin_start(view, BORDER_WIDTH);
+    gtk_widget_set_margin_end(view, BORDER_WIDTH);
+
+    gtk_box_append(GTK_BOX(hbox), view);
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
 
     renderer = gtk_cell_renderer_text_new();

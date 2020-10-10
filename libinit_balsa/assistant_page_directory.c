@@ -180,7 +180,7 @@ verify_mailbox_entry(GtkWidget * entry, const gchar * name,
     if (!*verify)
         return;
 
-    text = gtk_entry_get_text(GTK_ENTRY(entry));
+    text = gtk_editable_get_text(GTK_EDITABLE(entry));
     error = NULL;
     unconditional_mailbox(text, name, mailbox, &error);
 
@@ -195,8 +195,10 @@ verify_mailbox_entry(GtkWidget * entry, const gchar * name,
                                    _("Problem verifying path “%s”:\n%s"),
                                    text, error);
         g_free(error);
-        gtk_dialog_run(GTK_DIALOG(dlg));
-        gtk_widget_destroy(dlg);
+
+        g_signal_connect(dlg, "response", G_CALLBACK(gtk_window_destroy), NULL);
+        gtk_widget_show(dlg);
+
         *verify = FALSE;
     }
 }
@@ -264,7 +266,7 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
                                    "These will be created if necessary."));
     label = GTK_LABEL(label_widget);
     gtk_label_set_justify(label, GTK_JUSTIFY_RIGHT);
-    gtk_label_set_line_wrap(label, TRUE);
+    gtk_label_set_wrap(label, TRUE);
     gtk_widget_set_hexpand(label_widget, TRUE);
     gtk_widget_set_vexpand(label_widget, TRUE);
 
@@ -303,10 +305,9 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
 
     gtk_widget_set_vexpand(GTK_WIDGET(grid), TRUE);
     gtk_widget_set_valign(GTK_WIDGET(grid), GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(grid));
-    gtk_widget_show_all(GTK_WIDGET(grid));
+    gtk_box_append(GTK_BOX(page), GTK_WIDGET(grid));
 
-    gtk_container_add(GTK_CONTAINER(page), verify_button(dir));
+    gtk_box_append(GTK_BOX(page), verify_button(dir));
 
     g_signal_connect(druid, "prepare",
                      G_CALLBACK(balsa_druid_page_directory_prepare),
@@ -360,22 +361,22 @@ balsa_druid_page_directory_prepare(GtkAssistant * druid,
     if (!dir->paths_locked) {
         buf = g_build_filename(balsa_app.local_mail_directory, "outbox",
                                NULL);
-        gtk_entry_set_text(GTK_ENTRY(dir->outbox), buf);
+        gtk_editable_set_text(GTK_EDITABLE(dir->outbox), buf);
         g_free(buf);
 
         buf = g_build_filename(balsa_app.local_mail_directory, "sentbox",
                                NULL);
-        gtk_entry_set_text(GTK_ENTRY(dir->sentbox), buf);
+        gtk_editable_set_text(GTK_EDITABLE(dir->sentbox), buf);
         g_free(buf);
 
         buf = g_build_filename(balsa_app.local_mail_directory, "draftbox",
                                NULL);
-        gtk_entry_set_text(GTK_ENTRY(dir->draftbox), buf);
+        gtk_editable_set_text(GTK_EDITABLE(dir->draftbox), buf);
         g_free(buf);
 
         buf = g_build_filename(balsa_app.local_mail_directory, "trash",
                                NULL);
-        gtk_entry_set_text(GTK_ENTRY(dir->trash), buf);
+        gtk_editable_set_text(GTK_EDITABLE(dir->trash), buf);
         g_free(buf);
     }
 

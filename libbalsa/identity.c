@@ -811,7 +811,12 @@ append_ident_notebook_page(GtkNotebook *notebook,
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     grid = libbalsa_create_grid();
-    g_object_set(grid, "margin", padding, NULL);
+
+    gtk_widget_set_margin_top(grid, padding);
+    gtk_widget_set_margin_bottom(grid, padding);
+    gtk_widget_set_margin_start(grid, padding);
+    gtk_widget_set_margin_end(grid, padding);
+
     gtk_box_append(GTK_BOX(vbox), grid);
     gtk_notebook_append_page(notebook, vbox, gtk_label_new(tab_label));
 

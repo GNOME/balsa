@@ -445,6 +445,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     GtkWidget *box;
     GtkWidget *button;
     GtkWidget *content_area;
+    GtkWidget *notebook;
 
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new folder. */
@@ -492,9 +493,11 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     }
 
     folder_data->server_cfg = libbalsa_server_cfg_new(folder_data->server, (mn != NULL) ? balsa_mailbox_node_get_name(mn) : NULL);
-    content_area = gtk_dialog_get_content_area(GTK_DIALOG(folder_data->common_data.dialog));
-    gtk_container_add(GTK_CONTAINER(content_area), GTK_WIDGET(folder_data->server_cfg));
     g_signal_connect(folder_data->server_cfg, "changed", G_CALLBACK(validate_folder), folder_data);
+
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(folder_data->common_data.dialog));
+    notebook = libbalsa_server_cfg_get_notebook(folder_data->server_cfg);
+    gtk_box_append(GTK_BOX(content_area), notebook);
 
     /* additional basic settings - subscription management */
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);

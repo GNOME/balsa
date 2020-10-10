@@ -87,7 +87,7 @@ static GtkWidget *create_osmo_dialog(AddressBookConfig *abc);
 
 static void help_button_cb(AddressBookConfig * abc);
 static gboolean handle_close(AddressBookConfig * abc);
-static gboolean bad_path(gchar * path, GtkWindow * window, gint type);
+static gboolean bad_path(GtkWindow * window, gint type);
 static gboolean create_book(AddressBookConfig * abc);
 static void modify_book(AddressBookConfig * abc);
 
@@ -112,10 +112,9 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
     AddressBookConfig *abc;
 
     abc = g_object_get_data(G_OBJECT(address_book), "balsa-abc");
-    if (abc) {
+    if (abc != NULL) {
         /* Only one dialog per address book. */
-        gtk_window_present_with_time(GTK_WINDOW(abc->window),
-                                     gtk_get_current_event_time());
+        gtk_window_present_with_time(GTK_WINDOW(abc->window), GDK_CURRENT_TIME);
         return;
     }
 
@@ -129,7 +128,7 @@ balsa_address_book_config_new(LibBalsaAddressBook * address_book,
     if (address_book)
 	gtk_widget_grab_focus(abc->name_entry);
 
-    gtk_widget_show_all(GTK_WIDGET(abc->window));
+    gtk_widget_show(GTK_WIDGET(abc->window));
 }
 
 void
@@ -154,7 +153,7 @@ edit_book_thread(gpointer user_data)
 {
     AddressBookConfig *abc = user_data;
 
-    switch (abc->response) {
+    switch (abc->response_id) {
     case GTK_RESPONSE_APPLY:
         if (handle_close(abc))
             break;
@@ -167,7 +166,7 @@ edit_book_thread(gpointer user_data)
     if (abc->address_book != NULL)
         g_object_set_data(G_OBJECT(abc->address_book), "balsa-abc", NULL);
 
-    gidle_add((GSourceFunc) gtk_window_destroy, abc->dialog);
+    g_idle_add((GSourceFunc) gtk_window_destroy, abc->dialog);
 
     return NULL;
 }
@@ -184,7 +183,7 @@ edit_book_response(GtkWidget * dialog, gint response,
     }
 
     abc->dialog = dialog;
-    abc->response = response;
+    abc->response_id = response;
 
     thread = g_thread_new("edit-book-thread", edit_book_thread, abc);
     g_thread_unref(thread);
@@ -195,30 +194,23 @@ static void
 add_radio_buttons(GtkWidget * grid, gint row, AddressBookConfig * abc)
 {
     GtkWidget *label;
-    GSList *radio_group;
     GtkWidget *button;
 
     label = gtk_label_new(_("Suggest complete addresses:"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(GTK_GRID(grid), label, 0, row, 2, 1);
 
-    abc->as_i_type =
-        gtk_radio_button_new_with_label(NULL, _("as I type"));
-    radio_group =
-        gtk_radio_button_get_group(GTK_RADIO_BUTTON(abc->as_i_type));
+    abc->as_i_type = gtk_toggle_button_new_with_label(_("as I type"));
     ++row;
     gtk_grid_attach(GTK_GRID(grid), abc->as_i_type, 0, row, 2, 1);
 
-    abc->on_request =
-        gtk_radio_button_new_with_label(radio_group,
-                                        _("when I hit the Escape key"));
-    radio_group =
-        gtk_radio_button_get_group(GTK_RADIO_BUTTON(abc->on_request));
+    abc->on_request = gtk_toggle_button_new_with_label(_("when I hit the Escape key"));
+    gtk_toggle_button_set_group(GTK_TOGGLE_BUTTON(abc->on_request), GTK_TOGGLE_BUTTON(abc->as_i_type));
     ++row;
     gtk_grid_attach(GTK_GRID(grid), abc->on_request, 0, row, 2, 1);
 
-    abc->never =
-        gtk_radio_button_new_with_label(radio_group, _("never"));
+    abc->never = gtk_toggle_button_new_with_label( _("never"));
+    gtk_toggle_button_set_group(GTK_TOGGLE_BUTTON(abc->never), GTK_TOGGLE_BUTTON(abc->as_i_type));
     ++row;
     gtk_grid_attach(GTK_GRID(grid), abc->never, 0, row, 2, 1);
 
@@ -240,6 +232,7 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
     const gchar *action;
     const gchar *name;
     GtkWidget *grid;
+    GtkWidget *content_area;
     GtkWidget *label;
     LibBalsaAddressBook *ab;
     GtkSizeGroup *size_group;
@@ -269,7 +262,9 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
     size_group = libbalsa_create_size_group(dialog);
 
     grid = libbalsa_create_grid();
-    gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), grid);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    gtk_box_append(GTK_BOX(content_area), grid);
+
     label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
     gtk_size_group_add_widget(size_group, label);
     abc->name_entry =
@@ -350,6 +345,7 @@ static GtkWidget *
 create_generic_dialog(AddressBookConfig * abc, const gchar * type)
 {
     GtkWidget *dialog;
+    GtkWidget *content_area;
     gchar *title;
     const gchar *action;
     LibBalsaAddressBook *ab;
@@ -374,12 +370,19 @@ create_generic_dialog(AddressBookConfig * abc, const gchar * type)
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, abc->parent);
 #endif
-    gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
-    gtk_container_set_border_width(GTK_CONTAINER
-                                   (gtk_dialog_get_content_area
-                                    (GTK_DIALOG(dialog))), 12);
-    g_signal_connect(dialog, "response",
-                     G_CALLBACK(edit_book_response), abc);
+
+    gtk_widget_set_margin_top(dialog, 5);
+    gtk_widget_set_margin_bottom(dialog, 5);
+    gtk_widget_set_margin_start(dialog, 5);
+    gtk_widget_set_margin_end(dialog, 5);
+
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    gtk_widget_set_margin_top(content_area, 12);
+    gtk_widget_set_margin_bottom(content_area, 12);
+    gtk_widget_set_margin_start(content_area, 12);
+    gtk_widget_set_margin_end(content_area, 12);
+
+    g_signal_connect(dialog, "response", G_CALLBACK(edit_book_response), abc);
 
     return dialog;
 }
@@ -447,7 +450,11 @@ create_externq_dialog(AddressBookConfig * abc)
 
     ab_externq = (LibBalsaAddressBookExternq*)abc->address_book; /* may be NULL */
     grid = libbalsa_create_grid();
-    gtk_container_set_border_width(GTK_CONTAINER(grid), 5);
+
+    gtk_widget_set_margin_top(grid, 5);
+    gtk_widget_set_margin_bottom(grid, 5);
+    gtk_widget_set_margin_start(grid, 5);
+    gtk_widget_set_margin_end(grid, 5);
 
     /* mailbox name */
 
@@ -657,16 +664,17 @@ chooser_bad_path(GtkFileChooser * chooser, GtkWindow * window, gint type)
 {
     GFile *file;
     char *path;
-    gboolean bad;
 
     file = gtk_file_chooser_get_file(chooser);
     path = g_file_get_path(file);
     g_object_unref(file);
 
-    bad = bad_path(path, window, type);
-    g_free(path);
+    if (path != NULL) {
+        g_free(path);
+        return FALSE;
+    }
 
-    return bad;
+    return bad_path(window, type);
 }
 
 static gboolean
@@ -705,29 +713,78 @@ handle_close(AddressBookConfig * abc)
  *
  * Returns TRUE if the path is bad and the user wants to correct it
  */
-static gboolean
-bad_path(gchar * path, GtkWindow * window, gint type)
-{
-    GtkWidget *ask;
-    gint clicked_button;
 
-    if (path) {
-        g_free(path);
-        return FALSE;
-    }
-    ask = gtk_message_dialog_new(window,
+typedef struct {
+    GMutex lock;
+    GCond cond;
+    GtkWindow *window;
+    int type;
+    int clicked_button;
+} bad_path_data;
+
+static void
+bad_path_response(GtkDialog *dialog,
+                  int        response_id,
+                  gpointer   user_data)
+{
+    bad_path_data *data = user_data;
+
+    g_mutex_lock(&data->lock);
+    data->clicked_button = response_id;
+    g_cond_signal(&data->cond);
+    g_mutex_unlock(&data->lock);
+
+    gtk_window_destroy(GTK_WINDOW(dialog));
+}
+
+static gboolean
+bad_path_idle(gpointer user_data)
+{
+    bad_path_data *data = user_data;
+    GtkWidget *ask;
+
+    ask = gtk_message_dialog_new(data->window,
 				 GTK_DIALOG_MODAL|
 				 GTK_DIALOG_DESTROY_WITH_PARENT,
                                  GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
                                  _("No path found. "
 				   "Do you want to give one?"));
 #if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(ask, window);
+    libbalsa_macosx_menu_for_parent(ask, data->window);
 #endif
     gtk_dialog_set_default_response(GTK_DIALOG(ask), GTK_RESPONSE_YES);
-    clicked_button = gtk_dialog_run(GTK_DIALOG(ask));
-    gtk_widget_destroy(ask);
-    return clicked_button == GTK_RESPONSE_YES;
+    g_signal_connect(ask, "response", G_CALLBACK(bad_path_response), data);
+
+    gtk_widget_show(ask);
+
+    return G_SOURCE_REMOVE;
+}
+
+static gboolean
+bad_path(GtkWindow * window, int type)
+{
+    bad_path_data data;
+
+    data.window = window;
+    data.type = type;
+
+    g_mutex_init(&data.lock);
+    g_cond_init(&data.cond);
+
+    g_mutex_lock(&data.lock);
+
+    g_idle_add(bad_path_idle, &data);
+
+    data.clicked_button = 0;
+    while (data.clicked_button == 0)
+        g_cond_wait(&data.cond, &data.lock);
+
+    g_mutex_unlock(&data.lock);
+
+    g_mutex_clear(&data.lock);
+    g_cond_clear(&data.cond);
+
+    return data.clicked_button == GTK_RESPONSE_YES;
 }
 
 static gboolean
@@ -940,7 +997,7 @@ add_vcard_cb(GSimpleAction *action,
 
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
     abc->window = create_vcard_dialog(abc);
-    gtk_widget_show_all(abc->window);
+    gtk_widget_show(abc->window);
 }
 
 static void
@@ -952,7 +1009,7 @@ add_externq_cb(GSimpleAction *action,
 
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ;
     abc->window = create_externq_dialog(abc);
-    gtk_widget_show_all(abc->window);
+    gtk_widget_show(abc->window);
 }
 
 static void
@@ -964,7 +1021,7 @@ add_ldif_cb(GSimpleAction *action,
 
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDIF;
     abc->window = create_ldif_dialog(abc);
-    gtk_widget_show_all(abc->window);
+    gtk_widget_show(abc->window);
 }
 
 #ifdef ENABLE_LDAP
@@ -977,7 +1034,7 @@ add_ldap_cb(GSimpleAction *action,
 
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
     abc->window = create_ldap_dialog(abc);
-    gtk_widget_show_all(abc->window);
+    gtk_widget_show(abc->window);
 }
 #endif /* ENABLE_LDAP */
 
@@ -991,7 +1048,7 @@ add_gpe_cb(GSimpleAction *action,
 
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
     abc->window = create_gpe_dialog(abc);
-    gtk_widget_show_all(abc->window);
+    gtk_widget_show(abc->window);
 }
 #endif /* HAVE_SQLITE */
 
@@ -1005,7 +1062,7 @@ add_rubrica_cb(GSimpleAction *action,
 
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
     abc->window = create_rubrica_dialog(abc);
-    gtk_widget_show_all(abc->window);
+    gtk_widget_show(abc->window);
 }
 #endif /* HAVE_SQLITE */
 
@@ -1019,7 +1076,7 @@ add_osmo_cb(GSimpleAction *action,
 
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_OSMO;
     abc->window = create_osmo_dialog(abc);
-    gtk_widget_show_all(abc->window);
+    gtk_widget_show(abc->window);
 }
 #endif /* HAVE_OSMO */
 

@@ -453,7 +453,6 @@ balsa_check_open_compose_window(void)
         gchar **attach;
 
         snd = sendmsg_window_compose();
-        snd->quit_on_close = FALSE;
 
         if (opt_compose_email != NULL) {
             if (g_ascii_strncasecmp(opt_compose_email, "mailto:", 7) == 0)

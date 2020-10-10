@@ -119,7 +119,6 @@ void libbalsa_show_message_source(GtkApplication * application,
 gchar *libbalsa_guess_email_address(void);
 gchar *libbalsa_guess_mail_spool(void);
 gboolean libbalsa_is_sending_mail(void);
-void libbalsa_wait_for_sending_thread(gint max_seconds);
 
 gchar *libbalsa_guess_imap_server(void);
 gchar *libbalsa_guess_ldap_server(void);

@@ -554,8 +554,6 @@ destroy_event_cb(GtkWidget * widget, gpointer data)
 static void
 balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 {
-    gboolean quit_on_close;
-
     g_assert(bsmsg != NULL);
 
     if (balsa_app.main_window) {
@@ -594,7 +592,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 
     g_debug("balsa_sendmsg_destroy_handler: Freeing bsmsg");
     gtk_widget_destroy(bsmsg->window);
-    quit_on_close = bsmsg->quit_on_close;
     g_free(bsmsg->fcc_url);
     g_free(bsmsg->in_reply_to);
     g_list_free_full(bsmsg->references, g_free);
@@ -624,10 +621,6 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
 
     g_free(bsmsg);
 
-    if (quit_on_close) {
-        libbalsa_wait_for_sending_thread(-1);
-	gtk_main_quit();
-    }
     g_debug("balsa_sendmsg_destroy(): Stop.");
 }
 
@@ -6816,7 +6809,6 @@ sendmsg_window_new()
     bsmsg->ident = g_object_ref(balsa_app.current_ident);
 
     bsmsg->update_config = FALSE;
-    bsmsg->quit_on_close = FALSE;
     bsmsg->state = SENDMSG_STATE_CLEAN;
 
     bsmsg->window = window =

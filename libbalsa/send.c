@@ -143,34 +143,6 @@ libbalsa_is_sending_mail(void)
 }
 
 
-/* libbalsa_wait_for_sending_thread:
-   wait for the sending thread but not longer than max_time seconds.
-   -1 means wait indefinetely (almost).
- */
-void
-libbalsa_wait_for_sending_thread(gint max_time)
-{
-    gint sleep_time = 0;
-#define DOZE_LENGTH (20 * 1000)
-    static const struct timespec req = {
-        0, DOZE_LENGTH * 1000
-    };   /*nanoseconds*/
-
-    if (max_time < 0) {
-        max_time = G_MAXINT;
-    } else {
-        max_time *= 1000000;  /* convert to microseconds */
-    }
-    while ((g_atomic_int_get(&sending_threads) > 0) && (sleep_time < max_time)) {
-        while (gtk_events_pending()) {
-            gtk_main_iteration_do(FALSE);
-        }
-        nanosleep(&req, NULL);
-        sleep_time += DOZE_LENGTH;
-    }
-}
-
-
 static MessageQueueItem *
 msg_queue_item_new(SendMessageInfo *smi)
 {

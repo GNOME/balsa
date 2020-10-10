@@ -91,8 +91,6 @@ G_BEGIN_DECLS
 	gboolean send_mp_alt;   /* send multipart/alternative (plain and html) */ 
 	gboolean req_mdn; 	 /* send a MDN */
 	gboolean req_dsn;	 /* send a delivery status notification */
-	gboolean quit_on_close; /* quit balsa after the compose window */
-	                        /* is closed.                          */
 	guint gpg_mode;
 	gboolean attach_pubkey;
 
@@ -136,8 +134,6 @@ G_BEGIN_DECLS
                                                SendType type);
     BalsaToolbarModel *sendmsg_window_get_toolbar_model(void);
     void sendmsg_window_add_action_entries(GActionMap * action_map);
-
-#define SENDMSG_WINDOW_QUIT_ON_CLOSE(bsmsg) ((bsmsg)->quit_on_close=TRUE)
 
 G_END_DECLS
 

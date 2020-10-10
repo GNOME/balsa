@@ -973,7 +973,10 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
 #define HIG_PADDING 6
     gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
     gtk_grid_set_column_spacing(GTK_GRID(grid), HIG_PADDING);
-    g_object_set(grid, "margin", HIG_PADDING, NULL);
+    gtk_widget_set_margin_top(grid, HIG_PADDING);
+    gtk_widget_set_margin_bottom(grid, HIG_PADDING);
+    gtk_widget_set_margin_start(grid, HIG_PADDING);
+    gtk_widget_set_margin_end(grid, HIG_PADDING);
 
     for (cnt = 0; cnt < NUM_FIELDS; cnt++) {
         if (!labels[cnt])

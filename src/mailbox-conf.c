@@ -781,6 +781,7 @@ static GtkWidget *
 create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 {
     GtkWidget *content_area;
+    GtkWidget *notebook;
 	LibBalsaMailbox *mailbox = mcw->mailbox;
     LibBalsaMailboxPOP3 *mailbox_pop3 = LIBBALSA_MAILBOX_POP3(mailbox);
 
@@ -798,8 +799,10 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
     mcw->mb_data.pop3.server_cfg =
         libbalsa_server_cfg_new(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox),
                                 libbalsa_mailbox_get_name(mailbox));
-    gtk_container_add(GTK_CONTAINER(content_area), GTK_WIDGET(mcw->mb_data.pop3.server_cfg));
     g_signal_connect(mcw->mb_data.pop3.server_cfg, "changed", G_CALLBACK(check_for_blank_fields), mcw);
+
+    notebook = libbalsa_server_cfg_get_notebook(mcw->mb_data.pop3.server_cfg);
+    gtk_box_append(GTK_BOX(content_area), notebook);
 
     /* toggle for deletion from server */
     mcw->mb_data.pop3.delete_from_server = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE,

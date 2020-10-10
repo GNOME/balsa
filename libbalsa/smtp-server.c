@@ -205,7 +205,7 @@ struct smtp_server_dialog_info {
     gchar *old_name;
     LibBalsaSmtpServerUpdate update;
     GtkWidget *dialog;
-    LibBalsaServerCfg *notebook;
+    LibBalsaServerCfg *server_cfg;
     GtkWidget *split_button;
     GtkWidget *big_message;
 };
@@ -215,8 +215,8 @@ static void
 smtp_server_destroy_notify(struct smtp_server_dialog_info *sdi)
 {
     g_free(sdi->old_name);
-    if (sdi->dialog)
-        gtk_widget_destroy(sdi->dialog);
+    if (sdi->dialog != NULL)
+        gtk_window_destroy(GTK_WINDOW(sdi->dialog));
     g_free(sdi);
 }
 
@@ -230,27 +230,35 @@ smtp_server_weak_notify(struct smtp_server_dialog_info *sdi, GObject *dialog)
 }
 
 static void
+smtp_server_help_finish(GObject      *source_object,
+                        GAsyncResult *result,
+                        gpointer      user_data)
+{
+    GtkWindow *parent = user_data;
+    GError *error = NULL;
+
+    if (!gtk_show_uri_full_finish(parent, result, &error)) {
+        libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Error displaying server help: %s\n"), error->message);
+        g_error_free(error);
+    }
+}
+
+static void
 smtp_server_response(GtkDialog * dialog, gint response,
                      struct smtp_server_dialog_info *sdi)
 {
     LibBalsaServer *server = LIBBALSA_SERVER(sdi->smtp_server);
-    GError *error = NULL;
 
     switch (response) {
     case GTK_RESPONSE_HELP:
-        gtk_show_uri_on_window(GTK_WINDOW(dialog),
-                               "help:balsa/preferences-mail-options#smtp-server-config",
-                               gtk_get_current_event_time(), &error);
-        if (error) {
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Error displaying server help: %s\n"),
-                                 error->message);
-            g_error_free(error);
-        }
+        gtk_show_uri_full(GTK_WINDOW(dialog),
+                          "help:balsa/preferences-mail-options#smtp-server-config",
+                          GDK_CURRENT_TIME, NULL, smtp_server_help_finish, dialog);
         return;
     case GTK_RESPONSE_OK:
-        libbalsa_smtp_server_set_name(sdi->smtp_server, libbalsa_server_cfg_get_name(sdi->notebook));
-        libbalsa_server_cfg_assign_server(sdi->notebook, server);
+        libbalsa_smtp_server_set_name(sdi->smtp_server, libbalsa_server_cfg_get_name(sdi->server_cfg));
+        libbalsa_server_cfg_assign_server(sdi->server_cfg, server);
         if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->split_button))) {
             /* big_message is stored in kB, but the widget is in MB. */
         	sdi->smtp_server->big_message =
@@ -270,7 +278,7 @@ smtp_server_response(GtkDialog * dialog, gint response,
     sdi->update(sdi->smtp_server, response, sdi->old_name);
     g_object_unref(server);
 
-    gtk_widget_destroy(GTK_WIDGET(dialog));
+    gtk_window_destroy(GTK_WINDOW(dialog));
 }
 
 static void
@@ -278,7 +286,7 @@ smtp_server_changed(GtkWidget G_GNUC_UNUSED *widget,
                     struct smtp_server_dialog_info *sdi)
 {
 	gboolean sensitive;
-	gboolean enable_ok = libbalsa_server_cfg_valid(sdi->notebook);
+	gboolean enable_ok = libbalsa_server_cfg_valid(sdi->server_cfg);
 
 	/* split big messages */
 	if ((sdi->big_message != NULL) && (sdi->split_button != NULL)) {
@@ -301,13 +309,13 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     GtkWidget *dialog;
     GtkWidget *content_area;
     GtkWidget *label, *hbox;
+    GtkWidget *notebook;
 
     /* Show only one dialog at a time. */
     sdi = g_object_get_data(G_OBJECT(smtp_server),
                             LIBBALSA_SMTP_SERVER_DIALOG_KEY);
     if (sdi != NULL) {
-        gtk_window_present_with_time(GTK_WINDOW(sdi->dialog),
-                                     gtk_get_current_event_time());
+        gtk_window_present_with_time(GTK_WINDOW(sdi->dialog), GDK_CURRENT_TIME);
         return;
     }
 
@@ -341,8 +349,9 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK,
                                       FALSE);
 
-    sdi->notebook = libbalsa_server_cfg_new(server, smtp_server->name);
-    gtk_container_add(GTK_CONTAINER(content_area), GTK_WIDGET(sdi->notebook));
+    sdi->server_cfg = libbalsa_server_cfg_new(server, smtp_server->name);
+    notebook = libbalsa_server_cfg_get_notebook(sdi->server_cfg);
+    gtk_box_append(GTK_BOX(content_area), notebook);
 
 #define HIG_PADDING 12
 
@@ -352,9 +361,9 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     sdi->big_message = gtk_spin_button_new_with_range(0.1, 100, 0.1);
     gtk_widget_set_hexpand(sdi->big_message, TRUE);
     gtk_widget_set_halign(sdi->big_message, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), sdi->big_message);
+    gtk_box_append(GTK_BOX(hbox), sdi->big_message);
     label = gtk_label_new(_("MB"));
-    gtk_container_add(GTK_CONTAINER(hbox), label);
+    gtk_box_append(GTK_BOX(hbox), label);
     if (smtp_server->big_message > 0) {
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button), TRUE);
         /* The widget is in MB, but big_message is stored in kB. */
@@ -364,12 +373,12 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button), FALSE);
         gtk_spin_button_set_value(GTK_SPIN_BUTTON(sdi->big_message), 1);
     }
-    libbalsa_server_cfg_add_row(sdi->notebook, FALSE, sdi->split_button, hbox);
-    g_signal_connect(sdi->notebook, "changed", G_CALLBACK(smtp_server_changed), sdi);
+    libbalsa_server_cfg_add_row(sdi->server_cfg, FALSE, sdi->split_button, hbox);
+    g_signal_connect(sdi->server_cfg, "changed", G_CALLBACK(smtp_server_changed), sdi);
     g_signal_connect(sdi->split_button, "toggled", G_CALLBACK(smtp_server_changed), sdi);
     g_signal_connect(sdi->big_message, "changed", G_CALLBACK(smtp_server_changed), sdi);
 
     smtp_server_changed(NULL, sdi);
 
-    gtk_widget_show_all(dialog);
+    gtk_widget_show(dialog);
 }

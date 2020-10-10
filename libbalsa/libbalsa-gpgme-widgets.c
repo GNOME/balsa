@@ -412,7 +412,12 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-	g_object_set(hbox, "margin", 6, NULL);
+
+    gtk_widget_set_margin_top(hbox, 6);
+    gtk_widget_set_margin_bottom(hbox, 6);
+    gtk_widget_set_margin_start(hbox, 6);
+    gtk_widget_set_margin_end(hbox, 6);
+
         gtk_widget_set_vexpand(hbox, TRUE);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
 	gtk_box_append(GTK_BOX(content_area), hbox);

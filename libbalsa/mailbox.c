@@ -2384,7 +2384,7 @@ lbm_set_threading(LibBalsaMailbox * mailbox)
     LIBBALSA_MAILBOX_GET_CLASS(mailbox)->set_threading(mailbox,
                                                        priv->view->threading_type);
 
-    if (priv->sort_idle_id == 0)
+    if (libbalsa_mailbox_total_messages(mailbox) > 0 && priv->sort_idle_id == 0)
         priv->sort_idle_id = g_idle_add((GSourceFunc) lbm_sort_idle_cb, mailbox);
 
     return TRUE;

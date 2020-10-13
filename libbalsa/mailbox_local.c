@@ -1242,7 +1242,8 @@ libbalsa_mailbox_local_set_threading(LibBalsaMailbox * mailbox,
 
         g_debug("after load messages: time=%lu", (unsigned long) time(NULL));
         if (natural) {
-            /* No need to thread. */
+            /* No need to thread, but we must set the flag. */
+            libbalsa_mailbox_set_messages_threaded(mailbox, TRUE);
             return;
         }
     }

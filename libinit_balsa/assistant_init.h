@@ -30,7 +30,6 @@ G_BEGIN_DECLS
 /*
  * Public methods
  */
-    void balsa_initdruid(GtkAssistant * assistant);
 
 void balsa_init_begin( void );
 

@@ -101,12 +101,9 @@ balsa_initdruid_apply(GtkAssistant * druid)
     gtk_main_quit();
 }
 
-void
+static void
 balsa_initdruid(GtkAssistant * assistant)
 {
-    g_return_if_fail(assistant != NULL);
-    g_return_if_fail(GTK_IS_ASSISTANT(assistant));
-
     g_signal_connect(assistant, "cancel",
                      G_CALLBACK(balsa_initdruid_cancel), NULL);
     g_signal_connect(assistant, "close",

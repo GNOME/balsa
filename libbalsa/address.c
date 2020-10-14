@@ -991,10 +991,10 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
             entries[cnt] = lba_addr_list_widget(changed_cb, changed_data);
             gtk_widget_set_margin_top(label, 1);
             gtk_widget_set_margin_bottom(label, 1);
-            gtk_container_add(GTK_CONTAINER(box), label);
+            gtk_box_append(GTK_BOX(box), label);
             gtk_widget_set_margin_top(but, 1);
             gtk_widget_set_margin_bottom(but, 1);
-            gtk_container_add(GTK_CONTAINER(box), but);
+            gtk_box_append(GTK_BOX(box), but);
             lhs = box;
             tree_view = gtk_frame_get_child(GTK_FRAME(entries[cnt]));
             g_signal_connect(but, "clicked", G_CALLBACK(add_row), tree_view);

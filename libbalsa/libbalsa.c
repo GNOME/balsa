@@ -467,7 +467,7 @@ ask_cert_real(void *data)
     gtk_box_append(GTK_BOX(content_area), cert_widget);
 
     g_signal_connect(dialog, "response", G_CALLBACK(ask_cert_real_response), acd);
-    gtk_widget_show_all(dialog);
+    gtk_widget_show(dialog);
 
     return G_SOURCE_REMOVE;
 }

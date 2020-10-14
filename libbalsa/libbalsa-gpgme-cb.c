@@ -143,7 +143,7 @@ row_activated_cb(GtkTreeView       *tree_view,
 
         gtk_tree_model_get(model, &iter, GPG_KEY_PTR_COLUMN, &key, -1);
         dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, key, GPG_SUBKEY_CAP_ALL, NULL, NULL);
-        g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+        g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
         gtk_widget_show(dialog);
     }
 }

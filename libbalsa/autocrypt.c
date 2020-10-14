@@ -435,7 +435,7 @@ main_dialog_response_cb(GtkDialog *dialog,
     GList *keys = user_data;
 
     g_list_free_full(keys, (GDestroyNotify) g_bytes_unref);
-    gtk_widget_destroy(GTK_WIDGET(dialog));
+    gtk_window_destroy(GTK_WINDOW(dialog));
 }
 
 /* documentation: see header file */
@@ -469,7 +469,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_vexpand(scrolled_window, TRUE);
     gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), scrolled_window);
+    gtk_box_append(GTK_BOX(vbox), scrolled_window);
 
     model = gtk_list_store_new(AC_DB_VIEW_COLUMNS, G_TYPE_STRING,	/* address */
     	G_TYPE_INT64,												/* last seen timestamp value (for sorting) */

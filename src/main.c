@@ -144,12 +144,26 @@ check_special_mailboxes(void)
 }
 
 static void
+config_finish(void)
+{
+    config_load();
+    config_defclient_save();
+    g_application_activate(G_APPLICATION(balsa_app.application));
+}
+
+static void
 config_init(void)
 {
-    while (!config_load()) {
-	balsa_init_begin();
+    if (config_load())
+        g_application_activate(G_APPLICATION(balsa_app.application));
+    else
+	balsa_init_begin(config_finish);
+}
+
+static void
+mailboxes_finish(void)
+{
         config_defclient_save();
-    }
 }
 
 static void
@@ -158,9 +172,7 @@ mailboxes_init(gboolean check_only)
     check_special_mailboxes();
     if (!balsa_app.inbox && !check_only) {
 	g_warning("*** error loading mailboxes");
-	balsa_init_begin();
-        config_defclient_save();
-	return;
+	balsa_init_begin(mailboxes_finish);
     }
 }
 
@@ -754,7 +766,6 @@ balsa_command_line_cb(GApplication            * application,
     } else {
         /* checking for valid config files */
         config_init();
-        g_application_activate(application);
     }
 
     return 0;

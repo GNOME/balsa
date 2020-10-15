@@ -5,14 +5,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option) 
+ * the Free Software Foundation; either version 2, or (at your option)
  * any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
@@ -36,26 +36,46 @@
 #include "assistant_page_defclient.h"
 #include "assistant_page_finish.h"
 
+#define ASSISTANT_CALLBACK "assistant-callback"
+
+static void
+cancel_response(GtkDialog *dialog,
+                int        response_id,
+                gpointer   user_data)
+{
+    if (response_id == GTK_RESPONSE_YES) {
+        libbalsa_conf_drop_all();
+        g_application_quit(G_APPLICATION(balsa_app.application));
+    } else {
+        gtk_window_destroy(GTK_WINDOW(dialog));
+    }
+}
+
 static void
 balsa_initdruid_cancel(GtkAssistant * druid)
 {
     GtkWidget *dialog =
         gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
-                                          (GTK_WIDGET(druid), 
+                                          (GTK_WIDGET(druid),
                                            GTK_TYPE_WINDOW)),
                                GTK_DIALOG_MODAL,
                                GTK_MESSAGE_QUESTION,
                                GTK_BUTTONS_YES_NO,
                                _("This will exit Balsa.\n"
                                  "Do you really want to do this?"));
-    GtkResponseType reply = 
-        gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
 
-    if (reply == GTK_RESPONSE_YES) {
-        libbalsa_conf_drop_all();
-        exit(0);
-    }
+    g_signal_connect(dialog, "response", G_CALLBACK(cancel_response), NULL);
+    gtk_widget_show(dialog);
+}
+
+static gboolean
+dismiss_the_druid(gpointer user_data)
+{
+    GtkWindow *druid = user_data;
+
+    gtk_window_destroy(druid);
+
+    return G_SOURCE_REMOVE;
 }
 
 static void
@@ -63,6 +83,7 @@ balsa_initdruid_apply(GtkAssistant * druid)
 {
     gchar *address_book;
     LibBalsaAddressBook *ab = NULL;
+    void (*callback)(void);
 
     address_book = g_build_filename(g_get_home_dir(), "GnomeCard.gcrd", NULL);
     if (g_file_test(address_book, G_FILE_TEST_EXISTS))
@@ -70,7 +91,7 @@ balsa_initdruid_apply(GtkAssistant * druid)
                                              address_book);
     g_free(address_book);
     if(!ab) {
-        address_book = g_build_filename(g_get_home_dir(), 
+        address_book = g_build_filename(g_get_home_dir(),
                                    ".addressbook.ldif", NULL);
         if (g_file_test(address_book, G_FILE_TEST_EXISTS))
             ab = libbalsa_address_book_ldif_new(_("Address Book"),
@@ -79,10 +100,10 @@ balsa_initdruid_apply(GtkAssistant * druid)
     }
     if(!ab) {
         /* This will be the default address book and its location */
-        address_book = g_build_filename(g_get_home_dir(), 
+        address_book = g_build_filename(g_get_home_dir(),
                                         ".balsa", "addressbook.ldif", NULL);
         ab = libbalsa_address_book_ldif_new(_("Address Book"),
-                                            address_book); 
+                                            address_book);
         g_free(address_book);
         libbalsa_assure_balsa_dir();
    }
@@ -98,7 +119,13 @@ balsa_initdruid_apply(GtkAssistant * druid)
     libbalsa_conf_set_bool("LibBalsaAddressView", TRUE);
     libbalsa_conf_pop_group();
     config_save();
-    gtk_main_quit();
+
+    /* we do not want to destroy druid immediately to avoid confusing
+       delay between the druid that left and balsa that entered. */
+    g_idle_add(dismiss_the_druid, druid);
+
+    callback = g_object_get_data(G_OBJECT(druid), ASSISTANT_CALLBACK);
+    callback();
 }
 
 static void
@@ -118,27 +145,16 @@ balsa_initdruid(GtkAssistant * assistant)
 
 
 /* The external interface code */
-static gboolean
-dismiss_the_wizard(GtkWidget *wizard)
-{
-    gtk_widget_destroy(wizard);
-    return FALSE;
-}
 
 void
-balsa_init_begin(void)
+balsa_init_begin(void (*callback)(void))
 {
     GtkWidget *assistant;
 
     assistant = gtk_assistant_new();
     gtk_window_set_title(GTK_WINDOW(assistant), _("Configure Balsa"));
 
+    g_object_set_data(G_OBJECT(assistant), ASSISTANT_CALLBACK, callback);
     balsa_initdruid(GTK_ASSISTANT(assistant));
-    gtk_widget_show_all(assistant);
-
-    gtk_main();
-
-    /* we do not want to destroy wizard immediately to avoid confusing
-       delay between the wizard that left and balsa that entered. */
-    g_idle_add((GSourceFunc)dismiss_the_wizard, assistant);
+    gtk_widget_show(assistant);
 }

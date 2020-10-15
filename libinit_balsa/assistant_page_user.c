@@ -86,10 +86,10 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     user->ed3.controller = &(user->econtroller);
     user->ed4.controller = &(user->econtroller);
     label = GTK_LABEL(gtk_label_new(_(header2)));
-    gtk_label_set_line_wrap(label, TRUE);
+    gtk_label_set_wrap(label, TRUE);
     gtk_widget_set_vexpand(GTK_WIDGET(label), TRUE);
     gtk_widget_set_valign(GTK_WIDGET(label), GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(label));
+    gtk_box_append(GTK_BOX(page), GTK_WIDGET(label));
 
     grid = GTK_GRID(gtk_grid_new());
     gtk_grid_set_row_spacing(grid, 2);
@@ -98,7 +98,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
 #if 0
     label = GTK_LABEL(gtk_label_new(_(header21)));
     gtk_label_set_justify(label, GTK_JUSTIFY_CENTER);
-    gtk_label_set_line_wrap(label, TRUE);
+    gtk_label_set_wrap(label, TRUE);
     gtk_grid_attach(grid, GTK_WIDGET(label), 0, 2, 0, 1,
                      GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
 #endif
@@ -155,7 +155,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
 
     gtk_widget_set_margin_top(GTK_WIDGET(grid), 3);
     gtk_widget_set_margin_bottom(GTK_WIDGET(grid), 3);
-    gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(grid));
+    gtk_box_append(GTK_BOX(page), GTK_WIDGET(grid));
 
     user->need_set = FALSE;
 }
@@ -246,6 +246,14 @@ create_imap_mbx(const gchar *name, const gchar* host, NetClientCryptMode securit
 }
 
 static void
+user_next_error_response(GtkDialog *dialog,
+                         int        response_id,
+                         gpointer   user_data)
+{
+    gtk_window_destroy(GTK_WINDOW(dialog));
+}
+
+static void
 balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
                            BalsaDruidPageUser * user)
 {
@@ -254,19 +262,13 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
     LibBalsaIdentity *ident;
     InternetAddress *ia;
     LibBalsaSmtpServer *smtp_server;
-    
-#if 0
-    printf("USER next ENTER %p %p\n", page, user->page);
-    if(page != user->page)
-        return;
-#endif
 
     /* incoming mail */
-    host = gtk_entry_get_text(GTK_ENTRY(user->incoming_srv));
+    host = gtk_editable_get_text(GTK_EDITABLE(user->incoming_srv));
     if(host && *host) {
         LibBalsaMailbox *mbx = NULL;
-        const gchar *login = gtk_entry_get_text(GTK_ENTRY(user->login));
-        const gchar *passwd = gtk_entry_get_text(GTK_ENTRY(user->passwd));
+        const gchar *login = gtk_editable_get_text(GTK_EDITABLE(user->login));
+        const gchar *passwd = gtk_editable_get_text(GTK_EDITABLE(user->passwd));
         NetClientCryptMode security = balsa_option_get_active(user->security) + NET_CLIENT_CRYPT_ENCRYPTED;
         gboolean remember = 
             balsa_option_get_active(user->remember_passwd) == 0;
@@ -285,7 +287,7 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
 
     /* identity */
 
-    mailbox = gtk_entry_get_text(GTK_ENTRY(user->name));
+    mailbox = gtk_editable_get_text(GTK_EDITABLE(user->name));
     if (balsa_app.identities == NULL) {
 	gchar *domain = strrchr(mailbox, '@');
         ident = LIBBALSA_IDENTITY(libbalsa_identity_new_with_name
@@ -298,7 +300,7 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
         ident = balsa_app.current_ident;
     }
     
-    ia = internet_address_mailbox_new (mailbox, gtk_entry_get_text(GTK_ENTRY(user->email)));
+    ia = internet_address_mailbox_new (mailbox, gtk_editable_get_text(GTK_EDITABLE(user->email)));
     libbalsa_identity_set_address (ident, ia);
 
     /* outgoing mail */
@@ -311,7 +313,7 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
 	smtp_server = balsa_app.smtp_servers->data;
     }
     libbalsa_server_set_host(LIBBALSA_SERVER(smtp_server),
-                             gtk_entry_get_text(GTK_ENTRY(user->smtp)),
+                             gtk_editable_get_text(GTK_EDITABLE(user->smtp)),
                              FALSE);	// FIXME!!
 
     g_free(balsa_app.local_mail_directory);
@@ -328,9 +330,12 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
                                    GTK_MESSAGE_ERROR,
                                    GTK_BUTTONS_OK,
                                    _("Local Mail Problem\n%s"), uhoh);
-        gtk_dialog_run(GTK_DIALOG(err));
-        gtk_widget_destroy(err);
+
         g_free(uhoh);
+
+        g_signal_connect(err, "response", G_CALLBACK(user_next_error_response), NULL);
+        gtk_widget_show(err);
+
         return; /* FIXME! Do not go to the next page! */
     }
 

@@ -77,7 +77,7 @@ balsa_init_add_grid_entry(GtkGrid * grid, guint num, const gchar * ltext,
 
         ed->controller->donemask = (ed->controller->donemask << 1) | 1;
     }
-    gtk_entry_set_text(GTK_ENTRY(e), etext);
+    gtk_editable_set_text(GTK_EDITABLE(e), etext);
     return e;
 }
 

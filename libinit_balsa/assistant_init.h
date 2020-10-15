@@ -31,7 +31,7 @@ G_BEGIN_DECLS
  * Public methods
  */
 
-void balsa_init_begin( void );
+void balsa_init_begin(void (*callback)(void));
 
 G_END_DECLS
 

@@ -37,7 +37,7 @@ balsa_druid_page_welcome(GtkAssistant * druid)
          "connect to the network.");
 
     page = gtk_label_new(_(text));
-    gtk_label_set_line_wrap(GTK_LABEL(page), TRUE);
+    gtk_label_set_wrap(GTK_LABEL(page), TRUE);
     
     gtk_assistant_append_page(druid, page);
     gtk_assistant_set_page_title(druid, page, _(title));

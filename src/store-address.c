@@ -76,21 +76,21 @@ balsa_store_address_from_messages(GList * messages)
     GList *message_list = NULL;
     GList *list;
 
-    for (list = messages; list; list = list->next) {
+    for (list = messages; list != NULL; list = list->next) {
         gpointer data = g_object_get_data(G_OBJECT(list->data),
                                           BALSA_STORE_ADDRESS_KEY);
 
-        if (data)
+        if (data != NULL)
             info = data;
         else
             message_list = g_list_prepend(message_list, list->data);
     }
 
-    if (!message_list) {
+    if (message_list == NULL) {
         /* All messages are already showing. */
-        if (info)
-            gtk_window_present_with_time(GTK_WINDOW(info->dialog),
-                                         gtk_get_current_event_time());
+        if (info != NULL)
+            gtk_window_present_with_time(GTK_WINDOW(info->dialog), GDK_CURRENT_TIME);
+
         return;
     }
 
@@ -134,7 +134,7 @@ balsa_store_address(LibBalsaAddress *address)
 
     g_signal_connect(info->dialog, "response",
                      G_CALLBACK(store_address_response), info);
-    gtk_widget_show_all(GTK_WIDGET(info->dialog));
+    gtk_widget_show(GTK_WIDGET(info->dialog));
 }
 
 /* Weak notify that a message was deleted; remove it from our list. */
@@ -187,7 +187,7 @@ static void
 store_address_free(StoreAddressInfo * info)
 {
     g_list_free(info->message_list);
-    gtk_widget_destroy(info->dialog);
+    gtk_window_destroy(GTK_WINDOW(info->dialog));
     g_free(info);
 }
 
@@ -221,16 +221,13 @@ store_address_dialog(StoreAddressInfo * info)
     if (balsa_app.address_book_list && balsa_app.address_book_list->next) {
         /* User has more than one address book, so show the options */
         frame = store_address_book_frame(info);
-        gtk_widget_show_all(frame);
-        gtk_container_add(GTK_CONTAINER(vbox), frame);
+        gtk_box_append(GTK_BOX(vbox), frame);
     }
 
     frame = store_address_note_frame(info);
-    gtk_widget_show_all(frame);
-
     gtk_widget_set_vexpand(frame, TRUE);
     gtk_widget_set_valign(frame, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), frame);
+    gtk_box_append(GTK_BOX(vbox), frame);
 
     return dialog;
 }
@@ -289,8 +286,13 @@ store_address_book_frame(StoreAddressInfo * info)
     GList *ab_list;
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
-    gtk_container_add(GTK_CONTAINER(hbox), gtk_label_new(_("Address Book:")));
+
+    gtk_widget_set_margin_top(hbox, 4);
+    gtk_widget_set_margin_bottom(hbox, 4);
+    gtk_widget_set_margin_start(hbox, 4);
+    gtk_widget_set_margin_end(hbox, 4);
+
+    gtk_box_append(GTK_BOX(hbox), gtk_label_new(_("Address Book:")));
 
     combo_box = gtk_combo_box_text_new();
     g_signal_connect(combo_box, "changed",
@@ -317,7 +319,7 @@ store_address_book_frame(StoreAddressInfo * info)
 
     gtk_widget_set_vexpand(combo_box, TRUE);
     gtk_widget_set_valign(combo_box, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), combo_box);
+    gtk_box_append(GTK_BOX(hbox), combo_box);
 
     return hbox;
 }
@@ -332,7 +334,11 @@ store_address_note_frame(StoreAddressInfo *info)
 
     info->notebook = gtk_notebook_new();
     gtk_notebook_set_scrollable(GTK_NOTEBOOK(info->notebook), TRUE);
-    gtk_container_set_border_width(GTK_CONTAINER(info->notebook), 4);
+
+    gtk_widget_set_margin_top(info->notebook, 4);
+    gtk_widget_set_margin_bottom(info->notebook, 4);
+    gtk_widget_set_margin_start(info->notebook, 4);
+    gtk_widget_set_margin_end(info->notebook, 4);
 
     for (list = info->message_list; list; list = list->next) {
         LibBalsaMessageHeaders *headers;

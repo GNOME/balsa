@@ -23,6 +23,26 @@
 #include <glib-object.h>
 #include "toolbar-prefs.h"
 
+/* Copied from Gtk 3 GtkToolbarStyle
+ *
+ * BalsaToolbarStyle:
+ * BALSA_TOOLBAR_ICONS: Buttons display only icons in the toolbar.
+ * BALSA_TOOLBAR_TEXT: Buttons display only text labels in the toolbar.
+ * BALSA_TOOLBAR_BOTH: Buttons display text and icons in the toolbar.
+ * BALSA_TOOLBAR_BOTH_HORIZ: Buttons display icons and text alongside each
+ *  other, rather than vertically stacked
+ *
+ * Used to customize the appearance of a BalsaToolbar. Note that
+ * setting the toolbar style overrides the user’s preferences
+ * for the default toolbar style.
+ */
+typedef enum {
+    BALSA_TOOLBAR_ICONS,
+    BALSA_TOOLBAR_TEXT,
+    BALSA_TOOLBAR_BOTH,
+    BALSA_TOOLBAR_BOTH_HORIZ
+} BalsaToolbarStyle;
+
 #define BALSA_TYPE_TOOLBAR_MODEL balsa_toolbar_model_get_type()
 
 G_DECLARE_FINAL_TYPE(BalsaToolbarModel,
@@ -41,8 +61,8 @@ extern button_data toolbar_buttons[];
 extern const int toolbar_button_count;
 
 typedef struct {
-    gchar *action;
-    gchar *icon;
+    char *action;
+    char *icon;
 } BalsaToolbarEntry;
 
 void update_all_toolbars(void);

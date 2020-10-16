@@ -50,7 +50,7 @@ struct _BalsaToolbarModel {
     GArray          *standard;
     GArray          *current;
     BalsaToolbarType type;
-    GtkToolbarStyle  style;
+    BalsaToolbarStyle  style;
     GSettings       *settings;
 };
 
@@ -112,7 +112,7 @@ balsa_toolbar_model_init(BalsaToolbarModel * model)
 /* End of class boilerplate */
 
 /* The descriptions must be SHORT */
-button_data toolbar_buttons[]={
+button_data toolbar_buttons[] = {
     {"",                         N_("Separator"),       FALSE},
     {"application-exit",         N_("Quit"),            FALSE},
     {BALSA_PIXMAP_RECEIVE,       N_("Check"),           TRUE},
@@ -128,32 +128,32 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_NEXT_FLAGGED,  N_("Next\nflagged"),   FALSE},
     {BALSA_PIXMAP_PREVIOUS_PART, N_("Previous\npart"),  FALSE},
     {BALSA_PIXMAP_NEXT_PART,     N_("Next\npart"),      FALSE},
-    {"edit-delete",           N_("Trash /\nDelete"), FALSE},
+    {"edit-delete",              N_("Trash /\nDelete"), FALSE},
     {BALSA_PIXMAP_POSTPONE,      N_("Postpone"),        FALSE},
-    {"document-print",            N_("Print"),           FALSE},
+    {"document-print",           N_("Print"),           FALSE},
     {BALSA_PIXMAP_REQUEST_MDN,   N_("Request\nMDN"),    FALSE},
     {BALSA_PIXMAP_SEND,          N_("Send"),            TRUE},
     {BALSA_PIXMAP_SEND_QUEUED,   N_("Send queued"),     TRUE},
     {BALSA_PIXMAP_SEND_RECEIVE,  N_("Exchange"),        FALSE},
-	{BALSA_PIXMAP_QUEUE,         N_("Queue"),           TRUE},
+    {BALSA_PIXMAP_QUEUE,         N_("Queue"),           TRUE},
     {BALSA_PIXMAP_ATTACHMENT,    N_("Attach"),          TRUE},
-    {"document-save",             N_("Save"),            TRUE},
+    {"document-save",            N_("Save"),            TRUE},
     {BALSA_PIXMAP_IDENTITY,      N_("Identity"),        FALSE},
-    {"tools-check-spelling",      N_("Spelling"),        TRUE},
+    {"tools-check-spelling",     N_("Spelling"),        TRUE},
     {"window-close-symbolic",    N_("Close"),           FALSE},
     {BALSA_PIXMAP_MARKED_NEW,    N_("Toggle\nnew"),     FALSE},
     {BALSA_PIXMAP_MARK_ALL,      N_("Mark all"),        FALSE},
     {BALSA_PIXMAP_SHOW_HEADERS,  N_("All\nheaders"),    FALSE},
-	{BALSA_PIXMAP_GPG_RECHECK,   N_("Recheck\ncryptography"), FALSE},
-    {"gtk-cancel",           N_("Reset\nFilter"),   FALSE},
+    {BALSA_PIXMAP_GPG_RECHECK,   N_("Recheck\ncryptography"), FALSE},
+    {"gtk-cancel",               N_("Reset\nFilter"),   FALSE},
     {BALSA_PIXMAP_SHOW_PREVIEW,  N_("Message Preview"),     FALSE},
     {BALSA_PIXMAP_GPG_SIGN,      N_("Sign"),            FALSE},
     {BALSA_PIXMAP_GPG_ENCRYPT,   N_("Encrypt"),         FALSE},
-    {"edit-undo",             N_("Undo"),            FALSE},
-    {"edit-redo",             N_("Redo"),            FALSE},
-    {"edit-clear",            N_("Expunge"),         FALSE},
-    {"list-remove",           N_("Empty\nTrash"),    FALSE},
-    {"gtk-edit",             N_("Edit"),            FALSE},
+    {"edit-undo",                N_("Undo"),            FALSE},
+    {"edit-redo",                N_("Redo"),            FALSE},
+    {"edit-clear",               N_("Expunge"),         FALSE},
+    {"list-remove",              N_("Empty\nTrash"),    FALSE},
+    {"gtk-edit",                 N_("Edit"),            FALSE},
 };
 
 const int toolbar_button_count = G_N_ELEMENTS(toolbar_buttons);
@@ -179,14 +179,13 @@ balsa_toolbar_sanitize_id(const gchar *id)
 	return NULL;
 }
 
-/* this should go to GTK because it modifies its internal structures. */
 static void
 balsa_toolbar_remove_all(GtkWidget * widget)
 {
-    GtkToolItem *item;
+    GtkWidget *child;
 
-    while ((item = gtk_toolbar_get_nth_item((GtkToolbar *) widget, 0)))
-        gtk_container_remove((GtkContainer *) widget, (GtkWidget *) item);
+    while ((child = gtk_widget_get_first_child(widget)) != NULL)
+        gtk_box_remove(GTK_BOX(widget), child);
 }
 
 /* Load and save config
@@ -235,7 +234,7 @@ tm_save_model(BalsaToolbarModel * model)
     libbalsa_conf_push_group(key);
     g_free(key);
 
-    if (model->style != (GtkToolbarStyle) (-1))
+    if (model->style != (BalsaToolbarStyle) (-1))
         libbalsa_conf_set_int("Style", model->style);
 
 
@@ -264,7 +263,7 @@ tm_gsettings_change_cb(GSettings   * settings,
     BalsaToolbarModel *model = user_data;
 
     if (!strcmp(key, "toolbar-style") &&
-        model->style == (GtkToolbarStyle) (-1))
+        model->style == (BalsaToolbarStyle) (-1))
         balsa_toolbar_model_changed(model);
 }
 
@@ -442,63 +441,50 @@ tm_has_second_line(BalsaToolbarModel * model)
     return FALSE;
 }
 
-static gint
-tm_set_tool_item_label(GtkToolItem * tool_item, const gchar * stock_id,
-                       gboolean make_two_line)
+static char *
+tm_label(int button, gboolean make_two_line)
 {
-    gint button = get_toolbar_button_index(stock_id);
-    const gchar *text;
-    gchar *label;
+    const char *text;
+    char *label;
 
     if (button < 0)
-        return button;
+        return NULL;
 
     text = balsa_toolbar_button_text(button);
     if (balsa_app.toolbar_wrap_button_text) {
         /* Make sure all buttons have the same number of lines of
          * text (1 or 2), to keep icons aligned */
-        label = make_two_line && !strchr(text, '\n') ?
+        label = make_two_line && strchr(text, '\n') == NULL ?
             g_strconcat(text, "\n", NULL) : g_strdup(text);
     } else {
-        gchar *p = label = g_strdup(text);
-        while ((p = strchr(p, '\n')))
+        char *p = label = g_strdup(text);
+        while ((p = strchr(p, '\n')) != NULL)
             *p++ = ' ';
     }
 
-    gtk_tool_button_set_label(GTK_TOOL_BUTTON(tool_item), label);
-    g_free(label);
-
-    gtk_tool_item_set_is_important(tool_item,
-                                   toolbar_buttons[button].is_important);
-
-    if (strcmp(toolbar_buttons[button].pixmap_id, BALSA_PIXMAP_SEND) == 0
-        && balsa_app.always_queue_sent_mail)
-        gtk_tool_item_set_tooltip_text(tool_item,
-                                       _("Queue this message for sending"));
-
-    return button;
+    return label;
 }
 
-static GtkToolbarStyle tm_default_style(void);
+static BalsaToolbarStyle tm_default_style(void);
 
 typedef struct {
     const gchar *text;
     const gchar *config_name;
-    GtkToolbarStyle style;
+    BalsaToolbarStyle style;
 } ToolbarOption;
 
 static const ToolbarOption tm_toolbar_options[] = {
-    {N_("Text Be_low Icons"),           "both",       GTK_TOOLBAR_BOTH},
-    {N_("Priority Text Be_side Icons"), "both-horiz", GTK_TOOLBAR_BOTH_HORIZ},
-    {NULL,                              "both_horiz", GTK_TOOLBAR_BOTH_HORIZ},
-    {N_("_Icons Only"),                 "icons",      GTK_TOOLBAR_ICONS},
-    {N_("_Text Only"),                  "text",       GTK_TOOLBAR_TEXT}
+    {N_("Text Be_low Icons"),           "both",       BALSA_TOOLBAR_BOTH},
+    {N_("Priority Text Be_side Icons"), "both-horiz", BALSA_TOOLBAR_BOTH_HORIZ},
+    {NULL,                              "both_horiz", BALSA_TOOLBAR_BOTH_HORIZ},
+    {N_("_Icons Only"),                 "icons",      BALSA_TOOLBAR_ICONS},
+    {N_("_Text Only"),                  "text",       BALSA_TOOLBAR_TEXT}
 };
 
-static GtkToolbarStyle
+static BalsaToolbarStyle
 tm_default_style(void)
 {
-    GtkToolbarStyle default_style = GTK_TOOLBAR_BOTH;
+    BalsaToolbarStyle default_style = BALSA_TOOLBAR_BOTH;
     GSettings *settings;
 
     /* Get global setting */
@@ -528,7 +514,8 @@ tm_default_style(void)
     return default_style;
 }
 
-/* Populate a model
+/*
+ * Populate a toolbar from a model
  */
 #define BALSA_TOOLBAR_ACTION_MAP "balsa-toolbar-action-map"
 static void
@@ -541,40 +528,77 @@ tm_populate(GtkWidget * toolbar, BalsaToolbarModel * model)
     GActionMap *action_map =
         g_object_get_data(G_OBJECT(toolbar), BALSA_TOOLBAR_ACTION_MAP);
 
-    style_is_both = (model->style == GTK_TOOLBAR_BOTH
-                     || (model->style == (GtkToolbarStyle) - 1
-                         && tm_default_style() == GTK_TOOLBAR_BOTH));
+    style_is_both = (model->style == BALSA_TOOLBAR_BOTH
+                     || (model->style == (BalsaToolbarStyle) (-1)
+                         && tm_default_style() == BALSA_TOOLBAR_BOTH));
     make_two_line = style_is_both && tm_has_second_line(model);
 
     current = balsa_toolbar_model_get_current(model);
     for (j = 0; j < current->len; j++) {
         BalsaToolbarEntry *entry;
-        GtkToolItem *item;
+        GtkWidget *item;
 
         entry = &g_array_index(current, BalsaToolbarEntry, j);
 
-        if (!*entry->action) {
-            item = gtk_separator_tool_item_new();
+        if (entry->action[0] == '\0') {
+            item = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
         } else {
-            GtkWidget *icon;
             GAction *action;
             const GVariantType *type;
+            int button = get_toolbar_button_index(entry->icon);
             gchar *prefixed_action;
 
-            icon = gtk_image_new_from_icon_name
-                (balsa_icon_id(entry->icon), GTK_ICON_SIZE_SMALL_TOOLBAR);
             action = g_action_map_lookup_action(action_map, entry->action);
-            if (action &&
-                (type = g_action_get_state_type(action)) &&
+            if (action != NULL &&
+                (type = g_action_get_state_type(action)) != NULL &&
                 g_variant_type_equal(type, G_VARIANT_TYPE_BOOLEAN)) {
-                item = gtk_toggle_tool_button_new();
-                g_object_set(item, "icon-widget", icon,
-                             "label", entry->action, NULL);
+                item = gtk_toggle_button_new();
             } else {
-                item = gtk_tool_button_new(icon, entry->action);
+                item = gtk_button_new();
             }
-            tm_set_tool_item_label(GTK_TOOL_ITEM(item), entry->icon,
-                                   make_two_line);
+
+            switch (model->style) {
+                GtkWidget *box;
+                GtkWidget *icon;
+                char *label;
+
+                case BALSA_TOOLBAR_ICONS:
+                    gtk_button_set_icon_name(GTK_BUTTON(item), entry->icon);
+                    break;
+
+                case BALSA_TOOLBAR_TEXT:
+                    label = tm_label(button, make_two_line);
+                    gtk_button_set_label(GTK_BUTTON(item), label);
+                    g_free(label);
+                    break;
+
+                case BALSA_TOOLBAR_BOTH_HORIZ:
+                    if (button >= 0 && !toolbar_buttons[button].is_important) {
+                        gtk_button_set_icon_name(GTK_BUTTON(item), entry->icon);
+                        break;
+                    } /* else fall through */
+
+                case BALSA_TOOLBAR_BOTH:
+                    box = gtk_box_new(model->style == BALSA_TOOLBAR_BOTH ?
+                                      GTK_ORIENTATION_VERTICAL : GTK_ORIENTATION_HORIZONTAL,
+                                      0);
+                    icon = gtk_image_new_from_icon_name(balsa_icon_id(entry->icon));
+                    gtk_image_set_icon_size(GTK_IMAGE(icon), GTK_ICON_SIZE_LARGE);
+                    gtk_box_append(GTK_BOX(box), icon);
+
+                    label = tm_label(button, make_two_line);
+                    gtk_box_append(GTK_BOX(box), gtk_label_new(label));
+                    g_free(label);
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (strcmp(toolbar_buttons[button].pixmap_id, BALSA_PIXMAP_SEND) == 0
+                && balsa_app.always_queue_sent_mail) {
+                gtk_widget_set_tooltip_text(item, _("Queue this message for sending"));
+            }
 
             prefixed_action =
                 g_strconcat(action ? "win." : "app.", entry->action, NULL);
@@ -582,14 +606,10 @@ tm_populate(GtkWidget * toolbar, BalsaToolbarModel * model)
                                            prefixed_action);
             g_free(prefixed_action);
         }
-        gtk_toolbar_insert((GtkToolbar *) toolbar, item, -1);
+        gtk_box_append(GTK_BOX(toolbar), item);
     }
 
-    gtk_toolbar_set_style(GTK_TOOLBAR(toolbar),
-                          model->style != (GtkToolbarStyle) (-1) ?
-                          model->style : tm_default_style());
-
-    gtk_widget_show_all(toolbar);
+    gtk_widget_show(toolbar);
 }
 
 /* Update a real toolbar when the model has changed.
@@ -628,13 +648,16 @@ tm_remove_underscore(const gchar * text)
     return r;
 }
 
+/*
+ * Context menu callbacks
+ */
 static void
 tm_set_style_changed(GSimpleAction *action,
                      GVariant      *parameter,
                      gpointer       user_data)
 {
     toolbar_info *info = user_data;
-    GtkToolbarStyle style;
+    BalsaToolbarStyle style;
 
     style = g_variant_get_int32(parameter);
     if (info->model->style != style) {
@@ -654,19 +677,17 @@ tm_customize_activated(GSimpleAction *action,
                        gpointer       user_data)
 {
     toolbar_info *info = user_data;
-    GtkWidget *toplevel;
+    GtkRoot *root;
 
-    toplevel = gtk_widget_get_toplevel(info->toolbar);
-    balsa_toolbar_customize(GTK_WINDOW(toplevel), info->model->type);
+    root = gtk_widget_get_root(info->toolbar);
+    balsa_toolbar_customize(GTK_WINDOW(root), info->model->type);
 }
 
-
-static gboolean
-tm_popup_context_menu_cb(GtkWidget    * toolbar,
-                         gint           x,
-                         gint           y,
-                         gint           button,
-                         toolbar_info * info)
+/*
+ * Context menu
+ */
+static void
+tm_popup_context_menu(toolbar_info *info, GdkEvent *event)
 {
     GSimpleActionGroup *simple;
     static const GActionEntry entries[] = {
@@ -677,9 +698,8 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
     GMenu *menu;
     GMenu *section;
     guint i;
-    GtkToolbarStyle default_style;
+    BalsaToolbarStyle default_style;
     GtkWidget *popup_menu;
-    GdkEvent *event;
 
     simple = g_simple_action_group_new();
     g_action_map_add_action_entries(G_ACTION_MAP(simple),
@@ -687,7 +707,7 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
                                     G_N_ELEMENTS(entries),
                                     info);
     set_style_action = g_action_map_lookup_action(G_ACTION_MAP(simple), "set-style");
-    gtk_widget_insert_action_group(toolbar, "toolbar", G_ACTION_GROUP(simple));
+    gtk_widget_insert_action_group(info->toolbar, "toolbar", G_ACTION_GROUP(simple));
     g_object_unref(simple);
 
     menu = g_menu_new();
@@ -745,7 +765,7 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
         }
     }
 
-    if (gtk_widget_is_sensitive(toolbar)) {
+    if (gtk_widget_is_sensitive(info->toolbar)) {
         /* This is a real toolbar, not the template from the
          * toolbar-prefs dialog. */
         section = g_menu_new();
@@ -756,29 +776,71 @@ tm_popup_context_menu_cb(GtkWidget    * toolbar,
         g_object_unref(section);
     }
 
-    popup_menu = libbalsa_popup_widget_new(toolbar, G_MENU_MODEL(menu), "toolbar");
+    popup_menu = libbalsa_popup_widget_new(info->toolbar, G_MENU_MODEL(menu), "toolbar");
 
     g_object_unref(menu);
     info->popup_menu = popup_menu;
 
-    event = gtk_get_current_event();
-
     libbalsa_popup_widget_popup(popup_menu, event);
     gtk_widget_set_sensitive(popup_menu, TRUE);
-
-    if (event != NULL)
-        gdk_event_free(event);
-
-    return TRUE;
 }
 
-GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
-                             GActionMap        * action_map)
+/*
+ * Toolbar callbacks
+ */
+static void
+tm_gesture_pressed(GtkGestureClick *click_gesture,
+                   gint             n_press,
+                   gdouble          x,
+                   gdouble          y,
+                   gpointer         user_data)
+{
+    toolbar_info *info = user_data;
+
+    if (n_press == 1) {
+        GtkGesture *gesture;
+        GdkEventSequence *sequence;
+        GdkEvent *event;
+
+        gesture  = GTK_GESTURE(click_gesture);
+        sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(gesture));
+        event    = gtk_gesture_get_last_event(gesture, sequence);
+
+        tm_popup_context_menu(info, event);
+    }
+}
+
+static gboolean
+tm_key_pressed(GtkEventControllerKey *controller,
+               guint                  keyval,
+               guint                  keycode,
+               GdkModifierType        state,
+               gpointer               user_data)
+{
+    toolbar_info *info = user_data;
+
+    if (keyval == GDK_KEY_F10 && (state & GDK_SHIFT_MASK) != 0) {
+        tm_popup_context_menu(info, NULL);
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+
+/*
+ * Create a toolbar
+ */
+GtkWidget *
+balsa_toolbar_new(BalsaToolbarModel * model,
+                  GActionMap        * action_map)
 {
     GtkWidget *toolbar;
     toolbar_info *info;
+    GtkGesture *gesture;
+    GtkEventController *key_controller;
 
-    toolbar = gtk_toolbar_new();
+    toolbar = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     g_object_set_data_full(G_OBJECT(toolbar), BALSA_TOOLBAR_ACTION_MAP,
                            g_object_ref(action_map),
                            (GDestroyNotify) g_object_unref);
@@ -789,13 +851,16 @@ GtkWidget *balsa_toolbar_new(BalsaToolbarModel * model,
     info->toolbar = toolbar;
 
     g_signal_connect(model, "changed", G_CALLBACK(tm_changed_cb), toolbar);
-    g_object_weak_ref(G_OBJECT(toolbar),
-                      (GWeakNotify) tm_toolbar_weak_notify, info);
+    g_object_weak_ref(G_OBJECT(toolbar), (GWeakNotify) tm_toolbar_weak_notify, info);
 
-    g_signal_connect(toolbar, "popup-context-menu",
-                     G_CALLBACK(tm_popup_context_menu_cb), info);
+    gesture = gtk_gesture_click_new();
+    gtk_widget_add_controller(toolbar, GTK_EVENT_CONTROLLER(gesture));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), GDK_BUTTON_SECONDARY);
+    g_signal_connect(gesture, "pressed", G_CALLBACK(tm_gesture_pressed), info);
 
-    gtk_widget_show_all(toolbar);
+    key_controller = gtk_event_controller_key_new();
+    gtk_widget_add_controller(toolbar, GTK_EVENT_CONTROLLER(key_controller));
+    g_signal_connect(key_controller, "key-pressed", G_CALLBACK(tm_key_pressed), info);
 
     return toolbar;
 }

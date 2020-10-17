@@ -1,5 +1,24 @@
 2020-10-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-index: Set the "icon-name" property of the
+	GtkCellRendererPixbufs instead of the "pixbuf" property.
+
+	* src/balsa-index.c (balsa_index_init): set the "icon-name" property;
+	* src/balsa-icons.c (balsa_register_pixbufs):
+	    register the address-view icons by name instead of pixbuf.
+	* libbalsa/mailbox.c (mailbox_model_init): the status and
+	    attachment columns are now strings, not pixbufs;
+	  (mailbox_model_get_value): ditto;
+	  (libbalsa_mailbox_set_unread_icon), (libbalsa_mailbox_set_trash_icon),
+	  (libbalsa_mailbox_set_flagged_icon), (libbalsa_mailbox_set_replied_icon),
+	  (libbalsa_mailbox_set_attach_icon), (libbalsa_mailbox_set_good_icon),
+	  (libbalsa_mailbox_set_notrust_icon), (libbalsa_mailbox_set_bad_icon),
+	  (libbalsa_mailbox_set_sign_icon), (libbalsa_mailbox_set_encr_icon):
+	    the parameter is a string, not a pixbuf;
+	* libbalsa/mailbox.h: ditto.
+
+2020-10-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	Address-view: Set the "icon-name" property of the
 	GtkCellRendererPixbufs instead of the "pixbuf" property.
 

@@ -186,59 +186,24 @@ balsa_unregister_pixmaps(void)
 void
 balsa_register_pixbufs(GtkWidget * widget)
 {
-    static struct {
-	void (*set_icon_pixbuf) (GdkPixbuf *);
-	const char *icon;
-    } icon_pixbufs[] = {
-	{libbalsa_mailbox_set_unread_icon,  BALSA_PIXMAP_INFO_NEW},
-	{libbalsa_mailbox_set_trash_icon,   BALSA_PIXMAP_INFO_DELETED},
-	{libbalsa_mailbox_set_flagged_icon, BALSA_PIXMAP_INFO_FLAGGED},
-	{libbalsa_mailbox_set_replied_icon, BALSA_PIXMAP_INFO_REPLIED},
-	{libbalsa_mailbox_set_attach_icon, BALSA_PIXMAP_INFO_ATTACHMENT},
-	{libbalsa_mailbox_set_good_icon, BALSA_PIXMAP_SIGN_GOOD},
-	{libbalsa_mailbox_set_notrust_icon, BALSA_PIXMAP_SIGN_NOTRUST},
-	{libbalsa_mailbox_set_bad_icon, BALSA_PIXMAP_SIGN_BAD},
-	{libbalsa_mailbox_set_sign_icon, BALSA_PIXMAP_SIGN},
-	{libbalsa_mailbox_set_encr_icon, BALSA_PIXMAP_ENCR},
-    };
+    /* Icons for mailbox status column: */
+    libbalsa_mailbox_set_unread_icon("mail-unread");
+    libbalsa_mailbox_set_replied_icon("mail-replied");
+    libbalsa_mailbox_set_trash_icon("edit-delete");
+    libbalsa_mailbox_set_flagged_icon("emblem-important");
 
-    static struct {
-	void (*set_icon_name) (const char *);
-	const char *icon;
-    } icon_names[] = {
-        {libbalsa_address_view_set_book_icon,  "stock_book_red"},
-        {libbalsa_address_view_set_close_icon, "window-close-symbolic"},
-        {libbalsa_address_view_set_drop_down_icon, "pan-down-symbolic"},
-    };
+    /* Icons for mailbox attachment column: */
+    libbalsa_mailbox_set_attach_icon("mail-attachment");
+    libbalsa_mailbox_set_good_icon("balsa-signature-good");
+    libbalsa_mailbox_set_notrust_icon("balsa-signature-notrust");
+    libbalsa_mailbox_set_bad_icon("balsa-signature-bad");
+    libbalsa_mailbox_set_sign_icon("balsa-signature-unknown");
+    libbalsa_mailbox_set_encr_icon("balsa-encrypted");
 
-    unsigned i;
-    GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
-
-    for (i = 0; i < G_N_ELEMENTS(icon_pixbufs); i++) {
-        GdkPixbuf *pixbuf;
-        GError *err = NULL;
-        int width, height;
-        const char *use_id = balsa_icon_id(icon_pixbufs[i].icon);
-
-        if (use_id == NULL) /* No icon table */
-            break;
-
-        gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &width, &height);
-        pixbuf =
-            gtk_icon_theme_load_icon(icon_theme, use_id, width,
-                                     GTK_ICON_LOOKUP_USE_BUILTIN, &err);
-        if (err) {
-            g_warning("%s %s size %d err %s", __func__, use_id,
-                    width, err->message);
-            g_clear_error(&err);
-        } else {
-            icon_pixbufs[i].set_icon_pixbuf(pixbuf);
-        }
-    }
-
-    for (i = 0; i < G_N_ELEMENTS(icon_names); i++) {
-        icon_names[i].set_icon_name(icon_names[i].icon);
-    }
+    /* Icons for address-view: */
+    libbalsa_address_view_set_book_icon("stock_book_red");
+    libbalsa_address_view_set_close_icon("window-close-symbolic");
+    libbalsa_address_view_set_drop_down_icon("pan-down-symbolic");
 }
 
 const gchar *

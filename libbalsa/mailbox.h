@@ -532,16 +532,16 @@ gboolean libbalsa_mailbox_msgno_has_flags(LibBalsaMailbox * mailbox,
                                           LibBalsaMessageFlag unset);
 
 /* set icons */
-void libbalsa_mailbox_set_unread_icon(GdkPixbuf * pixbuf);
-void libbalsa_mailbox_set_trash_icon(GdkPixbuf * pixbuf);
-void libbalsa_mailbox_set_flagged_icon(GdkPixbuf * pixbuf);
-void libbalsa_mailbox_set_replied_icon(GdkPixbuf * pixbuf);
-void libbalsa_mailbox_set_attach_icon(GdkPixbuf * pixbuf);
-void libbalsa_mailbox_set_good_icon(GdkPixbuf * pixbuf);
-void libbalsa_mailbox_set_notrust_icon(GdkPixbuf * pixbuf);
-void libbalsa_mailbox_set_bad_icon(GdkPixbuf * pixbuf);
-void libbalsa_mailbox_set_sign_icon(GdkPixbuf * pixbuf);
-void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf);
+void libbalsa_mailbox_set_unread_icon(const char *name);
+void libbalsa_mailbox_set_trash_icon(const char *name);
+void libbalsa_mailbox_set_flagged_icon(const char *name);
+void libbalsa_mailbox_set_replied_icon(const char *name);
+void libbalsa_mailbox_set_attach_icon(const char *name);
+void libbalsa_mailbox_set_good_icon(const char *name);
+void libbalsa_mailbox_set_notrust_icon(const char *name);
+void libbalsa_mailbox_set_bad_icon(const char *name);
+void libbalsa_mailbox_set_sign_icon(const char *name);
+void libbalsa_mailbox_set_encr_icon(const char *name);
 
 /* Partial messages */
 void libbalsa_mailbox_try_reassemble(LibBalsaMailbox * mailbox,

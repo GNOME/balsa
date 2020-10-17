@@ -384,7 +384,7 @@ balsa_index_init(BalsaIndex * index)
     gtk_cell_renderer_set_fixed_size(renderer, -1, height);
     column = gtk_tree_view_column_new_with_attributes
         ("S", renderer,
-         "pixbuf",              LB_MBOX_MARKED_COL,
+         "icon-name",           LB_MBOX_MARKED_COL,
          "cell-background",     LB_MBOX_BACKGROUND_COL,
          "cell-background-set", LB_MBOX_BACKGROUND_SET_COL,
          NULL);
@@ -396,7 +396,7 @@ balsa_index_init(BalsaIndex * index)
     gtk_cell_renderer_set_fixed_size(renderer, -1, height);
     column = gtk_tree_view_column_new_with_attributes
         ("A", renderer,
-         "pixbuf",              LB_MBOX_ATTACH_COL,
+         "icon-name",           LB_MBOX_ATTACH_COL,
          "cell-background",     LB_MBOX_BACKGROUND_COL,
          "cell-background-set", LB_MBOX_BACKGROUND_SET_COL,
          NULL);

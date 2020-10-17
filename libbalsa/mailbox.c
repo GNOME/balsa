@@ -2971,8 +2971,8 @@ mailbox_model_init(GtkTreeModelIface *iface)
     iface->iter_parent     = mailbox_model_iter_parent;
 
     mailbox_model_col_type[LB_MBOX_MSGNO_COL]   = G_TYPE_UINT;
-    mailbox_model_col_type[LB_MBOX_MARKED_COL]  = GDK_TYPE_PIXBUF;
-    mailbox_model_col_type[LB_MBOX_ATTACH_COL]  = GDK_TYPE_PIXBUF;
+    mailbox_model_col_type[LB_MBOX_MARKED_COL]  = G_TYPE_STRING;
+    mailbox_model_col_type[LB_MBOX_ATTACH_COL]  = G_TYPE_STRING;
     mailbox_model_col_type[LB_MBOX_FROM_COL]    = G_TYPE_STRING;
     mailbox_model_col_type[LB_MBOX_SUBJECT_COL] = G_TYPE_STRING;
     mailbox_model_col_type[LB_MBOX_DATE_COL]    = G_TYPE_STRING;
@@ -3096,8 +3096,8 @@ mailbox_model_get_path(GtkTreeModel * tree_model, GtkTreeIter * iter)
   message failed.
 */
 
-static GdkPixbuf *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
-static GdkPixbuf *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
+static const char *status_icons[LIBBALSA_MESSAGE_STATUS_ICONS_NUM];
+static const char *attach_icons[LIBBALSA_MESSAGE_ATTACH_ICONS_NUM];
 
 
 /* Protects access to priv->msgnos_pending; */
@@ -3220,11 +3220,11 @@ mailbox_model_get_value(GtkTreeModel *tree_model,
         /* case LB_MBOX_MSGNO_COL: handled above */
     case LB_MBOX_MARKED_COL:
         if (msg && msg->status_icon < LIBBALSA_MESSAGE_STATUS_ICONS_NUM)
-            g_value_set_object(value, status_icons[msg->status_icon]);
+            g_value_set_static_string(value, status_icons[msg->status_icon]);
         break;
     case LB_MBOX_ATTACH_COL:
         if (msg && msg->attach_icon < LIBBALSA_MESSAGE_ATTACH_ICONS_NUM)
-            g_value_set_object(value, attach_icons[msg->attach_icon]);
+            g_value_set_static_string(value, attach_icons[msg->attach_icon]);
         break;
     case LB_MBOX_FROM_COL:
 	if(msg) {
@@ -3411,86 +3411,57 @@ mailbox_model_iter_parent(GtkTreeModel     * tree_model,
         return FALSE;
 }
 
-/* Set icons used in tree view. */
-static void
-libbalsa_mailbox_set_icon(GdkPixbuf * pixbuf, GdkPixbuf ** pixbuf_store)
-{
-    if (*pixbuf_store)
-        g_object_unref(*pixbuf_store);
-    *pixbuf_store = pixbuf;
-}
-
 /* Icons for status column. */
 void
-libbalsa_mailbox_set_unread_icon(GdkPixbuf * pixbuf)
+libbalsa_mailbox_set_unread_icon(const char *name)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &status_icons
-                              [LIBBALSA_MESSAGE_STATUS_UNREAD]);
+    status_icons[LIBBALSA_MESSAGE_STATUS_UNREAD] = name;
 }
 
-void libbalsa_mailbox_set_trash_icon(GdkPixbuf * pixbuf)
+void libbalsa_mailbox_set_trash_icon(const char *name)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &status_icons
-                              [LIBBALSA_MESSAGE_STATUS_DELETED]);
+    status_icons[LIBBALSA_MESSAGE_STATUS_DELETED] = name;
 }
 
-void libbalsa_mailbox_set_flagged_icon(GdkPixbuf * pixbuf)
+void libbalsa_mailbox_set_flagged_icon(const char *name)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &status_icons
-                              [LIBBALSA_MESSAGE_STATUS_FLAGGED]);
+    status_icons[LIBBALSA_MESSAGE_STATUS_FLAGGED] = name;
 }
 
-void libbalsa_mailbox_set_replied_icon(GdkPixbuf * pixbuf)
+void libbalsa_mailbox_set_replied_icon(const char *name)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &status_icons
-                              [LIBBALSA_MESSAGE_STATUS_REPLIED]);
+    status_icons[LIBBALSA_MESSAGE_STATUS_REPLIED] = name;
 }
 
 /* Icons for attachment column. */
-void libbalsa_mailbox_set_attach_icon(GdkPixbuf * pixbuf)
+void libbalsa_mailbox_set_attach_icon(const char *name)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_ATTACH]);
+    attach_icons[LIBBALSA_MESSAGE_ATTACH_ATTACH] = name;
 }
 
-void libbalsa_mailbox_set_good_icon(GdkPixbuf * pixbuf)
+void libbalsa_mailbox_set_good_icon(const char *name)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_GOOD]);
+    attach_icons[LIBBALSA_MESSAGE_ATTACH_GOOD] = name;
 }
 
-void libbalsa_mailbox_set_notrust_icon(GdkPixbuf * pixbuf)
+void libbalsa_mailbox_set_notrust_icon(const char *name)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_NOTRUST]);
+    attach_icons[LIBBALSA_MESSAGE_ATTACH_NOTRUST] = name;
 }
 
-void libbalsa_mailbox_set_bad_icon(GdkPixbuf * pixbuf)
+void libbalsa_mailbox_set_bad_icon(const char *name)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_BAD]);
+    attach_icons[LIBBALSA_MESSAGE_ATTACH_BAD] = name;
 }
 
-void libbalsa_mailbox_set_sign_icon(GdkPixbuf * pixbuf)
+void libbalsa_mailbox_set_sign_icon(const char *name)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_SIGN]);
+    attach_icons[LIBBALSA_MESSAGE_ATTACH_SIGN] = name;
 }
 
-void libbalsa_mailbox_set_encr_icon(GdkPixbuf * pixbuf)
+void libbalsa_mailbox_set_encr_icon(const char *name)
 {
-    libbalsa_mailbox_set_icon(pixbuf,
-                              &attach_icons
-                              [LIBBALSA_MESSAGE_ATTACH_ENCR]);
+    attach_icons[LIBBALSA_MESSAGE_ATTACH_ENCR] = name;
 }
 
 /* =================================================================== *

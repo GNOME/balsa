@@ -2269,14 +2269,14 @@ balsa_window_new(GtkApplication *application)
     GtkAdjustment *hadj, *vadj;
     GAction *action;
 
-    /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
-     * - allows for grey out */
-    balsa_register_pixmaps();
-
     window = g_object_new(BALSA_TYPE_WINDOW,
                           "application", application,
                           NULL);
     priv = balsa_window_get_instance_private(window);
+
+    /* Call to register custom balsa pixmaps with GNOME_STOCK_PIXMAPS
+     * - allows for grey out */
+    balsa_register_pixmaps(window);
 
     priv->vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_show(priv->vbox);

@@ -2228,7 +2228,7 @@ balsa_window_new(GtkApplication *application)
     bw_set_alt_bindings(window);
 
     gtk_window_set_title(GTK_WINDOW(window), "Balsa");
-    balsa_register_pixbufs(GTK_WIDGET(window));
+    balsa_register_icon_names();
 
     model = balsa_window_get_toolbar_model();
 

@@ -184,7 +184,7 @@ balsa_unregister_pixmaps(void)
 }
 
 void
-balsa_register_pixbufs(GtkWidget * widget)
+balsa_register_icon_names(void)
 {
     /* Icons for mailbox status column: */
     libbalsa_mailbox_set_unread_icon("mail-unread");

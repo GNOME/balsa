@@ -1,5 +1,15 @@
 2020-10-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	balsa-icons: rename balsa_register_pixbufs()
+
+	to balsa_register_icon_names(), and drop its now unused parameter.
+
+	* src/balsa-icons.c (balsa_register_icon_names):
+	* src/balsa-icons.h:
+	* src/main-window.c (balsa_window_new):
+
+2020-10-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	balsa-index: Set the "icon-name" property of the
 	GtkCellRendererPixbufs instead of the "pixbuf" property.
 

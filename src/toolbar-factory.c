@@ -862,5 +862,7 @@ balsa_toolbar_new(BalsaToolbarModel * model,
     gtk_widget_add_controller(toolbar, GTK_EVENT_CONTROLLER(key_controller));
     g_signal_connect(key_controller, "key-pressed", G_CALLBACK(tm_key_pressed), info);
 
+    gtk_widget_add_css_class(toolbar, "toolbar");
+
     return toolbar;
 }

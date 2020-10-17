@@ -1,3 +1,18 @@
+2020-10-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Address-view: Set the "icon-name" property of the
+	GtkCellRendererPixbufs instead of the "pixbuf" property.
+
+	* libbalsa/address-view.c (lbav_button_activated), (libbalsa_address_view_new):
+	  the icon column is now G_TYPE_STRING instead of GDK_TYPE_PIXBUF;
+	(libbalsa_address_view_set_book_icon),
+	(libbalsa_address_view_set_close_icon),
+	(libbalsa_address_view_set_drop_down_icon): the parameter is a
+	  string, not a pixbuf;
+	* libbalsa/address-view.h: ditto;
+	* src/balsa-icons.c (balsa_register_pixmaps),
+	(balsa_register_pixbufs): register the address-view icons by name instead of pixbuf.
+
 2020-09-23  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Remove LibBalsaCellRendererButton

@@ -62,9 +62,9 @@ InternetAddressList *libbalsa_address_view_get_list(LibBalsaAddressView *
                                                     const gchar *
                                                     address_type);
 
-void libbalsa_address_view_set_book_icon(GdkPixbuf * book_icon);
-void libbalsa_address_view_set_close_icon(GdkPixbuf * close_icon);
-void libbalsa_address_view_set_drop_down_icon(GdkPixbuf * drop_down_icon);
+void libbalsa_address_view_set_book_icon(const char * book_icon);
+void libbalsa_address_view_set_close_icon(const char * close_icon);
+void libbalsa_address_view_set_drop_down_icon(const char * drop_down_icon);
 
 G_END_DECLS
 #endif                          /* __LIBBALSA_ADDRESS_VIEW_H__ */

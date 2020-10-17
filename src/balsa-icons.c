@@ -131,7 +131,6 @@ balsa_register_pixmaps(void)
 	/* the following book icons aren't strictly necessary as Gnome provides
 	   them. However, this simplifies porting balsa if the Gnome libs
 	   aren't present... */
-        { BALSA_PIXMAP_BOOK_RED,        "stock_book_red" },
         { BALSA_PIXMAP_BOOK_YELLOW,     "stock_book_yellow" },
         { BALSA_PIXMAP_BOOK_GREEN,      "stock_book_green" },
         { BALSA_PIXMAP_BOOK_BLUE,       "stock_book_blue" },
@@ -162,9 +161,6 @@ balsa_register_pixmaps(void)
         { BALSA_PIXMAP_INFO_REPLIED,    "mail-replied" },
         { BALSA_PIXMAP_INFO_NEW,        "mail-unread" },
 	{ BALSA_PIXMAP_INFO_FLAGGED,    "emblem-important" },
-
-        /* drop-down icon for the address-view (16x16) */
-	{ BALSA_PIXMAP_DROP_DOWN,       "pan-down-symbolic" },
 	};
 
     unsigned i;
@@ -191,32 +187,38 @@ void
 balsa_register_pixbufs(GtkWidget * widget)
 {
     static struct {
-	void (*set_icon) (GdkPixbuf *);
-	const gchar *icon;
-    } icons[] = {
-	{
-	libbalsa_mailbox_set_unread_icon,  BALSA_PIXMAP_INFO_NEW}, {
-	libbalsa_mailbox_set_trash_icon,   BALSA_PIXMAP_INFO_DELETED}, {
-	libbalsa_mailbox_set_flagged_icon, BALSA_PIXMAP_INFO_FLAGGED}, {
-	libbalsa_mailbox_set_replied_icon, BALSA_PIXMAP_INFO_REPLIED}, {
-	libbalsa_mailbox_set_attach_icon, BALSA_PIXMAP_INFO_ATTACHMENT}, {
-	libbalsa_mailbox_set_good_icon, BALSA_PIXMAP_SIGN_GOOD}, {
-	libbalsa_mailbox_set_notrust_icon, BALSA_PIXMAP_SIGN_NOTRUST}, {
-	libbalsa_mailbox_set_bad_icon, BALSA_PIXMAP_SIGN_BAD}, {
-	libbalsa_mailbox_set_sign_icon, BALSA_PIXMAP_SIGN}, {
-	libbalsa_mailbox_set_encr_icon, BALSA_PIXMAP_ENCR}, {
-        libbalsa_address_view_set_book_icon,  BALSA_PIXMAP_BOOK_RED}, {
-        libbalsa_address_view_set_close_icon, "window-close-symbolic"}, {
-        libbalsa_address_view_set_drop_down_icon, BALSA_PIXMAP_DROP_DOWN},
+	void (*set_icon_pixbuf) (GdkPixbuf *);
+	const char *icon;
+    } icon_pixbufs[] = {
+	{libbalsa_mailbox_set_unread_icon,  BALSA_PIXMAP_INFO_NEW},
+	{libbalsa_mailbox_set_trash_icon,   BALSA_PIXMAP_INFO_DELETED},
+	{libbalsa_mailbox_set_flagged_icon, BALSA_PIXMAP_INFO_FLAGGED},
+	{libbalsa_mailbox_set_replied_icon, BALSA_PIXMAP_INFO_REPLIED},
+	{libbalsa_mailbox_set_attach_icon, BALSA_PIXMAP_INFO_ATTACHMENT},
+	{libbalsa_mailbox_set_good_icon, BALSA_PIXMAP_SIGN_GOOD},
+	{libbalsa_mailbox_set_notrust_icon, BALSA_PIXMAP_SIGN_NOTRUST},
+	{libbalsa_mailbox_set_bad_icon, BALSA_PIXMAP_SIGN_BAD},
+	{libbalsa_mailbox_set_sign_icon, BALSA_PIXMAP_SIGN},
+	{libbalsa_mailbox_set_encr_icon, BALSA_PIXMAP_ENCR},
     };
-    guint i;
+
+    static struct {
+	void (*set_icon_name) (const char *);
+	const char *icon;
+    } icon_names[] = {
+        {libbalsa_address_view_set_book_icon,  "stock_book_red"},
+        {libbalsa_address_view_set_close_icon, "window-close-symbolic"},
+        {libbalsa_address_view_set_drop_down_icon, "pan-down-symbolic"},
+    };
+
+    unsigned i;
     GtkIconTheme *icon_theme = gtk_icon_theme_get_default();
 
-    for (i = 0; i < G_N_ELEMENTS(icons); i++) {
+    for (i = 0; i < G_N_ELEMENTS(icon_pixbufs); i++) {
         GdkPixbuf *pixbuf;
         GError *err = NULL;
-        gint width, height;
-        const gchar *use_id = balsa_icon_id(icons[i].icon);
+        int width, height;
+        const char *use_id = balsa_icon_id(icon_pixbufs[i].icon);
 
         if (use_id == NULL) /* No icon table */
             break;
@@ -230,8 +232,12 @@ balsa_register_pixbufs(GtkWidget * widget)
                     width, err->message);
             g_clear_error(&err);
         } else {
-            icons[i].set_icon(pixbuf);
+            icon_pixbufs[i].set_icon_pixbuf(pixbuf);
         }
+    }
+
+    for (i = 0; i < G_N_ELEMENTS(icon_names); i++) {
+        icon_names[i].set_icon_name(icon_names[i].icon);
     }
 }
 

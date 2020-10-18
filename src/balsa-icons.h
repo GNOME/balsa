@@ -91,7 +91,7 @@
 
 #define BALSA_PIXMAP_DROP_DOWN                  "balsa_drop_down"
 
-void balsa_register_pixmaps(void);
+void balsa_register_pixmaps(GtkWidget *widget);
 void balsa_unregister_pixmaps(void);
 void balsa_register_icon_names(void);
 const gchar * balsa_icon_id(const gchar * name);

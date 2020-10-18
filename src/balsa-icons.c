@@ -93,7 +93,7 @@ load_balsa_pixmap(GtkIconTheme *icon_theme, const balsa_pixmap_t *bpixmap)
 }
 
 void
-balsa_register_pixmaps(BalsaWindow *window)
+balsa_register_pixmaps(GtkWidget *window)
 {
     const balsa_pixmap_t balsa_icons[] = {
 	/* icons for buttons and menus (24x24 and 16x16) */
@@ -165,11 +165,11 @@ balsa_register_pixmaps(BalsaWindow *window)
 
     unsigned i;
     GtkIconTheme *icon_theme =
-        gtk_icon_theme_get_for_display(gtk_widget_get_display(GTK_WIDGET(window)));
+        gtk_icon_theme_get_for_display(gtk_widget_get_display(window));
 
     balsa_icon_table =
         g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-    gtk_icon_theme_append_search_path(icon_theme, BALSA_DATA_PREFIX);
+    gtk_icon_theme_add_search_path(icon_theme, BALSA_DATA_PREFIX);
 
     for (i = 0; i < G_N_ELEMENTS(balsa_icons); i++)
 	load_balsa_pixmap(icon_theme, balsa_icons + i);

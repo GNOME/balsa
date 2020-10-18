@@ -73,10 +73,10 @@ struct ABMainWindow {
 
 
 static void
-bab_cleanup(void)
+bab_cleanup(GApplication *application)
 {
     g_object_unref(contacts_app.books_menu);
-    gtk_main_quit();
+    g_application_quit(application);
 }
 
 static void ab_set_edit_widget(LibBalsaAddress * address,
@@ -470,7 +470,7 @@ file_quit_activated(GSimpleAction * action,
                     GVariant      * state,
                     gpointer        user_data)
 {
-    gtk_main_quit();
+    gtk_window_destroy(contacts_app.window);
 }
 
 static void
@@ -1137,6 +1137,7 @@ main(int argc, char *argv[])
     GtkWidget *ab_window;
     GList *l;
     GError *error = NULL;
+    int retval;
 
     application =
         gtk_application_new("org.desktop.BalsaAb", G_APPLICATION_FLAGS_NONE);
@@ -1181,15 +1182,15 @@ main(int argc, char *argv[])
     ab_window = bab_window_new(application);
 
     g_signal_connect(ab_window, "destroy",
-                     G_CALLBACK(bab_cleanup), NULL);
+                     G_CALLBACK(bab_cleanup), application);
     bab_set_intial_address_book(ab, ab_window);
 
     /* session management */
 
-    gtk_widget_show_all(ab_window);
+    gtk_widget_show(ab_window);
     gtk_widget_hide(contacts_app.edit_widget);
 
-    gtk_main();
+    retval = g_application_run(G_APPLICATION(application), argc, argv);
 
     /* Proper shutdown here */
     for (l = contacts_app.address_book_list; l; l = l->next)
@@ -1197,5 +1198,5 @@ main(int argc, char *argv[])
             g_object_unref(l->data);
     g_list_free(contacts_app.address_book_list);
 
-    return 0;
+    return retval;
 }

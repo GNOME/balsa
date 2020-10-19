@@ -62,7 +62,6 @@
 
 /* gtk widget */
 static void bndx_destroy(GObject * obj);
-static gboolean bndx_popup_menu(GtkWidget * widget);
 
 /* statics */
 
@@ -80,11 +79,11 @@ static void bndx_mailbox_changed_cb(LibBalsaMailbox * mailbox,
 /* GtkTree* callbacks */
 static void bndx_selection_changed(GtkTreeSelection * selection,
                                    BalsaIndex * index);
-static void bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press_gesture,
-                                    gint                  n_press,
-                                    gdouble               x,
-                                    gdouble               y,
-                                    gpointer              user_data);
+static void bndx_gesture_pressed_cb(GtkGestureClick *click_gesture,
+                                    gint             n_press,
+                                    gdouble          x,
+                                    gdouble          y,
+                                    gpointer         user_data);
 static void bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
                                GtkTreeViewColumn * column,
                                gpointer user_data);
@@ -101,25 +100,10 @@ static void bndx_tree_collapse_cb(GtkTreeView * tree_view,
                                   GtkTreeIter * iter, GtkTreePath * path,
                                   gpointer user_data);
 
-/* formerly balsa-index-page stuff */
-enum {
-    TARGET_MESSAGES
-};
-
-static GtkTargetEntry index_drag_types[] = {
-    {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
-};
-
-static void bndx_drag_cb(GtkWidget* widget,
-                         GdkDragContext* drag_context,
-                         GtkSelectionData* data,
-                         guint info,
-                         guint time,
-                         gpointer user_data);
 
 /* Popup menu */
 static void bndx_popup_menu_create(BalsaIndex * index);
-static void bndx_do_popup(BalsaIndex * index, const GdkEvent *event);
+static void bndx_do_popup(BalsaIndex * index, GdkEvent *event);
 
 static void sendmsg_window_destroy_cb(GtkWidget * widget, gpointer data);
 
@@ -172,6 +156,8 @@ struct _BalsaIndex {
     LibBalsaMailboxSearchIter *search_iter;
     BalsaIndexWidthPreference width_preference;
 
+    GActionMap *popup_actions;
+
     /* Ephemera: used by idle handlers */
     GtkTreeRowReference *reference;
     guint row_inserted_msgno;
@@ -185,10 +171,8 @@ static void
 balsa_index_class_init(BalsaIndexClass * klass)
 {
     GObjectClass *object_class;
-    GtkWidgetClass *widget_class;
 
     object_class = (GObjectClass *) klass;
-    widget_class = (GtkWidgetClass *) klass;
 
     balsa_index_signals[INDEX_CHANGED] =
         g_signal_new("index-changed",
@@ -200,7 +184,6 @@ balsa_index_class_init(BalsaIndexClass * klass)
                      G_TYPE_NONE, 0);
 
     object_class->dispose = bndx_destroy;
-    widget_class->popup_menu = bndx_popup_menu;
 }
 
 /* Object class destroy method. */
@@ -209,7 +192,7 @@ bndx_mbnode_weak_notify(gpointer data, GObject *where_the_object_was)
 {
     BalsaIndex *bindex = data;
     bindex->mailbox_node = NULL;
-    gtk_widget_destroy(GTK_WIDGET(bindex));
+    gtk_window_destroy(GTK_WINDOW(bindex));
 }
 
 static void
@@ -276,27 +259,17 @@ bndx_destroy(GObject * obj)
         bindex->reference = NULL;
     }
 
-    if (bindex->popup_menu != NULL) {
-        g_object_unref(bindex->popup_menu);
-        bindex->popup_menu = NULL;
-    }
+    g_clear_object(&bindex->popup_actions);
+    g_clear_object(&bindex->popup_menu);
 
     G_OBJECT_CLASS(balsa_index_parent_class)->dispose(obj);
-}
-
-/* Widget class popup menu method. */
-static gboolean
-bndx_popup_menu(GtkWidget * widget)
-{
-    bndx_do_popup(BALSA_INDEX(widget), NULL);
-    return TRUE;
 }
 
 static void
 bi_apply_other_column_settings(GtkTreeViewColumn *column,
                                gboolean sortable, gint typeid)
 {
-    if(sortable)
+    if (sortable)
         gtk_tree_view_column_set_sort_column_id(column, typeid);
 
     gtk_tree_view_column_set_alignment(column, 0.5);
@@ -306,25 +279,45 @@ bi_apply_other_column_settings(GtkTreeViewColumn *column,
 #endif
 }
 
-/* Height and width of a string in pixels for the default font. */
-static GtkAllocation
-bndx_string_extent(const gchar * text)
+/* Height or width of a string in pixels for the default font. */
+static int
+bndx_string_extent(const char * text, GtkOrientation orientation)
 {
     GtkWidget *label;
-    GtkWidget *window;
-    GtkAllocation allocation;
+    int natural;
 
     label = gtk_label_new(NULL);
     gtk_label_set_markup((GtkLabel *) label, text);
+    gtk_widget_measure(label, orientation, 300, NULL, &natural, NULL, NULL);
+    g_object_ref_sink(label);
+    g_object_unref(label);
 
-    window = gtk_offscreen_window_new();
-    gtk_container_add(GTK_CONTAINER(window), label);
-    gtk_widget_show_all(window);
+    return natural;
+}
 
-    gtk_widget_get_allocation(window, &allocation);
-    gtk_widget_destroy(window);
+/*
+ * popup menu signals
+ */
 
-    return allocation;
+static gboolean
+bndx_key_pressed_cb(GtkEventControllerKey *controller,
+                    guint                  keyval,
+                    guint                  keycode,
+                    GdkModifierType        state,
+                    gpointer               user_data)
+{
+    if (keyval == GDK_KEY_F10 && (state & GDK_SHIFT_MASK) != 0) {
+        BalsaIndex *bindex = user_data;
+        GdkEvent *event;
+
+        event = gtk_event_controller_get_current_event(GTK_EVENT_CONTROLLER(controller));
+
+        bndx_do_popup(bindex, event);
+
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 /* BalsaIndex instance init method; no tree store is set on the tree
@@ -337,6 +330,7 @@ balsa_index_init(BalsaIndex * index)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkGesture *gesture;
+    GtkEventController *controller;
     gint height;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
@@ -344,13 +338,7 @@ balsa_index_init(BalsaIndex * index)
 
     /* hack: calculate the fixed cell renderer height as to work around the automatic calculation being confused by bold and/or
      * italics: round to 1.25 times the height of a utf8 char with ascender and descender; be sure to fit the Menu size icon */
-    height = (gint) (bndx_string_extent("<b>▓</b>").height * 1.25F + 0.5F);
-    {
-    	gint icon_height;
-
-    	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, NULL, &icon_height);
-    	height = MAX(height, icon_height);
-    }
+    height = (gint) (bndx_string_extent("<b>▓</b>", GTK_ORIENTATION_VERTICAL) * 1.25F + 0.5F);
     g_debug("%s: force cell height %d", __func__, height);
 #else
     height = -1:		/* automatic calculation */
@@ -454,7 +442,8 @@ balsa_index_init(BalsaIndex * index)
     g_object_set(renderer, "xalign", 1.0, NULL);
     /* get a better guess: */
     gtk_cell_renderer_set_fixed_size(renderer,
-    	bndx_string_extent("<b>99.9M</b>").width, height);
+                                     bndx_string_extent("<b>99.9M</b>", GTK_ORIENTATION_HORIZONTAL),
+                                     height);
     gtk_tree_view_column_pack_start(column, renderer, FALSE);
     gtk_tree_view_column_set_attributes
         (column, renderer,
@@ -483,7 +472,9 @@ balsa_index_init(BalsaIndex * index)
 
     /* we want to handle button presses to pop up context menus if
      * necessary */
-    gesture = gtk_gesture_multi_press_new(GTK_WIDGET(index));
+    gesture = gtk_gesture_click_new();
+    gtk_widget_add_controller(GTK_WIDGET(index), GTK_EVENT_CONTROLLER(gesture));
+
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
     g_signal_connect(gesture, "pressed",
                      G_CALLBACK(bndx_gesture_pressed_cb), index);
@@ -491,6 +482,12 @@ balsa_index_init(BalsaIndex * index)
 
     g_signal_connect(tree_view, "row-activated",
 		     G_CALLBACK(bndx_row_activated), NULL);
+
+    /* we also want to handle key presses (shift-F10) to pop up context menus if
+     * necessary, now that GtkWidget::popup_menu has gone away. */
+    controller = gtk_event_controller_key_new();
+    gtk_widget_add_controller(GTK_WIDGET(index), GTK_EVENT_CONTROLLER(controller));
+    g_signal_connect(controller, "key-pressed", G_CALLBACK(bndx_key_pressed_cb), index);
 
     /* catch thread expand events */
     index->row_expanded_id =
@@ -507,14 +504,6 @@ balsa_index_init(BalsaIndex * index)
                            G_CALLBACK(bndx_column_resize),
                            NULL);
     gtk_tree_view_set_enable_search(tree_view, FALSE);
-
-    gtk_drag_source_set(GTK_WIDGET (index),
-                        GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK,
-                        index_drag_types, G_N_ELEMENTS(index_drag_types),
-                        GDK_ACTION_DEFAULT | GDK_ACTION_COPY |
-                        GDK_ACTION_MOVE);
-    g_signal_connect(index, "drag-data-get",
-                     G_CALLBACK(bndx_drag_cb), NULL);
 
     balsa_index_set_column_widths(index);
 }
@@ -644,27 +633,26 @@ bndx_selection_changed(GtkTreeSelection * selection, BalsaIndex * bindex)
 }
 
 static void
-bndx_gesture_pressed_cb(GtkGestureMultiPress *multi_press_gesture,
-                        gint                  n_press,
-                        gdouble               x,
-                        gdouble               y,
-                        gpointer              user_data)
+bndx_gesture_pressed_cb(GtkGestureClick *click_gesture,
+                        gint             n_press,
+                        gdouble          x,
+                        gdouble          y,
+                        gpointer         user_data)
 {
     BalsaIndex *bindex = user_data;
     GtkTreeView *tree_view = GTK_TREE_VIEW(bindex);
     GtkGesture *gesture;
     GdkEventSequence *sequence;
-    const GdkEvent *event;
+    GdkEvent *event;
     gint bx;
     gint by;
     GtkTreePath *path;
 
-    gesture  = GTK_GESTURE(multi_press_gesture);
-    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press_gesture));
+    gesture  = GTK_GESTURE(click_gesture);
+    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(gesture));
     event    = gtk_gesture_get_last_event(gesture, sequence);
 
-    if (!gdk_event_triggers_context_menu(event)
-        || gdk_event_get_window(event) != gtk_tree_view_get_bin_window(tree_view))
+    if (!gdk_event_triggers_context_menu(event))
         return;
 
     gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (gint) x, (gint) y,
@@ -810,28 +798,6 @@ bndx_column_resize(GtkWidget * widget, GtkAllocation * allocation,
                                        (tree_view, LB_MBOX_SIZE_COL));
 }
 
-/* bndx_drag_cb
- *
- * This is the drag_data_get callback for the index widgets.
- * Currently supports DND only within the application.
- */
-static void
-bndx_drag_cb(GtkWidget * widget, GdkDragContext * drag_context,
-             GtkSelectionData * data, guint info, guint time,
-             gpointer user_data)
-{
-    BalsaIndex *index;
-
-    g_return_if_fail(widget != NULL);
-
-    index = BALSA_INDEX(widget);
-
-    if (gtk_tree_selection_count_selected_rows
-        (gtk_tree_view_get_selection(GTK_TREE_VIEW(index))) > 0)
-        gtk_selection_data_set(data, gtk_selection_data_get_target(data),
-                               8, (const guchar *) &index,
-                               sizeof(BalsaIndex *));
-}
 
 /* Public methods */
 GtkWidget *
@@ -1466,31 +1432,21 @@ void
 balsa_index_set_column_widths(BalsaIndex * index)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(index);
-    gint icon_w;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
     /* so that fixed width works properly */
-    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
-                                         (tree_view, LB_MBOX_MSGNO_COL),
-										 bndx_string_extent("00000").width);
+    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column(tree_view, LB_MBOX_MSGNO_COL),
+                                         bndx_string_extent("00000", GTK_ORIENTATION_HORIZONTAL));
 #endif
     /* I have no idea why we must add 5 pixels to the icon width - otherwise,
        the icon will be clipped... */
-    gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, &icon_w, NULL);
-    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
-                                         (tree_view, LB_MBOX_MARKED_COL),
-                                         icon_w + 5);
-    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
-                                         (tree_view, LB_MBOX_ATTACH_COL),
-                                         icon_w + 5);
-    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
-                                         (tree_view, LB_MBOX_FROM_COL),
+    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column(tree_view, LB_MBOX_MARKED_COL), 21);
+    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column(tree_view, LB_MBOX_ATTACH_COL), 21);
+    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column(tree_view, LB_MBOX_FROM_COL),
                                          balsa_app.index_from_width);
-    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
-                                         (tree_view, LB_MBOX_SUBJECT_COL),
+    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column(tree_view, LB_MBOX_SUBJECT_COL),
                                          balsa_app.index_subject_width);
-    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column
-                                         (tree_view, LB_MBOX_DATE_COL),
+    gtk_tree_view_column_set_fixed_width(gtk_tree_view_get_column(tree_view, LB_MBOX_DATE_COL),
                                          balsa_app.index_date_width);
 }
 
@@ -1539,7 +1495,7 @@ bndx_mailbox_changed_idle(BalsaIndex * bindex)
 static void
 bndx_mailbox_changed_cb(LibBalsaMailbox * mailbox, BalsaIndex * bindex)
 {
-    if (!gtk_widget_get_window(GTK_WIDGET(bindex)))
+    if (!gtk_widget_get_realized(GTK_WIDGET(bindex)))
         return;
 
     /* Find the next message to be shown now, not later in the idle
@@ -1853,7 +1809,7 @@ balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
          (page =
           gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
          i++) {
-        GtkWidget *index = gtk_bin_get_child(GTK_BIN(page));
+        GtkWidget *index = gtk_notebook_page_get_child(GTK_NOTEBOOK_PAGE(page));
         BalsaMailboxNode *mbnode;
 
         if (index != NULL &&
@@ -2059,8 +2015,7 @@ move_to_activated(GSimpleAction *action,
  * bndx_popup_menu_create: create the popup menu and popover at init time
  */
 static void
-bndx_add_actions(BalsaIndex  *bindex,
-                 const gchar *action_namespace)
+bndx_add_popup_actions(BalsaIndex  *bindex)
 {
     GSimpleActionGroup *simple;
     static const GActionEntry entries[] = {
@@ -2082,8 +2037,8 @@ bndx_add_actions(BalsaIndex  *bindex,
 
     simple = g_simple_action_group_new();
     g_action_map_add_action_entries(G_ACTION_MAP(simple), entries, G_N_ELEMENTS(entries), bindex);
-    gtk_widget_insert_action_group(GTK_WIDGET(bindex), action_namespace, G_ACTION_GROUP(simple));
-    g_object_unref(simple);
+    gtk_widget_insert_action_group(GTK_WIDGET(bindex), "popup", G_ACTION_GROUP(simple));
+    bindex->popup_actions = G_ACTION_MAP(simple);
 }
 
 static void
@@ -2091,7 +2046,7 @@ bndx_popup_menu_create(BalsaIndex * bindex)
 {
     GMenu *menu, *section, *submenu;
 
-    bndx_add_actions(bindex, "popup");
+    bndx_add_popup_actions(bindex);
 
     menu = g_menu_new();
 
@@ -2151,23 +2106,18 @@ bndx_popup_menu_create(BalsaIndex * bindex)
  */
 
 static void
-bndx_action_set_enabled(BalsaIndex  *bindex,
-                        const gchar *prefix,
-                        const gchar *action_name,
-                        gboolean     enabled)
+bndx_popup_action_set_enabled(BalsaIndex  *bindex,
+                              const gchar *action_name,
+                              gboolean     enabled)
 {
-    GActionGroup *action_group;
-    GActionMap *action_map;
     GAction *action;
 
-    action_group = gtk_widget_get_action_group(GTK_WIDGET(bindex), prefix);
-    action_map = G_ACTION_MAP(action_group);
-    action = g_action_map_lookup_action(action_map, action_name);
+    action = g_action_map_lookup_action(bindex->popup_actions, action_name);
     g_simple_action_set_enabled(G_SIMPLE_ACTION(action), enabled);
 }
 
 static void
-bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
+bndx_do_popup(BalsaIndex * index, GdkEvent *event)
 {
     LibBalsaMailbox* mailbox;
     gboolean any;
@@ -2195,23 +2145,23 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
     any = selected->len > 0;
     balsa_index_selected_msgnos_free(index, selected);
 
-    bndx_action_set_enabled(index, "popup", "reply", any);
-    bndx_action_set_enabled(index, "popup", "reply-to-all", any);
-    bndx_action_set_enabled(index, "popup", "reply-to-group", any);
-    bndx_action_set_enabled(index, "popup", "forward-attached", any);
-    bndx_action_set_enabled(index, "popup", "forward-inline", any);
-    bndx_action_set_enabled(index, "popup", "pipe", any);
-    bndx_action_set_enabled(index, "popup", "store-address", any);
-    bndx_action_set_enabled(index, "popup", "view-source", any);
+    bndx_popup_action_set_enabled(index, "reply", any);
+    bndx_popup_action_set_enabled(index, "reply-to-all", any);
+    bndx_popup_action_set_enabled(index, "reply-to-group", any);
+    bndx_popup_action_set_enabled(index, "forward-attached", any);
+    bndx_popup_action_set_enabled(index, "forward-inline", any);
+    bndx_popup_action_set_enabled(index, "pipe", any);
+    bndx_popup_action_set_enabled(index, "store-address", any);
+    bndx_popup_action_set_enabled(index, "view-source", any);
 
     readonly = libbalsa_mailbox_get_readonly(mailbox);
 
-    bndx_action_set_enabled(index, "popup", "delete", any_not_deleted && !readonly);
-    bndx_action_set_enabled(index, "popup", "undelete", any_deleted && !readonly);
-    bndx_action_set_enabled(index, "popup", "trash", any && !readonly && mailbox != balsa_app.trash);
-    bndx_action_set_enabled(index, "popup", "toggle-flagged", any && !readonly);
-    bndx_action_set_enabled(index, "popup", "toggle-unread", any && !readonly);
-    bndx_action_set_enabled(index, "popup", "move-to", any && !readonly);
+    bndx_popup_action_set_enabled(index, "delete", any_not_deleted && !readonly);
+    bndx_popup_action_set_enabled(index, "undelete", any_deleted && !readonly);
+    bndx_popup_action_set_enabled(index, "trash", any && !readonly && mailbox != balsa_app.trash);
+    bndx_popup_action_set_enabled(index, "toggle-flagged", any && !readonly);
+    bndx_popup_action_set_enabled(index, "toggle-unread", any && !readonly);
+    bndx_popup_action_set_enabled(index, "move-to", any && !readonly);
 
     /* The move-to submenu */
     item = g_menu_item_new_from_model(G_MENU_MODEL(index->popup_menu),
@@ -2806,7 +2756,7 @@ bndx_mailbox_notify(gpointer data)
 {
     struct bndx_mailbox_info *info = data;
 
-    gtk_widget_destroy(info->dialog);
+    gtk_window_destroy(GTK_WINDOW(info->dialog));
     balsa_index_selected_msgnos_free(info->bindex, info->msgnos);
     g_free(info);
 }
@@ -2872,9 +2822,9 @@ balsa_index_pipe(BalsaIndex * index)
     g_return_if_fail(LIBBALSA_IS_MAILBOX(mailbox));
 
     info = g_object_get_data(G_OBJECT(mailbox), BALSA_INDEX_PIPE_INFO);
-    if (info) {
-        gtk_window_present_with_time(GTK_WINDOW(info->dialog),
-                                     gtk_get_current_event_time());
+    if (info != NULL) {
+        gtk_window_present_with_time(GTK_WINDOW(info->dialog), GDK_CURRENT_TIME);
+
         return;
     }
 
@@ -2901,19 +2851,22 @@ balsa_index_pipe(BalsaIndex * index)
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-    gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
+
+    gtk_widget_set_margin_top(dialog, 5);
+    gtk_widget_set_margin_bottom(dialog, 5);
+    gtk_widget_set_margin_start(dialog, 5);
+    gtk_widget_set_margin_end(dialog, 5);
 
     vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     gtk_box_set_spacing(GTK_BOX(vbox), HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(vbox), label =
-                      gtk_label_new(_("Specify the program to run:")));
+    gtk_box_append(GTK_BOX(vbox), label = gtk_label_new(_("Specify the program to run:")));
 
     info->entry = entry = gtk_combo_box_text_new_with_entry();
     for (list = balsa_app.pipe_cmds; list; list = list->next)
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(entry),
                                        list->data);
     gtk_combo_box_set_active(GTK_COMBO_BOX(entry), 0);
-    gtk_container_add(GTK_CONTAINER(vbox), entry);
+    gtk_box_append(GTK_BOX(vbox), entry);
 
     gtk_widget_show(label);
     gtk_widget_show(entry);

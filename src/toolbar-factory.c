@@ -789,24 +789,21 @@ tm_popup_context_menu(toolbar_info *info, GdkEvent *event)
  * Toolbar callbacks
  */
 static void
-tm_gesture_pressed(GtkGestureClick *click_gesture,
+tm_gesture_pressed(GtkGestureClick *gesture,
                    gint             n_press,
                    gdouble          x,
                    gdouble          y,
                    gpointer         user_data)
 {
-    toolbar_info *info = user_data;
-
     if (n_press == 1) {
-        GtkGesture *gesture;
-        GdkEventSequence *sequence;
+        toolbar_info *info = user_data;
         GdkEvent *event;
 
-        gesture  = GTK_GESTURE(click_gesture);
-        sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(gesture));
-        event    = gtk_gesture_get_last_event(gesture, sequence);
+        event = gtk_event_controller_get_current_event(GTK_EVENT_CONTROLLER(gesture));
 
         tm_popup_context_menu(info, event);
+
+        gtk_gesture_set_state(GTK_GESTURE(gesture), GTK_EVENT_SEQUENCE_CLAIMED);
     }
 }
 
@@ -817,10 +814,14 @@ tm_key_pressed(GtkEventControllerKey *controller,
                GdkModifierType        state,
                gpointer               user_data)
 {
-    toolbar_info *info = user_data;
-
     if (keyval == GDK_KEY_F10 && (state & GDK_SHIFT_MASK) != 0) {
-        tm_popup_context_menu(info, NULL);
+        toolbar_info *info = user_data;
+        GdkEvent *event;
+
+        event = gtk_event_controller_get_current_event(GTK_EVENT_CONTROLLER(controller));
+
+        tm_popup_context_menu(info, event);
+
         return TRUE;
     }
 

@@ -87,9 +87,6 @@ static void bmbl_get_property(GObject * object, guint prop_id,
 static gboolean bmbl_drag_motion(GtkWidget * mblist,
                                  GdkDragContext * context, gint x, gint y,
                                  guint time);
-static gboolean bmbl_popup_menu(GtkWidget * widget);
-static void bmbl_select_mailbox(GtkTreeSelection * selection,
-                                gpointer data);
 static gboolean bmbl_selection_func(GtkTreeSelection * selection,
                                     GtkTreeModel * model,
                                     GtkTreePath * path,
@@ -104,8 +101,9 @@ static void bmbl_tree_collapse(GtkTreeView * tree_view, GtkTreeIter * iter,
 static gint bmbl_row_compare(GtkTreeModel * model,
                              GtkTreeIter * iter1,
                              GtkTreeIter * iter2, gpointer data);
-static void bmbl_column_resize(GtkWidget * widget,
-                               GtkAllocation * allocation, gpointer data);
+static void bmbl_column_resize(GObject    *gobject,
+                               GParamSpec *pspec,
+                               gpointer    user_data);
 static void bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
                          gint x, gint y,
                          GtkSelectionData * selection_data, guint info,
@@ -127,9 +125,9 @@ static gboolean bmbl_store_redraw_mbnode(GtkTreeIter * iter,
 					 BalsaMailboxNode * mbnode);
 static void bmbl_node_style(GtkTreeModel * model, GtkTreeIter * iter);
 static gint bmbl_core_mailbox(LibBalsaMailbox * mailbox);
-static void bmbl_do_popup(GtkTreeView    *tree_view,
-                          GtkTreePath    *path,
-                          const GdkEvent *event);
+static void bmbl_do_popup(GtkTreeView *tree_view,
+                          GtkTreePath *path,
+                          GdkEvent    *event);
 static void bmbl_expand_to_row(BalsaMBList * mblist, GtkTreePath * path);
 /* end of prototypes */
 
@@ -177,12 +175,11 @@ balsa_mblist_class_init(BalsaMBListClass * klass)
 
     /* GtkWidget signals */
     widget_class->drag_motion = bmbl_drag_motion;
-    widget_class->popup_menu = bmbl_popup_menu;
 
     /* Properties */
     g_object_class_install_property(object_class, PROP_SHOW_CONTENT_INFO,
                                     g_param_spec_boolean
-                                    ("show_content_info", NULL, NULL,
+                                    ("show-content-info", NULL, NULL,
                                      FALSE, G_PARAM_READWRITE));
 }
 
@@ -320,6 +317,7 @@ balsa_mblist_init(BalsaMBList * mblist)
 
     gtk_tree_view_set_model(tree_view, GTK_TREE_MODEL(store));
     g_object_unref(store);
+    gtk_tree_view_set_activate_on_single_click(tree_view, TRUE);
 
     /* Mailbox icon and name go in first column. */
     column = gtk_tree_view_column_new();
@@ -408,7 +406,7 @@ balsa_mblist_init(BalsaMBList * mblist)
                      G_CALLBACK(bmbl_tree_collapse), NULL);
 
     g_object_set(mblist,
-                 "show_content_info",
+                 "show-content-info",
                  balsa_app.mblist_show_mb_content_info,
                  NULL);
 
@@ -549,15 +547,9 @@ bmbl_tree_expand(GtkTreeView * tree_view, GtkTreeIter * iter,
 		} else
 		    libbalsa_mailbox_set_exposed(mailbox, FALSE);
 		if (mailbox == current_mailbox) {
-		    GtkTreeSelection *selection =
-			gtk_tree_view_get_selection(tree_view);
-		    g_signal_handlers_block_by_func(selection,
-						    bmbl_select_mailbox,
-						    NULL);
+                    GtkTreeSelection *selection =
+                        gtk_tree_view_get_selection(tree_view);
 		    gtk_tree_selection_select_iter(selection, &child_iter);
-		    g_signal_handlers_unblock_by_func(selection,
-						      bmbl_select_mailbox,
-						      NULL);
 		}
 	    }
 	    g_object_unref(mbnode);
@@ -666,75 +658,56 @@ bmbl_row_compare(GtkTreeModel * model, GtkTreeIter * iter1,
    (clicking on folders is passed to GtkTreeView and may trigger expand events
 */
 static void
-bmbl_gesture_pressed_cb(GtkGestureMultiPress *multi_press_gesture,
-                        gint                  n_press,
-                        gdouble               x,
-                        gdouble               y,
-                        gpointer              user_data)
+bmbl_gesture_pressed_cb(GtkGestureClick *click_gesture,
+                        gint             n_press,
+                        gdouble          x,
+                        gdouble          y,
+                        gpointer         user_data)
 {
     GtkTreeView *tree_view = user_data;
     GtkGesture *gesture;
     GdkEventSequence *sequence;
-    const GdkEvent *event;
-    gint bx;
-    gint by;
+    GdkEvent *event;
+    int bx;
+    int by;
     GtkTreePath *path;
 
-    gesture  = GTK_GESTURE(multi_press_gesture);
-    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press_gesture));
+    gesture  = GTK_GESTURE(click_gesture);
+    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(click_gesture));
     event    = gtk_gesture_get_last_event(gesture, sequence);
 
-    if (!gdk_event_triggers_context_menu(event) ||
-        gdk_event_get_window(event) != gtk_tree_view_get_bin_window(tree_view))
+    if (!gdk_event_triggers_context_menu(event))
         return;
 
     gtk_gesture_set_sequence_state(gesture, sequence, GTK_EVENT_SEQUENCE_CLAIMED);
 
-    gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (gint) x, (gint) y,
+    gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (int) x, (int) y,
                                                       &bx, &by);
-
-    if (!gtk_tree_view_get_path_at_pos(tree_view, bx, by,
-                                       &path, NULL, NULL, NULL))
+    if (!gtk_tree_view_get_path_at_pos(tree_view, bx, by, &path, NULL, NULL, NULL))
         path = NULL;
 
     bmbl_do_popup(tree_view, path, event);
-    /* bmbl_do_popup frees path */
+    if (path != NULL)
+        gtk_tree_path_free(path);
 }
 
-/* bmbl_popup_menu:
- * default handler for the "popup-menu" signal, which is issued when the
- * user hits shift-F10
- */
-static gboolean
-bmbl_popup_menu(GtkWidget * widget)
-{
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
-    GtkTreePath *path;
-
-    gtk_tree_view_get_cursor(tree_view, &path, NULL);
-    bmbl_do_popup(tree_view, path, NULL);
-    /* bmbl_do_popup frees path */
-    return TRUE;
-}
-
-/* bmbl_do_popup:
- * do the popup, and free the path
+/*
+ * bmbl_do_popup:
  */
 static void
-bmbl_do_popup(GtkTreeView    *tree_view,
-              GtkTreePath    *path,
-              const GdkEvent *event)
+bmbl_do_popup(GtkTreeView *tree_view,
+              GtkTreePath *path,
+              GdkEvent    *event)
 {
     BalsaMailboxNode *mbnode = NULL;
     GtkWidget *menu;
 
-    if (path) {
+    if (path != NULL) {
         GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
         GtkTreeIter iter;
 
         if (gtk_tree_model_get_iter(model, &iter, path))
             gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
-        gtk_tree_path_free(path);
     }
 
     menu = balsa_mailbox_node_get_context_menu(mbnode, GTK_WIDGET(tree_view));
@@ -747,26 +720,22 @@ bmbl_do_popup(GtkTreeView    *tree_view,
 
 /* bmbl_column_resize [MBG]
  *
- * clist: The clist (in this case ctree), that is having it's columns resized.
- * column: The column being resized
- * size:  The new size of the column
- * data:  The data passed on to the callback when it was connected (NULL)
- *
  * Description: This callback assigns the new column widths to the balsa_app,
  * so they can be saved and restored between sessions.
  * */
 static void
-bmbl_column_resize(GtkWidget * widget,
-                           GtkAllocation * allocation, gpointer data)
+bmbl_column_resize(GObject    *gobject,
+                   GParamSpec *pspec,
+                   gpointer    user_data)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
-    gint name_width =
+    GtkTreeView *tree_view = user_data;
+    int name_width =
         gtk_tree_view_column_get_width(gtk_tree_view_get_column
                                        (tree_view, 0));
-    gint newmsg_width =
+    int newmsg_width =
         gtk_tree_view_column_get_width(gtk_tree_view_get_column
                                        (tree_view, 1));
-    gint totalmsg_width =
+    int totalmsg_width =
         gtk_tree_view_column_get_width(gtk_tree_view_get_column
                                        (tree_view, 2));
 
@@ -843,87 +812,6 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
 
     if (balsa_find_iter_by_data(&iter, orig_mailbox))
         gtk_tree_selection_select_iter(selection, &iter);
-}
-
-/* bmbl_select_mailbox
- *
- * This function is called when the user clicks on the mailbox list,
- * to open the mailbox. It's also called if the user uses the keyboard
- * to focus on the mailbox, in which case we don't open the mailbox.
- */
-static void
-bmbl_select_mailbox(GtkTreeSelection * selection, gpointer data)
-{
-    GdkEvent *event = gtk_get_current_event();
-    GtkTreeView *tree_view =
-        gtk_tree_selection_get_tree_view(selection);
-    GtkTreeModel *model =
-        gtk_tree_view_get_model(tree_view);
-    GtkTreePath *path;
-    guint button;
-    gdouble x_win, y_win;
-
-    if (event == NULL) {
-	GtkTreeIter iter;
-
-	if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
-	    BalsaMailboxNode *mbnode;
-	    LibBalsaMailbox *mailbox;
-	    gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
-	    mailbox = balsa_mailbox_node_get_mailbox(mbnode);
-	    g_object_unref(mbnode);
-	    if (MAILBOX_OPEN(mailbox))
-		/* Opening a mailbox under program control. */
-		return;
-	}
-	/* Not opening a mailbox--must be the initial selection of the
-	 * first mailbox in the list, so we'll unselect it again. */
-	g_signal_handlers_block_by_func(selection, bmbl_select_mailbox, NULL);
-	gtk_tree_selection_unselect_all(selection);
-	g_signal_handlers_unblock_by_func(selection, bmbl_select_mailbox, NULL);
-
-        return;
-    }
-
-    if (gdk_event_get_event_type(event) != GDK_BUTTON_PRESS
-            /* keyboard navigation */
-        || !gdk_event_get_button(event, &button) || button != 1
-            /* soft select */
-        || gdk_event_get_window(event) != gtk_tree_view_get_bin_window(tree_view)
-            /* click on a different widget */ ) {
-        gdk_event_free(event);
-
-        return;
-    }
-
-    if (!gdk_event_get_coords(event, &x_win, &y_win) ||
-        !gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win, &path,
-                                       NULL, NULL, NULL)) {
-        /* GtkTreeView selects the first node in the tree when the
-         * widget first gets the focus, whether it's a keyboard event or
-         * a button event. If it's a button event, but no mailbox was
-         * clicked, we'll just undo that selection and return. */
-	g_signal_handlers_block_by_func(selection, bmbl_select_mailbox, NULL);
-        gtk_tree_selection_unselect_all(selection);
-	g_signal_handlers_unblock_by_func(selection, bmbl_select_mailbox, NULL);
-        gdk_event_free(event);
-        return;
-    }
-
-    if (gtk_tree_selection_path_is_selected(selection, path)) {
-        GtkTreeIter iter;
-        BalsaMailboxNode *mbnode;
-        LibBalsaMailbox *mailbox;
-
-        gtk_tree_model_get_iter(model, &iter, path);
-        gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
-
-        if ((mailbox = balsa_mailbox_node_get_mailbox(mbnode)) != NULL)
-            balsa_mblist_open_mailbox(mailbox);
-	g_object_unref(mbnode);
-    }
-    gtk_tree_path_free(path);
-    gdk_event_free(event);
 }
 
 /*
@@ -1248,27 +1136,24 @@ void
 balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
 {
     GtkGesture *gesture;
-    GtkTreeSelection *selection;
+    int n;
+    GtkTreeViewColumn *column;
 
-    gesture = gtk_gesture_multi_press_new(GTK_WIDGET(mblist));
+    gesture = gtk_gesture_click_new();
+    gtk_widget_add_controller(GTK_WIDGET(mblist), GTK_EVENT_CONTROLLER(gesture));
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
     g_signal_connect(gesture, "pressed",
                      G_CALLBACK(bmbl_gesture_pressed_cb), mblist);
 
-    g_signal_connect_after(mblist, "size-allocate",
-                           G_CALLBACK(bmbl_column_resize), NULL);
+    for (n = 0; (column = gtk_tree_view_get_column(GTK_TREE_VIEW(mblist), n)) != NULL; n++)
+        g_signal_connect(column, "notify::width", G_CALLBACK(bmbl_column_resize), mblist);
+
     gtk_tree_view_enable_model_drag_dest(GTK_TREE_VIEW(mblist),
-                                         bmbl_drop_types,
-										 G_N_ELEMENTS(bmbl_drop_types),
-                                         GDK_ACTION_DEFAULT |
-                                         GDK_ACTION_COPY |
-                                         GDK_ACTION_MOVE);
+                                         bmbl_drop_types, G_N_ELEMENTS(bmbl_drop_types),
+                                         GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
     g_signal_connect(mblist, "drag-data-received",
                      G_CALLBACK(bmbl_drag_cb), NULL);
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
-    g_signal_connect(selection, "changed",
-                     G_CALLBACK(bmbl_select_mailbox), NULL);
     g_signal_connect(mblist, "row-activated",
                      G_CALLBACK(bmbl_row_activated_cb), NULL);
 }
@@ -1670,8 +1555,6 @@ typedef void (*MRUCallback) (gchar * url, gpointer user_data);
 /* Forward references */
 static void bmbl_mru_activate_cb(GtkWidget * widget, gpointer data);
 static void bmbl_mru_show_tree(GtkWidget * widget, gpointer data);
-static void bmbl_mru_selected_cb(GtkTreeSelection * selection,
-                                 gpointer data);
 static void bmbl_mru_activated_cb(GtkTreeView * tree_view,
                                   GtkTreePath * path,
                                   GtkTreeViewColumn * column,
@@ -1758,31 +1641,23 @@ bmbl_mru_activate_cb(GtkWidget * item, gpointer data)
  */
 
 /*
- * bmbl_mru_size_allocate_cb:
+ * bmbl_dialog_response:
  *
- * Callback for the dialog's "size-allocate" signal.
- * Remember the width and height.
+ * Callback for the dialog's "response" signal.
+ * Remember the width and height, then destroy it.
  */
 static void
-bmbl_mru_size_allocate_cb(GtkWidget * widget, GdkRectangle * allocation,
-                          gpointer user_data)
+bmbl_dialog_response(GtkDialog *dialog,
+                     int        response_id,
+                     gpointer   user_data)
 {
-    GdkWindow *gdk_window;
-    gboolean maximized;
-
-    gdk_window = gtk_widget_get_window(widget);
-    if (gdk_window == NULL)
-        return;
+    GtkWindow *window = GTK_WINDOW(dialog);
 
     /* Maximizing a GtkDialog may not be possible, but we check anyway. */
-    maximized =
-        (gdk_window_get_state(gdk_window) &
-         (GDK_WINDOW_STATE_MAXIMIZED | GDK_WINDOW_STATE_FULLSCREEN)) != 0;
+    if (!gtk_window_is_maximized(window))
+        gtk_window_get_size(window, &balsa_app.mru_tree_width, &balsa_app.mru_tree_height);
 
-    if (!maximized)
-        gtk_window_get_size(GTK_WINDOW(widget),
-                            & balsa_app.mru_tree_width,
-                            & balsa_app.mru_tree_height);
+    gtk_window_destroy(window);
 }
 
 static void
@@ -1793,22 +1668,18 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
     GtkWidget *content_area;
     GtkWidget *scroll;
     GtkWidget *mblist;
-    GtkTreeSelection *selection;
 
     mblist = balsa_mblist_new();
+    g_object_set(mblist, "show-content-info", FALSE, NULL);
     g_signal_connect(mblist, "row-activated",
                      G_CALLBACK(bmbl_mru_activated_cb), data);
+    gtk_tree_view_set_activate_on_single_click(GTK_TREE_VIEW(mblist), TRUE);
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
-    g_signal_connect(selection, "changed",
-                     G_CALLBACK(bmbl_mru_selected_cb), data);
-
-    scroll = gtk_scrolled_window_new(NULL, NULL);
+    scroll = gtk_scrolled_window_new();
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
-    gtk_container_add(GTK_CONTAINER(scroll), mblist);
-    gtk_widget_show_all(scroll);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), mblist);
 
     dialog =
         gtk_dialog_new_with_buttons(_("Choose destination folder"),
@@ -1824,77 +1695,14 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
 
     gtk_widget_set_vexpand(scroll, TRUE);
     gtk_widget_set_valign(scroll, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(content_area), scroll);
+    gtk_box_append(GTK_BOX(content_area), scroll);
 
-    g_signal_connect(dialog, "size-allocate",
-                     G_CALLBACK(bmbl_mru_size_allocate_cb), NULL);
     gtk_window_set_default_size(GTK_WINDOW(dialog),
                                 balsa_app.mru_tree_width,
                                 balsa_app.mru_tree_height);
 
-    gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
-}
-
-/*
- * bmbl_mru_selected_cb:
- *
- * Callback for the "changed" signal of the GtkTreeSelection in the
- * BalsaMBList object. This permits one-click selection of a mailbox.
- *
- * Emulates selecting one of the other menu items, and closes the dialog.
- */
-static void
-bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
-{
-    GdkEvent *event;
-    GtkTreeView *tree_view;
-    gdouble x_win, y_win;
-    GtkTreePath *path;
-
-    if (!data)
-        return;
-
-    event = gtk_get_current_event();
-    if (event == NULL)
-        return;
-
-    if (gdk_event_get_event_type(event) != GDK_BUTTON_PRESS ||
-        !gdk_event_get_coords(event, &x_win, &y_win)) {
-        gdk_event_free(event);
-        return;
-    }
-
-    tree_view = gtk_tree_selection_get_tree_view(selection);
-
-    if (!gtk_tree_view_get_path_at_pos(tree_view, (gint) x_win, (gint) y_win, &path,
-                                       NULL, NULL, NULL)) {
-        gtk_tree_selection_unselect_all(selection);
-        gdk_event_free(event);
-        return;
-    }
-
-    if (gtk_tree_selection_path_is_selected(selection, path)) {
-        GtkTreeModel *model;
-        GtkTreeIter iter;
-        BalsaMailboxNode *mbnode;
-
-        model = gtk_tree_view_get_model(tree_view);
-        gtk_tree_model_get_iter(model, &iter, path);
-        gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
-        ((BalsaMBListMRUEntry *) data)->url =
-            g_strdup(libbalsa_mailbox_get_url(balsa_mailbox_node_get_mailbox(mbnode)));
-	g_object_unref(mbnode);
-        bmbl_mru_activate_cb(NULL, data);
-
-        gtk_dialog_response(GTK_DIALOG
-                            (gtk_widget_get_ancestor
-                             (GTK_WIDGET(tree_view), GTK_TYPE_DIALOG)),
-                            GTK_RESPONSE_OK);
-    }
-
-    gtk_tree_path_free(path);
-    gdk_event_free(event);
+    g_signal_connect(dialog, "response", G_CALLBACK(bmbl_dialog_response), NULL);
+    gtk_widget_show(dialog);
 }
 
 /*
@@ -2265,62 +2073,9 @@ bmbl_choose_mailbox_row_activated(GtkTreeView       *tree_view,
     *mailbox = balsa_mailbox_node_get_mailbox(mbnode);
     g_object_unref(mbnode);
 
-    gtk_dialog_response(GTK_DIALOG
-                        (gtk_widget_get_ancestor
-                        (GTK_WIDGET(tree_view), GTK_TYPE_DIALOG)),
+    gtk_dialog_response(GTK_DIALOG(gtk_widget_get_ancestor(GTK_WIDGET(tree_view),
+                                                           GTK_TYPE_DIALOG)),
                         GTK_RESPONSE_OK);
-}
-
-/*
- * bmbl_choose_mailbox_selected_cb:
- *
- * Callback for the "changed" signal of the GtkTreeSelection in the
- * BalsaMBList object. This permits one-click selection of a mailbox.
- */
-static void
-bmbl_choose_mailbox_selected_cb(GtkTreeSelection * selection,
-                                gpointer           data)
-{
-    GdkEvent *event;
-    GtkTreeView *tree_view;
-    GtkTreePath *path;
-    LibBalsaMailbox **mailbox = data;
-
-    *mailbox = NULL;
-
-    event = gtk_get_current_event();
-    if (event == NULL)
-        return;
-
-    tree_view = gtk_tree_selection_get_tree_view(selection);
-    if (event->type != GDK_BUTTON_PRESS ||
-        !gtk_tree_view_get_path_at_pos(tree_view, event->button.x,
-                                       event->button.y, &path,
-                                       NULL, NULL, NULL)) {
-        gtk_tree_selection_unselect_all(selection);
-        gdk_event_free(event);
-        return;
-    }
-
-    if (gtk_tree_selection_path_is_selected(selection, path)) {
-        GtkTreeModel *model;
-        GtkTreeIter iter;
-        BalsaMailboxNode *mbnode;
-
-        model = gtk_tree_view_get_model(tree_view);
-        gtk_tree_model_get_iter(model, &iter, path);
-        gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
-        *mailbox = balsa_mailbox_node_get_mailbox(mbnode);
-	g_object_unref(mbnode);
-
-        gtk_dialog_response(GTK_DIALOG
-                            (gtk_widget_get_ancestor
-                             (GTK_WIDGET(tree_view), GTK_TYPE_DIALOG)),
-                            GTK_RESPONSE_OK);
-    }
-
-    gtk_tree_path_free(path);
-    gdk_event_free(event);
 }
 
 static LibBalsaMailbox *
@@ -2328,28 +2083,24 @@ bmbl_choose_mailbox(GtkWidget *widget)
 {
     GtkWidget *mblist;
     LibBalsaMailbox *mailbox;
-    GtkTreeSelection *selection;
     GtkWidget *scroll;
     GtkWidget *dialog;
 
     mblist = balsa_mblist_new();
+    g_object_set(mblist, "show-content-info", FALSE, NULL);
     g_signal_connect(mblist, "row-activated",
                      G_CALLBACK(bmbl_choose_mailbox_row_activated), &mailbox);
+    gtk_tree_view_set_activate_on_single_click(GTK_TREE_VIEW(mblist), TRUE);
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(mblist));
-    g_signal_connect(selection, "changed",
-                     G_CALLBACK(bmbl_choose_mailbox_selected_cb), &mailbox);
-
-    scroll = gtk_scrolled_window_new(NULL, NULL);
+    scroll = gtk_scrolled_window_new();
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
-    gtk_container_add(GTK_CONTAINER(scroll), mblist);
-    gtk_widget_show_all(scroll);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), mblist);
 
     dialog =
         gtk_dialog_new_with_buttons(_("Choose destination folder"),
-                                    GTK_WINDOW(gtk_widget_get_toplevel(widget)),
+                                    GTK_WINDOW(gtk_widget_get_root(widget)),
                                     GTK_DIALOG_MODAL |
                                     libbalsa_dialog_flags(),
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
@@ -2357,18 +2108,14 @@ bmbl_choose_mailbox(GtkWidget *widget)
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, window);
 #endif
-    gtk_box_pack_start(GTK_BOX
-                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      scroll, TRUE, TRUE, 0);
+    gtk_box_append(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), scroll);
 
-    g_signal_connect(dialog, "size-allocate",
-                     G_CALLBACK(bmbl_mru_size_allocate_cb), NULL);
     gtk_window_set_default_size(GTK_WINDOW(dialog),
                                 balsa_app.mru_tree_width,
                                 balsa_app.mru_tree_height);
 
-    gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
+    g_signal_connect(dialog, "response", G_CALLBACK(bmbl_dialog_response), NULL);
+    gtk_widget_show(dialog);
 
     return mailbox;
 }

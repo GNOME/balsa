@@ -75,18 +75,11 @@ enum {
 };
 static gint balsa_mblist_signals[LAST_SIGNAL] = { 0 };
 
-static GtkTargetEntry bmbl_drop_types[] = {
-    {"x-application/x-message-list", GTK_TARGET_SAME_APP, TARGET_MESSAGES}
-};
-
 /* class methods */
 static void bmbl_set_property(GObject * object, guint prop_id,
                               const GValue * value, GParamSpec * pspec);
 static void bmbl_get_property(GObject * object, guint prop_id,
                               GValue * value, GParamSpec * pspec);
-static gboolean bmbl_drag_motion(GtkWidget * mblist,
-                                 GdkDragContext * context, gint x, gint y,
-                                 guint time);
 static gboolean bmbl_selection_func(GtkTreeSelection * selection,
                                     GtkTreeModel * model,
                                     GtkTreePath * path,
@@ -104,10 +97,14 @@ static gint bmbl_row_compare(GtkTreeModel * model,
 static void bmbl_column_resize(GObject    *gobject,
                                GParamSpec *pspec,
                                gpointer    user_data);
-static void bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
-                         gint x, gint y,
-                         GtkSelectionData * selection_data, guint info,
-                         guint32 time, gpointer data);
+static gboolean bmbl_drag_accept(GtkDropTarget *drop_target,
+                                 GdkDrop       *drop,
+                                 gpointer       user_data);
+static gboolean bmbl_drag_drop(GtkDropTarget *drop_target,
+                               GValue        *value,
+                               gdouble        x,
+                               gdouble        y,
+                               gpointer       user_data);
 static void bmbl_row_activated_cb(GtkTreeView * tree_view,
                                   GtkTreePath * path,
                                   GtkTreeViewColumn * column,
@@ -152,10 +149,8 @@ static void
 balsa_mblist_class_init(BalsaMBListClass * klass)
 {
     GObjectClass *object_class;
-    GtkWidgetClass *widget_class;
 
     object_class = (GObjectClass *) klass;
-    widget_class = (GtkWidgetClass *) klass;
 
     /* HAS_UNREAD_MAILBOX is emitted when the number of mailboxes with
      * unread mail might have changed. */
@@ -172,9 +167,6 @@ balsa_mblist_class_init(BalsaMBListClass * klass)
     /* GObject signals */
     object_class->set_property = bmbl_set_property;
     object_class->get_property = bmbl_get_property;
-
-    /* GtkWidget signals */
-    widget_class->drag_motion = bmbl_drag_motion;
 
     /* Properties */
     g_object_class_install_property(object_class, PROP_SHOW_CONTENT_INFO,
@@ -271,23 +263,26 @@ bmbl_get_property(GObject * object, guint prop_id, GValue * value,
     }
 }
 
+/*
+ * bmbl_drag_accept
+ *
+ * Handler for the "accept" signal
+ */
+
 static gboolean
-bmbl_drag_motion(GtkWidget * mblist, GdkDragContext * context, gint x,
-                 gint y, guint time)
+bmbl_drag_accept(GtkDropTarget *drop_target,
+                 GdkDrop       *drop,
+                 gpointer       user_data)
 {
+    BalsaMBList *mblist = user_data;
     GtkTreeView *tree_view = GTK_TREE_VIEW(mblist);
     GtkTreePath *path;
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-    gboolean ret_val;
     gboolean can_drop;
 
-    ret_val =
-        GTK_WIDGET_CLASS(balsa_mblist_parent_class)->drag_motion(mblist, context, x, y,
-                                                    time);
-
     gtk_tree_view_get_drag_dest_row(tree_view, &path, NULL);
-    if (!path)
+    if (path == NULL)
         return FALSE;
 
     can_drop = bmbl_selection_func(selection, model, path, FALSE, NULL);
@@ -295,12 +290,7 @@ bmbl_drag_motion(GtkWidget * mblist, GdkDragContext * context, gint x,
                                     GTK_TREE_VIEW_DROP_INTO_OR_BEFORE);
     gtk_tree_path_free(path);
 
-    gdk_drag_status(context,
-                    (gdk_drag_context_get_actions(context) ==
-                     GDK_ACTION_COPY) ? GDK_ACTION_COPY :
-                    GDK_ACTION_MOVE, time);
-
-    return (ret_val && can_drop);
+    return can_drop;
 }
 
 /*
@@ -746,21 +736,25 @@ bmbl_column_resize(GObject    *gobject,
     }
 }
 
-/* bmbl_drag_cb
+/*
+ * bmbl_drag_drop_callback
  *
- * Description: This is the drag_data_received signal handler for the
+ * Description: This is the async callback for the
  * BalsaMBList.  It retrieves the source BalsaIndex and transfers the
  * index's selected messages to the target
  * mailbox.  Depending on what key is held down when the message(s)
  * are dropped they are either copied or moved.  The default action is
  * to copy.
- * */
+ */
 static void
-bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
-             gint x, gint y, GtkSelectionData * selection_data,
-             guint info, guint32 time, gpointer data)
+bmbl_drag_drop_callback(GObject      *source_object,
+                        GAsyncResult *res,
+                        gpointer      user_data)
 {
-    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    GdkDrop *drop = GDK_DROP(source_object);
+    BalsaMBList *mblist = user_data;
+    const GValue *value;
+    GtkTreeView *tree_view = GTK_TREE_VIEW(mblist);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreePath *path;
@@ -770,12 +764,8 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
     BalsaIndex *orig_index;
     GArray *selected;
 
-    if (!selection_data || !gtk_selection_data_get_data(selection_data))
-	/* Drag'n'drop is weird... */
-	return;
-
-    orig_index =
-        *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
+    value = gdk_drop_read_value_finish(drop, res, NULL);
+    orig_index = g_value_get_pointer(value);
     selected = balsa_index_selected_msgnos_new(orig_index);
     if (selected->len == 0) {
 	/* it is actually possible to drag from GtkTreeView when no rows
@@ -787,13 +777,8 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
     orig_mailbox = balsa_index_get_mailbox(orig_index);
 
     /* find the node and mailbox */
-
-    /* we should be able to use:
-     * gtk_tree_view_get_drag_dest_row(tree_view, &path, NULL);
-     * but it sets path to NULL for some reason, so we'll go down to a
-     * lower level. */
-    if (gtk_tree_view_get_dest_row_at_pos(tree_view,
-                                          x, y, &path, NULL)) {
+    gtk_tree_view_get_drag_dest_row(tree_view, &path, NULL);
+    if (path != NULL) {
 	BalsaMailboxNode *mbnode;
 
         gtk_tree_model_get_iter(model, &iter, path);
@@ -804,14 +789,38 @@ bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
         /* cannot transfer to the originating mailbox */
         if (mailbox != NULL && mailbox != orig_mailbox)
             balsa_index_transfer(orig_index, selected, mailbox,
-                                 gdk_drag_context_get_selected_action
-                                 (context) != GDK_ACTION_MOVE);
+                                 gdk_drop_get_actions(drop) != GDK_ACTION_MOVE);
         gtk_tree_path_free(path);
     }
     balsa_index_selected_msgnos_free(orig_index, selected);
 
     if (balsa_find_iter_by_data(&iter, orig_mailbox))
         gtk_tree_selection_select_iter(selection, &iter);
+}
+
+/*
+ * bmbl_drag_drop
+ *
+ * Description: This is the "drop" signal handler for the
+ * BalsaMBList.  It launches the async operation that carries out the
+ * actual drop.
+  */
+static gboolean
+bmbl_drag_drop(GtkDropTarget *drop_target,
+               GValue        *value,
+               gdouble        x,
+               gdouble        y,
+               gpointer       user_data)
+{
+    GdkDrop *drop;
+
+    drop = gtk_drop_target_get_drop(drop_target);
+    if (drop == NULL)
+        return FALSE;
+
+    gdk_drop_read_value_async(drop, BALSA_TYPE_INDEX, 0, NULL, bmbl_drag_drop_callback, user_data);
+
+    return TRUE;
 }
 
 /*
@@ -1138,6 +1147,7 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
     GtkGesture *gesture;
     int n;
     GtkTreeViewColumn *column;
+    GtkDropTarget *drop_target;
 
     gesture = gtk_gesture_click_new();
     gtk_widget_add_controller(GTK_WIDGET(mblist), GTK_EVENT_CONTROLLER(gesture));
@@ -1148,14 +1158,14 @@ balsa_mblist_default_signal_bindings(BalsaMBList * mblist)
     for (n = 0; (column = gtk_tree_view_get_column(GTK_TREE_VIEW(mblist), n)) != NULL; n++)
         g_signal_connect(column, "notify::width", G_CALLBACK(bmbl_column_resize), mblist);
 
-    gtk_tree_view_enable_model_drag_dest(GTK_TREE_VIEW(mblist),
-                                         bmbl_drop_types, G_N_ELEMENTS(bmbl_drop_types),
-                                         GDK_ACTION_DEFAULT | GDK_ACTION_COPY | GDK_ACTION_MOVE);
-    g_signal_connect(mblist, "drag-data-received",
-                     G_CALLBACK(bmbl_drag_cb), NULL);
-
     g_signal_connect(mblist, "row-activated",
                      G_CALLBACK(bmbl_row_activated_cb), NULL);
+
+    /* Drag and drop */
+    drop_target = gtk_drop_target_new(BALSA_TYPE_INDEX, GDK_ACTION_COPY | GDK_ACTION_MOVE);
+    gtk_widget_add_controller(GTK_WIDGET(mblist), GTK_EVENT_CONTROLLER(drop_target));
+    g_signal_connect(drop_target, "accept", G_CALLBACK(bmbl_drag_accept), mblist);
+    g_signal_connect(drop_target, "drop", G_CALLBACK(bmbl_drag_drop), mblist);
 }
 
 /* bmbl_disconnect_mailbox_signals

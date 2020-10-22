@@ -25,6 +25,7 @@
 #include <string.h>
 #include "balsa-app.h"
 #include <glib/gi18n.h>
+#include <glib.h>
 #include "libbalsa-vfs.h"
 #include "balsa-message.h"
 #include "balsa-mime-widget.h"
@@ -71,21 +72,163 @@ balsa_mime_widget_ctx_menu_cb(GtkWidget *button,
 
     @param mime_body message part to be saved.
 */
+typedef struct {
+    GMutex lock;
+    GCond cond;
+    LibBalsaMessageBody *mime_body;
+    LibbalsaVfs *save_file;
+    char *file_uri;
+    int response_id;
+} ctx_menu_data;
+
+static void
+ctx_menu_confirm(GtkDialog *confirm,
+                 int        response_id,
+                 gpointer   user_data)
+{
+    ctx_menu_data *data = user_data;
+
+    g_mutex_lock(&data->lock);
+    data->response_id = response_id;
+    g_cond_signal(&data->cond);
+    g_mutex_unlock(&data->lock);
+
+    gtk_window_destroy(GTK_WINDOW(confirm));
+}
+
+static gboolean
+ctx_menu_idle(gpointer user_data)
+{
+    ctx_menu_data *data = user_data;
+    GtkWidget *confirm;
+
+    /* File exists. check if they really want to overwrite */
+    confirm = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
+                                     GTK_DIALOG_MODAL,
+                                     GTK_MESSAGE_QUESTION,
+                                     GTK_BUTTONS_YES_NO, _("File already exists. Overwrite?"));
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(confirm, GTK_WINDOW(balsa_app.main_window));
+#endif
+
+    g_signal_connect(confirm, "response", G_CALLBACK(ctx_menu_confirm), data);
+    gtk_widget_show(confirm);
+
+    return G_SOURCE_REMOVE;
+}
+
+static gpointer
+ctx_menu_thread(gpointer user_data)
+{
+    ctx_menu_data *data = user_data;
+    gboolean do_save;
+
+    /* get a confirmation to overwrite if the file exists */
+    if (libbalsa_vfs_file_exists(data->save_file)) {
+        g_mutex_init(&data->lock);
+        g_cond_init(&data->cond);
+
+        g_mutex_lock(&data->lock);
+        data->response_id = 0;
+        g_idle_add(ctx_menu_idle, data);
+        while (data->response_id == 0)
+            g_cond_wait(&data->cond, &data->lock);
+        g_mutex_unlock(&data->lock);
+
+        g_mutex_clear(&data->lock);
+        g_cond_clear(&data->cond);
+
+	do_save = data->response_id == GTK_RESPONSE_YES;
+	if (do_save) {
+            GError *err = NULL;
+
+	    if (libbalsa_vfs_file_unlink(data->save_file, &err) != 0) {
+                balsa_information(LIBBALSA_INFORMATION_ERROR,
+                                  _("Unlink %s: %s"),
+                                  data->file_uri, err != NULL ? err->message : "Unknown error");
+                g_clear_error(&err);
+            }
+        }
+    } else
+	do_save = TRUE;
+
+    /* save the file */
+    if (do_save) {
+        GError *err = NULL;
+
+	if (!libbalsa_message_body_save_vfs(data->mime_body, data->save_file,
+                                            LIBBALSA_MESSAGE_BODY_UNSAFE,
+                                            data->mime_body->body_type ==
+                                            LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
+                                            &err)) {
+	    balsa_information(LIBBALSA_INFORMATION_ERROR,
+			      _("Could not save %s: %s"),
+			      data->file_uri, err != NULL ? err->message : "Unknown error");
+            g_clear_error(&err);
+        }
+    }
+
+    g_object_unref(data->save_file);
+    g_free(data->file_uri);
+    g_free(data);
+
+    return NULL;
+}
+
+static void
+ctx_menu_response(GtkDialog *save_dialog,
+                  int        response_id,
+                  gpointer   user_data)
+{
+    ctx_menu_data *data = user_data;
+    GFile *file;
+
+    if (response_id != GTK_RESPONSE_OK) {
+	gtk_window_destroy(GTK_WINDOW(save_dialog));
+        g_free(data);
+
+	return;
+    }
+
+    /* get the file name */
+    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(save_dialog));
+    gtk_window_destroy(GTK_WINDOW(save_dialog));
+
+    data->file_uri = g_file_get_uri(file);
+    g_object_unref(file);
+
+    if ((data->save_file = libbalsa_vfs_new_from_uri(data->file_uri)) == NULL) {
+        balsa_information(LIBBALSA_INFORMATION_ERROR,
+                          _("Could not construct URI from %s"),
+                          data->file_uri);
+        g_free(data->file_uri);
+        g_free(data);
+
+	return;
+    }
+
+    /* remember the folder uri */
+    g_free(balsa_app.save_dir);
+    balsa_app.save_dir = g_strdup(libbalsa_vfs_get_folder(data->save_file));
+
+    /* do the rest in a thread, as it may block waiting for user
+     * confirmation */
+    g_thread_unref(g_thread_new("ctx-menu-thread", ctx_menu_thread, data));
+}
+
 void
 balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 				LibBalsaMessageBody * mime_body)
 {
-    gchar *cont_type, *title;
+    ctx_menu_data *data;
+    char *cont_type, *title;
     GtkWidget *save_dialog;
-    gchar *file_uri;
-    LibbalsaVfs *save_file;
-    gboolean do_save;
-    GError *err = NULL;
 
     g_return_if_fail(mime_body != NULL);
 
     cont_type = libbalsa_message_body_get_mime_type(mime_body);
     title = g_strdup_printf(_("Save %s MIME Part"), cont_type);
+    g_free(cont_type);
 
     save_dialog =
 	gtk_file_chooser_dialog_new(title,
@@ -97,87 +240,30 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(save_dialog, balsa_get_parent_window(parent_widget));
 #endif
-    gtk_dialog_set_default_response(GTK_DIALOG(save_dialog),
-				    GTK_RESPONSE_OK);
+    gtk_dialog_set_default_response(GTK_DIALOG(save_dialog), GTK_RESPONSE_OK);
     g_free(title);
-    g_free(cont_type);
 
-    gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(save_dialog),
-                                    libbalsa_vfs_local_only());
-    if (balsa_app.save_dir)
-        gtk_file_chooser_set_current_folder_uri(GTK_FILE_CHOOSER(save_dialog),
-                                                balsa_app.save_dir);
+    if (balsa_app.save_dir != NULL) {
+        GFile *file;
+
+        file = g_file_new_for_uri(balsa_app.save_dir);
+        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(save_dialog), file, NULL);
+        g_object_unref(file);
+    }
 
     if (mime_body->filename) {
-        gchar * filename = g_path_get_basename(mime_body->filename);
-	libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit,
-			       NULL);
-	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_dialog),
-					  filename);
+        char *filename = g_path_get_basename(mime_body->filename);
+	libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit, NULL);
+	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_dialog), filename);
 	g_free(filename);
     }
 
+    data = g_new(ctx_menu_data, 1);
+    data->mime_body = mime_body;
+    g_signal_connect(save_dialog, "response", G_CALLBACK(ctx_menu_response), data);
+
     gtk_window_set_modal(GTK_WINDOW(save_dialog), TRUE);
-    if (gtk_dialog_run(GTK_DIALOG(save_dialog)) != GTK_RESPONSE_OK) {
-	gtk_widget_destroy(save_dialog);
-	return;
-    }
-
-    /* get the file name */
-    file_uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(save_dialog));
-    gtk_widget_destroy(save_dialog);
-    if (!(save_file = libbalsa_vfs_new_from_uri(file_uri))) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Could not construct URI from %s"),
-                          file_uri);
-        g_free(file_uri);
-	return;
-    }
-
-    /* remember the folder uri */
-    g_free(balsa_app.save_dir);
-    balsa_app.save_dir = g_strdup(libbalsa_vfs_get_folder(save_file));
-
-    /* get a confirmation to overwrite if the file exists */
-    if (libbalsa_vfs_file_exists(save_file)) {
-	GtkWidget *confirm;
-
-	/* File exists. check if they really want to overwrite */
-	confirm = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-					 GTK_DIALOG_MODAL,
-					 GTK_MESSAGE_QUESTION,
-					 GTK_BUTTONS_YES_NO,
-					 _("File already exists. Overwrite?"));
-#if HAVE_MACOSX_DESKTOP
-	libbalsa_macosx_menu_for_parent(confirm, GTK_WINDOW(balsa_app.main_window));
-#endif
-	do_save =
-	    (gtk_dialog_run(GTK_DIALOG(confirm)) == GTK_RESPONSE_YES);
-	gtk_widget_destroy(confirm);
-	if (do_save)
-	    if (libbalsa_vfs_file_unlink(save_file, &err) != 0)
-                balsa_information(LIBBALSA_INFORMATION_ERROR,
-                                  _("Unlink %s: %s"),
-                                  file_uri, err ? err->message : "Unknown error");
-    } else
-	do_save = TRUE;
-
-    /* save the file */
-    if (do_save) {
-	if (!libbalsa_message_body_save_vfs(mime_body, save_file,
-                                            LIBBALSA_MESSAGE_BODY_UNSAFE,
-                                            mime_body->body_type ==
-                                            LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
-                                            &err)) {
-	    balsa_information(LIBBALSA_INFORMATION_ERROR,
-			      _("Could not save %s: %s"),
-			      file_uri, err ? err->message : "Unknown error");
-            g_clear_error(&err);
-        }
-    }
-
-    g_object_unref(save_file);
-    g_free(file_uri);
+    gtk_widget_show(save_dialog);
 }
 
 static void
@@ -276,11 +362,17 @@ balsa_mime_widget_key_pressed(GtkEventControllerKey *controller,
 
 static void
 bmw_set_can_focus(GtkWidget *widget,
-                  gpointer   data)
+                  gboolean   can_focus)
 {
-    if (GTK_IS_CONTAINER(widget))
-        gtk_container_foreach(GTK_CONTAINER(widget), bmw_set_can_focus, data);
-    gtk_widget_set_can_focus(widget, GPOINTER_TO_INT(data));
+    GtkWidget *child;
+
+    for (child = gtk_widget_get_first_child(widget);
+         child != NULL;
+         child = gtk_widget_get_next_sibling(child)) {
+        bmw_set_can_focus(child, can_focus);
+    }
+
+    gtk_widget_set_can_focus(widget, can_focus);
 }
 
 
@@ -294,7 +386,7 @@ balsa_mime_widget_limit_focus(GtkEventControllerKey *key_controller,
 
     /* Disable can_focus on other message parts so that TAB does not
      * attempt to move the focus on them. */
-    bmw_set_can_focus(container, GINT_TO_POINTER(FALSE));
+    bmw_set_can_focus(container, FALSE);
     gtk_widget_set_can_focus(widget, TRUE);
 
     if (balsa_message_get_focus_state(bm) == BALSA_MESSAGE_FOCUS_STATE_NO)
@@ -309,7 +401,7 @@ balsa_mime_widget_unlimit_focus(GtkEventControllerKey *key_controller,
     BalsaMessage *bm = user_data;
     GtkWidget *container = balsa_mime_widget_get_container(balsa_message_get_bm_widget(bm));
 
-    bmw_set_can_focus(container, GINT_TO_POINTER(TRUE));
+    bmw_set_can_focus(container, TRUE);
 
     if (balsa_message_get_message(bm) != NULL) {
         BalsaMessageFocusState focus_state = balsa_message_get_focus_state(bm);

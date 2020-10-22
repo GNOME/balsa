@@ -109,6 +109,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
     gchar *content_type;
     mime_delegate_t *delegate;
     GtkEventController *key_controller;
+    GtkAdjustment *vadj;
 
     g_return_val_if_fail(bm != NULL, NULL);
     g_return_val_if_fail(mime_body != NULL, NULL);
@@ -129,7 +130,8 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
     if (mw == NULL)
 	mw = balsa_mime_widget_new_unknown(bm, mime_body, content_type);
 
-    key_controller = gtk_event_controller_key_new(GTK_WIDGET(mw));
+    key_controller = gtk_event_controller_key_new();
+    gtk_widget_add_controller(GTK_WIDGET(mw), key_controller);
     g_signal_connect(key_controller, "focus-in",
                      G_CALLBACK(balsa_mime_widget_limit_focus), bm);
     g_signal_connect(key_controller, "focus-out",
@@ -149,7 +151,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
         priv = balsa_mime_widget_get_instance_private(mw);
         container = priv->container;
         mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-        gtk_container_add(GTK_CONTAINER(mw), crypto_frame);
+        gtk_box_append(GTK_BOX(mw), crypto_frame);
         priv = balsa_mime_widget_get_instance_private(mw);
         priv->container = container;
     } else if (mime_body->was_encrypted &&
@@ -162,21 +164,17 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
         priv = balsa_mime_widget_get_instance_private(mw);
         container = priv->container;
         mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-        gtk_container_add(GTK_CONTAINER(mw), crypto_frame);
+        gtk_box_append(GTK_BOX(mw), crypto_frame);
         priv = balsa_mime_widget_get_instance_private(mw);
         priv->container = container;
     }
     g_free(content_type);
 
-    if (GTK_IS_LAYOUT(mw)) {
-        GtkAdjustment *vadj;
-
-        g_object_get(mw, "vadjustment", &vadj, NULL);
+    g_object_get(mw, "vadjustment", &vadj, NULL);
+    if (vadj != NULL) {
         g_signal_connect(vadj, "changed", G_CALLBACK(vadj_change_cb), mw);
         g_object_unref(vadj);
     }
-
-    gtk_widget_show_all(GTK_WIDGET(mw));
 
     return mw;
 }
@@ -199,12 +197,14 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
-    gtk_container_set_border_width(GTK_CONTAINER(mw),
-				   BMW_CONTAINER_BORDER);
+    gtk_widget_set_margin_top(GTK_WIDGET(mw), BMW_CONTAINER_BORDER);
+    gtk_widget_set_margin_bottom(GTK_WIDGET(mw), BMW_CONTAINER_BORDER);
+    gtk_widget_set_margin_start(GTK_WIDGET(mw), BMW_CONTAINER_BORDER);
+    gtk_widget_set_margin_end(GTK_WIDGET(mw), BMW_CONTAINER_BORDER);
 
     if (mime_body->filename) {
 	msg = g_strdup_printf(_("File name: %s"), mime_body->filename);
-	gtk_container_add(GTK_CONTAINER(mw), gtk_label_new(msg));
+	gtk_box_append(GTK_BOX(mw), gtk_label_new(msg));
 	g_free(msg);
     }
 
@@ -258,7 +258,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     msg_label = gtk_label_new(msg);
     g_free(msg);
     gtk_label_set_ellipsize(GTK_LABEL(msg_label), PANGO_ELLIPSIZE_END);
-    gtk_container_add(GTK_CONTAINER(mw), msg_label);
+    gtk_box_append(GTK_BOX(mw), msg_label);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
     gtk_box_set_homogeneous(GTK_BOX(hbox), TRUE);
@@ -267,9 +267,9 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
                                            (gpointer) mime_body))) {
         gtk_widget_set_hexpand(button, TRUE);
         gtk_widget_set_halign(button, GTK_ALIGN_FILL);
-        gtk_container_add(GTK_CONTAINER(hbox), button);
+        gtk_box_append(GTK_BOX(hbox), button);
     } else {
-	gtk_container_add(GTK_CONTAINER(mw),
+	gtk_box_append(GTK_BOX(mw),
 			   gtk_label_new(_("No open or view action "
 					   "defined for this content type")));
     }
@@ -278,21 +278,21 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     button = gtk_button_new_with_mnemonic(_("S_ave part"));
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), button);
+    gtk_box_append(GTK_BOX(hbox), button);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(balsa_mime_widget_ctx_menu_save),
 		     (gpointer) mime_body);
 
-    gtk_container_add(GTK_CONTAINER(mw), hbox);
+    gtk_box_append(GTK_BOX(mw), hbox);
 
     return mw;
 }
 
 
-static gint resize_idle_id;
+static unsigned resize_idle_id;
 
 static GtkWidget *old_widget, *new_widget;
-static gdouble old_upper, new_upper;
+static double old_upper, new_upper;
 
 static gboolean
 resize_idle(GtkWidget * widget)
@@ -309,17 +309,18 @@ resize_idle(GtkWidget * widget)
 void
 balsa_mime_widget_schedule_resize(GtkWidget * widget)
 {
-    g_object_ref(widget);
+    if (resize_idle_id != 0)
+        g_source_remove(resize_idle_id);
     resize_idle_id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE,
                                      (GSourceFunc) resize_idle,
-                                     widget, g_object_unref);
+                                     g_object_ref(widget), g_object_unref);
 }
 
 
-static void 
+static void
 vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
 {
-    gdouble upper = gtk_adjustment_get_upper(vadj);
+    double upper = gtk_adjustment_get_upper(vadj);
 
     /* do nothing if it's the same widget and the height hasn't changed
      *
@@ -330,8 +331,6 @@ vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
         return;
     new_widget = widget;
     new_upper = upper;
-    if (resize_idle_id) 
-        g_source_remove(resize_idle_id);
     balsa_mime_widget_schedule_resize(widget);
 }
 

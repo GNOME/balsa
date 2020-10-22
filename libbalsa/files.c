@@ -125,3 +125,38 @@ libbalsa_icon_finder(const char        * mime_type,
 
     return gicon;
 }
+
+
+/* libbalsa_icon_name_finder:
+ *   locate a suitable icon based on 'mime-type' and/or
+ *   'filename', either of which can be NULL.  If both arguments are
+ *   non-NULL, 'mime-type' has priority.  If both are NULL, the default
+ *   "attachment" icon name will be returned.
+ */
+char *
+libbalsa_icon_name_finder(const char        * mime_type,
+                          const LibbalsaVfs * for_file,
+                          char             ** used_type)
+{
+    const char *content_type;
+    char *content_icon;
+
+    if (mime_type)
+        content_type = mime_type;
+    else if (for_file) {
+        content_type = libbalsa_vfs_get_mime_type((LibbalsaVfs *) for_file);
+    } else
+        content_type = "application/octet-stream";
+
+    content_icon = g_content_type_get_generic_icon_name(content_type);
+
+    if (content_icon == NULL) {
+        /* load the default icon */
+        content_icon = g_strdup("attachment");
+    }
+
+    if (used_type)
+        *used_type = g_strdup(content_type);
+
+    return content_icon;
+}

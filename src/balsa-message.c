@@ -267,7 +267,7 @@ bm_header_tl_buttons(BalsaMessage * balsa_message)
     gtk_widget_set_tooltip_text(button, _("Select message part to display"));
 
     key_controller = gtk_event_controller_key_new();
-    gtk_widget_add_controller(button, GTK_EVENT_CONTROLLER(key_controller));
+    gtk_widget_add_controller(button, key_controller);
     g_signal_connect(key_controller, "focus-in",
 		     G_CALLBACK(balsa_mime_widget_limit_focus), balsa_message);
     g_signal_connect(key_controller, "focus-out",

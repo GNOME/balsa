@@ -1227,12 +1227,9 @@ md_face_path_changed(const gchar * filename, gboolean active,
         return;
     }
 
-    child = gtk_widget_get_first_child(face_box);
-    while (child != NULL) {
-        GtkWidget *this_child = child;
-        child = gtk_widget_get_next_sibling(child);
-        gtk_box_remove(GTK_BOX(face_box), this_child);
-    }
+    while ((child = gtk_widget_get_first_child(face_box)) != NULL)
+        gtk_box_remove(GTK_BOX(face_box), child);
+
     gtk_box_append(GTK_BOX(face_box), image);
     gtk_widget_show(face_box);
 

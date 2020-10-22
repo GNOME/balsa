@@ -320,6 +320,30 @@ bndx_key_pressed_cb(GtkEventControllerKey *controller,
     return FALSE;
 }
 
+/*
+ * Handler for the drag-source's "prepare" signal
+ */
+static GdkContentProvider *
+bndx_drag_source_prepare(GtkDragSource *source,
+                         gdouble        x,
+                         gdouble        y,
+                         gpointer       user_data)
+{
+    BalsaIndex *bindex = user_data;
+    GtkTreeView *tree_view = GTK_TREE_VIEW(bindex);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+    GdkContentProvider *provider = NULL;
+
+    if (gtk_tree_selection_count_selected_rows(selection) > 0) {
+        GValue value;
+
+        g_value_init_from_instance(&value, bindex);
+        provider = gdk_content_provider_new_for_value(&value);
+    }
+
+    return provider;
+}
+
 /* BalsaIndex instance init method; no tree store is set on the tree
  * view--that's handled later, when the view is populated. */
 static void
@@ -504,6 +528,14 @@ balsa_index_init(BalsaIndex * index)
                            G_CALLBACK(bndx_column_resize),
                            NULL);
     gtk_tree_view_set_enable_search(tree_view, FALSE);
+
+    {
+        GtkDragSource *drag_source;
+
+        drag_source = gtk_drag_source_new();
+        gtk_widget_add_controller(GTK_WIDGET(index), GTK_EVENT_CONTROLLER(drag_source));
+        g_signal_connect(drag_source, "prepare", G_CALLBACK(bndx_drag_source_prepare), index);
+    }
 
     balsa_index_set_column_widths(index);
 }

@@ -355,6 +355,7 @@ balsa_index_init(BalsaIndex * index)
     GtkTreeViewColumn *column;
     GtkGesture *gesture;
     GtkEventController *controller;
+    GtkDragSource *drag_source;
     gint height;
 
 #if defined(TREE_VIEW_FIXED_HEIGHT)
@@ -510,7 +511,7 @@ balsa_index_init(BalsaIndex * index)
     /* we also want to handle key presses (shift-F10) to pop up context menus if
      * necessary, now that GtkWidget::popup_menu has gone away. */
     controller = gtk_event_controller_key_new();
-    gtk_widget_add_controller(GTK_WIDGET(index), GTK_EVENT_CONTROLLER(controller));
+    gtk_widget_add_controller(GTK_WIDGET(index), controller);
     g_signal_connect(controller, "key-pressed", G_CALLBACK(bndx_key_pressed_cb), index);
 
     /* catch thread expand events */
@@ -529,13 +530,9 @@ balsa_index_init(BalsaIndex * index)
                            NULL);
     gtk_tree_view_set_enable_search(tree_view, FALSE);
 
-    {
-        GtkDragSource *drag_source;
-
-        drag_source = gtk_drag_source_new();
-        gtk_widget_add_controller(GTK_WIDGET(index), GTK_EVENT_CONTROLLER(drag_source));
-        g_signal_connect(drag_source, "prepare", G_CALLBACK(bndx_drag_source_prepare), index);
-    }
+    drag_source = gtk_drag_source_new();
+    gtk_widget_add_controller(GTK_WIDGET(index), GTK_EVENT_CONTROLLER(drag_source));
+    g_signal_connect(drag_source, "prepare", G_CALLBACK(bndx_drag_source_prepare), index);
 
     balsa_index_set_column_widths(index);
 }

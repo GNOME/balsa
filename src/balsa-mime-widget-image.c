@@ -84,44 +84,31 @@ img_check_size(BalsaMimeWidgetImage * mwi)
     GtkWidget *widget;
     GtkImage *image;
     GtkWidget *viewport;
-    gint orig_width;
+    int orig_width;
     GdkPixbuf *pixbuf;
-    gint curr_w, dst_w;
-    GtkAllocation allocation;
+    int curr_w, dst_w;
 
     mwi->img_check_size_id = 0;
 
     widget = GTK_WIDGET(mwi);
     viewport = gtk_widget_get_ancestor(widget, GTK_TYPE_VIEWPORT);
-    if (viewport == NULL) {
+    if (viewport == NULL)
         return G_SOURCE_REMOVE;
-    }
 
     pixbuf = mwi->pixbuf;
-    if (pixbuf == NULL) {
+    if (pixbuf == NULL)
         return G_SOURCE_REMOVE;
-    }
 
     orig_width = gdk_pixbuf_get_width(pixbuf);
-    if (orig_width <= 0) {
+    if (orig_width <= 0)
         return G_SOURCE_REMOVE;
-    }
 
     image = GTK_IMAGE(mwi->image);
-    if (gtk_image_get_storage_type(image) == GTK_IMAGE_PIXBUF)
-        curr_w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(image));
-    else
-        curr_w = 0;
+    curr_w = 0;
 
-
-    gtk_widget_get_allocation(viewport, &allocation);
-    dst_w = allocation.width;
-    gtk_widget_get_allocation(gtk_bin_get_child(GTK_BIN(viewport)),
-                              &allocation);
-    dst_w -= allocation.width;
-    gtk_widget_get_allocation(gtk_widget_get_parent(widget),
-                              &allocation);
-    dst_w += allocation.width;
+    dst_w = gtk_widget_get_allocated_width(viewport);
+    dst_w -= gtk_widget_get_allocated_width(gtk_viewport_get_child(GTK_VIEWPORT(viewport)));
+    dst_w += gtk_widget_get_allocated_width(gtk_widget_get_parent(widget));
     dst_w -= 16;                /* Magic number? */
     dst_w = CLAMP(dst_w, 32, orig_width);
 
@@ -140,26 +127,22 @@ img_check_size(BalsaMimeWidgetImage * mwi)
 }
 
 static void
-balsa_image_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
-                            gint                  n_press,
-                            gdouble               x,
-                            gdouble               y,
-                            gpointer              user_data)
+balsa_image_button_press_cb(GtkGestureClick *click_gesture,
+                            int              n_press,
+                            double           x,
+                            double           y,
+                            gpointer         user_data)
 {
     GtkWidget *menu = user_data;
-    GtkGesture *gesture;
-    GdkEventSequence *sequence;
-    const GdkEvent *event;
+    GdkEvent *event;
 
-    gesture  = GTK_GESTURE(multi_press_gesture);
-    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press_gesture));
-    event    = gtk_gesture_get_last_event(gesture, sequence);
+    event = gtk_event_controller_get_current_event(GTK_EVENT_CONTROLLER(click_gesture));
 
     libbalsa_popup_widget_popup(menu, event);
 }
 
 static void
-img_size_allocate_cb(BalsaMimeWidgetImage *mwi)
+img_realize_cb(BalsaMimeWidgetImage *mwi)
 {
     if (mwi->pixbuf != NULL && mwi->img_check_size_id == 0) {
         mwi->img_check_size_id = g_idle_add((GSourceFunc) img_check_size, mwi);
@@ -175,19 +158,18 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
                             LibBalsaMessageBody * mime_body,
 			    const gchar * content_type, gpointer data)
 {
+    GtkWidget *popover = data;
     GdkPixbuf *pixbuf;
     GtkWidget *image;
     GError * load_err = NULL;
     BalsaMimeWidgetImage *mwi;
-    BalsaMimeWidget *mw;
-    GtkWidget *widget;
     GtkGesture *gesture;
 
     g_return_val_if_fail(mime_body != NULL, NULL);
     g_return_val_if_fail(content_type != NULL, NULL);
 
     pixbuf = libbalsa_message_body_get_pixbuf(mime_body, &load_err);
-    if (!pixbuf) {
+    if (pixbuf == NULL) {
 	if (load_err) {
             balsa_information(LIBBALSA_INFORMATION_ERROR,
 			      _("Error loading attached image: %s\n"),
@@ -200,27 +182,18 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     mwi = g_object_new(BALSA_TYPE_MIME_WIDGET_IMAGE, NULL);
     mwi->pixbuf = pixbuf;
 
-    mw = (BalsaMimeWidget *) mwi;
-
-    widget = gtk_event_box_new();
-    gtk_container_add(GTK_CONTAINER(mw), widget);
-
-    gesture = gtk_gesture_multi_press_new(widget);
+    gesture = gtk_gesture_click_new();
+    gtk_widget_add_controller(GTK_WIDGET(mwi), GTK_EVENT_CONTROLLER(gesture));
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
 
-    if (GTK_IS_POPOVER(data)) {
-        GtkPopover *popover = data;
-        gtk_popover_set_relative_to(popover, widget);
-    }
+    gtk_widget_set_parent(popover, GTK_WIDGET(mwi));
 
     g_signal_connect(gesture, "pressed",
-                     G_CALLBACK(balsa_image_button_press_cb), data);
+                     G_CALLBACK(balsa_image_button_press_cb), popover);
 
-    mwi->image = image = gtk_image_new_from_icon_name("image-missing",
-                                                      GTK_ICON_SIZE_BUTTON);
-    g_signal_connect_swapped(image, "size-allocate",
-                             G_CALLBACK(img_size_allocate_cb), mwi);
-    gtk_container_add(GTK_CONTAINER(widget), image);
+    mwi->image = image = gtk_image_new_from_icon_name("image-missing");
+    g_signal_connect_swapped(image, "realize", G_CALLBACK(img_realize_cb), mwi);
+    gtk_box_append(GTK_BOX(mwi), image);
 
-    return mw;
+    return (BalsaMimeWidget *) mwi;
 }

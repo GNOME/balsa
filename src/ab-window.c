@@ -404,7 +404,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 
 
     frame = gtk_frame_new(_("Treat multiple addresses as:"));
-    gtk_box_append(GTK_BOX(frame), box2);
+    gtk_frame_set_child(GTK_FRAME(frame), box2);
 
     gtk_widget_set_margin_top(frame, 1);
     gtk_widget_set_margin_bottom(frame, 1);

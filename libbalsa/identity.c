@@ -389,8 +389,12 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     gtk_box_append(GTK_BOX
                        (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                        frame);
-    gtk_box_append(GTK_BOX(frame), tree);
-    g_object_set(frame, "amrgin", padding, NULL);
+    gtk_frame_set_child(GTK_FRAME(frame), tree);
+
+    gtk_widget_set_margin_top(frame, padding);
+    gtk_widget_set_margin_bottom(frame, padding);
+    gtk_widget_set_margin_start(frame, padding);
+    gtk_widget_set_margin_end(frame, padding);
 
     gtk_widget_show(dialog);
     gtk_widget_grab_focus(tree);
@@ -645,7 +649,7 @@ libbalsa_identity_config_frame(GList** identities,
     g_object_set_data(G_OBJECT(tree), "callback", cb);
     g_object_set_data(G_OBJECT(tree), "cb-data",  data);
 
-    gtk_box_append(GTK_BOX(config_frame), tree);
+    gtk_frame_set_child(GTK_FRAME(config_frame), tree);
 
     identity_list_update(GTK_TREE_VIEW(tree));
 

@@ -1385,7 +1385,7 @@ launch_app_activated(GSimpleAction *action,
     if (!result)
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not launch application: %s"),
-                          err ? err->message : "Unknown error");
+                          err ? err->message : _("Unknown error"));
     g_clear_error(&err);
 
     if (GTK_IS_POPOVER(info->popup_menu))
@@ -1690,7 +1690,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
                                    "%s: %s", filename,
-                                   err && err->message ? err->message : _("unknown error"));
+                                   err && err->message ? err->message : _("Unknown error"));
 	g_error_free(err);
 	g_object_unref(file_uri);
 	return FALSE;
@@ -2965,7 +2965,7 @@ add_file_attachment(BalsaSendmsg        *bsmsg,
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
                                    _("Could not save attachment: %s"),
-                                   err ? err->message : "Unknown error");
+                                   err ? err->message : _("Unknown error"));
         g_clear_error(&err);
         /* FIXME: do not try any further? */
     }

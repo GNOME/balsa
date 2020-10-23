@@ -749,7 +749,7 @@ save_selected_to_folder_response(GtkDialog *dump_dialog,
                                       _("Could not save %s: %s"),
                                       libbalsa_vfs_get_uri_utf8(save_uri),
                                       err != NULL && err->message != NULL ?
-                                      err->message : "Unknown error");
+                                      err->message : _("Unknown error"));
                 g_clear_error(&err);
                 g_object_unref(save_uri);
             }

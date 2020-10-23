@@ -431,7 +431,7 @@ balsa_ab_window_run_editor(GtkWidget * widget, gpointer data)
                        NULL, NULL, NULL, &err))
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not launch %s: %s"), argv[0],
-                          err ? err->message : "Unknown error");
+                          err ? err->message : _("Unknown error"));
     g_clear_error(&err);
 }
 

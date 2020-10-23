@@ -75,13 +75,13 @@ balsa_mime_widget_new_pgpkey(BalsaMessage        *bm,
     body_size = libbalsa_message_body_get_content(mime_body, &body_buf, &err);
     if (body_size < 0) {
         balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not save a text part: %s"),
-                          err ? err->message : "Unknown error");
+                          err ? err->message : _("Unknown error"));
         g_clear_error(&err);
     } else {
         mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
         if (!create_import_keys_widget(mw, body_buf, &err)) {
             balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not process GnuPG keys: %s"),
-                              err ? err->message : "Unknown error");
+                              err ? err->message : _("Unknown error"));
             g_clear_error(&err);
             g_object_unref(mw);
             mw = NULL;
@@ -321,7 +321,7 @@ on_key_import_button(GtkButton *button,
 			GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
 			GTK_MESSAGE_ERROR,
 			GTK_BUTTONS_CLOSE,
-			_("Error importing key data: %s"), (error != NULL) ? error->message : _("unknown error"));
+			_("Error importing key data: %s"), (error != NULL) ? error->message : _("Unknown error"));
 		g_clear_error(&error);
 	}
 	g_free(import_info);

@@ -367,7 +367,7 @@ extbody_send_mail(GtkWidget * button, LibBalsaMessageBody * mime_body)
     if(libbalsa_message_body_get_content(mime_body, &data, &err)<0) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("Could not get a part: %s"),
-                          err ? err->message : "Unknown error");
+                          err ? err->message : _("Unknown error"));
         g_clear_error(&err);
     }
 

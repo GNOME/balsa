@@ -50,7 +50,7 @@ balsa_mime_widget_ctx_menu_launch_app(const gchar         *app_name,
     if (!result)
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not launch application: %s"),
-                          err ? err->message : "Unknown error");
+                          err ? err->message : _("Unknown error"));
     g_clear_error(&err);
 }
 
@@ -145,7 +145,7 @@ ctx_menu_thread(gpointer user_data)
 	    if (libbalsa_vfs_file_unlink(data->save_file, &err) != 0) {
                 balsa_information(LIBBALSA_INFORMATION_ERROR,
                                   _("Unlink %s: %s"),
-                                  data->file_uri, err != NULL ? err->message : "Unknown error");
+                                  data->file_uri, err != NULL ? err->message : _("Unknown error"));
                 g_clear_error(&err);
             }
         }
@@ -163,7 +163,7 @@ ctx_menu_thread(gpointer user_data)
                                             &err)) {
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
 			      _("Could not save %s: %s"),
-			      data->file_uri, err != NULL ? err->message : "Unknown error");
+			      data->file_uri, err != NULL ? err->message : _("Unknown error"));
             g_clear_error(&err);
         }
     }

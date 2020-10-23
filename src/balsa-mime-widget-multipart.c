@@ -53,7 +53,7 @@ balsa_mime_widget_new_multipart(BalsaMessage * bm,
 					   mime_body->was_encrypted, FALSE, NULL);
 
         mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-        gtk_container_add(GTK_CONTAINER(mw), crypto_frame);
+        gtk_box_append(GTK_BOX(mw), crypto_frame);
     }
 
     balsa_mime_widget_set_container(mw, widget);

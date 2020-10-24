@@ -44,8 +44,8 @@ static GtkWidget * create_text_widget(const char * content_type);
 static void bm_modify_font_from_string(GtkWidget * widget, const char *font);
 static GtkTextTag * quote_tag(GtkTextBuffer * buffer, gint level, gint margin);
 static gboolean fix_text_widget(GtkWidget *widget, gpointer user_data);
-static void text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
-                                     gpointer user_data);
+static GMenu *text_view_extra_menu(GtkWidget *widget, BalsaMimeWidgetText *mwt);
+static GMenu *text_view_url_extra_menu(GtkWidget *widget, BalsaMimeWidgetText *mwt);
 
 #ifdef HAVE_HTML_WIDGET
 static BalsaMimeWidget *bm_widget_new_html(BalsaMessage * bm,
@@ -59,55 +59,55 @@ static BalsaMimeWidget * bm_widget_new_vcard(BalsaMessage * bm,
 /* URL related stuff */
 typedef struct _message_url_t {
     GtkTextMark *end_mark;
-    gint start, end;             /* pos in the buffer */
-    gchar *url;                  /* the link */
+    int start, end;             /* pos in the buffer */
+    char *url;                  /* the link */
 } message_url_t;
 
 
 /* citation bars */
 typedef struct {
-    gint start_offs;
-    gint end_offs;
+    int start_offs;
+    int end_offs;
     GtkTextIter start_iter;
     GtkTextIter end_iter;
-    gint y_pos;
-    gint height;
-    guint depth;
+    int y_pos;
+    int height;
+    unsigned depth;
     GtkWidget * bar;
 } cite_bar_t;
 
 /* store the coordinates at which the button was pressed */
-static gint stored_x = -1, stored_y = -1;
+static int stored_x = -1, stored_y = -1;
 static GdkModifierType stored_mask = -1;
 #define STORED_MASK_BITS (  GDK_SHIFT_MASK   \
                           | GDK_CONTROL_MASK \
-                          | GDK_MOD1_MASK    \
-                          | GDK_MOD2_MASK    \
-                          | GDK_MOD3_MASK    \
-                          | GDK_MOD4_MASK    \
-                          | GDK_MOD5_MASK    )
+                          | GDK_BUTTON1_MASK    \
+                          | GDK_BUTTON2_MASK    \
+                          | GDK_BUTTON3_MASK    \
+                          | GDK_BUTTON4_MASK    \
+                          | GDK_BUTTON5_MASK    )
 
 /* the cursors which are displayed over URL's and normal message text */
 static GdkCursor *url_cursor_normal = NULL;
 static GdkCursor *url_cursor_over_url = NULL;
 
 
-static void store_button_coords(GtkGestureMultiPress *multi_press,
-                                gint                  n_press,
-                                gdouble               x,
-                                gdouble               y,
-                                gpointer              user_data);
+static void store_button_coords(GtkGestureClick *click,
+                                int              n_press,
+                                double           x,
+                                double           y,
+                                gpointer         user_data);
 static void check_over_url(BalsaMimeWidgetText * mwt,
                            message_url_t       * url);
 static void pointer_over_url(GtkWidget * widget, message_url_t * url, gboolean set);
 static void prepare_url_offsets(GtkTextBuffer * buffer, GList * url_list);
 static void url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
                          const gchar * buf, guint len, gpointer data);
-static void check_call_url(GtkGestureMultiPress *multi_press,
-                           gint                  n_press,
-                           gdouble               x,
-                           gdouble               y,
-                           gpointer              user_data);
+static void check_call_url(GtkGestureClick *click,
+                           int              n_press,
+                           double           x,
+                           double           y,
+                           gpointer         user_data);
 static message_url_t * find_url(BalsaMimeWidgetText *mwt,
                                 gint                 x,
                                 gint                 y);
@@ -149,9 +149,10 @@ struct _BalsaMimeWidgetText {
     message_url_t       *current_url;
     LibBalsaMessageBody *mime_body;
     GList               *cite_bar_list;
-    gint                 cite_bar_dimension;
-    gint                 phrase_hl;
-    GtkTextTag          *invisible;
+    int                  cite_bar_dimension;
+    int                  phrase_hl;
+    GMenu               *extra_menu;
+    GMenu               *url_extra_menu;
 };
 
 G_DEFINE_TYPE(BalsaMimeWidgetText, balsa_mime_widget_text, BALSA_TYPE_MIME_WIDGET)
@@ -190,21 +191,21 @@ balsa_mime_widget_text_init(BalsaMimeWidgetText * self)
 
 static void
 mwt_controller_motion_cb(GtkEventControllerMotion * motion,
-                         gdouble                    x,
-                         gdouble                    y,
+                         double                     x,
+                         double                     y,
                          gpointer                   user_data)
 {
     BalsaMimeWidgetText *mwt = user_data;
     message_url_t *url;
 
-    url = find_url(mwt, (gint) x, (gint) y);
+    url = find_url(mwt, (int) x, (int) y);
     check_over_url(mwt, url);
 }
 
 static void
 mwt_controller_leave_cb(GtkEventControllerMotion * motion,
-                        gdouble                    x,
-                        gdouble                    y,
+                        double                     x,
+                        double                     y,
                         GdkCrossingMode            mode,
                         GdkNotifyType              detail,
                         gpointer                   user_data)
@@ -277,6 +278,10 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     mwt->mime_body = mime_body;
     mwt->text_widget = widget = create_text_widget(content_type);
     text_view = GTK_TEXT_VIEW(widget);
+    mime_body->user_data = widget;
+
+    mwt->extra_menu = text_view_extra_menu(widget, mwt);
+    gtk_text_view_set_extra_menu(text_view, G_MENU_MODEL(mwt->extra_menu));
 
     /* configure text or source view */
     gtk_text_view_set_editable(text_view, FALSE);
@@ -304,12 +309,11 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
                         is_text_plain);
     g_free(ptr);
 
-    key_controller = gtk_event_controller_key_new(widget);
+    key_controller = gtk_event_controller_key_new();
+    gtk_widget_add_controller(widget, key_controller);
     g_signal_connect(key_controller, "key-pressed",
 		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
 
-    g_signal_connect(widget, "populate-popup",
-		     G_CALLBACK(text_view_populate_popup), mwt);
     g_signal_connect_after(widget, "realize",
 			   G_CALLBACK(fix_text_widget), mwt);
 
@@ -317,13 +321,17 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
         GtkGesture *gesture;
         GtkEventController *motion_controller;
 
-        gesture = gtk_gesture_multi_press_new(widget);
+        mwt->url_extra_menu = text_view_url_extra_menu(widget, mwt);
+
+        gesture = gtk_gesture_click_new();
+        gtk_widget_add_controller(widget, GTK_EVENT_CONTROLLER(gesture));
         g_signal_connect(gesture, "pressed",
                          G_CALLBACK(store_button_coords), NULL);
         g_signal_connect(gesture, "released",
                 G_CALLBACK(check_call_url), mwt);
 
-        motion_controller = gtk_event_controller_motion_new(widget);
+        motion_controller = gtk_event_controller_motion_new();
+        gtk_widget_add_controller(widget, motion_controller);
         g_signal_connect(motion_controller, "motion",
                          G_CALLBACK(mwt_controller_motion_cb), mwt);
         g_signal_connect(motion_controller, "leave",
@@ -342,7 +350,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     }
 
     mw = (BalsaMimeWidget *) mwt;
-    gtk_container_add(GTK_CONTAINER(mw), widget);
+    gtk_box_append(GTK_BOX(mw), widget);
 
     return mw;
 }
@@ -415,7 +423,7 @@ bm_modify_font_from_string(GtkWidget * widget, const char *font)
     css = libbalsa_font_string_to_css(font, BALSA_MESSAGE_TEXT_HEADER);
 
     css_provider = gtk_css_provider_new();
-    gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+    gtk_css_provider_load_from_data(css_provider, css, -1);
     g_free(css);
 
     gtk_style_context_add_provider(gtk_widget_get_style_context(widget) ,
@@ -470,57 +478,30 @@ quote_tag(GtkTextBuffer * buffer, gint level, gint margin)
 }
 
 /* set the gtk_text widget's cursor to a vertical bar
-   fix event mask so that pointer motions are reported(if necessary) */
+ */
 static gboolean
 fix_text_widget(GtkWidget *widget, gpointer user_data)
 {
-    BalsaMimeWidgetText *mwt = user_data;
-    GdkWindow *w =
-        gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
-                                 GTK_TEXT_WINDOW_TEXT);
-
-    if (mwt->url_list != NULL) {
-        gdk_window_set_events(w,
-                              gdk_window_get_events(w) |
-                              GDK_POINTER_MOTION_MASK |
-                              GDK_LEAVE_NOTIFY_MASK);
-    }
-
     if (url_cursor_normal == NULL || url_cursor_over_url == NULL) {
-        GdkDisplay *display;
-
-        display = gdk_window_get_display(w);
-        url_cursor_normal =
-            gdk_cursor_new_for_display(display, GDK_XTERM);
-        url_cursor_over_url =
-            gdk_cursor_new_for_display(display, GDK_HAND2);
+        url_cursor_normal = gdk_cursor_new_from_name("text", NULL);
+        url_cursor_over_url = gdk_cursor_new_from_name("grab", NULL);
     }
-    gdk_window_set_cursor(w, url_cursor_normal);
+
+    gtk_widget_set_cursor(widget, url_cursor_normal);
 
     return FALSE;
 }
 
 static void
-gtk_widget_destroy_insensitive(GtkWidget * widget)
+highlight_structured_phrases(BalsaMimeWidgetText *mwt, gboolean new_hl)
 {
-    if (!gtk_widget_get_sensitive(widget) ||
-	GTK_IS_SEPARATOR_MENU_ITEM(widget))
-	gtk_widget_destroy(widget);
-}
-
-static void
-structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
-			  gpointer          user_data)
-{
-    BalsaMimeWidgetText *mwt = user_data;
     GtkTextView * text_view;
     GtkTextTagTable * table;
     GtkTextTag * tag;
-    gboolean new_hl;
 
     text_view = GTK_TEXT_VIEW(mwt->text_widget);
     table = gtk_text_buffer_get_tag_table(gtk_text_view_get_buffer(text_view));
-    new_hl = gtk_check_menu_item_get_active(checkmenuitem);
+
     if (table == NULL || mwt->phrase_hl == 0 ||
         (mwt->phrase_hl == PHRASE_HIGHLIGHT_ON && new_hl) ||
         (mwt->phrase_hl == PHRASE_HIGHLIGHT_OFF && !new_hl))
@@ -542,170 +523,187 @@ structured_phrases_toggle(GtkCheckMenuItem *checkmenuitem,
     mwt->phrase_hl = new_hl ? PHRASE_HIGHLIGHT_ON : PHRASE_HIGHLIGHT_OFF;
 }
 
+/*
+ * Extra menus for GtkTextView
+ *
+ * First, one for when over an URI:
+ */
 static void
-url_copy_cb(GtkWidget * menu_item, message_url_t * uri)
+copy_link_activated(GSimpleAction *action,
+                    GVariant      *parameter,
+                    gpointer       user_data)
 {
+    BalsaMimeWidgetText *mwt = user_data;
     GdkDisplay *display;
-    GtkClipboard *clipboard;
+    GdkClipboard *clipboard;
 
-    display = gtk_widget_get_display(menu_item);
-    clipboard =
-        gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
-    gtk_clipboard_set_text(clipboard, uri->url, -1);
+    display = gtk_widget_get_display(GTK_WIDGET(mwt));
+    clipboard = gdk_display_get_clipboard(display);
+    gdk_clipboard_set_text(clipboard, mwt->current_url->url);
 }
 
 static void
-url_open_cb(GtkWidget * menu_item, message_url_t * uri)
+open_link_activated(GSimpleAction *action,
+                    GVariant      *parameter,
+                    gpointer       user_data)
 {
-    handle_url(uri->url);
+    BalsaMimeWidgetText *mwt = user_data;
+
+    handle_url(mwt->current_url->url);
 }
 
 static void
-url_send_cb(GtkWidget * menu_item, message_url_t * uri)
+send_link_activated(GSimpleAction *action,
+                    GVariant      *parameter,
+                    gpointer       user_data)
 {
+    BalsaMimeWidgetText *mwt = user_data;
     BalsaSendmsg * newmsg;
 
     newmsg = sendmsg_window_compose();
-    sendmsg_window_set_field(newmsg, "body", uri->url, FALSE);
+    sendmsg_window_set_field(newmsg, "body", mwt->current_url->url, FALSE);
 }
 
-static gboolean
-text_view_url_popup(GtkWidget *widget, GtkMenu *menu, message_url_t *url)
+static GMenu *
+text_view_url_extra_menu(GtkWidget *widget, BalsaMimeWidgetText *mwt)
 {
-    GtkWidget *menu_item;
+    GSimpleActionGroup *simple;
+    static const GActionEntry entries[] = {
+        {"copy-link", copy_link_activated},
+        {"open-link", open_link_activated},
+        {"send-link", send_link_activated},
+    };
+    GMenu *menu;
 
-    /* check if we are over an url */
-    if (url == NULL)
-	return FALSE;
+    /* Set up the actions: */
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    entries,
+                                    G_N_ELEMENTS(entries),
+                                    mwt);
+    gtk_widget_insert_action_group(GTK_WIDGET(mwt),
+                                   "text-view-url-popup",
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
 
-    /* build a popup to copy or open the URL */
-    gtk_container_foreach(GTK_CONTAINER(menu),
-                         (GtkCallback)gtk_widget_destroy, NULL);
+    menu = g_menu_new();
 
-    menu_item = gtk_menu_item_new_with_label(_("Copy link"));
-    g_signal_connect(menu_item, "activate",
-                      G_CALLBACK(url_copy_cb), (gpointer)url);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+    g_menu_append(menu, _("Copy link"), "copy-link");
+    g_menu_append(menu, _("Open link"), "open-link");
+    g_menu_append(menu, _("Send link"), "send-link");
 
-    menu_item = gtk_menu_item_new_with_label(_("Open link"));
-    g_signal_connect(menu_item, "activate",
-                      G_CALLBACK(url_open_cb), (gpointer)url);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-
-    menu_item = gtk_menu_item_new_with_label(_("Send link…"));
-    g_signal_connect(menu_item, "activate",
-                      G_CALLBACK(url_send_cb), (gpointer)url);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-
-    gtk_widget_show_all(GTK_WIDGET(menu));
-
-    return TRUE;
+    return menu;
 }
 
+/*
+ * Extra menu when not over an URI:
+ */
 static void
 open_with_activated(GSimpleAction *action,
                     GVariant      *parameter,
                     gpointer       user_data)
 {
     const gchar *app_name = g_variant_get_string(parameter, NULL);
-    LibBalsaMessageBody *part = user_data;
+    BalsaMimeWidgetText *mwt = user_data;
 
-    balsa_mime_widget_ctx_menu_launch_app(app_name, part);
+    balsa_mime_widget_ctx_menu_launch_app(app_name, mwt->mime_body);
 }
 
 static void
-text_view_populate_popup(GtkWidget *widget, GtkMenu *menu,
-                         gpointer user_data)
+save_activated(GSimpleAction *action,
+               GVariant      *parameter,
+               gpointer       user_data)
 {
     BalsaMimeWidgetText *mwt = user_data;
-    GtkWidget *menu_item;
+    LibBalsaMessageBody *part = mwt->mime_body;
+
+    balsa_mime_widget_ctx_menu_save(part->user_data, part);
+}
+
+static void
+highlight_change_state(GSimpleAction *action,
+                       GVariant      *state,
+                       gpointer       user_data)
+{
+    gboolean highlight = g_variant_get_boolean(state);
+    BalsaMimeWidgetText *mwt = user_data;
+
+    highlight_structured_phrases(mwt, highlight);
+}
+
+static GMenu *
+text_view_extra_menu(GtkWidget *widget, BalsaMimeWidgetText *mwt)
+{
     GSimpleActionGroup *simple;
     static const GActionEntry text_view_popup_entries[] = {
-        {"open-with", open_with_activated, "s"}
+        {"open-with", open_with_activated, "s"},
+        {"save",      save_activated},
+        {"highlight", NULL, NULL, "true", highlight_change_state},
     };
+    GMenu *menu;
     GMenu *open_menu;
-    GtkWidget *submenu;
+    GAction *highlight_action;
 
-    /* GtkTextView's populate-popup signal handler is supposed to check: */
-    if (!GTK_IS_MENU(menu))
-        return;
-
-    gtk_widget_hide(GTK_WIDGET(menu));
-    gtk_container_foreach(GTK_CONTAINER(menu),
-                         (GtkCallback) gtk_widget_hide, NULL);
-
-    if (text_view_url_popup(widget, menu, mwt->current_url))
-	return;
-
-    gtk_container_foreach(GTK_CONTAINER(menu),
-                          (GtkCallback) gtk_widget_destroy_insensitive, NULL);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu),
-			  gtk_separator_menu_item_new());
-
-    /* Set up the "open-with" action: */
+    /* Set up the actions: */
     simple = g_simple_action_group_new();
     g_action_map_add_action_entries(G_ACTION_MAP(simple),
                                     text_view_popup_entries,
                                     G_N_ELEMENTS(text_view_popup_entries),
-                                    mwt->mime_body);
-    gtk_widget_insert_action_group(GTK_WIDGET(menu),
+                                    mwt);
+    gtk_widget_insert_action_group(GTK_WIDGET(mwt),
                                    "text-view-popup",
                                    G_ACTION_GROUP(simple));
+    highlight_action = g_action_map_lookup_action(G_ACTION_MAP(simple), "highlight");
     g_object_unref(simple);
 
+    menu = g_menu_new();
+
     open_menu = g_menu_new();
-    libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/plain", "open-with");
-    submenu = gtk_menu_new_from_model(G_MENU_MODEL(open_menu));
+    libbalsa_vfs_fill_menu_by_content_type(open_menu, "text/plain", "text-view-popup.open-with");
+    g_menu_append_submenu(menu, _("Open…"), G_MENU_MODEL(open_menu));
     g_object_unref(open_menu);
 
-    menu_item = gtk_menu_item_new_with_label(_("Open…"));
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), submenu);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-
-    menu_item = gtk_menu_item_new_with_label(_("Save…"));
-    g_signal_connect(menu_item, "activate",
-                     G_CALLBACK(balsa_mime_widget_ctx_menu_save), mwt->mime_body);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+    g_menu_append(menu, _("Save…"), "text-view-popup.save");
 
     if (mwt->phrase_hl != 0) {
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu),
-			      gtk_separator_menu_item_new());
-	menu_item = gtk_check_menu_item_new_with_label(_("Highlight structured phrases"));
-	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menu_item),
-                                       mwt->phrase_hl == PHRASE_HIGHLIGHT_ON);
-	g_signal_connect(menu_item, "toggled",
-                         G_CALLBACK(structured_phrases_toggle), mwt);
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+        GMenu *section;
+
+        section = g_menu_new();
+	g_menu_append(section, _("Highlight structured phrases"), "text-view-popup.highlight");
+        g_simple_action_set_state(G_SIMPLE_ACTION(highlight_action),
+                                  g_variant_new_boolean(mwt->phrase_hl == PHRASE_HIGHLIGHT_ON));
+
+        g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
+        g_object_unref(section);
     }
 
-    gtk_widget_show_all(GTK_WIDGET(menu));
+    return menu;
 }
 
 
 /* -- URL related stuff -- */
 
 static void
-store_button_coords(GtkGestureMultiPress *multi_press,
-                    gint                  n_press,
-                    gdouble               x,
-                    gdouble               y,
-                    gpointer              user_data)
+store_button_coords(GtkGestureClick *click,
+                    int              n_press,
+                    double           x,
+                    double           y,
+                    gpointer         user_data)
 {
     GtkGesture *gesture;
-    const GdkEvent *event;
+    GdkEvent *event;
     GdkModifierType state;
 
-    gesture = GTK_GESTURE(multi_press);
-    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    gesture = GTK_GESTURE(click);
+    event = gtk_event_controller_get_current_event(GTK_EVENT_CONTROLLER(gesture));
+    state = gdk_event_get_modifier_state(event);
 
-    stored_x = (gint) x;
-    stored_y = (gint) y;
+    stored_x = (int) x;
+    stored_y = (int) y;
 
-    if (gdk_event_get_state(event, &state)) {
-        /* compare only shift, ctrl, and mod1-mod5 */
-        state &= STORED_MASK_BITS;
-        stored_mask = state;
-    }
+    /* compare only shift, ctrl, and buttons 1-5 */
+    state &= STORED_MASK_BITS;
+    stored_mask = state;
 }
 
 /* check if we are over an url and change the cursor in this case */
@@ -715,32 +713,28 @@ check_over_url(BalsaMimeWidgetText * mwt,
 {
     static gboolean was_over_url = FALSE;
     GtkWidget *widget;
-    GdkWindow *window;
 
     widget = mwt->text_widget;
-    window = gtk_text_view_get_window(GTK_TEXT_VIEW(widget),
-                                      GTK_TEXT_WINDOW_TEXT);
 
     if (url != NULL) {
         if (url_cursor_normal == NULL || url_cursor_over_url == NULL) {
-            GdkDisplay *display;
-
-            display = gdk_window_get_display(window);
-            url_cursor_normal =
-                gdk_cursor_new_for_display(display, GDK_LEFT_PTR);
-            url_cursor_over_url =
-                gdk_cursor_new_for_display(display, GDK_HAND2);
+            url_cursor_normal = gdk_cursor_new_from_name("text", NULL);
+            url_cursor_over_url = gdk_cursor_new_from_name("grab", NULL);
         }
+
         if (!was_over_url) {
-            gdk_window_set_cursor(window, url_cursor_over_url);
+            gtk_widget_set_cursor(widget, url_cursor_over_url);
+            gtk_text_view_set_extra_menu(GTK_TEXT_VIEW(widget), G_MENU_MODEL(mwt->url_extra_menu));
             was_over_url = TRUE;
         }
+
         if (url != mwt->current_url) {
             pointer_over_url(widget, mwt->current_url, FALSE);
             pointer_over_url(widget, url, TRUE);
         }
     } else if (was_over_url) {
-        gdk_window_set_cursor(window, url_cursor_normal);
+        gtk_widget_set_cursor(widget, url_cursor_normal);
+        gtk_text_view_set_extra_menu(GTK_TEXT_VIEW(widget), G_MENU_MODEL(mwt->extra_menu));
         pointer_over_url(widget, mwt->current_url, FALSE);
         was_over_url = FALSE;
     }
@@ -822,29 +816,30 @@ url_found_cb(GtkTextBuffer * buffer, GtkTextIter * iter,
 /* if the mouse button was released over an URL, and the mouse hasn't
  * moved since the button was pressed, try to call the URL */
 static void
-check_call_url(GtkGestureMultiPress *multi_press,
-               gint                  n_press,
-               gdouble               x,
-               gdouble               y,
-               gpointer              user_data)
+check_call_url(GtkGestureClick *click,
+               int              n_press,
+               double           x,
+               double           y,
+               gpointer         user_data)
 {
     BalsaMimeWidgetText *mwt = user_data;
     GtkGesture *gesture;
-    const GdkEvent *event;
+    GdkEvent *event;
     GdkModifierType state;
 
-    gesture = GTK_GESTURE(multi_press);
-    event = gtk_gesture_get_last_event(gesture, gtk_gesture_get_last_updated_sequence(gesture));
+    gesture = GTK_GESTURE(click);
+    event = gtk_event_controller_get_current_event(GTK_EVENT_CONTROLLER(gesture));
 
-    if (event == NULL || !gdk_event_get_state(event, &state))
+    if (event == NULL)
         return;
+    state = gdk_event_get_modifier_state(event);
 
     /* 2-pixel motion tolerance */
     if (abs((int) x - stored_x) <= 2 && abs((int) y - stored_y) <= 2
         && (state & STORED_MASK_BITS) == stored_mask) {
         message_url_t *url;
 
-        url = find_url(mwt, x, y);
+        url = find_url(mwt, (int) x, (int) y);
         if (url != NULL)
             handle_url(url->url);
     }
@@ -854,7 +849,7 @@ check_call_url(GtkGestureMultiPress *multi_press,
  * look in widget at coordinates x, y for a URL in url_list.
  */
 static message_url_t *
-find_url(BalsaMimeWidgetText * mwt, gint x, gint y)
+find_url(BalsaMimeWidgetText * mwt, int x, int y)
 {
     GtkTextIter iter;
     gint offset;
@@ -895,20 +890,37 @@ statusbar_pop(gpointer data)
     return FALSE;
 }
 
+static void
+handle_url_finish(GObject      *source_object,
+                  GAsyncResult *res,
+                  gpointer      user_data)
+{
+    char *url = user_data;
+    GError *err = NULL;
+
+    if (!gtk_show_uri_full_finish(GTK_WINDOW(source_object), res, &err)) {
+            balsa_information(LIBBALSA_INFORMATION_WARNING,
+                              _("Error showing %s: %s\n"),
+                              url, err->message);
+            g_error_free(err);
+    }
+
+    g_free(url);
+}
+
 #define SCHEDULE_BAR_REFRESH() \
     g_timeout_add_seconds(5, statusbar_pop, NULL);
 
 static void
-handle_url(const gchar * url)
+handle_url(const char * url)
 {
-    if (!g_ascii_strncasecmp(url, "mailto:", 7)) {
+    if (g_ascii_strncasecmp(url, "mailto:", 7) == 0) {
         BalsaSendmsg *snd = sendmsg_window_compose();
         sendmsg_window_process_url(snd, url + 7, FALSE);
     } else {
         GtkStatusbar *statusbar;
         guint context_id;
         gchar *notice = g_strdup_printf(_("Calling URL %s…"), url);
-        GError *err = NULL;
 
         statusbar = balsa_window_get_statusbar(balsa_app.main_window);
         context_id =
@@ -917,15 +929,8 @@ handle_url(const gchar * url)
         gtk_statusbar_push(statusbar, context_id, notice);
         SCHEDULE_BAR_REFRESH();
         g_free(notice);
-        gtk_show_uri_on_window(GTK_WINDOW(balsa_app.main_window), url,
-                               gtk_get_current_event_time(), &err);
-
-        if (err != NULL) {
-            balsa_information(LIBBALSA_INFORMATION_WARNING,
-                              _("Error showing %s: %s\n"),
-                              url, err->message);
-            g_error_free(err);
-        }
+        gtk_show_uri_full(GTK_WINDOW(balsa_app.main_window), url,
+                          GDK_CURRENT_TIME, NULL, handle_url_finish, g_strdup(url));
     }
 }
 
@@ -1017,9 +1022,9 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     GtkTextView * view;
     GtkTextBuffer * buffer;
     gint dimension;
-    gint buffer_y;
-    gint y_pos;
-    gint height;
+    GdkRectangle location;
+    int y_pos;
+    int height;
 
     view = GTK_TEXT_VIEW(mwt->text_widget);
     buffer = gtk_text_view_get_buffer(view);
@@ -1036,15 +1041,10 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     }
 
     /* get the locations */
-    gtk_text_view_get_line_yrange(view, &bar->start_iter, &buffer_y, NULL);
-    gtk_text_view_buffer_to_window_coords(view, GTK_TEXT_WINDOW_TEXT,
-                                          0, buffer_y,
-                                          NULL, &y_pos);
-    gtk_text_view_get_line_yrange(view, &bar->end_iter, &buffer_y, NULL);
-    gtk_text_view_buffer_to_window_coords(view, GTK_TEXT_WINDOW_TEXT,
-                                          0, buffer_y,
-                                          NULL, &height);
-    height -= y_pos;
+    gtk_text_view_get_iter_location(view, &bar->start_iter, &location);
+    y_pos = location.y;
+    gtk_text_view_get_iter_location(view, &bar->end_iter, &location);
+    height = location.y - y_pos;
 
     /* add a new widget if necessary */
     if (!bar->bar) {
@@ -1063,7 +1063,7 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
         g_free(color);
 
         css_provider = gtk_css_provider_new();
-        gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
+        gtk_css_provider_load_from_data(css_provider, css, -1);
         g_free(css);
 
         gtk_style_context_add_provider(gtk_widget_get_style_context(bar->bar) ,
@@ -1071,13 +1071,11 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
         g_object_unref(css_provider);
 
-        gtk_widget_show(bar->bar);
-        gtk_text_view_add_child_in_window(view, bar->bar,
-                                          GTK_TEXT_WINDOW_TEXT, 0, y_pos);
+        gtk_text_view_add_overlay(view, bar->bar, 0, y_pos);
     } else if (bar->y_pos != y_pos || bar->height != height) {
         /* shift/resize existing widget */
         balsa_cite_bar_resize(BALSA_CITE_BAR(bar->bar), height);
-        gtk_text_view_move_child(view, bar->bar, 0, y_pos);
+        gtk_text_view_move_overlay(view, bar->bar, 0, y_pos);
     }
 
     /* remember current values */
@@ -1396,9 +1394,8 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
     mwt->text_widget = widget =
         libbalsa_html_new(mime_body,
                          (LibBalsaHtmlCallback) bm_widget_on_url,
-                         (LibBalsaHtmlCallback) handle_url,
-                         libbalsa_html_get_load_content(from));
-    gtk_container_add(GTK_CONTAINER(mwt), widget);
+                         (LibBalsaHtmlCallback) handle_url);
+    gtk_box_append(GTK_BOX(mwt), widget);
 
     g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);
 
@@ -1448,7 +1445,7 @@ bm_widget_new_vcard(BalsaMessage *bm, LibBalsaMessageBody *mime_body,
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
     widget = gtk_grid_new();
     g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);
-    gtk_container_add(GTK_CONTAINER(mw), widget);
+    gtk_box_append(GTK_BOX(mw), widget);
 
     grid = (GtkGrid *) widget;
     gtk_grid_set_row_spacing(grid, 6);
@@ -1513,20 +1510,19 @@ check_text_encoding(BalsaMessage * bm, gchar *text_buf)
 static void
 fill_text_buf_cited(BalsaMimeWidgetText *mwt,
                     GtkWidget           *widget,
-                    const gchar         *text_body,
+                    const char         *text_body,
                     gboolean             is_flowed,
                     gboolean             is_plain)
 {
     GRegex *rex = NULL;
     PangoContext *context = gtk_widget_get_pango_context(widget);
     PangoFontDescription *desc = pango_context_get_font_description(context);
-    gdouble char_width;
-    GdkScreen *screen;
+    double char_width;
     GtkTextBuffer *buffer;
     GdkRGBA *rgba;
     LibBalsaUrlInsertInfo url_info;
-    guint cite_level;
-    guint cite_start;
+    unsigned cite_level;
+    unsigned cite_start;
 
     /* prepare citation regular expression for plain bodies */
     if (is_plain) {
@@ -1539,8 +1535,8 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
         char_width = char_width / PANGO_SCALE;
 
     /* convert char_width from points to pixels */
-    screen = gtk_widget_get_screen(widget);
-    mwt->cite_bar_dimension = (char_width / 72.0) * gdk_screen_get_resolution(screen);
+    /* Assume a logical DPI of 96, which is alleged to be common */
+    mwt->cite_bar_dimension = (char_width / 72.0) * 96;
 
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
     rgba = &balsa_app.url_color;

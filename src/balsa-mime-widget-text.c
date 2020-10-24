@@ -899,10 +899,10 @@ handle_url_finish(GObject      *source_object,
     GError *err = NULL;
 
     if (!gtk_show_uri_full_finish(GTK_WINDOW(source_object), res, &err)) {
-            balsa_information(LIBBALSA_INFORMATION_WARNING,
-                              _("Error showing %s: %s\n"),
-                              url, err->message);
-            g_error_free(err);
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Error showing %s: %s\n"),
+                          url, err->message);
+        g_error_free(err);
     }
 
     g_free(url);

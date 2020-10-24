@@ -66,8 +66,7 @@ filters_export_dialog(GtkWindow * parent)
 	return;
     }
     if (fex_already_open) {
-	gtk_window_present_with_time(GTK_WINDOW(fex_window),
-                                     gtk_get_current_event_time());
+	gtk_window_present_with_time(GTK_WINDOW(fex_window), GDK_CURRENT_TIME);
 	return;
     }
 
@@ -82,9 +81,8 @@ filters_export_dialog(GtkWindow * parent)
                                     _("_Help"), GTK_RESPONSE_HELP,
                                     NULL);
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(fex_window));
-    gtk_window_set_role(GTK_WINDOW(fex_window), "filter-export");
 
-    sw = gtk_scrolled_window_new(NULL, NULL);
+    sw = gtk_scrolled_window_new();
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
@@ -92,13 +90,13 @@ filters_export_dialog(GtkWindow * parent)
     list =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
                                  NULL, TRUE);
-    gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(list));
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(sw), GTK_WIDGET(list));
 
     gtk_widget_set_vexpand(sw, TRUE);
     gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(sw, 2);
     gtk_widget_set_margin_bottom(sw, 2);
-    gtk_container_add(GTK_CONTAINER(content_area), sw);
+    gtk_box_append(GTK_BOX(content_area), sw);
 
     /* Populate the list of filters */
 
@@ -121,5 +119,5 @@ filters_export_dialog(GtkWindow * parent)
     g_signal_connect(fex_window, "destroy",
 		     G_CALLBACK(fex_destroy_window_cb), NULL);
 
-    gtk_widget_show_all(GTK_WIDGET(fex_window));
+    gtk_widget_show(GTK_WIDGET(fex_window));
 }

@@ -72,7 +72,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     g_free(markup_buf);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_widget_set_valign(label, GTK_ALIGN_START);
-    gtk_container_add(GTK_CONTAINER(mw), label);
+    gtk_box_append(GTK_BOX(mw), label);
 
     /* a reply may be created only for unread requests */
     if ((libbalsa_vcal_method(vcal_obj) == ICAL_METHOD_REQUEST) &&
@@ -103,10 +103,15 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
     	GtkWidget *event;
 
     	frame = gtk_frame_new(NULL);
-        gtk_container_add(GTK_CONTAINER(mw), frame);
+        gtk_box_append(GTK_BOX(mw), frame);
     	event = balsa_vevent_widget(libbalsa_vcal_vevent(vcal_obj, event_no), vcal_obj, may_reply, sender);
-        gtk_container_set_border_width(GTK_CONTAINER(event), 6U);
-    	gtk_container_add(GTK_CONTAINER(frame), event);
+
+        gtk_widget_set_margin_top(event, 6U);
+        gtk_widget_set_margin_bottom(event, 6U);
+        gtk_widget_set_margin_start(event, 6U);
+        gtk_widget_set_margin_end(event, 6U);
+
+    	gtk_frame_set_child(GTK_FRAME(frame), event);
     }
 
     g_object_unref(vcal_obj);
@@ -261,12 +266,12 @@ balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_repl
 			       (GDestroyNotify) g_object_unref);
 
 	/* pack everything into a box */
-	gtk_container_add(GTK_CONTAINER(box), GTK_WIDGET(grid));
+	gtk_box_append(GTK_BOX(box), GTK_WIDGET(grid));
 	label =
 	    gtk_label_new(_("The sender asks you for a reply to this request:"));
-	gtk_container_add(GTK_CONTAINER(box), label);
+	gtk_box_append(GTK_BOX(box), label);
         bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-	gtk_container_add(GTK_CONTAINER(box), bbox);
+	gtk_box_append(GTK_BOX(box), bbox);
 
         button = libbalsa_add_mnemonic_button_to_box(_("Accept"), bbox, GTK_ALIGN_CENTER);
 	g_object_set_data(G_OBJECT(button), "event", event);
@@ -394,8 +399,7 @@ vevent_reply(GObject * button, GtkWidget * box)
 				   balsa_find_sentbox_by_url,
 				   libbalsa_identity_get_smtp_server(ident),
 				   balsa_app.send_progress_dialog,
-                                   GTK_WINDOW(gtk_widget_get_toplevel
-                                              ((GtkWidget *) button)),
+                                   GTK_WINDOW(gtk_widget_get_root((GtkWidget *) button)),
 				   FALSE, &error);
     if (result != LIBBALSA_MESSAGE_CREATE_OK)
 	libbalsa_information(LIBBALSA_INFORMATION_ERROR,

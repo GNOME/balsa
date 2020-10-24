@@ -158,11 +158,26 @@ void save_filters(BalsaFilterRunDialog * p)
 }
 
 /* Dialog box button callbacks */
+static void
+help_button_finish(GObject      *source_object,
+                   GAsyncResult *result,
+                   gpointer      user_data)
+{
+    GtkWindow *parent = user_data;
+    GError *error = NULL;
+
+    if (!gtk_show_uri_full_finish(parent, result, &error)) {
+    	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+		             _("Error displaying run filters help: %s\n"),
+                             error->message);
+        g_error_free(error);
+    }
+}
+
 void fr_dialog_response(GtkWidget * widget, gint response,
 			gpointer throwaway)
 {
     BalsaFilterRunDialog * p;
-    GError *err = NULL;
 
     p=BALSA_FILTER_RUN_DIALOG(widget);
     switch (response) {
@@ -177,23 +192,16 @@ void fr_dialog_response(GtkWidget * widget, gint response,
 
 	break;
     case GTK_RESPONSE_HELP:     /* Help button */
-        gtk_show_uri_on_window(GTK_WINDOW(widget),
-                               "help:balsa/win-run-filters",
-                               gtk_get_current_event_time(), &err);
-	if (err) {
-	    balsa_information_parented(GTK_WINDOW(widget),
-		    LIBBALSA_INFORMATION_WARNING,
-		    _("Error displaying run filters help: %s\n"),
-		    err->message);
-	    g_error_free(err);
-	}
+        gtk_show_uri_full(GTK_WINDOW(widget),
+                          "help:balsa/win-run-filters",
+                          GDK_CURRENT_TIME, NULL, help_button_finish, widget);
 	return;
 
     default:
 	/* we should NEVER get here */
 	break;
     }
-    gtk_widget_destroy(GTK_WIDGET(p));
+    gtk_window_destroy(GTK_WINDOW(p));
 }
 
 

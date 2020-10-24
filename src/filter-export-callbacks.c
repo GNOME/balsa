@@ -70,5 +70,5 @@ fex_dialog_response(GtkWidget * dialog, gint response, gpointer data)
                                             fex_dialog_response_func,
                                             NULL);
     }
-    gtk_widget_destroy(dialog);
+    gtk_window_destroy(GTK_WINDOW(dialog));
 }

@@ -319,22 +319,32 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
     return mw;
 }
 
+static void
+extbody_call_url_finish(GObject      *source_object,
+                        GAsyncResult *res,
+                        gpointer      user_data)
+{
+    char *url = user_data;
+    GError *err = NULL;
+
+    if (!gtk_show_uri_full_finish(GTK_WINDOW(source_object), res, &err)) {
+        balsa_information(LIBBALSA_INFORMATION_WARNING,
+                          _("Error showing %s: %s\n"), url, err->message);
+        g_error_free(err);
+    }
+
+    g_free(url);
+}
 
 static void
 extbody_call_url(GtkWidget * button, gpointer data)
 {
-    gchar *url = g_object_get_data(G_OBJECT(button), "call_url");
+    char *url = g_object_get_data(G_OBJECT(button), "call_url");
     GtkRoot *root;
-    GError *err = NULL;
 
-    g_return_if_fail(url);
     root = gtk_widget_get_root(GTK_WIDGET(button));
-    gtk_show_uri(GTK_WINDOW(root), url, GDK_CURRENT_TIME);
-    if (err != NULL) {
-	balsa_information(LIBBALSA_INFORMATION_WARNING,
-			  _("Error showing %s: %s\n"), url, err->message);
-	g_error_free(err);
-    }
+    gtk_show_uri_full(GTK_WINDOW(root), url, GDK_CURRENT_TIME, NULL,
+                      extbody_call_url_finish, g_strdup(url));
 }
 
 static void

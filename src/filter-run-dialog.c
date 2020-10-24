@@ -175,7 +175,6 @@ balsa_filter_run_dialog_new(LibBalsaMailbox *mbox,
     dialog_title = g_strconcat(_("Filters of Mailbox: "),
                                libbalsa_mailbox_get_name(p->mbox), NULL);
     gtk_window_set_title(GTK_WINDOW(p), dialog_title);
-    gtk_window_set_role(GTK_WINDOW(p), "filter-run");
     g_free(dialog_title);
 
     /* Load associated filters if needed */
@@ -312,12 +311,12 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     gtk_widget_set_vexpand(hbox, TRUE);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(content_area), hbox);
+    gtk_box_append(GTK_BOX(content_area), hbox);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    gtk_box_append(GTK_BOX(hbox), vbox);
 
     p->available_filters =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
@@ -329,21 +328,21 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     g_signal_connect(selection, "changed",
                      G_CALLBACK(available_list_selection_changed), p);
 
-    sw = gtk_scrolled_window_new(NULL, NULL);
+    sw = gtk_scrolled_window_new();
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
-    gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(p->available_filters));
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(sw), GTK_WIDGET(p->available_filters));
 
     gtk_widget_set_vexpand(sw, TRUE);
     gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), sw);
+    gtk_box_append(GTK_BOX(vbox), sw);
 
     /* To keep a consistent look, make a button box for a single button. */
     bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
     gtk_widget_set_margin_top(bbox, 2);
     gtk_widget_set_margin_bottom(bbox, 2);
-    gtk_container_add(GTK_CONTAINER(vbox), bbox);
+    gtk_box_append(GTK_BOX(vbox), bbox);
 
     /* "Apply selected" button */
     p->apply_selected_button = button =
@@ -356,9 +355,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     bbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
 
     /* Right/Add button */
-    p->add_button = button =
-        gtk_button_new_from_icon_name("go-next-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+    p->add_button = button = gtk_button_new_from_icon_name("go-next-symbolic");
     gtk_widget_set_tooltip_text(button,
                                 _("Add selected filter to mailbox"));
     gtk_widget_set_sensitive(button, FALSE);
@@ -366,11 +363,9 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
                              G_CALLBACK(fr_add_pressed), p);
     gtk_widget_set_vexpand(button, TRUE);
     gtk_widget_set_valign(button, GTK_ALIGN_END);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_append(GTK_BOX(bbox), button);
     /* Left/Remove button */
-    p->remove_button = button =
-        gtk_button_new_from_icon_name("go-previous-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+    p->remove_button = button = gtk_button_new_from_icon_name("go-previous-symbolic");
     gtk_widget_set_tooltip_text(button,
                                 _("Remove selected filter from mailbox"));
     gtk_widget_set_sensitive(button, FALSE);
@@ -378,19 +373,19 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
                              G_CALLBACK(fr_remove_pressed), p);
     gtk_widget_set_vexpand(button, TRUE);
     gtk_widget_set_valign(button, GTK_ALIGN_START);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_append(GTK_BOX(bbox), button);
 
     gtk_widget_set_margin_start(bbox, 6);
     gtk_widget_set_margin_end(bbox, 6);
-    gtk_container_add(GTK_CONTAINER(hbox), bbox);
+    gtk_box_append(GTK_BOX(hbox), bbox);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
 
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox),vbox);
+    gtk_box_append(GTK_BOX(hbox), vbox);
 
-    sw = gtk_scrolled_window_new(NULL, NULL);
+    sw = gtk_scrolled_window_new();
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
@@ -403,23 +398,21 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     g_signal_connect(selection, "changed",
                      G_CALLBACK(selected_list_selection_changed), p);
 
-    gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(p->selected_filters));
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(sw), GTK_WIDGET(p->selected_filters));
 
     gtk_widget_set_vexpand(sw, TRUE);
     gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), sw);
+    gtk_box_append(GTK_BOX(vbox), sw);
 
     /* up down arrow buttons */
     bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 
     gtk_widget_set_margin_top(bbox, 2);
     gtk_widget_set_margin_bottom(bbox, 2);
-    gtk_container_add(GTK_CONTAINER(vbox), bbox);
+    gtk_box_append(GTK_BOX(vbox), bbox);
 
     /* up button */
-    p->move_up_button = button =
-        gtk_button_new_from_icon_name("go-up-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+    p->move_up_button = button = gtk_button_new_from_icon_name("go-up-symbolic");
     gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_set_tooltip_text(button,
                                 _("Move selected filter up"));
@@ -428,11 +421,9 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, GTK_ALIGN_CENTER);
     gtk_size_group_add_widget(size_group, button);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_append(GTK_BOX(bbox), button);
     /* down button */
-    p->move_down_button = button =
-        gtk_button_new_from_icon_name("go-down-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
+    p->move_down_button = button = gtk_button_new_from_icon_name("go-down-symbolic");
     gtk_widget_set_sensitive(button, FALSE);
     gtk_widget_set_tooltip_text(button,
                                 _("Move selected filter down"));
@@ -441,7 +432,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, GTK_ALIGN_CENTER);
     gtk_size_group_add_widget(size_group, button);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_append(GTK_BOX(bbox), button);
 
     p->apply_now_button = button =
             gtk_button_new_with_mnemonic(_("A_pply Now!"));
@@ -451,7 +442,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, GTK_ALIGN_CENTER);
     gtk_size_group_add_widget(size_group, button);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
+    gtk_box_append(GTK_BOX(bbox), button);
 
     g_object_unref(size_group);
 
@@ -502,8 +493,7 @@ filters_run_dialog(LibBalsaMailbox *mbox,
     }
     if (lst) {
 	/* If there was yet a dialog box for this mailbox, we raise it */
-	gtk_window_present_with_time(GTK_WINDOW(lst->data),
-                                     gtk_get_current_event_time());
+	gtk_window_present_with_time(GTK_WINDOW(lst->data), GDK_CURRENT_TIME);
 	return;
     }
 
@@ -513,5 +503,5 @@ filters_run_dialog(LibBalsaMailbox *mbox,
     gtk_window_set_default_size(GTK_WINDOW(p), 500, 250);
     fr_dialogs_opened = g_list_prepend(fr_dialogs_opened, p);
 
-    gtk_widget_show_all(p);
+    gtk_widget_show(p);
 }

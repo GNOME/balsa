@@ -828,7 +828,7 @@ show_condition_help_finish(GObject      *source_object,
                            GAsyncResult *result,
                            gpointer      user_data)
 {
-    GtkWindow *parent = user_data;
+    GtkWindow *parent = GTK_WINDOW(source_object);
     GError *error = NULL;
 
     if (!gtk_show_uri_full_finish(parent, result, &error)) {
@@ -1499,7 +1499,7 @@ show_filter_help_finish(GObject      *source_object,
                         GAsyncResult *result,
                         gpointer      user_data)
 {
-    GtkWindow *parent = user_data;
+    GtkWindow *parent = GTK_WINDOW(source_object);
     GError *error = NULL;
 
     if (!gtk_show_uri_full_finish(parent, result, &error)) {

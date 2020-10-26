@@ -58,7 +58,7 @@ balsa_information_list_response_cb(GtkWidget * dialog, gint response,
         gtk_text_buffer_set_text(gtk_text_view_get_buffer(view), "", 0);
 	break;
     default:
-	gtk_widget_destroy(dialog);
+	gtk_window_destroy(GTK_WINDOW(dialog));
 	break;
     }
 }
@@ -120,7 +120,7 @@ balsa_information_idle(gpointer user_data)
     g_free(show_msg);
 
     if (info->type == LIBBALSA_INFORMATION_FATAL)
-	gtk_main_quit();
+	g_application_quit(G_APPLICATION(balsa_app.application));
 
     g_free(info);
 
@@ -212,7 +212,7 @@ balsa_information_dialog(GtkWindow *parent, LibBalsaInformationType type,
     libbalsa_macosx_menu_for_parent(messagebox, GTK_WINDOW(parent));
 #endif
 
-    g_signal_connect(messagebox, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+    g_signal_connect(messagebox, "response", G_CALLBACK(gtk_window_destroy), NULL);
     gtk_widget_show(messagebox);
 }
 
@@ -270,37 +270,32 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 	/* Reset the policy gtk_dialog_new makes itself non-resizable */
 	gtk_window_set_resizable(GTK_WINDOW(information_dialog), TRUE);
 	gtk_window_set_default_size(GTK_WINDOW(information_dialog), 350, 200);
-	gtk_window_set_role(GTK_WINDOW(information_dialog), "Information");
 
-        g_object_add_weak_pointer(G_OBJECT(information_dialog),
-                                  (gpointer *) &information_list);
+        g_object_add_weak_pointer(G_OBJECT(information_dialog), (gpointer *) &information_list);
 
 	/* A scrolled window for the list. */
-	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+	scrolled_window = gtk_scrolled_window_new();
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW
 				       (scrolled_window),
 				       GTK_POLICY_AUTOMATIC,
 				       GTK_POLICY_AUTOMATIC);
         gtk_widget_set_vexpand(scrolled_window, TRUE);
         gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
-        gtk_widget_set_margin_top(scrolled_window, 1);
-        gtk_widget_set_margin_bottom(scrolled_window, 1);
-        gtk_container_add(GTK_CONTAINER
-                           (gtk_dialog_get_content_area
-                            (GTK_DIALOG(information_dialog))),
-                           scrolled_window);
-	gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 6);
-	gtk_widget_show(scrolled_window);
+        gtk_box_append(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(information_dialog))),
+                       scrolled_window);
+
+	gtk_widget_set_margin_top(scrolled_window, 6);
+	gtk_widget_set_margin_bottom(scrolled_window, 6);
+	gtk_widget_set_margin_start(scrolled_window, 6);
+	gtk_widget_set_margin_end(scrolled_window, 6);
 
 	/* The list itself */
 	information_list = balsa_information_list_new();
-	gtk_container_add(GTK_CONTAINER(scrolled_window),
-			  information_list);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window), information_list);
         g_signal_connect(information_dialog, "response",
-                         G_CALLBACK(balsa_information_list_response_cb),
-                         information_list);
+                         G_CALLBACK(balsa_information_list_response_cb), information_list);
 
-	gtk_widget_show_all(information_dialog);
+	gtk_widget_show(information_dialog);
     }
 
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(information_list));

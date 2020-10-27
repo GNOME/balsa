@@ -104,6 +104,7 @@ struct _BalsaMailboxNode {
 
     GtkWidget *context_menu;
     GtkWidget *relative_to;
+    GActionMap *action_map;
 
     unsigned subscribed:1;     /* Used only by remote */
     unsigned list_inbox:1;     /* Used only by remote */
@@ -166,6 +167,8 @@ balsa_mailbox_node_dispose(GObject * object)
 	g_object_unref(mailbox);
 	mn->mailbox = NULL;
     }
+
+    g_clear_object(&mn->action_map);
 
     G_OBJECT_CLASS(balsa_mailbox_node_parent_class)->dispose(object);
 }
@@ -958,19 +961,14 @@ static void
 context_menu_set_enabled(BalsaMailboxNode *mbnode)
 {
     gboolean is_open;
-    GActionGroup *action_group;
-    GActionMap *action_map;
     GAction *action;
-
-    action_group = gtk_widget_get_action_group(mbnode->relative_to, "mbnode");
-    action_map = G_ACTION_MAP(action_group);
 
     is_open = MAILBOX_OPEN(mbnode->mailbox);
 
-    action = g_action_map_lookup_action(action_map, "open");
+    action = g_action_map_lookup_action(mbnode->action_map, "open");
     g_simple_action_set_enabled(G_SIMPLE_ACTION(action), !is_open);
 
-    action = g_action_map_lookup_action(action_map, "close");
+    action = g_action_map_lookup_action(mbnode->action_map, "close");
     g_simple_action_set_enabled(G_SIMPLE_ACTION(action), is_open);
 }
 
@@ -1102,7 +1100,7 @@ create_context_menu(BalsaMailboxNode *mbnode,
     gtk_widget_insert_action_group(GTK_WIDGET(relative_to),
                                    "mbnode",
                                    G_ACTION_GROUP(simple));
-    g_object_unref(simple);
+    mbnode->action_map = G_ACTION_MAP(simple);
 
     menu = g_menu_new();
 

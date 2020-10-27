@@ -169,13 +169,93 @@ mailbox_conf_edit_cb(GtkWidget * widget, gpointer data)
 }
 
 /* END OF COMMONLY USED CALLBACKS SECTION ------------------------ */
+static void
+mailbox_conf_delete_response(GtkDialog *ask,
+                             int        response_id,
+                             gpointer   user_data)
+{
+    BalsaMailboxNode *mbnode = user_data;
+    LibBalsaMailbox* mailbox = balsa_mailbox_node_get_mailbox(mbnode);
+    char *url;
+    char *group;
+
+    gtk_window_destroy(GTK_WINDOW(ask));
+
+    /* response_id < 0 means that the dialog window was closed without pressing
+       any button other than CANCEL.
+    */
+    if (response_id < 0)
+	return;
+
+    /* Save the mailbox URL */
+    url = g_strdup(libbalsa_mailbox_get_url(mailbox) ?
+                   libbalsa_mailbox_get_url(mailbox) : libbalsa_mailbox_get_name(mailbox));
+
+    /* Delete it from the config file and internal nodes */
+    config_mailbox_delete(mailbox);
+
+    /* Close the mailbox, in case it was open */
+    if (!LIBBALSA_IS_MAILBOX_POP3(mailbox))
+	balsa_mblist_close_mailbox(mailbox);
+
+    /* Remove mailbox on IMAP server */
+    if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) &&
+        libbalsa_mailbox_get_config_prefix(mailbox) == NULL) {
+        GError *err = NULL;
+	BalsaMailboxNode *parent = balsa_mailbox_node_get_parent(mbnode);
+        if(libbalsa_imap_delete_folder(LIBBALSA_MAILBOX_IMAP(mailbox),
+                                       &err)) {
+            /* a chain of folders might go away, so we'd better rescan from
+             * higher up
+             */
+            while (balsa_mailbox_node_get_mailbox(parent) == NULL &&
+                   balsa_mailbox_node_get_parent(parent) != NULL) {
+                mbnode = parent;
+                parent = balsa_mailbox_node_get_parent(parent);
+            }
+            balsa_mblist_mailbox_node_remove(mbnode);
+            balsa_mailbox_node_rescan(parent); /* see it as server sees it */
+        } else {
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _("Folder deletion failed. Reason: %s"),
+                              err ? err->message : "unknown");
+            g_clear_error(&err);
+            g_free(url);
+        }
+	return;
+    }
+
+    /* Delete local files */
+    if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox) && response_id == 1)
+	libbalsa_mailbox_local_remove_files(LIBBALSA_MAILBOX_LOCAL(
+             mailbox));
+
+    /* Remove the node from balsa's mailbox list */
+    if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
+	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
+					      mbnode);
+    } else
+	balsa_mblist_mailbox_node_remove(mbnode);
+    update_mail_servers();
+
+    /* Clean up filters */
+    group = mailbox_filters_section_lookup(url);
+    if (group) {
+        libbalsa_conf_remove_group(group);
+        g_free(group);
+    }
+
+    /* Remove view */
+    config_view_remove(url);
+
+    g_free(url);
+}
+
 void
 mailbox_conf_delete(BalsaMailboxNode * mbnode)
 {
-    gint button;
     GtkWidget *ask;
     LibBalsaMailbox* mailbox = balsa_mailbox_node_get_mailbox(mbnode);
-    gchar *url, *group;
 
     if(BALSA_IS_MAILBOX_SPECIAL(mailbox)) {
 	balsa_information(
@@ -245,80 +325,12 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
                                _("_Cancel"), GTK_RESPONSE_CANCEL,
                                NULL);
     }
-    
+
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(balsa_app.main_window));
 #endif
-    button = gtk_dialog_run(GTK_DIALOG(ask));
-    gtk_widget_destroy(ask);
-
-    /* button < 0 means that the dialog window was closed without pressing
-       any button other than CANCEL.
-    */
-    if ( button < 0)
-	return;
-
-    /* Save the mailbox URL */
-    url = g_strdup(libbalsa_mailbox_get_url(mailbox) ? libbalsa_mailbox_get_url(mailbox) : libbalsa_mailbox_get_name(mailbox));
-
-    /* Delete it from the config file and internal nodes */
-    config_mailbox_delete(mailbox);
-
-    /* Close the mailbox, in case it was open */
-    if (!LIBBALSA_IS_MAILBOX_POP3(mailbox))
-	balsa_mblist_close_mailbox(mailbox);
-
-    /* Remove mailbox on IMAP server */
-    if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) &&
-        libbalsa_mailbox_get_config_prefix(mailbox) == NULL) {
-        GError *err = NULL;
-	BalsaMailboxNode *parent = balsa_mailbox_node_get_parent(mbnode);
-        if(libbalsa_imap_delete_folder(LIBBALSA_MAILBOX_IMAP(mailbox),
-                                       &err)) {
-            /* a chain of folders might go away, so we'd better rescan from
-             * higher up
-             */
-            while (balsa_mailbox_node_get_mailbox(parent) == NULL &&
-                   balsa_mailbox_node_get_parent(parent) != NULL) {
-                mbnode = parent;
-                parent = balsa_mailbox_node_get_parent(parent);
-            }
-            balsa_mblist_mailbox_node_remove(mbnode);
-            balsa_mailbox_node_rescan(parent); /* see it as server sees it */
-        } else {
-            balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              _("Folder deletion failed. Reason: %s"),
-                              err ? err->message : "unknown");
-            g_clear_error(&err);
-            g_free(url);
-        }
-	return;
-    }
-
-    /* Delete local files */
-    if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox) && button == 1)
-	libbalsa_mailbox_local_remove_files(LIBBALSA_MAILBOX_LOCAL(
-             mailbox));
-
-    /* Remove the node from balsa's mailbox list */
-    if (LIBBALSA_IS_MAILBOX_POP3(mailbox)) {
-	balsa_app.inbox_input = g_list_remove(balsa_app.inbox_input, 
-					      mbnode);
-    } else
-	balsa_mblist_mailbox_node_remove(mbnode);
-    update_mail_servers();
-
-    /* Clean up filters */
-    group = mailbox_filters_section_lookup(url);
-    if (group) {
-        libbalsa_conf_remove_group(group);
-        g_free(group);
-    }
-
-    /* Remove view */
-    config_view_remove(url);
-
-    g_free(url);
+    g_signal_connect(ask, "response", G_CALLBACK(mailbox_conf_delete_response), mbnode);
+    gtk_widget_show(ask);
 }
 
 #define MCW_RESPONSE 1
@@ -343,11 +355,11 @@ conf_response_cb(GtkDialog* dialog, gint response, MailboxConfWindow * mcw)
     	}
         break;
     }
-    gtk_widget_destroy(GTK_WIDGET(dialog));
+    gtk_window_destroy(GTK_WINDOW(dialog));
 }
 
 static GtkWidget *
-run_mailbox_conf(BalsaMailboxNode* mbnode, GType mailbox_type, 
+run_mailbox_conf(BalsaMailboxNode* mbnode, GType mailbox_type,
 		 gboolean update)
 {
     MailboxConfWindow* mcw;
@@ -380,7 +392,7 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GType mailbox_type,
 
     g_signal_connect(mcw->window, "response", 
                      G_CALLBACK(conf_response_cb), mcw);
-    gtk_widget_show_all(GTK_WIDGET(mcw->window));
+    gtk_widget_show(GTK_WIDGET(mcw->window));
 
     return GTK_WIDGET(mcw->window);
 }
@@ -393,9 +405,9 @@ mailbox_conf_new(GType mailbox_type)
 {
     static GtkWidget *dialog;
 
-    if (dialog) {
-        gtk_window_present_with_time(GTK_WINDOW(dialog),
-                                     gtk_get_current_event_time());
+    if (dialog != NULL) {
+        gtk_window_present(GTK_WINDOW(dialog));
+
         return;
     }
 
@@ -415,9 +427,9 @@ mailbox_conf_edit(BalsaMailboxNode * mbnode)
 
     dialog = g_object_get_data(G_OBJECT(balsa_mailbox_node_get_mailbox(mbnode)),
                                BALSA_MAILBOX_CONF_DIALOG);
-    if (dialog) {
-        gtk_window_present_with_time(GTK_WINDOW(dialog),
-                                     gtk_get_current_event_time());
+    if (dialog != NULL) {
+        gtk_window_present(GTK_WINDOW(dialog));
+
         return;
     }
 
@@ -446,32 +458,33 @@ check_for_blank_fields(GtkWidget G_GNUC_UNUSED *widget,
     }
 
     if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_POP3)) {
-    	gboolean enable_filter;
+        gboolean enable_filter;
 
-    	sensitive = libbalsa_server_cfg_valid(mcw->mb_data.pop3.server_cfg);
+        sensitive = libbalsa_server_cfg_valid(mcw->mb_data.pop3.server_cfg);
 
-    	/* procmail filter */
-    	enable_filter = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter));
-    	gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd, enable_filter);
-    	if (enable_filter) {
-    		sensitive = sensitive && (*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd)) != '\0');
-    	}
-    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL)) {
-    	sensitive = TRUE;
-
-        if ((mcw->mb_data.local.mailbox_name != NULL) &&
-        	(*gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.local.mailbox_name)) == '\0')) {
-        	sensitive = FALSE;
-        } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL)) {
-        	gchar *filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(mcw->window));
-        	if (filename != NULL) {
-        		g_free(filename);
-        	} else {
-        		sensitive = FALSE;
-        	}
+        /* procmail filter */
+        enable_filter = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter));
+        gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd, enable_filter);
+        if (enable_filter) {
+            sensitive = sensitive
+                && (*gtk_editable_get_text(GTK_EDITABLE(mcw->mb_data.pop3.filter_cmd)) != '\0');
         }
+    } else if (g_type_is_a(mcw->mailbox_type, LIBBALSA_TYPE_MAILBOX_LOCAL)) {
+        GFile *file;
+        char *filename;
+
+        sensitive = TRUE;
+
+        file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(mcw->window));
+        filename = g_file_get_path(file);
+        g_object_unref(file);
+
+        if (filename != NULL)
+            g_free(filename);
+        else
+            sensitive = FALSE;
     } else {
-    	g_assert_not_reached();
+        g_assert_not_reached();
     }
 
     gtk_dialog_set_response_sensitive(mcw->window, MCW_RESPONSE, sensitive);
@@ -504,7 +517,7 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 	libbalsa_mailbox_pop3_set_check(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check)));
 	libbalsa_mailbox_pop3_set_delete_from_server(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON (mcw->mb_data.pop3.delete_from_server)));
 	libbalsa_mailbox_pop3_set_filter(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter)));
-	libbalsa_mailbox_pop3_set_filter_cmd(mailbox_pop3, gtk_entry_get_text(GTK_ENTRY(mcw->mb_data.pop3.filter_cmd)));
+	libbalsa_mailbox_pop3_set_filter_cmd(mailbox_pop3, gtk_editable_get_text(GTK_EDITABLE(mcw->mb_data.pop3.filter_cmd)));
 
 	/* advanced settings */
 	libbalsa_mailbox_pop3_set_disable_apop(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop)));
@@ -512,9 +525,9 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 }
 
 /* conf_update_mailbox:
-   if changing path of the local mailbox in the local mail directory, just 
+   if changing path of the local mailbox in the local mail directory, just
    rename the file, don't insert it to the configuration.
-   FIXME: make sure that the rename breaks nothing. 
+   FIXME: make sure that the rename breaks nothing.
 */
 static void
 mailbox_conf_update(MailboxConfWindow *mcw)
@@ -525,13 +538,17 @@ mailbox_conf_update(MailboxConfWindow *mcw)
 
     if (LIBBALSA_IS_MAILBOX_LOCAL(mailbox)) {
 	BalsaMailboxNode *mbnode;
-	gchar *filename;
-	gchar *path;
-	gchar *name;
+        GFile *file;
+	char *filename;
+	char *path;
+	char *name;
 
 	mbnode = balsa_find_mailbox(mailbox);
-        filename =
-            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(mcw->window));
+
+        file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(mcw->window));
+        filename = g_file_get_path(file);
+        g_object_unref(file);
+
 	path =
             g_strdup(libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox));
         if (strcmp(filename, path) != 0) {
@@ -608,10 +625,13 @@ mailbox_conf_add(MailboxConfWindow * mcw)
 
     if ( LIBBALSA_IS_MAILBOX_LOCAL(mcw->mailbox) ) {
 	LibBalsaMailboxLocal *ml  = LIBBALSA_MAILBOX_LOCAL(mcw->mailbox);
-	gchar *path;
-	gchar *basename;
+        GFile *file;
+	char *path;
+	char *basename;
 
-        path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(mcw->window));
+        file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(mcw->window));
+        path = g_file_get_path(file);
+        g_object_unref(file);
 
         if (libbalsa_mailbox_local_set_path(ml, path, TRUE) != 0) {
             g_free(path);
@@ -669,11 +689,15 @@ create_dialog(MailboxConfWindow *mcw)
 static void
 balsa_get_entry(GtkWidget * widget, GtkWidget ** entry)
 {
-    if (GTK_IS_ENTRY(widget))
+    if (GTK_IS_ENTRY(widget)) {
         *entry = widget;
-    else if (GTK_IS_CONTAINER(widget))
-        gtk_container_foreach((GtkContainer *) widget,
-                              (GtkCallback) balsa_get_entry, entry);
+    } else {
+        for (widget = gtk_widget_get_first_child(widget);
+             widget != NULL;
+             widget = gtk_widget_get_next_sibling(widget)) {
+            balsa_get_entry(widget, entry);
+        }
+    }
 }
 
 /*
@@ -689,7 +713,12 @@ static void
 local_mailbox_dialog_cb(GtkWidget         *widget,
 						MailboxConfWindow *mcw)
 {
-    gchar *filename = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(mcw->window));
+    GFile *file;
+    gchar *filename;
+
+    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(mcw->window));
+    filename = g_file_get_uri(file);
+    g_object_unref(file);
 
     if (filename != NULL) {
         gboolean changed = TRUE;
@@ -708,48 +737,55 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
 {
     GtkWidget *dialog;
     GtkWidget *grid;
-    gint row = -1;
+    GtkWidget *content_area;
+    int row = -1;
     GtkFileChooserAction action;
     GtkWidget *entry = NULL;
     GtkSizeGroup *size_group;
-    const gchar *type;
-    gchar *title;
+    const char *type;
+    char *title;
 
     grid = libbalsa_create_grid();
 
     type = g_type_name(mcw->mailbox_type) + 15;
     title = g_strdup_printf(mcw->mailbox ?
-                            _("Local %s Mailbox Properties") :
-                            _("New Local %s Mailbox"), type);
+                            _("Local %s Mailbox Properties") : _("New Local %s Mailbox"), type);
 
     action = mcw->mailbox_type == LIBBALSA_TYPE_MAILBOX_MBOX ?
-        GTK_FILE_CHOOSER_ACTION_SAVE :
-		GTK_FILE_CHOOSER_ACTION_CREATE_FOLDER;
+        GTK_FILE_CHOOSER_ACTION_SAVE : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER;
     dialog =
         gtk_file_chooser_dialog_new(title,
                                     GTK_WINDOW(balsa_app.main_window),
                                     action,
                                     mcw->ok_button_name, MCW_RESPONSE,
-                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                    NULL);
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL, NULL);
     g_free(title);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
 #endif
 
-    gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), grid);
-    if (mcw->mailbox != NULL && libbalsa_mailbox_get_url(mcw->mailbox) != NULL) {
-		const gchar *path = libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox));
-		gchar *basename = g_path_get_basename(path);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    gtk_box_append(GTK_BOX(content_area), grid);
 
-		gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog), path);
-		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), basename);
-		g_free(basename);
+    if (mcw->mailbox != NULL && libbalsa_mailbox_get_url(mcw->mailbox) != NULL) {
+        const char *path = libbalsa_mailbox_local_get_path(LIBBALSA_MAILBOX_LOCAL(mcw->mailbox));
+        GFile *file;
+        char *basename = g_path_get_basename(path);
+
+        file = g_file_new_for_path(path);
+        gtk_file_chooser_set_file(GTK_FILE_CHOOSER(dialog), file, NULL);
+        g_object_unref(file);
+
+        gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dialog), basename);
+        g_free(basename);
     } else {
-        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), balsa_app.local_mail_directory);
+        GFile *file;
+
+        file = g_file_new_for_path(balsa_app.local_mail_directory);
+        gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), file, NULL);
+        g_object_unref(file);
     }
-    g_signal_connect(dialog, "selection-changed",
-                     G_CALLBACK(local_mailbox_dialog_cb), mcw);
+    g_signal_connect(dialog, "selection-changed", G_CALLBACK(local_mailbox_dialog_cb), mcw);
 
     size_group = libbalsa_create_size_group(dialog);
     if (libbalsa_mailbox_get_config_prefix(mcw->mailbox) != NULL) {
@@ -762,13 +798,12 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
                                        mcw, row, libbalsa_mailbox_get_name(mcw->mailbox), label);
         gtk_size_group_add_widget(size_group, label);
     } else {
-    	mcw->mb_data.local.mailbox_name = NULL;
+        mcw->mb_data.local.mailbox_name = NULL;
     }
 
     balsa_get_entry(dialog, &entry);
     if (entry)
-	g_signal_connect(entry, "changed",
-                         G_CALLBACK(local_mailbox_dialog_cb), mcw);
+        g_signal_connect(entry, "changed", G_CALLBACK(local_mailbox_dialog_cb), mcw);
 
     mcw->view_info =
         mailbox_conf_view_new_full(mcw->mailbox, GTK_WINDOW(dialog), grid,

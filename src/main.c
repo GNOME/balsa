@@ -78,24 +78,6 @@ static gchar **opt_attach_list = NULL;
 /* opt_compose_email: To: field for the compose window */
 static const gchar *opt_compose_email = NULL;
 
-static void
-accel_map_load(void)
-{
-    gchar *accel_map_filename =
-        g_build_filename(g_get_home_dir(), ".balsa", "accelmap", NULL);
-    gtk_accel_map_load(accel_map_filename);
-    g_free(accel_map_filename);
-}
-
-static void
-accel_map_save(void)
-{
-    gchar *accel_map_filename =
-        g_build_filename(g_get_home_dir(), ".balsa", "accelmap", NULL);
-    gtk_accel_map_save(accel_map_filename);
-    g_free(accel_map_filename);
-}
-
 static gboolean
 balsa_main_check_new_messages(gpointer data)
 {
@@ -523,9 +505,9 @@ balsa_setup_libbalsa_notification(GApplication *application)
 /* -------------------------- main --------------------------------- */
 static void
 balsa_startup_cb(GApplication *application,
-           gpointer      user_data)
+                 gpointer      user_data)
 {
-    gchar *default_icon;
+    char *default_icon;
 #ifdef ENABLE_AUTOCRYPT
     GError *error = NULL;
 #endif
@@ -574,8 +556,8 @@ balsa_startup_cb(GApplication *application,
 #endif
 
     default_icon = balsa_pixmap_finder("balsa_icon.png");
-    if (default_icon) { /* may be NULL for developer installations */
-        gtk_window_set_default_icon_from_file(default_icon, NULL);
+    if (default_icon != NULL) { /* may be NULL for developer installations */
+        gtk_window_set_default_icon_name(default_icon);
         g_free(default_icon);
     }
 
@@ -583,8 +565,6 @@ balsa_startup_cb(GApplication *application,
         libbalsa_gpgme_check_crypto_engine(GPGME_PROTOCOL_OpenPGP);
     balsa_app.has_smime =
         libbalsa_gpgme_check_crypto_engine(GPGME_PROTOCOL_CMS);
-
-    accel_map_load();
 }
 
 static void
@@ -596,20 +576,19 @@ balsa_shutdown_cb(void)
     balsa_app_destroy();
 
     libbalsa_conf_drop_all();
-    accel_map_save();
     libbalsa_imap_server_close_all_connections();
     libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, "%s", "");
 }
 
 static void
 balsa_activate_cb(GApplication *application,
-            gpointer      user_data)
+                  gpointer      user_data)
 {
     GtkWidget *window;
 
     if (balsa_app.main_window != NULL) {
-        gtk_window_present_with_time(GTK_WINDOW(balsa_app.main_window),
-                                     gtk_get_current_event_time());
+        gtk_window_present(GTK_WINDOW(balsa_app.main_window));
+
         return;
     }
 
@@ -719,8 +698,7 @@ handle_remote(GApplicationCommandLine * command_line)
 
         if (!balsa_check_open_compose_window()) {
             /* Move the main window to the request's screen */
-            gtk_window_present_with_time(GTK_WINDOW(balsa_app.main_window),
-                                         gtk_get_current_event_time());
+            gtk_window_present(GTK_WINDOW(balsa_app.main_window));
         }
     }
 }

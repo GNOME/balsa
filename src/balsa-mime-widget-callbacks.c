@@ -273,12 +273,11 @@ scroll_change(GtkAdjustment * adj, gint diff, BalsaMessage * bm)
         gtk_adjustment_get_upper(adj) - gtk_adjustment_get_page_size(adj);
     gdouble value;
 
-    if (bm && gtk_adjustment_get_value(adj) >= upper && diff > 0) {
-        if (balsa_window_next_unread(balsa_app.main_window))
-            /* We're changing mailboxes, and GtkNotebook will grab the
-             * focus, so we want to grab it back the next time we lose
-             * it. */
-            balsa_message_set_focus_state(bm, BALSA_MESSAGE_FOCUS_STATE_HOLD);
+    if (bm != NULL && gtk_adjustment_get_value(adj) >= upper && diff > 0) {
+        /* Scrolling below the bottom of a message means select the next
+         * unread message: */
+        balsa_window_next_unread(balsa_app.main_window, bm);
+
         return;
     }
 

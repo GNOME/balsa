@@ -1346,7 +1346,7 @@ next_unread_activated(GSimpleAction * action,
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
 
-    balsa_window_next_unread(window);
+    balsa_window_next_unread(window, NULL);
 }
 
 static void
@@ -4783,35 +4783,73 @@ balsa_window_set_statusbar(BalsaWindow * window, LibBalsaMailbox * mailbox)
     g_string_free(desc, TRUE);
 }
 
-/* Select next unread message, changing mailboxes if necessary;
- * returns TRUE if mailbox was changed. */
-gboolean
-balsa_window_next_unread(BalsaWindow * window)
+/* Select next unread message, changing mailboxes if necessary; */
+typedef struct {
+    LibBalsaMailbox *mailbox;
+    BalsaMessage    *bm;
+} bw_next_unread_data;
+
+static void
+bw_next_unread_response(GtkDialog *dialog,
+                        int        response,
+                        gpointer   user_data)
 {
-    BalsaIndex *index =
+    if (response == GTK_RESPONSE_YES) {
+        bw_next_unread_data *data = user_data;
+        BalsaIndex *bindex;
+
+        balsa_mblist_open_mailbox(data->mailbox);
+        bindex = balsa_find_index_by_mailbox(data->mailbox);
+        if (bindex != NULL) {
+            balsa_index_select_next_unread(bindex);
+        } else {
+            g_object_set_data(G_OBJECT(data->mailbox), BALSA_INDEX_VIEW_ON_OPEN, GINT_TO_POINTER(TRUE));
+        }
+        /* We are changing mailboxes, and GtkNotebook will grab the
+         * focus, so we want to grab it back the next time we lose it. */
+        if (data->bm != NULL)
+            balsa_message_set_focus_state(data->bm, BALSA_MESSAGE_FOCUS_STATE_HOLD);
+    }
+
+    g_free(user_data);
+    if (dialog != NULL)
+        gtk_window_destroy(GTK_WINDOW(dialog));
+}
+
+/* See the header file for why the second parameter is a gpointer */
+void
+balsa_window_next_unread(BalsaWindow * window, gpointer bm_gpointer)
+{
+    BalsaMessage *bm = bm_gpointer;
+    BalsaIndex *bindex =
         BALSA_INDEX(balsa_window_find_current_index(window));
-    LibBalsaMailbox *mailbox = index ? balsa_index_get_mailbox(index): NULL;
+    LibBalsaMailbox *mailbox = bindex ? balsa_index_get_mailbox(bindex): NULL;
+    bw_next_unread_data *data;
 
     if (libbalsa_mailbox_get_unread(mailbox) > 0) {
-        balsa_index_select_next_unread(index);
+        balsa_index_select_next_unread(bindex);
 
-        return FALSE;
+        return;
     }
 
     mailbox = bw_next_unread_mailbox(mailbox);
-    if (!mailbox || libbalsa_mailbox_get_unread(mailbox) == 0)
-        return FALSE;
+    if (mailbox == NULL || libbalsa_mailbox_get_unread(mailbox) == 0)
+        return;
 
-    if (balsa_app.ask_before_select) {
+    data = g_new(bw_next_unread_data, 1);
+    data->mailbox = mailbox;
+    data->bm = bm;
+
+    if (!balsa_app.ask_before_select) {
+        bw_next_unread_response(NULL, GTK_RESPONSE_YES, data);
+    } else {
         GtkWidget *dialog;
-        gint response;
 
-        dialog =
-            gtk_message_dialog_new(GTK_WINDOW(window), 0,
-                                   GTK_MESSAGE_QUESTION,
-                                   GTK_BUTTONS_YES_NO,
-                                   _("The next unread message is in %s"),
-                                   libbalsa_mailbox_get_name(mailbox));
+        dialog = gtk_message_dialog_new(GTK_WINDOW(window), 0,
+                                        GTK_MESSAGE_QUESTION,
+                                        GTK_BUTTONS_YES_NO,
+                                        _("The next unread message is in %s"),
+                                        libbalsa_mailbox_get_name(mailbox));
 #if HAVE_MACOSX_DESKTOP
         libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(window));
 #endif
@@ -4820,20 +4858,10 @@ balsa_window_next_unread(BalsaWindow * window)
              _("Do you want to select %s?"), libbalsa_mailbox_get_name(mailbox));
         gtk_dialog_set_default_response(GTK_DIALOG(dialog),
                                         GTK_RESPONSE_YES);
-        response = gtk_dialog_run(GTK_DIALOG(dialog));
-        gtk_widget_destroy(dialog);
-        if (response != GTK_RESPONSE_YES)
-            return FALSE;
-    }
 
-    balsa_mblist_open_mailbox(mailbox);
-    index = balsa_find_index_by_mailbox(mailbox);
-    if (index)
-        balsa_index_select_next_unread(index);
-    else
-        g_object_set_data(G_OBJECT(mailbox),
-                          BALSA_INDEX_VIEW_ON_OPEN, GINT_TO_POINTER(TRUE));
-    return TRUE;
+        g_signal_connect(dialog, "response", G_CALLBACK(bw_next_unread_response), data);
+        gtk_widget_show(dialog);
+    }
 }
 
 /*

@@ -170,7 +170,7 @@ typedef struct _PropertyUI {
     GtkWidget *display_alt_plain;
 
     /* how to handle broken mails with 8-bit chars */
-    GtkRadioButton *convert_unknown_8bit[NUM_CONVERT_8BIT_MODES];
+    GtkToggleButton *convert_unknown_8bit[NUM_CONVERT_8BIT_MODES];
     GtkWidget *convert_unknown_8bit_codeset;
 
 #if !(HAVE_GSPELL || HAVE_GTKSPELL)
@@ -388,10 +388,11 @@ check_font_button(GtkWidget * button, gchar ** font)
 static void
 apply_prefs(GtkDialog * pbox)
 {
-    gint i;
+    GFile *file;
+    int i;
     GtkWidget *balsa_window;
-    const gchar *tmp;
-    guint save_enum; /* FIXME: assumes that enums are unsigned */
+    const char *tmp;
+    int save_enum;
     gboolean save_setting;
 
     /*
@@ -403,13 +404,13 @@ apply_prefs(GtkDialog * pbox)
                                 update_view_defaults, NULL);
 
 
+    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(pui->mail_directory));
     g_free(balsa_app.local_mail_directory);
-    balsa_app.local_mail_directory =
-        gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
-                                      (pui->mail_directory));
+    balsa_app.local_mail_directory = g_file_get_path(file);
+    g_object_unref(file);
 
-    /* 
-     * display page 
+    /*
+     * display page
      */
     balsa_app.recv_progress_dialog = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->recv_progress_dlg));
     balsa_app.send_progress_dialog = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->send_progress_dlg));
@@ -420,7 +421,7 @@ apply_prefs(GtkDialog * pbox)
     save_enum = balsa_app.layout_type;
     balsa_app.layout_type =
         pm_combo_box_get_level(pui->layout_type);
-    if (balsa_app.layout_type != save_enum)
+    if ((int) balsa_app.layout_type != save_enum)
         balsa_change_window_layout(balsa_app.main_window);
 
     balsa_app.view_message_on_open =
@@ -538,7 +539,7 @@ apply_prefs(GtkDialog * pbox)
     /* arp */
     g_free(balsa_app.quote_str);
     balsa_app.quote_str =
-        g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->quote_str)));
+        g_strdup(gtk_editable_get_text(GTK_EDITABLE(pui->quote_str)));
 
     /* fonts */
     balsa_app.use_system_fonts =
@@ -551,7 +552,7 @@ apply_prefs(GtkDialog * pbox)
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->mark_quoted));
     g_free(balsa_app.quote_regex);
-    tmp = gtk_entry_get_text(GTK_ENTRY(pui->quote_pattern));
+    tmp = gtk_editable_get_text(GTK_EDITABLE(pui->quote_pattern));
     balsa_app.quote_regex = g_strcompress(tmp);
 
     balsa_app.browse_wrap =
@@ -598,13 +599,12 @@ apply_prefs(GtkDialog * pbox)
     /* date format */
     g_free(balsa_app.date_string);
     balsa_app.date_string =
-        g_strdup(gtk_entry_get_text(GTK_ENTRY(pui->date_format)));
+        g_strdup(gtk_editable_get_text(GTK_EDITABLE(pui->date_format)));
 
     /* selected headers */
     g_free(balsa_app.selected_headers);
     balsa_app.selected_headers =
-        g_ascii_strdown(gtk_entry_get_text
-                        (GTK_ENTRY(pui->selected_headers)), -1);
+        g_ascii_strdown(gtk_editable_get_text(GTK_EDITABLE(pui->selected_headers)), -1);
 
     /* quoted text color */
     for (i = 0; i < MAX_QUOTED_COLOR; i++) {
@@ -668,15 +668,18 @@ apply_prefs(GtkDialog * pbox)
 static void
 set_prefs(void)
 {
+    GFile *file;
     unsigned i;
     gchar *tmp;
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->recv_progress_dlg), balsa_app.recv_progress_dialog);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->send_progress_dlg), balsa_app.send_progress_dialog);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->recv_progress_dlg),
+                                 balsa_app.recv_progress_dialog);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->send_progress_dlg),
+                                 balsa_app.send_progress_dialog);
 
-    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
-                                        (pui->mail_directory),
-                                  balsa_app.local_mail_directory);
+    file = g_file_new_for_path(balsa_app.local_mail_directory);
+    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(pui->mail_directory), file, NULL);
+    g_object_unref(file);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->previewpane),
                                  balsa_app.previewpane);
@@ -789,12 +792,12 @@ set_prefs(void)
                                  balsa_app.edit_headers);
 
     /* arp */
-    gtk_entry_set_text(GTK_ENTRY(pui->quote_str), balsa_app.quote_str);
+    gtk_editable_set_text(GTK_EDITABLE(pui->quote_str), balsa_app.quote_str);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->mark_quoted),
                                  balsa_app.mark_quoted);
     gtk_widget_set_sensitive(pui->quote_pattern, balsa_app.mark_quoted);
     tmp = g_strescape(balsa_app.quote_regex, NULL);
-    gtk_entry_set_text(GTK_ENTRY(pui->quote_pattern), tmp);
+    gtk_editable_set_text(GTK_EDITABLE(pui->quote_pattern), tmp);
     g_free(tmp);
 
     /* wrap incoming text/plain */
@@ -848,14 +851,12 @@ set_prefs(void)
 
 
     /* date format */
-    if (balsa_app.date_string)
-        gtk_entry_set_text(GTK_ENTRY(pui->date_format),
-                           balsa_app.date_string);
+    if (balsa_app.date_string != NULL)
+        gtk_editable_set_text(GTK_EDITABLE(pui->date_format), balsa_app.date_string);
 
     /* selected headers */
-    if (balsa_app.selected_headers)
-        gtk_entry_set_text(GTK_ENTRY(pui->selected_headers),
-                           balsa_app.selected_headers);
+    if (balsa_app.selected_headers != NULL)
+        gtk_editable_set_text(GTK_EDITABLE(pui->selected_headers), balsa_app.selected_headers);
 
     /* Colour */
     for (i = 0; i < MAX_QUOTED_COLOR; i++)
@@ -1011,7 +1012,7 @@ add_button_to_box(const gchar * label, GCallback cb, gpointer cb_data,
 {
     GtkWidget *button = gtk_button_new_with_mnemonic(label);
     g_signal_connect_swapped(button, "clicked", cb, cb_data);
-    gtk_container_add(GTK_CONTAINER(box), button);
+    gtk_box_append(GTK_BOX(box), button);
 
     return button;
 }
@@ -1024,12 +1025,13 @@ add_menu_button_to_box(const gchar *label,
     GtkWidget *menu_button;
 
     menu_button = gtk_menu_button_new();
-    gtk_container_add(GTK_CONTAINER(menu_button), gtk_label_new_with_mnemonic(label));
 
-    gtk_menu_button_set_use_popover(GTK_MENU_BUTTON(menu_button), libbalsa_use_popover());
+    gtk_menu_button_set_label(GTK_MENU_BUTTON(menu_button), label);
+    gtk_menu_button_set_use_underline(GTK_MENU_BUTTON(menu_button), TRUE);
+
     gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(menu_button), menu_model);
 
-    gtk_box_pack_start(GTK_BOX(box), menu_button, FALSE, FALSE, 0);
+    gtk_box_append(GTK_BOX(box), menu_button);
 }
 
 static void
@@ -1047,23 +1049,22 @@ add_show_menu(const char* label, gint level, GtkWidget* menu)
  */
 
 static void
-option_menu_cb(GtkMenuItem * widget, gpointer data)
+option_menu_cb(GtkComboBox * widget, gpointer user_data)
 {
     /* update the index number */
-    gint *index = (gint *) data;
+    int *index = user_data;
 
-    *index = gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
+    *index = gtk_combo_box_get_active(widget);
 }
 
 static GtkWidget *
-create_pref_option_menu(const gchar * names[], gint size, gint * index)
+create_pref_option_menu(const char * names[], int size, int * index)
 {
     GtkWidget *combo_box;
-    gint i;
+    int i;
 
     combo_box = pm_combo_box_new();
-    g_signal_connect(combo_box, "changed",
-                     G_CALLBACK(option_menu_cb), index);
+    g_signal_connect(combo_box, "changed", G_CALLBACK(option_menu_cb), index);
 
     for (i = 0; i < size; i++)
 	add_show_menu(_(names[i]), i, combo_box);
@@ -1092,16 +1093,32 @@ create_action_after_move_menu(void)
 }
 
 static void
+help_button_finish(GObject      *source_object,
+                   GAsyncResult *result,
+                   gpointer      user_data)
+{
+    GtkWindow *parent = GTK_WINDOW(source_object);
+    const char *uri = user_data;
+    GError *error = NULL;
+
+    if (!gtk_show_uri_full_finish(parent, result, &error)) {
+    	libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+                             _("Error displaying %s: %s\n"),
+                             uri, error->message);
+        g_error_free(error);
+    }
+}
+
+static void
 balsa_help_pbox_display(void)
 {
     GtkTreeSelection *selection;
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeIter parent;
-    gchar *text, *p;
-    GError *err = NULL;
-    gchar *uri;
-    GtkWidget *toplevel;
+    char *text, *p;
+    char *uri;
+    GtkRoot *root;
     GString *string;
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(pui->view));
@@ -1125,17 +1142,9 @@ balsa_help_pbox_display(void)
     g_free(text);
 
     uri = g_string_free(string, FALSE);
-    toplevel = gtk_widget_get_toplevel(GTK_WIDGET(pui->view));
-    if (gtk_widget_is_toplevel(toplevel)) {
-        gtk_show_uri_on_window(GTK_WINDOW(toplevel), uri,
-                               gtk_get_current_event_time(), &err);
-    }
-    if (err) {
-        balsa_information(LIBBALSA_INFORMATION_WARNING,
-		_("Error displaying %s: %s\n"),
-		uri, err->message);
-        g_error_free(err);
-    }
+
+    root = gtk_widget_get_root(GTK_WIDGET(pui->view));
+    gtk_show_uri_full(GTK_WINDOW(root), uri, GDK_CURRENT_TIME, NULL, help_button_finish, uri);
 
     g_free(uri);
 }
@@ -1901,12 +1910,18 @@ static void
 font_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean show_size =
-        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                      (pui->use_default_font_size));
+        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->use_default_font_size));
+    GtkFontChooserLevel level =
+        gtk_font_chooser_get_level(GTK_FONT_CHOOSER(widget));
 
     properties_modified_cb(widget, pbox);
 
-    gtk_font_button_set_show_size(GTK_FONT_BUTTON(widget), show_size);
+    if (show_size)
+        level |= GTK_FONT_CHOOSER_LEVEL_SIZE;
+    else
+        level &= ~GTK_FONT_CHOOSER_LEVEL_SIZE;
+    gtk_font_chooser_set_level(GTK_FONT_CHOOSER(widget), level);
+
     g_object_set_data(G_OBJECT(widget), "font-modified",
                       GINT_TO_POINTER(TRUE));
 }
@@ -1945,7 +1960,7 @@ response_cb(GtkDialog * dialog, gint response, gpointer data)
         /* and fall through to... */
     default:
         destroy_pref_window_cb();
-        gtk_widget_destroy(GTK_WIDGET(dialog));
+        gtk_window_destroy(GTK_WINDOW(dialog));
     }
 }
 
@@ -1981,7 +1996,7 @@ pm_grid_add_remote_mailbox_servers_group(GtkWidget * grid_widget)
 
     pm_grid_attach(grid, pm_group_label(_("Remote mailbox servers")), 0, row, 3, 1);
 
-    scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
+    scrolledwindow = gtk_scrolled_window_new();
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_size_request(scrolledwindow, -1, 100);
@@ -2010,7 +2025,7 @@ pm_grid_add_remote_mailbox_servers_group(GtkWidget * grid_widget)
                                                  NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 
-    gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledwindow), tree_view);
 
     g_signal_connect(pui->mail_servers, "row-activated",
                      G_CALLBACK(server_edit_cb), NULL);
@@ -2074,7 +2089,7 @@ pm_grid_add_outgoing_mail_group(GtkWidget * grid_widget)
 
     pm_grid_attach(grid, pm_group_label(_("Outgoing mail servers")), 0, row, 3, 1);
 
-    scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+    scrolled_window = gtk_scrolled_window_new();
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
                                    GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_size_request(scrolled_window, -1, 100);
@@ -2095,7 +2110,7 @@ pm_grid_add_outgoing_mail_group(GtkWidget * grid_widget)
                                                       "text", 0, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 
-    gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window), tree_view);
 
     g_signal_connect(pui->smtp_servers, "row-activated",
                      G_CALLBACK(smtp_server_edit_cb), NULL);
@@ -2161,19 +2176,19 @@ pm_grid_add_checking_group(GtkWidget * grid_widget)
 
     label = gtk_label_new(_("When mail arrives:"));
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_container_add(GTK_CONTAINER(hbox), label);
+    gtk_box_append(GTK_BOX(hbox), label);
 
     pui->notify_new_mail_dialog =
         gtk_check_button_new_with_label(_("Display message"));
-    gtk_container_add(GTK_CONTAINER(hbox), pui->notify_new_mail_dialog);
+    gtk_box_append(GTK_BOX(hbox), pui->notify_new_mail_dialog);
 
     pui->notify_new_mail_sound =
         gtk_check_button_new_with_label(_("Play sound"));
-    gtk_container_add(GTK_CONTAINER(hbox), pui->notify_new_mail_sound);
+    gtk_box_append(GTK_BOX(hbox), pui->notify_new_mail_sound);
 
     pui->notify_new_mail_icon =
         gtk_check_button_new_with_label(_("Show icon"));
-    gtk_container_add(GTK_CONTAINER(hbox), pui->notify_new_mail_icon);
+    gtk_box_append(GTK_BOX(hbox), pui->notify_new_mail_icon);
 
     pm_grid_attach(grid, hbox, 1, ++row, 3, 1);
 
@@ -2475,12 +2490,17 @@ pm_grid_add_preview_font_group(GtkWidget * grid_widget)
         use_default_font_size = TRUE;
 
     if (use_default_font_size) {
-        gtk_font_button_set_show_size(GTK_FONT_BUTTON
-                                      (pui->message_font_button), FALSE);
-        gtk_font_button_set_show_size(GTK_FONT_BUTTON
-                                      (pui->subject_font_button), FALSE);
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-                                     (pui->use_default_font_size), TRUE);
+        GtkFontChooserLevel level;
+
+        level = gtk_font_chooser_get_level(GTK_FONT_CHOOSER(pui->message_font_button));
+        level &= ~GTK_FONT_CHOOSER_LEVEL_SIZE;
+        gtk_font_chooser_set_level(GTK_FONT_CHOOSER(pui->message_font_button), level);
+
+        level = gtk_font_chooser_get_level(GTK_FONT_CHOOSER(pui->subject_font_button));
+        level &= ~GTK_FONT_CHOOSER_LEVEL_SIZE;
+        gtk_font_chooser_set_level(GTK_FONT_CHOOSER(pui->subject_font_button), level);
+
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->use_default_font_size), TRUE);
     }
 
     if (balsa_app.use_system_fonts) {
@@ -2662,7 +2682,6 @@ pm_grid_add_broken_8bit_codeset_group(GtkWidget * grid_widget)
 {
     GtkGrid *grid = (GtkGrid *) grid_widget;
     gint row = pm_grid_get_next_row(grid);
-    GSList *radio_group = NULL;
 
     /* treatment of messages with 8-bit chars, but without proper MIME encoding */
 
@@ -2670,22 +2689,18 @@ pm_grid_add_broken_8bit_codeset_group(GtkWidget * grid_widget)
                                           "without codeset header")), 0, row, 3, 1);
 
     pui->convert_unknown_8bit[0] =
-	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
-							 _("display as “?”")));
+        GTK_TOGGLE_BUTTON(gtk_toggle_button_new_with_label(_("display as “?”")));
     pm_grid_attach(grid, GTK_WIDGET(pui->convert_unknown_8bit[0]),
                    1, ++row, 2, 1);
-    radio_group =
-	gtk_radio_button_get_group(GTK_RADIO_BUTTON(pui->convert_unknown_8bit[0]));
 
     pui->convert_unknown_8bit[1] =
-	GTK_RADIO_BUTTON(gtk_radio_button_new_with_label(radio_group,
-							 _("display in codeset")));
+        GTK_TOGGLE_BUTTON(gtk_toggle_button_new_with_label(_("display in codeset")));
+    gtk_toggle_button_set_group(pui->convert_unknown_8bit[1], pui->convert_unknown_8bit[0]);
     pm_grid_attach(grid, GTK_WIDGET(pui->convert_unknown_8bit[1]),
                     1, ++row, 1, 1);
 
     pui->convert_unknown_8bit_codeset = libbalsa_charset_button_new();
-    gtk_combo_box_set_active(GTK_COMBO_BOX
-                             (pui->convert_unknown_8bit_codeset),
+    gtk_combo_box_set_active(GTK_COMBO_BOX(pui->convert_unknown_8bit_codeset),
                              balsa_app.convert_unknown_8bit_codeset);
     gtk_widget_set_hexpand(pui->convert_unknown_8bit_codeset, TRUE);
     pm_grid_attach(grid, pui->convert_unknown_8bit_codeset,
@@ -2766,7 +2781,7 @@ pm_grid_add_address_books_group(GtkWidget * grid_widget)
 
     pm_grid_attach(grid, pm_group_label(_("Address books")), 0, row, 3, 1);
 
-    scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
+    scrolledwindow = gtk_scrolled_window_new();
     gtk_widget_set_vexpand(scrolledwindow, TRUE);
     pm_grid_attach(grid, scrolledwindow, 1, ++row, 1, 1);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow),
@@ -2813,7 +2828,7 @@ pm_grid_add_address_books_group(GtkWidget * grid_widget)
     g_signal_connect(tree_view, "row-activated",
                      G_CALLBACK(address_book_edit_cb), NULL);
 
-    gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledwindow), tree_view);
 
     menu_model = balsa_address_book_add_menu(address_book_change,
                                              GTK_WINDOW(property_box));
@@ -2947,7 +2962,6 @@ pm_grid_add_misc_group(GtkWidget * grid_widget)
     pui->close_mailbox_minutes =
 	gtk_spin_button_new(close_spinbutton_adj, 1, 0);
     gtk_widget_set_hexpand(pui->close_mailbox_minutes, TRUE);
-    gtk_widget_show(pui->close_mailbox_minutes);
     gtk_widget_set_sensitive(pui->close_mailbox_minutes, FALSE);
     pm_grid_attach(grid, pui->close_mailbox_minutes, 2, row, 1, 1);
 
@@ -2996,7 +3010,6 @@ pm_grid_add_deleting_messages_group(GtkWidget * grid_widget)
     expunge_spinbutton_adj = gtk_adjustment_new(120, 1, 1440, 1, 10, 0);
     pui->expunge_minutes = gtk_spin_button_new(expunge_spinbutton_adj, 1, 0);
     gtk_widget_set_hexpand(pui->expunge_minutes, TRUE);
-    gtk_widget_show(pui->expunge_minutes);
     gtk_widget_set_sensitive(pui->expunge_minutes, FALSE);
     pm_grid_attach(grid, pui->expunge_minutes, 2, row, 1, 1);
 
@@ -3261,14 +3274,17 @@ create_display_section(GtkTreeStore * store,
 static gboolean
 open_preferences_manager_idle(void)
 {
-    gchar *name;
+    GFile *file;
+    char *name;
 
     if (pui == NULL) {
         return FALSE;
     }
 
-    name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
-                                         (pui->mail_directory));
+    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(pui->mail_directory));
+    name = g_file_get_path(file);
+    g_object_unref(file);
+
     if (g_strcmp0(name, balsa_app.local_mail_directory) != 0) {
         /* Chooser still hasn't been initialized. */
         g_free(name);
@@ -3298,15 +3314,14 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     GtkTreeSelection * selection;
     GtkWidget *stack;
     GtkWidget *active_win = data;
-    gint i;
+    int i;
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkTreeIter iter;
 
     /* only one preferences manager window */
     if (already_open) {
-        gtk_window_present_with_time(GTK_WINDOW(property_box),
-                                     gtk_get_current_event_time());
+        gtk_window_present(GTK_WINDOW(property_box));
         return;
     }
 
@@ -3326,15 +3341,15 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     libbalsa_macosx_menu_for_parent(property_box, GTK_WINDOW(active_win));
 #endif
 
-	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-	content_area = gtk_dialog_get_content_area(GTK_DIALOG(property_box));
-	gtk_container_add(GTK_CONTAINER(content_area), hbox);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(property_box));
+    gtk_box_append(GTK_BOX(content_area), hbox);
 
     store = gtk_tree_store_new(PM_NUM_COLS,
                                G_TYPE_STRING,   /* PM_TEXT_COL     */
                                G_TYPE_STRING,   /* PM_HELP_COL     */
                                GTK_TYPE_WIDGET  /* PM_CHILD_COL    */
-            );
+                              );
     pui->view = view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 
     gtk_widget_set_margin_top(view, BORDER_WIDTH);
@@ -3356,7 +3371,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_stack_set_transition_type((GtkStack *) stack,
                                   GTK_STACK_TRANSITION_TYPE_SLIDE_UP_DOWN);
     gtk_stack_set_transition_duration((GtkStack *) stack, 400);
-    gtk_container_add(GTK_CONTAINER(hbox), stack);
+    gtk_box_append(GTK_BOX(hbox), stack);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
     g_signal_connect(selection, "changed",
@@ -3578,7 +3593,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(property_box, "response",
                      G_CALLBACK(response_cb), NULL);
 
-    gtk_widget_show_all(GTK_WIDGET(property_box));
+    gtk_widget_show(GTK_WIDGET(property_box));
 
 }                               /* open_preferences_manager */
 

@@ -1093,12 +1093,12 @@ create_action_after_move_menu(void)
 }
 
 static void
-help_button_finish(GObject      *source_object,
-                   GAsyncResult *result,
-                   gpointer      user_data)
+help_pbox_display_finish(GObject      *source_object,
+                         GAsyncResult *result,
+                         gpointer      user_data)
 {
     GtkWindow *parent = GTK_WINDOW(source_object);
-    const char *uri = user_data;
+    char *uri = user_data;
     GError *error = NULL;
 
     if (!gtk_show_uri_full_finish(parent, result, &error)) {
@@ -1107,6 +1107,8 @@ help_button_finish(GObject      *source_object,
                              uri, error->message);
         g_error_free(error);
     }
+
+    g_free(uri);
 }
 
 static void
@@ -1144,7 +1146,8 @@ balsa_help_pbox_display(void)
     uri = g_string_free(string, FALSE);
 
     root = gtk_widget_get_root(GTK_WIDGET(pui->view));
-    gtk_show_uri_full(GTK_WINDOW(root), uri, GDK_CURRENT_TIME, NULL, help_button_finish, uri);
+    gtk_show_uri_full(GTK_WINDOW(root), uri, GDK_CURRENT_TIME, NULL,
+                      help_pbox_display_finish, g_strdup(uri));
 
     g_free(uri);
 }

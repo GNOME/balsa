@@ -114,22 +114,23 @@ mw_set_part_buttons_sensitive(MessageWindow * mw, BalsaMessage * msg)
 }
 
 static gboolean
-message_window_idle_handler(MessageWindow * mw)
+message_window_idle_handler(gpointer user_data)
 {
+    MessageWindow *mw = user_data;
     BalsaMessage *msg;
 
     mw->idle_handler_id = 0;
 
     msg = BALSA_MESSAGE(mw->bmessage);
-    if (!balsa_message_set(msg,
-                           libbalsa_message_get_mailbox(mw->message),
-                           libbalsa_message_get_msgno(mw->message))) {
-        gtk_widget_destroy(mw->window);
-        return FALSE;
+    if (balsa_message_set(msg,
+                          libbalsa_message_get_mailbox(mw->message),
+                          libbalsa_message_get_msgno(mw->message))) {
+        balsa_message_grab_focus(msg);
+    } else {
+        gtk_window_destroy(GTK_WINDOW(mw->window));
     }
-    balsa_message_grab_focus(msg);
 
-    return FALSE;
+    return G_SOURCE_REMOVE;
 }
 
 /* ===================================================================
@@ -200,7 +201,7 @@ mw_bindex_closed_cb(gpointer data, GObject *bindex)
 {
     MessageWindow *mw = data;
     mw->bindex = NULL;
-    gtk_widget_destroy(mw->window);
+    gtk_window_destroy(GTK_WINDOW(mw->window));
 }
 
 static void
@@ -300,16 +301,6 @@ mw_show_all_headers_change_state(GSimpleAction * action,
  */
 
 static void
-mw_menubar_foreach(GtkWidget *widget, gpointer data)
-{
-    GtkWidget **move_menu = data;
-    GtkMenuItem *item = GTK_MENU_ITEM(widget);
-
-    if (strcmp(gtk_menu_item_get_label(item), _("M_ove")) == 0)
-        *move_menu = widget;
-}
-
-static void
 mw_set_buttons_sensitive(MessageWindow * mw)
 {
     LibBalsaMailbox *mailbox;
@@ -319,7 +310,7 @@ mw_set_buttons_sensitive(MessageWindow * mw)
 
     mailbox = libbalsa_message_get_mailbox(mw->message);
     if (mailbox == NULL) {
-        gtk_widget_destroy(mw->window);
+        gtk_window_destroy(GTK_WINDOW(mw->window));
         return;
     }
 
@@ -355,9 +346,8 @@ mw_set_message(MessageWindow * mw, LibBalsaMessage * message)
 
     if (message) {
         g_object_set_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY, mw);
-        if (!mw->idle_handler_id)
-            mw->idle_handler_id =
-                g_idle_add((GSourceFunc) message_window_idle_handler, mw);
+        if (mw->idle_handler_id == 0)
+            mw->idle_handler_id = g_idle_add(message_window_idle_handler, mw);
         mw_set_buttons_sensitive(mw);
     }
 }
@@ -397,7 +387,7 @@ static void
 mw_expunged_cb(LibBalsaMailbox * mailbox, guint msgno, MessageWindow * mw)
 {
     if (mw->message != NULL && (guint) libbalsa_message_get_msgno(mw->message) == msgno)
-        gtk_widget_destroy(mw->window);
+        gtk_window_destroy(GTK_WINDOW(mw->window));
 }
 
 static void
@@ -531,7 +521,7 @@ mw_close_activated(GSimpleAction * action, GVariant * parameter,
                    gpointer data)
 {
     MessageWindow *mw = (MessageWindow *) data;
-    gtk_widget_destroy(mw->window);
+    gtk_window_destroy(GTK_WINDOW(mw->window));
 }
 
 static void
@@ -583,13 +573,12 @@ mw_set_selected(MessageWindow * mw, void (*select_func) (BalsaIndex *))
     if ((tmp = g_object_get_data(G_OBJECT(message),
                                  BALSA_MESSAGE_WINDOW_KEY))) {
         if (tmp == mw) {
-            gtk_window_present_with_time(GTK_WINDOW(tmp->window),
-                                         gtk_get_current_event_time());
+            gtk_window_present(GTK_WINDOW(tmp->window));
             g_object_unref(message);
             return;
         }
         /* Close the other window */
-        gtk_widget_destroy(tmp->window);
+        gtk_window_destroy(GTK_WINDOW(tmp->window));
     }
 
     mw_set_message(mw, message);
@@ -623,7 +612,7 @@ message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
     if (mw->message == original)
         /* Either action-after-move was CLOSE, or we failed to select
          * another message; either way, we close the window. */
-        gtk_widget_destroy(mw->window);
+        gtk_window_destroy(GTK_WINDOW(mw->window));
 }
 
 static void
@@ -810,6 +799,43 @@ move_to_activated(GSimpleAction *action,
     }
 }
 
+static void
+mw_menubar_set_mru_menu(GtkWidget *menubar)
+{
+    GMenuModel *model;
+    int i;
+    int n;
+    int move_position = -1;
+
+    model = gtk_popover_menu_bar_get_menu_model(GTK_POPOVER_MENU_BAR(menubar));
+    n = g_menu_model_get_n_items(model);
+    for (i = 0; i < n; i++) {
+        const char *label;
+
+        if (g_menu_model_get_item_attribute(model, i, "label", "s", &label) &&
+            strcmp(label, "M_ove") == 0) {
+            move_position = i;
+            break;
+        }
+    }
+
+    if (move_position >= 0) {
+        GMenuItem *item;
+        GMenu *mru_menu;
+
+        item = g_menu_item_new_from_model(model, i);
+
+        mru_menu = balsa_mblist_mru_menu(&balsa_app.folder_mru, "message-window.move-to");
+        g_menu_item_set_submenu(item, G_MENU_MODEL(mru_menu));
+        g_object_unref(mru_menu);
+
+        /* Replace the existing submenu */
+        g_menu_remove(G_MENU(model), move_position);
+        g_menu_insert_item(G_MENU(model), move_position, item);
+        g_object_unref(item);
+    }
+}
+
 void
 message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 {
@@ -819,7 +845,6 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     BalsaToolbarModel *model;
     GError *error = NULL;
     GtkWidget *menubar;
-    GtkWidget *move_menu, *submenu;
     GtkWidget *vbox;
     static const gchar *const header_options[] =
         { "none", "selected", "all" };
@@ -829,47 +854,45 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     static const GActionEntry message_window_entries[] = {
         {"move-to", move_to_activated, "s"},
     };
-    GMenu *mru_menu;
 
-    if (!mailbox || !msgno)
+    if (mailbox == NULL || msgno == 0)
 	return;
 
     message = libbalsa_mailbox_get_message(mailbox, msgno);
-    if (message 
-        && (mw = g_object_get_data(G_OBJECT(message), 
-                                   BALSA_MESSAGE_WINDOW_KEY))) {
-        gtk_window_present_with_time(GTK_WINDOW(mw->window),
-                                     gtk_get_current_event_time());
+    if (message != NULL
+        && (mw = g_object_get_data(G_OBJECT(message),
+                                   BALSA_MESSAGE_WINDOW_KEY)) != NULL) {
+        gtk_window_present(GTK_WINDOW(mw->window));
         g_object_unref(message);
         return;
     }
 
     mw = g_malloc0(sizeof(MessageWindow));
 
-    mw->window = window =
-        gtk_application_window_new(balsa_app.application);
+    mw->window = window = gtk_application_window_new(balsa_app.application);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(window), vbox);
+    gtk_window_set_child(GTK_WINDOW(window), vbox);
 
     /* Set up the GMenu structures */
     menubar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
                                            win_entries,
                                            G_N_ELEMENTS(win_entries),
                                            resource_path, &error, mw);
-    if (!menubar) {
+    if (menubar == NULL) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Error adding from %s: %s\n"), resource_path,
                              error->message);
         g_error_free(error);
         return;
     }
-    gtk_widget_show(menubar);
 #if HAVE_MACOSX_DESKTOP
     libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
 #else
-    gtk_container_add(GTK_CONTAINER(vbox), menubar);
+    gtk_box_append(GTK_BOX(vbox), menubar);
 #endif
+
+    mw_menubar_set_mru_menu(menubar);
 
     mw->headers_shown = balsa_app.shown_headers;
     mw->show_all_headers = FALSE;
@@ -877,9 +900,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     model = message_window_get_toolbar_model();
 
     mw->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
-    gtk_container_add(GTK_CONTAINER(vbox), mw->toolbar);
-
-    gtk_window_set_role(GTK_WINDOW(window), "message");
+    gtk_box_append(GTK_BOX(vbox), mw->toolbar);
 
     g_signal_connect(window, "destroy",
 		     G_CALLBACK(destroy_message_window), mw);
@@ -903,19 +924,11 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     gtk_widget_insert_action_group(GTK_WIDGET(mw->window),
                                    "message-window",
                                    G_ACTION_GROUP(simple));
+    action = g_action_map_lookup_action(G_ACTION_MAP(simple), "move-to");
     g_object_unref(simple);
 
-    mru_menu =
-        balsa_mblist_mru_menu(&balsa_app.folder_mru, "message-window.move-to");
-    submenu = gtk_menu_new_from_model(G_MENU_MODEL(mru_menu));
-    g_object_unref(mru_menu);
-
-    gtk_container_foreach(GTK_CONTAINER(menubar), mw_menubar_foreach,
-                          &move_menu);
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(move_menu), submenu);
-
     if (libbalsa_mailbox_get_readonly(mailbox)) {
-	gtk_widget_set_sensitive(move_menu, FALSE);
+	g_simple_action_set_enabled(G_SIMPLE_ACTION(action), FALSE);
 	mw_disable_trash(mw);
     }
     if (mailbox == balsa_app.trash)
@@ -924,8 +937,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 
     gtk_widget_set_vexpand(mw->bmessage, TRUE);
     gtk_widget_set_valign(mw->bmessage, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), mw->bmessage);
-    gtk_widget_show(vbox);
+    gtk_box_append(GTK_BOX(vbox), mw->bmessage);
 
     g_signal_connect(mw->bmessage, "select-part",
 		     G_CALLBACK(mw_select_part_cb), mw);

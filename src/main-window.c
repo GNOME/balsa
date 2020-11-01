@@ -579,6 +579,38 @@ bw_create_index_widget(BalsaWindow *bw)
     return vbox;
 }
 
+/*
+ * bw_fix_panes
+ *
+ * Called as either an idle handler or a timeout handler, after the
+ * BalsaWindow has been created
+ */
+
+static gboolean
+bw_fix_panes(BalsaWindow *window)
+{
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
+
+    if (balsa_app.show_mblist) {
+        gtk_paned_set_position(GTK_PANED(priv->mblist_parent),
+                               balsa_app.mblist_width);
+    }
+
+    g_signal_connect(priv->mblist_parent, "notify::position",
+                     G_CALLBACK(bw_mblist_parent_position_cb), NULL);
+
+    if (priv->notebook_parent != NULL) {
+        if (balsa_app.previewpane) {
+            gtk_paned_set_position(GTK_PANED(priv->notebook_parent),
+                                   balsa_app.notebook_height);
+        }
+        g_signal_connect(priv->notebook_parent, "notify::position",
+                         G_CALLBACK(bw_notebook_parent_position_cb), NULL);
+    }
+
+    return FALSE;
+}
+
 static void
 bw_set_panes(BalsaWindow * window)
 {
@@ -586,6 +618,7 @@ bw_set_panes(BalsaWindow * window)
     GtkWidget *index_widget;
     GtkWidget *bindex;
     BalsaIndexWidthPreference width_preference;
+    const geometry_t *main_size;
 
     if (priv->paned_parent != NULL)
         gtk_container_remove(GTK_CONTAINER(priv->vbox), priv->paned_parent);
@@ -658,6 +691,20 @@ bw_set_panes(BalsaWindow * window)
 
     if ((bindex = balsa_window_find_current_index(window)) != NULL)
         balsa_index_set_width_preference(BALSA_INDEX(bindex), width_preference);
+
+    main_size = geometry_manager_get("MainWindow");
+    g_assert(main_size != NULL);
+    if (main_size->maximized) {
+        /*
+         * When maximized at startup, the window changes from maximized
+         * to not maximized a couple of times, so we wait until it has
+         * stabilized (100 msec is not enough!).
+         */
+        g_timeout_add(800, (GSourceFunc) bw_fix_panes, window);
+    } else {
+        /* No need to wait. */
+        g_idle_add((GSourceFunc) bw_fix_panes, window);
+    }
 }
 
 /* Create the toolbar model for the main window's toolbar.
@@ -2391,38 +2438,6 @@ balsa_window_new(GtkApplication *application)
 
     gtk_widget_show(GTK_WIDGET(window));
     return GTK_WIDGET(window);
-}
-
-/*
- * balsa_window_fix_paned
- *
- * Called as either an idle handler or a timeout handler, after the
- * BalsaWindow has been created
- */
-
-gboolean
-balsa_window_fix_paned(BalsaWindow *window)
-{
-    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
-
-    if (balsa_app.show_mblist) {
-        gtk_paned_set_position(GTK_PANED(priv->mblist_parent),
-                               balsa_app.mblist_width);
-    }
-
-    g_signal_connect(priv->mblist_parent, "notify::position",
-                     G_CALLBACK(bw_mblist_parent_position_cb), NULL);
-
-    if (priv->notebook_parent != NULL) {
-        if (balsa_app.previewpane) {
-            gtk_paned_set_position(GTK_PANED(priv->notebook_parent),
-                                   balsa_app.notebook_height);
-        }
-        g_signal_connect(priv->notebook_parent, "notify::position",
-                         G_CALLBACK(bw_notebook_parent_position_cb), NULL);
-    }
-
-    return FALSE;
 }
 
 /*

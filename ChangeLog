@@ -1,5 +1,14 @@
 2020-11-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
+	main-window: Do not export balsa_window_fix_paned
+
+	* src/main-window.c (bw_fix_panes): it is now local;
+	  (bw_set_panes): set the GSource for it;
+	* src/main-window.h: do not export it;
+	* src/main.c (balsa_activate_cb): do not use it.
+
+2020-11-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
 	main-window: Fix some geometry
 
 	Use the correct GtkPaned's position to detect changes in the

@@ -1,3 +1,26 @@
+2020-11-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	main-window: Fix some geometry
+
+	Use the correct GtkPaned's position to detect changes in the
+	width of BalsaMBList and the height of BalsaIndex
+
+	* src/main-window.c
+	  (Private structure): add mblist_parent and notebook_parent
+	    widgets;
+	  (bw_mblist_parent_position_cb): callback for the mblist's
+	    horizontal GtkPaned parent;
+	  (bw_notebook_parent_position_cb): callback for the notebook's
+	    vertical GtkPaned parent;
+	  (bw_set_panes): set priv->mblist_parent and
+	    priv->notebook_parent according to the layout;
+	  (balsa_window_new),
+	  (balsa_window_fix_paned),
+	  (balsa_window_refresh),
+	  (bw_show_mbtree),
+	  (balsa_change_window_layout): use the appropriate parent
+	  GtkPaneds, instead of paned_parent and paned_child.
+
 2020-10-17  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	balsa-icons: rename balsa_register_pixbufs()

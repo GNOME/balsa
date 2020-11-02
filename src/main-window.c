@@ -2738,20 +2738,6 @@ bw_mailbox_changed(LibBalsaMailbox * mailbox, GtkLabel * lab)
 }
 
 /*
- * bw_notebook_tab_drag_accept
- *
- * Handler for the "accept" signal
- */
-
-static gboolean
-bw_notebook_tab_drag_accept(GtkDropTarget *drop_target,
-                            GdkDrop       *drop,
-                            gpointer       user_data)
-{
-    return TRUE;
-}
-
-/*
  * bw_notebook_tab_drag_drop
  *
  * Description: This is the async callback for the notebook tabs.
@@ -2848,7 +2834,6 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
     /* Drag and drop */
     drop_target = gtk_drop_target_new(BALSA_TYPE_INDEX, GDK_ACTION_COPY | GDK_ACTION_MOVE);
     gtk_widget_add_controller(box, GTK_EVENT_CONTROLLER(drop_target));
-    g_signal_connect(drop_target, "accept", G_CALLBACK(bw_notebook_tab_drag_accept), box);
     g_signal_connect(drop_target, "drop", G_CALLBACK(bw_notebook_tab_drag_drop), box);
     g_object_set_data(G_OBJECT(box), BALSA_WINDOW_MAILBOX_KEY, mailbox);
 

@@ -138,10 +138,10 @@ static void bw_select_part_cb(BalsaMessage * bm, gpointer data);
 static void bw_find_real(BalsaWindow * window, BalsaIndex * bindex,
                          gboolean again);
 
-static void bw_notebook_switch_page_cb(GtkWidget * notebook,
-                                       void * page,
-                                       guint page_num,
-                                       gpointer data);
+static void bw_notebook_switch_page_cb(GtkWidget *notebook,
+                                       GtkWidget *page,
+                                       unsigned   page_num,
+                                       gpointer   user_data);
 static void bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
 static void bw_notebook_page_notify_cb(GtkWidget  *child,
                                        GParamSpec *child_property,
@@ -576,7 +576,8 @@ bw_set_panes(BalsaWindow * window)
     const geometry_t *main_size;
 
     if (priv->paned_parent != NULL)
-        gtk_container_remove(GTK_CONTAINER(priv->vbox), priv->paned_parent);
+        gtk_box_remove(GTK_BOX(priv->content_area), priv->paned_parent);
+
     index_widget = bw_create_index_widget(window);
 
     switch (balsa_app.layout_type) {
@@ -587,14 +588,10 @@ bw_set_panes(BalsaWindow * window)
         priv->mblist_parent = priv->paned_child;
         priv->notebook_parent = priv->paned_parent;
 
-	gtk_paned_pack1(GTK_PANED(priv->paned_child),
-			bw_frame(priv->mblist), TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(priv->paned_child),
-			bw_frame(index_widget), TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(priv->paned_parent),
-			priv->paned_child, TRUE, TRUE);
-	gtk_paned_pack2(GTK_PANED(priv->paned_parent),
-			bw_frame(priv->preview), TRUE, TRUE);
+        gtk_paned_set_start_child(GTK_PANED(priv->paned_child), bw_frame(priv->mblist));
+        gtk_paned_set_end_child(GTK_PANED(priv->paned_child), bw_frame(index_widget));
+        gtk_paned_set_start_child(GTK_PANED(priv->paned_parent), priv->paned_child);
+        gtk_paned_set_end_child(GTK_PANED(priv->paned_parent), bw_frame(priv->preview));
 
         width_preference = BALSA_INDEX_WIDE;
 
@@ -607,14 +604,10 @@ bw_set_panes(BalsaWindow * window)
         priv->mblist_parent = priv->paned_parent;
         priv->notebook_parent = NULL;
 
-	gtk_paned_pack1(GTK_PANED(priv->paned_parent),
-                        bw_frame(priv->mblist), TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(priv->paned_parent), priv->paned_child,
-                        TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(priv->paned_child),
-                        bw_frame(index_widget), TRUE, FALSE);
-	gtk_paned_pack2(GTK_PANED(priv->paned_child),
-                        bw_frame(priv->preview), TRUE, TRUE);
+        gtk_paned_set_start_child(GTK_PANED(priv->paned_parent), bw_frame(priv->mblist));
+        gtk_paned_set_end_child(GTK_PANED(priv->paned_parent), priv->paned_child);
+        gtk_paned_set_start_child(GTK_PANED(priv->paned_child), bw_frame(index_widget));
+        gtk_paned_set_end_child(GTK_PANED(priv->paned_child), bw_frame(priv->preview));
         width_preference = BALSA_INDEX_NARROW;
 	break;
     case LAYOUT_DEFAULT:
@@ -622,21 +615,15 @@ bw_set_panes(BalsaWindow * window)
 	priv->paned_parent = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
 	priv->paned_child  = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 
-	gtk_paned_pack1(GTK_PANED(priv->paned_parent),
-                        bw_frame(priv->mblist), TRUE, TRUE);
-        gtk_paned_pack2(GTK_PANED(priv->paned_parent), priv->paned_child,
-                        TRUE, TRUE);
-        gtk_paned_pack1(GTK_PANED(priv->paned_child),
-                        bw_frame(index_widget), TRUE, TRUE);
-	gtk_paned_pack2(GTK_PANED(priv->paned_child),
-                        bw_frame(priv->preview), TRUE, TRUE);
+        gtk_paned_set_start_child(GTK_PANED(priv->paned_parent), bw_frame(priv->mblist));
+        gtk_paned_set_end_child(GTK_PANED(priv->paned_parent), priv->paned_child);
+        gtk_paned_set_start_child(GTK_PANED(priv->paned_child), bw_frame(index_widget));
+        gtk_paned_set_end_child(GTK_PANED(priv->paned_child), bw_frame(priv->preview));
 
         width_preference = BALSA_INDEX_WIDE;
     }
 
-    gtk_widget_show(priv->paned_child);
-    gtk_widget_show(priv->paned_parent);
-    gtk_box_pack_start(GTK_BOX(priv->vbox), priv->paned_parent, TRUE, TRUE, 0);
+    gtk_box_append(GTK_BOX(priv->content_area), priv->paned_parent);
 
     if ((bindex = balsa_window_find_current_index(window)) != NULL)
         balsa_index_set_width_preference(BALSA_INDEX(bindex), width_preference);
@@ -691,7 +678,7 @@ static const BalsaToolbarEntry main_toolbar_extras[] = {
     { "mailbox-close",     "window-close-symbolic"     },
     { "mailbox-select-all", BALSA_PIXMAP_MARK_ALL      },
     { "show-all-headers",   BALSA_PIXMAP_SHOW_HEADERS  },
-	{ "recheck-crypt",      BALSA_PIXMAP_GPG_RECHECK   },
+    { "recheck-crypt",      BALSA_PIXMAP_GPG_RECHECK   },
     { "reset-filter",      "gtk-cancel"                },
     { "show-preview-pane",  BALSA_PIXMAP_SHOW_PREVIEW  },
     { "mailbox-expunge",   "edit-clear"                },
@@ -2233,7 +2220,7 @@ balsa_window_new(GtkApplication *application)
     balsa_register_pixmaps(GTK_WIDGET(window));
 
     priv->vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_box_append(GTK_BOX(window), priv->vbox);
+    gtk_window_set_child(GTK_WINDOW(window), priv->vbox);
 
     /* Set up the GMenu structures */
     bw_set_menus(window);
@@ -2300,7 +2287,7 @@ balsa_window_new(GtkApplication *application)
     gtk_scrolled_window_set_hadjustment(GTK_SCROLLED_WINDOW(priv->mblist), hadj);
     gtk_scrolled_window_set_vadjustment(GTK_SCROLLED_WINDOW(priv->mblist), vadj);
 
-    gtk_box_append(GTK_BOX(priv->mblist), GTK_WIDGET(balsa_app.mblist));
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(priv->mblist), GTK_WIDGET(balsa_app.mblist));
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(priv->mblist),
                                    GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     g_signal_connect_swapped(balsa_app.mblist, "has-unread-mailbox",
@@ -2853,7 +2840,7 @@ bw_notebook_label_new(BalsaMailboxNode * mbnode)
                      G_CALLBACK(bw_mailbox_tab_close_cb), mbnode);
 
     close_pix = gtk_image_new_from_icon_name("window-close-symbolic");
-    gtk_box_append(GTK_BOX(but), close_pix);
+    gtk_button_set_child(GTK_BUTTON(but), close_pix);
     gtk_box_append(GTK_BOX(box), but);
 
     gtk_widget_set_tooltip_text(box, libbalsa_mailbox_get_url(mailbox));
@@ -4223,7 +4210,7 @@ bw_show_mbtree(BalsaWindow * window)
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
 
     if (balsa_app.show_mblist) {
-        gtk_paned_set_position(GTK_PANED(parent), balsa_app.mblist_width);
+        gtk_paned_set_position(GTK_PANED(priv->mblist_parent), balsa_app.mblist_width);
     } else {
         gtk_widget_hide(priv->mblist);
         gtk_paned_set_position(GTK_PANED(priv->mblist_parent), 0);
@@ -4264,12 +4251,12 @@ balsa_change_window_layout(BalsaWindow *window)
    mailbox in the mailbox tree.
  */
 static void
-bw_notebook_switch_page_cb(GtkWidget * notebook,
+bw_notebook_switch_page_cb(GtkWidget *notebook,
                            GtkWidget *page,
-                           unsigned page_num,
-                           gpointer data)
+                           unsigned   page_num,
+                           gpointer   user_data)
 {
-    BalsaWindow *window = BALSA_WINDOW(data);
+    BalsaWindow *window = BALSA_WINDOW(user_data);
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GtkNotebookPage *notebook_page;
     BalsaIndex *index;

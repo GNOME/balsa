@@ -806,6 +806,8 @@ mw_menubar_set_mru_menu(GtkWidget *menubar)
     int i;
     int n;
     int move_position = -1;
+    GMenuItem *item;
+    GMenu *mru_menu;
 
     model = gtk_popover_menu_bar_get_menu_model(GTK_POPOVER_MENU_BAR(menubar));
     n = g_menu_model_get_n_items(model);
@@ -819,21 +821,18 @@ mw_menubar_set_mru_menu(GtkWidget *menubar)
         }
     }
 
-    if (move_position >= 0) {
-        GMenuItem *item;
-        GMenu *mru_menu;
+    g_return_if_fail(move_position >= 0);
 
-        item = g_menu_item_new_from_model(model, i);
+    item = g_menu_item_new_from_model(model, move_position);
 
-        mru_menu = balsa_mblist_mru_menu(&balsa_app.folder_mru, "message-window.move-to");
-        g_menu_item_set_submenu(item, G_MENU_MODEL(mru_menu));
-        g_object_unref(mru_menu);
+    mru_menu = balsa_mblist_mru_menu(&balsa_app.folder_mru, "message-window.move-to");
+    g_menu_item_set_submenu(item, G_MENU_MODEL(mru_menu));
+    g_object_unref(mru_menu);
 
-        /* Replace the existing submenu */
-        g_menu_remove(G_MENU(model), move_position);
-        g_menu_insert_item(G_MENU(model), move_position, item);
-        g_object_unref(item);
-    }
+    /* Replace the existing submenu */
+    g_menu_remove(G_MENU(model), move_position);
+    g_menu_insert_item(G_MENU(model), move_position, item);
+    g_object_unref(item);
 }
 
 void

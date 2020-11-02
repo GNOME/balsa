@@ -2738,7 +2738,7 @@ bw_mailbox_changed(LibBalsaMailbox * mailbox, GtkLabel * lab)
 }
 
 /*
- * bw_notebook_tab_drag_drop
+ * bw_notebook_tab_drag_drop_callback
  *
  * Description: This is the async callback for the notebook tabs.
  * It retrieves the source BalsaIndex and transfers the
@@ -2749,9 +2749,9 @@ bw_mailbox_changed(LibBalsaMailbox * mailbox, GtkLabel * lab)
  */
 #define BALSA_WINDOW_MAILBOX_KEY "balsa-window-mailbox-key"
 static void
-bw_notebook_tab_drag_drop(GObject      *source_object,
-                          GAsyncResult *res,
-                          gpointer      user_data)
+bw_notebook_tab_drag_drop_callback(GObject      *source_object,
+                                   GAsyncResult *res,
+                                   gpointer      user_data)
 {
     GdkDrop *drop = GDK_DROP(source_object);
     GtkWidget *box = user_data;
@@ -2780,6 +2780,32 @@ bw_notebook_tab_drag_drop(GObject      *source_object,
                              gdk_drop_get_actions(drop) != GDK_ACTION_MOVE);
     }
     balsa_index_selected_msgnos_free(orig_index, selected);
+}
+
+/*
+ * bw_notebook_tab_drag_drop
+ *
+ * Description: This is the "drop" signal handler for the
+ * BalsaMBList.  It launches the async operation that carries out the
+ * actual drop.
+  */
+static gboolean
+bw_notebook_tab_drag_drop(GtkDropTarget *drop_target,
+                          GValue        *value,
+                          gdouble        x,
+                          gdouble        y,
+                          gpointer       user_data)
+{
+    GdkDrop *drop;
+
+    drop = gtk_drop_target_get_drop(drop_target);
+    if (drop == NULL)
+        return FALSE;
+
+    gdk_drop_read_value_async(drop, BALSA_TYPE_INDEX, 0, NULL, bw_notebook_tab_drag_drop_callback,
+                              user_data);
+
+    return TRUE;
 }
 
 static GtkWidget *

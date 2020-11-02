@@ -65,13 +65,6 @@ static void libbalsa_vfs_dispose(GObject *object);
 static void libbalsa_vfs_finalize(GObject *object);
 
 
-gboolean
-libbalsa_vfs_local_only(void)
-{
-    return FALSE;
-}
-
-
 G_DEFINE_TYPE(LibbalsaVfs, libbalsa_vfs, G_TYPE_OBJECT)
 
 

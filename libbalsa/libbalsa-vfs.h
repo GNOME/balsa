@@ -43,7 +43,6 @@ G_DECLARE_FINAL_TYPE(LibbalsaVfs,
                      GObject)
 
 
-gboolean libbalsa_vfs_local_only(void);
 LibbalsaVfs * libbalsa_vfs_new(void);
 LibbalsaVfs * libbalsa_vfs_new_from_uri(const gchar * uri);
 LibbalsaVfs * libbalsa_vfs_append(LibbalsaVfs * file,

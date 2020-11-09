@@ -338,7 +338,7 @@ select_key_idle(gpointer user_data)
 }
 
 gpgme_key_t
-lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
+lb_gpgme_select_key(const char * user_name, lb_key_sel_md_t mode, GList * keys,
 		    gpgme_protocol_t protocol, GtkWindow * parent)
 {
     select_key_data_t data;
@@ -350,13 +350,12 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     data.keys = keys;
     data.parent = parent;
 
-    g_idle_add(select_key_idle, &data);
-
     g_mutex_init(&data.lock);
     g_cond_init(&data.cond);
 
     g_mutex_lock(&data.lock);
     data.done = FALSE;
+    g_idle_add(select_key_idle, &data);
     while (!data.done)
         g_cond_wait(&data.cond, &data.lock);
     g_mutex_unlock(&data.lock);

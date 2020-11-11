@@ -46,6 +46,12 @@ G_BEGIN_DECLS
         SENDMSG_STATE_AUTO_SAVED
     } SendmsgState;
 
+    typedef enum {
+        QUOTE_HEADERS,
+        QUOTE_ALL,
+        QUOTE_NOPREFIX
+    } QuoteType;
+
 #define VIEW_MENU_LENGTH 5
 
     typedef struct _BalsaSendmsg BalsaSendmsg;
@@ -106,6 +112,24 @@ G_BEGIN_DECLS
 
         gboolean ready_to_send;
         gboolean queue_only;    /* Set when about to send */
+
+        /* Set when attaching files, so we know when to close the dialog */
+        unsigned n_attachments;
+        GtkWidget *attach_dialog;
+
+        /* Set when inserting text */
+        GString         *body;
+        LibBalsaMessage *message;
+        QuoteType        quote_type;
+
+        /* Set when quoting message or part */
+        LibBalsaMessageHeaders *headers;
+        char                   *message_id;
+        GList                  *fill_references;
+        LibBalsaMessageBody    *root;
+
+        /* Set when sending */
+        gboolean has_subject;
     };
 
     BalsaSendmsg *sendmsg_window_compose(void);
@@ -124,10 +148,10 @@ G_BEGIN_DECLS
     void sendmsg_window_set_field(BalsaSendmsg *bsmsg, const gchar* key,
                                   const gchar* val, gboolean from_command_line);
 
-    gboolean add_attachment(BalsaSendmsg * bsmsg,
-                            const gchar *filename, 
-                            gboolean is_a_tmp_file, 
-                            const gchar *forced_mime_type);
+    void add_attachment(BalsaSendmsg * bsmsg,
+                        const char *filename,
+                        gboolean is_a_tmp_file,
+                        const char *forced_mime_type);
 
     void sendmsg_window_process_url(BalsaSendmsg *bsmsg,
                                     const char *url,

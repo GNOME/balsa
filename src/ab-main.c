@@ -1035,8 +1035,8 @@ ab_warning(const char *fmt, ...)
                                GTK_DIALOG_DESTROY_WITH_PARENT,
                                GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
                                "%s", msg);
-    gtk_dialog_run(GTK_DIALOG(d));
-    gtk_widget_destroy(d);
+    g_signal_connect(d, "response", G_CALLBACK(gtk_window_destroy), NULL);
+    gtk_widget_show(d);
 }
 
 static void

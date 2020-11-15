@@ -114,7 +114,7 @@ ask_password_real(LibBalsaServer *server, const gchar *cert_subject)
 			libbalsa_server_config_changed(server);
 		}
 	}
-    gtk_widget_destroy(GTK_WIDGET(dialog));
+    gtk_window_destroy(GTK_WINDOW(dialog));
     return passwd;
 }
 

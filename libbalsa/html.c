@@ -419,8 +419,8 @@ lbh_info_bar_response_cb(GtkInfoBar * info_bar,
 		}
 	}
 
-	gtk_widget_destroy(info->info_bar);
-	info->info_bar = NULL;
+    gtk_window_destroy(GTK_WINDOW(info->info_bar));
+    info->info_bar = NULL;
 }
 
 static void
@@ -490,7 +490,7 @@ lbh_resource_notify_response_cb(WebKitWebResource * resource,
                 webkit_web_resource_get_uri(resource));
         /* web_view is loading an image from its cache, so we do not
          * need to ask the user for permission to download */
-        gtk_widget_destroy(info->info_bar);
+        gtk_window_destroy(GTK_WINDOW(info->info_bar));
         info->info_bar = NULL;
     } else {
         g_debug("%s %s null info_bar", __func__,
@@ -811,7 +811,7 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
     }
 
     /* destroy the offscreen window */
-    gtk_widget_destroy(offline_window);
+    gtk_window_destroy(GTK_WINDOW(offline_window));
 
     /* return the surface */
     return html_surface;

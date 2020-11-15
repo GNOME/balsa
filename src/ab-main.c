@@ -487,8 +487,7 @@ entry_new_activated(GSimpleAction * action,
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW
                                             (contacts_app.entry_list));
     gtk_tree_selection_unselect_all(selection);
-    gtk_widget_grab_focus(gtk_container_get_focus_child
-                          (GTK_CONTAINER(contacts_app.edit_widget)));
+    gtk_widget_grab_focus(gtk_widget_get_focus_child(contacts_app.edit_widget));
 }
 
 static LibBalsaABErr
@@ -603,7 +602,7 @@ static void
 ab_set_edit_widget(LibBalsaAddress * address, gboolean can_remove)
 {
     libbalsa_address_set_edit_entries(address, contacts_app.entries);
-    gtk_widget_show_all(contacts_app.edit_widget);
+    gtk_widget_show(contacts_app.edit_widget);
     gtk_widget_set_sensitive(contacts_app.apply_button, FALSE);
     gtk_widget_set_sensitive(contacts_app.remove_button, can_remove);
     gtk_widget_set_sensitive(contacts_app.cancel_button, TRUE);
@@ -664,38 +663,30 @@ list_row_activated_cb(GtkTreeView *tree, gpointer data)
     contacts_app.displayed_address = address;
 }
 
-static void
-addrlist_drag_get_cb(GtkWidget* widget, GdkDragContext* drag_context,
-                     GtkSelectionData* sel_data, guint target_type,
-                     guint time, gpointer user_data)
+/*
+ * Handler for the drag-source's "prepare" signal
+ */
+static GdkContentProvider *
+bab_drag_source_prepare(GtkDragSource *source,
+                        double         x,
+                        double         y,
+                        gpointer       user_data)
 {
-    GtkTreeView *addrlist;
+    GtkTreeView *tree_view = GTK_TREE_VIEW(source);
+    GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model;
-    GtkTreeSelection *selection;
     GtkTreeIter iter;
-    LibBalsaAddress *address;
-    GValue gv = {0,};
+    GdkContentProvider *provider = NULL;
 
-    g_return_if_fail (widget != NULL);
-    addrlist = GTK_TREE_VIEW(widget);
+    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+        GValue value = G_VALUE_INIT;
 
-    switch (target_type) {
-    case LIBBALSA_ADDRESS_TRG_ADDRESS:
-        selection = gtk_tree_view_get_selection(addrlist);
-        if(!gtk_tree_selection_get_selected(selection, &model, &iter))
-            return;
-        gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &gv);
-        address = LIBBALSA_ADDRESS(g_value_get_object(&gv));
-        gtk_selection_data_set(sel_data,
-                               gtk_selection_data_get_target(sel_data),
-                               8, (const guchar *) &address,
-                               sizeof(LibBalsaAddress*));
-        break;
-    case LIBBALSA_ADDRESS_TRG_STRING:
-        g_warning("Text/plain cannot be sent.");
-        break;
-    default: g_debug("Do not know what to do!");
+        gtk_tree_model_get_value(model, &iter, LIST_COLUMN_ADDRESS, &value);
+        provider = gdk_content_provider_new_for_value(&value);
+        g_value_unset(&value);
     }
+
+    return provider;
 }
 
 static GtkWidget *
@@ -706,17 +697,14 @@ bab_window_list_new(void)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkTreeSelection *selection;
+    GtkDragSource *drag_source;
 
     store =
         gtk_list_store_new(N_COLUMNS,
                            G_TYPE_STRING,   /* LIST_COLUMN_NAME           */
                            G_TYPE_STRING,   /* LIST_COLUMN_ADDRSPEC       */
                            G_TYPE_OBJECT);  /* LIST_COLUMN_ADDRESS        */
-    /*
-    gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(store), 0,
-                                    balsa_ab_window_compare_entries,
-                                    GINT_TO_POINTER(0), NULL);
-    */
+
     gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(store), 0,
                                          GTK_SORT_ASCENDING);
 
@@ -737,13 +725,9 @@ bab_window_list_new(void)
                                                  LIST_COLUMN_NAME, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
-
-    gtk_drag_source_set(GTK_WIDGET(tree),
-                        GDK_BUTTON1_MASK,
-                        libbalsa_address_target_list, 2,
-                        GDK_ACTION_COPY);
-    g_signal_connect(tree, "drag-data-get",
-                     G_CALLBACK(addrlist_drag_get_cb), NULL);
+    drag_source = gtk_drag_source_new();
+    gtk_widget_add_controller(tree, GTK_EVENT_CONTROLLER(drag_source));
+    g_signal_connect(drag_source, "prepare", G_CALLBACK(bab_drag_source_prepare), index);
 
     renderer = gtk_cell_renderer_text_new();
     column =
@@ -754,6 +738,7 @@ bab_window_list_new(void)
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
     gtk_widget_show(tree);
+
     return tree;
 }
 
@@ -853,7 +838,7 @@ bab_get_edit_button_box(struct ABMainWindow *abmw)
 static void
 bab_filter_entry_activate(GtkWidget *entry, GtkWidget *button)
 {
-    const gchar *filter = gtk_entry_get_text(GTK_ENTRY(entry));
+    const char *filter = gtk_editable_get_text(GTK_EDITABLE(entry));
     bab_set_address_book(contacts_app.address_book, contacts_app.entry_list,
                          filter);
     gtk_widget_set_sensitive(button, FALSE);
@@ -878,7 +863,7 @@ bab_get_filter_box(void)
     widget = find_label;
     gtk_widget_set_margin_start(widget, 1);
     gtk_widget_set_margin_end(widget, 1);
-    gtk_container_add(GTK_CONTAINER(search_hbox), widget);
+    gtk_box_append(GTK_BOX(search_hbox), widget);
 
     find_entry = gtk_entry_new();
     gtk_widget_show(find_entry);
@@ -888,20 +873,19 @@ bab_get_filter_box(void)
     gtk_widget_set_halign(widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_start(widget, 1);
     gtk_widget_set_margin_end(widget, 1);
-    gtk_container_add(GTK_CONTAINER(search_hbox), widget);
+    gtk_box_append(GTK_BOX(search_hbox), widget);
 
     gtk_widget_show(search_hbox);
     gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), find_entry);
 
     button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button),
-                      gtk_image_new_from_icon_name("gtk-ok",
-                                                   GTK_ICON_SIZE_BUTTON));
+    gtk_button_set_child(GTK_BUTTON(button),
+                         gtk_image_new_from_icon_name("gtk-ok"));
 
     widget = button;
     gtk_widget_set_margin_start(widget, 1);
     gtk_widget_set_margin_end(widget, 1);
-    gtk_container_add(GTK_CONTAINER(search_hbox), widget);
+    gtk_box_append(GTK_BOX(search_hbox), widget);
 
     g_signal_connect(find_entry, "activate",
                      G_CALLBACK(bab_filter_entry_activate),
@@ -922,14 +906,14 @@ ew_key_pressed(GtkEventControllerKey *controller,
                GdkModifierType        state,
                gpointer               user_data)
 {
-    struct ABMainWindow *abmw = user_data;
+    gboolean retval = FALSE;
 
-    if (keyval != GDK_KEY_Escape)
-	return FALSE;
+    if (keyval == GDK_KEY_Escape) {
+        ab_clear_edit_widget();
+        retval = TRUE;
+    }
 
-    gtk_button_clicked(GTK_BUTTON(abmw->cancel_button));
-
-    return TRUE;
+    return retval;
 }
 
 static GtkWidget*
@@ -951,7 +935,7 @@ bab_window_new(GtkApplication * application)
 
     /* main vbox */
     main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
-    gtk_container_add(GTK_CONTAINER(wnd), main_vbox);
+    gtk_window_set_child(GTK_WINDOW(wnd), main_vbox);
 
     contacts_app.notebook = gtk_notebook_new();
 
@@ -960,7 +944,7 @@ bab_window_new(GtkApplication * application)
     gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(widget, 1);
     gtk_widget_set_margin_bottom(widget, 1);
-    gtk_container_add(GTK_CONTAINER(main_vbox), widget);
+    gtk_box_append(GTK_BOX(main_vbox), widget);
 
     browse_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
 
@@ -968,22 +952,23 @@ bab_window_new(GtkApplication * application)
     widget = bab_get_filter_box();
     gtk_widget_set_margin_top(widget, 1);
     gtk_widget_set_margin_bottom(widget, 1);
-    gtk_container_add(GTK_CONTAINER(browse_widget), widget);
+    gtk_box_append(GTK_BOX(browse_widget), widget);
 
-    scroll = gtk_scrolled_window_new(NULL, NULL);
+    scroll = gtk_scrolled_window_new();
     gtk_widget_show(scroll);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
-				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+				   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_AUTOMATIC);
 
     widget = scroll;
     gtk_widget_set_vexpand(widget, TRUE);
     gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
     gtk_widget_set_margin_top(widget, 1);
     gtk_widget_set_margin_bottom(widget, 1);
-    gtk_container_add(GTK_CONTAINER(browse_widget), widget);
+    gtk_box_append(GTK_BOX(browse_widget), widget);
 
     contacts_app.entry_list = bab_window_list_new();
-    gtk_container_add(GTK_CONTAINER(scroll), contacts_app.entry_list);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), contacts_app.entry_list);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(contacts_app.notebook), browse_widget,
 			     gtk_label_new(_("Browse")));
@@ -997,27 +982,25 @@ bab_window_new(GtkApplication * application)
     widget = contacts_app.edit_widget;
     gtk_widget_set_margin_top(widget, 1);
     gtk_widget_set_margin_bottom(widget, 1);
-    gtk_container_add(GTK_CONTAINER(edit_widget), widget);
+    gtk_box_append(GTK_BOX(edit_widget), widget);
 
     widget = bab_get_edit_button_box(&contacts_app);
     gtk_widget_set_margin_top(widget, 1);
     gtk_widget_set_margin_bottom(widget, 1);
-    gtk_container_add(GTK_CONTAINER(edit_widget), widget);
+    gtk_box_append(GTK_BOX(edit_widget), widget);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(contacts_app.notebook), edit_widget,
 			     gtk_label_new(_("Edit")));
 
-    /*
-    g_signal_connect(find_entry, "changed",
-		     G_CALLBACK(balsa_ab_window_find), ab);
-    */
-    key_controller = gtk_event_controller_key_new(wnd);
+    key_controller = gtk_event_controller_key_new();
+    gtk_widget_add_controller(wnd, key_controller);
     g_signal_connect(key_controller, "key-pressed",
 		     G_CALLBACK(ew_key_pressed), &contacts_app);
 
     gtk_window_set_default_size(GTK_WINDOW(wnd), 500, 400);
 
-    gtk_widget_show_all(wnd);
+    gtk_widget_show(wnd);
+
     return wnd;
 }
 

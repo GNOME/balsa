@@ -587,7 +587,7 @@ balsa_spell_check_start(BalsaSpellCheck *spell_check)
                                    "%s",
                                    enchant_error);
 
-        gtk_widget_destroy((GtkWidget *) spell_check);
+        gtk_window_destroy(GTK_WINDOW(spell_check));
 
         return;
     }
@@ -902,7 +902,7 @@ spch_finish(BalsaSpellCheck *spell_check,
 
     g_debug("finished");
 
-    gtk_widget_destroy((GtkWidget *) spell_check);
+    gtk_window_destroy(GTK_WINDOW(spell_check));
 }
 
 

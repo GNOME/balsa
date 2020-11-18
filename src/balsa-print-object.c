@@ -271,79 +271,34 @@ p_string_height_from_layout(PangoLayout * layout, const gchar * text)
 /* print a GdkPixbuf to cairo at the specified position and with the
  * specified scale */
 gboolean
-cairo_print_pixbuf(cairo_t * cairo_ctx, const GdkPixbuf * pixbuf,
-		   gdouble c_at_x, gdouble c_at_y, gdouble scale)
+cairo_print_pixbuf(cairo_t   *cairo_ctx,
+                   GdkPixbuf *pixbuf,
+                   double    c_at_x,
+                   double    c_at_y,
+                   double    scale)
 {
-    guchar *raw_image;
-    gint n_chans;
-    guint32 *surface_buf;
-    gint width;
-    gint height;
-    gint rowstride;
-    guint32 *dest;
-    cairo_format_t format;
-    cairo_surface_t *surface;
+    int n_chans;
+    int width;
+    int height;
     cairo_pattern_t *pattern;
     cairo_matrix_t matrix;
 
     /* paranoia checks */
-    g_return_val_if_fail(cairo_ctx && pixbuf, FALSE);
-
-    /* must have 8 bpp */
-    g_return_val_if_fail(gdk_pixbuf_get_bits_per_sample(pixbuf) == 8,
-			 FALSE);
+    g_return_val_if_fail(cairo_ctx != NULL, FALSE);
+    g_return_val_if_fail(pixbuf != NULL, FALSE);
 
     /* must have 3 (no alpha) or 4 (with alpha) channels */
     n_chans = gdk_pixbuf_get_n_channels(pixbuf);
     g_return_val_if_fail(n_chans == 3 || n_chans == 4, FALSE);
 
-    /* allocate a new buffer */
-    /* FIXME: does this work on 64 bit machines if the witdth is odd? */
-    width = gdk_pixbuf_get_width(pixbuf);
+    width  = gdk_pixbuf_get_width(pixbuf);
     height = gdk_pixbuf_get_height(pixbuf);
-    if (!(surface_buf = g_new0(guint32, width * height)))
-	return FALSE;
-
-    /* copy pixbuf to a cairo buffer */
-    dest = surface_buf;
-    raw_image = gdk_pixbuf_get_pixels(pixbuf);
-    rowstride = gdk_pixbuf_get_rowstride(pixbuf);
-    if (n_chans == 4) {
-	/* 4 channels: copy 32-bit vals, converting R-G-B-Alpha to
-	 * Alpha-R-G-B... */
-	gint line;
-
-	format = CAIRO_FORMAT_ARGB32;
-	for (line = 0; line < height; line++) {
-	    guchar *src = raw_image + line * rowstride;
-	    gint col;
-
-	    for (col = width; col; col--, src += 4)
-		*dest++ = (((((src[3] << 8) + src[0]) << 8) + src[1]) << 8) + src[2];
-	}
-    } else {
-	/* 3 channels: copy 3 byte R-G-B to Alpha-R-G-B... */
-	gint line;
-
-	format = CAIRO_FORMAT_RGB24;
-	for (line = 0; line < height; line++) {
-	    guchar *src = raw_image + line * rowstride;
-	    gint col;
-
-	    for (col = width; col; col--, src += 3)
-		*dest++ = (((src[0] << 8) + src[1]) << 8) + src[2];
-	}
-    }
 
     /* save current state */
     cairo_save(cairo_ctx);
 
-    /* create the curface */
-    surface =
-	cairo_image_surface_create_for_data((unsigned char *) surface_buf,
-					    format, width, height,
-					    4 * width);
-    cairo_set_source_surface(cairo_ctx, surface, c_at_x, c_at_y);
+    /* set the curface */
+    gdk_cairo_set_source_pixbuf(cairo_ctx, pixbuf, c_at_x, c_at_y);
 
     /* scale */
     pattern = cairo_get_source(cairo_ctx);
@@ -359,16 +314,14 @@ cairo_print_pixbuf(cairo_t * cairo_ctx, const GdkPixbuf * pixbuf,
     cairo_move_to(cairo_ctx, c_at_x, c_at_y);
     cairo_line_to(cairo_ctx, c_at_x + width * scale, c_at_y);
     cairo_line_to(cairo_ctx, c_at_x + width * scale,
-		  c_at_y + height * scale);
+                  c_at_y + height * scale);
     cairo_line_to(cairo_ctx, c_at_x, c_at_y + height * scale);
     cairo_close_path(cairo_ctx);
     cairo_clip(cairo_ctx);
 
-    /* paint, restore and clean up */
+    /* paint and restore */
     cairo_paint(cairo_ctx);
     cairo_restore(cairo_ctx);
-    cairo_surface_destroy(surface);
-    g_free(surface_buf);
 
     return TRUE;
 }

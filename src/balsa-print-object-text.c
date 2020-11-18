@@ -361,23 +361,36 @@ balsa_print_object_text(GList *list, GtkPrintContext * context,
 }
 
 static GdkPixbuf *
-get_icon(const gchar         *icon_name,
-		 LibBalsaMessageBody *body)
+get_icon(const char          *icon_name,
+         LibBalsaMessageBody *body)
 {
-    gint width;
-    gint height;
+    GtkIconTheme *theme = gtk_icon_theme_get_for_display(gdk_display_get_default());
     GdkPixbuf *pixbuf;
 
-    if (!gtk_icon_size_lookup(GTK_ICON_SIZE_DND, &width, &height)) {
-        width = 16;
-    }
+    if (gtk_icon_theme_has_icon(theme, icon_name)) {
+        int *sizes;
+        int *s;
+        int size = 0;
+        GtkIconPaintable *info;
 
-    pixbuf = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), icon_name, width, GTK_ICON_LOOKUP_FORCE_SIZE, NULL);
-    if (pixbuf == NULL) {
-    	gchar *conttype = libbalsa_message_body_get_mime_type(body);
+        sizes = gtk_icon_theme_get_icon_sizes(theme, icon_name);
+        for (s = sizes; *s != 0; s++) {
+            if (*s == -1 || *s >= 32) {
+                size = 32; /* GTK_ICON_SIZE_DND */
+                break;
+            }
+            size = MAX(size, *s);
+        }
+        g_free(sizes);
 
-    	pixbuf = libbalsa_icon_finder(NULL, conttype, NULL, NULL, GTK_ICON_SIZE_DND);
-    	g_free(conttype);
+        info = gtk_icon_theme_lookup_icon(theme, icon_name, NULL, size, 1, GTK_TEXT_DIR_NONE,
+                                          (GtkIconLookupFlags) 0);
+        pixbuf = gdk_pixbuf_get_from_texture(GDK_TEXTURE(info));
+        g_object_unref(info);
+    } else {
+        char *conttype = libbalsa_message_body_get_mime_type(body);
+        pixbuf = libbalsa_icon_finder(conttype, NULL, NULL);
+        g_free(conttype);
     }
 
     return pixbuf;

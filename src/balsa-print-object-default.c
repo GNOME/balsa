@@ -81,25 +81,27 @@ balsa_print_object_default_destroy(GObject * self)
 
 
 GList *
-balsa_print_object_default(GList 			   *list,
-			   	   	   	   GtkPrintContext 	   *context,
-						   LibBalsaMessageBody *body,
-						   BalsaPrintSetup     *psetup)
+balsa_print_object_default(GList               *list,
+                           GtkPrintContext     *context,
+                           LibBalsaMessageBody *body,
+                           BalsaPrintSetup     *psetup)
 {
-	GdkPixbuf *pixbuf;
-	gint p_label_width;
+    GdkPixbuf *pixbuf;
+    int p_label_width;
     PangoFontDescription *header_font;
     PangoLayout *test_layout;
-    gchar *conttype;
+    char *conttype;
     GString *desc_buf;
-    gchar *part_desc;
-    gchar *description;
+    char *part_desc;
+    char *description;
 
-    g_return_val_if_fail((context != NULL) && (body != NULL) && (psetup != NULL), list);
+    g_return_val_if_fail(context != NULL, list);
+    g_return_val_if_fail(body != NULL, list);
+    g_return_val_if_fail(psetup != NULL, list);
 
     /* get a pixbuf according to the mime type */
     conttype = libbalsa_message_body_get_mime_type(body);
-    pixbuf = libbalsa_icon_finder(NULL, conttype, NULL, NULL, GTK_ICON_SIZE_DND);
+    pixbuf = libbalsa_icon_finder(conttype, NULL, NULL);
 
     /* create a layout for calculating the maximum label width */
     header_font = pango_font_description_from_string(balsa_app.print_header_font);
@@ -144,11 +146,11 @@ balsa_print_object_default(GList 			   *list,
 
 GList *
 balsa_print_object_default_full(GList           *list,
-		  	  	  	  	  	  	GtkPrintContext *context,
-								GdkPixbuf       *pixbuf,
-								const gchar     *description,
-								gint             p_label_width,
-								BalsaPrintSetup *psetup)
+                                GtkPrintContext *context,
+                                GdkPixbuf       *pixbuf,
+                                const gchar     *description,
+                                gint             p_label_width,
+                                BalsaPrintSetup *psetup)
 {
     BalsaPrintObjectDefault *pod;
     BalsaPrintObject *po;
@@ -161,7 +163,10 @@ balsa_print_object_default_full(GList           *list,
     GList *this_par_part;
     gdouble c_at_y;
 
-	g_return_val_if_fail((context != NULL) && (pixbuf != NULL) && (description != NULL) && (psetup != NULL), list);
+    g_return_val_if_fail(context != NULL, list);
+    g_return_val_if_fail(pixbuf != NULL, list);
+    g_return_val_if_fail(description != NULL, list);
+    g_return_val_if_fail(psetup != NULL, list);
 
     pod = g_object_new(BALSA_TYPE_PRINT_OBJECT_DEFAULT, NULL);
     g_assert(pod != NULL);
@@ -251,8 +256,8 @@ balsa_print_object_default_draw(BalsaPrintObject * self,
 {
     BalsaPrintObjectDefault *pod;
     const BalsaPrintRect *rect;
-    gdouble c_max_height;
-    gdouble c_offset;
+    double c_max_height;
+    double c_offset;
     PangoLayout *layout;
     PangoFontDescription *font;
     PangoTabArray *tabs;
@@ -266,9 +271,8 @@ balsa_print_object_default_draw(BalsaPrintObject * self,
     c_offset = pod->c_image_width + 4 * C_LABEL_SEP;
 
     /* print the icon */
-    if (pod->pixbuf != NULL) {
+    if (pod->pixbuf != NULL)
         cairo_print_pixbuf(cairo_ctx, pod->pixbuf, rect->c_at_x, rect->c_at_y, 1.0);
-    }
 
     /* print the description */
     font = pango_font_description_from_string(balsa_app.print_header_font);

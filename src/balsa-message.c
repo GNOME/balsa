@@ -253,24 +253,20 @@ bm_header_tl_buttons(BalsaMessage * balsa_message)
 {
     GPtrArray *array;
     GtkWidget *button;
-    GtkWidget *image;
-    GtkEventController *key_controller;
+    GtkEventController *controller;
 
     array = g_ptr_array_new();
 
     balsa_message->attach_button = button = gtk_menu_button_new();
-    gtk_button_set_has_frame(GTK_BUTTON(button), FALSE);
-
-    image = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_ATTACHMENT));
-    gtk_button_set_child(GTK_BUTTON(button), image);
+    gtk_menu_button_set_has_frame(GTK_MENU_BUTTON(button), FALSE);
 
     gtk_widget_set_tooltip_text(button, _("Select message part to display"));
 
-    key_controller = gtk_event_controller_key_new();
-    gtk_widget_add_controller(button, key_controller);
-    g_signal_connect(key_controller, "focus-in",
+    controller = gtk_event_controller_focus_new();
+    gtk_widget_add_controller(button, controller);
+    g_signal_connect(controller, "enter",
 		     G_CALLBACK(balsa_mime_widget_limit_focus), balsa_message);
-    g_signal_connect(key_controller, "focus-out",
+    g_signal_connect(controller, "leave",
 		     G_CALLBACK(balsa_mime_widget_unlimit_focus), balsa_message);
 
     g_ptr_array_add(array, button);
@@ -896,7 +892,7 @@ balsa_message_init(BalsaMessage * balsa_message)
     GtkTreeStore *model;
     GtkCellRenderer *renderer;
     GtkTreeSelection *selection;
-    GtkEventController *key_controller;
+    GtkEventController *controller;
     GtkGesture *gesture;
     GMenu *menu;
 
@@ -923,9 +919,9 @@ balsa_message_init(BalsaMessage * balsa_message)
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
 
-    key_controller = gtk_event_controller_key_new();
-    gtk_widget_add_controller(scroll, key_controller);
-    g_signal_connect(key_controller, "key-pressed",
+    controller = gtk_event_controller_key_new();
+    gtk_widget_add_controller(scroll, controller);
+    g_signal_connect(controller, "key-pressed",
 		     G_CALLBACK(balsa_mime_widget_key_pressed), balsa_message);
 
     gtk_widget_set_vexpand(scroll, TRUE);
@@ -937,12 +933,11 @@ balsa_message_init(BalsaMessage * balsa_message)
     balsa_message->bm_widget = balsa_mime_widget_new_message_tl(balsa_message, buttons);
     g_free(buttons);
 
-    /* Widget to hold message */
-    key_controller = gtk_event_controller_key_new();
-    gtk_widget_add_controller(GTK_WIDGET(balsa_message->bm_widget), key_controller);
-    g_signal_connect(key_controller, "focus-in",
+    controller = gtk_event_controller_focus_new();
+    gtk_widget_add_controller(GTK_WIDGET(balsa_message->bm_widget), controller);
+    g_signal_connect(controller, "enter",
                      G_CALLBACK(balsa_mime_widget_limit_focus), balsa_message);
-    g_signal_connect(key_controller, "focus-out",
+    g_signal_connect(controller, "leave",
                      G_CALLBACK(balsa_mime_widget_unlimit_focus), balsa_message);
 
     /* If we do not add the widget to a viewport, GtkContainer would
@@ -970,9 +965,9 @@ balsa_message_init(BalsaMessage * balsa_message)
                      G_CALLBACK(tree_button_press_cb), balsa_message);
     gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture), GTK_PHASE_CAPTURE);
 
-    key_controller = gtk_event_controller_key_new();
-    gtk_widget_add_controller(GTK_WIDGET(balsa_message->treeview), key_controller);
-    g_signal_connect(key_controller, "key-pressed",
+    controller = gtk_event_controller_key_new();
+    gtk_widget_add_controller(GTK_WIDGET(balsa_message->treeview), controller);
+    g_signal_connect(controller, "key-pressed",
 		     G_CALLBACK(tree_key_press_cb), balsa_message);
     g_object_unref(model);
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);

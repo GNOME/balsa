@@ -528,12 +528,15 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 
     controller = gtk_event_controller_key_new();
     gtk_widget_add_controller(grid, controller);
-    g_signal_connect(controller, "focus-in",
-		     G_CALLBACK(balsa_mime_widget_limit_focus), bm);
-    g_signal_connect(controller, "focus-out",
-		     G_CALLBACK(balsa_mime_widget_unlimit_focus), bm);
     g_signal_connect(controller, "key-pressed",
 		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
+
+    controller = gtk_event_controller_focus_new();
+    gtk_widget_add_controller(grid, controller);
+    g_signal_connect(controller, "enter",
+		     G_CALLBACK(balsa_mime_widget_limit_focus), bm);
+    g_signal_connect(controller, "leave",
+		     G_CALLBACK(balsa_mime_widget_unlimit_focus), bm);
 
     info_bar_widget = gtk_info_bar_new();
     info_bar = GTK_INFO_BAR(info_bar_widget);
@@ -541,9 +544,11 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     gtk_info_bar_add_child(info_bar, grid);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
+    gtk_widget_set_hexpand(vbox, TRUE);
+    gtk_widget_set_halign(vbox, GTK_ALIGN_END);
     gtk_widget_set_vexpand(vbox, TRUE);
     gtk_widget_set_valign(vbox, GTK_ALIGN_START);
-    gtk_info_bar_add_action_widget(info_bar, vbox, 0);
+    gtk_info_bar_add_child(info_bar, vbox);
 
     if (balsa_message_get_face_box(bm) == NULL) {
         GtkWidget *face_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);

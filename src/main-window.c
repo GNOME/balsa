@@ -143,9 +143,9 @@ static void bw_notebook_switch_page_cb(GtkWidget *notebook,
                                        unsigned   page_num,
                                        gpointer   user_data);
 static void bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data);
-static void bw_notebook_page_notify_cb(GtkWidget  *child,
-                                       GParamSpec *child_property,
-                                       gpointer    user_data);
+static void bw_notebook_page_notify_cb(GtkNotebookPage *notebook_page,
+                                       GParamSpec      *property,
+                                       gpointer         notebook);
 
 
 static GtkWidget *bw_notebook_label_new (BalsaMailboxNode* mbnode);
@@ -457,10 +457,8 @@ static struct {
 static gboolean view_filters_translated = FALSE;
 
 static void
-bw_sos_icon_release(GtkEditable         *entry,
-                    GtkEntryIconPosition icon_pos,
-                    GdkEvent            *event,
-                    gpointer             user_data)
+bw_sos_stop_search(GtkEditable *entry,
+                   gpointer     user_data)
 {
     /* User clicked the button for clearing the text, so we also clear the
      * search results. */
@@ -503,8 +501,8 @@ bw_create_index_widget(BalsaWindow *bw)
                      G_CALLBACK(bw_check_filter), bw);
 
     button = gtk_button_new_from_icon_name("gtk-ok");
-    g_signal_connect(priv->sos_entry, "icon-release",
-                     G_CALLBACK(bw_sos_icon_release), button);
+    g_signal_connect(priv->sos_entry, "stop-search",
+                     G_CALLBACK(bw_sos_stop_search), button);
 
     gtk_widget_set_hexpand(priv->sos_entry, TRUE);
     gtk_widget_set_halign(priv->sos_entry, GTK_ALIGN_FILL);
@@ -614,6 +612,9 @@ bw_set_panes(BalsaWindow * window)
     default:
 	priv->paned_parent = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
 	priv->paned_child  = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
+
+        priv->mblist_parent = priv->paned_parent;
+        priv->notebook_parent = priv->paned_child;
 
         gtk_paned_set_start_child(GTK_PANED(priv->paned_parent), bw_frame(priv->mblist));
         gtk_paned_set_end_child(GTK_PANED(priv->paned_parent), priv->paned_child);
@@ -2891,6 +2892,7 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
     GtkWidget         *scroll;
     gint               page_num;
     LibBalsaCondition *filter;
+    GtkNotebookPage   *notebook_page;
 
     if (mbnode == NULL)
         return FALSE;
@@ -2912,10 +2914,12 @@ bw_real_open_mbnode_idle_cb(BalsaWindowRealOpenMbnodeInfo * info)
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), GTK_WIDGET(index));
-    g_signal_connect(scroll, "child-notify::position",
-                     G_CALLBACK(bw_notebook_page_notify_cb), priv->notebook);
     page_num = gtk_notebook_append_page(GTK_NOTEBOOK(priv->notebook), scroll, label);
     gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(priv->notebook), scroll, TRUE);
+
+    notebook_page = gtk_notebook_get_page(GTK_NOTEBOOK(priv->notebook), scroll);
+    g_signal_connect(notebook_page, "notify::position",
+                     G_CALLBACK(bw_notebook_page_notify_cb), priv->notebook);
 
     if (info->set_current) {
         /* change the page to the newly selected notebook item */
@@ -4269,7 +4273,6 @@ bw_notebook_switch_page_cb(GtkWidget *notebook,
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
     BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
-    GtkNotebookPage *notebook_page;
     BalsaIndex *index;
     LibBalsaMailbox *mailbox;
     gchar *title;
@@ -4287,8 +4290,7 @@ bw_notebook_switch_page_cb(GtkWidget *notebook,
         /* Quitt'n time! */
         return;
 
-    notebook_page = gtk_notebook_get_page(GTK_NOTEBOOK(notebook), page);
-    priv->current_index = gtk_notebook_page_get_child(notebook_page);
+    priv->current_index = gtk_scrolled_window_get_child(GTK_SCROLLED_WINDOW(page));
 
     index = BALSA_INDEX(priv->current_index);
     g_object_add_weak_pointer(G_OBJECT(index),
@@ -4418,23 +4420,25 @@ bw_send_msg_window_destroy_cb(GtkWidget * widget, gpointer data)
 }
 
 static void
-bw_notebook_page_notify_cb(GtkWidget  *widget,
-                           GParamSpec *child_property,
-                           gpointer    notebook)
+bw_notebook_page_notify_cb(GtkNotebookPage *notebook_page,
+                           GParamSpec      *property,
+                           gpointer         notebook)
 {
+    GtkWidget *scroll;
     GtkWidget *child;
 
     if (balsa_app.in_destruction)
         return;
 
-    child = gtk_scrolled_window_get_child(GTK_SCROLLED_WINDOW(widget));
+    scroll = gtk_notebook_page_get_child(notebook_page);
+    child = gtk_scrolled_window_get_child(GTK_SCROLLED_WINDOW(scroll));
 
     if (child != NULL) {
         LibBalsaMailbox *mailbox;
         int page_num;
 
         mailbox = balsa_index_get_mailbox(BALSA_INDEX(child));
-        page_num = gtk_notebook_page_num(notebook, widget);
+        page_num = gtk_notebook_page_num(notebook, scroll);
         libbalsa_mailbox_set_position(mailbox, page_num);
     }
 }

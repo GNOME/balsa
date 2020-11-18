@@ -87,8 +87,7 @@ static void bndx_gesture_pressed_cb(GtkGestureClick *click_gesture,
 static void bndx_row_activated(GtkTreeView * tree_view, GtkTreePath * path,
                                GtkTreeViewColumn * column,
                                gpointer user_data);
-static void bndx_column_resize(GtkWidget * widget,
-                               GtkAllocation * allocation, gpointer data);
+static void bndx_column_resize(GtkWidget * widget, gpointer user_data);
 static void bndx_tree_expand_cb(GtkTreeView * tree_view,
                                 GtkTreeIter * iter, GtkTreePath * path,
                                 gpointer user_data);
@@ -524,10 +523,9 @@ balsa_index_init(BalsaIndex * index)
         g_signal_connect_after(tree_view, "row-collapsed",
                                G_CALLBACK(bndx_tree_collapse_cb), NULL);
 
-    /* We want to catch column resize attempts to store the new value */
-    g_signal_connect_after(tree_view, "size-allocate",
-                           G_CALLBACK(bndx_column_resize),
-                           NULL);
+    /* We catch unmap events to store the column widths */
+    g_signal_connect(tree_view, "unmap",
+                     G_CALLBACK(bndx_column_resize), NULL);
     gtk_tree_view_set_enable_search(tree_view, FALSE);
 
     drag_source = gtk_drag_source_new();
@@ -799,8 +797,7 @@ bndx_tree_collapse_cb(GtkTreeView * tree_view, GtkTreeIter * iter,
 
 /* When a column is resized, store the new size for later use */
 static void
-bndx_column_resize(GtkWidget * widget, GtkAllocation * allocation,
-                   gpointer data)
+bndx_column_resize(GtkWidget * widget, gpointer user_data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
 
@@ -1825,20 +1822,19 @@ balsa_message_move_to_trash(gpointer user_data)
     balsa_mailbox_node_set_last_use_time(index->mailbox_node);
 }
 
-gint
+int
 balsa_find_notebook_page_num(LibBalsaMailbox * mailbox)
 {
     GtkWidget *page;
-    gint i;
+    int i;
 
-    if (!balsa_app.notebook)
+    if (balsa_app.notebook == NULL)
         return -1;
 
     for (i = 0;
-         (page =
-          gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i));
+         (page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(balsa_app.notebook), i)) != NULL;
          i++) {
-        GtkWidget *index = gtk_notebook_page_get_child(GTK_NOTEBOOK_PAGE(page));
+        GtkWidget *index = gtk_scrolled_window_get_child(GTK_SCROLLED_WINDOW(page));
         BalsaMailboxNode *mbnode;
 
         if (index != NULL &&

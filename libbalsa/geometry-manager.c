@@ -36,9 +36,8 @@ static void geometry_manager_destroy(void);
 static void geometry_manager_save_item(const gchar            *key,
 							  	  	   const geometry_t       *size_item,
 									   gpointer G_GNUC_UNUSED  user_data);
-static void size_allocate_cb(GtkWindow                  *window,
-                 	 	 	 GdkRectangle G_GNUC_UNUSED *allocation,
-							 geometry_t                 *size_item);
+static gboolean close_request_cb(GtkWindow *window,
+                                 gpointer   user_data);
 static void notify_is_maximized_cb(GtkWindow                *window,
                        	   	   	   GParamSpec G_GNUC_UNUSED *pspec,
 								   geometry_t               *size_item);
@@ -89,22 +88,23 @@ geometry_manager_get(const gchar *key)
 
 
 void
-geometry_manager_attach(GtkWindow *window, const gchar *key)
+geometry_manager_attach(GtkWindow *window, const char *key)
 {
-	geometry_t *size_item;
+    geometry_t *size_item;
 
-	G_LOCK(geometry_hash);
-	size_item = g_hash_table_lookup(geometry_hash, key);
-	if (size_item != NULL) {
-		gtk_window_set_resizable(window, TRUE);
-		gtk_window_set_default_size(window, size_item->width, size_item->height);
-		if (size_item->maximized) {
-			gtk_window_maximize(window);
-		}
-		g_signal_connect(window, "size_allocate", G_CALLBACK(size_allocate_cb), size_item);
-	    g_signal_connect(window, "notify::is-maximized", G_CALLBACK(notify_is_maximized_cb), size_item);
-	}
-	G_UNLOCK(geometry_hash);
+    G_LOCK(geometry_hash);
+    size_item = g_hash_table_lookup(geometry_hash, key);
+    if (size_item != NULL) {
+        gtk_window_set_resizable(window, TRUE);
+        gtk_window_set_default_size(window, size_item->width, size_item->height);
+        if (size_item->maximized) {
+            gtk_window_maximize(window);
+        }
+        g_signal_connect(window, "close-request", G_CALLBACK(close_request_cb), size_item);
+        g_signal_connect(window, "notify::is-maximized", G_CALLBACK(notify_is_maximized_cb),
+                         size_item);
+    }
+    G_UNLOCK(geometry_hash);
 }
 
 
@@ -149,16 +149,19 @@ geometry_manager_save_item(const gchar            *key,
 }
 
 
-static void
-size_allocate_cb(GtkWindow                  *window,
-                 GdkRectangle G_GNUC_UNUSED *allocation,
-	         geometry_t                 *size_item)
+static gboolean
+close_request_cb(GtkWindow *window,
+                 gpointer   user_data)
 {
-	G_LOCK(geometry_hash);
-        if (!size_item->maximized) {
-                gtk_window_get_size(window, &size_item->width, &size_item->height);
-        }
-	G_UNLOCK(geometry_hash);
+    geometry_t *size_item = user_data;
+
+    G_LOCK(geometry_hash);
+    if (!size_item->maximized) {
+        gtk_window_get_size(window, &size_item->width, &size_item->height);
+    }
+    G_UNLOCK(geometry_hash);
+
+    return FALSE;
 }
 
 

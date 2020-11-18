@@ -166,9 +166,13 @@ gchar *libbalsa_get_header_from_path(const gchar * header,
                                      GError ** err);
 GtkWidget *libbalsa_get_image_from_face_header(const gchar * content,
                                                GError ** err);
+GdkPixbuf *libbalsa_get_pixbuf_from_face_header(const gchar * content,
+                                                GError ** err);
 #if HAVE_COMPFACE
 GtkWidget *libbalsa_get_image_from_x_face_header(const gchar * content,
                                                  GError ** err);
+GdkPixbuf *libbalsa_get_pixbuf_from_x_face_header(const gchar * content,
+                                                  GError ** err);
 #endif                          /* HAVE_COMPFACE */
 
 GQuark libbalsa_image_error_quark(void);

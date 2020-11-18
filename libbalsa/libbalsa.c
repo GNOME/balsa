@@ -566,11 +566,26 @@ libbalsa_get_header_from_path(const gchar * header, const gchar * path,
 GtkWidget *
 libbalsa_get_image_from_face_header(const gchar * content, GError ** err)
 {
+    GdkPixbuf *pixbuf;
+    GtkWidget *image;
+
+    pixbuf = libbalsa_get_pixbuf_from_face_header(content, err);
+    image = gtk_image_new_from_pixbuf(pixbuf);
+
+    if (pixbuf != NULL)
+        g_object_unref(pixbuf);
+
+    return image;
+}
+
+GdkPixbuf *
+libbalsa_get_pixbuf_from_face_header(const gchar * content, GError ** err)
+{
     GMimeStream *stream;
     GMimeStream *stream_filter;
     GMimeFilter *filter;
     GByteArray *array;
-    GtkWidget *image = NULL;
+    GdkPixbuf *pixbuf = NULL;
 
     stream = g_mime_stream_mem_new();
     stream_filter = g_mime_stream_filter_new(stream);
@@ -583,48 +598,66 @@ libbalsa_get_image_from_face_header(const gchar * content, GError ** err)
     g_object_unref(stream_filter);
 
     array = GMIME_STREAM_MEM(stream)->buffer;
-    if (array->len == 0)
-        g_set_error(err, LIBBALSA_IMAGE_ERROR,
-                    LIBBALSA_IMAGE_ERROR_NO_DATA, _("No image data"));
-    else {
-        GdkPixbufLoader *loader =
-            gdk_pixbuf_loader_new_with_type("png", NULL);
+    if (array->len == 0) {
+        g_set_error(err,
+                    LIBBALSA_IMAGE_ERROR,
+                    LIBBALSA_IMAGE_ERROR_NO_DATA,
+                    _("No image data"));
+    } else {
+        GdkPixbufLoader *loader = gdk_pixbuf_loader_new_with_type("png", NULL);
 
-        gdk_pixbuf_loader_write(loader, array->data, array->len, err);
-        gdk_pixbuf_loader_close(loader, *err ? NULL : err);
+        if (gdk_pixbuf_loader_write(loader, array->data, array->len, err) &&
+            gdk_pixbuf_loader_close(loader, err)) {
+            pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
+        }
 
-        if (!*err)
-            image = gtk_image_new_from_pixbuf(gdk_pixbuf_loader_get_pixbuf
-                                              (loader));
         g_object_unref(loader);
     }
+
     g_object_unref(stream);
 
-    return image;
+    return pixbuf;
 }
 
 #if HAVE_COMPFACE
 GtkWidget *
 libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
 {
-    gchar buf[2048];
+    GdkPixbuf *pixbuf;
+    GtkWidget *image;
+
+    pixbuf = libbalsa_get_pixbuf_from_x_face_header(content, err);
+    image = gtk_image_new_from_pixbuf(pixbuf);
+    if (pixbuf != NULL)
+        g_object_unref(pixbuf);
+
+    return image;
+}
+
+GdkPixbuf *
+libbalsa_get_pixbuf_from_x_face_header(const char * content, GError ** err)
+{
+    char buf[2048];
     GdkPixbuf *pixbuf;
     guchar *pixels;
-    gint lines;
-    const gchar *p;
-    GtkWidget *image = NULL;
+    int lines;
+    const char *p;
 
     strncpy(buf, content, sizeof buf - 1);
 
     switch (uncompface(buf)) {
     case -1:
-        g_set_error(err, LIBBALSA_IMAGE_ERROR, LIBBALSA_IMAGE_ERROR_FORMAT,
+        g_set_error(err,
+                    LIBBALSA_IMAGE_ERROR,
+                    LIBBALSA_IMAGE_ERROR_FORMAT,
                     _("Invalid input format"));
-        return image;
+        return NULL;
     case -2:
-        g_set_error(err, LIBBALSA_IMAGE_ERROR, LIBBALSA_IMAGE_ERROR_BUFFER,
+        g_set_error(err,
+                    LIBBALSA_IMAGE_ERROR,
+                    LIBBALSA_IMAGE_ERROR_BUFFER,
                     _("Internal buffer overrun"));
-        return image;
+        return NULL;
     }
 
     pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, 48, 48);
@@ -632,17 +665,18 @@ libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
 
     p = buf;
     for (lines = 48; lines > 0; --lines) {
-        guint x[3];
-        gint j, k;
+        unsigned x[3];
+        int j, k;
         guchar *q;
 
         if (sscanf(p, "%8x,%8x,%8x,", &x[0], &x[1], &x[2]) != 3) {
-            g_set_error(err, LIBBALSA_IMAGE_ERROR,
+            g_set_error(err,
+                        LIBBALSA_IMAGE_ERROR,
                         LIBBALSA_IMAGE_ERROR_BAD_DATA,
                         /* Translators: please do not translate Face. */
                         _("Bad X-Face data"));
             g_object_unref(pixbuf);
-            return image;
+            return NULL;
         }
         for (j = 0, q = pixels; j < 3; j++)
             for (k = 15; k >= 0; --k){
@@ -655,10 +689,7 @@ libbalsa_get_image_from_x_face_header(const gchar * content, GError ** err)
         pixels += gdk_pixbuf_get_rowstride(pixbuf);
     }
 
-    image = gtk_image_new_from_pixbuf(pixbuf);
-    g_object_unref(pixbuf);
-
-    return image;
+    return pixbuf;
 }
 #endif                          /* HAVE_COMPFACE */
 
@@ -789,6 +820,15 @@ libbalsa_dialog_flags(void)
 /*
  * Construct a GtkPopover
  */
+
+static void
+set_parent_cb(GtkWidget *parent, gpointer user_data)
+{
+    GtkWidget *popup_widget = user_data;
+
+    gtk_widget_set_parent(popup_widget, parent);
+}
+
 GtkWidget *
 libbalsa_popup_widget_new(GtkWidget  *parent,
                           GMenuModel *model,
@@ -808,7 +848,7 @@ libbalsa_popup_widget_new(GtkWidget  *parent,
     popup_widget = gtk_popover_menu_new_from_model_full(G_MENU_MODEL(menu), (GtkPopoverMenuFlags) 0);
     g_object_unref(menu);
 
-    gtk_widget_set_parent(popup_widget, parent);
+    g_signal_connect(parent, "realize", G_CALLBACK(set_parent_cb), popup_widget);
 
     return popup_widget;
 }

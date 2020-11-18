@@ -156,9 +156,8 @@ balsa_print_object_header_new_real(GList * list,
 		    headers->dispnotify_to, &p_label_width, print_all_headers);
 
     /* user headers */
-    p = g_list_first(headers->user_hdrs);
     face = NULL;
-    while (p) {
+    for (p = headers->user_hdrs; p != NULL; p = p->next) {
 	gchar **pair, *curr_hdr;
 
 	pair = p->data;
@@ -168,27 +167,14 @@ balsa_print_object_header_new_real(GList * list,
 	g_free(curr_hdr);
 
 	/* check for face and x-face */
-	if (!face) {
-	    GError *err = NULL;
-	    GtkWidget * f_widget = NULL;
-
-	    if (!g_ascii_strcasecmp("Face", pair[0]))
-		f_widget = libbalsa_get_image_from_face_header(pair[1], &err);
+	if (face == NULL) {
+	    if (g_ascii_strcasecmp("Face", pair[0]) == 0)
+		face = libbalsa_get_pixbuf_from_face_header(pair[1], NULL);
 #if HAVE_COMPFACE
-	    else if (!g_ascii_strcasecmp("X-Face", pair[0]))
-		f_widget = libbalsa_get_image_from_x_face_header(pair[1], &err);
+	    else if (g_ascii_strcasecmp("X-Face", pair[0]) == 0)
+		face = libbalsa_get_pixbuf_from_x_face_header(pair[1], NULL);
 #endif                          /* HAVE_COMPFACE */
-	    if (err)
-		g_error_free(err);
-
-	    if (f_widget) {
-		face = g_object_ref(gtk_image_get_pixbuf(GTK_IMAGE(f_widget)));
-		gtk_window_destroy(GTK_WINDOW(f_widget));
-	    }
 	}
-
-	/* next */
-	p = g_list_next(p);
     }
 
     /* add a small space between label and value */

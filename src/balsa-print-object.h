@@ -71,7 +71,7 @@ typedef struct {
 
 gint p_string_width_from_layout(PangoLayout * layout, const gchar * text);
 gint p_string_height_from_layout(PangoLayout * layout, const gchar * text);
-gboolean cairo_print_pixbuf(cairo_t * cairo_ctx, const GdkPixbuf * pixbuf,
+gboolean cairo_print_pixbuf(cairo_t * cairo_ctx, GdkPixbuf * pixbuf,
 			    gdouble c_at_x, gdouble c_at_y, gdouble scale);
 GList *split_for_layout(PangoLayout * layout, const gchar * text,
 			PangoAttrList * attributes,

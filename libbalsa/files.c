@@ -98,13 +98,16 @@ libbalsa_default_attachment_icon(void)
  *   non-NULL, 'mime-type' has priority.  If both are NULL, the default
  *   'attachment.png' icon will be returned.
  */
-GIcon *
+GdkPixbuf *
 libbalsa_icon_finder(const char        * mime_type,
                      const LibbalsaVfs * for_file,
                      char             ** used_type)
 {
     const gchar *content_type;
-    GIcon *gicon;
+    GIcon *icon;
+    GtkWidget *image;
+    GdkPaintable *paintable;
+    GdkPixbuf *pixbuf;
 
     if (mime_type)
         content_type = mime_type;
@@ -113,17 +116,24 @@ libbalsa_icon_finder(const char        * mime_type,
     } else
         content_type = "application/octet-stream";
 
-    gicon = g_content_type_get_icon(content_type);
+    icon = g_content_type_get_icon(content_type);
 
-    if (gicon == NULL) {
+    if (icon == NULL) {
         /* load the default icon */
-        gicon = libbalsa_default_attachment_icon();
+        icon = libbalsa_default_attachment_icon();
     }
+
+    image = gtk_image_new_from_gicon(icon);
+    g_object_unref(icon);
+
+    paintable = gtk_image_get_paintable(GTK_IMAGE(image));
+    pixbuf = gdk_pixbuf_get_from_texture(GDK_TEXTURE(paintable));
+    g_object_unref(g_object_ref_sink(image));
 
     if (used_type)
         *used_type = g_strdup(content_type);
 
-    return gicon;
+    return pixbuf;
 }
 
 

@@ -39,9 +39,9 @@ gchar *balsa_file_finder(const char * filename,
 
 #define balsa_pixmap_finder(filename) (balsa_file_finder((filename), "pixmaps"))
 
-GIcon * libbalsa_icon_finder(const char        * mime_type,
-                             const LibbalsaVfs * for_file,
-                             gchar            ** used_type);
+GdkPixbuf * libbalsa_icon_finder(const char        * mime_type,
+                                 const LibbalsaVfs * for_file,
+                                 char             ** used_type);
 char * libbalsa_icon_name_finder(const char        * mime_type,
                                  const LibbalsaVfs * for_file,
                                  char             ** used_type);

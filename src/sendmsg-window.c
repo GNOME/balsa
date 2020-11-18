@@ -6941,15 +6941,15 @@ sw_spell_check_activated(GSimpleAction * action,
     GtkTextView *text_view = GTK_TEXT_VIEW(bsmsg->text);
     BalsaSpellCheck *sc;
 
-    if (bsmsg->spell_checker) {
-        if (gtk_widget_get_window(bsmsg->spell_checker)) {
-            gtk_window_present_with_time(GTK_WINDOW(bsmsg->spell_checker),
-                                         gtk_get_current_event_time());
+    if (bsmsg->spell_checker != NULL) {
+        if (gtk_widget_get_realized(bsmsg->spell_checker)) {
+            gtk_window_present(GTK_WINDOW(bsmsg->spell_checker));
             return;
-        } else
+        } else {
             /* A spell checker was created, but not shown because of
              * errors; we'll destroy it, and create a new one. */
             gtk_window_destroy(GTK_WINDOW(bsmsg->spell_checker));
+        }
     }
 
     sw_buffer_signals_disconnect(bsmsg);

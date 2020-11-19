@@ -948,11 +948,11 @@ balsa_message_init(BalsaMessage * balsa_message)
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), viewport);
 
     /* structure view */
-    model = gtk_tree_store_new (NUM_COLUMNS,
-                                TYPE_BALSA_PART_INFO,
-				G_TYPE_STRING,
-                                GDK_TYPE_PIXBUF,
-                                G_TYPE_STRING);
+    model = gtk_tree_store_new(NUM_COLUMNS,
+                               TYPE_BALSA_PART_INFO,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING,
+                               G_TYPE_STRING);
     balsa_message->treeview = gtk_tree_view_new_with_model (GTK_TREE_MODEL(model));
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW (balsa_message->treeview));
     g_signal_connect(balsa_message->treeview, "row-activated",
@@ -1347,7 +1347,6 @@ balsa_message_set(BalsaMessage * balsa_message, LibBalsaMailbox * mailbox, guint
 
     display_headers(balsa_message);
     display_content(balsa_message);
-    gtk_widget_show(GTK_WIDGET(balsa_message));
 
     if (balsa_message->info_count > 1)
         gtk_widget_show(balsa_message->switcher);

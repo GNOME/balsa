@@ -263,13 +263,13 @@ folder_conf_clicked_ok_idle(gpointer user_data)
     libbalsa_imap_server_set_max_connections
         (imap, gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(folder_data->connection_limit)));
     libbalsa_imap_server_enable_persistent_cache
-        (imap, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(folder_data->enable_persistent)));
+        (imap, gtk_check_button_get_active(GTK_CHECK_BUTTON(folder_data->enable_persistent)));
     libbalsa_imap_server_set_use_idle
-        (imap, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(folder_data->use_idle)));
+        (imap, gtk_check_button_get_active(GTK_CHECK_BUTTON(folder_data->use_idle)));
     libbalsa_imap_server_set_bug
-        (imap, ISBUG_FETCH, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(folder_data->has_bugs)));
+        (imap, ISBUG_FETCH, gtk_check_button_get_active(GTK_CHECK_BUTTON(folder_data->has_bugs)));
     libbalsa_imap_server_set_use_status
-        (imap, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(folder_data->use_status)));
+        (imap, gtk_check_button_get_active(GTK_CHECK_BUTTON(folder_data->use_status)));
 
     if (mbnode == NULL) {
     	folder_data->common_data.mbnode = mbnode =
@@ -288,9 +288,9 @@ folder_conf_clicked_ok_idle(gpointer user_data)
     balsa_mailbox_node_set_dir(mbnode,
                                gtk_editable_get_text(GTK_EDITABLE(folder_data->prefix)));
     balsa_mailbox_node_set_subscribed(mbnode,
-                                      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(folder_data->subscribed)));
+                                      gtk_check_button_get_active(GTK_CHECK_BUTTON(folder_data->subscribed)));
     balsa_mailbox_node_set_list_inbox(mbnode,
-                                      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(folder_data->list_inbox)));
+                                      gtk_check_button_get_active(GTK_CHECK_BUTTON(folder_data->list_inbox)));
 
     libbalsa_server_config_changed(folder_data->server); /* trigger config save */
     imap_update_subscriptions(folder_data);
@@ -475,10 +475,10 @@ folder_conf_imap_subscriptions(GtkButton        *widget,
 }
 
 static void
-folder_data_subscribed_toggled(GtkToggleButton *toggle,
-					   GtkWidget       *button)
+folder_data_subscribed_toggled(GtkCheckButton *check,
+                               GtkWidget       *button)
 {
-	gtk_widget_set_sensitive(button, gtk_toggle_button_get_active(toggle));
+	gtk_widget_set_sensitive(button, gtk_check_button_get_active(check));
 }
 
 /* folder_conf_imap_node:
@@ -558,10 +558,10 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     g_signal_connect(button, "clicked", G_CALLBACK(folder_conf_imap_subscriptions), folder_data);
     if (mn != NULL) {
         gboolean subscribed = balsa_mailbox_node_get_subscribed(mn);
-    	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(folder_data->subscribed), subscribed);
+    	gtk_check_button_set_active(GTK_CHECK_BUTTON(folder_data->subscribed), subscribed);
     	gtk_widget_set_sensitive(button, subscribed);
     } else {
-    	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(folder_data->subscribed), FALSE);
+    	gtk_check_button_set_active(GTK_CHECK_BUTTON(folder_data->subscribed), FALSE);
     	gtk_widget_set_sensitive(button, FALSE);
     }
     gtk_box_append(GTK_BOX(box), button);

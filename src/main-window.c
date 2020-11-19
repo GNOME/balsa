@@ -3785,13 +3785,13 @@ balsa_window_find_current_index(BalsaWindow * window)
     return priv->current_index;
 }
 
-static GtkToggleButton*
+static GtkCheckButton*
 bw_add_check_button(GtkWidget* grid, const gchar* label, gint x, gint y)
 {
     GtkWidget* res = gtk_check_button_new_with_mnemonic(label);
     gtk_widget_set_hexpand(res, TRUE);
     gtk_grid_attach(GTK_GRID(grid), res, x, y, 1, 1);
-    return GTK_TOGGLE_BUTTON(res);
+    return GTK_CHECK_BUTTON(res);
 }
 
 enum {
@@ -3816,11 +3816,11 @@ typedef struct {
     GtkWidget *reverse_button;
     GtkWidget *wrap_button;
     GtkWidget *search_entry;
-    GtkToggleButton *matching_body;
-    GtkToggleButton *matching_from;
-    GtkToggleButton *matching_to;
-    GtkToggleButton *matching_cc;
-    GtkToggleButton *matching_subject;
+    GtkCheckButton *matching_body;
+    GtkCheckButton *matching_from;
+    GtkCheckButton *matching_to;
+    GtkCheckButton *matching_cc;
+    GtkCheckButton *matching_subject;
 } bw_find_real_data;
 
 static void
@@ -3839,22 +3839,22 @@ bw_find_real_response(GtkDialog *dia,
 
     case GTK_RESPONSE_OK:
     case FIND_RESPONSE_FILTER:
-        data->reverse = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(data->reverse_button));
-        data->wrap = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(data->wrap_button));
+        data->reverse = gtk_check_button_get_active(GTK_CHECK_BUTTON(data->reverse_button));
+        data->wrap = gtk_check_button_get_active(GTK_CHECK_BUTTON(data->wrap_button));
         g_free(data->cnd->match.string.string);
         data->cnd->match.string.string =
             g_strdup(gtk_editable_get_text(GTK_EDITABLE(data->search_entry)));
         data->cnd->match.string.fields = CONDITION_EMPTY;
 
-        if (gtk_toggle_button_get_active(data->matching_body))
+        if (gtk_check_button_get_active(data->matching_body))
             CONDITION_SETMATCH(data->cnd, CONDITION_MATCH_BODY);
-        if (gtk_toggle_button_get_active(data->matching_to))
+        if (gtk_check_button_get_active(data->matching_to))
             CONDITION_SETMATCH(data->cnd, CONDITION_MATCH_TO);
-        if (gtk_toggle_button_get_active(data->matching_subject))
+        if (gtk_check_button_get_active(data->matching_subject))
             CONDITION_SETMATCH(data->cnd, CONDITION_MATCH_SUBJECT);
-        if (gtk_toggle_button_get_active(data->matching_from))
+        if (gtk_check_button_get_active(data->matching_from))
             CONDITION_SETMATCH(data->cnd, CONDITION_MATCH_FROM);
-        if (gtk_toggle_button_get_active(data->matching_cc))
+        if (gtk_check_button_get_active(data->matching_cc))
             CONDITION_SETMATCH(data->cnd, CONDITION_MATCH_CC);
         if (!(data->cnd->match.string.fields != CONDITION_EMPTY && data->cnd->match.string.string[0]))
             /* FIXME : We should print error messages, but for
@@ -4040,7 +4040,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 
 	data.reverse_button =
             gtk_check_button_new_with_mnemonic(_("_Reverse search"));
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(data.reverse_button),
+	gtk_check_button_set_active(GTK_CHECK_BUTTON(data.reverse_button),
                                      data.reverse);
 
         gtk_widget_set_vexpand(data.reverse_button, TRUE);
@@ -4049,7 +4049,7 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 
 	data.wrap_button =
             gtk_check_button_new_with_mnemonic(_("_Wrap around"));
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(data.wrap_button),
+	gtk_check_button_set_active(GTK_CHECK_BUTTON(data.wrap_button),
                                      data.wrap);
 
         gtk_widget_set_vexpand(data.wrap_button, TRUE);
@@ -4073,17 +4073,15 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
 	if (data.cnd->match.string.string)
 	    gtk_editable_set_text(GTK_EDITABLE(data.search_entry),
                                   data.cnd->match.string.string);
-	gtk_toggle_button_set_active(data.matching_body,
-				     CONDITION_CHKMATCH(data.cnd,
-							CONDITION_MATCH_BODY));
-	gtk_toggle_button_set_active(data.matching_to,
-				     CONDITION_CHKMATCH(data.cnd,
-                                                        CONDITION_MATCH_TO));
-	gtk_toggle_button_set_active(data.matching_from,
+	gtk_check_button_set_active(data.matching_body,
+				     CONDITION_CHKMATCH(data.cnd, CONDITION_MATCH_BODY));
+	gtk_check_button_set_active(data.matching_to,
+				     CONDITION_CHKMATCH(data.cnd, CONDITION_MATCH_TO));
+	gtk_check_button_set_active(data.matching_from,
 				     CONDITION_CHKMATCH(data.cnd,CONDITION_MATCH_FROM));
-	gtk_toggle_button_set_active(data.matching_subject,
+	gtk_check_button_set_active(data.matching_subject,
 				     CONDITION_CHKMATCH(data.cnd,CONDITION_MATCH_SUBJECT));
-	gtk_toggle_button_set_active(data.matching_cc,
+	gtk_check_button_set_active(data.matching_cc,
 				     CONDITION_CHKMATCH(data.cnd,CONDITION_MATCH_CC));
 
         gtk_widget_grab_focus(data.search_entry);

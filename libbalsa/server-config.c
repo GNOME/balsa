@@ -292,16 +292,16 @@ libbalsa_server_cfg_assign_server(LibBalsaServerCfg *server_cfg, LibBalsaServer 
 
     /* authentication stuff */
     if (server_cfg->require_auth != NULL) {
-        libbalsa_server_set_try_anonymous(server, !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->require_auth)));
+        libbalsa_server_set_try_anonymous(server, !gtk_check_button_get_active(GTK_CHECK_BUTTON(server_cfg->require_auth)));
     } else {
         libbalsa_server_set_try_anonymous(server, FALSE);
     }
     libbalsa_server_set_username(server, gtk_editable_get_text(GTK_EDITABLE(server_cfg->username)));
     libbalsa_server_set_password(server, gtk_editable_get_text(GTK_EDITABLE(server_cfg->password)), FALSE);
-    libbalsa_server_set_remember_password(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->remember_pass)));
+    libbalsa_server_set_remember_password(server, gtk_check_button_get_active(GTK_CHECK_BUTTON(server_cfg->remember_pass)));
 
     /* client certificate */
-    libbalsa_server_set_client_cert(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->require_cert)));
+    libbalsa_server_set_client_cert(server, gtk_check_button_get_active(GTK_CHECK_BUTTON(server_cfg->require_cert)));
 
     file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(server_cfg->cert_file));
     cert_file = g_file_get_path(file);
@@ -311,7 +311,7 @@ libbalsa_server_cfg_assign_server(LibBalsaServerCfg *server_cfg, LibBalsaServer 
     g_free(cert_file);
 
     libbalsa_server_set_password(server, gtk_editable_get_text(GTK_EDITABLE(server_cfg->cert_pass)), TRUE);
-    libbalsa_server_set_remember_cert_passphrase(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->remember_cert_pass)));
+    libbalsa_server_set_remember_cert_passphrase(server, gtk_check_button_get_active(GTK_CHECK_BUTTON(server_cfg->remember_cert_pass)));
 }
 
 
@@ -409,7 +409,7 @@ on_server_cfg_changed(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
 
 	/* user name/password only if authentication is required */
 	if (server_cfg->require_auth != NULL) {
-		sensitive = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->require_auth));
+		sensitive = gtk_check_button_get_active(GTK_CHECK_BUTTON(server_cfg->require_auth));
 	} else {
 		sensitive = TRUE;
 	}
@@ -426,7 +426,7 @@ on_server_cfg_changed(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
 	sensitive = (NetClientCryptMode) (gtk_combo_box_get_active(GTK_COMBO_BOX(server_cfg->security)) + 1) != NET_CLIENT_CRYPT_NONE;
 	gtk_widget_set_sensitive(server_cfg->require_cert, sensitive);
 	if (sensitive) {
-		sensitive = sensitive && gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->require_cert));
+		sensitive = sensitive && gtk_check_button_get_active(GTK_CHECK_BUTTON(server_cfg->require_cert));
 	}
 
 	gtk_widget_set_sensitive(server_cfg->cert_file, sensitive);

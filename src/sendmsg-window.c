@@ -3702,7 +3702,7 @@ show_decrypted_warning_response(GtkDialog *dialog,
 {
     GtkWidget *remind_btn = user_data;
 
-    balsa_app.warn_reply_decrypted = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(remind_btn));
+    balsa_app.warn_reply_decrypted = !gtk_check_button_get_active(GTK_CHECK_BUTTON(remind_btn));
 
     gtk_window_destroy(GTK_WINDOW(dialog));
 }
@@ -3726,7 +3726,7 @@ show_decrypted_warning(GtkWindow *parent)
     message_area = gtk_message_dialog_get_message_area(GTK_MESSAGE_DIALOG(dialog));
 
     remind_btn = gtk_check_button_new_with_label(_("Do not remind me again."));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(remind_btn), FALSE);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(remind_btn), FALSE);
     gtk_box_append(GTK_BOX(message_area), remind_btn);
 
     g_signal_connect(dialog, "response", G_CALLBACK(show_decrypted_warning_response), remind_btn);

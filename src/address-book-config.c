@@ -847,8 +847,7 @@ create_book(AddressBookConfig * abc)
         const gchar *book_dn =
             gtk_editable_get_text(GTK_EDITABLE(abc->ab_specific.ldap.book_dn));
         gboolean enable_tls =
-            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                         (abc->ab_specific.ldap.enable_tls));
+            gtk_check_button_get_active(GTK_CHECK_BUTTON(abc->ab_specific.ldap.enable_tls));
         address_book =
             libbalsa_address_book_ldap_new(name, host, base_dn,
                                            bind_dn, passwd, book_dn,
@@ -954,8 +953,7 @@ modify_book(AddressBookConfig * abc)
         const gchar *book_dn =
             gtk_editable_get_text(GTK_EDITABLE(abc->ab_specific.ldap.book_dn));
         gboolean enable_tls =
-            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                         (abc->ab_specific.ldap.enable_tls));
+            gtk_check_button_get_active(GTK_CHECK_BUTTON(abc->ab_specific.ldap.enable_tls));
 
         ldap = LIBBALSA_ADDRESS_BOOK_LDAP(address_book);
 

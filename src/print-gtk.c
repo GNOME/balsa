@@ -602,11 +602,11 @@ message_prefs_widget(GtkPrintOperation * operation,
 
     print_prefs->highlight_cited =
 	gtk_check_button_new_with_mnemonic(_("Highlight _cited text"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->highlight_cited), balsa_app.print_highlight_cited);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(print_prefs->highlight_cited), balsa_app.print_highlight_cited);
     gtk_grid_attach(GTK_GRID(grid), print_prefs->highlight_cited, 1, 0, 1, 1);
 
     print_prefs->highlight_phrases = gtk_check_button_new_with_mnemonic(_("Highlight _structured phrases"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->highlight_phrases), balsa_app.print_highlight_phrases);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(print_prefs->highlight_phrases), balsa_app.print_highlight_phrases);
     gtk_grid_attach(GTK_GRID(grid), print_prefs->highlight_phrases, 1, 1, 1, 1);
 
 #ifdef HAVE_HTML_WIDGET
@@ -687,10 +687,10 @@ message_prefs_apply(GtkPrintOperation * operation, GtkWidget * widget,
     balsa_app.print_footer_font =
 	gtk_font_chooser_get_font(GTK_FONT_CHOOSER(print_prefs->footer_font));
     balsa_app.print_highlight_cited =
-	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+	gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (print_prefs->highlight_cited));
     balsa_app.print_highlight_phrases =
-	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+	gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (print_prefs->highlight_phrases));
 
     balsa_app.margin_top =
@@ -710,9 +710,9 @@ message_prefs_apply(GtkPrintOperation * operation, GtkWidget * widget,
     }
 #ifdef HAVE_HTML_WIDGET
     print_prefs->setup->print_alt_html =
-    	!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(print_prefs->html_print));
-    print_prefs->setup->html_load_ext_content =
-    	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(print_prefs->html_load_ext_content));
+    	!gtk_check_button_get_active(GTK_CHECK_BUTTON(print_prefs->html_print));
+    print_prefs->setup->html_load_images =
+    	gtk_check_button_get_active(GTK_CHECK_BUTTON(print_prefs->html_load_imgs));
 #endif
 }
 

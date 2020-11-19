@@ -335,7 +335,7 @@ mw_set_message(MessageWindow * mw, LibBalsaMessage * message)
     if (mw->idle_handler_id && !message) {
 	g_source_remove(mw->idle_handler_id);
 	mw->idle_handler_id = 0;
-    } 
+    }
 
     if (mw->message) {
         g_object_set_data(G_OBJECT(mw->message), BALSA_MESSAGE_WINDOW_KEY, NULL);
@@ -352,9 +352,9 @@ mw_set_message(MessageWindow * mw, LibBalsaMessage * message)
     }
 }
 
-/* Handler for the "destroy" signal for mw->window. */
+/* Handler for the "unrealize" signal for mw->window. */
 static void
-destroy_message_window(GtkWidget * widget, MessageWindow * mw)
+mw_window_unrealized(GtkWidget * widget, MessageWindow * mw)
 {
     if (mw->bindex) {           /* BalsaIndex still exists */
         g_object_weak_unref(G_OBJECT(mw->bindex), mw_bindex_closed_cb, mw);
@@ -900,8 +900,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     mw->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
     gtk_box_append(GTK_BOX(vbox), mw->toolbar);
 
-    g_signal_connect(window, "destroy",
-		     G_CALLBACK(destroy_message_window), mw);
+    g_signal_connect(window, "unrealize", G_CALLBACK(mw_window_unrealized), mw);
 
     mw->bindex = balsa_find_index_by_mailbox(mailbox);
     g_object_weak_ref(G_OBJECT(mw->bindex), mw_bindex_closed_cb, mw);

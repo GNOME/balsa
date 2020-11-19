@@ -259,7 +259,7 @@ smtp_server_response(GtkDialog * dialog, gint response,
     case GTK_RESPONSE_OK:
         libbalsa_smtp_server_set_name(sdi->smtp_server, libbalsa_server_cfg_get_name(sdi->server_cfg));
         libbalsa_server_cfg_assign_server(sdi->server_cfg, server);
-        if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->split_button))) {
+        if (gtk_check_button_get_active(GTK_CHECK_BUTTON(sdi->split_button))) {
             /* big_message is stored in kB, but the widget is in MB. */
         	sdi->smtp_server->big_message =
                 gtk_spin_button_get_value(GTK_SPIN_BUTTON(sdi->big_message)) * 1024.0;
@@ -290,7 +290,7 @@ smtp_server_changed(GtkWidget G_GNUC_UNUSED *widget,
 
 	/* split big messages */
 	if ((sdi->big_message != NULL) && (sdi->split_button != NULL)) {
-		sensitive = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(sdi->split_button));
+		sensitive = gtk_check_button_get_active(GTK_CHECK_BUTTON(sdi->split_button));
 	    gtk_widget_set_sensitive(sdi->big_message, sensitive);
 	}
 
@@ -365,12 +365,12 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     label = gtk_label_new(_("MB"));
     gtk_box_append(GTK_BOX(hbox), label);
     if (smtp_server->big_message > 0) {
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button), TRUE);
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(sdi->split_button), TRUE);
         /* The widget is in MB, but big_message is stored in kB. */
         gtk_spin_button_set_value(GTK_SPIN_BUTTON(sdi->big_message),
                                   ((gdouble) smtp_server->big_message) / 1024.0);
     } else {
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button), FALSE);
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(sdi->split_button), FALSE);
         gtk_spin_button_set_value(GTK_SPIN_BUTTON(sdi->big_message), 1);
     }
     libbalsa_server_cfg_add_row(sdi->server_cfg, FALSE, sdi->split_button, hbox);

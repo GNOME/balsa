@@ -572,8 +572,8 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 }
 
 static gboolean
-label_size_allocate_cb(GtkLabel * label, GdkRectangle * rectangle,
-                       GtkWidget * expander)
+label_map_cb(GtkLabel  *label,
+             GtkWidget *expander)
 {
     PangoLayout *layout;
 
@@ -613,7 +613,7 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
     if (balsa_app.use_system_fonts) {
         if (strcmp(header, "subject") == 0)
             /* Use bold for the subject line */
-            css = g_strdup("#" BALSA_MESSAGE_HEADER " {font-weight:bold}");
+            css = g_strdup("#" BALSA_MESSAGE_HEADER " {font-weight: bold;}");
         else
             css = g_strdup("");
     } else {
@@ -673,10 +673,8 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
             gtk_label_set_ellipsize(GTK_LABEL(value_label), PANGO_ELLIPSIZE_END);
             gtk_expander_set_expanded(GTK_EXPANDER(expander), FALSE);
         }
-        g_signal_connect(expander, "notify::expanded",
-                         G_CALLBACK(expanded_cb), value_label);
-        g_signal_connect(value_label, "size-allocate",
-                         G_CALLBACK(label_size_allocate_cb), expander);
+        g_signal_connect(expander, "notify::expanded", G_CALLBACK(expanded_cb), value_label);
+        g_signal_connect(value_label, "map", G_CALLBACK(label_map_cb), expander);
 
         hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
         gtk_box_append(GTK_BOX(hbox), value_label);

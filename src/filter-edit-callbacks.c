@@ -419,20 +419,20 @@ fe_match_fields_buttons_cb(GtkWidget * widget, gpointer data)
     gboolean active = GPOINTER_TO_INT(data) != 3;  /* 3 ==uncheck all buttons */
 
     condition_has_changed = TRUE;
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_body),active);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_to),active);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_from),active);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_subject),active);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_cc),active);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_body),active);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_to),active);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_from),active);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_subject),active);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_cc),active);
 }                       /* end fe_match_fields_buttons_cb */
 
 static void
 fe_match_field_user_header_cb(GtkWidget * widget)
 {
-    GtkToggleButton *button =
-        GTK_TOGGLE_BUTTON(fe_matching_fields_us_head);
+    GtkCheckButton *button =
+        GTK_CHECK_BUTTON(fe_matching_fields_us_head);
     gtk_widget_set_sensitive(fe_user_header,
-                             gtk_toggle_button_get_active(button));
+                             gtk_check_button_get_active(button));
     condition_has_changed = TRUE;
 }
 
@@ -517,17 +517,17 @@ condition_validate(LibBalsaCondition* new_cnd)
     /* Retrieve matching fields only if they are meaningful
        for the condition type */
     if (new_cnd->type != CONDITION_DATE && new_cnd->type != CONDITION_FLAG) {
-        if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_body)))
+        if (gtk_check_button_get_active(GTK_CHECK_BUTTON(fe_matching_fields_body)))
             CONDITION_SETMATCH(new_cnd,CONDITION_MATCH_BODY);
-        if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_to)))
+        if (gtk_check_button_get_active(GTK_CHECK_BUTTON(fe_matching_fields_to)))
             CONDITION_SETMATCH(new_cnd,CONDITION_MATCH_TO);
-        if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_subject)))
+        if (gtk_check_button_get_active(GTK_CHECK_BUTTON(fe_matching_fields_subject)))
             CONDITION_SETMATCH(new_cnd,CONDITION_MATCH_SUBJECT);
-        if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_from)))
+        if (gtk_check_button_get_active(GTK_CHECK_BUTTON(fe_matching_fields_from)))
             CONDITION_SETMATCH(new_cnd,CONDITION_MATCH_FROM);
-        if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_cc)))
+        if (gtk_check_button_get_active(GTK_CHECK_BUTTON(fe_matching_fields_cc)))
             CONDITION_SETMATCH(new_cnd,CONDITION_MATCH_CC);
-        if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_matching_fields_us_head))) {
+        if (gtk_check_button_get_active(GTK_CHECK_BUTTON(fe_matching_fields_us_head))) {
 	    CONDITION_SETMATCH(new_cnd,CONDITION_MATCH_US_HEAD);
             c_str = gtk_editable_get_text(GTK_EDITABLE(gtk_combo_box_get_child(GTK_COMBO_BOX(fe_user_header))));
 	    if (c_str[0] == '\0') {
@@ -637,7 +637,7 @@ condition_validate(LibBalsaCondition* new_cnd)
         for (row = 0;row<2;row++)
             for (col = 0;col<2;col++)
                 new_cnd->match.flags |=
-                    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_type_flag_buttons[row*2+col])) ? 1 << (row*2+col): 0;
+                    gtk_check_button_get_active(GTK_CHECK_BUTTON(fe_type_flag_buttons[row*2+col])) ? 1 << (row*2+col): 0;
 
     case CONDITION_NONE:
     case CONDITION_AND: /*FIXME: verify this! */
@@ -739,17 +739,17 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     /* First update matching fields
      * but if type is date or flag, these are meaning less so we disable them */
     andmask = (cnd->type != CONDITION_FLAG && cnd->type != CONDITION_DATE);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_body),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_body),
                                  CONDITION_CHKMATCH(cnd,CONDITION_MATCH_BODY) && andmask);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_to),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_to),
                                  CONDITION_CHKMATCH(cnd,CONDITION_MATCH_TO) && andmask);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_from),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_from),
                                  CONDITION_CHKMATCH(cnd,CONDITION_MATCH_FROM) && andmask);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_subject),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_subject),
                                  CONDITION_CHKMATCH(cnd,CONDITION_MATCH_SUBJECT) && andmask);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_cc),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_cc),
                                  CONDITION_CHKMATCH(cnd,CONDITION_MATCH_CC) && andmask);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_matching_fields_us_head),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_matching_fields_us_head),
                                  CONDITION_CHKMATCH(cnd,CONDITION_MATCH_US_HEAD) && andmask);
     if (CONDITION_CHKMATCH(cnd,CONDITION_MATCH_US_HEAD) && andmask) {
 	gtk_widget_set_sensitive(fe_user_header, TRUE);
@@ -809,7 +809,7 @@ fill_condition_widgets(LibBalsaCondition* cnd)
     case CONDITION_FLAG:
         for (row = 0;row<2;row++)
             for (col = 0;col<2;col++)
-                gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_type_flag_buttons[row*2+col]),
+                gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_type_flag_buttons[row*2+col]),
                                              cnd->match.flags & (1 << (row*2+col)));
         fe_update_label(fe_type_flag_label,   &flags_label);
         break;
@@ -1595,8 +1595,8 @@ fe_action_selected(GtkWidget * widget, gpointer data)
 void
 fe_button_toggled(GtkWidget * widget, gpointer data)
 {
-    GtkToggleButton *button = GTK_TOGGLE_BUTTON(widget);
-    gboolean active = gtk_toggle_button_get_active(button);
+    GtkCheckButton *button = GTK_CHECK_BUTTON(widget);
+    gboolean active = gtk_check_button_get_active(button);
     GtkWidget *child;
 
     child = gtk_widget_get_first_child(GTK_WIDGET(data));
@@ -1850,8 +1850,8 @@ fe_delete_pressed(GtkWidget * widget, gpointer data)
         gtk_list_store_clear(GTK_LIST_STORE
                              (gtk_tree_view_get_model
                               (fe_conditions_list)));
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),FALSE);
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_popup_button),FALSE);
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_sound_button),FALSE);
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_popup_button),FALSE);
         /* We make the filters delete,revert,apply buttons unsensitive */
         gtk_widget_set_sensitive(fe_delete_button,FALSE);
         set_button_sensitivities(FALSE);
@@ -1962,21 +1962,21 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     if (fil->action == FILTER_COLOR) {
         GdkRGBA rgba;
         GString *string = g_string_new(NULL);
-        GtkToggleButton *toggle_button;
+        GtkCheckButton *check_button;
         gchar *color_string;
 
-        toggle_button = (GTK_TOGGLE_BUTTON(fe_foreground_set));
-        if (gtk_toggle_button_get_active(toggle_button)) {
+        check_button = (GTK_CHECK_BUTTON(fe_foreground_set));
+        if (gtk_check_button_get_active(check_button)) {
             gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(fe_foreground),
                                        &rgba);
             color_string = gdk_rgba_to_string(&rgba);
             g_string_append_printf(string, "foreground:%s", color_string);
             g_free(color_string);
-            gtk_toggle_button_set_active(toggle_button, FALSE);
+            gtk_check_button_set_active(check_button, FALSE);
         }
 
-        toggle_button = (GTK_TOGGLE_BUTTON(fe_background_set));
-        if (gtk_toggle_button_get_active(toggle_button)) {
+        check_button = (GTK_CHECK_BUTTON(fe_background_set));
+        if (gtk_check_button_get_active(check_button)) {
             gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(fe_background),
                                        &rgba);
             color_string = gdk_rgba_to_string(&rgba);
@@ -1984,13 +1984,13 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
                 g_string_append_c(string, ';');
             g_string_append_printf(string, "background:%s", color_string);
             g_free(color_string);
-            gtk_toggle_button_set_active(toggle_button, FALSE);
+            gtk_check_button_set_active(check_button, FALSE);
         }
 
         fil->action_string = g_string_free(string, FALSE);
     } else if (fil->action != FILTER_TRASH)
         fil->action_string = g_strdup(balsa_mblist_mru_option_menu_get(fe_mailboxes));
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_popup_button))) {
+    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(fe_popup_button))) {
         static gchar defstring[] = N_("Filter has matched");
         const gchar *tmpstr;
 
@@ -2002,7 +2002,7 @@ fe_apply_pressed(GtkWidget * widget, gpointer data)
     }
 
 /* FIXME never defined?? #ifdef HAVE_LIBESD */
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(fe_sound_button))) {
+    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(fe_sound_button))) {
         GFile *file;
         gchar *tmpstr;
 
@@ -2108,12 +2108,12 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
 
     /* Populate all fields with filter data */
     gtk_editable_set_text(GTK_EDITABLE(fe_name_entry),fil->name);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_popup_button),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_popup_button),
                                  fil->popup_text != NULL);
     gtk_editable_set_text(GTK_EDITABLE(fe_popup_entry),
                        fil->popup_text != NULL
                        ? fil->popup_text : "");
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_sound_button),
                                  fil->sound != NULL);
     if (fil->sound != NULL) {
         GFile *file;
@@ -2140,14 +2140,14 @@ fe_filters_list_selection_changed(GtkTreeSelection * selection,
                 gdk_rgba_parse(&rgba, (*p) + 11);
                 gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(fe_foreground),
                                            &rgba);
-                gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                gtk_check_button_set_active(GTK_CHECK_BUTTON
                                              (fe_foreground_set), TRUE);
             }
             if (g_str_has_prefix(*p, "background:")) {
                 gdk_rgba_parse(&rgba, (*p) + 11);
                 gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(fe_background),
                                            &rgba);
-                gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+                gtk_check_button_set_active(GTK_CHECK_BUTTON
                                              (fe_background_set), TRUE);
             }
         }
@@ -2218,11 +2218,11 @@ fe_sound_response(GtkDialog * dialog, gint response)
 
 /* Callback for color check-buttons' "toggled" signal */
 void
-fe_color_check_toggled(GtkToggleButton * check_button, gpointer data)
+fe_color_check_toggled(GtkCheckButton * check_button, gpointer data)
 {
     GtkWidget *color_button = GTK_WIDGET(data);
     gtk_widget_set_sensitive(color_button,
-                             gtk_toggle_button_get_active(check_button));
+                             gtk_check_button_get_active(check_button));
     set_button_sensitivities(TRUE);
 }
 

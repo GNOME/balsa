@@ -43,8 +43,6 @@ static BalsaMimeWidget *balsa_mime_widget_new_unknown(BalsaMessage * bm,
 						      const gchar *
 						      content_type);
 
-static void vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget);
-
 typedef struct {
     /* container widget if more sub-parts can be added */
     GtkWidget *container;
@@ -108,8 +106,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
     BalsaMimeWidget *mw = NULL;
     gchar *content_type;
     mime_delegate_t *delegate;
-    GtkEventController *key_controller;
-    GtkAdjustment *vadj;
+    GtkEventController *controller;
 
     g_return_val_if_fail(bm != NULL, NULL);
     g_return_val_if_fail(mime_body != NULL, NULL);
@@ -130,12 +127,11 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
     if (mw == NULL)
 	mw = balsa_mime_widget_new_unknown(bm, mime_body, content_type);
 
-    key_controller = gtk_event_controller_key_new();
-    gtk_widget_add_controller(GTK_WIDGET(mw), key_controller);
-    g_signal_connect(key_controller, "focus-in",
-                     G_CALLBACK(balsa_mime_widget_limit_focus), bm);
-    g_signal_connect(key_controller, "focus-out",
-                     G_CALLBACK(balsa_mime_widget_unlimit_focus), bm);
+    controller = gtk_event_controller_focus_new();
+    gtk_widget_add_controller(GTK_WIDGET(mw), controller);
+    g_signal_connect(controller, "enter", G_CALLBACK(balsa_mime_widget_limit_focus), bm);
+    g_signal_connect(controller, "leave", G_CALLBACK(balsa_mime_widget_unlimit_focus), bm);
+
     if (mime_body->sig_info != NULL &&
         strcmp("application/pgp-signature", content_type) != 0 &&
         strcmp("application/pkcs7-signature", content_type) != 0 &&
@@ -169,12 +165,6 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
         priv->container = container;
     }
     g_free(content_type);
-
-    g_object_get(mw, "vadjustment", &vadj, NULL);
-    if (vadj != NULL) {
-        g_signal_connect(vadj, "changed", G_CALLBACK(vadj_change_cb), mw);
-        g_object_unref(vadj);
-    }
 
     return mw;
 }
@@ -316,23 +306,6 @@ balsa_mime_widget_schedule_resize(GtkWidget * widget)
                                      g_object_ref(widget), g_object_unref);
 }
 
-
-static void
-vadj_change_cb(GtkAdjustment *vadj, GtkWidget *widget)
-{
-    double upper = gtk_adjustment_get_upper(vadj);
-
-    /* do nothing if it's the same widget and the height hasn't changed
-     *
-     * an HtmlView widget seems to grow by 4 pixels each time we resize
-     * it, whence the following unobvious test: */
-    if (widget == old_widget
-        && upper >= old_upper && upper <= old_upper + 4)
-        return;
-    new_widget = widget;
-    new_upper = upper;
-    balsa_mime_widget_schedule_resize(widget);
-}
 
 /*
  * Getters

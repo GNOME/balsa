@@ -463,7 +463,7 @@ check_for_blank_fields(GtkWidget G_GNUC_UNUSED *widget,
         sensitive = libbalsa_server_cfg_valid(mcw->mb_data.pop3.server_cfg);
 
         /* procmail filter */
-        enable_filter = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter));
+        enable_filter = gtk_check_button_get_active(GTK_CHECK_BUTTON(mcw->mb_data.pop3.filter));
         gtk_widget_set_sensitive(mcw->mb_data.pop3.filter_cmd, enable_filter);
         if (enable_filter) {
             sensitive = sensitive
@@ -514,14 +514,14 @@ update_pop_mailbox(MailboxConfWindow *mcw)
 	libbalsa_server_cfg_assign_server(mcw->mb_data.pop3.server_cfg, server);
 	libbalsa_server_config_changed(server);
 
-	libbalsa_mailbox_pop3_set_check(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.check)));
-	libbalsa_mailbox_pop3_set_delete_from_server(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON (mcw->mb_data.pop3.delete_from_server)));
-	libbalsa_mailbox_pop3_set_filter(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.filter)));
+	libbalsa_mailbox_pop3_set_check(mailbox_pop3, gtk_check_button_get_active(GTK_CHECK_BUTTON(mcw->mb_data.pop3.check)));
+	libbalsa_mailbox_pop3_set_delete_from_server(mailbox_pop3, gtk_check_button_get_active(GTK_CHECK_BUTTON (mcw->mb_data.pop3.delete_from_server)));
+	libbalsa_mailbox_pop3_set_filter(mailbox_pop3, gtk_check_button_get_active(GTK_CHECK_BUTTON(mcw->mb_data.pop3.filter)));
 	libbalsa_mailbox_pop3_set_filter_cmd(mailbox_pop3, gtk_editable_get_text(GTK_EDITABLE(mcw->mb_data.pop3.filter_cmd)));
 
 	/* advanced settings */
-	libbalsa_mailbox_pop3_set_disable_apop(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.disable_apop)));
-	libbalsa_mailbox_pop3_set_enable_pipe(mailbox_pop3, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(mcw->mb_data.pop3.enable_pipe)));
+	libbalsa_mailbox_pop3_set_disable_apop(mailbox_pop3, gtk_check_button_get_active(GTK_CHECK_BUTTON(mcw->mb_data.pop3.disable_apop)));
+	libbalsa_mailbox_pop3_set_enable_pipe(mailbox_pop3, gtk_check_button_get_active(GTK_CHECK_BUTTON(mcw->mb_data.pop3.enable_pipe)));
 }
 
 /* conf_update_mailbox:
@@ -896,7 +896,7 @@ thread_messages_toggled(GtkWidget * widget,
 {
     gboolean thread_messages;
 
-    thread_messages = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+    thread_messages = gtk_check_button_get_active(GTK_CHECK_BUTTON(widget));
     gtk_widget_set_sensitive(view_info->subject_gather, thread_messages);
 }
 
@@ -1072,14 +1072,14 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
         changed = TRUE;
     }
 
-    active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+    active = gtk_check_button_get_active(GTK_CHECK_BUTTON
                                           (view_info->show_to));
     if (libbalsa_mailbox_set_show(mailbox, active ?
                                   LB_MAILBOX_SHOW_TO :
                                   LB_MAILBOX_SHOW_FROM))
         changed = TRUE;
 
-    active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+    active = gtk_check_button_get_active(GTK_CHECK_BUTTON
                                           (view_info->subscribe));
     if (libbalsa_mailbox_set_subscribe(mailbox, active ?
 				       LB_MAILBOX_SUBSCRIBE_YES :
@@ -1088,12 +1088,12 @@ mailbox_conf_view_check(BalsaMailboxConfView * view_info,
 
     /* Threading */
 
-    active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+    active = gtk_check_button_get_active(GTK_CHECK_BUTTON
                                           (view_info->subject_gather));
     libbalsa_mailbox_set_subject_gather(mailbox, active);
     threading_type = active ? LB_MAILBOX_THREADING_JWZ : LB_MAILBOX_THREADING_SIMPLE;
 
-    active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+    active = gtk_check_button_get_active(GTK_CHECK_BUTTON
                                           (view_info->thread_messages));
     /* Set the threading type directly, not through the UI: */
     libbalsa_mailbox_set_threading_type(mailbox,

@@ -174,7 +174,7 @@ ask_password_response(GtkDialog *dialog,
 
         old_remember = apd->remember;
         passwd = g_strdup(gtk_editable_get_text(GTK_EDITABLE(apd->entry)));
-        apd->remember = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(apd->rememb_check));
+        apd->remember = gtk_check_button_get_active(GTK_CHECK_BUTTON(apd->rememb_check));
         if (apd->cert_subject != NULL)
             libbalsa_server_set_remember_cert_passphrase(apd->server, apd->remember);
         else
@@ -920,9 +920,9 @@ balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode)
 BalsaIndex*
 balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
 {
+    unsigned i;
     GtkWidget *page;
-    GtkWidget *child;
-    guint i;
+    BalsaIndex *bindex = NULL;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
     g_return_val_if_fail(GTK_IS_NOTEBOOK(balsa_app.notebook), NULL);
@@ -930,18 +930,17 @@ balsa_find_index_by_mailbox(LibBalsaMailbox * mailbox)
     for (i = 0;
 	 (page = gtk_notebook_get_nth_page((GtkNotebook *) balsa_app.notebook, i)) != NULL;
 	 i++) {
-        child = gtk_notebook_page_get_child(GTK_NOTEBOOK_PAGE(page));
-	if (child != NULL) {
-            BalsaIndex *bindex = BALSA_INDEX(child);
-            LibBalsaMailbox *this_mailbox = balsa_index_get_mailbox(bindex);
+        GtkWidget *child = gtk_scrolled_window_get_child(GTK_SCROLLED_WINDOW(page));
+        BalsaIndex *this_bindex = BALSA_INDEX(child);
+        LibBalsaMailbox *this_mailbox = balsa_index_get_mailbox(this_bindex);
 
-            if (this_mailbox == mailbox)
-                return bindex;
+        if (mailbox == this_mailbox) {
+            bindex = this_bindex;
+            break;
         }
     }
 
-    /* didn't find a matching mailbox */
-    return NULL;
+    return bindex;
 }
 
 GRegex *

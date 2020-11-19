@@ -151,8 +151,8 @@ balsa_init_add_grid_checkbox(GtkGrid *grid, guint num,
 
     *dest = gtk_check_button_new();
     gtk_grid_attach(grid, *dest, 1, num + 1, 1, 1);
-    if(defval)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(*dest), TRUE);
+    if (defval)
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(*dest), TRUE);
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), *dest);
 }
 

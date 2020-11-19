@@ -193,7 +193,7 @@ balsa_toolbar_customize(GtkWindow * active_window, BalsaToolbarType type)
 
     wrap_button =
         gtk_check_button_new_with_mnemonic(_("_Wrap button labels"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(wrap_button),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(wrap_button),
                                  balsa_app.toolbar_wrap_button_text);
     g_signal_connect(wrap_button, "toggled",
                      G_CALLBACK(wrap_toggled_cb), notebook);
@@ -237,7 +237,7 @@ wrap_toggled_cb(GtkWidget * widget, GtkNotebook * notebook)
     ToolbarPage *page;
 
     balsa_app.toolbar_wrap_button_text =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(widget));
 
     for (i = 0; (child = gtk_notebook_get_nth_page(notebook, i)); i++) {
         page = g_object_get_data(G_OBJECT(child), BALSA_KEY_TOOLBAR_PAGE);

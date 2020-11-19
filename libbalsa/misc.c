@@ -956,7 +956,7 @@ libbalsa_create_grid_check(const gchar * text, GtkWidget * grid, gint row,
     gtk_grid_attach(GTK_GRID(grid), check_button, 0, row, 2, 1);
 
     if (initval)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_button),
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(check_button),
                                      TRUE);
 
     return check_button;

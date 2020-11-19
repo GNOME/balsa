@@ -344,8 +344,7 @@ update_view_defaults(const gchar * group, const gchar * url,
     if (view->sort_field == libbalsa_mailbox_get_sort_field(NULL))
         view->sort_field = pui->sort_field_index;
     if (view->threading_type == libbalsa_mailbox_get_threading_type(NULL)) {
-        if (gtk_toggle_button_get_active
-            (GTK_TOGGLE_BUTTON(pui->thread_messages_check))) {
+        if (gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->thread_messages_check))) {
             view->threading_type = LB_MAILBOX_THREADING_SIMPLE;
         } else {
             view->threading_type = LB_MAILBOX_THREADING_FLAT;
@@ -369,8 +368,7 @@ check_font_button(GtkWidget * button, gchar ** font)
         fontname = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(button));
 
         g_free(*font);
-        if (!gtk_toggle_button_get_active
-            (GTK_TOGGLE_BUTTON(pui->use_default_font_size))) {
+        if (!gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->use_default_font_size))) {
             *font = fontname;
         } else {
             PangoFontDescription *desc;
@@ -412,11 +410,11 @@ apply_prefs(GtkDialog * pbox)
     /*
      * display page
      */
-    balsa_app.recv_progress_dialog = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->recv_progress_dlg));
-    balsa_app.send_progress_dialog = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->send_progress_dlg));
+    balsa_app.recv_progress_dialog = gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->recv_progress_dlg));
+    balsa_app.send_progress_dialog = gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->send_progress_dlg));
 
     balsa_app.previewpane =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->previewpane));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->previewpane));
 
     save_enum = balsa_app.layout_type;
     balsa_app.layout_type =
@@ -425,19 +423,19 @@ apply_prefs(GtkDialog * pbox)
         balsa_change_window_layout(balsa_app.main_window);
 
     balsa_app.view_message_on_open =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->view_message_on_open));
     balsa_app.ask_before_select =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->ask_before_select));
     balsa_app.pgdownmod =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->pgdownmod));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->pgdownmod));
     balsa_app.pgdown_percent =
         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
                                          (pui->pgdown_percent));
 
     if (balsa_app.mblist_show_mb_content_info !=
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->mblist_show_mb_content_info))) {
         balsa_app.mblist_show_mb_content_info =
             !balsa_app.mblist_show_mb_content_info;
@@ -446,30 +444,30 @@ apply_prefs(GtkDialog * pbox)
     }
 
     balsa_app.check_mail_auto =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->check_mail_auto));
     balsa_app.check_mail_timer =
         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
                                          (pui->check_mail_minutes));
     balsa_app.quiet_background_check =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->quiet_background_check));
     balsa_app.msg_size_limit =
         gtk_spin_button_get_value(GTK_SPIN_BUTTON(pui->msg_size_limit)) *
         1024;
     balsa_app.check_imap =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->check_imap));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->check_imap));
     balsa_app.check_imap_inbox =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->check_imap_inbox));
     balsa_app.notify_new_mail_dialog =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->notify_new_mail_dialog));
     balsa_app.notify_new_mail_sound =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->notify_new_mail_sound));
     balsa_app.notify_new_mail_icon =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->notify_new_mail_icon));
     balsa_app.mdn_reply_clean =
         pm_combo_box_get_level(pui->mdn_reply_clean_menu);
@@ -482,38 +480,38 @@ apply_prefs(GtkDialog * pbox)
         update_timer(FALSE, 0);
 
     balsa_app.wordwrap =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->wordwrap));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->wordwrap));
     balsa_app.wraplength =
         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->wraplength));
     balsa_app.autoquote =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->autoquote));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->autoquote));
     balsa_app.reply_strip_html =
-        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        !gtk_check_button_get_active(GTK_CHECK_BUTTON
                                       (pui->reply_include_html_parts));
     balsa_app.forward_attached =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->forward_attached));
 
     save_setting = balsa_app.always_queue_sent_mail;
     balsa_app.always_queue_sent_mail =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->always_queue_sent_mail));
     if (balsa_app.always_queue_sent_mail != save_setting) {
         balsa_toolbar_model_changed(balsa_window_get_toolbar_model());
     }
 
 	balsa_app.send_mail_auto =
-		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->send_mail_auto));
+		gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->send_mail_auto));
 	balsa_app.send_mail_timer =
 		gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(pui->send_mail_minutes));
 	libbalsa_auto_send_config(balsa_app.send_mail_auto, balsa_app.send_mail_timer);
 
     balsa_app.copy_to_sentbox =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->copy_to_sentbox));
 
     balsa_app.close_mailbox_auto =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->close_mailbox_auto));
     balsa_app.close_mailbox_timeout =
         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
@@ -522,10 +520,10 @@ apply_prefs(GtkDialog * pbox)
 
     libbalsa_mailbox_set_filter(NULL, pui->filter);
     balsa_app.expunge_on_close =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->expunge_on_close));
     balsa_app.expunge_auto =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->expunge_auto));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->expunge_auto));
     balsa_app.expunge_timeout =
         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
                                          (pui->expunge_minutes)) * 60;
@@ -534,7 +532,7 @@ apply_prefs(GtkDialog * pbox)
 
     /* external editor */
     balsa_app.edit_headers =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->edit_headers));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->edit_headers));
 
     /* arp */
     g_free(balsa_app.quote_str);
@@ -543,20 +541,20 @@ apply_prefs(GtkDialog * pbox)
 
     /* fonts */
     balsa_app.use_system_fonts =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->use_system_fonts));
     check_font_button(pui->message_font_button, &balsa_app.message_font);
     check_font_button(pui->subject_font_button, &balsa_app.subject_font);
 
     balsa_app.mark_quoted =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->mark_quoted));
     g_free(balsa_app.quote_regex);
     tmp = gtk_editable_get_text(GTK_EDITABLE(pui->quote_pattern));
     balsa_app.quote_regex = g_strcompress(tmp);
 
     balsa_app.browse_wrap =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->browse_wrap));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->browse_wrap));
     /* main window view menu can also toggle balsa_app.browse_wrap
      * update_view_menu lets it know we've made a change */
     update_view_menu(balsa_app.main_window);
@@ -565,17 +563,17 @@ apply_prefs(GtkDialog * pbox)
                                          (pui->browse_wrap_length));
 
     balsa_app.display_alt_plain =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->display_alt_plain));
 
     balsa_app.open_inbox_upon_startup =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->open_inbox_upon_startup));
     balsa_app.check_mail_upon_startup =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->check_mail_upon_startup));
     balsa_app.remember_open_mboxes =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->remember_open_mboxes));
     balsa_app.local_scan_depth =
         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
@@ -584,15 +582,15 @@ apply_prefs(GtkDialog * pbox)
         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
                                          (pui->imap_scan_depth));
     balsa_app.empty_trash_on_exit =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->empty_trash));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->empty_trash));
 
 #if !(HAVE_GSPELL || HAVE_GTKSPELL)
     /* spell checking */
     balsa_app.check_sig =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->spell_check_sig));
     balsa_app.check_quoted =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->spell_check_quoted));
 #endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
 
@@ -621,14 +619,14 @@ apply_prefs(GtkDialog * pbox)
 
     { /* Scope */
         gboolean thread_messages =
-            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->thread_messages_check));
+            gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->thread_messages_check));
         libbalsa_mailbox_set_threading_type(NULL, thread_messages ?
                                             LB_MAILBOX_THREADING_SIMPLE :
                                             LB_MAILBOX_THREADING_FLAT);
     }
 
     balsa_app.expand_tree =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->tree_expand_check));
 
     /* Information dialogs */
@@ -645,7 +643,7 @@ apply_prefs(GtkDialog * pbox)
 
     /* handling of 8-bit message parts without codeset header */
     balsa_app.convert_unknown_8bit =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->convert_unknown_8bit[1]));
     balsa_app.convert_unknown_8bit_codeset =
         gtk_combo_box_get_active(GTK_COMBO_BOX
@@ -672,56 +670,55 @@ set_prefs(void)
     unsigned i;
     gchar *tmp;
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->recv_progress_dlg),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->recv_progress_dlg),
                                  balsa_app.recv_progress_dialog);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->send_progress_dlg),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->send_progress_dlg),
                                  balsa_app.send_progress_dialog);
 
     file = g_file_new_for_path(balsa_app.local_mail_directory);
     gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(pui->mail_directory), file, NULL);
     g_object_unref(file);
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->previewpane),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->previewpane),
                                  balsa_app.previewpane);
     pm_combo_box_set_level(pui->layout_type, balsa_app.layout_type);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->view_message_on_open),
                                  balsa_app.view_message_on_open);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->ask_before_select),
                                  balsa_app.ask_before_select);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->pgdownmod),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->pgdownmod),
                                  balsa_app.pgdownmod);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->pgdown_percent),
                               (float) balsa_app.pgdown_percent);
     gtk_widget_set_sensitive(pui->pgdown_percent,
-                             gtk_toggle_button_get_active
-                             (GTK_TOGGLE_BUTTON(pui->pgdownmod)));
+                             gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->pgdownmod)));
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->mblist_show_mb_content_info),
                                  balsa_app.mblist_show_mb_content_info);
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->check_mail_auto),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->check_mail_auto),
                                  balsa_app.check_mail_auto);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->check_mail_minutes),
                               (float) balsa_app.check_mail_timer);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->quiet_background_check),
                                  balsa_app.quiet_background_check);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->msg_size_limit),
                               ((float) balsa_app.msg_size_limit) / 1024);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->check_imap),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->check_imap),
                                  balsa_app.check_imap);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->check_imap_inbox),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->check_imap_inbox),
                                  balsa_app.check_imap_inbox);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->notify_new_mail_dialog),
                                  balsa_app.notify_new_mail_dialog);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->notify_new_mail_sound),
                                  balsa_app.notify_new_mail_sound);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->notify_new_mail_icon),
                                  balsa_app.notify_new_mail_icon);
     if (!balsa_app.check_imap)
@@ -732,68 +729,66 @@ set_prefs(void)
     pm_combo_box_set_level(pui->mdn_reply_notclean_menu,
                            balsa_app.mdn_reply_notclean);
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->close_mailbox_auto),
                                  balsa_app.close_mailbox_auto);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->close_mailbox_minutes),
                               (float) balsa_app.close_mailbox_timeout /
                               60);
     gtk_widget_set_sensitive(pui->close_mailbox_minutes,
-                             gtk_toggle_button_get_active
-                             (GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)));
+                             gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->close_mailbox_auto)));
 
     pui->filter = libbalsa_mailbox_get_filter(NULL);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->hide_deleted),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->hide_deleted),
                                  pui->filter & (1 << 0));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->expunge_on_close),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->expunge_on_close),
                                  balsa_app.expunge_on_close);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->expunge_auto),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->expunge_auto),
                                  balsa_app.expunge_auto);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->expunge_minutes),
                               (float) balsa_app.expunge_timeout / 60);
     gtk_widget_set_sensitive(pui->expunge_minutes,
-                             gtk_toggle_button_get_active
-                             (GTK_TOGGLE_BUTTON(pui->expunge_auto)));
+                             gtk_check_button_get_active
+                             (GTK_CHECK_BUTTON(pui->expunge_auto)));
     gtk_widget_set_sensitive(pui->check_mail_minutes,
-                             gtk_toggle_button_get_active
-                             (GTK_TOGGLE_BUTTON(pui->check_mail_auto)));
+                             gtk_check_button_get_active
+                             (GTK_CHECK_BUTTON(pui->check_mail_auto)));
     pm_combo_box_set_level(pui->action_after_move_menu,
                            balsa_app.mw_action_after_move);
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->wordwrap),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->wordwrap),
                                  balsa_app.wordwrap);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->wraplength),
                               (float) balsa_app.wraplength);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->always_queue_sent_mail),
                                  balsa_app.always_queue_sent_mail);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->send_mail_auto),
+	gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->send_mail_auto),
 								 balsa_app.send_mail_auto);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->send_mail_minutes),
 							  (float) balsa_app.send_mail_timer);
 	gtk_widget_set_sensitive(pui->send_mail_minutes,
-							 gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->send_mail_auto)));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->copy_to_sentbox),
+							 gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->send_mail_auto)));
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->copy_to_sentbox),
                                  balsa_app.copy_to_sentbox);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->autoquote),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->autoquote),
                                  balsa_app.autoquote);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->reply_include_html_parts),
                                  !balsa_app.reply_strip_html);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->forward_attached),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->forward_attached),
                                  balsa_app.forward_attached);
 
     gtk_widget_set_sensitive(pui->wraplength,
-                             gtk_toggle_button_get_active
-                             (GTK_TOGGLE_BUTTON(pui->wordwrap)));
+                             gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->wordwrap)));
 
     /* external editor */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->edit_headers),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->edit_headers),
                                  balsa_app.edit_headers);
 
     /* arp */
     gtk_editable_set_text(GTK_EDITABLE(pui->quote_str), balsa_app.quote_str);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->mark_quoted),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->mark_quoted),
                                  balsa_app.mark_quoted);
     gtk_widget_set_sensitive(pui->quote_pattern, balsa_app.mark_quoted);
     tmp = g_strescape(balsa_app.quote_regex, NULL);
@@ -801,7 +796,7 @@ set_prefs(void)
     g_free(tmp);
 
     /* wrap incoming text/plain */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->browse_wrap),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->browse_wrap),
                                  balsa_app.browse_wrap);
     gtk_widget_set_sensitive(pui->browse_wrap_length,
                              balsa_app.browse_wrap);
@@ -809,42 +804,42 @@ set_prefs(void)
                               (float) balsa_app.browse_wrap_length);
 
     /* how to treat multipart/alternative */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->display_alt_plain),
                                  balsa_app.display_alt_plain);
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->open_inbox_upon_startup),
                                  balsa_app.open_inbox_upon_startup);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->check_mail_upon_startup),
                                  balsa_app.check_mail_upon_startup);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->remember_open_mboxes),
                                  balsa_app.remember_open_mboxes);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->local_scan_depth),
                               balsa_app.local_scan_depth);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(pui->imap_scan_depth),
                               balsa_app.imap_scan_depth);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->empty_trash),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->empty_trash),
                                  balsa_app.empty_trash_on_exit);
 
     /* sorting and threading */
     pui->sort_field_index = libbalsa_mailbox_get_sort_field(NULL);
     pm_combo_box_set_level(pui->default_sort_field, pui->sort_field_index);
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->thread_messages_check),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->thread_messages_check),
                                  libbalsa_mailbox_get_threading_type(NULL)
                                  != LB_MAILBOX_THREADING_FLAT);
 
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->tree_expand_check),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->tree_expand_check),
                                  balsa_app.expand_tree);
 
 #if !(HAVE_GSPELL || HAVE_GTKSPELL)
     /* spelling */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->spell_check_sig),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->spell_check_sig),
                                  balsa_app.check_sig);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->spell_check_quoted),
                                  balsa_app.check_quoted);
 #endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
@@ -878,7 +873,7 @@ set_prefs(void)
                            balsa_app.debug_message);
 
     /* handling of 8-bit message parts without codeset header */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
+    gtk_check_button_set_active(GTK_CHECK_BUTTON
                                  (pui->convert_unknown_8bit[1]),
                                  balsa_app.convert_unknown_8bit);
     gtk_widget_set_sensitive(pui->convert_unknown_8bit_codeset,
@@ -1762,7 +1757,7 @@ static void
 timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate = 
-	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+	gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->check_mail_auto));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->check_mail_minutes), newstate);
@@ -1772,7 +1767,7 @@ timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 static void
 send_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
-	gboolean newstate = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->send_mail_auto));
+	gboolean newstate = gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->send_mail_auto));
 
 	gtk_widget_set_sensitive(GTK_WIDGET(pui->send_mail_minutes), newstate);
 	properties_modified_cb(widget, pbox);
@@ -1782,7 +1777,7 @@ static void
 browse_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate =
-	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->browse_wrap));
+	gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->browse_wrap));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->browse_wrap_length), newstate);
     properties_modified_cb(widget, pbox);
@@ -1792,7 +1787,7 @@ static void
 mark_quoted_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate =
-	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->mark_quoted));
+	gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->mark_quoted));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->quote_pattern), newstate);
     properties_modified_cb(widget, pbox);
@@ -1802,7 +1797,7 @@ static void
 wrap_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate =
-	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->wordwrap));
+	gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->wordwrap));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->wraplength), newstate);
     properties_modified_cb(widget, pbox);
@@ -1812,7 +1807,7 @@ static void
 pgdown_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate =
-	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->pgdownmod));
+	gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->pgdownmod));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->pgdown_percent), newstate);
     properties_modified_cb(widget, pbox);
@@ -1822,7 +1817,7 @@ static void
 mailbox_close_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->close_mailbox_auto));
 
     gtk_widget_set_sensitive(GTK_WIDGET(pui->close_mailbox_minutes),
@@ -1834,7 +1829,7 @@ mailbox_close_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 static void
 filter_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
-    if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->hide_deleted)))
+    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->hide_deleted)))
 	pui->filter |= (1 << 0);
     else
 	pui->filter &= ~(1 << 0);
@@ -1846,10 +1841,10 @@ static void
 expunge_on_close_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+        gtk_check_button_get_active(GTK_CHECK_BUTTON
                                      (pui->expunge_on_close));
     gtk_widget_set_sensitive(GTK_WIDGET(pui->expunge_auto), newstate);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->expunge_auto),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->expunge_auto),
                                  newstate);
 
     properties_modified_cb(widget, pbox);
@@ -1859,7 +1854,7 @@ static void
 expunge_auto_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean newstate =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->expunge_auto));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->expunge_auto));
     gtk_widget_set_sensitive(GTK_WIDGET(pui->expunge_minutes), newstate);
 
     properties_modified_cb(widget, pbox);
@@ -1870,11 +1865,10 @@ imap_toggled_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     properties_modified_cb(widget, pbox);
 
-    if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->check_imap)))
+    if (gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->check_imap))) {
 	gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), TRUE);
-    else {
-	gtk_toggle_button_set_active(
-	    GTK_TOGGLE_BUTTON(pui->check_imap_inbox), FALSE);
+    } else {
+	gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->check_imap_inbox), FALSE);
 	gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
     }
 }
@@ -1884,10 +1878,8 @@ convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     properties_modified_cb(widget, pbox);
 
-    gtk_widget_set_sensitive
-        (pui->convert_unknown_8bit_codeset,
-         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                      (pui->convert_unknown_8bit[1])));
+    gtk_widget_set_sensitive(pui->convert_unknown_8bit_codeset,
+            gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->convert_unknown_8bit[1])));
 }
 
 /*
@@ -1898,7 +1890,7 @@ static void
 use_system_fonts_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean use_custom_fonts =
-        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+        !gtk_check_button_get_active(GTK_CHECK_BUTTON(widget));
 
     properties_modified_cb(widget, pbox);
 
@@ -1913,7 +1905,7 @@ static void
 font_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
     gboolean show_size =
-        !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->use_default_font_size));
+        !gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->use_default_font_size));
     GtkFontChooserLevel level =
         gtk_font_chooser_get_level(GTK_FONT_CHOOSER(widget));
 
@@ -1932,7 +1924,7 @@ font_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 static void
 default_font_size_cb(GtkWidget * widget, GtkWidget * pbox)
 {
-    if (!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget))) {
+    if (!gtk_check_button_get_active(GTK_CHECK_BUTTON(widget))) {
         /* Changing from default font size to user-specified font size;
          * we make sure the font size is not initially zero. */
         font_button_check_font_size(pui->message_font_button, widget);
@@ -2466,7 +2458,7 @@ pm_grid_add_preview_font_group(GtkWidget * grid_widget)
 
     pui->use_system_fonts =
         gtk_check_button_new_with_label(_("Use system fonts"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->use_system_fonts),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->use_system_fonts),
                                  balsa_app.use_system_fonts);
     gtk_widget_set_hexpand(pui->use_system_fonts, TRUE);
     pm_grid_attach(grid, pui->use_system_fonts,
@@ -2503,7 +2495,7 @@ pm_grid_add_preview_font_group(GtkWidget * grid_widget)
         level &= ~GTK_FONT_CHOOSER_LEVEL_SIZE;
         gtk_font_chooser_set_level(GTK_FONT_CHOOSER(pui->subject_font_button), level);
 
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->use_default_font_size), TRUE);
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->use_default_font_size), TRUE);
     }
 
     if (balsa_app.use_system_fonts) {
@@ -3607,7 +3599,7 @@ refresh_preferences_manager(void)
 {
     if (pui == NULL)
         return;
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->browse_wrap),
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->browse_wrap),
                                  balsa_app.browse_wrap);
 }
 

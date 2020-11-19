@@ -416,7 +416,7 @@ build_action_page(GtkWindow * window)
     gtk_grid_attach(GTK_GRID(grid), fe_sound_entry, 1, 0, 1, 1);
     /* fe_sound_entry is initially sensitive, so to be consistent
      * we must make fe_sound_button active */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_sound_button), TRUE);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_sound_button), TRUE);
     g_signal_connect(fe_sound_button, "toggled",
                      G_CALLBACK(fe_button_toggled), fe_sound_entry);
     g_signal_connect(dialog, "response",
@@ -432,7 +432,7 @@ build_action_page(GtkWindow * window)
     gtk_grid_attach(GTK_GRID(grid), fe_popup_entry, 1, 1, 1, 1);
     /* fe_popup_entry is initially sensitive, so to be consistent
      * we must make fe_popup_button active */
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fe_popup_button), TRUE);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(fe_popup_button), TRUE);
     g_signal_connect(fe_popup_button, "toggled",
                      G_CALLBACK(fe_button_toggled), fe_popup_entry);
     g_signal_connect(fe_popup_entry, "changed",

@@ -858,9 +858,8 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 	return;
 
     message = libbalsa_mailbox_get_message(mailbox, msgno);
-    if (message != NULL
-        && (mw = g_object_get_data(G_OBJECT(message),
-                                   BALSA_MESSAGE_WINDOW_KEY)) != NULL) {
+    if (message != NULL &&
+        (mw = g_object_get_data(G_OBJECT(message), BALSA_MESSAGE_WINDOW_KEY)) != NULL) {
         gtk_window_present(GTK_WINDOW(mw->window));
         g_object_unref(message);
         return;

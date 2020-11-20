@@ -1310,7 +1310,7 @@ libbalsa_add_mnemonic_button_to_box(const gchar *markup,
     gtk_size_group_add_widget(size_group, label);
 
     button = gtk_button_new();
-    gtk_box_append(GTK_BOX(button), label);
+    gtk_button_set_child(GTK_BUTTON(button), label);
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, align);
     gtk_widget_show(button);

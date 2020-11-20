@@ -1021,7 +1021,7 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     BalsaMimeWidgetText *mwt = user_data;
     GtkTextView * view;
     GtkTextBuffer * buffer;
-    gint dimension;
+    int dimension;
     GdkRectangle location;
     int y_pos;
     int height;
@@ -1527,13 +1527,14 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
     }
 
     /* width of monospace characters is 3/5 of the size */
-    char_width = 0.6 * pango_font_description_get_size(desc);
-    if (!pango_font_description_get_size_is_absolute(desc))
-        char_width = char_width / PANGO_SCALE;
+    char_width = 0.6 * (double) pango_font_description_get_size(desc) / (double) PANGO_SCALE;
 
-    /* convert char_width from points to pixels */
-    /* Assume a logical DPI of 96, which is alleged to be common */
-    mwt->cite_bar_dimension = (char_width / 72.0) * 96;
+    if (!pango_font_description_get_size_is_absolute(desc)) {
+        /* convert char_width from points to pixels */
+        /* Assume a logical DPI of 96, which is alleged to be common */
+        char_width = (char_width / 72.0) * 96.0;
+    }
+    mwt->cite_bar_dimension = (int) (char_width + 0.5); /* rounding */
 
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
     rgba = &balsa_app.url_color;

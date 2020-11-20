@@ -295,7 +295,7 @@ static void identity_list_update_real(GtkTreeView * tree,
                                       LibBalsaIdentity * default_id);
 static GtkWidget *libbalsa_identity_tree(GCallback toggled_cb,
                                          gpointer toggled_data,
-                                         gchar * toggled_title);
+                                         char * toggled_title);
 
 /*
  * The Select Identity dialog; called from compose window.
@@ -563,7 +563,7 @@ static gpointer ident_dialog_get_value(GObject * dialog,
 
 /* Callback for the "toggled" signal of the "Default" column. */
 static void
-toggle_cb(GObject * dialog, gchar * path)
+toggle_cb(GObject * dialog, char * path)
 {
     GtkTreeView *tree = g_object_get_data(dialog, "tree");
     GtkTreeModel *model = gtk_tree_view_get_model(tree);
@@ -854,7 +854,7 @@ static const struct {
 };
 
 #define LIBBALSA_IDENTITY_CHECK "libbalsa-identity-check"
-static void md_sig_path_changed_cb(GtkToggleButton * sig_button,
+static void md_sig_path_changed_cb(GtkCheckButton * sig_button,
                                    GObject * dialog);
 
 static GtkWidget*
@@ -1154,12 +1154,11 @@ ident_dialog_add_keysel_entry(GtkWidget   *grid,
 
 /* Callbacks and helpers. */
 static void
-file_chooser_check_cb(GtkToggleButton * button, GtkWidget * chooser)
+file_chooser_check_cb(GtkCheckButton * button, GtkWidget * chooser)
 {
-    gtk_widget_set_sensitive(chooser,
-                             gtk_toggle_button_get_active(button));
+    gtk_widget_set_sensitive(chooser, gtk_check_button_get_active(button));
     /* Force validation of current path, if any. */
-    g_signal_emit_by_name(chooser, "selection-changed");
+    g_signal_emit_by_name(chooser, "file-set");
 }
 
 static void
@@ -1264,9 +1263,9 @@ md_sig_path_changed(gboolean active, GObject * dialog)
 }
 
 static void
-md_sig_path_changed_cb(GtkToggleButton *sig_button, GObject *dialog)
+md_sig_path_changed_cb(GtkCheckButton *sig_button, GObject *dialog)
 {
-    md_sig_path_changed(gtk_toggle_button_get_active(sig_button), dialog);
+    md_sig_path_changed(gtk_check_button_get_active(sig_button), dialog);
 }
 
 #define LIBBALSA_IDENTITY_INFO "libbalsa-identity-info"
@@ -1276,7 +1275,7 @@ file_chooser_cb(GtkWidget * chooser, gpointer data)
     GFile *file;
     gchar *filename;
     LibBalsaIdentityPathType type;
-    GtkToggleButton *check;
+    GtkCheckButton *check;
     gboolean active;
 
     file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(chooser));
@@ -1291,7 +1290,7 @@ file_chooser_cb(GtkWidget * chooser, gpointer data)
     type = GPOINTER_TO_UINT(g_object_get_data
                             (G_OBJECT(chooser), LIBBALSA_IDENTITY_INFO));
     check = g_object_get_data(G_OBJECT(chooser), LIBBALSA_IDENTITY_CHECK);
-    active = gtk_toggle_button_get_active(check);
+    active = gtk_check_button_get_active(check);
 
 #if 0
     if (type == LBI_PATH_TYPE_SIG)
@@ -1339,7 +1338,7 @@ ident_dialog_add_file_chooser_button(GtkWidget * grid, gint row,
                       GUINT_TO_POINTER(type));
     g_signal_connect(check, "toggled",
                      G_CALLBACK(file_chooser_check_cb), button);
-    g_signal_connect(button, "selection-changed",
+    g_signal_connect(button, "file-set",
                      G_CALLBACK(file_chooser_cb), dialog);
 }
 
@@ -1495,16 +1494,18 @@ ident_dialog_update(GObject * dlg)
  * Get the text from an entry in the editing/creation dialog.  The
  * given key accesses the entry using object data.
  */
-static gchar*
-ident_dialog_get_text(GObject * dialog, const gchar * key)
+static char*
+ident_dialog_get_text(GObject * dialog, const char * key)
 {
     GtkEditable *entry;
-    GtkToggleButton *check;
+    GtkCheckButton *check;
 
     entry = g_object_get_data(dialog, key);
     check = g_object_get_data(G_OBJECT(entry), LIBBALSA_IDENTITY_CHECK);
-    if (check && !gtk_toggle_button_get_active(check))
+
+    if (check != NULL && !gtk_check_button_get_active(check))
         return NULL;
+
     return gtk_editable_get_chars(entry, 0, -1);
 }
 
@@ -1515,12 +1516,13 @@ ident_dialog_get_text(GObject * dialog, const gchar * key)
  * data
  */
 static gboolean
-ident_dialog_get_bool(GObject* dialog, const gchar* key)
+ident_dialog_get_bool(GObject* dialog, const char* key)
 {
-    GtkToggleButton *button;
+    GtkCheckButton *button;
 
     button = g_object_get_data(dialog, key);
-    return gtk_toggle_button_get_active(button);
+
+    return gtk_check_button_get_active(button);
 }
 
 
@@ -1900,9 +1902,9 @@ display_frame_set_boolean(GObject * dialog,
                           const gchar* key,
                           gboolean value)
 {
-    GtkToggleButton *check = g_object_get_data(dialog, key);
+    GtkCheckButton *check = g_object_get_data(dialog, key);
 
-    gtk_toggle_button_set_active(check, value);
+    gtk_check_button_set_active(check, value);
 }
 
 static void
@@ -1913,7 +1915,7 @@ display_frame_set_path(GObject *dialog,
 {
     gboolean set = (value != NULL && value[0] != '\0');
     GtkWidget *chooser = g_object_get_data(dialog, key);
-    GtkToggleButton *check =
+    GtkCheckButton *check =
         g_object_get_data(G_OBJECT(chooser), LIBBALSA_IDENTITY_CHECK);
 
     if (set) {
@@ -1926,7 +1928,7 @@ display_frame_set_path(GObject *dialog,
         }
     }
     gtk_widget_set_sensitive(GTK_WIDGET(chooser), set);
-    gtk_toggle_button_set_active(check, set);
+    gtk_check_button_set_active(check, set);
 }
 
 

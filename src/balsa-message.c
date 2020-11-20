@@ -1347,6 +1347,7 @@ balsa_message_set(BalsaMessage * balsa_message, LibBalsaMailbox * mailbox, guint
 
     display_headers(balsa_message);
     display_content(balsa_message);
+    gtk_widget_show(GTK_WIDGET(balsa_message));
 
     if (balsa_message->info_count > 1)
         gtk_widget_show(balsa_message->switcher);

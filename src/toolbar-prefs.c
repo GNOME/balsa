@@ -110,6 +110,7 @@ balsa_toolbar_customize(GtkWindow * active_window, BalsaToolbarType type)
     BalsaToolbarModel *model;
     GSimpleActionGroup *group;
     GtkWidget *content_area;
+    GtkWidget *vbox;
 
     static GtkWidget *customize_widget;
 
@@ -135,12 +136,14 @@ balsa_toolbar_customize(GtkWindow * active_window, BalsaToolbarType type)
     g_signal_connect(customize_widget, "response",
                      G_CALLBACK(tp_dialog_response_cb), NULL);
 
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(customize_widget));
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_box_append(GTK_BOX(content_area), vbox);
+
     notebook = gtk_notebook_new();
-    content_area =
-        gtk_dialog_get_content_area(GTK_DIALOG(customize_widget));
     gtk_widget_set_vexpand(notebook, TRUE);
     gtk_widget_set_valign(notebook, GTK_ALIGN_FILL);
-    gtk_box_append(GTK_BOX(content_area), notebook);
+    gtk_box_append(GTK_BOX(vbox), notebook);
 
     gtk_window_set_default_size(GTK_WINDOW(customize_widget), 600, 440);
 
@@ -180,7 +183,7 @@ balsa_toolbar_customize(GtkWindow * active_window, BalsaToolbarType type)
     gtk_widget_set_margin_start(option_frame, 6);
     gtk_widget_set_margin_end(option_frame, 6);
 
-    gtk_box_append(GTK_BOX(content_area), option_frame);
+    gtk_box_append(GTK_BOX(vbox), option_frame);
 
     option_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
 
@@ -467,9 +470,13 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
                                    GTK_POLICY_AUTOMATIC);
 
     list_frame = gtk_frame_new(_("Available buttons"));
+
     page->available = tp_list_new();
 
+    gtk_widget_set_hexpand(list_frame, TRUE);
+    gtk_widget_set_halign(list_frame, GTK_ALIGN_FILL);
     gtk_box_append(GTK_BOX(lower_ctlbox), list_frame);
+
     gtk_frame_set_child(GTK_FRAME(list_frame), list_scroll);
     gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(list_scroll), page->available);
 
@@ -482,6 +489,7 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
                                    GTK_POLICY_AUTOMATIC);
 
     destination_frame = gtk_frame_new(_("Current toolbar"));
+
     page->current = tp_list_new();
 
     /* Done with destination list */

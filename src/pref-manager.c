@@ -643,7 +643,7 @@ apply_prefs(GtkDialog * pbox)
 
     /* handling of 8-bit message parts without codeset header */
     balsa_app.convert_unknown_8bit =
-        gtk_check_button_get_active(GTK_CHECK_BUTTON
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->convert_unknown_8bit[1]));
     balsa_app.convert_unknown_8bit_codeset =
         gtk_combo_box_get_active(GTK_COMBO_BOX
@@ -873,7 +873,7 @@ set_prefs(void)
                            balsa_app.debug_message);
 
     /* handling of 8-bit message parts without codeset header */
-    gtk_check_button_set_active(GTK_CHECK_BUTTON
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->convert_unknown_8bit[1]),
                                  balsa_app.convert_unknown_8bit);
     gtk_widget_set_sensitive(pui->convert_unknown_8bit_codeset,
@@ -1879,7 +1879,7 @@ convert_8bit_cb(GtkWidget * widget, GtkWidget * pbox)
     properties_modified_cb(widget, pbox);
 
     gtk_widget_set_sensitive(pui->convert_unknown_8bit_codeset,
-            gtk_check_button_get_active(GTK_CHECK_BUTTON(pui->convert_unknown_8bit[1])));
+            gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->convert_unknown_8bit[1])));
 }
 
 /*
@@ -3287,7 +3287,7 @@ open_preferences_manager_idle(void)
     }
     g_free(name);
 
-    g_signal_connect(pui->mail_directory, "selection-changed",
+    g_signal_connect(pui->mail_directory, "file-set",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     return FALSE;
@@ -3573,10 +3573,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     /* Colour */
     for (i = 0; i < MAX_QUOTED_COLOR; i++)
-        g_signal_connect(pui->quoted_color[i], "released",
+        g_signal_connect(pui->quoted_color[i], "color-set",
                          G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(pui->url_color, "released",
+    g_signal_connect(pui->url_color, "color-set",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* handling of message parts with 8-bit chars without codeset headers */

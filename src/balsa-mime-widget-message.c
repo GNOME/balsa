@@ -572,9 +572,10 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 }
 
 static gboolean
-label_map_cb(GtkLabel  *label,
-             GtkWidget *expander)
+label_idle(gpointer user_data)
 {
+    GtkLabel *label = user_data;
+    GtkWidget *expander = g_object_get_data(G_OBJECT(label), "balsa-message-expander");
     PangoLayout *layout;
 
     layout = gtk_label_get_layout(label);
@@ -585,7 +586,7 @@ label_map_cb(GtkLabel  *label,
     else
         gtk_widget_hide(expander);
 
-    return FALSE;
+    return G_SOURCE_REMOVE;
 }
 
 static void
@@ -674,7 +675,9 @@ add_header_gchar(GtkGrid * grid, const gchar * header, const gchar * label,
             gtk_expander_set_expanded(GTK_EXPANDER(expander), FALSE);
         }
         g_signal_connect(expander, "notify::expanded", G_CALLBACK(expanded_cb), value_label);
-        g_signal_connect(value_label, "map", G_CALLBACK(label_map_cb), expander);
+
+        g_object_set_data(G_OBJECT(value_label), "balsa-message-expander", expander);
+        g_idle_add(label_idle, value_label);
 
         hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
         gtk_box_append(GTK_BOX(hbox), value_label);

@@ -2689,7 +2689,6 @@ create_info_pane(BalsaSendmsg * bsmsg)
     create_email_entry(bsmsg, grid, ++row, &bsmsg->recipient_view,
                        bsmsg->recipients, "Rec_ipients:", address_types,
                        G_N_ELEMENTS(address_types));
-    gtk_widget_set_vexpand(bsmsg->recipients[1], TRUE);
     g_signal_connect_swapped(gtk_tree_view_get_model
                              (GTK_TREE_VIEW(bsmsg->recipient_view)),
                              "row-changed",

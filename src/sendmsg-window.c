@@ -7362,7 +7362,7 @@ sendmsg_window_new()
         gtk_application_window_new(balsa_app.application);
     geometry_manager_attach(GTK_WINDOW(window), "SendMsgWindow");
 
-    gtk_box_append(GTK_BOX(window), main_box);
+    gtk_window_set_child(GTK_WINDOW(window), main_box);
     gtk_widget_show(window);
 
     bsmsg->gpg_mode = LIBBALSA_PROTECT_RFC3156;

@@ -467,9 +467,10 @@ delete_handler_response(GtkDialog *dialog,
         gtk_window_destroy(GTK_WINDOW(bsmsg->window));
 }
 
-static void
-delete_handler(BalsaSendmsg * bsmsg)
+static gboolean
+delete_handler(gpointer user_data)
 {
+    BalsaSendmsg *bsmsg = user_data;
     InternetAddressList *list;
     InternetAddress *ia;
     const gchar *tmp = NULL;
@@ -478,9 +479,14 @@ delete_handler(BalsaSendmsg * bsmsg)
 
     g_debug("%s", __func__);
 
+    if (bsmsg == NULL)
+        return G_SOURCE_REMOVE;
+
     if (bsmsg->state == SENDMSG_STATE_CLEAN) {
-        gtk_window_destroy(GTK_WINDOW(bsmsg->window));
-        return;
+        if (GTK_IS_WINDOW(bsmsg->window))
+            gtk_window_destroy(GTK_WINDOW(bsmsg->window));
+
+        return G_SOURCE_REMOVE;
     }
 
     list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
@@ -510,6 +516,8 @@ delete_handler(BalsaSendmsg * bsmsg)
 
     g_signal_connect(dialog, "response", G_CALLBACK(delete_handler_response), bsmsg);
     gtk_widget_show(dialog);
+
+    return G_SOURCE_REMOVE;
 }
 
 static gboolean
@@ -517,7 +525,7 @@ sw_close_request_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
 {
     BalsaSendmsg *bsmsg = data;
 
-    delete_handler(bsmsg);
+    g_idle_add(delete_handler, bsmsg);
 
     /* Block closing; delete_handler will close if appropriate */
     return TRUE;

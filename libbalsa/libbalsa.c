@@ -834,21 +834,27 @@ libbalsa_popup_widget_new(GtkWidget  *parent,
                           GMenuModel *model,
                           const char *action_namespace)
 {
-    GMenu *menu;
     GMenuItem *menu_item;
+    GMenu *menu;
     GtkWidget *popup_widget;
 
-    menu = g_menu_new();
     menu_item = g_menu_item_new(NULL, NULL);
     g_menu_item_set_attribute(menu_item, G_MENU_ATTRIBUTE_ACTION_NAMESPACE, "s", action_namespace);
     g_menu_item_set_link(menu_item, G_MENU_LINK_SECTION, model);
+
+    menu = g_menu_new();
     g_menu_append_item(menu, menu_item);
     g_object_unref(menu_item);
 
-    popup_widget = gtk_popover_menu_new_from_model_full(G_MENU_MODEL(menu), (GtkPopoverMenuFlags) 0);
+    popup_widget = gtk_popover_menu_new_from_model(G_MENU_MODEL(menu));
     g_object_unref(menu);
 
-    g_signal_connect(parent, "realize", G_CALLBACK(set_parent_cb), popup_widget);
+    if (parent != NULL) {
+        if (gtk_widget_get_realized(parent))
+            gtk_widget_set_parent(popup_widget, parent);
+        else
+            g_signal_connect(parent, "realize", G_CALLBACK(set_parent_cb), popup_widget);
+    }
 
     return popup_widget;
 }

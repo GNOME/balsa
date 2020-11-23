@@ -1021,17 +1021,15 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     BalsaMimeWidgetText *mwt = user_data;
     GtkTextView * view;
     GtkTextBuffer * buffer;
-    int dimension;
     GdkRectangle location;
     int y_pos;
     int height;
 
     view = GTK_TEXT_VIEW(mwt->text_widget);
     buffer = gtk_text_view_get_buffer(view);
-    dimension = mwt->cite_bar_dimension;
 
     /* initialise iters if we don't have the widget yet */
-    if (!bar->bar) {
+    if (bar->bar == NULL) {
         gtk_text_buffer_get_iter_at_offset(buffer,
                                            &bar->start_iter,
                                            bar->start_offs);
@@ -1047,13 +1045,13 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     height = location.y - y_pos;
 
     /* add a new widget if necessary */
-    if (!bar->bar) {
+    if (bar->bar == NULL) {
 #define BALSA_MESSAGE_CITE_BAR "balsa-message-cite-bar"
-        gchar *color;
-        gchar *css;
+        char *color;
+        char *css;
         GtkCssProvider *css_provider;
 
-        bar->bar = balsa_cite_bar_new(height, bar->depth, dimension);
+        bar->bar = balsa_cite_bar_new(height, bar->depth, mwt->cite_bar_dimension);
         gtk_widget_set_name(bar->bar, BALSA_MESSAGE_CITE_BAR);
 
         color =
@@ -1083,6 +1081,15 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     bar->height = height;
 }
 
+static gboolean
+draw_cite_bars_idle(gpointer user_data)
+{
+    BalsaMimeWidgetText *mwt = user_data;
+
+    g_list_foreach(mwt->cite_bar_list, draw_cite_bar_real, mwt);
+
+    return G_SOURCE_REMOVE;
+}
 
 static void
 draw_cite_bars(GtkWidget *widget,
@@ -1090,7 +1097,7 @@ draw_cite_bars(GtkWidget *widget,
 {
     BalsaMimeWidgetText *mwt = user_data;
 
-    g_list_foreach(mwt->cite_bar_list, draw_cite_bar_real, mwt);
+    g_idle_add(draw_cite_bars_idle, mwt);
 }
 
 
@@ -1637,7 +1644,7 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
 
     /* add list of citation bars(if any) */
     if (mwt->cite_bar_list != NULL)
-        g_signal_connect_after(widget, "map", G_CALLBACK(draw_cite_bars), mwt);
+        g_signal_connect(widget, "realize", G_CALLBACK(draw_cite_bars), mwt);
 
     if (rex != NULL)
         g_regex_unref(rex);

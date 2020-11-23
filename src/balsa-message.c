@@ -1745,7 +1745,7 @@ display_content(BalsaMessage * balsa_message)
 
     balsa_message->parts_menu = g_menu_new();
 
-    balsa_message->parts_popup = libbalsa_popup_widget_new(balsa_message->attach_button,
+    balsa_message->parts_popup = libbalsa_popup_widget_new(NULL,
                                                            G_MENU_MODEL(balsa_message->parts_menu),
                                                            "message-menu");
 

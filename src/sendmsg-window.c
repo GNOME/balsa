@@ -479,12 +479,8 @@ delete_handler(gpointer user_data)
 
     g_debug("%s", __func__);
 
-    if (bsmsg == NULL)
-        return G_SOURCE_REMOVE;
-
     if (bsmsg->state == SENDMSG_STATE_CLEAN) {
-        if (GTK_IS_WINDOW(bsmsg->window))
-            gtk_window_destroy(GTK_WINDOW(bsmsg->window));
+        gtk_window_destroy(GTK_WINDOW(bsmsg->window));
 
         return G_SOURCE_REMOVE;
     }
@@ -521,7 +517,7 @@ delete_handler(gpointer user_data)
 }
 
 static gboolean
-sw_close_request_cb(GtkWidget * widget, GdkEvent * e, gpointer data)
+sw_close_request_cb(GtkWindow * window, gpointer data)
 {
     BalsaSendmsg *bsmsg = data;
 
@@ -545,13 +541,12 @@ sw_close_activated(GSimpleAction * action,
     g_debug("close_window_cb: end");
 }
 
-static gint
-destroy_event_cb(GtkWidget * widget, gpointer data)
+static void
+sw_unrealize_cb(GtkWidget * widget, gpointer data)
 {
     BalsaSendmsg *bsmsg = data;
 
     balsa_sendmsg_destroy_handler(bsmsg);
-    return TRUE;
 }
 
 /* the balsa_sendmsg destructor; copies first the shown headers setting
@@ -7378,8 +7373,8 @@ sendmsg_window_new()
 
     g_signal_connect(window, "close-request",
 		     G_CALLBACK(sw_close_request_cb), bsmsg);
-    g_signal_connect(window, "destroy",
-		     G_CALLBACK(destroy_event_cb), bsmsg);
+    g_signal_connect(window, "unrealize",
+		     G_CALLBACK(sw_unrealize_cb), bsmsg);
     /* If any compose windows are open when Balsa is closed, we want
      * them also to be closed. */
     g_object_weak_ref(G_OBJECT(balsa_app.main_window),

@@ -701,8 +701,7 @@ balsa_get_entry(GtkWidget * widget, GtkWidget ** entry)
 }
 
 /*
- * Callback for the file chooser's "selection-changed" signal and its
- * entry's "changed" signal
+ * Callback for the file chooser's entry's "changed" signal
  *
  * If the path has really changed, call check_for_blank_fields to set
  * the sensitivity of the buttons appropriately.  If it hasn't, this is
@@ -711,7 +710,7 @@ balsa_get_entry(GtkWidget * widget, GtkWidget ** entry)
  */
 static void
 local_mailbox_dialog_cb(GtkWidget         *widget,
-						MailboxConfWindow *mcw)
+                        MailboxConfWindow *mcw)
 {
     GFile *file;
     gchar *filename;
@@ -785,7 +784,6 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
         gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dialog), file, NULL);
         g_object_unref(file);
     }
-    g_signal_connect(dialog, "selection-changed", G_CALLBACK(local_mailbox_dialog_cb), mcw);
 
     size_group = libbalsa_create_size_group(dialog);
     if (libbalsa_mailbox_get_config_prefix(mcw->mailbox) != NULL) {

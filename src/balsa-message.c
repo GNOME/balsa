@@ -244,6 +244,12 @@ balsa_message_class_init(BalsaMessageClass * klass)
 
 /* Helpers for balsa_message_init. */
 
+static void
+balsa_headers_attachments_popup(GtkButton * button, BalsaMessage * balsa_message)
+{
+    if (balsa_message->parts_popup != NULL)
+        libbalsa_popup_widget_popup(balsa_message->parts_popup, NULL);
+}
 
 /* Note: this function returns a NULL-terminated array of buttons for a top-level headers widget.  Currently, we return just a
  * single item (the button for showing the menu for switching between attachments) so we /could/ change the return type to
@@ -257,8 +263,9 @@ bm_header_tl_buttons(BalsaMessage * balsa_message)
 
     array = g_ptr_array_new();
 
-    balsa_message->attach_button = button = gtk_menu_button_new();
-    gtk_menu_button_set_has_frame(GTK_MENU_BUTTON(button), FALSE);
+    balsa_message->attach_button = button =
+        gtk_button_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_ATTACHMENT));
+    g_signal_connect(button, "clicked", G_CALLBACK(balsa_headers_attachments_popup), balsa_message);
 
     gtk_widget_set_tooltip_text(button, _("Select message part to display"));
 
@@ -1745,12 +1752,9 @@ display_content(BalsaMessage * balsa_message)
 
     balsa_message->parts_menu = g_menu_new();
 
-    balsa_message->parts_popup = libbalsa_popup_widget_new(NULL,
+    balsa_message->parts_popup = libbalsa_popup_widget_new(balsa_message->attach_button,
                                                            G_MENU_MODEL(balsa_message->parts_menu),
                                                            "message-menu");
-
-    gtk_menu_button_set_popover(GTK_MENU_BUTTON(balsa_message->attach_button),
-                                balsa_message->parts_popup);
 
     /* Populate the parts-menu */
     display_parts(balsa_message, libbalsa_message_get_body_list(balsa_message->message), NULL, NULL);

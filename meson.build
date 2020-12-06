@@ -462,7 +462,8 @@ if balsa_from_git
     '-DNM_DISABLE_DEPRECATED',
     '-DPANGO_DISABLE_DEPRECATED',
     ]
-  if get_option('optimization').to_int() >= 2
+  opt_level = get_option('optimization')
+  if opt_level == '2' or opt_level == '3'
     message('Add FORTIFY_SOURCE macro')
     args += [
       '-U_FORTIFY_SOURCE',

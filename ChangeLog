@@ -1,3 +1,8 @@
+2020-12-06  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	* meson.build: Define the FORTIFY_SOURCE macro only if the
+	  optimiztion level is at least 2.
+
 2020-11-01  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	main-window: Do not export balsa_window_fix_paned

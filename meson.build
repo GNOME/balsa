@@ -448,7 +448,7 @@ endif # more_warnings
 # extra warnings for GIT.
 #
 if balsa_from_git
-  args = compiler.get_supported_arguments([
+  args = [
     '-Werror',
     '-Wdeprecated-declarations',
     '-Wredundant-decls',
@@ -461,10 +461,15 @@ if balsa_from_git
     '-DGTK_DISABLE_DEPRECATED',
     '-DNM_DISABLE_DEPRECATED',
     '-DPANGO_DISABLE_DEPRECATED',
-    '-U_FORTIFY_SOURCE',
-    '-D_FORTIFY_SOURCE=2',
-  ])
-  add_global_arguments(args, language : 'c')
+    ]
+  if get_option('optimization').to_int() >= 2
+    message('Add FORTIFY_SOURCE macro')
+    args += [
+      '-U_FORTIFY_SOURCE',
+      '-D_FORTIFY_SOURCE=2',
+      ]
+  endif # get_option('optimization') >= 2
+  add_global_arguments(compiler.get_supported_arguments(args), language : 'c')
 endif # balsa_from_git
 
 ###########################################################################

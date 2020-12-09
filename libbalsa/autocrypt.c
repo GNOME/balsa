@@ -670,7 +670,7 @@ extract_ac_keydata(GMimeAutocryptHeader *autocrypt_header, ac_key_data_t *dest, 
 	gboolean success = FALSE;
 
 	keydata = g_mime_autocrypt_header_get_keydata(autocrypt_header);
-	if (keydata) {
+	if (keydata != NULL) {
 		gpgme_ctx_t ctx;
 
 		dest->keydata = g_bytes_get_data(keydata, &dest->keysize);
@@ -696,11 +696,14 @@ extract_ac_keydata(GMimeAutocryptHeader *autocrypt_header, ac_key_data_t *dest, 
 					if ((key != NULL) && (key->subkeys != NULL)) {
 						dest->fingerprint = g_strdup(key->subkeys->fpr);
 						dest->expires = key->subkeys->expires;
+					} else {
+						success = FALSE;
 					}
 				} else {
 					g_warning("Failed to import or list key data for '%s': %s (%u keys, %u bad)",
 						g_mime_autocrypt_header_get_address_as_string(autocrypt_header),
 						(gpg_error != NULL) ? gpg_error->message : "unknown", (keys != NULL) ? g_list_length(keys) : 0U, bad_keys);
+					success = FALSE;
 				}
 				g_clear_error(&gpg_error);
 

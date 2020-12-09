@@ -47,9 +47,6 @@ gboolean       libbalsa_regex_match_simple  (const gchar         *pattern,
                                              const gchar         *string,
                                              guint                compile_options,
                                              guint                match_options);
-gchar        **libbalsa_regex_split         (const LibBalsaRegex *regex,
-                                             const gchar         *string,
-                                             guint                options);
 gboolean       libbalsa_match_data_fetch_pos(LibBalsaMatchData   *match_data,
                                              gint                 match_num,
                                              gint                *start_pos,

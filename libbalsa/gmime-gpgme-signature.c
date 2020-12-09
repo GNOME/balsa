@@ -342,6 +342,34 @@ hex_decode(const gchar *hexstr)
     return result;
 }
 
+/*
+ * Simple parser: split the subject at every unescaped '=' or ','
+ */
+static char **
+split_subject(const char *subject)
+{
+    GPtrArray *result = g_ptr_array_new();
+    const char *p = subject;
+    const char *start = subject;
+
+    while (*p != '\0') {
+        int c = *p++;
+
+        if (c == '\\') {
+            if (*p != '\0')
+                p++;
+        } else if (c == '=' || c == ',') {
+            g_ptr_array_add(result, g_strndup(start, (p - start) - 1));
+            start = p;
+        }
+    }
+
+    g_ptr_array_add(result, g_strndup(start, p - start));
+    g_ptr_array_add(result, NULL);
+
+    return (char **) g_ptr_array_free(result, FALSE);
+}
+
 /** \brief Split a S/MIME certificate subject string into tokens
  *
  * \param subject certificate subject string
@@ -354,20 +382,12 @@ hex_decode(const gchar *hexstr)
  *
  * If the string starts with a '<', it contains an email address, and is returned untouched in the array.
  */
+
 static gchar **
 tokenize_subject(const gchar *subject,
 				 gboolean     unescape)
 {
-	static LibBalsaRegex *split_re = NULL;
-	static volatile guint initialized = 0U;
 	gchar **result;
-
-	/* create the reqular expression when called for teh first time */
-	if (g_atomic_int_or(&initialized, 1U) == 0U) {
-		/* split a DN string at unescaped ',' and '=' chars */
-		split_re = libbalsa_regex_new("(?<!\\\\)[,=]", 0, NULL);
-		g_assert(split_re != NULL);
-	}
 
 	/* catch empty string */
 	if (subject == NULL) {
@@ -380,7 +400,7 @@ tokenize_subject(const gchar *subject,
 		result[0] = g_strdup(subject);
 	} else {
 		/* split into (oid, value) pairs */
-		result = libbalsa_regex_split(split_re, subject, 0);
+		result = split_subject(subject);
 		if (result != NULL) {
 			gint n;
 

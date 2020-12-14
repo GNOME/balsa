@@ -131,6 +131,8 @@ folder_conf_response_thread(gpointer user_data)
             break;
         /* ...or fall over */
     default:
+        g_object_remove_weak_pointer(G_OBJECT(common_data->dialog),
+                                              (gpointer *) &common_data->dialog);
         g_idle_add((GSourceFunc) gtk_window_destroy, common_data->dialog);
         common_data->dialog = NULL;
         g_clear_object(&common_data->store);

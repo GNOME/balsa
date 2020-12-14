@@ -22,9 +22,8 @@
 #endif                          /* HAVE_CONFIG_H */
 #include "address-book-config.h"
 
-#include <gtk/gtk.h>
-
 #include "balsa-app.h"
+#include "file-chooser-button.h"
 #include <glib/gi18n.h>
 
 #if HAVE_MACOSX_DESKTOP
@@ -87,7 +86,7 @@ static GtkWidget *create_osmo_dialog(AddressBookConfig *abc);
 
 static void help_button_cb(AddressBookConfig * abc);
 static gboolean handle_close(AddressBookConfig * abc);
-static gboolean bad_path(GtkWindow * window, gint type);
+static gboolean bad_path(GtkWidget * window, gint type);
 static gboolean create_book(AddressBookConfig * abc);
 static void modify_book(AddressBookConfig * abc);
 
@@ -469,9 +468,10 @@ create_externq_dialog(AddressBookConfig * abc)
     gtk_widget_set_halign(label, GTK_ALIGN_END);
     gtk_grid_attach(GTK_GRID(grid), label, 0, 1, 1, 1);
     abc->ab_specific.externq.load =
-        gtk_file_chooser_button_new
-        (_("Select load program for address book"),
-         GTK_FILE_CHOOSER_ACTION_OPEN);
+        libbalsa_file_chooser_button_new(_("Select load program for address book"),
+                                         GTK_FILE_CHOOSER_ACTION_OPEN,
+                                         NULL,
+                                         NULL);
     gtk_widget_set_hexpand(abc->ab_specific.externq.load, TRUE);
     gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.externq.load,
                     1, 1, 1, 1);
@@ -482,9 +482,10 @@ create_externq_dialog(AddressBookConfig * abc)
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_grid_attach(GTK_GRID(grid), label, 0, 2, 1, 1);
     abc->ab_specific.externq.save =
-        gtk_file_chooser_button_new
-        (_("Select save program for address book"),
-         GTK_FILE_CHOOSER_ACTION_OPEN);
+        libbalsa_file_chooser_button_new(_("Select save program for address book"),
+                                         GTK_FILE_CHOOSER_ACTION_OPEN,
+                                         NULL,
+                                         NULL);
     gtk_widget_set_hexpand(abc->ab_specific.externq.save, TRUE);
     gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.externq.save,
                     1, 2, 1, 1);
@@ -497,11 +498,11 @@ create_externq_dialog(AddressBookConfig * abc)
         GFile *file;
 
         file = g_file_new_for_path(libbalsa_address_book_externq_get_load(ab_externq));
-        gtk_file_chooser_set_file(GTK_FILE_CHOOSER(GTK_FILE_CHOOSER(abc->ab_specific.externq.load)), file, NULL);
+        libbalsa_file_chooser_button_set_file(abc->ab_specific.externq.load, file);
         g_object_unref(file);
 
         file = g_file_new_for_path(libbalsa_address_book_externq_get_save(ab_externq));
-        gtk_file_chooser_set_file(GTK_FILE_CHOOSER(GTK_FILE_CHOOSER(abc->ab_specific.externq.save)), file, NULL);
+        libbalsa_file_chooser_button_set_file(abc->ab_specific.externq.save, file);
         g_object_unref(file);
     }
 
@@ -660,14 +661,13 @@ enum {
  *                      correct it.
  */
 static gboolean
-chooser_bad_path(GtkFileChooser * chooser, GtkWindow * window, gint type)
+file_bad_path(GFile     *file,
+              GtkWidget *window,
+              int        type)
 {
-    GFile *file;
     char *path;
 
-    file = gtk_file_chooser_get_file(chooser);
     path = g_file_get_path(file);
-    g_object_unref(file);
 
     if (path != NULL) {
         g_free(path);
@@ -678,27 +678,61 @@ chooser_bad_path(GtkFileChooser * chooser, GtkWindow * window, gint type)
 }
 
 static gboolean
+chooser_bad_path(GtkWidget *chooser,
+                 GtkWidget *window,
+                 int        type)
+{
+    GFile *file;
+    gboolean retval;
+
+    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(chooser));
+    retval = file_bad_path(file, window, type);
+    g_object_unref(file);
+
+    return retval;
+}
+
+static gboolean
+button_bad_path(GtkWidget *chooser,
+                GtkWidget *window,
+                int        type)
+{
+    GFile *file;
+    gboolean retval;
+
+    file = libbalsa_file_chooser_button_get_file(chooser);
+    retval = file_bad_path(file, window, type);
+    g_object_unref(file);
+
+    return retval;
+}
+
+static gboolean
 handle_close(AddressBookConfig * abc)
 {
     if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD) {
-        if (chooser_bad_path(GTK_FILE_CHOOSER(abc->window),
-                     GTK_WINDOW(abc->window),
-                     ADDRESS_BOOK_CONFIG_PATH_FILE))
+        if (chooser_bad_path(abc->window,
+                             abc->window,
+                             ADDRESS_BOOK_CONFIG_PATH_FILE)) {
             return FALSE;
+        }
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
-        if (chooser_bad_path(GTK_FILE_CHOOSER(abc->window),
-                     GTK_WINDOW(abc->window),
-                     ADDRESS_BOOK_CONFIG_PATH_FILE))
+        if (chooser_bad_path(abc->window,
+                             abc->window,
+                             ADDRESS_BOOK_CONFIG_PATH_FILE)) {
             return FALSE;
+        }
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ) {
-        if (chooser_bad_path(GTK_FILE_CHOOSER(abc->ab_specific.externq.load),
-                     GTK_WINDOW(abc->window),
-                     ADDRESS_BOOK_CONFIG_PATH_LOAD))
+        if (button_bad_path(abc->ab_specific.externq.load,
+                            abc->window,
+                            ADDRESS_BOOK_CONFIG_PATH_LOAD)) {
             return FALSE;
-        if (chooser_bad_path(GTK_FILE_CHOOSER(abc->ab_specific.externq.save),
-                     GTK_WINDOW(abc->window),
-                     ADDRESS_BOOK_CONFIG_PATH_SAVE))
+        }
+        if (button_bad_path(abc->ab_specific.externq.save,
+                            abc->window,
+                            ADDRESS_BOOK_CONFIG_PATH_SAVE)) {
             return FALSE;
+        }
     }
 
     if (abc->address_book == NULL)
@@ -717,7 +751,7 @@ handle_close(AddressBookConfig * abc)
 typedef struct {
     GMutex lock;
     GCond cond;
-    GtkWindow *window;
+    GtkWidget *window;
     int type;
     int clicked_button;
 } bad_path_data;
@@ -743,7 +777,7 @@ bad_path_idle(gpointer user_data)
     bad_path_data *data = user_data;
     GtkWidget *ask;
 
-    ask = gtk_message_dialog_new(data->window,
+    ask = gtk_message_dialog_new(GTK_WINDOW(data->window),
 				 GTK_DIALOG_MODAL|
 				 GTK_DIALOG_DESTROY_WITH_PARENT,
                                  GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
@@ -761,7 +795,7 @@ bad_path_idle(gpointer user_data)
 }
 
 static gboolean
-bad_path(GtkWindow * window, int type)
+bad_path(GtkWidget * window, int type)
 {
     bad_path_data data;
 

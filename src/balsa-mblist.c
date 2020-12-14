@@ -1665,7 +1665,7 @@ bmbl_dialog_response(GtkDialog *dialog,
 
     /* Maximizing a GtkDialog may not be possible, but we check anyway. */
     if (!gtk_window_is_maximized(window))
-        gtk_window_get_size(window, &balsa_app.mru_tree_width, &balsa_app.mru_tree_height);
+        gtk_window_get_default_size(window, &balsa_app.mru_tree_width, &balsa_app.mru_tree_height);
 
     gtk_window_destroy(window);
 }

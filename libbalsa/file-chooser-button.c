@@ -73,6 +73,8 @@ libbalsa_file_chooser_button_response(GtkDialog *dialog,
         gtk_button_set_label(GTK_BUTTON(data->button), basename);
         g_free(basename);
 
+        gtk_label_set_xalign(GTK_LABEL(gtk_button_get_child(GTK_BUTTON(data->button))), 0.0);
+
         if (data->response_cb != NULL)
             ((GFunc) data->response_cb)(data->button, data->response_data);
     }
@@ -161,6 +163,8 @@ libbalsa_file_chooser_button_set_file(GtkWidget *button, GFile *file)
     basename = g_file_get_basename(file);
     gtk_button_set_label(GTK_BUTTON(data->button), basename);
     g_free(basename);
+
+    gtk_label_set_xalign(GTK_LABEL(gtk_button_get_child(GTK_BUTTON(data->button))), 0.0);
 
     g_set_object(&data->file, file);
 }

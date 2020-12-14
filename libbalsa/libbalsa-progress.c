@@ -175,6 +175,7 @@ libbalsa_progress_dialog_ensure_real(ProgressDialog *progress_dialog,
     	progress_dialog->dialog = gtk_dialog_new_with_buttons(dialog_title, parent,
     		GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), _("_Hide"), GTK_RESPONSE_CLOSE, NULL);
         gtk_window_set_resizable(GTK_WINDOW(progress_dialog->dialog), FALSE);
+        gtk_window_set_default_size(GTK_WINDOW(progress_dialog->dialog), PROGRESS_DIALOG_WIDTH, 1);
         g_signal_connect(progress_dialog->dialog, "response", G_CALLBACK(progress_dialog_response_cb), NULL);
         g_signal_connect(progress_dialog->dialog, "destroy", G_CALLBACK(progress_dialog_destroy_cb), progress_dialog);
 
@@ -326,8 +327,6 @@ remove_progress_widget(progress_widget_data_t *progress_data)
 
 	if (rev_children == 0U)
 		gtk_window_destroy(GTK_WINDOW(parent_dialog));
-	else
-		gtk_window_resize(GTK_WINDOW(parent_dialog), PROGRESS_DIALOG_WIDTH, 1);
 
 	return FALSE;
 }

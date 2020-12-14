@@ -36,6 +36,8 @@ libbalsa_a_SOURCES = 		\
 	body.h			\
 	completion.c            \
 	completion.h            \
+        file-chooser-button.c   \
+        file-chooser-button.h   \
 	files.c			\
 	files.h			\
 	filter-error.c		\

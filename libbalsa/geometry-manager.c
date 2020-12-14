@@ -157,7 +157,7 @@ close_request_cb(GtkWindow *window,
 
     G_LOCK(geometry_hash);
     if (!size_item->maximized) {
-        gtk_window_get_size(window, &size_item->width, &size_item->height);
+        gtk_window_get_default_size(window, &size_item->width, &size_item->height);
     }
     G_UNLOCK(geometry_hash);
 

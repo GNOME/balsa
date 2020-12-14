@@ -22,6 +22,7 @@
 #endif                          /* HAVE_CONFIG_H */
 
 #include "balsa-app.h"
+#include "file-chooser-button.h"
 #include "filter-edit.h"
 #include "filter-funcs.h"
 #include "message.h"
@@ -411,7 +412,7 @@ build_action_page(GtkWindow * window)
                                     NULL);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog),
                                     GTK_RESPONSE_ACCEPT);
-    fe_sound_entry = gtk_file_chooser_button_new_with_dialog(dialog);
+    fe_sound_entry = libbalsa_file_chooser_button_new_with_dialog(dialog);
     gtk_widget_set_hexpand(fe_sound_entry, TRUE);
     gtk_grid_attach(GTK_GRID(grid), fe_sound_entry, 1, 0, 1, 1);
     /* fe_sound_entry is initially sensitive, so to be consistent

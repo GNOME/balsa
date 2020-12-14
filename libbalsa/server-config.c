@@ -23,6 +23,7 @@
 #endif                          /* HAVE_CONFIG_H */
 
 #include <glib/gi18n.h>
+#include "file-chooser-button.h"
 #include "misc.h"
 #include "server-config.h"
 
@@ -160,16 +161,19 @@ libbalsa_server_cfg_new(LibBalsaServer *server, const gchar *name)
     server_cfg->require_cert = server_cfg_add_check(server_cfg->advanced_grid, server_cfg->advanced_rows++, _("Server _requires client certificate"),
         libbalsa_server_get_client_cert(server), G_CALLBACK(on_server_cfg_changed), server_cfg);
 
-    server_cfg->cert_file = gtk_file_chooser_button_new(_("Choose Client Certificate"), GTK_FILE_CHOOSER_ACTION_OPEN);
+    server_cfg->cert_file =
+        libbalsa_file_chooser_button_new(_("Choose Client Certificate"),
+                                         GTK_FILE_CHOOSER_ACTION_OPEN,
+                                         G_CALLBACK(on_server_cfg_changed),
+                                         server_cfg);
     server_cfg_add_widget(server_cfg->advanced_grid, server_cfg->advanced_rows++, _("Certificate _File:"), server_cfg->cert_file);
 
     cert_file = libbalsa_server_get_cert_file(server);
     if (cert_file != NULL) {
         GFile *file = g_file_new_for_path(cert_file);
-        gtk_file_chooser_set_file(GTK_FILE_CHOOSER(server_cfg->cert_file), file, NULL);
+        libbalsa_file_chooser_button_set_file(server_cfg->cert_file, file);
         g_object_unref(file);
     }
-    g_signal_connect(server_cfg->cert_file, "file-set", G_CALLBACK(on_server_cfg_changed), server_cfg);
 
 	server_cfg->cert_pass = server_cfg_add_entry(server_cfg->advanced_grid, server_cfg->advanced_rows++, _("Certificate _Pass Phrase:"),
 		libbalsa_server_get_cert_passphrase(server), G_CALLBACK(on_server_cfg_changed), server_cfg);
@@ -303,7 +307,7 @@ libbalsa_server_cfg_assign_server(LibBalsaServerCfg *server_cfg, LibBalsaServer 
     /* client certificate */
     libbalsa_server_set_client_cert(server, gtk_check_button_get_active(GTK_CHECK_BUTTON(server_cfg->require_cert)));
 
-    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(server_cfg->cert_file));
+    file = libbalsa_file_chooser_button_get_file(server_cfg->cert_file);
     cert_file = g_file_get_path(file);
     g_object_unref(file);
 
@@ -435,10 +439,10 @@ on_server_cfg_changed(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
 
 	/* invalid configuration if a certificate is required, but no file name given */
 	if (sensitive) {
-            GFile *file;
-		gchar *cert_file;
+		GFile *file;
+		char *cert_file;
 
-                file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(server_cfg->cert_file));
+                file = libbalsa_file_chooser_button_get_file(server_cfg->cert_file);
                 cert_file = g_file_get_path(file);
                 g_object_unref(file);
 

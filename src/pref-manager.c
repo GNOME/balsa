@@ -26,6 +26,7 @@
 
 #include "balsa-app.h"
 #include "mailbox-conf.h"
+#include "file-chooser-button.h"
 #include "folder-conf.h"
 #include "main-window.h"
 #include "save-restore.h"
@@ -402,7 +403,7 @@ apply_prefs(GtkDialog * pbox)
                                 update_view_defaults, NULL);
 
 
-    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(pui->mail_directory));
+    file = libbalsa_file_chooser_button_get_file(pui->mail_directory);
     g_free(balsa_app.local_mail_directory);
     balsa_app.local_mail_directory = g_file_get_path(file);
     g_object_unref(file);
@@ -676,7 +677,7 @@ set_prefs(void)
                                  balsa_app.send_progress_dialog);
 
     file = g_file_new_for_path(balsa_app.local_mail_directory);
-    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(pui->mail_directory), file, NULL);
+    libbalsa_file_chooser_button_set_file(pui->mail_directory, file);
     g_object_unref(file);
 
     gtk_check_button_set_active(GTK_CHECK_BUTTON(pui->previewpane),
@@ -2058,8 +2059,10 @@ pm_grid_add_local_mail_group(GtkWidget * grid_widget)
     pm_grid_attach(grid, pm_group_label(_("Local mail directory")), 0, row, 3, 1);
 
     pui->mail_directory =
-        gtk_file_chooser_button_new(_("Select your local mail directory"),
-                                    GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+        libbalsa_file_chooser_button_new(_("Select your local mail directory"),
+                                         GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                         G_CALLBACK(properties_modified_cb),
+                                         property_box);
 
     pm_grid_attach(grid, pui->mail_directory, 1, ++row, 2, 1);
     pm_grid_set_next_row(grid, ++row);
@@ -3262,37 +3265,6 @@ create_display_section(GtkTreeStore * store,
  * End of sections
  */
 
-/*
- * Idle handler for open_preferences_manager
- */
-
-static gboolean
-open_preferences_manager_idle(void)
-{
-    GFile *file;
-    char *name;
-
-    if (pui == NULL) {
-        return FALSE;
-    }
-
-    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(pui->mail_directory));
-    name = g_file_get_path(file);
-    g_object_unref(file);
-
-    if (g_strcmp0(name, balsa_app.local_mail_directory) != 0) {
-        /* Chooser still hasn't been initialized. */
-        g_free(name);
-        return TRUE;
-    }
-    g_free(name);
-
-    g_signal_connect(pui->mail_directory, "file-set",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    return FALSE;
-}                               /* open_preferences_manager_idle */
-
 /****************
  *
  * Public methods
@@ -3438,11 +3410,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                      G_CALLBACK(properties_modified_cb), property_box);
 #endif                          /* !(HAVE_GSPELL || HAVE_GTKSPELL) */
 
-    /* Connect signal in an idle handler, after the file chooser has
-     * been initialized. */
-    g_idle_add_full(G_PRIORITY_LOW,
-                    (GSourceFunc) open_preferences_manager_idle,
-                    NULL, NULL);
     g_signal_connect(pui->check_mail_auto, "toggled",
                      G_CALLBACK(timer_modified_cb), property_box);
 

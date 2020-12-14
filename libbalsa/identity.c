@@ -23,6 +23,7 @@
 #include "identity.h"
 
 #include "rfc3156.h"
+#include "file-chooser-button.h"
 #include "libbalsa.h"
 #include "information.h"
 #include "libbalsa-conf.h"
@@ -1157,8 +1158,6 @@ static void
 file_chooser_check_cb(GtkCheckButton * button, GtkWidget * chooser)
 {
     gtk_widget_set_sensitive(chooser, gtk_check_button_get_active(button));
-    /* Force validation of current path, if any. */
-    g_signal_emit_by_name(chooser, "file-set");
 }
 
 static void
@@ -1278,7 +1277,7 @@ file_chooser_cb(GtkWidget * chooser, gpointer data)
     GtkCheckButton *check;
     gboolean active;
 
-    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(chooser));
+    file = libbalsa_file_chooser_button_get_file(chooser);
     filename = g_file_get_path(file);
     g_object_unref(file);
 
@@ -1316,20 +1315,22 @@ ident_dialog_add_file_chooser_button(GtkWidget * grid, gint row,
         gtk_check_button_new_with_mnemonic(_(path_info[type].mnemonic));
     gtk_grid_attach(GTK_GRID(grid), check, 0, row, 1, 1);
 
-    filename =
-        g_build_filename(g_get_home_dir(), path_info[type].basename, NULL);
     title = g_strdup_printf("Choose %s file", _(path_info[type].info));
-    button = gtk_file_chooser_button_new(title,
-                                         GTK_FILE_CHOOSER_ACTION_OPEN);
+    button = libbalsa_file_chooser_button_new(title,
+                                              GTK_FILE_CHOOSER_ACTION_OPEN,
+                                              G_CALLBACK(file_chooser_cb),
+                                              dialog);
     g_free(title);
 
+    filename =
+        g_build_filename(g_get_home_dir(), path_info[type].basename, NULL);
     file = g_file_new_for_path(filename);
     g_free(filename);
-    gtk_file_chooser_set_file(GTK_FILE_CHOOSER(button), file, NULL);
+
+    libbalsa_file_chooser_button_set_file(button, file);
     g_object_unref(file);
 
     gtk_widget_set_hexpand(button, TRUE);
-    gtk_widget_set_vexpand(button, TRUE);
     gtk_grid_attach(GTK_GRID(grid), button, 1, row, 1, 1);
 
     g_object_set_data(G_OBJECT(dialog), path_info[type].path_key, button);
@@ -1338,8 +1339,6 @@ ident_dialog_add_file_chooser_button(GtkWidget * grid, gint row,
                       GUINT_TO_POINTER(type));
     g_signal_connect(check, "toggled",
                      G_CALLBACK(file_chooser_check_cb), button);
-    g_signal_connect(button, "file-set",
-                     G_CALLBACK(file_chooser_cb), dialog);
 }
 
 static void
@@ -1541,7 +1540,7 @@ ident_dialog_get_path(GObject * dialog, const char * key)
     if (!gtk_widget_get_sensitive(chooser))
         return NULL;
 
-    file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(chooser));
+    file = libbalsa_file_chooser_button_get_file(chooser);
     path = g_file_get_path(file);
     g_object_unref(file);
 
@@ -1921,7 +1920,7 @@ display_frame_set_path(GObject *dialog,
     if (set) {
         if (use_chooser) {
             GFile *file = g_file_new_for_path(value);
-            gtk_file_chooser_set_file(GTK_FILE_CHOOSER(chooser), file, NULL);
+            libbalsa_file_chooser_button_set_file(chooser, file);
             g_object_unref(file);
         } else {
             gtk_editable_set_text(GTK_EDITABLE(chooser), value);

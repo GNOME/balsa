@@ -61,10 +61,11 @@ imap_authenticate(ImapMboxHandle* handle)
 
   for(authenticator = imap_authenticators_arr;
       *authenticator; authenticator++) {
+    if (!imap_mbox_is_connected(handle)) { return IMAP_AUTH_CANCELLED; }
     if ((r = (*authenticator)(handle)) 
         != IMAP_AUTH_UNAVAIL) {
       if (r == IMAP_SUCCESS)
-	imap_mbox_handle_set_state(handle, IMHS_AUTHENTICATED);
+        imap_mbox_handle_set_state(handle, IMHS_AUTHENTICATED);
       return r;
     }
   }

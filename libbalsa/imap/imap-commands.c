@@ -110,36 +110,28 @@ need_fetch_view_set(unsigned i, struct fetch_data_set* fd)
 
 
 /* 6.1.1 CAPABILITY Command */
-/* imap_check_capability: make sure we can log in to this server. */
-static gboolean
-imap_check_capability(ImapMboxHandle* handle)
-{
-  IMAP_REQUIRED_STATE3_U(handle, IMHS_CONNECTED, IMHS_AUTHENTICATED,
-                       IMHS_SELECTED, FALSE);
-  if (imap_cmd_exec(handle, "CAPABILITY") != IMR_OK)
-    return FALSE;
-
-  if (!(imap_mbox_handle_can_do(handle, IMCAP_IMAP4) ||
-        imap_mbox_handle_can_do(handle, IMCAP_IMAP4REV1))) {
-    g_warning("IMAP4rev1 required but not provided.");
-    return FALSE;
-  }  
-  return TRUE;
-}
-
 int
 imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap)
 {
+  IMAP_REQUIRED_STATE3_U(handle, IMHS_CONNECTED, IMHS_AUTHENTICATED,
+                         IMHS_SELECTED, IMR_BAD);
   if(cap == IMCAP_FETCHBODY)
     return handle->can_fetch_body;
 
   /* perhaps it already has capabilities? */
-  if(!handle->has_capabilities)
-    imap_check_capability(handle);
+  if(!handle->has_capabilities) {
+    /* If we request CAPABILITY, we have the definitive answer
+     * regardless of the response.
+     */
+    handle->has_capabilities = TRUE;
+    imap_cmd_exec(handle, "CAPABILITY");
+    if (!(handle->capabilities[IMCAP_IMAP4] ||
+          handle->capabilities[IMCAP_IMAP4REV1])) {
+      g_warning("IMAP4rev1 required but not provided.");
+    }
+  }
 
-  if(cap<IMCAP_MAX)
-    return handle->capabilities[cap];
-  else return 0;
+  return (cap<IMCAP_MAX) ? handle->capabilities[cap] : 0;
 }
 
 

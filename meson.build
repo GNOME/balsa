@@ -1,7 +1,7 @@
 project('balsa', 'c',
         version         : '2.6.1',
         meson_version   : '>= 0.50.0',
-        default_options : ['sysconfdir=/etc', 'optimization=2'])
+        default_options : ['sysconfdir=/etc', 'buildtype=debugoptimized'])
 
 # if meson is used not in a git source tree, use project version:
 balsa_version = meson.project_version()

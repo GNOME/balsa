@@ -1,3 +1,17 @@
+* Balsa-2.6.2 release. Release date 2020-12-21
+
+- Webkit widgets are now sandboxed.
+- Improved desktop notifications.
+- iTIP calendar reply are improved.
+- Handling of multiple crypto keys for the same recipient.
+- build cleanups and improvements, e.g. application logging.
+- code cleanups and simplifications as enabled by moving to more modern
+  libraries.
+- bug fixes: draft with message/external-body attachments; 
+  do not crash on importing half-broken keys
+- improved translations.
+
+
 * Balsa-2.6.1 release. Release date 2020-05-10
 
 - fix server identity verification.

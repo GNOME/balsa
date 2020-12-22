@@ -546,10 +546,7 @@ bw_create_index_widget(BalsaWindow *bw)
     g_signal_connect(priv->sos_entry, "notify::has-focus",
                      G_CALLBACK(bw_check_filter), bw);
 
-    button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button),
-                      gtk_image_new_from_icon_name("gtk-ok",
-                                                    GTK_ICON_SIZE_BUTTON));
+    button = gtk_button_new_from_icon_name("gtk-ok", GTK_ICON_SIZE_BUTTON);
     g_signal_connect(priv->sos_entry, "icon-release",
                      G_CALLBACK(bw_sos_icon_release), button);
 

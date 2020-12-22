@@ -112,6 +112,8 @@ libbalsa_a_SOURCES = 		\
 	mime-stream-shared.h    \
 	misc.c			\
 	misc.h			\
+	oauth2.c		\
+	oauth2.h		\
 	rfc2445.c		\
 	rfc2445.h		\
 	rfc3156.c		\

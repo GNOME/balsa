@@ -132,6 +132,24 @@ net_client_get_host(NetClient *client)
 }
 
 
+GNetworkAddress *
+net_client_get_remote_address(NetClient *client)
+{
+	GNetworkAddress *result;
+
+	if (NET_IS_CLIENT(client)) {
+		const NetClientPrivate *priv;
+
+		/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+		priv = net_client_get_instance_private(client);
+		result = G_NETWORK_ADDRESS(priv->remote_address);
+	} else {
+		result = NULL;
+	}
+	return result;
+}
+
+
 gboolean
 net_client_connect(NetClient *client, GError **error)
 {

@@ -2015,9 +2015,11 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     envelope = imsg->envelope;
     libbalsa_message_set_subject_from_header(message, envelope->subject);
 
-    sender = internet_address_new_list_from_imap_address_list(envelope->sender);
-    libbalsa_message_set_sender(message, sender);
-    g_object_unref(sender);
+    if (envelope->sender) {
+        sender = internet_address_new_list_from_imap_address_list(envelope->sender);
+		libbalsa_message_set_sender(message, sender);
+		g_object_unref(sender);
+	}
 
     libbalsa_message_set_in_reply_to_from_string(message, envelope->in_reply_to);
     if (envelope->message_id != NULL) {

@@ -185,7 +185,7 @@ libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
     }
     names=g_slist_reverse(names);
     /* Second we construct the vector of gchar * */
-    filters_names = g_new(gchar *, nb_filters);
+    filters_names = g_new(gchar *, nb_filters + 1);
     lst = names;
     for(i = 0; i < nb_filters; i++) {
 	filters_names[i] = (gchar*) lst->data;
@@ -204,9 +204,7 @@ libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
     }
     libbalsa_conf_set_vector(MAILBOX_FILTERS_WHEN_KEY,nb_filters,
                              (const gchar **) filters_names);
-    for (i = 0; i < nb_filters; i++)
-	g_free(filters_names[i]);
-    g_free(filters_names);
+    g_strfreev(filters_names);
 }
 
 /* Temporary code for transition from 2.0.x */

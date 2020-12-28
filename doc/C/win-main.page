@@ -193,7 +193,7 @@ id="win-main">
               <gui> Edit</gui>
               <gui> Copy</gui>
             </guiseq>
-            <keyseq><key>Ctrl></key><key>C</key></keyseq> &mdash;
+            <keyseq><key>Ctrl</key><key>C</key></keyseq> &mdash;
             Copy selected text to the clipboard.</p>
           </item>
           <item>

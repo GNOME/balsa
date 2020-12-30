@@ -37,7 +37,10 @@
 typedef struct _keyserver_op_t {
 	gpgme_ctx_t gpgme_ctx;
 	gchar *fingerprint;
+	gpgme_key_t imported_key;
 	GtkWindow *parent;
+	GtkMessageType msg_type;
+	gchar *message;
 } keyserver_op_t;
 
 
@@ -51,9 +54,6 @@ static inline gboolean check_key(const gpgme_key_t key,
 								 gboolean          on_keyserver,
 								 gint64            now);
 static gpointer gpgme_keyserver_run(gpointer user_data);
-static GtkWidget *gpgme_keyserver_do_import(keyserver_op_t *keyserver_op,
-	  	  	  	  	  	  	  	  	  	    gpgme_key_t     key)
-	G_GNUC_WARN_UNUSED_RESULT;
 static gboolean gpgme_import_key(gpgme_ctx_t   ctx,
 								 gpgme_key_t   key,
 								 gchar       **import_info,
@@ -454,8 +454,8 @@ check_key(const gpgme_key_t key,
  * \return always NULL
  *
  * Use the passed key server thread data to call libbalsa_gpgme_list_keys().  On success, check if exactly \em one key has been
- * returned and call gpgme_keyserver_do_import() as to import or update it in this case.  Call show_keyserver_dialog() as idle
- * callback to present the user the results.
+ * returned and call gpgme_import_key() as to import or update it in this case.  Call show_keyserver_dialog() as idle callback to
+ * present the user the results.
  */
 static gpointer
 gpgme_keyserver_run(gpointer user_data)
@@ -467,72 +467,43 @@ gpgme_keyserver_run(gpointer user_data)
 
 	result = libbalsa_gpgme_list_keys(keyserver_op->gpgme_ctx, &keys, NULL, keyserver_op->fingerprint, FALSE, TRUE, FALSE, &error);
 	if (result) {
-		GtkWidget *dialog;
-
 		if (keys == NULL) {
-			dialog = gtk_message_dialog_new(keyserver_op->parent,
-				GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-				_("Cannot find a key with fingerprint %s on the key server."), keyserver_op->fingerprint);
+			keyserver_op->msg_type = GTK_MESSAGE_INFO;
+			keyserver_op->message =
+				g_strdup_printf(_("Cannot find a key with fingerprint %s on the key server."), keyserver_op->fingerprint);
 		} else if (keys->next != NULL) {
+			guint key_cnt;
+
 			/* more than one key found */
-			dialog = gtk_message_dialog_new(keyserver_op->parent,
-				GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE,
+			key_cnt = g_list_length(keys);
+			keyserver_op->msg_type = GTK_MESSAGE_WARNING;
+			keyserver_op->message = g_strdup_printf(
 				ngettext("Found %u key with fingerprint %s on the key server. Please check and import the proper key manually.",
 				         "Found %u keys with fingerprint %s on the key server. Please check and import the proper key manually.",
-				         g_list_length(keys)),
-				g_list_length(keys), keyserver_op->fingerprint);
+						 key_cnt), key_cnt, keyserver_op->fingerprint);
 		} else {
-			dialog = gpgme_keyserver_do_import(keyserver_op, (gpgme_key_t) keys->data);
+			gboolean import_res;
+
+			import_res = gpgme_import_key(keyserver_op->gpgme_ctx, (gpgme_key_t) keys->data, &keyserver_op->message,
+				&keyserver_op->imported_key, &error);
+			if (!import_res) {
+				keyserver_op->msg_type = GTK_MESSAGE_ERROR;
+				g_free(keyserver_op->message);
+				keyserver_op->message = g_strdup(error->message);
+				g_error_free(error);
+			} else {
+				keyserver_op->msg_type = GTK_MESSAGE_INFO;
+			}
 		}
 		g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
-		g_idle_add(show_keyserver_dialog, dialog);
+		g_idle_add(show_keyserver_dialog, keyserver_op);	/* idle callback will free the data */
 	} else {
 		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Searching the key server failed: %s"), error->message);
 		g_error_free(error);
+		keyserver_op_free(keyserver_op);
 	}
-	keyserver_op_free(keyserver_op);
 
 	return NULL;
-}
-
-
-/** \brief Import a key
- *
- * \param keyserver_op key server thread data
- * \param key the key which shall be imported
- * \return a GtkDialog with information about the import
- *
- * Run gpgme_import_key() and create a dialogue either containing an error message on error, or the import data and the key details
- * on success.
- */
-static GtkWidget *
-gpgme_keyserver_do_import(keyserver_op_t *keyserver_op,
-						  gpgme_key_t     key)
-{
-	GtkWidget *dialog;
-	gboolean import_res;
-	gchar *import_msg = NULL;
-	GError *error = NULL;
-	gpgme_key_t imported_key = NULL;
-
-	import_res = gpgme_import_key(keyserver_op->gpgme_ctx, key, &import_msg, &imported_key, &error);
-	if (!import_res) {
-		dialog = gtk_message_dialog_new(keyserver_op->parent, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-			GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", error->message);
-		g_error_free(error);
-	} else {
-		if (imported_key == NULL) {
-			dialog = gtk_message_dialog_new(keyserver_op->parent, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-				GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "%s", import_msg);
-		} else {
-			dialog = libbalsa_key_dialog(keyserver_op->parent, GTK_BUTTONS_CLOSE, imported_key, GPG_SUBKEY_CAP_ALL,
-				NULL, import_msg);
-			gpgme_key_unref(imported_key);
-		}
-		g_free(import_msg);
-	}
-
-	return dialog;
 }
 
 
@@ -602,6 +573,8 @@ gpgme_import_res_to_gchar(gpgme_import_result_t import_result)
 
 	if (import_result->considered == 0) {
 		import_info = g_strdup(_("No key was imported or updated."));
+	} else if (import_result->considered == import_result->no_user_id) {
+		import_info = g_strdup(_("The key was ignored because it does not have a user ID."));
 	} else {
 		if (import_result->imported != 0) {
 			import_info = g_strdup(_("The key was imported into the local key ring."));
@@ -641,20 +614,32 @@ gpgme_import_res_to_gchar(gpgme_import_result_t import_result)
 }
 
 
-/** \brief Display a dialogue
+/** \brief Display a dialogue with the result of the key server operation
  *
- * \param user_data dialogue widget, cast'ed to GtkWidget *
+ * \param user_data key server thread data, cast'ed to \ref keyserver_op_t *
  * \return always FALSE
  *
- * This helper function, called as idle callback, just shows the passed dialogue.
+ * This helper function, called as idle callback, creates either a key dialogue created by calling libbalsa_key_dialog(), or just
+ * a message dialogue of type \ref keyserver_op_t::msg_type if \ref keyserver_op_t::imported_key is NULL.  After running the
+ * dialogue, the passed key server thread data is freed by calling keyserver_op_free().
  */
 static gboolean
 show_keyserver_dialog(gpointer user_data)
 {
-	GtkWidget *dialog = GTK_WIDGET(user_data);
+	GtkWidget *dialog;
+	keyserver_op_t *keyserver_op = (keyserver_op_t *) user_data;
 
-    gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
+	if (keyserver_op->imported_key != NULL) {
+		dialog = libbalsa_key_dialog(keyserver_op->parent, GTK_BUTTONS_CLOSE, keyserver_op->imported_key, GPG_SUBKEY_CAP_ALL, NULL,
+			keyserver_op->message);
+	} else {
+		dialog = gtk_message_dialog_new(keyserver_op->parent, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+			keyserver_op->msg_type, GTK_BUTTONS_CLOSE, "%s", keyserver_op->message);
+	}
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+    keyserver_op_free(keyserver_op);
+
 	return FALSE;
 }
 
@@ -669,10 +654,14 @@ static void
 keyserver_op_free(keyserver_op_t *keyserver_op)
 {
 	if (keyserver_op != NULL) {
+		if (keyserver_op->imported_key != NULL) {
+			gpgme_key_unref(keyserver_op->imported_key);
+		}
 		if (keyserver_op->gpgme_ctx != NULL) {
 			gpgme_release(keyserver_op->gpgme_ctx);
 		}
 		g_free(keyserver_op->fingerprint);
+		g_free(keyserver_op->message);
 		g_free(keyserver_op);
 	}
 }

@@ -260,67 +260,50 @@ vcard_charset_to_utf8(gchar * str, const gchar * charset)
 /* mainly copied from g_strsplit, but (a) with the fixed delimiter ';'
  * (b) ignoring '\;' sequences (c) always returning as many elements as
  * possible and (d) unescape '\;' sequences in the resulting array */
-static gchar **
-vcard_strsplit(const gchar * string)
+static char **
+vcard_strsplit(const char *string)
 {
-    GSList *string_list = NULL, *slist;
-    gchar **str_array, *s;
-    guint n = 0;
-    const gchar *remainder;
+    GPtrArray *string_list;
+    char *s;
+    const char *remainder;
+    char **str;
 
-    g_return_val_if_fail(string != NULL, NULL);
-
+    string_list = g_ptr_array_new();
     remainder = string;
     s = strchr(remainder, ';');
-    while (s && s > remainder && s[-1] == '\\')
+    while (s != NULL && s > remainder && s[-1] == '\\')
 	s = strchr(s + 1, ';');
 
-    while (s) {
+    while (s != NULL) {
 	gsize len;
 
 	len = s - remainder;
         /* skip empty fields: */
-        if (len > 0) {
-            string_list =
-                g_slist_prepend(string_list, g_strndup(remainder, len));
-            n++;
-        }
+        if (len > 0)
+            g_ptr_array_add(string_list, g_strndup(remainder, len));
 	remainder = s + 1;
 	s = strchr(remainder, ';');
-	while (s && s > remainder && s[-1] == '\\')
+        while (s != NULL && s > remainder && s[-1] == '\\')
 	    s = strchr(s + 1, ';');
     }
 
-    if (*string) {
-	n++;
-	string_list = g_slist_prepend(string_list, g_strdup(remainder));
+    if (*string != '\0')
+        g_ptr_array_add(string_list, g_strdup(remainder));
+
+    /* NULL-terminate, and NULL-pad to 5 entries if necessary: */
+    do {
+        g_ptr_array_add(string_list, NULL);
+    } while (string_list->len < 5);
+
+    for (str = (char **) string_list->pdata; *str != NULL; str++) {
+        char *p;
+
+        /* Unescape any escaped ';': */
+        while ((p = strstr(*str, "\\;")) != NULL)
+            memmove(p, p + 1, strlen(p + 1) + 1);
     }
 
-    if (n < 5U) {
-    	str_array = g_new0(gchar*, 5U);
-    } else {
-    	str_array = g_new0(gchar*, n + 1);
-    }
-
-    for (slist = string_list; slist; slist = slist->next) {
-	gchar * str = (gchar *) slist->data;
-	gchar * p;
-
-	while ((p = strstr(str, "\\;"))) {
-	    gchar * newstr = g_malloc(strlen(str));
-
-	    strncpy(newstr, str, p - str);
-	    strcpy(newstr + (p - str), p + 1);
-	    g_free(str);
-	    str = newstr;
-	}
-	str_array[--n] = str;
-    }
-    g_assert(n == 0);
-
-    g_slist_free(string_list);
-
-    return str_array;
+    return (char **) g_ptr_array_free(string_list, FALSE);
 }
 
 /*

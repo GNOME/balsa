@@ -256,8 +256,7 @@ lbav_entry_setup_matches(LibBalsaAddressView * address_view,
     if (*prefix)
         match = lbav_get_matching_addresses(address_view, prefix, type);
     lbav_append_addresses(address_view, completion, match, prefix);
-    g_list_foreach(match, (GFunc) g_object_unref, NULL);
-    g_list_free(match);
+    g_list_free_full(match, g_object_unref);
 }
 
 /*

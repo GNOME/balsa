@@ -170,41 +170,24 @@ libbalsa_mailbox_filters_load_config(LibBalsaMailbox* mbox)
 void
 libbalsa_mailbox_filters_save_config(LibBalsaMailbox * mbox)
 {
-    gint i, nb_filters = 0;
-    gchar **filters_names;
-    GSList *fil, *names = NULL, *lst;
+    GSList *filters = libbalsa_mailbox_get_filters(mbox);
+    GPtrArray *names;
+    GSList *fil;
 
-    /* First we construct a list containing the names of associated filters
-     * Note : in all the following we never copy the filters name, so we don't have to (and me must not!) free any gchar *
-     * That's why we only free g_slist and gchar **
-     */
-    for (fil = libbalsa_mailbox_get_filters(mbox); fil != NULL; fil = fil->next) {
-	names=g_slist_prepend(names,
-                              ((LibBalsaMailboxFilter*)fil->data)->actual_filter->name);
-	nb_filters++;
-    }
-    names=g_slist_reverse(names);
-    /* Second we construct the vector of gchar * */
-    filters_names = g_new0(gchar *, nb_filters + 1);
-    lst = names;
-    for(i = 0; i < nb_filters; i++) {
-	filters_names[i] = (gchar*) lst->data;
-	lst = lst->next;
-    }
-    g_slist_free(names);
-    libbalsa_conf_set_vector(MAILBOX_FILTERS_KEY, nb_filters,
-                             (const gchar **) filters_names);
+    names = g_ptr_array_new();
 
-    fil = libbalsa_mailbox_get_filters(mbox);
-    for (i = 0; i < nb_filters; i++) {
-	filters_names[i]=
-            g_strdup_printf("%d",
-                            ((LibBalsaMailboxFilter*)fil->data)->when);
-	fil = fil->next;
-    }
-    libbalsa_conf_set_vector(MAILBOX_FILTERS_WHEN_KEY,nb_filters,
-                             (const gchar **) filters_names);
-    g_strfreev(filters_names);
+    for (fil = filters; fil != NULL; fil = fil->next)
+        g_ptr_array_add(names, ((LibBalsaMailboxFilter*)fil->data)->actual_filter->name);
+    libbalsa_conf_set_vector(MAILBOX_FILTERS_KEY, names->len, (const char **) names->pdata);
+
+    g_ptr_array_set_size(names, 0);
+    g_ptr_array_set_free_func(names, g_free);
+
+    for (fil = filters; fil != NULL; fil = fil->next)
+        g_ptr_array_add(names, g_strdup_printf("%d", ((LibBalsaMailboxFilter*)fil->data)->when));
+    libbalsa_conf_set_vector(MAILBOX_FILTERS_WHEN_KEY, names->len, (const char **) names->pdata);
+
+    g_ptr_array_free(names, TRUE);
 }
 
 /* Temporary code for transition from 2.0.x */

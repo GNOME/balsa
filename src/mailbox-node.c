@@ -197,14 +197,14 @@ balsa_mailboxes_append_children(GtkTreeModel *model, GtkTreeIter *parent,
 
     if (!gtk_tree_model_iter_children(model, &child, parent))
 	return;
+
     do {
         BalsaMailboxNode *mbnode;
         gchar *str;
 
         gtk_tree_model_get(model, &child, 0, &mbnode, -1);
-        g_return_if_fail(mbnode->server);
-        if(mbnode->mailbox) {
-            const char *path = 
+        if (mbnode->mailbox != NULL) {
+            const char *path =
                 libbalsa_mailbox_imap_get_path
                 (LIBBALSA_MAILBOX_IMAP(mbnode->mailbox));
 
@@ -218,35 +218,32 @@ balsa_mailboxes_append_children(GtkTreeModel *model, GtkTreeIter *parent,
         g_object_unref(mbnode);
 
         balsa_mailboxes_append_children(model, &child, children_names);
-    } while(gtk_tree_model_iter_next(model, &child));
+    } while (gtk_tree_model_iter_next(model, &child));
 }
 
 static void
 balsa_mailbox_node_real_save_config(BalsaMailboxNode* mn, const gchar * group)
 {
-    GPtrArray *children_names;
     GtkTreeIter iter;
-    
-    g_return_if_fail(!mn->parent);
 
-    if(mn->name)
+    if(mn->name != NULL)
 	g_debug("Saving mailbox node %s with group %s", mn->name, group);
     libbalsa_imap_server_save_config(LIBBALSA_IMAP_SERVER(mn->server));
     libbalsa_conf_set_string("Name",      mn->name);
     libbalsa_conf_set_string("Directory", mn->dir);
     libbalsa_conf_set_bool("Subscribed",  mn->subscribed);
     libbalsa_conf_set_bool("ListInbox",   mn->list_inbox);
-    
+
     if (balsa_find_iter_by_data(&iter, mn)) {
+        GPtrArray *children_names;
         GtkTreeModel *model = GTK_TREE_MODEL(balsa_app.mblist_tree_store);
 
-        children_names = g_ptr_array_new();
+        children_names = g_ptr_array_new_with_free_func(g_free);
         balsa_mailboxes_append_children(model, &iter,
                                         children_names);
         g_debug("Saving %d children", children_names->len);
         libbalsa_conf_set_vector("Children", children_names->len,
                                  (const char*const*)(children_names->pdata));
-        g_ptr_array_foreach(children_names, (GFunc)g_free, NULL);
         g_ptr_array_free(children_names, TRUE);
     }
 

@@ -41,10 +41,6 @@
 #endif                          /* defined(HAVE_LIBSECRET) */
 
 
-/* define the following to enable verbose HTTP (soup) session logging */
-#define HTTP_VERBOSE			1
-
-
 /** Web page template for displaying a message in the web browser that the authorisation code has been received. */
 #define OAUTH_AUTH_DONE_TEMPLATE													\
 	"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n"			\
@@ -126,13 +122,27 @@ static const oauth2_provider_t providers[] = {
 		// FIXME - Thunderbird client id & secret
 		.id            = "yahoo.com",
 		.display_name  = "Yahoo Mail",
-		.email_re      = "^.*@yahoo\\.[a-z]{2,3}$",						// FIXME - are there more?
+		.email_re      = "^.*@yahoo\\.[a-z.]+$",						// FIXME - are there more?
 		.client_id     = "dj0yJmk9NUtCTWFMNVpTaVJmJmQ9WVdrOVJ6UjVTa2xJTXpRbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD0yYw--",
 		.client_secret = "f2de6a30ae123cdbc258c15e0812799010d589cc",
 		.auth_uri      = "https://api.login.yahoo.com/oauth2/request_auth",
 		.token_uri     = "https://api.login.yahoo.com/oauth2/get_token",
 		.scope         = "mail-w",
-		.oob_mode      = TRUE }
+		.oob_mode      = TRUE },
+	{	/*
+		 * Microsoft Accounts: see
+	     * https://docs.microsoft.com/en-us/Exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
+	     */
+		.id            = "outlook.com",
+		.display_name  = "Microsoft",
+		.email_re      = "^.*@(outlook|hotmail)(\\.com)?\\.[a-z]{2,3}$",	// FIXME - are there more?
+		.client_id     = "04a18be9-b37c-43a4-a58e-9c251ba1eb5b",
+		.client_secret = NULL,
+		.auth_uri      = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+		.token_uri     = "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+		.scope         = "https://outlook.office.com/IMAP.AccessAsUser.All https://outlook.office.com/POP.AccessAsUser.All "
+						 "https://outlook.office.com/SMTP.Send offline_access",
+		.oob_mode      = FALSE }
 };
 
 
@@ -166,9 +176,11 @@ static const oauth2_provider_t *libbalsa_oauth2_find_provider(const gchar *mailb
 #if defined(HAVE_LIBSECRET)
 static void load_oauth2_token_libsecret(LibBalsaOauth2 *oauth);
 static void save_oauth2_token_libsecret(const LibBalsaOauth2 *oauth);
+static void erase_oauth2_token_libsecret(const LibBalsaOauth2 *oauth);
 #endif  /* defined(HAVE_LIBSECRET) */
 static void load_oauth2_token_config(LibBalsaOauth2 *oauth);
 static void save_oauth2_token_config(const LibBalsaOauth2 *oauth);
+static void erase_oauth2_token_config(const LibBalsaOauth2 *oauth);
 
 static gboolean oauth2_refresh(LibBalsaOauth2  *oauth,
 							   GError         **error);
@@ -463,6 +475,30 @@ save_oauth2_token_libsecret(const LibBalsaOauth2 *oauth)
 	}
 }
 
+
+/** @brief Remove OAuth2 tokens from the Secret Service
+ *
+ * @param[in] oauth OAuth2 context
+ *
+ * Remove all information of the passed OAuth2 object from the Secret Service.
+ */
+static void
+erase_oauth2_token_libsecret(const LibBalsaOauth2 *oauth)
+{
+	gboolean result;
+	GError *error = NULL;
+
+	result =
+		secret_password_clear_sync(&oauth2_schema, NULL, &error, "provider", oauth->provider->id, "user", oauth->account, NULL);
+	if (!result) {
+		g_warning("%s: cannot remove OAuth2 token for %s/%s from secret service: %s", __func__, oauth->account,
+			oauth->provider->id, (error != NULL) ? error->message : "unknown");
+		g_clear_error(&error);
+	} else {
+		g_debug("%s: removed token for %s/%s from secret service", __func__, oauth->account, oauth->provider->id);
+	}
+}
+
 #endif  /* defined(HAVE_LIBSECRET) */
 
 
@@ -518,6 +554,27 @@ save_oauth2_token_config(const LibBalsaOauth2 *oauth)
 }
 
 
+/** @brief Remove OAuth2 tokens from the private config file
+ *
+ * @param[in] oauth OAuth2 context
+ *
+ * Remove all information of the passed OAuth2 object from the local private configuration file.
+ */
+static void
+erase_oauth2_token_config(const LibBalsaOauth2 *oauth)
+{
+	GChecksum *hash;
+	const gchar *group_name;
+
+	hash = g_checksum_new(G_CHECKSUM_SHA256);
+	g_checksum_update(hash, (const guchar *) oauth->provider->id, strlen(oauth->provider->id));
+	g_checksum_update(hash, (const guchar *) oauth->account, strlen(oauth->account));
+	group_name = g_checksum_get_string(hash);
+	libbalsa_conf_private_remove_group(group_name);
+	g_checksum_free(hash);
+}
+
+
 /* == OAuth2 token refresh related functions ==================================================================================== */
 
 /** @brief Refresh a OAuth2 access token
@@ -543,12 +600,20 @@ oauth2_refresh(LibBalsaOauth2 *oauth, GError **error)
 	g_debug("%s: post refresh request for %s: uri=%s id=%s secret=%s token=%s", __func__, oauth->account,
 		oauth->provider->token_uri, oauth->provider->client_id, oauth->provider->client_secret, oauth->refresh_token);
 	session = oauth_soup_session_new();
-	message = soup_form_request_new("POST", oauth->provider->token_uri,
-		"grant_type", "refresh_token",
-		"client_id", oauth->provider->client_id,
-		"client_secret", oauth->provider->client_secret,
-		"refresh_token", oauth->refresh_token,
-		NULL);
+	if (oauth->provider->client_secret != NULL) {
+		message = soup_form_request_new("POST", oauth->provider->token_uri,
+			"grant_type", "refresh_token",
+			"client_id", oauth->provider->client_id,
+			"client_secret", oauth->provider->client_secret,
+			"refresh_token", oauth->refresh_token,
+			NULL);
+	} else {
+		message = soup_form_request_new("POST", oauth->provider->token_uri,
+			"grant_type", "refresh_token",
+			"client_id", oauth->provider->client_id,
+			"refresh_token", oauth->refresh_token,
+			NULL);
+	}
 	status = soup_session_send_message(session, message);
 	g_debug("%s: status=%u, code=%u, reason=%s", __func__, status, message->status_code, message->reason_phrase);
 
@@ -556,6 +621,17 @@ oauth2_refresh(LibBalsaOauth2 *oauth, GError **error)
 	oauth->access_token = NULL;
 	if ((status != SOUP_STATUS_OK) || (message->status_code != SOUP_STATUS_OK) || (message->response_body == NULL)) {
 		eval_json_error(_("OAuth2 refresh token request failed"), message, error);
+		/* a 4xy status probably means that we must re-authorise, so erase the refresh token in this case */
+		if ((status / 100U) == 4U) {
+			g_free(oauth->access_token);
+			oauth->access_token = NULL;
+			g_free(oauth->refresh_token);
+			oauth->refresh_token = NULL;
+#if defined(HAVE_LIBSECRET)
+			erase_oauth2_token_libsecret(oauth);
+#endif
+			erase_oauth2_token_config(oauth);
+		}
 		result = FALSE;
 	} else {
 		result = eval_json_auth_reply(oauth, message, FALSE, error);
@@ -908,6 +984,8 @@ oauth2_authorize_finish(oauth2_auth_ctx_t *auth_ctx, const gchar *auth_code)
 	SoupSession *session;
 	SoupMessage *message;
 	guint status;
+	gboolean success = FALSE;
+	GtkWidget *icon;
 
 	gtk_label_set_label(GTK_LABEL(auth_ctx->spinner_label), _("sending authorization code…"));
 	g_debug("%s: uri=%s, client_id=%s, client_secret=%s code=%s listen_uri=%s", __func__, provider->token_uri, provider->client_id,
@@ -915,16 +993,26 @@ oauth2_authorize_finish(oauth2_auth_ctx_t *auth_ctx, const gchar *auth_code)
 
 	/* send the authorisation code */
 	session = oauth_soup_session_new();
-	message = soup_form_request_new("POST", provider->token_uri,
-		"grant_type", "authorization_code",
-		"client_id", provider->client_id,
-		"client_secret", provider->client_secret,
-		"code", auth_code,
-		"redirect_uri", auth_ctx->listen_uri,
-		NULL);
+	if (provider->client_secret != NULL) {
+		message = soup_form_request_new("POST", provider->token_uri,
+			"grant_type", "authorization_code",
+			"client_id", provider->client_id,
+			"client_secret", provider->client_secret,
+			"code", auth_code,
+			"redirect_uri", auth_ctx->listen_uri,
+			NULL);
+	} else {
+		message = soup_form_request_new("POST", provider->token_uri,
+			"grant_type", "authorization_code",
+			"client_id", provider->client_id,
+			"code", auth_code,
+			"redirect_uri", auth_ctx->listen_uri,
+			NULL);
+	}
 	status = soup_session_send_message(session, message);
 	g_debug("%s: status=%u, code=%u, reason=%s", __func__, status, message->status_code, message->reason_phrase);
 
+	gtk_spinner_stop(GTK_SPINNER(auth_ctx->spinner));
 	if ((status != SOUP_STATUS_OK) || (message->status_code != SOUP_STATUS_OK) || (message->response_body == NULL)) {
 		eval_json_error(_("OAuth2 authorization request failed"), message, &auth_ctx->auth_err);
 		gtk_label_set_label(GTK_LABEL(auth_ctx->spinner_label), _("send error"));
@@ -932,11 +1020,16 @@ oauth2_authorize_finish(oauth2_auth_ctx_t *auth_ctx, const gchar *auth_code)
 		if (eval_json_auth_reply(auth_ctx->oauth, message, TRUE, &auth_ctx->auth_err)) {
 			gtk_label_set_label(GTK_LABEL(auth_ctx->spinner_label), _("authorization successful"));
 			gtk_dialog_set_response_sensitive(GTK_DIALOG(auth_ctx->auth_dialog), GTK_RESPONSE_ACCEPT, TRUE);
+			success = TRUE;
 		} else {
 			gtk_label_set_label(GTK_LABEL(auth_ctx->spinner_label), _("authorization failed"));
 		}
 	}
-	gtk_spinner_stop(GTK_SPINNER(auth_ctx->spinner));
+	icon = gtk_image_new_from_icon_name(success ? "gtk-yes" : "gtk-no", GTK_ICON_SIZE_BUTTON);
+	gtk_box_pack_start(GTK_BOX(gtk_widget_get_parent(auth_ctx->spinner)), icon, FALSE, FALSE, 0U);
+	gtk_widget_hide(auth_ctx->spinner);
+	gtk_widget_destroy(auth_ctx->spinner);
+	gtk_widget_show(icon);
 	g_object_unref(message);
 	g_object_unref(session);
 }
@@ -1044,7 +1137,7 @@ run_oauth2_dialog(oauth2_auth_ctx_t *auth_ctx, const oauth2_provider_t *provider
 	gtk_spinner_start(GTK_SPINNER(auth_ctx->spinner));
 	gtk_box_pack_start(GTK_BOX(hbox), auth_ctx->spinner, FALSE, FALSE, 0U);
 	auth_ctx->spinner_label = gtk_label_new(_("…waiting for authorization code"));
-	gtk_box_pack_start(GTK_BOX(hbox), auth_ctx->spinner_label, FALSE, FALSE, 0U);
+	gtk_box_pack_end(GTK_BOX(hbox), auth_ctx->spinner_label, TRUE, TRUE, 0U);
 
 	gtk_widget_show_all(auth_ctx->auth_dialog);
 	result = gtk_dialog_run(GTK_DIALOG(auth_ctx->auth_dialog));
@@ -1058,26 +1151,45 @@ run_oauth2_dialog(oauth2_auth_ctx_t *auth_ctx, const oauth2_provider_t *provider
  *
  * @return a new SoupSession
  *
- * @todo Check the environment variable @c G_MESSAGES_DEBUG for @c oauth instead of using the compile-time @ref HTTP_VERBOSE define.
+ * The soup session includes a Soup logger, dumping the full body, iff the environment variable @c G_MESSAGES_DEBUG contains either
+ * @c all or <c>oauth</c>.  Note that this logger object is never freed, i.e. running Balsa with the aforementioned configuration
+ * will produce a (harmless) leak.
  */
 static SoupSession *
 oauth_soup_session_new(void)
 {
-#ifdef HTTP_VERBOSE
+	static gsize env_checked = 0UL;
 	static SoupLogger *logger = NULL;
-#endif
 	SoupSession *session;
 
+	/* check the environment once if we should add the soup logger (note: GLib 2.68 adds g_log_writer_default_would_drop() which
+	 * might be used instead of the following code...) */
+	if (g_once_init_enter(&env_checked)) {
+		const gchar *log_domains;
+
+		log_domains = g_getenv("G_MESSAGES_DEBUG");
+		if (log_domains != NULL) {
+			gchar **domlist;
+			guint n;
+
+			domlist = g_strsplit(log_domains, " ", -1);
+			for (n = 0U; (logger == NULL) && (domlist[n] != NULL); n++) {
+				if ((strcmp(domlist[n], "all") == 0) || (strcmp(domlist[n], G_LOG_DOMAIN) == 0)) {
+					logger = soup_logger_new(SOUP_LOGGER_LOG_BODY, -1);
+					g_debug("%s: create Soup logger", __func__);
+				}
+			}
+			g_strfreev(domlist);
+		}
+		g_once_init_leave(&env_checked, 1UL);
+	}
+
+	/* create the new session */
 	session = soup_session_new();
 	g_object_set(session, "user-agent", PACKAGE "/" BALSA_VERSION " ", NULL);
-
-#ifdef HTTP_VERBOSE
-	if (g_once_init_enter(&logger)) {
-		SoupLogger *_logger = soup_logger_new(SOUP_LOGGER_LOG_BODY, -1);
-		g_once_init_leave(&logger, _logger);
+	if (logger != NULL) {
+		soup_session_add_feature(session, SOUP_SESSION_FEATURE(logger));
 	}
-	soup_session_add_feature(session, SOUP_SESSION_FEATURE(logger));
-#endif
 
 	return session;
 }

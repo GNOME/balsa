@@ -62,7 +62,8 @@ typedef enum
   IMCAP_ACRAM_MD5,		/* RFC 2195: CRAM-MD5 authentication */
   IMCAP_AGSSAPI,		/* RFC 1731: GSSAPI authentication */
   IMCAP_APLAIN,                 /* RFC 2595: */
-  IMCAP_AOAUTH2,				/* RFC 7628: OAUTHBEARER authentication */
+  IMCAP_AXOAUTH2,				/* RFC 6749: Google XOAUTH2 authentication */
+  IMCAP_AOAUTHBEARER,			/* RFC 7628: OAUTHBEARER authentication */
   IMCAP_ACL,			/* RFC 2086: IMAP4 ACL extension */
   IMCAP_RIGHTS,                 /* RFC 4314: IMAP4 RIGHTS= extension */
   IMCAP_BINARY,                 /* RFC 3516 */

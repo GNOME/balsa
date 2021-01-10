@@ -69,12 +69,6 @@ static gboolean async_process(GSocket      *source,
 			  	  	  	  	  GIOCondition  condition,
 							  gpointer      data);
 
-G_DECLARE_FINAL_TYPE(ImapMboxHandle,
-                     imap_mbox_handle,
-                     IMAP,
-                     MBOX_HANDLE,
-                     GObject)
-
 G_DEFINE_TYPE(ImapMboxHandle, imap_mbox_handle, G_TYPE_OBJECT)
 
 static void

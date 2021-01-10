@@ -17,8 +17,13 @@
  * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <time.h>
-#include <glib.h>
+#include <glib-object.h>
+
+G_DECLARE_FINAL_TYPE(ImapMboxHandle,
+                     imap_mbox_handle,
+                     IMAP,
+                     MBOX_HANDLE,
+                     GObject);
 
 /* connection states, as defined in rfc-2060, 3 */
 typedef enum {
@@ -227,8 +232,6 @@ typedef struct ImapMessage_ {
                                     * sending requests if the header
                                     * in question is not present. */
 } ImapMessage;
-
-typedef struct _ImapMboxHandle      ImapMboxHandle;
 
 ImapEnvelope *imap_envelope_new(void);
 void imap_envelope_free(ImapEnvelope *);

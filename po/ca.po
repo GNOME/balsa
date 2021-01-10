@@ -219,7 +219,8 @@ msgstr "No s'ha pogut llegir el missatge incrustat"
 
 #: ../libbalsa/filter.c:125 ../libbalsa/mailbox_local.c:871
 msgid "Unable to load message body to match filter"
-msgstr "No s'ha pogut carregar el cos del missatge per coincidir amb el filtre"
+msgstr ""
+"No s'ha pogut carregar el cos del missatge per a coincidir amb el filtre"
 
 #: ../libbalsa/filter.c:232
 #, c-format
@@ -2103,7 +2104,7 @@ msgstr "La signatura és vàlida però ha caducat."
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
-"La signatura és vàlida, però la clau utilitzada per verificar la signatura "
+"La signatura és vàlida, però la clau utilitzada per a verificar la signatura "
 "ha caducat."
 
 #: ../libbalsa/rfc3156.c:630
@@ -6763,7 +6764,7 @@ msgstr ""
 "El fitxer\n"
 "%s\n"
 "no està codificat en US-ASCII o UTF-8.\n"
-"Trieu el joc de caràcters utilitzat per codificar el fitxer."
+"Trieu el joc de caràcters utilitzat per a codificar el fitxer."
 
 #: ../src/sendmsg-window.c:1580
 msgid "Attach as MIME type:"
@@ -8074,7 +8075,7 @@ msgstr "_Respon a"
 
 #: ../ui/sendmsg-window.ui.h:32
 msgid "F_cc"
-msgstr "F_cc:"
+msgstr "F_cc"
 
 #: ../ui/sendmsg-window.ui.h:34
 msgid "_Options"

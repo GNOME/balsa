@@ -649,6 +649,7 @@ imap_timeout_cb(void *arg)
 static ImapResult
 imap_mbox_connect(ImapMboxHandle* handle)
 {
+  ImapResult retval;
   ImapResponse resp;
   GError *error = NULL;
 
@@ -697,20 +698,20 @@ imap_mbox_connect(ImapMboxHandle* handle)
     (strncmp(handle->last_msg, "Microsoft Exchange", 18) != 0);
   if((handle->tls_mode == NET_CLIENT_CRYPT_ENCRYPTED) ||
 	 (handle->tls_mode == NET_CLIENT_CRYPT_NONE)) {
-    resp = IMAP_SUCCESS; /* secured already with SSL, or no encryption requested */
+    retval = IMAP_SUCCESS; /* secured already with SSL, or no encryption requested */
   } else if(imap_mbox_handle_can_do(handle, IMCAP_STARTTLS)) {
     if( imap_handle_starttls(handle, &error) != IMR_OK) {
       imap_mbox_handle_set_msg(handle, _("TLS negotiation failed: %s"), error_safe(error));
-      resp = IMAP_UNSECURE; /* TLS negotiation error */
+      retval = IMAP_UNSECURE; /* TLS negotiation error */
     } else {
-      resp = IMAP_SUCCESS; /* secured with TLS */
+      retval = IMAP_SUCCESS; /* secured with TLS */
     }
   } else {
 	imap_mbox_handle_set_msg(handle, _("TLS required but not available"));
-    resp = IMR_NO; /* TLS unavailable */
+    retval = IMAP_AUTH_UNAVAIL; /* TLS unavailable */
   }
 
-  return resp;
+  return retval;
 }
 
 unsigned

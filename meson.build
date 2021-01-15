@@ -456,6 +456,7 @@ if balsa_from_git
     '-Wformat',
     '-Wformat-security',
     '-Wignored-qualifiers',
+    '-Wenum-conversion',
     '-DGDK_DISABLE_DEPRECATED',
     '-DGMIME_DISABLE_DEPRECATED',
     '-DGTK_DISABLE_DEPRECATED',

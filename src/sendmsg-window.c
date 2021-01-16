@@ -1591,29 +1591,32 @@ sw_set_charset(BalsaSendmsg * bsmsg, const gchar * filename,
 
 
 static LibBalsaMessageHeaders *
-get_fwd_mail_headers(const gchar *mailfile)
+get_fwd_mail_headers(const gchar *mailfile_uri)
 {
-    int fd;
+    GFile *msg_file;
     GMimeStream *stream;
     GMimeParser *parser;
     GMimeMessage *message;
-    LibBalsaMessageHeaders *headers;
+    LibBalsaMessageHeaders *headers = NULL;
 
-    /* try to open the mail file */
-    if ((fd = open(mailfile, O_RDONLY)) == -1)
-	return NULL;
-    if ((stream = g_mime_stream_fs_new(fd)) == NULL) {
-	close(fd);
-	return NULL;
+    /* create a stream from the mail file uri
+     * note: the next call will never fail, but... */
+    msg_file = g_file_new_for_uri(mailfile_uri);
+    if (!g_file_query_exists(msg_file, NULL)) {
+    	g_object_unref(msg_file);	/* ...we need a paranoia check for file existence */
+    	return NULL;
     }
+    stream = g_mime_stream_gio_new(msg_file);	/* consumes the GFil */
 
-    /* parse the file */
+    /* try to parse the file */
     parser = g_mime_parser_new_with_stream(stream);
     g_mime_parser_set_format(parser, GMIME_FORMAT_MESSAGE);
     message = g_mime_parser_construct_message (parser, libbalsa_parser_options());
-    g_object_unref (parser);
+    g_object_unref(parser);
     g_object_unref(stream);
-    close(fd);
+    if (message == NULL) {
+    	return NULL;
+    }
 
     /* get the headers from the gmime message */
     headers = g_new0(LibBalsaMessageHeaders, 1);

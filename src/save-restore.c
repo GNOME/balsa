@@ -252,7 +252,11 @@ sr_special_notify(gpointer data, GObject * mailbox)
 }
 
 static gchar *specialNames[] = {
-    INBOX_NAME, SENTBOX_NAME, TRASH_NAME, DRAFTS_NAME, OUTBOX_NAME
+    N_(INBOX_NAME),
+    N_(SENTBOX_NAME),
+    N_(TRASH_NAME),
+    N_(DRAFTS_NAME),
+    N_(OUTBOX_NAME)
 };
 
 static inline gboolean
@@ -315,7 +319,7 @@ config_mailbox_set_as_special(LibBalsaMailbox * mailbox, specialType which)
 	g_object_unref(mbnode);
     }
     config_mailbox_delete(mailbox);
-    libbalsa_mailbox_set_name(mailbox, specialNames[which]);
+    libbalsa_mailbox_set_name(mailbox, _(specialNames[which]));
     config_mailbox_add(mailbox, specialNames[which]);
 
     *special = mailbox;

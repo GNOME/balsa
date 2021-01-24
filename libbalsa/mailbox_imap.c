@@ -2235,7 +2235,9 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
        LIBBALSA_MESSAGE_GET_LENGTH(message)<8192 ||
         (headers != NULL &&
          (headers->content_type == NULL ||
-          !g_mime_content_type_is_type(headers->content_type, "multipart", "*"))) ){
+          !g_mime_content_type_is_type(headers->content_type, "multipart", "*") ||
+		  g_mime_content_type_is_type(headers->content_type, "multipart", "signed") ||
+		  g_mime_content_type_is_type(headers->content_type, "multipart", "encrypted"))) ){
         /* we could optimize this part a little bit: we do not need to
          * keep reopening the stream. */
         GMimeStream *stream = 

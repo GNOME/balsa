@@ -495,7 +495,7 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
             continue;
 
         msg_info.local_info.flags = msg_info.orig_flags;
-#if GLIB_CHECK_VERSION(2, 68, 0)
+#if GLIB_CHECK_VERSION(2, 67, 3)
         g_ptr_array_add(mbox->msgno_2_msg_info, g_memdup2(&msg_info, sizeof(msg_info)));
 #else
         g_ptr_array_add(mbox->msgno_2_msg_info, g_memdup(&msg_info, sizeof(msg_info)));
@@ -583,7 +583,7 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
             && !lbm_mbox_seek_to_message(mbox, msg_info->end))
             /* Error: no message following this one. */
             break;
-#if GLIB_CHECK_VERSION(2, 68, 0)
+#if GLIB_CHECK_VERSION(2, 67, 3)
         g_ptr_array_add(mbox->msgno_2_msg_info, g_memdup2(msg_info, sizeof *msg_info));
 #else
         g_ptr_array_add(mbox->msgno_2_msg_info, g_memdup(msg_info, sizeof *msg_info));

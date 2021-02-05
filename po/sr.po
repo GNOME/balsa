@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2020-12-30 18:56+0000\n"
-"PO-Revision-Date: 2021-02-01 18:05+0200\n"
+"POT-Creation-Date: 2021-02-01 17:15+0000\n"
+"PO-Revision-Date: 2021-02-05 09:03+0200\n"
 "Last-Translator: Мирослав Николић <miroslavnikolic@rocketmail.com>\n"
 "Language-Team: српски <gnome-sr@googlegroups.org>\n"
 "Language: sr\n"
@@ -109,7 +109,7 @@ msgid "Cannot find address in address book"
 msgstr "Не могу да нађем адресу у адресару"
 
 #: ../libbalsa/address-book.c:308 ../src/main-window.c:2984
-#: ../src/main-window.c:4138 ../src/sendmsg-window.c:3888
+#: ../src/main-window.c:4138 ../src/sendmsg-window.c:3891
 msgid "Unknown error"
 msgstr "Непозната грешка"
 
@@ -122,14 +122,13 @@ msgstr "Без-ИБ"
 #: ../libbalsa/address-book-ldap.c:550 ../libbalsa/address-book-ldif.c:189
 #: ../libbalsa/address-book-ldif.c:227 ../libbalsa/address-book-ldif.c:270
 #: ../libbalsa/address-book-ldif.c:274 ../libbalsa/address-book-vcard.c:142
-#: ../libbalsa/address-book-vcard.c:249 ../libbalsa/address.c:409
+#: ../libbalsa/address-book-vcard.c:249 ../libbalsa/address.c:392
 #: ../libbalsa/rfc6350.c:112
 msgid "No-Name"
 msgstr "Без-имена"
 
 #. very unlikely...
 #: ../libbalsa/address-book-ldap.c:333
-#| msgid "Not found"
 msgid "Host not found"
 msgstr "Нисам нашао домаћина"
 
@@ -157,43 +156,43 @@ msgstr ""
 msgid "Reading Osmo contacts failed: %s"
 msgstr "Читање Осмо контакта није успело: %s"
 
-#: ../libbalsa/address.c:972
+#: ../libbalsa/address.c:955
 msgid "D_isplayed Name:"
 msgstr "Приказано _име:"
 
-#: ../libbalsa/address.c:973
+#: ../libbalsa/address.c:956
 msgid "_First Name:"
 msgstr "_Име:"
 
-#: ../libbalsa/address.c:974
+#: ../libbalsa/address.c:957
 msgid "_Last Name:"
 msgstr "_Презиме:"
 
-#: ../libbalsa/address.c:975
+#: ../libbalsa/address.c:958
 msgid "_Nickname:"
 msgstr "_Надимак:"
 
-#: ../libbalsa/address.c:976
+#: ../libbalsa/address.c:959
 msgid "O_rganization:"
 msgstr "О_рганизација:"
 
-#: ../libbalsa/address.c:977
+#: ../libbalsa/address.c:960
 msgid "_Email Address:"
 msgstr "Адреса _е-поште:"
 
-#: ../libbalsa/address.c:998 ../src/filter-edit-callbacks.c:1068
+#: ../libbalsa/address.c:981 ../src/filter-edit-callbacks.c:1068
 msgid "A_dd"
 msgstr "_Додај"
 
 #: ../libbalsa/address-view.c:157 ../src/balsa-mime-widget-message.c:757
 #: ../src/balsa-print-object-header.c:146 ../src/sendmsg-window.c:675
-#: ../src/sendmsg-window.c:3583
+#: ../src/sendmsg-window.c:3586
 msgid "To:"
 msgstr "Прима:"
 
 #: ../libbalsa/address-view.c:158 ../src/balsa-mime-widget-message.c:759
 #: ../src/balsa-print-object-header.c:148 ../src/sendmsg-window.c:675
-#: ../src/sendmsg-window.c:3591
+#: ../src/sendmsg-window.c:3594
 msgid "CC:"
 msgstr "ЦЦ:"
 
@@ -206,13 +205,12 @@ msgstr "БЦЦ:"
 msgid "Reply To:"
 msgstr "Одговори:"
 
-#: ../libbalsa/autocrypt.c:181
+#: ../libbalsa/autocrypt.c:193
 #, c-format
-#| msgid "Cannot not read the file “%s”: %s"
 msgid "cannot initialise Autocrypt database “%s”: %s"
 msgstr "не могу да покренем базу података аутошифровања „%s“: %s"
 
-#: ../libbalsa/autocrypt.c:307
+#: ../libbalsa/autocrypt.c:319
 #, c-format
 msgid ""
 "No usable private key for “%s” found! Please create a key or disable "
@@ -221,60 +219,72 @@ msgstr ""
 "Нисам нашао употребљив приватни кључ за „%s“! Направите кључ или искључите "
 "Аутошифровање."
 
-#: ../libbalsa/autocrypt.c:374 ../libbalsa/autocrypt.c:382
-#: ../libbalsa/autocrypt.c:651 ../libbalsa/autocrypt.c:657
+#: ../libbalsa/autocrypt.c:386 ../libbalsa/autocrypt.c:394
+#: ../libbalsa/autocrypt.c:677 ../libbalsa/autocrypt.c:683
 #, c-format
-#| msgid "Error executing signature generator “%s”: %s"
 msgid "error reading Autocrypt data for “%s”: %s"
 msgstr "грешка читања података аутошифровања за „%s“: %s"
 
-#: ../libbalsa/autocrypt.c:435
+#: ../libbalsa/autocrypt.c:447
 msgid "Autocrypt database"
 msgstr "База података аутошифровања"
 
-#: ../libbalsa/autocrypt.c:436 ../libbalsa/html.c:424
+#: ../libbalsa/autocrypt.c:448 ../libbalsa/html.c:424
 #: ../libbalsa/identity.c:1658 ../libbalsa/libbalsa-gpgme-widgets.c:765
-#: ../src/ab-window.c:148 ../src/folder-conf.c:337 ../src/mailbox-node.c:1052
+#: ../src/ab-window.c:148 ../src/folder-conf.c:337 ../src/mailbox-node.c:1049
 #: ../src/main-window.c:3830 ../src/toolbar-prefs.c:130
 #: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
 #: ../ui/sendmsg-window.ui.h:12 ../ui/source-viewer.ui.h:2
 msgid "_Close"
 msgstr "_Затвори"
 
-#: ../libbalsa/autocrypt.c:442 ../libbalsa/libbalsa-gpgme-cb.c:223
-msgid "Double-click key to show details"
-msgstr "Два пута кликните на кључ да покажете појединости"
-
-#: ../libbalsa/autocrypt.c:497 ../src/balsa-mblist.c:326
+#: ../libbalsa/autocrypt.c:517 ../src/balsa-mblist.c:326
 msgid "Mailbox"
 msgstr "Сандуче"
 
-#: ../libbalsa/autocrypt.c:502
-#| msgid "Last Name"
+#: ../libbalsa/autocrypt.c:523
 msgid "Last seen"
 msgstr "Последња посета"
 
-#: ../libbalsa/autocrypt.c:507
-#| msgid "Cannot create message"
+#: ../libbalsa/autocrypt.c:529
 msgid "Last Autocrypt message"
 msgstr "Последња порука аутошифровања"
 
-#: ../libbalsa/autocrypt.c:512
-#| msgid "_Preferences"
+#: ../libbalsa/autocrypt.c:535
 msgid "Prefer encryption"
 msgstr "Дај предност шифровању"
 
-#: ../libbalsa/autocrypt.c:748 ../libbalsa/autocrypt.c:768
+#: ../libbalsa/autocrypt.c:774 ../libbalsa/autocrypt.c:794
 #, c-format
-#| msgid "exporting key for “%s” failed"
 msgid "update user “%s” failed: %s"
 msgstr "ажурирање корисника „%s“ није успело: %s"
 
-#: ../libbalsa/autocrypt.c:748
+#: ../libbalsa/autocrypt.c:774
 #, c-format
-#| msgid "exporting key for “%s” failed"
 msgid "insert user “%s” failed: %s"
 msgstr "уметање корисника „%s“ није успело: %s"
+
+#: ../libbalsa/autocrypt.c:870
+msgid "_Show details…"
+msgstr "_Прикажи детаље…"
+
+#: ../libbalsa/autocrypt.c:873 ../src/balsa-index.c:2000
+#: ../src/mailbox-node.c:1041 ../src/mailbox-node.c:1057
+#: ../src/pref-manager.c:2001 ../src/pref-manager.c:2086
+#: ../src/pref-manager.c:2766 ../ui/ab-main.ui.h:11 ../ui/main-window.ui.h:61
+msgid "_Delete"
+msgstr "_Обриши"
+
+#: ../libbalsa/autocrypt.c:923
+#, c-format
+#| msgid "The path “%s” does not lead to a mailbox."
+msgid "The database entry for “%s” does not contain a key."
+msgstr "Унос базе података за „%s“ не садржи кључ."
+
+#: ../libbalsa/autocrypt.c:960
+#, c-format
+msgid "Delete the Autocrypt key for “%s” from the database?"
+msgstr "Да обришем кључ самошифровања за „%s“ из базе података?"
 
 #: ../libbalsa/body.c:119 ../libbalsa/mailbox_local.c:1879
 #: ../libbalsa/message.c:941 ../libbalsa/message.c:958
@@ -406,7 +416,6 @@ msgstr "Или"
 
 #: ../libbalsa/folder-scanners.c:507
 #, c-format
-#| msgid "could not set protocol “%s”"
 msgid "Could not connect to “%s”"
 msgstr "Не могу да се повежем са „%s“"
 
@@ -424,19 +433,16 @@ msgstr "никад"
 
 #: ../libbalsa/gmime-gpgme-signature.c:166
 #, c-format
-#| msgid "Cannot read signature file “%s”: %s"
 msgid "%s signature of “%s”: %s"
 msgstr "%s потпис за „%s“: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:170
 #, c-format
-#| msgid "PGP signature: "
 msgid "%s signature: %s"
 msgstr "%s потпис: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:188
 #, c-format
-#| msgid "PGP signature: "
 msgid " signature: %s"
 msgstr " потпис: %s"
 
@@ -471,7 +477,7 @@ msgstr ""
 #: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc2445.c:415
 #: ../libbalsa/rfc2445.c:444 ../libbalsa/rfc2445.c:467
 #: ../libbalsa/rfc2445.c:1120 ../libbalsa/rfc3156.c:689
-#: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5309
+#: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5312
 msgid "unknown"
 msgstr "непознато"
 
@@ -562,13 +568,13 @@ msgstr "Преузми _слике"
 
 #. should "re" be localized ?
 #: ../libbalsa/identity.c:109 ../libbalsa/mailbox_local.c:2002
-#: ../libbalsa/mailbox_local.c:2004 ../src/sendmsg-window.c:3836
-#: ../src/sendmsg-window.c:3838
+#: ../libbalsa/mailbox_local.c:2004 ../src/sendmsg-window.c:3839
+#: ../src/sendmsg-window.c:3841
 msgid "Re:"
 msgstr "Re:"
 
-#: ../libbalsa/identity.c:110 ../src/sendmsg-window.c:3775
-#: ../src/sendmsg-window.c:3776 ../src/sendmsg-window.c:3777
+#: ../libbalsa/identity.c:110 ../src/sendmsg-window.c:3778
+#: ../src/sendmsg-window.c:3779 ../src/sendmsg-window.c:3780
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -578,7 +584,6 @@ msgstr "Нови идентитет"
 
 #: ../libbalsa/identity.c:235
 #, c-format
-#| msgid "Error executing signature generator “%s”: %s"
 msgid "Error executing signature generator “%s”: "
 msgstr "Грешка извршавања творца потписа „%s“: "
 
@@ -589,13 +594,11 @@ msgstr "Грешка извршавања творца потписа „%s“: 
 
 #: ../libbalsa/identity.c:245
 #, c-format
-#| msgid "Cannot read signature file “%s”: %s"
 msgid "Cannot read signature file “%s”: "
 msgstr "Не могу да прочитам датотеку потписа „%s“: "
 
 #: ../libbalsa/identity.c:256
 #, c-format
-#| msgid "Signature in %s is not a UTF-8 text."
 msgid "Signature in “%s” is not a UTF-8 text."
 msgstr "Потпис у „%s“ није УТФ-8 текст."
 
@@ -613,9 +616,9 @@ msgstr "Потпис у „%s“ није УТФ-8 текст."
 #: ../src/mailbox-conf.c:229 ../src/mailbox-conf.c:245
 #: ../src/mailbox-conf.c:733 ../src/mailbox-conf.c:790
 #: ../src/pref-manager.c:3260 ../src/sendmsg-window.c:494
-#: ../src/sendmsg-window.c:1498 ../src/sendmsg-window.c:1957
-#: ../src/sendmsg-window.c:3341 ../src/sendmsg-window.c:4777
-#: ../src/sendmsg-window.c:5078 ../src/sendmsg-window.c:5164
+#: ../src/sendmsg-window.c:1498 ../src/sendmsg-window.c:1960
+#: ../src/sendmsg-window.c:3344 ../src/sendmsg-window.c:4780
+#: ../src/sendmsg-window.c:5081 ../src/sendmsg-window.c:5167
 #: ../src/spell-check.c:395 ../src/store-address.c:208
 msgid "_Cancel"
 msgstr "_Откажи"
@@ -628,8 +631,8 @@ msgstr "_Откажи"
 #: ../src/filter-export-dialog.c:79 ../src/filter-run-dialog.c:299
 #: ../src/folder-conf.c:344 ../src/main-window.c:3922
 #: ../src/pref-manager.c:3258 ../src/sendmsg-window.c:1497
-#: ../src/sendmsg-window.c:1958 ../src/sendmsg-window.c:3340
-#: ../src/sendmsg-window.c:4778 ../src/store-address.c:209
+#: ../src/sendmsg-window.c:1961 ../src/sendmsg-window.c:3343
+#: ../src/sendmsg-window.c:4781 ../src/store-address.c:209
 msgid "_OK"
 msgstr "У _реду"
 
@@ -832,7 +835,6 @@ msgstr "Да ли заиста желите да обришете изабран
 
 #: ../libbalsa/identity.c:1611
 #, c-format
-#| msgid "Error displaying help for identities: %s\n"
 msgid "Error displaying help for identities: %s"
 msgstr "Грешка приказивања помоћи за личности: %s"
 
@@ -867,7 +869,6 @@ msgid "disabled"
 msgstr "искључен"
 
 #: ../libbalsa/identity.c:2043
-#| msgid "Balsa Preferences"
 msgid "enabled, no preference"
 msgstr "укључен, без преференце"
 
@@ -889,18 +890,15 @@ msgstr "ГпгСМ С/МИМЕ режим"
 
 #: ../libbalsa/imap/auth-cram.c:47 ../libbalsa/imap/imap-auth.c:91
 #: ../libbalsa/imap/imap-auth.c:142
-#| msgid "_Authentication:"
 msgid "Authentication cancelled"
 msgstr "Потврђивање идентитета је отказано"
 
 #: ../libbalsa/imap/auth-gssapi.c:130
-#| msgid "Server requires authentication"
 msgid "User name required, authentication cancelled"
 msgstr "Корисничко име је неопходно, потврђивање идентитета је отказано"
 
 #: ../libbalsa/imap/auth-gssapi.c:162
 #, c-format
-#| msgid "Sending the disposition notification failed: %s"
 msgid "GSSAPI authentication failed: %s"
 msgstr "ГССАПИ потврђивање удентитета није успело: %s"
 
@@ -920,28 +918,24 @@ msgstr "Неуређени подаци су примљени са сервер�
 msgid "Bug in implementation of SORT command on IMAP server exposed."
 msgstr "Искрсла је грешка у примени наредбе „SORT“ (поређај) на ИМАП серверу."
 
-#: ../libbalsa/imap/imap-handle.c:676
+#: ../libbalsa/imap/imap-handle.c:671
 #, c-format
-#| msgid "Scanning of %s failed: %s"
 msgid "Connecting %s failed: %s"
 msgstr "Повезивање са „%s“ није успело: %s"
 
-#: ../libbalsa/imap/imap-handle.c:689 ../libbalsa/imap/imap-handle.c:709
+#: ../libbalsa/imap/imap-handle.c:684 ../libbalsa/imap/imap-handle.c:704
 #, c-format
-#| msgid "Send failed: %s"
 msgid "TLS negotiation failed: %s"
 msgstr "ТЛС преговарање није успело: %s"
 
-#: ../libbalsa/imap/imap-handle.c:715
-#| msgid "TLS requested but not compiled in"
+#: ../libbalsa/imap/imap-handle.c:710
 msgid "TLS required but not available"
 msgstr "ТЛС је затражен али није доступан"
 
 #. it is not we, so it must be the server
-#: ../libbalsa/imap/imap-handle.c:2297 ../libbalsa/imap/imap-handle.c:2315
-#: ../libbalsa/imap/imap-handle.c:2331 ../libbalsa/imap/imap-handle.c:2362
+#: ../libbalsa/imap/imap-handle.c:2292 ../libbalsa/imap/imap-handle.c:2310
+#: ../libbalsa/imap/imap-handle.c:2326 ../libbalsa/imap/imap-handle.c:2357
 #, c-format
-#| msgid "IMAP server %s error: %s"
 msgid "IMAP response: %s"
 msgstr "ИМАП одговор: %s"
 
@@ -978,18 +972,15 @@ msgstr "Прекорачен је број веза са сервером „%s�
 
 #: ../libbalsa/imap-server.c:882
 #, c-format
-#| msgid "exporting key for “%s” failed"
 msgid "subscribing to “%s” failed"
 msgstr "претплата на „%s“ није успела"
 
 #: ../libbalsa/imap-server.c:898
 #, c-format
-#| msgid "exporting key for “%s” failed"
 msgid "unsubscribing from “%s” failed"
 msgstr "поништавање претплате са „%s“ није успело"
 
 #: ../libbalsa/libbalsa.c:398
-#| msgid "SSL/TLS certificate"
 msgid "broken TLS certificate"
 msgstr "оштећено ТЛС уверење"
 
@@ -1033,7 +1024,6 @@ msgid "the certificate’s activation time is still in the future"
 msgstr "време покретања уверења је још увек у будућности"
 
 #: ../libbalsa/libbalsa.c:454
-#| msgid "Certificate _Pass Phrase:"
 msgid "the certificate has expired"
 msgstr "уверење је истекло"
 
@@ -1046,7 +1036,6 @@ msgid "the certificate’s algorithm is considered insecure"
 msgstr "алгоритам уверења се сматра несигурним"
 
 #: ../libbalsa/libbalsa.c:457
-#| msgid "error loading certificate: %s"
 msgid "an error occurred validating the certificate"
 msgstr "дошло је до грешке потврђивања уверења"
 
@@ -1193,17 +1182,20 @@ msgstr ""
 "Изгледа да у вашем привеску кључева не постоји јавни кључ за примаоца „%s“.\n"
 "Ако сте сигурни да прималац поседује другачији кључ, изаберите га са списка."
 
+#: ../libbalsa/libbalsa-gpgme-cb.c:223
+msgid "Double-click key to show details"
+msgstr "Два пута кликните на кључ да покажете појединости"
+
 #: ../libbalsa/libbalsa-gpgme-cb.c:280
 msgid "User ID"
 msgstr "ИБ корисника"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:287 ../src/balsa-index.c:460
-#: ../src/pref-manager.c:219 ../src/sendmsg-window.c:2620
+#: ../src/pref-manager.c:219 ../src/sendmsg-window.c:2623
 msgid "Size"
 msgstr "Величина"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:294
-#| msgid "Created:"
 msgid "Created"
 msgstr "Направљен"
 
@@ -1279,12 +1271,10 @@ msgstr "извоз кључа за „%s“ није успео"
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:316 ../libbalsa/libbalsa-gpgme-keys.c:324
 #, c-format
-#| msgid "exporting key for “%s” failed"
 msgid "cannot export minimal key for “%s”"
 msgstr "не могу да извезем најмањи кључ за „%s“"
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:400
-#| msgid "importing ASCII-armored key data failed"
 msgid "importing key data failed"
 msgstr "увоз података кључа није успео"
 
@@ -1328,7 +1318,6 @@ msgid "No key was imported or updated."
 msgstr "Никакав кључ није увезен или освежен."
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:577
-#| msgid "The key was imported into the local key ring."
 msgid "The key was ignored because it does not have a user ID."
 msgstr "Кључ је занемарен зато што нема ИБ корисника."
 
@@ -1605,7 +1594,7 @@ msgstr " крива „%s“"
 msgid "_Hide"
 msgstr "_Сакриј"
 
-#: ../libbalsa/libbalsa-vfs.c:495 ../src/sendmsg-window.c:4570
+#: ../libbalsa/libbalsa-vfs.c:495 ../src/sendmsg-window.c:4573
 #, c-format
 msgid "not a regular file"
 msgstr "није обична датотека"
@@ -1725,32 +1714,32 @@ msgstr "Нисам пронашао путању за сандуче „%s“, �
 msgid "Cannot get IMAP handle"
 msgstr "Не могу да добавим ИМАП управљање"
 
-#: ../libbalsa/mailbox_imap.c:2433 ../libbalsa/mailbox_imap.c:2496
+#: ../libbalsa/mailbox_imap.c:2435 ../libbalsa/mailbox_imap.c:2498
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr "Грешка довлачења поруке са ИМАП сервера: %s"
 
-#: ../libbalsa/mailbox_imap.c:2468
+#: ../libbalsa/mailbox_imap.c:2470
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Преузимам %u kB"
 
-#: ../libbalsa/mailbox_imap.c:2509
+#: ../libbalsa/mailbox_imap.c:2511
 #, c-format
 msgid "Cannot create temporary file"
 msgstr "Не могу да направим привремену датотеку"
 
-#: ../libbalsa/mailbox_imap.c:2533
+#: ../libbalsa/mailbox_imap.c:2535
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Не могу да пишем у привремену датотеку „%s“"
 
-#: ../libbalsa/mailbox_imap.c:2760 ../libbalsa/mailbox_imap.c:2877
+#: ../libbalsa/mailbox_imap.c:2762 ../libbalsa/mailbox_imap.c:2879
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Шаљем %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:3180
+#: ../libbalsa/mailbox_imap.c:3182
 msgid "Server-side threading not supported."
 msgstr "Није подржано темачење са стране сервера."
 
@@ -1843,9 +1832,6 @@ msgstr "Сандуче „%s“ не изгледа као сандуче врс
 
 #: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:278
 #, c-format
-#| msgid ""
-#| "Could not remove %s:\n"
-#| "%s"
 msgid "Could not remove %s: %s"
 msgstr "Не могу да уклоним „%s“: %s"
 
@@ -1918,9 +1904,6 @@ msgstr "Не могу да створим структуру врсте „MH“
 
 #: ../libbalsa/mailbox_mh.c:272
 #, c-format
-#| msgid ""
-#| "Could not remove contents of %s:\n"
-#| "%s"
 msgid "Could not remove contents of %s: %s"
 msgstr "Не могу да уклоним садржај „%s“: %s"
 
@@ -2111,7 +2094,6 @@ msgstr "Не могу да отворим %s: ово је симболичка �
 
 #: ../libbalsa/misc.c:731
 #, c-format
-#| msgid "Send failed: %s"
 msgid "fcntl failed: %s."
 msgstr "„fcntl“ није успело: %s."
 
@@ -2164,7 +2146,6 @@ msgstr[2] "часова"
 msgstr[3] "час"
 
 #: ../libbalsa/rfc2445.c:385
-#| msgid "minutes"
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "минут"
@@ -2181,7 +2162,6 @@ msgstr[2] "секунди"
 msgstr[3] "секунда"
 
 #: ../libbalsa/rfc2445.c:416
-#| msgid "Accept tentatively"
 msgid "event is tentative"
 msgstr "догађај је покушајни"
 
@@ -2271,7 +2251,6 @@ msgid "every %d days"
 msgstr "сваког %d дана"
 
 #: ../libbalsa/rfc2445.c:565
-#| msgid "never"
 msgid "every "
 msgstr "сваких "
 
@@ -2332,13 +2311,11 @@ msgstr "сваког дана у месецу сваког %d месеца"
 #: ../libbalsa/rfc2445.c:643 ../libbalsa/rfc2445.c:687
 #: ../libbalsa/rfc2445.c:724 ../libbalsa/rfc2445.c:786
 #: ../libbalsa/rfc2445.c:791 ../libbalsa/rfc2445.c:794
-#| msgid "Auto-complete"
 msgid "rule too complex"
 msgstr "правило је вревише сложено"
 
 #: ../libbalsa/rfc2445.c:649
 #, c-format
-#| msgid "never"
 msgid "every %s"
 msgstr "сваког %s"
 
@@ -2425,7 +2402,6 @@ msgstr "сваке %d године сваког дана у %s"
 
 #: ../libbalsa/rfc2445.c:770
 #, c-format
-#| msgid "%s on %s"
 msgid "every %s of %s"
 msgstr "сваког %s у %s"
 
@@ -2449,7 +2425,6 @@ msgid "secondly"
 msgstr "секундно"
 
 #: ../libbalsa/rfc2445.c:816
-#| msgid "minutes"
 msgid "minutely"
 msgstr "минутно"
 
@@ -2462,7 +2437,6 @@ msgid "occurrence"
 msgstr "понављање"
 
 #: ../libbalsa/rfc2445.c:840
-#| msgid "_Preferences"
 msgid "occurrences"
 msgstr "понављања"
 
@@ -2519,7 +2493,6 @@ msgid "The signature could not be verified due to a missing key."
 msgstr "Потпис није могао да буде проверен због непостојања кључа."
 
 #: ../libbalsa/rfc3156.c:641
-#| msgid "This part is not a real PGP signature."
 msgid "This part is not a real signature."
 msgstr "Овај део није прави потпис."
 
@@ -2538,13 +2511,11 @@ msgstr "Потпис садржи више потписника, ово је м�
 
 #: ../libbalsa/rfc3156.c:653
 #, c-format
-#| msgid "An error prevented the signature verification."
 msgid "An error prevented the signature verification: %s: %s"
 msgstr "Грешка је спречила проверу потписа: %s: %s"
 
 #: ../libbalsa/rfc3156.c:655
 #, c-format
-#| msgid "An error prevented the signature verification."
 msgid "An error prevented the signature verification: %s"
 msgstr "Грешка је спречила проверу потписа: %s"
 
@@ -2702,13 +2673,11 @@ msgstr "Балсине лозинке"
 
 #: ../libbalsa/server.c:338
 #, c-format
-#| msgid "Error storing password for %s@%s: %s\n"
 msgid "Error storing password for %s@%s:%s: %s"
 msgstr "Грешка складиштења лозинке за %s@%s:%s: %s"
 
 #: ../libbalsa/server.c:360
 #, c-format
-#| msgid "Error looking up password for %s@%s: %s\n"
 msgid "Error looking up password for %s@%s:%s: %s"
 msgstr "Грешка тражења лозинке за %s@%s:%s: %s"
 
@@ -2717,22 +2686,18 @@ msgid "loaded fallback password from private config file"
 msgstr "учитах резервну лозинку из приватне датотеке подешавања"
 
 #: ../libbalsa/server-config.c:75
-#| msgid "_Remember password in Secret Service"
 msgid "_Remember user password in Secret Service"
 msgstr "_Запамти корисничку лозинку у услузи тајни"
 
 #: ../libbalsa/server-config.c:76
-#| msgid "_Remember password in Secret Service"
 msgid "_Remember certificate pass phrase in Secret Service"
 msgstr "_Запамти лозинку уверења у услузи тајни"
 
 #: ../libbalsa/server-config.c:80
-#| msgid "_Remember your password:"
 msgid "_Remember user password"
 msgstr "_Запамти корисничку лозинку"
 
 #: ../libbalsa/server-config.c:81
-#| msgid "Certificate _Pass Phrase:"
 msgid "_Remember certificate pass phrase"
 msgstr "_Запамти лозинку уверења"
 
@@ -2755,7 +2720,6 @@ msgid "Se_curity:"
 msgstr "_Безбедност:"
 
 #: ../libbalsa/server-config.c:123
-#| msgid "Server requires authentication"
 msgid "Server requires _authentication"
 msgstr "Сервер захтева _потврђивање идентитета"
 
@@ -2774,7 +2738,6 @@ msgstr "_Напредно"
 
 #. client certificate and passphrase
 #: ../libbalsa/server-config.c:149
-#| msgid "Server requires client certificate"
 msgid "Server _requires client certificate"
 msgstr "Сервер _захтева уверење клијента"
 
@@ -2792,7 +2755,6 @@ msgstr "Лозинка _уверења:"
 
 #: ../libbalsa/server-config.c:371
 #, c-format
-#| msgid "SMTP over SSL (SMTPS)"
 msgid "%s over SSL (%sS)"
 msgstr "%s преко ССЛ-а (%sС)"
 
@@ -2845,15 +2807,11 @@ msgstr "Оштећен кључ, не могу да одредим ланац у
 
 #: ../libbalsa/x509-cert-widget.c:280
 #, c-format
-#| msgid ""
-#| "\n"
-#| "Key fingerprint: %s"
 msgid "fingerprint %s"
 msgstr "отисак: %s"
 
 #: ../libbalsa/x509-cert-widget.c:281
 #, c-format
-#| msgid "Cannot find a key with fingerprint %s on the key server."
 msgid "cannot load key with fingerprint %s: %s"
 msgstr "не могу да учитам кључ са отиском „%s“: %s"
 
@@ -2867,11 +2825,6 @@ msgstr ""
 
 #: ../libbalsa/x509-cert-widget.c:491
 #, c-format
-#| msgid ""
-#| "<b>This certificate is valid</b>\n"
-#| "from %s\n"
-#| "to %s\n"
-#| "<b>Fingerprint:</b> %s"
 msgid ""
 "<b>This certificate is valid</b>\n"
 "from %s\n"
@@ -3196,7 +3149,6 @@ msgstr "веза је већ шифрована"
 
 #: ../libnetclient/net-client.c:576
 #, c-format
-#| msgid "connection is already encrypted"
 msgid "connection is already compressed"
 msgstr "веза је већ сажета"
 
@@ -3245,7 +3197,6 @@ msgstr "пролазна грешка %d: %s"
 
 #: ../libnetclient/net-client-smtp.c:709
 #, c-format
-#| msgid "_Authentication:"
 msgid "authentication failure %d: %s"
 msgstr "неуспех потврђивања идентитета %d: %s"
 
@@ -3449,7 +3400,6 @@ msgid "Select save program for address book"
 msgstr "Изаберите програм за чување адресара"
 
 #: ../src/address-book-config.c:504
-#| msgid "_SMTP Server:"
 msgid "_LDAP Server URI"
 msgstr "Путања _ЛДАП сервера"
 
@@ -3532,7 +3482,6 @@ msgstr ""
 
 #: ../src/balsa-app.c:84 ../src/balsa-app.c:154
 #, c-format
-#| msgid "_Password for %s@%s (%s):"
 msgid "Password for %s@%s (%s)"
 msgstr "Лозинка за „%s@%s“ (%s)"
 
@@ -3541,7 +3490,6 @@ msgid "Password needed"
 msgstr "Неопходна је лозинка"
 
 #: ../src/balsa-app.c:178
-#| msgid "_Password:"
 msgid "Password:"
 msgstr "Лозинка:"
 
@@ -3598,13 +3546,6 @@ msgstr "_Преспој…"
 #: ../src/balsa-index.c:1986 ../ui/main-window.ui.h:83
 msgid "_Store Address…"
 msgstr "_Сачувај адресу…"
-
-#: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1044
-#: ../src/mailbox-node.c:1060 ../src/pref-manager.c:2001
-#: ../src/pref-manager.c:2086 ../src/pref-manager.c:2766 ../ui/ab-main.ui.h:11
-#: ../ui/main-window.ui.h:61
-msgid "_Delete"
-msgstr "_Обриши"
 
 #: ../src/balsa-index.c:2004
 msgid "_Undelete"
@@ -3748,7 +3689,6 @@ msgstr "Не могу да приступим поруци „%u“ у санд�
 
 #: ../src/balsa-message.c:1187 ../src/main.c:559
 #, c-format
-#| msgid "error: %s"
 msgid "Autocrypt error: %s"
 msgstr "Грешка самошифровања: %s"
 
@@ -4045,39 +3985,42 @@ msgid "_Import Autocrypt key"
 msgstr "_Увези кључ самошифровања"
 
 #: ../src/balsa-mime-widget-crypto.c:148
+msgid ""
+"The message contains an Autocrypt header, but it is either broken or the "
+"signature has been created using a different key."
+msgstr ""
+"Порука садржи заглавље самошифровања, али је оно или оштећено или је потпис "
+"направљен другим кључем."
+
+#: ../src/balsa-mime-widget-crypto.c:152
 msgid "_Search key server for this key"
 msgstr "Потражи овај кључ на _серверу кључева"
 
-#: ../src/balsa-mime-widget-crypto.c:150
+#: ../src/balsa-mime-widget-crypto.c:154
 msgid "_Search key server for updates of this key"
 msgstr "Потражи ажурирања овог кључа на _серверу кључева"
 
-#: ../src/balsa-mime-widget-crypto.c:194
-#| msgid "encrypted: "
+#: ../src/balsa-mime-widget-crypto.c:198
 msgid "decrypted"
 msgstr "дешифровано"
 
-#: ../src/balsa-mime-widget-crypto.c:207
-#| msgid "_Execute signature"
+#: ../src/balsa-mime-widget-crypto.c:211
 msgid "trusted signature"
 msgstr "поверљиви потпис"
 
-#: ../src/balsa-mime-widget-crypto.c:210
-#| msgid "_Execute signature"
+#: ../src/balsa-mime-widget-crypto.c:214
 msgid "low trust signature"
 msgstr "слабо поверљиви потпис"
 
-#: ../src/balsa-mime-widget-crypto.c:213
-#| msgid "Signature"
+#: ../src/balsa-mime-widget-crypto.c:217
 msgid "bad signature"
 msgstr "лош потпис"
 
-#: ../src/balsa-mime-widget-crypto.c:216
-#| msgid "No signature found!"
+#: ../src/balsa-mime-widget-crypto.c:220
 msgid "unknown signature status"
 msgstr "непознато стање потписа"
 
-#: ../src/balsa-mime-widget-crypto.c:302
+#: ../src/balsa-mime-widget-crypto.c:306
 #, c-format
 msgid ""
 "Import GnuPG key:\n"
@@ -4086,20 +4029,20 @@ msgstr ""
 "Увоз ГнуПГ кључа:\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:309
+#: ../src/balsa-mime-widget-crypto.c:313
 #, c-format
 msgid "Error importing key data: %s"
 msgstr "Грешка увоза података кључева: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:309 ../src/sendmsg-window.c:1670
+#: ../src/balsa-mime-widget-crypto.c:313 ../src/sendmsg-window.c:1673
 msgid "unknown error"
 msgstr "непозната грешка"
 
-#: ../src/balsa-mime-widget-crypto.c:346
+#: ../src/balsa-mime-widget-crypto.c:350
 msgid "(imported)"
 msgstr "(увезен)"
 
-#: ../src/balsa-mime-widget-crypto.c:354
+#: ../src/balsa-mime-widget-crypto.c:358
 msgid "Import key into the local key ring"
 msgstr "Увези кључ у месни прстен кључева"
 
@@ -4199,18 +4142,18 @@ msgstr "ИМАП сервер није известио о структури п
 #: ../src/balsa-mime-widget-message.c:735
 #: ../src/balsa-print-object-header.c:131 ../src/sendmsg-window.c:704
 #: ../src/sendmsg-window.c:706 ../src/sendmsg-window.c:797
-#: ../src/sendmsg-window.c:3568 ../src/sendmsg-window.c:5110
+#: ../src/sendmsg-window.c:3571 ../src/sendmsg-window.c:5113
 msgid "Subject:"
 msgstr "Тема:"
 
 #: ../src/balsa-mime-widget-message.c:740
-#: ../src/balsa-print-object-header.c:139 ../src/sendmsg-window.c:3564
+#: ../src/balsa-print-object-header.c:139 ../src/sendmsg-window.c:3567
 msgid "Date:"
 msgstr "Датум:"
 
 #. addresses
 #: ../src/balsa-mime-widget-message.c:746
-#: ../src/balsa-print-object-header.c:144 ../src/sendmsg-window.c:3575
+#: ../src/balsa-print-object-header.c:144 ../src/sendmsg-window.c:3578
 msgid "From:"
 msgstr "Шаље:"
 
@@ -4341,13 +4284,11 @@ msgstr "Крај:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:196
 #: ../src/balsa-print-object-text.c:554
-#| msgid "Location:"
 msgid "Duration:"
 msgstr "Трајање:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:202
 #: ../src/balsa-print-object-text.c:560
-#| msgid "References:"
 msgid "Recurrence:"
 msgstr "Понављање:"
 
@@ -4724,7 +4665,7 @@ msgstr "Пусти звук:"
 msgid "Use Sound…"
 msgstr "Користи звук…"
 
-#: ../src/filter-edit-dialog.c:405 ../src/mailbox-node.c:1050
+#: ../src/filter-edit-dialog.c:405 ../src/mailbox-node.c:1047
 msgid "_Open"
 msgstr "_Отвори"
 
@@ -4867,23 +4808,19 @@ msgstr "Грешка приказивања помоћи подешавања: %
 
 #: ../src/folder-conf.c:201
 #, c-format
-#| msgid "Scanning of %s failed: %s"
 msgid "Changing subscriptions failed: %s"
 msgstr "Промена претплате није успела: %s"
 
 #: ../src/folder-conf.c:323
 #, c-format
-#| msgid "Cannot get IMAP handle"
 msgid "Cannot list IMAP folders: %s"
 msgstr "Не могу да исишем ИМАП фасцикле: %s"
 
 #: ../src/folder-conf.c:372
-#| msgid "Subfolder of:"
 msgid "folder"
 msgstr "фасцикла"
 
 #: ../src/folder-conf.c:385
-#| msgid "_Unsubscribe"
 msgid "subscribed"
 msgstr "претплате"
 
@@ -4893,7 +4830,6 @@ msgid "Manage folder subscriptions of IMAP server “%s”"
 msgstr "Управљајте претплате фасциле ИМАП сервера „%s“"
 
 #: ../src/folder-conf.c:414
-#| msgid "Description"
 msgid "Manage subscriptions"
 msgstr "Управљајте претплатама"
 
@@ -4947,7 +4883,6 @@ msgstr "Користи „СТАЊЕ“ за проверу сандучета"
 
 #: ../src/folder-conf.c:609
 #, c-format
-#| msgid "Select parent folder"
 msgid "Select parent folder of “%s”"
 msgstr "Изабери родитељску фасциклу за „%s“"
 
@@ -5117,7 +5052,6 @@ msgid "Confirm"
 msgstr "Потврди"
 
 #: ../src/folder-conf.c:1086
-#| msgid "Create subfolder"
 msgid "Create IMAP subfolder"
 msgstr "Направи ИМАП подфасциклу"
 
@@ -5331,7 +5265,6 @@ msgid "_Subscribe for new mail check"
 msgstr "_Претплати се за проверу нове поште"
 
 #: ../src/mailbox-conf.c:953
-#| msgid "H_ide messages"
 msgid "_Thread messages"
 msgstr "_Надовежи поруке"
 
@@ -5339,16 +5272,16 @@ msgstr "_Надовежи поруке"
 msgid "_Merge threads with the same subject"
 msgstr "_Споји нити са истом темом"
 
-#: ../src/mailbox-node.c:278
+#: ../src/mailbox-node.c:275
 msgid "The folder edition to be written."
 msgstr "Издање фасцикле за упис."
 
-#: ../src/mailbox-node.c:457
+#: ../src/mailbox-node.c:454
 #, c-format
 msgid "Scanning %s. Please wait…"
 msgstr "Прегледам „%s“. Сачекајте…"
 
-#: ../src/mailbox-node.c:473
+#: ../src/mailbox-node.c:470
 #, c-format
 msgid ""
 "Scanning of %s failed: %s\n"
@@ -5357,76 +5290,75 @@ msgstr ""
 "Прегледање „%s“ није успело: %s\n"
 "Проверите повезаност на мрежу."
 
-#: ../src/mailbox-node.c:475
+#: ../src/mailbox-node.c:472
 #, c-format
 msgid "Scanning of %s failed: %s"
 msgstr "Прегледање „%s“ није успело: %s"
 
-#: ../src/mailbox-node.c:967
-#| msgid "You can apply filters only on mailbox\n"
+#: ../src/mailbox-node.c:964
 msgid "You can apply filters only on mailbox"
 msgstr "Пропуснике можете применити само на сандуче"
 
-#: ../src/mailbox-node.c:1001
+#: ../src/mailbox-node.c:998
 msgid "Local _mbox mailbox…"
 msgstr "Месно сандуче „_mbox“…"
 
-#: ../src/mailbox-node.c:1003
+#: ../src/mailbox-node.c:1000
 msgid "Local Mail_dir mailbox…"
 msgstr "Месно сандуче „Mail_dir“…"
 
-#: ../src/mailbox-node.c:1005
+#: ../src/mailbox-node.c:1002
 msgid "Local M_H mailbox…"
 msgstr "Месно сандуче „M_H“…"
 
-#: ../src/mailbox-node.c:1008
+#: ../src/mailbox-node.c:1005
 msgid "Remote IMAP _folder…"
 msgstr "Удаљена _фасцикла ИМАП-а…"
 
-#: ../src/mailbox-node.c:1011
+#: ../src/mailbox-node.c:1008
 msgid "Remote IMAP _subfolder…"
 msgstr "Удаљена _подфасцикла ИМАП-а…"
 
 #. Translators: popup menu item "New" mailbox or folder
-#: ../src/mailbox-node.c:1017
+#: ../src/mailbox-node.c:1014
 msgctxt "mailbox"
 msgid "_New"
 msgstr "_Нова"
 
 #. clicked on the empty space
-#: ../src/mailbox-node.c:1024 ../src/mailbox-node.c:1040
+#: ../src/mailbox-node.c:1021 ../src/mailbox-node.c:1037
 msgid "_Rescan"
 msgstr "Поново п_регледај"
 
-#: ../src/mailbox-node.c:1034
+#: ../src/mailbox-node.c:1031
 msgid "_Properties…"
 msgstr "_Својства…"
 
-#: ../src/mailbox-node.c:1064
+#: ../src/mailbox-node.c:1061
 msgid "Mark as _Inbox"
 msgstr "Означи као „_долазно“"
 
-#: ../src/mailbox-node.c:1066
+#: ../src/mailbox-node.c:1063
 msgid "_Mark as Sentbox"
 msgstr "Означи као „_одлазно“"
 
-#: ../src/mailbox-node.c:1068
+#: ../src/mailbox-node.c:1065
 msgid "Mark as _Trash"
 msgstr "Означи као „_смеће“"
 
-#: ../src/mailbox-node.c:1070
+#: ../src/mailbox-node.c:1067
 msgid "Mark as D_raftbox"
 msgstr "Означи као „с_кице“"
 
-#: ../src/mailbox-node.c:1073
+#: ../src/mailbox-node.c:1070
 msgid "_Empty trash"
 msgstr "_Избаци смеће"
 
-#: ../src/mailbox-node.c:1078
+#: ../src/mailbox-node.c:1075
 msgid "_Edit/Apply filters"
 msgstr "_Уреди/примени филтере"
 
-#: ../src/mailbox-node.c:1165
+#: ../src/mailbox-node.c:1162
 #, c-format
 msgid "The path “%s” does not lead to a mailbox."
 msgstr "Путања „%s“ не води ка сандучету."
@@ -5825,7 +5757,7 @@ msgid "Remote mailbox servers"
 msgstr "Удаљени сервери за пошту"
 
 #: ../src/pref-manager.c:1969 ../src/pref-manager.c:2720
-#: ../src/sendmsg-window.c:2602
+#: ../src/sendmsg-window.c:2605
 msgid "Type"
 msgstr "Врста"
 
@@ -6016,7 +5948,6 @@ msgid "Default sort column:"
 msgstr "Основна колона ређања:"
 
 #: ../src/pref-manager.c:2396
-#| msgid "sign messages by default"
 msgid "Thread messages by default"
 msgstr "Надовежи поруке по основи"
 
@@ -6311,17 +6242,14 @@ msgid "Page %d of %d"
 msgstr "Страница %d од %d"
 
 #: ../src/print-gtk.c:168
-#| msgid "Signed and encrypted matter"
 msgid "Signed and encrypted"
 msgstr "Потписана и шифрована"
 
 #: ../src/print-gtk.c:170
-#| msgid "Sign"
 msgid "Signed"
 msgstr "Потписана"
 
 #: ../src/print-gtk.c:173
-#| msgid "Encrypt"
 msgid "Encrypted"
 msgstr "Шифрована"
 
@@ -6329,10 +6257,14 @@ msgstr "Шифрована"
 #, c-format
 msgid "Cannot print page %d because the document has only %d page."
 msgid_plural "Cannot print page %d because the document has only %d pages."
-msgstr[0] "Не могу да штампам %d. страницу зато што документ има само %d страницу."
-msgstr[1] "Не могу да штампам %d. страницу зато што документ има само %d странице."
-msgstr[2] "Не могу да штампам %d. страницу зато што документ има само %d страница."
-msgstr[3] "Не могу да штампам %d. страницу зато што документ има само једну страницу."
+msgstr[0] ""
+"Не могу да штампам %d. страницу зато што документ има само %d страницу."
+msgstr[1] ""
+"Не могу да штампам %d. страницу зато што документ има само %d странице."
+msgstr[2] ""
+"Не могу да штампам %d. страницу зато што документ има само %d страница."
+msgstr[3] ""
+"Не могу да штампам %d. страницу зато што документ има само једну страницу."
 
 #. Translate to the default units to use for presenting
 #. * lengths to the user. Translate to default:inch if you
@@ -6685,42 +6617,42 @@ msgstr "Приложи као МИМЕ врсту:"
 msgid "Character set for file %s changed from “%s” to “%s”."
 msgstr "Скуп знакова за датотеку „%s“ је измењен из „%s“ у „%s“."
 
-#: ../src/sendmsg-window.c:1625 ../src/sendmsg-window.c:5114
+#: ../src/sendmsg-window.c:1628 ../src/sendmsg-window.c:5117
 msgid "(no subject)"
 msgstr "(без наслова)"
 
-#: ../src/sendmsg-window.c:1662
+#: ../src/sendmsg-window.c:1665
 #, c-format
 msgid "Cannot create file URI object for %s"
 msgstr "Не могу да направим предмет путање датотеке за %s"
 
-#: ../src/sendmsg-window.c:1710
+#: ../src/sendmsg-window.c:1713
 msgid "forwarded message"
 msgstr "прослеђена порука"
 
-#: ../src/sendmsg-window.c:1715
+#: ../src/sendmsg-window.c:1718
 #, c-format
 msgid "Message from %s, subject: “%s”"
 msgstr "Поруку шаље %s, тема: „%s“"
 
-#: ../src/sendmsg-window.c:1799 ../src/sendmsg-window.c:1875
+#: ../src/sendmsg-window.c:1802 ../src/sendmsg-window.c:1878
 msgid "Remove"
 msgstr "Уклони"
 
-#: ../src/sendmsg-window.c:1887
+#: ../src/sendmsg-window.c:1890
 msgid "Open…"
 msgstr "Отвори…"
 
-#: ../src/sendmsg-window.c:1899
+#: ../src/sendmsg-window.c:1902
 msgid "(URL)"
 msgstr "(Адреса)"
 
-#: ../src/sendmsg-window.c:1954
+#: ../src/sendmsg-window.c:1957
 msgid "Attach file"
 msgstr "Приложи датотеку"
 
-#: ../src/sendmsg-window.c:2066 ../src/sendmsg-window.c:2142
-#: ../src/sendmsg-window.c:7090
+#: ../src/sendmsg-window.c:2069 ../src/sendmsg-window.c:2145
+#: ../src/sendmsg-window.c:7093
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -6728,88 +6660,87 @@ msgstr ""
 "Неуспешно укључивање поруке.\n"
 "Могући разлог: недовољно простора за привремени смештај"
 
-#: ../src/sendmsg-window.c:2357
+#: ../src/sendmsg-window.c:2360
 msgid "F_rom:"
 msgstr "_Шаље:"
 
 #. Subject:
-#: ../src/sendmsg-window.c:2507
+#: ../src/sendmsg-window.c:2510
 msgid "S_ubject:"
 msgstr "_Тема:"
 
-#: ../src/sendmsg-window.c:2538
+#: ../src/sendmsg-window.c:2541
 msgid "F_CC:"
 msgstr "Ф_ЦЦ:"
 
 #. Attachment list
-#: ../src/sendmsg-window.c:2565
+#: ../src/sendmsg-window.c:2568
 msgid "_Attachments:"
 msgstr "_Прилози:"
 
-#: ../src/sendmsg-window.c:2609
+#: ../src/sendmsg-window.c:2612
 msgid "Mode"
 msgstr "Начин"
 
-#: ../src/sendmsg-window.c:2632
+#: ../src/sendmsg-window.c:2635
 msgid "Description"
 msgstr "Опис"
 
-#: ../src/sendmsg-window.c:2934
+#: ../src/sendmsg-window.c:2937
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Не могу да сачувам прилог: %s"
 
-#: ../src/sendmsg-window.c:3008
+#: ../src/sendmsg-window.c:3011
 msgid "No subject"
 msgstr "Без теме"
 
-#: ../src/sendmsg-window.c:3057
-#| msgid "encrypted: "
+#: ../src/sendmsg-window.c:3060
 msgid "decrypted: "
 msgstr "дешифрована: "
 
-#: ../src/sendmsg-window.c:3065
+#: ../src/sendmsg-window.c:3068
 #, c-format
 msgid "inlined file “%s” (%s)"
 msgstr "непосредна датотека „%s“ (%s)"
 
-#: ../src/sendmsg-window.c:3068
+#: ../src/sendmsg-window.c:3071
 #, c-format
 msgid "attached file “%s” (%s)"
 msgstr "приложена датотека „%s“ (%s)"
 
-#: ../src/sendmsg-window.c:3073
+#: ../src/sendmsg-window.c:3076
 #, c-format
 msgid "inlined %s part"
 msgstr "непосредан %s део"
 
-#: ../src/sendmsg-window.c:3075
+#: ../src/sendmsg-window.c:3078
 #, c-format
 msgid "attached %s part"
 msgstr "приложен %s део"
 
-#: ../src/sendmsg-window.c:3156
+#: ../src/sendmsg-window.c:3159
 #, c-format
 msgid "message from %s, subject “%s”"
 msgstr "поруку шаље %s, тема „%s“"
 
-#: ../src/sendmsg-window.c:3284
+#: ../src/sendmsg-window.c:3287
 msgid "quoted"
 msgstr "цитирано"
 
-#: ../src/sendmsg-window.c:3289 ../src/sendmsg-window.c:3292
+#: ../src/sendmsg-window.c:3292 ../src/sendmsg-window.c:3295
 msgid "quoted attachment"
 msgstr "цитирани прилог"
 
-#: ../src/sendmsg-window.c:3336
+#: ../src/sendmsg-window.c:3339
 msgid "Select parts for quotation"
 msgstr "Изабери делове за цитирање"
 
-#: ../src/sendmsg-window.c:3348
+#: ../src/sendmsg-window.c:3351
 msgid "Select the parts of the message which shall be quoted in the reply"
 msgstr "Изаберите делове поруке који ће бити цитирани у одговору"
 
-#: ../src/sendmsg-window.c:3371
+#: ../src/sendmsg-window.c:3374
 msgid ""
 "<b>Warning:</b> The original message contains an abnormal mixture of "
 "encrypted and unencrypted parts. This <i>might</i> indicate an attack.\n"
@@ -6819,7 +6750,7 @@ msgstr ""
 "нешифрованих делова. То <i>може</i> да указује на напад.\n"
 "Два пута проверите саддржај одговора пре слања."
 
-#: ../src/sendmsg-window.c:3378 ../src/sendmsg-window.c:3450
+#: ../src/sendmsg-window.c:3381 ../src/sendmsg-window.c:3453
 msgid ""
 "You reply to an encrypted message. The reply will contain the decrypted "
 "contents of the original message.\n"
@@ -6831,70 +6762,70 @@ msgstr ""
 "Размислите о шифровању одговора и уверите се да ненамерно не пропуштате "
 "осетљиве информације."
 
-#: ../src/sendmsg-window.c:3454
+#: ../src/sendmsg-window.c:3457
 msgid "Do not remind me again."
 msgstr "Немој више да ме подсећаш."
 
-#: ../src/sendmsg-window.c:3549
+#: ../src/sendmsg-window.c:3552
 msgid "you"
 msgstr "ви"
 
-#: ../src/sendmsg-window.c:3558
+#: ../src/sendmsg-window.c:3561
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------прослеђена порука коју шаље %s------\n"
 
-#: ../src/sendmsg-window.c:3595
+#: ../src/sendmsg-window.c:3598
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "ИБ поруке: %s\n"
 
-#: ../src/sendmsg-window.c:3601
+#: ../src/sendmsg-window.c:3604
 msgid "References:"
 msgstr "Позивања:"
 
-#: ../src/sendmsg-window.c:3612
+#: ../src/sendmsg-window.c:3615
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Дана %s, %s је написао:\n"
 
-#: ../src/sendmsg-window.c:3614
+#: ../src/sendmsg-window.c:3617
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s је написао:\n"
 
-#: ../src/sendmsg-window.c:3880
+#: ../src/sendmsg-window.c:3883
 msgid "Could not save message."
 msgstr "Не могу да сачувам поруку."
 
-#: ../src/sendmsg-window.c:3887
+#: ../src/sendmsg-window.c:3890
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Не могу да отворим скице: %s"
 
-#: ../src/sendmsg-window.c:3916
+#: ../src/sendmsg-window.c:3919
 msgid "Message saved."
 msgstr "Порука је сачувана."
 
-#: ../src/sendmsg-window.c:4554 ../src/sendmsg-window.c:4562
-#: ../src/sendmsg-window.c:4569 ../src/sendmsg-window.c:4593
+#: ../src/sendmsg-window.c:4557 ../src/sendmsg-window.c:4565
+#: ../src/sendmsg-window.c:4572 ../src/sendmsg-window.c:4596
 #, c-format
 msgid "Could not attach the file %s: %s."
 msgstr "Не могу да приложим датотеку „%s“: %s."
 
-#: ../src/sendmsg-window.c:4555
+#: ../src/sendmsg-window.c:4558
 msgid "not an absolute path"
 msgstr "није апсолутна путања"
 
-#: ../src/sendmsg-window.c:4563
+#: ../src/sendmsg-window.c:4566
 msgid "does not exist"
 msgstr "не постоји"
 
-#: ../src/sendmsg-window.c:4594
+#: ../src/sendmsg-window.c:4597
 msgid "not in current directory"
 msgstr "није у текућем директоријуму"
 
-#: ../src/sendmsg-window.c:4646
+#: ../src/sendmsg-window.c:4649
 msgid ""
 "The link that you selected created\n"
 "a “Blind copy” (BCC) address.\n"
@@ -6906,58 +6837,56 @@ msgstr ""
 "Молим проверите да ли је адреса\n"
 "одговарајућа."
 
-#: ../src/sendmsg-window.c:4755
+#: ../src/sendmsg-window.c:4758
 #, c-format
-#| msgid "Cannot not read the file “%s”: %s"
 msgid "Cannot read the file “%s”: %s"
 msgstr "Не могу да прочитам датотеку „%s“: %s"
 
-#: ../src/sendmsg-window.c:4774
+#: ../src/sendmsg-window.c:4777
 msgid "Include file"
 msgstr "Укључи датотеку"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4961
+#: ../src/sendmsg-window.c:4964
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Не могу да учитам сличицу заглавља „%s“: %s"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4964
+#: ../src/sendmsg-window.c:4967
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Не могу да учитам Х-сличицу заглавља „%s“: %s"
 
-#: ../src/sendmsg-window.c:5074
+#: ../src/sendmsg-window.c:5077
 msgid "No Subject"
 msgstr "Нема теме"
 
-#: ../src/sendmsg-window.c:5079
+#: ../src/sendmsg-window.c:5082
 msgid "_Send"
 msgstr "_Пошаљи"
 
-#: ../src/sendmsg-window.c:5100
+#: ../src/sendmsg-window.c:5103
 msgid "You did not specify a subject for this message"
 msgstr "Нисте навели тему за ову поруку"
 
-#: ../src/sendmsg-window.c:5101
+#: ../src/sendmsg-window.c:5104
 msgid "If you would like to provide one, enter it below."
 msgstr "Ако желите, упишите је испод."
 
-#: ../src/sendmsg-window.c:5159
-#| msgid "Message could not be encrypted"
+#: ../src/sendmsg-window.c:5162
 msgid "Message could be encrypted"
 msgstr "Порука може бити шифрована"
 
-#: ../src/sendmsg-window.c:5162
+#: ../src/sendmsg-window.c:5165
 msgid "Send _encrypted"
 msgstr "Пошаљи _шифровану"
 
-#: ../src/sendmsg-window.c:5163
+#: ../src/sendmsg-window.c:5166
 msgid "Send _unencrypted"
 msgstr "Пошаљи _нешифровану"
 
-#: ../src/sendmsg-window.c:5233 ../src/sendmsg-window.c:5321
+#: ../src/sendmsg-window.c:5236 ../src/sendmsg-window.c:5324
 #, c-format
 msgid ""
 "You did not select encryption for this message, although %s public keys are "
@@ -6968,13 +6897,12 @@ msgstr ""
 "свим примаоцима. Да бисте заштитили вашу приватност, порука би могла бити "
 "„%s“ шифрована."
 
-#: ../src/sendmsg-window.c:5308
+#: ../src/sendmsg-window.c:5311
 #, c-format
-#| msgid "Error selecting key: %s"
 msgid "error checking Autocrypt keys: %s"
 msgstr "грешка провере кључева самошифровања: %s"
 
-#: ../src/sendmsg-window.c:5339
+#: ../src/sendmsg-window.c:5342
 msgid ""
 "\n"
 "However, encryption is discouraged as the Autocrypt status indicates that "
@@ -6984,7 +6912,7 @@ msgstr ""
 "Међутим, шифровање се не препоручује јер стање самошифровања показује да "
 "неки примаоци <i>неће</i> моћи да читају поруку."
 
-#: ../src/sendmsg-window.c:5352
+#: ../src/sendmsg-window.c:5355
 #, c-format
 msgid ""
 "<i>Note:</i> choosing encryption will import %u key from the Autocrypt "
@@ -7005,17 +6933,16 @@ msgstr[3] ""
 "<i>Напомена:</i> бирајући шифровање биће увезен један кључ из базе "
 "самошифровања у ГнуПГ привезак."
 
-#: ../src/sendmsg-window.c:5377
+#: ../src/sendmsg-window.c:5380
 #, c-format
-#| msgid "Cannot process the message: %s"
 msgid "Cannot import Autocrypt keys: %s"
 msgstr "Не могу да увезем кључеве самошифровања: %s"
 
-#: ../src/sendmsg-window.c:5437
+#: ../src/sendmsg-window.c:5440
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "Изабрали сте ОпенПГП безбедност за ову поруку.\n"
 
-#: ../src/sendmsg-window.c:5442
+#: ../src/sendmsg-window.c:5445
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
@@ -7023,12 +6950,12 @@ msgstr ""
 "Текст поруке ће бити послат и као обичан текст и ако ХТМЛ, сали само обичан "
 "текст може бити потписан.\n"
 
-#: ../src/sendmsg-window.c:5447
+#: ../src/sendmsg-window.c:5450
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr "Порука садржи прилоге, који не могу бити потписани или шифровани.\n"
 
-#: ../src/sendmsg-window.c:5451
+#: ../src/sendmsg-window.c:5454
 msgid ""
 "You should select MIME mode if the complete message shall be protected. Do "
 "you really want to proceed?"
@@ -7036,36 +6963,36 @@ msgstr ""
 "Треба да изаберете МИМЕ режим ако читава порука треба да буде шифрована. Да "
 "ли заиста желите да наставите?"
 
-#: ../src/sendmsg-window.c:5474
+#: ../src/sendmsg-window.c:5477
 #, c-format
 msgid "sending message with GPG mode %d"
 msgstr "шаљем поруку у ГПГ режиму %d"
 
-#: ../src/sendmsg-window.c:5504
+#: ../src/sendmsg-window.c:5507
 msgid "Message could not be created"
 msgstr "Не могу да направим поруку"
 
-#: ../src/sendmsg-window.c:5506
+#: ../src/sendmsg-window.c:5509
 msgid "Message could not be queued in outbox"
 msgstr "Порука не може бити стављена у ред у одлазном"
 
-#: ../src/sendmsg-window.c:5508
+#: ../src/sendmsg-window.c:5511
 msgid "Message could not be saved in sentbox"
 msgstr "Порука не може бити сачувана у послатом"
 
-#: ../src/sendmsg-window.c:5510
+#: ../src/sendmsg-window.c:5513
 msgid "Message could not be sent"
 msgstr "Не могу да пошаљем поруку"
 
-#: ../src/sendmsg-window.c:5512
+#: ../src/sendmsg-window.c:5515
 msgid "Message could not be signed"
 msgstr "Не могу да потпишем поруку"
 
-#: ../src/sendmsg-window.c:5514
+#: ../src/sendmsg-window.c:5517
 msgid "Message could not be encrypted"
 msgstr "Не могу да шифрујем поруку"
 
-#: ../src/sendmsg-window.c:5519
+#: ../src/sendmsg-window.c:5522
 #, c-format
 msgid ""
 "Send failed: %s\n"
@@ -7074,45 +7001,45 @@ msgstr ""
 "Нисам успео да пошаљем: %s\n"
 "%s"
 
-#: ../src/sendmsg-window.c:5525
+#: ../src/sendmsg-window.c:5528
 #, c-format
 msgid "Send failed: %s"
 msgstr "Нисам успео да пошаљем: %s"
 
-#: ../src/sendmsg-window.c:5624
+#: ../src/sendmsg-window.c:5627
 #, c-format
 msgid "Could not postpone message: %s"
 msgstr "Не могу да одложим поруку: %s"
 
-#: ../src/sendmsg-window.c:5645
+#: ../src/sendmsg-window.c:5648
 msgid "Message postponed."
 msgstr "Порука је одложена."
 
-#: ../src/sendmsg-window.c:5650
+#: ../src/sendmsg-window.c:5653
 msgid "Could not postpone message."
 msgstr "Не могу да одложим поруку."
 
-#: ../src/sendmsg-window.c:5862
+#: ../src/sendmsg-window.c:5865
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Грешка покретања провере правописа: %s"
 
-#: ../src/sendmsg-window.c:6625
+#: ../src/sendmsg-window.c:6628
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Одговор за %s: %s"
 
-#: ../src/sendmsg-window.c:6630
+#: ../src/sendmsg-window.c:6633
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Проследи поруку за %s: %s"
 
-#: ../src/sendmsg-window.c:6634
+#: ../src/sendmsg-window.c:6637
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Нова порука за %s: %s"
 
-#: ../src/sendmsg-window.c:6782 ../ui/sendmsg-window.ui.h:33
+#: ../src/sendmsg-window.c:6785 ../ui/sendmsg-window.ui.h:33
 msgid "_Language"
 msgstr "_Језик"
 
@@ -7376,7 +7303,6 @@ msgstr ""
 "заглавља"
 
 #: ../src/toolbar-factory.c:146
-#| msgid "Check cryptographic signature"
 msgid ""
 "Recheck\n"
 "cryptography"
@@ -7573,7 +7499,6 @@ msgstr "_О програму"
 
 #. Translators: window menu item - New message or mailbox
 #: ../ui/main-window.ui.h:3
-#| msgid "_New"
 msgctxt "window menu"
 msgid "_New"
 msgstr "_Нова"
@@ -7665,7 +7590,6 @@ msgid "_Preferences"
 msgstr "_Поставке"
 
 #: ../ui/main-window.ui.h:29
-#| msgid "_Settings"
 msgid "_Settings…"
 msgstr "_Поставке…"
 
@@ -7720,7 +7644,6 @@ msgid "All _Headers"
 msgstr "С_ва заглавља"
 
 #: ../ui/main-window.ui.h:42
-#| msgid "H_ide messages"
 msgid "Th_read messages"
 msgstr "_Надовежи поруке"
 
@@ -7803,7 +7726,6 @@ msgid "_Message"
 msgstr "_Порука"
 
 #: ../ui/main-window.ui.h:67
-#| msgid "_New"
 msgid "_New…"
 msgstr "_Нова…"
 
@@ -7832,9 +7754,6 @@ msgid "_View Source…"
 msgstr "_Погледај извор…"
 
 #: ../ui/main-window.ui.h:78 ../ui/message-window.ui.h:30
-#| msgid ""
-#| "_Decrypt and check\n"
-#| "signatures automatically:"
 msgid "Decrypt and check signatures"
 msgstr "Дешифрујте и проверите потписе"
 
@@ -7855,7 +7774,6 @@ msgid "_New"
 msgstr "_Нова"
 
 #: ../ui/main-window.ui.h:84
-#| msgid "_No"
 msgid "_Go"
 msgstr "_Иди"
 
@@ -7880,7 +7798,6 @@ msgid "_Contents"
 msgstr "_Садржај"
 
 #: ../ui/main-window.ui.h:91
-#| msgid "About Balsa"
 msgid "_About Balsa"
 msgstr "_О Балси"
 

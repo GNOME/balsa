@@ -435,7 +435,6 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 
     gmime_parser = g_mime_parser_new_with_stream(mbox->gmime_stream);
     g_mime_parser_set_format(gmime_parser, GMIME_FORMAT_MBOX);
-    g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
                                    "^Status|^X-Status|^MIME-Version",
 				   lbm_mbox_header_cb, &msg_info_p);

@@ -1209,6 +1209,7 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
     if (mimap->expunged_idle_id != 0) {
         g_source_remove(mimap->expunged_idle_id);
         mimap->expunged_idle_id = 0;
+        g_array_set_size(mimap->expunged_seqnos, 0);
     }
 
     free_messages_info(mimap);

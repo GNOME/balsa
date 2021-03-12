@@ -86,6 +86,9 @@ struct _LibBalsaMailboxImap {
 
     gboolean disconnected;
     struct ImapCacheManager *icm;
+
+    GArray *expunged_seqnos;
+    guint expunged_idle_id;
 };
 
 struct message_info {
@@ -275,6 +278,9 @@ libbalsa_mailbox_imap_init(LibBalsaMailboxImap * mailbox)
     mailbox->sort_ranks = g_array_new(FALSE, FALSE, sizeof(guint));
     mailbox->sort_field = -1;	/* Initially invalid. */
     mailbox->disconnected = FALSE;
+
+    mailbox->expunged_seqnos = g_array_new(FALSE, FALSE, sizeof(guint));
+    mailbox->expunged_idle_id = 0;
 }
 
 static void
@@ -297,6 +303,13 @@ libbalsa_mailbox_imap_dispose(GObject * object)
         mimap->unread_update_id = 0;
     }
 
+    if (mimap->expunged_idle_id != 0) {
+        /* Should have been removed at close time, but to be on the safe
+         * side: */
+        g_source_remove(mimap->expunged_idle_id);
+        mimap->expunged_idle_id = 0;
+    }
+
     G_OBJECT_CLASS(libbalsa_mailbox_imap_parent_class)->dispose(object);
 }
 
@@ -307,6 +320,7 @@ libbalsa_mailbox_imap_finalize(GObject * object)
 
     g_free(mimap->path);
     g_array_free(mimap->sort_ranks, TRUE);
+    g_array_free(mimap->expunged_seqnos, TRUE);
     g_list_free_full(mimap->acls, (GDestroyNotify) imap_user_acl_free);
     if (mimap->icm != NULL)
         imap_cache_manager_free(mimap->icm);
@@ -884,21 +898,66 @@ imap_exists_cb(ImapMboxHandle *handle, LibBalsaMailboxImap *mimap)
     g_idle_add(imap_exists_idle, g_object_ref(mimap));
 }
 
+static gboolean
+imap_expunge_idle(gpointer user_data)
+{
+    LibBalsaMailboxImap *mimap = user_data;
+    guint j;
+
+    LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
+
+    libbalsa_lock_mailbox(mailbox);
+
+    for (j = 0; j < mimap->expunged_seqnos->len; j++) {
+        guint seqno = g_array_index(mimap->expunged_seqnos, guint, j);
+        struct message_info *msg_info;
+        guint i;
+
+        libbalsa_mailbox_msgno_removed(mailbox, seqno);
+
+        msg_info = message_info_from_msgno(mimap, seqno);
+        if (msg_info != NULL) {
+            if (msg_info->message != NULL)
+                g_object_unref(msg_info->message);
+            g_array_remove_index(mimap->messages_info, seqno - 1);
+        }
+
+        if (seqno <= mimap->msgids->len) {
+            gchar *msgid;
+
+            msgid = g_ptr_array_index(mimap->msgids, seqno - 1);
+            g_free(msgid);
+            g_ptr_array_remove_index(mimap->msgids, seqno - 1);
+        }
+
+        for (i = seqno - 1; i < mimap->messages_info->len; i++) {
+            struct message_info *info =
+                &g_array_index(mimap->messages_info, struct message_info, i);
+
+            g_assert(info != NULL);
+            if (info->message != NULL)
+                libbalsa_message_set_msgno(info->message, i + 1);
+        }
+    }
+
+    ++mimap->search_stamp;
+    mimap->sort_field = -1;     /* Invalidate. */
+
+    mimap->expunged_idle_id = 0;
+    g_array_set_size(mimap->expunged_seqnos, 0);
+    libbalsa_unlock_mailbox(mailbox);
+
+    return G_SOURCE_REMOVE;
+}
+
 static void
 imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
                 LibBalsaMailboxImap *mimap)
 {
     ImapMessage *imsg;
-    guint i;
-
     LibBalsaMailbox *mailbox = LIBBALSA_MAILBOX(mimap);
-    struct message_info *msg_info;
 
     libbalsa_lock_mailbox(mailbox);
-
-    libbalsa_mailbox_msgno_removed(mailbox, seqno);
-    ++mimap->search_stamp;
-    mimap->sort_field = -1;	/* Invalidate. */
 
     /* Use imap_mbox_handle_get_msg(mimap->handle, seqno)->uid, not
      * IMAP_MESSAGE_UID(msg_info->message), as the latter may try to
@@ -912,29 +971,9 @@ imap_expunge_cb(ImapMboxHandle *handle, unsigned seqno,
         g_strfreev(pair);
     }
 
-    msg_info = message_info_from_msgno(mimap, seqno);
-    if (msg_info) {
-        if (msg_info->message)
-            g_object_unref(msg_info->message);
-        g_array_remove_index(mimap->messages_info, seqno-1);
-    }
-
-    if (seqno <= mimap->msgids->len) {
-        gchar *msgid;
-
-        msgid = g_ptr_array_index(mimap->msgids, seqno - 1);
-        g_free(msgid);
-        g_ptr_array_remove_index(mimap->msgids, seqno - 1);
-    }
-
-    for (i = seqno - 1; i < mimap->messages_info->len; i++) {
-	struct message_info *info =
-	    &g_array_index(mimap->messages_info, struct message_info, i);
-
-        g_assert(info != NULL);
-        if (info->message != NULL)
-            libbalsa_message_set_msgno(info->message, i + 1);
-    }
+    g_array_append_val(mimap->expunged_seqnos, seqno);
+    if (mimap->expunged_idle_id == 0)
+        mimap->expunged_idle_id = g_idle_add(imap_expunge_idle, mimap);
 
     libbalsa_unlock_mailbox(mailbox);
 }
@@ -1167,6 +1206,10 @@ libbalsa_mailbox_imap_close(LibBalsaMailbox * mailbox, gboolean expunge)
     }
     clean_cache(mailbox);
 
+    if (mimap->expunged_idle_id != 0) {
+        g_source_remove(mimap->expunged_idle_id);
+        mimap->expunged_idle_id = 0;
+    }
 
     free_messages_info(mimap);
     libbalsa_mailbox_imap_release_handle(mimap);
@@ -2285,6 +2328,10 @@ libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
     glong msgno;
 
     msgno = libbalsa_message_get_msgno(message);
+    /* If message numbers are out of sync with the mail store,
+     * just skip the message: */
+    if (msgno > imap_mbox_handle_get_exists(mimap->handle))
+        return;
 
     II(rc,mimap->handle,
        imap_mbox_handle_fetch_range(mimap->handle, msgno, msgno,

@@ -52,8 +52,7 @@ balsa_mime_widget_new_signature(BalsaMessage * bm,
 	return NULL;
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-    gtk_box_append(GTK_BOX(mw),
-                      balsa_mime_widget_signature_widget(mime_body, content_type));
+    gtk_box_append(GTK_BOX(mw), balsa_mime_widget_signature_widget(mime_body, content_type));
 
     return mw;
 }
@@ -93,24 +92,24 @@ balsa_mime_widget_new_pgpkey(BalsaMessage        *bm,
 }
 
 GtkWidget *
-balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
-				   const gchar * content_type)
+balsa_mime_widget_signature_widget(LibBalsaMessageBody *mime_body,
+                                   const char          *content_type)
 {
-	gpgme_key_t key;
-	gchar *infostr;
+    gpgme_key_t key;
+    gchar *infostr;
     GtkWidget *expander;
     GtkWidget *vbox, *label;
     GtkWidget *signature_widget;
     gchar **lines;
 
-    if (!mime_body->sig_info ||
-    	g_mime_gpgme_sigstat_status(mime_body->sig_info) == GPG_ERR_NOT_SIGNED)
-	return NULL;
+    if (!mime_body->sig_info || g_mime_gpgme_sigstat_status(mime_body->sig_info) == GPG_ERR_NOT_SIGNED)
+        return NULL;
 
     infostr = g_mime_gpgme_sigstat_to_gchar(mime_body->sig_info, FALSE, balsa_app.date_string);
-    if (infostr == NULL) {
+
+    if (infostr == NULL)
         return NULL;
-    }
+
     lines = g_strsplit(infostr, "\n", 2);
     g_free(infostr);
 
@@ -119,15 +118,19 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
     gtk_box_append(GTK_BOX(vbox), label);
+
     key = g_mime_gpgme_sigstat_key(mime_body->sig_info);
     if (key != NULL) {
-		GtkWidget *key_widget;
+        GtkWidget *key_widget;
 
-		key_widget = libbalsa_gpgme_key(key, g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info), 0U, FALSE);
-		gtk_box_append(GTK_BOX(vbox), key_widget);
+        key_widget =
+            libbalsa_gpgme_key(key, g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info), 0U,
+                               FALSE);
+        gtk_box_append(GTK_BOX(vbox), key_widget);
     }
+
     if (g_mime_gpgme_sigstat_protocol(mime_body->sig_info) == GPGME_PROTOCOL_OpenPGP) {
-    	GtkWidget *hbox;
+        GtkWidget *hbox;
         GtkWidget *button;
 
         hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
@@ -154,14 +157,19 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         	}
 #endif
             button = libbalsa_add_mnemonic_button_to_box(_("_Search key server for this key"),
-                                                hbox, GTK_ALIGN_FILL);
+                                                         hbox, GTK_ALIGN_FILL);
         } else {
-            button = libbalsa_add_mnemonic_button_to_box(_("_Search key server for updates of this key"),
-                                                hbox, GTK_ALIGN_FILL);
+            button =
+                libbalsa_add_mnemonic_button_to_box(_("_Search key server for updates of this key"),
+                                                    hbox, GTK_ALIGN_FILL);
         }
         g_signal_connect(button, "clicked",
                          G_CALLBACK(on_gpg_key_button),
                          (gpointer) g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info));
+
+        gtk_widget_set_hexpand(button, TRUE);
+        gtk_widget_set_halign(button, GTK_ALIGN_FILL);
+        gtk_box_append(GTK_BOX(hbox), button);
     }
 
     /* Hack alert: if we omit the box below and use the expander as signature widget

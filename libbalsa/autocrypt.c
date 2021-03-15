@@ -115,24 +115,33 @@ static AutocryptData *autocrypt_user_info(const gchar  *mailbox,
 	G_GNUC_WARN_UNUSED_RESULT;
 static void autocrypt_free(AutocryptData *data);
 static AutocryptRecommend autocrypt_check_ia_list(gpgme_ctx_t           gpgme_ctx,
-												  InternetAddressList  *recipients,
-												  time_t                ref_time,
-												  GList               **missing_keys,
-												  GError              **error);
+                                                  InternetAddressList  *recipients,
+                                                  time_t                ref_time,
+                                                  GList               **missing_keys,
+                                                  GError              **error);
 
-static gboolean popup_menu_cb(GtkWidget *widget,
-							  gpointer   user_data);
-static void button_press_cb(GtkGestureMultiPress *multi_press_gesture,
-							gint                  n_press,
-							gdouble               x,
-							gdouble               y,
-							gpointer              user_data);
-static void popup_menu_real(GtkWidget      *widget,
-							const GdkEvent *event);
-static void show_key_details_cb(GtkMenuItem *menuitem,
-								gpointer     user_data);
-static void remove_key_cb(GtkMenuItem *menuitem,
-						  gpointer     user_data);
+static gboolean key_press_cb(GtkEventControllerKey *controller,
+                             unsigned               keyval,
+                             unsigned               keycode,
+                             GdkModifierType        state,
+                             gpointer               user_data);
+
+static void button_press_cb(GtkGestureClick *click_gesture,
+                            int              n_press,
+                            double           x,
+                            double           y,
+                            gpointer         user_data);
+
+static void popup_menu_real(GtkWidget *widget,
+                            GdkEvent  *event);
+
+static void show_details_activated(GSimpleAction *action,
+                                   GVariant      *parameter,
+                                   gpointer       user_data);
+
+static void delete_activated(GSimpleAction *action,
+                             GVariant      *parameter,
+                             gpointer       user_data);
 
 
 static sqlite3 *autocrypt_db = NULL;
@@ -427,133 +436,171 @@ autocrypt_recommendation(InternetAddressList *recipients, GList **missing_keys, 
 	return result;
 }
 
-static void
-main_dialog_response_cb(GtkDialog *dialog,
-                        int        response_id,
-                        gpointer   user_data)
-{
-    GList *keys = user_data;
+static const char action_namespace[] = "autocrypt-popup-menu";
 
-    g_list_free_full(keys, (GDestroyNotify) g_bytes_unref);
-    gtk_window_destroy(GTK_WINDOW(dialog));
+static void
+add_actions(GtkWidget  *widget,
+            const char *namespace)
+{
+    GSimpleActionGroup *simple;
+    static const GActionEntry entries[] = {
+        {"show-details", show_details_activated},
+        {"delete",       delete_activated},
+    };
+
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    entries, G_N_ELEMENTS(entries),
+                                    widget);
+
+    gtk_widget_insert_action_group(widget,
+                                   namespace,
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
 }
 
 /* documentation: see header file */
 void
 autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 {
-	GtkWidget *dialog;
-	GtkWidget *vbox;
+    GtkWidget *dialog;
+    GtkWidget *content_area;
+    GtkWidget *vbox;
     GtkWidget *scrolled_window;
     GtkWidget *tree_view;
     GtkListStore *model;
     GtkTreeSelection *selection;
-	GtkCellRenderer *renderer;
-	GtkTreeViewColumn *column;
-	GtkGesture *gesture;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    GtkGesture *gesture;
+    GtkEventController *controller;
     GList *keys = NULL;
-	int sqlite_res;
+    int sqlite_res;
 
-	dialog = gtk_dialog_new_with_buttons(_("Autocrypt database"), parent,
-		GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), _("_Close"), GTK_RESPONSE_CLOSE, NULL);
-	geometry_manager_attach(GTK_WINDOW(dialog), "AutocryptDB");
+    dialog = gtk_dialog_new_with_buttons(_("Autocrypt database"), parent,
+                                         GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+                                         _("_Close"), GTK_RESPONSE_CLOSE, NULL);
+    geometry_manager_attach(GTK_WINDOW(dialog), "AutocryptDB");
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
+    gtk_box_append(GTK_BOX(content_area), vbox);
     gtk_widget_set_vexpand(vbox, TRUE);
+    gtk_widget_set_hexpand(vbox, TRUE);
 
-    scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-    gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 12U);
-    gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrolled_window), GTK_SHADOW_ETCHED_IN);
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    scrolled_window = gtk_scrolled_window_new();
+
+    gtk_widget_set_margin_top(scrolled_window, 12U);
+    gtk_widget_set_margin_bottom(scrolled_window, 12U);
+    gtk_widget_set_margin_start(scrolled_window, 12U);
+    gtk_widget_set_margin_end(scrolled_window, 12U);
+
+    gtk_scrolled_window_set_has_frame(GTK_SCROLLED_WINDOW(scrolled_window), TRUE);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
+                                   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_AUTOMATIC);
     gtk_widget_set_vexpand(scrolled_window, TRUE);
     gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
     gtk_box_append(GTK_BOX(vbox), scrolled_window);
 
-    model = gtk_list_store_new(AC_DB_VIEW_COLUMNS, G_TYPE_STRING,	/* address */
-    	G_TYPE_INT64,												/* last seen timestamp value (for sorting) */
-    	G_TYPE_STRING,												/* formatted last seen timestamp */
-		G_TYPE_INT64,												/* last Autocrypt message timestamp value (for sorting) */
-		G_TYPE_STRING,												/* formatted last Autocrypt message timestamp */
-		G_TYPE_BOOLEAN,												/* user prefers encrypted messages */
-		G_TYPE_POINTER);											/* key */
+    model = gtk_list_store_new(AC_DB_VIEW_COLUMNS,
+                               G_TYPE_STRING,   /* address */
+                               G_TYPE_INT64,    /* last seen timestamp value (for sorting) */
+                               G_TYPE_STRING,   /* formatted last seen timestamp */
+                               G_TYPE_INT64,    /* last Autocrypt message timestamp value (for sorting) */
+                               G_TYPE_STRING,   /* formatted last Autocrypt message timestamp */
+                               G_TYPE_BOOLEAN,  /* user prefers encrypted messages */
+                               G_TYPE_POINTER); /* key */
 
     tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
 
-    gesture = gtk_gesture_multi_press_new(tree_view);
-    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-    g_signal_connect(gesture, "pressed", G_CALLBACK(button_press_cb), NULL);
-    gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture), GTK_PHASE_CAPTURE);
-    g_signal_connect(tree_view, "popup-menu", G_CALLBACK(popup_menu_cb), NULL);
+    add_actions(tree_view, action_namespace);
 
-    gtk_box_append(GTK_BOX(scrolled_window), tree_view);
+    gesture = gtk_gesture_click_new();
+    gtk_widget_add_controller(tree_view, GTK_EVENT_CONTROLLER(gesture));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_signal_connect(gesture, "pressed", G_CALLBACK(button_press_cb), tree_view);
+    gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture), GTK_PHASE_CAPTURE);
+
+    controller = gtk_event_controller_key_new();
+    gtk_widget_add_controller(tree_view, controller);
+    g_signal_connect(controller, "key-pressed", G_CALLBACK(key_press_cb), tree_view);
+
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window), tree_view);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
 
     /* add the keys */
     sqlite_res = sqlite3_step(query[5]);
     while (sqlite_res == SQLITE_ROW) {
-    	gint64 last_seen_val;
-    	gchar *last_seen_buf;
-    	gint64 last_ac_val;
-    	gchar *last_ac_buf;
-    	GBytes *key;
+        gint64 last_seen_val;
+        gchar *last_seen_buf;
+        gint64 last_ac_val;
+        gchar *last_ac_buf;
+        GBytes *key;
         GtkTreeIter iter;
 
         last_seen_val = sqlite3_column_int64(query[5], 1);
-    	last_seen_buf = libbalsa_date_to_utf8(last_seen_val, date_string);
-    	last_ac_val = sqlite3_column_int64(query[5], 2);
-    	last_ac_buf = libbalsa_date_to_utf8(last_ac_val, date_string);
-    	key = g_bytes_new(sqlite3_column_blob(query[5], 4), sqlite3_column_bytes(query[5], 4));
-    	keys = g_list_prepend(keys, key);
+        last_seen_buf = libbalsa_date_to_utf8(last_seen_val, date_string);
+        last_ac_val = sqlite3_column_int64(query[5], 2);
+        last_ac_buf = libbalsa_date_to_utf8(last_ac_val, date_string);
+        key = g_bytes_new(sqlite3_column_blob(query[5], 4), sqlite3_column_bytes(query[5], 4));
+        keys = g_list_prepend(keys, key);
 
-		gtk_list_store_append(model, &iter);
-		gtk_list_store_set(model, &iter,
-			AC_ADDRESS_COLUMN, sqlite3_column_text(query[5], 0),
-			AC_LAST_SEEN_INT_COLUMN, last_seen_val,
-			AC_LAST_SEEN_COLUMN, last_seen_buf,
-			AC_TIMESTAMP_INT_COLUMN, last_ac_val,
-			AC_TIMESTAMP_COLUMN, last_ac_buf,
-			AC_PREFER_ENCRYPT_COLUMN, sqlite3_column_int(query[5], 3),
-			AC_KEY_PTR_COLUMN, key,
-			-1);
-		g_free(last_seen_buf);
-		g_free(last_ac_buf);
+        gtk_list_store_append(model, &iter);
+        gtk_list_store_set(model, &iter,
+                           AC_ADDRESS_COLUMN, sqlite3_column_text(query[5], 0),
+                           AC_LAST_SEEN_INT_COLUMN, last_seen_val,
+                           AC_LAST_SEEN_COLUMN, last_seen_buf,
+                           AC_TIMESTAMP_INT_COLUMN, last_ac_val,
+                           AC_TIMESTAMP_COLUMN, last_ac_buf,
+                           AC_PREFER_ENCRYPT_COLUMN, sqlite3_column_int(query[5], 3),
+                           AC_KEY_PTR_COLUMN, key, -1);
+        g_free(last_seen_buf);
+        g_free(last_ac_buf);
 
-    	sqlite_res = sqlite3_step(query[5]);
+        sqlite_res = sqlite3_step(query[5]);
     }
     sqlite3_reset(query[5]);
 
     /* set up the tree view */
-	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Mailbox"), renderer, "text", AC_ADDRESS_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, AC_ADDRESS_COLUMN);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-	gtk_tree_view_column_set_resizable(column, TRUE);
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Mailbox"), renderer, "text", AC_ADDRESS_COLUMN,
+                                                 NULL);
+    gtk_tree_view_column_set_sort_column_id(column, AC_ADDRESS_COLUMN);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+    gtk_tree_view_column_set_resizable(column, TRUE);
 
-	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Last seen"), renderer, "text", AC_LAST_SEEN_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, AC_LAST_SEEN_INT_COLUMN);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-	gtk_tree_view_column_set_resizable(column, TRUE);
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Last seen"), renderer, "text",
+                                                 AC_LAST_SEEN_COLUMN, NULL);
+    gtk_tree_view_column_set_sort_column_id(column, AC_LAST_SEEN_INT_COLUMN);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+    gtk_tree_view_column_set_resizable(column, TRUE);
 
-	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Last Autocrypt message"), renderer, "text", AC_TIMESTAMP_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, AC_TIMESTAMP_INT_COLUMN);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-	gtk_tree_view_column_set_resizable(column, TRUE);
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Last Autocrypt message"), renderer, "text",
+                                                 AC_TIMESTAMP_COLUMN, NULL);
+    gtk_tree_view_column_set_sort_column_id(column, AC_TIMESTAMP_INT_COLUMN);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+    gtk_tree_view_column_set_resizable(column, TRUE);
 
-	renderer = gtk_cell_renderer_toggle_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Prefer encryption"), renderer, "active", AC_PREFER_ENCRYPT_COLUMN, NULL);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-	gtk_tree_view_column_set_resizable(column, TRUE);
+    renderer = gtk_cell_renderer_toggle_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Prefer encryption"), renderer, "active",
+                                                 AC_PREFER_ENCRYPT_COLUMN, NULL);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
+    gtk_tree_view_column_set_resizable(column, TRUE);
 
-	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(model), AC_ADDRESS_COLUMN, GTK_SORT_ASCENDING);
+    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(model), AC_ADDRESS_COLUMN,
+                                         GTK_SORT_ASCENDING);
     g_object_unref(model);
 
-        g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
-	gtk_widget_show(dialog);
+    g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
+    gtk_widget_show(dialog);
 }
 
 
@@ -820,117 +867,236 @@ update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
 	sqlite3_reset(query[3]);
 }
 
-static void
-popup_menu_real(GtkWidget *widget, const GdkEvent *event)
-{
-    GtkWidget *popup_menu;
-    GtkWidget* menu_item;
 
-	popup_menu = gtk_menu_new();
-    menu_item = gtk_menu_item_new_with_mnemonic(_("_Show details…"));
-	g_signal_connect(menu_item, "activate", G_CALLBACK(show_key_details_cb), widget);
-    gtk_menu_shell_append(GTK_MENU_SHELL(popup_menu), menu_item);
-    menu_item = gtk_menu_item_new_with_mnemonic(_("_Delete"));
-    g_signal_connect(menu_item, "activate", G_CALLBACK(remove_key_cb), widget);
-    gtk_menu_shell_append(GTK_MENU_SHELL(popup_menu), menu_item);
-    gtk_widget_show_all(popup_menu);
-    if (event != NULL) {
-    	gtk_menu_popup_at_pointer(GTK_MENU(popup_menu), event);
-    } else {
-        gtk_menu_popup_at_widget(GTK_MENU(popup_menu), widget, GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER, NULL);
+/* callback: popup menu key in autocrypt database dialogue activated */
+static gboolean
+key_press_cb(GtkEventControllerKey *controller,
+             unsigned               keyval,
+             unsigned               keycode,
+             GdkModifierType        state,
+             gpointer               user_data)
+{
+    if (keyval == GDK_KEY_F10 && (state & GDK_SHIFT_MASK) != 0) {
+        GtkWidget *widget = user_data;
+        GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+        GtkTreeSelection *selection;
+        GtkTreeModel *model;
+        GtkTreeIter iter;
+
+        selection = gtk_tree_view_get_selection(tree_view);
+        if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+            GtkTreePath *path;
+
+            path = gtk_tree_model_get_path(model, &iter);
+            gtk_tree_view_scroll_to_cell(tree_view, path, NULL, FALSE, 0.0, 0.0);
+            gtk_tree_path_free(path);
+            popup_menu_real(widget, NULL);
+
+            return TRUE;
+        }
     }
+
+    return FALSE;
+}
+
+
+/* callback: mouse click in autocrypt database dialogue activated */
+static void
+button_press_cb(GtkGestureClick *click_gesture,
+                int              G_GNUC_UNUSED n_press,
+                double           x,
+                double           y,
+                gpointer         user_data)
+{
+    GtkTreeView *tree_view = user_data;
+    GdkEvent *event;
+
+    event = gtk_event_controller_get_current_event(GTK_EVENT_CONTROLLER(click_gesture));
+
+    if (gdk_event_triggers_context_menu(event)) {
+        int bx;
+        int by;
+        GtkTreePath *path;
+
+        gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (int) x, (int) y, &bx, &by);
+        if (gtk_tree_view_get_path_at_pos(tree_view, bx, by, &path, NULL, NULL, NULL)) {
+        	GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+            GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+            GtkTreeIter iter;
+
+            gtk_tree_selection_unselect_all(selection);
+            gtk_tree_selection_select_path(selection, path);
+            gtk_tree_view_set_cursor(GTK_TREE_VIEW(tree_view), path, NULL, FALSE);
+            if (gtk_tree_model_get_iter(model, &iter, path))
+            	popup_menu_real(GTK_WIDGET(tree_view), event);
+            gtk_tree_path_free(path);
+        }
+    }
+}
+
+
+/* autocrypt database dialogue context menu */
+static void
+popup_menu_real(GtkWidget *widget,
+                GdkEvent  *event)
+{
+    GMenu *popup_menu;
+    GtkWidget *popup_widget;
+
+    popup_menu = g_menu_new();
+    g_menu_append(popup_menu, _("_Show details…"), "show-details");
+    g_menu_append(popup_menu, _("_Delete"), "delete");
+
+    popup_widget = libbalsa_popup_widget_new(widget, G_MENU_MODEL(popup_menu), action_namespace);
+    g_object_unref(popup_menu);
+
+    libbalsa_popup_widget_popup(popup_widget, event);
 }
 
 
 /* key context menu callback: show key details */
 static void
-show_key_details_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
+show_details_response(GtkDialog *dialog,
+                      int        response_id,
+                      gpointer   user_data)
 {
-    GtkTreeModel *model;
+    GList *keys = user_data;
+
+    gtk_window_destroy(GTK_WINDOW(dialog));
+    g_list_free_full(keys, (GDestroyNotify) gpgme_key_release);
+}
+
+static void
+show_details_activated(GSimpleAction *action,
+                       GVariant      *parameter,
+                       gpointer       user_data)
+{
     GtkTreeSelection *selection;
+    GtkTreeModel *model;
     GtkTreeIter iter;
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(user_data));
-	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		gpgme_ctx_t ctx;
+    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+        gpgme_ctx_t ctx;
 
-		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, NULL);
-		if (ctx != NULL) {
-			gchar *temp_dir = NULL;
+        ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, NULL);
+        if (ctx != NULL) {
+            gchar *temp_dir = NULL;
 
-			if (libbalsa_mktempdir(&temp_dir)) {
-				GBytes *key;
-				gchar *mail_addr;
-				GList *keys = NULL;
-				gboolean success;
+            if (libbalsa_mktempdir(&temp_dir)) {
+                GBytes *key;
+                gchar *mail_addr;
+                GList *keys = NULL;
+                gboolean success;
 
-				gtk_tree_model_get(model, &iter, AC_KEY_PTR_COLUMN, &key, AC_ADDRESS_COLUMN, &mail_addr, -1);
-				success = libbalsa_gpgme_ctx_set_home(ctx, temp_dir, NULL) &&
-					libbalsa_gpgme_import_bin_key(ctx, key, NULL, NULL) &&
-					libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, TRUE, NULL);
-				if (success) {
-					GtkWidget *toplevel;
-			    	GtkWindow *window;
-			    	GtkWidget *dialog;
+                gtk_tree_model_get(model, &iter, AC_KEY_PTR_COLUMN, &key, AC_ADDRESS_COLUMN,
+                                   &mail_addr, -1);
+                success = (libbalsa_gpgme_ctx_set_home(ctx, temp_dir, NULL) &&
+                           libbalsa_gpgme_import_bin_key(ctx, key, NULL, NULL) &&
+                           libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, TRUE, NULL));
 
-			    	toplevel = gtk_widget_get_toplevel(GTK_WIDGET(user_data));
-			    	window = GTK_IS_WINDOW(toplevel) ? GTK_WINDOW(toplevel) : NULL;
-			    	if (keys != NULL) {
-			    		dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, (gpgme_key_t) keys->data, GPG_SUBKEY_CAP_ALL,
-			    			NULL, NULL);
-			    	} else {
-			    		dialog = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-			    			GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, _("The database entry for “%s” does not contain a key."),
-							mail_addr);
-			    	}
-			    	(void) gtk_dialog_run(GTK_DIALOG(dialog));
-			    	gtk_widget_destroy(dialog);
-			    	g_list_free_full(keys, (GDestroyNotify) gpgme_key_release);
-				}
-				libbalsa_delete_directory_contents(temp_dir);
-				g_rmdir(temp_dir);
-				g_free(mail_addr);
-			}
+                if (success) {
+                    GtkRoot *root;
+                    GtkWindow *window;
+                    GtkWidget *dialog;
 
-			gpgme_release(ctx);
-		}
-	}
+                    root = gtk_widget_get_root(GTK_WIDGET(user_data));
+                    window = GTK_IS_WINDOW(root) ? (GtkWindow *) root : NULL;
+
+                    if (keys != NULL) {
+                        dialog =
+                            libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, (gpgme_key_t) keys->data,
+                                                GPG_SUBKEY_CAP_ALL, NULL, NULL);
+                    } else {
+                        dialog =
+                            gtk_message_dialog_new(window,
+                                                   GTK_DIALOG_DESTROY_WITH_PARENT |
+                                                   libbalsa_dialog_flags(), GTK_MESSAGE_INFO,
+                                                   GTK_BUTTONS_CLOSE,
+                                                   _("The database entry for “%s” "
+                                                     "does not contain a key."),
+                                                   mail_addr);
+                    }
+                    g_signal_connect(dialog, "response", G_CALLBACK(show_details_response), keys);
+                    gtk_widget_show(dialog);
+                }
+                libbalsa_delete_directory_contents(temp_dir);
+                g_rmdir(temp_dir);
+                g_free(mail_addr);
+            }
+
+            gpgme_release(ctx);
+        }
+    }
 }
 
 
 /* key context menu callback: remove key from database */
-static void
-remove_key_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
-{
+typedef struct {
     GtkTreeModel *model;
-    GtkTreeSelection *selection;
     GtkTreeIter iter;
+    char *mail_addr;
+} delete_info;
+
+static void
+delete_response(GtkDialog *dialog,
+                int        response_id,
+                gpointer   user_data)
+{
+    delete_info *info = user_data;
+
+    if (response_id == GTK_RESPONSE_YES) {
+        if ((sqlite3_bind_text(query[6], 1, info->mail_addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
+            (sqlite3_step(query[6]) != SQLITE_DONE)) {
+            g_warning("deleting database entry for \"%s\" failed: %s", info->mail_addr,
+                      sqlite3_errmsg(autocrypt_db));
+        } else {
+            g_debug("deleted database entry for \"%s\"", info->mail_addr);
+        }
+        sqlite3_reset(query[6]);
+        gtk_list_store_remove(GTK_LIST_STORE(info->model), &info->iter);
+    }
+
+    gtk_window_destroy(GTK_WINDOW(dialog));
+    g_free(info->mail_addr);
+    g_free(info);
+}
+
+static void
+delete_activated(GSimpleAction *action,
+                 GVariant      *parameter,
+                 gpointer       user_data)
+{
+    GtkTreeSelection *selection;
+    delete_info *info;
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(user_data));
-	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		GtkWidget *toplevel;
-    	GtkWindow *window;
-		GtkWidget *dialog;
-		gchar *mail_addr;
 
-    	toplevel = gtk_widget_get_toplevel(GTK_WIDGET(user_data));
-    	window = GTK_IS_WINDOW(toplevel) ? GTK_WINDOW(toplevel) : NULL;
-    	gtk_tree_model_get(model, &iter, AC_ADDRESS_COLUMN, &mail_addr, -1);
-		dialog = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-			GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, _("Delete the Autocrypt key for “%s” from the database?"), mail_addr);
-		if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES) {
-			if ((sqlite3_bind_text(query[6], 1, mail_addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
-				(sqlite3_step(query[6]) != SQLITE_DONE)) {
-				g_warning("deleting database entry for \"%s\" failed: %s", mail_addr, sqlite3_errmsg(autocrypt_db));
-			} else {
-				g_debug("deleted database entry for \"%s\"", mail_addr);
-			}
-			sqlite3_reset(query[6]);
-			gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
-		}
-		gtk_widget_destroy(dialog);
-		g_free(mail_addr);
-	}
+    info = g_new(delete_info, 1);
+
+    if (gtk_tree_selection_get_selected(selection, &info->model, &info->iter)) {
+        GtkRoot *root;
+        GtkWindow *window;
+        GtkWidget *dialog;
+
+        root = gtk_widget_get_root(GTK_WIDGET(user_data));
+        window = GTK_IS_WINDOW(root) ? (GtkWindow *) root : NULL;
+
+        gtk_tree_model_get(info->model, &info->iter,
+                           AC_ADDRESS_COLUMN, &info->mail_addr,
+                           -1);
+
+        dialog =
+            gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+                                   GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+                                   _("Delete the Autocrypt key for “%s” from the database?"),
+                                   info->mail_addr);
+
+        g_signal_connect(dialog, "response", G_CALLBACK(delete_response), info);
+        gtk_widget_show(dialog);
+    } else {
+        g_free(info);
+    }
 }
 
 

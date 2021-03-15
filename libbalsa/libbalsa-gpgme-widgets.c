@@ -459,7 +459,7 @@ libbalsa_key_dialog(GtkWindow            *parent,
 	gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scrolledw), 120);
 
 	key_data = libbalsa_gpgme_key(key, NULL, subkey_capa, TRUE);
-	gtk_box_append(GTK_BOX(scrolledw), key_data);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledw), key_data);
 
 	return dialog;
 }

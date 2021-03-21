@@ -1809,6 +1809,11 @@ imap_cmd_step(ImapMboxHandle* handle, unsigned lastcmd)
     if(rc == IMR_BYE) {
       return handle->doing_logout ? IMR_UNTAGGED : IMR_BYE;
     }
+    if (rc != IMR_OK) {
+      g_warning("Encountered protocol error while handling untagged response.");
+      imap_handle_disconnect(handle);
+      return IMR_BAD;
+    }
     return IMR_UNTAGGED;
   }
 
@@ -2595,7 +2600,14 @@ static ImapResponse
 ir_exists(ImapMboxHandle *h, unsigned seqno)
 {
   unsigned old_exists = h->exists;
-  ImapResponse rc = ir_check_crlf(h, sio_getc(h->sio));
+  ImapResponse rc;
+  if ((h->state != IMHS_AUTHENTICATED) && (h->state != IMHS_SELECTED)) {
+    /* bad state for a response to SELECT or EXAMINE, see RFC 3501, Sect. 6.4. and 7.3.1. */
+    g_info("received EXISTS response in bad state %d", h->state);
+    return IMR_PROTOCOL;
+  }
+
+  rc = ir_check_crlf(h, sio_getc(h->sio));
   imap_mbox_resize_cache(h, seqno);
   mbox_view_resize(&h->mbox_view, old_exists, seqno);
 
@@ -2607,6 +2619,12 @@ ir_exists(ImapMboxHandle *h, unsigned seqno)
 static ImapResponse
 ir_recent(ImapMboxHandle *h, unsigned seqno)
 {
+  if ((h->state != IMHS_AUTHENTICATED) && (h->state != IMHS_SELECTED)) {
+    /* bad state for a response to SELECT or EXAMINE, see RFC 3501, Sect. 6.4. and 7.3.2. */
+    g_info("received RECENT response in bad state %d", h->state);
+    return IMR_PROTOCOL;
+  }
+
   h->recent = seqno;
   /* FIXME: send a signal here! */
   return ir_check_crlf(h, sio_getc(h->sio));
@@ -2615,11 +2633,34 @@ ir_recent(ImapMboxHandle *h, unsigned seqno)
 static ImapResponse
 ir_expunge(ImapMboxHandle *h, unsigned seqno)
 {
-  ImapResponse rc = ir_check_crlf(h, sio_getc(h->sio));
+  ImapResponse rc;
+
+  if (h->state != IMHS_SELECTED) {
+    /* does not make sense in any other state, see RFC 3501, Sect. 6.4. and 7.4.1. */
+    g_info("received EXPUNGE response in bad state %d", h->state);
+    return IMR_PROTOCOL;
+  }
+
+  if (seqno > h->exists) {
+    g_info("received EXPUNGE %u response with only %u messages", seqno, h->exists);
+    return IMR_PROTOCOL;
+  }
+
+  rc = ir_check_crlf(h, sio_getc(h->sio));
   g_signal_emit(h, imap_mbox_handle_signals[EXPUNGE_NOTIFY],
 		0, seqno);
   
+  /* Current code guarantees that h->flag_cache->len == h->exists, so
+   * the above guard means that it is safe to remove seqno - 1 from
+   * h->flag_cache; we will assert that, to catch any changes in the
+   * future: */
+  g_assert(h->flag_cache->len == h->exists);
   g_array_remove_index(h->flag_cache, seqno-1);
+
+  /* Similarly, current code guarantees that h->msg_cache is allocated
+   * at least h->exists elements, so it is safe to dereference
+   * h->msg_cache[seqno - 1]; however, it is a plain C array, so we
+   * cannot check that here, just keep our fingers crossed: */
   if(h->msg_cache[seqno-1] != NULL)
     imap_message_free(h->msg_cache[seqno-1]);
   while(seqno<h->exists) {
@@ -3980,6 +4021,12 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
   unsigned i;
   int c = 0;
   ImapResponse rc;
+
+  if (h->state != IMHS_SELECTED) {
+    /* bad state for a response to FETCH, see RFC 3501, Sect. 6.4. and 7.4.2. */
+    g_info("received FETCH response in bad state %d", h->state);
+    return IMR_PROTOCOL;
+  }
 
   if(seqno<1 || seqno > h->exists) return IMR_PROTOCOL;
   if(sio_getc(h->sio) != '(') return IMR_PROTOCOL;

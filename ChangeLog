@@ -1,3 +1,15 @@
+2021-03-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	imap-handle: check for non-compliant responses
+
+	* libbalsa/imap/imap-handle.c
+	  (imap_cmd_step): disconnect if a protocol error is found;
+	  (ir_exists): check that the handle is either authenticated or selected;
+	  (ir_recent): ditto;
+	  (ir_fetch_seq): check that the handle is selected;
+	  (ir_expunge): ditto; also check that the sequence number of
+	    the expunged message is valid.
+
 2021-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	Try to avoid critical messages

@@ -1,3 +1,14 @@
+2021-03-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox: Lock destination when copying or moving
+
+	* libbalsa/mailbox.c
+	  (libbalsa_mailbox_real_messages_copy): remove guards;
+	  (messages_copy_locked): helper;
+	  (libbalsa_mailbox_messages_copy): guard and lock destination,
+	    and use helper;
+	  (libbalsa_mailbox_messages_move): ditto.
+
 2021-03-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	imap-handle: check for non-compliant responses

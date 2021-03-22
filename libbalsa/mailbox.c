@@ -1091,10 +1091,6 @@ libbalsa_mailbox_real_messages_copy(LibBalsaMailbox * mailbox,
     guint successfully_copied;
     struct MsgCopyData mcd;
 
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), FALSE);
-    g_return_val_if_fail(dest != mailbox, FALSE);
-
     text = g_strdup_printf(_("Copying from %s to %s"), priv->name,
                            dest_priv->name);
     mcd.progress = LIBBALSA_PROGRESS_INIT;
@@ -2224,6 +2220,15 @@ libbalsa_mailbox_msgno_change_flags(LibBalsaMailbox * mailbox,
 }
 
 /* Copy messages with msgnos in the list from mailbox to dest. */
+static gboolean
+messages_copy_locked(LibBalsaMailbox *mailbox,
+                     GArray          *msgnos,
+                     LibBalsaMailbox *dest,
+                     GError         **err)
+{
+    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->messages_copy(mailbox, msgnos, dest, err);
+}
+
 gboolean
 libbalsa_mailbox_messages_copy(LibBalsaMailbox * mailbox, GArray * msgnos,
                                LibBalsaMailbox * dest, GError **err)
@@ -2232,10 +2237,13 @@ libbalsa_mailbox_messages_copy(LibBalsaMailbox * mailbox, GArray * msgnos,
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(msgnos->len > 0, TRUE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), FALSE);
+    g_return_val_if_fail(dest != mailbox, FALSE);
 
     libbalsa_lock_mailbox(mailbox);
-    retval = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->
-	messages_copy(mailbox, msgnos, dest, err);
+    libbalsa_lock_mailbox(dest);
+    retval = messages_copy_locked(mailbox, msgnos, dest, err);
+    libbalsa_unlock_mailbox(dest);
     libbalsa_unlock_mailbox(mailbox);
 
     return retval;
@@ -2251,9 +2259,13 @@ libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
     g_return_val_if_fail(msgnos->len > 0, TRUE);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(dest), FALSE);
+    g_return_val_if_fail(dest != mailbox, FALSE);
 
     libbalsa_lock_mailbox(mailbox);
-    if (libbalsa_mailbox_messages_copy(mailbox, msgnos, dest, err)) {
+    libbalsa_lock_mailbox(dest);
+    retval = messages_copy_locked(mailbox, msgnos, dest, err);
+    if (retval) {
         retval = libbalsa_mailbox_messages_change_flags
             (mailbox, msgnos, LIBBALSA_MESSAGE_FLAG_DELETED,
              (LibBalsaMessageFlag) 0);
@@ -2261,8 +2273,8 @@ libbalsa_mailbox_messages_move(LibBalsaMailbox * mailbox,
 	    g_set_error(err,LIBBALSA_MAILBOX_ERROR,
                         LIBBALSA_MAILBOX_COPY_ERROR,
 			_("Removing messages from source mailbox failed"));
-    } else
-        retval = FALSE;
+    }
+    libbalsa_unlock_mailbox(dest);
     libbalsa_unlock_mailbox(mailbox);
 
     return retval;

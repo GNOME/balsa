@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Balsa gtk3 branch\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2020-12-30 18:56+0000\n"
-"PO-Revision-Date: 2021-01-02 20:21+0200\n"
+"POT-Creation-Date: 2021-01-31 16:48+0000\n"
+"PO-Revision-Date: 2021-01-31 18:02+0100\n"
 "Last-Translator: Florentina Mușat <florentina.musat.28@gmail.com>\n"
 "Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
 "Language: ro\n"
@@ -112,7 +112,7 @@ msgid "Cannot find address in address book"
 msgstr "Nu s-a găsit adresa în agendă"
 
 #: ../libbalsa/address-book.c:308 ../src/main-window.c:2984
-#: ../src/main-window.c:4138 ../src/sendmsg-window.c:3888
+#: ../src/main-window.c:4138 ../src/sendmsg-window.c:3891
 msgid "Unknown error"
 msgstr "Eroare necunoscută"
 
@@ -125,7 +125,7 @@ msgstr "Fără-Id"
 #: ../libbalsa/address-book-ldap.c:550 ../libbalsa/address-book-ldif.c:189
 #: ../libbalsa/address-book-ldif.c:227 ../libbalsa/address-book-ldif.c:270
 #: ../libbalsa/address-book-ldif.c:274 ../libbalsa/address-book-vcard.c:142
-#: ../libbalsa/address-book-vcard.c:249 ../libbalsa/address.c:409
+#: ../libbalsa/address-book-vcard.c:249 ../libbalsa/address.c:392
 #: ../libbalsa/rfc6350.c:112
 msgid "No-Name"
 msgstr "Fără-Nume"
@@ -159,43 +159,43 @@ msgstr ""
 msgid "Reading Osmo contacts failed: %s"
 msgstr "Citirea contactelor Osmo a eșuat: %s"
 
-#: ../libbalsa/address.c:972
+#: ../libbalsa/address.c:955
 msgid "D_isplayed Name:"
 msgstr "_Nume afișat:"
 
-#: ../libbalsa/address.c:973
+#: ../libbalsa/address.c:956
 msgid "_First Name:"
 msgstr "_Prenume:"
 
-#: ../libbalsa/address.c:974
+#: ../libbalsa/address.c:957
 msgid "_Last Name:"
 msgstr "Nume de _familie:"
 
-#: ../libbalsa/address.c:975
+#: ../libbalsa/address.c:958
 msgid "_Nickname:"
 msgstr "Pseu_donim:"
 
-#: ../libbalsa/address.c:976
+#: ../libbalsa/address.c:959
 msgid "O_rganization:"
 msgstr "Organi_zație:"
 
-#: ../libbalsa/address.c:977
+#: ../libbalsa/address.c:960
 msgid "_Email Address:"
 msgstr "Adresă de _mail:"
 
-#: ../libbalsa/address.c:998 ../src/filter-edit-callbacks.c:1068
+#: ../libbalsa/address.c:981 ../src/filter-edit-callbacks.c:1068
 msgid "A_dd"
 msgstr "Ada_ugă"
 
 #: ../libbalsa/address-view.c:157 ../src/balsa-mime-widget-message.c:757
 #: ../src/balsa-print-object-header.c:146 ../src/sendmsg-window.c:675
-#: ../src/sendmsg-window.c:3583
+#: ../src/sendmsg-window.c:3586
 msgid "To:"
 msgstr "Destinatar:"
 
 #: ../libbalsa/address-view.c:158 ../src/balsa-mime-widget-message.c:759
 #: ../src/balsa-print-object-header.c:148 ../src/sendmsg-window.c:675
-#: ../src/sendmsg-window.c:3591
+#: ../src/sendmsg-window.c:3594
 msgid "CC:"
 msgstr "CC:"
 
@@ -208,12 +208,12 @@ msgstr "BCC:"
 msgid "Reply To:"
 msgstr "Răspunde către:"
 
-#: ../libbalsa/autocrypt.c:181
+#: ../libbalsa/autocrypt.c:193
 #, c-format
 msgid "cannot initialise Autocrypt database “%s”: %s"
 msgstr "nu se poate inițializa baza de date Autocrypt „%s”: %s"
 
-#: ../libbalsa/autocrypt.c:307
+#: ../libbalsa/autocrypt.c:319
 #, c-format
 msgid ""
 "No usable private key for “%s” found! Please create a key or disable "
@@ -222,54 +222,71 @@ msgstr ""
 "Nu s-a găsit nicio cheie privată pentru „%s”! Creați o cheie sau dezactivați "
 "Autocrypt."
 
-#: ../libbalsa/autocrypt.c:374 ../libbalsa/autocrypt.c:382
-#: ../libbalsa/autocrypt.c:651 ../libbalsa/autocrypt.c:657
+#: ../libbalsa/autocrypt.c:386 ../libbalsa/autocrypt.c:394
+#: ../libbalsa/autocrypt.c:677 ../libbalsa/autocrypt.c:683
 #, c-format
 msgid "error reading Autocrypt data for “%s”: %s"
 msgstr "eroare la citirea datelor Autocrypt pentru „%s”: %s"
 
-#: ../libbalsa/autocrypt.c:435
+#: ../libbalsa/autocrypt.c:447
 msgid "Autocrypt database"
 msgstr "Bază de date Autocrypt"
 
-#: ../libbalsa/autocrypt.c:436 ../libbalsa/html.c:424
+#: ../libbalsa/autocrypt.c:448 ../libbalsa/html.c:424
 #: ../libbalsa/identity.c:1658 ../libbalsa/libbalsa-gpgme-widgets.c:765
-#: ../src/ab-window.c:148 ../src/folder-conf.c:337 ../src/mailbox-node.c:1052
+#: ../src/ab-window.c:148 ../src/folder-conf.c:337 ../src/mailbox-node.c:1049
 #: ../src/main-window.c:3830 ../src/toolbar-prefs.c:130
 #: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
 #: ../ui/sendmsg-window.ui.h:12 ../ui/source-viewer.ui.h:2
 msgid "_Close"
 msgstr "În_chide"
 
-#: ../libbalsa/autocrypt.c:442 ../libbalsa/libbalsa-gpgme-cb.c:223
-msgid "Double-click key to show details"
-msgstr "Clic dublu pe cheie pentru a arăta detalii"
-
-#: ../libbalsa/autocrypt.c:497 ../src/balsa-mblist.c:326
+#: ../libbalsa/autocrypt.c:517 ../src/balsa-mblist.c:326
 msgid "Mailbox"
 msgstr "Căsuțe de mail"
 
-#: ../libbalsa/autocrypt.c:502
+#: ../libbalsa/autocrypt.c:523
 msgid "Last seen"
 msgstr "Văzut ultima dată"
 
-#: ../libbalsa/autocrypt.c:507
+#: ../libbalsa/autocrypt.c:529
 msgid "Last Autocrypt message"
 msgstr "Ultimul mesaj Autocrypt"
 
-#: ../libbalsa/autocrypt.c:512
+#: ../libbalsa/autocrypt.c:535
 msgid "Prefer encryption"
 msgstr "Preferă criptarea"
 
-#: ../libbalsa/autocrypt.c:748 ../libbalsa/autocrypt.c:768
+#: ../libbalsa/autocrypt.c:774 ../libbalsa/autocrypt.c:794
 #, c-format
 msgid "update user “%s” failed: %s"
 msgstr "actualizarea utilizatorului „%s” a eșuat: %s"
 
-#: ../libbalsa/autocrypt.c:748
+#: ../libbalsa/autocrypt.c:774
 #, c-format
 msgid "insert user “%s” failed: %s"
 msgstr "inserarea utilizatorului „%s” a eșuat: %s"
+
+#: ../libbalsa/autocrypt.c:870
+msgid "_Show details…"
+msgstr "Arată _detalii…"
+
+#: ../libbalsa/autocrypt.c:873 ../src/balsa-index.c:2000
+#: ../src/mailbox-node.c:1041 ../src/mailbox-node.c:1057
+#: ../src/pref-manager.c:2001 ../src/pref-manager.c:2086
+#: ../src/pref-manager.c:2766 ../ui/ab-main.ui.h:11 ../ui/main-window.ui.h:61
+msgid "_Delete"
+msgstr "Șt_erge"
+
+#: ../libbalsa/autocrypt.c:923
+#, c-format
+msgid "The database entry for “%s” does not contain a key."
+msgstr "Intrarea din baza de date pentru „%s” nu conține o cheie."
+
+#: ../libbalsa/autocrypt.c:960
+#, c-format
+msgid "Delete the Autocrypt key for “%s” from the database?"
+msgstr "Ștergeți cheia de autocriptare pentru „%s” din baza de date?"
 
 #: ../libbalsa/body.c:119 ../libbalsa/mailbox_local.c:1879
 #: ../libbalsa/message.c:941 ../libbalsa/message.c:958
@@ -462,7 +479,7 @@ msgstr ""
 #: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc2445.c:415
 #: ../libbalsa/rfc2445.c:444 ../libbalsa/rfc2445.c:467
 #: ../libbalsa/rfc2445.c:1120 ../libbalsa/rfc3156.c:689
-#: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5309
+#: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5312
 msgid "unknown"
 msgstr "necunoscută"
 
@@ -553,13 +570,13 @@ msgstr "_Descarcă imaginile"
 
 #. should "re" be localized ?
 #: ../libbalsa/identity.c:109 ../libbalsa/mailbox_local.c:2002
-#: ../libbalsa/mailbox_local.c:2004 ../src/sendmsg-window.c:3836
-#: ../src/sendmsg-window.c:3838
+#: ../libbalsa/mailbox_local.c:2004 ../src/sendmsg-window.c:3839
+#: ../src/sendmsg-window.c:3841
 msgid "Re:"
 msgstr "Re:"
 
-#: ../libbalsa/identity.c:110 ../src/sendmsg-window.c:3775
-#: ../src/sendmsg-window.c:3776 ../src/sendmsg-window.c:3777
+#: ../libbalsa/identity.c:110 ../src/sendmsg-window.c:3778
+#: ../src/sendmsg-window.c:3779 ../src/sendmsg-window.c:3780
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -601,9 +618,9 @@ msgstr "Semnătura în „%s” nu este un text UTF-8."
 #: ../src/mailbox-conf.c:229 ../src/mailbox-conf.c:245
 #: ../src/mailbox-conf.c:733 ../src/mailbox-conf.c:790
 #: ../src/pref-manager.c:3260 ../src/sendmsg-window.c:494
-#: ../src/sendmsg-window.c:1498 ../src/sendmsg-window.c:1957
-#: ../src/sendmsg-window.c:3341 ../src/sendmsg-window.c:4777
-#: ../src/sendmsg-window.c:5078 ../src/sendmsg-window.c:5164
+#: ../src/sendmsg-window.c:1498 ../src/sendmsg-window.c:1960
+#: ../src/sendmsg-window.c:3344 ../src/sendmsg-window.c:4780
+#: ../src/sendmsg-window.c:5081 ../src/sendmsg-window.c:5167
 #: ../src/spell-check.c:395 ../src/store-address.c:208
 msgid "_Cancel"
 msgstr "_Renunță"
@@ -616,8 +633,8 @@ msgstr "_Renunță"
 #: ../src/filter-export-dialog.c:79 ../src/filter-run-dialog.c:299
 #: ../src/folder-conf.c:344 ../src/main-window.c:3922
 #: ../src/pref-manager.c:3258 ../src/sendmsg-window.c:1497
-#: ../src/sendmsg-window.c:1958 ../src/sendmsg-window.c:3340
-#: ../src/sendmsg-window.c:4778 ../src/store-address.c:209
+#: ../src/sendmsg-window.c:1961 ../src/sendmsg-window.c:3343
+#: ../src/sendmsg-window.c:4781 ../src/store-address.c:209
 msgid "_OK"
 msgstr "_OK"
 
@@ -905,23 +922,23 @@ msgstr "Date neordonate primite de la server"
 msgid "Bug in implementation of SORT command on IMAP server exposed."
 msgstr "Eșec în implementarea de comandă SORT pe serverul IMAP expus."
 
-#: ../libbalsa/imap/imap-handle.c:676
+#: ../libbalsa/imap/imap-handle.c:671
 #, c-format
 msgid "Connecting %s failed: %s"
 msgstr "Conectarea %s a eșuat: %s"
 
-#: ../libbalsa/imap/imap-handle.c:689 ../libbalsa/imap/imap-handle.c:709
+#: ../libbalsa/imap/imap-handle.c:684 ../libbalsa/imap/imap-handle.c:704
 #, c-format
 msgid "TLS negotiation failed: %s"
 msgstr "Negocierea TLS a eșuat: %s"
 
-#: ../libbalsa/imap/imap-handle.c:715
+#: ../libbalsa/imap/imap-handle.c:710
 msgid "TLS required but not available"
 msgstr "Se cere TLS dar nu este disponibil"
 
 #. it is not we, so it must be the server
-#: ../libbalsa/imap/imap-handle.c:2297 ../libbalsa/imap/imap-handle.c:2315
-#: ../libbalsa/imap/imap-handle.c:2331 ../libbalsa/imap/imap-handle.c:2362
+#: ../libbalsa/imap/imap-handle.c:2292 ../libbalsa/imap/imap-handle.c:2310
+#: ../libbalsa/imap/imap-handle.c:2326 ../libbalsa/imap/imap-handle.c:2357
 #, c-format
 msgid "IMAP response: %s"
 msgstr "Răspuns IMAP: %s"
@@ -1176,12 +1193,16 @@ msgstr ""
 "chei.\n"
 "Dacă sunteți sigur că recipientul deține o altă cheie, selectați-o din listă."
 
+#: ../libbalsa/libbalsa-gpgme-cb.c:223
+msgid "Double-click key to show details"
+msgstr "Clic dublu pe cheie pentru a arăta detalii"
+
 #: ../libbalsa/libbalsa-gpgme-cb.c:280
 msgid "User ID"
 msgstr "ID utilizator"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:287 ../src/balsa-index.c:460
-#: ../src/pref-manager.c:219 ../src/sendmsg-window.c:2620
+#: ../src/pref-manager.c:219 ../src/sendmsg-window.c:2623
 msgid "Size"
 msgstr "Mărime"
 
@@ -1568,7 +1589,7 @@ msgstr " curba „%s”"
 msgid "_Hide"
 msgstr "_Ascunde"
 
-#: ../libbalsa/libbalsa-vfs.c:495 ../src/sendmsg-window.c:4570
+#: ../libbalsa/libbalsa-vfs.c:495 ../src/sendmsg-window.c:4573
 #, c-format
 msgid "not a regular file"
 msgstr "nu este un fișier obișnuit"
@@ -1686,32 +1707,32 @@ msgstr "Nu s-a găsit nicio cale pentru căsuța „%s”, se utilizează „%s�
 msgid "Cannot get IMAP handle"
 msgstr "Nu s-a reușit obținerea unei conexiuni IMAP"
 
-#: ../libbalsa/mailbox_imap.c:2433 ../libbalsa/mailbox_imap.c:2496
+#: ../libbalsa/mailbox_imap.c:2435 ../libbalsa/mailbox_imap.c:2498
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr "Eroare la descărcarea mesajului de pe serverul IMAP: %s"
 
-#: ../libbalsa/mailbox_imap.c:2468
+#: ../libbalsa/mailbox_imap.c:2470
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Se descarcă %u kB"
 
-#: ../libbalsa/mailbox_imap.c:2509
+#: ../libbalsa/mailbox_imap.c:2511
 #, c-format
 msgid "Cannot create temporary file"
 msgstr "Nu s-a putut crea un fișier temporar"
 
-#: ../libbalsa/mailbox_imap.c:2533
+#: ../libbalsa/mailbox_imap.c:2535
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Nu s-a putut scrie în fișierul temporar %s"
 
-#: ../libbalsa/mailbox_imap.c:2760 ../libbalsa/mailbox_imap.c:2877
+#: ../libbalsa/mailbox_imap.c:2762 ../libbalsa/mailbox_imap.c:2879
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Se transmit %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:3180
+#: ../libbalsa/mailbox_imap.c:3182
 msgid "Server-side threading not supported."
 msgstr "Sortarea discuțiilor nu e suportată de server."
 
@@ -3508,13 +3529,6 @@ msgstr "_Trimite prin…"
 msgid "_Store Address…"
 msgstr "_Stochează adresa…"
 
-#: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1044
-#: ../src/mailbox-node.c:1060 ../src/pref-manager.c:2001
-#: ../src/pref-manager.c:2086 ../src/pref-manager.c:2766 ../ui/ab-main.ui.h:11
-#: ../ui/main-window.ui.h:61
-msgid "_Delete"
-msgstr "Șt_erge"
-
 #: ../src/balsa-index.c:2004
 msgid "_Undelete"
 msgstr "Recuperea_ză"
@@ -3958,34 +3972,42 @@ msgid "_Import Autocrypt key"
 msgstr "_Importă cheia autocript"
 
 #: ../src/balsa-mime-widget-crypto.c:148
+msgid ""
+"The message contains an Autocrypt header, but it is either broken or the "
+"signature has been created using a different key."
+msgstr ""
+"Mesajul conține un antet autocriptare, dar este fie defect sau semnătura a "
+"fost creeată cu o altă cheie."
+
+#: ../src/balsa-mime-widget-crypto.c:152
 msgid "_Search key server for this key"
 msgstr "_Caută cheia serverului pentru această cheie"
 
-#: ../src/balsa-mime-widget-crypto.c:150
+#: ../src/balsa-mime-widget-crypto.c:154
 msgid "_Search key server for updates of this key"
 msgstr "_Caută serverul de chei pentru actualizări ale acestei chei"
 
-#: ../src/balsa-mime-widget-crypto.c:194
+#: ../src/balsa-mime-widget-crypto.c:198
 msgid "decrypted"
 msgstr "decriptat"
 
-#: ../src/balsa-mime-widget-crypto.c:207
+#: ../src/balsa-mime-widget-crypto.c:211
 msgid "trusted signature"
 msgstr "semnătură de încredere"
 
-#: ../src/balsa-mime-widget-crypto.c:210
+#: ../src/balsa-mime-widget-crypto.c:214
 msgid "low trust signature"
 msgstr "semnătură de încredere joasă"
 
-#: ../src/balsa-mime-widget-crypto.c:213
+#: ../src/balsa-mime-widget-crypto.c:217
 msgid "bad signature"
 msgstr "semnătură greșită"
 
-#: ../src/balsa-mime-widget-crypto.c:216
+#: ../src/balsa-mime-widget-crypto.c:220
 msgid "unknown signature status"
 msgstr "stare de semnătură necunoscută"
 
-#: ../src/balsa-mime-widget-crypto.c:302
+#: ../src/balsa-mime-widget-crypto.c:306
 #, c-format
 msgid ""
 "Import GnuPG key:\n"
@@ -3994,20 +4016,20 @@ msgstr ""
 "Importă cheia GnuPG:\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:309
+#: ../src/balsa-mime-widget-crypto.c:313
 #, c-format
 msgid "Error importing key data: %s"
 msgstr "Eroare la importarea datelor cheii: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:309 ../src/sendmsg-window.c:1670
+#: ../src/balsa-mime-widget-crypto.c:313 ../src/sendmsg-window.c:1673
 msgid "unknown error"
 msgstr "eroare necunoscută"
 
-#: ../src/balsa-mime-widget-crypto.c:346
+#: ../src/balsa-mime-widget-crypto.c:350
 msgid "(imported)"
 msgstr "(importat)"
 
-#: ../src/balsa-mime-widget-crypto.c:354
+#: ../src/balsa-mime-widget-crypto.c:358
 msgid "Import key into the local key ring"
 msgstr "Importă cheia în inelul de chei locale"
 
@@ -4107,18 +4129,18 @@ msgstr "Serverul IMAP nu a raportat structura mesajului"
 #: ../src/balsa-mime-widget-message.c:735
 #: ../src/balsa-print-object-header.c:131 ../src/sendmsg-window.c:704
 #: ../src/sendmsg-window.c:706 ../src/sendmsg-window.c:797
-#: ../src/sendmsg-window.c:3568 ../src/sendmsg-window.c:5110
+#: ../src/sendmsg-window.c:3571 ../src/sendmsg-window.c:5113
 msgid "Subject:"
 msgstr "Subiect:"
 
 #: ../src/balsa-mime-widget-message.c:740
-#: ../src/balsa-print-object-header.c:139 ../src/sendmsg-window.c:3564
+#: ../src/balsa-print-object-header.c:139 ../src/sendmsg-window.c:3567
 msgid "Date:"
 msgstr "Dată:"
 
 #. addresses
 #: ../src/balsa-mime-widget-message.c:746
-#: ../src/balsa-print-object-header.c:144 ../src/sendmsg-window.c:3575
+#: ../src/balsa-print-object-header.c:144 ../src/sendmsg-window.c:3578
 msgid "From:"
 msgstr "Expeditor:"
 
@@ -4627,7 +4649,7 @@ msgstr "Redă sunetul:"
 msgid "Use Sound…"
 msgstr "Utilizează sunetul…"
 
-#: ../src/filter-edit-dialog.c:405 ../src/mailbox-node.c:1050
+#: ../src/filter-edit-dialog.c:405 ../src/mailbox-node.c:1047
 msgid "_Open"
 msgstr "_Deschide"
 
@@ -5239,16 +5261,16 @@ msgstr "Faceți un _fir cu mesajele"
 msgid "_Merge threads with the same subject"
 msgstr "Î_mbină firele cu același subiect"
 
-#: ../src/mailbox-node.c:278
+#: ../src/mailbox-node.c:275
 msgid "The folder edition to be written."
 msgstr "Formatul dosarului ce va fi scris."
 
-#: ../src/mailbox-node.c:457
+#: ../src/mailbox-node.c:454
 #, c-format
 msgid "Scanning %s. Please wait…"
 msgstr "Se scanează %s. Așteptați…"
 
-#: ../src/mailbox-node.c:473
+#: ../src/mailbox-node.c:470
 #, c-format
 msgid ""
 "Scanning of %s failed: %s\n"
@@ -5257,75 +5279,75 @@ msgstr ""
 "Scanarea %s a eșuat: %s\n"
 "Verificați funcționalitatea rețelei."
 
-#: ../src/mailbox-node.c:475
+#: ../src/mailbox-node.c:472
 #, c-format
 msgid "Scanning of %s failed: %s"
 msgstr "Scanarea %s a eșuat: %s"
 
-#: ../src/mailbox-node.c:967
+#: ../src/mailbox-node.c:964
 msgid "You can apply filters only on mailbox"
 msgstr "Puteți aplica filtre doar pe cutia de mail"
 
-#: ../src/mailbox-node.c:1001
+#: ../src/mailbox-node.c:998
 msgid "Local _mbox mailbox…"
 msgstr "Căsuță de mail locală _mbox…"
 
-#: ../src/mailbox-node.c:1003
+#: ../src/mailbox-node.c:1000
 msgid "Local Mail_dir mailbox…"
 msgstr "Căsuță de mail locală Mail_dir…"
 
-#: ../src/mailbox-node.c:1005
+#: ../src/mailbox-node.c:1002
 msgid "Local M_H mailbox…"
 msgstr "Căsuță de mail locală M­­_H…"
 
-#: ../src/mailbox-node.c:1008
+#: ../src/mailbox-node.c:1005
 msgid "Remote IMAP _folder…"
 msgstr "_Dosar la distanță IMAP…"
 
-#: ../src/mailbox-node.c:1011
+#: ../src/mailbox-node.c:1008
 msgid "Remote IMAP _subfolder…"
 msgstr "_Subdosar la distanță IMAP…"
 
 #. Translators: popup menu item "New" mailbox or folder
-#: ../src/mailbox-node.c:1017
+#: ../src/mailbox-node.c:1014
 msgctxt "mailbox"
 msgid "_New"
 msgstr "_Nouă"
 
 #. clicked on the empty space
-#: ../src/mailbox-node.c:1024 ../src/mailbox-node.c:1040
+#: ../src/mailbox-node.c:1021 ../src/mailbox-node.c:1037
 msgid "_Rescan"
 msgstr "_Rescanează"
 
-#: ../src/mailbox-node.c:1034
+#: ../src/mailbox-node.c:1031
 msgid "_Properties…"
 msgstr "_Proprietăți…"
 
-#: ../src/mailbox-node.c:1064
+#: ../src/mailbox-node.c:1061
 msgid "Mark as _Inbox"
 msgstr "_Marchează ca „Primite”"
 
-#: ../src/mailbox-node.c:1066
+#: ../src/mailbox-node.c:1063
 msgid "_Mark as Sentbox"
 msgstr "Marchează ca „_Trimise”"
 
-#: ../src/mailbox-node.c:1068
+#: ../src/mailbox-node.c:1065
 msgid "Mark as _Trash"
 msgstr "Marchează drept „C_oș”"
 
-#: ../src/mailbox-node.c:1070
+#: ../src/mailbox-node.c:1067
 msgid "Mark as D_raftbox"
 msgstr "Marchează c_a „Neterminate”"
 
-#: ../src/mailbox-node.c:1073
+#: ../src/mailbox-node.c:1070
 msgid "_Empty trash"
 msgstr "_Golește coșul"
 
-#: ../src/mailbox-node.c:1078
+#: ../src/mailbox-node.c:1075
 msgid "_Edit/Apply filters"
 msgstr "_Editează/Aplică filtrele"
 
-#: ../src/mailbox-node.c:1165
+#: ../src/mailbox-node.c:1162
 #, c-format
 msgid "The path “%s” does not lead to a mailbox."
 msgstr "Calea „%s” nu duce la o căsuță de mail."
@@ -5434,7 +5456,7 @@ msgstr ""
 "Mișu Moldovan <dumol@gnome.org>\n"
 "Florentina Mușat <florentina [dot] musat [dot] 28 [at] gmail [dot] com>, "
 "2020-2021\n"
-"Daniel Șerbănescu <daniel [at] serbanescu [dot] dk>, 2020"
+"Daniel Șerbănescu <daniel [at] serbanescu [dot] dk>, 2020-2021"
 
 #: ../src/main-window.c:1076
 msgid "The Balsa email client is part of the GNOME desktop environment."
@@ -5718,7 +5740,7 @@ msgid "Remote mailbox servers"
 msgstr "Servere cu căsuțe poștale"
 
 #: ../src/pref-manager.c:1969 ../src/pref-manager.c:2720
-#: ../src/sendmsg-window.c:2602
+#: ../src/sendmsg-window.c:2605
 msgid "Type"
 msgstr "Tip"
 
@@ -6576,42 +6598,42 @@ msgstr "Atașare ca tip MIME:"
 msgid "Character set for file %s changed from “%s” to “%s”."
 msgstr "Codarea fișierului %s s-a schimbat din „%s” în „%s”."
 
-#: ../src/sendmsg-window.c:1625 ../src/sendmsg-window.c:5114
+#: ../src/sendmsg-window.c:1628 ../src/sendmsg-window.c:5117
 msgid "(no subject)"
 msgstr "(fără subiect)"
 
-#: ../src/sendmsg-window.c:1662
+#: ../src/sendmsg-window.c:1665
 #, c-format
 msgid "Cannot create file URI object for %s"
 msgstr "Nu se poate crea obiectul URI pentru fișierul %s"
 
-#: ../src/sendmsg-window.c:1710
+#: ../src/sendmsg-window.c:1713
 msgid "forwarded message"
 msgstr "mesaj înaintat"
 
-#: ../src/sendmsg-window.c:1715
+#: ../src/sendmsg-window.c:1718
 #, c-format
 msgid "Message from %s, subject: “%s”"
 msgstr "Mesaj de la %s cu subiectul: „%s”"
 
-#: ../src/sendmsg-window.c:1799 ../src/sendmsg-window.c:1875
+#: ../src/sendmsg-window.c:1802 ../src/sendmsg-window.c:1878
 msgid "Remove"
 msgstr "Șterge"
 
-#: ../src/sendmsg-window.c:1887
+#: ../src/sendmsg-window.c:1890
 msgid "Open…"
 msgstr "Deschide…"
 
-#: ../src/sendmsg-window.c:1899
+#: ../src/sendmsg-window.c:1902
 msgid "(URL)"
 msgstr "(URL)"
 
-#: ../src/sendmsg-window.c:1954
+#: ../src/sendmsg-window.c:1957
 msgid "Attach file"
 msgstr "Atașare fișier"
 
-#: ../src/sendmsg-window.c:2066 ../src/sendmsg-window.c:2142
-#: ../src/sendmsg-window.c:7090
+#: ../src/sendmsg-window.c:2069 ../src/sendmsg-window.c:2145
+#: ../src/sendmsg-window.c:7093
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -6619,87 +6641,87 @@ msgstr ""
 "Atașarea mesajului a eșuat.\n"
 "Motiv posibil: nu există suficient spațiu temporar"
 
-#: ../src/sendmsg-window.c:2357
+#: ../src/sendmsg-window.c:2360
 msgid "F_rom:"
 msgstr "E_xpeditor:"
 
 #. Subject:
-#: ../src/sendmsg-window.c:2507
+#: ../src/sendmsg-window.c:2510
 msgid "S_ubject:"
 msgstr "_Subiect:"
 
-#: ../src/sendmsg-window.c:2538
+#: ../src/sendmsg-window.c:2541
 msgid "F_CC:"
 msgstr "F_CC:"
 
 #. Attachment list
-#: ../src/sendmsg-window.c:2565
+#: ../src/sendmsg-window.c:2568
 msgid "_Attachments:"
 msgstr "_Atașamente:"
 
-#: ../src/sendmsg-window.c:2609
+#: ../src/sendmsg-window.c:2612
 msgid "Mode"
 msgstr "Mod"
 
-#: ../src/sendmsg-window.c:2632
+#: ../src/sendmsg-window.c:2635
 msgid "Description"
 msgstr "Descriere"
 
-#: ../src/sendmsg-window.c:2934
+#: ../src/sendmsg-window.c:2937
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Nu s-a putut salva atașamentul: %s"
 
-#: ../src/sendmsg-window.c:3008
+#: ../src/sendmsg-window.c:3011
 msgid "No subject"
 msgstr "Fără subiect"
 
-#: ../src/sendmsg-window.c:3057
+#: ../src/sendmsg-window.c:3060
 msgid "decrypted: "
 msgstr "decriptat: "
 
-#: ../src/sendmsg-window.c:3065
+#: ../src/sendmsg-window.c:3068
 #, c-format
 msgid "inlined file “%s” (%s)"
 msgstr "fișierul în linie „%s” (%s)"
 
-#: ../src/sendmsg-window.c:3068
+#: ../src/sendmsg-window.c:3071
 #, c-format
 msgid "attached file “%s” (%s)"
 msgstr "fișierul atașat „%s” (%s)"
 
-#: ../src/sendmsg-window.c:3073
+#: ../src/sendmsg-window.c:3076
 #, c-format
 msgid "inlined %s part"
 msgstr "parte inclusă %s"
 
-#: ../src/sendmsg-window.c:3075
+#: ../src/sendmsg-window.c:3078
 #, c-format
 msgid "attached %s part"
 msgstr "parte atașată %s"
 
-#: ../src/sendmsg-window.c:3156
+#: ../src/sendmsg-window.c:3159
 #, c-format
 msgid "message from %s, subject “%s”"
 msgstr "mesaj de la %s, cu subiectul: „%s”"
 
-#: ../src/sendmsg-window.c:3284
+#: ../src/sendmsg-window.c:3287
 msgid "quoted"
 msgstr "citat"
 
-#: ../src/sendmsg-window.c:3289 ../src/sendmsg-window.c:3292
+#: ../src/sendmsg-window.c:3292 ../src/sendmsg-window.c:3295
 msgid "quoted attachment"
 msgstr "atașament citat"
 
-#: ../src/sendmsg-window.c:3336
+#: ../src/sendmsg-window.c:3339
 msgid "Select parts for quotation"
 msgstr "Selectați părțile de citat"
 
-#: ../src/sendmsg-window.c:3348
+#: ../src/sendmsg-window.c:3351
 msgid "Select the parts of the message which shall be quoted in the reply"
 msgstr "Selectați părțile mesajului ce vor fi citate în răspuns"
 
-#: ../src/sendmsg-window.c:3371
+#: ../src/sendmsg-window.c:3374
 msgid ""
 "<b>Warning:</b> The original message contains an abnormal mixture of "
 "encrypted and unencrypted parts. This <i>might</i> indicate an attack.\n"
@@ -6709,7 +6731,7 @@ msgstr ""
 "necriptate. Aceasta <i>poate</i> indica un atac.\n"
 "Verificați cu atenție conținuturile înainte de a răspunde."
 
-#: ../src/sendmsg-window.c:3378 ../src/sendmsg-window.c:3450
+#: ../src/sendmsg-window.c:3381 ../src/sendmsg-window.c:3453
 msgid ""
 "You reply to an encrypted message. The reply will contain the decrypted "
 "contents of the original message.\n"
@@ -6721,70 +6743,70 @@ msgstr ""
 "Considerați criptarea răspunsului, și verificați dacă nu propagați "
 "informații sensitive în mod neintenționat."
 
-#: ../src/sendmsg-window.c:3454
+#: ../src/sendmsg-window.c:3457
 msgid "Do not remind me again."
 msgstr "Nu-mi mai aminti din nou."
 
-#: ../src/sendmsg-window.c:3549
+#: ../src/sendmsg-window.c:3552
 msgid "you"
 msgstr "dumneavoastră"
 
-#: ../src/sendmsg-window.c:3558
+#: ../src/sendmsg-window.c:3561
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------ mesaj înaintat de la %s ------\n"
 
-#: ../src/sendmsg-window.c:3595
+#: ../src/sendmsg-window.c:3598
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Identificare: %s\n"
 
-#: ../src/sendmsg-window.c:3601
+#: ../src/sendmsg-window.c:3604
 msgid "References:"
 msgstr "Referiri:"
 
-#: ../src/sendmsg-window.c:3612
+#: ../src/sendmsg-window.c:3615
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "În data de %s, %s a scris:\n"
 
-#: ../src/sendmsg-window.c:3614
+#: ../src/sendmsg-window.c:3617
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s a scris:\n"
 
-#: ../src/sendmsg-window.c:3880
+#: ../src/sendmsg-window.c:3883
 msgid "Could not save message."
 msgstr "Nu s-a putut salva mesajul."
 
-#: ../src/sendmsg-window.c:3887
+#: ../src/sendmsg-window.c:3890
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Nu s-a putut deschide căsuța „Neterminate”: %s"
 
-#: ../src/sendmsg-window.c:3916
+#: ../src/sendmsg-window.c:3919
 msgid "Message saved."
 msgstr "Mesajul a fost salvat."
 
-#: ../src/sendmsg-window.c:4554 ../src/sendmsg-window.c:4562
-#: ../src/sendmsg-window.c:4569 ../src/sendmsg-window.c:4593
+#: ../src/sendmsg-window.c:4557 ../src/sendmsg-window.c:4565
+#: ../src/sendmsg-window.c:4572 ../src/sendmsg-window.c:4596
 #, c-format
 msgid "Could not attach the file %s: %s."
 msgstr "Nu s-a putut atașa fișierul %s: %s."
 
-#: ../src/sendmsg-window.c:4555
+#: ../src/sendmsg-window.c:4558
 msgid "not an absolute path"
 msgstr "nu este o cale absolută"
 
-#: ../src/sendmsg-window.c:4563
+#: ../src/sendmsg-window.c:4566
 msgid "does not exist"
 msgstr "nu există"
 
-#: ../src/sendmsg-window.c:4594
+#: ../src/sendmsg-window.c:4597
 msgid "not in current directory"
 msgstr "nu în directorul curent"
 
-#: ../src/sendmsg-window.c:4646
+#: ../src/sendmsg-window.c:4649
 msgid ""
 "The link that you selected created\n"
 "a “Blind copy” (BCC) address.\n"
@@ -6796,56 +6818,56 @@ msgstr ""
 "Verificați dacă adresa\n"
 "este potrivită."
 
-#: ../src/sendmsg-window.c:4755
+#: ../src/sendmsg-window.c:4758
 #, c-format
 msgid "Cannot read the file “%s”: %s"
 msgstr "Nu se poate citi fișierul „%s”: %s"
 
-#: ../src/sendmsg-window.c:4774
+#: ../src/sendmsg-window.c:4777
 msgid "Include file"
 msgstr "Includere fișier"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4961
+#: ../src/sendmsg-window.c:4964
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Nu s-a putut încărca fișierul de antet „Face” %s: %s"
 
 #. Translators: please do not translate Face.
-#: ../src/sendmsg-window.c:4964
+#: ../src/sendmsg-window.c:4967
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Nu s-a putut încărca fișierul de antet „X-Face” %s: %s"
 
-#: ../src/sendmsg-window.c:5074
+#: ../src/sendmsg-window.c:5077
 msgid "No Subject"
 msgstr "Fără subiect"
 
-#: ../src/sendmsg-window.c:5079
+#: ../src/sendmsg-window.c:5082
 msgid "_Send"
 msgstr "_Trimite"
 
-#: ../src/sendmsg-window.c:5100
+#: ../src/sendmsg-window.c:5103
 msgid "You did not specify a subject for this message"
 msgstr "Nu ați specificat un subiect pentru acest mesaj"
 
-#: ../src/sendmsg-window.c:5101
+#: ../src/sendmsg-window.c:5104
 msgid "If you would like to provide one, enter it below."
 msgstr "Dacă doriți să furnizați unul, introduceți-l mai jos."
 
-#: ../src/sendmsg-window.c:5159
+#: ../src/sendmsg-window.c:5162
 msgid "Message could be encrypted"
 msgstr "Mesajul poate fi criptat"
 
-#: ../src/sendmsg-window.c:5162
+#: ../src/sendmsg-window.c:5165
 msgid "Send _encrypted"
 msgstr "Trimite _criptat"
 
-#: ../src/sendmsg-window.c:5163
+#: ../src/sendmsg-window.c:5166
 msgid "Send _unencrypted"
 msgstr "Trimite _necriptat"
 
-#: ../src/sendmsg-window.c:5233 ../src/sendmsg-window.c:5321
+#: ../src/sendmsg-window.c:5236 ../src/sendmsg-window.c:5324
 #, c-format
 msgid ""
 "You did not select encryption for this message, although %s public keys are "
@@ -6856,12 +6878,12 @@ msgstr ""
 "„%s” sunt disponibile pentru toți destinatarii. Pentru a proteja intimitatea "
 "dumneavoastră, mesajul poate fi criptat %s."
 
-#: ../src/sendmsg-window.c:5308
+#: ../src/sendmsg-window.c:5311
 #, c-format
 msgid "error checking Autocrypt keys: %s"
 msgstr "eroare la verificarea cheilor Autocrypt: %s"
 
-#: ../src/sendmsg-window.c:5339
+#: ../src/sendmsg-window.c:5342
 msgid ""
 "\n"
 "However, encryption is discouraged as the Autocrypt status indicates that "
@@ -6871,7 +6893,7 @@ msgstr ""
 "Oricum, encripția este descurajată pentru că starea Autocrypt indică unele "
 "recipiente ce <i>ar putea</i> să fie capabile să citească mesajul."
 
-#: ../src/sendmsg-window.c:5352
+#: ../src/sendmsg-window.c:5355
 #, c-format
 msgid ""
 "<i>Note:</i> choosing encryption will import %u key from the Autocrypt "
@@ -6889,16 +6911,16 @@ msgstr[2] ""
 "<i>Notă:</i> alegerea encripției va importa %u de chei din baza de date "
 "Autocrypt în inelul de chei GnuPG."
 
-#: ../src/sendmsg-window.c:5377
+#: ../src/sendmsg-window.c:5380
 #, c-format
 msgid "Cannot import Autocrypt keys: %s"
 msgstr "Nu se pot importa cheile Autocrypt: %s"
 
-#: ../src/sendmsg-window.c:5437
+#: ../src/sendmsg-window.c:5440
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "Ați ales criptarea OpenPGP pentru acest mesaj.\n"
 
-#: ../src/sendmsg-window.c:5442
+#: ../src/sendmsg-window.c:5445
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
@@ -6906,14 +6928,14 @@ msgstr ""
 "Textul mesajului va fi trimis ca text simplu și HTML, dar numai prima din "
 "cele două părți poate fi semnată.\n"
 
-#: ../src/sendmsg-window.c:5447
+#: ../src/sendmsg-window.c:5450
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr ""
 "Mesajul conține atașamente, iar acestea nu vor putea fi semnate sau "
 "criptate.\n"
 
-#: ../src/sendmsg-window.c:5451
+#: ../src/sendmsg-window.c:5454
 msgid ""
 "You should select MIME mode if the complete message shall be protected. Do "
 "you really want to proceed?"
@@ -6921,36 +6943,36 @@ msgstr ""
 "Ar trebui să alegeți modul MIME pentru ca întregul mesaj să fie protejat. "
 "Sigur doriți să continuați?"
 
-#: ../src/sendmsg-window.c:5474
+#: ../src/sendmsg-window.c:5477
 #, c-format
 msgid "sending message with GPG mode %d"
 msgstr "se trimite mesajul cu modul GPG %d"
 
-#: ../src/sendmsg-window.c:5504
+#: ../src/sendmsg-window.c:5507
 msgid "Message could not be created"
 msgstr "Mesajul nu a putut fi creat"
 
-#: ../src/sendmsg-window.c:5506
+#: ../src/sendmsg-window.c:5509
 msgid "Message could not be queued in outbox"
 msgstr "Mesajul nu a putut fi încolonat în „Netrimise”"
 
-#: ../src/sendmsg-window.c:5508
+#: ../src/sendmsg-window.c:5511
 msgid "Message could not be saved in sentbox"
 msgstr "Mesajul nu a putut fi salvat în „Trimise”"
 
-#: ../src/sendmsg-window.c:5510
+#: ../src/sendmsg-window.c:5513
 msgid "Message could not be sent"
 msgstr "Mesajul nu a putut fi trimis"
 
-#: ../src/sendmsg-window.c:5512
+#: ../src/sendmsg-window.c:5515
 msgid "Message could not be signed"
 msgstr "Mesajul nu a putut fi semnat"
 
-#: ../src/sendmsg-window.c:5514
+#: ../src/sendmsg-window.c:5517
 msgid "Message could not be encrypted"
 msgstr "Mesajul nu a putut fi criptat"
 
-#: ../src/sendmsg-window.c:5519
+#: ../src/sendmsg-window.c:5522
 #, c-format
 msgid ""
 "Send failed: %s\n"
@@ -6959,45 +6981,45 @@ msgstr ""
 "Trimiterea a eșuat: %s\n"
 "%s"
 
-#: ../src/sendmsg-window.c:5525
+#: ../src/sendmsg-window.c:5528
 #, c-format
 msgid "Send failed: %s"
 msgstr "Trimiterea a eșuat: %s"
 
-#: ../src/sendmsg-window.c:5624
+#: ../src/sendmsg-window.c:5627
 #, c-format
 msgid "Could not postpone message: %s"
 msgstr "Nu s-a putut amâna mesajul: %s"
 
-#: ../src/sendmsg-window.c:5645
+#: ../src/sendmsg-window.c:5648
 msgid "Message postponed."
 msgstr "Mesajul a fost amânat."
 
-#: ../src/sendmsg-window.c:5650
+#: ../src/sendmsg-window.c:5653
 msgid "Could not postpone message."
 msgstr "Nu s-a putut amâna mesajul."
 
-#: ../src/sendmsg-window.c:5862
+#: ../src/sendmsg-window.c:5865
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Eroare la inițierea verificării ortografice: %s"
 
-#: ../src/sendmsg-window.c:6625
+#: ../src/sendmsg-window.c:6628
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Răspuns către %s: %s"
 
-#: ../src/sendmsg-window.c:6630
+#: ../src/sendmsg-window.c:6633
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Înaintare mesaj către %s: %s"
 
-#: ../src/sendmsg-window.c:6634
+#: ../src/sendmsg-window.c:6637
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Mesaj nou către %s: %s"
 
-#: ../src/sendmsg-window.c:6782 ../ui/sendmsg-window.ui.h:33
+#: ../src/sendmsg-window.c:6785 ../ui/sendmsg-window.ui.h:33
 msgid "_Language"
 msgstr "_Limbă"
 

@@ -1,3 +1,58 @@
+2021-03-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	mailbox: Lock destination when copying or moving
+
+	* libbalsa/mailbox.c
+	  (libbalsa_mailbox_real_messages_copy): remove guards;
+	  (messages_copy_locked): helper;
+	  (libbalsa_mailbox_messages_copy): guard and lock destination,
+	    and use helper;
+	  (libbalsa_mailbox_messages_move): ditto.
+
+2021-03-21  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	imap-handle: check for non-compliant responses
+
+	* libbalsa/imap/imap-handle.c
+	  (imap_cmd_step): disconnect if a protocol error is found;
+	  (ir_exists): check that the handle is either authenticated or selected;
+	  (ir_recent): ditto;
+	  (ir_fetch_seq): check that the handle is selected;
+	  (ir_expunge): ditto; also check that the sequence number of
+	    the expunged message is valid.
+
+2021-03-09  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Try to avoid critical messages
+
+	* libbalsa/mailbox_imap.c
+	  (imap_expunge_idle): handle expunged messages in the order
+	    they are expunged;
+	  (libbalsa_mailbox_imap_fetch_headers): avoid a critical message.
+
+2021-03-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Remove a scheduled idle callback at close time instead of at
+	dispose time.
+
+	* libbalsa/mailbox_imap.c
+	  (libbalsa_mailbox_imap_close): remove expunged idle source, if any;
+	  (libbalsa_mailbox_imap_dispose): comment that it should have
+	    been removed at close time.
+
+2021-03-08  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Handle expunged IMAP messages in an idle callback
+
+	* libbalsa/mailbox_imap.c: add an array of expunged messages and
+	    an idle id to LibBalsaMailboxImap;
+	  (libbalsa_mailbox_imap_init): initialize them;
+	  (libbalsa_mailbox_imap_dispose): remove any outstanding idle source;
+	  (libbalsa_mailbox_imap_finalize): free the array;
+	  (imap_expunge_cb): populate the array, and if necessary schedule the idle
+	    callback;
+	  (imap_expunge_idle): handle the expunged messages.
+
 2020-12-21  Pawel Salek  <pawsa0@gmail.com>
 
     * NEWS, configure.ac, meson.build: release balsa-2.6.2

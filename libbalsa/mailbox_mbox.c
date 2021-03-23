@@ -435,7 +435,6 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
 
     gmime_parser = g_mime_parser_new_with_stream(mbox->gmime_stream);
     g_mime_parser_set_format(gmime_parser, GMIME_FORMAT_MBOX);
-    g_mime_parser_set_respect_content_length(gmime_parser, TRUE);
     g_mime_parser_set_header_regex(gmime_parser,
                                    "^Status|^X-Status|^MIME-Version",
 				   lbm_mbox_header_cb, &msg_info_p);
@@ -496,8 +495,11 @@ parse_mailbox(LibBalsaMailboxMbox * mbox)
             continue;
 
         msg_info.local_info.flags = msg_info.orig_flags;
-        g_ptr_array_add(mbox->msgno_2_msg_info,
-                        g_memdup(&msg_info, sizeof(msg_info)));
+#if GLIB_CHECK_VERSION(2, 68, 0)
+        g_ptr_array_add(mbox->msgno_2_msg_info, g_memdup2(&msg_info, sizeof(msg_info)));
+#else
+        g_ptr_array_add(mbox->msgno_2_msg_info, g_memdup(&msg_info, sizeof(msg_info)));
+#endif
         mbox->messages_info_changed = TRUE;
 
         libbalsa_message_set_flags(msg, msg_info.orig_flags);
@@ -581,8 +583,11 @@ lbm_mbox_restore(LibBalsaMailboxMbox * mbox)
             && !lbm_mbox_seek_to_message(mbox, msg_info->end))
             /* Error: no message following this one. */
             break;
-        g_ptr_array_add(mbox->msgno_2_msg_info,
-                        g_memdup(msg_info, sizeof *msg_info));
+#if GLIB_CHECK_VERSION(2, 68, 0)
+        g_ptr_array_add(mbox->msgno_2_msg_info, g_memdup2(msg_info, sizeof *msg_info));
+#else
+        g_ptr_array_add(mbox->msgno_2_msg_info, g_memdup(msg_info, sizeof *msg_info));
+#endif
     } while (++msg_info < (struct message_info *) (contents + length));
 
     g_debug("%s: %s restored %zd messages", __func__,

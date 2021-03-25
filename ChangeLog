@@ -1,3 +1,11 @@
+2021-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	html: WebKit deprecation cleanup
+
+	* libbalsa/html.c (lbh_web_view_new):
+	webkit_settings_set_enable_plugins() is deprecated in 2.32 (we
+	test for 2.31.91).
+
 2021-03-22  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	mailbox: Lock destination when copying or moving

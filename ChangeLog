@@ -1,3 +1,20 @@
+2021-03-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	imap-handle: use a flexible array member
+
+	to append data to struct ImapMsgSerialized.
+
+	Thanks to @albrecht for the suggestion and reference to the C99
+	standard, in https://gitlab.gnome.org/GNOME/balsa/-/issues/57
+
+	* libbalsa/imap/imap-handle.c:
+	  struct ImapMsgSerialized: replace
+	    - gchar fetched_headers_first_char;
+	    with a flexible array member
+	    + gchar fetched_headers_data[];
+	  (imap_message_serialize): adapt to the change;
+	  (imap_message_deserialize): ditto.
+
 2021-03-25  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	html: WebKit deprecation cleanup

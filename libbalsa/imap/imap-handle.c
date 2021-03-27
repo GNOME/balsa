@@ -1658,7 +1658,7 @@ struct ImapMsgSerialized {
   ImapDate     internal_date; /* delivery date */
   int rfc822size;
   ImapFetchType available_headers;
-  gchar fetched_headers_first_char;
+  gchar fetched_headers_data[];
 };
 
 void*
@@ -1676,7 +1676,7 @@ imap_message_serialize(ImapMessage *imsg)
   strings[0] = imsg->fetched_header_fields;
   strings[1] = imap_envelope_to_string(imsg->envelope);
   strings[2] = imap_body_to_string(imsg->body);
-  tot_size = sizeof(struct ImapMsgSerialized)-1;
+  tot_size = sizeof(struct ImapMsgSerialized);
   for(i=0; i<3; i++) {
     lengths[i] = strings[i]  ? strlen(strings[i])  : 0;
     tot_size += lengths[i] + 1;
@@ -1691,7 +1691,7 @@ imap_message_serialize(ImapMessage *imsg)
   imes->rfc822size    = imsg->rfc822size;
   imes->available_headers = imsg->available_headers;
 
-  ptr = &imes->fetched_headers_first_char;
+  ptr = imes->fetched_headers_data;
   for(i=0; i<3; i++) {
     if(strings[i])
       strcpy(ptr, strings[i]);
@@ -1719,7 +1719,7 @@ imap_message_deserialize(void *data)
   imsg->rfc822size = imes->rfc822size;
   imsg->available_headers = imes->available_headers;
   /* Envelope */
-  ptr = &imes->fetched_headers_first_char;
+  ptr = imes->fetched_headers_data;
   imsg->fetched_header_fields = *ptr ? g_strdup(ptr) : NULL;
   ptr += strlen(ptr) + 1;
   imsg->envelope = imap_envelope_from_string(ptr);

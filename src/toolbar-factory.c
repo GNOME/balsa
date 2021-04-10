@@ -267,6 +267,31 @@ tm_gsettings_change_cb(GSettings   * settings,
         balsa_toolbar_model_changed(model);
 }
 
+static GSettings *
+tm_get_settings(void)
+{
+    GSettingsSchemaSource *schema_source;
+    GSettings *settings = NULL;
+
+    schema_source = g_settings_schema_source_get_default();
+    if (schema_source != NULL) {
+    	GSettingsSchema *schema;
+
+    	schema = g_settings_schema_source_lookup(schema_source, "org.gnome.desktop.interface", TRUE);
+    	if (schema != NULL) {
+    		settings = g_settings_new("org.gnome.desktop.interface");
+    		g_debug("settings schema 'org.gnome.desktop.interface' loaded");
+    		g_settings_schema_unref(schema);
+    	} else {
+    		g_info("the settings schema 'org.gnome.desktop.interface' does not exist");
+    	}
+    } else {
+    	g_warning("cannot get default settings schema source");
+    }
+
+    return settings;
+}
+
 /* Create a BalsaToolbarModel structure.
  */
 BalsaToolbarModel *
@@ -293,9 +318,10 @@ balsa_toolbar_model_new(BalsaToolbarType          type,
     balsa_toolbar_model_add_entries(model, entries, n_entries);
     tm_load_model(model);
 
-    model->settings = g_settings_new("org.gnome.desktop.interface");
-    g_signal_connect(model->settings, "changed",
-                     G_CALLBACK(tm_gsettings_change_cb), model);
+    model->settings = tm_get_settings();
+    if (model->settings != NULL) {
+    	g_signal_connect(model->settings, "changed", G_CALLBACK(tm_gsettings_change_cb), model);
+    }
 
     return model;
 }
@@ -471,22 +497,25 @@ tm_default_style(void)
 {
     GtkToolbarStyle default_style = GTK_TOOLBAR_BOTH;
     GSettings *settings;
-    gchar *str;
 
     /* Get global setting */
-    settings = g_settings_new("org.gnome.desktop.interface");
-    str  = g_settings_get_string(settings, "toolbar-style");
-    if (str) {
-        guint i;
+    settings = tm_get_settings();
+    if (settings != NULL) {
+        gchar *str;
 
-        for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++)
-            if (strcmp(tm_toolbar_options[i].config_name, str) == 0) {
-                default_style = tm_toolbar_options[i].style;
-                break;
-            }
-        g_free(str);
+        str = g_settings_get_string(settings, "toolbar-style");
+        if (str != NULL) {
+        	guint i;
+
+        	for (i = 0; i < G_N_ELEMENTS(tm_toolbar_options); i++)
+        		if (strcmp(tm_toolbar_options[i].config_name, str) == 0) {
+        			default_style = tm_toolbar_options[i].style;
+        			break;
+        		}
+        	g_free(str);
+        }
+        g_object_unref(settings);
     }
-    g_object_unref(settings);
 
     return default_style;
 }

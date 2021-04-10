@@ -688,7 +688,7 @@ libbalsa_mailbox_mbox_open(LibBalsaMailbox * mailbox, GError **err)
 
     mbox->size = st.st_size;
     g_debug("%s %s set size from stat %ld", __func__, libbalsa_mailbox_get_name(mailbox),
-            mbox->size);
+            (long) mbox->size);
     libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
     mbox->gmime_stream = gmime_stream;
 
@@ -957,7 +957,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
         libbalsa_mailbox_set_mtime(mailbox, st.st_mtime);
 	mbox->size = st.st_size;
         g_debug("%s %s set size from stat %ld", __func__, libbalsa_mailbox_get_name(mailbox),
-                mbox->size);
+                (long) mbox->size);
 	return;
     }
     if (st.st_mtime == mtime && st.st_size == mbox->size)
@@ -972,7 +972,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
 	/* Cache the file size, so we don't check the next time. */
 	mbox->size = st.st_size;
         g_debug("%s %s set size from stat %ld", __func__, libbalsa_mailbox_get_name(mailbox),
-                mbox->size);
+                (long) mbox->size);
 	return;
     }
 
@@ -1057,7 +1057,7 @@ libbalsa_mailbox_mbox_check(LibBalsaMailbox * mailbox)
     parse_mailbox(mbox);
     mbox->size = g_mime_stream_tell(mbox_stream);
     g_debug("%s %s set size from tell %ld", __func__, libbalsa_mailbox_get_name(mailbox),
-            mbox->size);
+            (long) mbox->size);
     libbalsa_mime_stream_shared_unlock(mbox_stream);
     mbox_unlock(mailbox, mbox_stream);
 
@@ -1562,7 +1562,7 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     else if (g_mime_stream_write_to_stream(temp_stream, mbox_stream) != -1) {
         mbox->size = g_mime_stream_tell(mbox_stream);
         g_debug("%s %s set size from tell %ld", __func__, libbalsa_mailbox_get_name(mailbox),
-                mbox->size);
+                (long) mbox->size);
         if (ftruncate(GMIME_STREAM_FS(mbox_stream)->fd, mbox->size) == 0)
             save_failed = FALSE;
     }

@@ -41,4 +41,4 @@ AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	-DG_LOG_DOMAIN=\"imap\" \
 	$(BALSA_CFLAGS)
 
-AM_CFLAGS   = $(LIBIMAP_CFLAGS) -ansi
+AM_CFLAGS   = $(LIBIMAP_CFLAGS)

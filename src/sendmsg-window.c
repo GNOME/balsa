@@ -72,7 +72,7 @@
 #elif HAVE_GSPELL
 #include <gspell/gspell.h>
 #else                           /* HAVE_GTKSPELL */
-#include <enchant/enchant.h>
+#include <enchant.h>
 #include "spell-check.h"
 #endif                          /* HAVE_GTKSPELL */
 #if HAVE_GTKSOURCEVIEW

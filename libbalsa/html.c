@@ -602,7 +602,11 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
     gtk_widget_set_vexpand(GTK_WIDGET(view), TRUE);
 
 	settings = webkit_web_view_get_settings(view);
+#if WEBKIT_CHECK_VERSION(2, 31, 91)
+    g_object_set(G_OBJECT(settings), "enable-plugins", FALSE, NULL);
+#else  /* WEBKIT_CHECK_VERSION(2, 31, 91) */
     webkit_settings_set_enable_plugins(settings, FALSE);
+#endif /* WEBKIT_CHECK_VERSION(2, 31, 91) */
     webkit_settings_set_enable_javascript(settings, FALSE);
 	webkit_settings_set_enable_java(settings, FALSE);
 	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);

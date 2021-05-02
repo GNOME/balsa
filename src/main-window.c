@@ -2982,6 +2982,8 @@ bw_real_open_mbnode_thread(BalsaWindowRealOpenMbnodeInfo * info)
             LIBBALSA_INFORMATION_ERROR,
             _("Unable to Open Mailbox!\n%s."),
 	    err ? err->message : _("Unknown error"));
+        if (err != NULL)
+            g_error_free(err);
         balsa_window_decrease_activity(info->window, info->message);
         bw_open_mbnode_info_free(info);
     }

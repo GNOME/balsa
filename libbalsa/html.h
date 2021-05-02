@@ -70,6 +70,9 @@ gboolean libbalsa_html_get_selection_bounds(GtkWidget * widget,
 GtkWidget *libbalsa_html_popup_menu_widget(GtkWidget * widget);
 GtkWidget *libbalsa_html_get_view_widget(GtkWidget * widget);
 
+guint64 libbalsa_html_cache_size(void);
+void libbalsa_html_clear_cache(void);
+
 gboolean libbalsa_html_can_print(GtkWidget * widget);
 void libbalsa_html_print(GtkWidget * widget);
 cairo_surface_t *libbalsa_html_print_bitmap(LibBalsaMessageBody *body,

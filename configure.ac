@@ -260,7 +260,9 @@ AC_MSG_CHECKING(whether to use an HTML widget)
 case "$use_html_widget" in
     webkit2)
         AC_MSG_RESULT([$use_html_widget])
-        PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.0 >= 2.28.0 ])
+        # note: sqlite3 is needed to manage html vs. plain and image download preferences
+        PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.0 >= 2.28.0
+                                  sqlite3 >= 3.24.0])
         AC_PATH_PROGS(HTML2TEXT,
                       [python-html2text  \
                        html2markdown     \

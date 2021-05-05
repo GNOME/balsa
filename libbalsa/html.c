@@ -750,7 +750,8 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
 GtkWidget *
 libbalsa_html_new(LibBalsaMessageBody * body,
                   LibBalsaHtmlCallback  hover_cb,
-                  LibBalsaHtmlCallback  clicked_cb)
+                  LibBalsaHtmlCallback  clicked_cb,
+                  gboolean              auto_load_images)
 {
     gchar *text;
     gssize len;
@@ -771,7 +772,8 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     have_src_cid = g_regex_match_simple(CID_REGEX, text, G_REGEX_CASELESS, 0);
     have_src_oth = g_regex_match_simple(SRC_REGEX, text, G_REGEX_CASELESS, 0);
 
-    info->web_view = lbh_web_view_new(info, LBH_NATURAL_SIZE, have_src_cid && !have_src_oth);
+    info->web_view = lbh_web_view_new(info, LBH_NATURAL_SIZE,
+    	auto_load_images || (have_src_cid && !have_src_oth));
 
     g_signal_connect(info->web_view, "mouse-target-changed",
                      G_CALLBACK(lbh_mouse_target_changed_cb), info);

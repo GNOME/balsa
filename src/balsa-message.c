@@ -1997,16 +1997,16 @@ balsa_message_has_previous_part(BalsaMessage * balsa_message)
 
 #ifdef HAVE_HTML_WIDGET
 static gboolean
-libbalsa_can_display(LibBalsaMessageBody *part)
+libbalsa_can_display(LibBalsaMessageBody *part, InternetAddressList *from)
 {
     gchar *content_type = libbalsa_message_body_get_mime_type(part);
     gboolean res = FALSE;
-    if (!balsa_app.display_alt_plain &&
+    if ((!balsa_app.display_alt_plain || libbalsa_html_get_prefer_html(from)) &&
 	libbalsa_html_type(content_type))
 	res = TRUE;
     else if(strcmp(content_type, "multipart/related") == 0 &&
 	    part->parts)
-	res = libbalsa_can_display(part->parts);
+	res = libbalsa_can_display(part->parts, from);
     g_free(content_type);
     return res;
 }
@@ -2026,7 +2026,7 @@ libbalsa_can_display(LibBalsaMessageBody *part)
    In the case as above, B & C should be displayed.
 */
 static LibBalsaMessageBody*
-preferred_part(LibBalsaMessageBody *parts)
+preferred_part(LibBalsaMessageBody *parts, InternetAddressList *from)
 {
     LibBalsaMessageBody *body, *preferred = parts;
 
@@ -2039,7 +2039,7 @@ preferred_part(LibBalsaMessageBody *parts)
             strcmp(content_type, "text/calendar") == 0)
             preferred = body;
 #ifdef HAVE_HTML_WIDGET
-        else if (libbalsa_can_display(body))
+        else if (libbalsa_can_display(body, from))
             preferred = body;
 #endif                          /* HAVE_HTML_WIDGET */
 
@@ -2163,8 +2163,11 @@ add_multipart(BalsaMessage *balsa_message, LibBalsaMessageBody *body,
         /* add the compound object root part */
         body = add_body(balsa_message, libbalsa_message_body_mp_related_root(body), container);
     } else if (g_mime_content_type_is_type(type, "multipart", "alternative")) {
-            /* Add the most suitable part. */
-        body = add_body(balsa_message, preferred_part(body->parts), container);
+        InternetAddressList *from = NULL;
+
+        from = libbalsa_message_get_headers(balsa_message->message)->from;
+        /* Add the most suitable part. */
+        body = add_body(balsa_message, preferred_part(body->parts, from), container);
     } else if (g_mime_content_type_is_type(type, "multipart", "digest")) {
 	body = add_multipart_digest(balsa_message, body->parts, container);
     } else { /* default to multipart/mixed */

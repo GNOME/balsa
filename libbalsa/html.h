@@ -38,11 +38,14 @@ typedef enum {
 
 # ifdef HAVE_HTML_WIDGET
 
+#include "html-pref-db.h"
+
 typedef void (*LibBalsaHtmlCallback) (const gchar * uri);
 
 GtkWidget *libbalsa_html_new(LibBalsaMessageBody * body,
                              LibBalsaHtmlCallback hover_cb,
-                             LibBalsaHtmlCallback clicked_cb);
+                             LibBalsaHtmlCallback clicked_cb,
+                             gboolean             auto_load_images);
 void libbalsa_html_to_string(gchar ** text, size_t len);
 gboolean libbalsa_html_can_zoom(GtkWidget * widget);
 void libbalsa_html_zoom(GtkWidget * widget, gint in_out);

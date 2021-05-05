@@ -60,6 +60,8 @@ libbalsa_a_SOURCES = 		\
 	gmime-part-rfc2440.c	\
 	html.c                  \
 	html.h                  \
+	html-pref-db.c		\
+	html-pref-db.h		\
 	identity.c		\
 	identity.h		\
 	imap-server.c		\

@@ -167,6 +167,7 @@ libnetclient_deps = [glib_dep,
 #
 if html_widget == 'webkit2'
   html_dep = dependency('webkit2gtk-4.0', version : '>= 2.28.0')
+  htmlpref_dep = dependency('sqlite3', version : '>= 3.24.0')
 
   html2text = find_program('python-html2text',
                            'html2markdown',
@@ -194,7 +195,7 @@ if html_widget == 'webkit2'
 
   conf.set('HAVE_HTML_WIDGET', 1,
     description : 'Defined when an HTML widget can be used.')
-  balsa_deps += html_dep
+  balsa_deps += [html_dep, htmlpref_dep]
 endif
 
 # Autocrypt

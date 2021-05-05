@@ -2553,6 +2553,11 @@ pm_grid_add_alternative_group(GtkWidget * grid_widget)
 	pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Prefer text/plain over HTML"));
 
 #ifdef HAVE_HTML_WIDGET
+    button = gtk_button_new_with_label(_("Manage exceptions…"));
+    g_signal_connect_swapped(button, "clicked",
+        G_CALLBACK(libbalsa_html_pref_dialog_run), property_box);
+    pm_grid_attach(grid, button, 2, row, 1, 1);
+
     label = gtk_label_new(NULL);
     set_html_cache_label_str(GTK_LABEL(label));
     pm_grid_attach(grid, label, 1, ++row, 1, 1);

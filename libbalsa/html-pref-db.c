@@ -221,9 +221,9 @@ pref_db_check(void)
 {
 	static const gchar * const prepare_statements[NUM_QUERIES] = {
 		"SELECT * FROM html_prefs WHERE addr = LOWER(?)",
-		"INSERT INTO html_prefs (addr, prefer_html) VALUES (?1, ?2) "
+		"INSERT INTO html_prefs (addr, prefer_html) VALUES (LOWER(?1), ?2) "
 				"ON CONFLICT (addr) DO UPDATE SET prefer_html = ?2",
-		"INSERT INTO html_prefs (addr, prefer_load_img) VALUES (?1, ?2) "
+		"INSERT INTO html_prefs (addr, prefer_load_img) VALUES (LOWER(?1), ?2) "
 				"ON CONFLICT (addr) DO UPDATE SET prefer_load_img = ?2",
 		"DELETE FROM html_prefs WHERE addr = LOWER(?1)",
 		"SELECT addr, prefer_html, prefer_load_img FROM html_prefs ORDER BY addr ASC"

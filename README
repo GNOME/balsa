@@ -71,7 +71,8 @@ Specify the kerberos directory as the argument.
 	When using webkit2, in order to quote html-only messages
 it is recommended to install a html-to-text conversion tool.  Supported
 tools are python-html2text, html2markdown, html2markdown.py2,
-html2markdown.py3 and html2text.
+html2markdown.py3 and html2text.  Additionally, sqlite3 is required for
+managing sender-dependent HTML preferences.
 
 --with-spell-checker=(internal|gtkspell|gspell)
 	Select the spell checker for the message composer. The internal spell

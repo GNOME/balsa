@@ -47,6 +47,9 @@
 /* use a negative lookahead assertion to match "src=" *not* followed by "cid:" */
 #define SRC_REGEX	"<[^>]*src\\s*=\\s*(?!['\"]?\\s*cid:)"
 
+/* HTTP cache folder in ~/.balsa */
+#define CACHE_DIR	"http-cache"
+
 /* approximate image resolution for printing */
 #define HTML_PRINT_DPI			200.0
 /* zoom level for printing */
@@ -530,16 +533,17 @@ lbh_web_process_terminated_cb(WebKitWebView                     *web_view,
  */
 static void
 lbh_cid_cb(WebKitURISchemeRequest * request,
-           gpointer                 data)
+           gpointer G_GNUC_UNUSED   data)
 {
-    LibBalsaWebKitInfo *info = *(LibBalsaWebKitInfo **) data;
+    LibBalsaWebKitInfo *info;
     const gchar *path;
     LibBalsaMessageBody *body;
 
     path = webkit_uri_scheme_request_get_path(request);
-    g_debug("%s path %s", __func__, path);
+    info = g_object_get_data(G_OBJECT(webkit_uri_scheme_request_get_web_view(request)), LIBBALSA_HTML_INFO);
+    g_debug("%s path %s, info %p", __func__, path, info);
 
-    if ((info->body != NULL) &&
+    if ((info != NULL) && (info->body != NULL) &&
     	(body = libbalsa_message_get_part_by_id(info->body->message, path))) {
         gchar *content;
         gssize len;
@@ -585,6 +589,28 @@ lbh_context_menu_cb(WebKitWebView       * web_view,
     return retval;
 }
 
+static WebKitWebContext *
+lbh_get_web_view_context(void)
+{
+	static WebKitWebContext *context = NULL;
+
+	if (g_once_init_enter(&context)) {
+		WebKitWebsiteDataManager *data_manager;
+		WebKitWebContext *tmp;
+		gchar *cache_dir;
+
+		cache_dir = g_build_filename(g_get_home_dir(), ".balsa", CACHE_DIR, NULL);
+		data_manager = webkit_website_data_manager_new("base-cache-directory", cache_dir, NULL);
+		g_free(cache_dir);
+		tmp = webkit_web_context_new_with_website_data_manager(data_manager);
+		webkit_web_context_set_cache_model(tmp, WEBKIT_CACHE_MODEL_DOCUMENT_BROWSER);
+		webkit_web_context_register_uri_scheme(tmp, "cid", lbh_cid_cb, NULL, NULL);
+		g_debug("%s: registered “cid:” scheme", __func__);
+		g_once_init_leave(&context, tmp);
+	}
+	return context;
+}
+
 static WebKitWebView *
 lbh_web_view_new(LibBalsaWebKitInfo *info,
 				 gint				 width,
@@ -592,11 +618,8 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 {
 	WebKitWebView *view;
 	WebKitSettings *settings;
-	static guint have_registered_cid = 0U;
-        static LibBalsaWebKitInfo *info_for_cid;
 
-        info_for_cid = info;
-	view = WEBKIT_WEB_VIEW(webkit_web_view_new());
+	view = WEBKIT_WEB_VIEW(webkit_web_view_new_with_context(lbh_get_web_view_context()));
     g_object_set_data_full(G_OBJECT(view), LIBBALSA_HTML_INFO, info, (GDestroyNotify) lbh_webkit_info_free);
     gtk_widget_set_size_request(GTK_WIDGET(view), width, LBH_NATURAL_SIZE);
     gtk_widget_set_vexpand(GTK_WIDGET(view), TRUE);
@@ -611,19 +634,6 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 	webkit_settings_set_enable_java(settings, FALSE);
 	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);
 	webkit_settings_set_auto_load_images(settings, auto_load_images);
-
-	if (g_atomic_int_or(&have_registered_cid, 1U) == 0U) {
-        WebKitWebContext *context;
-        /* Apparently, WebKitWebContext is static, and does not like to
-         * have the scheme registered many times (13? 15?), after which
-         * the web process crashes and does not get respawned.
-         * We register it once with the address of a static pointer to
-         * LibBalsaWebKitInfo. */
-
-        context = webkit_web_view_get_context(view);
-        webkit_web_context_register_uri_scheme(context, "cid", lbh_cid_cb, &info_for_cid, NULL);
-        g_debug("%s_ registered “cid:” scheme", __func__);
-	}
 
 	g_signal_connect(view, "web-process-terminated", G_CALLBACK(lbh_web_process_terminated_cb), info);
     g_signal_connect(view, "decide-policy", G_CALLBACK(lbh_decide_policy_cb), info);
@@ -740,7 +750,8 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
 GtkWidget *
 libbalsa_html_new(LibBalsaMessageBody * body,
                   LibBalsaHtmlCallback  hover_cb,
-                  LibBalsaHtmlCallback  clicked_cb)
+                  LibBalsaHtmlCallback  clicked_cb,
+                  gboolean              auto_load_images)
 {
     gchar *text;
     gssize len;
@@ -761,7 +772,8 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     have_src_cid = g_regex_match_simple(CID_REGEX, text, G_REGEX_CASELESS, 0);
     have_src_oth = g_regex_match_simple(SRC_REGEX, text, G_REGEX_CASELESS, 0);
 
-    info->web_view = lbh_web_view_new(info, LBH_NATURAL_SIZE, have_src_cid && !have_src_oth);
+    info->web_view = lbh_web_view_new(info, LBH_NATURAL_SIZE,
+    	auto_load_images || (have_src_cid && !have_src_oth));
 
     g_signal_connect(info->web_view, "mouse-target-changed",
                      G_CALLBACK(lbh_mouse_target_changed_cb), info);
@@ -1042,6 +1054,24 @@ libbalsa_html_search(GtkWidget                * widget,
     } else {
         lbh_search_continue(controller, text, find_forward, wrap);
     }
+}
+
+guint64
+libbalsa_html_cache_size(void)
+{
+	GFile *cache_dir;
+	guint64 result = 0;
+
+	cache_dir = g_file_new_build_filename(g_get_home_dir(), ".balsa", CACHE_DIR, NULL);
+	g_file_measure_disk_usage(cache_dir, G_FILE_MEASURE_NONE, NULL, NULL, NULL, &result, NULL, NULL, NULL);
+	g_object_unref(cache_dir);
+	return result;
+}
+
+void
+libbalsa_html_clear_cache(void)
+{
+	webkit_web_context_clear_cache(lbh_get_web_view_context());
 }
 
 /*

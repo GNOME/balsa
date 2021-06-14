@@ -1104,11 +1104,28 @@ bmwt_html_select_all_cb(GtkWidget * html)
 }
 
 static void
+bmwt_html_prefer_html_changed(GtkCheckMenuItem *checkmenuitem,
+                              gpointer          user_data)
+{
+	libbalsa_html_prefer_set_prefer_html(INTERNET_ADDRESS_LIST(user_data),
+		gtk_check_menu_item_get_active(checkmenuitem));
+}
+
+static void
+bmwt_html_load_images_changed(GtkCheckMenuItem *checkmenuitem,
+                              gpointer          user_data)
+{
+	libbalsa_html_prefer_set_load_images(INTERNET_ADDRESS_LIST(user_data),
+		gtk_check_menu_item_get_active(checkmenuitem));
+}
+
+static void
 bmwt_html_populate_popup_menu(BalsaMessage * bm,
                               GtkWidget    * html,
                               GtkMenu      * menu)
 {
     GtkWidget *menuitem;
+    InternetAddressList *from;
     gpointer mime_body = g_object_get_data(G_OBJECT(html), "mime-body");
 
     menuitem = gtk_menu_item_new_with_label(_("Zoom In"));
@@ -1158,6 +1175,25 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
                              G_CALLBACK(libbalsa_html_print), html);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
     gtk_widget_set_sensitive(menuitem, libbalsa_html_can_print(html));
+
+    menuitem = gtk_separator_menu_item_new();
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
+    from = libbalsa_message_get_headers(balsa_message_get_message(bm))->from;
+    menuitem = gtk_check_menu_item_new_with_label(_("Prefer HTML for this sender"));
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem),
+        libbalsa_html_get_prefer_html(from));
+    gtk_widget_set_sensitive(menuitem, from != NULL);
+    g_signal_connect(menuitem, "toggled", G_CALLBACK(bmwt_html_prefer_html_changed), from);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
+    menuitem = gtk_check_menu_item_new_with_label(_("Load images for this sender"));
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem),
+        libbalsa_html_get_load_images(from));
+    gtk_widget_set_sensitive(menuitem, from != NULL);
+    g_signal_connect(menuitem, "toggled", G_CALLBACK(bmwt_html_load_images_changed), from);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
     gtk_widget_show_all(GTK_WIDGET(menu));
 }
 
@@ -1230,14 +1266,17 @@ static BalsaMimeWidget *
 bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
 {
     BalsaMimeWidgetText *mwt = g_object_new(BALSA_TYPE_MIME_WIDGET_TEXT, NULL);
+    InternetAddressList *from;
     GtkWidget *widget;
     GtkWidget *popup_menu;
     GtkEventController *key_controller;
 
+    from = libbalsa_message_get_headers(balsa_message_get_message(bm))->from;
     mwt->text_widget = widget =
         libbalsa_html_new(mime_body,
                          (LibBalsaHtmlCallback) bm_widget_on_url,
-                         (LibBalsaHtmlCallback) handle_url);
+                         (LibBalsaHtmlCallback) handle_url,
+                         libbalsa_html_get_load_images(from));
     gtk_container_add(GTK_CONTAINER(mwt), widget);
 
     g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);

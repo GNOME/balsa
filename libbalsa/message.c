@@ -1101,6 +1101,12 @@ libbalsa_message_headers_from_gmime(LibBalsaMessageHeaders *headers,
     	/* set the reference date far in the future so we can ignore messages w/o Date: header */
     	reftime = g_date_time_new_from_unix_utc(time(NULL) + (365 * 24 * 60 * 60));
     	headers->autocrypt_hdr = g_mime_message_get_autocrypt_header(mime_msg, reftime);
+    	/* remember if the message really included an Autocrypt header, or if GMime
+    	 * returned an incomplete one (see
+    	 * https://developer.gnome.org/gmime/stable/GMimeMessage.html#g-mime-message-get-autocrypt-header).
+    	 */
+    	headers->autocrypt_hdr_present =
+    		(g_mime_object_get_header(GMIME_OBJECT(mime_msg), "autocrypt") != NULL);
     	g_date_time_unref(reftime);
     }
 #endif

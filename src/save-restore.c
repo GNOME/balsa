@@ -727,6 +727,9 @@ config_global_load(void)
     geometry_manager_init("IMAPSelectParent", 200, 160, FALSE);
     geometry_manager_init("KeyDialog", 400, 200, FALSE);
     geometry_manager_init("KeyList", 300, 200, FALSE);
+#ifdef HAVE_HTML_WIDGET
+    geometry_manager_init("HTMLPrefsDB", 300, 200, FALSE);
+#endif
 #ifdef ENABLE_AUTOCRYPT
     geometry_manager_init("AutocryptDB", 300, 200, FALSE);
 #endif  /* ENABLE_AUTOCRYPT */

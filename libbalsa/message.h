@@ -146,8 +146,12 @@ struct _LibBalsaMessageHeaders {
     GList *user_hdrs;
 
 #if defined ENABLE_AUTOCRYPT
-    /* received Autocrypt header */
+    /* received Autocrypt header data
+     * Note that g_mime_message_get_autocrypt_header() will return an object
+     * even if there is no Autocrypt: header, so we must remember if there
+     * hase been one */
     GMimeAutocryptHeader *autocrypt_hdr;
+    gboolean autocrypt_hdr_present;
 #endif
 };
 

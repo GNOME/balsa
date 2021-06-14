@@ -2112,7 +2112,7 @@ msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
 msgstr ""
-"La signatura és vàlida, però s'ha rebutjat la clau utilitzada per verificar "
+"La signatura és vàlida, però s'ha rebutjat la clau utilitzada per a verificar "
 "la signatura."
 
 #: ../libbalsa/rfc3156.c:633
@@ -6502,7 +6502,7 @@ msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 "L'opció per a fer la petició d'una MDN (notificació d'entrega del missatge) "
-"està al menú opcions de la finestra de redacció."
+"és al menú opcions de la finestra de redacció."
 
 #: ../src/save-restore.c:1105
 #, fuzzy
@@ -7903,7 +7903,7 @@ msgstr "Sense llegi_r"
 
 #: ../ui/main-window.ui.h:65
 msgid "Un_flagged"
-msgstr "Sense _senyalat"
+msgstr "Sense _senyalar"
 
 #: ../ui/main-window.ui.h:66
 msgid "_Answered"

@@ -719,9 +719,20 @@ extract_ac_keydata(GMimeAutocryptHeader *autocrypt_header, ac_key_data_t *dest)
 				if (success && (keys != NULL) && (keys->next == NULL)) {
 					gpgme_key_t key = (gpgme_key_t) keys->data;
 
-					if ((key != NULL) && (key->subkeys != NULL)) {
-						dest->fingerprint = g_strdup(key->subkeys->fpr);
-						dest->expires = key->subkeys->expires;
+					if (key != NULL) {
+						gpgme_subkey_t sign_subkey;
+
+						for (sign_subkey = key->subkeys;
+							 (sign_subkey != NULL) && (sign_subkey->can_sign == 0);
+							 sign_subkey = sign_subkey->next);
+						if (sign_subkey != NULL) {
+							dest->fingerprint = g_strdup(sign_subkey->fpr);
+							dest->expires = sign_subkey->expires;
+						} else {
+							g_warning("Autocrypt key for '%s' does not contain a signing-capable subkey",
+								g_mime_autocrypt_header_get_address_as_string(autocrypt_header));
+							success = FALSE;
+						}
 					} else {
 						success = FALSE;
 					}

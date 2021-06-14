@@ -435,14 +435,13 @@ static gchar*
 get_cache_dir(gboolean is_persistent)
 {
     gchar *fname;
-    if(is_persistent) {
-        const gchar *home = g_get_home_dir();
-        fname = g_strconcat(home, G_DIR_SEPARATOR_S ".balsa"
-                            G_DIR_SEPARATOR_S "imap-cache", NULL);
-    } else
+    if (is_persistent) {
+        fname = g_build_filename(g_get_home_dir(), ".balsa", "imap-cache", NULL);
+    } else {
         fname = g_strconcat(g_get_tmp_dir(),
-                            G_DIR_SEPARATOR_S "/balsa-",
+                            G_DIR_SEPARATOR_S "balsa-",
                             g_get_user_name(), NULL);
+    }
 
     return fname;
 }

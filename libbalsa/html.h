@@ -38,11 +38,14 @@ typedef enum {
 
 # ifdef HAVE_HTML_WIDGET
 
+#include "html-pref-db.h"
+
 typedef void (*LibBalsaHtmlCallback) (const gchar * uri);
 
 GtkWidget *libbalsa_html_new(LibBalsaMessageBody * body,
                              LibBalsaHtmlCallback hover_cb,
-                             LibBalsaHtmlCallback clicked_cb);
+                             LibBalsaHtmlCallback clicked_cb,
+                             gboolean             auto_load_images);
 void libbalsa_html_to_string(gchar ** text, size_t len);
 gboolean libbalsa_html_can_zoom(GtkWidget * widget);
 void libbalsa_html_zoom(GtkWidget * widget, gint in_out);
@@ -69,6 +72,9 @@ gboolean libbalsa_html_get_selection_bounds(GtkWidget * widget,
 #define LIBBALSA_HTML_POPUP_EVENT "libbalsa-html-popup-event"
 GtkWidget *libbalsa_html_popup_menu_widget(GtkWidget * widget);
 GtkWidget *libbalsa_html_get_view_widget(GtkWidget * widget);
+
+guint64 libbalsa_html_cache_size(void);
+void libbalsa_html_clear_cache(void);
 
 gboolean libbalsa_html_can_print(GtkWidget * widget);
 void libbalsa_html_print(GtkWidget * widget);

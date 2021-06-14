@@ -34,6 +34,7 @@
 #include "quote-color.h"
 #include "misc.h"
 #include "send.h"
+#include "html.h"
 #include "imap-server.h"
 
 #if HAVE_MACOSX_DESKTOP
@@ -2504,6 +2505,31 @@ pm_grid_add_quoted_group(GtkWidget * grid_widget)
     pm_grid_set_next_row(grid, ++row);
 }
 
+#ifdef HAVE_HTML_WIDGET
+static void
+set_html_cache_label_str(GtkLabel *label)
+{
+	gchar *size_str;
+	gchar *label_str;
+
+	size_str = g_format_size(libbalsa_html_cache_size());
+	label_str = g_strdup_printf(_("HTTP cache size: %s"), size_str);
+	g_free(size_str);
+	gtk_label_set_text(label, label_str);
+	g_free(label_str);
+}
+
+static void
+clear_html_cache_cb(GtkButton G_GNUC_UNUSED *button,
+					gpointer				 user_data)
+{
+	libbalsa_html_clear_cache();
+	g_thread_yield();               /* ...give the webkit thread a chance to do the cleanup work */
+	g_usleep(2500);
+	set_html_cache_label_str(GTK_LABEL(user_data));
+}
+#endif
+
 /*
  * Multipart group
  */
@@ -2513,6 +2539,10 @@ pm_grid_add_alternative_group(GtkWidget * grid_widget)
 {
     GtkGrid *grid = (GtkGrid *) grid_widget;
     gint row = pm_grid_get_next_row(grid);
+#ifdef HAVE_HTML_WIDGET
+    GtkWidget *label;
+    GtkWidget *button;
+#endif
 
     /* handling of multipart/alternative */
 
@@ -2521,6 +2551,20 @@ pm_grid_add_alternative_group(GtkWidget * grid_widget)
 
     pui->display_alt_plain =
 	pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Prefer text/plain over HTML"));
+
+#ifdef HAVE_HTML_WIDGET
+    button = gtk_button_new_with_label(_("Manage exceptions…"));
+    g_signal_connect_swapped(button, "clicked",
+        G_CALLBACK(libbalsa_html_pref_dialog_run), property_box);
+    pm_grid_attach(grid, button, 2, row, 1, 1);
+
+    label = gtk_label_new(NULL);
+    set_html_cache_label_str(GTK_LABEL(label));
+    pm_grid_attach(grid, label, 1, ++row, 1, 1);
+    button = gtk_button_new_with_label(_("Clear HTTP cache…"));
+    pm_grid_attach(grid, button, 2, row, 1, 1);
+    g_signal_connect(button, "clicked", G_CALLBACK(clear_html_cache_cb), label);
+#endif
 
     pm_grid_set_next_row(grid, ++row);
 }

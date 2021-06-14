@@ -21,10 +21,8 @@ libimap_a_sources = [
   'util.h'
   ]
 
-libimap_compile_arg = '-ansi'
 libimap_link_arg    = '-lz'
-libimap_compile_dep  = declare_dependency(compile_args : libimap_compile_arg,
-                                          link_args    : libimap_link_arg)
+libimap_compile_dep  = declare_dependency(link_args    : libimap_link_arg)
 
 libimap_a = static_library('imap', libimap_a_sources,
                            c_args              : '-DG_LOG_DOMAIN="imap"',

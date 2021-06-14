@@ -26,6 +26,7 @@
 #include "balsa-app.h"
 #include "print.h"
 #include "misc.h"
+#include "html.h"
 #include "balsa-message.h"
 #include "quote-color.h"
 #include <glib/gi18n.h>
@@ -51,6 +52,8 @@ typedef struct {
 #ifdef HAVE_HTML_WIDGET
     GtkWidget *html_print;
     GtkWidget *html_load_imgs;
+    gboolean prefer_text;
+    gboolean load_images;
     BalsaPrintSetup *setup;
 #endif
 } BalsaPrintPrefs;
@@ -607,11 +610,11 @@ message_prefs_widget(GtkPrintOperation * operation,
     grid = create_options_group(_("Highlighting"), page, 1, 1, 1);
 
     print_prefs->html_print = gtk_check_button_new_with_mnemonic(_("Prefer text/plain over HTML"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_print), balsa_app.display_alt_plain);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_print), print_prefs->prefer_text);
     gtk_grid_attach(GTK_GRID(grid), print_prefs->html_print, 1, 0, 1, 1);
 
     print_prefs->html_load_imgs = gtk_check_button_new_with_mnemonic(_("Download images from remote servers (may be dangerous)"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_load_imgs), FALSE);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_load_imgs), print_prefs->load_images);
     gtk_grid_attach(GTK_GRID(grid), print_prefs->html_load_imgs, 1, 1, 1, 1);
 
     /* phantom alignment */
@@ -737,6 +740,9 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
     GtkPrintOperationResult res;
     BalsaPrintData *print_data;
     BalsaPrintPrefs print_prefs;
+#ifdef HAVE_HTML_WIDGET
+    InternetAddressList *from;
+#endif
     GError *err = NULL;
 
     print = gtk_print_operation_new();
@@ -760,6 +766,9 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
     print_data->message = msg;
 #ifdef HAVE_HTML_WIDGET
     print_prefs.setup = &print_data->setup;
+    from = libbalsa_message_get_headers(msg)->from;
+    print_prefs.prefer_text = balsa_app.display_alt_plain && !libbalsa_html_get_prefer_html(from);
+    print_prefs.load_images = libbalsa_html_get_load_images(from);
 #endif
 
     g_signal_connect(print, "begin_print", G_CALLBACK(begin_print), print_data);

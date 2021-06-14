@@ -910,7 +910,7 @@ net_client_pop_auth_oauth2(NetClientPop *client, const gchar *user, const gchar 
 
 static gboolean
 net_client_pop_auth_oauth2(NetClientPop G_GNUC_UNUSED *client, const gchar G_GNUC_UNUSED *user,
-	const gchar G_GNUC_UNUSED *access_token, GError G_GNUC_UNUSED **error)
+	const gchar G_GNUC_UNUSED *access_token, gboolean G_GNUC_UNUSED oauthbearer, GError G_GNUC_UNUSED **error)
 {
 	g_assert_not_reached();			/* this should never happen! */
 	return FALSE;					/* never reached, make gcc happy */

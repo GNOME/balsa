@@ -576,7 +576,6 @@ libbalsa_server_get_auth(NetClient         *client,
     LibBalsaServer *server = LIBBALSA_SERVER(user_data);
     LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
     gchar **result = NULL;
-    GError *error = NULL;
 
     g_debug("%s: %p %d %p: encrypted = %d", __func__, client, mode, user_data, net_client_is_encrypted(client));
     if (priv->auth_mode != NET_CLIENT_AUTH_NONE_ANON) {
@@ -593,7 +592,9 @@ libbalsa_server_get_auth(NetClient         *client,
         case NET_CLIENT_AUTH_KERBEROS:
         	break;			/* only user name required */
 #if defined(HAVE_OAUTH2)
-        case NET_CLIENT_AUTH_OAUTH2:
+        case NET_CLIENT_AUTH_OAUTH2: {
+        	GError *error = NULL;
+
         	if (priv->oauth == NULL) {
         		priv->oauth = libbalsa_oauth2_new(server, &error);
         	}
@@ -606,6 +607,7 @@ libbalsa_server_get_auth(NetClient         *client,
         		g_clear_error(&error);
         	}
         	break;
+        }
 #endif	/* defined(HAVE_OAUTH2) */
         default:
         	g_assert_not_reached();

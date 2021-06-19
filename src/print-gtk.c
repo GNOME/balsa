@@ -710,9 +710,9 @@ message_prefs_apply(GtkPrintOperation * operation, GtkWidget * widget,
     }
 #ifdef HAVE_HTML_WIDGET
     print_prefs->setup->print_alt_html =
-    	!gtk_check_button_get_active(GTK_CHECK_BUTTON(print_prefs->html_print));
+        !gtk_check_button_get_active(GTK_CHECK_BUTTON(print_prefs->html_print));
     print_prefs->setup->html_load_images =
-    	gtk_check_button_get_active(GTK_CHECK_BUTTON(print_prefs->html_load_imgs));
+        gtk_check_button_get_active(GTK_CHECK_BUTTON(print_prefs->html_load_imgs));
 #endif
 }
 

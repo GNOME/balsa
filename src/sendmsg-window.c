@@ -2380,7 +2380,7 @@ sw_address_view_drop(GtkDropTarget *drop_target,
     GdkDrop *drop;
     const char *address;
 
-    drop = gtk_drop_target_get_drop(drop_target);
+    drop = gtk_drop_target_get_current_drop(drop_target);
 
     if (drop == NULL || !G_VALUE_HOLDS_STRING(value))
         return FALSE;

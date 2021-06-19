@@ -2799,7 +2799,7 @@ bw_notebook_tab_drag_drop(GtkDropTarget *drop_target,
 {
     GdkDrop *drop;
 
-    drop = gtk_drop_target_get_drop(drop_target);
+    drop = gtk_drop_target_get_current_drop(drop_target);
     if (drop == NULL)
         return FALSE;
 

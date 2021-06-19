@@ -148,12 +148,14 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody *mime_body,
                                                             hbox, GTK_ALIGN_FILL);
         		g_object_set_data_full(G_OBJECT(button), "autocrypt_key", autocrypt_key, (GDestroyNotify) g_bytes_unref);
         		g_signal_connect(button, "clicked", G_CALLBACK(on_key_import_button), NULL);
-        		gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+
+                        gtk_widget_set_hexpand(button, TRUE);
+                        gtk_widget_set_halign(button, GTK_ALIGN_FILL);
+                        gtk_box_append(GTK_BOX(hbox), button);
         	} else if (libbalsa_message_get_headers(mime_body->message)->autocrypt_hdr_present) {
         		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
         			_("The message contains an Autocrypt header, but it is either broken "
         			  "or the signature has been created using a different key."));
-        		gtk_container_add(GTK_CONTAINER(hbox), button);
         	}
 #endif
             button = libbalsa_add_mnemonic_button_to_box(_("_Search key server for this key"),

@@ -1195,7 +1195,7 @@ prefer_html_change_state(GSimpleAction *action,
     from = libbalsa_message_get_headers(balsa_message_get_message(bm))->from;
     libbalsa_html_prefer_set_prefer_html(from, g_variant_get_boolean(state);
 
-    g_simple_action_set_state(G_SIMPLE_ACTION(action), state);
+    g_simple_action_set_state(action, state);
 }
 
 static void
@@ -1210,7 +1210,7 @@ load_images_change_state(GSimpleAction *action,
     from = libbalsa_message_get_headers(balsa_message_get_message(bm))->from;
     libbalsa_html_prefer_set_load_images(from, g_variant_get_boolean(state);
 
-    g_simple_action_set_state(G_SIMPLE_ACTION(action), state);
+    g_simple_action_set_state(action, state);
 }
 
 static void
@@ -1252,14 +1252,18 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
         {"prefer-html", NULL, NULL, "false", prefer_html_change_state},
         {"load-images", NULL, NULL, "false", load_images_change_state}
     };
+    GActionMap *action_map;
     GAction *print_action;
-    GMenu *open_menu;
+    GAction *prefer_html_action;
+    GAction *load_images_action;
     GMenu *section;
+    GMenu *open_menu;
     InternetAddressList *from;
 
     /* Set up the actions: */
     simple = g_simple_action_group_new();
-    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+    action_map = G_ACTION_MAP(simple);
+    g_action_map_add_action_entries(action_map,
                                     text_view_popup_entries,
                                     G_N_ELEMENTS(text_view_popup_entries),
                                     html);
@@ -1267,7 +1271,10 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
                                    namespace,
                                    G_ACTION_GROUP(simple));
 
-    print_action = g_action_map_lookup_action(G_ACTION_MAP(simple), "print");
+    print_action = g_action_map_lookup_action(action_map, "print");
+    prefer_html_action = g_action_map_lookup_action(action_map, "prefer-html");
+    load_images_action = g_action_map_lookup_action(action_map, "load-images");
+
     g_object_unref(simple);
 
     section = g_menu_new();
@@ -1312,13 +1319,13 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
     section = g_menu_new();
 
     g_menu_append(section, _("Prefer HTML for this sender"), "text-view-popup.prefer-html");
-    g_simple_action_set_enabled(G_SIMPLE_ACTION(prefer_html_action),
-                                libbalsa_html_get_prefer_html(from));
+    g_simple_action_set_state(G_SIMPLE_ACTION(prefer_html_action),
+                              g_variant_new_boolean(libbalsa_html_get_prefer_html(from)));
     g_simple_action_set_enabled(G_SIMPLE_ACTION(prefer_html_action), from != NULL);
 
     g_menu_append(section, _("Load images for this sender") "text-view-popup.prefer-html");
-    g_simple_action_set_enabled(G_SIMPLE_ACTION(load_images_action),
-                                libbalsa_html_get_load_images(from));
+    g_simple_action_set_state(G_SIMPLE_ACTION(load_images_action),
+                              g_variant_new_boolean(libbalsa_html_get_load_images(from)));
     g_simple_action_set_enabled(G_SIMPLE_ACTION(load_images_action), from != NULL);
 
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));

@@ -56,13 +56,12 @@
 
 #ifdef HAVE_HTML_WIDGET
 #include <gtk/gtk.h>
-#if defined(GTK_DISABLE_DEPRECATED)
-#define GtkAction GAction
+
+typedef gpointer GtkAction;
+typedef gpointer GdkEventKey;
+typedef gpointer GtkContainer;
+typedef gpointer GtkContainerClass;
 #include <webkit2/webkit2.h>
-#undef GtkAction
-#else  /* defined(GTK_DISABLE_DEPRECATED) */
-#include <webkit2/webkit2.h>
-#endif /* defined(GTK_DISABLE_DEPRECATED) */
 #endif /* HAVE_HTML_WIDGET */
 
 /* We need separate variable for storing command line requests to check the

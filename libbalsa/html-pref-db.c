@@ -73,15 +73,16 @@ static gboolean pref_db_set_name(const gchar *sender,
 
 static gboolean popup_menu_cb(GtkWidget *widget,
                               gpointer   user_data);
-static void button_press_cb(GtkGestureMultiPress *multi_press_gesture,
-                            gint                  n_press,
-                            gdouble               x,
-                            gdouble               y,
-                            gpointer              user_data);
-static void popup_menu_real(GtkWidget      *widget,
-                            const GdkEvent *event);
-static void remove_item_cb(GtkMenuItem G_GNUC_UNUSED *menuitem,
-                           gpointer                   user_data);
+static void button_press_cb(GtkGestureClick *click_gesture,
+                            int              n_press,
+                            double           x,
+                            double           y,
+                            gpointer         user_data);
+static void popup_menu_real(GtkWidget *widget,
+                            GdkEvent  *event);
+static void delete_activated(GSimpleAction *action,
+                             GVariant      *parameter,
+                             gpointer       user_data);
 static void on_prefs_button_toggled(GtkCellRendererToggle *cell_renderer,
                                     gchar                 *path,
                                     gpointer               user_data);
@@ -116,102 +117,143 @@ libbalsa_html_prefer_set_load_content(InternetAddressList *from, gboolean state)
 	pref_db_set_ial(from, 2, state);
 }
 
+static void
+add_actions(GtkWidget  *widget,
+            const char *namespace)
+{
+    GSimpleActionGroup *simple;
+    static const GActionEntry entries[] = {
+        {"delete", delete_activated},
+    };
+
+    simple = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(simple),
+                                    entries, G_N_ELEMENTS(entries),
+                                    widget);
+
+    gtk_widget_insert_action_group(widget,
+                                   namespace,
+                                   G_ACTION_GROUP(simple));
+    g_object_unref(simple);
+}
+
+static const char action_namespace[] = "html-pref-popup-menu";
 
 void
 libbalsa_html_pref_dialog_run(GtkWindow *parent)
 {
-	GtkWidget *dialog;
-	GtkWidget *vbox;
-	GtkWidget *scrolled_window;
-	GtkListStore *model;
-	GtkWidget *tree_view;
-	GtkGesture *gesture;
-	GtkTreeSelection *selection;
-	GtkCellRenderer *renderer;
-	GtkTreeViewColumn *column;
-	int sqlite_res;
+    GtkWidget *dialog;
+    GtkWidget *vbox;
+    GtkWidget *scrolled_window;
+    GtkListStore *model;
+    GtkWidget *tree_view;
+    GtkTreeView *view;
+    GtkGesture *gesture;
+    GtkTreeSelection *selection;
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    int sqlite_res;
 
-	if (!pref_db_check()) {
-		return;
-	}
+    if (!pref_db_check()) {
+        return;
+    }
 
-	dialog = gtk_dialog_new_with_buttons(_("HTML preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-		_("_Close"), GTK_RESPONSE_CLOSE, NULL);
-	geometry_manager_attach(GTK_WINDOW(dialog), "HTMLPrefsDB");
+    dialog =
+        gtk_dialog_new_with_buttons(_("HTML preferences"), parent,
+                                    GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+                                    _("_Close"), GTK_RESPONSE_CLOSE, NULL);
+    geometry_manager_attach(GTK_WINDOW(dialog), "HTMLPrefsDB");
 
-	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-	gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
-	gtk_widget_set_vexpand(vbox, TRUE);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
+    gtk_box_append(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
+    gtk_widget_set_vexpand(vbox, TRUE);
 
-	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-	gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 12U);
-	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrolled_window), GTK_SHADOW_ETCHED_IN);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
+    scrolled_window = gtk_scrolled_window_new();
 
-	model = gtk_list_store_new(PREFS_DB_VIEW_COLUMNS,
-		G_TYPE_STRING,			/* address */
-		G_TYPE_BOOLEAN,			/* prefer html over plain text */
-		G_TYPE_BOOLEAN);		/* auto-load external content */
+    gtk_widget_set_margin_top(scrolled_window, 12U);
+    gtk_widget_set_margin_bottom(scrolled_window, 12U);
+    gtk_widget_set_margin_start(scrolled_window, 12U);
+    gtk_widget_set_margin_end(scrolled_window, 12U);
 
-	tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+    gtk_scrolled_window_set_has_frame(GTK_SCROLLED_WINDOW(scrolled_window), TRUE);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
+                                   GTK_POLICY_AUTOMATIC,
+                                   GTK_POLICY_AUTOMATIC);
 
-	gesture = gtk_gesture_multi_press_new(tree_view);
-	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
-	g_signal_connect(gesture, "pressed", G_CALLBACK(button_press_cb), NULL);
-	gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture), GTK_PHASE_CAPTURE);
-	g_signal_connect(tree_view, "popup-menu", G_CALLBACK(popup_menu_cb), NULL);
+    gtk_widget_set_vexpand(scrolled_window, TRUE);
+    gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
+    gtk_box_append(GTK_BOX(vbox), scrolled_window);
 
-	gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
-	gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+    model = gtk_list_store_new(PREFS_DB_VIEW_COLUMNS, G_TYPE_STRING,    /* address */
+                               G_TYPE_BOOLEAN,  /* prefer html over plain text */
+                               G_TYPE_BOOLEAN); /* auto-load images */
 
-	/* add all database items */
-	G_LOCK(db_mutex);
-	sqlite_res = sqlite3_step(query[4]);
-	while (sqlite_res == SQLITE_ROW) {
-		GtkTreeIter iter;
+    tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+    view = GTK_TREE_VIEW(tree_view);
 
-		gtk_list_store_append(model, &iter);
-		gtk_list_store_set(model, &iter,
-			PREFS_ADDRESS_COLUMN, sqlite3_column_text(query[4], 0),
-			PREFS_PREFER_HTML_COLUMN, sqlite3_column_int(query[4], 1),
-			PREFS_LOAD_EXT_CONTENT, sqlite3_column_int(query[4], 2),
-			-1);
-		sqlite_res = sqlite3_step(query[4]);
-	}
-	sqlite3_reset(query[4]);
-	G_UNLOCK(db_mutex);
+    gesture = gtk_gesture_click_new();
+    gtk_widget_add_controller(tree_view, GTK_EVENT_CONTROLLER(gesture));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
+    g_signal_connect(gesture, "pressed", G_CALLBACK(button_press_cb), NULL);
+    gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture), GTK_PHASE_CAPTURE);
+    g_signal_connect(tree_view, "popup-menu", G_CALLBACK(popup_menu_cb), NULL);
 
-	/* set up the tree view */
-	renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Sender"), renderer, "text", PREFS_ADDRESS_COLUMN, NULL);
-	gtk_tree_view_column_set_sort_column_id(column, PREFS_ADDRESS_COLUMN);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-	gtk_tree_view_column_set_resizable(column, TRUE);
+    add_actions(tree_view, action_namespace);
 
-	renderer = gtk_cell_renderer_toggle_new();
-	g_object_set_data(G_OBJECT(renderer), "dbcol", GINT_TO_POINTER(PREFS_PREFER_HTML_COLUMN));
-	g_signal_connect(renderer, "toggled", G_CALLBACK(on_prefs_button_toggled), model);
-	column = gtk_tree_view_column_new_with_attributes(_("Prefer HTML"), renderer, "active", PREFS_PREFER_HTML_COLUMN, NULL);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-	gtk_tree_view_column_set_resizable(column, TRUE);
-	gtk_widget_show_all(vbox);
+    selection = gtk_tree_view_get_selection(view);
+    gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
 
-	renderer = gtk_cell_renderer_toggle_new();
-	g_object_set_data(G_OBJECT(renderer), "dbcol", GINT_TO_POINTER(PREFS_LOAD_EXT_CONTENT));
-	g_signal_connect(renderer, "toggled", G_CALLBACK(on_prefs_button_toggled), model);
-	column = gtk_tree_view_column_new_with_attributes(_("Auto-load external content"), renderer, "active", PREFS_LOAD_EXT_CONTENT,
-		NULL);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
-	gtk_tree_view_column_set_resizable(column, TRUE);
-	gtk_widget_show_all(vbox);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window), tree_view);
 
-	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(model), PREFS_ADDRESS_COLUMN, GTK_SORT_ASCENDING);
-	g_object_unref(model);
+    /* add all database items */
+    G_LOCK(db_mutex);
+    sqlite_res = sqlite3_step(query[4]);
+    while (sqlite_res == SQLITE_ROW) {
+        GtkTreeIter iter;
 
-	(void) gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
+        gtk_list_store_append(model, &iter);
+        gtk_list_store_set(model, &iter,
+                           PREFS_ADDRESS_COLUMN, sqlite3_column_text(query[4], 0),
+                           PREFS_PREFER_HTML_COLUMN, sqlite3_column_int(query[4], 1),
+                           PREFS_LOAD_IMAGES_COLUMN, sqlite3_column_int(query[4], 2), -1);
+        sqlite_res = sqlite3_step(query[4]);
+    }
+    sqlite3_reset(query[4]);
+    G_UNLOCK(db_mutex);
+
+    /* set up the tree view */
+    renderer = gtk_cell_renderer_text_new();
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Sender"), renderer, "text",
+                                                 PREFS_ADDRESS_COLUMN, NULL);
+    gtk_tree_view_column_set_sort_column_id(column, PREFS_ADDRESS_COLUMN);
+    gtk_tree_view_append_column(view, column);
+    gtk_tree_view_column_set_resizable(column, TRUE);
+
+    renderer = gtk_cell_renderer_toggle_new();
+    g_object_set_data(G_OBJECT(renderer), "dbcol", GINT_TO_POINTER(PREFS_PREFER_HTML_COLUMN));
+    g_signal_connect(renderer, "toggled", G_CALLBACK(on_prefs_button_toggled), model);
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Prefer HTML"), renderer, "active",
+                                                 PREFS_PREFER_HTML_COLUMN, NULL);
+    gtk_tree_view_append_column(view, column);
+    gtk_tree_view_column_set_resizable(column, TRUE);
+
+    renderer = gtk_cell_renderer_toggle_new();
+    g_object_set_data(G_OBJECT(renderer), "dbcol", GINT_TO_POINTER(PREFS_LOAD_IMAGES_COLUMN));
+    g_signal_connect(renderer, "toggled", G_CALLBACK(on_prefs_button_toggled), model);
+    column =
+        gtk_tree_view_column_new_with_attributes(_("Auto-load images"), renderer, "active",
+                                                 PREFS_LOAD_IMAGES_COLUMN, NULL);
+    gtk_tree_view_append_column(view, column);
+    gtk_tree_view_column_set_resizable(column, TRUE);
+
+    gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(model), PREFS_ADDRESS_COLUMN,
+                                         GTK_SORT_ASCENDING);
+    g_object_unref(model);
+
+    g_signal_connect(dialog, "response", G_CALLBACK(gtk_window_destroy), NULL);
+    gtk_widget_show(dialog);
 }
 
 
@@ -404,82 +446,88 @@ popup_menu_cb(GtkWidget *widget, gpointer G_GNUC_UNUSED user_data)
 
 /* callback: mouse click in html prefs database dialogue activated */
 static void
-button_press_cb(GtkGestureMultiPress *multi_press_gesture, gint G_GNUC_UNUSED n_press, gdouble x,
-	gdouble y, gpointer G_GNUC_UNUSED user_data)
+button_press_cb(GtkGestureClick *click_gesture,
+                int              n_press G_GNUC_UNUSED,
+                double           x,
+                double           y,
+                gpointer         user_data G_GNUC_UNUSED)
 {
-	GtkWidget *widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(multi_press_gesture));
-	GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
-	GtkGesture *gesture;
-	GdkEventSequence *sequence;
-	const GdkEvent *event;
+    GtkWidget *widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(click_gesture));
+    GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
+    GtkGesture *gesture;
+    GdkEventSequence *sequence;
+    GdkEvent *event;
 
-	gesture = GTK_GESTURE(multi_press_gesture);
-	sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(multi_press_gesture));
-	event = gtk_gesture_get_last_event(gesture, sequence);
-	if (gdk_event_triggers_context_menu(event) && (gdk_event_get_window(event) == gtk_tree_view_get_bin_window(tree_view))) {
-		gint bx;
-		gint by;
-		GtkTreePath *path;
+    gesture = GTK_GESTURE(click_gesture);
+    sequence = gtk_gesture_single_get_current_sequence(GTK_GESTURE_SINGLE(gesture));
+    event = gtk_gesture_get_last_event(gesture, sequence);
 
-		gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (gint) x, (gint) y, &bx, &by);
-		if (gtk_tree_view_get_path_at_pos(tree_view, bx, by, &path, NULL, NULL, NULL)) {
-			GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
-			GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
-			GtkTreeIter iter;
+    if (gdk_event_triggers_context_menu(event)) {
+        int bx;
+        int by;
+        GtkTreePath *path;
 
-			gtk_tree_selection_unselect_all(selection);
-			gtk_tree_selection_select_path(selection, path);
-			gtk_tree_view_set_cursor(GTK_TREE_VIEW(tree_view), path, NULL, FALSE);
-			if (gtk_tree_model_get_iter(model, &iter, path)) {
-				popup_menu_real(GTK_WIDGET(tree_view), event);
-			}
-			gtk_tree_path_free(path);
-		}
-	}
+        gtk_tree_view_convert_widget_to_bin_window_coords(tree_view, (int) x, (int) y, &bx, &by);
+        if (gtk_tree_view_get_path_at_pos(tree_view, bx, by, &path, NULL, NULL, NULL)) {
+            GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
+            GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+            GtkTreeIter iter;
+
+            gtk_tree_selection_unselect_all(selection);
+            gtk_tree_selection_select_path(selection, path);
+            gtk_tree_view_set_cursor(GTK_TREE_VIEW(tree_view), path, NULL, FALSE);
+
+            if (gtk_tree_model_get_iter(model, &iter, path))
+                popup_menu_real(GTK_WIDGET(tree_view), event);
+
+            gtk_tree_path_free(path);
+        }
+    }
 }
 
 
 /* html prefs database dialogue context menu */
 static void
-popup_menu_real(GtkWidget *widget, const GdkEvent *event)
+popup_menu_real(GtkWidget *widget,
+                GdkEvent  *event)
 {
-	GtkWidget *popup_menu;
-	GtkWidget* menu_item;
+    GMenu *popup_menu;
+    GtkWidget *popup_widget;
 
-	popup_menu = gtk_menu_new();
-	menu_item = gtk_menu_item_new_with_mnemonic(_("_Delete"));
-	g_signal_connect(menu_item, "activate", G_CALLBACK(remove_item_cb), widget);
-	gtk_menu_shell_append(GTK_MENU_SHELL(popup_menu), menu_item);
-	gtk_widget_show_all(popup_menu);
-	if (event != NULL) {
-		gtk_menu_popup_at_pointer(GTK_MENU(popup_menu), event);
-	} else {
-		gtk_menu_popup_at_widget(GTK_MENU(popup_menu), widget, GDK_GRAVITY_CENTER, GDK_GRAVITY_CENTER, NULL);
-	}
+    popup_menu = g_menu_new();
+    g_menu_append(popup_menu, _("_Delete"), "delete");
+
+    popup_widget = libbalsa_popup_widget_new(widget, G_MENU_MODEL(popup_menu), action_namespace);
+    g_object_unref(popup_menu);
+
+    libbalsa_popup_widget_popup(popup_widget, event);
 }
 
 
 /* context menu callback: remove entry from database */
 static void
-remove_item_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
+delete_activated(GSimpleAction *action,
+                 GVariant      *parameter,
+                 gpointer       user_data)
 {
-	GtkTreeModel *model;
-	GtkTreeSelection *selection;
-	GtkTreeIter iter;
+    GtkTreeModel *model;
+    GtkTreeSelection *selection;
+    GtkTreeIter iter;
 
-	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(user_data));
-	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		gchar *addr;
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(user_data));
+    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+        gchar *addr;
 
-		gtk_tree_model_get(model, &iter, PREFS_ADDRESS_COLUMN, &addr, -1);
-		if ((sqlite3_bind_text(query[3], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
-			(sqlite3_step(query[3]) != SQLITE_DONE)) {
-			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot delete database entry: %s"), sqlite3_errmsg(pref_db));
-		}
-		gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
-		sqlite3_reset(query[3]);
-		g_free(addr);
-	}
+        gtk_tree_model_get(model, &iter, PREFS_ADDRESS_COLUMN, &addr, -1);
+        if ((sqlite3_bind_text(query[3], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
+            (sqlite3_step(query[3]) != SQLITE_DONE)) {
+            libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot delete database entry: %s"),
+                                 sqlite3_errmsg(pref_db));
+        }
+        gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+        sqlite3_reset(query[3]);
+        g_free(addr);
+    }
 }
 
 

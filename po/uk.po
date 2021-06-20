@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2021-06-14 15:29+0000\n"
-"PO-Revision-Date: 2021-06-15 22:29+0300\n"
+"POT-Creation-Date: 2021-06-20 09:00+0000\n"
+"PO-Revision-Date: 2021-06-20 14:22+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -234,8 +234,9 @@ msgid "Autocrypt database"
 msgstr "База даних автошифрування"
 
 #: ../libbalsa/autocrypt.c:448 ../libbalsa/html.c:427
-#: ../libbalsa/identity.c:1658 ../libbalsa/libbalsa-gpgme-widgets.c:765
-#: ../src/ab-window.c:148 ../src/folder-conf.c:337 ../src/mailbox-node.c:1049
+#: ../libbalsa/html-pref-db.c:137 ../libbalsa/identity.c:1658
+#: ../libbalsa/libbalsa-gpgme-widgets.c:765 ../src/ab-window.c:148
+#: ../src/folder-conf.c:337 ../src/mailbox-node.c:1049
 #: ../src/main-window.c:3832 ../src/toolbar-prefs.c:130
 #: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
 #: ../ui/sendmsg-window.ui.h:12 ../ui/source-viewer.ui.h:2
@@ -272,10 +273,11 @@ msgstr "не вдалося вставити користувача «%s»: %s"
 msgid "_Show details…"
 msgstr "Показати п_одробиці…"
 
-#: ../libbalsa/autocrypt.c:884 ../src/balsa-index.c:2000
-#: ../src/mailbox-node.c:1041 ../src/mailbox-node.c:1057
-#: ../src/pref-manager.c:2002 ../src/pref-manager.c:2087
-#: ../src/pref-manager.c:2810 ../ui/ab-main.ui.h:11 ../ui/main-window.ui.h:61
+#: ../libbalsa/autocrypt.c:884 ../libbalsa/html-pref-db.c:447
+#: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1041
+#: ../src/mailbox-node.c:1057 ../src/pref-manager.c:2002
+#: ../src/pref-manager.c:2087 ../src/pref-manager.c:2810 ../ui/ab-main.ui.h:11
+#: ../ui/main-window.ui.h:61
 msgid "_Delete"
 msgstr "В_илучити"
 
@@ -569,6 +571,49 @@ msgstr ""
 #: ../libbalsa/html.c:425
 msgid "_Download images"
 msgstr "_Отримати зображення"
+
+#: ../libbalsa/html-pref-db.c:136
+#| msgid "_Preferences"
+msgid "HTML preferences"
+msgstr "Налаштування HTML"
+
+#: ../libbalsa/html-pref-db.c:186 ../src/pref-manager.c:221
+msgid "Sender"
+msgstr "Відправник"
+
+#: ../libbalsa/html-pref-db.c:194
+msgid "Prefer HTML"
+msgstr ""
+"Перевага HTML"
+
+#: ../libbalsa/html-pref-db.c:202
+#| msgid "_Download images"
+msgid "Auto-load images"
+msgstr "Автоматично завантажувати зображення"
+
+#: ../libbalsa/html-pref-db.c:267
+#, c-format
+#| msgid "cannot initialise Autocrypt database “%s”: %s"
+msgid "Cannot initialise HTML preferences database “%s”: %s"
+msgstr "Не вдалося ініціалізувати базу даних налаштувань HTML «%s»: %s"
+
+#: ../libbalsa/html-pref-db.c:313
+#, c-format
+#| msgid "Cannot read the file “%s”: %s"
+msgid "Cannot read HTML preferences for “%s”: %s"
+msgstr "Не вдалося прочитати налаштування HTML для «%s»: %s"
+
+#: ../libbalsa/html-pref-db.c:366
+#, c-format
+#| msgid "Cannot read the file “%s”: %s"
+msgid "Cannot save HTML preferences for “%s”: %s"
+msgstr "Не вдалося зберегти налаштування HTML для «%s»: %s"
+
+#: ../libbalsa/html-pref-db.c:474
+#, c-format
+#| msgid "Cannot add duplicate entry"
+msgid "Cannot delete database entry: %s"
+msgstr "Не вдалося вилучити запис бази даних: %s"
 
 #. should "re" be localized ?
 #: ../libbalsa/identity.c:109 ../libbalsa/mailbox_local.c:2002
@@ -4251,13 +4296,11 @@ msgstr "Надрукувати…"
 
 #: ../src/balsa-mime-widget-text.c:1183
 msgid "Prefer HTML for this sender"
-msgstr ""
-"Перевага HTML для цього відправника"
+msgstr "Перевага HTML для цього відправника"
 
 #: ../src/balsa-mime-widget-text.c:1190
 msgid "Load images for this sender"
-msgstr ""
-"Завантажувати зображення для цього відправника"
+msgstr "Завантажувати зображення для цього відправника"
 
 #: ../src/balsa-mime-widget-text.c:1344
 msgid "S_tore Address"
@@ -5719,10 +5762,6 @@ msgstr "Поки не буде закрито"
 msgid "Message number"
 msgstr "Номер повідомлення"
 
-#: ../src/pref-manager.c:221
-msgid "Sender"
-msgstr "Відправник"
-
 #: ../src/pref-manager.c:225
 msgid "Flat"
 msgstr "Плоский"
@@ -6047,7 +6086,6 @@ msgstr "Позиція перенесення тексту"
 
 #: ../src/pref-manager.c:2516
 #, c-format
-#| msgid "FTP site: %s\n"
 msgid "HTTP cache size: %s"
 msgstr "Розмір кешу HTTP: %s"
 
@@ -6061,14 +6099,12 @@ msgid "Prefer text/plain over HTML"
 msgstr "Перевага звичайного тексту над HTML"
 
 #: ../src/pref-manager.c:2556
-#| msgid "Manage subscriptions…"
 msgid "Manage exceptions…"
 msgstr "Керування виключеннями…"
 
 #: ../src/pref-manager.c:2564
 msgid "Clear HTTP cache…"
-msgstr ""
-"Спорожнити кеш HTTP…"
+msgstr "Спорожнити кеш HTTP…"
 
 #: ../src/pref-manager.c:2583
 msgid "Message colors"

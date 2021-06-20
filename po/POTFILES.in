@@ -23,6 +23,7 @@ libbalsa/gmime-application-pkcs7.c
 libbalsa/gmime-gpgme-signature.c
 libbalsa/gmime-multipart-crypt.c
 libbalsa/html.c
+libbalsa/html-pref-db.c
 libbalsa/identity.c
 libbalsa/imap/auth-cram.c
 libbalsa/imap/auth-gssapi.c

@@ -147,20 +147,11 @@ html2text(gchar ** text, gsize len)
 #endif
 
 /* Allow the build: */
+typedef gpointer GtkAction;
 typedef gpointer GdkEventKey;
 typedef gpointer GtkContainer;
 typedef gpointer GtkContainerClass;
-
-/* WebKitContextMenuItem uses GtkAction, which is deprecated.
- * We don't use it, but it breaks the git-tree build, so we just mangle
- * it: */
-#if defined(GTK_DISABLE_DEPRECATED)
-#define GtkAction GAction
 #include <webkit2/webkit2.h>
-#undef GtkAction
-#else  /* defined(GTK_DISABLE_DEPRECATED) */
-#include <webkit2/webkit2.h>
-#endif /* defined(GTK_DISABLE_DEPRECATED) */
 
 typedef struct {
     LibBalsaMessageBody  *body;
@@ -644,7 +635,7 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 }
 
 
-#ifdef HTML_PRINT_BITMAP
+#if 0
 static void
 dump_snapshot(GObject      *source_object,
               GAsyncResult *res,
@@ -664,6 +655,7 @@ dump_snapshot(GObject      *source_object,
 	}
 	g_atomic_int_inc(&info->screenshot_done);
 }
+#endif /* 0 */
 
 /** \brief Render a HMTL part into a Cairo surface
  *
@@ -677,6 +669,7 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
 						   gdouble 				width,
 						   gboolean 			load_external_images)
 {
+#if 0
 	gint render_width;
     gchar *text;
     gboolean have_src_cid;
@@ -737,8 +730,10 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
 
     /* return the surface */
     return html_surface;
+#else  /* 0 */
+    return NULL;
+#endif /* 0 */
 }
-#endif /* HTML_PRINT_BITMAP */
 
 
 /* Create a new WebKitWebView widget:

@@ -161,6 +161,11 @@ html2text(gchar ** text, gsize len)
 
 #endif
 
+/* Allow the build: */
+typedef gpointer GdkEventKey;
+typedef gpointer GtkContainer;
+typedef gpointer GtkContainerClass;
+
 /* WebKitContextMenuItem uses GtkAction, which is deprecated.
  * We don't use it, but it breaks the git-tree build, so we just mangle
  * it: */
@@ -435,7 +440,7 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
     GtkWidget *info_bar_widget;
     GtkInfoBar *info_bar;
     GtkWidget *label;
-    GtkWidget *content_area;
+#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
     static const gchar text[] =
                  N_("This message part references content on one or more external servers. "
                 	"To protect your privacy, Balsa has not downloaded it. You may choose "
@@ -448,14 +453,10 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
                                      NULL);
 
     info_bar = GTK_INFO_BAR(info_bar_widget);
-    gtk_orientable_set_orientation(GTK_ORIENTABLE
-                                   (gtk_info_bar_get_action_area
-                                    (info_bar)), GTK_ORIENTATION_VERTICAL);
 
     label = libbalsa_create_wrap_label(text, FALSE);
 
-    content_area = gtk_info_bar_get_content_area(info_bar);
-    gtk_container_add(GTK_CONTAINER(content_area), label);
+    gtk_info_bar_add_child(info_bar, label);
 
     g_signal_connect(info_bar, "realize",
                      G_CALLBACK(lbh_info_bar_realize_cb), info);
@@ -722,6 +723,7 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 }
 
 
+#ifdef HTML_PRINT_BITMAP
 static void
 dump_snapshot(GObject      *source_object,
               GAsyncResult *res,
@@ -741,7 +743,6 @@ dump_snapshot(GObject      *source_object,
 	}
 	g_atomic_int_inc(&info->screenshot_done);
 }
-
 
 /** \brief Render a HMTL part into a Cairo surface
  *
@@ -816,6 +817,7 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
     /* return the surface */
     return html_surface;
 }
+#endif /* HTML_PRINT_BITMAP */
 
 
 /* Create a new WebKitWebView widget:
@@ -863,13 +865,13 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     /* Simple check for possible resource requests: */
     if (have_src_oth && !auto_load_ext_content) {
         info->info_bar = lbh_info_bar(info);
-        gtk_container_add(GTK_CONTAINER(vbox), info->info_bar);
+        gtk_box_append(GTK_BOX(vbox), info->info_bar);
         g_debug("%s shows info_bar", __func__);
     }
 
     gtk_widget_set_vexpand(GTK_WIDGET(info->web_view), TRUE);
     gtk_widget_set_valign(GTK_WIDGET(info->web_view), GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), GTK_WIDGET(info->web_view));
+    gtk_box_append(GTK_BOX(vbox), GTK_WIDGET(info->web_view));
 
     webkit_web_view_load_html(info->web_view, text, NULL);
     g_free(text);
@@ -885,20 +887,22 @@ libbalsa_html_to_string(gchar ** text, size_t len)
 }
 
 /*
- * We may be passed either the WebKitWebView or a container:
+ * We may be passed either the WebKitWebView or a containing widget:
  */
 
 static void
-lbh_get_web_view_helper(GtkWidget *widget, gpointer data)
+lbh_get_web_view_helper(GtkWidget *widget, GtkWidget **child)
 {
-    GtkWidget **child = data;
-
     if (*child == NULL) {
-        if (WEBKIT_IS_WEB_VIEW(widget))
+        if (WEBKIT_IS_WEB_VIEW(widget)) {
             *child = widget;
-        else if (GTK_IS_CONTAINER(widget))
-            gtk_container_foreach((GtkContainer *) widget,
-                                  lbh_get_web_view_helper, data);
+        } else {
+            for (widget = gtk_widget_get_first_child(widget);
+                 widget != NULL;
+                 widget = gtk_widget_get_next_sibling(widget)) {
+                lbh_get_web_view_helper(widget, child);
+            }
+        }
     }
 }
 

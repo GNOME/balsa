@@ -1201,11 +1201,11 @@ gpg_check_capas(const gchar *gpg_path, const gchar *version)
 	/* check for the "--export-filter keep-uid=..." option */
 	if (g_spawn_sync(NULL, gpg_args, NULL, G_SPAWN_STDOUT_TO_DEV_NULL + G_SPAWN_STDERR_TO_DEV_NULL, NULL, NULL, NULL, NULL,
 					 &exit_status, NULL)) {
-#if       GLIB_CHECK_VERSION(2, 70, 0)
+#if       GLIB_CHECK_VERSION(2, 69, 0)
 		gpg_capas.export_filter_uid = g_spawn_check_wait_status(exit_status, NULL);
-#else  /* GLIB_CHECK_VERSION(2, 70, 0) */
+#else  /* GLIB_CHECK_VERSION(2, 69, 0) */
 		gpg_capas.export_filter_uid = g_spawn_check_exit_status(exit_status, NULL);
-#endif /* GLIB_CHECK_VERSION(2, 70, 0) */
+#endif /* GLIB_CHECK_VERSION(2, 69, 0) */
 	}
 	g_debug("%s supports '--export-filter keep-uid=...': %d", gpg_path, gpg_capas.export_filter_uid);
 

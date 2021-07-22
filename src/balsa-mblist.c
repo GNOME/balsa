@@ -814,11 +814,11 @@ bmbl_drag_drop(GtkDropTarget *drop_target,
 {
     GdkDrop *drop;
 
-#if       GTK_CHECK_VERSION(4, 4, 0)
+#if       GTK_CHECK_VERSION(4, 3, 0)
     drop = gtk_drop_target_get_current_drop(drop_target);
-#else  /* GTK_CHECK_VERSION(4, 4, 0) */
+#else  /* GTK_CHECK_VERSION(4, 3, 0) */
     drop = gtk_drop_target_get_drop(drop_target);
-#endif /* GTK_CHECK_VERSION(4, 4, 0) */
+#endif /* GTK_CHECK_VERSION(4, 3, 0) */
     if (drop == NULL)
         return FALSE;
 

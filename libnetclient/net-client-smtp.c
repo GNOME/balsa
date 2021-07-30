@@ -673,7 +673,7 @@ net_client_smtp_read_reply(NetClientSmtp *client, gint expect_code, gchar **last
 			} else {
 				/* nothing to do (see MISRA C:2012, Rule 15.7) */
 			}
-			if (reply[3] == ' ') {
+			if ((strlen(reply) > 3UL) && (reply[3] == ' ')) {
 				done = TRUE;
 				if (last_reply != NULL) {
 					*last_reply = g_strdup(&reply[4]);

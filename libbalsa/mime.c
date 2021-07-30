@@ -1210,7 +1210,7 @@ gchar *
 libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lang)
 {
     GString * html_body =
-        g_string_new("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n");
+        g_string_new("<!DOCTYPE HTML>\n");
     gchar * html_subject;
     const gchar * start = body;
     gchar * html_lang;
@@ -1226,12 +1226,12 @@ libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lan
         html_lang = g_strdup("x-unknown");
     html_subject = g_markup_escape_text(title, -1);
     g_string_append_printf(html_body, 
-                           "<html lang=\"%s\"><head>\n"
+                           "<html lang=\"%s\">\n<head>\n"
                            "<title>%s</title>\n"
                            "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">\n"
-                           "<style type=\"text/css\">\n"
+                           "<style>\n"
                            "  p { margin-top: 0px; margin-bottom: 0px; }\n"
-                           "</style></head>\n"
+                           "</style>\n</head>\n"
                            "<body>\n", html_lang, html_subject);
     g_free(html_subject);
     g_free(html_lang);
@@ -1294,8 +1294,8 @@ libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lan
     }
 
     /* close the html context */
-    html_body = g_string_append(html_body, "</body></html>\n");
-    
+    html_body = g_string_append(html_body, "</body>\n</html>\n");
+
     /* return the utf-8 encoded text/html */
     return g_string_free(html_body, FALSE);
 }

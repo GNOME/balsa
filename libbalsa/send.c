@@ -1176,6 +1176,11 @@ get_mailbox_names(GList               *list,
     return list;
 }
 
+static inline gboolean
+ia_list_not_empty(InternetAddressList *ial)
+{
+	return (ial != NULL) && (internet_address_list_length(ial) > 0);
+}
 
 static LibBalsaMsgCreateResult
 libbalsa_message_create_mime_message(LibBalsaMessage *message,
@@ -1425,14 +1430,14 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
 
     headers = libbalsa_message_get_headers(message);
 
-    if (headers->from != NULL) {
+    if (ia_list_not_empty(headers->from)) {
         InternetAddressList *from;
 
         from = g_mime_message_get_from(mime_message);
         internet_address_list_append(from, headers->from);
     }
 
-    if (headers->reply_to != NULL) {
+    if (ia_list_not_empty(headers->reply_to)) {
         InternetAddressList *reply_to;
 
         reply_to = g_mime_message_get_reply_to(mime_message);
@@ -1448,28 +1453,28 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
     g_mime_message_set_date(mime_message, datetime);
     g_date_time_unref(datetime);
 
-    if (headers->to_list != NULL) {
+    if (ia_list_not_empty(headers->to_list)) {
         InternetAddressList *addresses =
             g_mime_message_get_addresses(mime_message,
                                           GMIME_ADDRESS_TYPE_TO);
         internet_address_list_append(addresses, headers->to_list);
     }
 
-    if (headers->cc_list != NULL) {
+    if (ia_list_not_empty(headers->cc_list)) {
         InternetAddressList *addresses =
             g_mime_message_get_addresses(mime_message,
                                           GMIME_ADDRESS_TYPE_CC);
         internet_address_list_append(addresses, headers->cc_list);
     }
 
-    if (headers->bcc_list != NULL) {
+    if (ia_list_not_empty(headers->bcc_list)) {
         InternetAddressList *addresses =
             g_mime_message_get_addresses(mime_message,
                                           GMIME_ADDRESS_TYPE_BCC);
         internet_address_list_append(addresses, headers->bcc_list);
     }
 
-    if (headers->dispnotify_to != NULL) {
+    if (ia_list_not_empty(headers->dispnotify_to)) {
         tmp = internet_address_list_to_string(headers->dispnotify_to, NULL, TRUE);
         if (tmp != NULL) {
             g_mime_object_append_header(GMIME_OBJECT(mime_message),

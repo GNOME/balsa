@@ -813,18 +813,14 @@ libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
    by the search code. It is a "virtual method", indeed IMAP has a
    special way to implement it for speed/bandwidth reasons
  */
-gboolean
-libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
-                               guint msgno,
-                               LibBalsaMailboxSearchIter * search_iter)
+
+static gboolean
+lbm_message_match(LibBalsaMailbox           *mailbox,
+                  guint                      msgno,
+                  LibBalsaMailboxSearchIter *search_iter)
 {
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     gboolean match;
-
-    g_return_val_if_fail(mailbox != NULL, FALSE);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-    g_return_val_if_fail(msgno <= libbalsa_mailbox_total_messages(mailbox),
-                         FALSE);
 
     if (libbalsa_condition_is_flag_only(search_iter->condition,
                                         mailbox, msgno, &match))
@@ -835,6 +831,18 @@ libbalsa_mailbox_message_match(LibBalsaMailbox * mailbox,
     priv->must_cache_message = FALSE;
 
     return match;
+}
+
+gboolean
+libbalsa_mailbox_message_match(LibBalsaMailbox           *mailbox,
+                               guint                      msgno,
+                               LibBalsaMailboxSearchIter *search_iter)
+{
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
+    g_return_val_if_fail(msgno > 0 && msgno <= libbalsa_mailbox_total_messages(mailbox), FALSE);
+    g_return_val_if_fail(search_iter != NULL, FALSE);
+
+    return lbm_message_match(mailbox, msgno, search_iter);
 }
 
 gboolean libbalsa_mailbox_real_can_match(LibBalsaMailbox  *mailbox,
@@ -864,11 +872,12 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
     GSList *filters;
     guint progress_count;
     GSList *lst;
-    static LibBalsaCondition *recent_undeleted;
     gchar *text;
     guint total;
     guint progress_total;
     LibBalsaProgress progress;
+    GArray *msgnos;
+    guint msgno;
 
     libbalsa_lock_mailbox(mailbox);
 
@@ -909,48 +918,39 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
             ++progress_count;
     }
 
-    if (!recent_undeleted)
-        recent_undeleted =
-            libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
-                                            libbalsa_condition_new_flag_enum
-                                            (FALSE,
-                                             LIBBALSA_MESSAGE_FLAG_RECENT),
-                                            libbalsa_condition_new_flag_enum
-                                            (TRUE,
-                                             LIBBALSA_MESSAGE_FLAG_DELETED));
-
     text = g_strdup_printf(_("Applying filter rules to %s"), priv->name);
     total = libbalsa_mailbox_total_messages(mailbox);
     progress_total = progress_count * total;
     libbalsa_progress_set_text(&progress, text, progress_total);
     g_free(text);
 
+    msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
+    libbalsa_mailbox_register_msgnos(mailbox, msgnos);
+
     progress_count = 0;
     for (lst = filters; lst; lst = lst->next) {
         LibBalsaFilter *filter = lst->data;
         gboolean use_progress;
-        LibBalsaCondition *cond;
         LibBalsaMailboxSearchIter *search_iter;
-        guint msgno;
-        GArray *msgnos;
 
-        if (!filter->condition)
+        if (filter->condition == NULL)
             continue;
 
         use_progress = !libbalsa_condition_is_flag_only(filter->condition,
                                                         NULL, 0, NULL);
 
-        cond = libbalsa_condition_new_bool_ptr(FALSE, CONDITION_AND,
-                                               recent_undeleted,
-                                               filter->condition);
-        search_iter = libbalsa_mailbox_search_iter_new(cond);
-        libbalsa_condition_unref(cond);
-
-        msgnos = g_array_new(FALSE, FALSE, sizeof(guint));
+        search_iter = libbalsa_mailbox_search_iter_new(filter->condition);
 
         for (msgno = 1; msgno <= total; msgno++) {
-            if (libbalsa_mailbox_message_match(mailbox, msgno, search_iter))
+            gboolean must_check =
+                libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
+                                                 LIBBALSA_MESSAGE_FLAG_RECENT,
+                                                 LIBBALSA_MESSAGE_FLAG_DELETED |
+                                                 LIBBALSA_MESSAGE_FLAG_CHECKED);
+
+            if (must_check && lbm_message_match(mailbox, msgno, search_iter))
                 g_array_append_val(msgnos, msgno);
+
             if (use_progress) {
                 libbalsa_progress_set_fraction(&progress,
                                                ((gdouble) ++progress_count)
@@ -959,14 +959,31 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
             }
         }
 
-        libbalsa_mailbox_register_msgnos(mailbox, msgnos);
-        libbalsa_filter_mailbox_messages(filter, mailbox, msgnos);
-        libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
+        if (msgnos->len > 0)
+            libbalsa_filter_mailbox_messages(filter, mailbox, msgnos);
 
-        g_array_free(msgnos, TRUE);
+        g_array_set_size(msgnos, 0);
 
         libbalsa_mailbox_search_iter_unref(search_iter);
     }
+
+    /* Mark as checked the messages that we actually checked: */
+    total = libbalsa_mailbox_total_messages(mailbox);
+    for (msgno = 1; msgno <= total; msgno++) {
+        gboolean must_check =
+            libbalsa_mailbox_msgno_has_flags(mailbox, msgno,
+                                             LIBBALSA_MESSAGE_FLAG_RECENT,
+                                             LIBBALSA_MESSAGE_FLAG_DELETED |
+                                             LIBBALSA_MESSAGE_FLAG_CHECKED);
+
+        if (must_check)
+            g_array_append_val(msgnos, msgno);
+    }
+    if (msgnos->len > 0)
+        libbalsa_mailbox_messages_change_flags(mailbox, msgnos, LIBBALSA_MESSAGE_FLAG_CHECKED, 0);
+
+    libbalsa_mailbox_unregister_msgnos(mailbox, msgnos);
+    g_array_free(msgnos, TRUE);
 
     libbalsa_progress_set_text(&progress, NULL, 0);
 
@@ -1654,8 +1671,7 @@ lbm_msgno_filt_check(LibBalsaMailbox * mailbox, guint seqno,
     gboolean match;
     GNode *node;
 
-    match = search_iter ?
-        libbalsa_mailbox_message_match(mailbox, seqno, search_iter) : TRUE;
+    match = search_iter != NULL ? lbm_message_match(mailbox, seqno, search_iter) : TRUE;
     node = g_node_find(priv->msg_tree, G_PRE_ORDER, G_TRAVERSE_ALL,
                        GUINT_TO_POINTER(seqno));
     if (node) {

@@ -3,6 +3,21 @@
 	* .../Makefile.am: include '*meson*' files in the distribution package.
 	* NEWS, configure.ac, meson.build: release balsa-2.6.3
 
+2021-08-12  Peter Bloomfield  <pbloomfield@bellsouth.net>
+
+	Improve message filtering on reception
+
+	* libbalsa/message.h: add LIBBALSA_MESSAGE_FLAG_CHECKED to the
+	LibBalsaMessageFlag enum;
+	* libbalsa/mailbox.c
+	(lbm_run_filters_on_reception_idle_cb): use the new
+	flag to avoid repeated checks for matching filters;
+	(lbm_message_match): new private helper;
+	(lbm_msgno_filt_check): call it;
+	(libbalsa_mailbox_message_match): call it, after guards.
+
+	Possible fix for #58
+
 2021-03-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	imap-handle: use a flexible array member

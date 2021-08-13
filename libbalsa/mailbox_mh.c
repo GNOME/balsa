@@ -778,8 +778,6 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     int sequences_fd;
     GMimeStream *temp_stream;
     const gchar* sequences_filename;
-    GMimeStream *gmime_stream;
-    GMimeStream *gmime_stream_buffer;
     GByteArray *line;
     gboolean retval = FALSE;
 
@@ -895,6 +893,9 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
     if (sequences_fd >= 0) {
         /* copy unknown sequences */
+        GMimeStream *gmime_stream;
+        GMimeStream *gmime_stream_buffer;
+
         gmime_stream = g_mime_stream_fs_new(sequences_fd);
         gmime_stream_buffer =
             g_mime_stream_buffer_new(gmime_stream,

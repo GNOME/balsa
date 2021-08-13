@@ -772,13 +772,11 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     const gchar *path;
     gchar *name_used;
     guint msgno;
-    struct message_info *msg_info;
 
     int fd;
     int sequences_fd;
     GMimeStream *temp_stream;
     const gchar* sequences_filename;
-    GByteArray *line;
     gboolean retval = FALSE;
 
     g_return_val_if_fail(LIBBALSA_IS_MAILBOX_MH(mailbox), FALSE);
@@ -807,7 +805,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
     msgno = 1;
     while (msgno <= mh->msgno_2_msg_info->len) {
-	msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
+        struct message_info *msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
 	if (msg_info->local_info.flags == LIBBALSA_MESSAGE_FLAG_INVALID)
 	    msg_info->local_info.flags = msg_info->orig_flags;
 	if (libbalsa_mailbox_get_state(mailbox) == LB_MAILBOX_STATE_CLOSING)
@@ -869,7 +867,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
     /* Renumber */
     for (msgno = 1; msgno <= mh->msgno_2_msg_info->len; msgno++) {
-	msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
+        struct message_info *msg_info = lbm_mh_message_info_from_msgno(mh, msgno);
 	if (msg_info->local_info.message != NULL)
 	    libbalsa_message_set_msgno(msg_info->local_info.message, msgno);
     }
@@ -895,6 +893,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
         /* copy unknown sequences */
         GMimeStream *gmime_stream;
         GMimeStream *gmime_stream_buffer;
+        GByteArray *line;
 
         gmime_stream = g_mime_stream_fs_new(sequences_fd);
         gmime_stream_buffer =

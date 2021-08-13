@@ -87,6 +87,8 @@ static gboolean libbalsa_mailbox_mh_fetch_message_structure(LibBalsaMailbox
                                                             flags);
 static guint libbalsa_mailbox_mh_total_messages(LibBalsaMailbox * mailbox);
 
+static const guint8 zero[1] = {0};
+
 struct _LibBalsaMailboxMh {
     LibBalsaMailboxLocal parent;
 
@@ -457,10 +459,8 @@ lbm_mh_parse_sequences(LibBalsaMailboxMh * mailbox)
     g_object_unref(gmime_stream);
     line = g_byte_array_new();
     do {
-	guint8 zero = 0;
-
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
-	g_byte_array_append(line, &zero, 1);
+	g_byte_array_append(line, zero, 1);
 
 	lbm_mh_handle_seq_line(mailbox, (gchar *) line->data);
 	line->len = 0;
@@ -542,10 +542,11 @@ lbm_mh_check(LibBalsaMailboxMh * mh, const gchar * path)
 					GMIME_STREAM_BUFFER_BLOCK_READ);
     g_object_unref(gmime_stream);
 
-    line = (GByteArray *) g_array_new(TRUE, FALSE, 1);
+    line = g_byte_array_new();
     do {
 	line->len = 0;
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
+	g_byte_array_append(line, zero, 1);
 
 	if (libbalsa_str_has_prefix((gchar *) line->data,
 				    LibBalsaMailboxMhUnseen)) {

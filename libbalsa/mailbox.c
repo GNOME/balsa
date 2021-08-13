@@ -1328,7 +1328,7 @@ lbm_msgnos_changed_idle_cb(LibBalsaMailbox * mailbox)
 
     g_debug("%s %s %d processed", __func__, priv->name,
             priv->msgnos_changed->len);
-    priv->msgnos_changed->len = 0;
+    g_array_set_size(priv->msgnos_changed, 0);
     g_mutex_unlock(&msgnos_changed_lock);
 
     g_object_unref(mailbox);
@@ -3152,7 +3152,7 @@ lbm_get_index_entry_real(LibBalsaMailbox * mailbox)
 
     g_debug("%s %s %d processed", __func__, priv->name,
             priv->msgnos_pending->len);
-    priv->msgnos_pending->len = 0;
+    g_array_set_size(priv->msgnos_pending, 0);
     g_mutex_unlock(&get_index_entry_lock);
 
     g_object_unref(mailbox);
@@ -4437,7 +4437,7 @@ lbm_update_msgnos(LibBalsaMailbox * mailbox, guint seqno, GArray * msgnos)
         g_array_index(msgnos, guint, j) = msgno;
         ++j;
     }
-    msgnos->len = j;
+    g_array_set_size(msgnos, j);
 }
 
 void

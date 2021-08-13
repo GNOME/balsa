@@ -3610,7 +3610,7 @@ icm_restore_from_cache(ImapMboxHandle *h, struct ImapCacheManager *icm)
                "- syncing uid map for msgno [%u:%u].",
                icm->exists, exists, icm->uidnext, uidnext, lo, hi);
         if(k) {
-            uidmap->len = lo-1;
+            g_array_set_size(uidmap, lo-1);
             rc = imap_search_exec(h, TRUE, k, set_uid, uidmap);
             imap_search_key_free(k);
         } else rc = IMR_NO;

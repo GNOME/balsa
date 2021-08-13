@@ -745,7 +745,7 @@ lbm_mbox_readln(LbmMboxStreamBuffer * buffer, GByteArray * line)
 {
     gchar *p, *q, *r;
 
-    line->len = 0;
+    g_byte_array_set_size(line, 0);
 
     do {
         if (buffer->start >= buffer->end) {
@@ -1697,7 +1697,6 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 	j++;
     }
     libbalsa_mime_stream_shared_unlock(mbox_stream);
-    mbox->msgno_2_msg_info->len = j;
     g_object_unref(gmime_parser);
     lbm_mbox_save(mbox);
 

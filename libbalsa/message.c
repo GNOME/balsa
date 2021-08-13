@@ -1415,7 +1415,7 @@ libbalsa_message_load_envelope_from_stream(LibBalsaMessage *message,
             message->length = g_mime_stream_length(gmime_stream);
             break;
         }
-        line->len = 0;
+        g_byte_array_set_size(line, 0);
         g_byte_array_append(line, &lookahead, 1);
     } while (TRUE);
     g_byte_array_free(line, TRUE);

@@ -459,11 +459,11 @@ lbm_mh_parse_sequences(LibBalsaMailboxMh * mailbox)
     g_object_unref(gmime_stream);
     line = g_byte_array_new();
     do {
+	g_byte_array_set_size(line, 0);
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
 	g_byte_array_append(line, zero, 1);
 
 	lbm_mh_handle_seq_line(mailbox, (gchar *) line->data);
-	line->len = 0;
     } while (!g_mime_stream_eos(gmime_stream_buffer));
     g_object_unref(gmime_stream_buffer);
     g_byte_array_free(line, TRUE);
@@ -544,7 +544,7 @@ lbm_mh_check(LibBalsaMailboxMh * mh, const gchar * path)
 
     line = g_byte_array_new();
     do {
-	line->len = 0;
+	g_byte_array_set_size(line, 0);
 	g_mime_stream_buffer_readln(gmime_stream_buffer, line);
 	g_byte_array_append(line, zero, 1);
 
@@ -904,7 +904,7 @@ libbalsa_mailbox_mh_sync(LibBalsaMailbox * mailbox, gboolean expunge)
         do {
             gchar *buf;
 
-            line->len = 0;
+            g_byte_array_set_size(line, 0);
             g_mime_stream_buffer_readln(gmime_stream_buffer, line);
             buf = (gchar *) line->data;
             if (buf &&

@@ -1,3 +1,7 @@
+2021-08-18  Pawel Salek  <pawsa0@gmail.com>
+
+    * NEWS, configure.ac, meson.build: release balsa-2.6.3
+
 2021-03-27  Peter Bloomfield  <pbloomfield@bellsouth.net>
 
 	imap-handle: use a flexible array member

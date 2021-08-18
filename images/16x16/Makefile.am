@@ -28,7 +28,8 @@ extra_appicons_IMGS = \
 	mail-outbox.png
 
 
-EXTRA_DIST = $(extra_appicons_IMGS)
+EXTRA_DIST = $(extra_appicons_IMGS)	\
+	meson.build
 
 extra_appiconsdir = $(BALSA_DATA_PREFIX)/hicolor/16x16/apps
 extra_appicons_DATA = $(extra_appicons_IMGS)

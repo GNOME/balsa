@@ -42,3 +42,6 @@ AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	$(BALSA_CFLAGS)
 
 AM_CFLAGS   = $(LIBIMAP_CFLAGS)
+
+EXTRA_DIST = \
+	meson.build

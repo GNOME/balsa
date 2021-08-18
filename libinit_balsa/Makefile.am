@@ -23,3 +23,6 @@ AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) \
         $(BALSA_CFLAGS)
 
 AM_CFLAGS = $(BALSA_DEFS)
+
+EXTRA_DIST = \
+	meson.build

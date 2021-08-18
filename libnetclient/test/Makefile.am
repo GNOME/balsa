@@ -11,6 +11,7 @@ EXTRA_DIST = 		\
 	ca_cert.pem		\
 	cert.pem 		\
 	cert_u.pem 		\
+	meson.build		\
 	valgrind.supp
 
 TESTFLAGS = -fprofile-arcs -ftest-coverage -g -Wno-error

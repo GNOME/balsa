@@ -8,7 +8,8 @@ balsa_IMGS = \
 	balsa_icon.png		\
 	balsa_logo.png
 
-EXTRA_DIST =	$(balsa_IMGS)
+EXTRA_DIST =	$(balsa_IMGS)	\
+	meson.build
 
 balsabitmapsdir = $(BALSA_DATA_PREFIX)/pixmaps
 

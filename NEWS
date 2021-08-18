@@ -1,3 +1,14 @@
+* Balsa-2.6.3 release. Release date 2021-08-18
+
+- Improve Autocrypt-related error messages.
+- Improvements to communication with GnuPG key servers.
+- Create standard-compatible HTML messages.
+- Implement sender-dependent HTML message preferences.
+- Reuse HTTP connections when rendering HTML messages.
+- Do not send empty Reply-To, Cc, etc headers.
+- More robust IMAP parser and response handling.
+- Code cleanups, platform-dependent build fixes
+
 * Balsa-2.6.2 release. Release date 2020-12-21
 
 - Webkit widgets are now sandboxed.

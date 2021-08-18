@@ -16,6 +16,8 @@ CLEANFILES = doxygen.log
 SUBDIRS = test
 AM_CFLAGS = $(LIBNETCLIENT_CFLAGS)
 AM_CPPFLAGS = -DG_LOG_DOMAIN=\"libnetclient\"
+EXTRA_DIST = \
+	meson.build
 
 clean-local:
 	-rm -rf html

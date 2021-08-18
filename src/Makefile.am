@@ -122,7 +122,8 @@ balsa_SOURCES =			\
 	$(balsa_built_sources)
 
 
-EXTRA_DIST = $(balsa_spell_extra_dist) $(resource_xml) $(ab_resource_xml)
+EXTRA_DIST = $(balsa_spell_extra_dist) $(resource_xml) $(ab_resource_xml) \
+	meson.build
 
 AM_CPPFLAGS = \
 	-DGNOMELOCALEDIR=\""$(datadir)/locale"\" \

@@ -37,7 +37,12 @@ balsa_extra_dist =		\
 	gnome-balsa2.png	\
 	intltool-extract.in	\
 	intltool-merge.in	\
-	intltool-update.in
+	intltool-update.in	\
+	meson.build	\
+	meson_options.txt	\
+	balsa-mailto-handler.desktop.meson	\
+	org.desktop.Balsa.desktop.meson	\
+	po/meson.build
 
 EXTRA_DIST =			\
     $(balsa_extra_dist)
@@ -48,8 +53,10 @@ gtksourceview_DATA = balsa-mail.lang		\
 	balsa-mail-style.xml
 endif
 
+# remove ./po/.intltool-merge-cache.lock to workaround intltool-0.51.0-6 bug
 DISTCLEANFILES = $(desktop_DATA) $(server_DATA) $(dist_appdata_DATA) \
-	intltool-extract intltool-merge intltool-update
+	intltool-extract intltool-merge intltool-update \
+	po/.intltool-merge-cache.lock
 
 
 dist-hook: balsa.spec
@@ -79,12 +86,8 @@ dist-hook: balsa.spec
 
 ## to automatically rebuild aclocal.m4 if any of the macros in
 ## `macros/' change
-bzdist: distdir
+xzdist: distdir
 	@test -n "$(AMTAR)" || { echo "AMTAR undefined. Run make bzdist AMTAR=gtar"; false; }
 	-chmod -R a+r $(distdir)
-	$(AMTAR) chojf $(distdir).tar.bz2 $(distdir)
+	$(AMTAR) choJf $(distdir).tar.xz $(distdir)
 	-rm -rf $(distdir)
-
-# macros are not used any more by current configure.in, see also
-# post by Ildar Mulyukov to balsa-list, 2006.06.27
-# ACLOCAL_AMFLAGS = -I macros

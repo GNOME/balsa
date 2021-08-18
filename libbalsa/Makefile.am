@@ -140,6 +140,7 @@ libbalsa_a_SOURCES = 		\
 
 
 EXTRA_DIST = 				\
+	meson.build	\
 	padlock-keyhole.xpm
 
 AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \

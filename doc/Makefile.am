@@ -68,7 +68,8 @@ balsa_spell_extra_dist =
 
 endif
 
-EXTRA_DIST   = $(balsa_spell_extra_dist)
+EXTRA_DIST   = $(balsa_spell_extra_dist)	\
+	meson.build
 
 HELP_EXTRA   = balsa.entities
 

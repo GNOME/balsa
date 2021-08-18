@@ -32,7 +32,9 @@ extra_appicons_IMGS = \
 	stock_view-fields.png
 
 
-EXTRA_DIST = $(extra_appicons_IMGS)
+EXTRA_DIST = $(extra_appicons_IMGS) \
+	meson.build
+
 
 extra_appiconsdir = $(BALSA_DATA_PREFIX)/hicolor/24x24/apps
 extra_appicons_DATA = $(extra_appicons_IMGS)

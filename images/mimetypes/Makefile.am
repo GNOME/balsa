@@ -12,7 +12,8 @@ extramimetypes_IMGS = 				\
 	multipart-signed.png
 
 
-EXTRA_DIST = $(extramimetypes_IMGS)
+EXTRA_DIST = $(extramimetypes_IMGS) \
+	meson.build
 
 extramimetypesdir = $(BALSA_DATA_PREFIX)/hicolor/48x48/mimetypes
 extramimetypes_DATA = $(extramimetypes_IMGS)

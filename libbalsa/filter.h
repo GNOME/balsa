@@ -278,9 +278,10 @@ void filter_perror(const gchar * s);
 /* Test */
 gboolean libbalsa_condition_can_match(LibBalsaCondition * cond,
 				      LibBalsaMessage * message);
-gboolean libbalsa_condition_is_flag_only(LibBalsaCondition * cond,
-                                         LibBalsaMailbox * mailbox,
-                                         guint msgno, gboolean * match);
+gboolean libbalsa_condition_is_flag_only(LibBalsaCondition * cond);
+gboolean libbalsa_condition_try_flag_match(LibBalsaCondition * cond,
+                                           LibBalsaMailbox * mailbox,
+                                           guint msgno, gboolean * match);
 
 /* Compatibility */
 LibBalsaCondition *libbalsa_condition_new_2_0(const gchar *

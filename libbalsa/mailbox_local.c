@@ -366,8 +366,7 @@ libbalsa_mailbox_local_load_message(LibBalsaMailboxLocal * local,
     view_filter = libbalsa_mailbox_get_view_filter(mailbox, FALSE);
     if (view_filter == NULL)
         match = TRUE;
-    else if (!libbalsa_condition_is_flag_only(view_filter,
-                                              mailbox, msgno, &match))
+    else if (!libbalsa_condition_try_flag_match(view_filter, mailbox, msgno, &match))
         match = message_match_real(mailbox, msgno, view_filter);
 
     if (match)
@@ -1295,7 +1294,7 @@ lbm_local_update_view_filter(LibBalsaMailbox * mailbox,
 
     total = libbalsa_mailbox_total_messages(mailbox);
     if (view_filter
-        && !libbalsa_condition_is_flag_only(view_filter, NULL, 0, NULL)) {
+        && !libbalsa_condition_is_flag_only(view_filter)) {
         gchar *text;
 
         text = g_strdup_printf(_("Filtering %s"), libbalsa_mailbox_get_name(mailbox));

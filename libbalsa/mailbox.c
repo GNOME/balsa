@@ -810,8 +810,8 @@ libbalsa_mailbox_changed(LibBalsaMailbox * mailbox)
 /* libbalsa_mailbox_message_match:
  * Tests if message with msgno matches the conditions cached in the
  * search_iter: this is used
-   by the search code. It is a "virtual method", indeed IMAP has a
-   special way to implement it for speed/bandwidth reasons
+ * by the search code. It is a "virtual method", indeed IMAP has a
+ * special way to implement it for speed/bandwidth reasons
  */
 
 static gboolean
@@ -822,13 +822,11 @@ lbm_message_match(LibBalsaMailbox           *mailbox,
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     gboolean match;
 
-    if (libbalsa_condition_is_flag_only(search_iter->condition,
-                                        mailbox, msgno, &match))
-        return match;
-
-    priv->must_cache_message = TRUE;
-    match = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match(mailbox, msgno, search_iter);
-    priv->must_cache_message = FALSE;
+    if (!libbalsa_condition_try_flag_match(search_iter->condition, mailbox, msgno, &match)) {
+        priv->must_cache_message = TRUE;
+        match = LIBBALSA_MAILBOX_GET_CLASS(mailbox)->message_match(mailbox, msgno, search_iter);
+        priv->must_cache_message = FALSE;
+    }
 
     return match;
 }
@@ -913,8 +911,7 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
         LibBalsaFilter *filter = lst->data;
 
         if (filter->condition
-            && !libbalsa_condition_is_flag_only(filter->condition, NULL, 0,
-                                                NULL))
+            && !libbalsa_condition_is_flag_only(filter->condition))
             ++progress_count;
     }
 
@@ -936,8 +933,7 @@ lbm_run_filters_on_reception_idle_cb(LibBalsaMailbox * mailbox)
         if (filter->condition == NULL)
             continue;
 
-        use_progress = !libbalsa_condition_is_flag_only(filter->condition,
-                                                        NULL, 0, NULL);
+        use_progress = !libbalsa_condition_is_flag_only(filter->condition);
 
         search_iter = libbalsa_mailbox_search_iter_new(filter->condition);
 

@@ -854,7 +854,9 @@ get_url_reg(void)
         NULL,
         "(((https?|ftps?|nntp)://)|(mailto:|news:))"
             "(%[0-9A-F]{2}|[-_.!~*';/?:@&=+$,#[:alnum:]])+"
-            "(%[0-9A-F]{2}|[-_!~*';/?:@&=+$,#[:alnum:]])",
+            /* do not include a trailing period or comma as part of the match;
+             * it is more likely to be punctuation than part of a URL */
+            "(%[0-9A-F]{2}|[-_!~*';/?:@&=+$#[:alnum:]])",
         __func__,
         "url regex compilation failed"
     };

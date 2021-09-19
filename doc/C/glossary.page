@@ -87,7 +87,7 @@ id="glossary">
     <section id="regular-expression">
       <title>Regular Expression</title>
       <p>Often abbreviated as a
-      <em>regexp</em>, this is a method of specifing a pattern to
+      <em>regexp</em>, this is a method of specifying a pattern to
       match in text. Both very simple and very complex patterns can
       be easily matched using this method. For information on how
       to understand and construct regular expressions the best

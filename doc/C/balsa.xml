@@ -2074,7 +2074,7 @@ This is version 2.721 of the Balsa manual.
 <title>Specifying Addresses</title>
 	
 <para>
-  &Balsa; supports many different methods of selecting email addresss.
+  &Balsa; supports many different methods of selecting email addresses.
   All of the headers that can contain addresses have a small colored
   book to the right of them that will open up &Balsa;'s
   address book. 
@@ -2083,7 +2083,7 @@ This is version 2.721 of the Balsa manual.
 <para>
   However, &Balsa; will also attempt to guess what the headers should
   contain depending on what context the composition window is opened in,
-  so it may not be neccessary to fill
+  so it may not be necessary to fill
   them in most of the time.
 </para>
 
@@ -2093,7 +2093,7 @@ This is version 2.721 of the Balsa manual.
     will guess the e-mail address from all the entries in the
     &GnomeCard; application.  To enable this feature, read the section
     on <link linkend="ct-alias-expansion">Alias Expansion</link>.  In
-    addtion, the composition window supports drag-and-drop of
+    addition, the composition window supports drag-and-drop of
     addresses from the &GnomeCard; application.
   </para>
 </tip>
@@ -2209,7 +2209,7 @@ This is version 2.721 of the Balsa manual.
   <term><guibutton>Change All</guibutton></term>
   <listitem>
     <para>
-      Change all occurances of the current incorrect word with the
+      Change all occurrences of the current incorrect word with the
       currently selected suggestion.
     </para>
   </listitem>
@@ -2228,7 +2228,7 @@ This is version 2.721 of the Balsa manual.
   <term><guibutton>Ignore All</guibutton></term>
   <listitem>
     <para>
-      Ignore all occurrances of the current word, and continue to the
+      Ignore all occurrences of the current word, and continue to the
       next incorrect word.
      </para>
   </listitem>
@@ -2547,7 +2547,7 @@ This is version 2.721 of the Balsa manual.
 	<listitem><para>The TLS certificate pass phrase.</para></listitem>
 
 	<listitem><para>Whether to split large messages, and the
-                threshhold size.  </para></listitem>
+                threshold size.  </para></listitem>
       </itemizedlist>
     </para>
   </listitem>
@@ -3561,7 +3561,7 @@ will be encrypted from the start. Not all servers provide this service
 <para>The <guilabel>Use TLS</guilabel> option list determines instruct balsa how
 to negotiate the TLS encryption. &Balsa; can never attempt to negotiate
 it, can start TLS encryption whenever it is supported by server, or
-can abort the connection if TLS is inavailable or fails for some
+can abort the connection if TLS is unavailable or fails for some
 reason.</para>
 </listitem>
 
@@ -4079,7 +4079,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <term><guilabel>Use secret key with this id for signing.</guilabel></term>
     <listitem>
       <para>
-        Usually, &Balsa; automaticylly selects a proper secret key for cryptographic
+        Usually, &Balsa; automatically selects a proper secret key for cryptographic
         signatures from the identity's mail address. Therefore, most users should
         leave this entry empty. If you want to force using a specific secret key for
         cryptographic signatures, enter the key id here. You can get the key id by
@@ -4732,13 +4732,13 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <filename>/etc/openldap/ldap.conf</filename> and
     <filename>/etc/openldap/slapd.conf</filename>. Consult your LDAP
     configuration and other sources to choose the right Domain Name
-    for your institution and authentication level apriopriate to your
+    for your institution and authentication level appropriate to your
     environment.</para></listitem>
 
     <listitem><para>Import data to your LDAP server. OpenLDAP comes
     with a set of migration tools but they do not create directly
     objects of standard <classname>inetOrgPerson</classname> class
-    which is an apropriate type for address book entry. You may need
+    which is an appropriate type for address book entry. You may need
     to tune them.</para></listitem>
 
   </itemizedlist>
@@ -5005,7 +5005,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       <glossdef>
 	<para>An acronym for &quot;Mail Delivery Agent&quot;, this
 	type of program is also known as a Local Delivery Agent (LDA).
-	It is responsible for delivering the mail recieved for someone
+	It is responsible for delivering the mail received for someone
 	on a machine to the mail folder of that person.
 	&procmail; is an example of this type
 	of program, although many <glossterm
@@ -5047,7 +5047,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       <glossterm>Regular Expression</glossterm>
       <glossdef>
 	<para>Often abbreviated as a <abbrev>regexp</abbrev>, this is
-	a method of specifing a pattern to match in text.  Both very
+	a method of specifying a pattern to match in text.  Both very
 	simple and very complex patterns can be easily matched using
 	this method.  For information on how to understand and
 	construct regular expressions the best source is the grep

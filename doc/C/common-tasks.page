@@ -145,13 +145,13 @@ id="common-tasks">
         <file>/etc/openldap/slapd.conf</file>. Consult your LDAP
         configuration and other sources to choose the right Domain
         Name for your institution and authentication level
-        apriopriate to your environment.</p>
+        appropriate to your environment.</p>
       </item>
       <item>
         <p>Import data to your LDAP server. OpenLDAP comes with a
         set of migration tools but they do not create directly
         objects of standard
-        <code>inetOrgPerson</code> class which is an apropriate type
+        <code>inetOrgPerson</code> class which is an appropriate type
         for address book entry. You may need to tune them.</p>
       </item>
     </list>

@@ -1377,7 +1377,7 @@ align="center"></graphic>
 
     <itemizedlist>
       <listitem><para>Baltic</para></listitem>
-      <listitem><para>Brazillian</para></listitem>
+      <listitem><para>Brazilian</para></listitem>
       <listitem><para>Catalan</para></listitem>
       <listitem><para>Danish</para></listitem>
       <listitem><para>Dutch</para></listitem>
@@ -1399,7 +1399,7 @@ align="center"></graphic>
       <listitem><para>Spanish</para></listitem>
       <listitem><para>Swedish</para></listitem>
       <listitem><para>Turkish</para></listitem>
-      <listitem><para>Ukranian</para></listitem>
+      <listitem><para>Ukrainian</para></listitem>
     </itemizedlist>
 
   </listitem>
@@ -1533,7 +1533,7 @@ align="center"></graphic>
       <literal>From</literal> is used to indicate the origin of the
       message, Balsa automatically fills this in for you if you have
       entered your name and email address in the <link
-      linkend="identities">identites</link> window.
+      linkend="identities">identities</link> window.
     </para>
   </listitem>
 </varlistentry>
@@ -1631,7 +1631,7 @@ align="center"></graphic>
 <title>Specifying Addresses</title>
 	
 <para>
-  &Balsa; supports many different methods of selecting email addresss.
+  &Balsa; supports many different methods of selecting email addresses.
   All of the headers that can contain addresses have a small coloured
   book to the right of them that will open up &Balsa;'s
   <interface>address book</interface>. 
@@ -1640,7 +1640,7 @@ align="center"></graphic>
 <para>
   However, &Balsa; will also attempt to guess what the headers should
   contain depending on what context the <interface>composition
-  window</interface> is opened in, so it may not be neccessary to fill
+  window</interface> is opened in, so it may not be necessary to fill
   them in most of the time.
 </para>
 
@@ -1650,7 +1650,7 @@ align="center"></graphic>
     will guess the e-mail address from all the entries in the
     &GnomeCard; application.  To enable this feature, read the section
     on <link linkend="ct-alias-expansion">Alias Expansion</link>.  In
-    addtion, the composition window supports drag-and-drop of
+    addition, the composition window supports drag-and-drop of
     addresses from the &GnomeCard; application.
   </para>
 </tip>
@@ -1754,7 +1754,7 @@ align="center"></graphic>
   <term><guibutton>Change All</guibutton></term>
   <listitem>
     <para>
-      Change all occurances of the current incorrect word with the
+      Change all occurrences of the current incorrect word with the
       currently selected suggestion.
     </para>
   </listitem>
@@ -1773,7 +1773,7 @@ align="center"></graphic>
   <term><guibutton>Ignore All</guibutton></term>
   <listitem>
     <para>
-      Ignore all occurrances of the current word, and continue to the
+      Ignore all occurrences of the current word, and continue to the
       next incorrect word.
      </para>
   </listitem>
@@ -1952,7 +1952,7 @@ align="center"></graphic>
 	<listitem><para>What does the check check box mean?</para></listitem>
 
 	<listitem><para>You can select the 'delete from server' button
-          to remove the downoladed messages from the
+          to remove the downloaded messages from the
           server.</para></listitem>
       </itemizedlist>
     </para>
@@ -2516,7 +2516,7 @@ align="center"></graphic>
         to read a message.  This uses a format string of the same
         general kind as <function>printf</function>. It's a mixture of
         text and substitution commands, where the text is used
-        literally, and substition commands are in one of the forms:
+        literally, and substitution commands are in one of the forms:
 
       <itemizedlist>
 
@@ -2634,7 +2634,7 @@ align="center"></graphic>
 
 	<listitem>
 	  <para>This mode quickly scans for replacements, which means
-	    it might be used by a good speller who occaisonally makes
+	    it might be used by a good speller who occasionally makes
 	    typographical errors.</para>
 	</listitem>
       </varlistentry>
@@ -2651,7 +2651,7 @@ align="center"></graphic>
       <varlistentry>
 	<term><guilabel>Bad Spellers</guilabel></term>
 	<listitem>
-	  <para>The Bad Spellers mode is the most thourough and
+	  <para>The Bad Spellers mode is the most thorough and
 	    accurate mode, however it also takes the longest to find a
 	    list of suggestions.</para>
 	</listitem>
@@ -2950,7 +2950,7 @@ remaining lines should have this format:</para>
 e-mail address	full name	nickname
 </computeroutput></para>
 
-<para>The three fields should be seperated by tabs. The third field is
+<para>The three fields should be separated by tabs. The third field is
 currently not used by balsa, but might be in the future. It is also
 kept to ensure compatibility with mutt. </para>
 
@@ -2959,7 +2959,7 @@ search for. A space (" ") is used as the first argument when creating
 a list of all users.</para>
 
 <para>All characters are allowed, except from the tab(\t), since that
-is the field seperator. 
+is the field separator.
 </para>
 
 <para>An example output could be:</para>
@@ -3405,7 +3405,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     ("On exit"), the filter will be applied to the entire mailbox when you exit Balsa.
   </para>
   <para>
-    Note : the "On exit" feature is not yet implented.
+    Note : the "On exit" feature is not yet implemented.
   </para>
   <para>
     When you tell Balsa to apply several filters on the same mailbox (i.e. when you
@@ -3683,13 +3683,13 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
     <filename>/etc/openldap/ldap.conf</filename> and
     <filename>/etc/openldap/slapd.conf</filename>. Consult your LDAP
     configuration and other sources to choose the right Domain Name
-    for your institution and authentication level apriopriate to your
+    for your institution and authentication level appropriate to your
     environment.</para></listitem>
 
     <listitem><para>Import data to your LDAP server. OpenLDAP comes
     with a set of migration tools but they do not create directly
     objects of standard <classname>inetOrgPerson</classname> class
-    which is an apropriate type for address book entry. You may need
+    which is an appropriate type for address book entry. You may need
     to tune them.</para></listitem>
 
   </itemizedlist>
@@ -3978,7 +3978,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       <glossdef>
 	<para>An acronym for &quot;Mail Delivery Agent&quot;, this
 	type of program is also known as a Local Delivery Agent (LDA).
-	It is responsible for delivering the mail recieved for someone
+	It is responsible for delivering the mail received for someone
 	on a machine to the mail folder of that person.
 	&procmail; is an example of this type
 	of program, although many <glossterm
@@ -4020,7 +4020,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       <glossterm>Regular Expression</glossterm>
       <glossdef>
 	<para>Often abbreviated as a <abbrev>regexp</abbrev>, this is
-	a method of specifing a pattern to match in text.  Both very
+	a method of specifying a pattern to match in text.  Both very
 	simple and very complex patterns can be easily matched using
 	this method.  For information on how to understand and
 	construct regular expressions the best source is the grep
@@ -4032,7 +4032,7 @@ the third is an alias (currently not used and replaced by 'TODO').</para>
       <glossterm>SMTP</glossterm>
       <glossdef>
 	<para>An acronym that stands for &quot;Simple Mail Transfer
-	Protocol&quot;, it is excatly that.  A standard that defines a
+	Protocol&quot;, it is exactly that.  A standard that defines a
 	simple an reliable way to transfer messages between computers
 	on a network.  It is used by most, if not all, mail programs
 	to transfer mail.</para>

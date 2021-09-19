@@ -116,7 +116,7 @@ id="preferences-mail-options">
           <p>The TLS certificate pass phrase.</p>
         </item>
         <item>
-          <p>Whether to split large messages, and the threshhold
+          <p>Whether to split large messages, and the threshold
           size.</p>
         </item>
       </list>

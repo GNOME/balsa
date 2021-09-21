@@ -604,12 +604,12 @@ id="win-composer">
     <section id="specify-addresses">
     <title>Specifying Addresses</title>
     <p>&Balsa; supports many different methods of selecting
-    email addresss. All of the headers that can contain addresses
+    email addresses. All of the headers that can contain addresses
     have a small colored book to the left of them that will open up
     &Balsa;'s address book.</p>
     <p>However, &Balsa; will also attempt to guess what the
     headers should contain depending on what context the
-    composition window is opened in, so it may not be neccessary to
+    composition window is opened in, so it may not be necessary to
     fill them in most of the time.</p>
     <note>
       <p>Also, &Balsa; supports alias expansion. As you type a
@@ -618,7 +618,7 @@ id="win-composer">
       feature, read the section on
       <link xref="common-tasks#ct-alias-expansion">
       Alias Expansion</link> . In
-      addtion, the composition window supports drag-and-drop of
+      addition, the composition window supports drag-and-drop of
       addresses from the &GnomeCard; application.</p>
     </note> &gt;</section>
   </section>
@@ -693,7 +693,7 @@ id="win-composer">
         <title>
           <gui>Change All</gui>
         </title>
-        <p>Change all occurances of the current incorrect word with
+        <p>Change all occurrences of the current incorrect word with
         the currently selected suggestion.</p>
       </item>
       <item>
@@ -704,7 +704,7 @@ id="win-composer">
         next one.</p>
       </item>
       <item>
-        <p>Ignore all occurrances of the current word, and continue
+        <p>Ignore all occurrences of the current word, and continue
         to the next incorrect word.</p>
       </item>
       <item>

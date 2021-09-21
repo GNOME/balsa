@@ -68,7 +68,7 @@ id="folder-config">
         to negotiate the TLS encryption. &Balsa; can never
         attempt to negotiate it, can start TLS encryption whenever
         it is supported by server, or can abort the connection if
-        TLS is inavailable or fails for some reason.</p>
+        TLS is unavailable or fails for some reason.</p>
       </item>
       <item>
         <p>

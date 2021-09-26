@@ -412,10 +412,10 @@ libbalsa_vevent_status_str(LibBalsaVEvent *event)
 		icalproperty_status status;
 		gchar *status_str;
 	} status[] = {
-		{ ICAL_STATUS_NONE, N_("unknown") },
-		{ ICAL_STATUS_TENTATIVE, N_("event is tentative") },
-		{ ICAL_STATUS_CONFIRMED, N_("event is definite") },
-		{ ICAL_STATUS_CANCELLED, N_("event was cancelled") }
+		{ ICAL_STATUS_NONE, NC_("ical_status", "unknown") },
+		{ ICAL_STATUS_TENTATIVE, NC_("ical_status", "event is tentative") },
+		{ ICAL_STATUS_CONFIRMED, NC_("ical_status", "event is definite") },
+		{ ICAL_STATUS_CANCELLED, NC_("ical_status", "event was cancelled") }
 	};
 	guint n;
 
@@ -441,11 +441,11 @@ libbalsa_vcal_method_str(LibBalsaVCal *vcal)
     	icalproperty_method method;
 		gchar *meth_str;
     } methods[] = {
-		{ ICAL_METHOD_NONE, N_("unknown") },
-		{ ICAL_METHOD_PUBLISH, N_("Event Notification") },
-		{ ICAL_METHOD_REQUEST, N_("Event Request") },
-		{ ICAL_METHOD_REPLY, N_("Reply to Event Request") },
-		{ ICAL_METHOD_CANCEL, N_("Event Cancellation") }
+		{ ICAL_METHOD_NONE, NC_("ical_method", "unknown") },
+		{ ICAL_METHOD_PUBLISH, NC_("ical_method", "Event Notification") },
+		{ ICAL_METHOD_REQUEST, NC_("ical_method", "Event Request") },
+		{ ICAL_METHOD_REPLY, NC_("ical_method", "Reply to Event Request") },
+		{ ICAL_METHOD_CANCEL, NC_("ical_method", "Event Cancellation") }
 	};
     guint n;
 
@@ -464,12 +464,12 @@ libbalsa_vcal_part_stat_to_str(icalparameter_partstat pstat)
     	icalparameter_partstat partstat;
     	gchar *partstat_str;
     } partstats[] = {
-    	{ ICAL_PARTSTAT_NONE, N_("unknown") },
-    	{ ICAL_PARTSTAT_NEEDSACTION, N_("needs action") },
-    	{ ICAL_PARTSTAT_ACCEPTED, N_("accepted") },
-		{ ICAL_PARTSTAT_DECLINED, N_("declined") },
-		{ ICAL_PARTSTAT_TENTATIVE, N_("tentatively accepted") },
-		{ ICAL_PARTSTAT_DELEGATED, N_("delegated") }
+		{ ICAL_PARTSTAT_NONE, NC_("ical_partstat", "unknown") },
+		{ ICAL_PARTSTAT_NEEDSACTION, NC_("ical_partstat", "needs action") },
+		{ ICAL_PARTSTAT_ACCEPTED, NC_("ical_partstat", "accepted") },
+		{ ICAL_PARTSTAT_DECLINED, NC_("ical_partstat", "declined") },
+		{ ICAL_PARTSTAT_TENTATIVE, NC_("ical_partstat", "tentatively accepted") },
+		{ ICAL_PARTSTAT_DELEGATED, NC_("ical_partstat", "delegated") }
     };
     guint n;
 
@@ -511,8 +511,15 @@ ical_ar_empty(const short *array)
 static inline const gchar *
 day_name(gint day)
 {
-	static const gchar * day_names[7] =
-		{ N_("Sunday"), N_("Monday"), N_("Tuesday"), N_("Wednesday"), N_("Thursday"), N_("Friday"), N_("Saturday") };
+	static const gchar * day_names[7] = {
+		NC_("day_of_week", "Sunday"),
+		NC_("day_of_week", "Monday"),
+		NC_("day_of_week", "Tuesday"),
+		NC_("day_of_week", "Wednesday"),
+		NC_("day_of_week", "Thursday"),
+		NC_("day_of_week", "Friday"),
+		NC_("day_of_week", "Saturday")
+	};
 
 	return ((day >= 0) && (day < 7)) ? day_names[day] : "???";
 }
@@ -547,6 +554,7 @@ vevent_recurrence_daily(const struct icalrecurrencetype *rrule)
 	} else if (rrule->interval == 1) {
 		g_string_append(result, _("every day"));
 	} else {
+		// #1: interval
 		g_string_append_printf(result, _("every %d days"), rrule->interval);
 	}
 	return result;
@@ -564,6 +572,7 @@ vevent_recurrence_weekly(const struct icalrecurrencetype *rrule)
 		if (rrule->interval == 1) {
 			g_string_append(result, _("every "));
 		} else {
+			// #1: interval
 			g_string_append_printf(result, _("every %d weeks on "), rrule->interval);
 		}
 		g_string_append(result, day_name(rrule->by_day[0] - 1));
@@ -571,6 +580,7 @@ vevent_recurrence_weekly(const struct icalrecurrencetype *rrule)
 			if ((n < (ICAL_BY_DAY_SIZE - 1)) && (rrule->by_day[n + 1] != ICAL_RECURRENCE_ARRAY_MAX)) {
 				g_string_append_printf(result, ", %s", day_name(rrule->by_day[n] - 1));
 			} else {
+				// #1: the day of week (defined in the day_of_week context)
 				g_string_append_printf(result, _(" and %s"), day_name(rrule->by_day[n] - 1));
 			}
 		}
@@ -578,6 +588,7 @@ vevent_recurrence_weekly(const struct icalrecurrencetype *rrule)
 		if (rrule->interval == 1) {
 			g_string_append(result, _("every week"));
 		} else {
+			// #1: interval
 			g_string_append_printf(result, _("every %d weeks"), rrule->interval);
 		}
 	}
@@ -596,15 +607,19 @@ day_ordinal_append(GString *buffer, int day, const gchar *last_append, const gch
 	} else {
 		switch (day % 10) {
 		case 1:
+			// #1: the day of month
 			g_string_append_printf(buffer, _("%dst"), day);
 			break;
 		case 2:
+			// #1: the day of month
 			g_string_append_printf(buffer, _("%dnd"), day);
 			break;
 		case 3:
+			// #1: the day of month
 			g_string_append_printf(buffer, _("%drd"), day);
 			break;
 		default:
+			// #1: the day of month
 			g_string_append_printf(buffer, _("%dth"), day);
 		}
 		if (ordinal_append != NULL) {
@@ -625,6 +640,7 @@ vevent_recurrence_monthly(const struct icalrecurrencetype *rrule, const icaltime
 			if (rrule->interval == 1) {
 				g_string_append(result, _("every day of every month"));
 			} else {
+				// #1: interval
 				g_string_append_printf(result, _("every day of the month every %d months"), rrule->interval);
 			}
 			return result;		/* eject here so we don't append the month interval again... */
@@ -646,6 +662,7 @@ vevent_recurrence_monthly(const struct icalrecurrencetype *rrule, const icaltime
 
 					day_of_week = icalrecurrencetype_day_day_of_week(rrule->by_day[n]);
 					every_mask |= 1U << day_of_week;
+					// #1: the day of week (defined in the day_of_week context)
 					days = g_list_append(days, g_strdup_printf(_("every %s"), day_name(day_of_week - 1)));
 				} else {
 					/* handled below... */
@@ -673,6 +690,7 @@ vevent_recurrence_monthly(const struct icalrecurrencetype *rrule, const icaltime
 				if (p->next != NULL) {
 					g_string_append_printf(result, ", %s", (const gchar *) p->data);
 				} else {
+					// #1: recurrence expression
 					g_string_append_printf(result, _(" and %s"), (const gchar *) p->data);
 				}
 			}
@@ -703,6 +721,7 @@ vevent_recurrence_monthly(const struct icalrecurrencetype *rrule, const icaltime
 	if (rrule->interval == 1) {
 		g_string_append(result, _(" of every month"));
 	} else {
+		// #1: interval
 		g_string_append_printf(result, _(" of every %d months"), rrule->interval);
 	}
 
@@ -713,9 +732,20 @@ vevent_recurrence_monthly(const struct icalrecurrencetype *rrule, const icaltime
 static GString *
 vevent_recurrence_yearly(const struct icalrecurrencetype *rrule, const icaltimetype *start)
 {
-	static const gchar *mon_name[12] =
-		{ N_("January"), N_("February"), N_("March"), N_("April"), N_("May"), N_("June"),
-		  N_("July"), N_("August"), N_("September"), N_("October"), N_("November"), N_("December") };
+	static const gchar *mon_name[12] = {
+		NC_("name_of_month", "January"),
+		NC_("name_of_month", "February"),
+		NC_("name_of_month", "March"),
+		NC_("name_of_month", "April"),
+		NC_("name_of_month", "May"),
+		NC_("name_of_month", "June"),
+		NC_("name_of_month", "July"),
+		NC_("name_of_month", "August"),
+		NC_("name_of_month", "September"),
+		NC_("name_of_month", "October"),
+		NC_("name_of_month", "November"),
+		NC_("name_of_month", "December")
+	};
 	GString *result = g_string_new(NULL);
 
 	/* rules which are too complex for Lightning, so ignore them here, too... */
@@ -743,8 +773,13 @@ vevent_recurrence_yearly(const struct icalrecurrencetype *rrule, const icaltimet
 			day_ordinal_append(day, rrule->by_month_day[0], _("day"), NULL);
 		}
 		if (rrule->interval == 1) {
+			// #1: name of month (defined in the name_of_month context)
+			// #2: day of week (defined in the day_of_week context)
 			g_string_append_printf(result, _("every %s %s"), month, day->str);
 		} else {
+			// #1: interval
+			// #2: name of month (defined in the name_of_month context)
+			// #3: day of week (defined in the day_of_week context)
 			g_string_append_printf(result, _("every %d years on %s %s"), rrule->interval, month, day->str);
 		}
 		g_string_free(day, TRUE);
@@ -755,8 +790,11 @@ vevent_recurrence_yearly(const struct icalrecurrencetype *rrule, const icaltimet
 		if (ical_check_bydays(rrule, 0x7cU)) {
 			/* every day of the month */
 			if (rrule->interval == 1) {
+				// #1: name of month (defined in the name_of_month context)
 				g_string_append_printf(result, _("every day of %s"), month);
 			} else {
+				// #1: interval
+				// #2: name of month (defined in the name_of_month context)
 				g_string_append_printf(result, _("every %d years every day of %s"), rrule->interval, month);
 			}
 		} else if (rrule->by_day[1] == ICAL_RECURRENCE_ARRAY_MAX) {
@@ -767,8 +805,13 @@ vevent_recurrence_yearly(const struct icalrecurrencetype *rrule, const icaltimet
 			day_of_week = icalrecurrencetype_day_day_of_week(rrule->by_day[0]);
 			if (day_pos == 0) {
 				if (rrule->interval == 1) {
+					// #1: day of week (defined in the day_of_week context)
+					// #2: name of month (defined in the name_of_month context)
 					g_string_append_printf(result, _("every %s of %s"), day_name(day_of_week - 1), month);
 				} else {
+					// #1: interval
+					// #2: day of week (defined in the day_of_week context)
+					// #3: name of month (defined in the name_of_month context)
 					g_string_append_printf(result, _("every %d years on every %s of %s"), rrule->interval,
 						day_name(day_of_week - 1), month);
 				}
@@ -777,8 +820,13 @@ vevent_recurrence_yearly(const struct icalrecurrencetype *rrule, const icaltimet
 
 				day_ordinal_append(day, day_pos, day_name(day_of_week - 1), day_name(day_of_week - 1));
 				if (rrule->interval == 1) {
+					// #1: day of week (defined in the day_of_week context)
+					// #2: name of month (defined in the name_of_month context)
 					g_string_append_printf(result, _("the %s of every %s"), day->str, month);
 				} else {
+					// #1: interval
+					// #2: day of week (defined in the day_of_week context)
+					// #3: name of month (defined in the name_of_month context)
 					g_string_append_printf(result, _("every %d years on the %s of %s"), rrule->interval, day->str, month);
 				}
 				g_string_free(day, TRUE);
@@ -810,13 +858,13 @@ libbalsa_vevent_recurrence_str(LibBalsaVEvent *event, const gchar *format_str)
 
 		switch (event->rrule.freq) {
 		case ICAL_SECONDLY_RECURRENCE:
-			buffer = g_string_new(_("secondly"));
+			buffer = g_string_new(C_("ical_recurrence", "secondly"));
 			break;
 		case ICAL_MINUTELY_RECURRENCE:
-			buffer = g_string_new(_("minutely"));
+			buffer = g_string_new(C_("ical_recurrence", "minutely"));
 			break;
 		case ICAL_HOURLY_RECURRENCE:
-			buffer = g_string_new(_("hourly"));
+			buffer = g_string_new(C_("ical_recurrence", "hourly"));
 			break;
 		case ICAL_DAILY_RECURRENCE:
 	    	buffer = vevent_recurrence_daily(&event->rrule);
@@ -836,12 +884,12 @@ libbalsa_vevent_recurrence_str(LibBalsaVEvent *event, const gchar *format_str)
 
 		/* end timestamp or count */
 		if (event->rrule.count > 0) {
-			g_string_append_printf(buffer, ", %d ", event->rrule.count);
-			g_string_append(buffer, ngettext(_("occurrence"), _("occurrences"), event->rrule.count));
+			g_string_append(buffer, ngettext(", %d occurrence", ", %d occurrences", event->rrule.count));
 		} else if (icaltime_is_null_time(event->rrule.until) == 0) {
 			gchar *timestr;
 
 			timestr = icaltime_str(event->rrule.until, format_str);
+			// #1: time string
 			g_string_append_printf(buffer, _(" until %s"), timestr);
 			g_free(timestr);
 		} else {
@@ -1117,11 +1165,11 @@ vcal_role_to_str(icalparameter_role role)
     	icalparameter_role role;
     	gchar *role_str;
     } roles[] = {
-    	{ ICAL_ROLE_NONE, N_("unknown") },
-    	{ ICAL_ROLE_CHAIR, N_("chair") },
-		{ ICAL_ROLE_REQPARTICIPANT, N_("required participant") },
-		{ ICAL_ROLE_OPTPARTICIPANT, N_("optional participant") },
-		{ ICAL_ROLE_NONPARTICIPANT, N_("non-participant, information only") }
+		{ ICAL_ROLE_NONE, NC_("ical_role", "unknown") },
+		{ ICAL_ROLE_CHAIR, NC_("ical_role", "chair") },
+		{ ICAL_ROLE_REQPARTICIPANT, NC_("ical_role", "required participant") },
+		{ ICAL_ROLE_OPTPARTICIPANT, NC_("ical_role", "optional participant") },
+		{ ICAL_ROLE_NONPARTICIPANT, NC_("ical_role", "non-participant, information only") }
     };
     guint n;
 

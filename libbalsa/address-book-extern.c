@@ -281,7 +281,7 @@ libbalsa_address_book_externq_add_address(LibBalsaAddressBook * ab,
                    full_name, "TODO");
         if ((gc = popen(command, "r")) == NULL)
             return LBABERR_CANNOT_WRITE;
-        if (fclose(gc) != 0)
+        if (pclose(gc) != 0)
             return LBABERR_CANNOT_WRITE;
 
         return LBABERR_OK;

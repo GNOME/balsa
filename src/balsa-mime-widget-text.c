@@ -1441,7 +1441,7 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
 
     if (rex != NULL) {
         invisible = gtk_text_buffer_create_tag(buffer, "hide-cite",
-                                               "size-points", (gdouble) 0.01,
+                                               "invisible", TRUE,
                                                NULL);
     } else {
         invisible = NULL;
@@ -1501,8 +1501,7 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
                 text_body += cite_idx;
 
                 /* append a zero-width space if the remainder of the line is
-                 * empty, as otherwise the line is not visible (i.e.
-                 * completely 0.01 pts high)... */
+                 * empty, as otherwise the line is not visible */
                 if (text_body == line_end || *text_body == '\r')
                     gtk_text_buffer_insert_at_cursor(buffer, "\xE2\x80\x8B", 3);
             }

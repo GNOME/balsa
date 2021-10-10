@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2021-06-20 09:00+0000\n"
-"PO-Revision-Date: 2021-07-01 21:34+0200\n"
+"POT-Creation-Date: 2021-10-10 22:12+0000\n"
+"PO-Revision-Date: 2021-10-11 01:43+0200\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -23,7 +23,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 #: ../balsa.appdata.xml.in.h:1
 msgid ""
@@ -479,9 +479,7 @@ msgstr ""
 "Nyckelfingeravtryck: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:237 ../libbalsa/imap/imap-handle.c:46
-#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc2445.c:415
-#: ../libbalsa/rfc2445.c:444 ../libbalsa/rfc2445.c:467
-#: ../libbalsa/rfc2445.c:1120 ../libbalsa/rfc3156.c:689
+#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:689
 #: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5312
 msgid "unknown"
 msgstr "okänd"
@@ -1835,8 +1833,8 @@ msgstr ""
 msgid "Mailbox does not exist."
 msgstr "Postlådan existerar inte."
 
-#: ../libbalsa/mailbox_maildir.c:908 ../libbalsa/mailbox_mbox.c:1936
-#: ../libbalsa/mailbox_mh.c:1086
+#: ../libbalsa/mailbox_maildir.c:908 ../libbalsa/mailbox_mbox.c:1935
+#: ../libbalsa/mailbox_mh.c:1087
 #, c-format
 msgid "Data copy error"
 msgstr "Datakopieringsfel"
@@ -1846,7 +1844,7 @@ msgstr "Datakopieringsfel"
 msgid "Mailbox %s does not appear to be an mbox mailbox."
 msgstr "Postlådan %s verkar inte vara en mbox-postlåda."
 
-#: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:278
+#: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:280
 #, c-format
 msgid "Could not remove %s: %s"
 msgstr "Kunde inte ta bort %s: %s"
@@ -1887,48 +1885,48 @@ msgstr "Postlådan är inte i mbox-formatet."
 msgid "Cannot lock mailbox."
 msgstr "Det går inte att låsa postlåda."
 
-#: ../libbalsa/mailbox_mbox.c:1892
+#: ../libbalsa/mailbox_mbox.c:1891
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: kunde inte öppna %s."
 
-#: ../libbalsa/mailbox_mbox.c:1904
+#: ../libbalsa/mailbox_mbox.c:1903
 #, c-format
 msgid "%s: could not get new MIME stream."
 msgstr "%s: kunde inte få tag i nytt MIME-flöde."
 
 # c-format
-#: ../libbalsa/mailbox_mbox.c:1912
+#: ../libbalsa/mailbox_mbox.c:1911
 #, c-format
 msgid "%s: %s is not in mbox format."
 msgstr "%s: %s är inte i mbox-formatet."
 
-#: ../libbalsa/mailbox_mh.c:155
+#: ../libbalsa/mailbox_mh.c:157
 #, c-format
 msgid "Mailbox %s does not appear to be an MH mailbox."
 msgstr "Postlådan %s verkar inte vara en MH-postlåda."
 
-#: ../libbalsa/mailbox_mh.c:165
+#: ../libbalsa/mailbox_mh.c:167
 #, c-format
 msgid "Could not create MH directory at %s (%s)"
 msgstr "Kunde inte skapa en MH-katalog på %s (%s)"
 
-#: ../libbalsa/mailbox_mh.c:177
+#: ../libbalsa/mailbox_mh.c:179
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Kunde inte skapa MH-struktur på %s (%s)"
 
-#: ../libbalsa/mailbox_mh.c:272
+#: ../libbalsa/mailbox_mh.c:274
 #, c-format
 msgid "Could not remove contents of %s: %s"
 msgstr "Kunde inte ta bort innehållet i %s: %s"
 
-#: ../libbalsa/mailbox_mh.c:1068
+#: ../libbalsa/mailbox_mh.c:1069
 #, c-format
 msgid "Cannot create message"
 msgstr "Det går inte att skapa meddelande"
 
-#: ../libbalsa/mailbox_mh.c:1111
+#: ../libbalsa/mailbox_mh.c:1112
 #, c-format
 msgid "Message rename error"
 msgstr "Fel vid namnbyte på meddelande"
@@ -2140,8 +2138,8 @@ msgid_plural "weeks"
 msgstr[0] "vecka"
 msgstr[1] "veckor"
 
-#: ../libbalsa/rfc2445.c:371 ../libbalsa/rfc2445.c:696
-#: ../libbalsa/rfc2445.c:700 ../libbalsa/rfc2445.c:743
+#: ../libbalsa/rfc2445.c:371 ../libbalsa/rfc2445.c:714
+#: ../libbalsa/rfc2445.c:718 ../libbalsa/rfc2445.c:773
 msgid "day"
 msgid_plural "days"
 msgstr[0] "dag"
@@ -2165,305 +2163,393 @@ msgid_plural "seconds"
 msgstr[0] "sekund"
 msgstr[1] "sekunder"
 
+#: ../libbalsa/rfc2445.c:415
+msgctxt "ical_status"
+msgid "unknown"
+msgstr "okänd"
+
 #: ../libbalsa/rfc2445.c:416
+msgctxt "ical_status"
 msgid "event is tentative"
 msgstr "händelse är preliminär"
 
 #: ../libbalsa/rfc2445.c:417
+msgctxt "ical_status"
 msgid "event is definite"
 msgstr "händelse är slutgiltig"
 
 #: ../libbalsa/rfc2445.c:418
+msgctxt "ical_status"
 msgid "event was cancelled"
 msgstr "händelse avbröts"
 
+#: ../libbalsa/rfc2445.c:444
+msgctxt "ical_method"
+msgid "unknown"
+msgstr "okänd"
+
 #: ../libbalsa/rfc2445.c:445
+msgctxt "ical_method"
 msgid "Event Notification"
-msgstr "Händelsenotifiering"
+msgstr "Händelseavisering"
 
 #: ../libbalsa/rfc2445.c:446
+msgctxt "ical_method"
 msgid "Event Request"
 msgstr "Händelsebegäran"
 
 #: ../libbalsa/rfc2445.c:447
+msgctxt "ical_method"
 msgid "Reply to Event Request"
 msgstr "Svara på händelsebegäran"
 
 #: ../libbalsa/rfc2445.c:448
+msgctxt "ical_method"
 msgid "Event Cancellation"
 msgstr "Avbryt händelse"
 
+#: ../libbalsa/rfc2445.c:467
+msgctxt "ical_partstat"
+msgid "unknown"
+msgstr "okänd"
+
 #: ../libbalsa/rfc2445.c:468
+msgctxt "ical_partstat"
 msgid "needs action"
 msgstr "kräver åtgärd"
 
 #: ../libbalsa/rfc2445.c:469
+msgctxt "ical_partstat"
 msgid "accepted"
 msgstr "accepterad"
 
 #: ../libbalsa/rfc2445.c:470
+msgctxt "ical_partstat"
 msgid "declined"
 msgstr "nekad"
 
 #: ../libbalsa/rfc2445.c:471
+msgctxt "ical_partstat"
 msgid "tentatively accepted"
 msgstr "preliminärt accepterad"
 
 #: ../libbalsa/rfc2445.c:472
+msgctxt "ical_partstat"
 msgid "delegated"
 msgstr "delegerad"
 
 #: ../libbalsa/rfc2445.c:515
+msgctxt "day_of_week"
 msgid "Sunday"
 msgstr "söndag"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:516
+msgctxt "day_of_week"
 msgid "Monday"
 msgstr "måndag"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:517
+msgctxt "day_of_week"
 msgid "Tuesday"
 msgstr "tisdag"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:518
+msgctxt "day_of_week"
 msgid "Wednesday"
 msgstr "onsdag"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:519
+msgctxt "day_of_week"
 msgid "Thursday"
 msgstr "torsdag"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:520
+msgctxt "day_of_week"
 msgid "Friday"
 msgstr "fredag"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:521
+msgctxt "day_of_week"
 msgid "Saturday"
 msgstr "lördag"
 
-#: ../libbalsa/rfc2445.c:546
+#: ../libbalsa/rfc2445.c:553
 msgid "every weekday"
 msgstr "varje vardag"
 
-#: ../libbalsa/rfc2445.c:548
+#: ../libbalsa/rfc2445.c:555
 msgid "every day"
 msgstr "varje dag"
 
-#: ../libbalsa/rfc2445.c:550
+#. #1: interval
+#: ../libbalsa/rfc2445.c:558
 #, c-format
 msgid "every %d days"
 msgstr "var %d dag"
 
-#: ../libbalsa/rfc2445.c:565
+#: ../libbalsa/rfc2445.c:573
 msgid "every "
 msgstr "varje "
 
-#: ../libbalsa/rfc2445.c:567
+#. #1: interval
+#: ../libbalsa/rfc2445.c:576
 #, c-format
 msgid "every %d weeks on "
 msgstr "var %d vecka på "
 
-#: ../libbalsa/rfc2445.c:574 ../libbalsa/rfc2445.c:676
+#. #1: the day of week (defined in the day_of_week context)
+#. #1: recurrence expression
+#: ../libbalsa/rfc2445.c:584 ../libbalsa/rfc2445.c:694
 #, c-format
 msgid " and %s"
 msgstr " och %s"
 
-#: ../libbalsa/rfc2445.c:579
+#: ../libbalsa/rfc2445.c:589
 msgid "every week"
 msgstr "varje vecka"
 
-#: ../libbalsa/rfc2445.c:581
+#. #1: interval
+#: ../libbalsa/rfc2445.c:592
 #, c-format
 msgid "every %d weeks"
 msgstr "var %d vecka"
 
-#: ../libbalsa/rfc2445.c:592
+#: ../libbalsa/rfc2445.c:603
 msgid "the last"
 msgstr "den sista"
 
-#: ../libbalsa/rfc2445.c:599
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:611
 #, c-format
 msgid "%dst"
 msgstr "%d:a"
 
-#: ../libbalsa/rfc2445.c:602
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:615
 #, c-format
 msgid "%dnd"
 msgstr "%d:a"
 
-#: ../libbalsa/rfc2445.c:605
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:619
 #, c-format
 msgid "%drd"
 msgstr "%d:e"
 
-#: ../libbalsa/rfc2445.c:608
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:623
 #, c-format
 msgid "%dth"
 msgstr "%d:e"
 
-#: ../libbalsa/rfc2445.c:626
+#: ../libbalsa/rfc2445.c:641
 msgid "every day of every month"
 msgstr "varje dag i varje månad"
 
 # TODO: ordinal på siffror eller annan lösning skulle ev passa bättre för svenska
-#: ../libbalsa/rfc2445.c:628
+#. #1: interval
+#: ../libbalsa/rfc2445.c:644
 #, c-format
 msgid "every day of the month every %d months"
 msgstr "varje dag i månaden var %d månad"
 
 #. currently we don't support yearly rules with more than one BYDAY element or exactly 7 elements with all the weekdays
 #. * (the "every day" case)
-#: ../libbalsa/rfc2445.c:643 ../libbalsa/rfc2445.c:687
-#: ../libbalsa/rfc2445.c:724 ../libbalsa/rfc2445.c:786
-#: ../libbalsa/rfc2445.c:791 ../libbalsa/rfc2445.c:794
+#: ../libbalsa/rfc2445.c:659 ../libbalsa/rfc2445.c:705
+#: ../libbalsa/rfc2445.c:754 ../libbalsa/rfc2445.c:834
+#: ../libbalsa/rfc2445.c:839 ../libbalsa/rfc2445.c:842
 msgid "rule too complex"
 msgstr "regeln är för komplex"
 
-#: ../libbalsa/rfc2445.c:649
+#. #1: the day of week (defined in the day_of_week context)
+#: ../libbalsa/rfc2445.c:666
 #, c-format
 msgid "every %s"
 msgstr "varje %s"
 
-#: ../libbalsa/rfc2445.c:693
+#: ../libbalsa/rfc2445.c:711
 msgid " and "
 msgstr " och "
 
-#: ../libbalsa/rfc2445.c:704
+#: ../libbalsa/rfc2445.c:722
 msgid " of every month"
 msgstr " varje månad"
 
 # TODO: ordinal på siffror eller annan lösning skulle ev passa bättre för svenska
-#: ../libbalsa/rfc2445.c:706
+#. #1: interval
+#: ../libbalsa/rfc2445.c:725
 #, c-format
 msgid " of every %d months"
 msgstr " var %d månad"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:736
+msgctxt "name_of_month"
 msgid "January"
 msgstr "januari"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:737
+msgctxt "name_of_month"
 msgid "February"
 msgstr "februari"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:738
+msgctxt "name_of_month"
 msgid "March"
 msgstr "mars"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:739
+msgctxt "name_of_month"
 msgid "April"
 msgstr "april"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:740
+msgctxt "name_of_month"
 msgid "May"
 msgstr "maj"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:741
+msgctxt "name_of_month"
 msgid "June"
 msgstr "juni"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:742
+msgctxt "name_of_month"
 msgid "July"
 msgstr "juli"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:743
+msgctxt "name_of_month"
 msgid "August"
 msgstr "augusti"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:744
+msgctxt "name_of_month"
 msgid "September"
 msgstr "september"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:745
+msgctxt "name_of_month"
 msgid "October"
 msgstr "oktober"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:746
+msgctxt "name_of_month"
 msgid "November"
 msgstr "november"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:747
+msgctxt "name_of_month"
 msgid "December"
 msgstr "december"
 
-#: ../libbalsa/rfc2445.c:746
+#. #1: name of month (defined in the name_of_month context)
+#. #2: day of week (defined in the day_of_week context)
+#: ../libbalsa/rfc2445.c:778
 #, c-format
 msgid "every %s %s"
 msgstr "varje år %2$s %1$s"
 
-#: ../libbalsa/rfc2445.c:748
+#. #1: interval
+#. #2: name of month (defined in the name_of_month context)
+#. #3: day of week (defined in the day_of_week context)
+#: ../libbalsa/rfc2445.c:783
 #, c-format
 msgid "every %d years on %s %s"
 msgstr "med %1$d års mellanrum %3$s %2$s"
 
-#: ../libbalsa/rfc2445.c:758
+#. #1: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:794
 #, c-format
 msgid "every day of %s"
 msgstr "varje dag i %s"
 
-#: ../libbalsa/rfc2445.c:760
+#. #1: interval
+#. #2: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:798
 #, c-format
 msgid "every %d years every day of %s"
 msgstr "med %d års mellanrum, varje dag i %s"
 
-#: ../libbalsa/rfc2445.c:770
+#. #1: day of week (defined in the day_of_week context)
+#. #2: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:810
 #, c-format
 msgid "every %s of %s"
 msgstr "varje %s i %s"
 
-#: ../libbalsa/rfc2445.c:772
+#. #1: interval
+#. #2: day of week (defined in the day_of_week context)
+#. #3: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:815
 #, c-format
 msgid "every %d years on every %s of %s"
 msgstr "med %d års mellanrum, varje %s i %s"
 
-#: ../libbalsa/rfc2445.c:780
+#. #1: day of week (defined in the day_of_week context)
+#. #2: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:825
 #, c-format
 msgid "the %s of every %s"
 msgstr "den %s varje %s"
 
-#: ../libbalsa/rfc2445.c:782
+#. #1: interval
+#. #2: day of week (defined in the day_of_week context)
+#. #3: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:830
 #, c-format
 msgid "every %d years on the %s of %s"
 msgstr "med %d års mellanrum, den %s %s"
 
-#: ../libbalsa/rfc2445.c:813
+#: ../libbalsa/rfc2445.c:861
+msgctxt "ical_recurrence"
 msgid "secondly"
 msgstr "varje sekund"
 
-#: ../libbalsa/rfc2445.c:816
+#: ../libbalsa/rfc2445.c:864
+msgctxt "ical_recurrence"
 msgid "minutely"
 msgstr "varje minut"
 
-#: ../libbalsa/rfc2445.c:819
+#: ../libbalsa/rfc2445.c:867
+msgctxt "ical_recurrence"
 msgid "hourly"
 msgstr "varje timme"
 
-#: ../libbalsa/rfc2445.c:840
-msgid "occurrence"
-msgstr "förekomst"
+#: ../libbalsa/rfc2445.c:887
+#, c-format
+msgid ", %d occurrence"
+msgid_plural ", %d occurrences"
+msgstr[0] ", %d förekomst"
+msgstr[1] ", %d förekomster"
 
-#: ../libbalsa/rfc2445.c:840
-msgid "occurrences"
-msgstr "förekomster"
-
-#: ../libbalsa/rfc2445.c:845
+#. #1: time string
+#: ../libbalsa/rfc2445.c:893
 #, c-format
 msgid " until %s"
 msgstr " till %s"
 
-#: ../libbalsa/rfc2445.c:1121
+#: ../libbalsa/rfc2445.c:1168
+msgctxt "ical_role"
+msgid "unknown"
+msgstr "okänd"
+
+#: ../libbalsa/rfc2445.c:1169
+msgctxt "ical_role"
 msgid "chair"
 msgstr "ansvarig"
 
-#: ../libbalsa/rfc2445.c:1122
+#: ../libbalsa/rfc2445.c:1170
+msgctxt "ical_role"
 msgid "required participant"
 msgstr "nödvändig deltagare"
 
-#: ../libbalsa/rfc2445.c:1123
+#: ../libbalsa/rfc2445.c:1171
+msgctxt "ical_role"
 msgid "optional participant"
 msgstr "valfri deltagare"
 
-#: ../libbalsa/rfc2445.c:1124
+#: ../libbalsa/rfc2445.c:1172
+msgctxt "ical_role"
 msgid "non-participant, information only"
 msgstr "icke-deltagare, endast för information"
 
@@ -2650,17 +2736,17 @@ msgid_plural "Transmitted %u messages to %s"
 msgstr[0] "Överförde %u meddelande till %s"
 msgstr[1] "Överförde %u meddelanden till %s"
 
-#: ../libbalsa/send.c:1260 ../libbalsa/send.c:1328
+#: ../libbalsa/send.c:1265 ../libbalsa/send.c:1333
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Det går inte att läsa %s: %s"
 
-#: ../libbalsa/send.c:1263 ../libbalsa/send.c:1331
+#: ../libbalsa/send.c:1268 ../libbalsa/send.c:1336
 #, c-format
 msgid "Cannot read %s"
 msgstr "Det går inte att läsa %s"
 
-#: ../libbalsa/send.c:1295
+#: ../libbalsa/send.c:1300
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2668,7 +2754,7 @@ msgstr ""
 "Det går inte att avgöra teckentabellen för textfilen ”%s”, skickar som MIME-"
 "typen ”%s”"
 
-#: ../libbalsa/send.c:1823 ../libbalsa/send.c:1921
+#: ../libbalsa/send.c:1828 ../libbalsa/send.c:1926
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] ""
@@ -7935,6 +8021,9 @@ msgstr "Bifoga ö_ppen GnuPG-nyckel"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Använd kontrollsekvenser för specialtecken"
+
+#~ msgid "occurrences"
+#~ msgstr "förekomster"
 
 #~ msgid "libbalsa_mailbox_get_message: mailbox %s is closed"
 #~ msgstr "libbalsa_mailbox_get_message: postlådan %s är stängd"

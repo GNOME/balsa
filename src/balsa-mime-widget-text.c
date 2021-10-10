@@ -150,6 +150,7 @@ struct _BalsaMimeWidgetText {
     GList               *cite_bar_list;
     gint                 cite_bar_dimension;
     gint                 phrase_hl;
+    GtkTextTag          *invisible;
 };
 
 G_DEFINE_TYPE(BalsaMimeWidgetText, balsa_mime_widget_text, BALSA_TYPE_MIME_WIDGET)
@@ -977,8 +978,7 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     GtkTextView * view;
     GtkTextBuffer * buffer;
     gint dimension;
-    GdkRectangle location;
-    gint x_pos;
+    gint buffer_y;
     gint y_pos;
     gint height;
 
@@ -997,14 +997,14 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     }
 
     /* get the locations */
-    gtk_text_view_get_iter_location(view, &bar->start_iter, &location);
+    gtk_text_view_get_line_yrange(view, &bar->start_iter, &buffer_y, NULL);
     gtk_text_view_buffer_to_window_coords(view, GTK_TEXT_WINDOW_TEXT,
-                                          location.x, location.y,
-                                          &x_pos, &y_pos);
-    gtk_text_view_get_iter_location(view, &bar->end_iter, &location);
+                                          0, buffer_y,
+                                          NULL, &y_pos);
+    gtk_text_view_get_line_yrange(view, &bar->end_iter, &buffer_y, NULL);
     gtk_text_view_buffer_to_window_coords(view, GTK_TEXT_WINDOW_TEXT,
-                                          location.x, location.y,
-                                          &x_pos, &height);
+                                          0, buffer_y,
+                                          NULL, &height);
     height -= y_pos;
 
     /* add a new widget if necessary */
@@ -1411,7 +1411,6 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
     GdkScreen *screen;
     GtkTextBuffer *buffer;
     GdkRGBA *rgba;
-    GtkTextTag *invisible;
     LibBalsaUrlInsertInfo url_info;
     guint cite_level;
     guint cite_start;
@@ -1440,11 +1439,11 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
                                NULL);
 
     if (rex != NULL) {
-        invisible = gtk_text_buffer_create_tag(buffer, "hide-cite",
-                                               "invisible", TRUE,
-                                               NULL);
+        mwt->invisible = gtk_text_buffer_create_tag(buffer, "hide-cite",
+                                                    "size-points", (gdouble) 0.0,
+                                                    NULL);
     } else {
-        invisible = NULL;
+        mwt->invisible = NULL;
     }
 
     mwt->url_list = NULL;
@@ -1497,11 +1496,12 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
                 gtk_text_buffer_insert_with_tags(buffer, &cite_iter,
                                                  text_body,
                                                  cite_idx,
-                                                 tag, invisible, NULL);
+                                                 tag, mwt->invisible, NULL);
                 text_body += cite_idx;
 
                 /* append a zero-width space if the remainder of the line is
-                 * empty, as otherwise the line is not visible */
+                 * empty, as otherwise the line is not visible (i.e.
+                 * completely 0.01 pts high)... */
                 if (text_body == line_end || *text_body == '\r')
                     gtk_text_buffer_insert_at_cursor(buffer, "\xE2\x80\x8B", 3);
             }

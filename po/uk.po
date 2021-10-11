@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2021-06-20 09:00+0000\n"
-"PO-Revision-Date: 2021-06-20 14:22+0300\n"
+"POT-Creation-Date: 2021-10-10 22:12+0000\n"
+"PO-Revision-Date: 2021-10-11 09:05+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -479,9 +479,7 @@ msgstr ""
 "Відбиток ключа: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:237 ../libbalsa/imap/imap-handle.c:46
-#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc2445.c:415
-#: ../libbalsa/rfc2445.c:444 ../libbalsa/rfc2445.c:467
-#: ../libbalsa/rfc2445.c:1120 ../libbalsa/rfc3156.c:689
+#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:689
 #: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5312
 msgid "unknown"
 msgstr "невідомо"
@@ -573,7 +571,6 @@ msgid "_Download images"
 msgstr "_Отримати зображення"
 
 #: ../libbalsa/html-pref-db.c:136
-#| msgid "_Preferences"
 msgid "HTML preferences"
 msgstr "Налаштування HTML"
 
@@ -583,35 +580,29 @@ msgstr "Відправник"
 
 #: ../libbalsa/html-pref-db.c:194
 msgid "Prefer HTML"
-msgstr ""
-"Перевага HTML"
+msgstr "Перевага HTML"
 
 #: ../libbalsa/html-pref-db.c:202
-#| msgid "_Download images"
 msgid "Auto-load images"
 msgstr "Автоматично завантажувати зображення"
 
 #: ../libbalsa/html-pref-db.c:267
 #, c-format
-#| msgid "cannot initialise Autocrypt database “%s”: %s"
 msgid "Cannot initialise HTML preferences database “%s”: %s"
 msgstr "Не вдалося ініціалізувати базу даних налаштувань HTML «%s»: %s"
 
 #: ../libbalsa/html-pref-db.c:313
 #, c-format
-#| msgid "Cannot read the file “%s”: %s"
 msgid "Cannot read HTML preferences for “%s”: %s"
 msgstr "Не вдалося прочитати налаштування HTML для «%s»: %s"
 
 #: ../libbalsa/html-pref-db.c:366
 #, c-format
-#| msgid "Cannot read the file “%s”: %s"
 msgid "Cannot save HTML preferences for “%s”: %s"
 msgstr "Не вдалося зберегти налаштування HTML для «%s»: %s"
 
 #: ../libbalsa/html-pref-db.c:474
 #, c-format
-#| msgid "Cannot add duplicate entry"
 msgid "Cannot delete database entry: %s"
 msgstr "Не вдалося вилучити запис бази даних: %s"
 
@@ -1882,8 +1873,8 @@ msgstr ""
 msgid "Mailbox does not exist."
 msgstr "Поштова скринька не існує."
 
-#: ../libbalsa/mailbox_maildir.c:908 ../libbalsa/mailbox_mbox.c:1936
-#: ../libbalsa/mailbox_mh.c:1086
+#: ../libbalsa/mailbox_maildir.c:908 ../libbalsa/mailbox_mbox.c:1935
+#: ../libbalsa/mailbox_mh.c:1087
 #, c-format
 msgid "Data copy error"
 msgstr "Помилка копіювання даних"
@@ -1893,7 +1884,7 @@ msgstr "Помилка копіювання даних"
 msgid "Mailbox %s does not appear to be an mbox mailbox."
 msgstr "Поштова скринька «%s» не схожа на скриньку mbox."
 
-#: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:278
+#: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:280
 #, c-format
 msgid "Could not remove %s: %s"
 msgstr "Не вдалося вилучити %s: %s"
@@ -1933,47 +1924,47 @@ msgstr "Поштову скриньку записано не у форматі 
 msgid "Cannot lock mailbox."
 msgstr "Не вдалося заблокувати поштову скриньку."
 
-#: ../libbalsa/mailbox_mbox.c:1892
+#: ../libbalsa/mailbox_mbox.c:1891
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: не вдається відкрити %s."
 
-#: ../libbalsa/mailbox_mbox.c:1904
+#: ../libbalsa/mailbox_mbox.c:1903
 #, c-format
 msgid "%s: could not get new MIME stream."
 msgstr "%s: не вдалося отримати новий потік даних MIME."
 
-#: ../libbalsa/mailbox_mbox.c:1912
+#: ../libbalsa/mailbox_mbox.c:1911
 #, c-format
 msgid "%s: %s is not in mbox format."
 msgstr "%s: %s не є файлом у форматі mbox."
 
-#: ../libbalsa/mailbox_mh.c:155
+#: ../libbalsa/mailbox_mh.c:157
 #, c-format
 msgid "Mailbox %s does not appear to be an MH mailbox."
 msgstr "Поштова скринька «%s» не схожа на скриньку MH."
 
-#: ../libbalsa/mailbox_mh.c:165
+#: ../libbalsa/mailbox_mh.c:167
 #, c-format
 msgid "Could not create MH directory at %s (%s)"
 msgstr "Не вдалося створити каталог MH на %s (%s)"
 
-#: ../libbalsa/mailbox_mh.c:177
+#: ../libbalsa/mailbox_mh.c:179
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Не вдалося створити структуру MH на %s (%s)"
 
-#: ../libbalsa/mailbox_mh.c:272
+#: ../libbalsa/mailbox_mh.c:274
 #, c-format
 msgid "Could not remove contents of %s: %s"
 msgstr "Не вдалося вилучити вміст %s: %s"
 
-#: ../libbalsa/mailbox_mh.c:1068
+#: ../libbalsa/mailbox_mh.c:1069
 #, c-format
 msgid "Cannot create message"
 msgstr "Не вдалося створити повідомлення"
 
-#: ../libbalsa/mailbox_mh.c:1111
+#: ../libbalsa/mailbox_mh.c:1112
 #, c-format
 msgid "Message rename error"
 msgstr "Помилка під час спроби перейменувати повідомлення"
@@ -2192,8 +2183,8 @@ msgstr[1] "тижнів"
 msgstr[2] "тижнів"
 msgstr[3] "тиждень"
 
-#: ../libbalsa/rfc2445.c:371 ../libbalsa/rfc2445.c:696
-#: ../libbalsa/rfc2445.c:700 ../libbalsa/rfc2445.c:743
+#: ../libbalsa/rfc2445.c:371 ../libbalsa/rfc2445.c:714
+#: ../libbalsa/rfc2445.c:718 ../libbalsa/rfc2445.c:773
 msgid "day"
 msgid_plural "days"
 msgstr[0] "день"
@@ -2225,303 +2216,436 @@ msgstr[1] "другий"
 msgstr[2] "другий"
 msgstr[3] "другий"
 
+#: ../libbalsa/rfc2445.c:415
+#| msgid "unknown"
+msgctxt "ical_status"
+msgid "unknown"
+msgstr "невідомо"
+
 #: ../libbalsa/rfc2445.c:416
+#| msgid "event is tentative"
+msgctxt "ical_status"
 msgid "event is tentative"
 msgstr "подія є обумовленою"
 
 #: ../libbalsa/rfc2445.c:417
+#| msgid "event is definite"
+msgctxt "ical_status"
 msgid "event is definite"
 msgstr "подія є певною"
 
 #: ../libbalsa/rfc2445.c:418
+#| msgid "event was cancelled"
+msgctxt "ical_status"
 msgid "event was cancelled"
 msgstr "подію скасовано"
 
+#: ../libbalsa/rfc2445.c:444
+#| msgid "unknown"
+msgctxt "ical_method"
+msgid "unknown"
+msgstr "невідомо"
+
 #: ../libbalsa/rfc2445.c:445
+#| msgid "Event Notification"
+msgctxt "ical_method"
 msgid "Event Notification"
 msgstr "Сповіщення про події"
 
 #: ../libbalsa/rfc2445.c:446
+#| msgid "Event Request"
+msgctxt "ical_method"
 msgid "Event Request"
 msgstr "Запит щодо події"
 
 #: ../libbalsa/rfc2445.c:447
+#| msgid "Reply to Event Request"
+msgctxt "ical_method"
 msgid "Reply to Event Request"
 msgstr "Відповісти на запит щодо події"
 
 #: ../libbalsa/rfc2445.c:448
+#| msgid "Event Cancellation"
+msgctxt "ical_method"
 msgid "Event Cancellation"
 msgstr "Скасування події"
 
+#: ../libbalsa/rfc2445.c:467
+#| msgid "unknown"
+msgctxt "ical_partstat"
+msgid "unknown"
+msgstr "невідомо"
+
 #: ../libbalsa/rfc2445.c:468
+#| msgid "needs action"
+msgctxt "ical_partstat"
 msgid "needs action"
 msgstr "потребує дії"
 
 #: ../libbalsa/rfc2445.c:469
+#| msgid "accepted"
+msgctxt "ical_partstat"
 msgid "accepted"
 msgstr "прийнято"
 
 #: ../libbalsa/rfc2445.c:470
+#| msgid "declined"
+msgctxt "ical_partstat"
 msgid "declined"
 msgstr "відхилено"
 
 #: ../libbalsa/rfc2445.c:471
+#| msgid "tentatively accepted"
+msgctxt "ical_partstat"
 msgid "tentatively accepted"
 msgstr "умовно прийнято"
 
 #: ../libbalsa/rfc2445.c:472
+#| msgid "delegated"
+msgctxt "ical_partstat"
 msgid "delegated"
 msgstr "доручено"
 
 #: ../libbalsa/rfc2445.c:515
+#| msgid "Sunday"
+msgctxt "day_of_week"
 msgid "Sunday"
 msgstr "Неділя"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:516
+#| msgid "Monday"
+msgctxt "day_of_week"
 msgid "Monday"
 msgstr "Понеділок"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:517
+#| msgid "Tuesday"
+msgctxt "day_of_week"
 msgid "Tuesday"
 msgstr "Вівторок"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:518
+#| msgid "Wednesday"
+msgctxt "day_of_week"
 msgid "Wednesday"
 msgstr "Середа"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:519
+#| msgid "Thursday"
+msgctxt "day_of_week"
 msgid "Thursday"
 msgstr "Четвер"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:520
+#| msgid "Friday"
+msgctxt "day_of_week"
 msgid "Friday"
 msgstr "П'ятниця"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:521
+#| msgid "Saturday"
+msgctxt "day_of_week"
 msgid "Saturday"
 msgstr "Субота"
 
-#: ../libbalsa/rfc2445.c:546
+#: ../libbalsa/rfc2445.c:553
 msgid "every weekday"
 msgstr "кожного певного дня тижня"
 
-#: ../libbalsa/rfc2445.c:548
+#: ../libbalsa/rfc2445.c:555
 msgid "every day"
 msgstr "кожного дня"
 
-#: ../libbalsa/rfc2445.c:550
+#. #1: interval
+#: ../libbalsa/rfc2445.c:558
 #, c-format
 msgid "every %d days"
 msgstr "кожні %d днів"
 
-#: ../libbalsa/rfc2445.c:565
+#: ../libbalsa/rfc2445.c:573
 msgid "every "
 msgstr "кожні "
 
-#: ../libbalsa/rfc2445.c:567
+#. #1: interval
+#: ../libbalsa/rfc2445.c:576
 #, c-format
 msgid "every %d weeks on "
 msgstr "кожні %d тижні у "
 
-#: ../libbalsa/rfc2445.c:574 ../libbalsa/rfc2445.c:676
+#. #1: the day of week (defined in the day_of_week context)
+#. #1: recurrence expression
+#: ../libbalsa/rfc2445.c:584 ../libbalsa/rfc2445.c:694
 #, c-format
 msgid " and %s"
 msgstr " і %s"
 
-#: ../libbalsa/rfc2445.c:579
+#: ../libbalsa/rfc2445.c:589
 msgid "every week"
 msgstr "кожен тиждень"
 
-#: ../libbalsa/rfc2445.c:581
+#. #1: interval
+#: ../libbalsa/rfc2445.c:592
 #, c-format
 msgid "every %d weeks"
 msgstr "кожні %d тижні"
 
-#: ../libbalsa/rfc2445.c:592
+#: ../libbalsa/rfc2445.c:603
 msgid "the last"
 msgstr "останній"
 
-#: ../libbalsa/rfc2445.c:599
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:611
 #, c-format
 msgid "%dst"
 msgstr "%d-а"
 
-#: ../libbalsa/rfc2445.c:602
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:615
 #, c-format
 msgid "%dnd"
 msgstr "%d-а"
 
-#: ../libbalsa/rfc2445.c:605
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:619
 #, c-format
 msgid "%drd"
 msgstr "%d-я"
 
-#: ../libbalsa/rfc2445.c:608
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:623
 #, c-format
 msgid "%dth"
 msgstr "%d-а"
 
-#: ../libbalsa/rfc2445.c:626
+#: ../libbalsa/rfc2445.c:641
 msgid "every day of every month"
 msgstr "кожного для кожного місяця"
 
-#: ../libbalsa/rfc2445.c:628
+#. #1: interval
+#: ../libbalsa/rfc2445.c:644
 #, c-format
 msgid "every day of the month every %d months"
 msgstr "кожного дня місяця кожні %d місяців"
 
 #. currently we don't support yearly rules with more than one BYDAY element or exactly 7 elements with all the weekdays
 #. * (the "every day" case)
-#: ../libbalsa/rfc2445.c:643 ../libbalsa/rfc2445.c:687
-#: ../libbalsa/rfc2445.c:724 ../libbalsa/rfc2445.c:786
-#: ../libbalsa/rfc2445.c:791 ../libbalsa/rfc2445.c:794
+#: ../libbalsa/rfc2445.c:659 ../libbalsa/rfc2445.c:705
+#: ../libbalsa/rfc2445.c:754 ../libbalsa/rfc2445.c:834
+#: ../libbalsa/rfc2445.c:839 ../libbalsa/rfc2445.c:842
 msgid "rule too complex"
 msgstr "правило є надто складним"
 
-#: ../libbalsa/rfc2445.c:649
+#. #1: the day of week (defined in the day_of_week context)
+#: ../libbalsa/rfc2445.c:666
 #, c-format
 msgid "every %s"
 msgstr "кожного %s"
 
-#: ../libbalsa/rfc2445.c:693
+#: ../libbalsa/rfc2445.c:711
 msgid " and "
 msgstr " і "
 
-#: ../libbalsa/rfc2445.c:704
+#: ../libbalsa/rfc2445.c:722
 msgid " of every month"
 msgstr " кожного місяця"
 
-#: ../libbalsa/rfc2445.c:706
+#. #1: interval
+#: ../libbalsa/rfc2445.c:725
 #, c-format
 msgid " of every %d months"
 msgstr " кожних %d місяці"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:736
+#| msgid "January"
+msgctxt "name_of_month"
 msgid "January"
 msgstr "Січень"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:737
+#| msgid "February"
+msgctxt "name_of_month"
 msgid "February"
 msgstr "Лютий"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:738
+#| msgid "March"
+msgctxt "name_of_month"
 msgid "March"
 msgstr "Березень"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:739
+#| msgid "April"
+msgctxt "name_of_month"
 msgid "April"
 msgstr "Квітень"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:740
+#| msgid "May"
+msgctxt "name_of_month"
 msgid "May"
 msgstr "Травень"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:741
+#| msgid "June"
+msgctxt "name_of_month"
 msgid "June"
 msgstr "Червень"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:742
+#| msgid "July"
+msgctxt "name_of_month"
 msgid "July"
 msgstr "Липень"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:743
+#| msgid "August"
+msgctxt "name_of_month"
 msgid "August"
 msgstr "Серпень"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:744
+#| msgid "September"
+msgctxt "name_of_month"
 msgid "September"
 msgstr "Вересень"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:745
+#| msgid "October"
+msgctxt "name_of_month"
 msgid "October"
 msgstr "Жовтень"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:746
+#| msgid "November"
+msgctxt "name_of_month"
 msgid "November"
 msgstr "Листопад"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:747
+#| msgid "December"
+msgctxt "name_of_month"
 msgid "December"
 msgstr "Грудень"
 
-#: ../libbalsa/rfc2445.c:746
+#. #1: name of month (defined in the name_of_month context)
+#. #2: day of week (defined in the day_of_week context)
+#: ../libbalsa/rfc2445.c:778
 #, c-format
 msgid "every %s %s"
 msgstr "кожні %s %s"
 
-#: ../libbalsa/rfc2445.c:748
+#. #1: interval
+#. #2: name of month (defined in the name_of_month context)
+#. #3: day of week (defined in the day_of_week context)
+#: ../libbalsa/rfc2445.c:783
 #, c-format
 msgid "every %d years on %s %s"
 msgstr "кожні %d років %s %s"
 
-#: ../libbalsa/rfc2445.c:758
+#. #1: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:794
 #, c-format
 msgid "every day of %s"
 msgstr "кожного дня %s"
 
-#: ../libbalsa/rfc2445.c:760
+#. #1: interval
+#. #2: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:798
 #, c-format
 msgid "every %d years every day of %s"
 msgstr "кожні %d років, кожного дня %s"
 
-#: ../libbalsa/rfc2445.c:770
+#. #1: day of week (defined in the day_of_week context)
+#. #2: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:810
 #, c-format
 msgid "every %s of %s"
 msgstr "кожного %s %s"
 
-#: ../libbalsa/rfc2445.c:772
+#. #1: interval
+#. #2: day of week (defined in the day_of_week context)
+#. #3: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:815
 #, c-format
 msgid "every %d years on every %s of %s"
 msgstr "кожні %d років, кожного %s %s"
 
-#: ../libbalsa/rfc2445.c:780
+#. #1: day of week (defined in the day_of_week context)
+#. #2: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:825
 #, c-format
 msgid "the %s of every %s"
 msgstr "%s кожного %s"
 
-#: ../libbalsa/rfc2445.c:782
+#. #1: interval
+#. #2: day of week (defined in the day_of_week context)
+#. #3: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:830
 #, c-format
 msgid "every %d years on the %s of %s"
 msgstr "кожні %d років %s %s"
 
-#: ../libbalsa/rfc2445.c:813
+#: ../libbalsa/rfc2445.c:861
+#| msgid "secondly"
+msgctxt "ical_recurrence"
 msgid "secondly"
 msgstr "щосекунди"
 
-#: ../libbalsa/rfc2445.c:816
+#: ../libbalsa/rfc2445.c:864
+#| msgid "minutely"
+msgctxt "ical_recurrence"
 msgid "minutely"
 msgstr "щохвилини"
 
-#: ../libbalsa/rfc2445.c:819
+#: ../libbalsa/rfc2445.c:867
+#| msgid "hourly"
+msgctxt "ical_recurrence"
 msgid "hourly"
 msgstr "щогодини"
 
-#: ../libbalsa/rfc2445.c:840
-msgid "occurrence"
-msgstr "випадок"
+#: ../libbalsa/rfc2445.c:887
+#, c-format
+#| msgid "occurrence"
+msgid ", %d occurrence"
+msgid_plural ", %d occurrences"
+msgstr[0] ", %d повторення"
+msgstr[1] ", %d повторення"
+msgstr[2] ", %d повторень"
+msgstr[3] ", %d повторення"
 
-#: ../libbalsa/rfc2445.c:840
-msgid "occurrences"
-msgstr "випадки"
-
-#: ../libbalsa/rfc2445.c:845
+#. #1: time string
+#: ../libbalsa/rfc2445.c:893
 #, c-format
 msgid " until %s"
 msgstr " до %s"
 
-#: ../libbalsa/rfc2445.c:1121
+#: ../libbalsa/rfc2445.c:1168
+#| msgid "unknown"
+msgctxt "ical_role"
+msgid "unknown"
+msgstr "невідомо"
+
+#: ../libbalsa/rfc2445.c:1169
+#| msgid "chair"
+msgctxt "ical_role"
 msgid "chair"
 msgstr "голова"
 
-#: ../libbalsa/rfc2445.c:1122
+#: ../libbalsa/rfc2445.c:1170
+#| msgid "required participant"
+msgctxt "ical_role"
 msgid "required participant"
 msgstr "обов'язковий учасник"
 
-#: ../libbalsa/rfc2445.c:1123
+#: ../libbalsa/rfc2445.c:1171
+#| msgid "optional participant"
+msgctxt "ical_role"
 msgid "optional participant"
 msgstr "необов'язковий учасник"
 
-#: ../libbalsa/rfc2445.c:1124
+#: ../libbalsa/rfc2445.c:1172
+#| msgid "non-participant, information only"
+msgctxt "ical_role"
 msgid "non-participant, information only"
 msgstr "не є учасником, лише інформація"
 
@@ -2711,17 +2835,17 @@ msgstr[1] "Передаємо %u повідомлення до %s"
 msgstr[2] "Передаємо %u повідомлень до %s"
 msgstr[3] "Передаємо %u повідомлення до %s"
 
-#: ../libbalsa/send.c:1260 ../libbalsa/send.c:1328
+#: ../libbalsa/send.c:1265 ../libbalsa/send.c:1333
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Не вдалося прочитати %s: %s"
 
-#: ../libbalsa/send.c:1263 ../libbalsa/send.c:1331
+#: ../libbalsa/send.c:1268 ../libbalsa/send.c:1336
 #, c-format
 msgid "Cannot read %s"
 msgstr "Не вдалося прочитати %s"
 
-#: ../libbalsa/send.c:1295
+#: ../libbalsa/send.c:1300
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2729,7 +2853,7 @@ msgstr ""
 "Не вдалося визначити кодування символів текстового файла «%s» — надсилаємо "
 "як тип MIME «%s»"
 
-#: ../libbalsa/send.c:1823 ../libbalsa/send.c:1921
+#: ../libbalsa/send.c:1828 ../libbalsa/send.c:1926
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] ""
@@ -8037,3 +8161,6 @@ msgstr "Долучити _відкритий ключ GnuPG"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Екранувати спеціальні символи"
+
+#~ msgid "occurrences"
+#~ msgstr "випадки"

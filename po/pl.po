@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2021-06-20 11:01+0200\n"
-"PO-Revision-Date: 2021-06-20 11:05+0200\n"
+"POT-Creation-Date: 2021-10-17 13:27+0200\n"
+"PO-Revision-Date: 2021-10-17 13:28+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -481,12 +481,10 @@ msgstr ""
 "Odcisk klucza: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:237 ../libbalsa/imap/imap-handle.c:46
-#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc2445.c:415
-#: ../libbalsa/rfc2445.c:444 ../libbalsa/rfc2445.c:467
-#: ../libbalsa/rfc2445.c:1120 ../libbalsa/rfc3156.c:689
+#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:689
 #: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5312
 msgid "unknown"
-msgstr "nieznany"
+msgstr "nieznane"
 
 #: ../libbalsa/gmime-multipart-crypt.c:230
 msgid "Cannot verify multipart/signed part due to missing subparts."
@@ -1855,8 +1853,8 @@ msgstr ""
 msgid "Mailbox does not exist."
 msgstr "Skrzynka nie istnieje."
 
-#: ../libbalsa/mailbox_maildir.c:908 ../libbalsa/mailbox_mbox.c:1936
-#: ../libbalsa/mailbox_mh.c:1086
+#: ../libbalsa/mailbox_maildir.c:908 ../libbalsa/mailbox_mbox.c:1935
+#: ../libbalsa/mailbox_mh.c:1087
 #, c-format
 msgid "Data copy error"
 msgstr "Błąd podczas kopiowania danych"
@@ -1866,7 +1864,7 @@ msgstr "Błąd podczas kopiowania danych"
 msgid "Mailbox %s does not appear to be an mbox mailbox."
 msgstr "Skrzynka %s nie jest skrzynką typu mbox."
 
-#: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:278
+#: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:280
 #, c-format
 msgid "Could not remove %s: %s"
 msgstr "Nie można usunąć %s: %s"
@@ -1908,47 +1906,47 @@ msgstr "Skrzynka nie jest w formacie mbox."
 msgid "Cannot lock mailbox."
 msgstr "Nie można zablokować skrzynki."
 
-#: ../libbalsa/mailbox_mbox.c:1892
+#: ../libbalsa/mailbox_mbox.c:1891
 #, c-format
 msgid "%s: could not open %s."
 msgstr "%s: nie można otworzyć %s."
 
-#: ../libbalsa/mailbox_mbox.c:1904
+#: ../libbalsa/mailbox_mbox.c:1903
 #, c-format
 msgid "%s: could not get new MIME stream."
 msgstr "%s: nie można pobrać nowego strumienia MIME."
 
-#: ../libbalsa/mailbox_mbox.c:1912
+#: ../libbalsa/mailbox_mbox.c:1911
 #, c-format
 msgid "%s: %s is not in mbox format."
 msgstr "%s: %s nie jest w formacie mbox."
 
-#: ../libbalsa/mailbox_mh.c:155
+#: ../libbalsa/mailbox_mh.c:157
 #, c-format
 msgid "Mailbox %s does not appear to be an MH mailbox."
 msgstr "Skrzynka %s nie jest skrzynką typu MH."
 
-#: ../libbalsa/mailbox_mh.c:165
+#: ../libbalsa/mailbox_mh.c:167
 #, c-format
 msgid "Could not create MH directory at %s (%s)"
 msgstr "Nie można utworzyć katalogu MH w %s (%s)"
 
-#: ../libbalsa/mailbox_mh.c:177
+#: ../libbalsa/mailbox_mh.c:179
 #, c-format
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Nie można utworzyć struktury MH w %s (%s)"
 
-#: ../libbalsa/mailbox_mh.c:272
+#: ../libbalsa/mailbox_mh.c:274
 #, c-format
 msgid "Could not remove contents of %s: %s"
 msgstr "Nie można usunąć zawartości %s: %s"
 
-#: ../libbalsa/mailbox_mh.c:1068
+#: ../libbalsa/mailbox_mh.c:1069
 #, c-format
 msgid "Cannot create message"
 msgstr "Nie można utworzyć wiadomości"
 
-#: ../libbalsa/mailbox_mh.c:1111
+#: ../libbalsa/mailbox_mh.c:1112
 #, c-format
 msgid "Message rename error"
 msgstr "Błąd podczas zmiany nazwy wiadomości"
@@ -2162,8 +2160,8 @@ msgstr[0] "tydzień"
 msgstr[1] "tygodnie"
 msgstr[2] "tygodni"
 
-#: ../libbalsa/rfc2445.c:371 ../libbalsa/rfc2445.c:696
-#: ../libbalsa/rfc2445.c:700 ../libbalsa/rfc2445.c:743
+#: ../libbalsa/rfc2445.c:371 ../libbalsa/rfc2445.c:714
+#: ../libbalsa/rfc2445.c:718 ../libbalsa/rfc2445.c:773
 msgid "day"
 msgid_plural "days"
 msgstr[0] "dzień"
@@ -2191,304 +2189,393 @@ msgstr[0] "sekunda"
 msgstr[1] "sekundy"
 msgstr[2] "sekund"
 
+#: ../libbalsa/rfc2445.c:415
+msgctxt "ical_status"
+msgid "unknown"
+msgstr "nieznane"
+
 #: ../libbalsa/rfc2445.c:416
+msgctxt "ical_status"
 msgid "event is tentative"
 msgstr "wydarzenie jest wstępne"
 
 #: ../libbalsa/rfc2445.c:417
+msgctxt "ical_status"
 msgid "event is definite"
 msgstr "wydarzenie jest ostateczne"
 
 #: ../libbalsa/rfc2445.c:418
+msgctxt "ical_status"
 msgid "event was cancelled"
 msgstr "wydarzenie zostało anulowane"
 
+#: ../libbalsa/rfc2445.c:444
+msgctxt "ical_method"
+msgid "unknown"
+msgstr "nieznane"
+
 #: ../libbalsa/rfc2445.c:445
+msgctxt "ical_method"
 msgid "Event Notification"
 msgstr "Powiadomienie o wydarzeniu"
 
 #: ../libbalsa/rfc2445.c:446
+msgctxt "ical_method"
 msgid "Event Request"
 msgstr "Żądanie wydarzenia"
 
 #: ../libbalsa/rfc2445.c:447
+msgctxt "ical_method"
 msgid "Reply to Event Request"
 msgstr "Odpowiedz na żądanie wydarzenia"
 
 #: ../libbalsa/rfc2445.c:448
+msgctxt "ical_method"
 msgid "Event Cancellation"
 msgstr "Anulowanie wydarzenia"
 
+#: ../libbalsa/rfc2445.c:467
+msgctxt "ical_partstat"
+msgid "unknown"
+msgstr "nieznane"
+
 #: ../libbalsa/rfc2445.c:468
+msgctxt "ical_partstat"
 msgid "needs action"
 msgstr "wymaga działania"
 
 #: ../libbalsa/rfc2445.c:469
+msgctxt "ical_partstat"
 msgid "accepted"
 msgstr "przyjęto"
 
 #: ../libbalsa/rfc2445.c:470
+msgctxt "ical_partstat"
 msgid "declined"
 msgstr "odmówiono"
 
 #: ../libbalsa/rfc2445.c:471
+msgctxt "ical_partstat"
 msgid "tentatively accepted"
 msgstr "wstępnie przyjęto"
 
 #: ../libbalsa/rfc2445.c:472
+msgctxt "ical_partstat"
 msgid "delegated"
 msgstr "oddelegowano"
 
 #: ../libbalsa/rfc2445.c:515
+msgctxt "day_of_week"
 msgid "Sunday"
 msgstr "niedziela"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:516
+msgctxt "day_of_week"
 msgid "Monday"
 msgstr "poniedziałek"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:517
+msgctxt "day_of_week"
 msgid "Tuesday"
 msgstr "wtorek"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:518
+msgctxt "day_of_week"
 msgid "Wednesday"
 msgstr "środa"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:519
+msgctxt "day_of_week"
 msgid "Thursday"
 msgstr "czwartek"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:520
+msgctxt "day_of_week"
 msgid "Friday"
 msgstr "piątek"
 
-#: ../libbalsa/rfc2445.c:515
+#: ../libbalsa/rfc2445.c:521
+msgctxt "day_of_week"
 msgid "Saturday"
 msgstr "sobota"
 
-#: ../libbalsa/rfc2445.c:546
+#: ../libbalsa/rfc2445.c:553
 msgid "every weekday"
 msgstr "każdego dnia roboczego"
 
-#: ../libbalsa/rfc2445.c:548
+#: ../libbalsa/rfc2445.c:555
 msgid "every day"
 msgstr "każdego dnia"
 
-# FIXME all of these don’t work in Polish, need to file a bug
-#: ../libbalsa/rfc2445.c:550
+# FIXME all of these don’t work in Polish, need to file a bug about using ngettext
+#. #1: interval
+#: ../libbalsa/rfc2445.c:558
 #, c-format
 msgid "every %d days"
 msgstr "co %d dni"
 
-#: ../libbalsa/rfc2445.c:565
+#: ../libbalsa/rfc2445.c:573
 msgid "every "
 msgstr "co "
 
-#: ../libbalsa/rfc2445.c:567
+#. #1: interval
+#: ../libbalsa/rfc2445.c:576
 #, c-format
 msgid "every %d weeks on "
 msgstr "co %d tyg. w "
 
-#: ../libbalsa/rfc2445.c:574 ../libbalsa/rfc2445.c:676
+#. #1: the day of week (defined in the day_of_week context)
+#. #1: recurrence expression
+#: ../libbalsa/rfc2445.c:584 ../libbalsa/rfc2445.c:694
 #, c-format
 msgid " and %s"
 msgstr " i %s"
 
-#: ../libbalsa/rfc2445.c:579
+#: ../libbalsa/rfc2445.c:589
 msgid "every week"
 msgstr "każdego tygodnia"
 
-#: ../libbalsa/rfc2445.c:581
+#. #1: interval
+#: ../libbalsa/rfc2445.c:592
 #, c-format
 msgid "every %d weeks"
 msgstr "co %d tyg."
 
-#: ../libbalsa/rfc2445.c:592
+#: ../libbalsa/rfc2445.c:603
 msgid "the last"
 msgstr "ostatni"
 
-#: ../libbalsa/rfc2445.c:599
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:611
 #, c-format
 msgid "%dst"
 msgstr "%d."
 
-#: ../libbalsa/rfc2445.c:602
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:615
 #, c-format
 msgid "%dnd"
 msgstr "%d."
 
-#: ../libbalsa/rfc2445.c:605
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:619
 #, c-format
 msgid "%drd"
 msgstr "%d."
 
-#: ../libbalsa/rfc2445.c:608
+#. #1: the day of month
+#: ../libbalsa/rfc2445.c:623
 #, c-format
 msgid "%dth"
 msgstr "%d."
 
-#: ../libbalsa/rfc2445.c:626
+#: ../libbalsa/rfc2445.c:641
 msgid "every day of every month"
 msgstr "każdego dnia każdego miesiąca"
 
-#: ../libbalsa/rfc2445.c:628
+#. #1: interval
+#: ../libbalsa/rfc2445.c:644
 #, c-format
 msgid "every day of the month every %d months"
 msgstr "każdego dnia miesiąca co %d mies."
 
 #. currently we don't support yearly rules with more than one BYDAY element or exactly 7 elements with all the weekdays
 #. * (the "every day" case)
-#: ../libbalsa/rfc2445.c:643 ../libbalsa/rfc2445.c:687
-#: ../libbalsa/rfc2445.c:724 ../libbalsa/rfc2445.c:786
-#: ../libbalsa/rfc2445.c:791 ../libbalsa/rfc2445.c:794
+#: ../libbalsa/rfc2445.c:659 ../libbalsa/rfc2445.c:705
+#: ../libbalsa/rfc2445.c:754 ../libbalsa/rfc2445.c:834
+#: ../libbalsa/rfc2445.c:839 ../libbalsa/rfc2445.c:842
 msgid "rule too complex"
 msgstr "reguła jest zbyt złożona"
 
-#: ../libbalsa/rfc2445.c:649
+#. #1: the day of week (defined in the day_of_week context)
+#: ../libbalsa/rfc2445.c:666
 #, c-format
 msgid "every %s"
 msgstr "co %s"
 
-#: ../libbalsa/rfc2445.c:693
+#: ../libbalsa/rfc2445.c:711
 msgid " and "
 msgstr " i "
 
-#: ../libbalsa/rfc2445.c:704
+#: ../libbalsa/rfc2445.c:722
 msgid " of every month"
 msgstr " każdego miesiąca"
 
-#: ../libbalsa/rfc2445.c:706
+#. #1: interval
+#: ../libbalsa/rfc2445.c:725
 #, c-format
 msgid " of every %d months"
 msgstr " co %d mies."
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:736
+msgctxt "name_of_month"
 msgid "January"
 msgstr "styczeń"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:737
+msgctxt "name_of_month"
 msgid "February"
 msgstr "luty"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:738
+msgctxt "name_of_month"
 msgid "March"
 msgstr "marzec"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:739
+msgctxt "name_of_month"
 msgid "April"
 msgstr "kwiecień"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:740
+msgctxt "name_of_month"
 msgid "May"
 msgstr "maj"
 
-#: ../libbalsa/rfc2445.c:717
+#: ../libbalsa/rfc2445.c:741
+msgctxt "name_of_month"
 msgid "June"
 msgstr "czerwiec"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:742
+msgctxt "name_of_month"
 msgid "July"
 msgstr "lipiec"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:743
+msgctxt "name_of_month"
 msgid "August"
 msgstr "sierpień"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:744
+msgctxt "name_of_month"
 msgid "September"
 msgstr "wrzesień"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:745
+msgctxt "name_of_month"
 msgid "October"
 msgstr "październik"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:746
+msgctxt "name_of_month"
 msgid "November"
 msgstr "listopad"
 
-#: ../libbalsa/rfc2445.c:718
+#: ../libbalsa/rfc2445.c:747
+msgctxt "name_of_month"
 msgid "December"
 msgstr "grudzień"
 
-#: ../libbalsa/rfc2445.c:746
+#. #1: name of month (defined in the name_of_month context)
+#. #2: day of week (defined in the day_of_week context)
+#: ../libbalsa/rfc2445.c:778
 #, c-format
 msgid "every %s %s"
 msgstr "co %s %s"
 
-#: ../libbalsa/rfc2445.c:748
+#. #1: interval
+#. #2: name of month (defined in the name_of_month context)
+#. #3: day of week (defined in the day_of_week context)
+#: ../libbalsa/rfc2445.c:783
 #, c-format
 msgid "every %d years on %s %s"
 msgstr "co %d lat w %s %s"
 
-#: ../libbalsa/rfc2445.c:758
+#. #1: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:794
 #, c-format
 msgid "every day of %s"
 msgstr "każdego dnia %s"
 
-#: ../libbalsa/rfc2445.c:760
+#. #1: interval
+#. #2: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:798
 #, c-format
 msgid "every %d years every day of %s"
 msgstr "co %d lata każdego dnia %s"
 
-#: ../libbalsa/rfc2445.c:770
+#. #1: day of week (defined in the day_of_week context)
+#. #2: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:810
 #, c-format
 msgid "every %s of %s"
 msgstr "co %s %s"
 
-#: ../libbalsa/rfc2445.c:772
+#. #1: interval
+#. #2: day of week (defined in the day_of_week context)
+#. #3: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:815
 #, c-format
 msgid "every %d years on every %s of %s"
 msgstr "co %d lat każdego %s %s"
 
-#: ../libbalsa/rfc2445.c:780
+#. #1: day of week (defined in the day_of_week context)
+#. #2: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:825
 #, c-format
 msgid "the %s of every %s"
 msgstr "%s każdego %s"
 
-#: ../libbalsa/rfc2445.c:782
+#. #1: interval
+#. #2: day of week (defined in the day_of_week context)
+#. #3: name of month (defined in the name_of_month context)
+#: ../libbalsa/rfc2445.c:830
 #, c-format
 msgid "every %d years on the %s of %s"
 msgstr "co %d lat w %s %s"
 
-#: ../libbalsa/rfc2445.c:813
+#: ../libbalsa/rfc2445.c:861
+msgctxt "ical_recurrence"
 msgid "secondly"
 msgstr "co sekundę"
 
-#: ../libbalsa/rfc2445.c:816
+#: ../libbalsa/rfc2445.c:864
+msgctxt "ical_recurrence"
 msgid "minutely"
 msgstr "co minutę"
 
-#: ../libbalsa/rfc2445.c:819
+#: ../libbalsa/rfc2445.c:867
+msgctxt "ical_recurrence"
 msgid "hourly"
 msgstr "co godzinę"
 
-#: ../libbalsa/rfc2445.c:840
-msgid "occurrence"
-msgstr "wystąpienie"
+#: ../libbalsa/rfc2445.c:887
+#, c-format
+msgid ", %d occurrence"
+msgid_plural ", %d occurrences"
+msgstr[0] ", %d wystąpienie"
+msgstr[1] ", %d wystąpienia"
+msgstr[2] ", %d wystąpień"
 
-#: ../libbalsa/rfc2445.c:840
-msgid "occurrences"
-msgstr "wystąpienia"
-
-#: ../libbalsa/rfc2445.c:845
+#. #1: time string
+#: ../libbalsa/rfc2445.c:893
 #, c-format
 msgid " until %s"
 msgstr " do %s"
 
-#: ../libbalsa/rfc2445.c:1121
+#: ../libbalsa/rfc2445.c:1168
+msgctxt "ical_role"
+msgid "unknown"
+msgstr "nieznane"
+
+#: ../libbalsa/rfc2445.c:1169
+msgctxt "ical_role"
 msgid "chair"
 msgstr "prowadzący"
 
-#: ../libbalsa/rfc2445.c:1122
+#: ../libbalsa/rfc2445.c:1170
+msgctxt "ical_role"
 msgid "required participant"
 msgstr "obowiązkowy uczestnik"
 
-#: ../libbalsa/rfc2445.c:1123
+#: ../libbalsa/rfc2445.c:1171
+msgctxt "ical_role"
 msgid "optional participant"
 msgstr "opcjonalny uczestnik"
 
-#: ../libbalsa/rfc2445.c:1124
+#: ../libbalsa/rfc2445.c:1172
+msgctxt "ical_role"
 msgid "non-participant, information only"
 msgstr "nie jest uczestnikiem, tylko informacja"
 
@@ -2675,17 +2762,17 @@ msgstr[0] "Przesłano %u wiadomość do %s"
 msgstr[1] "Przesłano %u wiadomości do %s"
 msgstr[2] "Przesłano %u wiadomości do %s"
 
-#: ../libbalsa/send.c:1260 ../libbalsa/send.c:1328
+#: ../libbalsa/send.c:1265 ../libbalsa/send.c:1333
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Nie można odczytać %s: %s"
 
-#: ../libbalsa/send.c:1263 ../libbalsa/send.c:1331
+#: ../libbalsa/send.c:1268 ../libbalsa/send.c:1336
 #, c-format
 msgid "Cannot read %s"
 msgstr "Nie można odczytać %s"
 
-#: ../libbalsa/send.c:1295
+#: ../libbalsa/send.c:1300
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2693,7 +2780,7 @@ msgstr ""
 "Nie można ustalić zestawu znaków dla pliku tekstowego „%s”, wysyłanie jako "
 "typ MIME „%s”"
 
-#: ../libbalsa/send.c:1823 ../libbalsa/send.c:1921
+#: ../libbalsa/send.c:1828 ../libbalsa/send.c:1926
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Ta wiadomość nie zostanie zaszyfrowana dla odbiorcy z pola „UDW:”."

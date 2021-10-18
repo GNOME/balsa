@@ -150,6 +150,7 @@ struct _BalsaMimeWidgetText {
     GList               *cite_bar_list;
     int                  cite_bar_dimension;
     int                  phrase_hl;
+    GtkTextTag          *invisible;
     GMenu               *extra_menu;
     GMenu               *url_extra_menu;
 };
@@ -1021,9 +1022,10 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     BalsaMimeWidgetText *mwt = user_data;
     GtkTextView * view;
     GtkTextBuffer * buffer;
-    GdkRectangle location;
-    int y_pos;
-    int height;
+    gint dimension;
+    gint buffer_y;
+    gint y_pos;
+    gint height;
 
     view = GTK_TEXT_VIEW(mwt->text_widget);
     buffer = gtk_text_view_get_buffer(view);
@@ -1039,10 +1041,15 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     }
 
     /* get the locations */
-    gtk_text_view_get_iter_location(view, &bar->start_iter, &location);
-    y_pos = location.y;
-    gtk_text_view_get_iter_location(view, &bar->end_iter, &location);
-    height = location.y - y_pos;
+    gtk_text_view_get_line_yrange(view, &bar->start_iter, &buffer_y, NULL);
+    gtk_text_view_buffer_to_window_coords(view, GTK_TEXT_WINDOW_TEXT,
+                                          0, buffer_y,
+                                          NULL, &y_pos);
+    gtk_text_view_get_line_yrange(view, &bar->end_iter, &buffer_y, NULL);
+    gtk_text_view_buffer_to_window_coords(view, GTK_TEXT_WINDOW_TEXT,
+                                          0, buffer_y,
+                                          NULL, &height);
+    height -= y_pos;
 
     /* add a new widget if necessary */
     if (bar->bar == NULL) {
@@ -1559,9 +1566,9 @@ fill_text_buf_cited(BalsaMimeWidgetText *mwt,
                                NULL);
 
     if (rex != NULL) {
-        invisible = gtk_text_buffer_create_tag(buffer, "hide-cite",
-                                               "invisible", TRUE,
-                                               NULL);
+        mwt->invisible = gtk_text_buffer_create_tag(buffer, "hide-cite",
+                                                    "invisible", TRUE,
+                                                    NULL);
     } else {
         mwt->invisible = NULL;
     }

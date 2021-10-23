@@ -33,7 +33,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 
 #ifdef HAVE_HTML_WIDGET
 
@@ -41,6 +43,15 @@
 #  undef G_LOG_DOMAIN
 #endif
 #define G_LOG_DOMAIN "html"
+
+
+/* Note:
+ * If the following variable is set, search the build folder for the Webkit
+ * extension first, and fall back to the install folder if the folder does
+ * not exist.  Thus, this variable should be set for testing/development,
+ * and unset for release builds to avoid leaking the build folder name.
+ */
+#define WEB_EXT_CHECK_BUILDDIR	1
 
 
 #define CID_REGEX	"<[^>]*src\\s*=\\s*['\"]?\\s*cid:"
@@ -57,6 +68,10 @@
 
 /* LBH_NATURAL_SIZE means, well, to use a widget's natural width or height */
 #define LBH_NATURAL_SIZE (-1)
+
+
+/* indicates if Balsa's HTML filter webkit extension is available */
+static guint html_filter_found = 0U;
 
 
 /*
@@ -361,6 +376,20 @@ lbh_decide_policy_cb(WebKitWebView           * web_view,
     return TRUE;
 }
 
+
+static void
+lbh_load_external_resources(WebKitWebView *web_view, gboolean load_resources)
+{
+	WebKitUserMessage *message;
+	GVariant *data;
+
+	data = g_variant_new_boolean(load_resources);
+	message = webkit_user_message_new("load_ext", data);
+	webkit_web_view_send_message_to_page(web_view, message, NULL, NULL, NULL);
+	g_usleep(1000);
+}
+
+
 /*
  * Show the GtkInfoBar for asking about downloading images
  *
@@ -369,25 +398,29 @@ lbh_decide_policy_cb(WebKitWebView           * web_view,
 
 static void
 lbh_info_bar_response_cb(GtkInfoBar * info_bar,
-                         gint response_id, gpointer data)
+	gint response_id, gpointer data)
 {
-    LibBalsaWebKitInfo *info = data;
+	LibBalsaWebKitInfo *info = data;
 
-    if (response_id == GTK_RESPONSE_OK) {
-        gchar *text;
+	if (response_id == GTK_RESPONSE_OK) {
+		gchar *text;
 
-        if (lbh_get_body_content_utf8(info->body, &text) >= 0) {
-            WebKitSettings *settings;
+		if (lbh_get_body_content_utf8(info->body, &text) >= 0) {
+			if (g_atomic_int_get(&html_filter_found) != 0) {
+				lbh_load_external_resources(info->web_view, TRUE);
+			} else {
+				WebKitSettings *settings;
 
-            settings = webkit_web_view_get_settings(info->web_view);
-            webkit_settings_set_auto_load_images(settings, TRUE);
-            webkit_web_view_load_html(info->web_view, text, NULL);
-            g_free(text);
-        }
-    }
+				settings = webkit_web_view_get_settings(info->web_view);
+				webkit_settings_set_auto_load_images(settings, TRUE);
+			}
+			webkit_web_view_load_html(info->web_view, text, NULL);
+			g_free(text);
+		}
+	}
 
-    gtk_widget_destroy(info->info_bar);
-    info->info_bar = NULL;
+	gtk_widget_destroy(info->info_bar);
+	info->info_bar = NULL;
 }
 
 static void
@@ -403,26 +436,13 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
     GtkInfoBar *info_bar;
     GtkWidget *label;
     GtkWidget *content_area;
-#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
     static const gchar text[] =
-                 N_("This message part contains images "
-                    "from a remote server.\n"
-                    "To protect your privacy, "
-                    "Balsa has not downloaded them.\n"
-                    "You may choose to download them "
-                    "if you trust the server.");
-#else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
-    static const gchar text[] =
-                 N_("This message part contains images "
-                    "from a remote server. "
-                    "To protect your privacy, "
-                    "Balsa has not downloaded them. "
-                    "You may choose to download them "
-                    "if you trust the server.");
-#endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
+                 N_("This message part references contents on one or more external servers. "
+                	"To protect your privacy, Balsa has not downloaded them. You may choose "
+                	"to download them if you trust the sender of the message.");
 
     info_bar_widget =
-        gtk_info_bar_new_with_buttons(_("_Download images"),
+        gtk_info_bar_new_with_buttons(_("_Download external contents"),
                                      GTK_RESPONSE_OK,
                                      _("_Close"), GTK_RESPONSE_CLOSE,
                                      NULL);
@@ -454,14 +474,15 @@ lbh_resource_notify_response_cb(WebKitWebResource * resource,
                                 GParamSpec        * pspec,
                                 gpointer            data)
 {
-    LibBalsaWebKitInfo *info = data;
+    LibBalsaWebKitInfo *info = (LibBalsaWebKitInfo *) data;
     const gchar *mime_type;
     WebKitURIResponse *response;
 
     response = webkit_web_resource_get_response(resource);
     mime_type = webkit_uri_response_get_mime_type(response);
     g_debug("%s mime-type %s", __func__, mime_type);
-    if (g_ascii_strncasecmp(mime_type, "image/", 6) != 0)
+    if ((g_atomic_int_get(&html_filter_found) != 0) ||
+    	(g_ascii_strncasecmp(mime_type, "image/", 6) != 0))
         return;
 
     if (info->info_bar) {
@@ -589,6 +610,25 @@ lbh_context_menu_cb(WebKitWebView       * web_view,
     return retval;
 }
 
+static gboolean
+lbh_web_extension_cb(WebKitWebContext G_GNUC_UNUSED *context,
+					 WebKitUserMessage              *message,
+					 gpointer G_GNUC_UNUSED          user_data)
+{
+	gboolean result;
+
+	if (strcmp(webkit_user_message_get_name(message), "balsa-html-filter") == 0) {
+		g_atomic_int_or(&html_filter_found, 1U);
+		g_debug("%s: Balsa HTML filter WebKit extension found", __func__);
+		result = TRUE;
+	} else {
+		g_info("%s: unknown webkit extension message '%s'", __func__, webkit_user_message_get_name(message));
+		result = FALSE;
+	}
+	return result;
+}
+
+
 static WebKitWebContext *
 lbh_get_web_view_context(void)
 {
@@ -596,16 +636,52 @@ lbh_get_web_view_context(void)
 
 	if (g_once_init_enter(&context)) {
 		WebKitWebsiteDataManager *data_manager;
+		WebKitCookieManager *cookie_manager;
 		WebKitWebContext *tmp;
+		WebKitWebView *view;
 		gchar *cache_dir;
 
 		cache_dir = g_build_filename(g_get_home_dir(), ".balsa", CACHE_DIR, NULL);
 		data_manager = webkit_website_data_manager_new("base-cache-directory", cache_dir, NULL);
 		g_free(cache_dir);
+		webkit_website_data_manager_set_tls_errors_policy(data_manager, WEBKIT_TLS_ERRORS_POLICY_FAIL);
+		cookie_manager = webkit_website_data_manager_get_cookie_manager(data_manager);
+		webkit_cookie_manager_set_accept_policy(cookie_manager, WEBKIT_COOKIE_POLICY_ACCEPT_NEVER);
 		tmp = webkit_web_context_new_with_website_data_manager(data_manager);
-		webkit_web_context_set_cache_model(tmp, WEBKIT_CACHE_MODEL_DOCUMENT_BROWSER);
+#ifdef WEB_EXT_CHECK_BUILDDIR
+		g_debug("%s: WEB_EXT_CHECK_BUILDDIR is defined, check for '%s'", __func__, BALSA_WEB_EXT_DEVEL "/libhtmlfilter.so");
+		if (g_access(BALSA_WEB_EXT_DEVEL "/libhtmlfilter.so", R_OK) == 0) {
+			g_debug("%s: set extensions folder '%s'", __func__, BALSA_WEB_EXT_DEVEL);
+			webkit_web_context_set_web_extensions_directory(tmp, BALSA_WEB_EXT_DEVEL);
+		} else {
+			g_debug("%s: set extensions folder '%s'", __func__, BALSA_WEB_EXTENSIONS);
+			webkit_web_context_set_web_extensions_directory(tmp, BALSA_WEB_EXTENSIONS);
+		}
+#else
+		g_debug("%s: set extensions folder '%s'", __func__, BALSA_WEB_EXTENSIONS);
+		webkit_web_context_set_web_extensions_directory(tmp, BALSA_WEB_EXTENSIONS);
+#endif
+		g_signal_connect(tmp, "user-message-received", G_CALLBACK(lbh_web_extension_cb), NULL);
+		webkit_web_context_set_cache_model(tmp, WEBKIT_CACHE_MODEL_WEB_BROWSER);
 		webkit_web_context_register_uri_scheme(tmp, "cid", lbh_cid_cb, NULL, NULL);
 		g_debug("%s: registered “cid:” scheme", __func__);
+
+		/* create a dummy view to trigger loading the html filter extension */
+		view = WEBKIT_WEB_VIEW(webkit_web_view_new_with_context(tmp));
+		webkit_web_view_load_uri(view, "about:blank");
+		while (webkit_web_view_is_loading(view)) {
+			gtk_main_iteration_do(FALSE);
+			g_usleep(100);
+		}
+		g_object_ref_sink(view);
+		g_object_unref(view);
+		if (g_atomic_int_get(&html_filter_found) != 0) {
+			g_debug("%s: Balsa HTML filter available", __func__);
+		} else {
+			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				_("Balsa's external HTML resources filter web extension is not available in the folder “%s”, "
+				  "falling back to simplified image filtering. Please check your installation. "), BALSA_WEB_EXTENSIONS);
+		}
 		g_once_init_leave(&context, tmp);
 	}
 	return context;
@@ -633,7 +709,9 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
     webkit_settings_set_enable_javascript(settings, FALSE);
 	webkit_settings_set_enable_java(settings, FALSE);
 	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);
-	webkit_settings_set_auto_load_images(settings, auto_load_images);
+	webkit_settings_set_auto_load_images(settings,
+		auto_load_images || (g_atomic_int_get(&html_filter_found) != 0));
+	lbh_load_external_resources(view, auto_load_images);
 
 	g_signal_connect(view, "web-process-terminated", G_CALLBACK(lbh_web_process_terminated_cb), info);
     g_signal_connect(view, "decide-policy", G_CALLBACK(lbh_decide_policy_cb), info);

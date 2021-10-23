@@ -139,6 +139,12 @@ libbalsa_a_SOURCES = 		\
 	x509-cert-widget.h
 
 
+pkglib_LTLIBRARIES = libhtmlfilter.la
+libhtmlfilter_la_SOURCES = html-filter.c
+libhtmlfilter_la_CFLAGS = $(BALSA_CFLAGS)
+libhtmlfilter_la_LIBADD = $(BALSA_LIBS)
+libhtmlfilter_la_LDFLAGS = -module -avoid-version -no-undefined
+
 EXTRA_DIST = 				\
 	meson.build	\
 	padlock-keyhole.xpm
@@ -149,3 +155,5 @@ AM_CPPFLAGS = -I${top_builddir} -I${top_srcdir} -I${top_srcdir}/libbalsa \
 	$(BALSA_DEFS)
 
 AM_CFLAGS = $(BALSA_CFLAGS)
+
+html.o:	AM_CPPFLAGS += -DBALSA_WEB_EXT_DEVEL=\"${abs_builddir}/.libs\"

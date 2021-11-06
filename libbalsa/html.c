@@ -391,7 +391,7 @@ lbh_load_external_resources(WebKitWebView *web_view, gboolean load_resources)
 
 
 /*
- * Show the GtkInfoBar for asking about downloading images
+ * Show the GtkInfoBar for asking about downloading external content
  *
  * First two signal callbacks
  */
@@ -437,12 +437,12 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
     GtkWidget *label;
     GtkWidget *content_area;
     static const gchar text[] =
-                 N_("This message part references contents on one or more external servers. "
-                	"To protect your privacy, Balsa has not downloaded them. You may choose "
-                	"to download them if you trust the sender of the message.");
+                 N_("This message part references content on one or more external servers. "
+                	"To protect your privacy, Balsa has not downloaded it. You may choose "
+                	"to download it if you trust the sender of the message.");
 
     info_bar_widget =
-        gtk_info_bar_new_with_buttons(_("_Download external contents"),
+        gtk_info_bar_new_with_buttons(_("_Download external content"),
                                      GTK_RESPONSE_OK,
                                      _("_Close"), GTK_RESPONSE_CLOSE,
                                      NULL);
@@ -690,7 +690,7 @@ lbh_get_web_view_context(void)
 static WebKitWebView *
 lbh_web_view_new(LibBalsaWebKitInfo *info,
 				 gint				 width,
-				 gboolean            auto_load_images)
+				 gboolean            auto_load_ext_content)
 {
 	WebKitWebView *view;
 	WebKitSettings *settings;
@@ -710,8 +710,8 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 	webkit_settings_set_enable_java(settings, FALSE);
 	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);
 	webkit_settings_set_auto_load_images(settings,
-		auto_load_images || (g_atomic_int_get(&html_filter_found) != 0));
-	lbh_load_external_resources(view, auto_load_images);
+		auto_load_ext_content || (g_atomic_int_get(&html_filter_found) != 0));
+	lbh_load_external_resources(view, auto_load_ext_content);
 
 	g_signal_connect(view, "web-process-terminated", G_CALLBACK(lbh_web_process_terminated_cb), info);
     g_signal_connect(view, "decide-policy", G_CALLBACK(lbh_decide_policy_cb), info);
@@ -747,13 +747,13 @@ dump_snapshot(GObject      *source_object,
  *
  * \param body HTML message body part
  * \param width rendering width in Cairo units (1/72")
- * \param load_external_images whether external images referenced by the HTML shall be loaded
+ * \param load_external_content whether external content referenced by the HTML shall be loaded
  * \return a cairo surface on success, or NULL on error
  */
 cairo_surface_t *
 libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
 						   gdouble 				width,
-						   gboolean 			load_external_images)
+						   gboolean 			load_external_content)
 {
 	gint render_width;
     gchar *text;
@@ -780,7 +780,7 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
 	render_width = (gint) (width * HTML_PRINT_DPI / 72.0);
 	g_debug("%s: request Cairo width %g, render width %d", __func__, width, render_width);
     gtk_window_set_default_size(GTK_WINDOW(offline_window), render_width, LBH_NATURAL_SIZE);
-    view = lbh_web_view_new(info, render_width, load_external_images || (have_src_cid && !have_src_oth));
+    view = lbh_web_view_new(info, render_width, load_external_content || (have_src_cid && !have_src_oth));
     webkit_web_view_set_zoom_level(view, HTML_PRINT_ZOOM);			/* heuristic setting, any way to calculate it? */
     gtk_container_add(GTK_CONTAINER(offline_window), GTK_WIDGET(view));
     gtk_widget_show_all(offline_window);
@@ -829,7 +829,7 @@ GtkWidget *
 libbalsa_html_new(LibBalsaMessageBody * body,
                   LibBalsaHtmlCallback  hover_cb,
                   LibBalsaHtmlCallback  clicked_cb,
-                  gboolean              auto_load_images)
+                  gboolean              auto_load_ext_content)
 {
     gchar *text;
     gssize len;
@@ -851,7 +851,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     have_src_oth = g_regex_match_simple(SRC_REGEX, text, G_REGEX_CASELESS, 0);
 
     info->web_view = lbh_web_view_new(info, LBH_NATURAL_SIZE,
-    	auto_load_images || (have_src_cid && !have_src_oth));
+    	auto_load_ext_content || (have_src_cid && !have_src_oth));
 
     g_signal_connect(info->web_view, "mouse-target-changed",
                      G_CALLBACK(lbh_mouse_target_changed_cb), info);
@@ -862,7 +862,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     gtk_box_pack_end(GTK_BOX(vbox), GTK_WIDGET(info->web_view), TRUE, TRUE, 0);
 
     /* Simple check for possible resource requests: */
-    if (have_src_oth) {
+    if (have_src_oth && !auto_load_ext_content) {
         info->info_bar = lbh_info_bar(info);
         gtk_box_pack_start(GTK_BOX(vbox), info->info_bar, FALSE, FALSE, 0);
         g_debug("%s shows info_bar", __func__);

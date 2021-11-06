@@ -39,11 +39,13 @@
 enum {
 	PREFS_ADDRESS_COLUMN = 0,
 	PREFS_PREFER_HTML_COLUMN,
-	PREFS_LOAD_IMAGES_COLUMN,
+	PREFS_LOAD_EXT_CONTENT,
 	PREFS_DB_VIEW_COLUMNS
 };
 
 
+/* Note: the database column prefer_load_img actually indicates if any external content shall be loaded.  The naming is kept for
+ * backward compatibility from previous versions where only loading external images automatically could be configured. */
 #define DB_SCHEMA								\
 	"PRAGMA auto_vacuum = 1;"					\
 	"CREATE TABLE html_prefs("					\
@@ -95,7 +97,7 @@ libbalsa_html_get_prefer_html(InternetAddressList *from)
 
 
 gboolean
-libbalsa_html_get_load_images(InternetAddressList *from)
+libbalsa_html_get_load_content(InternetAddressList *from)
 {
 	return pref_db_get(from, 2);
 }
@@ -109,7 +111,7 @@ libbalsa_html_prefer_set_prefer_html(InternetAddressList *from, gboolean state)
 
 
 void
-libbalsa_html_prefer_set_load_images(InternetAddressList *from, gboolean state)
+libbalsa_html_prefer_set_load_content(InternetAddressList *from, gboolean state)
 {
 	pref_db_set_ial(from, 2, state);
 }
@@ -150,7 +152,7 @@ libbalsa_html_pref_dialog_run(GtkWindow *parent)
 	model = gtk_list_store_new(PREFS_DB_VIEW_COLUMNS,
 		G_TYPE_STRING,			/* address */
 		G_TYPE_BOOLEAN,			/* prefer html over plain text */
-		G_TYPE_BOOLEAN);		/* auto-load images */
+		G_TYPE_BOOLEAN);		/* auto-load external content */
 
 	tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
 
@@ -174,7 +176,7 @@ libbalsa_html_pref_dialog_run(GtkWindow *parent)
 		gtk_list_store_set(model, &iter,
 			PREFS_ADDRESS_COLUMN, sqlite3_column_text(query[4], 0),
 			PREFS_PREFER_HTML_COLUMN, sqlite3_column_int(query[4], 1),
-			PREFS_LOAD_IMAGES_COLUMN, sqlite3_column_int(query[4], 2),
+			PREFS_LOAD_EXT_CONTENT, sqlite3_column_int(query[4], 2),
 			-1);
 		sqlite_res = sqlite3_step(query[4]);
 	}
@@ -197,9 +199,10 @@ libbalsa_html_pref_dialog_run(GtkWindow *parent)
 	gtk_widget_show_all(vbox);
 
 	renderer = gtk_cell_renderer_toggle_new();
-	g_object_set_data(G_OBJECT(renderer), "dbcol", GINT_TO_POINTER(PREFS_LOAD_IMAGES_COLUMN));
+	g_object_set_data(G_OBJECT(renderer), "dbcol", GINT_TO_POINTER(PREFS_LOAD_EXT_CONTENT));
 	g_signal_connect(renderer, "toggled", G_CALLBACK(on_prefs_button_toggled), model);
-	column = gtk_tree_view_column_new_with_attributes(_("Auto-load images"), renderer, "active", PREFS_LOAD_IMAGES_COLUMN, NULL);
+	column = gtk_tree_view_column_new_with_attributes(_("Auto-load external content"), renderer, "active", PREFS_LOAD_EXT_CONTENT,
+		NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 	gtk_tree_view_column_set_resizable(column, TRUE);
 	gtk_widget_show_all(vbox);
@@ -283,7 +286,7 @@ pref_db_check(void)
 /** \brief Get the HTML preferences setting for a sender
  *
  * \param from From: address list, may be NULL or empty
- * \param col 1 prefer HTML, 2 auto-load images
+ * \param col 1 prefer HTML, 2 auto-load external content
  * \return the requested setting, FALSE on error, empty address list or missing entry
  */
 static gboolean
@@ -328,7 +331,7 @@ pref_db_get(InternetAddressList *from, int col)
 /** \brief Set the HTML preferences setting for a sender
  *
  * \param from From: address list, must not be NULL
- * \param pref_idx 1 prefer HTML, 2 auto-load images
+ * \param pref_idx 1 prefer HTML, 2 auto-load external content
  */
 static void
 pref_db_set_ial(InternetAddressList *from, int pref_idx, gboolean value)
@@ -350,7 +353,7 @@ pref_db_set_ial(InternetAddressList *from, int pref_idx, gboolean value)
 /** \brief Set the HTML preferences setting for a sender
  *
  * \param sender From: mailbox, must not be NULL
- * \param pref_idx 1 prefer HTML, 2 auto-load images
+ * \param pref_idx 1 prefer HTML, 2 auto-load external content
  * \return TRUE if the operation was successful
  */
 static gboolean

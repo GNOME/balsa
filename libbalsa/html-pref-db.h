@@ -39,12 +39,12 @@
  */
 gboolean libbalsa_html_get_prefer_html(InternetAddressList *from);
 
-/** \brief Check if images in HTML messages from a sender shall be loaded automatically
+/** \brief Check if external content in HTML messages from a sender shall be loaded automatically
  *
  * \param from From: address list, may be NULL or empty
- * \return TRUE if images in HTML messages shall be loaded without confirmation
+ * \return TRUE if external content in HTML messages shall be loaded without confirmation
  */
-gboolean libbalsa_html_get_load_images(InternetAddressList *from);
+gboolean libbalsa_html_get_load_content(InternetAddressList *from);
 
 /** \brief Remember if HTML is preferred for messages from a sender
  *
@@ -55,13 +55,13 @@ gboolean libbalsa_html_get_load_images(InternetAddressList *from);
 void libbalsa_html_prefer_set_prefer_html(InternetAddressList *from,
                                           gboolean             state);
 
-/** \brief Remember if images in HTML messages from a sender shall be loaded automatically
+/** \brief Remember if external content in HTML messages from a sender shall be loaded automatically
  *
  * \param from From: address list, must not be NULL
- * \param state TRUE if images in HTML messages shall be loaded without confirmation
+ * \param state TRUE if external content in HTML messages shall be loaded without confirmation
  * \note The function is a no-op if the InternetAddressList does not contain an InternetAddressMailbox as 1st element.
  */
-void libbalsa_html_prefer_set_load_images(InternetAddressList *from,
+void libbalsa_html_prefer_set_load_content(InternetAddressList *from,
                                           gboolean             state);
 
 /** \brief Show the dialogue for managing the HTML preferences database

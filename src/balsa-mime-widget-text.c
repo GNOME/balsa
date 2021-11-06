@@ -1240,6 +1240,13 @@ bmwt_html_print_activated(GSimpleAction *action,
     libbalsa_html_print(html);
 }
 
+bmwt_html_load_external_content_changed(GtkCheckMenuItem *checkmenuitem,
+                              gpointer          user_data)
+{
+	libbalsa_html_prefer_set_load_content(INTERNET_ADDRESS_LIST(user_data),
+		gtk_check_menu_item_get_active(checkmenuitem));
+}
+
 static void
 bmwt_html_populate_popup_menu(BalsaMessage * bm,
                               GtkWidget    * html,
@@ -1329,10 +1336,10 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
                               g_variant_new_boolean(libbalsa_html_get_prefer_html(from)));
     g_simple_action_set_enabled(G_SIMPLE_ACTION(prefer_html_action), from != NULL);
 
-    g_menu_append(section, _("Load images for this sender"), "text-view-popup.load-images");
-    g_simple_action_set_state(G_SIMPLE_ACTION(load_images_action),
-                              g_variant_new_boolean(libbalsa_html_get_load_images(from)));
-    g_simple_action_set_enabled(G_SIMPLE_ACTION(load_images_action), from != NULL);
+    g_menu_append(section, _("Load external content for this sender"), "text-view-popup.load-ext-content");
+    g_simple_action_set_state(G_SIMPLE_ACTION(load_ext_content_action),
+                              g_variant_new_boolean(libbalsa_html_get_load_ext_content(from)));
+    g_simple_action_set_enabled(G_SIMPLE_ACTION(load_ext_content_action), from != NULL);
 
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);
@@ -1408,7 +1415,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
         libbalsa_html_new(mime_body,
                          (LibBalsaHtmlCallback) bm_widget_on_url,
                          (LibBalsaHtmlCallback) handle_url,
-                         libbalsa_html_get_load_images(from));
+                         libbalsa_html_get_load_content(from));
     gtk_box_append(GTK_BOX(mwt), widget);
     view_widget = libbalsa_html_get_view_widget(widget);
 

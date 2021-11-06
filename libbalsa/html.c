@@ -432,12 +432,12 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
     GtkInfoBar *info_bar;
     GtkWidget *label;
     static const gchar text[] =
-                 N_("This message part references contents on one or more external servers. "
-                	"To protect your privacy, Balsa has not downloaded them. You may choose "
-                	"to download them if you trust the sender of the message.");
+                 N_("This message part references content on one or more external servers. "
+                	"To protect your privacy, Balsa has not downloaded it. You may choose "
+                	"to download it if you trust the sender of the message.");
 
     info_bar_widget =
-        gtk_info_bar_new_with_buttons(_("_Download external contents"),
+        gtk_info_bar_new_with_buttons(_("_Download external content"),
                                      GTK_RESPONSE_OK,
                                      _("_Close"), GTK_RESPONSE_CLOSE,
                                      NULL);
@@ -701,8 +701,8 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 	webkit_settings_set_enable_java(settings, FALSE);
 	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);
 	webkit_settings_set_auto_load_images(settings,
-		auto_load_images || (g_atomic_int_get(&html_filter_found) != 0));
-	lbh_load_external_resources(view, auto_load_images);
+		auto_load_ext_content || (g_atomic_int_get(&html_filter_found) != 0));
+	lbh_load_external_resources(view, auto_load_ext_content);
 
 	g_signal_connect(view, "web-process-terminated", G_CALLBACK(lbh_web_process_terminated_cb), info);
     g_signal_connect(view, "decide-policy", G_CALLBACK(lbh_decide_policy_cb), info);

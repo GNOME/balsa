@@ -530,6 +530,8 @@ libbalsa_address_book_ldap_get_address(LibBalsaAddressBook * ab,
 	}
         ldap_memfree(attr);
     }
+    ber_free(ber, 0);
+
     /*
      * Record will have e-mail (searched)
      */
@@ -597,6 +599,7 @@ lbabl_get_internet_address(GList *addrs, LDAP *dir, LDAPMessage * e)
 	}
         ldap_memfree(attr);
     }
+    ber_free(ber, 0);
 
     if(!cn)
         cn = create_name(first, sn);

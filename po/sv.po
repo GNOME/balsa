@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2021-10-10 22:12+0000\n"
-"PO-Revision-Date: 2021-10-11 01:43+0200\n"
+"POT-Creation-Date: 2021-12-16 15:34+0000\n"
+"PO-Revision-Date: 2021-12-16 18:26+0100\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -124,7 +124,7 @@ msgid "No-Id"
 msgstr "Inget-Id"
 
 #: ../libbalsa/address-book-extern.c:191 ../libbalsa/address-book-extern.c:349
-#: ../libbalsa/address-book-ldap.c:550 ../libbalsa/address-book-ldif.c:189
+#: ../libbalsa/address-book-ldap.c:552 ../libbalsa/address-book-ldif.c:189
 #: ../libbalsa/address-book-ldif.c:227 ../libbalsa/address-book-ldif.c:270
 #: ../libbalsa/address-book-ldif.c:274 ../libbalsa/address-book-vcard.c:142
 #: ../libbalsa/address-book-vcard.c:249 ../libbalsa/address.c:392
@@ -146,11 +146,11 @@ msgstr "LDAP-servern ”%s” stöder inte LDAPv3, interaktion kan misslyckas."
 msgid "TLS requested but not compiled in"
 msgstr "TLS begärdes men är inte inbyggt"
 
-#: ../libbalsa/address-book-ldap.c:666
+#: ../libbalsa/address-book-ldap.c:669
 msgid "Undefined location of user address book"
 msgstr "Odefinierad plats för användaradressbok"
 
-#: ../libbalsa/address-book-ldap.c:1097
+#: ../libbalsa/address-book-ldap.c:1100
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr "LDAP-servern %s nere, nästa försök kommer att försöka ansluta på nytt."
@@ -233,8 +233,8 @@ msgstr "fel vid läsning av Autocrypt-data för ”%s”: %s"
 msgid "Autocrypt database"
 msgstr "Autocrypt-databas"
 
-#: ../libbalsa/autocrypt.c:448 ../libbalsa/html.c:427
-#: ../libbalsa/html-pref-db.c:137 ../libbalsa/identity.c:1658
+#: ../libbalsa/autocrypt.c:448 ../libbalsa/html.c:447
+#: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
 #: ../libbalsa/libbalsa-gpgme-widgets.c:765 ../src/ab-window.c:148
 #: ../src/folder-conf.c:337 ../src/mailbox-node.c:1049
 #: ../src/main-window.c:3832 ../src/toolbar-prefs.c:130
@@ -273,7 +273,7 @@ msgstr "”insert” av användaren ”%s” misslyckades: %s"
 msgid "_Show details…"
 msgstr "_Visa detaljer…"
 
-#: ../libbalsa/autocrypt.c:884 ../libbalsa/html-pref-db.c:447
+#: ../libbalsa/autocrypt.c:884 ../libbalsa/html-pref-db.c:450
 #: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1041
 #: ../src/mailbox-node.c:1057 ../src/pref-manager.c:2002
 #: ../src/pref-manager.c:2087 ../src/pref-manager.c:2810 ../ui/ab-main.ui.h:11
@@ -536,72 +536,73 @@ msgstr ""
 "Det går inte att dekryptera multipart/encrypted-del: misslyckades med att "
 "tolka dekrypterat innehåll"
 
-#: ../libbalsa/html.c:79
+#: ../libbalsa/html.c:94
 #, c-format
 msgid "Could not get an HTML part: %s"
 msgstr "Kunde inte hämta en HTML-del: %s"
 
-#: ../libbalsa/html.c:137
+#: ../libbalsa/html.c:152
 #, c-format
 msgid "Could not convert HTML part to text: %s"
 msgstr "Kunde inte konvertera en HTML-del till text: %s"
 
-#: ../libbalsa/html.c:408
+#: ../libbalsa/html.c:440
 msgid ""
-"This message part contains images from a remote server.\n"
-"To protect your privacy, Balsa has not downloaded them.\n"
-"You may choose to download them if you trust the server."
+"This message part references content on one or more external servers. To "
+"protect your privacy, Balsa has not downloaded it. You may choose to "
+"download it if you trust the sender of the message."
 msgstr ""
-"Denna meddelandedel innehåller bilder från en fjärrserver.\n"
-"För att skydda din integritet har Balsa inte hämtat dem.\n"
-"Du kan välja att hämta dem om du litar på servern."
+"Denna meddelandedel hänvisar till innehåll på en eller flera fjärrservrar. "
+"För att skydda din integritet har Balsa inte hämtat den. Du kan välja att "
+"hämta den om du litar på meddelandets avsändare."
 
-#: ../libbalsa/html.c:416
+#: ../libbalsa/html.c:445
+msgid "_Download external content"
+msgstr "_Hämta externt innehåll"
+
+#: ../libbalsa/html.c:682
+#, c-format
 msgid ""
-"This message part contains images from a remote server. To protect your "
-"privacy, Balsa has not downloaded them. You may choose to download them if "
-"you trust the server."
+"Balsa's external HTML resources filter web extension is not available in the "
+"folder “%s”, falling back to simplified image filtering. Please check your "
+"installation. "
 msgstr ""
-"Denna meddelandedel innehåller bilder från en fjärrserver. För att skydda "
-"din integritet har Balsa inte hämtat dem. Du kan välja att hämta dem om du "
-"litar på servern."
+"Balsas webbtillägg för filtrering av externa HTML-resurser är inte "
+"tillgängligt i mappen ”%s”, faller tillbaka på förenklad bildfiltrering. "
+"Kontrollera din installation. "
 
-#: ../libbalsa/html.c:425
-msgid "_Download images"
-msgstr "_Hämta bilder"
-
-#: ../libbalsa/html-pref-db.c:136
+#: ../libbalsa/html-pref-db.c:138
 msgid "HTML preferences"
 msgstr "HTML-inställningar"
 
-#: ../libbalsa/html-pref-db.c:186 ../src/pref-manager.c:221
+#: ../libbalsa/html-pref-db.c:188 ../src/pref-manager.c:221
 msgid "Sender"
 msgstr "Avsändare"
 
-#: ../libbalsa/html-pref-db.c:194
+#: ../libbalsa/html-pref-db.c:196
 msgid "Prefer HTML"
 msgstr "Föredra HTML"
 
-#: ../libbalsa/html-pref-db.c:202
-msgid "Auto-load images"
-msgstr "Läs automatiskt in bilder"
+#: ../libbalsa/html-pref-db.c:204
+msgid "Auto-load external content"
+msgstr "Läs in externt innehåll automatiskt"
 
-#: ../libbalsa/html-pref-db.c:267
+#: ../libbalsa/html-pref-db.c:270
 #, c-format
 msgid "Cannot initialise HTML preferences database “%s”: %s"
 msgstr "Det går inte att initiera HTML-inställningsdatabasen ”%s”: %s"
 
-#: ../libbalsa/html-pref-db.c:313
+#: ../libbalsa/html-pref-db.c:316
 #, c-format
 msgid "Cannot read HTML preferences for “%s”: %s"
 msgstr "Det går inte att läsa HTML-inställningar för ”%s”: %s"
 
-#: ../libbalsa/html-pref-db.c:366
+#: ../libbalsa/html-pref-db.c:369
 #, c-format
 msgid "Cannot save HTML preferences for “%s”: %s"
 msgstr "Det går inte att spara HTML-inställningar för ”%s”: %s"
 
-#: ../libbalsa/html-pref-db.c:474
+#: ../libbalsa/html-pref-db.c:477
 #, c-format
 msgid "Cannot delete database entry: %s"
 msgstr "Det går inte att ta bort databaspost: %s"
@@ -4058,7 +4059,7 @@ msgstr "Filen finns redan. Skriv över?"
 msgid "Unlink %s: %s"
 msgstr "Avlänka %s: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:76 ../src/balsa-mime-widget-text.c:253
+#: ../src/balsa-mime-widget-crypto.c:76 ../src/balsa-mime-widget-text.c:254
 #, c-format
 msgid "Could not save a text part: %s"
 msgstr "Kunde inte spara en textdel: %s"
@@ -4198,7 +4199,7 @@ msgstr "Ärende: %s\n"
 msgid "Se_nd message to obtain this part"
 msgstr "Skicka _meddelande för att få tag i denna del"
 
-#: ../src/balsa-mime-widget-message.c:325 ../src/balsa-mime-widget-text.c:885
+#: ../src/balsa-mime-widget-message.c:325 ../src/balsa-mime-widget-text.c:886
 #: ../src/sendmsg-window.c:1428
 #, c-format
 msgid "Error showing %s: %s\n"
@@ -4259,27 +4260,27 @@ msgstr "FCC:"
 msgid "Disposition-Notification-To:"
 msgstr "Dispositionsbekräftelse-till:"
 
-#: ../src/balsa-mime-widget-text.c:583
+#: ../src/balsa-mime-widget-text.c:584
 msgid "Copy link"
 msgstr "Kopiera länk"
 
-#: ../src/balsa-mime-widget-text.c:588
+#: ../src/balsa-mime-widget-text.c:589
 msgid "Open link"
 msgstr "Öppna länk"
 
-#: ../src/balsa-mime-widget-text.c:593
+#: ../src/balsa-mime-widget-text.c:594
 msgid "Send link…"
 msgstr "Skicka länk…"
 
-#: ../src/balsa-mime-widget-text.c:625 ../src/balsa-mime-widget-text.c:1164
+#: ../src/balsa-mime-widget-text.c:626 ../src/balsa-mime-widget-text.c:1164
 msgid "Save…"
 msgstr "Spara…"
 
-#: ../src/balsa-mime-widget-text.c:633
+#: ../src/balsa-mime-widget-text.c:634
 msgid "Highlight structured phrases"
 msgstr "Färgmarkera strukturerade fraser"
 
-#: ../src/balsa-mime-widget-text.c:870
+#: ../src/balsa-mime-widget-text.c:871
 #, c-format
 msgid "Calling URL %s…"
 msgstr "Anropar URL:en %s…"
@@ -4310,8 +4311,8 @@ msgid "Prefer HTML for this sender"
 msgstr "Föredra HTML för den här avsändaren"
 
 #: ../src/balsa-mime-widget-text.c:1190
-msgid "Load images for this sender"
-msgstr "Läs in bilder för den här avsändaren"
+msgid "Load external content for this sender"
+msgstr "Läs in externt innehåll för den här avsändaren"
 
 #: ../src/balsa-mime-widget-text.c:1344
 msgid "S_tore Address"
@@ -6404,32 +6405,32 @@ msgstr "Färgmarkera _citerad text"
 msgid "Highlight _structured phrases"
 msgstr "Färgmarkera _strukturerade fraser"
 
-#: ../src/print-gtk.c:616
-msgid "Download images from remote servers (may be dangerous)"
-msgstr "Hämta bilder från fjärrservrar (kan vara farligt)"
+#: ../src/print-gtk.c:617
+msgid "Download content from remote servers (may be dangerous)"
+msgstr "Hämta innehåll från fjärrservrar (kan vara farligt)"
 
 #. margins
-#: ../src/print-gtk.c:627
+#: ../src/print-gtk.c:628
 msgid "Margins"
 msgstr "Marginaler"
 
-#: ../src/print-gtk.c:631
+#: ../src/print-gtk.c:632
 msgid "_Top"
 msgstr "_Överkant"
 
-#: ../src/print-gtk.c:637
+#: ../src/print-gtk.c:638
 msgid "_Bottom"
 msgstr "_Nederkant"
 
-#: ../src/print-gtk.c:649
+#: ../src/print-gtk.c:650
 msgid "_Left"
 msgstr "_Vänster"
 
-#: ../src/print-gtk.c:655
+#: ../src/print-gtk.c:656
 msgid "_Right"
 msgstr "_Höger"
 
-#: ../src/print-gtk.c:793
+#: ../src/print-gtk.c:794
 #, c-format
 msgid "Error printing message: %s"
 msgstr "Fel vid utskrift av meddelande: %s"
@@ -8021,6 +8022,21 @@ msgstr "Bifoga ö_ppen GnuPG-nyckel"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Använd kontrollsekvenser för specialtecken"
+
+#~ msgid ""
+#~ "This message part contains images from a remote server.\n"
+#~ "To protect your privacy, Balsa has not downloaded them.\n"
+#~ "You may choose to download them if you trust the server."
+#~ msgstr ""
+#~ "Denna meddelandedel innehåller bilder från en fjärrserver.\n"
+#~ "För att skydda din integritet har Balsa inte hämtat dem.\n"
+#~ "Du kan välja att hämta dem om du litar på servern."
+
+#~ msgid "_Download images"
+#~ msgstr "_Hämta bilder"
+
+#~ msgid "Auto-load images"
+#~ msgstr "Läs automatiskt in bilder"
 
 #~ msgid "occurrences"
 #~ msgstr "förekomster"

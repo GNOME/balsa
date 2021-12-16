@@ -145,4 +145,11 @@ libbalsa_a = static_library('balsa', libbalsa_a_sources,
                                                    libimap_include],
                             install             : false)
 
+libhtmlfilter_la = shared_library('htmlfilter',
+                                  'html-filter.c',
+                                  dependencies        : balsa_deps,
+                                  include_directories : [top_include],
+                                  install             : true,
+                                  install_dir         : balsa_web_extensions)
+
 subdir('imap')

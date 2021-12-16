@@ -1112,10 +1112,10 @@ bmwt_html_prefer_html_changed(GtkCheckMenuItem *checkmenuitem,
 }
 
 static void
-bmwt_html_load_images_changed(GtkCheckMenuItem *checkmenuitem,
+bmwt_html_load_external_content_changed(GtkCheckMenuItem *checkmenuitem,
                               gpointer          user_data)
 {
-	libbalsa_html_prefer_set_load_images(INTERNET_ADDRESS_LIST(user_data),
+	libbalsa_html_prefer_set_load_content(INTERNET_ADDRESS_LIST(user_data),
 		gtk_check_menu_item_get_active(checkmenuitem));
 }
 
@@ -1187,11 +1187,11 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
     g_signal_connect(menuitem, "toggled", G_CALLBACK(bmwt_html_prefer_html_changed), from);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
-    menuitem = gtk_check_menu_item_new_with_label(_("Load images for this sender"));
+    menuitem = gtk_check_menu_item_new_with_label(_("Load external content for this sender"));
     gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(menuitem),
-        libbalsa_html_get_load_images(from));
+        libbalsa_html_get_load_content(from));
     gtk_widget_set_sensitive(menuitem, from != NULL);
-    g_signal_connect(menuitem, "toggled", G_CALLBACK(bmwt_html_load_images_changed), from);
+    g_signal_connect(menuitem, "toggled", G_CALLBACK(bmwt_html_load_external_content_changed), from);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 
     gtk_widget_show_all(GTK_WIDGET(menu));
@@ -1276,7 +1276,7 @@ bm_widget_new_html(BalsaMessage * bm, LibBalsaMessageBody * mime_body)
         libbalsa_html_new(mime_body,
                          (LibBalsaHtmlCallback) bm_widget_on_url,
                          (LibBalsaHtmlCallback) handle_url,
-                         libbalsa_html_get_load_images(from));
+                         libbalsa_html_get_load_content(from));
     gtk_container_add(GTK_CONTAINER(mwt), widget);
 
     g_object_set_data(G_OBJECT(widget), "mime-body", mime_body);

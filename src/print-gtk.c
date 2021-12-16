@@ -51,9 +51,9 @@ typedef struct {
     GtkWidget *margin_right;
 #ifdef HAVE_HTML_WIDGET
     GtkWidget *html_print;
-    GtkWidget *html_load_imgs;
+    GtkWidget *html_load_ext_content;
     gboolean prefer_text;
-    gboolean load_images;
+    gboolean load_ext_content;
     BalsaPrintSetup *setup;
 #endif
 } BalsaPrintPrefs;
@@ -613,9 +613,10 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_print), print_prefs->prefer_text);
     gtk_grid_attach(GTK_GRID(grid), print_prefs->html_print, 1, 0, 1, 1);
 
-    print_prefs->html_load_imgs = gtk_check_button_new_with_mnemonic(_("Download images from remote servers (may be dangerous)"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_load_imgs), print_prefs->load_images);
-    gtk_grid_attach(GTK_GRID(grid), print_prefs->html_load_imgs, 1, 1, 1, 1);
+    print_prefs->html_load_ext_content =
+    	gtk_check_button_new_with_mnemonic(_("Download content from remote servers (may be dangerous)"));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_load_ext_content), print_prefs->load_ext_content);
+    gtk_grid_attach(GTK_GRID(grid), print_prefs->html_load_ext_content, 1, 1, 1, 1);
 
     /* phantom alignment */
     dummy = gtk_label_new(" ");
@@ -708,8 +709,8 @@ message_prefs_apply(GtkPrintOperation * operation, GtkWidget * widget,
 #ifdef HAVE_HTML_WIDGET
     print_prefs->setup->print_alt_html =
     	!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(print_prefs->html_print));
-    print_prefs->setup->html_load_images =
-    	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(print_prefs->html_load_imgs));
+    print_prefs->setup->html_load_ext_content =
+    	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(print_prefs->html_load_ext_content));
 #endif
 }
 
@@ -768,7 +769,7 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
     print_prefs.setup = &print_data->setup;
     from = libbalsa_message_get_headers(msg)->from;
     print_prefs.prefer_text = balsa_app.display_alt_plain && !libbalsa_html_get_prefer_html(from);
-    print_prefs.load_images = libbalsa_html_get_load_images(from);
+    print_prefs.load_ext_content = libbalsa_html_get_load_content(from);
 #endif
 
     g_signal_connect(print, "begin_print", G_CALLBACK(begin_print), print_data);

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2021-10-10 22:12+0000\n"
-"PO-Revision-Date: 2021-10-11 09:05+0300\n"
+"POT-Creation-Date: 2021-12-16 15:34+0000\n"
+"PO-Revision-Date: 2021-12-18 08:35+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -119,7 +119,7 @@ msgid "No-Id"
 msgstr "Без-ідентифікатора"
 
 #: ../libbalsa/address-book-extern.c:191 ../libbalsa/address-book-extern.c:349
-#: ../libbalsa/address-book-ldap.c:550 ../libbalsa/address-book-ldif.c:189
+#: ../libbalsa/address-book-ldap.c:552 ../libbalsa/address-book-ldif.c:189
 #: ../libbalsa/address-book-ldif.c:227 ../libbalsa/address-book-ldif.c:270
 #: ../libbalsa/address-book-ldif.c:274 ../libbalsa/address-book-vcard.c:142
 #: ../libbalsa/address-book-vcard.c:249 ../libbalsa/address.c:392
@@ -143,11 +143,11 @@ msgstr ""
 msgid "TLS requested but not compiled in"
 msgstr "Запитано TLS, але програма скомпільована баз підтримки TLS"
 
-#: ../libbalsa/address-book-ldap.c:666
+#: ../libbalsa/address-book-ldap.c:669
 msgid "Undefined location of user address book"
 msgstr "Невизначене розташування адресної книги користувача"
 
-#: ../libbalsa/address-book-ldap.c:1097
+#: ../libbalsa/address-book-ldap.c:1100
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr ""
@@ -233,8 +233,8 @@ msgstr ""
 msgid "Autocrypt database"
 msgstr "База даних автошифрування"
 
-#: ../libbalsa/autocrypt.c:448 ../libbalsa/html.c:427
-#: ../libbalsa/html-pref-db.c:137 ../libbalsa/identity.c:1658
+#: ../libbalsa/autocrypt.c:448 ../libbalsa/html.c:447
+#: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
 #: ../libbalsa/libbalsa-gpgme-widgets.c:765 ../src/ab-window.c:148
 #: ../src/folder-conf.c:337 ../src/mailbox-node.c:1049
 #: ../src/main-window.c:3832 ../src/toolbar-prefs.c:130
@@ -273,7 +273,7 @@ msgstr "не вдалося вставити користувача «%s»: %s"
 msgid "_Show details…"
 msgstr "Показати п_одробиці…"
 
-#: ../libbalsa/autocrypt.c:884 ../libbalsa/html-pref-db.c:447
+#: ../libbalsa/autocrypt.c:884 ../libbalsa/html-pref-db.c:450
 #: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1041
 #: ../src/mailbox-node.c:1057 ../src/pref-manager.c:2002
 #: ../src/pref-manager.c:2087 ../src/pref-manager.c:2810 ../ui/ab-main.ui.h:11
@@ -536,72 +536,76 @@ msgstr ""
 "Не вдалося розшифрувати частину multipart/encrypted: не вдалося обробити "
 "розшифровані дані"
 
-#: ../libbalsa/html.c:79
+#: ../libbalsa/html.c:94
 #, c-format
 msgid "Could not get an HTML part: %s"
 msgstr "Не вдалося отримати частину HTML: %s"
 
-#: ../libbalsa/html.c:137
+#: ../libbalsa/html.c:152
 #, c-format
 msgid "Could not convert HTML part to text: %s"
 msgstr "Не вдалося перетворити частину HTML на текст: %s"
 
-#: ../libbalsa/html.c:408
+#: ../libbalsa/html.c:440
+#| msgid ""
+#| "This message part contains images from a remote server. To protect your "
+#| "privacy, Balsa has not downloaded them. You may choose to download them "
+#| "if you trust the server."
 msgid ""
-"This message part contains images from a remote server.\n"
-"To protect your privacy, Balsa has not downloaded them.\n"
-"You may choose to download them if you trust the server."
+"This message part references content on one or more external servers. To "
+"protect your privacy, Balsa has not downloaded it. You may choose to "
+"download it if you trust the sender of the message."
 msgstr ""
-"У цій частині повідомлення містяться зображення з віддаленого сервера.\n"
-"Щоб захистити вас, Balsa не отримувала дані цих зображень.\n"
-"Ви можете наказати програмі отримати зображення, якщо довіряєте серверу."
+"У цій частині повідомлення містяться посилання на дані на одному або декількох зовнішніх серверах. Щоб захистити вас, Balsa не отримувала ці дані. Ви можете наказати "
+"програмі отримати дані, якщо довіряєте відправникові."
 
-#: ../libbalsa/html.c:416
+#: ../libbalsa/html.c:445
+msgid "_Download external content"
+msgstr ""
+"_Отримати зовнішні дані"
+
+#: ../libbalsa/html.c:682
+#, c-format
 msgid ""
-"This message part contains images from a remote server. To protect your "
-"privacy, Balsa has not downloaded them. You may choose to download them if "
-"you trust the server."
+"Balsa's external HTML resources filter web extension is not available in the "
+"folder “%s”, falling back to simplified image filtering. Please check your "
+"installation. "
 msgstr ""
-"У цій частині повідомлення містяться зображення з віддаленого сервера. Щоб "
-"захистити вас, Balsa не отримувала дані цих зображень. Ви можете наказати "
-"програмі отримати зображення, якщо довіряєте серверу."
+"Веброзширення фільтрування зовнішніх ресурсів HTML Balsa є недоступним у теці «%s». Повертаємося до спрощеного фільтрування зображень. Будь ласка, перевірте, чи встановлено пакунок з програмою належним чином. "
 
-#: ../libbalsa/html.c:425
-msgid "_Download images"
-msgstr "_Отримати зображення"
-
-#: ../libbalsa/html-pref-db.c:136
+#: ../libbalsa/html-pref-db.c:138
 msgid "HTML preferences"
 msgstr "Налаштування HTML"
 
-#: ../libbalsa/html-pref-db.c:186 ../src/pref-manager.c:221
+#: ../libbalsa/html-pref-db.c:188 ../src/pref-manager.c:221
 msgid "Sender"
 msgstr "Відправник"
 
-#: ../libbalsa/html-pref-db.c:194
+#: ../libbalsa/html-pref-db.c:196
 msgid "Prefer HTML"
 msgstr "Перевага HTML"
 
-#: ../libbalsa/html-pref-db.c:202
-msgid "Auto-load images"
-msgstr "Автоматично завантажувати зображення"
+#: ../libbalsa/html-pref-db.c:204
+msgid "Auto-load external content"
+msgstr ""
+"Автозавантаження зовнішніх даних"
 
-#: ../libbalsa/html-pref-db.c:267
+#: ../libbalsa/html-pref-db.c:270
 #, c-format
 msgid "Cannot initialise HTML preferences database “%s”: %s"
 msgstr "Не вдалося ініціалізувати базу даних налаштувань HTML «%s»: %s"
 
-#: ../libbalsa/html-pref-db.c:313
+#: ../libbalsa/html-pref-db.c:316
 #, c-format
 msgid "Cannot read HTML preferences for “%s”: %s"
 msgstr "Не вдалося прочитати налаштування HTML для «%s»: %s"
 
-#: ../libbalsa/html-pref-db.c:366
+#: ../libbalsa/html-pref-db.c:369
 #, c-format
 msgid "Cannot save HTML preferences for “%s”: %s"
 msgstr "Не вдалося зберегти налаштування HTML для «%s»: %s"
 
-#: ../libbalsa/html-pref-db.c:474
+#: ../libbalsa/html-pref-db.c:477
 #, c-format
 msgid "Cannot delete database entry: %s"
 msgstr "Не вдалося вилучити запис бази даних: %s"
@@ -2217,133 +2221,111 @@ msgstr[2] "другий"
 msgstr[3] "другий"
 
 #: ../libbalsa/rfc2445.c:415
-#| msgid "unknown"
 msgctxt "ical_status"
 msgid "unknown"
 msgstr "невідомо"
 
 #: ../libbalsa/rfc2445.c:416
-#| msgid "event is tentative"
 msgctxt "ical_status"
 msgid "event is tentative"
 msgstr "подія є обумовленою"
 
 #: ../libbalsa/rfc2445.c:417
-#| msgid "event is definite"
 msgctxt "ical_status"
 msgid "event is definite"
 msgstr "подія є певною"
 
 #: ../libbalsa/rfc2445.c:418
-#| msgid "event was cancelled"
 msgctxt "ical_status"
 msgid "event was cancelled"
 msgstr "подію скасовано"
 
 #: ../libbalsa/rfc2445.c:444
-#| msgid "unknown"
 msgctxt "ical_method"
 msgid "unknown"
 msgstr "невідомо"
 
 #: ../libbalsa/rfc2445.c:445
-#| msgid "Event Notification"
 msgctxt "ical_method"
 msgid "Event Notification"
 msgstr "Сповіщення про події"
 
 #: ../libbalsa/rfc2445.c:446
-#| msgid "Event Request"
 msgctxt "ical_method"
 msgid "Event Request"
 msgstr "Запит щодо події"
 
 #: ../libbalsa/rfc2445.c:447
-#| msgid "Reply to Event Request"
 msgctxt "ical_method"
 msgid "Reply to Event Request"
 msgstr "Відповісти на запит щодо події"
 
 #: ../libbalsa/rfc2445.c:448
-#| msgid "Event Cancellation"
 msgctxt "ical_method"
 msgid "Event Cancellation"
 msgstr "Скасування події"
 
 #: ../libbalsa/rfc2445.c:467
-#| msgid "unknown"
 msgctxt "ical_partstat"
 msgid "unknown"
 msgstr "невідомо"
 
 #: ../libbalsa/rfc2445.c:468
-#| msgid "needs action"
 msgctxt "ical_partstat"
 msgid "needs action"
 msgstr "потребує дії"
 
 #: ../libbalsa/rfc2445.c:469
-#| msgid "accepted"
 msgctxt "ical_partstat"
 msgid "accepted"
 msgstr "прийнято"
 
 #: ../libbalsa/rfc2445.c:470
-#| msgid "declined"
 msgctxt "ical_partstat"
 msgid "declined"
 msgstr "відхилено"
 
 #: ../libbalsa/rfc2445.c:471
-#| msgid "tentatively accepted"
 msgctxt "ical_partstat"
 msgid "tentatively accepted"
 msgstr "умовно прийнято"
 
 #: ../libbalsa/rfc2445.c:472
-#| msgid "delegated"
 msgctxt "ical_partstat"
 msgid "delegated"
 msgstr "доручено"
 
 #: ../libbalsa/rfc2445.c:515
-#| msgid "Sunday"
 msgctxt "day_of_week"
 msgid "Sunday"
 msgstr "Неділя"
 
 #: ../libbalsa/rfc2445.c:516
-#| msgid "Monday"
 msgctxt "day_of_week"
 msgid "Monday"
 msgstr "Понеділок"
 
 #: ../libbalsa/rfc2445.c:517
-#| msgid "Tuesday"
 msgctxt "day_of_week"
 msgid "Tuesday"
 msgstr "Вівторок"
 
 #: ../libbalsa/rfc2445.c:518
-#| msgid "Wednesday"
 msgctxt "day_of_week"
 msgid "Wednesday"
 msgstr "Середа"
 
 #: ../libbalsa/rfc2445.c:519
-#| msgid "Thursday"
 msgctxt "day_of_week"
 msgid "Thursday"
 msgstr "Четвер"
 
 #: ../libbalsa/rfc2445.c:520
-#| msgid "Friday"
 msgctxt "day_of_week"
 msgid "Friday"
 msgstr "П'ятниця"
 
 #: ../libbalsa/rfc2445.c:521
-#| msgid "Saturday"
 msgctxt "day_of_week"
 msgid "Saturday"
 msgstr "Субота"
@@ -2456,73 +2438,61 @@ msgid " of every %d months"
 msgstr " кожних %d місяці"
 
 #: ../libbalsa/rfc2445.c:736
-#| msgid "January"
 msgctxt "name_of_month"
 msgid "January"
 msgstr "Січень"
 
 #: ../libbalsa/rfc2445.c:737
-#| msgid "February"
 msgctxt "name_of_month"
 msgid "February"
 msgstr "Лютий"
 
 #: ../libbalsa/rfc2445.c:738
-#| msgid "March"
 msgctxt "name_of_month"
 msgid "March"
 msgstr "Березень"
 
 #: ../libbalsa/rfc2445.c:739
-#| msgid "April"
 msgctxt "name_of_month"
 msgid "April"
 msgstr "Квітень"
 
 #: ../libbalsa/rfc2445.c:740
-#| msgid "May"
 msgctxt "name_of_month"
 msgid "May"
 msgstr "Травень"
 
 #: ../libbalsa/rfc2445.c:741
-#| msgid "June"
 msgctxt "name_of_month"
 msgid "June"
 msgstr "Червень"
 
 #: ../libbalsa/rfc2445.c:742
-#| msgid "July"
 msgctxt "name_of_month"
 msgid "July"
 msgstr "Липень"
 
 #: ../libbalsa/rfc2445.c:743
-#| msgid "August"
 msgctxt "name_of_month"
 msgid "August"
 msgstr "Серпень"
 
 #: ../libbalsa/rfc2445.c:744
-#| msgid "September"
 msgctxt "name_of_month"
 msgid "September"
 msgstr "Вересень"
 
 #: ../libbalsa/rfc2445.c:745
-#| msgid "October"
 msgctxt "name_of_month"
 msgid "October"
 msgstr "Жовтень"
 
 #: ../libbalsa/rfc2445.c:746
-#| msgid "November"
 msgctxt "name_of_month"
 msgid "November"
 msgstr "Листопад"
 
 #: ../libbalsa/rfc2445.c:747
-#| msgid "December"
 msgctxt "name_of_month"
 msgid "December"
 msgstr "Грудень"
@@ -2586,26 +2556,22 @@ msgid "every %d years on the %s of %s"
 msgstr "кожні %d років %s %s"
 
 #: ../libbalsa/rfc2445.c:861
-#| msgid "secondly"
 msgctxt "ical_recurrence"
 msgid "secondly"
 msgstr "щосекунди"
 
 #: ../libbalsa/rfc2445.c:864
-#| msgid "minutely"
 msgctxt "ical_recurrence"
 msgid "minutely"
 msgstr "щохвилини"
 
 #: ../libbalsa/rfc2445.c:867
-#| msgid "hourly"
 msgctxt "ical_recurrence"
 msgid "hourly"
 msgstr "щогодини"
 
 #: ../libbalsa/rfc2445.c:887
 #, c-format
-#| msgid "occurrence"
 msgid ", %d occurrence"
 msgid_plural ", %d occurrences"
 msgstr[0] ", %d повторення"
@@ -2620,31 +2586,26 @@ msgid " until %s"
 msgstr " до %s"
 
 #: ../libbalsa/rfc2445.c:1168
-#| msgid "unknown"
 msgctxt "ical_role"
 msgid "unknown"
 msgstr "невідомо"
 
 #: ../libbalsa/rfc2445.c:1169
-#| msgid "chair"
 msgctxt "ical_role"
 msgid "chair"
 msgstr "голова"
 
 #: ../libbalsa/rfc2445.c:1170
-#| msgid "required participant"
 msgctxt "ical_role"
 msgid "required participant"
 msgstr "обов'язковий учасник"
 
 #: ../libbalsa/rfc2445.c:1171
-#| msgid "optional participant"
 msgctxt "ical_role"
 msgid "optional participant"
 msgstr "необов'язковий учасник"
 
 #: ../libbalsa/rfc2445.c:1172
-#| msgid "non-participant, information only"
 msgctxt "ical_role"
 msgid "non-participant, information only"
 msgstr "не є учасником, лише інформація"
@@ -4171,7 +4132,7 @@ msgstr "Файл вже існує.  Переписати?"
 msgid "Unlink %s: %s"
 msgstr "Від'єднати %s: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:76 ../src/balsa-mime-widget-text.c:253
+#: ../src/balsa-mime-widget-crypto.c:76 ../src/balsa-mime-widget-text.c:254
 #, c-format
 msgid "Could not save a text part: %s"
 msgstr "Не вдалося зберегти текстову частину: %s"
@@ -4311,7 +4272,7 @@ msgstr "Тема: %s\n"
 msgid "Se_nd message to obtain this part"
 msgstr "Надіс_лати повідомлення для отримання цієї частини"
 
-#: ../src/balsa-mime-widget-message.c:325 ../src/balsa-mime-widget-text.c:885
+#: ../src/balsa-mime-widget-message.c:325 ../src/balsa-mime-widget-text.c:886
 #: ../src/sendmsg-window.c:1428
 #, c-format
 msgid "Error showing %s: %s\n"
@@ -4372,27 +4333,27 @@ msgstr "FCC:"
 msgid "Disposition-Notification-To:"
 msgstr "Сповіщення про отримання:"
 
-#: ../src/balsa-mime-widget-text.c:583
+#: ../src/balsa-mime-widget-text.c:584
 msgid "Copy link"
 msgstr "Копіювати посилання"
 
-#: ../src/balsa-mime-widget-text.c:588
+#: ../src/balsa-mime-widget-text.c:589
 msgid "Open link"
 msgstr "Відкрити посилання"
 
-#: ../src/balsa-mime-widget-text.c:593
+#: ../src/balsa-mime-widget-text.c:594
 msgid "Send link…"
 msgstr "Надіслати посилання…"
 
-#: ../src/balsa-mime-widget-text.c:625 ../src/balsa-mime-widget-text.c:1164
+#: ../src/balsa-mime-widget-text.c:626 ../src/balsa-mime-widget-text.c:1164
 msgid "Save…"
 msgstr "Зберегти…"
 
-#: ../src/balsa-mime-widget-text.c:633
+#: ../src/balsa-mime-widget-text.c:634
 msgid "Highlight structured phrases"
 msgstr "Підсвітити складені фрази"
 
-#: ../src/balsa-mime-widget-text.c:870
+#: ../src/balsa-mime-widget-text.c:871
 #, c-format
 msgid "Calling URL %s…"
 msgstr "Викликаємо адресу %s…"
@@ -4423,8 +4384,9 @@ msgid "Prefer HTML for this sender"
 msgstr "Перевага HTML для цього відправника"
 
 #: ../src/balsa-mime-widget-text.c:1190
-msgid "Load images for this sender"
-msgstr "Завантажувати зображення для цього відправника"
+#| msgid "Load images for this sender"
+msgid "Load external content for this sender"
+msgstr "Завантажувати зовнішні дані для цього відправника"
 
 #: ../src/balsa-mime-widget-text.c:1344
 msgid "S_tore Address"
@@ -6538,32 +6500,33 @@ msgstr "Підсвічення _цитованого тексту"
 msgid "Highlight _structured phrases"
 msgstr "Підсвічувати с_кладені фрази"
 
-#: ../src/print-gtk.c:616
-msgid "Download images from remote servers (may be dangerous)"
-msgstr "Отримувати зображення з віддалених серверів (може бути небезпечним)"
+#: ../src/print-gtk.c:617
+#| msgid "Download images from remote servers (may be dangerous)"
+msgid "Download content from remote servers (may be dangerous)"
+msgstr "Отримувати дані з віддалених серверів (може бути небезпечним)"
 
 #. margins
-#: ../src/print-gtk.c:627
+#: ../src/print-gtk.c:628
 msgid "Margins"
 msgstr "Поля"
 
-#: ../src/print-gtk.c:631
+#: ../src/print-gtk.c:632
 msgid "_Top"
 msgstr "_Верх"
 
-#: ../src/print-gtk.c:637
+#: ../src/print-gtk.c:638
 msgid "_Bottom"
 msgstr "_Знизу"
 
-#: ../src/print-gtk.c:649
+#: ../src/print-gtk.c:650
 msgid "_Left"
 msgstr "З_ліва"
 
-#: ../src/print-gtk.c:655
+#: ../src/print-gtk.c:656
 msgid "_Right"
 msgstr "Сп_рава"
 
-#: ../src/print-gtk.c:793
+#: ../src/print-gtk.c:794
 #, c-format
 msgid "Error printing message: %s"
 msgstr "Помилка під час спроби надрукувати повідомлення: %s"
@@ -8161,6 +8124,21 @@ msgstr "Долучити _відкритий ключ GnuPG"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Екранувати спеціальні символи"
+
+#~ msgid ""
+#~ "This message part contains images from a remote server.\n"
+#~ "To protect your privacy, Balsa has not downloaded them.\n"
+#~ "You may choose to download them if you trust the server."
+#~ msgstr ""
+#~ "У цій частині повідомлення містяться зображення з віддаленого сервера.\n"
+#~ "Щоб захистити вас, Balsa не отримувала дані цих зображень.\n"
+#~ "Ви можете наказати програмі отримати зображення, якщо довіряєте серверу."
+
+#~ msgid "_Download images"
+#~ msgstr "_Отримати зображення"
+
+#~ msgid "Auto-load images"
+#~ msgstr "Автоматично завантажувати зображення"
 
 #~ msgid "occurrences"
 #~ msgstr "випадки"

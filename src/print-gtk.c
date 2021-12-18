@@ -614,12 +614,14 @@ message_prefs_widget(GtkPrintOperation * operation,
     grid = create_options_group(_("Highlighting"), page, 1, 1, 1);
 
     print_prefs->html_print = gtk_check_button_new_with_mnemonic(_("Prefer text/plain over HTML"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_print), print_prefs->prefer_text);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(print_prefs->html_print),
+                                print_prefs->prefer_text);
     gtk_grid_attach(GTK_GRID(grid), print_prefs->html_print, 1, 0, 1, 1);
 
     print_prefs->html_load_ext_content =
     	gtk_check_button_new_with_mnemonic(_("Download content from remote servers (may be dangerous)"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_load_ext_content), print_prefs->load_ext_content);
+    gtk_check_button_set_active(GTK_CHECK_BUTTON(print_prefs->html_load_ext_content),
+                                print_prefs->load_ext_content);
     gtk_grid_attach(GTK_GRID(grid), print_prefs->html_load_ext_content, 1, 1, 1, 1);
 
     /* phantom alignment */
@@ -710,9 +712,9 @@ message_prefs_apply(GtkPrintOperation * operation, GtkWidget * widget,
     }
 #ifdef HAVE_HTML_WIDGET
     print_prefs->setup->print_alt_html =
-    	!gtk_toggle_button_get_active(GTK_CHECK_BUTTON(print_prefs->html_print));
+    	!gtk_check_button_get_active(GTK_CHECK_BUTTON(print_prefs->html_print));
     print_prefs->setup->html_load_ext_content =
-    	gtk_toggle_button_get_active(GTK_CHECK_BUTTON(print_prefs->html_load_ext_content));
+    	gtk_check_button_get_active(GTK_CHECK_BUTTON(print_prefs->html_load_ext_content));
 #endif
 }
 

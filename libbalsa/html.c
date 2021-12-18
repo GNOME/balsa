@@ -661,7 +661,7 @@ lbh_get_web_view_context(void)
 		view = WEBKIT_WEB_VIEW(webkit_web_view_new_with_context(tmp));
 		webkit_web_view_load_uri(view, "about:blank");
 		while (webkit_web_view_is_loading(view)) {
-			gtk_main_iteration_do(FALSE);
+			g_main_context_iteration(NULL, FALSE);
 			g_usleep(100);
 		}
 		g_object_ref_sink(view);

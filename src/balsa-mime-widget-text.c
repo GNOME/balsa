@@ -1022,7 +1022,6 @@ draw_cite_bar_real(gpointer data, gpointer user_data)
     BalsaMimeWidgetText *mwt = user_data;
     GtkTextView * view;
     GtkTextBuffer * buffer;
-    gint dimension;
     gint buffer_y;
     gint y_pos;
     gint height;
@@ -1205,16 +1204,16 @@ prefer_html_change_state(GSimpleAction *action,
 }
 
 static void
-load_images_change_state(GSimpleAction *action,
-                         GVariant      *state,
-                         gpointer       user_data)
+load_content_change_state(GSimpleAction *action,
+                          GVariant      *state,
+                          gpointer       user_data)
 {
     GtkWidget *html = user_data;
     BalsaMessage *bm = g_object_get_data(G_OBJECT(html), "bm");
     InternetAddressList *from;
 
     from = libbalsa_message_get_headers(balsa_message_get_message(bm))->from;
-    libbalsa_html_prefer_set_load_images(from, g_variant_get_boolean(state));
+    libbalsa_html_prefer_set_load_content(from, g_variant_get_boolean(state));
 
     g_simple_action_set_state(action, state);
 }
@@ -1240,13 +1239,6 @@ bmwt_html_print_activated(GSimpleAction *action,
     libbalsa_html_print(html);
 }
 
-bmwt_html_load_external_content_changed(GtkCheckMenuItem *checkmenuitem,
-                              gpointer          user_data)
-{
-	libbalsa_html_prefer_set_load_content(INTERNET_ADDRESS_LIST(user_data),
-		gtk_check_menu_item_get_active(checkmenuitem));
-}
-
 static void
 bmwt_html_populate_popup_menu(BalsaMessage * bm,
                               GtkWidget    * html,
@@ -1263,12 +1255,12 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
         {"save", bmwt_html_save_activated},
         {"print", bmwt_html_print_activated},
         {"prefer-html", NULL, NULL, "false", prefer_html_change_state},
-        {"load-images", NULL, NULL, "false", load_images_change_state}
+        {"load-content", NULL, NULL, "false", load_content_change_state}
     };
     GActionMap *action_map;
     GAction *print_action;
     GAction *prefer_html_action;
-    GAction *load_images_action;
+    GAction *load_content_action;
     GMenu *section;
     GMenu *open_menu;
     InternetAddressList *from;
@@ -1286,7 +1278,7 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
 
     print_action = g_action_map_lookup_action(action_map, "print");
     prefer_html_action = g_action_map_lookup_action(action_map, "prefer-html");
-    load_images_action = g_action_map_lookup_action(action_map, "load-images");
+    load_content_action = g_action_map_lookup_action(action_map, "load-content");
 
     g_object_unref(simple);
 
@@ -1337,9 +1329,9 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
     g_simple_action_set_enabled(G_SIMPLE_ACTION(prefer_html_action), from != NULL);
 
     g_menu_append(section, _("Load external content for this sender"), "text-view-popup.load-ext-content");
-    g_simple_action_set_state(G_SIMPLE_ACTION(load_ext_content_action),
-                              g_variant_new_boolean(libbalsa_html_get_load_ext_content(from)));
-    g_simple_action_set_enabled(G_SIMPLE_ACTION(load_ext_content_action), from != NULL);
+    g_simple_action_set_state(G_SIMPLE_ACTION(load_content_action),
+                              g_variant_new_boolean(libbalsa_html_get_load_content(from)));
+    g_simple_action_set_enabled(G_SIMPLE_ACTION(load_content_action), from != NULL);
 
     g_menu_append_section(menu, NULL, G_MENU_MODEL(section));
     g_object_unref(section);

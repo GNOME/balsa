@@ -162,14 +162,20 @@ libbalsa_html_pref_dialog_run(GtkWindow *parent)
 	geometry_manager_attach(GTK_WINDOW(dialog), "HTMLPrefsDB");
 
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-	gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
+	gtk_box_append(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
 	gtk_widget_set_vexpand(vbox, TRUE);
 
-	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-	gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 12U);
-	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrolled_window), GTK_SHADOW_ETCHED_IN);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
+	scrolled_window = gtk_scrolled_window_new();
+
+	gtk_widget_set_margin_top(scrolled_window, 12U);
+	gtk_widget_set_margin_bottom(scrolled_window, 12U);
+	gtk_widget_set_margin_start(scrolled_window, 12U);
+	gtk_widget_set_margin_end(scrolled_window, 12U);
+
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
+                                       GTK_POLICY_AUTOMATIC,
+                                       GTK_POLICY_AUTOMATIC);
+	gtk_box_append(GTK_BOX(vbox), scrolled_window);
 
 	model = gtk_list_store_new(PREFS_DB_VIEW_COLUMNS,
 		G_TYPE_STRING,			/* address */
@@ -178,15 +184,19 @@ libbalsa_html_pref_dialog_run(GtkWindow *parent)
 
 	tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
 
-	gesture = gtk_gesture_multi_press_new(tree_view);
+	gesture = gtk_gesture_click_new();
+        gtk_widget_add_controller(tree_view, GTK_EVENT_CONTROLLER(gesture));
 	gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);
 	g_signal_connect(gesture, "pressed", G_CALLBACK(button_press_cb), NULL);
 	gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture), GTK_PHASE_CAPTURE);
 	g_signal_connect(tree_view, "popup-menu", G_CALLBACK(popup_menu_cb), NULL);
 
-	gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
+        add_actions(tree_view, action_namespace);
+
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
 	gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
+
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window), tree_view);
 
 	/* add all database items */
 	G_LOCK(db_mutex);
@@ -218,7 +228,6 @@ libbalsa_html_pref_dialog_run(GtkWindow *parent)
 	column = gtk_tree_view_column_new_with_attributes(_("Prefer HTML"), renderer, "active", PREFS_PREFER_HTML_COLUMN, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 	gtk_tree_view_column_set_resizable(column, TRUE);
-	gtk_widget_show_all(vbox);
 
 	renderer = gtk_cell_renderer_toggle_new();
 	g_object_set_data(G_OBJECT(renderer), "dbcol", GINT_TO_POINTER(PREFS_LOAD_EXT_CONTENT));
@@ -227,7 +236,6 @@ libbalsa_html_pref_dialog_run(GtkWindow *parent)
 		NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 	gtk_tree_view_column_set_resizable(column, TRUE);
-	gtk_widget_show_all(vbox);
 
 	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(model), PREFS_ADDRESS_COLUMN, GTK_SORT_ASCENDING);
 	g_object_unref(model);

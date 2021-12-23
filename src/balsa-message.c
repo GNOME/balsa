@@ -147,10 +147,6 @@ static GdkPixbuf * get_crypto_content_icon(LibBalsaMessageBody * body,
 					   const gchar * content_type,
 					   gchar ** icon_title);
 
-#ifdef ENABLE_AUTOCRYPT
-static inline gboolean autocrypt_in_use(void);
-#endif
-
 G_DEFINE_TYPE(BalsaPartInfo, balsa_part_info, G_TYPE_OBJECT)
 
 static void
@@ -1179,7 +1175,7 @@ balsa_message_set(BalsaMessage * balsa_message, LibBalsaMailbox * mailbox, guint
 
 #ifdef ENABLE_AUTOCRYPT
     /* check for Autocrypt information if the message is new only */
-    if (is_new && autocrypt_in_use()) {
+    if (is_new && balsa_autocrypt_in_use()) {
     	GError *error = NULL;
 
     	autocrypt_from_message(message, &error);
@@ -2963,13 +2959,13 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 	    break;
 	case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
 	    if (g_mime_gpgme_sigstat_protocol(body->parts->next->sig_info) == GPGME_PROTOCOL_CMS)
-		libbalsa_information
-		    (LIBBALSA_INFORMATION_MESSAGE,
+		libbalsa_information_may_hide
+		    (LIBBALSA_INFORMATION_MESSAGE, "SIG_NOTRUST",
 		     _("Detected a good signature with insufficient "
 		       "validity"));
 	    else
-		libbalsa_information
-		    (LIBBALSA_INFORMATION_MESSAGE,
+		libbalsa_information_may_hide
+		    (LIBBALSA_INFORMATION_MESSAGE, "SIG_NOTRUST",
 		     _("Detected a good signature with insufficient "
 		       "validity/trust"));
 	    break;
@@ -3093,8 +3089,8 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
         if ((g_mime_gpgme_sigstat_summary(body->sig_info) & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
         	g_debug("%s: detected a good signature", __func__);
         } else {
-            libbalsa_information
-		(LIBBALSA_INFORMATION_MESSAGE,
+            libbalsa_information_may_hide
+		(LIBBALSA_INFORMATION_MESSAGE, "SIG_NOTRUST",
 		 _("Detected a good signature with insufficient "
 		   "validity/trust"));
         }
@@ -3320,22 +3316,6 @@ balsa_message_find_in_message(BalsaMessage * balsa_message)
             gtk_widget_grab_focus(balsa_message->find_entry);
     }
 }
-
-#ifdef ENABLE_AUTOCRYPT
-static inline gboolean
-autocrypt_in_use(void)
-{
-	gboolean result = FALSE;
-	GList *ident;
-
-	for (ident = balsa_app.identities; !result && (ident != NULL); ident = ident->next) {
-                LibBalsaIdentity *identity = LIBBALSA_IDENTITY(ident->data);
-                AutocryptMode autocrypt_mode = libbalsa_identity_get_autocrypt_mode(identity);
-		result = autocrypt_mode != AUTOCRYPT_DISABLE;
-	}
-	return result;
-}
-#endif
 
 /*
  * Getters

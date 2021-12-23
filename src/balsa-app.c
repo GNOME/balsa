@@ -940,3 +940,20 @@ balsa_quote_regex_new(void)
 
     return g_regex_ref(regex);
 }
+
+gboolean
+balsa_autocrypt_in_use(void)
+{
+	gboolean result = FALSE;
+#ifdef ENABLE_AUTOCRYPT
+	GList *ident;
+
+	for (ident = balsa_app.identities; !result && (ident != NULL); ident = ident->next) {
+                LibBalsaIdentity *identity = LIBBALSA_IDENTITY(ident->data);
+                AutocryptMode autocrypt_mode = libbalsa_identity_get_autocrypt_mode(identity);
+		result = autocrypt_mode != AUTOCRYPT_DISABLE;
+	}
+#endif  /* ENABLE_AUTOCRYPT */
+	return result;
+}
+

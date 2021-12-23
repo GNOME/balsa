@@ -474,39 +474,8 @@ balsa_check_open_compose_window(void)
     return FALSE;
 }
 
-/*
- * Set up GNotification for libbalsa
- */
 
 #define BALSA_NOTIFICATION "balsa-notification"
-
-static void
-balsa_notification_notify_cb(GNotification *notification,
-                             GParamSpec *pspec,
-                             GApplication *application)
-{
-    gboolean send;
-
-    send = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(notification), "send"));
-    if (send) {
-        g_application_send_notification(application,
-                                        BALSA_NOTIFICATION, notification);
-    } else {
-        g_application_withdraw_notification(application, BALSA_NOTIFICATION);
-    }
-}
-
-static void
-balsa_setup_libbalsa_notification(GApplication *application)
-{
-    GNotification *notification;
-
-    notification = libbalsa_notification_new("Balsa");
-    g_signal_connect(notification, "notify",
-                     G_CALLBACK(balsa_notification_notify_cb), application);
-    g_signal_connect_swapped(application, "shutdown",
-                             G_CALLBACK(g_object_unref), notification);
-}
 
 /* -------------------------- main --------------------------------- */
 static void
@@ -543,7 +512,7 @@ balsa_startup_cb(GApplication *application,
     balsa_app_init();
 
     /* Initialize libbalsa */
-    balsa_setup_libbalsa_notification(application);
+    libbalsa_information_init(application, "Balsa", BALSA_NOTIFICATION);
     libbalsa_init();
     libbalsa_filters_set_url_mapper(balsa_find_mailbox_by_url);
     libbalsa_filters_set_filter_list(&balsa_app.filters);
@@ -586,7 +555,7 @@ balsa_shutdown_cb(void)
     libbalsa_conf_drop_all();
     accel_map_save();
     libbalsa_imap_server_close_all_connections();
-    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, "%s", "");
+    libbalsa_information_shutdown();
 }
 
 static void

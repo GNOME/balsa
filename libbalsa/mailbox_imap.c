@@ -3225,8 +3225,8 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
                 g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
             break;
         } else 
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Server-side threading not supported."));
+            libbalsa_information_may_hide(LIBBALSA_INFORMATION_WARNING,
+            	"LBIMAP_SSTH", _("Server-side threading not supported."));
         /* fall through */
     case LB_MAILBOX_THREADING_FLAT:
         if(filter) {

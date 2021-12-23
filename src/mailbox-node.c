@@ -960,8 +960,7 @@ mb_filter_cb(GtkWidget * widget, BalsaMailboxNode * mbnode)
 	   problems of infinite recursion (when one mailbox being
 	   filtered is also the destination of the filter action (eg a
 	   copy)). So let's see that later :) */
-    	libbalsa_information_parented(GTK_WINDOW(balsa_app.main_window),
-    		LIBBALSA_INFORMATION_MESSAGE, _("You can apply filters only on mailbox"));
+    	libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, _("You can apply filters only on mailbox"));
 }
 
 static void

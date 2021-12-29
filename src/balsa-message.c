@@ -904,6 +904,7 @@ balsa_message_init(BalsaMessage * balsa_message)
     GMenu *menu;
 
     balsa_message->switcher = gtk_stack_switcher_new();
+    gtk_widget_set_halign(balsa_message->switcher, GTK_ALIGN_START);
     gtk_box_append(GTK_BOX(balsa_message), balsa_message->switcher);
 
     balsa_message->stack = gtk_stack_new();

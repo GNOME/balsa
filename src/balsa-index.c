@@ -260,6 +260,7 @@ bndx_destroy(GObject * obj)
 
     g_clear_object(&bindex->popup_actions);
     g_clear_object(&bindex->popup_menu);
+    g_clear_pointer(&bindex->popup_widget, gtk_widget_unparent);
 
     G_OBJECT_CLASS(balsa_index_parent_class)->dispose(obj);
 }

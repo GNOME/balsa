@@ -327,7 +327,7 @@ select_key_idle(gpointer user_data)
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 	gtk_tree_view_column_set_resizable(column, FALSE);
 
-    gtk_box_append(GTK_BOX(scrolled_window), tree_view);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window), tree_view);
     g_signal_connect(tree_view, "row-activated", G_CALLBACK(row_activated_cb), dialog);
 
     g_signal_connect(dialog, "response", G_CALLBACK(select_key_response), data);

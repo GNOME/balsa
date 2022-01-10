@@ -171,7 +171,7 @@ create_chain_widget(GList *cert_list)
 
 	store = gtk_tree_store_new(CERT_COLUMNS, G_TYPE_STRING, GTK_TYPE_WIDGET);
 	tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-	gtk_box_append(GTK_BOX(scrolledwin), tree_view);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledwin), tree_view);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer, "text", CERT_NAME_COLUMN, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);

@@ -318,7 +318,7 @@ balsa_ab_window_init(BalsaAbWindow *ab)
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
     gtk_grid_attach(GTK_GRID(grid), scrolled_window, 0, 1, 1, 1);
-    gtk_box_append(GTK_BOX(scrolled_window), ab->address_list);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window), ab->address_list);
     gtk_widget_set_size_request(scrolled_window, 300, 250);
 
     /* Buttons ... */

@@ -7,7 +7,7 @@
           <attribute name="label"
             translatable="yes">_Close</attribute>
           <attribute name="action">win.close</attribute>
-          <attribute name="accel">&lt;Primary&gt;w</attribute>
+          <attribute name="accel">&lt;Control&gt;w</attribute>
         </item>
       </section>
     </submenu>
@@ -18,7 +18,7 @@
           <attribute name="label"
             translatable="yes">_Copy</attribute>
           <attribute name="action">win.copy</attribute>
-          <attribute name="accel">&lt;Primary&gt;c</attribute>
+          <attribute name="accel">&lt;Control&gt;c</attribute>
         </item>
       </section>
       <section>
@@ -26,7 +26,7 @@
           <attribute name="label"
             translatable="yes">_Select Text</attribute>
           <attribute name="action">win.select</attribute>
-          <attribute name="accel">&lt;Primary&gt;a</attribute>
+          <attribute name="accel">&lt;Control&gt;a</attribute>
         </item>
       </section>
     </submenu>

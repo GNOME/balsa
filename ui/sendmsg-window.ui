@@ -29,7 +29,7 @@
           <attribute name="label"
             translatable="yes">Send</attribute>
           <attribute name="action">win.send</attribute>
-          <attribute name="accel">&lt;Primary&gt;Return</attribute>
+          <attribute name="accel">&lt;Control&gt;Return</attribute>
         </item>
         <item>
           <attribute name="label"
@@ -45,7 +45,7 @@
           <attribute name="label"
             translatable="yes">_Save</attribute>
           <attribute name="action">win.save</attribute>
-          <attribute name="accel">&lt;Primary&gt;s</attribute>
+          <attribute name="accel">&lt;Control&gt;s</attribute>
         </item>
       </section>
       <section>
@@ -58,7 +58,7 @@
           <attribute name="label"
             translatable="yes">_Print…</attribute>
           <attribute name="action">win.print</attribute>
-          <attribute name="accel">&lt;Primary&gt;p</attribute>
+          <attribute name="accel">&lt;Control&gt;p</attribute>
         </item>
       </section>
       <section>
@@ -66,7 +66,7 @@
           <attribute name="label"
             translatable="yes">_Close</attribute>
           <attribute name="action">win.close</attribute>
-          <attribute name="accel">&lt;Primary&gt;w</attribute>
+          <attribute name="accel">&lt;Control&gt;w</attribute>
         </item>
       </section>
     </submenu>
@@ -77,13 +77,13 @@
           <attribute name="label"
             translatable="yes">Undo</attribute>
           <attribute name="action">win.undo</attribute>
-          <attribute name="accel">&lt;Primary&gt;z</attribute>
+          <attribute name="accel">&lt;Control&gt;z</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">Redo</attribute>
           <attribute name="action">win.redo</attribute>
-          <attribute name="accel">&lt;Shift&gt;&lt;Primary&gt;z</attribute>
+          <attribute name="accel">&lt;Shift&gt;&lt;Control&gt;z</attribute>
         </item>
       </section>
       <section>
@@ -91,25 +91,25 @@
           <attribute name="label"
             translatable="yes">Cu_t</attribute>
           <attribute name="action">win.cut</attribute>
-          <attribute name="accel">&lt;Primary&gt;x</attribute>
+          <attribute name="accel">&lt;Control&gt;x</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">_Copy</attribute>
           <attribute name="action">win.copy</attribute>
-          <attribute name="accel">&lt;Primary&gt;c</attribute>
+          <attribute name="accel">&lt;Control&gt;c</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">_Paste</attribute>
           <attribute name="action">win.paste</attribute>
-          <attribute name="accel">&lt;Primary&gt;v</attribute>
+          <attribute name="accel">&lt;Control&gt;v</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">Select _All</attribute>
           <attribute name="action">win.select-all</attribute>
-          <attribute name="accel">&lt;Primary&gt;a</attribute>
+          <attribute name="accel">&lt;Control&gt;a</attribute>
         </item>
       </section>
       <section>
@@ -117,13 +117,13 @@
           <attribute name="label"
             translatable="yes">_Wrap Body</attribute>
           <attribute name="action">win.wrap-body</attribute>
-          <attribute name="accel">&lt;Primary&gt;b</attribute>
+          <attribute name="accel">&lt;Control&gt;b</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">_Reflow Selected Text</attribute>
           <attribute name="action">win.reflow</attribute>
-          <attribute name="accel">&lt;Primary&gt;r</attribute>
+          <attribute name="accel">&lt;Control&gt;r</attribute>
         </item>
       </section>
       <section>
@@ -131,7 +131,7 @@
           <attribute name="label"
             translatable="yes">Insert Si_gnature</attribute>
           <attribute name="action">win.insert-sig</attribute>
-          <attribute name="accel">&lt;Primary&gt;g</attribute>
+          <attribute name="accel">&lt;Control&gt;g</attribute>
         </item>
         <item>
           <attribute name="label"

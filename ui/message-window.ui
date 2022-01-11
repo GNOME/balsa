@@ -12,7 +12,7 @@
           <attribute name="label"
             translatable="yes">_Print…</attribute>
           <attribute name="action">win.print</attribute>
-          <attribute name="accel">&lt;Primary&gt;p</attribute>
+          <attribute name="accel">&lt;Control&gt;p</attribute>
         </item>
       </section>
       <section>
@@ -20,7 +20,7 @@
           <attribute name="label"
             translatable="yes">_Close</attribute>
           <attribute name="action">win.close</attribute>
-          <attribute name="accel">&lt;Primary&gt;w</attribute>
+          <attribute name="accel">&lt;Control&gt;w</attribute>
         </item>
       </section>
     </submenu>
@@ -31,13 +31,13 @@
           <attribute name="label"
             translatable="yes">_Copy</attribute>
           <attribute name="action">win.copy</attribute>
-          <attribute name="accel">&lt;Primary&gt;c</attribute>
+          <attribute name="accel">&lt;Control&gt;c</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">Select _All</attribute>
           <attribute name="action">win.select-all</attribute>
-          <attribute name="accel">&lt;Primary&gt;a</attribute>
+          <attribute name="accel">&lt;Control&gt;a</attribute>
         </item>
       </section>
       <section>
@@ -90,13 +90,13 @@
           <attribute name="label"
             translatable="yes">Zoom _In</attribute>
           <attribute name="action">win.zoom-in</attribute>
-          <attribute name="accel">&lt;Primary&gt;plus</attribute>
+          <attribute name="accel">&lt;Control&gt;plus</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">Zoom _Out</attribute>
           <attribute name="action">win.zoom-out</attribute>
-          <attribute name="accel">&lt;Primary&gt;minus</attribute>
+          <attribute name="accel">&lt;Control&gt;minus</attribute>
         </item>
         <item>
           <attribute name="label"
@@ -146,31 +146,31 @@
           <attribute name="label"
             translatable="yes">_Next Part</attribute>
           <attribute name="action">win.next-part</attribute>
-          <attribute name="accel">&lt;Primary&gt;period</attribute>
+          <attribute name="accel">&lt;Control&gt;period</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">_Previous Part</attribute>
           <attribute name="action">win.previous-part</attribute>
-          <attribute name="accel">&lt;Primary&gt;comma</attribute>
+          <attribute name="accel">&lt;Control&gt;comma</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">Save Current Part…</attribute>
           <attribute name="action">win.save-part</attribute>
-          <attribute name="accel">&lt;Primary&gt;s</attribute>
+          <attribute name="accel">&lt;Control&gt;s</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">_View Source…</attribute>
           <attribute name="action">win.view-source</attribute>
-          <attribute name="accel">&lt;Primary&gt;u</attribute>
+          <attribute name="accel">&lt;Control&gt;u</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">Decrypt and check signatures</attribute>
           <attribute name="action">win.recheck-crypt</attribute>
-          <attribute name="accel">&lt;Primary&gt;y</attribute>
+          <attribute name="accel">&lt;Control&gt;y</attribute>
         </item>
       </section>
       <section>
@@ -190,13 +190,13 @@
           <attribute name="label"
             translatable="yes">Next Unread Message</attribute>
           <attribute name="action">win.next-unread</attribute>
-          <attribute name="accel">&lt;Primary&gt;n</attribute>
+          <attribute name="accel">&lt;Control&gt;n</attribute>
         </item>
         <item>
           <attribute name="label"
             translatable="yes">Next Flagged Message</attribute>
           <attribute name="action">win.next-flagged</attribute>
-          <attribute name="accel">&lt;Primary&gt;&lt;Alt&gt;f</attribute>
+          <attribute name="accel">&lt;Control&gt;&lt;Alt&gt;f</attribute>
         </item>
       </section>
       <section>

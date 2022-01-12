@@ -156,15 +156,30 @@ libbalsa_window_get_menu_bar(GtkApplicationWindow * window,
  * menumodel    the GMenuModel
  */
 
+static GtkEventController *
+get_controller_from_window(GtkApplicationWindow * window)
+{
+    GtkEventController *controller;
+
+    controller = g_object_get_data(G_OBJECT(window), "libbalsa-shortcut-controller");
+
+    if (controller == NULL) {
+        controller = gtk_shortcut_controller_new();
+        gtk_widget_add_controller(GTK_WIDGET(window), controller);
+        g_object_set_data(G_OBJECT(window), "libbalsa-shortcut-controller", controller);
+    }
+
+    return controller;
+}
+
 void
 libbalsa_window_set_accels(GtkApplicationWindow * window,
                            GMenuModel           * menu_model)
 {
     GtkEventController *controller;
 
-    controller = gtk_shortcut_controller_new();
+    controller = get_controller_from_window(window);
     extract_accels_from_menu(menu_model, GTK_SHORTCUT_CONTROLLER(controller));
-    gtk_widget_add_controller(GTK_WIDGET(window), controller);
 }
 
 void
@@ -203,7 +218,6 @@ libbalsa_window_add_accelerator(GtkApplicationWindow * window,
 
     shortcut = gtk_shortcut_new(trigger, action);
 
-    controller = gtk_shortcut_controller_new();
+    controller = get_controller_from_window(window);
     gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(controller), shortcut);
-    gtk_widget_add_controller(GTK_WIDGET(window), controller);
 }

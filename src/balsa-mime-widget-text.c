@@ -549,7 +549,7 @@ url_copy_cb(GtkWidget * menu_item, message_url_t * uri)
 
     display = gtk_widget_get_display(menu_item);
     clipboard =
-        gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
+        gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
     gtk_clipboard_set_text(clipboard, uri->url, -1);
 }
 

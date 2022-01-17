@@ -70,7 +70,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     GtkWidget *save_dialog;
     gchar *file_uri;
     LibbalsaVfs *save_file;
-    gboolean do_save;
+    gboolean do_save = TRUE;
     GError *err = NULL;
 
     g_return_if_fail(mime_body != NULL);
@@ -145,13 +145,16 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 	do_save =
 	    (gtk_dialog_run(GTK_DIALOG(confirm)) == GTK_RESPONSE_YES);
 	gtk_widget_destroy(confirm);
-	if (do_save)
-	    if (libbalsa_vfs_file_unlink(save_file, &err) != 0)
+	if (do_save) {
+	    if (libbalsa_vfs_file_unlink(save_file, &err) != 0) {
                 balsa_information(LIBBALSA_INFORMATION_ERROR,
                                   _("Unlink %s: %s"),
                                   file_uri, err ? err->message : "Unknown error");
-    } else
-	do_save = TRUE;
+                g_clear_error(&err);
+                do_save = FALSE;
+            }
+        }
+    }
 
     /* save the file */
     if (do_save) {

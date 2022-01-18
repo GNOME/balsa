@@ -5,14 +5,14 @@
 # Andraž Tori <andraz.tori1@guest.arnes.si>, 2002.
 # Tadej Janež <tadej_janez@email.si>, 2003.
 # Andrej Žnidaršič <andrej.znidarsic@gmail.com>, 2010.
-# Matej Urbančič <mateju@svn.gnome.org>, 2006–2020.
+# Matej Urbančič <mateju@svn.gnome.org>, 2006–2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2021-10-18 14:44+0000\n"
-"PO-Revision-Date: 2021-11-08 22:35+0100\n"
+"POT-Creation-Date: 2022-01-17 23:54+0000\n"
+"PO-Revision-Date: 2022-01-18 18:06+0100\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenščina <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
@@ -123,7 +123,7 @@ msgid "No-Id"
 msgstr "Brez-ID"
 
 #: ../libbalsa/address-book-extern.c:191 ../libbalsa/address-book-extern.c:349
-#: ../libbalsa/address-book-ldap.c:550 ../libbalsa/address-book-ldif.c:189
+#: ../libbalsa/address-book-ldap.c:552 ../libbalsa/address-book-ldif.c:189
 #: ../libbalsa/address-book-ldif.c:227 ../libbalsa/address-book-ldif.c:270
 #: ../libbalsa/address-book-ldif.c:274 ../libbalsa/address-book-vcard.c:142
 #: ../libbalsa/address-book-vcard.c:249 ../libbalsa/address.c:392
@@ -145,11 +145,11 @@ msgstr ""
 msgid "TLS requested but not compiled in"
 msgstr "TLS je bil zahtevan, vendar ni kodno preveden"
 
-#: ../libbalsa/address-book-ldap.c:666
+#: ../libbalsa/address-book-ldap.c:669
 msgid "Undefined location of user address book"
 msgstr "Nedoločeno mesto imenika uporabnikov"
 
-#: ../libbalsa/address-book-ldap.c:1097
+#: ../libbalsa/address-book-ldap.c:1100
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr ""
@@ -230,10 +230,10 @@ msgstr "Napaka izvajanja ustvarjalnika podpisa »%s«: %s"
 
 #: ../libbalsa/autocrypt.c:447
 msgid "Autocrypt database"
-msgstr ""
+msgstr "Samošifriraj podatkovno zbirko"
 
-#: ../libbalsa/autocrypt.c:448 ../libbalsa/html.c:427
-#: ../libbalsa/html-pref-db.c:137 ../libbalsa/identity.c:1658
+#: ../libbalsa/autocrypt.c:448 ../libbalsa/html.c:447
+#: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
 #: ../libbalsa/libbalsa-gpgme-widgets.c:765 ../src/ab-window.c:148
 #: ../src/folder-conf.c:337 ../src/mailbox-node.c:1049
 #: ../src/main-window.c:3832 ../src/toolbar-prefs.c:130
@@ -257,10 +257,8 @@ msgid "Last Autocrypt message"
 msgstr "Ni mogoče ustvariti sporočila"
 
 #: ../libbalsa/autocrypt.c:535
-#, fuzzy
-#| msgid "Prefere_nces"
 msgid "Prefer encryption"
-msgstr "Mož_nosti"
+msgstr "Prednostno uporabi šifriranje"
 
 #: ../libbalsa/autocrypt.c:785 ../libbalsa/autocrypt.c:805
 #, fuzzy, c-format
@@ -278,7 +276,7 @@ msgstr "Shranjevanje poslanega sporočila v %s ni uspelo: %s"
 msgid "_Show details…"
 msgstr "Pokaži _podrobnosti …"
 
-#: ../libbalsa/autocrypt.c:884 ../libbalsa/html-pref-db.c:447
+#: ../libbalsa/autocrypt.c:884 ../libbalsa/html-pref-db.c:450
 #: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1041
 #: ../src/mailbox-node.c:1057 ../src/pref-manager.c:2002
 #: ../src/pref-manager.c:2087 ../src/pref-manager.c:2810 ../ui/ab-main.ui.h:11
@@ -544,80 +542,75 @@ msgstr ""
 "Ni mogoče odšifrirati dela večdelnega predmeta: razčlenjevanje šifrirane "
 "vsebine je spodletelo."
 
-#: ../libbalsa/html.c:79
+#: ../libbalsa/html.c:94
 #, c-format
 msgid "Could not get an HTML part: %s"
 msgstr "Ni mogoče dobiti dela HTML: %s"
 
-#: ../libbalsa/html.c:137
+#: ../libbalsa/html.c:152
 #, c-format
 msgid "Could not convert HTML part to text: %s"
 msgstr "Ni mogoče pretvoriti HTML v neoblikovano besedilo: %s"
 
-#: ../libbalsa/html.c:408
+#: ../libbalsa/html.c:440
 #, fuzzy
 #| msgid ""
 #| "This message part contains images from a remote server. To protect your "
 #| "privacy, Balsa has not downloaded them. You may choose to download them "
 #| "if you trust the server."
 msgid ""
-"This message part contains images from a remote server.\n"
-"To protect your privacy, Balsa has not downloaded them.\n"
-"You may choose to download them if you trust the server."
+"This message part references content on one or more external servers. To "
+"protect your privacy, Balsa has not downloaded it. You may choose to "
+"download it if you trust the sender of the message."
 msgstr ""
 "Ta del sporočila vsebuje slike z oddaljenega strežnika. Za zaščito vaše "
 "zasebnosti niso bile prenesene. V primeru da zaupate strežniku, lahko "
 "izberete njihov prejem."
 
-#: ../libbalsa/html.c:416
+#: ../libbalsa/html.c:445
+msgid "_Download external content"
+msgstr "_Prejmi oddaljeno vsebino"
+
+#: ../libbalsa/html.c:682
+#, c-format
 msgid ""
-"This message part contains images from a remote server. To protect your "
-"privacy, Balsa has not downloaded them. You may choose to download them if "
-"you trust the server."
+"Balsa's external HTML resources filter web extension is not available in the "
+"folder “%s”, falling back to simplified image filtering. Please check your "
+"installation. "
 msgstr ""
-"Ta del sporočila vsebuje slike z oddaljenega strežnika. Za zaščito vaše "
-"zasebnosti niso bile prenesene. V primeru da zaupate strežniku, lahko "
-"izberete njihov prejem."
 
-#: ../libbalsa/html.c:425
-msgid "_Download images"
-msgstr "_Prejmi slike"
-
-#: ../libbalsa/html-pref-db.c:136
+#: ../libbalsa/html-pref-db.c:138
 msgid "HTML preferences"
 msgstr "Možnosti HTML"
 
-#: ../libbalsa/html-pref-db.c:186 ../src/pref-manager.c:221
+#: ../libbalsa/html-pref-db.c:188 ../src/pref-manager.c:221
 msgid "Sender"
 msgstr "Pošiljatelj"
 
-#: ../libbalsa/html-pref-db.c:194
+#: ../libbalsa/html-pref-db.c:196
 msgid "Prefer HTML"
+msgstr "Prednostno uporabi HTML"
+
+#: ../libbalsa/html-pref-db.c:204
+msgid "Auto-load external content"
 msgstr ""
 
-#: ../libbalsa/html-pref-db.c:202
-msgid "Auto-load images"
-msgstr "Samodejno naloži slike"
-
-#: ../libbalsa/html-pref-db.c:267
-#, fuzzy, c-format
-#| msgid "Could not write file %s: %s"
+#: ../libbalsa/html-pref-db.c:270
+#, c-format
 msgid "Cannot initialise HTML preferences database “%s”: %s"
-msgstr "Datoteka PO »%s« ne obstaja ali pa je ni mogoče prebrati."
+msgstr "Ni mogoče začeti podatkovne zbirke lastnosti HTML za datoteka »%s«: %s"
 
-#: ../libbalsa/html-pref-db.c:313
-#, fuzzy, c-format
-#| msgid "Could not write file %s: %s"
+#: ../libbalsa/html-pref-db.c:316
+#, c-format
 msgid "Cannot read HTML preferences for “%s”: %s"
-msgstr "Datoteka PO »%s« ne obstaja ali pa je ni mogoče prebrati."
+msgstr "Ni mogoče prebrati lastnosti HTML za datoteka »%s«: %s"
 
-#: ../libbalsa/html-pref-db.c:366
-#, fuzzy, c-format
-#| msgid "Could not write file %s: %s"
+#: ../libbalsa/html-pref-db.c:369
+#, c-format
 msgid "Cannot save HTML preferences for “%s”: %s"
-msgstr "Datoteka PO »%s« ne obstaja ali pa je ni mogoče prebrati."
+msgstr "Ni mogoče shraniti lastnosti HTML za datoteka »%s«: %s"
 
-#: ../libbalsa/html-pref-db.c:474
+#: ../libbalsa/html-pref-db.c:477
 #, c-format
 msgid "Cannot delete database entry: %s"
 msgstr "Ni mogoče izbrisati vnosa podatkovne zbirke: %s"
@@ -860,10 +853,9 @@ msgid "Autocrypt mode"
 msgstr "Samošifrirni način"
 
 #: ../libbalsa/identity.c:1079
-#, fuzzy, c-format
-#| msgid "Error loading Face: %s"
+#, c-format
 msgid "Error selecting key: %s"
-msgstr "Napaka med nalaganjem Face: %s"
+msgstr "Napaka izbire ključa: %s"
 
 #: ../libbalsa/identity.c:1101
 msgid "Choose…"
@@ -964,10 +956,8 @@ msgstr "Način GpgSM S/MIME "
 
 #: ../libbalsa/imap/auth-cram.c:47 ../libbalsa/imap/imap-auth.c:91
 #: ../libbalsa/imap/imap-auth.c:142
-#, fuzzy
-#| msgid "_Authentication:"
 msgid "Authentication cancelled"
-msgstr "_Overitev:"
+msgstr "Overitev je preklicana"
 
 #: ../libbalsa/imap/auth-gssapi.c:130
 #, fuzzy
@@ -1758,10 +1748,8 @@ msgstr ""
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
 #: ../libbalsa/mailbox_imap.c:609
-#, fuzzy
-#| msgid "IMAP connection has been severed. Reconnecting..."
 msgid "IMAP connection has been severed. Reconnecting…"
-msgstr "Povezava IMAP je bila prekinjena. Ponovno povezovanje ..."
+msgstr "Povezava IMAP je bila prekinjena. Poteka ponovno povezovanje …"
 
 #: ../libbalsa/mailbox_imap.c:612
 msgid "IMAP protocol error. Try enabling bug workarounds."
@@ -2271,155 +2259,111 @@ msgstr[2] ""
 msgstr[3] ""
 
 #: ../libbalsa/rfc2445.c:415
-#, fuzzy
-#| msgid "unknown"
 msgctxt "ical_status"
 msgid "unknown"
-msgstr "neznan"
+msgstr "neznano"
 
 #: ../libbalsa/rfc2445.c:416
-#, fuzzy
-#| msgid "Accept tentatively"
 msgctxt "ical_status"
 msgid "event is tentative"
-msgstr "Poskusno sprejmi"
+msgstr "dogodek je v usklajevanju"
 
 #: ../libbalsa/rfc2445.c:417
-#, fuzzy
-#| msgid "Accept tentatively"
 msgctxt "ical_status"
 msgid "event is definite"
-msgstr "Poskusno sprejmi"
+msgstr "dogodek je določen"
 
 #: ../libbalsa/rfc2445.c:418
-#, fuzzy
-#| msgid "_Authentication:"
 msgctxt "ical_status"
 msgid "event was cancelled"
-msgstr "_Overitev:"
+msgstr "dogodek je preklican"
 
 #: ../libbalsa/rfc2445.c:444
-#, fuzzy
-#| msgid "unknown"
 msgctxt "ical_method"
 msgid "unknown"
-msgstr "neznan"
+msgstr "neznano"
 
 #: ../libbalsa/rfc2445.c:445
-#, fuzzy
-#| msgid "Event Notification"
 msgctxt "ical_method"
 msgid "Event Notification"
 msgstr "Obvestilo dogodka"
 
 #: ../libbalsa/rfc2445.c:446
-#, fuzzy
-#| msgid "Event Request"
 msgctxt "ical_method"
 msgid "Event Request"
 msgstr "Zahteva dogodka"
 
 #: ../libbalsa/rfc2445.c:447
-#, fuzzy
-#| msgid "Reply to Event Request"
 msgctxt "ical_method"
 msgid "Reply to Event Request"
 msgstr "Odgovori na zahtevo dogodka"
 
 #: ../libbalsa/rfc2445.c:448
-#, fuzzy
-#| msgid "Event Cancellation"
 msgctxt "ical_method"
 msgid "Event Cancellation"
 msgstr "Preklic dogodka"
 
 #: ../libbalsa/rfc2445.c:467
-#, fuzzy
-#| msgid "unknown"
 msgctxt "ical_partstat"
 msgid "unknown"
-msgstr "neznan"
+msgstr "neznano"
 
 #: ../libbalsa/rfc2445.c:468
-#, fuzzy
-#| msgid "needs action"
 msgctxt "ical_partstat"
 msgid "needs action"
 msgstr "zahteva dejanje"
 
 #: ../libbalsa/rfc2445.c:469
-#, fuzzy
-#| msgid "accepted"
 msgctxt "ical_partstat"
 msgid "accepted"
 msgstr "sprejeto"
 
 #: ../libbalsa/rfc2445.c:470
-#, fuzzy
-#| msgid "declined"
 msgctxt "ical_partstat"
 msgid "declined"
 msgstr "odklonjeno"
 
 #: ../libbalsa/rfc2445.c:471
-#, fuzzy
-#| msgid "tentatively accepted"
 msgctxt "ical_partstat"
 msgid "tentatively accepted"
 msgstr "poskusno sprejeto"
 
 #: ../libbalsa/rfc2445.c:472
-#, fuzzy
-#| msgid "delegated"
 msgctxt "ical_partstat"
 msgid "delegated"
-msgstr "pooblaščeno"
+msgstr "dodeljeno"
 
 #: ../libbalsa/rfc2445.c:515
-#, fuzzy
-#| msgid "Sunday"
 msgctxt "day_of_week"
 msgid "Sunday"
 msgstr "nedelja"
 
 #: ../libbalsa/rfc2445.c:516
-#, fuzzy
-#| msgid "Monday"
 msgctxt "day_of_week"
 msgid "Monday"
 msgstr "ponedeljek"
 
 #: ../libbalsa/rfc2445.c:517
-#, fuzzy
-#| msgid "Tuesday"
 msgctxt "day_of_week"
 msgid "Tuesday"
 msgstr "torek"
 
 #: ../libbalsa/rfc2445.c:518
-#, fuzzy
-#| msgid "Wednesday"
 msgctxt "day_of_week"
 msgid "Wednesday"
 msgstr "sreda"
 
 #: ../libbalsa/rfc2445.c:519
-#, fuzzy
-#| msgid "Thursday"
 msgctxt "day_of_week"
 msgid "Thursday"
 msgstr "četrtek"
 
 #: ../libbalsa/rfc2445.c:520
-#, fuzzy
-#| msgid "Friday"
 msgctxt "day_of_week"
 msgid "Friday"
 msgstr "petek"
 
 #: ../libbalsa/rfc2445.c:521
-#, fuzzy
-#| msgid "Saturday"
 msgctxt "day_of_week"
 msgid "Saturday"
 msgstr "sobota"
@@ -2687,39 +2631,29 @@ msgid " until %s"
 msgstr ""
 
 #: ../libbalsa/rfc2445.c:1168
-#, fuzzy
-#| msgid "unknown"
 msgctxt "ical_role"
 msgid "unknown"
-msgstr "neznan"
+msgstr "neznana"
 
 #: ../libbalsa/rfc2445.c:1169
-#, fuzzy
-#| msgid "chair"
 msgctxt "ical_role"
 msgid "chair"
-msgstr "predsednik"
+msgstr "predsedujoči"
 
 #: ../libbalsa/rfc2445.c:1170
-#, fuzzy
-#| msgid "required participant"
 msgctxt "ical_role"
 msgid "required participant"
-msgstr "zahtevani udeleženi"
+msgstr "zahtevano udeleženi"
 
 #: ../libbalsa/rfc2445.c:1171
-#, fuzzy
-#| msgid "optional participant"
 msgctxt "ical_role"
 msgid "optional participant"
-msgstr "izbirni udeleženci"
+msgstr "izbirno udeleženi"
 
 #: ../libbalsa/rfc2445.c:1172
-#, fuzzy
-#| msgid "non-participant, information only"
 msgctxt "ical_role"
 msgid "non-participant, information only"
-msgstr "ne-udeleženci, le podatki"
+msgstr "ne-udeleženci, le spremljevalci"
 
 #: ../libbalsa/rfc3156.c:596 ../libbalsa/rfc3156.c:603
 msgid "decryption and signature verification failed"
@@ -2754,10 +2688,8 @@ msgid "The signature could not be verified due to a missing key."
 msgstr "Podpisa ni mogoče preveriti zaradi manjkajočega ključa."
 
 #: ../libbalsa/rfc3156.c:641
-#, fuzzy
-#| msgid "This part is not a real PGP signature."
 msgid "This part is not a real signature."
-msgstr "Ta del ni pravi podpis PGP."
+msgstr "Ta del ni pravi podpis."
 
 #: ../libbalsa/rfc3156.c:643
 msgid "The signature could not be verified due to an invalid crypto engine."
@@ -2874,7 +2806,6 @@ msgstr "Poteka pošiljanje sporočila"
 
 #: ../libbalsa/send.c:941
 #, c-format
-#| msgid "Save this message and close"
 msgid "Save message in %s…"
 msgstr "Shrani sporočilo v %s …"
 
@@ -2962,28 +2893,20 @@ msgid "loaded fallback password from private config file"
 msgstr ""
 
 #: ../libbalsa/server-config.c:75
-#, fuzzy
-#| msgid "_Remember password in keyring"
 msgid "_Remember user password in Secret Service"
-msgstr "Za_pomni si geslo"
+msgstr "Za_pomni si uporabniško geslo varne storitve"
 
 #: ../libbalsa/server-config.c:76
-#, fuzzy
-#| msgid "_Remember password in keyring"
 msgid "_Remember certificate pass phrase in Secret Service"
-msgstr "Za_pomni si geslo"
+msgstr "Za_pomni si šifrirno geslo potrdila varne storitve"
 
 #: ../libbalsa/server-config.c:80
-#, fuzzy
-#| msgid "_Remember your password:"
 msgid "_Remember user password"
-msgstr "_Zapomni si geslo:"
+msgstr "_Zapomni si geslo"
 
 #: ../libbalsa/server-config.c:81
-#, fuzzy
-#| msgid "C_ertificate Pass Phrase:"
 msgid "_Remember certificate pass phrase"
-msgstr "_Šifrirno geslo:"
+msgstr "Za_pomni si šifrirno geslo potrdila"
 
 #: ../libbalsa/server-config.c:103
 msgid "_Basic"
@@ -3268,7 +3191,7 @@ msgstr ""
 
 #: ../libinit_balsa/assistant_page_finish.c:47
 msgid "All Done!"
-msgstr "Končni preizkus"
+msgstr "Vse je opravljeno!"
 
 #: ../libinit_balsa/assistant_page_user.c:55
 msgid ""
@@ -3416,16 +3339,14 @@ msgid "error loading certificate: %s"
 msgstr "napaka nalaganja potrdila: %s"
 
 #: ../libnetclient/net-client.c:433
-#, fuzzy, c-format
-#| msgid "Error printing message: %s"
+#, c-format
 msgid "error initializing key: %s"
-msgstr "Napaka med začenjanjem Avahi: %s"
+msgstr "napaka začenjanja ključa: %s"
 
 #: ../libnetclient/net-client.c:493
-#, fuzzy, c-format
-#| msgid "Error loading Face: %s"
+#, c-format
 msgid "error loading key: %s"
-msgstr "Napaka med nalaganjem Face: %s"
+msgstr "napaka nalagana ključa: %s"
 
 #: ../libnetclient/net-client.c:535 ../libnetclient/net-client.c:574
 #, c-format
@@ -3433,28 +3354,27 @@ msgid "not connected"
 msgstr "povezava ni vzpostavljena"
 
 #: ../libnetclient/net-client.c:537
-#, fuzzy, c-format
+#, c-format
 msgid "connection is already encrypted"
-msgstr "Povezava je že odprta"
+msgstr "povezava je že šifrirana"
 
 #: ../libnetclient/net-client.c:576
-#, fuzzy, c-format
+#, c-format
 msgid "connection is already compressed"
-msgstr "Povezava je že odprta"
+msgstr "povezava je že stisnjena"
 
 #. unexpected server reply
 #: ../libnetclient/net-client-pop.c:231 ../libnetclient/net-client-pop.c:450
 #: ../libnetclient/net-client-smtp.c:600 ../libnetclient/net-client-smtp.c:671
 #: ../libnetclient/net-client-smtp.c:718
-#, fuzzy, c-format
-#| msgid "Mail server: %s\n"
+#, c-format
 msgid "bad server reply: %s"
-msgstr "Neustrezen odziv posredniškega strežnika HTTP"
+msgstr "neustrezen odziv strežnika: %s"
 
 #: ../libnetclient/net-client-pop.c:270
-#, fuzzy, c-format
+#, c-format
 msgid "bad server reply"
-msgstr "Strežnik je vrnil izmaličen odgovor."
+msgstr "neustrezen odziv strežnika"
 
 #: ../libnetclient/net-client-pop.c:442 ../libnetclient/net-client-pop.c:723
 #, c-format
@@ -3467,17 +3387,14 @@ msgid "error"
 msgstr "napaka"
 
 #: ../libnetclient/net-client-pop.c:509 ../libnetclient/net-client-smtp.c:413
-#, fuzzy, c-format
+#, c-format
 msgid "no suitable authentication mechanism"
-msgstr ""
-"Prijava na strežnik »%s« je spodletela. Ustreznega načina overitve ni mogoče "
-"najti."
+msgstr "ni podanega ustreznega načina overitve"
 
 #: ../libnetclient/net-client-pop.c:511 ../libnetclient/net-client-smtp.c:415
-#, fuzzy, c-format
-#| msgid "Password needed"
+#, c-format
 msgid "password required"
-msgstr "Zahtevano geslo"
+msgstr "zahtevano je geslo"
 
 #: ../libnetclient/net-client-smtp.c:146
 #, fuzzy, c-format
@@ -3500,10 +3417,9 @@ msgid "authentication failure %d: %s"
 msgstr "_Overitev:"
 
 #: ../libnetclient/net-client-smtp.c:712
-#, fuzzy, c-format
-#| msgid "Sending error: %s"
+#, c-format
 msgid "permanent error %d: %s"
-msgstr "Napaka v vrstici %d: %s"
+msgstr "trajna napaka %d: %s"
 
 #: ../libnetclient/net-client-utils.c:155
 #, fuzzy, c-format
@@ -3532,10 +3448,9 @@ msgid "cannot create GSS login request: %s"
 msgstr "ni mogoče ustvariti zahteve prijave GSS: %s"
 
 #: ../libnetclient/net-client-utils.c:330
-#, fuzzy, c-format
-#| msgid "unknown error"
+#, c-format
 msgid "unknown error code %u:%u"
-msgstr "Koda napake %u med poizvedovanjem vnosa: %s"
+msgstr "neznana koda napake %u: %u"
 
 #: ../sounds/balsa.soundlist.in.h:1
 msgid "Balsa Email Reader"
@@ -3553,7 +3468,7 @@ msgstr "Obvestilo o prispeli pošti"
 
 #: ../src/ab-main.c:218 ../src/ab-window.c:707
 msgid " address book: "
-msgstr " imenik:"
+msgstr " imenik: "
 
 #: ../src/ab-main.c:735
 msgid "_Name"
@@ -3603,10 +3518,8 @@ msgid "Run _Editor"
 msgstr "Zaženi _urejevalnik"
 
 #: ../src/ab-window.c:334
-#, fuzzy
-#| msgid "_Re-Import"
 msgid "_Re-import"
-msgstr "Od:"
+msgstr "_Ponovno uvozi"
 
 #. -- grid column 3 --
 #. label for selected addresses in compose mode
@@ -4097,7 +4010,7 @@ msgstr "Ni mogoče ustvariti naslova URI za %s"
 msgid "%s message part"
 msgstr "%s del sporočila"
 
-#: ../src/balsa-message.c:1821 ../src/balsa-mime-widget-callbacks.c:164
+#: ../src/balsa-message.c:1821 ../src/balsa-mime-widget-callbacks.c:167
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "Ni mogoče shraniti %s: %s"
@@ -4580,7 +4493,7 @@ msgid "Prefer HTML for this sender"
 msgstr ""
 
 #: ../src/balsa-mime-widget-text.c:1190
-msgid "Load images for this sender"
+msgid "Load external content for this sender"
 msgstr ""
 
 #: ../src/balsa-mime-widget-text.c:1344
@@ -6821,32 +6734,32 @@ msgstr "Poudari _navedeno besedilo"
 msgid "Highlight _structured phrases"
 msgstr "Poudari _oblikovana rekla"
 
-#: ../src/print-gtk.c:616
-msgid "Download images from remote servers (may be dangerous)"
+#: ../src/print-gtk.c:617
+msgid "Download content from remote servers (may be dangerous)"
 msgstr ""
 
 #. margins
-#: ../src/print-gtk.c:627
+#: ../src/print-gtk.c:628
 msgid "Margins"
 msgstr "Robovi"
 
-#: ../src/print-gtk.c:631
+#: ../src/print-gtk.c:632
 msgid "_Top"
 msgstr "_Zgoraj"
 
-#: ../src/print-gtk.c:637
+#: ../src/print-gtk.c:638
 msgid "_Bottom"
 msgstr "_Spodaj"
 
-#: ../src/print-gtk.c:649
+#: ../src/print-gtk.c:650
 msgid "_Left"
 msgstr "_Levo"
 
-#: ../src/print-gtk.c:655
+#: ../src/print-gtk.c:656
 msgid "_Right"
 msgstr "_Desno"
 
-#: ../src/print-gtk.c:793
+#: ../src/print-gtk.c:794
 #, c-format
 msgid "Error printing message: %s"
 msgstr "Napaka med tiskanjem sporočila: %s"
@@ -8472,6 +8385,26 @@ msgstr ""
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Izpusti posebne znake"
+
+#, fuzzy
+#~| msgid ""
+#~| "This message part contains images from a remote server. To protect your "
+#~| "privacy, Balsa has not downloaded them. You may choose to download them "
+#~| "if you trust the server."
+#~ msgid ""
+#~ "This message part contains images from a remote server.\n"
+#~ "To protect your privacy, Balsa has not downloaded them.\n"
+#~ "You may choose to download them if you trust the server."
+#~ msgstr ""
+#~ "Ta del sporočila vsebuje slike z oddaljenega strežnika. Za zaščito vaše "
+#~ "zasebnosti niso bile prenesene. V primeru da zaupate strežniku, lahko "
+#~ "izberete njihov prejem."
+
+#~ msgid "_Download images"
+#~ msgstr "_Prejmi slike"
+
+#~ msgid "Auto-load images"
+#~ msgstr "Samodejno naloži slike"
 
 #~ msgid "SASL Interaction\n"
 #~ msgstr "Delovanje SASL\n"

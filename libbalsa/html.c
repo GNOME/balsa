@@ -92,7 +92,7 @@ lbh_get_body_content(LibBalsaMessageBody * body, gchar ** buf)
     if (len < 0) {
         libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                              _("Could not get an HTML part: %s"),
-                             err ? err->message : "Unknown error");
+                             err ? err->message : _("Unknown error"));
         g_error_free(err);
         return len;
     }
@@ -150,7 +150,7 @@ html2text(gchar ** text, gsize len)
     if (err != NULL) {
         libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                              _("Could not convert HTML part to text: %s"),
-                             err ? err->message : "Unknown error");
+                             err ? err->message : _("Unknown error"));
         g_error_free(err);
     }
 }

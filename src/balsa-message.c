@@ -1821,7 +1821,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 				  _("Could not save %s: %s"),
 				  libbalsa_vfs_get_uri_utf8(save_uri),
                                   err && err->message ?
-                                  err->message : "Unknown error");
+                                  err->message : _("Unknown error"));
             g_clear_error(&err);
 	    g_object_unref(save_uri);
 	    info_list = g_list_next(info_list);

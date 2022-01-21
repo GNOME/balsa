@@ -252,7 +252,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
     if (alloced < 0) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("Could not save a text part: %s"),
-                          err ? err->message : "Unknown error");
+                          err ? err->message : _("Unknown error"));
         g_clear_error(&err);
         return NULL;
     }

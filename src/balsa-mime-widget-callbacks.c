@@ -50,7 +50,7 @@ balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item,
     if (!result)
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not launch application: %s"),
-                          err ? err->message : "Unknown error");
+                          err ? err->message : _("Unknown error"));
     g_clear_error(&err);
 }
 
@@ -149,7 +149,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 	    if (libbalsa_vfs_file_unlink(save_file, &err) != 0) {
                 balsa_information(LIBBALSA_INFORMATION_ERROR,
                                   _("Unlink %s: %s"),
-                                  file_uri, err ? err->message : "Unknown error");
+                                  file_uri, err ? err->message : _("Unknown error"));
                 g_clear_error(&err);
                 do_save = FALSE;
             }
@@ -165,7 +165,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
                                             &err)) {
 	    balsa_information(LIBBALSA_INFORMATION_ERROR,
 			      _("Could not save %s: %s"),
-			      file_uri, err ? err->message : "Unknown error");
+			      file_uri, err ? err->message : _("Unknown error"));
             g_clear_error(&err);
         }
     }

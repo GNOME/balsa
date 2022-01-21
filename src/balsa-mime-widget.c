@@ -220,7 +220,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
         if(!stream) {
             libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                              _("Error reading message part: %s"),
-                             err ? err->message : "Unknown error");
+                             err ? err->message : _("Unknown error"));
             g_clear_error(&err);
             use_content_type = g_strdup(content_type);
         } else {

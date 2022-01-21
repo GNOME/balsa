@@ -1400,7 +1400,7 @@ attachment_menu_vfs_cb(GtkWidget * menu_item, BalsaAttachInfo * info)
     if (!result)
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Could not launch application: %s"),
-                          err ? err->message : "Unknown error");
+                          err ? err->message : _("Unknown error"));
     g_clear_error(&err);
 }
 
@@ -2935,7 +2935,7 @@ add_file_attachment(BalsaSendmsg        *bsmsg,
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,
                                    _("Could not save attachment: %s"),
-                                   err ? err->message : "Unknown error");
+                                   err ? err->message : _("Unknown error"));
         g_clear_error(&err);
         /* FIXME: do not try any further? */
     }

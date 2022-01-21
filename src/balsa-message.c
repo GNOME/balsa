@@ -1670,7 +1670,7 @@ part_create_menu (BalsaPartInfo* info)
     	app_info = g_app_info_get_default_for_type("inode/directory", FALSE);
     	if (app_info != NULL) {
     		menu_item = gtk_menu_item_new_with_mnemonic (_("Save and _view…"));
-    		g_object_set_data(G_OBJECT(menu_item), BALSA_MIME_WIDGET_CB_APPINFO, app_info);
+    		g_object_set_data_full(G_OBJECT(menu_item), BALSA_MIME_WIDGET_CB_APPINFO, app_info, g_object_unref);
     		g_signal_connect(menu_item, "activate",
     						 G_CALLBACK (balsa_mime_widget_ctx_menu_save), info->body);
     		gtk_menu_shell_append (GTK_MENU_SHELL (info->popup_menu), menu_item);

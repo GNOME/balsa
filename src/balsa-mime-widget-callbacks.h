@@ -27,6 +27,9 @@
 G_BEGIN_DECLS
 
 
+#define BALSA_MIME_WIDGET_CB_APPINFO	"balsa-mime-widget-appinfo"
+
+
 void balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item, LibBalsaMessageBody * mime_body);
 void balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
                                      LibBalsaMessageBody * mime_body);

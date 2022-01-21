@@ -167,6 +167,21 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 			      _("Could not save %s: %s"),
 			      file_uri, err ? err->message : _("Unknown error"));
             g_clear_error(&err);
+        } else {
+        	GAppInfo *app_info;
+
+        	app_info = (GAppInfo *) g_object_get_data(G_OBJECT(parent_widget), BALSA_MIME_WIDGET_CB_APPINFO);
+        	if (app_info != NULL) {
+        		GList *list;
+
+        		list = g_list_prepend(NULL, balsa_app.save_dir);
+        		if (!g_app_info_launch_uris(app_info, list, NULL, &err)) {
+        			balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not view %s: %s"),
+        				file_uri, err ? err->message : _("Unknown error"));
+        			g_clear_error(&err);
+        		}
+        		g_list_free(list);
+        	}
         }
     }
 

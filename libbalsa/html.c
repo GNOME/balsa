@@ -598,14 +598,22 @@ lbh_context_menu_cb(WebKitWebView       * web_view,
     GtkWidget *parent;
     gboolean retval;
 
+    /* display the default Webkit context menu if the user selected some content */
+    if (webkit_hit_test_result_context_is_selection(hit_test_result)) {
+        return FALSE;
+    }
+
     parent = gtk_widget_get_parent(GTK_WIDGET(web_view));
     /* The signal is asynchronous, so gtk_get_current_event() gets NULL;
      * we pass the event to the popup-menu handler: */
     g_object_set_data(G_OBJECT(parent), LIBBALSA_HTML_POPUP_EVENT, event);
+    g_object_set_data(G_OBJECT(parent), LIBBALSA_HTML_POPUP_URL,
+        (gpointer) webkit_hit_test_result_get_link_uri(hit_test_result));
 
     g_signal_emit_by_name(parent, "popup-menu", &retval);
 
     g_object_set_data(G_OBJECT(parent), LIBBALSA_HTML_POPUP_EVENT, NULL);
+    g_object_set_data(G_OBJECT(parent), LIBBALSA_HTML_POPUP_URL, NULL);
 
     return retval;
 }

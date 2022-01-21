@@ -70,6 +70,7 @@ gboolean libbalsa_html_get_selection_bounds(GtkWidget * widget,
                                             selection_bounds);
 
 #define LIBBALSA_HTML_POPUP_EVENT "libbalsa-html-popup-event"
+#define LIBBALSA_HTML_POPUP_URL "libbalsa-html-popup-url"
 GtkWidget *libbalsa_html_popup_menu_widget(GtkWidget * widget);
 GtkWidget *libbalsa_html_get_view_widget(GtkWidget * widget);
 

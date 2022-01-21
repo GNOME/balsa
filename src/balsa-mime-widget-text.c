@@ -1197,15 +1197,46 @@ bmwt_html_populate_popup_menu(BalsaMessage * bm,
     gtk_widget_show_all(GTK_WIDGET(menu));
 }
 
+static void
+bmwt_html_populate_url_menu(GtkMenu *menu, const gchar *url)
+{
+	GtkWidget *menuitem;
+	message_url_t *popup_url;
+
+	popup_url = g_new0(message_url_t, 1U);
+	popup_url->url = g_strdup(url);
+	g_object_set_data_full(G_OBJECT(menu), "url", popup_url, (GDestroyNotify) free_url);
+
+	menuitem = gtk_menu_item_new_with_label(_("Copy link"));
+	g_signal_connect(menuitem, "activate", G_CALLBACK(url_copy_cb), popup_url);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
+	menuitem = gtk_menu_item_new_with_label(_("Open link"));
+	g_signal_connect(menuitem, "activate", G_CALLBACK(url_open_cb), popup_url);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
+	menuitem = gtk_menu_item_new_with_label(_("Send link…"));
+	g_signal_connect(menuitem, "activate", G_CALLBACK(url_send_cb), popup_url);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+
+	gtk_widget_show_all(GTK_WIDGET(menu));
+}
+
 static gboolean
 bmwt_html_popup_context_menu(GtkWidget * html, BalsaMessage * bm)
 {
     GtkWidget *menu;
+    const gchar *popup_url;
     const GdkEvent *event;
     GdkEvent *current_event = NULL;
 
     menu = gtk_menu_new();
-    bmwt_html_populate_popup_menu(bm, html, GTK_MENU(menu));
+    popup_url = (const gchar *) g_object_get_data(G_OBJECT(html), LIBBALSA_HTML_POPUP_URL);
+    if (popup_url != NULL) {
+    	bmwt_html_populate_url_menu(GTK_MENU(menu), popup_url);
+    } else {
+    	bmwt_html_populate_popup_menu(bm, html, GTK_MENU(menu));
+    }
 
     /* In WebKit2, the context menu signal is asynchronous, so the
      * GdkEvent is no longer current; instead it is preserved and passed

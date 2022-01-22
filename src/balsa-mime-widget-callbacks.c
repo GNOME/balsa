@@ -168,25 +168,32 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 			      file_uri, err ? err->message : _("Unknown error"));
             g_clear_error(&err);
         } else {
-        	GAppInfo *app_info;
-
-        	app_info = (GAppInfo *) g_object_get_data(G_OBJECT(parent_widget), BALSA_MIME_WIDGET_CB_APPINFO);
-        	if (app_info != NULL) {
-        		GList *list;
-
-        		list = g_list_prepend(NULL, balsa_app.save_dir);
-        		if (!g_app_info_launch_uris(app_info, list, NULL, &err)) {
-        			balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not view %s: %s"),
-        				file_uri, err ? err->message : _("Unknown error"));
-        			g_clear_error(&err);
-        		}
-        		g_list_free(list);
-        	}
+        	balsa_mime_widget_view_save_dir(parent_widget);
         }
     }
 
     g_object_unref(save_file);
     g_free(file_uri);
+}
+
+void
+balsa_mime_widget_view_save_dir(GtkWidget *widget)
+{
+	GAppInfo *app_info;
+
+	app_info = (GAppInfo *) g_object_get_data(G_OBJECT(widget), BALSA_MIME_WIDGET_CB_APPINFO);
+	if (app_info != NULL) {
+		GList *list;
+		GError *error = NULL;
+
+		list = g_list_prepend(NULL, balsa_app.save_dir);
+		if (!g_app_info_launch_uris(app_info, list, NULL, &error)) {
+			balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not view %s: %s"),
+				balsa_app.save_dir, error ? error->message : _("Unknown error"));
+			g_clear_error(&error);
+		}
+		g_list_free(list);
+	}
 }
 
 static void

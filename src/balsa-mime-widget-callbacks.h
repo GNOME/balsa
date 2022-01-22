@@ -42,6 +42,7 @@ void balsa_mime_widget_limit_focus(GtkEventControllerKey *key_controller,
                                    gpointer               user_data);
 void balsa_mime_widget_unlimit_focus(GtkEventControllerKey *key_controller,
                                      gpointer               user_data);
+void balsa_mime_widget_view_save_dir(GtkWidget *widget);
 
 
 G_END_DECLS

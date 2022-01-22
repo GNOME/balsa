@@ -93,6 +93,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     g_free(title);
     g_free(cont_type);
 
+    gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(save_dialog), TRUE);
     gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(save_dialog),
                                     libbalsa_vfs_local_only());
     if (balsa_app.save_dir)
@@ -129,31 +130,14 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     g_free(balsa_app.save_dir);
     balsa_app.save_dir = g_strdup(libbalsa_vfs_get_folder(save_file));
 
-    /* get a confirmation to overwrite if the file exists */
-    if (libbalsa_vfs_file_exists(save_file)) {
-	GtkWidget *confirm;
-
-	/* File exists. check if they really want to overwrite */
-	confirm = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
-					 GTK_DIALOG_MODAL,
-					 GTK_MESSAGE_QUESTION,
-					 GTK_BUTTONS_YES_NO,
-					 _("File already exists. Overwrite?"));
-#if HAVE_MACOSX_DESKTOP
-	libbalsa_macosx_menu_for_parent(confirm, GTK_WINDOW(balsa_app.main_window));
-#endif
-	do_save =
-	    (gtk_dialog_run(GTK_DIALOG(confirm)) == GTK_RESPONSE_YES);
-	gtk_widget_destroy(confirm);
-	if (do_save) {
-	    if (libbalsa_vfs_file_unlink(save_file, &err) != 0) {
-                balsa_information(LIBBALSA_INFORMATION_ERROR,
-                                  _("Unlink %s: %s"),
-                                  file_uri, err ? err->message : _("Unknown error"));
-                g_clear_error(&err);
-                do_save = FALSE;
-            }
+    /* remove file, if it exists */
+    if (libbalsa_vfs_file_unlink(save_file, &err) != 0) {
+        if (!g_error_matches(err, G_IO_ERROR, G_IO_ERROR_NOT_FOUND)) {
+            balsa_information(LIBBALSA_INFORMATION_ERROR,
+                              _("Unlink %s: %s"), file_uri, err->message);
+            do_save = FALSE;
         }
+        g_clear_error(&err);
     }
 
     /* save the file */

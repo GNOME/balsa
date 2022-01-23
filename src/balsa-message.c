@@ -1786,7 +1786,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 
 	/* save all parts without further user interaction */
 	info_list = g_list_first(info_list);
-	while (dir_uri && info_list) {
+	while (info_list) {
 	    BalsaPartInfo *info = BALSA_PART_INFO(info_list->data);
             LibbalsaVfs * save_uri;
 	    gboolean result;
@@ -1843,9 +1843,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 	    g_object_unref(save_uri);
 	    info_list = g_list_next(info_list);
 	}
-	if (dir_uri != NULL) {
-		balsa_mime_widget_view_save_dir(menu_item);
-	}
+	balsa_mime_widget_view_save_dir(menu_item);
 	g_object_unref(dir_uri);
     }
     gtk_widget_destroy(dump_dialog);

@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * libbalsa vfs glue layer library
- * Copyright (C) 2008 Albrecht Dreß <albrecht.dress@arcor.de>
+ * Copyright (C) 2008 Albrecht Dreï¿½ <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ G_DECLARE_FINAL_TYPE(LibbalsaVfs,
 
 
 gboolean libbalsa_vfs_local_only(void);
-LibbalsaVfs * libbalsa_vfs_new(void);
 LibbalsaVfs * libbalsa_vfs_new_from_uri(const gchar * uri);
 LibbalsaVfs * libbalsa_vfs_append(LibbalsaVfs * file,
                                   const gchar * text);
@@ -55,7 +54,6 @@ const gchar * libbalsa_vfs_get_uri_utf8(LibbalsaVfs * file);
 const gchar * libbalsa_vfs_get_basename_utf8(LibbalsaVfs * file);
 const gchar * libbalsa_vfs_get_mime_type(LibbalsaVfs * file);
 const gchar * libbalsa_vfs_get_charset(LibbalsaVfs * file);
-LibBalsaTextAttribute libbalsa_vfs_get_text_attr(LibbalsaVfs * file);
 guint64 libbalsa_vfs_get_size(LibbalsaVfs * file);
 GMimeStream * libbalsa_vfs_create_stream(LibbalsaVfs * file,
                                          mode_t mode, 

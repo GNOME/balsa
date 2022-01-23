@@ -117,13 +117,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     /* get the file name */
     file_uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(save_dialog));
     gtk_widget_destroy(save_dialog);
-    if (!(save_file = libbalsa_vfs_new_from_uri(file_uri))) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Could not construct URI from %s"),
-                          file_uri);
-        g_free(file_uri);
-	return;
-    }
+    save_file = libbalsa_vfs_new_from_uri(file_uri);
 
     /* remember the folder uri */
     g_free(balsa_app.save_dir);

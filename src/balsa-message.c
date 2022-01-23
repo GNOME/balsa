@@ -1778,10 +1778,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
         LibbalsaVfs * dir_uri;
 
         g_debug("store to URI: %s", dir_name);
-        if (!(dir_uri = libbalsa_vfs_new_from_uri(dir_name)))
-            balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              _("Could not create URI for %s"),
-                              dir_name);
+        dir_uri = libbalsa_vfs_new_from_uri(dir_name);
 
 	/* remember the folder */
 	g_free(balsa_app.save_dir);

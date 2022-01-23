@@ -1,7 +1,7 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /*
  * libbalsa vfs glue layer library
- * Copyright (C) 2008 Albrecht Dreß <albrecht.dress@arcor.de>
+ * Copyright (C) 2008 Albrecht Dreï¿½ <albrecht.dress@arcor.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,6 +65,7 @@ struct _LibbalsaVfs {
 
 static void libbalsa_vfs_dispose(GObject *object);
 static void libbalsa_vfs_finalize(GObject *object);
+static LibBalsaTextAttribute libbalsa_vfs_get_text_attr(LibbalsaVfs * file);
 
 
 gboolean
@@ -122,21 +123,14 @@ libbalsa_vfs_finalize(GObject *object)
 
 
 LibbalsaVfs *
-libbalsa_vfs_new(void)
-{
-    return LIBBALSA_VFS(g_object_new(LIBBALSA_TYPE_VFS, NULL));
-}
-
-
-LibbalsaVfs *
 libbalsa_vfs_new_from_uri(const gchar * uri)
 {
     LibbalsaVfs * retval;
 
     g_return_val_if_fail(uri != NULL, NULL);
 
-    if ((retval = libbalsa_vfs_new()) == NULL)
-        return NULL;
+    retval = LIBBALSA_VFS(g_object_new(LIBBALSA_TYPE_VFS, NULL));
+    g_assert(retval != NULL);
 
     retval->text_attr = (LibBalsaTextAttribute) -1;
 
@@ -333,7 +327,7 @@ libbalsa_vfs_get_charset(LibbalsaVfs * file)
 }
 
 
-LibBalsaTextAttribute
+static LibBalsaTextAttribute
 libbalsa_vfs_get_text_attr(LibbalsaVfs * file)
 {
     g_return_val_if_fail(LIBBALSA_IS_VFS(file), 0);

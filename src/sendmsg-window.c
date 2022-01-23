@@ -1659,13 +1659,7 @@ add_attachment(BalsaSendmsg * bsmsg, const gchar *filename,
     gchar *content_desc;
 
     g_debug("Trying to attach '%s'", filename);
-    if (!(file_uri = libbalsa_vfs_new_from_uri(filename))) {
-        balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                   LIBBALSA_INFORMATION_ERROR,
-                                   _("Cannot create file URI object for %s"),
-                                   filename);
-        return FALSE;
-    }
+    file_uri = libbalsa_vfs_new_from_uri(filename);
     if (!libbalsa_vfs_is_regular_file(file_uri, &err)) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_ERROR,

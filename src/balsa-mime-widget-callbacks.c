@@ -182,7 +182,7 @@ balsa_mime_widget_view_save_dir(GtkWidget *widget)
 
 		list = g_list_prepend(NULL, balsa_app.save_dir);
 		if (!g_app_info_launch_uris(app_info, list, NULL, &error)) {
-			balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not view %s: %s"),
+			balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not open folder %s: %s"),
 				balsa_app.save_dir, error ? error->message : _("Unknown error"));
 			g_clear_error(&error);
 		}

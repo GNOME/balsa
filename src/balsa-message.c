@@ -977,7 +977,7 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
                           G_CALLBACK (part_context_dump_all_cb),
                           (gpointer) balsa_message->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (balsa_message->save_all_popup), menu_item);
-        add_save_view_menu_item(balsa_message->save_all_popup, _("Save selected to folder and view…"),
+        add_save_view_menu_item(balsa_message->save_all_popup, _("Save selected to folder and browse…"),
         	G_CALLBACK(part_context_dump_all_cb), balsa_message->save_all_list);
         gtk_widget_show_all(balsa_message->save_all_popup);
         if (event != NULL) {
@@ -1682,7 +1682,7 @@ part_create_menu (BalsaPartInfo* info)
                                   info->body);
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), submenu);
     } else {
-    	add_save_view_menu_item(info->popup_menu, _("Save and view…"),
+    	add_save_view_menu_item(info->popup_menu, _("Save and open folder…"),
     		G_CALLBACK(balsa_mime_widget_ctx_menu_save), info->body);
     }
 

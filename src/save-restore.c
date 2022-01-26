@@ -1542,6 +1542,9 @@ config_save(void)
     save_mru(balsa_app.fcc_mru,    "FccMRU");
     save_mru(balsa_app.pipe_cmds,  "PipeCommands");
 
+    /* disabled desktop notifications */
+    libbalsa_information_save_cfg();
+
     libbalsa_conf_sync();
     return TRUE;
 }				/* config_global_save */

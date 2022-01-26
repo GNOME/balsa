@@ -1063,38 +1063,6 @@ libbalsa_dialog_flags(void)
 
 #define BALSA_AB_NOTIFICATION "balsa-ab-notification"
 
-static void
-balsa_ab_notification_notify_cb(GNotification *notification, GApplication *application)
-{
-    gboolean send;
-
-    send = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(notification), "send"));
-    if (send) {
-        g_application_send_notification(application,
-                                        BALSA_AB_NOTIFICATION, notification);
-    } else {
-        g_application_withdraw_notification(application, BALSA_AB_NOTIFICATION);
-    }
-}
-
-static void
-balsa_ab_notification_shutdown_cb(GApplication *application, GNotification *notification)
-{
-    g_object_unref(notification);
-}
-
-static void
-balsa_ab_setup_libbalsa_notification(GApplication *application)
-{
-    GNotification *notification;
-
-    notification = libbalsa_notification_new("BalsaAb");
-    g_signal_connect(notification, "notify",
-                     G_CALLBACK(balsa_ab_notification_notify_cb), application);
-    g_signal_connect(application, "shutdown",
-                     G_CALLBACK(balsa_ab_notification_shutdown_cb), notification);
-}
-
 int
 main(int argc, char *argv[])
 {
@@ -1124,7 +1092,8 @@ main(int argc, char *argv[])
 #endif
 
     bab_init();
-    balsa_ab_setup_libbalsa_notification((GApplication *) application);
+    libbalsa_information_init(G_APPLICATION(application),
+    	_("Balsa Address Book"), BALSA_AB_NOTIFICATION);
     g_mime_init();
     libbalsa_parser_options_init();
 

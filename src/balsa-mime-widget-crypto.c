@@ -144,9 +144,15 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         		g_signal_connect(button, "clicked", G_CALLBACK(on_key_import_button), NULL);
         		gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
         	} else if (libbalsa_message_get_headers(mime_body->message)->autocrypt_hdr_present) {
-        		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-        			_("The message contains an Autocrypt header, but it is either broken "
-        			  "or the signature has been created using a different key."));
+        		if (balsa_autocrypt_in_use()) {
+        			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+        				_("The message contains an Autocrypt header, but it is either broken "
+        				  "or the signature has been created using a different key."));
+        		} else {
+        			libbalsa_information_may_hide(LIBBALSA_INFORMATION_MESSAGE, "ACRYPT_OFF",
+        				_("The message contains an Autocrypt header which is ignored as none "
+        				  "of your identities has Autocrypt support enabled."));
+        		}
         	}
 #endif
             button = gtk_button_new_with_mnemonic(_("_Search key server for this key"));

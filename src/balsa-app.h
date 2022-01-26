@@ -403,4 +403,7 @@ void  balsa_remove_children_mailbox_nodes(BalsaMailboxNode * mbnode);
 
 GRegex *balsa_quote_regex_new(void);
 
+/* return TRUE iff Balsa is built with Autocrypt support and any identity uses it */
+gboolean balsa_autocrypt_in_use(void);
+
 #endif				/* __BALSA_APP_H__ */

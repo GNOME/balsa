@@ -1098,10 +1098,12 @@ quit_activated(GSimpleAction * action,
     GdkEventAny e = { GDK_DELETE, NULL, 0 };
 
     e.window = gtk_widget_get_window(GTK_WIDGET(window));
-    libbalsa_information_parented(NULL, /* to outlive the window */
-                                  LIBBALSA_INFORMATION_MESSAGE,
-                                  _("Balsa closes files and connections."
-                                    " Please wait…"));
+    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+    	_("Balsa closes files and connections. Please wait…"));
+    /* note: add a small delay to ensure that the notification ID has been
+     * reported back to us if we use the org.freedesktop.Notifications
+     * interface - otherwise, it is apparently impossible to withdraw it. */
+    g_usleep(1000);
     while(gtk_events_pending())
         gtk_main_iteration_do(FALSE);
     gdk_event_put((GdkEvent*)&e);

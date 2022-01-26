@@ -3224,9 +3224,17 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
             new_tree =
                 g_node_copy(imap_mbox_handle_get_thread_root(mimap->handle));
             break;
-        } else 
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-			     _("Server-side threading not supported."));
+		} else {
+			LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
+			gchar *hide_id;
+
+			hide_id = g_strdup_printf("LBIMAP_SSTH_%u_%u",
+				g_str_hash(libbalsa_server_get_user(s)),
+				g_str_hash(libbalsa_server_get_host(s)));
+			libbalsa_information_may_hide(LIBBALSA_INFORMATION_WARNING,
+				hide_id, _("Server-side threading not supported."));
+			g_free(hide_id);
+		}
         /* fall through */
     case LB_MAILBOX_THREADING_FLAT:
         if(filter) {

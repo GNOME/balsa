@@ -507,7 +507,7 @@ libbalsa_text_attr_string(const gchar * string)
     gboolean has_esc = FALSE;
     gboolean has_hi_bit = FALSE;
     gboolean has_hi_ctrl = FALSE;
-    gboolean is_utf8 = TRUE;
+    gboolean is_utf8;
 
     lb_text_attr(string, -1, &has_esc, &has_hi_bit, &has_hi_ctrl);
     is_utf8 = g_utf8_validate(string, -1, NULL);

@@ -150,7 +150,7 @@ html2text(gchar ** text, gsize len)
     if (err != NULL) {
         libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                              _("Could not convert HTML part to text: %s"),
-                             err ? err->message : _("Unknown error"));
+                             err->message);
         g_error_free(err);
     }
 }

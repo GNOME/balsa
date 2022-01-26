@@ -206,7 +206,7 @@ static GList *
 scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 	  LibBalsaMessageBody * body, gboolean no_first_sep)
 {
-    gboolean add_signature = FALSE;
+    gboolean add_signature;
     gboolean have_crypto_frame;
 	gboolean is_mp_signed;
     while (body) {

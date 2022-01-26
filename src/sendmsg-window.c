@@ -5211,7 +5211,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
         return TRUE;
 
     /* collect all to and cc recipients */
-    protocol = bsmsg->gpg_mode & LIBBALSA_PROTECT_SMIMEV3 ?
+    protocol = (bsmsg->gpg_mode & LIBBALSA_PROTECT_SMIMEV3) ?
 	GPGME_PROTOCOL_CMS : GPGME_PROTOCOL_OpenPGP;
 
     ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");

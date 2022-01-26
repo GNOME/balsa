@@ -3,13 +3,13 @@
 #
 # Yuri Syrota <rasta@renome.rovno.ua>, 1999.
 # Maxim Dziumanenko <mvd@mylinux.com.ua>, 2004.
-# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2021.
+# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2021, 2022.
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2021-12-16 15:34+0000\n"
-"PO-Revision-Date: 2021-12-18 08:35+0200\n"
+"POT-Creation-Date: 2022-01-26 00:18+0000\n"
+"PO-Revision-Date: 2022-01-26 13:05+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -108,8 +108,15 @@ msgstr "Не можна додавати дублікат запису"
 msgid "Cannot find address in address book"
 msgstr "Не вдалося знайти адресу у адресній книзі"
 
-#: ../libbalsa/address-book.c:308 ../src/main-window.c:2984
-#: ../src/main-window.c:4140 ../src/sendmsg-window.c:3891
+#: ../libbalsa/address-book.c:308 ../libbalsa/html.c:95 ../libbalsa/html.c:153
+#: ../src/ab-window.c:439 ../src/balsa-message.c:1820
+#: ../src/balsa-mime-widget.c:223 ../src/balsa-mime-widget-callbacks.c:53
+#: ../src/balsa-mime-widget-callbacks.c:152
+#: ../src/balsa-mime-widget-crypto.c:77 ../src/balsa-mime-widget-crypto.c:83
+#: ../src/balsa-mime-widget-message.c:363 ../src/balsa-mime-widget-text.c:255
+#: ../src/main-window.c:2986 ../src/main-window.c:4142
+#: ../src/sendmsg-window.c:1403 ../src/sendmsg-window.c:2938
+#: ../src/sendmsg-window.c:3891
 msgid "Unknown error"
 msgstr "Невідома помилка"
 
@@ -236,8 +243,8 @@ msgstr "База даних автошифрування"
 #: ../libbalsa/autocrypt.c:448 ../libbalsa/html.c:447
 #: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
 #: ../libbalsa/libbalsa-gpgme-widgets.c:765 ../src/ab-window.c:148
-#: ../src/folder-conf.c:337 ../src/mailbox-node.c:1049
-#: ../src/main-window.c:3832 ../src/toolbar-prefs.c:130
+#: ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
+#: ../src/main-window.c:3834 ../src/toolbar-prefs.c:130
 #: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
 #: ../ui/sendmsg-window.ui.h:12 ../ui/source-viewer.ui.h:2
 msgid "_Close"
@@ -274,8 +281,8 @@ msgid "_Show details…"
 msgstr "Показати п_одробиці…"
 
 #: ../libbalsa/autocrypt.c:884 ../libbalsa/html-pref-db.c:450
-#: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1041
-#: ../src/mailbox-node.c:1057 ../src/pref-manager.c:2002
+#: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1040
+#: ../src/mailbox-node.c:1056 ../src/pref-manager.c:2002
 #: ../src/pref-manager.c:2087 ../src/pref-manager.c:2810 ../ui/ab-main.ui.h:11
 #: ../ui/main-window.ui.h:61
 msgid "_Delete"
@@ -547,31 +554,30 @@ msgid "Could not convert HTML part to text: %s"
 msgstr "Не вдалося перетворити частину HTML на текст: %s"
 
 #: ../libbalsa/html.c:440
-#| msgid ""
-#| "This message part contains images from a remote server. To protect your "
-#| "privacy, Balsa has not downloaded them. You may choose to download them "
-#| "if you trust the server."
 msgid ""
 "This message part references content on one or more external servers. To "
 "protect your privacy, Balsa has not downloaded it. You may choose to "
 "download it if you trust the sender of the message."
 msgstr ""
-"У цій частині повідомлення містяться посилання на дані на одному або декількох зовнішніх серверах. Щоб захистити вас, Balsa не отримувала ці дані. Ви можете наказати "
-"програмі отримати дані, якщо довіряєте відправникові."
+"У цій частині повідомлення містяться посилання на дані на одному або "
+"декількох зовнішніх серверах. Щоб захистити вас, Balsa не отримувала ці "
+"дані. Ви можете наказати програмі отримати дані, якщо довіряєте "
+"відправникові."
 
 #: ../libbalsa/html.c:445
 msgid "_Download external content"
-msgstr ""
-"_Отримати зовнішні дані"
+msgstr "_Отримати зовнішні дані"
 
-#: ../libbalsa/html.c:682
+#: ../libbalsa/html.c:690
 #, c-format
 msgid ""
 "Balsa's external HTML resources filter web extension is not available in the "
 "folder “%s”, falling back to simplified image filtering. Please check your "
 "installation. "
 msgstr ""
-"Веброзширення фільтрування зовнішніх ресурсів HTML Balsa є недоступним у теці «%s». Повертаємося до спрощеного фільтрування зображень. Будь ласка, перевірте, чи встановлено пакунок з програмою належним чином. "
+"Веброзширення фільтрування зовнішніх ресурсів HTML Balsa є недоступним у "
+"теці «%s». Повертаємося до спрощеного фільтрування зображень. Будь ласка, "
+"перевірте, чи встановлено пакунок з програмою належним чином. "
 
 #: ../libbalsa/html-pref-db.c:138
 msgid "HTML preferences"
@@ -587,8 +593,7 @@ msgstr "Перевага HTML"
 
 #: ../libbalsa/html-pref-db.c:204
 msgid "Auto-load external content"
-msgstr ""
-"Автозавантаження зовнішніх даних"
+msgstr "Автозавантаження зовнішніх даних"
 
 #: ../libbalsa/html-pref-db.c:270
 #, c-format
@@ -651,7 +656,7 @@ msgstr "Підпис у «%s» не є текстом у кодуванні UTF-
 #: ../src/ab-main.c:849 ../src/ab-window.c:141 ../src/address-book-config.c:240
 #: ../src/address-book-config.c:346 ../src/address-book-config.c:392
 #: ../src/balsa-app.c:94 ../src/balsa-app.c:163 ../src/balsa-index.c:2793
-#: ../src/balsa-mblist.c:1890 ../src/balsa-message.c:1741
+#: ../src/balsa-mblist.c:1890 ../src/balsa-message.c:1737
 #: ../src/balsa-mime-widget-callbacks.c:85 ../src/filter-edit-callbacks.c:1238
 #: ../src/filter-edit-dialog.c:404 ../src/filter-edit-dialog.c:574
 #: ../src/filter-export-dialog.c:80 ../src/filter-run-dialog.c:300
@@ -670,10 +675,10 @@ msgstr "_Скасувати"
 #: ../libbalsa/identity.c:369 ../libbalsa/libbalsa-gpgme-cb.c:183
 #: ../libbalsa/libbalsa-gpgme-cb.c:362 ../libbalsa/smtp-server.c:326
 #: ../src/ab-window.c:140 ../src/balsa-app.c:95 ../src/balsa-app.c:162
-#: ../src/balsa-message.c:1742 ../src/balsa-mime-widget-callbacks.c:86
+#: ../src/balsa-message.c:1738 ../src/balsa-mime-widget-callbacks.c:86
 #: ../src/filter-edit-callbacks.c:1237 ../src/filter-edit-dialog.c:573
 #: ../src/filter-export-dialog.c:79 ../src/filter-run-dialog.c:299
-#: ../src/folder-conf.c:344 ../src/main-window.c:3924
+#: ../src/folder-conf.c:344 ../src/main-window.c:3926
 #: ../src/pref-manager.c:3302 ../src/sendmsg-window.c:1497
 #: ../src/sendmsg-window.c:1961 ../src/sendmsg-window.c:3343
 #: ../src/sendmsg-window.c:4781 ../src/store-address.c:209
@@ -864,7 +869,7 @@ msgid "Face header file %s contains binary data."
 msgstr "Файл заголовка Face %s містить двійкові дані."
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/identity.c:1186 ../src/balsa-message.c:1568
+#: ../libbalsa/identity.c:1186 ../src/balsa-message.c:1564
 #, c-format
 msgid "Error loading Face: %s"
 msgstr "Помилка під час спроби завантажити Face: %s"
@@ -895,7 +900,7 @@ msgstr "Керування профілями"
 #: ../src/address-book-config.c:390 ../src/filter-edit-callbacks.c:1239
 #: ../src/filter-edit-dialog.c:575 ../src/filter-export-dialog.c:81
 #: ../src/filter-run-dialog.c:301 ../src/folder-conf.c:470
-#: ../src/folder-conf.c:843 ../src/main-window.c:3831
+#: ../src/folder-conf.c:843 ../src/main-window.c:3833
 #: ../src/pref-manager.c:3305 ../src/toolbar-prefs.c:131 ../ui/ab-main.ui.h:16
 #: ../ui/main-window.ui.h:89
 msgid "_Help"
@@ -1123,7 +1128,7 @@ msgstr "Тепер ваші налаштування Balsa зберігають�
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: ../libbalsa/libbalsa-gpgme.c:188 ../src/balsa-message.c:2939
+#: ../libbalsa/libbalsa-gpgme.c:188 ../src/balsa-message.c:2935
 msgid "S/MIME"
 msgstr "S/MIME"
 
@@ -1797,7 +1802,7 @@ msgstr "Не вдалося записати дані до тимчасовог�
 msgid "Uploading %ld kB"
 msgstr "Вивантажуємо %ld кБ"
 
-#: ../libbalsa/mailbox_imap.c:3229
+#: ../libbalsa/mailbox_imap.c:3235
 msgid "Server-side threading not supported."
 msgstr "Розбивання на гілки на сервері не підтримується."
 
@@ -3417,7 +3422,7 @@ msgstr "_Адреса"
 
 #: ../src/ab-main.c:839 ../src/address-book-config.c:229
 #: ../src/address-book-config.c:335 ../src/address-book-config.c:379
-#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3888
+#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3890
 #: ../src/pref-manager.c:3303
 msgid "_Apply"
 msgstr "_Застосувати"
@@ -3433,6 +3438,11 @@ msgstr "Вибрати"
 #: ../src/ab-main.c:974 ../src/toolbar-factory.c:155
 msgid "Edit"
 msgstr "Змінити"
+
+#: ../src/ab-main.c:1096
+#| msgid "Osmo Address Book"
+msgid "Balsa Address Book"
+msgstr "Адресна книга Balsa"
 
 #: ../src/ab-window.c:184 ../src/filter-edit-dialog.c:207
 #: ../src/filter-export-dialog.c:91 ../src/filter-run-dialog.c:209
@@ -3584,7 +3594,7 @@ msgid "GPE Address Book"
 msgstr "Адресна книга GPE"
 
 #: ../src/address-book-config.c:602 ../src/main-window.c:1040
-#: ../src/main-window.c:3995
+#: ../src/main-window.c:3997
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Помилка відображення довідки: %s\n"
@@ -3799,155 +3809,155 @@ msgstr "Вибір теки призначення"
 msgid "Other…"
 msgstr "Інше…"
 
-#: ../src/balsa-message.c:267
+#: ../src/balsa-message.c:263
 msgid "Select message part to display"
 msgstr "Виберіть частину повідомлення для показу"
 
-#: ../src/balsa-message.c:319
+#: ../src/balsa-message.c:315
 msgid "Wrapped"
 msgstr "Циклічний пошук"
 
-#: ../src/balsa-message.c:323
+#: ../src/balsa-message.c:319
 msgid "Not found"
 msgstr "Не знайдено"
 
-#: ../src/balsa-message.c:564
+#: ../src/balsa-message.c:560
 msgid "Find:"
 msgstr "Знайти:"
 
-#: ../src/balsa-message.c:576 ../src/toolbar-factory.c:124
+#: ../src/balsa-message.c:572 ../src/toolbar-factory.c:124
 msgid "Previous"
 msgstr "Попереднє"
 
-#: ../src/balsa-message.c:583 ../src/toolbar-factory.c:125
+#: ../src/balsa-message.c:579 ../src/toolbar-factory.c:125
 msgid "Next"
 msgstr "Наступне"
 
-#: ../src/balsa-message.c:683
+#: ../src/balsa-message.c:679
 msgid "Content"
 msgstr "Вміст"
 
-#: ../src/balsa-message.c:776
+#: ../src/balsa-message.c:772
 msgid "Message parts"
 msgstr "Частини повідомлення"
 
-#: ../src/balsa-message.c:953
+#: ../src/balsa-message.c:949
 msgid "Save selected as…"
 msgstr "Зберегти позначене як…"
 
-#: ../src/balsa-message.c:960
+#: ../src/balsa-message.c:956
 msgid "Save selected to folder…"
 msgstr "Зберегти позначене до теки…"
 
-#: ../src/balsa-message.c:1067
+#: ../src/balsa-message.c:1063
 msgid "(No sender)"
 msgstr "(Немає відправника)"
 
-#: ../src/balsa-message.c:1122 ../src/balsa-message.c:1134
+#: ../src/balsa-message.c:1118 ../src/balsa-message.c:1130
 #, c-format
 msgid "Could not access message %u in mailbox “%s”."
 msgstr "Не вдалося отримати доступ до повідомлення %u у поштовій скриньці «%s»"
 
-#: ../src/balsa-message.c:1187 ../src/main.c:559
+#: ../src/balsa-message.c:1183 ../src/main.c:528
 #, c-format
 msgid "Autocrypt error: %s"
 msgstr "Помилка автошифрування: %s"
 
-#: ../src/balsa-message.c:1321
+#: ../src/balsa-message.c:1317
 msgid "mixed parts"
 msgstr "змішані частини"
 
-#: ../src/balsa-message.c:1323
+#: ../src/balsa-message.c:1319
 msgid "alternative parts"
 msgstr "альтернативні частини"
 
-#: ../src/balsa-message.c:1325
+#: ../src/balsa-message.c:1321
 msgid "signed parts"
 msgstr "підписані частини"
 
-#: ../src/balsa-message.c:1327
+#: ../src/balsa-message.c:1323
 msgid "encrypted parts"
 msgstr "зашифровані частини"
 
-#: ../src/balsa-message.c:1329
+#: ../src/balsa-message.c:1325
 msgid "RFC822 message"
 msgstr "Лист RFC822"
 
-#: ../src/balsa-message.c:1331
+#: ../src/balsa-message.c:1327
 #, c-format
 msgid "“%s” parts"
 msgstr "Частини «%s»"
 
-#: ../src/balsa-message.c:1379
+#: ../src/balsa-message.c:1375
 msgid "force inline for all parts"
 msgstr "примусово вбудувати усі частини"
 
-#: ../src/balsa-message.c:1422
+#: ../src/balsa-message.c:1418
 #, c-format
 msgid "RFC822 message (from %s, subject “%s”)"
 msgstr "Повідомлення RFC822 (від %s, тема «%s»)"
 
-#: ../src/balsa-message.c:1434
+#: ../src/balsa-message.c:1430
 msgid "complete message"
 msgstr "повне повідомлення"
 
-#: ../src/balsa-message.c:1451
+#: ../src/balsa-message.c:1447
 #, c-format
 msgid "part %s: %s (file %s)"
 msgstr "частина %s: %s (файл %s)"
 
-#: ../src/balsa-message.c:1462
+#: ../src/balsa-message.c:1458
 #, c-format
 msgid "part %s: %s"
 msgstr "частина %s: %s"
 
-#: ../src/balsa-message.c:1476
+#: ../src/balsa-message.c:1472
 msgid "encrypted: "
 msgstr "зашифровано: "
 
-#: ../src/balsa-message.c:1612
+#: ../src/balsa-message.c:1608
 #, c-format
 msgid "Reading embedded message failed: %s"
 msgstr "Не вдалося прочитати вбудоване повідомлення: %s"
 
-#: ../src/balsa-message.c:1620
+#: ../src/balsa-message.c:1616
 #, c-format
 msgid "Appending message to %s failed: %s"
 msgstr "Не вдалося дописати повідомлення до %s: %s"
 
-#: ../src/balsa-message.c:1649
+#: ../src/balsa-message.c:1645
 msgid "_Save…"
 msgstr "З_берегти…"
 
-#: ../src/balsa-message.c:1658 ../src/balsa-mime-widget-message.c:457
+#: ../src/balsa-message.c:1654 ../src/balsa-mime-widget-message.c:457
 msgid "_Copy to folder…"
 msgstr "С_копіювати до теки…"
 
-#: ../src/balsa-message.c:1738
+#: ../src/balsa-message.c:1734
 msgid "Select folder for saving selected parts"
 msgstr "Виберіть теку для зберігання вибраних частин"
 
-#: ../src/balsa-message.c:1763
+#: ../src/balsa-message.c:1759
 #, c-format
 msgid "Could not create URI for %s"
 msgstr "Не вдалося створити адресу для %s"
 
-#: ../src/balsa-message.c:1788
+#: ../src/balsa-message.c:1784
 #, c-format
 msgid "%s message part"
 msgstr "Частина повідомлення %s"
 
-#: ../src/balsa-message.c:1821 ../src/balsa-mime-widget-callbacks.c:164
+#: ../src/balsa-message.c:1817 ../src/balsa-mime-widget-callbacks.c:151
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "Не вдалося зберегти %s: %s"
 
-#: ../src/balsa-message.c:2479 ../src/balsa-message.c:2624
+#: ../src/balsa-message.c:2475 ../src/balsa-message.c:2620
 #, c-format
 msgid "Sending the disposition notification failed: %s"
 msgstr "Не вдалося надіслати сповіщення про отримання повідомлення: %s"
 
-#: ../src/balsa-message.c:2579
+#: ../src/balsa-message.c:2575
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -3958,11 +3968,11 @@ msgstr ""
 "сповіщення про отримання повідомлення (СОП) на «%s».\n"
 "Бажаєте надіслати це сповіщення?"
 
-#: ../src/balsa-message.c:2589
+#: ../src/balsa-message.c:2585
 msgid "Reply to MDN?"
 msgstr "Відповісти на СОП?"
 
-#: ../src/balsa-message.c:2799
+#: ../src/balsa-message.c:2795
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -3972,18 +3982,18 @@ msgstr ""
 "разів.\n"
 "Будь ласка, закрийте інші екземпляри цього повідомлення і повторіть спробу."
 
-#: ../src/balsa-message.c:2820 ../src/balsa-message.c:2905
-#: ../src/balsa-message.c:3031
+#: ../src/balsa-message.c:2816 ../src/balsa-message.c:2901
+#: ../src/balsa-message.c:3027
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Не вдалося обробити частину повідомлення: %s"
 
-#: ../src/balsa-message.c:2821 ../src/balsa-message.c:2906
-#: ../src/balsa-message.c:3032
+#: ../src/balsa-message.c:2817 ../src/balsa-message.c:2902
+#: ../src/balsa-message.c:3028
 msgid "Possible disk space problem."
 msgstr "Можлива проблема із місцем на диску."
 
-#: ../src/balsa-message.c:2835
+#: ../src/balsa-message.c:2831
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains an encrypted part, but its "
@@ -3992,7 +4002,7 @@ msgstr ""
 "Повідомлення, надіслане %s з темою «%s», містить зашифровану складову, але "
 "її структура неправильна."
 
-#: ../src/balsa-message.c:2843
+#: ../src/balsa-message.c:2839
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a PGP encrypted part, but "
@@ -4001,7 +4011,7 @@ msgstr ""
 "Повідомлення надіслане %s з темою «%s» містить зашифровану PGP частину, але "
 "цей криптографічний протокол недоступний."
 
-#: ../src/balsa-message.c:2856
+#: ../src/balsa-message.c:2852
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a S/MIME encrypted part, "
@@ -4010,7 +4020,7 @@ msgstr ""
 "Повідомлення надіслане %s з темою «%s» містить зашифровану S/MIME частину, "
 "але цей криптографічний протокол недоступний."
 
-#: ../src/balsa-message.c:2923
+#: ../src/balsa-message.c:2919
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a signed part, but its "
@@ -4019,7 +4029,7 @@ msgstr ""
 "Повідомлення, надіслане %s, з темою «%s» містить підписану складову, але її "
 "структура неправильна. Підпис, якщо він є, не може бути перевірений."
 
-#: ../src/balsa-message.c:2936
+#: ../src/balsa-message.c:2932
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a %s signed part, but this "
@@ -4028,19 +4038,19 @@ msgstr ""
 "Повідомлення надіслане %s з темою «%s» містить %s підписану складову, але "
 "цей криптографічний протокол недоступний."
 
-#: ../src/balsa-message.c:2939
+#: ../src/balsa-message.c:2935
 msgid "PGP"
 msgstr "PGP"
 
-#: ../src/balsa-message.c:2968
+#: ../src/balsa-message.c:2964
 msgid "Detected a good signature with insufficient validity"
 msgstr "Виявлено якісний підпис без недостатньої чинності"
 
-#: ../src/balsa-message.c:2973 ../src/balsa-message.c:3098
+#: ../src/balsa-message.c:2969 ../src/balsa-message.c:3094
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Виявлено якісний підпис без недостатньої чинності чи довіри"
 
-#: ../src/balsa-message.c:2983 ../src/balsa-message.c:3107
+#: ../src/balsa-message.c:2979 ../src/balsa-message.c:3103
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” "
@@ -4050,7 +4060,7 @@ msgstr ""
 "Перевірка підпису надісланого %s повідомлення з темою «%s» повернула:\n"
 "%s"
 
-#: ../src/balsa-message.c:2996
+#: ../src/balsa-message.c:2992
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” failed "
@@ -4058,7 +4068,7 @@ msgid ""
 msgstr ""
 "Помилка при перевірці підпису повідомлення надісланого %s з темою «%s»."
 
-#: ../src/balsa-message.c:3058
+#: ../src/balsa-message.c:3054
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
@@ -4066,7 +4076,7 @@ msgstr ""
 "Розшифрування не можна виконати, оскільки це повідомлення показано декілька "
 "разів."
 
-#: ../src/balsa-message.c:3060
+#: ../src/balsa-message.c:3056
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -4074,7 +4084,7 @@ msgstr ""
 "Перевірку підпису та вилучення захисту OpenPGP не може бути виконано, "
 "оскільки це повідомлення показано у декількох вікнах."
 
-#: ../src/balsa-message.c:3063
+#: ../src/balsa-message.c:3059
 msgid "Please close the other instances of this message and try again."
 msgstr ""
 "Будь ласка, закрийте інші екземпляри цього повідомлення і повторіть спробу."
@@ -4118,16 +4128,12 @@ msgstr "Не вдалося запустити програму: %s"
 msgid "Save %s MIME Part"
 msgstr "Збереження %s MIME частини"
 
-#: ../src/balsa-mime-widget-callbacks.c:122
+#: ../src/balsa-mime-widget-callbacks.c:123
 #, c-format
 msgid "Could not construct URI from %s"
 msgstr "Не вдалося побудувати адресу з %s"
 
-#: ../src/balsa-mime-widget-callbacks.c:141
-msgid "File already exists. Overwrite?"
-msgstr "Файл вже існує.  Переписати?"
-
-#: ../src/balsa-mime-widget-callbacks.c:151
+#: ../src/balsa-mime-widget-callbacks.c:137
 #, c-format
 msgid "Unlink %s: %s"
 msgstr "Від'єднати %s: %s"
@@ -4146,7 +4152,7 @@ msgstr "Не вдалося обробити ключі GnuPG: %s"
 msgid "_Import Autocrypt key"
 msgstr "_Імпортувати ключ автошифрування"
 
-#: ../src/balsa-mime-widget-crypto.c:148
+#: ../src/balsa-mime-widget-crypto.c:149
 msgid ""
 "The message contains an Autocrypt header, but it is either broken or the "
 "signature has been created using a different key."
@@ -4154,35 +4160,45 @@ msgstr ""
 "У повідомленні міститься заголовок Autocrypt, але його або пошкоджено, або "
 "підпис було створено з використанням іншого ключа."
 
-#: ../src/balsa-mime-widget-crypto.c:152
+#: ../src/balsa-mime-widget-crypto.c:153
+#| msgid ""
+#| "The message contains an Autocrypt header, but it is either broken or the "
+#| "signature has been created using a different key."
+msgid ""
+"The message contains an Autocrypt header which is ignored as none of your "
+"identities has Autocrypt support enabled."
+msgstr ""
+"У повідомленні міститься заголовок Autocrypt, який буде проігноровано, оскільки для жодного із ваших профілів не увімкнено підтримки Autocrypt."
+
+#: ../src/balsa-mime-widget-crypto.c:158
 msgid "_Search key server for this key"
 msgstr "_Шукати цей ключ на сервері ключів"
 
-#: ../src/balsa-mime-widget-crypto.c:154
+#: ../src/balsa-mime-widget-crypto.c:160
 msgid "_Search key server for updates of this key"
 msgstr "_Шукати на сервері ключів оновлення цього ключа"
 
-#: ../src/balsa-mime-widget-crypto.c:198
+#: ../src/balsa-mime-widget-crypto.c:204
 msgid "decrypted"
 msgstr "розшифровано"
 
-#: ../src/balsa-mime-widget-crypto.c:211
+#: ../src/balsa-mime-widget-crypto.c:217
 msgid "trusted signature"
 msgstr "довірений підпис"
 
-#: ../src/balsa-mime-widget-crypto.c:214
+#: ../src/balsa-mime-widget-crypto.c:220
 msgid "low trust signature"
 msgstr "підпис із низькою довірою"
 
-#: ../src/balsa-mime-widget-crypto.c:217
+#: ../src/balsa-mime-widget-crypto.c:223
 msgid "bad signature"
 msgstr "помилковий підпис"
 
-#: ../src/balsa-mime-widget-crypto.c:220
+#: ../src/balsa-mime-widget-crypto.c:226
 msgid "unknown signature status"
 msgstr "невідомий стан підпису"
 
-#: ../src/balsa-mime-widget-crypto.c:306
+#: ../src/balsa-mime-widget-crypto.c:312
 #, c-format
 msgid ""
 "Import GnuPG key:\n"
@@ -4191,20 +4207,20 @@ msgstr ""
 "Імпорт ключа GnuPG:\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:313
+#: ../src/balsa-mime-widget-crypto.c:319
 #, c-format
 msgid "Error importing key data: %s"
 msgstr "Помилка під час імпортування даних ключа: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:313 ../src/sendmsg-window.c:1673
+#: ../src/balsa-mime-widget-crypto.c:319 ../src/sendmsg-window.c:1673
 msgid "unknown error"
 msgstr "невідома помилка"
 
-#: ../src/balsa-mime-widget-crypto.c:350
+#: ../src/balsa-mime-widget-crypto.c:356
 msgid "(imported)"
 msgstr "(імпортовано)"
 
-#: ../src/balsa-mime-widget-crypto.c:358
+#: ../src/balsa-mime-widget-crypto.c:364
 msgid "Import key into the local key ring"
 msgstr "Імпорт ключа до локальної зв'язки ключів"
 
@@ -4333,15 +4349,15 @@ msgstr "FCC:"
 msgid "Disposition-Notification-To:"
 msgstr "Сповіщення про отримання:"
 
-#: ../src/balsa-mime-widget-text.c:584
+#: ../src/balsa-mime-widget-text.c:584 ../src/balsa-mime-widget-text.c:1210
 msgid "Copy link"
 msgstr "Копіювати посилання"
 
-#: ../src/balsa-mime-widget-text.c:589
+#: ../src/balsa-mime-widget-text.c:589 ../src/balsa-mime-widget-text.c:1214
 msgid "Open link"
 msgstr "Відкрити посилання"
 
-#: ../src/balsa-mime-widget-text.c:594
+#: ../src/balsa-mime-widget-text.c:594 ../src/balsa-mime-widget-text.c:1218
 msgid "Send link…"
 msgstr "Надіслати посилання…"
 
@@ -4384,39 +4400,38 @@ msgid "Prefer HTML for this sender"
 msgstr "Перевага HTML для цього відправника"
 
 #: ../src/balsa-mime-widget-text.c:1190
-#| msgid "Load images for this sender"
 msgid "Load external content for this sender"
 msgstr "Завантажувати зовнішні дані для цього відправника"
 
-#: ../src/balsa-mime-widget-text.c:1344
+#: ../src/balsa-mime-widget-text.c:1375
 msgid "S_tore Address"
 msgstr "З_берегти адресу"
 
-#: ../src/balsa-mime-widget-text.c:1350
+#: ../src/balsa-mime-widget-text.c:1381
 msgid "Full Name:"
 msgstr "Повне ім'я:"
 
-#: ../src/balsa-mime-widget-text.c:1351
+#: ../src/balsa-mime-widget-text.c:1382
 msgid "Nick Name:"
 msgstr "Псевдонім:"
 
-#: ../src/balsa-mime-widget-text.c:1352
+#: ../src/balsa-mime-widget-text.c:1383
 msgid "First Name:"
 msgstr "Ім'я:"
 
-#: ../src/balsa-mime-widget-text.c:1353
+#: ../src/balsa-mime-widget-text.c:1384
 msgid "Last Name:"
 msgstr "Прізвище:"
 
-#: ../src/balsa-mime-widget-text.c:1354
+#: ../src/balsa-mime-widget-text.c:1385
 msgid "Organization:"
 msgstr "Організація:"
 
-#: ../src/balsa-mime-widget-text.c:1355
+#: ../src/balsa-mime-widget-text.c:1386
 msgid "Email Address:"
 msgstr "Електронна адреса:"
 
-#: ../src/balsa-mime-widget-text.c:1383
+#: ../src/balsa-mime-widget-text.c:1414
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains 8-bit characters, but no "
@@ -4631,15 +4646,15 @@ msgstr "_Всі"
 msgid "C_lear"
 msgstr "О_чистити"
 
-#: ../src/filter-edit-callbacks.c:954 ../src/main-window.c:3872
+#: ../src/filter-edit-callbacks.c:954 ../src/main-window.c:3874
 msgid "_Body"
 msgstr "_Тіло"
 
-#: ../src/filter-edit-callbacks.c:955 ../src/main-window.c:3873
+#: ../src/filter-edit-callbacks.c:955 ../src/main-window.c:3875
 msgid "_To:"
 msgstr "_До:"
 
-#: ../src/filter-edit-callbacks.c:956 ../src/main-window.c:3874
+#: ../src/filter-edit-callbacks.c:956 ../src/main-window.c:3876
 msgid "_From:"
 msgstr "_Від:"
 
@@ -4647,7 +4662,7 @@ msgstr "_Від:"
 msgid "_Subject"
 msgstr "Т_ема"
 
-#: ../src/filter-edit-callbacks.c:958 ../src/main-window.c:3876
+#: ../src/filter-edit-callbacks.c:958 ../src/main-window.c:3878
 msgid "_CC:"
 msgstr "Ко_пія:"
 
@@ -4699,7 +4714,7 @@ msgstr "Т_ип пошуку:"
 msgid "Edit condition for filter: "
 msgstr "Редагування умови фільтрування: "
 
-#: ../src/filter-edit-callbacks.c:1475 ../src/save-restore.c:1947
+#: ../src/filter-edit-callbacks.c:1475 ../src/save-restore.c:1950
 msgid "Filter with no condition was omitted"
 msgstr "Фільтр, який не має умови, пропущено"
 
@@ -4837,7 +4852,7 @@ msgstr "Відтворити звук:"
 msgid "Use Sound…"
 msgstr "Використовувати звук…"
 
-#: ../src/filter-edit-dialog.c:405 ../src/mailbox-node.c:1047
+#: ../src/filter-edit-dialog.c:405 ../src/mailbox-node.c:1046
 msgid "_Open"
 msgstr "_Відкрити"
 
@@ -5250,7 +5265,7 @@ msgstr ""
 msgid "Information — Balsa"
 msgstr "Інформація – Balsa"
 
-#: ../src/information-dialog.c:235 ../src/main-window.c:3893
+#: ../src/information-dialog.c:235 ../src/main-window.c:3895
 msgid "_Clear"
 msgstr "О_чистити"
 
@@ -5473,70 +5488,75 @@ msgstr ""
 msgid "Scanning of %s failed: %s"
 msgstr "Помилка сканування %s: %s"
 
-#: ../src/mailbox-node.c:964
+#. FIXME : Perhaps should we be able to apply filters on
+#. folders (ie recurse on all mailboxes in it), but there are
+#. problems of infinite recursion (when one mailbox being
+#. filtered is also the destination of the filter action (eg a
+#. copy)). So let's see that later :)
+#: ../src/mailbox-node.c:963
 msgid "You can apply filters only on mailbox"
 msgstr "Застосовувати фільтри модна лише на поштову скриньку"
 
-#: ../src/mailbox-node.c:998
+#: ../src/mailbox-node.c:997
 msgid "Local _mbox mailbox…"
 msgstr "Локальна скринька _mbox…"
 
-#: ../src/mailbox-node.c:1000
+#: ../src/mailbox-node.c:999
 msgid "Local Mail_dir mailbox…"
 msgstr "Локальна скринька mail_dir…"
 
-#: ../src/mailbox-node.c:1002
+#: ../src/mailbox-node.c:1001
 msgid "Local M_H mailbox…"
 msgstr "Локальна скринька M_H…"
 
-#: ../src/mailbox-node.c:1005
+#: ../src/mailbox-node.c:1004
 msgid "Remote IMAP _folder…"
 msgstr "Віддалена _тека IMAP…"
 
-#: ../src/mailbox-node.c:1008
+#: ../src/mailbox-node.c:1007
 msgid "Remote IMAP _subfolder…"
 msgstr "Віддалена п_ідтека IMAP…"
 
 #. Translators: popup menu item "New" mailbox or folder
-#: ../src/mailbox-node.c:1014
+#: ../src/mailbox-node.c:1013
 msgctxt "mailbox"
 msgid "_New"
 msgstr "С_творити"
 
 #. clicked on the empty space
-#: ../src/mailbox-node.c:1021 ../src/mailbox-node.c:1037
+#: ../src/mailbox-node.c:1020 ../src/mailbox-node.c:1036
 msgid "_Rescan"
 msgstr "_Пересканувати"
 
-#: ../src/mailbox-node.c:1031
+#: ../src/mailbox-node.c:1030
 msgid "_Properties…"
 msgstr "В_ластивості…"
 
-#: ../src/mailbox-node.c:1061
+#: ../src/mailbox-node.c:1060
 msgid "Mark as _Inbox"
 msgstr "Позначити як \"В_хідні\""
 
-#: ../src/mailbox-node.c:1063
+#: ../src/mailbox-node.c:1062
 msgid "_Mark as Sentbox"
 msgstr "Позначити як \"В_ихідні\""
 
-#: ../src/mailbox-node.c:1065
+#: ../src/mailbox-node.c:1064
 msgid "Mark as _Trash"
 msgstr "Позначити як \"_Смітник\""
 
-#: ../src/mailbox-node.c:1067
+#: ../src/mailbox-node.c:1066
 msgid "Mark as D_raftbox"
 msgstr "Позначити як \"_Чернетки\""
 
-#: ../src/mailbox-node.c:1070
+#: ../src/mailbox-node.c:1069
 msgid "_Empty trash"
 msgstr "С_порожнити смітник"
 
-#: ../src/mailbox-node.c:1075
+#: ../src/mailbox-node.c:1074
 msgid "_Edit/Apply filters"
 msgstr "_Редагувати/Застосувати фільтри"
 
-#: ../src/mailbox-node.c:1162
+#: ../src/mailbox-node.c:1161
 #, c-format
 msgid "The path “%s” does not lead to a mailbox."
 msgstr "Шлях «%s» не вказує на поштову скриньку."
@@ -5571,39 +5591,39 @@ msgstr "Смітник"
 msgid "Compressing mail folders…"
 msgstr "Стискання поштової теки…"
 
-#: ../src/main.c:628
+#: ../src/main.c:597
 msgid "Get new mail on start-up"
 msgstr "Отримувати нову пошту при запуску"
 
-#: ../src/main.c:630
+#: ../src/main.c:599
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Скласти нове повідомлення до ЕЛПОШТА@АДРЕСА"
 
-#: ../src/main.c:632
+#: ../src/main.c:601
 msgid "Attach file at URI"
 msgstr "Долучити файл за вказаною адресою"
 
-#: ../src/main.c:634
+#: ../src/main.c:603
 msgid "Opens MAILBOXNAME"
 msgstr "Відкрити НАЗВА_ПОШТОВОЇ_СКРИНЬКИ"
 
-#: ../src/main.c:634
+#: ../src/main.c:603
 msgid "MAILBOXNAME"
 msgstr "НАЗВА_ПОШТОВОЇ_СКРИНЬКИ"
 
-#: ../src/main.c:636
+#: ../src/main.c:605
 msgid "Opens first unread mailbox"
 msgstr "Відкрити першу непрочитану поштову скриньку"
 
-#: ../src/main.c:638
+#: ../src/main.c:607
 msgid "Opens default Inbox on start-up"
 msgstr "Відкриває типову теку «Вхідні» після запуску"
 
-#: ../src/main.c:640
+#: ../src/main.c:609
 msgid "Prints number unread and unsent messages"
 msgstr "Виводить кількість непрочитаних та не відправлених повідомлень"
 
-#: ../src/main.c:642
+#: ../src/main.c:611
 msgid "Show version"
 msgstr "Показати версію"
 
@@ -5659,20 +5679,20 @@ msgstr ""
 msgid "About Balsa"
 msgstr "Про Balsa"
 
-#: ../src/main-window.c:1103
+#: ../src/main-window.c:1102
 msgid "Balsa closes files and connections. Please wait…"
 msgstr "Balsa закриває файли та з'єднання. Зачекайте, будь ласка…"
 
-#: ../src/main-window.c:1502
+#: ../src/main-window.c:1504
 msgid "You can apply filters only on mailbox\n"
 msgstr "Застосовувати фільтри модна лише на поштову скриньку\n"
 
-#: ../src/main-window.c:1522
+#: ../src/main-window.c:1524
 #, c-format
 msgid "Removing duplicates failed: %s"
 msgstr "Не вдалося вилучити дублікати: %s"
 
-#: ../src/main-window.c:1528
+#: ../src/main-window.c:1530
 #, c-format
 msgid "Removed %d duplicate"
 msgid_plural "Removed %d duplicates"
@@ -5681,11 +5701,11 @@ msgstr[1] "Вилучено %d дублікати"
 msgstr[2] "Вилучено %d дублікатів"
 msgstr[3] "Вилучено один дублікат"
 
-#: ../src/main-window.c:1533
+#: ../src/main-window.c:1535
 msgid "No duplicates found"
 msgstr "Дублікатів не знайдено"
 
-#: ../src/main-window.c:2983
+#: ../src/main-window.c:2985
 #, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
@@ -5694,32 +5714,32 @@ msgstr ""
 "Не вдалося відкрити поштову скриньку!\n"
 "%s."
 
-#: ../src/main-window.c:3013
+#: ../src/main-window.c:3015
 #, c-format
 msgid "Opening %s"
 msgstr "Відкриваємо %s"
 
-#: ../src/main-window.c:3280 ../src/main-window.c:3435
-#: ../src/main-window.c:3556 ../src/main-window.c:3566
+#: ../src/main-window.c:3282 ../src/main-window.c:3437
+#: ../src/main-window.c:3558 ../src/main-window.c:3568
 msgid "Checking Mail…"
 msgstr "Перевірка пошти…"
 
-#: ../src/main-window.c:3518 ../src/main-window.c:3523
-#: ../src/main-window.c:3556 ../src/main-window.c:3561
+#: ../src/main-window.c:3520 ../src/main-window.c:3525
+#: ../src/main-window.c:3558 ../src/main-window.c:3563
 msgid "Mailboxes"
 msgstr "Поштові скриньки"
 
-#: ../src/main-window.c:3519
+#: ../src/main-window.c:3521
 #, c-format
 msgid "IMAP mailbox: %s"
 msgstr "Поштова скринька IMAP: %s"
 
-#: ../src/main-window.c:3524
+#: ../src/main-window.c:3526
 #, c-format
 msgid "Local mailbox: %s"
 msgstr "Локальна поштова скринька: %s"
 
-#: ../src/main-window.c:3602
+#: ../src/main-window.c:3604
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
@@ -5728,69 +5748,69 @@ msgstr[1] "Ви отримали %d повідомлень."
 msgstr[2] "Ви отримали %d повідомлень."
 msgstr[3] "Ви отримали %d повідомлення."
 
-#: ../src/main-window.c:3607
+#: ../src/main-window.c:3609
 msgid "You have new mail."
 msgstr "Ви отримали нову пошту."
 
-#: ../src/main-window.c:3827
+#: ../src/main-window.c:3829
 msgid "Search mailbox"
 msgstr "Пошук у скриньці"
 
-#: ../src/main-window.c:3850
+#: ../src/main-window.c:3852
 msgid "_Search for:"
 msgstr "З_найти:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: ../src/main-window.c:3863
+#: ../src/main-window.c:3865
 msgid "In:"
 msgstr "У:"
 
-#: ../src/main-window.c:3875
+#: ../src/main-window.c:3877
 msgid "S_ubject"
 msgstr "_Тема"
 
 #. Frame with Apply and Clear buttons
-#: ../src/main-window.c:3880
+#: ../src/main-window.c:3882
 msgid "Show only matching messages"
 msgstr "Показувати лише відповідні повідомлення"
 
 #. Frame with OK button
-#: ../src/main-window.c:3901
+#: ../src/main-window.c:3903
 msgid "Open next matching message"
 msgstr "Відкрити наступне відповідне повідомлення"
 
-#: ../src/main-window.c:3913
+#: ../src/main-window.c:3915
 msgid "_Reverse search"
 msgstr "_Зворотний пошук"
 
-#: ../src/main-window.c:3918
+#: ../src/main-window.c:3920
 msgid "_Wrap around"
 msgstr "Пере_нос"
 
-#: ../src/main-window.c:4138
+#: ../src/main-window.c:4140
 #, c-format
 msgid "Could not open trash: %s"
 msgstr "Не вдалося відкрити смітник: %s"
 
-#: ../src/main-window.c:4258
+#: ../src/main-window.c:4260
 #, c-format
 msgid "Balsa: %s (read-only)"
 msgstr "Balsa: %s (лише читання)"
 
-#: ../src/main-window.c:4260
+#: ../src/main-window.c:4262
 #, c-format
 msgid "Balsa: %s"
 msgstr "Balsa: %s"
 
 #. xgettext: this is the first part of the message
 #. * "Shown mailbox: %s with %d messages, %d new, %d hidden".
-#: ../src/main-window.c:4812
+#: ../src/main-window.c:4814
 #, c-format
 msgid "Shown mailbox: %s "
 msgstr "Показано поштову скриньку: %s "
 
-#: ../src/main-window.c:4817
+#: ../src/main-window.c:4819
 #, c-format
 msgid "with %d message"
 msgid_plural "with %d messages"
@@ -5799,7 +5819,7 @@ msgstr[1] "з %d повідомленнями"
 msgstr[2] "з %d повідомленнями"
 msgstr[3] "з одним повідомленням"
 
-#: ../src/main-window.c:4824
+#: ../src/main-window.c:4826
 #, c-format
 msgid ", %d new"
 msgid_plural ", %d new"
@@ -5808,7 +5828,7 @@ msgstr[1] ", %d нових"
 msgstr[2] ", %d нових"
 msgstr[3] ", одне нове"
 
-#: ../src/main-window.c:4831
+#: ../src/main-window.c:4833
 #, c-format
 msgid ", %d hidden"
 msgid_plural ", %d hidden"
@@ -5817,12 +5837,12 @@ msgstr[1] ", %d прихованих"
 msgstr[2] ", %d прихованих"
 msgstr[3] ", одне приховане"
 
-#: ../src/main-window.c:4872
+#: ../src/main-window.c:4874
 #, c-format
 msgid "The next unread message is in %s"
 msgstr "Наступне непрочитане повідомлення перебуває у %s"
 
-#: ../src/main-window.c:4879
+#: ../src/main-window.c:4881
 #, c-format
 msgid "Do you want to select %s?"
 msgstr "Хочете вибрати %s?"
@@ -6501,7 +6521,6 @@ msgid "Highlight _structured phrases"
 msgstr "Підсвічувати с_кладені фрази"
 
 #: ../src/print-gtk.c:617
-#| msgid "Download images from remote servers (may be dangerous)"
 msgid "Download content from remote servers (may be dangerous)"
 msgstr "Отримувати дані з віддалених серверів (може бути небезпечним)"
 
@@ -8124,6 +8143,9 @@ msgstr "Долучити _відкритий ключ GnuPG"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Екранувати спеціальні символи"
+
+#~ msgid "File already exists. Overwrite?"
+#~ msgstr "Файл вже існує.  Переписати?"
 
 #~ msgid ""
 #~ "This message part contains images from a remote server.\n"

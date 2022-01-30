@@ -32,6 +32,7 @@ libbalsa/imap/imap-commands.c
 libbalsa/imap/imap-handle.c
 libbalsa/imap/imap-tls.c
 libbalsa/imap-server.c
+libbalsa/information.c
 libbalsa/libbalsa.c
 libbalsa/libbalsa-conf.c
 libbalsa/libbalsa-gpgme.c

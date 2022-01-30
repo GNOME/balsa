@@ -8,15 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-01-26 00:18+0000\n"
-"PO-Revision-Date: 2022-01-26 13:05+0200\n"
+"POT-Creation-Date: 2022-01-30 12:02+0000\n"
+"PO-Revision-Date: 2022-01-30 16:47+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
+"%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Lokalize 20.12.0\n"
 
 #: ../balsa.appdata.xml.in.h:1
@@ -108,9 +109,9 @@ msgstr "Не можна додавати дублікат запису"
 msgid "Cannot find address in address book"
 msgstr "Не вдалося знайти адресу у адресній книзі"
 
-#: ../libbalsa/address-book.c:308 ../libbalsa/html.c:95 ../libbalsa/html.c:153
-#: ../src/ab-window.c:439 ../src/balsa-message.c:1820
-#: ../src/balsa-mime-widget.c:223 ../src/balsa-mime-widget-callbacks.c:53
+#: ../libbalsa/address-book.c:308 ../libbalsa/html.c:95 ../src/ab-window.c:439
+#: ../src/balsa-message.c:1820 ../src/balsa-mime-widget.c:223
+#: ../src/balsa-mime-widget-callbacks.c:53
 #: ../src/balsa-mime-widget-callbacks.c:152
 #: ../src/balsa-mime-widget-crypto.c:77 ../src/balsa-mime-widget-crypto.c:83
 #: ../src/balsa-mime-widget-message.c:363 ../src/balsa-mime-widget-text.c:255
@@ -1033,6 +1034,11 @@ msgstr "не вдалося підписатися на «%s»"
 #, c-format
 msgid "unsubscribing from “%s” failed"
 msgstr "не вдалося скасувати підписку на «%s»"
+
+#: ../libbalsa/information.c:179
+#| msgid "Do not remind me again."
+msgid "do not show again"
+msgstr "більше не показувати"
 
 #: ../libbalsa/libbalsa.c:398
 msgid "broken TLS certificate"
@@ -3440,7 +3446,6 @@ msgid "Edit"
 msgstr "Змінити"
 
 #: ../src/ab-main.c:1096
-#| msgid "Osmo Address Book"
 msgid "Balsa Address Book"
 msgstr "Адресна книга Balsa"
 
@@ -4161,14 +4166,12 @@ msgstr ""
 "підпис було створено з використанням іншого ключа."
 
 #: ../src/balsa-mime-widget-crypto.c:153
-#| msgid ""
-#| "The message contains an Autocrypt header, but it is either broken or the "
-#| "signature has been created using a different key."
 msgid ""
 "The message contains an Autocrypt header which is ignored as none of your "
 "identities has Autocrypt support enabled."
 msgstr ""
-"У повідомленні міститься заголовок Autocrypt, який буде проігноровано, оскільки для жодного із ваших профілів не увімкнено підтримки Autocrypt."
+"У повідомленні міститься заголовок Autocrypt, який буде проігноровано, "
+"оскільки для жодного із ваших профілів не увімкнено підтримки Autocrypt."
 
 #: ../src/balsa-mime-widget-crypto.c:158
 msgid "_Search key server for this key"

@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-01-26 20:15+0000\n"
-"PO-Revision-Date: 2022-01-27 12:56+0100\n"
+"POT-Creation-Date: 2022-01-30 12:02+0000\n"
+"PO-Revision-Date: 2022-01-30 13:11+0100\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -1027,6 +1027,10 @@ msgstr "misslyckades med att prenumerera på ”%s”"
 #, c-format
 msgid "unsubscribing from “%s” failed"
 msgstr "misslyckades med att avsluta prenumeration på ”%s”"
+
+#: ../libbalsa/information.c:179
+msgid "do not show again"
+msgstr "visa inte igen"
 
 #: ../libbalsa/libbalsa.c:398
 msgid "broken TLS certificate"
@@ -7731,7 +7735,7 @@ msgstr "Visa postlåde_flikar"
 #: ../ui/main-window.ui.h:35 ../ui/message-window.ui.h:10
 #: ../ui/sendmsg-window.ui.h:28
 msgid "Show Too_lbar"
-msgstr "Visa ver_ktygsrad"
+msgstr "Visa ver_ktygsfält"
 
 #: ../ui/main-window.ui.h:36
 msgid "Show St_atus Bar"
@@ -8554,9 +8558,6 @@ msgstr "_Använd kontrollsekvenser för specialtecken"
 #~ msgid "Bcc: "
 #~ msgstr "Blindkopia:"
 
-#~ msgid "_Customize Toolbars..."
-#~ msgstr "_Anpassa verktygsrader..."
-
 #~ msgid "the crypto engine for protocol OpenPGP is not available"
 #~ msgstr "krypteringsmotorn för protokollet OpenPGP är inte tillgänglig"
 
@@ -8773,12 +8774,6 @@ msgstr "_Använd kontrollsekvenser för specialtecken"
 
 #~ msgid "Delete messages from the Trash mailbox"
 #~ msgstr "Ta bort meddelanden från papperskorgen"
-
-#~ msgid "_Toolbars..."
-#~ msgstr "_Verktygsrader..."
-
-#~ msgid "Customize toolbars"
-#~ msgstr "Anpassa verktygsrader"
 
 #~ msgid "Create and set current identities"
 #~ msgstr "Skapa och ställ in aktuella identiteter"
@@ -8999,9 +8994,6 @@ msgstr "_Använd kontrollsekvenser för specialtecken"
 #~ msgid "Move the message to Trash mailbox"
 #~ msgstr "Flytta meddelandet till papperskorgen"
 
-#~ msgid "Show toolbar"
-#~ msgstr "Visa verktygsrad"
-
 #~ msgid "_Selected Headers"
 #~ msgstr "Valda _rubriker"
 
@@ -9109,9 +9101,6 @@ msgstr "_Använd kontrollsekvenser för specialtecken"
 
 #~ msgid "Sa_ve and Close"
 #~ msgstr "Spa_ra och stäng"
-
-#~ msgid "Too_lbar"
-#~ msgstr "Verkt_ygsrad"
 
 #~ msgid "Request Message Disposition Notification"
 #~ msgstr "Begär meddelandekvittens (MDN)"

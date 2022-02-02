@@ -552,8 +552,8 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
     g_assert(bsmsg != NULL);
 
     if (balsa_app.main_window) {
-        g_signal_handler_disconnect(balsa_app.main_window,
-                                    bsmsg->delete_sig_id);
+        if (bsmsg->delete_sig_id != 0)
+            g_signal_handler_disconnect(balsa_app.main_window, bsmsg->delete_sig_id);
         g_signal_handler_disconnect(balsa_app.main_window,
                                     bsmsg->identities_changed_id);
         g_object_weak_unref(G_OBJECT(balsa_app.main_window),
@@ -599,7 +599,7 @@ balsa_sendmsg_destroy_handler(BalsaSendmsg * bsmsg)
         g_source_remove(bsmsg->autosave_timeout_id);
 
 #if !HAVE_GTKSOURCEVIEW
-    g_object_unref(bsmsg->buffer2);
+    g_clear_object(&bsmsg->buffer2);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
     if (g_list_find(balsa_app.identities, bsmsg->ident) != NULL) {
@@ -1074,28 +1074,7 @@ sw_action_get_active(BalsaSendmsg * bsmsg,
 static void
 update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 {
-    GtkTextBuffer *buffer =
-        gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    GtkTextIter start, end;
-
-    gint replace_offset = 0;
-    gint siglen;
-
-    gboolean found_sig = FALSE;
-    gchar* old_sig;
-    gchar* new_sig;
-    gchar* message_text;
-    gchar* compare_str;
-    gchar** message_split;
-    gchar* tmpstr;
-    const gchar* subject;
-    gint replen, fwdlen;
     const gchar *addr;
-    const gchar *reply_string;
-    const gchar *old_reply_string;
-    const gchar *forward_string;
-    const gchar *old_forward_string;
-
     LibBalsaIdentity* old_ident;
     gboolean reply_type = (bsmsg->type == SEND_REPLY ||
                            bsmsg->type == SEND_REPLY_ALL ||
@@ -1104,7 +1083,6 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
                              bsmsg->type == SEND_FORWARD_INLINE);
 
     g_return_if_fail(ident != NULL);
-
 
     /* change entries to reflect new identity */
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from.body),
@@ -1171,148 +1149,173 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
         g_object_unref(bcc_list);
     }
 
-    /* change the subject to use the reply/forward strings */
-    subject = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject.body));
+    if (bsmsg->type != SEND_RESEND) {
+        GtkTextBuffer *buffer;
+        GtkTextIter start, end;
+        gint replace_offset = 0;
+        gint siglen;
 
-    /*
-     * If the subject begins with the old reply string
-     *    Then replace it with the new reply string.
-     * Else, if the subject begins with the old forward string
-     *    Then replace it with the new forward string.
-     * Else, if the old reply string was empty, and the message
-     *    is a reply, OR the old forward string was empty, and the
-     *    message is a forward
-     *    Then call bsmsg_set_subject_from_body()
-     * Else assume the user hand edited the subject and does
-     *    not want it altered
-     */
+        gboolean found_sig = FALSE;
+        gchar* old_sig;
+        gchar* new_sig;
+        gchar* message_text;
+        gchar* compare_str;
+        gchar** message_split;
+        gchar* tmpstr;
+        const gchar* subject;
+        gint replen, fwdlen;
+        const gchar *reply_string;
+        const gchar *old_reply_string;
+        const gchar *forward_string;
+        const gchar *old_forward_string;
 
-    reply_string = libbalsa_identity_get_reply_string(ident);
-    forward_string = libbalsa_identity_get_forward_string(ident);
 
-    old_ident = bsmsg->ident;
-    old_reply_string = libbalsa_identity_get_reply_string(old_ident);
-    old_forward_string = libbalsa_identity_get_forward_string(old_ident);
+        /* change the subject to use the reply/forward strings */
+        subject = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1]));
 
-    if (((replen = strlen(old_forward_string)) > 0) &&
-	(strncmp(subject, old_reply_string, replen) == 0)) {
-	tmpstr = g_strconcat(reply_string, &(subject[replen]), NULL);
-	gtk_entry_set_text(GTK_ENTRY(bsmsg->subject.body), tmpstr);
-	g_free(tmpstr);
-    } else if (((fwdlen = strlen(old_forward_string)) > 0) &&
-	       (strncmp(subject, old_forward_string, fwdlen) == 0)) {
-	tmpstr = g_strconcat(forward_string, &(subject[fwdlen]), NULL);
-	gtk_entry_set_text(GTK_ENTRY(bsmsg->subject.body), tmpstr);
-	g_free(tmpstr);
-    } else {
-        if ((replen == 0 && reply_type) ||
-            (fwdlen == 0 && forward_type) ) {
-            LibBalsaMessage *msg = bsmsg->parent_message ?
-                bsmsg->parent_message : bsmsg->draft_message;
-            bsmsg_set_subject_from_body(bsmsg, libbalsa_message_get_body_list(msg), ident);
+        /*
+         * If the subject begins with the old reply string
+         *    Then replace it with the new reply string.
+         * Else, if the subject begins with the old forward string
+         *    Then replace it with the new forward string.
+         * Else, if the old reply string was empty, and the message
+         *    is a reply, OR the old forward string was empty, and the
+         *    message is a forward
+         *    Then call bsmsg_set_subject_from_body()
+         * Else assume the user hand edited the subject and does
+         *    not want it altered
+         */
+
+        reply_string = libbalsa_identity_get_reply_string(ident);
+        forward_string = libbalsa_identity_get_forward_string(ident);
+
+        old_ident = bsmsg->ident;
+        old_reply_string = libbalsa_identity_get_reply_string(old_ident);
+        old_forward_string = libbalsa_identity_get_forward_string(old_ident);
+
+        if (((replen = strlen(old_forward_string)) > 0) &&
+    	(strncmp(subject, old_reply_string, replen) == 0)) {
+            tmpstr = g_strconcat(reply_string, &(subject[replen]), NULL);
+            gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]), tmpstr);
+            g_free(tmpstr);
+        } else if (((fwdlen = strlen(old_forward_string)) > 0) &&
+    	       (strncmp(subject, old_forward_string, fwdlen) == 0)) {
+            tmpstr = g_strconcat(forward_string, &(subject[fwdlen]), NULL);
+            gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]), tmpstr);
+            g_free(tmpstr);
+        } else {
+            if ((replen == 0 && reply_type) ||
+                (fwdlen == 0 && forward_type) ) {
+                LibBalsaMessage *msg = bsmsg->parent_message ?
+                    bsmsg->parent_message : bsmsg->draft_message;
+                bsmsg_set_subject_from_body(bsmsg, libbalsa_message_get_body_list(msg), ident);
+            }
         }
-    }
 
-    /* -----------------------------------------------------------
-     * remove/add the signature depending on the new settings, change
-     * the signature if path changed */
+        /* -----------------------------------------------------------
+         * remove/add the signature depending on the new settings, change
+         * the signature if path changed */
 
-    /* reconstruct the old signature to search with */
-    old_sig = libbalsa_identity_get_signature(old_ident, NULL);
+        /* reconstruct the old signature to search with */
+        old_sig = libbalsa_identity_get_signature(old_ident, NULL);
 
-    /* switch identities in bsmsg here so we can use read_signature
-     * again */
-    g_set_object(&bsmsg->ident, ident);
-    if ( (reply_type && libbalsa_identity_get_sig_whenreply(ident))
-         || (forward_type && libbalsa_identity_get_sig_whenforward(ident))
-         || (bsmsg->type == SEND_NORMAL && libbalsa_identity_get_sig_sending(ident)))
-        new_sig = libbalsa_identity_get_signature(ident, NULL);
-    else
-        new_sig = NULL;
-    if(!new_sig) new_sig = g_strdup("");
-
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-    message_text = gtk_text_iter_get_text(&start, &end);
-    if (!old_sig) {
-        replace_offset = libbalsa_identity_get_sig_prepend(bsmsg->ident)
-            ? 0 : g_utf8_strlen(message_text, -1);
-        replace_identity_signature(bsmsg, ident, old_ident, &replace_offset,
-                                   0, new_sig);
-    } else {
-        /* split on sig separator */
-        message_split = g_strsplit(message_text, "\n-- \n", 0);
-        siglen = g_utf8_strlen(old_sig, -1);
-
-	/* check the special case of starting a message with a sig */
-	compare_str = g_strconcat("\n", message_split[0], NULL);
-
-	if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
-	    g_free(compare_str);
-	    replace_identity_signature(bsmsg, ident, old_ident,
-                                       &replace_offset, siglen - 1, new_sig);
-	    found_sig = TRUE;
-	} else {
-            gint i;
-
-            g_free(compare_str);
-            for (i = 0; message_split[i] != NULL; i++) {
-		/* put sig separator back to search */
-		compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
-
-		/* try to find occurance of old signature */
-		if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
-		    replace_identity_signature(bsmsg, ident, old_ident,
-                                               &replace_offset, siglen,
-                                               new_sig);
-		    found_sig = TRUE;
-		}
-
-		replace_offset +=
-		    g_utf8_strlen(i ? compare_str : message_split[i], -1);
-		g_free(compare_str);
-	    }
+        /* switch identities in bsmsg here so we can use read_signature
+         * again */
+        g_set_object(&bsmsg->ident, ident);
+        if ((reply_type && libbalsa_identity_get_sig_whenreply(ident))
+             || (forward_type && libbalsa_identity_get_sig_whenforward(ident))
+             || (bsmsg->type == SEND_NORMAL && libbalsa_identity_get_sig_sending(ident))) {
+            new_sig = libbalsa_identity_get_signature(ident, NULL);
+        } else {
+            new_sig = NULL;
         }
-        /* if no sig seperators found, do a slower brute force
-         * approach.  We could have stopped earlier if the message was
-         * empty, but we didn't. Now, it is really time to do
-         * that... */
-        if (*message_text && !found_sig) {
-            compare_str = message_text;
-            replace_offset = 0;
+        if (new_sig == NULL)
+            new_sig = g_strdup("");
 
-	    /* check the special case of starting a message with a sig */
-	    tmpstr = g_strconcat("\n", message_text, NULL);
+        buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+        gtk_text_buffer_get_bounds(buffer, &start, &end);
+        message_text = gtk_text_iter_get_text(&start, &end);
+        if (!old_sig) {
+            replace_offset = libbalsa_identity_get_sig_prepend(bsmsg->ident)
+                ? 0 : g_utf8_strlen(message_text, -1);
+            replace_identity_signature(bsmsg, ident, old_ident, &replace_offset,
+                                       0, new_sig);
+        } else {
+            /* split on sig separator */
+            message_split = g_strsplit(message_text, "\n-- \n", 0);
+            siglen = g_utf8_strlen(old_sig, -1);
 
-	    if (g_ascii_strncasecmp(old_sig, tmpstr, siglen) == 0) {
-		g_free(tmpstr);
-		replace_identity_signature(bsmsg, ident, old_ident,
-                                           &replace_offset, siglen - 1,
-                                           new_sig);
-	    } else {
-		g_free(tmpstr);
-		replace_offset++;
-		compare_str = g_utf8_next_char(compare_str);
-		while (*compare_str) {
-		    if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
-			replace_identity_signature(bsmsg, ident, old_ident,
+    	/* check the special case of starting a message with a sig */
+    	compare_str = g_strconcat("\n", message_split[0], NULL);
+
+    	if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
+    	    g_free(compare_str);
+    	    replace_identity_signature(bsmsg, ident, old_ident,
+                                           &replace_offset, siglen - 1, new_sig);
+    	    found_sig = TRUE;
+    	} else {
+                gint i;
+
+                g_free(compare_str);
+                for (i = 0; message_split[i] != NULL; i++) {
+    		/* put sig separator back to search */
+    		compare_str = g_strconcat("\n-- \n", message_split[i], NULL);
+
+    		/* try to find occurance of old signature */
+    		if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
+    		    replace_identity_signature(bsmsg, ident, old_ident,
                                                    &replace_offset, siglen,
                                                    new_sig);
-		    }
-		    replace_offset++;
-		    compare_str = g_utf8_next_char(compare_str);
-		}
-	    }
+    		    found_sig = TRUE;
+    		}
+
+    		replace_offset +=
+    		    g_utf8_strlen(i ? compare_str : message_split[i], -1);
+    		g_free(compare_str);
+    	    }
+            }
+            /* if no sig seperators found, do a slower brute force
+             * approach.  We could have stopped earlier if the message was
+             * empty, but we didn't. Now, it is really time to do
+             * that... */
+            if (*message_text && !found_sig) {
+                compare_str = message_text;
+                replace_offset = 0;
+
+    	    /* check the special case of starting a message with a sig */
+    	    tmpstr = g_strconcat("\n", message_text, NULL);
+
+    	    if (g_ascii_strncasecmp(old_sig, tmpstr, siglen) == 0) {
+    		g_free(tmpstr);
+    		replace_identity_signature(bsmsg, ident, old_ident,
+                                               &replace_offset, siglen - 1,
+                                               new_sig);
+    	    } else {
+    		g_free(tmpstr);
+    		replace_offset++;
+    		compare_str = g_utf8_next_char(compare_str);
+    		while (*compare_str) {
+    		    if (g_ascii_strncasecmp(old_sig, compare_str, siglen) == 0) {
+    			replace_identity_signature(bsmsg, ident, old_ident,
+                                                       &replace_offset, siglen,
+                                                       new_sig);
+    		    }
+    		    replace_offset++;
+    		    compare_str = g_utf8_next_char(compare_str);
+    		}
+    	    }
+            }
+            g_strfreev(message_split);
         }
-        g_strfreev(message_split);
+        sw_action_set_active(bsmsg, "send-html",
+                             libbalsa_identity_get_send_mp_alternative(bsmsg->ident));
+
+        bsmsg_update_gpg_ui_on_ident_change(bsmsg, ident);
+
+        g_free(old_sig);
+        g_free(new_sig);
+        g_free(message_text);
     }
-    sw_action_set_active(bsmsg, "send-html",
-                         libbalsa_identity_get_send_mp_alternative(bsmsg->ident));
-
-    bsmsg_update_gpg_ui_on_ident_change(bsmsg, ident);
-
-    g_free(old_sig);
-    g_free(new_sig);
-    g_free(message_text);
 
     libbalsa_address_view_set_domain(bsmsg->recipient_view, libbalsa_identity_get_domain(ident));
 
@@ -2518,8 +2521,9 @@ create_info_pane(BalsaSendmsg * bsmsg)
     /* From: */
     create_from_header(grid, bsmsg);
 
-    /* Create the 'Reply To:' entry before the regular recipients, to
-     * get the initial focus in the regular recipients*/
+    if (bsmsg->type != SEND_RESEND) {
+        /* Create the 'Reply To:' entry before the regular recipients, to
+         * get the initial focus in the regular recipients*/
 #define REPLY_TO_ROW 3
     create_email_header(bsmsg, grid, REPLY_TO_ROW, &bsmsg->replyto_view,
                         &bsmsg->replyto, "R_eply To:", NULL, 0);
@@ -2538,17 +2542,17 @@ create_info_pane(BalsaSendmsg * bsmsg)
                              "row-deleted",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
-    /* Subject: */
-    create_string_header(bsmsg, grid, _("S_ubject:"), ++row,
-                         &bsmsg->subject);
-    g_signal_connect_swapped(bsmsg->subject.body, "changed",
-                             G_CALLBACK(sendmsg_window_set_title), bsmsg);
+    if (bsmsg->type != SEND_RESEND) {
+        /* Subject: */
+        create_string_header(bsmsg, grid, _("S_ubject:"), ++row, &bsmsg->subject);
+        g_signal_connect_swapped(bsmsg->subject.body, "changed",
+                                 G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
-    /* Reply To: */
-    /* We already created it, so just increment row: */
-    ++row;
-    g_assert(row == REPLY_TO_ROW);
+        /* Reply To: */
+        /* We already created it, so just increment row: */
+        g_assert(++row == REPLY_TO_ROW);
 #undef REPLY_TO_ROW
+    }
 
     /* fcc: mailbox folder where the message copy will be written to */
     if (balsa_app.fcc_mru == NULL)
@@ -6805,7 +6809,7 @@ sw_menubar_foreach(GtkWidget *widget, gpointer data)
 }
 
 static BalsaSendmsg*
-sendmsg_window_new()
+sendmsg_window_new(SendType send_type)
 {
     BalsaToolbarModel *model;
     GtkWidget *window;
@@ -6818,9 +6822,11 @@ sendmsg_window_new()
     GtkWidget *menubar;
     GtkWidget *paned;
     const gchar resource_path[] = "/org/desktop/Balsa/sendmsg-window.ui";
+    const gchar resend_resource_path[] = "/org/desktop/Balsa/resend-window.ui";
     const gchar *current_locale;
 
-    bsmsg = g_malloc(sizeof(BalsaSendmsg));
+    bsmsg = g_malloc0(sizeof(BalsaSendmsg));
+    bsmsg->type = send_type;
     bsmsg->in_reply_to = NULL;
     bsmsg->references = NULL;
     bsmsg->spell_check_lang = NULL;
@@ -6834,14 +6840,14 @@ sendmsg_window_new()
 
     bsmsg->window = window =
         gtk_application_window_new(balsa_app.application);
-    geometry_manager_attach(GTK_WINDOW(window), "SendMsgWindow");
+    geometry_manager_attach(GTK_WINDOW(window),
+                            send_type == SEND_RESEND ? "ResendWindow" : "SendMsgWindow");
 
     gtk_window_set_role(GTK_WINDOW(window), "compose");
 
     gtk_container_add(GTK_CONTAINER(window), main_box);
     gtk_widget_show_all(window);
 
-    bsmsg->type = SEND_NORMAL;
     bsmsg->is_continue = FALSE;
 #if !HAVE_GTKSPELL && !HAVE_GSPELL
     bsmsg->spell_checker = NULL;
@@ -6866,7 +6872,10 @@ sendmsg_window_new()
     menubar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
                                            win_entries,
                                            G_N_ELEMENTS(win_entries),
-                                           resource_path, &error, bsmsg);
+                                           send_type == SEND_RESEND ?
+                                           resend_resource_path :
+                                           resource_path,
+                                           &error, bsmsg);
     if (error) {
         g_warning("%s %s", __func__, error->message);
         g_error_free(error);
@@ -6876,24 +6885,26 @@ sendmsg_window_new()
 
     gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
 
-    /*
-     * Set up the spell-checker language menu
-     */
-    gtk_container_foreach(GTK_CONTAINER(menubar), sw_menubar_foreach,
-                          &bsmsg->current_language_menu);
-    current_locale = create_lang_menu(bsmsg->current_language_menu, bsmsg);
-    if (current_locale == NULL) {
-        sw_action_set_enabled(bsmsg, "spell-check", FALSE);
+    if (send_type != SEND_RESEND) {
+        model = sendmsg_window_get_toolbar_model();
+        bsmsg->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
+        gtk_box_pack_start(GTK_BOX(main_box), bsmsg->toolbar,
+                           FALSE, FALSE, 0);
+
+        bsmsg->flow = !balsa_app.wordwrap;
+        sw_action_set_enabled(bsmsg, "reflow", bsmsg->flow);
+        bsmsg->send_mp_alt = FALSE;
+#if !HAVE_GTKSOURCEVIEW
+        sw_buffer_set_undo(bsmsg, TRUE, FALSE);
+#endif                          /* HAVE_GTKSOURCEVIEW */
+
+        sw_action_set_active(bsmsg, "flowed", bsmsg->flow);
+        sw_action_set_active(bsmsg, "send-html",
+                             libbalsa_identity_get_send_mp_alternative(bsmsg->ident));
+        sw_action_set_active(bsmsg, "show-toolbar", balsa_app.show_compose_toolbar);
+
+        bsmsg_setup_gpg_ui(bsmsg);
     }
-
-    model = sendmsg_window_get_toolbar_model();
-    bsmsg->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
-    gtk_box_pack_start(GTK_BOX(main_box), bsmsg->toolbar,
-                       FALSE, FALSE, 0);
-
-    bsmsg->flow = !balsa_app.wordwrap;
-    sw_action_set_enabled(bsmsg, "reflow", bsmsg->flow);
-    bsmsg->send_mp_alt = FALSE;
 
     sw_action_set_enabled(bsmsg, "select-ident",
                      balsa_app.identities->next != NULL);
@@ -6901,20 +6912,10 @@ sendmsg_window_new()
         g_signal_connect_swapped(balsa_app.main_window, "identities-changed",
                                  (GCallback)bsmsg_identities_changed_cb,
                                  bsmsg);
-#if !HAVE_GTKSOURCEVIEW
-    sw_buffer_set_undo(bsmsg, TRUE, FALSE);
-#endif                          /* HAVE_GTKSOURCEVIEW */
 
     /* set options */
     bsmsg->req_mdn = FALSE;
     bsmsg->req_dsn = FALSE;
-
-    sw_action_set_active(bsmsg, "flowed", bsmsg->flow);
-    sw_action_set_active(bsmsg, "send-html",
-                         libbalsa_identity_get_send_mp_alternative(bsmsg->ident));
-    sw_action_set_active(bsmsg, "show-toolbar", balsa_app.show_compose_toolbar);
-
-    bsmsg_setup_gpg_ui(bsmsg);
 
     /* Paned window for the addresses at the top, and the content at the
      * bottom: */
@@ -6926,42 +6927,54 @@ sendmsg_window_new()
     gtk_paned_add1(GTK_PANED(paned), create_info_pane(bsmsg));
     bsmsg->tree_view = NULL;
 
-    /* create text area for the message */
-    gtk_paned_add2(GTK_PANED(paned), create_text_area(bsmsg));
+    if (send_type != SEND_RESEND) {
+        /*
+         * Set up the spell-checker language menu
+         */
+        gtk_container_foreach(GTK_CONTAINER(menubar), sw_menubar_foreach,
+                              &bsmsg->current_language_menu);
+        current_locale = create_lang_menu(bsmsg->current_language_menu, bsmsg);
+        if (current_locale == NULL) {
+            sw_action_set_enabled(bsmsg, "spell-check", FALSE);
+        }
 
-    /* set the menus - and language index */
-    init_menus(bsmsg);
+        /* create text area for the message */
+        gtk_paned_add2(GTK_PANED(paned), create_text_area(bsmsg));
 
-    /* Connect to "text-changed" here, so that we catch the initial text
-     * and wrap it... */
-    sw_buffer_signals_connect(bsmsg);
+        /* set the menus - and language index */
+        init_menus(bsmsg);
+
+        /* Connect to "text-changed" here, so that we catch the initial text
+         * and wrap it... */
+        sw_buffer_signals_connect(bsmsg);
 
 #if HAVE_GTKSOURCEVIEW
-    source_buffer = GTK_SOURCE_BUFFER(gtk_text_view_get_buffer
-                                      (GTK_TEXT_VIEW(bsmsg->text)));
-    gtk_source_buffer_begin_not_undoable_action(source_buffer);
-    gtk_source_buffer_end_not_undoable_action(source_buffer);
-    sw_action_set_enabled(bsmsg, "undo", FALSE);
-    sw_action_set_enabled(bsmsg, "redo", FALSE);
+        source_buffer = GTK_SOURCE_BUFFER(gtk_text_view_get_buffer
+                                          (GTK_TEXT_VIEW(bsmsg->text)));
+        gtk_source_buffer_begin_not_undoable_action(source_buffer);
+        gtk_source_buffer_end_not_undoable_action(source_buffer);
+        sw_action_set_enabled(bsmsg, "undo", FALSE);
+        sw_action_set_enabled(bsmsg, "redo", FALSE);
 #else                           /* HAVE_GTKSOURCEVIEW */
-    sw_buffer_set_undo(bsmsg, FALSE, FALSE);
+        sw_buffer_set_undo(bsmsg, FALSE, FALSE);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
-    bsmsg->update_config = TRUE;
+        bsmsg->update_config = TRUE;
 
-    bsmsg->delete_sig_id =
-	g_signal_connect(balsa_app.main_window, "delete-event",
-			 G_CALLBACK(delete_event_cb), bsmsg);
+        bsmsg->delete_sig_id =
+    	g_signal_connect(balsa_app.main_window, "delete-event",
+    			 G_CALLBACK(delete_event_cb), bsmsg);
 
-    setup_headers_from_identity(bsmsg, bsmsg->ident);
+        setup_headers_from_identity(bsmsg, bsmsg->ident);
 
-    /* Finish setting up the spell checker */
+        /* Finish setting up the spell checker */
 #if HAVE_GSPELL || HAVE_GTKSPELL
-    if (current_locale != NULL) {
-        sw_action_set_active(bsmsg, "spell-check", balsa_app.spell_check_active);
-    }
+        if (current_locale != NULL) {
+            sw_action_set_active(bsmsg, "spell-check", balsa_app.spell_check_active);
+        }
 #endif
-    set_locale(bsmsg, current_locale);
+        set_locale(bsmsg, current_locale);
+    }
 
     return bsmsg;
 }
@@ -6969,10 +6982,9 @@ sendmsg_window_new()
 BalsaSendmsg*
 sendmsg_window_compose(void)
 {
-    BalsaSendmsg *bsmsg = sendmsg_window_new();
+    BalsaSendmsg *bsmsg = sendmsg_window_new(SEND_NORMAL);
 
     /* set the initial window title */
-    bsmsg->type = SEND_NORMAL;
     sendmsg_window_set_title(bsmsg);
     if (libbalsa_identity_get_sig_sending(bsmsg->ident))
         insert_initial_sig(bsmsg);
@@ -7009,8 +7021,8 @@ sendmsg_window_reply(LibBalsaMailbox * mailbox, guint msgno,
         }
     case SEND_REPLY:
     case SEND_REPLY_ALL:
-        bsmsg = sendmsg_window_new();
-        bsmsg->type = reply_type;       break;
+        bsmsg = sendmsg_window_new(reply_type);
+        break;
     default: g_error("reply_type: %d", reply_type);
     }
     bsmsg->parent_message = message;
@@ -7045,7 +7057,7 @@ BalsaSendmsg*
 sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
                               SendType reply_type)
 {
-    BalsaSendmsg *bsmsg = sendmsg_window_new();
+    BalsaSendmsg *bsmsg = sendmsg_window_new(reply_type);
     LibBalsaMessageHeaders *headers;
 
     g_assert(part);
@@ -7055,7 +7067,7 @@ sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
     case SEND_REPLY:
     case SEND_REPLY_ALL:
     case SEND_REPLY_GROUP:
-        bsmsg->type = reply_type;       break;
+        break;
     default: g_error("reply_type: %d", reply_type);
     }
     bsm_prepare_for_setup(g_object_ref(part->message));
@@ -7096,10 +7108,11 @@ sendmsg_window_forward(LibBalsaMailbox *mailbox, guint msgno,
 {
     LibBalsaMessage *message =
         libbalsa_mailbox_get_message(mailbox, msgno);
-    BalsaSendmsg *bsmsg = sendmsg_window_new();
+    SendType send_type = attach ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE;
+    BalsaSendmsg *bsmsg = sendmsg_window_new(send_type);
+
     g_assert(message);
 
-    bsmsg->type = attach ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE;
     if (attach) {
 	if(!attach_message(bsmsg, message))
             balsa_information_parented(GTK_WINDOW(bsmsg->window),
@@ -7147,7 +7160,7 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
         return NULL;
     }
 
-    bsmsg = sendmsg_window_new();
+    bsmsg = sendmsg_window_new(SEND_CONTINUE);
     bsmsg->is_continue = TRUE;
     bsm_prepare_for_setup(message);
     bsmsg->draft_message = message;
@@ -7214,5 +7227,30 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     bsm_finish_setup(bsmsg, libbalsa_message_get_body_list(message));
     g_idle_add((GSourceFunc) sw_grab_focus_to_text,
                g_object_ref(bsmsg->text));
+    return bsmsg;
+}
+
+BalsaSendmsg *
+sendmsg_window_resend(LibBalsaMailbox *mailbox, guint msgno)
+{
+    LibBalsaMessage *message =
+        libbalsa_mailbox_get_message(mailbox, msgno);
+    char *name, *tmp_file_name;
+    BalsaSendmsg *bsmsg;
+
+    g_assert(message != NULL);
+
+    if (!libbalsa_mktempdir(&tmp_file_name))
+	return NULL;
+    name = g_strdup_printf("%s/resend-message", tmp_file_name);
+    g_free(tmp_file_name);
+
+    if (!libbalsa_message_save(message, name)) {
+        g_free(name);
+        return NULL;
+    }
+
+    bsmsg = sendmsg_window_new(SEND_RESEND);
+
     return bsmsg;
 }

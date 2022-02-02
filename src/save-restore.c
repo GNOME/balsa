@@ -724,6 +724,7 @@ config_global_load(void)
     geometry_manager_init("MainWindow", 640, 480, FALSE);
     balsa_app.mblist_width = libbalsa_conf_get_int("MailboxListWidth=130");
     geometry_manager_init("SendMsgWindow", 640, 480, FALSE);
+    geometry_manager_init("ResendWindow", 480, 200, FALSE);
     geometry_manager_init("SelectReplyParts", 400, 200, FALSE);
     geometry_manager_init("MessageWindow", 400, 500, FALSE);
     geometry_manager_init("SourceView", 500, 400, FALSE);

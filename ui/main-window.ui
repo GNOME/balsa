@@ -414,6 +414,11 @@
             translatable="yes">Forward _Inline…</attribute>
           <attribute name="action">win.forward-inline</attribute>
         </item>
+        <item>
+          <attribute name="label"
+            translatable="yes">Resend…</attribute>
+          <attribute name="action">win.resend</attribute>
+        </item>
       </section>
       <section>
         <item>

@@ -1571,6 +1571,16 @@ reply_group_activated(GSimpleAction * action,
 }
 
 static void
+resend_activated(GSimpleAction * action,
+                 GVariant      * parameter,
+                 gpointer        user_data)
+{
+    BalsaWindow *window = BALSA_WINDOW(user_data);
+
+    balsa_message_resend(balsa_window_find_current_index(window));
+}
+
+static void
 forward_attached_activated(GSimpleAction * action,
                            GVariant      * parameter,
                            gpointer        user_data)
@@ -2091,6 +2101,7 @@ static GActionEntry win_entries[] = {
     {"reply",                 reply_activated},
     {"reply-all",             reply_all_activated},
     {"reply-group",           reply_group_activated},
+    {"resend",                resend_activated},
     {"forward-attached",      forward_attached_activated},
     {"forward-inline",        forward_inline_activated},
     {"pipe",                  pipe_activated},
@@ -2217,6 +2228,7 @@ static const gchar *const mailbox_actions[] = {
 static const gchar *const message_actions[] = {
     "reply", "reply-all",
     "store-address", "view-source", "forward-attached", "forward-inline",
+    "resend",
     "pipe", "select-thread"
 };
 

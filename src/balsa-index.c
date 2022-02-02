@@ -1685,6 +1685,9 @@ bndx_compose_foreach(BalsaIndex * index, SendType send_type)
         case SEND_REPLY_GROUP:
             sm = sendmsg_window_reply(mailbox, msgno, send_type);
             break;
+        case SEND_RESEND:
+            sm = sendmsg_window_resend(mailbox, msgno);
+            break;
         case SEND_CONTINUE:
             sm = sendmsg_window_continue(mailbox, msgno);
             break;
@@ -1738,6 +1741,15 @@ void
 balsa_message_continue(gpointer user_data)
 {
     bndx_compose_foreach(BALSA_INDEX (user_data), SEND_CONTINUE);
+}
+
+/*
+ * Public `resend' method
+ */
+void
+balsa_message_resend(gpointer user_data)
+{
+    bndx_compose_foreach(BALSA_INDEX (user_data), SEND_RESEND);
 }
 
 /*

@@ -35,6 +35,7 @@ G_BEGIN_DECLS
        SEND_REPLY,             /* by Reply               */
        SEND_REPLY_ALL,         /* by Reply All           */
        SEND_REPLY_GROUP,       /* by Reply to Group      */
+       SEND_RESEND,            /* by Resend              */
        SEND_FORWARD_ATTACH,    /* by Forward attached    */
        SEND_FORWARD_INLINE,    /* by Forward inline      */
        SEND_CONTINUE           /* by Continue postponed  */
@@ -122,6 +123,8 @@ G_BEGIN_DECLS
                                        guint msgno, SendType rt);
     BalsaSendmsg *sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
                                                 SendType reply_type);
+
+    BalsaSendmsg *sendmsg_window_resend(LibBalsaMailbox *mailbox, guint msgno);
 
     BalsaSendmsg *sendmsg_window_forward(LibBalsaMailbox *,
                                          guint msgno, gboolean attach);

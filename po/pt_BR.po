@@ -21,8 +21,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-01-26 20:15+0000\n"
-"PO-Revision-Date: 2022-01-24 20:43-0300\n"
+"POT-Creation-Date: 2022-01-30 12:02+0000\n"
+"PO-Revision-Date: 2022-01-31 14:18-0300\n"
 "Last-Translator: Matheus Barbosa <mdpb.matheus@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
@@ -1044,6 +1044,11 @@ msgstr "inscrição para “%s” falhou"
 #, c-format
 msgid "unsubscribing from “%s” failed"
 msgstr "desinscrição de “%s” falhou"
+
+#: ../libbalsa/information.c:179
+#| msgid "Do not remind me again."
+msgid "do not show again"
+msgstr "não mostrar novamente"
 
 #: ../libbalsa/libbalsa.c:398
 msgid "broken TLS certificate"
@@ -4138,7 +4143,8 @@ msgid ""
 "The message contains an Autocrypt header which is ignored as none of your "
 "identities has Autocrypt support enabled."
 msgstr ""
-"A mensagem contém um cabeçalho Autocrypt, o que é ignorado pois nenhuma de suas identidades possui suporte a Autocrypt habilitado."
+"A mensagem contém um cabeçalho Autocrypt, o que é ignorado pois nenhuma de "
+"suas identidades possui suporte a Autocrypt habilitado."
 
 #: ../src/balsa-mime-widget-crypto.c:158
 msgid "_Search key server for this key"

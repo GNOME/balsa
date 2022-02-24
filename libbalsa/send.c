@@ -573,6 +573,27 @@ add_recipients(NetClientSmtpMessage *message,
 }
 
 
+static void
+add_resent_recipients(NetClientSmtpMessage *message,
+                      LibBalsaMessage      *msg,
+                      const char           *resent_field,
+                      gboolean              request_dsn)
+{
+    const char *resent_header;
+
+    resent_header = libbalsa_message_get_user_header(msg, resent_field);
+    if (resent_header != NULL) {
+        InternetAddressList  *recipient_list;
+
+        recipient_list = internet_address_list_parse(libbalsa_parser_options(), resent_header);
+        if (recipient_list != NULL) {
+            add_recipients(message, recipient_list, request_dsn);
+            g_object_unref(recipient_list);
+        }
+    }
+}
+
+
 static gssize
 send_message_data_cb(gchar   *buffer,
                      gsize    count,
@@ -708,6 +729,7 @@ lbs_process_queue_msg(guint 		   msgno,
                 InternetAddressList *from;
 		const InternetAddress* ia;
 		const gchar* mailbox;
+		const gchar* resent_from;
 
 		libbalsa_message_change_flags(msg, LIBBALSA_MESSAGE_FLAG_FLAGGED, 0);
 		send_message_info->items = g_list_prepend(send_message_info->items, new_message);
@@ -720,8 +742,16 @@ lbs_process_queue_msg(guint 		   msgno,
 		}
 
 		/* Add the sender info */
+                resent_from = libbalsa_message_get_user_header(msg, "Resent-From");
 		headers = libbalsa_message_get_headers(msg);
-		from = headers->from;
+                if (resent_from != NULL) {
+                    from = internet_address_list_parse(libbalsa_parser_options(), resent_from);
+                } else {
+                    from = headers->from;
+                    if (from != NULL)
+                        g_object_ref(from);
+                }
+
 		if (from != NULL &&
                     (ia = internet_address_list_get_address(from, 0)) != NULL) {
 			while (ia != NULL && INTERNET_ADDRESS_IS_GROUP(ia)) {
@@ -735,10 +765,19 @@ lbs_process_queue_msg(guint 		   msgno,
 
 		net_client_smtp_msg_set_sender(new_message->smtp_msg, mailbox);
 
+                if (from != NULL)
+                    g_object_unref(from);
+
 		/* Now need to add the recipients to the message. */
-		add_recipients(new_message->smtp_msg, headers->to_list, request_dsn);
-		add_recipients(new_message->smtp_msg, headers->cc_list, request_dsn);
-		add_recipients(new_message->smtp_msg, headers->bcc_list, request_dsn);
+                if (resent_from != NULL) {
+                    add_resent_recipients(new_message->smtp_msg, msg, "Resent-To", request_dsn);
+                    add_resent_recipients(new_message->smtp_msg, msg, "Resent-Cc", request_dsn);
+                    add_resent_recipients(new_message->smtp_msg, msg, "Resent-Bcc", request_dsn);
+                } else {
+                    add_recipients(new_message->smtp_msg, headers->to_list, request_dsn);
+                    add_recipients(new_message->smtp_msg, headers->cc_list, request_dsn);
+                    add_recipients(new_message->smtp_msg, headers->bcc_list, request_dsn);
+                }
 
 		/* Estimate the size of the message.  This need not be exact but it's better to err
 		 * on the large side since some message headers may be altered during the transfer. */
@@ -1591,6 +1630,7 @@ libbalsa_set_message_id(GMimeMessage *mime_message)
     gchar *message_id;
     guint8 *src;
     gchar *dst;
+    gboolean is_resend;
 
     g_mutex_lock(&mutex);
     if (rand == NULL) {
@@ -1639,7 +1679,17 @@ libbalsa_set_message_id(GMimeMessage *mime_message)
             *dst++ = '.';
         }
     }
-    g_mime_message_set_message_id(mime_message, message_id);
+
+    is_resend = g_mime_object_get_header(GMIME_OBJECT(mime_message), "Resent-From") != NULL;
+    if (is_resend) {
+        g_mime_object_prepend_header(GMIME_OBJECT(mime_message),
+                                     "Resent-Message-ID",
+                                     message_id,
+                                     NULL);
+    } else {
+        g_mime_message_set_message_id(mime_message, message_id);
+    }
+
     g_free(message_id);
 }
 

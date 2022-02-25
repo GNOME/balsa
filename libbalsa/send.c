@@ -222,10 +222,11 @@ static GMimePart *lb_create_pubkey_part(LibBalsaMessage  *message,
 										GError          **error);
 
 static gpointer balsa_send_message_real(SendMessageInfo *info);
-static LibBalsaMsgCreateResult libbalsa_message_create_mime_message(LibBalsaMessage *message,
-                                                                    gboolean         flow,
-                                                                    gboolean         postponing,
-                                                                    GError         **error);
+static LibBalsaMsgCreateResult create_mime_message(LibBalsaMessage *message,
+                                                   gboolean         flow,
+                                                   gboolean         postponing,
+                                                   GMimeMessage   **return_message,
+                                                   GError         **error);
 static LibBalsaMsgCreateResult libbalsa_create_msg(LibBalsaMessage *message,
                                                    gboolean         flow,
                                                    GError         **error);
@@ -1183,10 +1184,11 @@ ia_list_not_empty(InternetAddressList *ial)
 }
 
 static LibBalsaMsgCreateResult
-libbalsa_message_create_mime_message(LibBalsaMessage *message,
-                                     gboolean         flow,
-                                     gboolean         postponing,
-                                     GError         **error)
+create_mime_message(LibBalsaMessage *message,
+                    gboolean         flow,
+                    gboolean         postponing,
+                    GMimeMessage   **return_message,
+                    GError         **error)
 {
     GMimeObject *mime_root = NULL;
     GMimeMessage *mime_message;
@@ -1510,6 +1512,10 @@ libbalsa_message_create_mime_message(LibBalsaMessage *message,
 #endif
 
     libbalsa_message_set_mime_message(message, mime_message);
+    /* message now holds a reference to mime_message, so we do not add one here: */
+    if (return_message != NULL)
+        *return_message = mime_message;
+
     g_object_unref(mime_message);
 
     return LIBBALSA_MESSAGE_CREATE_OK;
@@ -1530,20 +1536,22 @@ libbalsa_message_postpone(LibBalsaMessage *message,
                           gboolean         flow,
                           GError         **error)
 {
-    if (!libbalsa_message_get_mime_message(message)
-        && (libbalsa_message_create_mime_message(message, flow,
-                                                 TRUE, error) !=
-            LIBBALSA_MESSAGE_CREATE_OK)) {
-        return FALSE;
+    GMimeMessage *mime_message;
+
+    mime_message = libbalsa_message_get_mime_message(message);
+    if (mime_message == NULL) {
+        LibBalsaMsgCreateResult res =
+            create_mime_message(message, flow, FALSE, &mime_message, error);
+        if (res != LIBBALSA_MESSAGE_CREATE_OK)
+            return FALSE;
     }
 
     if (extra_headers != NULL) {
+        GMimeObject *object = GMIME_OBJECT(mime_message);
         gint i;
 
-        for (i = 0; extra_headers[i] && extra_headers[i + 1]; i += 2) {
-            g_mime_object_set_header(GMIME_OBJECT(libbalsa_message_get_mime_message(message)),
-                                     extra_headers[i], extra_headers[i + 1], NULL);
-        }
+        for (i = 0; extra_headers[i] && extra_headers[i + 1]; i += 2)
+            g_mime_object_set_header(object, extra_headers[i], extra_headers[i + 1], NULL);
     }
 
     return libbalsa_message_copy(message, draftbox, error);
@@ -1642,16 +1650,17 @@ libbalsa_create_msg(LibBalsaMessage *message,
                     gboolean         flow,
                     GError         **error)
 {
-    if (libbalsa_message_get_mime_message(message) == NULL) {
+    GMimeMessage *mime_message;
+
+    mime_message = libbalsa_message_get_mime_message(message);
+    if (mime_message == NULL) {
         LibBalsaMsgCreateResult res =
-            libbalsa_message_create_mime_message(message, flow,
-                                                 FALSE, error);
-        if (res != LIBBALSA_MESSAGE_CREATE_OK) {
+            create_mime_message(message, flow, FALSE, &mime_message, error);
+        if (res != LIBBALSA_MESSAGE_CREATE_OK)
             return res;
-        }
     }
 
-    libbalsa_set_message_id(libbalsa_message_get_mime_message(message));
+    libbalsa_set_message_id(mime_message);
 
     return LIBBALSA_MESSAGE_CREATE_OK;
 }

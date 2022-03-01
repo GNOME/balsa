@@ -445,7 +445,8 @@ lbs_message_queue_real(LibBalsaMessage    *message,
                 g_mime_part_set_content_encoding(GMIME_PART
                                                      (mime_msgs[i]->mime_part),
                                                  GMIME_CONTENT_ENCODING_7BIT);
-                libbalsa_set_message_id(mime_msgs[i]);
+                if (i > 0)
+                    libbalsa_set_message_id(mime_msgs[i]);
             }
             if (rc) {
                 /* Temporarily modify message by changing its mime_msg: */
@@ -1578,6 +1579,7 @@ libbalsa_message_postpone(LibBalsaMessage *message,
                           GError         **error)
 {
     GMimeMessage *mime_message;
+    gboolean resending;
 
     mime_message = libbalsa_message_get_mime_message(message);
     if (mime_message == NULL) {
@@ -1585,6 +1587,17 @@ libbalsa_message_postpone(LibBalsaMessage *message,
             create_mime_message(message, flow, TRUE, &mime_message, error);
         if (res != LIBBALSA_MESSAGE_CREATE_OK)
             return FALSE;
+    }
+
+    resending = libbalsa_message_get_user_header(message, "X-Balsa-Resend") != NULL;
+    if (resending) {
+        /* Cosmetics: copy the resent message's subject to the containing message,
+         * so that it displays helpfully in the draftbox */
+        GMimeObject *part = g_mime_message_get_mime_part(mime_message);
+        GMimeMessage *resend_mime_message =
+            g_mime_message_part_get_message(GMIME_MESSAGE_PART(part));
+        const char *subject = g_mime_message_get_subject(resend_mime_message);
+        g_mime_message_set_subject(mime_message, subject, NULL);
     }
 
     if (extra_headers != NULL) {
@@ -1630,7 +1643,6 @@ libbalsa_set_message_id(GMimeMessage *mime_message)
     gchar *message_id;
     guint8 *src;
     gchar *dst;
-    gboolean is_resend;
 
     g_mutex_lock(&mutex);
     if (rand == NULL) {
@@ -1680,19 +1692,76 @@ libbalsa_set_message_id(GMimeMessage *mime_message)
         }
     }
 
-    is_resend = g_mime_object_get_header(GMIME_OBJECT(mime_message), "Resent-From") != NULL;
-    if (is_resend) {
-        g_mime_object_prepend_header(GMIME_OBJECT(mime_message),
-                                     "Resent-Message-ID",
-                                     message_id,
-                                     NULL);
-    } else {
-        g_mime_message_set_message_id(mime_message, message_id);
-    }
+    g_mime_message_set_message_id(mime_message, message_id);
 
     g_free(message_id);
 }
 
+static void
+lbs_prepend_resent_header(GMimeObject         *object,
+                          InternetAddressList *list,
+                          const char          *field)
+{
+    if (ia_list_not_empty(list)) {
+        char *value = internet_address_list_to_string(list, NULL, FALSE);
+        g_mime_object_prepend_header(object, field, value, NULL);
+        g_free(value);
+    }
+}
+
+static void
+lbs_add_resent_headers(LibBalsaMessage *message, GMimeMessage *mime_message)
+{
+    LibBalsaMessageHeaders *headers = libbalsa_message_get_headers(message);
+    GMimeObject *object = GMIME_OBJECT(mime_message);
+    const char *mailbox = "";
+    char *value;
+    GDateTime *date_time;
+
+    lbs_prepend_resent_header(object, headers->bcc_list, "Resent-BCC");
+    lbs_prepend_resent_header(object, headers->cc_list, "Resent-CC");
+    lbs_prepend_resent_header(object, headers->to_list, "Resent-To");
+
+    if (ia_list_not_empty(headers->from)) {
+        InternetAddress *ia = internet_address_list_get_address(headers->from, 0);
+        while (ia != NULL && INTERNET_ADDRESS_IS_GROUP(ia))
+            ia = internet_address_list_get_address(INTERNET_ADDRESS_GROUP( ia)->members, 0);
+        if (ia != NULL)
+            mailbox = INTERNET_ADDRESS_MAILBOX(ia)->addr;
+    }
+    g_mime_object_prepend_header(object, "Resent-From", mailbox, NULL);
+
+    date_time = g_date_time_new_from_unix_local(headers->date);
+    value = g_mime_utils_header_format_date(date_time);
+    g_date_time_unref(date_time);
+    g_mime_object_prepend_header(object, "Resent-Date", value, NULL);
+    g_free(value);
+}
+
+static void
+create_mime_message_resend(LibBalsaMessage  *message,
+                           const char       *message_id,
+                           GMimeMessage    **return_message)
+{
+    GMimeObject *part;
+    GMimeMessage *mime_message;
+
+    part = g_mime_message_get_mime_part(*return_message);
+    mime_message = g_mime_message_part_get_message(GMIME_MESSAGE_PART(part));
+
+    g_mime_object_prepend_header(GMIME_OBJECT(mime_message),
+                                 "Resent-Message-ID",
+                                 message_id,
+                                 NULL);
+
+    lbs_add_resent_headers(message, mime_message);
+    libbalsa_message_set_subject(message, g_mime_message_get_subject(mime_message));
+
+    g_object_ref(*return_message);
+    libbalsa_message_set_mime_message(message, mime_message);
+    g_set_object(return_message, mime_message);
+    g_object_unref(*return_message);
+}
 
 /* balsa_create_msg:
    copies message to msg.
@@ -1703,6 +1772,7 @@ libbalsa_create_msg(LibBalsaMessage *message,
                     GError         **error)
 {
     GMimeMessage *mime_message;
+    gboolean resending;
 
     mime_message = libbalsa_message_get_mime_message(message);
     if (mime_message == NULL) {
@@ -1713,6 +1783,14 @@ libbalsa_create_msg(LibBalsaMessage *message,
     }
 
     libbalsa_set_message_id(mime_message);
+
+    resending = libbalsa_message_get_user_header(message, "X-Balsa-Resend") != NULL;
+    if (resending) {
+        const char *message_id = g_mime_message_get_message_id(mime_message);
+        char *resent_message_id = g_strdup_printf("<%s>", message_id);
+        create_mime_message_resend(message, resent_message_id, &mime_message);
+        g_free(resent_message_id);
+    }
 
     return LIBBALSA_MESSAGE_CREATE_OK;
 }

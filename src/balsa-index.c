@@ -1686,7 +1686,7 @@ bndx_compose_foreach(BalsaIndex * index, SendType send_type)
             sm = sendmsg_window_reply(mailbox, msgno, send_type);
             break;
         case SEND_RESEND:
-            sm = sendmsg_window_resend(mailbox, msgno);
+            sm = sendmsg_window_forward(mailbox, msgno, send_type);
             break;
         case SEND_CONTINUE:
             sm = sendmsg_window_continue(mailbox, msgno);

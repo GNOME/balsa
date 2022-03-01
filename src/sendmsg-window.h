@@ -124,10 +124,8 @@ G_BEGIN_DECLS
     BalsaSendmsg *sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
                                                 SendType reply_type);
 
-    BalsaSendmsg *sendmsg_window_resend(LibBalsaMailbox *mailbox, guint msgno);
-
     BalsaSendmsg *sendmsg_window_forward(LibBalsaMailbox *,
-                                         guint msgno, gboolean attach);
+                                         guint msgno, SendType send_type);
     BalsaSendmsg *sendmsg_window_continue(LibBalsaMailbox *,
                                           guint msgno);
 

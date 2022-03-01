@@ -2999,7 +2999,9 @@ continue_body(BalsaSendmsg * bsmsg, LibBalsaMessage * message)
 
     /* if the first part is of type text/plain with a NULL filename, it
        was the message... */
-    if (body != NULL && body->filename == NULL) {
+    if (body != NULL &&
+        body->filename == NULL &&
+        libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_TEXT) {
         GString *rbdy;
         gchar *body_type = libbalsa_message_body_get_mime_type(body);
         gint llen = -1;
@@ -5009,26 +5011,28 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     LibBalsaMessage *message;
     LibBalsaMessageHeaders *headers;
     LibBalsaMessageBody *body;
-    gchar *tmp;
     GtkTextIter start, end;
     LibBalsaIdentity *ident = bsmsg->ident;
     InternetAddress *ia = libbalsa_identity_get_address(ident);
     GtkTextBuffer *buffer;
     GtkTextBuffer *new_buffer = NULL;
 
-    if (bsmsg->type == SEND_RESEND)
-        return bsmsg2resent_message(bsmsg);
-
     message = libbalsa_message_new();
+
+    if (bsmsg->type == SEND_RESEND)
+        libbalsa_message_set_user_header(message, "X-Balsa-Resend", "message is to be resent");
+
     headers = libbalsa_message_get_headers(message);
 
     headers->from = internet_address_list_new ();
     internet_address_list_add(headers->from, ia);
 
-    tmp = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject.body), 0, -1);
-    strip_chars(tmp, "\r\n");
-    libbalsa_message_set_subject(message, tmp);
-    g_free(tmp);
+    if (bsmsg->subject.body != NULL) {
+        char *subject = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject.body), 0, -1);
+        strip_chars(subject, "\r\n");
+        libbalsa_message_set_subject(message, subject);
+        g_free(subject);
+    }
 
     headers->to_list =
         libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
@@ -5044,81 +5048,95 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     bsmsg->fcc_url =
         g_strdup(balsa_mblist_mru_option_menu_get(bsmsg->fcc.body));
 
-    headers->reply_to =
-        libbalsa_address_view_get_list(bsmsg->replyto_view, "Reply To:");
-
-    if (bsmsg->req_mdn)
-	libbalsa_message_set_dispnotify(message, ia);
     libbalsa_message_set_request_dsn(message, bsmsg->req_dsn);
 
+    if (bsmsg->type != SEND_RESEND) {
+        headers->reply_to = libbalsa_address_view_get_list(bsmsg->replyto_view, "Reply To:");
 
-    sw_set_header_from_path(message, "Face", libbalsa_identity_get_face_path(ident),
-            /* Translators: please do not translate Face. */
-                            _("Could not load Face header file %s: %s"));
-    sw_set_header_from_path(message, "X-Face", libbalsa_identity_get_x_face_path(ident),
-            /* Translators: please do not translate Face. */
-                            _("Could not load X-Face header file %s: %s"));
+        if (bsmsg->req_mdn)
+            libbalsa_message_set_dispnotify(message, ia);
 
-    libbalsa_message_set_references(message, bsmsg->references);
-    bsmsg->references = NULL; /* steal it */
 
-    if (bsmsg->in_reply_to != NULL) {
-        libbalsa_message_set_in_reply_to(message,
-                                         g_list_prepend(NULL,
-                                                        g_strdup(bsmsg->in_reply_to)));
+        sw_set_header_from_path(message, "Face", libbalsa_identity_get_face_path(ident),
+                /* Translators: please do not translate Face. */
+                                _("Could not load Face header file %s: %s"));
+        sw_set_header_from_path(message, "X-Face", libbalsa_identity_get_x_face_path(ident),
+                /* Translators: please do not translate Face. */
+                                _("Could not load X-Face header file %s: %s"));
+
+        libbalsa_message_set_references(message, bsmsg->references);
+        bsmsg->references = NULL; /* steal it */
+
+        if (bsmsg->in_reply_to != NULL) {
+            libbalsa_message_set_in_reply_to(message,
+                                             g_list_prepend(NULL,
+                                                            g_strdup(bsmsg->in_reply_to)));
+        }
+
+        body = libbalsa_message_body_new(message);
+
+        buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+        gtk_text_buffer_get_bounds(buffer, &start, &end);
+
+        if (bsmsg->flow) {
+            /* Copy the message text to a new buffer: */
+            GtkTextTagTable *table;
+            char *text;
+
+            table = gtk_text_buffer_get_tag_table(buffer);
+            new_buffer = gtk_text_buffer_new(table);
+
+            text = gtk_text_iter_get_text(&start, &end);
+            gtk_text_buffer_set_text(new_buffer, text, -1);
+            g_free(text);
+
+            /* Remove spaces before a newline: */
+            gtk_text_buffer_get_bounds(new_buffer, &start, &end);
+            libbalsa_unwrap_buffer(new_buffer, &start, -1);
+            gtk_text_buffer_get_bounds(new_buffer, &start, &end);
+        }
+
+        /* Copy the buffer text to the message: */
+        body->buffer = gtk_text_iter_get_text(&start, &end);
+        if (new_buffer)
+            g_object_unref(new_buffer);
+
+        if (bsmsg->send_mp_alt)
+            body->html_buffer =
+                libbalsa_text_to_html(LIBBALSA_MESSAGE_GET_SUBJECT(message), body->buffer,
+                                      bsmsg->spell_check_lang);
+        if (bsmsg->flow)
+            body->buffer =
+                libbalsa_wrap_rfc2646(body->buffer, balsa_app.wraplength,
+                                      TRUE, FALSE, TRUE);
+
+        /* Ildar reports that, when a message contains both text/plain and
+         * text/html parts, some broken MUAs use the charset from the
+         * text/plain part to display the text/html part; the latter is
+         * encoded as UTF-8 by add_mime_body_plain (send.c), so we'll use
+         * the same encoding for the text/plain part.
+         * https://bugzilla.gnome.org/show_bug.cgi?id=580704 */
+        body->charset =
+            g_strdup(bsmsg->send_mp_alt ?
+                     "UTF-8" : sw_required_charset(bsmsg, body->buffer));
+        libbalsa_message_append_part(message, body);
+
+        if (balsa_app.has_openpgp || balsa_app.has_smime) {
+            libbalsa_message_set_gpg_mode(message,
+                (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 ? bsmsg->gpg_mode : 0);
+            libbalsa_message_set_attach_pubkey(message, bsmsg->attach_pubkey);
+            libbalsa_message_set_identity(message, ident);
+        } else {
+            libbalsa_message_set_gpg_mode(message, 0);
+            libbalsa_message_set_attach_pubkey(message, FALSE);
+        }
     }
-
-    body = libbalsa_message_body_new(message);
-
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-
-    if (bsmsg->flow) {
-        /* Copy the message text to a new buffer: */
-        GtkTextTagTable *table;
-
-        table = gtk_text_buffer_get_tag_table(buffer);
-        new_buffer = gtk_text_buffer_new(table);
-
-        tmp = gtk_text_iter_get_text(&start, &end);
-        gtk_text_buffer_set_text(new_buffer, tmp, -1);
-        g_free(tmp);
-
-        /* Remove spaces before a newline: */
-        gtk_text_buffer_get_bounds(new_buffer, &start, &end);
-        libbalsa_unwrap_buffer(new_buffer, &start, -1);
-        gtk_text_buffer_get_bounds(new_buffer, &start, &end);
-    }
-
-    /* Copy the buffer text to the message: */
-    body->buffer = gtk_text_iter_get_text(&start, &end);
-    if (new_buffer)
-        g_object_unref(new_buffer);
-
-    if (bsmsg->send_mp_alt)
-        body->html_buffer =
-            libbalsa_text_to_html(LIBBALSA_MESSAGE_GET_SUBJECT(message), body->buffer,
-                                  bsmsg->spell_check_lang);
-    if (bsmsg->flow)
-	body->buffer =
-	    libbalsa_wrap_rfc2646(body->buffer, balsa_app.wraplength,
-                                  TRUE, FALSE, TRUE);
-
-    /* Ildar reports that, when a message contains both text/plain and
-     * text/html parts, some broken MUAs use the charset from the
-     * text/plain part to display the text/html part; the latter is
-     * encoded as UTF-8 by add_mime_body_plain (send.c), so we'll use
-     * the same encoding for the text/plain part.
-     * https://bugzilla.gnome.org/show_bug.cgi?id=580704 */
-    body->charset =
-        g_strdup(bsmsg->send_mp_alt ?
-                 "UTF-8" : sw_required_charset(bsmsg, body->buffer));
-    libbalsa_message_append_part(message, body);
 
     /* add attachments */
-    if (bsmsg->tree_view)
+    if (bsmsg->tree_view != NULL) {
         gtk_tree_model_foreach(BALSA_MSG_ATTACH_MODEL(bsmsg),
                                attachment2message, message);
+    }
 
     headers->date = time(NULL);
     if (balsa_app.has_openpgp || balsa_app.has_smime) {
@@ -5500,7 +5518,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     LibBalsaMsgCreateResult result;
     LibBalsaMessage *message;
     LibBalsaMailbox *fcc;
-    LibBalsaMailbox *parent_mailbox = NULL;
     GtkTreeIter iter;
     GError * error = NULL;
 
@@ -5573,11 +5590,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                                _("sending message with GPG mode %d"),
                                libbalsa_message_get_crypt_mode(message));
 
-    if (bsmsg->type == SEND_RESEND)
-        parent_mailbox = libbalsa_message_get_mailbox(bsmsg->parent_message);
-    if (parent_mailbox != NULL)
-        libbalsa_mailbox_lock_store(parent_mailbox);
-
     if(queue_only)
 	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
 					libbalsa_identity_get_smtp_server(bsmsg->ident),
@@ -5589,10 +5601,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 					   	   	   	   	   balsa_app.send_progress_dialog,
                                        GTK_WINDOW(balsa_app.main_window),
                                        bsmsg->flow, &error);
-
-    if (parent_mailbox != NULL)
-        libbalsa_mailbox_unlock_store(parent_mailbox);
-
     if (result == LIBBALSA_MESSAGE_CREATE_OK) {
 	if (bsmsg->parent_message != NULL) {
             LibBalsaMailbox *mailbox = libbalsa_message_get_mailbox(bsmsg->parent_message);
@@ -6568,8 +6576,7 @@ sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
     switch(type) {
     case SEND_FORWARD_ATTACH:
     case SEND_FORWARD_INLINE:
-        bsmsg = sendmsg_window_forward(mailbox, msgno,
-                                       type == SEND_FORWARD_ATTACH);
+        bsmsg = sendmsg_window_forward(mailbox, msgno, type);
         break;
     default:
         g_assert_not_reached(); /* since it hardly makes sense... */
@@ -6735,8 +6742,7 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
         break;
 
     case SEND_RESEND:
-        title_format = _("Resend message to %s: %s");
-        subject_string = LIBBALSA_MESSAGE_GET_SUBJECT(bsmsg->parent_message);
+        title_format = _("Resend message to %s");
         break;
 
     default:
@@ -6748,7 +6754,7 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
     to_string = internet_address_list_to_string(list, NULL, FALSE);
     g_object_unref(list);
 
-    if (subject_string == NULL)
+    if (bsmsg->subject.body != NULL)
         subject_string = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject.body));
 
     title = g_strdup_printf(title_format, to_string ? to_string : "", subject_string);
@@ -7188,41 +7194,67 @@ sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
 }
 
 BalsaSendmsg*
-sendmsg_window_forward(LibBalsaMailbox *mailbox, guint msgno,
-                       gboolean attach)
+sendmsg_window_forward(LibBalsaMailbox *mailbox, guint msgno, SendType send_type)
 {
-    LibBalsaMessage *message =
-        libbalsa_mailbox_get_message(mailbox, msgno);
-    SendType send_type = attach ? SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE;
-    BalsaSendmsg *bsmsg = sendmsg_window_new(send_type);
+    LibBalsaMessage *message;
+    BalsaSendmsg *bsmsg;
 
-    g_assert(message);
+    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
+    message = libbalsa_mailbox_get_message(mailbox, msgno);
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
 
-    if (attach) {
-	if(!attach_message(bsmsg, message))
-            balsa_information_parented(GTK_WINDOW(bsmsg->window),
-                                       LIBBALSA_INFORMATION_WARNING,
-                                       _("Attaching message failed.\n"
-                                         "Possible reason: not enough temporary space"));
-        bsmsg->state = SENDMSG_STATE_CLEAN;
-        bsmsg_set_subject_from_body(bsmsg, libbalsa_message_get_body_list(message), bsmsg->ident);
-    } else {
-        bsm_prepare_for_setup(message);
-        fill_body_from_message(bsmsg, message, QUOTE_NOPREFIX);
-        bsm_finish_setup(bsmsg, libbalsa_message_get_body_list(message));
+    bsmsg = sendmsg_window_new(send_type);
+
+    switch (send_type) {
+        case SEND_FORWARD_ATTACH:
+            if (!attach_message(bsmsg, message)) {
+                balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                           LIBBALSA_INFORMATION_WARNING,
+                                           _("Attaching message failed.\n"
+                                             "Possible reason: not enough temporary space"));
+            }
+            bsmsg->state = SENDMSG_STATE_CLEAN;
+            bsmsg_set_subject_from_body(bsmsg, libbalsa_message_get_body_list(message), bsmsg->ident);
+            if (libbalsa_identity_get_sig_whenforward(bsmsg->ident))
+                insert_initial_sig(bsmsg);
+
+            break;
+
+        case SEND_RESEND:
+            if (!attach_message(bsmsg, message)) {
+                balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                           LIBBALSA_INFORMATION_WARNING,
+                                           _("Attaching message failed.\n"
+                                             "Possible reason: not enough temporary space"));
+            }
+
+            break;
+
+        case SEND_FORWARD_INLINE:
+            {
+                GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+                GtkTextIter pos;
+
+                bsm_prepare_for_setup(message);
+                fill_body_from_message(bsmsg, message, QUOTE_NOPREFIX);
+                bsm_finish_setup(bsmsg, libbalsa_message_get_body_list(message));
+
+                if (libbalsa_identity_get_sig_whenforward(bsmsg->ident))
+                    insert_initial_sig(bsmsg);
+
+                gtk_text_buffer_get_start_iter(buffer, &pos);
+                gtk_text_buffer_place_cursor(buffer, &pos);
+                gtk_text_buffer_insert_at_cursor(buffer, "\n", 1);
+                gtk_text_buffer_get_start_iter(buffer, &pos);
+                gtk_text_buffer_place_cursor(buffer, &pos);
+            }
+
+            break;
+
+        default:
+            g_assert_not_reached();
     }
-    if (libbalsa_identity_get_sig_whenforward(bsmsg->ident))
-        insert_initial_sig(bsmsg);
-    if(!attach) {
-        GtkTextBuffer *buffer =
-            gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
-        GtkTextIter pos;
-        gtk_text_buffer_get_start_iter(buffer, &pos);
-        gtk_text_buffer_place_cursor(buffer, &pos);
-        gtk_text_buffer_insert_at_cursor(buffer, "\n", 1);
-        gtk_text_buffer_get_start_iter(buffer, &pos);
-        gtk_text_buffer_place_cursor(buffer, &pos);
-     }
+
     return bsmsg;
 }
 
@@ -7231,6 +7263,7 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
 {
     LibBalsaMessage *message =
         libbalsa_mailbox_get_message(mailbox, msgno);
+    gboolean resending;
     BalsaSendmsg *bsmsg;
     const gchar *postpone_hdr;
     GList *list, *refs = NULL;
@@ -7245,7 +7278,9 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
         return NULL;
     }
 
-    bsmsg = sendmsg_window_new(SEND_CONTINUE);
+    resending = libbalsa_message_get_user_header(message, "X-Balsa-Resend") != NULL;
+    bsmsg = sendmsg_window_new(resending ? SEND_RESEND : SEND_CONTINUE);
+
     bsmsg->is_continue = TRUE;
     bsm_prepare_for_setup(message);
     bsmsg->draft_message = message;
@@ -7254,89 +7289,67 @@ sendmsg_window_continue(LibBalsaMailbox * mailbox, guint msgno)
     set_identity(bsmsg, message);
     setup_headers_from_message(bsmsg, message);
 
-    libbalsa_address_view_set_from_list(bsmsg->replyto_view,
-                                        "Reply To:",
-                                        libbalsa_message_get_headers(message)->reply_to);
-    in_reply_to = libbalsa_message_get_in_reply_to(message);
-    if (in_reply_to != NULL)
-        bsmsg->in_reply_to =
-            g_strconcat("<", in_reply_to->data, ">", NULL);
+    if (resending) {
+        continue_body(bsmsg, message);
+    } else {
+        libbalsa_address_view_set_from_list(bsmsg->replyto_view,
+                                            "Reply To:",
+                                            libbalsa_message_get_headers(message)->reply_to);
+        in_reply_to = libbalsa_message_get_in_reply_to(message);
+        if (in_reply_to != NULL)
+            bsmsg->in_reply_to =
+                g_strconcat("<", in_reply_to->data, ">", NULL);
 
-    if ((postpone_hdr =
-         libbalsa_message_get_user_header(message, "X-Balsa-Crypto")))
-        bsmsg_setup_gpg_ui_by_mode(bsmsg, atoi(postpone_hdr));
-    postpone_hdr = libbalsa_message_get_user_header(message, "X-Balsa-Att-Pubkey");
-    if (postpone_hdr != NULL) {
-    	sw_action_set_active(bsmsg, "attpubkey", atoi(postpone_hdr) != 0);
-    }
-    if ((postpone_hdr =
-         libbalsa_message_get_user_header(message, "X-Balsa-MDN")))
-        sw_action_set_active(bsmsg, "request-mdn", atoi(postpone_hdr) != 0);
-    if ((postpone_hdr =
-         libbalsa_message_get_user_header(message, "X-Balsa-DSN")))
-        sw_action_set_active(bsmsg, "request-dsn", atoi(postpone_hdr) != 0);
-    if ((postpone_hdr =
-         libbalsa_message_get_user_header(message, "X-Balsa-Lang"))) {
-        GtkWidget *langs =
-            gtk_menu_item_get_submenu(GTK_MENU_ITEM
-                                      (bsmsg->current_language_menu));
-        GList *children =
-            gtk_container_get_children(GTK_CONTAINER(langs));
-        set_locale(bsmsg, postpone_hdr);
-        for (list = children; list; list = list->next) {
-            GtkCheckMenuItem *menu_item = list->data;
-            const gchar *lang;
-
-            lang = g_object_get_data(G_OBJECT(menu_item),
-                                     BALSA_LANGUAGE_MENU_LANG);
-            if (strcmp(lang, postpone_hdr) == 0)
-                gtk_check_menu_item_set_active(menu_item, TRUE);
+        if ((postpone_hdr =
+             libbalsa_message_get_user_header(message, "X-Balsa-Crypto")))
+            bsmsg_setup_gpg_ui_by_mode(bsmsg, atoi(postpone_hdr));
+        postpone_hdr = libbalsa_message_get_user_header(message, "X-Balsa-Att-Pubkey");
+        if (postpone_hdr != NULL) {
+            sw_action_set_active(bsmsg, "attpubkey", atoi(postpone_hdr) != 0);
         }
-        g_list_free(children);
+        if ((postpone_hdr =
+             libbalsa_message_get_user_header(message, "X-Balsa-MDN")))
+            sw_action_set_active(bsmsg, "request-mdn", atoi(postpone_hdr) != 0);
+        if ((postpone_hdr =
+             libbalsa_message_get_user_header(message, "X-Balsa-DSN")))
+            sw_action_set_active(bsmsg, "request-dsn", atoi(postpone_hdr) != 0);
+        if ((postpone_hdr =
+             libbalsa_message_get_user_header(message, "X-Balsa-Lang"))) {
+            GtkWidget *langs =
+                gtk_menu_item_get_submenu(GTK_MENU_ITEM
+                                          (bsmsg->current_language_menu));
+            GList *children =
+                gtk_container_get_children(GTK_CONTAINER(langs));
+            set_locale(bsmsg, postpone_hdr);
+            for (list = children; list; list = list->next) {
+                GtkCheckMenuItem *menu_item = list->data;
+                const gchar *lang;
+
+                lang = g_object_get_data(G_OBJECT(menu_item),
+                                         BALSA_LANGUAGE_MENU_LANG);
+                if (strcmp(lang, postpone_hdr) == 0)
+                    gtk_check_menu_item_set_active(menu_item, TRUE);
+            }
+            g_list_free(children);
+        }
+        if ((postpone_hdr =
+             libbalsa_message_get_user_header(message, "X-Balsa-Format")))
+            sw_action_set_active(bsmsg, "flowed", strcmp(postpone_hdr, "Fixed"));
+        if ((postpone_hdr =
+             libbalsa_message_get_user_header(message, "X-Balsa-MP-Alt")))
+            sw_action_set_active(bsmsg, "send-html", !strcmp(postpone_hdr, "yes"));
+        if ((postpone_hdr =
+             libbalsa_message_get_user_header(message, "X-Balsa-Send-Type")))
+            bsmsg->type = atoi(postpone_hdr);
+
+        for (list = libbalsa_message_get_references(message); list != NULL; list = list->next)
+            refs = g_list_prepend(refs, g_strdup(list->data));
+        bsmsg->references = g_list_reverse(refs);
+
+        continue_body(bsmsg, message);
+        bsm_finish_setup(bsmsg, libbalsa_message_get_body_list(message));
+        g_idle_add((GSourceFunc) sw_grab_focus_to_text, g_object_ref(bsmsg->text));
     }
-    if ((postpone_hdr =
-         libbalsa_message_get_user_header(message, "X-Balsa-Format")))
-        sw_action_set_active(bsmsg, "flowed", strcmp(postpone_hdr, "Fixed"));
-    if ((postpone_hdr =
-         libbalsa_message_get_user_header(message, "X-Balsa-MP-Alt")))
-        sw_action_set_active(bsmsg, "send-html", !strcmp(postpone_hdr, "yes"));
-    if ((postpone_hdr =
-         libbalsa_message_get_user_header(message, "X-Balsa-Send-Type")))
-        bsmsg->type = atoi(postpone_hdr);
-
-    for (list = libbalsa_message_get_references(message); list != NULL; list = list->next)
-        refs = g_list_prepend(refs, g_strdup(list->data));
-    bsmsg->references = g_list_reverse(refs);
-
-    continue_body(bsmsg, message);
-    bsm_finish_setup(bsmsg, libbalsa_message_get_body_list(message));
-    g_idle_add((GSourceFunc) sw_grab_focus_to_text,
-               g_object_ref(bsmsg->text));
-    return bsmsg;
-}
-
-/*
- * sendmsg_window_resend
- *
- * Opens a small compose window for resending the message to new
- * recipient(s).
- *
- * https://datatracker.ietf.org/doc/html/rfc5322#section-3.6.6
- */
-BalsaSendmsg *
-sendmsg_window_resend(LibBalsaMailbox *mailbox, guint msgno)
-{
-    LibBalsaMessage *message;
-    BalsaSendmsg *bsmsg;
-
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), NULL);
-    message = libbalsa_mailbox_get_message(mailbox, msgno);
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), NULL);
-
-    bsmsg = sendmsg_window_new(SEND_RESEND);
-    bsmsg->parent_message = message;
-    libbalsa_mailbox_open(mailbox, NULL);
-    set_identity(bsmsg, message);
 
     return bsmsg;
 }

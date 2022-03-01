@@ -451,7 +451,7 @@ mw_forward_attached_activated(GSimpleAction * action, GVariant * parameter,
 
     sendmsg_window_forward(libbalsa_message_get_mailbox(mw->message),
                            libbalsa_message_get_msgno(mw->message),
-                           TRUE);
+                           SEND_FORWARD_ATTACH);
 }
 
 static void
@@ -464,7 +464,7 @@ mw_forward_inline_activated(GSimpleAction * action, GVariant * parameter,
 
     sendmsg_window_forward(libbalsa_message_get_mailbox(mw->message),
                            libbalsa_message_get_msgno(mw->message),
-                           FALSE);
+                           SEND_FORWARD_INLINE);
 }
 
 #if 0

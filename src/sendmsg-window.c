@@ -4280,6 +4280,10 @@ create_lang_menu(GtkWidget * parent, BalsaSendmsg * bsmsg)
     return g_object_get_data(G_OBJECT(active_item), BALSA_LANGUAGE_MENU_LANG);
 }
 
+/*
+ * Compose window toolbar
+ */
+
 /* Standard buttons; "" means a separator. */
 static const BalsaToolbarEntry compose_toolbar[] = {
     { "toolbar-send", BALSA_PIXMAP_SEND       },
@@ -4329,6 +4333,51 @@ sendmsg_window_get_toolbar_model(void)
 
     return model;
 }
+
+/*
+ * Resend window toolbar
+ */
+
+/* Standard buttons; "" means a separator. */
+static const BalsaToolbarEntry resend_toolbar[] = {
+    { "toolbar-send", BALSA_PIXMAP_SEND       },
+    { "", ""                                  },
+    { "save",        "document-save"          },
+    { "", ""                                  },
+    { "select-ident", BALSA_PIXMAP_IDENTITY   },
+    { "", ""                                  },
+    {"close",        "window-close-symbolic"  }
+};
+
+/* Optional extra buttons */
+static const BalsaToolbarEntry resend_toolbar_extras[] = {
+    { "postpone",    BALSA_PIXMAP_POSTPONE    },
+    { "queue",       BALSA_PIXMAP_QUEUE       }
+};
+
+/* Create the toolbar model for the resend window's toolbar.
+ */
+BalsaToolbarModel *
+resend_window_get_toolbar_model(void)
+{
+    static BalsaToolbarModel *model = NULL;
+
+    if (model)
+        return model;
+
+    model =
+        balsa_toolbar_model_new(BALSA_TOOLBAR_TYPE_RESEND_WINDOW,
+                                resend_toolbar,
+                                G_N_ELEMENTS(resend_toolbar));
+    balsa_toolbar_model_add_entries(model, resend_toolbar_extras,
+                                    G_N_ELEMENTS(resend_toolbar_extras));
+
+    return model;
+}
+
+/*
+ * End of toolbars
+ */
 
 static void
 bsmsg_identities_changed_cb(BalsaSendmsg * bsmsg)
@@ -6979,12 +7028,13 @@ sendmsg_window_new(SendType send_type)
 
     gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
 
-    if (send_type != SEND_RESEND) {
-        model = sendmsg_window_get_toolbar_model();
-        bsmsg->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
-        gtk_box_pack_start(GTK_BOX(main_box), bsmsg->toolbar,
-                           FALSE, FALSE, 0);
+    model = send_type == SEND_RESEND ?
+        resend_window_get_toolbar_model() :
+        sendmsg_window_get_toolbar_model();
+    bsmsg->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
+    gtk_box_pack_start(GTK_BOX(main_box), bsmsg->toolbar, FALSE, FALSE, 0);
 
+    if (send_type != SEND_RESEND) {
         bsmsg->flow = !balsa_app.wordwrap;
         sw_action_set_enabled(bsmsg, "reflow", bsmsg->flow);
         bsmsg->send_mp_alt = FALSE;

@@ -50,6 +50,13 @@
       <section>
         <item>
           <attribute name="label"
+            translatable="yes">Show Too_lbar</attribute>
+          <attribute name="action">win.show-toolbar</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name="label"
             translatable="yes">F_rom</attribute>
           <attribute name="action">win.from</attribute>
         </item>

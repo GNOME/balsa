@@ -36,7 +36,7 @@
 
 /* Must be consistent with BalsaToolbarType enum: */
 static const gchar *const balsa_toolbar_names[] =
-    { "MainWindow", "ComposeWindow", "MessageWindow" };
+    { "MainWindow", "ComposeWindow", "ResendWindow", "MessageWindow" };
 
 /*
  * The BalsaToolbarModel class.

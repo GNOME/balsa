@@ -158,6 +158,15 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
                              gtk_label_new(_("Compose window")));
 
+    model = resend_window_get_toolbar_model();
+    group = g_simple_action_group_new();
+    sendmsg_window_add_action_entries(G_ACTION_MAP(group));
+    g_debug("%s: resend window", __func__);
+    child = create_toolbar_page(model, G_ACTION_MAP(group));
+    g_object_unref(group);
+    gtk_notebook_append_page(GTK_NOTEBOOK(notebook), child,
+                             gtk_label_new(_("Resend window")));
+
     model = message_window_get_toolbar_model();
     group = g_simple_action_group_new();
     message_window_add_action_entries(G_ACTION_MAP(group));

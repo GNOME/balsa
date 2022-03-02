@@ -143,8 +143,11 @@ G_BEGIN_DECLS
     BalsaSendmsg *sendmsg_window_new_from_list(LibBalsaMailbox * mailbox,
                                                GArray * selected,
                                                SendType type);
+
     BalsaToolbarModel *sendmsg_window_get_toolbar_model(void);
     void sendmsg_window_add_action_entries(GActionMap * action_map);
+
+    BalsaToolbarModel *resend_window_get_toolbar_model(void);
 
 G_END_DECLS
 

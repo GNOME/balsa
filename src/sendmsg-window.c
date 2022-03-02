@@ -6192,6 +6192,9 @@ sw_entry_helper(GSimpleAction      *action,
                 BalsaSendmsg       *bsmsg,
                 BalsaSendmsgHeader *header)
 {
+    if (entry[0] == NULL)
+        return;
+
     if (g_variant_get_boolean(state)) {
         gtk_widget_show_all(header->name);
         gtk_widget_show_all(header->body);
@@ -7018,7 +7021,9 @@ sendmsg_window_new(SendType send_type)
     gtk_paned_add1(GTK_PANED(paned), create_info_pane(bsmsg));
     bsmsg->tree_view = NULL;
 
-    if (send_type != SEND_RESEND) {
+    if (send_type == SEND_RESEND) {
+        init_menus(bsmsg);
+    } else {
         /*
          * Set up the spell-checker language menu
          */

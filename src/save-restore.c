@@ -872,6 +872,8 @@ config_global_load(void)
         libbalsa_conf_get_bool("ShowMessageWindowToolbar=true");
     balsa_app.show_compose_toolbar =
         libbalsa_conf_get_bool("ShowComposeWindowToolbar=true");
+    balsa_app.show_resend_toolbar =
+        libbalsa_conf_get_bool("ShowResendWindowToolbar=true");
     balsa_app.show_statusbar =
         libbalsa_conf_get_bool("ShowStatusbar=true");
     balsa_app.show_sos_bar =
@@ -1361,6 +1363,8 @@ config_save(void)
                            balsa_app.show_message_toolbar);
     libbalsa_conf_set_bool("ShowComposeWindowToolbar",
                            balsa_app.show_compose_toolbar);
+    libbalsa_conf_set_bool("ShowResendWindowToolbar",
+                           balsa_app.show_resend_toolbar);
     libbalsa_conf_set_bool("ShowStatusbar",
                            balsa_app.show_statusbar);
     libbalsa_conf_set_bool("ShowSOSbar",

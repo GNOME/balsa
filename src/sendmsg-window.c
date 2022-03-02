@@ -6330,11 +6330,19 @@ sw_show_toolbar_change_state(GSimpleAction * action, GVariant * state, gpointer 
 {
     BalsaSendmsg *bsmsg = data;
 
-    balsa_app.show_compose_toolbar = g_variant_get_boolean(state);
-    if (balsa_app.show_compose_toolbar)
-        gtk_widget_show(bsmsg->toolbar);
-    else
-        gtk_widget_hide(bsmsg->toolbar);
+    if (bsmsg->type == SEND_RESEND) {
+        balsa_app.show_resend_toolbar = g_variant_get_boolean(state);
+        if (balsa_app.show_resend_toolbar)
+            gtk_widget_show(bsmsg->toolbar);
+        else
+            gtk_widget_hide(bsmsg->toolbar);
+    } else {
+        balsa_app.show_compose_toolbar = g_variant_get_boolean(state);
+        if (balsa_app.show_compose_toolbar)
+            gtk_widget_show(bsmsg->toolbar);
+        else
+            gtk_widget_hide(bsmsg->toolbar);
+    }
 
     g_simple_action_set_state(action, state);
 }
@@ -7034,7 +7042,9 @@ sendmsg_window_new(SendType send_type)
     bsmsg->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
     gtk_box_pack_start(GTK_BOX(main_box), bsmsg->toolbar, FALSE, FALSE, 0);
 
-    if (send_type != SEND_RESEND) {
+    if (send_type == SEND_RESEND) {
+        sw_action_set_active(bsmsg, "show-toolbar", balsa_app.show_resend_toolbar);
+    } else {
         bsmsg->flow = !balsa_app.wordwrap;
         sw_action_set_enabled(bsmsg, "reflow", bsmsg->flow);
         bsmsg->send_mp_alt = FALSE;

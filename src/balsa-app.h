@@ -251,6 +251,7 @@ extern struct BalsaApplication {
     gboolean show_main_toolbar;
     gboolean show_message_toolbar;
     gboolean show_compose_toolbar;
+    gboolean show_resend_toolbar;
     gboolean show_statusbar;
     gboolean show_sos_bar;
 

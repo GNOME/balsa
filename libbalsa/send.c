@@ -1245,6 +1245,7 @@ create_mime_message(LibBalsaMessage *message,
     LibBalsaIdentity *identity;
 #endif /* ENABLE_AUTOCRYPT */
     GDateTime *datetime;
+    gboolean resending = libbalsa_message_get_user_header(message, "X-Balsa-Resend") != NULL;
 
     /* attach the public key only if we send the message, not if we just postpone it */
     if (!postponing &&
@@ -1402,7 +1403,7 @@ create_mime_message(LibBalsaMessage *message,
             LibBalsaMsgCreateResult crypt_res = LIBBALSA_MESSAGE_CREATE_OK;
 
             /* in '2440 mode, touch *only* the first body! */
-            if (!postponing &&
+            if (!resending && !postponing &&
                 (body == libbalsa_message_get_body_list(body->message)) &&
                 ((gpg_mode = libbalsa_message_get_crypt_mode(message)) != 0) &&
                 ((gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0)) {
@@ -1431,7 +1432,7 @@ create_mime_message(LibBalsaMessage *message,
         body = body->next;
     }
 
-    if (attach_pubkey) {
+    if (!resending && attach_pubkey) {
     	GMimePart *pubkey_part;
 
     	pubkey_part = lb_create_pubkey_part(message, parent, error);
@@ -1449,7 +1450,7 @@ create_mime_message(LibBalsaMessage *message,
         }
     }
 
-    if ((libbalsa_message_get_body_list(message) != NULL) && !postponing) {
+    if (!resending && (libbalsa_message_get_body_list(message) != NULL) && !postponing) {
         LibBalsaMsgCreateResult crypt_res =
             do_multipart_crypto(message, &mime_root, parent, error);
         if (crypt_res != LIBBALSA_MESSAGE_CREATE_OK) {

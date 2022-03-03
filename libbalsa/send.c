@@ -1540,7 +1540,7 @@ libbalsa_message_postpone(LibBalsaMessage *message,
     mime_message = libbalsa_message_get_mime_message(message);
     if (mime_message == NULL) {
         LibBalsaMsgCreateResult res =
-            create_mime_message(message, flow, FALSE, &mime_message, error);
+            create_mime_message(message, flow, TRUE, &mime_message, error);
         if (res != LIBBALSA_MESSAGE_CREATE_OK)
             return FALSE;
     }

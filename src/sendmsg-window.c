@@ -5605,17 +5605,9 @@ message_postpone(BalsaSendmsg * bsmsg)
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->type));
     g_ptr_array_add(headers, NULL);
 
-    if ((bsmsg->type == SEND_REPLY || bsmsg->type == SEND_REPLY_ALL ||
-        bsmsg->type == SEND_REPLY_GROUP))
-	successp = libbalsa_message_postpone(message, balsa_app.draftbox,
-                                             bsmsg->parent_message,
-                                             (gchar **) headers->pdata,
-                                             bsmsg->flow, &error);
-    else
-	successp = libbalsa_message_postpone(message, balsa_app.draftbox,
-                                             NULL,
-                                             (gchar **) headers->pdata,
-                                             bsmsg->flow, &error);
+    successp = libbalsa_message_postpone(message, balsa_app.draftbox,
+                                         (gchar **) headers->pdata,
+                                         bsmsg->flow, &error);
     g_ptr_array_foreach(headers, (GFunc) g_free, NULL);
     g_ptr_array_free(headers, TRUE);
 

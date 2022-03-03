@@ -6783,41 +6783,54 @@ rfc2822_skip_comments(const gchar * str)
 static void
 sendmsg_window_set_title(BalsaSendmsg * bsmsg)
 {
-    gchar *title_format;
     InternetAddressList *list;
     gchar *to_string;
-    const gchar *subject_string = NULL;
+    const gchar *subject_string;
     gchar *title;
-
-    switch (bsmsg->type) {
-    case SEND_REPLY:
-    case SEND_REPLY_ALL:
-    case SEND_REPLY_GROUP:
-        title_format = _("Reply to %s: %s");
-        break;
-
-    case SEND_FORWARD_ATTACH:
-    case SEND_FORWARD_INLINE:
-        title_format = _("Forward message to %s: %s");
-        break;
-
-    case SEND_RESEND:
-        title_format = _("Resend message to %s");
-        break;
-
-    default:
-        title_format = _("New message to %s: %s");
-        break;
-    }
 
     list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
     to_string = internet_address_list_to_string(list, NULL, FALSE);
     g_object_unref(list);
 
-    if (bsmsg->subject.body != NULL)
+    if (GTK_IS_ENTRY(bsmsg->subject.body))
         subject_string = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject.body));
+    else if (LIBBALSA_IS_MESSAGE(bsmsg->parent_message))
+        subject_string = libbalsa_message_get_subject(bsmsg->parent_message);
+    else if (LIBBALSA_IS_MESSAGE(bsmsg->draft_message))
+        subject_string = libbalsa_message_get_subject(bsmsg->draft_message);
 
-    title = g_strdup_printf(title_format, to_string ? to_string : "", subject_string);
+    if (subject_string == NULL || subject_string[0] == '\0')
+        subject_string = _("No subject");
+
+    switch (bsmsg->type) {
+    case SEND_REPLY:
+    case SEND_REPLY_ALL:
+    case SEND_REPLY_GROUP:
+        title = to_string != NULL ?
+            g_strdup_printf(_("Reply to %s: %s"), to_string, subject_string) :
+            g_strdup_printf(_("Reply: %s"), subject_string);
+        break;
+
+    case SEND_FORWARD_ATTACH:
+    case SEND_FORWARD_INLINE:
+        title = to_string != NULL ?
+            g_strdup_printf(_("Forward message to %s: %s"), to_string, subject_string) :
+            g_strdup_printf(_("Forward message: %s"), subject_string);
+        break;
+
+    case SEND_RESEND:
+        title = to_string != NULL ?
+            g_strdup_printf(_("Resend message to %s: %s"), to_string, subject_string) :
+            g_strdup_printf(_("Resend message: %s"), subject_string);
+        break;
+
+    default:
+        title = to_string != NULL ?
+            g_strdup_printf(_("New message to %s: %s"), to_string, subject_string) :
+            g_strdup_printf(_("New message: %s"), subject_string);
+        break;
+    }
+
     g_free(to_string);
     gtk_window_set_title(GTK_WINDOW(bsmsg->window), title);
     g_free(title);
@@ -7292,6 +7305,9 @@ sendmsg_window_forward(LibBalsaMailbox *mailbox, guint msgno, SendType send_type
                                            _("Attaching message failed.\n"
                                              "Possible reason: not enough temporary space"));
             }
+            bsmsg->parent_message = message;
+            libbalsa_mailbox_open(libbalsa_message_get_mailbox(message), NULL);
+            sendmsg_window_set_title(bsmsg);
 
             break;
 

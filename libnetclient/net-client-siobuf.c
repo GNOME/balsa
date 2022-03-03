@@ -45,16 +45,12 @@ net_client_siobuf_new(const gchar *host, guint16 port)
 	g_return_val_if_fail(host != NULL, NULL);
 
 	client = NET_CLIENT_SIOBUF(g_object_new(NET_CLIENT_SIOBUF_TYPE, NULL));
-	if (client != NULL) {
-		if (!net_client_configure(NET_CLIENT(client), host, port, 0, NULL)) {
-			g_object_unref(client);
-			client = NULL;
-		} else {
-			client->buffer = g_string_sized_new(1024U);
-			client->read_ptr = NULL;
-			client->writebuf = g_string_sized_new(1024U);
-		}
+	if (!net_client_configure(NET_CLIENT(client), host, port, 0, NULL)) {
+		g_assert_not_reached();
 	}
+	client->buffer = g_string_sized_new(1024U);
+	client->read_ptr = NULL;
+	client->writebuf = g_string_sized_new(1024U);
 
 	return client;
 }

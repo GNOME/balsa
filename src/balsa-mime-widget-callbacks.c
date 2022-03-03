@@ -118,13 +118,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     /* get the file name */
     file_uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(save_dialog));
     gtk_widget_destroy(save_dialog);
-    if (!(save_file = libbalsa_vfs_new_from_uri(file_uri))) {
-        balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Could not construct URI from %s"),
-                          file_uri);
-        g_free(file_uri);
-	return;
-    }
+    save_file = libbalsa_vfs_new_from_uri(file_uri);
 
     /* remember the folder uri */
     g_free(balsa_app.save_dir);
@@ -151,11 +145,33 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 			      _("Could not save %s: %s"),
 			      file_uri, err ? err->message : _("Unknown error"));
             g_clear_error(&err);
+        } else {
+        	balsa_mime_widget_view_save_dir(parent_widget);
         }
     }
 
     g_object_unref(save_file);
     g_free(file_uri);
+}
+
+void
+balsa_mime_widget_view_save_dir(GtkWidget *widget)
+{
+	GAppInfo *app_info;
+
+	app_info = (GAppInfo *) g_object_get_data(G_OBJECT(widget), BALSA_MIME_WIDGET_CB_APPINFO);
+	if (app_info != NULL) {
+		GList *list;
+		GError *error = NULL;
+
+		list = g_list_prepend(NULL, balsa_app.save_dir);
+		if (!g_app_info_launch_uris(app_info, list, NULL, &error)) {
+			balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not open folder %s: %s"),
+				balsa_app.save_dir, error ? error->message : _("Unknown error"));
+			g_clear_error(&error);
+		}
+		g_list_free(list);
+	}
 }
 
 static void

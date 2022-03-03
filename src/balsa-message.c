@@ -904,6 +904,22 @@ collect_selected_info(GtkTreeModel * model, GtkTreePath * path,
 }
 
 static void
+add_save_view_menu_item(GtkWidget *menu, const gchar *label, GCallback callback, gpointer user_data)
+{
+	GAppInfo *app_info;
+
+	app_info = g_app_info_get_default_for_type("inode/directory", FALSE);
+	if (app_info != NULL) {
+		GtkWidget *menu_item;
+
+		menu_item = gtk_menu_item_new_with_label(label);
+		g_object_set_data_full(G_OBJECT(menu_item), BALSA_MIME_WIDGET_CB_APPINFO, app_info, g_object_unref);
+		g_signal_connect(menu_item, "activate", callback, user_data);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+	}
+}
+
+static void
 tree_mult_selection_popup(BalsaMessage     *balsa_message,
                           const GdkEvent   *event,
                           GtkTreeSelection *selection)
@@ -947,18 +963,19 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
         g_object_ref_sink(balsa_message->save_all_popup);
         menu_item =
             gtk_menu_item_new_with_label (_("Save selected as…"));
-        gtk_widget_show(menu_item);
         g_signal_connect (menu_item, "activate",
                           G_CALLBACK (part_context_save_all_cb),
                           (gpointer) balsa_message->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (balsa_message->save_all_popup), menu_item);
         menu_item =
             gtk_menu_item_new_with_label (_("Save selected to folder…"));
-        gtk_widget_show(menu_item);
         g_signal_connect (menu_item, "activate",
                           G_CALLBACK (part_context_dump_all_cb),
                           (gpointer) balsa_message->save_all_list);
         gtk_menu_shell_append (GTK_MENU_SHELL (balsa_message->save_all_popup), menu_item);
+        add_save_view_menu_item(balsa_message->save_all_popup, _("Save selected to folder and browse…"),
+        	G_CALLBACK(part_context_dump_all_cb), balsa_message->save_all_list);
+        gtk_widget_show_all(balsa_message->save_all_popup);
         if (event != NULL) {
             gtk_menu_popup_at_pointer(GTK_MENU(balsa_message->save_all_popup), event);
         } else {
@@ -1660,6 +1677,9 @@ part_create_menu (BalsaPartInfo* info)
                                   G_CALLBACK(balsa_message_copy_part),
                                   info->body);
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), submenu);
+    } else {
+    	add_save_view_menu_item(info->popup_menu, _("Save and open folder…"),
+    		G_CALLBACK(balsa_mime_widget_ctx_menu_save), info->body);
     }
 
     gtk_widget_show_all (info->popup_menu);
@@ -1754,10 +1774,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
         LibbalsaVfs * dir_uri;
 
         g_debug("store to URI: %s", dir_name);
-        if (!(dir_uri = libbalsa_vfs_new_from_uri(dir_name)))
-            balsa_information(LIBBALSA_INFORMATION_ERROR,
-                              _("Could not create URI for %s"),
-                              dir_name);
+        dir_uri = libbalsa_vfs_new_from_uri(dir_name);
 
 	/* remember the folder */
 	g_free(balsa_app.save_dir);
@@ -1765,7 +1782,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 
 	/* save all parts without further user interaction */
 	info_list = g_list_first(info_list);
-	while (dir_uri && info_list) {
+	while (info_list) {
 	    BalsaPartInfo *info = BALSA_PART_INFO(info_list->data);
             LibbalsaVfs * save_uri;
 	    gboolean result;
@@ -1822,6 +1839,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 	    g_object_unref(save_uri);
 	    info_list = g_list_next(info_list);
 	}
+	balsa_mime_widget_view_save_dir(menu_item);
 	g_object_unref(dir_uri);
     }
     gtk_widget_destroy(dump_dialog);

@@ -83,14 +83,10 @@ net_client_smtp_new(const gchar *host, guint16 port, NetClientCryptMode crypt_mo
 		NULL);
 
 	client = NET_CLIENT_SMTP(g_object_new(NET_CLIENT_SMTP_TYPE, NULL));
-	if (client != NULL) {
-		if (!net_client_configure(NET_CLIENT(client), host, port, MAX_SMTP_LINE_LEN, NULL)) {
-			g_object_unref(client);
-			client = NULL;
-		} else {
-			client->crypt_mode = crypt_mode;
-		}
+	if (!net_client_configure(NET_CLIENT(client), host, port, MAX_SMTP_LINE_LEN, NULL)) {
+		g_assert_not_reached();
 	}
+	client->crypt_mode = crypt_mode;
 
 	return client;
 }

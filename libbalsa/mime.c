@@ -183,7 +183,7 @@ content2reply(LibBalsaMessageBody * root, gchar * reply_prefix_str,
     LibBalsaMessageBody *body;
     GString *reply = NULL, *res;
 
-    libbalsa_message_body_ref(message, FALSE, FALSE);
+    libbalsa_message_body_ref(message, FALSE);
     for (body = root; body; body = body->next) {
 	res = process_mime_part(message, body, reply_prefix_str, llen,
                                 ignore_html, flow);

@@ -712,7 +712,6 @@ libbalsa_message_reply(LibBalsaMessage *message)
  */
 gboolean
 libbalsa_message_body_ref(LibBalsaMessage *message,
-                          gboolean         read,
                           gboolean         fetch_all_headers)
 {
     LibBalsaFetchFlag flags = 0;

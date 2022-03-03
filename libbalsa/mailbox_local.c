@@ -869,7 +869,7 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
                 message = libbalsa_mailbox_get_message(mailbox, msgno);
             if (!message)
                 return FALSE;
-            is_refed = libbalsa_message_body_ref(message, FALSE, FALSE);
+            is_refed = libbalsa_message_body_ref(message, FALSE);
             if (!is_refed) {
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "

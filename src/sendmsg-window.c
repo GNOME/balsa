@@ -3481,7 +3481,7 @@ collect_for_quote(BalsaSendmsg        * bsmsg,
         return q_body;
 
     message = root->message;
-    libbalsa_message_body_ref(message, FALSE, FALSE);
+    libbalsa_message_body_ref(message, FALSE);
 
     /* scan the message and collect text parts which might be included
      * in the reply, and if there is only one return this part */
@@ -3685,7 +3685,7 @@ quote_message_body(BalsaSendmsg * bsmsg,
 {
     GString *res;
 
-    if (libbalsa_message_body_ref(message, FALSE, FALSE)) {
+    if (libbalsa_message_body_ref(message, FALSE)) {
         res = quote_body(bsmsg,
                          libbalsa_message_get_headers(message),
                          libbalsa_message_get_message_id(message),
@@ -4352,7 +4352,7 @@ bsm_prepare_for_setup(LibBalsaMessage *message)
         libbalsa_mailbox_open(mailbox, NULL);
     /* fill in that info:
      * ref the message so that we have all needed headers */
-    libbalsa_message_body_ref(message, TRUE, TRUE);
+    libbalsa_message_body_ref(message, TRUE);
     /* scan the message for encrypted parts - this is only possible if
        there is *no* other ref to it */
     balsa_message_perform_crypto(message, LB_MAILBOX_CHK_CRYPT_NEVER,

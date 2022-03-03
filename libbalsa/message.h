@@ -199,7 +199,7 @@ void libbalsa_message_reply(LibBalsaMessage * message);
 void libbalsa_message_append_part(LibBalsaMessage * message,
 				  LibBalsaMessageBody * body);
 
-gboolean libbalsa_message_body_ref(LibBalsaMessage * message, gboolean read,
+gboolean libbalsa_message_body_ref(LibBalsaMessage * message,
                                    gboolean fetch_all_headers);
 void libbalsa_message_body_unref(LibBalsaMessage * message);
 

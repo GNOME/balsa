@@ -683,7 +683,7 @@ lbs_process_queue_msg(guint 		   msgno,
 	}
 
 	/* check the smtp server */
-	libbalsa_message_body_ref(msg, TRUE, TRUE);
+	libbalsa_message_body_ref(msg, TRUE);
 	smtp_server_name = libbalsa_message_get_user_header(msg, "X-Balsa-SmtpServer");
 	if (!smtp_server_name) {
 		smtp_server_name = libbalsa_smtp_server_get_name(NULL);

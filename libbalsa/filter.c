@@ -121,7 +121,7 @@ libbalsa_condition_matches(LibBalsaCondition* cond,
              CONDITION_CHKMATCH(cond,CONDITION_MATCH_BODY));
         if(will_ref) {
             gboolean is_refed =
-                libbalsa_message_body_ref(message, FALSE, FALSE);
+                libbalsa_message_body_ref(message, FALSE);
             if (!is_refed) {
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR,
                                      _("Unable to load message body to "

@@ -1122,7 +1122,7 @@ balsa_message_set(BalsaMessage * balsa_message, LibBalsaMailbox * mailbox, guint
     }
 
     is_new = LIBBALSA_MESSAGE_IS_UNREAD(message);
-    if(!libbalsa_message_body_ref(message, TRUE, TRUE)) {
+    if(!libbalsa_message_body_ref(message, TRUE)) {
 	libbalsa_mailbox_check(mailbox);
         g_object_unref(balsa_message->message);
         balsa_message->message = NULL;
@@ -3220,7 +3220,7 @@ balsa_message_recheck_crypto(BalsaMessage *balsa_message)
     select_part(balsa_message, NULL);
     bm_clear_tree(balsa_message);
 
-    if (!libbalsa_message_body_ref(message, TRUE, TRUE)) {
+    if (!libbalsa_message_body_ref(message, TRUE)) {
 	g_object_unref(message);
         return;
     }

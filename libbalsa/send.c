@@ -1531,7 +1531,6 @@ create_mime_message(LibBalsaMessage *message,
 gboolean
 libbalsa_message_postpone(LibBalsaMessage *message,
                           LibBalsaMailbox *draftbox,
-                          LibBalsaMessage *reply_message,
                           gchar          **extra_headers,
                           gboolean         flow,
                           GError         **error)

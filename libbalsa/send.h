@@ -43,7 +43,6 @@ enum _LibBalsaMsgCreateResult {
 
 gboolean libbalsa_message_postpone(LibBalsaMessage * message,
 				   LibBalsaMailbox * draftbox,
-				   LibBalsaMessage * reply_message,
 				   gchar ** extra_headers,
 				   gboolean flow, 
 				   GError **error);

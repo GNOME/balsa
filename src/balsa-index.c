@@ -1987,6 +1987,8 @@ bndx_popup_menu_create(BalsaIndex * index)
                 G_CALLBACK(balsa_message_replytogroup)}, {
         BALSA_PIXMAP_FORWARD, N_("_Forward Attached…"),
                 G_CALLBACK(balsa_message_forward_attached)}, {
+        BALSA_PIXMAP_FORWARD, N_("_Resend…"),
+                G_CALLBACK(balsa_message_resend)}, {
         BALSA_PIXMAP_FORWARD, N_("Forward _Inline…"),
                 G_CALLBACK(balsa_message_forward_inline)}, {
         NULL,                 N_("_Pipe through…"),

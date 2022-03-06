@@ -1029,23 +1029,14 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
             headers->date = g_date_time_to_unix(datetime);
     }
 
-    if (headers->to_list == NULL)
+    if (headers->to_list == NULL) {
         headers->to_list =
             lb_message_recipients(mime_msg, GMIME_ADDRESS_TYPE_TO);
+    }
 
     if (headers->content_type == NULL) {
-        /* If we could:
-         * headers->content_type =
-         *     g_mime_content_type_copy
-         *         (g_mime_object_get_content_type(mime_msg->mime_part));
-         */
-        GMimeContentType *content_type;
-        gchar *str;
-
-        content_type = g_mime_object_get_content_type(mime_msg->mime_part);
-        str = g_mime_content_type_get_mime_type(content_type);
-        headers->content_type = g_mime_content_type_parse(libbalsa_parser_options(), str);
-        g_free(str);
+        g_set_object(&headers->content_type,
+                     g_mime_object_get_content_type(mime_msg->mime_part));
     }
 }
 

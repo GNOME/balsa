@@ -727,7 +727,7 @@ lbs_process_queue_msg(guint 		   msgno,
 	} else {
                 gboolean request_dsn;
                 LibBalsaMessageHeaders *headers;
-                InternetAddressList *from;
+                InternetAddressList *from = NULL;
 		const InternetAddress* ia;
 		const gchar* mailbox;
 		const gchar* resent_from;
@@ -745,13 +745,10 @@ lbs_process_queue_msg(guint 		   msgno,
 		/* Add the sender info */
                 resent_from = libbalsa_message_get_user_header(msg, "Resent-From");
 		headers = libbalsa_message_get_headers(msg);
-                if (resent_from != NULL) {
+                if (resent_from != NULL)
                     from = internet_address_list_parse(libbalsa_parser_options(), resent_from);
-                } else {
-                    from = headers->from;
-                    if (from != NULL)
-                        g_object_ref(from);
-                }
+                else
+                    g_set_object(&from, headers->from);
 
 		if (from != NULL &&
                     (ia = internet_address_list_get_address(from, 0)) != NULL) {
@@ -766,8 +763,7 @@ lbs_process_queue_msg(guint 		   msgno,
 
 		net_client_smtp_msg_set_sender(new_message->smtp_msg, mailbox);
 
-                if (from != NULL)
-                    g_object_unref(from);
+                g_set_object(&from, NULL);
 
 		/* Now need to add the recipients to the message. */
                 if (resent_from != NULL) {

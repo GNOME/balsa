@@ -153,8 +153,10 @@ libbalsa_icon_finder(GtkWidget         * widget,
         pixbuf = libbalsa_default_attachment_pixbuf(width);
     }
 
-    if (used_type)
+    if (used_type) {
+        g_free(*used_type);
         *used_type = g_strdup(content_type);
+    }
 
     return pixbuf;
 }

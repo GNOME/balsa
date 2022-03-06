@@ -640,8 +640,10 @@ extract_data(xmlNodePtr entry, gchar ** first_name, gchar ** last_name,
     }
 
     /* construct first name */
-    if (title)
+    if (title) {
 	_first_name = g_string_new(title);
+        g_free(title);
+    }
 
     if (prefix) {
 	if (_first_name) {
@@ -649,6 +651,7 @@ extract_data(xmlNodePtr entry, gchar ** first_name, gchar ** last_name,
 	    _first_name = g_string_append(_first_name, prefix);
 	} else
 	    _first_name = g_string_new(prefix);
+        g_free(prefix);
     }
 
     if (first) {
@@ -657,6 +660,7 @@ extract_data(xmlNodePtr entry, gchar ** first_name, gchar ** last_name,
 	    _first_name = g_string_append(_first_name, first);
 	} else
 	    _first_name = g_string_new(first);
+        g_free(first);
     }
 
     if (middle) {
@@ -665,6 +669,7 @@ extract_data(xmlNodePtr entry, gchar ** first_name, gchar ** last_name,
 	    _first_name = g_string_append(_first_name, middle);
 	} else
 	    _first_name = g_string_new(middle);
+        g_free(middle);
     }
 
     if (_first_name)

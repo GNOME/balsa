@@ -1005,6 +1005,7 @@ balsa_send_message_syslog(const gchar            *smtp_server,
 		syslog(LOG_MAIL | LOG_NOTICE, "%s Error='%s'", syslog_msg->str,
 				(server_error != NULL) ? server_error->message : "unknown");
 	}
+        g_string_free(syslog_msg, TRUE);
 }
 
 static gpointer

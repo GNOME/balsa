@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-03-03 20:23+0000\n"
-"PO-Revision-Date: 2022-03-03 21:48+0100\n"
+"POT-Creation-Date: 2022-03-03 20:49+0000\n"
+"PO-Revision-Date: 2022-03-12 12:47+0100\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -7654,7 +7654,7 @@ msgstr "Skicka och ta _emot post"
 
 #: ../ui/main-window.ui.h:13 ../ui/message-window.ui.h:2
 msgid "Page _Setup"
-msgstr "Sid_konfiguration"
+msgstr "Sid_inställning"
 
 #: ../ui/main-window.ui.h:14 ../ui/message-window.ui.h:3
 #: ../ui/sendmsg-window.ui.h:11
@@ -7939,7 +7939,7 @@ msgstr "_Spara"
 
 #: ../ui/sendmsg-window.ui.h:10
 msgid "Page S_etup"
-msgstr "Sid_konfiguration"
+msgstr "Si_dinställning"
 
 #: ../ui/sendmsg-window.ui.h:16
 msgid "Cu_t"

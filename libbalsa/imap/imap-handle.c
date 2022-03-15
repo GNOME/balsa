@@ -2293,6 +2293,7 @@ ir_ok(ImapMboxHandle *h)
   if(rc == IMR_PARSE)
     rc = IMR_OK;
   else if (rc != IMR_SEVERED && (l=strlen(line))>0 ) {
+    l = MAX(l, 2);
     line[l-2] = '\0'; 
     imap_mbox_handle_set_msg(h, _("IMAP response: %s"), line);
     if(h->info_cb)

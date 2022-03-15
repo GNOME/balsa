@@ -2325,9 +2325,9 @@ libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
 {
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     ImapResponse rc;
-    glong msgno;
+    guint msgno;
 
-    msgno = libbalsa_message_get_msgno(message);
+    msgno = (guint) libbalsa_message_get_msgno(message);
     /* If message numbers are out of sync with the mail store,
      * just skip the message: */
     if (msgno > imap_mbox_handle_get_exists(mimap->handle))

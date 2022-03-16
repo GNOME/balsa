@@ -2256,7 +2256,7 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     LibBalsaServer *server;
     LibBalsaMessageHeaders *headers;
-    glong msgno;
+    guint msgno;
     ImapFetchType ift = 0;
 
     g_return_val_if_fail(mimap->opened, FALSE);
@@ -2327,7 +2327,7 @@ libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
     ImapResponse rc;
     guint msgno;
 
-    msgno = (guint) libbalsa_message_get_msgno(message);
+    msgno = libbalsa_message_get_msgno(message);
     /* If message numbers are out of sync with the mail store,
      * just skip the message: */
     if (msgno > imap_mbox_handle_get_exists(mimap->handle))
@@ -2473,7 +2473,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * message,
     LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
     FILE *fp;
     gchar *section;
-    glong msgno = libbalsa_message_get_msgno(message);
+    guint msgno = libbalsa_message_get_msgno(message);
     ImapMessage *imsg = mi_get_imsg(mimap, msgno);
 
     if (imsg == NULL) {
@@ -2538,7 +2538,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * message,
                                        section, FALSE, ifbo, append_str, &dt));
         libbalsa_unlock_mailbox(mailbox);
         if(rc != IMR_OK) {
-            g_debug("Error fetching imap message no %ld section %s",
+            g_debug("Error fetching imap message no %u section %s",
                     msgno, section);
             g_set_error(err,
                         LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,

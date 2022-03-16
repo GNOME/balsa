@@ -300,7 +300,7 @@ LibBalsaMessageBody    *libbalsa_message_get_body_list(LibBalsaMessage *message)
 GMimeMessage           *libbalsa_message_get_mime_message(LibBalsaMessage *message);
 LibBalsaMessageFlag     libbalsa_message_get_flags(LibBalsaMessage *message);
 const gchar            *libbalsa_message_get_message_id(LibBalsaMessage *message);
-glong                   libbalsa_message_get_msgno(LibBalsaMessage *message);
+guint                   libbalsa_message_get_msgno(LibBalsaMessage *message);
 glong                   libbalsa_message_get_length(LibBalsaMessage *message);
 gboolean                libbalsa_message_get_has_all_headers(LibBalsaMessage *message);
 InternetAddressList    *libbalsa_message_get_sender(LibBalsaMessage *message);
@@ -324,7 +324,7 @@ void libbalsa_message_set_flags(LibBalsaMessage    *message,
 void libbalsa_message_set_mailbox(LibBalsaMessage *message,
                                   LibBalsaMailbox *mailbox);
 void libbalsa_message_set_msgno(LibBalsaMessage *message,
-                                glong            msgno);
+                                guint            msgno);
 void libbalsa_message_set_has_all_headers(LibBalsaMessage *message,
                                           gboolean         has_all_headers);
 

@@ -114,7 +114,7 @@ struct _LibBalsaMessage {
     guint body_ref;
     LibBalsaMessageBody *body_list;
 
-    glong msgno;     /* message no; always copy for faster sorting;
+    guint msgno;     /* message no; always copy for faster sorting;
                       * counting starts at 1. */
 #if MESSAGE_COPY_CONTENT
     glong length;   /* byte len */
@@ -1584,7 +1584,7 @@ libbalsa_message_get_message_id(LibBalsaMessage *message)
 }
 
 
-glong
+guint
 libbalsa_message_get_msgno(LibBalsaMessage *message)
 {
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), 0);
@@ -1747,7 +1747,7 @@ libbalsa_message_set_mailbox(LibBalsaMessage *message,
 
 void
 libbalsa_message_set_msgno(LibBalsaMessage *message,
-                           glong            msgno)
+                           guint            msgno)
 {
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 

@@ -61,12 +61,8 @@ struct _LibBalsaMessage {
     /* the mailbox this message belongs to */
     LibBalsaMailbox *mailbox;
 
-    /* flags */
-    LibBalsaMessageFlag flags;
-
     /* headers */
     LibBalsaMessageHeaders *headers;
-    int updated; /** whether complete headers have been fetched */
 
     GMimeMessage *mime_msg;
 
@@ -100,9 +96,6 @@ struct _LibBalsaMessage {
     /* sender identity, required for choosing a forced GnuPG or S/MIME key */
     LibBalsaIdentity *ident;
 
-    /* request a DSN (sending) */
-    gboolean request_dsn;
-
     /* a forced multipart subtype or NULL for mixed; used only for
      * sending */
     gchar *subtype;
@@ -110,9 +103,15 @@ struct _LibBalsaMessage {
     /* additional message content type parameters; used only for sending */
     GList *parameters;
 
+    gchar *tempdir;     /* to hold named parts */
+
     /* message body */
-    guint body_ref;
     LibBalsaMessageBody *body_list;
+    /* end of pointers, begin ints */
+    guint body_ref;
+
+    /* flags */
+    LibBalsaMessageFlag flags;
 
     guint msgno;     /* message no; always copy for faster sorting;
                       * counting starts at 1. */
@@ -120,9 +119,20 @@ struct _LibBalsaMessage {
     glong length;   /* byte len */
 #endif /* MESSAGE_COPY_CONTENT */
 
-    gchar *tempdir;     /* to hold named parts */
+    /* GPG sign and/or encrypt message (sending) */
+    guint gpg_mode;
 
+    /* protection (i.e. sign/encrypt) status (received message) */
+    LibBalsaMsgProtectState prot_state;
+
+    /* end of ints, begin bit fields */
     unsigned has_all_headers : 1;
+
+    /* attach the GnuPG public key to the message (sending) */
+    unsigned att_pubkey : 1;
+
+    /* request a DSN (sending) */
+    unsigned request_dsn : 1;
 };
 
 G_DEFINE_TYPE(LibBalsaMessage,
@@ -133,20 +143,27 @@ static void
 libbalsa_message_init(LibBalsaMessage * message)
 {
     message->headers = g_new0(LibBalsaMessageHeaders, 1);
-    message->flags = 0;
     message->mailbox = NULL;
     message->sender = NULL;
     message->subj = NULL;
     message->references = NULL;
     message->in_reply_to = NULL;
     message->message_id = NULL;
-    message->subtype = 0;
+    message->subtype = NULL;
     message->parameters = NULL;
     message->body_ref = 0;
     message->body_list = NULL;
     message->has_all_headers = 0;
     message->crypt_mode = LIBBALSA_PROTECT_NONE;
     message->ident = NULL;
+    message->body_list = NULL;
+    message->body_ref = 0;
+    message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
+    message->flags = LIBBALSA_MESSAGE_FLAG_NONE;
+    message->gpg_mode = 0;
+    message->has_all_headers = 0;
+    message->att_pubkey = 0;
+    message->request_dsn = 0;
 }
 
 
@@ -725,7 +742,7 @@ libbalsa_message_body_ref(LibBalsaMessage *message,
 
     libbalsa_lock_mailbox(message->mailbox);
 
-    if (fetch_all_headers && !message->has_all_headers)
+    if (fetch_all_headers && message->has_all_headers == 0)
         flags |= LB_FETCH_RFC822_HEADERS;
 
     if ((message->body_ref == 0) && !message->body_list) {
@@ -1607,7 +1624,7 @@ libbalsa_message_get_has_all_headers(LibBalsaMessage *message)
 {
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    return message->has_all_headers;
+    return message->has_all_headers != 0;
 }
 
 
@@ -1625,7 +1642,7 @@ libbalsa_message_get_request_dsn(LibBalsaMessage *message)
 {
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    return message->request_dsn;
+    return message->request_dsn != 0;
 }
 
 
@@ -1698,7 +1715,7 @@ libbalsa_message_get_attach_pubkey(LibBalsaMessage *message)
 {
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    return message->att_pubkey;
+    return message->att_pubkey != 0;
 }
 
 
@@ -1761,7 +1778,7 @@ libbalsa_message_set_has_all_headers(LibBalsaMessage *message,
 {
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    message->has_all_headers = has_all_headers;
+    message->has_all_headers = has_all_headers ? 1 : 0;
 }
 
 
@@ -1817,7 +1834,7 @@ libbalsa_message_set_request_dsn(LibBalsaMessage *message,
 {
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    message->request_dsn = request_dsn;
+    message->request_dsn = request_dsn ? 1 : 0;
 }
 
 
@@ -1888,11 +1905,11 @@ libbalsa_message_set_always_trust(LibBalsaMessage *message,
 
 void
 libbalsa_message_set_attach_pubkey(LibBalsaMessage *message,
-                                gboolean         att_pubkey)
+                                   gboolean         att_pubkey)
 {
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    message->att_pubkey = att_pubkey;
+    message->att_pubkey = att_pubkey ? 1 : 0;
 }
 
 

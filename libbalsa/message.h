@@ -33,8 +33,6 @@
 
 #include "rfc3156.h"
 
-#define MESSAGE_COPY_CONTENT 1
-
 #define LIBBALSA_TYPE_MESSAGE libbalsa_message_get_type()
 
 G_DECLARE_FINAL_TYPE(LibBalsaMessage,
@@ -262,10 +260,6 @@ void libbalsa_message_set_subject_from_header(LibBalsaMessage * message,
    function out if we find a way.
 */
 const gchar* libbalsa_message_get_subject(LibBalsaMessage* message);
-#ifndef MESSAGE_COPY_CONTENT
-guint libbalsa_message_get_lines(LibBalsaMessage* msg);
-glong libbalsa_message_get_length(LibBalsaMessage* msg);
-#endif /* !MESSAGE_COPY_CONTENT */
 glong libbalsa_message_get_no(LibBalsaMessage* msg);
 LibBalsaMessageAttach libbalsa_message_get_attach_icon(LibBalsaMessage *
 						       message);
@@ -328,13 +322,8 @@ void libbalsa_message_set_msgno(LibBalsaMessage *message,
                                 guint            msgno);
 void libbalsa_message_set_has_all_headers(LibBalsaMessage *message,
                                           gboolean         has_all_headers);
-
-#if MESSAGE_COPY_CONTENT
 void libbalsa_message_set_length(LibBalsaMessage *message,
                                  glong            length);
-
-#endif /* MESSAGE_COPY_CONTENT */
-
 void libbalsa_message_set_mime_message(LibBalsaMessage *message,
                                    GMimeMessage    *mime_message);
 void libbalsa_message_set_sender(LibBalsaMessage     *message,

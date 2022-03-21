@@ -26,6 +26,7 @@
    - Lack of inline functions in C increases program complexity. This cost
    can be accepted.
    - thorough analysis of memory usage is needed.
+   2022-03-21: All code conditional on MESSAGE_COPY_CONTENT is removed.
  */
 
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
@@ -115,9 +116,7 @@ struct _LibBalsaMessage {
 
     guint msgno;     /* message no; always copy for faster sorting;
                       * counting starts at 1. */
-#if MESSAGE_COPY_CONTENT
     glong length;   /* byte len */
-#endif /* MESSAGE_COPY_CONTENT */
 
     /* GPG sign and/or encrypt message (sending) */
     guint gpg_mode;
@@ -216,9 +215,7 @@ libbalsa_message_finalize(GObject * object)
 
     g_free(message->message_id);
     g_free(message->subtype);
-#if MESSAGE_COPY_CONTENT
     g_free(message->subj);
-#endif /* MESSAGE_COPY_CONTENT */
 
     libbalsa_message_body_free(message->body_list);
 
@@ -950,64 +947,11 @@ libbalsa_message_set_dispnotify(LibBalsaMessage * message,
 /* libbalsa_message_get_subject:
    get constant pointer to the subject of the message; 
 */
-#ifdef MESSAGE_COPY_CONTENT
 const gchar *
 libbalsa_message_get_subject(LibBalsaMessage *message)
 {
     return message->subj != NULL ? message->subj : _("(No subject)");
 }
-
-
-#else /* MESSAGE_COPY_CONTENT */
-const gchar *
-libbalsa_message_get_subject(LibBalsaMessage* msg)
-{
-    const gchar *ret;
-    if(msg->subj == NULL &&
-       msg->mime_msg != NULL && msg->mailbox != NULL) { /* a message in a mailbox... */
-        g_return_val_if_fail(MAILBOX_OPEN(msg->mailbox), NULL);
-        ret = g_mime_message_get_subject(msg->mime_msg);
-        libbalsa_message_set_subject_from_header(msg, ret);
-    } else
-	ret = msg->subj;
-
-    return ret ? ret : _("(No subject)");
-}
-
-
-guint
-libbalsa_message_get_lines(LibBalsaMessage* msg)
-{
-    /* set the line count */
-    const char *value;
-    if (msg->mime_msg == NULL)
-	return 0;
-    value = g_mime_object_get_header(msg->mime_msg, "Lines");
-    if (value == NULL)
-	return 0;
-    return atoi(value);
-}
-glong
-libbalsa_message_get_length(LibBalsaMessage* msg)
-{
-    /* set the length */
-    const char *value;
-    if (msg->mime_msg == NULL)
-	return 0;
-    value = g_mime_object_get_header(msg->mime_msg, "Content-Length");
-    if (value == NULL)
-	return 0;
-    return atoi(value);
-}
-
-glong
-libbalsa_message_get_no(LibBalsaMessage* msg)
-{
-    return msg->msgno;
-}
-
-
-#endif /* MESSAGE_COPY_CONTENT */
 
 /* Populate headers from mime_msg, but only the members that are needed
  * all the time. */
@@ -1130,7 +1074,6 @@ libbalsa_message_init_from_gmime(LibBalsaMessage * message,
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
     g_return_if_fail(GMIME_IS_MESSAGE(mime_msg));
 
-#ifdef MESSAGE_COPY_CONTENT
     header = g_mime_message_get_subject(mime_msg);
     libbalsa_message_set_subject_from_header(message, header);
 
@@ -1138,7 +1081,6 @@ libbalsa_message_init_from_gmime(LibBalsaMessage * message,
     if (header)
         message->length = atoi(header);
 
-#endif /* MESSAGE_COPY_CONTENT */
     header = g_mime_message_get_message_id(mime_msg);
     if (header)
         message->message_id = g_strdup(header);
@@ -1276,9 +1218,7 @@ lbmsg_set_header(LibBalsaMessage *message,
             g_free(val);
             return FALSE;
         }
-#if MESSAGE_COPY_CONTENT
         libbalsa_message_set_subject_from_header(message, value);
-#endif /* MESSAGE_COPY_CONTENT */
     } else if (g_ascii_strcasecmp(name, "Date") == 0) {
         GDateTime *datetime;
 
@@ -1307,11 +1247,9 @@ lbmsg_set_header(LibBalsaMessage *message,
                (g_ascii_strcasecmp(name, "Disposition-Notification-To") == 0)) {
         headers->dispnotify_to = internet_address_list_parse(libbalsa_parser_options(), value);
     } else
-#ifdef MESSAGE_COPY_CONTENT
     if (g_ascii_strcasecmp(name, "Content-Length") == 0) {
         message->length = atoi(value);
     } else
-#endif /* MESSAGE_COPY_CONTENT */
     if (all) {
         headers->user_hdrs =
             g_list_prepend(headers->user_hdrs,
@@ -1782,7 +1720,6 @@ libbalsa_message_set_has_all_headers(LibBalsaMessage *message,
 }
 
 
-#if MESSAGE_COPY_CONTENT
 void
 libbalsa_message_set_length(LibBalsaMessage *message,
                             glong            length)
@@ -1792,8 +1729,6 @@ libbalsa_message_set_length(LibBalsaMessage *message,
     message->length = length;
 }
 
-
-#endif /* MESSAGE_COPY_CONTENT */
 
 void
 libbalsa_message_set_mime_message(LibBalsaMessage *message,

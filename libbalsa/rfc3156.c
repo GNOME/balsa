@@ -56,27 +56,6 @@ static gboolean have_pub_key_for(gpgme_ctx_t gpgme_ctx,
 
 
 /* ==== public functions =================================================== */
-static gboolean
-body_is_type(LibBalsaMessageBody * body, const gchar * type,
-	     const gchar * sub_type)
-{
-    gboolean retval;
-
-    if (body->mime_part) {
-	GMimeContentType *content_type =
-	    g_mime_object_get_content_type(body->mime_part);
-	retval = g_mime_content_type_is_type(content_type, type, sub_type);
-    } else {
-	GMimeContentType *content_type =
-	    g_mime_content_type_parse(libbalsa_parser_options(), body->content_type);
-	retval = g_mime_content_type_is_type(content_type, type, sub_type);
-	g_object_unref(content_type);
-    }
-
-    return retval;
-}
-
-
 /* return TRUE if we can encrypt for every recipient in the recipients list
  * using protocol */
 gboolean
@@ -102,82 +81,6 @@ libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
     	/* loop over all recipients and try to find valid keys */
     	result = have_pub_key_for(gpgme_ctx, recipients);
     	gpgme_release(gpgme_ctx);
-    }
-
-    return result;
-}
-
-
-/*
- * Check if body (and eventually its subparts) are RFC 2633 or RFC 3156 signed
- * or encrypted.
- */
-gint
-libbalsa_message_body_protection(LibBalsaMessageBody * body)
-{
-    gint result = 0;
-
-    g_return_val_if_fail(body != NULL, 0);
-    g_return_val_if_fail(body->content_type != NULL, 0);
-
-    if (body_is_type(body, "multipart", "signed")) {
-	gchar *protocol =
-	    libbalsa_message_body_get_parameter(body, "protocol");
-	gchar *micalg =
-	    libbalsa_message_body_get_parameter(body, "micalg");
-
-	result = LIBBALSA_PROTECT_SIGN;
-	if (protocol && body->parts && body->parts->next) {
-	    if ((!g_ascii_strcasecmp("application/pkcs7-signature",
-				     protocol)
-		 && body_is_type(body->parts->next, "application", 
-				 "pkcs7-signature")) ||
-		(!g_ascii_strcasecmp("application/x-pkcs7-signature",
-				     protocol)
-		 && body_is_type(body->parts->next, "application",
-				 "x-pkcs7-signature"))) {
-		result |= LIBBALSA_PROTECT_SMIMEV3;
-		if (!micalg)
-		    result |= LIBBALSA_PROTECT_ERROR;
-	    } else
-		if (!g_ascii_strcasecmp
-		    ("application/pgp-signature", protocol)
-		    && body_is_type(body->parts->next, "application",
-				    "pgp-signature")) {
-		result |= LIBBALSA_PROTECT_RFC3156;
-		if (!micalg || g_ascii_strncasecmp("pgp-", micalg, 4))
-		    result |= LIBBALSA_PROTECT_ERROR;
-	    } else
-		result |= LIBBALSA_PROTECT_ERROR;
-	} else
-	    result |= LIBBALSA_PROTECT_ERROR;
-	g_free(micalg);
-	g_free(protocol);
-    } else if (body_is_type(body, "multipart", "encrypted")) {
-	gchar *protocol =
-	    libbalsa_message_body_get_parameter(body, "protocol");
-
-	result = LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_RFC3156;
-	if (!protocol ||
-	    g_ascii_strcasecmp("application/pgp-encrypted", protocol) ||
-	    !body->parts || !body->parts->next ||
-	    !body_is_type(body->parts, "application", "pgp-encrypted") ||
-	    !body_is_type(body->parts->next, "application",
-			  "octet-stream"))
-	    result |= LIBBALSA_PROTECT_ERROR;
-	g_free(protocol);
-    } else if (body_is_type(body, "application", "pkcs7-mime") ||
-	    body_is_type(body, "application", "x-pkcs7-mime")) {
-	gchar *smime_type =
-	    libbalsa_message_body_get_parameter(body, "smime-type");
-
-	result = LIBBALSA_PROTECT_SMIMEV3;
-	if (!g_ascii_strcasecmp("enveloped-data", smime_type) ||
-	    !g_ascii_strcasecmp("signed-data", smime_type))
-	    result |= LIBBALSA_PROTECT_ENCRYPT;
-	else
-	    result |= LIBBALSA_PROTECT_ERROR;
-	g_free(smime_type);
     }
 
     return result;
@@ -457,7 +360,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     	body->was_encrypted = smime_encrypted;
     }
     if (body->was_encrypted)
-        libbalsa_message_set_protect_state(body->message, LIBBALSA_MSG_PROTECT_CRYPT);
+        libbalsa_message_set_crypt_mode(body->message, LIBBALSA_PROTECT_ENCRYPT);
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
     if (sig_state) {

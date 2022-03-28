@@ -118,7 +118,7 @@ gboolean libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
 gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
                                               GError **err);
 
-gchar *libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
+gchar *libbalsa_message_body_get_parameter(const LibBalsaMessageBody * body,
 					   const gchar * param);
 gchar *libbalsa_message_body_get_mime_type(LibBalsaMessageBody * body);
 
@@ -132,7 +132,8 @@ LibBalsaMessageBody *libbalsa_message_body_get_by_id(LibBalsaMessageBody *
                                                      const gchar * id);
 LibBalsaMessageBody *libbalsa_message_body_mp_related_root(LibBalsaMessageBody *body);
 
-LibBalsaMsgProtectState libbalsa_message_body_protect_state(const LibBalsaMessageBody *body);
+guint libbalsa_message_body_protect_mode(const LibBalsaMessageBody * body);
+guint libbalsa_message_body_signature_state(const LibBalsaMessageBody *body);
 gboolean libbalsa_message_body_multipart_signed(const LibBalsaMessageBody *body);
 gboolean libbalsa_message_body_inline_signed(const LibBalsaMessageBody *body);
 gboolean libbalsa_message_body_has_crypto_content(const LibBalsaMessageBody *body);

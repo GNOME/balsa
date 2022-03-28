@@ -100,7 +100,7 @@ static void init_menus(BalsaSendmsg *);
 static void bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg);
 static void bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg *bsmsg,
                                                 LibBalsaIdentity *new_ident);
-static void bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode);
+static void bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, guint mode);
 
 #if !HAVE_GSPELL && !HAVE_GTKSPELL
 static void sw_spell_check_weak_notify(BalsaSendmsg * bsmsg);
@@ -5023,13 +5023,15 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     headers->date = time(NULL);
     if (balsa_app.has_openpgp || balsa_app.has_smime) {
-        libbalsa_message_set_gpg_mode(message,
-            (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 ? bsmsg->gpg_mode : 0);
+        libbalsa_message_set_crypt_mode(message,
+            (bsmsg->crypt_mode & LIBBALSA_PROTECT_MODE) != 0 ? bsmsg->crypt_mode : LIBBALSA_PROTECT_NONE);
         libbalsa_message_set_attach_pubkey(message, bsmsg->attach_pubkey);
+        libbalsa_message_set_always_trust(message, bsmsg->always_trust);
         libbalsa_message_set_identity(message, ident);
     } else {
-        libbalsa_message_set_gpg_mode(message, 0);
+        libbalsa_message_set_crypt_mode(message, LIBBALSA_PROTECT_NONE);
         libbalsa_message_set_attach_pubkey(message, FALSE);
+        libbalsa_message_set_always_trust(message, FALSE);
     }
 
     /* remember the parent window */
@@ -5169,7 +5171,7 @@ run_check_encrypt_dialog(BalsaSendmsg *bsmsg, const gchar *secondary_msg, gint d
 	choice = gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);
 	if (choice == GTK_RESPONSE_YES) {
-	    bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->gpg_mode | LIBBALSA_PROTECT_ENCRYPT);
+	    bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->crypt_mode | LIBBALSA_PROTECT_ENCRYPT);
 	} else if ((choice == GTK_RESPONSE_CANCEL) || (choice == GTK_RESPONSE_DELETE_EVENT)) {
 	    result = FALSE;
     } else {
@@ -5194,7 +5196,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
 	return TRUE;
 
     /* nothing to do if encryption is already enabled */
-    if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_ENCRYPT) != 0)
+    if ((bsmsg->crypt_mode & LIBBALSA_PROTECT_ENCRYPT) != 0)
 	return TRUE;
 
     /* we can not encrypt if we have bcc recipients */
@@ -5205,7 +5207,7 @@ check_suggest_encryption(BalsaSendmsg * bsmsg)
         return TRUE;
 
     /* collect all to and cc recipients */
-    protocol = (bsmsg->gpg_mode & LIBBALSA_PROTECT_SMIMEV3) ?
+    protocol = (bsmsg->crypt_mode & LIBBALSA_PROTECT_SMIME) ?
 	GPGME_PROTOCOL_CMS : GPGME_PROTOCOL_OpenPGP;
 
     ia_list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");
@@ -5278,7 +5280,7 @@ check_autocrypt_recommendation(BalsaSendmsg *bsmsg)
     }
 
     /* nothing to do if encryption is already enabled or if S/MIME mode is selected */
-    if ((bsmsg->gpg_mode & (LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_SMIMEV3)) != 0) {
+    if ((bsmsg->crypt_mode & (LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_SMIME)) != 0) {
     	return TRUE;
     }
 
@@ -5324,7 +5326,7 @@ check_autocrypt_recommendation(BalsaSendmsg *bsmsg)
     	if (((autocrypt_mode == AUTOCRYPT_ENCR_AVAIL_MUTUAL) &&
              (libbalsa_identity_get_autocrypt_mode(bsmsg->ident) == AUTOCRYPT_PREFER_ENCRYPT)) ||
             ((bsmsg->parent_message != NULL) &&
-             (libbalsa_message_get_protect_state(bsmsg->parent_message) == LIBBALSA_MSG_PROTECT_CRYPT))) {
+             (libbalsa_message_get_crypt_mode(bsmsg->parent_message) == LIBBALSA_PROTECT_ENCRYPT))) {
     		default_choice = GTK_RESPONSE_YES;
     	} else if (autocrypt_mode == AUTOCRYPT_ENCR_AVAIL) {
     		default_choice = GTK_RESPONSE_NO;
@@ -5359,12 +5361,12 @@ check_autocrypt_recommendation(BalsaSendmsg *bsmsg)
     	/* run the dialog */
     	result = run_check_encrypt_dialog(bsmsg, message, default_choice);
 
-    	if (result && ((bsmsg->gpg_mode & LIBBALSA_PROTECT_ENCRYPT) != 0)) {
+    	if (result && ((bsmsg->crypt_mode & LIBBALSA_PROTECT_ENCRYPT) != 0)) {
     		/* make sure the message is also signed as required by the Autocrypt standard, and that a protocol is selected */
-    		if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_PROTOCOL) == 0) {
-    			bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->gpg_mode | (LIBBALSA_PROTECT_RFC3156 + LIBBALSA_PROTECT_SIGN));
+    		if ((bsmsg->crypt_mode & LIBBALSA_PROTECT_PROTOCOL) == 0) {
+    			bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->crypt_mode | (LIBBALSA_PROTECT_RFC3156 | LIBBALSA_PROTECT_SIGN));
     		} else {
-    			bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->gpg_mode | LIBBALSA_PROTECT_SIGN);
+    			bsmsg_setup_gpg_ui_by_mode(bsmsg, bsmsg->crypt_mode | LIBBALSA_PROTECT_SIGN);
     		}
 
         	/* import any missing keys */
@@ -5415,14 +5417,14 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     }
 #endif /* ENABLE_AUTOCRYPT */
 
-    if ((bsmsg->gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
+    if ((bsmsg->crypt_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
         gboolean warn_mp;
         gboolean warn_html_sign;
 
-        warn_mp = (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 &&
+        warn_mp = (bsmsg->crypt_mode & LIBBALSA_PROTECT_MODE) != 0 &&
             bsmsg->tree_view &&
             gtk_tree_model_get_iter_first(BALSA_MSG_ATTACH_MODEL(bsmsg), &iter);
-        warn_html_sign = (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) == LIBBALSA_PROTECT_SIGN &&
+        warn_html_sign = (bsmsg->crypt_mode & LIBBALSA_PROTECT_MODE) == LIBBALSA_PROTECT_SIGN &&
             bsmsg->send_mp_alt;
 
         if (warn_mp || warn_html_sign) {
@@ -5469,7 +5471,7 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
     balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                LIBBALSA_INFORMATION_DEBUG,
                                _("sending message with GPG mode %d"),
-                               libbalsa_message_get_gpg_mode(message));
+                               libbalsa_message_get_crypt_mode(message));
 
     if(queue_only)
 	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
@@ -5578,7 +5580,7 @@ message_postpone(BalsaSendmsg * bsmsg)
     g_ptr_array_add(headers, g_strdup("X-Balsa-DSN"));
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->req_dsn));
     g_ptr_array_add(headers, g_strdup("X-Balsa-Crypto"));
-    g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->gpg_mode));
+    g_ptr_array_add(headers, g_strdup_printf("%u", bsmsg->crypt_mode));
     g_ptr_array_add(headers, g_strdup("X-Balsa-Att-Pubkey"));
     g_ptr_array_add(headers, g_strdup_printf("%d", bsmsg->attach_pubkey));
 
@@ -6199,11 +6201,11 @@ sw_gpg_helper(GSimpleAction  * action,
 
     butval = g_variant_get_boolean(state);
     if (butval)
-        bsmsg->gpg_mode |= mask;
+        bsmsg->crypt_mode |= mask;
     else
-        bsmsg->gpg_mode &= ~mask;
+        bsmsg->crypt_mode &= ~mask;
 
-    radio_on = (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) > 0;
+    radio_on = (bsmsg->crypt_mode & LIBBALSA_PROTECT_MODE) != 0;
     sw_action_set_enabled(bsmsg, "gpg-mode", radio_on);
 
     g_simple_action_set_state(action, state);
@@ -6245,14 +6247,14 @@ sw_gpg_mode_change_state(GSimpleAction  * action,
     else if (strcmp(mode, "open-pgp") == 0)
         rfc_flag = LIBBALSA_PROTECT_OPENPGP;
     else if (strcmp(mode, "smime") == 0)
-        rfc_flag = LIBBALSA_PROTECT_SMIMEV3;
+        rfc_flag = LIBBALSA_PROTECT_SMIME;
     else {
         g_warning("%s unknown mode “%s”", __func__, mode);
         return;
     }
 
-    bsmsg->gpg_mode =
-        (bsmsg->gpg_mode & ~LIBBALSA_PROTECT_PROTOCOL) | rfc_flag;
+    bsmsg->crypt_mode =
+        (bsmsg->crypt_mode & ~LIBBALSA_PROTECT_PROTOCOL) | rfc_flag;
 
     g_simple_action_set_state(action, state);
 }
@@ -6648,30 +6650,29 @@ bsmsg_update_gpg_ui_on_ident_change(BalsaSendmsg * bsmsg,
     action = sw_get_action(bsmsg, "gpg-mode");
 
     /* preset according to identity */
-    bsmsg->gpg_mode = 0;
-    if (libbalsa_identity_get_always_trust(ident))
-        bsmsg->gpg_mode |= LIBBALSA_PROTECT_ALWAYS_TRUST;
+    bsmsg->crypt_mode = LIBBALSA_PROTECT_NONE;
+    bsmsg->always_trust = libbalsa_identity_get_always_trust(ident);
 
     sw_action_set_active(bsmsg, "sign", libbalsa_identity_get_gpg_sign(ident));
     if (libbalsa_identity_get_gpg_sign(ident))
-        bsmsg->gpg_mode |= LIBBALSA_PROTECT_SIGN;
+        bsmsg->crypt_mode |= LIBBALSA_PROTECT_SIGN;
 
     sw_action_set_active(bsmsg, "encrypt", libbalsa_identity_get_gpg_encrypt(ident));
     if (libbalsa_identity_get_gpg_encrypt(ident))
-        bsmsg->gpg_mode |= LIBBALSA_PROTECT_ENCRYPT;
+        bsmsg->crypt_mode |= LIBBALSA_PROTECT_ENCRYPT;
 
     switch (libbalsa_identity_get_crypt_protocol(ident)) {
     case LIBBALSA_PROTECT_OPENPGP:
-        bsmsg->gpg_mode |= LIBBALSA_PROTECT_OPENPGP;
+        bsmsg->crypt_mode |= LIBBALSA_PROTECT_OPENPGP;
         g_action_change_state(action, g_variant_new_string("open-pgp"));
         break;
-    case LIBBALSA_PROTECT_SMIMEV3:
-        bsmsg->gpg_mode |= LIBBALSA_PROTECT_SMIMEV3;
+    case LIBBALSA_PROTECT_SMIME:
+        bsmsg->crypt_mode |= LIBBALSA_PROTECT_SMIME;
         g_action_change_state(action, g_variant_new_string("smime"));
         break;
     case LIBBALSA_PROTECT_RFC3156:
     default:
-        bsmsg->gpg_mode |= LIBBALSA_PROTECT_RFC3156;
+        bsmsg->crypt_mode |= LIBBALSA_PROTECT_RFC3156;
         g_action_change_state(action, g_variant_new_string("mime"));
     }
 }
@@ -6686,7 +6687,7 @@ bsmsg_setup_gpg_ui(BalsaSendmsg *bsmsg)
 }
 
 static void
-bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode)
+bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, guint mode)
 {
     GAction *action;
 
@@ -6694,12 +6695,12 @@ bsmsg_setup_gpg_ui_by_mode(BalsaSendmsg *bsmsg, gint mode)
     if (!balsa_app.has_openpgp && !balsa_app.has_smime)
 	return;
 
-    bsmsg->gpg_mode = mode;
+    bsmsg->crypt_mode = mode;
     sw_action_set_active(bsmsg, "sign", mode & LIBBALSA_PROTECT_SIGN);
     sw_action_set_active(bsmsg, "encrypt", mode & LIBBALSA_PROTECT_ENCRYPT);
 
     action = sw_get_action(bsmsg, "gpg-mode");
-    if (mode & LIBBALSA_PROTECT_SMIMEV3)
+    if (mode & LIBBALSA_PROTECT_SMIME)
         g_action_change_state(action, g_variant_new_string("smime"));
     else if (mode & LIBBALSA_PROTECT_OPENPGP)
         g_action_change_state(action, g_variant_new_string("open-pgp"));
@@ -6814,7 +6815,7 @@ sendmsg_window_new()
 #if !HAVE_GTKSPELL && !HAVE_GSPELL
     bsmsg->spell_checker = NULL;
 #endif                          /* HAVE_GTKSPELL */
-    bsmsg->gpg_mode = LIBBALSA_PROTECT_RFC3156;
+    bsmsg->crypt_mode = LIBBALSA_PROTECT_RFC3156;
     bsmsg->attach_pubkey = FALSE;
     bsmsg->autosave_timeout_id = /* autosave every 5 minutes */
         g_timeout_add_seconds(60*5, (GSourceFunc)sw_autosave_timeout_cb, bsmsg);

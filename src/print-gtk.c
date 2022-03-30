@@ -607,7 +607,7 @@ message_prefs_widget(GtkPrintOperation * operation,
 
 #ifdef HAVE_HTML_WIDGET
     /* treatment of HTML messages and parts */
-    grid = create_options_group(_("Highlighting"), page, 1, 1, 1);
+    grid = create_options_group(_("HTML options"), page, 1, 1, 1);
 
     print_prefs->html_print = gtk_check_button_new_with_mnemonic(_("Prefer text/plain over HTML"));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_print), print_prefs->prefer_text);

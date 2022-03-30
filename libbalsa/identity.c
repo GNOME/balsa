@@ -71,7 +71,7 @@ struct _LibBalsaIdentity {
     gboolean gpg_encrypt;
     gboolean always_trust;
     gboolean warn_send_plain;
-    gint crypt_protocol;
+    guint crypt_protocol;
     gchar *force_gpg_key_id;
     gchar *force_smime_key_id;
 #ifdef ENABLE_AUTOCRYPT
@@ -544,7 +544,7 @@ static void add_show_menu(const char *label, gpointer data,
 static void ident_dialog_free_values(GPtrArray * values);
 
 static void display_frame_set_gpg_mode(GObject * dialog,
-                                       const gchar * key, gint * value);
+                                       const gchar * key, guint * value);
 
 static void ident_dialog_add_smtp_menu(GtkWidget * grid, gint row,
                                        GtkDialog * dialog,
@@ -1427,7 +1427,7 @@ ident_dialog_update(GObject * dlg)
     id->gpg_encrypt     = ident_dialog_get_bool(dlg, "identity-gpgencrypt");
     id->always_trust    = ident_dialog_get_bool(dlg, "identity-trust-always");
     id->warn_send_plain = ident_dialog_get_bool(dlg, "identity-warn-send-plain");
-    id->crypt_protocol  = GPOINTER_TO_INT(ident_dialog_get_value
+    id->crypt_protocol  = GPOINTER_TO_UINT(ident_dialog_get_value
                                           (dlg, "identity-crypt-protocol"));
     g_free(id->force_gpg_key_id);
     id->force_gpg_key_id = g_strstrip(ident_dialog_get_text(dlg, "identity-keyid"));
@@ -1916,7 +1916,7 @@ libbalsa_identity_new_from_config(const gchar* name)
     ident->gpg_encrypt = libbalsa_conf_get_bool("GpgEncrypt");
     ident->always_trust = libbalsa_conf_get_bool("GpgTrustAlways");
     ident->warn_send_plain = libbalsa_conf_get_bool("GpgWarnSendPlain=true");
-    ident->crypt_protocol = libbalsa_conf_get_int("CryptProtocol=16");
+    ident->crypt_protocol = (guint) libbalsa_conf_get_int("CryptProtocol=16");
     ident->force_gpg_key_id = libbalsa_conf_get_string("ForceKeyID");
     ident->force_smime_key_id = libbalsa_conf_get_string("ForceKeyIDSMime");
 #ifdef ENABLE_AUTOCRYPT
@@ -1965,7 +1965,7 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
     libbalsa_conf_set_bool("GpgEncrypt", ident->gpg_encrypt);
     libbalsa_conf_set_bool("GpgTrustAlways", ident->always_trust);
     libbalsa_conf_set_bool("GpgWarnSendPlain", ident->warn_send_plain);
-    libbalsa_conf_set_int("CryptProtocol", ident->crypt_protocol);
+    libbalsa_conf_set_int("CryptProtocol", (gint) ident->crypt_protocol);
     libbalsa_conf_set_string("ForceKeyID", ident->force_gpg_key_id);
     libbalsa_conf_set_string("ForceKeyIDSMime", ident->force_smime_key_id);
 #ifdef ENABLE_AUTOCRYPT
@@ -1980,7 +1980,7 @@ libbalsa_identity_save(LibBalsaIdentity* ident, const gchar* group)
 
 
 static void
-display_frame_set_gpg_mode(GObject * dialog, const gchar* key, gint * value)
+display_frame_set_gpg_mode(GObject * dialog, const gchar* key, guint * value)
 {
     GtkComboBox *opt_menu = g_object_get_data(G_OBJECT(dialog), key);
 
@@ -2073,11 +2073,11 @@ ident_dialog_add_gpg_menu(GtkWidget * grid, gint row, GtkDialog * dialog,
     g_object_set_data(G_OBJECT(dialog), menu_key, opt_menu);
 
     add_show_menu(_("GnuPG MIME mode"),
-                  GINT_TO_POINTER(LIBBALSA_PROTECT_RFC3156), opt_menu);
+                  GUINT_TO_POINTER(LIBBALSA_PROTECT_RFC3156), opt_menu);
     add_show_menu(_("GnuPG OpenPGP mode"),
                   GINT_TO_POINTER(LIBBALSA_PROTECT_OPENPGP), opt_menu);
     add_show_menu(_("GpgSM S/MIME mode"),
-                  GINT_TO_POINTER(LIBBALSA_PROTECT_SMIME), opt_menu);
+                  GUINT_TO_POINTER(LIBBALSA_PROTECT_SMIME), opt_menu);
 }
 
 /* add_show_menu: helper function */
@@ -2329,7 +2329,7 @@ libbalsa_identity_get_sig_separator(LibBalsaIdentity *ident)
     return ident->sig_separator;
 }
 
-gint
+guint
 libbalsa_identity_get_crypt_protocol(LibBalsaIdentity *ident)
 {
     g_return_val_if_fail(LIBBALSA_IS_IDENTITY(ident), 0);

@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-03-03 20:49+0000\n"
-"PO-Revision-Date: 2022-03-12 12:47+0100\n"
+"POT-Creation-Date: 2022-03-30 16:13+0000\n"
+"PO-Revision-Date: 2022-03-30 21:57+0200\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -982,8 +982,8 @@ msgid "TLS required but not available"
 msgstr "TLS krävs men är inte tillgängligt"
 
 #. it is not we, so it must be the server
-#: ../libbalsa/imap/imap-handle.c:2297 ../libbalsa/imap/imap-handle.c:2315
-#: ../libbalsa/imap/imap-handle.c:2331 ../libbalsa/imap/imap-handle.c:2362
+#: ../libbalsa/imap/imap-handle.c:2298 ../libbalsa/imap/imap-handle.c:2316
+#: ../libbalsa/imap/imap-handle.c:2332 ../libbalsa/imap/imap-handle.c:2363
 #, c-format
 msgid "IMAP response: %s"
 msgstr "IMAP-svar: %s"
@@ -1980,7 +1980,7 @@ msgid "Cannot load certificate file %s: %s"
 msgstr "Det går inte att läsa in certifikatfilen %s: %s"
 
 #. connect server
-#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1022
+#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1023
 #, c-format
 msgid "Connecting %s…"
 msgstr "Ansluter %s…"
@@ -2005,7 +2005,7 @@ msgstr "Fel för POP3-postlådan %s: %s"
 msgid "POP3 message %d oversized: %s — skipped."
 msgstr "POP3-meddelande %d för stort: %s — hoppar över."
 
-#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1032
+#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1033
 #, c-format
 msgid "Connected to %s"
 msgstr "Ansluten till %s"
@@ -2026,7 +2026,7 @@ msgstr "Tar bort meddelanden från servern…"
 msgid "POP3 error: %s"
 msgstr "POP3-fel: %s"
 
-#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1113
+#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1114
 msgid "Finished"
 msgstr "Färdig"
 
@@ -2737,29 +2737,29 @@ msgstr ""
 "Misslyckades med att skicka meddelandet: %s\n"
 "Meddelandet är kvar i din utkorg."
 
-#: ../libbalsa/send.c:1097
+#: ../libbalsa/send.c:1098
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr "Anslutning till SMTP-server %s (%s) misslyckades: %s"
 
-#: ../libbalsa/send.c:1116
+#: ../libbalsa/send.c:1117
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
 msgstr[0] "Överförde %u meddelande till %s"
 msgstr[1] "Överförde %u meddelanden till %s"
 
-#: ../libbalsa/send.c:1267 ../libbalsa/send.c:1335
+#: ../libbalsa/send.c:1268 ../libbalsa/send.c:1336
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Det går inte att läsa %s: %s"
 
-#: ../libbalsa/send.c:1270 ../libbalsa/send.c:1338
+#: ../libbalsa/send.c:1271 ../libbalsa/send.c:1339
 #, c-format
 msgid "Cannot read %s"
 msgstr "Det går inte att läsa %s"
 
-#: ../libbalsa/send.c:1302
+#: ../libbalsa/send.c:1303
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2767,7 +2767,7 @@ msgstr ""
 "Det går inte att avgöra teckentabellen för textfilen ”%s”, skickar som MIME-"
 "typen ”%s”"
 
-#: ../libbalsa/send.c:1836 ../libbalsa/send.c:1934
+#: ../libbalsa/send.c:1837 ../libbalsa/send.c:1935
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] ""
@@ -6420,8 +6420,7 @@ msgid "_Footer Font:"
 msgstr "Typsnitt för sid_fot:"
 
 #. syntax highlighting
-#. treatment of HTML messages and parts
-#: ../src/print-gtk.c:597 ../src/print-gtk.c:610
+#: ../src/print-gtk.c:597
 msgid "Highlighting"
 msgstr "Färgmarkering"
 
@@ -6432,6 +6431,11 @@ msgstr "Färgmarkera _citerad text"
 #: ../src/print-gtk.c:604
 msgid "Highlight _structured phrases"
 msgstr "Färgmarkera _strukturerade fraser"
+
+#. treatment of HTML messages and parts
+#: ../src/print-gtk.c:610
+msgid "HTML options"
+msgstr "HTML-alternativ"
 
 #: ../src/print-gtk.c:617
 msgid "Download content from remote servers (may be dangerous)"

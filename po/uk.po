@@ -8,15 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-03-03 20:23+0000\n"
-"PO-Revision-Date: 2022-03-04 11:37+0200\n"
+"POT-Creation-Date: 2022-03-30 16:13+0000\n"
+"PO-Revision-Date: 2022-03-30 21:45+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
+"%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Lokalize 20.12.0\n"
 
 #: ../balsa.appdata.xml.in.h:1
@@ -988,8 +989,8 @@ msgid "TLS required but not available"
 msgstr "Потрібна TLS, але вона недоступна"
 
 #. it is not we, so it must be the server
-#: ../libbalsa/imap/imap-handle.c:2297 ../libbalsa/imap/imap-handle.c:2315
-#: ../libbalsa/imap/imap-handle.c:2331 ../libbalsa/imap/imap-handle.c:2362
+#: ../libbalsa/imap/imap-handle.c:2298 ../libbalsa/imap/imap-handle.c:2316
+#: ../libbalsa/imap/imap-handle.c:2332 ../libbalsa/imap/imap-handle.c:2363
 #, c-format
 msgid "IMAP response: %s"
 msgstr "Відповідь IMAP: %s"
@@ -2020,7 +2021,7 @@ msgid "Cannot load certificate file %s: %s"
 msgstr "Не вдалося завантажити файл сертифіката %s: %s"
 
 #. connect server
-#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1022
+#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1023
 #, c-format
 msgid "Connecting %s…"
 msgstr "Встановлюємо з'єднання з %s…"
@@ -2045,7 +2046,7 @@ msgstr "Помилка поштової скриньки POP3 %s: %s"
 msgid "POP3 message %d oversized: %s — skipped."
 msgstr "Розмір повідомлення POP3 %d є надмірним: %s — пропускаємо."
 
-#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1032
+#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1033
 #, c-format
 msgid "Connected to %s"
 msgstr "Підключений до %s"
@@ -2068,7 +2069,7 @@ msgstr "Вилучаємо повідомлення з сервера…"
 msgid "POP3 error: %s"
 msgstr "Помилка POP3: %s"
 
-#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1113
+#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1114
 msgid "Finished"
 msgstr "Завершено"
 
@@ -2792,12 +2793,12 @@ msgstr ""
 "Не вдалося надіслати повідомлення: %s\n"
 "Повідомлення лишилося у теці «Вхідні»."
 
-#: ../libbalsa/send.c:1097
+#: ../libbalsa/send.c:1098
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr "Не вдалося з'єднатися із сервером SMTP %s (%s): %s"
 
-#: ../libbalsa/send.c:1116
+#: ../libbalsa/send.c:1117
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
@@ -2806,17 +2807,17 @@ msgstr[1] "Передаємо %u повідомлення до %s"
 msgstr[2] "Передаємо %u повідомлень до %s"
 msgstr[3] "Передаємо %u повідомлення до %s"
 
-#: ../libbalsa/send.c:1267 ../libbalsa/send.c:1335
+#: ../libbalsa/send.c:1268 ../libbalsa/send.c:1336
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Не вдалося прочитати %s: %s"
 
-#: ../libbalsa/send.c:1270 ../libbalsa/send.c:1338
+#: ../libbalsa/send.c:1271 ../libbalsa/send.c:1339
 #, c-format
 msgid "Cannot read %s"
 msgstr "Не вдалося прочитати %s"
 
-#: ../libbalsa/send.c:1302
+#: ../libbalsa/send.c:1303
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2824,7 +2825,7 @@ msgstr ""
 "Не вдалося визначити кодування символів текстового файла «%s» — надсилаємо "
 "як тип MIME «%s»"
 
-#: ../libbalsa/send.c:1836 ../libbalsa/send.c:1934
+#: ../libbalsa/send.c:1837 ../libbalsa/send.c:1935
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] ""
@@ -3854,7 +3855,6 @@ msgid "Save selected to folder…"
 msgstr "Зберегти позначене до теки…"
 
 #: ../src/balsa-message.c:976
-#| msgid "Save selected to folder…"
 msgid "Save selected to folder and browse…"
 msgstr "Зберегти позначене до теки і перейти до неї…"
 
@@ -3943,7 +3943,6 @@ msgid "_Copy to folder…"
 msgstr "С_копіювати до теки…"
 
 #: ../src/balsa-message.c:1681
-#| msgid "Save selected to folder…"
 msgid "Save and open folder…"
 msgstr "Зберегти і відкрити теку…"
 
@@ -4144,7 +4143,6 @@ msgstr "Від'єднати %s: %s"
 
 #: ../src/balsa-mime-widget-callbacks.c:169
 #, c-format
-#| msgid "Could not open trash: %s"
 msgid "Could not open folder %s: %s"
 msgstr "Не вдалося відкрити теку %s: %s"
 
@@ -6515,8 +6513,7 @@ msgid "_Footer Font:"
 msgstr "Шрифт _нижнього колонтитула:"
 
 #. syntax highlighting
-#. treatment of HTML messages and parts
-#: ../src/print-gtk.c:597 ../src/print-gtk.c:610
+#: ../src/print-gtk.c:597
 msgid "Highlighting"
 msgstr "Підсвічування"
 
@@ -6527,6 +6524,12 @@ msgstr "Підсвічення _цитованого тексту"
 #: ../src/print-gtk.c:604
 msgid "Highlight _structured phrases"
 msgstr "Підсвічувати с_кладені фрази"
+
+#. treatment of HTML messages and parts
+#: ../src/print-gtk.c:610
+#| msgid "Mail options"
+msgid "HTML options"
+msgstr "Параметри HTML"
 
 #: ../src/print-gtk.c:617
 msgid "Download content from remote servers (may be dangerous)"

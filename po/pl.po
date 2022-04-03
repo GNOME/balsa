@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-03-06 12:25+0100\n"
-"PO-Revision-Date: 2022-03-06 12:27+0100\n"
+"POT-Creation-Date: 2022-04-03 13:35+0200\n"
+"PO-Revision-Date: 2022-04-03 13:37+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -987,8 +987,8 @@ msgid "TLS required but not available"
 msgstr "Wymagane jest TLS, ale nie jest dostępne"
 
 #. it is not we, so it must be the server
-#: ../libbalsa/imap/imap-handle.c:2297 ../libbalsa/imap/imap-handle.c:2315
-#: ../libbalsa/imap/imap-handle.c:2331 ../libbalsa/imap/imap-handle.c:2362
+#: ../libbalsa/imap/imap-handle.c:2298 ../libbalsa/imap/imap-handle.c:2316
+#: ../libbalsa/imap/imap-handle.c:2332 ../libbalsa/imap/imap-handle.c:2363
 #, c-format
 msgid "IMAP response: %s"
 msgstr "Odpowiedź IMAP: %s"
@@ -2000,7 +2000,7 @@ msgid "Cannot load certificate file %s: %s"
 msgstr "Nie można wczytać pliku certyfikatu %s: %s"
 
 #. connect server
-#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1022
+#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1023
 #, c-format
 msgid "Connecting %s…"
 msgstr "Łączenie z %s…"
@@ -2025,7 +2025,7 @@ msgstr "Błąd skrzynki POP3 %s: %s"
 msgid "POP3 message %d oversized: %s — skipped."
 msgstr "Wiadomość POP3 %d przekroczyła rozmiar: %s — pominięto."
 
-#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1032
+#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1033
 #, c-format
 msgid "Connected to %s"
 msgstr "Połączono z %s"
@@ -2047,7 +2047,7 @@ msgstr "Usuwanie wiadomości na serwerze…"
 msgid "POP3 error: %s"
 msgstr "Błąd POP3: %s"
 
-#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1113
+#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1114
 msgid "Finished"
 msgstr "Ukończono"
 
@@ -2762,12 +2762,12 @@ msgstr ""
 "Wysłanie wiadomości się nie powiodło: %s\n"
 "Wiadomość pozostała w skrzynce wychodzącej."
 
-#: ../libbalsa/send.c:1097
+#: ../libbalsa/send.c:1098
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr "Połączenie z serwerem SMTP %s (%s) się nie powiodło: %s"
 
-#: ../libbalsa/send.c:1116
+#: ../libbalsa/send.c:1117
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
@@ -2775,17 +2775,17 @@ msgstr[0] "Przesłano %u wiadomość do %s"
 msgstr[1] "Przesłano %u wiadomości do %s"
 msgstr[2] "Przesłano %u wiadomości do %s"
 
-#: ../libbalsa/send.c:1267 ../libbalsa/send.c:1335
+#: ../libbalsa/send.c:1268 ../libbalsa/send.c:1336
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Nie można odczytać %s: %s"
 
-#: ../libbalsa/send.c:1270 ../libbalsa/send.c:1338
+#: ../libbalsa/send.c:1271 ../libbalsa/send.c:1339
 #, c-format
 msgid "Cannot read %s"
 msgstr "Nie można odczytać %s"
 
-#: ../libbalsa/send.c:1302
+#: ../libbalsa/send.c:1303
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2793,7 +2793,7 @@ msgstr ""
 "Nie można ustalić zestawu znaków dla pliku tekstowego „%s”, wysyłanie jako "
 "typ MIME „%s”"
 
-#: ../libbalsa/send.c:1836 ../libbalsa/send.c:1934
+#: ../libbalsa/send.c:1837 ../libbalsa/send.c:1935
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Ta wiadomość nie zostanie zaszyfrowana dla odbiorcy z pola „UDW:”."
@@ -6455,8 +6455,7 @@ msgid "_Footer Font:"
 msgstr "Czcionka _stopki:"
 
 #. syntax highlighting
-#. treatment of HTML messages and parts
-#: ../src/print-gtk.c:597 ../src/print-gtk.c:610
+#: ../src/print-gtk.c:597
 msgid "Highlighting"
 msgstr "Wyróżnianie"
 
@@ -6467,6 +6466,11 @@ msgstr "Wyróżnianie _cytowanego tekstu"
 #: ../src/print-gtk.c:604
 msgid "Highlight _structured phrases"
 msgstr "Wy_różnianie cytowanych zdań"
+
+#. treatment of HTML messages and parts
+#: ../src/print-gtk.c:610
+msgid "HTML options"
+msgstr "Opcje HTML"
 
 #: ../src/print-gtk.c:617
 msgid "Download content from remote servers (may be dangerous)"

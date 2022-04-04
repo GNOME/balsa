@@ -42,6 +42,7 @@ typedef enum {
 
 typedef void (*LibBalsaHtmlCallback) (const gchar * uri);
 
+void libbalsa_html_init(void);
 GtkWidget *libbalsa_html_new(LibBalsaMessageBody * body,
                              LibBalsaHtmlCallback hover_cb,
                              LibBalsaHtmlCallback clicked_cb,

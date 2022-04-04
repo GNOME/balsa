@@ -190,6 +190,17 @@ typedef struct {
 
 #define LIBBALSA_HTML_INFO "libbalsa-webkit2-info"
 
+
+static WebKitWebContext *lbh_get_web_view_context(void);
+
+
+void
+libbalsa_html_init(void)
+{
+	(void) lbh_get_web_view_context();
+}
+
+
 /*
  * Unlike older HTML widgets, webkit2 wants UTF-8 text
  */

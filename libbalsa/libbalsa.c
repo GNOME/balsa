@@ -46,6 +46,7 @@
 #include "misc.h"
 #include "missing.h"
 #include "x509-cert-widget.h"
+#include "html.h"
 #include <glib/gi18n.h>
 
 static GThread *main_thread_id;
@@ -85,6 +86,9 @@ libbalsa_init(void)
 #endif
 #if HAVE_OSMO
     LIBBALSA_TYPE_ADDRESS_BOOK_OSMO;
+#endif
+#ifdef HAVE_HTML_WIDGET
+    libbalsa_html_init();
 #endif
 }
 

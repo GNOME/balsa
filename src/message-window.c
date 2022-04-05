@@ -52,6 +52,7 @@ struct _MessageWindow {
     int headers_shown;
     int show_all_headers;
     guint idle_handler_id;
+    guint index_changed_id;
 };
 
 /*
@@ -367,6 +368,11 @@ static void
 destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 {
     if (mw->bindex) {           /* BalsaIndex still exists */
+        if (mw->index_changed_id != 0) {
+            g_signal_handler_disconnect(mw->bindex, mw->index_changed_id);
+            mw->index_changed_id = 0;
+        }
+
         g_object_weak_unref(G_OBJECT(mw->bindex), mw_bindex_closed_cb, mw);
         g_signal_handlers_disconnect_matched(mw->bindex,
                                              G_SIGNAL_MATCH_DATA, 0, 0,
@@ -566,16 +572,25 @@ mw_find_in_message_activated(GSimpleAction * action, GVariant * parameter,
     balsa_message_find_in_message(BALSA_MESSAGE(mw->bmessage));
 }
 
+/*
+ * Handler for BalsaIndex "index-changed" signal
+ *
+ * We connect to this signal in mw_set_selected(), after calling select_func(),
+ * to find the msgno of the newly selected message, and immediately disconnect it. *
+ */
 static void
-mw_set_selected(MessageWindow * mw, void (*select_func) (BalsaIndex *))
+mw_index_changed(BalsaIndex *bindex,
+                 gpointer    user_data)
 {
+    MessageWindow *mw = user_data;
     guint msgno;
     LibBalsaMessage *message;
     MessageWindow *tmp;
 
-    balsa_index_set_next_msgno(mw->bindex, libbalsa_message_get_msgno(mw->message));
-    select_func(mw->bindex);
-    msgno = balsa_index_get_next_msgno(mw->bindex);
+    g_signal_handler_disconnect(bindex, mw->index_changed_id);
+    mw->index_changed_id = 0;
+
+    msgno = balsa_index_get_next_msgno(bindex);
     message = libbalsa_mailbox_get_message(libbalsa_message_get_mailbox(mw->message), msgno);
     if (!message)
         return;
@@ -593,6 +608,20 @@ mw_set_selected(MessageWindow * mw, void (*select_func) (BalsaIndex *))
     }
 
     mw_set_message(mw, message);
+}
+
+static void
+mw_set_selected(MessageWindow * mw, void (*select_func) (BalsaIndex *))
+{
+    /* We must wait until the BalsaIndex's "selection-changed" signal is
+     * handled, as it seems to no longer be synchronous. */
+    if (mw->index_changed_id == 0) {
+        mw->index_changed_id = g_signal_connect(mw->bindex, "index-changed",
+                                                G_CALLBACK(mw_index_changed), mw);
+    }
+
+    balsa_index_set_next_msgno(mw->bindex, libbalsa_message_get_msgno(mw->message));
+    select_func(mw->bindex);
 }
 
 static void

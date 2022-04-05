@@ -2075,7 +2075,7 @@ ident_dialog_add_gpg_menu(GtkWidget * grid, gint row, GtkDialog * dialog,
     add_show_menu(_("GnuPG MIME mode"),
                   GUINT_TO_POINTER(LIBBALSA_PROTECT_RFC3156), opt_menu);
     add_show_menu(_("GnuPG OpenPGP mode"),
-                  GINT_TO_POINTER(LIBBALSA_PROTECT_OPENPGP), opt_menu);
+                  GUINT_TO_POINTER(LIBBALSA_PROTECT_OPENPGP), opt_menu);
     add_show_menu(_("GpgSM S/MIME mode"),
                   GUINT_TO_POINTER(LIBBALSA_PROTECT_SMIME), opt_menu);
 }

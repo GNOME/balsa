@@ -88,14 +88,14 @@ struct _LibBalsaMessage {
     /* message ID */
     gchar *message_id;
 
-    /* GPG sign and/or encrypt message (sending) */
-    guint gpg_mode;
+    /* GnuPG or S/MIME sign and/or encrypt message (sending), or status of received message */
+    guint crypt_mode;
+
+    /* Indicate that uid's should always be trusted when signing a message */
+    gboolean always_trust;
 
     /* attach the GnuPG public key to the message (sending) */
     gboolean att_pubkey;
-
-    /* protection (i.e. sign/encrypt) status (received message) */
-    LibBalsaMsgProtectState prot_state;
 
     /* sender identity, required for choosing a forced GnuPG or S/MIME key */
     LibBalsaIdentity *ident;
@@ -145,7 +145,7 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->body_ref = 0;
     message->body_list = NULL;
     message->has_all_headers = 0;
-    message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
+    message->crypt_mode = LIBBALSA_PROTECT_NONE;
     message->ident = NULL;
 }
 
@@ -644,19 +644,19 @@ libbalsa_message_get_attach_icon(LibBalsaMessage * message)
 
     if (libbalsa_message_is_encrypted(message)) {
 	attach_icon = LIBBALSA_MESSAGE_ATTACH_ENCR;
-    } else if (message->prot_state != LIBBALSA_MSG_PROTECT_NONE ||
+    } else if (message->crypt_mode != LIBBALSA_PROTECT_NONE ||
 	libbalsa_message_is_signed(message)) {
-	switch (message->prot_state) {
-	case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
+	switch (message->crypt_mode) {
+	case LIBBALSA_PROTECT_SIGN_GOOD:
 	    attach_icon = LIBBALSA_MESSAGE_ATTACH_GOOD;
             break;
-	case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
+	case LIBBALSA_PROTECT_SIGN_NOTRUST:
 	    attach_icon = LIBBALSA_MESSAGE_ATTACH_NOTRUST;
             break;
-	case LIBBALSA_MSG_PROTECT_SIGN_BAD:
+	case LIBBALSA_PROTECT_SIGN_BAD:
 	    attach_icon = LIBBALSA_MESSAGE_ATTACH_BAD;
             break;
-	case LIBBALSA_MSG_PROTECT_CRYPT:
+	case LIBBALSA_PROTECT_ENCRYPT:
 	    attach_icon = LIBBALSA_MESSAGE_ATTACH_ENCR;
             break;
 	default:
@@ -1667,11 +1667,20 @@ libbalsa_message_get_subtype(LibBalsaMessage *message)
 
 
 guint
-libbalsa_message_get_gpg_mode(LibBalsaMessage *message)
+libbalsa_message_get_crypt_mode(LibBalsaMessage *message)
 {
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), 0);
 
-    return message->gpg_mode;
+    return message->crypt_mode;
+}
+
+
+gboolean
+libbalsa_message_get_always_trust(LibBalsaMessage *message)
+{
+    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
+
+    return message->always_trust;
 }
 
 
@@ -1690,15 +1699,6 @@ libbalsa_message_get_attach_pubkey(LibBalsaMessage *message)
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
     return message->att_pubkey;
-}
-
-
-LibBalsaMsgProtectState
-libbalsa_message_get_protect_state(LibBalsaMessage *message)
-{
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), 0);
-
-    return message->prot_state;
 }
 
 
@@ -1812,16 +1812,6 @@ libbalsa_message_set_message_id(LibBalsaMessage *message,
 
 
 void
-libbalsa_message_set_protect_state(LibBalsaMessage        *message,
-                                LibBalsaMsgProtectState prot_state)
-{
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-
-    message->prot_state = prot_state;
-}
-
-
-void
 libbalsa_message_set_request_dsn(LibBalsaMessage *message,
                                  gboolean         request_dsn)
 {
@@ -1877,12 +1867,22 @@ libbalsa_message_set_in_reply_to(LibBalsaMessage *message,
 
 
 void
-libbalsa_message_set_gpg_mode(LibBalsaMessage *message,
-                              guint            mode)
+libbalsa_message_set_crypt_mode(LibBalsaMessage *message,
+                                guint            mode)
 {
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    message->gpg_mode = mode;
+    message->crypt_mode = mode;
+}
+
+
+void
+libbalsa_message_set_always_trust(LibBalsaMessage *message,
+                                  gboolean         mode)
+{
+    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
+
+    message->always_trust = mode;
 }
 
 

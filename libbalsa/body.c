@@ -303,7 +303,7 @@ libbalsa_message_body_type(LibBalsaMessageBody * body)
 }
 
 gchar *
-libbalsa_message_body_get_parameter(LibBalsaMessageBody * body,
+libbalsa_message_body_get_parameter(const LibBalsaMessageBody * body,
 				    const gchar * param)
 {
     GMimeContentType *type;
@@ -941,21 +941,130 @@ libbalsa_message_body_mp_related_root(LibBalsaMessageBody *body)
     return root_body;
 }
 
-LibBalsaMsgProtectState
-libbalsa_message_body_protect_state(const LibBalsaMessageBody *body)
+/** Basic requirements for a multipart crypto: protocol is not NULL, exactly two body parts */
+#define MP_CRYPT_STRUCTURE(part, protocol)										\
+	(((protocol) != NULL) && ((body)->parts != NULL) && 						\
+	 ((body)->parts->next != NULL) && ((body)->parts->next->next == NULL))
+
+/** Check if protocol is application/subtype, and that part has the same MIME type */
+#define IS_PROT_PART(part, protocol, subtype)									\
+	((g_ascii_strcasecmp("application/" subtype, protocol) == 0) &&				\
+	 body_is_type(part, "application", subtype))
+
+static inline gboolean
+body_is_type(const LibBalsaMessageBody *body,
+			 const gchar               *type,
+			 const gchar               *sub_type)
 {
-	LibBalsaMsgProtectState state;
+	gboolean retval;
+	GMimeContentType *content_type;
+
+	if (body->mime_part) {
+		content_type = g_mime_object_get_content_type(body->mime_part);
+		retval = g_mime_content_type_is_type(content_type, type, sub_type);
+	} else {
+		content_type = g_mime_content_type_parse(libbalsa_parser_options(), body->content_type);
+		retval = g_mime_content_type_is_type(content_type, type, sub_type);
+		g_object_unref(content_type);
+	}
+
+	return retval;
+}
+
+/** @brief Get the basic protection mode of a body
+ *
+ * @param body message body
+ * @return a bit mask indicating the protection state of the body
+ *
+ * Check the structure and parameters of the passed body, and return a bit mask indicating if it is signed or encrypted, and which
+ * protocol is used.  @ref LIBBALSA_PROTECT_ERROR indicates obvious errors.  The bit mask does @em not include the validity of a
+ * signature (see libbalsa_message_body_signature_state() for this purpose).
+ */
+guint
+libbalsa_message_body_protect_mode(const LibBalsaMessageBody * body)
+{
+	guint result;
+
+	g_return_val_if_fail(body != NULL, 0);
+	g_return_val_if_fail(body->content_type != NULL, 0);
+
+	if (body_is_type(body, "multipart", "signed")) {
+		/* multipart/signed (PGP/MIME, S/MIME) must have a protocol and a micalg parameter */
+		gchar *protocol = libbalsa_message_body_get_parameter(body, "protocol");
+		gchar *micalg = libbalsa_message_body_get_parameter(body, "micalg");
+
+		result = LIBBALSA_PROTECT_SIGN;
+		if (MP_CRYPT_STRUCTURE(body, protocol)) {
+			if (IS_PROT_PART(body->parts->next, protocol, "pkcs7-signature") ||
+				IS_PROT_PART(body->parts->next, protocol, "x-pkcs7-signature")) {
+				result |= LIBBALSA_PROTECT_SMIME;
+				if (micalg == NULL) {
+					result |= LIBBALSA_PROTECT_ERROR;
+				}
+			} else if (IS_PROT_PART(body->parts->next, protocol, "pgp-signature")) {
+				result |= LIBBALSA_PROTECT_RFC3156;
+				if ((micalg == NULL) || (g_ascii_strncasecmp("pgp-", micalg, 4) != 0)) {
+					result |= LIBBALSA_PROTECT_ERROR;
+				}
+			} else {
+				result |= LIBBALSA_PROTECT_ERROR;
+			}
+		} else {
+			result |= LIBBALSA_PROTECT_ERROR;
+		}
+		g_free(micalg);
+		g_free(protocol);
+	} else if (body_is_type(body, "multipart", "encrypted")) {
+		/* multipart/signed (PGP/MIME, S/MIME) must have a protocol parameter */
+		gchar *protocol = libbalsa_message_body_get_parameter(body, "protocol");
+
+		result = LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_RFC3156;
+		if (!MP_CRYPT_STRUCTURE(body, protocol) ||
+			!IS_PROT_PART(body->parts, protocol, "pgp-encrypted") ||
+			!body_is_type(body->parts->next, "application", "octet-stream")) {
+			result |= LIBBALSA_PROTECT_ERROR;
+		}
+		g_free(protocol);
+	} else if (body_is_type(body, "application", "pkcs7-mime") ||
+			   body_is_type(body, "application", "x-pkcs7-mime")) {
+		/* multipart/pkcs7-mime (S/MIME) must have a smime-type parameter */
+		gchar *smime_type = libbalsa_message_body_get_parameter(body, "smime-type");
+
+		result = LIBBALSA_PROTECT_SMIME;
+		if ((g_ascii_strcasecmp("enveloped-data", smime_type) == 0) ||
+			(g_ascii_strcasecmp("signed-data", smime_type) == 0)) {
+			result |= LIBBALSA_PROTECT_ENCRYPT;
+		} else {
+			result |= LIBBALSA_PROTECT_ERROR;
+		}
+		g_free(smime_type);
+	} else {
+		result = LIBBALSA_PROTECT_NONE;
+	}
+
+	return result;
+}
+
+/** @brief Get the cryptographic signature state of a body
+ *
+ * @param body message body
+ * @return a value indicating the cryptographic signature state of the body
+ */
+guint
+libbalsa_message_body_signature_state(const LibBalsaMessageBody *body)
+{
+	guint state;
 
 	if ((body == NULL) || (body->sig_info == NULL) ||
 		(g_mime_gpgme_sigstat_status(body->sig_info) == GPG_ERR_NOT_SIGNED) ||
 		(g_mime_gpgme_sigstat_status(body->sig_info) == GPG_ERR_CANCELED)) {
-		state = LIBBALSA_MSG_PROTECT_NONE;
+		state = LIBBALSA_PROTECT_NONE;
 	} else if (g_mime_gpgme_sigstat_status(body->sig_info) != GPG_ERR_NO_ERROR) {
-		state = LIBBALSA_MSG_PROTECT_SIGN_BAD;
+		state = LIBBALSA_PROTECT_SIGN_BAD;
 	} else if ((g_mime_gpgme_sigstat_summary(body->sig_info) & GPGME_SIGSUM_VALID) == GPGME_SIGSUM_VALID) {
-		state = LIBBALSA_MSG_PROTECT_SIGN_GOOD;
+		state = LIBBALSA_PROTECT_SIGN_GOOD;
 	} else {
-		state = LIBBALSA_MSG_PROTECT_SIGN_NOTRUST;
+		state = LIBBALSA_PROTECT_SIGN_NOTRUST;
 	}
 
 	return state;
@@ -977,10 +1086,10 @@ libbalsa_message_body_multipart_signed(const LibBalsaMessageBody *body)
 			(body->content_type != NULL) &&
 			(g_ascii_strcasecmp(body->content_type, "multipart/signed") == 0) &&
 			(body->parts != NULL) &&					/* must have children */
-		    (body->parts->next != NULL) &&				/* must have *two* child parts... */
-		    (body->parts->next->next == NULL) &&		/* ...but not more */
-		    (body->parts->next->sig_info != NULL) &&
-		    (g_mime_gpgme_sigstat_status(body->parts->next->sig_info) != GPG_ERR_NOT_SIGNED);
+			(body->parts->next != NULL) &&				/* must have *two* child parts... */
+			(body->parts->next->next == NULL) &&		/* ...but not more */
+			(body->parts->next->sig_info != NULL) &&
+			(g_mime_gpgme_sigstat_status(body->parts->next->sig_info) != GPG_ERR_NOT_SIGNED);
 }
 
 

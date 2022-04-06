@@ -1207,7 +1207,7 @@ create_mime_message(LibBalsaMessage *message,
     /* attach the public key only if we send the message, not if we just postpone it */
     if (!postponing &&
         libbalsa_message_get_attach_pubkey(message) &&
-        ((libbalsa_message_get_gpg_mode(message) & LIBBALSA_PROTECT_PROTOCOL) != 0)) {
+        ((libbalsa_message_get_crypt_mode(message) & LIBBALSA_PROTECT_PROTOCOL) != 0)) {
     	attach_pubkey = TRUE;
     }
 
@@ -1362,7 +1362,7 @@ create_mime_message(LibBalsaMessage *message,
             /* in '2440 mode, touch *only* the first body! */
             if (!postponing &&
                 (body == libbalsa_message_get_body_list(body->message)) &&
-                ((gpg_mode = libbalsa_message_get_gpg_mode(message)) > 0) &&
+                ((gpg_mode = libbalsa_message_get_crypt_mode(message)) != 0) &&
                 ((gpg_mode & LIBBALSA_PROTECT_OPENPGP) != 0)) {
                 use_gpg_mode = gpg_mode;
             } else {
@@ -1801,8 +1801,8 @@ libbalsa_create_rfc2440_buffer(LibBalsaMessage *message,
                                GtkWindow       *parent,
                                GError         **error)
 {
-    gint mode = libbalsa_message_get_gpg_mode(message);
-    gboolean always_trust = (mode & LIBBALSA_PROTECT_ALWAYS_TRUST) != 0;
+    guint mode = libbalsa_message_get_crypt_mode(message);
+    gboolean always_trust = libbalsa_message_get_always_trust(message);
 
     switch (mode & LIBBALSA_PROTECT_MODE) {
     case LIBBALSA_PROTECT_SIGN:       /* sign only */
@@ -1883,7 +1883,7 @@ do_multipart_crypto(LibBalsaMessage *message,
     gpgme_protocol_t protocol;
     gboolean always_trust;
 
-    mode = libbalsa_message_get_gpg_mode(message);
+    mode = libbalsa_message_get_crypt_mode(message);
 
     /* check if we shall do any protection */
     if ((mode & LIBBALSA_PROTECT_MODE) == 0) {
@@ -1893,14 +1893,14 @@ do_multipart_crypto(LibBalsaMessage *message,
     /* check which protocol should be used */
     if (mode & LIBBALSA_PROTECT_RFC3156) {
         protocol = GPGME_PROTOCOL_OpenPGP;
-    } else if (mode & LIBBALSA_PROTECT_SMIMEV3) {
+    } else if (mode & LIBBALSA_PROTECT_SMIME) {
         protocol = GPGME_PROTOCOL_CMS;
     } else if (mode & LIBBALSA_PROTECT_OPENPGP) {
         return LIBBALSA_MESSAGE_CREATE_OK;  /* already done... */
     } else {
         return LIBBALSA_MESSAGE_ENCRYPT_ERROR;  /* hmmm.... */
     }
-    always_trust = (mode & LIBBALSA_PROTECT_ALWAYS_TRUST) != 0;
+    always_trust = libbalsa_message_get_always_trust(message);
     /* sign and/or encrypt */
     switch (mode & LIBBALSA_PROTECT_MODE) {
     case LIBBALSA_PROTECT_SIGN:       /* sign message */
@@ -1940,7 +1940,7 @@ do_multipart_crypto(LibBalsaMessage *message,
                              (headers->bcc_list)));
         }
 
-        if ((libbalsa_message_get_gpg_mode(message) & LIBBALSA_PROTECT_SIGN) != 0) {
+        if ((libbalsa_message_get_crypt_mode(message) & LIBBALSA_PROTECT_SIGN) != 0) {
             success =
                 libbalsa_sign_encrypt_mime_object(mime_root,
                                                   lb_send_from(message, protocol),

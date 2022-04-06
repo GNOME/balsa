@@ -85,15 +85,6 @@ struct _LibBalsaMessage {
     /* message ID */
     gchar *message_id;
 
-    /* GnuPG or S/MIME sign and/or encrypt message (sending), or status of received message */
-    guint crypt_mode;
-
-    /* Indicate that uid's should always be trusted when signing a message */
-    gboolean always_trust;
-
-    /* attach the GnuPG public key to the message (sending) */
-    gboolean att_pubkey;
-
     /* sender identity, required for choosing a forced GnuPG or S/MIME key */
     LibBalsaIdentity *ident;
 
@@ -108,7 +99,14 @@ struct _LibBalsaMessage {
 
     /* message body */
     LibBalsaMessageBody *body_list;
-    /* end of pointers, begin ints */
+
+    /* end of pointers, begin long ints */
+    glong length;   /* byte len */
+
+    /* end of longs, begin ints */
+    /* GnuPG or S/MIME sign and/or encrypt message (sending), or status of received message */
+    guint crypt_mode;
+
     guint body_ref;
 
     /* flags */
@@ -116,16 +114,15 @@ struct _LibBalsaMessage {
 
     guint msgno;     /* message no; always copy for faster sorting;
                       * counting starts at 1. */
-    glong length;   /* byte len */
 
     /* GPG sign and/or encrypt message (sending) */
     guint gpg_mode;
 
-    /* protection (i.e. sign/encrypt) status (received message) */
-    LibBalsaMsgProtectState prot_state;
-
     /* end of ints, begin bit fields */
     unsigned has_all_headers : 1;
+
+    /* Indicate that uid's should always be trusted when signing a message */
+    unsigned always_trust : 1;
 
     /* attach the GnuPG public key to the message (sending) */
     unsigned att_pubkey : 1;
@@ -157,7 +154,6 @@ libbalsa_message_init(LibBalsaMessage * message)
     message->ident = NULL;
     message->body_list = NULL;
     message->body_ref = 0;
-    message->prot_state = LIBBALSA_MSG_PROTECT_NONE;
     message->flags = LIBBALSA_MESSAGE_FLAG_NONE;
     message->gpg_mode = 0;
     message->has_all_headers = 0;
@@ -1635,7 +1631,7 @@ libbalsa_message_get_always_trust(LibBalsaMessage *message)
 {
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), FALSE);
 
-    return message->always_trust;
+    return message->always_trust != 0;
 }
 
 
@@ -1834,7 +1830,7 @@ libbalsa_message_set_always_trust(LibBalsaMessage *message,
 {
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 
-    message->always_trust = mode;
+    message->always_trust = mode ? 1 : 0;
 }
 
 

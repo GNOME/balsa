@@ -141,7 +141,7 @@ static BalsaPartInfo* balsa_part_info_new(LibBalsaMessageBody* body);
 static void balsa_part_info_dispose(GObject * object);
 static void balsa_part_info_finalize(GObject * object);
 
-static LibBalsaMsgProtectState bm_scan_signatures(LibBalsaMessageBody *body,
+static guint bm_scan_signatures(LibBalsaMessageBody *body,
 							     LibBalsaMessage * message);
 static GdkPixbuf * get_crypto_content_icon(LibBalsaMessageBody * body,
 					   const gchar * content_type,
@@ -1104,7 +1104,7 @@ balsa_message_set(BalsaMessage * balsa_message, LibBalsaMailbox * mailbox, guint
     BalsaPartInfo *info;
     gboolean has_focus;
     LibBalsaMessage *message;
-    LibBalsaMsgProtectState prot_state;
+    guint prot_state;
 
     g_return_val_if_fail(balsa_message != NULL, FALSE);
     has_focus = balsa_message->focus_state != BALSA_MESSAGE_FOCUS_STATE_NO;
@@ -1155,13 +1155,13 @@ balsa_message_set(BalsaMessage * balsa_message, LibBalsaMailbox * mailbox, guint
 				 libbalsa_mailbox_get_crypto_mode(mailbox),
 				 FALSE, 1);
     /* calculate the signature summary state if not set earlier */
-    prot_state = libbalsa_message_get_protect_state(message);
-    if (prot_state == LIBBALSA_MSG_PROTECT_NONE) {
-        LibBalsaMsgProtectState new_prot_state =
+    prot_state = libbalsa_message_get_crypt_mode(message);
+    if (prot_state == LIBBALSA_PROTECT_NONE) {
+        guint new_prot_state =
             bm_scan_signatures(libbalsa_message_get_body_list(message), message);
         /* update the icon if necessary */
         if (prot_state != new_prot_state)
-            libbalsa_message_set_protect_state(message, new_prot_state);
+            libbalsa_message_set_crypt_mode(message, new_prot_state);
     }
 
     /* may update the icon */
@@ -2688,17 +2688,17 @@ balsa_message_zoom(BalsaMessage * balsa_message, gint in_out)
  * Calculate and return a "worst case" summary of all checked signatures in a
  * message.
  */
-static LibBalsaMsgProtectState
+static guint
 bm_scan_signatures(LibBalsaMessageBody *body,
                               LibBalsaMessage * message)
 {
-    LibBalsaMsgProtectState result = LIBBALSA_MSG_PROTECT_NONE;
+    guint result = LIBBALSA_PROTECT_NONE;
 
     g_return_val_if_fail(libbalsa_message_get_headers(message) != NULL, result);
 
     while (body) {
-	LibBalsaMsgProtectState this_part_state =
-	    libbalsa_message_body_protect_state(body);
+	guint this_part_state =
+	    libbalsa_message_body_signature_state(body);
 
 	/* remember: greater means worse... */
 	if (this_part_state > result)
@@ -2706,10 +2706,10 @@ bm_scan_signatures(LibBalsaMessageBody *body,
 
         /* scan embedded messages */
         if (body->parts) {
-            LibBalsaMsgProtectState sub_result =
+            guint sub_result =
                 bm_scan_signatures(body->parts, message);
 
-            if (sub_result >= result)
+            if (sub_result > result)
                 result = sub_result;
         }
 
@@ -2733,12 +2733,12 @@ get_crypto_content_icon(LibBalsaMessageBody * body, const gchar * content_type,
     gchar * new_title;
     const gchar * icon_name;
 
-    if ((libbalsa_message_body_protection(body) &
+    if ((libbalsa_message_body_protect_mode(body) &
          (LIBBALSA_PROTECT_ENCRYPT | LIBBALSA_PROTECT_ERROR)) ==
         LIBBALSA_PROTECT_ENCRYPT)
         return NULL;
 
-    icon_name = balsa_mime_widget_signature_icon_name(libbalsa_message_body_protect_state(body));
+    icon_name = balsa_mime_widget_signature_icon_name(libbalsa_message_body_signature_state(body));
     if (!icon_name)
         return NULL;
     icon =
@@ -2800,7 +2800,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
     while (strcmp(mime_type, "multipart/encrypted") == 0 ||
 	   strcmp(mime_type, "application/pkcs7-mime") == 0 ||
 	   strcmp(mime_type, "application/x-pkcs7-mime") == 0) {
-	gint encrres;
+	guint encrres;
 
 	/* FIXME: not checking for body_ref > 1 (or > 2 when re-checking, which
 	 * adds an extra ref) leads to a crash if we have both the encrypted and
@@ -2839,7 +2839,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
             }
 	}
 
-	encrres = libbalsa_message_body_protection(this_body);
+	encrres = libbalsa_message_body_protect_mode(this_body);
 
 	if (encrres & LIBBALSA_PROTECT_ENCRYPT) {
 	    if (encrres & LIBBALSA_PROTECT_ERROR) {
@@ -2862,7 +2862,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
                     this_body =
                         libbalsa_body_decrypt(this_body,
                                               GPGME_PROTOCOL_OpenPGP, NULL);
-            } else if (encrres & LIBBALSA_PROTECT_SMIMEV3) {
+            } else if (encrres & LIBBALSA_PROTECT_SMIME) {
                 if (!balsa_app.has_smime)
                     libbalsa_information
                         (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
@@ -2900,7 +2900,7 @@ static void
 libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 			   chk_crypto_t * chk_crypto)
 {
-    gint signres;
+    guint signres;
 
     if (chk_crypto->no_mp_signed)
 	return;
@@ -2925,7 +2925,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
     }
 
     /* check which type of protection we've got */
-    signres = libbalsa_message_body_protection(body);
+    signres = libbalsa_message_body_protect_mode(body);
     if (!(signres & LIBBALSA_PROTECT_SIGN))
 	return;
 
@@ -2943,7 +2943,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 
     /* check for an unsupported protocol */
     if (((signres & LIBBALSA_PROTECT_RFC3156) && !balsa_app.has_openpgp) ||
-	((signres & LIBBALSA_PROTECT_SMIMEV3) && !balsa_app.has_smime)) {
+	((signres & LIBBALSA_PROTECT_SMIME) && !balsa_app.has_smime)) {
 	libbalsa_information
 	    (chk_crypto->chk_mode == LB_MAILBOX_CHK_CRYPT_ALWAYS ?
 	     LIBBALSA_INFORMATION_WARNING : LIBBALSA_INFORMATION_MESSAGE,
@@ -2971,11 +2971,11 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
                       GUINT_TO_POINTER(TRUE));
 
     if (body->parts->next->sig_info) {
-	switch (libbalsa_message_body_protect_state(body->parts->next)) {
-	case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
+	switch (libbalsa_message_body_signature_state(body->parts->next)) {
+	case LIBBALSA_PROTECT_SIGN_GOOD:
 	    g_debug("Detected a good signature");
 	    break;
-	case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
+	case LIBBALSA_PROTECT_SIGN_NOTRUST:
 	    if (g_mime_gpgme_sigstat_protocol(body->parts->next->sig_info) == GPGME_PROTOCOL_CMS)
 		libbalsa_information_may_hide
 		    (LIBBALSA_INFORMATION_MESSAGE, "SIG_NOTRUST",
@@ -2987,7 +2987,7 @@ libbalsa_msg_try_mp_signed(LibBalsaMessage * message, LibBalsaMessageBody *body,
 		     _("Detected a good signature with insufficient "
 		       "validity/trust"));
 	    break;
-	case LIBBALSA_MSG_PROTECT_SIGN_BAD: {
+	case LIBBALSA_PROTECT_SIGN_BAD: {
 		gchar *status;
 
 		status = libbalsa_gpgme_sig_stat_to_gchar(g_mime_gpgme_sigstat_status(body->parts->next->sig_info));
@@ -3227,7 +3227,7 @@ void
 balsa_message_recheck_crypto(BalsaMessage *balsa_message)
 {
     LibBalsaMessageBody *body_list;
-    LibBalsaMsgProtectState prot_state;
+    guint prot_state;
     LibBalsaMessage * message;
     GtkTreeIter iter;
     BalsaPartInfo * info;
@@ -3251,7 +3251,7 @@ balsa_message_recheck_crypto(BalsaMessage *balsa_message)
     prot_state = bm_scan_signatures(body_list, message);
 
     /* update the icon if necessary */
-    libbalsa_message_set_protect_state(message, prot_state);
+    libbalsa_message_set_crypt_mode(message, prot_state);
 
     /* may update the icon */
     libbalsa_mailbox_msgno_update_attach(libbalsa_message_get_mailbox(balsa_message->message),

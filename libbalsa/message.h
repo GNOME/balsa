@@ -71,18 +71,6 @@ enum _LibBalsaMessageStatus {
     LIBBALSA_MESSAGE_STATUS_ICONS_NUM
 };
 
-
-typedef enum _LibBalsaMsgProtectState LibBalsaMsgProtectState;
-
-enum _LibBalsaMsgProtectState {
-    LIBBALSA_MSG_PROTECT_NONE,
-    LIBBALSA_MSG_PROTECT_SIGN_UNKNOWN,
-    LIBBALSA_MSG_PROTECT_SIGN_GOOD,
-    LIBBALSA_MSG_PROTECT_SIGN_NOTRUST,
-    LIBBALSA_MSG_PROTECT_SIGN_BAD,
-    LIBBALSA_MSG_PROTECT_CRYPT
-};
-
 typedef enum _LibBalsaMessageAttach LibBalsaMessageAttach;
 enum _LibBalsaMessageAttach {
     LIBBALSA_MESSAGE_ATTACH_ATTACH,
@@ -174,6 +162,41 @@ struct _LibBalsaMessageHeaders {
 #define LIBBALSA_MESSAGE_GET_SUBJECT(m) libbalsa_message_get_subject(m)
 #define LIBBALSA_MESSAGE_GET_NO(m)      libbalsa_message_get_msgno(m)
 #define LIBBALSA_MESSAGE_GET_LENGTH(m)  libbalsa_message_get_length(m)
+
+
+/** @brief Message cryptographic protection flags
+ *
+ * Bit flags for reporting the cryptographic state of received messages and message bodies, and for creating new messages.  Uses by
+ * - _LibBalsaMessage::crypt_mode, _BalsaSendmsg::crypt_mode
+ * - libbalsa_message_set_crypt_mode(), libbalsa_message_get_crypt_mode()
+ * - libbalsa_message_body_protect_mode(), libbalsa_message_body_signature_state()
+ *
+ * @{
+ */
+/* no protection */
+#define LIBBALSA_PROTECT_NONE          0x0000U
+
+/* bits to define the protection mode: signed or encrypted */
+#define LIBBALSA_PROTECT_SIGN          0x0001U
+#define LIBBALSA_PROTECT_ENCRYPT       0x0002U
+#define LIBBALSA_PROTECT_MODE          (LIBBALSA_PROTECT_SIGN | LIBBALSA_PROTECT_ENCRYPT)
+
+/* bits to define the protection method */
+#define LIBBALSA_PROTECT_OPENPGP       0x0004U	/* RFC 2440 (OpenPGP) */
+#define LIBBALSA_PROTECT_SMIME         0x0008U	/* RFC 8551 (S/MIME v4 or earlier) */
+#define LIBBALSA_PROTECT_RFC3156       0x0010U	/* RFC 3156 (PGP/MIME) */
+#define LIBBALSA_PROTECT_PROTOCOL      (LIBBALSA_PROTECT_OPENPGP | LIBBALSA_PROTECT_SMIME | LIBBALSA_PROTECT_RFC3156)
+
+/* indicate broken structure */
+#define LIBBALSA_PROTECT_ERROR         0x0020U
+
+/* cryptographic signature state of a received message - note that the signature state is not really a bit mask, and must be sorted
+ * in ascending order, i.e. the best state must have the lowest and the worst the highest value */
+#define LIBBALSA_PROTECT_SIGN_GOOD     0x0100U
+#define LIBBALSA_PROTECT_SIGN_NOTRUST  0x0200U
+#define LIBBALSA_PROTECT_SIGN_BAD      0x0300U
+/** @} */
+
 
 /*
  * message headers
@@ -286,10 +309,10 @@ GList                  *libbalsa_message_get_references(LibBalsaMessage *message
 LibBalsaIdentity       *libbalsa_message_get_identity(LibBalsaMessage *message);
 GList                  *libbalsa_message_get_parameters(LibBalsaMessage *message);
 const gchar            *libbalsa_message_get_subtype(LibBalsaMessage *message);
-guint                   libbalsa_message_get_gpg_mode(LibBalsaMessage *message);
+guint                   libbalsa_message_get_crypt_mode(LibBalsaMessage *message);
+gboolean                libbalsa_message_get_always_trust(LibBalsaMessage *message);
 GList                  *libbalsa_message_get_in_reply_to(LibBalsaMessage *message);
 gboolean                libbalsa_message_get_attach_pubkey(LibBalsaMessage *message);
-LibBalsaMsgProtectState libbalsa_message_get_protect_state(LibBalsaMessage *message);
 guint                   libbalsa_message_get_body_ref(LibBalsaMessage *message);
 gboolean				libbalsa_message_has_crypto_content(LibBalsaMessage *message);
 
@@ -317,8 +340,6 @@ void libbalsa_message_set_sender(LibBalsaMessage     *message,
                                  InternetAddressList *sender);
 void libbalsa_message_set_message_id(LibBalsaMessage *message,
                                      const gchar     *message_id);
-void libbalsa_message_set_protect_state(LibBalsaMessage        *message,
-                                     LibBalsaMsgProtectState prot_state);
 void libbalsa_message_set_request_dsn(LibBalsaMessage *message,
                                       gboolean         request_dsn);
 void libbalsa_message_set_subtype(LibBalsaMessage *message,
@@ -329,8 +350,10 @@ void libbalsa_message_set_references(LibBalsaMessage *message,
                                      GList           *references);
 void libbalsa_message_set_in_reply_to(LibBalsaMessage *message,
                                       GList           *in_reply_to);
-void libbalsa_message_set_gpg_mode(LibBalsaMessage *message,
-                                   guint            mode);
+void libbalsa_message_set_crypt_mode(LibBalsaMessage *message,
+                                     guint            mode);
+void libbalsa_message_set_always_trust(LibBalsaMessage *message,
+                                       gboolean         mode);
 void libbalsa_message_set_attach_pubkey(LibBalsaMessage *message,
                                      gboolean         att_pubkey);
 void libbalsa_message_set_identity(LibBalsaMessage  *message,

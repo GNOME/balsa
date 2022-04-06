@@ -205,7 +205,7 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
         gtk_box_pack_start(GTK_BOX(icon_box), icon, FALSE, FALSE, 0);
     }
     if (!no_signature) {
-    	LibBalsaMsgProtectState sig_state = libbalsa_message_body_protect_state(mime_body);
+    	guint sig_state = libbalsa_message_body_signature_state(mime_body);
     	const gchar *icon_name = balsa_mime_widget_signature_icon_name(sig_state);
 
     	if (icon_name == NULL) {
@@ -213,13 +213,13 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
     	}
 		icon = gtk_image_new_from_icon_name(balsa_icon_id(icon_name), GTK_ICON_SIZE_MENU);
     	switch (sig_state) {
-    	case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
+    	case LIBBALSA_PROTECT_SIGN_GOOD:
     		gtk_widget_set_tooltip_text(icon, _("trusted signature"));
     		break;
-    	case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
+    	case LIBBALSA_PROTECT_SIGN_NOTRUST:
     		gtk_widget_set_tooltip_text(icon, _("low trust signature"));
     		break;
-    	case LIBBALSA_MSG_PROTECT_SIGN_BAD:
+    	case LIBBALSA_PROTECT_SIGN_BAD:
     		gtk_widget_set_tooltip_text(icon, _("bad signature"));
     		break;
     	default:
@@ -244,14 +244,14 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
  * get the proper icon name for a given protection state
  */
 const gchar *
-balsa_mime_widget_signature_icon_name(LibBalsaMsgProtectState protect_state)
+balsa_mime_widget_signature_icon_name(guint protect_state)
 {
     switch (protect_state) {
-    case LIBBALSA_MSG_PROTECT_SIGN_GOOD:
+    case LIBBALSA_PROTECT_SIGN_GOOD:
         return BALSA_PIXMAP_SIGN_GOOD;
-    case LIBBALSA_MSG_PROTECT_SIGN_NOTRUST:
+    case LIBBALSA_PROTECT_SIGN_NOTRUST:
         return BALSA_PIXMAP_SIGN_NOTRUST;
-    case LIBBALSA_MSG_PROTECT_SIGN_BAD:
+    case LIBBALSA_PROTECT_SIGN_BAD:
         return BALSA_PIXMAP_SIGN_BAD;
     default:
         return NULL;

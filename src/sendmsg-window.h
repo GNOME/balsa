@@ -91,7 +91,8 @@ G_BEGIN_DECLS
 	gboolean send_mp_alt;   /* send multipart/alternative (plain and html) */ 
 	gboolean req_mdn; 	 /* send a MDN */
 	gboolean req_dsn;	 /* send a delivery status notification */
-	guint gpg_mode;
+	guint crypt_mode;
+	gboolean always_trust;
 	gboolean attach_pubkey;
 
 #if !HAVE_GTKSOURCEVIEW

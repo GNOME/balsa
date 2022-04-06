@@ -88,7 +88,7 @@ gboolean     libbalsa_identity_get_gpg_sign(LibBalsaIdentity *ident);
 gboolean     libbalsa_identity_get_gpg_encrypt(LibBalsaIdentity *ident);
 gboolean     libbalsa_identity_get_sig_executable(LibBalsaIdentity *ident);
 gboolean     libbalsa_identity_get_sig_separator(LibBalsaIdentity *ident);
-gint         libbalsa_identity_get_crypt_protocol(LibBalsaIdentity *ident);
+guint        libbalsa_identity_get_crypt_protocol(LibBalsaIdentity *ident);
 gchar* libbalsa_identity_get_signature(LibBalsaIdentity *ident, GError **error);
 const gchar *libbalsa_identity_get_identity_name(LibBalsaIdentity *ident);
 const gchar *libbalsa_identity_get_force_gpg_key_id(LibBalsaIdentity *ident);

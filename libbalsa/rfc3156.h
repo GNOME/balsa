@@ -20,38 +20,12 @@
 #ifndef __RFC3156_H__
 #define __RFC3156_H__
 
-#ifndef BALSA_VERSION
-# error "Include config.h before this file."
-#endif
-
-/* bits to define the protection method; needed even when we don't
- * HAVE_GPGME */
-#define LIBBALSA_PROTECT_OPENPGP       (1 << 2)	/* RFC 2440 (OpenPGP) */
-#define LIBBALSA_PROTECT_SMIMEV3       (1 << 3)	/* RFC 2633 (S/MIME v3) */
-#define LIBBALSA_PROTECT_RFC3156       (1 << 4)	/* RFC 3156 (PGP/MIME) */
-
 #include <gpgme.h>
 #include "libbalsa.h"
 #include "misc.h"
 #include "gmime-gpgme-signature.h"
 
 
-/* bits to define the protection mode: signed or encrypted */
-#define LIBBALSA_PROTECT_SIGN          (1 << 0)
-#define LIBBALSA_PROTECT_ENCRYPT       (1 << 1)
-#define LIBBALSA_PROTECT_MODE          (3 << 0)
-
-/* bits to define the protection method */
-#define LIBBALSA_PROTECT_PROTOCOL      (7 << 2)
-
-/* indicate broken structure */
-#define LIBBALSA_PROTECT_ERROR         (1 << 5)
-
-/* indicate that uid's should always be trusted */
-#define LIBBALSA_PROTECT_ALWAYS_TRUST  (1 << 6)
-
-
-gint libbalsa_message_body_protection(LibBalsaMessageBody * body);
 gboolean libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
 				      gpgme_protocol_t protocol);
 

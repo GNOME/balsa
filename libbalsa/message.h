@@ -260,7 +260,6 @@ void libbalsa_message_set_subject_from_header(LibBalsaMessage * message,
    function out if we find a way.
 */
 const gchar* libbalsa_message_get_subject(LibBalsaMessage* message);
-glong libbalsa_message_get_no(LibBalsaMessage* msg);
 LibBalsaMessageAttach libbalsa_message_get_attach_icon(LibBalsaMessage *
 						       message);
 #define libbalsa_message_date_to_utf8(m, f) \
@@ -296,7 +295,7 @@ GMimeMessage           *libbalsa_message_get_mime_message(LibBalsaMessage *messa
 LibBalsaMessageFlag     libbalsa_message_get_flags(LibBalsaMessage *message);
 const gchar            *libbalsa_message_get_message_id(LibBalsaMessage *message);
 guint                   libbalsa_message_get_msgno(LibBalsaMessage *message);
-glong                   libbalsa_message_get_length(LibBalsaMessage *message);
+gint64                  libbalsa_message_get_length(LibBalsaMessage *message);
 gboolean                libbalsa_message_get_has_all_headers(LibBalsaMessage *message);
 InternetAddressList    *libbalsa_message_get_sender(LibBalsaMessage *message);
 gboolean                libbalsa_message_get_request_dsn(LibBalsaMessage *message);
@@ -323,7 +322,7 @@ void libbalsa_message_set_msgno(LibBalsaMessage *message,
 void libbalsa_message_set_has_all_headers(LibBalsaMessage *message,
                                           gboolean         has_all_headers);
 void libbalsa_message_set_length(LibBalsaMessage *message,
-                                 glong            length);
+                                 gint64           length);
 void libbalsa_message_set_mime_message(LibBalsaMessage *message,
                                    GMimeMessage    *mime_message);
 void libbalsa_message_set_sender(LibBalsaMessage     *message,

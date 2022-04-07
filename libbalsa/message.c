@@ -100,10 +100,10 @@ struct _LibBalsaMessage {
     /* message body */
     LibBalsaMessageBody *body_list;
 
-    /* end of pointers, begin long ints */
-    glong length;   /* byte len */
+    /* end of pointers, begin 64-bit ints */
+    gint64 length;   /* byte len */
 
-    /* end of longs, begin ints */
+    /* end of 64-bit ints, begin ints */
     /* GnuPG or S/MIME sign and/or encrypt message (sending), or status of received message */
     guint crypt_mode;
 
@@ -1074,8 +1074,15 @@ libbalsa_message_init_from_gmime(LibBalsaMessage * message,
     libbalsa_message_set_subject_from_header(message, header);
 
     header = g_mime_object_get_header(GMIME_OBJECT(mime_msg), "Content-Length");
-    if (header)
-        message->length = atoi(header);
+    if (header) {
+        char *endptr;
+
+        message->length = strtoll(header, &endptr, 10);
+        if (*endptr != '\0') {
+            message->length = -1;
+            g_debug("Bad Content-Length header: “%s”; using -1", header);
+        }
+    }
 
     header = g_mime_message_get_message_id(mime_msg);
     if (header)
@@ -1242,11 +1249,15 @@ lbmsg_set_header(LibBalsaMessage *message,
     } else if ((headers->dispnotify_to == NULL) &&
                (g_ascii_strcasecmp(name, "Disposition-Notification-To") == 0)) {
         headers->dispnotify_to = internet_address_list_parse(libbalsa_parser_options(), value);
-    } else
-    if (g_ascii_strcasecmp(name, "Content-Length") == 0) {
-        message->length = atoi(value);
-    } else
-    if (all) {
+    } else if (g_ascii_strcasecmp(name, "Content-Length") == 0) {
+        char *endptr;
+
+        message->length = strtoll(value, &endptr, 10);
+        if (*endptr != '\0') {
+            message->length = -1;
+            g_debug("Bad Content-Length header: “%s”; using -1", value);
+        }
+    } else if (all) {
         headers->user_hdrs =
             g_list_prepend(headers->user_hdrs,
                            libbalsa_create_hdr_pair(name, g_strdup(value)));
@@ -1544,7 +1555,7 @@ libbalsa_message_get_msgno(LibBalsaMessage *message)
 }
 
 
-glong
+gint64
 libbalsa_message_get_length(LibBalsaMessage *message)
 {
     g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), 0);
@@ -1718,7 +1729,7 @@ libbalsa_message_set_has_all_headers(LibBalsaMessage *message,
 
 void
 libbalsa_message_set_length(LibBalsaMessage *message,
-                            glong            length)
+                            gint64           length)
 {
     g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
 

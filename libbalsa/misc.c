@@ -30,6 +30,9 @@
 #define _SVID_SOURCE           1
 #include <ctype.h>
 #include <errno.h>
+#ifdef USE_FCNTL
+# include <fcntl.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

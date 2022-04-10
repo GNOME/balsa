@@ -4819,16 +4819,22 @@ sw_wrap_body(BalsaSendmsg * bsmsg)
         GtkTextIter now;
         gint pos;
         gchar *the_text;
+        GRegex *rex;
+        char *wrapped;
 
         gtk_text_buffer_get_iter_at_mark(buffer, &now,
                                          gtk_text_buffer_get_insert(buffer));
         pos = gtk_text_iter_get_offset(&now);
 
         the_text = gtk_text_iter_get_text(&start, &end);
-        libbalsa_wrap_string(the_text, balsa_app.wraplength);
-        gtk_text_buffer_set_text(buffer, "", 0);
-        gtk_text_buffer_insert_at_cursor(buffer, the_text, -1);
+        rex = balsa_quote_regex_new();
+        wrapped = libbalsa_wrap_quoted_string(the_text, balsa_app.browse_wrap_length, rex);
+        g_regex_unref(rex);
         g_free(the_text);
+
+        gtk_text_buffer_set_text(buffer, "", 0);
+        gtk_text_buffer_insert_at_cursor(buffer, wrapped, -1);
+        g_free(wrapped);
 
         gtk_text_buffer_get_iter_at_offset(buffer, &now, pos);
         gtk_text_buffer_place_cursor(buffer, &now);

@@ -34,5 +34,8 @@ GString *process_mime_part(LibBalsaMessage * message,
 GString *content2reply(LibBalsaMessageBody *root,
 		       gchar * reply_prefix_str, gint llen,
 		       gboolean ignore_html, gboolean flow);
+char *libbalsa_wrap_quoted_string(const char *str,
+                                  unsigned    width,
+                                  GRegex     *quote_regex);
 
 #endif				/* __LIBBALSA_MIME_H__ */

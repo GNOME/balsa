@@ -1301,3 +1301,77 @@ libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lan
     /* return the utf-8 encoded text/html */
     return g_string_free(html_body, FALSE);
 }
+
+/*
+ * libbalsa_wrap_quoted string
+ * Wraps the string, prefixing wrapped lines with any quote string
+ * Uses the same wrapping strategy as libbalsa_wrap_string()
+ * Returns a newly allocated string--deallocate with g_free() when done
+*/
+char *
+libbalsa_wrap_quoted_string(const char *str,
+                            unsigned    width,
+                            GRegex     *quote_regex)
+{
+    char **lines;
+    char **line;
+    GString *wrapped;
+
+    g_return_val_if_fail(str != NULL, NULL);
+    g_return_val_if_fail(quote_regex != NULL, NULL);
+
+    lines = g_strsplit(str, "\n", -1);
+    wrapped = g_string_new(NULL);
+
+    for (line = lines; *line != NULL; line++) {
+        unsigned quote_len, quote_len_utf8;
+        const char *start_pos, *space_pos, *ptr;
+        const unsigned minl = width / 2;
+        unsigned te = 0;    /* tabs' extra space */
+        unsigned ptr_offset, line_begin_offset, space_pos_offset;
+
+        libbalsa_match_regex(*line, quote_regex, NULL, &quote_len);
+
+        g_string_append_len(wrapped, *line, quote_len);
+        ptr = *line + quote_len;
+
+        quote_len_utf8 = g_utf8_pointer_to_offset(*line, ptr);
+        ptr_offset = quote_len_utf8;
+
+        line_begin_offset = space_pos_offset = 0;
+        start_pos = space_pos = ptr;
+
+        while (*ptr != '\0') {
+            switch (*ptr) {
+            case '\t':
+                te += 7;
+                break;
+            case ' ':
+                space_pos = ptr;
+                space_pos_offset = ptr_offset;
+                break;
+            }
+
+            if (ptr_offset - line_begin_offset >= width - te &&
+                space_pos_offset >= line_begin_offset + minl) {
+                g_string_append_len(wrapped, start_pos, space_pos - start_pos);
+                g_string_append_c(wrapped, '\n');
+
+                g_string_append_len(wrapped, *line, quote_len);
+                ptr_offset += quote_len_utf8;
+
+                start_pos = space_pos + 1;
+                line_begin_offset = space_pos_offset + 1;
+                te = 0;
+            }
+            ptr = g_utf8_next_char(ptr);
+            ptr_offset++;
+        }
+        g_string_append(wrapped, start_pos);
+        g_string_append_c(wrapped, '\n');
+    }
+
+    g_strfreev(lines);
+
+    return (char *) g_string_free(wrapped, FALSE);
+}

@@ -97,6 +97,9 @@ gchar *libbalsa_get_domainname(void);
 
 gboolean libbalsa_find_word(const gchar * word, const gchar * str);
 void libbalsa_wrap_string(gchar * str, int width);
+char *libbalsa_wrap_quoted_string(const char *str,
+                                  unsigned    width,
+                                  GRegex     *quote_regex);
 GString *libbalsa_process_text_rfc2646(gchar * par, gint width,
 				       gboolean from_screen,
 				       gboolean to_screen, gboolean quote,

@@ -1316,6 +1316,7 @@ libbalsa_wrap_quoted_string(const char *str,
     char **lines;
     char **line;
     GString *wrapped;
+    PangoLogAttr *log_attrs = NULL;
 
     g_return_val_if_fail(str != NULL, NULL);
     g_return_val_if_fail(quote_regex != NULL, NULL);
@@ -1325,52 +1326,71 @@ libbalsa_wrap_quoted_string(const char *str,
 
     for (line = lines; *line != NULL; line++) {
         unsigned quote_len, quote_len_utf8;
-        const char *start_pos, *space_pos, *ptr;
+        const char *start_ptr, *break_ptr, *ptr;
         const unsigned minl = width / 2;
-        unsigned te = 0;    /* tabs' extra space */
-        unsigned ptr_offset, line_begin_offset, space_pos_offset;
+        unsigned ptr_offset, start_offset, break_offset;
+        int num_chars;
+        int attrs_len;
+        unsigned cursor;
+
+        num_chars = g_utf8_strlen(*line, -1);
+        attrs_len = num_chars + 1;
+        log_attrs = g_renew(PangoLogAttr, log_attrs, attrs_len);
+        pango_get_log_attrs(*line, -1, -1, pango_language_get_default(), log_attrs, attrs_len);
 
         libbalsa_match_regex(*line, quote_regex, NULL, &quote_len);
 
         g_string_append_len(wrapped, *line, quote_len);
         ptr = *line + quote_len;
 
-        quote_len_utf8 = g_utf8_pointer_to_offset(*line, ptr);
-        ptr_offset = quote_len_utf8;
+        ptr_offset = g_utf8_pointer_to_offset(*line, ptr);
+        cursor = quote_len_utf8 = ptr_offset;
 
-        line_begin_offset = space_pos_offset = 0;
-        start_pos = space_pos = ptr;
+        start_ptr = break_ptr = ptr;
+        start_offset = break_offset = ptr_offset;
 
         while (*ptr != '\0') {
-            switch (*ptr) {
-            case '\t':
-                te += 7;
-                break;
-            case ' ':
-                space_pos = ptr;
-                space_pos_offset = ptr_offset;
-                break;
+            gunichar c = g_utf8_get_char(ptr);
+
+            if (c == '\t')
+                cursor += 8 - cursor % 8;
+            else
+                cursor++;
+
+            if (log_attrs[ptr_offset].is_line_break) {
+                break_ptr = ptr;
+                break_offset = ptr_offset;
             }
 
-            if (ptr_offset - line_begin_offset >= width - te &&
-                space_pos_offset >= line_begin_offset + minl) {
-                g_string_append_len(wrapped, start_pos, space_pos - start_pos);
+            if (cursor >= width && break_offset >= start_offset + minl && !g_unichar_isspace(c)) {
+                const char *end_ptr, *test_ptr;
+                gunichar test_char;
+
+                /* Back up over whitespace */
+                test_ptr = break_ptr;
+                do {
+                    end_ptr = test_ptr;
+                    test_ptr = g_utf8_prev_char(test_ptr);
+                    test_char = g_utf8_get_char(test_ptr);
+                } while (test_ptr > start_ptr && g_unichar_isspace(test_char));
+
+                g_string_append_len(wrapped, start_ptr, end_ptr - start_ptr);
                 g_string_append_c(wrapped, '\n');
-
                 g_string_append_len(wrapped, *line, quote_len);
-                ptr_offset += quote_len_utf8;
 
-                start_pos = space_pos + 1;
-                line_begin_offset = space_pos_offset + 1;
-                te = 0;
+                start_ptr = break_ptr;
+                start_offset = break_offset;
+                cursor = quote_len_utf8 + ptr_offset - start_offset;
             }
             ptr = g_utf8_next_char(ptr);
             ptr_offset++;
         }
-        g_string_append(wrapped, start_pos);
+
+        g_string_append(wrapped, start_ptr);
         g_string_append_c(wrapped, '\n');
     }
 
+    g_free(log_attrs);
     g_strfreev(lines);
 
     return (char *) g_string_free(wrapped, FALSE);

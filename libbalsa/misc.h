@@ -104,7 +104,6 @@ GString *libbalsa_process_text_rfc2646(gchar * par, gint width,
 gchar *libbalsa_wrap_rfc2646(gchar * par, gint width,
                              gboolean from_screen, gboolean to_screen,
 			     gboolean delsp);
-void libbalsa_wrap_view(GtkTextView * view, gint length);
 void libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
                             gint lines);
 

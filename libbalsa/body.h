@@ -83,6 +83,12 @@ struct _LibBalsaMessageBody {
     gboolean was_encrypted;
     GMimeGpgmeSigstat* sig_info;  /* info about a pgp or S/MIME signature body */
 
+#ifdef HAVE_HTML_WIDGET
+    gboolean html_ext_loaded;	/* if external HTML content was loaded */
+    gboolean html_selected;		/* if the HTML part of a multipart/alternative is selected */
+#endif /* HAVE_HTML_WIDGET */
+
+    LibBalsaMessageBody *parent;	/* Parent part in the message */
     LibBalsaMessageBody *next;	/* Next part in the message */
     LibBalsaMessageBody *parts;	/* The parts of a multipart or message/rfc822 message */
 };
@@ -131,6 +137,14 @@ LibBalsaMessageBody *libbalsa_message_body_get_by_id(LibBalsaMessageBody *
                                                      body,
                                                      const gchar * id);
 LibBalsaMessageBody *libbalsa_message_body_mp_related_root(LibBalsaMessageBody *body);
+
+#ifdef HAVE_HTML_WIDGET
+void libbalsa_message_body_set_html_selected(LibBalsaMessageBody *body);
+gboolean libbalsa_message_body_get_html_selected(LibBalsaMessageBody *body);
+#else
+#define libbalsa_message_body_set_html_selected(x)
+#define libbalsa_message_body_get_html_selected(x)	FALSE
+#endif /*HAVE_HTML_WIDGET*/
 
 guint libbalsa_message_body_protect_mode(const LibBalsaMessageBody * body);
 guint libbalsa_message_body_signature_state(const LibBalsaMessageBody *body);

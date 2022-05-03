@@ -35,6 +35,7 @@
 #include <glib/gi18n.h>
 #include "gmime-part-rfc2440.h"
 #include "libbalsa-gpgme.h"
+#include "html.h"
 
 LibBalsaMessageBody *
 libbalsa_message_body_new(LibBalsaMessage * message)
@@ -194,8 +195,10 @@ libbalsa_message_body_set_message_part(LibBalsaMessageBody * body,
         body->embhdrs =
             libbalsa_message_body_extract_embedded_headers
             (embedded_message);
-        if (!*next_part)
+        if (!*next_part) {
             *next_part = libbalsa_message_body_new(body->message);
+            (*next_part)->parent = body;
+        }
         libbalsa_message_body_set_mime_body(*next_part,
                                             embedded_message->mime_part);
     }
@@ -214,8 +217,10 @@ libbalsa_message_body_set_multipart(LibBalsaMessageBody * body,
     count = g_mime_multipart_get_count (multipart);
     for (i = 0; i < count; i++) {
 	part = g_mime_multipart_get_part (multipart, i);
-	if (!*next_part)
+	if (!*next_part) {
 	    *next_part = libbalsa_message_body_new(body->message);
+	    (*next_part)->parent = body;
+	}
 	libbalsa_message_body_set_mime_body(*next_part, part);
 	next_part = &(*next_part)->next;
     }
@@ -940,6 +945,97 @@ libbalsa_message_body_mp_related_root(LibBalsaMessageBody *body)
     g_free(conttype);
     return root_body;
 }
+
+
+#ifdef HAVE_HTML_WIDGET
+
+/** @brief Find the multipart/alternative parent of a body
+ *
+ * @param[in] body message body
+ * @return the body's multipart/alternative parent, NULL if it is not the child of such a part
+ *
+ * Return the multipart/alternative parent of the passed body, which @em must be either the direct parent, or if the body's direct
+ * parent is a multipart/related the direct parent of the latter.
+ */
+static inline LibBalsaMessageBody *
+find_mp_alt_parent(const LibBalsaMessageBody *body)
+{
+	LibBalsaMessageBody *mp_alt = NULL;
+
+	mp_alt = body->parent;
+	if ((mp_alt != NULL) && (mp_alt->body_type == LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART)) {
+		gchar *conttype;
+
+		conttype = libbalsa_message_body_get_mime_type(mp_alt);
+		if (strcmp(conttype, "multipart/related") == 0) {
+			g_free(conttype);
+			mp_alt = mp_alt->parent;
+			if (mp_alt != NULL) {
+				conttype = libbalsa_message_body_get_mime_type(mp_alt);
+			} else {
+				conttype = NULL;
+			}
+		}
+
+		if ((conttype != NULL) && strcmp(conttype, "multipart/alternative") != 0) {
+			mp_alt = NULL;
+		}
+		g_free(conttype);
+	}
+
+	return mp_alt;
+}
+
+
+/** @brief Set if a multipart/alternative HTML or plain part is selected
+ *
+ * @param[in] body message body
+ *
+ * Iff the passed body is the child of a multipart/alternative set the LibBalsaMessageBody::html_selected property of the latter if
+ * the body's content type is a HTML type.
+ *
+ * @sa find_mp_alt_parent(), libbalsa_html_type()
+ */
+void
+libbalsa_message_body_set_html_selected(LibBalsaMessageBody *body)
+{
+	LibBalsaMessageBody *mp_alt_body;
+
+	if ((body != NULL) && (body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_TEXT)) {
+		mp_alt_body = find_mp_alt_parent(body);
+		if (mp_alt_body != NULL) {
+			gchar *conttype;
+
+			conttype = libbalsa_message_body_get_mime_type(body);
+			mp_alt_body->html_selected = libbalsa_html_type(conttype) != LIBBALSA_HTML_TYPE_NONE;
+			g_free(conttype);
+		}
+	}
+}
+
+
+/** @brief Check if a multipart/alternative HTML or plain part is selected
+ *
+ * @param[in] body message body
+ * @return TRUE iff body is a child of a multipart/alternative for which the HTML part is selected
+ * @sa find_mp_alt_parent()
+ */
+gboolean
+libbalsa_message_body_get_html_selected(LibBalsaMessageBody *body)
+{
+	LibBalsaMessageBody *mp_alt_body;
+	gboolean result = FALSE;
+
+	g_return_val_if_fail(body != NULL, FALSE);
+	mp_alt_body = find_mp_alt_parent(body);
+	if (mp_alt_body != NULL) {
+		result = mp_alt_body->html_selected;
+	}
+	return result;
+}
+
+#endif /*HAVE_HTML_WIDGET*/
+
 
 /** Basic requirements for a multipart crypto: protocol is not NULL, exactly two body parts */
 #define MP_CRYPT_STRUCTURE(part, protocol)										\

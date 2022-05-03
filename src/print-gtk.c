@@ -49,13 +49,6 @@ typedef struct {
     GtkWidget *margin_bottom;
     GtkWidget *margin_left;
     GtkWidget *margin_right;
-#ifdef HAVE_HTML_WIDGET
-    GtkWidget *html_print;
-    GtkWidget *html_load_ext_content;
-    gboolean prefer_text;
-    gboolean load_ext_content;
-    BalsaPrintSetup *setup;
-#endif
 } BalsaPrintPrefs;
 
 typedef struct {
@@ -119,47 +112,6 @@ print_header_footer(GtkPrintContext * context, cairo_t * cairo_ctx,
 }
 
 
-/*
- * Scan the parts of a multipart/alternative as to find the proper one for printing.  According to RFC 2046, Sect. 5.1.4, the first
- * /should/ be the "plain" one, and the following the "fancier" ones.  This is not guaranteed, though.
- * 
- * Furthermore, we may have cases like
- * +- multipart/alternative
- *      +- text/plain
- *      +- multipart/mixed
- *           +- text/html
- *           +- ...
- */
-static LibBalsaMessageBody *
-find_alt_part(LibBalsaMessageBody *parts,
-			  gboolean			   print_alt_html)
-{
-	LibBalsaMessageBody *part;
-	LibBalsaMessageBody *use_part = parts;		/* fallback: print 1st alternative part */
-
-	/* scan the parts */
-	for (part = parts; part != NULL; part = part->next) {
-		gchar *mime_type;
-		
-		mime_type = libbalsa_message_body_get_mime_type(part);
-		if ((strncmp(mime_type, "multipart/", 10U) == 0) && (part->parts != NULL)) {
-			/* consider the first child of a multipart */
-			g_free(mime_type);
-			mime_type = libbalsa_message_body_get_mime_type(part->parts);
-		}
-
-		if ((strcmp(mime_type, "text/calendar") == 0) ||
-			((strcmp(mime_type, "text/plain") == 0) && !print_alt_html) ||
-			((strcmp(mime_type, "text/html") == 0) && print_alt_html)) {
-			use_part = part;
-		}
-		g_free(mime_type);
-	}
-	
-	return use_part;
-}
-
-
 static inline GList *
 begin_crypto_frame(GList 		   *bpo_list,
 				   BalsaPrintSetup *psetup,
@@ -199,8 +151,61 @@ print_single_part(GList 			  *bpo_list,
 }
 
 
+static LibBalsaMessageBody *
+select_from_mp_alt(LibBalsaMessageBody *parts, gboolean html_part)
+{
+	LibBalsaMessageBody *body;
+	LibBalsaMessageBody *use_body = NULL;
+
+	for (body = parts; (body != NULL) && (use_body == NULL); body = body->next) {
+		gchar *conttype;
+
+		conttype = libbalsa_message_body_get_mime_type(body);
+		if ((html_part && (libbalsa_html_type(conttype) != LIBBALSA_HTML_TYPE_NONE)) ||
+			(!html_part && strcmp(conttype, "text/plain") == 0)) {
+			use_body = body;
+		} else if (html_part && (strcmp(conttype, "multipart/related") == 0)) {
+			use_body = libbalsa_message_body_mp_related_root(body);
+		}
+		g_free(conttype);
+	}
+
+	return (use_body != NULL) ? use_body : parts;
+}
+
+
 /*
  * scan the body list and prepare print data according to the content type
+ *
+ * Multipart/alternative and multipart/related require additional attention, as the printout shall reflect the screen display.
+ * According to RFC 2046, Sect. 5.1.4, the first child of a multipart/alternative /should/ be the "plain" part, and the following
+ * the "fancier" ones.  This is not guaranteed, though.  Multipart/related typically bundles a html and inlined images, etc., but
+ * the ordering multipart/related and multipart/alternative is not defined.
+ *
+ * Thus, in practice, the following cases will occur:
+ *
+ * (1) multipart/alternative: print plain or html according to html_selected property
+ *       text/plain
+ *       text/html
+ *
+ * (2) multipart/alternative: print plain or html from multipart/related according to html_selected property
+ *       text/plain
+ *       multipart/related
+ *         text/html
+ *         image/png
+ *         [...]
+ *
+ * (3) multipart/related: print plain or html from multipart/alternative child according to its html_selected property
+ *       multipart/alternative
+ *         text/plain
+ *         text/html
+ *       image/png
+ *       [...]
+ *
+ * (4) multipart/related: print html-only message
+ *       text/html
+ *       image/png
+ *       [...]
  */
 static GList *
 scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
@@ -240,16 +245,32 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 	}
 
 	if (body->parts) {
-		if (g_ascii_strcasecmp(conttype, "multipart/alternative") == 0) {
-			LibBalsaMessageBody *print_part;
+		LibBalsaMessageBody *print_part;
 
-			print_part = find_alt_part(body->parts, psetup->print_alt_html);
+		if (strcmp(conttype, "multipart/alternative") == 0) {
+#ifdef HAVE_HTML_WIDGET
+			print_part = select_from_mp_alt(body->parts, body->html_selected);
+#else
+			print_part = select_from_mp_alt(body->parts, FALSE);
+#endif
 			bpo_list = print_single_part(bpo_list, context, psetup, print_part, no_first_sep, add_signature);
-		} else if (g_ascii_strcasecmp(conttype, "multipart/related") == 0) {
-			/* catch the case of a RFC 2387 multipart/related, typically a text/html with images which are enclosed in the
-			 * "related" container */
-			bpo_list = print_single_part(bpo_list, context, psetup, libbalsa_message_body_mp_related_root(body), no_first_sep,
-				add_signature);
+		} else if (strcmp(conttype, "multipart/related") == 0) {
+			LibBalsaMessageBody *mp_rel_root;
+			gchar *mp_rel_root_type;
+
+			mp_rel_root = libbalsa_message_body_mp_related_root(body);
+			mp_rel_root_type = libbalsa_message_body_get_mime_type(mp_rel_root);
+			if (strcmp(mp_rel_root_type, "multipart/alternative") == 0) {
+#ifdef HAVE_HTML_WIDGET
+				print_part = select_from_mp_alt(mp_rel_root->parts, mp_rel_root->html_selected);
+#else
+				print_part = select_from_mp_alt(mp_rel_root->parts, FALSE);
+#endif
+			} else {
+				print_part = mp_rel_root;
+			}
+			g_free(mp_rel_root_type);
+			bpo_list = print_single_part(bpo_list, context, psetup, print_part, no_first_sep, add_signature);
 		} else {
 			bpo_list = scan_body(bpo_list, context, psetup, body->parts, no_first_sep);
 		}
@@ -272,6 +293,7 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 
     return bpo_list;
 }
+
 
 static void
 begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
@@ -574,9 +596,6 @@ message_prefs_widget(GtkPrintOperation * operation,
 {
     GtkWidget *page;
     GtkWidget *grid;
-#ifdef HAVE_HTML_WIDGET
-    GtkWidget *dummy;
-#endif
     GtkPageSetup *pg_setup;
 
     gtk_print_operation_set_custom_tab_label(operation, _("Message"));
@@ -604,25 +623,6 @@ message_prefs_widget(GtkPrintOperation * operation,
     print_prefs->highlight_phrases = gtk_check_button_new_with_mnemonic(_("Highlight _structured phrases"));
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->highlight_phrases), balsa_app.print_highlight_phrases);
     gtk_grid_attach(GTK_GRID(grid), print_prefs->highlight_phrases, 1, 1, 1, 1);
-
-#ifdef HAVE_HTML_WIDGET
-    /* treatment of HTML messages and parts */
-    grid = create_options_group(_("HTML options"), page, 1, 1, 1);
-
-    print_prefs->html_print = gtk_check_button_new_with_mnemonic(_("Prefer text/plain over HTML"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_print), print_prefs->prefer_text);
-    gtk_grid_attach(GTK_GRID(grid), print_prefs->html_print, 1, 0, 1, 1);
-
-    print_prefs->html_load_ext_content =
-    	gtk_check_button_new_with_mnemonic(_("Download content from remote servers (may be dangerous)"));
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(print_prefs->html_load_ext_content), print_prefs->load_ext_content);
-    gtk_grid_attach(GTK_GRID(grid), print_prefs->html_load_ext_content, 1, 1, 1, 1);
-
-    /* phantom alignment */
-    dummy = gtk_label_new(" ");
-    gtk_widget_set_hexpand(dummy, TRUE);
-    gtk_grid_attach(GTK_GRID(grid), dummy, 2, 1, 1, 1);
-#endif
 
     /* margins */
     grid = create_options_group(_("Margins"), page, 0, 2, 2);
@@ -706,12 +706,6 @@ message_prefs_apply(GtkPrintOperation * operation, GtkWidget * widget,
 	balsa_app.margin_left /= 25.4;
 	balsa_app.margin_right /= 25.4;
     }
-#ifdef HAVE_HTML_WIDGET
-    print_prefs->setup->print_alt_html =
-    	!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(print_prefs->html_print));
-    print_prefs->setup->html_load_ext_content =
-    	gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(print_prefs->html_load_ext_content));
-#endif
 }
 
 
@@ -741,9 +735,6 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
     GtkPrintOperationResult res;
     BalsaPrintData *print_data;
     BalsaPrintPrefs print_prefs;
-#ifdef HAVE_HTML_WIDGET
-    InternetAddressList *from;
-#endif
     GError *err = NULL;
 
     print = gtk_print_operation_new();
@@ -765,12 +756,6 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
     /* create a print context */
     print_data = g_new0(BalsaPrintData, 1);
     print_data->message = msg;
-#ifdef HAVE_HTML_WIDGET
-    print_prefs.setup = &print_data->setup;
-    from = libbalsa_message_get_headers(msg)->from;
-    print_prefs.prefer_text = balsa_app.display_alt_plain && !libbalsa_html_get_prefer_html(from);
-    print_prefs.load_ext_content = libbalsa_html_get_load_content(from);
-#endif
 
     g_signal_connect(print, "begin_print", G_CALLBACK(begin_print), print_data);
     g_signal_connect(print, "draw_page", G_CALLBACK(draw_page), print_data);

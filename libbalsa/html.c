@@ -419,6 +419,7 @@ lbh_info_bar_response_cb(GtkInfoBar * info_bar,
 		if (lbh_get_body_content_utf8(info->body, &text) >= 0) {
 			if (g_atomic_int_get(&html_filter_found) != 0) {
 				lbh_load_external_resources(info->web_view, TRUE);
+				info->body->html_ext_loaded= TRUE;
 			} else {
 				WebKitSettings *settings;
 
@@ -771,8 +772,7 @@ dump_snapshot(GObject      *source_object,
  */
 cairo_surface_t *
 libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
-						   gdouble 				width,
-						   gboolean 			load_external_content)
+						   gdouble 				width)
 {
 	gint render_width;
     gchar *text;
@@ -799,7 +799,7 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
 	render_width = (gint) (width * HTML_PRINT_DPI / 72.0);
 	g_debug("%s: request Cairo width %g, render width %d", __func__, width, render_width);
     gtk_window_set_default_size(GTK_WINDOW(offline_window), render_width, LBH_NATURAL_SIZE);
-    view = lbh_web_view_new(info, render_width, load_external_content || (have_src_cid && !have_src_oth));
+    view = lbh_web_view_new(info, render_width, body->html_ext_loaded || (have_src_cid && !have_src_oth));
     webkit_web_view_set_zoom_level(view, HTML_PRINT_ZOOM);			/* heuristic setting, any way to calculate it? */
     gtk_container_add(GTK_CONTAINER(offline_window), GTK_WIDGET(view));
     gtk_widget_show_all(offline_window);
@@ -869,8 +869,9 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     have_src_cid = g_regex_match_simple(CID_REGEX, text, G_REGEX_CASELESS, 0);
     have_src_oth = g_regex_match_simple(SRC_REGEX, text, G_REGEX_CASELESS, 0);
 
+    body->html_ext_loaded = auto_load_ext_content || body->html_ext_loaded;
     info->web_view = lbh_web_view_new(info, LBH_NATURAL_SIZE,
-    	auto_load_ext_content || (have_src_cid && !have_src_oth));
+    	body->html_ext_loaded || (have_src_cid && !have_src_oth));
 
     g_signal_connect(info->web_view, "mouse-target-changed",
                      G_CALLBACK(lbh_mouse_target_changed_cb), info);
@@ -881,7 +882,7 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     gtk_box_pack_end(GTK_BOX(vbox), GTK_WIDGET(info->web_view), TRUE, TRUE, 0);
 
     /* Simple check for possible resource requests: */
-    if (have_src_oth && !auto_load_ext_content) {
+    if (have_src_oth && !body->html_ext_loaded) {
         info->info_bar = lbh_info_bar(info);
         gtk_box_pack_start(GTK_BOX(vbox), info->info_bar, FALSE, FALSE, 0);
         g_debug("%s shows info_bar", __func__);

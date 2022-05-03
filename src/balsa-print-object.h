@@ -45,11 +45,6 @@ typedef struct {
 
     gint page_count;
     guint curr_depth;
-
-    /* note: the following two fields are relevant only if HTML support is enabled;
-     * don't hide them for code simplicity even if HTML support is disabled */
-    gboolean print_alt_html;	/* print text/html in multipart/alternative */
-    gboolean html_load_ext_content;	/* load external content when printing text/html */
 } BalsaPrintSetup;
 
 

@@ -2015,8 +2015,9 @@ libbalsa_can_display(LibBalsaMessageBody *part, InternetAddressList *from)
 {
     gchar *content_type = libbalsa_message_body_get_mime_type(part);
     gboolean res = FALSE;
-    if ((!balsa_app.display_alt_plain || libbalsa_html_get_prefer_html(from)) &&
-	libbalsa_html_type(content_type))
+    if ((!balsa_app.display_alt_plain || libbalsa_html_get_prefer_html(from) ||
+         libbalsa_message_body_get_html_selected(part)) &&
+	(libbalsa_html_type(content_type) != LIBBALSA_HTML_TYPE_NONE))
 	res = TRUE;
     else if(strcmp(content_type, "multipart/related") == 0 &&
 	    part->parts)
@@ -2028,7 +2029,7 @@ libbalsa_can_display(LibBalsaMessageBody *part, InternetAddressList *from)
 
 /** Determines whether given part can be displayed. We display plain
    text, parts html/rtf parts unless it has been disabled in the
-   preferences. We make sure the process is correctly recurrsive, to
+   preferences. We make sure the process is correctly recursive, to
    display properly messages of following structure:
 
    multiplart/alternative
@@ -2277,6 +2278,7 @@ select_part(BalsaMessage * balsa_message, BalsaPartInfo *info)
     body = add_part(balsa_message, info,
                     balsa_mime_widget_get_container(balsa_message->bm_widget));
     balsa_message->current_part = part_info_from_body(balsa_message, body);
+    libbalsa_message_body_set_html_selected(body);
 
     g_signal_emit(balsa_message, balsa_message_signals[SELECT_PART], 0);
 

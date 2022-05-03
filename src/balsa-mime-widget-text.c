@@ -238,7 +238,7 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 
     /* handle HTML if possible */
     html_type = libbalsa_html_type(content_type);
-    if (html_type) {
+    if (html_type != LIBBALSA_HTML_TYPE_NONE) {
         BalsaMimeWidget *html_widget = NULL;
 
 #ifdef HAVE_HTML_WIDGET

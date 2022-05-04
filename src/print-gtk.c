@@ -249,7 +249,7 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 
 		if (strcmp(conttype, "multipart/alternative") == 0) {
 #ifdef HAVE_HTML_WIDGET
-			print_part = select_from_mp_alt(body->parts, body->html_selected);
+			print_part = select_from_mp_alt(body->parts, body->mp_alt_selection == LIBBALSA_MP_ALT_HTML);
 #else
 			print_part = select_from_mp_alt(body->parts, FALSE);
 #endif
@@ -262,7 +262,7 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 			mp_rel_root_type = libbalsa_message_body_get_mime_type(mp_rel_root);
 			if (strcmp(mp_rel_root_type, "multipart/alternative") == 0) {
 #ifdef HAVE_HTML_WIDGET
-				print_part = select_from_mp_alt(mp_rel_root->parts, mp_rel_root->html_selected);
+				print_part = select_from_mp_alt(mp_rel_root->parts, mp_rel_root->mp_alt_selection == LIBBALSA_MP_ALT_HTML);
 #else
 				print_part = select_from_mp_alt(mp_rel_root->parts, FALSE);
 #endif

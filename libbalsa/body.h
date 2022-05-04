@@ -57,6 +57,14 @@ enum _LibBalsaAttachMode {
     LIBBALSA_ATTACH_AS_EXTBODY
 };
 
+typedef enum _LibBalsaMpAltSelection LibBalsaMpAltSelection;
+
+enum _LibBalsaMpAltSelection {
+	LIBBALSA_MP_ALT_AUTO = 0,			/**< Automatically select text/plain or text/html. */
+	LIBBALSA_MP_ALT_PLAIN,				/**< User selected text/plain.  */
+	LIBBALSA_MP_ALT_HTML				/**< User selected text/html. */
+};
+
 #define LIBBALSA_MESSAGE_BODY_SAFE (S_IRUSR | S_IWUSR)
 #define LIBBALSA_MESSAGE_BODY_UNSAFE \
     (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
@@ -85,7 +93,7 @@ struct _LibBalsaMessageBody {
 
 #ifdef HAVE_HTML_WIDGET
     gboolean html_ext_loaded;	/* if external HTML content was loaded */
-    gboolean html_selected;		/* if the HTML part of a multipart/alternative is selected */
+    LibBalsaMpAltSelection mp_alt_selection;	/* which part of a multipart/alternative is selected */
 #endif /* HAVE_HTML_WIDGET */
 
     LibBalsaMessageBody *parent;	/* Parent part in the message */
@@ -140,10 +148,10 @@ LibBalsaMessageBody *libbalsa_message_body_mp_related_root(LibBalsaMessageBody *
 
 #ifdef HAVE_HTML_WIDGET
 void libbalsa_message_body_set_html_selected(LibBalsaMessageBody *body);
-gboolean libbalsa_message_body_get_html_selected(LibBalsaMessageBody *body);
+LibBalsaMpAltSelection libbalsa_message_body_get_html_selected(LibBalsaMessageBody *body);
 #else
 #define libbalsa_message_body_set_html_selected(x)
-#define libbalsa_message_body_get_html_selected(x)	FALSE
+#define libbalsa_message_body_get_html_selected(x)	LIBBALSA_MP_ALT_AUTO
 #endif /*HAVE_HTML_WIDGET*/
 
 guint libbalsa_message_body_protect_mode(const LibBalsaMessageBody * body);

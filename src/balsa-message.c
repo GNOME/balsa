@@ -2013,17 +2013,30 @@ balsa_message_has_previous_part(BalsaMessage * balsa_message)
 static gboolean
 libbalsa_can_display(LibBalsaMessageBody *part, InternetAddressList *from)
 {
-    gchar *content_type = libbalsa_message_body_get_mime_type(part);
-    gboolean res = FALSE;
-    if ((!balsa_app.display_alt_plain || libbalsa_html_get_prefer_html(from) ||
-         libbalsa_message_body_get_html_selected(part)) &&
-	(libbalsa_html_type(content_type) != LIBBALSA_HTML_TYPE_NONE))
-	res = TRUE;
-    else if(strcmp(content_type, "multipart/related") == 0 &&
-	    part->parts)
-	res = libbalsa_can_display(part->parts, from);
-    g_free(content_type);
-    return res;
+	gchar *content_type = libbalsa_message_body_get_mime_type(part);
+	gboolean res;
+
+	if (strcmp(content_type, "multipart/related") == 0) {
+		res = (part->parts != NULL) ? libbalsa_can_display(part->parts, from) : FALSE;
+	} else {
+		switch (libbalsa_message_body_get_html_selected(part)) {
+		case LIBBALSA_MP_ALT_AUTO:
+			res = (!balsa_app.display_alt_plain || libbalsa_html_get_prefer_html(from)) &&
+				(libbalsa_html_type(content_type) != LIBBALSA_HTML_TYPE_NONE);
+			break;
+		case LIBBALSA_MP_ALT_PLAIN:
+			res = FALSE;
+			break;
+		case LIBBALSA_MP_ALT_HTML:
+			res = (libbalsa_html_type(content_type) != LIBBALSA_HTML_TYPE_NONE);
+			break;
+		default:
+			g_assert_not_reached();		/* paranoid check... */
+		}
+	}
+
+	g_free(content_type);
+	return res;
 }
 #endif                          /* HAVE_HTML_WIDGET */
 

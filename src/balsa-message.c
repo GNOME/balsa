@@ -2019,7 +2019,7 @@ libbalsa_can_display(LibBalsaMessageBody *part, InternetAddressList *from)
 	if (strcmp(content_type, "multipart/related") == 0) {
 		res = (part->parts != NULL) ? libbalsa_can_display(part->parts, from) : FALSE;
 	} else {
-		switch (libbalsa_message_body_get_html_selected(part)) {
+		switch (libbalsa_message_body_get_mp_alt_selection(part)) {
 		case LIBBALSA_MP_ALT_AUTO:
 			res = (!balsa_app.display_alt_plain || libbalsa_html_get_prefer_html(from)) &&
 				(libbalsa_html_type(content_type) != LIBBALSA_HTML_TYPE_NONE);
@@ -2291,7 +2291,7 @@ select_part(BalsaMessage * balsa_message, BalsaPartInfo *info)
     body = add_part(balsa_message, info,
                     balsa_mime_widget_get_container(balsa_message->bm_widget));
     balsa_message->current_part = part_info_from_body(balsa_message, body);
-    libbalsa_message_body_set_html_selected(body);
+    libbalsa_message_body_set_mp_alt_selection(body);
 
     g_signal_emit(balsa_message, balsa_message_signals[SELECT_PART], 0);
 

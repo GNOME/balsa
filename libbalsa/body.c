@@ -997,7 +997,7 @@ find_mp_alt_parent(const LibBalsaMessageBody *body)
  * @sa find_mp_alt_parent(), libbalsa_html_type()
  */
 void
-libbalsa_message_body_set_html_selected(LibBalsaMessageBody *body)
+libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body)
 {
 	LibBalsaMessageBody *mp_alt_body;
 
@@ -1026,7 +1026,7 @@ libbalsa_message_body_set_html_selected(LibBalsaMessageBody *body)
  * @sa find_mp_alt_parent()
  */
 LibBalsaMpAltSelection
-libbalsa_message_body_get_html_selected(LibBalsaMessageBody *body)
+libbalsa_message_body_get_mp_alt_selection(LibBalsaMessageBody *body)
 {
 	LibBalsaMessageBody *mp_alt_body;
 	LibBalsaMpAltSelection result = LIBBALSA_MP_ALT_AUTO;

@@ -147,11 +147,11 @@ LibBalsaMessageBody *libbalsa_message_body_get_by_id(LibBalsaMessageBody *
 LibBalsaMessageBody *libbalsa_message_body_mp_related_root(LibBalsaMessageBody *body);
 
 #ifdef HAVE_HTML_WIDGET
-void libbalsa_message_body_set_html_selected(LibBalsaMessageBody *body);
-LibBalsaMpAltSelection libbalsa_message_body_get_html_selected(LibBalsaMessageBody *body);
+void libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body);
+LibBalsaMpAltSelection libbalsa_message_body_get_mp_alt_selection(LibBalsaMessageBody *body);
 #else
-#define libbalsa_message_body_set_html_selected(x)
-#define libbalsa_message_body_get_html_selected(x)	LIBBALSA_MP_ALT_AUTO
+#define libbalsa_message_body_set_mp_alt_selection(x)
+#define libbalsa_message_body_get_mp_alt_selection(x)	LIBBALSA_MP_ALT_AUTO
 #endif /*HAVE_HTML_WIDGET*/
 
 guint libbalsa_message_body_protect_mode(const LibBalsaMessageBody * body);

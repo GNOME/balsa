@@ -402,7 +402,7 @@ destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 static void
 mw_expunged_cb(LibBalsaMailbox * mailbox, guint msgno, MessageWindow * mw)
 {
-    if (mw->message != NULL && (guint) libbalsa_message_get_msgno(mw->message) == msgno)
+    if (mw->message != NULL && libbalsa_message_get_msgno(mw->message) == msgno)
         gtk_widget_destroy(mw->window);
 }
 

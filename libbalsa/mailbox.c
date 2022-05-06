@@ -3259,8 +3259,12 @@ mailbox_model_get_value(GtkTreeModel *tree_model,
         break;
     case LB_MBOX_SIZE_COL:
         if(msg) {
-            tmp = libbalsa_size_to_gchar(msg->size);
-            g_value_take_string(value, tmp);
+            if (msg->size != -1) {
+                tmp = libbalsa_size_to_gchar(msg->size);
+                g_value_take_string(value, tmp);
+            } else {
+                g_value_set_static_string(value, "?");
+            }
         }
         else g_value_set_static_string(value, "          ");
         break;

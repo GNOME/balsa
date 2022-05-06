@@ -37,7 +37,7 @@ struct LibBalsaMailboxIndexEntry_ {
     time_t internal_date;
     unsigned short status_icon;
     unsigned short attach_icon;
-    unsigned long size;
+    gint64 size;
     gchar *foreground;
     gchar *background;
     unsigned foreground_set:1;

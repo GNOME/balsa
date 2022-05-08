@@ -5676,7 +5676,7 @@ sw_print_activated(GSimpleAction * action,
     LibBalsaMessage *message;
 
     message = bsmsg2message(bsmsg);
-    message_print(message, GTK_WINDOW(bsmsg->window));
+    message_print(message, GTK_WINDOW(bsmsg->window), NULL);
     g_object_unref(message);
 }
 

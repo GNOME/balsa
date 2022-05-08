@@ -67,6 +67,9 @@ typedef struct {
     /* page footer related stuff */
     gchar *footer;
     gdouble c_footer_y;
+
+    /* key used to find the mp_alt_selection */
+    gpointer mp_alt_selection_key;
 } BalsaPrintData;
 
 
@@ -209,7 +212,7 @@ select_from_mp_alt(LibBalsaMessageBody *parts, gboolean html_part)
  */
 static GList *
 scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
-	  LibBalsaMessageBody * body, gboolean no_first_sep)
+	  LibBalsaMessageBody * body, gboolean no_first_sep, gpointer key)
 {
     gboolean add_signature;
     gboolean have_crypto_frame;
@@ -249,7 +252,9 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 
 		if (strcmp(conttype, "multipart/alternative") == 0) {
 #ifdef HAVE_HTML_WIDGET
-			print_part = select_from_mp_alt(body->parts, body->mp_alt_selection == LIBBALSA_MP_ALT_HTML);
+                        LibBalsaMpAltSelection selection =
+                            libbalsa_message_body_get_mp_alt_selection(body, key);
+			print_part = select_from_mp_alt(body->parts, selection == LIBBALSA_MP_ALT_HTML);
 #else
 			print_part = select_from_mp_alt(body->parts, FALSE);
 #endif
@@ -262,7 +267,10 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 			mp_rel_root_type = libbalsa_message_body_get_mime_type(mp_rel_root);
 			if (strcmp(mp_rel_root_type, "multipart/alternative") == 0) {
 #ifdef HAVE_HTML_WIDGET
-				print_part = select_from_mp_alt(mp_rel_root->parts, mp_rel_root->mp_alt_selection == LIBBALSA_MP_ALT_HTML);
+                                LibBalsaMpAltSelection selection =
+                                    libbalsa_message_body_get_mp_alt_selection(mp_rel_root, key);
+				print_part = select_from_mp_alt(mp_rel_root->parts,
+                                                                selection == LIBBALSA_MP_ALT_HTML);
 #else
 				print_part = select_from_mp_alt(mp_rel_root->parts, FALSE);
 #endif
@@ -272,7 +280,7 @@ scan_body(GList *bpo_list, GtkPrintContext * context, BalsaPrintSetup * psetup,
 			g_free(mp_rel_root_type);
 			bpo_list = print_single_part(bpo_list, context, psetup, print_part, no_first_sep, add_signature);
 		} else {
-			bpo_list = scan_body(bpo_list, context, psetup, body->parts, no_first_sep);
+			bpo_list = scan_body(bpo_list, context, psetup, body->parts, no_first_sep, key);
 		}
 		no_first_sep = FALSE;
 	}
@@ -419,7 +427,8 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
     /* add the mime bodies */
     pdata->print_parts = 
 	scan_body(pdata->print_parts, context, &pdata->setup,
-		  libbalsa_message_get_body_list(pdata->message), FALSE);
+		  libbalsa_message_get_body_list(pdata->message), FALSE,
+                  pdata->mp_alt_selection_key);
 
     /* done */
     gtk_print_operation_set_n_pages(operation, pdata->setup.page_count);
@@ -729,7 +738,8 @@ message_print_page_setup(GtkWindow * parent)
 
 
 void
-message_print(LibBalsaMessage * msg, GtkWindow * parent)
+message_print(LibBalsaMessage * msg, GtkWindow * parent,
+              gpointer mp_alt_selection_key)
 {
     GtkPrintOperation *print;
     GtkPrintOperationResult res;
@@ -756,6 +766,7 @@ message_print(LibBalsaMessage * msg, GtkWindow * parent)
     /* create a print context */
     print_data = g_new0(BalsaPrintData, 1);
     print_data->message = msg;
+    print_data->mp_alt_selection_key = mp_alt_selection_key;
 
     g_signal_connect(print, "begin_print", G_CALLBACK(begin_print), print_data);
     g_signal_connect(print, "draw_page", G_CALLBACK(draw_page), print_data);

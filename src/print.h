@@ -26,7 +26,7 @@
 
 G_BEGIN_DECLS
 
-    void message_print(LibBalsaMessage * msg, GtkWindow * parent);
+    void message_print(LibBalsaMessage * msg, GtkWindow * parent, gpointer mp_alt_selection_key);
     void message_print_page_setup(GtkWindow * parent);
 
 G_END_DECLS

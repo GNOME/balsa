@@ -93,7 +93,7 @@ struct _LibBalsaMessageBody {
 
 #ifdef HAVE_HTML_WIDGET
     gboolean html_ext_loaded;	/* if external HTML content was loaded */
-    LibBalsaMpAltSelection mp_alt_selection;	/* which part of a multipart/alternative is selected */
+    GHashTable *selection_table; /* which part of a multipart/alternative is selected for a given key*/
 #endif /* HAVE_HTML_WIDGET */
 
     LibBalsaMessageBody *parent;	/* Parent part in the message */
@@ -147,8 +147,10 @@ LibBalsaMessageBody *libbalsa_message_body_get_by_id(LibBalsaMessageBody *
 LibBalsaMessageBody *libbalsa_message_body_mp_related_root(LibBalsaMessageBody *body);
 
 #ifdef HAVE_HTML_WIDGET
-void libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body);
-LibBalsaMpAltSelection libbalsa_message_body_get_mp_alt_selection(LibBalsaMessageBody *body);
+void libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body,
+                                                gpointer key);
+LibBalsaMpAltSelection libbalsa_message_body_get_mp_alt_selection(LibBalsaMessageBody *body,
+                                                                  gpointer key);
 #else
 #define libbalsa_message_body_set_mp_alt_selection(x)
 #define libbalsa_message_body_get_mp_alt_selection(x)	LIBBALSA_MP_ALT_AUTO

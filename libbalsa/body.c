@@ -65,6 +65,22 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     return body;
 }
 
+static void
+body_weak_notify(gpointer  data,
+                 GObject  *key)
+{
+    LibBalsaMessageBody *body = data;
+
+    g_hash_table_remove(body->selection_table, key);
+}
+
+static void
+selection_table_foreach(gpointer key,
+                        gpointer value,
+                        gpointer user_data)
+{
+    g_object_weak_unref(key, body_weak_notify, user_data);
+}
 
 void
 libbalsa_message_body_free(LibBalsaMessageBody * body)
@@ -93,8 +109,13 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     libbalsa_message_body_free(body->parts);
 
     if (body->mime_part)
-	g_object_unref(body->mime_part);	
-    
+	g_object_unref(body->mime_part);
+
+    if (body->selection_table != NULL) {
+        g_hash_table_foreach(body->selection_table, selection_table_foreach, body);
+        g_hash_table_destroy(body->selection_table);
+    }
+
     g_free(body);
 }
 
@@ -986,7 +1007,6 @@ find_mp_alt_parent(const LibBalsaMessageBody *body)
 	return mp_alt;
 }
 
-
 /** @brief Set if a multipart/alternative HTML or plain part is selected
  *
  * @param[in] body message body
@@ -997,7 +1017,7 @@ find_mp_alt_parent(const LibBalsaMessageBody *body)
  * @sa find_mp_alt_parent(), libbalsa_html_type()
  */
 void
-libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body)
+libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body, gpointer key)
 {
 	LibBalsaMessageBody *mp_alt_body;
 
@@ -1005,18 +1025,30 @@ libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body)
 		mp_alt_body = find_mp_alt_parent(body);
 		if (mp_alt_body != NULL) {
 			gchar *conttype;
+                        LibBalsaMpAltSelection selection;
 
 			conttype = libbalsa_message_body_get_mime_type(body);
 			if (libbalsa_html_type(conttype) != LIBBALSA_HTML_TYPE_NONE) {
-				mp_alt_body->mp_alt_selection = LIBBALSA_MP_ALT_HTML;
+				selection = LIBBALSA_MP_ALT_HTML;
 			} else {
-				mp_alt_body->mp_alt_selection = LIBBALSA_MP_ALT_PLAIN;
+				selection = LIBBALSA_MP_ALT_PLAIN;
 			}
 			g_free(conttype);
+
+                        if (mp_alt_body->selection_table == NULL)
+                            mp_alt_body->selection_table = g_hash_table_new(NULL, NULL);
+
+                        if (g_hash_table_insert(mp_alt_body->selection_table, key,
+                                                GINT_TO_POINTER(selection))) {
+                            g_object_weak_ref(key, body_weak_notify, mp_alt_body);
+                        }
 		}
 	}
 }
 
+static inline gboolean body_is_type(const LibBalsaMessageBody *body,
+                                    const gchar               *type,
+                                    const gchar               *sub_type);
 
 /** @brief Check if a multipart/alternative HTML or plain part is selected
  *
@@ -1026,17 +1058,19 @@ libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body)
  * @sa find_mp_alt_parent()
  */
 LibBalsaMpAltSelection
-libbalsa_message_body_get_mp_alt_selection(LibBalsaMessageBody *body)
+libbalsa_message_body_get_mp_alt_selection(LibBalsaMessageBody *body, gpointer key)
 {
-	LibBalsaMessageBody *mp_alt_body;
-	LibBalsaMpAltSelection result = LIBBALSA_MP_ALT_AUTO;
+	LibBalsaMpAltSelection selection = LIBBALSA_MP_ALT_AUTO;
 
 	g_return_val_if_fail(body != NULL, FALSE);
-	mp_alt_body = find_mp_alt_parent(body);
-	if (mp_alt_body != NULL) {
-		result = mp_alt_body->mp_alt_selection;
-	}
-	return result;
+
+	if (!body_is_type(body, "multipart", "alternative"))
+            body = find_mp_alt_parent(body);
+
+	if (body != NULL && body->selection_table != NULL)
+		selection = GPOINTER_TO_INT(g_hash_table_lookup(body->selection_table, key));
+
+	return selection;
 }
 
 #endif /*HAVE_HTML_WIDGET*/

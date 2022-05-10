@@ -43,6 +43,10 @@
 #include <gtksourceview/gtksource.h>
 #endif
 
+#if HAVE_CANBERRA
+#include <canberra-gtk.h>
+#endif
+
 #include "misc.h"
 #include "missing.h"
 #include "x509-cert-widget.h"
@@ -694,6 +698,24 @@ libbalsa_source_view_new(gboolean highlight_phrases)
     return sview;
 }
 #endif  /* HAVE_GTKSOURCEVIEW */
+
+#if HAVE_CANBERRA
+gboolean
+libbalsa_play_sound(const gchar *soundfile, GError **error)
+{
+	GdkScreen *screen;
+	gint rc;
+
+	g_return_val_if_fail(soundfile != NULL, FALSE);
+
+	screen = gdk_screen_get_default();
+	rc = ca_context_play(ca_gtk_context_get_for_screen(screen), 0, CA_PROP_MEDIA_FILENAME, soundfile, NULL);
+	if (rc != 0) {
+		g_set_error(error, LIBBALSA_ERROR_QUARK, rc, _("Cannot play sound file “%s”: %s"), soundfile, ca_strerror(rc));
+	}
+	return rc == 0;
+}
+#endif /* HAVE_CANBERRA */
 
 /*
  * Error domains for GError:

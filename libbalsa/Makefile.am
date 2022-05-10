@@ -130,6 +130,8 @@ libbalsa_a_SOURCES = 		\
 	server-config.h		\
 	smtp-server.c		\
 	smtp-server.h		\
+	system-tray.c		\
+	system-tray.h		\
 	source-viewer.c		\
 	url.c			\
 	url.h			\

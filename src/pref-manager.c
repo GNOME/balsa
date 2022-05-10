@@ -44,6 +44,10 @@
 #include "smtp-server.h"
 #include "libbalsa-conf.h"
 
+#ifdef ENABLE_SYSTRAY
+#include "system-tray.h"
+#endif
+
 #include <glib/gi18n.h>
 
 #define NUM_ENCODING_MODES 3
@@ -87,8 +91,11 @@ typedef struct _PropertyUI {
     GtkWidget *check_imap;
     GtkWidget *check_imap_inbox;
     GtkWidget *notify_new_mail_dialog;
+#ifdef HAVE_CANBERRA
     GtkWidget *notify_new_mail_sound;
-    GtkWidget *notify_new_mail_icon;
+    GtkWidget *new_mail_sound_file;
+    GtkWidget *new_mail_sound_play;
+#endif
     GtkWidget *mdn_reply_clean_menu, *mdn_reply_notclean_menu;
 
     GtkWidget *close_mailbox_auto;
@@ -99,6 +106,9 @@ typedef struct _PropertyUI {
     GtkWidget *expunge_auto;
     GtkWidget *expunge_minutes;
     GtkWidget *action_after_move_menu;
+#ifdef ENABLE_SYSTRAY
+    GtkWidget *enable_systray_icon;
+#endif
 
     GtkWidget *previewpane;
     GtkWidget *layout_type;
@@ -464,12 +474,16 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.notify_new_mail_dialog =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->notify_new_mail_dialog));
+
+#ifdef HAVE_CANBERRA
     balsa_app.notify_new_mail_sound =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->notify_new_mail_sound));
-    balsa_app.notify_new_mail_icon =
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
-                                     (pui->notify_new_mail_icon));
+    g_free(balsa_app.new_mail_sound_file);
+    balsa_app.new_mail_sound_file =
+        gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(pui->new_mail_sound_file));
+#endif
+
     balsa_app.mdn_reply_clean =
         pm_combo_box_get_level(pui->mdn_reply_clean_menu);
     balsa_app.mdn_reply_notclean =
@@ -518,6 +532,13 @@ apply_prefs(GtkDialog * pbox)
         gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON
                                          (pui->close_mailbox_minutes)) *
         60;
+
+#ifdef ENABLE_SYSTRAY
+    balsa_app.enable_systray_icon =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
+                                     (pui->enable_systray_icon));
+    libbalsa_systray_icon_enable(balsa_app.enable_systray_icon != 0);
+#endif
 
     libbalsa_mailbox_set_filter(NULL, pui->filter);
     balsa_app.expunge_on_close =
@@ -715,12 +736,14 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->notify_new_mail_dialog),
                                  balsa_app.notify_new_mail_dialog);
+#ifdef HAVE_CANBERRA
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->notify_new_mail_sound),
                                  balsa_app.notify_new_mail_sound);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
-                                 (pui->notify_new_mail_icon),
-                                 balsa_app.notify_new_mail_icon);
+    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(pui->new_mail_sound_file),
+                                  balsa_app.new_mail_sound_file);
+#endif
+
     if (!balsa_app.check_imap)
         gtk_widget_set_sensitive(GTK_WIDGET(pui->check_imap_inbox), FALSE);
 
@@ -738,6 +761,11 @@ set_prefs(void)
     gtk_widget_set_sensitive(pui->close_mailbox_minutes,
                              gtk_toggle_button_get_active
                              (GTK_TOGGLE_BUTTON(pui->close_mailbox_auto)));
+
+#ifdef ENABLE_SYSTRAY
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->enable_systray_icon),
+                                 balsa_app.enable_systray_icon);
+#endif
 
     pui->filter = libbalsa_mailbox_get_filter(NULL);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->hide_deleted),
@@ -1728,6 +1756,47 @@ timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
     properties_modified_cb(widget, pbox);
 }
 
+#ifdef HAVE_CANBERRA
+static void
+sound_modified_cb(GtkWidget *widget, GtkWidget *pbox)
+{
+	gboolean newstate;
+
+	newstate = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->notify_new_mail_sound));
+
+	gtk_widget_set_sensitive(pui->new_mail_sound_file, newstate);
+	if (newstate) {
+		gchar *soundfile;
+
+		soundfile = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(pui->new_mail_sound_file));
+		gtk_widget_set_sensitive(pui->new_mail_sound_play, soundfile != NULL);
+		g_free(soundfile);
+	} else {
+		gtk_widget_set_sensitive(pui->new_mail_sound_play, FALSE);
+	}
+	properties_modified_cb(widget, pbox);
+}
+
+static void
+sound_play(GtkWidget G_GNUC_UNUSED *widget, gpointer G_GNUC_UNUSED data)
+{
+	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->notify_new_mail_sound))) {
+		gchar *soundfile;
+
+		soundfile = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(pui->new_mail_sound_file));
+		if (soundfile != NULL) {
+			GError *error = NULL;
+
+			if (!libbalsa_play_sound(soundfile, &error)) {
+				libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", (error != NULL) ? error->message : _("unknown"));
+				g_clear_error(&error);
+			}
+			g_free(soundfile);
+		}
+	}
+}
+#endif	/* HAVE_CANBERRA */
+
 static void
 send_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
@@ -2106,7 +2175,6 @@ pm_grid_add_checking_group(GtkWidget * grid_widget)
     gint row = pm_grid_get_next_row(grid);
     GtkAdjustment *spinbutton_adj;
     GtkWidget *label;
-    GtkWidget *hbox;
 
     pm_grid_attach(grid, pm_group_label(_("Checking")), 0, row, 3, 1);
 
@@ -2131,29 +2199,6 @@ pm_grid_add_checking_group(GtkWidget * grid_widget)
         gtk_check_button_new_with_mnemonic(_("Check Inbox _only"));
     pm_grid_attach(grid, pui->check_imap_inbox, 2, row, 2, 1);
 
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, COL_SPACING);
-
-    label = gtk_label_new(_("When mail arrives:"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
-
-    pui->notify_new_mail_dialog =
-        gtk_check_button_new_with_label(_("Display message"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_dialog,
-                       FALSE, FALSE, 0);
-
-    pui->notify_new_mail_sound =
-        gtk_check_button_new_with_label(_("Play sound"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_sound,
-                       FALSE, FALSE, 0);
-
-    pui->notify_new_mail_icon =
-        gtk_check_button_new_with_label(_("Show icon"));
-    gtk_box_pack_start(GTK_BOX(hbox), pui->notify_new_mail_icon,
-                       FALSE, FALSE, 0);
-
-    pm_grid_attach(grid, hbox, 1, ++row, 3, 1);
-
     pui->quiet_background_check = gtk_check_button_new_with_label(
 	_("Do background check quietly (no messages in status bar)"));
     pm_grid_attach(grid, pui->quiet_background_check, 1, ++row, 3, 1);
@@ -2171,6 +2216,35 @@ pm_grid_add_checking_group(GtkWidget * grid_widget)
     pm_grid_attach(grid, label, 3, row, 1, 1);
 
     pm_grid_set_next_row(grid, ++row);
+}
+
+/*
+ * New messages notification group
+ */
+static void
+pm_grid_add_new_mail_notify_group(GtkWidget * grid_widget)
+{
+	GtkGrid *grid = (GtkGrid *) grid_widget;
+	gint row = pm_grid_get_next_row(grid);
+
+	pm_grid_attach(grid, pm_group_label(_("Notification about new messages")), 0, row, 3, 1);
+
+	pui->notify_new_mail_dialog = gtk_check_button_new_with_label(_("Display message"));
+	pm_grid_attach(grid, pui->notify_new_mail_dialog, 1, ++row, 1, 1);
+
+#ifdef HAVE_CANBERRA
+	pui->notify_new_mail_sound = gtk_check_button_new_with_label(_("Play sound"));
+	pm_grid_attach(grid, pui->notify_new_mail_sound, 1, ++row, 1, 1);
+
+	pui->new_mail_sound_file = gtk_file_chooser_button_new(_("New message sound"), GTK_FILE_CHOOSER_ACTION_OPEN);
+	pm_grid_attach(grid, pui->new_mail_sound_file, 2, row, 1, 1);
+
+	pui->new_mail_sound_play = gtk_button_new_from_icon_name("media-playback-start", GTK_ICON_SIZE_SMALL_TOOLBAR);
+	pm_grid_attach(grid, pui->new_mail_sound_play, 3, row, 1, 1);
+	gtk_widget_set_halign(pui->new_mail_sound_play, GTK_ALIGN_START);
+#endif
+
+	pm_grid_set_next_row(grid, ++row);
 }
 
 /*
@@ -2935,6 +3009,11 @@ pm_grid_add_misc_group(GtkWidget * grid_widget)
 
     pm_grid_attach_label(grid, 3, row, 1, 1, _("minutes"));
 
+#ifdef ENABLE_SYSTRAY
+    pui->enable_systray_icon =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Enable System Tray Icon support"));
+#endif
+
     pm_grid_set_next_row(grid, ++row);
 }
 
@@ -3042,6 +3121,7 @@ pm_incoming_page(void)
     GtkWidget *grid = pm_grid_new();
 
     pm_grid_add_checking_group(grid);
+    pm_grid_add_new_mail_notify_group(grid);
     pm_grid_add_mdn_group(grid);
 
     return grid;
@@ -3430,11 +3510,14 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(pui->notify_new_mail_dialog, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 
+#ifdef HAVE_CANBERRA
     g_signal_connect(pui->notify_new_mail_sound, "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
-
-    g_signal_connect(pui->notify_new_mail_icon, "toggled",
-                     G_CALLBACK(properties_modified_cb), property_box);
+                     G_CALLBACK(sound_modified_cb), property_box);
+    g_signal_connect(pui->new_mail_sound_file, "selection-changed",
+                     G_CALLBACK(sound_modified_cb), property_box);
+    g_signal_connect(pui->new_mail_sound_play, "clicked",
+                     G_CALLBACK(sound_play), property_box);
+#endif
 
     g_signal_connect(pui->close_mailbox_auto, "toggled",
                      G_CALLBACK(mailbox_close_timer_modified_cb),
@@ -3442,6 +3525,11 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(pui->close_mailbox_minutes, "changed",
                      G_CALLBACK(mailbox_close_timer_modified_cb),
                      property_box);
+
+#ifdef ENABLE_SYSTRAY
+    g_signal_connect(pui->enable_systray_icon, "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
+#endif
 
     g_signal_connect(pui->hide_deleted, "toggled",
                      G_CALLBACK(filter_modified_cb), property_box);

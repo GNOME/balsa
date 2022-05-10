@@ -190,4 +190,8 @@ GtkDialogFlags libbalsa_dialog_flags(void);
 GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
+#ifdef HAVE_CANBERRA
+gboolean libbalsa_play_sound(const gchar *soundfile, GError **error);
+#endif /* HAVE_CANBERRA*/
+
 #endif                          /* __LIBBALSA_H__ */

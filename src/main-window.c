@@ -68,6 +68,7 @@
 #include "toolbar-factory.h"
 #include "libbalsa-progress.h"
 #include "geometry-manager.h"
+#include "system-tray.h"
 
 #include "filter.h"
 #include "filter-funcs.h"
@@ -785,6 +786,11 @@ bw_is_active_notify(GObject * gobject, GParamSpec * pspec,
             priv->new_mail_notification_sent = FALSE;
         }
         gtk_window_set_urgency_hint(gtk_window, FALSE);
+#ifdef ENABLE_SYSTRAY
+        if (balsa_app.enable_systray_icon) {
+            libbalsa_systray_icon_attention(FALSE);
+        }
+#endif
     }
 }
 
@@ -2254,6 +2260,65 @@ bw_enable_next_unread(BalsaWindow * window, gboolean has_unread_mailbox)
     bw_action_set_enabled(window, "next-unread", has_unread_mailbox);
 }
 
+#ifdef ENABLE_SYSTRAY
+static void
+on_systray_click(gpointer data)
+{
+	GtkWindow *window = GTK_WINDOW(data);
+
+	g_return_if_fail(window != NULL);
+	if (gtk_window_is_active(window)) {
+		gtk_window_iconify(window);
+	} else {
+		gtk_window_present_with_time(window, gtk_get_current_event_time());
+	}
+}
+
+static void
+on_systray_show_hide(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
+{
+	/* process pending events, as otherwise the Balsa window will never be active... */
+	while (gtk_events_pending()) {
+		gtk_main_iteration();
+	}
+	on_systray_click(user_data);
+}
+
+static void
+on_systray_receive(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
+{
+	if (g_atomic_int_get(&checking_mail) == 1) {
+		check_new_messages_real(BALSA_WINDOW(user_data), TRUE);
+	}
+}
+
+static void
+on_systray_new_msg(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
+{
+	new_message_activated(NULL, NULL, user_data);
+}
+
+static void
+bw_init_systray(BalsaWindow *window)
+{
+    GtkWidget *menu;
+    GtkWidget *menuitem;
+
+    menu = gtk_menu_new();
+    menuitem = gtk_menu_item_new_with_label(_("Show/Hide"));
+    g_signal_connect(menuitem, "activate", G_CALLBACK(on_systray_show_hide), window);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    menuitem = gtk_menu_item_new_with_label(_("Check"));
+    g_signal_connect(menuitem, "activate", G_CALLBACK(on_systray_receive), window);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    menuitem = gtk_menu_item_new_with_label(_("Compose"));
+    g_signal_connect(menuitem, "activate", G_CALLBACK(on_systray_new_msg), window);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+    gtk_widget_show_all(menu);
+    libbalsa_systray_icon_init(GTK_MENU(menu), on_systray_click, window);
+}
+#endif
+
 GtkWidget *
 balsa_window_new(GtkApplication *application)
 {
@@ -2434,6 +2499,11 @@ balsa_window_new(GtkApplication *application)
     bw_action_set_enabled(window, "get-new-mail", g_atomic_int_get(&checking_mail) == 1);
 
     g_timeout_add_seconds(30, (GSourceFunc) bw_close_mailbox_on_timer, window);
+
+#ifdef ENABLE_SYSTRAY
+    bw_init_systray(window);
+    libbalsa_systray_icon_enable(balsa_app.enable_systray_icon != 0);
+#endif
 
     gtk_widget_show(GTK_WIDGET(window));
     return GTK_WIDGET(window);
@@ -3198,6 +3268,10 @@ balsa_window_dispose(GObject * object)
     G_OBJECT_CLASS(balsa_window_parent_class)->dispose(object);
 
     balsa_unregister_pixmaps();
+
+#ifdef ENABLE_SYSTRAY
+    libbalsa_systray_icon_destroy();
+#endif
 }
 
 /*
@@ -3626,6 +3700,10 @@ bw_display_new_mail_notification(int num_new, int has_new)
     GtkWindow *window = GTK_WINDOW(balsa_app.main_window);
     BalsaWindowPrivate *priv =
         balsa_window_get_instance_private(balsa_app.main_window);
+#ifdef HAVE_CANBERRA
+    static gint64 last_new_mail_sound = -1;
+    gint64 now;
+#endif
 
     /* remove a running notification timeout task */
     if (notify_ctx.timeout_id > 0U) {
@@ -3633,10 +3711,32 @@ bw_display_new_mail_notification(int num_new, int has_new)
     	notify_ctx.timeout_id = 0U;
     }
 
-    if (!balsa_app.notify_new_mail_dialog)
+    if (gtk_window_is_active(window))
         return;
 
-    if (gtk_window_is_active(window))
+#ifdef HAVE_CANBERRA
+    /* play sound if configured, but not too frequently (min. 30 seconds in between)*/
+    now = g_get_monotonic_time();
+    if ((balsa_app.notify_new_mail_sound != 0) && (balsa_app.new_mail_sound_file != NULL) &&
+    	(now > (last_new_mail_sound + 30 * 1000000))) {
+    	GError *error = NULL;
+
+    	if (!libbalsa_play_sound(balsa_app.new_mail_sound_file, &error)) {
+    		g_warning("%s: %s", __func__, (error != NULL) ? error->message : "unknown");
+    		g_clear_error(&error);
+    	} else {
+    		last_new_mail_sound = now;
+    	}
+    }
+#endif
+
+#ifdef ENABLE_SYSTRAY
+    if (balsa_app.enable_systray_icon) {
+    	libbalsa_systray_icon_attention(TRUE);
+    }
+#endif
+
+    if (balsa_app.notify_new_mail_dialog == 0)
         return;
 
     gtk_window_set_urgency_hint(window, TRUE);

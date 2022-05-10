@@ -980,10 +980,12 @@ config_global_load(void)
 
     balsa_app.notify_new_mail_dialog =
 	d_get_gint("NewMailNotificationDialog", 0);
+#ifdef HAVE_CANBERRA
     balsa_app.notify_new_mail_sound =
-	d_get_gint("NewMailNotificationSound", 1);
-    balsa_app.notify_new_mail_icon =
-	d_get_gint("NewMailNotificationIcon", 1);
+	d_get_gint("NewMailNotificationSound", 0);
+    balsa_app.new_mail_sound_file =
+	libbalsa_conf_get_string("NewMailNotificationSoundFile");
+#endif
     balsa_app.check_mail_upon_startup =
 	libbalsa_conf_get_bool("OnStartup=false");
     balsa_app.check_mail_auto = libbalsa_conf_get_bool("Auto=false");
@@ -1139,6 +1141,11 @@ config_global_load(void)
 
     /* This setting is now per address book */
     libbalsa_conf_clean_key("AddressBookDistMode");
+
+#ifdef ENABLE_SYSTRAY
+    balsa_app.enable_systray_icon =
+	d_get_gint("EnableSystrayIcon", 0);
+#endif
 
     libbalsa_conf_pop_group();
     
@@ -1434,10 +1441,11 @@ config_save(void)
 
     libbalsa_conf_set_int("NewMailNotificationDialog",
                           balsa_app.notify_new_mail_dialog);
+#ifdef HAVE_CANBERRA
     libbalsa_conf_set_int("NewMailNotificationSound",
                           balsa_app.notify_new_mail_sound);
-    libbalsa_conf_set_int("NewMailNotificationIcon",
-                          balsa_app.notify_new_mail_icon);
+    libbalsa_conf_set_string("NewMailNotificationSoundFile", balsa_app.new_mail_sound_file);
+#endif
     libbalsa_conf_set_bool("OnStartup", balsa_app.check_mail_upon_startup);
     libbalsa_conf_set_bool("Auto", balsa_app.check_mail_auto);
     libbalsa_conf_set_int("AutoDelay", balsa_app.check_mail_timer);
@@ -1525,6 +1533,10 @@ config_save(void)
                                  (balsa_app.default_address_book));
     else
 	libbalsa_conf_clean_key("DefaultAddressBook");
+
+#ifdef ENABLE_SYSTRAY
+    libbalsa_conf_set_int("EnableSystrayIcon", balsa_app.enable_systray_icon);
+#endif
 
     libbalsa_conf_pop_group();
 

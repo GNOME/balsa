@@ -412,9 +412,16 @@ balsa_app_init(void)
     balsa_app.error_message = 0;
     balsa_app.debug_message = 0;
 
-    balsa_app.notify_new_mail_sound = 1;
+#ifdef HAVE_CANBERRA
+    balsa_app.notify_new_mail_sound = 0;
+    balsa_app.new_mail_sound_file = NULL;
+#endif
+
     balsa_app.notify_new_mail_dialog = 0;
-    balsa_app.notify_new_mail_icon = 1;
+
+#ifdef ENABLE_SYSTRAY
+    balsa_app.enable_systray_icon = 0;
+#endif
 
     /* Local and IMAP */
     balsa_app.local_scan_depth = 1;

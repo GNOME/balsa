@@ -35,10 +35,6 @@
 #include <ctype.h>
 #include <string.h>
 
-#if HAVE_CANBERRA
-#include <canberra-gtk.h>
-#endif                          /* HAVE_CANBERRA */
-
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 
@@ -249,13 +245,10 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 
 #if HAVE_CANBERRA
     if (filt->sound) {
-        GdkScreen *screen;
-        gint rc;
-
-        screen = gdk_screen_get_default();
-        rc = ca_context_play(ca_gtk_context_get_for_screen(screen), 0,
-                             CA_PROP_MEDIA_FILENAME, filt->sound, NULL);
-        g_debug("(%s) play %s, %s", __func__, filt->sound, ca_strerror(rc));
+        if (!libbalsa_play_sound(filt->sound, &err)) {
+            g_warning("%s: %s", __func__, (err != NULL) ? err->message : "unknown");
+            g_clear_error(&err);
+        }
     }
 #endif                          /* HAVE_CANBERRA */
     if (filt->popup_text)

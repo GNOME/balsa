@@ -6,6 +6,7 @@ balsa_IMGS = \
 	attachment.png		\
 	balsa-top.png		\
 	balsa_icon.png		\
+	balsa_attention.png	\
 	balsa_logo.png
 
 EXTRA_DIST =	$(balsa_IMGS)	\

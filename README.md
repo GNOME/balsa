@@ -1,41 +1,41 @@
-Balsa E-Mail Client 2.6.x
-=========================
+# Balsa 
+An E-Mail Client, version 2.6.x
 
-See ChangeLog for the list of the recent changes and NEWS for highlights.
+See [ChangeLog](./ChangeLog) for the list of the recent changes and [NEWS](./NEWS) for highlights.
 
 Copyright (C) 1997-2020 Stuart Parmenter and others
 
-See 'COPYING' for license information.
+See [COPYING](./COPYING) for license information.
 
-See 'AUTHORS' for a list of contributors
-
-
-Authors:
--------
-	See AUTHORS
+See [AUTHORS](./AUTHORS) for a list of contributors
 
 
-Website:
--------
-	https://pawsa.fedorapeople.org/balsa/
+## Authors:
+
+See [AUTHORS](./AUTHORS)
 
 
-Description:
------------
- 	Balsa is an e-mail reader.  This client is part of the GNOME
+## Website:
+
+https://pawsa.fedorapeople.org/balsa/
+
+
+## Description:
+
+Balsa is an e-mail reader.  This client is part of the GNOME
 desktop environment.  It supports local mailboxes, POP3 and IMAP.
 
 
-Configuration:
--------------
-        Balsa can be built using either Autotools (configure, make, and so on)
+## Configuration:
+
+Balsa can be built using either Autotools (configure, make, and so on)
 or using Meson and an appropriate backend such as Ninja. Details of the
 autotools configure script follow; the corresponding Meson files, meson.build
 and meson_options.txt, provide exactly the same configuration options, in a
 more Mesonish way.
 
-        Balsa has a lot of options to its configure script; you
-should run './configure --help' to get an idea of them. More
+Balsa has a lot of options to its configure script; you
+should run `./configure --help` to get an idea of them. More
 complete descriptions are here.
 
 Basically, Balsa requires
@@ -49,79 +49,79 @@ Basically, Balsa requires
 - libical >= 2.0.0
 - fribidi
 
---disable-more-warnings
+`--disable-more-warnings`
 	Balsa by default is very sensitive to compilation warnings
 which often mean simply programming or configuration errors. If you
 are sure this is not the case, or you cannot change your system setup
 use this option to compile the code and hope for the best. 
 (some Solaris setups require this).
 
---with-gnome
+`--with-gnome`
 	Add "GNOME;" to Balsa's categories in the two .desktop files.
 
---with-libsecret
+`--with-libsecret`
 	Link to libsecret to store credentials in the key ring instead of
 the obfuscated text file ~/.balsa/config-private.
 
---with-gss[=/usr/kerberos]
+`--with-gss[=/usr/kerberos]`
 	This enables GSSAPI Kerberos based authentication scheme. 
 Specify the kerberos directory as the argument.
 
---with-html-widget=(no|webkit2)
+`--with-html-widget=(no|webkit2)`
 	When using webkit2, in order to quote html-only messages
 it is recommended to install a html-to-text conversion tool.  Supported
 tools are python-html2text, html2markdown, html2markdown.py2,
 html2markdown.py3 and html2text.  Additionally, sqlite3 is required for
 managing sender-dependent HTML preferences.
 
---with-spell-checker=(internal|gtkspell|gspell)
+`--with-spell-checker=(internal|gtkspell|gspell)`
 	Select the spell checker for the message composer. The internal spell
 checker depends on the enchant library (any version except 1.6.1).
 
---with-ldap
+`--with-ldap`
         Use ldap libraries for a read-only address book. The read/write
 address book is in the works but needs some finishing touches.
 
---with-sqlite
+`--with-sqlite`
 	Use SQLite for GPE address books.
 
---with-rubrica
+`--with-rubrica`
 	Use libxml2 for Rubrica2 address book support.
 
---with-osmo
+`--with-osmo`
 	Enable experimental support for read-only DBus access to the Osmo
 	contacts.  Note that Osmo svn rev. 1099 or later is required.
 
---with-canberra
+`--with-canberra`
 	Use libcanberra-gtk3 for filter sounds.
 
---with-compface
+`--with-compface`
 	Use Compface for rendering X-Face format thumbnails of email
 authors in a mail header.
 
---with-gtksourceview
+`--with-gtksourceview`
 	Use GtkSourceview for highlighting structured phrases in
 messages, and for syntax highlighting in attachments.
 
 
-Libraries:
----------
-	If you use the autotools build system, make sure you have libtool
+## Libraries:
+
+If you use the autotools build system, make sure you have libtool
 installed (if you get some error messages during compilation or when
 running precompiled binaries saying that libtdl is missing it means you
 need to install just that package).
 
 
-Balsa GIT:
-----------
-	Balsa is hosted on the Gnome GitLab server. To get the latest
+## Balsa GIT:
+
+Balsa is hosted on the Gnome GitLab server. To get the latest
 source, get the module 'balsa':
 git clone https://gitlab.gnome.org/GNOME/balsa.git
 
 
-End-to-End Encryption (E2EE):
------------------------------
-	Balsa supports E2EE using the multipart OpenPGP (RFC 3156)
+## End-to-End Encryption (E2EE):
+
+Balsa supports E2EE using the multipart OpenPGP (RFC 3156)
 or S/MIME (RFC RFC 8551) standards as well as single-part OpenPGP
 (RFC 4880).  Messages can be signed, encrypted, or both.  The GpgME
 library (https://gnupg.org/software/gpgme/) must be installed.  For
@@ -132,8 +132,8 @@ Optionally, Balsa can be configured to include Autocrypt support
 (https://autocrypt.org/index.html).
 
 
-Specifying the SMTP Server:
----------------------------
+## Specifying the SMTP Server:
+
 
 Remote SMTP Server:
 	Specify the domain name and optionally the port for of the SMTP
@@ -174,9 +174,9 @@ Split large messages:
 	appropriate value here.
 
 
-Gtk+-3 Dialog Header Bars:
---------------------------
-	If the Gtk+ version is >= 3.12.0, Balsa uses the new Gtk header
+## Gtk+-3 Dialog Header Bars:
+
+If the Gtk+ version is >= 3.12.0, Balsa uses the new Gtk header
 bars instead of the traditional action areas.  As this may look ugly when
 using other desktop environments than Gnome (e.g. XFCE), Balsa can be
 switched to the old style by defining the environment variable
@@ -184,55 +184,55 @@ switched to the old style by defining the environment variable
 	BALSA_DIALOG_HEADERBAR=0
 
 
-Help System:
-------------
-	In order to compile the help files, you need to have the
+## Help System:
+
+In order to compile the help files, you need to have the
 Mallard documentation system. Very good documentation
 can be found at: http://projectmallard.org/
 
 
-Balsa as mailto protocol handler:
----------------------------------
-	Balsa can be used as mailto protocol handler; by default, a
+## Balsa as mailto protocol handler:
+
+Balsa can be used as mailto protocol handler; by default, a
 desktop file that declares this capability is installed.
 
 
-Mailbox locking:
-----------------
-        Balsa uses flock+dotfile for mailbox file locking. It does not
+## Mailbox locking:
+
+Balsa uses flock+dotfile for mailbox file locking. It does not
 use fcntl (although it can be enabled) since this locking method is
 very fragile and often not portable (see for example
 https://web.pa.msu.edu/reference/pine-tech-notes/low-level.html#locking).
 
-        Make sure that your spool directory has drwxrwxrwt (01777) access
+Make sure that your spool directory has drwxrwxrwt (01777) access
 privileges. Presently, dotfile locking requires this unconditionally
 In the future, we may relax this requirement and will allow you to
 shoot yourself in your leg.
 
 
-POP3 mail filtering:
--------------------
+## POP3 mail filtering:
 
-        When the respective POP3 'mailbox' has the 'filter' box checked, the
+When the respective POP3 'mailbox' has the 'filter' box checked, the
 downloaded mail is passed on to procmail which will use
 ~/.procmailrc file as its configuration, so you can share it between
 Balsa and fetchmail and get consistent behavior no matter you use
 Balsa or fetchmail for downloading.
 
 Simple example ~/.procmailrc file:
+```
 --------- cut here ----------------
 :0H:
 * ^Subject:.*balsa
 mail/balsa-related-mail
 --------- cut here ----------------
-
+```
 It is recommended to read procmail(1) and procmailrc(1) for more
 real-life examples and syntax explanation.
 
 
-Debugging:
----------
-        Set the environment variable G_MESSAGES_DEBUG to print debugging
+## Debugging:
+
+Set the environment variable G_MESSAGES_DEBUG to print debugging
 information to the console.  The value shall be either a space-
 separated list of log domains, or the special value "all".  The
 following custom domains are implemented in Balsa:
@@ -255,15 +255,14 @@ following custom domains are implemented in Balsa:
 - spell-check: internal spell checker
 
 
-Reporting Bugs:
---------------
-	To report a bug, please create an issue at
+## Reporting Bugs:
+
+To report a bug, please create an issue at
 https://gitlab.gnome.org/GNOME/balsa/issues.
 Patches are welcome!
 
 
-Known issues:
-------------
+## Known issues:
 
 *	When dotlocking is not possible (Wrong access privilieges for
 	the mailbox file) Balsa will open mailbox for reading only.

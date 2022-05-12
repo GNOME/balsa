@@ -93,7 +93,10 @@ struct _LibBalsaMessageBody {
 
 #ifdef HAVE_HTML_WIDGET
     gboolean html_ext_loaded;	/* if external HTML content was loaded */
-    GHashTable *selection_table; /* which part of a multipart/alternative is selected for a given key*/
+    LibBalsaMpAltSelection mp_alt_selection; /* which part of a multipart/alternative
+                                                was most recently selected */
+    GHashTable *selection_table;             /* which part of a multipart/alternative
+                                                was most recently selected for a given key */
 #endif /* HAVE_HTML_WIDGET */
 
     LibBalsaMessageBody *parent;	/* Parent part in the message */

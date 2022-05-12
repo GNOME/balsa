@@ -1035,9 +1035,13 @@ libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body, gpointer k
 			}
 			g_free(conttype);
 
+                        /* Remember the most recent selection: */
+                        mp_alt_body->mp_alt_selection = selection;
+
                         if (mp_alt_body->selection_table == NULL)
                             mp_alt_body->selection_table = g_hash_table_new(NULL, NULL);
 
+                        /* Remember the most recent selection for this key: */
                         if (g_hash_table_insert(mp_alt_body->selection_table, key,
                                                 GINT_TO_POINTER(selection))) {
                             g_object_weak_ref(key, body_weak_notify, mp_alt_body);
@@ -1060,15 +1064,26 @@ static inline gboolean body_is_type(const LibBalsaMessageBody *body,
 LibBalsaMpAltSelection
 libbalsa_message_body_get_mp_alt_selection(LibBalsaMessageBody *body, gpointer key)
 {
-	LibBalsaMpAltSelection selection = LIBBALSA_MP_ALT_AUTO;
+	LibBalsaMpAltSelection selection;
 
-	g_return_val_if_fail(body != NULL, FALSE);
+	g_return_val_if_fail(body != NULL, LIBBALSA_MP_ALT_AUTO);
 
 	if (!body_is_type(body, "multipart", "alternative"))
             body = find_mp_alt_parent(body);
 
-	if (body != NULL && body->selection_table != NULL)
+	if (body == NULL) {
+            selection = LIBBALSA_MP_ALT_AUTO;
+        } else {
+            if (body->selection_table != NULL && g_hash_table_contains(body->selection_table, key)) {
+                /* The part is currently being viewed, so return the
+                 * selection that was used to view it: */
 		selection = GPOINTER_TO_INT(g_hash_table_lookup(body->selection_table, key));
+            } else {
+                /* The part is not currently being viewed, so return the
+                 * most recent selection: */
+                selection = body->mp_alt_selection;
+            }
+        }
 
 	return selection;
 }

@@ -776,10 +776,12 @@ sw_edit_activated(GSimpleAction * action,
         return;
     }
 
+    strcpy(filename, TMP_PATTERN);
+    tmpfd = mkstemp(filename);
+
     argc = 2;
     argv = g_new0 (char *, argc + 1);
     argv[0] = g_strdup(g_app_info_get_executable(app));
-    strcpy(filename, TMP_PATTERN);
     argv[1] =
         g_strdup_printf("%s%s",
                         g_app_info_supports_uris(app) ? "file://" : "",
@@ -788,7 +790,6 @@ sw_edit_activated(GSimpleAction * action,
      * terminal??? */
     g_object_unref(app);
 
-    tmpfd = mkstemp(filename);
     tmp = fdopen(tmpfd, "w+");
 
     if(balsa_app.edit_headers) {

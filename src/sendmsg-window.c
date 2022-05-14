@@ -695,13 +695,14 @@ edit_with_gnome_check(gpointer data) {
         return TRUE;
     }
     if (balsa_app.edit_headers) {
-        while (fgets(line, sizeof(line), tmp)) {
+        /* Blank line terminates headers: */
+        while (fgets(line, sizeof(line), tmp) != NULL && line[0] != '\n') {
             guint type;
 
             if (line[strlen(line) - 1] == '\n')
                 line[strlen(line) - 1] = '\0';
 
-            if (libbalsa_str_has_prefix(line, _("Subject:")) == 0) {
+            if (libbalsa_str_has_prefix(line, _("Subject:"))) {
                 gtk_entry_set_text(GTK_ENTRY(data_real->bsmsg->subject[1]),
                                    line + strlen(_("Subject:")) + 1);
                 continue;
@@ -729,6 +730,10 @@ edit_with_gnome_check(gpointer data) {
     while(fgets(line, sizeof(line), tmp))
         gtk_text_buffer_insert_at_cursor(buffer, line, -1);
     sw_buffer_signals_unblock(data_real->bsmsg, buffer);
+
+    /* We do not know whether the message has been modified, but we mark
+     * it as such, to be on the safe side: */
+    data_real->bsmsg->state = SENDMSG_STATE_MODIFIED;
 
     fclose(tmp);
     unlink(data_real->filename);
@@ -806,6 +811,7 @@ sw_edit_activated(GSimpleAction * action,
             fprintf(tmp, "%s %s\n", _(address_types[type]), addr_string);
             g_free(addr_string);
         }
+        /* Blank line terminates headers: */
         fprintf(tmp, "\n");
     }
 

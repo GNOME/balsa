@@ -76,7 +76,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 	html_type = libbalsa_html_type(mime_type);
 	g_free(mime_type);
 
-	if (ignore_html && html_type)
+	if (ignore_html && (html_type != LIBBALSA_HTML_TYPE_NONE))
 	    break;
 
 #ifdef HAVE_HTML_WIDGET

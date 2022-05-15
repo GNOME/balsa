@@ -57,6 +57,14 @@ enum _LibBalsaAttachMode {
     LIBBALSA_ATTACH_AS_EXTBODY
 };
 
+typedef enum _LibBalsaMpAltSelection LibBalsaMpAltSelection;
+
+enum _LibBalsaMpAltSelection {
+	LIBBALSA_MP_ALT_AUTO = 0,			/**< Automatically select text/plain or text/html. */
+	LIBBALSA_MP_ALT_PLAIN,				/**< User selected text/plain.  */
+	LIBBALSA_MP_ALT_HTML				/**< User selected text/html. */
+};
+
 #define LIBBALSA_MESSAGE_BODY_SAFE (S_IRUSR | S_IWUSR)
 #define LIBBALSA_MESSAGE_BODY_UNSAFE \
     (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH)
@@ -83,6 +91,15 @@ struct _LibBalsaMessageBody {
     gboolean was_encrypted;
     GMimeGpgmeSigstat* sig_info;  /* info about a pgp or S/MIME signature body */
 
+#ifdef HAVE_HTML_WIDGET
+    gboolean html_ext_loaded;	/* if external HTML content was loaded */
+    LibBalsaMpAltSelection mp_alt_selection; /* which part of a multipart/alternative
+                                                was most recently selected */
+    GHashTable *selection_table;             /* which part of a multipart/alternative
+                                                was most recently selected for a given key */
+#endif /* HAVE_HTML_WIDGET */
+
+    LibBalsaMessageBody *parent;	/* Parent part in the message */
     LibBalsaMessageBody *next;	/* Next part in the message */
     LibBalsaMessageBody *parts;	/* The parts of a multipart or message/rfc822 message */
 };
@@ -131,6 +148,16 @@ LibBalsaMessageBody *libbalsa_message_body_get_by_id(LibBalsaMessageBody *
                                                      body,
                                                      const gchar * id);
 LibBalsaMessageBody *libbalsa_message_body_mp_related_root(LibBalsaMessageBody *body);
+
+#ifdef HAVE_HTML_WIDGET
+void libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body,
+                                                gpointer key);
+LibBalsaMpAltSelection libbalsa_message_body_get_mp_alt_selection(LibBalsaMessageBody *body,
+                                                                  gpointer key);
+#else
+#define libbalsa_message_body_set_mp_alt_selection(x)
+#define libbalsa_message_body_get_mp_alt_selection(x)	LIBBALSA_MP_ALT_AUTO
+#endif /*HAVE_HTML_WIDGET*/
 
 guint libbalsa_message_body_protect_mode(const LibBalsaMessageBody * body);
 guint libbalsa_message_body_signature_state(const LibBalsaMessageBody *body);

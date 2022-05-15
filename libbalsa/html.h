@@ -81,8 +81,7 @@ void libbalsa_html_clear_cache(void);
 gboolean libbalsa_html_can_print(GtkWidget * widget);
 void libbalsa_html_print(GtkWidget * widget);
 cairo_surface_t *libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
-						   	   	   	   	    gdouble			 	 width,
-											gboolean 			 load_external_images)
+						   	   	   	   	    gdouble			 	 width)
 	G_GNUC_WARN_UNUSED_RESULT;
 
 # endif				/* HAVE_HTML_WIDGET */

@@ -2011,24 +2011,38 @@ balsa_message_has_previous_part(BalsaMessage * balsa_message)
 
 #ifdef HAVE_HTML_WIDGET
 static gboolean
-libbalsa_can_display(LibBalsaMessageBody *part, InternetAddressList *from)
+libbalsa_can_display(LibBalsaMessageBody *part, InternetAddressList *from, gpointer key)
 {
-    gchar *content_type = libbalsa_message_body_get_mime_type(part);
-    gboolean res = FALSE;
-    if ((!balsa_app.display_alt_plain || libbalsa_html_get_prefer_html(from)) &&
-	libbalsa_html_type(content_type))
-	res = TRUE;
-    else if(strcmp(content_type, "multipart/related") == 0 &&
-	    part->parts)
-	res = libbalsa_can_display(part->parts, from);
-    g_free(content_type);
-    return res;
+	gchar *content_type = libbalsa_message_body_get_mime_type(part);
+	gboolean res;
+
+	if (strcmp(content_type, "multipart/related") == 0) {
+		res = (part->parts != NULL) ? libbalsa_can_display(part->parts, from, key) : FALSE;
+	} else {
+		switch (libbalsa_message_body_get_mp_alt_selection(part, key)) {
+		case LIBBALSA_MP_ALT_AUTO:
+			res = (!balsa_app.display_alt_plain || libbalsa_html_get_prefer_html(from)) &&
+				(libbalsa_html_type(content_type) != LIBBALSA_HTML_TYPE_NONE);
+			break;
+		case LIBBALSA_MP_ALT_PLAIN:
+			res = FALSE;
+			break;
+		case LIBBALSA_MP_ALT_HTML:
+			res = (libbalsa_html_type(content_type) != LIBBALSA_HTML_TYPE_NONE);
+			break;
+		default:
+			g_assert_not_reached();		/* paranoid check... */
+		}
+	}
+
+	g_free(content_type);
+	return res;
 }
 #endif                          /* HAVE_HTML_WIDGET */
 
 /** Determines whether given part can be displayed. We display plain
    text, parts html/rtf parts unless it has been disabled in the
-   preferences. We make sure the process is correctly recurrsive, to
+   preferences. We make sure the process is correctly recursive, to
    display properly messages of following structure:
 
    multiplart/alternative
@@ -2040,7 +2054,7 @@ libbalsa_can_display(LibBalsaMessageBody *part, InternetAddressList *from)
    In the case as above, B & C should be displayed.
 */
 static LibBalsaMessageBody*
-preferred_part(LibBalsaMessageBody *parts, InternetAddressList *from)
+preferred_part(LibBalsaMessageBody *parts, InternetAddressList *from, gpointer key)
 {
     LibBalsaMessageBody *body, *preferred = parts;
 
@@ -2053,7 +2067,7 @@ preferred_part(LibBalsaMessageBody *parts, InternetAddressList *from)
             strcmp(content_type, "text/calendar") == 0)
             preferred = body;
 #ifdef HAVE_HTML_WIDGET
-        else if (libbalsa_can_display(body, from))
+        else if (libbalsa_can_display(body, from, key))
             preferred = body;
 #endif                          /* HAVE_HTML_WIDGET */
 
@@ -2181,7 +2195,7 @@ add_multipart(BalsaMessage *balsa_message, LibBalsaMessageBody *body,
 
         from = libbalsa_message_get_headers(balsa_message->message)->from;
         /* Add the most suitable part. */
-        body = add_body(balsa_message, preferred_part(body->parts, from), container);
+        body = add_body(balsa_message, preferred_part(body->parts, from, balsa_message), container);
     } else if (g_mime_content_type_is_type(type, "multipart", "digest")) {
 	body = add_multipart_digest(balsa_message, body->parts, container);
     } else { /* default to multipart/mixed */
@@ -2277,6 +2291,7 @@ select_part(BalsaMessage * balsa_message, BalsaPartInfo *info)
     body = add_part(balsa_message, info,
                     balsa_mime_widget_get_container(balsa_message->bm_widget));
     balsa_message->current_part = part_info_from_body(balsa_message, body);
+    libbalsa_message_body_set_mp_alt_selection(body, balsa_message);
 
     g_signal_emit(balsa_message, balsa_message_signals[SELECT_PART], 0);
 

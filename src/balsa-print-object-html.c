@@ -92,7 +92,7 @@ balsa_print_object_html(GList 				*list,
     c_use_width = psetup->c_width - 2.0 * psetup->curr_depth * C_LABEL_SEP;
 
     /* render the HTML part into a surface, fall back to default if this fails */
-    html_surface = libbalsa_html_print_bitmap(body, c_use_width, psetup->html_load_ext_content);
+    html_surface = libbalsa_html_print_bitmap(body, c_use_width);
     if (html_surface == NULL) {
     	return balsa_print_object_default(list, context, body, psetup);
     }

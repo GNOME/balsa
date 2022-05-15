@@ -720,7 +720,7 @@ mw_print_activated(GSimpleAction * action, GVariant * parameter,
 {
     MessageWindow *mw = (MessageWindow *) data;
 
-    message_print(mw->message, GTK_WINDOW(mw->window));
+    message_print(mw->message, GTK_WINDOW(mw->window), mw->bmessage);
 }
 
 static void

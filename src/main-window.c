@@ -1177,6 +1177,7 @@ print_activated(GSimpleAction * action,
                 gpointer        user_data)
 {
     BalsaWindow *window = BALSA_WINDOW(user_data);
+    BalsaWindowPrivate *priv = balsa_window_get_instance_private(window);
     GtkWidget *widget;
     BalsaIndex *bindex;
     guint current_msgno;
@@ -1195,7 +1196,7 @@ print_activated(GSimpleAction * action,
         if (message == NULL)
             return;
 
-        message_print(message, GTK_WINDOW(window));
+        message_print(message, GTK_WINDOW(window), priv->preview);
         g_object_unref(message);
     }
 }

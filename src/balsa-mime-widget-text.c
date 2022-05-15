@@ -295,8 +295,13 @@ balsa_mime_widget_new_text(BalsaMessage * bm, LibBalsaMessageBody * mime_body,
 #if HAVE_GTKSOURCEVIEW
 	       && !GTK_SOURCE_IS_VIEW(widget)
 #endif
-	       )
-	libbalsa_wrap_string(ptr, balsa_app.browse_wrap_length);
+	       ) {
+        GRegex *rex = balsa_quote_regex_new();
+        char *wrapped = libbalsa_wrap_quoted_string(ptr, balsa_app.browse_wrap_length, rex);
+        g_regex_unref(rex);
+        g_free(ptr);
+        ptr = wrapped;
+    }
 
     fill_text_buf_cited(mwt, widget, ptr,
                         libbalsa_message_body_is_flowed(mime_body),

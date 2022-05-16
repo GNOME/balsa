@@ -85,7 +85,6 @@
 #endif							/* ENABLE_AUTOCRYPT */
 
 typedef struct {
-    pid_t pid_editor;
     gchar *filename;
     BalsaSendmsg *bsmsg;
 } balsa_edit_with_gnome_data;
@@ -785,12 +784,13 @@ sw_edit_activated(GSimpleAction * action,
                   gpointer        data)
 {
     BalsaSendmsg *bsmsg = data;
-    static const char TMP_PATTERN[] = "/tmp/balsa-edit-XXXXXX";
-    gchar filename[sizeof(TMP_PATTERN)];
+    GFile *tmp_file;
+    static const char TMP_PATTERN[] = "balsa-edit-XXXXXX";
+    gchar *filename;
+    GFileIOStream *iostream;
+    GOutputStream *stream;
     balsa_edit_with_gnome_data *edit_data;
     pid_t pid;
-    FILE *tmp;
-    int tmpfd;
     GtkTextBuffer *buffer;
     GtkTextIter start, end;
     gchar *p;
@@ -807,8 +807,17 @@ sw_edit_activated(GSimpleAction * action,
         return;
     }
 
-    strcpy(filename, TMP_PATTERN);
-    tmpfd = mkstemp(filename);
+    tmp_file = g_file_new_tmp(TMP_PATTERN, &iostream, &error);
+    if (tmp_file == NULL) {
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_ERROR,
+                                   _("Could not create temporary file: %s"),
+                                   error->message);
+        g_error_free(error);
+        return;
+    }
+    filename = g_file_get_path(tmp_file);
+    g_object_unref(tmp_file);
 
     argv = g_new(char *, 3);
     argv[0] = g_strdup(g_app_info_get_executable(app));
@@ -821,39 +830,44 @@ sw_edit_activated(GSimpleAction * action,
      * terminal??? */
     g_object_unref(app);
 
-    tmp = fdopen(tmpfd, "w+");
+    stream = g_io_stream_get_output_stream(G_IO_STREAM(iostream));
 
-    if(balsa_app.edit_headers) {
+    if (balsa_app.edit_headers) {
         guint type;
 
-        fprintf(tmp, "%s %s\n", _("Subject:"),
-                gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));
+        g_output_stream_printf(stream, NULL, NULL, NULL, 
+                               "%s %s\n", _("Subject:"),
+                               gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));
         for (type = 0; type < G_N_ELEMENTS(address_types); type++) {
             InternetAddressList *list =
                 libbalsa_address_view_get_list(bsmsg->recipient_view,
                                                address_types[type]);
             gchar *addr_string = internet_address_list_to_string(list, NULL, FALSE);
             g_object_unref(list);
-            fprintf(tmp, "%s %s\n", _(address_types[type]), addr_string);
+            g_output_stream_printf(stream, NULL, NULL, NULL,
+                                   "%s %s\n", _(address_types[type]), addr_string);
             g_free(addr_string);
         }
         /* Blank line terminates headers: */
-        fprintf(tmp, "\n");
+        g_output_stream_write_all(stream, "\n", 1, NULL, NULL, NULL);
     }
 
     gtk_widget_set_sensitive(GTK_WIDGET(bsmsg->text), FALSE);
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     gtk_text_buffer_get_bounds(buffer, &start, &end);
+
     p = gtk_text_iter_get_text(&start, &end);
-    fputs(p, tmp);
+    g_output_stream_write_all(stream, p, strlen(p), NULL, NULL, NULL);
     g_free(p);
-    fclose(tmp);
+
+    g_output_stream_close(stream, NULL, NULL);
+    g_object_unref(iostream);
 
     if (g_spawn_async(NULL, argv, NULL, G_SPAWN_DO_NOT_REAP_CHILD | G_SPAWN_SEARCH_PATH,
                       NULL, NULL, &pid, &error)) {
         /* Return immediately. We don't want balsa to 'hang' */
         edit_data = g_malloc(sizeof(balsa_edit_with_gnome_data));
-        edit_data->filename = g_strdup(filename);
+        edit_data->filename = filename;
         edit_data->bsmsg = bsmsg;
         g_child_watch_add(pid, edit_with_gnome_check, edit_data);
     } else {
@@ -862,6 +876,7 @@ sw_edit_activated(GSimpleAction * action,
                                    _("Could not launch application: %s"),
                                   error->message);
         g_error_free(error);
+        g_free(filename);
     }
 
     g_strfreev(argv);

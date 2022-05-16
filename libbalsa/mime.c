@@ -803,6 +803,7 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
     match = g_regex_match(url_reg, chars, 0, &url_match)
         && g_match_info_fetch_pos(url_match, 0, &start_pos, &end_pos)
         && chars + start_pos < line_end;
+    g_match_info_free(url_match);
 
     while (match) {
         gchar *spc;
@@ -879,15 +880,15 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
 
         chars += end_pos;
         if (prescanner(chars, line_end - chars)) {
-            g_match_info_free(url_match);
             match = g_regex_match(url_reg, chars, 0, &url_match)
                 && g_match_info_fetch_pos(url_match, 0, &start_pos,
                                           &end_pos)
                 && chars + start_pos < line_end;
-        } else
+            g_match_info_free(url_match);
+        } else {
             match = FALSE;
+        }
     }
-    g_match_info_free(url_match);
 
     gtk_text_buffer_insert_with_tags(buffer, &iter, chars,
                                      line_end - chars, tag, NULL);

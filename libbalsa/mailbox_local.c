@@ -853,12 +853,17 @@ message_match_real(LibBalsaMailbox *mailbox, guint msgno,
         lbm_local_cache_message(local, msgno, message);
         entry = libbalsa_mailbox_get_index_entry(mailbox, msgno);
         info  = g_ptr_array_index(priv->threading_info, msgno - 1);
-        if (entry == NULL || info == NULL)
+        if (entry == NULL || info == NULL) {
+            g_object_unref(message);
             return FALSE;
+        }
     }
 
-    if (entry->idle_pending)
+    if (entry->idle_pending) {
+        if (message != NULL)
+            g_object_unref(message);
         return FALSE;   /* Can't match. */
+    }
 
     switch (cond->type) {
     case CONDITION_STRING:

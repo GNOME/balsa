@@ -681,11 +681,14 @@ edit_with_gnome_check(GPid     pid,
 {
     balsa_edit_with_gnome_data *data_real = (balsa_edit_with_gnome_data *) user_data;
     BalsaSendmsg *bsmsg = data_real->bsmsg;
+    char *filename = data_real->filename;
     GError *error = NULL;
-    FILE *tmp;
+    gchar *filebuf;
+    size_t filebuf_len;
+    gchar **lines, **line_p;
     GtkTextBuffer *buffer;
 
-    gchar line[81]; /* FIXME:All lines should wrap at this line */
+    g_free(data_real);
 
     if (!g_spawn_check_wait_status(wait_status, &error)) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
@@ -693,21 +696,44 @@ edit_with_gnome_check(GPid     pid,
                                    _("Editing failed: %s"),
                                    error->message);
         g_error_free(error);
+        g_unlink(filename);
+        g_free(filename);
         return;
     }
 
-    tmp = fopen(data_real->filename, "r");
-    if(tmp == NULL){
-        perror("fopen");
+    if (!g_file_get_contents(filename, &filebuf, NULL, &error)) {
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Cannot read the file “%s”: %s"),
+                                   filename,
+                                   error->message);
+        g_error_free(error);
+        g_unlink(filename);
+        g_free(filename);
         return;
     }
+
+    filebuf_len = strlen(filebuf);
+    if (filebuf_len > 0) {
+        /* Delete a trailing '\n' to avoid a last empty line from g_strsplit(). */
+        gchar *last_char = &filebuf[filebuf_len - 1];
+        if (*last_char == '\n')
+            *last_char = '\0';
+    }
+
+    line_p = lines = g_strsplit(filebuf, "\n", 0);
+    g_free(filebuf);
+
     if (balsa_app.edit_headers) {
-        /* Blank line terminates headers: */
-        while (fgets(line, sizeof(line), tmp) != NULL && line[0] != '\n') {
+        for (; *line_p != NULL; line_p++) {
+            char *line = *line_p;
             guint type;
 
-            if (line[strlen(line) - 1] == '\n')
-                line[strlen(line) - 1] = '\0';
+            if (line[0] == '\0') {
+                /* Blank line terminates headers; skip it: */
+                line_p++;
+                break;
+            }
 
             if (libbalsa_str_has_prefix(line, _("Subject:"))) {
                 gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]),
@@ -727,15 +753,20 @@ edit_with_gnome_check(GPid     pid,
             }
         }
     }
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
 
 #if !HAVE_GTKSOURCEVIEW
     sw_buffer_save(bsmsg);
 #endif                          /* HAVE_GTKSOURCEVIEW */
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     sw_buffer_signals_block(bsmsg, buffer);
     gtk_text_buffer_set_text(buffer, "", 0);
-    while(fgets(line, sizeof(line), tmp))
-        gtk_text_buffer_insert_at_cursor(buffer, line, -1);
+
+    for (; *line_p != NULL; line_p++) {
+        gtk_text_buffer_insert_at_cursor(buffer, *line_p, -1);
+        gtk_text_buffer_insert_at_cursor(buffer, "\n", -1);
+    }
+    g_strfreev(lines);
+
     sw_buffer_signals_unblock(bsmsg, buffer);
 
     /* We do not know whether the message has been modified, but we mark
@@ -743,10 +774,8 @@ edit_with_gnome_check(GPid     pid,
     bsmsg->state = SENDMSG_STATE_MODIFIED;
     gtk_widget_set_sensitive(bsmsg->text, TRUE);
 
-    fclose(tmp);
-    g_unlink(data_real->filename);
-    g_free(data_real->filename);
-    g_free(data_real);
+    g_unlink(filename);
+    g_free(filename);
 }
 
 /* Edit the current file with an external editor. */

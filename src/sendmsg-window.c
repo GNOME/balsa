@@ -689,7 +689,11 @@ edit_with_gnome_check(GPid     pid,
 
     g_free(data_real);
 
+#if GLIB_CHECK_VERSION(2, 70, 0)
     if (!g_spawn_check_wait_status(wait_status, &error)) {
+#else
+    if (!g_spawn_check_exit_status(wait_status, &error)) {
+#endif
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
                                    _("Editing failed: %s"),

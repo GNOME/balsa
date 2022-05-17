@@ -683,7 +683,7 @@ edit_with_gnome_check(GPid     pid,
     char *filename = data_real->filename;
     GError *error = NULL;
     gchar *filebuf;
-    size_t filebuf_len;
+    gsize filebuf_len;
     gchar **lines, **line_p;
     GtkTextBuffer *buffer;
 
@@ -700,7 +700,7 @@ edit_with_gnome_check(GPid     pid,
         return;
     }
 
-    if (!g_file_get_contents(filename, &filebuf, NULL, &error)) {
+    if (!g_file_get_contents(filename, &filebuf, &filebuf_len, &error)) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
                                    _("Cannot read the file “%s”: %s"),
@@ -712,7 +712,6 @@ edit_with_gnome_check(GPid     pid,
         return;
     }
 
-    filebuf_len = strlen(filebuf);
     if (filebuf_len > 0) {
         /* Delete a trailing '\n' to avoid a last empty line from g_strsplit(). */
         gchar *last_char = &filebuf[filebuf_len - 1];

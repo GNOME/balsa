@@ -733,7 +733,7 @@ edit_with_gnome_check(GPid     pid,
                 break;
             }
 
-            if (libbalsa_str_has_prefix(line, _("Subject:"))) {
+            if (g_str_has_prefix(line, _("Subject:"))) {
                 gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]),
                                    line + strlen(_("Subject:")) + 1);
                 continue;
@@ -743,11 +743,12 @@ edit_with_gnome_check(GPid     pid,
                  type < G_N_ELEMENTS(address_types);
                  type++) {
                 const gchar *type_string = _(address_types[type]);
-                if (libbalsa_str_has_prefix(line, type_string))
+                if (g_str_has_prefix(line, type_string)) {
                     libbalsa_address_view_set_from_string
                         (bsmsg->recipient_view,
                          address_types[type],
                          line + strlen(type_string) + 1);
+                }
             }
         }
     }

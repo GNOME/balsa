@@ -85,7 +85,6 @@
 #endif							/* ENABLE_AUTOCRYPT */
 
 typedef struct {
-    pid_t pid_editor;
     gchar *filename;
     BalsaSendmsg *bsmsg;
 } balsa_edit_with_gnome_data;
@@ -674,36 +673,69 @@ sw_buffer_signals_unblock(BalsaSendmsg * bsmsg, GtkTextBuffer * buffer)
 static const gchar *const address_types[] =
     { N_("To:"), N_("CC:"), N_("BCC:") };
 
-static gboolean
-edit_with_gnome_check(gpointer data) {
-    FILE *tmp;
-    balsa_edit_with_gnome_data *data_real = (balsa_edit_with_gnome_data *)data;
+static void
+edit_with_gnome_check(GPid     pid,
+                      gint     wait_status,
+                      gpointer user_data)
+{
+    balsa_edit_with_gnome_data *data_real = (balsa_edit_with_gnome_data *) user_data;
+    BalsaSendmsg *bsmsg = data_real->bsmsg;
+    char *filename = data_real->filename;
+    GError *error = NULL;
+    gchar *filebuf;
+    size_t filebuf_len;
+    gchar **lines, **line_p;
     GtkTextBuffer *buffer;
 
-    pid_t pid;
-    gchar line[81]; /* FIXME:All lines should wrap at this line */
-    /* Editor not ready */
-    pid = waitpid (data_real->pid_editor, NULL, WNOHANG);
-    if(pid == -1) {
-        perror("waitpid");
-        return TRUE;
-    } else if(pid == 0) return TRUE;
+    g_free(data_real);
 
-    tmp = fopen(data_real->filename, "r");
-    if(tmp == NULL){
-        perror("fopen");
-        return TRUE;
+    if (!g_spawn_check_wait_status(wait_status, &error)) {
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Editing failed: %s"),
+                                   error->message);
+        g_error_free(error);
+        g_unlink(filename);
+        g_free(filename);
+        return;
     }
+
+    if (!g_file_get_contents(filename, &filebuf, NULL, &error)) {
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Cannot read the file “%s”: %s"),
+                                   filename,
+                                   error->message);
+        g_error_free(error);
+        g_unlink(filename);
+        g_free(filename);
+        return;
+    }
+
+    filebuf_len = strlen(filebuf);
+    if (filebuf_len > 0) {
+        /* Delete a trailing '\n' to avoid a last empty line from g_strsplit(). */
+        gchar *last_char = &filebuf[filebuf_len - 1];
+        if (*last_char == '\n')
+            *last_char = '\0';
+    }
+
+    line_p = lines = g_strsplit(filebuf, "\n", 0);
+    g_free(filebuf);
+
     if (balsa_app.edit_headers) {
-        /* Blank line terminates headers: */
-        while (fgets(line, sizeof(line), tmp) != NULL && line[0] != '\n') {
+        for (; *line_p != NULL; line_p++) {
+            char *line = *line_p;
             guint type;
 
-            if (line[strlen(line) - 1] == '\n')
-                line[strlen(line) - 1] = '\0';
+            if (line[0] == '\0') {
+                /* Blank line terminates headers; skip it: */
+                line_p++;
+                break;
+            }
 
             if (libbalsa_str_has_prefix(line, _("Subject:"))) {
-                gtk_entry_set_text(GTK_ENTRY(data_real->bsmsg->subject[1]),
+                gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]),
                                    line + strlen(_("Subject:")) + 1);
                 continue;
             }
@@ -714,63 +746,57 @@ edit_with_gnome_check(gpointer data) {
                 const gchar *type_string = _(address_types[type]);
                 if (libbalsa_str_has_prefix(line, type_string))
                     libbalsa_address_view_set_from_string
-                        (data_real->bsmsg->recipient_view,
+                        (bsmsg->recipient_view,
                          address_types[type],
                          line + strlen(type_string) + 1);
             }
         }
     }
-    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(data_real->bsmsg->text));
 
 #if !HAVE_GTKSOURCEVIEW
-    sw_buffer_save(data_real->bsmsg);
+    sw_buffer_save(bsmsg);
 #endif                          /* HAVE_GTKSOURCEVIEW */
-    sw_buffer_signals_block(data_real->bsmsg, buffer);
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
+    sw_buffer_signals_block(bsmsg, buffer);
     gtk_text_buffer_set_text(buffer, "", 0);
-    while(fgets(line, sizeof(line), tmp))
-        gtk_text_buffer_insert_at_cursor(buffer, line, -1);
-    sw_buffer_signals_unblock(data_real->bsmsg, buffer);
+
+    for (; *line_p != NULL; line_p++) {
+        gtk_text_buffer_insert_at_cursor(buffer, *line_p, -1);
+        gtk_text_buffer_insert_at_cursor(buffer, "\n", -1);
+    }
+    g_strfreev(lines);
+
+    sw_buffer_signals_unblock(bsmsg, buffer);
 
     /* We do not know whether the message has been modified, but we mark
      * it as such, to be on the safe side: */
-    data_real->bsmsg->state = SENDMSG_STATE_MODIFIED;
+    bsmsg->state = SENDMSG_STATE_MODIFIED;
+    gtk_widget_set_sensitive(bsmsg->text, TRUE);
 
-    fclose(tmp);
-    unlink(data_real->filename);
-    g_free(data_real->filename);
-    gtk_widget_set_sensitive(data_real->bsmsg->text, TRUE);
-    g_free(data);
-
-    return FALSE;
+    g_unlink(filename);
+    g_free(filename);
 }
 
-/* Edit the current file with an external editor.
- *
- * We fork twice current process, so we get:
- *
- * - Old (parent) process (this needs to continue because we don't want
- *   balsa to 'hang' until the editor exits
- * - New (child) process (forks and waits for child to finish)
- * - New (grandchild) process (executes editor)
- */
+/* Edit the current file with an external editor. */
 static void
 sw_edit_activated(GSimpleAction * action,
                   GVariant      * parameter,
                   gpointer        data)
 {
     BalsaSendmsg *bsmsg = data;
-    static const char TMP_PATTERN[] = "/tmp/balsa-edit-XXXXXX";
-    gchar filename[sizeof(TMP_PATTERN)];
+    GFile *tmp_file;
+    static const char TMP_PATTERN[] = "balsa-edit-XXXXXX";
+    gchar *filename;
+    GFileIOStream *iostream;
+    GOutputStream *stream;
     balsa_edit_with_gnome_data *edit_data;
     pid_t pid;
-    FILE *tmp;
-    int tmpfd;
     GtkTextBuffer *buffer;
     GtkTextIter start, end;
     gchar *p;
     GAppInfo *app;
     char **argv;
-    int argc;
+    GError *error = NULL;
 
     app = g_app_info_get_default_for_type("text/plain", FALSE);
     if (!app) {
@@ -781,66 +807,79 @@ sw_edit_activated(GSimpleAction * action,
         return;
     }
 
-    strcpy(filename, TMP_PATTERN);
-    tmpfd = mkstemp(filename);
+    tmp_file = g_file_new_tmp(TMP_PATTERN, &iostream, &error);
+    if (tmp_file == NULL) {
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_ERROR,
+                                   _("Could not create temporary file: %s"),
+                                   error->message);
+        g_error_free(error);
+        return;
+    }
+    filename = g_file_get_path(tmp_file);
+    g_object_unref(tmp_file);
 
-    argc = 2;
-    argv = g_new0 (char *, argc + 1);
+    argv = g_new(char *, 3);
     argv[0] = g_strdup(g_app_info_get_executable(app));
     argv[1] =
         g_strdup_printf("%s%s",
                         g_app_info_supports_uris(app) ? "file://" : "",
                         filename);
+    argv[2] = NULL;
     /* FIXME: how can I detect if the called application needs the
      * terminal??? */
     g_object_unref(app);
 
-    tmp = fdopen(tmpfd, "w+");
+    stream = g_io_stream_get_output_stream(G_IO_STREAM(iostream));
 
-    if(balsa_app.edit_headers) {
+    if (balsa_app.edit_headers) {
         guint type;
 
-        fprintf(tmp, "%s %s\n", _("Subject:"),
-                gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));
+        g_output_stream_printf(stream, NULL, NULL, NULL, 
+                               "%s %s\n", _("Subject:"),
+                               gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));
         for (type = 0; type < G_N_ELEMENTS(address_types); type++) {
             InternetAddressList *list =
                 libbalsa_address_view_get_list(bsmsg->recipient_view,
                                                address_types[type]);
             gchar *addr_string = internet_address_list_to_string(list, NULL, FALSE);
             g_object_unref(list);
-            fprintf(tmp, "%s %s\n", _(address_types[type]), addr_string);
+            g_output_stream_printf(stream, NULL, NULL, NULL,
+                                   "%s %s\n", _(address_types[type]), addr_string);
             g_free(addr_string);
         }
         /* Blank line terminates headers: */
-        fprintf(tmp, "\n");
+        g_output_stream_write_all(stream, "\n", 1, NULL, NULL, NULL);
     }
 
     gtk_widget_set_sensitive(GTK_WIDGET(bsmsg->text), FALSE);
     buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(bsmsg->text));
     gtk_text_buffer_get_bounds(buffer, &start, &end);
+
     p = gtk_text_iter_get_text(&start, &end);
-    fputs(p, tmp);
+    g_output_stream_write_all(stream, p, strlen(p), NULL, NULL, NULL);
     g_free(p);
-    fclose(tmp);
-    if ((pid = fork()) < 0) {
-        perror ("fork");
-        g_strfreev(argv);
-        return;
+
+    g_output_stream_close(stream, NULL, NULL);
+    g_object_unref(iostream);
+
+    if (g_spawn_async(NULL, argv, NULL, G_SPAWN_DO_NOT_REAP_CHILD | G_SPAWN_SEARCH_PATH,
+                      NULL, NULL, &pid, &error)) {
+        /* Return immediately. We don't want balsa to 'hang' */
+        edit_data = g_malloc(sizeof(balsa_edit_with_gnome_data));
+        edit_data->filename = filename;
+        edit_data->bsmsg = bsmsg;
+        g_child_watch_add(pid, edit_with_gnome_check, edit_data);
+    } else {
+        balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                   LIBBALSA_INFORMATION_WARNING,
+                                   _("Could not launch application: %s"),
+                                  error->message);
+        g_error_free(error);
+        g_free(filename);
     }
-    if (pid == 0) {
-        setpgid(0, 0);
-        execvp (argv[0], argv);
-        perror ("execvp");
-        g_strfreev (argv);
-        exit(127);
-    }
-    g_strfreev (argv);
-    /* Return immediately. We don't want balsa to 'hang' */
-    edit_data = g_malloc(sizeof(balsa_edit_with_gnome_data));
-    edit_data->pid_editor = pid;
-    edit_data->filename = g_strdup(filename);
-    edit_data->bsmsg = bsmsg;
-    g_timeout_add(200, (GSourceFunc)edit_with_gnome_check, edit_data);
+
+    g_strfreev(argv);
 }
 
 static void

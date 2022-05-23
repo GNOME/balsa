@@ -701,17 +701,33 @@ libbalsa_source_view_new(gboolean highlight_phrases)
 
 #if HAVE_CANBERRA
 gboolean
-libbalsa_play_sound(const gchar *soundfile, GError **error)
+libbalsa_play_sound_event(const gchar *event_id, GError **error)
 {
 	GdkScreen *screen;
 	gint rc;
 
-	g_return_val_if_fail(soundfile != NULL, FALSE);
+	g_return_val_if_fail(event_id != NULL, FALSE);
 
 	screen = gdk_screen_get_default();
-	rc = ca_context_play(ca_gtk_context_get_for_screen(screen), 0, CA_PROP_MEDIA_FILENAME, soundfile, NULL);
+	rc = ca_context_play(ca_gtk_context_get_for_screen(screen), 0, CA_PROP_EVENT_ID, event_id, NULL);
 	if (rc != 0) {
-		g_set_error(error, LIBBALSA_ERROR_QUARK, rc, _("Cannot play sound file “%s”: %s"), soundfile, ca_strerror(rc));
+		g_set_error(error, LIBBALSA_ERROR_QUARK, rc, _("Cannot play sound event “%s”: %s"), event_id, ca_strerror(rc));
+	}
+	return rc == 0;
+}
+
+gboolean
+libbalsa_play_sound_file(const gchar *filename, GError **error)
+{
+	GdkScreen *screen;
+	gint rc;
+
+	g_return_val_if_fail(filename != NULL, FALSE);
+
+	screen = gdk_screen_get_default();
+	rc = ca_context_play(ca_gtk_context_get_for_screen(screen), 0, CA_PROP_MEDIA_FILENAME, filename, NULL);
+	if (rc != 0) {
+		g_set_error(error, LIBBALSA_ERROR_QUARK, rc, _("Cannot play sound file “%s”: %s"), filename, ca_strerror(rc));
 	}
 	return rc == 0;
 }

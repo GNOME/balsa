@@ -169,7 +169,6 @@ extern struct BalsaApplication {
 
 #ifdef HAVE_CANBERRA
     gint notify_new_mail_sound;
-    gchar *new_mail_sound_file;
 #endif
     
     gint notify_new_mail_dialog;

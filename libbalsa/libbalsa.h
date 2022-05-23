@@ -191,7 +191,10 @@ GtkWidget *libbalsa_source_view_new(gboolean highlight_phrases);
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
 #ifdef HAVE_CANBERRA
-gboolean libbalsa_play_sound(const gchar *soundfile, GError **error);
+gboolean libbalsa_play_sound_event(const gchar  *event_id,
+                                   GError      **error);
+gboolean libbalsa_play_sound_file(const gchar  *filename,
+                                  GError      **error);
 #endif /* HAVE_CANBERRA*/
 
 #endif                          /* __LIBBALSA_H__ */

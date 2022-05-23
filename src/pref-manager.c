@@ -93,8 +93,6 @@ typedef struct _PropertyUI {
     GtkWidget *notify_new_mail_dialog;
 #ifdef HAVE_CANBERRA
     GtkWidget *notify_new_mail_sound;
-    GtkWidget *new_mail_sound_file;
-    GtkWidget *new_mail_sound_play;
 #endif
     GtkWidget *mdn_reply_clean_menu, *mdn_reply_notclean_menu;
 
@@ -479,9 +477,6 @@ apply_prefs(GtkDialog * pbox)
     balsa_app.notify_new_mail_sound =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
                                      (pui->notify_new_mail_sound));
-    g_free(balsa_app.new_mail_sound_file);
-    balsa_app.new_mail_sound_file =
-        gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(pui->new_mail_sound_file));
 #endif
 
     balsa_app.mdn_reply_clean =
@@ -740,8 +735,6 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON
                                  (pui->notify_new_mail_sound),
                                  balsa_app.notify_new_mail_sound);
-    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(pui->new_mail_sound_file),
-                                  balsa_app.new_mail_sound_file);
 #endif
 
     if (!balsa_app.check_imap)
@@ -1756,47 +1749,6 @@ timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
     properties_modified_cb(widget, pbox);
 }
 
-#ifdef HAVE_CANBERRA
-static void
-sound_modified_cb(GtkWidget *widget, GtkWidget *pbox)
-{
-	gboolean newstate;
-
-	newstate = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->notify_new_mail_sound));
-
-	gtk_widget_set_sensitive(pui->new_mail_sound_file, newstate);
-	if (newstate) {
-		gchar *soundfile;
-
-		soundfile = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(pui->new_mail_sound_file));
-		gtk_widget_set_sensitive(pui->new_mail_sound_play, soundfile != NULL);
-		g_free(soundfile);
-	} else {
-		gtk_widget_set_sensitive(pui->new_mail_sound_play, FALSE);
-	}
-	properties_modified_cb(widget, pbox);
-}
-
-static void
-sound_play(GtkWidget G_GNUC_UNUSED *widget, gpointer G_GNUC_UNUSED data)
-{
-	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->notify_new_mail_sound))) {
-		gchar *soundfile;
-
-		soundfile = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(pui->new_mail_sound_file));
-		if (soundfile != NULL) {
-			GError *error = NULL;
-
-			if (!libbalsa_play_sound(soundfile, &error)) {
-				libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", (error != NULL) ? error->message : _("unknown"));
-				g_clear_error(&error);
-			}
-			g_free(soundfile);
-		}
-	}
-}
-#endif	/* HAVE_CANBERRA */
-
 static void
 send_timer_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 {
@@ -2235,13 +2187,6 @@ pm_grid_add_new_mail_notify_group(GtkWidget * grid_widget)
 #ifdef HAVE_CANBERRA
 	pui->notify_new_mail_sound = gtk_check_button_new_with_label(_("Play sound"));
 	pm_grid_attach(grid, pui->notify_new_mail_sound, 1, ++row, 1, 1);
-
-	pui->new_mail_sound_file = gtk_file_chooser_button_new(_("New message sound"), GTK_FILE_CHOOSER_ACTION_OPEN);
-	pm_grid_attach(grid, pui->new_mail_sound_file, 2, row, 1, 1);
-
-	pui->new_mail_sound_play = gtk_button_new_from_icon_name("media-playback-start", GTK_ICON_SIZE_SMALL_TOOLBAR);
-	pm_grid_attach(grid, pui->new_mail_sound_play, 3, row, 1, 1);
-	gtk_widget_set_halign(pui->new_mail_sound_play, GTK_ALIGN_START);
 #endif
 
 	pm_grid_set_next_row(grid, ++row);
@@ -3512,11 +3457,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
 #ifdef HAVE_CANBERRA
     g_signal_connect(pui->notify_new_mail_sound, "toggled",
-                     G_CALLBACK(sound_modified_cb), property_box);
-    g_signal_connect(pui->new_mail_sound_file, "selection-changed",
-                     G_CALLBACK(sound_modified_cb), property_box);
-    g_signal_connect(pui->new_mail_sound_play, "clicked",
-                     G_CALLBACK(sound_play), property_box);
+                     G_CALLBACK(properties_modified_cb), property_box);
 #endif
 
     g_signal_connect(pui->close_mailbox_auto, "toggled",

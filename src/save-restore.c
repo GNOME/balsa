@@ -983,8 +983,6 @@ config_global_load(void)
 #ifdef HAVE_CANBERRA
     balsa_app.notify_new_mail_sound =
 	d_get_gint("NewMailNotificationSound", 0);
-    balsa_app.new_mail_sound_file =
-	libbalsa_conf_get_string("NewMailNotificationSoundFile");
 #endif
     balsa_app.check_mail_upon_startup =
 	libbalsa_conf_get_bool("OnStartup=false");
@@ -1444,7 +1442,6 @@ config_save(void)
 #ifdef HAVE_CANBERRA
     libbalsa_conf_set_int("NewMailNotificationSound",
                           balsa_app.notify_new_mail_sound);
-    libbalsa_conf_set_string("NewMailNotificationSoundFile", balsa_app.new_mail_sound_file);
 #endif
     libbalsa_conf_set_bool("OnStartup", balsa_app.check_mail_upon_startup);
     libbalsa_conf_set_bool("Auto", balsa_app.check_mail_auto);

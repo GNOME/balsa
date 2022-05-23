@@ -245,7 +245,7 @@ libbalsa_filter_mailbox_messages(LibBalsaFilter * filt,
 
 #if HAVE_CANBERRA
     if (filt->sound) {
-        if (!libbalsa_play_sound(filt->sound, &err)) {
+        if (!libbalsa_play_sound_file(filt->sound, &err)) {
             g_warning("%s: %s", __func__, (err != NULL) ? err->message : "unknown");
             g_clear_error(&err);
         }

@@ -414,7 +414,6 @@ balsa_app_init(void)
 
 #ifdef HAVE_CANBERRA
     balsa_app.notify_new_mail_sound = 0;
-    balsa_app.new_mail_sound_file = NULL;
 #endif
 
     balsa_app.notify_new_mail_dialog = 0;

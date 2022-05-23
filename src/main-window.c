@@ -3717,12 +3717,11 @@ bw_display_new_mail_notification(int num_new, int has_new)
 #ifdef HAVE_CANBERRA
     /* play sound if configured, but not too frequently (min. 30 seconds in between)*/
     now = g_get_monotonic_time();
-    if ((balsa_app.notify_new_mail_sound != 0) && (balsa_app.new_mail_sound_file != NULL) &&
-    	(now > (last_new_mail_sound + 30 * 1000000))) {
+    if ((balsa_app.notify_new_mail_sound != 0) && (now > (last_new_mail_sound + 30 * 1000000))) {
     	GError *error = NULL;
 
-    	if (!libbalsa_play_sound(balsa_app.new_mail_sound_file, &error)) {
-    		g_warning("%s: %s", __func__, (error != NULL) ? error->message : "unknown");
+        if (!libbalsa_play_sound_event("message-new-email", &error)) {
+    		g_warning("%s: %s", __func__, error->message);
     		g_clear_error(&error);
     	} else {
     		last_new_mail_sound = now;

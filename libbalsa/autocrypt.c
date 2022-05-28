@@ -309,7 +309,7 @@ autocrypt_header(LibBalsaIdentity *identity, GError **error)
 				if ((key != NULL) && (key->subkeys != NULL)) {
 					use_fpr = g_strdup(key->subkeys->fpr);
 				}
-				g_list_free_full(keys, (GDestroyNotify) gpgme_key_release);
+				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
 			}
 			gpgme_release(ctx);
 		}
@@ -744,7 +744,7 @@ extract_ac_keydata(GMimeAutocryptHeader *autocrypt_header, ac_key_data_t *dest)
 				}
 				g_clear_error(&gpg_error);
 
-				g_list_free_full(keys, (GDestroyNotify) gpgme_key_release);
+				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
 				libbalsa_delete_directory_contents(temp_dir);
 				g_rmdir(temp_dir);
 			}
@@ -936,7 +936,7 @@ show_key_details_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 			    	}
 			    	(void) gtk_dialog_run(GTK_DIALOG(dialog));
 			    	gtk_widget_destroy(dialog);
-			    	g_list_free_full(keys, (GDestroyNotify) gpgme_key_release);
+			    	g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
 				}
 				libbalsa_delete_directory_contents(temp_dir);
 				g_rmdir(temp_dir);

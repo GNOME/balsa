@@ -149,6 +149,8 @@ balsa_print_object_header_new_real(GList * list,
 		    headers->cc_list, &p_label_width, print_all_headers);
     header_add_list(test_layout, header_buf, "bcc", _("BCC:"),
 		    headers->bcc_list, &p_label_width, print_all_headers);
+    header_add_list(test_layout, header_buf, "sender", _("Sender:"),
+		    headers->sender, &p_label_width, print_all_headers);
     header_add_string(test_layout, header_buf, "fcc", _("FCC:"),
 		      headers->fcc_url, &p_label_width, print_all_headers);
     header_add_list(test_layout, header_buf, "disposition-notification-to",

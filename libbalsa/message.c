@@ -67,9 +67,6 @@ struct _LibBalsaMessage {
 
     GMimeMessage *mime_msg;
 
-    /* sender address */
-    InternetAddressList *sender;
-
     /* subject line; we still need it here for sending;
      * although _SET_SUBJECT might resolve it(?)
      * but we can set to to NULL unless there is no mailbox, like
@@ -140,7 +137,6 @@ libbalsa_message_init(LibBalsaMessage * message)
 {
     message->headers = g_new0(LibBalsaMessageHeaders, 1);
     message->mailbox = NULL;
-    message->sender = NULL;
     message->subj = NULL;
     message->references = NULL;
     message->in_reply_to = NULL;
@@ -190,7 +186,6 @@ libbalsa_message_dispose(GObject * object)
 {
     LibBalsaMessage *message = LIBBALSA_MESSAGE(object);
 
-    g_clear_object(&message->sender);
     g_clear_object(&message->mime_msg);
     g_clear_object(&message->ident);
 
@@ -252,6 +247,11 @@ libbalsa_message_headers_destroy(LibBalsaMessageHeaders *headers)
     if (headers->from) {
 	g_object_unref(headers->from);
 	headers->from = NULL;
+    }
+
+    if (headers->sender) {
+	g_object_unref(headers->sender);
+	headers->sender = NULL;
     }
 
     if (headers->to_list) {
@@ -498,7 +498,7 @@ prepend_header_misc(GList      *res,
 {
     char lcname[28]; /* one byte longer than the longest ignored header */
     static const char ignored_headers[] =
-        "subject date from to cc bcc "
+        "subject date from sender to cc bcc "
         "message-id references in-reply-to status lines"
         "disposition-notification-to";
     unsigned i;
@@ -976,6 +976,11 @@ lb_message_headers_basic_from_gmime(LibBalsaMessageHeaders *headers,
     if (headers->from == NULL) {
         headers->from =
             lb_message_address_list_ref(g_mime_message_get_from(mime_msg));
+    }
+
+    if (headers->sender == NULL) {
+        headers->sender =
+            lb_message_address_list_ref(g_mime_message_get_addresses(mime_msg, GMIME_ADDRESS_TYPE_SENDER));
     }
 
     if (headers->date == 0) {
@@ -1573,15 +1578,6 @@ libbalsa_message_get_has_all_headers(LibBalsaMessage *message)
 }
 
 
-InternetAddressList *
-libbalsa_message_get_sender(LibBalsaMessage *message)
-{
-    g_return_val_if_fail(LIBBALSA_IS_MESSAGE(message), 0);
-
-    return message->sender;
-}
-
-
 gboolean
 libbalsa_message_get_request_dsn(LibBalsaMessage *message)
 {
@@ -1745,17 +1741,6 @@ libbalsa_message_set_mime_message(LibBalsaMessage *message,
     g_return_if_fail(mime_message == NULL || GMIME_IS_MESSAGE(mime_message));
 
     g_set_object(&message->mime_msg, mime_message);
-}
-
-
-void
-libbalsa_message_set_sender(LibBalsaMessage     *message,
-                            InternetAddressList *sender)
-{
-    g_return_if_fail(LIBBALSA_IS_MESSAGE(message));
-    g_return_if_fail(sender == NULL || IS_INTERNET_ADDRESS_LIST(sender));
-
-    g_set_object(&message->sender, sender);
 }
 
 

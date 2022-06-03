@@ -1427,7 +1427,7 @@ display_part(BalsaMessage * balsa_message, LibBalsaMessageBody * body,
 
         if (strcmp(content_type, "message/rfc822") == 0 &&
             body->embhdrs) {
-            gchar *from = balsa_message_sender_to_gchar(body->embhdrs->from, 0);
+            gchar *from = balsa_message_sender_to_gchar(body->embhdrs->from, -1);
             gchar *subj = g_strdup(body->embhdrs->subject);
             libbalsa_utf8_sanitize(&from, balsa_app.convert_unknown_8bit, NULL);
             libbalsa_utf8_sanitize(&subj, balsa_app.convert_unknown_8bit, NULL);
@@ -2400,36 +2400,28 @@ handle_mdn_request(GtkWindow *parent,
                    LibBalsaMessage *message,
                    LibBalsaMessageHeaders *headers)
 {
-    gboolean suspicious;
-    InternetAddressList *use_from = NULL;
+    const gchar *return_path;
+    gboolean suspicious = TRUE;
     InternetAddressList *list;
-    InternetAddress *from, *dn;
+    InternetAddress *dn;
     BalsaMDNReply action;
     LibBalsaMessage *mdn;
     LibBalsaIdentity *mdn_ident = NULL;
     gint i, len;
 
-    /* Check if the dispnotify_to address is equal to the (in this order,
-       if present) reply_to, from or sender address. */
-    if (headers->reply_to != NULL) {
-        use_from = headers->reply_to;
-    } else if (headers->from != NULL) {
-        use_from = headers->from;
-    }
-    if (use_from == NULL) {
-        InternetAddressList *sender;
-
-        sender = libbalsa_message_get_sender(message);
-        if (sender != NULL)
-            use_from = sender;
-        else
-            use_from = NULL;
-    }
-    /* note: neither Disposition-Notification-To: nor Reply-To:, From: or
-       Sender: may be address groups */
-    from = use_from ? internet_address_list_get_address (use_from, 0) : NULL;
+    /* according to RFC 8098 sect. 2.1 a MDN request shall be considered suspicious if the Return-Path differs from the
+     * Disposition-Notification-To address */
+    return_path = libbalsa_message_get_user_header(message, "Return-Path");
     dn = internet_address_list_get_address(headers->dispnotify_to, 0);
-    suspicious = !libbalsa_ia_rfc2821_equal(dn, from);
+    if (return_path != NULL) {
+    	InternetAddressList *return_ia;
+
+    	return_ia = internet_address_list_parse(NULL, return_path);
+    	if (return_ia != NULL) {
+    		suspicious = !libbalsa_ia_rfc2821_equal(dn, internet_address_list_get_address(return_ia, 0));
+    		g_object_unref(return_ia);
+    	}
+    }
 
     /* Try to find "my" identity first in the to, then in the cc list */
     list = headers->to_list;
@@ -2485,7 +2477,7 @@ handle_mdn_request(GtkWindow *parent,
     if (action == BALSA_MDN_REPLY_ASKME) {
         gchar *sender;
         gchar *reply_to;
-        sender = from ? internet_address_to_string(from, NULL, FALSE) : NULL;
+        sender = internet_address_list_to_string(headers->from, NULL, FALSE);
         reply_to =
             internet_address_list_to_string (headers->dispnotify_to, NULL,
 		                             FALSE);

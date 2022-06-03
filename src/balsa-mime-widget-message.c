@@ -760,6 +760,8 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
                             show_all_headers);
     add_header_address_list(bm, grid, "bcc", _("BCC:"), headers->bcc_list,
                             show_all_headers);
+    add_header_address_list(bm, grid, "sender", _("Sender:"), headers->sender,
+                            show_all_headers);
 
 #if BALSA_SHOW_FCC_AS_WELL_AS_X_BALSA_FCC
     if (headers->fcc_url)

@@ -2006,6 +2006,14 @@ internet_address_new_list_from_imap_address_list(ImapAddress *list)
     return internet_address_new_list_from_imap_address(list, NULL);
 }
 
+/*
+ * Note: We ignore the "Sender" and "Reply-To" elements from the IMAP ENVELOPE response
+ * as they may not the contain the actual header values of the RFC 5322 message.  See
+ * RFC 3501:
+ *    If the Sender or Reply-To lines are absent in the [RFC-2822] header, or are present
+ *    but empty, the server sets the corresponding member of the envelope to be the same
+ *    value as the from member [...].
+ */
 static void
 lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
                gboolean is_embedded)
@@ -2013,8 +2021,6 @@ lb_set_headers(LibBalsaMessageHeaders *headers, ImapEnvelope *  envelope,
     headers->date = envelope->date;
     headers->from =
 	internet_address_new_list_from_imap_address_list(envelope->from);
-    headers->reply_to =
-        internet_address_new_list_from_imap_address_list(envelope->replyto);
     headers->to_list =
 	internet_address_new_list_from_imap_address_list(envelope->to);
     headers->cc_list =
@@ -2036,7 +2042,6 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     ImapEnvelope *envelope;
     ImapMessage* imsg;
     gchar *hdr;
-    InternetAddressList *sender;
     
     g_return_val_if_fail(mimap->opened, FALSE);
     imsg = mi_get_imsg(mimap, libbalsa_message_get_msgno(message));
@@ -2057,12 +2062,6 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     libbalsa_message_set_length(message, imsg->rfc822size);
     envelope = imsg->envelope;
     libbalsa_message_set_subject_from_header(message, envelope->subject);
-
-    if (envelope->sender) {
-        sender = internet_address_new_list_from_imap_address_list(envelope->sender);
-		libbalsa_message_set_sender(message, sender);
-		g_object_unref(sender);
-	}
 
     libbalsa_message_set_in_reply_to_from_string(message, envelope->in_reply_to);
     if (envelope->message_id != NULL) {

@@ -81,20 +81,15 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
 
 	may_reply = TRUE;
         headers = libbalsa_message_get_headers(lbm);
+
+	/* Note: usually, a VEvent reply is sent to the ORGANIZER; use the Reply-To:
+	 * or From: address as fallback only if it is not specified */
 	if (headers != NULL) {
 	    if (headers->reply_to != NULL)
                 sender = internet_address_list_get_address(headers->reply_to, 0);
 	    else if (headers->from != NULL)
                 sender = internet_address_list_get_address(headers->from, 0);
 	}
-        if (sender == NULL) {
-            InternetAddressList *ia_list;
-
-            ia_list = libbalsa_message_get_sender(lbm);
-
-            if (ia_list != NULL)
-                sender = internet_address_list_get_address(ia_list, 0);
-        }
     }
 
     /* add events */
@@ -175,9 +170,10 @@ balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_repl
     GtkGrid *grid;
     int row = 0;
     LibBalsaIdentity *vevent_ident = NULL;
+    gchar *answer_to_mail = NULL;
     guint attendee;
     gchar *buffer;
-	GString *all_atts = NULL;
+    GString *all_atts = NULL;
 
     grid = GTK_GRID(gtk_grid_new());
     gtk_grid_set_row_spacing(grid, 6);
@@ -224,6 +220,11 @@ balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_repl
                     if (libbalsa_ia_rfc2821_equal(libbalsa_identity_get_address(ident),
                                                   ia)) {
                         vevent_ident = ident;
+                        if (libbalsa_vevent_organizer(event) != NULL) {
+                            answer_to_mail = libbalsa_address_to_gchar(libbalsa_vevent_organizer(event), 0);
+                        } else if (sender != NULL) {
+                            answer_to_mail = internet_address_to_string(sender, NULL, FALSE);
+                        }
                         break;
                     }
                 }
@@ -246,7 +247,7 @@ balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_repl
 
     GRID_ATTACH_TEXT(grid, libbalsa_vevent_description(event), _("Description:"));
 
-    if (sender && vevent_ident) {
+    if (answer_to_mail != NULL) {
 	GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
 	GtkWidget *label;
 	GtkWidget *bbox;
@@ -254,7 +255,7 @@ balsa_vevent_widget(LibBalsaVEvent *event, LibBalsaVCal *vcal, gboolean may_repl
 
 	/* add the callback data to the event object */
 	g_object_set_data_full(G_OBJECT(event), "ev:sender",
-			       internet_address_to_string(sender, NULL, FALSE),
+			       answer_to_mail,
 			       (GDestroyNotify) g_free);
         g_object_set_data_full(G_OBJECT(event), "ev:ident",
                                g_object_ref(vevent_ident),

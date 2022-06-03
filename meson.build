@@ -6,7 +6,8 @@ project('balsa', 'c',
 # if meson is used not in a git source tree, use project version:
 balsa_version = meson.project_version()
 
-balsa_from_git = run_command('sh', '-c', 'test -d ${MESON_SOURCE_ROOT}/.git').returncode() == 0
+balsa_from_git = run_command('sh', '-c', 'test -d ${MESON_SOURCE_ROOT}/.git',
+                             check: false).returncode() == 0
 
 if balsa_from_git
   git_describe = run_command('git', 'describe', '--tags')
@@ -183,7 +184,8 @@ if html_widget == 'webkit2'
       description : 'Path to html2text program.')
     conftest_htm = join_paths(meson.current_build_dir(), 'conftest.htm')
     run_command('sh', '-c', 'echo "<html/>" > ' + conftest_htm)
-    unicode_snob = run_command(html2text.path(), '--unicode-snob', conftest_htm)
+    unicode_snob = run_command(html2text.path(), '--unicode-snob', conftest_htm,
+                               check: false)
     if unicode_snob.returncode() == 0
       conf.set('HTML2TEXT_UCOPT', 1,
         description : 'Defined when HTML2TEXT accepts the --unicode-snob option.')

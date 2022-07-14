@@ -114,11 +114,12 @@ struct _LibBalsaMessageHeaders {
     gchar *subject;
 
     /* from, reply, and disposition notification addresses */
-    InternetAddressList *from;
+    InternetAddressList *from;		/* may actually be a list */
+    InternetAddressList *sender;
     InternetAddressList *reply_to;
     InternetAddressList *dispnotify_to;
 
-    /* primary, secondary, and blind recipent lists */
+    /* primary, secondary, and blind recipient lists */
     InternetAddressList *to_list;
     InternetAddressList *cc_list;
     InternetAddressList *bcc_list;
@@ -297,7 +298,6 @@ const gchar            *libbalsa_message_get_message_id(LibBalsaMessage *message
 guint                   libbalsa_message_get_msgno(LibBalsaMessage *message);
 gint64                  libbalsa_message_get_length(LibBalsaMessage *message);
 gboolean                libbalsa_message_get_has_all_headers(LibBalsaMessage *message);
-InternetAddressList    *libbalsa_message_get_sender(LibBalsaMessage *message);
 gboolean                libbalsa_message_get_request_dsn(LibBalsaMessage *message);
 GList                  *libbalsa_message_get_references(LibBalsaMessage *message);
 LibBalsaIdentity       *libbalsa_message_get_identity(LibBalsaMessage *message);
@@ -325,8 +325,6 @@ void libbalsa_message_set_length(LibBalsaMessage *message,
                                  gint64           length);
 void libbalsa_message_set_mime_message(LibBalsaMessage *message,
                                    GMimeMessage    *mime_message);
-void libbalsa_message_set_sender(LibBalsaMessage     *message,
-                                 InternetAddressList *sender);
 void libbalsa_message_set_message_id(LibBalsaMessage *message,
                                      const gchar     *message_id);
 void libbalsa_message_set_request_dsn(LibBalsaMessage *message,

@@ -165,6 +165,7 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 			GtkWidget *chain_btn;
 			gchar *chain_fpr;
 
+			/* Translators: x509 certificate chain ID */
 			issuer_row = create_key_grid_row(GTK_GRID(issuer_grid), issuer_row, _("Chain ID:"), key->chain_id, FALSE);
 
 			/* add button to show the full chain - copy the fingerprint as the key may be unref'ed... */
@@ -197,6 +198,7 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 			/* indicate that we show only subkeys with certain capabilities */
 			capa_str = create_purpose_str((subkey_capa & GPG_SUBKEY_CAP_SIGN) != 0U, (subkey_capa & GPG_SUBKEY_CAP_ENCRYPT) != 0U,
 				(subkey_capa & GPG_SUBKEY_CAP_CERTIFY) != 0U, (subkey_capa & GPG_SUBKEY_CAP_AUTH) != 0U);
+			/* Translators: #1 subkey capabilities string */
 			label_str = g_strdup_printf(_("Subkeys (%s only)"), capa_str);
 			subkey_expander = gtk_expander_new(label_str);
 			g_free(label_str);
@@ -303,6 +305,7 @@ libbalsa_gpgme_key_to_gchar(gpgme_key_t  key,
 			g_string_append_printf(result, "\n" BULLET_STR "%s %s", _("Serial number:"), key->issuer_serial);
 		}
 		if (key->chain_id != NULL) {
+			/* Translators: x509 certificate chain ID */
 			g_string_append_printf(result, "\n" BULLET_STR "%s %s", _("Chain ID:"), key->chain_id);
 		}
 	}
@@ -737,6 +740,7 @@ create_subkey_type_str(gpgme_subkey_t subkey)
 		g_string_append_printf(type_str, " %s", algo);
 	}
 	if (subkey->curve != NULL) {
+		/* Translators: Elliptic Curve Cryptography (ECC) curve name */
 		g_string_append_printf(type_str, _(" curve “%s”"), subkey->curve);
 	}
 

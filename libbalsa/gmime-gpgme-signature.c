@@ -163,10 +163,12 @@ g_mime_gpgme_sigstat_info(GMimeGpgmeSigstat *info,
     }
     status_str = libbalsa_gpgme_sig_stat_to_gchar(info->status);
     if (signer_str != NULL) {
+		/* Translators: #1 signature crypto protocol; #2 signer; #3 status message */
     	res_msg = g_strdup_printf(_("%s signature of “%s”: %s"), libbalsa_gpgme_protocol_name(info->protocol),
     			signer_str, status_str);
     	g_free(signer_str);
     } else {
+		/* Translators: #1 signature crypto protocol; #2 status message */
     	res_msg = g_strdup_printf(_("%s signature: %s"), libbalsa_gpgme_protocol_name(info->protocol), status_str);
     }
     g_free(status_str);

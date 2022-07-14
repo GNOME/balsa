@@ -190,6 +190,7 @@ autocrypt_init(GError **error)
 
 		/* error checks... */
 		if (sqlite_res != SQLITE_OK) {
+			/* Translators: #1 database file; #2 error message */
 			g_set_error(error, AUTOCRYPT_ERROR_QUARK, sqlite_res, _("cannot initialise Autocrypt database “%s”: %s"), db_path,
 				sqlite3_errmsg(autocrypt_db));
 			autocrypt_close();
@@ -315,6 +316,7 @@ autocrypt_header(LibBalsaIdentity *identity, GError **error)
 		}
 
 		if (use_fpr == NULL) {
+			/* Translators: #1 sender's email address */
 			g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1,
 				_("No usable private key for “%s” found! Please create a key or disable Autocrypt."), mailbox);
 		} else {
@@ -383,6 +385,7 @@ autocrypt_get_key(const gchar *fingerprint, GError **error)
 		}
 
 		if (sqlite_res != SQLITE_DONE) {
+			/* Translators: #1 GPG key fingerprint; #2 error message */
 			g_set_error(error, AUTOCRYPT_ERROR_QUARK, sqlite_res, _("error reading Autocrypt data for “%s”: %s"), fingerprint,
 				sqlite3_errmsg(autocrypt_db));
 			if (result != NULL) {
@@ -391,6 +394,7 @@ autocrypt_get_key(const gchar *fingerprint, GError **error)
 			}
 		}
 	} else {
+		/* Translators: #1 GPG key fingerprint; #2 error message */
 		g_set_error(error, AUTOCRYPT_ERROR_QUARK, sqlite_res, _("error reading Autocrypt data for “%s”: %s"), fingerprint,
 			sqlite3_errmsg(autocrypt_db));
 	}
@@ -674,12 +678,14 @@ autocrypt_user_info(const gchar *mailbox, GError **error)
 		}
 
 		if (sqlite_res != SQLITE_DONE) {
+			/* Translators: #1 mailbox; #2 error message */
 			g_set_error(error, AUTOCRYPT_ERROR_QUARK, sqlite_res, _("error reading Autocrypt data for “%s”: %s"), mailbox,
 				sqlite3_errmsg(autocrypt_db));
 			autocrypt_free(user_info);
 			user_info = NULL;
 		}
 	} else {
+		/* Translators: #1 mailbox; #2 error message */
 		g_set_error(error, AUTOCRYPT_ERROR_QUARK, sqlite_res, _("error reading Autocrypt data for “%s”: %s"), mailbox,
 			sqlite3_errmsg(autocrypt_db));
 	}
@@ -782,6 +788,7 @@ add_or_update_user_info(GMimeAutocryptHeader *autocrypt_header, const ac_key_dat
 		(sqlite3_bind_int64(query[query_idx], 5, ac_key_data->expires) != SQLITE_OK) ||
 		(sqlite3_bind_int(query[query_idx], 6, prefer_encrypt) != SQLITE_OK) ||
 		(sqlite3_step(query[query_idx]) != SQLITE_DONE)) {
+		/* Translators: #1 email address; #2 error message */
 		g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1, update ? _("update user “%s” failed: %s") : _("insert user “%s” failed: %s"),
 			addr, sqlite3_errmsg(autocrypt_db));
 	} else {
@@ -802,6 +809,7 @@ update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
 	if ((sqlite3_bind_text(query[3], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 		(sqlite3_bind_int64(query[3], 2, date_header) != SQLITE_OK) ||
 		(sqlite3_step(query[3]) != SQLITE_DONE)) {
+		/* Translators: #1 email address; #2 error message */
 		g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1, _("update user “%s” failed: %s"), addr, sqlite3_errmsg(autocrypt_db));
 	} else {
 		g_debug("updated last_seen for '%s': %d", addr, sqlite3_changes(autocrypt_db));
@@ -930,6 +938,7 @@ show_key_details_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 			    		dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, (gpgme_key_t) keys->data, GPG_SUBKEY_CAP_ALL,
 			    			NULL, NULL);
 			    	} else {
+			    		/* Translators: #1 email address */
 			    		dialog = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
 			    			GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, _("The database entry for “%s” does not contain a key."),
 							mail_addr);
@@ -967,6 +976,7 @@ remove_key_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
     	toplevel = gtk_widget_get_toplevel(GTK_WIDGET(user_data));
     	window = GTK_IS_WINDOW(toplevel) ? GTK_WINDOW(toplevel) : NULL;
     	gtk_tree_model_get(model, &iter, AC_ADDRESS_COLUMN, &mail_addr, -1);
+		/* Translators: #1 email address */
 		dialog = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
 			GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, _("Delete the Autocrypt key for “%s” from the database?"), mail_addr);
 		if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES) {

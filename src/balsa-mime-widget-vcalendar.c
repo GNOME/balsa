@@ -63,6 +63,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
 
     mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
 
+	/* Translators: #1 calendar message type */
     text = g_strdup_printf(_("This is an iTIP calendar “%s” message."),
 			   libbalsa_vcal_method_str(vcal_obj));
     markup_buf = g_markup_printf_escaped("<b>%s</b>", text);
@@ -371,6 +372,7 @@ vevent_reply(GObject * button, GtkWidget * box)
     body->charset = g_strdup("utf-8");
     body->content_type = NULL;
     textbuf = g_string_new(NULL);
+	/* Translators: #1 message sender display name; #2 sender's event action (e.g. "accepted", "rejected", ...) */
     g_string_append_printf(textbuf, _("%s %s the following iTIP calendar request:\n\n"),
     	internet_address_get_name(ia), libbalsa_vcal_part_stat_to_str(pstat));
     BUFFER_APPEND(textbuf, _("Summary:"), libbalsa_vevent_summary(event));

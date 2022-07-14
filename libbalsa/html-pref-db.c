@@ -267,6 +267,7 @@ pref_db_check(void)
 
 		/* error checks... */
 		if (sqlite_res != SQLITE_OK) {
+			/* Translators: #1 database path; #2 error message */
 			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot initialise HTML preferences database “%s”: %s"), db_path,
 				sqlite3_errmsg(pref_db));
 			html_pref_db_close();
@@ -313,6 +314,7 @@ pref_db_get(InternetAddressList *from, int col)
 						sqlite_res = sqlite3_step(query[0]);
 					}
 					if (sqlite_res != SQLITE_DONE) {
+						/* Translators: #1 message sender address; #2 error message */
 						libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot read HTML preferences for “%s”: %s"), sender,
 							sqlite3_errmsg(pref_db));
 						result = FALSE;
@@ -366,6 +368,7 @@ pref_db_set_name(const gchar *sender, int pref_idx, gboolean value)
 		if ((sqlite3_bind_text(query[pref_idx], 1, sender, -1, SQLITE_STATIC) != SQLITE_OK) ||
 			(sqlite3_bind_int(query[pref_idx], 2, value) != SQLITE_OK) ||
 			(sqlite3_step(query[pref_idx]) != SQLITE_DONE)) {
+			/* Translators: #1 message sender address; #2 error message */
 			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot save HTML preferences for “%s”: %s"), sender,
 				sqlite3_errmsg(pref_db));
 		} else {
@@ -474,6 +477,7 @@ remove_item_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 		gtk_tree_model_get(model, &iter, PREFS_ADDRESS_COLUMN, &addr, -1);
 		if ((sqlite3_bind_text(query[3], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 			(sqlite3_step(query[3]) != SQLITE_DONE)) {
+			/* Translators: #1 error message */
 			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot delete database entry: %s"), sqlite3_errmsg(pref_db));
 		}
 		gtk_list_store_remove(GTK_LIST_STORE(model), &iter);

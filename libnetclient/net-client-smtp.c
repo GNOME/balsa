@@ -695,6 +695,7 @@ net_client_smtp_eval_rescode(gint res_code, const gchar *reply, GError **error)
 		result = TRUE;
 		break;
 	case 4:
+		/* Translators: #1 SMTP (RFC 5321) error code; #2 error message */
 		g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_TRANSIENT,
 			_("transient error %d: %s"), res_code, reply);
 		result = FALSE;
@@ -702,9 +703,11 @@ net_client_smtp_eval_rescode(gint res_code, const gchar *reply, GError **error)
 	case 5:
 		if ((res_code == 534) || (res_code == 535)) {
 			g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_AUTHFAIL,
+				/* Translators: #1 SMTP (RFC 5321) error code; #2 error message */
 				_("authentication failure %d: %s"), res_code, reply);
 		} else {
 			g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_PERMANENT,
+				/* Translators: #1 SMTP (RFC 5321) error code; #2 error message */
 				_("permanent error %d: %s"), res_code, reply);
 		}
 		result = FALSE;

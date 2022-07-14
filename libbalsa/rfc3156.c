@@ -553,8 +553,10 @@ libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 
 		gpgme_strerror_r(stat, errbuf, sizeof(errbuf));
 		if (gpgme_err_source(stat) != GPG_ERR_SOURCE_UNKNOWN) {
+			/* Translators: #1 error source; #2 error message */
 			return g_strdup_printf(_("An error prevented the signature verification: %s: %s"), gpgme_strsource(stat), errbuf);
 		} else {
+			/* Translators: #1 error message */
 			return g_strdup_printf(_("An error prevented the signature verification: %s"), errbuf);
 		}
 	}

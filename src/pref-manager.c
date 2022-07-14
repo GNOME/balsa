@@ -942,6 +942,7 @@ update_address_books(void)
             type = _("Unknown");
 
         if (address_book == balsa_app.default_address_book) {
+            /* Translators: #1 address book name */
             name = g_strdup_printf(_("%s (default)"), libbalsa_address_book_get_name(address_book));
         } else {
             name = g_strdup(libbalsa_address_book_get_name(address_book));
@@ -2553,6 +2554,8 @@ pm_grid_add_alternative_group(GtkWidget * grid_widget)
 	pm_grid_attach_check(grid, 1, ++row, 1, 1, _("Prefer text/plain over HTML"));
 
 #ifdef HAVE_HTML_WIDGET
+    /* Translators: per-sender database of exceptions over global HTTP
+     * preferences (display HTML vs. plain, auto-load external items) */
     button = gtk_button_new_with_label(_("Manage exceptions…"));
     g_signal_connect_swapped(button, "clicked",
         G_CALLBACK(libbalsa_html_pref_dialog_run), property_box);

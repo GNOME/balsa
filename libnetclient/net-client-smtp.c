@@ -695,8 +695,8 @@ net_client_smtp_eval_rescode(gint res_code, const gchar *reply, GError **error)
 		result = TRUE;
 		break;
 	case 4:
-		/* Translators: #1 SMTP (RFC 5321) error code; #2 error message */
 		g_set_error(error, NET_CLIENT_SMTP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_SMTP_TRANSIENT,
+			/* Translators: #1 SMTP (RFC 5321) error code; #2 error message */
 			_("transient error %d: %s"), res_code, reply);
 		result = FALSE;
 		break;

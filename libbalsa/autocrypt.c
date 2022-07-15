@@ -316,8 +316,8 @@ autocrypt_header(LibBalsaIdentity *identity, GError **error)
 		}
 
 		if (use_fpr == NULL) {
-			/* Translators: #1 sender's email address */
 			g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1,
+				/* Translators: #1 sender's email address */
 				_("No usable private key for “%s” found! Please create a key or disable Autocrypt."), mailbox);
 		} else {
 			g_debug("found fingerprint %s for '%s'", use_fpr, mailbox);
@@ -938,9 +938,10 @@ show_key_details_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 			    		dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, (gpgme_key_t) keys->data, GPG_SUBKEY_CAP_ALL,
 			    			NULL, NULL);
 			    	} else {
-			    		/* Translators: #1 email address */
 			    		dialog = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-			    			GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, _("The database entry for “%s” does not contain a key."),
+			    			GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
+			    			/* Translators: #1 email address */
+							_("The database entry for “%s” does not contain a key."),
 							mail_addr);
 			    	}
 			    	(void) gtk_dialog_run(GTK_DIALOG(dialog));
@@ -976,9 +977,10 @@ remove_key_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
     	toplevel = gtk_widget_get_toplevel(GTK_WIDGET(user_data));
     	window = GTK_IS_WINDOW(toplevel) ? GTK_WINDOW(toplevel) : NULL;
     	gtk_tree_model_get(model, &iter, AC_ADDRESS_COLUMN, &mail_addr, -1);
-		/* Translators: #1 email address */
 		dialog = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-			GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, _("Delete the Autocrypt key for “%s” from the database?"), mail_addr);
+			GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+			/* Translators: #1 email address */
+			_("Delete the Autocrypt key for “%s” from the database?"), mail_addr);
 		if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES) {
 			if ((sqlite3_bind_text(query[6], 1, mail_addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 				(sqlite3_step(query[6]) != SQLITE_DONE)) {

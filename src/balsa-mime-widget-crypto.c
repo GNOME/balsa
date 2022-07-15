@@ -305,11 +305,11 @@ on_key_import_button(GtkButton *button,
 	}
 
 	if (success) {
-		/* Translators: successful import of a GnuPG key; #1: backend message */
 		dialog = gtk_message_dialog_new(GTK_WINDOW(balsa_app.main_window),
 			GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
 			GTK_MESSAGE_INFO,
 			GTK_BUTTONS_CLOSE,
+			/* Translators: successful import of a GnuPG key; #1: backend message */
 			_("Import GnuPG key:\n%s"), import_info);
 		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
 	} else {

@@ -18,7 +18,7 @@ id="ab-conf">
 <!-- Balsa support for an external query addressbook -->
 <!-- By Jelmer Vernooij <jelmer@nl.linux.org>        -->
 
-<p>The balsa addressbook supports input from programs. Thus, you
+<p>The &Balsa; addressbook supports input from programs. Thus, you
 can use (no importing needed!) for example your pine or mutt
 addressbook. The mutt mailer (<link
 href="http://www.mutt.org/">www.mutt.org</link>) uses an identical
@@ -28,7 +28,7 @@ system to retrieve addresses from programs.</p>
    <title>Existing programs</title>
 
 <p>The following programs are compatible with the mutt mail reader
-and <em>should</em> be with balsa. Submit links to more programs.</p>
+and <em>should</em> be with &Balsa;. Submit links to more programs.</p>
 
 <list>
 <item><p>
@@ -42,7 +42,7 @@ addressbook, big brother database, ldap database.
 
 <item><p>
 <link href="http://www.fiction.net/blong/programs/mutt/">http://www.fiction.net/blong/programs/mutt/</link>
- - palm address database, ldapsearch wrapper, ph/qi server, UIUC, ph,
+ - palm address database, ldapsearch wrapper, ph/qi server, UIUC, ph.
 </p></item>
 </list>
 </section>
@@ -58,7 +58,7 @@ e-mail address	full name	nickname
 </output></p>
 
 <p>The three fields should be separated by tabs. The third field is
-currently not used by balsa, but might be in the future. It is also
+currently not used by &Balsa;, but might be in the future. It is also
 kept to ensure compatibility with mutt. </p>
 
 <p>&Balsa; executes your script with one argument: the pattern to

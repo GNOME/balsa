@@ -33,7 +33,7 @@ id="identities">
     </item>
     <item>
       <title>
-        <gui>Reply-To address</gui>
+        <gui>Reply To</gui>
       </title>
       <p>The address that you wish people to reply to your email
       with (if you have a home and a work address, for
@@ -41,7 +41,7 @@ id="identities">
     </item>
     <item>
       <title>
-        <gui>Default Domain</gui>
+        <gui>Domain</gui>
       </title>
       <p>The domain that you wish to append to all e-mail entries
       where you did not specify the domain. Normally you would use
@@ -86,7 +86,7 @@ id="identities">
       <title>
         <gui>Face Path</gui>
       </title>
-      <p>Whether a “Face” header should be attached to a program.
+      <p>Whether a “Face” header should be attached to a message.
       Specified path points out to a file containing a textual
       representation of the face icon. Please see
       <link href="http://quimby.gnus.org/circus/face/">a
@@ -98,7 +98,7 @@ id="identities">
       <title>
         <gui>X-Face Path</gui>
       </title>
-      <p>Whether a “Face” header should be attached to a program.
+      <p>Whether a “Face” header should be attached to a message.
       Specified path points out to a file containing a textual
       representation of the face icon.</p>
     </item>

@@ -14,7 +14,7 @@ id="win-search">
   <guiseq>
     <gui>Edit</gui>
     <gui>Find</gui>
-  </guiseq>command, or
+  </guiseq> command, or
   <keyseq>
     <key>Ctrl</key>
     <key>F</key>
@@ -26,16 +26,16 @@ id="win-search">
         <gui>Show only matching messages</gui>
       </title>
       <p>If you click the
-      <gui>Apply</gui>button, the mailbox view will be filtered to
+      <gui>Apply</gui> button, the mailbox view will be filtered to
       show only the messages that match the conditions. If you
       click the
-      <gui>Clear</gui>button, the filter will be cleared, and the
+      <gui>Clear</gui> button, the filter will be cleared, and the
       mailbox view will be restored to show all messages. You can
       also use
       <guiseq>
         <gui>Mailbox</gui>
         <gui>Reset Filter</gui>
-      </guiseq>to restore the view.</p>
+      </guiseq> to restore the view.</p>
     </item>
     <item>
       <title>
@@ -44,7 +44,7 @@ id="win-search">
       <p>Alternatively, you can step through the matching messages,
       either forward or in reverse, and optionally wrapping the
       search when it reaches the end of the mailbox. Click the
-      <gui>OK</gui>button to view the first matching message after
+      <gui>OK</gui> button to view the first matching message after
       (or before) the current message. Then you can use
       <guiseq>
         <gui>Edit</gui>

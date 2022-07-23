@@ -19,15 +19,15 @@ id="mbox-formats">
     <item>
       <title>Mailbox Format Characteristics</title>
       <p>
-        <link href="http://www.washington.edu/imap/documentation/formats.txt.html">
-        http://www.washington.edu/imap/documentation/formats.txt.html</link>
+        <link href="https://github.com/winlibs/imap/blob/master/docs/formats.txt">
+        https://github.com/winlibs/imap/blob/master/docs/formats.txt</link>
       </p>
     </item>
     <item>
       <title>Maildir format</title>
       <p>maildir(5) manual page (from qmail):
-      <link href="http://www.qmail.org/qmail-manual-html/man5/maildir.html">
-      http://www.qmail.org/qmail-manual-html/man5/maildir.html</link></p>
+      <link href="http://qmail.org/qmail-manual-html/man5/maildir.html">
+      http://qmail.org/qmail-manual-html/man5/maildir.html</link></p>
     </item>
     <item>
       <title>Using Maildir format</title>
@@ -39,8 +39,8 @@ id="mbox-formats">
     <item>
       <title>QMail</title>
       <p>mbox(5) manual page (from qmail):
-      <link href="http://www.qmail.org/qmail-manual-html/man5/mbox.html">
-      http://www.qmail.org/qmail-manual-html/man5/mbox.html</link></p>
+      <link href="http://qmail.org/qmail-manual-html/man5/mbox.html">
+      http://qmail.org/qmail-manual-html/man5/mbox.html</link></p>
     </item>
     <item>
       <title>Mailbox formats</title>

@@ -253,7 +253,7 @@ id="win-composer">
             <p>
             <guiseq>
               <gui>Edit</gui>
-              <gui>Reflow Paragraph</gui>
+              <gui>Reflow Selected Text</gui>
             </guiseq>
             <keyseq>
               <key>Ctrl</key>
@@ -348,7 +348,7 @@ id="win-composer">
             with your
             <code>From</code> address. Please note that the handling
             of this request depends on the receiving mail program
-            and that it not guaranteed that this notification will
+            and that it is not guaranteed that this notification will
             be sent back.</p>
           </item>
           <item>
@@ -453,8 +453,8 @@ id="win-composer">
               E-Mail cryptography, see the
               <link href="http://www.gnupg.org/documentation/manuals/gnupg/"
               type="http"> GnuPG Manual</link> and the
-              <link href="http://www.dewinter.com/gnupg_howto/english/GPGMiniHowto.html"
-              type="http"> GnuPG HOWTO</link> .</p>
+              <link href="https://www.gnupg.org/howtos/en/GPGMiniHowto.html">
+              GnuPG HOWTO</link>.</p>
             </note>
           </item>
         </list>
@@ -617,7 +617,7 @@ id="win-composer">
       entries in the &GnomeCard; application. To enable this
       feature, read the section on
       <link xref="common-tasks#ct-alias-expansion">
-      Alias Expansion</link> . In
+      Alias Expansion</link>. In
       addition, the composition window supports drag-and-drop of
       addresses from the &GnomeCard; application.</p>
     </note> &gt;</section>
@@ -668,7 +668,7 @@ id="win-composer">
       <media type="image" src="figures/spell-check.png" />
     </figure>
     <p>As shown above, the panel consists of a list of two panes,
-    one the left containing a list of suggestions and an entry box,
+    one to the left containing a list of suggestions and an entry box,
     while the right contains several buttons to choose your action.
     The list on the left is re-generated for each incorrect word,
     with all the suggestions the spell check program comes up with.
@@ -757,7 +757,7 @@ id="win-composer">
     <p>If, while selecting people to send your message to, you
     decide to add someone new to the address book, it is a simple
     matter to click on the
-    <gui>Run GnomeCard</gui> button. This will bring up the
+    <gui>Run Editor</gui> button. This will bring up the
     &GnomeCard; application, allowing you to easily manipulate
     your contact list. After any changes have been made using the
     address book, they can be forced to show up in the left hand

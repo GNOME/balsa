@@ -77,7 +77,7 @@ id="preferences-mail-options">
       <gui>Modify</gui> . To create a new server, click
       <gui>Add</gui> . A dialog will open, showing the properties of
       the selected server. Specify the domain name and optionally
-      the port for of the SMTP server you use for submitting mail.
+      the port of the SMTP server you use for submitting mail.
       Please note that the default port number is 587. The syntax
       is hostname[:port]. Port can be a decimal number or the name
       of the service as specified in
@@ -193,7 +193,7 @@ id="preferences-mail-options">
       </item>
       <item>
         <title>
-          <gui>Message Disposition Notification request</gui>
+          <gui>Message Disposition Notification requests</gui>
         </title>
         <p>You will sometimes receive a message whose sender has
         asked for notification that you have received or seen the

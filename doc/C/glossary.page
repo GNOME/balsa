@@ -67,7 +67,7 @@ id="glossary">
       <title>MTA</title>
       <p>An acronym for “Mail Transfer Agent”, this class of
       program is responsible for moving mail around between people,
-      be they on the same computer, on on completely separate
+      be they on the same computer, or on completely separate
       networks. Examples of this type of program include
       <app>sendmail</app>,
       <app>qmail</app>, and
@@ -75,12 +75,12 @@ id="glossary">
     </section>
     <section id="mua">
       <title>MUA</title>
-      <p>An acronym for “Mail User Agent”, this the program a user
+      <p>An acronym for “Mail User Agent”, this is the program a user
       would use to read existing mail and create new messages. MUAs
       are one of three types of programs that allow internet email
       to work. The other two types of programs are
-      <link xref="glossary#mta">MTA</link> s and
-      <link xref="glossary#mda">MDA</link> s. &Balsa; is
+      <link xref="glossary#mta">MTA</link>s and
+      <link xref="glossary#mda">MDA</link>s. &Balsa; is
       primarily an MUA, but it also functions as an MDA/MTA when
       retrieving mail from a remote server.</p>
     </section>
@@ -98,7 +98,7 @@ id="glossary">
       <title>SMTP</title>
       <p>An acronym that stands for “Simple Mail Transfer
       Protocol”, it is exactly that. A standard that defines a
-      simple an reliable way to transfer messages between computers
+      simple and reliable way to transfer messages between computers
       on a network. It is used by most, if not all, mail programs
       to transfer mail.</p>
     </section>

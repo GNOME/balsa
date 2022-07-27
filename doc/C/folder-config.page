@@ -36,7 +36,7 @@ id="folder-config">
         IMAP server.</p>
       </item>
       <item>
-        <p>Check box allows you to choose all mailboxes on the
+        <p>A check box allows you to choose all mailboxes on the
         server, or only those you subscribed to.</p>
       </item>
       <item>
@@ -58,13 +58,13 @@ id="folder-config">
         <p>The
         <gui>Use SSL</gui> check box should be active if the
         connection is to be made to IMAPS service on port 993.
-        Connection to this port will be encrypted from the start.
+        Connections to this port will be encrypted from the start.
         Not all servers provide this service - many provide only
         negotiated TLS encryption.</p>
       </item>
       <item>
         <p>The
-        <gui>Use TLS</gui> option list determines instruct balsa how
+        <gui>Use TLS</gui> option list instructs &Balsa; how
         to negotiate the TLS encryption. &Balsa; can never
         attempt to negotiate it, can start TLS encryption whenever
         it is supported by server, or can abort the connection if
@@ -72,13 +72,13 @@ id="folder-config">
       </item>
       <item>
         <p>
-        <gui>Max. number of connections</gui> limits the number of
+        <gui>Max number of connections</gui> limits the number of
         concurrent connections open to the IMAP server. A number
         around 15-40 is a sane option as it avoids time-consuming
         and load-creating reselections of imap mailboxes. Some IMAP
         servers -- notably Courier -- limit the number of
         connections open from single IP number to 4 by default. The
-        limit in balsa has to be in such a case adjusted
+        limit in &Balsa; has to be in such a case adjusted
         accordingly.</p>
       </item>
       <item>
@@ -118,7 +118,7 @@ id="folder-config">
         <p>The
         <gui>Use STATUS for mailbox checking</gui> check box enables
         a more thorough but potentially more expensive way of
-        checking mailboxes on IMAP server. This method can be
+        checking mailboxes on IMAP servers. This method can
         consume many resources on the server and should be used
         <em>only</em> on IMAP servers that have optimized STATUS
         command.</p>

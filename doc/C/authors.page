@@ -24,7 +24,7 @@ id="authors">
       pawsa@theochem.kth.se</link> )</p>
     </item>
   </list>
-  <p>In the past, numerous people contributed to balsa, including
+  <p>In the past, numerous people contributed to &Balsa;, including
   (in alphabetical order):</p>
   <list>
     <item>
@@ -71,9 +71,7 @@ id="authors">
   database</link>. Instructions for submitting bug reports can be
   found on-line at
   <link href="https://pawsa.fedorapeople.org/balsa/bugs.html">
-  https://pawsa.fedorapeople.org/balsa/bugs.html</link>. If you are using GNOME
-  1.1 or later, you can also use command
-  <cmd>bug-buddy</cmd> for submitting bug reports.</p>
+  https://pawsa.fedorapeople.org/balsa/bugs.html</link>.</p>
   <p>The following people contributed to this manual:</p>
   <list>
     <item>
@@ -118,6 +116,6 @@ id="authors">
   <link href="https://mail.gnome.org/mailman/listinfo/balsa-list">
   &Balsa; Discussion List</link>. You can also add your
   comments online by using
-  <link href="http://library.gnome.org/devel/gdp-handbook/stable/gettingstarted.html.en">
+  <link href="https://developer-old.gnome.org/gdp-handbook/stable/gettingstarted.html.en">
   GNOME Documentation Status Table</link>.</p>
 </page>

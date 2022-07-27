@@ -27,7 +27,7 @@ id="preferences-miscellaneous">
     </item>
     <item>
       <title>
-        <gui>Automatically close mailbox</gui>
+        <gui>Close mailbox if unused more than</gui>
       </title>
       <p>Set &Balsa; to close any mailbox that is unused for
       more than the specified time. The currently displayed mailbox

@@ -22,7 +22,7 @@ id="win-filters">
       condition. Then you fill in the different fields in the
       notebook pages (in particular remember to change the name of
       the filter), add the conditions that will describe how this
-      filters matches a message, and to confirm the modifications
+      filter matches a message, and to confirm the modifications
       push the
       <gui>Apply</gui> button on the right hand side of the Filters
       window.</p>
@@ -79,7 +79,7 @@ id="win-filters">
     <p>The three buttons under the list allows you to edit the
     selected condition, add a new one, or remove one. Editing or
     creating a condition is done in the
-    <link xref="win-condition">condition window</link>, which
+    <link xref="win-filters#win-condition">condition window</link>, which
     pops up when you click on the
     <gui>Edit</gui> or the
     <gui>New</gui> button.</p>
@@ -120,7 +120,7 @@ id="win-filters">
     <list>
       <item>
         <p>The
-        <gui>Match in</gui> frame: it's a set of check boxes, one
+        <gui>Match Fields</gui> frame: it's a set of check boxes, one
         per match field. For example if you want to match all
         messages that was sent by hotmail users, you just have to
         check the
@@ -141,7 +141,7 @@ id="win-filters">
         <gui>Clear</gui> button will uncheck all boxes (as you might
         have guessed).</p>
         <p>If you specify several headers, a message will match
-        this condition if one of the header matches. For example if
+        this condition if one of the headers matches. For example if
         you want to filter all messages talking about &Balsa;,
         you should check the
         <gui>Body</gui> and the
@@ -160,7 +160,7 @@ id="win-filters">
         <gui>Simple</gui>,
         <gui>Regular expression</gui>,
         <gui>Date interval</gui>, or
-        <gui>flag condition</gui>. Your choice will change the
+        <gui>Flag condition</gui>. Your choice will change the
         third frame so that it displays the fields needed by the
         type of match chosen.</p>
       </item>
@@ -188,7 +188,7 @@ id="win-filters">
             <gui>One matches/None matches</gui> lets you specify
             when a message matches the condition: when one of the
             regular expression matches or when none matches. The
-            sentence above te list will be updated accordingly.</p>
+            sentence above the list will be updated accordingly.</p>
           </item>
           <item>
             <p>

@@ -20,7 +20,7 @@ id="preferences-display-options">
       </item>
       <item>
         <title>
-          <gui>Show Mailbox Info</gui>
+          <gui>Show Message Counts in Mailbox List</gui>
         </title>
         <p>This will allow the number of total and unread messages
         for each mailbox to be shown in the left pane of the
@@ -250,7 +250,7 @@ id="preferences-display-options">
       </item>
       <item>
         <title>
-          <gui>Display Progress</gui>
+          <gui>Display Progress Dialog</gui>
         </title>
         <p>This sets the behaviour of the dialog that is shown when
         &Balsa; retrieves messages from its specified

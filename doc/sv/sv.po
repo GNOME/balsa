@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
-"POT-Creation-Date: 2021-10-18 14:44+0000\n"
-"PO-Revision-Date: 2022-07-23 00:13+0200\n"
+"POT-Creation-Date: 2022-07-27 18:07+0000\n"
+"PO-Revision-Date: 2022-07-29 17:01+0200\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.1\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #. Put one translator per line, in the form NAME <EMAIL>, YEAR1, YEAR2
 msgctxt "_"
@@ -50,15 +50,15 @@ msgstr "Extern adressbok"
 #. (itstool) path: section/p
 #: C/ab-conf.page:21
 msgid ""
-"The balsa addressbook supports input from programs. Thus, you can use (no "
-"importing needed!) for example your pine or mutt addressbook. The mutt "
-"mailer (<link href=\"http://www.mutt.org/\">www.mutt.org</link>) uses an "
-"identical system to retrieve addresses from programs."
+"The <app>Balsa</app> addressbook supports input from programs. Thus, you can "
+"use (no importing needed!) for example your pine or mutt addressbook. The "
+"mutt mailer (<link href=\"http://www.mutt.org/\">www.mutt.org</link>) uses "
+"an identical system to retrieve addresses from programs."
 msgstr ""
-"Balsa-adressboken stöder indata från program. Därmed kan du (utan behov av "
-"import!) använda exempelvis din pine- eller mutt-adressbok. E-postklienten "
-"Mutt (<link href=\"http://www.mutt.org/\">www.mutt.org</link>) använder ett "
-"identiskt system för att erhålla adresser från program."
+"<app>Balsa</app>-adressboken stöder indata från program. Därmed kan du (utan "
+"behov av import!) använda exempelvis din pine- eller mutt-adressbok. E-"
+"postklienten Mutt (<link href=\"http://www.mutt.org/\">www.mutt.org</link>) "
+"använder ett identiskt system för att erhålla adresser från program."
 
 #. (itstool) path: section/title
 #: C/ab-conf.page:28
@@ -69,10 +69,10 @@ msgstr "Befintliga program"
 #: C/ab-conf.page:30
 msgid ""
 "The following programs are compatible with the mutt mail reader and "
-"<em>should</em> be with balsa. Submit links to more programs."
+"<em>should</em> be with <app>Balsa</app>. Submit links to more programs."
 msgstr ""
 "Följande program är kompatibla med e-postläsaren mutt och <em>bör</em> vara "
-"det med balsa. Skicka in länkar till fler program."
+"det med <app>Balsa</app>. Skicka in länkar till fler program."
 
 #. (itstool) path: item/p
 #: C/ab-conf.page:34
@@ -89,17 +89,16 @@ msgstr ""
 "programmet abook, mutt-adressböcker, pine-adressböcker, palm-adressböcker, "
 "gnomecard-adressböcker, big brother-databaser och ldap-databaser."
 
-# TODO: end with .
 #. (itstool) path: item/p
 #: C/ab-conf.page:43
 msgid ""
 "<link href=\"http://www.fiction.net/blong/programs/mutt/\">http://www."
 "fiction.net/blong/programs/mutt/</link> - palm address database, ldapsearch "
-"wrapper, ph/qi server, UIUC, ph,"
+"wrapper, ph/qi server, UIUC, ph."
 msgstr ""
 "<link href=\"http://www.fiction.net/blong/programs/mutt/\">http://www."
 "fiction.net/blong/programs/mutt/</link> - palm-adressdatabas, ldapsearch-"
-"omslag, ph/qi-server, UIUC, ph,"
+"omslag, ph/qi-server, UIUC, ph."
 
 #. (itstool) path: section/title
 #: C/ab-conf.page:51
@@ -126,12 +125,12 @@ msgstr "<output> e-postadress fullständigt namn smeknamn </output>"
 #: C/ab-conf.page:60
 msgid ""
 "The three fields should be separated by tabs. The third field is currently "
-"not used by balsa, but might be in the future. It is also kept to ensure "
-"compatibility with mutt."
+"not used by <app>Balsa</app>, but might be in the future. It is also kept to "
+"ensure compatibility with mutt."
 msgstr ""
 "De tre fälten ska separeras av tabbar. Det tredje fältet används för "
-"närvarande inte av balsa, men kan göra det i framtiden. Det behålls också "
-"för att försäkra kompatibilitet med mutt."
+"närvarande inte av <app>Balsa</app>, men kan göra det i framtiden. Det "
+"behålls också för att försäkra kompatibilitet med mutt."
 
 #. (itstool) path: section/p
 #: C/ab-conf.page:64
@@ -234,7 +233,7 @@ msgid "<app>Balsa</app> is currently developed by (in alphabetical order):"
 msgstr "<app>Balsa</app> utvecklas för närvarande av (i alfabetisk ordning):"
 
 #. (itstool) path: item/p
-#: C/authors.page:13 C/authors.page:80
+#: C/authors.page:13 C/authors.page:78
 msgid ""
 "Peter Bloomfield ( <link href=\"mailto:peterbloomfield@bellsouth.net\"> "
 "peterbloomfield@bellsouth.net</link> )"
@@ -250,7 +249,7 @@ msgstr ""
 "Carlos Morgado ( <link href=\"mailto:chbm@chbm.nu\">chbm@chbm.nu</link> )"
 
 #. (itstool) path: item/p
-#: C/authors.page:22 C/authors.page:100
+#: C/authors.page:22 C/authors.page:98
 msgid ""
 "Pawel Salek ( <link href=\"mailto:pawsa@theochem.kth.se\"> pawsa@theochem."
 "kth.se</link> )"
@@ -261,11 +260,11 @@ msgstr ""
 #. (itstool) path: page/p
 #: C/authors.page:27
 msgid ""
-"In the past, numerous people contributed to balsa, including (in "
+"In the past, numerous people contributed to <app>Balsa</app>, including (in "
 "alphabetical order):"
 msgstr ""
-"Tidigare har många personer bidragit till balsa, däribland (i alfabetisk "
-"ordning):"
+"Tidigare har många personer bidragit till <app>Balsa</app>, däribland (i "
+"alfabetisk ordning):"
 
 #. (itstool) path: item/p
 #: C/authors.page:31
@@ -277,7 +276,7 @@ msgstr ""
 "hector@scouts-es.org</link> )"
 
 #. (itstool) path: item/p
-#: C/authors.page:36 C/authors.page:90
+#: C/authors.page:36 C/authors.page:88
 msgid ""
 "Matthew Guenther ( <link href=\"mailto:guentherm@asme.org\"> guentherm@asme."
 "org</link> )"
@@ -320,7 +319,7 @@ msgstr ""
 "dpickens@iaesthetic.com</link> )"
 
 #. (itstool) path: item/p
-#: C/authors.page:61 C/authors.page:110
+#: C/authors.page:61 C/authors.page:108
 msgid ""
 "Peter Williams ( <link href=\"mailto:peter@newton.cx\"> peter@newton.cx</"
 "link> )"
@@ -328,7 +327,6 @@ msgstr ""
 "Peter Williams ( <link href=\"mailto:peter@newton.cx\"> peter@newton.cx</"
 "link> )"
 
-# TODO: bug-buddy is outdated
 #. (itstool) path: page/p
 #: C/authors.page:66
 msgid ""
@@ -338,9 +336,7 @@ msgid ""
 "gitlab.gnome.org/GNOME/balsa/issues\">GNOME bug tracking database</link>. "
 "Instructions for submitting bug reports can be found on-line at <link "
 "href=\"https://pawsa.fedorapeople.org/balsa/bugs.html\"> https://pawsa."
-"fedorapeople.org/balsa/bugs.html</link>. If you are using GNOME 1.1 or "
-"later, you can also use command <cmd>bug-buddy</cmd> for submitting bug "
-"reports."
+"fedorapeople.org/balsa/bugs.html</link>."
 msgstr ""
 "För att få mer information besök <app>Balsa</app>s <link href=\"https://"
 "pawsa.fedorapeople.org/balsa/\">webbsida</link>. Skicka kommentarer, förslag "
@@ -348,16 +344,15 @@ msgstr ""
 "issues\">GNOMEs felrapporteringsdatabas</link>. Instruktioner för att skicka "
 "in felrapporter kan hittas på nätet på <link href=\"https://pawsa."
 "fedorapeople.org/balsa/bugs.html\"> https://pawsa.fedorapeople.org/balsa/"
-"bugs.html</link>. Om du använder GNOME 1.1 eller senare kan du också använda "
-"kommandot <cmd>bug-buddy</cmd> för att lämna in felrapporter."
+"bugs.html</link>."
 
 #. (itstool) path: page/p
-#: C/authors.page:77
+#: C/authors.page:75
 msgid "The following people contributed to this manual:"
 msgstr "Följande personer bidrog till denna handbok:"
 
 #. (itstool) path: item/p
-#: C/authors.page:85
+#: C/authors.page:83
 msgid ""
 "Berend De Schouwer ( <link href=\"mailto:bds@jhb.ucs.co.za\"> bds@jhb.ucs.co."
 "za</link> )"
@@ -366,7 +361,7 @@ msgstr ""
 "za</link> )"
 
 #. (itstool) path: item/p
-#: C/authors.page:95
+#: C/authors.page:93
 msgid ""
 "Craig Routledge ( <link href=\"mailto:webstuff@craigroutledge.com\"> "
 "webstuff@craigroutledge.com</link> )"
@@ -375,7 +370,7 @@ msgstr ""
 "webstuff@craigroutledge.com</link> )"
 
 #. (itstool) path: item/p
-#: C/authors.page:105
+#: C/authors.page:103
 msgid ""
 "Jelmer Vernooij ( <link href=\"mailto:jelmer@nl.linux.org\"> jelmer@nl.linux."
 "org</link> )"
@@ -383,15 +378,14 @@ msgstr ""
 "Jelmer Vernooij ( <link href=\"mailto:jelmer@nl.linux.org\"> jelmer@nl.linux."
 "org</link> )"
 
-# TODO: gdp-handbook is dead link
 #. (itstool) path: page/p
-#: C/authors.page:115
+#: C/authors.page:113
 msgid ""
 "Please send all comments and suggestions regarding the manual to the GNOME "
 "Documentation Project at <link href=\"mailto:docs@gnome.org\">docs@gnome."
 "org</link> and the <link href=\"https://mail.gnome.org/mailman/listinfo/"
 "balsa-list\"> <app>Balsa</app> Discussion List</link>. You can also add your "
-"comments online by using <link href=\"http://library.gnome.org/devel/gdp-"
+"comments online by using <link href=\"https://developer-old.gnome.org/gdp-"
 "handbook/stable/gettingstarted.html.en\"> GNOME Documentation Status Table</"
 "link>."
 msgstr ""
@@ -400,7 +394,7 @@ msgstr ""
 "org\">docs@gnome.org</link> och <link href=\"https://mail.gnome.org/mailman/"
 "listinfo/balsa-list\"> <app>Balsa</app>s diskussionslista</link>. Du kan "
 "också lägga till dina kommentarer på nätet genom att använda <link "
-"href=\"http://library.gnome.org/devel/gdp-handbook/stable/gettingstarted."
+"href=\"https://developer-old.gnome.org/gdp-handbook/stable/gettingstarted."
 "html.en\"> GNOMEs dokumentationsstatustabell</link>."
 
 #. (itstool) path: page/title
@@ -735,14 +729,13 @@ msgstr ""
 msgid "Password is the password used for authorization on the IMAP server."
 msgstr "Lösenord är lösenordet som används för autentisering på IMAP-servern."
 
-# TODO: Check box*es*?
 #. (itstool) path: item/p
 #: C/folder-config.page:39
 msgid ""
-"Check box allows you to choose all mailboxes on the server, or only those "
+"A check box allows you to choose all mailboxes on the server, or only those "
 "you subscribed to."
 msgstr ""
-"Kryssrutor låter dig välja alla postlådor på servern, eller bara de du "
+"En kryssruta låter dig välja alla postlådor på servern, eller bara de du "
 "prenumererar på."
 
 #. (itstool) path: item/p
@@ -774,51 +767,49 @@ msgstr ""
 "få bättre prestanda. Denna funktionalitet tillhandahålls av fliken för "
 "avancerad IMAP-mappkonfiguration."
 
-# TODO: Connection*s* to this port
 #. (itstool) path: item/p
 #: C/folder-config.page:58
 msgid ""
 "The <gui>Use SSL</gui> check box should be active if the connection is to be "
-"made to IMAPS service on port 993. Connection to this port will be encrypted "
-"from the start. Not all servers provide this service - many provide only "
-"negotiated TLS encryption."
+"made to IMAPS service on port 993. Connections to this port will be "
+"encrypted from the start. Not all servers provide this service - many "
+"provide only negotiated TLS encryption."
 msgstr ""
 "Kryssrutan <gui>Använd SSL</gui> bör vara ikryssad om anslutningen ska göras "
 "till IMAPS-tjänsten på port 993. Anslutningar till denna port kommer "
 "krypteras från början. Alla servrar tillhandahåller inte denna tjänst - "
 "många tillhandahåller endast förhandlad TLS-kryptering."
 
-# TODO: One of determines/instruct can be removed.
 #. (itstool) path: item/p
 #: C/folder-config.page:66
 msgid ""
-"The <gui>Use TLS</gui> option list determines instruct balsa how to "
+"The <gui>Use TLS</gui> option list instructs <app>Balsa</app> how to "
 "negotiate the TLS encryption. <app>Balsa</app> can never attempt to "
 "negotiate it, can start TLS encryption whenever it is supported by server, "
 "or can abort the connection if TLS is unavailable or fails for some reason."
 msgstr ""
-"Alternativlistan <gui>Använd TLS</gui> instruerar balsa om hur TLS-"
-"krypteringen ska förhandlas. <app>Balsa</app> kan antingen aldrig försöka "
-"förhandla den, starta TLS-kryptering närhelst den stöds av servern, eller "
-"avsluta anslutningen om TLS inte är tillgängligt eller av någon orsak "
+"Alternativlistan <gui>Använd TLS</gui> instruerar <app>Balsa</app> om hur "
+"TLS-krypteringen ska förhandlas. <app>Balsa</app> kan antingen aldrig "
+"försöka förhandla den, starta TLS-kryptering närhelst den stöds av servern, "
+"eller avsluta anslutningen om TLS inte är tillgängligt eller av någon orsak "
 "misslyckas."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:74
 msgid ""
-"<gui>Max. number of connections</gui> limits the number of concurrent "
+"<gui>Max number of connections</gui> limits the number of concurrent "
 "connections open to the IMAP server. A number around 15-40 is a sane option "
 "as it avoids time-consuming and load-creating reselections of imap "
 "mailboxes. Some IMAP servers -- notably Courier -- limit the number of "
-"connections open from single IP number to 4 by default. The limit in balsa "
-"has to be in such a case adjusted accordingly."
+"connections open from single IP number to 4 by default. The limit in "
+"<app>Balsa</app> has to be in such a case adjusted accordingly."
 msgstr ""
 "<gui>Maximalt antal anslutningar</gui> begränsar antalet samtidiga "
 "anslutningar som kan vara öppna till IMAP-servern. Ett antal runt 15-40 är "
 "vettigt då det undviker tidskrävande och belastningsskapande omval av IMAP-"
 "postlådor. Vissa IMAP-servrar -- som Courier -- begränsar som standard "
 "antalet anslutningar som kan vara öppna från ett IP-nummer till 4. Gränsen i "
-"balsa behöver i så fall justeras i enlighet med det."
+"<app>Balsa</app> behöver i så fall justeras i enlighet med det."
 
 #. (itstool) path: item/p
 #: C/folder-config.page:85
@@ -874,14 +865,13 @@ msgstr ""
 "meddelandedelar. <app>Balsa</app> kommer i så fall försöka hämta hela "
 "meddelanden i stället."
 
-# TODO: mailboxes on IMAP servers
 #. (itstool) path: item/p
 #: C/folder-config.page:118
 msgid ""
 "The <gui>Use STATUS for mailbox checking</gui> check box enables a more "
 "thorough but potentially more expensive way of checking mailboxes on IMAP "
-"server. This method can be consume many resources on the server and should "
-"be used <em>only</em> on IMAP servers that have optimized STATUS command."
+"servers. This method can consume many resources on the server and should be "
+"used <em>only</em> on IMAP servers that have optimized STATUS command."
 msgstr ""
 "Kryssrutan <gui>Använd STATUS för kontroll av postlåda</gui> aktiverar ett "
 "mer grundligt men möjligen mer kostsamt sätt att kontrollera postlådor på "
@@ -1170,12 +1160,11 @@ msgstr ""
 msgid "MTA"
 msgstr "MTA"
 
-# TODO: on on completely -> or on completely
 #. (itstool) path: section/p
 #: C/glossary.page:68
 msgid ""
 "An acronym for “Mail Transfer Agent”, this class of program is responsible "
-"for moving mail around between people, be they on the same computer, on on "
+"for moving mail around between people, be they on the same computer, or on "
 "completely separate networks. Examples of this type of program include "
 "<app>sendmail</app>, <app>qmail</app>, and <app>postfix</app>."
 msgstr ""
@@ -1189,18 +1178,15 @@ msgstr ""
 msgid "MUA"
 msgstr "MUA"
 
-# TODO: this the program -> this is the program
-# Remove space before s?
 #. (itstool) path: section/p
 #: C/glossary.page:78
 msgid ""
-"An acronym for “Mail User Agent”, this the program a user would use to read "
-"existing mail and create new messages. MUAs are one of three types of "
+"An acronym for “Mail User Agent”, this is the program a user would use to "
+"read existing mail and create new messages. MUAs are one of three types of "
 "programs that allow internet email to work. The other two types of programs "
-"are <link xref=\"glossary#mta\">MTA</link> s and <link "
-"xref=\"glossary#mda\">MDA</link> s. <app>Balsa</app> is primarily an MUA, "
-"but it also functions as an MDA/MTA when retrieving mail from a remote "
-"server."
+"are <link xref=\"glossary#mta\">MTA</link>s and <link "
+"xref=\"glossary#mda\">MDA</link>s. <app>Balsa</app> is primarily an MUA, but "
+"it also functions as an MDA/MTA when retrieving mail from a remote server."
 msgstr ""
 "En förkortning för ”Mail User Agent”. Det här är programmet som en användare "
 "skulle använda för att läsa befintlig e-post och skapa nya meddelanden. MUA "
@@ -1235,12 +1221,11 @@ msgstr ""
 msgid "SMTP"
 msgstr "SMTP"
 
-# TODO: and reliable
 #. (itstool) path: section/p
 #: C/glossary.page:99
 msgid ""
 "An acronym that stands for “Simple Mail Transfer Protocol”, it is exactly "
-"that. A standard that defines a simple an reliable way to transfer messages "
+"that. A standard that defines a simple and reliable way to transfer messages "
 "between computers on a network. It is used by most, if not all, mail "
 "programs to transfer mail."
 msgstr ""
@@ -1320,10 +1305,9 @@ msgstr "<gui>E-postadress</gui>"
 msgid "As you wish it to appear in your “From” header."
 msgstr "Som du vill att den ska visas i din ”Från”-rubrik."
 
-# TODO: Reply to in GUI
 #. (itstool) path: item/title
 #: C/identities.page:35
-msgid "<gui>Reply-To address</gui>"
+msgid "<gui>Reply To</gui>"
 msgstr "<gui>Svara till</gui>"
 
 #. (itstool) path: item/p
@@ -1335,10 +1319,9 @@ msgstr ""
 "Adressen som du vill att folk ska använda för svar till ditt meddelande till "
 "(exempelvis om du har en hem- och en arbetsadress)."
 
-# TODO: "Domain" in GUI
 #. (itstool) path: item/title
 #: C/identities.page:43
-msgid "<gui>Default Domain</gui>"
+msgid "<gui>Domain</gui>"
 msgstr "<gui>Domän</gui>"
 
 #. (itstool) path: item/p
@@ -1412,36 +1395,34 @@ msgstr "Huruvida meddelandedispositionsbekräftelse ska begäras som standard."
 msgid "<gui>Face Path</gui>"
 msgstr "<gui>Face-sökväg</gui>"
 
-# TODO: attached to a message?
 #. (itstool) path: item/p
 #: C/identities.page:89
 msgid ""
-"Whether a “Face” header should be attached to a program. Specified path "
+"Whether a “Face” header should be attached to a message. Specified path "
 "points out to a file containing a textual representation of the face icon. "
 "Please see <link href=\"http://quimby.gnus.org/circus/face/\">a description "
 "of Face and X-Face</link> headers for more details as well as the list of "
 "mail programs supporting this feature."
 msgstr ""
-"Huruvida en ”Face”-rubrik ska bifogas till ett program. Angiven sökväg pekar "
-"på en fil som innehåller en textrepresentation av face-ikonen. Se <link "
-"href=\"http://quimby.gnus.org/circus/face/\">en beskrivning av rubrikerna "
-"Face och X-Face</link> för mer detaljer såväl som listan över e-postprogram "
-"som stöder denna funktion."
+"Huruvida en ”Face”-rubrik ska bifogas till ett meddelande. Angiven sökväg "
+"pekar på en fil som innehåller en textrepresentation av face-ikonen. Se "
+"<link href=\"http://quimby.gnus.org/circus/face/\">en beskrivning av "
+"rubrikerna Face och X-Face</link> för mer detaljer såväl som listan över e-"
+"postprogram som stöder denna funktion."
 
 #. (itstool) path: item/title
 #: C/identities.page:98
 msgid "<gui>X-Face Path</gui>"
 msgstr "<gui>X-Face-sökväg</gui>"
 
-# TODO: attached to a message?
 #. (itstool) path: item/p
 #: C/identities.page:101
 msgid ""
-"Whether a “Face” header should be attached to a program. Specified path "
+"Whether a “Face” header should be attached to a message. Specified path "
 "points out to a file containing a textual representation of the face icon."
 msgstr ""
-"Huruvida en ”Face”-rubrik ska bifogas till ett program. Angiven sökväg pekar "
-"på en fil som innehåller en textrepresentation av face-ikonen."
+"Huruvida en ”Face”-rubrik ska bifogas till ett meddelande. Angiven sökväg "
+"pekar på en fil som innehåller en textrepresentation av face-ikonen."
 
 #. (itstool) path: item/title
 #: C/identities.page:106
@@ -1858,7 +1839,6 @@ msgstr ""
 "en kombination av GMime för att hantera Mime-meddelanden, och sina egna "
 "drivrutiner för e-postlagring lokalt och på annan plats."
 
-# TODO: bug-buddy still around?
 #. (itstool) path: page/p
 #: C/introduction.page:20
 msgid ""
@@ -1868,9 +1848,8 @@ msgid ""
 "balsa-list\"> https://mail.gnome.org/mailman/listinfo/balsa-list</link> or "
 "by sending a message with a subject of <em>subscribe</em> to <link "
 "href=\"mailto:balsa-list-request@gnome.org?subject=Subscribe\"> balsa-list-"
-"request@gnome.org</link>. Bugs can be reported via <app>bug-buddy</app> or "
-"to the <link href=\"https://gitlab.gnome.org/GNOME/balsa/issues\"> Gnome bug "
-"tool</link>."
+"request@gnome.org</link>. Bugs can be reported to the <link href=\"https://"
+"gitlab.gnome.org/GNOME/balsa/issues\"> Gnome bug tool</link>."
 msgstr ""
 "Om du vill lära dig mer om <app>Balsa</app> är det bästa sättet sändlistan "
 "<code>balsa-list@gnome.org</code> som du kan prenumerera på genom att gå "
@@ -1878,9 +1857,8 @@ msgstr ""
 "list\"> https://mail.gnome.org/mailman/listinfo/balsa-list</link> eller "
 "genom att skicka ett meddelande med ämnesraden <em>subscribe</em> till <link "
 "href=\"mailto:balsa-list-request@gnome.org?subject=Subscribe\"> balsa-list-"
-"request@gnome.org</link>. Fel kan rapporteras genom <app>bug-buddy</app> "
-"eller till <link href=\"https://gitlab.gnome.org/GNOME/balsa/issues\"> "
-"GNOMEs ärendehanteringssystem</link>."
+"request@gnome.org</link>. Fel kan rapporteras till <link href=\"https://"
+"gitlab.gnome.org/GNOME/balsa/issues\"> GNOMEs ärendehanteringssystem</link>."
 
 #. (itstool) path: page/title
 #: C/its-not-working.page:8
@@ -2066,31 +2044,29 @@ msgstr ""
 msgid "Mailbox Format Characteristics"
 msgstr "Karakteristik för postlådeformat"
 
-# TODO: dead link
 #. (itstool) path: item/p
 #: C/mbox-formats.page:21
 msgid ""
-"<link href=\"http://www.washington.edu/imap/documentation/formats.txt."
-"html\"> http://www.washington.edu/imap/documentation/formats.txt.html</link>"
+"<link href=\"https://github.com/winlibs/imap/blob/master/docs/formats.txt\"> "
+"https://github.com/winlibs/imap/blob/master/docs/formats.txt</link>"
 msgstr ""
-"<link href=\"http://www.washington.edu/imap/documentation/formats.txt."
-"html\"> http://www.washington.edu/imap/documentation/formats.txt.html</link>"
+"<link href=\"https://github.com/winlibs/imap/blob/master/docs/formats.txt\"> "
+"https://github.com/winlibs/imap/blob/master/docs/formats.txt</link>"
 
 #. (itstool) path: item/title
 #: C/mbox-formats.page:27
 msgid "Maildir format"
 msgstr "Maildir-formatet"
 
-# TODO: dead link
 #. (itstool) path: item/p
 #: C/mbox-formats.page:28
 msgid ""
-"maildir(5) manual page (from qmail): <link href=\"http://www.qmail.org/qmail-"
-"manual-html/man5/maildir.html\"> http://www.qmail.org/qmail-manual-html/man5/"
+"maildir(5) manual page (from qmail): <link href=\"http://qmail.org/qmail-"
+"manual-html/man5/maildir.html\"> http://qmail.org/qmail-manual-html/man5/"
 "maildir.html</link>"
 msgstr ""
-"Manualsidan maildir(5) (från qmail): <link href=\"http://www.qmail.org/qmail-"
-"manual-html/man5/maildir.html\"> http://www.qmail.org/qmail-manual-html/man5/"
+"Manualsidan maildir(5) (från qmail): <link href=\"http://qmail.org/qmail-"
+"manual-html/man5/maildir.html\"> http://qmail.org/qmail-manual-html/man5/"
 "maildir.html</link>"
 
 #. (itstool) path: item/title
@@ -2112,17 +2088,16 @@ msgstr ""
 msgid "QMail"
 msgstr "QMail"
 
-# TODO: dead link
 #. (itstool) path: item/p
 #: C/mbox-formats.page:41
 msgid ""
-"mbox(5) manual page (from qmail): <link href=\"http://www.qmail.org/qmail-"
-"manual-html/man5/mbox.html\"> http://www.qmail.org/qmail-manual-html/man5/"
-"mbox.html</link>"
+"mbox(5) manual page (from qmail): <link href=\"http://qmail.org/qmail-manual-"
+"html/man5/mbox.html\"> http://qmail.org/qmail-manual-html/man5/mbox.html</"
+"link>"
 msgstr ""
-"Manualsidan mbox(5) (från qmail): <link href=\"http://www.qmail.org/qmail-"
-"manual-html/man5/mbox.html\"> http://www.qmail.org/qmail-manual-html/man5/"
-"mbox.html</link>"
+"Manualsidan mbox(5) (från qmail): <link href=\"http://qmail.org/qmail-manual-"
+"html/man5/mbox.html\"> http://qmail.org/qmail-manual-html/man5/mbox.html</"
+"link>"
 
 #. (itstool) path: item/title
 #: C/mbox-formats.page:46
@@ -2364,11 +2339,10 @@ msgstr ""
 "Ställ in huruvida förhandsgranskningspanelen ska användas för att visa "
 "meddelanden, eller använd det separata meddelandevisningsfönstret."
 
-# TODO: Not in GUI?
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:22
-msgid "<gui>Show Mailbox Info</gui>"
-msgstr "<gui>Visa postlådeinfo</gui>"
+msgid "<gui>Show Message Counts in Mailbox List</gui>"
+msgstr "<gui>Visa meddelandeantal i postlådelista</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-display-options.page:25
@@ -2385,7 +2359,7 @@ msgstr ""
 "<app>Balsa</app> kommer då visa antalet olästa meddelanden (i parenteser) "
 "efter postlådans namn."
 
-# TODO: not found in GUI.
+# TODO: This text not in GUI as such. Is a dropdown with "Default Layout", "Wide Message Layout", "Wide Screen Layout"
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:33
 msgid "<gui>Alternative Layout</gui>"
@@ -2406,7 +2380,8 @@ msgstr ""
 "upptar den övre delen av fönstret, medan förhandsgranskningspanelen har full "
 "bredd och finns under dem."
 
-# TODO: not found in GUI
+# TODO: not found in GUI.
+# Is it "Automatically view message when mailbox opened"?
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:44
 msgid "<gui>Automatic View</gui>"
@@ -2736,10 +2711,9 @@ msgstr ""
 "meddelanden. Du kan ange hur du vill att alla fem nivåerna ska presenteras "
 "för dig."
 
-# TODO: "Display progress dialog" in GUI
 #. (itstool) path: item/title
 #: C/preferences-display-options.page:252
-msgid "<gui>Display Progress</gui>"
+msgid "<gui>Display Progress Dialog</gui>"
 msgstr "<gui>Visa förloppsmätarfönster</gui>"
 
 #. (itstool) path: item/p
@@ -2879,21 +2853,20 @@ msgstr ""
 "som du behöver. Servern som används för ett specifikt meddelande styrs av "
 "<link xref=\"identities\">identiteten</link> du väljer för meddelandet."
 
-# TODO: "for of the" -> either "for the" or "of the"
 #. (itstool) path: item/p
 #: C/preferences-mail-options.page:75
 msgid ""
 "To view or change the details of a server, select it and click <gui>Modify</"
 "gui> . To create a new server, click <gui>Add</gui> . A dialog will open, "
 "showing the properties of the selected server. Specify the domain name and "
-"optionally the port for of the SMTP server you use for submitting mail. "
-"Please note that the default port number is 587. The syntax is hostname[:"
-"port]. Port can be a decimal number or the name of the service as specified "
-"in <file>/etc/services</file> . Typically you can just set this to "
-"“localhost:smtp”. <app>Balsa</app> can also break up a large message into "
-"fragments, which can be reassembled by <app>Balsa</app> or any RFC 2046-"
-"compliant mailer. This dialog allows you to set this option, and the size "
-"above which a message should be split."
+"optionally the port of the SMTP server you use for submitting mail. Please "
+"note that the default port number is 587. The syntax is hostname[:port]. "
+"Port can be a decimal number or the name of the service as specified in "
+"<file>/etc/services</file> . Typically you can just set this to “localhost:"
+"smtp”. <app>Balsa</app> can also break up a large message into fragments, "
+"which can be reassembled by <app>Balsa</app> or any RFC 2046-compliant "
+"mailer. This dialog allows you to set this option, and the size above which "
+"a message should be split."
 msgstr ""
 "För att visa eller ändra detaljerna för en server väljer du den och klickar "
 "på <gui>Modifiera</gui>. För att skapa en ny server, klicka på <gui>Lägg "
@@ -3104,10 +3077,9 @@ msgstr ""
 "meddelanden</gui> är valt, men detta kommer vanligen lämna kvar ociterade "
 "raddelar."
 
-# TODO: request*s* in GUI
 #. (itstool) path: item/title
 #: C/preferences-mail-options.page:195
-msgid "<gui>Message Disposition Notification request</gui>"
+msgid "<gui>Message Disposition Notification requests</gui>"
 msgstr "<gui>Begäranden om meddelandedispositionsbekräftelse</gui>"
 
 #. (itstool) path: item/p
@@ -3301,11 +3273,10 @@ msgstr ""
 "Ställ in <app>Balsa</app> att ta bort alla meddelanden i postlådan "
 "<code>Papperskorg</code> när <app>Balsa</app> avslutar."
 
-# TODO: Not in GUI
 #. (itstool) path: item/title
 #: C/preferences-miscellaneous.page:29
-msgid "<gui>Automatically close mailbox</gui>"
-msgstr "<gui>Stäng automatiskt postlåda</gui>"
+msgid "<gui>Close mailbox if unused more than</gui>"
+msgstr "<gui>Stäng postlådan om den varit oanvänd mer än</gui>"
 
 #. (itstool) path: item/p
 #: C/preferences-miscellaneous.page:32
@@ -3866,11 +3837,10 @@ msgstr ""
 "<key>Ctrl</key> <key>B</key> </keyseq> -- Få alla rader i meddelandet att "
 "radbrytas till den angivna kolumnen för utgående e-post."
 
-# TODO: "Reflow Selected Text" in GUI
 #. (itstool) path: item/p
 #: C/win-composer.page:253
 msgid ""
-"<guiseq> <gui>Edit</gui> <gui>Reflow Paragraph</gui> </guiseq> <keyseq> "
+"<guiseq> <gui>Edit</gui> <gui>Reflow Selected Text</gui> </guiseq> <keyseq> "
 "<key>Ctrl</key> <key>R</key> </keyseq> -- Cause all selected lines to be "
 "wrapped to the specified outgoing mail wrap column."
 msgstr ""
@@ -3969,7 +3939,6 @@ msgstr ""
 msgid "<gui>Options</gui>"
 msgstr "<gui>Alternativ</gui>"
 
-# TODO: that it is not guaranteed
 #. (itstool) path: item/p
 #: C/win-composer.page:341
 msgid ""
@@ -3977,7 +3946,8 @@ msgid ""
 "guiseq> -- If checked <app>Balsa</app> will include the <code>Disposition-"
 "Notification-To</code> header line with your <code>From</code> address. "
 "Please note that the handling of this request depends on the receiving mail "
-"program and that it not guaranteed that this notification will be sent back."
+"program and that it is not guaranteed that this notification will be sent "
+"back."
 msgstr ""
 "<guiseq> <gui>Alternativ</gui> <gui>Begär dispositionsbekräftelse</gui> </"
 "guiseq> -- Om ikryssad kommer <app>Balsa</app> inkludera rubrikraden "
@@ -4110,8 +4080,6 @@ msgstr ""
 "MIME-läget (RFC 2633). Observera att meddelandets kuvert (inklusive ämnet) "
 "inte är skyddat."
 
-# TODO: no space before .
-# TODO: GnuPG HOWTO is dead link
 #. (itstool) path: note/p
 #: C/win-composer.page:450
 msgid ""
@@ -4119,15 +4087,15 @@ msgid ""
 "app> has been built with <app>GnuPG</app> support. For a detailed "
 "description of E-Mail cryptography, see the <link href=\"http://www.gnupg."
 "org/documentation/manuals/gnupg/\" type=\"http\"> GnuPG Manual</link> and "
-"the <link href=\"http://www.dewinter.com/gnupg_howto/english/GPGMiniHowto."
-"html\" type=\"http\"> GnuPG HOWTO</link> ."
+"the <link href=\"https://www.gnupg.org/howtos/en/GPGMiniHowto.html\"> GnuPG "
+"HOWTO</link>."
 msgstr ""
 "Kryptografiska signaturer och kryptering är endast tillgängligt när "
 "<app>Balsa</app> har byggts med <app>GnuPG</app>-stöd. För en detaljerad "
 "beskrivning av e-postkryptografi kan du se <link href=\"http://www.gnupg.org/"
 "documentation/manuals/gnupg/\" type=\"http\"> handboken för GnuPG</link> och "
-"<link href=\"http://www.dewinter.com/gnupg_howto/english/GPGMiniHowto.html\" "
-"type=\"http\"> GnuPG HOWTO</link>."
+"<link href=\"https://www.gnupg.org/howtos/en/GPGMiniHowto.html\"> GnuPG "
+"HOWTO</link>."
 
 #. (itstool) path: section/p
 #: C/win-composer.page:466
@@ -4398,7 +4366,7 @@ msgid ""
 "Also, <app>Balsa</app> supports alias expansion. As you type a name, "
 "<app>Balsa</app> will guess the e-mail address from all the entries in the "
 "<app>GnomeCard</app> application. To enable this feature, read the section "
-"on <link xref=\"common-tasks#ct-alias-expansion\"> Alias Expansion</link> . "
+"on <link xref=\"common-tasks#ct-alias-expansion\"> Alias Expansion</link>. "
 "In addition, the composition window supports drag-and-drop of addresses from "
 "the <app>GnomeCard</app> application."
 msgstr ""
@@ -4534,12 +4502,11 @@ msgid ""
 msgstr ""
 "external ref='figures/spell-check.png' md5='99eea5d4372fe11ce809fba8da61569c'"
 
-# TODO: one to the left
 # TODO: preferences-spelling is dead link
 #. (itstool) path: section/p
 #: C/win-composer.page:670
 msgid ""
-"As shown above, the panel consists of a list of two panes, one the left "
+"As shown above, the panel consists of a list of two panes, one to the left "
 "containing a list of suggestions and an entry box, while the right contains "
 "several buttons to choose your action. The list on the left is re-generated "
 "for each incorrect word, with all the suggestions the spell check program "
@@ -4713,14 +4680,13 @@ msgstr ""
 "klicka på pilknappen som pekar till vänster, eller dubbelklicka på adressen "
 "igen för att flytta tillbaka den."
 
-# TODO: Now "Run Editor" in GUI.
-# Is GnomeCard still around??
+# TODO: Is GnomeCard still around??
 #. (itstool) path: section/p
 #: C/win-composer.page:757
 msgid ""
 "If, while selecting people to send your message to, you decide to add "
 "someone new to the address book, it is a simple matter to click on the "
-"<gui>Run GnomeCard</gui> button. This will bring up the <app>GnomeCard</app> "
+"<gui>Run Editor</gui> button. This will bring up the <app>GnomeCard</app> "
 "application, allowing you to easily manipulate your contact list. After any "
 "changes have been made using the address book, they can be forced to show up "
 "in the left hand pane by clicking on the <gui>Re-Import</gui> button."
@@ -4758,7 +4724,6 @@ msgstr ""
 msgid "There are two buttons under the filters list:"
 msgstr "Det finns två knappar under filterlistan:"
 
-# TODO: how this filter
 #. (itstool) path: item/p
 #: C/win-filters.page:19
 msgid ""
@@ -4766,7 +4731,7 @@ msgid ""
 "filter is initially named “New Filter”, and contains no condition. Then you "
 "fill in the different fields in the notebook pages (in particular remember "
 "to change the name of the filter), add the conditions that will describe how "
-"this filters matches a message, and to confirm the modifications push the "
+"this filter matches a message, and to confirm the modifications push the "
 "<gui>Apply</gui> button on the right hand side of the Filters window."
 msgstr ""
 "Knappen <gui>Nytt</gui>: du klickar på den för att skapa ett nytt filter, "
@@ -4850,19 +4815,19 @@ msgstr ""
 "<gui>Flaggvillkor</gui>: matchningen görs genom att kontrollera meddelandets "
 "flaggor: oläst, besvarat, borttaget, flaggat."
 
-# TODO: win-condition is dead link.
 #. (itstool) path: section/p
 #: C/win-filters.page:79
 msgid ""
 "The three buttons under the list allows you to edit the selected condition, "
 "add a new one, or remove one. Editing or creating a condition is done in the "
-"<link xref=\"win-condition\">condition window</link>, which pops up when you "
-"click on the <gui>Edit</gui> or the <gui>New</gui> button."
+"<link xref=\"win-filters#win-condition\">condition window</link>, which pops "
+"up when you click on the <gui>Edit</gui> or the <gui>New</gui> button."
 msgstr ""
 "De tre knapparna under listan låter dig redigera det valda villkoret, lägga "
 "till ett nytt, eller ta bort ett villkor. Redigering eller skapande av "
-"villkor görs i <link xref=\"win-condition\">villkorsfönstret</link>, vilket "
-"poppar upp när du klickar på knappen <gui>Redigera</gui> eller <gui>Ny</gui>."
+"villkor görs i <link xref=\"win-filters#win-condition\">villkorsfönstret</"
+"link>, vilket poppar upp när du klickar på knappen <gui>Redigera</gui> eller "
+"<gui>Ny</gui>."
 
 #. (itstool) path: section/p
 #: C/win-filters.page:86
@@ -4937,11 +4902,10 @@ msgstr ""
 msgid "This window is made of three frames:"
 msgstr "Detta fönster utgörs av tre ramar:"
 
-# TODO: Called "Match Fields" in GUI
 #. (itstool) path: item/p
 #: C/win-filters.page:122
 msgid ""
-"The <gui>Match in</gui> frame: it's a set of check boxes, one per match "
+"The <gui>Match Fields</gui> frame: it's a set of check boxes, one per match "
 "field. For example if you want to match all messages that was sent by "
 "hotmail users, you just have to check the <gui>From</gui> box, or if you "
 "want to match all messages about <app>Balsa</app>, check the <gui>Subject</"
@@ -4970,7 +4934,7 @@ msgid ""
 "message by the MUAs with their name and versions."
 msgstr ""
 "För avancerad användning kan du också direkt ange namnet på rubriken att "
-"matcha mot. Ett standardexempel är rubriken ”X-Mailer” som läggs till i ditt "
+"matcha mot. Ett exempel är rubriken ”X-Mailer” som läggs till i ditt "
 "meddelande av e-postklienter med deras namn och version."
 
 #. (itstool) path: item/p
@@ -4982,12 +4946,11 @@ msgstr ""
 "Knappen <gui>Alla</gui> kommer kryssa i alla rutor, medan knappen <gui>Töm</"
 "gui> kommer avmarkera alla rutor (som du kanske gissat)."
 
-# TODO: one of the headers
 #. (itstool) path: item/p
 #: C/win-filters.page:143
 msgid ""
 "If you specify several headers, a message will match this condition if one "
-"of the header matches. For example if you want to filter all messages "
+"of the headers matches. For example if you want to filter all messages "
 "talking about <app>Balsa</app>, you should check the <gui>Body</gui> and the "
 "<gui>Subject</gui> boxes, so that all mails with the word “Balsa” in its "
 "subject or its body will match. You can also, if you're fed up with "
@@ -5004,13 +4967,12 @@ msgstr ""
 "ämnesrad eller meddelandetexten. Se beskrivningen av söktyperna för att se "
 "hur du gör detta."
 
-# TODO: *F*lag condition
 #. (itstool) path: item/p
 #: C/win-filters.page:157
 msgid ""
 "The <gui>Search Type</gui> frame: it's a list of the different condition "
 "types. You choose <gui>Simple</gui>, <gui>Regular expression</gui>, "
-"<gui>Date interval</gui>, or <gui>flag condition</gui>. Your choice will "
+"<gui>Date interval</gui>, or <gui>Flag condition</gui>. Your choice will "
 "change the third frame so that it displays the fields needed by the type of "
 "match chosen."
 msgstr ""
@@ -5039,7 +5001,6 @@ msgstr ""
 "är en delsträng av de angivna rubrikerna, meningen ovanför textfältet kommer "
 "uppdateras i enlighet med det."
 
-# TODO: above the list
 #. (itstool) path: item/p
 #: C/win-filters.page:180
 msgid ""
@@ -5049,7 +5010,7 @@ msgid ""
 "gui> button destroys the selected regular expression in the list. The last "
 "button <gui>One matches/None matches</gui> lets you specify when a message "
 "matches the condition: when one of the regular expression matches or when "
-"none matches. The sentence above te list will be updated accordingly."
+"none matches. The sentence above the list will be updated accordingly."
 msgstr ""
 "<gui>Reguljärt uttryck</gui>: du kan mata in en lista med reguljära uttryck. "
 "Du skriver in ditt reguljära uttryck i textfältet och klickar sedan på "
@@ -5110,22 +5071,20 @@ msgid ""
 msgstr ""
 "external ref='figures/main-window.png' md5='19fb1edfaade98c5786473ea9d46afaf'"
 
-# TODO: "Show Mailbox Info" not in GUI?
-# Should it be "Show message counts in mailbox list"?
 #. (itstool) path: page/p
 #: C/win-main.page:13
 msgid ""
-"<app>Balsa</app> 's main window has three major areas. To the left is the "
-"<link xref=\"win-main#subwin-mblist\"> mailbox list</link> . This displays "
+"<app>Balsa</app>'s main window has three major areas. To the left is the "
+"<link xref=\"win-main#subwin-mblist\"> mailbox list</link>. This displays "
 "all the mailboxes <app>Balsa</app> knows about; it will scan for ones in "
 "your local mail directory. (This means <app>Balsa</app> works well with "
-"<app>procmail</app> .) It will also list <link xref=\"glossary#imap\">IMAP</"
-"link> mailboxes that you have configured. If the <gui> Show Mailbox Info</"
-"gui> preference is set, two columns will also be displayed next to the "
-"mailbox names containing the number of unread and total messages in each "
-"mailbox that has unread messages; otherwise, the number of unread messages "
-"is shown in parentheses after the mailbox name. Also, any mailboxes that "
-"contain unread messages will be shown in a bold font."
+"<app>procmail</app>.) It will also list <link xref=\"glossary#imap\">IMAP</"
+"link> mailboxes that you have configured. If the <gui> Show Message Counts "
+"in Mailbox List</gui> preference is set, two columns will also be displayed "
+"next to the mailbox names containing the number of unread and total messages "
+"in each mailbox that has unread messages; otherwise, the number of unread "
+"messages is shown in parentheses after the mailbox name. Also, any mailboxes "
+"that contain unread messages will be shown in a bold font."
 msgstr ""
 "<app>Balsa</app>s huvudfönster har tre stora områden. Till vänster är <link "
 "xref=\"win-main#subwin-mblist\"> postlådelistan</link>. Den visar alla "
@@ -5144,7 +5103,7 @@ msgstr ""
 #: C/win-main.page:26
 msgid ""
 "At the top-right is a view of the currently open mailbox, called the <link "
-"xref=\"win-main#subwin-msgindex\"> message index</link> . You can browse "
+"xref=\"win-main#subwin-msgindex\"> message index</link>. You can browse "
 "messages and manipulate them here."
 msgstr ""
 "Högst upp till höger är en vy över den öppna postlådan, kallad <link "
@@ -5154,8 +5113,8 @@ msgstr ""
 #. (itstool) path: page/p
 #: C/win-main.page:30
 msgid ""
-"At the bottom-right of <app>Balsa</app> 's main window is the <link "
-"xref=\"win-main#subwin-msgview\"> message view</link> . This displays the "
+"At the bottom-right of <app>Balsa</app>'s main window is the <link "
+"xref=\"win-main#subwin-msgview\"> message view</link>. This displays the "
 "message selected in the message index. You can save attachments, view "
 "attachments, and read incoming email here."
 msgstr ""
@@ -5251,20 +5210,20 @@ msgstr ""
 "IMAP-server. Denna dialogruta för <link xref=\"folder-config\"> IMAP-"
 "mappegenskaper</link> kan också användas för att ändra kontots detaljer."
 
-# TODO: subfolder-config is dead link
 #. (itstool) path: item/p
 #: C/win-main.page:96
 msgid ""
 "<guiseq> <gui> File</gui> <gui> New</gui> <gui> Remote IMAP subfolder…</gui> "
 "</guiseq> -- Open a dialog box to create a new subfolder in an existing IMAP "
-"folder tree. This <link xref=\"subfolder-config\"> IMAP subfolder "
-"properties</link> dialog can also be used to rename or move a subfolder."
+"folder tree. This <link xref=\"folder-config#subfolder-config\"> IMAP "
+"subfolder properties</link> dialog can also be used to rename or move a "
+"subfolder."
 msgstr ""
 "<guiseq> <gui> Arkiv</gui> <gui> Ny</gui> <gui> IMAP-fjärrundermapp…</gui> </"
 "guiseq> -- Öppna en dialogruta för att skapa en ny undermapp i ett "
-"befintligt IMAP-mappträd. Denna dialogruta för <link xref=\"subfolder-"
-"config\"> IMAP-undermappsegenskaper</link> kan också användas för att byta "
-"namn på eller flytta en undermapp."
+"befintligt IMAP-mappträd. Denna dialogruta för <link xref=\"folder-"
+"config#subfolder-config\"> IMAP-undermappsegenskaper</link> kan också "
+"användas för att byta namn på eller flytta en undermapp."
 
 #. (itstool) path: item/p
 #: C/win-main.page:110
@@ -5329,12 +5288,11 @@ msgstr ""
 "<guiseq> <gui> Arkiv</gui> <gui> Skriv ut</gui> </guiseq> -- Skriv ut det "
 "markerade meddelandet (visas i meddelandevypanelen.)"
 
-# TODO: remove space before 's
 #. (itstool) path: item/p
 #: C/win-main.page:166
 msgid ""
 "<guiseq> <gui> File</gui> <gui> Address Book</gui> </guiseq> <key>B</key> -- "
-"Open <app>Balsa</app> 's address book."
+"Open <app>Balsa</app>'s address book."
 msgstr ""
 "<guiseq> <gui> Arkiv</gui> <gui> Adressbok</gui> </guiseq> <key>B</key> -- "
 "Öppna <app>Balsa</app>s adressbok."
@@ -5389,7 +5347,7 @@ msgid ""
 "<guiseq> <gui> Edit</gui> <gui> Find</gui> </guiseq> <keyseq><key>Ctrl</"
 "key><key>F</key></keyseq> -- Find messages in the current mailbox that match "
 "a given set of conditions, using the <link xref=\"win-search\"> search "
-"mailbox window</link> ."
+"mailbox window</link>."
 msgstr ""
 "<guiseq> <gui> Redigera</gui> <gui> Sök</gui> </guiseq> <keyseq><key>Ctrl</"
 "key><key>F</key></keyseq> -- Sök meddelanden i aktuell postlåda som matchar "
@@ -5423,7 +5381,7 @@ msgstr ""
 #: C/win-main.page:250
 msgid ""
 "<guiseq> <gui> Edit</gui> <gui> Filters</gui> </guiseq> -- Open up the <link "
-"xref=\"win-filters\"> filters window</link> ."
+"xref=\"win-filters\"> filters window</link>."
 msgstr ""
 "<guiseq> <gui> Redigera</gui> <gui> Filter</gui> </guiseq> -- Öppna <link "
 "xref=\"win-filters\"> filterfönstret</link>."
@@ -5442,7 +5400,7 @@ msgstr ""
 msgid ""
 "<guiseq> <gui> Edit</gui> <gui> Preferences…</gui> </guiseq> -- Open the "
 "<link xref=\"preferences\"> Preferences</link> window to change the settings "
-"of <app>Balsa</app> ."
+"of <app>Balsa</app>."
 msgstr ""
 "<guiseq> <gui> Redigera</gui> <gui> Inställningar…</gui> </guiseq> -- Öppna "
 "fönstret <link xref=\"preferences\"> Inställningar</link> för att ändra "
@@ -5752,7 +5710,6 @@ msgstr ""
 "<guiseq> <gui> Meddelande</gui> <gui> Vidarebefordra infogat…</gui> </"
 "guiseq> -- Vidarebefordra markerade meddelanden, infogade som citat."
 
-# TODO: Space before --
 #. (itstool) path: item/p
 #: C/win-main.page:554
 msgid ""
@@ -5777,7 +5734,6 @@ msgstr ""
 "<keyseq><key>Ctrl</key><key>,</key></keyseq> -- Visa föregående del av "
 "meddelandet."
 
-# TODO: Space before --
 #. (itstool) path: item/p
 #: C/win-main.page:580
 msgid ""
@@ -5796,7 +5752,7 @@ msgid ""
 "shortcut> <gui> Message</gui> <gui> View Source…</gui> </guiseq> "
 "<keyseq><key>Ctrl</key><key>U</key></keyseq> -- Opens a new window that "
 "displays the raw message as received from the <link "
-"xref=\"glossary#mta\">MTA</link> ."
+"xref=\"glossary#mta\">MTA</link>."
 msgstr ""
 "<guiseq> <shortcut> <keycombo> <sys> Ctrl</sys> <sys> U</sys> </keycombo> </"
 "shortcut> <gui> Meddelande</gui> <gui> Visa källa…</gui> </guiseq> "
@@ -5906,19 +5862,17 @@ msgstr ""
 msgid "<gui> Settings</gui>"
 msgstr "<gui> Inställningar</gui>"
 
-# TODO: remove space before 's
 #. (itstool) path: item/p
 #: C/win-main.page:716
-msgid "Menu for changing <app>Balsa</app> 's configuration."
+msgid "Menu for changing <app>Balsa</app>'s configuration."
 msgstr "Meny för att ändra <app>Balsa</app>s konfiguration."
 
-# TODO: space before .?
 #. (itstool) path: item/p
 #: C/win-main.page:719
 msgid ""
 "<guiseq> <gui> Settings</gui> <gui> Toolbars…</gui> </guiseq> -- Open the "
 "<link xref=\"toolbar-prefs\"> Toolbars</link> window to modify the content "
-"and arrangement of the toolbars in <app>Balsa</app> ."
+"and arrangement of the toolbars in <app>Balsa</app>."
 msgstr ""
 "<guiseq> <gui> Inställningar</gui> <gui> Verktygsfält…</gui> </guiseq> -- "
 "Öppna fönstret <link xref=\"toolbar-prefs\"> Verktygsfält</link> för att "
@@ -6042,8 +5996,7 @@ msgstr ""
 msgid "The pop-up (context) menu contains the following items:"
 msgstr "Snabbvalsmenyn (poppupp) innehåller följande objekt:"
 
-# TODO: space before .
-# TODO: is subwin-messagemenu right?
+# TODO: subwin-messagemenu needs to be section for link to work?
 #. (itstool) path: item/p
 #: C/win-main.page:797
 msgid ""
@@ -6056,7 +6009,7 @@ msgid ""
 "guiseq> , <guiseq> <gui> Toggle Unread</gui> </guiseq> , <guiseq> <gui> Move "
 "to</gui> </guiseq> , <guiseq> <gui> View Source</gui> </guiseq> -- These "
 "perform the same actions as their counterparts in the <link xref=\"win-"
-"main#subwin-messagemenu\"> message menu</link> ."
+"main#subwin-messagemenu\"> message menu</link>."
 msgstr ""
 "<guiseq> <gui> Svara</gui> </guiseq> , <guiseq> <gui> Svara alla</gui> </"
 "guiseq> , <guiseq> <gui> Svara grupp</gui> </guiseq> , <guiseq> <gui> "
@@ -6111,27 +6064,25 @@ msgstr ""
 "kunna välja bland program som är kända för att hantera delen. Vidare finns "
 "alltid ett alternativ för att spara bilagan till en fil."
 
-# TODO: End with .
 #. (itstool) path: note/p
 #: C/win-main.page:864
 msgid ""
 "<app>Balsa</app> supports viewing HTML messages only when compiled with "
 "<app> gtkhtml</app> or <app> WebKit</app> support. Gtkhtml support will be "
 "compiled in if gtkhtml-devel files are found. WebKit is currently supported "
-"only on an experimental basis,"
+"only on an experimental basis."
 msgstr ""
 "<app>Balsa</app> stöder visning av HTML-meddelanden endast när det är "
 "kompilerat med stöd för <app> gtkhtml</app> eller <app> WebKit</app>. "
 "Gtkhtml-stöd kommer kompileras in om gtkhtml-devel-filer hittas. WebKit "
 "stöds för närvarande bara på experimentell nivå."
 
-# TODO: space before .
 #. (itstool) path: section/p
 #: C/win-main.page:871
 msgid ""
 "You are not restricted to that pane either. Double-clicking on a message in "
 "the message index, or touching either the space bar or the <sys> Enter</sys> "
-"key, will open it in a <link xref=\"win-message\"> separate window</link> ."
+"key, will open it in a <link xref=\"win-message\"> separate window</link>."
 msgstr ""
 "Du är inte heller begränsad till den panelen. Att dubbelklicka på ett "
 "meddelande i meddelandeindexet, eller trycka på antingen blankstegstangenten "
@@ -6428,7 +6379,7 @@ msgid ""
 "string in the To, From, Subject, or Cc headers, or in the message body. This "
 "window allows you to specify the string for which you want to search and "
 "where <app>Balsa</app> should look. Open the window with the <guiseq> "
-"<gui>Edit</gui> <gui>Find</gui> </guiseq>command, or <keyseq> <key>Ctrl</"
+"<gui>Edit</gui> <gui>Find</gui> </guiseq> command, or <keyseq> <key>Ctrl</"
 "key> <key>F</key> </keyseq>."
 msgstr ""
 "Du kan söka i en postlåda för att hitta och visa meddelanden som innehåller "
@@ -6448,15 +6399,14 @@ msgstr "Du kan visa matchande meddelanden på två sätt:"
 msgid "<gui>Show only matching messages</gui>"
 msgstr "<gui>Visa endast matchande meddelanden</gui>"
 
-# TODO: Spaces between gui and button.
 #. (itstool) path: item/p
 #: C/win-search.page:28
 msgid ""
-"If you click the <gui>Apply</gui>button, the mailbox view will be filtered "
+"If you click the <gui>Apply</gui> button, the mailbox view will be filtered "
 "to show only the messages that match the conditions. If you click the "
-"<gui>Clear</gui>button, the filter will be cleared, and the mailbox view "
+"<gui>Clear</gui> button, the filter will be cleared, and the mailbox view "
 "will be restored to show all messages. You can also use <guiseq> "
-"<gui>Mailbox</gui> <gui>Reset Filter</gui> </guiseq>to restore the view."
+"<gui>Mailbox</gui> <gui>Reset Filter</gui> </guiseq> to restore the view."
 msgstr ""
 "Om du klickar på knappen <gui>Verkställ</gui> kommer postlådevyn filtreras "
 "så den endast visar meddelandena som matchar villkoren. Om du klickar på "
@@ -6475,7 +6425,7 @@ msgstr "<gui>Öppna nästa matchande meddelande</gui>"
 msgid ""
 "Alternatively, you can step through the matching messages, either forward or "
 "in reverse, and optionally wrapping the search when it reaches the end of "
-"the mailbox. Click the <gui>OK</gui>button to view the first matching "
+"the mailbox. Click the <gui>OK</gui> button to view the first matching "
 "message after (or before) the current message. Then you can use <guiseq> "
 "<gui>Edit</gui> <gui>Find Next</gui> </guiseq>, or <keyseq> <key>Ctrl</key> "
 "<key>G</key> </keyseq>, to step through the matching messages."
@@ -6487,3 +6437,15 @@ msgstr ""
 "sedan använda <guiseq> <gui>Redigera</gui> <gui>Sök nästa</gui> </guiseq> "
 "eller <keyseq> <key>Ctrl</key> <key>G</key> </keyseq> för att stega genom de "
 "matchande meddelandena."
+
+#~ msgid "<gui>Reply-To address</gui>"
+#~ msgstr "<gui>Svara till</gui>"
+
+#~ msgid "<gui>Default Domain</gui>"
+#~ msgstr "<gui>Domän</gui>"
+
+#~ msgid "<gui>Show Mailbox Info</gui>"
+#~ msgstr "<gui>Visa meddelandeantal i postlådelista</gui>"
+
+#~ msgid "<gui>Automatically close mailbox</gui>"
+#~ msgstr "<gui>Stäng postlådan om den varit oanvänd mer än</gui>"

@@ -536,11 +536,11 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer      *server,
 
 
 static GList *
-update_msg_list(struct fetch_data         *fd,
-                const LibBalsaMailboxPOP3 *mailbox_pop3,
-                GHashTable               **current_uids,
-                LibBalsaServer            *server,
-                GList                     *msg_list)
+update_msg_list(struct fetch_data   *fd,
+                LibBalsaMailboxPOP3 *mailbox_pop3,
+                GHashTable         **current_uids,
+                LibBalsaServer      *server,
+                GList               *msg_list)
 {
 	GHashTable *uids = NULL;
 	gchar *uid_prefix = NULL;
@@ -571,8 +571,8 @@ update_msg_list(struct fetch_data         *fd,
 			gchar *size_str;
 
 			size_str = libbalsa_size_to_gchar(msg_info->size);
-			libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("POP3 message %d oversized: %s — skipped."), msg_info->id,
-				size_str);
+			libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("POP3 mailbox %s: message %d oversized: %s — skipped."),
+				libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mailbox_pop3)), msg_info->id, size_str);
 			g_free(size_str);
 			skip = TRUE;
 		}
@@ -698,8 +698,8 @@ libbalsa_mailbox_pop3_check(LibBalsaMailbox * mailbox)
 
 		if (!result) {
 			net_client_shutdown(NET_CLIENT(pop));
-			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 error: %s"),
-                                             err != NULL ? err->message : "?");
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("POP3 mailbox %s error: %s"),
+				libbalsa_mailbox_get_name(mailbox), err != NULL ? err->message : "?");
 			if (err != NULL)
 				g_error_free(err);
 		}

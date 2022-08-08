@@ -983,8 +983,9 @@ balsa_send_message_error(MessageQueueItem *mqi,
 			libbalsa_message_change_flags(mqi->orig, LIBBALSA_MESSAGE_FLAG_FLAGGED, LIBBALSA_MESSAGE_FLAG_DELETED);
 		}
 	}
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Sending message failed: %s\nMessage left in your outbox."),
-		error->message);
+	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+		_("Sending message to SMTP server %s failed: %s\nMessage left in your outbox."),
+		libbalsa_smtp_server_get_name(mqi->smsg_info->smtp_server), error->message);
 }
 
 static void

@@ -205,22 +205,14 @@ endif
 # Autocrypt
 if autocrypt
   autocrypt_dep = dependency('sqlite3', required : true)
-  if autocrypt_dep.found()
-    conf.set('ENABLE_AUTOCRYPT', 1, description : 'If defined, enable Autocrypt support.')
-  else
-    error('*** You enabled Autocrypt but sqlite3 library is not found.')
-  endif
+  conf.set('ENABLE_AUTOCRYPT', 1, description : 'If defined, enable Autocrypt support.')
   balsa_deps += autocrypt_dep
 endif
 
 # System Tray Icons
 if systray
   systray_dep = dependency('xapp', required : true)
-  if systray_dep.found()
-    conf.set('ENABLE_SYSTRAY', 1, description : 'If defined, enable System Tray Icon support.')
-  else
-    error('*** You enabled System Tray Icon support but libxapp is not found.')
-  endif
+  conf.set('ENABLE_SYSTRAY', 1, description : 'If defined, enable System Tray Icon support.')
   balsa_deps += systray_dep
 endif
 

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-07-15 19:29+0000\n"
-"PO-Revision-Date: 2022-07-16 08:47+0300\n"
+"POT-Creation-Date: 2022-08-10 15:49+0000\n"
+"PO-Revision-Date: 2022-08-10 22:12+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -1764,67 +1764,80 @@ msgstr "*** ПОМИЛКА: потік даних поштової скринь�
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
-#: ../libbalsa/mailbox_imap.c:609
-msgid "IMAP connection has been severed. Reconnecting…"
-msgstr "IMAP з'єднання було розірвано. Повторне підключення…"
-
-#: ../libbalsa/mailbox_imap.c:612
-msgid "IMAP protocol error. Try enabling bug workarounds."
-msgstr "Помилка протоколу IMAP. Намагаємося обійти проблему."
-
-#: ../libbalsa/mailbox_imap.c:615
+#. Translators: #1 context (mailbox, server); #2 mailbox or server name
+#: ../libbalsa/mailbox_imap.c:610
 #, c-format
-msgid "IMAP server has shut the connection: %s Reconnecting…"
-msgstr "IMAP сервер розірвав з'єднання: %s Намагаємося з'єднатися повторно…"
+#| msgid "IMAP connection has been severed. Reconnecting…"
+msgid "IMAP %s %s: connection has been severed. Reconnecting…"
+msgstr "IMAP %s %s: з'єднання було розірвано. Повторне підключення…"
 
-#: ../libbalsa/mailbox_imap.c:627
+#. Translators: #1 context (mailbox, server); #2 mailbox or server name
+#: ../libbalsa/mailbox_imap.c:614
 #, c-format
-msgid "Async IMAP cmd %s could not be executed. Reconnecting…"
+#| msgid "IMAP protocol error. Try enabling bug workarounds."
+msgid "IMAP %s %s: protocol error. Try enabling bug workarounds."
+msgstr "IMAP %s %s: помилка протоколу. Намагаємося обійти проблему."
+
+#. Translators: #1 context (mailbox, server); #2 mailbox or server name; #3 error message
+#: ../libbalsa/mailbox_imap.c:618
+#, c-format
+#| msgid "IMAP server has shut the connection: %s Reconnecting…"
+msgid "IMAP %s %s: server has shut down the connection: %s. Reconnecting…"
 msgstr ""
-"Не вдалося виконати асинхронну команду IMAP %s. Встановлюємо з'єднання "
-"повторно…"
+"IMAP %s %s: сервер розірвав з'єднання: %s Намагаємося з'єднатися повторно…"
 
-#: ../libbalsa/mailbox_imap.c:1238
+#. helper macro for calling II in the context of a mailbox
+#: ../libbalsa/mailbox_imap.c:623
+#| msgid "Mailbox"
+msgid "mailbox"
+msgstr "скринька"
+
+#: ../libbalsa/mailbox_imap.c:1233
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Отримуємо %ld кБ"
 
-#: ../libbalsa/mailbox_imap.c:1704
+#: ../libbalsa/mailbox_imap.c:1698
 #, c-format
 msgid "No path found for mailbox “%s”, using “%s”"
 msgstr "Не знайдено шлях до поштової скриньки «%s», використовуємо «%s»"
 
-#: ../libbalsa/mailbox_imap.c:1811 ../libbalsa/mailbox_imap.c:1852
+#: ../libbalsa/mailbox_imap.c:1805 ../libbalsa/mailbox_imap.c:1846
 #, c-format
 msgid "Cannot get IMAP handle"
 msgstr "Не вдалося отримати дескриптор IMAP"
 
-#: ../libbalsa/mailbox_imap.c:2481 ../libbalsa/mailbox_imap.c:2544
+#: ../libbalsa/mailbox_imap.c:1856
+#| msgid "_Server:"
+msgid "server"
+msgstr "сервер"
+
+#: ../libbalsa/mailbox_imap.c:2475 ../libbalsa/mailbox_imap.c:2538
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr "Помилка під час отримання повідомлення з сервера IMAP: %s"
 
-#: ../libbalsa/mailbox_imap.c:2516
+#: ../libbalsa/mailbox_imap.c:2510
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Отримуємо %u кБ"
 
-#: ../libbalsa/mailbox_imap.c:2557
+#: ../libbalsa/mailbox_imap.c:2551
 #, c-format
 msgid "Cannot create temporary file"
 msgstr "Не вдалося створити тимчасовий файл"
 
-#: ../libbalsa/mailbox_imap.c:2581
+#: ../libbalsa/mailbox_imap.c:2575
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Не вдалося записати дані до тимчасового файла %s"
 
-#: ../libbalsa/mailbox_imap.c:2808 ../libbalsa/mailbox_imap.c:2925
+#: ../libbalsa/mailbox_imap.c:2802 ../libbalsa/mailbox_imap.c:2919
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Вивантажуємо %ld кБ"
 
-#: ../libbalsa/mailbox_imap.c:3234
+#: ../libbalsa/mailbox_imap.c:3228
 msgid "Server-side threading not supported."
 msgstr "Розбивання на гілки на сервері не підтримується."
 
@@ -2037,7 +2050,7 @@ msgid "Cannot load certificate file %s: %s"
 msgstr "Не вдалося завантажити файл сертифіката %s: %s"
 
 #. connect server
-#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1023
+#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1024
 #, c-format
 msgid "Connecting %s…"
 msgstr "Встановлюємо з'єднання з %s…"
@@ -2052,17 +2065,20 @@ msgstr "Поштова скринька POP3 %s: не вдалося з'єдна
 msgid "List messages…"
 msgstr "Показ списку повідомлень…"
 
-#: ../libbalsa/mailbox_pop3.c:527
+#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:701
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr "Помилка поштової скриньки POP3 %s: %s"
 
 #: ../libbalsa/mailbox_pop3.c:574
 #, c-format
-msgid "POP3 message %d oversized: %s — skipped."
-msgstr "Розмір повідомлення POP3 %d є надмірним: %s — пропускаємо."
+#| msgid "POP3 message %d oversized: %s — skipped."
+msgid "POP3 mailbox %s: message %d oversized: %s — skipped."
+msgstr ""
+"Поштова скринька POP3 %s: розмір повідомлення %d є надмірним: %s —"
+" пропускаємо."
 
-#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1033
+#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1034
 #, c-format
 msgid "Connected to %s"
 msgstr "Підключений до %s"
@@ -2080,12 +2096,7 @@ msgstr[3] "%lu нове повідомлення (%s)"
 msgid "Deleting messages on server…"
 msgstr "Вилучаємо повідомлення з сервера…"
 
-#: ../libbalsa/mailbox_pop3.c:701
-#, c-format
-msgid "POP3 error: %s"
-msgstr "Помилка POP3: %s"
-
-#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1114
+#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1115
 msgid "Finished"
 msgstr "Завершено"
 
@@ -2803,21 +2814,24 @@ msgstr "Зберегти повідомлення у %s…"
 msgid "Saving sent message to %s failed: %s"
 msgstr "Не вдалося зберегти надіслане повідомлення до %s: %s"
 
-#: ../libbalsa/send.c:986
+#: ../libbalsa/send.c:987
 #, c-format
+#| msgid ""
+#| "Sending message failed: %s\n"
+#| "Message left in your outbox."
 msgid ""
-"Sending message failed: %s\n"
+"Sending message to SMTP server %s failed: %s\n"
 "Message left in your outbox."
 msgstr ""
-"Не вдалося надіслати повідомлення: %s\n"
+"Не вдалося надіслати повідомлення на сервера SMTP %s: %s\n"
 "Повідомлення лишилося у теці «Вхідні»."
 
-#: ../libbalsa/send.c:1098
+#: ../libbalsa/send.c:1099
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr "Не вдалося з'єднатися із сервером SMTP %s (%s): %s"
 
-#: ../libbalsa/send.c:1117
+#: ../libbalsa/send.c:1118
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
@@ -2826,17 +2840,17 @@ msgstr[1] "Передаємо %u повідомлення до %s"
 msgstr[2] "Передаємо %u повідомлень до %s"
 msgstr[3] "Передаємо %u повідомлення до %s"
 
-#: ../libbalsa/send.c:1268 ../libbalsa/send.c:1336
+#: ../libbalsa/send.c:1269 ../libbalsa/send.c:1337
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Не вдалося прочитати %s: %s"
 
-#: ../libbalsa/send.c:1271 ../libbalsa/send.c:1339
+#: ../libbalsa/send.c:1272 ../libbalsa/send.c:1340
 #, c-format
 msgid "Cannot read %s"
 msgstr "Не вдалося прочитати %s"
 
-#: ../libbalsa/send.c:1303
+#: ../libbalsa/send.c:1304
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2844,7 +2858,7 @@ msgstr ""
 "Не вдалося визначити кодування символів текстового файла «%s» — надсилаємо "
 "як тип MIME «%s»"
 
-#: ../libbalsa/send.c:1837 ../libbalsa/send.c:1935
+#: ../libbalsa/send.c:1838 ../libbalsa/send.c:1936
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] ""
@@ -4374,7 +4388,6 @@ msgstr "Відповідати-на:"
 
 #: ../src/balsa-mime-widget-message.c:763
 #: ../src/balsa-print-object-header.c:152
-#| msgid "Sender"
 msgid "Sender:"
 msgstr "Відправник:"
 
@@ -8188,6 +8201,16 @@ msgstr "Долучити _відкритий ключ GnuPG"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Екранувати спеціальні символи"
+
+#, c-format
+#~ msgid "Async IMAP cmd %s could not be executed. Reconnecting…"
+#~ msgstr ""
+#~ "Не вдалося виконати асинхронну команду IMAP %s. Встановлюємо з'єднання "
+#~ "повторно…"
+
+#, c-format
+#~ msgid "POP3 error: %s"
+#~ msgstr "Помилка POP3: %s"
 
 #~| msgid "Mail options"
 #~ msgid "HTML options"

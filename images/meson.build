@@ -17,7 +17,10 @@ balsabitmapsdir = join_paths(get_option('datadir'), 'balsa', 'pixmaps')
 install_data(balsa_imgs, install_dir : balsabitmapsdir)
 
 if gtk_update_icon_cache_program.found()
-  gtk_update_icon_cache = gtk_update_icon_cache_program.path()
   icon_cache_dir = join_paths(get_option('prefix'), get_option('datadir'), 'balsa')
-  run_command(gtk_update_icon_cache, '--ignore-theme-index', icon_cache_dir)
-endif
+  result = run_command(gtk_update_icon_cache_program, '--ignore-theme-index', icon_cache_dir,
+                       check : false)
+  if result.returncode() != 0
+    warning(result.stderr())
+  endif # result.returncode() != 0
+endif # gtk_update_icon_cache_program.found()

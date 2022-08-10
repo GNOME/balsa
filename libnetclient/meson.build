@@ -22,7 +22,7 @@ libnetclient_a = static_library('netclient', libnetclient_a_sources,
 if libnetclient_docs
   doxygen = doxygen_program.path()
   dox_path = join_paths(meson.source_root(), meson.current_source_dir(), 'libnetclient.dox')
-  run_command(doxygen, dox_path)
+  run_command(doxygen, dox_path, check : true)
 endif
 
 subdir('test')

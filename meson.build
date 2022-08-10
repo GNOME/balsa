@@ -7,10 +7,11 @@ project('balsa', 'c',
 balsa_version = meson.project_version()
 
 balsa_from_git = run_command('sh', '-c', 'test -d ${MESON_SOURCE_ROOT}/.git',
-                             check: false).returncode() == 0
+                             check : false).returncode() == 0
 
 if balsa_from_git
-  git_describe = run_command('git', 'describe', '--tags')
+  git_describe = run_command('git', 'describe', '--tags',
+                             check : true)
   if git_describe.returncode() == 0
     balsa_version = git_describe.stdout().strip()
   endif
@@ -183,9 +184,9 @@ if html_widget == 'webkit2'
     conf.set_quoted('HTML2TEXT', html2text.path(),
       description : 'Path to html2text program.')
     conftest_htm = join_paths(meson.current_build_dir(), 'conftest.htm')
-    run_command('sh', '-c', 'echo "<html/>" > ' + conftest_htm)
+    run_command('sh', '-c', 'echo "<html/>" > ' + conftest_htm, check : true)
     unicode_snob = run_command(html2text.path(), '--unicode-snob', conftest_htm,
-                               check: false)
+                               check : false)
     if unicode_snob.returncode() == 0
       conf.set('HTML2TEXT_UCOPT', 1,
         description : 'Defined when HTML2TEXT accepts the --unicode-snob option.')
@@ -302,8 +303,8 @@ if gss
   conf.set('HAVE_GSSAPI', 1,
     description : 'Defined when GSSAPI support is to be compiled.')
   krb5_config = krb5_config_program.path()
-  krb5_cflags = run_command(krb5_config, ['--cflags', 'gssapi']).stdout().strip().split()
-  krb5_libs   = run_command(krb5_config, ['--libs',   'gssapi']).stdout().strip().split()
+  krb5_cflags = run_command(krb5_config, ['--cflags', 'gssapi'], check : true).stdout().strip().split()
+  krb5_libs   = run_command(krb5_config, ['--libs',   'gssapi'], check : true).stdout().strip().split()
   if compiler.has_header('gssapi.h')
     conf.set('HAVE_HEIMDAL', 1,
       description : 'Defined for Heimdal.')

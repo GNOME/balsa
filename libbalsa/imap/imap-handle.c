@@ -835,7 +835,7 @@ imap_mbox_handle_set_msg(ImapMboxHandle *handle, const gchar *fmt, ...)
 
 	g_free(handle->last_msg);
     va_start(va_args, fmt);
-    handle->last_msg = g_strdup_vprintf(fmt, va_args);
+    handle->last_msg = g_strstrip(g_strdup_vprintf(fmt, va_args));
     va_end(va_args);
 }
 

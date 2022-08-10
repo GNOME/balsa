@@ -597,7 +597,7 @@ mi_reconnect(ImapMboxHandle *h)
 /* ImapIssue macro handles reconnecting. We might issue a
    LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
    login information... */
-#define II(rc,h,name,line) \
+#define II(rc,h,ctx,name,line) \
    {int trials=2;do{\
     if(imap_mbox_is_disconnected(h) &&mi_reconnect(h)!=IMAP_SUCCESS)\
         {rc=IMR_NO;break;};\
@@ -606,15 +606,21 @@ mi_reconnect(ImapMboxHandle *h)
         break;\
     else if(rc==IMR_SEVERED)                             \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
-    _("IMAP mailbox %s: connection has been severed. Reconnecting…"), name); \
+    /* Translators: #1 context (mailbox, server); #2 mailbox or server name */ \
+    _("IMAP %s %s: connection has been severed. Reconnecting…"), ctx, name); \
     else if(rc==IMR_PROTOCOL)                               \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
-    _("IMAP mailbox %s: protocol error. Try enabling bug workarounds."), name);\
+    /* Translators: #1 context (mailbox, server); #2 mailbox or server name */ \
+    _("IMAP %s %s: protocol error. Try enabling bug workarounds."), ctx, name);\
     else if(rc==IMR_BYE) {char *text = imap_mbox_handle_get_last_msg(h); \
     libbalsa_information(LIBBALSA_INFORMATION_WARNING, \
-    _("IMAP mailbox %s: server has shut down the connection: %s. Reconnecting…"), name, text); \
+    /* Translators: #1 context (mailbox, server); #2 mailbox or server name; #3 error message */ \
+    _("IMAP %s %s: server has shut down the connection: %s. Reconnecting…"), ctx, name, text); \
     g_free(text);}\
     else break;}while(trials-->0);}
+
+/* helper macro for calling II in the context of a mailbox */
+#define II_mbx(rc, h, mbx, line)	II(rc, h, _("mailbox"), libbalsa_mailbox_get_name(mbx), line)
 
 static ImapMboxHandle *
 libbalsa_mailbox_imap_get_handle(LibBalsaMailboxImap *mimap, GError **err)
@@ -733,7 +739,7 @@ mi_get_imsg(LibBalsaMailboxImap *mimap, unsigned msgno)
             ? total_msgs-msgno+1 : MAX_CHUNK_LENGTH;
         for(i=0; i<csd.cnt; i++) csd.msgno_arr[i] = msgno+i;
     }
-    II(rc,mimap->handle,libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mimap)),
+    II_mbx(rc,mimap->handle,LIBBALSA_MAILBOX(mimap),
        imap_mbox_handle_fetch_set(mimap->handle, csd.msgno_arr,
                                   csd.cnt,
                                   IMFETCH_FLAGS |
@@ -1005,7 +1011,7 @@ libbalsa_mailbox_imap_get_selected_handle(LibBalsaMailboxImap *mimap,
         if (!mimap->handle)
             return NULL;
     }
-    II(rc,mimap->handle,libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mimap)),
+    II_mbx(rc,mimap->handle,LIBBALSA_MAILBOX(mimap),
        imap_mbox_select(mimap->handle, mimap->path, &readonly));
     libbalsa_mailbox_set_readonly(LIBBALSA_MAILBOX(mimap), readonly);
     if (rc != IMR_OK) {
@@ -1230,9 +1236,8 @@ get_cache_stream(LibBalsaMailboxImap *mimap, guint uid, gboolean peek)
         cache = fopen(path, "wb");
         if(cache) {
 	    int ferr;
-            II(rc,mimap->handle,libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mimap)),
-               imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, peek,
-						 cache));
+            II_mbx(rc,mimap->handle,LIBBALSA_MAILBOX(mimap),
+               imap_mbox_handle_fetch_rfc822_uid(mimap->handle, uid, peek, cache));
 	    ferr = ferror(cache);
             fclose(cache);
 	    if(ferr || rc != IMR_OK) {
@@ -1407,7 +1412,7 @@ libbalsa_mailbox_imap_message_match(LibBalsaMailbox* mailbox, guint msgno,
 
 	matchings = g_hash_table_new(NULL, NULL);
 	query = lbmi_build_imap_query(search_iter->condition, NULL);
-	II(rc,mimap->handle,libbalsa_mailbox_get_name(mailbox),
+	II_mbx(rc,mimap->handle,mailbox,
            imap_mbox_filter_msgnos(mimap->handle, query, matchings));
 	imap_search_key_free(query);
 	if (rc != IMR_OK) {
@@ -1613,7 +1618,7 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 #else	
         g_warning("Search results ignored. Fixme!");
 #endif
-        II(rc,mbox->handle,libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mbox)),
+        II_mbx(rc,mbox->handle,LIBBALSA_MAILBOX(mbox),
            imap_mbox_uid_search(mbox->handle, query,
                                 (void(*)(unsigned,void*))imap_matched,
                                 cbdata));
@@ -1801,7 +1806,7 @@ libbalsa_imap_rename_subfolder(LibBalsaMailboxImap* imap,
 	return FALSE;
     }
 
-    II(rc,handle,libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(imap)),
+    II_mbx(rc,handle,LIBBALSA_MAILBOX(imap),
        imap_mbox_subscribe(handle, imap->path, FALSE));
     delim[0] = imap_mbox_handle_get_delim(handle, new_parent);
     delim[1] = '\0';
@@ -1837,7 +1842,7 @@ libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
 					     NULL);
     if (!handle) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                    LIBBALSA_MAILBOX_RENAME_ERROR,
+                    LIBBALSA_MAILBOX_CREATE_ERROR,
                     _("Cannot get IMAP handle"));
 	return FALSE;
     }
@@ -1848,7 +1853,7 @@ libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
         new_path = g_build_path(delim, parent, folder, NULL);
     } else
         new_path = g_strdup(folder);
-    II(rc,handle,libbalsa_server_get_host(server),
+    II(rc,handle,_("server"),libbalsa_server_get_host(server),
        imap_mbox_create(handle, new_path));
     if (subscribe && rc == IMR_OK)
 	rc = imap_mbox_subscribe(handle, new_path, TRUE);
@@ -1856,7 +1861,7 @@ libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
     if(rc != IMR_OK) {
         gchar *msg = imap_mbox_handle_get_last_msg(handle);
         g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-                    LIBBALSA_MAILBOX_RENAME_ERROR,
+                    LIBBALSA_MAILBOX_CREATE_ERROR,
                     "%s", msg);
         g_free(msg);
     }
@@ -1880,7 +1885,7 @@ libbalsa_imap_delete_folder(LibBalsaMailboxImap *mailbox, GError **err)
      * the subscription list should be treated as a list of bookmarks,
      * not a list of physically existing mailboxes. */
     imap_mbox_subscribe(handle, mailbox->path, FALSE);
-    II(rc,handle,libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mailbox)),
+    II_mbx(rc,handle,LIBBALSA_MAILBOX(mailbox),
        imap_mbox_delete(handle, mailbox->path));
     if(rc != IMR_OK) {
         gchar *msg = imap_mbox_handle_get_last_msg(handle);
@@ -1922,7 +1927,7 @@ libbalsa_mailbox_imap_sync(LibBalsaMailbox * mailbox, gboolean expunge)
     /* we are always in sync, we need only to do expunge now and then */
     if(expunge) {
         ImapResponse rc;
-        II(rc,mimap->handle,libbalsa_mailbox_get_name(mailbox),
+        II_mbx(rc,mimap->handle,mailbox,
            imap_mbox_expunge(mimap->handle));
         res = (rc == IMR_OK);
     }
@@ -2284,7 +2289,7 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
     if(flags & LB_FETCH_RFC822_HEADERS) ift |= IMFETCH_RFC822HEADERS_SELECTED;
     if(flags & LB_FETCH_STRUCTURE)      ift |= IMFETCH_BODYSTRUCT;
 
-    II(rc, mimap->handle, libbalsa_mailbox_get_name(mailbox),
+    II_mbx(rc, mimap->handle, mailbox,
        imap_mbox_handle_fetch_range(mimap->handle, msgno, msgno, ift));
     if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
         gchar *hdr;
@@ -2321,7 +2326,7 @@ libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
     if (msgno > imap_mbox_handle_get_exists(mimap->handle))
         return;
 
-    II(rc,mimap->handle,libbalsa_mailbox_get_name(mailbox),
+    II_mbx(rc,mimap->handle,mailbox,
        imap_mbox_handle_fetch_range(mimap->handle, msgno, msgno,
                                     IMFETCH_RFC822HEADERS_SELECTED));
     if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
@@ -2521,7 +2526,7 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * message,
         }
         rc = IMR_OK;
         if (dt.body->octets > 0)
-        II(rc,mimap->handle,libbalsa_mailbox_get_name(mailbox),
+        II_mbx(rc,mimap->handle,mailbox,
            imap_mbox_handle_fetch_body(mimap->handle, msgno,
                                        section, FALSE, ifbo, append_str, &dt));
         libbalsa_unlock_mailbox(mailbox);
@@ -3109,12 +3114,12 @@ lbm_imap_messages_change_flags(LibBalsaMailbox * mailbox, GArray * seqno,
        pretty much of a theoretical character but we do not want to
        risk the mail store integrity, do we? */
     if (flag_set)
-        II(rc, handle, libbalsa_mailbox_get_name(mailbox),
+        II_mbx(rc, handle, mailbox,
            imap_mbox_store_flag(handle,
                                 seqno->len, (guint *) seqno->data,
                                 flag_set, TRUE));
     if (rc && flag_clr)
-        II(rc, handle, libbalsa_mailbox_get_name(mailbox),
+        II_mbx(rc, handle, mailbox,
            imap_mbox_store_flag(handle,
                                 seqno->len, (guint *) seqno->data,
                                 flag_clr, FALSE));
@@ -3206,7 +3211,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
     switch(thread_type) {
     case LB_MAILBOX_THREADING_SIMPLE:
     case LB_MAILBOX_THREADING_JWZ:
-        II(rc,mimap->handle,libbalsa_mailbox_get_name(mailbox),
+        II_mbx(rc,mimap->handle,mailbox,
            imap_mbox_thread(mimap->handle, "REFERENCES", filter));
         if(rc == IMR_OK) {
             new_tree =
@@ -3226,7 +3231,7 @@ libbalsa_mailbox_imap_set_threading(LibBalsaMailbox *mailbox,
         /* fall through */
     case LB_MAILBOX_THREADING_FLAT:
         if(filter) {
-            II(rc,mimap->handle,libbalsa_mailbox_get_name(mailbox),
+            II_mbx(rc,mimap->handle,mailbox,
                imap_mbox_sort_filter(mimap->handle,
                                      lbmi_get_imap_sort_key(mailbox),
                                      libbalsa_mailbox_get_view(mailbox)->sort_type ==
@@ -3307,7 +3312,7 @@ libbalsa_mailbox_imap_sort(LibBalsaMailbox *mbox, GArray *array)
         if (libbalsa_mailbox_get_view(mbox)->sort_field != LB_MAILBOX_SORT_NO) {
             ImapResponse rc;
 	    /* Server-side sort of the whole mailbox. */
-            II(rc, LIBBALSA_MAILBOX_IMAP(mbox)->handle, libbalsa_mailbox_get_name(mbox),
+            II_mbx(rc, LIBBALSA_MAILBOX_IMAP(mbox)->handle, mbox,
                imap_mbox_sort_msgno(LIBBALSA_MAILBOX_IMAP(mbox)->handle,
                                     lbmi_get_imap_sort_key(mbox), TRUE,
                                     msgno_arr, len)); /* ignore errors */

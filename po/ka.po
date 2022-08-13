@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-07-17 10:59+0000\n"
-"PO-Revision-Date: 2022-08-13 20:53+0200\n"
+"POT-Creation-Date: 2022-08-13 18:55+0000\n"
+"PO-Revision-Date: 2022-08-13 20:57+0200\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: \n"
 "Language: ka\n"
@@ -417,11 +417,11 @@ msgstr ""
 
 #: ../libbalsa/filter-funcs.c:469
 msgid "And"
-msgstr ""
+msgstr "და"
 
 #: ../libbalsa/filter-funcs.c:472
 msgid "Or"
-msgstr ""
+msgstr "ან"
 
 #: ../libbalsa/folder-scanners.c:507
 #, c-format
@@ -1641,65 +1641,74 @@ msgstr ""
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
-#: ../libbalsa/mailbox_imap.c:609
-msgid "IMAP connection has been severed. Reconnecting…"
-msgstr ""
-
-#: ../libbalsa/mailbox_imap.c:612
-msgid "IMAP protocol error. Try enabling bug workarounds."
-msgstr ""
-
-#: ../libbalsa/mailbox_imap.c:615
+#. Translators: #1 context (mailbox, server); #2 mailbox or server name
+#: ../libbalsa/mailbox_imap.c:610
 #, c-format
-msgid "IMAP server has shut the connection: %s Reconnecting…"
+msgid "IMAP %s %s: connection has been severed. Reconnecting…"
 msgstr ""
 
-#: ../libbalsa/mailbox_imap.c:627
+#. Translators: #1 context (mailbox, server); #2 mailbox or server name
+#: ../libbalsa/mailbox_imap.c:614
 #, c-format
-msgid "Async IMAP cmd %s could not be executed. Reconnecting…"
+msgid "IMAP %s %s: protocol error. Try enabling bug workarounds."
 msgstr ""
 
-#: ../libbalsa/mailbox_imap.c:1238
+#. Translators: #1 context (mailbox, server); #2 mailbox or server name; #3 error message
+#: ../libbalsa/mailbox_imap.c:618
+#, c-format
+msgid "IMAP %s %s: server has shut down the connection: %s. Reconnecting…"
+msgstr ""
+
+#. helper macro for calling II in the context of a mailbox
+#: ../libbalsa/mailbox_imap.c:623
+msgid "mailbox"
+msgstr ""
+
+#: ../libbalsa/mailbox_imap.c:1233
 #, c-format
 msgid "Downloading %ld kB"
 msgstr ""
 
-#: ../libbalsa/mailbox_imap.c:1704
+#: ../libbalsa/mailbox_imap.c:1698
 #, c-format
 msgid "No path found for mailbox “%s”, using “%s”"
 msgstr ""
 
-#: ../libbalsa/mailbox_imap.c:1811 ../libbalsa/mailbox_imap.c:1852
+#: ../libbalsa/mailbox_imap.c:1805 ../libbalsa/mailbox_imap.c:1846
 #, c-format
 msgid "Cannot get IMAP handle"
 msgstr ""
 
-#: ../libbalsa/mailbox_imap.c:2481 ../libbalsa/mailbox_imap.c:2544
+#: ../libbalsa/mailbox_imap.c:1856
+msgid "server"
+msgstr "სერვერი"
+
+#: ../libbalsa/mailbox_imap.c:2475 ../libbalsa/mailbox_imap.c:2538
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr ""
 
-#: ../libbalsa/mailbox_imap.c:2516
+#: ../libbalsa/mailbox_imap.c:2510
 #, c-format
 msgid "Downloading %u kB"
 msgstr ""
 
-#: ../libbalsa/mailbox_imap.c:2557
+#: ../libbalsa/mailbox_imap.c:2551
 #, c-format
 msgid "Cannot create temporary file"
 msgstr ""
 
-#: ../libbalsa/mailbox_imap.c:2581
+#: ../libbalsa/mailbox_imap.c:2575
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr ""
 
-#: ../libbalsa/mailbox_imap.c:2808 ../libbalsa/mailbox_imap.c:2925
+#: ../libbalsa/mailbox_imap.c:2802 ../libbalsa/mailbox_imap.c:2919
 #, c-format
 msgid "Uploading %ld kB"
 msgstr ""
 
-#: ../libbalsa/mailbox_imap.c:3234
+#: ../libbalsa/mailbox_imap.c:3228
 msgid "Server-side threading not supported."
 msgstr ""
 
@@ -1907,7 +1916,7 @@ msgid "Cannot load certificate file %s: %s"
 msgstr ""
 
 #. connect server
-#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1023
+#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1024
 #, c-format
 msgid "Connecting %s…"
 msgstr ""
@@ -1922,17 +1931,17 @@ msgstr ""
 msgid "List messages…"
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:527
+#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:701
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr ""
 
 #: ../libbalsa/mailbox_pop3.c:574
 #, c-format
-msgid "POP3 message %d oversized: %s — skipped."
+msgid "POP3 mailbox %s: message %d oversized: %s — skipped."
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1033
+#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1034
 #, c-format
 msgid "Connected to %s"
 msgstr "მიერთებულია %s-თან"
@@ -1948,12 +1957,7 @@ msgstr[1] ""
 msgid "Deleting messages on server…"
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:701
-#, c-format
-msgid "POP3 error: %s"
-msgstr ""
-
-#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1114
+#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1115
 msgid "Finished"
 msgstr "დასრულებულია"
 
@@ -2647,42 +2651,42 @@ msgstr ""
 msgid "Saving sent message to %s failed: %s"
 msgstr ""
 
-#: ../libbalsa/send.c:986
+#: ../libbalsa/send.c:987
 #, c-format
 msgid ""
-"Sending message failed: %s\n"
+"Sending message to SMTP server %s failed: %s\n"
 "Message left in your outbox."
 msgstr ""
 
-#: ../libbalsa/send.c:1098
+#: ../libbalsa/send.c:1099
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr ""
 
-#: ../libbalsa/send.c:1117
+#: ../libbalsa/send.c:1118
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/send.c:1268 ../libbalsa/send.c:1336
+#: ../libbalsa/send.c:1269 ../libbalsa/send.c:1337
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr ""
 
-#: ../libbalsa/send.c:1271 ../libbalsa/send.c:1339
+#: ../libbalsa/send.c:1272 ../libbalsa/send.c:1340
 #, c-format
 msgid "Cannot read %s"
 msgstr ""
 
-#: ../libbalsa/send.c:1303
+#: ../libbalsa/send.c:1304
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
 msgstr ""
 
-#: ../libbalsa/send.c:1837 ../libbalsa/send.c:1935
+#: ../libbalsa/send.c:1838 ../libbalsa/send.c:1936
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] ""
@@ -6828,15 +6832,15 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:5565
 msgid "Message could not be sent"
-msgstr ""
+msgstr "შეტყობინების გაგზავნა შეუძლებელია"
 
 #: ../src/sendmsg-window.c:5567
 msgid "Message could not be signed"
-msgstr ""
+msgstr "შეტყობინებაზე ხელის მოწერა შეუძლებელია"
 
 #: ../src/sendmsg-window.c:5569
 msgid "Message could not be encrypted"
-msgstr ""
+msgstr "შეტყობინების დაშიფვრა შეუძლებელია"
 
 #: ../src/sendmsg-window.c:5574
 #, c-format
@@ -6844,11 +6848,13 @@ msgid ""
 "Send failed: %s\n"
 "%s"
 msgstr ""
+"გაგზავნის შეცდომა: %s\n"
+"%s"
 
 #: ../src/sendmsg-window.c:5580
 #, c-format
 msgid "Send failed: %s"
-msgstr ""
+msgstr "გაგზავნის შეცდომა: %s"
 
 #: ../src/sendmsg-window.c:5671
 #, c-format
@@ -6889,7 +6895,7 @@ msgstr "ე_ნა"
 
 #: ../src/spell-check.c:224
 msgid "Spell check"
-msgstr ""
+msgstr "მართლწერის შემოწმება"
 
 #: ../src/spell-check.c:352
 msgid "C_hange"
@@ -6926,7 +6932,7 @@ msgstr ""
 
 #: ../src/spell-check.c:382
 msgid "_Learn"
-msgstr ""
+msgstr "_სწავლა"
 
 #: ../src/spell-check.c:384
 msgid "Add the current word to your personal dictionary"
@@ -6983,19 +6989,19 @@ msgstr ""
 
 #: ../src/store-address.c:339
 msgid "From: "
-msgstr ""
+msgstr "ვისგან: "
 
 #: ../src/store-address.c:340
 msgid "To: "
-msgstr ""
+msgstr "ვის: "
 
 #: ../src/store-address.c:341
 msgid "CC: "
-msgstr ""
+msgstr "ასლი: "
 
 #: ../src/store-address.c:342
 msgid "BCC: "
-msgstr ""
+msgstr "ფარულიასლი: "
 
 #: ../src/toolbar-factory.c:115
 msgid "Separator"
@@ -7026,6 +7032,8 @@ msgid ""
 "Reply\n"
 "to all"
 msgstr ""
+"ყველასთვის\n"
+"პასუხი"
 
 #: ../src/toolbar-factory.c:122
 msgid ""
@@ -7104,7 +7112,7 @@ msgstr "მიმაგრება"
 
 #: ../src/toolbar-factory.c:139
 msgid "Save"
-msgstr ""
+msgstr "შენახვა"
 
 #: ../src/toolbar-factory.c:140
 msgid "Identity"

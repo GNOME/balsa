@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-07-17 12:58+0200\n"
-"PO-Revision-Date: 2022-07-17 12:59+0200\n"
+"POT-Creation-Date: 2022-08-14 15:49+0200\n"
+"PO-Revision-Date: 2022-08-14 15:50+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -1742,67 +1742,74 @@ msgstr "*** BŁĄD: zamknięto strumień skrzynki: %s ***\n"
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
-#: ../libbalsa/mailbox_imap.c:609
-msgid "IMAP connection has been severed. Reconnecting…"
-msgstr "Połączenie IMAP zostało zerwane. Łączenie ponownie…"
-
-#: ../libbalsa/mailbox_imap.c:612
-msgid "IMAP protocol error. Try enabling bug workarounds."
-msgstr "Błąd protokołu IMAP. Proszę spróbować włączyć obejścia błędów."
-
-#: ../libbalsa/mailbox_imap.c:615
+#. Translators: #1 context (mailbox, server); #2 mailbox or server name
+#: ../libbalsa/mailbox_imap.c:610
 #, c-format
-msgid "IMAP server has shut the connection: %s Reconnecting…"
-msgstr "Serwer IMAP zamknął połączenie: %s. Łączenie ponownie…"
+msgid "IMAP %s %s: connection has been severed. Reconnecting…"
+msgstr "IMAP %s %s: połączenie zostało zerwane. Łączenie ponownie…"
 
-#: ../libbalsa/mailbox_imap.c:627
+#. Translators: #1 context (mailbox, server); #2 mailbox or server name
+#: ../libbalsa/mailbox_imap.c:614
 #, c-format
-msgid "Async IMAP cmd %s could not be executed. Reconnecting…"
-msgstr ""
-"Nie można wykonać asynchronicznego polecenia %s protokołu IMAP. Łączenie "
-"ponownie…"
+msgid "IMAP %s %s: protocol error. Try enabling bug workarounds."
+msgstr "IMAP %s %s: błąd protokołu. Proszę spróbować włączyć obejścia błędów."
 
-#: ../libbalsa/mailbox_imap.c:1238
+#. Translators: #1 context (mailbox, server); #2 mailbox or server name; #3 error message
+#: ../libbalsa/mailbox_imap.c:618
+#, c-format
+msgid "IMAP %s %s: server has shut down the connection: %s. Reconnecting…"
+msgstr "IMAP %s %s: serwer zamknął połączenie: %s. Łączenie ponownie…"
+
+#. helper macro for calling II in the context of a mailbox
+#: ../libbalsa/mailbox_imap.c:623
+msgid "mailbox"
+msgstr "skrzynka"
+
+#: ../libbalsa/mailbox_imap.c:1233
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Pobieranie %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:1704
+#: ../libbalsa/mailbox_imap.c:1698
 #, c-format
 msgid "No path found for mailbox “%s”, using “%s”"
 msgstr "Nie odnaleziono ścieżki do skrzynki „%s”, używającej „%s”"
 
-#: ../libbalsa/mailbox_imap.c:1811 ../libbalsa/mailbox_imap.c:1852
+#: ../libbalsa/mailbox_imap.c:1805 ../libbalsa/mailbox_imap.c:1846
 #, c-format
 msgid "Cannot get IMAP handle"
 msgstr "Nie można pobrać modułu obsługującego IMAP"
 
-#: ../libbalsa/mailbox_imap.c:2481 ../libbalsa/mailbox_imap.c:2544
+#: ../libbalsa/mailbox_imap.c:1856
+msgid "server"
+msgstr "serwer"
+
+#: ../libbalsa/mailbox_imap.c:2475 ../libbalsa/mailbox_imap.c:2538
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr "Błąd podczas pobierania wiadomości z serwera IMAP: %s"
 
-#: ../libbalsa/mailbox_imap.c:2516
+#: ../libbalsa/mailbox_imap.c:2510
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Pobieranie %u kB"
 
-#: ../libbalsa/mailbox_imap.c:2557
+#: ../libbalsa/mailbox_imap.c:2551
 #, c-format
 msgid "Cannot create temporary file"
 msgstr "Nie można utworzyć pliku tymczasowego"
 
-#: ../libbalsa/mailbox_imap.c:2581
+#: ../libbalsa/mailbox_imap.c:2575
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Nie można zapisać do pliku tymczasowego %s"
 
-#: ../libbalsa/mailbox_imap.c:2808 ../libbalsa/mailbox_imap.c:2925
+#: ../libbalsa/mailbox_imap.c:2802 ../libbalsa/mailbox_imap.c:2919
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Wysyłanie %ld kB"
 
-#: ../libbalsa/mailbox_imap.c:3234
+#: ../libbalsa/mailbox_imap.c:3228
 msgid "Server-side threading not supported."
 msgstr "Wątki po stronie serwera nie są obsługiwane."
 
@@ -2016,7 +2023,7 @@ msgid "Cannot load certificate file %s: %s"
 msgstr "Nie można wczytać pliku certyfikatu %s: %s"
 
 #. connect server
-#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1023
+#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1024
 #, c-format
 msgid "Connecting %s…"
 msgstr "Łączenie z %s…"
@@ -2031,17 +2038,17 @@ msgstr "Skrzynka POP3 %s: nie można połączyć z %s: %s"
 msgid "List messages…"
 msgstr "Wyświetl listę wiadomości…"
 
-#: ../libbalsa/mailbox_pop3.c:527
+#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:701
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr "Błąd skrzynki POP3 %s: %s"
 
 #: ../libbalsa/mailbox_pop3.c:574
 #, c-format
-msgid "POP3 message %d oversized: %s — skipped."
-msgstr "Wiadomość POP3 %d przekroczyła rozmiar: %s — pominięto."
+msgid "POP3 mailbox %s: message %d oversized: %s — skipped."
+msgstr "Skrzynka %s POP3: wiadomość %d przekroczyła rozmiar: %s — pominięto."
 
-#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1033
+#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1034
 #, c-format
 msgid "Connected to %s"
 msgstr "Połączono z %s"
@@ -2058,12 +2065,7 @@ msgstr[2] "%lu nowych wiadomości (%s)"
 msgid "Deleting messages on server…"
 msgstr "Usuwanie wiadomości na serwerze…"
 
-#: ../libbalsa/mailbox_pop3.c:701
-#, c-format
-msgid "POP3 error: %s"
-msgstr "Błąd POP3: %s"
-
-#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1114
+#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1115
 msgid "Finished"
 msgstr "Ukończono"
 
@@ -2771,21 +2773,21 @@ msgstr "Zapisz wiadomość w %s…"
 msgid "Saving sent message to %s failed: %s"
 msgstr "Zapisanie wysłanej wiadomości do %s się nie powiodło: %s"
 
-#: ../libbalsa/send.c:986
+#: ../libbalsa/send.c:987
 #, c-format
 msgid ""
-"Sending message failed: %s\n"
+"Sending message to SMTP server %s failed: %s\n"
 "Message left in your outbox."
 msgstr ""
-"Wysłanie wiadomości się nie powiodło: %s\n"
+"Wysłanie wiadomości do serwera SMTP %s się nie powiodło: %s\n"
 "Wiadomość pozostała w skrzynce wychodzącej."
 
-#: ../libbalsa/send.c:1098
+#: ../libbalsa/send.c:1099
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr "Połączenie z serwerem SMTP %s (%s) się nie powiodło: %s"
 
-#: ../libbalsa/send.c:1117
+#: ../libbalsa/send.c:1118
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
@@ -2793,17 +2795,17 @@ msgstr[0] "Przesłano %u wiadomość do %s"
 msgstr[1] "Przesłano %u wiadomości do %s"
 msgstr[2] "Przesłano %u wiadomości do %s"
 
-#: ../libbalsa/send.c:1268 ../libbalsa/send.c:1336
+#: ../libbalsa/send.c:1269 ../libbalsa/send.c:1337
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Nie można odczytać %s: %s"
 
-#: ../libbalsa/send.c:1271 ../libbalsa/send.c:1339
+#: ../libbalsa/send.c:1272 ../libbalsa/send.c:1340
 #, c-format
 msgid "Cannot read %s"
 msgstr "Nie można odczytać %s"
 
-#: ../libbalsa/send.c:1303
+#: ../libbalsa/send.c:1304
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2811,7 +2813,7 @@ msgstr ""
 "Nie można ustalić zestawu znaków dla pliku tekstowego „%s”, wysyłanie jako "
 "typ MIME „%s”"
 
-#: ../libbalsa/send.c:1837 ../libbalsa/send.c:1935
+#: ../libbalsa/send.c:1838 ../libbalsa/send.c:1936
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Ta wiadomość nie zostanie zaszyfrowana dla odbiorcy z pola „UDW:”."

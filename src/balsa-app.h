@@ -167,14 +167,15 @@ extern struct BalsaApplication {
     gint check_mail_timer;
     gint check_mail_timer_id;
 
-    /* This can be configured from the gnome control panel */
-    /* It's here just in case some other app also uses the same */
-    /* system wide sound event and you want Balsa to behave differently */
-    /* There is no prefs setting for this item */
+#ifdef HAVE_CANBERRA
     gint notify_new_mail_sound;
+#endif
     
     gint notify_new_mail_dialog;
-    gint notify_new_mail_icon;
+
+#ifdef ENABLE_SYSTRAY
+    gint enable_systray_icon;
+#endif
 
     /* automatically close mailboxes after XX minutes */
     gboolean close_mailbox_auto;

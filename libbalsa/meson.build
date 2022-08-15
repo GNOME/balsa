@@ -128,6 +128,8 @@ libbalsa_a_sources = [
   'smtp-server.c',
   'smtp-server.h',
   'source-viewer.c',
+  'system-tray.c',
+  'system-tray.h',
   'url.c',
   'url.h',
   'geometry-manager.c',

@@ -10,6 +10,7 @@ balsa_imgs = [
   'attachment.png',
   'balsa-top.png',
   'balsa_icon.png',
+  'balsa_attention.png',
   'balsa_logo.png'
   ]
 

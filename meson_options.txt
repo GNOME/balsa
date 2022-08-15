@@ -16,7 +16,12 @@ option('fcntl',
 option('autocrypt',
   type        : 'boolean',
   value       : false,
-  description : 'build with Autocrypt support (see https://autocrypt.org/), (default=false), requires gpgme and sqlite3')
+  description : 'build with Autocrypt support (see https://autocrypt.org/), (default=false), requires sqlite3')
+
+option('systray',
+  type        : 'boolean',
+  value       : false,
+  description : 'enable System Tray Icon support, (default=false), requires libxapp')
 
 option('canberra',
   type        : 'boolean',

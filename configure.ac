@@ -65,9 +65,14 @@ AC_ARG_ENABLE([autocrypt],
                   [build with Autocrypt support (see https://autocrypt.org/), default=no, requires sqlite3)]),
                   [autocrypt=$enableval], [autocrypt=no])
 
+AC_ARG_ENABLE([systray],
+   AC_HELP_STRING([--enable-systray],
+                  [enable System Tray Icon support, default=no, requires libxapp]),
+                  [systray=$enableval], [systray=no])
+
 AC_ARG_WITH(canberra,
    AC_HELP_STRING([--with-canberra],
-                  [Use libcanberra-gtk3 for filter sounds (default=no)]),
+                  [Use libcanberra-gtk3 for new messages and filter sounds (default=no)]),
                   [with_canberra=$withval],[with_canberra=no])
 
 AC_ARG_WITH(compface,
@@ -317,6 +322,18 @@ if test x"$autocrypt" != xno ; then
 	AC_DEFINE(ENABLE_AUTOCRYPT,1,[If defined, enable Autocrypt support])
 	BALSA_CFLAGS="$BALSA_CFLAGS $AUTOCRYPT_CFLAGS"
 	BALSA_LIBS="$BALSA_LIBS $AUTOCRYPT_LIBS"
+else
+	AC_MSG_RESULT([no])
+fi
+
+# System Tray icon support via libxapp
+AC_MSG_CHECKING(whether to build with System Tray Icon support)
+if test x"$systray" != xno ; then
+	AC_MSG_RESULT([yes])
+	PKG_CHECK_MODULES(SYSTRAY, [xapp])
+	AC_DEFINE(ENABLE_SYSTRAY,1,[If defined, enable System Tray Icon support])
+	BALSA_CFLAGS="$BALSA_CFLAGS $SYSTRAY_CFLAGS"
+	BALSA_LIBS="$BALSA_LIBS $SYSTRAY_LIBS"
 else
 	AC_MSG_RESULT([no])
 fi
@@ -653,6 +670,7 @@ echo "               HTML widget: $use_html_widget"
 echo "                 Use GNOME: $with_gnome"
 echo "              Use Canberra: $with_canberra"
 echo "             Use Autocrypt: $autocrypt"
+echo "          System Tray Icon: $systray"
 echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"

@@ -14,14 +14,20 @@ balsa_imgs = [
   'balsa_logo.png'
   ]
 
-balsabitmapsdir = join_paths(get_option('datadir'), 'balsa', 'pixmaps')
-install_data(balsa_imgs, install_dir : balsabitmapsdir)
+balsa_bitmaps_dir = join_paths(get_option('datadir'), 'balsa', 'pixmaps')
+install_data(balsa_imgs, install_dir : balsa_bitmaps_dir)
 
+gtk_update_icon_cache_program = find_program('gtk-update-icon-cache')
 if gtk_update_icon_cache_program.found()
   icon_cache_dir = join_paths(get_option('prefix'), get_option('datadir'), 'balsa')
-  result = run_command(gtk_update_icon_cache_program, '--ignore-theme-index', icon_cache_dir,
-                       check : false)
-  if result.returncode() != 0
-    warning(result.stderr())
-  endif # result.returncode() != 0
+  if meson.version().version_compare('>=0.55')
+    meson.add_install_script(gtk_update_icon_cache_program, '--ignore-theme-index', icon_cache_dir)
+  else # meson.version().version_compare('>=0.55')
+    gtk_update_icon_cache_script = join_paths(meson.current_build_dir(), 'gtk-update-icon-cache.sh')
+    run_command('sh', '-c', 'echo "#!/bin/sh" > ' + gtk_update_icon_cache_script,
+                check : false)
+    run_command('sh', '-c', 'echo "gtk-update-icon-cache $1 $2" >> ' + gtk_update_icon_cache_script,
+                check : false)
+    meson.add_install_script(gtk_update_icon_cache_script, '--ignore-theme-index', icon_cache_dir)
+  endif # meson.version().version_compare('>=0.55')
 endif # gtk_update_icon_cache_program.found()

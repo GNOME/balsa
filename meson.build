@@ -492,8 +492,6 @@ endif # balsa_from_git
 balsa_data_prefix = join_paths(get_option('prefix'), get_option('datadir'), 'balsa')
 add_global_arguments('-DBALSA_DATA_PREFIX="' + balsa_data_prefix + '"', language : 'c')
 
-gtk_update_icon_cache_program = find_program('gtk-update-icon-cache')
-
 ###########################################################################
 # Documentation and Testing requirements for libnetclient
 ###########################################################################

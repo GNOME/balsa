@@ -47,22 +47,22 @@ if libnetclient_test
   vg_path    = join_paths(build_path, 'vg')
   supp_path  = join_paths(source_path, 'valgrind.supp')
   tests_path = join_paths(build_path, 'tests')
-  run_command(valgrind, [valgr_flags,
-                         '--suppressions=' + supp_path,
-                         '--log-file=' + vg_path,
-                         tests_path],
+  run_command(valgrind_program, [valgr_flags,
+                                 '--suppressions=' + supp_path,
+                                 '--log-file=' + vg_path,
+                                 tests_path],
               check : true)
 
   # lcov
   # Note: the following hack is needed so lcov recognises the paths of the sources...
   libsrcdir = join_paths(source_path, '..')
   lcov_out_path = join_paths(build_path, 'tests.covi')
-  run_command(lcov, ['-c', '-b', libsrcdir, '-d', source_path, '--no-external', '-o', lcov_out_path],
+  run_command(lcov_program, ['-c', '-b', libsrcdir, '-d', source_path, '--no-external', '-o', lcov_out_path],
               check : true)
-  run_command(lcov, ['-r', lcov_out_path, 'tests.c', '-o', lcov_out_path], check : true)
+  run_command(lcov_program, ['-r', lcov_out_path, 'tests.c', '-o', lcov_out_path], check : true)
 
   # genhtml
   html_out_path = join_paths(build_path, 'gcov')
-  run_command(genhtml, [genhtml_flags, '-o', html_out_path, lcov_out_path], check : true)
+  run_command(genhtml_program, [genhtml_flags, '-o', html_out_path, lcov_out_path], check : true)
 
 endif # libnetclient_test

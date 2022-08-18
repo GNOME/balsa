@@ -182,11 +182,16 @@ if html_widget == 'webkit2'
                            'html2text',
                            required : false)
   if html2text.found()
-    conf.set_quoted('HTML2TEXT', html2text.path(),
+    if meson.version().version_compare('>=0.55')
+      html2text_path = html2text.full_path()
+    else # meson.version().version_compare('>=0.55')
+      html2text_path = html2text.path()
+    endif # meson.version().version_compare('>=0.55')
+    conf.set_quoted('HTML2TEXT', html2text_path,
       description : 'Path to html2text program.')
     conftest_htm = join_paths(meson.current_build_dir(), 'conftest.htm')
     run_command('sh', '-c', 'echo "<html/>" > ' + conftest_htm, check : true)
-    unicode_snob = run_command(html2text.path(), '--unicode-snob', conftest_htm,
+    unicode_snob = run_command(html2text, '--unicode-snob', conftest_htm,
                                check : false)
     if unicode_snob.returncode() == 0
       conf.set('HTML2TEXT_UCOPT', 1,
@@ -297,16 +302,15 @@ endif # osmo
 # KRB5/GSSAPI configuration.
 #
 if gss
-  krb5_config_program = find_program('krb5-config',
-                                     '/usr/kerberos/bin/krb5-config',
-                                     '/usr/lib/mit/bin/krb5-config',
-                                     required : false)
-  if not krb5_config_program.found()
+  krb5_config = find_program('krb5-config',
+                             '/usr/kerberos/bin/krb5-config',
+                             '/usr/lib/mit/bin/krb5-config',
+                             required : false)
+  if not krb5_config.found()
     error('GSS requested but krb5-config not found. Install krb5-devel/heimdal-devel')
   endif
   conf.set('HAVE_GSSAPI', 1,
     description : 'Defined when GSSAPI support is to be compiled.')
-  krb5_config = krb5_config_program.path()
   krb5_cflags = run_command(krb5_config, ['--cflags', 'gssapi'], check : true).stdout().strip().split()
   krb5_libs   = run_command(krb5_config, ['--libs',   'gssapi'], check : true).stdout().strip().split()
   if compiler.has_header('gssapi.h')
@@ -524,13 +528,6 @@ if libnetclient_test
     error('*** Cannot run libnetclient tests, see libnetclient/README for fixing this issue ***')
   endif
 
-  valgrind    = valgrind_program.path()
-  lcov        = lcov_program.path()
-  genhtml     = genhtml_program.path()
-  screen      = screen_program.path()
-  gnutls_serv = gnutls_serv_program.path()
-  sudo        = sudo_program.path()
-  inetsim     = inetsim_program.path()
 endif # libnetclient_test
 
 #####################################################################

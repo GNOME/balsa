@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-08-15 18:17+0000\n"
-"PO-Revision-Date: 2022-08-16 20:55+0300\n"
+"POT-Creation-Date: 2022-08-21 11:04+0000\n"
+"PO-Revision-Date: 2022-08-21 16:56+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -62,7 +62,7 @@ msgid "and the proverbial much, much more."
 msgstr "а також багато-багато чого іншого."
 
 #: ../org.desktop.Balsa.desktop.in.in.h:1
-#: ../balsa-mailto-handler.desktop.in.in.h:1
+#: ../balsa-mailto-handler.desktop.in.in.h:1 ../libbalsa/system-tray.c:102
 msgid "Balsa"
 msgstr "Balsa"
 
@@ -1141,13 +1141,11 @@ msgstr "Помилкові дані X-Face"
 
 #: ../libbalsa/libbalsa.c:714
 #, c-format
-#| msgid "Cannot read the file “%s”: %s"
 msgid "Cannot play sound event “%s”: %s"
 msgstr "Не вдалося відтворити озвучену подію «%s»: %s"
 
 #: ../libbalsa/libbalsa.c:730
 #, c-format
-#| msgid "Cannot read the file “%s”: %s"
 msgid "Cannot play sound file “%s”: %s"
 msgstr "Не вдалося відтворити файл звукових даних «%s»: %s"
 
@@ -3006,6 +3004,11 @@ msgstr "Джерело повідомлення"
 #, c-format
 msgid "Error adding from %s: %s\n"
 msgstr "Помилка додавання з %s: %s\n"
+
+#: ../libbalsa/system-tray.c:99
+#| msgid "You have new mail."
+msgid "Balsa: you have new mail"
+msgstr "Bals: ви отримали нову пошту"
 
 #: ../libbalsa/x509-cert-widget.c:134
 msgid "Broken key, cannot identify certificate chain."

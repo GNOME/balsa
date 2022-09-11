@@ -17,6 +17,7 @@
 
 
 #include "net-client.h"
+#include "net-client-utils.h"
 
 
 G_BEGIN_DECLS
@@ -41,37 +42,6 @@ enum _NetClientPopError {
 	NET_CLIENT_ERROR_POP_NO_STARTTLS,		/**< The server does not support STARTTLS. */
 	NET_CLIENT_ERROR_POP_AUTHFAIL			/**< Authentication failure. */
 };
-
-
-/** @name POP authentication methods
- *
- * Note that the availability of these authentication methods depends upon the result of the CAPABILITY list.  According to RFC
- * 1939, Section 4, at least either APOP or USER/PASS @em must be supported.
- * @{
- */
-/** RFC 1939 "USER" and "PASS" authentication method. */
-#define NET_CLIENT_POP_AUTH_USER_PASS		0x01U
-/** RFC 1939 "APOP" authentication method. */
-#define NET_CLIENT_POP_AUTH_APOP			0x02U
-/** RFC 5034 SASL "LOGIN" authentication method. */
-#define NET_CLIENT_POP_AUTH_LOGIN			0x04U
-/** RFC 5034 SASL "PLAIN" authentication method. */
-#define NET_CLIENT_POP_AUTH_PLAIN			0x08U
-/** RFC 5034 SASL "CRAM-MD5" authentication method. */
-#define NET_CLIENT_POP_AUTH_CRAM_MD5		0x10U
-/** RFC 5034 SASL "CRAM-SHA1" authentication method. */
-#define NET_CLIENT_POP_AUTH_CRAM_SHA1		0x20U
-/** RFC 4752 "GSSAPI" authentication method. */
-#define NET_CLIENT_POP_AUTH_GSSAPI			0x40U
-/** Mask of all safe authentication methods, i.e. all methods which do not send the cleartext password. */
-#define NET_CLIENT_POP_AUTH_SAFE			\
-	(NET_CLIENT_POP_AUTH_APOP + NET_CLIENT_POP_AUTH_CRAM_MD5 + NET_CLIENT_POP_AUTH_CRAM_SHA1 + NET_CLIENT_POP_AUTH_GSSAPI)
-/** Mask of all authentication methods. */
-#define NET_CLIENT_POP_AUTH_ALL				\
-	(NET_CLIENT_POP_AUTH_USER_PASS + NET_CLIENT_POP_AUTH_PLAIN + NET_CLIENT_POP_AUTH_LOGIN + NET_CLIENT_POP_AUTH_SAFE)
-/** Mask of all authentication methods which do not require a password. */
-#define NET_CLIENT_POP_AUTH_NO_PWD			NET_CLIENT_POP_AUTH_GSSAPI
-/** @} */
 
 
 /** @brief Message information
@@ -115,6 +85,21 @@ typedef gboolean (*NetClientPopMsgCb)(const gchar *buffer, gssize count, gsize l
 									  gpointer user_data, GError **error);
 
 
+/** @brief Probe a POP3 server
+ *
+ * @param host host name or IP address of the server to probe
+ * @param timeout_secs time-out in seconds
+ * @param result filled with the probe results
+ * @param cert_cb optional server certificate acceptance callback
+ * @param error filled with error information if probing fails
+ * @return TRUE if probing the passed server was successful, FALSE if not
+ *
+ * Probe the passed server by trying to connect to the standard ports (in this order) 995 and 110.
+ */
+gboolean net_client_pop_probe(const gchar *host, guint timeout_secs, NetClientProbeResult *result, GCallback cert_cb,
+	GError **error);
+
+
 /** @brief Create a new POP network client
  *
  * @param host host name or IP address to connect
@@ -129,16 +114,17 @@ NetClientPop *net_client_pop_new(const gchar *host, guint16 port, NetClientCrypt
 /** @brief Set allowed POP AUTH methods
  *
  * @param client POP network client object
- * @param encrypted set allowed methods for encrypted or unencrypted connections
- * @param allow_auth mask of allowed authentication methods
- * @return TRUE on success or FALSE on error
+ * @param auth_mode mask of allowed authentication methods
+ * @param disable_apop TRUE to disable APOP authentication which is not supported by some broken servers
+ * @return TRUE on success or FALSE on error or if no authentication method is allowed
  *
- * Set the allowed authentication methods for the passed connection.  The default is @ref NET_CLIENT_POP_AUTH_ALL for both encrypted
- * and unencrypted connections.
+ * Set the allowed authentication methods for the passed connection.  The default is to enable all authentication methods.
  *
- * @note Call this function @em before calling net_client_pop_connect().
+ * @note Call this function @em before calling net_client_pop_connect().\n
+ *       POP3 does not allow anonymous access without authentication, i.e. the flag @ref NET_CLIENT_AUTH_ANONYMOUS in the argument
+ *       is ignored.
  */
-gboolean net_client_pop_allow_auth(NetClientPop *client, gboolean encrypted, guint allow_auth);
+gboolean net_client_pop_set_auth_mode(NetClientPop *client, NetClientAuthMode auth_mode, gboolean disable_apop);
 
 
 /** @brief Connect a POP network client
@@ -151,9 +137,10 @@ gboolean net_client_pop_allow_auth(NetClientPop *client, gboolean encrypted, gui
  * Connect the remote POP server, initialise the encryption if requested, and emit the @ref auth signal to request authentication
  * information.  Simply ignore the signal for an unauthenticated connection.
  *
- * The function will try only @em one authentication method supported by the server and enabled for the current encryption state
- * (see net_client_pop_allow_auth() and \ref NET_CLIENT_POP_AUTH_ALL etc.).  The priority is, from highest to lowest, GSSAPI (if
- * configured), CRAM-SHA1, CRAM-MD5, APOP, PLAIN, USER/PASS or LOGIN.
+ * The function will try only @em one authentication method which is both supported by the server and enabled by calling
+ * net_client_pop_set_auth_mode().  The precedence is: ANONYMOUS, GSSAPI (Kerberos), user name and password.  For the latter, the
+ * order is CRAM-SHA1, CRAM-MD5, APOP, PLAIN, LOGIN or USER/PASS.  It is up to the caller to ensure encryption or a connection to
+ * @c localhost if one of the plain text methods shall be used.
  *
  * In order to shut down a successfully established connection, just call <tt>g_object_unref()</tt> on the POP network client
  * object.
@@ -240,10 +227,10 @@ void net_client_pop_msg_info_free(NetClientPopMessageInfo *info);
  * - the <i>STAT</i>, <i>LIST</i>, <i>RETR</i> and <i>DELE</i> commands as defined in RFC 1939;
  * - support for <i>PIPELINING</i> and <i>UIDL</i> as defined by <a href="https://tools.ietf.org/html/rfc2449">RFC 2449</a>;
  * - <i>STLS</i> encryption as defined by <a href="https://tools.ietf.org/html/rfc2595">RFC 2595</a>;
- * - authentication using <i>APOP</i>, <i>USER/PASS</i> (both RFC 1939) or the SASL methods <i>PLAIN</i>, <i>LOGIN</i>,
- *   <i>CRAM-MD5</i>, <i>CRAM-SHA1</i> or <i>GSSAPI</i> (see <a href="https://tools.ietf.org/html/rfc4752">RFC 4752</a> and
- *   <a href="https://tools.ietf.org/html/rfc5034">RFC 5034</a>), depending upon the capabilities reported by the server.  Note the
- *   <i>GSSAPI</i> is available only if configured with gssapi support.
+ * - authentication using <i>APOP</i>, <i>USER/PASS</i> (both RFC 1939) or the SASL methods <i>ANONYMOUS</i>, <i>PLAIN</i>,
+ *   <i>LOGIN</i>, <i>CRAM-MD5</i>, <i>CRAM-SHA1</i> and <i>GSSAPI</i> (see <a href="https://tools.ietf.org/html/rfc4752">RFC
+ *   4752</a> depending upon the capabilities reported by the server.  Note that <i>GSSAPI</i> is available only if
+ *   configured with the respective support.
  */
 
 

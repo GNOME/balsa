@@ -32,6 +32,7 @@
 
 #include "assistant_page_welcome.h"
 #include "assistant_page_user.h"
+#include "assistant_page_server.h"
 #include "assistant_page_directory.h"
 #include "assistant_page_defclient.h"
 #include "assistant_page_finish.h"
@@ -111,6 +112,7 @@ balsa_initdruid(GtkAssistant * assistant)
 
     balsa_druid_page_welcome(assistant);
     balsa_druid_page_user(assistant);
+    balsa_druid_page_server(assistant);
     balsa_druid_page_directory(assistant);
     balsa_druid_page_defclient(assistant);
     balsa_druid_page_finish(assistant);
@@ -132,6 +134,7 @@ balsa_init_begin(void)
 
     assistant = gtk_assistant_new();
     gtk_window_set_title(GTK_WINDOW(assistant), _("Configure Balsa"));
+    gtk_window_set_default_size(GTK_WINDOW(assistant), 1, 1);
 
     balsa_initdruid(GTK_ASSISTANT(assistant));
     gtk_widget_show_all(assistant);

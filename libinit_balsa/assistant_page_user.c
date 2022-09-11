@@ -54,24 +54,8 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     static const char *header2 =
         N_("The following settings are also needed "
            "(and you can find them later, if need be, in the Email "
-           "application in the “Preferences” and “Identities” "
-           "menu items)");
-#if 0
-    static const char *header21 =
-        N_(" Whoever provides your email account should be able "
-           "to give you the following information (if you have "
-           "a Network Administrator, they may already have set "
-           "this up for you):");
-#endif
-    static const char* server_types[] = { "POP3", "IMAP", NULL };
-    static const gchar *security_modes[] = {
-    	N_("SSL"),
-		N_("TLS required"),
-		N_("TLS if possible (not recommended)"),
-		N_("None (not recommended)"),
-		NULL };
-    static const char* remember_passwd[] = {
-        N_("Yes, remember it"), N_("No, type it in every time"), NULL };
+           "application in the “Edit \342\217\265 Preferences \342\217\265 Identities…” "
+           "menu item)");
     GtkGrid *grid;
     GtkLabel *label;
     gchar *preset;
@@ -83,8 +67,6 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     user->ed0.controller = &(user->econtroller);
     user->ed1.controller = &(user->econtroller);
     user->ed2.controller = &(user->econtroller);
-    user->ed3.controller = &(user->econtroller);
-    user->ed4.controller = &(user->econtroller);
     label = GTK_LABEL(gtk_label_new(_(header2)));
     gtk_label_set_line_wrap(label, TRUE);
     gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(label), FALSE, TRUE, 0);
@@ -93,63 +75,22 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     gtk_grid_set_row_spacing(grid, 2);
     gtk_grid_set_column_spacing(grid, 5);
 
-#if 0
-    label = GTK_LABEL(gtk_label_new(_(header21)));
-    gtk_label_set_justify(label, GTK_JUSTIFY_CENTER);
-    gtk_label_set_line_wrap(label, TRUE);
-    gtk_grid_attach(grid, GTK_WIDGET(label), 0, 2, 0, 1,
-                     GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 8, 4);
-#endif
-    /* 2.1 */
-    balsa_init_add_grid_entry(grid, row++,
-                               _("Name of mail server for incoming _mail:"),
-                               "", /* no guessing here */
-                               NULL, druid, page, &(user->incoming_srv));
-
-    balsa_init_add_grid_option(grid, row++,
-                                _("_Type of mail server:"),
-                               server_types, druid, &(user->incoming_type));
-
-    balsa_init_add_grid_option(grid, row++,
-    						   _("Connection _Security:"),
-							   security_modes, druid, &(user->security));
-    gtk_combo_box_set_active(GTK_COMBO_BOX(user->security), NET_CLIENT_CRYPT_STARTTLS - 1);
-
-    balsa_init_add_grid_entry(grid, row++, _("Your email _login name:"),
-                               g_get_user_name(),
-                               NULL, druid, page, &(user->login));
-    balsa_init_add_grid_entry(grid, row++, _("Your _password:"),
-                               "",
-                               NULL, druid, page, &(user->passwd));
-    gtk_entry_set_visibility(GTK_ENTRY(user->passwd), FALSE);
-    /* separator line here */
-
-    preset = "localhost:25";
-    balsa_init_add_grid_entry(grid, row++, _("_SMTP Server:"), preset,
-                               &(user->ed2), druid, page, &(user->smtp));
-
     /* 2.1 */
     balsa_init_add_grid_entry(grid, row++, _("Your real _name:"),
                                g_get_real_name(),
                                &(user->ed0), druid, page, &(user->name));
 
-    preset = libbalsa_guess_email_address();
     balsa_init_add_grid_entry
         (grid, row++, _("Your _email address for this email account:"),
-         preset, &(user->ed1), druid, page, &(user->email));
-    g_free(preset);
+         "", &(user->ed1), druid, page, &(user->email));
 
-    balsa_init_add_grid_option(grid, row++,
-                                _("_Remember your password:"),
-                                remember_passwd, druid,
-                                &(user->remember_passwd));
-
-    preset = g_strconcat(g_get_home_dir(), "/mail", NULL);
+    preset = g_build_filename(g_get_home_dir(), "mail", NULL);
     balsa_init_add_grid_entry(grid, row++, _("_Local mail directory:"),
                                preset,
-                               &(user->ed4), druid, page,
+                               &(user->ed2), druid, page,
                                &(user->localmaildir));
     g_free(preset);
+
     gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(grid), FALSE, FALSE, 3);
 
     user->need_set = FALSE;
@@ -188,98 +129,21 @@ balsa_druid_page_user_prepare(GtkAssistant * druid, GtkWidget * page,
     gtk_assistant_set_page_complete(druid, page,
                                     ENTRY_CONTROLLER_DONE(&user->econtroller));
 
-    gtk_widget_grab_focus(user->incoming_srv);
+    gtk_widget_grab_focus(user->email);
     user->need_set = TRUE;
-}
-
-static LibBalsaMailbox*
-create_pop3_mbx(const gchar *name, const gchar* host, gint security,
-                const gchar *login, const gchar *passwd,
-                gboolean remember)
-{
-    LibBalsaMailboxPOP3 *mailbox_pop3 = libbalsa_mailbox_pop3_new();
-    LibBalsaMailbox *mailbox          = LIBBALSA_MAILBOX(mailbox_pop3);
-    LibBalsaServer *server            = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
-    gchar *mailbox_name;
-
-    libbalsa_server_set_username(server, login);
-    libbalsa_server_set_password(server, passwd, FALSE);
-    libbalsa_server_set_host(server, host, security);
-    libbalsa_server_set_remember_password(server, remember);
-
-    mailbox_name = g_strdup(name != NULL && name[0] != '\0' ? name : host);
-    libbalsa_mailbox_set_name(mailbox, mailbox_name);
-    g_free(mailbox_name);
-
-    libbalsa_mailbox_pop3_set_check(mailbox_pop3, TRUE);
-    libbalsa_mailbox_pop3_set_disable_apop(mailbox_pop3, FALSE);
-    libbalsa_mailbox_pop3_set_delete_from_server(mailbox_pop3, TRUE);
-    libbalsa_mailbox_pop3_set_filter(mailbox_pop3, FALSE);
-    libbalsa_mailbox_pop3_set_filter_cmd(mailbox_pop3, "procmail -f -");
-
-    return mailbox;
-}
-
-static void
-create_imap_mbx(const gchar *name, const gchar* host, NetClientCryptMode security,
-                const gchar *login, const gchar *passwd,
-                gboolean remember)
-{
-    BalsaMailboxNode *mbnode;
-    LibBalsaServer *server =
-        LIBBALSA_SERVER(libbalsa_imap_server_new(login, host));
-    libbalsa_server_set_username(server, login);
-    libbalsa_server_set_password(server, passwd, FALSE);
-    libbalsa_server_set_host(server, host, security);
-    libbalsa_server_set_remember_password(server, remember);
-    mbnode = balsa_mailbox_node_new_imap_folder(server, NULL);
-    balsa_mailbox_node_set_name(mbnode, name != NULL && name[0] != '\0' ? name : host);
-
-    config_folder_add(mbnode, NULL);
-    /* memory leak? */
-    g_object_unref(mbnode);
 }
 
 static void
 balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
                            BalsaDruidPageUser * user)
 {
-    const gchar *host, *mailbox;
+    const gchar *mailbox;
     gchar *uhoh;
     LibBalsaIdentity *ident;
     InternetAddress *ia;
-    LibBalsaSmtpServer *smtp_server;
     
-#if 0
-    printf("USER next ENTER %p %p\n", page, user->page);
-    if(page != user->page)
-        return;
-#endif
-
-    /* incoming mail */
-    host = gtk_entry_get_text(GTK_ENTRY(user->incoming_srv));
-    if(host && *host) {
-        LibBalsaMailbox *mbx = NULL;
-        const gchar *login = gtk_entry_get_text(GTK_ENTRY(user->login));
-        const gchar *passwd = gtk_entry_get_text(GTK_ENTRY(user->passwd));
-        NetClientCryptMode security = balsa_option_get_active(user->security) + NET_CLIENT_CRYPT_ENCRYPTED;
-        gboolean remember = 
-            balsa_option_get_active(user->remember_passwd) == 0;
-        switch(balsa_option_get_active(user->incoming_type)) {
-        case 0: /* POP */
-            mbx = create_pop3_mbx(host, host, security, login, passwd, remember);
-            if(mbx)
-                config_mailbox_add(mbx, NULL);
-            break;
-        case 1: /* IMAP */
-            create_imap_mbx(host, host, security, login, passwd, remember);
-            break; 
-        default: /* hm */;
-        }
-    }
 
     /* identity */
-
     mailbox = gtk_entry_get_text(GTK_ENTRY(user->name));
     if (balsa_app.identities == NULL) {
 	gchar *domain = strrchr(mailbox, '@');
@@ -295,19 +159,6 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
     
     ia = internet_address_mailbox_new (mailbox, gtk_entry_get_text(GTK_ENTRY(user->email)));
     libbalsa_identity_set_address (ident, ia);
-
-    /* outgoing mail */
-    if (balsa_app.smtp_servers == NULL) {
-	smtp_server = libbalsa_smtp_server_new();
-        libbalsa_smtp_server_set_name(smtp_server,
-                                      libbalsa_smtp_server_get_name(NULL));
-	balsa_app.smtp_servers = g_slist_prepend(NULL, smtp_server);
-    } else {
-	smtp_server = balsa_app.smtp_servers->data;
-    }
-    libbalsa_server_set_host(LIBBALSA_SERVER(smtp_server),
-                             gtk_entry_get_text(GTK_ENTRY(user->smtp)),
-                             FALSE);	// FIXME!!
 
     g_free(balsa_app.local_mail_directory);
     balsa_app.local_mail_directory =

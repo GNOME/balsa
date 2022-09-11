@@ -64,9 +64,9 @@ void libbalsa_server_save_config(LibBalsaServer * server);
 
 
 /* NetClient related signal handlers */
-gchar **libbalsa_server_get_auth(NetClient *client,
-								 gboolean   need_passwd,
-								 gpointer   user_data);
+gchar **libbalsa_server_get_auth(NetClient         *client,
+								 NetClientAuthMode  mode,
+								 gpointer           user_data);
 gboolean libbalsa_server_check_cert(NetClient           *client,
            	   	   	   	   	   	    GTlsCertificate     *peer_cert,
 									GTlsCertificateFlags errors,
@@ -98,7 +98,7 @@ const gchar * libbalsa_server_get_protocol(LibBalsaServer *server);
 const gchar * libbalsa_server_get_password(LibBalsaServer *server);
 const gchar * libbalsa_server_get_cert_passphrase(LibBalsaServer *server);
 NetClientCryptMode libbalsa_server_get_security(LibBalsaServer *server);
-gboolean libbalsa_server_get_try_anonymous(LibBalsaServer *server);
+NetClientAuthMode libbalsa_server_get_auth_mode(LibBalsaServer *server);
 gboolean libbalsa_server_get_client_cert(LibBalsaServer *server);
 gboolean libbalsa_server_get_remember_password(LibBalsaServer *server);
 gboolean libbalsa_server_get_remember_cert_passphrase(LibBalsaServer *server);
@@ -107,7 +107,7 @@ gboolean libbalsa_server_get_remember_cert_passphrase(LibBalsaServer *server);
 void libbalsa_server_set_protocol(LibBalsaServer *server, const gchar *protocol);
 void libbalsa_server_set_cert_file(LibBalsaServer *server, const gchar *cert_file);
 void libbalsa_server_set_security(LibBalsaServer *server, NetClientCryptMode security);
-void libbalsa_server_set_try_anonymous(LibBalsaServer *server, gboolean try_anonymous);
+void libbalsa_server_set_auth_mode(LibBalsaServer *server, NetClientAuthMode auth_mode);
 void libbalsa_server_set_remember_password(LibBalsaServer *server, gboolean remember_password);
 void libbalsa_server_set_client_cert(LibBalsaServer *server, gboolean client_cert);
 void libbalsa_server_set_remember_cert_passphrase(LibBalsaServer *server,

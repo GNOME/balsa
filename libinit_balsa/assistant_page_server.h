@@ -1,6 +1,6 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; -*- */
 /* Balsa E-Mail Client
- * Copyright (C) 1997-2016 Stuart Parmenter and others,
+ * Copyright (C) 1997-2022 Stuart Parmenter and others,
  *                         See the file AUTHORS for a list.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,8 +17,8 @@
  * along with this program; if not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __BALSA_DRUID_PAGE_USER_H__
-#define __BALSA_DRUID_PAGE_USER_H__
+#ifndef __BALSA_DRUID_PAGE_SERVER_H__
+#define __BALSA_DRUID_PAGE_SERVER_H__
 
 #include <gtk/gtk.h>
 #include "assistant_helper.h"
@@ -29,27 +29,26 @@ G_BEGIN_DECLS
 /*
  * Main object structure
  */
-#ifndef __TYPEDEF_BALSA_DRUID_PAGE_USER__
-#define __TYPEDEF_BALSA_DRUID_PAGE_USER__
-    typedef struct _BalsaDruidPageUser BalsaDruidPageUser;
+#ifndef __TYPEDEF_BALSA_DRUID_PAGE_SERVER__
+#define __TYPEDEF_BALSA_DRUID_PAGE_SERVER__
+typedef struct _BalsaDruidPageServer BalsaDruidPageServer;
 #endif
-#define BALSA_DRUID_PAGE_USER(obj) ((BalsaDruidPageUser *) obj)
-    struct _BalsaDruidPageUser {
-        GtkWidget *page;
-        GtkWidget *name;
-        GtkWidget *email;
-        GtkWidget *localmaildir;
-        EntryController econtroller;
-        EntryData ed0;
-        EntryData ed1;
-        EntryData ed2;
-        gboolean need_set;
-    };
+#define BALSA_DRUID_PAGE_SERVER(obj) ((BalsaDruidPageServer *) obj)
+struct _BalsaDruidPageServer {
+	GtkWidget *page;
+	GtkWidget *incoming_type;
+	GtkWidget *incoming_srv;
+	GtkWidget *login;
+	GtkWidget *passwd;
+	GtkWidget *smtp;
+	GtkWidget *remember_passwd;
+	gboolean need_set;
+};
 
 /*
  * Public methods
  */
-    void balsa_druid_page_user(GtkAssistant * druid);
+void balsa_druid_page_server(GtkAssistant * druid);
 
 G_END_DECLS
 

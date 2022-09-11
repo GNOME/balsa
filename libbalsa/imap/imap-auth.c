@@ -37,11 +37,8 @@ static ImapResult imap_auth_login(ImapMboxHandle* handle);
 
 typedef ImapResult (*ImapAuthenticator)(ImapMboxHandle* handle);
 
-/* ordered from strongest to weakest. Auth anonymous does not really
- * belong here, does it? */
+/* User name/password methods, ordered from strongest to weakest. */
 static ImapAuthenticator imap_authenticators_arr[] = {
-  imap_auth_anonymous, /* will be tried only if enabled */
-  imap_auth_gssapi,
   imap_auth_cram,
   imap_auth_plain,
   imap_auth_login, /* login is deprecated */
@@ -59,17 +56,21 @@ imap_authenticate(ImapMboxHandle* handle)
   if (imap_mbox_is_authenticated(handle) || imap_mbox_is_selected(handle))
     return IMAP_SUCCESS;
 
-  for(authenticator = imap_authenticators_arr;
-      *authenticator; authenticator++) {
-    if (!imap_mbox_is_connected(handle)) { return IMAP_AUTH_CANCELLED; }
-    if ((r = (*authenticator)(handle)) 
-        != IMAP_AUTH_UNAVAIL) {
-      if (r == IMAP_SUCCESS)
-        imap_mbox_handle_set_state(handle, IMHS_AUTHENTICATED);
-      return r;
-    }
+  if ((handle->auth_mode & NET_CLIENT_AUTH_KERBEROS) != 0U) {
+	  r = imap_auth_gssapi(handle);
+  } else if ((handle->auth_mode & NET_CLIENT_AUTH_NONE_ANON) != 0U) {
+	  r = imap_auth_anonymous(handle);
+  } else {
+	  for (authenticator = imap_authenticators_arr; (r != IMAP_SUCCESS) && *authenticator; authenticator++) {
+		  r = (*authenticator)(handle);
+	  }
   }
-  imap_mbox_handle_set_msg(handle, _("No way to authenticate is known"));
+
+  if (r == IMAP_SUCCESS) {
+	  imap_mbox_handle_set_state(handle, IMHS_AUTHENTICATED);
+  } else if (r == IMAP_AUTH_UNAVAIL) {
+	  imap_mbox_handle_set_msg(handle, _("No way to authenticate is known"));
+  }
   return r;
 }
 
@@ -86,7 +87,7 @@ imap_auth_login(ImapMboxHandle* handle)
   if (imap_mbox_handle_can_do(handle, IMCAP_LOGINDISABLED))
     return IMAP_AUTH_UNAVAIL;
   
-  g_signal_emit_by_name(handle->sio, "auth", TRUE, &auth_data);
+  g_signal_emit_by_name(handle->sio, "auth", NET_CLIENT_AUTH_USER_PASS, &auth_data);
   if((auth_data == NULL) || (auth_data[0] == NULL) || (auth_data[1] == NULL)) {
     imap_mbox_handle_set_msg(handle, _("Authentication cancelled"));
 	g_strfreev(auth_data);
@@ -176,7 +177,7 @@ getmsg_plain(ImapMboxHandle *h, char **retmsg, int *retmsglen)
 	gchar **auth_data;
 	gboolean result;
 
-	g_signal_emit_by_name(h->sio, "auth", TRUE, &auth_data);
+	g_signal_emit_by_name(h->sio, "auth", NET_CLIENT_AUTH_USER_PASS, &auth_data);
 	if ((auth_data == NULL) || (auth_data[0] == NULL) || (auth_data[1] == NULL)) {
 		result = FALSE;
 	} else {
@@ -201,31 +202,19 @@ imap_auth_plain(ImapMboxHandle* handle)
 
 
 /* =================================================================== */
-/* SASL ANONYMOUS RFC-2245                                             */
+/* SASL ANONYMOUS RFC-4505                                             */
 /* =================================================================== */
 static gboolean
 getmsg_anonymous(ImapMboxHandle *h, char **retmsg, int *retmsglen)
 {
-	gchar **auth_data;
-	gboolean result;
-
-	g_signal_emit_by_name(h->sio, "auth", FALSE, &auth_data);
-	if((auth_data == NULL) || (auth_data[0] == NULL)) {
-		result = FALSE;
-	} else {
-		*retmsg = g_base64_encode((const guchar *) auth_data[0], strlen(auth_data[0]));
-		*retmsglen = strlen(*retmsg);
-		result = TRUE;
-	}
-	g_strfreev(auth_data);
-	return result;
+	*retmsg = net_client_auth_anonymous_token();
+	*retmsglen = strlen(*retmsg);
+	return TRUE;
 }
 
 static ImapResult
 imap_auth_anonymous(ImapMboxHandle* handle)
 {
-  if(!handle->enable_anonymous)
-    return IMAP_AUTH_UNAVAIL;
   return imap_auth_sasl(handle, IMCAP_AANONYMOUS, "AUTHENTICATE ANONYMOUS",
 			getmsg_anonymous);
 }

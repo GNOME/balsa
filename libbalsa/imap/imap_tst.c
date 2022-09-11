@@ -124,7 +124,7 @@ get_handle(const char *host)
 
   imap_handle_set_tls_mode(h, TestContext.tls_mode);
   if(TestContext.anonymous)
-    imap_handle_set_option(h, IMAP_OPT_ANONYMOUS, TRUE);
+	  imap_handle_set_auth_mode(h, NET_CLIENT_AUTH_NONE_ANON);
 
   if(TestContext.compress)
     imap_handle_set_option(h, IMAP_OPT_COMPRESS, TRUE);

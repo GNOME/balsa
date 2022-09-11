@@ -7,6 +7,8 @@ libinit_balsa_a_SOURCES = 		\
 	assistant_page_directory.h	\
 	assistant_page_finish.c	\
 	assistant_page_finish.h	\
+	assistant_page_server.c		\
+	assistant_page_server.h		\
 	assistant_page_user.c		\
 	assistant_page_user.h		\
 	assistant_page_welcome.c	\

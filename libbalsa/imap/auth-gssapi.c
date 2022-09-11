@@ -125,7 +125,7 @@ imap_auth_gssapi(ImapMboxHandle* handle)
         return IMAP_AUTH_UNAVAIL;
     }
 
-    g_signal_emit_by_name(handle->sio, "auth", FALSE, &auth_data);
+    g_signal_emit_by_name(handle->sio, "auth", NET_CLIENT_AUTH_KERBEROS, &auth_data);
     if((auth_data == NULL) || (auth_data[0] == NULL)) {
     	imap_mbox_handle_set_msg(handle, _("User name required, authentication cancelled"));
     	g_strfreev(auth_data);

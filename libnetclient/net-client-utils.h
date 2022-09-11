@@ -18,6 +18,7 @@
 
 #include "config.h"
 #include <gio/gio.h>
+#include "net-client.h"
 
 
 G_BEGIN_DECLS
@@ -28,6 +29,25 @@ G_BEGIN_DECLS
 typedef struct _NetClientGssCtx NetClientGssCtx;
 
 #endif		/* HAVE_GSSAPI */
+
+
+typedef struct _NetClientProbeResult NetClientProbeResult;
+
+/** @brief Server probe results */
+struct _NetClientProbeResult {
+	guint16 port;							/**< The port where the server listens. */
+	NetClientCryptMode crypt_mode;			/**< The encryption mode the server supports for the returned port. */
+	NetClientAuthMode auth_mode;			/**< The authentication modes the server supports for the port and encryption mode. */
+};
+
+
+/** @brief Check is a host is resolvable and reachable
+ *
+ * @param host host name or IP address
+ * @param error filled with error information on error
+ * @return TRUE if the passed host name is resolvable and reachable
+ */
+gboolean net_client_host_reachable(const gchar *host, GError **error);
 
 
 /** @brief Calculate a CRAM authentication string
@@ -46,7 +66,7 @@ typedef struct _NetClientGssCtx NetClientGssCtx;
  * \sa <a href="https://tools.ietf.org/html/rfc2195">RFC 2195</a>.
  */
 gchar *net_client_cram_calc(const gchar *base64_challenge, GChecksumType chksum_type, const gchar *user, const gchar *passwd)
-	G_GNUC_MALLOC;
+	G_GNUC_MALLOC G_GNUC_WARN_UNUSED_RESULT;
 
 
 /** @brief Get the checksum type as string
@@ -63,12 +83,12 @@ const gchar *net_client_chksum_to_str(GChecksumType chksum_type);
  * @param passwd password
  * @return a newly allocated string containing the base64-encoded authentication
  *
- * This helper function calculates the the base64-encoded SASL AUTH PLAIN authentication string from the user name and the password
+ * This helper function calculates the base64-encoded SASL AUTH PLAIN authentication string from the user name and the password
  * according to <a href="https://tools.ietf.org/html/rfc4616">RFC 4616</a>.  The caller shall free the returned string when it is
  * not needed any more.
  */
 gchar *net_client_auth_plain_calc(const gchar *user, const gchar *passwd)
-	G_GNUC_MALLOC;
+	G_GNUC_MALLOC G_GNUC_WARN_UNUSED_RESULT;
 
 
 /** @brief Safely free an authentication string
@@ -79,6 +99,31 @@ gchar *net_client_auth_plain_calc(const gchar *user, const gchar *passwd)
  * then frees it.
  */
 void net_client_free_authstr(gchar *str);
+
+
+/** @brief Create a token for anonymous authentication
+ *
+ * @return a newly allocated string containing the base64-encoded authentication
+ *
+ * This helper function calculates a base64-encoded SASL AUTH ANONYMOUS authentication token which is used as trace information by
+ * the server.  As recommended by RFC 4505, the token does not contain personal data.  The returned value is the encoded SHA256 hex
+ * hash of the string <c>user-name@host-name:time<c> (time is the creation time stamp as returned by time()).  This token will be
+ * unique, but makes it impossible for the server to extract user and host.  However, the client @em may store to token if linking
+ * server to client operations is required, e.g. for debugging purposes.
+ *
+ * The caller shall free the returned string when it is not needed any more.
+ */
+gchar *net_client_auth_anonymous_token(void)
+	G_GNUC_WARN_UNUSED_RESULT;
+
+
+/** \brief Return the host part of a host:port string
+ *
+ * @param[in] host_and_port a string containing a host name, optionally followed by a colon and a port number
+ * @return a newly allocated string containing the host part only
+ */
+gchar *net_client_host_only(const gchar *host_and_port)
+	G_GNUC_WARN_UNUSED_RESULT;
 
 
 #if defined(HAVE_GSSAPI)
@@ -145,7 +190,7 @@ void net_client_gss_ctx_free(NetClientGssCtx *gss_ctx);
 
 /** @file
  *
- * This module implements authentication-related helper functions for the network client library.
+ * This module implements probing and authentication-related helper functions for the network client library.
  */
 
 

@@ -660,6 +660,7 @@ lbh_get_web_view_context(void)
 		WebKitWebContext *tmp;
 		WebKitWebView *view;
 		gchar *cache_dir;
+		WebKitSettings *settings;
 
 		cache_dir = g_build_filename(g_get_home_dir(), ".balsa", CACHE_DIR, NULL);
 		data_manager = webkit_website_data_manager_new("base-cache-directory", cache_dir, NULL);
@@ -688,6 +689,11 @@ lbh_get_web_view_context(void)
 
 		/* create a dummy view to trigger loading the html filter extension */
 		view = WEBKIT_WEB_VIEW(webkit_web_view_new_with_context(tmp));
+		settings = webkit_web_view_get_settings(view);
+		/* note: enabling hardware acceleration seems to trigger strange segfaults in Webkit at least on some systems running
+		 * Wayland (probably the same issue as https://github.com/NixOS/nixpkgs/issues/168939), so we just disable it
+		 * completely */
+		webkit_settings_set_hardware_acceleration_policy(settings, WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER);
 		webkit_web_view_load_uri(view, "about:blank");
 		while (webkit_web_view_is_loading(view)) {
 			gtk_main_iteration_do(FALSE);
@@ -721,6 +727,8 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
     gtk_widget_set_vexpand(GTK_WIDGET(view), TRUE);
 
 	settings = webkit_web_view_get_settings(view);
+	/* might be paranoid - see note in function lbh_get_web_view_context() above */
+	webkit_settings_set_hardware_acceleration_policy(settings, WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER);
 #if WEBKIT_CHECK_VERSION(2, 31, 91)
     g_object_set(G_OBJECT(settings), "enable-plugins", FALSE, NULL);
 #else  /* WEBKIT_CHECK_VERSION(2, 31, 91) */

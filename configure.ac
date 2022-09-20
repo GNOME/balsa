@@ -3,15 +3,13 @@ dnl follow section 5.3 of Autoconf, Automake book.
 dnl
 dnl 1. Boilerplate.
 dnl
-AC_PREREQ(2.59)
+AC_PREREQ([2.71])
 dnl ###########################################################################
 dnl Boilerplace and versioning
 dnl ###########################################################################
 
-# if autoconf is used not in a git source tree, use version=2.6.3
-AC_INIT([balsa],
-        m4_esyscmd([test -d .git && echo -n `git describe --tags` || echo -n 2.6.3]),
-        [])
+# if autoconf is used not in a git source tree, use version=2.6.4
+AC_INIT([balsa],[m4_esyscmd(test -d .git && echo -n `git describe --tags` || echo -n 2.6.4)],[])
 
 AM_INIT_AUTOMAKE
 AC_LANG([C])
@@ -31,7 +29,7 @@ dnl #####################################################################
 dnl 2. Options
 dnl #####################################################################
 AC_ARG_WITH([gnome],
-        AC_HELP_STRING([--with-gnome],
+        AS_HELP_STRING([--with-gnome],
                 [Use GNOME libraries (default=yes)]),[
 	with_gnome=$withval
 ],[
@@ -43,7 +41,7 @@ dnl Configure locking
 dnl ###########################################################################
 
 AC_ARG_ENABLE(flock,
-        AC_HELP_STRING([--enable-flock],
+        AS_HELP_STRING([--enable-flock],
                        [Do NOT use flock() to lock files (default=no)]),
 	[if test x$enableval = xno; then balsa_cv_flock=no; fi])
 
@@ -53,7 +51,7 @@ fi
 
 balsa_cv_fcntl=yes
 AC_ARG_ENABLE(fcntl,
-        AC_HELP_STRING([--disable-fcntl],
+        AS_HELP_STRING([--disable-fcntl],
                        [Use fcntl() to lock files (default=yes)]),
 	[if test x$enableval = no; then balsa_cv_fcntl=no; fi])
 if test x$balsa_cv_fcntl = xyes; then
@@ -61,95 +59,95 @@ if test x$balsa_cv_fcntl = xyes; then
 fi
 
 AC_ARG_ENABLE([autocrypt],
-   AC_HELP_STRING([--enable-autocrypt],
+   AS_HELP_STRING([--enable-autocrypt],
                   [build with Autocrypt support (see https://autocrypt.org/), default=no, requires sqlite3)]),
                   [autocrypt=$enableval], [autocrypt=no])
 
 AC_ARG_ENABLE([systray],
-   AC_HELP_STRING([--enable-systray],
+   AS_HELP_STRING([--enable-systray],
                   [enable System Tray Icon support, default=no, requires libxapp]),
                   [systray=$enableval], [systray=no])
 
 AC_ARG_WITH(canberra,
-   AC_HELP_STRING([--with-canberra],
+   AS_HELP_STRING([--with-canberra],
                   [Use libcanberra-gtk3 for new messages and filter sounds (default=no)]),
                   [with_canberra=$withval],[with_canberra=no])
 
 AC_ARG_WITH(compface,
-   AC_HELP_STRING([--with-compface],
+   AS_HELP_STRING([--with-compface],
                   [Enable Compface (default=no)]),
                   [with_compface=$withval],[with_compface=no])
 
 AC_ARG_WITH(gss,
-   AC_HELP_STRING([--with-gss],
+   AS_HELP_STRING([--with-gss],
                   [Enable GSS (default=no)]),
                   [with_gss=$withval],[with_gss=no])
 
 AC_ARG_WITH(html-widget,
-            AC_HELP_STRING([--with-html-widget=(no|webkit2)],
+            AS_HELP_STRING([--with-html-widget=(no|webkit2)],
                            [select the HTML renderer (default webkit2)]),
             [use_html_widget=$withval],
             [use_html_widget=webkit2])
 
 AC_ARG_WITH([gtksourceview],
-   AC_HELP_STRING([--with-gtksourceview],
+   AS_HELP_STRING([--with-gtksourceview],
                   [Use GtkSourceView-3 if available (default=no)]),
 		  [with_gtksourceview=$withval],[with_gtksourceview=no])
 
 AC_ARG_WITH([spell-checker],
-            AC_HELP_STRING([--with-spell-checker=(internal|gtkspell|gspell)],
+            AS_HELP_STRING([--with-spell-checker=(internal|gtkspell|gspell)],
                            [select the spell checker (default internal)]),
             [use_spell_checker=$withval],
             [use_spell_checker=internal])
 
 AC_ARG_WITH([ldap],
-   AC_HELP_STRING([--with-ldap=DIR],
+   AS_HELP_STRING([--with-ldap=DIR],
                   [Use OpenLDAP if available (default=no)]),
 		  [with_ldap=$withval],[with_ldap=no])
 
 AC_ARG_WITH([macosx-desktop],
-   AC_HELP_STRING([--with-macosx-desktop],
+   AS_HELP_STRING([--with-macosx-desktop],
 	          [Use Mac OS X Desktop Integration (default=no, extremely experimental)]),
 		  [use_igemacint=$withval],[use_igemacint=no])
 
 AC_ARG_WITH([rubrica],
-   AC_HELP_STRING([--with-rubrica],
+   AS_HELP_STRING([--with-rubrica],
                   [add Rubrica2 address book support (needs libxml2, default=no)]),
 		  [with_rubrica=$withval],[with_rubrica=no])
 
 AC_ARG_WITH([osmo],
-   AC_HELP_STRING([--with-osmo],
+   AS_HELP_STRING([--with-osmo],
                   [add Osmo address book support (experimental, needs osmo > svn rev. 1099, default=no)]),
 		  [with_osmo=$withval],[with_osmo=no])
 
 AC_ARG_WITH([sqlite],
-   AC_HELP_STRING([--with-sqlite=DIR],
+   AS_HELP_STRING([--with-sqlite=DIR],
                   [Use SQLite for GPE address books (default=no)]),
                   [with_sqlite=$withval],[with_sqlite=no])
 
 AC_ARG_WITH(libsecret,
-   AC_HELP_STRING([--with-libsecret],
+   AS_HELP_STRING([--with-libsecret],
                   [Use libsecret to store credentials (default=yes)]),
                   [with_libsecret=$withval],[with_libsecret=yes])
 
 AC_ARG_WITH(gcr,
-   AC_HELP_STRING([--with-gcr],
+   AS_HELP_STRING([--with-gcr],
                   [Use libgcr-3 for dealing with TLS certificates (experimental, default=no)]),
                   [with_gcr=$withval],[with_gcr=no])
 
 AC_ARG_ENABLE(more-warnings,
-   AC_HELP_STRING([--enable-more-warnings],
+   AS_HELP_STRING([--enable-more-warnings],
                   [Enable maximum compiler warnings (default=yes)]),
                   [set_more_warnings="$enableval"], [set_more_warnings=yes])
 
 dnl Documentation and Testing requirements for libnetclient
 AC_ARG_WITH(libnetclient-docs,
-   AC_HELP_STRING([--with-libnetclient-docs],
+   AS_HELP_STRING([--with-libnetclient-docs],
                   [Check requirements for building the libnetclient API docs (see libnetclient/README; default=no)]),
                   [with_libncdocs=$withval],[with_libncdocs=no])
 
 AC_ARG_WITH(libnetclient-test,
-   AC_HELP_STRING([--with-libnetclient-test],
+   AS_HELP_STRING([--with-libnetclient-test],
                   [Check requirements for running libnetclient tests (see libnetclient/README; default=no)]),
                   [with_libncdtest=$withval],[with_libncdtest=no])
 
@@ -158,7 +156,7 @@ dnl #####################################################################
 dnl 3. Programs: compilers and their options.
 dnl #####################################################################
 AC_PROG_CC
-m4_ifdef([LT_INIT],[LT_INIT],[AC_PROG_LIBTOOL])
+m4_ifdef([LT_INIT],[LT_INIT],[LT_INIT])
 AC_PROG_LN_S
 AC_CHECK_MEMBERS([struct utsname.domainname],[],[],[[#include<sys/utsname.h>]])
 
@@ -194,8 +192,7 @@ AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
         [The gettext package name.])
 
-AC_PROG_INTLTOOL
-AM_GLIB_GNU_GETTEXT
+IT_PROG_INTLTOOL
 
 # _NL_MEASUREMENT_MEASUREMENT is an enum and not a define
 AC_MSG_CHECKING([for _NL_MEASUREMENT_MEASUREMENT])
@@ -537,7 +534,6 @@ dnl #####################################################################
 dnl 6. Typedefs, structures and compiler characteristics.
 dnl #####################################################################
 AC_C_CONST
-AC_STDC_HEADERS
 
 AC_CHECK_DECLS([ctime_r], [], [], [[#include <time.h>]])
 AC_CHECK_FUNCS([ctime_r])
@@ -553,9 +549,7 @@ if test "$GCC" = "yes" -a "$set_more_warnings" != "no"; then
                 SAVE_CFLAGS="$CFLAGS"
                 CFLAGS="$CFLAGS $option"
                 AC_MSG_CHECKING([whether gcc understands $option])
-                AC_TRY_COMPILE([], [],
-                        has_option=yes,
-                        has_option=no,)
+                AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[has_option=yes],[has_option=no])
                 if test $has_option = no; then
                   CFLAGS="$SAVE_CFLAGS"
                 fi

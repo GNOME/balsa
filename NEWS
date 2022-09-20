@@ -1,3 +1,18 @@
+* Balsa-2.6.4 release. Release date 2022-09-20
+
+- Fix display/printout with nondefault HTML preferences.
+- HTML context meny improments, integration with Webkit HTML privacy
+  filter.
+- Header edition in GNOME editor fixed.
+- Some MDN, iCalendar issues fixed.
+- More informative error messages.
+- Notification improvements.
+- Show UI for opening download location after download.
+- Minor memory leaks plugged.
+- code refactoring and lceanup.
+- Library and build system deprecation cleanups.
+- Translation updates.
+
 * Balsa-2.6.3 release. Release date 2021-08-18
 
 - Improve Autocrypt-related error messages.

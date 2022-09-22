@@ -155,8 +155,8 @@ void libbalsa_message_body_set_mp_alt_selection(LibBalsaMessageBody *body,
 LibBalsaMpAltSelection libbalsa_message_body_get_mp_alt_selection(LibBalsaMessageBody *body,
                                                                   gpointer key);
 #else
-#define libbalsa_message_body_set_mp_alt_selection(x)
-#define libbalsa_message_body_get_mp_alt_selection(x)	LIBBALSA_MP_ALT_AUTO
+#define libbalsa_message_body_set_mp_alt_selection(x, y)
+#define libbalsa_message_body_get_mp_alt_selection(x, y)	LIBBALSA_MP_ALT_AUTO
 #endif /*HAVE_HTML_WIDGET*/
 
 guint libbalsa_message_body_protect_mode(const LibBalsaMessageBody * body);

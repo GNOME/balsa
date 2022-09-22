@@ -65,6 +65,7 @@ libbalsa_message_body_new(LibBalsaMessage * message)
     return body;
 }
 
+#ifdef HAVE_HTML_WIDGET
 static void
 body_weak_notify(gpointer  data,
                  GObject  *key)
@@ -81,6 +82,7 @@ selection_table_foreach(gpointer key,
 {
     g_object_weak_unref(key, body_weak_notify, user_data);
 }
+#endif /* HAVE_HTML_WIDGET */
 
 void
 libbalsa_message_body_free(LibBalsaMessageBody * body)
@@ -111,10 +113,12 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
     if (body->mime_part)
 	g_object_unref(body->mime_part);
 
+#ifdef HAVE_HTML_WIDGET
     if (body->selection_table != NULL) {
         g_hash_table_foreach(body->selection_table, selection_table_foreach, body);
         g_hash_table_destroy(body->selection_table);
     }
+#endif  /* HAVE_HTML_WIDGET */
 
     g_free(body);
 }

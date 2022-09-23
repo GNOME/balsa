@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
 "POT-Creation-Date: 2022-09-22 17:53+0000\n"
-"PO-Revision-Date: 2022-09-22 22:42+0200\n"
+"PO-Revision-Date: 2022-09-23 22:19+0200\n"
 "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
 "Language-Team: Slovenščina <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
@@ -218,10 +218,9 @@ msgstr "Odgovori na:"
 
 #. Translators: #1 database file; #2 error message
 #: ../libbalsa/autocrypt.c:194
-#, fuzzy, c-format
-#| msgid "Could not write file %s: %s"
+#, c-format
 msgid "cannot initialise Autocrypt database “%s”: %s"
-msgstr "Datoteka PO »%s« ne obstaja ali pa je ni mogoče prebrati."
+msgstr "ni mogoče začeti podatkovne zbirke samošifriranja »%s«: %s"
 
 #. Translators: #1 sender's email address
 #: ../libbalsa/autocrypt.c:321
@@ -230,19 +229,20 @@ msgid ""
 "No usable private key for “%s” found! Please create a key or disable "
 "Autocrypt."
 msgstr ""
+"Ni mogoče najti uporabnega zasebnega ključa za »%s«. Ustvarite ključ, ali pa "
+"onemogočite samošifriranje."
 
 #. Translators: #1 GPG key fingerprint; #2 error message
 #. Translators: #1 mailbox; #2 error message
 #: ../libbalsa/autocrypt.c:389 ../libbalsa/autocrypt.c:398
 #: ../libbalsa/autocrypt.c:682 ../libbalsa/autocrypt.c:689
-#, fuzzy, c-format
-#| msgid "Error executing signature generator “%s”: %s"
+#, c-format
 msgid "error reading Autocrypt data for “%s”: %s"
-msgstr "Napaka izvajanja ustvarjalnika podpisa »%s«: %s"
+msgstr "napaka branja podatkov samošifriranja za »%s«: %s"
 
 #: ../libbalsa/autocrypt.c:451
 msgid "Autocrypt database"
-msgstr "Samošifriraj podatkovno zbirko"
+msgstr "Podatkovna zbirka samošifriranja"
 
 #: ../libbalsa/autocrypt.c:452 ../libbalsa/html.c:459
 #: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
@@ -263,10 +263,8 @@ msgid "Last seen"
 msgstr "Zadnjič videno"
 
 #: ../libbalsa/autocrypt.c:533
-#, fuzzy
-#| msgid "Cannot create message"
 msgid "Last Autocrypt message"
-msgstr "Ni mogoče ustvariti sporočila"
+msgstr "Zadnje samošifrirano sporočilo"
 
 #: ../libbalsa/autocrypt.c:539
 msgid "Prefer encryption"
@@ -274,16 +272,14 @@ msgstr "Prednostno uporabi šifriranje"
 
 #. Translators: #1 email address; #2 error message
 #: ../libbalsa/autocrypt.c:792 ../libbalsa/autocrypt.c:813
-#, fuzzy, c-format
-#| msgid "part %s: %s (file %s)"
+#, c-format
 msgid "update user “%s” failed: %s"
-msgstr "del %s: %s (datoteka %s)"
+msgstr "posodabljanje uporabnika »%s« je spodletelo: %s"
 
 #: ../libbalsa/autocrypt.c:792
-#, fuzzy, c-format
-#| msgid "Saving sent message to %s failed: %s"
+#, c-format
 msgid "insert user “%s” failed: %s"
-msgstr "Shranjevanje poslanega sporočila v %s ni uspelo: %s"
+msgstr "vstavljanje uporabnika »%s« je spodletelo: %s"
 
 #: ../libbalsa/autocrypt.c:889
 msgid "_Show details…"
@@ -308,7 +304,7 @@ msgstr "Poštni predal %s ni videti kot poštni predal v obliki Maildir."
 #: ../libbalsa/autocrypt.c:983
 #, c-format
 msgid "Delete the Autocrypt key for “%s” from the database?"
-msgstr ""
+msgstr "Ali želite izbrisati samošifrirni ključ »%s« iz podatkovne zbirke?"
 
 #: ../libbalsa/body.c:145 ../libbalsa/mailbox_local.c:1884
 #: ../libbalsa/message.c:949
@@ -714,7 +710,7 @@ msgstr "Trenutna"
 
 #: ../libbalsa/identity.c:643 ../libbalsa/smtp-server.c:140
 msgid "Default"
-msgstr "Privzeta"
+msgstr "Privzeto"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:837
@@ -871,7 +867,7 @@ msgstr ""
 
 #: ../libbalsa/identity.c:961
 msgid "Autocrypt mode"
-msgstr "Samošifrirni način"
+msgstr "Način samošifriranja"
 
 #: ../libbalsa/identity.c:1079
 #, c-format
@@ -1009,30 +1005,25 @@ msgid "Bug in implementation of SORT command on IMAP server exposed."
 msgstr ""
 
 #: ../libbalsa/imap/imap-handle.c:671
-#, fuzzy, c-format
-#| msgid "Scanning of %s failed: %s"
+#, c-format
 msgid "Connecting %s failed: %s"
-msgstr "Preiskovanje %s ni uspelo: %s"
+msgstr "Vzpostavljanje povezave z %s je spodletelo: %s"
 
 #: ../libbalsa/imap/imap-handle.c:684 ../libbalsa/imap/imap-handle.c:704
-#, fuzzy, c-format
-#| msgid "Send failed: %s"
+#, c-format
 msgid "TLS negotiation failed: %s"
-msgstr "Pošiljanje je spodletelo: %s"
+msgstr "Pogajanje TLS je spodletelo: %s"
 
 #: ../libbalsa/imap/imap-handle.c:710
-#, fuzzy
-#| msgid "TLS requested but not compiled in"
 msgid "TLS required but not available"
-msgstr "TLS je bil zahtevan, vendar ni kodno preveden"
+msgstr "Zahtevana je uporaba TLS, ki pa ni na voljo"
 
 #. it is not we, so it must be the server
 #: ../libbalsa/imap/imap-handle.c:2298 ../libbalsa/imap/imap-handle.c:2316
 #: ../libbalsa/imap/imap-handle.c:2332 ../libbalsa/imap/imap-handle.c:2363
-#, fuzzy, c-format
-#| msgid "IMAP server %s error: %s"
+#, c-format
 msgid "IMAP response: %s"
-msgstr "Napaka strežnika IMAP %s: %s"
+msgstr "Odziv strežnika IMAP: %s"
 
 #. IMAP host name + message
 #: ../libbalsa/imap-server.c:213
@@ -1264,10 +1255,9 @@ msgid "Could not find a key for “%s”"
 msgstr "Ni mogoče najti tujega ključa za \"'%s\""
 
 #: ../libbalsa/libbalsa-gpgme.c:992
-#, fuzzy, c-format
-#| msgid "%s: multiple keys for %s"
+#, c-format
 msgid "Multiple keys for “%s”"
-msgstr "Več ključev"
+msgstr "Več ključev za »%s«"
 
 #: ../libbalsa/libbalsa-gpgme.c:1014
 #, fuzzy, c-format
@@ -1370,10 +1360,9 @@ msgstr ""
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:101 ../libbalsa/libbalsa-gpgme-keys.c:126
 #: ../libbalsa/libbalsa-gpgme-keys.c:168 ../libbalsa/libbalsa-gpgme-keys.c:172
-#, fuzzy, c-format
-#| msgid "could not list keys for \"%s\""
+#, c-format
 msgid "could not list keys for “%s”"
-msgstr "Nekaterih ključev ni mogoče zapisati."
+msgstr "ni mogoče izpisati seznama ključev za »%s«"
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:179
 #, fuzzy, c-format
@@ -1431,14 +1420,12 @@ msgid "Searching the key server failed: %s"
 msgstr "Strežnik je vrnil neveljaven ključ \"%s\""
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:540
-#, fuzzy
 msgid "error importing key"
-msgstr "Napaka med uvažanjem stikov: %s"
+msgstr "napaka uvažanja ključa"
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:575
-#, fuzzy
 msgid "No key was imported or updated."
-msgstr "Vrednost za posodobitev"
+msgstr "Noben ključ ni bil uvožen oziroma posodobljen."
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:577
 #, fuzzy
@@ -1536,14 +1523,8 @@ msgstr "ID osnovnega uporabnika:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:119
 #: ../libbalsa/libbalsa-gpgme-widgets.c:276
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "Key owner trust: %s"
 msgid "Key owner trust:"
-msgstr ""
-"\n"
-"Zaupanje lastniku ključa: %s"
+msgstr "Zaupanje lastniku ključa:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:129
 #: ../libbalsa/libbalsa-gpgme-widgets.c:283
@@ -2029,14 +2010,9 @@ msgid "Could not create MH structure at %s (%s)"
 msgstr "Ni mogoče ustvariti strukture MH na %s (%s)"
 
 #: ../libbalsa/mailbox_mh.c:274
-#, fuzzy, c-format
-#| msgid ""
-#| "Could not remove contents of %s:\n"
-#| "%s"
+#, c-format
 msgid "Could not remove contents of %s: %s"
-msgstr ""
-"Ni mogoče odstraniti vsebine %s:\n"
-"%s"
+msgstr "Ni mogoče odstraniti vsebine %s: %s"
 
 #: ../libbalsa/mailbox_mh.c:1069
 #, c-format
@@ -2061,10 +2037,9 @@ msgid "Passing POP message to %s failed: %s"
 msgstr "Overitev na strežniku POP %s je spodletela:"
 
 #: ../libbalsa/mailbox_pop3.c:308
-#, fuzzy, c-format
-#| msgid "Saving POP message to %s failed"
+#, c-format
 msgid "Saving POP message failed"
-msgstr "Shranjevanje poslanega sporočila v %s ni uspelo: %s"
+msgstr "Shranjevanje sporočila POP je spodletelo"
 
 #: ../libbalsa/mailbox_pop3.c:327
 #, fuzzy, c-format
@@ -2101,10 +2076,8 @@ msgstr "Ni mogoče odpreti začasnega poštnega predala: %s"
 
 #. load message list
 #: ../libbalsa/mailbox_pop3.c:525
-#, fuzzy
-#| msgid "H_ide messages"
 msgid "List messages…"
-msgstr "S_krij sporočila"
+msgstr "Izpiši sporočila …"
 
 #: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:701
 #, fuzzy, c-format
@@ -2496,10 +2469,8 @@ msgstr ""
 #: ../libbalsa/rfc2445.c:659 ../libbalsa/rfc2445.c:705
 #: ../libbalsa/rfc2445.c:754 ../libbalsa/rfc2445.c:834
 #: ../libbalsa/rfc2445.c:839 ../libbalsa/rfc2445.c:842
-#, fuzzy
-#| msgid "Auto-complete"
 msgid "rule too complex"
-msgstr "Samodejno zaključevanje"
+msgstr "pravilo je preveč zapleteno"
 
 #. #1: the day of week (defined in the day_of_week context)
 #: ../libbalsa/rfc2445.c:666
@@ -2656,7 +2627,7 @@ msgstr "minut"
 #: ../libbalsa/rfc2445.c:867
 msgctxt "ical_recurrence"
 msgid "hourly"
-msgstr ""
+msgstr "vsako uro"
 
 #: ../libbalsa/rfc2445.c:887
 #, fuzzy, c-format
@@ -2672,7 +2643,7 @@ msgstr[3] "Mož_nosti"
 #: ../libbalsa/rfc2445.c:893
 #, c-format
 msgid " until %s"
-msgstr ""
+msgstr "do %s"
 
 #: ../libbalsa/rfc2445.c:1168
 msgctxt "ical_role"
@@ -2821,9 +2792,9 @@ msgid "malformed card, END:VCARD missing"
 msgstr ""
 
 #: ../libbalsa/rfc6350.c:259
-#, fuzzy, c-format
+#, c-format
 msgid "malformed line “%s”, missing “:”"
-msgstr "Izmaličena vrstica stanja"
+msgstr "Izmaličena vrstica stanja »%s«, manjka » : «."
 
 #: ../libbalsa/rfc6350.c:270
 #, c-format
@@ -2901,14 +2872,12 @@ msgid "Cannot read %s"
 msgstr "Ni mogoče prebrati %s"
 
 #: ../libbalsa/send.c:1304
-#, fuzzy, c-format
-#| msgid ""
-#| "Cannot determine charset for text file `%s'; sending as mime type `%s'"
+#, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
 msgstr ""
-"Ni mogoče določiti nabora znakov za datoteko `%s'; pošiljanje kot mime vrsta "
-"`%s'"
+"Ni mogoče določiti nabora znakov za besedilo datoteko »%s«; poslana bo kot "
+"vrsta MIME »%s«"
 
 #: ../libbalsa/send.c:1838 ../libbalsa/send.c:1936
 msgid "This message will not be encrypted for the BCC: recipient."
@@ -3051,16 +3020,13 @@ msgid "Message Source"
 msgstr "Izvorna koda sporočila"
 
 #: ../libbalsa/source-viewer.c:229 ../src/message-window.c:881
-#, fuzzy, c-format
-#| msgid "Error loading %s: %s\n"
+#, c-format
 msgid "Error adding from %s: %s\n"
-msgstr "Napaka med dodajanjem stika: %s"
+msgstr "Napaka med dodajanjem iz %s: %s\n"
 
 #: ../libbalsa/system-tray.c:99
-#, fuzzy
-#| msgid "Balsa: you have new mail."
 msgid "Balsa: you have new mail"
-msgstr "Balsa: imate novo pošto."
+msgstr "Balsa: prejeli ste novo pošto."
 
 #: ../libbalsa/x509-cert-widget.c:134
 msgid "Broken key, cannot identify certificate chain."
@@ -3072,9 +3038,9 @@ msgid "fingerprint %s"
 msgstr "prstni odtis %s"
 
 #: ../libbalsa/x509-cert-widget.c:281
-#, fuzzy, c-format
+#, c-format
 msgid "cannot load key with fingerprint %s: %s"
-msgstr "Na tem mestu ni mogoče najti ključa »%s«."
+msgstr "ni mogoče naložiti ključa s prstnim odtisom %s: %s"
 
 #: ../libbalsa/x509-cert-widget.c:482
 msgid ""
@@ -3124,10 +3090,9 @@ msgstr ""
 
 #: ../libinit_balsa/assistant_helper.c:201
 #: ../libinit_balsa/assistant_helper.c:224
-#, fuzzy, c-format
-#| msgid "The file with pathname \"%s\" is not a directory."
+#, c-format
 msgid "The file with pathname “%s” is not a directory."
-msgstr "Pot »%s« ni absolutna pot"
+msgstr "Datoteka z imenom poti »%s« ni mapa."
 
 #: ../libinit_balsa/assistant_helper.c:215
 #, fuzzy, c-format
@@ -3465,10 +3430,9 @@ msgstr "Napaka v vrstici %d: %s"
 
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
 #: ../libnetclient/net-client-smtp.c:707
-#, fuzzy, c-format
-#| msgid "_Authentication:"
+#, c-format
 msgid "authentication failure %d: %s"
-msgstr "_Overitev:"
+msgstr "spodletela overitev %d: %s"
 
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
 #: ../libnetclient/net-client-smtp.c:711
@@ -3512,10 +3476,8 @@ msgid "Balsa Email Reader"
 msgstr "Poštni odjemalec Balsa"
 
 #: ../sounds/balsa.soundlist.in.h:2
-#, fuzzy
-#| msgid "Program startup"
 msgid "Program start-up"
-msgstr "Zaženi razhroščevalnik in naloži program"
+msgstr "Zagon programa"
 
 #: ../sounds/balsa.soundlist.in.h:3
 msgid "New mail notification"
@@ -3553,10 +3515,8 @@ msgid "Edit"
 msgstr "Uredi"
 
 #: ../src/ab-main.c:1101
-#, fuzzy
-#| msgid "Osmo Address Book"
 msgid "Balsa Address Book"
-msgstr "Imenik Osmo"
+msgstr "Imenik Balsa"
 
 #: ../src/ab-window.c:184 ../src/filter-edit-dialog.c:207
 #: ../src/filter-export-dialog.c:91 ../src/filter-run-dialog.c:209
@@ -3607,14 +3567,13 @@ msgid "Could not launch %s: %s"
 msgstr "Ni mogoče zagnati %s: %s"
 
 #: ../src/ab-window.c:736
-#, fuzzy, c-format
-#| msgid ""
-#| "Error opening address book '%s':\n"
-#| "%s"
+#, c-format
 msgid ""
 "Error opening address book “%s”:\n"
 "%s"
-msgstr "Poteka odpiranje imenika »%s«"
+msgstr ""
+"Napaka med odpiranjem imenika »%s«:\n"
+"%s"
 
 #: ../src/address-book-config.c:180
 msgid "Suggest complete addresses:"
@@ -3655,10 +3614,9 @@ msgid "A_ddress Book Name:"
 msgstr "_Ime imenika:"
 
 #: ../src/address-book-config.c:378
-#, fuzzy, c-format
-#| msgid "Modify %s Address Book"
+#, c-format
 msgid "Modify Osmo Address Book"
-msgstr "Spremeni imenik %s"
+msgstr "Spremeni imenik Osmo"
 
 #: ../src/address-book-config.c:382
 #, c-format
@@ -3716,10 +3674,8 @@ msgid "Error displaying help: %s\n"
 msgstr "Napaka med prikazovanjem pomoči: %s\n"
 
 #: ../src/address-book-config.c:679
-#, fuzzy
-#| msgid "No path found.  Do you want to give one?"
 msgid "No path found. Do you want to give one?"
-msgstr "Poti ni mogoče najti. Jo želite določiti?"
+msgstr "Poti ni mogoče najti. Ali jo želite določiti?"
 
 #: ../src/address-book-config.c:935
 msgid "vCard Address Book (GnomeCard)"
@@ -3746,10 +3702,8 @@ msgid "Osmo Address Book"
 msgstr "Imenik Osmo"
 
 #: ../src/balsa-app.c:60 ../src/balsa-app.c:142
-#, fuzzy
-#| msgid "_Remember password in keyring"
 msgid "_Remember password in Secret Service"
-msgstr "Za_pomni si geslo"
+msgstr "Za_pomni si geslo v varnih storitvah"
 
 #: ../src/balsa-app.c:63 ../src/balsa-app.c:145
 msgid "_Remember password"
@@ -3965,20 +3919,17 @@ msgstr "Shrani izbrano v mapo …"
 
 #. Translators: save all items to folder and open the folder in standard file manager app
 #: ../src/balsa-message.c:977
-#, fuzzy
-#| msgid "Save selected to folder…"
 msgid "Save selected to folder and browse…"
-msgstr "Shrani izbrano v mapo …"
+msgstr "Shrani izbrano v mapo in prebrskaj …"
 
 #: ../src/balsa-message.c:1081
 msgid "(No sender)"
 msgstr "(ni pošiljatelja)"
 
 #: ../src/balsa-message.c:1136 ../src/balsa-message.c:1148
-#, fuzzy, c-format
-#| msgid "Could not access message %u in mailbox \"%s\"."
+#, c-format
 msgid "Could not access message %u in mailbox “%s”."
-msgstr "Ni mogoč dostop do sporočila %u za prenos v %s"
+msgstr "Ni mogoče dostopiti do sporočila %u v predalo »%s«."
 
 #: ../src/balsa-message.c:1201 ../src/main.c:528
 #, c-format
@@ -4016,10 +3967,10 @@ msgid "force inline for all parts"
 msgstr "vsili vse dele medvrstično"
 
 #: ../src/balsa-message.c:1436
-#, fuzzy, c-format
+#, c-format
 #| msgid "rfc822 message (from %s, subject \"%s\")"
 msgid "RFC822 message (from %s, subject “%s”)"
-msgstr "------ posredovano sporočilo od %s ------\n"
+msgstr "Sporočilo RFC822 (od %s, zadeva »%s«)"
 
 #: ../src/balsa-message.c:1448
 msgid "complete message"
@@ -4299,19 +4250,23 @@ msgstr "Ni mogoče obdelati ključev GnuPG: %s"
 
 #: ../src/balsa-mime-widget-crypto.c:142
 msgid "_Import Autocrypt key"
-msgstr ""
+msgstr "_Uvozi samošifrirni ključ"
 
 #: ../src/balsa-mime-widget-crypto.c:149
 msgid ""
 "The message contains an Autocrypt header, but it is either broken or the "
 "signature has been created using a different key."
 msgstr ""
+"Sporočilo vsebuje glavo samošifriranja, ki pa je ali okvarjeno ali pa je "
+"podpis ustvarjen z drugim ključem."
 
 #: ../src/balsa-mime-widget-crypto.c:153
 msgid ""
 "The message contains an Autocrypt header which is ignored as none of your "
 "identities has Autocrypt support enabled."
 msgstr ""
+"Sporočilo vsebuje glavo samošifriranja, ki pa je prezrta, saj nobena od "
+"istovetnosti nima omogočene podpore samošifriranja."
 
 #: ../src/balsa-mime-widget-crypto.c:158
 #, fuzzy
@@ -4329,28 +4284,20 @@ msgid "decrypted"
 msgstr "šifrirano"
 
 #: ../src/balsa-mime-widget-crypto.c:217
-#, fuzzy
-#| msgid "_Execute signature"
 msgid "trusted signature"
-msgstr "I_zvedi podpis"
+msgstr "zaupanja vreden podpis"
 
 #: ../src/balsa-mime-widget-crypto.c:220
-#, fuzzy
-#| msgid "_Execute signature"
 msgid "low trust signature"
-msgstr "I_zvedi podpis"
+msgstr "pogojno zaupanja vreden podpis"
 
 #: ../src/balsa-mime-widget-crypto.c:223
-#, fuzzy
-#| msgid "Signature"
 msgid "bad signature"
-msgstr "Podpis"
+msgstr "neustrezen podpis"
 
 #: ../src/balsa-mime-widget-crypto.c:226
-#, fuzzy
-#| msgid "No signature found!"
 msgid "unknown signature status"
-msgstr "Ni mogoče najti podpisa!"
+msgstr "neznano stanje podpisa"
 
 #. Translators: successful import of a GnuPG key; #1: backend message
 #: ../src/balsa-mime-widget-crypto.c:313
@@ -4363,9 +4310,9 @@ msgstr ""
 "%s"
 
 #: ../src/balsa-mime-widget-crypto.c:320
-#, fuzzy, c-format
+#, c-format
 msgid "Error importing key data: %s"
-msgstr "Napaka med uvažanjem stikov: %s"
+msgstr "Napaka med uvažanjem podatkov ključa: %s"
 
 #: ../src/balsa-mime-widget-crypto.c:320 ../src/sendmsg-window.c:1717
 msgid "unknown error"
@@ -4376,9 +4323,8 @@ msgid "(imported)"
 msgstr "(uvoženo)"
 
 #: ../src/balsa-mime-widget-crypto.c:365
-#, fuzzy
 msgid "Import key into the local key ring"
-msgstr "Uvozi izbrane ključe v osebno zbirko ključev"
+msgstr "Uvozi ključ v osebno zbirko ključev"
 
 #: ../src/balsa-mime-widget-image.c:196
 #, c-format
@@ -4497,15 +4443,13 @@ msgstr "Odgovor-za:"
 
 #: ../src/balsa-mime-widget-message.c:763
 #: ../src/balsa-print-object-header.c:152
-#, fuzzy
-#| msgid "Sender"
 msgid "Sender:"
-msgstr "Pošiljatelj"
+msgstr "Pošiljatelj:"
 
 #: ../src/balsa-mime-widget-message.c:768
 #: ../src/balsa-print-object-header.c:154
 msgid "FCC:"
-msgstr ""
+msgstr "PKp:"
 
 #: ../src/balsa-mime-widget-message.c:776
 #: ../src/balsa-print-object-header.c:157
@@ -4565,7 +4509,7 @@ msgstr "Prednostno uporabi HTML za tega pošiljatelja"
 
 #: ../src/balsa-mime-widget-text.c:1195
 msgid "Load external content for this sender"
-msgstr ""
+msgstr "Naloži zunanjo vsebino za tega pošiljatelja"
 
 #: ../src/balsa-mime-widget-text.c:1380
 msgid "S_tore Address"
@@ -5460,7 +5404,7 @@ msgstr "_Ustvari"
 
 #: ../src/folder-conf.c:1102
 msgid "server (top level)"
-msgstr ""
+msgstr "strežnik (vrhnja raven)"
 
 #: ../src/folder-conf.c:1118
 #, c-format
@@ -5686,10 +5630,8 @@ msgid "_Subscribe for new mail check"
 msgstr "_Naroči se za novo preverjanje pošte"
 
 #: ../src/mailbox-conf.c:953
-#, fuzzy
-#| msgid "H_ide messages"
 msgid "_Thread messages"
-msgstr "S_krij sporočila"
+msgstr "_Nitena sporočila"
 
 #: ../src/mailbox-conf.c:968
 msgid "_Merge threads with the same subject"
@@ -5805,10 +5747,9 @@ msgstr "Poštni predal %s ni videti kot poštni predal v obliki Maildir."
 
 #: ../src/main.c:116 ../src/main.c:121 ../src/main.c:127 ../src/main.c:133
 #: ../src/main.c:139
-#, fuzzy, c-format
-#| msgid "Balsa cannot open your \"%s\" mailbox."
+#, c-format
 msgid "Balsa cannot open your “%s” mailbox."
-msgstr "Ni mogoče odpreti začasnega poštnega predala: %s"
+msgstr "Ni mogoče odpreti poštnega predala »%s«."
 
 #: ../src/main.c:116
 msgid "Inbox"
@@ -5831,16 +5772,12 @@ msgid "Trash"
 msgstr "Smeti"
 
 #: ../src/main.c:353
-#, fuzzy
-#| msgid "Compressing mail folders..."
 msgid "Compressing mail folders…"
-msgstr "Stiskanje datotek"
+msgstr "Poteka stiskanje map …"
 
 #: ../src/main.c:597
-#, fuzzy
-#| msgid "Get new mail on startup"
 msgid "Get new mail on start-up"
-msgstr "Ni mogoče začeti novega prijavnega zaslona."
+msgstr "Ob zagonu pridobi novo pošto"
 
 #: ../src/main.c:599
 msgid "Compose a new email to EMAIL@ADDRESS"
@@ -5863,10 +5800,8 @@ msgid "Opens first unread mailbox"
 msgstr "Odpre prvi neprebran poštni predal"
 
 #: ../src/main.c:607
-#, fuzzy
-#| msgid "Opens default Inbox on startup"
 msgid "Opens default Inbox on start-up"
-msgstr "ID ali vzdevek sestavnega dela, ki naj se privzeto prikaže ob zagonu."
+msgstr "Odpre privzeto mapo dohodne pošte ob zagonu."
 
 #: ../src/main.c:609
 msgid "Prints number unread and unsent messages"
@@ -5924,10 +5859,8 @@ msgid "About Balsa"
 msgstr "O programu"
 
 #: ../src/main-window.c:1108
-#, fuzzy
-#| msgid "Balsa closes files and connections. Please wait..."
 msgid "Balsa closes files and connections. Please wait…"
-msgstr "Balsa zapira datoteke in povezave. Počakajte ..."
+msgstr "Program zapira datoteke in povezave. Počakajte …"
 
 #: ../src/main-window.c:1511
 msgid "You can apply filters only on mailbox\n"
@@ -5953,7 +5886,7 @@ msgstr "Ni mogoče najti podvojenih sporočil"
 
 #: ../src/main-window.c:2309
 msgid "Show/Hide"
-msgstr ""
+msgstr "Pokaži/Skrij"
 
 #: ../src/main-window.c:2312 ../src/toolbar-factory.c:117
 msgid "Check"
@@ -5979,10 +5912,8 @@ msgstr "Odpiranje %s"
 
 #: ../src/main-window.c:3357 ../src/main-window.c:3512
 #: ../src/main-window.c:3633 ../src/main-window.c:3643
-#, fuzzy
-#| msgid "Checking Mail..."
 msgid "Checking Mail…"
-msgstr "Preverjanje za novo pošto"
+msgstr "Preverjanje za novo pošto …"
 
 #: ../src/main-window.c:3595 ../src/main-window.c:3600
 #: ../src/main-window.c:3633 ../src/main-window.c:3638
@@ -6171,10 +6102,9 @@ msgid "Close message window"
 msgstr "Zapri okno sporočila"
 
 #: ../src/pref-manager.c:1141
-#, fuzzy, c-format
-#| msgid "Error displaying help: %s\n"
+#, c-format
 msgid "Error displaying %s: %s\n"
-msgstr "Napaka med prikazovanjem pomoči: %s\n"
+msgstr "Napaka med prikazovanjem %s: %s\n"
 
 #: ../src/pref-manager.c:1154
 msgid "Show nothing"
@@ -6248,22 +6178,20 @@ msgstr "Preverjanje"
 
 #: ../src/pref-manager.c:2135
 msgid "_Check mail automatically every"
-msgstr "Samodejno _preveri pošto vsakih"
+msgstr "Samodejno _preveri pošto na"
 
 #: ../src/pref-manager.c:2143 ../src/pref-manager.c:2314
 #: ../src/pref-manager.c:2958 ../src/pref-manager.c:3012
 msgid "minutes"
-msgstr "minut"
+msgstr "min"
 
 #: ../src/pref-manager.c:2148
 msgid "Check _IMAP mailboxes"
 msgstr "Preveri poštne predale _IMAP"
 
 #: ../src/pref-manager.c:2152
-#, fuzzy
-#| msgid "Check INBOX _only"
 msgid "Check Inbox _only"
-msgstr "Preveri _le dohoden predal"
+msgstr "Preveri _le dohodni predal"
 
 #: ../src/pref-manager.c:2156
 msgid "Do background check quietly (no messages in status bar)"
@@ -6274,10 +6202,8 @@ msgid "_POP message size limit:"
 msgstr "Omejitev velikosti sporočila _POP:"
 
 #: ../src/pref-manager.c:2183
-#, fuzzy
-#| msgid "Compose a new message"
 msgid "Notification about new messages"
-msgstr "Sestavi novo sporočilo"
+msgstr "Obvestilo o novih sporočilih"
 
 #: ../src/pref-manager.c:2185
 msgid "Display message"
@@ -6295,31 +6221,23 @@ msgstr "Zahteve po obvestilih o prejetju"
 msgid ""
 "When I receive a message whose sender requested a Message Disposition "
 "Notification (MDN), send it if:"
-msgstr ""
-"Ob prejemu sporočila, katerega pošiljatelj je zahteval obvestilo o prejemu, "
-"bo poslano v primeru, da:"
+msgstr "Pred pošiljanjem potrdila o prejemu upoštevaj pravila:"
 
 #: ../src/pref-manager.c:2223
-#, fuzzy
-#| msgid ""
-#| "The message header looks clean\n"
-#| "(the notify-to address is the return path,\n"
-#| "and I am in the \"To:\" or \"Cc:\" list)."
 msgid ""
 "The message header looks clean (the notify-to address is the return path, "
 "and I am in the “To:” or “CC:” list)."
 msgstr ""
-"Glava sporočila je videti v redu\n"
-"(naslov za obvestilo je enak kot povratna pot,\n"
-"vaš naslov pa je v vrstici \"Za:\" ali \"Kp:\")."
+"Če je glava sporočila videti v redu (naslov povratnice je poslanemu in vaš "
+"naslov je med prejemniki):"
 
 #: ../src/pref-manager.c:2237
 msgid "The message header looks suspicious."
-msgstr "Glava sporočila je videti sumljiva."
+msgstr "Če je glava sporočila videti sumljiva:"
 
 #: ../src/pref-manager.c:2261
 msgid "Word wrap"
-msgstr "Prelom besed"
+msgstr "Prelom besedila"
 
 #: ../src/pref-manager.c:2264
 msgid "Wrap outgoing text at"
@@ -6339,11 +6257,11 @@ msgstr "Predpona odgovora:"
 
 #: ../src/pref-manager.c:2297
 msgid "Automatically quote original when replying"
-msgstr "Ob odgovarjanju samodejno navedi izvirnik"
+msgstr "Ob odgovarjanju samodejno navedi izvorno besedilo"
 
 #: ../src/pref-manager.c:2300
 msgid "Forward a mail as attachment instead of quoting it"
-msgstr "Posreduj pošto kot prilogo namesto navajanja v sporočilu"
+msgstr "Posreduj pošto kot prilogo in ne v navedbi sporočila"
 
 #: ../src/pref-manager.c:2303
 msgid "Copy outgoing messages to sentbox"
@@ -6351,13 +6269,11 @@ msgstr "Kopiraj odhodna sporočila v predal poslane pošte"
 
 #: ../src/pref-manager.c:2305
 msgid "Send button always queues outgoing mail in outbox"
-msgstr "Gumb pošlji vedno postavi odhodno pošto v vrsto v odhodni predal"
+msgstr "Gumb za pošiljanje postavi sporočilo v odhodni predal"
 
 #: ../src/pref-manager.c:2309
-#, fuzzy
-#| msgid "_Check mail automatically every"
 msgid "_Send queued mail automatically every"
-msgstr "Samodejno _preveri pošto vsakih"
+msgstr "_Odhodno pošto pošlji samodejno vsakih"
 
 #: ../src/pref-manager.c:2319
 msgid "Edit headers in external editor"
@@ -6365,8 +6281,7 @@ msgstr "Uredi glave v zunanjem urejevalniku"
 
 #: ../src/pref-manager.c:2321
 msgid "Include HTML parts as text when replying or forwarding"
-msgstr ""
-"Ob odgovarjanju ali posredovanju vključi dele HTML kot običajno besedilo"
+msgstr "Ob odgovarjanju vključi dele HTML kot običajno besedilo"
 
 #: ../src/pref-manager.c:2339 ../src/toolbar-prefs.c:158
 msgid "Main window"
@@ -6377,26 +6292,21 @@ msgid "Use preview pane"
 msgstr "Uporabi pladenj predogleda"
 
 #: ../src/pref-manager.c:2346
-#, fuzzy
-#| msgid "Could not access message %u in mailbox \"%s\"."
 msgid "Show message counts in mailbox list"
-msgstr "Pokaži izbrisana sporočila na seznamu sporočil"
+msgstr "Pokaži števec sporočil na seznamu poštnih predalov"
 
 #: ../src/pref-manager.c:2352
 msgid "Automatically view message when mailbox opened"
-msgstr "Samodejno poglej sporočilo ob odprtju poštnega predala"
+msgstr "Samodejno pokaži sporočilo ob odprtju poštnega predala"
 
 #: ../src/pref-manager.c:2355
 msgid "Ask me before selecting a different mailbox to show an unread message"
 msgstr ""
-"Vprašaj me pred izbiro drugega poštnega predala za prikaz neprebranega "
-"sporočila"
+"Vprašaj pred izbiro drugega poštnega predala za prikaz neprebranega sporočila"
 
 #: ../src/pref-manager.c:2359
-#, fuzzy
-#| msgid "PageUp/PageDown keys scroll text by"
 msgid "Page Up/Page Down keys scroll text by"
-msgstr "Tipki StranGor in StranDol premakneta besedilo za"
+msgstr "Tipki PgUp in PgDn pomakneta besedilo za"
 
 #: ../src/pref-manager.c:2367
 msgid "percent"
@@ -6419,10 +6329,8 @@ msgid "Default sort column:"
 msgstr "Privzet stolpec razvrščanja:"
 
 #: ../src/pref-manager.c:2417
-#, fuzzy
-#| msgid "sign messages by default"
 msgid "Thread messages by default"
-msgstr "samodejno podpiši sporočila"
+msgstr "Privzeto razvrščaj v niteni obliki"
 
 #: ../src/pref-manager.c:2419
 msgid "Expand threads on open"
@@ -6460,22 +6368,17 @@ msgid "Mark quoted text"
 msgstr "Označi navedeno besedilo"
 
 #: ../src/pref-manager.c:2514
-#, fuzzy
-#| msgid ""
-#| "Quoted text\n"
-#| "regular expression:"
 msgid "Quoted text regular expression:"
-msgstr "Iskalni niz je logični izraz"
+msgstr "Logični izraz navedenega besedila:"
 
 #: ../src/pref-manager.c:2517
 msgid "Wrap text at"
 msgstr "Prelomi besedilo na"
 
 #: ../src/pref-manager.c:2536
-#, fuzzy, c-format
-#| msgid "FTP site: %s\n"
+#, c-format
 msgid "HTTP cache size: %s"
-msgstr "Stran FTP: %s\n"
+msgstr "Velikost predpomnilnika HTTP: %s"
 
 #. handling of multipart/alternative
 #: ../src/pref-manager.c:2569
@@ -6483,22 +6386,18 @@ msgid "Display of multipart/alternative parts"
 msgstr "Prikaži večdelne/dodatne dele"
 
 #: ../src/pref-manager.c:2573
-#, fuzzy
-#| msgid "Prefer text/plain over html"
 msgid "Prefer text/plain over HTML"
-msgstr "Ali naj imajo ikone prednost pred besedilom"
+msgstr "Prednostno uporabi golo besedilo in ne HTML"
 
 #. Translators: per-sender database of exceptions over global HTTP
 #. * preferences (display HTML vs. plain, auto-load external items)
 #: ../src/pref-manager.c:2578
-#, fuzzy
-#| msgid "Description"
 msgid "Manage exceptions…"
-msgstr "Opis"
+msgstr "Upravljanje izjem …"
 
 #: ../src/pref-manager.c:2586
 msgid "Clear HTTP cache…"
-msgstr ""
+msgstr "Počisti predpomnilnik HTTP …"
 
 #: ../src/pref-manager.c:2605
 msgid "Message colors"
@@ -6507,7 +6406,7 @@ msgstr "Barve sporočila"
 #: ../src/pref-manager.c:2610
 #, c-format
 msgid "Quote level %d color"
-msgstr "%d barva ravni navedbe"
+msgstr "Barva %d ravni navedbe"
 
 #: ../src/pref-manager.c:2628
 msgid "Link color"
@@ -6533,13 +6432,11 @@ msgstr "Izbrane glave:"
 #: ../src/pref-manager.c:2668
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
-"Nacionalni (8-bitni) znaki v besedilu sporočila brez podatkov o naboru."
+"Nadomestni (8-bitni) znaki v besedilu sporočila, brez podatkov o naboru"
 
 #: ../src/pref-manager.c:2673
-#, fuzzy
-#| msgid "display as \"?\""
 msgid "display as “?”"
-msgstr "PRIKAZ"
+msgstr "zamenjaj z znakom » ? «"
 
 #: ../src/pref-manager.c:2681
 msgid "display in codeset"
@@ -6574,16 +6471,12 @@ msgid "Display progress dialog"
 msgstr "Pokaži pogovorno okno napredovanja"
 
 #: ../src/pref-manager.c:2743
-#, fuzzy
-#| msgid "Display progress dialog"
 msgid "Display progress dialog when sending messages"
-msgstr "Pokaži pogovorno okno napredovanja"
+msgstr "Pokaži pogovorno okno napredovanja ob pošiljanju sporočil"
 
 #: ../src/pref-manager.c:2744
-#, fuzzy
-#| msgid "Display progress dialog"
 msgid "Display progress dialog when retrieving messages"
-msgstr "Pokaži pogovorno okno napredovanja"
+msgstr "Pokaži pogovorno okno napredovanja ob pridobivanju sporočil"
 
 #: ../src/pref-manager.c:2766 ../src/pref-manager.c:3384
 msgid "Address books"
@@ -6614,20 +6507,14 @@ msgid "Check quoted"
 msgstr "Preveri navedeno"
 
 #: ../src/pref-manager.c:2874
-#, fuzzy
-#| msgid "Startup options"
 msgid "Start-up options"
-msgstr "Pokaži čarovnika prvega zagona"
+msgstr "Možnosti zagona"
 
 #: ../src/pref-manager.c:2877
-#, fuzzy
-#| msgid "Open Inbox upon startup"
 msgid "Open Inbox upon start-up"
 msgstr "Ob zagonu odpri dohodno pošto"
 
 #: ../src/pref-manager.c:2879
-#, fuzzy
-#| msgid "Check mail upon startup"
 msgid "Check mail upon start-up"
 msgstr "Ob zagonu preveri pošto"
 
@@ -6640,29 +6527,24 @@ msgid "Folder scanning"
 msgstr "Preiskovanje map"
 
 #: ../src/pref-manager.c:2902
-#, fuzzy
-#| msgid ""
-#| "Choose depth 1 for fast startup; this defers scanning some folders.  To "
-#| "see more of the tree at startup, choose a greater depth."
 msgid ""
 "Choose depth 1 for fast start-up; this defers scanning some folders. To see "
 "more of the tree at start-up, choose a greater depth."
 msgstr ""
-"Izberite globino 1 za hiter zagon; to onemogoči preiskovanje nekaterih map. "
-"V primeru, da želite ob zagonu videti večji del drevesa, izberite večjo "
-"globino."
+"Izberite globino 1 ravni za hiter zagon; to onemogoči preiskovanje nekaterih "
+"map. Če želite videti ob zagonu večji del drevesa, določite večjo globino."
 
 #: ../src/pref-manager.c:2909
 msgid "Scan local folders to depth"
-msgstr "Preiskovanje krajevnih map do globine"
+msgstr "Preiskuj krajevne mape do globine"
 
 #: ../src/pref-manager.c:2918
 msgid "Scan IMAP folders to depth"
-msgstr "Preiskovanje map IMAP do globine"
+msgstr "Preiskuj mape IMAP do globine"
 
 #: ../src/pref-manager.c:2940 ../src/pref-manager.c:3398
 msgid "Miscellaneous"
-msgstr "Različno"
+msgstr "Razno"
 
 #: ../src/pref-manager.c:2943
 msgid "Empty trash on exit"
@@ -6670,7 +6552,7 @@ msgstr "Ob izhodu izprazni smeti"
 
 #: ../src/pref-manager.c:2947
 msgid "Close mailbox if unused more than"
-msgstr "Zapri poštni predal, če ni uporabljen več kot"
+msgstr "Zapri poštni predal, če ni dejavnosti več kot"
 
 #: ../src/pref-manager.c:2962
 msgid "Enable System Tray Icon support"
@@ -6689,26 +6571,25 @@ msgid ""
 "The following setting is global, but may be overridden for the selected "
 "mailbox using Mailbox %s Hide messages:"
 msgstr ""
-"Nastavitev je splošna, vendar jo je mogoče za izbrane poštne predale "
-"prepisati s skritimi %s sporočili poštnega predala:"
+"Nastavitev je splošna, a jo je mogoče za izbrane poštne predale prepisati z "
+"uporabo možnosti %s skrivanja sporočil:"
 
 #: ../src/pref-manager.c:2993
 msgid "Hide messages marked as deleted"
-msgstr "Skrij sporočila označena kot izbrisana"
+msgstr "Skrij sporočila, označena kot izbrisana"
 
 #: ../src/pref-manager.c:2995
 msgid "The following settings are global:"
-msgstr "Naslednje nastavitve so splošne:"
+msgstr "Splošna določila:"
 
 #: ../src/pref-manager.c:2998
 msgid "Expunge deleted messages when mailbox is closed"
-msgstr "Samodejno uniči izbrisana sporočila ob zaprtju poštnega predala"
+msgstr "Uniči izbrisana sporočila ob zapiranju poštnega predala"
 
 #: ../src/pref-manager.c:3002
-#, fuzzy
 #| msgid "...and if unused more than"
 msgid "…and if unused more than"
-msgstr "Zapri poštni predal, če ni uporabljen več kot"
+msgstr "… in če je predal nedejaven več kot"
 
 #: ../src/pref-manager.c:3220
 msgid "Mail options"
@@ -6728,7 +6609,7 @@ msgstr "Možnosti prikaza"
 
 #: ../src/pref-manager.c:3243
 msgid "Sort and thread"
-msgstr "Razvrsti in ustvari niten seznam"
+msgstr "Razvrščanje in nitenje"
 
 #: ../src/pref-manager.c:3247 ../src/print-gtk.c:610
 msgid "Message"
@@ -6752,8 +6633,6 @@ msgid "Spelling"
 msgstr "Črkovanje"
 
 #: ../src/pref-manager.c:3394
-#, fuzzy
-#| msgid "Startup"
 msgid "Start-up"
 msgstr "Zagon"
 
@@ -6763,10 +6642,8 @@ msgid "Page %d of %d"
 msgstr "Stran %d od %d"
 
 #: ../src/print-gtk.c:126
-#, fuzzy
-#| msgid "Signed and encrypted matter"
 msgid "Signed and encrypted"
-msgstr "Šifrirana in podpisana zadeva"
+msgstr "Podpisano in šifrirano"
 
 #: ../src/print-gtk.c:128
 msgid "Signed"
@@ -7093,41 +6970,30 @@ msgstr ""
 "Naj bo shranjeno v predal osnutkov?"
 
 #: ../src/sendmsg-window.c:699
-#, fuzzy, c-format
-#| msgid "Send failed: %s"
+#, c-format
 msgid "Editing failed: %s"
-msgstr "Pošiljanje je spodletelo: %s"
+msgstr "Urejanje je spodletelo: %s"
 
 #: ../src/sendmsg-window.c:710 ../src/sendmsg-window.c:4802
-#, fuzzy, c-format
-#| msgid "Could not write file %s: %s"
+#, c-format
 msgid "Cannot read the file “%s”: %s"
-msgstr "Datoteka PO »%s« ne obstaja ali pa je ni mogoče prebrati."
+msgstr "Ni mogoče prebrati datoteke »%s«: %s"
 
 #: ../src/sendmsg-window.c:809
-#, fuzzy
-#| msgid "Gnome editor is not defined in your preferred applications."
 msgid "GNOME editor is not defined in your preferred applications."
-msgstr "Gnome urejevalnik ni določen med priljubljenimi programi."
+msgstr "Urejevalnik GNOME ni določen med priljubljenimi programi."
 
 #: ../src/sendmsg-window.c:818
-#, fuzzy, c-format
-#| msgid "Cannot create temporary file"
+#, c-format
 msgid "Could not create temporary file: %s"
-msgstr "Ni mogoče ustvariti začasne datoteke"
+msgstr "Ni mogoče ustvariti začasne datoteke: %s"
 
 #: ../src/sendmsg-window.c:897
 msgid "Select Identity"
 msgstr "Izbor istovetnosti"
 
 #: ../src/sendmsg-window.c:1406
-#, fuzzy, c-format
-#| msgid ""
-#| "Saying yes will not send the file `%s' itself, but just a MIME message/"
-#| "external-body reference.  Note that the recipient must have proper "
-#| "permissions to see the `real' file.\n"
-#| "\n"
-#| "Do you really want to attach this file as reference?"
+#, c-format
 msgid ""
 "Saying yes will not send the file “%s” itself, but just a MIME message/"
 "external-body reference. Note that the recipient must have proper "
@@ -7135,9 +7001,9 @@ msgid ""
 "\n"
 "Do you really want to attach this file as reference?"
 msgstr ""
-"Odgovor 'da' ne bo poslal datoteke `%s', temveč le sporočilo MIME o "
-"zunajtelesnem sklicu.  Prejemnik mora imeti prava dovoljenja za ogled "
-"`prave' datoteke.\n"
+"Ob pritrdilnem odzivu datoteka »%s« ne bo poslana, poslan bo le sklic MIME "
+"sporočila. Prejemnik mora imeti ustrezna dovoljenja za ogled »prave« "
+"datoteke.\n"
 "\n"
 "Ali zares želite priložiti to datoteko kot sklic?"
 
@@ -7146,19 +7012,11 @@ msgid "Attach as Reference?"
 msgstr "Priloži kot sklic?"
 
 #: ../src/sendmsg-window.c:1543
-#, fuzzy
-#| msgid "Choose charset"
 msgid "Choose character set"
-msgstr ""
-"Izbor nabora znakov, ki naj bo uporabljen med branjem oznak ID3v1 in ID3v2."
+msgstr "Izbor nabora znakov"
 
 #: ../src/sendmsg-window.c:1551
-#, fuzzy, c-format
-#| msgid ""
-#| "File\n"
-#| "%s\n"
-#| "is not encoded in US-ASCII or UTF-8.\n"
-#| "Please choose the charset used to encode the file."
+#, c-format
 msgid ""
 "File\n"
 "%s\n"
@@ -7168,17 +7026,16 @@ msgstr ""
 "Datoteka\n"
 "%s\n"
 "ni kodirana v naboru US-ASCII ali UTF-8.\n"
-"Izberite znakovni nabor za to datoteko."
+"Izberite znakovni nabor za kodiranje te datoteke."
 
 #: ../src/sendmsg-window.c:1571
 msgid "Attach as MIME type:"
 msgstr "Priloži kot vrsto MIME:"
 
 #: ../src/sendmsg-window.c:1632
-#, fuzzy, c-format
-#| msgid "Character set for file %s changed from \"%s\" to \"%s\"."
+#, c-format
 msgid "Character set for file %s changed from “%s” to “%s”."
-msgstr "Pretvorba iz nabora »%s« v »UTF-8« ni podprto"
+msgstr "Kodni nabor je za datoteko %s spremenjen iz »%s« v »%s«."
 
 #: ../src/sendmsg-window.c:1678 ../src/sendmsg-window.c:5169
 msgid "(no subject)"
@@ -7189,10 +7046,9 @@ msgid "forwarded message"
 msgstr "posredovano sporočilo"
 
 #: ../src/sendmsg-window.c:1762
-#, fuzzy, c-format
-#| msgid "Message from %s, subject: \"%s\""
+#, c-format
 msgid "Message from %s, subject: “%s”"
-msgstr "------ posredovano sporočilo od %s ------\n"
+msgstr "Sporočilo od %s, zadeva: »%s«"
 
 #: ../src/sendmsg-window.c:1846 ../src/sendmsg-window.c:1922
 msgid "Remove"
@@ -7229,9 +7085,8 @@ msgid "S_ubject:"
 msgstr "_Zadeva:"
 
 #: ../src/sendmsg-window.c:2585
-#, fuzzy
 msgid "F_CC:"
-msgstr "Kp: "
+msgstr "_PKp:"
 
 #. Attachment list
 #: ../src/sendmsg-window.c:2612
@@ -7256,22 +7111,18 @@ msgid "No subject"
 msgstr "Brez zadeve"
 
 #: ../src/sendmsg-window.c:3104
-#, fuzzy
-#| msgid "encrypted: "
 msgid "decrypted: "
-msgstr "šifrirano:"
+msgstr "odšifrirano: "
 
 #: ../src/sendmsg-window.c:3112
-#, fuzzy, c-format
-#| msgid "inlined file \"%s\" (%s)"
+#, c-format
 msgid "inlined file “%s” (%s)"
-msgstr "medvrstični del %s"
+msgstr "vstavljena datoteka »%s« (%s)"
 
 #: ../src/sendmsg-window.c:3115
-#, fuzzy, c-format
-#| msgid "attached file \"%s\" (%s)"
+#, c-format
 msgid "attached file “%s” (%s)"
-msgstr "Napaka med nalaganjem priložene slike: %s\n"
+msgstr "priložena datoteka »%s« (%s)"
 
 #: ../src/sendmsg-window.c:3120
 #, c-format
@@ -7434,8 +7285,6 @@ msgid "If you would like to provide one, enter it below."
 msgstr "Če jo želite navesti, jo vpišite spodaj."
 
 #: ../src/sendmsg-window.c:5214
-#, fuzzy
-#| msgid "Message could not be encrypted"
 msgid "Message could be encrypted"
 msgstr "Sporočila ni mogoče šifrirati"
 
@@ -7458,10 +7307,9 @@ msgstr ""
 "vsem prejemnikom. Za zaščito svoje zasebnosti lahko sporočilo šifrirate s %s."
 
 #: ../src/sendmsg-window.c:5363
-#, fuzzy, c-format
-#| msgid "Error loading Face: %s"
+#, c-format
 msgid "error checking Autocrypt keys: %s"
-msgstr "Napaka med nalaganjem Face: %s"
+msgstr "napaka preverjanja samošifrirnih ključev: %s"
 
 #: ../src/sendmsg-window.c:5394
 msgid ""
@@ -7484,10 +7332,9 @@ msgstr[2] ""
 msgstr[3] ""
 
 #: ../src/sendmsg-window.c:5432
-#, fuzzy, c-format
-#| msgid "Cannot process the message: %s"
+#, c-format
 msgid "Cannot import Autocrypt keys: %s"
-msgstr "Sporočila ni mogoče obdelati: %s"
+msgstr "Ni mogoče uvoziti samošifrirnih ključev: %s"
 
 #: ../src/sendmsg-window.c:5492
 msgid "You selected OpenPGP security for this message.\n"
@@ -7653,10 +7500,9 @@ msgid "Revert all changes and finish spell checking"
 msgstr "Povrni vse spremembe in končaj preverjanje črkovanja"
 
 #: ../src/spell-check.c:1024
-#, fuzzy, c-format
-#| msgid "BalsaSpellCheck: Pspell Error: %s\n"
+#, c-format
 msgid "BalsaSpellCheck: Enchant Error: %s\n"
-msgstr "napaka: %s\n"
+msgstr "Jezikovni pregled: napaka Enchant: %s\n"
 
 #: ../src/store-address.c:105
 msgid "Store address: no addresses"
@@ -7850,12 +7696,12 @@ msgstr ""
 "glave"
 
 #: ../src/toolbar-factory.c:146
-#, fuzzy
-#| msgid "Check cryptographic signature"
 msgid ""
 "Recheck\n"
 "cryptography"
-msgstr "Preveri šifrirni podpis"
+msgstr ""
+"Ponovno preveri\n"
+"šifriranje"
 
 #: ../src/toolbar-factory.c:147
 msgid ""
@@ -8097,7 +7943,7 @@ msgstr "_Imenik"
 
 #: ../ui/main-window.ui.h:16
 msgid "A_utocrypt Database"
-msgstr "Samodejno _šifriraj podatkovno zbirko"
+msgstr "Podatkovna zbirka samošifriranja"
 
 #: ../ui/main-window.ui.h:17
 msgid "Empty _Trash"

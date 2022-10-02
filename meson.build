@@ -169,7 +169,10 @@ libnetclient_deps = [glib_dep,
 # HTML widget
 #
 if html_widget == 'webkit2'
-  html_dep = dependency('webkit2gtk-4.0', version : '>= 2.28.0')
+  html_dep = dependency('webkit2gtk-4.1', required : false)
+  if not html_dep.found()
+    html_dep = dependency('webkit2gtk-4.0', version : '>= 2.28.0')
+  endif
   htmlpref_dep = dependency('sqlite3', version : '>= 3.24.0')
   balsa_web_extensions = join_paths(get_option('prefix'), get_option('libdir'), 'balsa')
   add_project_arguments('-DBALSA_WEB_EXTENSIONS="' + balsa_web_extensions + '"', language : 'c')

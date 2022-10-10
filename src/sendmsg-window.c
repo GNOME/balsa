@@ -5171,12 +5171,12 @@ bsmsg2message(BalsaSendmsg * bsmsg)
         libbalsa_message_append_part(message, body);
 
         if (balsa_app.has_openpgp || balsa_app.has_smime) {
-            libbalsa_message_set_gpg_mode(message,
-                (bsmsg->gpg_mode & LIBBALSA_PROTECT_MODE) != 0 ? bsmsg->gpg_mode : 0);
+            libbalsa_message_set_crypt_mode(message,
+                (bsmsg->crypt_mode & LIBBALSA_PROTECT_MODE) != 0 ? bsmsg->crypt_mode : 0);
             libbalsa_message_set_attach_pubkey(message, bsmsg->attach_pubkey);
             libbalsa_message_set_identity(message, ident);
         } else {
-            libbalsa_message_set_gpg_mode(message, 0);
+            libbalsa_message_set_crypt_mode(message, 0);
             libbalsa_message_set_attach_pubkey(message, FALSE);
         }
     }
@@ -5188,17 +5188,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     }
 
     headers->date = time(NULL);
-    if (balsa_app.has_openpgp || balsa_app.has_smime) {
-        libbalsa_message_set_crypt_mode(message,
-            (bsmsg->crypt_mode & LIBBALSA_PROTECT_MODE) != 0 ? bsmsg->crypt_mode : LIBBALSA_PROTECT_NONE);
-        libbalsa_message_set_attach_pubkey(message, bsmsg->attach_pubkey);
-        libbalsa_message_set_always_trust(message, bsmsg->always_trust);
-        libbalsa_message_set_identity(message, ident);
-    } else {
-        libbalsa_message_set_crypt_mode(message, LIBBALSA_PROTECT_NONE);
-        libbalsa_message_set_attach_pubkey(message, FALSE);
-        libbalsa_message_set_always_trust(message, FALSE);
-    }
 
     /* remember the parent window */
     g_object_set_data(G_OBJECT(message), "parent-window",

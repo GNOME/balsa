@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-08-13 18:55+0000\n"
-"PO-Revision-Date: 2022-08-13 20:57+0200\n"
+"POT-Creation-Date: 2022-08-21 11:04+0000\n"
+"PO-Revision-Date: 2022-10-25 07:13+0200\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: \n"
 "Language: ka\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.2\n"
 
 #: ../balsa.appdata.xml.in.h:1
 msgid ""
@@ -57,7 +57,7 @@ msgid "and the proverbial much, much more."
 msgstr ""
 
 #: ../org.desktop.Balsa.desktop.in.in.h:1
-#: ../balsa-mailto-handler.desktop.in.in.h:1
+#: ../balsa-mailto-handler.desktop.in.in.h:1 ../libbalsa/system-tray.c:102
 msgid "Balsa"
 msgstr "Balsa"
 
@@ -69,7 +69,7 @@ msgstr ""
 #: ../org.desktop.Balsa.desktop.in.in.h:3
 #: ../balsa-mailto-handler.desktop.in.in.h:3
 msgid "Mail Client"
-msgstr ""
+msgstr "საფოსტო კლიენტი"
 
 #: ../org.desktop.Balsa.desktop.in.in.h:4
 #: ../balsa-mailto-handler.desktop.in.in.h:4
@@ -111,7 +111,7 @@ msgstr ""
 #: ../src/balsa-mime-widget-callbacks.c:170
 #: ../src/balsa-mime-widget-crypto.c:77 ../src/balsa-mime-widget-crypto.c:83
 #: ../src/balsa-mime-widget-message.c:363 ../src/balsa-mime-widget-text.c:255
-#: ../src/main-window.c:2987 ../src/main-window.c:4143
+#: ../src/main-window.c:3057 ../src/main-window.c:4242
 #: ../src/sendmsg-window.c:1453 ../src/sendmsg-window.c:2982
 #: ../src/sendmsg-window.c:3935
 msgid "Unknown error"
@@ -238,7 +238,7 @@ msgstr ""
 #: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
 #: ../libbalsa/libbalsa-gpgme-widgets.c:769 ../src/ab-window.c:148
 #: ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
-#: ../src/main-window.c:3835 ../src/toolbar-prefs.c:130
+#: ../src/main-window.c:3934 ../src/toolbar-prefs.c:130
 #: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
 #: ../ui/sendmsg-window.ui.h:12 ../ui/source-viewer.ui.h:2
 msgid "_Close"
@@ -246,7 +246,7 @@ msgstr "_დახურვა"
 
 #: ../libbalsa/autocrypt.c:521 ../src/balsa-mblist.c:326
 msgid "Mailbox"
-msgstr ""
+msgstr "საფოსტო ყუთი"
 
 #: ../libbalsa/autocrypt.c:527
 msgid "Last seen"
@@ -277,8 +277,8 @@ msgstr ""
 
 #: ../libbalsa/autocrypt.c:892 ../libbalsa/html-pref-db.c:453
 #: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1040
-#: ../src/mailbox-node.c:1056 ../src/pref-manager.c:2003
-#: ../src/pref-manager.c:2088 ../src/pref-manager.c:2813 ../ui/ab-main.ui.h:11
+#: ../src/mailbox-node.c:1056 ../src/pref-manager.c:2024
+#: ../src/pref-manager.c:2109 ../src/pref-manager.c:2832 ../ui/ab-main.ui.h:11
 #: ../ui/main-window.ui.h:61
 msgid "_Delete"
 msgstr "_წაშლა"
@@ -310,31 +310,31 @@ msgstr ""
 msgid "Could not read embedded message"
 msgstr ""
 
-#: ../libbalsa/filter.c:127 ../libbalsa/mailbox_local.c:880
+#: ../libbalsa/filter.c:123 ../libbalsa/mailbox_local.c:880
 msgid "Unable to load message body to match filter"
 msgstr ""
 
-#: ../libbalsa/filter.c:225
+#: ../libbalsa/filter.c:221
 #, c-format
 msgid "Invalid filter: %s"
 msgstr ""
 
-#: ../libbalsa/filter.c:273 ../libbalsa/filter.c:296
+#: ../libbalsa/filter.c:266 ../libbalsa/filter.c:289
 #, c-format
 msgid "Bad mailbox name for filter: %s"
 msgstr ""
 
-#: ../libbalsa/filter.c:277
+#: ../libbalsa/filter.c:270
 #, c-format
 msgid "Error when copying messages: %s"
 msgstr ""
 
-#: ../libbalsa/filter.c:287
+#: ../libbalsa/filter.c:280
 #, c-format
 msgid "Error when trashing messages: %s"
 msgstr ""
 
-#: ../libbalsa/filter.c:300
+#: ../libbalsa/filter.c:293
 #, c-format
 msgid "Error when moving messages: %s"
 msgstr ""
@@ -370,7 +370,7 @@ msgid "From"
 msgstr "URI-დან"
 
 #: ../libbalsa/filter-funcs.c:383 ../src/balsa-index.c:427
-#: ../src/pref-manager.c:218
+#: ../src/pref-manager.c:226
 msgid "Subject"
 msgstr "შინაარსი"
 
@@ -380,7 +380,7 @@ msgstr "CC"
 
 #: ../libbalsa/filter-funcs.c:385
 msgid "Body"
-msgstr ""
+msgstr "სხეული"
 
 #: ../libbalsa/filter-funcs.c:390
 #, c-format
@@ -397,7 +397,7 @@ msgstr "წაშლილია"
 
 #: ../libbalsa/filter-funcs.c:414 ../src/filter-edit-callbacks.c:991
 msgid "Replied"
-msgstr ""
+msgstr "ნაპასუხები"
 
 #: ../libbalsa/filter-funcs.c:415 ../src/filter-edit-callbacks.c:991
 msgid "Flagged"
@@ -558,7 +558,7 @@ msgstr ""
 msgid "HTML preferences"
 msgstr ""
 
-#: ../libbalsa/html-pref-db.c:188 ../src/pref-manager.c:221
+#: ../libbalsa/html-pref-db.c:188 ../src/pref-manager.c:229
 msgid "Sender"
 msgstr "გამომგზავნი"
 
@@ -643,7 +643,7 @@ msgstr ""
 #: ../src/folder-conf.c:1090 ../src/mailbox-conf.c:207
 #: ../src/mailbox-conf.c:229 ../src/mailbox-conf.c:245
 #: ../src/mailbox-conf.c:733 ../src/mailbox-conf.c:790
-#: ../src/pref-manager.c:3307 ../src/sendmsg-window.c:493
+#: ../src/pref-manager.c:3332 ../src/sendmsg-window.c:493
 #: ../src/sendmsg-window.c:1548 ../src/sendmsg-window.c:2004
 #: ../src/sendmsg-window.c:3388 ../src/sendmsg-window.c:4824
 #: ../src/sendmsg-window.c:5133 ../src/sendmsg-window.c:5219
@@ -657,8 +657,8 @@ msgstr "გაუქმება"
 #: ../src/balsa-message.c:1760 ../src/balsa-mime-widget-callbacks.c:86
 #: ../src/filter-edit-callbacks.c:1237 ../src/filter-edit-dialog.c:573
 #: ../src/filter-export-dialog.c:79 ../src/filter-run-dialog.c:299
-#: ../src/folder-conf.c:344 ../src/main-window.c:3927
-#: ../src/pref-manager.c:3305 ../src/sendmsg-window.c:1547
+#: ../src/folder-conf.c:344 ../src/main-window.c:4026
+#: ../src/pref-manager.c:3330 ../src/sendmsg-window.c:1547
 #: ../src/sendmsg-window.c:2005 ../src/sendmsg-window.c:3387
 #: ../src/sendmsg-window.c:4825 ../src/store-address.c:209
 msgid "_OK"
@@ -871,8 +871,8 @@ msgstr ""
 #: ../src/address-book-config.c:390 ../src/filter-edit-callbacks.c:1239
 #: ../src/filter-edit-dialog.c:575 ../src/filter-export-dialog.c:81
 #: ../src/filter-run-dialog.c:301 ../src/folder-conf.c:470
-#: ../src/folder-conf.c:843 ../src/main-window.c:3834
-#: ../src/pref-manager.c:3308 ../src/toolbar-prefs.c:131 ../ui/ab-main.ui.h:16
+#: ../src/folder-conf.c:843 ../src/main-window.c:3933
+#: ../src/pref-manager.c:3333 ../src/toolbar-prefs.c:131 ../ui/ab-main.ui.h:16
 #: ../ui/main-window.ui.h:89
 msgid "_Help"
 msgstr "დახმარება"
@@ -1006,87 +1006,97 @@ msgstr ""
 msgid "do not show again"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:402
+#: ../libbalsa/libbalsa.c:406
 msgid "broken TLS certificate"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:406
+#: ../libbalsa/libbalsa.c:410
 msgid "SSL/TLS certificate"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:410
+#: ../libbalsa/libbalsa.c:414
 msgid "_Accept Once"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:411
+#: ../libbalsa/libbalsa.c:415
 msgid "Accept & _Save"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:412
+#: ../libbalsa/libbalsa.c:416
 msgid "_Reject"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:417
+#: ../libbalsa/libbalsa.c:421
 #, c-format
 msgid ""
 "<big><b>Authenticity of this certificate could not be verified.</b></big>\n"
 "Reason: %s"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:455
+#: ../libbalsa/libbalsa.c:459
 msgid "the signing certificate authority is not known"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:456
+#: ../libbalsa/libbalsa.c:460
 msgid ""
 "the certificate does not match the expected identity of the site that it was "
 "retrieved from"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:457
+#: ../libbalsa/libbalsa.c:461
 msgid "the certificate’s activation time is still in the future"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:458
+#: ../libbalsa/libbalsa.c:462
 msgid "the certificate has expired"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:459
+#: ../libbalsa/libbalsa.c:463
 msgid "the certificate has been revoked"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:460
+#: ../libbalsa/libbalsa.c:464
 msgid "the certificate’s algorithm is considered insecure"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:461
+#: ../libbalsa/libbalsa.c:465
 msgid "an error occurred validating the certificate"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:477
+#: ../libbalsa/libbalsa.c:481
 #, c-format
 msgid "unknown certificate validation error %u"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:556
+#: ../libbalsa/libbalsa.c:560
 #, c-format
 msgid "No image data"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:590
+#: ../libbalsa/libbalsa.c:594
 #, c-format
 msgid "Invalid input format"
 msgstr ""
 
-#: ../libbalsa/libbalsa.c:594
+#: ../libbalsa/libbalsa.c:598
 #, c-format
 msgid "Internal buffer overrun"
 msgstr ""
 
 #. Translators: please do not translate Face.
-#: ../libbalsa/libbalsa.c:611
+#: ../libbalsa/libbalsa.c:615
 #, c-format
 msgid "Bad X-Face data"
+msgstr ""
+
+#: ../libbalsa/libbalsa.c:714
+#, c-format
+msgid "Cannot play sound event “%s”: %s"
+msgstr ""
+
+#: ../libbalsa/libbalsa.c:730
+#, c-format
+msgid "Cannot play sound file “%s”: %s"
 msgstr ""
 
 #: ../libbalsa/libbalsa-conf.c:139
@@ -1212,7 +1222,7 @@ msgid "User ID"
 msgstr "მომხმარებლის ID"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:287 ../src/balsa-index.c:460
-#: ../src/pref-manager.c:220 ../src/sendmsg-window.c:2667
+#: ../src/pref-manager.c:228 ../src/sendmsg-window.c:2667
 msgid "Size"
 msgstr "ზომა"
 
@@ -1461,7 +1471,7 @@ msgstr "მდგომარეობა:"
 #: ../libbalsa/libbalsa-gpgme-widgets.c:336
 #: ../libbalsa/libbalsa-gpgme-widgets.c:649
 msgid "Fingerprint:"
-msgstr ""
+msgstr "ანაბეჭდი:"
 
 #. add type and filename (if available)
 #: ../libbalsa/libbalsa-gpgme-widgets.c:339
@@ -1517,7 +1527,7 @@ msgstr "გაუქმებულია"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:475
 msgid "expired"
-msgstr ""
+msgstr "ვადაგასულია"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:481
 msgid "invalid"
@@ -1525,11 +1535,11 @@ msgstr "მცდარი"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:707
 msgid "sign"
-msgstr ""
+msgstr "ხელმოწერა"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:710
 msgid "encrypt"
-msgstr ""
+msgstr "დაშიფრვა"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:713
 msgid "certify"
@@ -2041,7 +2051,7 @@ msgstr "კორეული"
 #: ../libbalsa/misc.c:614
 #, c-format
 msgid "Cannot open %s: %s"
-msgstr ""
+msgstr "%s-ის გახსნის შეცდომა: %s"
 
 #: ../libbalsa/misc.c:623
 #, c-format
@@ -2229,7 +2239,7 @@ msgstr "ყოველდღე"
 #: ../libbalsa/rfc2445.c:558
 #, c-format
 msgid "every %d days"
-msgstr ""
+msgstr "ყოველ %d დღეში"
 
 #: ../libbalsa/rfc2445.c:573
 msgid "every "
@@ -2256,7 +2266,7 @@ msgstr "ყოველ კვირა"
 #: ../libbalsa/rfc2445.c:592
 #, c-format
 msgid "every %d weeks"
-msgstr ""
+msgstr "ყოველ %d კვირაში"
 
 #: ../libbalsa/rfc2445.c:603
 msgid "the last"
@@ -2809,7 +2819,7 @@ msgstr ""
 msgid "Sp_lit message larger than"
 msgstr ""
 
-#: ../libbalsa/smtp-server.c:352 ../src/pref-manager.c:2170
+#: ../libbalsa/smtp-server.c:352 ../src/pref-manager.c:2167
 msgid "MB"
 msgstr "მბ"
 
@@ -2819,11 +2829,15 @@ msgstr ""
 
 #: ../libbalsa/source-viewer.c:219
 msgid "Message Source"
-msgstr ""
+msgstr "შეტყობინების წყარო"
 
 #: ../libbalsa/source-viewer.c:229 ../src/message-window.c:881
 #, c-format
 msgid "Error adding from %s: %s\n"
+msgstr ""
+
+#: ../libbalsa/system-tray.c:99
+msgid "Balsa: you have new mail"
 msgstr ""
 
 #: ../libbalsa/x509-cert-widget.c:134
@@ -2917,23 +2931,23 @@ msgstr ""
 
 #: ../libinit_balsa/assistant_page_directory.c:48
 msgid "_Inbox:"
-msgstr ""
+msgstr "_შემომავლები:"
 
 #: ../libinit_balsa/assistant_page_directory.c:48
 msgid "_Outbox:"
-msgstr ""
+msgstr "_გამავლები:"
 
 #: ../libinit_balsa/assistant_page_directory.c:48
 msgid "_Sentbox:"
-msgstr ""
+msgstr "გ_აგზავნილები:"
 
 #: ../libinit_balsa/assistant_page_directory.c:48
 msgid "_Draftbox:"
-msgstr ""
+msgstr "_მონახაზები:"
 
 #: ../libinit_balsa/assistant_page_directory.c:49
 msgid "_Trash:"
-msgstr ""
+msgstr "_ნაგვის ყუთი:"
 
 #: ../libinit_balsa/assistant_page_directory.c:83
 #, c-format
@@ -3156,12 +3170,12 @@ msgstr ""
 #: ../libnetclient/net-client-pop.c:438 ../libnetclient/net-client-pop.c:719
 #, c-format
 msgid "error: %s"
-msgstr ""
+msgstr "შეცდომა: %s"
 
 #: ../libnetclient/net-client-pop.c:441
 #, c-format
 msgid "error"
-msgstr ""
+msgstr "ბრძანება"
 
 #: ../libnetclient/net-client-pop.c:505 ../libnetclient/net-client-smtp.c:409
 #, c-format
@@ -3244,7 +3258,7 @@ msgstr ""
 
 #: ../src/ab-main.c:735
 msgid "_Name"
-msgstr ""
+msgstr "_სახელი"
 
 #: ../src/ab-main.c:751
 msgid "_Address"
@@ -3252,14 +3266,14 @@ msgstr "_მისამართი"
 
 #: ../src/ab-main.c:839 ../src/address-book-config.c:229
 #: ../src/address-book-config.c:335 ../src/address-book-config.c:379
-#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3891
-#: ../src/pref-manager.c:3306
+#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3990
+#: ../src/pref-manager.c:3331
 msgid "_Apply"
 msgstr "_გადატარება"
 
 #: ../src/ab-main.c:877
 msgid "F_ilter:"
-msgstr ""
+msgstr "_ფილტრი:"
 
 #: ../src/ab-main.c:960
 msgid "Browse"
@@ -3277,7 +3291,7 @@ msgstr ""
 #: ../src/filter-export-dialog.c:91 ../src/filter-run-dialog.c:209
 #: ../src/filter-run-dialog.c:318
 msgid "Name"
-msgstr ""
+msgstr "სახელი"
 
 #: ../src/ab-window.c:192 ../src/balsa-print-object-text.c:450
 msgid "Email Address"
@@ -3352,8 +3366,8 @@ msgstr ""
 
 #: ../src/address-book-config.c:233 ../src/address-book-config.c:338
 #: ../src/address-book-config.c:383 ../src/mailbox-conf.c:366
-#: ../src/pref-manager.c:1998 ../src/pref-manager.c:2081
-#: ../src/pref-manager.c:2806
+#: ../src/pref-manager.c:2019 ../src/pref-manager.c:2102
+#: ../src/pref-manager.c:2825
 msgid "_Add"
 msgstr "დამატება"
 
@@ -3420,8 +3434,8 @@ msgstr ""
 msgid "GPE Address Book"
 msgstr ""
 
-#: ../src/address-book-config.c:602 ../src/main-window.c:1040
-#: ../src/main-window.c:3998
+#: ../src/address-book-config.c:602 ../src/main-window.c:1046
+#: ../src/main-window.c:4097
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr ""
@@ -3483,12 +3497,12 @@ msgstr ""
 msgid "Password:"
 msgstr "პაროლი:"
 
-#: ../src/balsa-app.c:541
+#: ../src/balsa-app.c:547
 #, c-format
 msgid "Couldn’t open mailbox “%s”"
 msgstr ""
 
-#: ../src/balsa-index.c:445 ../src/pref-manager.c:219
+#: ../src/balsa-index.c:445 ../src/pref-manager.c:227
 msgid "Date"
 msgstr "თარიღი"
 
@@ -4127,12 +4141,12 @@ msgstr ""
 
 #: ../src/balsa-mime-widget-message.c:753
 msgid "Reply-To:"
-msgstr ""
+msgstr "უპასუხეთ:"
 
 #: ../src/balsa-mime-widget-message.c:763
 #: ../src/balsa-print-object-header.c:152
 msgid "Sender:"
-msgstr ""
+msgstr "გამგზავნი:"
 
 #: ../src/balsa-mime-widget-message.c:768
 #: ../src/balsa-print-object-header.c:154
@@ -4154,11 +4168,11 @@ msgstr "ბმულის გახსნა"
 
 #: ../src/balsa-mime-widget-text.c:599 ../src/balsa-mime-widget-text.c:1223
 msgid "Send link…"
-msgstr ""
+msgstr "ბმულის გაგზავნა..."
 
 #: ../src/balsa-mime-widget-text.c:631 ../src/balsa-mime-widget-text.c:1169
 msgid "Save…"
-msgstr ""
+msgstr "შენახვა…"
 
 #: ../src/balsa-mime-widget-text.c:639
 msgid "Highlight structured phrases"
@@ -4204,7 +4218,7 @@ msgstr ""
 
 #: ../src/balsa-mime-widget-text.c:1386
 msgid "Full Name:"
-msgstr ""
+msgstr "სრული სახელი:"
 
 #: ../src/balsa-mime-widget-text.c:1387
 msgid "Nick Name:"
@@ -4224,7 +4238,7 @@ msgstr "ორგანიზაცია:"
 
 #: ../src/balsa-mime-widget-text.c:1391
 msgid "Email Address:"
-msgstr ""
+msgstr "ელფოსტის მისამართი:"
 
 #: ../src/balsa-mime-widget-text.c:1419
 #, c-format
@@ -4248,7 +4262,7 @@ msgstr "შეჯამება:"
 #: ../src/balsa-mime-widget-vcalendar.c:186
 #: ../src/balsa-print-object-text.c:547
 msgid "Organizer:"
-msgstr ""
+msgstr "ორგანიზატორი:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:188
 #: ../src/balsa-mime-widget-vcalendar.c:380
@@ -4342,7 +4356,7 @@ msgstr "სრული სახელი"
 
 #: ../src/balsa-print-object-text.c:446
 msgid "Nick Name"
-msgstr ""
+msgstr "მეტსახელი"
 
 #: ../src/balsa-print-object-text.c:447
 msgid "First Name"
@@ -4433,15 +4447,15 @@ msgstr "_ყველა"
 msgid "C_lear"
 msgstr "_გასუფთავება"
 
-#: ../src/filter-edit-callbacks.c:954 ../src/main-window.c:3875
+#: ../src/filter-edit-callbacks.c:954 ../src/main-window.c:3974
 msgid "_Body"
 msgstr ""
 
-#: ../src/filter-edit-callbacks.c:955 ../src/main-window.c:3876
+#: ../src/filter-edit-callbacks.c:955 ../src/main-window.c:3975
 msgid "_To:"
 msgstr ""
 
-#: ../src/filter-edit-callbacks.c:956 ../src/main-window.c:3877
+#: ../src/filter-edit-callbacks.c:956 ../src/main-window.c:3976
 msgid "_From:"
 msgstr "_გამგზავნი:"
 
@@ -4449,7 +4463,7 @@ msgstr "_გამგზავნი:"
 msgid "_Subject"
 msgstr ""
 
-#: ../src/filter-edit-callbacks.c:958 ../src/main-window.c:3879
+#: ../src/filter-edit-callbacks.c:958 ../src/main-window.c:3978
 msgid "_CC:"
 msgstr ""
 
@@ -4501,7 +4515,7 @@ msgstr ""
 msgid "Edit condition for filter: "
 msgstr ""
 
-#: ../src/filter-edit-callbacks.c:1475 ../src/save-restore.c:1950
+#: ../src/filter-edit-callbacks.c:1475 ../src/save-restore.c:1959
 msgid "Filter with no condition was omitted"
 msgstr ""
 
@@ -4540,7 +4554,7 @@ msgstr ""
 msgid "(Example: write December 31, 2000, as %s)"
 msgstr ""
 
-#: ../src/filter-edit-dialog.c:95 ../src/pref-manager.c:226
+#: ../src/filter-edit-dialog.c:95 ../src/pref-manager.c:234
 msgid "Simple"
 msgstr "მარტივი"
 
@@ -4615,7 +4629,7 @@ msgstr "ჩასწორება"
 #: ../src/filter-edit-dialog.c:316
 msgctxt "filter match"
 msgid "Ne_w"
-msgstr ""
+msgstr "_ახალი"
 
 #: ../src/filter-edit-dialog.c:348
 msgid "Foreground"
@@ -4641,7 +4655,7 @@ msgstr ""
 
 #: ../src/filter-edit-dialog.c:405 ../src/mailbox-node.c:1046
 msgid "_Open"
-msgstr ""
+msgstr "_გახსნა"
 
 #: ../src/filter-edit-dialog.c:420
 msgid "Pop-up text:"
@@ -4690,7 +4704,7 @@ msgstr ""
 
 #: ../src/filter-export-dialog.c:76
 msgid "Export Filters"
-msgstr ""
+msgstr "ფილტრების გატანა"
 
 #: ../src/filter-run-callbacks.c:186
 #, c-format
@@ -4732,7 +4746,7 @@ msgstr ""
 
 #: ../src/filter-run-dialog.c:230
 msgid "On exit"
-msgstr ""
+msgstr "გასვლისას"
 
 #: ../src/filter-run-dialog.c:343
 msgid "_Apply Selected"
@@ -4926,7 +4940,7 @@ msgstr ""
 
 #: ../src/folder-conf.c:910
 msgid "post"
-msgstr ""
+msgstr "პოსტი"
 
 #: ../src/folder-conf.c:911
 msgid "append"
@@ -4942,7 +4956,7 @@ msgstr ""
 
 #: ../src/folder-conf.c:920
 msgid "Permissions:"
-msgstr ""
+msgstr "ნებართვები:"
 
 #: ../src/folder-conf.c:928
 msgid ""
@@ -5021,7 +5035,7 @@ msgstr ""
 msgid "Information — Balsa"
 msgstr ""
 
-#: ../src/information-dialog.c:235 ../src/main-window.c:3896
+#: ../src/information-dialog.c:235 ../src/main-window.c:3995
 msgid "_Clear"
 msgstr "გასუფთავება"
 
@@ -5167,8 +5181,8 @@ msgid ""
 "signatures automatically:"
 msgstr ""
 
-#: ../src/mailbox-conf.c:907 ../src/pref-manager.c:212
-#: ../src/pref-manager.c:1152
+#: ../src/mailbox-conf.c:907 ../src/pref-manager.c:220
+#: ../src/pref-manager.c:1173
 msgid "Never"
 msgstr "არასოდეს"
 
@@ -5176,7 +5190,7 @@ msgstr "არასოდეს"
 msgid "If Possible"
 msgstr ""
 
-#: ../src/mailbox-conf.c:909 ../src/pref-manager.c:1154
+#: ../src/mailbox-conf.c:909 ../src/pref-manager.c:1175
 msgid "Always"
 msgstr "ყოველთვის"
 
@@ -5302,7 +5316,7 @@ msgstr "საფოსტო ყუთი"
 
 #: ../src/main.c:122
 msgid "Outbox"
-msgstr ""
+msgstr "გამავლები"
 
 #: ../src/main.c:128
 msgid "Sentbox"
@@ -5356,201 +5370,213 @@ msgstr ""
 msgid "Show version"
 msgstr "ვერსიის ჩვენება"
 
-#: ../src/main-window.c:326
+#: ../src/main-window.c:327
 msgid ""
 "Balsa is sending a mail now.\n"
 "Abort sending?"
 msgstr ""
 
-#: ../src/main-window.c:492
+#: ../src/main-window.c:493
 msgid "Subject or Sender Contains:"
 msgstr ""
 
-#: ../src/main-window.c:493
+#: ../src/main-window.c:494
 msgid "Subject or Recipient Contains:"
 msgstr ""
 
-#: ../src/main-window.c:494
+#: ../src/main-window.c:495
 msgid "Subject Contains:"
 msgstr ""
 
-#: ../src/main-window.c:495
+#: ../src/main-window.c:496
 msgid "Body Contains:"
 msgstr ""
 
-#: ../src/main-window.c:496
+#: ../src/main-window.c:497
 msgid "Older than (days):"
 msgstr ""
 
-#: ../src/main-window.c:497
+#: ../src/main-window.c:498
 msgid "Old at most (days):"
 msgstr ""
 
-#: ../src/main-window.c:1065
+#: ../src/main-window.c:1071
 msgid "translator-credits"
 msgstr "თემური დოღონაძე"
 
-#: ../src/main-window.c:1076
+#: ../src/main-window.c:1082
 msgid "The Balsa email client is part of the GNOME desktop environment."
 msgstr ""
 
 #. license ?
-#: ../src/main-window.c:1081
+#: ../src/main-window.c:1087
 msgid "About Balsa"
 msgstr ""
 
-#: ../src/main-window.c:1102
+#: ../src/main-window.c:1108
 msgid "Balsa closes files and connections. Please wait…"
 msgstr ""
 
-#: ../src/main-window.c:1505
+#: ../src/main-window.c:1511
 msgid "You can apply filters only on mailbox\n"
 msgstr ""
 
-#: ../src/main-window.c:1525
+#: ../src/main-window.c:1531
 #, c-format
 msgid "Removing duplicates failed: %s"
 msgstr ""
 
-#: ../src/main-window.c:1531
+#: ../src/main-window.c:1537
 #, c-format
 msgid "Removed %d duplicate"
 msgid_plural "Removed %d duplicates"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/main-window.c:1536
+#: ../src/main-window.c:1542
 msgid "No duplicates found"
 msgstr ""
 
-#: ../src/main-window.c:2986
+#: ../src/main-window.c:2309
+msgid "Show/Hide"
+msgstr ""
+
+#: ../src/main-window.c:2312 ../src/toolbar-factory.c:117
+msgid "Check"
+msgstr "შემოწმება"
+
+#: ../src/main-window.c:2315 ../src/toolbar-factory.c:118
+msgid "Compose"
+msgstr "შექმნა"
+
+#: ../src/main-window.c:3056
 #, c-format
 msgid ""
 "Unable to Open Mailbox!\n"
 "%s."
 msgstr ""
 
-#: ../src/main-window.c:3016
+#: ../src/main-window.c:3086
 #, c-format
 msgid "Opening %s"
 msgstr "'%s'-ის გახსნა"
 
-#: ../src/main-window.c:3283 ../src/main-window.c:3438
-#: ../src/main-window.c:3559 ../src/main-window.c:3569
+#: ../src/main-window.c:3357 ../src/main-window.c:3512
+#: ../src/main-window.c:3633 ../src/main-window.c:3643
 msgid "Checking Mail…"
 msgstr ""
 
-#: ../src/main-window.c:3521 ../src/main-window.c:3526
-#: ../src/main-window.c:3559 ../src/main-window.c:3564
+#: ../src/main-window.c:3595 ../src/main-window.c:3600
+#: ../src/main-window.c:3633 ../src/main-window.c:3638
 msgid "Mailboxes"
-msgstr ""
+msgstr "საფოსტო ყუთები"
 
-#: ../src/main-window.c:3522
+#: ../src/main-window.c:3596
 #, c-format
 msgid "IMAP mailbox: %s"
 msgstr ""
 
-#: ../src/main-window.c:3527
+#: ../src/main-window.c:3601
 #, c-format
 msgid "Local mailbox: %s"
 msgstr ""
 
-#: ../src/main-window.c:3605
+#: ../src/main-window.c:3679
 #, c-format
 msgid "You have received %d new message."
 msgid_plural "You have received %d new messages."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/main-window.c:3610
+#: ../src/main-window.c:3684
 msgid "You have new mail."
-msgstr ""
+msgstr "თქვენ გაქვთ ახალი წერილი."
 
-#: ../src/main-window.c:3830
+#: ../src/main-window.c:3929
 msgid "Search mailbox"
 msgstr ""
 
-#: ../src/main-window.c:3853
+#: ../src/main-window.c:3952
 msgid "_Search for:"
 msgstr "_ძებნა:"
 
 #. builds the toggle buttons to specify fields concerned by
 #. * the search.
-#: ../src/main-window.c:3866
+#: ../src/main-window.c:3965
 msgid "In:"
 msgstr ""
 
-#: ../src/main-window.c:3878
+#: ../src/main-window.c:3977
 msgid "S_ubject"
 msgstr ""
 
 #. Frame with Apply and Clear buttons
-#: ../src/main-window.c:3883
+#: ../src/main-window.c:3982
 msgid "Show only matching messages"
 msgstr ""
 
 #. Frame with OK button
-#: ../src/main-window.c:3904
+#: ../src/main-window.c:4003
 msgid "Open next matching message"
 msgstr ""
 
-#: ../src/main-window.c:3916
+#: ../src/main-window.c:4015
 msgid "_Reverse search"
 msgstr ""
 
-#: ../src/main-window.c:3921
+#: ../src/main-window.c:4020
 msgid "_Wrap around"
 msgstr "_სიტყვების გადატანა"
 
-#: ../src/main-window.c:4141
+#: ../src/main-window.c:4240
 #, c-format
 msgid "Could not open trash: %s"
 msgstr ""
 
-#: ../src/main-window.c:4261
+#: ../src/main-window.c:4360
 #, c-format
 msgid "Balsa: %s (read-only)"
 msgstr ""
 
-#: ../src/main-window.c:4263
+#: ../src/main-window.c:4362
 #, c-format
 msgid "Balsa: %s"
 msgstr ""
 
 #. xgettext: this is the first part of the message
 #. * "Shown mailbox: %s with %d messages, %d new, %d hidden".
-#: ../src/main-window.c:4815
+#: ../src/main-window.c:4914
 #, c-format
 msgid "Shown mailbox: %s "
 msgstr ""
 
-#: ../src/main-window.c:4820
+#: ../src/main-window.c:4919
 #, c-format
 msgid "with %d message"
 msgid_plural "with %d messages"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/main-window.c:4827
+#: ../src/main-window.c:4926
 #, c-format
 msgid ", %d new"
 msgid_plural ", %d new"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/main-window.c:4834
+#: ../src/main-window.c:4933
 #, c-format
 msgid ", %d hidden"
 msgid_plural ", %d hidden"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../src/main-window.c:4875
+#: ../src/main-window.c:4974
 #, c-format
 msgid "The next unread message is in %s"
 msgstr ""
 
-#: ../src/main-window.c:4882
+#: ../src/main-window.c:4981
 #, c-format
 msgid "Do you want to select %s?"
 msgstr ""
@@ -5564,583 +5590,583 @@ msgstr ""
 msgid "Message from %s: %s"
 msgstr ""
 
-#: ../src/pref-manager.c:210
+#: ../src/pref-manager.c:218
 msgid "While retrieving messages"
 msgstr ""
 
-#: ../src/pref-manager.c:211
+#: ../src/pref-manager.c:219
 msgid "Until closed"
 msgstr ""
 
-#: ../src/pref-manager.c:217
+#: ../src/pref-manager.c:225
 msgid "Message number"
 msgstr ""
 
-#: ../src/pref-manager.c:225
+#: ../src/pref-manager.c:233
 msgid "Flat"
 msgstr "ბრტყელი"
 
-#: ../src/pref-manager.c:227
+#: ../src/pref-manager.c:235
 msgid "JWZ"
 msgstr ""
 
-#: ../src/pref-manager.c:942 ../src/pref-manager.c:3612
+#: ../src/pref-manager.c:963 ../src/pref-manager.c:3641
 msgid "Unknown"
 msgstr ""
 
 #. Translators: #1 address book name
-#: ../src/pref-manager.c:946
+#: ../src/pref-manager.c:967
 #, c-format
 msgid "%s (default)"
-msgstr ""
+msgstr "%s (ნაგულისხმები)"
 
-#: ../src/pref-manager.c:1063
+#: ../src/pref-manager.c:1084
 msgid "Default layout"
 msgstr ""
 
-#: ../src/pref-manager.c:1064
+#: ../src/pref-manager.c:1085
 msgid "Wide message layout"
 msgstr ""
 
-#: ../src/pref-manager.c:1065
+#: ../src/pref-manager.c:1086
 msgid "Wide screen layout"
 msgstr ""
 
-#: ../src/pref-manager.c:1073
+#: ../src/pref-manager.c:1094
 msgid "Show next unread message"
 msgstr ""
 
-#: ../src/pref-manager.c:1074
+#: ../src/pref-manager.c:1095
 msgid "Show next message"
 msgstr ""
 
-#: ../src/pref-manager.c:1075
+#: ../src/pref-manager.c:1096
 msgid "Close message window"
 msgstr ""
 
-#: ../src/pref-manager.c:1120
+#: ../src/pref-manager.c:1141
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr ""
 
-#: ../src/pref-manager.c:1133
+#: ../src/pref-manager.c:1154
 msgid "Show nothing"
 msgstr ""
 
-#: ../src/pref-manager.c:1135
+#: ../src/pref-manager.c:1156
 msgid "Show dialog"
 msgstr "ფანჯრის ჩვენება"
 
-#: ../src/pref-manager.c:1137
+#: ../src/pref-manager.c:1158
 msgid "Show in list"
 msgstr ""
 
-#: ../src/pref-manager.c:1139
+#: ../src/pref-manager.c:1160
 msgid "Show in status bar"
 msgstr ""
 
-#: ../src/pref-manager.c:1141
+#: ../src/pref-manager.c:1162
 msgid "Print to console"
 msgstr ""
 
-#: ../src/pref-manager.c:1153
+#: ../src/pref-manager.c:1174
 msgid "Ask me"
 msgstr "მკითხე"
 
-#: ../src/pref-manager.c:1689
+#: ../src/pref-manager.c:1710
 msgid "Remote POP3 mailbox…"
 msgstr ""
 
-#: ../src/pref-manager.c:1693 ../ui/main-window.ui.h:7
+#: ../src/pref-manager.c:1714 ../ui/main-window.ui.h:7
 msgid "Remote IMAP folder…"
 msgstr ""
 
-#: ../src/pref-manager.c:1954
+#: ../src/pref-manager.c:1975
 msgid "Remote mailbox servers"
 msgstr ""
 
-#: ../src/pref-manager.c:1971 ../src/pref-manager.c:2767
+#: ../src/pref-manager.c:1992 ../src/pref-manager.c:2786
 #: ../src/sendmsg-window.c:2649
 msgid "Type"
 msgstr "ტიპი"
 
-#: ../src/pref-manager.c:1979
+#: ../src/pref-manager.c:2000
 msgid "Mailbox name"
 msgstr ""
 
-#: ../src/pref-manager.c:2001 ../src/pref-manager.c:2084
-#: ../src/pref-manager.c:2810
+#: ../src/pref-manager.c:2022 ../src/pref-manager.c:2105
+#: ../src/pref-manager.c:2829
 msgid "_Modify"
 msgstr ""
 
-#: ../src/pref-manager.c:2023
+#: ../src/pref-manager.c:2044
 msgid "Local mail directory"
 msgstr ""
 
-#: ../src/pref-manager.c:2026
+#: ../src/pref-manager.c:2047
 msgid "Select your local mail directory"
 msgstr ""
 
-#: ../src/pref-manager.c:2050
+#: ../src/pref-manager.c:2071
 msgid "Outgoing mail servers"
 msgstr ""
 
-#: ../src/pref-manager.c:2068
+#: ../src/pref-manager.c:2089
 msgid "Server name"
 msgstr "სერვერი სახელი"
 
-#: ../src/pref-manager.c:2112
+#: ../src/pref-manager.c:2132
 msgid "Checking"
 msgstr ""
 
-#: ../src/pref-manager.c:2115
+#: ../src/pref-manager.c:2135
 msgid "_Check mail automatically every"
 msgstr ""
 
-#: ../src/pref-manager.c:2123 ../src/pref-manager.c:2295
-#: ../src/pref-manager.c:2939 ../src/pref-manager.c:2988
+#: ../src/pref-manager.c:2143 ../src/pref-manager.c:2314
+#: ../src/pref-manager.c:2958 ../src/pref-manager.c:3012
 msgid "minutes"
 msgstr "წუთი"
 
-#: ../src/pref-manager.c:2128
+#: ../src/pref-manager.c:2148
 msgid "Check _IMAP mailboxes"
 msgstr ""
 
-#: ../src/pref-manager.c:2132
+#: ../src/pref-manager.c:2152
 msgid "Check Inbox _only"
 msgstr ""
 
-#: ../src/pref-manager.c:2137
-msgid "When mail arrives:"
-msgstr ""
-
-#: ../src/pref-manager.c:2142
-msgid "Display message"
-msgstr ""
-
-#: ../src/pref-manager.c:2147
-msgid "Play sound"
-msgstr ""
-
-#: ../src/pref-manager.c:2152
-msgid "Show icon"
-msgstr ""
-
-#: ../src/pref-manager.c:2159
+#: ../src/pref-manager.c:2156
 msgid "Do background check quietly (no messages in status bar)"
 msgstr ""
 
-#: ../src/pref-manager.c:2162
+#: ../src/pref-manager.c:2159
 msgid "_POP message size limit:"
 msgstr ""
 
-#: ../src/pref-manager.c:2191
+#: ../src/pref-manager.c:2183
+msgid "Notification about new messages"
+msgstr ""
+
+#: ../src/pref-manager.c:2185
+msgid "Display message"
+msgstr ""
+
+#: ../src/pref-manager.c:2189
+msgid "Play sound"
+msgstr ""
+
+#: ../src/pref-manager.c:2210
 msgid "Message disposition notification requests"
 msgstr ""
 
-#: ../src/pref-manager.c:2196
+#: ../src/pref-manager.c:2215
 msgid ""
 "When I receive a message whose sender requested a Message Disposition "
 "Notification (MDN), send it if:"
 msgstr ""
 
-#: ../src/pref-manager.c:2204
+#: ../src/pref-manager.c:2223
 msgid ""
 "The message header looks clean (the notify-to address is the return path, "
 "and I am in the “To:” or “CC:” list)."
 msgstr ""
 
-#: ../src/pref-manager.c:2218
+#: ../src/pref-manager.c:2237
 msgid "The message header looks suspicious."
 msgstr ""
 
-#: ../src/pref-manager.c:2242
+#: ../src/pref-manager.c:2261
 msgid "Word wrap"
 msgstr "სიტყვების გადატანა"
 
-#: ../src/pref-manager.c:2245
+#: ../src/pref-manager.c:2264
 msgid "Wrap outgoing text at"
 msgstr ""
 
-#: ../src/pref-manager.c:2254 ../src/pref-manager.c:2504
+#: ../src/pref-manager.c:2273 ../src/pref-manager.c:2523
 msgid "characters"
 msgstr ""
 
-#: ../src/pref-manager.c:2273
+#: ../src/pref-manager.c:2292
 msgid "Other options"
 msgstr "სხვა პარამეტრები"
 
-#: ../src/pref-manager.c:2275
+#: ../src/pref-manager.c:2294
 msgid "Reply prefix:"
 msgstr ""
 
-#: ../src/pref-manager.c:2278
+#: ../src/pref-manager.c:2297
 msgid "Automatically quote original when replying"
 msgstr ""
 
-#: ../src/pref-manager.c:2281
+#: ../src/pref-manager.c:2300
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr ""
 
-#: ../src/pref-manager.c:2284
+#: ../src/pref-manager.c:2303
 msgid "Copy outgoing messages to sentbox"
 msgstr ""
 
-#: ../src/pref-manager.c:2286
+#: ../src/pref-manager.c:2305
 msgid "Send button always queues outgoing mail in outbox"
 msgstr ""
 
-#: ../src/pref-manager.c:2290
+#: ../src/pref-manager.c:2309
 msgid "_Send queued mail automatically every"
 msgstr ""
 
-#: ../src/pref-manager.c:2300
+#: ../src/pref-manager.c:2319
 msgid "Edit headers in external editor"
 msgstr ""
 
-#: ../src/pref-manager.c:2302
+#: ../src/pref-manager.c:2321
 msgid "Include HTML parts as text when replying or forwarding"
 msgstr ""
 
-#: ../src/pref-manager.c:2320 ../src/toolbar-prefs.c:158
+#: ../src/pref-manager.c:2339 ../src/toolbar-prefs.c:158
 msgid "Main window"
 msgstr "მთავარი ფანჯარა"
 
-#: ../src/pref-manager.c:2323
+#: ../src/pref-manager.c:2342
 msgid "Use preview pane"
 msgstr ""
 
-#: ../src/pref-manager.c:2327
+#: ../src/pref-manager.c:2346
 msgid "Show message counts in mailbox list"
 msgstr ""
 
-#: ../src/pref-manager.c:2333
+#: ../src/pref-manager.c:2352
 msgid "Automatically view message when mailbox opened"
 msgstr ""
 
-#: ../src/pref-manager.c:2336
+#: ../src/pref-manager.c:2355
 msgid "Ask me before selecting a different mailbox to show an unread message"
 msgstr ""
 
-#: ../src/pref-manager.c:2340
+#: ../src/pref-manager.c:2359
 msgid "Page Up/Page Down keys scroll text by"
 msgstr ""
 
-#: ../src/pref-manager.c:2348
+#: ../src/pref-manager.c:2367
 msgid "percent"
 msgstr "პროცენტი"
 
-#: ../src/pref-manager.c:2365 ../src/toolbar-prefs.c:176
+#: ../src/pref-manager.c:2384 ../src/toolbar-prefs.c:176
 msgid "Message window"
 msgstr ""
 
-#: ../src/pref-manager.c:2367
+#: ../src/pref-manager.c:2386
 msgid "After moving a message:"
 msgstr ""
 
-#: ../src/pref-manager.c:2388
+#: ../src/pref-manager.c:2407
 msgid "Sorting and threading"
 msgstr ""
 
-#: ../src/pref-manager.c:2390
+#: ../src/pref-manager.c:2409
 msgid "Default sort column:"
 msgstr ""
 
-#: ../src/pref-manager.c:2398
+#: ../src/pref-manager.c:2417
 msgid "Thread messages by default"
 msgstr ""
 
-#: ../src/pref-manager.c:2400
+#: ../src/pref-manager.c:2419
 msgid "Expand threads on open"
 msgstr ""
 
 #. fonts
-#: ../src/pref-manager.c:2425 ../src/print-gtk.c:618
+#: ../src/pref-manager.c:2444 ../src/print-gtk.c:618
 msgid "Fonts"
 msgstr "შრიფტები"
 
-#: ../src/pref-manager.c:2428
+#: ../src/pref-manager.c:2447
 msgid "Use system fonts"
 msgstr "სისტემური ფონტების გამოყენება"
 
-#: ../src/pref-manager.c:2436
+#: ../src/pref-manager.c:2455
 msgid "Use default font size"
 msgstr ""
 
-#: ../src/pref-manager.c:2442
+#: ../src/pref-manager.c:2461
 msgid "Message font:"
 msgstr ""
 
-#: ../src/pref-manager.c:2449
+#: ../src/pref-manager.c:2468
 msgid "Subject font:"
 msgstr ""
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: ../src/pref-manager.c:2489
+#: ../src/pref-manager.c:2508
 msgid "Quoted and flowed text"
 msgstr ""
 
-#: ../src/pref-manager.c:2492
+#: ../src/pref-manager.c:2511
 msgid "Mark quoted text"
 msgstr ""
 
-#: ../src/pref-manager.c:2495
+#: ../src/pref-manager.c:2514
 msgid "Quoted text regular expression:"
 msgstr ""
 
-#: ../src/pref-manager.c:2498
+#: ../src/pref-manager.c:2517
 msgid "Wrap text at"
 msgstr ""
 
-#: ../src/pref-manager.c:2517
+#: ../src/pref-manager.c:2536
 #, c-format
 msgid "HTTP cache size: %s"
 msgstr ""
 
 #. handling of multipart/alternative
-#: ../src/pref-manager.c:2550
+#: ../src/pref-manager.c:2569
 msgid "Display of multipart/alternative parts"
 msgstr ""
 
-#: ../src/pref-manager.c:2554
+#: ../src/pref-manager.c:2573
 msgid "Prefer text/plain over HTML"
 msgstr ""
 
 #. Translators: per-sender database of exceptions over global HTTP
 #. * preferences (display HTML vs. plain, auto-load external items)
-#: ../src/pref-manager.c:2559
+#: ../src/pref-manager.c:2578
 msgid "Manage exceptions…"
 msgstr ""
 
-#: ../src/pref-manager.c:2567
+#: ../src/pref-manager.c:2586
 msgid "Clear HTTP cache…"
 msgstr ""
 
-#: ../src/pref-manager.c:2586
+#: ../src/pref-manager.c:2605
 msgid "Message colors"
 msgstr ""
 
-#: ../src/pref-manager.c:2591
+#: ../src/pref-manager.c:2610
 #, c-format
 msgid "Quote level %d color"
 msgstr ""
 
-#: ../src/pref-manager.c:2609
+#: ../src/pref-manager.c:2628
 msgid "Link color"
 msgstr ""
 
-#: ../src/pref-manager.c:2611
+#: ../src/pref-manager.c:2630
 msgid "Hyperlink color"
 msgstr ""
 
-#: ../src/pref-manager.c:2626 ../src/pref-manager.c:3230
+#: ../src/pref-manager.c:2645 ../src/pref-manager.c:3255
 msgid "Format"
 msgstr "_ფორმატი"
 
-#: ../src/pref-manager.c:2629
+#: ../src/pref-manager.c:2648
 msgid "Date encoding (for strftime):"
 msgstr ""
 
-#: ../src/pref-manager.c:2631
+#: ../src/pref-manager.c:2650
 msgid "Selected headers:"
 msgstr ""
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: ../src/pref-manager.c:2649
+#: ../src/pref-manager.c:2668
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
 
-#: ../src/pref-manager.c:2654
+#: ../src/pref-manager.c:2673
 msgid "display as “?”"
 msgstr ""
 
-#: ../src/pref-manager.c:2662
+#: ../src/pref-manager.c:2681
 msgid "display in codeset"
 msgstr ""
 
-#: ../src/pref-manager.c:2687
+#: ../src/pref-manager.c:2706
 msgid "Information messages"
 msgstr ""
 
-#: ../src/pref-manager.c:2691
+#: ../src/pref-manager.c:2710
 msgid "Information messages:"
 msgstr ""
 
-#: ../src/pref-manager.c:2695
+#: ../src/pref-manager.c:2714
 msgid "Warning messages:"
 msgstr ""
 
-#: ../src/pref-manager.c:2699
+#: ../src/pref-manager.c:2718
 msgid "Error messages:"
 msgstr ""
 
-#: ../src/pref-manager.c:2703
+#: ../src/pref-manager.c:2722
 msgid "Fatal error messages:"
 msgstr ""
 
-#: ../src/pref-manager.c:2707
+#: ../src/pref-manager.c:2726
 msgid "Debug messages:"
 msgstr ""
 
-#: ../src/pref-manager.c:2723
+#: ../src/pref-manager.c:2742
 msgid "Display progress dialog"
 msgstr ""
 
-#: ../src/pref-manager.c:2724
+#: ../src/pref-manager.c:2743
 msgid "Display progress dialog when sending messages"
 msgstr ""
 
-#: ../src/pref-manager.c:2725
+#: ../src/pref-manager.c:2744
 msgid "Display progress dialog when retrieving messages"
 msgstr ""
 
-#: ../src/pref-manager.c:2747 ../src/pref-manager.c:3359
+#: ../src/pref-manager.c:2766 ../src/pref-manager.c:3384
 msgid "Address books"
 msgstr ""
 
-#: ../src/pref-manager.c:2775
+#: ../src/pref-manager.c:2794
 msgid "Address book name"
 msgstr ""
 
-#: ../src/pref-manager.c:2783
+#: ../src/pref-manager.c:2802
 msgid "Auto-complete"
 msgstr ""
 
-#: ../src/pref-manager.c:2816
+#: ../src/pref-manager.c:2835
 msgid "_Set as default"
 msgstr "ნაგულისხმებად დაყენება"
 
-#: ../src/pref-manager.c:2833
+#: ../src/pref-manager.c:2852
 msgid "Miscellaneous spelling settings"
 msgstr ""
 
-#: ../src/pref-manager.c:2837
+#: ../src/pref-manager.c:2856
 msgid "Check signature"
 msgstr ""
 
-#: ../src/pref-manager.c:2839
+#: ../src/pref-manager.c:2858
 msgid "Check quoted"
 msgstr ""
 
-#: ../src/pref-manager.c:2855
+#: ../src/pref-manager.c:2874
 msgid "Start-up options"
 msgstr ""
 
-#: ../src/pref-manager.c:2858
+#: ../src/pref-manager.c:2877
 msgid "Open Inbox upon start-up"
 msgstr ""
 
-#: ../src/pref-manager.c:2860
+#: ../src/pref-manager.c:2879
 msgid "Check mail upon start-up"
 msgstr ""
 
-#: ../src/pref-manager.c:2862
+#: ../src/pref-manager.c:2881
 msgid "Remember open mailboxes between sessions"
 msgstr ""
 
-#: ../src/pref-manager.c:2880
+#: ../src/pref-manager.c:2899
 msgid "Folder scanning"
 msgstr ""
 
-#: ../src/pref-manager.c:2883
+#: ../src/pref-manager.c:2902
 msgid ""
 "Choose depth 1 for fast start-up; this defers scanning some folders. To see "
 "more of the tree at start-up, choose a greater depth."
 msgstr ""
 
-#: ../src/pref-manager.c:2890
+#: ../src/pref-manager.c:2909
 msgid "Scan local folders to depth"
 msgstr ""
 
-#: ../src/pref-manager.c:2899
+#: ../src/pref-manager.c:2918
 msgid "Scan IMAP folders to depth"
 msgstr ""
 
-#: ../src/pref-manager.c:2921 ../src/pref-manager.c:3373
+#: ../src/pref-manager.c:2940 ../src/pref-manager.c:3398
 msgid "Miscellaneous"
 msgstr "სხვადასხვა"
 
-#: ../src/pref-manager.c:2924
+#: ../src/pref-manager.c:2943
 msgid "Empty trash on exit"
 msgstr ""
 
-#: ../src/pref-manager.c:2928
+#: ../src/pref-manager.c:2947
 msgid "Close mailbox if unused more than"
 msgstr ""
 
-#: ../src/pref-manager.c:2956
+#: ../src/pref-manager.c:2962
+msgid "Enable System Tray Icon support"
+msgstr ""
+
+#: ../src/pref-manager.c:2980
 msgid "Deleting messages"
 msgstr ""
 
 #. Translators: this used to be "using Mailbox -> Hide messages";
 #. * the UTF-8 string for the right-arrow symbol is broken out to
 #. * avoid msgconv problems.
-#: ../src/pref-manager.c:2961
+#: ../src/pref-manager.c:2985
 #, c-format
 msgid ""
 "The following setting is global, but may be overridden for the selected "
 "mailbox using Mailbox %s Hide messages:"
 msgstr ""
 
-#: ../src/pref-manager.c:2969
+#: ../src/pref-manager.c:2993
 msgid "Hide messages marked as deleted"
 msgstr ""
 
-#: ../src/pref-manager.c:2971
+#: ../src/pref-manager.c:2995
 msgid "The following settings are global:"
 msgstr ""
 
-#: ../src/pref-manager.c:2974
+#: ../src/pref-manager.c:2998
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr ""
 
-#: ../src/pref-manager.c:2978
+#: ../src/pref-manager.c:3002
 msgid "…and if unused more than"
 msgstr ""
 
-#: ../src/pref-manager.c:3195
+#: ../src/pref-manager.c:3220
 msgid "Mail options"
 msgstr ""
 
-#: ../src/pref-manager.c:3199
+#: ../src/pref-manager.c:3224
 msgid "Incoming"
 msgstr "შემომავალი"
 
-#: ../src/pref-manager.c:3203
+#: ../src/pref-manager.c:3228
 msgid "Outgoing"
 msgstr "გამავალი"
 
-#: ../src/pref-manager.c:3214
+#: ../src/pref-manager.c:3239
 msgid "Display options"
 msgstr ""
 
-#: ../src/pref-manager.c:3218
+#: ../src/pref-manager.c:3243
 msgid "Sort and thread"
 msgstr ""
 
-#: ../src/pref-manager.c:3222 ../src/print-gtk.c:610
+#: ../src/pref-manager.c:3247 ../src/print-gtk.c:610
 msgid "Message"
 msgstr "შეტყობინება"
 
-#: ../src/pref-manager.c:3226
+#: ../src/pref-manager.c:3251
 msgid "Colors"
 msgstr "ფერები"
 
-#: ../src/pref-manager.c:3234
+#: ../src/pref-manager.c:3259
 msgid "Status messages"
 msgstr ""
 
 #. must NOT be modal
-#: ../src/pref-manager.c:3301
+#: ../src/pref-manager.c:3326
 msgid "Balsa Preferences"
 msgstr ""
 
-#: ../src/pref-manager.c:3364 ../src/toolbar-factory.c:141
+#: ../src/pref-manager.c:3389 ../src/toolbar-factory.c:141
 msgid "Spelling"
 msgstr "მართლწერა"
 
-#: ../src/pref-manager.c:3369
+#: ../src/pref-manager.c:3394
 msgid "Start-up"
 msgstr ""
 
@@ -6263,7 +6289,7 @@ msgid ""
 "The option to request a MDN is now on the Options menu of the compose window."
 msgstr ""
 
-#: ../src/save-restore.c:1179
+#: ../src/save-restore.c:1184
 msgid ""
 "This version of Balsa uses a new user interface; if you have changed Balsa’s "
 "keyboard accelerators, you will need to set them again."
@@ -6274,163 +6300,163 @@ msgstr ""
 #. * cannot be found.
 #: ../src/sendmsg-window.c:182
 msgid "_Brazilian Portuguese"
-msgstr ""
+msgstr "_ბრაზილიის პორტუგალიური"
 
 #: ../src/sendmsg-window.c:183
 msgid "_Catalan"
-msgstr ""
+msgstr "_კატალანური"
 
 #: ../src/sendmsg-window.c:184
 msgid "_Chinese Simplified"
-msgstr ""
+msgstr "_ჩინური (გამარტივებული)"
 
 #: ../src/sendmsg-window.c:185
 msgid "_Chinese Traditional"
-msgstr ""
+msgstr "ჩ_ინური (ტრადიციული)"
 
 #: ../src/sendmsg-window.c:186
 msgid "_Czech"
-msgstr ""
+msgstr "_ჩეხური"
 
 #: ../src/sendmsg-window.c:187
 msgid "_Danish"
-msgstr ""
+msgstr "_დანიური"
 
 #: ../src/sendmsg-window.c:188
 msgid "_Dutch"
-msgstr ""
+msgstr "_ჰოლანდიური"
 
 #: ../src/sendmsg-window.c:189
 msgid "_English (American)"
-msgstr ""
+msgstr "_ინგლისური (ამერიკული)"
 
 #: ../src/sendmsg-window.c:190
 msgid "_English (British)"
-msgstr ""
+msgstr "_ინგლისური (ბრიტანული)"
 
 #: ../src/sendmsg-window.c:191
 msgid "_Esperanto"
-msgstr ""
+msgstr "_ესპერანტო"
 
 #: ../src/sendmsg-window.c:192
 msgid "_Estonian"
-msgstr ""
+msgstr "_ესტონური"
 
 #: ../src/sendmsg-window.c:193
 msgid "_Finnish"
-msgstr ""
+msgstr "_ფინური"
 
 #: ../src/sendmsg-window.c:194
 msgid "_French"
-msgstr ""
+msgstr "_ფრანგული"
 
 #: ../src/sendmsg-window.c:195
 msgid "_German"
-msgstr ""
+msgstr "_გერმანული"
 
 #: ../src/sendmsg-window.c:196
 msgid "_German (Austrian)"
-msgstr ""
+msgstr "_გერმანული (ავსტრიული)"
 
 #: ../src/sendmsg-window.c:197
 msgid "_German (Swiss)"
-msgstr ""
+msgstr "_გერმანული (შვეიცარიული)"
 
 #: ../src/sendmsg-window.c:198
 msgid "_Greek"
-msgstr ""
+msgstr "_ბერძნული"
 
 #: ../src/sendmsg-window.c:199
 msgid "_Hebrew"
-msgstr ""
+msgstr "_ივრითი"
 
 #: ../src/sendmsg-window.c:200
 msgid "_Hungarian"
-msgstr ""
+msgstr "_უნგრული"
 
 #: ../src/sendmsg-window.c:201
 msgid "_Italian"
-msgstr ""
+msgstr "_იტალიური"
 
 #: ../src/sendmsg-window.c:202
 msgid "_Japanese (JIS)"
-msgstr ""
+msgstr "_იაპონური (JIS)"
 
 #: ../src/sendmsg-window.c:203
 msgid "_Kazakh"
-msgstr ""
+msgstr "_ყაზახური"
 
 #: ../src/sendmsg-window.c:204
 msgid "_Korean"
-msgstr ""
+msgstr "_კორეული"
 
 #: ../src/sendmsg-window.c:205
 msgid "_Latvian"
-msgstr ""
+msgstr "_ლატვიური"
 
 #: ../src/sendmsg-window.c:206
 msgid "_Lithuanian"
-msgstr ""
+msgstr "_ლიეტუვური"
 
 #: ../src/sendmsg-window.c:207
 msgid "_Norwegian"
-msgstr ""
+msgstr "_ნორვეგიული"
 
 #: ../src/sendmsg-window.c:208
 msgid "_Polish"
-msgstr ""
+msgstr "_პოლონური"
 
 #: ../src/sendmsg-window.c:209
 msgid "_Portuguese"
-msgstr ""
+msgstr "_პორტუგალიური"
 
 #: ../src/sendmsg-window.c:210
 msgid "_Romanian"
-msgstr ""
+msgstr "_რუმინული"
 
 #: ../src/sendmsg-window.c:211
 msgid "_Russian"
-msgstr ""
+msgstr "_რუსული"
 
 #: ../src/sendmsg-window.c:212
 msgid "_Serbian"
-msgstr ""
+msgstr "_სერბული"
 
 #: ../src/sendmsg-window.c:213
 msgid "_Serbian (Latin)"
-msgstr ""
+msgstr "_სერბული (ლათინური)"
 
 #: ../src/sendmsg-window.c:214
 msgid "_Slovak"
-msgstr ""
+msgstr "_სლოვაკური"
 
 #: ../src/sendmsg-window.c:215
 msgid "_Spanish"
-msgstr ""
+msgstr "_ესპანური"
 
 #: ../src/sendmsg-window.c:216
 msgid "_Swedish"
-msgstr ""
+msgstr "_შვედური"
 
 #: ../src/sendmsg-window.c:217
 msgid "_Tatar"
-msgstr ""
+msgstr "_თათრული"
 
 #: ../src/sendmsg-window.c:218
 msgid "_Turkish"
-msgstr ""
+msgstr "_თურქული"
 
 #: ../src/sendmsg-window.c:219
 msgid "_Ukrainian"
-msgstr ""
+msgstr "_უკრაინული"
 
 #: ../src/sendmsg-window.c:220
 msgid "_Generic UTF-8"
-msgstr ""
+msgstr "_ზოგადი UTF-8"
 
 #: ../src/sendmsg-window.c:264
 msgid "Attachment"
-msgstr ""
+msgstr "დანართი"
 
 #: ../src/sendmsg-window.c:264
 msgid "Inline"
@@ -6442,7 +6468,7 @@ msgstr "ბმა"
 
 #: ../src/sendmsg-window.c:478
 msgid "(No name)"
-msgstr ""
+msgstr "(სახელის გარეშე)"
 
 #: ../src/sendmsg-window.c:484
 #, c-format
@@ -6512,7 +6538,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:1678 ../src/sendmsg-window.c:5169
 msgid "(no subject)"
-msgstr ""
+msgstr "(სათაურის გარეშე)"
 
 #: ../src/sendmsg-window.c:1757
 msgid "forwarded message"
@@ -6525,11 +6551,11 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:1846 ../src/sendmsg-window.c:1922
 msgid "Remove"
-msgstr ""
+msgstr "წაშლა"
 
 #: ../src/sendmsg-window.c:1934
 msgid "Open…"
-msgstr ""
+msgstr "გახსნა…"
 
 #: ../src/sendmsg-window.c:1946
 msgid "(URL)"
@@ -6537,7 +6563,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:2001
 msgid "Attach file"
-msgstr ""
+msgstr "ფაილის მიმაგრება"
 
 #: ../src/sendmsg-window.c:2113 ../src/sendmsg-window.c:2189
 #: ../src/sendmsg-window.c:7136
@@ -6647,7 +6673,7 @@ msgstr ""
 
 #: ../src/sendmsg-window.c:3596
 msgid "you"
-msgstr ""
+msgstr "თქვენ"
 
 #: ../src/sendmsg-window.c:3605
 #, c-format
@@ -6985,7 +7011,7 @@ msgstr ""
 
 #: ../src/store-address.c:290
 msgid "Address Book:"
-msgstr ""
+msgstr "მისამართების წიგნი:"
 
 #: ../src/store-address.c:339
 msgid "From: "
@@ -7010,14 +7036,6 @@ msgstr "გამყოფი"
 #: ../src/toolbar-factory.c:116
 msgid "Quit"
 msgstr "გასვლა"
-
-#: ../src/toolbar-factory.c:117
-msgid "Check"
-msgstr "შემოწმება"
-
-#: ../src/toolbar-factory.c:118
-msgid "Compose"
-msgstr "შექმნა"
 
 #: ../src/toolbar-factory.c:119
 msgid "Continue"
@@ -7104,7 +7122,7 @@ msgstr ""
 #: ../src/toolbar-factory.c:137 ../src/toolbar-factory.c:167
 #: ../ui/sendmsg-window.ui.h:7
 msgid "Queue"
-msgstr ""
+msgstr "რიგი"
 
 #: ../src/toolbar-factory.c:138
 msgid "Attach"
@@ -7168,7 +7186,7 @@ msgstr "ბრძანების აღდგენა"
 
 #: ../src/toolbar-factory.c:153
 msgid "Expunge"
-msgstr ""
+msgstr "Expunge"
 
 #: ../src/toolbar-factory.c:154
 msgid ""
@@ -7604,11 +7622,11 @@ msgstr "გადასვლა"
 
 #: ../ui/main-window.ui.h:85 ../ui/message-window.ui.h:31
 msgid "Next Message"
-msgstr ""
+msgstr "შემდეგი შეტყობინება"
 
 #: ../ui/main-window.ui.h:86 ../ui/message-window.ui.h:32
 msgid "Previous Message"
-msgstr ""
+msgstr "წინა შეტყობინება"
 
 #: ../ui/main-window.ui.h:87 ../ui/message-window.ui.h:33
 msgid "Next Unread Message"

@@ -604,6 +604,7 @@ update_msg_list(struct fetch_data   *fd,
 		gpointer key;
 
 		g_hash_table_iter_init(&iter, uids);
+                g_assert(uid_prefix != NULL);  /* Avoid a false positive in scan-build */
 		while (g_hash_table_iter_next(&iter, &key, NULL)) {
 			if (strncmp((const char *) key, uid_prefix, prefix_len) != 0) {
 				g_hash_table_insert(*current_uids, key, GINT_TO_POINTER(1));

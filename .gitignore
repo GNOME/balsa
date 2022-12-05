@@ -2,6 +2,8 @@
 
 *.o
 *.a
+*.lo
+*.la
 *.gmo
 *.omf
 *.stamp

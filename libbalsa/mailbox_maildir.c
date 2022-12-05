@@ -307,22 +307,18 @@ static void
 lbm_maildir_remove_files(LibBalsaMailboxLocal *mailbox)
 {
     const gchar* path;
+    GError *error = NULL;
 
     g_return_if_fail(LIBBALSA_IS_MAILBOX_MAILDIR(mailbox));
 
     path = libbalsa_mailbox_local_get_path((LibBalsaMailboxLocal *) mailbox);
     g_debug("DELETE MAILDIR");
 
-    if (!libbalsa_delete_directory_contents(path)) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("Could not remove contents of %s:\n%s"),
-			     path, g_strerror(errno));
-	return;
-    }
-    if ( rmdir(path) == -1 ) {
-	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
-			     _("Could not remove %s:\n%s"),
-			     path, g_strerror(errno));
+    if (!libbalsa_delete_directory(path, &error)) {
+    	libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+    			     _("Could not remove “%s”: %s"),
+    			     path, error->message);
+    	g_clear_error(&error);
     }
     LIBBALSA_MAILBOX_LOCAL_CLASS(libbalsa_mailbox_maildir_parent_class)->remove_files(mailbox);
 }

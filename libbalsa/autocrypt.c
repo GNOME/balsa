@@ -751,8 +751,8 @@ extract_ac_keydata(GMimeAutocryptHeader *autocrypt_header, ac_key_data_t *dest)
 				g_clear_error(&gpg_error);
 
 				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
-				libbalsa_delete_directory_contents(temp_dir);
-				g_rmdir(temp_dir);
+				libbalsa_delete_directory(temp_dir, NULL);
+				g_free(temp_dir);
 			}
 
 			gpgme_release(ctx);
@@ -948,8 +948,8 @@ show_key_details_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 			    	gtk_widget_destroy(dialog);
 			    	g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
 				}
-				libbalsa_delete_directory_contents(temp_dir);
-				g_rmdir(temp_dir);
+				libbalsa_delete_directory(temp_dir, NULL);
+				g_free(temp_dir);
 				g_free(mail_addr);
 			}
 

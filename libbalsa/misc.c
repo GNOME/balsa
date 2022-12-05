@@ -196,46 +196,47 @@ libbalsa_wrap_string(gchar * str, int width)
 }
 
 
-/* Delete the contents of a directory (not the directory itself).
+/* Delete the contents of a directory and the directory itself.
    Return TRUE if everything was OK.
-   If FALSE is returned then errno will be set to some useful value.
+   If FALSE is returned then error will be set to some useful value.
 */
 gboolean
-libbalsa_delete_directory_contents(const gchar *path)
+libbalsa_delete_directory(const gchar *path, GError **error)
 {
 	GDir *dir;
 	gboolean result;
 
-    g_return_val_if_fail(path != NULL, FALSE);
-    dir = g_dir_open(path, 0, NULL);
-    if (dir == NULL) {
-    	result = FALSE;
-    } else {
-    	const gchar *item;
+	g_return_val_if_fail(path != NULL, FALSE);
+	dir = g_dir_open(path, 0, error);
+	if (dir == NULL) {
+		result = FALSE;
+	} else {
+		const gchar *item;
 
-    	result = TRUE;
-    	item = g_dir_read_name(dir);
-    	while (result && (item != NULL)) {
-    		gchar *full_path;
+		result = TRUE;
+		item = g_dir_read_name(dir);
+		while (result && (item != NULL)) {
+			gchar *full_path;
 
-    		full_path = g_build_filename(path, item, NULL);
-    		if (g_file_test(full_path, G_FILE_TEST_IS_DIR)) {
-    	   		result = libbalsa_delete_directory_contents(full_path);
-    			if (g_rmdir(full_path) != 0) {
-    				result = FALSE;
-    			}
-    		} else {
-    	   		if (g_unlink(full_path) != 0) {
-    				result = FALSE;
-    			}
-    		}
-    		g_free(full_path);
-    		item = g_dir_read_name(dir);
-    	}
-    	g_dir_close(dir);
-    }
-
-    return result;
+			full_path = g_build_filename(path, item, NULL);
+			if (g_file_test(full_path, G_FILE_TEST_IS_DIR)) {
+				result = libbalsa_delete_directory(full_path, error);
+			} else {
+				if (g_unlink(full_path) != 0) {
+					g_set_error(error, LIBBALSA_ERROR_QUARK, errno, _("cannot delete “%s”: %s"), full_path, g_strerror(errno));
+					result = FALSE;
+				}
+			}
+			g_free(full_path);
+			item = g_dir_read_name(dir);
+		}
+		g_dir_close(dir);
+		if (g_rmdir(path) != 0) {
+			g_set_error(error, LIBBALSA_ERROR_QUARK, errno, _("cannot delete “%s”: %s"), path, g_strerror(errno));
+			result = FALSE;
+		}
+	}
+	return result;
 }
 
 /* libbalsa_expand_path:

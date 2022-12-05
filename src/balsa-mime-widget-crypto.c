@@ -377,8 +377,7 @@ create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
 				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
 			}
 
-			libbalsa_delete_directory_contents(temp_dir);
-			g_rmdir(temp_dir);
+			libbalsa_delete_directory(temp_dir, NULL);
 			g_free(temp_dir);
 		}
 

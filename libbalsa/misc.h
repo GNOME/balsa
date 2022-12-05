@@ -110,7 +110,7 @@ gchar *libbalsa_wrap_rfc2646(gchar * par, gint width,
 void libbalsa_unwrap_buffer(GtkTextBuffer * buffer, GtkTextIter * iter,
                             gint lines);
 
-gboolean libbalsa_delete_directory_contents(const gchar *path);
+gboolean libbalsa_delete_directory(const gchar *path, GError **error);
 gchar *libbalsa_expand_path(const gchar *path);
 gboolean libbalsa_mktempdir(gchar ** name);
 LibBalsaCodeset libbalsa_set_fallback_codeset(LibBalsaCodeset codeset);

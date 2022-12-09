@@ -1,0 +1,7801 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: balsa\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
+"product=balsa&keywords=I18N+L10N&component=general\n"
+"POT-Creation-Date: 2016-03-22 17:25+0600\n"
+"PO-Revision-Date: 2021-07-15 00:22+0700\n"
+"Language-Team: IE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.12\n"
+"Last-Translator: OIS <mistresssilvara@hotmail.com>\n"
+"Language: ie\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../balsa.desktop.in.in.h:1 ../balsa-mailto-handler.desktop.in.in.h:1
+msgid "Balsa"
+msgstr "Balsa"
+
+#: ../balsa.desktop.in.in.h:2 ../balsa-mailto-handler.desktop.in.in.h:2
+msgid "E-Mail utility"
+msgstr "Letor de postage"
+
+#: ../balsa.desktop.in.in.h:3 ../balsa-mailto-handler.desktop.in.in.h:3
+msgid "Mail Client"
+msgstr "Client de postage"
+
+#: ../balsa.desktop.in.in.h:4 ../balsa-mailto-handler.desktop.in.in.h:4
+msgid "Balsa Mail Client"
+msgstr "Client de postage Balsa"
+
+#: ../libbalsa/address-book.c:312 ../libbalsa/filter-error.c:45
+#, fuzzy
+msgid "No error"
+msgstr "Null errore"
+
+#: ../libbalsa/address-book.c:313
+msgid "Cannot read from address book"
+msgstr ""
+
+#: ../libbalsa/address-book.c:314
+#, fuzzy
+msgid "Cannot write to address book"
+msgstr "Adressarium GnomeCard"
+
+#: ../libbalsa/address-book.c:315
+#, fuzzy
+msgid "Cannot connect to the server"
+msgstr "Connexer a ti-ci servitore"
+
+#: ../libbalsa/address-book.c:316
+#, fuzzy
+msgid "Cannot search in the address book"
+msgstr "Adressarium GnomeCard"
+
+#: ../libbalsa/address-book.c:318
+#, fuzzy
+msgid "Cannot add duplicate entry"
+msgstr " A                      Adjunter un element"
+
+#: ../libbalsa/address-book.c:320
+#, fuzzy
+msgid "Cannot find address in address book"
+msgstr "Adressarium GnomeCard"
+
+#: ../libbalsa/address-book.c:321 ../src/main-window.c:2387
+#: ../src/main-window.c:4837 ../src/sendmsg-window.c:4201
+msgid "Unknown error"
+msgstr "Ínconosset errore"
+
+#. The externq database doesn't support Id's, sorry!
+#: ../libbalsa/address-book-extern.c:208 ../libbalsa/address-book-ldap.c:493
+#: ../libbalsa/address-book-ldif.c:330
+#, fuzzy
+msgid "No-Id"
+msgstr "ID:"
+
+#: ../libbalsa/address-book-extern.c:213 ../libbalsa/address-book-extern.c:368
+#: ../libbalsa/address-book-ldap.c:499 ../libbalsa/address-book-ldif.c:309
+#: ../libbalsa/address-book-ldif.c:333 ../libbalsa/address-book-ldif.c:352
+#: ../libbalsa/address-book-ldif.c:356 ../libbalsa/address-book-vcard.c:158
+#: ../libbalsa/address-book-vcard.c:256 ../libbalsa/address.c:401
+#, fuzzy
+msgid "No-Name"
+msgstr "Null nómine"
+
+#: ../libbalsa/address-book-ldap.c:281
+msgid "SASL Interaction\n"
+msgstr ""
+
+#: ../libbalsa/address-book-ldap.c:328
+#, fuzzy
+msgid "TLS requested but not compiled in"
+msgstr "Ne compilat con li supporte de SSL/TLS"
+
+#: ../libbalsa/address-book-ldap.c:608
+msgid "Undefined location of user address book"
+msgstr ""
+
+#: ../libbalsa/address.c:953
+#, fuzzy
+msgid "D_isplayed Name:"
+msgstr "Nómine intern: %s-%d"
+
+#: ../libbalsa/address.c:954
+#, fuzzy
+msgid "_First Name:"
+msgstr "Prenómine"
+
+#: ../libbalsa/address.c:955
+#, fuzzy
+msgid "_Last Name:"
+msgstr "ultim"
+
+#: ../libbalsa/address.c:956
+#, fuzzy
+msgid "_Nickname:"
+msgstr "Pseudonim"
+
+#: ../libbalsa/address.c:957
+msgid "O_rganization:"
+msgstr "O_rganisation:"
+
+#: ../libbalsa/address.c:958
+#, fuzzy
+msgid "_Email Address:"
+msgstr "Adresse de e-post:"
+
+#. Right/Add button
+#: ../libbalsa/address.c:977 ../src/filter-edit-callbacks.c:1086
+#: ../src/filter-run-dialog.c:327
+msgid "A_dd"
+msgstr "A_djunter"
+
+#: ../libbalsa/address-view.c:127 ../src/balsa-mime-widget-message.c:750
+#: ../src/balsa-print-object-header.c:171 ../src/sendmsg-window.c:1121
+#: ../src/sendmsg-window.c:3864 ../src/store-address.c:339
+msgid "To:"
+msgstr "A:"
+
+#: ../libbalsa/address-view.c:128 ../src/balsa-mime-widget-message.c:751
+#: ../src/balsa-print-object-header.c:173 ../src/sendmsg-window.c:1121
+#: ../src/sendmsg-window.c:3872 ../src/store-address.c:340
+msgid "Cc:"
+msgstr "Cc:"
+
+#: ../libbalsa/address-view.c:129 ../src/balsa-mime-widget-message.c:752
+#: ../src/balsa-print-object-header.c:175 ../src/sendmsg-window.c:1121
+#: ../src/store-address.c:341
+msgid "Bcc:"
+msgstr ""
+
+#: ../libbalsa/address-view.c:131
+#, fuzzy
+msgid "Reply To:"
+msgstr "Responder-a:"
+
+#: ../libbalsa/body.c:121 ../libbalsa/mailbox_local.c:1760
+#: ../libbalsa/message.c:843
+msgid "(No subject)"
+msgstr "(Null tema)"
+
+#: ../libbalsa/body.c:388 ../libbalsa/body.c:435
+#, fuzzy, c-format
+msgid "Failed to create output stream"
+msgstr "Esque vu vole crear li fluvie?"
+
+#: ../libbalsa/body.c:579
+#, fuzzy, c-format
+msgid "Could not read embedded message"
+msgstr "%s: Anzeigeadresse konnte nicht gelesen werden"
+
+#: ../libbalsa/filter.c:127 ../libbalsa/mailbox_local.c:840
+msgid "Unable to load message body to match filter"
+msgstr ""
+
+#: ../libbalsa/filter.c:234
+#, fuzzy, c-format
+msgid "Invalid filter: %s"
+msgstr "&Filtre..."
+
+#: ../libbalsa/filter.c:282 ../libbalsa/filter.c:305
+#, c-format
+msgid "Bad mailbox name for filter: %s"
+msgstr ""
+
+#: ../libbalsa/filter.c:286
+#, fuzzy, c-format
+msgid "Error when copying messages: %s"
+msgstr "Errore copiante a «%s»: Li destination es solmen-letion"
+
+#: ../libbalsa/filter.c:296
+#, fuzzy, c-format
+msgid "Error when trashing messages: %s"
+msgstr ""
+"Un errore evenit executent «%s»:\n"
+"%s."
+
+#: ../libbalsa/filter.c:309
+#, fuzzy, c-format
+msgid "Error when moving messages: %s"
+msgstr ""
+"Un errore evenit executent «%s»:\n"
+"%s."
+
+#: ../libbalsa/filter-error.c:46
+msgid "Syntax error in the filter configuration file"
+msgstr ""
+
+#: ../libbalsa/filter-error.c:47
+#, fuzzy
+msgid "Unable to allocate memory"
+msgstr "Ne posset aperter li atachament"
+
+#: ../libbalsa/filter-error.c:48
+#, fuzzy
+msgid "Error in regular expression syntax"
+msgstr "Errore de expression regulari in li mustre"
+
+#: ../libbalsa/filter-error.c:49
+msgid "Attempt to apply an invalid filter"
+msgstr ""
+
+#: ../libbalsa/filter-file.c:137
+#, fuzzy, c-format
+msgid "Invalid filters %s for mailbox %s"
+msgstr "Modificar li lettre-bux: %s"
+
+#. FIXME: this is hack!
+#: ../libbalsa/filter-funcs.c:381 ../src/balsa-index.c:1053
+msgid "To"
+msgstr "A"
+
+#: ../libbalsa/filter-funcs.c:382 ../src/balsa-index.c:357
+msgid "From"
+msgstr "De"
+
+#: ../libbalsa/filter-funcs.c:383 ../src/balsa-index.c:373
+#: ../src/pref-manager.c:416
+msgid "Subject"
+msgstr "Tema"
+
+#: ../libbalsa/filter-funcs.c:384
+msgid "Cc"
+msgstr "Cc"
+
+#: ../libbalsa/filter-funcs.c:385
+#, fuzzy
+msgid "Body"
+msgstr "Córpor:"
+
+#: ../libbalsa/filter-funcs.c:390
+#, fuzzy, c-format
+msgid "Header:%s"
+msgstr "Cap-linea:"
+
+#: ../libbalsa/filter-funcs.c:396 ../libbalsa/filter-funcs.c:424
+#, fuzzy, c-format
+msgid ",%s"
+msgstr "\"%s\""
+
+#: ../libbalsa/filter-funcs.c:412
+msgid "New"
+msgstr "Nov"
+
+#: ../libbalsa/filter-funcs.c:413 ../src/filter-edit-callbacks.c:1009
+msgid "Deleted"
+msgstr "Deletet"
+
+#: ../libbalsa/filter-funcs.c:414 ../src/filter-edit-callbacks.c:1009
+msgid "Replied"
+msgstr "Respondet"
+
+#: ../libbalsa/filter-funcs.c:415 ../src/filter-edit-callbacks.c:1009
+msgid "Flagged"
+msgstr "Flaggat"
+
+#: ../libbalsa/filter-funcs.c:439
+msgid "Not "
+msgstr "NE"
+
+#: ../libbalsa/filter-funcs.c:455
+#, fuzzy
+msgid "From %Y-%m-%d"
+msgstr "%d %b %y, %H:%M"
+
+#: ../libbalsa/filter-funcs.c:461
+#, fuzzy
+msgid "To %Y-%m-%d"
+msgstr "%Y-%m-%d"
+
+#: ../libbalsa/filter-funcs.c:469
+msgid "And"
+msgstr "E"
+
+#: ../libbalsa/filter-funcs.c:472
+msgid "Or"
+msgstr "O"
+
+#: ../libbalsa/gmime-application-pkcs7.c:123
+#, c-format
+msgid "Failed to decrypt MIME part: parse error"
+msgstr ""
+
+#: ../libbalsa/gmime-multipart-crypt.c:223
+msgid "Cannot verify multipart/signed part due to missing subparts."
+msgstr ""
+
+#: ../libbalsa/gmime-multipart-crypt.c:249
+#, fuzzy, c-format
+msgid "unsupported protocol '%s'"
+msgstr "Ínsuportat protocol."
+
+#: ../libbalsa/gmime-multipart-crypt.c:262
+msgid ""
+"Cannot verify multipart/signed part: signature content-type does not match "
+"protocol."
+msgstr ""
+
+#: ../libbalsa/gmime-multipart-crypt.c:485
+#, c-format
+msgid ""
+"Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
+"'%s'."
+msgstr ""
+
+#: ../libbalsa/gmime-multipart-crypt.c:486
+#, fuzzy
+msgid "(none)"
+msgstr "(null)"
+
+#: ../libbalsa/gmime-multipart-crypt.c:499
+msgid ""
+"Cannot decrypt multipart/encrypted part: content-type does not match "
+"protocol."
+msgstr ""
+
+#: ../libbalsa/gmime-multipart-crypt.c:514
+msgid "Cannot decrypt multipart/encrypted part: unexpected content type"
+msgstr ""
+
+#: ../libbalsa/gmime-multipart-crypt.c:556
+msgid ""
+"Cannot decrypt multipart/encrypted part: failed to parse decrypted content"
+msgstr ""
+
+#: ../libbalsa/html.c:66
+#, fuzzy, c-format
+msgid "Could not get an HTML part: %s"
+msgstr "Rechnername des Servers konnte nicht ermittelt werden: %s!"
+
+#: ../libbalsa/html.c:338
+msgid ""
+"This message part contains images from a remote server. To protect your "
+"privacy, Balsa has not downloaded them. You may choose to download them if "
+"you trust the server."
+msgstr ""
+
+#: ../libbalsa/html.c:346
+#, fuzzy
+msgid "_Download images"
+msgstr "Descargar"
+
+#. should "re" be localized ?
+#: ../libbalsa/identity.c:101 ../libbalsa/mailbox_local.c:1879
+#: ../libbalsa/mailbox_local.c:1881 ../src/sendmsg-window.c:4098
+#: ../src/sendmsg-window.c:4100
+msgid "Re:"
+msgstr "Re:"
+
+#: ../libbalsa/identity.c:102 ../src/sendmsg-window.c:4038
+#: ../src/sendmsg-window.c:4039 ../src/sendmsg-window.c:4040
+msgid "Fwd:"
+msgstr ""
+
+#: ../libbalsa/identity.c:164
+#, fuzzy
+msgid "New Identity"
+msgstr "NOV IDENTITÁ"
+
+#: ../libbalsa/identity.c:343
+#, fuzzy, c-format
+msgid "Error executing signature generator %s"
+msgstr "Un errore evenit executent «%s»: %s"
+
+#: ../libbalsa/identity.c:353
+#, c-format
+msgid "Cannot open signature file '%s' for reading"
+msgstr ""
+
+#: ../libbalsa/identity.c:359
+#, fuzzy, c-format
+msgid "Error reading signature from %s"
+msgstr "Un errore evenit leente «%s»: %s"
+
+#: ../libbalsa/identity.c:364
+#, fuzzy, c-format
+msgid "Signature in %s is not a UTF-8 text."
+msgstr "Ne successat converter li textu a UTF-8!\n"
+
+#: ../libbalsa/identity.c:495
+#, fuzzy
+msgid "Current"
+msgstr "Actual"
+
+#: ../libbalsa/identity.c:749 ../libbalsa/smtp-server.c:264
+msgid "Default"
+msgstr "Predefinit"
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/identity.c:948
+msgid "_Face Path"
+msgstr "Rute _Face"
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/identity.c:954
+msgid "_X-Face Path"
+msgstr "Rute _X-Face"
+
+#. create the "General" tab
+#: ../libbalsa/identity.c:982
+msgid "General"
+msgstr "General"
+
+#: ../libbalsa/identity.c:984
+msgid "_Identity name:"
+msgstr "_Identitá:"
+
+#: ../libbalsa/identity.c:986
+msgid "_Full name:"
+msgstr "Nómine compl_et:"
+
+#: ../libbalsa/identity.c:988
+#, fuzzy
+msgid "_Mailing address:"
+msgstr "P_ostage-liste:"
+
+#: ../libbalsa/identity.c:990
+#, fuzzy
+msgid "Reply _to:"
+msgstr "Response a"
+
+#: ../libbalsa/identity.c:992
+msgid "_Domain:"
+msgstr "_Dominia:"
+
+#. create the "Messages" tab
+#: ../libbalsa/identity.c:996
+#, fuzzy
+msgid "Messages"
+msgstr "Missages"
+
+#: ../libbalsa/identity.c:998
+msgid "_Bcc:"
+msgstr ""
+
+#: ../libbalsa/identity.c:1000
+#, fuzzy
+msgid "Reply _string:"
+msgstr "Response-a:"
+
+#: ../libbalsa/identity.c:1002
+#, fuzzy
+msgid "F_orward string:"
+msgstr "Catene"
+
+#: ../libbalsa/identity.c:1005
+msgid "send messages in both plain text and _HTML format"
+msgstr ""
+
+#: ../libbalsa/identity.c:1008
+msgid "request positive (successful) _Delivery Status Notification by default"
+msgstr ""
+
+#: ../libbalsa/identity.c:1011
+msgid "request _Message Disposition Notification by default"
+msgstr ""
+
+#: ../libbalsa/identity.c:1021
+msgid "SMT_P server:"
+msgstr "Servitore SMT_P:"
+
+#. create the "Signature" tab
+#: ../libbalsa/identity.c:1026
+msgid "Signature"
+msgstr "Signature"
+
+#: ../libbalsa/identity.c:1029
+#, fuzzy
+msgid "Signature _path"
+msgstr "Rute"
+
+#: ../libbalsa/identity.c:1032
+#, fuzzy
+msgid "_Execute signature"
+msgstr "Executer"
+
+#: ../libbalsa/identity.c:1035
+#, fuzzy
+msgid "Incl_ude signature"
+msgstr "Signature"
+
+#: ../libbalsa/identity.c:1038
+msgid "Include signature when for_warding"
+msgstr ""
+
+#: ../libbalsa/identity.c:1041
+msgid "Include signature when rep_lying"
+msgstr ""
+
+#: ../libbalsa/identity.c:1044
+#, fuzzy
+msgid "_Add signature separator"
+msgstr "--- Separator ---"
+
+#: ../libbalsa/identity.c:1047
+#, fuzzy
+msgid "Prepend si_gnature"
+msgstr "Inserter li si_gnature"
+
+#: ../libbalsa/identity.c:1053
+msgid ""
+"Signing and encrypting messages are possible\n"
+"only if Balsa is built with cryptographic support."
+msgstr ""
+
+#: ../libbalsa/identity.c:1058
+msgid "Security"
+msgstr "Securitá"
+
+#: ../libbalsa/identity.c:1061
+#, fuzzy
+msgid "sign messages by default"
+msgstr "Signar li file per li predefinit clave"
+
+#: ../libbalsa/identity.c:1064
+#, fuzzy
+msgid "encrypt messages by default"
+msgstr "Sempre ciffrar missages"
+
+#: ../libbalsa/identity.c:1067
+#, fuzzy
+msgid "default protocol"
+msgstr "Protocol predefinit"
+
+#: ../libbalsa/identity.c:1070
+msgid "always trust GnuPG keys when encrypting"
+msgstr ""
+
+#: ../libbalsa/identity.c:1073
+msgid "remind me if messages can be encrypted"
+msgstr ""
+
+#: ../libbalsa/identity.c:1076
+msgid ""
+"use secret key with this id for signing\n"
+"(leave empty for automatic selection)"
+msgstr ""
+
+#: ../libbalsa/identity.c:1210
+#, fuzzy, c-format
+msgid "Error reading file %s: %s"
+msgstr "Un errore evenit leente «%s»: %s"
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/identity.c:1220
+#, c-format
+msgid "Face header file %s is too long (%lu bytes)."
+msgstr ""
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/identity.c:1230
+#, c-format
+msgid "Face header file %s contains binary data."
+msgstr ""
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/identity.c:1250 ../src/balsa-message.c:1573
+#, fuzzy, c-format
+msgid "Error loading Face: %s"
+msgstr "Un errore evenit cargante li tema: %s\n"
+
+#: ../libbalsa/identity.c:1429
+msgid "Error: The identity does not have a name"
+msgstr ""
+
+#: ../libbalsa/identity.c:1439
+#, fuzzy
+msgid "Error: An identity with that name already exists"
+msgstr "Li fólder con ti-ci nómine ja existe."
+
+#: ../libbalsa/identity.c:1639
+msgid "Do you really want to delete the selected identity?"
+msgstr ""
+
+#: ../libbalsa/identity.c:1676
+#, fuzzy, c-format
+msgid "Error displaying help for identities: %s\n"
+msgstr ""
+"Un error ha evenit durante que monstrar auxilie:\n"
+"%s"
+
+#: ../libbalsa/identity.c:1722
+#, fuzzy
+msgid "Manage Identities"
+msgstr "_Identitás..."
+
+#: ../libbalsa/identity.c:2123
+msgid "GnuPG MIME mode"
+msgstr "Mode GnuPG MIME"
+
+#: ../libbalsa/identity.c:2125
+msgid "GnuPG OpenPGP mode"
+msgstr "Mode GnuPG OpenPGP"
+
+#: ../libbalsa/identity.c:2128
+msgid "GpgSM S/MIME mode"
+msgstr "Mode GpgSM S/MIME"
+
+#. IMAP host name + message
+#: ../libbalsa/imap-server.c:317
+#, fuzzy, c-format
+msgid ""
+"IMAP server %s alert:\n"
+"%s"
+msgstr "Navigar li rete por trovar un servitore %s"
+
+#. IMAP host name + message
+#: ../libbalsa/imap-server.c:321
+#, fuzzy, c-format
+msgid "IMAP server %s error: %s"
+msgstr "errore - iconv: %s -> %s\n"
+
+#. IMAP host name + message
+#: ../libbalsa/imap-server.c:327
+#, fuzzy, c-format
+msgid "%s: %s"
+msgstr "\t%s%s%s%s%s\n"
+
+#: ../libbalsa/imap-server.c:573 ../libbalsa/server.c:346
+#: ../libbalsa/server.c:390
+#, fuzzy
+msgid "Balsa passwords"
+msgstr "Balsa"
+
+#: ../libbalsa/imap-server.c:624
+#, fuzzy, c-format
+msgid "Cannot connect to %s"
+msgstr "Connexer a servitore %s"
+
+#: ../libbalsa/imap-server.c:629 ../libbalsa/imap-server.c:634
+#, fuzzy, c-format
+msgid "Cannot connect to the server: %s"
+msgstr "Ne successat conexer al servitore RDP %s."
+
+#: ../libbalsa/imap-server.c:782
+#, c-format
+msgid "Exceeded the number of connections per server %s"
+msgstr ""
+
+#: ../libbalsa/libbalsa.c:385
+msgid "Invalid date"
+msgstr "Ínvalid date"
+
+#: ../libbalsa/libbalsa.c:401 ../src/pref-manager.c:1406
+#: ../src/pref-manager.c:1502
+msgid "Unknown"
+msgstr "Ínconosset"
+
+#: ../libbalsa/libbalsa.c:547
+#, c-format
+msgid ""
+"Authenticity of this certificate could not be verified.\n"
+"<b>Reason:</b> %s\n"
+"<b>This certificate belongs to:</b>\n"
+msgstr ""
+
+#: ../libbalsa/libbalsa.c:559
+#, fuzzy
+msgid ""
+"\n"
+"<b>This certificate was issued by:</b>\n"
+msgstr "<b>A:</b>"
+
+#: ../libbalsa/libbalsa.c:570
+#, c-format
+msgid ""
+"<b>This certificate is valid</b>\n"
+"from %s\n"
+"to %s\n"
+"<b>Fingerprint:</b> %s"
+msgstr ""
+
+#: ../libbalsa/libbalsa.c:579
+msgid "SSL/TLS certificate"
+msgstr "Certificate SSL/TLS"
+
+#: ../libbalsa/libbalsa.c:581
+msgid "_Accept Once"
+msgstr "_Acceptar un vez"
+
+#: ../libbalsa/libbalsa.c:582
+#, fuzzy
+msgid "Accept&_Save"
+msgstr " Acceptar "
+
+#: ../libbalsa/libbalsa.c:583
+msgid "_Reject"
+msgstr "_Rejecter"
+
+#: ../libbalsa/libbalsa.c:629
+#, c-format
+msgid "Connection to %s timed out. Abort?"
+msgstr ""
+
+#: ../libbalsa/libbalsa.c:875
+#, fuzzy, c-format
+msgid "No image data"
+msgstr "Data del image"
+
+#: ../libbalsa/libbalsa.c:919
+#, fuzzy, c-format
+msgid "Invalid input format"
+msgstr "Ínvalid formate"
+
+#: ../libbalsa/libbalsa.c:923
+#, fuzzy, c-format
+msgid "Internal buffer overrun"
+msgstr "Grandore de buffre"
+
+#. Translators: please do not translate Face.
+#: ../libbalsa/libbalsa.c:940
+#, fuzzy, c-format
+msgid "Bad X-Face data"
+msgstr "Rute _X-Face"
+
+#: ../libbalsa/libbalsa-conf.c:141
+msgid "Your Balsa configuration is now stored in \"~/.balsa/config\"."
+msgstr ""
+
+#: ../libbalsa/libbalsa-gpgme.c:243 ../libbalsa/libbalsa-gpgme.c:254
+#: ../libbalsa/libbalsa-gpgme.c:356 ../libbalsa/libbalsa-gpgme.c:479
+#: ../libbalsa/libbalsa-gpgme.c:572
+#, fuzzy
+msgid "could not get data from stream"
+msgstr "Ne successat cargar data de menú ex %s"
+
+#: ../libbalsa/libbalsa-gpgme.c:267 ../libbalsa/rfc3156.c:392
+#: ../libbalsa/rfc3156.c:397 ../libbalsa/rfc3156.c:569
+#: ../libbalsa/rfc3156.c:575
+#, fuzzy
+msgid "signature verification failed"
+msgstr "Verification ne successat"
+
+#: ../libbalsa/libbalsa-gpgme.c:364 ../libbalsa/libbalsa-gpgme.c:488
+#: ../libbalsa/libbalsa-gpgme.c:580
+#, fuzzy
+msgid "could not create new data object"
+msgstr "Ne posset crear un nov file"
+
+#: ../libbalsa/libbalsa-gpgme.c:373
+#, fuzzy
+msgid "signing failed"
+msgstr "Signation"
+
+#: ../libbalsa/libbalsa-gpgme.c:447
+#, c-format
+msgid "combined signing and encryption is defined only for RFC 2440"
+msgstr ""
+
+#: ../libbalsa/libbalsa-gpgme.c:515
+#, fuzzy
+msgid "signing and encryption failed"
+msgstr "Ciffration"
+
+#: ../libbalsa/libbalsa-gpgme.c:517
+#, fuzzy
+msgid "encryption failed"
+msgstr "Sin ciffration"
+
+#: ../libbalsa/libbalsa-gpgme.c:590 ../libbalsa/rfc3156.c:470
+#: ../libbalsa/rfc3156.c:475
+#, fuzzy
+msgid "decryption failed"
+msgstr ""
+"Deciffration ne successat. Probabilmen vu ne have li clave de deciffration."
+
+#: ../libbalsa/libbalsa-gpgme.c:691
+#, fuzzy
+msgid "could not create context"
+msgstr "Ne posset crear li album"
+
+#: ../libbalsa/libbalsa-gpgme.c:695
+#, fuzzy, c-format
+msgid "could not set protocol '%s'"
+msgstr "Ne successat assignar un application predefinit: %s"
+
+#: ../libbalsa/libbalsa-gpgme.c:734 ../libbalsa/libbalsa-gpgme.c:762
+#, fuzzy, c-format
+msgid "could not list keys for \"%s\""
+msgstr "%s: Autorisierungsliste konnte nicht gelesen werden"
+
+#: ../libbalsa/libbalsa-gpgme.c:780
+#, c-format
+msgid ""
+"%s: a key for %s is present, but it is expired, disabled, revoked or invalid"
+msgstr ""
+
+#: ../libbalsa/libbalsa-gpgme.c:785
+#, fuzzy, c-format
+msgid "%s: could not find a key for %s"
+msgstr "Ne posset trovar li volume: %s"
+
+#: ../libbalsa/libbalsa-gpgme.c:792
+#, c-format
+msgid ""
+"%s: a key with id %s is present, but it is expired, disabled, revoked or "
+"invalid"
+msgstr ""
+
+#: ../libbalsa/libbalsa-gpgme.c:797
+#, fuzzy, c-format
+msgid "%s: could not find a key with id %s"
+msgstr "%s: Herstellerkennung konnte nicht gelesen werden"
+
+#: ../libbalsa/libbalsa-gpgme.c:814
+#, c-format
+msgid "%s: multiple keys for %s"
+msgstr "%s: multiplic claves por %s"
+
+#: ../libbalsa/libbalsa-gpgme.c:860
+#, fuzzy, c-format
+msgid "%s: insufficient validity for uid %s"
+msgstr "%s: Besitzer von %s hat nicht die Benutzerkennung %d."
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:143
+#, fuzzy
+msgid "User ID"
+msgstr "ID de usator:"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:143
+msgid "Key ID"
+msgstr "Clave ID"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:143
+msgid "Length"
+msgstr "Longore"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:143
+msgid "Validity"
+msgstr "Validitá"
+
+#. FIXME: create dialog according to the Gnome HIG
+#: ../libbalsa/libbalsa-gpgme-cb.c:158
+#, fuzzy
+msgid "Select key"
+msgstr "Selecter un clave"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:174
+#, c-format
+msgid "Select the private key for the signer %s"
+msgstr ""
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:178
+#, fuzzy, c-format
+msgid "Select the public key for the recipient %s"
+msgstr "Autentification per clave public SSH ne successat: %s"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:301
+#, fuzzy, c-format
+msgid "Insufficient trust for recipient %s"
+msgstr "Fider a «%s» e importar li clave PGP"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:305
+#, fuzzy, c-format
+msgid "The validity of the key with user ID \"%s\" is \"%s\"."
+msgstr "Signat %2$s per <i><key id='%1$s'/></i>."
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:316
+#, fuzzy
+msgid "Use this key anyway?"
+msgstr "Importar sin egard"
+
+#. FIXME: create dialog according to the Gnome HIG
+#: ../libbalsa/libbalsa-gpgme-cb.c:342
+#, fuzzy
+msgid "Enter Passphrase"
+msgstr "Intra li pass-frase"
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:369
+#, c-format
+msgid ""
+"%s\n"
+"The passphrase for this key was bad, please try again!\n"
+"\n"
+"Key: %s"
+msgstr ""
+
+#: ../libbalsa/libbalsa-gpgme-cb.c:374
+#, c-format
+msgid ""
+"%s\n"
+"Please enter the passphrase for the secret key!\n"
+"\n"
+"Key: %s"
+msgstr ""
+
+#: ../libbalsa/libbalsa-vfs.c:556 ../src/sendmsg-window.c:5239
+#, c-format
+msgid "not a regular file"
+msgstr "ne es un file regulari"
+
+#: ../libbalsa/libbalsa-vfs.c:608
+#, fuzzy, c-format
+msgid "Cannot launch, missing application"
+msgstr "APPLICATION [URI...] — startar un APPLICATION"
+
+#: ../libbalsa/libbalsa-vfs.c:674
+#, c-format
+msgid "Open with %s"
+msgstr "Aperter per %s"
+
+#: ../libbalsa/libbalsa-vfs.c:727
+#, fuzzy, c-format
+msgid "Open _part with %s"
+msgstr "Original parte %s"
+
+#: ../libbalsa/mailbox.c:520
+#, fuzzy, c-format
+msgid "Cannot load mailbox %s"
+msgstr "Die Benutzeroberfläche konnte nicht geladen werden"
+
+#: ../libbalsa/mailbox.c:527
+#, fuzzy, c-format
+msgid "No such mailbox type: %s"
+msgstr "Selecte un tip de lettre-bux"
+
+#: ../libbalsa/mailbox.c:544
+#, fuzzy, c-format
+msgid "Bad local mailbox path \"%s\""
+msgstr "«%s» ne es un local rute"
+
+#: ../libbalsa/mailbox.c:549
+#, fuzzy, c-format
+msgid "Could not create a mailbox of type %s"
+msgstr "Ne successat crear un fólder \"%s\": %s\n"
+
+#: ../libbalsa/mailbox.c:872
+#, c-format
+msgid "Applying filter rules to %s"
+msgstr ""
+
+#: ../libbalsa/mailbox.c:1027
+#, fuzzy, c-format
+msgid "Copying from %s to %s"
+msgstr "Copiation del files ex «%s» ad «%s»"
+
+#: ../libbalsa/mailbox.c:1934
+#, c-format
+msgid "libbalsa_mailbox_get_message: mailbox %s is closed"
+msgstr ""
+
+#: ../libbalsa/mailbox.c:2144
+#, c-format
+msgid "Removing messages from source mailbox failed"
+msgstr ""
+
+#: ../libbalsa/mailbox.c:3017
+#, fuzzy
+msgid "from unknown"
+msgstr "Ínconosset"
+
+#: ../libbalsa/mailbox.c:3019
+#, fuzzy
+msgid "Loading..."
+msgstr "Carga..."
+
+#: ../libbalsa/mailbox.c:3989
+#, fuzzy, c-format
+msgid "Searching %s for partial messages"
+msgstr "Serchante por «%s»..."
+
+#: ../libbalsa/mailbox.c:4079
+#, fuzzy
+msgid "Reconstructing message"
+msgstr "_Missage..."
+
+#: ../libbalsa/mailbox.c:4348
+#, c-format
+msgid "Finding duplicate messages in source mailbox failed"
+msgstr ""
+
+#. ImapIssue macro handles reconnecting. We might issue a
+#. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
+#. login information...
+#: ../libbalsa/mailbox_imap.c:617
+msgid "IMAP connection has been severed. Reconnecting..."
+msgstr ""
+
+#: ../libbalsa/mailbox_imap.c:620
+msgid "IMAP protocol error. Try enabling bug workarounds."
+msgstr ""
+
+#: ../libbalsa/mailbox_imap.c:623
+#, c-format
+msgid "IMAP server has shut the connection: %s Reconnecting..."
+msgstr ""
+
+#: ../libbalsa/mailbox_imap.c:635
+#, c-format
+msgid "Async IMAP cmd %s could not be executed. Reconnecting..."
+msgstr ""
+
+#: ../libbalsa/mailbox_imap.c:1126 ../libbalsa/mailbox_maildir.c:509
+#: ../libbalsa/mailbox_mbox.c:748 ../libbalsa/mailbox_mh.c:543
+#, fuzzy, c-format
+msgid "%s: Opening %s Refcount: %d\n"
+msgstr "Ne successat aperter un file %s."
+
+#: ../libbalsa/mailbox_imap.c:1213
+#, fuzzy, c-format
+msgid "Downloading %ld kB"
+msgstr "%ld de %ld"
+
+#: ../libbalsa/mailbox_imap.c:1612
+#, c-format
+msgid ""
+"IMAP SEARCH command failed for mailbox %s\n"
+"falling back to default searching method"
+msgstr ""
+
+#: ../libbalsa/mailbox_imap.c:1672
+#, c-format
+msgid "No path found for mailbox \"%s\", using \"%s\""
+msgstr ""
+
+#: ../libbalsa/mailbox_imap.c:1800 ../libbalsa/mailbox_imap.c:1841
+#, fuzzy, c-format
+msgid "Cannot get IMAP handle"
+msgstr "Caja ne posse manipular localisationes «%s»."
+
+#: ../libbalsa/mailbox_imap.c:2445 ../libbalsa/mailbox_imap.c:2511
+#, c-format
+msgid "Error fetching message from IMAP server: %s"
+msgstr ""
+
+#: ../libbalsa/mailbox_imap.c:2479
+#, fuzzy, c-format
+msgid "Downloading %u kB"
+msgstr "%u kb/s"
+
+#: ../libbalsa/mailbox_imap.c:2523
+#, fuzzy, c-format
+msgid "Cannot create temporary file"
+msgstr "Ne posset crear un file temporari por gardar: %s"
+
+#: ../libbalsa/mailbox_imap.c:2543
+#, fuzzy, c-format
+msgid "Cannot write to temporary file %s"
+msgstr "Ne successat scrir li file de configuration de KDM"
+
+#: ../libbalsa/mailbox_imap.c:2772 ../libbalsa/mailbox_imap.c:2891
+#, fuzzy, c-format
+msgid "Uploading %ld kB"
+msgstr "Cargante..."
+
+#: ../libbalsa/mailbox_imap.c:3194
+#, fuzzy
+msgid "Server-side threading not supported."
+msgstr "Tip de servitore ne es suportat."
+
+#: ../libbalsa/mailbox_local.c:538
+#, fuzzy, c-format
+msgid "Failed to save cache file \"%s\": %s."
+msgstr "Ne successat gardar li file %s."
+
+#: ../libbalsa/mailbox_local.c:570
+#, fuzzy, c-format
+msgid "Cache file for mailbox %s will be created"
+msgstr "Li file de cache har esset creat con success.\n"
+
+#: ../libbalsa/mailbox_local.c:579
+#, fuzzy, c-format
+msgid "Failed to read cache file %s: %s"
+msgstr "Ne successat leer li file «%s»: %s"
+
+#: ../libbalsa/mailbox_local.c:597 ../libbalsa/mailbox_local.c:614
+#: ../libbalsa/mailbox_local.c:638
+#, c-format
+msgid "Cache file for mailbox %s will be repaired"
+msgstr ""
+
+#: ../libbalsa/mailbox_local.c:1164
+#, fuzzy, c-format
+msgid "Filtering %s"
+msgstr "_Filtration..."
+
+#: ../libbalsa/mailbox_local.c:1252
+#, fuzzy, c-format
+msgid "Preparing %s"
+msgstr "Preparante li transaction: %s"
+
+#: ../libbalsa/mailbox_local.c:2048
+#, fuzzy, c-format
+msgid "Open of %s failed. Errno = %d, "
+msgstr "Ne successat aperter «%s»: %s"
+
+#: ../libbalsa/mailbox_local.c:2070
+#, fuzzy, c-format
+msgid "Failed to sync mailbox \"%s\""
+msgstr "Modificar li lettre-bux: %s"
+
+#: ../libbalsa/mailbox_maildir.c:195
+#, c-format
+msgid "Mailbox %s does not appear to be a Maildir mailbox."
+msgstr ""
+
+#: ../libbalsa/mailbox_maildir.c:204
+#, fuzzy, c-format
+msgid "Could not create a MailDir directory at %s (%s)"
+msgstr "Ne successat crear un fólder \"%s\": %s\n"
+
+#: ../libbalsa/mailbox_maildir.c:212 ../libbalsa/mailbox_maildir.c:221
+#: ../libbalsa/mailbox_maildir.c:232
+#, fuzzy, c-format
+msgid "Could not create a MailDir at %s (%s)"
+msgstr "Ne successat crear un fólder \"%s\": %s\n"
+
+#: ../libbalsa/mailbox_maildir.c:339 ../libbalsa/mailbox_mh.c:292
+#, fuzzy, c-format
+msgid ""
+"Could not remove contents of %s:\n"
+"%s"
+msgstr "Ne successat remover li emblema «%s»."
+
+#: ../libbalsa/mailbox_maildir.c:345 ../libbalsa/mailbox_mbox.c:324
+#: ../libbalsa/mailbox_mh.c:298
+#, fuzzy, c-format
+msgid ""
+"Could not remove %s:\n"
+"%s"
+msgstr "Ne successat remover li schema de colores «%s»."
+
+#: ../libbalsa/mailbox_maildir.c:488 ../libbalsa/mailbox_mbox.c:692
+#: ../libbalsa/mailbox_mh.c:524
+#, fuzzy, c-format
+msgid "Mailbox does not exist."
+msgstr "Li file ne existe."
+
+#: ../libbalsa/mailbox_maildir.c:929 ../libbalsa/mailbox_mbox.c:2029
+#: ../libbalsa/mailbox_mh.c:1106
+#, fuzzy, c-format
+msgid "Data copy error"
+msgstr "Copiar un DVD de data"
+
+#: ../libbalsa/mailbox_mbox.c:209
+#, c-format
+msgid "Mailbox %s does not appear to be an Mbox mailbox."
+msgstr ""
+
+#: ../libbalsa/mailbox_mbox.c:427
+#, fuzzy, c-format
+msgid "Could not write file %s: %s"
+msgstr "Ne successat scrir li file %s"
+
+#: ../libbalsa/mailbox_mbox.c:439
+#, fuzzy, c-format
+msgid "Failed to create temporary file \"%s\": %s"
+msgstr "Ne successat crear un file temporari: %s"
+
+#: ../libbalsa/mailbox_mbox.c:451
+#, c-format
+msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
+msgstr ""
+
+#: ../libbalsa/mailbox_mbox.c:459
+#, fuzzy, c-format
+msgid "Could not unlink file %s: %s"
+msgstr "unlink %s ne successat: %s"
+
+#: ../libbalsa/mailbox_mbox.c:700
+#, fuzzy, c-format
+msgid "Cannot open mailbox."
+msgstr "Ne successat aperter un image."
+
+#: ../libbalsa/mailbox_mbox.c:712
+#, fuzzy, c-format
+msgid "Mailbox is not in mbox format."
+msgstr "Lettre-bux"
+
+#: ../libbalsa/mailbox_mbox.c:720
+#, fuzzy, c-format
+msgid "Cannot lock mailbox."
+msgstr "Serrar"
+
+#: ../libbalsa/mailbox_mbox.c:1986
+#, fuzzy, c-format
+msgid "%s: could not open %s."
+msgstr "Ne successat aperter %s: %s\n"
+
+#: ../libbalsa/mailbox_mbox.c:1997
+#, c-format
+msgid "%s: could not get new mime stream."
+msgstr ""
+
+#: ../libbalsa/mailbox_mbox.c:2005
+#, fuzzy, c-format
+msgid "%s: %s is not in mbox format."
+msgstr "Ínvalid formate de %s."
+
+#: ../libbalsa/mailbox_mh.c:173
+#, c-format
+msgid "Mailbox %s does not appear to be a Mh mailbox."
+msgstr ""
+
+#: ../libbalsa/mailbox_mh.c:183
+#, fuzzy, c-format
+msgid "Could not create MH directory at %s (%s)"
+msgstr "Ne successat crear un fólder \"%s\": %s\n"
+
+#: ../libbalsa/mailbox_mh.c:195
+#, fuzzy, c-format
+msgid "Could not create MH structure at %s (%s)"
+msgstr "Ne successat crear un fólder \"%s\": %s\n"
+
+#: ../libbalsa/mailbox_mh.c:1087
+#, fuzzy, c-format
+msgid "Cannot create message"
+msgstr "Ne successat crear un image pixbuf!"
+
+#: ../libbalsa/mailbox_mh.c:1131
+#, fuzzy, c-format
+msgid "Message rename error"
+msgstr "Errore de renomination"
+
+#: ../libbalsa/mailbox_pop3.c:190
+#, c-format
+msgid "Error appending message %d from %s to %s: %s"
+msgstr ""
+
+#: ../libbalsa/mailbox_pop3.c:339
+#, c-format
+msgid "Saving POP message to %s failed"
+msgstr ""
+
+#: ../libbalsa/mailbox_pop3.c:346
+#, fuzzy, c-format
+msgid "Retrieving Message %d of %d"
+msgstr "(%d ex %d)"
+
+#: ../libbalsa/mailbox_pop3.c:369
+#, fuzzy, c-format
+msgid "Received %ld kB of %ld"
+msgstr "%ld de %ld"
+
+#: ../libbalsa/mailbox_pop3.c:383
+#, c-format
+msgid "Saving POP message to %s failed."
+msgstr ""
+
+#: ../libbalsa/mailbox_pop3.c:393
+#, c-format
+msgid "Transferring POP message to %s failed."
+msgstr ""
+
+#: ../libbalsa/mailbox_pop3.c:475
+#, c-format
+msgid ""
+"POP3 mailbox %s temp file error:\n"
+"%s"
+msgstr ""
+
+#: ../libbalsa/mailbox_pop3.c:500
+#, fuzzy, c-format
+msgid "POP3 mailbox %s error: %s\n"
+msgstr "Modificar li lettre-bux: %s"
+
+#: ../libbalsa/mailbox_pop3.c:538
+#, c-format
+msgid "POP3 message %d oversized: %d kB - skipped."
+msgstr ""
+
+#: ../libbalsa/mailbox_pop3.c:550
+#, c-format
+msgid "POP3 error: cannot open %s for writing."
+msgstr ""
+
+#: ../libbalsa/mailbox_pop3.c:558
+#, fuzzy, c-format
+msgid "POP3 error: cannot close %s."
+msgstr ""
+"Un errore evenit, ne successat adjunter un tag.\n"
+"%s"
+
+#: ../libbalsa/mailbox_pop3.c:593
+#, fuzzy, c-format
+msgid "POP3 error: %s."
+msgstr "POP3"
+
+#: ../libbalsa/message.c:615
+#, c-format
+msgid "Mailbox (%s) is readonly: cannot change flags."
+msgstr ""
+
+#: ../libbalsa/misc.c:596
+#, fuzzy
+msgid "west european"
+msgstr "West-Europan"
+
+#: ../libbalsa/misc.c:598 ../libbalsa/misc.c:632
+#, fuzzy
+msgid "east european"
+msgstr "Ost-Europan"
+
+#: ../libbalsa/misc.c:600
+#, fuzzy
+msgid "south european"
+msgstr "Sud-Europan"
+
+#: ../libbalsa/misc.c:602
+#, fuzzy
+msgid "north european"
+msgstr "Nord"
+
+#: ../libbalsa/misc.c:604 ../libbalsa/misc.c:634
+#, fuzzy
+msgid "cyrillic"
+msgstr "Cirilic"
+
+#: ../libbalsa/misc.c:606 ../libbalsa/misc.c:640
+#, fuzzy
+msgid "arabic"
+msgstr "Arabic"
+
+#: ../libbalsa/misc.c:608 ../libbalsa/misc.c:636
+msgid "greek"
+msgstr "grec"
+
+#: ../libbalsa/misc.c:610 ../libbalsa/misc.c:638
+#, fuzzy
+msgid "hebrew"
+msgstr "Hebreic"
+
+#: ../libbalsa/misc.c:612
+#, fuzzy
+msgid "turkish"
+msgstr "Turcian"
+
+#: ../libbalsa/misc.c:614
+#, fuzzy
+msgid "nordic"
+msgstr "Nord-Europan"
+
+#: ../libbalsa/misc.c:616
+#, fuzzy
+msgid "thai"
+msgstr "Thai"
+
+#: ../libbalsa/misc.c:618 ../libbalsa/misc.c:642
+#, fuzzy
+msgid "baltic"
+msgstr "Baltic"
+
+#: ../libbalsa/misc.c:620
+#, fuzzy
+msgid "celtic"
+msgstr "Celtic"
+
+#: ../libbalsa/misc.c:622
+#, fuzzy
+msgid "west europe (euro)"
+msgstr "West"
+
+#: ../libbalsa/misc.c:624
+msgid "russian"
+msgstr "russ"
+
+#: ../libbalsa/misc.c:626
+#, fuzzy
+msgid "ukrainian"
+msgstr "Ucrainan"
+
+#: ../libbalsa/misc.c:628
+msgid "japanese"
+msgstr "japanesi"
+
+#: ../libbalsa/misc.c:630
+msgid "korean"
+msgstr "korean"
+
+#: ../libbalsa/misc.c:831
+#, fuzzy, c-format
+msgid "Cannot open %s: %s"
+msgstr ""
+"Ne successat aperter li archive cpio\n"
+"%s"
+
+#: ../libbalsa/misc.c:840
+#, fuzzy, c-format
+msgid "Cannot open %s: is a symbolic link"
+msgstr "Ne successat crear un simbolic ligament por «%s»."
+
+#: ../libbalsa/misc.c:967
+msgid "Timeout exceeded while attempting fcntl lock!"
+msgstr ""
+
+#: ../libbalsa/misc.c:974
+#, c-format
+msgid "Waiting for fcntl lock... %d"
+msgstr ""
+
+#: ../libbalsa/misc.c:1002
+msgid "Timeout exceeded while attempting flock lock!"
+msgstr ""
+
+#: ../libbalsa/misc.c:1009
+#, c-format
+msgid "Waiting for flock attempt... %d"
+msgstr ""
+
+#: ../libbalsa/misc.c:1290
+#, fuzzy, c-format
+msgid "LDAP Directory for %s"
+msgstr "\"%s\" es un directoria"
+
+#: ../libbalsa/rfc2445.c:88 ../libbalsa/rfc2445.c:681 ../libbalsa/rfc2445.c:700
+#: ../libbalsa/rfc3156.c:714
+msgid "unknown"
+msgstr "ínconosset"
+
+#: ../libbalsa/rfc2445.c:89
+#, fuzzy
+msgid "needs action"
+msgstr "Action:"
+
+#: ../libbalsa/rfc2445.c:90
+#, fuzzy
+msgid "accepted"
+msgstr "cceptat"
+
+#: ../libbalsa/rfc2445.c:91
+#, fuzzy
+msgid "declined"
+msgstr "declinat"
+
+#: ../libbalsa/rfc2445.c:92
+#, fuzzy
+msgid "tentatively accepted"
+msgstr "provisorimen acceptat"
+
+#: ../libbalsa/rfc2445.c:93
+msgid "delegated"
+msgstr ""
+
+#: ../libbalsa/rfc2445.c:94
+#, fuzzy
+msgid "completed"
+msgstr "Completat"
+
+#: ../libbalsa/rfc2445.c:95
+#, fuzzy
+msgid "in process"
+msgstr "Processu"
+
+#: ../libbalsa/rfc2445.c:682
+#, fuzzy
+msgid "Event Notification"
+msgstr "Eveniment:"
+
+#: ../libbalsa/rfc2445.c:683
+#, fuzzy
+msgid "Event Request"
+msgstr "Null eveniment"
+
+#: ../libbalsa/rfc2445.c:684
+#, fuzzy
+msgid "Reply to Event Request"
+msgstr "Null eveniment"
+
+#: ../libbalsa/rfc2445.c:685
+#, fuzzy
+msgid "Event Cancellation"
+msgstr "Null eveniment"
+
+#: ../libbalsa/rfc2445.c:701
+msgid "chair"
+msgstr ""
+
+#: ../libbalsa/rfc2445.c:702
+#, fuzzy
+msgid "required participant"
+msgstr "Participante"
+
+#: ../libbalsa/rfc2445.c:703
+#, fuzzy
+msgid "optional participant"
+msgstr "Participante"
+
+#: ../libbalsa/rfc2445.c:704
+msgid "non-participant, information only"
+msgstr ""
+
+#: ../libbalsa/rfc3156.c:624 ../libbalsa/rfc3156.c:631
+#, fuzzy
+msgid "decryption and signature verification failed"
+msgstr "Verification ne successat"
+
+#: ../libbalsa/rfc3156.c:657
+#, fuzzy
+msgid "The signature is valid."
+msgstr "Ínfidet signature valid"
+
+#: ../libbalsa/rfc3156.c:659
+#, fuzzy
+msgid "The signature is valid but expired."
+msgstr "Signature expirat"
+
+#: ../libbalsa/rfc3156.c:662
+msgid ""
+"The signature is valid but the key used to verify the signature has expired."
+msgstr ""
+
+#: ../libbalsa/rfc3156.c:665
+msgid ""
+"The signature is valid but the key used to verify the signature has been "
+"revoked."
+msgstr ""
+
+#: ../libbalsa/rfc3156.c:668
+#, fuzzy
+msgid "The signature is invalid."
+msgstr "Signature ínvalid"
+
+#: ../libbalsa/rfc3156.c:671
+msgid "The signature could not be verified due to a missing key."
+msgstr ""
+
+#: ../libbalsa/rfc3156.c:673
+#, fuzzy
+msgid "This part is not a real PGP signature."
+msgstr "Signature PGP:"
+
+#: ../libbalsa/rfc3156.c:676
+msgid "The signature could not be verified due to an invalid crypto engine."
+msgstr ""
+
+#: ../libbalsa/rfc3156.c:679 ../libbalsa/rfc3156.c:1042
+msgid "GnuPG is rebuilding the trust database and is currently unavailable."
+msgstr ""
+
+#: ../libbalsa/rfc3156.c:682
+#, fuzzy
+msgid "An error prevented the signature verification."
+msgstr "Errore del signature"
+
+#: ../libbalsa/rfc3156.c:692
+#, fuzzy
+msgid "The user ID is of unknown validity."
+msgstr "<Ínconosset usator>"
+
+#: ../libbalsa/rfc3156.c:694
+#, fuzzy
+msgid "The validity of the user ID is undefined."
+msgstr "Assignar ID de _usator"
+
+#: ../libbalsa/rfc3156.c:696
+#, fuzzy
+msgid "The user ID is never valid."
+msgstr "%u ne es un valid ID de notification"
+
+#: ../libbalsa/rfc3156.c:698
+#, fuzzy
+msgid "The user ID is marginally valid."
+msgstr "%u ne es un valid ID de notification"
+
+#: ../libbalsa/rfc3156.c:700
+#, fuzzy
+msgid "The user ID is fully valid."
+msgstr "%u ne es un valid ID de notification"
+
+#: ../libbalsa/rfc3156.c:702
+#, fuzzy
+msgid "The user ID is ultimately valid."
+msgstr "%u ne es un valid ID de notification"
+
+#: ../libbalsa/rfc3156.c:704 ../libbalsa/rfc3156.c:726
+#, fuzzy
+msgid "bad validity"
+msgstr "Validitá"
+
+#: ../libbalsa/rfc3156.c:716
+#, fuzzy
+msgid "undefined"
+msgstr "Índefinit"
+
+#: ../libbalsa/rfc3156.c:718 ../libbalsa/rfc3156.c:753
+#: ../src/address-book-config.c:198
+msgid "never"
+msgstr "nequande"
+
+#: ../libbalsa/rfc3156.c:720
+#, fuzzy
+msgid "marginal"
+msgstr "Marginal"
+
+#: ../libbalsa/rfc3156.c:722
+#, fuzzy
+msgid "full"
+msgstr "complet"
+
+#: ../libbalsa/rfc3156.c:724
+#, fuzzy
+msgid "ultimate"
+msgstr "Ultim"
+
+#: ../libbalsa/rfc3156.c:736
+msgid "PGP signature: "
+msgstr "Signature PGP:"
+
+#: ../libbalsa/rfc3156.c:738
+msgid "S/MIME signature: "
+msgstr "Signature S/MIME: "
+
+#: ../libbalsa/rfc3156.c:740
+#, fuzzy
+msgid "(unknown protocol) "
+msgstr "Protocol «%1» es ínconosset"
+
+#: ../libbalsa/rfc3156.c:770
+#, c-format
+msgid ""
+"\n"
+"Signature validity: %s"
+msgstr ""
+"\n"
+"Validita del signature: %s"
+
+#: ../libbalsa/rfc3156.c:773
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Signed on: %s"
+msgstr "Signat"
+
+#: ../libbalsa/rfc3156.c:775
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Key owner trust: %s"
+msgstr "Vu _fide al possessor:"
+
+#: ../libbalsa/rfc3156.c:779
+#, c-format
+msgid ""
+"\n"
+"Key fingerprint: %s"
+msgstr ""
+"\n"
+"Fingre-print del clave: %s"
+
+#: ../libbalsa/rfc3156.c:793
+#, fuzzy
+msgid ""
+"\n"
+"User ID's:"
+msgstr "ID de usator"
+
+#: ../libbalsa/rfc3156.c:796
+#, fuzzy
+msgid ""
+"\n"
+"User ID:"
+msgstr "ID de usator"
+
+#: ../libbalsa/rfc3156.c:807
+msgid " [Revoked]"
+msgstr "[Revocat]"
+
+#: ../libbalsa/rfc3156.c:809
+msgid " [Invalid]"
+msgstr "[Ínvalid]"
+
+#: ../libbalsa/rfc3156.c:836
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Subkey created on: %s"
+msgstr "Subclave %d de %s"
+
+#: ../libbalsa/rfc3156.c:838
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Subkey expires on: %s"
+msgstr "Subclave %d de %s"
+
+#: ../libbalsa/rfc3156.c:847
+msgid " revoked"
+msgstr "revocat"
+
+#: ../libbalsa/rfc3156.c:852
+msgid " expired"
+msgstr "expirat"
+
+#: ../libbalsa/rfc3156.c:857
+#, fuzzy
+msgid " disabled"
+msgstr "(Depermisset)"
+
+#: ../libbalsa/rfc3156.c:862
+msgid " invalid"
+msgstr "ínvalid"
+
+#. ngettext: string begins with a single space, so no space
+#. * after the colon is correct punctuation (in English).
+#: ../libbalsa/rfc3156.c:866
+#, c-format
+msgid ""
+"\n"
+"Subkey attribute:%s"
+msgid_plural ""
+"\n"
+"Subkey attributes:%s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../libbalsa/rfc3156.c:878
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Issuer name: %s"
+msgstr "Emissor:"
+
+#: ../libbalsa/rfc3156.c:882
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Issuer serial number: %s"
+msgstr "Nró serial: "
+
+#: ../libbalsa/rfc3156.c:885
+#, fuzzy, c-format
+msgid ""
+"\n"
+"Chain ID: %s"
+msgstr "ID de session: %s\n"
+
+#: ../libbalsa/rfc3156.c:944
+#, c-format
+msgid "Could not launch %s to query the public key %s."
+msgstr ""
+
+#: ../libbalsa/rfc3156.c:994
+#, c-format
+msgid ""
+"Running %s failed with return value %d:\n"
+"%s"
+msgstr ""
+
+#: ../libbalsa/rfc3156.c:1001
+#, fuzzy, c-format
+msgid ""
+"Running %s successful:\n"
+"%s"
+msgstr "Executente un scriptlette: %s"
+
+#: ../libbalsa/rfc3156.c:1043
+#, fuzzy
+msgid "Try again later."
+msgstr ""
+"%s\n"
+"Ples repenar denov plu tard."
+
+#: ../libbalsa/send.c:251 ../libbalsa/send.c:258
+#, fuzzy
+msgid "Sending Mail..."
+msgstr "Emissente postage"
+
+#: ../libbalsa/send.c:254 ../src/main-window.c:2874
+msgid "_Hide"
+msgstr "_Celar"
+
+#: ../libbalsa/send.c:964
+#, c-format
+msgid ""
+"Could not send the message to %s:\n"
+"%d: %s\n"
+"Message left in your outbox.\n"
+msgstr ""
+
+#: ../libbalsa/send.c:1010
+#, c-format
+msgid "Saving sent message to %s failed: %s"
+msgstr ""
+
+#: ../libbalsa/send.c:1040 ../libbalsa/send.c:1052
+#, c-format
+msgid ""
+"Relaying refused:\n"
+"%d: %s\n"
+"Message left in your outbox.\n"
+msgstr ""
+
+#: ../libbalsa/send.c:1059
+msgid ""
+"Message submission problem, placing it into your outbox.\n"
+"System will attempt to resubmit the message until you delete it."
+msgstr ""
+
+#: ../libbalsa/send.c:1089
+#, fuzzy
+msgid "Connected to MTA"
+msgstr "Conexet a"
+
+#. status code, mailbox
+#: ../libbalsa/send.c:1098
+#, fuzzy, c-format
+msgid "From: %d <%s>"
+msgstr "Captura de %s - %d.%s"
+
+#. mailbox, status code, status text
+#: ../libbalsa/send.c:1102
+#, fuzzy, c-format
+msgid "From %s: %d %s"
+msgstr "Captura de %s - %d.%s"
+
+#. status code, mailbox
+#: ../libbalsa/send.c:1113
+#, fuzzy, c-format
+msgid "To: %d <%s>"
+msgstr "%d (\"%s\")"
+
+#. mailbox, status code, status text
+#: ../libbalsa/send.c:1117
+#, fuzzy, c-format
+msgid "To %s: %d %s"
+msgstr "%s: %d%s ye %dMo/s"
+
+#: ../libbalsa/send.c:1155
+#, fuzzy
+msgid "Disconnected"
+msgstr "Deconexet"
+
+#: ../libbalsa/send.c:1437
+msgid ""
+"SMTP server refused connection.\n"
+"Check your internet connection."
+msgstr ""
+
+#: ../libbalsa/send.c:1442
+msgid ""
+"SMTP server cannot be reached.\n"
+"Check your internet connection."
+msgstr ""
+
+#: ../libbalsa/send.c:1451
+msgid "Message left in Outbox (try again later)"
+msgstr ""
+
+#: ../libbalsa/send.c:1455
+#, c-format
+msgid ""
+"SMTP server problem (%d): %s\n"
+"Message is left in outbox."
+msgstr ""
+
+#: ../libbalsa/send.c:1770 ../libbalsa/send.c:1839
+#, fuzzy, c-format
+msgid "Cannot read %s: %s"
+msgstr ""
+"chmod \"%s\" ne successat\n"
+"%s"
+
+#: ../libbalsa/send.c:1773 ../libbalsa/send.c:1842
+#, fuzzy, c-format
+msgid "Cannot read %s"
+msgstr "Ne successat leer «%s»: %s"
+
+#: ../libbalsa/send.c:1803
+#, c-format
+msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
+msgstr ""
+
+#: ../libbalsa/send.c:2173
+msgid "This message will not be encrypted for the BCC: recipient."
+msgid_plural "This message will not be encrypted for the BCC: recipients."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../libbalsa/send.c:2261
+msgid "This message will not be encrypted for the BCC: recipient(s)."
+msgstr ""
+
+#. host, authentication method
+#: ../libbalsa/server.c:429
+#, fuzzy, c-format
+msgid "Logging in to %s using %s"
+msgstr "Usante audio %s."
+
+#: ../libbalsa/smtp-server.c:384 ../libbalsa/smtp-server.c:392
+#: ../src/mailbox-conf.c:208 ../src/mailbox-conf.c:1508
+#: ../src/pref-manager.c:402 ../src/pref-manager.c:3428
+msgid "Never"
+msgstr "Nequande"
+
+#: ../libbalsa/smtp-server.c:386 ../libbalsa/smtp-server.c:393
+#: ../src/mailbox-conf.c:209 ../src/mailbox-conf.c:1509
+#, fuzzy
+msgid "If Possible"
+msgstr "Marcar omni possibil actualisamentes"
+
+#: ../libbalsa/smtp-server.c:388 ../libbalsa/smtp-server.c:394
+#: ../src/mailbox-conf.c:210
+#, fuzzy
+msgid "Required"
+msgstr "besonat"
+
+#: ../libbalsa/smtp-server.c:428
+#, fuzzy, c-format
+msgid "Error displaying server help: %s\n"
+msgstr "Un errore ha evenit monstrante auxilie: %s"
+
+#: ../libbalsa/smtp-server.c:543
+msgid "SMTP Server"
+msgstr "Servitore SMTP"
+
+#: ../libbalsa/smtp-server.c:570
+#, fuzzy
+msgid "_Descriptive Name:"
+msgstr ""
+"Provide un descritiv nómine apu li emblema. Ti nómine va esser usat por "
+"identificar li emblema."
+
+#. pop server
+#. imap server
+#: ../libbalsa/smtp-server.c:577 ../src/folder-conf.c:375
+#: ../src/mailbox-conf.c:1232 ../src/mailbox-conf.c:1345
+msgid "_Server:"
+msgstr "_Servitore:"
+
+#: ../libbalsa/smtp-server.c:584
+msgid "_User Name:"
+msgstr "Nómine de _usator:"
+
+#: ../libbalsa/smtp-server.c:591
+msgid "_Pass Phrase:"
+msgstr "Contra_signe:"
+
+#: ../libbalsa/smtp-server.c:600 ../src/mailbox-conf.c:240
+msgid "Use _TLS:"
+msgstr "Usar _TLS:"
+
+#: ../libbalsa/smtp-server.c:605
+#, fuzzy
+msgid "C_ertificate Pass Phrase:"
+msgstr "Contra_signe:"
+
+#: ../libbalsa/smtp-server.c:617
+msgid "Sp_lit message larger than"
+msgstr ""
+
+#: ../libbalsa/smtp-server.c:623 ../src/pref-manager.c:1916
+msgid "MB"
+msgstr "Mo"
+
+#. Top level
+#. Menus
+#: ../libbalsa/source-viewer.c:44 ../src/ab-main.c:551 ../src/main-window.c:344
+#: ../src/message-window.c:237 ../src/sendmsg-window.c:322
+msgid "_File"
+msgstr "_File"
+
+#: ../libbalsa/source-viewer.c:45 ../src/filter-edit-dialog.c:330
+#: ../src/main-window.c:345 ../src/message-window.c:238
+#: ../src/sendmsg-window.c:323
+msgid "_Edit"
+msgstr "_Redacter"
+
+#: ../libbalsa/source-viewer.c:46 ../src/main-window.c:346
+#: ../src/message-window.c:239
+msgid "_View"
+msgstr "_Vise"
+
+#. Items
+#: ../libbalsa/source-viewer.c:48 ../src/mailbox-node.c:1094
+#: ../src/main-window.c:519 ../src/message-window.c:246
+#: ../src/sendmsg-window.c:352
+msgid "_Close"
+msgstr "_Clúder"
+
+#: ../libbalsa/source-viewer.c:49
+msgid "Close the window"
+msgstr "Clúder li fenestre"
+
+#. Edit menu items
+#: ../libbalsa/source-viewer.c:50 ../src/main-window.c:419
+#: ../src/main-window.c:585 ../src/message-window.c:249
+#: ../src/sendmsg-window.c:360
+msgid "_Copy"
+msgstr "_Copiar"
+
+#: ../libbalsa/source-viewer.c:51
+msgid "Copy text"
+msgstr "Copiar li textu"
+
+#: ../libbalsa/source-viewer.c:52 ../src/main-window.c:587
+#, fuzzy
+msgid "_Select Text"
+msgstr "Selecter"
+
+#: ../libbalsa/source-viewer.c:53 ../src/main-window.c:588
+#, fuzzy
+msgid "Select entire mail"
+msgstr "Selecter li tot diarium"
+
+#: ../libbalsa/source-viewer.c:58
+#, fuzzy
+msgid "_Escape Special Characters"
+msgstr "Caracteres special"
+
+#: ../libbalsa/source-viewer.c:59
+#, fuzzy
+msgid "Escape special and non-ASCII characters"
+msgstr "Remover non-_ASCII caracteres"
+
+#: ../libbalsa/source-viewer.c:157
+#, fuzzy
+msgid "Mailbox closed"
+msgstr "Lettre-bux"
+
+#: ../libbalsa/source-viewer.c:278
+#, fuzzy
+msgid "Message Source"
+msgstr "Anuncie"
+
+#: ../libinit_balsa/assistant_helper.c:66
+#, fuzzy, c-format
+msgid "Error loading %s: %s\n"
+msgstr "Un errore evenit cargante li tema: %s\n"
+
+#: ../libinit_balsa/assistant_helper.c:214
+#, c-format
+msgid "The path %s must be relative to the filesystem root (start with /)."
+msgstr ""
+
+#: ../libinit_balsa/assistant_helper.c:226
+#, c-format
+msgid ""
+"Couldn't create a directory: mkdir() failed on pathname \"%s\", with error "
+"\"%s\"."
+msgstr ""
+
+#: ../libinit_balsa/assistant_helper.c:238
+#: ../libinit_balsa/assistant_helper.c:261
+#, fuzzy, c-format
+msgid "The file with pathname \"%s\" is not a directory."
+msgstr "File «%s» ne es un regulari file o directoria."
+
+#: ../libinit_balsa/assistant_helper.c:252
+#, c-format
+msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
+msgstr ""
+
+#: ../libinit_balsa/assistant_init.c:49
+#, fuzzy
+msgid ""
+"This will exit Balsa.\n"
+"Do you really want to do this?"
+msgstr "Esque vu vole vacuar li diarium de notificationes?"
+
+#: ../libinit_balsa/assistant_init.c:72
+msgid "GnomeCard Address Book"
+msgstr "Adressarium GnomeCard"
+
+#: ../libinit_balsa/assistant_init.c:79 ../libinit_balsa/assistant_init.c:87
+#: ../src/ab-window.c:234
+msgid "Address Book"
+msgstr "Adressarium"
+
+#: ../libinit_balsa/assistant_init.c:146
+msgid "Configure Balsa"
+msgstr "Configurar Balsa"
+
+#: ../libinit_balsa/assistant_page_defclient.c:57
+msgid "Use Balsa as default email client?"
+msgstr ""
+
+#: ../libinit_balsa/assistant_page_defclient.c:61
+msgid "_Yes"
+msgstr "_Yes"
+
+#: ../libinit_balsa/assistant_page_defclient.c:63
+msgid "_No"
+msgstr "_No"
+
+#: ../libinit_balsa/assistant_page_defclient.c:100
+#, fuzzy
+msgid "Default Client"
+msgstr "Assignar quam li cliente predefinit"
+
+#: ../libinit_balsa/assistant_page_directory.c:58
+msgid "_Inbox:"
+msgstr "Rec_ivet:"
+
+#: ../libinit_balsa/assistant_page_directory.c:58
+msgid "_Outbox:"
+msgstr "_Salient:"
+
+#: ../libinit_balsa/assistant_page_directory.c:58
+msgid "_Sentbox:"
+msgstr "Invia_t:"
+
+#: ../libinit_balsa/assistant_page_directory.c:58
+msgid "_Draftbox:"
+msgstr "_Esquisses:"
+
+#: ../libinit_balsa/assistant_page_directory.c:59
+msgid "_Trash:"
+msgstr "Paper-_corb:"
+
+#: ../libinit_balsa/assistant_page_directory.c:93
+#, c-format
+msgid ""
+"The pathname \"%s\" must be specified canonically -- it must start with a "
+"'/'."
+msgstr ""
+
+#: ../libinit_balsa/assistant_page_directory.c:159
+#, fuzzy, c-format
+msgid "The mailbox \"%s\" does not appear to be valid."
+msgstr "Li file «%s» ne es un valid image."
+
+#: ../libinit_balsa/assistant_page_directory.c:202
+msgid ""
+"Please verify the locations of your default mail files.\n"
+"These will be created if necessary."
+msgstr ""
+
+#: ../libinit_balsa/assistant_page_directory.c:264
+msgid "Mail Files"
+msgstr "Files de postage"
+
+#: ../libinit_balsa/assistant_page_directory.c:360
+#: ../libinit_balsa/assistant_page_directory.c:394
+#, fuzzy, c-format
+msgid ""
+"Problem Creating Mailboxes\n"
+"%s"
+msgstr "Creante simbolic ligamentes in «%s»..."
+
+#: ../libinit_balsa/assistant_page_finish.c:42
+msgid ""
+"You've successfully set up Balsa. Have fun!\n"
+"   -- The Balsa development team"
+msgstr ""
+
+#: ../libinit_balsa/assistant_page_finish.c:47
+msgid "All Done!"
+msgstr "Finit!"
+
+#: ../libinit_balsa/assistant_page_user.c:55
+msgid ""
+"The following settings are also needed (and you can find them later, if need "
+"be, in the Email application in the 'Preferences' and 'Identities' commands "
+"on the 'Tools' menu)"
+msgstr ""
+
+#: ../libinit_balsa/assistant_page_user.c:61
+msgid ""
+" Whoever provides your email account should be able to give you the "
+"following information (if you have a Network Administrator, they may already "
+"have set this up for you):"
+msgstr ""
+
+#: ../libinit_balsa/assistant_page_user.c:68
+#, fuzzy
+msgid "Yes, remember it"
+msgstr "Memorar"
+
+#: ../libinit_balsa/assistant_page_user.c:68
+#, fuzzy
+msgid "No, type it in every time"
+msgstr "Questionar chascun vez"
+
+#: ../libinit_balsa/assistant_page_user.c:101
+msgid "Name of mail server for incoming _mail:"
+msgstr ""
+
+#: ../libinit_balsa/assistant_page_user.c:106
+#, fuzzy
+msgid "_Type of mail server:"
+msgstr "Tip de servitore:"
+
+#: ../libinit_balsa/assistant_page_user.c:110
+#, fuzzy
+msgid "Connect using _SSL:"
+msgstr "Usante {}"
+
+#: ../libinit_balsa/assistant_page_user.c:113
+#, fuzzy
+msgid "Your email _login name:"
+msgstr "ftpfs: inviante li nómine de registration"
+
+#: ../libinit_balsa/assistant_page_user.c:116
+msgid "Your _password:"
+msgstr "Vor _contrasigne:"
+
+#: ../libinit_balsa/assistant_page_user.c:124
+msgid "_SMTP Server:"
+msgstr "_Servitore SMTP:"
+
+#. 2.1
+#: ../libinit_balsa/assistant_page_user.c:129
+#, fuzzy
+msgid "Your real _name:"
+msgstr "Brasilian real"
+
+#: ../libinit_balsa/assistant_page_user.c:135
+#, fuzzy
+msgid "Your _Email Address, for this email account:"
+msgstr "Vor adresse de e-post:"
+
+#: ../libinit_balsa/assistant_page_user.c:140
+msgid "_Remember your password:"
+msgstr "_Memorar li contrasigne:"
+
+#: ../libinit_balsa/assistant_page_user.c:146
+#, fuzzy
+msgid "_Local mail directory:"
+msgstr "Local fólder de MH"
+
+#: ../libinit_balsa/assistant_page_user.c:165
+msgid "User Settings"
+msgstr "Parametres de usator"
+
+#: ../libinit_balsa/assistant_page_user.c:287
+msgid "Default Identity"
+msgstr "Identitá predefinit"
+
+#: ../libinit_balsa/assistant_page_user.c:332
+#, fuzzy, c-format
+msgid ""
+"Local Mail Problem\n"
+"%s"
+msgstr "Local fólder de MH"
+
+#: ../libinit_balsa/assistant_page_welcome.c:27
+msgid "Welcome to Balsa!"
+msgstr "Benevenit a Balsa!"
+
+#: ../libinit_balsa/assistant_page_welcome.c:30
+msgid ""
+"Before you can send or receive email:\n"
+"\n"
+"-- either you should already have Internet access and an email account, "
+"provided by an Internet Service Provider, and you should have made that "
+"Internet connection on your computer\n"
+"\n"
+"-- or your Network Administrator at your place of work/study/similar may "
+"have set up your computer to connect to the network."
+msgstr ""
+
+#: ../sounds/balsa.soundlist.in.h:1
+msgid "Balsa E-mail reader"
+msgstr "Letor de postage Balsa"
+
+#: ../sounds/balsa.soundlist.in.h:2
+#, fuzzy
+msgid "Program startup"
+msgstr "Programma de iniciament"
+
+#: ../sounds/balsa.soundlist.in.h:3
+#, fuzzy
+msgid "New mail notification"
+msgstr "Null nov missages"
+
+#: ../src/ab-main.c:226 ../src/ab-window.c:700
+#, fuzzy
+msgid " address book: "
+msgstr "_Adressarium..."
+
+#: ../src/ab-main.c:552
+#, fuzzy
+msgid "_Entry"
+msgstr "Element"
+
+#: ../src/ab-main.c:553 ../src/main-window.c:350
+msgid "_Help"
+msgstr "Au_xilie"
+
+#. new button
+#: ../src/ab-main.c:554 ../src/filter-edit-dialog.c:235
+#: ../src/mailbox-node.c:1059 ../src/main-window.c:352 ../src/main-window.c:607
+#: ../src/main-window.c:616
+#, fuzzy
+msgid "_New"
+msgstr "_Creation"
+
+#: ../src/ab-main.c:555 ../src/address-book-config.c:866
+msgid "VCard Address Book (GnomeCard)"
+msgstr "Adressarium VCard (GnomeCard)"
+
+#: ../src/ab-main.c:557 ../src/address-book-config.c:872
+#, fuzzy
+msgid "External query (a program)"
+msgstr "Programma"
+
+#: ../src/ab-main.c:559 ../src/address-book-config.c:877
+msgid "LDIF Address Book"
+msgstr "Adressarium LDIF"
+
+#: ../src/ab-main.c:562 ../src/address-book-config.c:883
+msgid "LDAP Address Book"
+msgstr "Adressarium LDAP"
+
+#: ../src/ab-main.c:566 ../src/address-book-config.c:505
+#: ../src/address-book-config.c:890
+#, fuzzy
+msgid "GPE Address Book"
+msgstr "_Adressarium..."
+
+#: ../src/ab-main.c:570
+msgid "Rubrica Address Book"
+msgstr "Adressarium Rubrica"
+
+#: ../src/ab-main.c:573
+msgid "_Properties"
+msgstr "_Proprietás"
+
+#: ../src/ab-main.c:574
+#, fuzzy
+msgid "Edit address book properties"
+msgstr "Modificar proprietás"
+
+#: ../src/ab-main.c:575 ../src/balsa-index.c:1909
+#: ../src/filter-edit-dialog.c:241 ../src/mailbox-node.c:1086
+#: ../src/mailbox-node.c:1102 ../src/pref-manager.c:1714
+#: ../src/pref-manager.c:1789 ../src/pref-manager.c:2966
+msgid "_Delete"
+msgstr "_Deleter"
+
+#: ../src/ab-main.c:576
+#, fuzzy
+msgid "Delete address book"
+msgstr "Remover li a_dressarium"
+
+#: ../src/ab-main.c:577 ../src/main-window.c:387
+msgid "_Quit"
+msgstr "Sa_lir"
+
+#: ../src/ab-main.c:577
+#, fuzzy
+msgid "Exit the program"
+msgstr "Surtir li programma"
+
+#: ../src/ab-main.c:579
+#, fuzzy
+msgid "_New Entry"
+msgstr "Nov inscrition"
+
+#: ../src/ab-main.c:580
+#, fuzzy
+msgid "Add new entry"
+msgstr "Adjuncter un nov element"
+
+#: ../src/ab-main.c:581
+#, fuzzy
+msgid "_Delete Entry"
+msgstr "Deleter ti-ci inscrition"
+
+#: ../src/ab-main.c:582
+#, fuzzy
+msgid "Delete entry"
+msgstr "Deleter ti-ci inscrition"
+
+#: ../src/ab-main.c:583 ../src/main-window.c:479
+msgid "_About"
+msgstr "_Pri"
+
+#: ../src/ab-main.c:815
+msgid "_Name"
+msgstr "_Nómine"
+
+#: ../src/ab-main.c:831
+msgid "_Address"
+msgstr "_Adresse"
+
+#: ../src/ab-main.c:957
+msgid "F_ilter:"
+msgstr "F_iltre:"
+
+#: ../src/ab-window.c:170 ../src/filter-edit-dialog.c:218
+#: ../src/filter-export-dialog.c:90 ../src/filter-run-dialog.c:221
+#: ../src/filter-run-dialog.c:295
+msgid "Name"
+msgstr "Nómine"
+
+#: ../src/ab-window.c:178
+#, fuzzy
+msgid "E-Mail Address"
+msgstr "Adresse de e-post"
+
+#. -- table column 1 --
+#. Entry widget for finding an address
+#: ../src/ab-window.c:290
+#, fuzzy
+msgid "_Search for Name:"
+msgstr "Serchar un nómine del fonde"
+
+#: ../src/ab-window.c:325
+#, fuzzy
+msgid "Run Editor"
+msgstr "Executer"
+
+#: ../src/ab-window.c:332
+msgid "_Re-Import"
+msgstr "_Reimportar"
+
+#. -- table column 3 --
+#. label for selected addresses in compose mode
+#: ../src/ab-window.c:364
+#, fuzzy
+msgid "Send-To"
+msgstr "Inviar a"
+
+#. mode switching stuff
+#: ../src/ab-window.c:379
+#, fuzzy
+msgid "Treat multiple addresses as:"
+msgstr "Multiplic"
+
+#: ../src/ab-window.c:383
+msgid "alternative addresses for the same person"
+msgstr ""
+
+#: ../src/ab-window.c:388
+#, fuzzy
+msgid "a distribution list"
+msgstr "Distribution:"
+
+#: ../src/ab-window.c:431
+#, fuzzy, c-format
+msgid "Could not launch %s: %s"
+msgstr "Ne successat lansar «%s»"
+
+#: ../src/ab-window.c:728
+#, fuzzy, c-format
+msgid ""
+"Error opening address book '%s':\n"
+"%s"
+msgstr "Ne successat aperter un file %s."
+
+#: ../src/address-book-config.c:175
+#, fuzzy
+msgid "Suggest complete addresses:"
+msgstr "Suggester"
+
+#: ../src/address-book-config.c:181
+#, fuzzy
+msgid "as I type"
+msgstr "i"
+
+#: ../src/address-book-config.c:190
+msgid "when I hit the Escape key"
+msgstr ""
+
+#: ../src/address-book-config.c:227 ../src/address-book-config.c:328
+#, fuzzy, c-format
+msgid "Modify %s Address Book"
+msgstr "Modificar «%s»"
+
+#: ../src/address-book-config.c:231 ../src/address-book-config.c:331
+#, fuzzy, c-format
+msgid "Add %s Address Book"
+msgstr "Adjunter al adressarium"
+
+#. mailbox name
+#. may be NULL
+#. mailbox name
+#: ../src/address-book-config.c:251 ../src/address-book-config.c:370
+#: ../src/address-book-config.c:436 ../src/address-book-config.c:503
+#, fuzzy
+msgid "A_ddress Book Name:"
+msgstr "A_dresse:"
+
+#: ../src/address-book-config.c:375
+#, fuzzy
+msgid "Load program location:"
+msgstr "Ne posset cargar li localisation"
+
+#: ../src/address-book-config.c:381
+msgid "Select load program for address book"
+msgstr ""
+
+#: ../src/address-book-config.c:388
+#, fuzzy
+msgid "Save program location:"
+msgstr "Gardar in _localisation:"
+
+#: ../src/address-book-config.c:394
+msgid "Select save program for address book"
+msgstr ""
+
+#: ../src/address-book-config.c:441
+#, fuzzy
+msgid "_Host Name"
+msgstr "Host: "
+
+#: ../src/address-book-config.c:446
+#, fuzzy
+msgid "Base Domain _Name"
+msgstr "Nómine del _dominia:"
+
+#: ../src/address-book-config.c:451
+#, fuzzy
+msgid "_User Name (Bind DN)"
+msgstr "Li visibil nómine del renominator"
+
+#: ../src/address-book-config.c:456
+msgid "_Password"
+msgstr "_Contrasigne"
+
+#: ../src/address-book-config.c:462
+#, fuzzy
+msgid "_User Address Book DN"
+msgstr "_Adressarium..."
+
+#: ../src/address-book-config.c:468
+msgid "Enable _TLS"
+msgstr "Usar _TLS"
+
+#: ../src/address-book-config.c:536 ../src/main-window.c:2719
+#: ../src/main-window.c:4484
+#, fuzzy, c-format
+msgid "Error displaying help: %s\n"
+msgstr "Un errore ha evenit monstrante auxilie: %s"
+
+#: ../src/address-book-config.c:613
+msgid "No path found.  Do you want to give one?"
+msgstr ""
+
+#: ../src/address-book-config.c:897
+msgid "Rubrica2 Address Book"
+msgstr "Adressarium Rubrica2"
+
+#: ../src/balsa-app.c:77 ../src/folder-conf.c:274 ../src/mailbox-conf.c:1326
+#, fuzzy
+msgid "_Remember password in keyring"
+msgstr "Porta-clave de contrasignes"
+
+#: ../src/balsa-app.c:80 ../src/folder-conf.c:277 ../src/mailbox-conf.c:1329
+msgid "_Remember password"
+msgstr "_Memorar li contrasigne"
+
+#: ../src/balsa-app.c:86
+#, c-format
+msgid ""
+"Opening remote mailbox %s.\n"
+"The _password for %s@%s:"
+msgstr ""
+
+#: ../src/balsa-app.c:91
+#, c-format
+msgid "_Password for %s@%s (%s):"
+msgstr "_Contrasigne por %s@%s (%s):"
+
+#: ../src/balsa-app.c:94
+#, fuzzy
+msgid "Password needed"
+msgstr "Li contrasigne de ciffration es besonat"
+
+#: ../src/balsa-app.c:549
+#, fuzzy, c-format
+msgid "Couldn't open mailbox \"%s\""
+msgstr "ne successat aperter %s por scrition"
+
+#: ../src/balsa-index.c:390 ../src/pref-manager.c:417
+msgid "Date"
+msgstr "Date"
+
+#: ../src/balsa-index.c:405 ../src/pref-manager.c:418
+#: ../src/sendmsg-window.c:3048
+msgid "Size"
+msgstr "Grandore"
+
+#: ../src/balsa-index.c:1724
+#, fuzzy, c-format
+msgid "Move to Trash failed: %s"
+msgstr "Retornar «%s» al Paper-corb"
+
+#. Message menu items
+#: ../src/balsa-index.c:1882 ../src/main-window.c:535
+#: ../src/message-window.c:266
+msgid "_Reply..."
+msgstr "_Responder..."
+
+#: ../src/balsa-index.c:1884
+#, fuzzy
+msgid "Reply To _All..."
+msgstr "Responder a _omni..."
+
+#: ../src/balsa-index.c:1886
+#, fuzzy
+msgid "Reply To _Group..."
+msgstr "Responder a _gruppe..."
+
+#: ../src/balsa-index.c:1888
+#, fuzzy
+msgid "_Forward Attached..."
+msgstr "_Transmisser quam atachament..."
+
+#: ../src/balsa-index.c:1890
+#, fuzzy
+msgid "Forward _Inline..."
+msgstr "_Transmisser..."
+
+#: ../src/balsa-index.c:1892 ../src/main-window.c:562
+#, fuzzy
+msgid "_Pipe through..."
+msgstr "Tube:"
+
+#: ../src/balsa-index.c:1894 ../src/main-window.c:542
+#, fuzzy
+msgid "_Store Address..."
+msgstr "Butíca Magnatune"
+
+#: ../src/balsa-index.c:1914
+msgid "_Undelete"
+msgstr "D_edeleter"
+
+#: ../src/balsa-index.c:1919
+#, fuzzy
+msgid "Move To _Trash"
+msgstr "Al _Paper-corb"
+
+#: ../src/balsa-index.c:1923
+#, fuzzy
+msgid "T_oggle"
+msgstr "_Ye:"
+
+#. Message:toggle-flag submenu items
+#: ../src/balsa-index.c:1927 ../src/main-window.c:612 ../src/main-window.c:657
+msgid "_Flagged"
+msgstr "_Flaggat"
+
+#: ../src/balsa-index.c:1930
+msgid "_Unread"
+msgstr "Ínl_eet"
+
+#: ../src/balsa-index.c:1938
+#, fuzzy
+msgid "_Move to"
+msgstr "_Mover a"
+
+#: ../src/balsa-index.c:1946
+#, fuzzy
+msgid "_View Source"
+msgstr "_Vider li fonte..."
+
+#: ../src/balsa-index.c:2191
+#, c-format
+msgid "Failed to copy %d message to mailbox \"%s\": %s"
+msgid_plural "Failed to copy %d messages to mailbox \"%s\": %s"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/balsa-index.c:2203
+#, fuzzy, c-format
+msgid "Copied to \"%s\"."
+msgstr "Copiat"
+
+#: ../src/balsa-index.c:2204
+#, fuzzy, c-format
+msgid "Moved to \"%s\"."
+msgstr ""
+"Vor anteyan fólder de configuration «%s» ne posset esser movet a «%s» (%s). "
+"Ples mover it in ta loc manualmen."
+
+#: ../src/balsa-index.c:2306
+#, fuzzy, c-format
+msgid "Committing mailbox %s failed."
+msgstr "Modificar li lettre-bux: %s"
+
+#: ../src/balsa-index.c:2404
+#, fuzzy, c-format
+msgid "Cannot process the message: %s"
+msgstr "Processu ne successat (%s)"
+
+#: ../src/balsa-index.c:2527
+#, c-format
+msgid "Cannot access message %u to pass to %s"
+msgstr ""
+
+#: ../src/balsa-index.c:2554
+#, c-format
+msgid "Cannot read message %u to pass to %s"
+msgstr ""
+
+#: ../src/balsa-index.c:2723
+msgid "Pipe message through a program"
+msgstr ""
+
+#: ../src/balsa-index.c:2726
+#, fuzzy
+msgid "_Run"
+msgstr "_Executer"
+
+#: ../src/balsa-index.c:2738
+#, fuzzy
+msgid "Specify the program to run:"
+msgstr "Permisser _executer li file quam un programma"
+
+#: ../src/balsa-mblist.c:362
+msgid "Mailbox"
+msgstr "Lettre-bux"
+
+#: ../src/balsa-mblist.c:1142 ../src/balsa-mblist.c:1192
+#, fuzzy
+msgid "Failed to find mailbox"
+msgstr "Lettre-bux"
+
+#: ../src/balsa-mblist.c:1778
+#, fuzzy
+msgid "_Other..."
+msgstr "_Altri..."
+
+#: ../src/balsa-mblist.c:1846
+#, fuzzy
+msgid "Choose destination folder"
+msgstr "Fólder de _destination:"
+
+#: ../src/balsa-mblist.c:2059
+msgid "Other..."
+msgstr "Altri..."
+
+#: ../src/balsa-message.c:301
+msgid "Check cryptographic signature"
+msgstr "Controlar li signature criptografic"
+
+#: ../src/balsa-message.c:322
+#, fuzzy
+msgid "Select message part to display"
+msgstr "_Ne monstrar plu ti-ci avise"
+
+#: ../src/balsa-message.c:409
+msgid "Wrapped"
+msgstr ""
+
+#: ../src/balsa-message.c:413
+#, fuzzy
+msgid "Not found"
+msgstr "Ne esset trovat"
+
+#: ../src/balsa-message.c:602
+#, fuzzy
+msgid "Find:"
+msgstr "Trovar..."
+
+#: ../src/balsa-message.c:615 ../src/toolbar-factory.c:140
+msgid "Previous"
+msgstr "Precedent"
+
+#: ../src/balsa-message.c:623 ../src/toolbar-factory.c:141
+msgid "Next"
+msgstr "Sequent"
+
+#: ../src/balsa-message.c:712
+msgid "Content"
+msgstr "Contenete"
+
+#: ../src/balsa-message.c:805
+msgid "Message parts"
+msgstr "Partes del missage"
+
+#: ../src/balsa-message.c:981
+#, fuzzy
+msgid "Save selected as..."
+msgstr "Gardar li selectet images con altri nómines"
+
+#: ../src/balsa-message.c:988
+#, fuzzy
+msgid "Save selected to folder..."
+msgstr "Gardar li selectet playlist"
+
+#: ../src/balsa-message.c:1081
+#, fuzzy
+msgid "(No sender)"
+msgstr "_Inviator"
+
+#: ../src/balsa-message.c:1135 ../src/balsa-message.c:1147
+#, c-format
+msgid "Could not access message %u in mailbox \"%s\"."
+msgstr ""
+
+#: ../src/balsa-message.c:1323
+msgid "mixed parts"
+msgstr "mixtet partes"
+
+#: ../src/balsa-message.c:1325
+msgid "alternative parts"
+msgstr "alternativ partes"
+
+#: ../src/balsa-message.c:1327
+msgid "signed parts"
+msgstr "signat partes"
+
+#: ../src/balsa-message.c:1329
+msgid "encrypted parts"
+msgstr "ciffrat partes"
+
+#: ../src/balsa-message.c:1331
+msgid "rfc822 message"
+msgstr "Missage rfc822"
+
+#: ../src/balsa-message.c:1333
+#, c-format
+msgid "\"%s\" parts"
+msgstr "partes «%s»"
+
+#: ../src/balsa-message.c:1381
+msgid "force inline for all parts"
+msgstr ""
+
+#: ../src/balsa-message.c:1424
+#, c-format
+msgid "rfc822 message (from %s, subject \"%s\")"
+msgstr ""
+
+#: ../src/balsa-message.c:1436
+msgid "complete message"
+msgstr "complet missage"
+
+#: ../src/balsa-message.c:1453
+#, fuzzy, c-format
+msgid "part %s: %s (file %s)"
+msgstr " Paccage %s: parte(s) "
+
+#: ../src/balsa-message.c:1464
+#, fuzzy, c-format
+msgid "part %s: %s"
+msgstr "Original parte %s"
+
+#: ../src/balsa-message.c:1479
+msgid "encrypted: "
+msgstr "ciffrat: "
+
+#: ../src/balsa-message.c:1616
+#, fuzzy, c-format
+msgid "Reading embedded message failed: %s"
+msgstr "Ne successat aperter %s por letion"
+
+#: ../src/balsa-message.c:1624
+#, fuzzy, c-format
+msgid "Appending message to %s failed: %s"
+msgstr "unlink %s ne successat: %s"
+
+#: ../src/balsa-message.c:1653
+msgid "_Save..."
+msgstr "_Salvar..."
+
+#: ../src/balsa-message.c:1662 ../src/balsa-mime-widget-message.c:467
+#, fuzzy
+msgid "_Copy to folder..."
+msgstr "It es ínpossibil copiar un fólder a se self."
+
+#: ../src/balsa-message.c:1745
+msgid "Select folder for saving selected parts"
+msgstr ""
+
+#: ../src/balsa-message.c:1769
+#, fuzzy, c-format
+msgid "Could not create URI for %s"
+msgstr "Ne successat crear un fólder \"%s\": %s\n"
+
+#: ../src/balsa-message.c:1794
+#, fuzzy, c-format
+msgid "%s message part"
+msgstr "Original parte %s"
+
+#: ../src/balsa-message.c:1827 ../src/balsa-mime-widget-callbacks.c:163
+#, fuzzy, c-format
+msgid "Could not save %s: %s"
+msgstr "Ne posset salvar li image «%s»"
+
+#: ../src/balsa-message.c:2486 ../src/balsa-message.c:2630
+#, c-format
+msgid "Sending the disposition notification failed: %s"
+msgstr ""
+
+#: ../src/balsa-message.c:2583
+#, c-format
+msgid ""
+"The sender of this mail, %s, requested \n"
+"a Message Disposition Notification(MDN) to be returned to `%s'.\n"
+"Do you want to send this notification?"
+msgstr ""
+
+#: ../src/balsa-message.c:2593
+#, fuzzy
+msgid "Reply to MDN?"
+msgstr "Response-a:"
+
+#: ../src/balsa-message.c:2804
+msgid ""
+"The decryption cannot be performed because this message is displayed more "
+"than once.\n"
+"Please close the other instances of this message and try again."
+msgstr ""
+
+#: ../src/balsa-message.c:2825 ../src/balsa-message.c:2910
+#: ../src/balsa-message.c:3032
+#, c-format
+msgid "Parsing a message part failed: %s"
+msgstr ""
+
+#: ../src/balsa-message.c:2826 ../src/balsa-message.c:2911
+#: ../src/balsa-message.c:3033
+#, fuzzy
+msgid "Possible disk space problem."
+msgstr "Ínsuficent spacie de disco"
+
+#: ../src/balsa-message.c:2840
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains an encrypted part, but "
+"it's structure is invalid."
+msgstr ""
+
+#: ../src/balsa-message.c:2848
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
+"but this crypto protocol is not available."
+msgstr ""
+
+#: ../src/balsa-message.c:2861
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a S/MIME encrypted part, "
+"but this crypto protocol is not available."
+msgstr ""
+
+#: ../src/balsa-message.c:2928
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a signed part, but its "
+"structure is invalid. The signature, if there is any, cannot be checked."
+msgstr ""
+
+#: ../src/balsa-message.c:2941
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains a %s signed part, but "
+"this crypto protocol is not available."
+msgstr ""
+
+#: ../src/balsa-message.c:2944
+msgid "PGP"
+msgstr "PGP"
+
+#: ../src/balsa-message.c:2944 ../src/balsa-mime-widget-crypto.c:76
+#: ../src/print-gtk.c:199
+msgid "S/MIME"
+msgstr "S/MIME"
+
+#: ../src/balsa-message.c:2968 ../src/balsa-message.c:3095
+#, fuzzy
+msgid "Detected a good signature"
+msgstr "Signature valid"
+
+#: ../src/balsa-message.c:2974
+msgid "Detected a good signature with insufficient validity"
+msgstr ""
+
+#: ../src/balsa-message.c:2979 ../src/balsa-message.c:3099
+msgid "Detected a good signature with insufficient validity/trust"
+msgstr ""
+
+#: ../src/balsa-message.c:2986 ../src/balsa-message.c:3105
+#, c-format
+msgid ""
+"Checking the signature of the message sent by %s with subject \"%s\" "
+"returned:\n"
+"%s"
+msgstr ""
+
+#: ../src/balsa-message.c:2998
+#, c-format
+msgid ""
+"Checking the signature of the message sent by %s with subject \"%s\" failed "
+"with an error!"
+msgstr ""
+
+#: ../src/balsa-message.c:3057
+msgid ""
+"The decryption cannot be performed because this message is displayed more "
+"than once."
+msgstr ""
+
+#: ../src/balsa-message.c:3059
+msgid ""
+"The signature check and removal of the OpenPGP armor cannot be performed "
+"because this message is displayed more than once."
+msgstr ""
+
+#: ../src/balsa-message.c:3062
+msgid "Please close the other instances of this message and try again."
+msgstr ""
+
+#: ../src/balsa-mime-widget.c:236 ../src/balsa-mime-widget-message.c:172
+#: ../src/balsa-mime-widget-message.c:218
+#, fuzzy, c-format
+msgid "File name: %s"
+msgstr "Nómine del file: %s"
+
+#: ../src/balsa-mime-widget.c:255
+#, fuzzy, c-format
+msgid "Error reading message part: %s"
+msgstr "Un errore evenit leente «%s»: %s"
+
+#: ../src/balsa-mime-widget.c:279
+#, c-format
+msgid "Type: %s (%s)"
+msgstr "Tip: %s (%s)"
+
+#: ../src/balsa-mime-widget.c:283
+#, fuzzy, c-format
+msgid "Content Type: %s"
+msgstr "Ne successat obtener li tip de contenete de «%s»"
+
+#: ../src/balsa-mime-widget.c:296
+msgid "No open or view action defined for this content type"
+msgstr ""
+
+#: ../src/balsa-mime-widget.c:301
+#, fuzzy
+msgid "S_ave part"
+msgstr "G_ardar sin egarda"
+
+#: ../src/balsa-mime-widget-callbacks.c:52 ../src/sendmsg-window.c:1813
+#, fuzzy, c-format
+msgid "Could not launch application: %s"
+msgstr "Ne posset lansar li application"
+
+#: ../src/balsa-mime-widget-callbacks.c:79
+#, fuzzy, c-format
+msgid "Save %s MIME Part"
+msgstr " Paccage %s: parte(s) "
+
+#: ../src/balsa-mime-widget-callbacks.c:121
+#, fuzzy, c-format
+msgid "Could not construct URI from %s"
+msgstr "Ne successat converter '%s' ex UTF-8"
+
+#: ../src/balsa-mime-widget-callbacks.c:140
+#, fuzzy
+msgid "File already exists. Overwrite?"
+msgstr "Li file ja existe. Vicear it?"
+
+#: ../src/balsa-mime-widget-callbacks.c:150
+#, fuzzy, c-format
+msgid "Unlink %s: %s"
+msgstr "unlink %s ne successat: %s"
+
+#: ../src/balsa-mime-widget-crypto.c:74
+#, c-format
+msgid ""
+"This is an inline %s signed %s message part:\n"
+"%s"
+msgstr ""
+
+#: ../src/balsa-mime-widget-crypto.c:76 ../src/print-gtk.c:199
+msgid "OpenPGP"
+msgstr "OpenPGP"
+
+#: ../src/balsa-mime-widget-crypto.c:94
+#, fuzzy
+msgid "_Run GnuPG to import this key"
+msgstr "Importar un clave PGP..."
+
+#: ../src/balsa-mime-widget-crypto.c:98
+msgid "_Run GnuPG to check for an update of this key"
+msgstr ""
+
+#: ../src/balsa-mime-widget-image.c:52 ../src/balsa-mime-widget-image.c:176
+#, fuzzy, c-format
+msgid "Error loading attached image: %s\n"
+msgstr "Un errore evenit cargante un image: %s"
+
+#: ../src/balsa-mime-widget-message.c:140 ../src/balsa-print-object.c:113
+#, fuzzy
+msgid "message headers"
+msgstr "Cap-lineas"
+
+#: ../src/balsa-mime-widget-message.c:170
+#: ../src/balsa-mime-widget-message.c:182
+#: ../src/balsa-mime-widget-message.c:210
+#: ../src/balsa-mime-widget-message.c:263
+#, fuzzy
+msgid "Content Type: external-body\n"
+msgstr "Ínsuportat tip de contenete"
+
+#: ../src/balsa-mime-widget-message.c:171
+#, fuzzy, c-format
+msgid "Access type: local-file\n"
+msgstr "Local file"
+
+#: ../src/balsa-mime-widget-message.c:183
+#, fuzzy, c-format
+msgid "Access type: URL\n"
+msgstr "Li URL de destination"
+
+#: ../src/balsa-mime-widget-message.c:184
+#, c-format
+msgid "URL: %s"
+msgstr "URL: %s"
+
+#: ../src/balsa-mime-widget-message.c:211
+#, fuzzy, c-format
+msgid "Access type: %s\n"
+msgstr "_Tip de accesse:"
+
+#: ../src/balsa-mime-widget-message.c:215
+#, fuzzy, c-format
+msgid "FTP site: %s\n"
+msgstr "FTP"
+
+#: ../src/balsa-mime-widget-message.c:217
+#, fuzzy, c-format
+msgid "Directory: %s\n"
+msgstr "Li fólder de destination «%s» ne existe"
+
+#: ../src/balsa-mime-widget-message.c:264
+#, fuzzy
+msgid "Access type: mail-server\n"
+msgstr "_Servitore de post:"
+
+#: ../src/balsa-mime-widget-message.c:265
+#, fuzzy, c-format
+msgid "Mail server: %s\n"
+msgstr "_Servitore de post:"
+
+#: ../src/balsa-mime-widget-message.c:267
+#, c-format
+msgid "Subject: %s\n"
+msgstr "Tema: %s\n"
+
+#: ../src/balsa-mime-widget-message.c:284
+msgid "Se_nd message to obtain this part"
+msgstr ""
+
+#: ../src/balsa-mime-widget-message.c:305 ../src/balsa-mime-widget-text.c:809
+#: ../src/sendmsg-window.c:1834
+#, fuzzy, c-format
+msgid "Error showing %s: %s\n"
+msgstr "errore - iconv: %s -> %s\n"
+
+#: ../src/balsa-mime-widget-message.c:340
+#, fuzzy, c-format
+msgid "Could not get a part: %s"
+msgstr "Rechnername des Servers konnte nicht ermittelt werden: %s!"
+
+#: ../src/balsa-mime-widget-message.c:372
+#, c-format
+msgid "Sending the external body request failed: %s"
+msgstr ""
+
+#: ../src/balsa-mime-widget-message.c:459
+msgid "Reply..."
+msgstr "Responder..."
+
+#: ../src/balsa-mime-widget-message.c:564
+msgid "... [truncated]"
+msgstr ""
+
+#. Gmail sometimes fails to do that.
+#: ../src/balsa-mime-widget-message.c:716
+msgid "Error:"
+msgstr "Errore:"
+
+#: ../src/balsa-mime-widget-message.c:717
+msgid "IMAP server did not report message structure"
+msgstr ""
+
+#: ../src/balsa-mime-widget-message.c:730
+#: ../src/balsa-print-object-header.c:156 ../src/sendmsg-window.c:1152
+#: ../src/sendmsg-window.c:1154 ../src/sendmsg-window.c:1244
+#: ../src/sendmsg-window.c:3849 ../src/sendmsg-window.c:5776
+msgid "Subject:"
+msgstr "Tema:"
+
+#: ../src/balsa-mime-widget-message.c:734
+#: ../src/balsa-print-object-header.c:164 ../src/sendmsg-window.c:3845
+msgid "Date:"
+msgstr "Date:"
+
+#. addresses
+#: ../src/balsa-mime-widget-message.c:740
+#: ../src/balsa-print-object-header.c:169 ../src/sendmsg-window.c:3856
+#: ../src/store-address.c:338
+msgid "From:"
+msgstr "De:"
+
+#: ../src/balsa-mime-widget-message.c:747
+msgid "Reply-To:"
+msgstr "Responder-a:"
+
+#: ../src/balsa-mime-widget-message.c:756
+#: ../src/balsa-print-object-header.c:177
+msgid "Fcc:"
+msgstr ""
+
+#: ../src/balsa-mime-widget-message.c:763
+#: ../src/balsa-print-object-header.c:180
+#, fuzzy
+msgid "Disposition-Notification-To:"
+msgstr " notification"
+
+#: ../src/balsa-mime-widget-text.c:172
+#, fuzzy, c-format
+msgid "Could not save a text part: %s"
+msgstr "Ne posset salvar li archive «%s»"
+
+#: ../src/balsa-mime-widget-text.c:516
+#, fuzzy
+msgid "Copy link"
+msgstr "Copiar li ligament"
+
+#: ../src/balsa-mime-widget-text.c:521
+#, fuzzy
+msgid "Open link"
+msgstr "Aperter li ligament"
+
+#: ../src/balsa-mime-widget-text.c:526
+#, fuzzy
+msgid "Send link..."
+msgstr "In_viar a..."
+
+#: ../src/balsa-mime-widget-text.c:559 ../src/balsa-mime-widget-text.c:1051
+#, fuzzy
+msgid "Save..."
+msgstr "Salvar quam"
+
+#: ../src/balsa-mime-widget-text.c:569
+#, fuzzy
+msgid "Highlight structured phrases"
+msgstr "Marcar: "
+
+#: ../src/balsa-mime-widget-text.c:796
+#, fuzzy, c-format
+msgid "Calling URL %s..."
+msgstr "Aperter li URL %s"
+
+#: ../src/balsa-mime-widget-text.c:1165
+msgid "Address"
+msgstr "Adresse"
+
+#: ../src/balsa-mime-widget-text.c:1168
+#, fuzzy
+msgid "S_tore"
+msgstr ".../%s"
+
+#: ../src/balsa-mime-widget-text.c:1176 ../src/balsa-print-object-text.c:506
+#, fuzzy
+msgid "Full Name"
+msgstr "Nómine complet"
+
+#: ../src/balsa-mime-widget-text.c:1177 ../src/balsa-print-object-text.c:508
+#, fuzzy
+msgid "Nick Name"
+msgstr "Nómine"
+
+#: ../src/balsa-mime-widget-text.c:1178 ../src/balsa-print-object-text.c:510
+msgid "First Name"
+msgstr "Prenómine"
+
+#: ../src/balsa-mime-widget-text.c:1179 ../src/balsa-print-object-text.c:512
+#, fuzzy
+msgid "Last Name"
+msgstr "ultim"
+
+#: ../src/balsa-mime-widget-text.c:1180 ../src/balsa-print-object-text.c:514
+msgid "Organization"
+msgstr "Organisation"
+
+#: ../src/balsa-mime-widget-text.c:1182 ../src/balsa-print-object-text.c:517
+#, fuzzy
+msgid "Email Address"
+msgstr "Adresse de e-post"
+
+#: ../src/balsa-mime-widget-text.c:1211
+#, c-format
+msgid ""
+"The message sent by %s with subject \"%s\" contains 8-bit characters, but no "
+"header describing the used codeset (converted to %s)"
+msgstr ""
+
+#: ../src/balsa-mime-widget-vcalendar.c:65
+#, fuzzy, c-format
+msgid "This is an iTIP calendar \"%s\" message."
+msgstr "Missage de calendare"
+
+#: ../src/balsa-mime-widget-vcalendar.c:167
+#: ../src/balsa-print-object-text.c:663
+msgid "Summary"
+msgstr "Compendie"
+
+#: ../src/balsa-mime-widget-vcalendar.c:168
+#: ../src/balsa-print-object-text.c:665
+#, fuzzy
+msgid "Organizer"
+msgstr "Organisator"
+
+#: ../src/balsa-mime-widget-vcalendar.c:169
+#: ../src/balsa-print-object-text.c:667
+#, fuzzy
+msgid "Start"
+msgstr "Comense"
+
+#: ../src/balsa-mime-widget-vcalendar.c:170
+#: ../src/balsa-print-object-text.c:669
+#, fuzzy
+msgid "End"
+msgstr "End"
+
+#: ../src/balsa-mime-widget-vcalendar.c:171
+#: ../src/balsa-print-object-text.c:671
+msgid "Location"
+msgstr "Localisation"
+
+#: ../src/balsa-mime-widget-vcalendar.c:203
+#: ../src/balsa-print-object-text.c:680
+msgid "Attendees"
+msgstr ""
+
+#: ../src/balsa-mime-widget-vcalendar.c:203
+#: ../src/balsa-print-object-text.c:680
+msgid "Attendee"
+msgstr ""
+
+#: ../src/balsa-mime-widget-vcalendar.c:206
+#: ../src/balsa-print-object-text.c:694 ../src/sendmsg-window.c:3060
+msgid "Description"
+msgstr "Descrition"
+
+#: ../src/balsa-mime-widget-vcalendar.c:227
+msgid "The sender asks you for a reply to this request:"
+msgstr ""
+
+#: ../src/balsa-mime-widget-vcalendar.c:234
+msgid "Accept"
+msgstr "Acceptar"
+
+#: ../src/balsa-mime-widget-vcalendar.c:243
+#, fuzzy
+msgid "Accept tentatively"
+msgstr "Acceptar provisorimen"
+
+#: ../src/balsa-mime-widget-vcalendar.c:251
+#, fuzzy
+msgid "Decline"
+msgstr "Declinar"
+
+#: ../src/balsa-mime-widget-vcalendar.c:298
+#, fuzzy
+msgid "iTip Calendar Request"
+msgstr "_Calendare:"
+
+#: ../src/balsa-mime-widget-vcalendar.c:332
+#, c-format
+msgid "Sending the iTip calendar reply failed: %s"
+msgstr ""
+
+#: ../src/balsa-print-object-default.c:151
+#: ../src/balsa-print-object-default.c:153
+#: ../src/balsa-print-object-default.c:156
+msgid "Type:"
+msgstr "Tip:"
+
+#: ../src/balsa-print-object-default.c:161
+#: ../src/balsa-print-object-default.c:165
+msgid "File name:"
+msgstr "Nómine de file:"
+
+#: ../src/filter-edit-callbacks.c:335
+#, fuzzy
+msgid "One of the specified fields contains:"
+msgstr "Paper-corb contene ún element"
+
+#: ../src/filter-edit-callbacks.c:336
+msgid "None of the specified fields contains:"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:338
+#, fuzzy
+msgid "One of the regular expressions matches"
+msgstr "Nómine = un e_xpression regulari"
+
+#: ../src/filter-edit-callbacks.c:339
+#, fuzzy
+msgid "None of the regular expressions matches"
+msgstr "Nómine = un e_xpression regulari"
+
+#: ../src/filter-edit-callbacks.c:341
+#, fuzzy
+msgid "Match when date is in the interval:"
+msgstr "Insertente date e hora..."
+
+#: ../src/filter-edit-callbacks.c:342
+msgid "Match when date is outside the interval:"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:344 ../src/filter-edit-callbacks.c:1153
+msgid "Match when one of these flags is set:"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:345
+msgid "Match when none of these flags is set:"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:552
+msgid "You must specify the name of the user header to match on"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:563
+msgid "You must specify at least one field for matching"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:573
+#, fuzzy
+msgid "You must provide a string"
+msgstr "Textu quel vu vole trovar"
+
+#: ../src/filter-edit-callbacks.c:581
+msgid "You must provide at least one regular expression"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:594
+#, fuzzy
+msgid "Low date is incorrect"
+msgstr "Formate de date es ínvalid"
+
+#: ../src/filter-edit-callbacks.c:605
+#, fuzzy
+msgid "High date is incorrect"
+msgstr "Formate de date es ínvalid"
+
+#: ../src/filter-edit-callbacks.c:613
+msgid "Low date is greater than high date"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:908
+#, fuzzy, c-format
+msgid "Error displaying condition help: %s\n"
+msgstr "Un errore ha evenit monstrante auxilie: %s"
+
+#: ../src/filter-edit-callbacks.c:949
+#, fuzzy
+msgid "Match Fields"
+msgstr "Camps"
+
+#: ../src/filter-edit-callbacks.c:959
+msgid "_All"
+msgstr "_Omni"
+
+#: ../src/filter-edit-callbacks.c:960
+#, fuzzy
+msgid "C_lear"
+msgstr "_Vacuar"
+
+#: ../src/filter-edit-callbacks.c:962 ../src/main-window.c:4360
+#, fuzzy
+msgid "_Body"
+msgstr "Córpor:"
+
+#: ../src/filter-edit-callbacks.c:963 ../src/main-window.c:4361
+msgid "_To:"
+msgstr "_A:"
+
+#: ../src/filter-edit-callbacks.c:964 ../src/main-window.c:4362
+msgid "_From:"
+msgstr "_De:"
+
+#: ../src/filter-edit-callbacks.c:965
+msgid "_Subject"
+msgstr "_Tema"
+
+#: ../src/filter-edit-callbacks.c:966 ../src/main-window.c:4364
+msgid "_Cc:"
+msgstr "_Cc:"
+
+#: ../src/filter-edit-callbacks.c:968
+#, fuzzy
+msgid "_User header:"
+msgstr "Usator:"
+
+#: ../src/filter-edit-callbacks.c:1009
+msgid "Unread"
+msgstr "Ínleet"
+
+#: ../src/filter-edit-callbacks.c:1024
+msgid "One of the specified f_ields contains"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:1039
+#, fuzzy
+msgid "Contain/Does _Not Contain"
+msgstr "ne contene"
+
+#: ../src/filter-edit-callbacks.c:1059
+#, fuzzy
+msgid "_One of the regular expressions matches"
+msgstr "Nómine = un e_xpression regulari"
+
+#. Left/Remove button
+#: ../src/filter-edit-callbacks.c:1090 ../src/filter-edit-dialog.c:339
+#: ../src/filter-run-dialog.c:332
+msgid "_Remove"
+msgstr "_Remover"
+
+#: ../src/filter-edit-callbacks.c:1094
+#, fuzzy
+msgid "One _Matches/None Matches"
+msgstr "Null corespondenties trovat"
+
+#: ../src/filter-edit-callbacks.c:1105
+msgid "Filtering using regular expressions is not yet implemented."
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:1115
+msgid "Match when message date is in the interval:"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:1135
+msgid "Inside/outside the date interval"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:1182
+msgid "Match when one flag is set/when no flag is set"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:1201
+#, fuzzy
+msgid "Search T_ype:"
+msgstr "T_ip de servicie:"
+
+#: ../src/filter-edit-callbacks.c:1278
+#, fuzzy
+msgid "Edit condition for filter: "
+msgstr "Condition"
+
+#: ../src/filter-edit-callbacks.c:1496 ../src/save-restore.c:1971
+#, fuzzy
+msgid "Filter with no condition was omitted"
+msgstr "Condition:"
+
+#: ../src/filter-edit-callbacks.c:1522
+#, fuzzy, c-format
+msgid "Error displaying filter help: %s\n"
+msgstr "Un errore ha evenit monstrante auxilie: %s"
+
+#: ../src/filter-edit-callbacks.c:1721
+#, fuzzy
+msgid "New filter"
+msgstr "Nov filtre"
+
+#: ../src/filter-edit-callbacks.c:1850
+#, fuzzy
+msgid "No filter name specified."
+msgstr "_Nómine de filtre:"
+
+#: ../src/filter-edit-callbacks.c:1855
+#, fuzzy, c-format
+msgid "Filter \"%s\" already exists."
+msgstr "Un file nominat «%s» ja existe"
+
+#: ../src/filter-edit-callbacks.c:1865
+#, fuzzy
+msgid "Filter must have conditions."
+msgstr "Ne posse haver ti-ci tag [NE]"
+
+#: ../src/filter-edit-callbacks.c:1951
+#, fuzzy
+msgid "Filter has matched"
+msgstr "&Filtre..."
+
+#: ../src/filter-edit-callbacks.c:1971
+msgid "You must provide a sound to play"
+msgstr ""
+
+#: ../src/filter-edit-callbacks.c:2153
+#, c-format
+msgid "(Example: write December 31, 2000, as %s)"
+msgstr ""
+
+#: ../src/filter-edit-dialog.c:95 ../src/pref-manager.c:424
+#, fuzzy
+msgid "Simple"
+msgstr "Simplic"
+
+#: ../src/filter-edit-dialog.c:96
+#, fuzzy
+msgid "Regular Expression"
+msgstr "Expression regulari"
+
+#: ../src/filter-edit-dialog.c:97
+#, fuzzy
+msgid "Date interval"
+msgstr "_Intervalle:"
+
+#: ../src/filter-edit-dialog.c:98
+#, fuzzy
+msgid "Flag condition"
+msgstr "_Flaggar"
+
+#: ../src/filter-edit-dialog.c:102
+#, fuzzy
+msgid "Copy to folder:"
+msgstr "It es ínpossibil copiar un fólder a se self."
+
+#: ../src/filter-edit-dialog.c:103
+#, fuzzy
+msgid "Move to folder:"
+msgstr "It es ínpossibil mover un fólder a se self."
+
+#: ../src/filter-edit-dialog.c:104
+#, fuzzy
+msgid "Colorize"
+msgstr "_Colorat valores"
+
+#: ../src/filter-edit-dialog.c:105
+#, fuzzy
+msgid "Print on printer:"
+msgstr "Printar al prov-printator"
+
+#: ../src/filter-edit-dialog.c:106
+#, fuzzy
+msgid "Run program:"
+msgstr "Executer un programma..."
+
+#: ../src/filter-edit-dialog.c:107
+#, fuzzy
+msgid "Send to Trash"
+msgstr "Paper-corb"
+
+#: ../src/filter-edit-dialog.c:111
+msgid "OR"
+msgstr ""
+
+#: ../src/filter-edit-dialog.c:112
+msgid "AND"
+msgstr ""
+
+#. The name entry
+#: ../src/filter-edit-dialog.c:267
+#, fuzzy
+msgid "_Filter name:"
+msgstr "_Nómine de filtre:"
+
+#. The filter op-code : "OR" or "AND" all the conditions
+#: ../src/filter-edit-dialog.c:285
+#, fuzzy
+msgid "Operation between conditions"
+msgstr "Conditiones:"
+
+#: ../src/filter-edit-dialog.c:335
+#, fuzzy
+msgid "Ne_w"
+msgstr "No_v postage"
+
+#: ../src/filter-edit-dialog.c:363
+#, fuzzy
+msgid "Foreground"
+msgstr "Avanplan"
+
+#: ../src/filter-edit-dialog.c:374
+#, fuzzy
+msgid "Background"
+msgstr "Funde"
+
+#. The notification area
+#: ../src/filter-edit-dialog.c:399
+msgid "Notification:"
+msgstr "Notification:"
+
+#. Notification buttons
+#: ../src/filter-edit-dialog.c:409
+#, fuzzy
+msgid "Play sound:"
+msgstr "Far un son"
+
+#: ../src/filter-edit-dialog.c:415
+#, fuzzy
+msgid "Use Sound..."
+msgstr "_Son"
+
+#: ../src/filter-edit-dialog.c:436
+#, fuzzy
+msgid "Popup text:"
+msgstr "Localisation de popup"
+
+#. The action area
+#: ../src/filter-edit-dialog.c:457
+#, fuzzy
+msgid "Action to perform:"
+msgstr "_Sempre far ti-ci action"
+
+#: ../src/filter-edit-dialog.c:510
+#, fuzzy
+msgid "Match"
+msgstr "Usar expressiones _regulari"
+
+#: ../src/filter-edit-dialog.c:513
+msgid "Action"
+msgstr "Action"
+
+#: ../src/filter-edit-dialog.c:525
+#, fuzzy
+msgid "Revert"
+msgstr "Reverter"
+
+#: ../src/filter-edit-dialog.c:576
+msgid "A filter run dialog is open. Close it before you can modify filters."
+msgstr ""
+
+#: ../src/filter-edit-dialog.c:589
+#, fuzzy
+msgid "Balsa Filters"
+msgstr "Balsa"
+
+#: ../src/filter-edit-dialog.c:658
+#, fuzzy, c-format
+msgid "Filter \"%s\" has no condition."
+msgstr "It ha essit preservat quam %s"
+
+#: ../src/filter-export-callbacks.c:57
+#, c-format
+msgid "Unable to export filter %s, an error occurred."
+msgstr ""
+
+#: ../src/filter-export-dialog.c:63
+msgid ""
+"There are opened filter run dialogs, close them before you can modify "
+"filters."
+msgstr ""
+
+#: ../src/filter-export-dialog.c:75
+#, fuzzy
+msgid "Balsa Filters Export"
+msgstr "Filtres"
+
+#: ../src/filter-run-callbacks.c:182
+#, fuzzy, c-format
+msgid "Error displaying run filters help: %s\n"
+msgstr "Un errore evenit monstrante auxilie: %s"
+
+#: ../src/filter-run-callbacks.c:232 ../src/filter-run-callbacks.c:254
+#, fuzzy
+msgid "Error when applying filters"
+msgstr "Un errore evenit serchante por tags sur AcoustID"
+
+#: ../src/filter-run-callbacks.c:235 ../src/filter-run-callbacks.c:257
+#, fuzzy, c-format
+msgid "Filter applied to \"%s\"."
+msgstr "_Filtre:"
+
+#: ../src/filter-run-callbacks.c:296
+#, c-format
+msgid ""
+"The destination mailbox of the filter \"%s\" is \"%s\".\n"
+"You can't associate it with the same mailbox (that causes recursion)."
+msgstr ""
+
+#: ../src/filter-run-callbacks.c:304
+#, c-format
+msgid ""
+"The filter \"%s\" is not compatible with the mailbox type of \"%s\".\n"
+"This happens for example when you use regular expressions match with IMAP "
+"mailboxes, it is done by a very slow method; if possible, use substring "
+"match instead."
+msgstr ""
+
+#: ../src/filter-run-dialog.c:189
+#, fuzzy
+msgid "Balsa Filters of Mailbox: "
+msgstr "Lettre-bux"
+
+#: ../src/filter-run-dialog.c:230
+#, fuzzy
+msgid "On reception"
+msgstr "Reception del file es complet"
+
+#: ../src/filter-run-dialog.c:242
+#, fuzzy
+msgid "On exit"
+msgstr "S_urtida"
+
+#: ../src/filter-run-dialog.c:316
+#, fuzzy
+msgid "Apply Selected"
+msgstr "Applicar"
+
+#. up button
+#: ../src/filter-run-dialog.c:364
+#, fuzzy
+msgid "_Up"
+msgstr "Ad-s_upra"
+
+#. down button
+#: ../src/filter-run-dialog.c:369
+#, fuzzy
+msgid "Do_wn"
+msgstr "Mover a-_bass"
+
+#: ../src/filter-run-dialog.c:375
+#, fuzzy
+msgid "A_pply Now!"
+msgstr "A_pplicar"
+
+#: ../src/filter-run-dialog.c:419
+msgid ""
+"The filters dialog is opened, close it before you can run filters on any "
+"mailbox"
+msgstr ""
+
+#: ../src/folder-conf.c:108
+#, fuzzy, c-format
+msgid "Error displaying config help: %s\n"
+msgstr "Un errore ha evenit monstrante auxilie: %s"
+
+#: ../src/folder-conf.c:296
+#, fuzzy
+msgid "Remote IMAP folder"
+msgstr "Lettre-bux IMAP"
+
+#. must NOT be modal
+#: ../src/folder-conf.c:299 ../src/folder-conf.c:787 ../src/mailbox-conf.c:571
+msgid "_Update"
+msgstr "Act_ualisar"
+
+#: ../src/folder-conf.c:299
+#, fuzzy
+msgid "C_reate"
+msgstr "C_rear"
+
+#: ../src/folder-conf.c:325 ../src/mailbox-conf.c:1224
+#: ../src/mailbox-conf.c:1336
+msgid "_Basic"
+msgstr "_Basic"
+
+#: ../src/folder-conf.c:330
+#, fuzzy
+msgid "_Max number of connections:"
+msgstr "Max númere de conexiones"
+
+#: ../src/folder-conf.c:337 ../src/mailbox-conf.c:1399
+#, fuzzy
+msgid "Enable _persistent cache"
+msgstr "Persistent"
+
+#: ../src/folder-conf.c:345
+#, fuzzy
+msgid "Use IDLE command"
+msgstr "Usar un per_sonal comande:"
+
+#: ../src/folder-conf.c:352 ../src/mailbox-conf.c:1403
+#, fuzzy
+msgid "Enable _bug workarounds"
+msgstr "Defecte de Xfce"
+
+#: ../src/folder-conf.c:359
+#, fuzzy
+msgid "Use STATUS for mailbox checking"
+msgstr "Control del statu de DKMS"
+
+#: ../src/folder-conf.c:365 ../src/mailbox-conf.c:1278
+#: ../src/mailbox-conf.c:1405
+msgid "_Advanced"
+msgstr "_Avansates"
+
+#. INPUT FIELD CREATION
+#: ../src/folder-conf.c:368
+#, fuzzy
+msgid "Descriptive _name:"
+msgstr ""
+"Provide un descritiv nómine apu li emblema. Ti nómine va esser usat por "
+"identificar li emblema."
+
+#. username
+#: ../src/folder-conf.c:383 ../src/mailbox-conf.c:1240
+msgid "Use_r name:"
+msgstr "Nómine de usato_r:"
+
+#: ../src/folder-conf.c:389
+msgid "_Password:"
+msgstr "_Contrasigne:"
+
+#: ../src/folder-conf.c:394 ../src/mailbox-conf.c:1361
+#, fuzzy
+msgid "_Anonymous access"
+msgstr "_Anonim"
+
+#: ../src/folder-conf.c:403
+#, fuzzy
+msgid "Subscribed _folders only"
+msgstr "On pote selecter solmen fólderes"
+
+#: ../src/folder-conf.c:405
+#, fuzzy
+msgid "Always show _INBOX"
+msgstr "Sempre monstrar li panel de cartes"
+
+#: ../src/folder-conf.c:408
+msgid "Pr_efix:"
+msgstr "Pr_efix:"
+
+#: ../src/folder-conf.c:554
+#, fuzzy
+msgid "Select parent folder"
+msgstr "Fólder superior:"
+
+#: ../src/folder-conf.c:632
+#, c-format
+msgid ""
+"Renaming INBOX is special!\n"
+"You will create a subfolder %s in %s\n"
+"containing the messages from INBOX.\n"
+"INBOX and its subfolders will remain.\n"
+"What would you like to do?"
+msgstr ""
+
+#: ../src/folder-conf.c:638
+msgid "Question"
+msgstr "Question"
+
+#: ../src/folder-conf.c:643
+#, fuzzy
+msgid "Rename INBOX"
+msgstr "Rec_ivet:"
+
+#: ../src/folder-conf.c:645
+msgid "Cancel"
+msgstr "Anullar"
+
+#: ../src/folder-conf.c:670
+#, fuzzy, c-format
+msgid "Folder rename failed. Reason: %s"
+msgstr "Ne successat inicialisar xfconf. Cause: %s"
+
+#: ../src/folder-conf.c:722
+#, fuzzy, c-format
+msgid "Folder creation failed. Reason: %s"
+msgstr "%s %s %s ne successat por un ínconosset cause"
+
+#: ../src/folder-conf.c:769
+msgid ""
+"An IMAP folder that is not a mailbox\n"
+"has no properties that can be changed."
+msgstr ""
+
+#: ../src/folder-conf.c:784
+#, fuzzy
+msgid "Remote IMAP subfolder"
+msgstr "Lettre-bux IMAP"
+
+#: ../src/folder-conf.c:787
+msgid "_Create"
+msgstr "_Crear"
+
+#: ../src/folder-conf.c:818
+#, fuzzy
+msgid "Create subfolder"
+msgstr "_Automatic sub-fólder"
+
+#. INPUT FIELD CREATION
+#: ../src/folder-conf.c:826
+msgid "_Folder name:"
+msgstr "Nómine del _fólder:"
+
+#: ../src/folder-conf.c:832
+#, fuzzy
+msgid "Host:"
+msgstr "_Host:"
+
+#: ../src/folder-conf.c:841
+#, fuzzy
+msgid "Subfolder of:"
+msgstr "_Automatic sub-fólder"
+
+#: ../src/folder-conf.c:846
+msgid "_Browse..."
+msgstr "_Trovar..."
+
+#: ../src/folder-conf.c:860
+msgid "read-only"
+msgstr "solmen letion"
+
+#: ../src/folder-conf.c:861
+#, fuzzy
+msgid "read-write"
+msgstr "Letion e scrition"
+
+#: ../src/folder-conf.c:862
+#, fuzzy
+msgid "admin"
+msgstr "Administrator"
+
+#: ../src/folder-conf.c:863
+#, fuzzy
+msgid "post"
+msgstr "Inviar"
+
+#: ../src/folder-conf.c:864
+msgid "append"
+msgstr "apender"
+
+#: ../src/folder-conf.c:865
+msgid "delete"
+msgstr "deleter"
+
+#: ../src/folder-conf.c:866
+msgid "special"
+msgstr "special"
+
+#: ../src/folder-conf.c:872
+msgid "Permissions:"
+msgstr "Permissiones:"
+
+#: ../src/folder-conf.c:879
+msgid ""
+"\n"
+"detailed permissions are available only for open folders"
+msgstr ""
+
+#: ../src/folder-conf.c:886
+msgid ""
+"\n"
+"the server does not support ACL's"
+msgstr ""
+
+#: ../src/folder-conf.c:895
+msgid "mine: "
+msgstr ""
+
+#: ../src/folder-conf.c:934
+msgid "Quota:"
+msgstr "Quote:"
+
+#: ../src/folder-conf.c:938
+msgid "quota information available only for open folders"
+msgstr ""
+
+#: ../src/folder-conf.c:943
+msgid "the server does not support quotas"
+msgstr ""
+
+#: ../src/folder-conf.c:945
+#, fuzzy
+msgid "no limits"
+msgstr "Límites"
+
+#: ../src/folder-conf.c:950
+#, fuzzy, c-format
+msgid "%s of %s (%.1f%%) used"
+msgstr "%s (%.1f%%) ex %s"
+
+#: ../src/folder-conf.c:987
+msgid ""
+"This folder is not stored in configuration. I do not yet know how to remove "
+"it from remote server."
+msgstr ""
+
+#: ../src/folder-conf.c:996
+#, c-format
+msgid ""
+"This will remove the folder \"%s\" from the list.\n"
+"You may use \"New IMAP Folder\" later to add this folder again.\n"
+msgstr ""
+
+#: ../src/folder-conf.c:1004
+msgid "Confirm"
+msgstr "Confirmar"
+
+#: ../src/information-dialog.c:230
+msgid "Information - Balsa"
+msgstr "Information - Balsa"
+
+#: ../src/information-dialog.c:357
+#, c-format
+msgid "WARNING: "
+msgstr "AVISE: "
+
+#: ../src/information-dialog.c:360
+#, c-format
+msgid "ERROR: "
+msgstr "ERRORE: "
+
+#: ../src/information-dialog.c:363
+#, fuzzy, c-format
+msgid "FATAL: "
+msgstr "Errore fatal"
+
+#: ../src/mailbox-conf.c:221
+msgid ""
+"Balsa was built without SSL support.\n"
+"Neither SSL nor TLS can be used."
+msgstr ""
+
+#: ../src/mailbox-conf.c:233
+msgid "Use _SSL"
+msgstr "Usar _SSL"
+
+#: ../src/mailbox-conf.c:372
+#, fuzzy
+msgid "No mailbox selected."
+msgstr "Lettre-bux"
+
+#: ../src/mailbox-conf.c:402
+#, c-format
+msgid ""
+"Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
+"If you really want to remove it, assign its function\n"
+"to some other mailbox."
+msgstr ""
+
+#: ../src/mailbox-conf.c:412
+#, c-format
+msgid ""
+"This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
+"also delete the disk file or files associated with this mailbox.\n"
+"If you do not remove the file on disk you may \"Add  Mailbox\" to access the "
+"mailbox again.\n"
+"What would you like to do?"
+msgstr ""
+
+#: ../src/mailbox-conf.c:424
+#, fuzzy
+msgid "Remove from _list"
+msgstr "Remover ex li liste"
+
+#: ../src/mailbox-conf.c:425
+#, fuzzy
+msgid "Remove from list and _disk"
+msgstr "Remover ex li liste"
+
+#: ../src/mailbox-conf.c:433
+#, c-format
+msgid ""
+"This will remove the mailbox \"%s\" and all its messages from your IMAP "
+"server.  If %s has subfolders, it will still appear as a node in the folder "
+"tree.\n"
+"You may use \"New IMAP subfolder\" later to add a mailbox with this name.\n"
+"What would you like to do?"
+msgstr ""
+
+#: ../src/mailbox-conf.c:446
+#, fuzzy
+msgid "_Remove from server"
+msgstr "_Remover ex li Pupitre"
+
+#: ../src/mailbox-conf.c:453
+#, c-format
+msgid ""
+"This will remove the mailbox \"%s\" from the list of mailboxes.\n"
+"You may use \"Add Mailbox\" later to access this mailbox again.\n"
+"What would you like to do?"
+msgstr ""
+
+#: ../src/mailbox-conf.c:462
+#, fuzzy
+msgid "_Remove from list"
+msgstr "Remover ex li liste"
+
+#: ../src/mailbox-conf.c:506
+#, fuzzy, c-format
+msgid "Folder deletion failed. Reason: %s"
+msgstr "%s %s %s ne successat por un ínconosset cause"
+
+#: ../src/mailbox-conf.c:575 ../src/pref-manager.c:1710
+#: ../src/pref-manager.c:1782 ../src/pref-manager.c:2960
+msgid "_Add"
+msgstr "_Adjunter"
+
+#: ../src/mailbox-conf.c:798
+#, fuzzy, c-format
+msgid "%s on %s"
+msgstr "\t%s%s%s%s%s\n"
+
+#: ../src/mailbox-conf.c:940
+#, fuzzy, c-format
+msgid ""
+"Rename of %s to %s failed:\n"
+"%s"
+msgstr "Ne successat renominar «%s» a «%s»."
+
+#: ../src/mailbox-conf.c:1150
+#, fuzzy
+msgid "_Mailbox Name:"
+msgstr "_Nómine de lettre-bux:"
+
+#: ../src/mailbox-conf.c:1159
+#, fuzzy, c-format
+msgid "Local %s Mailbox Properties"
+msgstr "Proprietás de %s"
+
+#: ../src/mailbox-conf.c:1160
+#, fuzzy, c-format
+msgid "New Local %s Mailbox"
+msgstr "Modificar li lettre-bux: %s"
+
+#: ../src/mailbox-conf.c:1202
+#, fuzzy
+msgid "Remote Mailbox Configurator"
+msgstr "Lettre-bux de GMail"
+
+#. mailbox name
+#: ../src/mailbox-conf.c:1227 ../src/mailbox-conf.c:1339
+#, fuzzy
+msgid "Mailbox _name:"
+msgstr "_Nómine de lettre-bux:"
+
+#. password field
+#: ../src/mailbox-conf.c:1246 ../src/mailbox-conf.c:1373
+#, fuzzy
+msgid "Pass_word:"
+msgstr "Contra_signe:"
+
+#: ../src/mailbox-conf.c:1254
+msgid "_Delete messages from server after download"
+msgstr ""
+
+#: ../src/mailbox-conf.c:1259
+#, fuzzy
+msgid "_Enable check for new mail"
+msgstr "(Des)activar li control de ortografie"
+
+#: ../src/mailbox-conf.c:1264
+msgid "_Filter messages through procmail"
+msgstr ""
+
+#: ../src/mailbox-conf.c:1268
+#, fuzzy
+msgid "Fi_lter Command:"
+msgstr "Tro_var:"
+
+#: ../src/mailbox-conf.c:1282
+#, fuzzy
+msgid "Disable _APOP"
+msgstr "_Depermisser"
+
+#. username
+#: ../src/mailbox-conf.c:1353
+msgid "_Username:"
+msgstr "Nómine de _usator:"
+
+#: ../src/mailbox-conf.c:1378
+#, fuzzy
+msgid "F_older path:"
+msgstr "Fól_der..."
+
+#: ../src/mailbox-conf.c:1468
+msgid "_Identity:"
+msgstr "_Identitá:"
+
+#: ../src/mailbox-conf.c:1510 ../src/pref-manager.c:3430
+msgid "Always"
+msgstr "Sempre"
+
+#: ../src/mailbox-conf.c:1514
+#, fuzzy
+msgid ""
+"_Decrypt and check\n"
+"signatures automatically:"
+msgstr "Automaticmen controlar nov versiones del programma"
+
+#: ../src/mailbox-conf.c:1545
+msgid "Show _Recipient column instead of Sender"
+msgstr ""
+
+#: ../src/mailbox-conf.c:1558
+#, fuzzy
+msgid "_Subscribe for new mail check"
+msgstr "Controlar _nov missages chascun"
+
+#: ../src/mailbox-node.c:314
+#, fuzzy
+msgid "The folder edition to be written."
+msgstr "Scrit de:"
+
+#: ../src/mailbox-node.c:489
+#, fuzzy, c-format
+msgid "Scanning %s. Please wait..."
+msgstr "Ples atender"
+
+#: ../src/mailbox-node.c:505
+#, c-format
+msgid ""
+"Scanning of %s failed: %s\n"
+"Check network connectivity."
+msgstr ""
+
+#: ../src/mailbox-node.c:507
+#, fuzzy, c-format
+msgid "Scanning of %s failed: %s"
+msgstr "Examinante «%s»..."
+
+#: ../src/mailbox-node.c:1044
+#, fuzzy
+msgid "Local _mbox mailbox..."
+msgstr "Local file mbox"
+
+#: ../src/mailbox-node.c:1046
+#, fuzzy
+msgid "Local Mail_dir mailbox..."
+msgstr "Local fólder de MH"
+
+#: ../src/mailbox-node.c:1048
+#, fuzzy
+msgid "Local M_H mailbox..."
+msgstr "%-e %B %H:%M"
+
+#: ../src/mailbox-node.c:1050
+#, fuzzy
+msgid "Remote _IMAP mailbox..."
+msgstr "Lettre-bux IMAP"
+
+#: ../src/mailbox-node.c:1053
+#, fuzzy
+msgid "Remote IMAP _folder..."
+msgstr "Lettre-bux IMAP"
+
+#: ../src/mailbox-node.c:1055
+#, fuzzy
+msgid "Remote IMAP _subfolder..."
+msgstr "Lettre-bux IMAP"
+
+#. clicked on the empty space
+#: ../src/mailbox-node.c:1066 ../src/mailbox-node.c:1082
+#, fuzzy
+msgid "_Rescan"
+msgstr "_Reexaminar"
+
+#: ../src/mailbox-node.c:1076 ../src/main-window.c:506
+msgid "_Properties..."
+msgstr "_Proprietás..."
+
+#: ../src/mailbox-node.c:1092
+msgid "_Open"
+msgstr "_Aperter"
+
+#: ../src/mailbox-node.c:1106
+msgid "_Subscribe"
+msgstr "_Abonnar"
+
+#: ../src/mailbox-node.c:1108
+msgid "_Unsubscribe"
+msgstr "D_esabonnar"
+
+#: ../src/mailbox-node.c:1114
+#, fuzzy
+msgid "Mark as _Inbox"
+msgstr "Rec_ivet:"
+
+#: ../src/mailbox-node.c:1116
+#, fuzzy
+msgid "_Mark as Sentbox"
+msgstr "Invia_t:"
+
+#: ../src/mailbox-node.c:1118
+msgid "Mark as _Trash"
+msgstr "Assignar quam _Paper-corb"
+
+#: ../src/mailbox-node.c:1120
+#, fuzzy
+msgid "Mark as D_raftbox"
+msgstr "_Marcar"
+
+#: ../src/mailbox-node.c:1123
+msgid "_Empty trash"
+msgstr "Vac_uar li Paper-corb"
+
+#: ../src/mailbox-node.c:1128
+#, fuzzy
+msgid "_Edit/Apply filters"
+msgstr "Applicar"
+
+#: ../src/mailbox-node.c:1216
+#, fuzzy, c-format
+msgid "The path \"%s\" does not lead to a mailbox."
+msgstr ""
+"Ne successat restartar: %s\n"
+"Esque $PATH ducte a %s?"
+
+#: ../src/mailbox-node.c:1229
+#, fuzzy, c-format
+msgid "Local mailbox %s loaded as: %s\n"
+msgstr "• Li module KVM es cargat: %s\n"
+
+#: ../src/mailbox-node.c:1260
+#, fuzzy, c-format
+msgid "Local folder %s\n"
+msgstr "Local fólder"
+
+#: ../src/main.c:210
+#, fuzzy, c-format
+msgid "Could not write to %s: %s"
+msgstr "Ne successat executer ssh_channel_write(): %s"
+
+#: ../src/main.c:460 ../src/main.c:509
+#, fuzzy
+msgid "Get new mail on startup"
+msgstr "Null nov missages"
+
+#: ../src/main.c:462 ../src/main.c:511
+#, fuzzy
+msgid "Compose a new email to EMAIL@ADDRESS"
+msgstr "Ne successat composter un nov missage"
+
+#: ../src/main.c:464
+#, fuzzy
+msgid "Attach file at PATH"
+msgstr "Atachar un file"
+
+#: ../src/main.c:466 ../src/main.c:516
+#, fuzzy
+msgid "Opens MAILBOXNAME"
+msgstr "<b>Aperter _med</b>"
+
+#: ../src/main.c:466 ../src/main.c:516
+msgid "MAILBOXNAME"
+msgstr ""
+
+#: ../src/main.c:469 ../src/main.c:519
+msgid "Opens first unread mailbox"
+msgstr ""
+
+#: ../src/main.c:472 ../src/main.c:522
+#, fuzzy
+msgid "Opens default Inbox on startup"
+msgstr "«Recivet» predefinit"
+
+#: ../src/main.c:475 ../src/main.c:525
+msgid "Prints number unread and unsent messages"
+msgstr ""
+
+#: ../src/main.c:477 ../src/main.c:527
+#, fuzzy
+msgid "Debug POP3 connection"
+msgstr "Debug"
+
+#: ../src/main.c:479 ../src/main.c:529
+#, fuzzy
+msgid "Debug IMAP connection"
+msgstr "Debug"
+
+#: ../src/main.c:501
+msgid "The Balsa E-Mail Client"
+msgstr "Client de postage Balsa"
+
+#: ../src/main.c:513
+#, fuzzy
+msgid "Attach file at URI"
+msgstr "Atachar un file"
+
+#: ../src/main.c:554
+#, fuzzy, c-format
+msgid "Run '%s --help' to see a full list of available command line options.\n"
+msgstr "Usa «%s --help» por vider li complet liste de disponibil optiones."
+
+#: ../src/main.c:601 ../src/main.c:606 ../src/main.c:612 ../src/main.c:618
+#: ../src/main.c:624
+#, c-format
+msgid "Balsa cannot open your \"%s\" mailbox."
+msgstr ""
+
+#: ../src/main.c:601
+msgid "Inbox"
+msgstr "Recivet"
+
+#: ../src/main.c:607
+msgid "Outbox"
+msgstr "Salient"
+
+#: ../src/main.c:613
+msgid "Sentbox"
+msgstr "Inviat"
+
+#: ../src/main.c:619
+msgid "Draftbox"
+msgstr "Esquisses"
+
+#: ../src/main.c:624
+msgid "Trash"
+msgstr "Paper-corb"
+
+#: ../src/main.c:843
+#, fuzzy
+msgid "Compressing mail folders..."
+msgstr "Fólderes de postage"
+
+#: ../src/main-window.c:322
+msgid "Balsa closes files and connections. Please wait..."
+msgstr ""
+
+#: ../src/main-window.c:347
+msgid "Mail_box"
+msgstr "Lettre-_bux"
+
+#: ../src/main-window.c:348 ../src/message-window.c:241
+msgid "_Message"
+msgstr "_Missage"
+
+#: ../src/main-window.c:349
+msgid "_Settings"
+msgstr "_Parametres"
+
+#: ../src/main-window.c:355
+#, fuzzy
+msgid "Mail_boxes"
+msgstr "Buxes"
+
+#. Less frequently used entries of the 'View' menu
+#. Less frequently used entries of the 'Message' menu
+#. Less frequently used entries of the 'File' menu
+#. Less frequently used entries of the 'Edit' menu
+#. Less frequently used entries of the 'Tools' menu
+#: ../src/main-window.c:357 ../src/main-window.c:362
+#: ../src/sendmsg-window.c:330 ../src/sendmsg-window.c:332
+#: ../src/sendmsg-window.c:334
+msgid "_More"
+msgstr "_Plu"
+
+#: ../src/main-window.c:358
+#, fuzzy
+msgid "_Headers"
+msgstr "Cap-lineas"
+
+#: ../src/main-window.c:359
+#, fuzzy
+msgid "_Sort Mailbox"
+msgstr "Lettre-bux"
+
+#: ../src/main-window.c:360
+#, fuzzy
+msgid "H_ide messages"
+msgstr "C_elar"
+
+#: ../src/main-window.c:363 ../src/sendmsg-window.c:328
+msgid "_Tools"
+msgstr "_Instrumentarium"
+
+#: ../src/main-window.c:364
+msgid "_Filters"
+msgstr "_Filtres"
+
+#: ../src/main-window.c:365
+msgid "F_ilters"
+msgstr "F_iltres"
+
+#: ../src/main-window.c:366 ../src/main-window.c:422
+#, fuzzy
+msgid "Manage filters"
+msgstr "Gerentie de filtres"
+
+#. File menu items
+#. Not in the touchpad menu, but still available as a toolbar
+#. * button:
+#: ../src/main-window.c:371
+msgid "_Continue"
+msgstr "_Continuar"
+
+#: ../src/main-window.c:372
+#, fuzzy
+msgid "Continue editing current message"
+msgstr "Continuar reproduction pos li actual track"
+
+#: ../src/main-window.c:374
+#, fuzzy
+msgid "_Get New Mail"
+msgstr "Reciver postage"
+
+#: ../src/main-window.c:375
+#, fuzzy
+msgid "Fetch new incoming mail"
+msgstr "Null nov missages"
+
+#: ../src/main-window.c:376
+#, fuzzy
+msgid "_Send Queued Mail"
+msgstr "_Inviar e-post a..."
+
+#: ../src/main-window.c:377
+#, fuzzy
+msgid "Send messages from the outbox"
+msgstr "  --send                 inviar omni missages in linea"
+
+#: ../src/main-window.c:380
+#, fuzzy
+msgid "Send and _Receive Mail"
+msgstr "Inviar per li e-post..."
+
+#: ../src/main-window.c:381
+#, fuzzy
+msgid "Send and Receive messages"
+msgstr "  --send                 inviar omni missages in linea"
+
+#: ../src/main-window.c:383 ../src/message-window.c:242
+#: ../src/sendmsg-window.c:347
+#, fuzzy
+msgid "Page _Setup"
+msgstr "Formate de págine"
+
+#: ../src/main-window.c:384 ../src/message-window.c:243
+#: ../src/sendmsg-window.c:348
+#, fuzzy
+msgid "Set up page for printing"
+msgstr "Printante págine %d ex %d..."
+
+#: ../src/main-window.c:385
+msgid "_Address Book..."
+msgstr "_Adressarium..."
+
+#: ../src/main-window.c:386
+msgid "Open the address book"
+msgstr "Aperter li adressarium"
+
+#: ../src/main-window.c:387
+#, fuzzy
+msgid "Quit Balsa"
+msgstr "Balsa"
+
+#. File:New submenu items
+#: ../src/main-window.c:390
+msgid "_Message..."
+msgstr "_Missage..."
+
+#: ../src/main-window.c:391
+#, fuzzy
+msgid "Compose a new message"
+msgstr "Composir un _nov missage"
+
+#: ../src/main-window.c:393
+#, fuzzy
+msgid "Local mbox mailbox..."
+msgstr "Local file mbox"
+
+#: ../src/main-window.c:394 ../src/main-window.c:403
+#, fuzzy
+msgid "Add a new mbox style mailbox"
+msgstr "Adjunter un nov lettre-bux"
+
+#: ../src/main-window.c:396
+#, fuzzy
+msgid "Local Maildir mailbox..."
+msgstr "Lettre-bux"
+
+#: ../src/main-window.c:397 ../src/main-window.c:406
+#, fuzzy
+msgid "Add a new Maildir style mailbox"
+msgstr "Adjunter un nov lettre-bux"
+
+#: ../src/main-window.c:399
+#, fuzzy
+msgid "Local MH mailbox..."
+msgstr "Local fólder de MH"
+
+#: ../src/main-window.c:400 ../src/main-window.c:409
+#, fuzzy
+msgid "Add a new MH style mailbox"
+msgstr "Adjunter un nov lettre-bux"
+
+#: ../src/main-window.c:402
+#, fuzzy
+msgid "New mailbox..."
+msgstr "Adjunter un nov lettre-bux"
+
+#: ../src/main-window.c:405
+#, fuzzy
+msgid "New \"Maildir\" mailbox..."
+msgstr "Adjunter un nov lettre-bux"
+
+#: ../src/main-window.c:408
+#, fuzzy
+msgid "New \"MH\" mailbox..."
+msgstr "Adjunter un nov lettre-bux"
+
+#: ../src/main-window.c:411 ../src/pref-manager.c:3279
+#, fuzzy
+msgid "Remote IMAP mailbox..."
+msgstr "Lettre-bux IMAP"
+
+#: ../src/main-window.c:412
+#, fuzzy
+msgid "Add a new IMAP mailbox"
+msgstr "Adjunter un nov lettre-bux"
+
+#: ../src/main-window.c:413 ../src/pref-manager.c:3284
+#, fuzzy
+msgid "Remote IMAP folder..."
+msgstr "Lettre-bux IMAP"
+
+#: ../src/main-window.c:414
+#, fuzzy
+msgid "Add a new IMAP folder"
+msgstr "Adjuncter un nov vacui fólder"
+
+#: ../src/main-window.c:415
+#, fuzzy
+msgid "Remote IMAP subfolder..."
+msgstr "Lettre-bux IMAP"
+
+#: ../src/main-window.c:416
+#, fuzzy
+msgid "Add a new IMAP subfolder"
+msgstr "Adjunter un nov labor-spacie"
+
+#: ../src/main-window.c:421
+msgid "F_ilters..."
+msgstr "F_iltres..."
+
+#. Export selected filters to a text file.
+#: ../src/main-window.c:424
+#, fuzzy
+msgid "_Export Filters..."
+msgstr "Exportar quam..."
+
+#: ../src/main-window.c:425
+msgid "Export filters as Sieve scripts"
+msgstr ""
+
+#: ../src/main-window.c:426
+msgid "Prefere_nces"
+msgstr "Prefere_nties"
+
+#. View menu items
+#: ../src/main-window.c:429
+#, fuzzy
+msgid "E_xpand All"
+msgstr "E_xpander omni nodes"
+
+#: ../src/main-window.c:430
+#, fuzzy
+msgid "Expand all threads"
+msgstr "_Expander omni"
+
+#: ../src/main-window.c:431
+#, fuzzy
+msgid "_Collapse All"
+msgstr "_Contraer omni"
+
+#: ../src/main-window.c:432
+#, fuzzy
+msgid "Collapse all expanded threads"
+msgstr "_Contraer omni"
+
+#: ../src/main-window.c:434 ../src/message-window.c:257
+msgid "Zoom _In"
+msgstr "_Agrandar"
+
+#: ../src/main-window.c:435 ../src/message-window.c:258
+#, fuzzy
+msgid "Increase magnification"
+msgstr "Agrandation"
+
+#: ../src/main-window.c:436 ../src/message-window.c:259
+msgid "Zoom _Out"
+msgstr "_Diminuer"
+
+#: ../src/main-window.c:437 ../src/message-window.c:260
+#, fuzzy
+msgid "Decrease magnification"
+msgstr "Agrandation"
+
+#. To warn msgfmt that the % sign isn't a format specifier:
+#: ../src/main-window.c:440 ../src/message-window.c:263
+#, fuzzy, no-c-format
+msgid "Zoom _100%"
+msgstr "Scale de 100%"
+
+#: ../src/main-window.c:441 ../src/message-window.c:264
+#, fuzzy
+msgid "No magnification"
+msgstr "Agrandation"
+
+#. Mailbox menu item that does not require a mailbox
+#: ../src/main-window.c:444 ../src/main-window.c:445
+#: ../src/message-window.c:298 ../src/message-window.c:299
+#, fuzzy
+msgid "Next Unread Message"
+msgstr "Ínleet missage"
+
+#: ../src/main-window.c:447
+msgid "Empty _Trash"
+msgstr "Vacuar li _Paper-corb"
+
+#: ../src/main-window.c:448
+#, fuzzy
+msgid "Delete messages from the Trash mailbox"
+msgstr "_Deleter ex li Paper-corb"
+
+#. Settings menu items
+#: ../src/main-window.c:451
+#, fuzzy
+msgid "_Toolbars..."
+msgstr "Paneles de _instrumentarium"
+
+#: ../src/main-window.c:452
+#, fuzzy
+msgid "Customize toolbars"
+msgstr "Adjustar"
+
+#: ../src/main-window.c:453
+msgid "_Identities..."
+msgstr "_Identitás..."
+
+#: ../src/main-window.c:454
+#, fuzzy
+msgid "Create and set current identities"
+msgstr "Assignar un image quam li Tapete"
+
+#. Help menu items
+#: ../src/main-window.c:457
+msgid "_Contents"
+msgstr "_Contenete"
+
+#: ../src/main-window.c:458
+#, fuzzy
+msgid "Table of Contents"
+msgstr "Contenete"
+
+#. license ?
+#: ../src/main-window.c:479 ../src/main-window.c:2774
+msgid "About Balsa"
+msgstr "Pri Balsa"
+
+#. Edit menu items
+#: ../src/main-window.c:486 ../src/message-window.c:251
+#: ../src/sendmsg-window.c:364
+msgid "Select _All"
+msgstr "Selecter _omni"
+
+#: ../src/main-window.c:488
+msgid "_Find"
+msgstr "_Trovar"
+
+#: ../src/main-window.c:490
+#, fuzzy
+msgid "Find Ne_xt"
+msgstr "Trovar se_quent"
+
+#. Mailbox menu items
+#: ../src/main-window.c:493 ../src/main-window.c:494
+#: ../src/message-window.c:296 ../src/message-window.c:297
+msgid "Next Message"
+msgstr "Sequent missage"
+
+#: ../src/main-window.c:495 ../src/main-window.c:496
+#: ../src/message-window.c:301 ../src/message-window.c:302
+msgid "Previous Message"
+msgstr "Precedent missage"
+
+#: ../src/main-window.c:497 ../src/main-window.c:498
+#: ../src/message-window.c:303 ../src/message-window.c:304
+#, fuzzy
+msgid "Next Flagged Message"
+msgstr "_Sequent missage"
+
+#: ../src/main-window.c:500
+#, fuzzy
+msgid "_Hide Messages"
+msgstr "Missages"
+
+#: ../src/main-window.c:501
+#, fuzzy
+msgid "_Reset Filter"
+msgstr "Reverter li filtre"
+
+#: ../src/main-window.c:502
+#, fuzzy
+msgid "Reset mailbox filter"
+msgstr "Reverter li filtre"
+
+#: ../src/main-window.c:503
+msgid "_Select All"
+msgstr "Selecter _omnicos"
+
+#: ../src/main-window.c:504
+msgid "Select all messages in current mailbox"
+msgstr ""
+
+#: ../src/main-window.c:507
+#, fuzzy
+msgid "Edit the selected mailbox"
+msgstr "Modificar li lettre-bux: %s"
+
+#: ../src/main-window.c:508
+msgid "_Delete..."
+msgstr "_Deleter..."
+
+#: ../src/main-window.c:509
+#, fuzzy
+msgid "Delete the selected mailbox"
+msgstr "Lettre-bux"
+
+#: ../src/main-window.c:512 ../src/main-window.c:515
+msgid "E_xpunge Deleted Messages"
+msgstr ""
+
+#: ../src/main-window.c:513 ../src/main-window.c:516
+msgid "Expunge messages marked as deleted in the current mailbox"
+msgstr ""
+
+#: ../src/main-window.c:519
+#, fuzzy
+msgid "Close mailbox"
+msgstr "Lettre-bux"
+
+#: ../src/main-window.c:521
+#, fuzzy
+msgid "Select _Filters"
+msgstr " Filtres "
+
+#: ../src/main-window.c:522
+msgid "Select filters to be applied automatically to current mailbox"
+msgstr ""
+
+#: ../src/main-window.c:525
+msgid "_Remove Duplicates"
+msgstr "_Remover duplicates"
+
+#: ../src/main-window.c:526
+msgid "Remove duplicated messages from the current mailbox"
+msgstr ""
+
+#: ../src/main-window.c:536 ../src/message-window.c:267
+#, fuzzy
+msgid "Reply to the current message"
+msgstr "Responder-a:"
+
+#: ../src/main-window.c:537 ../src/message-window.c:268
+msgid "Reply to _All..."
+msgstr "Responder a _omni..."
+
+#: ../src/main-window.c:538 ../src/message-window.c:269
+msgid "Reply to all recipients of the current message"
+msgstr ""
+
+#: ../src/main-window.c:540 ../src/message-window.c:271
+msgid "Reply to _Group..."
+msgstr "Responder a _gruppe..."
+
+#: ../src/main-window.c:541 ../src/message-window.c:272
+#, fuzzy
+msgid "Reply to mailing list"
+msgstr "P_ostage-liste:"
+
+#: ../src/main-window.c:543
+msgid "Store address of sender in addressbook"
+msgstr ""
+
+#: ../src/main-window.c:545 ../src/message-window.c:276
+msgid "_View Source..."
+msgstr "_Vider li fonte..."
+
+#: ../src/main-window.c:546 ../src/message-window.c:277
+#, fuzzy
+msgid "View source form of the message"
+msgstr "_Vider li fonte..."
+
+#. All three "Forward" actions and the "Pipe" action have the same
+#. * stock_id; the first in this list defines the action tied to the
+#. * toolbar's Forward button, so "ForwardDefault" must come before
+#. * the others.
+#: ../src/main-window.c:552
+msgid "_Forward..."
+msgstr "_Transmisser..."
+
+#: ../src/main-window.c:553 ../src/message-window.c:283
+msgid "Forward the current message"
+msgstr "Transmisser li actual missage"
+
+#: ../src/main-window.c:556 ../src/message-window.c:285
+msgid "_Forward attached..."
+msgstr "_Transmisser quam atachament..."
+
+#: ../src/main-window.c:557 ../src/message-window.c:286
+#, fuzzy
+msgid "Forward the current message as attachment"
+msgstr "Transmisser li actual missage"
+
+#: ../src/main-window.c:559 ../src/message-window.c:288
+#, fuzzy
+msgid "Forward _inline..."
+msgstr "_Transmisser..."
+
+#: ../src/main-window.c:560 ../src/message-window.c:289
+#, fuzzy
+msgid "Forward the current message inline"
+msgstr "Transmisser li actual missage"
+
+#: ../src/main-window.c:563
+msgid "Pipe the message through another program"
+msgstr ""
+
+#: ../src/main-window.c:565
+#, fuzzy
+msgid "Select _Thread"
+msgstr "Tema"
+
+#: ../src/main-window.c:566
+msgid "Select all messages in current thread"
+msgstr ""
+
+#. File menu item
+#: ../src/main-window.c:574 ../src/message-window.c:244
+#: ../src/sendmsg-window.c:350
+msgid "_Print..."
+msgstr "_Printar..."
+
+#: ../src/main-window.c:575 ../src/message-window.c:245
+#, fuzzy
+msgid "Print current message"
+msgstr "Printar li actual págine"
+
+#: ../src/main-window.c:576 ../src/message-window.c:273
+#, fuzzy
+msgid "Save Current Part..."
+msgstr "Gardar li actual CSS"
+
+#: ../src/main-window.c:577 ../src/message-window.c:274
+msgid "Save currently displayed part of message"
+msgstr ""
+
+#: ../src/main-window.c:580 ../src/message-window.c:291
+#, fuzzy
+msgid "_Next Part"
+msgstr "_Seq >"
+
+#: ../src/main-window.c:581 ../src/message-window.c:292
+#, fuzzy
+msgid "Next part in message"
+msgstr "_Sequent missage"
+
+#: ../src/main-window.c:582 ../src/message-window.c:293
+#, fuzzy
+msgid "_Previous Part"
+msgstr "< _Prec"
+
+#: ../src/main-window.c:583 ../src/message-window.c:294
+#, fuzzy
+msgid "Previous part in message"
+msgstr "_Precedent missage"
+
+#: ../src/main-window.c:586
+#, fuzzy
+msgid "Copy message"
+msgstr "Copiar _a..."
+
+#: ../src/main-window.c:589
+#, fuzzy
+msgid "Find in _Message"
+msgstr "Trovar sur..."
+
+#: ../src/main-window.c:590 ../src/message-window.c:254
+#, fuzzy
+msgid "Find a string in this message"
+msgstr "Trovar un sequent occurrentie de textu"
+
+#: ../src/main-window.c:600 ../src/message-window.c:306
+msgid "_Move to Trash"
+msgstr "_Mover in li Paper-corb"
+
+#: ../src/main-window.c:601 ../src/main-window.c:605
+msgid "Move the current message to Trash mailbox"
+msgstr ""
+
+#: ../src/main-window.c:604
+#, fuzzy
+msgid "_Delete to Trash"
+msgstr "_Deleter ex li Paper-corb"
+
+#: ../src/main-window.c:608 ../src/main-window.c:617
+#, fuzzy
+msgid "Toggle New"
+msgstr "(De)marcar"
+
+#: ../src/main-window.c:610
+#, fuzzy
+msgid "_Toggle Flag"
+msgstr "_Flaggar"
+
+#: ../src/main-window.c:613
+#, fuzzy
+msgid "Toggle flagged"
+msgstr "ne flaggat"
+
+#. Hide messages menu items
+#: ../src/main-window.c:614 ../src/main-window.c:649
+msgid "_Deleted"
+msgstr "_Deletet"
+
+#: ../src/main-window.c:615
+#, fuzzy
+msgid "Toggle deleted flag"
+msgstr "Removet"
+
+#: ../src/main-window.c:618 ../src/main-window.c:661
+msgid "_Answered"
+msgstr "Resp_ondet"
+
+#: ../src/main-window.c:619
+#, fuzzy
+msgid "Toggle Answered"
+msgstr "Resp_ondet"
+
+#: ../src/main-window.c:626
+#, fuzzy
+msgid "_Show Mailbox Tree"
+msgstr "Monstrar li statu del árbor de labor"
+
+#: ../src/main-window.c:627
+msgid "Toggle display of mailbox and folder tree"
+msgstr ""
+
+#: ../src/main-window.c:629
+#, fuzzy
+msgid "Show Mailbox _Tabs"
+msgstr "Lettre-bux"
+
+#: ../src/main-window.c:630
+msgid "Toggle display of mailbox notebook tabs"
+msgstr ""
+
+#: ../src/main-window.c:632 ../src/message-window.c:313
+#, fuzzy
+msgid "Show Too_lbar"
+msgstr "_Instrumentarium"
+
+#: ../src/main-window.c:634
+#, fuzzy
+msgid "Show St_atus Bar"
+msgstr "Monstrar li panel del _statu"
+
+#: ../src/main-window.c:636
+#, fuzzy
+msgid "Show _Index Filter"
+msgstr "Panel _láteral de filtre"
+
+#: ../src/main-window.c:639
+#, fuzzy
+msgid "_Descending"
+msgstr "Secun _descension"
+
+#: ../src/main-window.c:640
+#, fuzzy
+msgid "Sort in a descending order"
+msgstr "Ordinar elementes secun descension"
+
+#: ../src/main-window.c:642
+#, fuzzy
+msgid "_View filter"
+msgstr "&Filtre..."
+
+#: ../src/main-window.c:643
+msgid "Enable quick message index filter"
+msgstr ""
+
+#: ../src/main-window.c:646 ../src/message-window.c:315
+#, fuzzy
+msgid "_Wrap"
+msgstr "Rupter lineas"
+
+#: ../src/main-window.c:646 ../src/message-window.c:315
+#: ../src/sendmsg-window.c:367
+#, fuzzy
+msgid "Wrap message lines"
+msgstr "Rupter long lineas"
+
+#: ../src/main-window.c:651
+#, fuzzy
+msgid "Un_Deleted"
+msgstr "Removet"
+
+#: ../src/main-window.c:653
+msgid "_Read"
+msgstr "_Leet"
+
+#: ../src/main-window.c:655
+#, fuzzy
+msgid "Un_read"
+msgstr "De_minimisar omni"
+
+#: ../src/main-window.c:659
+#, fuzzy
+msgid "Un_flagged"
+msgstr "ne flaggat"
+
+#: ../src/main-window.c:663
+#, fuzzy
+msgid "Un_answered"
+msgstr "Resp_ondet"
+
+#. Toolbar items not on any menu
+#: ../src/main-window.c:666 ../src/toolbar-factory.c:159
+#, fuzzy
+msgid ""
+"All\n"
+"headers"
+msgstr "Cap-lineas"
+
+#: ../src/main-window.c:667 ../src/message-window.c:318
+#, fuzzy
+msgid "Show all headers"
+msgstr "Cap-lineas"
+
+#: ../src/main-window.c:669 ../src/toolbar-factory.c:161
+#, fuzzy
+msgid "Msg Preview"
+msgstr "_Previder"
+
+#: ../src/main-window.c:670
+#, fuzzy
+msgid "Show preview pane"
+msgstr "Prevision"
+
+#: ../src/main-window.c:676 ../src/message-window.c:324
+#, fuzzy
+msgid "_No Headers"
+msgstr "Cap-lineas"
+
+#: ../src/main-window.c:677 ../src/message-window.c:325
+#, fuzzy
+msgid "Display no headers"
+msgstr "Cap-lineas"
+
+#: ../src/main-window.c:678
+#, fuzzy
+msgid "S_elected Headers"
+msgstr "Mover s_electet subtitules"
+
+#: ../src/main-window.c:679 ../src/message-window.c:327
+#, fuzzy
+msgid "Display selected headers"
+msgstr "Remover li selectet profil de monitor."
+
+#: ../src/main-window.c:680 ../src/message-window.c:328
+#, fuzzy
+msgid "All _Headers"
+msgstr "Cap-lineas"
+
+#: ../src/main-window.c:681 ../src/message-window.c:329
+#, fuzzy
+msgid "Display all headers"
+msgstr "Cap-lineas"
+
+#: ../src/main-window.c:685
+#, fuzzy
+msgid "_Flat index"
+msgstr "Plat"
+
+#: ../src/main-window.c:686
+#, fuzzy
+msgid "No threading at all"
+msgstr "Ne por omni"
+
+#: ../src/main-window.c:687
+#, fuzzy
+msgid "Si_mple threading"
+msgstr "Si_gnar"
+
+#: ../src/main-window.c:688
+#, fuzzy
+msgid "Simple threading algorithm"
+msgstr "Simplic"
+
+#: ../src/main-window.c:689
+#, fuzzy
+msgid "_JWZ threading"
+msgstr "JWZ"
+
+#: ../src/main-window.c:690
+#, fuzzy
+msgid "Elaborate JWZ threading"
+msgstr "JWZ"
+
+#: ../src/main-window.c:695
+msgid "By _Arrival"
+msgstr ""
+
+#: ../src/main-window.c:696
+#, fuzzy
+msgid "Arrival order"
+msgstr "Ordinar:"
+
+#: ../src/main-window.c:697
+#, fuzzy
+msgid "By _Sender"
+msgstr "_Inviator"
+
+#: ../src/main-window.c:698
+#, fuzzy
+msgid "Sender order"
+msgstr "_Inviator"
+
+#: ../src/main-window.c:699
+#, fuzzy
+msgid "By S_ubject"
+msgstr "Secun li _tema"
+
+#: ../src/main-window.c:700
+#, fuzzy
+msgid "Subject order"
+msgstr "(Tema manca)"
+
+#: ../src/main-window.c:701
+#, fuzzy
+msgid "By Si_ze"
+msgstr "_Grandore:"
+
+#: ../src/main-window.c:702
+#, fuzzy
+msgid "By message size"
+msgstr "secun _grandore"
+
+#: ../src/main-window.c:703
+msgid "_Threaded"
+msgstr ""
+
+#: ../src/main-window.c:704
+#, fuzzy
+msgid "Use message threading"
+msgstr "Usar"
+
+#: ../src/main-window.c:1065
+msgid ""
+"Balsa is sending a mail now.\n"
+"Abort sending?"
+msgstr ""
+
+#: ../src/main-window.c:1235
+#, fuzzy
+msgid "Subject or Sender Contains:"
+msgstr "Tema"
+
+#: ../src/main-window.c:1236
+#, fuzzy
+msgid "Subject or Recipient Contains:"
+msgstr "Tema"
+
+#: ../src/main-window.c:1237
+#, fuzzy
+msgid "Subject Contains:"
+msgstr "(Tema manca)"
+
+#: ../src/main-window.c:1238
+#, fuzzy
+msgid "Body Contains:"
+msgstr "contene"
+
+#: ../src/main-window.c:1239
+#, fuzzy
+msgid "Older than (days):"
+msgstr "dies"
+
+#: ../src/main-window.c:1240
+#, fuzzy
+msgid "Old at most (days):"
+msgstr "admaxim"
+
+#: ../src/main-window.c:2369
+#, fuzzy, c-format
+msgid "Opening %s"
+msgstr "Apertente %s"
+
+#: ../src/main-window.c:2386
+#, fuzzy, c-format
+msgid ""
+"Unable to Open Mailbox!\n"
+"%s."
+msgstr "Ne successat aperter un fólder por %s"
+
+#: ../src/main-window.c:2758
+msgid "translator-credits"
+msgstr "OIS <mistresssilvara@hotmail.com>, 2016"
+
+#: ../src/main-window.c:2769
+msgid "The Balsa email client is part of the GNOME desktop environment."
+msgstr ""
+
+#: ../src/main-window.c:2871 ../src/main-window.c:2889
+#, fuzzy
+msgid "Checking Mail..."
+msgstr "Provante codificationes..."
+
+#: ../src/main-window.c:3092
+#, fuzzy, c-format
+msgid "IMAP mailbox: %s"
+msgstr "Lettre-bux IMAP"
+
+#: ../src/main-window.c:3096
+#, fuzzy, c-format
+msgid "Local mailbox: %s"
+msgstr "Modificar li lettre-bux: %s"
+
+#: ../src/main-window.c:3252
+#, fuzzy
+msgid "Finished Checking."
+msgstr "[ Completat ]"
+
+#: ../src/main-window.c:3317
+#, fuzzy, c-format
+msgid "Sending error: %s"
+msgstr "Un errore evenit inviante li signale"
+
+#: ../src/main-window.c:3382
+#, c-format
+msgid "You have received %d new message."
+msgid_plural "You have received %d new messages."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/main-window.c:3385
+#, fuzzy
+msgid "You have new mail."
+msgstr "Balsa: vu recivet nov postage."
+
+#: ../src/main-window.c:3426
+#, c-format
+msgid "Balsa: you have received %d new message."
+msgid_plural "Balsa: you have received %d new messages."
+msgstr[0] "Balsa: vu ha recivet %d nov missage."
+msgstr[1] "Balsa: vu ha recivet %d nov missages."
+
+#: ../src/main-window.c:3430
+msgid "Balsa: you have new mail."
+msgstr "Balsa: vu recivet nov postage."
+
+#: ../src/main-window.c:3490
+#, fuzzy
+msgid "Balsa: New mail"
+msgstr "Balsa: vu recivet nov postage."
+
+#: ../src/main-window.c:3779
+#, fuzzy, c-format
+msgid "The next unread message is in %s"
+msgstr "Ínleet missage"
+
+#: ../src/main-window.c:3786
+#, fuzzy, c-format
+msgid "Do you want to select %s?"
+msgstr "Esque vu vole superscrir li playlist: %s?"
+
+#: ../src/main-window.c:4319
+#, fuzzy
+msgid "Search mailbox"
+msgstr "Lettre-bux"
+
+#: ../src/main-window.c:4339
+#, fuzzy
+msgid "_Search for:"
+msgstr "_Serchar por:"
+
+#. builds the toggle buttons to specify fields concerned by
+#. * the search.
+#: ../src/main-window.c:4352
+msgid "In:"
+msgstr "In:"
+
+#: ../src/main-window.c:4363
+msgid "S_ubject"
+msgstr "_Tema"
+
+#. Frame with Apply and Clear buttons
+#: ../src/main-window.c:4368
+#, fuzzy
+msgid "Show only matching messages"
+msgstr "Monstrar errores de auto-conexion"
+
+#. Frame with OK button
+#: ../src/main-window.c:4389
+#, fuzzy
+msgid "Open next matching message"
+msgstr "Ear al secuent textu"
+
+#: ../src/main-window.c:4400
+#, fuzzy
+msgid "_Reverse search"
+msgstr "_Reversat"
+
+#: ../src/main-window.c:4405
+#, fuzzy
+msgid "_Wrap around"
+msgstr "_Ciclic"
+
+#: ../src/main-window.c:4580
+msgid "You can apply filters only on mailbox\n"
+msgstr ""
+
+#: ../src/main-window.c:4595
+#, fuzzy, c-format
+msgid "Removing duplicates failed: %s"
+msgstr "Removente element %s ex %s"
+
+#: ../src/main-window.c:4601
+#, c-format
+msgid "Removed %d duplicate"
+msgid_plural "Removed %d duplicates"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/main-window.c:4606
+#, fuzzy
+msgid "No duplicates found"
+msgstr "Duplicates:"
+
+#: ../src/main-window.c:4835
+#, fuzzy, c-format
+msgid "Could not open trash: %s"
+msgstr "Li Paper-corb es índisponibil. Ne posse mover «%s» in li Paper-corb."
+
+#: ../src/main-window.c:4983
+#, fuzzy, c-format
+msgid "Balsa: %s (readonly)"
+msgstr "Balsa: %s"
+
+#: ../src/main-window.c:4985
+#, c-format
+msgid "Balsa: %s"
+msgstr "Balsa: %s"
+
+#. xgettext: this is the first part of the message
+#. * "Shown mailbox: %s with %d messages, %d new, %d hidden".
+#: ../src/main-window.c:5566
+#, fuzzy, c-format
+msgid "Shown mailbox: %s "
+msgstr "Modificar li lettre-bux: %s"
+
+#: ../src/main-window.c:5571
+#, c-format
+msgid "with %d message"
+msgid_plural "with %d messages"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../src/main-window.c:5578
+#, c-format
+msgid ", %d new"
+msgid_plural ", %d new"
+msgstr[0] ", %d nov"
+msgstr[1] ", %d nov"
+
+#: ../src/main-window.c:5585
+#, c-format
+msgid ", %d hidden"
+msgid_plural ", %d hidden"
+msgstr[0] ", %d celat"
+msgstr[1] ", %d celat"
+
+#: ../src/message-window.c:240
+msgid "M_ove"
+msgstr "M_over"
+
+#: ../src/message-window.c:247
+#, fuzzy
+msgid "Close the message window"
+msgstr "Clúder li fenestre del message"
+
+#: ../src/message-window.c:253
+#, fuzzy
+msgid "_Find in message"
+msgstr "Trovar sur..."
+
+#: ../src/message-window.c:307
+#, fuzzy
+msgid "Move the message to Trash mailbox"
+msgstr "Ne posset mover li file in li Paper-corb"
+
+#: ../src/message-window.c:314
+#, fuzzy
+msgid "Show toolbar"
+msgstr "Monstrar li panel de instrumentarium"
+
+#: ../src/message-window.c:326
+#, fuzzy
+msgid "_Selected Headers"
+msgstr "Cap-lineas"
+
+#: ../src/message-window.c:1048
+#, fuzzy, c-format
+msgid "Message from %s: %s"
+msgstr "de «%s» ex «%s» (%s)"
+
+#: ../src/pref-manager.c:400
+#, fuzzy
+msgid "While retrieving messages"
+msgstr "Obtenente fil-nómines... %s octetes"
+
+#: ../src/pref-manager.c:401
+#, fuzzy
+msgid "Until closed"
+msgstr "Cluder cartes"
+
+#: ../src/pref-manager.c:407
+#, fuzzy
+msgid "Fast"
+msgstr "Rapid"
+
+#: ../src/pref-manager.c:408
+msgid "Normal"
+msgstr "Normal"
+
+#: ../src/pref-manager.c:409
+#, fuzzy
+msgid "Bad spellers"
+msgstr "Signature ínvalid"
+
+#: ../src/pref-manager.c:415
+#, fuzzy
+msgid "Message number"
+msgstr "Numeró de textu:"
+
+#: ../src/pref-manager.c:419
+#, fuzzy
+msgid "Sender"
+msgstr "Inviator"
+
+#: ../src/pref-manager.c:423
+#, fuzzy
+msgid "Flat"
+msgstr "Plat"
+
+#: ../src/pref-manager.c:425
+msgid "JWZ"
+msgstr "JWZ"
+
+#. must NOT be modal
+#: ../src/pref-manager.c:521
+msgid "Balsa Preferences"
+msgstr "Preferenties de Balsa"
+
+#: ../src/pref-manager.c:575
+#, fuzzy
+msgid "Mail options"
+msgstr ""
+"\n"
+"Optiones:\n"
+
+#: ../src/pref-manager.c:577
+#, fuzzy
+msgid "Display options"
+msgstr "Parametres de monitor"
+
+#: ../src/pref-manager.c:579 ../src/pref-manager.c:2907
+msgid "Address books"
+msgstr "Adressariums"
+
+#: ../src/pref-manager.c:583 ../src/toolbar-factory.c:155
+msgid "Spelling"
+msgstr "Ortografie"
+
+#: ../src/pref-manager.c:587
+#, fuzzy
+msgid "Startup"
+msgstr "Al inicie"
+
+#: ../src/pref-manager.c:589 ../src/pref-manager.c:2695
+#, fuzzy
+msgid "Miscellaneous"
+msgstr "Diversi"
+
+#: ../src/pref-manager.c:1409
+#, fuzzy, c-format
+msgid "%s (default)"
+msgstr "%s (Predefinit)"
+
+#: ../src/pref-manager.c:1669
+#, fuzzy
+msgid "Remote mailbox servers"
+msgstr "Lettre-bux de GMail"
+
+#: ../src/pref-manager.c:1690 ../src/pref-manager.c:2928
+#: ../src/sendmsg-window.c:3030
+msgid "Type"
+msgstr "Tip"
+
+#: ../src/pref-manager.c:1698
+#, fuzzy
+msgid "Mailbox name"
+msgstr "Nómine de lettre-bux:"
+
+#: ../src/pref-manager.c:1712 ../src/pref-manager.c:1785
+#: ../src/pref-manager.c:2963
+#, fuzzy
+msgid "_Modify"
+msgstr "_Modificar..."
+
+#: ../src/pref-manager.c:1726
+#, fuzzy
+msgid "Local mail directory"
+msgstr "Local fólder de MH"
+
+#: ../src/pref-manager.c:1728
+msgid "Select your local mail directory"
+msgstr ""
+
+#: ../src/pref-manager.c:1749
+#, fuzzy
+msgid "Outgoing mail servers"
+msgstr "_Servitores:"
+
+#: ../src/pref-manager.c:1771
+#, fuzzy
+msgid "Server name"
+msgstr "Nómine de servitore"
+
+#: ../src/pref-manager.c:1811
+#, fuzzy
+msgid "Mail servers"
+msgstr "_Servitores:"
+
+#: ../src/pref-manager.c:1813
+#, fuzzy
+msgid "Incoming"
+msgstr "_Portu por intrant conexiones:"
+
+#: ../src/pref-manager.c:1815
+msgid "Outgoing"
+msgstr ""
+
+#: ../src/pref-manager.c:1842
+#, fuzzy
+msgid "Checking"
+msgstr "Selecte li _lingue por control de ortografia."
+
+#: ../src/pref-manager.c:1848
+#, fuzzy
+msgid "_Check mail automatically every"
+msgstr "Controlar _nov missages chascun"
+
+#: ../src/pref-manager.c:1859 ../src/pref-manager.c:2718
+#: ../src/pref-manager.c:2778
+msgid "minutes"
+msgstr "minutes"
+
+#: ../src/pref-manager.c:1866
+#, fuzzy
+msgid "Check _IMAP mailboxes"
+msgstr "IMAP"
+
+#: ../src/pref-manager.c:1872
+#, fuzzy
+msgid "Check INBOX _only"
+msgstr "Rec_ivet:"
+
+#: ../src/pref-manager.c:1879
+msgid "When mail arrives:"
+msgstr "Quande postage ariva:"
+
+#: ../src/pref-manager.c:1884
+msgid "Display message"
+msgstr "Monstra li missage"
+
+#: ../src/pref-manager.c:1889
+msgid "Play sound"
+msgstr "Far un son"
+
+#: ../src/pref-manager.c:1894
+msgid "Show icon"
+msgstr "Monstrar un icone"
+
+#: ../src/pref-manager.c:1903
+msgid "Do background check quietly (no messages in status bar)"
+msgstr ""
+
+#: ../src/pref-manager.c:1908
+msgid "_POP message size limit:"
+msgstr ""
+
+#. Quoted text regular expression
+#. and RFC2646-style flowed text
+#: ../src/pref-manager.c:1936
+#, fuzzy
+msgid "Quoted and flowed text"
+msgstr "File textual"
+
+#: ../src/pref-manager.c:1941
+#, fuzzy
+msgid "Mark quoted text"
+msgstr "_Marcar"
+
+#: ../src/pref-manager.c:1946
+#, fuzzy
+msgid ""
+"Quoted text\n"
+"regular expression:"
+msgstr "Expression regulari:"
+
+#: ../src/pref-manager.c:1955
+#, fuzzy
+msgid "Wrap text at"
+msgstr "Rupter lineas de simplic textu:"
+
+#: ../src/pref-manager.c:1966 ../src/pref-manager.c:2133
+msgid "characters"
+msgstr "caracteres"
+
+#. handling of multipart/alternative
+#: ../src/pref-manager.c:1981
+#, fuzzy
+msgid "Display of multipart/alternative parts"
+msgstr "alternativ partes"
+
+#: ../src/pref-manager.c:1984
+msgid "Prefer text/plain over html"
+msgstr ""
+
+#: ../src/pref-manager.c:2000
+msgid "National (8-bit) characters in broken messages without codeset header"
+msgstr ""
+
+#: ../src/pref-manager.c:2007
+#, fuzzy
+msgid "display as \"?\""
+msgstr "Monstrar:"
+
+#: ../src/pref-manager.c:2016
+#, fuzzy
+msgid "display in codeset"
+msgstr "Codification:"
+
+#. How to handle received MDN requests
+#: ../src/pref-manager.c:2046
+msgid "Message disposition notification requests"
+msgstr ""
+
+#: ../src/pref-manager.c:2048
+msgid ""
+"When I receive a message whose sender requested a Message Disposition "
+"Notification (MDN), send it if:"
+msgstr ""
+
+#: ../src/pref-manager.c:2060
+msgid ""
+"The message header looks clean\n"
+"(the notify-to address is the return path,\n"
+"and I am in the \"To:\" or \"Cc:\" list)."
+msgstr ""
+
+#: ../src/pref-manager.c:2077
+msgid "The message header looks suspicious."
+msgstr ""
+
+#: ../src/pref-manager.c:2114
+#, fuzzy
+msgid "Word wrap"
+msgstr "Rupter lineas"
+
+#: ../src/pref-manager.c:2119
+#, fuzzy
+msgid "Wrap outgoing text at"
+msgstr "Rupter lineas de simplic textu:"
+
+#: ../src/pref-manager.c:2147
+#, fuzzy
+msgid "Other options"
+msgstr "Altri optiones"
+
+#: ../src/pref-manager.c:2152
+#, fuzzy
+msgid "Reply prefix:"
+msgstr "Responder-a:"
+
+#: ../src/pref-manager.c:2155
+msgid "Automatically quote original when replying"
+msgstr ""
+
+#: ../src/pref-manager.c:2158
+msgid "Forward a mail as attachment instead of quoting it"
+msgstr ""
+
+#: ../src/pref-manager.c:2161
+msgid "Copy outgoing messages to sentbox"
+msgstr ""
+
+#: ../src/pref-manager.c:2163
+msgid "Send button always queues outgoing mail in outbox"
+msgstr ""
+
+#: ../src/pref-manager.c:2166
+#, fuzzy
+msgid "Edit headers in external editor"
+msgstr "Aperter li diarium de notificationes in un redactor extern"
+
+#: ../src/pref-manager.c:2168
+msgid "Include HTML parts as text when replying or forwarding"
+msgstr ""
+
+#: ../src/pref-manager.c:2185
+#, fuzzy
+msgid "Layout"
+msgstr "Arangeament"
+
+#: ../src/pref-manager.c:2187
+#, fuzzy
+msgid "Sort and thread"
+msgstr "&Ordinar..."
+
+#: ../src/pref-manager.c:2189 ../src/print-gtk.c:499
+msgid "Message"
+msgstr "Missage"
+
+#: ../src/pref-manager.c:2191
+msgid "Colors"
+msgstr "Colores"
+
+#: ../src/pref-manager.c:2193 ../src/pref-manager.c:2284
+msgid "Format"
+msgstr "Formate"
+
+#: ../src/pref-manager.c:2195
+#, fuzzy
+msgid "Status messages"
+msgstr "Statu-anuncies"
+
+#: ../src/pref-manager.c:2220 ../src/toolbar-prefs.c:166
+#, fuzzy
+msgid "Main window"
+msgstr "Li fenestre principal"
+
+#: ../src/pref-manager.c:2223
+#, fuzzy
+msgid "Use preview pane"
+msgstr "Prevision"
+
+#: ../src/pref-manager.c:2225
+msgid "Show mailbox statistics in left pane"
+msgstr ""
+
+#: ../src/pref-manager.c:2229
+msgid "Automatically view message when mailbox opened"
+msgstr ""
+
+#: ../src/pref-manager.c:2232
+msgid "Ask me before selecting a different mailbox to show an unread message"
+msgstr ""
+
+#: ../src/pref-manager.c:2238
+msgid "PageUp/PageDown keys scroll text by"
+msgstr ""
+
+#: ../src/pref-manager.c:2249
+#, fuzzy
+msgid "percent"
+msgstr "percent"
+
+#: ../src/pref-manager.c:2264
+#, fuzzy
+msgid "Display progress dialog"
+msgstr "Progresse"
+
+#: ../src/pref-manager.c:2289
+#, fuzzy
+msgid "Date encoding (for strftime):"
+msgstr ""
+"\n"
+"Codification: "
+
+#: ../src/pref-manager.c:2291
+#, fuzzy
+msgid "Selected headers:"
+msgstr "Cap-lineas"
+
+#: ../src/pref-manager.c:2313
+#, fuzzy
+msgid "Information messages"
+msgstr "_Information"
+
+#: ../src/pref-manager.c:2318
+#, fuzzy
+msgid "Information messages:"
+msgstr "_Information"
+
+#: ../src/pref-manager.c:2322
+#, fuzzy
+msgid "Warning messages:"
+msgstr "Avise: "
+
+#: ../src/pref-manager.c:2326
+#, fuzzy
+msgid "Error messages:"
+msgstr "Monstrar errores de auto-conexion"
+
+#: ../src/pref-manager.c:2330
+#, fuzzy
+msgid "Fatal error messages:"
+msgstr "Un errore fatal evenit: %s."
+
+#: ../src/pref-manager.c:2334
+#, fuzzy
+msgid "Debug messages:"
+msgstr "De_bug-anuncies"
+
+#: ../src/pref-manager.c:2360
+#, fuzzy
+msgid "Message colors"
+msgstr "Colores:"
+
+#: ../src/pref-manager.c:2365
+#, fuzzy, c-format
+msgid "Quote level %d color"
+msgstr "Scal_e predefinit:"
+
+#: ../src/pref-manager.c:2378
+#, fuzzy
+msgid "Link color"
+msgstr "Color de ligament"
+
+#: ../src/pref-manager.c:2380
+#, fuzzy
+msgid "Hyperlink color"
+msgstr "Aperter li _hiperligament"
+
+#: ../src/pref-manager.c:2391
+#, fuzzy
+msgid "Composition window"
+msgstr "  --compose [adresse]    aperter un fenestre de composition"
+
+#: ../src/pref-manager.c:2395
+msgid "Invalid or incomplete address label color"
+msgstr ""
+
+#: ../src/pref-manager.c:2481 ../src/print-gtk.c:508
+msgid "Fonts"
+msgstr "Fondes"
+
+#: ../src/pref-manager.c:2485
+#, fuzzy
+msgid "Message font:"
+msgstr "Li fonde"
+
+#: ../src/pref-manager.c:2490
+#, fuzzy
+msgid "Subject font:"
+msgstr "(Tema manca)"
+
+#: ../src/pref-manager.c:2496
+#, fuzzy
+msgid "Use default font size"
+msgstr "Personalisat dimension de _fonde:"
+
+#: ../src/pref-manager.c:2544
+#, fuzzy
+msgid "Sorting and threading"
+msgstr "_Ordinar"
+
+#: ../src/pref-manager.c:2548
+#, fuzzy
+msgid "Default sort column:"
+msgstr "Órdine predefinit"
+
+#: ../src/pref-manager.c:2552
+#, fuzzy
+msgid "Default threading style:"
+msgstr "predefinit"
+
+#: ../src/pref-manager.c:2557
+#, fuzzy
+msgid "Expand threads on open"
+msgstr "_Expander"
+
+#: ../src/pref-manager.c:2632
+msgid "Pspell settings"
+msgstr "Parametres de pspell"
+
+#: ../src/pref-manager.c:2638
+#, fuzzy
+msgid "Spell check module"
+msgstr "Controlar _ortografie"
+
+#: ../src/pref-manager.c:2644
+#, fuzzy
+msgid "Suggestion level"
+msgstr "_Nivelle:"
+
+#. do the ignore length
+#: ../src/pref-manager.c:2649
+msgid "Ignore words shorter than"
+msgstr ""
+
+#: ../src/pref-manager.c:2667
+#, fuzzy
+msgid "Miscellaneous spelling settings"
+msgstr "_Ortografie"
+
+#: ../src/pref-manager.c:2669
+#, fuzzy
+msgid "Check signature"
+msgstr "Controlar li signature criptografic"
+
+#: ../src/pref-manager.c:2670
+#, fuzzy
+msgid "Check quoted"
+msgstr "_Controlar"
+
+#: ../src/pref-manager.c:2697
+#, fuzzy
+msgid "Debug"
+msgstr "Debug"
+
+#: ../src/pref-manager.c:2698
+#, fuzzy
+msgid "Empty trash on exit"
+msgstr "Vacuar li _Paper-corb..."
+
+#: ../src/pref-manager.c:2705
+msgid "Close mailbox if unused more than"
+msgstr ""
+
+#: ../src/pref-manager.c:2733
+#, fuzzy
+msgid "Deleting messages"
+msgstr "Deletion..."
+
+#. Translators: this used to be "using Mailbox -> Hide messages";
+#. * the UTF-8 string for the right-arrow symbol is broken out to
+#. * avoid msgconv problems.
+#: ../src/pref-manager.c:2738
+#, c-format
+msgid ""
+"The following setting is global, but may be overridden for the selected "
+"mailbox using Mailbox %s Hide messages:"
+msgstr ""
+
+#: ../src/pref-manager.c:2750
+msgid "Hide messages marked as deleted"
+msgstr ""
+
+#: ../src/pref-manager.c:2752
+#, fuzzy
+msgid "The following settings are global:"
+msgstr "Usar global parametres"
+
+#: ../src/pref-manager.c:2758
+msgid "Expunge deleted messages when mailbox is closed"
+msgstr ""
+
+#: ../src/pref-manager.c:2765
+#, fuzzy
+msgid "...and if unused more than"
+msgstr "ínusat"
+
+#: ../src/pref-manager.c:2790 ../src/toolbar-prefs.c:180
+msgid "Message window"
+msgstr "Fenestre de missage"
+
+#: ../src/pref-manager.c:2795
+msgid "After moving a message:"
+msgstr "Pos mover un missage:"
+
+#: ../src/pref-manager.c:2824
+#, fuzzy
+msgid "Startup options"
+msgstr "Al inicie:"
+
+#: ../src/pref-manager.c:2827
+#, fuzzy
+msgid "Open Inbox upon startup"
+msgstr "Aperter li ultim file al inicie"
+
+#: ../src/pref-manager.c:2829
+#, fuzzy
+msgid "Check mail upon startup"
+msgstr "Controlar nov versiones al inicie"
+
+#: ../src/pref-manager.c:2831
+msgid "Remember open mailboxes between sessions"
+msgstr ""
+
+#: ../src/pref-manager.c:2845
+#, fuzzy
+msgid "Folder scanning"
+msgstr "Examination, "
+
+#: ../src/pref-manager.c:2847
+msgid ""
+"Choose depth 1 for fast startup; this defers scanning some folders.  To see "
+"more of the tree at startup, choose a greater depth."
+msgstr ""
+
+#: ../src/pref-manager.c:2858
+#, fuzzy
+msgid "Scan local folders to depth"
+msgstr "Non posset scannar alcun fólderes in «%s»"
+
+#: ../src/pref-manager.c:2871
+#, fuzzy
+msgid "Scan IMAP folders to depth"
+msgstr "Non posset scannar alcun fólderes in «%s»"
+
+#: ../src/pref-manager.c:2936
+#, fuzzy
+msgid "Address book name"
+msgstr "_Adressarium..."
+
+#: ../src/pref-manager.c:2944
+#, fuzzy
+msgid "Auto-complete"
+msgstr "Auto"
+
+#: ../src/pref-manager.c:2969
+#, fuzzy
+msgid "_Set as default"
+msgstr "_Assignar quam predefinit"
+
+#: ../src/pref-manager.c:3274
+#, fuzzy
+msgid "Remote POP3 mailbox..."
+msgstr "Lettre-bux POP3"
+
+#: ../src/pref-manager.c:3410
+msgid "Show nothing"
+msgstr "Monstra necós"
+
+#: ../src/pref-manager.c:3412
+msgid "Show dialog"
+msgstr "Monstrar un dialog"
+
+#: ../src/pref-manager.c:3414
+msgid "Show in list"
+msgstr "Monstrar in li liste"
+
+#: ../src/pref-manager.c:3416
+msgid "Show in status bar"
+msgstr "Monstra in li panel del statu"
+
+#: ../src/pref-manager.c:3418
+msgid "Print to console"
+msgstr "Printar al console"
+
+#: ../src/pref-manager.c:3429
+#, fuzzy
+msgid "Ask me"
+msgstr "Ne questionar denov"
+
+#: ../src/pref-manager.c:3545
+#, fuzzy
+msgid "Default layout"
+msgstr "Configuration de panel predefinit"
+
+#: ../src/pref-manager.c:3546
+#, fuzzy
+msgid "Wide message layout"
+msgstr "_Larg missage"
+
+#: ../src/pref-manager.c:3547
+#, fuzzy
+msgid "Wide screen layout"
+msgstr "LARG ARANGEMENT"
+
+#: ../src/pref-manager.c:3555
+#, fuzzy
+msgid "Show next unread message"
+msgstr "Monstrar li sequent missagie"
+
+#: ../src/pref-manager.c:3556
+msgid "Show next message"
+msgstr "Monstrar li sequent missage"
+
+#: ../src/pref-manager.c:3557
+msgid "Close message window"
+msgstr "Clúder li fenestre del message"
+
+#: ../src/pref-manager.c:3598
+#, fuzzy, c-format
+msgid "Error displaying link_id %s: %s\n"
+msgstr "Un errore ha evenit monstrante auxilie: %s"
+
+#: ../src/print-gtk.c:89 ../src/print-gtk.c:248
+#, fuzzy, c-format
+msgid "Page %d of %d"
+msgstr "Págine %d ex %d"
+
+#: ../src/print-gtk.c:143 ../src/print-gtk.c:169
+#, fuzzy
+msgid "Signed and encrypted matter"
+msgstr "Ciffrat"
+
+#: ../src/print-gtk.c:147 ../src/print-gtk.c:173
+#, fuzzy
+msgid "Signed matter"
+msgstr "Signat"
+
+#: ../src/print-gtk.c:154
+#, fuzzy
+msgid "Encrypted matter"
+msgstr "ciffrat: "
+
+#: ../src/print-gtk.c:197
+#, c-format
+msgid "This is an inline %s signed %s message part:"
+msgstr ""
+
+#: ../src/print-gtk.c:352
+#, c-format
+msgid "Cannot print page %d because the document has only %d page."
+msgid_plural "Cannot print page %d because the document has only %d pages."
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translate to the default units to use for presenting
+#. * lengths to the user. Translate to default:inch if you
+#. * want inches, otherwise translate to default:mm.
+#. * Do *not* translate it to "predefinito:mm", if it
+#. * it isn't default:mm or default:inch it will not work
+#.
+#: ../src/print-gtk.c:390
+msgid "default:mm"
+msgstr "default:mm"
+
+#: ../src/print-gtk.c:447
+msgid "inch"
+msgstr "inch"
+
+#: ../src/print-gtk.c:454
+msgid "mm"
+msgstr "mm"
+
+#: ../src/print-gtk.c:529
+#, fuzzy
+msgid "_Header Font:"
+msgstr "Selecter un fonde de rubricas"
+
+#: ../src/print-gtk.c:532
+#, fuzzy
+msgid "B_ody Font:"
+msgstr "<b>Fonde</b>"
+
+#: ../src/print-gtk.c:535
+#, fuzzy
+msgid "_Footer Font:"
+msgstr "Li fonde"
+
+#: ../src/print-gtk.c:542
+#, fuzzy
+msgid "Highlighting"
+msgstr "Coloration"
+
+#: ../src/print-gtk.c:557
+#, fuzzy
+msgid "Highlight _cited text"
+msgstr "Marcar"
+
+#: ../src/print-gtk.c:566
+#, fuzzy
+msgid "Highlight _structured phrases"
+msgstr "Marcar: "
+
+#: ../src/print-gtk.c:577
+msgid "Margins"
+msgstr "Márgines"
+
+#: ../src/print-gtk.c:599
+#, fuzzy
+msgid "_Top"
+msgstr "Ad _alt"
+
+#: ../src/print-gtk.c:605
+#, fuzzy
+msgid "_Bottom"
+msgstr "A _bass"
+
+#: ../src/print-gtk.c:617
+#, fuzzy
+msgid "_Left"
+msgstr "A _levul"
+
+#: ../src/print-gtk.c:623
+#, fuzzy
+msgid "_Right"
+msgstr "A _dextri"
+
+#: ../src/print-gtk.c:749
+#, fuzzy, c-format
+msgid "Error printing message: %s"
+msgstr ""
+"Un errore evenit  printante li file:\n"
+"%s"
+
+#: ../src/save-restore.c:608
+#, fuzzy
+msgid "Error during filters loading: "
+msgstr "Un errore evenit cargante págine de auxilie"
+
+#: ../src/save-restore.c:610
+#, c-format
+msgid ""
+"Error during filters loading: %s\n"
+"Filters may not be correct."
+msgstr ""
+
+#: ../src/save-restore.c:734
+msgid "The option not to recognize \"format=flowed\" text has been removed."
+msgstr ""
+
+#: ../src/save-restore.c:1015
+msgid ""
+"The option not to send \"format=flowed\" text is now on the Options menu of "
+"the compose window."
+msgstr ""
+
+#: ../src/save-restore.c:1047
+msgid ""
+"The option to request a MDN is now on the Options menu of the compose window."
+msgstr ""
+
+#: ../src/save-restore.c:1129
+msgid ""
+"This version of Balsa uses a new user interface; if you have changed Balsa's "
+"keyboard accelerators, you will need to set them again."
+msgstr ""
+
+#: ../src/save-restore.c:2168
+#, fuzzy
+msgid "Error opening GConf database\n"
+msgstr ""
+"Errore de GConf:\n"
+"  %s"
+
+#: ../src/save-restore.c:2176 ../src/save-restore.c:2187
+#, fuzzy, c-format
+msgid "Error setting GConf field: %s\n"
+msgstr ""
+"Errore de GConf:\n"
+"  %s"
+
+#. Translators: please use the initial letter of each language as
+#. * its accelerator; this is a long list, and unique accelerators
+#. * cannot be found.
+#: ../src/sendmsg-window.c:260
+#, fuzzy
+msgid "_Brazilian Portuguese"
+msgstr "Portugues de Brasil"
+
+#: ../src/sendmsg-window.c:261
+msgid "_Catalan"
+msgstr "_Catalan"
+
+#: ../src/sendmsg-window.c:262
+msgid "_Chinese Simplified"
+msgstr "_Chinesi simplificat"
+
+#: ../src/sendmsg-window.c:263
+msgid "_Chinese Traditional"
+msgstr "_Chinesi traditional"
+
+#: ../src/sendmsg-window.c:264
+msgid "_Czech"
+msgstr "_Tchec"
+
+#: ../src/sendmsg-window.c:265
+#, fuzzy
+msgid "_Danish"
+msgstr "Danese"
+
+#: ../src/sendmsg-window.c:266
+msgid "_Dutch"
+msgstr "_Hollandese"
+
+#: ../src/sendmsg-window.c:267
+#, fuzzy
+msgid "_English (American)"
+msgstr "American anglese"
+
+#: ../src/sendmsg-window.c:268
+#, fuzzy
+msgid "_English (British)"
+msgstr "Anglese (Britanic)"
+
+#: ../src/sendmsg-window.c:269
+msgid "_Esperanto"
+msgstr "_Esperanto"
+
+#: ../src/sendmsg-window.c:270
+#, fuzzy
+msgid "_Estonian"
+msgstr "Estonian"
+
+#: ../src/sendmsg-window.c:271
+msgid "_Finnish"
+msgstr "_Finlandesi"
+
+#: ../src/sendmsg-window.c:272
+msgid "_French"
+msgstr "_Francese"
+
+#: ../src/sendmsg-window.c:273
+msgid "_German"
+msgstr "_German"
+
+#: ../src/sendmsg-window.c:274
+msgid "_German (Austrian)"
+msgstr "_German (austrian)"
+
+#: ../src/sendmsg-window.c:275
+msgid "_German (Swiss)"
+msgstr "_German (swissian)"
+
+#: ../src/sendmsg-window.c:276
+msgid "_Greek"
+msgstr "_Grec"
+
+#: ../src/sendmsg-window.c:277
+#, fuzzy
+msgid "_Hebrew"
+msgstr "Hebreic"
+
+#: ../src/sendmsg-window.c:278
+#, fuzzy
+msgid "_Hungarian"
+msgstr "Hungarian"
+
+#: ../src/sendmsg-window.c:279
+#, fuzzy
+msgid "_Italian"
+msgstr "Italian"
+
+#: ../src/sendmsg-window.c:280
+#, fuzzy
+msgid "_Japanese (JIS)"
+msgstr "Japanesi (Shift_JIS)"
+
+#: ../src/sendmsg-window.c:281
+#, fuzzy
+msgid "_Kazakh"
+msgstr "Kazakh"
+
+#: ../src/sendmsg-window.c:282
+msgid "_Korean"
+msgstr "_Korean"
+
+#: ../src/sendmsg-window.c:283
+#, fuzzy
+msgid "_Latvian"
+msgstr "Latvian"
+
+#: ../src/sendmsg-window.c:284
+#, fuzzy
+msgid "_Lithuanian"
+msgstr "Lituanian"
+
+#: ../src/sendmsg-window.c:285
+msgid "_Norwegian"
+msgstr ""
+
+#: ../src/sendmsg-window.c:286
+#, fuzzy
+msgid "_Polish"
+msgstr "Polonese"
+
+#: ../src/sendmsg-window.c:287
+msgid "_Portugese"
+msgstr "_Portugese"
+
+#: ../src/sendmsg-window.c:288
+msgid "_Romanian"
+msgstr "_Rumanian"
+
+#: ../src/sendmsg-window.c:289
+msgid "_Russian"
+msgstr "_Russ"
+
+#: ../src/sendmsg-window.c:290
+#, fuzzy
+msgid "_Serbian"
+msgstr "Serbian"
+
+#: ../src/sendmsg-window.c:291
+#, fuzzy
+msgid "_Serbian (Latin)"
+msgstr "Latin"
+
+#: ../src/sendmsg-window.c:292
+msgid "_Slovak"
+msgstr "_Slovac"
+
+#: ../src/sendmsg-window.c:293
+msgid "_Spanish"
+msgstr "_Hispan"
+
+#: ../src/sendmsg-window.c:294
+msgid "_Swedish"
+msgstr "_Svedese"
+
+#: ../src/sendmsg-window.c:295
+msgid "_Tatar"
+msgstr "_Tataric"
+
+#: ../src/sendmsg-window.c:296
+msgid "_Turkish"
+msgstr "_Turcian"
+
+#: ../src/sendmsg-window.c:297
+msgid "_Ukrainian"
+msgstr "_Ucrainan"
+
+#: ../src/sendmsg-window.c:298
+#, fuzzy
+msgid "_Generic UTF-8"
+msgstr "UTF-8"
+
+#: ../src/sendmsg-window.c:324
+#, fuzzy
+msgid "_Show"
+msgstr "_Monstrar"
+
+#: ../src/sendmsg-window.c:325
+msgid "_Language"
+msgstr "_Lingue"
+
+#: ../src/sendmsg-window.c:326
+msgid "_Options"
+msgstr "_Optiones"
+
+#: ../src/sendmsg-window.c:336
+#, fuzzy
+msgid "_Include File..."
+msgstr "Includer"
+
+#: ../src/sendmsg-window.c:337
+#, fuzzy
+msgid "Include a file"
+msgstr ""
+"Possibil valores include: general::unsorted (ínordinat), file::name "
+"(nómine), file::size (grandore), file::mtime (date de modification), exif::"
+"photo::datetimeoriginal"
+
+#: ../src/sendmsg-window.c:338
+#, fuzzy
+msgid "_Attach File..."
+msgstr "_Atachar un file"
+
+#: ../src/sendmsg-window.c:339
+#, fuzzy
+msgid "Attach a file"
+msgstr "Atachar un file"
+
+#: ../src/sendmsg-window.c:340
+#, fuzzy
+msgid "I_nclude Message(s)"
+msgstr "I_ncluder:"
+
+#: ../src/sendmsg-window.c:341
+#, fuzzy
+msgid "Include selected message(s)"
+msgstr "«%s» selectet"
+
+#: ../src/sendmsg-window.c:342
+#, fuzzy
+msgid "Attach _Message(s)"
+msgstr "Missage: %s"
+
+#: ../src/sendmsg-window.c:343
+#, fuzzy
+msgid "Attach selected message(s)"
+msgstr "Missage: %s"
+
+#: ../src/sendmsg-window.c:344
+msgid "_Save"
+msgstr "_Salvar"
+
+#: ../src/sendmsg-window.c:345
+#, fuzzy
+msgid "Save this message"
+msgstr ""
+"Ne successat gardar li file.\n"
+"\n"
+"%(error_message)s\n"
+"\n"
+"Ples provar gardar it a un altri localisation."
+
+#: ../src/sendmsg-window.c:351
+#, fuzzy
+msgid "Print the edited message"
+msgstr "Modificat dies"
+
+#: ../src/sendmsg-window.c:354
+msgid "_Undo"
+msgstr "_Defar"
+
+#: ../src/sendmsg-window.c:355
+#, fuzzy
+msgid "Undo most recent change"
+msgstr "_Defar: Alterar permissiones"
+
+#: ../src/sendmsg-window.c:356
+msgid "_Redo"
+msgstr "_Refar"
+
+#: ../src/sendmsg-window.c:357
+#, fuzzy
+msgid "Redo most recent change"
+msgstr "_Refar: Alterar permissiones"
+
+#: ../src/sendmsg-window.c:358
+msgid "Cu_t"
+msgstr "Ci_ser"
+
+#: ../src/sendmsg-window.c:359
+#, fuzzy
+msgid "Cut the selected text"
+msgstr "Exciser li selectet textu al Paperiere"
+
+#: ../src/sendmsg-window.c:361
+#, fuzzy
+msgid "Copy to the clipboard"
+msgstr "Copiar al Paperiere"
+
+#: ../src/sendmsg-window.c:362
+msgid "_Paste"
+msgstr "Co_llar"
+
+#: ../src/sendmsg-window.c:363
+#, fuzzy
+msgid "Paste from the clipboard"
+msgstr "Collar ex li diarium del Paperiere"
+
+#: ../src/sendmsg-window.c:366
+#, fuzzy
+msgid "_Wrap Body"
+msgstr "Largore:"
+
+#: ../src/sendmsg-window.c:368
+#, fuzzy
+msgid "_Reflow Selected Text"
+msgstr "Null textu es selectet"
+
+#: ../src/sendmsg-window.c:370
+#, fuzzy
+msgid "Insert Si_gnature"
+msgstr "Inserter li si_gnature"
+
+#: ../src/sendmsg-window.c:372
+#, fuzzy
+msgid "_Quote Message(s)"
+msgstr "Citation: "
+
+#: ../src/sendmsg-window.c:375 ../src/sendmsg-window.c:417
+#, fuzzy
+msgid "C_heck Spelling"
+msgstr "_Ortografie"
+
+#: ../src/sendmsg-window.c:376 ../src/sendmsg-window.c:418
+#, fuzzy
+msgid "Check the spelling of the message"
+msgstr "Control de ortografie e suggestiones"
+
+#: ../src/sendmsg-window.c:379
+#, fuzzy
+msgid "Select _Identity..."
+msgstr "Identitá"
+
+#: ../src/sendmsg-window.c:380
+#, fuzzy
+msgid "Select the Identity to use for the message"
+msgstr "Selecte un nómine de codification"
+
+#: ../src/sendmsg-window.c:383
+#, fuzzy
+msgid "_Edit with Gnome-Editor"
+msgstr "_Pri Redactor de traductiones de GNOME"
+
+#: ../src/sendmsg-window.c:384
+msgid "Edit the current message with the default Gnome editor"
+msgstr ""
+
+#. All three "Send" and "Queue" actions have the same
+#. * stock_id; the first in this list defines the action tied to the
+#. * toolbar's "Send" button, so "ToolbarSend" must come before
+#. * the others.
+#: ../src/sendmsg-window.c:395 ../src/sendmsg-window.c:397
+#, fuzzy
+msgid "Sen_d"
+msgstr "de %d"
+
+#: ../src/sendmsg-window.c:396 ../src/sendmsg-window.c:398
+#, fuzzy
+msgid "Send this message"
+msgstr "Ne successat inviar un missage D-Bus"
+
+#: ../src/sendmsg-window.c:400
+#, fuzzy
+msgid "_Queue"
+msgstr "_Linea"
+
+#: ../src/sendmsg-window.c:401 ../src/sendmsg-window.c:407
+#, fuzzy
+msgid "Queue this message in Outbox for sending"
+msgstr "Inviante li missage med comande: %s\n"
+
+#: ../src/sendmsg-window.c:403
+#, fuzzy
+msgid "_Postpone"
+msgstr "_Procrastinar"
+
+#: ../src/sendmsg-window.c:404
+#, fuzzy
+msgid "Save this message and close"
+msgstr "Clúder li fenestre del message"
+
+#: ../src/sendmsg-window.c:406
+#, fuzzy
+msgid "Send _Later"
+msgstr "Inviar p_lu tard"
+
+#: ../src/sendmsg-window.c:409
+#, fuzzy
+msgid "Sa_ve and Close"
+msgstr "_Gardar e cluder"
+
+#: ../src/sendmsg-window.c:421
+#, fuzzy
+msgid "Too_lbar"
+msgstr "_Instrumentarium"
+
+#: ../src/sendmsg-window.c:423
+msgid "F_rom"
+msgstr "_De"
+
+#: ../src/sendmsg-window.c:425
+msgid "Rec_ipients"
+msgstr "Rec_ipientes"
+
+#: ../src/sendmsg-window.c:428
+#, fuzzy
+msgid "R_eply To"
+msgstr "R_enominar..."
+
+#: ../src/sendmsg-window.c:431
+#, fuzzy
+msgid "F_cc"
+msgstr "_Cc:"
+
+#: ../src/sendmsg-window.c:434
+#, fuzzy
+msgid "_Request Disposition Notification"
+msgstr " notification"
+
+#: ../src/sendmsg-window.c:435
+msgid "Request Message Disposition Notification"
+msgstr ""
+
+#: ../src/sendmsg-window.c:438
+#, fuzzy
+msgid "_Request Delivery Status Notification"
+msgstr "Monstrar un _icone in li area de notificationes"
+
+#: ../src/sendmsg-window.c:439
+msgid "Request positive (successful) Delivery Status Notification"
+msgstr ""
+
+#: ../src/sendmsg-window.c:441
+#, fuzzy
+msgid "_Format = Flowed"
+msgstr "_Formatar por:"
+
+#. Send as message/alternative with text/plain and text/html parts
+#: ../src/sendmsg-window.c:444
+#, fuzzy
+msgid "Send as plain text and _HTML"
+msgstr "Rupter lineas de simplic textu:"
+
+#: ../src/sendmsg-window.c:448 ../src/sendmsg-window.c:454
+#, fuzzy
+msgid "_Sign Message"
+msgstr "Inregistrar se"
+
+#: ../src/sendmsg-window.c:449
+#, fuzzy
+msgid "Sign message using GPG"
+msgstr "Inviante li missage med comande: %s\n"
+
+#: ../src/sendmsg-window.c:450 ../src/sendmsg-window.c:457
+#, fuzzy
+msgid "_Encrypt Message"
+msgstr "Ciffrar..."
+
+#: ../src/sendmsg-window.c:451
+#, fuzzy
+msgid "Encrypt message using GPG"
+msgstr "Inviante li missage med comande: %s\n"
+
+#: ../src/sendmsg-window.c:455
+#, fuzzy
+msgid "signs the message using GnuPG"
+msgstr "Inviante li missage med comande: %s\n"
+
+#: ../src/sendmsg-window.c:459
+msgid "signs the message using GnuPG for all To: and CC: recipients"
+msgstr ""
+
+#: ../src/sendmsg-window.c:469
+#, fuzzy
+msgid "_GnuPG uses MIME mode"
+msgstr "Mode GnuPG MIME"
+
+#: ../src/sendmsg-window.c:471
+#, fuzzy
+msgid "_GnuPG uses old OpenPGP mode"
+msgstr "Mode GnuPG OpenPGP"
+
+#: ../src/sendmsg-window.c:474
+#, fuzzy
+msgid "_S/MIME mode (GpgSM)"
+msgstr "Mode GpgSM S/MIME"
+
+#: ../src/sendmsg-window.c:688
+#, fuzzy
+msgid "Attachment"
+msgstr "Atachament"
+
+#: ../src/sendmsg-window.c:688
+#, fuzzy
+msgid "Inline"
+msgstr "Curt citation in linea"
+
+#: ../src/sendmsg-window.c:688
+#, fuzzy
+msgid "Reference"
+msgstr "Referentie, ref"
+
+#: ../src/sendmsg-window.c:929
+#, fuzzy
+msgid "(No name)"
+msgstr "Null nómine"
+
+#: ../src/sendmsg-window.c:935
+#, fuzzy, c-format
+msgid ""
+"The message to '%s' is modified.\n"
+"Save message to Draftbox?"
+msgstr ""
+"Ne successat gardar li file.\n"
+"\n"
+"%(error_message)s"
+
+#: ../src/sendmsg-window.c:1233
+msgid "Gnome editor is not defined in your preferred applications."
+msgstr ""
+
+#: ../src/sendmsg-window.c:1289
+#, fuzzy
+msgid "Select Identity"
+msgstr "Identitá"
+
+#: ../src/sendmsg-window.c:1767
+#, c-format
+msgid ""
+"Saying yes will not send the file `%s' itself, but just a MIME message/"
+"external-body reference.  Note that the recipient must have proper "
+"permissions to see the `real' file.\n"
+"\n"
+"Do you really want to attach this file as reference?"
+msgstr ""
+
+#: ../src/sendmsg-window.c:1780
+#, fuzzy
+msgid "Attach as Reference?"
+msgstr "_Atachar"
+
+#: ../src/sendmsg-window.c:1873
+#, fuzzy
+msgid "Choose charset"
+msgstr "Codification:"
+
+#: ../src/sendmsg-window.c:1880
+#, c-format
+msgid ""
+"File\n"
+"%s\n"
+"is not encoded in US-ASCII or UTF-8.\n"
+"Please choose the charset used to encode the file."
+msgstr ""
+
+#: ../src/sendmsg-window.c:1900
+#, fuzzy
+msgid "Attach as MIME type:"
+msgstr "Li MIME-tip del file."
+
+#: ../src/sendmsg-window.c:1969
+#, c-format
+msgid "Character set for file %s changed from \"%s\" to \"%s\"."
+msgstr ""
+
+#: ../src/sendmsg-window.c:2012 ../src/sendmsg-window.c:5780
+#, fuzzy
+msgid "(no subject)"
+msgstr "(Tema manca)"
+
+#: ../src/sendmsg-window.c:2050
+#, c-format
+msgid "Cannot create file URI object for %s"
+msgstr ""
+
+#: ../src/sendmsg-window.c:2058
+#, fuzzy
+msgid "unknown error"
+msgstr "ínconosset errore"
+
+#: ../src/sendmsg-window.c:2105
+#, fuzzy
+msgid "forwarded message"
+msgstr "Ne redirectet"
+
+#: ../src/sendmsg-window.c:2110
+#, fuzzy, c-format
+msgid "Message from %s, subject: \"%s\""
+msgstr "mail -s <tema> -c <cc> <a>"
+
+#: ../src/sendmsg-window.c:2186 ../src/sendmsg-window.c:2259
+#, fuzzy
+msgid "Remove"
+msgstr "Remover"
+
+#: ../src/sendmsg-window.c:2271
+msgid "Open..."
+msgstr "Aperter..."
+
+#: ../src/sendmsg-window.c:2283
+#, fuzzy
+msgid "(URL)"
+msgstr "_URL:"
+
+#: ../src/sendmsg-window.c:2341
+#, fuzzy
+msgid "Attach file"
+msgstr "_Atachar un file"
+
+#: ../src/sendmsg-window.c:2442 ../src/sendmsg-window.c:2552
+#: ../src/sendmsg-window.c:5033
+msgid ""
+"Attaching message failed.\n"
+"Possible reason: not enough temporary space"
+msgstr ""
+
+#: ../src/sendmsg-window.c:2806
+#, fuzzy
+msgid "F_rom:"
+msgstr "_De"
+
+#. Subject:
+#: ../src/sendmsg-window.c:2948
+#, fuzzy
+msgid "S_ubject:"
+msgstr "_Tema:"
+
+#. fcc: mailbox folder where the message copy will be written to
+#: ../src/sendmsg-window.c:2959
+#, fuzzy
+msgid "F_cc:"
+msgstr "_Cc:"
+
+#. Attachment list
+#: ../src/sendmsg-window.c:2988
+#, fuzzy
+msgid "_Attachments:"
+msgstr "_Atachamentes"
+
+#: ../src/sendmsg-window.c:3037
+#, fuzzy
+msgid "Mode"
+msgstr "Mode"
+
+#: ../src/sendmsg-window.c:3384
+#, fuzzy, c-format
+msgid "Could not save attachment: %s"
+msgstr "Ne successat gardar li atachament «%s»: %s"
+
+#: ../src/sendmsg-window.c:3408
+#, fuzzy
+msgid "No subject"
+msgstr "Tema: "
+
+#: ../src/sendmsg-window.c:3441
+#, fuzzy, c-format
+msgid "inlined file \"%s\" (%s)"
+msgstr "Ear a %s in li file «%s»"
+
+#: ../src/sendmsg-window.c:3444
+#, fuzzy, c-format
+msgid "attached file \"%s\" (%s)"
+msgstr "Ear a %s in li file «%s»"
+
+#: ../src/sendmsg-window.c:3448
+#, fuzzy, c-format
+msgid "inlined %s part"
+msgstr "Original parte %s"
+
+#: ../src/sendmsg-window.c:3450
+#, fuzzy, c-format
+msgid "attached %s part"
+msgstr "Original parte %s"
+
+#: ../src/sendmsg-window.c:3518
+#, fuzzy, c-format
+msgid "message from %s, subject \"%s\""
+msgstr "mail -s <tema> -c <cc> <a>"
+
+#: ../src/sendmsg-window.c:3645
+msgid "quoted"
+msgstr ""
+
+#: ../src/sendmsg-window.c:3650 ../src/sendmsg-window.c:3653
+#, fuzzy
+msgid "quoted attachment"
+msgstr "Atachament"
+
+#: ../src/sendmsg-window.c:3679
+#, fuzzy
+msgid "Select parts for quotation"
+msgstr "Partes"
+
+#: ../src/sendmsg-window.c:3688
+msgid "Select the parts of the message which shall be quoted in the reply"
+msgstr ""
+
+#: ../src/sendmsg-window.c:3830
+#, fuzzy
+msgid "you"
+msgstr "Vu"
+
+#: ../src/sendmsg-window.c:3839
+#, fuzzy, c-format
+msgid "------forwarded message from %s------\n"
+msgstr " de %s"
+
+#: ../src/sendmsg-window.c:3876
+#, c-format
+msgid "Message-ID: %s\n"
+msgstr "Message-ID: %s\n"
+
+#: ../src/sendmsg-window.c:3882
+msgid "References:"
+msgstr "Referenties:"
+
+#: ../src/sendmsg-window.c:3893
+#, fuzzy, c-format
+msgid "On %s, %s wrote:\n"
+msgstr "%s scrit:\n"
+
+#: ../src/sendmsg-window.c:3895
+#, c-format
+msgid "%s wrote:\n"
+msgstr "%s scrit:\n"
+
+#: ../src/sendmsg-window.c:4005
+#, fuzzy
+msgid "No signature found!"
+msgstr "Null signature trovat"
+
+#: ../src/sendmsg-window.c:4193
+#, fuzzy
+msgid "Could not save message."
+msgstr "Ne successat gardar li configuration de monitores"
+
+#: ../src/sendmsg-window.c:4200
+#, fuzzy, c-format
+msgid "Could not open draftbox: %s"
+msgstr "Ne successat aperter li fólder «%s»"
+
+#: ../src/sendmsg-window.c:4225
+#, fuzzy
+msgid "Message saved."
+msgstr "Inmagasinat"
+
+#: ../src/sendmsg-window.c:5216 ../src/sendmsg-window.c:5224
+#: ../src/sendmsg-window.c:5231 ../src/sendmsg-window.c:5238
+#: ../src/sendmsg-window.c:5262
+#, fuzzy, c-format
+msgid "Could not attach the file %s: %s."
+msgstr "Ne successat deleter li file «%s»: %s"
+
+#: ../src/sendmsg-window.c:5217
+#, fuzzy
+msgid "not an absolute path"
+msgstr "Li directoria de labor deve esser un absolut rute"
+
+#: ../src/sendmsg-window.c:5225
+#, fuzzy
+msgid "not in your directory"
+msgstr ""
+"Migrar vor documentes de Windows a vor hem-fólder. On posse copiar les, o "
+"partir les con li altri sistema de operation."
+
+#: ../src/sendmsg-window.c:5232
+#, fuzzy
+msgid "does not exist"
+msgstr "%s ne existe."
+
+#: ../src/sendmsg-window.c:5263
+#, fuzzy
+msgid "not in current directory"
+msgstr "Automaticmen selecter un altri tapete ex li actual fólder."
+
+#: ../src/sendmsg-window.c:5313
+msgid ""
+"The link that you selected created\n"
+"a \"Blind copy\" (Bcc) address.\n"
+"Please check that the address\n"
+"is appropriate."
+msgstr ""
+
+#: ../src/sendmsg-window.c:5397
+#, fuzzy, c-format
+msgid "Could not open the file %s.\n"
+msgstr "Ne successat aperter li file «%s»."
+
+#: ../src/sendmsg-window.c:5445
+#, fuzzy
+msgid "Include file"
+msgstr "Includer"
+
+#. Translators: please do not translate Face.
+#: ../src/sendmsg-window.c:5632
+#, fuzzy, c-format
+msgid "Could not load Face header file %s: %s"
+msgstr "Ne successat cargar un file de GUI: %s"
+
+#. Translators: please do not translate Face.
+#: ../src/sendmsg-window.c:5635
+#, c-format
+msgid "Could not load X-Face header file %s: %s"
+msgstr ""
+
+#: ../src/sendmsg-window.c:5764
+msgid "You did not specify a subject for this message"
+msgstr ""
+
+#: ../src/sendmsg-window.c:5765
+msgid "If you would like to provide one, enter it below."
+msgstr ""
+
+#: ../src/sendmsg-window.c:5815
+msgid "_Send"
+msgstr "_Inviar"
+
+#: ../src/sendmsg-window.c:5898
+#, c-format
+msgid ""
+"You did not select encryption for this message, although %s public keys are "
+"available for all recipients. In order to protect your privacy, the message "
+"could be %s encrypted."
+msgstr ""
+
+#: ../src/sendmsg-window.c:5925
+#, fuzzy
+msgid "Send _encrypted"
+msgstr "Ne successat inviar ciffrat data: %s"
+
+#: ../src/sendmsg-window.c:5943
+#, fuzzy
+msgid "Send _unencrypted"
+msgstr "Ínciffrat"
+
+#: ../src/sendmsg-window.c:6006
+msgid "You selected OpenPGP security for this message.\n"
+msgstr ""
+
+#: ../src/sendmsg-window.c:6011
+msgid ""
+"The message text will be sent as plain text and as HTML, but only the plain "
+"part can be signed.\n"
+msgstr ""
+
+#: ../src/sendmsg-window.c:6016
+msgid ""
+"The message contains attachments, which cannot be signed or encrypted.\n"
+msgstr ""
+
+#: ../src/sendmsg-window.c:6020
+msgid ""
+"You should select MIME mode if the complete message shall be protected. Do "
+"you really want to proceed?"
+msgstr ""
+
+#: ../src/sendmsg-window.c:6045
+#, c-format
+msgid "sending message with gpg mode %d"
+msgstr ""
+
+#: ../src/sendmsg-window.c:6082
+#, fuzzy
+msgid "Message could not be created"
+msgstr "Li archive «%s» ne posset esser creat"
+
+#: ../src/sendmsg-window.c:6084
+#, fuzzy
+msgid "Message could not be queued in outbox"
+msgstr ""
+"Ne successat gardar li file.\n"
+"\n"
+"%(error_message)s"
+
+#: ../src/sendmsg-window.c:6086
+#, fuzzy
+msgid "Message could not be saved in sentbox"
+msgstr "Li file ne posset esser salvat quam «%s»."
+
+#: ../src/sendmsg-window.c:6088
+#, fuzzy
+msgid "Message could not be sent"
+msgstr "Image sta inviat"
+
+#: ../src/sendmsg-window.c:6091
+#, fuzzy
+msgid "Message could not be signed"
+msgstr "Autosubscrit"
+
+#: ../src/sendmsg-window.c:6093
+#, fuzzy
+msgid "Message could not be encrypted"
+msgstr "Ciffrat missage"
+
+#: ../src/sendmsg-window.c:6099
+#, fuzzy, c-format
+msgid ""
+"Send failed: %s\n"
+"%s"
+msgstr "Ne successat inviar ciffrat data: %s"
+
+#: ../src/sendmsg-window.c:6104
+#, fuzzy, c-format
+msgid "Send failed: %s"
+msgstr "Ne successat inviar ciffrat data: %s"
+
+#: ../src/sendmsg-window.c:6197
+#, fuzzy, c-format
+msgid "Could not postpone message: %s"
+msgstr ""
+"Ne successat gardar li file.\n"
+"\n"
+"%(error_message)s"
+
+#: ../src/sendmsg-window.c:6214
+#, fuzzy
+msgid "Message postponed."
+msgstr "ajornat"
+
+#: ../src/sendmsg-window.c:6219
+#, fuzzy
+msgid "Could not postpone message."
+msgstr "_Procrastinar"
+
+#: ../src/sendmsg-window.c:6372
+#, c-format
+msgid "Error starting spell checker: %s"
+msgstr ""
+
+#: ../src/sendmsg-window.c:6539
+#, fuzzy, c-format
+msgid "Could not compile %s"
+msgstr "Compilar a..."
+
+#: ../src/sendmsg-window.c:6540
+#, fuzzy
+msgid "Quoted Text Regular Expression"
+msgstr "Expression regulari:"
+
+#: ../src/sendmsg-window.c:7054
+#, fuzzy, c-format
+msgid "Reply to %s: %s"
+msgstr "Response-a:"
+
+#: ../src/sendmsg-window.c:7059
+#, fuzzy, c-format
+msgid "Forward message to %s: %s"
+msgstr "Transmisser li actual missage"
+
+#: ../src/sendmsg-window.c:7063
+#, fuzzy, c-format
+msgid "New message to %s: %s"
+msgstr "Nov %s"
+
+#: ../src/spell-check.c:507
+#, fuzzy
+msgid "_Change"
+msgstr "_Modificar"
+
+#: ../src/spell-check.c:509
+msgid "Replace the current word with the selected suggestion"
+msgstr ""
+
+#: ../src/spell-check.c:514
+#, fuzzy
+msgid "Change _All"
+msgstr "Modificar..."
+
+#: ../src/spell-check.c:516
+msgid ""
+"Replace all occurrences of the current word with the selected suggestion"
+msgstr ""
+
+#: ../src/spell-check.c:525
+msgid "_Ignore"
+msgstr "_Ignorar"
+
+#: ../src/spell-check.c:528
+#, fuzzy
+msgid "Skip the current word"
+msgstr "Omisser li actual album"
+
+#: ../src/spell-check.c:532
+#, fuzzy
+msgid "Ignore A_ll"
+msgstr "Gardar o_mni"
+
+#: ../src/spell-check.c:534
+msgid "Skip all occurrences of the current word"
+msgstr ""
+
+#: ../src/spell-check.c:540
+#, fuzzy
+msgid "_Learn"
+msgstr "Plu information pri Crowdin"
+
+#: ../src/spell-check.c:542
+msgid "Add the current word to your personal dictionary"
+msgstr ""
+
+#: ../src/spell-check.c:547
+#, fuzzy
+msgid "_Done"
+msgstr "_Finit"
+
+#: ../src/spell-check.c:548
+#, fuzzy
+msgid "Finish spell checking"
+msgstr "Control de ortografie"
+
+#: ../src/spell-check.c:553
+msgid "Revert all changes and finish spell checking"
+msgstr ""
+
+#: ../src/spell-check.c:582
+#, fuzzy
+msgid "Spell check"
+msgstr "Controlar ortografie"
+
+#: ../src/spell-check.c:860
+msgid "BalsaSpellCheck: Quoted text regular expression compilation failed\n"
+msgstr ""
+
+#: ../src/spell-check.c:984
+#, c-format
+msgid ""
+"BalsaSpellCheck: Learn operation failed;\n"
+"%s\n"
+msgstr ""
+
+#: ../src/spell-check.c:990
+#, fuzzy
+msgid "BalsaSpellCheck: Learn operation failed.\n"
+msgstr "Ne successat lansar un operation"
+
+#: ../src/spell-check.c:1189
+#, fuzzy, c-format
+msgid "BalsaSpellCheck: Suggest %s (%s)\n"
+msgstr "%s — %s [%s] (%s)"
+
+#: ../src/spell-check.c:1291
+#, fuzzy, c-format
+msgid "BalsaSpellCheck: Pspell Error: %s\n"
+msgstr "errore - iconv: %s -> %s\n"
+
+#: ../src/store-address.c:107
+#, fuzzy
+msgid "Store address: no addresses"
+msgstr "Butíca Magnatune"
+
+#: ../src/store-address.c:202
+#, fuzzy
+msgid "Store Address"
+msgstr "Butíca eMusic"
+
+#: ../src/store-address.c:223
+#, fuzzy
+msgid "Save this address and close the dialog?"
+msgstr "Gardar e _cluder"
+
+#: ../src/store-address.c:241
+#, fuzzy
+msgid "No address book selected...."
+msgstr "Adressarium GnomeCard"
+
+#: ../src/store-address.c:254
+#, fuzzy
+msgid "Address could not be written to this address book."
+msgstr "Adressarium GnomeCard"
+
+#: ../src/store-address.c:257
+#, fuzzy
+msgid "Address book could not be accessed."
+msgstr "Adressarium GnomeCard"
+
+#: ../src/store-address.c:259
+#, fuzzy
+msgid "This mail address is already in this address book."
+msgstr "Adressarium de Claws Mail"
+
+#: ../src/store-address.c:262
+msgid "Unexpected address book error. Report it."
+msgstr ""
+
+#: ../src/store-address.c:278
+#, fuzzy
+msgid "Choose Address Book"
+msgstr "_Adressarium..."
+
+#: ../src/store-address.c:326
+#, fuzzy
+msgid "Choose Address"
+msgstr "adresse"
+
+#: ../src/toolbar-factory.c:131
+msgid "Separator"
+msgstr "Separator"
+
+#: ../src/toolbar-factory.c:132
+msgid "Quit"
+msgstr "Salir"
+
+#: ../src/toolbar-factory.c:133
+msgid "Check"
+msgstr "Reciver"
+
+#: ../src/toolbar-factory.c:134
+msgid "Compose"
+msgstr "Composir"
+
+#: ../src/toolbar-factory.c:135
+#, fuzzy
+msgid "Continue"
+msgstr "Continuar"
+
+#: ../src/toolbar-factory.c:136
+msgid "Reply"
+msgstr "Responder"
+
+#: ../src/toolbar-factory.c:137
+msgid ""
+"Reply\n"
+"to all"
+msgstr ""
+"Responder\n"
+"a omni"
+
+#: ../src/toolbar-factory.c:138
+msgid ""
+"Reply\n"
+"to group"
+msgstr ""
+"Responder\n"
+"a gruppe"
+
+#: ../src/toolbar-factory.c:139
+msgid "Forward"
+msgstr "Transmisser"
+
+#: ../src/toolbar-factory.c:142
+#, fuzzy
+msgid ""
+"Next\n"
+"unread"
+msgstr "Ínleet"
+
+#: ../src/toolbar-factory.c:143
+#, fuzzy
+msgid ""
+"Next\n"
+"flagged"
+msgstr "ne flaggat"
+
+#: ../src/toolbar-factory.c:144
+#, fuzzy
+msgid ""
+"Previous\n"
+"part"
+msgstr "< _Prec"
+
+#: ../src/toolbar-factory.c:145
+#, fuzzy
+msgid ""
+"Next\n"
+"part"
+msgstr "_Seq >"
+
+#: ../src/toolbar-factory.c:146
+#, fuzzy
+msgid ""
+"Trash /\n"
+"Delete"
+msgstr ""
+"Li files ne posse esser movet in li Paper-corb. Esque deleter les "
+"permanentmen ex li disco?"
+
+#: ../src/toolbar-factory.c:147
+msgid "Postpone"
+msgstr "Ajornar"
+
+#: ../src/toolbar-factory.c:148
+msgid "Print"
+msgstr "Printar"
+
+#: ../src/toolbar-factory.c:149
+#, fuzzy
+msgid ""
+"Request\n"
+"MDN"
+msgstr "Ínvalid demande"
+
+#: ../src/toolbar-factory.c:150
+#, fuzzy
+msgid "Send"
+msgstr "Inviar a"
+
+#: ../src/toolbar-factory.c:151
+#, fuzzy
+msgid "Exchange"
+msgstr "Algoritmes de KEX (exchange de claves)"
+
+#: ../src/toolbar-factory.c:152
+msgid "Attach"
+msgstr "Atachar"
+
+#: ../src/toolbar-factory.c:153
+msgid "Save"
+msgstr "Salvar"
+
+#: ../src/toolbar-factory.c:154
+msgid "Identity"
+msgstr "Identitá"
+
+#: ../src/toolbar-factory.c:156
+msgid "Close"
+msgstr "Clúder"
+
+#: ../src/toolbar-factory.c:157
+#, fuzzy
+msgid ""
+"Toggle\n"
+"new"
+msgstr "(De)marcar"
+
+#: ../src/toolbar-factory.c:158
+#, fuzzy
+msgid "Mark all"
+msgstr "_Marcar omni"
+
+#: ../src/toolbar-factory.c:160
+#, fuzzy
+msgid ""
+"Reset\n"
+"Filter"
+msgstr "Reverter li filtre"
+
+#: ../src/toolbar-factory.c:163
+msgid "Sign"
+msgstr "Signar"
+
+#: ../src/toolbar-factory.c:164
+msgid "Encrypt"
+msgstr "Ciffrar"
+
+#: ../src/toolbar-factory.c:166
+msgid "Undo"
+msgstr "Defar"
+
+#: ../src/toolbar-factory.c:167
+msgid "Redo"
+msgstr "Refar"
+
+#: ../src/toolbar-factory.c:168
+msgid "Expunge"
+msgstr "Efaciar"
+
+#: ../src/toolbar-factory.c:169
+msgid ""
+"Empty\n"
+"Trash"
+msgstr "Vacuar li Paper-corb"
+
+#: ../src/toolbar-factory.c:170
+msgid "Edit"
+msgstr "Redacter"
+
+#: ../src/toolbar-factory.c:183
+#, fuzzy
+msgid "Queue"
+msgstr "Linea"
+
+#: ../src/toolbar-factory.c:388
+#, fuzzy, c-format
+msgid "Unknown toolbar icon \"%s\""
+msgstr "Ínconosset (%s %s)"
+
+#: ../src/toolbar-factory.c:459
+#, fuzzy
+msgid "Queue this message for sending"
+msgstr "Inviante li missage med comande: %s\n"
+
+#: ../src/toolbar-factory.c:525
+msgid "Text Be_low Icons"
+msgstr "Textu s_ub icones"
+
+#: ../src/toolbar-factory.c:526
+msgid "Priority Text Be_side Icons"
+msgstr "Textu important _apu icones"
+
+#: ../src/toolbar-factory.c:528
+msgid "_Icons Only"
+msgstr "Sol _icones"
+
+#: ../src/toolbar-factory.c:529
+msgid "_Text Only"
+msgstr "Sol _textu"
+
+#: ../src/toolbar-factory.c:752
+#, fuzzy, c-format
+msgid "Use Desktop _Default (%s)"
+msgstr "Predefinit"
+
+#: ../src/toolbar-factory.c:782
+#, fuzzy
+msgid "_Customize Toolbars..."
+msgstr "Adjustar"
+
+#: ../src/toolbar-prefs.c:136
+#, fuzzy
+msgid "Customize Toolbars"
+msgstr "Adjustar"
+
+#: ../src/toolbar-prefs.c:173
+#, fuzzy
+msgid "Compose window"
+msgstr "Fenestre de composition"
+
+#: ../src/toolbar-prefs.c:182
+#, fuzzy
+msgid "Toolbar options"
+msgstr "Panel de _instrumentarium"
+
+#: ../src/toolbar-prefs.c:191
+#, fuzzy
+msgid "_Wrap button labels"
+msgstr "Monstrar _etiquettes de butones"
+
+#: ../src/toolbar-prefs.c:406
+#, fuzzy, c-format
+msgid "Error displaying toolbar help: %s\n"
+msgstr "Un errore ha evenit monstrante auxilie: %s"
+
+#. Preview display
+#: ../src/toolbar-prefs.c:442
+msgid "Preview"
+msgstr "Previder"
+
+#: ../src/toolbar-prefs.c:479
+#, fuzzy
+msgid "_Restore toolbar to standard buttons"
+msgstr "Stil del panel de instrumentarium"
+
+#. Style button
+#: ../src/toolbar-prefs.c:483
+#, fuzzy
+msgid "Toolbar _style..."
+msgstr "Stil de panel de _instrumentarium"
+
+#: ../src/toolbar-prefs.c:500
+#, fuzzy
+msgid "Available buttons"
+msgstr "_Butones"
+
+#: ../src/toolbar-prefs.c:516
+#, fuzzy
+msgid "Current toolbar"
+msgstr "Panel de _instrumentarium"
+
+#: ../src/toolbar-prefs.c:533
+#, fuzzy
+msgid "Up"
+msgstr "Ad up"
+
+#: ../src/toolbar-prefs.c:549
+#, fuzzy
+msgid "Down"
+msgstr "Descarga"

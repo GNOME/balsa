@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-08-21 11:04+0000\n"
-"PO-Revision-Date: 2022-08-21 16:56+0300\n"
+"POT-Creation-Date: 2022-12-09 21:07+0000\n"
+"PO-Revision-Date: 2022-12-10 08:41+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -307,17 +307,17 @@ msgstr "У записі бази даних для «%s» не міститьс�
 msgid "Delete the Autocrypt key for “%s” from the database?"
 msgstr "Вилучити ключ Autocrypt для «%s» з бази даних?"
 
-#: ../libbalsa/body.c:141 ../libbalsa/mailbox_local.c:1884
+#: ../libbalsa/body.c:145 ../libbalsa/mailbox_local.c:1884
 #: ../libbalsa/message.c:949
 msgid "(No subject)"
 msgstr "(Без теми)"
 
-#: ../libbalsa/body.c:427 ../libbalsa/body.c:474
+#: ../libbalsa/body.c:431 ../libbalsa/body.c:478
 #, c-format
 msgid "Failed to create output stream"
 msgstr "Не вдалося створити потік виведення даних"
 
-#: ../libbalsa/body.c:611
+#: ../libbalsa/body.c:615
 #, c-format
 msgid "Could not read embedded message"
 msgstr "Не вдалося прочитати вбудоване повідомлення"
@@ -579,7 +579,7 @@ msgstr ""
 msgid "_Download external content"
 msgstr "_Отримати зовнішні дані"
 
-#: ../libbalsa/html.c:702
+#: ../libbalsa/html.c:708
 #, c-format
 msgid ""
 "Balsa's external HTML resources filter web extension is not available in the "
@@ -1898,32 +1898,20 @@ msgstr "Не вдалося створити каталог Maildir на %s (%s)
 msgid "Could not create a Maildir at %s (%s)"
 msgstr "Не вдалося створити Maildir на %s (%s)"
 
-#: ../libbalsa/mailbox_maildir.c:318
+#: ../libbalsa/mailbox_maildir.c:319 ../libbalsa/mailbox_mh.c:276
 #, c-format
-msgid ""
-"Could not remove contents of %s:\n"
-"%s"
-msgstr ""
-"Не вдалося вилучити вміст %s:\n"
-"%s"
+#| msgid "Could not remove %s: %s"
+msgid "Could not remove “%s”: %s"
+msgstr "Не вдалося вилучити «%s»: %s"
 
-#: ../libbalsa/mailbox_maildir.c:324
-#, c-format
-msgid ""
-"Could not remove %s:\n"
-"%s"
-msgstr ""
-"Не вдалося вилучити %s:\n"
-"%s"
-
-#: ../libbalsa/mailbox_maildir.c:467 ../libbalsa/mailbox_mbox.c:656
-#: ../libbalsa/mailbox_mh.c:507
+#: ../libbalsa/mailbox_maildir.c:463 ../libbalsa/mailbox_mbox.c:656
+#: ../libbalsa/mailbox_mh.c:504
 #, c-format
 msgid "Mailbox does not exist."
 msgstr "Поштова скринька не існує."
 
-#: ../libbalsa/mailbox_maildir.c:908 ../libbalsa/mailbox_mbox.c:1935
-#: ../libbalsa/mailbox_mh.c:1087
+#: ../libbalsa/mailbox_maildir.c:904 ../libbalsa/mailbox_mbox.c:1935
+#: ../libbalsa/mailbox_mh.c:1084
 #, c-format
 msgid "Data copy error"
 msgstr "Помилка копіювання даних"
@@ -1933,7 +1921,7 @@ msgstr "Помилка копіювання даних"
 msgid "Mailbox %s does not appear to be an mbox mailbox."
 msgstr "Поштова скринька «%s» не схожа на скриньку mbox."
 
-#: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:280
+#: ../libbalsa/mailbox_mbox.c:279
 #, c-format
 msgid "Could not remove %s: %s"
 msgstr "Не вдалося вилучити %s: %s"
@@ -2003,17 +1991,12 @@ msgstr "Не вдалося створити каталог MH на %s (%s)"
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Не вдалося створити структуру MH на %s (%s)"
 
-#: ../libbalsa/mailbox_mh.c:274
-#, c-format
-msgid "Could not remove contents of %s: %s"
-msgstr "Не вдалося вилучити вміст %s: %s"
-
-#: ../libbalsa/mailbox_mh.c:1069
+#: ../libbalsa/mailbox_mh.c:1066
 #, c-format
 msgid "Cannot create message"
 msgstr "Не вдалося створити повідомлення"
 
-#: ../libbalsa/mailbox_mh.c:1112
+#: ../libbalsa/mailbox_mh.c:1109
 #, c-format
 msgid "Message rename error"
 msgstr "Помилка під час спроби перейменувати повідомлення"
@@ -2070,7 +2053,7 @@ msgstr "Поштова скринька POP3 %s: не вдалося з'єдна
 msgid "List messages…"
 msgstr "Показ списку повідомлень…"
 
-#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:701
+#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:702
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr "Помилка поштової скриньки POP3 %s: %s"
@@ -2082,12 +2065,12 @@ msgstr ""
 "Поштова скринька POP3 %s: розмір повідомлення %d є надмірним: %s — "
 "пропускаємо."
 
-#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1034
+#: ../libbalsa/mailbox_pop3.c:650 ../libbalsa/send.c:1034
 #, c-format
 msgid "Connected to %s"
 msgstr "Підключений до %s"
 
-#: ../libbalsa/mailbox_pop3.c:665
+#: ../libbalsa/mailbox_pop3.c:666
 #, c-format
 msgid "%lu new message (%s)"
 msgid_plural "%lu new messages (%s)"
@@ -2096,11 +2079,11 @@ msgstr[1] "%lu нових повідомлення (%s)"
 msgstr[2] "%lu нових повідомлень (%s)"
 msgstr[3] "%lu нове повідомлення (%s)"
 
-#: ../libbalsa/mailbox_pop3.c:676
+#: ../libbalsa/mailbox_pop3.c:677
 msgid "Deleting messages on server…"
 msgstr "Вилучаємо повідомлення з сервера…"
 
-#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1115
+#: ../libbalsa/mailbox_pop3.c:712 ../libbalsa/send.c:1115
 msgid "Finished"
 msgstr "Завершено"
 
@@ -2111,112 +2094,118 @@ msgstr ""
 "Поштова скринька (%s) працює у режимі лише читання: змінювати прапорці не "
 "можна."
 
-#: ../libbalsa/misc.c:387
+#: ../libbalsa/misc.c:226 ../libbalsa/misc.c:235
+#, c-format
+#| msgid "Cannot read the file “%s”: %s"
+msgid "cannot delete “%s”: %s"
+msgstr "не вдалося вилучити «%s»: %s"
+
+#: ../libbalsa/misc.c:388
 msgid "West European"
 msgstr "Західноєвропейське"
 
-#: ../libbalsa/misc.c:389 ../libbalsa/misc.c:423
+#: ../libbalsa/misc.c:390 ../libbalsa/misc.c:424
 msgid "East European"
 msgstr "Східноєвропейське"
 
-#: ../libbalsa/misc.c:391
+#: ../libbalsa/misc.c:392
 msgid "South European"
 msgstr "Південноєвропейське"
 
-#: ../libbalsa/misc.c:393
+#: ../libbalsa/misc.c:394
 msgid "North European"
 msgstr "Північноєвропейське"
 
-#: ../libbalsa/misc.c:395 ../libbalsa/misc.c:425
+#: ../libbalsa/misc.c:396 ../libbalsa/misc.c:426
 msgid "Cyrillic"
 msgstr "Кирилиця"
 
-#: ../libbalsa/misc.c:397 ../libbalsa/misc.c:431
+#: ../libbalsa/misc.c:398 ../libbalsa/misc.c:432
 msgid "Arabic"
 msgstr "Арабське"
 
-#: ../libbalsa/misc.c:399 ../libbalsa/misc.c:427
+#: ../libbalsa/misc.c:400 ../libbalsa/misc.c:428
 msgid "Greek"
 msgstr "Грецьке"
 
-#: ../libbalsa/misc.c:401 ../libbalsa/misc.c:429
+#: ../libbalsa/misc.c:402 ../libbalsa/misc.c:430
 msgid "Hebrew"
 msgstr "Іврит"
 
-#: ../libbalsa/misc.c:403
+#: ../libbalsa/misc.c:404
 msgid "Turkish"
 msgstr "Турецьке"
 
-#: ../libbalsa/misc.c:405
+#: ../libbalsa/misc.c:406
 msgid "Nordic"
 msgstr "Нордичне"
 
-#: ../libbalsa/misc.c:407
+#: ../libbalsa/misc.c:408
 msgid "Thai"
 msgstr "Тайське"
 
-#: ../libbalsa/misc.c:409 ../libbalsa/misc.c:433
+#: ../libbalsa/misc.c:410 ../libbalsa/misc.c:434
 msgid "Baltic"
 msgstr "Балтійське"
 
-#: ../libbalsa/misc.c:411
+#: ../libbalsa/misc.c:412
 msgid "Celtic"
 msgstr "Кельтське"
 
-#: ../libbalsa/misc.c:413
+#: ../libbalsa/misc.c:414
 msgid "West European (euro)"
 msgstr "Західноєвропейське (євро)"
 
-#: ../libbalsa/misc.c:415
+#: ../libbalsa/misc.c:416
 msgid "Russian"
 msgstr "Російське"
 
-#: ../libbalsa/misc.c:417
+#: ../libbalsa/misc.c:418
 msgid "Ukrainian"
 msgstr "Українське"
 
-#: ../libbalsa/misc.c:419
+#: ../libbalsa/misc.c:420
 msgid "Japanese"
 msgstr "Японське"
 
-#: ../libbalsa/misc.c:421
+#: ../libbalsa/misc.c:422
 msgid "Korean"
 msgstr "Корейське"
 
-#: ../libbalsa/misc.c:614
+#: ../libbalsa/misc.c:615
 #, c-format
 msgid "Cannot open %s: %s"
 msgstr "Не вдалося відкрити %s: %s"
 
-#: ../libbalsa/misc.c:623
+#: ../libbalsa/misc.c:624
 #, c-format
 msgid "Cannot open %s: is a symbolic link"
 msgstr "Не вдалося відкрити %s: це символічне посилання"
 
-#: ../libbalsa/misc.c:734
+#: ../libbalsa/misc.c:735
 #, c-format
 msgid "fcntl failed: %s."
 msgstr "Помилка fcntl: %s."
 
-#: ../libbalsa/misc.c:750
+#: ../libbalsa/misc.c:751
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Вийшов час очікування на спробі виконати блокування через fcntl!"
 
-#: ../libbalsa/misc.c:757
+#: ../libbalsa/misc.c:758
 #, c-format
 msgid "Waiting for fcntl lock… %d"
 msgstr "Очікуємо на блокування fcntl… %d"
 
-#: ../libbalsa/misc.c:786
+#: ../libbalsa/misc.c:787
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Вичерпано час очікування на спробі виконати блокування через flock!"
 
-#: ../libbalsa/misc.c:794
+#: ../libbalsa/misc.c:795
 #, c-format
 msgid "Waiting for flock attempt… %d"
 msgstr "Очікування блокування через flock… %d"
 
-#: ../libbalsa/misc.c:1099
+#: ../libbalsa/misc.c:1100
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Каталог LDAP для %s"
@@ -3006,7 +2995,6 @@ msgid "Error adding from %s: %s\n"
 msgstr "Помилка додавання з %s: %s\n"
 
 #: ../libbalsa/system-tray.c:99
-#| msgid "You have new mail."
 msgid "Balsa: you have new mail"
 msgstr "Bals: ви отримали нову пошту"
 
@@ -3487,7 +3475,7 @@ msgstr "Вибрати"
 msgid "Edit"
 msgstr "Змінити"
 
-#: ../src/ab-main.c:1096
+#: ../src/ab-main.c:1101
 msgid "Balsa Address Book"
 msgstr "Адресна книга Balsa"
 
@@ -8211,6 +8199,26 @@ msgstr "Долучити _відкритий ключ GnuPG"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Екранувати спеціальні символи"
+
+#, c-format
+#~ msgid ""
+#~ "Could not remove contents of %s:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Не вдалося вилучити вміст %s:\n"
+#~ "%s"
+
+#, c-format
+#~ msgid ""
+#~ "Could not remove %s:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Не вдалося вилучити %s:\n"
+#~ "%s"
+
+#, c-format
+#~ msgid "Could not remove contents of %s: %s"
+#~ msgstr "Не вдалося вилучити вміст %s: %s"
 
 #~ msgid "When mail arrives:"
 #~ msgstr "Коли з'являється пошта:"

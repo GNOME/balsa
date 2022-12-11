@@ -1,22 +1,22 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Georgian translation for balsa.
+# Copyright (C) 2022, balsa authors
+# This file is distributed under the same license as the balsa package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2022
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-08-21 11:04+0000\n"
-"PO-Revision-Date: 2022-10-25 07:13+0200\n"
-"Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
+"POT-Creation-Date: 2022-12-09 21:07+0000\n"
+"PO-Revision-Date: 2022-12-11 10:31+0100\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: \n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: ../balsa.appdata.xml.in.h:1
 msgid ""
@@ -26,7 +26,7 @@ msgstr ""
 
 #: ../balsa.appdata.xml.in.h:2
 msgid "IMAP and POP3 support;"
-msgstr ""
+msgstr "IMAP -ის და POP3 -ის მხარდაჭერა;"
 
 #: ../balsa.appdata.xml.in.h:3
 msgid "sendmail or direct SMTP support;"
@@ -46,7 +46,7 @@ msgstr ""
 
 #: ../balsa.appdata.xml.in.h:7
 msgid "mail printing;"
-msgstr ""
+msgstr "ელფოსტის ბეჭდვა:"
 
 #: ../balsa.appdata.xml.in.h:8
 msgid "inline attachment viewing;"
@@ -64,7 +64,7 @@ msgstr "Balsa"
 #: ../org.desktop.Balsa.desktop.in.in.h:2
 #: ../balsa-mailto-handler.desktop.in.in.h:2
 msgid "Email utility"
-msgstr ""
+msgstr "ელფოსტის პროგრამა"
 
 #: ../org.desktop.Balsa.desktop.in.in.h:3
 #: ../balsa-mailto-handler.desktop.in.in.h:3
@@ -120,7 +120,7 @@ msgstr "უცნობი შეცდომა"
 #. The extern database doesn't support Id's, sorry!
 #: ../libbalsa/address-book-extern.c:189 ../libbalsa/address-book-ldif.c:243
 msgid "No-Id"
-msgstr ""
+msgstr "ID-ის გარეშე"
 
 #: ../libbalsa/address-book-extern.c:191 ../libbalsa/address-book-extern.c:349
 #: ../libbalsa/address-book-ldap.c:552 ../libbalsa/address-book-ldif.c:189
@@ -129,7 +129,7 @@ msgstr ""
 #: ../libbalsa/address-book-vcard.c:249 ../libbalsa/address.c:392
 #: ../libbalsa/rfc6350.c:112
 msgid "No-Name"
-msgstr ""
+msgstr "სახელის-გარეშე"
 
 #. very unlikely...
 #: ../libbalsa/address-book-ldap.c:333
@@ -161,27 +161,27 @@ msgstr ""
 
 #: ../libbalsa/address.c:955
 msgid "D_isplayed Name:"
-msgstr ""
+msgstr "_საჩვენებელი სახელი:"
 
 #: ../libbalsa/address.c:956
 msgid "_First Name:"
-msgstr ""
+msgstr "_სახელი:"
 
 #: ../libbalsa/address.c:957
 msgid "_Last Name:"
-msgstr ""
+msgstr "_გვარი:"
 
 #: ../libbalsa/address.c:958
 msgid "_Nickname:"
-msgstr ""
+msgstr "_მეტსახელი:"
 
 #: ../libbalsa/address.c:959
 msgid "O_rganization:"
-msgstr ""
+msgstr "_ორგანიზაცია:"
 
 #: ../libbalsa/address.c:960
 msgid "_Email Address:"
-msgstr ""
+msgstr "_ელფოსტის მისამართი:"
 
 #: ../libbalsa/address.c:981 ../src/filter-edit-callbacks.c:1068
 msgid "A_dd"
@@ -273,7 +273,7 @@ msgstr ""
 
 #: ../libbalsa/autocrypt.c:889
 msgid "_Show details…"
-msgstr ""
+msgstr "_დეტალების ჩვენება…"
 
 #: ../libbalsa/autocrypt.c:892 ../libbalsa/html-pref-db.c:453
 #: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1040
@@ -295,17 +295,17 @@ msgstr ""
 msgid "Delete the Autocrypt key for “%s” from the database?"
 msgstr ""
 
-#: ../libbalsa/body.c:141 ../libbalsa/mailbox_local.c:1884
+#: ../libbalsa/body.c:145 ../libbalsa/mailbox_local.c:1884
 #: ../libbalsa/message.c:949
 msgid "(No subject)"
 msgstr "(სათაურის გარეშე)"
 
-#: ../libbalsa/body.c:427 ../libbalsa/body.c:474
+#: ../libbalsa/body.c:431 ../libbalsa/body.c:478
 #, c-format
 msgid "Failed to create output stream"
 msgstr ""
 
-#: ../libbalsa/body.c:611
+#: ../libbalsa/body.c:615
 #, c-format
 msgid "Could not read embedded message"
 msgstr ""
@@ -317,7 +317,7 @@ msgstr ""
 #: ../libbalsa/filter.c:221
 #, c-format
 msgid "Invalid filter: %s"
-msgstr ""
+msgstr "არასწორი ფილტრი: %s"
 
 #: ../libbalsa/filter.c:266 ../libbalsa/filter.c:289
 #, c-format
@@ -363,7 +363,7 @@ msgstr ""
 #. FIXME: this is hack!
 #: ../libbalsa/filter-funcs.c:381 ../src/balsa-index.c:1129
 msgid "To"
-msgstr ""
+msgstr "ვის"
 
 #: ../libbalsa/filter-funcs.c:382 ../src/balsa-index.c:410
 msgid "From"
@@ -401,19 +401,19 @@ msgstr "ნაპასუხები"
 
 #: ../libbalsa/filter-funcs.c:415 ../src/filter-edit-callbacks.c:991
 msgid "Flagged"
-msgstr ""
+msgstr "ალმის სტატუსი"
 
 #: ../libbalsa/filter-funcs.c:439
 msgid "Not "
-msgstr ""
+msgstr "არ "
 
 #: ../libbalsa/filter-funcs.c:455
 msgid "From %Y-%m-%d"
-msgstr ""
+msgstr "საიდან %Y-%m-%d"
 
 #: ../libbalsa/filter-funcs.c:461
 msgid "To %Y-%m-%d"
-msgstr ""
+msgstr "სად %Y-%m-%d"
 
 #: ../libbalsa/filter-funcs.c:469
 msgid "And"
@@ -450,12 +450,12 @@ msgstr ""
 #: ../libbalsa/gmime-gpgme-signature.c:172
 #, c-format
 msgid "%s signature: %s"
-msgstr ""
+msgstr "%s ხელმოწერა: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:190
 #, c-format
 msgid " signature: %s"
-msgstr ""
+msgstr " ხელმოწერა: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:194
 #, c-format
@@ -470,6 +470,8 @@ msgid ""
 "\n"
 "Signed on: %s"
 msgstr ""
+"\n"
+"ხელმოწერის თარიღი: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:201
 #, c-format
@@ -546,7 +548,7 @@ msgstr ""
 msgid "_Download external content"
 msgstr ""
 
-#: ../libbalsa/html.c:702
+#: ../libbalsa/html.c:708
 #, c-format
 msgid ""
 "Balsa's external HTML resources filter web extension is not available in the "
@@ -604,7 +606,7 @@ msgstr "Re:"
 #: ../libbalsa/identity.c:110 ../src/sendmsg-window.c:3822
 #: ../src/sendmsg-window.c:3823 ../src/sendmsg-window.c:3824
 msgid "Fwd:"
-msgstr ""
+msgstr "გადაგზავნა:"
 
 #: ../libbalsa/identity.c:175
 msgid "New Identity"
@@ -693,11 +695,11 @@ msgstr ""
 
 #: ../libbalsa/identity.c:869
 msgid "_Full name:"
-msgstr ""
+msgstr "_სახელი და გვარი:"
 
 #: ../libbalsa/identity.c:871
 msgid "_Mailing address:"
-msgstr ""
+msgstr "_ფოსტის მისამართი:"
 
 #: ../libbalsa/identity.c:873
 msgid "Reply _to:"
@@ -705,7 +707,7 @@ msgstr ""
 
 #: ../libbalsa/identity.c:875
 msgid "_Domain:"
-msgstr ""
+msgstr "_დომენი:"
 
 #. create the "Messages" tab
 #: ../libbalsa/identity.c:879
@@ -714,7 +716,7 @@ msgstr "შეტყობინებები"
 
 #: ../libbalsa/identity.c:881
 msgid "_BCC:"
-msgstr ""
+msgstr "_ფარული ასლი:"
 
 #: ../libbalsa/identity.c:883
 msgid "Reply _string:"
@@ -738,7 +740,7 @@ msgstr ""
 
 #: ../libbalsa/identity.c:904
 msgid "SMT_P server:"
-msgstr ""
+msgstr "_SMTP სერვერი:"
 
 #. create the "Signature" tab
 #: ../libbalsa/identity.c:908
@@ -1774,28 +1776,19 @@ msgstr ""
 msgid "Could not create a Maildir at %s (%s)"
 msgstr ""
 
-#: ../libbalsa/mailbox_maildir.c:318
+#: ../libbalsa/mailbox_maildir.c:319 ../libbalsa/mailbox_mh.c:276
 #, c-format
-msgid ""
-"Could not remove contents of %s:\n"
-"%s"
+msgid "Could not remove “%s”: %s"
 msgstr ""
 
-#: ../libbalsa/mailbox_maildir.c:324
-#, c-format
-msgid ""
-"Could not remove %s:\n"
-"%s"
-msgstr ""
-
-#: ../libbalsa/mailbox_maildir.c:467 ../libbalsa/mailbox_mbox.c:656
-#: ../libbalsa/mailbox_mh.c:507
+#: ../libbalsa/mailbox_maildir.c:463 ../libbalsa/mailbox_mbox.c:656
+#: ../libbalsa/mailbox_mh.c:504
 #, c-format
 msgid "Mailbox does not exist."
 msgstr ""
 
-#: ../libbalsa/mailbox_maildir.c:908 ../libbalsa/mailbox_mbox.c:1935
-#: ../libbalsa/mailbox_mh.c:1087
+#: ../libbalsa/mailbox_maildir.c:904 ../libbalsa/mailbox_mbox.c:1935
+#: ../libbalsa/mailbox_mh.c:1084
 #, c-format
 msgid "Data copy error"
 msgstr ""
@@ -1805,7 +1798,7 @@ msgstr ""
 msgid "Mailbox %s does not appear to be an mbox mailbox."
 msgstr ""
 
-#: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:280
+#: ../libbalsa/mailbox_mbox.c:279
 #, c-format
 msgid "Could not remove %s: %s"
 msgstr ""
@@ -1875,17 +1868,12 @@ msgstr ""
 msgid "Could not create MH structure at %s (%s)"
 msgstr ""
 
-#: ../libbalsa/mailbox_mh.c:274
-#, c-format
-msgid "Could not remove contents of %s: %s"
-msgstr ""
-
-#: ../libbalsa/mailbox_mh.c:1069
+#: ../libbalsa/mailbox_mh.c:1066
 #, c-format
 msgid "Cannot create message"
 msgstr ""
 
-#: ../libbalsa/mailbox_mh.c:1112
+#: ../libbalsa/mailbox_mh.c:1109
 #, c-format
 msgid "Message rename error"
 msgstr ""
@@ -1941,7 +1929,7 @@ msgstr ""
 msgid "List messages…"
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:701
+#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:702
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr ""
@@ -1951,23 +1939,23 @@ msgstr ""
 msgid "POP3 mailbox %s: message %d oversized: %s — skipped."
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1034
+#: ../libbalsa/mailbox_pop3.c:650 ../libbalsa/send.c:1034
 #, c-format
 msgid "Connected to %s"
 msgstr "მიერთებულია %s-თან"
 
-#: ../libbalsa/mailbox_pop3.c:665
+#: ../libbalsa/mailbox_pop3.c:666
 #, c-format
 msgid "%lu new message (%s)"
 msgid_plural "%lu new messages (%s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/mailbox_pop3.c:676
+#: ../libbalsa/mailbox_pop3.c:677
 msgid "Deleting messages on server…"
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1115
+#: ../libbalsa/mailbox_pop3.c:712 ../libbalsa/send.c:1115
 msgid "Finished"
 msgstr "დასრულებულია"
 
@@ -1976,112 +1964,117 @@ msgstr "დასრულებულია"
 msgid "Mailbox (%s) is read-only: cannot change flags."
 msgstr ""
 
-#: ../libbalsa/misc.c:387
+#: ../libbalsa/misc.c:226 ../libbalsa/misc.c:235
+#, c-format
+msgid "cannot delete “%s”: %s"
+msgstr "%s-ის წაშლის შეცდომა: %s"
+
+#: ../libbalsa/misc.c:388
 msgid "West European"
 msgstr ""
 
-#: ../libbalsa/misc.c:389 ../libbalsa/misc.c:423
+#: ../libbalsa/misc.c:390 ../libbalsa/misc.c:424
 msgid "East European"
-msgstr ""
+msgstr "აღმოსავლურ ევროპული"
 
-#: ../libbalsa/misc.c:391
+#: ../libbalsa/misc.c:392
 msgid "South European"
 msgstr "სამხრეთ ევროპული"
 
-#: ../libbalsa/misc.c:393
+#: ../libbalsa/misc.c:394
 msgid "North European"
 msgstr ""
 
-#: ../libbalsa/misc.c:395 ../libbalsa/misc.c:425
+#: ../libbalsa/misc.c:396 ../libbalsa/misc.c:426
 msgid "Cyrillic"
 msgstr "კირილიცა"
 
-#: ../libbalsa/misc.c:397 ../libbalsa/misc.c:431
+#: ../libbalsa/misc.c:398 ../libbalsa/misc.c:432
 msgid "Arabic"
 msgstr "არაბული"
 
-#: ../libbalsa/misc.c:399 ../libbalsa/misc.c:427
+#: ../libbalsa/misc.c:400 ../libbalsa/misc.c:428
 msgid "Greek"
 msgstr "ბერძნული"
 
-#: ../libbalsa/misc.c:401 ../libbalsa/misc.c:429
+#: ../libbalsa/misc.c:402 ../libbalsa/misc.c:430
 msgid "Hebrew"
 msgstr "ივრითი"
 
-#: ../libbalsa/misc.c:403
+#: ../libbalsa/misc.c:404
 msgid "Turkish"
 msgstr "თურქული"
 
-#: ../libbalsa/misc.c:405
+#: ../libbalsa/misc.c:406
 msgid "Nordic"
 msgstr "სკანდინავიური"
 
-#: ../libbalsa/misc.c:407
+#: ../libbalsa/misc.c:408
 msgid "Thai"
 msgstr "ტაილანდური"
 
-#: ../libbalsa/misc.c:409 ../libbalsa/misc.c:433
+#: ../libbalsa/misc.c:410 ../libbalsa/misc.c:434
 msgid "Baltic"
 msgstr "ბალტიური"
 
-#: ../libbalsa/misc.c:411
+#: ../libbalsa/misc.c:412
 msgid "Celtic"
 msgstr "კელტური"
 
-#: ../libbalsa/misc.c:413
+#: ../libbalsa/misc.c:414
 msgid "West European (euro)"
 msgstr ""
 
-#: ../libbalsa/misc.c:415
+#: ../libbalsa/misc.c:416
 msgid "Russian"
 msgstr "რუსული"
 
-#: ../libbalsa/misc.c:417
+#: ../libbalsa/misc.c:418
 msgid "Ukrainian"
 msgstr "უკრაინული"
 
-#: ../libbalsa/misc.c:419
+#: ../libbalsa/misc.c:420
 msgid "Japanese"
 msgstr "იაპონური"
 
-#: ../libbalsa/misc.c:421
+#: ../libbalsa/misc.c:422
 msgid "Korean"
 msgstr "კორეული"
 
-#: ../libbalsa/misc.c:614
+#: ../libbalsa/misc.c:615
 #, c-format
 msgid "Cannot open %s: %s"
 msgstr "%s-ის გახსნის შეცდომა: %s"
 
-#: ../libbalsa/misc.c:623
+#: ../libbalsa/misc.c:624
 #, c-format
 msgid "Cannot open %s: is a symbolic link"
 msgstr ""
 
-#: ../libbalsa/misc.c:734
+#: ../libbalsa/misc.c:735
 #, c-format
 msgid "fcntl failed: %s."
 msgstr ""
 
-#: ../libbalsa/misc.c:750
+#: ../libbalsa/misc.c:751
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr ""
 
-#: ../libbalsa/misc.c:757
+#: ../libbalsa/misc.c:758
 #, c-format
 msgid "Waiting for fcntl lock… %d"
 msgstr ""
 
-#: ../libbalsa/misc.c:786
+#: ../libbalsa/misc.c:787
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr ""
 
-#: ../libbalsa/misc.c:794
+#: ../libbalsa/misc.c:795
 #, c-format
 msgid "Waiting for flock attempt… %d"
 msgstr ""
 
-#: ../libbalsa/misc.c:1099
+#: ../libbalsa/misc.c:1100
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr ""
@@ -2530,7 +2523,7 @@ msgstr ""
 
 #: ../libbalsa/rfc3156.c:540
 msgid "The signature is invalid."
-msgstr ""
+msgstr "ხელმოწერა არასწორია."
 
 #: ../libbalsa/rfc3156.c:542
 msgid "The signature could not be verified due to a missing key."
@@ -3283,7 +3276,7 @@ msgstr "დათვალიერება"
 msgid "Edit"
 msgstr "რედაქტირება"
 
-#: ../src/ab-main.c:1096
+#: ../src/ab-main.c:1101
 msgid "Balsa Address Book"
 msgstr ""
 
@@ -3644,7 +3637,7 @@ msgstr ""
 
 #: ../src/balsa-message.c:315
 msgid "Wrapped"
-msgstr ""
+msgstr "_გადატანილი"
 
 #: ../src/balsa-message.c:319
 msgid "Not found"
@@ -4168,7 +4161,7 @@ msgstr "ბმულის გახსნა"
 
 #: ../src/balsa-mime-widget-text.c:599 ../src/balsa-mime-widget-text.c:1223
 msgid "Send link…"
-msgstr "ბმულის გაგზავნა..."
+msgstr "ბმულის გაგზავნა…"
 
 #: ../src/balsa-mime-widget-text.c:631 ../src/balsa-mime-widget-text.c:1169
 msgid "Save…"
@@ -4912,7 +4905,7 @@ msgstr ""
 #. INPUT FIELD CREATION
 #: ../src/folder-conf.c:873 ../src/folder-conf.c:1106
 msgid "_Folder name:"
-msgstr ""
+msgstr "_საქაღალდის სახელი:"
 
 #: ../src/folder-conf.c:879
 msgid "Host:"
@@ -4924,7 +4917,7 @@ msgstr ""
 
 #: ../src/folder-conf.c:895
 msgid "_Browse…"
-msgstr ""
+msgstr "_პოვნა…"
 
 #: ../src/folder-conf.c:907
 msgid "read-only"
@@ -5269,11 +5262,11 @@ msgstr "_ახალი"
 #. clicked on the empty space
 #: ../src/mailbox-node.c:1020 ../src/mailbox-node.c:1036
 msgid "_Rescan"
-msgstr ""
+msgstr "_თავიდან სკანირება"
 
 #: ../src/mailbox-node.c:1030
 msgid "_Properties…"
-msgstr ""
+msgstr "_თვისებები…"
 
 #: ../src/mailbox-node.c:1060
 msgid "Mark as _Inbox"
@@ -5612,7 +5605,7 @@ msgstr ""
 
 #: ../src/pref-manager.c:963 ../src/pref-manager.c:3641
 msgid "Unknown"
-msgstr ""
+msgstr "უცნობ"
 
 #. Translators: #1 address book name
 #: ../src/pref-manager.c:967
@@ -5717,7 +5710,7 @@ msgstr "სერვერი სახელი"
 
 #: ../src/pref-manager.c:2132
 msgid "Checking"
-msgstr ""
+msgstr "შემოწმება"
 
 #: ../src/pref-manager.c:2135
 msgid "_Check mail automatically every"
@@ -6181,7 +6174,7 @@ msgstr ""
 
 #: ../src/print-gtk.c:128
 msgid "Signed"
-msgstr ""
+msgstr "ხელმოწერილი"
 
 #: ../src/print-gtk.c:131
 msgid "Encrypted"
@@ -6227,7 +6220,7 @@ msgstr ""
 #. syntax highlighting
 #: ../src/print-gtk.c:625
 msgid "Highlighting"
-msgstr ""
+msgstr "გამოკვეთა"
 
 #: ../src/print-gtk.c:628
 msgid "Highlight _cited text"
@@ -7095,7 +7088,7 @@ msgstr ""
 
 #: ../src/toolbar-factory.c:131 ../ui/sendmsg-window.ui.h:8
 msgid "Postpone"
-msgstr ""
+msgstr "გადადება"
 
 #: ../src/toolbar-factory.c:132
 msgid "Print"
@@ -7706,7 +7699,7 @@ msgstr ""
 
 #: ../ui/sendmsg-window.ui.h:27
 msgid "_Show"
-msgstr ""
+msgstr "_ჩვენება"
 
 #: ../ui/sendmsg-window.ui.h:29
 msgid "F_rom"

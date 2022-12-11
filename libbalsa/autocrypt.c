@@ -704,58 +704,51 @@ extract_ac_keydata(GMimeAutocryptHeader *autocrypt_header, ac_key_data_t *dest)
 	keydata = g_mime_autocrypt_header_get_keydata(autocrypt_header);
 	if (keydata != NULL) {
 		gpgme_ctx_t ctx;
+		gchar *temp_dir = NULL;
 
 		dest->keydata = g_bytes_get_data(keydata, &dest->keysize);
 
 		/* try to import the key into a temporary context: validate, get fingerprint and expiry date */
-		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, NULL);
+		ctx = libbalsa_gpgme_temp_with_proto(GPGME_PROTOCOL_OpenPGP, &temp_dir, NULL);
 		if (ctx != NULL) {
-			gchar *temp_dir = NULL;
+			GList *keys = NULL;
+			GError *gpg_error = NULL;
+			guint bad_keys = 0U;
 
-			if (!libbalsa_mktempdir(&temp_dir)) {
-				g_warning("Failed to create a temporary folder");
-			} else {
-				GList *keys = NULL;
-				GError *gpg_error = NULL;
-				guint bad_keys = 0U;
+			success = libbalsa_gpgme_import_bin_key(ctx, keydata, NULL, &gpg_error) &&
+				libbalsa_gpgme_list_keys(ctx, &keys, &bad_keys, NULL, FALSE, FALSE, FALSE, &gpg_error);
+			if (success && (keys != NULL) && (keys->next == NULL)) {
+				gpgme_key_t key = (gpgme_key_t) keys->data;
 
-				success = libbalsa_gpgme_ctx_set_home(ctx, temp_dir, &gpg_error) &&
-					libbalsa_gpgme_import_bin_key(ctx, keydata, NULL, &gpg_error) &&
-					libbalsa_gpgme_list_keys(ctx, &keys, &bad_keys, NULL, FALSE, FALSE, FALSE, &gpg_error);
-				if (success && (keys != NULL) && (keys->next == NULL)) {
-					gpgme_key_t key = (gpgme_key_t) keys->data;
+				if (key != NULL) {
+					gpgme_subkey_t sign_subkey;
 
-					if (key != NULL) {
-						gpgme_subkey_t sign_subkey;
-
-						for (sign_subkey = key->subkeys;
-							 (sign_subkey != NULL) && (sign_subkey->can_sign == 0);
-							 sign_subkey = sign_subkey->next);
-						if (sign_subkey != NULL) {
-							dest->fingerprint = g_strdup(sign_subkey->fpr);
-							dest->expires = sign_subkey->expires;
-						} else {
-							g_warning("Autocrypt key for '%s' does not contain a signing-capable subkey",
-								g_mime_autocrypt_header_get_address_as_string(autocrypt_header));
-							success = FALSE;
-						}
+					for (sign_subkey = key->subkeys;
+						(sign_subkey != NULL) && (sign_subkey->can_sign == 0);
+						sign_subkey = sign_subkey->next);
+					if (sign_subkey != NULL) {
+						dest->fingerprint = g_strdup(sign_subkey->fpr);
+						dest->expires = sign_subkey->expires;
 					} else {
+						g_warning("Autocrypt key for '%s' does not contain a signing-capable subkey",
+							g_mime_autocrypt_header_get_address_as_string(autocrypt_header));
 						success = FALSE;
 					}
 				} else {
-					g_warning("Failed to import or list key data for '%s': %s (%u keys, %u bad)",
-						g_mime_autocrypt_header_get_address_as_string(autocrypt_header),
-						(gpg_error != NULL) ? gpg_error->message : "unknown", (keys != NULL) ? g_list_length(keys) : 0U, bad_keys);
 					success = FALSE;
 				}
-				g_clear_error(&gpg_error);
-
-				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
-				libbalsa_delete_directory(temp_dir, NULL);
-				g_free(temp_dir);
+			} else {
+				g_warning("Failed to import or list key data for '%s': %s (%u keys, %u bad)",
+					g_mime_autocrypt_header_get_address_as_string(autocrypt_header),
+					(gpg_error != NULL) ? gpg_error->message : "unknown", (keys != NULL) ? g_list_length(keys) : 0U, bad_keys);
+				success = FALSE;
 			}
+			g_clear_error(&gpg_error);
 
+			g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
 			gpgme_release(ctx);
+			libbalsa_delete_directory(temp_dir, NULL);
+			g_free(temp_dir);
 		}
 	}
 
@@ -905,55 +898,56 @@ popup_menu_real(GtkWidget *widget, const GdkEvent *event)
 static void
 show_key_details_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 {
-    GtkTreeModel *model;
-    GtkTreeSelection *selection;
-    GtkTreeIter iter;
+	GtkTreeModel *model;
+	GtkTreeSelection *selection;
+	GtkTreeIter iter;
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(user_data));
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(user_data));
 	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
 		gpgme_ctx_t ctx;
+		gchar *temp_dir = NULL;
+		GError *error = NULL;
 
-		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, NULL);
+		ctx = libbalsa_gpgme_temp_with_proto(GPGME_PROTOCOL_OpenPGP, &temp_dir, &error);
 		if (ctx != NULL) {
-			gchar *temp_dir = NULL;
+			GBytes *key;
+			gchar *mail_addr;
+			GList *keys = NULL;
+			gboolean success;
 
-			if (libbalsa_mktempdir(&temp_dir)) {
-				GBytes *key;
-				gchar *mail_addr;
-				GList *keys = NULL;
-				gboolean success;
+			gtk_tree_model_get(model, &iter, AC_KEY_PTR_COLUMN, &key, AC_ADDRESS_COLUMN, &mail_addr, -1);
+			success = libbalsa_gpgme_import_bin_key(ctx, key, NULL, &error) &&
+				libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, TRUE, &error);
+			if (success) {
+				GtkWidget *toplevel;
+				GtkWindow *window;
+				GtkWidget *dialog;
 
-				gtk_tree_model_get(model, &iter, AC_KEY_PTR_COLUMN, &key, AC_ADDRESS_COLUMN, &mail_addr, -1);
-				success = libbalsa_gpgme_ctx_set_home(ctx, temp_dir, NULL) &&
-					libbalsa_gpgme_import_bin_key(ctx, key, NULL, NULL) &&
-					libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, TRUE, NULL);
-				if (success) {
-					GtkWidget *toplevel;
-			    	GtkWindow *window;
-			    	GtkWidget *dialog;
-
-			    	toplevel = gtk_widget_get_toplevel(GTK_WIDGET(user_data));
-			    	window = GTK_IS_WINDOW(toplevel) ? GTK_WINDOW(toplevel) : NULL;
-			    	if (keys != NULL) {
-			    		dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, (gpgme_key_t) keys->data, GPG_SUBKEY_CAP_ALL,
-			    			NULL, NULL);
-			    	} else {
-			    		dialog = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-			    			GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-			    			/* Translators: #1 email address */
-							_("The database entry for “%s” does not contain a key."),
-							mail_addr);
-			    	}
-			    	(void) gtk_dialog_run(GTK_DIALOG(dialog));
-			    	gtk_widget_destroy(dialog);
-			    	g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
+				toplevel = gtk_widget_get_toplevel(GTK_WIDGET(user_data));
+				window = GTK_IS_WINDOW(toplevel) ? GTK_WINDOW(toplevel) : NULL;
+				if (keys != NULL) {
+					dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, (gpgme_key_t) keys->data, GPG_SUBKEY_CAP_ALL,
+						NULL, NULL);
+				} else {
+					dialog = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+						GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
+						/* Translators: #1 email address */
+						_("The database entry for “%s” does not contain a key."),
+						mail_addr);
 				}
-				libbalsa_delete_directory(temp_dir, NULL);
-				g_free(temp_dir);
-				g_free(mail_addr);
+				(void) gtk_dialog_run(GTK_DIALOG(dialog));
+				gtk_widget_destroy(dialog);
+				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
 			}
-
 			gpgme_release(ctx);
+			libbalsa_delete_directory(temp_dir, NULL);
+			g_free(temp_dir);
+			g_free(mail_addr);
+		}
+
+		if (error != NULL) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("cannot show key details: %s"), error->message);
+			g_error_free(error);
 		}
 	}
 }

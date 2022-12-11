@@ -276,47 +276,72 @@ libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,
 }
 
 
-/** \brief Set the configuration folder for a GpgME context
+/** \brief Create a temporary GpgME context for a protocol
  *
- * \param ctx GpgME context
- * \param home_dir configuration directory for the crypto engine, or NULL for the default one
- * \param error Filled with error information on error.
- * \return TRUE on success, or FALSE on error
+ * \param protocol requested protocol
+ * \param home_dir filled with the path of the temporary folder of the GpgME context on success, \em MUST be freed by the caller
+ * \param error filled with error information on error
+ * \return the new gpgme context on success, or NULL on error
  *
- * Set the configuration and key ring folder for a GpgME context.
+ * This helper function creates a new GpgME context using a temporary folder for the specified protocol.
+ *
+ * \note The caller \em SHOULD erase the temporary folder after releasing the context
  */
-gboolean
-libbalsa_gpgme_ctx_set_home(gpgme_ctx_t   ctx,
-							const gchar  *home_dir,
-							GError      **error)
+gpgme_ctx_t
+libbalsa_gpgme_temp_with_proto(gpgme_protocol_t   protocol,
+							   gchar            **home_dir,
+							   GError           **error)
 {
-	gpgme_protocol_t protocol;
-	gpgme_engine_info_t engine_info;
-	gpgme_engine_info_t this_engine;
-	gboolean result = FALSE;
+	gpgme_ctx_t ctx = NULL;
 
-	g_return_val_if_fail(ctx != NULL, FALSE);
+	g_return_val_if_fail(home_dir != NULL, NULL);
 
-	protocol = gpgme_get_protocol(ctx);
-    engine_info = gpgme_ctx_get_engine_info(ctx);
-    for (this_engine = engine_info;
-    	 (this_engine != NULL) && (this_engine->protocol != protocol);
-    	 this_engine = this_engine->next) {
-    	/* nothing to do */
-    }
-    if (this_engine != NULL) {
-    	gpgme_error_t err;
+	*home_dir = NULL;
+	ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
+	if (ctx != NULL) {
+		char *temp_dir;
 
-    	err = gpgme_ctx_set_engine_info(ctx, protocol, this_engine->file_name, home_dir);
-    	if (err == GPG_ERR_NO_ERROR) {
-    		result = TRUE;
-    	} else {
-    		libbalsa_gpgme_set_error(error, err, _("could not set folder “%s” for engine “%s”"), home_dir,
-    				libbalsa_gpgme_protocol_name(protocol));
-    	}
-    }
+		if (!libbalsa_mktempdir(&temp_dir)) {
+			g_set_error(error, GPGME_ERROR_QUARK, -1, _("failed to create a temporary folder"));
+			gpgme_release(ctx);
+			ctx = NULL;
+		} else {
+			gpgme_engine_info_t this_engine;
 
-    return result;
+			/* get the engine info */
+			for (this_engine = gpgme_ctx_get_engine_info(ctx);
+				(this_engine != NULL) && (this_engine->protocol != protocol);
+				this_engine = this_engine->next) {
+				/* nothing to do */
+			}
+
+			if (this_engine != NULL) {
+				gpgme_error_t err;
+
+				err = gpgme_ctx_set_engine_info(ctx, protocol, this_engine->file_name, temp_dir);
+				if (err == GPG_ERR_NO_ERROR) {
+					*home_dir = temp_dir;
+				} else {
+					libbalsa_gpgme_set_error(error, err, _("could not set folder “%s” for engine “%s”"), temp_dir,
+						libbalsa_gpgme_protocol_name(protocol));
+				}
+			} else {
+				/* paranoid - should *never* happen */
+				libbalsa_gpgme_set_error(error, -1, _("no crypto engine for “%s” available"),
+					libbalsa_gpgme_protocol_name(protocol));
+			}
+
+			/* unset home_dir indicates error condition */
+			if (*home_dir == NULL) {
+				gpgme_release(ctx);
+				ctx = NULL;
+				libbalsa_delete_directory(temp_dir, NULL);
+				g_free(temp_dir);
+			}
+		}
+	}
+
+	return ctx;
 }
 
 

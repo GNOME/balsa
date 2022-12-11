@@ -331,57 +331,50 @@ create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
 {
 	gboolean success = FALSE;
 	gpgme_ctx_t ctx;
+	gchar *temp_dir = NULL;
 
-	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
+	ctx = libbalsa_gpgme_temp_with_proto(GPGME_PROTOCOL_OpenPGP, &temp_dir, error);
 	if (ctx != NULL) {
-		gchar *temp_dir = NULL;
+		GList *keys = NULL;
 
-		if (!libbalsa_mktempdir(&temp_dir)) {
-			g_warning("Failed to create a temporary folder");
-		} else {
-			GList *keys = NULL;
+		success = libbalsa_gpgme_import_ascii_key(ctx, key_buf, NULL, error) &&
+			libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, TRUE, error);
 
-			success = libbalsa_gpgme_ctx_set_home(ctx, temp_dir, error) &&
-				libbalsa_gpgme_import_ascii_key(ctx, key_buf, NULL, error) &&
-				libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, TRUE, error);
+		if (success && (keys != NULL)) {
+			GList *item;
 
-			if (success && (keys != NULL)) {
-				GList *item;
+			for (item = keys; success && (item != NULL); item = item->next) {
+				gpgme_key_t this_key = (gpgme_key_t) item->data;
+				gchar *key_ascii;
+				GtkWidget *key_widget;
+				GtkWidget *import_btn;
 
-				for (item = keys; success && (item != NULL); item = item->next) {
-					gpgme_key_t this_key = (gpgme_key_t) item->data;
-					gchar *key_ascii;
-					GtkWidget *key_widget;
-					GtkWidget *import_btn;
+				key_ascii = libbalsa_gpgme_export_key(ctx, this_key, _("(imported)"), error);
 
-					key_ascii = libbalsa_gpgme_export_key(ctx, this_key, _("(imported)"), error);
+				if (key_ascii == NULL) {
+					success = FALSE;
+				} else {
+					key_widget = libbalsa_gpgme_key(this_key, NULL, GPG_SUBKEY_CAP_ALL, FALSE);
+					gtk_box_pack_start(box, key_widget, FALSE, FALSE, 0);
 
-					if (key_ascii == NULL) {
-						success = FALSE;
-					} else {
-						key_widget = libbalsa_gpgme_key(this_key, NULL, GPG_SUBKEY_CAP_ALL, FALSE);
-						gtk_box_pack_start(box, key_widget, FALSE, FALSE, 0);
+					import_btn = gtk_button_new_with_label(_("Import key into the local key ring"));
+					g_object_set_data_full(G_OBJECT(import_btn), "keydata", key_ascii, (GDestroyNotify) g_free);
+					g_signal_connect(import_btn, "clicked", (GCallback) on_key_import_button, NULL);
+					gtk_box_pack_start(box, import_btn, FALSE, FALSE, 0);
 
-						import_btn = gtk_button_new_with_label(_("Import key into the local key ring"));
-						g_object_set_data_full(G_OBJECT(import_btn), "keydata", key_ascii, (GDestroyNotify) g_free);
-						g_signal_connect(import_btn, "clicked", (GCallback) on_key_import_button, NULL);
-						gtk_box_pack_start(box, import_btn, FALSE, FALSE, 0);
-
-						if (item->next != NULL) {
-							gtk_box_pack_start(box, gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE,
-								BMW_VBOX_SPACE);
-						}
+					if (item->next != NULL) {
+						gtk_box_pack_start(box, gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE,
+							BMW_VBOX_SPACE);
 					}
 				}
-
-				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
 			}
 
-			libbalsa_delete_directory(temp_dir, NULL);
-			g_free(temp_dir);
+			g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
 		}
 
 		gpgme_release(ctx);
+		libbalsa_delete_directory(temp_dir, NULL);
+		g_free(temp_dir);
 	}
 
 	return success;

@@ -51,8 +51,7 @@ static gboolean import_key_real(gpgme_ctx_t     ctx,
 								GError        **error);
 static inline gboolean check_key(const gpgme_key_t key,
 		  	  	  	  	  	  	 gboolean          secret,
-								 gboolean          on_keyserver,
-								 gint64            now);
+								 gboolean          on_keyserver);
 static gpointer gpgme_keyserver_run(gpointer user_data);
 static gboolean gpgme_import_key(gpgme_ctx_t   ctx,
 								 gpgme_key_t   key,
@@ -100,14 +99,7 @@ libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 		if (gpgme_err != GPG_ERR_NO_ERROR) {
 			libbalsa_gpgme_set_error(error, gpgme_err, _("could not list keys for “%s”"), pattern);
 		} else {
-			GDateTime *current_time;
-			gint64 now;
 			guint bad = 0U;
-
-			/* get the current time so we can check for expired keys */
-			current_time = g_date_time_new_now_utc();
-			now = g_date_time_to_unix(current_time);
-			g_date_time_unref(current_time);
 
 			/* loop over all keys */
 			// FIXME - this may be /very/ slow, show a spinner?
@@ -116,7 +108,7 @@ libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 
 				gpgme_err = gpgme_op_keylist_next(ctx, &key);
 				if (gpgme_err == GPG_ERR_NO_ERROR) {
-					if (list_bad_keys || check_key(key, secret, on_keyserver, now)) {
+					if (list_bad_keys || check_key(key, secret, on_keyserver)) {
 						*keys = g_list_prepend(*keys, key);
 					} else {
 						bad++;
@@ -416,8 +408,7 @@ import_key_real(gpgme_ctx_t     ctx,
  * \param key GpgME key
  * \param secret TRUE for a private key, FALSE for a public key
  * \param on_keyserver TRUE for a key on a key server, FALSE for a key in the local key ring
- * \param now current time stamp in UTC
- * \return TRUE if the key is usable, FALSE if it is expired, disabled, revoked or invalid
+ * \return TRUE if the key is usable, FALSE if it is expired, disabled, revoked, invalid or does not have a fingerprint
  *
  * Note that GpgME provides less information for keys on a key server, in particular regarding the sub-keys, so the check has to be
  * relaxed for this case.
@@ -425,18 +416,16 @@ import_key_real(gpgme_ctx_t     ctx,
 static inline gboolean
 check_key(const gpgme_key_t key,
 		  gboolean          secret,
-		  gboolean          on_keyserver,
-		  gint64            now)
+		  gboolean          on_keyserver)
 {
 	gboolean result = FALSE;
 
-	if ((key->expired == 0U) && (key->revoked == 0U) && (key->disabled == 0U) && (key->invalid == 0U)) {
+	if ((key->fpr != NULL) && (key->expired == 0U) && (key->revoked == 0U) && (key->disabled == 0U) && (key->invalid == 0U)) {
 		gpgme_subkey_t subkey = key->subkeys;
 
 		while (!result && (subkey != NULL)) {
 			if ((on_keyserver || (secret && (subkey->can_sign != 0U)) || (!secret && (subkey->can_encrypt != 0U))) &&
-				(subkey->expired == 0U) && (subkey->revoked == 0U) && (subkey->disabled == 0U) && (subkey->invalid == 0U) &&
-				((subkey->expires == 0) || (subkey->expires > (long int) now))) {
+				(subkey->expired == 0U) && (subkey->revoked == 0U) && (subkey->disabled == 0U) && (subkey->invalid == 0U)) {
 				result = TRUE;
 			} else {
 				subkey = subkey->next;

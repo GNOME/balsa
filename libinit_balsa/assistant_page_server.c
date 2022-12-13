@@ -365,7 +365,7 @@ balsa_druid_page_server_next(GtkAssistant *druid, GtkWidget *page, BalsaDruidPag
  * @return an NULL-terminated array containing the submission, imap and pop3 servers on success, @em must be freed by the caller
  *
  * Strategy for guessing the server names:
- * - some ISP's have "strange" server names (inter alia Microsoft for outlook.com, Yahoo for yahoo.com): return them from a
+ * - some ISP's have "strange" server names (inter alia Microsoft for outlook.com, Yahoo for yahoo.*): return them from a
  *   hard-wired lookup table;
  * - do a DNS lookup for SRV records (see https://www.rfc-editor.org/rfc/rfc6186.html, e.g. _imaps._tcp.<domain>);
  * - try to guess servers by name (e.g. imap.<domain>).
@@ -383,10 +383,18 @@ guess_servers(const gchar *mail_address)
 		{"imap", "imap4", "mail", NULL},
 		{"pop", "pop3", "mail", NULL}
 	};
-	/* FIXME - this list probably needs to be extended */
-	static const gchar * const specials[2][4] = {
+	/* FIXME - this list of uncommon server names probably needs to be extended
+	 * format: mail domain (lower-case glob string); smtp; imap; pop3 servers */
+	static const gchar * const specials[][4] = {
+		/* Microsoft: for outlook.com and apparently also for old hotmail.com and live.com addresses */
 		{"outlook.com", "outlook.office365.com", "outlook.office365.com", "outlook.office365.com"},
-		{"yahoo.com", "smtp.mail.yahoo.com", "imap.mail.yahoo.com", "pop.mail.yahoo.com"}
+		{"hotmail.com", "outlook.office365.com", "outlook.office365.com", "outlook.office365.com"},
+		{"live.com", "outlook.office365.com", "outlook.office365.com", "outlook.office365.com"},
+		/* Yahoo: same servers for yahoo.com, yahoo.de, yahoo.co.uk... */
+		{"yahoo.??*", "smtp.mail.yahoo.com", "imap.mail.yahoo.com", "pop.mail.yahoo.com"},
+		/* T-Online: magenta is their corporate colour... */
+		{"t-online.de", "securesmtp.t-online.de", "secureimap.t-online.de", "securepop.t-online.de"},
+		{"magenta.de", "securesmtp.t-online.de", "secureimap.t-online.de", "securepop.t-online.de"}
 	};
 	GResolver *resolver;
 	const gchar *at_sign;
@@ -399,18 +407,19 @@ guess_servers(const gchar *mail_address)
 
 	result = g_new0(gchar *, 4UL);
 
-	/* a few mail providers are known to be special... */
+	/* a few (?) mail providers are known to be special... */
+	domain = g_ascii_strdown(&at_sign[1], -1);
 	for (n = 0U; n < G_N_ELEMENTS(specials); n++) {
-		if (g_ascii_strcasecmp(&at_sign[1], specials[n][0]) == 0) {
+		if (g_pattern_match_simple(specials[n][0], domain)) {
 			result[0] = g_strdup(specials[n][1]);
 			result[1] = g_strdup(specials[n][2]);
 			result[2] = g_strdup(specials[n][3]);
+			g_free(domain);
 			return result;
 		}
 	}
 
 	/* try to resolve the proper servers */
-	domain = g_ascii_strdown(&at_sign[1], -1);
 	resolver = g_resolver_get_default();
 	for (n = 0; n < 3; n++) {
 		result[n] = server_from_srv(resolver, srv_names[n], domain);

@@ -658,7 +658,7 @@ have_pub_key_for(gpgme_ctx_t          gpgme_ctx,
     		result = FALSE;
     		/* enclose the mail address into "<...>" to perform an exact search */
     		mail_name = g_strconcat("<", INTERNET_ADDRESS_MAILBOX(ia)->addr, ">", NULL);
-    		if (libbalsa_gpgme_list_keys(gpgme_ctx, &keys, NULL, mail_name, FALSE, FALSE, FALSE, NULL)) {
+    		if (libbalsa_gpgme_list_keys(gpgme_ctx, &keys, NULL, mail_name, FALSE, FALSE, NULL)) {
     			if (keys != NULL) {
     				result = TRUE;
     				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);

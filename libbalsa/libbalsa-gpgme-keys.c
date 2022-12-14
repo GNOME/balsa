@@ -44,6 +44,15 @@ typedef struct _keyserver_op_t {
 } keyserver_op_t;
 
 
+
+static gboolean list_keys_real(gpgme_ctx_t            ctx,
+							   GList                **keys,
+							   guint                 *bad_keys,
+							   const gchar           *pattern,
+							   gboolean               secret,
+							   gpgme_keylist_mode_t   keylist_mode,
+							   gboolean	              list_bad_keys,
+							   GError               **error);
 static gboolean import_key_real(gpgme_ctx_t     ctx,
 								gconstpointer   key_buf,
 								gsize		    buf_len,
@@ -71,71 +80,16 @@ libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 						 guint        *bad_keys,
 						 const gchar  *pattern,
 						 gboolean      secret,
-						 gboolean      on_keyserver,
 						 gboolean	   list_bad_keys,
 						 GError      **error)
 {
-	gpgme_error_t gpgme_err;
-	gpgme_keylist_mode_t kl_save;
-	gpgme_keylist_mode_t kl_mode;
-
 	g_return_val_if_fail((ctx != NULL) && (keys != NULL), FALSE);
 
-	/* set key list mode to external if we want to search a remote key server, or to the local key ring */
-	kl_save = gpgme_get_keylist_mode(ctx);
-	if (on_keyserver) {
-		kl_mode = (kl_save & ~GPGME_KEYLIST_MODE_LOCAL) | GPGME_KEYLIST_MODE_EXTERN;
-	} else {
-		kl_mode = (kl_save & ~GPGME_KEYLIST_MODE_EXTERN) | GPGME_KEYLIST_MODE_LOCAL;
-	}
-	gpgme_err = gpgme_set_keylist_mode(ctx, kl_mode);
-	if (gpgme_err != GPG_ERR_NO_ERROR) {
-		libbalsa_gpgme_set_error(error, gpgme_err, _("error setting key list mode"));
-	}
-
-	/* list keys */
-	if (gpgme_err == GPG_ERR_NO_ERROR) {
-		gpgme_err = gpgme_op_keylist_start(ctx, pattern, (int) secret);
-		if (gpgme_err != GPG_ERR_NO_ERROR) {
-			libbalsa_gpgme_set_error(error, gpgme_err, _("could not list keys for “%s”"), pattern);
-		} else {
-			guint bad = 0U;
-
-			/* loop over all keys */
-			// FIXME - this may be /very/ slow, show a spinner?
-			do {
-				gpgme_key_t key;
-
-				gpgme_err = gpgme_op_keylist_next(ctx, &key);
-				if (gpgme_err == GPG_ERR_NO_ERROR) {
-					if (list_bad_keys || check_key(key, secret, on_keyserver)) {
-						*keys = g_list_prepend(*keys, key);
-					} else {
-						bad++;
-						gpgme_key_unref(key);
-					}
-				} else if (gpgme_err_code(gpgme_err) != GPG_ERR_EOF) {
-					libbalsa_gpgme_set_error(error, gpgme_err, _("could not list keys for “%s”"), pattern);
-				} else {
-					/* nothing to do, see MISRA C:2012, Rule 15.7 */
-				}
-			} while (gpgme_err == GPG_ERR_NO_ERROR);
-			gpgme_op_keylist_end(ctx);
-
-			if (*keys != NULL) {
-				*keys = g_list_reverse(*keys);
-			}
-			if (bad_keys != NULL) {
-				*bad_keys = bad;
-			}
-		}
-	}
-	gpgme_set_keylist_mode(ctx, kl_save);
-
-	return (gpgme_err_code(gpgme_err) == GPG_ERR_EOF);
+	return list_keys_real(ctx, keys, bad_keys, pattern, secret, GPGME_KEYLIST_MODE_LOCAL, list_bad_keys, error);
 }
 
 
+/* documentation: see header file */
 gpgme_key_t
 libbalsa_gpgme_load_key(gpgme_ctx_t   ctx,
 						const gchar  *fingerprint,
@@ -359,6 +313,75 @@ libbalsa_gpgme_import_bin_key(gpgme_ctx_t   ctx,
 
 /* ---- local functions ------------------------------------------------------ */
 
+/* See the documentation of libbalsa_gpgme_list_keys() in the header file.
+ * The additional parameter keylist_mode shall be one of the following values:
+ * - GPGME_KEYLIST_MODE_LOCAL: search the local key ring (gpg --list-keys)
+ * - GPGME_KEYLIST_MODE_EXTERN: search external source (gpg --search-keys or gpgsm --list-external-keys)
+ */
+static gboolean
+list_keys_real(gpgme_ctx_t            ctx,
+			   GList                **keys,
+			   guint                 *bad_keys,
+			   const gchar           *pattern,
+			   gboolean               secret,
+			   gpgme_keylist_mode_t   keylist_mode,
+			   gboolean	              list_bad_keys,
+			   GError               **error)
+{
+	gpgme_error_t gpgme_err;
+	gpgme_keylist_mode_t kl_save;
+	gpgme_keylist_mode_t kl_mode;
+
+	kl_save = gpgme_get_keylist_mode(ctx);
+	kl_mode = (kl_save & ~(GPGME_KEYLIST_MODE_LOCAL | GPGME_KEYLIST_MODE_EXTERN)) | keylist_mode;
+	gpgme_err = gpgme_set_keylist_mode(ctx, kl_mode);
+	if (gpgme_err != GPG_ERR_NO_ERROR) {
+		libbalsa_gpgme_set_error(error, gpgme_err, _("error setting key list mode"));
+	}
+
+	/* list keys */
+	if (gpgme_err == GPG_ERR_NO_ERROR) {
+		gpgme_err = gpgme_op_keylist_start(ctx, pattern, (int) secret);
+		if (gpgme_err != GPG_ERR_NO_ERROR) {
+			libbalsa_gpgme_set_error(error, gpgme_err, _("could not list keys for “%s”"), pattern);
+		} else {
+			guint bad = 0U;
+
+			/* loop over all keys */
+			// FIXME - this may be /very/ slow, show a spinner?
+			do {
+				gpgme_key_t key;
+
+				gpgme_err = gpgme_op_keylist_next(ctx, &key);
+				if (gpgme_err == GPG_ERR_NO_ERROR) {
+					if (list_bad_keys || check_key(key, secret, (keylist_mode & GPGME_KEYLIST_MODE_LOCAL) == 0)) {
+						*keys = g_list_prepend(*keys, key);
+					} else {
+						bad++;
+						gpgme_key_unref(key);
+					}
+				} else if (gpgme_err_code(gpgme_err) != GPG_ERR_EOF) {
+					libbalsa_gpgme_set_error(error, gpgme_err, _("could not list keys for “%s”"), pattern);
+				} else {
+					/* nothing to do, see MISRA C:2012, Rule 15.7 */
+				}
+			} while (gpgme_err == GPG_ERR_NO_ERROR);
+			gpgme_op_keylist_end(ctx);
+
+			if (*keys != NULL) {
+				*keys = g_list_reverse(*keys);
+			}
+			if (bad_keys != NULL) {
+				*bad_keys = bad;
+			}
+		}
+	}
+	gpgme_set_keylist_mode(ctx, kl_save);
+
+	return (gpgme_err_code(gpgme_err) == GPG_ERR_EOF);
+}
+
+
 /** \brief Import a binary or ASCII-armoured key
  *
  * \param ctx GpgME context
@@ -454,7 +477,9 @@ gpgme_keyserver_run(gpointer user_data)
 	gboolean result;
 	GError *error = NULL;
 
-	result = libbalsa_gpgme_list_keys(keyserver_op->gpgme_ctx, &keys, NULL, keyserver_op->fingerprint, FALSE, TRUE, FALSE, &error);
+	result = list_keys_real(keyserver_op->gpgme_ctx, &keys, NULL, keyserver_op->fingerprint, FALSE, GPGME_KEYLIST_MODE_EXTERN,
+		FALSE, &error);
+
 	if (result) {
 		if (keys == NULL) {
 			keyserver_op->msg_type = GTK_MESSAGE_INFO;

@@ -303,7 +303,7 @@ autocrypt_header(LibBalsaIdentity *identity, GError **error)
 		if (ctx != NULL) {
 			GList *keys = NULL;
 
-			libbalsa_gpgme_list_keys(ctx, &keys, NULL, mailbox, TRUE, FALSE, FALSE, error);
+			libbalsa_gpgme_list_keys(ctx, &keys, NULL, mailbox, TRUE, FALSE, error);
 			if (keys != NULL) {
 				gpgme_key_t key = (gpgme_key_t) keys->data;
 
@@ -576,7 +576,7 @@ autocrypt_check_ia_list(gpgme_ctx_t           gpgme_ctx,
         		GList *keys = NULL;
 
     			/* check if we have a public key, keep the state if we found one, disable if not */
-        		if (libbalsa_gpgme_list_keys(gpgme_ctx, &keys, NULL, mailbox, FALSE, FALSE, FALSE, error)) {
+        		if (libbalsa_gpgme_list_keys(gpgme_ctx, &keys, NULL, mailbox, FALSE, FALSE, error)) {
         			if (keys != NULL) {
         				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
         				g_debug("'%s': found in public key ring, overall status %d", mailbox, result);
@@ -603,7 +603,7 @@ autocrypt_check_ia_list(gpgme_ctx_t           gpgme_ctx,
     			if (missing_keys != NULL) {
             		GList *keys = NULL;
 
-            		if (libbalsa_gpgme_list_keys(gpgme_ctx, &keys, NULL, autocrypt_user->fingerprint, FALSE, FALSE, FALSE, error)) {
+            		if (libbalsa_gpgme_list_keys(gpgme_ctx, &keys, NULL, autocrypt_user->fingerprint, FALSE, FALSE, error)) {
             			if (keys != NULL) {
             				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
             			} else {
@@ -716,7 +716,7 @@ extract_ac_keydata(GMimeAutocryptHeader *autocrypt_header, ac_key_data_t *dest)
 			guint bad_keys = 0U;
 
 			success = libbalsa_gpgme_import_bin_key(ctx, keydata, NULL, &gpg_error) &&
-				libbalsa_gpgme_list_keys(ctx, &keys, &bad_keys, NULL, FALSE, FALSE, FALSE, &gpg_error);
+				libbalsa_gpgme_list_keys(ctx, &keys, &bad_keys, NULL, FALSE, FALSE, &gpg_error);
 			if (success && (keys != NULL) && (keys->next == NULL)) {
 				gpgme_key_t key = (gpgme_key_t) keys->data;
 
@@ -917,7 +917,7 @@ show_key_details_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 
 			gtk_tree_model_get(model, &iter, AC_KEY_PTR_COLUMN, &key, AC_ADDRESS_COLUMN, &mail_addr, -1);
 			success = libbalsa_gpgme_import_bin_key(ctx, key, NULL, &error) &&
-				libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, TRUE, &error);
+				libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, TRUE, &error);
 			if (success) {
 				GtkWidget *toplevel;
 				GtkWindow *window;

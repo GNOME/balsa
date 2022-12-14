@@ -41,7 +41,6 @@ G_BEGIN_DECLS
  * \param bad_keys filled with the number of matching keys which are expired, disabled, revoked or invalid, may be NULL
  * \param pattern key search pattern (e.g. name, fingerprint, ...), may be NULL to list all keys
  * \param secret TRUE to search for private keys, FALSE to search for public keys
- * \param on_keyserver TRUE to search on a key server, FALSE to search the local key ring
  * \param list_bad_keys include expired, revoked, invalid and disabled keys
  * \param error filled with error information on error, may be NULL
  * \return TRUE on success, or FALSE if any error occurred
@@ -49,9 +48,7 @@ G_BEGIN_DECLS
  * Use the passed context to search for keys matching the passed criteria.  Note that even if the function returns success, the
  * list of keys may be empty if no matching key could be found.
  *
- * \note Listing external (key server) keys for a fingerprint longer than 16 hex characters fails, so be sure to cut them
- *       appropriately when calling this function with \em on_keyserver == TRUE.\n
- *       The returned list of keys shall be freed by the caller.
+ * \note The returned list of keys shall be freed by the caller.
  * \todo We might want to add flags for returning only keys which have the is_qualified (subkey can be used for qualified
  *       signatures according to local government regulations) and/or is_de_vs (complies with the rules for classified information
  *       in Germany at the restricted level, VS-NfD, requires gpgme >= 1.9.0) properties set.
@@ -61,7 +58,6 @@ gboolean libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 								  guint        *bad_keys,
 								  const gchar  *pattern,
 								  gboolean      secret,
-								  gboolean      on_keyserver,
 								  gboolean		list_bad_keys,
 								  GError      **error);
 

@@ -50,7 +50,6 @@
 
 
 /* local prototypes */
-static gboolean gpg_updates_trustdb(void);
 static gboolean have_pub_key_for(gpgme_ctx_t gpgme_ctx,
 				 InternetAddressList * recipients);
 
@@ -68,10 +67,6 @@ libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
     /* silent paranoia checks */
     if (!recipients)
 	return TRUE;  /* we can of course encrypt for nobody... */
-
-    /* check if gpg is currently available */
-    if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
-	return FALSE;
 
     /* create the gpgme context and set the protocol */
     gpgme_ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, NULL);
@@ -107,10 +102,6 @@ libbalsa_sign_mime_object(GMimeObject ** content, const gchar * rfc822_for,
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(content != NULL, FALSE);
 
-    /* check if gpg is currently available */
-    if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
-	return FALSE;
-
     /* call gpgme to create the signature */
     if (!(mps = g_mime_multipart_signed_new())) {
 	return FALSE;
@@ -144,10 +135,6 @@ libbalsa_encrypt_mime_object(GMimeObject ** content, GList * rfc822_for,
     /* paranoia checks */
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(content != NULL, FALSE);
-
-    /* check if gpg is currently available */
-    if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
-	return FALSE;
 
     /* convert the key list to a GPtrArray */
     recipients = g_ptr_array_new();
@@ -204,10 +191,6 @@ libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
     g_return_val_if_fail(rfc822_for != NULL, FALSE);
     g_return_val_if_fail(content != NULL, FALSE);
 
-    /* check if gpg is currently available */
-    if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
-	return FALSE;
-
     /* we want to be able to restore */
     signed_object = g_object_ref(*content);
 
@@ -248,10 +231,6 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
     g_return_val_if_fail(body, FALSE);
     g_return_val_if_fail(body->mime_part != NULL, FALSE);
     g_return_val_if_fail(body->message, FALSE);
-
-    /* check if gpg is currently available */
-    if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
-	return FALSE;
 
     /* check if the body is really a multipart/signed */
     if (!GMIME_IS_MULTIPART_SIGNED(body->mime_part)
@@ -301,10 +280,6 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     g_return_val_if_fail(body != NULL, body);
     g_return_val_if_fail(body->mime_part != NULL, body);
     g_return_val_if_fail(body->message != NULL, body);
-
-    /* check if gpg is currently available */
-    if (protocol == GPGME_PROTOCOL_OpenPGP && gpg_updates_trustdb())
-	return body;
 
     /* sanity checks... */
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
@@ -388,10 +363,6 @@ libbalsa_rfc2440_sign_encrypt(GMimePart *part, const gchar *sign_for,
     g_return_val_if_fail(part != NULL, FALSE);
     g_return_val_if_fail(sign_for != NULL || encrypt_for != NULL, FALSE);
 
-    /* check if gpg is currently available */
-    if (gpg_updates_trustdb())
-	return FALSE;
-
     /* convert the key list to a GPtrArray */
     if (encrypt_for) {
 	recipients = g_ptr_array_new();
@@ -431,10 +402,6 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 	g_object_unref(*sig_info);
 	*sig_info = NULL;
     }
-
-    /* check if gpg is currently available */
-    if (gpg_updates_trustdb())
-	return GPG_ERR_TRY_AGAIN;
 
     /* verify */
     result = g_mime_part_rfc2440_verify(part, &error);
@@ -485,10 +452,6 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
 	g_object_unref(*sig_info);
 	*sig_info = NULL;
     }
-
-    /* check if gpg is currently available */
-    if (gpg_updates_trustdb())
-	return GPG_ERR_TRY_AGAIN;
 
     /* decrypt */
     result = g_mime_part_rfc2440_decrypt(part, parent, &error);
@@ -544,8 +507,6 @@ libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)
 		return g_strdup(_("This part is not a real signature."));
 	case GPG_ERR_INV_ENGINE:
 		return g_strdup(_("The signature could not be verified due to an invalid crypto engine."));
-	case GPG_ERR_TRY_AGAIN:
-		return g_strdup(_("GnuPG is rebuilding the trust database and is currently unavailable."));
 	case GPG_ERR_MULT_SIGNATURES:
 		return g_strdup(_("The signature contains multiple signers, this may be a forgery."));
 	default: {
@@ -609,32 +570,6 @@ libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity)
 
 
 /* ==== local stuff ======================================================== */
-
-
-/*
- * return TRUE is gpg is currently updating the trust database (indicated by
- * the file ~/.gnupg/trustdb.gpg.lock)
- */
-static gboolean
-gpg_updates_trustdb(void)
-{
-	static gchar *lockname = NULL;
-	gboolean result;
-
-	if (lockname == NULL) {
-		lockname = g_build_filename(g_get_home_dir(), ".gnupg", "trustdb.gpg.lock", NULL);
-	}
-
-	if (g_file_test(lockname, G_FILE_TEST_EXISTS)) {
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s %s",
-			_("GnuPG is rebuilding the trust database and is currently unavailable."),
-			_("Try again later."));
-		result = TRUE;
-	} else {
-		result = FALSE;
-	}
-	return result;
-}
 
 
 /* check if the local key ring contains a public key for the passed recipients */

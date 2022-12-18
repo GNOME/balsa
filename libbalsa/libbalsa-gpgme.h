@@ -38,8 +38,7 @@ G_BEGIN_DECLS
 
 #define GPG_ERR_MULT_SIGNATURES        GPG_ERR_USER_13
 #define GPG_ERR_KEY_SELECTION          GPG_ERR_USER_14
-#define GPG_ERR_TRY_AGAIN              GPG_ERR_USER_15
-#define GPG_ERR_NOT_SIGNED             GPG_ERR_USER_16
+#define GPG_ERR_NOT_SIGNED             GPG_ERR_USER_15
 
 #define GPGME_ERROR_QUARK (g_quark_from_static_string("gmime-gpgme"))
 

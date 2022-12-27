@@ -2640,7 +2640,8 @@ lbm_imap_get_msg_part(LibBalsaMessage * msg, LibBalsaMessageBody * part,
     }
 
     if (GMIME_IS_MULTIPART_SIGNED(part->mime_part)
-        || GMIME_IS_MULTIPART_ENCRYPTED(part->mime_part))
+        || GMIME_IS_MULTIPART_ENCRYPTED(part->mime_part)
+        || GMIME_IS_MESSAGE_PART(part->mime_part))
         need_children = TRUE;
 
     if (need_children) {

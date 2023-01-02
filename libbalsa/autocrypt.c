@@ -575,7 +575,9 @@ autocrypt_check_ia_list(gpgme_ctx_t           gpgme_ctx,
     		const gchar *mailbox;
 
     		mailbox = INTERNET_ADDRESS_MAILBOX(ia)->addr;
+    		G_LOCK(db_mutex);
     		autocrypt_user = autocrypt_user_info(mailbox, NULL);
+    		G_UNLOCK(db_mutex);
     		if (autocrypt_user == NULL) {
         		GList *keys = NULL;
 
@@ -658,6 +660,7 @@ autocrypt_close(void)
 }
 
 
+/* note: this function is called when db_mutex is already locked, so DO NOT lock it again */
 static AutocryptData *
 autocrypt_user_info(const gchar *mailbox, GError **error)
 {
@@ -666,7 +669,6 @@ autocrypt_user_info(const gchar *mailbox, GError **error)
 
 	g_return_val_if_fail((mailbox != NULL) && (autocrypt_db != NULL), NULL);
 
-	G_LOCK(db_mutex);
 	sqlite_res = sqlite3_bind_text(query[0], 1, mailbox, -1, SQLITE_STATIC);
 	if (sqlite_res == SQLITE_OK) {
 		sqlite_res = sqlite3_step(query[0]);
@@ -695,7 +697,6 @@ autocrypt_user_info(const gchar *mailbox, GError **error)
 			sqlite3_errmsg(autocrypt_db));
 	}
 	sqlite3_reset(query[0]);
-	G_UNLOCK(db_mutex);
 
 	return user_info;
 }
@@ -762,6 +763,7 @@ extract_ac_keydata(GMimeAutocryptHeader *autocrypt_header, ac_key_data_t *dest)
 }
 
 
+/* note: this function is called when db_mutex is already locked, so DO NOT lock it again */
 static void
 add_or_update_user_info(GMimeAutocryptHeader *autocrypt_header, const ac_key_data_t *ac_key_data, gboolean update, GError **error)
 {
@@ -780,7 +782,6 @@ add_or_update_user_info(GMimeAutocryptHeader *autocrypt_header, const ac_key_dat
 		prefer_encrypt = (gint) AUTOCRYPT_NOPREFERENCE;
 	}
 
-	G_LOCK(db_mutex);
 	if ((sqlite3_bind_text(query[query_idx], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 		(sqlite3_bind_int64(query[query_idx], 2, date_header) != SQLITE_OK) ||
 		(sqlite3_bind_blob(query[query_idx], 3, ac_key_data->keydata, ac_key_data->keysize, SQLITE_STATIC) != SQLITE_OK) ||
@@ -795,10 +796,10 @@ add_or_update_user_info(GMimeAutocryptHeader *autocrypt_header, const ac_key_dat
 		g_debug("%s user '%s': %d", update ? "updated" : "inserted", addr, sqlite3_changes(autocrypt_db));
 	}
 	sqlite3_reset(query[query_idx]);
-	G_UNLOCK(db_mutex);
 }
 
 
+/* note: this function is called when db_mutex is already locked, so DO NOT lock it again */
 static void
 update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
 {
@@ -807,7 +808,6 @@ update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
 
 	addr = g_mime_autocrypt_header_get_address_as_string(autocrypt_header);
 	date_header = g_date_time_to_unix(g_mime_autocrypt_header_get_effective_date(autocrypt_header));
-	G_LOCK(db_mutex);
 	if ((sqlite3_bind_text(query[3], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 		(sqlite3_bind_int64(query[3], 2, date_header) != SQLITE_OK) ||
 		(sqlite3_step(query[3]) != SQLITE_DONE)) {
@@ -817,7 +817,6 @@ update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
 		g_debug("updated last_seen for '%s': %d", addr, sqlite3_changes(autocrypt_db));
 	}
 	sqlite3_reset(query[3]);
-	G_UNLOCK(db_mutex);
 }
 
 

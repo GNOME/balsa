@@ -376,6 +376,7 @@ autocrypt_get_key(const gchar *fingerprint, GError **error)
 	/* prepend SQL "LIKE" wildcard */
 	param = g_strconcat("%", fingerprint, NULL);
 
+	G_LOCK(db_mutex);
 	sqlite_res = sqlite3_bind_text(query[4], 1, param, -1, SQLITE_STATIC);
 	if (sqlite_res == SQLITE_OK) {
 		sqlite_res = sqlite3_step(query[4]);
@@ -399,6 +400,7 @@ autocrypt_get_key(const gchar *fingerprint, GError **error)
 			sqlite3_errmsg(autocrypt_db));
 	}
 	sqlite3_reset(query[4]);
+	G_UNLOCK(db_mutex);
 	g_free(param);
 
 	return result;
@@ -483,6 +485,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
 
     /* add the keys */
+    G_LOCK(db_mutex);
     sqlite_res = sqlite3_step(query[5]);
     while (sqlite_res == SQLITE_ROW) {
     	gint64 last_seen_val;
@@ -515,6 +518,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     	sqlite_res = sqlite3_step(query[5]);
     }
     sqlite3_reset(query[5]);
+    G_UNLOCK(db_mutex);
 
     /* set up the tree view */
 	renderer = gtk_cell_renderer_text_new();
@@ -662,6 +666,7 @@ autocrypt_user_info(const gchar *mailbox, GError **error)
 
 	g_return_val_if_fail((mailbox != NULL) && (autocrypt_db != NULL), NULL);
 
+	G_LOCK(db_mutex);
 	sqlite_res = sqlite3_bind_text(query[0], 1, mailbox, -1, SQLITE_STATIC);
 	if (sqlite_res == SQLITE_OK) {
 		sqlite_res = sqlite3_step(query[0]);
@@ -690,6 +695,7 @@ autocrypt_user_info(const gchar *mailbox, GError **error)
 			sqlite3_errmsg(autocrypt_db));
 	}
 	sqlite3_reset(query[0]);
+	G_UNLOCK(db_mutex);
 
 	return user_info;
 }
@@ -774,6 +780,7 @@ add_or_update_user_info(GMimeAutocryptHeader *autocrypt_header, const ac_key_dat
 		prefer_encrypt = (gint) AUTOCRYPT_NOPREFERENCE;
 	}
 
+	G_LOCK(db_mutex);
 	if ((sqlite3_bind_text(query[query_idx], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 		(sqlite3_bind_int64(query[query_idx], 2, date_header) != SQLITE_OK) ||
 		(sqlite3_bind_blob(query[query_idx], 3, ac_key_data->keydata, ac_key_data->keysize, SQLITE_STATIC) != SQLITE_OK) ||
@@ -788,6 +795,7 @@ add_or_update_user_info(GMimeAutocryptHeader *autocrypt_header, const ac_key_dat
 		g_debug("%s user '%s': %d", update ? "updated" : "inserted", addr, sqlite3_changes(autocrypt_db));
 	}
 	sqlite3_reset(query[query_idx]);
+	G_UNLOCK(db_mutex);
 }
 
 
@@ -799,6 +807,7 @@ update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
 
 	addr = g_mime_autocrypt_header_get_address_as_string(autocrypt_header);
 	date_header = g_date_time_to_unix(g_mime_autocrypt_header_get_effective_date(autocrypt_header));
+	G_LOCK(db_mutex);
 	if ((sqlite3_bind_text(query[3], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 		(sqlite3_bind_int64(query[3], 2, date_header) != SQLITE_OK) ||
 		(sqlite3_step(query[3]) != SQLITE_DONE)) {
@@ -808,6 +817,7 @@ update_last_seen(GMimeAutocryptHeader *autocrypt_header, GError **error)
 		g_debug("updated last_seen for '%s': %d", addr, sqlite3_changes(autocrypt_db));
 	}
 	sqlite3_reset(query[3]);
+	G_UNLOCK(db_mutex);
 }
 
 
@@ -976,6 +986,7 @@ remove_key_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 			/* Translators: #1 email address */
 			_("Delete the Autocrypt key for “%s” from the database?"), mail_addr);
 		if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES) {
+			G_LOCK(db_mutex);
 			if ((sqlite3_bind_text(query[6], 1, mail_addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 				(sqlite3_step(query[6]) != SQLITE_DONE)) {
 				g_warning("deleting database entry for \"%s\" failed: %s", mail_addr, sqlite3_errmsg(autocrypt_db));
@@ -983,6 +994,7 @@ remove_key_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 				g_debug("deleted database entry for \"%s\"", mail_addr);
 			}
 			sqlite3_reset(query[6]);
+			G_UNLOCK(db_mutex);
 			gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
 		}
 		gtk_widget_destroy(dialog);

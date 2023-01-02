@@ -475,6 +475,7 @@ remove_item_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 		gchar *addr;
 
 		gtk_tree_model_get(model, &iter, PREFS_ADDRESS_COLUMN, &addr, -1);
+		G_LOCK(db_mutex);
 		if ((sqlite3_bind_text(query[3], 1, addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
 			(sqlite3_step(query[3]) != SQLITE_DONE)) {
 			/* Translators: #1 error message */
@@ -482,6 +483,7 @@ remove_item_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 		}
 		gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
 		sqlite3_reset(query[3]);
+		G_UNLOCK(db_mutex);
 		g_free(addr);
 	}
 }

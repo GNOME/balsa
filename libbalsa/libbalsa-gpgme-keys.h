@@ -28,6 +28,7 @@
 #endif
 
 #include <gpgme.h>
+#include <gmime/internet-address.h>
 #include <gtk/gtk.h>
 
 
@@ -37,7 +38,7 @@ G_BEGIN_DECLS
 /** \brief List keys
  *
  * \param ctx GpgME context
- * \param keys filled with a list of gpgme_key_t items matching the search pattern
+ * \param keys filled with a list of gpgme_key_t items matching the search pattern, filled with NULL on error
  * \param bad_keys filled with the number of matching keys which are expired, disabled, revoked or invalid, may be NULL
  * \param pattern key search pattern (e.g. name, fingerprint, ...), may be NULL to list all keys
  * \param secret TRUE to search for private keys, FALSE to search for public keys
@@ -58,8 +59,51 @@ gboolean libbalsa_gpgme_list_keys(gpgme_ctx_t   ctx,
 								  guint        *bad_keys,
 								  const gchar  *pattern,
 								  gboolean      secret,
-								  gboolean		list_bad_keys,
+								  gboolean      list_bad_keys,
 								  GError      **error);
+
+/** \brief List local public keys
+ *
+ * \param ctx GpgME context
+ * \param keys filled with a list of gpgme_key_t items matching the internet mailbox addresses from the list, filled with NULL on
+ *        error
+ * \param addresses list on internet addresses for which all keys shall be returned
+ * \param error filled with error information on error, may be NULL
+ * \return TRUE on success, or FALSE if any error occurred
+ *
+ * Use the passed context to search for all valid public keys in the local key ring matching any of the mailboxes in the passed
+ * internet address list.  Note that even if the function returns success, the list of keys may be empty if no matching key could
+ * be found.  If multiple addresses in in internet address list share the same public key, the duplicates are removed, i.e. every
+ * fingerprint is guaranteed to occur only once in the returned list.
+ */
+gboolean libbalsa_gpgme_list_local_pubkeys(gpgme_ctx_t           ctx,
+										   GList               **keys,
+										   InternetAddressList  *addresses,
+										   GError              **error);
+
+/** \brief Check if a public keys are available
+ *
+ * \param ctx GpgME context
+ * \param address list of internet addresses to check
+ * \param error filled with error information on error, may be NULL
+ * \return TRUE if a public key is available for \em every address in the passed list, or FALSE if not or if any error occurred
+ * \note This function checks \em only the local key ring for the passed crypto protocol.
+ */
+gboolean libbalsa_gpgme_have_all_keys(gpgme_ctx_t           ctx,
+									  InternetAddressList  *addresses,
+									  GError              **error);
+
+/** \brief Check if a public key is available
+ *
+ * \param ctx GpgME context
+ * \param mailbox RFC 5322 internet mailbox to check
+ * \param error filled with error information on error, may be NULL
+ * \return TRUE if a public key is available for the passed address, or FALSE if not or if any error occurred
+ * \note This function checks \em only the local key ring for the passed crypto protocol.
+ */
+gboolean libbalsa_gpgme_have_key(gpgme_ctx_t              ctx,
+								 InternetAddressMailbox  *mailbox,
+								 GError                 **error);
 
 /** \brief Load a key
  *
@@ -78,20 +122,35 @@ gpgme_key_t libbalsa_gpgme_load_key(gpgme_ctx_t   ctx,
 
 /** \brief Search the key server for a key
  *
- * \param fingerprint key fingerprint to search for
+ * \param fingerprint key fingerprint to search for, required
+ * \param email_address email address to search for, may be NULL
  * \param parent parent window
  * \param error filled with error information on error, may be NULL
  * \return TRUE on success, or FALSE on error
  *
- * Launch a new thread for searching the passed fingerprint on the key servers.  If the key is found, it is imported or updated in
- * the local key ring, and a dialogue is displayed.
- *
- * \note The passed fingerprint may be longer than 16 hex characters (see \ref libbalsa_gpgme_list_keys) and is truncated
- *       appropriately by this function if necessary.
+ * Launch a new thread for searching a GnuPG key for the passed fingerprint on the key servers.  If no key is found and the email
+ * address is known, try to locate the key by the email address which (if configured) will search the Web Key Directories (WKD).
+ * If the key is found, it is imported or updated in the local key ring, and a dialogue is displayed.
  */
 gboolean libbalsa_gpgme_keyserver_op(const gchar  *fingerprint,
+									 const gchar  *email_address,
 									 GtkWindow    *parent,
 									 GError      **error);
+
+/** \brief Search the key server for internet addresses and import public keys
+ *
+ * \param ctx GpgME context
+ * \param addresses internet addresses
+ * \param error filled with error information on error, may be NULL
+ * \return the count of imported keys on success, -1 on error, 0 if no key has been imported
+ *
+ * Loop over all internet addresses in the passed list, resolving groups into individual mailboxes, and for each mailbox check if
+ * a public key for the mailbox exists in the local key ring.  If not, check the key servers, and if this does not find and key and
+ * the protocol is OpenPGP, the Web Key Directory (WKD).  Any matching keys are imported without further confirmation.
+ */
+gint libbalsa_gpgme_keyserver_import(gpgme_ctx_t           ctx,
+									 InternetAddressList  *addresses,
+									 GError              **error);
 
 /** \brief Export a public key
  *
@@ -153,7 +212,7 @@ gboolean libbalsa_gpgme_import_ascii_key(gpgme_ctx_t   ctx,
  * Import a binary GnuPG key into the key ring.
  */
 gboolean libbalsa_gpgme_import_bin_key(gpgme_ctx_t   ctx,
-								   	   GBytes       *key_buf,
+									   GBytes       *key_buf,
 									   gchar       **import_info,
 									   GError      **error);
 

@@ -6263,6 +6263,7 @@ sw_gpg_helper(GSimpleAction  * action,
 
     radio_on = (bsmsg->crypt_mode & LIBBALSA_PROTECT_MODE) != 0;
     sw_action_set_enabled(bsmsg, "gpg-mode", radio_on);
+    libbalsa_address_view_set_crypt_mode(bsmsg->recipient_view, bsmsg->crypt_mode);
 
     g_simple_action_set_state(action, state);
 }
@@ -6311,6 +6312,7 @@ sw_gpg_mode_change_state(GSimpleAction  * action,
 
     bsmsg->crypt_mode =
         (bsmsg->crypt_mode & ~LIBBALSA_PROTECT_PROTOCOL) | rfc_flag;
+    libbalsa_address_view_set_crypt_mode(bsmsg->recipient_view, bsmsg->crypt_mode);
 
     g_simple_action_set_state(action, state);
 }

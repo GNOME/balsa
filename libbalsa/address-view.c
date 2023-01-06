@@ -28,6 +28,11 @@
 #if defined(HAVE_CONFIG_H) && HAVE_CONFIG_H
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
+#include "libbalsa.h"
+#include "libbalsa-gpgme.h"
+#include "libbalsa-gpgme-keys.h"
+#include "libbalsa-gpgme-widgets.h"
+#include "autocrypt.h"
 #include "address-view.h"
 
 #include <string.h>
@@ -53,10 +58,14 @@ struct _LibBalsaAddressView {
 
     gchar *domain;
 
+    guint crypt_mode;
+    gpgme_ctx_t gpgme_ctx;
+
     GtkTreeViewColumn *button_column;
     GtkTreeViewColumn *type_column;
     GtkTreeViewColumn *dropdown_column;
     GtkTreeViewColumn *focus_column;
+    GtkTreeViewColumn *keystate_column;
     GtkCellRenderer   *renderer_combo;
 
     /*
@@ -71,16 +80,24 @@ struct _LibBalsaAddressView {
     gchar *path_string;         /* ditto        */
 };
 
+/* thread data for checking the key servers for a missing key */
+typedef struct {
+    InternetAddressList *addresses;      /* addresses to look for */
+    gpgme_protocol_t protocol;           /* encryption protocol */
+    GWeakRef av_ref;                     /* threaf-safe weak reference to the address view */
+} lbav_keyserver_data_t;
+
 /*
  *     GObject class boilerplate
  */
 
 enum {
     OPEN_ADDRESS_BOOK,
+    UPDATE_KEYSTATE_ICONS,
     LAST_SIGNAL
 };
 
-static guint address_view_signals[LAST_SIGNAL] = { 0 };
+static guint address_view_signals[LAST_SIGNAL] = { 0, 0 };
 
 G_DEFINE_TYPE(LibBalsaAddressView, libbalsa_address_view,
               GTK_TYPE_TREE_VIEW)
@@ -97,6 +114,10 @@ libbalsa_address_view_finalize(GObject * object)
 
     g_free(address_view->domain);
     g_free(address_view->path_string);
+
+    if (address_view->gpgme_ctx != NULL) {
+        gpgme_release(address_view->gpgme_ctx);
+    }
 
     if (address_view->focus_row)
         gtk_tree_row_reference_free(address_view->focus_row);
@@ -130,6 +151,19 @@ libbalsa_address_view_class_init(LibBalsaAddressViewClass * klass)
                      0, 0, NULL, NULL,
                      NULL,
                      G_TYPE_NONE, 1, G_TYPE_POINTER);
+
+    /**
+     * LibBalsaAddressView::update-keystate-icons
+     * @address_view: the object which received the signal
+     *
+     * The signal is emitted after a key server operation has been finished, possibly resulting in different key states.
+     */
+    address_view_signals[UPDATE_KEYSTATE_ICONS] =
+        g_signal_new("update-keystate-icons",
+                     G_OBJECT_CLASS_TYPE(object_class),
+                     0, 0, NULL, NULL,
+                     NULL,
+                     G_TYPE_NONE, 0);
 }
 
 /*
@@ -143,7 +177,9 @@ enum {
     ADDRESS_TYPE_COL,
     ADDRESS_TYPESTRING_COL,
     ADDRESS_NAME_COL,
-    ADDRESS_ICON_COL
+    ADDRESS_ICON_COL,
+    ADDRESS_KEYSTATE_COL,
+    ADDRESS_COL_COUNT
 };
 
 typedef enum LibBalsaAddressViewMatchType_ LibBalsaAddressViewMatchType;
@@ -162,6 +198,7 @@ const gchar *const libbalsa_address_view_types[] = {
 
 /* Icon names */
 static const char *lbav_book_icon, *lbav_close_icon, *lbav_drop_down_icon;
+static const char *lbav_key_no_icon, *lbav_key_yes_icon;
 
 /*
  *     Helpers
@@ -335,6 +372,7 @@ lbav_ensure_blank_line(LibBalsaAddressView * address_view,
                            ADDRESS_TYPESTRING_COL,
                            _(lbav_type_string(address_view, type)),
                            ADDRESS_ICON_COL, lbav_book_icon,
+                           ADDRESS_KEYSTATE_COL, NULL,
                            -1);
 
     if (address_view->focus_row)
@@ -395,9 +433,23 @@ lbav_add_from_list(LibBalsaAddressView * address_view,
     for (i = 0; i < internet_address_list_length(list); i++) {
         InternetAddress *ia = internet_address_list_get_address(list, i);
         gchar *name = internet_address_to_string(ia, NULL, FALSE);
+        const gchar *keystate_icon;
 
         libbalsa_utf8_sanitize(&name, address_view->fallback, NULL);
         lbav_clean_text(name);
+
+        if (address_view->gpgme_ctx != NULL) {
+            if ((INTERNET_ADDRESS_IS_MAILBOX(ia) &&
+                 libbalsa_gpgme_have_key(address_view->gpgme_ctx, INTERNET_ADDRESS_MAILBOX(ia), NULL)) ||
+                (INTERNET_ADDRESS_IS_GROUP(ia) &&
+                 libbalsa_gpgme_have_all_keys(address_view->gpgme_ctx, INTERNET_ADDRESS_GROUP(ia)->members, NULL))) {
+                keystate_icon = lbav_key_yes_icon;
+            } else {
+                keystate_icon = lbav_key_no_icon;
+            }
+        } else {
+            keystate_icon = NULL;
+        }
 
         if (i > 0)
             gtk_list_store_insert_after(address_store, iter, iter);
@@ -406,7 +458,8 @@ lbav_add_from_list(LibBalsaAddressView * address_view,
                            ADDRESS_TYPESTRING_COL,
                            _(lbav_type_string(address_view, type)),
                            ADDRESS_NAME_COL, name,
-                           ADDRESS_ICON_COL, lbav_close_icon, -1);
+                           ADDRESS_ICON_COL, lbav_close_icon,
+                           ADDRESS_KEYSTATE_COL, keystate_icon, -1);
         g_free(name);
     }
 }
@@ -518,7 +571,8 @@ lbav_set_text(LibBalsaAddressView * address_view, const gchar * text)
             gchar *text_dup = g_strdup(text);
             lbav_clean_text(text_dup);
             gtk_list_store_set(address_store, &iter,
-                               ADDRESS_NAME_COL, text_dup, -1);
+                               ADDRESS_NAME_COL, text_dup,
+                               ADDRESS_KEYSTATE_COL, lbav_key_no_icon, -1);
             g_free(text_dup);
         }
         return;
@@ -533,7 +587,8 @@ lbav_set_text(LibBalsaAddressView * address_view, const gchar * text)
     g_free(name);
 
     /* Clear the text. */
-    gtk_list_store_set(address_store, &iter, ADDRESS_NAME_COL, NULL, -1);
+    gtk_list_store_set(address_store, &iter, ADDRESS_NAME_COL, NULL,
+                       ADDRESS_KEYSTATE_COL, NULL, -1);
 
     /* If this is not the only blank line, remove it. */
     count = 0;
@@ -887,6 +942,144 @@ lbav_dropdown_activated(LibBalsaAddressView *address_view,
                                      TRUE);
 }
 
+/* thread function checking the key server for a key */
+static gpointer
+keyserver_thread_func(gpointer data)
+{
+    lbav_keyserver_data_t *thread_data = (lbav_keyserver_data_t *) data;
+    gpgme_ctx_t ctx;
+    gchar *addr_buf;
+    gboolean update_av = FALSE;
+    GError *error = NULL;
+
+    addr_buf = internet_address_list_to_string(thread_data->addresses, NULL, FALSE);
+
+#ifdef ENABLE_AUTOCRYPT
+    if (thread_data->protocol == GPGME_PROTOCOL_OpenPGP) {
+        gint imported;
+
+        imported = autocrypt_import_keys(thread_data->addresses, &error);
+        if (imported == -1) {
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, _("Cannot load Autocrypt keys: %s"), error->message);
+            g_clear_error(&error);
+        } else if (imported > 0) {
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                ngettext("Imported %d key from the Autocrypt database into your key ring.",
+                         "Imported %d keys from the Autocrypt database into your key ring.", imported),
+                imported);
+            update_av = TRUE;
+        }
+    }
+#endif /* ENABLE_AUTOCRYPT */
+
+    ctx = libbalsa_gpgme_new_with_proto(thread_data->protocol, NULL, NULL, &error);
+    if (ctx != NULL) {
+        gint keyserver_res;
+
+        keyserver_res = libbalsa_gpgme_keyserver_import(ctx, thread_data->addresses, &error);
+        if (keyserver_res == 0) {
+            /* no key server keys found: show message unless we imported any Autocrypt key */
+            if (!update_av) {
+                /* Translators: #1 crypto protocol; #2 RFC 5322 internet address */
+                libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, _("Cannot find any %s key for “%s”"),
+                    libbalsa_gpgme_protocol_name(thread_data->protocol), addr_buf);
+            }
+        } else if (keyserver_res > 0) {
+            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
+                /* Translators: #1 key count, #2 crypto protocol; #2 RFC 5322 internet address */
+                ngettext("Imported %d %s key for “%s” into your key ring.",
+                         "Imported %d %s keys for “%s” into your key ring.", keyserver_res),
+                         keyserver_res, libbalsa_gpgme_protocol_name(thread_data->protocol), addr_buf);
+            update_av = TRUE;
+        }
+        gpgme_release(ctx);
+    }
+    if (error != NULL) {
+        libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Cannot import missing keys for “%s”: %s"), addr_buf, error->message);
+        g_error_free(error);
+    }
+    g_free(addr_buf);
+    if (update_av) {
+        LibBalsaAddressView *address_view;
+
+        address_view = g_weak_ref_get(&thread_data->av_ref);
+        if (LIBBALSA_IS_ADDRESS_VIEW(address_view)) {
+            g_signal_emit(address_view, address_view_signals[UPDATE_KEYSTATE_ICONS], 0);
+            g_object_unref(address_view);
+        }
+    }
+    g_weak_ref_clear(&thread_data->av_ref);
+    g_object_unref(thread_data->addresses);
+    g_free(thread_data);
+    return NULL;
+}
+
+static void
+lbav_keystate_activated(LibBalsaAddressView *address_view,
+                        GtkTreePath         *path)
+{
+    GtkTreeView *tree_view = GTK_TREE_VIEW(address_view);
+    GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    GtkTreeIter iter;
+    gchar *addr_name = NULL;
+    gchar *icon_name = NULL;
+    InternetAddressList *list;
+
+    if (!gtk_tree_model_get_iter(model, &iter, path)) {
+        return;
+    }
+
+    gtk_tree_model_get(model, &iter, ADDRESS_NAME_COL, &addr_name, ADDRESS_KEYSTATE_COL, &icon_name, -1);
+    if ((addr_name == NULL) || (addr_name[0] == '\0') || (icon_name == NULL) ||
+        ((strcmp(icon_name, lbav_key_yes_icon) != 0) && (strcmp(icon_name, lbav_key_no_icon) != 0))) {
+        g_free(addr_name);
+        g_free(icon_name);
+        return;
+    }
+
+    list = internet_address_list_parse(libbalsa_parser_options(), addr_name);
+    if (list != NULL) {
+        if (strcmp(icon_name, lbav_key_yes_icon) == 0) {
+            GList *keys = NULL;
+            GError *error = NULL;
+
+            if (!libbalsa_gpgme_list_local_pubkeys(address_view->gpgme_ctx, &keys, list, &error)) {
+                libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", error->message);
+                g_error_free(error);
+            } else if (keys == NULL) {
+                /* paranoid, should never happen */
+                libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("cannot find a key for “%s”"), addr_name);
+            } else {
+                GtkWidget *dialog;
+                gchar *message;
+                guint key_count;
+
+                key_count = g_list_length(keys);
+                message = g_strdup_printf(ngettext("Encryption key for “%s”", "Encryption keys for “%s”", key_count), addr_name);
+                dialog = libbalsa_key_list_dialog(NULL, GTK_BUTTONS_CLOSE, keys, GPG_SUBKEY_CAP_ENCRYPT, NULL, message);
+                g_free(message);
+                (void) gtk_dialog_run(GTK_DIALOG(dialog));
+                gtk_widget_destroy(dialog);
+            }
+            g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
+            g_object_unref(list);
+        } else {
+            GThread *thread_id;
+            lbav_keyserver_data_t *thread_data;
+
+            thread_data = g_new(lbav_keyserver_data_t, 1U);
+            thread_data->protocol = gpgme_get_protocol(address_view->gpgme_ctx);
+            thread_data->addresses = list;
+            g_weak_ref_init(&thread_data->av_ref, address_view);
+            thread_id = g_thread_new("keyserver", keyserver_thread_func, thread_data);
+            g_thread_unref(thread_id);
+        }
+    }
+
+    g_free(addr_name);
+    g_free(icon_name);
+}
+
 /*
  *     Callback for the address-view's "row-activated" signal
  *
@@ -905,6 +1098,76 @@ lbav_row_activated_cb(GtkTreeView       *tree_view,
         lbav_button_activated(address_view, path);
     else if (column == address_view->dropdown_column)
         lbav_dropdown_activated(address_view, path);
+    else if (column == address_view->keystate_column)
+        lbav_keystate_activated(address_view, path);
+}
+
+/* Callback for the address-view's "query-tooltip" signal
+ *
+ * Only on the keystate_column, show a help text re. the key status.
+ */
+static gboolean
+lbav_tooltip_cb(GtkTreeView *view,
+				gint         x,
+				gint         y,
+				gboolean     keyboard_mode,
+				GtkTooltip  *tooltip,
+				gpointer     data)
+{
+	GtkTreePath *path = NULL;
+	GtkTreeViewColumn *column;
+	gint cellx;
+	gint celly;
+	gboolean result = FALSE;
+
+	g_return_val_if_fail((view != NULL) && LIBBALSA_IS_ADDRESS_VIEW(data), FALSE);
+
+	if (gtk_tree_view_get_path_at_pos(view, x, y, &path, &column, &cellx, &celly)) {
+		if (column == LIBBALSA_ADDRESS_VIEW(data)->keystate_column) {
+			GtkTreeModel *model = gtk_tree_view_get_model(view);
+			GtkTreeIter iter;
+
+			if (gtk_tree_model_get_iter(model, &iter, path)) {
+				gchar *name;
+				gchar *keystate;
+
+				gtk_tree_model_get(model, &iter, ADDRESS_NAME_COL, &name, ADDRESS_KEYSTATE_COL, &keystate, -1);
+				if (name != NULL) {
+					InternetAddressList *list;
+
+					list = internet_address_list_parse(libbalsa_parser_options(), name);
+					if (list != NULL) {
+						gboolean mult_addr;
+
+						gtk_tree_view_set_tooltip_cell(view, tooltip, path, column, NULL);
+						result = TRUE;
+						mult_addr = (internet_address_list_length(list) > 1) ||
+							INTERNET_ADDRESS_IS_GROUP(internet_address_list_get_address(list, 0));
+						if (strcmp(keystate, lbav_key_no_icon) == 0) {
+							if (mult_addr) {
+								gtk_tooltip_set_text(tooltip, _("public key(s) missing, click to search key server"));
+							} else {
+								gtk_tooltip_set_text(tooltip, _("public key missing, click to search key server"));
+							}
+						} else {
+							if (mult_addr) {
+								gtk_tooltip_set_text(tooltip, _("all public keys available, click to show them"));
+							} else {
+								gtk_tooltip_set_text(tooltip, _("public key available, click to show it"));
+							}
+						}
+						g_object_unref(list);
+					}
+				}
+				g_free(name);
+				g_free(keystate);
+			}
+		}
+	}
+	if (path != NULL) {
+		gtk_tree_path_free(path);
+	}
+	return result;
 }
 
 /*
@@ -941,6 +1204,38 @@ lbav_sort_func(GtkTreeModel * model, GtkTreeIter * a, GtkTreeIter * b,
 }
 
 /*
+* Update the key status icon column.
+*/
+static void
+lbav_recheck_keystate(LibBalsaAddressView *address_view)
+{
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    gboolean valid;
+
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(address_view));
+    for (valid = gtk_tree_model_get_iter_first(model, &iter); valid; valid = gtk_tree_model_iter_next(model, &iter)) {
+        gchar *name;
+
+        gtk_tree_model_get(model, &iter, ADDRESS_NAME_COL, &name, -1);
+        if (name != NULL) {
+            InternetAddressList *this_list;
+
+            this_list = internet_address_list_parse(libbalsa_parser_options(), name);
+            if (this_list != NULL) {
+                gboolean have_key;
+
+                have_key = libbalsa_gpgme_have_all_keys(address_view->gpgme_ctx, this_list, NULL);
+                gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                    ADDRESS_KEYSTATE_COL, have_key ? lbav_key_yes_icon : lbav_key_no_icon, -1);
+                g_object_unref(this_list);
+            }
+        }
+        g_free(name);
+    }
+}
+
+/*
  *     Public API.
  */
 
@@ -959,7 +1254,7 @@ libbalsa_address_view_new(const gchar * const *types,
     GtkTreeViewColumn *column;
 
     /* List store for the widget: */
-    address_store = gtk_list_store_new(4,
+    address_store = gtk_list_store_new(ADDRESS_COL_COUNT,
                                        /* ADDRESS_TYPE_COL: */
                                        G_TYPE_INT,
                                        /* ADDRESS_TYPESTRING_COL: */
@@ -967,6 +1262,8 @@ libbalsa_address_view_new(const gchar * const *types,
                                        /* ADDRESS_NAME_COL: */
                                        G_TYPE_STRING,
                                        /* ADDRESS_ICON_COL: */
+                                       G_TYPE_STRING,
+                                       /* ADDRESS_KEYSTATE_COL: */
                                        G_TYPE_STRING);
 
     gtk_tree_sortable_set_default_sort_func(GTK_TREE_SORTABLE
@@ -990,6 +1287,9 @@ libbalsa_address_view_new(const gchar * const *types,
     address_view->fallback = fallback;
 
     tree_view = GTK_TREE_VIEW(address_view);
+
+    gtk_widget_set_has_tooltip(GTK_WIDGET(tree_view), TRUE);
+    g_signal_connect(tree_view, "query-tooltip", G_CALLBACK(lbav_tooltip_cb), address_view);
 
     g_signal_connect(tree_view, "row-activated", G_CALLBACK(lbav_row_activated_cb), NULL);
 
@@ -1049,6 +1349,7 @@ libbalsa_address_view_new(const gchar * const *types,
 
     /* Column for the entry widget. */
     address_view->focus_column = column = gtk_tree_view_column_new();
+    gtk_tree_view_column_set_expand(column, TRUE);
 
     /* The address entry: */
     renderer = gtk_cell_renderer_text_new();
@@ -1059,6 +1360,18 @@ libbalsa_address_view_new(const gchar * const *types,
     gtk_tree_view_column_set_attributes(column, renderer,
                                         "text", ADDRESS_NAME_COL, NULL);
     gtk_tree_view_append_column(tree_view, column);
+
+    /* Column for key status icon */
+    address_view->keystate_column = column = gtk_tree_view_column_new();
+    gtk_tree_view_column_set_expand(column, FALSE);
+    renderer = gtk_cell_renderer_pixbuf_new();
+    gtk_tree_view_column_pack_start(column, renderer, FALSE);
+    gtk_tree_view_column_set_attributes(column, renderer,
+                                        "icon-name", ADDRESS_KEYSTATE_COL,
+                                        NULL);
+    gtk_tree_view_append_column(tree_view, column);
+    gtk_tree_view_column_set_visible(column, FALSE);
+    g_signal_connect(address_view, "update-keystate-icons", G_CALLBACK(lbav_recheck_keystate), NULL);
 
     lbav_ensure_blank_line(address_view, NULL, 0);
 
@@ -1254,6 +1567,58 @@ libbalsa_address_view_get_list(LibBalsaAddressView * address_view,
 }
 
 void
+libbalsa_address_view_set_crypt_mode(LibBalsaAddressView *address_view,
+                                     guint                mode)
+{
+    GtkTreeViewColumn *key_column;
+
+    g_return_if_fail(LIBBALSA_IS_ADDRESS_VIEW(address_view));
+
+    key_column = gtk_tree_view_get_column(GTK_TREE_VIEW(address_view), ADDRESS_KEYSTATE_COL);
+    if ((mode & LIBBALSA_PROTECT_MODE) != 0) {
+        gboolean prot_changed;
+
+        /* drop the existing GpgME context if the protocol changed */
+        if ((mode & LIBBALSA_PROTECT_SMIME) != (address_view->crypt_mode & LIBBALSA_PROTECT_SMIME)) {
+            if (address_view->gpgme_ctx != NULL) {
+                gpgme_release(address_view->gpgme_ctx);
+                address_view->gpgme_ctx = NULL;
+            }
+            prot_changed = TRUE;
+        } else {
+            prot_changed = FALSE;
+        }
+
+        /* create a proper GpgME context if necessary */
+        if (address_view->gpgme_ctx == NULL) {
+        	gpgme_protocol_t protocol;
+            GError *error = NULL;
+
+            protocol = ((mode & LIBBALSA_PROTECT_SMIME) != 0U) ? GPGME_PROTOCOL_CMS : GPGME_PROTOCOL_OpenPGP;
+            address_view->gpgme_ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, &error);
+            if (error != NULL) {
+                libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", error->message);
+                g_error_free(error);
+            }
+        }
+
+        /* update all key status icons if necessary and possible */
+        if ((address_view->gpgme_ctx != NULL) &&
+            (((address_view->crypt_mode & LIBBALSA_PROTECT_MODE) == 0) || prot_changed)) {
+            lbav_recheck_keystate(address_view);
+        }
+        gtk_tree_view_column_set_visible(key_column, TRUE);
+    } else {
+        if (address_view->gpgme_ctx != NULL) {
+            gpgme_release(address_view->gpgme_ctx);
+            address_view->gpgme_ctx = NULL;
+        }
+        gtk_tree_view_column_set_visible(key_column, FALSE);
+    }
+    address_view->crypt_mode = mode;
+}
+
+void
 libbalsa_address_view_set_book_icon(const char * icon)
 {
     g_return_if_fail(icon != NULL);
@@ -1275,4 +1640,14 @@ libbalsa_address_view_set_drop_down_icon(const char * icon)
     g_return_if_fail(icon != NULL);
 
     lbav_drop_down_icon = icon;
+}
+
+void
+libbalsa_address_view_set_key_icons(const char *yes_icon,
+                                    const char *no_icon)
+{
+    g_return_if_fail((yes_icon != NULL) && (no_icon != NULL));
+
+    lbav_key_yes_icon = yes_icon;
+    lbav_key_no_icon = no_icon;
 }

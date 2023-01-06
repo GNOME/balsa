@@ -89,7 +89,7 @@ void autocrypt_from_message(LibBalsaMessage  *message,
  * Autocrypt mode of the passed identity is AUTOCRYPT_DISABLE.
  */
 gchar *autocrypt_header(LibBalsaIdentity  *identity,
-						GError        		   **error)
+						GError           **error)
 	G_GNUC_WARN_UNUSED_RESULT;
 
 /** \brief Check if a media type shall be ignored for Autocrypt
@@ -102,7 +102,7 @@ gchar *autocrypt_header(LibBalsaIdentity  *identity,
  */
 gboolean autocrypt_ignore(GMimeContentType *content_type);
 
-/** \brief Get a key from the Autocrypt database
+/** \brief Get a key from the Autocrypt database by fingerprint
  *
  * \param fingerprint key fingerprint
  * \param error filled with error information on error, may be NULL
@@ -112,6 +112,19 @@ gboolean autocrypt_ignore(GMimeContentType *content_type);
  */
 GBytes *autocrypt_get_key(const gchar  *fingerprint,
 						  GError      **error)
+	G_GNUC_WARN_UNUSED_RESULT;
+
+/** \brief Import missing keys from the Autocrypt database for a list of internet addresses
+ *
+ * \param addresses Internet addresses
+ * \param error filled with error information on error, may be NULL
+ * \return the count of imported keys (>= 0) on success, -1 on error
+ *
+ * Check for every mailbox in the passed list if a valid key exists in the Autocrypt database, but not in the local key ring, and
+ * import them into the latter.
+ */
+gint autocrypt_import_keys(InternetAddressList  *addresses,
+						   GError              **error)
 	G_GNUC_WARN_UNUSED_RESULT;
 
 /** \brief Get the recommendation for encryption

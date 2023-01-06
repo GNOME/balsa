@@ -204,6 +204,7 @@ balsa_register_icon_names(void)
     libbalsa_address_view_set_book_icon("stock_book_red");
     libbalsa_address_view_set_close_icon("window-close-symbolic");
     libbalsa_address_view_set_drop_down_icon("pan-down-symbolic");
+    libbalsa_address_view_set_key_icons("security-high", "process-stop");
 }
 
 const gchar *

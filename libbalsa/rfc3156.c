@@ -49,11 +49,6 @@
 #define G_LOG_DOMAIN "crypto"
 
 
-/* local prototypes */
-static gboolean have_pub_key_for(gpgme_ctx_t gpgme_ctx,
-				 InternetAddressList * recipients);
-
-
 /* ==== public functions =================================================== */
 /* return TRUE if we can encrypt for every recipient in the recipients list
  * using protocol */
@@ -74,7 +69,7 @@ libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
     	result = FALSE;
     } else {
     	/* loop over all recipients and try to find valid keys */
-    	result = have_pub_key_for(gpgme_ctx, recipients);
+    	result = libbalsa_gpgme_have_all_keys(gpgme_ctx, recipients, NULL);
     	gpgme_release(gpgme_ctx);
     }
 
@@ -566,42 +561,4 @@ libbalsa_gpgme_validity_to_gchar_short(gpgme_validity_t validity)
     default:
 	return _("bad validity");
     }
-}
-
-
-/* ==== local stuff ======================================================== */
-
-
-/* check if the local key ring contains a public key for the passed recipients */
-static gboolean
-have_pub_key_for(gpgme_ctx_t          gpgme_ctx,
-				 InternetAddressList *recipients)
-{
-    gboolean result = TRUE;
-    gint i;
-
-    for (i = 0; result && (i < internet_address_list_length(recipients)); i++) {
-    	InternetAddress *ia = internet_address_list_get_address(recipients, i);
-
-    	/* check all entries in the list, handle groups recursively */
-    	if (INTERNET_ADDRESS_IS_GROUP(ia)) {
-    		result = have_pub_key_for(gpgme_ctx, INTERNET_ADDRESS_GROUP(ia)->members);
-    	} else {
-    		gchar *mail_name;
-    		GList *keys = NULL;
-
-    		result = FALSE;
-    		/* enclose the mail address into "<...>" to perform an exact search */
-    		mail_name = g_strconcat("<", INTERNET_ADDRESS_MAILBOX(ia)->addr, ">", NULL);
-    		if (libbalsa_gpgme_list_keys(gpgme_ctx, &keys, NULL, mail_name, FALSE, FALSE, NULL)) {
-    			if (keys != NULL) {
-    				result = TRUE;
-    				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
-    			}
-    		}
-    		g_free(mail_name);
-    	}
-    }
-
-    return result;
 }

@@ -32,7 +32,7 @@
 #include "balsa-mime-widget.h"
 
 
-static void on_gpg_key_button(GtkWidget *button, const gchar *fingerprint);
+static void on_gpg_key_button(GtkWidget *button, LibBalsaMessageBody *mime_body);
 static void on_key_import_button(GtkButton *button, gpointer user_data);
 static gboolean create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error);
 
@@ -159,9 +159,7 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         } else {
             button = gtk_button_new_with_mnemonic(_("_Search key server for updates of this key"));
         }
-        g_signal_connect(button, "clicked",
-                         G_CALLBACK(on_gpg_key_button),
-                         (gpointer) g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info));
+        g_signal_connect(button, "clicked", G_CALLBACK(on_gpg_key_button), mime_body);
         gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
     }
 
@@ -261,17 +259,45 @@ balsa_mime_widget_signature_icon_name(guint protect_state)
 
 /* Callback: try to import a public key */
 static void
-on_gpg_key_button(GtkWidget   *button,
-				  const gchar *fingerprint)
+on_gpg_key_button(GtkWidget           *button,
+				  LibBalsaMessageBody *mime_body)
 {
+	LibBalsaMessageBody *p = mime_body;
+	LibBalsaMessageHeaders *crypt_headers = NULL;
+	const gchar *address;
 	GError *error = NULL;
 
-    if (!libbalsa_gpgme_keyserver_op(fingerprint, balsa_get_parent_window(button), &error)) {
-    	libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", error->message);
-    	g_error_free(error);
-    } else {
+	/* WKD: check which headers we shall use: first look for the headers if this is an embedded message... */
+	while ((p != NULL) && crypt_headers == NULL) {
+		crypt_headers = p->embhdrs;
+		p = p->parent;
+	}
+	/* ...none found: use the main message headers... */
+	if (crypt_headers == NULL) {
+		crypt_headers = libbalsa_message_get_headers(mime_body->message);
+	}
+
+	/* ...use From: unless is contains more than one address, and Sender: is present */
+	if ((crypt_headers->from != NULL) && (internet_address_list_length(crypt_headers->from) > 1) &&
+		(crypt_headers->sender != NULL)) {
+		address = internet_address_mailbox_get_addr(
+			INTERNET_ADDRESS_MAILBOX(internet_address_list_get_address(crypt_headers->sender, 0)));
+	} else if (crypt_headers->from != NULL) {
+		address = internet_address_mailbox_get_addr(
+			INTERNET_ADDRESS_MAILBOX(internet_address_list_get_address(crypt_headers->from, 0)));
+	} else {
+		/* this should never happen (would violate RFC 5322) */
+		address = NULL;
+	}
+
+	/* launch the background key server operation */
+	if (!libbalsa_gpgme_keyserver_op(g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info), address,
+		balsa_get_parent_window(button), &error)) {
+		libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", error->message);
+		g_error_free(error);
+	} else {
 		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
-    }
+	}
 }
 
 

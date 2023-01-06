@@ -61,10 +61,14 @@ InternetAddressList *libbalsa_address_view_get_list(LibBalsaAddressView *
                                                     address_view,
                                                     const gchar *
                                                     address_type);
+void libbalsa_address_view_set_crypt_mode(LibBalsaAddressView *address_view,
+                                          guint                mode);
 
 void libbalsa_address_view_set_book_icon(const char * book_icon);
 void libbalsa_address_view_set_close_icon(const char * close_icon);
 void libbalsa_address_view_set_drop_down_icon(const char * drop_down_icon);
+void libbalsa_address_view_set_key_icons(const char *yes_icon,
+                                         const char *no_icon);
 
 G_END_DECLS
 #endif                          /* __LIBBALSA_ADDRESS_VIEW_H__ */

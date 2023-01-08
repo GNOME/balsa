@@ -102,6 +102,8 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     GtkWidget *signature_widget;
     gchar **lines;
 
+    g_return_val_if_fail(mime_body != NULL, NULL);
+
     if (!mime_body->sig_info ||
     	g_mime_gpgme_sigstat_status(mime_body->sig_info) == GPG_ERR_NOT_SIGNED)
 	return NULL;

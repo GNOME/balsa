@@ -102,10 +102,11 @@ endif
 
 code = '''
 #include <langinfo.h>
-void func()
+char func(void)
 {
     char c;
     c = *((unsigned char *) nl_langinfo(_NL_MEASUREMENT_MEASUREMENT));
+    return c;
 }
 '''
 result = compiler.compiles(code, name : '_NL_MEASUREMENT_MEASUREMENT test')

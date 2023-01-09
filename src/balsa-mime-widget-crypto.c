@@ -267,6 +267,8 @@ on_gpg_key_button(GtkWidget           *button,
 	const gchar *address;
 	GError *error = NULL;
 
+	g_assert(mime_body != NULL);
+
 	/* WKD: check which headers we shall use: first look for the headers if this is an embedded message... */
 	while ((p != NULL) && crypt_headers == NULL) {
 		crypt_headers = p->embhdrs;

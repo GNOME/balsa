@@ -4,7 +4,7 @@
 # Kenneth Christiansen <kenneth@ripen.dk>.
 # Keld Simonsen <keld@dkuug.dk>, 2000-2002.
 # Joe Hansen <joedalton2@yahoo.dk>, 2009, 2010, 2011, 2012.
-# Alan Mortensen <alanmortensen.am@gmail.com>, 2016-22.
+# Alan Mortensen <alanmortensen.am@gmail.com>, 2016-23.
 # scootergrisen, 2020.
 #
 # built -> bygget (måske kompileret?)
@@ -47,8 +47,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-08-21 11:04+0000\n"
-"PO-Revision-Date: 2022-09-20 18:40+0200\n"
+"POT-Creation-Date: 2022-12-09 21:07+0000\n"
+"PO-Revision-Date: 2023-01-01 15:26+0100\n"
 "Last-Translator: Alan Mortensen <alanmortensen.am@gmail.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
@@ -341,17 +341,17 @@ msgstr "Databaseindgangen for “%s” indeholder ikke en nøgle."
 msgid "Delete the Autocrypt key for “%s” from the database?"
 msgstr "Slet Autocrypt-nøglen for “%s” fra databasen?"
 
-#: ../libbalsa/body.c:141 ../libbalsa/mailbox_local.c:1884
+#: ../libbalsa/body.c:145 ../libbalsa/mailbox_local.c:1884
 #: ../libbalsa/message.c:949
 msgid "(No subject)"
 msgstr "(Intet emne)"
 
-#: ../libbalsa/body.c:427 ../libbalsa/body.c:474
+#: ../libbalsa/body.c:431 ../libbalsa/body.c:478
 #, c-format
 msgid "Failed to create output stream"
 msgstr "Kunne ikke oprette uddatastrøm"
 
-#: ../libbalsa/body.c:611
+#: ../libbalsa/body.c:615
 #, c-format
 msgid "Could not read embedded message"
 msgstr "Kunne ikke læse indlejret besked"
@@ -611,7 +611,7 @@ msgstr ""
 msgid "_Download external content"
 msgstr "_Hent eksternt indhold"
 
-#: ../libbalsa/html.c:702
+#: ../libbalsa/html.c:708
 #, c-format
 msgid ""
 "Balsa's external HTML resources filter web extension is not available in the "
@@ -1908,32 +1908,19 @@ msgstr "Kunne ikke oprette et Maildir-katalog i %s (%s)"
 msgid "Could not create a Maildir at %s (%s)"
 msgstr "Kunne ikke oprette et Maildir i %s (%s)"
 
-#: ../libbalsa/mailbox_maildir.c:318
+#: ../libbalsa/mailbox_maildir.c:319 ../libbalsa/mailbox_mh.c:276
 #, c-format
-msgid ""
-"Could not remove contents of %s:\n"
-"%s"
-msgstr ""
-"Kunne ikke fjerne indholdet af %s:\n"
-"%s"
+msgid "Could not remove “%s”: %s"
+msgstr "Kunne ikke fjerne “%s”: %s"
 
-#: ../libbalsa/mailbox_maildir.c:324
-#, c-format
-msgid ""
-"Could not remove %s:\n"
-"%s"
-msgstr ""
-"Kunne ikke fjerne %s:\n"
-"%s"
-
-#: ../libbalsa/mailbox_maildir.c:467 ../libbalsa/mailbox_mbox.c:656
-#: ../libbalsa/mailbox_mh.c:507
+#: ../libbalsa/mailbox_maildir.c:463 ../libbalsa/mailbox_mbox.c:656
+#: ../libbalsa/mailbox_mh.c:504
 #, c-format
 msgid "Mailbox does not exist."
 msgstr "Postkasse eksisterer ikke."
 
-#: ../libbalsa/mailbox_maildir.c:908 ../libbalsa/mailbox_mbox.c:1935
-#: ../libbalsa/mailbox_mh.c:1087
+#: ../libbalsa/mailbox_maildir.c:904 ../libbalsa/mailbox_mbox.c:1935
+#: ../libbalsa/mailbox_mh.c:1084
 #, c-format
 msgid "Data copy error"
 msgstr "Datakopieringsfejl"
@@ -1943,7 +1930,7 @@ msgstr "Datakopieringsfejl"
 msgid "Mailbox %s does not appear to be an mbox mailbox."
 msgstr "Postkassen “%s” ser ikke ud til at være en Mbox-postkasse."
 
-#: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:280
+#: ../libbalsa/mailbox_mbox.c:279
 #, c-format
 msgid "Could not remove %s: %s"
 msgstr "Kunne ikke fjerne %s: %s"
@@ -2014,17 +2001,12 @@ msgstr "Kunne ikke oprette et MH-katalog i %s (%s)"
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Kunne ikke oprette en MH-struktur i %s (%s)"
 
-#: ../libbalsa/mailbox_mh.c:274
-#, c-format
-msgid "Could not remove contents of %s: %s"
-msgstr "Kunne ikke fjerne indholdet af %s: %s"
-
-#: ../libbalsa/mailbox_mh.c:1069
+#: ../libbalsa/mailbox_mh.c:1066
 #, c-format
 msgid "Cannot create message"
 msgstr "Kan ikke oprette besked"
 
-#: ../libbalsa/mailbox_mh.c:1112
+#: ../libbalsa/mailbox_mh.c:1109
 #, c-format
 msgid "Message rename error"
 msgstr "Omdøbningsfejl for besked"
@@ -2080,7 +2062,7 @@ msgstr "POP3-postkasse %s: Kan ikke forbinde %s: %s"
 msgid "List messages…"
 msgstr "Oplist beskeder …"
 
-#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:701
+#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:702
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr "Fejl for POP3-postkasse %s: %s"
@@ -2090,23 +2072,23 @@ msgstr "Fejl for POP3-postkasse %s: %s"
 msgid "POP3 mailbox %s: message %d oversized: %s — skipped."
 msgstr "POP3-postkasse %s: besked %d for stor: %s — udeladt."
 
-#: ../libbalsa/mailbox_pop3.c:649 ../libbalsa/send.c:1034
+#: ../libbalsa/mailbox_pop3.c:650 ../libbalsa/send.c:1034
 #, c-format
 msgid "Connected to %s"
 msgstr "Forbundet til %s"
 
-#: ../libbalsa/mailbox_pop3.c:665
+#: ../libbalsa/mailbox_pop3.c:666
 #, c-format
 msgid "%lu new message (%s)"
 msgid_plural "%lu new messages (%s)"
 msgstr[0] "%lu ny besked (%s)"
 msgstr[1] "%lu nye beskeder (%s)"
 
-#: ../libbalsa/mailbox_pop3.c:676
+#: ../libbalsa/mailbox_pop3.c:677
 msgid "Deleting messages on server…"
 msgstr "Sletter beskeder på server …"
 
-#: ../libbalsa/mailbox_pop3.c:711 ../libbalsa/send.c:1115
+#: ../libbalsa/mailbox_pop3.c:712 ../libbalsa/send.c:1115
 msgid "Finished"
 msgstr "Færdig"
 
@@ -2115,112 +2097,117 @@ msgstr "Færdig"
 msgid "Mailbox (%s) is read-only: cannot change flags."
 msgstr "Postkasse (%s) er skrivebeskyttet: Kan ikke ændre flag."
 
-#: ../libbalsa/misc.c:387
+#: ../libbalsa/misc.c:226 ../libbalsa/misc.c:235
+#, c-format
+msgid "cannot delete “%s”: %s"
+msgstr "kan ikke slette “%s”: %s"
+
+#: ../libbalsa/misc.c:388
 msgid "West European"
 msgstr "Vesteuropæisk"
 
-#: ../libbalsa/misc.c:389 ../libbalsa/misc.c:423
+#: ../libbalsa/misc.c:390 ../libbalsa/misc.c:424
 msgid "East European"
 msgstr "Østeuropæisk"
 
-#: ../libbalsa/misc.c:391
+#: ../libbalsa/misc.c:392
 msgid "South European"
 msgstr "Sydeuropæisk"
 
-#: ../libbalsa/misc.c:393
+#: ../libbalsa/misc.c:394
 msgid "North European"
 msgstr "Nordeuropæisk"
 
-#: ../libbalsa/misc.c:395 ../libbalsa/misc.c:425
+#: ../libbalsa/misc.c:396 ../libbalsa/misc.c:426
 msgid "Cyrillic"
 msgstr "Kyrillisk"
 
-#: ../libbalsa/misc.c:397 ../libbalsa/misc.c:431
+#: ../libbalsa/misc.c:398 ../libbalsa/misc.c:432
 msgid "Arabic"
 msgstr "Arabisk"
 
-#: ../libbalsa/misc.c:399 ../libbalsa/misc.c:427
+#: ../libbalsa/misc.c:400 ../libbalsa/misc.c:428
 msgid "Greek"
 msgstr "Græsk"
 
-#: ../libbalsa/misc.c:401 ../libbalsa/misc.c:429
+#: ../libbalsa/misc.c:402 ../libbalsa/misc.c:430
 msgid "Hebrew"
 msgstr "Hebraisk"
 
-#: ../libbalsa/misc.c:403
+#: ../libbalsa/misc.c:404
 msgid "Turkish"
 msgstr "Tyrkisk"
 
-#: ../libbalsa/misc.c:405
+#: ../libbalsa/misc.c:406
 msgid "Nordic"
 msgstr "Nordisk"
 
-#: ../libbalsa/misc.c:407
+#: ../libbalsa/misc.c:408
 msgid "Thai"
 msgstr "Thai"
 
-#: ../libbalsa/misc.c:409 ../libbalsa/misc.c:433
+#: ../libbalsa/misc.c:410 ../libbalsa/misc.c:434
 msgid "Baltic"
 msgstr "Baltisk"
 
-#: ../libbalsa/misc.c:411
+#: ../libbalsa/misc.c:412
 msgid "Celtic"
 msgstr "Keltisk"
 
-#: ../libbalsa/misc.c:413
+#: ../libbalsa/misc.c:414
 msgid "West European (euro)"
 msgstr "Vesteuropæisk (euro)"
 
-#: ../libbalsa/misc.c:415
+#: ../libbalsa/misc.c:416
 msgid "Russian"
 msgstr "Russisk"
 
-#: ../libbalsa/misc.c:417
+#: ../libbalsa/misc.c:418
 msgid "Ukrainian"
 msgstr "Ukrainsk"
 
-#: ../libbalsa/misc.c:419
+#: ../libbalsa/misc.c:420
 msgid "Japanese"
 msgstr "Japansk"
 
-#: ../libbalsa/misc.c:421
+#: ../libbalsa/misc.c:422
 msgid "Korean"
 msgstr "Koreansk"
 
-#: ../libbalsa/misc.c:614
+#: ../libbalsa/misc.c:615
 #, c-format
 msgid "Cannot open %s: %s"
 msgstr "Kan ikke åbne %s: %s"
 
-#: ../libbalsa/misc.c:623
+#: ../libbalsa/misc.c:624
 #, c-format
 msgid "Cannot open %s: is a symbolic link"
 msgstr "Kan ikke åbne %s: Er en symbolsk henvisning"
 
-#: ../libbalsa/misc.c:734
+#: ../libbalsa/misc.c:735
 #, c-format
 msgid "fcntl failed: %s."
 msgstr "fcntl fejlede: %s."
 
-#: ../libbalsa/misc.c:750
+#: ../libbalsa/misc.c:751
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Tidsrum overskredet under forsøg på fcntl-lås!"
 
-#: ../libbalsa/misc.c:757
+#: ../libbalsa/misc.c:758
 #, c-format
 msgid "Waiting for fcntl lock… %d"
 msgstr "Venter på fcntl-lås … %d"
 
-#: ../libbalsa/misc.c:786
+#: ../libbalsa/misc.c:787
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Tidsrum overskredet under forsøg på flock lås!"
 
-#: ../libbalsa/misc.c:794
+#: ../libbalsa/misc.c:795
 #, c-format
 msgid "Waiting for flock attempt… %d"
 msgstr "Venter på forsøg på flock … %d"
 
-#: ../libbalsa/misc.c:1099
+#: ../libbalsa/misc.c:1100
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "LDAP-katalog for %s"
@@ -3467,7 +3454,7 @@ msgstr "Gennemse"
 msgid "Edit"
 msgstr "Redigér"
 
-#: ../src/ab-main.c:1096
+#: ../src/ab-main.c:1101
 msgid "Balsa Address Book"
 msgstr "Balsa-adressebog"
 
@@ -8169,6 +8156,26 @@ msgstr "Vedhæft _GnuPG offentlig nøgle"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Undvig specialtegn"
+
+#, c-format
+#~ msgid ""
+#~ "Could not remove contents of %s:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Kunne ikke fjerne indholdet af %s:\n"
+#~ "%s"
+
+#, c-format
+#~ msgid ""
+#~ "Could not remove %s:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Kunne ikke fjerne %s:\n"
+#~ "%s"
+
+#, c-format
+#~ msgid "Could not remove contents of %s: %s"
+#~ msgstr "Kunne ikke fjerne indholdet af %s: %s"
 
 #, c-format
 #~ msgid "Async IMAP cmd %s could not be executed. Reconnecting…"

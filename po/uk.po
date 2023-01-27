@@ -3,13 +3,13 @@
 #
 # Yuri Syrota <rasta@renome.rovno.ua>, 1999.
 # Maxim Dziumanenko <mvd@mylinux.com.ua>, 2004.
-# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2021, 2022.
+# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2021, 2022, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-12-09 21:07+0000\n"
-"PO-Revision-Date: 2022-12-10 08:41+0200\n"
+"POT-Creation-Date: 2023-01-24 18:13+0000\n"
+"PO-Revision-Date: 2023-01-27 16:55+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -235,18 +235,18 @@ msgstr ""
 
 #. Translators: #1 GPG key fingerprint; #2 error message
 #. Translators: #1 mailbox; #2 error message
-#: ../libbalsa/autocrypt.c:389 ../libbalsa/autocrypt.c:398
-#: ../libbalsa/autocrypt.c:682 ../libbalsa/autocrypt.c:689
+#: ../libbalsa/autocrypt.c:390 ../libbalsa/autocrypt.c:399
+#: ../libbalsa/autocrypt.c:689 ../libbalsa/autocrypt.c:696
 #, c-format
 msgid "error reading Autocrypt data for “%s”: %s"
 msgstr ""
 "помилка під час спроби прочитати дані автоматичного шифрування для «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:451
+#: ../libbalsa/autocrypt.c:453
 msgid "Autocrypt database"
 msgstr "База даних автошифрування"
 
-#: ../libbalsa/autocrypt.c:452 ../libbalsa/html.c:459
+#: ../libbalsa/autocrypt.c:454 ../libbalsa/html.c:459
 #: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
 #: ../libbalsa/libbalsa-gpgme-widgets.c:769 ../src/ab-window.c:148
 #: ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
@@ -256,38 +256,38 @@ msgstr "База даних автошифрування"
 msgid "_Close"
 msgstr "_Закрити"
 
-#: ../libbalsa/autocrypt.c:521 ../src/balsa-mblist.c:326
+#: ../libbalsa/autocrypt.c:525 ../src/balsa-mblist.c:326
 msgid "Mailbox"
 msgstr "Скринька"
 
-#: ../libbalsa/autocrypt.c:527
+#: ../libbalsa/autocrypt.c:531
 msgid "Last seen"
 msgstr "Востаннє бачили"
 
-#: ../libbalsa/autocrypt.c:533
+#: ../libbalsa/autocrypt.c:537
 msgid "Last Autocrypt message"
 msgstr "Останнє автозашифроване повідомлення"
 
-#: ../libbalsa/autocrypt.c:539
+#: ../libbalsa/autocrypt.c:543
 msgid "Prefer encryption"
 msgstr "Перевага шифрування"
 
 #. Translators: #1 email address; #2 error message
-#: ../libbalsa/autocrypt.c:792 ../libbalsa/autocrypt.c:813
+#: ../libbalsa/autocrypt.c:793 ../libbalsa/autocrypt.c:815
 #, c-format
 msgid "update user “%s” failed: %s"
 msgstr "не вдалося оновити запис користувача «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:792
+#: ../libbalsa/autocrypt.c:793
 #, c-format
 msgid "insert user “%s” failed: %s"
 msgstr "не вдалося вставити користувача «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:889
+#: ../libbalsa/autocrypt.c:891
 msgid "_Show details…"
 msgstr "Показати п_одробиці…"
 
-#: ../libbalsa/autocrypt.c:892 ../libbalsa/html-pref-db.c:453
+#: ../libbalsa/autocrypt.c:894 ../libbalsa/html-pref-db.c:453
 #: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1040
 #: ../src/mailbox-node.c:1056 ../src/pref-manager.c:2024
 #: ../src/pref-manager.c:2109 ../src/pref-manager.c:2832 ../ui/ab-main.ui.h:11
@@ -301,8 +301,14 @@ msgstr "В_илучити"
 msgid "The database entry for “%s” does not contain a key."
 msgstr "У записі бази даних для «%s» не міститься ключа."
 
+#: ../libbalsa/autocrypt.c:958
+#, c-format
+#| msgid "Cannot open %s: %s"
+msgid "cannot show key details: %s"
+msgstr "не вдалося показати подробиці ключа: %s"
+
 #. Translators: #1 email address
-#: ../libbalsa/autocrypt.c:983
+#: ../libbalsa/autocrypt.c:986
 #, c-format
 msgid "Delete the Autocrypt key for “%s” from the database?"
 msgstr "Вилучити ключ Autocrypt для «%s» з бази даних?"
@@ -447,7 +453,7 @@ msgstr "Не вдалося розшифрувати частину MIME: пом
 
 #: ../libbalsa/gmime-gpgme-signature.c:147
 #: ../libbalsa/libbalsa-gpgme-widgets.c:360
-#: ../libbalsa/libbalsa-gpgme-widgets.c:673 ../libbalsa/rfc3156.c:598
+#: ../libbalsa/libbalsa-gpgme-widgets.c:673 ../libbalsa/rfc3156.c:559
 #: ../src/address-book-config.c:200
 msgid "never"
 msgstr "Ніколи"
@@ -497,7 +503,7 @@ msgstr ""
 "Відбиток ключа: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:239 ../libbalsa/imap/imap-handle.c:46
-#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:594
+#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:555
 #: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5364
 msgid "unknown"
 msgstr "невідомо"
@@ -625,7 +631,7 @@ msgid "Cannot save HTML preferences for “%s”: %s"
 msgstr "Не вдалося зберегти налаштування HTML для «%s»: %s"
 
 #. Translators: #1 error message
-#: ../libbalsa/html-pref-db.c:481
+#: ../libbalsa/html-pref-db.c:482
 #, c-format
 msgid "Cannot delete database entry: %s"
 msgstr "Не вдалося вилучити запис бази даних: %s"
@@ -1170,57 +1176,70 @@ msgstr "не вдалося створити контекст"
 msgid "could not set protocol “%s”"
 msgstr "не вдалося встановити протокол «%s»"
 
-#: ../libbalsa/libbalsa-gpgme.c:314
+#: ../libbalsa/libbalsa-gpgme.c:305
+#, c-format
+#| msgid "Failed to create temporary file “%s”: %s"
+msgid "failed to create a temporary folder"
+msgstr "не вдалося створити тимчасову теку"
+
+#: ../libbalsa/libbalsa-gpgme.c:325
 #, c-format
 msgid "could not set folder “%s” for engine “%s”"
 msgstr "не вдалося встановити теку «%s» для рушія «%s»"
 
-#: ../libbalsa/libbalsa-gpgme.c:371 ../libbalsa/libbalsa-gpgme.c:382
-#: ../libbalsa/libbalsa-gpgme.c:483 ../libbalsa/libbalsa-gpgme.c:606
-#: ../libbalsa/libbalsa-gpgme.c:699
+#. paranoid - should *never* happen
+#: ../libbalsa/libbalsa-gpgme.c:330
+#, c-format
+#| msgid "exporting key for “%s” failed"
+msgid "no crypto engine for “%s” available"
+msgstr "немає рушія шифрування для «%s»"
+
+#: ../libbalsa/libbalsa-gpgme.c:396 ../libbalsa/libbalsa-gpgme.c:407
+#: ../libbalsa/libbalsa-gpgme.c:508 ../libbalsa/libbalsa-gpgme.c:631
+#: ../libbalsa/libbalsa-gpgme.c:724
 msgid "could not get data from stream"
 msgstr "не вдалося отримати дані з потоку"
 
-#: ../libbalsa/libbalsa-gpgme.c:395 ../libbalsa/rfc3156.c:271
-#: ../libbalsa/rfc3156.c:276 ../libbalsa/rfc3156.c:444
-#: ../libbalsa/rfc3156.c:450
+#: ../libbalsa/libbalsa-gpgme.c:420 ../libbalsa/rfc3156.c:250
+#: ../libbalsa/rfc3156.c:255 ../libbalsa/rfc3156.c:411
+#: ../libbalsa/rfc3156.c:417
 msgid "signature verification failed"
 msgstr "помилка перевірки підпису"
 
-#: ../libbalsa/libbalsa-gpgme.c:491 ../libbalsa/libbalsa-gpgme.c:615
-#: ../libbalsa/libbalsa-gpgme.c:707
+#: ../libbalsa/libbalsa-gpgme.c:516 ../libbalsa/libbalsa-gpgme.c:640
+#: ../libbalsa/libbalsa-gpgme.c:732
 msgid "could not create new data object"
 msgstr "не вдалося створити новий об'єкт даних"
 
-#: ../libbalsa/libbalsa-gpgme.c:500
+#: ../libbalsa/libbalsa-gpgme.c:525
 msgid "signing failed"
 msgstr "помилка підпису"
 
-#: ../libbalsa/libbalsa-gpgme.c:574
+#: ../libbalsa/libbalsa-gpgme.c:599
 #, c-format
 msgid "combined signing and encryption is defined only for RFC 2440"
 msgstr "комбінація підписування та шифрування визначена лише для RFC 2440"
 
-#: ../libbalsa/libbalsa-gpgme.c:642
+#: ../libbalsa/libbalsa-gpgme.c:667
 msgid "signing and encryption failed"
 msgstr "помилка підпису та шифрування"
 
-#: ../libbalsa/libbalsa-gpgme.c:644
+#: ../libbalsa/libbalsa-gpgme.c:669
 msgid "encryption failed"
 msgstr "помилка шифрування"
 
-#: ../libbalsa/libbalsa-gpgme.c:717 ../libbalsa/rfc3156.c:344
-#: ../libbalsa/rfc3156.c:349
+#: ../libbalsa/libbalsa-gpgme.c:742 ../libbalsa/rfc3156.c:319
+#: ../libbalsa/rfc3156.c:324
 msgid "decryption failed"
 msgstr "помилка розшифровування"
 
-#: ../libbalsa/libbalsa-gpgme.c:824
+#: ../libbalsa/libbalsa-gpgme.c:849
 #, c-format
 msgid "No private key for protocol %s is available for the signer “%s”"
 msgstr ""
 "Немає доступного закритого ключа для протоколу %s для автора підпису «%s»"
 
-#: ../libbalsa/libbalsa-gpgme.c:974
+#: ../libbalsa/libbalsa-gpgme.c:999
 #, c-format
 msgid ""
 "A key for “%s” is present, but it is expired, disabled, revoked or invalid"
@@ -1228,17 +1247,17 @@ msgstr ""
 "Маємо ключ для «%s», але строк його дії вичерпано, його вимкнено, відкликано "
 "або він є некоректним"
 
-#: ../libbalsa/libbalsa-gpgme.c:977
+#: ../libbalsa/libbalsa-gpgme.c:1002
 #, c-format
 msgid "Could not find a key for “%s”"
 msgstr "Не вдалося знайти ключ для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme.c:992
+#: ../libbalsa/libbalsa-gpgme.c:1017
 #, c-format
 msgid "Multiple keys for “%s”"
 msgstr "Декілька ключів для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme.c:1014
+#: ../libbalsa/libbalsa-gpgme.c:1039
 #, c-format
 msgid "Insufficient key validity"
 msgstr "Недостатня чинність ключа"
@@ -1332,46 +1351,46 @@ msgstr ""
 "\n"
 "Ключ: %s"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:94 ../libbalsa/libbalsa-gpgme-keys.c:162
+#: ../libbalsa/libbalsa-gpgme-keys.c:108 ../libbalsa/libbalsa-gpgme-keys.c:339
 msgid "error setting key list mode"
 msgstr "помилка під час спроби встановити режим списку ключів"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:101 ../libbalsa/libbalsa-gpgme-keys.c:126
-#: ../libbalsa/libbalsa-gpgme-keys.c:168 ../libbalsa/libbalsa-gpgme-keys.c:172
+#: ../libbalsa/libbalsa-gpgme-keys.c:114 ../libbalsa/libbalsa-gpgme-keys.c:118
+#: ../libbalsa/libbalsa-gpgme-keys.c:346 ../libbalsa/libbalsa-gpgme-keys.c:364
 #, c-format
 msgid "could not list keys for “%s”"
 msgstr "не вдалося побудувати список ключів для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:179
+#: ../libbalsa/libbalsa-gpgme-keys.c:125
 #, c-format
 msgid "ambiguous keys for “%s”"
 msgstr "неоднозначні ключі для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:248 ../libbalsa/libbalsa-gpgme-keys.c:291
-#: ../libbalsa/libbalsa-gpgme-keys.c:396
+#: ../libbalsa/libbalsa-gpgme-keys.c:194 ../libbalsa/libbalsa-gpgme-keys.c:237
+#: ../libbalsa/libbalsa-gpgme-keys.c:411
 msgid "cannot create data buffer"
 msgstr "не вдалося створити буфер даних"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:256
+#: ../libbalsa/libbalsa-gpgme-keys.c:202
 #, c-format
 msgid "exporting key for “%s” failed"
 msgstr "не вдалося експортувати ключ для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:316 ../libbalsa/libbalsa-gpgme-keys.c:324
+#: ../libbalsa/libbalsa-gpgme-keys.c:262 ../libbalsa/libbalsa-gpgme-keys.c:270
 #, c-format
 msgid "cannot export minimal key for “%s”"
 msgstr "не вдалося експортувати мінімальний ключ для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:400
+#: ../libbalsa/libbalsa-gpgme-keys.c:415
 msgid "importing key data failed"
 msgstr "не вдалося імпортувати дані ключа"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:473
+#: ../libbalsa/libbalsa-gpgme-keys.c:487
 #, c-format
 msgid "Cannot find a key with fingerprint %s on the key server."
 msgstr "Не вдалося знайти ключ із відбитком %s на сервері ключів."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:481
+#: ../libbalsa/libbalsa-gpgme-keys.c:495
 #, c-format
 msgid ""
 "Found %u key with fingerprint %s on the key server. Please check and import "
@@ -1392,34 +1411,34 @@ msgstr[3] ""
 "На сервері ключів знайдено %u ключ із відбитком %s. Будь ласка, перевірте і "
 "імпортуйте належний ключ вручну."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:501
+#: ../libbalsa/libbalsa-gpgme-keys.c:515
 #, c-format
 msgid "Searching the key server failed: %s"
 msgstr "Пошук на сервері ключів завершився невдачею: %s"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:540
+#: ../libbalsa/libbalsa-gpgme-keys.c:554
 msgid "error importing key"
 msgstr "помилка під час імпортування ключа"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:575
+#: ../libbalsa/libbalsa-gpgme-keys.c:589
 msgid "No key was imported or updated."
 msgstr "Жодного ключа не було імпортовано або оновлено."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:577
+#: ../libbalsa/libbalsa-gpgme-keys.c:591
 msgid "The key was ignored because it does not have a user ID."
 msgstr ""
 "Ключ проігноровано, оскільки у ньому не міститься даних щодо ідентифікатора "
 "користувача."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:580
+#: ../libbalsa/libbalsa-gpgme-keys.c:594
 msgid "The key was imported into the local key ring."
 msgstr "Ключ було імпортовано до локальної зв'язки ключів."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:584
+#: ../libbalsa/libbalsa-gpgme-keys.c:598
 msgid "The key was updated in the local key ring:"
 msgstr "Ключ було оновлено у локальній зв'язці ключів:"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:587
+#: ../libbalsa/libbalsa-gpgme-keys.c:601
 #, c-format
 msgid ""
 "\n"
@@ -1440,7 +1459,7 @@ msgstr[3] ""
 "\n"
 "• один новий ідентифікатор користувача"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:592
+#: ../libbalsa/libbalsa-gpgme-keys.c:606
 #, c-format
 msgid ""
 "\n"
@@ -1461,7 +1480,7 @@ msgstr[3] ""
 "\n"
 "• %d новий підключ"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:597
+#: ../libbalsa/libbalsa-gpgme-keys.c:611
 #, c-format
 msgid ""
 "\n"
@@ -1482,7 +1501,7 @@ msgstr[3] ""
 "\n"
 "• %d новий підпис"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:603
+#: ../libbalsa/libbalsa-gpgme-keys.c:617
 #, c-format
 msgid ""
 "\n"
@@ -1503,7 +1522,7 @@ msgstr[3] ""
 "\n"
 "• одне нове відкликання"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:609
+#: ../libbalsa/libbalsa-gpgme-keys.c:623
 msgid "The existing key in the key ring was not changed."
 msgstr "Наявний ключ у зв'язці ключів змінено не було."
 
@@ -1837,12 +1856,12 @@ msgstr "Не вдалося створити тимчасовий файл"
 msgid "Cannot write to temporary file %s"
 msgstr "Не вдалося записати дані до тимчасового файла %s"
 
-#: ../libbalsa/mailbox_imap.c:2802 ../libbalsa/mailbox_imap.c:2919
+#: ../libbalsa/mailbox_imap.c:2803 ../libbalsa/mailbox_imap.c:2920
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Вивантажуємо %ld кБ"
 
-#: ../libbalsa/mailbox_imap.c:3228
+#: ../libbalsa/mailbox_imap.c:3229
 msgid "Server-side threading not supported."
 msgstr "Розбивання на гілки на сервері не підтримується."
 
@@ -1900,7 +1919,6 @@ msgstr "Не вдалося створити Maildir на %s (%s)"
 
 #: ../libbalsa/mailbox_maildir.c:319 ../libbalsa/mailbox_mh.c:276
 #, c-format
-#| msgid "Could not remove %s: %s"
 msgid "Could not remove “%s”: %s"
 msgstr "Не вдалося вилучити «%s»: %s"
 
@@ -2096,7 +2114,6 @@ msgstr ""
 
 #: ../libbalsa/misc.c:226 ../libbalsa/misc.c:235
 #, c-format
-#| msgid "Cannot read the file “%s”: %s"
 msgid "cannot delete “%s”: %s"
 msgstr "не вдалося вилучити «%s»: %s"
 
@@ -2641,26 +2658,26 @@ msgctxt "ical_role"
 msgid "non-participant, information only"
 msgstr "не є учасником, лише інформація"
 
-#: ../libbalsa/rfc3156.c:499 ../libbalsa/rfc3156.c:506
+#: ../libbalsa/rfc3156.c:462 ../libbalsa/rfc3156.c:469
 msgid "decryption and signature verification failed"
 msgstr "помилка розшифровування та перевірки підпису"
 
-#: ../libbalsa/rfc3156.c:532
+#: ../libbalsa/rfc3156.c:495
 msgid "The signature is valid."
 msgstr "Цей підпис правильний."
 
-#: ../libbalsa/rfc3156.c:534
+#: ../libbalsa/rfc3156.c:497
 msgid "The signature is valid but expired."
 msgstr "Підпис правильний, але вийшов його термін дії."
 
-#: ../libbalsa/rfc3156.c:536
+#: ../libbalsa/rfc3156.c:499
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 "Підпис правильний, але вийшов термін дії ключа, що використовується для "
 "перевірки підпису."
 
-#: ../libbalsa/rfc3156.c:538
+#: ../libbalsa/rfc3156.c:501
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
@@ -2668,92 +2685,84 @@ msgstr ""
 "Підпис правильний, але ключ, що використовується для перевірки підпису, був "
 "відкликаний."
 
-#: ../libbalsa/rfc3156.c:540
+#: ../libbalsa/rfc3156.c:503
 msgid "The signature is invalid."
 msgstr "Підпис є некоректним."
 
-#: ../libbalsa/rfc3156.c:542
+#: ../libbalsa/rfc3156.c:505
 msgid "The signature could not be verified due to a missing key."
 msgstr "Підпис не може бути перевірений, тому що ключ відсутній."
 
-#: ../libbalsa/rfc3156.c:544
+#: ../libbalsa/rfc3156.c:507
 msgid "This part is not a real signature."
 msgstr "У цієї частини немає справжнього підпису."
 
-#: ../libbalsa/rfc3156.c:546
+#: ../libbalsa/rfc3156.c:509
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
 "Підпис не може бути перевірений, через неправильний криптографічний механізм."
 
-#: ../libbalsa/rfc3156.c:548 ../libbalsa/rfc3156.c:630
-msgid "GnuPG is rebuilding the trust database and is currently unavailable."
-msgstr "GnuPG перебудовує базу даних довіри та наразі недоступна."
-
-#: ../libbalsa/rfc3156.c:550
+#: ../libbalsa/rfc3156.c:511
 msgid "The signature contains multiple signers, this may be a forgery."
 msgstr ""
 "У підписі містяться дані щодо декількох авторів підпису. Це може бути "
 "наслідком шахрайства."
 
 #. Translators: #1 error source; #2 error message
-#: ../libbalsa/rfc3156.c:557
+#: ../libbalsa/rfc3156.c:518
 #, c-format
 msgid "An error prevented the signature verification: %s: %s"
 msgstr "Помилка, що заважає перевірці підпису: %s: %s"
 
 #. Translators: #1 error message
-#: ../libbalsa/rfc3156.c:560
+#: ../libbalsa/rfc3156.c:521
 #, c-format
 msgid "An error prevented the signature verification: %s"
 msgstr "Помилка, що заважає перевірці підпису: %s"
 
-#: ../libbalsa/rfc3156.c:572
+#: ../libbalsa/rfc3156.c:533
 msgid "The user ID is of unknown validity."
 msgstr "Дійсність ідентифікатора користувача невідома."
 
-#: ../libbalsa/rfc3156.c:574
+#: ../libbalsa/rfc3156.c:535
 msgid "The validity of the user ID is undefined."
 msgstr "Дійсність ідентифікатора користувача невизначена."
 
-#: ../libbalsa/rfc3156.c:576
+#: ../libbalsa/rfc3156.c:537
 msgid "The user ID is never valid."
 msgstr "Ідентифікатор користувача недійсний."
 
-#: ../libbalsa/rfc3156.c:578
+#: ../libbalsa/rfc3156.c:539
 msgid "The user ID is marginally valid."
 msgstr "Ідентифікатор користувача незначно дійсний."
 
-#: ../libbalsa/rfc3156.c:580
+#: ../libbalsa/rfc3156.c:541
 msgid "The user ID is fully valid."
 msgstr "Ідентифікатор користувача повністю дійсний."
 
-#: ../libbalsa/rfc3156.c:582
+#: ../libbalsa/rfc3156.c:543
 msgid "The user ID is ultimately valid."
 msgstr "Ідентифікатор користувача зрештою дійсний."
 
-#: ../libbalsa/rfc3156.c:584 ../libbalsa/rfc3156.c:606
+#: ../libbalsa/rfc3156.c:545 ../libbalsa/rfc3156.c:567
 msgid "bad validity"
 msgstr "неправильна інформація дійсність"
 
-#: ../libbalsa/rfc3156.c:596
+#: ../libbalsa/rfc3156.c:557
 msgid "undefined"
 msgstr "невизначено"
 
-#: ../libbalsa/rfc3156.c:600
+#: ../libbalsa/rfc3156.c:561
 msgid "marginal"
 msgstr "частково"
 
-#: ../libbalsa/rfc3156.c:602
+#: ../libbalsa/rfc3156.c:563
 msgid "full"
 msgstr "повністю"
 
-#: ../libbalsa/rfc3156.c:604
+#: ../libbalsa/rfc3156.c:565
 msgid "ultimate"
 msgstr "остаточно"
-
-#: ../libbalsa/rfc3156.c:631
-msgid "Try again later."
-msgstr "Спробуйте ще раз, пізніше."
 
 #: ../libbalsa/rfc6350.c:62
 #, c-format
@@ -4190,11 +4199,11 @@ msgstr "Не вдалося зберегти текстову частину: %s
 msgid "Could not process GnuPG keys: %s"
 msgstr "Не вдалося обробити ключі GnuPG: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:142
+#: ../src/balsa-mime-widget-crypto.c:144
 msgid "_Import Autocrypt key"
 msgstr "_Імпортувати ключ автошифрування"
 
-#: ../src/balsa-mime-widget-crypto.c:149
+#: ../src/balsa-mime-widget-crypto.c:151
 msgid ""
 "The message contains an Autocrypt header, but it is either broken or the "
 "signature has been created using a different key."
@@ -4202,7 +4211,7 @@ msgstr ""
 "У повідомленні міститься заголовок Autocrypt, але його або пошкоджено, або "
 "підпис було створено з використанням іншого ключа."
 
-#: ../src/balsa-mime-widget-crypto.c:153
+#: ../src/balsa-mime-widget-crypto.c:155
 msgid ""
 "The message contains an Autocrypt header which is ignored as none of your "
 "identities has Autocrypt support enabled."
@@ -4210,36 +4219,36 @@ msgstr ""
 "У повідомленні міститься заголовок Autocrypt, який буде проігноровано, "
 "оскільки для жодного із ваших профілів не увімкнено підтримки Autocrypt."
 
-#: ../src/balsa-mime-widget-crypto.c:158
+#: ../src/balsa-mime-widget-crypto.c:160
 msgid "_Search key server for this key"
 msgstr "_Шукати цей ключ на сервері ключів"
 
-#: ../src/balsa-mime-widget-crypto.c:160
+#: ../src/balsa-mime-widget-crypto.c:162
 msgid "_Search key server for updates of this key"
 msgstr "_Шукати на сервері ключів оновлення цього ключа"
 
-#: ../src/balsa-mime-widget-crypto.c:204
+#: ../src/balsa-mime-widget-crypto.c:206
 msgid "decrypted"
 msgstr "розшифровано"
 
-#: ../src/balsa-mime-widget-crypto.c:217
+#: ../src/balsa-mime-widget-crypto.c:219
 msgid "trusted signature"
 msgstr "довірений підпис"
 
-#: ../src/balsa-mime-widget-crypto.c:220
+#: ../src/balsa-mime-widget-crypto.c:222
 msgid "low trust signature"
 msgstr "підпис із низькою довірою"
 
-#: ../src/balsa-mime-widget-crypto.c:223
+#: ../src/balsa-mime-widget-crypto.c:225
 msgid "bad signature"
 msgstr "помилковий підпис"
 
-#: ../src/balsa-mime-widget-crypto.c:226
+#: ../src/balsa-mime-widget-crypto.c:228
 msgid "unknown signature status"
 msgstr "невідомий стан підпису"
 
 #. Translators: successful import of a GnuPG key; #1: backend message
-#: ../src/balsa-mime-widget-crypto.c:313
+#: ../src/balsa-mime-widget-crypto.c:315
 #, c-format
 msgid ""
 "Import GnuPG key:\n"
@@ -4248,20 +4257,20 @@ msgstr ""
 "Імпорт ключа GnuPG:\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:320
+#: ../src/balsa-mime-widget-crypto.c:322
 #, c-format
 msgid "Error importing key data: %s"
 msgstr "Помилка під час імпортування даних ключа: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:320 ../src/sendmsg-window.c:1717
+#: ../src/balsa-mime-widget-crypto.c:322 ../src/sendmsg-window.c:1717
 msgid "unknown error"
 msgstr "невідома помилка"
 
-#: ../src/balsa-mime-widget-crypto.c:357
+#: ../src/balsa-mime-widget-crypto.c:354
 msgid "(imported)"
 msgstr "(імпортовано)"
 
-#: ../src/balsa-mime-widget-crypto.c:365
+#: ../src/balsa-mime-widget-crypto.c:362
 msgid "Import key into the local key ring"
 msgstr "Імпорт ключа до локальної зв'язки ключів"
 
@@ -8199,6 +8208,12 @@ msgstr "Долучити _відкритий ключ GnuPG"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "_Екранувати спеціальні символи"
+
+#~ msgid "GnuPG is rebuilding the trust database and is currently unavailable."
+#~ msgstr "GnuPG перебудовує базу даних довіри та наразі недоступна."
+
+#~ msgid "Try again later."
+#~ msgstr "Спробуйте ще раз, пізніше."
 
 #, c-format
 #~ msgid ""

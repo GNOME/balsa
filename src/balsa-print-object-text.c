@@ -153,8 +153,7 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
     	flowed = libbalsa_process_text_rfc2646(textbuf, G_MAXINT, FALSE, FALSE,
     					FALSE, libbalsa_message_body_is_delsp(body));
     	g_free(textbuf);
-    	textbuf = flowed->str;
-    	g_string_free(flowed, FALSE);
+    	textbuf = g_string_free(flowed, FALSE);
     }
 
     /* get the font */

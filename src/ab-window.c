@@ -450,7 +450,6 @@ balsa_ab_window_get_recipients(BalsaAbWindow * ab)
     GtkTreeIter iter;
     gboolean valid;
     GString *str = g_string_new(NULL);
-    gchar *text;
 
     g_return_val_if_fail(ab->composing, NULL);
 
@@ -459,6 +458,7 @@ balsa_ab_window_get_recipients(BalsaAbWindow * ab)
          valid = gtk_tree_model_iter_next(model, &iter)) {
         LibBalsaAddress *address = NULL;
         gint which_multiple = 0;
+        gchar *text;
 
         gtk_tree_model_get(model, &iter,
                            LIST_COLUMN_ADDRESS, &address,
@@ -473,9 +473,7 @@ balsa_ab_window_get_recipients(BalsaAbWindow * ab)
         }
     }
 
-    text = str->str;
-    g_string_free(str, FALSE);
-    return text;
+    return g_string_free(str, FALSE);
 }
 
 /*

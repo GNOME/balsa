@@ -48,6 +48,12 @@ static gchar *create_uid_str(const gpgme_user_id_t  uid,
 							 gboolean              *warn)
 	G_GNUC_WARN_UNUSED_RESULT;
 
+static GtkWidget *create_key_dialog(GtkWindow      *parent,
+									GtkButtonsType  buttons,
+									GtkWidget      *keys_widget,
+									const gchar    *message1,
+									const gchar    *message2)
+	G_GNUC_WARN_UNUSED_RESULT;
 static gint create_key_grid_row(GtkGrid     *grid,
 								gint         row,
 								const gchar *key,
@@ -374,76 +380,45 @@ libbalsa_gpgme_key_to_gchar(gpgme_key_t  key,
 /* documentation: see header file */
 GtkWidget *
 libbalsa_key_dialog(GtkWindow            *parent,
-	   	   	   	    GtkButtonsType		  buttons,
-	   	   	   	    gpgme_key_t           key,
+					GtkButtonsType        buttons,
+					gpgme_key_t           key,
 					lb_gpg_subkey_capa_t  subkey_capa,
 					const gchar          *message1,
 					const gchar          *message2)
 {
-	GtkWidget *dialog;
-	GtkWidget *hbox;
-	GtkWidget *icon;
-	GtkWidget *vbox;
-	GtkWidget *label;
 	GtkWidget *key_data;
-	GtkWidget *scrolledw;
 
 	g_return_val_if_fail(key != NULL, NULL);
 
-	switch (buttons) {
-	case GTK_BUTTONS_CLOSE:
-		dialog = gtk_dialog_new_with_buttons(NULL, parent, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-			_("Close"), GTK_RESPONSE_CLOSE, NULL);
-		break;
-	case GTK_BUTTONS_YES_NO:
-		dialog = gtk_dialog_new_with_buttons(NULL, parent, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-			_("No"), GTK_RESPONSE_NO, _("Yes"), GTK_RESPONSE_YES, NULL);
-		break;
-	default:
-		g_error("%s: buttons type %d not yet implemented", __func__, buttons);
-	}
-	geometry_manager_attach(GTK_WINDOW(dialog), "KeyDialog");
+	key_data = libbalsa_gpgme_key(key, NULL, subkey_capa, TRUE);
+	return create_key_dialog(parent, buttons, key_data, message1, message2);
+}
 
-	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
-	gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
-	gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), hbox, TRUE, TRUE, 0);
-	gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
 
-	/* standard key icon; "application-certificate" would be an alternative... */
-	icon = gtk_image_new_from_icon_name("dialog-password", GTK_ICON_SIZE_DIALOG);
-	gtk_box_pack_start(GTK_BOX(hbox), icon, FALSE, FALSE, 0);
-	gtk_widget_set_valign(icon, GTK_ALIGN_START);
+/* documentation: see header file */
+GtkWidget *
+libbalsa_key_list_dialog(GtkWindow            *parent,
+						 GtkButtonsType        buttons,
+						 GList                *key_list,
+						 lb_gpg_subkey_capa_t  subkey_capa,
+						 const gchar          *message1,
+						 const gchar          *message2)
+{
+	GtkWidget *vbox;
+	GtkWidget *key_data;
+
+	g_return_val_if_fail(key_list != NULL, NULL);
 
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
-	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
-	gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
-
-	if (message1 != NULL) {
-		char *markup;
-
-		label = gtk_label_new(NULL);
-		markup = g_markup_printf_escaped("<b><big>%s</big></b>", message1);
-		gtk_label_set_markup(GTK_LABEL(label), markup);
-		g_free(markup);
-		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+	key_data = libbalsa_gpgme_key((gpgme_key_t) (key_list->data), NULL, subkey_capa, TRUE);
+	gtk_box_pack_start(GTK_BOX(vbox), key_data, FALSE, TRUE, 0);
+	for (key_list = key_list->next; key_list != NULL; key_list = key_list->next) {
+		gtk_box_pack_start(GTK_BOX(vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, TRUE, 0);
+		key_data = libbalsa_gpgme_key((gpgme_key_t) (key_list->data), NULL, subkey_capa, TRUE);
+		gtk_box_pack_start(GTK_BOX(vbox), key_data, FALSE, TRUE, 0);
 	}
-
-	if (message2 != NULL) {
-		label = libbalsa_create_wrap_label(message2, FALSE);
-		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-	}
-
-	scrolledw = gtk_scrolled_window_new(NULL, NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), scrolledw, TRUE, TRUE, 6);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledw), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scrolledw), 120);
-
-	key_data = libbalsa_gpgme_key(key, NULL, subkey_capa, TRUE);
-	gtk_container_add(GTK_CONTAINER(scrolledw), key_data);
-
-	gtk_widget_show_all(hbox);
-
-	return dialog;
+	gtk_widget_show_all(vbox);
+	return create_key_dialog(parent, buttons, vbox, message1, message2);
 }
 
 
@@ -512,13 +487,94 @@ create_uid_str(const gpgme_user_id_t uid, gboolean *warn)
 		result = uid_readable;
 		do_warn = FALSE;
 	}
-        g_free(uid_status);
+	g_free(uid_status);
 
 	if (warn != NULL) {
 		*warn = do_warn;
 	}
 
 	return result;
+}
+
+
+/** \brief Create a key message dialogue
+ *
+ * \param parent transient parent window, may be NULL
+ * \param buttons set of buttons to use (currently only GTK_BUTTONS_CLOSE and GTK_BUTTONS_YES_NO are implemented)
+ * \param keys_widget widget containing the data of one or more keys
+ * \param message1 primary message, printed centred in bold and a little larger, may be NULL to omit
+ * \param message2 secondary message, printed start-aligned id normal font, may be NULL to omit
+ * \return the new dialogue
+ *
+ * Create a new dialogue, similar to e.g. gtk_message_dialog_new().
+ */
+static GtkWidget *
+create_key_dialog(GtkWindow      *parent,
+				  GtkButtonsType  buttons,
+				  GtkWidget      *keys_widget,
+				  const gchar    *message1,
+				  const gchar    *message2)
+{
+	GtkWidget *dialog;
+	GtkWidget *hbox;
+	GtkWidget *icon;
+	GtkWidget *vbox;
+	GtkWidget *label;
+	GtkWidget *scrolledw;
+
+	switch (buttons) {
+	case GTK_BUTTONS_CLOSE:
+		dialog = gtk_dialog_new_with_buttons(NULL, parent, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+			_("Close"), GTK_RESPONSE_CLOSE, NULL);
+		break;
+	case GTK_BUTTONS_YES_NO:
+		dialog = gtk_dialog_new_with_buttons(NULL, parent, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+			_("No"), GTK_RESPONSE_NO, _("Yes"), GTK_RESPONSE_YES, NULL);
+		break;
+	default:
+		g_error("%s: buttons type %d not yet implemented", __func__, buttons);
+	}
+	geometry_manager_attach(GTK_WINDOW(dialog), "KeyDialog");
+
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+	gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
+	gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), hbox, TRUE, TRUE, 0);
+	gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
+
+	/* standard key icon; "application-certificate" would be an alternative... */
+	icon = gtk_image_new_from_icon_name("dialog-password", GTK_ICON_SIZE_DIALOG);
+	gtk_box_pack_start(GTK_BOX(hbox), icon, FALSE, FALSE, 0);
+	gtk_widget_set_valign(icon, GTK_ALIGN_START);
+
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
+	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+	gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
+
+	if (message1 != NULL) {
+		char *markup;
+
+		label = gtk_label_new(NULL);
+		markup = g_markup_printf_escaped("<b><big>%s</big></b>", message1);
+		gtk_label_set_markup(GTK_LABEL(label), markup);
+		g_free(markup);
+		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+	}
+
+	if (message2 != NULL) {
+		label = libbalsa_create_wrap_label(message2, FALSE);
+		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+	}
+
+	scrolledw = gtk_scrolled_window_new(NULL, NULL);
+	gtk_box_pack_start(GTK_BOX(vbox), scrolledw, TRUE, TRUE, 6);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledw), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+	gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scrolledw), 120);
+
+	gtk_container_add(GTK_CONTAINER(scrolledw), keys_widget);
+
+	gtk_widget_show_all(hbox);
+
+	return dialog;
 }
 
 

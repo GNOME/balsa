@@ -65,7 +65,7 @@
 		"prefer_encrypt BOOLEAN DEFAULT 0);"
 
 
-#define NUM_QUERIES								7U
+#define NUM_QUERIES								8U
 
 
 struct _AutocryptData {
@@ -133,10 +133,14 @@ static void show_key_details_cb(GtkMenuItem *menuitem,
 								gpointer     user_data);
 static void remove_key_cb(GtkMenuItem *menuitem,
 						  gpointer     user_data);
+static gint get_keys_real(gpgme_ctx_t           gpgme_ctx,
+						  InternetAddressList  *addresses,
+						  time_t                now,
+						  GError              **error);
 
 
 static sqlite3 *autocrypt_db = NULL;
-static sqlite3_stmt *query[NUM_QUERIES] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+static sqlite3_stmt *query[NUM_QUERIES] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 G_LOCK_DEFINE_STATIC(db_mutex);
 
 
@@ -152,7 +156,8 @@ autocrypt_init(GError **error)
 		"UPDATE autocrypt SET last_seen = ?2 WHERE addr = LOWER(?1) AND last_seen < ?2 AND ac_timestamp < ?2",
 		"SELECT pubkey FROM autocrypt WHERE fingerprint LIKE ?",
 		"SELECT addr, last_seen, ac_timestamp, prefer_encrypt, pubkey FROM autocrypt ORDER BY addr ASC",
-		"DELETE FROM autocrypt WHERE addr = LOWER(?1)"
+		"DELETE FROM autocrypt WHERE addr = LOWER(?1)",
+		"SELECT pubkey FROM autocrypt WHERE addr = LOWER(?1) AND (expires = 0 OR expires > ?2)"
 	};
 	gboolean result;
 
@@ -403,6 +408,26 @@ autocrypt_get_key(const gchar *fingerprint, GError **error)
 	G_UNLOCK(db_mutex);
 	g_free(param);
 
+	return result;
+}
+
+
+/* documentation: see header file */
+gint autocrypt_import_keys(InternetAddressList *addresses, GError **error)
+{
+	gpgme_ctx_t gpgme_ctx;
+	gint result;
+
+	g_return_val_if_fail(IS_INTERNET_ADDRESS_LIST(addresses), -1);
+
+	/* create the gpgme context and set the protocol */
+	gpgme_ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
+	if (gpgme_ctx == NULL) {
+		result = -1;
+	} else {
+		result = get_keys_real(gpgme_ctx, addresses, time(NULL), error);
+		gpgme_release(gpgme_ctx);
+	}
 	return result;
 }
 
@@ -999,6 +1024,80 @@ remove_key_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 		gtk_widget_destroy(dialog);
 		g_free(mail_addr);
 	}
+}
+
+
+/** \brief Import keys from the Autocrypt database into the local key ring
+ *
+ * \param gpgme_ctx GpgME target context
+ * \param addresses internet addresse to check and import
+ * \param now current time, used to mask expired keys
+ * \param error filled with error information on error, may be NULL
+ * \return the count of imported keys (>= 0) on success, -1 on error
+ */
+static gint
+get_keys_real(gpgme_ctx_t gpgme_ctx, InternetAddressList *addresses, time_t now, GError **error)
+{
+	gint n;
+	gint imported = 0;
+
+	for (n = 0; (imported >= 0) && (n < internet_address_list_length(addresses)); n++) {
+		InternetAddress *this_addr;
+
+		this_addr = internet_address_list_get_address(addresses, n);
+		if (INTERNET_ADDRESS_IS_MAILBOX(this_addr)) {
+			if (!libbalsa_gpgme_have_key(gpgme_ctx, INTERNET_ADDRESS_MAILBOX(this_addr), NULL)) {
+				const gchar *mailbox = INTERNET_ADDRESS_MAILBOX(this_addr)->addr;
+
+				G_LOCK(db_mutex);
+				if ((sqlite3_bind_text(query[7], 1, mailbox, -1, SQLITE_STATIC) != SQLITE_OK) ||
+					(sqlite3_bind_int64(query[7], 2, now) != SQLITE_OK)) {
+					/* Translators: #1 email address (mailbox); #2 error message */
+					g_set_error(error, AUTOCRYPT_ERROR_QUARK, -1, _("error reading Autocrypt data for “%s”: %s"), mailbox,
+						sqlite3_errmsg(autocrypt_db));
+					imported = -1;
+				} else {
+					int sqlite_res;
+
+					sqlite_res = sqlite3_step(query[7]);
+					if (sqlite_res == SQLITE_ROW) {
+						GBytes *keybuf;
+
+						keybuf = g_bytes_new_static(sqlite3_column_blob(query[7], 0), sqlite3_column_bytes(query[7], 0));
+						if (libbalsa_gpgme_import_bin_key(gpgme_ctx, keybuf, NULL, error)) {
+							imported++;
+						} else {
+							imported = -1;
+						}
+						g_bytes_unref(keybuf);
+						sqlite_res = sqlite3_step(query[7]);
+					}
+
+					if (sqlite_res != SQLITE_DONE) {
+						/* Translators: #1 email address (mailbox); #2 error message */
+						g_set_error(error, AUTOCRYPT_ERROR_QUARK, sqlite_res, _("error reading Autocrypt data for “%s”: %s"),
+							mailbox, sqlite3_errmsg(autocrypt_db));
+						imported = -1;
+					}
+				}
+				sqlite3_reset(query[7]);
+				G_UNLOCK(db_mutex);
+			}
+		} else if (INTERNET_ADDRESS_IS_GROUP(this_addr)) {
+			gint sub_count;
+
+			sub_count = get_keys_real(gpgme_ctx, INTERNET_ADDRESS_GROUP(this_addr)->members, now, error);
+			if (sub_count >= 0) {
+				imported += sub_count;
+			} else {
+				imported = sub_count;
+			}
+		} else {
+			g_assert_not_reached();		/* should never happen */
+		}
+	}
+
+	return imported;
 }
 
 

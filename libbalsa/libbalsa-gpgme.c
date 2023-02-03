@@ -175,7 +175,7 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
  * \param protocol Protocol to return as string.
  * \return a static string denoting the passed protocol, or "unknown".
  *
- * Note that this function differs from gegme_get_protocol_name, as it returns "S/MIME" instead of "CMS" for GPGME_PROTOCOL_CMS,
+ * Note that this function differs from gpgme_get_protocol_name, as it returns "S/MIME" instead of "CMS" for GPGME_PROTOCOL_CMS,
  * and "unknown" for all other protocols but GPGME_PROTOCOL_OpenPGP (which is returned as "OpenPGP").
  */
 const gchar *

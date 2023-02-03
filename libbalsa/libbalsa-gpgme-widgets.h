@@ -95,11 +95,32 @@ gchar *libbalsa_gpgme_key_to_gchar(gpgme_key_t  key,
  * Create a new dialogue, similar to e.g. gtk_message_dialog_new().
  */
 GtkWidget *libbalsa_key_dialog(GtkWindow            *parent,
-							   GtkButtonsType		 buttons,
+							   GtkButtonsType        buttons,
 							   gpgme_key_t           key,
 							   lb_gpg_subkey_capa_t  subkey_capa,
 							   const gchar          *message1,
 							   const gchar          *message2)
+	G_GNUC_WARN_UNUSED_RESULT;
+
+
+/** \brief Create a key list message dialogue
+ *
+ * \param parent transient parent window, may be NULL
+ * \param buttons set of buttons to use (currently only GTK_BUTTONS_CLOSE and GTK_BUTTONS_YES_NO are implemented)
+ * \param key_list list of gpgme_key_t keys which shall be displayed
+ * \param subkey_capa mask of capabilities for which subkeys shall be included
+ * \param message1 primary message, printed centred in bold and a little larger, may be NULL to omit
+ * \param message2 secondary message, printed start-aligned id normal font, may be NULL to omit
+ * \return the new dialogue
+ *
+ * Create a new dialogue, similar to e.g. gtk_message_dialog_new().
+ */
+GtkWidget *libbalsa_key_list_dialog(GtkWindow            *parent,
+									GtkButtonsType        buttons,
+									GList                *key_list,
+									lb_gpg_subkey_capa_t  subkey_capa,
+									const gchar          *message1,
+									const gchar          *message2)
 	G_GNUC_WARN_UNUSED_RESULT;
 
 

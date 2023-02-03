@@ -470,6 +470,7 @@ cert_subject_cn_mail(const gchar *subject)
 		if (buffer->len > 0U) {
 			readable_subject = g_string_free(buffer, FALSE);
 		} else {
+			g_string_free(buffer, TRUE);
 			readable_subject = libbalsa_cert_subject_readable(subject);
 		}
 	}

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-01-24 18:13+0000\n"
-"PO-Revision-Date: 2023-01-24 20:01+0100\n"
+"POT-Creation-Date: 2023-02-03 17:49+0000\n"
+"PO-Revision-Date: 2023-02-04 08:44+0100\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: \n"
 "Language: ka\n"
@@ -82,11 +82,11 @@ msgstr "შეცდომის გარეშე"
 
 #: ../libbalsa/address-book.c:300
 msgid "Cannot read from address book"
-msgstr ""
+msgstr "მისამართების წიგნიდან წაკითხვის შეცდომა"
 
 #: ../libbalsa/address-book.c:301
 msgid "Cannot write to address book"
-msgstr ""
+msgstr "მისამართების წიგნში ჩაწერის შეცდომა"
 
 #: ../libbalsa/address-book.c:302
 msgid "Cannot connect to the server"
@@ -94,15 +94,15 @@ msgstr "სერვერთან დაკავშირების შე�
 
 #: ../libbalsa/address-book.c:303
 msgid "Cannot search in the address book"
-msgstr ""
+msgstr "მისამართების წიგნში ძებნის შეცდომა"
 
 #: ../libbalsa/address-book.c:305
 msgid "Cannot add duplicate entry"
-msgstr ""
+msgstr "განმეორებადი ჩანაწერის დამატება შეუძლებელია"
 
 #: ../libbalsa/address-book.c:307
 msgid "Cannot find address in address book"
-msgstr ""
+msgstr "მისამართების წიგნში მისამართი ვერ ვიპოვე"
 
 #: ../libbalsa/address-book.c:308 ../libbalsa/html.c:95 ../src/ab-window.c:439
 #: ../src/balsa-message.c:1839 ../src/balsa-mime-widget.c:223
@@ -143,11 +143,11 @@ msgstr ""
 
 #: ../libbalsa/address-book-ldap.c:370
 msgid "TLS requested but not compiled in"
-msgstr ""
+msgstr "TLS-ი მოთხოვნილია, მაგრამ არ იყო ჩართული აგების დროს"
 
 #: ../libbalsa/address-book-ldap.c:669
 msgid "Undefined location of user address book"
-msgstr ""
+msgstr "მომხმარებლის მისამართების წიგნის მდებარეობა მითითებული არაა"
 
 #: ../libbalsa/address-book-ldap.c:1100
 #, c-format
@@ -187,35 +187,95 @@ msgstr "_ელფოსტის მისამართი:"
 msgid "A_dd"
 msgstr "_დამატება"
 
-#: ../libbalsa/address-view.c:157 ../src/balsa-mime-widget-message.c:757
+#: ../libbalsa/address-view.c:193 ../src/balsa-mime-widget-message.c:757
 #: ../src/balsa-print-object-header.c:146 ../src/sendmsg-window.c:674
 #: ../src/sendmsg-window.c:3630
 msgid "To:"
 msgstr "ვის:"
 
-#: ../libbalsa/address-view.c:158 ../src/balsa-mime-widget-message.c:759
+#: ../libbalsa/address-view.c:194 ../src/balsa-mime-widget-message.c:759
 #: ../src/balsa-print-object-header.c:148 ../src/sendmsg-window.c:674
 #: ../src/sendmsg-window.c:3638
 msgid "CC:"
 msgstr "ასლი:"
 
-#: ../libbalsa/address-view.c:159 ../src/balsa-mime-widget-message.c:761
+#: ../libbalsa/address-view.c:195 ../src/balsa-mime-widget-message.c:761
 #: ../src/balsa-print-object-header.c:150 ../src/sendmsg-window.c:674
 msgid "BCC:"
 msgstr "ფარულიასლი:"
 
-#: ../libbalsa/address-view.c:160
+#: ../libbalsa/address-view.c:196
 msgid "Reply To:"
 msgstr "უპასუხეთ:"
 
+#: ../libbalsa/address-view.c:963
+#, c-format
+msgid "Cannot load Autocrypt keys: %s"
+msgstr "ავტომატური დაშიფვრის გასაღებების ჩატვირთვის შეცდომა: %s"
+
+#: ../libbalsa/address-view.c:967
+#, c-format
+msgid "Imported %d key from the Autocrypt database into your key ring."
+msgid_plural "Imported %d keys from the Autocrypt database into your key ring."
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: #1 crypto protocol; #2 RFC 5322 internet address
+#: ../libbalsa/address-view.c:984
+#, c-format
+msgid "Cannot find any %s key for “%s”"
+msgstr ""
+
+#. Translators: #1 key count, #2 crypto protocol; #2 RFC 5322 internet address
+#: ../libbalsa/address-view.c:990
+#, c-format
+msgid "Imported %d %s key for “%s” into your key ring."
+msgid_plural "Imported %d %s keys for “%s” into your key ring."
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../libbalsa/address-view.c:998
+#, c-format
+msgid "Cannot import missing keys for “%s”: %s"
+msgstr "\"%s\"-სთვის ნაკლული გასაღებების შემოტანის შეცდომა: %s"
+
+#. paranoid, should never happen
+#: ../libbalsa/address-view.c:1051
+#, c-format
+msgid "cannot find a key for “%s”"
+msgstr "\"%s\"-სთვის გასაღები ვერ ვიპოვე"
+
+#: ../libbalsa/address-view.c:1058
+#, c-format
+msgid "Encryption key for “%s”"
+msgid_plural "Encryption keys for “%s”"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../libbalsa/address-view.c:1148
+msgid "public key(s) missing, click to search key server"
+msgstr ""
+
+#: ../libbalsa/address-view.c:1150
+msgid "public key missing, click to search key server"
+msgstr ""
+
+#: ../libbalsa/address-view.c:1154
+msgid "all public keys available, click to show them"
+msgstr ""
+
+#: ../libbalsa/address-view.c:1156
+msgid "public key available, click to show it"
+msgstr ""
+
 #. Translators: #1 database file; #2 error message
-#: ../libbalsa/autocrypt.c:194
+#: ../libbalsa/autocrypt.c:199
 #, c-format
 msgid "cannot initialise Autocrypt database “%s”: %s"
 msgstr ""
 
 #. Translators: #1 sender's email address
-#: ../libbalsa/autocrypt.c:321
+#: ../libbalsa/autocrypt.c:326
 #, c-format
 msgid ""
 "No usable private key for “%s” found! Please create a key or disable "
@@ -224,19 +284,21 @@ msgstr ""
 
 #. Translators: #1 GPG key fingerprint; #2 error message
 #. Translators: #1 mailbox; #2 error message
-#: ../libbalsa/autocrypt.c:390 ../libbalsa/autocrypt.c:399
-#: ../libbalsa/autocrypt.c:689 ../libbalsa/autocrypt.c:696
+#. Translators: #1 email address (mailbox); #2 error message
+#: ../libbalsa/autocrypt.c:395 ../libbalsa/autocrypt.c:404
+#: ../libbalsa/autocrypt.c:714 ../libbalsa/autocrypt.c:721
+#: ../libbalsa/autocrypt.c:1056 ../libbalsa/autocrypt.c:1078
 #, c-format
 msgid "error reading Autocrypt data for “%s”: %s"
 msgstr ""
 
-#: ../libbalsa/autocrypt.c:453
+#: ../libbalsa/autocrypt.c:478
 msgid "Autocrypt database"
 msgstr ""
 
-#: ../libbalsa/autocrypt.c:454 ../libbalsa/html.c:459
+#: ../libbalsa/autocrypt.c:479 ../libbalsa/html.c:459
 #: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
-#: ../libbalsa/libbalsa-gpgme-widgets.c:769 ../src/ab-window.c:148
+#: ../libbalsa/libbalsa-gpgme-widgets.c:825 ../src/ab-window.c:148
 #: ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
 #: ../src/main-window.c:3934 ../src/toolbar-prefs.c:130
 #: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
@@ -244,38 +306,38 @@ msgstr ""
 msgid "_Close"
 msgstr "_დახურვა"
 
-#: ../libbalsa/autocrypt.c:525 ../src/balsa-mblist.c:326
+#: ../libbalsa/autocrypt.c:550 ../src/balsa-mblist.c:326
 msgid "Mailbox"
 msgstr "საფოსტო ყუთი"
 
-#: ../libbalsa/autocrypt.c:531
+#: ../libbalsa/autocrypt.c:556
 msgid "Last seen"
 msgstr "Ბოლო ნახვა"
 
-#: ../libbalsa/autocrypt.c:537
+#: ../libbalsa/autocrypt.c:562
 msgid "Last Autocrypt message"
 msgstr ""
 
-#: ../libbalsa/autocrypt.c:543
+#: ../libbalsa/autocrypt.c:568
 msgid "Prefer encryption"
 msgstr ""
 
 #. Translators: #1 email address; #2 error message
-#: ../libbalsa/autocrypt.c:793 ../libbalsa/autocrypt.c:815
+#: ../libbalsa/autocrypt.c:818 ../libbalsa/autocrypt.c:840
 #, c-format
 msgid "update user “%s” failed: %s"
 msgstr ""
 
-#: ../libbalsa/autocrypt.c:793
+#: ../libbalsa/autocrypt.c:818
 #, c-format
 msgid "insert user “%s” failed: %s"
 msgstr ""
 
-#: ../libbalsa/autocrypt.c:891
+#: ../libbalsa/autocrypt.c:916
 msgid "_Show details…"
 msgstr "_დეტალების ჩვენება…"
 
-#: ../libbalsa/autocrypt.c:894 ../libbalsa/html-pref-db.c:453
+#: ../libbalsa/autocrypt.c:919 ../libbalsa/html-pref-db.c:453
 #: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1040
 #: ../src/mailbox-node.c:1056 ../src/pref-manager.c:2024
 #: ../src/pref-manager.c:2109 ../src/pref-manager.c:2832 ../ui/ab-main.ui.h:11
@@ -284,18 +346,18 @@ msgid "_Delete"
 msgstr "_წაშლა"
 
 #. Translators: #1 email address
-#: ../libbalsa/autocrypt.c:944
+#: ../libbalsa/autocrypt.c:969
 #, c-format
 msgid "The database entry for “%s” does not contain a key."
 msgstr ""
 
-#: ../libbalsa/autocrypt.c:958
+#: ../libbalsa/autocrypt.c:983
 #, c-format
 msgid "cannot show key details: %s"
 msgstr "გასაღების დეტალების ჩვენების შეცდომა: %s"
 
 #. Translators: #1 email address
-#: ../libbalsa/autocrypt.c:986
+#: ../libbalsa/autocrypt.c:1011
 #, c-format
 msgid "Delete the Autocrypt key for “%s” from the database?"
 msgstr ""
@@ -350,7 +412,7 @@ msgstr ""
 
 #: ../libbalsa/filter-error.c:47
 msgid "Unable to allocate memory"
-msgstr ""
+msgstr "მეხსიერების გამოყოფის შეცდომა"
 
 #: ../libbalsa/filter-error.c:48
 msgid "Error in regular expression syntax"
@@ -390,7 +452,7 @@ msgstr "სხეული"
 #: ../libbalsa/filter-funcs.c:390
 #, c-format
 msgid "Header:%s"
-msgstr ""
+msgstr "თავსართი:%s"
 
 #: ../libbalsa/filter-funcs.c:412
 msgid "New"
@@ -439,8 +501,8 @@ msgid "Failed to decrypt MIME part: parse error"
 msgstr ""
 
 #: ../libbalsa/gmime-gpgme-signature.c:147
-#: ../libbalsa/libbalsa-gpgme-widgets.c:360
-#: ../libbalsa/libbalsa-gpgme-widgets.c:673 ../libbalsa/rfc3156.c:559
+#: ../libbalsa/libbalsa-gpgme-widgets.c:366
+#: ../libbalsa/libbalsa-gpgme-widgets.c:729 ../libbalsa/rfc3156.c:554
 #: ../src/address-book-config.c:200
 msgid "never"
 msgstr "არასოდეს"
@@ -468,6 +530,8 @@ msgid ""
 "\n"
 "Signature validity: %s"
 msgstr ""
+"\n"
+"ხელმოწერის სისწორე: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:197
 #, c-format
@@ -484,9 +548,11 @@ msgid ""
 "\n"
 "Key fingerprint: %s"
 msgstr ""
+"\n"
+"გასაღების ანაბეჭდი: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:239 ../libbalsa/imap/imap-handle.c:46
-#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:555
+#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:550
 #: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5364
 msgid "unknown"
 msgstr "unknown"
@@ -498,7 +564,7 @@ msgstr ""
 #: ../libbalsa/gmime-multipart-crypt.c:254
 #, c-format
 msgid "unsupported protocol “%s”"
-msgstr ""
+msgstr "“%s” პროტოკოლი მხარდაუჭერელია"
 
 #: ../libbalsa/gmime-multipart-crypt.c:267
 msgid ""
@@ -895,7 +961,7 @@ msgstr "_ახალი"
 msgid "_Remove"
 msgstr "ამო_ღება"
 
-#: ../libbalsa/identity.c:2041 ../libbalsa/libbalsa-gpgme-widgets.c:478
+#: ../libbalsa/identity.c:2041 ../libbalsa/libbalsa-gpgme-widgets.c:453
 msgid "disabled"
 msgstr "გამორთულია"
 
@@ -1149,9 +1215,9 @@ msgstr ""
 msgid "could not get data from stream"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme.c:420 ../libbalsa/rfc3156.c:250
-#: ../libbalsa/rfc3156.c:255 ../libbalsa/rfc3156.c:411
-#: ../libbalsa/rfc3156.c:417
+#: ../libbalsa/libbalsa-gpgme.c:420 ../libbalsa/rfc3156.c:245
+#: ../libbalsa/rfc3156.c:250 ../libbalsa/rfc3156.c:406
+#: ../libbalsa/rfc3156.c:412
 msgid "signature verification failed"
 msgstr ""
 
@@ -1162,7 +1228,7 @@ msgstr ""
 
 #: ../libbalsa/libbalsa-gpgme.c:525
 msgid "signing failed"
-msgstr ""
+msgstr "ხელმოწერის შეცდომა"
 
 #: ../libbalsa/libbalsa-gpgme.c:599
 #, c-format
@@ -1175,12 +1241,12 @@ msgstr ""
 
 #: ../libbalsa/libbalsa-gpgme.c:669
 msgid "encryption failed"
-msgstr ""
+msgstr "დაშიფვრის შეცდომა"
 
-#: ../libbalsa/libbalsa-gpgme.c:742 ../libbalsa/rfc3156.c:319
-#: ../libbalsa/rfc3156.c:324
+#: ../libbalsa/libbalsa-gpgme.c:742 ../libbalsa/rfc3156.c:314
+#: ../libbalsa/rfc3156.c:319
 msgid "decryption failed"
-msgstr ""
+msgstr "გაშიფვრის შეცდომა"
 
 #: ../libbalsa/libbalsa-gpgme.c:849
 #, c-format
@@ -1211,7 +1277,7 @@ msgstr ""
 #. FIXME: create dialog according to the Gnome HIG
 #: ../libbalsa/libbalsa-gpgme-cb.c:179
 msgid "Select key"
-msgstr ""
+msgstr "აირჩიეთ გასაღები"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:201
 #, c-format
@@ -1263,7 +1329,7 @@ msgstr ""
 #. FIXME: create dialog according to the Gnome HIG
 #: ../libbalsa/libbalsa-gpgme-cb.c:359
 msgid "Enter Passphrase"
-msgstr ""
+msgstr "შეიყვანეთ საკვანძო ფრაზა"
 
 #: ../libbalsa/libbalsa-gpgme-cb.c:387
 #, c-format
@@ -1283,46 +1349,46 @@ msgid ""
 "Key: %s"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:108 ../libbalsa/libbalsa-gpgme-keys.c:339
+#: ../libbalsa/libbalsa-gpgme-keys.c:210 ../libbalsa/libbalsa-gpgme-keys.c:479
 msgid "error setting key list mode"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:114 ../libbalsa/libbalsa-gpgme-keys.c:118
-#: ../libbalsa/libbalsa-gpgme-keys.c:346 ../libbalsa/libbalsa-gpgme-keys.c:364
+#: ../libbalsa/libbalsa-gpgme-keys.c:216 ../libbalsa/libbalsa-gpgme-keys.c:220
+#: ../libbalsa/libbalsa-gpgme-keys.c:484 ../libbalsa/libbalsa-gpgme-keys.c:502
 #, c-format
 msgid "could not list keys for “%s”"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:125
+#: ../libbalsa/libbalsa-gpgme-keys.c:227
 #, c-format
 msgid "ambiguous keys for “%s”"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:194 ../libbalsa/libbalsa-gpgme-keys.c:237
-#: ../libbalsa/libbalsa-gpgme-keys.c:411
+#: ../libbalsa/libbalsa-gpgme-keys.c:330 ../libbalsa/libbalsa-gpgme-keys.c:375
+#: ../libbalsa/libbalsa-gpgme-keys.c:590 ../libbalsa/libbalsa-gpgme-keys.c:797
 msgid "cannot create data buffer"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:202
+#: ../libbalsa/libbalsa-gpgme-keys.c:338
 #, c-format
 msgid "exporting key for “%s” failed"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:262 ../libbalsa/libbalsa-gpgme-keys.c:270
+#: ../libbalsa/libbalsa-gpgme-keys.c:400 ../libbalsa/libbalsa-gpgme-keys.c:408
 #, c-format
 msgid "cannot export minimal key for “%s”"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:415
+#: ../libbalsa/libbalsa-gpgme-keys.c:594 ../libbalsa/libbalsa-gpgme-keys.c:807
 msgid "importing key data failed"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:487
+#: ../libbalsa/libbalsa-gpgme-keys.c:676
 #, c-format
 msgid "Cannot find a key with fingerprint %s on the key server."
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:495
+#: ../libbalsa/libbalsa-gpgme-keys.c:684
 #, c-format
 msgid ""
 "Found %u key with fingerprint %s on the key server. Please check and import "
@@ -1333,32 +1399,41 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:515
+#: ../libbalsa/libbalsa-gpgme-keys.c:703
 #, c-format
 msgid "Searching the key server failed: %s"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:554
-msgid "error importing key"
+#: ../libbalsa/libbalsa-gpgme-keys.c:802
+#, c-format
+msgid "no data for key with fingerprint %s"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:589
+#: ../libbalsa/libbalsa-gpgme-keys.c:813
+msgid "reading key data failed"
+msgstr ""
+
+#: ../libbalsa/libbalsa-gpgme-keys.c:852 ../libbalsa/libbalsa-gpgme-keys.c:1043
+msgid "error importing key"
+msgstr "გასაღების შემოტანის შეცდომა"
+
+#: ../libbalsa/libbalsa-gpgme-keys.c:887
 msgid "No key was imported or updated."
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:591
+#: ../libbalsa/libbalsa-gpgme-keys.c:889
 msgid "The key was ignored because it does not have a user ID."
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:594
+#: ../libbalsa/libbalsa-gpgme-keys.c:892
 msgid "The key was imported into the local key ring."
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:598
+#: ../libbalsa/libbalsa-gpgme-keys.c:896
 msgid "The key was updated in the local key ring:"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:601
+#: ../libbalsa/libbalsa-gpgme-keys.c:899
 #, c-format
 msgid ""
 "\n"
@@ -1369,7 +1444,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:606
+#: ../libbalsa/libbalsa-gpgme-keys.c:904
 #, c-format
 msgid ""
 "\n"
@@ -1380,7 +1455,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:611
+#: ../libbalsa/libbalsa-gpgme-keys.c:909
 #, c-format
 msgid ""
 "\n"
@@ -1391,7 +1466,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:617
+#: ../libbalsa/libbalsa-gpgme-keys.c:915
 #, c-format
 msgid ""
 "\n"
@@ -1402,172 +1477,172 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:623
+#: ../libbalsa/libbalsa-gpgme-keys.c:921
 msgid "The existing key in the key ring was not changed."
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:95
-#: ../libbalsa/libbalsa-gpgme-widgets.c:255
+#: ../libbalsa/libbalsa-gpgme-widgets.c:101
+#: ../libbalsa/libbalsa-gpgme-widgets.c:261
 msgid "Key status:"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:101
-#: ../libbalsa/libbalsa-gpgme-widgets.c:108
-#: ../libbalsa/libbalsa-gpgme-widgets.c:261
-#: ../libbalsa/libbalsa-gpgme-widgets.c:269
+#: ../libbalsa/libbalsa-gpgme-widgets.c:107
+#: ../libbalsa/libbalsa-gpgme-widgets.c:114
+#: ../libbalsa/libbalsa-gpgme-widgets.c:267
+#: ../libbalsa/libbalsa-gpgme-widgets.c:275
 msgid "User ID:"
 msgstr "მომხმარებლის ID:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:101
-#: ../libbalsa/libbalsa-gpgme-widgets.c:261
+#: ../libbalsa/libbalsa-gpgme-widgets.c:107
+#: ../libbalsa/libbalsa-gpgme-widgets.c:267
 msgid "None"
 msgstr "არაფერი"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:106
-#: ../libbalsa/libbalsa-gpgme-widgets.c:267
+#: ../libbalsa/libbalsa-gpgme-widgets.c:112
+#: ../libbalsa/libbalsa-gpgme-widgets.c:273
 msgid "Primary user ID:"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:119
-#: ../libbalsa/libbalsa-gpgme-widgets.c:276
+#: ../libbalsa/libbalsa-gpgme-widgets.c:125
+#: ../libbalsa/libbalsa-gpgme-widgets.c:282
 msgid "Key owner trust:"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:129
-#: ../libbalsa/libbalsa-gpgme-widgets.c:283
+#: ../libbalsa/libbalsa-gpgme-widgets.c:135
+#: ../libbalsa/libbalsa-gpgme-widgets.c:289
 msgid "Additional User IDs"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:147
-#: ../libbalsa/libbalsa-gpgme-widgets.c:295
+#: ../libbalsa/libbalsa-gpgme-widgets.c:153
+#: ../libbalsa/libbalsa-gpgme-widgets.c:301
 msgid "Issuer"
 msgstr "გამომცემელი"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:158
-#: ../libbalsa/libbalsa-gpgme-widgets.c:301
+#: ../libbalsa/libbalsa-gpgme-widgets.c:164
+#: ../libbalsa/libbalsa-gpgme-widgets.c:307
 msgid "Name:"
 msgstr "სახელი:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:162
-#: ../libbalsa/libbalsa-gpgme-widgets.c:305
+#: ../libbalsa/libbalsa-gpgme-widgets.c:168
+#: ../libbalsa/libbalsa-gpgme-widgets.c:311
 msgid "Serial number:"
 msgstr "სერიული ნომერი:"
 
 #. Translators: x509 certificate chain ID
-#: ../libbalsa/libbalsa-gpgme-widgets.c:169
-#: ../libbalsa/libbalsa-gpgme-widgets.c:309
+#: ../libbalsa/libbalsa-gpgme-widgets.c:175
+#: ../libbalsa/libbalsa-gpgme-widgets.c:315
 msgid "Chain ID:"
 msgstr ""
 
 #. add button to show the full chain - copy the fingerprint as the key may be unref'ed...
-#: ../libbalsa/libbalsa-gpgme-widgets.c:172
+#: ../libbalsa/libbalsa-gpgme-widgets.c:178
 msgid "view certificate chain…"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:192
-#: ../libbalsa/libbalsa-gpgme-widgets.c:318
+#: ../libbalsa/libbalsa-gpgme-widgets.c:198
+#: ../libbalsa/libbalsa-gpgme-widgets.c:324
 msgid "Subkey used"
 msgstr ""
 
 #. Translators: #1 subkey capabilities string
-#: ../libbalsa/libbalsa-gpgme-widgets.c:202
+#: ../libbalsa/libbalsa-gpgme-widgets.c:208
 #, c-format
 msgid "Subkeys (%s only)"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:207
+#: ../libbalsa/libbalsa-gpgme-widgets.c:213
 msgid "Subkeys"
 msgstr "ქვეგასაღებები"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:332
-#: ../libbalsa/libbalsa-gpgme-widgets.c:645
+#: ../libbalsa/libbalsa-gpgme-widgets.c:338
+#: ../libbalsa/libbalsa-gpgme-widgets.c:701
 #: ../src/balsa-mime-widget-vcalendar.c:184
 #: ../src/balsa-print-object-text.c:545
 msgid "Status:"
 msgstr "მდგომარეობა:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:336
-#: ../libbalsa/libbalsa-gpgme-widgets.c:649
+#: ../libbalsa/libbalsa-gpgme-widgets.c:342
+#: ../libbalsa/libbalsa-gpgme-widgets.c:705
 msgid "Fingerprint:"
 msgstr "ანაბეჭდი:"
 
 #. add type and filename (if available)
-#: ../libbalsa/libbalsa-gpgme-widgets.c:339
-#: ../libbalsa/libbalsa-gpgme-widgets.c:652
+#: ../libbalsa/libbalsa-gpgme-widgets.c:345
+#: ../libbalsa/libbalsa-gpgme-widgets.c:708
 #: ../src/balsa-print-object-default.c:112
 #: ../src/balsa-print-object-default.c:115
 #: ../src/balsa-print-object-default.c:118
 msgid "Type:"
 msgstr "ტიპი:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:345
-#: ../libbalsa/libbalsa-gpgme-widgets.c:658
+#: ../libbalsa/libbalsa-gpgme-widgets.c:351
+#: ../libbalsa/libbalsa-gpgme-widgets.c:714
 msgid "Capabilities:"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:350
-#: ../libbalsa/libbalsa-gpgme-widgets.c:663
+#: ../libbalsa/libbalsa-gpgme-widgets.c:356
+#: ../libbalsa/libbalsa-gpgme-widgets.c:719
 msgid "invalid timestamp"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:352
-#: ../libbalsa/libbalsa-gpgme-widgets.c:665
+#: ../libbalsa/libbalsa-gpgme-widgets.c:358
+#: ../libbalsa/libbalsa-gpgme-widgets.c:721
 msgid "not available"
 msgstr "მიუწვდომელია"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:356
-#: ../libbalsa/libbalsa-gpgme-widgets.c:669
+#: ../libbalsa/libbalsa-gpgme-widgets.c:362
+#: ../libbalsa/libbalsa-gpgme-widgets.c:725
 #: ../src/balsa-mime-widget-vcalendar.c:187
 #: ../src/balsa-print-object-text.c:548
 msgid "Created:"
 msgstr "შექმნილია:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:364
-#: ../libbalsa/libbalsa-gpgme-widgets.c:677
+#: ../libbalsa/libbalsa-gpgme-widgets.c:370
+#: ../libbalsa/libbalsa-gpgme-widgets.c:733
 msgid "Expires:"
 msgstr "იწურება:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:396 ../src/toolbar-factory.c:142
-msgid "Close"
-msgstr "დახურვა"
-
-#: ../libbalsa/libbalsa-gpgme-widgets.c:400
-msgid "No"
-msgstr "არა"
-
-#: ../libbalsa/libbalsa-gpgme-widgets.c:400
-msgid "Yes"
-msgstr "დიახ"
-
-#: ../libbalsa/libbalsa-gpgme-widgets.c:472
+#: ../libbalsa/libbalsa-gpgme-widgets.c:447
 msgid "revoked"
 msgstr "გაუქმებულია"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:475
+#: ../libbalsa/libbalsa-gpgme-widgets.c:450
 msgid "expired"
 msgstr "ვადაგასულია"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:481
+#: ../libbalsa/libbalsa-gpgme-widgets.c:456
 msgid "invalid"
 msgstr "მცდარი"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:707
+#: ../libbalsa/libbalsa-gpgme-widgets.c:528 ../src/toolbar-factory.c:142
+msgid "Close"
+msgstr "დახურვა"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:532
+msgid "No"
+msgstr "არა"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:532
+msgid "Yes"
+msgstr "დიახ"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:763
 msgid "sign"
 msgstr "ხელმოწერა"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:710
+#: ../libbalsa/libbalsa-gpgme-widgets.c:766
 msgid "encrypt"
 msgstr "დაშიფრვა"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:713
+#: ../libbalsa/libbalsa-gpgme-widgets.c:769
 msgid "certify"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:716
+#: ../libbalsa/libbalsa-gpgme-widgets.c:772
 msgid "authenticate"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:737
+#: ../libbalsa/libbalsa-gpgme-widgets.c:793
 #, c-format
 msgid "%u bit"
 msgid_plural "%u bits"
@@ -1575,7 +1650,7 @@ msgstr[0] "%u ბიტი"
 msgstr[1] "%u ბიტი"
 
 #. Translators: Elliptic Curve Cryptography (ECC) curve name
-#: ../libbalsa/libbalsa-gpgme-widgets.c:744
+#: ../libbalsa/libbalsa-gpgme-widgets.c:800
 #, c-format
 msgid " curve “%s”"
 msgstr ""
@@ -2331,7 +2406,7 @@ msgstr ""
 
 #: ../libbalsa/rfc2445.c:711
 msgid " and "
-msgstr ""
+msgstr " და "
 
 #: ../libbalsa/rfc2445.c:722
 msgid " of every month"
@@ -2514,102 +2589,102 @@ msgctxt "ical_role"
 msgid "non-participant, information only"
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:462 ../libbalsa/rfc3156.c:469
+#: ../libbalsa/rfc3156.c:457 ../libbalsa/rfc3156.c:464
 msgid "decryption and signature verification failed"
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:495
+#: ../libbalsa/rfc3156.c:490
 msgid "The signature is valid."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:497
+#: ../libbalsa/rfc3156.c:492
 msgid "The signature is valid but expired."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:499
+#: ../libbalsa/rfc3156.c:494
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:501
+#: ../libbalsa/rfc3156.c:496
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:503
+#: ../libbalsa/rfc3156.c:498
 msgid "The signature is invalid."
 msgstr "ხელმოწერა არასწორია."
 
-#: ../libbalsa/rfc3156.c:505
+#: ../libbalsa/rfc3156.c:500
 msgid "The signature could not be verified due to a missing key."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:507
+#: ../libbalsa/rfc3156.c:502
 msgid "This part is not a real signature."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:509
+#: ../libbalsa/rfc3156.c:504
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:511
+#: ../libbalsa/rfc3156.c:506
 msgid "The signature contains multiple signers, this may be a forgery."
 msgstr ""
 
 #. Translators: #1 error source; #2 error message
-#: ../libbalsa/rfc3156.c:518
+#: ../libbalsa/rfc3156.c:513
 #, c-format
 msgid "An error prevented the signature verification: %s: %s"
 msgstr ""
 
 #. Translators: #1 error message
-#: ../libbalsa/rfc3156.c:521
+#: ../libbalsa/rfc3156.c:516
 #, c-format
 msgid "An error prevented the signature verification: %s"
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:533
+#: ../libbalsa/rfc3156.c:528
 msgid "The user ID is of unknown validity."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:535
+#: ../libbalsa/rfc3156.c:530
 msgid "The validity of the user ID is undefined."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:537
+#: ../libbalsa/rfc3156.c:532
 msgid "The user ID is never valid."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:539
+#: ../libbalsa/rfc3156.c:534
 msgid "The user ID is marginally valid."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:541
+#: ../libbalsa/rfc3156.c:536
 msgid "The user ID is fully valid."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:543
+#: ../libbalsa/rfc3156.c:538
 msgid "The user ID is ultimately valid."
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:545 ../libbalsa/rfc3156.c:567
+#: ../libbalsa/rfc3156.c:540 ../libbalsa/rfc3156.c:562
 msgid "bad validity"
 msgstr ""
 
-#: ../libbalsa/rfc3156.c:557
+#: ../libbalsa/rfc3156.c:552
 msgid "undefined"
 msgstr "გაურკვეველი"
 
-#: ../libbalsa/rfc3156.c:561
+#: ../libbalsa/rfc3156.c:556
 msgid "marginal"
 msgstr "საბოლოო"
 
-#: ../libbalsa/rfc3156.c:563
+#: ../libbalsa/rfc3156.c:558
 msgid "full"
 msgstr "მთლიანი"
 
-#: ../libbalsa/rfc3156.c:565
+#: ../libbalsa/rfc3156.c:560
 msgid "ultimate"
 msgstr "უკანასკნელი"
 
@@ -2650,7 +2725,7 @@ msgstr ""
 
 #: ../libbalsa/send.c:832
 msgid "Sending Mail"
-msgstr ""
+msgstr "ელფოსტის გაგზავნა"
 
 #: ../libbalsa/send.c:942
 #, c-format
@@ -3984,48 +4059,48 @@ msgstr ""
 msgid "_Search key server for updates of this key"
 msgstr ""
 
-#: ../src/balsa-mime-widget-crypto.c:206
+#: ../src/balsa-mime-widget-crypto.c:204
 msgid "decrypted"
 msgstr ""
 
-#: ../src/balsa-mime-widget-crypto.c:219
+#: ../src/balsa-mime-widget-crypto.c:217
 msgid "trusted signature"
 msgstr ""
 
-#: ../src/balsa-mime-widget-crypto.c:222
+#: ../src/balsa-mime-widget-crypto.c:220
 msgid "low trust signature"
 msgstr ""
 
-#: ../src/balsa-mime-widget-crypto.c:225
+#: ../src/balsa-mime-widget-crypto.c:223
 msgid "bad signature"
 msgstr "არასწორი ხელმოწერა"
 
-#: ../src/balsa-mime-widget-crypto.c:228
+#: ../src/balsa-mime-widget-crypto.c:226
 msgid "unknown signature status"
 msgstr ""
 
 #. Translators: successful import of a GnuPG key; #1: backend message
-#: ../src/balsa-mime-widget-crypto.c:315
+#: ../src/balsa-mime-widget-crypto.c:343
 #, c-format
 msgid ""
 "Import GnuPG key:\n"
 "%s"
 msgstr ""
 
-#: ../src/balsa-mime-widget-crypto.c:322
+#: ../src/balsa-mime-widget-crypto.c:350
 #, c-format
 msgid "Error importing key data: %s"
 msgstr ""
 
-#: ../src/balsa-mime-widget-crypto.c:322 ../src/sendmsg-window.c:1717
+#: ../src/balsa-mime-widget-crypto.c:350 ../src/sendmsg-window.c:1717
 msgid "unknown error"
 msgstr "უცნობი შეცდომა"
 
-#: ../src/balsa-mime-widget-crypto.c:354
+#: ../src/balsa-mime-widget-crypto.c:382
 msgid "(imported)"
 msgstr ""
 
-#: ../src/balsa-mime-widget-crypto.c:362
+#: ../src/balsa-mime-widget-crypto.c:390
 msgid "Import key into the local key ring"
 msgstr ""
 
@@ -6567,7 +6642,7 @@ msgid "Attach file"
 msgstr "ფაილის მიმაგრება"
 
 #: ../src/sendmsg-window.c:2113 ../src/sendmsg-window.c:2189
-#: ../src/sendmsg-window.c:7136
+#: ../src/sendmsg-window.c:7138
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -6901,22 +6976,22 @@ msgstr ""
 msgid "Error starting spell checker: %s"
 msgstr ""
 
-#: ../src/sendmsg-window.c:6672
+#: ../src/sendmsg-window.c:6674
 #, c-format
 msgid "Reply to %s: %s"
 msgstr ""
 
-#: ../src/sendmsg-window.c:6677
+#: ../src/sendmsg-window.c:6679
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr ""
 
-#: ../src/sendmsg-window.c:6681
+#: ../src/sendmsg-window.c:6683
 #, c-format
 msgid "New message to %s: %s"
 msgstr ""
 
-#: ../src/sendmsg-window.c:6828 ../ui/sendmsg-window.ui.h:33
+#: ../src/sendmsg-window.c:6830 ../ui/sendmsg-window.ui.h:33
 msgid "_Language"
 msgstr "ე_ნა"
 
@@ -7269,7 +7344,7 @@ msgstr ""
 
 #: ../src/toolbar-prefs.c:481
 msgid "Move selected item up"
-msgstr ""
+msgstr "მონიშნული ელემენტის მაღლა ატანა"
 
 #: ../src/toolbar-prefs.c:491
 msgid "Remove selected item from toolbar"
@@ -7281,7 +7356,7 @@ msgstr ""
 
 #: ../src/toolbar-prefs.c:506
 msgid "Move selected item down"
-msgstr ""
+msgstr "მონიშნული ელემენტის დაბლა ჩამოტანა"
 
 #: ../ui/ab-main.ui.h:1 ../ui/main-window.ui.h:1 ../ui/message-window.ui.h:1
 #: ../ui/sendmsg-window.ui.h:1 ../ui/source-viewer.ui.h:1

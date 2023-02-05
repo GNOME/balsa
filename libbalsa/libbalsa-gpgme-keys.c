@@ -1005,6 +1005,7 @@ keyserver_import_mailbox(gpgme_ctx_t              ctx,
 				/* apparently the WKD search returns only one element, even if more keys have been imported, so we re-check the
 				 * local key ring */
 				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
+				keys = NULL;
 				if (!list_keys_real(ctx, &keys, NULL, mailbox, FALSE, GPGME_KEYLIST_MODE_LOCAL, FALSE, error)) {
 					result = -1;
 				} else {

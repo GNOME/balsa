@@ -976,6 +976,10 @@ keyserver_thread_func(gpointer data)
     if (ctx != NULL) {
         gint keyserver_res;
 
+        libbalsa_information_may_hide(LIBBALSA_INFORMATION_MESSAGE, "SEARCH_CRYPT_KEY",
+            /* Translators: #1 crypto protocol; #2 RFC 5322 internet address */
+            _("Looking for %s key for “%s”"),
+            libbalsa_gpgme_protocol_name(thread_data->protocol), addr_buf);
         keyserver_res = libbalsa_gpgme_keyserver_import(ctx, thread_data->addresses, &error);
         if (keyserver_res == 0) {
             /* no key server keys found: show message unless we imported any Autocrypt key */

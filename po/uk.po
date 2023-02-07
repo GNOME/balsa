@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-02-03 17:49+0000\n"
-"PO-Revision-Date: 2023-02-03 21:49+0200\n"
+"POT-Creation-Date: 2023-02-06 19:05+0000\n"
+"PO-Revision-Date: 2023-02-07 16:54+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -219,18 +219,11 @@ msgstr "Відповідати до:"
 
 #: ../libbalsa/address-view.c:963
 #, c-format
-#| msgid "Cannot import Autocrypt keys: %s"
 msgid "Cannot load Autocrypt keys: %s"
 msgstr "Не вдалося завантажити ключі автоматичного шифрування: %s"
 
 #: ../libbalsa/address-view.c:967
 #, c-format
-#| msgid ""
-#| "<i>Note:</i> choosing encryption will import %u key from the Autocrypt "
-#| "database into the GnuPG key ring."
-#| msgid_plural ""
-#| "<i>Note:</i> choosing encryption will import %u keys from the Autocrypt "
-#| "database into the GnuPG key ring."
 msgid "Imported %d key from the Autocrypt database into your key ring."
 msgid_plural ""
 "Imported %d keys from the Autocrypt database into your key ring."
@@ -240,16 +233,21 @@ msgstr[2] "Імпортовано %d ключів з бази даних Autocry
 msgstr[3] "Імпортовано %d ключ з бази даних Autocrypt до сховища ключів."
 
 #. Translators: #1 crypto protocol; #2 RFC 5322 internet address
-#: ../libbalsa/address-view.c:984
+#: ../libbalsa/address-view.c:981
 #, c-format
-#| msgid "Could not find a key for “%s”"
+#| msgid "Cannot find any %s key for “%s”"
+msgid "Looking for %s key for “%s”"
+msgstr "Шукаємо ключ %s для «%s»"
+
+#. Translators: #1 crypto protocol; #2 RFC 5322 internet address
+#: ../libbalsa/address-view.c:988
+#, c-format
 msgid "Cannot find any %s key for “%s”"
 msgstr "Не вдалося знайти жодного ключа %s для «%s»»"
 
 #. Translators: #1 key count, #2 crypto protocol; #2 RFC 5322 internet address
-#: ../libbalsa/address-view.c:990
+#: ../libbalsa/address-view.c:994
 #, c-format
-#| msgid "Import key into the local key ring"
 msgid "Imported %d %s key for “%s” into your key ring."
 msgid_plural "Imported %d %s keys for “%s” into your key ring."
 msgstr[0] "Імпортовано %d ключ %s для «%s» до вашого сховища ключів."
@@ -257,22 +255,19 @@ msgstr[1] "Імпортовано %d ключі %s для «%s» до вашог
 msgstr[2] "Імпортовано %d ключів %s для «%s» до вашого сховища ключів."
 msgstr[3] "Імпортовано %d ключ %s для «%s» до вашого сховища ключів."
 
-#: ../libbalsa/address-view.c:998
+#: ../libbalsa/address-view.c:1002
 #, c-format
-#| msgid "cannot export minimal key for “%s”"
 msgid "Cannot import missing keys for “%s”: %s"
 msgstr "Не вдалося імпортувати пропущені ключі для «%s»: %s"
 
 #. paranoid, should never happen
-#: ../libbalsa/address-view.c:1051
+#: ../libbalsa/address-view.c:1055
 #, c-format
-#| msgid "Could not find a key for “%s”"
 msgid "cannot find a key for “%s”"
 msgstr "не вдалося знайти ключ для «%s»"
 
-#: ../libbalsa/address-view.c:1058
+#: ../libbalsa/address-view.c:1062
 #, c-format
-#| msgid "Multiple keys for “%s”"
 msgid "Encryption key for “%s”"
 msgid_plural "Encryption keys for “%s”"
 msgstr[0] "Ключі шифрування для «%s»"
@@ -280,21 +275,21 @@ msgstr[1] "Ключі шифрування для «%s»"
 msgstr[2] "Ключі шифрування для «%s»"
 msgstr[3] "Ключ шифрування для «%s»"
 
-#: ../libbalsa/address-view.c:1148
+#: ../libbalsa/address-view.c:1152
 msgid "public key(s) missing, click to search key server"
 msgstr ""
 "не вистачає відкритих ключів, натисніть, щоб виконати пошук на сервері ключів"
 
-#: ../libbalsa/address-view.c:1150
+#: ../libbalsa/address-view.c:1154
 msgid "public key missing, click to search key server"
 msgstr ""
 "не вистачає відкритого ключа, натисніть, щоб виконати пошук на сервері ключів"
 
-#: ../libbalsa/address-view.c:1154
+#: ../libbalsa/address-view.c:1158
 msgid "all public keys available, click to show them"
 msgstr "доступні усі відкриті ключі, натисніть, щоб показати їх"
 
-#: ../libbalsa/address-view.c:1156
+#: ../libbalsa/address-view.c:1160
 msgid "public key available, click to show it"
 msgstr "доступний відкритий ключ, натисніть, щоб показати його"
 
@@ -1498,16 +1493,14 @@ msgstr "Пошук на сервері ключів завершився нев�
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:802
 #, c-format
-#| msgid "cannot load key with fingerprint %s: %s"
 msgid "no data for key with fingerprint %s"
 msgstr "немає даних для ключа із відбитком %s"
 
 #: ../libbalsa/libbalsa-gpgme-keys.c:813
-#| msgid "importing key data failed"
 msgid "reading key data failed"
 msgstr "не вдалося прочитати дані ключів"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:852 ../libbalsa/libbalsa-gpgme-keys.c:1043
+#: ../libbalsa/libbalsa-gpgme-keys.c:852 ../libbalsa/libbalsa-gpgme-keys.c:1044
 msgid "error importing key"
 msgstr "помилка під час імпортування ключа"
 
@@ -1693,7 +1686,7 @@ msgstr "Підключі"
 #: ../libbalsa/libbalsa-gpgme-widgets.c:338
 #: ../libbalsa/libbalsa-gpgme-widgets.c:701
 #: ../src/balsa-mime-widget-vcalendar.c:184
-#: ../src/balsa-print-object-text.c:545
+#: ../src/balsa-print-object-text.c:544
 msgid "Status:"
 msgstr "Стан:"
 
@@ -1729,7 +1722,7 @@ msgstr "недоступний"
 #: ../libbalsa/libbalsa-gpgme-widgets.c:362
 #: ../libbalsa/libbalsa-gpgme-widgets.c:725
 #: ../src/balsa-mime-widget-vcalendar.c:187
-#: ../src/balsa-print-object-text.c:548
+#: ../src/balsa-print-object-text.c:547
 msgid "Created:"
 msgstr "Створено:"
 
@@ -3544,7 +3537,7 @@ msgstr "Запуск програми"
 msgid "New mail notification"
 msgstr "Сповіщення про нову пошту"
 
-#: ../src/ab-main.c:218 ../src/ab-window.c:707
+#: ../src/ab-main.c:218 ../src/ab-window.c:705
 msgid " address book: "
 msgstr " адресна книга: "
 
@@ -3585,7 +3578,7 @@ msgstr "Адресна книга Balsa"
 msgid "Name"
 msgstr "Назва"
 
-#: ../src/ab-window.c:192 ../src/balsa-print-object-text.c:450
+#: ../src/ab-window.c:192 ../src/balsa-print-object-text.c:449
 msgid "Email Address"
 msgstr "Адреса пошти"
 
@@ -3627,7 +3620,7 @@ msgstr "списком розповсюдження"
 msgid "Could not launch %s: %s"
 msgstr "Не вдалося запустити %s: %s"
 
-#: ../src/ab-window.c:736
+#: ../src/ab-window.c:734
 #, c-format
 msgid ""
 "Error opening address book “%s”:\n"
@@ -4587,52 +4580,52 @@ msgstr ""
 "заголовка, що описує кодування символів (перетворено у %s)"
 
 #. Translators: #1 calendar message type
-#: ../src/balsa-mime-widget-vcalendar.c:67 ../src/balsa-print-object-text.c:534
+#: ../src/balsa-mime-widget-vcalendar.c:67 ../src/balsa-print-object-text.c:533
 #, c-format
 msgid "This is an iTIP calendar “%s” message."
 msgstr "Це повідомлення «%s» календаря iTIP."
 
 #: ../src/balsa-mime-widget-vcalendar.c:182
 #: ../src/balsa-mime-widget-vcalendar.c:379
-#: ../src/balsa-print-object-text.c:543
+#: ../src/balsa-print-object-text.c:542
 msgid "Summary:"
 msgstr "Резюме:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:186
-#: ../src/balsa-print-object-text.c:547
+#: ../src/balsa-print-object-text.c:546
 msgid "Organizer:"
 msgstr "Організатор:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:188
 #: ../src/balsa-mime-widget-vcalendar.c:380
-#: ../src/balsa-print-object-text.c:549
+#: ../src/balsa-print-object-text.c:548
 msgid "Start:"
 msgstr "Початок:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:189
 #: ../src/balsa-mime-widget-vcalendar.c:381
-#: ../src/balsa-print-object-text.c:550
+#: ../src/balsa-print-object-text.c:549
 msgid "End:"
 msgstr "Кінець:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:193
-#: ../src/balsa-print-object-text.c:554
+#: ../src/balsa-print-object-text.c:553
 msgid "Duration:"
 msgstr "Тривалість:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:199
-#: ../src/balsa-print-object-text.c:560
+#: ../src/balsa-print-object-text.c:559
 msgid "Recurrence:"
 msgstr "Повторення:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:203
 #: ../src/balsa-mime-widget-vcalendar.c:382
-#: ../src/balsa-print-object-text.c:564
+#: ../src/balsa-print-object-text.c:563
 msgid "Location:"
 msgstr "Адреса:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:237
-#: ../src/balsa-print-object-text.c:573
+#: ../src/balsa-print-object-text.c:572
 msgid "Attendee:"
 msgid_plural "Attendees:"
 msgstr[0] "Присутній"
@@ -4641,7 +4634,7 @@ msgstr[2] "Запрошені:"
 msgstr[3] "Присутній"
 
 #: ../src/balsa-mime-widget-vcalendar.c:245
-#: ../src/balsa-print-object-text.c:602
+#: ../src/balsa-print-object-text.c:601
 msgid "Category:"
 msgid_plural "Categories:"
 msgstr[0] "Категорії:"
@@ -4651,7 +4644,7 @@ msgstr[3] "Категорія:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:249
 #: ../src/balsa-mime-widget-vcalendar.c:383
-#: ../src/balsa-print-object-text.c:587
+#: ../src/balsa-print-object-text.c:586
 msgid "Description:"
 msgstr "Опис:"
 
@@ -4695,23 +4688,23 @@ msgstr "Не вдалося надіслати відповідь щодо ка�
 msgid "File name:"
 msgstr "Назва файлу:"
 
-#: ../src/balsa-print-object-text.c:445
+#: ../src/balsa-print-object-text.c:444
 msgid "Full Name"
 msgstr "Повне ім'я"
 
-#: ../src/balsa-print-object-text.c:446
+#: ../src/balsa-print-object-text.c:445
 msgid "Nick Name"
 msgstr "Псевдонім"
 
-#: ../src/balsa-print-object-text.c:447
+#: ../src/balsa-print-object-text.c:446
 msgid "First Name"
 msgstr "Ім’я"
 
-#: ../src/balsa-print-object-text.c:448
+#: ../src/balsa-print-object-text.c:447
 msgid "Last Name"
 msgstr "Прізвище"
 
-#: ../src/balsa-print-object-text.c:449
+#: ../src/balsa-print-object-text.c:448
 msgid "Organization"
 msgstr "Організація"
 

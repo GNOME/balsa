@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-02-03 17:49+0000\n"
-"PO-Revision-Date: 2023-02-04 08:44+0100\n"
+"POT-Creation-Date: 2023-02-06 19:05+0000\n"
+"PO-Revision-Date: 2023-02-07 09:14+0100\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: \n"
 "Language: ka\n"
@@ -30,7 +30,7 @@ msgstr "IMAP -ის და POP3 -ის მხარდაჭერა;"
 
 #: ../balsa.appdata.xml.in.h:3
 msgid "sendmail or direct SMTP support;"
-msgstr ""
+msgstr "sendmail ან პირდაპირი SMTP მხარდაჭერა;"
 
 #: ../balsa.appdata.xml.in.h:4
 msgid "optional multi-threaded retrieval and sending of messages;"
@@ -42,7 +42,7 @@ msgstr ""
 
 #: ../balsa.appdata.xml.in.h:6
 msgid "automatic mail checking;"
-msgstr ""
+msgstr "ელფოსტის ავტომატური შემოწმება;"
 
 #: ../balsa.appdata.xml.in.h:7
 msgid "mail printing;"
@@ -74,7 +74,7 @@ msgstr "საფოსტო კლიენტი"
 #: ../org.desktop.Balsa.desktop.in.in.h:4
 #: ../balsa-mailto-handler.desktop.in.in.h:4
 msgid "Balsa Mail Client"
-msgstr ""
+msgstr "ელფოსტის კლიენტი Balsa"
 
 #: ../libbalsa/address-book.c:299 ../libbalsa/filter-error.c:45
 msgid "No error"
@@ -221,50 +221,56 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. Translators: #1 crypto protocol; #2 RFC 5322 internet address
-#: ../libbalsa/address-view.c:984
+#: ../libbalsa/address-view.c:981
+#, c-format
+msgid "Looking for %s key for “%s”"
+msgstr "%s გასაღების ძებნა \"%s\"-სთვის"
+
+#. Translators: #1 crypto protocol; #2 RFC 5322 internet address
+#: ../libbalsa/address-view.c:988
 #, c-format
 msgid "Cannot find any %s key for “%s”"
 msgstr ""
 
 #. Translators: #1 key count, #2 crypto protocol; #2 RFC 5322 internet address
-#: ../libbalsa/address-view.c:990
+#: ../libbalsa/address-view.c:994
 #, c-format
 msgid "Imported %d %s key for “%s” into your key ring."
 msgid_plural "Imported %d %s keys for “%s” into your key ring."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/address-view.c:998
+#: ../libbalsa/address-view.c:1002
 #, c-format
 msgid "Cannot import missing keys for “%s”: %s"
 msgstr "\"%s\"-სთვის ნაკლული გასაღებების შემოტანის შეცდომა: %s"
 
 #. paranoid, should never happen
-#: ../libbalsa/address-view.c:1051
+#: ../libbalsa/address-view.c:1055
 #, c-format
 msgid "cannot find a key for “%s”"
 msgstr "\"%s\"-სთვის გასაღები ვერ ვიპოვე"
 
-#: ../libbalsa/address-view.c:1058
+#: ../libbalsa/address-view.c:1062
 #, c-format
 msgid "Encryption key for “%s”"
 msgid_plural "Encryption keys for “%s”"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "დაშიფვრის გასაღები “%s”-სთვის"
+msgstr[1] "დაშიფვრის გასაღებები “%s”-სთვის"
 
-#: ../libbalsa/address-view.c:1148
+#: ../libbalsa/address-view.c:1152
 msgid "public key(s) missing, click to search key server"
 msgstr ""
 
-#: ../libbalsa/address-view.c:1150
+#: ../libbalsa/address-view.c:1154
 msgid "public key missing, click to search key server"
 msgstr ""
 
-#: ../libbalsa/address-view.c:1154
+#: ../libbalsa/address-view.c:1158
 msgid "all public keys available, click to show them"
 msgstr ""
 
-#: ../libbalsa/address-view.c:1156
+#: ../libbalsa/address-view.c:1160
 msgid "public key available, click to show it"
 msgstr ""
 
@@ -294,7 +300,7 @@ msgstr ""
 
 #: ../libbalsa/autocrypt.c:478
 msgid "Autocrypt database"
-msgstr ""
+msgstr "ბაზის ავტომატური დაშიფვრა"
 
 #: ../libbalsa/autocrypt.c:479 ../libbalsa/html.c:459
 #: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
@@ -320,7 +326,7 @@ msgstr ""
 
 #: ../libbalsa/autocrypt.c:568
 msgid "Prefer encryption"
-msgstr ""
+msgstr "მირჩევნია დავშიფრო"
 
 #. Translators: #1 email address; #2 error message
 #: ../libbalsa/autocrypt.c:818 ../libbalsa/autocrypt.c:840
@@ -617,7 +623,7 @@ msgstr ""
 
 #: ../libbalsa/html.c:457
 msgid "_Download external content"
-msgstr ""
+msgstr "_გარე შემცველობის გადმოწერა"
 
 #: ../libbalsa/html.c:708
 #, c-format
@@ -629,7 +635,7 @@ msgstr ""
 
 #: ../libbalsa/html-pref-db.c:138
 msgid "HTML preferences"
-msgstr ""
+msgstr "HTML-ის მორგება"
 
 #: ../libbalsa/html-pref-db.c:188 ../src/pref-manager.c:229
 msgid "Sender"
@@ -696,12 +702,12 @@ msgstr ""
 #: ../libbalsa/identity.c:245
 #, c-format
 msgid "Cannot read signature file “%s”: "
-msgstr ""
+msgstr "ხელმოწერის ფაილის (\"%s\") წაკითხვის შეცდომა: "
 
 #: ../libbalsa/identity.c:256
 #, c-format
 msgid "Signature in “%s” is not a UTF-8 text."
-msgstr ""
+msgstr "ხელმოწერა \"%s\"-ში UTF-8 ტექსტი არაა."
 
 #: ../libbalsa/identity.c:368 ../libbalsa/libbalsa-gpgme-cb.c:184
 #: ../libbalsa/libbalsa-gpgme-cb.c:363 ../libbalsa/smtp-server.c:327
@@ -774,7 +780,7 @@ msgstr "_ფოსტის მისამართი:"
 
 #: ../libbalsa/identity.c:873
 msgid "Reply _to:"
-msgstr ""
+msgstr "_პასუხი:"
 
 #: ../libbalsa/identity.c:875
 msgid "_Domain:"
@@ -791,11 +797,11 @@ msgstr "_ფარული ასლი:"
 
 #: ../libbalsa/identity.c:883
 msgid "Reply _string:"
-msgstr ""
+msgstr "_პასუხის სტრიქონი:"
 
 #: ../libbalsa/identity.c:885
 msgid "F_orward string:"
-msgstr ""
+msgstr "_გადაგზავნის სტრიქონი:"
 
 #: ../libbalsa/identity.c:888
 msgid "send messages in both plain text and _HTML format"
@@ -820,15 +826,15 @@ msgstr "ხელმოწერა"
 
 #: ../libbalsa/identity.c:911
 msgid "Signature _path"
-msgstr ""
+msgstr "ხელმოწერის _ბილიკი"
 
 #: ../libbalsa/identity.c:914
 msgid "_Execute signature"
-msgstr ""
+msgstr "ხელმოწერის _შესრულება"
 
 #: ../libbalsa/identity.c:917
 msgid "Incl_ude signature"
-msgstr ""
+msgstr "_ხელმოწერის ჩათვლით"
 
 #: ../libbalsa/identity.c:920
 msgid "Include signature when for_warding"
@@ -840,7 +846,7 @@ msgstr ""
 
 #: ../libbalsa/identity.c:926
 msgid "_Add signature separator"
-msgstr ""
+msgstr "_ხელმოწერის გამყოფის დამატება"
 
 #: ../libbalsa/identity.c:929
 msgid "Prepend si_gnature"
@@ -852,15 +858,15 @@ msgstr "უსაფრთხოება"
 
 #: ../libbalsa/identity.c:937
 msgid "sign messages by default"
-msgstr ""
+msgstr "შეტყობინებების ავტომატური ხელმოწერა"
 
 #: ../libbalsa/identity.c:940
 msgid "encrypt messages by default"
-msgstr ""
+msgstr "შეტყობინებების ავტომატური დაშიფვრა"
 
 #: ../libbalsa/identity.c:943
 msgid "default protocol"
-msgstr ""
+msgstr "ნაგულისხმები პროტოკოლი"
 
 #: ../libbalsa/identity.c:946
 msgid "always trust GnuPG keys to encrypt messages"
@@ -884,12 +890,12 @@ msgstr ""
 
 #: ../libbalsa/identity.c:961
 msgid "Autocrypt mode"
-msgstr ""
+msgstr "ავტომატური დაშიფვრის რეჟიმი"
 
 #: ../libbalsa/identity.c:1079
 #, c-format
 msgid "Error selecting key: %s"
-msgstr ""
+msgstr "შეცდომა გასაღების არჩევისას: %s"
 
 #: ../libbalsa/identity.c:1101
 msgid "Choose…"
@@ -1034,7 +1040,7 @@ msgstr ""
 #: ../libbalsa/imap/imap-handle.c:2332 ../libbalsa/imap/imap-handle.c:2363
 #, c-format
 msgid "IMAP response: %s"
-msgstr ""
+msgstr "IMAP პასუხი: %s"
 
 #. IMAP host name + message
 #: ../libbalsa/imap-server.c:213
@@ -1413,7 +1419,7 @@ msgstr ""
 msgid "reading key data failed"
 msgstr ""
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:852 ../libbalsa/libbalsa-gpgme-keys.c:1043
+#: ../libbalsa/libbalsa-gpgme-keys.c:852 ../libbalsa/libbalsa-gpgme-keys.c:1044
 msgid "error importing key"
 msgstr "გასაღების შემოტანის შეცდომა"
 
@@ -1557,7 +1563,7 @@ msgstr "ქვეგასაღებები"
 #: ../libbalsa/libbalsa-gpgme-widgets.c:338
 #: ../libbalsa/libbalsa-gpgme-widgets.c:701
 #: ../src/balsa-mime-widget-vcalendar.c:184
-#: ../src/balsa-print-object-text.c:545
+#: ../src/balsa-print-object-text.c:544
 msgid "Status:"
 msgstr "მდგომარეობა:"
 
@@ -1578,12 +1584,12 @@ msgstr "ტიპი:"
 #: ../libbalsa/libbalsa-gpgme-widgets.c:351
 #: ../libbalsa/libbalsa-gpgme-widgets.c:714
 msgid "Capabilities:"
-msgstr ""
+msgstr "შესაძლებლობები:"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:356
 #: ../libbalsa/libbalsa-gpgme-widgets.c:719
 msgid "invalid timestamp"
-msgstr ""
+msgstr "არასწორი დროის შტამპი"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:358
 #: ../libbalsa/libbalsa-gpgme-widgets.c:721
@@ -1593,7 +1599,7 @@ msgstr "მიუწვდომელია"
 #: ../libbalsa/libbalsa-gpgme-widgets.c:362
 #: ../libbalsa/libbalsa-gpgme-widgets.c:725
 #: ../src/balsa-mime-widget-vcalendar.c:187
-#: ../src/balsa-print-object-text.c:548
+#: ../src/balsa-print-object-text.c:547
 msgid "Created:"
 msgstr "შექმნილია:"
 
@@ -1636,11 +1642,11 @@ msgstr "დაშიფრვა"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:769
 msgid "certify"
-msgstr ""
+msgstr "სერტიფიკაცია"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:772
 msgid "authenticate"
-msgstr ""
+msgstr "ავთენტიფიკაცია"
 
 #: ../libbalsa/libbalsa-gpgme-widgets.c:793
 #, c-format
@@ -1716,7 +1722,7 @@ msgstr ""
 
 #: ../libbalsa/mailbox.c:3246
 msgid "from unknown"
-msgstr ""
+msgstr "უცნობისგან"
 
 #: ../libbalsa/mailbox.c:3248
 msgid "Loading…"
@@ -1765,7 +1771,7 @@ msgstr ""
 #. helper macro for calling II in the context of a mailbox
 #: ../libbalsa/mailbox_imap.c:623
 msgid "mailbox"
-msgstr ""
+msgstr "საფოსტო ყუთი"
 
 #: ../libbalsa/mailbox_imap.c:1233
 #, c-format
@@ -1882,7 +1888,7 @@ msgstr ""
 #: ../libbalsa/mailbox_mh.c:1084
 #, c-format
 msgid "Data copy error"
-msgstr ""
+msgstr "მონაცემების კოპირების შეცდომა"
 
 #: ../libbalsa/mailbox_mbox.c:172
 #, c-format
@@ -2062,7 +2068,7 @@ msgstr "%s-ის წაშლის შეცდომა: %s"
 
 #: ../libbalsa/misc.c:388
 msgid "West European"
-msgstr ""
+msgstr "დასავლეთ ევროპული"
 
 #: ../libbalsa/misc.c:390 ../libbalsa/misc.c:424
 msgid "East European"
@@ -2074,7 +2080,7 @@ msgstr "სამხრეთ ევროპული"
 
 #: ../libbalsa/misc.c:394
 msgid "North European"
-msgstr ""
+msgstr "ჩრდილოეთ ევროპული"
 
 #: ../libbalsa/misc.c:396 ../libbalsa/misc.c:426
 msgid "Cyrillic"
@@ -2114,7 +2120,7 @@ msgstr "კელტური"
 
 #: ../libbalsa/misc.c:414
 msgid "West European (euro)"
-msgstr ""
+msgstr "დასავლეთ ევროპული (ევრო)"
 
 #: ../libbalsa/misc.c:416
 msgid "Russian"
@@ -2145,7 +2151,7 @@ msgstr ""
 #: ../libbalsa/misc.c:735
 #, c-format
 msgid "fcntl failed: %s."
-msgstr ""
+msgstr "fcntl-ის შეცდომა: %s."
 
 #: ../libbalsa/misc.c:751
 msgid "Timeout exceeded while attempting fcntl lock!"
@@ -2354,7 +2360,7 @@ msgstr "ყოველ %d კვირაში"
 
 #: ../libbalsa/rfc2445.c:603
 msgid "the last"
-msgstr ""
+msgstr "ბოლო"
 
 #. #1: the day of month
 #: ../libbalsa/rfc2445.c:611
@@ -2396,7 +2402,7 @@ msgstr ""
 #: ../libbalsa/rfc2445.c:754 ../libbalsa/rfc2445.c:834
 #: ../libbalsa/rfc2445.c:839 ../libbalsa/rfc2445.c:842
 msgid "rule too complex"
-msgstr ""
+msgstr "წესი მეტისმეტად რთულია"
 
 #. #1: the day of week (defined in the day_of_week context)
 #: ../libbalsa/rfc2445.c:666
@@ -2711,7 +2717,7 @@ msgstr ""
 #: ../libbalsa/send.c:186
 #, c-format
 msgid "SMTP server %s"
-msgstr ""
+msgstr "SMTP სერვერი %s"
 
 #: ../libbalsa/send.c:600
 #, c-format
@@ -3328,7 +3334,7 @@ msgstr ""
 msgid "New mail notification"
 msgstr ""
 
-#: ../src/ab-main.c:218 ../src/ab-window.c:707
+#: ../src/ab-main.c:218 ../src/ab-window.c:705
 msgid " address book: "
 msgstr ""
 
@@ -3369,7 +3375,7 @@ msgstr ""
 msgid "Name"
 msgstr "სახელი"
 
-#: ../src/ab-window.c:192 ../src/balsa-print-object-text.c:450
+#: ../src/ab-window.c:192 ../src/balsa-print-object-text.c:449
 msgid "Email Address"
 msgstr "ელ-ფოსტის მისამართი"
 
@@ -3411,7 +3417,7 @@ msgstr ""
 msgid "Could not launch %s: %s"
 msgstr ""
 
-#: ../src/ab-window.c:736
+#: ../src/ab-window.c:734
 #, c-format
 msgid ""
 "Error opening address book “%s”:\n"
@@ -4324,59 +4330,59 @@ msgid ""
 msgstr ""
 
 #. Translators: #1 calendar message type
-#: ../src/balsa-mime-widget-vcalendar.c:67 ../src/balsa-print-object-text.c:534
+#: ../src/balsa-mime-widget-vcalendar.c:67 ../src/balsa-print-object-text.c:533
 #, c-format
 msgid "This is an iTIP calendar “%s” message."
 msgstr ""
 
 #: ../src/balsa-mime-widget-vcalendar.c:182
 #: ../src/balsa-mime-widget-vcalendar.c:379
-#: ../src/balsa-print-object-text.c:543
+#: ../src/balsa-print-object-text.c:542
 msgid "Summary:"
 msgstr "შეჯამება:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:186
-#: ../src/balsa-print-object-text.c:547
+#: ../src/balsa-print-object-text.c:546
 msgid "Organizer:"
 msgstr "ორგანიზატორი:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:188
 #: ../src/balsa-mime-widget-vcalendar.c:380
-#: ../src/balsa-print-object-text.c:549
+#: ../src/balsa-print-object-text.c:548
 msgid "Start:"
 msgstr "დასაწყისი:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:189
 #: ../src/balsa-mime-widget-vcalendar.c:381
-#: ../src/balsa-print-object-text.c:550
+#: ../src/balsa-print-object-text.c:549
 msgid "End:"
 msgstr "დასასრული:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:193
-#: ../src/balsa-print-object-text.c:554
+#: ../src/balsa-print-object-text.c:553
 msgid "Duration:"
 msgstr "ხანგრძლივობა:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:199
-#: ../src/balsa-print-object-text.c:560
+#: ../src/balsa-print-object-text.c:559
 msgid "Recurrence:"
 msgstr ""
 
 #: ../src/balsa-mime-widget-vcalendar.c:203
 #: ../src/balsa-mime-widget-vcalendar.c:382
-#: ../src/balsa-print-object-text.c:564
+#: ../src/balsa-print-object-text.c:563
 msgid "Location:"
 msgstr "მდებარეობა:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:237
-#: ../src/balsa-print-object-text.c:573
+#: ../src/balsa-print-object-text.c:572
 msgid "Attendee:"
 msgid_plural "Attendees:"
 msgstr[0] ""
 msgstr[1] ""
 
 #: ../src/balsa-mime-widget-vcalendar.c:245
-#: ../src/balsa-print-object-text.c:602
+#: ../src/balsa-print-object-text.c:601
 msgid "Category:"
 msgid_plural "Categories:"
 msgstr[0] "კატეგორია:"
@@ -4384,7 +4390,7 @@ msgstr[1] "კატეგორიები:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:249
 #: ../src/balsa-mime-widget-vcalendar.c:383
-#: ../src/balsa-print-object-text.c:587
+#: ../src/balsa-print-object-text.c:586
 msgid "Description:"
 msgstr ""
 
@@ -4426,23 +4432,23 @@ msgstr ""
 msgid "File name:"
 msgstr "ფაილის სახელი:"
 
-#: ../src/balsa-print-object-text.c:445
+#: ../src/balsa-print-object-text.c:444
 msgid "Full Name"
 msgstr "სრული სახელი"
 
-#: ../src/balsa-print-object-text.c:446
+#: ../src/balsa-print-object-text.c:445
 msgid "Nick Name"
 msgstr "მეტსახელი"
 
-#: ../src/balsa-print-object-text.c:447
+#: ../src/balsa-print-object-text.c:446
 msgid "First Name"
 msgstr "სახელი"
 
-#: ../src/balsa-print-object-text.c:448
+#: ../src/balsa-print-object-text.c:447
 msgid "Last Name"
 msgstr "გვარი"
 
-#: ../src/balsa-print-object-text.c:449
+#: ../src/balsa-print-object-text.c:448
 msgid "Organization"
 msgstr "ორგანიზაცია"
 

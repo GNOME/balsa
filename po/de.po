@@ -22,16 +22,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-01-24 18:13+0000\n"
-"PO-Revision-Date: 2023-01-24 23:22+0100\n"
-"Last-Translator: Jürgen Benvenuti <gastornis@posteo.org>\n"
+"POT-Creation-Date: 2023-02-07 14:55+0000\n"
+"PO-Revision-Date: 2023-02-10 20:37+0100\n"
+"Last-Translator: Tim Sabsch <tim@sabsch.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: ../balsa.appdata.xml.in.h:1
 msgid ""
@@ -208,35 +208,109 @@ msgstr "_E-Mail-Adresse:"
 msgid "A_dd"
 msgstr "_Hinzufügen"
 
-#: ../libbalsa/address-view.c:157 ../src/balsa-mime-widget-message.c:757
+#: ../libbalsa/address-view.c:193 ../src/balsa-mime-widget-message.c:757
 #: ../src/balsa-print-object-header.c:146 ../src/sendmsg-window.c:674
 #: ../src/sendmsg-window.c:3630
 msgid "To:"
 msgstr "An:"
 
-#: ../libbalsa/address-view.c:158 ../src/balsa-mime-widget-message.c:759
+#: ../libbalsa/address-view.c:194 ../src/balsa-mime-widget-message.c:759
 #: ../src/balsa-print-object-header.c:148 ../src/sendmsg-window.c:674
 #: ../src/sendmsg-window.c:3638
 msgid "CC:"
 msgstr "Kopie an:"
 
-#: ../libbalsa/address-view.c:159 ../src/balsa-mime-widget-message.c:761
+#: ../libbalsa/address-view.c:195 ../src/balsa-mime-widget-message.c:761
 #: ../src/balsa-print-object-header.c:150 ../src/sendmsg-window.c:674
 msgid "BCC:"
 msgstr "Blindkopie an:"
 
-#: ../libbalsa/address-view.c:160
+#: ../libbalsa/address-view.c:196
 msgid "Reply To:"
 msgstr "Antwort an:"
 
+#: ../libbalsa/address-view.c:963
+#, c-format
+msgid "Cannot load Autocrypt keys: %s"
+msgstr "Autocrypt-Schlüssel konnten nicht geladen werden: %s"
+
+#: ../libbalsa/address-view.c:967
+#, c-format
+msgid "Imported %d key from the Autocrypt database into your key ring."
+msgid_plural "Imported %d keys from the Autocrypt database into your key ring."
+msgstr[0] ""
+"%d Schlüssel aus der Autocrypt-Datenbank wurde in Ihren Schlüsselbund "
+"importiert."
+msgstr[1] ""
+"%d Schlüssel aus der Autocrypt-Datenbank wurden in Ihren Schlüsselbund "
+"importiert."
+
+#. Translators: #1 crypto protocol; #2 RFC 5322 internet address
+#: ../libbalsa/address-view.c:981
+#, c-format
+msgid "Looking for %s key for “%s”"
+msgstr "Es wird nach einem %s-Schlüssel für »%s« gesucht"
+
+#. Translators: #1 crypto protocol; #2 RFC 5322 internet address
+#: ../libbalsa/address-view.c:988
+#, c-format
+msgid "Cannot find any %s key for “%s”"
+msgstr "Es konnte kein %s Schlüssel für »%s« gefunden werden"
+
+#. Translators: #1 key count, #2 crypto protocol; #2 RFC 5322 internet address
+#: ../libbalsa/address-view.c:994
+#, c-format
+msgid "Imported %d %s key for “%s” into your key ring."
+msgid_plural "Imported %d %s keys for “%s” into your key ring."
+msgstr[0] "%d %s Schlüssel für »%s« wurde in Ihren Schlüsselbund importiert."
+msgstr[1] "%d %s Schlüssel für »%s« wurden in Ihren Schlüsselbund importiert."
+
+#: ../libbalsa/address-view.c:1002
+#, c-format
+msgid "Cannot import missing keys for “%s”: %s"
+msgstr "Importieren der fehlenden Schlüssel für »%s« ist fehlgeschlagen: %s"
+
+#. paranoid, should never happen
+#: ../libbalsa/address-view.c:1055
+#, c-format
+msgid "cannot find a key for “%s”"
+msgstr "Schlüssel für »%s« konnte nicht gefunden werden"
+
+#: ../libbalsa/address-view.c:1062
+#, c-format
+msgid "Encryption key for “%s”"
+msgid_plural "Encryption keys for “%s”"
+msgstr[0] "Verschlüsselungs-Schlüssel für »%s«"
+msgstr[1] "Verschlüsselungs-Schlüssel für »%s«"
+
+#: ../libbalsa/address-view.c:1152
+msgid "public key(s) missing, click to search key server"
+msgstr ""
+"Öffentliche(r) Schlüssel fehlen(fehlt), klicken Sie, um den Schlüsselserver "
+"zu durchsuchen"
+
+#: ../libbalsa/address-view.c:1154
+msgid "public key missing, click to search key server"
+msgstr ""
+"Öffentlicher Schlüssel fehlt, klicken Sie, um den Schlüsselserver zu "
+"durchsuchen"
+
+#: ../libbalsa/address-view.c:1158
+msgid "all public keys available, click to show them"
+msgstr "Alle öffentlichen Schlüssel verfügbar, klicken Sie, um sie anzuzeigen"
+
+#: ../libbalsa/address-view.c:1160
+msgid "public key available, click to show it"
+msgstr "Öffentlicher Schlüssel verfügbar, klicken Sie, um ihn anzuzeigen"
+
 #. Translators: #1 database file; #2 error message
-#: ../libbalsa/autocrypt.c:194
+#: ../libbalsa/autocrypt.c:199
 #, c-format
 msgid "cannot initialise Autocrypt database “%s”: %s"
 msgstr "Autocrypt-Datenbank »%s« konnte nicht initialisiert werden: %s"
 
 #. Translators: #1 sender's email address
-#: ../libbalsa/autocrypt.c:321
+#: ../libbalsa/autocrypt.c:326
 #, c-format
 msgid ""
 "No usable private key for “%s” found! Please create a key or disable "
@@ -247,19 +321,21 @@ msgstr ""
 
 #. Translators: #1 GPG key fingerprint; #2 error message
 #. Translators: #1 mailbox; #2 error message
-#: ../libbalsa/autocrypt.c:390 ../libbalsa/autocrypt.c:399
-#: ../libbalsa/autocrypt.c:689 ../libbalsa/autocrypt.c:696
+#. Translators: #1 email address (mailbox); #2 error message
+#: ../libbalsa/autocrypt.c:395 ../libbalsa/autocrypt.c:404
+#: ../libbalsa/autocrypt.c:714 ../libbalsa/autocrypt.c:721
+#: ../libbalsa/autocrypt.c:1056 ../libbalsa/autocrypt.c:1078
 #, c-format
 msgid "error reading Autocrypt data for “%s”: %s"
 msgstr "Fehler beim Lesen der Autocrypt-Daten für »%s«: %s"
 
-#: ../libbalsa/autocrypt.c:453
+#: ../libbalsa/autocrypt.c:478
 msgid "Autocrypt database"
 msgstr "Autocrypt-Datenbank"
 
-#: ../libbalsa/autocrypt.c:454 ../libbalsa/html.c:459
+#: ../libbalsa/autocrypt.c:479 ../libbalsa/html.c:459
 #: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
-#: ../libbalsa/libbalsa-gpgme-widgets.c:769 ../src/ab-window.c:148
+#: ../libbalsa/libbalsa-gpgme-widgets.c:825 ../src/ab-window.c:148
 #: ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
 #: ../src/main-window.c:3934 ../src/toolbar-prefs.c:130
 #: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
@@ -267,38 +343,38 @@ msgstr "Autocrypt-Datenbank"
 msgid "_Close"
 msgstr "S_chließen"
 
-#: ../libbalsa/autocrypt.c:525 ../src/balsa-mblist.c:326
+#: ../libbalsa/autocrypt.c:550 ../src/balsa-mblist.c:326
 msgid "Mailbox"
 msgstr "Postfach"
 
-#: ../libbalsa/autocrypt.c:531
+#: ../libbalsa/autocrypt.c:556
 msgid "Last seen"
 msgstr "Zuletzt gesehen"
 
-#: ../libbalsa/autocrypt.c:537
+#: ../libbalsa/autocrypt.c:562
 msgid "Last Autocrypt message"
 msgstr "Letzte Autocrypt-Nachricht"
 
-#: ../libbalsa/autocrypt.c:543
+#: ../libbalsa/autocrypt.c:568
 msgid "Prefer encryption"
 msgstr "Verschlüsselung bevorzugen"
 
 #. Translators: #1 email address; #2 error message
-#: ../libbalsa/autocrypt.c:793 ../libbalsa/autocrypt.c:815
+#: ../libbalsa/autocrypt.c:818 ../libbalsa/autocrypt.c:840
 #, c-format
 msgid "update user “%s” failed: %s"
 msgstr "Aktualisieren des Benutzers »%s« ist fehlgeschlagen: %s"
 
-#: ../libbalsa/autocrypt.c:793
+#: ../libbalsa/autocrypt.c:818
 #, c-format
 msgid "insert user “%s” failed: %s"
 msgstr "Einfügen des Benutzers »%s« ist fehlgeschlagen: %s"
 
-#: ../libbalsa/autocrypt.c:891
+#: ../libbalsa/autocrypt.c:916
 msgid "_Show details…"
 msgstr "Details _zeigen …"
 
-#: ../libbalsa/autocrypt.c:894 ../libbalsa/html-pref-db.c:453
+#: ../libbalsa/autocrypt.c:919 ../libbalsa/html-pref-db.c:453
 #: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1040
 #: ../src/mailbox-node.c:1056 ../src/pref-manager.c:2024
 #: ../src/pref-manager.c:2109 ../src/pref-manager.c:2832 ../ui/ab-main.ui.h:11
@@ -307,18 +383,18 @@ msgid "_Delete"
 msgstr "_Löschen"
 
 #. Translators: #1 email address
-#: ../libbalsa/autocrypt.c:944
+#: ../libbalsa/autocrypt.c:969
 #, c-format
 msgid "The database entry for “%s” does not contain a key."
 msgstr "Der Datenbankeintrag für »%s« enthält keinen Schlüssel."
 
-#: ../libbalsa/autocrypt.c:958
+#: ../libbalsa/autocrypt.c:983
 #, c-format
 msgid "cannot show key details: %s"
 msgstr "Schlüsseldetails können nicht angezeigt werden: %s"
 
 #. Translators: #1 email address
-#: ../libbalsa/autocrypt.c:986
+#: ../libbalsa/autocrypt.c:1011
 #, c-format
 msgid "Delete the Autocrypt key for “%s” from the database?"
 msgstr ""
@@ -463,8 +539,8 @@ msgid "Failed to decrypt MIME part: parse error"
 msgstr "Der MIME-Teil konnte nicht dekodiert werden: Analysefehler"
 
 #: ../libbalsa/gmime-gpgme-signature.c:147
-#: ../libbalsa/libbalsa-gpgme-widgets.c:360
-#: ../libbalsa/libbalsa-gpgme-widgets.c:673 ../libbalsa/rfc3156.c:559
+#: ../libbalsa/libbalsa-gpgme-widgets.c:366
+#: ../libbalsa/libbalsa-gpgme-widgets.c:729 ../libbalsa/rfc3156.c:554
 #: ../src/address-book-config.c:200
 msgid "never"
 msgstr "niemals"
@@ -514,7 +590,7 @@ msgstr ""
 "Fingerabdruck des Schlüssels: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:239 ../libbalsa/imap/imap-handle.c:46
-#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:555
+#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:550
 #: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5364
 msgid "unknown"
 msgstr "unbekannt"
@@ -951,7 +1027,7 @@ msgstr "_Neu"
 msgid "_Remove"
 msgstr "_Entfernen"
 
-#: ../libbalsa/identity.c:2041 ../libbalsa/libbalsa-gpgme-widgets.c:478
+#: ../libbalsa/identity.c:2041 ../libbalsa/libbalsa-gpgme-widgets.c:453
 msgid "disabled"
 msgstr "Deaktiviert"
 
@@ -1216,9 +1292,9 @@ msgstr "Keine Verschlüsselungsmethode für »%s« verfügbar"
 msgid "could not get data from stream"
 msgstr "Daten konnten nicht aus dem Datenstrom empfangen werden"
 
-#: ../libbalsa/libbalsa-gpgme.c:420 ../libbalsa/rfc3156.c:250
-#: ../libbalsa/rfc3156.c:255 ../libbalsa/rfc3156.c:411
-#: ../libbalsa/rfc3156.c:417
+#: ../libbalsa/libbalsa-gpgme.c:420 ../libbalsa/rfc3156.c:245
+#: ../libbalsa/rfc3156.c:250 ../libbalsa/rfc3156.c:406
+#: ../libbalsa/rfc3156.c:412
 msgid "signature verification failed"
 msgstr "Signatur konnte nicht überprüft werden"
 
@@ -1246,8 +1322,8 @@ msgstr "Signieren und Verschlüsseln fehlgeschlagen"
 msgid "encryption failed"
 msgstr "Verschlüsseln fehlgeschlagen"
 
-#: ../libbalsa/libbalsa-gpgme.c:742 ../libbalsa/rfc3156.c:319
-#: ../libbalsa/rfc3156.c:324
+#: ../libbalsa/libbalsa-gpgme.c:742 ../libbalsa/rfc3156.c:314
+#: ../libbalsa/rfc3156.c:319
 msgid "decryption failed"
 msgstr "Entschlüsselung fehlgeschlagen"
 
@@ -1371,48 +1447,48 @@ msgstr ""
 "\n"
 "Schlüssel: %s"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:108 ../libbalsa/libbalsa-gpgme-keys.c:339
+#: ../libbalsa/libbalsa-gpgme-keys.c:210 ../libbalsa/libbalsa-gpgme-keys.c:479
 msgid "error setting key list mode"
 msgstr "Fehler beim Setzen des Schlüssellistenmodus"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:114 ../libbalsa/libbalsa-gpgme-keys.c:118
-#: ../libbalsa/libbalsa-gpgme-keys.c:346 ../libbalsa/libbalsa-gpgme-keys.c:364
+#: ../libbalsa/libbalsa-gpgme-keys.c:216 ../libbalsa/libbalsa-gpgme-keys.c:220
+#: ../libbalsa/libbalsa-gpgme-keys.c:484 ../libbalsa/libbalsa-gpgme-keys.c:502
 #, c-format
 msgid "could not list keys for “%s”"
 msgstr "Schlüsselliste für »%s« konnte nicht erstellt werden"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:125
+#: ../libbalsa/libbalsa-gpgme-keys.c:227
 #, c-format
 msgid "ambiguous keys for “%s”"
 msgstr "Nicht eindeutige Schlüssel für »%s«"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:194 ../libbalsa/libbalsa-gpgme-keys.c:237
-#: ../libbalsa/libbalsa-gpgme-keys.c:411
+#: ../libbalsa/libbalsa-gpgme-keys.c:330 ../libbalsa/libbalsa-gpgme-keys.c:375
+#: ../libbalsa/libbalsa-gpgme-keys.c:590 ../libbalsa/libbalsa-gpgme-keys.c:797
 msgid "cannot create data buffer"
 msgstr "Datenpuffer konnte nicht erstellt werden"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:202
+#: ../libbalsa/libbalsa-gpgme-keys.c:338
 #, c-format
 msgid "exporting key for “%s” failed"
 msgstr "Exportieren des Schlüssels für »%s« ist fehlgeschlagen"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:262 ../libbalsa/libbalsa-gpgme-keys.c:270
+#: ../libbalsa/libbalsa-gpgme-keys.c:400 ../libbalsa/libbalsa-gpgme-keys.c:408
 #, c-format
 msgid "cannot export minimal key for “%s”"
 msgstr "Exportieren des minimalen Schlüssels für »%s« ist fehlgeschlagen"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:415
+#: ../libbalsa/libbalsa-gpgme-keys.c:594 ../libbalsa/libbalsa-gpgme-keys.c:807
 msgid "importing key data failed"
 msgstr "Importieren der Schlüsseldaten ist fehlgeschlagen"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:487
+#: ../libbalsa/libbalsa-gpgme-keys.c:676
 #, c-format
 msgid "Cannot find a key with fingerprint %s on the key server."
 msgstr ""
 "Auf dem Schlüsselserver konnte kein Schlüsselserver mit dem Fingerabdruck %s "
 "gefunden werden."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:495
+#: ../libbalsa/libbalsa-gpgme-keys.c:684
 #, c-format
 msgid ""
 "Found %u key with fingerprint %s on the key server. Please check and import "
@@ -1429,32 +1505,41 @@ msgstr[1] ""
 "gefunden. Bitte überprüfen und importieren Sie den passenden Schlüssel "
 "manuell."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:515
+#: ../libbalsa/libbalsa-gpgme-keys.c:703
 #, c-format
 msgid "Searching the key server failed: %s"
 msgstr "Durchsuchen des Schlüsselservers ist fehlgeschlagen: %s"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:554
+#: ../libbalsa/libbalsa-gpgme-keys.c:802
+#, c-format
+msgid "no data for key with fingerprint %s"
+msgstr "Keine Daten für Schlüssel mit dem Fingerabdruck %s"
+
+#: ../libbalsa/libbalsa-gpgme-keys.c:813
+msgid "reading key data failed"
+msgstr "Lesen der Schlüsseldaten ist fehlgeschlagen"
+
+#: ../libbalsa/libbalsa-gpgme-keys.c:852 ../libbalsa/libbalsa-gpgme-keys.c:1044
 msgid "error importing key"
 msgstr "Fehler beim Importieren des Schlüssels"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:589
+#: ../libbalsa/libbalsa-gpgme-keys.c:887
 msgid "No key was imported or updated."
 msgstr "Es wurde kein Schlüssel importiert oder aktualisiert."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:591
+#: ../libbalsa/libbalsa-gpgme-keys.c:889
 msgid "The key was ignored because it does not have a user ID."
 msgstr "Der Schlüssel wurde ignoriert, weil er keine Benutzerkennung hat."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:594
+#: ../libbalsa/libbalsa-gpgme-keys.c:892
 msgid "The key was imported into the local key ring."
 msgstr "Der Schlüssel wurde in den lokalen Schlüsselbund importiert."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:598
+#: ../libbalsa/libbalsa-gpgme-keys.c:896
 msgid "The key was updated in the local key ring:"
 msgstr "Der Schlüssel wurde im lokalen Schlüsselbund aktualisiert:"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:601
+#: ../libbalsa/libbalsa-gpgme-keys.c:899
 #, c-format
 msgid ""
 "\n"
@@ -1469,7 +1554,7 @@ msgstr[1] ""
 "\n"
 "• %d neue Benutzerkennungen"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:606
+#: ../libbalsa/libbalsa-gpgme-keys.c:904
 #, c-format
 msgid ""
 "\n"
@@ -1484,7 +1569,7 @@ msgstr[1] ""
 "\n"
 "• %d neue Unterschlüssel"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:611
+#: ../libbalsa/libbalsa-gpgme-keys.c:909
 #, c-format
 msgid ""
 "\n"
@@ -1499,7 +1584,7 @@ msgstr[1] ""
 "\n"
 "• %d neue Signaturen"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:617
+#: ../libbalsa/libbalsa-gpgme-keys.c:915
 #, c-format
 msgid ""
 "\n"
@@ -1514,172 +1599,172 @@ msgstr[1] ""
 "\n"
 "• %d neue Widerrufe"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:623
+#: ../libbalsa/libbalsa-gpgme-keys.c:921
 msgid "The existing key in the key ring was not changed."
 msgstr "Der vorhandene Schlüssel im Schlüsselbund wurde nicht geändert."
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:95
-#: ../libbalsa/libbalsa-gpgme-widgets.c:255
+#: ../libbalsa/libbalsa-gpgme-widgets.c:101
+#: ../libbalsa/libbalsa-gpgme-widgets.c:261
 msgid "Key status:"
 msgstr "Schlüsselstatus:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:101
-#: ../libbalsa/libbalsa-gpgme-widgets.c:108
-#: ../libbalsa/libbalsa-gpgme-widgets.c:261
-#: ../libbalsa/libbalsa-gpgme-widgets.c:269
+#: ../libbalsa/libbalsa-gpgme-widgets.c:107
+#: ../libbalsa/libbalsa-gpgme-widgets.c:114
+#: ../libbalsa/libbalsa-gpgme-widgets.c:267
+#: ../libbalsa/libbalsa-gpgme-widgets.c:275
 msgid "User ID:"
 msgstr "Benutzerkennung:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:101
-#: ../libbalsa/libbalsa-gpgme-widgets.c:261
+#: ../libbalsa/libbalsa-gpgme-widgets.c:107
+#: ../libbalsa/libbalsa-gpgme-widgets.c:267
 msgid "None"
 msgstr "Kein"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:106
-#: ../libbalsa/libbalsa-gpgme-widgets.c:267
+#: ../libbalsa/libbalsa-gpgme-widgets.c:112
+#: ../libbalsa/libbalsa-gpgme-widgets.c:273
 msgid "Primary user ID:"
 msgstr "Primäre Benutzerkennung:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:119
-#: ../libbalsa/libbalsa-gpgme-widgets.c:276
+#: ../libbalsa/libbalsa-gpgme-widgets.c:125
+#: ../libbalsa/libbalsa-gpgme-widgets.c:282
 msgid "Key owner trust:"
 msgstr "Vertrauen in Schlüsselbesitzer:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:129
-#: ../libbalsa/libbalsa-gpgme-widgets.c:283
+#: ../libbalsa/libbalsa-gpgme-widgets.c:135
+#: ../libbalsa/libbalsa-gpgme-widgets.c:289
 msgid "Additional User IDs"
 msgstr "Zusätzliche Benutzerkennungen"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:147
-#: ../libbalsa/libbalsa-gpgme-widgets.c:295
+#: ../libbalsa/libbalsa-gpgme-widgets.c:153
+#: ../libbalsa/libbalsa-gpgme-widgets.c:301
 msgid "Issuer"
 msgstr "Ausgeber"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:158
-#: ../libbalsa/libbalsa-gpgme-widgets.c:301
+#: ../libbalsa/libbalsa-gpgme-widgets.c:164
+#: ../libbalsa/libbalsa-gpgme-widgets.c:307
 msgid "Name:"
 msgstr "Name:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:162
-#: ../libbalsa/libbalsa-gpgme-widgets.c:305
+#: ../libbalsa/libbalsa-gpgme-widgets.c:168
+#: ../libbalsa/libbalsa-gpgme-widgets.c:311
 msgid "Serial number:"
 msgstr "Seriennummer:"
 
 #. Translators: x509 certificate chain ID
-#: ../libbalsa/libbalsa-gpgme-widgets.c:169
-#: ../libbalsa/libbalsa-gpgme-widgets.c:309
+#: ../libbalsa/libbalsa-gpgme-widgets.c:175
+#: ../libbalsa/libbalsa-gpgme-widgets.c:315
 msgid "Chain ID:"
 msgstr "Chain-ID:"
 
 #. add button to show the full chain - copy the fingerprint as the key may be unref'ed...
-#: ../libbalsa/libbalsa-gpgme-widgets.c:172
+#: ../libbalsa/libbalsa-gpgme-widgets.c:178
 msgid "view certificate chain…"
 msgstr "Zertifikatkette betrachten …"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:192
-#: ../libbalsa/libbalsa-gpgme-widgets.c:318
+#: ../libbalsa/libbalsa-gpgme-widgets.c:198
+#: ../libbalsa/libbalsa-gpgme-widgets.c:324
 msgid "Subkey used"
 msgstr "Genutzter Unterschlüssel"
 
 #. Translators: #1 subkey capabilities string
-#: ../libbalsa/libbalsa-gpgme-widgets.c:202
+#: ../libbalsa/libbalsa-gpgme-widgets.c:208
 #, c-format
 msgid "Subkeys (%s only)"
 msgstr "Unterschlüssel (nur %s)"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:207
+#: ../libbalsa/libbalsa-gpgme-widgets.c:213
 msgid "Subkeys"
 msgstr "Unterschlüssel"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:332
-#: ../libbalsa/libbalsa-gpgme-widgets.c:645
+#: ../libbalsa/libbalsa-gpgme-widgets.c:338
+#: ../libbalsa/libbalsa-gpgme-widgets.c:701
 #: ../src/balsa-mime-widget-vcalendar.c:184
-#: ../src/balsa-print-object-text.c:545
+#: ../src/balsa-print-object-text.c:544
 msgid "Status:"
 msgstr "Status:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:336
-#: ../libbalsa/libbalsa-gpgme-widgets.c:649
+#: ../libbalsa/libbalsa-gpgme-widgets.c:342
+#: ../libbalsa/libbalsa-gpgme-widgets.c:705
 msgid "Fingerprint:"
 msgstr "Fingerabdruck:"
 
 #. add type and filename (if available)
-#: ../libbalsa/libbalsa-gpgme-widgets.c:339
-#: ../libbalsa/libbalsa-gpgme-widgets.c:652
+#: ../libbalsa/libbalsa-gpgme-widgets.c:345
+#: ../libbalsa/libbalsa-gpgme-widgets.c:708
 #: ../src/balsa-print-object-default.c:112
 #: ../src/balsa-print-object-default.c:115
 #: ../src/balsa-print-object-default.c:118
 msgid "Type:"
 msgstr "Typ:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:345
-#: ../libbalsa/libbalsa-gpgme-widgets.c:658
+#: ../libbalsa/libbalsa-gpgme-widgets.c:351
+#: ../libbalsa/libbalsa-gpgme-widgets.c:714
 msgid "Capabilities:"
 msgstr "Fähigkeiten:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:350
-#: ../libbalsa/libbalsa-gpgme-widgets.c:663
+#: ../libbalsa/libbalsa-gpgme-widgets.c:356
+#: ../libbalsa/libbalsa-gpgme-widgets.c:719
 msgid "invalid timestamp"
 msgstr "Ungültiger Zeitstempel"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:352
-#: ../libbalsa/libbalsa-gpgme-widgets.c:665
+#: ../libbalsa/libbalsa-gpgme-widgets.c:358
+#: ../libbalsa/libbalsa-gpgme-widgets.c:721
 msgid "not available"
 msgstr "nicht verfügbar"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:356
-#: ../libbalsa/libbalsa-gpgme-widgets.c:669
+#: ../libbalsa/libbalsa-gpgme-widgets.c:362
+#: ../libbalsa/libbalsa-gpgme-widgets.c:725
 #: ../src/balsa-mime-widget-vcalendar.c:187
-#: ../src/balsa-print-object-text.c:548
+#: ../src/balsa-print-object-text.c:547
 msgid "Created:"
 msgstr "Erstellt:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:364
-#: ../libbalsa/libbalsa-gpgme-widgets.c:677
+#: ../libbalsa/libbalsa-gpgme-widgets.c:370
+#: ../libbalsa/libbalsa-gpgme-widgets.c:733
 msgid "Expires:"
 msgstr "Läuft ab am:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:396 ../src/toolbar-factory.c:142
-msgid "Close"
-msgstr "Schließen"
-
-#: ../libbalsa/libbalsa-gpgme-widgets.c:400
-msgid "No"
-msgstr "Nein"
-
-#: ../libbalsa/libbalsa-gpgme-widgets.c:400
-msgid "Yes"
-msgstr "Ja"
-
-#: ../libbalsa/libbalsa-gpgme-widgets.c:472
+#: ../libbalsa/libbalsa-gpgme-widgets.c:447
 msgid "revoked"
 msgstr "widerrufen"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:475
+#: ../libbalsa/libbalsa-gpgme-widgets.c:450
 msgid "expired"
 msgstr "verfallen"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:481
+#: ../libbalsa/libbalsa-gpgme-widgets.c:456
 msgid "invalid"
 msgstr "Ungültig"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:707
+#: ../libbalsa/libbalsa-gpgme-widgets.c:528 ../src/toolbar-factory.c:142
+msgid "Close"
+msgstr "Schließen"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:532
+msgid "No"
+msgstr "Nein"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:532
+msgid "Yes"
+msgstr "Ja"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:763
 msgid "sign"
 msgstr "signieren"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:710
+#: ../libbalsa/libbalsa-gpgme-widgets.c:766
 msgid "encrypt"
 msgstr "Verschlüsseln"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:713
+#: ../libbalsa/libbalsa-gpgme-widgets.c:769
 msgid "certify"
 msgstr "zertifizieren"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:716
+#: ../libbalsa/libbalsa-gpgme-widgets.c:772
 msgid "authenticate"
 msgstr "Legitimieren"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:737
+#: ../libbalsa/libbalsa-gpgme-widgets.c:793
 #, c-format
 msgid "%u bit"
 msgid_plural "%u bits"
@@ -1687,7 +1772,7 @@ msgstr[0] "%u Bit"
 msgstr[1] "%u Bits"
 
 #. Translators: Elliptic Curve Cryptography (ECC) curve name
-#: ../libbalsa/libbalsa-gpgme-widgets.c:744
+#: ../libbalsa/libbalsa-gpgme-widgets.c:800
 #, c-format
 msgid " curve “%s”"
 msgstr " Kurve »%s«"
@@ -2636,26 +2721,26 @@ msgctxt "ical_role"
 msgid "non-participant, information only"
 msgstr "Nicht beteiligt, nur zur Information"
 
-#: ../libbalsa/rfc3156.c:462 ../libbalsa/rfc3156.c:469
+#: ../libbalsa/rfc3156.c:457 ../libbalsa/rfc3156.c:464
 msgid "decryption and signature verification failed"
 msgstr "Entschlüsselung und Überprüfen der Signatur fehlgeschlagen"
 
-#: ../libbalsa/rfc3156.c:495
+#: ../libbalsa/rfc3156.c:490
 msgid "The signature is valid."
 msgstr "Die Signatur ist gültig."
 
-#: ../libbalsa/rfc3156.c:497
+#: ../libbalsa/rfc3156.c:492
 msgid "The signature is valid but expired."
 msgstr "Die Signatur ist gültig, jedoch abgelaufen."
 
-#: ../libbalsa/rfc3156.c:499
+#: ../libbalsa/rfc3156.c:494
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 "Die Signatur ist gültig, der zu deren Überprüfung verwendete Schlüssel ist "
 "jedoch abgelaufen."
 
-#: ../libbalsa/rfc3156.c:501
+#: ../libbalsa/rfc3156.c:496
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
@@ -2663,85 +2748,85 @@ msgstr ""
 "Die Signatur ist gültig, der zu deren Überprüfung verwendete Schlüssel ist "
 "jedoch nicht mehr gültig."
 
-#: ../libbalsa/rfc3156.c:503
+#: ../libbalsa/rfc3156.c:498
 msgid "The signature is invalid."
 msgstr "Die Signatur ist ungültig."
 
-#: ../libbalsa/rfc3156.c:505
+#: ../libbalsa/rfc3156.c:500
 msgid "The signature could not be verified due to a missing key."
 msgstr ""
 "Die Signatur konnte aufgrund eines fehlenden Schlüssels nicht überprüft "
 "werden."
 
-#: ../libbalsa/rfc3156.c:507
+#: ../libbalsa/rfc3156.c:502
 msgid "This part is not a real signature."
 msgstr "Dieser Teil ist keine gültige Signatur."
 
-#: ../libbalsa/rfc3156.c:509
+#: ../libbalsa/rfc3156.c:504
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
 "Die Signatur konnte aufgrund einer fehlerhaften Verschlüsselungsmethode "
 "nicht überprüft werden."
 
-#: ../libbalsa/rfc3156.c:511
+#: ../libbalsa/rfc3156.c:506
 msgid "The signature contains multiple signers, this may be a forgery."
 msgstr ""
 "Die Signatur enthält mehrere Unterzeichner, was auf eine mögliche Fälschung "
 "hindeutet."
 
 #. Translators: #1 error source; #2 error message
-#: ../libbalsa/rfc3156.c:518
+#: ../libbalsa/rfc3156.c:513
 #, c-format
 msgid "An error prevented the signature verification: %s: %s"
 msgstr "Ein Fehler verhinderte die Überprüfung der Signatur: %s: %s"
 
 #. Translators: #1 error message
-#: ../libbalsa/rfc3156.c:521
+#: ../libbalsa/rfc3156.c:516
 #, c-format
 msgid "An error prevented the signature verification: %s"
 msgstr "Ein Fehler verhinderte die Überprüfung der Signatur: %s"
 
-#: ../libbalsa/rfc3156.c:533
+#: ../libbalsa/rfc3156.c:528
 msgid "The user ID is of unknown validity."
 msgstr "Die Gültigkeit der Benutzerkennung ist unbekannt."
 
-#: ../libbalsa/rfc3156.c:535
+#: ../libbalsa/rfc3156.c:530
 msgid "The validity of the user ID is undefined."
 msgstr "Die Gültigkeit der Benutzerkennung wurde nicht festgelegt."
 
-#: ../libbalsa/rfc3156.c:537
+#: ../libbalsa/rfc3156.c:532
 msgid "The user ID is never valid."
 msgstr "Die Benutzerkennung ist niemals gültig."
 
-#: ../libbalsa/rfc3156.c:539
+#: ../libbalsa/rfc3156.c:534
 msgid "The user ID is marginally valid."
 msgstr "Die Benutzerkennung ist geringfügig gültig."
 
-#: ../libbalsa/rfc3156.c:541
+#: ../libbalsa/rfc3156.c:536
 msgid "The user ID is fully valid."
 msgstr "Die Benutzerkennung ist voll und ganz gültig."
 
-#: ../libbalsa/rfc3156.c:543
+#: ../libbalsa/rfc3156.c:538
 msgid "The user ID is ultimately valid."
 msgstr "Die Benutzerkennung ist ultimativ gültig."
 
-#: ../libbalsa/rfc3156.c:545 ../libbalsa/rfc3156.c:567
+#: ../libbalsa/rfc3156.c:540 ../libbalsa/rfc3156.c:562
 msgid "bad validity"
 msgstr "fehlerhafte Gültigkeit"
 
-#: ../libbalsa/rfc3156.c:557
+#: ../libbalsa/rfc3156.c:552
 msgid "undefined"
 msgstr "nicht festgelegt"
 
-#: ../libbalsa/rfc3156.c:561
+#: ../libbalsa/rfc3156.c:556
 msgid "marginal"
 msgstr "geringfügig"
 
-#: ../libbalsa/rfc3156.c:563
+#: ../libbalsa/rfc3156.c:558
 msgid "full"
 msgstr "voll und ganz"
 
-#: ../libbalsa/rfc3156.c:565
+#: ../libbalsa/rfc3156.c:560
 msgid "ultimate"
 msgstr "absolut"
 
@@ -3436,7 +3521,7 @@ msgstr "Programmstart"
 msgid "New mail notification"
 msgstr "Neue E-Mail eingetroffen"
 
-#: ../src/ab-main.c:218 ../src/ab-window.c:707
+#: ../src/ab-main.c:218 ../src/ab-window.c:705
 msgid " address book: "
 msgstr " Adressbuch: "
 
@@ -3477,7 +3562,7 @@ msgstr "Balsa-Adressbuch"
 msgid "Name"
 msgstr "Name"
 
-#: ../src/ab-window.c:192 ../src/balsa-print-object-text.c:450
+#: ../src/ab-window.c:192 ../src/balsa-print-object-text.c:449
 msgid "Email Address"
 msgstr "E-Mail-Adresse"
 
@@ -3519,7 +3604,7 @@ msgstr "einen Postverteiler"
 msgid "Could not launch %s: %s"
 msgstr "%s konnte nicht ausgeführt werden: %s"
 
-#: ../src/ab-window.c:736
+#: ../src/ab-window.c:734
 #, c-format
 msgid ""
 "Error opening address book “%s”:\n"
@@ -4221,28 +4306,28 @@ msgstr "Auf _Schlüsselserver nach diesem Schlüssel suchen"
 msgid "_Search key server for updates of this key"
 msgstr "Auf _Schlüsselserver nach Aktualisierungen dieses Schlüssels suchen"
 
-#: ../src/balsa-mime-widget-crypto.c:206
+#: ../src/balsa-mime-widget-crypto.c:204
 msgid "decrypted"
 msgstr "entschlüsselt"
 
-#: ../src/balsa-mime-widget-crypto.c:219
+#: ../src/balsa-mime-widget-crypto.c:217
 msgid "trusted signature"
 msgstr "vertrauenswürdige Signatur"
 
-#: ../src/balsa-mime-widget-crypto.c:222
+#: ../src/balsa-mime-widget-crypto.c:220
 msgid "low trust signature"
 msgstr "weniger vertrauenswürdige Signatur"
 
-#: ../src/balsa-mime-widget-crypto.c:225
+#: ../src/balsa-mime-widget-crypto.c:223
 msgid "bad signature"
 msgstr "unzureichende Signatur"
 
-#: ../src/balsa-mime-widget-crypto.c:228
+#: ../src/balsa-mime-widget-crypto.c:226
 msgid "unknown signature status"
 msgstr "unbekannter Signatur-Status"
 
 #. Translators: successful import of a GnuPG key; #1: backend message
-#: ../src/balsa-mime-widget-crypto.c:315
+#: ../src/balsa-mime-widget-crypto.c:343
 #, c-format
 msgid ""
 "Import GnuPG key:\n"
@@ -4251,20 +4336,20 @@ msgstr ""
 "GnuPG-Schlüssel importieren:\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:322
+#: ../src/balsa-mime-widget-crypto.c:350
 #, c-format
 msgid "Error importing key data: %s"
 msgstr "Fehler beim Importieren der Schlüsseldaten: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:322 ../src/sendmsg-window.c:1717
+#: ../src/balsa-mime-widget-crypto.c:350 ../src/sendmsg-window.c:1717
 msgid "unknown error"
 msgstr "Unbekannter Fehler"
 
-#: ../src/balsa-mime-widget-crypto.c:354
+#: ../src/balsa-mime-widget-crypto.c:382
 msgid "(imported)"
 msgstr "(importiert)"
 
-#: ../src/balsa-mime-widget-crypto.c:362
+#: ../src/balsa-mime-widget-crypto.c:390
 msgid "Import key into the local key ring"
 msgstr "Schlüssel in den lokalen Schlüsselbund importieren"
 
@@ -4492,59 +4577,59 @@ msgstr ""
 "wurde (umgewandelt zu %s)"
 
 #. Translators: #1 calendar message type
-#: ../src/balsa-mime-widget-vcalendar.c:67 ../src/balsa-print-object-text.c:534
+#: ../src/balsa-mime-widget-vcalendar.c:67 ../src/balsa-print-object-text.c:533
 #, c-format
 msgid "This is an iTIP calendar “%s” message."
 msgstr "Dies ist eine »%s«-Meldung eines iTip-Kalenders."
 
 #: ../src/balsa-mime-widget-vcalendar.c:182
 #: ../src/balsa-mime-widget-vcalendar.c:379
-#: ../src/balsa-print-object-text.c:543
+#: ../src/balsa-print-object-text.c:542
 msgid "Summary:"
 msgstr "Zusammenfassung:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:186
-#: ../src/balsa-print-object-text.c:547
+#: ../src/balsa-print-object-text.c:546
 msgid "Organizer:"
 msgstr "Organizer:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:188
 #: ../src/balsa-mime-widget-vcalendar.c:380
-#: ../src/balsa-print-object-text.c:549
+#: ../src/balsa-print-object-text.c:548
 msgid "Start:"
 msgstr "Start:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:189
 #: ../src/balsa-mime-widget-vcalendar.c:381
-#: ../src/balsa-print-object-text.c:550
+#: ../src/balsa-print-object-text.c:549
 msgid "End:"
 msgstr "Ende:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:193
-#: ../src/balsa-print-object-text.c:554
+#: ../src/balsa-print-object-text.c:553
 msgid "Duration:"
 msgstr "Dauer:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:199
-#: ../src/balsa-print-object-text.c:560
+#: ../src/balsa-print-object-text.c:559
 msgid "Recurrence:"
 msgstr "Wiederholung:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:203
 #: ../src/balsa-mime-widget-vcalendar.c:382
-#: ../src/balsa-print-object-text.c:564
+#: ../src/balsa-print-object-text.c:563
 msgid "Location:"
 msgstr "Ort:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:237
-#: ../src/balsa-print-object-text.c:573
+#: ../src/balsa-print-object-text.c:572
 msgid "Attendee:"
 msgid_plural "Attendees:"
 msgstr[0] "Teilnehmer:"
 msgstr[1] "Teilnehmer:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:245
-#: ../src/balsa-print-object-text.c:602
+#: ../src/balsa-print-object-text.c:601
 msgid "Category:"
 msgid_plural "Categories:"
 msgstr[0] "Kategorie:"
@@ -4552,7 +4637,7 @@ msgstr[1] "Kategorien:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:249
 #: ../src/balsa-mime-widget-vcalendar.c:383
-#: ../src/balsa-print-object-text.c:587
+#: ../src/balsa-print-object-text.c:586
 msgid "Description:"
 msgstr "Beschreibung:"
 
@@ -4596,23 +4681,23 @@ msgstr "Senden der Rückmeldung zum iTIP-Kalender ist gescheitert: %s"
 msgid "File name:"
 msgstr "Dateiname:"
 
-#: ../src/balsa-print-object-text.c:445
+#: ../src/balsa-print-object-text.c:444
 msgid "Full Name"
 msgstr "Vollständiger Name"
 
-#: ../src/balsa-print-object-text.c:446
+#: ../src/balsa-print-object-text.c:445
 msgid "Nick Name"
 msgstr "Spitzname"
 
-#: ../src/balsa-print-object-text.c:447
+#: ../src/balsa-print-object-text.c:446
 msgid "First Name"
 msgstr "Vorname"
 
-#: ../src/balsa-print-object-text.c:448
+#: ../src/balsa-print-object-text.c:447
 msgid "Last Name"
 msgstr "Nachname"
 
-#: ../src/balsa-print-object-text.c:449
+#: ../src/balsa-print-object-text.c:448
 msgid "Organization"
 msgstr "Organisation"
 
@@ -5880,7 +5965,7 @@ msgstr[1] "mit %d Nachrichten"
 #, c-format
 msgid ", %d new"
 msgid_plural ", %d new"
-msgstr[0] ", %d new"
+msgstr[0] ", %d neue"
 msgstr[1] ", %d neue"
 
 #: ../src/main-window.c:4933
@@ -6924,7 +7009,7 @@ msgid "Attach file"
 msgstr "Datei beilegen"
 
 #: ../src/sendmsg-window.c:2113 ../src/sendmsg-window.c:2189
-#: ../src/sendmsg-window.c:7136
+#: ../src/sendmsg-window.c:7138
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -7289,22 +7374,22 @@ msgstr "Nachricht konnte nicht aufgeschoben werden."
 msgid "Error starting spell checker: %s"
 msgstr "Fehler beim Starten der Rechtschreibprüfung: %s"
 
-#: ../src/sendmsg-window.c:6672
+#: ../src/sendmsg-window.c:6674
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Antwort an %s: %s"
 
-#: ../src/sendmsg-window.c:6677
+#: ../src/sendmsg-window.c:6679
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Nachricht an %s weiterleiten: %s"
 
-#: ../src/sendmsg-window.c:6681
+#: ../src/sendmsg-window.c:6683
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nachricht an %s verfassen: %s"
 
-#: ../src/sendmsg-window.c:6828 ../ui/sendmsg-window.ui.h:33
+#: ../src/sendmsg-window.c:6830 ../ui/sendmsg-window.ui.h:33
 msgid "_Language"
 msgstr "_Sprache"
 
@@ -7363,7 +7448,7 @@ msgstr "Rechtschreibüberprüfung beenden"
 
 #: ../src/spell-check.c:397
 msgid "Revert all changes and finish spell checking"
-msgstr "Alle Änderungen zurücknehmen and Überprüfungen abschließen"
+msgstr "Alle Änderungen zurücknehmen und Überprüfungen abschließen"
 
 #: ../src/spell-check.c:1024
 #, c-format

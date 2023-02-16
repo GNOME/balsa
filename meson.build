@@ -351,10 +351,10 @@ endif # compface != 'false'
 # GtkSourceView configuration
 #
 if gtksourceview
-  gsv_dep = dependency('gtksourceview-4')
+  gsv_dep = dependency('gtksourceview-5')
   balsa_deps += gsv_dep
   conf.set('HAVE_GTKSOURCEVIEW', 1,
-    description : 'Defined when GtkSourceView-4 can be used.')
+    description : 'Defined when GtkSourceView-5 can be used.')
 endif # gtksourceview
 
 # libcanberra configuration

@@ -730,7 +730,12 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 	/* might be paranoid - see note in function lbh_get_web_view_context() above */
 	webkit_settings_set_hardware_acceleration_policy(settings, WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER);
 #if WEBKIT_CHECK_VERSION(2, 32, 0)
-    g_object_set(G_OBJECT(settings), "enable-plugins", FALSE, NULL);
+    /* g_object_set(G_OBJECT(settings), "enable-plugins", FALSE, NULL); */
+    /* The property WebKitSettings:enable-plugins is deprecated and
+     * shouldn't be used anymore. It will be removed in a future
+     * version. */
+    /* webkit_settings_set_enable_plugins is deprecated and does
+     * nothing. Plugins are no longer supported. */
 #else  /* WEBKIT_CHECK_VERSION(2, 32, 0) */
     webkit_settings_set_enable_plugins(settings, FALSE);
 #endif /* WEBKIT_CHECK_VERSION(2, 32, 0) */

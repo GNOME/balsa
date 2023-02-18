@@ -247,7 +247,7 @@ lb_imap_server_info_new(LibBalsaServer *server)
     imap_handle_set_authcb(handle, G_CALLBACK(libbalsa_server_get_auth), server);
     imap_handle_set_certcb(handle, G_CALLBACK(libbalsa_server_check_cert));
     imap_handle_set_tls_mode(handle, libbalsa_server_get_security(server));
-    imap_handle_set_option(handle, IMAP_OPT_ANONYMOUS, libbalsa_server_get_try_anonymous(server));
+    imap_handle_set_auth_mode(handle, libbalsa_server_get_auth_mode(server));
     imap_handle_set_option(handle, IMAP_OPT_CLIENT_SORT, TRUE);
     /* binary fetches change encoding and the checksums, and
        signatures, disable them if we ever consider verifying message

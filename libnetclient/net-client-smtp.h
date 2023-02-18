@@ -17,6 +17,7 @@
 
 
 #include "net-client.h"
+#include "net-client-utils.h"
 
 
 G_BEGIN_DECLS
@@ -43,30 +44,6 @@ enum _NetClientSmtpError {
 	NET_CLIENT_ERROR_SMTP_AUTHFAIL			/**< Authentication failure (see RFC 4954, section 6): mechanism is too weak (534) or
 	 	 	 	 	 	 	 	 	 	 	 * credentials invalid (535). */
 };
-
-
-/** @name SMTP authentication methods
- * @{
- */
-/** RFC 4616 "PLAIN" authentication method. */
-#define NET_CLIENT_SMTP_AUTH_PLAIN			0x01U
-/** "LOGIN" authentication method. */
-#define NET_CLIENT_SMTP_AUTH_LOGIN			0x02U
-/** RFC 2195 "CRAM-MD5" authentication method. */
-#define NET_CLIENT_SMTP_AUTH_CRAM_MD5		0x04U
-/** RFC xxxx "CRAM-SHA1" authentication method. */
-#define NET_CLIENT_SMTP_AUTH_CRAM_SHA1		0x08U
-/** RFC 4752 "GSSAPI" authentication method. */
-#define NET_CLIENT_SMTP_AUTH_GSSAPI			0x10U
-/** Mask of all safe authentication methods, i.e. all methods which do not send the cleartext password. */
-#define NET_CLIENT_SMTP_AUTH_SAFE			\
-	(NET_CLIENT_SMTP_AUTH_CRAM_MD5 + NET_CLIENT_SMTP_AUTH_CRAM_SHA1 + NET_CLIENT_SMTP_AUTH_GSSAPI)
-/** Mask of all authentication methods. */
-#define NET_CLIENT_SMTP_AUTH_ALL			\
-	(NET_CLIENT_SMTP_AUTH_PLAIN + NET_CLIENT_SMTP_AUTH_LOGIN + NET_CLIENT_SMTP_AUTH_SAFE)
-/** Mask of all authentication methods which do not require a password. */
-#define NET_CLIENT_SMTP_AUTH_NO_PWD			NET_CLIENT_SMTP_AUTH_GSSAPI
-/** @} */
 
 
 /** @brief Delivery Status Notification mode
@@ -99,6 +76,23 @@ enum _NetClientSmtpDsnMode {
 typedef gssize (*NetClientSmtpSendCb)(gchar *buffer, gsize count, gpointer user_data, GError **error);
 
 
+/** @brief Probe a SMTP server
+ *
+ * @param host host name or IP address of the server to probe
+ * @param timeout_secs time-out in seconds
+ * @param result filled with the probe results
+ * @param cert_cb optional server certificate acceptance callback
+ * @param error filled with error information if probing fails
+ * @return TRUE if probing the passed server was successful, FALSE if not
+ *
+ * Probe the passed server by trying to connect to the standard ports (in this order) 465, 587 and 25.
+ *
+ * \sa https://www.rfc-editor.org/rfc/rfc8314.html#section-3.3
+ */
+gboolean net_client_smtp_probe(const gchar *host, guint timeout_secs, NetClientProbeResult *result, GCallback cert_cb,
+	GError **error);
+
+
 /** @brief Create a new SMTP network client
  *
  * @param host host name or IP address to connect
@@ -112,16 +106,14 @@ NetClientSmtp *net_client_smtp_new(const gchar *host, guint16 port, NetClientCry
 /** @brief Set allowed SMTP AUTH methods
  *
  * @param client SMTP network client object
- * @param encrypted set allowed methods for encrypted or unencrypted connections
- * @param allow_auth mask of allowed authentication methods
+ * @param auth_mode mask of allowed authentication methods
  * @return TRUE on success or FALSE on error
  *
- * Set the allowed authentication methods for the passed connection.  The default is @ref NET_CLIENT_SMTP_AUTH_ALL for encrypted and
- * @ref NET_CLIENT_SMTP_AUTH_SAFE for unencrypted connections, respectively.
+ * Set the allowed authentication methods for the passed connection.  The default is to enable all authentication methods.
  *
  * @note Call this function @em before calling net_client_smtp_connect().
  */
-gboolean net_client_smtp_allow_auth(NetClientSmtp *client, gboolean encrypted, guint allow_auth);
+gboolean net_client_smtp_set_auth_mode(NetClientSmtp *client, NetClientAuthMode auth_mode);
 
 
 /** @brief Connect a SMTP network client
@@ -132,11 +124,12 @@ gboolean net_client_smtp_allow_auth(NetClientSmtp *client, gboolean encrypted, g
  * @return TRUE on success or FALSE if the connection failed
  *
  * Connect the remote SMTP server, initialise the encryption if requested, and emit the @ref auth signal to request authentication
- * information.  Simply ignore the signal for an unauthenticated connection.
+ * information unless anonymous access has been configured by calling net_client_smtp_set_auth_mode().
  *
- * The function will try only @em one authentication method supported by the server and enabled for the current encryption state
- * (see net_client_smtp_allow_auth() and \ref NET_CLIENT_SMTP_AUTH_ALL etc.).  The priority is, from highest to lowest, GSSAPI (if
- * configured), CRAM-SHA1, CRAM-MD5, PLAIN or LOGIN.
+ * The function will try only @em one authentication method which is both supported by the server and enabled by calling
+ * net_client_smtp_set_auth_mode().  The precedence is: no authentication, GSSAPI (Kerberos), user name and password.  For the
+ * latter, the order is CRAM-SHA1, CRAM-MD5, PLAIN, or LOGIN.  It is up to the caller to ensure encryption or a connection to
+ * @c localhost if one of the plain text methods shall be used.
  *
  * In order to shut down a successfully established connection, just call <tt>g_object_unref()</tt> on the SMTP network client
  * object.

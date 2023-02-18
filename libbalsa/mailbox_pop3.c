@@ -460,7 +460,6 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer      *server,
         const gchar *host;
 	NetClientPop *pop;
 	GError *error = NULL;
-	guint allow_auth;
 
 	/* create the mailbox connection */
         security = libbalsa_server_get_security(server);
@@ -474,14 +473,8 @@ libbalsa_mailbox_pop3_startup(LibBalsaServer      *server,
 		return NULL;
 	}
 
-	/* configure the mailbox connection; allow all (including plain text) auth methods even for unencrypted connections so using
-	 * e.g. popfile on localhost is possible, i.e. the user is responsible for choosing a proper security mode */
-	allow_auth = NET_CLIENT_POP_AUTH_ALL;
-	if (mailbox_pop3->disable_apop) {
-		allow_auth &= ~NET_CLIENT_POP_AUTH_APOP;
-	}
-	net_client_pop_allow_auth(pop, TRUE, allow_auth);
-	net_client_pop_allow_auth(pop, FALSE, allow_auth);
+	/* configure the mailbox connection; allow configured auth methods */
+	net_client_pop_set_auth_mode(pop, libbalsa_server_get_auth_mode(server), mailbox_pop3->disable_apop);
 	net_client_set_timeout(NET_CLIENT(pop), 60U);
 
 	/* load client certificate if configured */

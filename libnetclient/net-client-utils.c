@@ -26,6 +26,24 @@
 #endif		/* HAVE_GSSAPI */
 
 
+gboolean
+net_client_host_reachable(const gchar *host, GError **error)
+{
+	GSocketConnectable *remote_address;
+	GNetworkMonitor *monitor;
+	gboolean success;
+
+	g_return_val_if_fail(host != NULL, FALSE);
+
+	remote_address = g_network_address_new(host, 1024U);
+	monitor = g_network_monitor_get_default();
+	success = g_network_monitor_can_reach(monitor, remote_address, NULL, error);
+	g_object_unref(remote_address);
+
+	return success;
+}
+
+
 #if defined(HAVE_GSSAPI)
 
 struct _NetClientGssCtx {
@@ -111,6 +129,41 @@ net_client_auth_plain_calc(const gchar *user, const gchar *passwd)
 }
 
 
+gchar *
+net_client_auth_anonymous_token(void)
+{
+	gchar *buffer;
+	GChecksum *hash;
+	const gchar *hash_str;
+
+	buffer = g_strdup_printf("%s@%s:%ld", g_get_user_name(), g_get_host_name(), (long) time(NULL));
+	hash = g_checksum_new(G_CHECKSUM_SHA256);
+	g_checksum_update(hash, (const guchar *) buffer, strlen(buffer));
+	g_free(buffer);
+
+	hash_str = g_checksum_get_string(hash);
+	buffer = g_base64_encode((const guchar *) hash_str, strlen(hash_str));
+	g_checksum_free(hash);
+	return buffer;
+}
+
+
+gchar *
+net_client_host_only(const gchar *host_and_port)
+{
+	gchar *result;
+	gchar *colon;
+
+	g_return_val_if_fail(host_and_port != NULL, NULL);
+	result = g_strdup(host_and_port);
+	colon = strchr(result, ':');
+	if (colon != NULL) {
+		colon[0] = '\0';
+	}
+	return result;
+}
+
+
 void
 net_client_free_authstr(gchar *str)
 {
@@ -137,7 +190,7 @@ net_client_gss_ctx_new(const gchar *service, const gchar *host, const gchar *use
     OM_uint32 maj_stat;
     OM_uint32 min_stat;
 
-    g_return_val_if_fail((service != NULL) && (host != NULL), NULL);
+    g_return_val_if_fail((service != NULL) && (host != NULL) && (user != NULL), NULL);
 
 	gss_ctx = g_new0(NetClientGssCtx, 1U);
 	service_str = g_strconcat(service, "@", host, NULL);

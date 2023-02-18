@@ -764,6 +764,7 @@ lbs_process_queue_init_session(LibBalsaServer* server)
 		// FIXME - submission (587) is the standard, but most isp's use 25...
 		session = net_client_smtp_new(host, 587U, security);
 	}
+	net_client_smtp_set_auth_mode(session, libbalsa_server_get_auth_mode(server));
 
 	/* connect signals */
 	g_signal_connect(session, "cert-check", G_CALLBACK(libbalsa_server_check_cert), session);

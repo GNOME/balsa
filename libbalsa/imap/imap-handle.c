@@ -80,6 +80,7 @@ imap_mbox_handle_init(ImapMboxHandle *handle)
                                                NULL, NULL);
   handle->state = IMHS_DISCONNECTED;
   handle->tls_mode = NET_CLIENT_CRYPT_STARTTLS;
+  handle->auth_mode = NET_CLIENT_AUTH_USER_PASS | NET_CLIENT_AUTH_KERBEROS;
   handle->idle_state = IDLE_INACTIVE;
   handle->enable_idle = 1;
 
@@ -166,7 +167,6 @@ void
 imap_handle_set_option(ImapMboxHandle *h, ImapOption opt, gboolean state)
 {
   switch(opt) {
-  case IMAP_OPT_ANONYMOUS:   h->enable_anonymous   = !!state; break;
   case IMAP_OPT_BINARY:      h->enable_binary      = !!state; break;
   case IMAP_OPT_CLIENT_SORT: h->enable_client_sort = !!state; break;
   case IMAP_OPT_COMPRESS:    h->enable_compress    = !!state; break;
@@ -606,13 +606,24 @@ imap_handle_force_disconnect(ImapMboxHandle *h)
 }
 
 NetClientCryptMode
-imap_handle_set_tls_mode(ImapMboxHandle* r, NetClientCryptMode state)
+imap_handle_set_tls_mode(ImapMboxHandle* h, NetClientCryptMode state)
 {
   NetClientCryptMode res;
-  g_return_val_if_fail(r,0);
-  res = r->tls_mode;
-  r->tls_mode = state;
+  g_return_val_if_fail(h,0);
+  res = h->tls_mode;
+  h->tls_mode = state;
   return res;
+}
+
+NetClientAuthMode
+imap_handle_set_auth_mode(ImapMboxHandle *h, NetClientAuthMode mode)
+{
+	NetClientAuthMode res;
+
+	g_return_val_if_fail(h != NULL, 0U);
+	res = h->auth_mode;
+	h->auth_mode = mode;
+	return res;
 }
 
 const char* imap_msg_flags[6] = { 
@@ -4427,4 +4438,108 @@ const char*
 mbox_view_get_str(MboxView *mv)
 {
   return mv->filter_str ? mv->filter_str : "";
+}
+
+gboolean
+imap_server_probe(const gchar *host, guint timeout_secs, NetClientProbeResult *result, GCallback cert_cb, GError **error)
+{
+	guint16 probe_ports[] = {993U, 143U, 0U};		/* imaps, imap */
+	gchar *host_only;
+	gboolean retval = FALSE;
+	gint check_id;
+
+	/* paranoia check */
+	g_return_val_if_fail((host != NULL) && (result != NULL), FALSE);
+
+	host_only = net_client_host_only(host);
+
+	if (!net_client_host_reachable(host_only, error)) {
+		g_free(host_only);
+		return FALSE;
+	}
+
+	for (check_id = 0; !retval && (probe_ports[check_id] > 0U); check_id++) {
+		ImapMboxHandle *handle;
+
+		g_debug("%s: probing %s:%u…", __func__, host_only, probe_ports[check_id]);
+		handle = imap_mbox_handle_new();
+		handle->sio = net_client_siobuf_new(host_only, probe_ports[check_id]);
+		net_client_set_timeout(NET_CLIENT(handle->sio), timeout_secs);
+		if (net_client_connect(NET_CLIENT(handle->sio), NULL)) {
+			gboolean this_success;
+			ImapResponse resp;
+			gboolean can_starttls = FALSE;
+
+			if (cert_cb != NULL) {
+				g_signal_connect(handle->sio, "cert-check", cert_cb, handle->sio);
+			}
+			if (check_id == 0) {	/* imaps */
+				this_success = net_client_start_tls(NET_CLIENT(handle->sio), NULL);
+			} else {
+				this_success = TRUE;
+			}
+
+			/* get the server greeting and initialise the capabilities */
+			if (this_success) {
+				handle->state = IMHS_CONNECTED;
+				resp = imap_cmd_step(handle, 0);
+				if (resp != IMR_UNTAGGED) {
+					imap_handle_disconnect(handle);
+					this_success = FALSE;
+				} else {
+					/* fetch capabilities */
+					can_starttls = imap_mbox_handle_can_do(handle, IMCAP_STARTTLS) != 0;
+				}
+			}
+
+			/* try to perform STARTTLS if supported */
+			if (this_success && can_starttls) {
+				can_starttls = FALSE;
+				resp = imap_cmd_exec(handle, "StartTLS");
+				if (resp == IMR_OK) {
+					if (net_client_start_tls(NET_CLIENT(handle->sio), NULL)) {
+						handle->has_capabilities = 0;
+						can_starttls = TRUE;
+					}
+				}
+			}
+
+			/* evaluate on success */
+			if (this_success) {
+				result->port = probe_ports[check_id];
+
+				if (check_id == 0) {
+					result->crypt_mode = NET_CLIENT_CRYPT_ENCRYPTED;
+				} else if (can_starttls) {
+					result->crypt_mode = NET_CLIENT_CRYPT_STARTTLS;
+				} else {
+					result->crypt_mode = NET_CLIENT_CRYPT_NONE;
+				}
+
+				result->auth_mode = 0U;
+				if (imap_mbox_handle_can_do(handle, IMCAP_AANONYMOUS) != 0) {
+					result->auth_mode |= NET_CLIENT_AUTH_NONE_ANON;
+				}
+				if ((imap_mbox_handle_can_do(handle, IMCAP_ACRAM_MD5) != 0) ||
+					(imap_mbox_handle_can_do(handle, IMCAP_APLAIN) != 0)) {
+					result->auth_mode |= NET_CLIENT_AUTH_USER_PASS;
+				}
+				if (imap_mbox_handle_can_do(handle, IMCAP_AGSSAPI) != 0) {
+					result->auth_mode |= NET_CLIENT_AUTH_KERBEROS;
+				}
+				retval = TRUE;
+			}
+		}
+
+		g_object_unref(handle);
+	}
+
+	if (!retval) {
+		g_set_error(error, NET_CLIENT_ERROR_QUARK, NET_CLIENT_PROBE_FAILED,
+			_("the server %s does not offer the IMAP service at port 993 or 143"), host_only);
+	}
+
+	g_free(host_only);
+
+	return retval;
 }

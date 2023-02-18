@@ -115,6 +115,8 @@ struct _ImapMboxHandle {
   guint idle_enable_id; /* callback to issue IDLE after a period of
                            inactivity */
   NetClientCryptMode tls_mode; /* disabled, enabled, required */
+  NetClientAuthMode auth_mode;
+
   enum { IDLE_INACTIVE, IDLE_RESPONSE_PENDING, IDLE_ACTIVE }
     idle_state; /*  IDLE State? */
   unsigned op_cancelled:1; /* last op timed out and was cancelled by user */
@@ -122,7 +124,6 @@ struct _ImapMboxHandle {
   unsigned can_fetch_body:1; /* set for servers that always respond
                               * correctly to FETCH x BODY[y]
                               * requests. */
-  unsigned enable_anonymous:1;   /**< try anonymous if possible */
   unsigned enable_binary:1;      /**< enable binary extension */
   unsigned enable_client_sort:1; /**< client side sorting allowed */
   unsigned enable_compress:1; /**< enable compress extension */

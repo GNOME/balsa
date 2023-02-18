@@ -42,7 +42,7 @@ imap_auth_cram(ImapMboxHandle* handle)
   if (!imap_mbox_handle_can_do(handle, IMCAP_ACRAM_MD5))
     return IMAP_AUTH_UNAVAIL;
 
-  g_signal_emit_by_name(handle->sio, "auth", TRUE, &auth_data);
+  g_signal_emit_by_name(handle->sio, "auth", NET_CLIENT_AUTH_USER_PASS, &auth_data);
   if((auth_data == NULL) || (auth_data[0] == NULL) || (auth_data[1] == NULL)) {
     imap_mbox_handle_set_msg(handle, _("Authentication cancelled"));
 	g_strfreev(auth_data);

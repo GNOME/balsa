@@ -3,7 +3,7 @@ dnl follow section 5.3 of Autoconf, Automake book.
 dnl
 dnl 1. Boilerplate.
 dnl
-AC_PREREQ([2.71])
+AC_PREREQ([2.69])
 dnl ###########################################################################
 dnl Boilerplace and versioning
 dnl ###########################################################################

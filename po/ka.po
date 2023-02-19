@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-02-06 19:05+0000\n"
-"PO-Revision-Date: 2023-02-07 09:14+0100\n"
+"POT-Creation-Date: 2023-02-18 21:13+0000\n"
+"PO-Revision-Date: 2023-02-19 06:42+0100\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: \n"
 "Language: ka\n"
@@ -304,8 +304,8 @@ msgstr "ბაზის ავტომატური დაშიფვრა"
 
 #: ../libbalsa/autocrypt.c:479 ../libbalsa/html.c:459
 #: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
-#: ../libbalsa/libbalsa-gpgme-widgets.c:825 ../src/ab-window.c:148
-#: ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
+#: ../libbalsa/libbalsa-gpgme-widgets.c:825 ../libbalsa/server-config.c:545
+#: ../src/ab-window.c:148 ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
 #: ../src/main-window.c:3934 ../src/toolbar-prefs.c:130
 #: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
 #: ../ui/sendmsg-window.ui.h:12 ../ui/source-viewer.ui.h:2
@@ -559,7 +559,8 @@ msgstr ""
 
 #: ../libbalsa/gmime-gpgme-signature.c:239 ../libbalsa/imap/imap-handle.c:46
 #: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:550
-#: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5364
+#: ../libbalsa/server-config.c:552 ../src/folder-conf.c:411
+#: ../src/sendmsg-window.c:5364
 msgid "unknown"
 msgstr "unknown"
 
@@ -710,7 +711,7 @@ msgid "Signature in “%s” is not a UTF-8 text."
 msgstr "ხელმოწერა \"%s\"-ში UTF-8 ტექსტი არაა."
 
 #: ../libbalsa/identity.c:368 ../libbalsa/libbalsa-gpgme-cb.c:184
-#: ../libbalsa/libbalsa-gpgme-cb.c:363 ../libbalsa/smtp-server.c:327
+#: ../libbalsa/libbalsa-gpgme-cb.c:363 ../libbalsa/smtp-server.c:334
 #: ../src/ab-main.c:849 ../src/ab-window.c:141 ../src/address-book-config.c:240
 #: ../src/address-book-config.c:346 ../src/address-book-config.c:392
 #: ../src/balsa-app.c:94 ../src/balsa-app.c:163 ../src/balsa-index.c:2793
@@ -731,7 +732,7 @@ msgid "_Cancel"
 msgstr "გაუქმება"
 
 #: ../libbalsa/identity.c:369 ../libbalsa/libbalsa-gpgme-cb.c:183
-#: ../libbalsa/libbalsa-gpgme-cb.c:362 ../libbalsa/smtp-server.c:326
+#: ../libbalsa/libbalsa-gpgme-cb.c:362 ../libbalsa/smtp-server.c:333
 #: ../src/ab-window.c:140 ../src/balsa-app.c:95 ../src/balsa-app.c:162
 #: ../src/balsa-message.c:1760 ../src/balsa-mime-widget-callbacks.c:86
 #: ../src/filter-edit-callbacks.c:1237 ../src/filter-edit-dialog.c:573
@@ -747,7 +748,7 @@ msgstr "_დიახ"
 msgid "Current"
 msgstr "მიმდინარე"
 
-#: ../libbalsa/identity.c:643 ../libbalsa/smtp-server.c:140
+#: ../libbalsa/identity.c:643 ../libbalsa/smtp-server.c:147
 msgid "Default"
 msgstr "ნაგულისხმები"
 
@@ -850,7 +851,7 @@ msgstr "_ხელმოწერის გამყოფის დამატ
 
 #: ../libbalsa/identity.c:929
 msgid "Prepend si_gnature"
-msgstr ""
+msgstr "_ხელმოწერის მიწერა"
 
 #: ../libbalsa/identity.c:934
 msgid "Security"
@@ -904,7 +905,7 @@ msgstr "არჩევა…"
 #: ../libbalsa/identity.c:1146
 #, c-format
 msgid "Error reading file %s: %s"
-msgstr ""
+msgstr "ფაილის \"%s\" წაკითხვის შეცდომა: %s"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/identity.c:1156
@@ -922,7 +923,7 @@ msgstr ""
 #: ../libbalsa/identity.c:1186 ../src/balsa-message.c:1582
 #, c-format
 msgid "Error loading Face: %s"
-msgstr ""
+msgstr "სახის ჩატვირთვის შეცდომა: %s"
 
 #: ../libbalsa/identity.c:1365
 msgid "Error: The identity does not have a name"
@@ -945,7 +946,7 @@ msgstr ""
 msgid "Manage Identities"
 msgstr ""
 
-#: ../libbalsa/identity.c:1654 ../libbalsa/smtp-server.c:328
+#: ../libbalsa/identity.c:1654 ../libbalsa/smtp-server.c:335
 #: ../src/address-book-config.c:241 ../src/address-book-config.c:344
 #: ../src/address-book-config.c:390 ../src/filter-edit-callbacks.c:1239
 #: ../src/filter-edit-dialog.c:575 ../src/filter-export-dialog.c:81
@@ -991,8 +992,8 @@ msgstr ""
 msgid "GpgSM S/MIME mode"
 msgstr ""
 
-#: ../libbalsa/imap/auth-cram.c:47 ../libbalsa/imap/imap-auth.c:91
-#: ../libbalsa/imap/imap-auth.c:142
+#: ../libbalsa/imap/auth-cram.c:47 ../libbalsa/imap/imap-auth.c:92
+#: ../libbalsa/imap/imap-auth.c:143
 msgid "Authentication cancelled"
 msgstr "ავთენტიკაცია გაუქმდა"
 
@@ -1009,7 +1010,7 @@ msgstr ""
 msgid "No way to authenticate is known"
 msgstr ""
 
-#: ../libbalsa/imap/imap-auth.c:98
+#: ../libbalsa/imap/imap-auth.c:99
 msgid "Cannot LOGIN with UTF-8 username or password"
 msgstr ""
 
@@ -1021,26 +1022,31 @@ msgstr ""
 msgid "Bug in implementation of SORT command on IMAP server exposed."
 msgstr ""
 
-#: ../libbalsa/imap/imap-handle.c:671
+#: ../libbalsa/imap/imap-handle.c:682
 #, c-format
 msgid "Connecting %s failed: %s"
 msgstr ""
 
-#: ../libbalsa/imap/imap-handle.c:684 ../libbalsa/imap/imap-handle.c:704
+#: ../libbalsa/imap/imap-handle.c:695 ../libbalsa/imap/imap-handle.c:715
 #, c-format
 msgid "TLS negotiation failed: %s"
 msgstr ""
 
-#: ../libbalsa/imap/imap-handle.c:710
+#: ../libbalsa/imap/imap-handle.c:721
 msgid "TLS required but not available"
 msgstr ""
 
 #. it is not we, so it must be the server
-#: ../libbalsa/imap/imap-handle.c:2298 ../libbalsa/imap/imap-handle.c:2316
-#: ../libbalsa/imap/imap-handle.c:2332 ../libbalsa/imap/imap-handle.c:2363
+#: ../libbalsa/imap/imap-handle.c:2309 ../libbalsa/imap/imap-handle.c:2327
+#: ../libbalsa/imap/imap-handle.c:2343 ../libbalsa/imap/imap-handle.c:2374
 #, c-format
 msgid "IMAP response: %s"
 msgstr "IMAP პასუხი: %s"
+
+#: ../libbalsa/imap/imap-handle.c:4539
+#, c-format
+msgid "the server %s does not offer the IMAP service at port 993 or 143"
+msgstr ""
 
 #. IMAP host name + message
 #: ../libbalsa/imap-server.c:213
@@ -1083,23 +1089,23 @@ msgstr ""
 
 #: ../libbalsa/information.c:179
 msgid "do not show again"
-msgstr ""
+msgstr "აღარ მაჩვენო"
 
 #: ../libbalsa/libbalsa.c:406
 msgid "broken TLS certificate"
-msgstr ""
+msgstr "გაფუჭებული TLS სერთიფიკატი"
 
 #: ../libbalsa/libbalsa.c:410
 msgid "SSL/TLS certificate"
-msgstr ""
+msgstr "SSL/TLS სერტიფიკატი"
 
 #: ../libbalsa/libbalsa.c:414
 msgid "_Accept Once"
-msgstr ""
+msgstr "_ერთხელ მიღება"
 
 #: ../libbalsa/libbalsa.c:415
 msgid "Accept & _Save"
-msgstr ""
+msgstr "მიღება და _შენახვა"
 
 #: ../libbalsa/libbalsa.c:416
 msgid "_Reject"
@@ -1124,15 +1130,15 @@ msgstr ""
 
 #: ../libbalsa/libbalsa.c:461
 msgid "the certificate’s activation time is still in the future"
-msgstr ""
+msgstr "სერტიფიკატის აქტივაციის დრო ჯერ კიდევ მომავალშია"
 
 #: ../libbalsa/libbalsa.c:462
 msgid "the certificate has expired"
-msgstr ""
+msgstr "სერტიფიკატი ვადაგასულია"
 
 #: ../libbalsa/libbalsa.c:463
 msgid "the certificate has been revoked"
-msgstr ""
+msgstr "სერტიფიკატი გაუქმებულია"
 
 #: ../libbalsa/libbalsa.c:464
 msgid "the certificate’s algorithm is considered insecure"
@@ -1155,12 +1161,12 @@ msgstr ""
 #: ../libbalsa/libbalsa.c:594
 #, c-format
 msgid "Invalid input format"
-msgstr ""
+msgstr "არასწორი შეყვანის ფორმატი"
 
 #: ../libbalsa/libbalsa.c:598
 #, c-format
 msgid "Internal buffer overrun"
-msgstr ""
+msgstr "შიდა ბუფერის გადავსება"
 
 #. Translators: please do not translate Face.
 #: ../libbalsa/libbalsa.c:615
@@ -1538,7 +1544,7 @@ msgstr "სერიული ნომერი:"
 #: ../libbalsa/libbalsa-gpgme-widgets.c:175
 #: ../libbalsa/libbalsa-gpgme-widgets.c:315
 msgid "Chain ID:"
-msgstr ""
+msgstr "ჯაჭვის ID:"
 
 #. add button to show the full chain - copy the fingerprint as the key may be unref'ed...
 #: ../libbalsa/libbalsa-gpgme-widgets.c:178
@@ -1548,7 +1554,7 @@ msgstr ""
 #: ../libbalsa/libbalsa-gpgme-widgets.c:198
 #: ../libbalsa/libbalsa-gpgme-widgets.c:324
 msgid "Subkey used"
-msgstr ""
+msgstr "გამოყენებული ქვეგასაღები"
 
 #. Translators: #1 subkey capabilities string
 #: ../libbalsa/libbalsa-gpgme-widgets.c:208
@@ -2005,54 +2011,54 @@ msgstr ""
 msgid "Error appending message %d from %s to %s: %s"
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:493 ../libbalsa/send.c:779
+#: ../libbalsa/mailbox_pop3.c:486 ../libbalsa/send.c:780
 #, c-format
 msgid "Cannot load certificate file %s: %s"
 msgstr ""
 
 #. connect server
-#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1024
+#: ../libbalsa/mailbox_pop3.c:503 ../libbalsa/send.c:1025
 #, c-format
 msgid "Connecting %s…"
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:512
+#: ../libbalsa/mailbox_pop3.c:505
 #, c-format
 msgid "POP3 mailbox %s: cannot connect %s: %s"
 msgstr ""
 
 #. load message list
-#: ../libbalsa/mailbox_pop3.c:525
+#: ../libbalsa/mailbox_pop3.c:518
 msgid "List messages…"
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:702
+#: ../libbalsa/mailbox_pop3.c:520 ../libbalsa/mailbox_pop3.c:695
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:574
+#: ../libbalsa/mailbox_pop3.c:567
 #, c-format
 msgid "POP3 mailbox %s: message %d oversized: %s — skipped."
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:650 ../libbalsa/send.c:1034
+#: ../libbalsa/mailbox_pop3.c:643 ../libbalsa/send.c:1035
 #, c-format
 msgid "Connected to %s"
 msgstr "მიერთებულია %s-თან"
 
-#: ../libbalsa/mailbox_pop3.c:666
+#: ../libbalsa/mailbox_pop3.c:659
 #, c-format
 msgid "%lu new message (%s)"
 msgid_plural "%lu new messages (%s)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/mailbox_pop3.c:677
+#: ../libbalsa/mailbox_pop3.c:670
 msgid "Deleting messages on server…"
 msgstr ""
 
-#: ../libbalsa/mailbox_pop3.c:712 ../libbalsa/send.c:1115
+#: ../libbalsa/mailbox_pop3.c:705 ../libbalsa/send.c:1116
 msgid "Finished"
 msgstr "დასრულებულია"
 
@@ -2729,179 +2735,236 @@ msgstr ""
 msgid "Cannot reach SMTP server %s (%s), any queued message will remain in %s."
 msgstr ""
 
-#: ../libbalsa/send.c:832
+#: ../libbalsa/send.c:833
 msgid "Sending Mail"
 msgstr "ელფოსტის გაგზავნა"
 
-#: ../libbalsa/send.c:942
+#: ../libbalsa/send.c:943
 #, c-format
 msgid "Save message in %s…"
 msgstr ""
 
-#: ../libbalsa/send.c:950
+#: ../libbalsa/send.c:951
 #, c-format
 msgid "Saving sent message to %s failed: %s"
 msgstr ""
 
-#: ../libbalsa/send.c:987
+#: ../libbalsa/send.c:988
 #, c-format
 msgid ""
 "Sending message to SMTP server %s failed: %s\n"
 "Message left in your outbox."
 msgstr ""
 
-#: ../libbalsa/send.c:1099
+#: ../libbalsa/send.c:1100
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr ""
 
-#: ../libbalsa/send.c:1118
+#: ../libbalsa/send.c:1119
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/send.c:1269 ../libbalsa/send.c:1337
+#: ../libbalsa/send.c:1270 ../libbalsa/send.c:1338
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr ""
 
-#: ../libbalsa/send.c:1272 ../libbalsa/send.c:1340
+#: ../libbalsa/send.c:1273 ../libbalsa/send.c:1341
 #, c-format
 msgid "Cannot read %s"
 msgstr ""
 
-#: ../libbalsa/send.c:1304
+#: ../libbalsa/send.c:1305
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
 msgstr ""
 
-#: ../libbalsa/send.c:1838 ../libbalsa/send.c:1936
+#: ../libbalsa/send.c:1839 ../libbalsa/send.c:1937
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libbalsa/server.c:332
+#: ../libbalsa/server.c:340
 msgid "Balsa passwords"
 msgstr ""
 
-#: ../libbalsa/server.c:338
+#: ../libbalsa/server.c:346
 #, c-format
 msgid "Error storing password for %s@%s:%s: %s"
 msgstr ""
 
-#: ../libbalsa/server.c:360
+#: ../libbalsa/server.c:368
 #, c-format
 msgid "Error looking up password for %s@%s:%s: %s"
 msgstr ""
 
-#: ../libbalsa/server.c:366
+#: ../libbalsa/server.c:374
 msgid "loaded fallback password from private config file"
 msgstr ""
 
-#: ../libbalsa/server-config.c:75
+#: ../libbalsa/server-config.c:90
 msgid "_Remember user password in Secret Service"
 msgstr ""
 
-#: ../libbalsa/server-config.c:76
+#: ../libbalsa/server-config.c:91
 msgid "_Remember certificate pass phrase in Secret Service"
 msgstr ""
 
-#: ../libbalsa/server-config.c:80
+#: ../libbalsa/server-config.c:95
 msgid "_Remember user password"
 msgstr ""
 
-#: ../libbalsa/server-config.c:81
+#: ../libbalsa/server-config.c:96
 msgid "_Remember certificate pass phrase"
 msgstr ""
 
-#: ../libbalsa/server-config.c:103
+#: ../libbalsa/server-config.c:118
 msgid "_Basic"
 msgstr "_ძირითადი"
 
 #. server descriptive name
-#: ../libbalsa/server-config.c:106
+#: ../libbalsa/server-config.c:121
 msgid "_Descriptive Name:"
 msgstr ""
 
+#: ../libbalsa/server-config.c:126
+msgid "probe…"
+msgstr ""
+
 #. host and port
-#: ../libbalsa/server-config.c:110
+#: ../libbalsa/server-config.c:141
 msgid "_Server:"
 msgstr "_სერვერი:"
 
-#: ../libbalsa/server-config.c:116
+#: ../libbalsa/server-config.c:146
 msgid "Se_curity:"
 msgstr ""
 
-#: ../libbalsa/server-config.c:123
-msgid "Server requires _authentication"
-msgstr ""
+#: ../libbalsa/server-config.c:151
+msgid "_Authentication:"
+msgstr "_ავთენტიკაცია:"
 
 #. user name and password
-#: ../libbalsa/server-config.c:129
+#: ../libbalsa/server-config.c:155
 msgid "_User Name:"
 msgstr "_მომხმარებლის სახელი:"
 
-#: ../libbalsa/server-config.c:133
+#: ../libbalsa/server-config.c:159
 msgid "_Pass Phrase:"
 msgstr ""
 
-#: ../libbalsa/server-config.c:146
+#: ../libbalsa/server-config.c:172
 msgid "_Advanced"
 msgstr "_დამატებით"
 
 #. client certificate and passphrase
-#: ../libbalsa/server-config.c:149
+#: ../libbalsa/server-config.c:175
 msgid "Server _requires client certificate"
 msgstr ""
 
-#: ../libbalsa/server-config.c:152
+#: ../libbalsa/server-config.c:178
 msgid "Choose Client Certificate"
 msgstr ""
 
-#: ../libbalsa/server-config.c:153
+#: ../libbalsa/server-config.c:179
 msgid "Certificate _File:"
 msgstr ""
 
-#: ../libbalsa/server-config.c:161
+#: ../libbalsa/server-config.c:188
 msgid "Certificate _Pass Phrase:"
 msgstr ""
 
-#: ../libbalsa/server-config.c:371
+#: ../libbalsa/server-config.c:404
 #, c-format
 msgid "%s over SSL (%sS)"
 msgstr ""
 
-#: ../libbalsa/server-config.c:375 ../libinit_balsa/assistant_page_user.c:69
+#: ../libbalsa/server-config.c:408
 msgid "TLS required"
 msgstr ""
 
-#: ../libbalsa/server-config.c:376 ../libinit_balsa/assistant_page_user.c:70
+#: ../libbalsa/server-config.c:409
 msgid "TLS if possible (not recommended)"
 msgstr ""
 
-#: ../libbalsa/server-config.c:377 ../libinit_balsa/assistant_page_user.c:71
+#: ../libbalsa/server-config.c:410
 msgid "None (not recommended)"
 msgstr ""
 
-#: ../libbalsa/smtp-server.c:246
+#: ../libbalsa/server-config.c:426
+msgid "anonymous access"
+msgstr ""
+
+#: ../libbalsa/server-config.c:428
+msgid "none required"
+msgstr ""
+
+#: ../libbalsa/server-config.c:430 ../libbalsa/server-config.c:529
+msgid "user name and pass phrase"
+msgstr ""
+
+#: ../libbalsa/server-config.c:432 ../libbalsa/server-config.c:526
+msgid "Kerberos (GSSAPI)"
+msgstr ""
+
+#: ../libbalsa/server-config.c:516
+msgid "yes (SSL/TLS)"
+msgstr ""
+
+#: ../libbalsa/server-config.c:519
+msgid "yes (STARTTLS)"
+msgstr ""
+
+#: ../libbalsa/server-config.c:522
+msgid "no"
+msgstr "არა"
+
+#: ../libbalsa/server-config.c:532
+msgid "none"
+msgstr "არცერთი"
+
+#: ../libbalsa/server-config.c:539
+#, c-format
+msgid ""
+"Probe results for server %s\n"
+"• Port: %u\n"
+"• Encryption: %s\n"
+"• Authentication: %s\n"
+msgstr ""
+
+#: ../libbalsa/server-config.c:544 ../src/ab-main.c:839
+#: ../src/address-book-config.c:229 ../src/address-book-config.c:335
+#: ../src/address-book-config.c:379 ../src/filter-edit-dialog.c:500
+#: ../src/main-window.c:3990 ../src/pref-manager.c:3331
+msgid "_Apply"
+msgstr "_გადატარება"
+
+#: ../libbalsa/server-config.c:551
+#, c-format
+msgid "Error probing server %s: %s"
+msgstr "შეცდომა სერვერის '%s' შემოწმებისას: %s"
+
+#: ../libbalsa/smtp-server.c:253
 #, c-format
 msgid "Error displaying server help: %s\n"
 msgstr ""
 
-#: ../libbalsa/smtp-server.c:322
+#: ../libbalsa/smtp-server.c:329
 msgid "SMTP Server"
 msgstr ""
 
 #. split large messages
-#: ../libbalsa/smtp-server.c:348
+#: ../libbalsa/smtp-server.c:355
 msgid "Sp_lit message larger than"
 msgstr ""
 
-#: ../libbalsa/smtp-server.c:352 ../src/pref-manager.c:2167
+#: ../libbalsa/smtp-server.c:359 ../src/pref-manager.c:2167
 msgid "MB"
 msgstr "მბ"
 
@@ -2976,22 +3039,22 @@ msgstr ""
 msgid "Couldn’t create a directory: mkdir() failed on pathname “%s”."
 msgstr ""
 
-#: ../libinit_balsa/assistant_init.c:49
+#: ../libinit_balsa/assistant_init.c:50
 msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
 msgstr ""
 
-#: ../libinit_balsa/assistant_init.c:69
+#: ../libinit_balsa/assistant_init.c:70
 msgid "GnomeCard Address Book"
 msgstr ""
 
-#: ../libinit_balsa/assistant_init.c:76 ../libinit_balsa/assistant_init.c:84
+#: ../libinit_balsa/assistant_init.c:77 ../libinit_balsa/assistant_init.c:85
 #: ../src/ab-window.c:243
 msgid "Address Book"
 msgstr "მისამართების წიგნი"
 
-#: ../libinit_balsa/assistant_init.c:134
+#: ../libinit_balsa/assistant_init.c:136
 msgid "Configure Balsa"
 msgstr ""
 
@@ -3081,79 +3144,32 @@ msgstr ""
 #: ../libinit_balsa/assistant_page_user.c:55
 msgid ""
 "The following settings are also needed (and you can find them later, if need "
-"be, in the Email application in the “Preferences” and “Identities” menu "
-"items)"
-msgstr ""
-
-#: ../libinit_balsa/assistant_page_user.c:61
-msgid ""
-" Whoever provides your email account should be able to give you the "
-"following information (if you have a Network Administrator, they may already "
-"have set this up for you):"
-msgstr ""
-
-#: ../libinit_balsa/assistant_page_user.c:68
-msgid "SSL"
-msgstr "SSL"
-
-#: ../libinit_balsa/assistant_page_user.c:74
-msgid "Yes, remember it"
-msgstr ""
-
-#: ../libinit_balsa/assistant_page_user.c:74
-msgid "No, type it in every time"
-msgstr ""
-
-#: ../libinit_balsa/assistant_page_user.c:105
-msgid "Name of mail server for incoming _mail:"
-msgstr ""
-
-#: ../libinit_balsa/assistant_page_user.c:110
-msgid "_Type of mail server:"
-msgstr ""
-
-#: ../libinit_balsa/assistant_page_user.c:114
-msgid "Connection _Security:"
-msgstr ""
-
-#: ../libinit_balsa/assistant_page_user.c:118
-msgid "Your email _login name:"
-msgstr ""
-
-#: ../libinit_balsa/assistant_page_user.c:121
-msgid "Your _password:"
-msgstr ""
-
-#: ../libinit_balsa/assistant_page_user.c:128
-msgid "_SMTP Server:"
+"be, in the Email application in the “Edit ⏵ Preferences ⏵ Identities…” menu "
+"item)"
 msgstr ""
 
 #. 2.1
-#: ../libinit_balsa/assistant_page_user.c:132
+#: ../libinit_balsa/assistant_page_user.c:79
 msgid "Your real _name:"
 msgstr ""
 
-#: ../libinit_balsa/assistant_page_user.c:138
+#: ../libinit_balsa/assistant_page_user.c:84
 msgid "Your _email address for this email account:"
 msgstr ""
 
-#: ../libinit_balsa/assistant_page_user.c:143
-msgid "_Remember your password:"
-msgstr ""
-
-#: ../libinit_balsa/assistant_page_user.c:148
+#: ../libinit_balsa/assistant_page_user.c:88
 msgid "_Local mail directory:"
 msgstr ""
 
-#: ../libinit_balsa/assistant_page_user.c:166
+#: ../libinit_balsa/assistant_page_user.c:107
 msgid "User Settings"
 msgstr "მომხმარებლის პარამეტრები"
 
-#: ../libinit_balsa/assistant_page_user.c:287
+#: ../libinit_balsa/assistant_page_user.c:151
 msgid "Default Identity"
 msgstr ""
 
-#: ../libinit_balsa/assistant_page_user.c:325
+#: ../libinit_balsa/assistant_page_user.c:176
 #, c-format
 msgid ""
 "Local Mail Problem\n"
@@ -3236,88 +3252,107 @@ msgstr ""
 msgid "connection is already compressed"
 msgstr ""
 
+#: ../libnetclient/net-client-pop.c:210
+#, c-format
+msgid "the server %s does not offer the POP3 service at port 995 or 110"
+msgstr ""
+
 #. unexpected server reply
-#: ../libnetclient/net-client-pop.c:227 ../libnetclient/net-client-pop.c:446
-#: ../libnetclient/net-client-smtp.c:596 ../libnetclient/net-client-smtp.c:667
-#: ../libnetclient/net-client-smtp.c:717
+#: ../libnetclient/net-client-pop.c:336 ../libnetclient/net-client-pop.c:554
+#: ../libnetclient/net-client-smtp.c:720 ../libnetclient/net-client-smtp.c:853
 #, c-format
 msgid "bad server reply: %s"
 msgstr ""
 
-#: ../libnetclient/net-client-pop.c:266
+#: ../libnetclient/net-client-pop.c:375
 #, c-format
 msgid "bad server reply"
 msgstr ""
 
-#: ../libnetclient/net-client-pop.c:438 ../libnetclient/net-client-pop.c:719
+#: ../libnetclient/net-client-pop.c:546 ../libnetclient/net-client-pop.c:867
 #, c-format
 msgid "error: %s"
 msgstr "შეცდომა: %s"
 
-#: ../libnetclient/net-client-pop.c:441
+#: ../libnetclient/net-client-pop.c:549
 #, c-format
 msgid "error"
 msgstr "ბრძანება"
 
-#: ../libnetclient/net-client-pop.c:505 ../libnetclient/net-client-smtp.c:409
+#: ../libnetclient/net-client-pop.c:612 ../libnetclient/net-client-smtp.c:509
 #, c-format
 msgid "no suitable authentication mechanism"
 msgstr ""
 
-#: ../libnetclient/net-client-pop.c:507 ../libnetclient/net-client-smtp.c:411
+#: ../libnetclient/net-client-pop.c:620 ../libnetclient/net-client-smtp.c:514
 #, c-format
-msgid "password required"
+msgid "user name required"
 msgstr ""
 
-#: ../libnetclient/net-client-smtp.c:142
+#: ../libnetclient/net-client-pop.c:629 ../libnetclient/net-client-smtp.c:523
+#, c-format
+msgid "user name and password required"
+msgstr ""
+
+#: ../libnetclient/net-client-smtp.c:228
+#, c-format
+msgid "the server %s does not offer the SMTP service at port 465, 587 or 25"
+msgstr ""
+
+#: ../libnetclient/net-client-smtp.c:270
 #, c-format
 msgid "remote server does not support STARTTLS"
 msgstr ""
 
+#: ../libnetclient/net-client-smtp.c:829
+#, c-format
+msgid "unexpected reply: %s"
+msgstr ""
+
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
-#: ../libnetclient/net-client-smtp.c:700
+#: ../libnetclient/net-client-smtp.c:836
 #, c-format
 msgid "transient error %d: %s"
 msgstr ""
 
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
-#: ../libnetclient/net-client-smtp.c:707
+#: ../libnetclient/net-client-smtp.c:843
 #, c-format
 msgid "authentication failure %d: %s"
 msgstr ""
 
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
-#: ../libnetclient/net-client-smtp.c:711
+#: ../libnetclient/net-client-smtp.c:847
 #, c-format
 msgid "permanent error %d: %s"
 msgstr ""
 
-#: ../libnetclient/net-client-utils.c:155
+#: ../libnetclient/net-client-utils.c:208
 #, c-format
 msgid "importing GSS service name %s failed: %s"
 msgstr ""
 
-#: ../libnetclient/net-client-utils.c:199
+#: ../libnetclient/net-client-utils.c:252
 #, c-format
 msgid "cannot initialize GSS security context: %s"
 msgstr ""
 
-#: ../libnetclient/net-client-utils.c:239
+#: ../libnetclient/net-client-utils.c:292
 #, c-format
 msgid "malformed GSS security token: %s"
 msgstr ""
 
-#: ../libnetclient/net-client-utils.c:248
+#: ../libnetclient/net-client-utils.c:301
 #, c-format
 msgid "malformed GSS security token"
 msgstr ""
 
-#: ../libnetclient/net-client-utils.c:265
+#: ../libnetclient/net-client-utils.c:318
 #, c-format
 msgid "cannot create GSS login request: %s"
 msgstr ""
 
-#: ../libnetclient/net-client-utils.c:330
+#: ../libnetclient/net-client-utils.c:383
 #, c-format
 msgid "unknown error code %u:%u"
 msgstr ""
@@ -3345,13 +3380,6 @@ msgstr "_სახელი"
 #: ../src/ab-main.c:751
 msgid "_Address"
 msgstr "_მისამართი"
-
-#: ../src/ab-main.c:839 ../src/address-book-config.c:229
-#: ../src/address-book-config.c:335 ../src/address-book-config.c:379
-#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3990
-#: ../src/pref-manager.c:3331
-msgid "_Apply"
-msgstr "_გადატარება"
 
 #: ../src/ab-main.c:877
 msgid "F_ilter:"
@@ -4366,7 +4394,7 @@ msgstr "ხანგრძლივობა:"
 #: ../src/balsa-mime-widget-vcalendar.c:199
 #: ../src/balsa-print-object-text.c:559
 msgid "Recurrence:"
-msgstr ""
+msgstr "გამეორებადობა:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:203
 #: ../src/balsa-mime-widget-vcalendar.c:382
@@ -7853,3 +7881,6 @@ msgstr ""
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr ""
+
+#~ msgid "SSL"
+#~ msgstr "SSL"

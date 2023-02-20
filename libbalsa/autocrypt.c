@@ -465,7 +465,6 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 {
 	GtkWidget *dialog;
 	GtkWidget *vbox;
-    GtkWidget *label;
     GtkWidget *scrolled_window;
     GtkWidget *tree_view;
     GtkListStore *model;
@@ -483,9 +482,6 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
     gtk_widget_set_vexpand(vbox, TRUE);
-    label = gtk_label_new(_("Double-click key to show details"));
-    gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_container_add(GTK_CONTAINER(vbox), label);
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
     gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 12U);

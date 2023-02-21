@@ -15,23 +15,23 @@
 # Jens Seidel <jseidel@cvs.gnome.org>, 2005.
 # Mario Blättermann <mario.blaettermann@gmail.com>, 2008-2010, 2016-2019, 2021.
 # Philipp Kiemle <philipp.kiemle@gmail.com>, 2021.
-# Jürgen Benvenuti <gastornis@posteo.org>, 2022, 2023
+# Jürgen Benvenuti <gastornis@posteo.org>, 2022, 2023.
 # Tim Sabsch <tim@sabsch.com>, 2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-02-07 14:55+0000\n"
-"PO-Revision-Date: 2023-02-10 20:37+0100\n"
-"Last-Translator: Tim Sabsch <tim@sabsch.com>\n"
+"POT-Creation-Date: 2023-02-18 21:13+0000\n"
+"PO-Revision-Date: 2023-02-20 22:35+0100\n"
+"Last-Translator: Jürgen Benvenuti <gastornis@posteo.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: ../balsa.appdata.xml.in.h:1
 msgid ""
@@ -335,8 +335,8 @@ msgstr "Autocrypt-Datenbank"
 
 #: ../libbalsa/autocrypt.c:479 ../libbalsa/html.c:459
 #: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
-#: ../libbalsa/libbalsa-gpgme-widgets.c:825 ../src/ab-window.c:148
-#: ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
+#: ../libbalsa/libbalsa-gpgme-widgets.c:825 ../libbalsa/server-config.c:545
+#: ../src/ab-window.c:148 ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
 #: ../src/main-window.c:3934 ../src/toolbar-prefs.c:130
 #: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
 #: ../ui/sendmsg-window.ui.h:12 ../ui/source-viewer.ui.h:2
@@ -591,7 +591,8 @@ msgstr ""
 
 #: ../libbalsa/gmime-gpgme-signature.c:239 ../libbalsa/imap/imap-handle.c:46
 #: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:550
-#: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5364
+#: ../libbalsa/server-config.c:552 ../src/folder-conf.c:411
+#: ../src/sendmsg-window.c:5364
 msgid "unknown"
 msgstr "unbekannt"
 
@@ -764,7 +765,7 @@ msgid "Signature in “%s” is not a UTF-8 text."
 msgstr "Die Signatur in »%s« ist kein UTF-8-Unicode-Text."
 
 #: ../libbalsa/identity.c:368 ../libbalsa/libbalsa-gpgme-cb.c:184
-#: ../libbalsa/libbalsa-gpgme-cb.c:363 ../libbalsa/smtp-server.c:327
+#: ../libbalsa/libbalsa-gpgme-cb.c:363 ../libbalsa/smtp-server.c:334
 #: ../src/ab-main.c:849 ../src/ab-window.c:141 ../src/address-book-config.c:240
 #: ../src/address-book-config.c:346 ../src/address-book-config.c:392
 #: ../src/balsa-app.c:94 ../src/balsa-app.c:163 ../src/balsa-index.c:2793
@@ -785,7 +786,7 @@ msgid "_Cancel"
 msgstr "Abbre_chen"
 
 #: ../libbalsa/identity.c:369 ../libbalsa/libbalsa-gpgme-cb.c:183
-#: ../libbalsa/libbalsa-gpgme-cb.c:362 ../libbalsa/smtp-server.c:326
+#: ../libbalsa/libbalsa-gpgme-cb.c:362 ../libbalsa/smtp-server.c:333
 #: ../src/ab-window.c:140 ../src/balsa-app.c:95 ../src/balsa-app.c:162
 #: ../src/balsa-message.c:1760 ../src/balsa-mime-widget-callbacks.c:86
 #: ../src/filter-edit-callbacks.c:1237 ../src/filter-edit-dialog.c:573
@@ -801,7 +802,7 @@ msgstr "_OK"
 msgid "Current"
 msgstr "Verwendet"
 
-#: ../libbalsa/identity.c:643 ../libbalsa/smtp-server.c:140
+#: ../libbalsa/identity.c:643 ../libbalsa/smtp-server.c:147
 msgid "Default"
 msgstr "Vorgabe"
 
@@ -1005,7 +1006,7 @@ msgstr "Fehler beim Anzeigen der Hilfe zu den Identitäten: %s"
 msgid "Manage Identities"
 msgstr "Identitäten verwalten"
 
-#: ../libbalsa/identity.c:1654 ../libbalsa/smtp-server.c:328
+#: ../libbalsa/identity.c:1654 ../libbalsa/smtp-server.c:335
 #: ../src/address-book-config.c:241 ../src/address-book-config.c:344
 #: ../src/address-book-config.c:390 ../src/filter-edit-callbacks.c:1239
 #: ../src/filter-edit-dialog.c:575 ../src/filter-export-dialog.c:81
@@ -1051,8 +1052,8 @@ msgstr "GnuPG OpenPGP-Modus"
 msgid "GpgSM S/MIME mode"
 msgstr "GpgSM S/MIME-Modus"
 
-#: ../libbalsa/imap/auth-cram.c:47 ../libbalsa/imap/imap-auth.c:91
-#: ../libbalsa/imap/imap-auth.c:142
+#: ../libbalsa/imap/auth-cram.c:47 ../libbalsa/imap/imap-auth.c:92
+#: ../libbalsa/imap/imap-auth.c:143
 msgid "Authentication cancelled"
 msgstr "Legitimierung abgebrochen"
 
@@ -1069,7 +1070,7 @@ msgstr "GSSAPI-Legitimierung fehlgeschlagen: %s"
 msgid "No way to authenticate is known"
 msgstr "Keine Legitimierungsmöglichkeit bekannt"
 
-#: ../libbalsa/imap/imap-auth.c:98
+#: ../libbalsa/imap/imap-auth.c:99
 msgid "Cannot LOGIN with UTF-8 username or password"
 msgstr "Anmeldung mit UTF-8-Benutzername oder Passwort nicht möglich"
 
@@ -1083,26 +1084,31 @@ msgstr ""
 "Fehler in der Implementation des SORT-Befehls auf dem IMAP-Server "
 "festgestellt."
 
-#: ../libbalsa/imap/imap-handle.c:671
+#: ../libbalsa/imap/imap-handle.c:682
 #, c-format
 msgid "Connecting %s failed: %s"
 msgstr "Verbindung zu %s ist fehlgeschlagen: %s"
 
-#: ../libbalsa/imap/imap-handle.c:684 ../libbalsa/imap/imap-handle.c:704
+#: ../libbalsa/imap/imap-handle.c:695 ../libbalsa/imap/imap-handle.c:715
 #, c-format
 msgid "TLS negotiation failed: %s"
 msgstr "TLS-Aushandlung fehlgeschlagen: %s"
 
-#: ../libbalsa/imap/imap-handle.c:710
+#: ../libbalsa/imap/imap-handle.c:721
 msgid "TLS required but not available"
 msgstr "TLS ist erforderlich, aber nicht verfügbar"
 
 #. it is not we, so it must be the server
-#: ../libbalsa/imap/imap-handle.c:2298 ../libbalsa/imap/imap-handle.c:2316
-#: ../libbalsa/imap/imap-handle.c:2332 ../libbalsa/imap/imap-handle.c:2363
+#: ../libbalsa/imap/imap-handle.c:2309 ../libbalsa/imap/imap-handle.c:2327
+#: ../libbalsa/imap/imap-handle.c:2343 ../libbalsa/imap/imap-handle.c:2374
 #, c-format
 msgid "IMAP response: %s"
 msgstr "IMAP-Antwort: %s"
+
+#: ../libbalsa/imap/imap-handle.c:4539
+#, c-format
+msgid "the server %s does not offer the IMAP service at port 993 or 143"
+msgstr "Der Server %s bietet keinen IMAP-Dienst auf Port 993 oder 143"
 
 #. IMAP host name + message
 #: ../libbalsa/imap-server.c:213
@@ -2125,54 +2131,54 @@ msgstr "Nachricht %lu von %lu (%s von %s)"
 msgid "Error appending message %d from %s to %s: %s"
 msgstr "Fehler beim Anhängen der Nachricht %d aus %s an %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:493 ../libbalsa/send.c:779
+#: ../libbalsa/mailbox_pop3.c:486 ../libbalsa/send.c:780
 #, c-format
 msgid "Cannot load certificate file %s: %s"
 msgstr "Zertifikatdatei %s konnte nicht geladen werden: %s"
 
 #. connect server
-#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1024
+#: ../libbalsa/mailbox_pop3.c:503 ../libbalsa/send.c:1025
 #, c-format
 msgid "Connecting %s…"
 msgstr "Verbindung mit %s wird aufgebaut …"
 
-#: ../libbalsa/mailbox_pop3.c:512
+#: ../libbalsa/mailbox_pop3.c:505
 #, c-format
 msgid "POP3 mailbox %s: cannot connect %s: %s"
 msgstr "POP3-Postfach %s: %s kann nicht verbunden werden: %s"
 
 #. load message list
-#: ../libbalsa/mailbox_pop3.c:525
+#: ../libbalsa/mailbox_pop3.c:518
 msgid "List messages…"
 msgstr "Nachrichten auflisten …"
 
-#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:702
+#: ../libbalsa/mailbox_pop3.c:520 ../libbalsa/mailbox_pop3.c:695
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr "Fehler im POP3-Postfach %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:574
+#: ../libbalsa/mailbox_pop3.c:567
 #, c-format
 msgid "POP3 mailbox %s: message %d oversized: %s — skipped."
 msgstr "POP3-Postfach %s: Nachricht %d ist zu groß: %s – übersprungen."
 
-#: ../libbalsa/mailbox_pop3.c:650 ../libbalsa/send.c:1034
+#: ../libbalsa/mailbox_pop3.c:643 ../libbalsa/send.c:1035
 #, c-format
 msgid "Connected to %s"
 msgstr "Verbunden mit %s"
 
-#: ../libbalsa/mailbox_pop3.c:666
+#: ../libbalsa/mailbox_pop3.c:659
 #, c-format
 msgid "%lu new message (%s)"
 msgid_plural "%lu new messages (%s)"
 msgstr[0] "%lu neue Nachricht (%s)"
 msgstr[1] "%lu neue Nachrichten (%s)"
 
-#: ../libbalsa/mailbox_pop3.c:677
+#: ../libbalsa/mailbox_pop3.c:670
 msgid "Deleting messages on server…"
 msgstr "Nachrichten werden auf dem Server gelöscht …"
 
-#: ../libbalsa/mailbox_pop3.c:712 ../libbalsa/send.c:1115
+#: ../libbalsa/mailbox_pop3.c:705 ../libbalsa/send.c:1116
 msgid "Finished"
 msgstr "Abgeschlossen"
 
@@ -2867,22 +2873,22 @@ msgstr ""
 "SMTP-Server %s kann nicht erreicht werden (%s), alle Nachrichten in der "
 "Warteschlange verbleiben in %s."
 
-#: ../libbalsa/send.c:832
+#: ../libbalsa/send.c:833
 msgid "Sending Mail"
 msgstr "Nachrichten werden verschickt"
 
-#: ../libbalsa/send.c:942
+#: ../libbalsa/send.c:943
 #, c-format
 msgid "Save message in %s…"
 msgstr "Nachricht speichern in %s …"
 
-#: ../libbalsa/send.c:950
+#: ../libbalsa/send.c:951
 #, c-format
 msgid "Saving sent message to %s failed: %s"
 msgstr "Speichern der gesendeten Nachricht in %s ist fehlgeschlagen: %s"
 
 # CHECK
-#: ../libbalsa/send.c:987
+#: ../libbalsa/send.c:988
 #, c-format
 msgid ""
 "Sending message to SMTP server %s failed: %s\n"
@@ -2891,29 +2897,29 @@ msgstr ""
 "Senden der Nachricht an SMTP-Server %s ist fehlgeschlagen: %s\n"
 "Die Nachricht verbleibt daher in Ihrem Postausgang."
 
-#: ../libbalsa/send.c:1099
+#: ../libbalsa/send.c:1100
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr "Verbinden mit dem SMTP-Server %s (%s) ist fehlgeschlagen: %s"
 
-#: ../libbalsa/send.c:1118
+#: ../libbalsa/send.c:1119
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
 msgstr[0] "%u Nachricht wurde zu %s übertragen"
 msgstr[1] "%u Nachrichten wurden zu %s übertragen"
 
-#: ../libbalsa/send.c:1269 ../libbalsa/send.c:1337
+#: ../libbalsa/send.c:1270 ../libbalsa/send.c:1338
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "»%s« ist nicht lesbar: %s"
 
-#: ../libbalsa/send.c:1272 ../libbalsa/send.c:1340
+#: ../libbalsa/send.c:1273 ../libbalsa/send.c:1341
 #, c-format
 msgid "Cannot read %s"
 msgstr "»%s« ist nicht lesbar"
 
-#: ../libbalsa/send.c:1304
+#: ../libbalsa/send.c:1305
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2921,7 +2927,7 @@ msgstr ""
 "Der Zeichensatz für die Textdatei »%s« konnte nicht ermittelt werden, sie "
 "wird als MIME-Typ »%s« gesendet"
 
-#: ../libbalsa/send.c:1838 ../libbalsa/send.c:1936
+#: ../libbalsa/send.c:1839 ../libbalsa/send.c:1937
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] ""
@@ -2929,124 +2935,185 @@ msgstr[0] ""
 msgstr[1] ""
 "Diese Nachricht wird für die Empfänger einer Blindkopie nicht verschlüsselt."
 
-#: ../libbalsa/server.c:332
+#: ../libbalsa/server.c:340
 msgid "Balsa passwords"
 msgstr "Balsa-Passwörter"
 
-#: ../libbalsa/server.c:338
+#: ../libbalsa/server.c:346
 #, c-format
 msgid "Error storing password for %s@%s:%s: %s"
 msgstr "Fehler beim Speichern des Passworts für %s@%s:%s: %s"
 
-#: ../libbalsa/server.c:360
+#: ../libbalsa/server.c:368
 #, c-format
 msgid "Error looking up password for %s@%s:%s: %s"
 msgstr "Fehler beim Nachschlagen des Passworts für %s@%s:%s: %s"
 
-#: ../libbalsa/server.c:366
+#: ../libbalsa/server.c:374
 msgid "loaded fallback password from private config file"
 msgstr "Ausweichpasswort wurde aus privater Konfigurationsdatei geladen"
 
-#: ../libbalsa/server-config.c:75
+#: ../libbalsa/server-config.c:90
 msgid "_Remember user password in Secret Service"
 msgstr "Passwo_rt im Secret Service speichern"
 
-#: ../libbalsa/server-config.c:76
+#: ../libbalsa/server-config.c:91
 msgid "_Remember certificate pass phrase in Secret Service"
 msgstr "Kennwo_rt des Zertifikats im Secret Service speichern"
 
-#: ../libbalsa/server-config.c:80
+#: ../libbalsa/server-config.c:95
 msgid "_Remember user password"
 msgstr "An Passwort _erinnern"
 
-#: ../libbalsa/server-config.c:81
+#: ../libbalsa/server-config.c:96
 msgid "_Remember certificate pass phrase"
 msgstr "An Kennwo_rt des Zertifikats erinnern"
 
-#: ../libbalsa/server-config.c:103
+#: ../libbalsa/server-config.c:118
 msgid "_Basic"
 msgstr "_Einfach"
 
 #. server descriptive name
-#: ../libbalsa/server-config.c:106
+#: ../libbalsa/server-config.c:121
 msgid "_Descriptive Name:"
 msgstr "_Beschreibender Name:"
 
+#: ../libbalsa/server-config.c:126
+msgid "probe…"
+msgstr "Überprüfen …"
+
 #. host and port
-#: ../libbalsa/server-config.c:110
+#: ../libbalsa/server-config.c:141
 msgid "_Server:"
 msgstr "_Server:"
 
-#: ../libbalsa/server-config.c:116
+#: ../libbalsa/server-config.c:146
 msgid "Se_curity:"
 msgstr "Si_cherheit:"
 
-#: ../libbalsa/server-config.c:123
-msgid "Server requires _authentication"
-msgstr "Server erfordert _Legitimierung"
+#: ../libbalsa/server-config.c:151
+msgid "_Authentication:"
+msgstr "_Legitimation:"
 
 #. user name and password
-#: ../libbalsa/server-config.c:129
+#: ../libbalsa/server-config.c:155
 msgid "_User Name:"
 msgstr "_Benutzername:"
 
-#: ../libbalsa/server-config.c:133
+#: ../libbalsa/server-config.c:159
 msgid "_Pass Phrase:"
 msgstr "_Kennwort:"
 
-#: ../libbalsa/server-config.c:146
+#: ../libbalsa/server-config.c:172
 msgid "_Advanced"
 msgstr "_Fortgeschritten"
 
 #. client certificate and passphrase
-#: ../libbalsa/server-config.c:149
+#: ../libbalsa/server-config.c:175
 msgid "Server _requires client certificate"
 msgstr "Se_rver benötigt ein Client-Zertifikat"
 
-#: ../libbalsa/server-config.c:152
+#: ../libbalsa/server-config.c:178
 msgid "Choose Client Certificate"
 msgstr "Client-Zertifikat wählen"
 
-#: ../libbalsa/server-config.c:153
+#: ../libbalsa/server-config.c:179
 msgid "Certificate _File:"
 msgstr "Zertifikat_datei:"
 
-#: ../libbalsa/server-config.c:161
+#: ../libbalsa/server-config.c:188
 msgid "Certificate _Pass Phrase:"
 msgstr "Kennwort des Z_ertifikats:"
 
-#: ../libbalsa/server-config.c:371
+#: ../libbalsa/server-config.c:404
 #, c-format
 msgid "%s over SSL (%sS)"
 msgstr "%s über SSL (%sS)"
 
-#: ../libbalsa/server-config.c:375 ../libinit_balsa/assistant_page_user.c:69
+#: ../libbalsa/server-config.c:408
 msgid "TLS required"
 msgstr "TLS erforderlich"
 
-#: ../libbalsa/server-config.c:376 ../libinit_balsa/assistant_page_user.c:70
+#: ../libbalsa/server-config.c:409
 msgid "TLS if possible (not recommended)"
 msgstr "TLS, wenn möglich (nicht empfohlen)"
 
-#: ../libbalsa/server-config.c:377 ../libinit_balsa/assistant_page_user.c:71
+#: ../libbalsa/server-config.c:410
 msgid "None (not recommended)"
 msgstr "Keine (nicht empfohlen)"
 
-#: ../libbalsa/smtp-server.c:246
+#: ../libbalsa/server-config.c:426
+msgid "anonymous access"
+msgstr "Anonymer Zugriff"
+
+#: ../libbalsa/server-config.c:428
+msgid "none required"
+msgstr "Keine erforderlich"
+
+#: ../libbalsa/server-config.c:430 ../libbalsa/server-config.c:529
+msgid "user name and pass phrase"
+msgstr "Benutzername und Passphrase"
+
+#: ../libbalsa/server-config.c:432 ../libbalsa/server-config.c:526
+msgid "Kerberos (GSSAPI)"
+msgstr "Kerberos (GSSAPI)"
+
+#: ../libbalsa/server-config.c:516
+msgid "yes (SSL/TLS)"
+msgstr "ja (SSL/TLS)"
+
+#: ../libbalsa/server-config.c:519
+msgid "yes (STARTTLS)"
+msgstr "ja (STARTTLS)"
+
+#: ../libbalsa/server-config.c:522
+msgid "no"
+msgstr "nein"
+
+#: ../libbalsa/server-config.c:532
+msgid "none"
+msgstr "keine"
+
+#: ../libbalsa/server-config.c:539
+#, c-format
+msgid ""
+"Probe results for server %s\n"
+"• Port: %u\n"
+"• Encryption: %s\n"
+"• Authentication: %s\n"
+msgstr ""
+"Prüfergebnisse für Server %s\n"
+"• Port: %u\n"
+"• Verschlüsselung: %s\n"
+"• Legitimierung: %s\n"
+
+#: ../libbalsa/server-config.c:544 ../src/ab-main.c:839
+#: ../src/address-book-config.c:229 ../src/address-book-config.c:335
+#: ../src/address-book-config.c:379 ../src/filter-edit-dialog.c:500
+#: ../src/main-window.c:3990 ../src/pref-manager.c:3331
+msgid "_Apply"
+msgstr "_Anwenden"
+
+#: ../libbalsa/server-config.c:551
+#, c-format
+msgid "Error probing server %s: %s"
+msgstr "Fehler beim Überprüfen des Servers %s: %s"
+
+#: ../libbalsa/smtp-server.c:253
 #, c-format
 msgid "Error displaying server help: %s\n"
 msgstr "Fehler beim Anzeigen der Hilfe: %s\n"
 
-#: ../libbalsa/smtp-server.c:322
+#: ../libbalsa/smtp-server.c:329
 msgid "SMTP Server"
 msgstr "SMTP-Server"
 
 #. split large messages
-#: ../libbalsa/smtp-server.c:348
+#: ../libbalsa/smtp-server.c:355
 msgid "Sp_lit message larger than"
 msgstr "Nachrichten a_ufteilen die größer sind als"
 
-#: ../libbalsa/smtp-server.c:352 ../src/pref-manager.c:2167
+#: ../libbalsa/smtp-server.c:359 ../src/pref-manager.c:2167
 msgid "MB"
 msgstr "MB"
 
@@ -3137,7 +3204,7 @@ msgstr ""
 "Ordner konnte nicht angelegt werden: mkdir() ist mit dem Pfadnamen »%s« "
 "fehlgeschlagen."
 
-#: ../libinit_balsa/assistant_init.c:49
+#: ../libinit_balsa/assistant_init.c:50
 msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
@@ -3145,16 +3212,16 @@ msgstr ""
 "Dies wird Balsa beenden.\n"
 "Wollen Sie das wirklich?"
 
-#: ../libinit_balsa/assistant_init.c:69
+#: ../libinit_balsa/assistant_init.c:70
 msgid "GnomeCard Address Book"
 msgstr "GnomeCard-Adressbuch"
 
-#: ../libinit_balsa/assistant_init.c:76 ../libinit_balsa/assistant_init.c:84
+#: ../libinit_balsa/assistant_init.c:77 ../libinit_balsa/assistant_init.c:85
 #: ../src/ab-window.c:243
 msgid "Address Book"
 msgstr "Adressbuch"
 
-#: ../libinit_balsa/assistant_init.c:134
+#: ../libinit_balsa/assistant_init.c:136
 msgid "Configure Balsa"
 msgstr "Balsa konfigurieren"
 
@@ -3250,85 +3317,35 @@ msgstr "Fertig!"
 #: ../libinit_balsa/assistant_page_user.c:55
 msgid ""
 "The following settings are also needed (and you can find them later, if need "
-"be, in the Email application in the “Preferences” and “Identities” menu "
-"items)"
+"be, in the Email application in the “Edit ⏵ Preferences ⏵ Identities…” menu "
+"item)"
 msgstr ""
 "Die folgenden Einstellungen sind ebenfalls erforderlich. Sie finden diese "
-"falls notwendig später in Balsa im Menü »Werkzeuge« unter »Einstellungen« "
-"und »Identitäten«."
-
-#: ../libinit_balsa/assistant_page_user.c:61
-msgid ""
-" Whoever provides your email account should be able to give you the "
-"following information (if you have a Network Administrator, they may already "
-"have set this up for you):"
-msgstr ""
-" Die folgenden Informationen erhalten Sie von Ihrem E-Mail-Dienstleister. "
-"Falls Sie Zugang zu einem Netzwerkadministrator haben, sollte auch dieser "
-"Ihnen weiterhelfen können:"
-
-#: ../libinit_balsa/assistant_page_user.c:68
-msgid "SSL"
-msgstr "SSL"
-
-#: ../libinit_balsa/assistant_page_user.c:74
-msgid "Yes, remember it"
-msgstr "Ja, daran erinnern"
-
-#: ../libinit_balsa/assistant_page_user.c:74
-msgid "No, type it in every time"
-msgstr "Nein, jedes Mal eingeben"
-
-#: ../libinit_balsa/assistant_page_user.c:105
-msgid "Name of mail server for incoming _mail:"
-msgstr "Name des E-Mail-Servers für eingehende _Nachrichten:"
-
-#: ../libinit_balsa/assistant_page_user.c:110
-msgid "_Type of mail server:"
-msgstr "_Art des Mail-Servers:"
-
-#: ../libinit_balsa/assistant_page_user.c:114
-msgid "Connection _Security:"
-msgstr "Verbindungs_sicherheit:"
-
-#: ../libinit_balsa/assistant_page_user.c:118
-msgid "Your email _login name:"
-msgstr "Ihr E-Mail-_Benutzername:"
-
-#: ../libinit_balsa/assistant_page_user.c:121
-msgid "Your _password:"
-msgstr "Ihr _Passwort:"
-
-#: ../libinit_balsa/assistant_page_user.c:128
-msgid "_SMTP Server:"
-msgstr "SMT_P-Server:"
+"später, falls notwendig, in Balsa im Menüeintrag »Bearbeiten« ⏵ "
+"»Einstellungen« ⏵ »Identitäten …«"
 
 #. 2.1
-#: ../libinit_balsa/assistant_page_user.c:132
+#: ../libinit_balsa/assistant_page_user.c:79
 msgid "Your real _name:"
 msgstr "Ihr richtiger _Name:"
 
-#: ../libinit_balsa/assistant_page_user.c:138
+#: ../libinit_balsa/assistant_page_user.c:84
 msgid "Your _email address for this email account:"
 msgstr "Ihre _E-Mail-Adresse für dieses E-Mail-Postfach:"
 
-#: ../libinit_balsa/assistant_page_user.c:143
-msgid "_Remember your password:"
-msgstr "An Passwort _erinnern:"
-
-#: ../libinit_balsa/assistant_page_user.c:148
+#: ../libinit_balsa/assistant_page_user.c:88
 msgid "_Local mail directory:"
 msgstr "_Lokaler E-Mail-Ordner:"
 
-#: ../libinit_balsa/assistant_page_user.c:166
+#: ../libinit_balsa/assistant_page_user.c:107
 msgid "User Settings"
 msgstr "Benutzereinstellungen"
 
-#: ../libinit_balsa/assistant_page_user.c:287
+#: ../libinit_balsa/assistant_page_user.c:151
 msgid "Default Identity"
 msgstr "Vorgabe-Identität"
 
-#: ../libinit_balsa/assistant_page_user.c:325
+#: ../libinit_balsa/assistant_page_user.c:176
 #, c-format
 msgid ""
 "Local Mail Problem\n"
@@ -3423,88 +3440,107 @@ msgstr "Verbindung ist bereits verschlüsselt"
 msgid "connection is already compressed"
 msgstr "Verbindung ist bereits komprimiert"
 
+#: ../libnetclient/net-client-pop.c:210
+#, c-format
+msgid "the server %s does not offer the POP3 service at port 995 or 110"
+msgstr "Der Server %s bietet keinen POP3-Dienst auf Port 995 oder 110"
+
 #. unexpected server reply
-#: ../libnetclient/net-client-pop.c:227 ../libnetclient/net-client-pop.c:446
-#: ../libnetclient/net-client-smtp.c:596 ../libnetclient/net-client-smtp.c:667
-#: ../libnetclient/net-client-smtp.c:717
+#: ../libnetclient/net-client-pop.c:336 ../libnetclient/net-client-pop.c:554
+#: ../libnetclient/net-client-smtp.c:720 ../libnetclient/net-client-smtp.c:853
 #, c-format
 msgid "bad server reply: %s"
 msgstr "Ungültige Antwort vom Server: %s"
 
-#: ../libnetclient/net-client-pop.c:266
+#: ../libnetclient/net-client-pop.c:375
 #, c-format
 msgid "bad server reply"
 msgstr "Ungültige Antwort vom Server"
 
-#: ../libnetclient/net-client-pop.c:438 ../libnetclient/net-client-pop.c:719
+#: ../libnetclient/net-client-pop.c:546 ../libnetclient/net-client-pop.c:867
 #, c-format
 msgid "error: %s"
 msgstr "Fehler: %s"
 
-#: ../libnetclient/net-client-pop.c:441
+#: ../libnetclient/net-client-pop.c:549
 #, c-format
 msgid "error"
 msgstr "Fehler"
 
-#: ../libnetclient/net-client-pop.c:505 ../libnetclient/net-client-smtp.c:409
+#: ../libnetclient/net-client-pop.c:612 ../libnetclient/net-client-smtp.c:509
 #, c-format
 msgid "no suitable authentication mechanism"
 msgstr "Kein nutzbarer Legitimierungsmechanismus"
 
-#: ../libnetclient/net-client-pop.c:507 ../libnetclient/net-client-smtp.c:411
+#: ../libnetclient/net-client-pop.c:620 ../libnetclient/net-client-smtp.c:514
 #, c-format
-msgid "password required"
-msgstr "Passwort erforderlich"
+msgid "user name required"
+msgstr "Benutzername erforderlich"
 
-#: ../libnetclient/net-client-smtp.c:142
+#: ../libnetclient/net-client-pop.c:629 ../libnetclient/net-client-smtp.c:523
+#, c-format
+msgid "user name and password required"
+msgstr "Benutzername und Passwort erforderlich"
+
+#: ../libnetclient/net-client-smtp.c:228
+#, c-format
+msgid "the server %s does not offer the SMTP service at port 465, 587 or 25"
+msgstr "Der Server %s bietet keinen SMTP-Dienst auf Port 465, 587 oder 25"
+
+#: ../libnetclient/net-client-smtp.c:270
 #, c-format
 msgid "remote server does not support STARTTLS"
 msgstr "Der entfernte Server unterstützt STARTTLS nicht"
 
+#: ../libnetclient/net-client-smtp.c:829
+#, c-format
+msgid "unexpected reply: %s"
+msgstr "Unerwartete Antwort: %s"
+
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
-#: ../libnetclient/net-client-smtp.c:700
+#: ../libnetclient/net-client-smtp.c:836
 #, c-format
 msgid "transient error %d: %s"
 msgstr "Temporärer Fehler %d: %s"
 
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
-#: ../libnetclient/net-client-smtp.c:707
+#: ../libnetclient/net-client-smtp.c:843
 #, c-format
 msgid "authentication failure %d: %s"
 msgstr "Legitimierungsfehler %d: %s"
 
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
-#: ../libnetclient/net-client-smtp.c:711
+#: ../libnetclient/net-client-smtp.c:847
 #, c-format
 msgid "permanent error %d: %s"
 msgstr "Dauerhafter Fehler %d: %s"
 
-#: ../libnetclient/net-client-utils.c:155
+#: ../libnetclient/net-client-utils.c:208
 #, c-format
 msgid "importing GSS service name %s failed: %s"
 msgstr "Importieren des GSS-Dienstnamens %s fehlgeschlagen: %s"
 
-#: ../libnetclient/net-client-utils.c:199
+#: ../libnetclient/net-client-utils.c:252
 #, c-format
 msgid "cannot initialize GSS security context: %s"
 msgstr "SSL-Sicherheitskontext kann nicht initialisiert werden: %s"
 
-#: ../libnetclient/net-client-utils.c:239
+#: ../libnetclient/net-client-utils.c:292
 #, c-format
 msgid "malformed GSS security token: %s"
 msgstr "Beschädigter GSS-Sicherheitstoken: %s"
 
-#: ../libnetclient/net-client-utils.c:248
+#: ../libnetclient/net-client-utils.c:301
 #, c-format
 msgid "malformed GSS security token"
 msgstr "Beschädigter GSS-Sicherheitstoken"
 
-#: ../libnetclient/net-client-utils.c:265
+#: ../libnetclient/net-client-utils.c:318
 #, c-format
 msgid "cannot create GSS login request: %s"
 msgstr "GSS-Anmeldeanfrage konnte nicht erstellt werden: %s"
 
-#: ../libnetclient/net-client-utils.c:330
+#: ../libnetclient/net-client-utils.c:383
 #, c-format
 msgid "unknown error code %u:%u"
 msgstr "Unbekannter Fehlercode %u:%u"
@@ -3532,13 +3568,6 @@ msgstr "_Name"
 #: ../src/ab-main.c:751
 msgid "_Address"
 msgstr "_Adresse"
-
-#: ../src/ab-main.c:839 ../src/address-book-config.c:229
-#: ../src/address-book-config.c:335 ../src/address-book-config.c:379
-#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3990
-#: ../src/pref-manager.c:3331
-msgid "_Apply"
-msgstr "_Anwenden"
 
 #: ../src/ab-main.c:877
 msgid "F_ilter:"
@@ -8270,6 +8299,48 @@ msgstr "Öffentlichen Gnu_PG-Schlüssel anhängen"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "Sonderzeichen maski_eren"
+
+#~ msgid "Server requires _authentication"
+#~ msgstr "Server erfordert _Legitimierung"
+
+#~ msgid ""
+#~ " Whoever provides your email account should be able to give you the "
+#~ "following information (if you have a Network Administrator, they may "
+#~ "already have set this up for you):"
+#~ msgstr ""
+#~ " Die folgenden Informationen erhalten Sie von Ihrem E-Mail-Dienstleister. "
+#~ "Falls Sie Zugang zu einem Netzwerkadministrator haben, sollte auch dieser "
+#~ "Ihnen weiterhelfen können:"
+
+#~ msgid "SSL"
+#~ msgstr "SSL"
+
+#~ msgid "Yes, remember it"
+#~ msgstr "Ja, daran erinnern"
+
+#~ msgid "No, type it in every time"
+#~ msgstr "Nein, jedes Mal eingeben"
+
+#~ msgid "Name of mail server for incoming _mail:"
+#~ msgstr "Name des E-Mail-Servers für eingehende _Nachrichten:"
+
+#~ msgid "_Type of mail server:"
+#~ msgstr "_Art des Mail-Servers:"
+
+#~ msgid "Connection _Security:"
+#~ msgstr "Verbindungs_sicherheit:"
+
+#~ msgid "Your email _login name:"
+#~ msgstr "Ihr E-Mail-_Benutzername:"
+
+#~ msgid "Your _password:"
+#~ msgstr "Ihr _Passwort:"
+
+#~ msgid "_SMTP Server:"
+#~ msgstr "SMT_P-Server:"
+
+#~ msgid "_Remember your password:"
+#~ msgstr "An Passwort _erinnern:"
 
 #~ msgid "GnuPG is rebuilding the trust database and is currently unavailable."
 #~ msgstr ""

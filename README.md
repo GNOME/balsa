@@ -103,6 +103,19 @@ authors in a mail header.
 	Use GtkSourceview for highlighting structured phrases in
 messages, and for syntax highlighting in attachments.
 
+`--with-gcr`
+	Use the GCR library for displaying certificates and crypto UI.
+
+`--enable-autocrypt`
+	Build with Autocrypt support to simplify GnuPG key exchange
+(see https://autocrypt.org/, requires sqlite3).
+
+`--enable-systray`
+	Enable Freedesktop System Tray Icon support (requires libxapp).
+
+`--disable-nls`
+	Do not use Native Language Support (Localization).
+
 
 ## Libraries:
 
@@ -140,8 +153,11 @@ Remote SMTP Server:
 	server you use for submitting mail.  Please note that the
 	default port number is 587 or 465 for SMTPS (see below).  The
 	syntax is hostname[:port].  Port can be a decimal number or the
-	name of the service as specified in /etc/services.  Typically
-	you can just set this to localhost:25.
+	name of the service as specified in /etc/services.  Just click
+	the *probe...* button to let Balsa detect the best port and
+	security (see below) combination.
+	If like system is running a local MTA (e.g. Postfix or Exim),
+	you can just set this to localhost:25 without encryption..
 
 Security:
 	Specify the security level.  For an ISP, this is typically "SMTP

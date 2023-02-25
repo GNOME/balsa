@@ -56,9 +56,6 @@ typedef struct _LibbalsaVfs LibbalsaVfs;
 #if HAVE_SQLITE
 #include "address-book-gpe.h"
 #endif
-#if HAVE_RUBRICA
-#include "address-book-rubrica.h"
-#endif
 #if HAVE_OSMO
 #include "address-book-osmo.h"
 #endif

@@ -951,10 +951,6 @@ update_address_books(void)
         else if (LIBBALSA_IS_ADDRESS_BOOK_GPE(address_book))
             type = "GPE";
 #endif
-#if HAVE_RUBRICA
-        else if (LIBBALSA_IS_ADDRESS_BOOK_RUBRICA(address_book))
-            type = "Rubrica";
-#endif
 #if HAVE_OSMO
         else if (LIBBALSA_IS_ADDRESS_BOOK_OSMO(address_book))
         	type = "Osmo";

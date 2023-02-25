@@ -33,11 +33,6 @@
                             translatable="yes">_GPE Address Book</attribute>
                         <attribute name="action">win.file-new-gpe</attribute>
                     </item>
-                    <item>
-                        <attribute name="label"
-                            translatable="yes">_Rubrica Address Book</attribute>
-                        <attribute name="action">win.file-new-rubrica</attribute>
-                    </item>
                 </submenu>
                 <item>
                     <attribute name="label"

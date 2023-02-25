@@ -29,10 +29,6 @@
 #include <locale.h>
 #endif
 
-#ifdef HAVE_RUBRICA
-#include <libxml/xmlversion.h>
-#endif
-
 #include <glib/gi18n.h>
 
 #include "balsa-app.h"
@@ -498,11 +494,6 @@ balsa_startup_cb(GApplication *application,
     bind_textdomain_codeset(PACKAGE, "UTF-8");
     textdomain(PACKAGE);
     setlocale(LC_ALL, "");
-#endif
-
-#ifdef HAVE_RUBRICA
-    /* initialise libxml */
-    LIBXML_TEST_VERSION
 #endif
 
     /* initialise the gpgme library and set the callback funcs */

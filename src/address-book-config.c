@@ -75,9 +75,6 @@ static GtkWidget *create_ldap_dialog(AddressBookConfig * abc);
 #ifdef HAVE_SQLITE
 static GtkWidget *create_gpe_dialog(AddressBookConfig * abc);
 #endif
-#ifdef HAVE_RUBRICA
-static GtkWidget *create_rubrica_dialog(AddressBookConfig * abc);
-#endif
 #ifdef HAVE_OSMO
 static GtkWidget *create_osmo_dialog(AddressBookConfig *abc);
 #endif
@@ -305,10 +302,6 @@ create_dialog_from_type(AddressBookConfig * abc)
 #ifdef HAVE_SQLITE
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_GPE) {
         return create_gpe_dialog(abc);
-#endif
-#ifdef HAVE_RUBRICA
-    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA) {
-        return create_rubrica_dialog(abc);
 #endif
 #ifdef HAVE_OSMO
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
@@ -580,14 +573,6 @@ create_gpe_dialog(AddressBookConfig * abc)
 }
 #endif
 
-#if HAVE_RUBRICA
-static GtkWidget *
-create_rubrica_dialog(AddressBookConfig * abc)
-{
-    return create_local_dialog(abc, "Rubrica");
-}
-#endif
-
 static void
 help_button_cb(AddressBookConfig * abc)
 {
@@ -740,14 +725,6 @@ create_book(AddressBookConfig * abc)
         address_book =
             libbalsa_address_book_gpe_new(name);
 #endif
-#ifdef HAVE_RUBRICA
-    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA) {
-        gchar *path =
-            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
-        if (path != NULL)
-            address_book = libbalsa_address_book_rubrica_new(name, path);
-        g_free(path);
-#endif
 #ifdef HAVE_OSMO
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
     	address_book = libbalsa_address_book_osmo_new(name);
@@ -776,9 +753,6 @@ modify_book(AddressBookConfig * abc)
 
     if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD
         || abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF
-#ifdef HAVE_RUBRICA
-        || abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA
-#endif /* HAVE_RUBRICA */
         ) {
         LibBalsaAddressBookText *ab_text =
             LIBBALSA_ADDRESS_BOOK_TEXT(address_book);
@@ -897,16 +871,6 @@ add_gpe_cb(GtkWidget * widget, AddressBookConfig * abc)
 }
 #endif /* HAVE_SQLITE */
 
-#ifdef HAVE_RUBRICA
-static void
-add_rubrica_cb(GtkWidget * widget, AddressBookConfig * abc)
-{
-    abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
-    abc->window = create_rubrica_dialog(abc);
-    gtk_widget_show_all(abc->window);
-}
-#endif /* HAVE_SQLITE */
-
 #ifdef HAVE_OSMO
 static void
 add_osmo_cb(GtkWidget * widget, AddressBookConfig * abc)
@@ -961,13 +925,6 @@ balsa_address_book_add_menu(BalsaAddressBookCallback callback,
                      G_CALLBACK(add_gpe_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 #endif /* HAVE_SQLITE */
-
-#ifdef HAVE_RUBRICA
-    menuitem = gtk_menu_item_new_with_label(_("Rubrica2 Address Book"));
-    g_signal_connect(menuitem, "activate",
-                     G_CALLBACK(add_rubrica_cb), abc);
-    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-#endif /* HAVE_RUBRICA */
 
 #ifdef HAVE_OSMO
     menuitem = gtk_menu_item_new_with_label(_("Osmo Address Book"));

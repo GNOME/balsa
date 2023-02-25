@@ -59,7 +59,6 @@ gtksourceview = get_option('gtksourceview')
 spell_checker = get_option('spell-checker')
 ldap          = get_option('ldap')
 igemacint     = get_option('macosx-desktop')
-rubrica       = get_option('rubrica')
 osmo          = get_option('osmo')
 sqlite        = get_option('sqlite')
 libsecret     = get_option('libsecret')
@@ -269,16 +268,6 @@ if sqlite != 'false'
   balsa_deps += real_dep
   balsa_ab_deps += real_dep
 endif # sqlite != 'false'
-
-# Rubrica (libxml2) configuration
-#
-if rubrica
-  xml_dep = dependency('libxml-2.0')
-  conf.set('HAVE_RUBRICA', 1,
-    description : 'If defined, enable Rubrica2 address book support.')
-  balsa_deps += xml_dep
-  balsa_ab_deps += xml_dep
-endif # rubrica
 
 # Osmo address book support
 #

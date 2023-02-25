@@ -65,11 +65,6 @@ option('macosx-desktop',
   value       : false,
   description : 'Use Mac OS X Desktop Integration (default=false, extremely experimental)')
 
-option('rubrica',
-  type        : 'boolean',
-  value       : false,
-  description : 'add Rubrica2 address book support (needs libxml2, default=false)')
-
 option('osmo',
   type        : 'boolean',
   value       : false,

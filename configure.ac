@@ -110,11 +110,6 @@ AC_ARG_WITH([macosx-desktop],
 	          [Use Mac OS X Desktop Integration (default=no, extremely experimental)]),
 		  [use_igemacint=$withval],[use_igemacint=no])
 
-AC_ARG_WITH([rubrica],
-   AS_HELP_STRING([--with-rubrica],
-                  [add Rubrica2 address book support (needs libxml2, default=no)]),
-		  [with_rubrica=$withval],[with_rubrica=no])
-
 AC_ARG_WITH([osmo],
    AS_HELP_STRING([--with-osmo],
                   [add Osmo address book support (experimental, needs osmo > svn rev. 1099, default=no)]),
@@ -374,20 +369,6 @@ if test x$with_sqlite != xno ; then
     BALSA_CFLAGS="$BALSA_CFLAGS $SQLITE_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $SQLITE_LIBS"
     BALSA_AB_LIBS="$BALSA_AB_LIBS $SQLITE_LIBS"
-else
-    AC_MSG_RESULT([no])
-fi
-
-# Rubrica (libxml2) configuration
-#
-AC_MSG_CHECKING(whether to include Rubrica2 support)
-if test x$with_rubrica != xno ; then
-    AC_MSG_RESULT([yes])
-    PKG_CHECK_MODULES(LIBXML2, [libxml-2.0])
-    AC_DEFINE(HAVE_RUBRICA,1,[If defined, enable Rubrica2 address book support.])
-    BALSA_CFLAGS="$BALSA_CFLAGS $LIBXML2_CFLAGS"
-    BALSA_LIBS="$BALSA_LIBS $LIBXML2_LIBS"
-    BALSA_AB_LIBS="$BALSA_AB_LIBS $LIBXML2_LIBS"
 else
     AC_MSG_RESULT([no])
 fi

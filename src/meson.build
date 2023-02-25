@@ -116,8 +116,10 @@ balsa_ab_sources = [
   'address-book-config.c'
   ]
 
+balsa_ab_compile_arg = '-DGNOMELOCALEDIR="' + locale_dir + '"'
+balsa_ab_compile_dep = declare_dependency(compile_args : balsa_ab_compile_arg)
 executable('balsa-ab', balsa_ab_sources, balsa_ab_resources,
-           dependencies        : balsa_ab_deps,
+           dependencies        : balsa_ab_deps + [balsa_ab_compile_dep],
            include_directories : [top_include, libbalsa_include],
            link_with           : libbalsa_a,
            install             : true)

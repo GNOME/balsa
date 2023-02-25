@@ -66,6 +66,7 @@ libsecret     = get_option('libsecret')
 gcr           = get_option('gcr')
 more_warnings = get_option('more-warnings')
 help_files    = get_option('help-files')
+nls           = get_option('nls')
 
 # Documentation and Testing requirements for libnetclient
 libnetclient_docs = get_option('libnetclient-docs')
@@ -96,23 +97,6 @@ if help_files
     message('    Continuing with build. ****')
     help_files = false
   endif
-endif
-
-# _NL_MEASUREMENT_MEASUREMENT is an enum and not a define
-
-code = '''
-#include <langinfo.h>
-char func(void)
-{
-    char c;
-    c = *((unsigned char *) nl_langinfo(_NL_MEASUREMENT_MEASUREMENT));
-    return c;
-}
-'''
-result = compiler.compiles(code, name : '_NL_MEASUREMENT_MEASUREMENT test')
-if result
-  conf.set('HAVE__NL_MEASUREMENT_MEASUREMENT', 1,
-    description : 'Define if _NL_MEASUREMENT_MEASUREMENT is available')
 endif
 
 # #####################################################################
@@ -441,9 +425,38 @@ if compiler.has_function('ctime_r')
     description : 'Define to 1 if you have the ‘ctime_r’ function.')
 endif
 
-if compiler.has_header('locale.h')
-  conf.set('HAVE_LOCALE_H', 1,
-    description : 'Define to 1 if you have the <locale.h> header')
+#####################################################################
+# Native Language Support
+#####################################################################
+
+if nls
+  if not compiler.has_header('libintl.h')
+    error('libintl.h not found')
+  endif
+  if compiler.has_header('locale.h')
+    conf.set('HAVE_LOCALE_H', 1,
+      description : 'Define to 1 if you have the <locale.h> header')
+  endif
+  conf.set_quoted('GETTEXT_PACKAGE', meson.project_name(),
+    description : 'The `gettext` package name.')
+  conf.set('ENABLE_NLS', 1,
+    description : 'Define to 1 if Native Language Support is enabled.')
+
+  # _NL_MEASUREMENT_MEASUREMENT is an enum and not a define
+  code = '''
+  #include <langinfo.h>
+  char func(void)
+  {
+      char c;
+      c = *((unsigned char *) nl_langinfo(_NL_MEASUREMENT_MEASUREMENT));
+      return c;
+  }
+  '''
+  result = compiler.compiles(code, name : '_NL_MEASUREMENT_MEASUREMENT test')
+  if result
+    conf.set('HAVE__NL_MEASUREMENT_MEASUREMENT', 1,
+      description : 'Define if _NL_MEASUREMENT_MEASUREMENT is available')
+  endif
 endif
 
 # set more warnings.
@@ -595,6 +608,7 @@ summary = [
   '============= Final configuration =============',
   ' Installing into prefix: @0@'.format(get_option('prefix')),
   'Enable compile warnings: @0@'.format(more_warnings),
+  'Native Language Support: @0@'.format(nls),
   '            HTML widget: @0@'.format(html_widget),
   '              Use GNOME: @0@'.format(gnome_desktop),
   '           Use Canberra: @0@'.format(canberra),

@@ -109,3 +109,8 @@ option('libnetclient-test',
   type        : 'boolean',
   value       : false,
   description : 'Check requirements for running libnetclient tests (see libnetclient/README; default=false)')
+
+option('nls',
+  type        : 'boolean',
+  value       : true,
+  description : 'use Native Language Support (default=true)')

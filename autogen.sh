@@ -8,10 +8,7 @@ olddir=`pwd`
 cd $srcdir
 
 echo "Running gettextize...  Ignore non-fatal messages."
-glib-gettextize --force --copy || exit 1
-echo "running intltoolize..."
-[ -d m4 ] || mkdir m4
-intltoolize --copy --force --automake || exit 1
+gettextize --force --no-changelog || exit 1
 echo "Running libtoolize..."
 libtoolize --force || exit 1
 echo "Running aclocal..."

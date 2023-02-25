@@ -39,9 +39,6 @@ config.sub
 configure
 depcomp
 install-sh
-intltool-extract.in
-intltool-merge.in
-intltool-update.in
 libbalsa/imap/imap_tst
 libbalsa/imap/libimap-marshal.c
 libbalsa/imap/libimap-marshal.h
@@ -52,7 +49,6 @@ ltmain.sh
 m4/
 missing
 mkinstalldirs
-po/.intltool-merge-cache
 po/Makefile.in.in
 po/POTFILES
 po/stamp-it
@@ -64,3 +60,12 @@ autoscan.log
 configure.scan
 gnome-doc-utils.make
 libnetclient/test/start-test-env.sh
+org.desktop.Balsa.desktop
+org.desktop.Balsa.desktop.in
+po/Makevars.template
+po/Rules-quot
+po/balsa.pot
+po/*.sed
+po/*.header
+po/*.sin
+po/stamp-po

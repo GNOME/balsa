@@ -35,7 +35,6 @@ BuildRequires: gmime-devel >= 2.5.1
 BuildRequires: gnome-doc-utils
 BuildRequires: gpgme-devel
 BuildRequires: gtkspell3-devel
-BuildRequires: intltool
 BuildRequires: libesmtp-devel >= 1.0.6
 BuildRequires: libnotify-devel
 BuildRequires: libsecret-devel

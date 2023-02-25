@@ -1,6 +1,6 @@
 #intl dir needed for tarball --disable-nls build.
 DISTCHECK_CONFIGURE_FLAGS="--disable-extra-mimeicons"
-SUBDIRS = po sounds images doc libnetclient libbalsa libinit_balsa src ui
+SUBDIRS = . sounds po images doc libnetclient libbalsa libinit_balsa src ui
 # set tar in case it is not set by automake or make
 
 man_MANS=balsa.1
@@ -12,15 +12,11 @@ desktopdir = $(datadir)/applications
 desktop_in_files = org.desktop.Balsa.desktop.in balsa-mailto-handler.desktop.in
 desktop_DATA = org.desktop.Balsa.desktop balsa-mailto-handler.desktop
 
-@INTLTOOL_DESKTOP_RULE@
-
 # Appdata files
 
 appdatadir = $(datarootdir)/metainfo
 appdata_in_files = balsa.appdata.xml.in
 dist_appdata_DATA = balsa.appdata.xml
-
-@INTLTOOL_XML_RULE@
 
 balsa_extra_dist =		\
 	HACKING			\
@@ -35,9 +31,6 @@ balsa_extra_dist =		\
 	$(desktop_in_files)	\
 	$(appdata_in_files)	\
 	gnome-balsa2.png	\
-	intltool-extract.in	\
-	intltool-merge.in	\
-	intltool-update.in	\
 	meson.build	\
 	meson_options.txt	\
 	balsa-mailto-handler.desktop.meson	\
@@ -45,7 +38,7 @@ balsa_extra_dist =		\
 	po/meson.build
 
 EXTRA_DIST =			\
-    $(balsa_extra_dist)
+	$(balsa_extra_dist)
 
 if BUILD_WITH_GTKSOURCEVIEW
 gtksourceviewdir = $(BALSA_DATA_PREFIX)/gtksourceview-3.0
@@ -53,11 +46,13 @@ gtksourceview_DATA = balsa-mail.lang		\
 	balsa-mail-style.xml
 endif
 
-# remove ./po/.intltool-merge-cache.lock to workaround intltool-0.51.0-6 bug
-DISTCLEANFILES = $(desktop_DATA) $(server_DATA) $(dist_appdata_DATA) \
-	intltool-extract intltool-merge intltool-update \
-	po/.intltool-merge-cache.lock
+DISTCLEANFILES = $(desktop_DATA) $(server_DATA) $(dist_appdata_DATA)
 
+%.desktop:	%.desktop.in
+	$(AM_V_GEN)$(MSGFMT) --desktop --template $< -d $(top_srcdir)/po -o $@
+
+%.xml:	%.xml.in
+	$(AM_V_GEN)$(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@
 
 dist-hook: balsa.spec
 	cp balsa.spec $(distdir)

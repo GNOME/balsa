@@ -1,5 +1,5 @@
 [__section_info__]
-_description=Balsa Email Reader
+description=The Balsa E-Mail Client
 
 [startup]
 file=balsa/startup.wav

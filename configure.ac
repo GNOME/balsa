@@ -186,27 +186,32 @@ fi
 
 # gettext
 #
-ALL_LINGUAS="am ar az bg ca cs da de dz el en_CA en_GB es et eu fi fr ga gl he hi hr hu id it ja ko lt lv mk ml ms nb ne nl nn oc pa pl pt pt_BR ro ru rw sk sl sq sr sr@latin sv tr uk vi wa zh_CN zh_HK zh_TW"
-GETTEXT_PACKAGE=balsa
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
-        [The gettext package name.])
+AM_NLS
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.21])
+if test x$USE_NLS = xyes; then
+    ALL_LINGUAS=`ls po/*.po | sed -e 's/po\///' -e 's/.po//' | tr '\n' ' '`
+    AC_MSG_NOTICE([Gettext languages: $ALL_LINGUAS])
+    GETTEXT_PACKAGE=balsa
+    AC_SUBST(GETTEXT_PACKAGE)
+    AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE",
+            [The gettext package name.])
+    AC_CHECK_HEADERS([locale.h])
 
-IT_PROG_INTLTOOL
-
-# _NL_MEASUREMENT_MEASUREMENT is an enum and not a define
-AC_MSG_CHECKING([for _NL_MEASUREMENT_MEASUREMENT])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <langinfo.h>]],
-                                [[char c;
-                                  c = *((unsigned char *)
-                                  nl_langinfo
-                                  (_NL_MEASUREMENT_MEASUREMENT));]])],
-               [have__nl_measurement_measurement=yes],
-               [have__nl_measurement_measurement=no])
-AC_MSG_RESULT($have__nl_measurement_measurement)
-if test "$have__nl_measurement_measurement" = "yes"; then
-  AC_DEFINE([HAVE__NL_MEASUREMENT_MEASUREMENT], [1],
-	    [Define if _NL_MEASUREMENT_MEASUREMENT is available])
+    # _NL_MEASUREMENT_MEASUREMENT is an enum and not a define
+    AC_MSG_CHECKING([for _NL_MEASUREMENT_MEASUREMENT])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <langinfo.h>]],
+                                    [[char c;
+                                      c = *((unsigned char *)
+                                      nl_langinfo
+                                      (_NL_MEASUREMENT_MEASUREMENT));]])],
+                   [have__nl_measurement_measurement=yes],
+                   [have__nl_measurement_measurement=no])
+    AC_MSG_RESULT($have__nl_measurement_measurement)
+    if test "$have__nl_measurement_measurement" = "yes"; then
+      AC_DEFINE([HAVE__NL_MEASUREMENT_MEASUREMENT], [1],
+	        [Define if _NL_MEASUREMENT_MEASUREMENT is available])
+    fi
 fi
 
 dnl #####################################################################
@@ -627,13 +632,12 @@ dnl #####################################################################
 dnl 8. Output
 dnl #####################################################################
 
-AC_CONFIG_FILES([
+AC_CONFIG_FILES([ po/Makefile.in
 Makefile
 balsa.1
 balsa.spec
 org.desktop.Balsa.desktop.in
 balsa-mailto-handler.desktop.in
-po/Makefile.in
 sounds/Makefile
 images/Makefile
 images/mimetypes/Makefile
@@ -660,6 +664,7 @@ echo ""
 echo "================ Final configuration ==================="
 echo "    Installing into prefix: $prefix"
 echo "   Enable compile warnings: $set_more_warnings"
+echo "   Native Language Support: $USE_NLS"
 echo "               HTML widget: $use_html_widget"
 echo "                 Use GNOME: $with_gnome"
 echo "              Use Canberra: $with_canberra"

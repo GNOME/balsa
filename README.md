@@ -85,9 +85,6 @@ address book is in the works but needs some finishing touches.
 `--with-sqlite`
 	Use SQLite for GPE address books.
 
-`--with-rubrica`
-	Use libxml2 for Rubrica2 address book support.
-
 `--with-osmo`
 	Enable experimental support for read-only DBus access to the Osmo
 	contacts.  Note that Osmo svn rev. 1099 or later is required.

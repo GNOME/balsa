@@ -15,8 +15,8 @@ id="preferences-address-books">
   &Balsa; to share address books with other GNOME
   applications.</p>
   <p>&Balsa; also supports LDIF address books, and can be built
-  to use GPE address books, when SQLite is available, and Rubrica
-  address books. Which types are supported depends on how
+  to use GPE address books, when SQLite is available.
+  Which types are supported depends on how
   &Balsa; was built.</p>
   <p>The main portion of the preferences page is occupied by the
   list of current address books for &Balsa;. The list shows the

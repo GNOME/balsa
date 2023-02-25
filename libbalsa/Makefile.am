@@ -16,8 +16,6 @@ libbalsa_a_SOURCES = 		\
 	address-book-ldif.h	\
 	address-book-osmo.c	\
 	address-book-osmo.h	\
-	address-book-rubrica.c	\
-	address-book-rubrica.h	\
 	address-book-text.c	\
 	address-book-text.h	\
 	address-book-vcard.c	\

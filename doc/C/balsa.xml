@@ -3205,7 +3205,7 @@ This is version 2.721 of the Balsa manual.
   share address books with other GNOME applications.</para>
   <para>&Balsa; also supports LDIF address books, and
   can be built to use GPE address books, when SQLite is
-  available, and Rubrica address books. Which types are supported
+  available. Which types are supported
   depends on how &Balsa; was built.
 </para>
 

@@ -44,9 +44,6 @@
 #if HAVE_SQLITE
 #include "address-book-gpe.h"
 #endif /* HAVE_SQLITE */
-#if HAVE_RUBRICA
-#include "address-book-rubrica.h"
-#endif /* HAVE_RUBRICA */
 #include "address-book-config.h"
 #include "application-helpers.h"
 #include "libbalsa-conf.h"
@@ -209,10 +206,6 @@ bab_window_set_title(LibBalsaAddressBook * address_book)
     else if (LIBBALSA_IS_ADDRESS_BOOK_GPE(address_book))
         type = "GPE";
 #endif
-#if HAVE_RUBRICA
-    else if (LIBBALSA_IS_ADDRESS_BOOK_RUBRICA(address_book))
-        type = "Rubrica";
-#endif /* HAVE_RUBRICA */
 
     title =
         g_strconcat(type, _(" address book: "), libbalsa_address_book_get_name(address_book), NULL);
@@ -403,18 +396,6 @@ file_new_gpe_activated(GSimpleAction * action,
 }
 #endif /* HAVE_SQLITE */
 
-#if HAVE_RUBRICA
-static void
-file_new_rubrica_activated(GSimpleAction * action,
-                           GVariant      * state,
-                           gpointer        user_data)
-{
-    balsa_address_book_config_new_from_type
-        (LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA, address_book_change,
-         contacts_app.window);
-}
-#endif /* HAVE_RUBRICA */
-
 static void
 file_properties_activated(GSimpleAction * action,
                           GVariant      * state,
@@ -562,9 +543,6 @@ get_main_menu(GtkApplication * application)
 #if HAVE_SQLITE
         {"file-new-gpe",        file_new_gpe_activated},
 #endif /* HAVE_SQLITE */
-#if HAVE_RUBRICA
-        {"file-new-rubrica",    file_new_rubrica_activated},
-#endif /* HAVE_RUBRICA */
         {"file-properties",     file_properties_activated},
         {"file-delete",         file_delete_activated},
         {"file-quit",           file_quit_activated},
@@ -1017,9 +995,6 @@ bab_init(void)
 #if HAVE_SQLITE
     LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
 #endif
-#if HAVE_RUBRICA
-    LIBBALSA_TYPE_ADDRESS_BOOK_RUBRICA;
-#endif /* HAVE_RUBRICA */
     memset(&contacts_app, 0, sizeof(contacts_app));
 }
 

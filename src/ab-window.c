@@ -696,10 +696,6 @@ balsa_ab_window_set_title(BalsaAbWindow *ab)
     else if (LIBBALSA_IS_ADDRESS_BOOK_GPE(address_book))
         type = "GPE";
 #endif
-#if HAVE_RUBRICA
-    else if (LIBBALSA_IS_ADDRESS_BOOK_RUBRICA(address_book))
-        type = "Rubrica";
-#endif
 
     title =
         g_strconcat(type, _(" address book: "),

@@ -646,14 +646,18 @@ lbav_entry_changed_cb(GtkEntry * entry, LibBalsaAddressView * address_view)
  *     Callback for the entry's "key-pressed" event
  */
 static gboolean
-lbav_key_pressed_cb(GtkEntry * entry,
-                    const GdkEvent * event,
-                    LibBalsaAddressView * address_view)
+lbav_key_pressed_cb(GtkEventControllerKey *key_controller,
+                    guint                  keyval,
+                    guint                  keycode,
+                    GdkModifierType        state,
+                    gpointer               user_data)
 {
-    guint keyval;
+    LibBalsaAddressView *address_view = user_data;
+    GtkWidget *entry_widget;
+    GtkEntry *entry;
     GtkEntryCompletion *completion;
 
-    if (!gdk_event_get_keyval(event, &keyval) || keyval != GDK_KEY_Escape)
+    if (keyval != GDK_KEY_Escape)
         return FALSE;
 
     if (address_view->last_was_escape) {
@@ -662,6 +666,8 @@ lbav_key_pressed_cb(GtkEntry * entry,
     }
     address_view->last_was_escape = TRUE;
 
+    entry_widget = gtk_event_controller_get_widget(GTK_EVENT_CONTROLLER(key_controller));
+    entry = GTK_ENTRY(entry_widget);
     completion = gtk_entry_get_completion(entry);
     g_signal_handlers_block_by_func(entry, lbav_entry_changed_cb,
                                     address_view);
@@ -850,6 +856,7 @@ lbav_row_editing_cb(GtkCellRenderer * renderer,
 {
     GtkEntryCompletion *completion;
     GtkListStore *store;
+    GtkEventController *key_controller;
 
     if (!GTK_IS_ENTRY(editable))
         return;
@@ -867,19 +874,21 @@ lbav_row_editing_cb(GtkCellRenderer * renderer,
     g_signal_connect(completion, "match-selected",
                      G_CALLBACK(lbav_completion_match_selected_cb),
                      address_view);
+    gtk_entry_set_completion(GTK_ENTRY(editable), completion);
+    g_object_unref(completion);
 
     g_signal_connect(editable, "changed",
                      G_CALLBACK(lbav_entry_changed_cb), address_view);
-    g_signal_connect(editable, "key-press-event",
-                     G_CALLBACK(lbav_key_pressed_cb), address_view);
     g_signal_connect(editable, "insert-text",
                      G_CALLBACK(lbav_insert_text_cb), address_view);
     g_signal_connect(editable, "editing-done",
                      G_CALLBACK(lbav_editing_done), address_view);
     g_signal_connect_after(editable, "notify::has-focus",
                      G_CALLBACK(lbav_notify_has_focus_cb), address_view);
-    gtk_entry_set_completion(GTK_ENTRY(editable), completion);
-    g_object_unref(completion);
+
+    key_controller = gtk_event_controller_key_new(GTK_WIDGET(editable));
+    g_signal_connect(key_controller, "key-pressed",
+                     G_CALLBACK(lbav_key_pressed_cb), address_view);
 
     address_view->last_was_escape = FALSE;
     address_view->editable = editable;

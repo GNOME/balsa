@@ -170,8 +170,7 @@ This is version 2.721 of the Balsa manual.
   If you want to learn more about &Balsa;, your best bet is the
   &Balsa; Discussion forum on the website <ulink
   url="&balsalist;">&balsalist;</ulink>. Bugs can be reported
-  via <application>bug-buddy</application>, <application>gnome-bug
-  </application> or to <email>submit@bugs.gnome.org</email>.
+  via <ulink url="https://gitlab.gnome.org/GNOME/balsa/-/issues">GNOME GitLab</ulink>.
 </para>
 </sect1> <!-- id=introduction -->
 

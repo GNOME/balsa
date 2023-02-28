@@ -9,7 +9,7 @@
 <!ENTITY Pine      "<application>pine</application>">
 <!ENTITY procmail  "<application>procmail</application>">
 <!ENTITY GnuPG     "<application>GnuPG</application>">
-<!ENTITY balsalist "http://mail.gnome.org/mailman/listinfo/balsa-list">
+<!ENTITY balsalist "https://discourse.gnome.org/tag/balsa">
 <!ENTITY IMAP 
 '<glossterm linkend="glossary-imap"><acronym>IMAP</acronym></glossterm>'>
 <!ENTITY LDAP
@@ -168,11 +168,8 @@ This is version 2.721 of the Balsa manual.
 
 <para>
   If you want to learn more about &Balsa;, your best bet is the
-  mailing list <email>balsa-list@gnome.org</email>, to which you can
-  subscribe by going to the website <ulink
-  url="&balsalist;">&balsalist;</ulink> or by sending a message with a
-  subject of <emphasis>subscribe</emphasis> to
-  <email>balsa-list-request@gnome.org</email>. Bugs can be reported
+  &Balsa; Discussion forum on the website <ulink
+  url="&balsalist;">&balsalist;</ulink>. Bugs can be reported
   via <application>bug-buddy</application>, <application>gnome-bug
   </application> or to <email>submit@bugs.gnome.org</email>.
 </para>

@@ -112,9 +112,8 @@ id="authors">
   </list>
   <p>Please send all comments and suggestions regarding the manual
   to the GNOME Documentation Project at
-  <link href="mailto:docs@gnome.org">docs@gnome.org</link> and the
-  <link href="https://mail.gnome.org/mailman/listinfo/balsa-list">
-  &Balsa; Discussion List</link>. You can also add your
+  <link href="https://discourse.gnome.org/tag/documentation">GNOME Discourse</link> and the
+  &Balsa; Discussion forum on <link href="https://discourse.gnome.org/tag/balsa">GNOME Discourse</link>. You can also add your
   comments online by using
   <link href="https://developer-old.gnome.org/gdp-handbook/stable/gettingstarted.html.en">
   GNOME Documentation Status Table</link>.</p>

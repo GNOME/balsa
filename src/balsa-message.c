@@ -198,6 +198,7 @@ struct _BalsaMessage {
         GtkWidget  *find_label;
         GtkTextIter find_iter;
         gboolean    find_forward;
+        GtkEventController *find_key_controller;
 
         /* Widget to hold Faces */
         GtkWidget *face_box;
@@ -549,6 +550,7 @@ bm_find_bar_new(BalsaMessage * balsa_message)
 {
     GtkWidget *toolbar;
     GtkWidget *hbox;
+    GtkWidget *toplevel;
     GtkToolItem *tool_item;
     GtkWidget *image;
     GtkWidget *search_bar;
@@ -563,6 +565,11 @@ bm_find_bar_new(BalsaMessage * balsa_message)
     g_signal_connect(balsa_message->find_entry, "search-changed",
                      G_CALLBACK(bm_find_entry_changed_cb), balsa_message);
     gtk_box_pack_start(GTK_BOX(hbox), balsa_message->find_entry, FALSE, FALSE, 0);
+
+    toplevel = gtk_widget_get_toplevel(GTK_WIDGET(balsa_message));
+    balsa_message->find_key_controller = gtk_event_controller_key_new(toplevel);
+    gtk_event_controller_set_propagation_phase(balsa_message->find_key_controller,
+                                               GTK_PHASE_CAPTURE);
 
     tool_item = gtk_tool_item_new();
     gtk_container_add(GTK_CONTAINER(tool_item), hbox);
@@ -603,14 +610,14 @@ bm_find_bar_new(BalsaMessage * balsa_message)
 static void bm_disable_find_entry(BalsaMessage * balsa_message);
 
 static gboolean
-bm_find_pass_to_entry(BalsaMessage * balsa_message, GdkEvent * event)
+bm_find_pass_to_entry(GtkEventControllerKey *key_controller,
+                      guint                  keyval,
+                      guint                  keycode,
+                      GdkModifierType        state,
+                      gpointer               user_data)
 {
-    guint keyval;
-    GdkModifierType state;
+    BalsaMessage *balsa_message = user_data;
     gboolean res = TRUE;
-
-    if (!gdk_event_get_keyval(event, &keyval))
-        return FALSE;
 
     switch (keyval) {
     case GDK_KEY_Escape:
@@ -619,20 +626,22 @@ bm_find_pass_to_entry(BalsaMessage * balsa_message, GdkEvent * event)
         bm_disable_find_entry(balsa_message);
         return res;
     case GDK_KEY_g:
-        if (gdk_event_get_state(event, &state) &&
-            (state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) == GDK_CONTROL_MASK &&
+        if ((state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK)) == GDK_CONTROL_MASK &&
             gtk_widget_get_sensitive(balsa_message->find_next)) {
             bm_find_again(balsa_message, balsa_message->find_forward);
             return res;
         }
+        /* else fall through */
     default:
         break;
     }
 
     res = FALSE;
-    if (gtk_widget_has_focus(balsa_message->find_entry))
-        g_signal_emit_by_name(balsa_message->find_entry, "key-press-event", event,
-                              &res, NULL);
+    if (gtk_widget_has_focus(balsa_message->find_entry)) {
+        GtkSearchEntry *search_entry = GTK_SEARCH_ENTRY(balsa_message->find_entry);
+        GdkEvent *event = gtk_get_current_event();
+        res = gtk_search_entry_handle_event(search_entry, event);
+    }
 
     return res;
 }
@@ -640,9 +649,9 @@ bm_find_pass_to_entry(BalsaMessage * balsa_message, GdkEvent * event)
 static void
 bm_disable_find_entry(BalsaMessage * balsa_message)
 {
-    g_signal_handlers_disconnect_by_func
-        (gtk_widget_get_toplevel(GTK_WIDGET(balsa_message)),
-         G_CALLBACK(bm_find_pass_to_entry), balsa_message);
+    g_signal_handlers_disconnect_by_func(balsa_message->find_key_controller,
+                                         G_CALLBACK(bm_find_pass_to_entry),
+                                         balsa_message);
     gtk_search_bar_set_search_mode(GTK_SEARCH_BAR(balsa_message->find_bar), FALSE);
 }
 
@@ -3332,9 +3341,9 @@ balsa_message_find_in_message(BalsaMessage * balsa_message)
 
         balsa_message->find_forward = TRUE;
         gtk_entry_set_text(GTK_ENTRY(balsa_message->find_entry), "");
-        g_signal_connect_swapped(gtk_widget_get_toplevel(GTK_WIDGET(balsa_message)),
-                                 "key-press-event",
-                                 G_CALLBACK(bm_find_pass_to_entry), balsa_message);
+
+        g_signal_connect(balsa_message->find_key_controller, "key-pressed",
+                         G_CALLBACK(bm_find_pass_to_entry), balsa_message);
 
         bm_find_set_status(balsa_message, BM_FIND_STATUS_INIT);
 

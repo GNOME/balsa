@@ -36,8 +36,12 @@ static gboolean update_osx_menubar(GtkWidget *widget, GdkEventFocus *event, GtkW
 void
 libbalsa_macosx_menu(GtkWidget *window, GtkMenuShell *menubar)
 {
+    GtkEventController *focus_controller;
+
     g_object_set_data(G_OBJECT(window), "osx-menubar", menubar);
-    g_signal_connect(window, "focus-in-event",
+
+    focus_controller = gtk_event_controller_focus_new(window);
+    g_signal_connect(focus_controller, "enter",
 		     G_CALLBACK(update_osx_menubar), window);
 }
 
@@ -45,27 +49,30 @@ libbalsa_macosx_menu(GtkWidget *window, GtkMenuShell *menubar)
 void
 libbalsa_macosx_menu_for_parent(GtkWidget *window, GtkWindow *parent)
 {
-    if(parent)
-	g_signal_connect(window, "focus-in-event",
+    if(parent) {
+        GtkEventController *focus_controller;
+
+        focus_controller = gtk_event_controller_focus_new(window);
+        g_signal_connect(focus_controller, "enter",
 			 G_CALLBACK(update_osx_menubar), parent);
-    else
+    } else {
 	g_debug("called %s for widget %p with NULL parent", __func__, window);
+    }
 }
 
 
-/* window "focus-in-event" callback for a window
+/* GtkEventControllerFocus "enter" callback for a window
  * get the "osx-menubar" from the user data object, and set it as OS X main menu
  */
-static gboolean
-update_osx_menubar(GtkWidget *widget,  GdkEventFocus *event, GtkWindow *window)
+static void
+update_osx_menubar(GtkWidget *widget, GtkWindow *window)
 {
     GtkMenuShell *menubar;
     
-    g_return_val_if_fail(window != NULL, FALSE);
+    g_return_if_fail(window != NULL);
     menubar = GTK_MENU_SHELL(g_object_get_data(G_OBJECT(window), "osx-menubar"));
-    g_return_val_if_fail(menubar != NULL, FALSE);
+    g_return_if_fail(menubar != NULL);
     ige_mac_menu_set_menu_bar(menubar);
-    return FALSE;
 }
 
 #endif  /* HAVE_MACOSX_DESKTOP */

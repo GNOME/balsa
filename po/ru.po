@@ -1,14 +1,17 @@
-# SOME DESCRIPTIVE TITLE.
+# Russian translations for balsa package.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# This file is distributed under the same license as the balsa package.
+# Alexander Kirillov <kirillov@math.ias.edu>, 1999
+# Sergey Panov <sipan@mit.edu>, 1999
+# Valek Filippov <frob@df.ru>, 2000-2001
+# Sergej A. <asvmail.as@gmail.com>, 2022-2023
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2022-11-16 16:45+0000\n"
-"PO-Revision-Date: 2022-11-24 23:58+1000\n"
+"POT-Creation-Date: 2023-02-18 21:13+0000\n"
+"PO-Revision-Date: 2023-02-19 09:17+1000\n"
 "Last-Translator: Ser82-png <asvmail.as@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -194,36 +197,109 @@ msgstr "_Электронный адрес:"
 msgid "A_dd"
 msgstr "_Добавить"
 
-#: ../libbalsa/address-view.c:157 ../src/balsa-mime-widget-message.c:757
+#: ../libbalsa/address-view.c:193 ../src/balsa-mime-widget-message.c:757
 #: ../src/balsa-print-object-header.c:146 ../src/sendmsg-window.c:674
 #: ../src/sendmsg-window.c:3630
 msgid "To:"
 msgstr "Кому:"
 
-#: ../libbalsa/address-view.c:158 ../src/balsa-mime-widget-message.c:759
+#: ../libbalsa/address-view.c:194 ../src/balsa-mime-widget-message.c:759
 #: ../src/balsa-print-object-header.c:148 ../src/sendmsg-window.c:674
 #: ../src/sendmsg-window.c:3638
 msgid "CC:"
 msgstr "Копия:"
 
-#: ../libbalsa/address-view.c:159 ../src/balsa-mime-widget-message.c:761
+#: ../libbalsa/address-view.c:195 ../src/balsa-mime-widget-message.c:761
 #: ../src/balsa-print-object-header.c:150 ../src/sendmsg-window.c:674
 msgid "BCC:"
 msgstr "Скрытая копия:"
 
-#: ../libbalsa/address-view.c:160
+#: ../libbalsa/address-view.c:196
 msgid "Reply To:"
 msgstr "Для ответа:"
 
+#: ../libbalsa/address-view.c:963
+#, c-format
+msgid "Cannot load Autocrypt keys: %s"
+msgstr "Не удалось загрузить ключи автоматического шифрования: %s"
+
+#: ../libbalsa/address-view.c:967
+#, c-format
+msgid "Imported %d key from the Autocrypt database into your key ring."
+msgid_plural "Imported %d keys from the Autocrypt database into your key ring."
+msgstr[0] "Импортирован %d ключ из базы данных Autocrypt в вашу связку ключей."
+msgstr[1] ""
+"Импортировано %d ключа из базы данных Autocrypt в вашу связку ключей."
+msgstr[2] ""
+"Импортировано %d ключей из базы данных Autocrypt в вашу связку ключей."
+
+#. Translators: #1 crypto protocol; #2 RFC 5322 internet address
+#: ../libbalsa/address-view.c:981
+#, c-format
+msgid "Looking for %s key for “%s”"
+msgstr "Ищем ключ %s для «%s»"
+
+#. Translators: #1 crypto protocol; #2 RFC 5322 internet address
+#: ../libbalsa/address-view.c:988
+#, c-format
+msgid "Cannot find any %s key for “%s”"
+msgstr "Не удалось найти ключ %s для «%s»"
+
+#. Translators: #1 key count, #2 crypto protocol; #2 RFC 5322 internet address
+#: ../libbalsa/address-view.c:994
+#, c-format
+msgid "Imported %d %s key for “%s” into your key ring."
+msgid_plural "Imported %d %s keys for “%s” into your key ring."
+msgstr[0] "Импортирован %d ключ %s для «%s» в вашу связку ключей."
+msgstr[1] "Импортировано %d ключа %s для «%s» в вашу связку ключей."
+msgstr[2] "Импортировано %d ключей %s для «%s» в вашу связку ключей."
+
+#: ../libbalsa/address-view.c:1002
+#, c-format
+msgid "Cannot import missing keys for “%s”: %s"
+msgstr "Не удалось импортировать пропущенные ключи для «%s»: %s"
+
+#. paranoid, should never happen
+#: ../libbalsa/address-view.c:1055
+#, c-format
+msgid "cannot find a key for “%s”"
+msgstr "не удалось найти ключ для «%s»"
+
+#: ../libbalsa/address-view.c:1062
+#, c-format
+msgid "Encryption key for “%s”"
+msgid_plural "Encryption keys for “%s”"
+msgstr[0] "Ключ шифрования для «%s»"
+msgstr[1] "Ключи шифрования для «%s»"
+msgstr[2] "Ключи шифрования для «%s»"
+
+#: ../libbalsa/address-view.c:1152
+msgid "public key(s) missing, click to search key server"
+msgstr ""
+"отсутствуют открытые ключи, нажмите, чтобы выполнить поиск на сервере ключей"
+
+#: ../libbalsa/address-view.c:1154
+msgid "public key missing, click to search key server"
+msgstr ""
+"отсутствует открытый ключ, нажмите, чтобы выполнить поиск на сервере ключей"
+
+#: ../libbalsa/address-view.c:1158
+msgid "all public keys available, click to show them"
+msgstr "все открытые ключи доступны, нажмите, чтобы показать их"
+
+#: ../libbalsa/address-view.c:1160
+msgid "public key available, click to show it"
+msgstr "открытый ключ доступен, нажмите, чтобы показать его"
+
 #. Translators: #1 database file; #2 error message
-#: ../libbalsa/autocrypt.c:194
+#: ../libbalsa/autocrypt.c:199
 #, c-format
 msgid "cannot initialise Autocrypt database “%s”: %s"
 msgstr ""
 "не удается инициализировать базу данных автоматического шифрования «%s»: %s"
 
 #. Translators: #1 sender's email address
-#: ../libbalsa/autocrypt.c:321
+#: ../libbalsa/autocrypt.c:326
 #, c-format
 msgid ""
 "No usable private key for “%s” found! Please create a key or disable "
@@ -234,58 +310,60 @@ msgstr ""
 
 #. Translators: #1 GPG key fingerprint; #2 error message
 #. Translators: #1 mailbox; #2 error message
-#: ../libbalsa/autocrypt.c:389 ../libbalsa/autocrypt.c:398
-#: ../libbalsa/autocrypt.c:682 ../libbalsa/autocrypt.c:689
+#. Translators: #1 email address (mailbox); #2 error message
+#: ../libbalsa/autocrypt.c:395 ../libbalsa/autocrypt.c:404
+#: ../libbalsa/autocrypt.c:714 ../libbalsa/autocrypt.c:721
+#: ../libbalsa/autocrypt.c:1056 ../libbalsa/autocrypt.c:1078
 #, c-format
 msgid "error reading Autocrypt data for “%s”: %s"
 msgstr "ошибка чтения данных автоматического шифрования для «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:451
+#: ../libbalsa/autocrypt.c:478
 msgid "Autocrypt database"
 msgstr "База данных автошифрования"
 
-#: ../libbalsa/autocrypt.c:452 ../libbalsa/html.c:459
+#: ../libbalsa/autocrypt.c:479 ../libbalsa/html.c:459
 #: ../libbalsa/html-pref-db.c:139 ../libbalsa/identity.c:1658
-#: ../libbalsa/libbalsa-gpgme-widgets.c:769 ../src/ab-window.c:148
-#: ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
+#: ../libbalsa/libbalsa-gpgme-widgets.c:825 ../libbalsa/server-config.c:545
+#: ../src/ab-window.c:148 ../src/folder-conf.c:337 ../src/mailbox-node.c:1048
 #: ../src/main-window.c:3934 ../src/toolbar-prefs.c:130
 #: ../ui/main-window.ui.h:65 ../ui/message-window.ui.h:4
 #: ../ui/sendmsg-window.ui.h:12 ../ui/source-viewer.ui.h:2
 msgid "_Close"
 msgstr "_Закрыть"
 
-#: ../libbalsa/autocrypt.c:521 ../src/balsa-mblist.c:326
+#: ../libbalsa/autocrypt.c:550 ../src/balsa-mblist.c:326
 msgid "Mailbox"
 msgstr "Почтовый ящик"
 
-#: ../libbalsa/autocrypt.c:527
+#: ../libbalsa/autocrypt.c:556
 msgid "Last seen"
 msgstr "Последнее посещение"
 
-#: ../libbalsa/autocrypt.c:533
+#: ../libbalsa/autocrypt.c:562
 msgid "Last Autocrypt message"
 msgstr "Последнее автоматически зашифрованное сообщение"
 
-#: ../libbalsa/autocrypt.c:539
+#: ../libbalsa/autocrypt.c:568
 msgid "Prefer encryption"
 msgstr "Предпочитать шифрование"
 
 #. Translators: #1 email address; #2 error message
-#: ../libbalsa/autocrypt.c:792 ../libbalsa/autocrypt.c:813
+#: ../libbalsa/autocrypt.c:818 ../libbalsa/autocrypt.c:840
 #, c-format
 msgid "update user “%s” failed: %s"
 msgstr "не удалось обновить пользователя «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:792
+#: ../libbalsa/autocrypt.c:818
 #, c-format
 msgid "insert user “%s” failed: %s"
 msgstr "не удалось вставить пользователя «%s»: %s"
 
-#: ../libbalsa/autocrypt.c:889
+#: ../libbalsa/autocrypt.c:916
 msgid "_Show details…"
 msgstr "_Показать детали…"
 
-#: ../libbalsa/autocrypt.c:892 ../libbalsa/html-pref-db.c:453
+#: ../libbalsa/autocrypt.c:919 ../libbalsa/html-pref-db.c:453
 #: ../src/balsa-index.c:2000 ../src/mailbox-node.c:1040
 #: ../src/mailbox-node.c:1056 ../src/pref-manager.c:2024
 #: ../src/pref-manager.c:2109 ../src/pref-manager.c:2832 ../ui/ab-main.ui.h:11
@@ -294,13 +372,18 @@ msgid "_Delete"
 msgstr "_Удалить"
 
 #. Translators: #1 email address
-#: ../libbalsa/autocrypt.c:944
+#: ../libbalsa/autocrypt.c:969
 #, c-format
 msgid "The database entry for “%s” does not contain a key."
 msgstr "Запись базы данных для «%s» не содержит ключа."
 
-#. Translators: #1 email address
 #: ../libbalsa/autocrypt.c:983
+#, c-format
+msgid "cannot show key details: %s"
+msgstr "не удалось показать детали ключа: %s"
+
+#. Translators: #1 email address
+#: ../libbalsa/autocrypt.c:1011
 #, c-format
 msgid "Delete the Autocrypt key for “%s” from the database?"
 msgstr "Удалить ключ автошифрования для «%s» из базы данных?"
@@ -444,8 +527,8 @@ msgid "Failed to decrypt MIME part: parse error"
 msgstr "Не удалось расшифровать часть MIME: ошибка обработки"
 
 #: ../libbalsa/gmime-gpgme-signature.c:147
-#: ../libbalsa/libbalsa-gpgme-widgets.c:360
-#: ../libbalsa/libbalsa-gpgme-widgets.c:673 ../libbalsa/rfc3156.c:598
+#: ../libbalsa/libbalsa-gpgme-widgets.c:366
+#: ../libbalsa/libbalsa-gpgme-widgets.c:729 ../libbalsa/rfc3156.c:554
 #: ../src/address-book-config.c:200
 msgid "never"
 msgstr "никогда"
@@ -495,8 +578,9 @@ msgstr ""
 "Отпечаток ключа: %s"
 
 #: ../libbalsa/gmime-gpgme-signature.c:239 ../libbalsa/imap/imap-handle.c:46
-#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:594
-#: ../src/folder-conf.c:411 ../src/sendmsg-window.c:5364
+#: ../libbalsa/libbalsa-gpgme.c:190 ../libbalsa/rfc3156.c:550
+#: ../libbalsa/server-config.c:552 ../src/folder-conf.c:411
+#: ../src/sendmsg-window.c:5364
 msgid "unknown"
 msgstr "неизвестно"
 
@@ -624,7 +708,7 @@ msgid "Cannot save HTML preferences for “%s”: %s"
 msgstr "Не удалось сохранить параметры HTML для «%s»: %s"
 
 #. Translators: #1 error message
-#: ../libbalsa/html-pref-db.c:481
+#: ../libbalsa/html-pref-db.c:482
 #, c-format
 msgid "Cannot delete database entry: %s"
 msgstr "Не удалось удалить запись базы данных: %s"
@@ -666,7 +750,7 @@ msgid "Signature in “%s” is not a UTF-8 text."
 msgstr "Подпись в «%s» не является текстом в кодировке UTF-8."
 
 #: ../libbalsa/identity.c:368 ../libbalsa/libbalsa-gpgme-cb.c:184
-#: ../libbalsa/libbalsa-gpgme-cb.c:363 ../libbalsa/smtp-server.c:327
+#: ../libbalsa/libbalsa-gpgme-cb.c:363 ../libbalsa/smtp-server.c:334
 #: ../src/ab-main.c:849 ../src/ab-window.c:141 ../src/address-book-config.c:240
 #: ../src/address-book-config.c:346 ../src/address-book-config.c:392
 #: ../src/balsa-app.c:94 ../src/balsa-app.c:163 ../src/balsa-index.c:2793
@@ -687,7 +771,7 @@ msgid "_Cancel"
 msgstr "_Отменить"
 
 #: ../libbalsa/identity.c:369 ../libbalsa/libbalsa-gpgme-cb.c:183
-#: ../libbalsa/libbalsa-gpgme-cb.c:362 ../libbalsa/smtp-server.c:326
+#: ../libbalsa/libbalsa-gpgme-cb.c:362 ../libbalsa/smtp-server.c:333
 #: ../src/ab-window.c:140 ../src/balsa-app.c:95 ../src/balsa-app.c:162
 #: ../src/balsa-message.c:1760 ../src/balsa-mime-widget-callbacks.c:86
 #: ../src/filter-edit-callbacks.c:1237 ../src/filter-edit-dialog.c:573
@@ -703,7 +787,7 @@ msgstr "_ОК"
 msgid "Current"
 msgstr "Текущий"
 
-#: ../libbalsa/identity.c:643 ../libbalsa/smtp-server.c:140
+#: ../libbalsa/identity.c:643 ../libbalsa/smtp-server.c:147
 msgid "Default"
 msgstr "По умолчанию"
 
@@ -907,7 +991,7 @@ msgstr "Ошибка отображения справки о профиле: %s
 msgid "Manage Identities"
 msgstr "Управление профилями"
 
-#: ../libbalsa/identity.c:1654 ../libbalsa/smtp-server.c:328
+#: ../libbalsa/identity.c:1654 ../libbalsa/smtp-server.c:335
 #: ../src/address-book-config.c:241 ../src/address-book-config.c:344
 #: ../src/address-book-config.c:390 ../src/filter-edit-callbacks.c:1239
 #: ../src/filter-edit-dialog.c:575 ../src/filter-export-dialog.c:81
@@ -929,7 +1013,7 @@ msgstr "_Создать"
 msgid "_Remove"
 msgstr "_Удалить"
 
-#: ../libbalsa/identity.c:2041 ../libbalsa/libbalsa-gpgme-widgets.c:478
+#: ../libbalsa/identity.c:2041 ../libbalsa/libbalsa-gpgme-widgets.c:453
 msgid "disabled"
 msgstr "отключено"
 
@@ -953,8 +1037,8 @@ msgstr "GnuPG OpenPGP режим"
 msgid "GpgSM S/MIME mode"
 msgstr "GpgSM S/MIME режим"
 
-#: ../libbalsa/imap/auth-cram.c:47 ../libbalsa/imap/imap-auth.c:91
-#: ../libbalsa/imap/imap-auth.c:142
+#: ../libbalsa/imap/auth-cram.c:47 ../libbalsa/imap/imap-auth.c:92
+#: ../libbalsa/imap/imap-auth.c:143
 msgid "Authentication cancelled"
 msgstr "Аутентификация отменена"
 
@@ -971,7 +1055,7 @@ msgstr "Ошибка аутентификации GSSAPI: %s"
 msgid "No way to authenticate is known"
 msgstr "Способ аутентификации неизвестен"
 
-#: ../libbalsa/imap/imap-auth.c:98
+#: ../libbalsa/imap/imap-auth.c:99
 msgid "Cannot LOGIN with UTF-8 username or password"
 msgstr ""
 "Не удалось выполнить LOGIN с именем пользователя или паролем в кодировке "
@@ -985,26 +1069,31 @@ msgstr "От сервера получены неупорядоченные да
 msgid "Bug in implementation of SORT command on IMAP server exposed."
 msgstr "Выявлена ​​ошибка в реализации команды SORT на IMAP-сервере."
 
-#: ../libbalsa/imap/imap-handle.c:671
+#: ../libbalsa/imap/imap-handle.c:682
 #, c-format
 msgid "Connecting %s failed: %s"
 msgstr "Подключение %s не удалось: %s"
 
-#: ../libbalsa/imap/imap-handle.c:684 ../libbalsa/imap/imap-handle.c:704
+#: ../libbalsa/imap/imap-handle.c:695 ../libbalsa/imap/imap-handle.c:715
 #, c-format
 msgid "TLS negotiation failed: %s"
 msgstr "Не удалось выполнить согласование TLS: %s"
 
-#: ../libbalsa/imap/imap-handle.c:710
+#: ../libbalsa/imap/imap-handle.c:721
 msgid "TLS required but not available"
 msgstr "Требуется TLS, но он недоступен"
 
 #. it is not we, so it must be the server
-#: ../libbalsa/imap/imap-handle.c:2298 ../libbalsa/imap/imap-handle.c:2316
-#: ../libbalsa/imap/imap-handle.c:2332 ../libbalsa/imap/imap-handle.c:2363
+#: ../libbalsa/imap/imap-handle.c:2309 ../libbalsa/imap/imap-handle.c:2327
+#: ../libbalsa/imap/imap-handle.c:2343 ../libbalsa/imap/imap-handle.c:2374
 #, c-format
 msgid "IMAP response: %s"
 msgstr "Ответ IMAP: %s"
+
+#: ../libbalsa/imap/imap-handle.c:4539
+#, c-format
+msgid "the server %s does not offer the IMAP service at port 993 or 143"
+msgstr "сервер %s не предоставляет доступ к службе IMAP через порт 993 или 143"
 
 #. IMAP host name + message
 #: ../libbalsa/imap-server.c:213
@@ -1169,56 +1258,67 @@ msgstr "не удалось создать контекст"
 msgid "could not set protocol “%s”"
 msgstr "не удалось установить протокол «%s»"
 
-#: ../libbalsa/libbalsa-gpgme.c:314
+#: ../libbalsa/libbalsa-gpgme.c:305
+#, c-format
+msgid "failed to create a temporary folder"
+msgstr "не удалось создать временную папку"
+
+#: ../libbalsa/libbalsa-gpgme.c:325
 #, c-format
 msgid "could not set folder “%s” for engine “%s”"
 msgstr "не удалось установить папку «%s» для движка «%s»"
 
-#: ../libbalsa/libbalsa-gpgme.c:371 ../libbalsa/libbalsa-gpgme.c:382
-#: ../libbalsa/libbalsa-gpgme.c:483 ../libbalsa/libbalsa-gpgme.c:606
-#: ../libbalsa/libbalsa-gpgme.c:699
+#. paranoid - should *never* happen
+#: ../libbalsa/libbalsa-gpgme.c:330
+#, c-format
+msgid "no crypto engine for “%s” available"
+msgstr "криптографический движок для «%s» недоступен"
+
+#: ../libbalsa/libbalsa-gpgme.c:396 ../libbalsa/libbalsa-gpgme.c:407
+#: ../libbalsa/libbalsa-gpgme.c:508 ../libbalsa/libbalsa-gpgme.c:631
+#: ../libbalsa/libbalsa-gpgme.c:724
 msgid "could not get data from stream"
 msgstr "не удалось получить данные из потока"
 
-#: ../libbalsa/libbalsa-gpgme.c:395 ../libbalsa/rfc3156.c:271
-#: ../libbalsa/rfc3156.c:276 ../libbalsa/rfc3156.c:444
-#: ../libbalsa/rfc3156.c:450
+#: ../libbalsa/libbalsa-gpgme.c:420 ../libbalsa/rfc3156.c:245
+#: ../libbalsa/rfc3156.c:250 ../libbalsa/rfc3156.c:406
+#: ../libbalsa/rfc3156.c:412
 msgid "signature verification failed"
 msgstr "не удалось проверить подпись"
 
-#: ../libbalsa/libbalsa-gpgme.c:491 ../libbalsa/libbalsa-gpgme.c:615
-#: ../libbalsa/libbalsa-gpgme.c:707
+#: ../libbalsa/libbalsa-gpgme.c:516 ../libbalsa/libbalsa-gpgme.c:640
+#: ../libbalsa/libbalsa-gpgme.c:732
 msgid "could not create new data object"
 msgstr "не удалось создать новый объект данных"
 
-#: ../libbalsa/libbalsa-gpgme.c:500
+#: ../libbalsa/libbalsa-gpgme.c:525
 msgid "signing failed"
 msgstr "на удалось подписать"
 
-#: ../libbalsa/libbalsa-gpgme.c:574
+#: ../libbalsa/libbalsa-gpgme.c:599
 #, c-format
 msgid "combined signing and encryption is defined only for RFC 2440"
 msgstr "комбинация подписи и шифрования определена только для RFC 2440"
 
-#: ../libbalsa/libbalsa-gpgme.c:642
+#: ../libbalsa/libbalsa-gpgme.c:667
 msgid "signing and encryption failed"
 msgstr "подпись и шифрование не удались"
 
-#: ../libbalsa/libbalsa-gpgme.c:644
+#: ../libbalsa/libbalsa-gpgme.c:669
 msgid "encryption failed"
 msgstr "шифрование не удалось"
 
-#: ../libbalsa/libbalsa-gpgme.c:717 ../libbalsa/rfc3156.c:344
-#: ../libbalsa/rfc3156.c:349
+#: ../libbalsa/libbalsa-gpgme.c:742 ../libbalsa/rfc3156.c:314
+#: ../libbalsa/rfc3156.c:319
 msgid "decryption failed"
 msgstr "расшифровка не удалась"
 
-#: ../libbalsa/libbalsa-gpgme.c:824
+#: ../libbalsa/libbalsa-gpgme.c:849
 #, c-format
 msgid "No private key for protocol %s is available for the signer “%s”"
 msgstr "Нет доступного закрытого ключа для %s для автора подписи «%s»"
 
-#: ../libbalsa/libbalsa-gpgme.c:974
+#: ../libbalsa/libbalsa-gpgme.c:999
 #, c-format
 msgid ""
 "A key for “%s” is present, but it is expired, disabled, revoked or invalid"
@@ -1226,17 +1326,17 @@ msgstr ""
 "Есть ключ для «%s», но срок его действия истёк, он отключён, отозван или "
 "некорректен"
 
-#: ../libbalsa/libbalsa-gpgme.c:977
+#: ../libbalsa/libbalsa-gpgme.c:1002
 #, c-format
 msgid "Could not find a key for “%s”"
 msgstr "Не удалось найти ключ для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme.c:992
+#: ../libbalsa/libbalsa-gpgme.c:1017
 #, c-format
 msgid "Multiple keys for “%s”"
 msgstr "Несколько ключей для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme.c:1014
+#: ../libbalsa/libbalsa-gpgme.c:1039
 #, c-format
 msgid "Insufficient key validity"
 msgstr "Недостаточная валидность ключа"
@@ -1328,46 +1428,46 @@ msgstr ""
 "\n"
 "Ключ: %s"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:94 ../libbalsa/libbalsa-gpgme-keys.c:162
+#: ../libbalsa/libbalsa-gpgme-keys.c:210 ../libbalsa/libbalsa-gpgme-keys.c:479
 msgid "error setting key list mode"
 msgstr "ошибка при попытке установить режим списка ключей"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:101 ../libbalsa/libbalsa-gpgme-keys.c:126
-#: ../libbalsa/libbalsa-gpgme-keys.c:168 ../libbalsa/libbalsa-gpgme-keys.c:172
+#: ../libbalsa/libbalsa-gpgme-keys.c:216 ../libbalsa/libbalsa-gpgme-keys.c:220
+#: ../libbalsa/libbalsa-gpgme-keys.c:484 ../libbalsa/libbalsa-gpgme-keys.c:502
 #, c-format
 msgid "could not list keys for “%s”"
 msgstr "не удалось создать список ключей для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:179
+#: ../libbalsa/libbalsa-gpgme-keys.c:227
 #, c-format
 msgid "ambiguous keys for “%s”"
 msgstr "неоднозначные ключи для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:248 ../libbalsa/libbalsa-gpgme-keys.c:291
-#: ../libbalsa/libbalsa-gpgme-keys.c:396
+#: ../libbalsa/libbalsa-gpgme-keys.c:330 ../libbalsa/libbalsa-gpgme-keys.c:375
+#: ../libbalsa/libbalsa-gpgme-keys.c:590 ../libbalsa/libbalsa-gpgme-keys.c:797
 msgid "cannot create data buffer"
 msgstr "не удалось создать буфер данных"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:256
+#: ../libbalsa/libbalsa-gpgme-keys.c:338
 #, c-format
 msgid "exporting key for “%s” failed"
 msgstr "не удалось экспортировать ключ для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:316 ../libbalsa/libbalsa-gpgme-keys.c:324
+#: ../libbalsa/libbalsa-gpgme-keys.c:400 ../libbalsa/libbalsa-gpgme-keys.c:408
 #, c-format
 msgid "cannot export minimal key for “%s”"
 msgstr "не удалось экспортировать минимальный ключ для «%s»"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:400
+#: ../libbalsa/libbalsa-gpgme-keys.c:594 ../libbalsa/libbalsa-gpgme-keys.c:807
 msgid "importing key data failed"
 msgstr "не удалось импортировать данные ключа"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:473
+#: ../libbalsa/libbalsa-gpgme-keys.c:676
 #, c-format
 msgid "Cannot find a key with fingerprint %s on the key server."
 msgstr "Не удается найти ключ с отпечатком %s на сервере ключей."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:481
+#: ../libbalsa/libbalsa-gpgme-keys.c:684
 #, c-format
 msgid ""
 "Found %u key with fingerprint %s on the key server. Please check and import "
@@ -1385,33 +1485,42 @@ msgstr[2] ""
 "На сервере ключей найдено %u ключей с отпечатком %s. Пожалуйста, проверьте и "
 "импортируйте нужный ключ вручную."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:501
+#: ../libbalsa/libbalsa-gpgme-keys.c:703
 #, c-format
 msgid "Searching the key server failed: %s"
 msgstr "Поиск на сервере ключей завершился неудачей: %s"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:540
+#: ../libbalsa/libbalsa-gpgme-keys.c:802
+#, c-format
+msgid "no data for key with fingerprint %s"
+msgstr "нет данных для ключа с отпечатком %s"
+
+#: ../libbalsa/libbalsa-gpgme-keys.c:813
+msgid "reading key data failed"
+msgstr "не удалось прочитать данные ключа"
+
+#: ../libbalsa/libbalsa-gpgme-keys.c:852 ../libbalsa/libbalsa-gpgme-keys.c:1044
 msgid "error importing key"
 msgstr "ошибка импорта ключа"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:575
+#: ../libbalsa/libbalsa-gpgme-keys.c:887
 msgid "No key was imported or updated."
 msgstr "Ни один ключ не был импортирован или обновлен."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:577
+#: ../libbalsa/libbalsa-gpgme-keys.c:889
 msgid "The key was ignored because it does not have a user ID."
 msgstr ""
 "Ключ проигнорирован, поскольку в нем не содержится данных ID пользователя."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:580
+#: ../libbalsa/libbalsa-gpgme-keys.c:892
 msgid "The key was imported into the local key ring."
 msgstr "Ключ был импортирован в локальную связку ключей."
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:584
+#: ../libbalsa/libbalsa-gpgme-keys.c:896
 msgid "The key was updated in the local key ring:"
 msgstr "Ключ был обновлен в локальной связке ключей:"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:587
+#: ../libbalsa/libbalsa-gpgme-keys.c:899
 #, c-format
 msgid ""
 "\n"
@@ -1429,7 +1538,7 @@ msgstr[2] ""
 "\n"
 "• %d новых ID пользователя"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:592
+#: ../libbalsa/libbalsa-gpgme-keys.c:904
 #, c-format
 msgid ""
 "\n"
@@ -1447,7 +1556,7 @@ msgstr[2] ""
 "\n"
 "• %d новых подключа"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:597
+#: ../libbalsa/libbalsa-gpgme-keys.c:909
 #, c-format
 msgid ""
 "\n"
@@ -1465,7 +1574,7 @@ msgstr[2] ""
 "\n"
 "• %d новых подписей"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:603
+#: ../libbalsa/libbalsa-gpgme-keys.c:915
 #, c-format
 msgid ""
 "\n"
@@ -1483,172 +1592,172 @@ msgstr[2] ""
 "\n"
 "• %d новых отзывов"
 
-#: ../libbalsa/libbalsa-gpgme-keys.c:609
+#: ../libbalsa/libbalsa-gpgme-keys.c:921
 msgid "The existing key in the key ring was not changed."
 msgstr "Существующий ключ в связке ключей не был изменён."
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:95
-#: ../libbalsa/libbalsa-gpgme-widgets.c:255
+#: ../libbalsa/libbalsa-gpgme-widgets.c:101
+#: ../libbalsa/libbalsa-gpgme-widgets.c:261
 msgid "Key status:"
 msgstr "Состояние ключа:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:101
-#: ../libbalsa/libbalsa-gpgme-widgets.c:108
-#: ../libbalsa/libbalsa-gpgme-widgets.c:261
-#: ../libbalsa/libbalsa-gpgme-widgets.c:269
+#: ../libbalsa/libbalsa-gpgme-widgets.c:107
+#: ../libbalsa/libbalsa-gpgme-widgets.c:114
+#: ../libbalsa/libbalsa-gpgme-widgets.c:267
+#: ../libbalsa/libbalsa-gpgme-widgets.c:275
 msgid "User ID:"
 msgstr "ID пользователя:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:101
-#: ../libbalsa/libbalsa-gpgme-widgets.c:261
+#: ../libbalsa/libbalsa-gpgme-widgets.c:107
+#: ../libbalsa/libbalsa-gpgme-widgets.c:267
 msgid "None"
 msgstr "Нет"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:106
-#: ../libbalsa/libbalsa-gpgme-widgets.c:267
+#: ../libbalsa/libbalsa-gpgme-widgets.c:112
+#: ../libbalsa/libbalsa-gpgme-widgets.c:273
 msgid "Primary user ID:"
 msgstr "Первичный ID пользователя:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:119
-#: ../libbalsa/libbalsa-gpgme-widgets.c:276
+#: ../libbalsa/libbalsa-gpgme-widgets.c:125
+#: ../libbalsa/libbalsa-gpgme-widgets.c:282
 msgid "Key owner trust:"
 msgstr "Доверие к владельцу ключа:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:129
-#: ../libbalsa/libbalsa-gpgme-widgets.c:283
+#: ../libbalsa/libbalsa-gpgme-widgets.c:135
+#: ../libbalsa/libbalsa-gpgme-widgets.c:289
 msgid "Additional User IDs"
 msgstr "Дополнительные ID пользователей"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:147
-#: ../libbalsa/libbalsa-gpgme-widgets.c:295
+#: ../libbalsa/libbalsa-gpgme-widgets.c:153
+#: ../libbalsa/libbalsa-gpgme-widgets.c:301
 msgid "Issuer"
 msgstr "Поставщик"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:158
-#: ../libbalsa/libbalsa-gpgme-widgets.c:301
+#: ../libbalsa/libbalsa-gpgme-widgets.c:164
+#: ../libbalsa/libbalsa-gpgme-widgets.c:307
 msgid "Name:"
 msgstr "Название:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:162
-#: ../libbalsa/libbalsa-gpgme-widgets.c:305
+#: ../libbalsa/libbalsa-gpgme-widgets.c:168
+#: ../libbalsa/libbalsa-gpgme-widgets.c:311
 msgid "Serial number:"
 msgstr "Серийный номер:"
 
 #. Translators: x509 certificate chain ID
-#: ../libbalsa/libbalsa-gpgme-widgets.c:169
-#: ../libbalsa/libbalsa-gpgme-widgets.c:309
+#: ../libbalsa/libbalsa-gpgme-widgets.c:175
+#: ../libbalsa/libbalsa-gpgme-widgets.c:315
 msgid "Chain ID:"
 msgstr "ID цепочки:"
 
 #. add button to show the full chain - copy the fingerprint as the key may be unref'ed...
-#: ../libbalsa/libbalsa-gpgme-widgets.c:172
+#: ../libbalsa/libbalsa-gpgme-widgets.c:178
 msgid "view certificate chain…"
 msgstr "просмотреть цепочку сертификатов…"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:192
-#: ../libbalsa/libbalsa-gpgme-widgets.c:318
+#: ../libbalsa/libbalsa-gpgme-widgets.c:198
+#: ../libbalsa/libbalsa-gpgme-widgets.c:324
 msgid "Subkey used"
 msgstr "Используемый подключ"
 
 #. Translators: #1 subkey capabilities string
-#: ../libbalsa/libbalsa-gpgme-widgets.c:202
+#: ../libbalsa/libbalsa-gpgme-widgets.c:208
 #, c-format
 msgid "Subkeys (%s only)"
 msgstr "Подключи (только %s)"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:207
+#: ../libbalsa/libbalsa-gpgme-widgets.c:213
 msgid "Subkeys"
 msgstr "Подключи"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:332
-#: ../libbalsa/libbalsa-gpgme-widgets.c:645
+#: ../libbalsa/libbalsa-gpgme-widgets.c:338
+#: ../libbalsa/libbalsa-gpgme-widgets.c:701
 #: ../src/balsa-mime-widget-vcalendar.c:184
-#: ../src/balsa-print-object-text.c:545
+#: ../src/balsa-print-object-text.c:544
 msgid "Status:"
 msgstr "Состояние:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:336
-#: ../libbalsa/libbalsa-gpgme-widgets.c:649
+#: ../libbalsa/libbalsa-gpgme-widgets.c:342
+#: ../libbalsa/libbalsa-gpgme-widgets.c:705
 msgid "Fingerprint:"
 msgstr "Отпечаток:"
 
 #. add type and filename (if available)
-#: ../libbalsa/libbalsa-gpgme-widgets.c:339
-#: ../libbalsa/libbalsa-gpgme-widgets.c:652
+#: ../libbalsa/libbalsa-gpgme-widgets.c:345
+#: ../libbalsa/libbalsa-gpgme-widgets.c:708
 #: ../src/balsa-print-object-default.c:112
 #: ../src/balsa-print-object-default.c:115
 #: ../src/balsa-print-object-default.c:118
 msgid "Type:"
 msgstr "Тип:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:345
-#: ../libbalsa/libbalsa-gpgme-widgets.c:658
+#: ../libbalsa/libbalsa-gpgme-widgets.c:351
+#: ../libbalsa/libbalsa-gpgme-widgets.c:714
 msgid "Capabilities:"
 msgstr "Возможности:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:350
-#: ../libbalsa/libbalsa-gpgme-widgets.c:663
+#: ../libbalsa/libbalsa-gpgme-widgets.c:356
+#: ../libbalsa/libbalsa-gpgme-widgets.c:719
 msgid "invalid timestamp"
 msgstr "некорректная временная отметка"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:352
-#: ../libbalsa/libbalsa-gpgme-widgets.c:665
+#: ../libbalsa/libbalsa-gpgme-widgets.c:358
+#: ../libbalsa/libbalsa-gpgme-widgets.c:721
 msgid "not available"
 msgstr "недоступен"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:356
-#: ../libbalsa/libbalsa-gpgme-widgets.c:669
+#: ../libbalsa/libbalsa-gpgme-widgets.c:362
+#: ../libbalsa/libbalsa-gpgme-widgets.c:725
 #: ../src/balsa-mime-widget-vcalendar.c:187
-#: ../src/balsa-print-object-text.c:548
+#: ../src/balsa-print-object-text.c:547
 msgid "Created:"
 msgstr "Создан:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:364
-#: ../libbalsa/libbalsa-gpgme-widgets.c:677
+#: ../libbalsa/libbalsa-gpgme-widgets.c:370
+#: ../libbalsa/libbalsa-gpgme-widgets.c:733
 msgid "Expires:"
 msgstr "Истекает:"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:396 ../src/toolbar-factory.c:142
-msgid "Close"
-msgstr "Закрыть"
-
-#: ../libbalsa/libbalsa-gpgme-widgets.c:400
-msgid "No"
-msgstr "Нет"
-
-#: ../libbalsa/libbalsa-gpgme-widgets.c:400
-msgid "Yes"
-msgstr "Да"
-
-#: ../libbalsa/libbalsa-gpgme-widgets.c:472
+#: ../libbalsa/libbalsa-gpgme-widgets.c:447
 msgid "revoked"
 msgstr "отозван"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:475
+#: ../libbalsa/libbalsa-gpgme-widgets.c:450
 msgid "expired"
 msgstr "истёкший"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:481
+#: ../libbalsa/libbalsa-gpgme-widgets.c:456
 msgid "invalid"
 msgstr "некорректный"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:707
+#: ../libbalsa/libbalsa-gpgme-widgets.c:528 ../src/toolbar-factory.c:142
+msgid "Close"
+msgstr "Закрыть"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:532
+msgid "No"
+msgstr "Нет"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:532
+msgid "Yes"
+msgstr "Да"
+
+#: ../libbalsa/libbalsa-gpgme-widgets.c:763
 msgid "sign"
 msgstr "подписать"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:710
+#: ../libbalsa/libbalsa-gpgme-widgets.c:766
 msgid "encrypt"
 msgstr "шифровать"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:713
+#: ../libbalsa/libbalsa-gpgme-widgets.c:769
 msgid "certify"
 msgstr "сертифицировать"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:716
+#: ../libbalsa/libbalsa-gpgme-widgets.c:772
 msgid "authenticate"
 msgstr "аутентифицировать"
 
-#: ../libbalsa/libbalsa-gpgme-widgets.c:737
+#: ../libbalsa/libbalsa-gpgme-widgets.c:793
 #, c-format
 msgid "%u bit"
 msgid_plural "%u bits"
@@ -1657,7 +1766,7 @@ msgstr[1] "%u бита"
 msgstr[2] "%u бит"
 
 #. Translators: Elliptic Curve Cryptography (ECC) curve name
-#: ../libbalsa/libbalsa-gpgme-widgets.c:744
+#: ../libbalsa/libbalsa-gpgme-widgets.c:800
 #, c-format
 msgid " curve “%s”"
 msgstr " кривая «%s»"
@@ -1813,12 +1922,12 @@ msgstr "Не удалось создать временный файл"
 msgid "Cannot write to temporary file %s"
 msgstr "Не удалось записать во временный файл %s"
 
-#: ../libbalsa/mailbox_imap.c:2802 ../libbalsa/mailbox_imap.c:2919
+#: ../libbalsa/mailbox_imap.c:2803 ../libbalsa/mailbox_imap.c:2920
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Выгружается %ld кБ"
 
-#: ../libbalsa/mailbox_imap.c:3228
+#: ../libbalsa/mailbox_imap.c:3229
 msgid "Server-side threading not supported."
 msgstr "Формирование цепочек сообщений на стороне сервера не поддерживается."
 
@@ -1874,32 +1983,19 @@ msgstr "Не удалось создать каталог MailDir в %s (%s)"
 msgid "Could not create a Maildir at %s (%s)"
 msgstr "Не удалось создать MailDir в %s (%s)"
 
-#: ../libbalsa/mailbox_maildir.c:318
+#: ../libbalsa/mailbox_maildir.c:319 ../libbalsa/mailbox_mh.c:276
 #, c-format
-msgid ""
-"Could not remove contents of %s:\n"
-"%s"
-msgstr ""
-"Не удалось удалить содержимое %s:\n"
-"%s"
+msgid "Could not remove “%s”: %s"
+msgstr "Не удалось удалить «%s»: %s"
 
-#: ../libbalsa/mailbox_maildir.c:324
-#, c-format
-msgid ""
-"Could not remove %s:\n"
-"%s"
-msgstr ""
-"Не удалось удалить %s:\n"
-"%s"
-
-#: ../libbalsa/mailbox_maildir.c:467 ../libbalsa/mailbox_mbox.c:656
-#: ../libbalsa/mailbox_mh.c:507
+#: ../libbalsa/mailbox_maildir.c:463 ../libbalsa/mailbox_mbox.c:656
+#: ../libbalsa/mailbox_mh.c:504
 #, c-format
 msgid "Mailbox does not exist."
 msgstr "Почтовый ящик не существует."
 
-#: ../libbalsa/mailbox_maildir.c:908 ../libbalsa/mailbox_mbox.c:1935
-#: ../libbalsa/mailbox_mh.c:1087
+#: ../libbalsa/mailbox_maildir.c:904 ../libbalsa/mailbox_mbox.c:1935
+#: ../libbalsa/mailbox_mh.c:1084
 #, c-format
 msgid "Data copy error"
 msgstr "Ошибка копирования данных"
@@ -1909,7 +2005,7 @@ msgstr "Ошибка копирования данных"
 msgid "Mailbox %s does not appear to be an mbox mailbox."
 msgstr "Почтовый ящик %s не является ящиком mbox."
 
-#: ../libbalsa/mailbox_mbox.c:279 ../libbalsa/mailbox_mh.c:280
+#: ../libbalsa/mailbox_mbox.c:279
 #, c-format
 msgid "Could not remove %s: %s"
 msgstr "Не удалось удалить %s: %s"
@@ -1980,17 +2076,12 @@ msgstr "Не удалось создать каталог MH в %s (%s)"
 msgid "Could not create MH structure at %s (%s)"
 msgstr "Не удалось создать структуру MH в %s (%s)"
 
-#: ../libbalsa/mailbox_mh.c:274
-#, c-format
-msgid "Could not remove contents of %s: %s"
-msgstr "Не удалось удалить содержимое %s: %s"
-
-#: ../libbalsa/mailbox_mh.c:1069
+#: ../libbalsa/mailbox_mh.c:1066
 #, c-format
 msgid "Cannot create message"
 msgstr "Невозможно создать сообщение"
 
-#: ../libbalsa/mailbox_mh.c:1112
+#: ../libbalsa/mailbox_mh.c:1109
 #, c-format
 msgid "Message rename error"
 msgstr "Ошибка переименования сообщения"
@@ -2025,43 +2116,43 @@ msgstr "Сообщение %lu от %lu (%s от %s)"
 msgid "Error appending message %d from %s to %s: %s"
 msgstr "Возникла ошибка при дописывании сообщения %d из %s в %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:493 ../libbalsa/send.c:779
+#: ../libbalsa/mailbox_pop3.c:486 ../libbalsa/send.c:780
 #, c-format
 msgid "Cannot load certificate file %s: %s"
 msgstr "Невозможно загрузить файл сертификата %s: %s"
 
 #. connect server
-#: ../libbalsa/mailbox_pop3.c:510 ../libbalsa/send.c:1024
+#: ../libbalsa/mailbox_pop3.c:503 ../libbalsa/send.c:1025
 #, c-format
 msgid "Connecting %s…"
 msgstr "Подключение к %s…"
 
-#: ../libbalsa/mailbox_pop3.c:512
+#: ../libbalsa/mailbox_pop3.c:505
 #, c-format
 msgid "POP3 mailbox %s: cannot connect %s: %s"
 msgstr "Почтовый ящик POP3 %s: не удалось подключиться %s: %s"
 
 #. load message list
-#: ../libbalsa/mailbox_pop3.c:525
+#: ../libbalsa/mailbox_pop3.c:518
 msgid "List messages…"
 msgstr "Список сообщений…"
 
-#: ../libbalsa/mailbox_pop3.c:527 ../libbalsa/mailbox_pop3.c:702
+#: ../libbalsa/mailbox_pop3.c:520 ../libbalsa/mailbox_pop3.c:695
 #, c-format
 msgid "POP3 mailbox %s error: %s"
 msgstr "Ошибка в почтовом ящике POP3 %s: %s"
 
-#: ../libbalsa/mailbox_pop3.c:574
+#: ../libbalsa/mailbox_pop3.c:567
 #, c-format
 msgid "POP3 mailbox %s: message %d oversized: %s — skipped."
 msgstr "Почтовый ящик POP3 %s: сообщение %d избыточный размер: %s — пропущено."
 
-#: ../libbalsa/mailbox_pop3.c:650 ../libbalsa/send.c:1034
+#: ../libbalsa/mailbox_pop3.c:643 ../libbalsa/send.c:1035
 #, c-format
 msgid "Connected to %s"
 msgstr "Соединение установлено с %s"
 
-#: ../libbalsa/mailbox_pop3.c:666
+#: ../libbalsa/mailbox_pop3.c:659
 #, c-format
 msgid "%lu new message (%s)"
 msgid_plural "%lu new messages (%s)"
@@ -2069,11 +2160,11 @@ msgstr[0] "%lu новое сообщение (%s)"
 msgstr[1] "%lu новых сообщений (%s)"
 msgstr[2] "%lu новых сообщений (%s)"
 
-#: ../libbalsa/mailbox_pop3.c:677
+#: ../libbalsa/mailbox_pop3.c:670
 msgid "Deleting messages on server…"
 msgstr "Удаление сообщений на сервере…"
 
-#: ../libbalsa/mailbox_pop3.c:712 ../libbalsa/send.c:1115
+#: ../libbalsa/mailbox_pop3.c:705 ../libbalsa/send.c:1116
 msgid "Finished"
 msgstr "Завершено"
 
@@ -2082,112 +2173,117 @@ msgstr "Завершено"
 msgid "Mailbox (%s) is read-only: cannot change flags."
 msgstr "Почтовый ящик (%s) доступен только для чтения: нельзя изменить флаги."
 
-#: ../libbalsa/misc.c:387
+#: ../libbalsa/misc.c:226 ../libbalsa/misc.c:235
+#, c-format
+msgid "cannot delete “%s”: %s"
+msgstr "не удалось удалить «%s»: %s"
+
+#: ../libbalsa/misc.c:388
 msgid "West European"
 msgstr "Западноевропейская"
 
-#: ../libbalsa/misc.c:389 ../libbalsa/misc.c:423
+#: ../libbalsa/misc.c:390 ../libbalsa/misc.c:424
 msgid "East European"
 msgstr "Восточноевропейская"
 
-#: ../libbalsa/misc.c:391
+#: ../libbalsa/misc.c:392
 msgid "South European"
 msgstr "Южноевропейская"
 
-#: ../libbalsa/misc.c:393
+#: ../libbalsa/misc.c:394
 msgid "North European"
 msgstr "Североевропейская"
 
-#: ../libbalsa/misc.c:395 ../libbalsa/misc.c:425
+#: ../libbalsa/misc.c:396 ../libbalsa/misc.c:426
 msgid "Cyrillic"
 msgstr "Кириллица"
 
-#: ../libbalsa/misc.c:397 ../libbalsa/misc.c:431
+#: ../libbalsa/misc.c:398 ../libbalsa/misc.c:432
 msgid "Arabic"
 msgstr "Арабская"
 
-#: ../libbalsa/misc.c:399 ../libbalsa/misc.c:427
+#: ../libbalsa/misc.c:400 ../libbalsa/misc.c:428
 msgid "Greek"
 msgstr "Греческая"
 
-#: ../libbalsa/misc.c:401 ../libbalsa/misc.c:429
+#: ../libbalsa/misc.c:402 ../libbalsa/misc.c:430
 msgid "Hebrew"
 msgstr "Иврит"
 
-#: ../libbalsa/misc.c:403
+#: ../libbalsa/misc.c:404
 msgid "Turkish"
 msgstr "Турецкая"
 
-#: ../libbalsa/misc.c:405
+#: ../libbalsa/misc.c:406
 msgid "Nordic"
 msgstr "Скандинавская"
 
-#: ../libbalsa/misc.c:407
+#: ../libbalsa/misc.c:408
 msgid "Thai"
 msgstr "Тайская"
 
-#: ../libbalsa/misc.c:409 ../libbalsa/misc.c:433
+#: ../libbalsa/misc.c:410 ../libbalsa/misc.c:434
 msgid "Baltic"
 msgstr "Балтийская"
 
-#: ../libbalsa/misc.c:411
+#: ../libbalsa/misc.c:412
 msgid "Celtic"
 msgstr "Кельтская"
 
-#: ../libbalsa/misc.c:413
+#: ../libbalsa/misc.c:414
 msgid "West European (euro)"
 msgstr "Западноевропейская (евро)"
 
-#: ../libbalsa/misc.c:415
+#: ../libbalsa/misc.c:416
 msgid "Russian"
 msgstr "Русская"
 
-#: ../libbalsa/misc.c:417
+#: ../libbalsa/misc.c:418
 msgid "Ukrainian"
 msgstr "Украинская"
 
-#: ../libbalsa/misc.c:419
+#: ../libbalsa/misc.c:420
 msgid "Japanese"
 msgstr "Японская"
 
-#: ../libbalsa/misc.c:421
+#: ../libbalsa/misc.c:422
 msgid "Korean"
 msgstr "Корейская"
 
-#: ../libbalsa/misc.c:614
+#: ../libbalsa/misc.c:615
 #, c-format
 msgid "Cannot open %s: %s"
 msgstr "Не удалось открыть %s: %s"
 
-#: ../libbalsa/misc.c:623
+#: ../libbalsa/misc.c:624
 #, c-format
 msgid "Cannot open %s: is a symbolic link"
 msgstr "Не удалось открыть %s: как символическую ссылку"
 
-#: ../libbalsa/misc.c:734
+#: ../libbalsa/misc.c:735
 #, c-format
 msgid "fcntl failed: %s."
 msgstr "ошибка fcntl: %s."
 
-#: ../libbalsa/misc.c:750
+#: ../libbalsa/misc.c:751
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Исчерпано время ожидания при попытке выполнить fcntl lock!"
 
-#: ../libbalsa/misc.c:757
+#: ../libbalsa/misc.c:758
 #, c-format
 msgid "Waiting for fcntl lock… %d"
 msgstr "Ожидание fcntl lock… %d"
 
-#: ../libbalsa/misc.c:786
+#: ../libbalsa/misc.c:787
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Исчерпано время ожидания при попытке выполнить flock lock!"
 
-#: ../libbalsa/misc.c:794
+#: ../libbalsa/misc.c:795
 #, c-format
 msgid "Waiting for flock attempt… %d"
 msgstr "Ожидание завершения попытки выполнить flock… %d"
 
-#: ../libbalsa/misc.c:1099
+#: ../libbalsa/misc.c:1100
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Каталог LDAP для %s"
@@ -2617,26 +2713,26 @@ msgctxt "ical_role"
 msgid "non-participant, information only"
 msgstr "не является участником, только информация"
 
-#: ../libbalsa/rfc3156.c:499 ../libbalsa/rfc3156.c:506
+#: ../libbalsa/rfc3156.c:457 ../libbalsa/rfc3156.c:464
 msgid "decryption and signature verification failed"
 msgstr "ошибка расшифровки и проверки подписи"
 
-#: ../libbalsa/rfc3156.c:532
+#: ../libbalsa/rfc3156.c:490
 msgid "The signature is valid."
 msgstr "Эта подпись верна."
 
-#: ../libbalsa/rfc3156.c:534
+#: ../libbalsa/rfc3156.c:492
 msgid "The signature is valid but expired."
 msgstr "Подпись действительна, но просрочена."
 
-#: ../libbalsa/rfc3156.c:536
+#: ../libbalsa/rfc3156.c:494
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 "Подпись действительна, но срок действия ключа, используемого для проверки "
 "подписи, истёк."
 
-#: ../libbalsa/rfc3156.c:538
+#: ../libbalsa/rfc3156.c:496
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
@@ -2644,91 +2740,82 @@ msgstr ""
 "Подпись действительна, но ключ, используемый для проверки подписи, был "
 "отозван."
 
-#: ../libbalsa/rfc3156.c:540
+#: ../libbalsa/rfc3156.c:498
 msgid "The signature is invalid."
 msgstr "Эта подпись не верна."
 
-#: ../libbalsa/rfc3156.c:542
+#: ../libbalsa/rfc3156.c:500
 msgid "The signature could not be verified due to a missing key."
 msgstr "Подпись не может быть проверена из-за отсутствия ключа."
 
-#: ../libbalsa/rfc3156.c:544
+#: ../libbalsa/rfc3156.c:502
 msgid "This part is not a real signature."
 msgstr "Эта часть не является настоящей подписью."
 
-#: ../libbalsa/rfc3156.c:546
+#: ../libbalsa/rfc3156.c:504
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr "Не удалось проверить подпись из-за неправильного механизма шифрования."
 
-#: ../libbalsa/rfc3156.c:548 ../libbalsa/rfc3156.c:630
-msgid "GnuPG is rebuilding the trust database and is currently unavailable."
-msgstr ""
-"GnuPG перестраивает базу данных доверия и в настоящее время недоступна."
-
-#: ../libbalsa/rfc3156.c:550
+#: ../libbalsa/rfc3156.c:506
 msgid "The signature contains multiple signers, this may be a forgery."
 msgstr ""
 "Подпись содержит данные о нескольких подписантах, что может быть подделкой."
 
 #. Translators: #1 error source; #2 error message
-#: ../libbalsa/rfc3156.c:557
+#: ../libbalsa/rfc3156.c:513
 #, c-format
 msgid "An error prevented the signature verification: %s: %s"
 msgstr "Ошибка, мешающая проверке подписи: %s: %s"
 
 #. Translators: #1 error message
-#: ../libbalsa/rfc3156.c:560
+#: ../libbalsa/rfc3156.c:516
 #, c-format
 msgid "An error prevented the signature verification: %s"
 msgstr "Ошибка, мешающая проверке подписи: %s"
 
-#: ../libbalsa/rfc3156.c:572
+#: ../libbalsa/rfc3156.c:528
 msgid "The user ID is of unknown validity."
 msgstr "Подлинность идентификатора пользователя неизвестна."
 
-#: ../libbalsa/rfc3156.c:574
+#: ../libbalsa/rfc3156.c:530
 msgid "The validity of the user ID is undefined."
 msgstr "Подлинность идентификатора пользователя не определена."
 
-#: ../libbalsa/rfc3156.c:576
+#: ../libbalsa/rfc3156.c:532
 msgid "The user ID is never valid."
 msgstr "Идентификатор пользователя недействителен."
 
-#: ../libbalsa/rfc3156.c:578
+#: ../libbalsa/rfc3156.c:534
 msgid "The user ID is marginally valid."
 msgstr "Идентификатор пользователя частично действителен."
 
-#: ../libbalsa/rfc3156.c:580
+#: ../libbalsa/rfc3156.c:536
 msgid "The user ID is fully valid."
 msgstr "Идентификатор пользователя полностью действителен."
 
-#: ../libbalsa/rfc3156.c:582
+#: ../libbalsa/rfc3156.c:538
 msgid "The user ID is ultimately valid."
 msgstr "Идентификатор пользователя абсолютно действителен."
 
-#: ../libbalsa/rfc3156.c:584 ../libbalsa/rfc3156.c:606
+#: ../libbalsa/rfc3156.c:540 ../libbalsa/rfc3156.c:562
 msgid "bad validity"
 msgstr "плохая валидность"
 
-#: ../libbalsa/rfc3156.c:596
+#: ../libbalsa/rfc3156.c:552
 msgid "undefined"
 msgstr "неопределенно"
 
-#: ../libbalsa/rfc3156.c:600
+#: ../libbalsa/rfc3156.c:556
 msgid "marginal"
 msgstr "частично"
 
-#: ../libbalsa/rfc3156.c:602
+#: ../libbalsa/rfc3156.c:558
 msgid "full"
 msgstr "полностью"
 
-#: ../libbalsa/rfc3156.c:604
+#: ../libbalsa/rfc3156.c:560
 msgid "ultimate"
 msgstr "абсолютно"
-
-#: ../libbalsa/rfc3156.c:631
-msgid "Try again later."
-msgstr "Попробовать ещё раз позже."
 
 #: ../libbalsa/rfc6350.c:62
 #, c-format
@@ -2767,21 +2854,21 @@ msgstr ""
 "Не удалось связаться с сервером SMTP %s (%s). Все сообщения из очереди "
 "останутся в %s."
 
-#: ../libbalsa/send.c:832
+#: ../libbalsa/send.c:833
 msgid "Sending Mail"
 msgstr "Отправка почты"
 
-#: ../libbalsa/send.c:942
+#: ../libbalsa/send.c:943
 #, c-format
 msgid "Save message in %s…"
 msgstr "Сохранить сообщение в %s…"
 
-#: ../libbalsa/send.c:950
+#: ../libbalsa/send.c:951
 #, c-format
 msgid "Saving sent message to %s failed: %s"
 msgstr "Не удалось сохранить отправленное сообщение в %s: %s"
 
-#: ../libbalsa/send.c:987
+#: ../libbalsa/send.c:988
 #, c-format
 msgid ""
 "Sending message to SMTP server %s failed: %s\n"
@@ -2790,12 +2877,12 @@ msgstr ""
 "Не удалось отправить сообщение на сервер SMTP %s: %s\n"
 " Сообщение осталось в папке «Исходящие»."
 
-#: ../libbalsa/send.c:1099
+#: ../libbalsa/send.c:1100
 #, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
 msgstr "Не удалось соединиться с сервером SMTP %s (%s): %s"
 
-#: ../libbalsa/send.c:1118
+#: ../libbalsa/send.c:1119
 #, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
@@ -2803,17 +2890,17 @@ msgstr[0] "Передано %u сообщение в %s"
 msgstr[1] "Передано %u сообщения в %s"
 msgstr[2] "Передано %u сообщений в %s"
 
-#: ../libbalsa/send.c:1269 ../libbalsa/send.c:1337
+#: ../libbalsa/send.c:1270 ../libbalsa/send.c:1338
 #, c-format
 msgid "Cannot read %s: %s"
 msgstr "Невозможно прочитать %s: %s"
 
-#: ../libbalsa/send.c:1272 ../libbalsa/send.c:1340
+#: ../libbalsa/send.c:1273 ../libbalsa/send.c:1341
 #, c-format
 msgid "Cannot read %s"
 msgstr "Невозможно прочитать %s"
 
-#: ../libbalsa/send.c:1304
+#: ../libbalsa/send.c:1305
 #, c-format
 msgid ""
 "Cannot determine character set for text file “%s”; sending as MIME type “%s”"
@@ -2821,131 +2908,192 @@ msgstr ""
 "Не удалось определить кодировку символов текстового файла «%s», отправляем "
 "как тип MIME «%s»"
 
-#: ../libbalsa/send.c:1838 ../libbalsa/send.c:1936
+#: ../libbalsa/send.c:1839 ../libbalsa/send.c:1937
 msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Это сообщение не будет зашифровано для получателя скрытой копии."
 msgstr[1] "Это сообщение не будет зашифровано для получателей скрытой копии."
 msgstr[2] "Это сообщение не будет зашифровано для получателей скрытой копии."
 
-#: ../libbalsa/server.c:332
+#: ../libbalsa/server.c:340
 msgid "Balsa passwords"
 msgstr "Пароли Balsa"
 
-#: ../libbalsa/server.c:338
+#: ../libbalsa/server.c:346
 #, c-format
 msgid "Error storing password for %s@%s:%s: %s"
 msgstr "Возникла ошибка при попытке сохранить пароль для %s@%s:%s: %s"
 
-#: ../libbalsa/server.c:360
+#: ../libbalsa/server.c:368
 #, c-format
 msgid "Error looking up password for %s@%s:%s: %s"
 msgstr "Возникла ошибка при поиске пароля для %s@%s:%s: %s"
 
-#: ../libbalsa/server.c:366
+#: ../libbalsa/server.c:374
 msgid "loaded fallback password from private config file"
 msgstr "загружен резервный пароль из приватного файла настроек"
 
-#: ../libbalsa/server-config.c:75
+#: ../libbalsa/server-config.c:90
 msgid "_Remember user password in Secret Service"
 msgstr "_Запомнить пароль пользователя в Secret Service"
 
-#: ../libbalsa/server-config.c:76
+#: ../libbalsa/server-config.c:91
 msgid "_Remember certificate pass phrase in Secret Service"
 msgstr "_Запомнить пароль сертификата в Secret Service"
 
-#: ../libbalsa/server-config.c:80
+#: ../libbalsa/server-config.c:95
 msgid "_Remember user password"
 msgstr "_Запомнить пароль пользователя"
 
-#: ../libbalsa/server-config.c:81
+#: ../libbalsa/server-config.c:96
 msgid "_Remember certificate pass phrase"
 msgstr "_Запомнить пароль сертификата"
 
-#: ../libbalsa/server-config.c:103
+#: ../libbalsa/server-config.c:118
 msgid "_Basic"
 msgstr "_Основные"
 
 #. server descriptive name
-#: ../libbalsa/server-config.c:106
+#: ../libbalsa/server-config.c:121
 msgid "_Descriptive Name:"
 msgstr "_Описательное имя:"
 
+#: ../libbalsa/server-config.c:126
+msgid "probe…"
+msgstr "проверка…"
+
 #. host and port
-#: ../libbalsa/server-config.c:110
+#: ../libbalsa/server-config.c:141
 msgid "_Server:"
 msgstr "Сервер:"
 
-#: ../libbalsa/server-config.c:116
+#: ../libbalsa/server-config.c:146
 msgid "Se_curity:"
 msgstr "_Защита:"
 
-#: ../libbalsa/server-config.c:123
-msgid "Server requires _authentication"
-msgstr "Сервер требует _аутентификации"
+#: ../libbalsa/server-config.c:151
+msgid "_Authentication:"
+msgstr "_Аутентификация:"
 
 #. user name and password
-#: ../libbalsa/server-config.c:129
+#: ../libbalsa/server-config.c:155
 msgid "_User Name:"
 msgstr "_Имя пользователя:"
 
-#: ../libbalsa/server-config.c:133
+#: ../libbalsa/server-config.c:159
 msgid "_Pass Phrase:"
 msgstr "_Пароль:"
 
-#: ../libbalsa/server-config.c:146
+#: ../libbalsa/server-config.c:172
 msgid "_Advanced"
 msgstr "_Расширенные"
 
 #. client certificate and passphrase
-#: ../libbalsa/server-config.c:149
+#: ../libbalsa/server-config.c:175
 msgid "Server _requires client certificate"
 msgstr "Серверу _требуется клиентский сертификат"
 
-#: ../libbalsa/server-config.c:152
+#: ../libbalsa/server-config.c:178
 msgid "Choose Client Certificate"
 msgstr "Выбрать сертификат клиента"
 
-#: ../libbalsa/server-config.c:153
+#: ../libbalsa/server-config.c:179
 msgid "Certificate _File:"
 msgstr "_Файл сертификата:"
 
-#: ../libbalsa/server-config.c:161
+#: ../libbalsa/server-config.c:188
 msgid "Certificate _Pass Phrase:"
 msgstr "_Пароль для сертификата:"
 
-#: ../libbalsa/server-config.c:371
+#: ../libbalsa/server-config.c:404
 #, c-format
 msgid "%s over SSL (%sS)"
 msgstr "%s через SSL (%sS)"
 
-#: ../libbalsa/server-config.c:375 ../libinit_balsa/assistant_page_user.c:69
+#: ../libbalsa/server-config.c:408
 msgid "TLS required"
 msgstr "Требуется TLS"
 
-#: ../libbalsa/server-config.c:376 ../libinit_balsa/assistant_page_user.c:70
+#: ../libbalsa/server-config.c:409
 msgid "TLS if possible (not recommended)"
 msgstr "TLS, если возможно (не рекомендуется)"
 
-#: ../libbalsa/server-config.c:377 ../libinit_balsa/assistant_page_user.c:71
+#: ../libbalsa/server-config.c:410
 msgid "None (not recommended)"
 msgstr "Отсутствует (не рекомендуется)"
 
-#: ../libbalsa/smtp-server.c:246
+#: ../libbalsa/server-config.c:426
+msgid "anonymous access"
+msgstr "анонимный доступ"
+
+#: ../libbalsa/server-config.c:428
+msgid "none required"
+msgstr "не требуется"
+
+#: ../libbalsa/server-config.c:430 ../libbalsa/server-config.c:529
+msgid "user name and pass phrase"
+msgstr "имя пользователя и пароль"
+
+#: ../libbalsa/server-config.c:432 ../libbalsa/server-config.c:526
+msgid "Kerberos (GSSAPI)"
+msgstr "Kerberos (GSSAPI)"
+
+#: ../libbalsa/server-config.c:516
+msgid "yes (SSL/TLS)"
+msgstr "да (SSL/TLS)"
+
+#: ../libbalsa/server-config.c:519
+msgid "yes (STARTTLS)"
+msgstr "да (STARTTLS)"
+
+#: ../libbalsa/server-config.c:522
+msgid "no"
+msgstr "нет"
+
+#: ../libbalsa/server-config.c:532
+msgid "none"
+msgstr "ничего"
+
+#: ../libbalsa/server-config.c:539
+#, c-format
+msgid ""
+"Probe results for server %s\n"
+"• Port: %u\n"
+"• Encryption: %s\n"
+"• Authentication: %s\n"
+msgstr ""
+"Результаты проверки сервера %s\n"
+"• Порт: %u\n"
+"• Шифрование: %s\n"
+"• Аутентификация: %s\n"
+
+#: ../libbalsa/server-config.c:544 ../src/ab-main.c:839
+#: ../src/address-book-config.c:229 ../src/address-book-config.c:335
+#: ../src/address-book-config.c:379 ../src/filter-edit-dialog.c:500
+#: ../src/main-window.c:3990 ../src/pref-manager.c:3331
+msgid "_Apply"
+msgstr "_Применить"
+
+#: ../libbalsa/server-config.c:551
+#, c-format
+msgid "Error probing server %s: %s"
+msgstr "Ошибка проверки сервера %s: %s"
+
+#: ../libbalsa/smtp-server.c:253
 #, c-format
 msgid "Error displaying server help: %s\n"
 msgstr "Ошибка показа справки по серверу: %s\n"
 
-#: ../libbalsa/smtp-server.c:322
+#: ../libbalsa/smtp-server.c:329
 msgid "SMTP Server"
 msgstr "SMTP сервер"
 
 #. split large messages
-#: ../libbalsa/smtp-server.c:348
+#: ../libbalsa/smtp-server.c:355
 msgid "Sp_lit message larger than"
 msgstr "Раз_бивать сообщение размером более"
 
-#: ../libbalsa/smtp-server.c:352 ../src/pref-manager.c:2167
+#: ../libbalsa/smtp-server.c:359 ../src/pref-manager.c:2167
 msgid "MB"
 msgstr "МБ"
 
@@ -3034,7 +3182,7 @@ msgstr ""
 "Не удалось создать каталог: ошибка при выполнении mkdir() с указанием пути "
 "«%s»."
 
-#: ../libinit_balsa/assistant_init.c:49
+#: ../libinit_balsa/assistant_init.c:50
 msgid ""
 "This will exit Balsa.\n"
 "Do you really want to do this?"
@@ -3042,16 +3190,16 @@ msgstr ""
 "Это действие приведет к выходу из Balsa.\n"
 "Вы действительно хотите сделать это?"
 
-#: ../libinit_balsa/assistant_init.c:69
+#: ../libinit_balsa/assistant_init.c:70
 msgid "GnomeCard Address Book"
 msgstr "Адресная книга GnomeCard"
 
-#: ../libinit_balsa/assistant_init.c:76 ../libinit_balsa/assistant_init.c:84
+#: ../libinit_balsa/assistant_init.c:77 ../libinit_balsa/assistant_init.c:85
 #: ../src/ab-window.c:243
 msgid "Address Book"
 msgstr "Адресная книга"
 
-#: ../libinit_balsa/assistant_init.c:134
+#: ../libinit_balsa/assistant_init.c:136
 msgid "Configure Balsa"
 msgstr "Конфигурирование Balsa"
 
@@ -3149,85 +3297,35 @@ msgstr "Все сделано!"
 #: ../libinit_balsa/assistant_page_user.c:55
 msgid ""
 "The following settings are also needed (and you can find them later, if need "
-"be, in the Email application in the “Preferences” and “Identities” menu "
-"items)"
+"be, in the Email application in the “Edit ⏵ Preferences ⏵ Identities…” menu "
+"item)"
 msgstr ""
-"Также необходимы следующие настройки (то вы можете найти их позже, если "
-"потребуется, в приложении электронной почты в пунктах меню «Параметры» и "
-"«Профили»)"
-
-#: ../libinit_balsa/assistant_page_user.c:61
-msgid ""
-" Whoever provides your email account should be able to give you the "
-"following information (if you have a Network Administrator, they may already "
-"have set this up for you):"
-msgstr ""
-" Кто бы ни предоставил вам учётную запись электронной почты, он должен был "
-"предоставить вам следующую информацию (если у вас есть сетевой "
-"администратор, возможно, он уже настроил её для вас):"
-
-#: ../libinit_balsa/assistant_page_user.c:68
-msgid "SSL"
-msgstr "SSL"
-
-#: ../libinit_balsa/assistant_page_user.c:74
-msgid "Yes, remember it"
-msgstr "Да, помнить его"
-
-#: ../libinit_balsa/assistant_page_user.c:74
-msgid "No, type it in every time"
-msgstr "Нет, вводить каждый раз"
-
-#: ../libinit_balsa/assistant_page_user.c:105
-msgid "Name of mail server for incoming _mail:"
-msgstr "Название почтового сервера для входящей _почты:"
-
-#: ../libinit_balsa/assistant_page_user.c:110
-msgid "_Type of mail server:"
-msgstr "_Тип почтового сервера:"
-
-#: ../libinit_balsa/assistant_page_user.c:114
-msgid "Connection _Security:"
-msgstr "_Защита соединения:"
-
-#: ../libinit_balsa/assistant_page_user.c:118
-msgid "Your email _login name:"
-msgstr "Ваш почтовый _логин:"
-
-#: ../libinit_balsa/assistant_page_user.c:121
-msgid "Your _password:"
-msgstr "_Пароль:"
-
-#: ../libinit_balsa/assistant_page_user.c:128
-msgid "_SMTP Server:"
-msgstr "_SMTP сервер:"
+"Следующие настройки также необходимы (вы можете найти их позже, если "
+"потребуется, в приложении электронной почты в пункте меню «Правка ⏵ "
+"Параметры ⏵ Профили…»)"
 
 #. 2.1
-#: ../libinit_balsa/assistant_page_user.c:132
+#: ../libinit_balsa/assistant_page_user.c:79
 msgid "Your real _name:"
 msgstr "Ваше реальное _имя:"
 
-#: ../libinit_balsa/assistant_page_user.c:138
+#: ../libinit_balsa/assistant_page_user.c:84
 msgid "Your _email address for this email account:"
 msgstr "Ваш адрес _электронной почты для этой учётной записи:"
 
-#: ../libinit_balsa/assistant_page_user.c:143
-msgid "_Remember your password:"
-msgstr "_Запомнить пароль:"
-
-#: ../libinit_balsa/assistant_page_user.c:148
+#: ../libinit_balsa/assistant_page_user.c:88
 msgid "_Local mail directory:"
 msgstr "_Локальный каталог почты:"
 
-#: ../libinit_balsa/assistant_page_user.c:166
+#: ../libinit_balsa/assistant_page_user.c:107
 msgid "User Settings"
 msgstr "Настройки пользователя"
 
-#: ../libinit_balsa/assistant_page_user.c:287
+#: ../libinit_balsa/assistant_page_user.c:151
 msgid "Default Identity"
 msgstr "Профиль по умолчанию"
 
-#: ../libinit_balsa/assistant_page_user.c:325
+#: ../libinit_balsa/assistant_page_user.c:176
 #, c-format
 msgid ""
 "Local Mail Problem\n"
@@ -3319,88 +3417,108 @@ msgstr "соединение уже зашифровано"
 msgid "connection is already compressed"
 msgstr "данные, передаваемые соединением, уже сжимаются"
 
+#: ../libnetclient/net-client-pop.c:210
+#, c-format
+msgid "the server %s does not offer the POP3 service at port 995 or 110"
+msgstr "сервер %s не предоставляет доступ к службе POP3 через порт 995 или 110"
+
 #. unexpected server reply
-#: ../libnetclient/net-client-pop.c:227 ../libnetclient/net-client-pop.c:446
-#: ../libnetclient/net-client-smtp.c:596 ../libnetclient/net-client-smtp.c:667
-#: ../libnetclient/net-client-smtp.c:717
+#: ../libnetclient/net-client-pop.c:336 ../libnetclient/net-client-pop.c:554
+#: ../libnetclient/net-client-smtp.c:720 ../libnetclient/net-client-smtp.c:853
 #, c-format
 msgid "bad server reply: %s"
 msgstr "плохой ответ сервера: %s"
 
-#: ../libnetclient/net-client-pop.c:266
+#: ../libnetclient/net-client-pop.c:375
 #, c-format
 msgid "bad server reply"
 msgstr "плохой ответ сервера"
 
-#: ../libnetclient/net-client-pop.c:438 ../libnetclient/net-client-pop.c:719
+#: ../libnetclient/net-client-pop.c:546 ../libnetclient/net-client-pop.c:867
 #, c-format
 msgid "error: %s"
 msgstr "ошибка: %s"
 
-#: ../libnetclient/net-client-pop.c:441
+#: ../libnetclient/net-client-pop.c:549
 #, c-format
 msgid "error"
 msgstr "ошибка"
 
-#: ../libnetclient/net-client-pop.c:505 ../libnetclient/net-client-smtp.c:409
+#: ../libnetclient/net-client-pop.c:612 ../libnetclient/net-client-smtp.c:509
 #, c-format
 msgid "no suitable authentication mechanism"
 msgstr "нет подходящего механизма аутентификации"
 
-#: ../libnetclient/net-client-pop.c:507 ../libnetclient/net-client-smtp.c:411
+#: ../libnetclient/net-client-pop.c:620 ../libnetclient/net-client-smtp.c:514
 #, c-format
-msgid "password required"
-msgstr "требуется пароль"
+msgid "user name required"
+msgstr "требуется имя пользователя"
 
-#: ../libnetclient/net-client-smtp.c:142
+#: ../libnetclient/net-client-pop.c:629 ../libnetclient/net-client-smtp.c:523
+#, c-format
+msgid "user name and password required"
+msgstr "требуется имя пользователя и пароль"
+
+#: ../libnetclient/net-client-smtp.c:228
+#, c-format
+msgid "the server %s does not offer the SMTP service at port 465, 587 or 25"
+msgstr ""
+"сервер %s не предоставляет доступ к службе SMTP через порт 465, 587 или 25"
+
+#: ../libnetclient/net-client-smtp.c:270
 #, c-format
 msgid "remote server does not support STARTTLS"
 msgstr "на удалённом сервере не предусмотрена поддержка STARTTLS"
 
+#: ../libnetclient/net-client-smtp.c:829
+#, c-format
+msgid "unexpected reply: %s"
+msgstr "неожиданный ответ: %s"
+
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
-#: ../libnetclient/net-client-smtp.c:700
+#: ../libnetclient/net-client-smtp.c:836
 #, c-format
 msgid "transient error %d: %s"
 msgstr "кратковременная ошибка %d: %s"
 
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
-#: ../libnetclient/net-client-smtp.c:707
+#: ../libnetclient/net-client-smtp.c:843
 #, c-format
 msgid "authentication failure %d: %s"
 msgstr "ошибка аутентификации %d: %s"
 
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
-#: ../libnetclient/net-client-smtp.c:711
+#: ../libnetclient/net-client-smtp.c:847
 #, c-format
 msgid "permanent error %d: %s"
 msgstr "перманентная ошибка %d: %s"
 
-#: ../libnetclient/net-client-utils.c:155
+#: ../libnetclient/net-client-utils.c:208
 #, c-format
 msgid "importing GSS service name %s failed: %s"
 msgstr "не удалось импортировать название службы GSS %s: %s"
 
-#: ../libnetclient/net-client-utils.c:199
+#: ../libnetclient/net-client-utils.c:252
 #, c-format
 msgid "cannot initialize GSS security context: %s"
 msgstr "не удалось инициализировать контекст безопасности GSS: %s"
 
-#: ../libnetclient/net-client-utils.c:239
+#: ../libnetclient/net-client-utils.c:292
 #, c-format
 msgid "malformed GSS security token: %s"
 msgstr "неверный токен безопасности GSS: %s"
 
-#: ../libnetclient/net-client-utils.c:248
+#: ../libnetclient/net-client-utils.c:301
 #, c-format
 msgid "malformed GSS security token"
 msgstr "неверный токен безопасности GSS"
 
-#: ../libnetclient/net-client-utils.c:265
+#: ../libnetclient/net-client-utils.c:318
 #, c-format
 msgid "cannot create GSS login request: %s"
 msgstr "не удалось создать запрос о входе в GSS: %s"
 
-#: ../libnetclient/net-client-utils.c:330
+#: ../libnetclient/net-client-utils.c:383
 #, c-format
 msgid "unknown error code %u:%u"
 msgstr "код неизвестной ошибки %u:%u"
@@ -3417,7 +3535,7 @@ msgstr "Запуск программы"
 msgid "New mail notification"
 msgstr "Уведомление о новой почте"
 
-#: ../src/ab-main.c:218 ../src/ab-window.c:707
+#: ../src/ab-main.c:218 ../src/ab-window.c:705
 msgid " address book: "
 msgstr " адресная книга: "
 
@@ -3428,13 +3546,6 @@ msgstr "И_мя"
 #: ../src/ab-main.c:751
 msgid "_Address"
 msgstr "_Адрес"
-
-#: ../src/ab-main.c:839 ../src/address-book-config.c:229
-#: ../src/address-book-config.c:335 ../src/address-book-config.c:379
-#: ../src/filter-edit-dialog.c:500 ../src/main-window.c:3990
-#: ../src/pref-manager.c:3331
-msgid "_Apply"
-msgstr "_Применить"
 
 #: ../src/ab-main.c:877
 msgid "F_ilter:"
@@ -3458,7 +3569,7 @@ msgstr "Адресная книга Balsa"
 msgid "Name"
 msgstr "Название"
 
-#: ../src/ab-window.c:192 ../src/balsa-print-object-text.c:450
+#: ../src/ab-window.c:192 ../src/balsa-print-object-text.c:449
 msgid "Email Address"
 msgstr "Электронный адрес"
 
@@ -3500,7 +3611,7 @@ msgstr "список рассылки"
 msgid "Could not launch %s: %s"
 msgstr "Не удалось запустить %s: %s"
 
-#: ../src/ab-window.c:736
+#: ../src/ab-window.c:734
 #, c-format
 msgid ""
 "Error opening address book “%s”:\n"
@@ -4156,11 +4267,11 @@ msgstr "Не удалось сохранить текстовую часть: %s
 msgid "Could not process GnuPG keys: %s"
 msgstr "Не удалось обработать ключи GnuPG: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:142
+#: ../src/balsa-mime-widget-crypto.c:144
 msgid "_Import Autocrypt key"
 msgstr "_Импортировать ключ автошифрования"
 
-#: ../src/balsa-mime-widget-crypto.c:149
+#: ../src/balsa-mime-widget-crypto.c:151
 msgid ""
 "The message contains an Autocrypt header, but it is either broken or the "
 "signature has been created using a different key."
@@ -4168,7 +4279,7 @@ msgstr ""
 "В сообщении содержится заголовок Autocrypt, но оно либо повреждено, либо "
 "подпись была создана другим ключом."
 
-#: ../src/balsa-mime-widget-crypto.c:153
+#: ../src/balsa-mime-widget-crypto.c:155
 msgid ""
 "The message contains an Autocrypt header which is ignored as none of your "
 "identities has Autocrypt support enabled."
@@ -4176,11 +4287,11 @@ msgstr ""
 "В сообщении содержится заголовок Autocrypt, который будет проигнорирован, "
 "поскольку ни в одном из ваших профилей не включена поддержка Autocrypt."
 
-#: ../src/balsa-mime-widget-crypto.c:158
+#: ../src/balsa-mime-widget-crypto.c:160
 msgid "_Search key server for this key"
 msgstr "_Поиск сервера ключей для этого ключа"
 
-#: ../src/balsa-mime-widget-crypto.c:160
+#: ../src/balsa-mime-widget-crypto.c:162
 msgid "_Search key server for updates of this key"
 msgstr "_Поиск сервера ключей для обновления этого ключа"
 
@@ -4205,7 +4316,7 @@ msgid "unknown signature status"
 msgstr "неизвестное состояние подписи"
 
 #. Translators: successful import of a GnuPG key; #1: backend message
-#: ../src/balsa-mime-widget-crypto.c:313
+#: ../src/balsa-mime-widget-crypto.c:343
 #, c-format
 msgid ""
 "Import GnuPG key:\n"
@@ -4214,20 +4325,20 @@ msgstr ""
 "Импортировать GnuPG ключ:\n"
 "%s"
 
-#: ../src/balsa-mime-widget-crypto.c:320
+#: ../src/balsa-mime-widget-crypto.c:350
 #, c-format
 msgid "Error importing key data: %s"
 msgstr "Возникла ошибка при импорте данных ключа: %s"
 
-#: ../src/balsa-mime-widget-crypto.c:320 ../src/sendmsg-window.c:1717
+#: ../src/balsa-mime-widget-crypto.c:350 ../src/sendmsg-window.c:1717
 msgid "unknown error"
 msgstr "неизвестная ошибка"
 
-#: ../src/balsa-mime-widget-crypto.c:357
+#: ../src/balsa-mime-widget-crypto.c:382
 msgid "(imported)"
 msgstr "(импортировано)"
 
-#: ../src/balsa-mime-widget-crypto.c:365
+#: ../src/balsa-mime-widget-crypto.c:390
 msgid "Import key into the local key ring"
 msgstr "Импорт ключа в локальную связку ключей"
 
@@ -4453,52 +4564,52 @@ msgstr ""
 "заголовка, описывающего кодировку символов (преобразовано в %s)"
 
 #. Translators: #1 calendar message type
-#: ../src/balsa-mime-widget-vcalendar.c:67 ../src/balsa-print-object-text.c:534
+#: ../src/balsa-mime-widget-vcalendar.c:67 ../src/balsa-print-object-text.c:533
 #, c-format
 msgid "This is an iTIP calendar “%s” message."
 msgstr "Это сообщение «%s» календаря iTIP."
 
 #: ../src/balsa-mime-widget-vcalendar.c:182
 #: ../src/balsa-mime-widget-vcalendar.c:379
-#: ../src/balsa-print-object-text.c:543
+#: ../src/balsa-print-object-text.c:542
 msgid "Summary:"
 msgstr "Резюме:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:186
-#: ../src/balsa-print-object-text.c:547
+#: ../src/balsa-print-object-text.c:546
 msgid "Organizer:"
 msgstr "Организация:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:188
 #: ../src/balsa-mime-widget-vcalendar.c:380
-#: ../src/balsa-print-object-text.c:549
+#: ../src/balsa-print-object-text.c:548
 msgid "Start:"
 msgstr "Начало:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:189
 #: ../src/balsa-mime-widget-vcalendar.c:381
-#: ../src/balsa-print-object-text.c:550
+#: ../src/balsa-print-object-text.c:549
 msgid "End:"
 msgstr "Конец:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:193
-#: ../src/balsa-print-object-text.c:554
+#: ../src/balsa-print-object-text.c:553
 msgid "Duration:"
 msgstr "Продолжительность:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:199
-#: ../src/balsa-print-object-text.c:560
+#: ../src/balsa-print-object-text.c:559
 msgid "Recurrence:"
 msgstr "Повторение:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:203
 #: ../src/balsa-mime-widget-vcalendar.c:382
-#: ../src/balsa-print-object-text.c:564
+#: ../src/balsa-print-object-text.c:563
 msgid "Location:"
 msgstr "Местонахождение:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:237
-#: ../src/balsa-print-object-text.c:573
+#: ../src/balsa-print-object-text.c:572
 msgid "Attendee:"
 msgid_plural "Attendees:"
 msgstr[0] "Участник:"
@@ -4506,7 +4617,7 @@ msgstr[1] "Участники:"
 msgstr[2] "Участники:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:245
-#: ../src/balsa-print-object-text.c:602
+#: ../src/balsa-print-object-text.c:601
 msgid "Category:"
 msgid_plural "Categories:"
 msgstr[0] "Категория:"
@@ -4515,7 +4626,7 @@ msgstr[2] "Категории:"
 
 #: ../src/balsa-mime-widget-vcalendar.c:249
 #: ../src/balsa-mime-widget-vcalendar.c:383
-#: ../src/balsa-print-object-text.c:587
+#: ../src/balsa-print-object-text.c:586
 msgid "Description:"
 msgstr "Описание:"
 
@@ -4559,23 +4670,23 @@ msgstr "Не удалось отправить ответ на календар�
 msgid "File name:"
 msgstr "Название файла:"
 
-#: ../src/balsa-print-object-text.c:445
+#: ../src/balsa-print-object-text.c:444
 msgid "Full Name"
 msgstr "Полное имя"
 
-#: ../src/balsa-print-object-text.c:446
+#: ../src/balsa-print-object-text.c:445
 msgid "Nick Name"
 msgstr "Псевдоним"
 
-#: ../src/balsa-print-object-text.c:447
+#: ../src/balsa-print-object-text.c:446
 msgid "First Name"
 msgstr "Имя"
 
-#: ../src/balsa-print-object-text.c:448
+#: ../src/balsa-print-object-text.c:447
 msgid "Last Name"
 msgstr "Фамилия"
 
-#: ../src/balsa-print-object-text.c:449
+#: ../src/balsa-print-object-text.c:448
 msgid "Organization"
 msgstr "Организация"
 
@@ -5675,7 +5786,7 @@ msgstr ""
 "Alexander Kirillov <kirillov@math.ias.edu>, 1999\n"
 "Sergey Panov <sipan@mit.edu>, 1999\n"
 "Valek Filippov <frob@df.ru>, 2000-2001\n"
-"Ser82-png <asvmail.as@gmail.com>, 2022"
+"Ser82-png <asvmail.as@gmail.com>, 2022-2023"
 
 #: ../src/main-window.c:1082
 msgid "The Balsa email client is part of the GNOME desktop environment."
@@ -6887,7 +6998,7 @@ msgid "Attach file"
 msgstr "Вложить файл"
 
 #: ../src/sendmsg-window.c:2113 ../src/sendmsg-window.c:2189
-#: ../src/sendmsg-window.c:7136
+#: ../src/sendmsg-window.c:7138
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -7254,22 +7365,22 @@ msgstr "Не удалось отложить сообщение."
 msgid "Error starting spell checker: %s"
 msgstr "Возникла ошибка при запуске проверки правописания: %s"
 
-#: ../src/sendmsg-window.c:6672
+#: ../src/sendmsg-window.c:6674
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Ответить на %s: %s"
 
-#: ../src/sendmsg-window.c:6677
+#: ../src/sendmsg-window.c:6679
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Переслать сообщение %s: %s"
 
-#: ../src/sendmsg-window.c:6681
+#: ../src/sendmsg-window.c:6683
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Новое сообщение для %s: %s"
 
-#: ../src/sendmsg-window.c:6828 ../ui/sendmsg-window.ui.h:33
+#: ../src/sendmsg-window.c:6830 ../ui/sendmsg-window.ui.h:33
 msgid "_Language"
 msgstr "_Язык"
 
@@ -8012,7 +8123,7 @@ msgstr "Следующее непрочитанное письмо"
 
 #: ../ui/main-window.ui.h:88 ../ui/message-window.ui.h:34
 msgid "Next Flagged Message"
-msgstr "Следедующее отмеченное письмо"
+msgstr "Следующее отмеченное письмо"
 
 #: ../ui/main-window.ui.h:90
 msgid "_Contents"
@@ -8080,7 +8191,7 @@ msgstr "Выбрать _профиль…"
 
 #: ../ui/sendmsg-window.ui.h:26
 msgid "Edit with GNOME-Editor"
-msgstr "Редактировать с помощью GNOME-Editor"
+msgstr "Редактировать с помощью редактора GNOME"
 
 #: ../ui/sendmsg-window.ui.h:27
 msgid "_Show"
@@ -8149,3 +8260,72 @@ msgstr "Прикрепить _открытый ключ GnuPG"
 #: ../ui/source-viewer.ui.h:7
 msgid "_Escape Special Characters"
 msgstr "Специальные _Escape-символы"
+
+#~ msgid "Server requires _authentication"
+#~ msgstr "Сервер требует _аутентификации"
+
+#~ msgid ""
+#~ " Whoever provides your email account should be able to give you the "
+#~ "following information (if you have a Network Administrator, they may "
+#~ "already have set this up for you):"
+#~ msgstr ""
+#~ " Кто бы ни предоставил вам учётную запись электронной почты, он должен "
+#~ "был предоставить вам следующую информацию (если у вас есть сетевой "
+#~ "администратор, возможно, он уже настроил её для вас):"
+
+#~ msgid "SSL"
+#~ msgstr "SSL"
+
+#~ msgid "Yes, remember it"
+#~ msgstr "Да, помнить его"
+
+#~ msgid "No, type it in every time"
+#~ msgstr "Нет, вводить каждый раз"
+
+#~ msgid "Name of mail server for incoming _mail:"
+#~ msgstr "Название почтового сервера для входящей _почты:"
+
+#~ msgid "_Type of mail server:"
+#~ msgstr "_Тип почтового сервера:"
+
+#~ msgid "Connection _Security:"
+#~ msgstr "_Защита соединения:"
+
+#~ msgid "Your email _login name:"
+#~ msgstr "Ваш почтовый _логин:"
+
+#~ msgid "Your _password:"
+#~ msgstr "_Пароль:"
+
+#~ msgid "_SMTP Server:"
+#~ msgstr "_SMTP сервер:"
+
+#~ msgid "_Remember your password:"
+#~ msgstr "_Запомнить пароль:"
+
+#, c-format
+#~ msgid ""
+#~ "Could not remove contents of %s:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Не удалось удалить содержимое %s:\n"
+#~ "%s"
+
+#, c-format
+#~ msgid ""
+#~ "Could not remove %s:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Не удалось удалить %s:\n"
+#~ "%s"
+
+#, c-format
+#~ msgid "Could not remove contents of %s: %s"
+#~ msgstr "Не удалось удалить содержимое %s: %s"
+
+#~ msgid "GnuPG is rebuilding the trust database and is currently unavailable."
+#~ msgstr ""
+#~ "GnuPG перестраивает базу данных доверия и в настоящее время недоступна."
+
+#~ msgid "Try again later."
+#~ msgstr "Попробовать ещё раз позже."

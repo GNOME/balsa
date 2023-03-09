@@ -26,10 +26,6 @@
 #include <locale.h>
 #endif
 
-#if HAVE_MACOSX_DESKTOP
-#include "macosx-helpers.h"
-#endif
-
 #include <gpgme.h>
 #include <glib.h>
 #include <glib/gi18n.h>
@@ -186,9 +182,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
     gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK, FALSE);
 	geometry_manager_attach(GTK_WINDOW(dialog), "KeyList");
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_widget_set_vexpand (vbox, TRUE);
     gtk_container_add(GTK_CONTAINER
@@ -328,9 +321,6 @@ lb_gpgme_accept_low_trust_key(const gchar *user_name,
     	libbalsa_gpgme_validity_to_gchar_short(key->owner_trust));
     dialog = libbalsa_key_dialog(parent, GTK_BUTTONS_YES_NO, key, GPG_SUBKEY_CAP_ENCRYPT, _("Insufficient key owner trust"),
     	message2);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
 
     /* ask the user */
     result = gtk_dialog_run(GTK_DIALOG(dialog));
@@ -362,9 +352,6 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
                                          _("_OK"),     GTK_RESPONSE_OK,
                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
                                          NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 12);
     gtk_container_add(GTK_CONTAINER

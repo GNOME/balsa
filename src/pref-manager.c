@@ -37,10 +37,6 @@
 #include "html.h"
 #include "imap-server.h"
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 #include "smtp-server.h"
 #include "libbalsa-conf.h"
 
@@ -3328,9 +3324,6 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Help"), GTK_RESPONSE_HELP,
                                     NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(property_box, GTK_WINDOW(active_win));
-#endif
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	content_area = gtk_dialog_get_content_area(GTK_DIALOG(property_box));

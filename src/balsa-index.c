@@ -50,10 +50,6 @@
 #include "misc.h"
 #include <glib/gi18n.h>
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 /* TREE_VIEW_FIXED_HEIGHT enables hight-performance mode of GtkTreeView
  * very useful for large mailboxes (#msg >5000)  */
 #define TREE_VIEW_FIXED_HEIGHT 1
@@ -2792,9 +2788,6 @@ balsa_index_pipe(BalsaIndex * index)
                                     _("_Run"), GTK_RESPONSE_OK,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
-#endif
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
     gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
 

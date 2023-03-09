@@ -34,10 +34,6 @@
 #include "smtp-server.h"
 #include "save-restore.h"
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 #if HAVE_GCR
 #define GCR_API_SUBJECT_TO_CHANGE
 #include <gcr/gcr.h>
@@ -162,9 +158,6 @@ ask_password_real(LibBalsaServer * server, const gchar *cert_subject)
                                          _("_OK"), GTK_RESPONSE_OK,
                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
                                          NULL); 
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
-#endif
 
     content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     gtk_container_set_border_width(GTK_CONTAINER(content), HIG_PADDING);

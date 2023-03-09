@@ -33,10 +33,6 @@
 #include "mailbox-node.h"
 #include "main-window.h"
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 /* Column numbers (used for sort_column_id): */
 typedef enum {
     BMBL_TREE_COLUMN_NAME = 1,
@@ -1889,9 +1885,6 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
                                     libbalsa_dialog_flags(),
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, mru->window);
-#endif
     gtk_box_pack_start(GTK_BOX
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                       scroll, TRUE, TRUE, 0);

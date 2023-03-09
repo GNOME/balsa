@@ -25,10 +25,6 @@
 #include <string.h>
 #include <glib/gi18n.h>
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 #include "balsa-app.h"
 
 /* global data */
@@ -212,10 +208,6 @@ store_address_dialog(StoreAddressInfo * info)
     gtk_widget_grab_focus(gtk_dialog_get_widget_for_response
                           (GTK_DIALOG(dialog), GTK_RESPONSE_OK));
     vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
-#endif
 
     info->current_address_book = balsa_app.default_address_book;
     if (balsa_app.address_book_list && balsa_app.address_book_list->next) {

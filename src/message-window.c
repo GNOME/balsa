@@ -36,10 +36,6 @@
 #include <glib/gi18n.h>
 #include <gdk/gdkkeysyms.h>
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 struct _MessageWindow {
     GtkWidget *window;
 
@@ -884,11 +880,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
         return;
     }
     gtk_widget_show(menubar);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
-#else
     gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
-#endif
 
     mw->headers_shown = balsa_app.shown_headers;
     mw->show_all_headers = FALSE;

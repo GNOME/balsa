@@ -30,10 +30,6 @@
 #include <locale.h>
 #endif
 
-#if HAVE_MACOSX_DESKTOP
-#  include <ige-mac-integration.h>
-#endif
-
 #include "address-book.h"
 #include "address-book-vcard.h"
 #include "address-book-extern.h"

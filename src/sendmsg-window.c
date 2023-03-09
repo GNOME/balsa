@@ -64,7 +64,6 @@
 #include "ab-window.h"
 #include "address-view.h"
 #include "print.h"
-#include "macosx-helpers.h"
 #include "geometry-manager.h"
 
 #if HAVE_GTKSPELL
@@ -484,9 +483,6 @@ delete_handler(BalsaSendmsg * bsmsg)
                                _("The message to “%s” is modified.\n"
                                  "Save message to Draftbox?"), tmp);
     g_free(free_me);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(d, GTK_WINDOW(bsmsg->window));
-#endif
     g_object_unref(list);
     gtk_dialog_set_default_response(GTK_DIALOG(d), GTK_RESPONSE_YES);
     gtk_dialog_add_button(GTK_DIALOG(d),
@@ -1412,9 +1408,6 @@ change_attach_mode(GtkWidget * menu_item, BalsaAttachInfo *info)
 				     "Do you really want to attach "
 				     "this file as reference?"),
 				   libbalsa_vfs_get_uri_utf8(info->file_uri));
-#if HAVE_MACOSX_DESKTOP
-	libbalsa_macosx_menu_for_parent(extbody_dialog, GTK_WINDOW(parent));
-#endif
 	gtk_window_set_title(GTK_WINDOW(extbody_dialog),
 			     _("Attach as Reference?"));
 	result = gtk_dialog_run(GTK_DIALOG(extbody_dialog));
@@ -1554,10 +1547,6 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
     GtkWidget *info = gtk_label_new(msg);
     GtkWidget *charset_button = libbalsa_charset_button_new();
     GtkBox *content_box;
-
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
-#endif
 
     g_free(msg);
     content_box = GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog)));
@@ -2004,9 +1993,6 @@ sw_attach_dialog(BalsaSendmsg * bsmsg)
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_OK"),     GTK_RESPONSE_OK,
                                     NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(fsw, GTK_WINDOW(bsmsg->window));
-#endif
     gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(fsw),
                                     libbalsa_vfs_local_only());
     gtk_window_set_destroy_with_parent(GTK_WINDOW(fsw), TRUE);
@@ -3387,9 +3373,6 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
 					 _("_OK"), GTK_RESPONSE_OK,
 					 _("_Cancel"), GTK_RESPONSE_CANCEL,
 					 NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
     geometry_manager_attach(GTK_WINDOW(dialog), "SelectReplyParts");
 
     label = libbalsa_create_wrap_label(_("Select the parts of the message"
@@ -4694,9 +4677,6 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
                    "a “Blind copy” (BCC) address.\n"
                    "Please check that the address\n"
                    "is appropriate."));
-#if HAVE_MACOSX_DESKTOP
-            libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
-#endif
             g_object_set_data(G_OBJECT(bsmsg->window),
                               "balsa-sendmsg-window-url-bcc", dialog);
             g_signal_connect(dialog, "response",
@@ -4824,9 +4804,6 @@ sw_include_file_activated(GSimpleAction * action,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_OK"),     GTK_RESPONSE_OK,
                                     NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(file_selector, GTK_WINDOW(bsmsg->window));
-#endif
     gtk_window_set_destroy_with_parent(GTK_WINDOW(file_selector), TRUE);
     /* Use the same folder as for attachments. */
     if (balsa_app.attach_dir)
@@ -5510,9 +5487,6 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                  GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
                  GTK_MESSAGE_QUESTION,
                  GTK_BUTTONS_OK_CANCEL, "%s", string->str);
-#if HAVE_MACOSX_DESKTOP
-	    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(bsmsg->window));
-#endif
             g_string_free(string, TRUE);
             choice = gtk_dialog_run(GTK_DIALOG(dialog));
             gtk_widget_destroy(dialog);
@@ -6901,11 +6875,7 @@ sendmsg_window_new()
     }
     gtk_widget_show(menubar);
 
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
-#else
     gtk_box_pack_start(GTK_BOX(main_box), menubar, FALSE, FALSE, 0);
-#endif
 
     /*
      * Set up the spell-checker language menu

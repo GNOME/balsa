@@ -31,7 +31,6 @@
 #include "libbalsa.h"
 #include "libbalsa_private.h"
 #include "misc.h"
-#include "macosx-helpers.h"
 #include "geometry-manager.h"
 #include <glib/gi18n.h>
 
@@ -233,11 +232,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     }
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu(window, GTK_MENU_SHELL(menu_bar));
-#else
     gtk_box_pack_start(GTK_BOX(vbox), menu_bar, FALSE, TRUE, 1);
-#endif
 
     gtk_box_pack_start(GTK_BOX(vbox), interior, TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(window), vbox);

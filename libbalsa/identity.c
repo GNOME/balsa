@@ -29,10 +29,6 @@
 #include <glib/gi18n.h>
 #include "misc.h"
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 #include "libbalsa-gpgme.h"
 
 #include <string.h>
@@ -368,9 +364,6 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_OK"),     GTK_RESPONSE_OK,
                                     NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
 
     g_signal_connect(dialog, "response",
                      G_CALLBACK(sd_response_cb), sdi);
@@ -1572,9 +1565,6 @@ delete_ident_cb(GtkTreeView * tree, GtkWidget * dialog)
                                      GTK_BUTTONS_OK_CANCEL,
                                      _("Do you really want to delete"
                                        " the selected identity?"));
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(confirm, GTK_WINDOW(dialog));
-#endif
     di = g_new(IdentityDeleteInfo, 1);
     di->tree = tree;
     di->dialog = dialog;
@@ -1657,9 +1647,6 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
                                     _("_Remove"),           IDENTITY_RESPONSE_REMOVE,
                                     _("_Close"),            IDENTITY_RESPONSE_CLOSE,
                                     NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
 
     frame = libbalsa_identity_config_frame(identities, default_id, dialog,
                                            changed_cb, parent);

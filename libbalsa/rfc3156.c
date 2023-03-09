@@ -36,10 +36,6 @@
 
 #include "gmime-application-pkcs7.h"
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 #include <glib/gi18n.h>
 
 

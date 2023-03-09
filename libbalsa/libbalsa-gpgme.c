@@ -26,10 +26,6 @@
 #include <locale.h>
 #endif
 
-#if HAVE_MACOSX_DESKTOP
-#include "macosx-helpers.h"
-#endif
-
 #include <string.h>
 #include <gpgme.h>
 #include <glib.h>

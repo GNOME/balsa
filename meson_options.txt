@@ -60,11 +60,6 @@ option('ldap',
   value       : 'false',
   description : 'Use OpenLDAP if available (true|false|path to LDAP installation, default=false)')
 
-option('macosx-desktop',
-  type        : 'boolean',
-  value       : false,
-  description : 'Use Mac OS X Desktop Integration (default=false, extremely experimental)')
-
 option('osmo',
   type        : 'boolean',
   value       : false,

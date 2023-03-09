@@ -58,7 +58,6 @@ html_widget   = get_option('html-widget')
 gtksourceview = get_option('gtksourceview')
 spell_checker = get_option('spell-checker')
 ldap          = get_option('ldap')
-igemacint     = get_option('macosx-desktop')
 osmo          = get_option('osmo')
 sqlite        = get_option('sqlite')
 libsecret     = get_option('libsecret')
@@ -353,16 +352,6 @@ if canberra
     description : 'Defined when canberra can be used.')
   balsa_deps += canberra_dep
 endif # canberra
-
-# ige-mac-integration (Mac OS X desktop only)
-#
-if igemacint
-  igemacint_dep = dependency('ige-mac-integration', version  : '>= 0.8')
-  conf.set('HAVE_MACOSX_DESKTOP', 1,
-    description : 'Defined when menus can be integrated into the Mac OS X desktop')
-  balsa_deps    += igemacint_dep
-  balsa_ab_deps += igemacint_dep
-endif # igemacint
 
 # Libsecret configuration
 #

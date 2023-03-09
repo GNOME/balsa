@@ -51,10 +51,6 @@
 #include "sendmsg-window.h"
 #include "libbalsa-vfs.h"
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 #include "gmime-part-rfc2440.h"
 
 #  define FORWARD_SEARCH(iter, text, match_begin, match_end)            \
@@ -1768,9 +1764,6 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_OK"),     GTK_RESPONSE_OK,
                                     NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dump_dialog, balsa_get_parent_window(menu_item));
-#endif
     gtk_dialog_set_default_response(GTK_DIALOG(dump_dialog),
                                     GTK_RESPONSE_CANCEL);
     gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(dump_dialog),
@@ -2615,9 +2608,6 @@ create_mdn_dialog(GtkWindow *parent, gchar * sender, gchar * mdn_to_address,
                                  "Do you want to send "
                                  "this notification?"),
                                sender, mdn_to_address);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(mdn_dialog, parent);
-#endif
     gtk_window_set_title(GTK_WINDOW(mdn_dialog), _("Reply to MDN?"));
     g_object_set_data(G_OBJECT(mdn_dialog), "balsa-send-msg", send_msg);
     g_object_set_data(G_OBJECT(mdn_dialog), "mdn-ident",

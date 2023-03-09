@@ -105,11 +105,6 @@ AC_ARG_WITH([ldap],
                   [Use OpenLDAP if available (default=no)]),
 		  [with_ldap=$withval],[with_ldap=no])
 
-AC_ARG_WITH([macosx-desktop],
-   AS_HELP_STRING([--with-macosx-desktop],
-	          [Use Mac OS X Desktop Integration (default=no, extremely experimental)]),
-		  [use_igemacint=$withval],[use_igemacint=no])
-
 AC_ARG_WITH([osmo],
    AS_HELP_STRING([--with-osmo],
                   [add Osmo address book support (experimental, needs osmo > svn rev. 1099, default=no)]),
@@ -445,23 +440,6 @@ if test x$with_canberra != xno; then
     AC_DEFINE(HAVE_CANBERRA,1,[Defined when canberra can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $CANBERRA_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $CANBERRA_LIBS"
-else
-    AC_MSG_RESULT([no])
-fi
-
-# ige-mac-integration (Mac OS X desktop only)
-AC_MSG_CHECKING([whether to include Mac OS X Desktop Integration])
-if test x$use_igemacint != xno; then
-    AC_MSG_CHECKING([for ige-mac-integration >= 0.8])
-    if $PKG_CONFIG --atleast-version=0.8 ige-mac-integration ; then
-	AC_MSG_RESULT([yes])
-	AC_DEFINE(HAVE_MACOSX_DESKTOP,1,[Defined when menus can be integrated into the Mac OS X desktop])
-	BALSA_CFLAGS="$BALSA_CFLAGS `$PKG_CONFIG --cflags ige-mac-integration`"
-	BALSA_LIBS="$BALSA_LIBS `$PKG_CONFIG --libs ige-mac-integration`"
-	BALSA_AB_LIBS="$BALSA_AB_LIBS `$PKG_CONFIG --libs ige-mac-integration`"
-    else
-	AC_MSG_ERROR([no])
-    fi
 else
     AC_MSG_RESULT([no])
 fi

@@ -31,10 +31,6 @@
 
 #include <gdk/gdkkeysyms.h>
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 
 void
 balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item,
@@ -85,9 +81,6 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_OK"),     GTK_RESPONSE_OK,
                                     NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(save_dialog, balsa_get_parent_window(parent_widget));
-#endif
     gtk_dialog_set_default_response(GTK_DIALOG(save_dialog),
 				    GTK_RESPONSE_OK);
     g_free(title);

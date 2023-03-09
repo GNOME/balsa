@@ -32,11 +32,6 @@
 #include "sendmsg-window.h"
 #include "toolbar-factory.h"
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
-
 /* Enumeration for GtkTreeModel columns. */
 enum {
     TP_TEXT_COLUMN,
@@ -130,9 +125,6 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
                                     _("_Close"), GTK_RESPONSE_CLOSE,
                                     _("_Help"),  GTK_RESPONSE_HELP,
                                     NULL);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(customize_widget, GTK_WINDOW(active_window));
-#endif
     g_object_add_weak_pointer(G_OBJECT(customize_widget),
                               (gpointer *) & customize_widget);
     g_signal_connect(customize_widget, "response",

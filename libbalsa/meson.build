@@ -75,8 +75,6 @@ libbalsa_a_sources = [
   'libbalsa-gpgme-widgets.c',
   'libbalsa-progress.c',
   'libbalsa-progress.h',
-  'macosx-helpers.c',
-  'macosx-helpers.h',
   'missing.h',
   'missing_time.c',
   'libbalsa.c',

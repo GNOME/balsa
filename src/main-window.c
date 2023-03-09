@@ -42,11 +42,6 @@
 #include "html.h"
 #include <glib/gi18n.h>
 
-#if HAVE_MACOSX_DESKTOP
-#  include <ige-mac-integration.h>
-#  include "macosx-helpers.h"
-#endif
-
 #include <gio/gio.h>
 
 #include "ab-window.h"
@@ -2149,11 +2144,7 @@ bw_set_menus(BalsaWindow * window)
     }
     gtk_widget_show(menubar);
 
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu(window, GTK_MENU_SHELL(menubar));
-#else
     gtk_box_pack_start(GTK_BOX(priv->vbox), menubar, FALSE, FALSE, 0);
-#endif
 }
 
 /*
@@ -2329,9 +2320,6 @@ balsa_window_new(GtkApplication *application)
     GtkWidget *hbox;
     static const gchar *const header_targets[] =
         { "none", "selected", "all" };
-#if HAVE_MACOSX_DESKTOP
-    IgeMacMenuGroup *group;
-#endif
     GtkAdjustment *hadj, *vadj;
     GAction *action;
 
@@ -3940,9 +3928,6 @@ bw_find_real(BalsaWindow * window, BalsaIndex * bindex, gboolean again)
         GtkToggleButton *matching_to, *matching_cc, *matching_subject;
 	gint ok;
 
-#if HAVE_MACOSX_DESKTOP
-	libbalsa_macosx_menu_for_parent(dia, GTK_WINDOW(window));
-#endif
         vbox = gtk_dialog_get_content_area(GTK_DIALOG(dia));
 
 	page=gtk_grid_new();
@@ -4973,9 +4958,6 @@ balsa_window_next_unread(BalsaWindow * window)
                                    GTK_BUTTONS_YES_NO,
                                    _("The next unread message is in %s"),
                                    libbalsa_mailbox_get_name(mailbox));
-#if HAVE_MACOSX_DESKTOP
-        libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(window));
-#endif
         gtk_message_dialog_format_secondary_text
             (GTK_MESSAGE_DIALOG(dialog),
              _("Do you want to select %s?"), libbalsa_mailbox_get_name(mailbox));

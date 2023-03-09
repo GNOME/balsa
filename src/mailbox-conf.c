@@ -58,10 +58,6 @@
 #include "libbalsa-conf.h"
 #include <glib/gi18n.h>
 
-#if HAVE_MACOSX_DESKTOP
-#  include "macosx-helpers.h"
-#endif
-
 struct _BalsaMailboxConfView {
     GtkWidget *identity_combo_box;
     GtkWidget *show_to;
@@ -246,9 +242,6 @@ mailbox_conf_delete(BalsaMailboxNode * mbnode)
                                NULL);
     }
     
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(balsa_app.main_window));
-#endif
     button = gtk_dialog_run(GTK_DIALOG(ask));
     gtk_widget_destroy(ask);
 
@@ -733,9 +726,6 @@ create_local_mailbox_dialog(MailboxConfWindow *mcw)
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
     g_free(title);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, GTK_WINDOW(balsa_app.main_window));
-#endif
 
     gtk_file_chooser_set_extra_widget(GTK_FILE_CHOOSER(dialog), grid);
     if (mcw->mailbox != NULL && libbalsa_mailbox_get_url(mcw->mailbox) != NULL) {
@@ -789,9 +779,6 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
         mcw->ok_button_name, MCW_RESPONSE,
 		_("_Cancel"), GTK_RESPONSE_CANCEL,
         NULL));
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(mcw->window, GTK_WINDOW(balsa_app.main_window));
-#endif
 
     mcw->mb_data.pop3.server_cfg =
         libbalsa_server_cfg_new(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox),

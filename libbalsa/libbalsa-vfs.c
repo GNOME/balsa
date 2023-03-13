@@ -522,6 +522,32 @@ libbalsa_vfs_file_unlink(LibbalsaVfs * file, GError **err)
     return result;
 }
 
+LibbalsaVfs *
+libbalsa_vfs_new_tmp(void)
+{
+    GFile *gio_gfile;
+    GFileIOStream *iostream;
+    LibbalsaVfs *retval;
+
+    gio_gfile = g_file_new_tmp("libbalsa-vfs-XXXXXX", &iostream, NULL);
+    g_object_unref(iostream);
+
+    retval = LIBBALSA_VFS(g_object_new(LIBBALSA_TYPE_VFS, NULL));
+    g_assert(retval != NULL);
+
+    retval->text_attr = (LibBalsaTextAttribute) -1;
+    retval->gio_gfile = gio_gfile;
+    retval->file_uri = g_file_get_uri(gio_gfile);
+
+    return retval;
+}
+
+gboolean
+libbalsa_vfs_move(LibbalsaVfs *source, LibbalsaVfs *dest, GError **err)
+{
+    return g_file_move(source->gio_gfile, dest->gio_gfile, G_FILE_COPY_OVERWRITE,
+                       NULL, NULL, NULL, err);
+}
 
 gboolean
 libbalsa_vfs_launch_app(LibbalsaVfs * file, GObject * object, GError **err)

@@ -369,6 +369,13 @@ libbalsa_message_body_get_cid(LibBalsaMessageBody * body)
     return NULL;
 }
 
+static gboolean
+message_body_save_stream(LibBalsaMessageBody *body,
+                         GMimeStream         *dest,
+                         gboolean             filter_crlf,
+                         ssize_t             *bytes_written,
+                         GError             **err);
+
 /* libbalsa_message_body_save_temporary:
    check if body has already its copy in temporary file and if not,
    allocates a temporary file name and saves the body there.
@@ -485,6 +492,7 @@ gboolean
 libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
                                LibbalsaVfs * dest, mode_t mode,
                                gboolean filter_crlf,
+                               ssize_t *bytes_written,
                                GError **err)
 {
     GMimeStream * out_stream;
@@ -492,7 +500,7 @@ libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
     if (!(out_stream = libbalsa_vfs_create_stream(dest, mode, TRUE, err)))
         return FALSE;
 
-    return libbalsa_message_body_save_stream(body, out_stream, filter_crlf, err);
+    return message_body_save_stream(body, out_stream, filter_crlf, bytes_written, err);
 }
 
 static GMimeStream *
@@ -766,10 +774,12 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
     return pixbuf;
 }
 
-gboolean
-libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
-                                  GMimeStream * dest, gboolean filter_crlf,
-                                  GError ** err)
+static gboolean
+message_body_save_stream(LibBalsaMessageBody *body,
+                         GMimeStream         *dest,
+                         gboolean             filter_crlf,
+                         ssize_t             *bytes_written,
+                         GError             **err)
 {
     GMimeStream *stream;
     LibBalsaMailbox *mailbox;
@@ -802,11 +812,24 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
     libbalsa_mailbox_unlock_store(mailbox);
     g_object_unref(dest);
 
-    if (len < 0)
+    if (len < 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
                     "Write error in save_stream");
+    } else {
+        if (bytes_written != NULL)
+            *bytes_written = len;
+    }
 
     return len >= 0;
+}
+
+gboolean
+libbalsa_message_body_save_stream(LibBalsaMessageBody *body,
+                                  GMimeStream         *dest,
+                                  gboolean             filter_crlf,
+                                  GError             **err)
+{
+    return message_body_save_stream(body, dest, filter_crlf, NULL, err);
 }
 
 gchar *

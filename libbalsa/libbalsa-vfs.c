@@ -522,6 +522,7 @@ libbalsa_vfs_file_unlink(LibbalsaVfs * file, GError **err)
     return result;
 }
 
+/* Create a LibbalsaVfs for a temporary file */
 LibbalsaVfs *
 libbalsa_vfs_new_tmp(void)
 {
@@ -542,10 +543,17 @@ libbalsa_vfs_new_tmp(void)
     return retval;
 }
 
+/* Move a source file to a destination. If the destination exists
+ * and overwrite is TRUE, the destination will be overwritten;
+ * otherwise, the move will fail and G_IO_ERROR_EXISTS will be returned in err.*/
 gboolean
-libbalsa_vfs_move(LibbalsaVfs *source, LibbalsaVfs *dest, GError **err)
+libbalsa_vfs_move(LibbalsaVfs *source,
+                  LibbalsaVfs *dest,
+                  gboolean     overwrite,
+                  GError     **err)
 {
-    return g_file_move(source->gio_gfile, dest->gio_gfile, G_FILE_COPY_OVERWRITE,
+    return g_file_move(source->gio_gfile, dest->gio_gfile,
+                       overwrite ? G_FILE_COPY_OVERWRITE : G_FILE_COPY_NONE,
                        NULL, NULL, NULL, err);
 }
 

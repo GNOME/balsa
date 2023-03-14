@@ -824,10 +824,9 @@ message_body_save_stream(LibBalsaMessageBody *body,
 }
 
 gboolean
-libbalsa_message_body_save_stream(LibBalsaMessageBody *body,
-                                  GMimeStream         *dest,
-                                  gboolean             filter_crlf,
-                                  GError             **err)
+libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
+                                  GMimeStream * dest, gboolean filter_crlf,
+                                  GError ** err)
 {
     return message_body_save_stream(body, dest, filter_crlf, NULL, err);
 }

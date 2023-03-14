@@ -67,6 +67,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     gchar *file_uri;
     LibbalsaVfs *save_file;
     LibbalsaVfs *tmp_file;
+    gboolean ok;
     GError *err = NULL;
     ssize_t bytes_written;
 
@@ -120,23 +121,35 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 
     /* save the file */
     tmp_file = libbalsa_vfs_new_tmp();
-    if (!libbalsa_message_body_save_vfs(mime_body, tmp_file,
+
+    ok = libbalsa_message_body_save_vfs(mime_body, tmp_file,
                                         LIBBALSA_MESSAGE_BODY_UNSAFE,
                                         mime_body->body_type ==
                                         LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
                                         &bytes_written,
-                                        &err)) {
+                                        &err);
+
+    if (!ok) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("Could not save %s: %s"),
                           file_uri, err ? err->message : _("Unknown error"));
         g_clear_error(&err);
-    } else if (bytes_written == 0) {
+    } else {
+        ok = bytes_written > 0;
+    }
+
+    if (!ok) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
                           _("Empty part was not saved to %s"), file_uri);
-    } else if (!libbalsa_vfs_move(tmp_file, save_file, &err)) {
+    } else {
+        ok = libbalsa_vfs_move(tmp_file, save_file, TRUE /* overwrite */, &err);
+    }
+
+    if (!ok) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("Could not save %s: %s"), file_uri, err->message);
         g_clear_error(&err);
+        libbalsa_vfs_file_unlink(tmp_file, NULL /* ignore errors */);
     } else {
         balsa_mime_widget_view_save_dir(parent_widget);
     }

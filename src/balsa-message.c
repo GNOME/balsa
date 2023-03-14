@@ -1791,7 +1791,6 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
             LibbalsaVfs * save_uri;
 	    gboolean result;
             GError *err = NULL;
-            ssize_t bytes_written;
 
 	    if (info->body->filename)
 		save_uri =
@@ -1833,19 +1832,13 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
                                                LIBBALSA_MESSAGE_BODY_UNSAFE,
                                                info->body->body_type ==
                                                LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
-                                               &bytes_written,
                                                &err);
-	    if (!result) {
+	    if (!result)
 		balsa_information(LIBBALSA_INFORMATION_ERROR,
 				  _("Could not save %s: %s"),
 				  libbalsa_vfs_get_uri_utf8(save_uri),
                                   err && err->message ?
                                   err->message : _("Unknown error"));
-            } else if (bytes_written == 0) {
-		balsa_information(LIBBALSA_INFORMATION_WARNING,
-				  _("Empty part was not saved to %s"),
-				  libbalsa_vfs_get_uri_utf8(save_uri));
-            }
             g_clear_error(&err);
 	    g_object_unref(save_uri);
 	    info_list = g_list_next(info_list);

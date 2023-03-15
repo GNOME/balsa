@@ -2955,7 +2955,7 @@ add_file_attachment(BalsaSendmsg        *bsmsg,
             GMimeStream * tmp_stream;
 
             if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
-                res = libbalsa_message_body_save_stream(body, tmp_stream, FALSE, &err);
+                res = libbalsa_message_body_save_stream(body, tmp_stream, FALSE, NULL, &err);
             else
                 close(fd);
         }

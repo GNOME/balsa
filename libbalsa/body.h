@@ -123,6 +123,7 @@ GdkPixbuf *libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body,
 gboolean libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
                                            GMimeStream * dest,
                                            gboolean filter_crlf,
+                                           ssize_t *bytes_written,
                                            GError **err);
 gboolean libbalsa_message_body_save(LibBalsaMessageBody * body,
                                     const gchar * filename, mode_t mode,

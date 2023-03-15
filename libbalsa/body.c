@@ -432,7 +432,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 
         if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
             return libbalsa_message_body_save_stream(body, tmp_stream,
-                                                     FALSE, err);
+                                                     FALSE, NULL, err);
         else {
             g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
                         _("Failed to create output stream"));
@@ -478,7 +478,7 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
 
     if ((out_stream = g_mime_stream_fs_new(fd)) != NULL)
         return libbalsa_message_body_save_stream(body, out_stream,
-                                                 filter_crlf, err);
+                                                 filter_crlf, NULL, err);
 
     /* could not create stream */
     g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
@@ -826,9 +826,10 @@ message_body_save_stream(LibBalsaMessageBody *body,
 gboolean
 libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
                                   GMimeStream * dest, gboolean filter_crlf,
+                                  ssize_t             *bytes_written,
                                   GError ** err)
 {
-    return message_body_save_stream(body, dest, filter_crlf, NULL, err);
+    return message_body_save_stream(body, dest, filter_crlf, bytes_written, err);
 }
 
 gchar *

@@ -64,11 +64,6 @@ gboolean libbalsa_vfs_is_regular_file(LibbalsaVfs * file,
                                       GError **err);
 gint libbalsa_vfs_file_unlink(LibbalsaVfs * file,
                               GError **err);
-LibbalsaVfs * libbalsa_vfs_new_tmp(void);
-gboolean libbalsa_vfs_move(LibbalsaVfs *source,
-                           LibbalsaVfs *dest,
-                           gboolean     overwrite,
-                           GError     **err);
 
 /* application launch helpers */
 gboolean libbalsa_vfs_launch_app(LibbalsaVfs * file,

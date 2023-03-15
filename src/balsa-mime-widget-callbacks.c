@@ -64,9 +64,12 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 {
     gchar *cont_type, *title;
     GtkWidget *save_dialog;
-    gchar *file_uri;
-    LibbalsaVfs *save_file;
-    LibbalsaVfs *tmp_file;
+    GtkFileChooser *save_chooser;
+    gchar *save_uri;
+    GFile *save_file;
+    GFile *tmp_file;
+    GFileIOStream *iostream;
+    GMimeStream *stream;
     gboolean ok;
     GError *err = NULL;
     ssize_t bytes_written;
@@ -88,19 +91,17 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     g_free(title);
     g_free(cont_type);
 
-    gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(save_dialog), TRUE);
-    gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(save_dialog),
-                                    libbalsa_vfs_local_only());
+    save_chooser = GTK_FILE_CHOOSER(save_dialog);
+    gtk_file_chooser_set_do_overwrite_confirmation(save_chooser, TRUE);
+    gtk_file_chooser_set_local_only(save_chooser, libbalsa_vfs_local_only());
     if (balsa_app.save_dir)
-        gtk_file_chooser_set_current_folder_uri(GTK_FILE_CHOOSER(save_dialog),
-                                                balsa_app.save_dir);
+        gtk_file_chooser_set_current_folder_uri(save_chooser, balsa_app.save_dir);
 
     if (mime_body->filename) {
         gchar * filename = g_path_get_basename(mime_body->filename);
 	libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit,
 			       NULL);
-	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(save_dialog),
-					  filename);
+	gtk_file_chooser_set_current_name(save_chooser, filename);
 	g_free(filename);
     }
 
@@ -111,52 +112,47 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     }
 
     /* get the file name */
-    file_uri = gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(save_dialog));
-    gtk_widget_destroy(save_dialog);
-    save_file = libbalsa_vfs_new_from_uri(file_uri);
+    save_uri = gtk_file_chooser_get_uri(save_chooser);
+    save_file = gtk_file_chooser_get_file(save_chooser);
 
     /* remember the folder uri */
     g_free(balsa_app.save_dir);
-    balsa_app.save_dir = g_strdup(libbalsa_vfs_get_folder(save_file));
+    balsa_app.save_dir = gtk_file_chooser_get_current_folder_uri(save_chooser);
+
+    gtk_widget_destroy(save_dialog);
 
     /* save the file */
-    tmp_file = libbalsa_vfs_new_tmp();
+    tmp_file = g_file_new_tmp("balsa-save-XXXXXX", &iostream, NULL);
+    stream = g_mime_stream_gio_new(tmp_file);
+    g_mime_stream_gio_set_owner(GMIME_STREAM_GIO(stream), FALSE);
 
-    ok = libbalsa_message_body_save_vfs(mime_body, tmp_file,
-                                        LIBBALSA_MESSAGE_BODY_UNSAFE,
-                                        mime_body->body_type ==
-                                        LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
-                                        &bytes_written,
-                                        &err);
+    ok = libbalsa_message_body_save_stream(mime_body, stream,
+                                           mime_body->body_type ==
+                                           LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
+                                           &bytes_written,
+                                           &err);
+    g_object_unref(iostream);
 
     if (!ok) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
                           _("Could not save %s: %s"),
-                          file_uri, err ? err->message : _("Unknown error"));
+                          save_uri, err ? err->message : _("Unknown error"));
         g_clear_error(&err);
-    } else {
-        ok = bytes_written > 0;
-    }
-
-    if (!ok) {
+    } else if (bytes_written == 0) {
         balsa_information(LIBBALSA_INFORMATION_WARNING,
-                          _("Empty part was not saved to %s"), file_uri);
-    } else {
-        ok = libbalsa_vfs_move(tmp_file, save_file, TRUE /* overwrite */, &err);
-    }
-
-    if (!ok) {
+                          _("Empty part was not saved to %s"), save_uri);
+    } else if (!g_file_move(tmp_file, save_file, G_FILE_COPY_OVERWRITE, NULL, NULL, NULL, &err)) {
         balsa_information(LIBBALSA_INFORMATION_ERROR,
-                          _("Could not save %s: %s"), file_uri, err->message);
+                          _("Could not save %s: %s"), save_uri, err->message);
         g_clear_error(&err);
-        libbalsa_vfs_file_unlink(tmp_file, NULL /* ignore errors */);
+        g_file_delete(tmp_file, NULL, NULL /* ignore errors */);
     } else {
         balsa_mime_widget_view_save_dir(parent_widget);
     }
 
-    g_object_unref(save_file);
     g_object_unref(tmp_file);
-    g_free(file_uri);
+    g_object_unref(save_file);
+    g_free(save_uri);
 }
 
 void

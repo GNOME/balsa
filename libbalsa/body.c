@@ -369,13 +369,6 @@ libbalsa_message_body_get_cid(LibBalsaMessageBody * body)
     return NULL;
 }
 
-static gboolean
-message_body_save_stream(LibBalsaMessageBody *body,
-                         GMimeStream         *dest,
-                         gboolean             filter_crlf,
-                         ssize_t             *bytes_written,
-                         GError             **err);
-
 /* libbalsa_message_body_save_temporary:
    check if body has already its copy in temporary file and if not,
    allocates a temporary file name and saves the body there.
@@ -500,7 +493,7 @@ libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
     if (!(out_stream = libbalsa_vfs_create_stream(dest, mode, TRUE, err)))
         return FALSE;
 
-    return message_body_save_stream(body, out_stream, filter_crlf, bytes_written, err);
+    return libbalsa_message_body_save_stream(body, out_stream, filter_crlf, bytes_written, err);
 }
 
 static GMimeStream *
@@ -774,12 +767,11 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
     return pixbuf;
 }
 
-static gboolean
-message_body_save_stream(LibBalsaMessageBody *body,
-                         GMimeStream         *dest,
-                         gboolean             filter_crlf,
-                         ssize_t             *bytes_written,
-                         GError             **err)
+gboolean
+libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
+                                  GMimeStream * dest, gboolean filter_crlf,
+                                  ssize_t             *bytes_written,
+                                  GError ** err)
 {
     GMimeStream *stream;
     LibBalsaMailbox *mailbox;
@@ -821,15 +813,6 @@ message_body_save_stream(LibBalsaMessageBody *body,
     }
 
     return len >= 0;
-}
-
-gboolean
-libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
-                                  GMimeStream * dest, gboolean filter_crlf,
-                                  ssize_t             *bytes_written,
-                                  GError ** err)
-{
-    return message_body_save_stream(body, dest, filter_crlf, bytes_written, err);
 }
 
 gchar *

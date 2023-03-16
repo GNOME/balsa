@@ -449,8 +449,6 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 }
 
 /* libbalsa_message_body_save:
-   NOTE: has to use libbalsa_safe_open to set the file access privileges
-   to safe.
 */
 gboolean
 libbalsa_message_body_save(LibBalsaMessageBody * body,
@@ -462,12 +460,11 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
     int flags = O_CREAT | O_EXCL | O_WRONLY;
     GMimeStream *out_stream;
 
-#ifdef O_NOFOLLOW
-    flags |= O_NOFOLLOW;
-#endif
-
-    if ((fd = libbalsa_safe_open(filename, flags, mode, err)) < 0)
+    if ((fd = open(filename, flags, mode)) < 0) {
+        g_set_error(err, LIBBALSA_ERROR_QUARK, errno,
+                    _("Cannot open %s: %s"), filename, g_strerror(errno));
 	return FALSE;
+    }
 
     if ((out_stream = g_mime_stream_fs_new(fd)) != NULL)
         return libbalsa_message_body_save_stream(body, out_stream,

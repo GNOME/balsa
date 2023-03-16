@@ -69,7 +69,6 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     GFile *save_file;
     GFile *tmp_file;
     GFileIOStream *iostream;
-    GMimeStream *stream;
     gboolean ok;
     GError *err = NULL;
     ssize_t bytes_written;
@@ -123,14 +122,10 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 
     /* save the file */
     tmp_file = g_file_new_tmp("balsa-save-XXXXXX", &iostream, NULL);
-    stream = g_mime_stream_gio_new(tmp_file);
-    g_mime_stream_gio_set_owner(GMIME_STREAM_GIO(stream), FALSE);
-
-    ok = libbalsa_message_body_save_stream(mime_body, stream,
-                                           mime_body->body_type ==
-                                           LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
-                                           &bytes_written,
-                                           &err);
+    ok = libbalsa_message_body_save_gio(mime_body, tmp_file,
+                                        mime_body->body_type ==
+                                        LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
+                                        &bytes_written, &err);
     g_object_unref(iostream);
 
     if (!ok) {

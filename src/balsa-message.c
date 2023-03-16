@@ -1791,7 +1791,6 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
             GFile *save_file;
             char *save_path;
             char *save_path_utf8;
-            GMimeStream *stream;
 	    gboolean result;
             GError *err = NULL;
             ssize_t bytes_written;
@@ -1833,15 +1832,12 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
             g_debug("store to file: %s", save_path_utf8);
 
 	    /* try to save the file */
-            stream = g_mime_stream_gio_new(save_file /* takes ownership */);
-
             result =
-                libbalsa_message_body_save_stream(info->body,
-                                                  stream /* takes ownership */,
-                                                  info->body->body_type ==
-                                                  LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
-                                                  &bytes_written,
-                                                  &err);
+                libbalsa_message_body_save_gio(info->body, save_file,
+                                               info->body->body_type ==
+                                               LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
+                                               &bytes_written, &err);
+            g_object_unref(save_file);
 
 	    if (!result) {
 		balsa_information(LIBBALSA_INFORMATION_ERROR,

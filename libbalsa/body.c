@@ -797,6 +797,29 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
     return len >= 0;
 }
 
+gboolean
+libbalsa_message_body_save_gio(LibBalsaMessageBody *body,
+                               GFile               *dest_file,
+                               gboolean             filter_crlf,
+                               ssize_t             *bytes_written,
+                               GError             **err)
+{
+    GMimeStream *dest;
+
+    dest = g_mime_stream_gio_new(dest_file);
+    /* Caller owns the reference to dest_file: */
+    g_mime_stream_gio_set_owner(GMIME_STREAM_GIO(dest), FALSE);
+
+    if (dest == NULL) {
+        g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
+                    _("Failed to create output stream"));
+        return FALSE;
+    }
+
+    return libbalsa_message_body_save_stream(body, dest /* takes ownership */,
+                                             filter_crlf, bytes_written, err);
+}
+
 gchar *
 libbalsa_message_body_get_mime_type(LibBalsaMessageBody * body)
 {

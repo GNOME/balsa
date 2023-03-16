@@ -128,12 +128,6 @@ gboolean libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
 gboolean libbalsa_message_body_save(LibBalsaMessageBody * body,
                                     const gchar * filename, mode_t mode,
                                     gboolean filter_crlf, GError **err);
-gboolean libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
-                                        LibbalsaVfs * dest,
-                                        mode_t mode,
-                                        gboolean filter_crlf,
-                                        ssize_t *bytes_written,
-                                        GError **err);
 gboolean libbalsa_message_body_save_temporary(LibBalsaMessageBody * body,
                                               GError **err);
 

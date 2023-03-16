@@ -481,21 +481,6 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
 }
 
 
-gboolean
-libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
-                               LibbalsaVfs * dest, mode_t mode,
-                               gboolean filter_crlf,
-                               ssize_t *bytes_written,
-                               GError **err)
-{
-    GMimeStream * out_stream;
-    
-    if (!(out_stream = libbalsa_vfs_create_stream(dest, mode, TRUE, err)))
-        return FALSE;
-
-    return libbalsa_message_body_save_stream(body, out_stream, filter_crlf, bytes_written, err);
-}
-
 static GMimeStream *
 libbalsa_message_body_stream_add_filter(GMimeStream * stream,
                                         GMimeFilter * filter)

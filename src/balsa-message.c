@@ -1775,10 +1775,10 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
     if (gtk_dialog_run(GTK_DIALOG(dump_dialog)) == GTK_RESPONSE_OK) {
 	gchar *dir_name =
             gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dump_dialog));
-        LibbalsaVfs * dir_uri;
+        GFile * dir_file;
 
         g_debug("store to URI: %s", dir_name);
-        dir_uri = libbalsa_vfs_new_from_uri(dir_name);
+        dir_file = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(dump_dialog));
 
 	/* remember the folder */
 	g_free(balsa_app.save_dir);
@@ -1788,15 +1788,17 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 	info_list = g_list_first(info_list);
 	while (info_list) {
 	    BalsaPartInfo *info = BALSA_PART_INFO(info_list->data);
-            LibbalsaVfs * save_uri;
+            GFile *save_file;
+            char *save_path;
+            char *save_path_utf8;
+            GMimeStream *stream;
 	    gboolean result;
             GError *err = NULL;
             ssize_t bytes_written;
 
-	    if (info->body->filename)
-		save_uri =
-		    libbalsa_vfs_dir_append(dir_uri, info->body->filename);
-	    else {
+	    if (info->body->filename) {
+		save_file = g_file_get_child(dir_file, info->body->filename);
+            } else {
 		gchar *cont_type =
 		    libbalsa_message_body_get_mime_type(info->body);
 		gchar *p;
@@ -1805,53 +1807,59 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 		g_strdelimit(cont_type, G_DIR_SEPARATOR_S, '-');
 		p = g_strdup_printf(_("%s message part"), cont_type);
 		g_free(cont_type);
-		save_uri = libbalsa_vfs_dir_append(dir_uri, p);
+		save_file = g_file_get_child(dir_file, p);
 		g_free(p);
 	    }
-            g_debug("store to file: %s", libbalsa_vfs_get_uri_utf8(save_uri));
+            save_path = g_file_get_path(save_file);
+            save_path_utf8 = g_filename_to_utf8(save_path, -1, NULL, NULL, NULL);
+            g_debug("store to file: %s", save_path_utf8);
+            g_free(save_path_utf8);
 
 	    /* don't overwrite existing files, append (1), (2), ... instead */
-	    if (libbalsa_vfs_file_exists(save_uri)) {
+	    if (g_file_query_exists(save_file, NULL)) {
 		gint n = 1;
-		LibbalsaVfs * base_uri = save_uri;
+                char *base_path = save_path;
 
-		save_uri = NULL;
+                save_path = NULL;
 		do {
-                    gchar * ext = g_strdup_printf(" (%d)", n++);
-		    if (save_uri)
-                        g_object_unref(save_uri);
-                    save_uri = libbalsa_vfs_append(base_uri, ext);
-                    g_free(ext);
-		} while (libbalsa_vfs_file_exists(save_uri));
-		g_object_unref(base_uri);
+                    g_free(save_path);
+                    g_object_unref(save_file);
+                    save_path = g_strdup_printf("%s (%d)", base_path, n++);
+                    save_file = g_file_new_for_path(save_path);
+		} while (g_file_query_exists(save_file, NULL));
+                g_free(base_path);
 	    }
-            g_debug("store to file: %s", libbalsa_vfs_get_uri_utf8(save_uri));
+            save_path_utf8 = g_filename_to_utf8(save_path, -1, NULL, NULL, NULL);
+            g_debug("store to file: %s", save_path_utf8);
 
 	    /* try to save the file */
+            stream = g_mime_stream_gio_new(save_file /* takes ownership */);
+
             result =
-                libbalsa_message_body_save_vfs(info->body, save_uri,
-                                               LIBBALSA_MESSAGE_BODY_UNSAFE,
-                                               info->body->body_type ==
-                                               LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
-                                               &bytes_written,
-                                               &err);
+                libbalsa_message_body_save_stream(info->body,
+                                                  stream /* takes ownership */,
+                                                  info->body->body_type ==
+                                                  LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
+                                                  &bytes_written,
+                                                  &err);
+
 	    if (!result) {
 		balsa_information(LIBBALSA_INFORMATION_ERROR,
 				  _("Could not save %s: %s"),
-				  libbalsa_vfs_get_uri_utf8(save_uri),
+				  save_path_utf8,
                                   err && err->message ?
                                   err->message : _("Unknown error"));
+                g_clear_error(&err);
             } else if (bytes_written == 0) {
 		balsa_information(LIBBALSA_INFORMATION_WARNING,
 				  _("Empty part was not saved to %s"),
-				  libbalsa_vfs_get_uri_utf8(save_uri));
+				  save_path_utf8);
             }
-            g_clear_error(&err);
-	    g_object_unref(save_uri);
-	    info_list = g_list_next(info_list);
+            g_free(save_path_utf8);
+	    info_list = info_list->next;
 	}
 	balsa_mime_widget_view_save_dir(menu_item);
-	g_object_unref(dir_uri);
+	g_object_unref(dir_file);
     }
     gtk_widget_destroy(dump_dialog);
 }

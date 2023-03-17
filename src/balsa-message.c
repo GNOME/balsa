@@ -1793,6 +1793,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
             char *save_path_utf8;
 	    gboolean result;
             GError *err = NULL;
+            ssize_t bytes_written;
 
 	    if (info->body->filename) {
 		save_file = g_file_get_child(dir_file, info->body->filename);

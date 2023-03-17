@@ -71,7 +71,6 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     GFileIOStream *iostream;
     gboolean ok;
     GError *err = NULL;
-    ssize_t bytes_written;
 
     g_return_if_fail(mime_body != NULL);
 

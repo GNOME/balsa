@@ -786,13 +786,9 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
     libbalsa_mailbox_unlock_store(mailbox);
     g_object_unref(dest);
 
-    if (len < 0) {
+    if (len < 0)
         g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
                     "Write error in save_stream");
-    } else {
-        if (bytes_written != NULL)
-            *bytes_written = len;
-    }
 
     return len >= 0;
 }

@@ -158,6 +158,11 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
  */
 
 /* First some helpers. */
+
+/* Set body->filename, if possible.
+ *
+ * If it is not NULL, GMime documents that the returned string will be in UTF-8.
+ */
 static void
 libbalsa_message_body_set_filename(LibBalsaMessageBody * body)
 {
@@ -166,6 +171,7 @@ libbalsa_message_body_set_filename(LibBalsaMessageBody * body)
 
     access_type = libbalsa_message_body_get_parameter(body, "access-type");
 
+    /* In either case, a UTF-8 string: */
     if (access_type != NULL && g_ascii_strcasecmp(access_type, "URL") == 0)
         filename = libbalsa_message_body_get_parameter(body, "URL");
     else if (GMIME_IS_PART(body->mime_part))
@@ -331,6 +337,12 @@ libbalsa_message_body_type(LibBalsaMessageBody * body)
     /* FIXME: this could be a virtual function... OR not? */
     return body->body_type;
 }
+
+/* Get a content-type parameter.
+ *
+ * GMime documents that if the parameter is set, the
+ * returned string will be in UTF-8.
+ */
 
 gchar *
 libbalsa_message_body_get_parameter(const LibBalsaMessageBody * body,

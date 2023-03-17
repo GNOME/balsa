@@ -97,9 +97,9 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
         gtk_file_chooser_set_current_folder_uri(save_chooser, balsa_app.save_dir);
 
     if (mime_body->filename) {
+        /* Note that LibBalsaMessageBody:filename is in UTF-8 encoding,
+         * even if the system’s encoding for filenames is different. */
         gchar * filename = g_path_get_basename(mime_body->filename);
-	libbalsa_utf8_sanitize(&filename, balsa_app.convert_unknown_8bit,
-			       NULL);
 	gtk_file_chooser_set_current_name(save_chooser, filename);
 	g_free(filename);
     }

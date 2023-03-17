@@ -461,8 +461,9 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
     GMimeStream *out_stream;
 
     if ((fd = open(filename, flags, mode)) < 0) {
-        g_set_error(err, LIBBALSA_ERROR_QUARK, errno,
-                    _("Cannot open %s: %s"), filename, g_strerror(errno));
+        int errsv = errno;
+        g_set_error(err, LIBBALSA_ERROR_QUARK, errsv,
+                    _("Cannot open %s: %s"), filename, g_strerror(errsv));
 	return FALSE;
     }
 

@@ -802,6 +802,9 @@ libbalsa_message_body_save_gio(LibBalsaMessageBody *body,
 {
     GMimeStream *dest;
 
+    g_return_val_if_fail(body != NULL, FALSE);
+    g_return_val_if_fail(G_IS_FILE(dest_file), FALSE);
+
     dest = g_mime_stream_gio_new(dest_file);
     /* Caller owns the reference to dest_file: */
     g_mime_stream_gio_set_owner(GMIME_STREAM_GIO(dest), FALSE);

@@ -66,6 +66,7 @@ libinit_balsa/assistant_init.c
 libinit_balsa/assistant_page_defclient.c
 libinit_balsa/assistant_page_directory.c
 libinit_balsa/assistant_page_finish.c
+libinit_balsa/assistant_page_server.c
 libinit_balsa/assistant_page_user.c
 libinit_balsa/assistant_page_welcome.c
 libnetclient/net-client.c

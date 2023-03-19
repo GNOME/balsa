@@ -397,7 +397,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
     if (body->temp_filename == NULL) {
         gchar *filename;
         gint fd = -1;
-        GMimeStream *tmp_stream;
+        gboolean retval;
 
         filename = body->filename ?
             g_strdup(body->filename) : libbalsa_message_body_get_cid(body);
@@ -435,15 +435,10 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
             return FALSE;
         }
 
-        if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
-            return libbalsa_message_body_save_stream(body, tmp_stream,
-                                                     FALSE, NULL, err);
-        else {
-            g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
-                        _("Failed to create output stream"));
-            close(fd);
-            return FALSE;
-        }
+        retval = libbalsa_message_body_save_fs(body, fd, FALSE, NULL, err);
+        close(fd);
+
+        return retval;
     } else {
 	/* the temporary name has been already allocated on previous
 	   save_temporary action. We just check if the file is still there.
@@ -470,7 +465,7 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
 {
     int fd;
     int flags = O_CREAT | O_EXCL | O_WRONLY;
-    GMimeStream *out_stream;
+    gboolean retval;
 
     if ((fd = open(filename, flags, mode)) < 0) {
         int errsv = errno;
@@ -479,15 +474,10 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
 	return FALSE;
     }
 
-    if ((out_stream = g_mime_stream_fs_new(fd)) != NULL)
-        return libbalsa_message_body_save_stream(body, out_stream,
-                                                 filter_crlf, NULL, err);
-
-    /* could not create stream */
-    g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
-                _("Failed to create output stream"));
+    retval = libbalsa_message_body_save_fs(body, fd, filter_crlf, NULL, err);
     close(fd);
-    return FALSE;
+
+    return retval;
 }
 
 

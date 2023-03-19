@@ -130,6 +130,11 @@ gboolean libbalsa_message_body_save_gio(LibBalsaMessageBody *body,
                                         gboolean             filter_crlf,
                                         ssize_t             *bytes_written,
                                         GError             **err);
+gboolean libbalsa_message_body_save_fs(LibBalsaMessageBody *body,
+                                       int                  fd,
+                                       gboolean             filter_crlf,
+                                       ssize_t             *bytes_written,
+                                       GError             **err);
 gboolean libbalsa_message_body_save(LibBalsaMessageBody * body,
                                     const gchar * filename, mode_t mode,
                                     gboolean filter_crlf, GError **err);

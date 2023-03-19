@@ -799,9 +799,13 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
     libbalsa_mailbox_unlock_store(mailbox);
     g_object_unref(dest);
 
-    if (len < 0)
+    if (len < 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
                     "Write error in save_stream");
+    } else {
+        if (bytes_written != NULL)
+            *bytes_written = len;
+    }
 
     return len >= 0;
 }
@@ -818,15 +822,31 @@ libbalsa_message_body_save_gio(LibBalsaMessageBody *body,
     g_return_val_if_fail(body != NULL, FALSE);
     g_return_val_if_fail(G_IS_FILE(dest_file), FALSE);
 
-    dest = g_mime_stream_gio_new(dest_file);
+    dest = g_mime_stream_gio_new(dest_file); /* Never NULL */
+
     /* Caller owns the reference to dest_file: */
     g_mime_stream_gio_set_owner(GMIME_STREAM_GIO(dest), FALSE);
 
-    if (dest == NULL) {
-        g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
-                    _("Failed to create output stream"));
-        return FALSE;
-    }
+    return libbalsa_message_body_save_stream(body, dest /* takes ownership */,
+                                             filter_crlf, bytes_written, err);
+}
+
+gboolean
+libbalsa_message_body_save_fs(LibBalsaMessageBody *body,
+                              int                  fd,
+                              gboolean             filter_crlf,
+                              ssize_t             *bytes_written,
+                              GError             **err)
+{
+    GMimeStream *dest;
+
+    g_return_val_if_fail(body != NULL, FALSE);
+    g_return_val_if_fail(fd >= 0, FALSE);
+
+    dest = g_mime_stream_fs_new(fd); /* Never NULL */
+
+    /* Caller owns the file descriptor: */
+    g_mime_stream_fs_set_owner(GMIME_STREAM_FS(dest), FALSE);
 
     return libbalsa_message_body_save_stream(body, dest /* takes ownership */,
                                              filter_crlf, bytes_written, err);

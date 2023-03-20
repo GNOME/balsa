@@ -1785,13 +1785,13 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 	balsa_app.save_dir = dir_name;
 
 	/* save all parts without further user interaction */
-	info_list = g_list_first(info_list);
-	while (info_list) {
+        for (/* nothing */; info_list != NULL; info_list = info_list->next) {
 	    BalsaPartInfo *info = BALSA_PART_INFO(info_list->data);
             GFile *save_file;
             char *save_path;
             char *save_path_utf8;
 	    gboolean result;
+            GFileOutputStream *stream;
             GError *err = NULL;
             ssize_t bytes_written;
 
@@ -1812,22 +1812,42 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
             save_path = g_file_get_path(save_file);
             save_path_utf8 = g_filename_to_utf8(save_path, -1, NULL, NULL, NULL);
             g_debug("store to file: %s", save_path_utf8);
-            g_free(save_path_utf8);
+
+            /* We don't use stream, but holding a reference to it keeps
+             * a file descriptor open and blocks any other process from
+             * opening the file. */
+            stream = g_file_create(save_file, G_FILE_CREATE_PRIVATE, NULL, &err);
 
 	    /* don't overwrite existing files, append (1), (2), ... instead */
-	    if (g_file_query_exists(save_file, NULL)) {
+	    if (stream == NULL) {
 		gint n = 1;
-                char *base_path = save_path;
+                char *base_path;
 
+                if (!g_error_matches(err, G_IO_ERROR, G_IO_ERROR_EXISTS)) {
+                    balsa_information(LIBBALSA_INFORMATION_ERROR,
+                                      _("Could not save %s: %s"), save_path_utf8,
+                                      err->message);
+                    g_clear_error(&err);
+
+                    /* Give up on this part */
+                    g_free(save_path);
+                    g_free(save_path_utf8);
+                    g_object_unref(save_file);
+                    continue;
+                }
+
+                base_path = save_path;
                 save_path = NULL;
 		do {
                     g_free(save_path);
-                    g_object_unref(save_file);
                     save_path = g_strdup_printf("%s (%d)", base_path, n++);
+                    g_object_unref(save_file);
                     save_file = g_file_new_for_path(save_path);
-		} while (g_file_query_exists(save_file, NULL));
+                    stream = g_file_create(save_file, G_FILE_CREATE_PRIVATE, NULL, NULL);
+		} while (stream == NULL);
                 g_free(base_path);
 	    }
+            g_free(save_path_utf8);
             save_path_utf8 = g_filename_to_utf8(save_path, -1, NULL, NULL, NULL);
             g_debug("store to file: %s", save_path_utf8);
 
@@ -1837,7 +1857,9 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
                                                info->body->body_type ==
                                                LIBBALSA_MESSAGE_BODY_TYPE_TEXT,
                                                &bytes_written, &err);
-            g_object_unref(save_file);
+
+            /* Now safe to drop our reference. */
+            g_object_unref(stream);
 
 	    if (!result) {
 		balsa_information(LIBBALSA_INFORMATION_ERROR,
@@ -1847,12 +1869,16 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
                                   err->message : _("Unknown error"));
                 g_clear_error(&err);
             } else if (bytes_written == 0) {
+                /* We could leave the empty file, but that would be
+                 * inconsistent with not saving an empty part when only
+                 * one file is selected. */
 		balsa_information(LIBBALSA_INFORMATION_WARNING,
 				  _("Empty part was not saved to %s"),
 				  save_path_utf8);
+                g_file_delete(save_file, NULL, NULL);
             }
             g_free(save_path_utf8);
-	    info_list = info_list->next;
+            g_object_unref(save_file);
 	}
 	balsa_mime_widget_view_save_dir(menu_item);
 	g_object_unref(dir_file);

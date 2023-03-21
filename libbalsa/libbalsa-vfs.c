@@ -141,67 +141,6 @@ libbalsa_vfs_new_from_uri(const gchar * uri)
 }
 
 
-/* create a new LibbalsaVfs object by appending text to the existing object
- * file (note: text is in utf8, not escaped) */
-LibbalsaVfs *
-libbalsa_vfs_append(LibbalsaVfs * file, const gchar * text)
-{
-    gchar * p;
-    gchar * q;
-    LibbalsaVfs * retval;
-
-    g_return_val_if_fail(LIBBALSA_IS_VFS(file), NULL);
-    g_return_val_if_fail(file->file_uri != NULL, NULL);
-    g_return_val_if_fail(text != NULL, NULL);
-
-    /* fake an absolute file name which we can convert to an uri */
-    p = g_strconcat("/", text, NULL);
-    q = g_filename_to_uri(p, NULL, NULL);
-    g_free(p);
-    if (q == NULL)
-        return NULL;
-
-    /* append to the existing uri and create the new object from it */
-    p = g_strconcat(file->file_uri, q + 8, NULL);
-    g_free(q);
-    retval = libbalsa_vfs_new_from_uri(p);
-    g_free(p);
-
-    return retval;
-}
-
-
-/* create a new LibbalsaVfs object by appending filename to the existing
- * object dir which describes a folder (note: filename is in utf8, not
- * escaped) */
-LibbalsaVfs *
-libbalsa_vfs_dir_append(LibbalsaVfs * dir, const gchar * filename)
-{
-    gchar * p;
-    gchar * q;
-    LibbalsaVfs * retval;
-
-    g_return_val_if_fail(LIBBALSA_IS_VFS(dir), NULL);
-    g_return_val_if_fail(dir->file_uri != NULL, NULL);
-    g_return_val_if_fail(filename != NULL, NULL);
-
-    /* fake an absolute file name which we can convert to an uri */
-    p = g_strconcat("/", filename, NULL);
-    q = g_filename_to_uri(p, NULL, NULL);
-    g_free(p);
-    if (!q)
-        return NULL;
-
-    /* append to the existing uri and create the new object from it */
-    p = g_strconcat(dir->file_uri, q + 7, NULL);
-    g_free(q);
-    retval = libbalsa_vfs_new_from_uri(p);
-    g_free(p);
-
-    return retval;
-}
-
-
 /* return the text uri of the passed file, removing the last component */
 const gchar *
 libbalsa_vfs_get_folder(LibbalsaVfs * file)
@@ -443,28 +382,6 @@ libbalsa_vfs_create_stream(LibbalsaVfs * file, mode_t mode,
     g_mime_stream_gio_set_owner((GMimeStreamGIO *) stream, FALSE);
 
     return stream;
-}
-
-
-/* return TRUE if the passed file exists */
-gboolean
-libbalsa_vfs_file_exists(LibbalsaVfs * file)
-{
-    gboolean result = FALSE;
-
-    g_return_val_if_fail(LIBBALSA_IS_VFS(file), FALSE);
-    g_return_val_if_fail(file->file_uri != NULL, FALSE);
-
-    /* use GIO to get the file's attributes - fails if the file does not exist */
-    g_return_val_if_fail(file->gio_gfile != NULL, FALSE);
-
-    if (file->info == NULL)
-        file->info =
-            g_file_query_info(file->gio_gfile, GIO_INFO_ATTS,
-                              G_FILE_QUERY_INFO_NONE, NULL, NULL);
-    result = file->info != NULL;
-
-    return result;
 }
 
 

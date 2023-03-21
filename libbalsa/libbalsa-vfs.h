@@ -44,10 +44,6 @@ G_DECLARE_FINAL_TYPE(LibbalsaVfs,
 
 gboolean libbalsa_vfs_local_only(void);
 LibbalsaVfs * libbalsa_vfs_new_from_uri(const gchar * uri);
-LibbalsaVfs * libbalsa_vfs_append(LibbalsaVfs * file,
-                                  const gchar * text);
-LibbalsaVfs * libbalsa_vfs_dir_append(LibbalsaVfs * dir,
-                                      const gchar * filename);
 const gchar * libbalsa_vfs_get_folder(LibbalsaVfs * file);
 const gchar * libbalsa_vfs_get_uri(LibbalsaVfs * file);
 const gchar * libbalsa_vfs_get_uri_utf8(LibbalsaVfs * file);
@@ -59,7 +55,6 @@ GMimeStream * libbalsa_vfs_create_stream(LibbalsaVfs * file,
                                          mode_t mode, 
                                          gboolean rdwr,
                                          GError ** err);
-gboolean libbalsa_vfs_file_exists(LibbalsaVfs * file);
 gboolean libbalsa_vfs_is_regular_file(LibbalsaVfs * file,
                                       GError **err);
 gint libbalsa_vfs_file_unlink(LibbalsaVfs * file,

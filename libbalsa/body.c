@@ -158,6 +158,11 @@ libbalsa_message_body_extract_embedded_headers(GMimeMessage* msg)
  */
 
 /* First some helpers. */
+
+/* Set body->filename, if possible.
+ *
+ * If it is not NULL, GMime documents that the returned string will be in UTF-8.
+ */
 static void
 libbalsa_message_body_set_filename(LibBalsaMessageBody * body)
 {
@@ -166,6 +171,7 @@ libbalsa_message_body_set_filename(LibBalsaMessageBody * body)
 
     access_type = libbalsa_message_body_get_parameter(body, "access-type");
 
+    /* In either case, a UTF-8 string: */
     if (access_type != NULL && g_ascii_strcasecmp(access_type, "URL") == 0)
         filename = libbalsa_message_body_get_parameter(body, "URL");
     else if (GMIME_IS_PART(body->mime_part))
@@ -332,6 +338,12 @@ libbalsa_message_body_type(LibBalsaMessageBody * body)
     return body->body_type;
 }
 
+/* Get a content-type parameter.
+ *
+ * GMime documents that if the parameter is set, the
+ * returned string will be in UTF-8.
+ */
+
 gchar *
 libbalsa_message_body_get_parameter(const LibBalsaMessageBody * body,
 				    const gchar * param)
@@ -385,7 +397,7 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
     if (body->temp_filename == NULL) {
         gchar *filename;
         gint fd = -1;
-        GMimeStream *tmp_stream;
+        gboolean retval;
 
         filename = body->filename ?
             g_strdup(body->filename) : libbalsa_message_body_get_cid(body);
@@ -423,15 +435,10 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
             return FALSE;
         }
 
-        if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
-            return libbalsa_message_body_save_stream(body, tmp_stream,
-                                                     FALSE, err);
-        else {
-            g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
-                        _("Failed to create output stream"));
-            close(fd);
-            return FALSE;
-        }
+        retval = libbalsa_message_body_save_fs(body, fd, FALSE, NULL, err);
+        close(fd);
+
+        return retval;
     } else {
 	/* the temporary name has been already allocated on previous
 	   save_temporary action. We just check if the file is still there.
@@ -449,8 +456,6 @@ libbalsa_message_body_save_temporary(LibBalsaMessageBody * body, GError **err)
 }
 
 /* libbalsa_message_body_save:
-   NOTE: has to use libbalsa_safe_open to set the file access privileges
-   to safe.
 */
 gboolean
 libbalsa_message_body_save(LibBalsaMessageBody * body,
@@ -460,40 +465,21 @@ libbalsa_message_body_save(LibBalsaMessageBody * body,
 {
     int fd;
     int flags = O_CREAT | O_EXCL | O_WRONLY;
-    GMimeStream *out_stream;
+    gboolean retval;
 
-#ifdef O_NOFOLLOW
-    flags |= O_NOFOLLOW;
-#endif
-
-    if ((fd = libbalsa_safe_open(filename, flags, mode, err)) < 0)
+    if ((fd = open(filename, flags, mode)) < 0) {
+        int errsv = errno;
+        g_set_error(err, LIBBALSA_ERROR_QUARK, errsv,
+                    _("Cannot open %s: %s"), filename, g_strerror(errsv));
 	return FALSE;
+    }
 
-    if ((out_stream = g_mime_stream_fs_new(fd)) != NULL)
-        return libbalsa_message_body_save_stream(body, out_stream,
-                                                 filter_crlf, err);
-
-    /* could not create stream */
-    g_set_error(err, LIBBALSA_ERROR_QUARK, 1,
-                _("Failed to create output stream"));
+    retval = libbalsa_message_body_save_fs(body, fd, filter_crlf, NULL, err);
     close(fd);
-    return FALSE;
+
+    return retval;
 }
 
-
-gboolean
-libbalsa_message_body_save_vfs(LibBalsaMessageBody * body,
-                               LibbalsaVfs * dest, mode_t mode,
-                               gboolean filter_crlf,
-                               GError **err)
-{
-    GMimeStream * out_stream;
-    
-    if (!(out_stream = libbalsa_vfs_create_stream(dest, mode, TRUE, err)))
-        return FALSE;
-
-    return libbalsa_message_body_save_stream(body, out_stream, filter_crlf, err);
-}
 
 static GMimeStream *
 libbalsa_message_body_stream_add_filter(GMimeStream * stream,
@@ -769,6 +755,7 @@ libbalsa_message_body_get_pixbuf(LibBalsaMessageBody * body, GError ** err)
 gboolean
 libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
                                   GMimeStream * dest, gboolean filter_crlf,
+                                  ssize_t             *bytes_written,
                                   GError ** err)
 {
     GMimeStream *stream;
@@ -802,11 +789,57 @@ libbalsa_message_body_save_stream(LibBalsaMessageBody * body,
     libbalsa_mailbox_unlock_store(mailbox);
     g_object_unref(dest);
 
-    if (len < 0)
+    if (len < 0) {
         g_set_error(err, LIBBALSA_MAILBOX_ERROR, LIBBALSA_MAILBOX_ACCESS_ERROR,
                     "Write error in save_stream");
+    } else {
+        if (bytes_written != NULL)
+            *bytes_written = len;
+    }
 
     return len >= 0;
+}
+
+gboolean
+libbalsa_message_body_save_gio(LibBalsaMessageBody *body,
+                               GFile               *dest_file,
+                               gboolean             filter_crlf,
+                               ssize_t             *bytes_written,
+                               GError             **err)
+{
+    GMimeStream *dest;
+
+    g_return_val_if_fail(body != NULL, FALSE);
+    g_return_val_if_fail(G_IS_FILE(dest_file), FALSE);
+
+    dest = g_mime_stream_gio_new(dest_file); /* Never NULL */
+
+    /* Caller owns the reference to dest_file: */
+    g_mime_stream_gio_set_owner(GMIME_STREAM_GIO(dest), FALSE);
+
+    return libbalsa_message_body_save_stream(body, dest /* takes ownership */,
+                                             filter_crlf, bytes_written, err);
+}
+
+gboolean
+libbalsa_message_body_save_fs(LibBalsaMessageBody *body,
+                              int                  fd,
+                              gboolean             filter_crlf,
+                              ssize_t             *bytes_written,
+                              GError             **err)
+{
+    GMimeStream *dest;
+
+    g_return_val_if_fail(body != NULL, FALSE);
+    g_return_val_if_fail(fd >= 0, FALSE);
+
+    dest = g_mime_stream_fs_new(fd); /* Never NULL */
+
+    /* Caller owns the file descriptor: */
+    g_mime_stream_fs_set_owner(GMIME_STREAM_FS(dest), FALSE);
+
+    return libbalsa_message_body_save_stream(body, dest /* takes ownership */,
+                                             filter_crlf, bytes_written, err);
 }
 
 gchar *

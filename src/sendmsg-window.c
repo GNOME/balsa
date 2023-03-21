@@ -2951,13 +2951,9 @@ add_file_attachment(BalsaSendmsg        *bsmsg,
     } else {
         int fd;
 
-        if ((fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL)) > 0) {
-            GMimeStream * tmp_stream;
-
-            if ((tmp_stream = g_mime_stream_fs_new(fd)) != NULL)
-                res = libbalsa_message_body_save_stream(body, tmp_stream, FALSE, &err);
-            else
-                close(fd);
+        if ((fd = g_file_open_tmp("balsa-continue-XXXXXX", &name, NULL)) >= 0) {
+            res = libbalsa_message_body_save_fs(body, fd, FALSE, NULL, &err);
+            close(fd);
         }
     }
 

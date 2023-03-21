@@ -2154,7 +2154,7 @@ lbm_imap_construct_body(LibBalsaMessageBody *lbbody, ImapBody *imap_body)
     if(str) {
         lbbody->filename  =
 	    g_mime_utils_header_decode_text(libbalsa_parser_options(), str);
-        libbalsa_utf8_sanitize(&lbbody->filename, TRUE, NULL);
+        /* GMime documents that this is a newly allocated UTF-8 string */
     }
     lbbody->charset   = g_strdup(imap_body_get_param(imap_body, "charset"));
     if(imap_body->envelope) {

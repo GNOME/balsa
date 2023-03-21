@@ -604,30 +604,6 @@ libbalsa_text_attr_file(const gchar * filename)
 
 #define compare_stat(osb, nsb)  ( (osb.st_dev != nsb.st_dev || osb.st_ino != nsb.st_ino || osb.st_rdev != nsb.st_rdev) ? -1 : 0 )
 
-int 
-libbalsa_safe_open (const char *path, int flags, mode_t mode, GError **err)
-{
-  struct stat osb, nsb;
-  int fd;
- 
-  if ((fd = open (path, flags, mode)) < 0) {
-      g_set_error(err, LIBBALSA_ERROR_QUARK, errno,
-                  _("Cannot open %s: %s"), path, g_strerror(errno));
-      return fd;
-  }
- 
-  /* make sure the file is not symlink */
-  if (lstat (path, &osb) < 0 || fstat (fd, &nsb) < 0 ||
-      compare_stat(osb, nsb) == -1) {
-      close (fd);
-      g_set_error(err, LIBBALSA_ERROR_QUARK, errno,
-                  _("Cannot open %s: is a symbolic link"), path);
-      return (-1);
-  }
- 
-  return (fd);
-}
-
 /* 
  * This function is supposed to do nfs-safe renaming of files.
  * 

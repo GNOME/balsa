@@ -6774,7 +6774,7 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
 {
     InternetAddressList *list;
     gchar *to_string;
-    const gchar *subject_string;
+    const gchar *subject_string = NULL;
     gchar *title;
 
     list = libbalsa_address_view_get_list(bsmsg->recipient_view, "To:");

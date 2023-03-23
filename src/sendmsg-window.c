@@ -1088,7 +1088,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from.body),
                              g_list_index(balsa_app.identities, ident));
 
-    if (bsmsg->replyto[0] != NULL) {
+    if (bsmsg->replyto.name != NULL) {
         addr = libbalsa_identity_get_replyto(ident);
         if (addr != NULL && addr[0] != '\0') {
             libbalsa_address_view_set_from_string(bsmsg->replyto_view,
@@ -2529,8 +2529,9 @@ create_info_pane(BalsaSendmsg * bsmsg)
         /* Create the 'Reply To:' entry before the regular recipients, to
          * get the initial focus in the regular recipients*/
 #define REPLY_TO_ROW 3
-    create_email_header(bsmsg, grid, REPLY_TO_ROW, &bsmsg->replyto_view,
-                        &bsmsg->replyto, "R_eply To:", NULL, 0);
+        create_email_header(bsmsg, grid, REPLY_TO_ROW, &bsmsg->replyto_view,
+                            &bsmsg->replyto, "R_eply To:", NULL, 0);
+    }
 
     /* To:, Cc:, and Bcc: */
     create_email_header(bsmsg, grid, ++row, &bsmsg->recipient_view,
@@ -5000,60 +5001,6 @@ sw_required_charset(BalsaSendmsg * bsmsg, const gchar * text)
     return charset;
 }
 
-static void
-bsmsg_add_resent_header(BalsaSendmsg *bsmsg,
-                        GMimeObject  *mime_object,
-                        const char   *address_view_type,
-                        const char   *field)
-{
-    InternetAddressList *list;
-    char *value;
-
-    list = libbalsa_address_view_get_list(bsmsg->recipient_view, address_view_type);
-    value = internet_address_list_to_string(list, NULL, FALSE);
-    g_mime_object_prepend_header(mime_object, field, value, NULL);
-    g_free(value);
-}
-
-static LibBalsaMessage *
-bsmsg2resent_message(BalsaSendmsg *bsmsg)
-{
-    LibBalsaMessage *message;
-    GMimeMessage *mime_message;
-    GMimeObject *mime_object;
-    InternetAddress *ia;
-    char *value;
-    GDateTime *date_time;
-
-    message = libbalsa_message_new();
-
-    mime_message = libbalsa_message_get_mime_message(bsmsg->parent_message);
-    libbalsa_message_set_mime_message(message, g_object_ref(mime_message));
-
-    mime_object = GMIME_OBJECT(mime_message);
-
-    ia = libbalsa_identity_get_address(bsmsg->ident);
-    value = internet_address_to_string(ia, NULL, FALSE);
-    g_mime_object_prepend_header(mime_object, "Resent-From", value, NULL);
-    g_free(value);
-
-    bsmsg_add_resent_header(bsmsg, mime_object, "To:", "Resent-To");
-    bsmsg_add_resent_header(bsmsg, mime_object, "CC:", "Resent-Cc");
-    bsmsg_add_resent_header(bsmsg, mime_object, "BCC:", "Resent-Bcc");
-
-    /* get the fcc-box from the option menu widget */
-    bsmsg->fcc_url =
-        g_strdup(balsa_mblist_mru_option_menu_get(bsmsg->fcc.body));
-
-    date_time = g_date_time_new_now_local();
-    value = g_mime_utils_header_format_date(date_time);
-    g_date_time_unref(date_time);
-    g_mime_object_prepend_header(mime_object, "Resent-Date", value, NULL);
-    g_free(value);
-
-    return message;
-}
-
 static LibBalsaMessage *
 bsmsg2message(BalsaSendmsg * bsmsg)
 {
@@ -6230,7 +6177,7 @@ sw_entry_helper(GSimpleAction      *action,
                 BalsaSendmsg       *bsmsg,
                 BalsaSendmsgHeader *header)
 {
-    if (entry[0] == NULL)
+    if (header->name == NULL)
         return;
 
     if (g_variant_get_boolean(state)) {

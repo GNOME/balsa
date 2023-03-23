@@ -48,14 +48,23 @@ G_BEGIN_DECLS
 
 #define VIEW_MENU_LENGTH 5
 
+    typedef struct _BalsaSendmsgHeader BalsaSendmsgHeader;
+    struct _BalsaSendmsgHeader {
+	GtkWidget *name;
+	GtkWidget *body;
+    };
+
     typedef struct _BalsaSendmsg BalsaSendmsg;
 
     struct _BalsaSendmsg {
 	GtkWidget *window;
 	GtkWidget *toolbar;
         LibBalsaAddressView *recipient_view, *replyto_view;
-	GtkWidget *from[2], *recipients[2], *subject[2], *fcc[2];
-	GtkWidget *replyto[2];
+	BalsaSendmsgHeader from;
+	BalsaSendmsgHeader recipients;
+	BalsaSendmsgHeader subject;
+	BalsaSendmsgHeader replyto;
+	BalsaSendmsgHeader fcc;
 	GtkWidget *tree_view;
         gchar *in_reply_to;
         GList *references;

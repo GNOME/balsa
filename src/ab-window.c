@@ -613,7 +613,7 @@ balsa_ab_window_activate_address(GtkTreeView * view,
         snd = sendmsg_window_compose_with_address(addr);
         g_free(addr);
 
-        gtk_widget_grab_focus(snd->subject[1]);
+        gtk_widget_grab_focus(snd->subject.body);
     }
 }
 

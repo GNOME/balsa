@@ -734,7 +734,7 @@ edit_with_gnome_check(GPid     pid,
             }
 
             if (g_str_has_prefix(line, _("Subject:"))) {
-                gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]),
+                gtk_entry_set_text(GTK_ENTRY(bsmsg->subject.body),
                                    line + strlen(_("Subject:")) + 1);
                 continue;
             }
@@ -837,7 +837,7 @@ sw_edit_activated(GSimpleAction * action,
 
         g_output_stream_printf(stream, NULL, NULL, NULL, 
                                "%s %s\n", _("Subject:"),
-                               gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));
+                               gtk_entry_get_text(GTK_ENTRY(bsmsg->subject.body)));
         for (type = 0; type < G_N_ELEMENTS(address_types); type++) {
             InternetAddressList *list =
                 libbalsa_address_view_get_list(bsmsg->recipient_view,
@@ -1107,7 +1107,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
 
 
     /* change entries to reflect new identity */
-    gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from[1]),
+    gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from.body),
                              g_list_index(balsa_app.identities, ident));
 
     addr = libbalsa_identity_get_replyto(ident);
@@ -1115,11 +1115,11 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
         libbalsa_address_view_set_from_string(bsmsg->replyto_view,
                                               "Reply To:",
                                               addr);
-        gtk_widget_show(bsmsg->replyto[0]);
-        gtk_widget_show(bsmsg->replyto[1]);
+        gtk_widget_show(bsmsg->replyto.name);
+        gtk_widget_show(bsmsg->replyto.body);
     } else if (!sw_action_get_active(bsmsg, "reply-to")) {
-        gtk_widget_hide(bsmsg->replyto[0]);
-        gtk_widget_hide(bsmsg->replyto[1]);
+        gtk_widget_hide(bsmsg->replyto.name);
+        gtk_widget_hide(bsmsg->replyto.body);
     }
 
     addr = libbalsa_identity_get_bcc(bsmsg->ident);
@@ -1172,7 +1172,7 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     }
 
     /* change the subject to use the reply/forward strings */
-    subject = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1]));
+    subject = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject.body));
 
     /*
      * If the subject begins with the old reply string
@@ -1197,12 +1197,12 @@ update_bsmsg_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity* ident)
     if (((replen = strlen(old_forward_string)) > 0) &&
 	(strncmp(subject, old_reply_string, replen) == 0)) {
 	tmpstr = g_strconcat(reply_string, &(subject[replen]), NULL);
-	gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]), tmpstr);
+	gtk_entry_set_text(GTK_ENTRY(bsmsg->subject.body), tmpstr);
 	g_free(tmpstr);
     } else if (((fwdlen = strlen(old_forward_string)) > 0) &&
 	       (strncmp(subject, old_forward_string, fwdlen) == 0)) {
 	tmpstr = g_strconcat(forward_string, &(subject[fwdlen]), NULL);
-	gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]), tmpstr);
+	gtk_entry_set_text(GTK_ENTRY(bsmsg->subject.body), tmpstr);
 	g_free(tmpstr);
     } else {
         if ((replen == 0 && reply_type) ||
@@ -2224,43 +2224,44 @@ to_add(GtkWidget * widget,
 }
 
 /*
- * static void create_email_or_string_entry()
+ * static void create_email_or_string_header()
  *
  * Creates a gtk_label()/entry pair.
+ * Creates a BalsaSendmsgHeader
  *
  * Input: GtkWidget* grid       - Grid to attach to.
  *        const gchar* label     - Label string.
  *        int y_pos              - position in the grid.
  *        arr                    - arr[1] is the entry widget.
  *
- * Output: GtkWidget* arr[] - arr[0] will be the label widget.
+ * Output: BalsaSendmsgHeader* header - header->name will be the label widget.
  */
 
 #define BALSA_COMPOSE_ENTRY "balsa-compose-entry"
 
 static void
-create_email_or_string_entry(BalsaSendmsg * bsmsg,
-                             GtkWidget    * grid,
-                             const gchar  * label,
-                             int            y_pos,
-                             GtkWidget    * arr[])
+create_email_or_string_header(BalsaSendmsg       *bsmsg,
+                              GtkWidget          *grid,
+                              const gchar        *label,
+                              int                 y_pos,
+                              BalsaSendmsgHeader *header)
 {
     GtkWidget *mnemonic_widget;
 
-    mnemonic_widget = arr[1];
+    mnemonic_widget = header->body;
     if (GTK_IS_FRAME(mnemonic_widget))
         mnemonic_widget = gtk_bin_get_child(GTK_BIN(mnemonic_widget));
-    arr[0] = gtk_label_new_with_mnemonic(label);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(arr[0]), mnemonic_widget);
-    gtk_widget_set_halign(arr[0], GTK_ALIGN_START);
-    g_object_set(arr[0], "margin", GNOME_PAD_SMALL, NULL);
-    gtk_grid_attach(GTK_GRID(grid), arr[0], 0, y_pos, 1, 1);
+    header->name = gtk_label_new_with_mnemonic(label);
+    gtk_label_set_mnemonic_widget(GTK_LABEL(header->name), mnemonic_widget);
+    gtk_widget_set_halign(header->name, GTK_ALIGN_START);
+    g_object_set(header->name, "margin", GNOME_PAD_SMALL, NULL);
+    gtk_grid_attach(GTK_GRID(grid), header->name, 0, y_pos, 1, 1);
 
     if (!balsa_app.use_system_fonts) {
         gchar *css;
         GtkCssProvider *css_provider;
 
-        gtk_widget_set_name(arr[1], BALSA_COMPOSE_ENTRY);
+        gtk_widget_set_name(header->body, BALSA_COMPOSE_ENTRY);
         css = libbalsa_font_string_to_css(balsa_app.message_font,
                                           BALSA_COMPOSE_ENTRY);
 
@@ -2268,63 +2269,64 @@ create_email_or_string_entry(BalsaSendmsg * bsmsg,
         gtk_css_provider_load_from_data(css_provider, css, -1, NULL);
         g_free(css);
 
-        gtk_style_context_add_provider(gtk_widget_get_style_context(arr[1]) ,
+        gtk_style_context_add_provider(gtk_widget_get_style_context(header->body) ,
                                        GTK_STYLE_PROVIDER(css_provider),
                                        GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
         g_object_unref(css_provider);
     }
 
-    gtk_widget_set_hexpand(arr[1], TRUE);
-    gtk_grid_attach(GTK_GRID(grid), arr[1], 1, y_pos, 1, 1);
+    gtk_widget_set_hexpand(header->body, TRUE);
+    gtk_grid_attach(GTK_GRID(grid), header->body, 1, y_pos, 1, 1);
 }
 
 
 /*
- * static void create_string_entry()
+ * static void create_string_header()
  *
- * Creates a gtk_label()/gtk_entry() pair.
+ * Creates a BalsaSendmsgHeader
  *
  * Input: GtkWidget* grid       - Grid to attach to.
  *        const gchar* label     - Label string.
  *        int y_pos              - position in the grid.
  *
- * Output: GtkWidget* arr[] - arr[0] will be the label widget.
- *                          - arr[1] will be the entry widget.
+ * Output: BalsaSendmsgHeader* header - header->name will be the label widget.
+ *                                    - header->body will be the entry widget.
  */
 static void
-create_string_entry(BalsaSendmsg * bsmsg,
-                    GtkWidget    * grid,
-                    const gchar  * label,
-                    int            y_pos,
-                    GtkWidget    * arr[])
+create_string_header(BalsaSendmsg       *bsmsg,
+                     GtkWidget          *grid,
+                     const gchar        *label,
+                     int                 y_pos,
+                     BalsaSendmsgHeader *header)
 {
-    arr[1] = gtk_entry_new();
-    gtk_entry_set_max_length(GTK_ENTRY(arr[1]), 2048);
-    create_email_or_string_entry(bsmsg, grid, label, y_pos, arr);
+    header->body = gtk_entry_new();
+    gtk_entry_set_max_length(GTK_ENTRY(header->body), 2048);
+    create_email_or_string_header(bsmsg, grid, label, y_pos, header);
 }
 
 /*
- * static void create_email_entry()
+ * static void create_email_header()
  *
  * Creates a gtk_label()/libbalsa_address_view() and button in a grid for
  * e-mail entries, eg. To:.  It also sets up some callbacks in gtk.
  *
  * Input:
  *         BalsaSendmsg *bsmsg  - The send message window
- *         GtkWidget *grid   - grid to insert the widgets into.
- *         int y_pos          - How far down in the grid to put label.
- * On return, bsmsg->address_view and bsmsg->addresses[1] have been set.
+ *         GtkWidget    *grid   - grid to insert the widgets into.
+ *         int           y_pos  - How far down in the grid to put label.
+ * On return, the LibBalsaAddressView** has been set
+ * and the BalsaSendmsgHeader* has been populated.
  */
 
 static void
-create_email_entry(BalsaSendmsg         * bsmsg,
-                   GtkWidget            * grid,
-                   int                    y_pos,
-                   LibBalsaAddressView ** view,
-                   GtkWidget           ** widget,
-                   const gchar          * label,
-                   const gchar * const  * types,
-                   guint                  n_types)
+create_email_header(BalsaSendmsg         *bsmsg,
+                    GtkWidget            *grid,
+                    int                   y_pos,
+                    LibBalsaAddressView **view,
+                    BalsaSendmsgHeader   *header,
+                    const gchar          *label,
+                    const gchar * const  *types,
+                    guint                 n_types)
 {
     GtkWidget *scroll;
 
@@ -2342,11 +2344,11 @@ create_email_entry(BalsaSendmsg         * bsmsg,
                                                60);
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(*view));
 
-    widget[1] = gtk_frame_new(NULL);
-    gtk_frame_set_shadow_type(GTK_FRAME(widget[1]), GTK_SHADOW_IN);
-    gtk_container_add(GTK_CONTAINER(widget[1]), scroll);
+    header->body = gtk_frame_new(NULL);
+    gtk_frame_set_shadow_type(GTK_FRAME(header->body), GTK_SHADOW_IN);
+    gtk_container_add(GTK_CONTAINER(header->body), scroll);
 
-    create_email_or_string_entry(bsmsg, grid, _(label), y_pos, widget);
+    create_email_or_string_header(bsmsg, grid, _(label), y_pos, header);
 
     g_signal_connect(*view, "drag_data_received",
                      G_CALLBACK(to_add), NULL);
@@ -2382,12 +2384,12 @@ sw_combo_box_changed(GtkComboBox * combo_box, BalsaSendmsg * bsmsg)
 }
 
 static void
-create_from_entry(GtkWidget * grid, BalsaSendmsg * bsmsg)
+create_from_header(GtkWidget * grid, BalsaSendmsg * bsmsg)
 {
-    bsmsg->from[1] =
+    bsmsg->from.body =
         libbalsa_identity_combo_box(balsa_app.identities, NULL,
                                     G_CALLBACK(sw_combo_box_changed), bsmsg);
-    create_email_or_string_entry(bsmsg, grid, _("F_rom:"), 0, bsmsg->from);
+    create_email_or_string_header(bsmsg, grid, _("F_rom:"), 0, &bsmsg->from);
 }
 
 static void
@@ -2514,19 +2516,19 @@ create_info_pane(BalsaSendmsg * bsmsg)
     gtk_container_set_border_width(GTK_CONTAINER(grid), 6);
 
     /* From: */
-    create_from_entry(grid, bsmsg);
+    create_from_header(grid, bsmsg);
 
     /* Create the 'Reply To:' entry before the regular recipients, to
      * get the initial focus in the regular recipients*/
 #define REPLY_TO_ROW 3
-    create_email_entry(bsmsg, grid, REPLY_TO_ROW, &bsmsg->replyto_view,
-                       bsmsg->replyto, "R_eply To:", NULL, 0);
+    create_email_header(bsmsg, grid, REPLY_TO_ROW, &bsmsg->replyto_view,
+                        &bsmsg->replyto, "R_eply To:", NULL, 0);
 
     /* To:, Cc:, and Bcc: */
-    create_email_entry(bsmsg, grid, ++row, &bsmsg->recipient_view,
-                       bsmsg->recipients, "Rec_ipients:", address_types,
-                       G_N_ELEMENTS(address_types));
-    gtk_widget_set_vexpand(bsmsg->recipients[1], TRUE);
+    create_email_header(bsmsg, grid, ++row, &bsmsg->recipient_view,
+                        &bsmsg->recipients, "Rec_ipients:", address_types,
+                        G_N_ELEMENTS(address_types));
+    gtk_widget_set_vexpand(bsmsg->recipients.body, TRUE);
     g_signal_connect_swapped(gtk_tree_view_get_model
                              (GTK_TREE_VIEW(bsmsg->recipient_view)),
                              "row-changed",
@@ -2537,9 +2539,9 @@ create_info_pane(BalsaSendmsg * bsmsg)
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
     /* Subject: */
-    create_string_entry(bsmsg, grid, _("S_ubject:"), ++row,
-                        bsmsg->subject);
-    g_signal_connect_swapped(bsmsg->subject[1], "changed",
+    create_string_header(bsmsg, grid, _("S_ubject:"), ++row,
+                         &bsmsg->subject);
+    g_signal_connect_swapped(bsmsg->subject.body, "changed",
                              G_CALLBACK(sendmsg_window_set_title), bsmsg);
 
     /* Reply To: */
@@ -2565,11 +2567,11 @@ create_info_pane(BalsaSendmsg * bsmsg)
         if (headers != NULL && headers->fcc_url != NULL)
             balsa_mblist_mru_add(&balsa_app.fcc_mru, headers->fcc_url);
     }
-    bsmsg->fcc[1] =
+    bsmsg->fcc.body =
         balsa_mblist_mru_option_menu(GTK_WINDOW(bsmsg->window),
                                      &balsa_app.fcc_mru);
-    create_email_or_string_entry(bsmsg, grid, _("F_CC:"), ++row,
-                                 bsmsg->fcc);
+    create_email_or_string_header(bsmsg, grid, _("F_CC:"), ++row,
+                                  &bsmsg->fcc);
 
     gtk_widget_show_all(grid);
     return grid;
@@ -3891,7 +3893,7 @@ bsmsg_set_subject_from_body(BalsaSendmsg * bsmsg,
         }
     }
 
-    gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]), subject);
+    gtk_entry_set_text(GTK_ENTRY(bsmsg->subject.body), subject);
     g_free(subject);
 }
 
@@ -4093,7 +4095,7 @@ setup_headers_from_identity(BalsaSendmsg* bsmsg, LibBalsaIdentity *ident)
 {
     const gchar *addr;
 
-    gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from[1]),
+    gtk_combo_box_set_active(GTK_COMBO_BOX(bsmsg->from.body),
                              g_list_index(balsa_app.identities, ident));
 
     addr = libbalsa_identity_get_replyto(ident);
@@ -4649,9 +4651,9 @@ sendmsg_window_set_field(BalsaSendmsg * bsmsg, const gchar * key,
     }
 #endif
     if(g_ascii_strcasecmp(key, "subject") == 0) {
-        append_comma_separated(GTK_EDITABLE(bsmsg->subject[1]), val);
-        gtk_widget_show_all(bsmsg->subject[0]);
-        gtk_widget_show_all(bsmsg->subject[1]);
+        append_comma_separated(GTK_EDITABLE(bsmsg->subject.body), val);
+        gtk_widget_show_all(bsmsg->subject.name);
+        gtk_widget_show_all(bsmsg->subject.body);
         return;
     }
 
@@ -4955,7 +4957,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     headers->from = internet_address_list_new ();
     internet_address_list_add(headers->from, ia);
 
-    tmp = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject[1]), 0, -1);
+    tmp = gtk_editable_get_chars(GTK_EDITABLE(bsmsg->subject.body), 0, -1);
     strip_chars(tmp, "\r\n");
     libbalsa_message_set_subject(message, tmp);
     g_free(tmp);
@@ -4972,7 +4974,7 @@ bsmsg2message(BalsaSendmsg * bsmsg)
 
     /* get the fcc-box from the option menu widget */
     bsmsg->fcc_url =
-        g_strdup(balsa_mblist_mru_option_menu_get(bsmsg->fcc[1]));
+        g_strdup(balsa_mblist_mru_option_menu_get(bsmsg->fcc.body));
 
     headers->reply_to =
         libbalsa_address_view_get_list(bsmsg->replyto_view, "Reply To:");
@@ -5087,7 +5089,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
 
     /* read the subject widget and verify that it is contains something else
        than spaces */
-    subj = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1]));
+    subj = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject.body));
     if (subj) {
 	const gchar *p = subj;
 
@@ -5152,7 +5154,7 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     response = gtk_dialog_run(GTK_DIALOG(no_subj_dialog));
 
     /* always set the current string in the subject entry */
-    gtk_entry_set_text(GTK_ENTRY(bsmsg->subject[1]),
+    gtk_entry_set_text(GTK_ENTRY(bsmsg->subject.body),
 		       gtk_entry_get_text(GTK_ENTRY(subj_entry)));
     gtk_widget_destroy(no_subj_dialog);
 
@@ -6095,18 +6097,18 @@ static const gchar * const header_action_names[] = {
    saves the show header configuration.
  */
 static void
-sw_entry_helper(GSimpleAction      * action,
-                GVariant     * state,
-                BalsaSendmsg * bsmsg,
-                GtkWidget    * entry[])
+sw_entry_helper(GSimpleAction      *action,
+                GVariant           *state,
+                BalsaSendmsg       *bsmsg,
+                BalsaSendmsgHeader *header)
 {
     if (g_variant_get_boolean(state)) {
-        gtk_widget_show_all(entry[0]);
-        gtk_widget_show_all(entry[1]);
-        gtk_widget_grab_focus(entry[1]);
+        gtk_widget_show_all(header->name);
+        gtk_widget_show_all(header->body);
+        gtk_widget_grab_focus(header->body);
     } else {
-        gtk_widget_hide(entry[0]);
-        gtk_widget_hide(entry[1]);
+        gtk_widget_hide(header->name);
+        gtk_widget_hide(header->body);
     }
 
     g_simple_action_set_state(G_SIMPLE_ACTION(action), state);
@@ -6134,7 +6136,7 @@ sw_from_change_state(GSimpleAction * action, GVariant * state, gpointer data)
 {
     BalsaSendmsg *bsmsg = data;
 
-    sw_entry_helper(action, state, bsmsg, bsmsg->from);
+    sw_entry_helper(action, state, bsmsg, &bsmsg->from);
 }
 
 static void
@@ -6142,7 +6144,7 @@ sw_recips_change_state(GSimpleAction * action, GVariant * state, gpointer data)
 {
     BalsaSendmsg *bsmsg = data;
 
-    sw_entry_helper(action, state, bsmsg, bsmsg->recipients);
+    sw_entry_helper(action, state, bsmsg, &bsmsg->recipients);
 }
 
 static void
@@ -6150,7 +6152,7 @@ sw_reply_to_change_state(GSimpleAction * action, GVariant * state, gpointer data
 {
     BalsaSendmsg *bsmsg = data;
 
-    sw_entry_helper(action, state, bsmsg, bsmsg->replyto);
+    sw_entry_helper(action, state, bsmsg, &bsmsg->replyto);
 }
 
 static void
@@ -6158,7 +6160,7 @@ sw_fcc_change_state(GSimpleAction * action, GVariant * state, gpointer data)
 {
     BalsaSendmsg *bsmsg = data;
 
-    sw_entry_helper(action, state, bsmsg, bsmsg->fcc);
+    sw_entry_helper(action, state, bsmsg, &bsmsg->fcc);
 }
 
 static void
@@ -6659,7 +6661,7 @@ sendmsg_window_set_title(BalsaSendmsg * bsmsg)
     g_object_unref(list);
 
     title = g_strdup_printf(title_format, to_string ? to_string : "",
-                            gtk_entry_get_text(GTK_ENTRY(bsmsg->subject[1])));
+                            gtk_entry_get_text(GTK_ENTRY(bsmsg->subject.body)));
     g_free(to_string);
     gtk_window_set_title(GTK_WINDOW(bsmsg->window), title);
     g_free(title);

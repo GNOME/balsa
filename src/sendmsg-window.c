@@ -2555,7 +2555,8 @@ create_info_pane(BalsaSendmsg * bsmsg)
 
         /* Reply To: */
         /* We already created it, so just increment row: */
-        g_assert(++row == REPLY_TO_ROW);
+        ++row;
+        g_assert(row == REPLY_TO_ROW);
 #undef REPLY_TO_ROW
     }
 

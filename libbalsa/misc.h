@@ -177,9 +177,13 @@ GMimeParserOptions *libbalsa_parser_options(void);
     } G_STMT_END
 #define libbalsa_set_margins(w, m)             \
     G_STMT_START {                             \
-        libbalsa_set_hmargins((w), (m);        \
-        libbalsa_set_vmargins((w), (m);        \
+        libbalsa_set_hmargins((w), (m));       \
+        libbalsa_set_vmargins((w), (m));       \
     } G_STMT_END
+
+GtkWidget * libbalsa_add_mnemonic_button_to_box(const gchar *markup,
+                                                GtkWidget   *box,
+                                                GtkAlign     align);
 
 
 #endif				/* __LIBBALSA_MISC_H__ */

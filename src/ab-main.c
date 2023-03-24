@@ -846,6 +846,7 @@ bab_get_filter_box(void)
 {
     GtkWidget *search_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 1);
     GtkWidget *find_label, *find_entry, *button;
+    GtkWidget *widget;
 
     find_label = gtk_label_new_with_mnemonic(_("F_ilter:"));
     gtk_widget_show(find_label);

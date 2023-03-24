@@ -377,9 +377,11 @@ libbalsa_identity_select_dialog(GtkWindow * parent,
     identity_list_update_real(GTK_TREE_VIEW(tree), identities, initial_id);
 
     frame = gtk_frame_new(NULL);
-    gtk_box_pack_start(GTK_BOX
+    gtk_widget_set_vexpand(frame, TRUE);
+    gtk_widget_set_valign(frame, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER
                        (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       frame, TRUE, TRUE, 0);
+                       frame);
     gtk_container_add(GTK_CONTAINER(frame), tree);
     gtk_container_set_border_width(GTK_CONTAINER(frame), padding);
 
@@ -808,7 +810,7 @@ append_ident_notebook_page(GtkNotebook *notebook,
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     grid = libbalsa_create_grid();
     gtk_container_set_border_width(GTK_CONTAINER(grid), padding);
-    gtk_box_pack_start(GTK_BOX(vbox), grid, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), grid);
     gtk_notebook_append_page(notebook, vbox, gtk_label_new(tab_label));
 
     return grid;
@@ -1660,11 +1662,13 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
                                     IDENTITY_RESPONSE_CLOSE);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, padding);
-    gtk_box_pack_start(GTK_BOX
+    gtk_widget_set_vexpand(hbox, TRUE);
+    gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER
                        (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       hbox, TRUE, TRUE, 0);
+                       hbox);
 
-    gtk_box_pack_start(GTK_BOX(hbox), frame, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), frame);
 
     smtp_server_list = g_new(GSList *, 1);
     *smtp_server_list = g_slist_copy(smtp_servers);
@@ -1675,7 +1679,9 @@ libbalsa_identity_config_dialog(GtkWindow *parent, GList **identities,
 	              (GWeakNotify) lbi_free_smtp_server_list,
 		      smtp_server_list);
 
-    gtk_box_pack_start(GTK_BOX(hbox), display_frame, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(display_frame, TRUE);
+    gtk_widget_set_halign(display_frame, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(hbox), display_frame);
 
     select = gtk_tree_view_get_selection(tree);
     g_signal_connect(select, "changed",

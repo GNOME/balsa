@@ -846,23 +846,18 @@ bab_get_filter_box(void)
 {
     GtkWidget *search_hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 1);
     GtkWidget *find_label, *find_entry, *button;
-    GtkWidget *widget;
 
     find_label = gtk_label_new_with_mnemonic(_("F_ilter:"));
     gtk_widget_show(find_label);
-
-    widget = find_label;
-    libbalsa_set_hmargins(widget, 1);
-    gtk_container_add(GTK_CONTAINER(search_hbox), widget);
+    libbalsa_set_hmargins(find_label, 1);
+    gtk_container_add(GTK_CONTAINER(search_hbox), find_label);
 
     find_entry = gtk_entry_new();
     gtk_widget_show(find_entry);
-
-    widget = find_entry;
-    gtk_widget_set_hexpand(widget, TRUE);
-    gtk_widget_set_halign(widget, GTK_ALIGN_FILL);
-    libbalsa_set_hmargins(widget, 1);
-    gtk_container_add(GTK_CONTAINER(search_hbox), widget);
+    gtk_widget_set_hexpand(find_entry, TRUE);
+    gtk_widget_set_halign(find_entry, GTK_ALIGN_FILL);
+    libbalsa_set_hmargins(find_entry, 1);
+    gtk_container_add(GTK_CONTAINER(search_hbox), find_entry);
 
     gtk_widget_show(search_hbox);
     gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), find_entry);
@@ -872,9 +867,8 @@ bab_get_filter_box(void)
                       gtk_image_new_from_icon_name("gtk-ok",
                                                    GTK_ICON_SIZE_BUTTON));
 
-    widget = button;
-    libbalsa_set_hmargins(widget, 1);
-    gtk_container_add(GTK_CONTAINER(search_hbox), widget);
+    libbalsa_set_hmargins(button, 1);
+    gtk_container_add(GTK_CONTAINER(search_hbox), button);
 
     g_signal_connect(find_entry, "activate",
                      G_CALLBACK(bab_filter_entry_activate),
@@ -928,11 +922,10 @@ bab_window_new(GtkApplication * application)
 
     contacts_app.notebook = gtk_notebook_new();
 
-    widget = contacts_app.notebook;
-    gtk_widget_set_vexpand(widget, TRUE);
-    gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
-    libbalsa_set_vmargins(widget, 1);
-    gtk_container_add(GTK_CONTAINER(main_vbox), widget);
+    gtk_widget_set_vexpand(contacts_app.notebook, TRUE);
+    gtk_widget_set_valign(contacts_app.notebook, GTK_ALIGN_FILL);
+    libbalsa_set_vmargins(contacts_app.notebook, 1);
+    gtk_container_add(GTK_CONTAINER(main_vbox), contacts_app.notebook);
 
     browse_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
 
@@ -945,12 +938,10 @@ bab_window_new(GtkApplication * application)
     gtk_widget_show(scroll);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
 				   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-
-    widget = scroll;
-    gtk_widget_set_vexpand(widget, TRUE);
-    gtk_widget_set_valign(widget, GTK_ALIGN_FILL);
-    libbalsa_set_vmargins(widget, 1);
-    gtk_container_add(GTK_CONTAINER(browse_widget), widget);
+    gtk_widget_set_vexpand(scroll, TRUE);
+    gtk_widget_set_valign(scroll, GTK_ALIGN_FILL);
+    libbalsa_set_vmargins(scroll, 1);
+    gtk_container_add(GTK_CONTAINER(browse_widget), scroll);
 
     contacts_app.entry_list = bab_window_list_new();
     gtk_container_add(GTK_CONTAINER(scroll), contacts_app.entry_list);
@@ -964,9 +955,8 @@ bab_window_new(GtkApplication * application)
                                          G_CALLBACK(address_changed_cb),
                                          &contacts_app);
 
-    widget = contacts_app.edit_widget;
-    libbalsa_set_vmargins(widget, 1);
-    gtk_container_add(GTK_CONTAINER(edit_widget), widget);
+    libbalsa_set_vmargins(contacts_app.edit_widget, 1);
+    gtk_container_add(GTK_CONTAINER(edit_widget), contacts_app.edit_widget);
 
     widget = bab_get_edit_button_box(&contacts_app);
     gtk_container_add(GTK_CONTAINER(edit_widget), widget);

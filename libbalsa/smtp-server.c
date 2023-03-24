@@ -341,8 +341,6 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     sdi->notebook = libbalsa_server_cfg_new(server, smtp_server->name);
     gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), GTK_WIDGET(sdi->notebook));
 
-#define HIG_PADDING 12
-
     /* split large messages */
     sdi->split_button = gtk_check_button_new_with_mnemonic(_("Sp_lit message larger than"));
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);

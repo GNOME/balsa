@@ -110,11 +110,10 @@ libbalsa_server_cfg_new(LibBalsaServer *server, const gchar *name)
     server_cfg = LIBBALSA_SERVER_CFG(g_object_new(libbalsa_server_cfg_get_type(), NULL));
 
     /* notebook page with basic options */
-#define HIG_PADDING 12
     server_cfg->basic_grid = libbalsa_create_grid();
     server_cfg->basic_rows = 0U;
 
-    gtk_container_set_border_width(GTK_CONTAINER(server_cfg->basic_grid), HIG_PADDING);
+    gtk_container_set_border_width(GTK_CONTAINER(server_cfg->basic_grid), 2 * HIG_PADDING);
     gtk_notebook_append_page(GTK_NOTEBOOK(server_cfg), server_cfg->basic_grid, gtk_label_new_with_mnemonic(_("_Basic")));
 
     /* server descriptive name */
@@ -168,7 +167,7 @@ libbalsa_server_cfg_new(LibBalsaServer *server, const gchar *name)
     /* notebook page with advanced options */
     server_cfg->advanced_grid = libbalsa_create_grid();
     server_cfg->advanced_rows = 0U;
-    gtk_container_set_border_width(GTK_CONTAINER(server_cfg->advanced_grid), HIG_PADDING);
+    gtk_container_set_border_width(GTK_CONTAINER(server_cfg->advanced_grid), 2 * HIG_PADDING);
     gtk_notebook_append_page(GTK_NOTEBOOK(server_cfg), server_cfg->advanced_grid, gtk_label_new_with_mnemonic(_("_Advanced")));
 
     /* client certificate and passphrase */
@@ -346,7 +345,7 @@ server_cfg_add_entry(GtkWidget *grid, guint row, const gchar *label, const gchar
 	if (button != NULL) {
 		GtkWidget *hbox;
 
-		hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, HIG_PADDING / 2);
+		hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, HIG_PADDING);
 		server_cfg_add_widget(grid, row, label, hbox);
 		gtk_box_pack_start(GTK_BOX(hbox), new_entry, TRUE, TRUE, 0U);
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0U);

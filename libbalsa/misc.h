@@ -163,5 +163,23 @@ gchar *libbalsa_font_string_to_css(const gchar * font_string, const gchar * name
 void libbalsa_parser_options_init(void);
 GMimeParserOptions *libbalsa_parser_options(void);
 
+/* Some margin helpers */
+#define HIG_PADDING 6
+#define libbalsa_set_hmargins(w, m)            \
+    G_STMT_START {                             \
+        gtk_widget_set_margin_start((w),(m));  \
+        gtk_widget_set_margin_end((w),(m));    \
+    } G_STMT_END
+#define libbalsa_set_vmargins(w, m)            \
+    G_STMT_START {                             \
+        gtk_widget_set_margin_top((w),(m));    \
+        gtk_widget_set_margin_bottom((w),(m)); \
+    } G_STMT_END
+#define libbalsa_set_margins(w, m)             \
+    G_STMT_START {                             \
+        libbalsa_set_hmargins((w), (m);        \
+        libbalsa_set_vmargins((w), (m);        \
+    } G_STMT_END
+
 
 #endif				/* __LIBBALSA_MISC_H__ */

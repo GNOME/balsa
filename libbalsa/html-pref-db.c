@@ -139,15 +139,17 @@ libbalsa_html_pref_dialog_run(GtkWindow *parent)
 		_("_Close"), GTK_RESPONSE_CLOSE, NULL);
 	geometry_manager_attach(GTK_WINDOW(dialog), "HTMLPrefsDB");
 
-	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2 * HIG_PADDING);
 	gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
 	gtk_widget_set_vexpand(vbox, TRUE);
 
 	scrolled_window = gtk_scrolled_window_new(NULL, NULL);
-	gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 12U);
+	gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 2 * HIG_PADDING);
 	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrolled_window), GTK_SHADOW_ETCHED_IN);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 0);
+        gtk_widget_set_vexpand(scrolled_window, TRUE);
+        gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
+	gtk_container_add(GTK_CONTAINER(vbox), scrolled_window);
 
 	model = gtk_list_store_new(PREFS_DB_VIEW_COLUMNS,
 		G_TYPE_STRING,			/* address */

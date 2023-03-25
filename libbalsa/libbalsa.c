@@ -396,6 +396,7 @@ ask_cert_real(void *data)
     GString *str;
     unsigned i;
     GtkWidget *label;
+    GtkWidget *content_area;
 
     /* never accept if the certificate is broken, resulting in a NULL widget */
     cert_widget = x509_cert_chain_tls(acd->certificate);
@@ -413,6 +414,7 @@ ask_cert_real(void *data)
                                          _("_Reject"), GTK_RESPONSE_CANCEL,
                                          NULL);
     gtk_window_set_role(GTK_WINDOW(dialog), "tls_cert_dialog");
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
     str = g_string_new("");
     g_string_printf(str, _("<big><b>Authenticity of this certificate "
@@ -422,11 +424,14 @@ ask_cert_real(void *data)
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       label, FALSE, FALSE, 1);
+    libbalsa_set_vmargins(label, 1);
+    gtk_container_add(GTK_CONTAINER(content_area), label);
     gtk_widget_show(label);
-    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                       cert_widget, TRUE, TRUE, 1);
+
+    gtk_widget_set_vexpand(cert_widget, TRUE);
+    gtk_widget_set_valign(cert_widget, GTK_ALIGN_FILL);
+    libbalsa_set_vmargins(cert_widget, 1);
+    gtk_container_add(GTK_CONTAINER(content_area), cert_widget);
     gtk_widget_show_all(cert_widget);
 
     switch(gtk_dialog_run(GTK_DIALOG(dialog))) {

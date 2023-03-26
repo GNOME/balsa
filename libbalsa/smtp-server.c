@@ -331,9 +331,6 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                     _("_Help"),   GTK_RESPONSE_HELP,
                                     NULL);
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
     g_object_weak_ref(G_OBJECT(dialog),
 		    (GWeakNotify) smtp_server_weak_notify, sdi);
     g_signal_connect(dialog, "response",

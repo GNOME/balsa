@@ -700,9 +700,6 @@ folder, parent);
                                                 NULL);
                 GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(ask));
 
-#if HAVE_MACOSX_DESKTOP
-		libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(sub_folder_data->common_data.dialog));
-#endif
                 gtk_container_add(GTK_CONTAINER(content_area), gtk_label_new(msg));
                 g_free(msg);
                 button = gtk_dialog_run(GTK_DIALOG(ask));
@@ -848,9 +845,6 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                     _("_Help"), GTK_RESPONSE_HELP,
                     NULL));
     content_area = gtk_dialog_get_content_area(sub_folder_data->common_data.dialog);
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(GTK_WIDGET(sub_folder_data->common_data.dialog), GTK_WINDOW(balsa_app.main_window));
-#endif
     g_object_add_weak_pointer(G_OBJECT(sub_folder_data->common_data.dialog),
                               (gpointer *) &sub_folder_data->common_data.dialog);
     /* `Enter' key => Create: */

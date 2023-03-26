@@ -184,9 +184,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_OK, FALSE);
 	geometry_manager_attach(GTK_WINDOW(dialog), "KeyList");
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
     gtk_widget_set_vexpand (vbox, TRUE);
@@ -360,9 +357,6 @@ get_passphrase_real(const gchar * uid_hint, const gchar * passphrase_info,
                                          _("_Cancel"), GTK_RESPONSE_CANCEL,
                                          NULL);
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(dialog, parent);
-#endif
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 12);

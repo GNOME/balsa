@@ -18,7 +18,7 @@
  */
 
 /*
- * This file contains functions to display inormational messages 
+ * This file contains functions to display informational messages
  * received from libbalsa
  */
 
@@ -246,11 +246,14 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 				       (scrolled_window),
 				       GTK_POLICY_AUTOMATIC,
 				       GTK_POLICY_AUTOMATIC);
-        gtk_box_pack_start(GTK_BOX
+        gtk_widget_set_vexpand(scrolled_window, TRUE);
+        gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
+        libbalsa_set_vmargins(scrolled_window, 1);
+        gtk_container_add(GTK_CONTAINER
                            (gtk_dialog_get_content_area
                             (GTK_DIALOG(information_dialog))),
-                           scrolled_window, TRUE, TRUE, 1);
-	gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), 6);
+                           scrolled_window);
+	gtk_container_set_border_width(GTK_CONTAINER(scrolled_window), HIG_PADDING);
 	gtk_widget_show(scrolled_window);
 
 	/* The list itself */

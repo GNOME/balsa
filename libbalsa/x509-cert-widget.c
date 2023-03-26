@@ -161,9 +161,12 @@ create_chain_widget(GList *cert_list)
 	GList *p;
 	gboolean is_root;
 
-	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
 	scrolledwin = gtk_scrolled_window_new(NULL, NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), scrolledwin, TRUE, TRUE, 6U);
+        gtk_widget_set_vexpand(scrolledwin, TRUE);
+        gtk_widget_set_valign(scrolledwin, GTK_ALIGN_FILL);
+        libbalsa_set_vmargins(scrolledwin, HIG_PADDING);
+        gtk_container_add(GTK_CONTAINER(vbox), scrolledwin);
 
 	store = gtk_tree_store_new(CERT_COLUMNS, G_TYPE_STRING, GTK_TYPE_WIDGET);
 	tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
@@ -172,12 +175,15 @@ create_chain_widget(GList *cert_list)
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer, "text", CERT_NAME_COLUMN, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 	gtk_tree_view_set_show_expanders(GTK_TREE_VIEW(tree_view), FALSE);
-	gtk_tree_view_set_level_indentation(GTK_TREE_VIEW(tree_view), 12);
+	gtk_tree_view_set_level_indentation(GTK_TREE_VIEW(tree_view), 2 * HIG_PADDING);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree_view), FALSE);
 	gtk_tree_view_set_activate_on_single_click(GTK_TREE_VIEW(tree_view), TRUE);
 
 	stack = gtk_stack_new();
-	gtk_box_pack_start(GTK_BOX(vbox), stack, TRUE, TRUE, 6U);
+        gtk_widget_set_vexpand(stack, TRUE);
+        gtk_widget_set_valign(stack, GTK_ALIGN_FILL);
+        libbalsa_set_vmargins(stack, HIG_PADDING);
+	gtk_container_add(GTK_CONTAINER(vbox), stack);
 	g_signal_connect(tree_view, "row-activated", G_CALLBACK(cert_selected_cb), stack);
 
 	is_root = TRUE;

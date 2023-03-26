@@ -708,6 +708,7 @@ create_subkey_widget(gpgme_subkey_t subkey)
 
 	subkey_grid = gtk_grid_new();
 	gtk_grid_set_column_spacing(GTK_GRID(subkey_grid), HIG_PADDING);
+        libbalsa_set_vmargins(subkey_grid, 2);
 
 	/* print a warning for a bad subkey status */
 	details_str = create_status_str(subkey->expired != 0U, subkey->revoked != 0U, subkey->disabled != 0U, subkey->invalid != 0U);

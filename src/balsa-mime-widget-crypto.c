@@ -147,9 +147,6 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
                                                             hbox, GTK_ALIGN_FILL);
         		g_object_set_data_full(G_OBJECT(button), "autocrypt_key", autocrypt_key, (GDestroyNotify) g_bytes_unref);
         		g_signal_connect(button, "clicked", G_CALLBACK(on_key_import_button), NULL);
-                        gtk_widget_set_hexpand(button, TRUE);
-                        gtk_widget_set_halign(button, GTK_ALIGN_FILL);
-                        gtk_container_add(GTK_CONTAINER(hbox), button);
         	} else if (libbalsa_message_get_headers(mime_body->message)->autocrypt_hdr_present) {
         		if (balsa_autocrypt_in_use()) {
         			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -169,9 +166,6 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
                                                 hbox, GTK_ALIGN_FILL);
         }
         g_signal_connect(button, "clicked", G_CALLBACK(on_gpg_key_button), mime_body);
-        gtk_widget_set_hexpand(button, TRUE);
-        gtk_widget_set_halign(button, GTK_ALIGN_FILL);
-        gtk_container_add(GTK_CONTAINER(hbox), button);
     }
 
     /* Hack alert: if we omit the box below and use the expander as signature widget

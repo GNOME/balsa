@@ -303,6 +303,7 @@ create_imap_folder_dialog(LibBalsaServer  *server,
 						  GtkWidget      **treeview)
 {
 	GtkWidget *dialog;
+	GtkWidget *content_area;
 	GtkWidget *vbox;
 	GtkWidget *label;
 	GtkWidget *scrolled_wind;
@@ -340,16 +341,17 @@ create_imap_folder_dialog(LibBalsaServer  *server,
                                                      _("_OK"), GTK_RESPONSE_ACCEPT,
                                                      NULL);
 	}
+        content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 	geometry_manager_attach(GTK_WINDOW(dialog), geometry_key);
 
 	/* content: vbox, message label, scrolled window */
-	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-	gtk_container_set_border_width(GTK_CONTAINER(vbox), 6);
-	gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
+	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2 * HIG_PADDING);
+	gtk_container_set_border_width(GTK_CONTAINER(vbox), HIG_PADDING);
+	gtk_container_add(GTK_CONTAINER(content_area), vbox);
 	gtk_widget_set_vexpand(vbox, TRUE);
 
 	label = libbalsa_create_wrap_label(message, FALSE);
-	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+	gtk_container_add(GTK_CONTAINER(vbox), label);
 
 	scrolled_wind = gtk_scrolled_window_new(NULL,NULL);
 	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(scrolled_wind),
@@ -357,7 +359,10 @@ create_imap_folder_dialog(LibBalsaServer  *server,
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_wind),
                                        GTK_POLICY_NEVER,
                                        GTK_POLICY_AUTOMATIC);
-	gtk_box_pack_start(GTK_BOX(vbox), scrolled_wind, TRUE, TRUE, 0);
+
+        gtk_widget_set_vexpand(scrolled_wind, TRUE);
+        gtk_widget_set_valign(scrolled_wind, GTK_ALIGN_FILL);
+	gtk_container_add(GTK_CONTAINER(vbox), scrolled_wind);
 
 	/* folder tree */
 	*treeview = gtk_tree_view_new_with_model(GTK_TREE_MODEL(*store));
@@ -435,6 +440,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     static FolderDialogData *folder_data_new;
     GtkWidget *box;
     GtkWidget *button;
+    GtkWidget *content_area;
 
     /* Allow only one dialog per mailbox node, and one with mn == NULL
      * for creating a new folder. */
@@ -479,13 +485,18 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     }
 
     folder_data->server_cfg = libbalsa_server_cfg_new(folder_data->server, (mn != NULL) ? balsa_mailbox_node_get_name(mn) : NULL);
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(folder_data->common_data.dialog))), GTK_WIDGET(folder_data->server_cfg));
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(folder_data->common_data.dialog));
+    gtk_container_add(GTK_CONTAINER(content_area), GTK_WIDGET(folder_data->server_cfg));
     g_signal_connect(folder_data->server_cfg, "changed", G_CALLBACK(validate_folder), folder_data);
 
     /* additional basic settings - subscription management */
-    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2 * HIG_PADDING);
+
     folder_data->subscribed = gtk_check_button_new_with_mnemonic(_("Subscribed _folders only"));
-    gtk_box_pack_start(GTK_BOX(box), folder_data->subscribed, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(folder_data->subscribed, TRUE);
+    gtk_widget_set_halign(folder_data->subscribed, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(box), folder_data->subscribed);
+
     button = gtk_button_new_with_label(_("Manage subscriptions…"));
     g_signal_connect(button, "clicked", G_CALLBACK(folder_conf_imap_subscriptions), folder_data);
     if (mn != NULL) {
@@ -496,7 +507,7 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(folder_data->subscribed), FALSE);
     	gtk_widget_set_sensitive(button, FALSE);
     }
-    gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(box), button);
     g_signal_connect(folder_data->subscribed, "toggled", G_CALLBACK(folder_data_subscribed_toggled), button);
     libbalsa_server_cfg_add_row(folder_data->server_cfg, TRUE, box, NULL);
 
@@ -687,9 +698,12 @@ folder, parent);
                                                 _("Cancel"),
                                                 GTK_RESPONSE_CANCEL,
                                                 NULL);
-                gtk_container_add(GTK_CONTAINER
-                                  (gtk_dialog_get_content_area
-                                   (GTK_DIALOG(ask))), gtk_label_new(msg));
+                GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(ask));
+
+#if HAVE_MACOSX_DESKTOP
+		libbalsa_macosx_menu_for_parent(ask, GTK_WINDOW(sub_folder_data->common_data.dialog));
+#endif
+                gtk_container_add(GTK_CONTAINER(content_area), gtk_label_new(msg));
                 g_free(msg);
                 button = gtk_dialog_run(GTK_DIALOG(ask));
                 gtk_widget_destroy(ask);
@@ -786,6 +800,7 @@ set_ok_sensitive(GtkDialog * dialog)
 void
 folder_conf_imap_sub_node(BalsaMailboxNode * mn)
 {
+    GtkWidget *content_area;
     GtkWidget *grid, *button, *label, *hbox;
     SubfolderDialogData *sub_folder_data;
     LibBalsaMailbox *mailbox;
@@ -832,6 +847,10 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                     _("_Help"), GTK_RESPONSE_HELP,
                     NULL));
+    content_area = gtk_dialog_get_content_area(sub_folder_data->common_data.dialog);
+#if HAVE_MACOSX_DESKTOP
+    libbalsa_macosx_menu_for_parent(GTK_WIDGET(sub_folder_data->common_data.dialog), GTK_WINDOW(balsa_app.main_window));
+#endif
     g_object_add_weak_pointer(G_OBJECT(sub_folder_data->common_data.dialog),
                               (gpointer *) &sub_folder_data->common_data.dialog);
     /* `Enter' key => Create: */
@@ -849,11 +868,12 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     }
 
     grid = libbalsa_create_grid();
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
-    gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
-    gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
-    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(sub_folder_data->common_data.dialog)),
-                       grid, TRUE, TRUE, 0);
+    gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 2 * HIG_PADDING);
+    gtk_container_set_border_width(GTK_CONTAINER(grid), 2 * HIG_PADDING);
+    gtk_widget_set_vexpand(grid, TRUE);
+    gtk_widget_set_valign(grid, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(content_area), grid);
  
     row = 0;
     /* INPUT FIELD CREATION */
@@ -883,10 +903,14 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(browse_button_cb), (gpointer) sub_folder_data);
 
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2 * HIG_PADDING);
+
+    gtk_widget_set_hexpand(sub_folder_data->parent_folder, TRUE);
+    gtk_widget_set_halign(sub_folder_data->parent_folder, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(hbox), sub_folder_data->parent_folder);
+    gtk_container_add(GTK_CONTAINER(hbox), button);
+
     gtk_widget_set_hexpand(hbox, TRUE);
-    gtk_box_pack_start(GTK_BOX(hbox), sub_folder_data->parent_folder, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0);
     gtk_grid_attach(GTK_GRID(grid), hbox, 1, row, 1, 1);
 
     {
@@ -1060,6 +1084,7 @@ folder_conf_add_imap_sub_cb(GtkWidget * widget, gpointer data)
 
 	if (mbnode != NULL) {
 		GtkWidget *dialog;
+		GtkWidget *content_area;
 		GtkWidget *grid;
 		GtkWidget *plabel;
 		GtkWidget *label;
@@ -1074,11 +1099,16 @@ folder_conf_add_imap_sub_cb(GtkWidget * widget, gpointer data)
              _("_Cancel"), GTK_RESPONSE_REJECT,
              NULL);
 		gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_REJECT);
+                content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+
 	    grid = libbalsa_create_grid();
-	    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
-	    gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
-	    gtk_container_set_border_width(GTK_CONTAINER(grid), 12);
-	    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), grid, TRUE, TRUE, 0);
+	    gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
+	    gtk_grid_set_column_spacing(GTK_GRID(grid), 2 * HIG_PADDING);
+	    gtk_container_set_border_width(GTK_CONTAINER(grid), 2 * HIG_PADDING);
+
+            gtk_widget_set_vexpand(grid, TRUE);
+            gtk_widget_set_valign(grid, GTK_ALIGN_FILL);
+            gtk_container_add(GTK_CONTAINER(content_area), grid);
 
 	    row = 0;
 	    (void) libbalsa_create_grid_label(_("Subfolder of:"), grid, row);

@@ -1859,6 +1859,7 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
 {
     BalsaMBListMRUEntry *mru = data;
     GtkWidget *dialog;
+    GtkWidget *content_area;
     GtkWidget *scroll;
     GtkWidget *mblist;
     GtkTreeSelection *selection;
@@ -1885,9 +1886,11 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
                                     libbalsa_dialog_flags(),
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     NULL);
-    gtk_box_pack_start(GTK_BOX
-                      (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-                      scroll, TRUE, TRUE, 0);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+
+    gtk_widget_set_vexpand(scroll, TRUE);
+    gtk_widget_set_valign(scroll, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(content_area), scroll);
 
     g_signal_connect(dialog, "size-allocate",
                      G_CALLBACK(bmbl_mru_size_allocate_cb), NULL);

@@ -347,8 +347,10 @@ server_cfg_add_entry(GtkWidget *grid, guint row, const gchar *label, const gchar
 
 		hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, HIG_PADDING);
 		server_cfg_add_widget(grid, row, label, hbox);
-		gtk_box_pack_start(GTK_BOX(hbox), new_entry, TRUE, TRUE, 0U);
-		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, FALSE, 0U);
+                gtk_widget_set_hexpand(new_entry, TRUE);
+                gtk_widget_set_halign(new_entry, GTK_ALIGN_FILL);
+		gtk_container_add(GTK_CONTAINER(hbox), new_entry);
+		gtk_container_add(GTK_CONTAINER(hbox), button);
 	} else {
 		server_cfg_add_widget(grid, row, label, new_entry);
 	}

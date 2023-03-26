@@ -257,7 +257,7 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
     dir->paths_locked = FALSE;
 
     grid = GTK_GRID(gtk_grid_new());
-    gtk_grid_set_column_spacing(grid, 6);
+    gtk_grid_set_column_spacing(grid, HIG_PADDING);
 
     label_widget = gtk_label_new(_("Please verify the locations "
                                    "of your default mail files. "
@@ -301,11 +301,12 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
         g_free(preset);
     }
 
-    gtk_box_pack_start(GTK_BOX(page), GTK_WIDGET(grid), FALSE, TRUE,
-                       0);
+    gtk_widget_set_vexpand(GTK_WIDGET(grid), TRUE);
+    gtk_widget_set_valign(GTK_WIDGET(grid), GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(grid));
     gtk_widget_show_all(GTK_WIDGET(grid));
 
-    gtk_box_pack_end(GTK_BOX(page), verify_button(dir), FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(page), verify_button(dir));
 
     g_signal_connect(druid, "prepare",
                      G_CALLBACK(balsa_druid_page_directory_prepare),

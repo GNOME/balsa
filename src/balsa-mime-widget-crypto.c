@@ -34,7 +34,8 @@
 
 static void on_gpg_key_button(GtkWidget *button, LibBalsaMessageBody *mime_body);
 static void on_key_import_button(GtkButton *button, gpointer user_data);
-static gboolean create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error);
+static gboolean create_import_keys_widget(BalsaMimeWidget *mw, const gchar *key_buf, GError **error);
+
 
 
 BalsaMimeWidget *
@@ -78,7 +79,7 @@ balsa_mime_widget_new_pgpkey(BalsaMessage        *bm,
         g_clear_error(&err);
     } else {
         mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-        if (!create_import_keys_widget(GTK_BOX(mw), body_buf, &err)) {
+        if (!create_import_keys_widget(mw, body_buf, &err)) {
             balsa_information(LIBBALSA_INFORMATION_ERROR, _("Could not process GnuPG keys: %s"),
                               err ? err->message : _("Unknown error"));
             g_clear_error(&err);
@@ -119,32 +120,36 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
     label = gtk_label_new((lines[1] != NULL) ? lines[1] : lines[0]);
     gtk_label_set_selectable(GTK_LABEL(label), TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_START);
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), label);
     key = g_mime_gpgme_sigstat_key(mime_body->sig_info);
     if (key != NULL) {
 		GtkWidget *key_widget;
 
 		key_widget = libbalsa_gpgme_key(key, g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info), 0U, FALSE);
-		gtk_box_pack_start(GTK_BOX(vbox), key_widget, FALSE, FALSE, 0);
+		gtk_container_add(GTK_CONTAINER(vbox), key_widget);
     }
     if (g_mime_gpgme_sigstat_protocol(mime_body->sig_info) == GPGME_PROTOCOL_OpenPGP) {
     	GtkWidget *hbox;
         GtkWidget *button;
 
-        hbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-        gtk_button_box_set_layout(GTK_BUTTON_BOX(hbox), GTK_BUTTONBOX_EXPAND);
-        gtk_box_set_spacing(GTK_BOX(hbox), BMW_HBOX_SPACE);
-        gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+        hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
+        gtk_widget_set_vexpand(hbox, TRUE);
+        gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
+        gtk_container_add(GTK_CONTAINER(vbox), hbox);
+
         if (g_mime_gpgme_sigstat_status(mime_body->sig_info) == GPG_ERR_NO_PUBKEY) {
 #ifdef ENABLE_AUTOCRYPT
         	GBytes *autocrypt_key;
 
         	autocrypt_key = autocrypt_get_key(g_mime_gpgme_sigstat_fingerprint(mime_body->sig_info), NULL);
         	if (autocrypt_key != NULL) {
-        		button = gtk_button_new_with_mnemonic(_("_Import Autocrypt key"));
+			button = libbalsa_add_mnemonic_button_to_box(_("_Import Autocrypt key"),
+                                                            hbox, GTK_ALIGN_FILL);
         		g_object_set_data_full(G_OBJECT(button), "autocrypt_key", autocrypt_key, (GDestroyNotify) g_bytes_unref);
         		g_signal_connect(button, "clicked", G_CALLBACK(on_key_import_button), NULL);
-        		gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+                        gtk_widget_set_hexpand(button, TRUE);
+                        gtk_widget_set_halign(button, GTK_ALIGN_FILL);
+                        gtk_container_add(GTK_CONTAINER(hbox), button);
         	} else if (libbalsa_message_get_headers(mime_body->message)->autocrypt_hdr_present) {
         		if (balsa_autocrypt_in_use()) {
         			libbalsa_information(LIBBALSA_INFORMATION_WARNING,
@@ -157,12 +162,16 @@ balsa_mime_widget_signature_widget(LibBalsaMessageBody * mime_body,
         		}
         	}
 #endif
-            button = gtk_button_new_with_mnemonic(_("_Search key server for this key"));
+            button = libbalsa_add_mnemonic_button_to_box(_("_Search key server for this key"),
+                                                hbox, GTK_ALIGN_FILL);
         } else {
-            button = gtk_button_new_with_mnemonic(_("_Search key server for updates of this key"));
+            button = libbalsa_add_mnemonic_button_to_box(_("_Search key server for updates of this key"),
+                                                hbox, GTK_ALIGN_FILL);
         }
         g_signal_connect(button, "clicked", G_CALLBACK(on_gpg_key_button), mime_body);
-        gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+        gtk_widget_set_hexpand(button, TRUE);
+        gtk_widget_set_halign(button, GTK_ALIGN_FILL);
+        gtk_container_add(GTK_CONTAINER(hbox), button);
     }
 
     /* Hack alert: if we omit the box below and use the expander as signature widget
@@ -202,7 +211,7 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
     if (was_encrypted) {
     	icon = gtk_image_new_from_icon_name(balsa_icon_id(BALSA_PIXMAP_ENCR), GTK_ICON_SIZE_MENU);
     	gtk_widget_set_tooltip_text(icon, _("decrypted"));
-        gtk_box_pack_start(GTK_BOX(icon_box), icon, FALSE, FALSE, 0);
+        gtk_container_add(GTK_CONTAINER(icon_box), icon);
     }
     if (!no_signature) {
     	guint sig_state = libbalsa_message_body_signature_state(mime_body);
@@ -225,15 +234,15 @@ balsa_mime_widget_crypto_frame(LibBalsaMessageBody * mime_body, GtkWidget * chil
     	default:
     		gtk_widget_set_tooltip_text(icon, _("unknown signature status"));
     	}
-        gtk_box_pack_start(GTK_BOX(icon_box), icon, FALSE, FALSE, 0);
+        gtk_container_add(GTK_CONTAINER(icon_box), icon);
     }
     gtk_frame_set_label_widget(GTK_FRAME(frame), icon_box);
     gtk_container_set_border_width(GTK_CONTAINER(vbox), BMW_MESSAGE_PADDING);
 
-    gtk_box_pack_start(GTK_BOX(vbox), child, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), child);
 
     if (signature) {
-	gtk_box_pack_end(GTK_BOX(vbox), signature, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(vbox), signature);
     }
 
     return frame;
@@ -357,7 +366,7 @@ on_key_import_button(GtkButton *button,
 
 
 static gboolean
-create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
+create_import_keys_widget(BalsaMimeWidget *mw, const gchar *key_buf, GError **error)
 {
 	gboolean success = FALSE;
 	gpgme_ctx_t ctx;
@@ -384,17 +393,22 @@ create_import_keys_widget(GtkBox *box, const gchar *key_buf, GError **error)
 				if (key_ascii == NULL) {
 					success = FALSE;
 				} else {
+                                    GtkWidget *container_widget = balsa_mime_widget_get_container(mw);
+                                    GtkContainer *container = GTK_CONTAINER(container_widget);
+
 					key_widget = libbalsa_gpgme_key(this_key, NULL, GPG_SUBKEY_CAP_ALL, FALSE);
-					gtk_box_pack_start(box, key_widget, FALSE, FALSE, 0);
+					gtk_container_add(container, key_widget);
 
 					import_btn = gtk_button_new_with_label(_("Import key into the local key ring"));
 					g_object_set_data_full(G_OBJECT(import_btn), "keydata", key_ascii, (GDestroyNotify) g_free);
 					g_signal_connect(import_btn, "clicked", (GCallback) on_key_import_button, NULL);
-					gtk_box_pack_start(box, import_btn, FALSE, FALSE, 0);
+					gtk_container_add(container, import_btn);
 
 					if (item->next != NULL) {
-						gtk_box_pack_start(box, gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE,
-							BMW_VBOX_SPACE);
+						GtkWidget *separator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
+                                                gtk_widget_set_margin_top(separator, BMW_VBOX_SPACE);
+                                                gtk_widget_set_margin_bottom(separator, BMW_VBOX_SPACE);
+						gtk_container_add(container, separator);
 					}
 				}
 			}

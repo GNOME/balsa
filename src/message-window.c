@@ -880,7 +880,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
         return;
     }
     gtk_widget_show(menubar);
-    gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), menubar);
 
     mw->headers_shown = balsa_app.shown_headers;
     mw->show_all_headers = FALSE;
@@ -888,7 +888,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     model = message_window_get_toolbar_model();
 
     mw->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
-    gtk_box_pack_start(GTK_BOX(vbox), mw->toolbar, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(vbox), mw->toolbar);
 
     gtk_window_set_role(GTK_WINDOW(window), "message");
 
@@ -920,7 +920,9 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 	mw_disable_trash(mw);
     mw->bmessage = balsa_message_new();
 
-    gtk_box_pack_start(GTK_BOX(vbox), mw->bmessage, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(mw->bmessage, TRUE);
+    gtk_widget_set_valign(mw->bmessage, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(vbox), mw->bmessage);
     gtk_widget_show(vbox);
 
     g_signal_connect(mw->bmessage, "select-part",

@@ -781,9 +781,6 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 		_("_Cancel"), GTK_RESPONSE_CANCEL,
         NULL));
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(mcw->window));
-#if HAVE_MACOSX_DESKTOP
-    libbalsa_macosx_menu_for_parent(mcw->window, GTK_WINDOW(balsa_app.main_window));
-#endif
 
     mcw->mb_data.pop3.server_cfg =
         libbalsa_server_cfg_new(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox),

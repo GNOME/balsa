@@ -400,8 +400,7 @@ create_import_keys_widget(BalsaMimeWidget *mw, const gchar *key_buf, GError **er
 
 					if (item->next != NULL) {
 						GtkWidget *separator = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
-                                                gtk_widget_set_margin_top(separator, BMW_VBOX_SPACE);
-                                                gtk_widget_set_margin_bottom(separator, BMW_VBOX_SPACE);
+                                                libbalsa_set_vmargins(separator, BMW_VBOX_SPACE);
 						gtk_container_add(container, separator);
 					}
 				}

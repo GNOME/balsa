@@ -341,8 +341,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     /* To keep a consistent look, make a button box for a single button. */
     bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
-    gtk_widget_set_margin_top(bbox, 2);
-    gtk_widget_set_margin_bottom(bbox, 2);
+    libbalsa_set_vmargins(bbox, 2);
     gtk_container_add(GTK_CONTAINER(vbox), bbox);
 
     /* "Apply selected" button */
@@ -412,8 +411,7 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     /* up down arrow buttons */
     bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 
-    gtk_widget_set_margin_top(bbox, 2);
-    gtk_widget_set_margin_bottom(bbox, 2);
+    libbalsa_set_vmargins(bbox, 2);
     gtk_container_add(GTK_CONTAINER(vbox), bbox);
 
     /* up button */

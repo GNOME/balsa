@@ -360,6 +360,72 @@ tp_dialog_response_cb(GtkDialog * dialog, gint response, gpointer data)
 
 /* Helpers. */
 
+/* List of toolbar items
+ */
+static GtkWidget*
+create_item_list(const char *title, GtkWidget **list)
+{
+    GtkWidget *frame;
+    GtkWidget *scroll;
+
+    frame = gtk_frame_new(title);
+    gtk_widget_set_hexpand(frame, TRUE);
+    gtk_widget_set_halign(frame, GTK_ALIGN_FILL);
+
+    scroll = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
+				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(frame), scroll);
+
+    *list = tp_list_new();
+    gtk_container_add(GTK_CONTAINER(scroll), *list);
+
+    return frame;
+}
+
+/* The four buttons
+ */
+static GtkWidget*
+create_button_box(ToolbarPage *page)
+{
+    GtkWidget *button_box;
+    GtkWidget *move_button_box;
+
+    button_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    page->back_button =
+        gtk_button_new_from_icon_name("go-up-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
+    gtk_widget_set_tooltip_text(page->back_button,
+                                _("Move selected item up"));
+    gtk_container_add(GTK_CONTAINER(button_box), page->back_button);
+
+    move_button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_container_add(GTK_CONTAINER(button_box), move_button_box);
+
+    page->remove_button =
+        gtk_button_new_from_icon_name("go-previous-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
+    gtk_widget_set_tooltip_text(page->remove_button,
+                                _("Remove selected item from toolbar"));
+    gtk_container_add(GTK_CONTAINER(move_button_box), page->remove_button);
+
+    page->add_button =
+        gtk_button_new_from_icon_name("go-next-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
+    gtk_widget_set_tooltip_text(page->add_button,
+                                _("Add selected item to toolbar"));
+    gtk_container_add(GTK_CONTAINER(move_button_box), page->add_button);
+
+    page->forward_button =
+        gtk_button_new_from_icon_name("go-down-symbolic",
+                                      GTK_ICON_SIZE_BUTTON);
+    gtk_widget_set_tooltip_text(page->forward_button,
+                                _("Move selected item down"));
+    gtk_container_add(GTK_CONTAINER(button_box), page->forward_button);
+
+    return button_box;
+}
+
 /* Create a page for the main notebook.
  */
 static GtkWidget*
@@ -368,9 +434,9 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     GtkWidget *outer_box;
     GtkWidget *toolbar_frame, *toolbar_scroll;
     GtkWidget *toolbar_ctlbox;
-    GtkWidget *lower_ctlbox, *button_box, *move_button_box, *center_button_box;
-    GtkWidget *list_frame, *list_scroll;
-    GtkWidget *destination_frame, *destination_scroll;
+    GtkWidget *lower_ctlbox, *button_box;
+    GtkWidget *available_items;
+    GtkWidget *current_items;
     GtkWidget *style_button;
     ToolbarPage *page;
     GtkTreeSelection *selection;
@@ -421,84 +487,23 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     /* Box for lower half of window */
     lower_ctlbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, HIG_PADDING);
     gtk_container_set_border_width(GTK_CONTAINER(lower_ctlbox), HIG_PADDING);
-
     gtk_widget_set_vexpand(lower_ctlbox, TRUE);
     gtk_widget_set_valign(lower_ctlbox, GTK_ALIGN_FILL);
     gtk_container_add(GTK_CONTAINER(outer_box), lower_ctlbox);
 
     /* A list to show the available items */
-    list_scroll=gtk_scrolled_window_new(NULL, NULL);
-
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(list_scroll),
-				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-
-    list_frame=gtk_frame_new(_("Available buttons"));
-    page->available = tp_list_new();
-
-    gtk_container_add(GTK_CONTAINER(lower_ctlbox), list_frame);
-    gtk_container_add(GTK_CONTAINER(list_frame), list_scroll);
-    gtk_container_add(GTK_CONTAINER(list_scroll), page->available);
-
-    /* Done with available list */
-
-    /* Another list to show the current tools */
-    destination_scroll=gtk_scrolled_window_new(NULL, NULL);
-
-    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(destination_scroll),
-				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-
-    destination_frame=gtk_frame_new(_("Current toolbar"));
-    page->current = tp_list_new();
-
-    /* Done with destination list */
+    available_items = create_item_list(_("Available buttons"), &page->available);
+    gtk_container_add(GTK_CONTAINER(lower_ctlbox), available_items);
 
     /* Button box */
-    center_button_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(lower_ctlbox), center_button_box);
-
-    button_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    button_box = create_button_box(page);
     gtk_widget_set_vexpand(button_box, TRUE);
     gtk_widget_set_valign(button_box, GTK_ALIGN_CENTER);
-    gtk_container_add(GTK_CONTAINER(center_button_box), button_box);
+    gtk_container_add(GTK_CONTAINER(lower_ctlbox), button_box);
 
-    page->back_button =
-        gtk_button_new_from_icon_name("go-up-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
-    gtk_widget_set_tooltip_text(page->back_button,
-                                _("Move selected item up"));
-    gtk_container_add(GTK_CONTAINER(button_box), page->back_button);
-
-    move_button_box=gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(button_box), move_button_box);
-
-    page->remove_button =
-        gtk_button_new_from_icon_name("go-previous-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
-    gtk_widget_set_tooltip_text(page->remove_button,
-                                _("Remove selected item from toolbar"));
-    gtk_container_add(GTK_CONTAINER(move_button_box), page->remove_button);
-
-    page->add_button =
-        gtk_button_new_from_icon_name("go-next-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
-    gtk_widget_set_tooltip_text(page->add_button,
-                                _("Add selected item to toolbar"));
-    gtk_container_add(GTK_CONTAINER(move_button_box), page->add_button);
-
-    page->forward_button =
-        gtk_button_new_from_icon_name("go-down-symbolic",
-                                      GTK_ICON_SIZE_BUTTON);
-    gtk_widget_set_tooltip_text(page->forward_button,
-                                _("Move selected item down"));
-    gtk_container_add(GTK_CONTAINER(button_box), page->forward_button);
-
-    /* Pack destination list */
-    gtk_widget_set_hexpand(destination_frame, TRUE);
-    gtk_widget_set_halign(destination_frame, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(lower_ctlbox), destination_frame);
-
-    gtk_container_add(GTK_CONTAINER(destination_frame), destination_scroll);
-    gtk_container_add(GTK_CONTAINER(destination_scroll), page->current);
+    /* Another list to show the current tools */
+    current_items = create_item_list(_("Current toolbar"), &page->current);
+    gtk_container_add(GTK_CONTAINER(lower_ctlbox), current_items);
 
     /* UI signals */
     g_signal_connect(page->available, "row-activated",

@@ -500,9 +500,8 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     gtk_container_add(GTK_CONTAINER(content_area), grid);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
-    gtk_widget_set_vexpand(vbox, TRUE);
-    gtk_widget_set_valign(vbox, GTK_ALIGN_START);
     action_area = gtk_info_bar_get_action_area(info_bar);
+    gtk_widget_set_valign(action_area, GTK_ALIGN_START);
     gtk_container_add(GTK_CONTAINER(action_area), vbox);
 
     if (balsa_message_get_face_box(bm) == NULL) {

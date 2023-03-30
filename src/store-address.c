@@ -214,7 +214,7 @@ store_address_dialog(StoreAddressInfo * info)
         /* User has more than one address book, so show the options */
         frame = store_address_book_frame(info);
         gtk_widget_show_all(frame);
-        gtk_container_add(GTK_CONTAINER(vbox), frame);
+        libbalsa_box_append(GTK_BOX(vbox), frame);
     }
 
     frame = store_address_note_frame(info);
@@ -222,7 +222,7 @@ store_address_dialog(StoreAddressInfo * info)
 
     gtk_widget_set_vexpand(frame, TRUE);
     gtk_widget_set_valign(frame, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), frame);
+    libbalsa_box_append(GTK_BOX(vbox), frame);
 
     return dialog;
 }
@@ -282,7 +282,7 @@ store_address_book_frame(StoreAddressInfo * info)
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2 * HIG_PADDING);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 4);
-    gtk_container_add(GTK_CONTAINER(hbox), gtk_label_new(_("Address Book:")));
+    libbalsa_box_append(GTK_BOX(hbox), gtk_label_new(_("Address Book:")));
 
     combo_box = gtk_combo_box_text_new();
     g_signal_connect(combo_box, "changed",
@@ -309,7 +309,7 @@ store_address_book_frame(StoreAddressInfo * info)
 
     gtk_widget_set_vexpand(combo_box, TRUE);
     gtk_widget_set_valign(combo_box, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), combo_box);
+    libbalsa_box_append(GTK_BOX(hbox), combo_box);
 
     return hbox;
 }

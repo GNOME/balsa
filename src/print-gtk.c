@@ -589,10 +589,10 @@ create_options_group(const gchar *label_str, GtkWidget *parent_grid, gint parent
     markup = g_strdup_printf("<b>%s</b>", label_str);
     label = libbalsa_create_wrap_label(markup, TRUE);
     g_free(markup);
-    gtk_container_add(GTK_CONTAINER(group), label);
+    libbalsa_box_append(GTK_BOX(group), label);
 
 	grid = gtk_grid_new();
-    gtk_container_add(GTK_CONTAINER(group), grid);
+    libbalsa_box_append(GTK_BOX(group), grid);
 	gtk_grid_set_column_spacing(GTK_GRID(grid), 0);
 	gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
 	gtk_grid_attach(GTK_GRID(grid), gtk_label_new("    "), 0, 0, 1, 1);

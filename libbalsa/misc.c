@@ -1284,12 +1284,95 @@ libbalsa_add_mnemonic_button_to_box(const gchar *markup,
     gtk_size_group_add_widget(size_group, label);
 
     button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button), label);
+    libbalsa_button_set_child(GTK_BUTTON(button), label);
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, align);
     gtk_widget_show(button);
 
-    gtk_container_add(GTK_CONTAINER(box), button);
+    libbalsa_box_append(GTK_BOX(box), button);
 
     return button;
+}
+
+/* Type-checking GtkContainer wrappers */
+
+void
+libbalsa_box_append(GtkBox *box, GtkWidget *child)
+{
+    g_return_if_fail(GTK_IS_BOX(box));
+    g_return_if_fail(child == NULL || GTK_IS_WIDGET(child));
+
+    gtk_container_add(GTK_CONTAINER(box), child);
+}
+
+void
+libbalsa_button_set_child(GtkButton *button, GtkWidget *child)
+{
+    g_return_if_fail(GTK_IS_BUTTON(button));
+    g_return_if_fail(child == NULL || GTK_IS_WIDGET(child));
+
+    gtk_container_add(GTK_CONTAINER(button), child);
+}
+
+void
+libbalsa_expander_set_child(GtkExpander *expander, GtkWidget *child)
+{
+    g_return_if_fail(GTK_IS_EXPANDER(expander));
+    g_return_if_fail(child == NULL || GTK_IS_WIDGET(child));
+
+    gtk_container_add(GTK_CONTAINER(expander), child);
+}
+
+void
+libbalsa_frame_set_child(GtkFrame *frame, GtkWidget *child)
+{
+    g_return_if_fail(GTK_IS_FRAME(frame));
+    g_return_if_fail(child == NULL || GTK_IS_WIDGET(child));
+
+    gtk_container_add(GTK_CONTAINER(frame), child);
+}
+
+void
+libbalsa_revealer_set_child(GtkRevealer *revealer, GtkWidget *child)
+{
+    g_return_if_fail(GTK_IS_REVEALER(revealer));
+    g_return_if_fail(child == NULL || GTK_IS_WIDGET(child));
+
+    gtk_container_add(GTK_CONTAINER(revealer), child);
+}
+
+void
+libbalsa_scrolled_window_set_child(GtkScrolledWindow *scrolled_window, GtkWidget *child)
+{
+    g_return_if_fail(GTK_IS_SCROLLED_WINDOW(scrolled_window));
+    g_return_if_fail(child == NULL || GTK_IS_WIDGET(child));
+
+    gtk_container_add(GTK_CONTAINER(scrolled_window), child);
+}
+
+void
+libbalsa_search_bar_set_child(GtkSearchBar *search_bar, GtkWidget *child)
+{
+    g_return_if_fail(GTK_IS_SEARCH_BAR(search_bar));
+    g_return_if_fail(child == NULL || GTK_IS_WIDGET(child));
+
+    gtk_container_add(GTK_CONTAINER(search_bar), child);
+}
+
+void
+libbalsa_viewport_set_child(GtkViewport *viewport, GtkWidget *child)
+{
+    g_return_if_fail(GTK_IS_VIEWPORT(viewport));
+    g_return_if_fail(child == NULL || GTK_IS_WIDGET(child));
+
+    gtk_container_add(GTK_CONTAINER(viewport), child);
+}
+
+void
+libbalsa_window_set_child(GtkWindow *window, GtkWidget *child)
+{
+    g_return_if_fail(GTK_IS_WINDOW(window));
+    g_return_if_fail(child == NULL || GTK_IS_WIDGET(child));
+
+    gtk_container_add(GTK_CONTAINER(window), child);
 }

@@ -161,7 +161,7 @@ ask_password_real(LibBalsaServer * server, const gchar *cert_subject)
     gtk_container_set_border_width(GTK_CONTAINER(content), 2 * HIG_PADDING);
 
     grid = libbalsa_create_grid();
-    gtk_container_add(GTK_CONTAINER(content), grid);
+    libbalsa_box_append(GTK_BOX(content), grid);
 
     gtk_grid_attach(GTK_GRID(grid), gtk_label_new(prompt), 0, 0, 2, 1);
     g_free(prompt);

@@ -322,7 +322,7 @@ bndx_string_extent(const gchar * text)
     gtk_label_set_markup((GtkLabel *) label, text);
 
     window = gtk_offscreen_window_new();
-    gtk_container_add(GTK_CONTAINER(window), label);
+    libbalsa_window_set_child(GTK_WINDOW(window), label);
     gtk_widget_show_all(window);
 
     gtk_widget_get_allocation(window, &allocation);
@@ -2791,7 +2791,7 @@ balsa_index_pipe(BalsaIndex * index)
 
     vbox = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     gtk_box_set_spacing(GTK_BOX(vbox), 2 * HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(vbox), label =
+    libbalsa_box_append(GTK_BOX(vbox), label =
                       gtk_label_new(_("Specify the program to run:")));
 
     info->entry = entry = gtk_combo_box_text_new_with_entry();
@@ -2799,7 +2799,7 @@ balsa_index_pipe(BalsaIndex * index)
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(entry),
                                        list->data);
     gtk_combo_box_set_active(GTK_COMBO_BOX(entry), 0);
-    gtk_container_add(GTK_CONTAINER(vbox), entry);
+    libbalsa_box_append(GTK_BOX(vbox), entry);
 
     gtk_widget_show(label);
     gtk_widget_show(entry);

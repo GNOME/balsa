@@ -349,8 +349,8 @@ server_cfg_add_entry(GtkWidget *grid, guint row, const gchar *label, const gchar
 		server_cfg_add_widget(grid, row, label, hbox);
                 gtk_widget_set_hexpand(new_entry, TRUE);
                 gtk_widget_set_halign(new_entry, GTK_ALIGN_FILL);
-		gtk_container_add(GTK_CONTAINER(hbox), new_entry);
-		gtk_container_add(GTK_CONTAINER(hbox), button);
+		libbalsa_box_append(GTK_BOX(hbox), new_entry);
+		libbalsa_box_append(GTK_BOX(hbox), button);
 	} else {
 		server_cfg_add_widget(grid, row, label, new_entry);
 	}

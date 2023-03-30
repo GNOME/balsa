@@ -341,7 +341,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                       FALSE);
 
     sdi->notebook = libbalsa_server_cfg_new(server, smtp_server->name);
-    gtk_container_add(GTK_CONTAINER(content_area), GTK_WIDGET(sdi->notebook));
+    libbalsa_box_append(GTK_BOX(content_area), GTK_WIDGET(sdi->notebook));
 
     /* split large messages */
     sdi->split_button = gtk_check_button_new_with_mnemonic(_("Sp_lit message larger than"));
@@ -349,9 +349,9 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     sdi->big_message = gtk_spin_button_new_with_range(0.1, 100, 0.1);
     gtk_widget_set_hexpand(sdi->big_message, TRUE);
     gtk_widget_set_halign(sdi->big_message, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), sdi->big_message);
+    libbalsa_box_append(GTK_BOX(hbox), sdi->big_message);
     label = gtk_label_new(_("MB"));
-    gtk_container_add(GTK_CONTAINER(hbox), label);
+    libbalsa_box_append(GTK_BOX(hbox), label);
     if (smtp_server->big_message > 0) {
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button), TRUE);
         /* The widget is in MB, but big_message is stored in kB. */

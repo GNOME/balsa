@@ -783,7 +783,7 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
     mcw->mb_data.pop3.server_cfg =
         libbalsa_server_cfg_new(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox),
                                 libbalsa_mailbox_get_name(mailbox));
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(mcw->window))), GTK_WIDGET(mcw->mb_data.pop3.server_cfg));
+    libbalsa_box_append(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(mcw->window))), GTK_WIDGET(mcw->mb_data.pop3.server_cfg));
     g_signal_connect(mcw->mb_data.pop3.server_cfg, "changed", G_CALLBACK(check_for_blank_fields), mcw);
 
     /* toggle for deletion from server */

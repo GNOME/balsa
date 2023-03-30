@@ -942,7 +942,7 @@ get_field_frame(void)
     gtk_grid_set_column_spacing(GTK_GRID(grid), 2);
     gtk_grid_set_column_homogeneous(GTK_GRID(grid), TRUE);
 
-    gtk_container_add(GTK_CONTAINER(frame), grid);
+    libbalsa_frame_set_child(GTK_FRAME(frame), grid);
 
     add_button(grid, _("_All"),  0,G_CALLBACK(fe_match_fields_buttons_cb),1);
     add_button(grid, _("C_lear"),1,G_CALLBACK(fe_match_fields_buttons_cb),3);
@@ -1002,7 +1002,7 @@ build_type_notebook()
     libbalsa_set_margins(box, HIG_PADDING);
     gtk_widget_set_vexpand(grid, TRUE);
     gtk_widget_set_valign(grid, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(box), grid);
+    libbalsa_box_append(GTK_BOX(box), grid);
 
     fe_type_simple_label = 
 	gtk_label_new_with_mnemonic(_("One of the specified f_ields contains"));
@@ -1034,7 +1034,7 @@ build_type_notebook()
     page = gtk_table_new(5, 6, FALSE);
     gtk_widget_set_vexpand(page, TRUE);
     gtk_widget_set_valign(page, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(box), page);
+    libbalsa_box_append(GTK_BOX(box), page);
 
     fe_type_regex_label = 
         gtk_label_new_with_mnemonic(_("_One of the regular expressions matches"));
@@ -1057,7 +1057,8 @@ build_type_notebook()
                                  G_CALLBACK(fe_regexs_selection_changed),
                                  FALSE);
 
-    gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(fe_type_regex_list));
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll),
+                                       GTK_WIDGET(fe_type_regex_list));
 
     box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
@@ -1069,21 +1070,21 @@ build_type_notebook()
     button = gtk_button_new_with_mnemonic(_("A_dd"));
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(box), button);
+    libbalsa_box_append(GTK_BOX(box), button);
     g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_add_pressed), NULL);
 
     fe_regex_remove_button = gtk_button_new_with_mnemonic(_("_Remove"));
     gtk_widget_set_hexpand(fe_regex_remove_button, TRUE);
     gtk_widget_set_halign(fe_regex_remove_button, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(box), fe_regex_remove_button);
+    libbalsa_box_append(GTK_BOX(box), fe_regex_remove_button);
     g_signal_connect(fe_regex_remove_button, "clicked",
                      G_CALLBACK(fe_remove_pressed), NULL);
 
     button = gtk_button_new_with_mnemonic(_("One _Matches/None Matches"));
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(box), button);
+    libbalsa_box_append(GTK_BOX(box), button);
     g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_negate_condition), NULL);
 
@@ -1097,7 +1098,7 @@ build_type_notebook()
     label = gtk_label_new(msg);
     gtk_widget_set_hexpand(label, TRUE);
     gtk_widget_set_halign(label, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(box), label);
+    libbalsa_box_append(GTK_BOX(box), label);
 #endif                  /* REGULAR_EXPRESSION_FILTERING_IS_IMPLEMENTED */
 
     /* The date page of the notebook */
@@ -1152,7 +1153,7 @@ build_type_notebook()
     gtk_grid_set_row_spacing(GTK_GRID(page), 2);
     gtk_grid_set_column_spacing(GTK_GRID(page), 2);
 
-    gtk_container_add(GTK_CONTAINER(frame), page);
+    libbalsa_frame_set_child(GTK_FRAME(frame), page);
 
     for (row=0;row<2;row++)
         for (col=0;col<2;col++) {
@@ -1186,26 +1187,26 @@ void build_condition_dialog(GtkWidget * condition_dialog)
 
     label = gtk_label_new_with_mnemonic(_("Search T_ype:"));
     libbalsa_set_hmargins(label, HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(box), label);
+    libbalsa_box_append(GTK_BOX(box), label);
 
     fe_search_option_menu =
         fe_build_option_menu(fe_search_type, G_N_ELEMENTS(fe_search_type),
                              G_CALLBACK(fe_typesmenu_cb), field_frame);
     libbalsa_set_hmargins(fe_search_option_menu, HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(box), fe_search_option_menu);
+    libbalsa_box_append(GTK_BOX(box), fe_search_option_menu);
     gtk_label_set_mnemonic_widget(GTK_LABEL(label), fe_search_option_menu);
 
     content_box = gtk_dialog_get_content_area(GTK_DIALOG(condition_dialog));
 
     libbalsa_set_vmargins(box, 2);
-    gtk_container_add(GTK_CONTAINER(content_box), box);
+    libbalsa_box_append(GTK_BOX(content_box), box);
 
     libbalsa_set_vmargins(field_frame, 2);
-    gtk_container_add(GTK_CONTAINER(content_box), field_frame);
+    libbalsa_box_append(GTK_BOX(content_box), field_frame);
 
     build_type_notebook();
     libbalsa_set_vmargins(fe_type_notebook, 2);
-    gtk_container_add(GTK_CONTAINER(content_box), fe_type_notebook);
+    libbalsa_box_append(GTK_BOX(content_box), fe_type_notebook);
 }
 
 /*

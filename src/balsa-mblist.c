@@ -1876,7 +1876,7 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
-    gtk_container_add(GTK_CONTAINER(scroll), mblist);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), mblist);
     gtk_widget_show_all(scroll);
 
     dialog =
@@ -1890,7 +1890,7 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
 
     gtk_widget_set_vexpand(scroll, TRUE);
     gtk_widget_set_valign(scroll, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(content_area), scroll);
+    libbalsa_box_append(GTK_BOX(content_area), scroll);
 
     g_signal_connect(dialog, "size-allocate",
                      G_CALLBACK(bmbl_mru_size_allocate_cb), NULL);

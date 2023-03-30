@@ -212,7 +212,7 @@ libbalsa_show_message_source(GtkApplication  * application,
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(interior),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_ALWAYS);
-    gtk_container_add(GTK_CONTAINER(interior), GTK_WIDGET(text));
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(interior), GTK_WIDGET(text));
 
     window = gtk_application_window_new(application);
     gtk_window_set_title(GTK_WINDOW(window), _("Message Source"));
@@ -233,11 +233,11 @@ libbalsa_show_message_source(GtkApplication  * application,
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
     libbalsa_set_vmargins(menu_bar, 1);
-    gtk_container_add(GTK_CONTAINER(vbox), menu_bar);
+    libbalsa_box_append(GTK_BOX(vbox), menu_bar);
 
     libbalsa_set_margins(interior, 2);
-    gtk_container_add(GTK_CONTAINER(vbox), interior);
-    gtk_container_add(GTK_CONTAINER(window), vbox);
+    libbalsa_box_append(GTK_BOX(vbox), interior);
+    libbalsa_window_set_child(GTK_WINDOW(window), vbox);
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);
     lsvi->msg = g_object_ref(msg);

@@ -138,9 +138,9 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 
 		uid_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
 		gtk_widget_set_margin_start(uid_box, 2 * HIG_PADDING);
-		gtk_container_add(GTK_CONTAINER(uid_expander), uid_box);
+		libbalsa_expander_set_child(GTK_EXPANDER(uid_expander), uid_box);
 		for (uid = key->uids->next; uid != NULL; uid = uid->next) {
-			gtk_container_add(GTK_CONTAINER(uid_box), create_key_uid_widget(uid));
+			libbalsa_box_append(GTK_BOX(uid_box), create_key_uid_widget(uid));
 		}
 	}
 
@@ -157,7 +157,7 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 		issuer_grid = gtk_grid_new();
 		gtk_widget_set_margin_start(issuer_grid, 2 * HIG_PADDING);
 		gtk_grid_set_column_spacing(GTK_GRID(issuer_grid), HIG_PADDING);
-		gtk_container_add(GTK_CONTAINER(issuer_expander), issuer_grid);
+		libbalsa_expander_set_child(GTK_EXPANDER(issuer_expander), issuer_grid);
 
 		if (key->issuer_name != NULL) {
 			uid_readable = libbalsa_cert_subject_readable(key->issuer_name);
@@ -217,7 +217,7 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 
 		subkey_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
 		gtk_widget_set_margin_start(subkey_box, 2 * HIG_PADDING);
-		gtk_container_add(GTK_CONTAINER(subkey_expander), subkey_box);
+		libbalsa_expander_set_child(GTK_EXPANDER(subkey_expander), subkey_box);
 
 		for (subkey = key->subkeys; subkey != NULL; subkey = subkey->next) {
 			if (fingerprint != NULL) {
@@ -229,7 +229,7 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
                                     GtkWidget *subkey_widget = create_subkey_widget(subkey);
 
                                     libbalsa_set_vmargins(subkey_widget, 2);
-                                    gtk_container_add(GTK_CONTAINER(subkey_box), subkey_widget);
+                                    libbalsa_box_append(GTK_BOX(subkey_box), subkey_widget);
 				}
 			} else if ((((subkey_capa & GPG_SUBKEY_CAP_SIGN) != 0U) && (subkey->can_sign != 0)) ||
 					   (((subkey_capa & GPG_SUBKEY_CAP_ENCRYPT) != 0U) && (subkey->can_encrypt != 0)) ||
@@ -237,7 +237,7 @@ libbalsa_gpgme_key(const gpgme_key_t     key,
 					   (((subkey_capa & GPG_SUBKEY_CAP_AUTH) != 0U) && (subkey->can_authenticate != 0))) {
                             GtkWidget *subkey_widget = create_subkey_widget(subkey);
                             libbalsa_set_vmargins(subkey_widget, 2);
-                            gtk_container_add(GTK_CONTAINER(subkey_box), subkey_widget);
+                            libbalsa_box_append(GTK_BOX(subkey_box), subkey_widget);
 			} else {
 				/* do not print this subkey */
 			}
@@ -416,11 +416,11 @@ libbalsa_key_list_dialog(GtkWindow            *parent,
 
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
 	key_data = libbalsa_gpgme_key((gpgme_key_t) (key_list->data), NULL, subkey_capa, TRUE);
-	gtk_container_add(GTK_CONTAINER(vbox), key_data);
+	libbalsa_box_append(GTK_BOX(vbox), key_data);
 	for (key_list = key_list->next; key_list != NULL; key_list = key_list->next) {
-		gtk_container_add(GTK_CONTAINER(vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL));
+		libbalsa_box_append(GTK_BOX(vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL));
 		key_data = libbalsa_gpgme_key((gpgme_key_t) (key_list->data), NULL, subkey_capa, TRUE);
-		gtk_container_add(GTK_CONTAINER(vbox), key_data);
+		libbalsa_box_append(GTK_BOX(vbox), key_data);
 	}
 	gtk_widget_show_all(vbox);
 	return create_key_dialog(parent, buttons, vbox, message1, message2);
@@ -545,18 +545,18 @@ create_key_dialog(GtkWindow      *parent,
 	gtk_container_set_border_width(GTK_CONTAINER(hbox), HIG_PADDING);
         gtk_widget_set_vexpand(hbox, TRUE);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-	gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), hbox);
+	libbalsa_box_append(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), hbox);
 	gtk_box_set_homogeneous(GTK_BOX(hbox), FALSE);
 
 	/* standard key icon; "application-certificate" would be an alternative... */
 	icon = gtk_image_new_from_icon_name("dialog-password", GTK_ICON_SIZE_DIALOG);
-	gtk_container_add(GTK_CONTAINER(hbox), icon);
+	libbalsa_box_append(GTK_BOX(hbox), icon);
 	gtk_widget_set_valign(icon, GTK_ALIGN_START);
 
 	vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
         gtk_widget_set_hexpand(vbox, TRUE);
         gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-	gtk_container_add(GTK_CONTAINER(hbox), vbox);
+	libbalsa_box_append(GTK_BOX(hbox), vbox);
 	gtk_box_set_homogeneous(GTK_BOX(vbox), FALSE);
 
 	if (message1 != NULL) {
@@ -566,24 +566,24 @@ create_key_dialog(GtkWindow      *parent,
 		markup = g_markup_printf_escaped("<b><big>%s</big></b>", message1);
 		gtk_label_set_markup(GTK_LABEL(label), markup);
 		g_free(markup);
-		gtk_container_add(GTK_CONTAINER(vbox), label);
+		libbalsa_box_append(GTK_BOX(vbox), label);
 	}
 
 	if (message2 != NULL) {
 		label = libbalsa_create_wrap_label(message2, FALSE);
-		gtk_container_add(GTK_CONTAINER(vbox), label);
+		libbalsa_box_append(GTK_BOX(vbox), label);
 	}
 
 	scrolledw = gtk_scrolled_window_new(NULL, NULL);
         gtk_widget_set_vexpand(scrolledw, TRUE);
         gtk_widget_set_valign(scrolledw, GTK_ALIGN_FILL);
         libbalsa_set_vmargins(scrolledw, HIG_PADDING);
-	gtk_container_add(GTK_CONTAINER(vbox), scrolledw);
+	libbalsa_box_append(GTK_BOX(vbox), scrolledw);
 
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledw), GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scrolledw), 120);
 
-	gtk_container_add(GTK_CONTAINER(scrolledw), keys_widget);
+	libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledw), keys_widget);
 
 	gtk_widget_show_all(hbox);
 
@@ -672,14 +672,14 @@ create_key_label_with_warn(const gchar *text,
 
 		result = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, HIG_PADDING);
 		icon = gtk_image_new_from_icon_name("dialog-warning", GTK_ICON_SIZE_MENU);
-		gtk_container_add(GTK_CONTAINER(result), icon);
+		libbalsa_box_append(GTK_BOX(result), icon);
 		buf = g_markup_printf_escaped("<span fgcolor=\"red\">%s</span>", text);
 		label = libbalsa_create_wrap_label(buf, TRUE);
 		g_free(buf);
 		gtk_label_set_selectable(GTK_LABEL(label), TRUE);
 		gtk_widget_set_hexpand(label, TRUE);
                 gtk_widget_set_halign(label, GTK_ALIGN_FILL);
-		gtk_container_add(GTK_CONTAINER(result), label);
+		libbalsa_box_append(GTK_BOX(result), label);
 	} else {
 		result = libbalsa_create_wrap_label(text, FALSE);
 		gtk_widget_set_hexpand(result, TRUE);
@@ -844,7 +844,7 @@ smime_show_chain(GtkWidget *button, gpointer G_GNUC_UNUSED user_data)
         gtk_widget_set_vexpand(chain, TRUE);
         gtk_widget_set_valign(chain, GTK_ALIGN_FILL);
         libbalsa_set_vmargins(chain, HIG_PADDING);
-	gtk_container_add(GTK_CONTAINER(vbox), chain);
+	libbalsa_box_append(GTK_BOX(vbox), chain);
 
 	gtk_widget_show_all(vbox);
 	gtk_dialog_run(GTK_DIALOG(dialog));

@@ -844,7 +844,7 @@ lba_addr_list_widget(GCallback changed_cb, gpointer changed_data)
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 
     frame = gtk_frame_new(NULL);
-    gtk_container_add(GTK_CONTAINER(frame), tree_view);
+    libbalsa_frame_set_child(GTK_FRAME(frame), tree_view);
     gtk_widget_show_all(frame);
 
     return frame;
@@ -981,8 +981,8 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
             GtkWidget *tree_view;
 
             entries[cnt] = lba_addr_list_widget(changed_cb, changed_data);
-            gtk_container_add(GTK_CONTAINER(box), label);
-            gtk_container_add(GTK_CONTAINER(box), but);
+            libbalsa_box_append(GTK_BOX(box), label);
+            libbalsa_box_append(GTK_BOX(box), but);
             lhs = box;
             tree_view = gtk_bin_get_child(GTK_BIN(entries[cnt]));
             g_signal_connect(but, "clicked", G_CALLBACK(add_row), tree_view);

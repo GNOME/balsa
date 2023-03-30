@@ -425,13 +425,13 @@ ask_cert_real(void *data)
     g_string_free(str, TRUE);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
     libbalsa_set_vmargins(label, 1);
-    gtk_container_add(GTK_CONTAINER(content_area), label);
+    libbalsa_box_append(GTK_BOX(content_area), label);
     gtk_widget_show(label);
 
     gtk_widget_set_vexpand(cert_widget, TRUE);
     gtk_widget_set_valign(cert_widget, GTK_ALIGN_FILL);
     libbalsa_set_vmargins(cert_widget, 1);
-    gtk_container_add(GTK_CONTAINER(content_area), cert_widget);
+    libbalsa_box_append(GTK_BOX(content_area), cert_widget);
     gtk_widget_show_all(cert_widget);
 
     switch(gtk_dialog_run(GTK_DIALOG(dialog))) {

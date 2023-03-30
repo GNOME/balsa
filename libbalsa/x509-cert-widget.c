@@ -166,11 +166,11 @@ create_chain_widget(GList *cert_list)
         gtk_widget_set_vexpand(scrolledwin, TRUE);
         gtk_widget_set_valign(scrolledwin, GTK_ALIGN_FILL);
         libbalsa_set_vmargins(scrolledwin, HIG_PADDING);
-        gtk_container_add(GTK_CONTAINER(vbox), scrolledwin);
+        libbalsa_box_append(GTK_BOX(vbox), scrolledwin);
 
 	store = gtk_tree_store_new(CERT_COLUMNS, G_TYPE_STRING, GTK_TYPE_WIDGET);
 	tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-	gtk_container_add(GTK_CONTAINER(scrolledwin), tree_view);
+	libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledwin), tree_view);
 	renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, renderer, "text", CERT_NAME_COLUMN, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
@@ -183,7 +183,7 @@ create_chain_widget(GList *cert_list)
         gtk_widget_set_vexpand(stack, TRUE);
         gtk_widget_set_valign(stack, GTK_ALIGN_FILL);
         libbalsa_set_vmargins(stack, HIG_PADDING);
-	gtk_container_add(GTK_CONTAINER(vbox), stack);
+	libbalsa_box_append(GTK_BOX(vbox), stack);
 	g_signal_connect(tree_view, "row-activated", G_CALLBACK(cert_selected_cb), stack);
 
 	is_root = TRUE;

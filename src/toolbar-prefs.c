@@ -135,7 +135,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
         gtk_dialog_get_content_area(GTK_DIALOG(customize_widget));
     gtk_widget_set_vexpand(notebook, TRUE);
     gtk_widget_set_valign(notebook, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(content_area), notebook);
+    libbalsa_box_append(GTK_BOX(content_area), notebook);
 
     gtk_window_set_role(GTK_WINDOW(customize_widget), "customize");
     gtk_window_set_default_size(GTK_WINDOW(customize_widget), 600, 440);
@@ -171,11 +171,11 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
 
     option_frame = gtk_frame_new(_("Toolbar options"));
     gtk_container_set_border_width(GTK_CONTAINER(option_frame), HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(content_area), option_frame);
+    libbalsa_box_append(GTK_BOX(content_area), option_frame);
 
     option_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
     gtk_container_set_border_width(GTK_CONTAINER(option_box), HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(option_frame), option_box);
+    libbalsa_frame_set_child(GTK_FRAME(option_frame), option_box);
 
     wrap_button =
         gtk_check_button_new_with_mnemonic(_("_Wrap button labels"));
@@ -183,7 +183,7 @@ customize_dialog_cb(GtkWidget * widget, gpointer data)
                                  balsa_app.toolbar_wrap_button_text);
     g_signal_connect(wrap_button, "toggled",
                      G_CALLBACK(wrap_toggled_cb), notebook);
-    gtk_container_add(GTK_CONTAINER(option_box), wrap_button);
+    libbalsa_box_append(GTK_BOX(option_box), wrap_button);
 
     gtk_widget_show_all(customize_widget);
 
@@ -386,10 +386,10 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     /* Preview display */
     toolbar_frame=gtk_frame_new(_("Preview"));
     gtk_container_set_border_width(GTK_CONTAINER(toolbar_frame), HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(outer_box), toolbar_frame);
+    libbalsa_box_append(GTK_BOX(outer_box), toolbar_frame);
 
     toolbar_ctlbox=gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(toolbar_frame), toolbar_ctlbox);
+    libbalsa_frame_set_child(GTK_FRAME(toolbar_frame), toolbar_ctlbox);
     gtk_container_set_border_width(GTK_CONTAINER(toolbar_ctlbox), HIG_PADDING);
 
     /* The preview is an actual, fully functional toolbar */
@@ -397,17 +397,17 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     gtk_widget_set_sensitive(page->toolbar, FALSE);
 
     /* embedded in a scrolled_window */
-    toolbar_scroll=gtk_scrolled_window_new(NULL, NULL);
+    toolbar_scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(toolbar_scroll),
 				   GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_NEVER);
 
-    gtk_container_add(GTK_CONTAINER(toolbar_ctlbox), toolbar_scroll);
-    gtk_container_add(GTK_CONTAINER(toolbar_scroll), page->toolbar);
+    libbalsa_box_append(GTK_BOX(toolbar_ctlbox), toolbar_scroll);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(toolbar_scroll), page->toolbar);
 
     /* Button box */
     button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(toolbar_ctlbox), button_box);
+    libbalsa_box_append(GTK_BOX(toolbar_ctlbox), button_box);
 
     /* Standard button */
     page->standard_button =
@@ -424,10 +424,10 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
 
     gtk_widget_set_vexpand(lower_ctlbox, TRUE);
     gtk_widget_set_valign(lower_ctlbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(outer_box), lower_ctlbox);
+    libbalsa_box_append(GTK_BOX(outer_box), lower_ctlbox);
 
     /* A list to show the available items */
-    list_scroll=gtk_scrolled_window_new(NULL, NULL);
+    list_scroll = gtk_scrolled_window_new(NULL, NULL);
 
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(list_scroll),
 				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
@@ -435,14 +435,14 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
     list_frame=gtk_frame_new(_("Available buttons"));
     page->available = tp_list_new();
 
-    gtk_container_add(GTK_CONTAINER(lower_ctlbox), list_frame);
-    gtk_container_add(GTK_CONTAINER(list_frame), list_scroll);
-    gtk_container_add(GTK_CONTAINER(list_scroll), page->available);
+    libbalsa_box_append(GTK_BOX(lower_ctlbox), list_frame);
+    libbalsa_frame_set_child(GTK_FRAME(list_frame), list_scroll);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(list_scroll), page->available);
 
     /* Done with available list */
 
     /* Another list to show the current tools */
-    destination_scroll=gtk_scrolled_window_new(NULL, NULL);
+    destination_scroll = gtk_scrolled_window_new(NULL, NULL);
 
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(destination_scroll),
 				   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
@@ -454,51 +454,51 @@ create_toolbar_page(BalsaToolbarModel * model, GActionMap * map)
 
     /* Button box */
     center_button_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(lower_ctlbox), center_button_box);
+    libbalsa_box_append(GTK_BOX(lower_ctlbox), center_button_box);
 
     button_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_vexpand(button_box, TRUE);
     gtk_widget_set_valign(button_box, GTK_ALIGN_CENTER);
-    gtk_container_add(GTK_CONTAINER(center_button_box), button_box);
+    libbalsa_box_append(GTK_BOX(center_button_box), button_box);
 
     page->back_button =
         gtk_button_new_from_icon_name("go-up-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
     gtk_widget_set_tooltip_text(page->back_button,
                                 _("Move selected item up"));
-    gtk_container_add(GTK_CONTAINER(button_box), page->back_button);
+    libbalsa_box_append(GTK_BOX(button_box), page->back_button);
 
     move_button_box=gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(button_box), move_button_box);
+    libbalsa_box_append(GTK_BOX(button_box), move_button_box);
 
     page->remove_button =
         gtk_button_new_from_icon_name("go-previous-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
     gtk_widget_set_tooltip_text(page->remove_button,
                                 _("Remove selected item from toolbar"));
-    gtk_container_add(GTK_CONTAINER(move_button_box), page->remove_button);
+    libbalsa_box_append(GTK_BOX(move_button_box), page->remove_button);
 
     page->add_button =
         gtk_button_new_from_icon_name("go-next-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
     gtk_widget_set_tooltip_text(page->add_button,
                                 _("Add selected item to toolbar"));
-    gtk_container_add(GTK_CONTAINER(move_button_box), page->add_button);
+    libbalsa_box_append(GTK_BOX(move_button_box), page->add_button);
 
     page->forward_button =
         gtk_button_new_from_icon_name("go-down-symbolic",
                                       GTK_ICON_SIZE_BUTTON);
     gtk_widget_set_tooltip_text(page->forward_button,
                                 _("Move selected item down"));
-    gtk_container_add(GTK_CONTAINER(button_box), page->forward_button);
+    libbalsa_box_append(GTK_BOX(button_box), page->forward_button);
 
     /* Pack destination list */
     gtk_widget_set_hexpand(destination_frame, TRUE);
     gtk_widget_set_halign(destination_frame, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(lower_ctlbox), destination_frame);
+    libbalsa_box_append(GTK_BOX(lower_ctlbox), destination_frame);
 
-    gtk_container_add(GTK_CONTAINER(destination_frame), destination_scroll);
-    gtk_container_add(GTK_CONTAINER(destination_scroll), page->current);
+    libbalsa_frame_set_child(GTK_FRAME(destination_frame), destination_scroll);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(destination_scroll), page->current);
 
     /* UI signals */
     g_signal_connect(page->available, "row-activated",

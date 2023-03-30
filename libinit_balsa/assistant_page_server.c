@@ -82,7 +82,7 @@ balsa_druid_page_server_init(BalsaDruidPageServer *server, GtkWidget *page, GtkA
 
 	label = GTK_LABEL(gtk_label_new(_(header)));
 	gtk_label_set_line_wrap(label, TRUE);
-	gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(label));
+	libbalsa_box_append(GTK_BOX(page), GTK_WIDGET(label));
 
 	grid = GTK_GRID(gtk_grid_new());
 	gtk_grid_set_row_spacing(grid, 2);
@@ -116,7 +116,7 @@ balsa_druid_page_server_init(BalsaDruidPageServer *server, GtkWidget *page, GtkA
 		&(server->remember_passwd));
 
         libbalsa_set_vmargins(GTK_WIDGET(grid), 3);
-	gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(grid));
+	libbalsa_box_append(GTK_BOX(page), GTK_WIDGET(grid));
 
 	server->need_set = FALSE;
 }

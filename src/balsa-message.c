@@ -555,11 +555,11 @@ bm_find_bar_new(BalsaMessage * balsa_message)
     gtk_toolbar_set_style(GTK_TOOLBAR(toolbar), GTK_TOOLBAR_BOTH_HORIZ);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
-    gtk_container_add(GTK_CONTAINER(hbox), gtk_label_new(_("Find:")));
+    libbalsa_box_append(GTK_BOX(hbox), gtk_label_new(_("Find:")));
     balsa_message->find_entry = gtk_search_entry_new();
     g_signal_connect(balsa_message->find_entry, "search-changed",
                      G_CALLBACK(bm_find_entry_changed_cb), balsa_message);
-    gtk_container_add(GTK_CONTAINER(hbox), balsa_message->find_entry);
+    libbalsa_box_append(GTK_BOX(hbox), balsa_message->find_entry);
 
     toplevel = gtk_widget_get_toplevel(GTK_WIDGET(balsa_message));
     balsa_message->find_key_controller = gtk_event_controller_key_new(toplevel);
@@ -597,7 +597,7 @@ bm_find_bar_new(BalsaMessage * balsa_message)
     gtk_search_bar_set_show_close_button(GTK_SEARCH_BAR(search_bar), TRUE);
     gtk_search_bar_connect_entry(GTK_SEARCH_BAR(search_bar),
                                  GTK_ENTRY(balsa_message->find_entry));
-    gtk_container_add(GTK_CONTAINER(search_bar), toolbar);
+    libbalsa_search_bar_set_child(GTK_SEARCH_BAR(search_bar), toolbar);
 
     return search_bar;
 }
@@ -669,7 +669,7 @@ balsa_message_init(BalsaMessage * balsa_message)
     GtkGesture *gesture;
 
     balsa_message->switcher = gtk_stack_switcher_new();
-    gtk_container_add(GTK_CONTAINER(balsa_message), balsa_message->switcher);
+    libbalsa_box_append(GTK_BOX(balsa_message), balsa_message->switcher);
 
     balsa_message->stack = gtk_stack_new();
     stack = GTK_STACK(balsa_message->stack);
@@ -679,7 +679,7 @@ balsa_message_init(BalsaMessage * balsa_message)
 
     gtk_widget_set_vexpand(balsa_message->stack, TRUE);
     gtk_widget_set_valign(balsa_message->stack, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(balsa_message), balsa_message->stack);
+    libbalsa_box_append(GTK_BOX(balsa_message), balsa_message->stack);
 
     /* Box to hold the scrolled window and the find bar */
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -697,7 +697,7 @@ balsa_message_init(BalsaMessage * balsa_message)
 
     gtk_widget_set_vexpand(scroll, TRUE);
     gtk_widget_set_valign(scroll, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), scroll);
+    libbalsa_box_append(GTK_BOX(vbox), scroll);
 
     /* Widget to hold headers */
     buttons = bm_header_tl_buttons(balsa_message);
@@ -715,8 +715,8 @@ balsa_message_init(BalsaMessage * balsa_message)
      * provide one, but it would also set it up to scroll on grab-focus,
      * which has been really annoying for a long time :-( */
     viewport = gtk_viewport_new(NULL, NULL);
-    gtk_container_add(GTK_CONTAINER(viewport), GTK_WIDGET(balsa_message->bm_widget));
-    gtk_container_add(GTK_CONTAINER(balsa_message->scroll), viewport);
+    libbalsa_viewport_set_child(GTK_VIEWPORT(viewport), GTK_WIDGET(balsa_message->bm_widget));
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(balsa_message->scroll), viewport);
 
     /* structure view */
     model = gtk_tree_store_new (NUM_COLUMNS,
@@ -779,7 +779,7 @@ balsa_message_init(BalsaMessage * balsa_message)
 	 (GTK_TREE_VIEW (balsa_message->treeview), MIME_ICON_COLUMN - 1));
 
     gtk_stack_add_titled(stack, scroll, "parts", _("Message parts"));
-    gtk_container_add(GTK_CONTAINER(scroll), balsa_message->treeview);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), balsa_message->treeview);
 
     balsa_message->current_part = NULL;
     balsa_message->message = NULL;
@@ -792,7 +792,7 @@ balsa_message_init(BalsaMessage * balsa_message)
 
     /* Find-in-message search bar, initially hidden. */
     balsa_message->find_bar = bm_find_bar_new(balsa_message);
-    gtk_container_add(GTK_CONTAINER(vbox), balsa_message->find_bar);
+    libbalsa_box_append(GTK_BOX(vbox), balsa_message->find_bar);
 
     gtk_widget_show_all(GTK_WIDGET(balsa_message));
 }
@@ -1593,7 +1593,7 @@ display_face(BalsaMessage * balsa_message)
         }
 
         if (image != NULL) {
-            gtk_container_add(GTK_CONTAINER(face_box), image);
+            libbalsa_box_append(GTK_BOX(face_box), image);
             gtk_widget_show_all(face_box);
         }
     }
@@ -2270,7 +2270,7 @@ add_part(BalsaMessage * balsa_message, BalsaPartInfo * info, GtkWidget * contain
     if (info->mime_widget == NULL)
 	part_info_init(balsa_message, info);
 
-    gtk_container_add(GTK_CONTAINER(container), GTK_WIDGET(info->mime_widget));
+    libbalsa_box_append(GTK_BOX(container), GTK_WIDGET(info->mime_widget));
 
     info_container = balsa_mime_widget_get_container(info->mime_widget);
     body = add_multipart(balsa_message, info->body,

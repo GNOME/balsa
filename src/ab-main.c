@@ -850,25 +850,25 @@ bab_get_filter_box(void)
     find_label = gtk_label_new_with_mnemonic(_("F_ilter:"));
     gtk_widget_show(find_label);
     libbalsa_set_hmargins(find_label, 1);
-    gtk_container_add(GTK_CONTAINER(search_hbox), find_label);
+    libbalsa_box_append(GTK_BOX(search_hbox), find_label);
 
     find_entry = gtk_entry_new();
     gtk_widget_show(find_entry);
     gtk_widget_set_hexpand(find_entry, TRUE);
     gtk_widget_set_halign(find_entry, GTK_ALIGN_FILL);
     libbalsa_set_hmargins(find_entry, 1);
-    gtk_container_add(GTK_CONTAINER(search_hbox), find_entry);
+    libbalsa_box_append(GTK_BOX(search_hbox), find_entry);
 
     gtk_widget_show(search_hbox);
     gtk_label_set_mnemonic_widget(GTK_LABEL(find_label), find_entry);
 
     button = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(button),
+    libbalsa_button_set_child(GTK_BUTTON(button),
                       gtk_image_new_from_icon_name("gtk-ok",
                                                    GTK_ICON_SIZE_BUTTON));
 
     libbalsa_set_hmargins(button, 1);
-    gtk_container_add(GTK_CONTAINER(search_hbox), button);
+    libbalsa_box_append(GTK_BOX(search_hbox), button);
 
     g_signal_connect(find_entry, "activate",
                      G_CALLBACK(bab_filter_entry_activate),
@@ -918,21 +918,21 @@ bab_window_new(GtkApplication * application)
 
     /* main vbox */
     main_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
-    gtk_container_add(GTK_CONTAINER(wnd), main_vbox);
+    libbalsa_window_set_child(GTK_WINDOW(wnd), main_vbox);
 
     contacts_app.notebook = gtk_notebook_new();
 
     gtk_widget_set_vexpand(contacts_app.notebook, TRUE);
     gtk_widget_set_valign(contacts_app.notebook, GTK_ALIGN_FILL);
     libbalsa_set_vmargins(contacts_app.notebook, 1);
-    gtk_container_add(GTK_CONTAINER(main_vbox), contacts_app.notebook);
+    libbalsa_box_append(GTK_BOX(main_vbox), contacts_app.notebook);
 
     browse_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
 
     /* Entry widget for finding an address */
     widget = bab_get_filter_box();
     libbalsa_set_vmargins(widget, 1);
-    gtk_container_add(GTK_CONTAINER(browse_widget), widget);
+    libbalsa_box_append(GTK_BOX(browse_widget), widget);
 
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_widget_show(scroll);
@@ -941,10 +941,10 @@ bab_window_new(GtkApplication * application)
     gtk_widget_set_vexpand(scroll, TRUE);
     gtk_widget_set_valign(scroll, GTK_ALIGN_FILL);
     libbalsa_set_vmargins(scroll, 1);
-    gtk_container_add(GTK_CONTAINER(browse_widget), scroll);
+    libbalsa_box_append(GTK_BOX(browse_widget), scroll);
 
     contacts_app.entry_list = bab_window_list_new();
-    gtk_container_add(GTK_CONTAINER(scroll), contacts_app.entry_list);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), contacts_app.entry_list);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(contacts_app.notebook), browse_widget,
 			     gtk_label_new(_("Browse")));
@@ -956,10 +956,10 @@ bab_window_new(GtkApplication * application)
                                          &contacts_app);
 
     libbalsa_set_vmargins(contacts_app.edit_widget, 1);
-    gtk_container_add(GTK_CONTAINER(edit_widget), contacts_app.edit_widget);
+    libbalsa_box_append(GTK_BOX(edit_widget), contacts_app.edit_widget);
 
     widget = bab_get_edit_button_box(&contacts_app);
-    gtk_container_add(GTK_CONTAINER(edit_widget), widget);
+    libbalsa_box_append(GTK_BOX(edit_widget), widget);
 
     gtk_notebook_append_page(GTK_NOTEBOOK(contacts_app.notebook), edit_widget,
 			     gtk_label_new(_("Edit")));

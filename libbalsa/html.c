@@ -467,7 +467,7 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
     label = libbalsa_create_wrap_label(text, FALSE);
 
     content_area = gtk_info_bar_get_content_area(info_bar);
-    gtk_container_add(GTK_CONTAINER(content_area), label);
+    libbalsa_box_append(GTK_BOX(content_area), label);
 
     g_signal_connect(info_bar, "realize",
                      G_CALLBACK(lbh_info_bar_realize_cb), info);
@@ -818,7 +818,7 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
     gtk_window_set_default_size(GTK_WINDOW(offline_window), render_width, LBH_NATURAL_SIZE);
     view = lbh_web_view_new(info, render_width, body->html_ext_loaded || (have_src_cid && !have_src_oth));
     webkit_web_view_set_zoom_level(view, HTML_PRINT_ZOOM);			/* heuristic setting, any way to calculate it? */
-    gtk_container_add(GTK_CONTAINER(offline_window), GTK_WIDGET(view));
+    libbalsa_window_set_child(GTK_WINDOW(offline_window), GTK_WIDGET(view));
     gtk_widget_show_all(offline_window);
 
     webkit_web_view_load_html(view, text, NULL);
@@ -900,13 +900,13 @@ libbalsa_html_new(LibBalsaMessageBody * body,
     /* Simple check for possible resource requests: */
     if (have_src_oth && !body->html_ext_loaded) {
         info->info_bar = lbh_info_bar(info);
-        gtk_container_add(GTK_CONTAINER(vbox), info->info_bar);
+        libbalsa_box_append(GTK_BOX(vbox), info->info_bar);
         g_debug("%s shows info_bar", __func__);
     }
 
     gtk_widget_set_vexpand(GTK_WIDGET(info->web_view), TRUE);
     gtk_widget_set_valign(GTK_WIDGET(info->web_view), GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), GTK_WIDGET(info->web_view));
+    libbalsa_box_append(GTK_BOX(vbox), GTK_WIDGET(info->web_view));
 
     webkit_web_view_load_html(info->web_view, text, NULL);
     g_free(text);

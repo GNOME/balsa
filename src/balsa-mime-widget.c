@@ -149,7 +149,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
         priv = balsa_mime_widget_get_instance_private(mw);
         container = priv->container;
         mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-        gtk_container_add(GTK_CONTAINER(mw), crypto_frame);
+        libbalsa_box_append(GTK_BOX(mw), crypto_frame);
         priv = balsa_mime_widget_get_instance_private(mw);
         priv->container = container;
     } else if (mime_body->was_encrypted &&
@@ -162,7 +162,7 @@ balsa_mime_widget_new(BalsaMessage * bm, LibBalsaMessageBody * mime_body, gpoint
         priv = balsa_mime_widget_get_instance_private(mw);
         container = priv->container;
         mw = g_object_new(BALSA_TYPE_MIME_WIDGET, NULL);
-        gtk_container_add(GTK_CONTAINER(mw), crypto_frame);
+        libbalsa_box_append(GTK_BOX(mw), crypto_frame);
         priv = balsa_mime_widget_get_instance_private(mw);
         priv->container = container;
     }
@@ -204,7 +204,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
 
     if (mime_body->filename) {
 	msg = g_strdup_printf(_("File name: %s"), mime_body->filename);
-	gtk_container_add(GTK_CONTAINER(mw), gtk_label_new(msg));
+	libbalsa_box_append(GTK_BOX(mw), gtk_label_new(msg));
 	g_free(msg);
     }
 
@@ -258,7 +258,7 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     msg_label = gtk_label_new(msg);
     g_free(msg);
     gtk_label_set_ellipsize(GTK_LABEL(msg_label), PANGO_ELLIPSIZE_END);
-    gtk_container_add(GTK_CONTAINER(mw), msg_label);
+    libbalsa_box_append(GTK_BOX(mw), msg_label);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, BMW_HBOX_SPACE);
     gtk_box_set_homogeneous(GTK_BOX(hbox), TRUE);
@@ -267,9 +267,9 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
                                            (gpointer) mime_body))) {
         gtk_widget_set_hexpand(button, TRUE);
         gtk_widget_set_halign(button, GTK_ALIGN_FILL);
-        gtk_container_add(GTK_CONTAINER(hbox), button);
+        libbalsa_box_append(GTK_BOX(hbox), button);
     } else {
-	gtk_container_add(GTK_CONTAINER(mw),
+	libbalsa_box_append(GTK_BOX(mw),
 			   gtk_label_new(_("No open or view action "
 					   "defined for this content type")));
     }
@@ -278,12 +278,12 @@ balsa_mime_widget_new_unknown(BalsaMessage * bm,
     button = gtk_button_new_with_mnemonic(_("S_ave part"));
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), button);
+    libbalsa_box_append(GTK_BOX(hbox), button);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(balsa_mime_widget_ctx_menu_save),
 		     (gpointer) mime_body);
 
-    gtk_container_add(GTK_CONTAINER(mw), hbox);
+    libbalsa_box_append(GTK_BOX(mw), hbox);
 
     return mw;
 }

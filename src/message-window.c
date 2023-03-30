@@ -865,7 +865,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
         gtk_application_window_new(balsa_app.application);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_container_add(GTK_CONTAINER(window), vbox);
+    libbalsa_window_set_child(GTK_WINDOW(window), vbox);
 
     /* Set up the GMenu structures */
     menubar = libbalsa_window_get_menu_bar(GTK_APPLICATION_WINDOW(window),
@@ -880,7 +880,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
         return;
     }
     gtk_widget_show(menubar);
-    gtk_container_add(GTK_CONTAINER(vbox), menubar);
+    libbalsa_box_append(GTK_BOX(vbox), menubar);
 
     mw->headers_shown = balsa_app.shown_headers;
     mw->show_all_headers = FALSE;
@@ -888,7 +888,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     model = message_window_get_toolbar_model();
 
     mw->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
-    gtk_container_add(GTK_CONTAINER(vbox), mw->toolbar);
+    libbalsa_box_append(GTK_BOX(vbox), mw->toolbar);
 
     gtk_window_set_role(GTK_WINDOW(window), "message");
 
@@ -922,7 +922,7 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 
     gtk_widget_set_vexpand(mw->bmessage, TRUE);
     gtk_widget_set_valign(mw->bmessage, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), mw->bmessage);
+    libbalsa_box_append(GTK_BOX(vbox), mw->bmessage);
     gtk_widget_show(vbox);
 
     g_signal_connect(mw->bmessage, "select-part",

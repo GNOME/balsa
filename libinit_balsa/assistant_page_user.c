@@ -71,7 +71,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     gtk_label_set_line_wrap(label, TRUE);
     gtk_widget_set_vexpand(GTK_WIDGET(label), TRUE);
     gtk_widget_set_valign(GTK_WIDGET(label), GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(label));
+    libbalsa_box_append(GTK_BOX(page), GTK_WIDGET(label));
 
     grid = GTK_GRID(gtk_grid_new());
     gtk_grid_set_row_spacing(grid, 2);
@@ -94,7 +94,7 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     g_free(preset);
 
     libbalsa_set_vmargins(GTK_WIDGET(grid), 3);
-    gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(grid));
+    libbalsa_box_append(GTK_BOX(page), GTK_WIDGET(grid));
 
     user->need_set = FALSE;
 }

@@ -492,7 +492,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 	geometry_manager_attach(GTK_WINDOW(dialog), "AutocryptDB");
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
+    libbalsa_box_append(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), vbox);
     gtk_widget_set_vexpand(vbox, TRUE);
 
     scrolled_window = gtk_scrolled_window_new(NULL, NULL);
@@ -501,7 +501,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_widget_set_vexpand(scrolled_window, TRUE);
     gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), scrolled_window);
+    libbalsa_box_append(GTK_BOX(vbox), scrolled_window);
 
     model = gtk_list_store_new(AC_DB_VIEW_COLUMNS, G_TYPE_STRING,	/* address */
     	G_TYPE_INT64,												/* last seen timestamp value (for sorting) */
@@ -519,7 +519,7 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
     gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture), GTK_PHASE_CAPTURE);
     g_signal_connect(tree_view, "popup-menu", G_CALLBACK(popup_menu_cb), NULL);
 
-    gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window), tree_view);
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_view));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
 

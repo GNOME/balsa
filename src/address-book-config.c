@@ -379,7 +379,7 @@ create_osmo_dialog(AddressBookConfig *abc)
 
     grid = libbalsa_create_grid();
     content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    gtk_container_add(GTK_CONTAINER(content_area), grid);
+    libbalsa_box_append(GTK_BOX(content_area), grid);
     label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
     gtk_size_group_add_widget(size_group, label);
     abc->name_entry =
@@ -451,7 +451,7 @@ create_externq_dialog(AddressBookConfig * abc)
     }
 
     dialog = create_generic_dialog(abc, "Extern");
-    gtk_container_add(GTK_CONTAINER
+    libbalsa_box_append(GTK_BOX
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                       grid);
     return dialog;
@@ -520,7 +520,7 @@ create_ldap_dialog(AddressBookConfig * abc)
     g_free(host);
     
     dialog = create_generic_dialog(abc, "LDAP");
-    gtk_container_add(GTK_CONTAINER
+    libbalsa_box_append(GTK_BOX
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                       grid);
     return dialog;
@@ -553,7 +553,7 @@ create_gpe_dialog(AddressBookConfig * abc)
     add_radio_buttons(grid, 1, abc);
 
     dialog = create_generic_dialog(abc, "GPE");
-    gtk_container_add(GTK_CONTAINER
+    libbalsa_box_append(GTK_BOX
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                       grid);
     return dialog;

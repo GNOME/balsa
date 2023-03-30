@@ -1552,12 +1552,12 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
     content_box = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
 
     libbalsa_set_vmargins(info, HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(content_box), info);
+    libbalsa_box_append(GTK_BOX(content_box), info);
 
     gtk_widget_set_vexpand(charset_button, TRUE);
     gtk_widget_set_valign(charset_button, GTK_ALIGN_FILL);
     libbalsa_set_vmargins(charset_button, HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER(content_box), charset_button);
+    libbalsa_box_append(GTK_BOX(content_box), charset_button);
 
     gtk_widget_show(info);
     gtk_widget_show(charset_button);
@@ -1571,11 +1571,11 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
         gtk_widget_set_vexpand(hbox, TRUE);
         gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
         libbalsa_set_vmargins(hbox, HIG_PADDING);
-        gtk_container_add(GTK_CONTAINER(content_box), hbox);
+        libbalsa_box_append(GTK_BOX(content_box), hbox);
 
         gtk_widget_set_hexpand(label, TRUE);
         gtk_widget_set_halign(label, GTK_ALIGN_FILL);
-        gtk_container_add(GTK_CONTAINER(hbox), label);
+        libbalsa_box_append(GTK_BOX(hbox), label);
 
         gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo_box),
                                        mime_type);
@@ -1588,7 +1588,7 @@ sw_get_user_codeset(BalsaSendmsg * bsmsg, gboolean * change_type,
 
         gtk_widget_set_hexpand(combo_box, TRUE);
         gtk_widget_set_halign(combo_box, GTK_ALIGN_FILL);
-        gtk_container_add(GTK_CONTAINER(hbox), combo_box);
+        libbalsa_box_append(GTK_BOX(hbox), combo_box);
 
         gtk_widget_show_all(hbox);
     }
@@ -2360,11 +2360,11 @@ create_email_header(BalsaSendmsg         *bsmsg,
      * recipient list is more than one line high: */
     gtk_scrolled_window_set_min_content_height(GTK_SCROLLED_WINDOW(scroll),
                                                60);
-    gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(*view));
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), GTK_WIDGET(*view));
 
     header->body = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(header->body), GTK_SHADOW_IN);
-    gtk_container_add(GTK_CONTAINER(header->body), scroll);
+    libbalsa_frame_set_child(GTK_FRAME(header->body), scroll);
 
     create_email_or_string_header(bsmsg, grid, _(label), y_pos, header);
 
@@ -2705,8 +2705,8 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
 
     frame = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-    gtk_container_add(GTK_CONTAINER(sw), tree_view);
-    gtk_container_add(GTK_CONTAINER(frame), sw);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(sw), tree_view);
+    libbalsa_frame_set_child(GTK_FRAME(frame), sw);
 
     gtk_widget_set_hexpand(frame, TRUE);
     gtk_grid_attach(GTK_GRID(grid), frame, 1, 0, 1, 1);
@@ -2900,7 +2900,7 @@ create_text_area(BalsaSendmsg * bsmsg)
     scroll = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
     				   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-    gtk_container_add(GTK_CONTAINER(scroll), bsmsg->text);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), bsmsg->text);
     g_signal_connect(bsmsg->text, "drag_data_received",
 		     G_CALLBACK(drag_data_quote), bsmsg);
     /* GTK_DEST_DEFAULT_ALL in drag_set would trigger bug 150141 */
@@ -3404,17 +3404,17 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2 * HIG_PADDING);
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2 * HIG_PADDING);
 
-    gtk_container_add(GTK_CONTAINER(vbox), label);
-    gtk_container_add(GTK_CONTAINER(hbox), image);
+    libbalsa_box_append(GTK_BOX(vbox), label);
+    libbalsa_box_append(GTK_BOX(hbox), image);
 
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    libbalsa_box_append(GTK_BOX(hbox), vbox);
 
     content_box = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     gtk_widget_set_vexpand(hbox, TRUE);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(content_box), hbox);
+    libbalsa_box_append(GTK_BOX(content_box), hbox);
 
     if (stats->decrypted > 0U) {
     	GtkWidget *warning;
@@ -3434,7 +3434,7 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
     			  "unintentionally leak sensitive information."), FALSE);
     	}
         gtk_widget_set_valign(warning, GTK_ALIGN_START);
-        gtk_container_add(GTK_CONTAINER(vbox), warning);
+        libbalsa_box_append(GTK_BOX(vbox), warning);
     }
 
     gtk_container_set_border_width(GTK_CONTAINER(dialog), HIG_PADDING);
@@ -3448,7 +3448,7 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
                                    GTK_POLICY_AUTOMATIC);
     gtk_widget_set_vexpand(scroll, TRUE);
     gtk_widget_set_valign(scroll, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(vbox), scroll);
+    libbalsa_box_append(GTK_BOX(vbox), scroll);
 
     /* add the tree view */
     tree_view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(tree_store));
@@ -3471,7 +3471,7 @@ quote_parts_select_dlg(GtkTreeStore               *tree_store,
     calculate_expander_toggles(GTK_TREE_MODEL(tree_store), &iter);
 
     /* add, show & run */
-    gtk_container_add(GTK_CONTAINER(scroll), tree_view);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scroll), tree_view);
     gtk_widget_show_all(hbox);
     result = gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_OK;
     gtk_widget_destroy(dialog);
@@ -3512,7 +3512,7 @@ show_decrypted_warning(GtkWindow *parent)
 	remind_btn = gtk_check_button_new_with_label(_("Do not remind me again."));
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(remind_btn), FALSE);
 	gtk_widget_show(remind_btn);
-	gtk_container_add(GTK_CONTAINER(message_area), remind_btn);
+	libbalsa_box_append(GTK_BOX(message_area), remind_btn);
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	balsa_app.warn_reply_decrypted = !gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(remind_btn));
 	gtk_widget_destroy(dialog);
@@ -5146,38 +5146,38 @@ subject_not_empty(BalsaSendmsg * bsmsg)
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2 * HIG_PADDING);
     gtk_widget_set_vexpand(hbox, TRUE);
     gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(dialog_vbox), hbox);
+    libbalsa_box_append(GTK_BOX(dialog_vbox), hbox);
     gtk_container_set_border_width (GTK_CONTAINER (hbox), HIG_PADDING);
 
     image = gtk_image_new_from_icon_name("dialog-question",
                                          GTK_ICON_SIZE_DIALOG);
-    gtk_container_add(GTK_CONTAINER (hbox), image);
+    libbalsa_box_append(GTK_BOX(hbox), image);
     gtk_widget_set_valign(image, GTK_ALIGN_START);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2 * HIG_PADDING);
     gtk_widget_set_hexpand(vbox, TRUE);
     gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+    libbalsa_box_append(GTK_BOX(hbox), vbox);
 
     text_str = g_strdup_printf("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
 			       _("You did not specify a subject for this message"),
 			       _("If you would like to provide one, enter it below."));
     label = libbalsa_create_wrap_label(text_str, TRUE);
     g_free(text_str);
-    gtk_container_add(GTK_CONTAINER (vbox), label);
+    libbalsa_box_append(GTK_BOX(vbox), label);
     gtk_widget_set_valign(label, GTK_ALIGN_START);
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER (vbox), hbox);
+    libbalsa_box_append(GTK_BOX(vbox), hbox);
 
     label = gtk_label_new (_("Subject:"));
-    gtk_container_add(GTK_CONTAINER (hbox), label);
+    libbalsa_box_append(GTK_BOX(hbox), label);
 
     subj_entry = gtk_entry_new ();
     gtk_entry_set_text(GTK_ENTRY(subj_entry), _("(no subject)"));
     gtk_widget_set_hexpand(subj_entry, TRUE);
     gtk_widget_set_halign(subj_entry, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), subj_entry);
+    libbalsa_box_append(GTK_BOX(hbox), subj_entry);
 
     gtk_entry_set_activates_default (GTK_ENTRY (subj_entry), TRUE);
     gtk_dialog_set_default_response(GTK_DIALOG (no_subj_dialog),
@@ -6873,7 +6873,7 @@ sendmsg_window_new()
 
     gtk_window_set_role(GTK_WINDOW(window), "compose");
 
-    gtk_container_add(GTK_CONTAINER(window), main_box);
+    libbalsa_window_set_child(GTK_WINDOW(window), main_box);
     gtk_widget_show_all(window);
 
     bsmsg->type = SEND_NORMAL;
@@ -6909,7 +6909,7 @@ sendmsg_window_new()
     }
     gtk_widget_show(menubar);
 
-    gtk_container_add(GTK_CONTAINER(main_box), menubar);
+    libbalsa_box_append(GTK_BOX(main_box), menubar);
 
     /*
      * Set up the spell-checker language menu
@@ -6923,7 +6923,7 @@ sendmsg_window_new()
 
     model = sendmsg_window_get_toolbar_model();
     bsmsg->toolbar = balsa_toolbar_new(model, G_ACTION_MAP(window));
-    gtk_container_add(GTK_CONTAINER(main_box), bsmsg->toolbar);
+    libbalsa_box_append(GTK_BOX(main_box), bsmsg->toolbar);
 
     bsmsg->flow = !balsa_app.wordwrap;
     sw_action_set_enabled(bsmsg, "reflow", bsmsg->flow);
@@ -6955,7 +6955,7 @@ sendmsg_window_new()
     bsmsg->paned = paned = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
     gtk_widget_set_vexpand(paned, TRUE);
     gtk_widget_set_valign(paned, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(main_box), paned);
+    libbalsa_box_append(GTK_BOX(main_box), paned);
     gtk_widget_show(paned);
 
     /* create the top portion with the to, from, etc in it */

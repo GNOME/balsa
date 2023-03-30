@@ -249,7 +249,7 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
         gtk_widget_set_vexpand(scrolled_window, TRUE);
         gtk_widget_set_valign(scrolled_window, GTK_ALIGN_FILL);
         libbalsa_set_vmargins(scrolled_window, 1);
-        gtk_container_add(GTK_CONTAINER
+        libbalsa_box_append(GTK_BOX
                            (gtk_dialog_get_content_area
                             (GTK_DIALOG(information_dialog))),
                            scrolled_window);
@@ -258,7 +258,7 @@ balsa_information_list(GtkWindow *parent, LibBalsaInformationType type,
 
 	/* The list itself */
 	information_list = balsa_information_list_new();
-	gtk_container_add(GTK_CONTAINER(scrolled_window),
+	libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window),
 			  information_list);
         g_signal_connect(information_dialog, "response",
                          G_CALLBACK(balsa_information_list_response_cb),

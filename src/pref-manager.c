@@ -1023,7 +1023,7 @@ add_button_to_box(const gchar * label, GCallback cb, gpointer cb_data,
 {
     GtkWidget *button = gtk_button_new_with_mnemonic(label);
     g_signal_connect_swapped(button, "clicked", cb, cb_data);
-    gtk_container_add(GTK_CONTAINER(box), button);
+    libbalsa_box_append(GTK_BOX(box), button);
 
     return button;
 }
@@ -1993,7 +1993,7 @@ pm_grid_add_remote_mailbox_servers_group(GtkWidget * grid_widget)
                                                  NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 
-    gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledwindow), tree_view);
 
     g_signal_connect(pui->mail_servers, "row-activated",
                      G_CALLBACK(server_edit_cb), NULL);
@@ -2081,7 +2081,7 @@ pm_grid_add_outgoing_mail_group(GtkWidget * grid_widget)
                                                       "text", 0, NULL);
     gtk_tree_view_append_column(GTK_TREE_VIEW(tree_view), column);
 
-    gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolled_window), tree_view);
 
     g_signal_connect(pui->smtp_servers, "row-activated",
                      G_CALLBACK(smtp_server_edit_cb), NULL);
@@ -2802,7 +2802,7 @@ pm_grid_add_address_books_group(GtkWidget * grid_widget)
     g_signal_connect(tree_view, "row-activated", 
                      G_CALLBACK(address_book_edit_cb), NULL);
 
-    gtk_container_add(GTK_CONTAINER(scrolledwindow), tree_view);
+    libbalsa_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrolledwindow), tree_view);
 
     address_book_add_menu =
         balsa_address_book_add_menu(address_book_change,
@@ -3325,7 +3325,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 	content_area = gtk_dialog_get_content_area(GTK_DIALOG(property_box));
-	gtk_container_add(GTK_CONTAINER(content_area), hbox);
+	libbalsa_box_append(GTK_BOX(content_area), hbox);
 
     store = gtk_tree_store_new(PM_NUM_COLS,
                                G_TYPE_STRING,   /* PM_TEXT_COL     */
@@ -3334,7 +3334,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
             );
     pui->view = view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
     libbalsa_set_margins(view , BORDER_WIDTH);
-    gtk_container_add(GTK_CONTAINER(hbox), view);
+    libbalsa_box_append(GTK_BOX(hbox), view);
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
 
     renderer = gtk_cell_renderer_text_new();
@@ -3348,7 +3348,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     gtk_stack_set_transition_type((GtkStack *) stack,
                                   GTK_STACK_TRANSITION_TYPE_SLIDE_UP_DOWN);
     gtk_stack_set_transition_duration((GtkStack *) stack, 400);
-    gtk_container_add(GTK_CONTAINER(hbox), stack);
+    libbalsa_box_append(GTK_BOX(hbox), stack);
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
     g_signal_connect(selection, "changed",

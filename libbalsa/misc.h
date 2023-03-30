@@ -192,5 +192,14 @@ GtkWidget * libbalsa_add_mnemonic_button_to_box(const gchar *markup,
                                                 GtkWidget   *box,
                                                 GtkAlign     align);
 
+void libbalsa_box_append(GtkBox *box, GtkWidget *child);
+void libbalsa_button_set_child(GtkButton *button, GtkWidget *child);
+void libbalsa_expander_set_child(GtkExpander *expander, GtkWidget *child);
+void libbalsa_frame_set_child(GtkFrame *frame, GtkWidget *child);
+void libbalsa_revealer_set_child(GtkRevealer *revealer, GtkWidget *child);
+void libbalsa_scrolled_window_set_child(GtkScrolledWindow *scrolled_window, GtkWidget *child);
+void libbalsa_search_bar_set_child(GtkSearchBar *search_bar, GtkWidget *child);
+void libbalsa_viewport_set_child(GtkViewport *viewport, GtkWidget *child);
+void libbalsa_window_set_child(GtkWindow *window, GtkWidget *child);
 
 #endif				/* __LIBBALSA_MISC_H__ */

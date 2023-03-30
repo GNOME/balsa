@@ -206,7 +206,7 @@ libbalsa_progress_dialog_ensure_real(ProgressDialog *progress_dialog,
 
     	progress_widget = create_progress_widget(progress_id);
     	gtk_revealer_set_reveal_child(GTK_REVEALER(progress_widget), TRUE);
-    	gtk_container_add(GTK_CONTAINER(content_box), progress_widget);
+    	libbalsa_box_append(GTK_BOX(content_box), progress_widget);
     	gtk_widget_show_all(progress_widget);
     }
 }
@@ -302,17 +302,17 @@ create_progress_widget(const gchar *progress_id)
     g_signal_connect(widget_data->revealer, "destroy", G_CALLBACK(progress_data_destroy_cb), widget_data);
 
 	box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
-	gtk_container_add(GTK_CONTAINER(widget_data->revealer), box);
+	libbalsa_revealer_set_child(GTK_REVEALER(widget_data->revealer), box);
 
 	label = gtk_label_new(progress_id);
-	gtk_container_add(GTK_CONTAINER(box), label);
+	libbalsa_box_append(GTK_BOX(box), label);
 
 	widget_data->label = gtk_label_new(" ");
 	gtk_label_set_line_wrap(GTK_LABEL(widget_data->label), TRUE);
-	gtk_container_add(GTK_CONTAINER(box), widget_data->label);
+	libbalsa_box_append(GTK_BOX(box), widget_data->label);
 
 	widget_data->progress = gtk_progress_bar_new();
-	gtk_container_add(GTK_CONTAINER(box), widget_data->progress);
+	libbalsa_box_append(GTK_BOX(box), widget_data->progress);
 
 	return widget_data->revealer;
 }

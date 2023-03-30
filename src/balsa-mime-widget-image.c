@@ -206,7 +206,7 @@ balsa_mime_widget_new_image(BalsaMessage * bm,
     mw = (BalsaMimeWidget *) mwi;
 
     widget = gtk_event_box_new();
-    gtk_container_add(GTK_CONTAINER(mw), widget);
+    libbalsa_box_append(GTK_BOX(mw), widget);
 
     gesture = gtk_gesture_multi_press_new(widget);
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(gesture), 0);

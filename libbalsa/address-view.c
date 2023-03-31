@@ -1027,6 +1027,29 @@ keyserver_thread_func(gpointer data)
     return NULL;
 }
 
+typedef struct {
+    gchar *addr_name;
+    gchar *icon_name;
+    GList *keys;
+    InternetAddressList *list;
+} lbav_keystate_activated_data_t;
+
+static void
+lbav_keystate_activated_response(GtkDialog *self,
+                                 gint       response,
+                                 gpointer   user_data)
+{
+    lbav_keystate_activated_data_t *data = user_data;
+
+    gtk_widget_destroy((GtkWidget *) self);
+
+    g_free(data->addr_name);
+    g_free(data->icon_name);
+    g_list_free_full(data->keys, (GDestroyNotify) gpgme_key_unref);
+    g_object_unref(data->list);
+    g_free(data);
+}
+
 static void
 lbav_keystate_activated(LibBalsaAddressView *address_view,
                         GtkTreePath         *path)
@@ -1066,13 +1089,23 @@ lbav_keystate_activated(LibBalsaAddressView *address_view,
                 GtkWidget *dialog;
                 gchar *message;
                 guint key_count;
+                lbav_keystate_activated_data_t *data;
 
                 key_count = g_list_length(keys);
                 message = g_strdup_printf(ngettext("Encryption key for “%s”", "Encryption keys for “%s”", key_count), addr_name);
                 dialog = libbalsa_key_list_dialog(NULL, GTK_BUTTONS_CLOSE, keys, GPG_SUBKEY_CAP_ENCRYPT, NULL, message);
                 g_free(message);
-                (void) gtk_dialog_run(GTK_DIALOG(dialog));
-                gtk_widget_destroy(dialog);
+
+                data = g_new(lbav_keystate_activated_data_t, 1);
+                data->addr_name = addr_name;
+                data->icon_name = icon_name;
+                data->list = list;
+                data->keys = keys;
+
+                g_signal_connect(dialog, "response",
+                                 G_CALLBACK(lbav_keystate_activated_response), data);
+                gtk_widget_show_all(dialog);
+                return;
             }
             g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
             g_object_unref(list);

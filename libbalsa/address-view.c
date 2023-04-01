@@ -1104,6 +1104,7 @@ lbav_keystate_activated(LibBalsaAddressView *address_view,
 
                 g_signal_connect(dialog, "response",
                                  G_CALLBACK(lbav_keystate_activated_response), data);
+                gtk_window_set_modal(GTK_WINDOW(dialog, TRUE));
                 gtk_widget_show_all(dialog);
                 return;
             }

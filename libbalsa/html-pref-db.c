@@ -120,6 +120,7 @@ libbalsa_html_prefer_set_load_content(InternetAddressList *from, gboolean state)
 void
 libbalsa_html_pref_dialog_run(GtkWindow *parent)
 {
+    GtkDialogFlags flags;
 	GtkWidget *dialog;
 	GtkWidget *vbox;
 	GtkWidget *scrolled_window;
@@ -135,7 +136,8 @@ libbalsa_html_pref_dialog_run(GtkWindow *parent)
 		return;
 	}
 
-	dialog = gtk_dialog_new_with_buttons(_("HTML preferences"), parent, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+	flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags();
+	dialog = gtk_dialog_new_with_buttons(_("HTML preferences"), parent, flags,
 		_("_Close"), GTK_RESPONSE_CLOSE, NULL);
 	geometry_manager_attach(GTK_WINDOW(dialog), "HTMLPrefsDB");
 
@@ -210,8 +212,8 @@ libbalsa_html_pref_dialog_run(GtkWindow *parent)
 	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(model), PREFS_ADDRESS_COLUMN, GTK_SORT_ASCENDING);
 	g_object_unref(model);
 
-	(void) gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
+	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+	gtk_widget_show_all(dialog);
 }
 
 

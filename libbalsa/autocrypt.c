@@ -459,6 +459,17 @@ autocrypt_recommendation(InternetAddressList *recipients, GList **missing_keys, 
 }
 
 
+static void
+autocrypt_db_dialog_run_response(GtkDialog *self,
+                                 gint       response,
+                                 gpointer   user_data)
+{
+    GList *keys = user_data;
+
+    gtk_widget_destroy((GtkWidget *) self);
+    g_list_free_full(keys, (GDestroyNotify) g_bytes_unref);
+}
+
 /* documentation: see header file */
 void
 autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
@@ -476,7 +487,8 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 	int sqlite_res;
 
 	dialog = gtk_dialog_new_with_buttons(_("Autocrypt database"), parent,
-		GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(), _("_Close"), GTK_RESPONSE_CLOSE, NULL);
+		GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+                _("_Close"), GTK_RESPONSE_CLOSE, NULL);
 	geometry_manager_attach(GTK_WINDOW(dialog), "AutocryptDB");
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
@@ -573,9 +585,9 @@ autocrypt_db_dialog_run(const gchar *date_string, GtkWindow *parent)
 	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(model), AC_ADDRESS_COLUMN, GTK_SORT_ASCENDING);
     g_object_unref(model);
 
-	(void) gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
-	g_list_free_full(keys, (GDestroyNotify) g_bytes_unref);
+    g_signal_connect(dialog, "response",
+                     G_CALLBACK(autocrypt_db_dialog_run_response), keys);
+    gtk_widget_show_all(dialog);
 }
 
 
@@ -927,6 +939,28 @@ popup_menu_real(GtkWidget *widget, const GdkEvent *event)
     }
 }
 
+typedef struct {
+    gchar *temp_dir;
+    gpgme_ctx_t ctx;
+    GList *keys;
+    gchar *mail_addr;
+} show_key_details_data_t;
+
+static void
+show_key_details_response(GtkDialog *self,
+                          gint       response,
+                          gpointer   user_data)
+{
+    show_key_details_data_t *data = user_data;
+
+    gtk_widget_destroy((GtkWidget *) self);
+
+    g_list_free_full(data->keys, (GDestroyNotify) gpgme_key_unref);
+    gpgme_release(data->ctx);
+    libbalsa_delete_directory(data->temp_dir, NULL);
+    g_free(data->mail_addr);
+    g_free(data);
+}
 
 /* key context menu callback: show key details */
 static void
@@ -956,22 +990,34 @@ show_key_details_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 				GtkWidget *toplevel;
 				GtkWindow *window;
 				GtkWidget *dialog;
+                                show_key_details_data_t *data;
 
 				toplevel = gtk_widget_get_toplevel(GTK_WIDGET(user_data));
 				window = GTK_IS_WINDOW(toplevel) ? GTK_WINDOW(toplevel) : NULL;
 				if (keys != NULL) {
 					dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, (gpgme_key_t) keys->data, GPG_SUBKEY_CAP_ALL,
 						NULL, NULL);
+                                        gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
 				} else {
-					dialog = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+                                    dialog =
+                                        gtk_message_dialog_new(window,
+                                                               GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
 						GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
 						/* Translators: #1 email address */
 						_("The database entry for “%s” does not contain a key."),
 						mail_addr);
 				}
-				(void) gtk_dialog_run(GTK_DIALOG(dialog));
-				gtk_widget_destroy(dialog);
-				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
+
+                                data = g_new(show_key_details_data_t, 1);
+                                data->keys = keys;
+                                data->ctx = ctx;
+                                data->temp_dir = temp_dir;
+                                data->mail_addr = mail_addr;
+
+                                g_signal_connect(dialog, "response",
+                                                 G_CALLBACK(show_key_details_response), data);
+                                gtk_widget_show_all(dialog);
+                                return;
 			}
 			gpgme_release(ctx);
 			libbalsa_delete_directory(temp_dir, NULL);
@@ -986,6 +1032,37 @@ show_key_details_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
 	}
 }
 
+typedef struct {
+    gchar *mail_addr;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+} remove_key_data_t;
+
+static void
+remove_key_response(GtkDialog *self,
+                    gint       response,
+                    gpointer   user_data)
+{
+    remove_key_data_t *data = user_data;
+
+    gtk_widget_destroy((GtkWidget *) self);
+
+    if (response == GTK_RESPONSE_YES) {
+        G_LOCK(db_mutex);
+        if ((sqlite3_bind_text(query[6], 1, data->mail_addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
+            (sqlite3_step(query[6]) != SQLITE_DONE)) {
+            g_warning("deleting database entry for \"%s\" failed: %s", data->mail_addr, sqlite3_errmsg(autocrypt_db));
+        } else {
+            g_debug("deleted database entry for \"%s\"", data->mail_addr);
+        }
+        sqlite3_reset(query[6]);
+        G_UNLOCK(db_mutex);
+        gtk_list_store_remove(GTK_LIST_STORE(data->model), &data->iter);
+    }
+
+    g_free(data->mail_addr);
+    g_free(data);
+}
 
 /* key context menu callback: remove key from database */
 static void
@@ -996,34 +1073,32 @@ remove_key_cb(GtkMenuItem G_GNUC_UNUSED *menuitem, gpointer user_data)
     GtkTreeIter iter;
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(user_data));
-	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		GtkWidget *toplevel;
-    	GtkWindow *window;
-		GtkWidget *dialog;
-		gchar *mail_addr;
+    if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
+        GtkWidget *toplevel;
+        GtkWindow *window;
+        GtkWidget *dialog;
+        gchar *mail_addr;
+        remove_key_data_t *data;
 
-    	toplevel = gtk_widget_get_toplevel(GTK_WIDGET(user_data));
-    	window = GTK_IS_WINDOW(toplevel) ? GTK_WINDOW(toplevel) : NULL;
-    	gtk_tree_model_get(model, &iter, AC_ADDRESS_COLUMN, &mail_addr, -1);
-		dialog = gtk_message_dialog_new(window, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-			GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-			/* Translators: #1 email address */
-			_("Delete the Autocrypt key for “%s” from the database?"), mail_addr);
-		if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_YES) {
-			G_LOCK(db_mutex);
-			if ((sqlite3_bind_text(query[6], 1, mail_addr, -1, SQLITE_STATIC) != SQLITE_OK) ||
-				(sqlite3_step(query[6]) != SQLITE_DONE)) {
-				g_warning("deleting database entry for \"%s\" failed: %s", mail_addr, sqlite3_errmsg(autocrypt_db));
-			} else {
-				g_debug("deleted database entry for \"%s\"", mail_addr);
-			}
-			sqlite3_reset(query[6]);
-			G_UNLOCK(db_mutex);
-			gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
-		}
-		gtk_widget_destroy(dialog);
-		g_free(mail_addr);
-	}
+        toplevel = gtk_widget_get_toplevel(GTK_WIDGET(user_data));
+        window = GTK_IS_WINDOW(toplevel) ? GTK_WINDOW(toplevel) : NULL;
+        gtk_tree_model_get(model, &iter, AC_ADDRESS_COLUMN, &mail_addr, -1);
+        dialog =
+            gtk_message_dialog_new(window,
+                                   GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
+                                   GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+                                   /* Translators: #1 email address */
+                                   _("Delete the Autocrypt key for “%s” from the database?"), mail_addr);
+
+        data = g_new(remove_key_data_t, 1);
+        data->mail_addr = mail_addr;
+        data->model = model;
+        data->iter = iter;
+
+        g_signal_connect(dialog, "response",
+                         G_CALLBACK(remove_key_response), data);
+        gtk_widget_show_all(dialog);
+    }
 }
 
 

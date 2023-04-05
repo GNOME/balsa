@@ -235,7 +235,7 @@ libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags)
 typedef struct {
     GMutex lock;
     GCond condvar;
-    int (*cb)(void *arg);
+    void (*cb)(void *arg);
     void *arg;
     gboolean done;
     int res;
@@ -249,9 +249,7 @@ ask_idle(gpointer data)
 {
     AskData* ad = (AskData*)data;
     g_debug("ask_idle: ENTER %p", data);
-    ad->res = (ad->cb)(ad->arg);
-    ad->done = TRUE;
-    g_cond_signal(&ad->condvar);
+    (ad->cb)(ad);
     g_debug("ask_idle: LEAVE %p", data);
     return FALSE;
 }
@@ -261,32 +259,31 @@ ask_idle(gpointer data)
    imap_dir_cb()/imap_folder_imap_dir().
 */
 static int
-libbalsa_ask(gboolean (*cb)(void *arg), void *arg)
+libbalsa_ask(void (*cb)(void *arg), void *arg)
 {
-    AskData ad;
+    AskData *ad = arg;
 
     if (!libbalsa_am_i_subthread()) {
-        int ret;
         g_debug("main thread asks the following question");
-        ret = cb(arg);
-        return ret;
+        g_warning("Must be in a thread!");
+        return -1;
     }
     g_debug("side thread asks the following question");
-    g_mutex_init(&ad.lock);
-    g_cond_init(&ad.condvar);
-    ad.cb  = cb;
-    ad.arg = arg;
-    ad.done = FALSE;
+    g_mutex_init(&ad->lock);
+    g_cond_init(&ad->condvar);
+    ad->cb  = cb;
+    ad->arg = arg;
+    ad->done = FALSE;
 
-    g_mutex_lock(&ad.lock);
+    g_mutex_lock(&ad->lock);
     g_idle_add(ask_idle, &ad);
-    while (!ad.done) {
-    	g_cond_wait(&ad.condvar, &ad.lock);
+    while (!ad->done) {
+        g_cond_wait(&ad->condvar, &ad->lock);
     }
 
-    g_cond_clear(&ad.condvar);
-    g_mutex_unlock(&ad.lock);
-    return ad.res;
+    g_cond_clear(&ad->condvar);
+    g_mutex_unlock(&ad->lock);
+    return ad->res;
 }
 
 
@@ -320,6 +317,7 @@ libbalsa_is_cert_known(GTlsCertificate      *cert,
 	gboolean cert_ok;
 	GList *lst;
 
+        g_message("%s in subthread? %s", __func__, libbalsa_am_i_subthread() ? "yes" : "no");
 	/* check the list of accepted certificates for this session */
 	g_mutex_lock(&certificate_lock);
 	for (lst = accepted_certs; lst; lst = lst->next) {
@@ -382,19 +380,51 @@ libbalsa_is_cert_known(GTlsCertificate      *cert,
 
 */
 struct AskCertData {
+    AskData ask_data;
     GTlsCertificate *certificate;
     gchar *explanation;
 };
 
+static void
+ask_cert_real_finish(gint                response,
+                     struct AskCertData *acd)
+{
+    unsigned i;
 
-static int
+    switch(response) {
+    case 0:
+        i = CERT_ACCEPT_SESSION;
+        break;
+    case 1:
+        i = CERT_ACCEPT_PERMANENT;
+        break;
+    case GTK_RESPONSE_CANCEL:
+    default:
+        i = CERT_ACCEPT_NO;
+        break;
+    }
+
+    acd->ask_data.res = i;
+    acd->ask_data.done = TRUE;
+    g_cond_signal(&acd->ask_data.condvar);
+}
+
+static void
+ask_cert_real_response(GtkDialog *self,
+                       gint       response,
+                       gpointer   user_data)
+{
+    gtk_widget_destroy((GtkWidget *) self);
+    ask_cert_real_finish(response, user_data);
+}
+
+static void
 ask_cert_real(void *data)
 {
     struct AskCertData *acd = (struct AskCertData*)data;
     GtkWidget *dialog;
     GtkWidget *cert_widget;
     GString *str;
-    unsigned i;
     GtkWidget *label;
     GtkWidget *content_area;
 
@@ -402,7 +432,8 @@ ask_cert_real(void *data)
     cert_widget = x509_cert_chain_tls(acd->certificate);
     if (cert_widget == NULL) {
     	libbalsa_information(LIBBALSA_INFORMATION_WARNING, _("broken TLS certificate"));
-    	return CERT_ACCEPT_NO;
+        ask_cert_real_finish(CERT_ACCEPT_NO, acd);
+        return;
     }
 
     dialog = gtk_dialog_new_with_buttons(_("SSL/TLS certificate"),
@@ -421,6 +452,8 @@ ask_cert_real(void *data)
                            "could not be verified.</b></big>\n"
                            "Reason: %s"),
                     acd->explanation);
+    g_free(acd->explanation);
+
     label = gtk_label_new(str->str);
     g_string_free(str, TRUE);
     gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
@@ -434,21 +467,9 @@ ask_cert_real(void *data)
     gtk_container_add(GTK_CONTAINER(content_area), cert_widget);
     gtk_widget_show_all(cert_widget);
 
-    switch(gtk_dialog_run(GTK_DIALOG(dialog))) {
-    case 0:
-    	i = CERT_ACCEPT_SESSION;
-    	break;
-    case 1:
-    	i = CERT_ACCEPT_PERMANENT;
-    	break;
-    case GTK_RESPONSE_CANCEL:
-    default:
-    	i = CERT_ACCEPT_NO;
-    	break;
-    }
-    gtk_widget_destroy(dialog);
-    g_free(acd->explanation);
-    return i;
+    g_signal_connect(dialog, "response",
+                     G_CALLBACK(ask_cert_real_response), acd);
+    gtk_widget_show_all(dialog);
 }
 
 

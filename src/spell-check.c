@@ -33,8 +33,6 @@
 #   include <gtksourceview/gtksource.h>
 #endif                          /* HAVE_GTKSOURCEVIEW */
 
-#define BALSA_SPELL_CHECK_PADDING 6
-
 #ifdef G_LOG_DOMAIN
 #  undef G_LOG_DOMAIN
 #endif
@@ -222,7 +220,7 @@ balsa_spell_check_new(GtkWindow *parent)
                                "transient-for", parent,
                                "destroy-with-parent", TRUE,
                                "title", _("Spell check"),
-                               "border-width", BALSA_SPELL_CHECK_PADDING,
+                               "border-width", HIG_PADDING,
                                NULL);
 
     return (GtkWidget *) spell_check;
@@ -295,8 +293,7 @@ balsa_spell_check_init(BalsaSpellCheck *spell_check)
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
     GtkTreeSelection *selection;
-    GtkWidget *box_widget;
-    GtkBox *box;
+    GtkWidget *box;
 
     /* Set spell checker */
 
@@ -308,18 +305,18 @@ balsa_spell_check_init(BalsaSpellCheck *spell_check)
     /* setup suggestion display */
     widget             = gtk_entry_new();
     spell_check->entry = GTK_ENTRY(widget);
-    box_widget         =
-        gtk_box_new(GTK_ORIENTATION_VERTICAL, BALSA_SPELL_CHECK_PADDING);
-    gtk_container_add((GtkContainer *) spell_check, box_widget);
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
+    gtk_container_add(GTK_CONTAINER(spell_check), box);
 
-    box = (GtkBox *) box_widget;
-    gtk_box_pack_start(box, widget, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(box), widget);
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
 				   GTK_POLICY_AUTOMATIC,
 				   GTK_POLICY_AUTOMATIC);
-    gtk_box_pack_start(box, sw, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(sw, TRUE);
+    gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(box), sw);
 
     /* setup suggestion list */
     store  = gtk_list_store_new(1, G_TYPE_STRING);
@@ -343,11 +340,11 @@ balsa_spell_check_init(BalsaSpellCheck *spell_check)
 
     /* setup buttons to perform actions */
     widget = gtk_grid_new();
-    gtk_box_pack_start(box, widget, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(box), widget);
 
     grid = GTK_GRID(widget);
-    gtk_grid_set_row_spacing(grid, BALSA_SPELL_CHECK_PADDING);
-    gtk_grid_set_column_spacing(grid, BALSA_SPELL_CHECK_PADDING);
+    gtk_grid_set_row_spacing(grid, HIG_PADDING);
+    gtk_grid_set_column_spacing(grid, HIG_PADDING);
 
     widget = gtk_button_new_with_mnemonic(_("C_hange"));
     gtk_widget_set_tooltip_text(widget,

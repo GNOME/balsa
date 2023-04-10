@@ -51,10 +51,8 @@
 #define NUM_THREADING_STYLES 3
 #define NUM_CONVERT_8BIT_MODES 2
 
-/* Spacing suggestions from
- * http://developer.gnome.org/projects/gup/hig/1.0/layout.html#window-layout-spacing
+/* Spacing suggestions from an old GNOME HIG
  */
-#define HIG_PADDING     6
 #define BORDER_WIDTH    (2 * HIG_PADDING)
 #define GROUP_SPACING   (3 * HIG_PADDING)
 #define HEADER_SPACING  (2 * HIG_PADDING)
@@ -1025,7 +1023,7 @@ add_button_to_box(const gchar * label, GCallback cb, gpointer cb_data,
 {
     GtkWidget *button = gtk_button_new_with_mnemonic(label);
     g_signal_connect_swapped(button, "clicked", cb, cb_data);
-    gtk_box_pack_start(GTK_BOX(box), button, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(box), button);
 
     return button;
 }
@@ -1226,7 +1224,7 @@ pm_grid_new(void)
     gtk_grid_set_column_spacing((GtkGrid *) grid, COL_SPACING);
     gtk_grid_set_row_spacing((GtkGrid *) grid, ROW_SPACING);
     pm_grid_set_next_row(grid, 0);
-    g_object_set(grid, "margin", BORDER_WIDTH, NULL);
+    libbalsa_set_margins(grid, BORDER_WIDTH);
 
     return grid;
 }
@@ -3335,7 +3333,7 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
                                GTK_TYPE_WIDGET  /* PM_CHILD_COL    */
             );
     pui->view = view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
-    g_object_set(view, "margin", BORDER_WIDTH, NULL);
+    libbalsa_set_margins(view , BORDER_WIDTH);
     gtk_container_add(GTK_CONTAINER(hbox), view);
     gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
 

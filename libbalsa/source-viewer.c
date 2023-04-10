@@ -232,9 +232,11 @@ libbalsa_show_message_source(GtkApplication  * application,
     }
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 1);
-    gtk_box_pack_start(GTK_BOX(vbox), menu_bar, FALSE, TRUE, 1);
+    libbalsa_set_vmargins(menu_bar, 1);
+    gtk_container_add(GTK_CONTAINER(vbox), menu_bar);
 
-    gtk_box_pack_start(GTK_BOX(vbox), interior, TRUE, TRUE, 0);
+    libbalsa_set_margins(interior, 2);
+    gtk_container_add(GTK_CONTAINER(vbox), interior);
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     lsvi = g_new(LibBalsaSourceViewerInfo, 1);

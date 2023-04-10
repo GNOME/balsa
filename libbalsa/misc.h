@@ -163,5 +163,30 @@ gchar *libbalsa_font_string_to_css(const gchar * font_string, const gchar * name
 void libbalsa_parser_options_init(void);
 GMimeParserOptions *libbalsa_parser_options(void);
 
+/* Some margin helpers */
+#define HIG_PADDING 6
+static inline void
+libbalsa_set_hmargins(GtkWidget *widget, int margin)
+{
+    gtk_widget_set_margin_start(widget, margin);
+    gtk_widget_set_margin_end(widget, margin);
+}
+static inline void
+libbalsa_set_vmargins(GtkWidget *widget, int margin)
+{
+    gtk_widget_set_margin_top(widget, margin);
+    gtk_widget_set_margin_bottom(widget, margin);
+}
+static inline void
+libbalsa_set_margins(GtkWidget *widget, int margin)
+{
+    libbalsa_set_hmargins(widget, margin);
+    libbalsa_set_vmargins(widget, margin);
+}
+
+GtkWidget * libbalsa_add_mnemonic_button_to_box(const gchar *markup,
+                                                GtkWidget   *box,
+                                                GtkAlign     align);
+
 
 #endif				/* __LIBBALSA_MISC_H__ */

@@ -966,7 +966,6 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
     g_return_val_if_fail(address == NULL || LIBBALSA_IS_ADDRESS(address), NULL);
 
     grid = gtk_grid_new();
-#define HIG_PADDING 6
     gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
     gtk_grid_set_column_spacing(GTK_GRID(grid), HIG_PADDING);
     gtk_container_set_border_width(GTK_CONTAINER(grid), HIG_PADDING);
@@ -977,13 +976,13 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
 	label = gtk_label_new_with_mnemonic(_(labels[cnt]));
 	gtk_widget_set_halign(label, GTK_ALIGN_END);
         if (cnt == EMAIL_ADDRESS) {
-            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
             GtkWidget *but = gtk_button_new_with_mnemonic(_("A_dd"));
             GtkWidget *tree_view;
 
             entries[cnt] = lba_addr_list_widget(changed_cb, changed_data);
-            gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 1);
-            gtk_box_pack_start(GTK_BOX(box), but,   FALSE, FALSE, 1);
+            gtk_container_add(GTK_CONTAINER(box), label);
+            gtk_container_add(GTK_CONTAINER(box), but);
             lhs = box;
             tree_view = gtk_bin_get_child(GTK_BIN(entries[cnt]));
             g_signal_connect(but, "clicked", G_CALLBACK(add_row), tree_view);
@@ -1006,13 +1005,13 @@ libbalsa_address_get_edit_widget(LibBalsaAddress *address,
         }
 	gtk_label_set_mnemonic_widget(GTK_LABEL(label), entries[cnt]);
 
-	gtk_grid_attach(GTK_GRID(grid), lhs, 0, cnt + 1, 1, 1);
+	gtk_grid_attach(GTK_GRID(grid), lhs, 0, cnt, 1, 1);
 
 	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
 
         gtk_widget_set_hexpand(entries[cnt], TRUE);
         gtk_widget_set_vexpand(entries[cnt], TRUE);
-	gtk_grid_attach(GTK_GRID(grid), entries[cnt], 1, cnt + 1, 1, 1);
+	gtk_grid_attach(GTK_GRID(grid), entries[cnt], 1, cnt, 1, 1);
     }
     g_signal_connect(entries[FIRST_NAME], "changed",
                      G_CALLBACK(lba_entry_changed), entries);

@@ -140,7 +140,7 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
         emb_hdrs = bm_header_widget_new(bm, NULL);
         balsa_mime_widget_set_header_widget(mw, emb_hdrs);
 
-	gtk_box_pack_start(GTK_BOX(container), emb_hdrs, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(container), emb_hdrs);
 
         bmw_message_set_headers(bm, mw, mime_body,
                                 balsa_message_get_shown_headers(bm) == HEADERS_ALL);
@@ -158,7 +158,7 @@ balsa_mime_widget_new_message(BalsaMessage * bm,
 
         gtk_widget_set_valign(header_widget, GTK_ALIGN_START);
         gtk_widget_set_vexpand(header_widget, FALSE);
-        g_object_set(header_widget, "margin", 5, NULL);
+        libbalsa_set_margins(header_widget, 5);
 	gtk_container_add(GTK_CONTAINER(widget), header_widget);
 	bmw_message_set_headers(bm, mw, mime_body, TRUE);
     }
@@ -244,13 +244,13 @@ bmw_message_extbody_url(LibBalsaMessageBody * mime_body,
     gtk_container_set_border_width(GTK_CONTAINER(mw),
 				   BMW_CONTAINER_BORDER);
 
-    gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg->str), FALSE,
-		       FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), gtk_label_new(msg->str));
     g_string_free(msg, TRUE);
 
     button = gtk_button_new_with_label(url);
-    gtk_box_pack_start(GTK_BOX(mw), button, FALSE, FALSE,
-		       BMW_BUTTON_PACK_SPACE);
+    libbalsa_set_vmargins(button, BMW_BUTTON_PACK_SPACE);
+    gtk_container_add(GTK_CONTAINER(mw), button);
+
     g_object_set_data_full(G_OBJECT(button), "call_url", url,
 			   (GDestroyNotify) g_free);
     g_signal_connect(button, "clicked",
@@ -290,15 +290,14 @@ bmw_message_extbody_mail(LibBalsaMessageBody * mime_body)
     gtk_container_set_border_width(GTK_CONTAINER(mw),
 				   BMW_CONTAINER_BORDER);
 
-    gtk_box_pack_start(GTK_BOX(mw), gtk_label_new(msg->str), FALSE,
-		       FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), gtk_label_new(msg->str));
     g_string_free(msg, TRUE);
 
     button =
 	gtk_button_new_with_mnemonic(_
 				     ("Se_nd message to obtain this part"));
-    gtk_box_pack_start(GTK_BOX(mw), button, FALSE, FALSE,
-		       BMW_BUTTON_PACK_SPACE);
+    libbalsa_set_vmargins(button, BMW_BUTTON_PACK_SPACE);
+    gtk_container_add(GTK_CONTAINER(mw), button);
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(extbody_send_mail), (gpointer) mime_body);
 
@@ -413,13 +412,15 @@ balsa_mime_widget_new_message_tl(BalsaMessage * bm,
     headers = bm_header_widget_new(bm, tl_buttons);
     balsa_mime_widget_set_header_widget(mw, headers);
 
-    gtk_box_pack_start(GTK_BOX(mw), headers, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(mw), headers);
 
     container = gtk_box_new(GTK_ORIENTATION_VERTICAL, BMW_MESSAGE_PADDING);
     balsa_mime_widget_set_container(mw, container);
 
-    gtk_box_pack_start(GTK_BOX(mw), container, TRUE, TRUE,
-		       BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
+    gtk_widget_set_vexpand(container, TRUE);
+    gtk_widget_set_valign(container, GTK_ALIGN_FILL);
+    libbalsa_set_vmargins(container, BMW_CONTAINER_BORDER - BMW_MESSAGE_PADDING);
+    gtk_container_add(GTK_CONTAINER(mw), container);
 
     return mw;
 }
@@ -472,19 +473,16 @@ static GtkWidget *
 bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
 {
     GtkWidget *grid;
-#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
-    GtkWidget *hbox;
-#else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     GtkWidget *info_bar_widget;
     GtkInfoBar *info_bar;
     GtkWidget *content_area;
-#endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
+    GtkWidget *vbox;
     GtkWidget *action_area;
     GtkWidget *widget;
     GtkEventController *key_controller;
 
     grid = gtk_grid_new();
-    gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), 2 * HIG_PADDING);
     gtk_widget_show(grid);
 
     key_controller = gtk_event_controller_key_new(grid);
@@ -495,50 +493,33 @@ bm_header_widget_new(BalsaMessage * bm, GtkWidget * const * buttons)
     g_signal_connect(key_controller, "key-pressed",
 		     G_CALLBACK(balsa_mime_widget_key_pressed), bm);
 
-#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add(GTK_CONTAINER(hbox), grid);
-    gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
-
-    action_area = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area),
-                              GTK_BUTTONBOX_START);
-    gtk_box_pack_end(GTK_BOX(hbox), action_area, FALSE, TRUE, 0);
-#else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     info_bar_widget = gtk_info_bar_new();
     info_bar = GTK_INFO_BAR(info_bar_widget);
 
     content_area = gtk_info_bar_get_content_area(info_bar);
     gtk_container_add(GTK_CONTAINER(content_area), grid);
 
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
     action_area = gtk_info_bar_get_action_area(info_bar);
-    gtk_orientable_set_orientation(GTK_ORIENTABLE(action_area),
-                                   GTK_ORIENTATION_VERTICAL);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(action_area),
-                              GTK_BUTTONBOX_START);
-#endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
+    gtk_widget_set_valign(action_area, GTK_ALIGN_START);
+    gtk_container_add(GTK_CONTAINER(action_area), vbox);
+
     if (balsa_message_get_face_box(bm) == NULL) {
         GtkWidget *face_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
         balsa_message_set_face_box(bm, face_box);
-        gtk_container_add(GTK_CONTAINER(action_area), face_box);
-        gtk_button_box_set_child_non_homogeneous(GTK_BUTTON_BOX(action_area),
-                                                 face_box, TRUE);
+        gtk_container_add(GTK_CONTAINER(vbox), face_box);
     }
 
     if (buttons) {
         while (*buttons) {
-            gtk_container_add(GTK_CONTAINER(action_area), *buttons++);
+            gtk_container_add(GTK_CONTAINER(vbox), *buttons++);
         }
     }
 
     widget = gtk_frame_new(NULL);
     gtk_frame_set_shadow_type(GTK_FRAME(widget), GTK_SHADOW_IN);
-#ifdef GTK_INFO_BAR_WRAPPING_IS_BROKEN
-    gtk_container_add(GTK_CONTAINER(widget), hbox);
-#else                           /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
     gtk_container_add(GTK_CONTAINER(widget), info_bar_widget);
-#endif                          /* GTK_INFO_BAR_WRAPPING_IS_BROKEN */
 
     g_object_set_data(G_OBJECT(widget), BALSA_MESSAGE_GRID, grid);
 

@@ -301,6 +301,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
     struct smtp_server_dialog_info *sdi;
     GtkWidget *dialog;
+    GtkWidget *content_area;
     GtkWidget *label, *hbox;
 
     /* Show only one dialog at a time. */
@@ -329,6 +330,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Help"),   GTK_RESPONSE_HELP,
                                     NULL);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
     g_object_weak_ref(G_OBJECT(dialog),
 		    (GWeakNotify) smtp_server_weak_notify, sdi);
     g_signal_connect(dialog, "response",
@@ -339,17 +341,17 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                       FALSE);
 
     sdi->notebook = libbalsa_server_cfg_new(server, smtp_server->name);
-    gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), GTK_WIDGET(sdi->notebook));
-
-#define HIG_PADDING 12
+    gtk_container_add(GTK_CONTAINER(content_area), GTK_WIDGET(sdi->notebook));
 
     /* split large messages */
     sdi->split_button = gtk_check_button_new_with_mnemonic(_("Sp_lit message larger than"));
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
     sdi->big_message = gtk_spin_button_new_with_range(0.1, 100, 0.1);
-    gtk_box_pack_start(GTK_BOX(hbox), sdi->big_message, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(sdi->big_message, TRUE);
+    gtk_widget_set_halign(sdi->big_message, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(hbox), sdi->big_message);
     label = gtk_label_new(_("MB"));
-    gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(hbox), label);
     if (smtp_server->big_message > 0) {
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sdi->split_button), TRUE);
         /* The widget is in MB, but big_message is stored in kB. */

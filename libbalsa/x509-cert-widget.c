@@ -31,8 +31,8 @@
 #include <gnutls/x509.h>
 #include <gnutls/crypto.h>
 #include "libbalsa.h"
-#include "misc.h"
 #endif
+#include "misc.h"
 
 #include <glib/gi18n.h>
 

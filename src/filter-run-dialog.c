@@ -274,10 +274,12 @@ static
 void
 balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 {
+    GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(p));
     GtkWidget *bbox, *hbox, *vbox;
     GtkTreeSelection *selection;
     GtkWidget *button;
     GtkWidget *sw;
+    GtkSizeGroup *size_group = gtk_size_group_new(GTK_SIZE_GROUP_HORIZONTAL);
 
 
 /*
@@ -308,11 +310,14 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 
-    gtk_box_pack_start(GTK_BOX(gtk_dialog_get_content_area(GTK_DIALOG(p))),
-		       hbox, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(hbox, TRUE);
+    gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(content_area), hbox);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
-    gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(vbox, TRUE);
+    gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(hbox), vbox);
 
     p->available_filters =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
@@ -328,28 +333,27 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
                                    GTK_POLICY_AUTOMATIC,
                                    GTK_POLICY_AUTOMATIC);
-
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(p->available_filters));
-    gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 0);
+
+    gtk_widget_set_vexpand(sw, TRUE);
+    gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(vbox), sw);
 
     /* To keep a consistent look, make a button box for a single button. */
-    bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_box_set_spacing(GTK_BOX(bbox), 2);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
-    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
+    bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
+    gtk_widget_set_margin_top(bbox, 2);
+    gtk_widget_set_margin_bottom(bbox, 2);
+    gtk_container_add(GTK_CONTAINER(vbox), bbox);
 
     /* "Apply selected" button */
     p->apply_selected_button = button =
-            gtk_button_new_with_mnemonic(_("_Apply Selected"));
+            libbalsa_add_mnemonic_button_to_box(_("_Apply Selected"), bbox, GTK_ALIGN_CENTER);
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(fr_apply_selected_pressed), p);
-    gtk_container_add(GTK_CONTAINER(bbox), button);
 
     /* Buttons between the 2 lists */
-    bbox = gtk_button_box_new(GTK_ORIENTATION_VERTICAL);
-    gtk_box_set_spacing(GTK_BOX(bbox), 2);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
+    bbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
 
     /* Right/Add button */
     p->add_button = button =
@@ -360,6 +364,8 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(fr_add_pressed), p);
+    gtk_widget_set_vexpand(button, TRUE);
+    gtk_widget_set_valign(button, GTK_ALIGN_END);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* Left/Remove button */
     p->remove_button = button =
@@ -370,13 +376,19 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(fr_remove_pressed), p);
+    gtk_widget_set_vexpand(button, TRUE);
+    gtk_widget_set_valign(button, GTK_ALIGN_START);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
-    gtk_box_pack_start(GTK_BOX(hbox),bbox, FALSE, FALSE, 6);
+    gtk_widget_set_margin_start(bbox, 6);
+    gtk_widget_set_margin_end(bbox, 6);
+    gtk_container_add(GTK_CONTAINER(hbox), bbox);
 
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
 
-    gtk_box_pack_start(GTK_BOX(hbox),vbox, TRUE, TRUE, 0);
+    gtk_widget_set_hexpand(vbox, TRUE);
+    gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(hbox),vbox);
 
     sw = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
@@ -393,14 +405,16 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(p->selected_filters));
 
-    gtk_box_pack_start(GTK_BOX(vbox),sw, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(sw, TRUE);
+    gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(vbox), sw);
 
     /* up down arrow buttons */
-    bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_box_set_spacing(GTK_BOX(bbox), 2);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
+    bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 
-    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
+    gtk_widget_set_margin_top(bbox, 2);
+    gtk_widget_set_margin_bottom(bbox, 2);
+    gtk_container_add(GTK_CONTAINER(vbox), bbox);
 
     /* up button */
     p->move_up_button = button =
@@ -411,6 +425,9 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
                                 _("Move selected filter up"));
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(fr_up_pressed), p);
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_widget_set_halign(button, GTK_ALIGN_CENTER);
+    gtk_size_group_add_widget(size_group, button);
     gtk_container_add(GTK_CONTAINER(bbox), button);
     /* down button */
     p->move_down_button = button =
@@ -421,6 +438,9 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
                                 _("Move selected filter down"));
     g_signal_connect(button, "clicked",
 		     G_CALLBACK(fr_down_pressed), p);
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_widget_set_halign(button, GTK_ALIGN_CENTER);
+    gtk_size_group_add_widget(size_group, button);
     gtk_container_add(GTK_CONTAINER(bbox), button);
 
     p->apply_now_button = button =
@@ -428,7 +448,12 @@ balsa_filter_run_dialog_init(BalsaFilterRunDialog *p)
     gtk_widget_set_sensitive(button, FALSE);
     g_signal_connect_swapped(button, "clicked",
                              G_CALLBACK(fr_apply_now_pressed), p);
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_widget_set_halign(button, GTK_ALIGN_CENTER);
+    gtk_size_group_add_widget(size_group, button);
     gtk_container_add(GTK_CONTAINER(bbox), button);
+
+    g_object_unref(size_group);
 
     p->filters_modified = FALSE;
 }

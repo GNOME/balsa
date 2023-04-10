@@ -28,7 +28,6 @@
 #include <glib/gi18n.h>
 
 #define FILTER_EDIT_ENTRY_MAX_LENGTH 256
-#define FILTER_EDIT_PADDING 6
 
 /* List of filter_run_dialog_box opened : this is !=NULL when
  * filter_run_dialog boxes are opened We test that because you don't
@@ -180,7 +179,6 @@ static GtkWidget *
 build_left_side(void)
 {
     GtkWidget *vbox, *bbox;
-
     GtkWidget *sw;
 
     /*
@@ -195,7 +193,7 @@ build_left_side(void)
        | -- --  |
        \--------/
      */
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
 
     /* the list */
     sw = gtk_scrolled_window_new(NULL, NULL);
@@ -211,26 +209,25 @@ build_left_side(void)
 
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(fe_filters_list));
 
-    gtk_box_pack_start(GTK_BOX(vbox), sw, TRUE, TRUE, 2);
+    gtk_widget_set_vexpand(sw, TRUE);
+    gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
+    libbalsa_set_vmargins(sw, 2);
+    gtk_container_add(GTK_CONTAINER(vbox), sw);
 
     /* new and delete buttons */
-    bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_box_set_spacing(GTK_BOX(bbox), 2);
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(bbox), GTK_BUTTONBOX_SPREAD);
+    bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2);
 
-    gtk_box_pack_start(GTK_BOX(vbox), bbox, FALSE, FALSE, 2);
+    gtk_container_add(GTK_CONTAINER(vbox), bbox);
 
     /* new button */
     /* Translators: button "New" filter */
-    fe_new_button = gtk_button_new_with_mnemonic(C_("filter", "_New"));
+    fe_new_button = libbalsa_add_mnemonic_button_to_box(C_("filter", "_New"), bbox, GTK_ALIGN_CENTER);
     g_signal_connect(fe_new_button, "clicked",
 		     G_CALLBACK(fe_new_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), fe_new_button);
     /* delete button */
-    fe_delete_button = gtk_button_new_with_mnemonic(("_Delete"));
+    fe_delete_button = libbalsa_add_mnemonic_button_to_box(("_Delete"), bbox, GTK_ALIGN_CENTER);
     g_signal_connect(fe_delete_button, "clicked",
 		     G_CALLBACK(fe_delete_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), fe_delete_button);
     gtk_widget_set_sensitive(fe_delete_button, FALSE);
 
     return vbox;
@@ -250,9 +247,9 @@ build_match_page()
 
     /* The notebook page */
     page = gtk_grid_new();
-    gtk_grid_set_row_spacing(GTK_GRID(page), 5);
-    gtk_grid_set_column_spacing(GTK_GRID(page), 5);
-    g_object_set(page, "margin", 5, NULL);
+    gtk_grid_set_row_spacing(GTK_GRID(page), HIG_PADDING);
+    gtk_grid_set_column_spacing(GTK_GRID(page), HIG_PADDING);
+    libbalsa_set_margins(page, HIG_PADDING);
 
     /* The name entry */
 
@@ -283,8 +280,8 @@ build_match_page()
 						NULL, NULL);
     g_signal_connect(fe_op_codes_option_menu, "changed",
                      G_CALLBACK(fe_action_changed), NULL);
-    gtk_box_pack_start(GTK_BOX(box), fe_op_codes_option_menu, FALSE, FALSE,
-		       2);
+    libbalsa_set_vmargins(fe_op_codes_option_menu, 2);
+    gtk_container_add(GTK_CONTAINER(box), fe_op_codes_option_menu);
 
     /* list of conditions defining how this filter matches */
 
@@ -304,22 +301,20 @@ build_match_page()
 
     gtk_container_add(GTK_CONTAINER(scroll), GTK_WIDGET(fe_conditions_list));
 
-    box = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_widget_set_hexpand(box, TRUE);
     gtk_grid_attach(GTK_GRID(page), box, 0, 3, 2, 1);
-    fe_condition_edit_button = gtk_button_new_with_mnemonic(_("_Edit"));
+
+    fe_condition_edit_button = libbalsa_add_mnemonic_button_to_box(_("_Edit"), box, GTK_ALIGN_START);
     gtk_widget_set_sensitive(fe_condition_edit_button,FALSE);
-    gtk_container_add(GTK_CONTAINER(box), fe_condition_edit_button);
     g_signal_connect(fe_condition_edit_button, "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(0));
     /* Translators: button "New" filter match */
-    button = gtk_button_new_with_mnemonic(C_("filter match", "Ne_w"));
-    gtk_container_add(GTK_CONTAINER(box), button);
+    button = libbalsa_add_mnemonic_button_to_box(C_("filter match", "Ne_w"), box, GTK_ALIGN_CENTER);
     g_signal_connect(button, "clicked",
                      G_CALLBACK(fe_edit_condition), GINT_TO_POINTER(1));
-    fe_condition_delete_button = gtk_button_new_with_mnemonic(_("_Remove"));
+    fe_condition_delete_button = libbalsa_add_mnemonic_button_to_box(_("_Remove"), box, GTK_ALIGN_END);
     gtk_widget_set_sensitive(fe_condition_delete_button,FALSE);
-    gtk_container_add(GTK_CONTAINER(box), fe_condition_delete_button);
     g_signal_connect(fe_condition_delete_button, "clicked",
 		     G_CALLBACK(fe_condition_remove_pressed), NULL);
 
@@ -342,8 +337,8 @@ fe_make_color_buttons(void)
 
     grid_widget = gtk_grid_new();
     grid = GTK_GRID(grid_widget);
-    gtk_grid_set_row_spacing(grid, 5);
-    gtk_grid_set_column_spacing(grid, 5);
+    gtk_grid_set_row_spacing(grid, HIG_PADDING);
+    gtk_grid_set_column_spacing(grid, HIG_PADDING);
 
     fe_foreground_set = gtk_check_button_new_with_mnemonic(_("Foreground"));
     gtk_grid_attach(grid, fe_foreground_set, 0, 0, 1, 1);
@@ -377,7 +372,7 @@ build_action_page(GtkWindow * window)
     GtkWidget *box;
     GtkWidget *dialog;
 
-    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    page = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
     gtk_box_set_homogeneous(GTK_BOX(page), TRUE);
 
     /* The notification area */
@@ -385,12 +380,12 @@ build_action_page(GtkWindow * window)
     frame = gtk_frame_new(_("Notification:"));
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(page), frame);
     gtk_container_set_border_width(GTK_CONTAINER(frame), 3);
 
     grid = gtk_grid_new();
-    gtk_grid_set_row_spacing(GTK_GRID(grid), 5);
-    gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
+    gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
+    gtk_grid_set_column_spacing(GTK_GRID(grid), HIG_PADDING);
     gtk_container_add(GTK_CONTAINER(frame), grid);
 
     /* Notification buttons */
@@ -437,7 +432,7 @@ build_action_page(GtkWindow * window)
     frame = gtk_frame_new(_("Action to perform:"));
     gtk_frame_set_label_align(GTK_FRAME(frame), GTK_POS_LEFT, GTK_POS_TOP);
     gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_ETCHED_IN);
-    gtk_box_pack_start(GTK_BOX(page), frame, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(page), frame);
 
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
     gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
@@ -447,8 +442,9 @@ build_action_page(GtkWindow * window)
     fe_action_option_menu =
         fe_build_option_menu(fe_actions, G_N_ELEMENTS(fe_actions),
                              G_CALLBACK(fe_action_selected), NULL);
-    gtk_box_pack_start(GTK_BOX(box), fe_action_option_menu,
-                       TRUE, FALSE, 1);
+    gtk_widget_set_vexpand(fe_action_option_menu, TRUE);
+    libbalsa_set_vmargins(fe_action_option_menu, 1);
+    gtk_container_add(GTK_CONTAINER(box), fe_action_option_menu);
 
     /* FIXME : we use the global mru folder list, perhaps we should use
        our own. We'll see this later, for now let's make something usable
@@ -459,10 +455,15 @@ build_action_page(GtkWindow * window)
 						&balsa_app.folder_mru);
     g_signal_connect(fe_mailboxes, "changed",
                      G_CALLBACK(fe_action_changed), NULL);
-    gtk_box_pack_start(GTK_BOX(box), fe_mailboxes, TRUE, FALSE, 1);
+    gtk_widget_set_vexpand(fe_mailboxes, TRUE);
+    libbalsa_set_vmargins(fe_mailboxes, 1);
+    gtk_container_add(GTK_CONTAINER(box), fe_mailboxes);
 
     fe_color_buttons = fe_make_color_buttons();
-    gtk_box_pack_start(GTK_BOX(box), fe_color_buttons, TRUE, FALSE, 1);
+    gtk_widget_set_vexpand(fe_color_buttons, TRUE);
+    libbalsa_set_vmargins(fe_color_buttons, 1);
+    gtk_container_add(GTK_CONTAINER(box), fe_color_buttons);
+
     return page;
 }				/* end build_action_page() */
 
@@ -479,12 +480,14 @@ build_right_side(GtkWindow * window)
     GtkWidget *notebook, *page;
     GtkWidget *bbox;
 
-    rightside = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    rightside = gtk_box_new(GTK_ORIENTATION_VERTICAL, HIG_PADDING);
 
     /* the main notebook */
     notebook = gtk_notebook_new();
     gtk_notebook_set_tab_pos(GTK_NOTEBOOK(notebook), GTK_POS_TOP);
-    gtk_box_pack_start(GTK_BOX(rightside), notebook, TRUE, TRUE, 0);
+    gtk_widget_set_vexpand(notebook, TRUE);
+    gtk_widget_set_valign(notebook, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(rightside), notebook);
 
     page = build_match_page();
     gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
@@ -494,18 +497,16 @@ build_right_side(GtkWindow * window)
 			     page, gtk_label_new(_("Action")));
 
     /* button box */
-    bbox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_box_pack_start(GTK_BOX(rightside), bbox, FALSE, FALSE, 0);
+    bbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_container_add(GTK_CONTAINER(rightside), bbox);
 
-    fe_apply_button = gtk_button_new_with_mnemonic(_("_Apply"));
+    fe_apply_button = libbalsa_add_mnemonic_button_to_box(_("_Apply"), bbox, GTK_ALIGN_START);
     g_signal_connect(fe_apply_button, "clicked",
 		     G_CALLBACK(fe_apply_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), fe_apply_button);
 
-    fe_revert_button = gtk_button_new_with_mnemonic(_("Re_vert"));
+    fe_revert_button = libbalsa_add_mnemonic_button_to_box(_("Re_vert"), bbox, GTK_ALIGN_END);
     g_signal_connect(fe_revert_button, "clicked",
 		     G_CALLBACK(fe_revert_pressed), NULL);
-    gtk_container_add(GTK_CONTAINER(bbox), fe_revert_button);
     gtk_widget_set_sensitive(fe_apply_button, FALSE);
     gtk_widget_set_sensitive(fe_revert_button, FALSE);
 
@@ -540,10 +541,10 @@ fe_collect_user_headers(LibBalsaCondition * condition)
  *
  * Returns immediately, but fires off the filter edit dialog.
  */
-#define BALSA_FILTER_PADDING 6
 void
 filters_edit_dialog(GtkWindow * parent)
 {
+    GtkWidget *content_area;
     GtkWidget *hbox;
     GtkWidget *piece;
     LibBalsaFilter * cpfil,* fil;
@@ -574,6 +575,7 @@ filters_edit_dialog(GtkWindow * parent)
                                             _("_Cancel"), GTK_RESPONSE_CANCEL,
                                             _("_Help"), GTK_RESPONSE_HELP,
 					    NULL);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(fe_window));
 
     g_signal_connect(fe_window, "response",
                      G_CALLBACK(fe_dialog_response), NULL);
@@ -585,33 +587,39 @@ filters_edit_dialog(GtkWindow * parent)
                                       GTK_RESPONSE_OK, FALSE);
 
     /* main hbox */
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, FILTER_EDIT_PADDING);
-    gtk_box_pack_start(GTK_BOX
-                       (gtk_dialog_get_content_area(GTK_DIALOG(fe_window))),
-                       hbox, TRUE, TRUE, FILTER_EDIT_PADDING);
-    gtk_box_pack_start(GTK_BOX(hbox), piece, FALSE, FALSE,
-                       FILTER_EDIT_PADDING);
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, HIG_PADDING);
+    gtk_widget_set_vexpand(hbox, TRUE);
+    gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
+    libbalsa_set_vmargins(hbox, HIG_PADDING);
+    gtk_container_add(GTK_CONTAINER(content_area), hbox);
 
-    gtk_box_pack_start(GTK_BOX(hbox),
-                       gtk_separator_new(GTK_ORIENTATION_VERTICAL),
-                       FALSE, FALSE, 0);
+    gtk_widget_set_hexpand(piece, FALSE);
+    libbalsa_set_hmargins(piece, HIG_PADDING);
+    gtk_container_add(GTK_CONTAINER(hbox), piece);
+
+    gtk_container_add(GTK_CONTAINER(hbox),
+                      gtk_separator_new(GTK_ORIENTATION_VERTICAL));
 
     fe_right_page = build_right_side(GTK_WINDOW(fe_window));
     gtk_widget_set_sensitive(fe_right_page, FALSE);
-    gtk_box_pack_start(GTK_BOX(hbox), fe_right_page, TRUE, TRUE,
-                       FILTER_EDIT_PADDING);
+
+    gtk_widget_set_hexpand(fe_right_page, TRUE);
+    gtk_widget_set_halign(fe_right_page, GTK_ALIGN_FILL);
+    libbalsa_set_hmargins(fe_right_page, HIG_PADDING);
+    gtk_container_add(GTK_CONTAINER(hbox), fe_right_page);
 
     fe_user_headers_list = NULL;
 
     /* Populate the list of filters */
     model = gtk_tree_view_get_model(fe_filters_list);
-    for(filter_list=balsa_app.filters; 
-        filter_list; filter_list=g_slist_next(filter_list)) {
+    for (filter_list = balsa_app.filters;
+         filter_list != NULL;
+         filter_list = filter_list->next) {
 
 	fil=(LibBalsaFilter*)filter_list->data;
 	/* Make a copy of the current filter */
 	cpfil=libbalsa_filter_new();
-	
+
 	cpfil->name=g_strdup(fil->name);
 	cpfil->flags=fil->flags;
 	if (fil->sound) cpfil->sound=g_strdup(fil->sound);

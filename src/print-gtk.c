@@ -583,18 +583,18 @@ create_options_group(const gchar *label_str, GtkWidget *parent_grid, gint parent
     GtkWidget *grid;
     gchar *markup;
 
-    group = gtk_box_new(GTK_ORIENTATION_VERTICAL, 12);
+    group = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2 * HIG_PADDING);
     gtk_grid_attach(GTK_GRID(parent_grid), group, parent_col, parent_row, parent_width, 1);
 
     markup = g_strdup_printf("<b>%s</b>", label_str);
     label = libbalsa_create_wrap_label(markup, TRUE);
     g_free(markup);
-    gtk_box_pack_start(GTK_BOX(group), label, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(group), label);
 
 	grid = gtk_grid_new();
-    gtk_box_pack_start(GTK_BOX(group), grid, FALSE, FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(group), grid);
 	gtk_grid_set_column_spacing(GTK_GRID(grid), 0);
-	gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
+	gtk_grid_set_row_spacing(GTK_GRID(grid), HIG_PADDING);
 	gtk_grid_attach(GTK_GRID(grid), gtk_label_new("    "), 0, 0, 1, 1);
 	return grid;
 }
@@ -610,9 +610,9 @@ message_prefs_widget(GtkPrintOperation * operation,
     gtk_print_operation_set_custom_tab_label(operation, _("Message"));
 
     page = gtk_grid_new();
-    gtk_grid_set_column_spacing(GTK_GRID(page), 18);
-    gtk_grid_set_row_spacing(GTK_GRID(page), 18);
-    gtk_container_set_border_width(GTK_CONTAINER(page), 12);
+    gtk_grid_set_column_spacing(GTK_GRID(page), 3 * HIG_PADDING);
+    gtk_grid_set_row_spacing(GTK_GRID(page), 3 * HIG_PADDING);
+    gtk_container_set_border_width(GTK_CONTAINER(page), 2 * HIG_PADDING);
 
     /* fonts */
     grid = create_options_group(_("Fonts"), page, 0, 0, 3);

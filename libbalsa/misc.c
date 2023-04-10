@@ -1232,3 +1232,64 @@ libbalsa_parser_options(void)
 {
     return parser_options;
 }
+
+/*
+ * libbalsa_add_mnemonic_button_to_box
+ *
+ * Create a button widget and add it to a GtkBox with the same
+ * look as a regular button in a GtkButtonBox; returns the button.
+ *
+ * markup: mnemonic text for the button;
+ * box:    the box;
+ * align:  how to align the button in its allocated space.
+ *
+ * To replace a GtkButtonBox with the default GTK_BUTTONBOX_EDGE style,
+ * align should be GTK_ALIGN_START for the first button, GTK_ALIGN_END
+ * for the last button, and GTK_ALIGN_CENTER for other buttons.
+ * To replace a GtkButtonBox with style GTK_BUTTONBOX_SPREAD,
+ * align should be GTK_ALIGN_CENTER for all buttons;
+ * To replace a GtkButtonBox with style GTK_BUTTONBOX_EXPAND,
+ * align should be GTK_ALIGN_FILL for all buttons.
+ *
+ * In the EDGE case with more than three buttons, and in the SPREAD case,
+ * the spacing is not identical to GtkButtonBox's.
+ */
+
+/* Margin to increase the width of the button, to approximate the look
+ * of a GtkButtonBox; may be a pixel or two too small: */
+#define LIBBALSA_LABEL_MARGIN 12
+
+#define LIBBALSA_SIZE_GROUP_KEY "libbalsa-size-group-key"
+
+GtkWidget *
+libbalsa_add_mnemonic_button_to_box(const gchar *markup,
+                                    GtkWidget   *box,
+                                    GtkAlign     align)
+{
+    GtkSizeGroup *size_group;
+    GtkWidget *label;
+    GtkWidget *button;
+
+    size_group = g_object_get_data(G_OBJECT(box), LIBBALSA_SIZE_GROUP_KEY);
+    if (size_group == NULL) {
+        size_group = gtk_size_group_new(GTK_SIZE_GROUP_BOTH);
+        g_object_set_data_full(G_OBJECT(box), LIBBALSA_SIZE_GROUP_KEY, size_group, g_object_unref);
+    }
+
+    label = gtk_label_new(NULL);
+    gtk_label_set_markup_with_mnemonic(GTK_LABEL(label), markup);
+    gtk_widget_set_margin_start(label, LIBBALSA_LABEL_MARGIN);
+    gtk_widget_set_margin_end(label, LIBBALSA_LABEL_MARGIN);
+    gtk_widget_show(label);
+    gtk_size_group_add_widget(size_group, label);
+
+    button = gtk_button_new();
+    gtk_container_add(GTK_CONTAINER(button), label);
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_widget_set_halign(button, align);
+    gtk_widget_show(button);
+
+    gtk_container_add(GTK_CONTAINER(box), button);
+
+    return button;
+}

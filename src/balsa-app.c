@@ -116,8 +116,6 @@ ask_password_real(LibBalsaServer *server, const gchar *cert_subject)
 
 #else
 
-#define HIG_PADDING 12
-
 /* ask_password:
    asks the user for the password to the mailbox on given remote server.
 */
@@ -160,7 +158,7 @@ ask_password_real(LibBalsaServer * server, const gchar *cert_subject)
                                          NULL); 
 
     content = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
-    gtk_container_set_border_width(GTK_CONTAINER(content), HIG_PADDING);
+    gtk_container_set_border_width(GTK_CONTAINER(content), 2 * HIG_PADDING);
 
     grid = libbalsa_create_grid();
     gtk_container_add(GTK_CONTAINER(content), grid);

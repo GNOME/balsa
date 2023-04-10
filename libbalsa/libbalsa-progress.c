@@ -206,7 +206,7 @@ libbalsa_progress_dialog_ensure_real(ProgressDialog *progress_dialog,
 
     	progress_widget = create_progress_widget(progress_id);
     	gtk_revealer_set_reveal_child(GTK_REVEALER(progress_widget), TRUE);
-    	gtk_box_pack_start(GTK_BOX(content_box), progress_widget, FALSE, FALSE, 0);
+    	gtk_container_add(GTK_CONTAINER(content_box), progress_widget);
     	gtk_widget_show_all(progress_widget);
     }
 }
@@ -305,14 +305,14 @@ create_progress_widget(const gchar *progress_id)
 	gtk_container_add(GTK_CONTAINER(widget_data->revealer), box);
 
 	label = gtk_label_new(progress_id);
-	gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(box), label);
 
 	widget_data->label = gtk_label_new(" ");
 	gtk_label_set_line_wrap(GTK_LABEL(widget_data->label), TRUE);
-	gtk_box_pack_start(GTK_BOX(box), widget_data->label, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(box), widget_data->label);
 
 	widget_data->progress = gtk_progress_bar_new();
-	gtk_box_pack_start(GTK_BOX(box), widget_data->progress, FALSE, FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(box), widget_data->progress);
 
 	return widget_data->revealer;
 }

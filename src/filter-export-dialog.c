@@ -51,6 +51,7 @@ GtkWidget * fex_window;
 void
 filters_export_dialog(GtkWindow * parent)
 {
+    GtkWidget *content_area;
     GtkTreeView *list;
     GtkTreeModel *model;
     GtkTreeIter iter;
@@ -80,6 +81,7 @@ filters_export_dialog(GtkWindow * parent)
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Help"), GTK_RESPONSE_HELP,
                                     NULL);
+    content_area = gtk_dialog_get_content_area(GTK_DIALOG(fex_window));
     gtk_window_set_role(GTK_WINDOW(fex_window), "filter-export");
 
     sw = gtk_scrolled_window_new(NULL, NULL);
@@ -90,11 +92,12 @@ filters_export_dialog(GtkWindow * parent)
     list =
         libbalsa_filter_list_new(TRUE, _("Name"), GTK_SELECTION_MULTIPLE,
                                  NULL, TRUE);
-
     gtk_container_add(GTK_CONTAINER(sw), GTK_WIDGET(list));
-    gtk_box_pack_start(GTK_BOX
-                       (gtk_dialog_get_content_area(GTK_DIALOG(fex_window))),
-                       sw, TRUE, TRUE, 2);
+
+    gtk_widget_set_vexpand(sw, TRUE);
+    gtk_widget_set_valign(sw, GTK_ALIGN_FILL);
+    libbalsa_set_vmargins(sw, 2);
+    gtk_container_add(GTK_CONTAINER(content_area), sw);
 
     /* Populate the list of filters */
 

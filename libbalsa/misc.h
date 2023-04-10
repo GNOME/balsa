@@ -165,21 +165,24 @@ GMimeParserOptions *libbalsa_parser_options(void);
 
 /* Some margin helpers */
 #define HIG_PADDING 6
-#define libbalsa_set_hmargins(w, m)            \
-    G_STMT_START {                             \
-        gtk_widget_set_margin_start((w),(m));  \
-        gtk_widget_set_margin_end((w),(m));    \
-    } G_STMT_END
-#define libbalsa_set_vmargins(w, m)            \
-    G_STMT_START {                             \
-        gtk_widget_set_margin_top((w),(m));    \
-        gtk_widget_set_margin_bottom((w),(m)); \
-    } G_STMT_END
-#define libbalsa_set_margins(w, m)             \
-    G_STMT_START {                             \
-        libbalsa_set_hmargins((w), (m));       \
-        libbalsa_set_vmargins((w), (m));       \
-    } G_STMT_END
+static inline void
+libbalsa_set_hmargins(GtkWidget *widget, int margin)
+{
+    gtk_widget_set_margin_start(widget, margin);
+    gtk_widget_set_margin_end(widget, margin);
+}
+static inline void
+libbalsa_set_vmargins(GtkWidget *widget, int margin)
+{
+    gtk_widget_set_margin_top(widget, margin);
+    gtk_widget_set_margin_bottom(widget, margin);
+}
+static inline void
+libbalsa_set_margins(GtkWidget *widget, int margin)
+{
+    libbalsa_set_hmargins(widget, margin);
+    libbalsa_set_vmargins(widget, margin);
+}
 
 GtkWidget * libbalsa_add_mnemonic_button_to_box(const gchar *markup,
                                                 GtkWidget   *box,

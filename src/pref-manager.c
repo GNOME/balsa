@@ -51,10 +51,8 @@
 #define NUM_THREADING_STYLES 3
 #define NUM_CONVERT_8BIT_MODES 2
 
-/* Spacing suggestions from
- * http://developer.gnome.org/projects/gup/hig/1.0/layout.html#window-layout-spacing
+/* Spacing suggestions from an old GNOME HIG
  */
-#define HIG_PADDING     6
 #define BORDER_WIDTH    (2 * HIG_PADDING)
 #define GROUP_SPACING   (3 * HIG_PADDING)
 #define HEADER_SPACING  (2 * HIG_PADDING)

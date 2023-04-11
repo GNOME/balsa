@@ -1046,6 +1046,20 @@ ident_dialog_add_entry(GtkWidget * grid, gint row, GtkDialog * dialog,
         gtk_widget_grab_focus(entry);
 }
 
+static void
+choose_key_cb(GObject      *source_object,
+              GAsyncResult *res,
+              gpointer      user_data)
+{
+    const gchar *target;
+    gchar *keyid;
+
+    target = g_object_get_data(source_object, "target");
+    keyid = libbalsa_gpgme_get_seckey_finish(res);
+
+    display_frame_set_field(G_OBJECT(user_data), target, keyid);
+    g_free(keyid);
+}
 
 static void
 choose_key(GtkButton *button, gpointer user_data)
@@ -1053,7 +1067,6 @@ choose_key(GtkButton *button, gpointer user_data)
 	const gchar *target;
 	gpgme_protocol_t protocol;
 	gchar *email;
-	gchar *keyid;
 	GError *error = NULL;
 
 	target = g_object_get_data(G_OBJECT(button), "target");
@@ -1064,16 +1077,16 @@ choose_key(GtkButton *button, gpointer user_data)
 	}
 
 	email = ident_dialog_get_text(G_OBJECT(user_data), "identity-address");
-	keyid = libbalsa_gpgme_get_seckey(protocol, email, GTK_WINDOW(user_data), &error);
-	if (keyid != NULL) {
-		display_frame_set_field(G_OBJECT(user_data), target, keyid);
-		g_free(keyid);
-	}
-	if (error != NULL) {
+
+    /* Getting a key may mean blocking on a user response, so handle
+     * it asynchronously */
+    libbalsa_gpgme_get_seckey_async(button, protocol, email, GTK_WINDOW(user_data),
+                                    choose_key_cb, user_data, &error);
+    if (error != NULL) {
         libbalsa_information(LIBBALSA_INFORMATION_WARNING,
                              _("Error selecting key: %s"), error->message);
-        g_clear_error(&error);
-	}
+        g_error_free(error);
+    }
 }
 
 

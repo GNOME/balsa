@@ -147,15 +147,42 @@ row_activated_cb(GtkTreeView       *tree_view,
 
         gtk_tree_model_get(model, &iter, GPG_KEY_PTR_COLUMN, &key, -1);
         dialog = libbalsa_key_dialog(window, GTK_BUTTONS_CLOSE, key, GPG_SUBKEY_CAP_ALL, NULL, NULL);
-        (void) gtk_dialog_run(GTK_DIALOG(dialog));
-        gtk_widget_destroy(dialog);
+        gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
+        g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+        gtk_widget_show_all(dialog);
     }
 }
 
+/* Select key */
 
-gpgme_key_t
-lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
-		    gpgme_protocol_t protocol, GtkWindow * parent)
+typedef struct {
+    gpgme_key_t use_key;
+    GTask *task;
+} lb_gpgme_select_key_data_t;
+
+static void
+lb_gpgme_select_key_response(GtkDialog *dialog,
+                             gint       response,
+                             gpointer   user_data)
+{
+    lb_gpgme_select_key_data_t *data = user_data;
+
+    gtk_widget_destroy((GtkWidget *) dialog);
+
+    if (response == GTK_RESPONSE_OK) {
+        gpgme_key_ref(data->use_key);
+        g_task_return_pointer(data->task, data->use_key, (GDestroyNotify) gpgme_key_unref);
+    } else {
+        g_task_return_pointer(data->task, NULL, NULL);
+    }
+
+    g_object_unref(data->task);
+    g_free(data);
+}
+
+void
+lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode,
+		    gpgme_protocol_t protocol, GtkWindow * parent, GTask *task)
 {
     GtkWidget *dialog;
     GtkWidget *content_area;
@@ -168,9 +195,14 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     GtkTreeSelection *selection;
     GtkTreeIter iter;
     gchar *prompt;
-    gpgme_key_t use_key = NULL;
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *column;
+    GList *list;
+    lb_gpgme_select_key_data_t *data;
+
+    data = g_new(lb_gpgme_select_key_data_t, 1);
+    data->use_key = NULL;
+    data->task = task;
 
     /* FIXME: create dialog according to the Gnome HIG */
     dialog = gtk_dialog_new_with_buttons(_("Select key"),
@@ -242,11 +274,11 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     g_object_set_data(G_OBJECT(selection), "first", GUINT_TO_POINTER(1));
     gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
     g_signal_connect(selection, "changed",
-		     G_CALLBACK(key_selection_changed_cb), &use_key);
+		     G_CALLBACK(key_selection_changed_cb), &data->use_key);
 
     /* add the keys */
-    while (keys != NULL) {
-    	gpgme_key_t key = (gpgme_key_t) keys->data;
+    for (list = g_task_get_task_data(task); list != NULL; list = list->next) {
+    	gpgme_key_t key = (gpgme_key_t) list->data;
 
     	/* simply add the primary uid -- the user can show the full key details */
     	if ((key->uids != NULL) && (key->uids->uid != NULL) && (key->subkeys != NULL)) {
@@ -267,7 +299,6 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     		g_free(bits);
     		g_free(created);
     	}
-    	keys = g_list_next(keys);
     }
 
     g_object_unref(model);
@@ -296,14 +327,9 @@ lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode, GList * keys,
     gtk_container_add(GTK_CONTAINER(scrolled_window), tree_view);
     g_signal_connect(tree_view, "row-activated", G_CALLBACK(row_activated_cb), dialog);
 
-    gtk_widget_show_all(content_area);
-
-    if (gtk_dialog_run(GTK_DIALOG(dialog)) != GTK_RESPONSE_OK) {
-    	use_key = NULL;
-    }
-    gtk_widget_destroy(dialog);
-
-    return use_key;
+    g_signal_connect(dialog, "response",
+                     G_CALLBACK(lb_gpgme_select_key_response), data);
+    gtk_widget_show_all(dialog);
 }
 
 

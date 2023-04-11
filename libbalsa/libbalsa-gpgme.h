@@ -56,16 +56,16 @@ typedef struct _gpg_capabilities gpg_capabilities;
  * Parameters:
  * - user name
  * - key selection mode
- * - list of available keys (gpgme_key_t data elements)
  * - protocol
  * - parent window
+ * - task for asynchronous work
  * Return: the key the user selected, or NULL if the operation shall be cancelled
  */
-typedef gpgme_key_t(*lbgpgme_select_key_cb) (const gchar *,
-						 	 	 	 	 	 lb_key_sel_md_t,
-											 GList *,
-											 gpgme_protocol_t,
-											 GtkWindow *);
+typedef void (*lbgpgme_select_key_cb) (const gchar *,
+                                       lb_key_sel_md_t,
+                                       gpgme_protocol_t,
+                                       GtkWindow *,
+                                       GTask *);
 
 /** Callback to ask the user whether a key with low trust shall be accepted
  * Parameters:
@@ -132,11 +132,15 @@ gchar *libbalsa_gpgme_get_pubkey(gpgme_protocol_t   protocol,
 								 GError           **error)
 	G_GNUC_WARN_UNUSED_RESULT;
 
-gchar *libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
-  	  	  	  	  	  	  	  	 const gchar       *name,
-								 GtkWindow 		   *parent,
-								 GError           **error)
-	G_GNUC_WARN_UNUSED_RESULT;
+gchar *libbalsa_gpgme_get_seckey_finish(GAsyncResult *result)
+    G_GNUC_WARN_UNUSED_RESULT;
+void libbalsa_gpgme_get_seckey_async(gpointer              object,
+                                     gpgme_protocol_t      protocol,
+                                     const gchar          *name,
+                                     GtkWindow            *parent,
+                                     GAsyncReadyCallback   callback,
+                                     gpointer              callback_data,
+                                     GError              **error);
 
 void libbalsa_gpgme_set_error(GError        **error,
 					          gpgme_error_t   gpgme_err,

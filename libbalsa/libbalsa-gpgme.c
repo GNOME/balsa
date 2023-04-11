@@ -790,68 +790,107 @@ libbalsa_gpgme_get_pubkey(gpgme_protocol_t   protocol,
 }
 
 
-/** \brief Get the key id of a secret key
+/** \brief Finish asynchronously getting the id of a secret key
  *
+ * \param result the result of the task
+ * \return a newly allocated string containing the key id key on success, shall be freed by the caller
+ */
+gchar *
+libbalsa_gpgme_get_seckey_finish(GAsyncResult *result)
+{
+    GTask *task = G_TASK(result);
+    gpgme_key_t key;
+    gchar *keyid = NULL;
+
+    key = g_task_propagate_pointer(task, NULL);
+    if (key != NULL) {
+        gpgme_subkey_t subkey;
+
+        for (subkey = key->subkeys; (subkey != NULL) && (keyid == NULL); subkey = subkey->next) {
+            if ((subkey->can_sign != 0) &&
+                (subkey->expired == 0U) &&
+                (subkey->revoked == 0U) &&
+                (subkey->disabled == 0U) &&
+                (subkey->invalid == 0U)) {
+                keyid = g_strdup(subkey->keyid);
+            }
+        }
+        gpgme_key_unref(key);
+    }
+
+    return keyid;
+}
+
+
+/** \brief Get the keyid of a secret key
+ *
+ * \param object GObject to own the task
  * \param protocol GpgME protocol (OpenPGP or CMS)
  * \param name email address for which the key shall be selected
  * \param parent parent window to be passed to the callback functions
+ * \param callback through which the key will be returned
+ * \param user_data for the callback
  * \param error Filled with error information on error
- * \return a newly allocated string containing the key id key on success, shall be freed by the caller
  *
  * Call libbalsa_gpgme_list_keys() to list all secret keys for the passed protocol, and \em always call \ref select_key_cb to let
  * the user choose the secret key, even if only one is available.
  */
-gchar *
-libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
-	  	  	  	  	  	  const gchar       *name,
-						  GtkWindow 		*parent,
-						  GError           **error)
+static void
+destroy_key_list(gpointer data)
 {
-	gpgme_ctx_t ctx;
-	gchar *keyid = NULL;
+    g_list_free_full(data, (GDestroyNotify) gpgme_key_unref);
+}
 
-	ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
-	if (ctx != NULL) {
-		GList *keys = NULL;
+void
+libbalsa_gpgme_get_seckey_async(gpointer              object,
+                                gpgme_protocol_t      protocol,
+                                const gchar          *name,
+                                GtkWindow            *parent,
+                                GAsyncReadyCallback   callback,
+                                gpointer              user_data,
+                                GError              **error)
+{
+    gpgme_ctx_t ctx;
 
-		/* Let gpgme list all available secret keys, including those not matching the passed email address.
-		 * Rationale: enable selecting a secret key even if the local email address is re-written by the MTA.
-		 * See e.g. http://www.postfix.org/ADDRESS_REWRITING_README.html#generic */
-		if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, TRUE, FALSE, error)) {
-			if (keys != NULL) {
-				gpgme_key_t key;
+    g_return_if_fail(G_IS_OBJECT(object));
 
-				/* let the user select a key from the list, even if there is only one */
-				if (select_key_cb != NULL) {
-					key = select_key_cb(name, LB_SELECT_PRIVATE_KEY, keys, gpgme_get_protocol(ctx), parent);
-					if (key != NULL) {
-						gpgme_subkey_t subkey;
+    ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
+    if (ctx != NULL) {
+        GList *keys = NULL;
 
-						for (subkey = key->subkeys; (subkey != NULL) && (keyid == NULL); subkey = subkey->next) {
-							if ((subkey->can_sign != 0) && (subkey->expired == 0U) && (subkey->revoked == 0U) &&
-								(subkey->disabled == 0U) && (subkey->invalid == 0U)) {
-								keyid = g_strdup(subkey->keyid);
-							}
-						}
-					}
-				}
-				g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
-			} else {
-				GtkWidget *dialog;
+        /* Let gpgme list all available secret keys, including those not matching the passed email address.
+         * Rationale: enable selecting a secret key even if the local email address is re-written by the MTA.
+         * See e.g. http://www.postfix.org/ADDRESS_REWRITING_README.html#generic */
+        if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, TRUE, FALSE, error)) {
+            if (keys != NULL) {
+                /* let the user select a key from the list, even if there is only one */
+                if (select_key_cb != NULL) {
+                    GTask *task;
 
-				dialog = gtk_message_dialog_new(parent,
-					GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-					GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-					_("No private key for protocol %s is available for the signer “%s”"),
-					libbalsa_gpgme_protocol_name(protocol), name);
-				(void) gtk_dialog_run(GTK_DIALOG(dialog));
-				gtk_widget_destroy(dialog);
-			}
-		}
-	    gpgme_release(ctx);
-	}
+                    task = g_task_new(object, NULL, callback, user_data);
+                    g_task_set_task_data(task, keys, destroy_key_list);
+                    select_key_cb(name, LB_SELECT_PRIVATE_KEY, gpgme_get_protocol(ctx), parent, task);
+                } else {
+                    destroy_key_list(keys);
+                }
+            } else {
+                GtkWidget *dialog;
+                GtkDialogFlags flags =
+                    GTK_DIALOG_MODAL |
+                    GTK_DIALOG_DESTROY_WITH_PARENT |
+                    libbalsa_dialog_flags();
 
-	return keyid;
+                dialog = gtk_message_dialog_new(parent, flags,
+                    GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
+                    _("No private key for protocol %s is available for the signer “%s”"),
+                    libbalsa_gpgme_protocol_name(protocol), name);
+                g_signal_connect(dialog, "response",
+                         G_CALLBACK(gtk_widget_destroy), NULL);
+                gtk_widget_show_all(dialog);
+            }
+        }
+        gpgme_release(ctx);
+    }
 }
 
 
@@ -955,7 +994,7 @@ cb_data_release(void *handle)
  *         cancelled the operation, GPG_ERR_AMBIGUOUS if multiple keys exist, or GPG_ERR_NOT_TRUSTED if the key is not trusted
  *
  * Get a key for a name or a fingerprint.  A name will always be enclosed in "<...>" to get an exact match.  If \em secret is set,
- * choose only secret (private) keys (signing).  Otherwise, choose only public keys (encryption).  If multiple keys would match,
+ * choose only secret (private) keys (signingselect_key_cb).  Otherwise, choose only public keys (encryption).  If multiple keys would match,
  * call the key selection CB \ref select_key_cb (if present).  If no matching key could be found or if any error occurs, return an
  * appropriate error code.
  */
@@ -1066,7 +1105,7 @@ get_pubkey(gpgme_ctx_t   ctx,
 		if (keys != NULL) {
 			/* let the user select a key from the list, even if there is only one */
 			if (select_key_cb != NULL) {
-				key = select_key_cb(name, LB_SELECT_PUBLIC_KEY_ANY, keys, gpgme_get_protocol(ctx), parent);
+				key = user_selects_key(name, LB_SELECT_PUBLIC_KEY_ANY, keys, gpgme_get_protocol(ctx), parent);
 				if (key != NULL) {
 					gpgme_key_ref(key);
 				}

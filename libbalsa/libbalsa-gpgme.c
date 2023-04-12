@@ -994,7 +994,7 @@ cb_data_release(void *handle)
  *         cancelled the operation, GPG_ERR_AMBIGUOUS if multiple keys exist, or GPG_ERR_NOT_TRUSTED if the key is not trusted
  *
  * Get a key for a name or a fingerprint.  A name will always be enclosed in "<...>" to get an exact match.  If \em secret is set,
- * choose only secret (private) keys (signingselect_key_cb).  Otherwise, choose only public keys (encryption).  If multiple keys would match,
+ * choose only secret (private) keys (signing).  Otherwise, choose only public keys (encryption).  If multiple keys would match,
  * call the key selection CB \ref select_key_cb (if present).  If no matching key could be found or if any error occurs, return an
  * appropriate error code.
  */
@@ -1105,7 +1105,7 @@ get_pubkey(gpgme_ctx_t   ctx,
 		if (keys != NULL) {
 			/* let the user select a key from the list, even if there is only one */
 			if (select_key_cb != NULL) {
-				key = user_selects_key(name, LB_SELECT_PUBLIC_KEY_ANY, keys, gpgme_get_protocol(ctx), parent);
+				key = select_key_cb(name, LB_SELECT_PUBLIC_KEY_ANY, keys, gpgme_get_protocol(ctx), parent);
 				if (key != NULL) {
 					gpgme_key_ref(key);
 				}

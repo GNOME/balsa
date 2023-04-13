@@ -113,6 +113,8 @@ G_BEGIN_DECLS
 
         GtkWidget *paned;
         gboolean ready_to_send;
+        gboolean queue_only;    /* Set when about to send */
+        gboolean has_subject;   /* Ditto */
     };
 
     BalsaSendmsg *sendmsg_window_compose(void);

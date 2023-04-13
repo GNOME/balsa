@@ -5101,102 +5101,6 @@ bsmsg2message(BalsaSendmsg * bsmsg)
     return message;
 }
 
-/* ask the user for a subject */
-static gboolean
-subject_not_empty(BalsaSendmsg * bsmsg)
-{
-    const gchar *subj;
-    GtkWidget *no_subj_dialog;
-    GtkWidget *dialog_vbox;
-    GtkWidget *hbox;
-    GtkWidget *image;
-    GtkWidget *vbox;
-    gchar *text_str;
-    GtkWidget *label;
-    GtkWidget *subj_entry;
-    gint response;
-
-    /* read the subject widget and verify that it is contains something else
-       than spaces */
-    subj = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject.body));
-    if (subj) {
-	const gchar *p = subj;
-
-	while (*p && g_unichar_isspace(g_utf8_get_char(p)))
-	    p = g_utf8_next_char(p);
-	if (*p != '\0')
-	    return TRUE;
-    }
-
-    /* build the dialog */
-    no_subj_dialog =
-        gtk_dialog_new_with_buttons(_("No Subject"),
-                                    GTK_WINDOW(bsmsg->window),
-                                    GTK_DIALOG_MODAL |
-                                    libbalsa_dialog_flags(),
-                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
-                                    _("_Send"),   GTK_RESPONSE_OK,
-                                    NULL);
-    gtk_container_set_border_width (GTK_CONTAINER (no_subj_dialog), HIG_PADDING);
-    gtk_window_set_resizable (GTK_WINDOW (no_subj_dialog), FALSE);
-    gtk_window_set_type_hint (GTK_WINDOW (no_subj_dialog), GDK_WINDOW_TYPE_HINT_DIALOG);
-
-    dialog_vbox = gtk_dialog_get_content_area(GTK_DIALOG(no_subj_dialog));
-
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2 * HIG_PADDING);
-    gtk_widget_set_vexpand(hbox, TRUE);
-    gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(dialog_vbox), hbox);
-    gtk_container_set_border_width (GTK_CONTAINER (hbox), HIG_PADDING);
-
-    image = gtk_image_new_from_icon_name("dialog-question",
-                                         GTK_ICON_SIZE_DIALOG);
-    gtk_container_add(GTK_CONTAINER (hbox), image);
-    gtk_widget_set_valign(image, GTK_ALIGN_START);
-
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2 * HIG_PADDING);
-    gtk_widget_set_hexpand(vbox, TRUE);
-    gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), vbox);
-
-    text_str = g_strdup_printf("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
-			       _("You did not specify a subject for this message"),
-			       _("If you would like to provide one, enter it below."));
-    label = libbalsa_create_wrap_label(text_str, TRUE);
-    g_free(text_str);
-    gtk_container_add(GTK_CONTAINER (vbox), label);
-    gtk_widget_set_valign(label, GTK_ALIGN_START);
-
-    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, HIG_PADDING);
-    gtk_container_add(GTK_CONTAINER (vbox), hbox);
-
-    label = gtk_label_new (_("Subject:"));
-    gtk_container_add(GTK_CONTAINER (hbox), label);
-
-    subj_entry = gtk_entry_new ();
-    gtk_entry_set_text(GTK_ENTRY(subj_entry), _("(no subject)"));
-    gtk_widget_set_hexpand(subj_entry, TRUE);
-    gtk_widget_set_halign(subj_entry, GTK_ALIGN_FILL);
-    gtk_container_add(GTK_CONTAINER(hbox), subj_entry);
-
-    gtk_entry_set_activates_default (GTK_ENTRY (subj_entry), TRUE);
-    gtk_dialog_set_default_response(GTK_DIALOG (no_subj_dialog),
-                                    GTK_RESPONSE_OK);
-
-    gtk_widget_grab_focus (subj_entry);
-    gtk_editable_select_region(GTK_EDITABLE(subj_entry), 0, -1);
-    gtk_widget_show_all(dialog_vbox);
-
-    response = gtk_dialog_run(GTK_DIALOG(no_subj_dialog));
-
-    /* always set the current string in the subject entry */
-    gtk_entry_set_text(GTK_ENTRY(bsmsg->subject.body),
-		       gtk_entry_get_text(GTK_ENTRY(subj_entry)));
-    gtk_widget_destroy(no_subj_dialog);
-
-    return response == GTK_RESPONSE_OK;
-}
-
 static void
 config_dlg_button(GtkDialog *dialog, gint response_id, const gchar *icon_id)
 {
@@ -5459,32 +5363,227 @@ check_autocrypt_recommendation(BalsaSendmsg *bsmsg)
 
 /* "send message" menu and toolbar callback.
  */
-static gint
+static gpointer send_message_thread(gpointer data);
+
+static void
 send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 {
+    const char *subj;
+
+    if (!bsmsg->ready_to_send)
+	return;
+
+    bsmsg->queue_only = queue_only;
+
+    /* read the subject widget and verify that it contains something else
+       than spaces */
+    subj = gtk_entry_get_text(GTK_ENTRY(bsmsg->subject.body));
+    bsmsg->has_subject = FALSE;
+    if (subj != NULL) {
+	const gchar *p = subj;
+	const gchar *end = subj + strlen(subj);
+
+	while (p < end && g_unichar_isspace(g_utf8_get_char(p)))
+	    p = g_utf8_next_char(p);
+	if (p < end)
+	    bsmsg->has_subject = TRUE;
+    }
+
+    g_thread_unref(g_thread_new("send-message", send_message_thread, bsmsg));
+}
+
+typedef struct {
+    BalsaSendmsg *bsmsg;
+    GMutex lock;
+    GCond cond;
+
+    int response;
+    gboolean warn_mp;
+    gboolean warn_html_sign;
+    GtkWidget *subj_entry;
+} send_message_data;
+
+static void
+send_message_thread_subject_response(GtkDialog *dialog,
+                                     int        response_id,
+                                     gpointer   user_data)
+{
+    send_message_data *data = user_data;
+
+    /* always set the current string in the subject entry */
+    gtk_entry_set_text(GTK_ENTRY(data->bsmsg->subject.body),
+                       gtk_entry_get_text(GTK_ENTRY(data->subj_entry)));
+
+    g_mutex_lock(&data->lock);
+    data->response = response_id;
+    g_cond_signal(&data->cond);
+    g_mutex_unlock(&data->lock);
+
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
+static gboolean
+send_message_thread_subject_idle(gpointer user_data)
+{
+    send_message_data *data = user_data;
+    BalsaSendmsg *bsmsg = data->bsmsg;
+    GtkWidget *no_subj_dialog;
+    GtkWidget *dialog_vbox;
+    GtkWidget *hbox;
+    GtkWidget *image;
+    GtkWidget *vbox;
+    char *text_str;
+    GtkWidget *label;
+
+    /* build the dialog */
+    no_subj_dialog =
+        gtk_dialog_new_with_buttons(_("No Subject"),
+                                    GTK_WINDOW(bsmsg->window),
+                                    GTK_DIALOG_MODAL |
+                                    libbalsa_dialog_flags(),
+                                    _("_Cancel"), GTK_RESPONSE_CANCEL,
+                                    _("_Send"),   GTK_RESPONSE_OK,
+                                    NULL);
+    libbalsa_set_margins(no_subj_dialog, HIG_PADDING);
+
+    gtk_window_set_resizable(GTK_WINDOW(no_subj_dialog), FALSE);
+
+    dialog_vbox = gtk_dialog_get_content_area(GTK_DIALOG(no_subj_dialog));
+
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 2 * HIG_PADDING);
+    gtk_widget_set_vexpand(hbox, TRUE);
+    gtk_widget_set_valign(hbox, GTK_ALIGN_FILL);
+    libbalsa_set_margins(hbox, HIG_PADDING);
+    gtk_container_add(GTK_CONTAINER(dialog_vbox), hbox);
+
+    image = gtk_image_new_from_icon_name("dialog-question", GTK_ICON_SIZE_DIALOG);
+    gtk_container_add(GTK_CONTAINER(hbox), image);
+    gtk_widget_set_valign(image, GTK_ALIGN_START);
+
+    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2 * HIG_PADDING);
+    gtk_widget_set_hexpand(vbox, TRUE);
+    gtk_widget_set_halign(vbox, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(hbox), vbox);
+
+    text_str = g_strdup_printf("<span weight=\"bold\" size=\"larger\">%s</span>\n\n%s",
+			       _("You did not specify a subject for this message"),
+			       _("If you would like to provide one, enter it below."));
+    label = libbalsa_create_wrap_label(text_str, TRUE);
+    g_free(text_str);
+    gtk_container_add(GTK_CONTAINER(vbox), label);
+    gtk_widget_set_valign(label, GTK_ALIGN_START);
+
+    hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, HIG_PADDING);
+    gtk_container_add(GTK_CONTAINER(vbox), hbox);
+
+    label = gtk_label_new (_("Subject:"));
+    gtk_container_add(GTK_CONTAINER(hbox), label);
+
+    data->subj_entry = gtk_entry_new ();
+    gtk_entry_set_text(GTK_ENTRY(data->subj_entry), _("(no subject)"));
+    gtk_widget_set_hexpand(data->subj_entry, TRUE);
+    gtk_widget_set_halign(data->subj_entry, GTK_ALIGN_FILL);
+    gtk_container_add(GTK_CONTAINER(hbox), data->subj_entry);
+
+    gtk_entry_set_activates_default(GTK_ENTRY(data->subj_entry), TRUE);
+    gtk_dialog_set_default_response(GTK_DIALOG (no_subj_dialog),
+                                    GTK_RESPONSE_OK);
+
+    gtk_widget_grab_focus (data->subj_entry);
+    gtk_editable_select_region(GTK_EDITABLE(data->subj_entry), 0, -1);
+
+    g_signal_connect(no_subj_dialog, "response",
+                     G_CALLBACK(send_message_thread_subject_response), data);
+    gtk_widget_show(no_subj_dialog);
+
+    return G_SOURCE_REMOVE;
+}
+
+static void
+send_message_thread_response(GtkDialog *dialog,
+                             int        response_id,
+                             gpointer   user_data)
+{
+    send_message_data *data = user_data;
+
+    g_mutex_lock(&data->lock);
+    data->response = response_id;
+    g_cond_signal(&data->cond);
+    g_mutex_unlock(&data->lock);
+
+    gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
+static gboolean
+send_message_thread_warn_idle(gpointer user_data)
+{
+    send_message_data *data = user_data;
+    GtkWidget *dialog;
+    GString *string =
+        g_string_new(_("You selected OpenPGP security for this message.\n"));
+
+    if (data->warn_html_sign)
+        g_string_append(string,
+                        _("The message text will be sent as plain text and as "
+                          "HTML, but only the plain part can be signed.\n"));
+    if (data->warn_mp)
+        g_string_append(string,
+                        _("The message contains attachments, which cannot be "
+                          "signed or encrypted.\n"));
+    g_string_append(string,
+                    _("You should select MIME mode if the complete "
+                      "message shall be protected. Do you really want to proceed?"));
+    dialog =
+        gtk_message_dialog_new(GTK_WINDOW(data->bsmsg->window),
+                               GTK_DIALOG_DESTROY_WITH_PARENT |
+                               GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION,
+                               GTK_BUTTONS_OK_CANCEL, "%s", string->str);
+    g_string_free(string, TRUE);
+
+    g_signal_connect(dialog, "response", G_CALLBACK(send_message_thread_response), NULL);
+    gtk_widget_show(dialog);
+
+    return G_SOURCE_REMOVE;
+}
+
+static gpointer
+send_message_thread(gpointer data) {
+    BalsaSendmsg *bsmsg = data;
+    send_message_data send_data;
     LibBalsaMsgCreateResult result;
     LibBalsaMessage *message;
     LibBalsaMailbox *fcc;
     GtkTreeIter iter;
-    GError * error = NULL;
-
-    if (!bsmsg->ready_to_send)
-	return FALSE;
-
-    if(!subject_not_empty(bsmsg))
-	return FALSE;
+    GError *error = NULL;
 
 #ifdef ENABLE_AUTOCRYPT
     if (!check_autocrypt_recommendation(bsmsg)) {
-    	return FALSE;
+        return NULL;
     }
 #else
     if (!check_suggest_encryption(bsmsg)) {
-    	return FALSE;
+        return NULL;
     }
 #endif /* ENABLE_AUTOCRYPT */
 
-    if ((bsmsg->crypt_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
+    send_data.response = GTK_RESPONSE_OK;
+
+    g_mutex_init(&send_data.lock);
+    g_cond_init(&send_data.cond);
+
+    send_data.bsmsg = bsmsg;
+
+    if (!bsmsg->has_subject) {
+        g_mutex_lock(&send_data.lock);
+        send_data.response = 0;
+        g_idle_add(send_message_thread_subject_idle, &send_data);
+        while (send_data.response == 0)
+            g_cond_wait(&send_data.cond, &send_data.lock);
+        g_mutex_unlock(&send_data.lock);
+    }
+
+    if (send_data.response == GTK_RESPONSE_OK &&
+        (bsmsg->crypt_mode & LIBBALSA_PROTECT_OPENPGP) != 0) {
         gboolean warn_mp;
         gboolean warn_html_sign;
 
@@ -5497,37 +5596,23 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
         if (warn_mp || warn_html_sign) {
             /* we are going to RFC2440 sign/encrypt a multipart, or to
              * RFC2440 sign a multipart/alternative... */
-            GtkWidget *dialog;
-            gint choice;
-            GString * string =
-                g_string_new(_("You selected OpenPGP security for this message.\n"));
+            send_data.warn_mp = warn_mp;
+            send_data.warn_html_sign = warn_html_sign;
 
-            if (warn_html_sign)
-                string =
-                    g_string_append(string,
-                        _("The message text will be sent as plain text and as "
-                          "HTML, but only the plain part can be signed.\n"));
-            if (warn_mp)
-                string =
-                    g_string_append(string,
-                        _("The message contains attachments, which cannot be "
-                          "signed or encrypted.\n"));
-            string =
-                g_string_append(string,
-                    _("You should select MIME mode if the complete "
-                      "message shall be protected. Do you really want to proceed?"));
-            dialog = gtk_message_dialog_new
-                (GTK_WINDOW(bsmsg->window),
-                 GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
-                 GTK_MESSAGE_QUESTION,
-                 GTK_BUTTONS_OK_CANCEL, "%s", string->str);
-            g_string_free(string, TRUE);
-            choice = gtk_dialog_run(GTK_DIALOG(dialog));
-            gtk_widget_destroy(dialog);
-            if (choice != GTK_RESPONSE_OK)
-                return FALSE;
+            g_mutex_lock(&send_data.lock);
+            g_idle_add(send_message_thread_warn_idle, &send_data);
+            send_data.response = 0;
+            while (send_data.response == 0)
+                g_cond_wait(&send_data.cond, &send_data.lock);
+            g_mutex_unlock(&send_data.lock);
         }
     }
+
+    g_mutex_clear(&send_data.lock);
+    g_cond_clear(&send_data.cond);
+
+    if (send_data.response != GTK_RESPONSE_OK)
+        return NULL;
 
     message = bsmsg2message(bsmsg);
     fcc = balsa_find_mailbox_by_url(bsmsg->fcc_url);
@@ -5537,17 +5622,18 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
                                _("sending message with GPG mode %d"),
                                libbalsa_message_get_crypt_mode(message));
 
-    if(queue_only)
+    if(bsmsg->queue_only) {
 	result = libbalsa_message_queue(message, balsa_app.outbox, fcc,
 					libbalsa_identity_get_smtp_server(bsmsg->ident),
 					bsmsg->flow, &error);
-    else
+    } else {
         result = libbalsa_message_send(message, balsa_app.outbox, fcc,
                                        balsa_find_sentbox_by_url,
 				       libbalsa_identity_get_smtp_server(bsmsg->ident),
 					   	   	   	   	   balsa_app.send_progress_dialog,
                                        GTK_WINDOW(balsa_app.main_window),
                                        bsmsg->flow, &error);
+    }
     if (result == LIBBALSA_MESSAGE_CREATE_OK) {
 	if (bsmsg->parent_message != NULL) {
             LibBalsaMailbox *mailbox = libbalsa_message_get_mailbox(bsmsg->parent_message);
@@ -5587,12 +5673,12 @@ send_message_handler(BalsaSendmsg * bsmsg, gboolean queue_only)
 				       LIBBALSA_INFORMATION_ERROR,
 				       _("Send failed: %s"), msg);
         }
-	return FALSE;
+	return NULL;
     }
 
-    gtk_widget_destroy(bsmsg->window);
+    g_idle_add((GSourceFunc) gtk_widget_destroy, bsmsg->window);
 
-    return TRUE;
+    return NULL;
 }
 
 

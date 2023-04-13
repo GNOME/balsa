@@ -467,6 +467,7 @@ libbalsa_gpgme_sign(const gchar * userid, GMimeStream * istream,
     };
 
     /* paranoia checks */
+    g_return_val_if_fail(libbalsa_am_i_subthread(), GPGME_MD_NONE);
     g_return_val_if_fail(GMIME_IS_STREAM(istream), GPGME_MD_NONE);
     g_return_val_if_fail(GMIME_IS_STREAM(ostream), GPGME_MD_NONE);
     g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP ||
@@ -574,6 +575,7 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
     };
 
     /* paranoia checks */
+    g_return_val_if_fail(libbalsa_am_i_subthread(), FALSE);
     g_return_val_if_fail(recipients != NULL, FALSE);
     g_return_val_if_fail(GMIME_IS_STREAM(istream), FALSE);
     g_return_val_if_fail(GMIME_IS_STREAM(ostream), FALSE);
@@ -771,6 +773,7 @@ libbalsa_gpgme_get_pubkey(gpgme_protocol_t   protocol,
 	gpgme_ctx_t ctx;
 	gchar *armored_key = NULL;
 
+	g_return_val_if_fail(libbalsa_am_i_subthread(), NULL);
 	g_return_val_if_fail(name != NULL, NULL);
 
 	ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
@@ -998,6 +1001,82 @@ cb_data_release(void *handle)
  * call the key selection CB \ref select_key_cb (if present).  If no matching key could be found or if any error occurs, return an
  * appropriate error code.
  */
+
+typedef struct {
+    GMutex lock;
+    GCond cond;
+    GError **error;
+    const char *name;
+    lb_key_sel_md_t mode;
+    gpgme_protocol_t protocol;
+    GtkWindow *parent;
+    GTask *task;
+    gpgme_key_t key;
+    gboolean done;
+} select_key_sync_data_t;
+
+static void
+select_key_sync_callback(GObject      *source_object,
+                           GAsyncResult *res,
+                           gpointer      user_data)
+{
+    select_key_sync_data_t *data = user_data;
+    GTask *task = G_TASK(res);
+
+    g_mutex_lock(&data->lock);
+    data->key = g_task_propagate_pointer(task, data->error);
+    data->done = TRUE;
+    g_cond_signal(&data->cond);
+    g_mutex_unlock(&data->lock);
+}
+
+static gboolean
+select_key_sync_idle(gpointer user_data)
+{
+    select_key_sync_data_t *data = user_data;
+
+    select_key_cb(data->name, data->mode, data->protocol, data->parent, data->task);
+
+    return G_SOURCE_REMOVE;
+}
+
+static gpgme_key_t
+select_key_sync(const char       *name,
+                lb_key_sel_md_t   mode,
+                GList            *keys,
+                GDestroyNotify    destroy_keys,
+                gpgme_protocol_t  protocol,
+                GtkWindow        *parent,
+                GError          **error)
+{
+    select_key_sync_data_t data;
+
+    g_assert(libbalsa_am_i_subthread());
+
+    data.task = g_task_new(G_OBJECT(parent), NULL, select_key_sync_callback, &data);
+    g_task_set_task_data(data.task, keys, destroy_keys);
+
+    g_mutex_init(&data.lock);
+    g_cond_init(&data.cond);
+
+    data.name = name;
+    data.mode = mode;
+    data.protocol = protocol;
+    data.parent = parent;
+    data.error = error;
+
+    g_mutex_lock(&data.lock);
+    data.done = FALSE;
+    g_idle_add(select_key_sync_idle, &data);
+    while (!data.done)
+        g_cond_wait(&data.cond, &data.lock);
+    g_mutex_unlock(&data.lock);
+
+    g_cond_clear(&data.cond);
+
+    return data.key;
+}
+
 static gpgme_error_t
 get_key_from_name(gpgme_ctx_t   ctx,
 				  gpgme_key_t  *key,
@@ -1041,10 +1120,12 @@ get_key_from_name(gpgme_ctx_t   ctx,
 
 	/* let the user select a key from the list if there is more than one */
 	result = GPG_ERR_NO_ERROR;
-	if (g_list_length(keys) > 1U) {
-		if (select_key_cb != NULL) {
-			selected = select_key_cb(name, secret ? LB_SELECT_PRIVATE_KEY : LB_SELECT_PUBLIC_KEY_USER,
-				keys, gpgme_get_protocol(ctx), parent);
+    if (g_list_length(keys) > 1U) {
+        if (select_key_cb != NULL) {
+            selected =
+                select_key_sync(name, secret ? LB_SELECT_PRIVATE_KEY : LB_SELECT_PUBLIC_KEY_USER,
+                                keys, NULL, gpgme_get_protocol(ctx), parent, error);
+
 			if (selected == NULL) {
 				result = GPG_ERR_CANCELED;
 			}
@@ -1061,7 +1142,7 @@ get_key_from_name(gpgme_ctx_t   ctx,
 	if (selected != NULL) {
 		gpgme_key_ref(selected);
 	}
-	g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
+	destroy_key_list(keys);
 
 	/* OpenPGP: ask the user if a low-validity key should be trusted for encryption (Note: owner_trust is not applicable to
 	 * S/MIME certificates) */
@@ -1101,18 +1182,18 @@ get_pubkey(gpgme_ctx_t   ctx,
 	gpgme_key_t key = NULL;
 
 	/* let gpgme list all available keys */
-	if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, error)) {
-		if (keys != NULL) {
-			/* let the user select a key from the list, even if there is only one */
-			if (select_key_cb != NULL) {
-				key = select_key_cb(name, LB_SELECT_PUBLIC_KEY_ANY, keys, gpgme_get_protocol(ctx), parent);
-				if (key != NULL) {
-					gpgme_key_ref(key);
-				}
-			}
-			g_list_free_full(keys, (GDestroyNotify) gpgme_key_unref);
-		}
-	}
+    if (libbalsa_gpgme_list_keys(ctx, &keys, NULL, NULL, FALSE, FALSE, error)) {
+        if (keys != NULL) {
+            /* let the user select a key from the list, even if there is only one */
+            if (select_key_cb != NULL) {
+                key =
+                    select_key_sync(name, LB_SELECT_PUBLIC_KEY_ANY, keys, destroy_key_list,
+                                    gpgme_get_protocol(ctx), parent, error);
+            } else {
+                destroy_key_list(keys);
+            }
+        }
+    }
 
 	return key;
 }

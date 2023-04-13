@@ -102,7 +102,7 @@ balsa_mime_widget_new_vcalendar(BalsaMessage * bm,
         libbalsa_box_append(GTK_BOX(mw), frame);
     	event = balsa_vevent_widget(libbalsa_vcal_vevent(vcal_obj, event_no), vcal_obj, may_reply, sender);
         gtk_container_set_border_width(GTK_CONTAINER(event), 6U);
-    	libbalsa_frame_set_child(GTK_FRAME(frame), event);
+        libbalsa_frame_set_child(GTK_FRAME(frame), event);
     }
 
     g_object_unref(vcal_obj);

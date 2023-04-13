@@ -188,10 +188,6 @@ GtkWidget * libbalsa_add_mnemonic_button_to_box(const gchar *markup,
                                                 GtkWidget   *box,
                                                 GtkAlign     align);
 
-GtkWidget * libbalsa_add_mnemonic_button_to_box(const gchar *markup,
-                                                GtkWidget   *box,
-                                                GtkAlign     align);
-
 void libbalsa_box_append(GtkBox *box, GtkWidget *child);
 void libbalsa_button_set_child(GtkButton *button, GtkWidget *child);
 void libbalsa_expander_set_child(GtkExpander *expander, GtkWidget *child);

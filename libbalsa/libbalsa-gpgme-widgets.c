@@ -846,7 +846,7 @@ smime_show_chain(GtkWidget *button, gpointer G_GNUC_UNUSED user_data)
         libbalsa_set_vmargins(chain, HIG_PADDING);
 	gtk_container_add(GTK_CONTAINER(vbox), chain);
 
-	gtk_widget_show_all(vbox);
-	gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
+        g_signal_connect(dialog, "response",
+                         G_CALLBACK(gtk_widget_destroy), NULL);
+	gtk_widget_show_all(dialog);
 }

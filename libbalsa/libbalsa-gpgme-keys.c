@@ -935,6 +935,25 @@ gpgme_import_res_to_gchar(gpgme_import_result_t import_result)
  * a message dialogue of type \ref keyserver_op_t::msg_type if \ref keyserver_op_t::imported_key is NULL.  After running the
  * dialogue, the passed key server thread data is freed.
  */
+static void
+show_keyserver_dialog_response(GtkDialog *self,
+                               gint       response_id,
+                               gpointer   user_data)
+{
+    keyserver_op_t *keyserver_op = (keyserver_op_t *) user_data;
+
+    gtk_widget_destroy(GTK_WIDGET(self));
+
+    /* free the remaining keyserver thread data */
+    if (keyserver_op->gpgme_ctx != NULL) {
+        gpgme_release(keyserver_op->gpgme_ctx);
+    }
+    g_free(keyserver_op->fingerprint);
+    g_free(keyserver_op->email_address);
+    g_free(keyserver_op->message);
+    g_free(keyserver_op);
+}
+
 static gboolean
 show_keyserver_dialog(gpointer user_data)
 {
@@ -949,17 +968,10 @@ show_keyserver_dialog(gpointer user_data)
 		dialog = gtk_message_dialog_new(keyserver_op->parent, GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
 			keyserver_op->msg_type, GTK_BUTTONS_CLOSE, "%s", keyserver_op->message);
 	}
-	gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
 
-	/* free the remaining keyserver thread data */
-	if (keyserver_op->gpgme_ctx != NULL) {
-		gpgme_release(keyserver_op->gpgme_ctx);
-	}
-	g_free(keyserver_op->fingerprint);
-	g_free(keyserver_op->email_address);
-	g_free(keyserver_op->message);
-	g_free(keyserver_op);
+        g_signal_connect(dialog, "response",
+                         G_CALLBACK(show_keyserver_dialog_response), keyserver_op);
+        gtk_widget_show_all(dialog);
 
 	return FALSE;
 }

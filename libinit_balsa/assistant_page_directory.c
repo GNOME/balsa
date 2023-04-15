@@ -195,9 +195,10 @@ verify_mailbox_entry(GtkWidget * entry, const gchar * name,
                                    _("Problem verifying path “%s”:\n%s"),
                                    text, error);
         g_free(error);
-        gtk_dialog_run(GTK_DIALOG(dlg));
-        gtk_widget_destroy(dlg);
         *verify = FALSE;
+        g_signal_connect(dlg, "response",
+                         G_CALLBACK(gtk_widget_destroy), NULL);
+        gtk_widget_show_all(dlg);
     }
 }
 

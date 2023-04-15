@@ -37,6 +37,10 @@
 #include "assistant_page_defclient.h"
 #include "assistant_page_finish.h"
 
+static void balsa_initdruid_cancel_response(GtkDialog *self,
+                                            gint       response_id,
+                                            gpointer   user_data);
+
 static void
 balsa_initdruid_cancel(GtkAssistant * druid)
 {
@@ -49,9 +53,19 @@ balsa_initdruid_cancel(GtkAssistant * druid)
                                GTK_BUTTONS_YES_NO,
                                _("This will exit Balsa.\n"
                                  "Do you really want to do this?"));
-    GtkResponseType reply = 
-        gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
+    g_signal_connect(dialog, "response",
+                     G_CALLBACK(balsa_initdruid_cancel_response), NULL);
+    gtk_widget_show_all(dialog);
+}
+
+static void
+balsa_initdruid_cancel_response(GtkDialog *self,
+                                gint       response_id,
+                                gpointer   user_data)
+{
+    GtkResponseType reply = response_id;
+
+    gtk_widget_destroy(GTK_WIDGET(self));
 
     if (reply == GTK_RESPONSE_YES) {
         libbalsa_conf_drop_all();

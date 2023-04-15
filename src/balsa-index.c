@@ -1459,10 +1459,15 @@ bndx_expand_to_row_and_select(BalsaIndex * index, GtkTreeIter * iter)
     path = gtk_tree_model_get_path(model, iter);
     bndx_expand_to_row(index, path);
 
+    if (index->reference != NULL) {
+        /* A previously scheduled idle has not been run */
+        gtk_tree_row_reference_free(index->reference);
+    } else {
+        g_idle_add((GSourceFunc) bndx_expand_to_row_and_select_idle, index);
+    }
+
     index->reference = gtk_tree_row_reference_new(model, path);
     gtk_tree_path_free(path);
-
-    g_idle_add((GSourceFunc) bndx_expand_to_row_and_select_idle, index);
 }
 
 /* End of select message interfaces. */

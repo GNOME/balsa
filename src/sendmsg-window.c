@@ -5546,6 +5546,13 @@ send_message_thread_warn_idle(gpointer user_data)
     return G_SOURCE_REMOVE;
 }
 
+static gboolean
+destroy_widget(gpointer user_data)
+{
+    gtk_widget_destroy(user_data);
+    return G_SOURCE_REMOVE;
+}
+
 static gpointer
 send_message_thread(gpointer data) {
     BalsaSendmsg *bsmsg = data;
@@ -5676,7 +5683,7 @@ send_message_thread(gpointer data) {
 	return NULL;
     }
 
-    g_idle_add((GSourceFunc) gtk_widget_destroy, bsmsg->window);
+    g_idle_add(destroy_widget, bsmsg->window);
 
     return NULL;
 }

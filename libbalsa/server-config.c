@@ -494,6 +494,15 @@ on_server_cfg_changed(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
 	g_signal_emit(server_cfg, changed_sig, 0);
 }
 
+typedef struct {
+    LibBalsaServerCfg *server_cfg;
+    char *server_name;
+    NetClientProbeResult probe_res;
+} on_server_probe_data_t;
+
+static void on_server_probe_response(GtkDialog *self,
+                                     gint       response_id,
+                                     gpointer   user_data);
 
 static void
 on_server_probe(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
@@ -503,7 +512,7 @@ on_server_probe(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
 	NetClientProbeResult probe_res;
 	GError *error = NULL;
 	GtkWidget *msgdlg;
-	gint action;
+	on_server_probe_data_t *data;
 
 	server_name = gtk_entry_get_text(GTK_ENTRY(server_cfg->host_port));
 	g_assert(server_cfg->probe_fn != NULL);
@@ -511,6 +520,8 @@ on_server_probe(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
 	if (success) {
 		const gchar *crypt_str;
 		const gchar *auth_str;
+		GtkDialogFlags flags =
+		    GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags();
 
 		switch (probe_res.crypt_mode) {
 		case NET_CLIENT_CRYPT_ENCRYPTED:
@@ -533,10 +544,7 @@ on_server_probe(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
 			auth_str = _("none");
 			probe_res.auth_mode = NET_CLIENT_AUTH_NONE_ANON;
 		}
-		msgdlg = gtk_message_dialog_new(NULL,
-			GTK_DIALOG_DESTROY_WITH_PARENT | libbalsa_dialog_flags(),
-            GTK_MESSAGE_INFO,
-            GTK_BUTTONS_NONE,
+		msgdlg = gtk_message_dialog_new(NULL, flags, GTK_MESSAGE_INFO, GTK_BUTTONS_NONE,
 			_("Probe results for server %s\n"
 			  "\342\200\242 Port: %u\n"
 			  "\342\200\242 Encryption: %s\n"
@@ -554,24 +562,44 @@ on_server_probe(GtkWidget *widget, LibBalsaServerCfg *server_cfg)
 	}
 	g_clear_error(&error);
 
-	action = gtk_dialog_run(GTK_DIALOG(msgdlg));
-	gtk_widget_destroy(msgdlg);
-	if (action == GTK_RESPONSE_APPLY) {
+	data = g_new(on_server_probe_data_t, 1);
+	data->server_cfg = g_object_ref(server_cfg);
+	data->server_name = g_strdup(server_name);
+	data->probe_res = probe_res;
+	g_signal_connect(msgdlg, "response",
+                         G_CALLBACK(on_server_probe_response), data);
+	gtk_widget_show_all(msgdlg);
+}
+
+static void
+on_server_probe_response(GtkDialog *self,
+                         gint       response_id,
+                         gpointer   user_data)
+{
+    on_server_probe_data_t *data = user_data;
+
+	gtk_widget_destroy(GTK_WIDGET(self));
+
+	if (response_id == GTK_RESPONSE_APPLY) {
 		gchar *buffer;
 		gchar id_buf[8];
 		const gchar *colon;
 
-		colon = strchr(server_name, ':');
+		colon = strchr(data->server_name, ':');
 		if (colon == NULL) {
-			buffer = g_strdup_printf("%s:%u", server_name, probe_res.port);
+			buffer = g_strdup_printf("%s:%u", data->server_name, data->probe_res.port);
 		} else {
-			buffer = g_strdup_printf("%.*s:%u", (int) (colon - server_name), server_name, probe_res.port);
+			buffer = g_strdup_printf("%.*s:%u", (int) (colon - data->server_name), data->server_name, data->probe_res.port);
 		}
-		gtk_entry_set_text(GTK_ENTRY(server_cfg->host_port), buffer);
+		gtk_entry_set_text(GTK_ENTRY(data->server_cfg->host_port), buffer);
 		g_free(buffer);
 
-		gtk_combo_box_set_active(GTK_COMBO_BOX(server_cfg->security), probe_res.crypt_mode - 1);
-		snprintf(id_buf, sizeof(id_buf), "%d", probe_res.auth_mode);
-		gtk_combo_box_set_active_id(GTK_COMBO_BOX(server_cfg->auth_mode), id_buf);
+		gtk_combo_box_set_active(GTK_COMBO_BOX(data->server_cfg->security), data->probe_res.crypt_mode - 1);
+		snprintf(id_buf, sizeof(id_buf), "%d", data->probe_res.auth_mode);
+		gtk_combo_box_set_active_id(GTK_COMBO_BOX(data->server_cfg->auth_mode), id_buf);
 	}
+
+	g_object_unref(data->server_cfg);
+	g_free(data->server_name);
+	g_free(data);
 }

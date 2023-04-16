@@ -982,18 +982,24 @@ bab_window_new(GtkApplication * application)
 static void
 ab_warning(const char *fmt, ...)
 {
-    GtkWidget *d;
+    GtkWidget *dialog;
     va_list va_args;
     char *msg;
+    GtkDialogFlags flags = GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT;
+
     va_start(va_args, fmt);
     msg =  g_strdup_vprintf(fmt, va_args);
     va_end(va_args);
-    d = gtk_message_dialog_new(contacts_app.window,
-                               GTK_DIALOG_DESTROY_WITH_PARENT,
+
+    dialog =
+        gtk_message_dialog_new(contacts_app.window, flags,
                                GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
                                "%s", msg);
-    gtk_dialog_run(GTK_DIALOG(d));
-    gtk_widget_destroy(d);
+    g_free(msg);
+
+    g_signal_connect(dialog, "response",
+                     G_CALLBACK(gtk_widget_destroy), NULL);
+    gtk_widget_show_all(dialog);
 }
 
 static void

@@ -177,10 +177,16 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
                                    GTK_MESSAGE_ERROR,
                                    GTK_BUTTONS_OK,
                                    _("Local Mail Problem\n%s"), uhoh);
-        gtk_dialog_run(GTK_DIALOG(err));
-        gtk_widget_destroy(err);
         g_free(uhoh);
-        return; /* FIXME! Do not go to the next page! */
+        /* Do not go to the next page!
+         * Go back to the previous page, so that we reappear on this one */
+        gtk_assistant_previous_page(druid);
+
+        g_signal_connect(err, "response",
+                         G_CALLBACK(gtk_widget_destroy), NULL);
+        gtk_widget_show_all(err);
+
+        return;
     }
 
     balsa_app.current_ident = ident;

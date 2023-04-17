@@ -90,9 +90,11 @@ ImapResponse imap_mbox_expunge_a(ImapMboxHandle *h);
 ImapResponse imap_mbox_store_flag(ImapMboxHandle *r, unsigned cnt,
                                   unsigned *seqno, ImapMsgFlag flg,
                                   gboolean state);
-unsigned imap_mbox_store_flag_a(ImapMboxHandle *r, unsigned cnt,
-				unsigned *seqno, ImapMsgFlag flg,
-				gboolean state);
+ImapResponse imap_mbox_store_flag_a(ImapMboxHandle *r,
+                                    unsigned        cnt,
+                                    unsigned       *seqno,
+                                    ImapMsgFlag     flg,
+                                    gboolean        state);
 
 ImapResponse imap_mbox_handle_copy(ImapMboxHandle* handle,
 				   unsigned cnt, unsigned *seqno,

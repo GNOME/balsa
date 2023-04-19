@@ -392,6 +392,36 @@ create_osmo_dialog(AddressBookConfig *abc)
 }
 #endif /* HAVE_OSMO */
 
+/* externq_dialog_changed
+ *
+ * callback (swapped) for the "activate" signal of abc->name_entry,
+ * and the "file-set" signals of abc->ab_specific.externq.load and
+ * abc->ab_specific.externq.save.
+ *
+ * If the name is non-empty and the files are set and anything has been
+ * changed, enable the relevant "Add" or "Apply" button.
+ */
+static void
+externq_dialog_changed(AddressBookConfig * abc)
+{
+    gchar *load;
+    gchar *save;
+    const gchar *name;
+    gboolean apply_ok;
+
+    load = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->ab_specific.externq.load));
+    save = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->ab_specific.externq.save));
+    name = gtk_entry_get_text(GTK_ENTRY(abc->name_entry));
+
+    apply_ok = (load != NULL && load[0] != '\0' &&
+                save != NULL && save[0] != '\0' &&
+                name[0] != '\0');
+    g_free(load);
+    g_free(save);
+
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(abc->window), GTK_RESPONSE_APPLY, apply_ok);
+}
+
 static GtkWidget *
 create_externq_dialog(AddressBookConfig * abc)
 {
@@ -412,6 +442,8 @@ create_externq_dialog(AddressBookConfig * abc)
 				   ab_externq != NULL ?
                                    libbalsa_address_book_get_name(LIBBALSA_ADDRESS_BOOK(ab_externq)) : NULL,
 				   label);
+    g_signal_connect_swapped(abc->name_entry, "activate",
+                             G_CALLBACK(externq_dialog_changed), abc);
 
     label = gtk_label_new(_("Load program location:"));
     gtk_widget_set_halign(label, GTK_ALIGN_END);
@@ -420,6 +452,9 @@ create_externq_dialog(AddressBookConfig * abc)
         gtk_file_chooser_button_new
         (_("Select load program for address book"),
          GTK_FILE_CHOOSER_ACTION_OPEN);
+    g_signal_connect_swapped(abc->ab_specific.externq.load, "file-set",
+                             G_CALLBACK(externq_dialog_changed), abc);
+
     gtk_widget_set_hexpand(abc->ab_specific.externq.load, TRUE);
     gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.externq.load,
                     1, 1, 1, 1);
@@ -433,6 +468,9 @@ create_externq_dialog(AddressBookConfig * abc)
         gtk_file_chooser_button_new
         (_("Select save program for address book"),
          GTK_FILE_CHOOSER_ACTION_OPEN);
+    g_signal_connect_swapped(abc->ab_specific.externq.save, "file-set",
+                             G_CALLBACK(externq_dialog_changed), abc);
+
     gtk_widget_set_hexpand(abc->ab_specific.externq.save, TRUE);
     gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.externq.save,
                     1, 2, 1, 1);
@@ -454,6 +492,9 @@ create_externq_dialog(AddressBookConfig * abc)
     gtk_container_add(GTK_CONTAINER
                       (gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
                       grid);
+
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_APPLY, FALSE);
+
     return dialog;
 }
 

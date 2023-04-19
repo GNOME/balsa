@@ -204,6 +204,33 @@ add_radio_buttons(GtkWidget * grid, gint row, AddressBookConfig * abc)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
 }
 
+static void
+local_dialog_changed(AddressBookConfig * abc)
+{
+    gchar *file_name;
+    const gchar *book_name;
+    gboolean apply_ok;
+
+    file_name = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
+    book_name = gtk_entry_get_text(GTK_ENTRY(abc->name_entry));
+
+    apply_ok = (file_name != NULL && file_name[0] != '\0' &&
+                book_name != NULL && book_name[0] != '\0');
+    g_free(file_name);
+
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(abc->window), GTK_RESPONSE_APPLY, apply_ok);
+}
+
+static gboolean
+local_dialog_idle(gpointer user_data)
+{
+    AddressBookConfig *abc = user_data;
+
+    gtk_dialog_set_response_sensitive(GTK_DIALOG(abc->window), GTK_RESPONSE_APPLY, FALSE);
+
+    return G_SOURCE_REMOVE;
+}
+
 static GtkWidget *
 create_local_dialog(AddressBookConfig * abc, const gchar * type)
 {
@@ -235,6 +262,9 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
                                     action,       GTK_RESPONSE_APPLY,
                                     NULL);
     g_free(title);
+    g_signal_connect_swapped(dialog, "selection-changed",
+                             G_CALLBACK(local_dialog_changed), abc);
+
     size_group = libbalsa_create_size_group(dialog);
 
     grid = libbalsa_create_grid();
@@ -243,6 +273,8 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
     gtk_size_group_add_widget(size_group, label);
     abc->name_entry =
         libbalsa_create_grid_entry(grid, NULL, NULL, 0, name, label);
+    g_signal_connect_swapped(abc->name_entry, "changed",
+                             G_CALLBACK(local_dialog_changed), abc);
 
     add_radio_buttons(grid, 1, abc);
 
@@ -263,6 +295,10 @@ create_local_dialog(AddressBookConfig * abc, const gchar * type)
     }
     g_signal_connect(dialog, "response",
                      G_CALLBACK(edit_book_response), abc);
+
+    /* Make the "apply" button insensitive after GtkFileChooser has set
+     * its sensitivity: */
+    g_timeout_add(500, local_dialog_idle, abc);
 
     return dialog;
 }
@@ -415,7 +451,7 @@ externq_dialog_changed(AddressBookConfig * abc)
 
     apply_ok = (load != NULL && load[0] != '\0' &&
                 save != NULL && save[0] != '\0' &&
-                name[0] != '\0');
+                name != NULL && name[0] != '\0');
     g_free(load);
     g_free(save);
 

@@ -650,7 +650,7 @@ net_client_class_init(NetClientClass *klass)
 	gobject_class->finalize = net_client_finalise;
 	signals[0] = g_signal_new("cert-check", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_BOOLEAN, 2U,
 		G_TYPE_TLS_CERTIFICATE, G_TYPE_TLS_CERTIFICATE_FLAGS);
-	signals[1] = g_signal_new("auth", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_STRV, 1U, G_TYPE_BOOLEAN);
+	signals[1] = g_signal_new("auth", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_STRV, 1U, G_TYPE_INT);
 	signals[2] = g_signal_new("cert-pass", NET_CLIENT_TYPE, G_SIGNAL_RUN_LAST, 0U, NULL, NULL, NULL, G_TYPE_STRING, 1U,
 		G_TYPE_STRING);
 }

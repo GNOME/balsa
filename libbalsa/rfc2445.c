@@ -995,7 +995,7 @@ libbalsa_vevent_reply(const LibBalsaVEvent   *event,
     	icalcomponent_add_property(ev_data, icalproperty_new_location(event->location));
     }
 
-    reply_str = icalcomponent_as_ical_string(reply);
+    reply_str = icalcomponent_as_ical_string_r(reply);
     icalcomponent_free(reply);
     return reply_str;
 }

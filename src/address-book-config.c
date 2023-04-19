@@ -77,7 +77,6 @@ static GtkWidget *create_osmo_dialog(AddressBookConfig *abc);
 
 static void help_button_cb(AddressBookConfig * abc);
 static gboolean handle_close(AddressBookConfig * abc);
-static gboolean bad_path(gchar * path, GtkWindow * window, gint type);
 static gboolean create_book(AddressBookConfig * abc);
 static void modify_book(AddressBookConfig * abc);
 
@@ -666,71 +665,20 @@ enum {
    NOTE: type cannot be made the switch select expression.
 
  * returns:     TRUE    if the close was successful, and it's OK to quit
- *              FALSE   if a bad path was detected and the user wants to
+ *              FALSE   if an error was detected and the user wants to
  *                      correct it.
  */
 static gboolean
-chooser_bad_path(GtkFileChooser * chooser, GtkWindow * window, gint type)
-{
-    return bad_path(gtk_file_chooser_get_filename(chooser), window, type);
-}
-
-static gboolean
 handle_close(AddressBookConfig * abc)
 {
-    if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD) {
-        if (chooser_bad_path(GTK_FILE_CHOOSER(abc->window),
-                     GTK_WINDOW(abc->window),
-                     ADDRESS_BOOK_CONFIG_PATH_FILE))
-            return FALSE;
-    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
-        if (chooser_bad_path(GTK_FILE_CHOOSER(abc->window),
-                     GTK_WINDOW(abc->window),
-                     ADDRESS_BOOK_CONFIG_PATH_FILE))
-            return FALSE;
-    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ) {
-        if (chooser_bad_path(GTK_FILE_CHOOSER(abc->ab_specific.externq.load),
-                     GTK_WINDOW(abc->window),
-                     ADDRESS_BOOK_CONFIG_PATH_LOAD))
-            return FALSE;
-        if (chooser_bad_path(GTK_FILE_CHOOSER(abc->ab_specific.externq.save),
-                     GTK_WINDOW(abc->window),
-                     ADDRESS_BOOK_CONFIG_PATH_SAVE))
-            return FALSE;
-    }
+    gboolean ok = TRUE;
 
     if (abc->address_book == NULL)
-        return create_book(abc);
+        ok = create_book(abc);
     else
         modify_book(abc);
 
-    return TRUE;
-}
-
-/* bad_path:
- *
- * Returns TRUE if the path is bad and the user wants to correct it
- */
-static gboolean
-bad_path(gchar * path, GtkWindow * window, gint type)
-{
-    GtkWidget *ask;
-    gint clicked_button;
-
-    if (path) {
-        g_free(path);
-        return FALSE;
-    }
-    ask = gtk_message_dialog_new(window,
-				 GTK_DIALOG_MODAL|
-				 GTK_DIALOG_DESTROY_WITH_PARENT,
-                                 GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-                                 _("No path found. "
-				   "Do you want to give one?"));
-    gtk_dialog_set_default_response(GTK_DIALOG(ask), GTK_RESPONSE_YES);
-    clicked_button = gtk_dialog_run(GTK_DIALOG(ask));
-    gtk_widget_destroy(ask);
-    return clicked_button == GTK_RESPONSE_YES;
+    return ok;
 }
 
 static gboolean
@@ -740,26 +688,20 @@ create_book(AddressBookConfig * abc)
     const gchar *name = gtk_entry_get_text(GTK_ENTRY(abc->name_entry));
 
     if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_VCARD) {
-        gchar *path =
-            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
-        if (path != NULL)
-            address_book = libbalsa_address_book_vcard_new(name, path);
+        gchar *path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
+        address_book = libbalsa_address_book_vcard_new(name, path);
         g_free(path);
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ) {
-#define GET_FILENAME(chooser) \
-  gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser))
-        gchar *load = GET_FILENAME(abc->ab_specific.externq.load);
-        gchar *save = GET_FILENAME(abc->ab_specific.externq.save);
-        if (load != NULL && save != NULL)
-            address_book =
-                libbalsa_address_book_externq_new(name, load, save);
+        gchar *load =
+            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->ab_specific.externq.load));
+        gchar *save =
+            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->ab_specific.externq.save));
+        address_book = libbalsa_address_book_externq_new(name, load, save);
         g_free(load);
         g_free(save);
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDIF) {
-        gchar *path =
-            gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
-        if (path != NULL)
-            address_book = libbalsa_address_book_ldif_new(name, path);
+        gchar *path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
+        address_book = libbalsa_address_book_ldif_new(name, path);
         g_free(path);
 #ifdef ENABLE_LDAP
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {

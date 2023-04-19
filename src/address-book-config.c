@@ -394,7 +394,7 @@ create_osmo_dialog(AddressBookConfig *abc)
 
 /* externq_dialog_changed
  *
- * callback (swapped) for the "activate" signal of abc->name_entry,
+ * callback (swapped) for the "changed" signal of abc->name_entry,
  * and the "file-set" signals of abc->ab_specific.externq.load and
  * abc->ab_specific.externq.save.
  *
@@ -442,7 +442,7 @@ create_externq_dialog(AddressBookConfig * abc)
 				   ab_externq != NULL ?
                                    libbalsa_address_book_get_name(LIBBALSA_ADDRESS_BOOK(ab_externq)) : NULL,
 				   label);
-    g_signal_connect_swapped(abc->name_entry, "activate",
+    g_signal_connect_swapped(abc->name_entry, "changed",
                              G_CALLBACK(externq_dialog_changed), abc);
 
     label = gtk_label_new(_("Load program location:"));

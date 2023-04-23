@@ -1766,7 +1766,7 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
     g_signal_connect_data(item, "activate",
                           G_CALLBACK(bmbl_mru_show_tree), mru,
-                          (GClosureNotify) g_free, (GConnectFlags) 0);
+                          (GClosureNotify) bmbl_mru_free, (GConnectFlags) 0);
 
     gtk_widget_show_all(menu);
 
@@ -1855,6 +1855,19 @@ bmbl_mru_size_allocate_cb(GtkWidget * widget, GdkRectangle * allocation,
 }
 
 static void
+bmbl_mru_show_tree_response(GtkDialog *self,
+                            gint       response_id,
+                            gpointer   user_data)
+{
+    BalsaMBListMRUEntry *mru = user_data;
+
+    gtk_widget_destroy(GTK_WIDGET(self));
+
+    if (mru->setup_cb != NULL)
+        ((MRUSetup) mru->setup_cb) (mru->user_data);
+}
+
+static void
 bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
 {
     BalsaMBListMRUEntry *mru = data;
@@ -1898,10 +1911,9 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
                                 balsa_app.mru_tree_width,
                                 balsa_app.mru_tree_height);
 
-    gtk_dialog_run(GTK_DIALOG(dialog));
-    gtk_widget_destroy(dialog);
-    if (mru->setup_cb)
-        ((MRUSetup) mru->setup_cb) (mru->user_data);
+    g_signal_connect(dialog, "response",
+                     G_CALLBACK(bmbl_mru_show_tree_response), mru);
+    gtk_widget_show_all(dialog);
 }
 
 /*
@@ -1915,6 +1927,7 @@ bmbl_mru_show_tree(GtkWidget * widget, gpointer data)
 static void
 bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
 {
+    BalsaMBListMRUEntry *mru = data;
     GdkEvent *event;
     GtkTreeView *tree_view;
     gdouble x_win, y_win;
@@ -1950,7 +1963,7 @@ bmbl_mru_selected_cb(GtkTreeSelection * selection, gpointer data)
         model = gtk_tree_view_get_model(tree_view);
         gtk_tree_model_get_iter(model, &iter, path);
         gtk_tree_model_get(model, &iter, 0, &mbnode, -1);
-        ((BalsaMBListMRUEntry *) data)->url =
+        mru->url =
             g_strdup(libbalsa_mailbox_get_url(balsa_mailbox_node_get_mailbox(mbnode)));
 	g_object_unref(mbnode);
         bmbl_mru_activate_cb(NULL, data);
@@ -1976,6 +1989,7 @@ bmbl_mru_activated_cb(GtkTreeView * tree_view, GtkTreePath * path,
                       GtkTreeViewColumn * column, gpointer data)
 {
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
+    BalsaMBListMRUEntry *mru = data;
     GtkTreeIter iter;
     BalsaMailboxNode *mbnode;
     LibBalsaMailbox *mailbox;
@@ -1985,8 +1999,7 @@ bmbl_mru_activated_cb(GtkTreeView * tree_view, GtkTreePath * path,
     g_return_if_fail(mbnode != NULL);
 
     if ((mailbox = balsa_mailbox_node_get_mailbox(mbnode)) != NULL) {
-        ((BalsaMBListMRUEntry *) data)->url =
-            g_strdup(libbalsa_mailbox_get_url(mailbox));
+        mru->url = g_strdup(libbalsa_mailbox_get_url(mailbox));
         bmbl_mru_activate_cb(NULL, data);
 
         gtk_dialog_response(GTK_DIALOG
@@ -2087,10 +2100,18 @@ bmbl_mru_combo_box_setup(GtkComboBox * combo_box)
 
 /* Callbacks */
 static void
+bmbl_mru_combo_box_changed_callback(gpointer data)
+{
+    GtkComboBox *combo_box = data;
+
+    bmbl_mru_combo_box_setup(combo_box);
+}
+
+static void
 bmbl_mru_combo_box_changed(GtkComboBox * combo_box,
                            BalsaMBListMRUOption * mro)
 {
-    BalsaMBListMRUEntry mru;
+    BalsaMBListMRUEntry *mru;
     const gchar *url;
     gint active = gtk_combo_box_get_active(combo_box);
 
@@ -2103,15 +2124,15 @@ bmbl_mru_combo_box_changed(GtkComboBox * combo_box,
     }
 
     /* User clicked on "Other..." */
-    mru.window = mro->window;
-    mru.url_list = mro->url_list;
-    mru.user_func = NULL;
-    mru.setup_cb = NULL;
-    mru.user_data = combo_box;
-    mru.url = NULL;
-    bmbl_mru_show_tree(NULL, &mru);
-    g_free(mru.url);
-    bmbl_mru_combo_box_setup(combo_box);
+    mru = bmbl_mru_new(mro->url_list, NULL, combo_box, NULL);
+    mru->window = mro->window;
+    mru->setup_cb = G_CALLBACK(bmbl_mru_combo_box_changed_callback);
+
+    /* Let the combobox own the mru: */
+    g_object_set_data_full(G_OBJECT(combo_box), "bmbl-mru-combo-box-data",
+                           mru, (GDestroyNotify) bmbl_mru_free);
+
+    bmbl_mru_show_tree(NULL, mru);
 }
 
 static void

@@ -117,7 +117,7 @@ static void tree_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
 
 static void part_info_init(BalsaMessage * balsa_message, BalsaPartInfo * info);
 static void part_context_save_all_cb(GtkWidget * menu_item, GList * info_list);
-static void part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list);
+static void part_context_dump_all_cb(GtkMenuItem *self, gpointer user_data);
 static void part_create_menu (BalsaPartInfo* info);
 
 /* stuff needed for sending Message Disposition Notifications */
@@ -980,11 +980,12 @@ tree_mult_selection_popup(BalsaMessage     *balsa_message,
             gtk_menu_item_new_with_label (_("Save selected to folder…"));
         g_signal_connect (menu_item, "activate",
                           G_CALLBACK (part_context_dump_all_cb),
-                          (gpointer) balsa_message->save_all_list);
+                          (gpointer) balsa_message);
         gtk_menu_shell_append (GTK_MENU_SHELL (balsa_message->save_all_popup), menu_item);
         /* Translators: save all items to folder and open the folder in standard file manager app */
-        add_save_view_menu_item(balsa_message->save_all_popup, _("Save selected to folder and browse…"),
-        	G_CALLBACK(part_context_dump_all_cb), balsa_message->save_all_list);
+        add_save_view_menu_item(balsa_message->save_all_popup,
+                                _("Save selected to folder and browse…"),
+                                G_CALLBACK(part_context_dump_all_cb), balsa_message);
         gtk_widget_show_all(balsa_message->save_all_popup);
         if (event != NULL) {
             gtk_menu_popup_at_pointer(GTK_MENU(balsa_message->save_all_popup), event);
@@ -1754,20 +1755,36 @@ part_context_save_all_cb(GtkWidget * menu_item, GList * info_list)
  * appending "(1)", "(2)", ... to the name to make it unique.
  * Sets balsa_app::save_dir to the selected folder.
  */
+typedef struct {
+    GtkWidget *menu_item;
+    GList     *info_list;
+} part_context_dump_all_data_t;
+
+static void part_context_dump_all_cb_response(GtkDialog *dialog,
+                                              gint       response_id,
+                                              gpointer   user_data);
+
 static void
-part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
+part_context_dump_all_cb(GtkMenuItem *self,
+                         gpointer     user_data)
 {
+    BalsaMessage *balsa_message = user_data;
+    GList *info_list = balsa_message->save_all_list;
     GtkWidget *dump_dialog;
+    part_context_dump_all_data_t *data;
 
     g_return_if_fail(info_list);
 
     dump_dialog =
         gtk_file_chooser_dialog_new(_("Select folder for saving selected parts"),
-                                    balsa_get_parent_window(menu_item),
+                                    balsa_get_parent_window(GTK_WIDGET(balsa_message)),
                                     GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_OK"),     GTK_RESPONSE_OK,
                                     NULL);
+
+    gtk_window_set_modal(GTK_WINDOW(dump_dialog), TRUE);
+
     gtk_dialog_set_default_response(GTK_DIALOG(dump_dialog),
                                     GTK_RESPONSE_CANCEL);
     gtk_file_chooser_set_local_only(GTK_FILE_CHOOSER(dump_dialog),
@@ -1776,9 +1793,25 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
         gtk_file_chooser_set_current_folder_uri(GTK_FILE_CHOOSER(dump_dialog),
                                                 balsa_app.save_dir);
 
-    if (gtk_dialog_run(GTK_DIALOG(dump_dialog)) == GTK_RESPONSE_OK) {
+    data = g_new(part_context_dump_all_data_t, 1);
+    data->menu_item = GTK_WIDGET(self);
+    data->info_list = info_list;
+
+    g_signal_connect(dump_dialog, "response",
+                     G_CALLBACK(part_context_dump_all_cb_response), data);
+    gtk_widget_show_all(dump_dialog);
+}
+
+static void
+part_context_dump_all_cb_response(GtkDialog *dump_dialog,
+                                  gint       response_id,
+                                  gpointer   user_data)
+{
+    if (response_id == GTK_RESPONSE_OK) {
 	gchar *dir_name =
             gtk_file_chooser_get_uri(GTK_FILE_CHOOSER(dump_dialog));
+        part_context_dump_all_data_t *data = user_data;
+        GList *info_list;
         GFile * dir_file;
 
         g_debug("store to URI: %s", dir_name);
@@ -1789,7 +1822,7 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
 	balsa_app.save_dir = dir_name;
 
 	/* save all parts without further user interaction */
-        for (/* nothing */; info_list != NULL; info_list = info_list->next) {
+        for (info_list = data->info_list; info_list != NULL; info_list = info_list->next) {
 	    BalsaPartInfo *info = BALSA_PART_INFO(info_list->data);
             GFile *save_file;
             char *save_path;
@@ -1884,10 +1917,12 @@ part_context_dump_all_cb(GtkWidget * menu_item, GList * info_list)
             g_free(save_path_utf8);
             g_object_unref(save_file);
 	}
-	balsa_mime_widget_view_save_dir(menu_item);
+        balsa_mime_widget_view_save_dir(data->menu_item);
 	g_object_unref(dir_file);
     }
-    gtk_widget_destroy(dump_dialog);
+
+    gtk_widget_destroy(GTK_WIDGET(dump_dialog));
+    g_free(user_data);
 }
 
 

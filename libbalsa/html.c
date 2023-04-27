@@ -571,6 +571,7 @@ lbh_cid_cb(WebKitURISchemeRequest * request,
     LibBalsaWebKitInfo *info;
     const gchar *path;
     LibBalsaMessageBody *body;
+    GError *cid_err = NULL;
 
     path = webkit_uri_scheme_request_get_path(request);
     info = g_object_get_data(G_OBJECT(webkit_uri_scheme_request_get_web_view(request)), LIBBALSA_HTML_INFO);
@@ -593,7 +594,17 @@ lbh_cid_cb(WebKitURISchemeRequest * request,
                                              mime_type);
             g_free(mime_type);
             g_object_unref(stream);
+        } else {
+            g_set_error(&cid_err, LIBBALSA_ERROR_QUARK, -1, "empty embedded content for Content-ID %s", path);
+            g_free(content);
         }
+    } else {
+        g_set_error(&cid_err, LIBBALSA_ERROR_QUARK, -1, "embedded content for Content-ID %s missing", path);
+    }
+    if (cid_err != NULL) {
+        g_debug("%s: %s", __func__, cid_err->message);
+        webkit_uri_scheme_request_finish_error(request, cid_err);
+        g_error_free(cid_err);
     }
 }
 

@@ -2061,8 +2061,8 @@ bmbl_mru_combo_box_setup(GtkComboBox * combo_box)
 /* Callbacks */
 static void
 bmbl_mru_combo_box_changed_cb(GtkDialog *self,
-                                    gint       response_id,
-                                    gpointer   user_data)
+                              gint       response_id,
+                              gpointer   user_data)
 {
     GtkComboBox *combo_box = user_data;
 

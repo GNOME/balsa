@@ -654,12 +654,10 @@ message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
 }
 
 static void
-mw_mru_menu_cb(GtkMenuShell *self,
-               gpointer      user_data)
+mw_mru_menu_cb(gchar * url, gpointer data)
 {
-    MessageWindow *mw = user_data;
-    const char *url = balsa_app.folder_mru->data; /* first URL in the list */
     LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
+    MessageWindow *mw = data;
 
     message_window_move_message(mw, mailbox);
 }
@@ -907,9 +905,9 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
     g_signal_connect(mailbox, "message_expunged",
                      G_CALLBACK(mw_expunged_cb), mw);
 
-    submenu = balsa_mblist_mru_menu(GTK_WINDOW(window), &balsa_app.folder_mru);
-    g_signal_connect(submenu, "selection-done",
-                     G_CALLBACK(mw_mru_menu_cb), mw);
+    submenu = balsa_mblist_mru_menu(GTK_WINDOW(window),
+                                    &balsa_app.folder_mru,
+                                    G_CALLBACK(mw_mru_menu_cb), mw);
     gtk_container_foreach(GTK_CONTAINER(menubar), mw_menubar_foreach,
                           &move_menu);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(move_menu), submenu);

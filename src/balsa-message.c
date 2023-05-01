@@ -1621,11 +1621,10 @@ display_content(BalsaMessage * balsa_message)
 }
 
 void
-balsa_message_copy_part(LibBalsaMessageBody *part)
+balsa_message_copy_part(const gchar *url, LibBalsaMessageBody *part)
 {
-    const char *url = balsa_app.folder_mru->data; /* first URL in the list */
-    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
     GError *err = NULL;
+    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
     GMimeStream *stream;
 
     g_return_if_fail(mailbox != NULL);
@@ -1685,9 +1684,9 @@ part_create_menu (BalsaPartInfo* info)
 
         submenu =
             balsa_mblist_mru_menu(GTK_WINDOW(gtk_widget_get_toplevel(info->popup_menu)),
-                                  &balsa_app.folder_mru);
-        g_signal_connect_swapped(submenu, "selection-done",
-                                 G_CALLBACK(balsa_message_copy_part), info->body);
+                                  &balsa_app.folder_mru,
+                                  G_CALLBACK(balsa_message_copy_part),
+                                  info->body);
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), submenu);
     } else {
     	/* Translators: save to folder and open the folder in standard file manager app */

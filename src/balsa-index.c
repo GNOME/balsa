@@ -1946,16 +1946,13 @@ bi_toggle_new_cb(gpointer user_data)
                             LIBBALSA_MESSAGE_FLAG_NEW);
 }
 
-/*
- * bndx_popup_menu_create: create the popup menu at init time
- */
+
 static void
-bndx_do_popup_selection_done(GtkMenuShell *self,
-                             gpointer      user_data)
+mru_menu_cb(const gchar * url, BalsaIndex * index)
 {
-    BalsaIndex *index = user_data;
-    const char *url = balsa_app.folder_mru->data; /* first URL in the list */
     LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
+
+    g_return_if_fail(mailbox != NULL);
 
     if (balsa_mailbox_node_get_mailbox(index->mailbox_node) != mailbox) {
         GArray *selected = balsa_index_selected_msgnos_new(index);
@@ -1964,6 +1961,9 @@ bndx_do_popup_selection_done(GtkMenuShell *self,
     }
 }
 
+/*
+ * bndx_popup_menu_create: create the popup menu at init time
+ */
 static GtkWidget *
 bndx_popup_menu_create(BalsaIndex * index)
 {
@@ -2095,10 +2095,10 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
                              any && !readonly);
 
     submenu =
-        balsa_mblist_mru_menu(GTK_WINDOW(gtk_widget_get_toplevel(GTK_WIDGET(index))),
-                              &balsa_app.folder_mru);
-    g_signal_connect(submenu, "selection-done",
-                     G_CALLBACK(bndx_do_popup_selection_done), index);
+        balsa_mblist_mru_menu(GTK_WINDOW
+                              (gtk_widget_get_toplevel(GTK_WIDGET(index))),
+                              &balsa_app.folder_mru,
+                              G_CALLBACK(mru_menu_cb), index);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(index->move_to_item),
                               submenu);
 

@@ -354,8 +354,8 @@ on_key_import_button(GtkButton *button,
 		g_clear_error(&error);
 	}
 	g_free(import_info);
-	(void) gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
+        g_signal_connect(dialog, "response",
+                         G_CALLBACK(gtk_widget_destroy), dialog);
 }
 
 

@@ -59,6 +59,15 @@ balsa_mime_widget_ctx_menu_cb(GtkWidget * menu_item,
 
     @param mime_body message part to be saved.
 */
+typedef struct {
+    GtkWidget *parent_widget;
+    LibBalsaMessageBody *mime_body;
+} balsa_mime_widget_ctx_menu_save_data_t;
+
+static void balsa_mime_widget_ctx_menu_save_response(GtkDialog *self,
+                                                     gint       response_id,
+                                                     gpointer   user_data);
+
 void
 balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 				LibBalsaMessageBody * mime_body)
@@ -66,10 +75,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     gchar *cont_type, *title;
     GtkWidget *save_dialog;
     GtkFileChooser *save_chooser;
-    gchar *save_path;
-    gchar *tmp_path;
-    int handle;
-    GFile *save_file;
+    balsa_mime_widget_ctx_menu_save_data_t *data;
 
     g_return_if_fail(mime_body != NULL);
 
@@ -102,8 +108,31 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
 	g_free(filename);
     }
 
+    data = g_new(balsa_mime_widget_ctx_menu_save_data_t, 1);
+    data->parent_widget = parent_widget;
+    data->mime_body = mime_body;
     gtk_window_set_modal(GTK_WINDOW(save_dialog), TRUE);
-    if (gtk_dialog_run(GTK_DIALOG(save_dialog)) != GTK_RESPONSE_OK) {
+    g_signal_connect(save_dialog, "response",
+                     G_CALLBACK(balsa_mime_widget_ctx_menu_save_response), data);
+    gtk_widget_show_all(save_dialog);
+}
+
+static void
+balsa_mime_widget_ctx_menu_save_response(GtkDialog *self,
+                                         gint       response_id,
+                                         gpointer   user_data)
+{
+    GtkWidget *save_dialog = (GtkWidget *) self;
+    GtkFileChooser *save_chooser = (GtkFileChooser *) self;
+    balsa_mime_widget_ctx_menu_save_data_t *data = user_data;
+    GtkWidget *parent_widget = data->parent_widget;
+    LibBalsaMessageBody *mime_body = data->mime_body;
+    GFile *save_file;
+    gchar *save_path;
+    gchar *tmp_path;
+    int handle;
+
+    if (response_id != GTK_RESPONSE_OK) {
 	gtk_widget_destroy(save_dialog);
 	return;
     }
@@ -160,6 +189,7 @@ balsa_mime_widget_ctx_menu_save(GtkWidget * parent_widget,
     g_object_unref(save_file);
     g_free(save_path);
     g_free(tmp_path);
+    g_free(data);
 }
 
 void

@@ -417,8 +417,10 @@ folder_conf_imap_subscriptions(GtkButton        *widget,
 	g_free(label_str);
 
 	if (dialog != NULL) {
-		(void) gtk_dialog_run(GTK_DIALOG(dialog));
-		gtk_widget_destroy(dialog);
+		/* dialog is modal, so the UI is blocked until it is closed */
+		g_signal_connect(dialog, "response",
+				 G_CALLBACK(gtk_widget_destroy), NULL);
+		gtk_widget_show_all(dialog);
 	}
 }
 

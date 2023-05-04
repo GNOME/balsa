@@ -322,7 +322,7 @@ create_imap_folder_dialog(LibBalsaServer  *server,
 			g_error_free(error);
 			return NULL;
 		} else {
-			g_object_ref(store);
+			g_object_ref(*store);
 		}
 	}
 

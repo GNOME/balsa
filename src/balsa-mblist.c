@@ -1675,9 +1675,6 @@ typedef void (*MRUCallback) (gchar * url, gpointer user_data);
 typedef void (*MRUSetup) (gpointer user_data);
 
 /* Forward references */
-static GtkWidget *bmbl_mru_menu(GtkWindow * window, GList ** url_list,
-                                GCallback user_func, gpointer user_data,
-                                gboolean allow_empty, GCallback setup_cb);
 static BalsaMBListMRUEntry *bmbl_mru_new(GList ** url_list,
                                          GCallback user_func,
                                          gpointer user_data,
@@ -1713,38 +1710,18 @@ GtkWidget *
 balsa_mblist_mru_menu(GtkWindow * window, GList ** url_list,
                       GCallback user_func, gpointer user_data)
 {
-    g_return_val_if_fail(url_list != NULL, NULL);
-    return bmbl_mru_menu(window, url_list, user_func, user_data, FALSE,
-                         NULL);
-}
-
-/*
- * bmbl_mru_menu:
- *
- * window, url_list, user_func, user_data:
- *              as for balsa_mblist_mru_menu;
- * allow_empty: if TRUE, a list with an empty url
- *              will be allowed into the menu;
- * setup_cb:    called when the tree has been displayed, to allow the
- *              display to be reset.
- *
- * Returns the GtkMenu.
- */
-static GtkWidget *
-bmbl_mru_menu(GtkWindow * window, GList ** url_list,
-              GCallback user_func, gpointer user_data,
-              gboolean allow_empty, GCallback setup_cb)
-{
     GtkWidget *menu = gtk_menu_new();
     GtkWidget *item;
     GList *list;
     BalsaMBListMRUEntry *mru;
 
-    for (list = *url_list; list; list = g_list_next(list)) {
+    g_return_val_if_fail(url_list != NULL, NULL);
+
+    for (list = *url_list; list; list = list->next) {
         gchar *url = list->data;
         LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
 
-        if (mailbox || (allow_empty && !*url)) {
+        if (mailbox != NULL) {
             mru = bmbl_mru_new(url_list, user_func, user_data, url);
             item =
                 gtk_menu_item_new_with_label(mailbox ? libbalsa_mailbox_get_name(mailbox) : "");
@@ -1761,7 +1738,7 @@ bmbl_mru_menu(GtkWindow * window, GList ** url_list,
 
     mru = bmbl_mru_new(url_list, user_func, user_data, NULL);
     mru->window = window;
-    mru->setup_cb = setup_cb;
+    mru->setup_cb = NULL;
     item = gtk_menu_item_new_with_mnemonic(_("_Other…"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
     g_signal_connect_data(item, "activate",

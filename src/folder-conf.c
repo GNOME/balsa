@@ -604,6 +604,16 @@ on_parent_double_click(GtkTreeView G_GNUC_UNUSED       *treeview,
     gtk_dialog_response(dialog, GTK_RESPONSE_ACCEPT);
 }
 
+typedef struct {
+    SubfolderDialogData *sub_folder_data;
+    GtkTreeSelection *selection;
+    GtkTreeModel *model;
+} browse_button_cb_data;
+
+static void browse_button_cb_response(GtkDialog *self,
+                                      gint       response_id,
+                                      gpointer   user_data);
+
 static void
 browse_button_cb(GtkWidget           *widget,
 				 SubfolderDialogData *sub_folder_data)
@@ -622,7 +632,7 @@ browse_button_cb(GtkWidget           *widget,
 		GtkTreeModel *model;
 		GtkTreeSelection *selection;
 		const gchar *current_parent;
-		gint result;
+		browse_button_cb_data *data;
 
 		/* select the parent item (if any) */
 		model = gtk_tree_view_get_model(GTK_TREE_VIEW(treeview));
@@ -640,22 +650,39 @@ browse_button_cb(GtkWidget           *widget,
 		}
 		g_signal_connect(treeview, "row-activated", G_CALLBACK(on_parent_double_click), dialog);
 
-		result = gtk_dialog_run(GTK_DIALOG(dialog));
-		if (result == GTK_RESPONSE_ACCEPT) {
-			GtkTreeIter iter;
-
-			if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
-				gchar *selected_path;
-
-				gtk_tree_model_get(model, &iter,
-						LB_SCANNER_IMAP_PATH, &selected_path, -1);
-				gtk_entry_set_text(GTK_ENTRY(sub_folder_data->parent_folder), selected_path);
-				g_free(selected_path);
-				validate_sub_folder(NULL, sub_folder_data);
-			}
-		}
-		gtk_widget_destroy(dialog);
+		data = g_new(browse_button_cb_data, 1);
+		data->sub_folder_data = sub_folder_data;
+		data->selection = selection;
+		data->model = model;
+		g_signal_connect(dialog, "response", G_CALLBACK(browse_button_cb_response), data);
+		gtk_widget_show_all(dialog);
 	}
+}
+
+static void
+browse_button_cb_response(GtkDialog *self,
+                          gint       response_id,
+                          gpointer   user_data)
+{
+    browse_button_cb_data *data = user_data;
+
+    if (response_id == GTK_RESPONSE_ACCEPT) {
+        GtkTreeIter iter;
+
+        if (gtk_tree_selection_get_selected(data->selection, NULL, &iter)) {
+            gchar *selected_path;
+
+            gtk_tree_model_get(data->model, &iter,
+                               LB_SCANNER_IMAP_PATH, &selected_path, -1);
+            gtk_entry_set_text(GTK_ENTRY(data->sub_folder_data->parent_folder),
+                               selected_path);
+            g_free(selected_path);
+            validate_sub_folder(NULL, data->sub_folder_data);
+        }
+    }
+
+    g_free(data);
+    gtk_widget_destroy(GTK_WIDGET(self));
 }
 
 static gboolean

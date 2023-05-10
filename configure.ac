@@ -453,6 +453,7 @@ if test x$with_libsecret != xno; then
     AC_DEFINE(HAVE_LIBSECRET,1,[Defined when libsecret can be used.])
     BALSA_CFLAGS="$BALSA_CFLAGS $LIBSECRET_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $LIBSECRET_LIBS"
+    BALSA_AB_LIBS="$BALSA_AB_LIBS $LIBSECRET_LIBS"
 else
     AC_MSG_RESULT([no])
     AC_MSG_WARN([libsecret support is disabled. Balsa will store the

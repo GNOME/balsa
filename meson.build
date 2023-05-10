@@ -363,6 +363,7 @@ if libsecret
   conf.set('HAVE_LIBSECRET', 1,
     description : 'Defined when libsecret can be used.')
   balsa_deps += secret_dep
+  balsa_ab_deps += secret_dep
 endif # libsecret
 
 #####################################################################

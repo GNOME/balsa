@@ -463,7 +463,7 @@ bm_header_extend_popup(GtkWidget * widget, GtkMenu * menu, gpointer arg)
         balsa_mblist_mru_menu(GTK_WINDOW
                               (gtk_widget_get_toplevel(widget)),
                               &balsa_app.folder_mru,
-                              G_CALLBACK(balsa_message_copy_part), arg);
+                              balsa_message_copy_part, arg);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item),
                               submenu);
     gtk_widget_show_all(submenu);

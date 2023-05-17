@@ -976,9 +976,6 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
     LibBalsaAddressBookClass *parent_class =
         LIBBALSA_ADDRESS_BOOK_CLASS(libbalsa_address_book_ldap_parent_class);
     LibBalsaAddressBookLdap *ab_ldap;
-#if defined(HAVE_LIBSECRET)
-    GError *error = NULL;
-#endif
 
     g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_LDAP(ab));
 
@@ -997,27 +994,33 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
         ab_ldap->bind_dn = NULL;
     }
 
+	if (ab_ldap->bind_dn != NULL) {
 #if defined(HAVE_LIBSECRET)
-	ab_ldap->passwd = secret_password_lookup_sync(&ldap_schema, NULL, &error,
-		"server", ab_ldap->host,
-		"user", ab_ldap->bind_dn,
-		NULL);
-	if (error != NULL) {
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Error loading LDAP credentials for address book %s: %s"),
-			libbalsa_address_book_get_name(ab), error->message);
-		g_error_free(error);
+		GError *error = NULL;
+
+		ab_ldap->passwd = secret_password_lookup_sync(&ldap_schema, NULL, &error,
+			"server", ab_ldap->host,
+			"user", ab_ldap->bind_dn,
+			NULL);
+		if (error != NULL) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Error loading LDAP credentials for address book %s: %s"),
+				libbalsa_address_book_get_name(ab), error->message);
+			g_error_free(error);
+		} else {
+			libbalsa_conf_clean_key("Passwd");
+		}
+#else
+		ab_ldap->passwd = libbalsa_conf_private_get_string("Passwd", TRUE);
+#endif
+		if ((ab_ldap->passwd != NULL) && (*ab_ldap->passwd == '\0')) {
+#if defined(HAVE_LIBSECRET)
+			secret_password_free(ab_ldap->passwd);
+#else
+			g_free(ab_ldap->passwd);
+#endif
+			ab_ldap->passwd = NULL;
+		}
 	} else {
-		libbalsa_conf_clean_key("Passwd");
-	}
-#else
-	ab_ldap->passwd = libbalsa_conf_private_get_string("Passwd", TRUE);
-#endif
-	if ((ab_ldap->passwd != NULL) && (*ab_ldap->passwd == '\0')) {
-#if defined(HAVE_LIBSECRET)
-		secret_password_free(ab_ldap->passwd);
-#else
-		g_free(ab_ldap->passwd);
-#endif
 		ab_ldap->passwd = NULL;
 	}
 

@@ -54,7 +54,9 @@ gboolean balsa_message_has_next_part(BalsaMessage * bmessage);
 void balsa_message_previous_part(BalsaMessage * bmessage);
 gboolean balsa_message_has_previous_part(BalsaMessage * bmessage);
 void balsa_message_save_current_part(BalsaMessage * bmessage);
-void balsa_message_copy_part(const gchar *url, LibBalsaMessageBody *part);
+void balsa_message_copy_part(GObject      *source_object,
+                             GAsyncResult *res,
+                             gpointer      data);
 
 void balsa_message_set_displayed_headers(BalsaMessage * bmessage,
 					     ShownHeaders sh);

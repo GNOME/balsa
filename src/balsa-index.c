@@ -1948,11 +1948,15 @@ bi_toggle_new_cb(gpointer user_data)
 
 
 static void
-mru_menu_cb(const gchar * url, BalsaIndex * index)
+mru_menu_cb(GObject      *source_object,
+            GAsyncResult *res,
+            gpointer      data)
 {
-    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
+    LibBalsaMailbox *mailbox = balsa_mblist_mru_menu_finish(res);
+    BalsaIndex *index = data;
 
-    g_return_if_fail(mailbox != NULL);
+    if (mailbox == NULL) /* move was canceled */
+        return;
 
     if (balsa_mailbox_node_get_mailbox(index->mailbox_node) != mailbox) {
         GArray *selected = balsa_index_selected_msgnos_new(index);
@@ -2098,7 +2102,7 @@ bndx_do_popup(BalsaIndex * index, const GdkEvent *event)
         balsa_mblist_mru_menu(GTK_WINDOW
                               (gtk_widget_get_toplevel(GTK_WIDGET(index))),
                               &balsa_app.folder_mru,
-                              G_CALLBACK(mru_menu_cb), index);
+                              mru_menu_cb, index);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(index->move_to_item),
                               submenu);
 

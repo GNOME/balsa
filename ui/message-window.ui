@@ -106,6 +106,9 @@
       </section>
     </submenu>
     <submenu>
+      <attribute name="label" translatable="yes">M_ove</attribute>
+    </submenu>
+    <submenu>
       <attribute name="label" translatable="yes">_Message</attribute>
       <section>
         <item>
@@ -194,12 +197,6 @@
             translatable="yes">Next Flagged Message</attribute>
           <attribute name="action">win.next-flagged</attribute>
           <attribute name="accel">&lt;Primary&gt;&lt;Alt&gt;f</attribute>
-        </item>
-      </section>
-      <section>
-        <item>
-          <attribute name="label" translatable="yes">M_ove…</attribute>
-          <attribute name="action">win.move</attribute>
         </item>
       </section>
       <section>

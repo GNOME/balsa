@@ -532,7 +532,7 @@ libbalsa_message_body_get_part_stream(LibBalsaMessageBody * body,
         break;
     }
 
-    /* convert text bodies but HTML - gtkhtml does conversion on its own. */
+    /* convert text bodies but HTML - WebKit 2 does conversion on its own. */
     if (libbalsa_message_body_type(body) == LIBBALSA_MESSAGE_BODY_TYPE_TEXT
         && strcmp(mime_type = libbalsa_message_body_get_mime_type(body),
                   "text/html") != 0

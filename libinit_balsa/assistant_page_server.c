@@ -450,29 +450,30 @@ server_from_srv(GResolver *resolver, const gchar * const *service, const gchar *
 	gchar *result = NULL;
 
 	for (n = 0; (result == NULL) && (service[n] != NULL); n++) {
-		gchar *srv_val;
 		GList *res;
 		GError *error = NULL;
 
-		srv_val = g_strdup_printf("_%s._tcp.%s", service[n], domain);
-		res = g_resolver_lookup_records(resolver, srv_val, G_RESOLVER_RECORD_SRV, NULL, &error);
+		res = g_resolver_lookup_service(resolver, service[n], "tcp", domain, NULL, &error);
 		if (res != NULL) {
-			GVariant *srv = (GVariant *) res->data;
-			guint16 port;
+			GList *p;
 
-			g_variant_get(srv, "(qqqs)", NULL, NULL, &port, &result);
-			if ((port == 0U) || (result == NULL) || (result[0] == '\0')) {
-				g_free(result);
-				result = NULL;
-			} else {
-				g_debug("lookup for %s: %s:%hu", srv_val, result, port);
+			for (p = res; (result == NULL) && (p != NULL); p = p->next) {
+				GSrvTarget *target = (GSrvTarget *) p->data;
+				const gchar *host;
+				guint16 port;
+
+				host = g_srv_target_get_hostname(target);
+				port = g_srv_target_get_port(target);
+				if ((host != NULL) && (host[0] != '\0') && (port > 0U)) {
+					result = g_strdup(host);
+					g_debug("lookup for TCP service %s of domain %s: %s:%hu", service[n], domain, result, port);
+				}
 			}
-			g_list_free_full(res, (GDestroyNotify) g_variant_unref);
+			g_resolver_free_targets(res);
 		} else if (error != NULL) {
-			g_debug("lookup for %s failed: %s", srv_val, error->message);
+			g_debug("lookup for TCP service %s of domain %s failed: %s", service[n], domain, error->message);
 		}
 		g_clear_error(&error);
-		g_free(srv_val);
 	}
 
 	return result;

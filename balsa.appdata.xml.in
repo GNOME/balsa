@@ -24,4 +24,7 @@
     <url type="homepage">https://pawsa.fedorapeople.org/balsa/</url>
     <url type="contact">https://gitlab.gnome.org/GNOME/balsa/-/issues</url>
     <content_rating type="oars-1.1" />
+    <provides>
+        <mediatype>x-scheme-handler/mailto</mediatype>
+    </provides>
 </component>

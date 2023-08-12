@@ -110,6 +110,11 @@ AC_ARG_WITH([osmo],
                   [add Osmo address book support (experimental, needs osmo > svn rev. 1099, default=no)]),
 		  [with_osmo=$withval],[with_osmo=no])
 
+AC_ARG_WITH([webdav],
+   AS_HELP_STRING([--with-webdav],
+                  [add WebDAV support: CardDAV address book (requires libsoup and libxml2, default=no)]),
+                  [with_webdav=$withval],[with_webdav=no])
+
 AC_ARG_WITH([sqlite],
    AS_HELP_STRING([--with-sqlite=DIR],
                   [Use SQLite for GPE address books (default=no)]),
@@ -463,6 +468,27 @@ else
 		which is usually not what you want.])
 fi
 
+# WebDAV (CardDAV) support
+#
+AC_MSG_CHECKING(whether to include WebDAV (CardDAV) support)
+if test x$with_webdav != xno ; then
+    AC_MSG_RESULT([yes])
+    PKG_CHECK_MODULES(WEBDAV, [
+        libsoup-3.0
+        libxml-2.0
+    ], , [
+        PKG_CHECK_MODULES(WEBDAV, [
+            libsoup-2.4
+            libxml-2.0
+        ])])
+    AC_DEFINE(HAVE_WEBDAV,1,[If defined, enable Webkit (CardDAV) support.])
+    BALSA_CFLAGS="$BALSA_CFLAGS $WEBDAV_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $WEBDAV_LIBS"
+    BALSA_AB_LIBS="$BALSA_AB_LIBS $WEBDAV_LIBS"
+else
+    AC_MSG_RESULT([no])
+fi
+
 dnl #####################################################################
 dnl 5. Headers.
 dnl #####################################################################
@@ -635,6 +661,7 @@ echo "          System Tray Icon: $systray"
 echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
 echo "                Use SQLite: $with_sqlite"
+echo "            WebDAV support: $with_webdav"
 echo "             Spell checker: $use_spell_checker"
 echo "         Use GtkSourceView: $with_gtksourceview"
 echo "              Use Compface: $with_compface"

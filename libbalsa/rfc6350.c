@@ -21,7 +21,7 @@
 # include "config.h"
 #endif                          /* HAVE_CONFIG_H */
 
-#if defined(HAVE_OSMO)
+#if defined(HAVE_OSMO) || defined(HAVE_WEBDAV)
 
 #include <glib/gi18n.h>
 #include "rfc6350.h"
@@ -34,6 +34,8 @@
 #define RFC6350_ERROR_BEGIN				3
 #define RFC6350_ERROR_END				4
 
+#define CRLF							"\r\n"
+
 
 static gboolean rfc6350_eval_line(gchar			  *line,
 								  LibBalsaAddress *address,
@@ -43,6 +45,11 @@ static gchar **rfc6350_strsplit(const gchar *item,
 static gchar *rfc6350_get_name(gchar *name);
 static void rfc6350_unescape(gchar *item);
 static gchar *rfc6350_fn_from_n(gchar **n_items);
+static gchar *rfc6350_escape(const gchar *value)
+	G_GNUC_WARN_UNUSED_RESULT;
+static void rfc6350_add_folded(GString     *strbuf,
+							   const gchar *label,
+							   const gchar *value);
 
 
 LibBalsaAddress *
@@ -114,6 +121,94 @@ rfc6350_parse_from_stream(GDataInputStream *stream,
 	}
 
 	return result;
+}
+
+
+gchar *
+rfc6350_from_address(LibBalsaAddress *address,
+					 gboolean         vcard4,
+					 gboolean         add_uuid)
+{
+	GString *vcbuf;
+	const gchar *first_name;
+	const gchar *last_name;
+	gchar *buf;
+	gchar *n_last_buf;
+	gchar *n_first_buf;
+	guint addr_idx;
+
+	g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), NULL);
+
+	/* header */
+	vcbuf = g_string_new("BEGIN:VCARD" CRLF "VERSION:");
+	g_string_append_c(vcbuf, vcard4 ? '4' : '3');
+	g_string_append(vcbuf, ".0" CRLF);
+
+	/* UUID if requested */
+	if (add_uuid) {
+		buf = g_uuid_string_random();
+		g_string_append_printf(vcbuf, "UID:urn:uuid:%s" CRLF, buf);
+		g_free(buf);
+	}
+
+	/* FN field, must be present */
+	first_name = libbalsa_address_get_first_name(address);
+	last_name = libbalsa_address_get_last_name(address);
+	if (libbalsa_address_get_full_name(address) != NULL) {
+		buf = rfc6350_escape(libbalsa_address_get_full_name(address));
+	} else {
+		gchar *fn_buf;
+
+		if ((first_name != NULL) && (last_name != NULL)) {
+			fn_buf = g_strconcat(first_name, " ", last_name, NULL);
+		} else if (first_name != NULL) {
+			fn_buf = g_strdup(first_name);
+		} else if (last_name != NULL)  {
+			fn_buf = g_strdup(last_name);
+		} else {
+			fn_buf = g_strdup(_("unknown"));
+		}
+		buf = rfc6350_escape(fn_buf);
+		g_free(fn_buf);
+	}
+	rfc6350_add_folded(vcbuf, "FN", buf);
+	g_free(buf);
+
+	/* N field, should be present */
+	if (last_name != NULL) {
+		n_last_buf = rfc6350_escape(last_name);
+	} else {
+		n_last_buf = g_strdup("");
+	}
+	if (first_name != NULL) {
+		n_first_buf = rfc6350_escape(first_name);
+	} else {
+		n_first_buf = g_strdup("");
+	}
+	buf = g_strconcat(n_last_buf, ";", n_first_buf, ";;;", NULL);
+	g_free(n_first_buf);
+	g_free(n_last_buf);
+	rfc6350_add_folded(vcbuf, "N", buf);
+	g_free(buf);
+
+	/* ORG field (optional) */
+	if (libbalsa_address_get_organization(address) != NULL) {
+		buf = rfc6350_escape(libbalsa_address_get_organization(address));
+		rfc6350_add_folded(vcbuf, "ORG", buf);
+		g_free(buf);
+	}
+
+	/* EMAIL fields */
+	for (addr_idx = 0U; addr_idx < libbalsa_address_get_n_addrs(address); addr_idx++) {
+		buf = rfc6350_escape(libbalsa_address_get_nth_addr(address, addr_idx));
+		rfc6350_add_folded(vcbuf, "EMAIL", buf);
+		g_free(buf);
+	}
+
+	/* footer */
+	g_string_append(vcbuf, "END:VCARD" CRLF);
+
+	return g_string_free(vcbuf, FALSE);
 }
 
 
@@ -337,4 +432,76 @@ rfc6350_fn_from_n(gchar **n_items)
 	return g_string_free(fn, FALSE);
 }
 
-#endif /* HAVE_OSMO */
+
+/** \brief RFC 6350 escape a string
+ *
+ * \param[in] value string to escape
+ * \return the newly allocated, escaped string
+ *
+ * Escape a string according to RFC 6350, sect. 3.4. "Property Value Escaping".
+ */
+static gchar *
+rfc6350_escape(const gchar *value)
+{
+	GString *buf;
+	const gchar *p;
+
+	buf = g_string_sized_new(strlen(value));
+	p = value;
+	do {
+		size_t chunk;
+
+		chunk = strcspn(p, ";,\\\n");
+		if (chunk > 0U) {
+			g_string_append_len(buf, p, chunk);
+			p = &p[chunk];
+		}
+		if (*p != '\0') {
+			g_string_append_c(buf, '\\');
+			g_string_append_c(buf, *p);
+			p = &p[1];
+		}
+	} while (*p != '\0');
+	return g_string_free(buf, FALSE);
+}
+
+
+/** \brief RFC 6350 fold a VCard entry
+ *
+ * \param[in,out] strbuf VCard buffer
+ * \param[in] label VCard item label
+ * \param[in] value VCard item value
+ *
+ * Append the passed label and value to the VCard string buffer, folding it according to RFC 6350, sect. 3.2. "Line Delimiting and
+ * Folding".
+ */
+static void
+rfc6350_add_folded(GString     *strbuf,
+				   const gchar *label,
+				   const gchar *value)
+{
+	long int label_offs;
+	const gchar *p;
+
+	p = value;
+	g_string_append_printf(strbuf, "%s:", label);
+	label_offs = strlen(label) + 1L;
+	do {
+		const gchar *chunk_end;
+
+		chunk_end = g_utf8_next_char(p);
+		do {
+			chunk_end = g_utf8_next_char(chunk_end);
+		} while ((*chunk_end != '\0') && ((chunk_end - p) <= (71 - label_offs)));
+		g_string_append_len(strbuf, p, chunk_end - p);
+		if (*chunk_end != '\0') {
+			g_string_append(strbuf, CRLF " ");
+		}
+		label_offs = 0;
+		p = chunk_end;
+	} while (*p != '\0');
+	g_string_append(strbuf, CRLF);
+}
+
+
+#endif /* HAVE_OSMO  || HAVE_WEBDAV */

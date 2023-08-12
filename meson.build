@@ -366,6 +366,19 @@ if libsecret
   balsa_ab_deps += secret_dep
 endif # libsecret
 
+# WebDAV configuration
+#
+if webdav
+  webdav_dep = dependency('libsoup-3.0', required : false)
+  if not webdav_dep.found()
+    webdav_dep = dependency('libsoup-2.4')
+  endif
+  webdav_xml_dep = dependency('libxml-2.0')
+  conf.set('HAVE_WEBDAV', 1,
+    description : 'Defined when Webkit (CardDAV) support is enabled.')
+  balsa_deps += [webdav_dep, webdav_xml_dep]
+endif # webdav
+
 #####################################################################
 # Headers.
 #####################################################################

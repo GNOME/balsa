@@ -116,6 +116,7 @@ libbalsa_address_new(void)
 
    [1] VCARD 1.2 specs: http://www.imc.org/pdi/vcard-21.txt
    [2] VCARD 3.0 specs, RFC 2426 (https://www.ietf.org/rfc/rfc2426.txt)
+   [3] VCARD 4.0 specs, RFC 6350 (https://www.rfc-editor.org/rfc/rfc6350)
 */
 
 static gboolean
@@ -410,7 +411,8 @@ libbalsa_address_new_from_vcard(const gchar *str, const gchar *charset)
 	     * - Thunderbird claims to use vcard 2.1, but uses only "quoted-printable",
 	     *   and the charset from part MIME header
 	     * - vcard 3.0 (rfc 2426) allows "encoding=b", the charset must be taken
-	     *   from the content-type MIME header */
+	     *   from the content-type MIME header
+	     * - vcard 4.0 (RFC 6350) requires utf-8 as charset */
 	    if (strchr(line, ':')) {
 		gchar ** parts = g_strsplit(line, ":", 2);
 		gchar ** tokens;

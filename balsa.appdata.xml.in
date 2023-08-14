@@ -21,6 +21,26 @@
         </ul>
         <p>and the proverbial much, much more.</p>
     </description>
+    <releases>
+        <release date="2022-09-20" version="2.6.4">
+            <description>
+                <ul>
+                    <li>Fix display/printout with nondefault HTML preferences.</li>
+                    <li>HTML context meny improvements,
+                        integration with Webkit HTML privacy filter.</li>
+                    <li>Header editing in GNOME editor fixed.</li>
+                    <li>Some MDN, iCalendar issues fixed.</li>
+                    <li>More informative error messages.</li>
+                    <li>Notification improvements.</li>
+                    <li>Show UI for opening download location after download.</li>
+                    <li>Minor memory leaks plugged.</li>
+                    <li>Code refactoring and cleanup.</li>
+                    <li>Library and build system deprecation cleanups.</li>
+                    <li>Translation updates.</li>
+                </ul>
+            </description>
+        </release>
+    </releases>
     <url type="homepage">https://pawsa.fedorapeople.org/balsa/</url>
     <url type="contact">https://gitlab.gnome.org/GNOME/balsa/-/issues</url>
     <content_rating type="oars-1.1" />

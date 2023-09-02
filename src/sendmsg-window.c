@@ -2196,12 +2196,16 @@ attachments_add(GtkWidget * widget,
         }
         balsa_index_selected_msgnos_free(index, selected);
     } else if (info == TARGET_URI_LIST) {
-        gchar **uris, **uri;
+        gchar **uris;
 
         uris = gtk_selection_data_get_uris(selection_data);
-        for (uri = uris; uri != NULL; ++uri)
-	    add_attachment(bsmsg, *uri, FALSE, NULL);
-        g_strfreev(uris);
+        if (uris != NULL) {
+            guint n;
+
+            for (n = 0U; uris[n] != NULL; n++)
+                add_attachment(bsmsg, uris[n], FALSE, NULL);
+            g_strfreev(uris);
+        }
     } else if( info == TARGET_STRING) {
 	gchar *url =
             rfc2396_uri((gchar *)
@@ -2778,23 +2782,26 @@ drag_data_quote(GtkWidget * widget,
         balsa_index_selected_msgnos_free(index, selected);
         break;
     case TARGET_URI_LIST: {
-        gchar **uris, **uri;
+        gchar **uris;
 
         uris = gtk_selection_data_get_uris(selection_data);
+        if (uris != NULL) {
+            guint n;
 
-        for (uri = uris; uri != NULL; ++uri) {
-            /* Since current GtkTextView gets this signal twice for
-             * every action (#150141) we need to check for duplicates,
-             * which is a good idea anyway. */
-	    has_file_attached_t find_file = {*uri, FALSE};
+            for (n = 0U; uris[n] != NULL; n++) {
+                /* Since current GtkTextView gets this signal twice for
+                 * every action (#150141) we need to check for duplicates,
+                 * which is a good idea anyway. */
+                has_file_attached_t find_file = {uris[n], FALSE};
 
-            if (bsmsg->tree_view)
-                gtk_tree_model_foreach(BALSA_MSG_ATTACH_MODEL(bsmsg),
-                                       has_file_attached, &find_file);
-            if (!find_file.found)
-                add_attachment(bsmsg, *uri, FALSE, NULL);
+                if (bsmsg->tree_view)
+                    gtk_tree_model_foreach(BALSA_MSG_ATTACH_MODEL(bsmsg),
+                                           has_file_attached, &find_file);
+                if (!find_file.found)
+                    add_attachment(bsmsg, uris[n], FALSE, NULL);
+            }
+            g_strfreev(uris);
         }
-        g_strfreev(uris);
     }
         break;
     case TARGET_EMAIL:

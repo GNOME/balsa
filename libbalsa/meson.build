@@ -3,6 +3,8 @@
 libbalsa_a_sources = [
   'abook-completion.c',
   'abook-completion.h',
+  'address-book-carddav.c',
+  'address-book-carddav.h',
   'address-book-extern.c',
   'address-book-extern.h',
   'address-book-gpe.c',

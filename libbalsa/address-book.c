@@ -157,6 +157,9 @@ libbalsa_address_book_add_address(LibBalsaAddressBook * ab,
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
 
+    if (LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->add_address == NULL) {
+        return LBABERR_CANNOT_WRITE;
+    }
     return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->add_address(ab, address);
 }
 
@@ -167,6 +170,9 @@ libbalsa_address_book_remove_address(LibBalsaAddressBook * ab,
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
 
+    if (LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->remove_address == NULL) {
+        return LBABERR_CANNOT_WRITE;
+    }
     return LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->remove_address(ab,
                                                                address);
 }
@@ -181,6 +187,9 @@ libbalsa_address_book_modify_address(LibBalsaAddressBook * ab,
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK(ab), LBABERR_OK);
     g_return_val_if_fail(LIBBALSA_IS_ADDRESS(address), LBABERR_OK);
 
+    if (LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->modify_address == NULL) {
+        return LBABERR_CANNOT_WRITE;
+    }
     res =
         LIBBALSA_ADDRESS_BOOK_GET_CLASS(ab)->modify_address(ab, address,
                                                             newval);

@@ -263,8 +263,10 @@ case "$use_html_widget" in
     webkit2)
         AC_MSG_RESULT([$use_html_widget])
         # note: sqlite3 is needed to manage html vs. plain and image download preferences
-        PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.0 >= 2.28.0
-                                  sqlite3 >= 3.24.0])
+        PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.1
+                                  sqlite3 >= 3.24.0], , [
+            PKG_CHECK_MODULES(HTML, [ webkit2gtk-4.0 >= 2.28.0
+                                      sqlite3 >= 3.24.0])])
         BALSA_WEB_EXTENSIONS="${libdir}/${PACKAGE}"
         AC_SUBST(BALSA_WEB_EXTENSIONS)
         CPPFLAGS="$CPPFLAGS -DBALSA_WEB_EXTENSIONS=\\\"$BALSA_WEB_EXTENSIONS\\\""

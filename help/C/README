@@ -54,5 +54,6 @@ should not be given extentions in the tag.  This is because the
 stylesheet will add the appropriate extension depending on whether it
 is being built for html or postscript.  
 
-Also, if you need help you can try the GDP mailing list,
-gnome-doc-list@gnome.org, or on IRC at irc.gnome.org, in #docs.
+Also, if you need help you can try the discussion forum at
+https://discourse.gnome.org/tag/documentation , or on in the #gnome-docs
+IRC channel on irc.libera.chat.

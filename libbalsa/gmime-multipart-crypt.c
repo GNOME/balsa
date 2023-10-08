@@ -194,7 +194,12 @@ g_mime_gpgme_mps_sign(GMimeMultipartSigned * mps, GMimeObject * content,
 	g_mime_part_set_content_encoding(signature,
 					 GMIME_CONTENT_ENCODING_BASE64);
 	g_mime_part_set_filename(signature, "smime.p7m");
+    } else {
+	g_mime_object_set_content_type_parameter(GMIME_OBJECT(signature),
+						 "name", "openpgp-digital-signature.asc");
     }
+    g_mime_part_set_content_description(signature,
+					"This is a digitally signed message part.");
 
     /* save the content and signature parts */
     /* FIXME: make sure there aren't any other parts?? */

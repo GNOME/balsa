@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2015 The Balsa developers -->
+<!-- Copyright 2023 The Balsa developers -->
 <component type="desktop">
     <id>org.desktop.Balsa.desktop</id>
+    <launchable type="desktop-id">org.desktop.Balsa.desktop</launchable>
+    <name>Balsa</name>
+    <summary>Email utility</summary>
     <metadata_license>CC0-1.0</metadata_license>
     <description>
         <p>Balsa is a graphical mail client. While it is in active development,
@@ -18,6 +21,30 @@
         </ul>
         <p>and the proverbial much, much more.</p>
     </description>
+    <releases>
+        <release date="2022-09-20" version="2.6.4">
+            <description>
+                <ul>
+                    <li>Fix display/printout with nondefault HTML preferences.</li>
+                    <li>HTML context meny improvements,
+                        integration with Webkit HTML privacy filter.</li>
+                    <li>Header editing in GNOME editor fixed.</li>
+                    <li>Some MDN, iCalendar issues fixed.</li>
+                    <li>More informative error messages.</li>
+                    <li>Notification improvements.</li>
+                    <li>Show UI for opening download location after download.</li>
+                    <li>Minor memory leaks plugged.</li>
+                    <li>Code refactoring and cleanup.</li>
+                    <li>Library and build system deprecation cleanups.</li>
+                    <li>Translation updates.</li>
+                </ul>
+            </description>
+        </release>
+    </releases>
     <url type="homepage">https://pawsa.fedorapeople.org/balsa/</url>
-    <updatecontact>balsa-list_at_gnome.org</updatecontact>
+    <url type="contact">https://gitlab.gnome.org/GNOME/balsa/-/issues</url>
+    <content_rating type="oars-1.1" />
+    <provides>
+        <mediatype>x-scheme-handler/mailto</mediatype>
+    </provides>
 </component>

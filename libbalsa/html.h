@@ -28,7 +28,7 @@
 #  include <gtk/gtk.h>
 #include "libbalsa.h"
 
-/* We need this enum even if we're not using GtkHtml. */
+/* We need this enum even if we're not using WebKit 2. */
 typedef enum {
     LIBBALSA_HTML_TYPE_NONE = 0,
     LIBBALSA_HTML_TYPE_HTML,

@@ -106,7 +106,7 @@ const gchar* libbalsa_address_book_strerror(LibBalsaAddressBook * ab,
 
 /*
 
- Returns a list of LibBalsaAddress objects. The caller is responsible
+ Returns a list of InternetAddress objects. The caller is responsible
  for unref()ing these address objects when it is finished with them
  and for freeing the list.
 

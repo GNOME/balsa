@@ -13,16 +13,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-05-10 16:49+0000\n"
-"PO-Revision-Date: 2023-03-12 08:21+0300\n"
-"Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
+"POT-Creation-Date: 2023-07-03 20:57+0000\n"
+"PO-Revision-Date: 2023-05-30 00:12+0300\n"
+"Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.2.2\n"
 "X-POOTLE-MTIME: 1426069247.000000\n"
 
 #: balsa.appdata.xml.in:7
@@ -43,13 +43,11 @@ msgstr "sendmail veya doğrudan SMTP desteği;"
 
 #: balsa.appdata.xml.in:12
 msgid "end-to-end encryption using GnuPG or S/MIME;"
-msgstr ""
+msgstr "GnuPG ya da S/MIME ile uçtan uca şifreleme;"
 
 #: balsa.appdata.xml.in:13
-#, fuzzy
-#| msgid "optional multi-threaded retrieval and sending of messages;"
 msgid "multi-threaded retrieval and sending of messages;"
-msgstr "isteğe bağlı çok ileti dizili ileti alma ve gönderme;"
+msgstr "çok ileti dizili ileti alma ve gönderme;"
 
 #: balsa.appdata.xml.in:14
 msgid "support for all configurations of local mail folders;"
@@ -86,38 +84,38 @@ msgstr "Posta İstemcisi"
 
 #: org.desktop.Balsa.desktop.in.in:15
 msgid "Mail;E-mail;Email;IMAP"
-msgstr ""
+msgstr "Posta;Mail;E-posta;E-mail;Eposta;Email;IMAP"
 
-#: libbalsa/address-book.c:299 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:308 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Hata yok"
 
-#: libbalsa/address-book.c:300
+#: libbalsa/address-book.c:309
 msgid "Cannot read from address book"
 msgstr "Adres defterinden okunamıyor"
 
-#: libbalsa/address-book.c:301
+#: libbalsa/address-book.c:310
 msgid "Cannot write to address book"
 msgstr "Adres defterine yazılamıyor"
 
-#: libbalsa/address-book.c:302
+#: libbalsa/address-book.c:311
 msgid "Cannot connect to the server"
 msgstr "Sunucuya bağlanılamıyor"
 
-#: libbalsa/address-book.c:303
+#: libbalsa/address-book.c:312
 msgid "Cannot search in the address book"
 msgstr "Adres defterinde aranamıyor"
 
-#: libbalsa/address-book.c:305
+#: libbalsa/address-book.c:314
 msgid "Cannot add duplicate entry"
 msgstr "Yinelemeli girdi eklenemiyor"
 
-#: libbalsa/address-book.c:307
+#: libbalsa/address-book.c:316
 msgid "Cannot find address in address book"
 msgstr "Adres, adres defterinde bulunamıyor"
 
-#: libbalsa/address-book.c:308 libbalsa/html.c:95 src/ab-window.c:438
-#: src/balsa-message.c:1906 src/balsa-mime-widget.c:222
+#: libbalsa/address-book.c:317 libbalsa/html.c:95 src/ab-window.c:438
+#: src/balsa-message.c:1910 src/balsa-mime-widget.c:222
 #: src/balsa-mime-widget-callbacks.c:50 src/balsa-mime-widget-callbacks.c:176
 #: src/balsa-mime-widget-callbacks.c:208 src/balsa-mime-widget-crypto.c:78
 #: src/balsa-mime-widget-crypto.c:84 src/balsa-mime-widget-message.c:362
@@ -158,10 +156,9 @@ msgid "TLS requested but not compiled in"
 msgstr "TLS istendi ama bu destekle derlenmemiş"
 
 #: libbalsa/address-book-ldap.c:418
-#, fuzzy, c-format
-#| msgid "Cannot write to address book"
+#, c-format
 msgid "Cannot open LDAP address book %s: %s"
-msgstr "Adres defterine yazılamıyor"
+msgstr "LDAP adres defteri %s açılamadı: %s"
 
 #: libbalsa/address-book-ldap.c:694
 msgid "Undefined location of user address book"
@@ -172,26 +169,16 @@ msgid "Balsa passwords"
 msgstr "Balsa parolaları"
 
 #: libbalsa/address-book-ldap.c:955
-#, fuzzy, c-format
-#| msgid ""
-#| "Error opening address book “%s”:\n"
-#| "%s"
+#, c-format
 msgid "Error saving LDAP credentials for address book %s: %s"
-msgstr ""
-"Adres defteri “%s” açılırken hata:\n"
-"%s"
+msgstr "%s adres defteri için LDAP kimlik bilgileri kaydedilirken hata: %s"
 
 #: libbalsa/address-book-ldap.c:1006
-#, fuzzy, c-format
-#| msgid ""
-#| "Error opening address book “%s”:\n"
-#| "%s"
+#, c-format
 msgid "Error loading LDAP credentials for address book %s: %s"
-msgstr ""
-"Adres defteri “%s” açılırken hata:\n"
-"%s"
+msgstr "%s adres defteri için LDAP kimlik bilgileri yüklenirken hata: %s"
 
-#: libbalsa/address-book-ldap.c:1165
+#: libbalsa/address-book-ldap.c:1168
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr "LDAP sunucusu %s kapalı, sonraki deneme yeniden bağlanmayı deneyecek."
@@ -382,7 +369,7 @@ msgstr "kullanıcı ekle “%s” başarısız oldu: %s"
 msgid "_Show details…"
 msgstr "_Ayrıntıları göster…"
 
-#: libbalsa/autocrypt.c:933 libbalsa/html-pref-db.c:457 src/balsa-index.c:2001
+#: libbalsa/autocrypt.c:933 libbalsa/html-pref-db.c:457 src/balsa-index.c:2005
 #: src/mailbox-node.c:1040 src/mailbox-node.c:1056 src/pref-manager.c:2014
 #: src/pref-manager.c:2099 src/pref-manager.c:2822 ui/ab-main.ui:44
 #: ui/main-window.ui:348
@@ -763,8 +750,8 @@ msgstr "“%s” içindeki imza bir UTF-8 metni değil."
 #: libbalsa/libbalsa-gpgme-cb.c:357 libbalsa/smtp-server.c:330
 #: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:259
 #: src/address-book-config.c:367 src/address-book-config.c:410
-#: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2792
-#: src/balsa-mblist.c:1877 src/balsa-message.c:1782
+#: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2796
+#: src/balsa-mblist.c:1894 src/balsa-message.c:1786
 #: src/balsa-mime-widget-callbacks.c:89 src/filter-edit-callbacks.c:1257
 #: src/filter-edit-dialog.c:399 src/filter-edit-dialog.c:575
 #: src/filter-export-dialog.c:81 src/filter-run-dialog.c:302
@@ -781,7 +768,7 @@ msgstr "_İptal"
 #: libbalsa/identity.c:365 libbalsa/libbalsa-gpgme-cb.c:180
 #: libbalsa/libbalsa-gpgme-cb.c:356 libbalsa/smtp-server.c:329
 #: src/ab-window.c:140 src/balsa-app.c:91 src/balsa-app.c:156
-#: src/balsa-message.c:1783 src/balsa-mime-widget-callbacks.c:90
+#: src/balsa-message.c:1787 src/balsa-mime-widget-callbacks.c:90
 #: src/filter-edit-callbacks.c:1256 src/filter-edit-dialog.c:574
 #: src/filter-export-dialog.c:80 src/filter-run-dialog.c:301
 #: src/folder-conf.c:341 src/main-window.c:4046 src/pref-manager.c:3320
@@ -1242,7 +1229,7 @@ msgstr "Balsa yapılandırmanız şimdi “~/.balsa/config” adresinde sakland�
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: libbalsa/libbalsa-gpgme.c:184 src/balsa-message.c:3037
+#: libbalsa/libbalsa-gpgme.c:184 src/balsa-message.c:3041
 msgid "S/MIME"
 msgstr "S/MIME"
 
@@ -2994,7 +2981,7 @@ msgstr "Posta kutusu kapatıldı"
 msgid "Message Source"
 msgstr "İleti Kaynağı"
 
-#: libbalsa/source-viewer.c:228 src/message-window.c:877
+#: libbalsa/source-viewer.c:228 src/message-window.c:912
 #, c-format
 msgid "Error adding from %s: %s\n"
 msgstr "%s’den eklenirken hata: %s\n"
@@ -3188,6 +3175,13 @@ msgid ""
 "Check the “Edit ⏵ Preferences ⏵ Settings ⏵ Mail options” menu item if you "
 "need to fine-tune them."
 msgstr ""
+"Ön ayar sunucu yapılandırması, e-posta adresinize göre en iyi tahmindir. "
+"Balsa, şifreleme ve kullanıcı adı için en iyilenmiş ayarları kendiliğinden "
+"belirleyecek ve parola tabanlı kimlik doğrulamayı seçecektir. \"İleri\" "
+"düğmesine tıkladığınızda sunucu yeteneklerini incelemenin birkaç saniye "
+"süreceğini unutmayın.\n"
+"İnce ayar yapmanız gerekiyorsa “Düzenle ⏵ Tercihler ⏵ Ayarlar ⏵ Posta "
+"seçenekleri” menüsünü denetleyin."
 
 #: libinit_balsa/assistant_page_server.c:77
 msgid "Yes, remember it"
@@ -3222,10 +3216,8 @@ msgid "_Remember your password:"
 msgstr "Parolanızı _anımsayın:"
 
 #: libinit_balsa/assistant_page_server.c:147
-#, fuzzy
-#| msgid "User Settings"
 msgid "Server Settings"
-msgstr "Kullanıcı Ayarları"
+msgstr "Sunucu Ayarları"
 
 #: libinit_balsa/assistant_page_user.c:55
 msgid ""
@@ -3696,119 +3688,119 @@ msgstr[0] "Kümeye Yanıtla: %d ileti, e-posta listesinden değil."
 msgid "Move to Trash failed: %s"
 msgstr "Çöp kutusuna taşıma başarısız: %s"
 
-#: src/balsa-index.c:1975 ui/main-window.ui:390 ui/message-window.ui:116
+#: src/balsa-index.c:1979 ui/main-window.ui:390 ui/message-window.ui:116
 msgid "_Reply…"
 msgstr "_Yanıtla…"
 
-#: src/balsa-index.c:1977
+#: src/balsa-index.c:1981
 msgid "Reply To _All…"
 msgstr "_Tümüne Yanıtla…"
 
-#: src/balsa-index.c:1979
+#: src/balsa-index.c:1983
 msgid "Reply To _Group…"
 msgstr "_Kümeye Yanıtla…"
 
-#: src/balsa-index.c:1981 ui/main-window.ui:408 ui/message-window.ui:134
+#: src/balsa-index.c:1985 ui/main-window.ui:408 ui/message-window.ui:134
 msgid "_Forward Attached…"
 msgstr "_Eklenti Olarak İlet…"
 
-#: src/balsa-index.c:1983 ui/main-window.ui:414 ui/message-window.ui:140
+#: src/balsa-index.c:1987 ui/main-window.ui:414 ui/message-window.ui:140
 msgid "Forward _Inline…"
 msgstr "_Satır Arası İlet…"
 
-#: src/balsa-index.c:1985 ui/main-window.ui:421
+#: src/balsa-index.c:1989 ui/main-window.ui:421
 msgid "_Pipe through…"
 msgstr "_Borula…"
 
-#: src/balsa-index.c:1987 ui/main-window.ui:507
+#: src/balsa-index.c:1991 ui/main-window.ui:507
 msgid "_Store Address…"
 msgstr "_Adresi Kaydet…"
 
-#: src/balsa-index.c:2005
+#: src/balsa-index.c:2009
 msgid "_Undelete"
 msgstr "_Kurtar"
 
-#: src/balsa-index.c:2009
+#: src/balsa-index.c:2013
 msgid "Move To _Trash"
 msgstr "Çö_p Kutusuna At"
 
-#: src/balsa-index.c:2013
+#: src/balsa-index.c:2017
 msgid "T_oggle"
 msgstr "İşare_tle"
 
-#: src/balsa-index.c:2016 ui/main-window.ui:308 ui/main-window.ui:482
+#: src/balsa-index.c:2020 ui/main-window.ui:308 ui/main-window.ui:482
 msgid "_Flagged"
 msgstr "İşaret_li"
 
-#: src/balsa-index.c:2019
+#: src/balsa-index.c:2023
 msgid "_Unread"
 msgstr "_Okunmamış"
 
-#: src/balsa-index.c:2027
+#: src/balsa-index.c:2031
 msgid "_Move to"
 msgstr "_Taşı"
 
-#: src/balsa-index.c:2034
+#: src/balsa-index.c:2038
 msgid "_View Source"
 msgstr "_Kaynağı Göster"
 
-#: src/balsa-index.c:2261
+#: src/balsa-index.c:2265
 #, c-format
 msgid "Failed to copy %d message to mailbox “%s”: %s"
 msgid_plural "Failed to copy %d messages to mailbox “%s”: %s"
 msgstr[0] "%d ileti “%s” posta kutusuna kopyalanamadı: %s"
 
-#: src/balsa-index.c:2273
+#: src/balsa-index.c:2277
 #, c-format
 msgid "Copied to “%s”."
 msgstr "“%s”e kopyalandı."
 
-#: src/balsa-index.c:2274
+#: src/balsa-index.c:2278
 #, c-format
 msgid "Moved to “%s”."
 msgstr "“%s”e taşındı."
 
-#: src/balsa-index.c:2365
+#: src/balsa-index.c:2369
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "%s posta kutusunun işlenmesi başarısız oldu."
 
-#: src/balsa-index.c:2474
+#: src/balsa-index.c:2478
 #, c-format
 msgid "Cannot process the message: %s"
 msgstr "İleti işlenemiyor: %s"
 
-#: src/balsa-index.c:2589
+#: src/balsa-index.c:2593
 #, c-format
 msgid "Cannot access message %u to pass to %s"
 msgstr "İleti %u’ya %s’e aktarım için erişilemiyor"
 
-#: src/balsa-index.c:2616
+#: src/balsa-index.c:2620
 #, c-format
 msgid "Cannot read message %u to pass to %s"
 msgstr "İleti %u %s’e geçiş için okunamıyor"
 
-#: src/balsa-index.c:2787
+#: src/balsa-index.c:2791
 msgid "Pipe message through a program"
 msgstr "İletiyi bir programla yönlendir"
 
-#: src/balsa-index.c:2791
+#: src/balsa-index.c:2795
 msgid "_Run"
 msgstr "Ç_alıştır"
 
-#: src/balsa-index.c:2800
+#: src/balsa-index.c:2804
 msgid "Specify the program to run:"
 msgstr "Çalıştırılacak programı belirtin:"
 
-#: src/balsa-mblist.c:1742
+#: src/balsa-mblist.c:1733
 msgid "_Other…"
 msgstr "_Diğerleri…"
 
-#: src/balsa-mblist.c:1873
+#: src/balsa-mblist.c:1890
 msgid "Choose destination folder"
 msgstr "Hedef klasörü seç"
 
-#: src/balsa-mblist.c:2073
+#: src/balsa-mblist.c:2088
 msgid "Other…"
 msgstr "Diğerleri…"
 
@@ -3922,55 +3914,55 @@ msgstr "bölüm %s: %s"
 msgid "encrypted: "
 msgstr "şifreli: "
 
-#: src/balsa-message.c:1636
+#: src/balsa-message.c:1640
 #, c-format
 msgid "Reading embedded message failed: %s"
 msgstr "Gömülü iletinin okunması başarısız: %s"
 
-#: src/balsa-message.c:1644
+#: src/balsa-message.c:1648
 #, c-format
 msgid "Appending message to %s failed: %s"
 msgstr "İletinin %s’e eklenmesi başarısız: %s"
 
-#: src/balsa-message.c:1673
+#: src/balsa-message.c:1677
 msgid "_Save…"
 msgstr "_Kaydet…"
 
-#: src/balsa-message.c:1682 src/balsa-mime-widget-message.c:458
+#: src/balsa-message.c:1686 src/balsa-mime-widget-message.c:458
 msgid "_Copy to folder…"
 msgstr "_Klasöre kopyala…"
 
 #. Translators: save to folder and open the folder in standard file manager app
-#: src/balsa-message.c:1693
+#: src/balsa-message.c:1697
 msgid "Save and open folder…"
 msgstr "Kaydet ve klasörü aç…"
 
-#: src/balsa-message.c:1779
+#: src/balsa-message.c:1783
 msgid "Select folder for saving selected parts"
 msgstr "Seçili bölümleri kaydetmek için klasör seç"
 
-#: src/balsa-message.c:1844
+#: src/balsa-message.c:1848
 #, c-format
 msgid "%s message part"
 msgstr "%s ileti kısmı"
 
-#: src/balsa-message.c:1865 src/balsa-message.c:1903
+#: src/balsa-message.c:1869 src/balsa-message.c:1907
 #: src/balsa-mime-widget-callbacks.c:175
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "%s kaydedilemedi: %s"
 
-#: src/balsa-message.c:1913 src/balsa-mime-widget-callbacks.c:180
+#: src/balsa-message.c:1917 src/balsa-mime-widget-callbacks.c:180
 #, c-format
 msgid "Empty part was not saved to %s"
-msgstr ""
+msgstr "Boş parça şuraya kaydedilemedi: %s"
 
-#: src/balsa-message.c:2580 src/balsa-message.c:2722
+#: src/balsa-message.c:2584 src/balsa-message.c:2726
 #, c-format
 msgid "Sending the disposition notification failed: %s"
 msgstr "İleti okundu bildirimi gönderimi başarısız: %s"
 
-#: src/balsa-message.c:2680
+#: src/balsa-message.c:2684
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -3981,11 +3973,11 @@ msgstr ""
 "Okundu Bildirimi (MDN) döndürülmesini istedi.\n"
 "Bu bildirimi göndermek istiyor musun?"
 
-#: src/balsa-message.c:2687
+#: src/balsa-message.c:2691
 msgid "Reply to MDN?"
 msgstr "MDN’ye yanıtlansın mı?"
 
-#: src/balsa-message.c:2897
+#: src/balsa-message.c:2901
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -3994,16 +3986,16 @@ msgstr ""
 "Bu ileti birçok kez gösterildiğinden şifresi çözülemedi.\n"
 "Lütfen bu iletinin diğer örneklerini kapatın ve yeniden deneyin."
 
-#: src/balsa-message.c:2918 src/balsa-message.c:3003 src/balsa-message.c:3129
+#: src/balsa-message.c:2922 src/balsa-message.c:3007 src/balsa-message.c:3133
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "İletinin bir bölümü ayrıştırılamadı: %s"
 
-#: src/balsa-message.c:2919 src/balsa-message.c:3004 src/balsa-message.c:3130
+#: src/balsa-message.c:2923 src/balsa-message.c:3008 src/balsa-message.c:3134
 msgid "Possible disk space problem."
 msgstr "Olası boş disk alanı sorunu."
 
-#: src/balsa-message.c:2933
+#: src/balsa-message.c:2937
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains an encrypted part, but its "
@@ -4012,7 +4004,7 @@ msgstr ""
 "%s tarafından gönderilen “%s” konulu ileti şifreli bir bölüm içeriyor, ancak "
 "yapısı geçersiz."
 
-#: src/balsa-message.c:2941
+#: src/balsa-message.c:2945
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a PGP encrypted part, but "
@@ -4021,7 +4013,7 @@ msgstr ""
 "%s tarafından gönderilen “%s” konulu ileti PGP şifreli bir bölüm içeriyor, "
 "ancak bu şifreleme iletişim kuralı kullanılabilir değil."
 
-#: src/balsa-message.c:2954
+#: src/balsa-message.c:2958
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a S/MIME encrypted part, "
@@ -4030,7 +4022,7 @@ msgstr ""
 "%s tarafından gönderilen “%s” konulu ileti S/MIME şifreli bir bölüm "
 "içeriyor, ancak bu şifreleme iletişim kuralı kullanılabilir değil."
 
-#: src/balsa-message.c:3021
+#: src/balsa-message.c:3025
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a signed part, but its "
@@ -4039,7 +4031,7 @@ msgstr ""
 "%s tarafından gönderilen “%s” konulu ileti imzalı bir bölüm içeriyor, ancak "
 "yapısı geçersiz. İmza, eğer varsa, denetlenemiyor."
 
-#: src/balsa-message.c:3034
+#: src/balsa-message.c:3038
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a %s signed part, but this "
@@ -4048,19 +4040,19 @@ msgstr ""
 "%s tarafından gönderilen “%s” konulu ileti %s imzalı bir bölüm içeriyor, "
 "ancak bu şifreleme iletişim kuralı kullanılabilir değil."
 
-#: src/balsa-message.c:3037
+#: src/balsa-message.c:3041
 msgid "PGP"
 msgstr "PGP"
 
-#: src/balsa-message.c:3066
+#: src/balsa-message.c:3070
 msgid "Detected a good signature with insufficient validity"
 msgstr "Yeterli geçerliliği olmayan iyi bir imza algılandı"
 
-#: src/balsa-message.c:3071 src/balsa-message.c:3196
+#: src/balsa-message.c:3075 src/balsa-message.c:3200
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Yeterli geçerliliği/güveni olmayan iyi bir imza algılandı"
 
-#: src/balsa-message.c:3081 src/balsa-message.c:3205
+#: src/balsa-message.c:3085 src/balsa-message.c:3209
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” "
@@ -4071,7 +4063,7 @@ msgstr ""
 "sonuçlandı:\n"
 "%s"
 
-#: src/balsa-message.c:3094
+#: src/balsa-message.c:3098
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” failed "
@@ -4080,14 +4072,14 @@ msgstr ""
 "%s tarafından gönderilen “%s” konulu iletinin imzasının denetimi bir hata "
 "ile sonuçlandı!"
 
-#: src/balsa-message.c:3156
+#: src/balsa-message.c:3160
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 msgstr ""
 "İleti birden çok defa görüntülendiğinden şifre çözümü gerçekleştirilemedi."
 
-#: src/balsa-message.c:3158
+#: src/balsa-message.c:3162
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -4095,7 +4087,7 @@ msgstr ""
 "İmza denetimi ve OpenPGP zırhının kaldırılması ileti birden çok "
 "görüntülendiğinden gerçekleştirilemedi."
 
-#: src/balsa-message.c:3161
+#: src/balsa-message.c:3165
 msgid "Please close the other instances of this message and try again."
 msgstr "Bu iletinin diğer görüntülenmelerini kapatıp yeniden deneyin."
 
@@ -4140,10 +4132,9 @@ msgid "Save %s MIME Part"
 msgstr "%s MIME Bölümünü Kaydet"
 
 #: src/balsa-mime-widget-callbacks.c:158
-#, fuzzy, c-format
-#| msgid "Failed to create temporary file “%s”: %s"
+#, c-format
 msgid "Failed to create file “%s”: %s"
-msgstr "“%s” geçiçi dosyası oluşturulamadı: %s"
+msgstr "“%s” dosyası oluşturulamadı: %s"
 
 #: src/balsa-mime-widget-callbacks.c:207
 #, c-format
@@ -4454,7 +4445,7 @@ msgstr ""
 msgid "This is an iTIP calendar “%s” message."
 msgstr "Bu bir iTIP takvim “%s” iletisidir."
 
-#: src/balsa-mime-widget-vcalendar.c:182 src/balsa-mime-widget-vcalendar.c:379
+#: src/balsa-mime-widget-vcalendar.c:182 src/balsa-mime-widget-vcalendar.c:374
 #: src/balsa-print-object-text.c:542
 msgid "Summary:"
 msgstr "Özet:"
@@ -4463,12 +4454,12 @@ msgstr "Özet:"
 msgid "Organizer:"
 msgstr "Düzenleyici:"
 
-#: src/balsa-mime-widget-vcalendar.c:188 src/balsa-mime-widget-vcalendar.c:380
+#: src/balsa-mime-widget-vcalendar.c:188 src/balsa-mime-widget-vcalendar.c:375
 #: src/balsa-print-object-text.c:548
 msgid "Start:"
 msgstr "Başlangıç:"
 
-#: src/balsa-mime-widget-vcalendar.c:189 src/balsa-mime-widget-vcalendar.c:381
+#: src/balsa-mime-widget-vcalendar.c:189 src/balsa-mime-widget-vcalendar.c:376
 #: src/balsa-print-object-text.c:549
 msgid "End:"
 msgstr "Bitiş:"
@@ -4481,7 +4472,7 @@ msgstr "Süre:"
 msgid "Recurrence:"
 msgstr "Yineleme:"
 
-#: src/balsa-mime-widget-vcalendar.c:203 src/balsa-mime-widget-vcalendar.c:382
+#: src/balsa-mime-widget-vcalendar.c:203 src/balsa-mime-widget-vcalendar.c:377
 #: src/balsa-print-object-text.c:563
 msgid "Location:"
 msgstr "Konum:"
@@ -4496,7 +4487,7 @@ msgid "Category:"
 msgid_plural "Categories:"
 msgstr[0] "Kategori:"
 
-#: src/balsa-mime-widget-vcalendar.c:249 src/balsa-mime-widget-vcalendar.c:383
+#: src/balsa-mime-widget-vcalendar.c:249 src/balsa-mime-widget-vcalendar.c:378
 #: src/balsa-print-object-text.c:586
 msgid "Description:"
 msgstr "Açıklama:"
@@ -4505,24 +4496,24 @@ msgstr "Açıklama:"
 msgid "The sender asks you for a reply to this request:"
 msgstr "Gönderici bu isteğe yanıt vermenizi istiyor:"
 
-#: src/balsa-mime-widget-vcalendar.c:275
+#: src/balsa-mime-widget-vcalendar.c:273
 msgid "Accept"
 msgstr "Kabul Et"
 
-#: src/balsa-mime-widget-vcalendar.c:288
+#: src/balsa-mime-widget-vcalendar.c:285
 msgid "Accept tentatively"
 msgstr "Bir defalık onayla"
 
-#: src/balsa-mime-widget-vcalendar.c:296
+#: src/balsa-mime-widget-vcalendar.c:292
 msgid "Decline"
 msgstr "Reddet"
 
-#: src/balsa-mime-widget-vcalendar.c:365
+#: src/balsa-mime-widget-vcalendar.c:360
 msgid "iTIP Calendar Request"
 msgstr "iTIP Takvim İsteği"
 
 #. Translators: #1 message sender display name; #2 sender's event action (e.g. "accepted", "rejected", ...)
-#: src/balsa-mime-widget-vcalendar.c:377
+#: src/balsa-mime-widget-vcalendar.c:372
 #, c-format
 msgid ""
 "%s %s the following iTIP calendar request:\n"
@@ -4531,7 +4522,7 @@ msgstr ""
 "%s, şu iTIP takvim istemini %s:\n"
 "\n"
 
-#: src/balsa-mime-widget-vcalendar.c:410
+#: src/balsa-mime-widget-vcalendar.c:405
 #, c-format
 msgid "Sending the iTIP calendar reply failed: %s"
 msgstr "iTIP takvim yanıtı gönderimi başarısız oldu: %s"
@@ -5827,11 +5818,11 @@ msgstr "Sonraki okunmamış ileti %s içinde"
 msgid "Do you want to select %s?"
 msgstr "%s’i seçmek istiyor musun?"
 
-#: src/message-window.c:305 ui/message-window.ui:109
+#: src/message-window.c:307 ui/message-window.ui:109
 msgid "M_ove"
 msgstr "Ta_şı"
 
-#: src/message-window.c:780
+#: src/message-window.c:815
 #, c-format
 msgid "Message from %s: %s"
 msgstr "%s’den ileti: %s"

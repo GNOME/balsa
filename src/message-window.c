@@ -41,6 +41,7 @@ struct _MessageWindow {
 
     GtkWidget *bmessage;
     GtkWidget *toolbar;
+    GtkWidget *move_menu;
 
     LibBalsaMailbox *mailbox;
     LibBalsaMessage *message;
@@ -49,6 +50,7 @@ struct _MessageWindow {
     int show_all_headers;
     guint idle_handler_id;
     guint index_changed_id;
+    guint move_menu_idle_id;
 };
 
 /*
@@ -391,6 +393,11 @@ destroy_message_window(GtkWidget * widget, MessageWindow * mw)
 
     mw_set_message(mw, NULL);
 
+    if (mw->move_menu_idle_id != 0) {
+	g_source_remove(mw->move_menu_idle_id);
+	mw->move_menu_idle_id = 0;
+    }
+
     g_free(mw);
 }
 
@@ -653,13 +660,41 @@ message_window_move_message(MessageWindow * mw, LibBalsaMailbox * mailbox)
         gtk_widget_destroy(mw->window);
 }
 
+static gboolean message_window_new_idle(gpointer data);
+
 static void
-mw_mru_menu_cb(gchar * url, gpointer data)
+mw_mru_menu_cb(GObject      *source_object,
+               GAsyncResult *res,
+               gpointer      data)
 {
-    LibBalsaMailbox *mailbox = balsa_find_mailbox_by_url(url);
     MessageWindow *mw = data;
+    LibBalsaMailbox *mailbox;
+
+    /* The mru menu can be used only once, so set a fresh one;
+     * use an idle callback, so that the new menu is set after this
+     * function completes. */
+    if (mw->move_menu_idle_id == 0)
+        mw->move_menu_idle_id = g_idle_add(message_window_new_idle, mw);
+
+    mailbox = balsa_mblist_mru_menu_finish(res);
+    if (mailbox == NULL) /* move was canceled */
+        return;
 
     message_window_move_message(mw, mailbox);
+}
+
+static gboolean
+message_window_new_idle(gpointer data)
+{
+    MessageWindow *mw = (MessageWindow *) data;
+    GtkWidget *submenu;
+
+    mw->move_menu_idle_id = 0;
+    submenu = balsa_mblist_mru_menu(GTK_WINDOW(mw->window), &balsa_app.folder_mru,
+                                    mw_mru_menu_cb, mw);
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(mw->move_menu), submenu);
+
+    return G_SOURCE_REMOVE;
 }
 
 static void
@@ -907,9 +942,10 @@ message_window_new(LibBalsaMailbox * mailbox, guint msgno)
 
     submenu = balsa_mblist_mru_menu(GTK_WINDOW(window),
                                     &balsa_app.folder_mru,
-                                    G_CALLBACK(mw_mru_menu_cb), mw);
+                                    mw_mru_menu_cb, mw);
     gtk_container_foreach(GTK_CONTAINER(menubar), mw_menubar_foreach,
                           &move_menu);
+    mw->move_menu = move_menu;
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(move_menu), submenu);
 
     if (libbalsa_mailbox_get_readonly(mailbox)) {

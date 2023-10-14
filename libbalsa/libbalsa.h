@@ -59,6 +59,11 @@ typedef struct _LibbalsaVfs LibbalsaVfs;
 #if HAVE_OSMO
 #include "address-book-osmo.h"
 #endif
+#if HAVE_WEBDAV
+#include "libbalsa-webdav.h"
+#include "libbalsa-carddav.h"
+#include "address-book-carddav.h"
+#endif
 
 /* Callback for testing whether a mailbox or server can be reached: */
 typedef void LibBalsaCanReachCallback(GObject * object,

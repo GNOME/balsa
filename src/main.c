@@ -61,6 +61,10 @@
 #endif /* defined(GTK_DISABLE_DEPRECATED) */
 #endif /* HAVE_HTML_WIDGET */
 
+#ifdef HAVE_WEBDAV
+#include <libxml/parser.h>
+#endif
+
 /* We need separate variable for storing command line requests to check the
    mail because such selection cannot be stored in balsa_app and later
    saved to the configuration file.
@@ -494,6 +498,11 @@ balsa_startup_cb(GApplication *application,
     bind_textdomain_codeset(PACKAGE, "UTF-8");
     textdomain(PACKAGE);
     setlocale(LC_ALL, "");
+#endif
+
+#ifdef HAVE_WEBDAV
+    LIBXML_TEST_VERSION
+    xmlInitParser();
 #endif
 
     /* initialise the gpgme library and set the callback funcs */

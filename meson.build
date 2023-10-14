@@ -61,6 +61,7 @@ ldap          = get_option('ldap')
 osmo          = get_option('osmo')
 sqlite        = get_option('sqlite')
 libsecret     = get_option('libsecret')
+webdav        = get_option('webdav')
 gcr           = get_option('gcr')
 more_warnings = get_option('more-warnings')
 help_files    = get_option('help-files')
@@ -365,6 +366,20 @@ if libsecret
   balsa_deps += secret_dep
   balsa_ab_deps += secret_dep
 endif # libsecret
+
+# WebDAV configuration
+#
+if webdav
+  webdav_dep = dependency('libsoup-3.0', required : false)
+  if not webdav_dep.found()
+    webdav_dep = dependency('libsoup-2.4')
+  endif
+  webdav_xml_dep = dependency('libxml-2.0')
+  conf.set('HAVE_WEBDAV', 1,
+    description : 'Defined when Webkit (CardDAV) support is enabled.')
+  balsa_deps += [webdav_dep, webdav_xml_dep]
+  balsa_ab_deps += [webdav_dep, webdav_xml_dep]
+endif # webdav
 
 #####################################################################
 # Headers.

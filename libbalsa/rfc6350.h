@@ -41,5 +41,16 @@ LibBalsaAddress *rfc6350_parse_from_stream(GDataInputStream *stream,
 										   gboolean			*eos,
 										   GError			**error);
 
+/** \brief Create a VCard from an address
+ *
+ * \param[in] address address object
+ * \param[in] vcard4 \c TRUE to create a VCard version 4.0, \c FALSE to use version 3.0
+ * \param[in] add_uuid \c TRUE to add a \c UID item
+ * \return the VCard
+ */
+gchar *rfc6350_from_address(LibBalsaAddress *address,
+							gboolean vcard4,
+							gboolean add_uuid);
+
 
 #endif /* LIBBALSA_RFC6350_H_ */

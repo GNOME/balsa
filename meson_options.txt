@@ -75,6 +75,11 @@ option('libsecret',
   value       : true,
   description : 'Link to libsecret (default=true)')
 
+option('webdav',
+  type        : 'boolean',
+  value       : false,
+  description : 'add WebDAV support: CardDAV address book (requires libsoup and libxml2, default=false)')
+
 option('gcr',
   type        : 'boolean',
   value       : false,

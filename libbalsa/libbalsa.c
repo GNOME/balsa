@@ -88,6 +88,9 @@ libbalsa_init(void)
 #if HAVE_OSMO
     LIBBALSA_TYPE_ADDRESS_BOOK_OSMO;
 #endif
+#if HAVE_WEBDAV
+    LIBBALSA_TYPE_ADDRESS_BOOK_CARDDAV;
+#endif
 #ifdef HAVE_HTML_WIDGET
     libbalsa_html_init();
 #endif

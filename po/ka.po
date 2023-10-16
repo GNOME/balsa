@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-10-14 15:45+0000\n"
-"PO-Revision-Date: 2023-10-15 05:50+0200\n"
+"POT-Creation-Date: 2023-10-15 11:57+0000\n"
+"PO-Revision-Date: 2023-10-16 05:13+0200\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <(nothing)>\n"
 "Language: ka\n"
@@ -117,6 +117,30 @@ msgstr "მისამართების წიგნში მისამ�
 msgid "Unknown error"
 msgstr "უცნობი შეცდომა"
 
+#: libbalsa/address-book-carddav.c:405 libbalsa/address-book-ldap.c:950
+#: libbalsa/server.c:340
+msgid "Balsa passwords"
+msgstr "Balsa-ის პაროლები"
+
+#. Translators: #1 address book name; #2 error message
+#: libbalsa/address-book-carddav.c:411
+#, c-format
+msgid "Error saving CardDAV credentials for address book “%s”: %s"
+msgstr ""
+
+#. Translators: #1 address book name; #2 error message
+#: libbalsa/address-book-carddav.c:452
+#, c-format
+msgid "Error loading CardDAV credentials for address book “%s”: %s"
+msgstr ""
+
+#: libbalsa/address-book-carddav.c:490 libbalsa/gmime-gpgme-signature.c:239
+#: libbalsa/imap/imap-handle.c:46 libbalsa/libbalsa-carddav.c:543
+#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
+#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
+msgid "unknown"
+msgstr "unknown"
+
 #. The extern database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:189 libbalsa/address-book-ldif.c:243
 msgid "No-Id"
@@ -153,10 +177,6 @@ msgstr "შეცდომა LDAP მისამართების წი�
 #: libbalsa/address-book-ldap.c:694
 msgid "Undefined location of user address book"
 msgstr "მომხმარებლის მისამართების წიგნის მდებარეობა მითითებული არაა"
-
-#: libbalsa/address-book-ldap.c:950 libbalsa/server.c:340
-msgid "Balsa passwords"
-msgstr "Balsa-ის პაროლები"
 
 #: libbalsa/address-book-ldap.c:955
 #, c-format
@@ -567,12 +587,6 @@ msgid ""
 msgstr ""
 "\n"
 "გასაღების ანაბეჭდი: %s"
-
-#: libbalsa/gmime-gpgme-signature.c:239 libbalsa/imap/imap-handle.c:46
-#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
-#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
-msgid "unknown"
-msgstr "unknown"
 
 #: libbalsa/gmime-multipart-crypt.c:235
 msgid "Cannot verify multipart/signed part due to missing subparts."
@@ -1186,6 +1200,28 @@ msgstr ""
 msgid "Cannot play sound file “%s”: %s"
 msgstr ""
 
+#: libbalsa/libbalsa-carddav.c:442
+msgid "The server returned an invalid reply."
+msgstr "სერვერის არასწორი პასუხი."
+
+#: libbalsa/libbalsa-carddav.c:514
+msgid "The server does not support any usable address book report."
+msgstr ""
+
+#. Translators: #1 address book name, #2 address book URL, #3 error message
+#: libbalsa/libbalsa-carddav.c:542
+#, c-format
+msgid ""
+"CardDAV error for address book “%s” (URL %s):\n"
+"%s"
+msgstr ""
+
+#. Translators: #1 error message
+#: libbalsa/libbalsa-carddav.c:564
+#, c-format
+msgid "CardDAV error: %s"
+msgstr "CardDAV-ის შეცდომა: %s"
+
 #: libbalsa/libbalsa-conf.c:139
 msgid "Your Balsa configuration is now stored in “~/.balsa/config”."
 msgstr ""
@@ -1661,6 +1697,34 @@ msgstr "%s-ით გახსნა"
 #: libbalsa/libbalsa-vfs.c:574
 #, c-format
 msgid "Open _part with %s"
+msgstr ""
+
+#: libbalsa/libbalsa-webdav.c:237 libbalsa/libbalsa-webdav.c:290
+msgid "failed to evaluate XPath expression"
+msgstr ""
+
+#. Translators: #1 HTTP (RFC 2616) status code, #2 HTTP status message
+#: libbalsa/libbalsa-webdav.c:349 libbalsa/libbalsa-webdav.c:402
+#: libbalsa/libbalsa-webdav.c:721 libbalsa/libbalsa-webdav.c:818
+#, c-format
+msgid "WebDAV response %d: %s"
+msgstr "WebDAV პასუხი %d: %s"
+
+#: libbalsa/libbalsa-webdav.c:725 libbalsa/libbalsa-webdav.c:732
+#: libbalsa/libbalsa-webdav.c:820
+msgid "WebDAV: empty response"
+msgstr ""
+
+#: libbalsa/libbalsa-webdav.c:736 libbalsa/libbalsa-webdav.c:824
+msgid "cannot parse the WebDAV server response as XML"
+msgstr ""
+
+#: libbalsa/libbalsa-webdav.c:963
+msgid "cannot add namespaces to XPath context"
+msgstr ""
+
+#: libbalsa/libbalsa-webdav.c:966
+msgid "cannot create XPath context"
 msgstr ""
 
 #: libbalsa/mailbox.c:539

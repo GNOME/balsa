@@ -13,19 +13,29 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-07-03 20:57+0000\n"
-"PO-Revision-Date: 2023-05-30 00:12+0300\n"
-"Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
+"POT-Creation-Date: 2023-10-16 19:44+0000\n"
+"PO-Revision-Date: 2023-10-18 20:00+0300\n"
+"Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.4\n"
 "X-POOTLE-MTIME: 1426069247.000000\n"
 
-#: balsa.appdata.xml.in:7
+#: balsa.appdata.xml.in:6 org.desktop.Balsa.desktop.in.in:3
+#: balsa-mailto-handler.desktop.in.in:3 libbalsa/system-tray.c:102
+msgid "Balsa"
+msgstr "Balsa"
+
+#: balsa.appdata.xml.in:7 org.desktop.Balsa.desktop.in.in:4
+#: balsa-mailto-handler.desktop.in.in:4
+msgid "Email utility"
+msgstr "E-posta aracı"
+
+#: balsa.appdata.xml.in:10
 msgid ""
 "Balsa is a graphical mail client. While it is in active development, Balsa "
 "has many features such as:"
@@ -33,50 +43,41 @@ msgstr ""
 "Balsa, grafiksel e-posta istemcisidir. Aktif olarak geliştirilmektedir ve "
 "birçok özelliği vardır:"
 
-#: balsa.appdata.xml.in:10
+#: balsa.appdata.xml.in:13
 msgid "IMAP and POP3 support;"
 msgstr "IMAP ve POP3 desteği;"
 
-#: balsa.appdata.xml.in:11
+#: balsa.appdata.xml.in:14
 msgid "sendmail or direct SMTP support;"
 msgstr "sendmail veya doğrudan SMTP desteği;"
 
-#: balsa.appdata.xml.in:12
+#: balsa.appdata.xml.in:15
 msgid "end-to-end encryption using GnuPG or S/MIME;"
 msgstr "GnuPG ya da S/MIME ile uçtan uca şifreleme;"
 
-#: balsa.appdata.xml.in:13
+#: balsa.appdata.xml.in:16
 msgid "multi-threaded retrieval and sending of messages;"
 msgstr "çok ileti dizili ileti alma ve gönderme;"
 
-#: balsa.appdata.xml.in:14
+#: balsa.appdata.xml.in:17
 msgid "support for all configurations of local mail folders;"
 msgstr "yerel posta klasörlerinin tüm yapılandırmalarına destek;"
 
-#: balsa.appdata.xml.in:15
+#: balsa.appdata.xml.in:18
 msgid "automatic mail checking;"
 msgstr "kendiliğinden posta denetimi;"
 
-#: balsa.appdata.xml.in:16
+#: balsa.appdata.xml.in:19
 msgid "mail printing;"
 msgstr "posta yazdırma;"
 
-#: balsa.appdata.xml.in:17
+#: balsa.appdata.xml.in:20
 msgid "inline attachment viewing;"
 msgstr "satır arası ek gösterimi;"
 
-#: balsa.appdata.xml.in:19
+#: balsa.appdata.xml.in:22
 msgid "and the proverbial much, much more."
 msgstr "ve daha çoğu."
-
-#: org.desktop.Balsa.desktop.in.in:3 balsa-mailto-handler.desktop.in.in:3
-#: libbalsa/system-tray.c:102
-msgid "Balsa"
-msgstr "Balsa"
-
-#: org.desktop.Balsa.desktop.in.in:4 balsa-mailto-handler.desktop.in.in:4
-msgid "Email utility"
-msgstr "E-posta aracı"
 
 #: org.desktop.Balsa.desktop.in.in:5 balsa-mailto-handler.desktop.in.in:5
 msgid "Mail Client"
@@ -120,10 +121,34 @@ msgstr "Adres, adres defterinde bulunamıyor"
 #: src/balsa-mime-widget-callbacks.c:208 src/balsa-mime-widget-crypto.c:78
 #: src/balsa-mime-widget-crypto.c:84 src/balsa-mime-widget-message.c:362
 #: src/balsa-mime-widget-text.c:255 src/main-window.c:3059
-#: src/main-window.c:4265 src/sendmsg-window.c:1446 src/sendmsg-window.c:2985
-#: src/sendmsg-window.c:3945
+#: src/main-window.c:4265 src/sendmsg-window.c:1446 src/sendmsg-window.c:2992
+#: src/sendmsg-window.c:3952
 msgid "Unknown error"
 msgstr "Bilinmeyen hata"
+
+#: libbalsa/address-book-carddav.c:405 libbalsa/address-book-ldap.c:950
+#: libbalsa/server.c:340
+msgid "Balsa passwords"
+msgstr "Balsa parolaları"
+
+#. Translators: #1 address book name; #2 error message
+#: libbalsa/address-book-carddav.c:411
+#, c-format
+msgid "Error saving CardDAV credentials for address book “%s”: %s"
+msgstr "“%s” adres defteri için CardDAV kimlik bilgileri kaydedilirken hata: %s"
+
+#. Translators: #1 address book name; #2 error message
+#: libbalsa/address-book-carddav.c:452
+#, c-format
+msgid "Error loading CardDAV credentials for address book “%s”: %s"
+msgstr "“%s” adres defteri için CardDAV kimlik bilgileri yüklenirken hata: %s"
+
+#: libbalsa/address-book-carddav.c:490 libbalsa/gmime-gpgme-signature.c:239
+#: libbalsa/imap/imap-handle.c:46 libbalsa/libbalsa-carddav.c:543
+#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
+#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
+msgid "unknown"
+msgstr "bilinmeyen"
 
 #. The extern database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:189 libbalsa/address-book-ldif.c:243
@@ -134,8 +159,8 @@ msgstr "Kimliksiz"
 #: libbalsa/address-book-ldap.c:577 libbalsa/address-book-ldif.c:189
 #: libbalsa/address-book-ldif.c:227 libbalsa/address-book-ldif.c:270
 #: libbalsa/address-book-ldif.c:274 libbalsa/address-book-vcard.c:142
-#: libbalsa/address-book-vcard.c:249 libbalsa/address.c:392
-#: libbalsa/rfc6350.c:112
+#: libbalsa/address-book-vcard.c:249 libbalsa/address.c:393
+#: libbalsa/rfc6350.c:119
 msgid "No-Name"
 msgstr "Adsız"
 
@@ -164,10 +189,6 @@ msgstr "LDAP adres defteri %s açılamadı: %s"
 msgid "Undefined location of user address book"
 msgstr "Kullanıcı adres defterinin konumu tanımlanmamış"
 
-#: libbalsa/address-book-ldap.c:950 libbalsa/server.c:340
-msgid "Balsa passwords"
-msgstr "Balsa parolaları"
-
 #: libbalsa/address-book-ldap.c:955
 #, c-format
 msgid "Error saving LDAP credentials for address book %s: %s"
@@ -188,43 +209,43 @@ msgstr "LDAP sunucusu %s kapalı, sonraki deneme yeniden bağlanmayı deneyecek.
 msgid "Reading Osmo contacts failed: %s"
 msgstr "Osmo kişi bilgilerinin okunması başarısız oldu: %s"
 
-#: libbalsa/address.c:955
+#: libbalsa/address.c:957
 msgid "D_isplayed Name:"
 msgstr "_Görünen Ad:"
 
-#: libbalsa/address.c:956
+#: libbalsa/address.c:958
 msgid "_First Name:"
 msgstr "_Ad:"
 
-#: libbalsa/address.c:957
+#: libbalsa/address.c:959
 msgid "_Last Name:"
 msgstr "_Soyad:"
 
-#: libbalsa/address.c:958
+#: libbalsa/address.c:960
 msgid "_Nickname:"
 msgstr "_Takma Ad:"
 
-#: libbalsa/address.c:959
+#: libbalsa/address.c:961
 msgid "O_rganization:"
 msgstr "_Kurum:"
 
-#: libbalsa/address.c:960
+#: libbalsa/address.c:962
 msgid "_Email Address:"
 msgstr "_E-posta Adresi:"
 
-#: libbalsa/address.c:980 src/filter-edit-callbacks.c:1069
+#: libbalsa/address.c:982 src/filter-edit-callbacks.c:1069
 msgid "A_dd"
 msgstr "_Ekle"
 
 #: libbalsa/address-view.c:193 src/balsa-mime-widget-message.c:738
 #: src/balsa-print-object-header.c:146 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:3640
+#: src/sendmsg-window.c:3647
 msgid "To:"
 msgstr "Alıcı:"
 
 #: libbalsa/address-view.c:194 src/balsa-mime-widget-message.c:740
 #: src/balsa-print-object-header.c:148 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:3648
+#: src/sendmsg-window.c:3655
 msgid "CC:"
 msgstr "CC:"
 
@@ -370,8 +391,8 @@ msgid "_Show details…"
 msgstr "_Ayrıntıları göster…"
 
 #: libbalsa/autocrypt.c:933 libbalsa/html-pref-db.c:457 src/balsa-index.c:2005
-#: src/mailbox-node.c:1040 src/mailbox-node.c:1056 src/pref-manager.c:2014
-#: src/pref-manager.c:2099 src/pref-manager.c:2822 ui/ab-main.ui:44
+#: src/mailbox-node.c:1040 src/mailbox-node.c:1056 src/pref-manager.c:2018
+#: src/pref-manager.c:2103 src/pref-manager.c:2826 ui/ab-main.ui:44
 #: ui/main-window.ui:348
 msgid "_Delete"
 msgstr "_Sil"
@@ -529,7 +550,7 @@ msgstr "MIME bölümünün şifresi çözülürken hata: ayrıştırma hatası"
 
 #: libbalsa/gmime-gpgme-signature.c:147 libbalsa/libbalsa-gpgme-widgets.c:371
 #: libbalsa/libbalsa-gpgme-widgets.c:744 libbalsa/rfc3156.c:550
-#: src/address-book-config.c:192
+#: src/address-book-config.c:208
 msgid "never"
 msgstr "asla"
 
@@ -580,22 +601,16 @@ msgstr ""
 "\n"
 "Tuş parmak izi: %s"
 
-#: libbalsa/gmime-gpgme-signature.c:239 libbalsa/imap/imap-handle.c:46
-#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546
-#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5375
-msgid "unknown"
-msgstr "bilinmeyen"
-
-#: libbalsa/gmime-multipart-crypt.c:230
+#: libbalsa/gmime-multipart-crypt.c:235
 msgid "Cannot verify multipart/signed part due to missing subparts."
 msgstr "Eksik alt bölümler yüzünden çoklu bölüm/imzalı bölüm doğrulanamıyor."
 
-#: libbalsa/gmime-multipart-crypt.c:254
+#: libbalsa/gmime-multipart-crypt.c:259
 #, c-format
 msgid "unsupported protocol “%s”"
 msgstr "desteklenmeyen iletişim kuralı “%s”"
 
-#: libbalsa/gmime-multipart-crypt.c:267
+#: libbalsa/gmime-multipart-crypt.c:272
 msgid ""
 "Cannot verify multipart/signed part: signature content-type does not match "
 "protocol."
@@ -603,7 +618,7 @@ msgstr ""
 "Çoklu bölüm/imzalı bölüm doğrulanamıyor: imza içerik türü iletişim kuralıyla "
 "eşleşmiyor."
 
-#: libbalsa/gmime-multipart-crypt.c:463
+#: libbalsa/gmime-multipart-crypt.c:468
 #, c-format
 msgid ""
 "Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
@@ -612,11 +627,11 @@ msgstr ""
 "Çoklu bölüm/şifreli bölümün şifresi çözülemiyor: desteklenmeyen şifreleme "
 "iletişim kuralı “%s”."
 
-#: libbalsa/gmime-multipart-crypt.c:464
+#: libbalsa/gmime-multipart-crypt.c:469
 msgid "(none)"
 msgstr "(hiçbiri)"
 
-#: libbalsa/gmime-multipart-crypt.c:477
+#: libbalsa/gmime-multipart-crypt.c:482
 msgid ""
 "Cannot decrypt multipart/encrypted part: content-type does not match "
 "protocol."
@@ -624,12 +639,12 @@ msgstr ""
 "Çoklu bölüm/şifreli bölümün şifresi çözülemiyor: içerik türü iletişim "
 "kuralıyla eşleşmiyor."
 
-#: libbalsa/gmime-multipart-crypt.c:492
+#: libbalsa/gmime-multipart-crypt.c:497
 msgid "Cannot decrypt multipart/encrypted part: unexpected content type"
 msgstr ""
 "Çoklu bölüm/şifreli bölümün şifresi çözülemiyor: beklenmedik içerik türü"
 
-#: libbalsa/gmime-multipart-crypt.c:534
+#: libbalsa/gmime-multipart-crypt.c:539
 msgid ""
 "Cannot decrypt multipart/encrypted part: failed to parse decrypted content"
 msgstr ""
@@ -712,13 +727,13 @@ msgstr "Veri tabanı girdisi silinemedi: %s"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:105 libbalsa/mailbox_local.c:2007
-#: libbalsa/mailbox_local.c:2009 src/sendmsg-window.c:3893
-#: src/sendmsg-window.c:3895
+#: libbalsa/mailbox_local.c:2009 src/sendmsg-window.c:3900
+#: src/sendmsg-window.c:3902
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:106 src/sendmsg-window.c:3832 src/sendmsg-window.c:3833
-#: src/sendmsg-window.c:3834
+#: libbalsa/identity.c:106 src/sendmsg-window.c:3839 src/sendmsg-window.c:3840
+#: src/sendmsg-window.c:3841
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -748,8 +763,8 @@ msgstr "“%s” içindeki imza bir UTF-8 metni değil."
 
 #: libbalsa/identity.c:364 libbalsa/libbalsa-gpgme-cb.c:181
 #: libbalsa/libbalsa-gpgme-cb.c:357 libbalsa/smtp-server.c:330
-#: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:259
-#: src/address-book-config.c:367 src/address-book-config.c:410
+#: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:275
+#: src/address-book-config.c:387 src/address-book-config.c:430
 #: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2796
 #: src/balsa-mblist.c:1894 src/balsa-message.c:1786
 #: src/balsa-mime-widget-callbacks.c:89 src/filter-edit-callbacks.c:1257
@@ -758,12 +773,12 @@ msgstr "“%s” içindeki imza bir UTF-8 metni değil."
 #: src/folder-conf.c:340 src/folder-conf.c:473 src/folder-conf.c:873
 #: src/folder-conf.c:1122 src/mailbox-conf.c:203 src/mailbox-conf.c:225
 #: src/mailbox-conf.c:241 src/mailbox-conf.c:726 src/mailbox-conf.c:780
-#: src/pref-manager.c:3322 src/sendmsg-window.c:489 src/sendmsg-window.c:1541
-#: src/sendmsg-window.c:2011 src/sendmsg-window.c:3391
-#: src/sendmsg-window.c:4831 src/sendmsg-window.c:5137
-#: src/sendmsg-window.c:5230 src/spell-check.c:392 src/store-address.c:204
+#: src/pref-manager.c:3326 src/sendmsg-window.c:489 src/sendmsg-window.c:1541
+#: src/sendmsg-window.c:2011 src/sendmsg-window.c:3398
+#: src/sendmsg-window.c:4838 src/sendmsg-window.c:5144
+#: src/sendmsg-window.c:5237 src/spell-check.c:392 src/store-address.c:204
 msgid "_Cancel"
-msgstr "_İptal"
+msgstr "İ_ptal"
 
 #: libbalsa/identity.c:365 libbalsa/libbalsa-gpgme-cb.c:180
 #: libbalsa/libbalsa-gpgme-cb.c:356 libbalsa/smtp-server.c:329
@@ -771,9 +786,9 @@ msgstr "_İptal"
 #: src/balsa-message.c:1787 src/balsa-mime-widget-callbacks.c:90
 #: src/filter-edit-callbacks.c:1256 src/filter-edit-dialog.c:574
 #: src/filter-export-dialog.c:80 src/filter-run-dialog.c:301
-#: src/folder-conf.c:341 src/main-window.c:4046 src/pref-manager.c:3320
+#: src/folder-conf.c:341 src/main-window.c:4046 src/pref-manager.c:3324
 #: src/sendmsg-window.c:1540 src/sendmsg-window.c:2012
-#: src/sendmsg-window.c:3390 src/sendmsg-window.c:4832 src/store-address.c:205
+#: src/sendmsg-window.c:3397 src/sendmsg-window.c:4839 src/store-address.c:205
 msgid "_OK"
 msgstr "_Tamam"
 
@@ -984,11 +999,11 @@ msgid "Manage Identities"
 msgstr "Kimlikleri Yönet"
 
 #: libbalsa/identity.c:1646 libbalsa/smtp-server.c:331
-#: src/address-book-config.c:260 src/address-book-config.c:365
-#: src/address-book-config.c:408 src/filter-edit-callbacks.c:1258
+#: src/address-book-config.c:276 src/address-book-config.c:385
+#: src/address-book-config.c:428 src/filter-edit-callbacks.c:1258
 #: src/filter-edit-dialog.c:576 src/filter-export-dialog.c:82
 #: src/filter-run-dialog.c:303 src/folder-conf.c:474 src/folder-conf.c:874
-#: src/main-window.c:3937 src/pref-manager.c:3323 src/toolbar-prefs.c:126
+#: src/main-window.c:3937 src/pref-manager.c:3327 src/toolbar-prefs.c:126
 #: ui/ab-main.ui:70 ui/main-window.ui:543
 msgid "_Help"
 msgstr "_Yardım"
@@ -1130,27 +1145,27 @@ msgstr "“%s” aboneliği iptal edilirken hata oluştu"
 msgid "do not show again"
 msgstr "yeniden gösterme"
 
-#: libbalsa/libbalsa.c:404
+#: libbalsa/libbalsa.c:407
 msgid "broken TLS certificate"
 msgstr "Bozuk TLS sertifikası"
 
-#: libbalsa/libbalsa.c:408
+#: libbalsa/libbalsa.c:411
 msgid "SSL/TLS certificate"
 msgstr "SSL/TLS sertifikası"
 
-#: libbalsa/libbalsa.c:412
+#: libbalsa/libbalsa.c:415
 msgid "_Accept Once"
 msgstr "_Bir Kez Kabul Et"
 
-#: libbalsa/libbalsa.c:413
+#: libbalsa/libbalsa.c:416
 msgid "Accept & _Save"
 msgstr "Kabul Et ve _Kaydet"
 
-#: libbalsa/libbalsa.c:414
+#: libbalsa/libbalsa.c:417
 msgid "_Reject"
 msgstr "_Geri Çevir"
 
-#: libbalsa/libbalsa.c:420
+#: libbalsa/libbalsa.c:423
 #, c-format
 msgid ""
 "<big><b>Authenticity of this certificate could not be verified.</b></big>\n"
@@ -1159,67 +1174,91 @@ msgstr ""
 "<big><b>Bu sertifikanın gerçekliği doğrulanamadı.</b></big>\n"
 "Neden: %s"
 
-#: libbalsa/libbalsa.c:461
+#: libbalsa/libbalsa.c:464
 msgid "the signing certificate authority is not known"
 msgstr "imzalayan sertifika yetkilisi bilinmiyor"
 
-#: libbalsa/libbalsa.c:462
+#: libbalsa/libbalsa.c:465
 msgid ""
 "the certificate does not match the expected identity of the site that it was "
 "retrieved from"
 msgstr "sertifika, alındığı sitenin beklenen kimliğiyle eşleşmiyor"
 
-#: libbalsa/libbalsa.c:463
+#: libbalsa/libbalsa.c:466
 msgid "the certificate’s activation time is still in the future"
 msgstr "sertifikanın etkinleştirilme tarihi henüz gelmemiş"
 
-#: libbalsa/libbalsa.c:464
+#: libbalsa/libbalsa.c:467
 msgid "the certificate has expired"
 msgstr "sertifikanın süresi dolmuş"
 
-#: libbalsa/libbalsa.c:465
+#: libbalsa/libbalsa.c:468
 msgid "the certificate has been revoked"
 msgstr "sertifika feshedilmiş"
 
-#: libbalsa/libbalsa.c:466
+#: libbalsa/libbalsa.c:469
 msgid "the certificate’s algorithm is considered insecure"
 msgstr "sertifikanın algoritması güvensiz kabul ediliyor"
 
-#: libbalsa/libbalsa.c:467
+#: libbalsa/libbalsa.c:470
 msgid "an error occurred validating the certificate"
 msgstr "sertifika doğrulanırken hata oluştu"
 
-#: libbalsa/libbalsa.c:483
+#: libbalsa/libbalsa.c:486
 #, c-format
 msgid "unknown certificate validation error %u"
 msgstr "bilinmeyen sertifika doğrulama hatası %u"
 
-#: libbalsa/libbalsa.c:562
+#: libbalsa/libbalsa.c:565
 msgid "No image data"
 msgstr "Resim verisi yok"
 
-#: libbalsa/libbalsa.c:596
+#: libbalsa/libbalsa.c:599
 msgid "Invalid input format"
 msgstr "Geçersiz girdi biçimi"
 
-#: libbalsa/libbalsa.c:600
+#: libbalsa/libbalsa.c:603
 msgid "Internal buffer overrun"
 msgstr "İç  taşması"
 
 #. Translators: please do not translate Face.
-#: libbalsa/libbalsa.c:617
+#: libbalsa/libbalsa.c:620
 msgid "Bad X-Face data"
 msgstr "Bozuk X-Face verisi"
 
-#: libbalsa/libbalsa.c:716
+#: libbalsa/libbalsa.c:719
 #, c-format
 msgid "Cannot play sound event “%s”: %s"
 msgstr "“%s” ses olayı oynatılamıyor: %s"
 
-#: libbalsa/libbalsa.c:732
+#: libbalsa/libbalsa.c:735
 #, c-format
 msgid "Cannot play sound file “%s”: %s"
 msgstr "“%s” ses dosyası oynatılamıyor: %s"
+
+#: libbalsa/libbalsa-carddav.c:442
+msgid "The server returned an invalid reply."
+msgstr "Sunucu geçersiz yanıt döndü."
+
+#: libbalsa/libbalsa-carddav.c:514
+msgid "The server does not support any usable address book report."
+msgstr "Sunucu, kullanılabilir bir adres defteri raporu desteklemiyor."
+
+#. Translators: #1 address book name, #2 address book URL, #3 error message
+#: libbalsa/libbalsa-carddav.c:542
+#, c-format
+msgid ""
+"CardDAV error for address book “%s” (URL %s):\n"
+"%s"
+msgstr ""
+"“%s” adres defteri (URL %s) için CardDAV hatası:\n"
+"%s"
+
+#. Translators: #1 error message
+#: libbalsa/libbalsa-carddav.c:564
+#, c-format
+msgid "CardDAV error: %s"
+msgstr "CardDAV hatası: %s"
 
 #: libbalsa/libbalsa-conf.c:139
 msgid "Your Balsa configuration is now stored in “~/.balsa/config”."
@@ -1356,7 +1395,7 @@ msgid "User ID"
 msgstr "Kullanıcı Kimliği"
 
 #: libbalsa/libbalsa-gpgme-cb.c:283 src/balsa-index.c:456
-#: src/pref-manager.c:222 src/sendmsg-window.c:2674
+#: src/pref-manager.c:222 src/sendmsg-window.c:2678
 msgid "Size"
 msgstr "Boyut"
 
@@ -1700,7 +1739,7 @@ msgstr " eğri “%s”"
 msgid "_Hide"
 msgstr "_Gizle"
 
-#: libbalsa/libbalsa-vfs.c:406 src/sendmsg-window.c:4627
+#: libbalsa/libbalsa-vfs.c:406 src/sendmsg-window.c:4634
 msgid "not a regular file"
 msgstr "sıradan dosya değil"
 
@@ -1717,6 +1756,34 @@ msgstr "%s ile aç"
 #, c-format
 msgid "Open _part with %s"
 msgstr "Bölümü %s ile _aç"
+
+#: libbalsa/libbalsa-webdav.c:237 libbalsa/libbalsa-webdav.c:290
+msgid "failed to evaluate XPath expression"
+msgstr "XPath ifadesi değerlendirilemedi"
+
+#. Translators: #1 HTTP (RFC 2616) status code, #2 HTTP status message
+#: libbalsa/libbalsa-webdav.c:349 libbalsa/libbalsa-webdav.c:402
+#: libbalsa/libbalsa-webdav.c:721 libbalsa/libbalsa-webdav.c:818
+#, c-format
+msgid "WebDAV response %d: %s"
+msgstr "WebDAV yanıtı %d: %s"
+
+#: libbalsa/libbalsa-webdav.c:725 libbalsa/libbalsa-webdav.c:732
+#: libbalsa/libbalsa-webdav.c:820
+msgid "WebDAV: empty response"
+msgstr "WebDAV: boş yanıt"
+
+#: libbalsa/libbalsa-webdav.c:736 libbalsa/libbalsa-webdav.c:824
+msgid "cannot parse the WebDAV server response as XML"
+msgstr "WebDAV sunucu yanıtı XML olarak ayrıştırılamadı"
+
+#: libbalsa/libbalsa-webdav.c:963
+msgid "cannot add namespaces to XPath context"
+msgstr "XPath içeriğine ad uzayı eklenemedi"
+
+#: libbalsa/libbalsa-webdav.c:966
+msgid "cannot create XPath context"
+msgstr "XPath içeriği oluşturulamadı"
 
 #: libbalsa/mailbox.c:539
 #, c-format
@@ -2704,20 +2771,20 @@ msgstr "tüm"
 msgid "ultimate"
 msgstr "üst düzey"
 
-#: libbalsa/rfc6350.c:62
+#: libbalsa/rfc6350.c:69
 msgid "malformed card, BEGIN:VCARD expected"
 msgstr "bozuk kart, BEGIN:VCARD bekleniyordu"
 
-#: libbalsa/rfc6350.c:100
+#: libbalsa/rfc6350.c:107
 msgid "malformed card, END:VCARD missing"
 msgstr "bozuk kart, END:VCARD kayıp"
 
-#: libbalsa/rfc6350.c:259
+#: libbalsa/rfc6350.c:354
 #, c-format
 msgid "malformed line “%s”, missing “:”"
 msgstr "bozuk satır “%s”, kayıp “:”"
 
-#: libbalsa/rfc6350.c:270
+#: libbalsa/rfc6350.c:365
 #, c-format
 msgid "malformed line “%s”, empty name or value"
 msgstr "bozuk satır “%s”, boş ad veya değer"
@@ -2835,7 +2902,7 @@ msgstr "_Temel"
 msgid "_Descriptive Name:"
 msgstr "_Tanımlayıcı Ad:"
 
-#: libbalsa/server-config.c:125
+#: libbalsa/server-config.c:125 src/address-book-config.c:785
 msgid "probe…"
 msgstr "araştır…"
 
@@ -2853,11 +2920,11 @@ msgid "_Authentication:"
 msgstr "_Kimlik doğrulama:"
 
 #. user name and password
-#: libbalsa/server-config.c:154
+#: libbalsa/server-config.c:154 src/address-book-config.c:774
 msgid "_User Name:"
 msgstr "_Kullanıcı Adı:"
 
-#: libbalsa/server-config.c:158
+#: libbalsa/server-config.c:158 src/address-book-config.c:778
 msgid "_Pass Phrase:"
 msgstr "_Parola Sözcüğü:"
 
@@ -2944,9 +3011,9 @@ msgstr ""
 "• Şifreleme: %s\n"
 "• Kimlik doğrulama: %s\n"
 
-#: libbalsa/server-config.c:553 src/ab-main.c:814 src/address-book-config.c:248
-#: src/address-book-config.c:356 src/address-book-config.c:397
-#: src/filter-edit-dialog.c:503 src/main-window.c:3997 src/pref-manager.c:3321
+#: libbalsa/server-config.c:553 src/ab-main.c:814 src/address-book-config.c:264
+#: src/address-book-config.c:376 src/address-book-config.c:417
+#: src/filter-edit-dialog.c:503 src/main-window.c:3997 src/pref-manager.c:3325
 msgid "_Apply"
 msgstr "_Uygula"
 
@@ -2969,7 +3036,7 @@ msgstr "SMTP Sunucu"
 msgid "Sp_lit message larger than"
 msgstr "Şundan büyük iletileri _böl"
 
-#: libbalsa/smtp-server.c:353 src/pref-manager.c:2157
+#: libbalsa/smtp-server.c:353 src/pref-manager.c:2161
 msgid "MB"
 msgstr "MB"
 
@@ -3522,119 +3589,176 @@ msgstr ""
 "Adres defteri “%s” açılırken hata:\n"
 "%s"
 
-#: src/address-book-config.c:172
+#: src/address-book-config.c:188
 msgid "Suggest complete addresses:"
 msgstr "Adres tamamlamayı öner:"
 
-#: src/address-book-config.c:177
+#: src/address-book-config.c:193
 msgid "as I type"
 msgstr "yazdığım gibi"
 
-#: src/address-book-config.c:185
+#: src/address-book-config.c:201
 msgid "when I hit the Escape key"
 msgstr "Escape tuşuna basıldığında"
 
-#: src/address-book-config.c:247 src/address-book-config.c:355
+#: src/address-book-config.c:263 src/address-book-config.c:375
 #, c-format
 msgid "Modify %s Address Book"
 msgstr "%s Adres Defterini Değiştir"
 
-#: src/address-book-config.c:251 src/address-book-config.c:358
+#: src/address-book-config.c:267 src/address-book-config.c:378
 #, c-format
 msgid "Add %s Address Book"
 msgstr "%s Adres Defteri Ekle"
 
-#: src/address-book-config.c:252 src/address-book-config.c:359
-#: src/address-book-config.c:401 src/mailbox-conf.c:359 src/pref-manager.c:2009
-#: src/pref-manager.c:2092 src/pref-manager.c:2815
+#: src/address-book-config.c:268 src/address-book-config.c:379
+#: src/address-book-config.c:421 src/mailbox-conf.c:359 src/pref-manager.c:2013
+#: src/pref-manager.c:2096 src/pref-manager.c:2819
 msgid "_Add"
 msgstr "_Ekle"
 
 #. mailbox name
 #. may be NULL
 #. mailbox name
-#: src/address-book-config.c:271 src/address-book-config.c:418
-#: src/address-book-config.c:474 src/address-book-config.c:553
-#: src/address-book-config.c:622
+#. may be NULL
+#. address book name
+#: src/address-book-config.c:287 src/address-book-config.c:438
+#: src/address-book-config.c:494 src/address-book-config.c:573
+#: src/address-book-config.c:642 src/address-book-config.c:766
 msgid "A_ddress Book Name:"
 msgstr "A_dres Defterinin Adı:"
 
-#: src/address-book-config.c:396
+#: src/address-book-config.c:416
 msgid "Modify Osmo Address Book"
 msgstr "Osmo Adres Defterini Değiştir"
 
-#: src/address-book-config.c:400
+#: src/address-book-config.c:420
 msgid "Add Osmo Address Book"
 msgstr "Osmo Adres Defteri Ekle"
 
-#: src/address-book-config.c:483
+#: src/address-book-config.c:503
 msgid "Load program location:"
 msgstr "Program konumunu yükle:"
 
-#: src/address-book-config.c:488
+#: src/address-book-config.c:508
 msgid "Select load program for address book"
 msgstr "Adres defteri için yükleme programını seç"
 
-#: src/address-book-config.c:499
+#: src/address-book-config.c:519
 msgid "Save program location:"
 msgstr "Kaydetme programı konumu:"
 
-#: src/address-book-config.c:504
+#: src/address-book-config.c:524
 msgid "Select save program for address book"
 msgstr "Adres defteri için kaydetme programını seç"
 
-#: src/address-book-config.c:560
+#: src/address-book-config.c:580
 msgid "_LDAP Server URI"
 msgstr "_LDAP Sunucu URI"
 
-#: src/address-book-config.c:565
+#: src/address-book-config.c:585
 msgid "Base Domain _Name"
 msgstr "Ana Sunucu _Adı"
 
-#: src/address-book-config.c:570
+#: src/address-book-config.c:590
 msgid "_User Name (Bind DN)"
 msgstr "_Kullanıcı Adı (Bind DN)"
 
-#: src/address-book-config.c:575
+#: src/address-book-config.c:595
 msgid "_Password"
 msgstr "_Parola"
 
-#: src/address-book-config.c:581
+#: src/address-book-config.c:601
 msgid "_User Address Book DN"
 msgstr "_Kullanıcı Adres Defteri DN"
 
-#: src/address-book-config.c:587
+#: src/address-book-config.c:607
 msgid "Enable _TLS"
 msgstr "_TLS etkinleştir"
 
-#: src/address-book-config.c:626 src/address-book-config.c:926
+#: src/address-book-config.c:646 src/address-book-config.c:1165
 msgid "GPE Address Book"
 msgstr "GPE Adres Defteri"
 
-#: src/address-book-config.c:650 src/main-window.c:1049 src/main-window.c:4120
+#: src/address-book-config.c:711
+msgid "DNS service record not found"
+msgstr "DNS hizmet kaydı bulunamadı"
+
+#: src/address-book-config.c:712
+#, c-format
+msgid ""
+"No DNS service record for the domain “%s” and service “carddavs” found. "
+"Please enter the “https://” URI manually."
+msgstr ""
+"“%s” alan adı ve “carddavs” hizmeti için DNS hizmet kaydı bulunamadı. "
+"Lütfen “https://” URI’sini elle girin."
+
+#: src/address-book-config.c:716
+msgid "Authorization failed"
+msgstr "Yetkilendirme başarısız oldu"
+
+#: src/address-book-config.c:717
+#, c-format
+msgid ""
+"The server rejected the authorization for “%s”. Please check the user name "
+"and the pass phrase"
+msgstr ""
+"Sunucu, “%s” için yetkilendirmeyi geri çevirdi. Lütfen kullanıcı adını ve "
+"parola metnini gözden geçirin"
+
+#: src/address-book-config.c:721
+msgid "Error"
+msgstr "Hata"
+
+#: src/address-book-config.c:770
+msgid "D_omain or URL:"
+msgstr "_Alan adı ya da URL:"
+
+#: src/address-book-config.c:789
+msgid "_CardDAV address book name:"
+msgstr "_CardDAV adres defteri adı:"
+
+#: src/address-book-config.c:798
+msgid "_Refresh period:"
+msgstr "_Yenileme sıklığı:"
+
+#: src/address-book-config.c:805 src/pref-manager.c:2137
+#: src/pref-manager.c:2308 src/pref-manager.c:2952 src/pref-manager.c:3006
+msgid "minutes"
+msgstr "dakika"
+
+#: src/address-book-config.c:808
+msgid "Force _Multiget for non-standard server"
+msgstr "Standart dış sunucu için _Multiget’e zorla"
+
+#: src/address-book-config.c:836 src/main-window.c:1049 src/main-window.c:4120
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Yardım görüntülenirken hata: %s\n"
 
-#: src/address-book-config.c:902
+#: src/address-book-config.c:1141
 msgid "vCard Address Book (GnomeCard)"
 msgstr "vCard Adres Defteri (GnomeCard)"
 
-#: src/address-book-config.c:908
+#: src/address-book-config.c:1147
 msgid "External query (a program)"
 msgstr "Dış sorgu (bir program)"
 
-#: src/address-book-config.c:913
+#: src/address-book-config.c:1152
 msgid "LDIF Address Book"
 msgstr "LDIF Adres Defteri"
 
-#: src/address-book-config.c:919
+#: src/address-book-config.c:1158
 msgid "LDAP Address Book"
 msgstr "LDAP Adres Defteri"
 
-#: src/address-book-config.c:933
+#: src/address-book-config.c:1172
 msgid "Osmo Address Book"
 msgstr "Osmo Adres Defteri"
+
+#: src/address-book-config.c:1179
+msgid "CardDAV Address Book"
+msgstr "CardDAV Adres Defteri"
 
 #: src/balsa-app.c:56 src/balsa-app.c:136
 msgid "_Remember password in Secret Service"
@@ -3857,7 +3981,7 @@ msgstr "(Gönderici yok)"
 msgid "Could not access message %u in mailbox “%s”."
 msgstr "%u iletisine “%s” posta kutusundan erişilemedi."
 
-#: src/balsa-message.c:1211 src/main.c:519
+#: src/balsa-message.c:1211 src/main.c:528
 #, c-format
 msgid "Autocrypt error: %s"
 msgstr "Autocrypt hatası: %s"
@@ -4317,18 +4441,18 @@ msgstr "IMAP sunucu ileti yapısı raporlamadı"
 
 #: src/balsa-mime-widget-message.c:716 src/balsa-print-object-header.c:131
 #: src/sendmsg-window.c:736 src/sendmsg-window.c:738 src/sendmsg-window.c:839
-#: src/sendmsg-window.c:3625 src/sendmsg-window.c:5173
+#: src/sendmsg-window.c:3632 src/sendmsg-window.c:5180
 msgid "Subject:"
 msgstr "Konu:"
 
 #: src/balsa-mime-widget-message.c:721 src/balsa-print-object-header.c:139
-#: src/sendmsg-window.c:3621
+#: src/sendmsg-window.c:3628
 msgid "Date:"
 msgstr "Tarih:"
 
 #. addresses
 #: src/balsa-mime-widget-message.c:727 src/balsa-print-object-header.c:144
-#: src/sendmsg-window.c:3632
+#: src/sendmsg-window.c:3639
 msgid "From:"
 msgstr "Kimden:"
 
@@ -5084,7 +5208,7 @@ msgstr "Gelen kutusunu yeniden adlandır"
 
 #: src/folder-conf.c:727
 msgid "Cancel"
-msgstr "İptal Et"
+msgstr "İptal"
 
 #: src/folder-conf.c:751
 #, c-format
@@ -5413,7 +5537,7 @@ msgstr ""
 "Şifreyi _çöz ve imzaları\n"
 "kendiliğinden denetle:"
 
-#: src/mailbox-conf.c:894 src/pref-manager.c:214 src/pref-manager.c:1163
+#: src/mailbox-conf.c:894 src/pref-manager.c:214 src/pref-manager.c:1167
 msgid "Never"
 msgstr "Asla"
 
@@ -5421,7 +5545,7 @@ msgstr "Asla"
 msgid "If Possible"
 msgstr "Mümkün Olduğunda"
 
-#: src/mailbox-conf.c:896 src/pref-manager.c:1165
+#: src/mailbox-conf.c:896 src/pref-manager.c:1169
 msgid "Always"
 msgstr "Her zaman"
 
@@ -5537,68 +5661,68 @@ msgstr "Süzgeçleri _düzenle/uygula"
 msgid "The path “%s” does not lead to a mailbox."
 msgstr "“%s” yolu bir posta kutusuna çıkmıyor."
 
-#: src/main.c:112 src/main.c:117 src/main.c:123 src/main.c:129 src/main.c:135
+#: src/main.c:116 src/main.c:121 src/main.c:127 src/main.c:133 src/main.c:139
 #, c-format
 msgid "Balsa cannot open your “%s” mailbox."
 msgstr "Balsa “%s” posta kutusunu açamadı."
 
-#: src/main.c:112
+#: src/main.c:116
 msgid "Inbox"
 msgstr "Gelen kutusu"
 
-#: src/main.c:118
+#: src/main.c:122
 msgid "Outbox"
 msgstr "Giden kutusu"
 
-#: src/main.c:124
+#: src/main.c:128
 msgid "Sentbox"
 msgstr "Gönderilenler kutusu"
 
-#: src/main.c:130
+#: src/main.c:134
 msgid "Draftbox"
 msgstr "Taslaklar kutusu"
 
-#: src/main.c:135
+#: src/main.c:139
 msgid "Trash"
 msgstr "Çöp kutusu"
 
-#: src/main.c:349
+#: src/main.c:353
 msgid "Compressing mail folders…"
 msgstr "Posta klasörleri sıkıştırılıyor…"
 
-#: src/main.c:588
+#: src/main.c:597
 msgid "Get new mail on start-up"
 msgstr "Açılışta yeni postaları al"
 
-#: src/main.c:590
+#: src/main.c:599
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "EMAIL@ADRESS adresi için yeni ileti oluşturur"
 
-#: src/main.c:592
+#: src/main.c:601
 msgid "Attach file at URI"
 msgstr "URI’deki dosyayı ekle"
 
-#: src/main.c:594
+#: src/main.c:603
 msgid "Opens MAILBOXNAME"
 msgstr "MAILBOXNAME’i açar"
 
-#: src/main.c:594
+#: src/main.c:603
 msgid "MAILBOXNAME"
 msgstr "MAILBOXNAME"
 
-#: src/main.c:596
+#: src/main.c:605
 msgid "Opens first unread mailbox"
 msgstr "İlk okunmamış posta kutusunu açar"
 
-#: src/main.c:598
+#: src/main.c:607
 msgid "Opens default Inbox on start-up"
 msgstr "Başlangıçta öntanımlı gelen kutusunu açar"
 
-#: src/main.c:600
+#: src/main.c:609
 msgid "Prints number unread and unsent messages"
 msgstr "Okunmamış ve gönderilmemiş ileti sayısını yazdırır"
 
-#: src/main.c:602
+#: src/main.c:611
 msgid "Show version"
 msgstr "Sürümü göster"
 
@@ -5847,155 +5971,150 @@ msgstr "Düz"
 msgid "JWZ"
 msgstr "JWZ"
 
-#: src/pref-manager.c:953 src/pref-manager.c:3628
+#: src/pref-manager.c:957 src/pref-manager.c:3632
 msgid "Unknown"
 msgstr "Bilinmeyen"
 
 #. Translators: #1 address book name
-#: src/pref-manager.c:957
+#: src/pref-manager.c:961
 #, c-format
 msgid "%s (default)"
 msgstr "%s (öntanımlı)"
 
-#: src/pref-manager.c:1074
+#: src/pref-manager.c:1078
 msgid "Default layout"
 msgstr "Öntanımlı düzen"
 
-#: src/pref-manager.c:1075
+#: src/pref-manager.c:1079
 msgid "Wide message layout"
 msgstr "Geniş ileti düzeni"
 
-#: src/pref-manager.c:1076
+#: src/pref-manager.c:1080
 msgid "Wide screen layout"
 msgstr "Geniş ekran düzeni"
 
-#: src/pref-manager.c:1084
+#: src/pref-manager.c:1088
 msgid "Show next unread message"
 msgstr "Sonraki okunmamış iletiyi göster"
 
-#: src/pref-manager.c:1085
+#: src/pref-manager.c:1089
 msgid "Show next message"
 msgstr "Sonraki iletiyi göster"
 
-#: src/pref-manager.c:1086
+#: src/pref-manager.c:1090
 msgid "Close message window"
 msgstr "İleti penceresini kapat"
 
-#: src/pref-manager.c:1131
+#: src/pref-manager.c:1135
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "%s görüntülenirken hata:%s\n"
 
-#: src/pref-manager.c:1144
+#: src/pref-manager.c:1148
 msgid "Show nothing"
 msgstr "Hiçbirşey gösterme"
 
-#: src/pref-manager.c:1146
+#: src/pref-manager.c:1150
 msgid "Show dialog"
 msgstr "İletişim penceresi göster"
 
-#: src/pref-manager.c:1148
+#: src/pref-manager.c:1152
 msgid "Show in list"
 msgstr "Listede göster"
 
-#: src/pref-manager.c:1150
+#: src/pref-manager.c:1154
 msgid "Show in status bar"
 msgstr "Durum çubuğunda göster"
 
-#: src/pref-manager.c:1152
+#: src/pref-manager.c:1156
 msgid "Print to console"
 msgstr "Konsola yazdır"
 
-#: src/pref-manager.c:1164
+#: src/pref-manager.c:1168
 msgid "Ask me"
 msgstr "Bana sor"
 
-#: src/pref-manager.c:1700
+#: src/pref-manager.c:1704
 msgid "Remote POP3 mailbox…"
 msgstr "Uzak POP3 posta kutusu…"
 
-#: src/pref-manager.c:1704 ui/main-window.ui:28
+#: src/pref-manager.c:1708 ui/main-window.ui:28
 msgid "Remote IMAP folder…"
 msgstr "Uzak IMAP klasörü…"
 
-#: src/pref-manager.c:1965
+#: src/pref-manager.c:1969
 msgid "Remote mailbox servers"
 msgstr "Uzak posta kutusu sunucuları"
 
-#: src/pref-manager.c:1982 src/pref-manager.c:2776 src/sendmsg-window.c:2656
+#: src/pref-manager.c:1986 src/pref-manager.c:2780 src/sendmsg-window.c:2660
 msgid "Type"
 msgstr "Tür"
 
-#: src/pref-manager.c:1990
+#: src/pref-manager.c:1994
 msgid "Mailbox name"
 msgstr "Posta kutusu adı"
 
-#: src/pref-manager.c:2012 src/pref-manager.c:2095 src/pref-manager.c:2819
+#: src/pref-manager.c:2016 src/pref-manager.c:2099 src/pref-manager.c:2823
 msgid "_Modify"
 msgstr "_Değiştir"
 
-#: src/pref-manager.c:2034
+#: src/pref-manager.c:2038
 msgid "Local mail directory"
 msgstr "Yerel posta dizini"
 
-#: src/pref-manager.c:2037
+#: src/pref-manager.c:2041
 msgid "Select your local mail directory"
 msgstr "Yerel posta dizinini seç"
 
-#: src/pref-manager.c:2061
+#: src/pref-manager.c:2065
 msgid "Outgoing mail servers"
 msgstr "Posta gönderme sunucuları"
 
-#: src/pref-manager.c:2079
+#: src/pref-manager.c:2083
 msgid "Server name"
 msgstr "Sunucu adı"
 
-#: src/pref-manager.c:2122
+#: src/pref-manager.c:2126
 msgid "Checking"
 msgstr "Denetleyiş"
 
-#: src/pref-manager.c:2125
+#: src/pref-manager.c:2129
 msgid "_Check mail automatically every"
 msgstr "_İletileri, belirtilen zaman aralığıyla kendiliğinden denetle"
 
-#: src/pref-manager.c:2133 src/pref-manager.c:2304 src/pref-manager.c:2948
-#: src/pref-manager.c:3002
-msgid "minutes"
-msgstr "dakika"
-
-#: src/pref-manager.c:2138
+#: src/pref-manager.c:2142
 msgid "Check _IMAP mailboxes"
 msgstr "_IMAP posta kutularını denetle"
 
-#: src/pref-manager.c:2142
+#: src/pref-manager.c:2146
 msgid "Check Inbox _only"
 msgstr "_Yalnızca Gelen kutusunu denetle"
 
-#: src/pref-manager.c:2146
+#: src/pref-manager.c:2150
 msgid "Do background check quietly (no messages in status bar)"
 msgstr "Arka planda sessizce denetle (durum çubuğunda ileti göstermeden)"
 
-#: src/pref-manager.c:2149
+#: src/pref-manager.c:2153
 msgid "_POP message size limit:"
 msgstr "_POP ileti boyutu sınırı:"
 
-#: src/pref-manager.c:2173
+#: src/pref-manager.c:2177
 msgid "Notification about new messages"
 msgstr "Yeni iletiler hakkında bildirim"
 
-#: src/pref-manager.c:2175
+#: src/pref-manager.c:2179
 msgid "Display message"
 msgstr "İleti göster"
 
-#: src/pref-manager.c:2179
+#: src/pref-manager.c:2183
 msgid "Play sound"
 msgstr "Ses çal"
 
-#: src/pref-manager.c:2200
+#: src/pref-manager.c:2204
 msgid "Message disposition notification requests"
 msgstr "İleti okundu bildirim istekleri"
 
-#: src/pref-manager.c:2205
+#: src/pref-manager.c:2209
 msgid ""
 "When I receive a message whose sender requested a Message Disposition "
 "Notification (MDN), send it if:"
@@ -6003,7 +6122,7 @@ msgstr ""
 "Bir ileti aldığımda gönderici geri dönüş istemişse aşağıdaki durumlarda bir "
 "İleti Okundu Bildirimi (MDN) gönder:"
 
-#: src/pref-manager.c:2213
+#: src/pref-manager.c:2217
 msgid ""
 "The message header looks clean (the notify-to address is the return path, "
 "and I am in the “To:” or “CC:” list)."
@@ -6011,305 +6130,305 @@ msgstr ""
 "İleti başlığı temiz görünüyor (bildirinin gideceği adres geri dönüş adresi, "
 "ve ben de “Alıcı:” veya “Bilgi:” listesindeyim)."
 
-#: src/pref-manager.c:2227
+#: src/pref-manager.c:2231
 msgid "The message header looks suspicious."
 msgstr "İleti başlığı şüpheli görünüyor."
 
-#: src/pref-manager.c:2251
+#: src/pref-manager.c:2255
 msgid "Word wrap"
 msgstr "Sözcük kaydırma"
 
-#: src/pref-manager.c:2254
+#: src/pref-manager.c:2258
 msgid "Wrap outgoing text at"
 msgstr "Giden metni şu noktada kaydır"
 
-#: src/pref-manager.c:2263 src/pref-manager.c:2513
+#: src/pref-manager.c:2267 src/pref-manager.c:2517
 msgid "characters"
 msgstr "karakter"
 
-#: src/pref-manager.c:2282
+#: src/pref-manager.c:2286
 msgid "Other options"
 msgstr "Diğer seçenekler"
 
-#: src/pref-manager.c:2284
+#: src/pref-manager.c:2288
 msgid "Reply prefix:"
 msgstr "Yanıt ön eki:"
 
-#: src/pref-manager.c:2287
+#: src/pref-manager.c:2291
 msgid "Automatically quote original when replying"
 msgstr "Yanıtlarken asıl metni kendiliğinden tırnağa al"
 
-#: src/pref-manager.c:2290
+#: src/pref-manager.c:2294
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "Postayı tırnağa almak yerine eklenti olarak ilet"
 
-#: src/pref-manager.c:2293
+#: src/pref-manager.c:2297
 msgid "Copy outgoing messages to sentbox"
 msgstr "Giden iletileri gönderilen kutusuna kopyala"
 
-#: src/pref-manager.c:2295
+#: src/pref-manager.c:2299
 msgid "Send button always queues outgoing mail in outbox"
 msgstr "Gönder düğmesi giden kutusundaki postayı her zaman kuyruğa alır"
 
-#: src/pref-manager.c:2299
+#: src/pref-manager.c:2303
 msgid "_Send queued mail automatically every"
 msgstr ""
 "_Kuyruktaki e-postaları, belirtilen zaman aralığı ile kendiliğinden gönder"
 
-#: src/pref-manager.c:2309
+#: src/pref-manager.c:2313
 msgid "Edit headers in external editor"
 msgstr "Başlıkları dış düzenleyicide düzenle"
 
-#: src/pref-manager.c:2311
+#: src/pref-manager.c:2315
 msgid "Include HTML parts as text when replying or forwarding"
 msgstr "Yanıtlarken veya iletirken HTML bölümleri metin olarak içer"
 
-#: src/pref-manager.c:2329 src/toolbar-prefs.c:152
+#: src/pref-manager.c:2333 src/toolbar-prefs.c:152
 msgid "Main window"
 msgstr "Ana pencere"
 
-#: src/pref-manager.c:2332
+#: src/pref-manager.c:2336
 msgid "Use preview pane"
 msgstr "Önizleme penceresini kullan"
 
-#: src/pref-manager.c:2336
+#: src/pref-manager.c:2340
 msgid "Show message counts in mailbox list"
 msgstr "Posta kutusu listelerinde ileti sayılarını göster"
 
-#: src/pref-manager.c:2342
+#: src/pref-manager.c:2346
 msgid "Automatically view message when mailbox opened"
 msgstr "Posta kutusu açıldığında iletiyi kendiliğinden göster"
 
-#: src/pref-manager.c:2345
+#: src/pref-manager.c:2349
 msgid "Ask me before selecting a different mailbox to show an unread message"
 msgstr ""
 "Okunmamış bir iletiyi gösterirken farklı bir posta kutusu seçmeden önce bana "
 "sor"
 
-#: src/pref-manager.c:2349
+#: src/pref-manager.c:2353
 msgid "Page Up/Page Down keys scroll text by"
 msgstr "Page Up/Page Down tuşları metni şu kadar kaydırır"
 
-#: src/pref-manager.c:2357
+#: src/pref-manager.c:2361
 msgid "percent"
 msgstr "yüzde"
 
-#: src/pref-manager.c:2374 src/toolbar-prefs.c:170
+#: src/pref-manager.c:2378 src/toolbar-prefs.c:170
 msgid "Message window"
 msgstr "İleti penceresi"
 
-#: src/pref-manager.c:2376
+#: src/pref-manager.c:2380
 msgid "After moving a message:"
 msgstr "İleti taşıdıktan sonra:"
 
-#: src/pref-manager.c:2397
+#: src/pref-manager.c:2401
 msgid "Sorting and threading"
 msgstr "Sıralama ve ileti dizileri"
 
-#: src/pref-manager.c:2399
+#: src/pref-manager.c:2403
 msgid "Default sort column:"
 msgstr "Öntanımlı sıralama sütunu:"
 
 # fuzzy
-#: src/pref-manager.c:2407
+#: src/pref-manager.c:2411
 msgid "Thread messages by default"
 msgstr "İletileri öntanımlı olarak dizilendir"
 
-#: src/pref-manager.c:2409
+#: src/pref-manager.c:2413
 msgid "Expand threads on open"
 msgstr "İleti dizilerini açarken genişlet"
 
 #. fonts
-#: src/pref-manager.c:2434 src/print-gtk.c:618
+#: src/pref-manager.c:2438 src/print-gtk.c:618
 msgid "Fonts"
 msgstr "Yazı tipleri"
 
-#: src/pref-manager.c:2437
+#: src/pref-manager.c:2441
 msgid "Use system fonts"
 msgstr "Sistem yazı tiplerini kullan"
 
-#: src/pref-manager.c:2445
+#: src/pref-manager.c:2449
 msgid "Use default font size"
 msgstr "Öntanımlı yazı tipi boyutunu kullan"
 
-#: src/pref-manager.c:2451
+#: src/pref-manager.c:2455
 msgid "Message font:"
 msgstr "İleti yazı tipi:"
 
-#: src/pref-manager.c:2458
+#: src/pref-manager.c:2462
 msgid "Subject font:"
 msgstr "Konu yazı tipi:"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:2498
+#: src/pref-manager.c:2502
 msgid "Quoted and flowed text"
 msgstr "Alıntılanan ve aktarılan metin"
 
-#: src/pref-manager.c:2501
+#: src/pref-manager.c:2505
 msgid "Mark quoted text"
 msgstr "Alıntılanan metni işaretle"
 
-#: src/pref-manager.c:2504
+#: src/pref-manager.c:2508
 msgid "Quoted text regular expression:"
 msgstr "Alıntılanan metnin düzenli ifadesi:"
 
-#: src/pref-manager.c:2507
+#: src/pref-manager.c:2511
 msgid "Wrap text at"
 msgstr "Metni şu noktada kaydır"
 
-#: src/pref-manager.c:2526
+#: src/pref-manager.c:2530
 #, c-format
 msgid "HTTP cache size: %s"
 msgstr "HTTP önbellek boyutu: %s"
 
 #. handling of multipart/alternative
-#: src/pref-manager.c:2559
+#: src/pref-manager.c:2563
 msgid "Display of multipart/alternative parts"
 msgstr "Çoklu bölüm/alternatif bölümlerin gösterimi"
 
-#: src/pref-manager.c:2563
+#: src/pref-manager.c:2567
 msgid "Prefer text/plain over HTML"
 msgstr "Metin/düz’ü HTML’ye yeğle"
 
 #. Translators: per-sender database of exceptions over global HTTP
 #. * preferences (display HTML vs. plain, auto-load external items)
-#: src/pref-manager.c:2568
+#: src/pref-manager.c:2572
 msgid "Manage exceptions…"
 msgstr "İstisnaları yönet…"
 
-#: src/pref-manager.c:2576
+#: src/pref-manager.c:2580
 msgid "Clear HTTP cache…"
 msgstr "HTTP önbelleğini temizle…"
 
-#: src/pref-manager.c:2595
+#: src/pref-manager.c:2599
 msgid "Message colors"
 msgstr "İleti renkleri"
 
-#: src/pref-manager.c:2600
+#: src/pref-manager.c:2604
 #, c-format
 msgid "Quote level %d color"
 msgstr "Alıntı düzeyi %d renk"
 
-#: src/pref-manager.c:2618
+#: src/pref-manager.c:2622
 msgid "Link color"
 msgstr "Bağlantı rengi"
 
-#: src/pref-manager.c:2620
+#: src/pref-manager.c:2624
 msgid "Hyperlink color"
 msgstr "Hiperlink rengi"
 
-#: src/pref-manager.c:2635 src/pref-manager.c:3245
+#: src/pref-manager.c:2639 src/pref-manager.c:3249
 msgid "Format"
 msgstr "Biçim"
 
-#: src/pref-manager.c:2638
+#: src/pref-manager.c:2642
 msgid "Date encoding (for strftime):"
 msgstr "Tarih biçimi ( strftime için ):"
 
-#: src/pref-manager.c:2640
+#: src/pref-manager.c:2644
 msgid "Selected headers:"
 msgstr "Seçili başlıklar:"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: src/pref-manager.c:2658
+#: src/pref-manager.c:2662
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
 "Kırık iletilerdeki ulusal (8-bit) karakterler kod kümesi başlığı olmadan"
 
-#: src/pref-manager.c:2663
+#: src/pref-manager.c:2667
 msgid "display as “?”"
 msgstr "“?” olarak göster"
 
-#: src/pref-manager.c:2671
+#: src/pref-manager.c:2675
 msgid "display in codeset"
 msgstr "kod kümesinde göster"
 
-#: src/pref-manager.c:2696
+#: src/pref-manager.c:2700
 msgid "Information messages"
 msgstr "Bilgi iletileri"
 
-#: src/pref-manager.c:2700
+#: src/pref-manager.c:2704
 msgid "Information messages:"
 msgstr "Bilgi iletileri:"
 
-#: src/pref-manager.c:2704
+#: src/pref-manager.c:2708
 msgid "Warning messages:"
 msgstr "Uyarı iletileri:"
 
-#: src/pref-manager.c:2708
+#: src/pref-manager.c:2712
 msgid "Error messages:"
 msgstr "Hata iletileri:"
 
-#: src/pref-manager.c:2712
+#: src/pref-manager.c:2716
 msgid "Fatal error messages:"
 msgstr "Ölümcül hata iletileri:"
 
-#: src/pref-manager.c:2716
+#: src/pref-manager.c:2720
 msgid "Debug messages:"
 msgstr "Hata ayıklama iletileri:"
 
-#: src/pref-manager.c:2732
+#: src/pref-manager.c:2736
 msgid "Display progress dialog"
 msgstr "Süreç iletişim penceresini göster"
 
-#: src/pref-manager.c:2733
+#: src/pref-manager.c:2737
 msgid "Display progress dialog when sending messages"
 msgstr "İleti gönderirken süreç iletişim penceresini göster"
 
-#: src/pref-manager.c:2734
+#: src/pref-manager.c:2738
 msgid "Display progress dialog when retrieving messages"
 msgstr "İleti alırken süreç iletişim penceresini göster"
 
-#: src/pref-manager.c:2756 src/pref-manager.c:3371
+#: src/pref-manager.c:2760 src/pref-manager.c:3375
 msgid "Address books"
 msgstr "Adres defterleri"
 
-#: src/pref-manager.c:2784
+#: src/pref-manager.c:2788
 msgid "Address book name"
 msgstr "Adres defteri adı"
 
-#: src/pref-manager.c:2792
+#: src/pref-manager.c:2796
 msgid "Auto-complete"
 msgstr "Kendiliğinden tamamlama"
 
-#: src/pref-manager.c:2825
+#: src/pref-manager.c:2829
 msgid "_Set as default"
 msgstr "_Öntanımlı olarak ayarla"
 
-#: src/pref-manager.c:2842
+#: src/pref-manager.c:2846
 msgid "Miscellaneous spelling settings"
 msgstr "Diğer imla ayarları"
 
-#: src/pref-manager.c:2846
+#: src/pref-manager.c:2850
 msgid "Check signature"
 msgstr "İmzayı denetle"
 
-#: src/pref-manager.c:2848
+#: src/pref-manager.c:2852
 msgid "Check quoted"
 msgstr "Alıntı yapılan kısmı denetle"
 
-#: src/pref-manager.c:2864
+#: src/pref-manager.c:2868
 msgid "Start-up options"
 msgstr "Başlangıç seçenekleri"
 
-#: src/pref-manager.c:2867
+#: src/pref-manager.c:2871
 msgid "Open Inbox upon start-up"
 msgstr "Gelen kutusunu başlangıçta aç"
 
-#: src/pref-manager.c:2869
+#: src/pref-manager.c:2873
 msgid "Check mail upon start-up"
 msgstr "Başlangıçta yeni iletileri denetle"
 
-#: src/pref-manager.c:2871
+#: src/pref-manager.c:2875
 msgid "Remember open mailboxes between sessions"
 msgstr "Oturumlar arasında açık posta kutularını aklında tut"
 
-#: src/pref-manager.c:2889
+#: src/pref-manager.c:2893
 msgid "Folder scanning"
 msgstr "Klasör tarama"
 
-#: src/pref-manager.c:2892
+#: src/pref-manager.c:2896
 msgid ""
 "Choose depth 1 for fast start-up; this defers scanning some folders. To see "
 "more of the tree at start-up, choose a greater depth."
@@ -6318,38 +6437,38 @@ msgstr ""
 "geciktirir. Açılışta ağacın daha çoğunu görmek istiyorsanız, daha büyük bir "
 "derinlik seçin."
 
-#: src/pref-manager.c:2899
+#: src/pref-manager.c:2903
 msgid "Scan local folders to depth"
 msgstr "Yerel klasörleri şu derinlikte tara"
 
-#: src/pref-manager.c:2908
+#: src/pref-manager.c:2912
 msgid "Scan IMAP folders to depth"
 msgstr "IMAP klasörlerini şu derinliğe kadar tara"
 
-#: src/pref-manager.c:2930 src/pref-manager.c:3385
+#: src/pref-manager.c:2934 src/pref-manager.c:3389
 msgid "Miscellaneous"
 msgstr "Diğer"
 
-#: src/pref-manager.c:2933
+#: src/pref-manager.c:2937
 msgid "Empty trash on exit"
 msgstr "Çıkışta çöp kutusunu boşalt"
 
-#: src/pref-manager.c:2937
+#: src/pref-manager.c:2941
 msgid "Close mailbox if unused more than"
 msgstr "Posta kutusu şu kadar süre kullanılmadığında kapat"
 
-#: src/pref-manager.c:2952
+#: src/pref-manager.c:2956
 msgid "Enable System Tray Icon support"
 msgstr "Sistem Tepsi Simgesi desteğini etkinleştir"
 
-#: src/pref-manager.c:2970
+#: src/pref-manager.c:2974
 msgid "Deleting messages"
 msgstr "İletiler siliniyor"
 
 #. Translators: this used to be "using Mailbox -> Hide messages";
 #. * the UTF-8 string for the right-arrow symbol is broken out to
 #. * avoid msgconv problems.
-#: src/pref-manager.c:2975
+#: src/pref-manager.c:2979
 #, c-format
 msgid ""
 "The following setting is global, but may be overridden for the selected "
@@ -6358,64 +6477,64 @@ msgstr ""
 "Aşağıdaki ayar geneldir, ama Posta Kutusu %s İletileri gizle ile seçili "
 "posta kutusu için değiştirilebilir:"
 
-#: src/pref-manager.c:2983
+#: src/pref-manager.c:2987
 msgid "Hide messages marked as deleted"
 msgstr "Silinmiş olarak işaretlenen iletileri gizle"
 
-#: src/pref-manager.c:2985
+#: src/pref-manager.c:2989
 msgid "The following settings are global:"
 msgstr "Şu ayarlar geneldir:"
 
-#: src/pref-manager.c:2988
+#: src/pref-manager.c:2992
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr "Posta kutusu kapatıldığında silinmiş iletileri tümüyle kaldır"
 
-#: src/pref-manager.c:2992
+#: src/pref-manager.c:2996
 msgid "…and if unused more than"
 msgstr "…ve eğer şu kadar süreden uzun süre kullanılmamışsa"
 
-#: src/pref-manager.c:3210
+#: src/pref-manager.c:3214
 msgid "Mail options"
 msgstr "Posta seçenekleri"
 
-#: src/pref-manager.c:3214
+#: src/pref-manager.c:3218
 msgid "Incoming"
 msgstr "Gelen"
 
-#: src/pref-manager.c:3218
+#: src/pref-manager.c:3222
 msgid "Outgoing"
 msgstr "Giden"
 
-#: src/pref-manager.c:3229
+#: src/pref-manager.c:3233
 msgid "Display options"
 msgstr "Görüntü seçenekleri"
 
-#: src/pref-manager.c:3233
+#: src/pref-manager.c:3237
 msgid "Sort and thread"
 msgstr "Sırala ve ileti dizisi"
 
-#: src/pref-manager.c:3237 src/print-gtk.c:610
+#: src/pref-manager.c:3241 src/print-gtk.c:610
 msgid "Message"
 msgstr "İleti"
 
-#: src/pref-manager.c:3241
+#: src/pref-manager.c:3245
 msgid "Colors"
 msgstr "Renkler"
 
-#: src/pref-manager.c:3249
+#: src/pref-manager.c:3253
 msgid "Status messages"
 msgstr "Durum iletileri"
 
 #. must NOT be modal
-#: src/pref-manager.c:3316
+#: src/pref-manager.c:3320
 msgid "Balsa Preferences"
 msgstr "Balsa Ayarları"
 
-#: src/pref-manager.c:3376 src/toolbar-factory.c:141
+#: src/pref-manager.c:3380 src/toolbar-factory.c:141
 msgid "Spelling"
 msgstr "İmla"
 
-#: src/pref-manager.c:3381
+#: src/pref-manager.c:3385
 msgid "Start-up"
 msgstr "Başlangıç"
 
@@ -6739,7 +6858,7 @@ msgstr ""
 msgid "Editing failed: %s"
 msgstr "Düzenleme başarısız oldu: %s"
 
-#: src/sendmsg-window.c:706 src/sendmsg-window.c:4809
+#: src/sendmsg-window.c:706 src/sendmsg-window.c:4816
 #, c-format
 msgid "Cannot read the file “%s”: %s"
 msgstr "“%s” dosyası okunamıyor: %s"
@@ -6802,7 +6921,7 @@ msgstr "MIME türü olarak ekle:"
 msgid "Character set for file %s changed from “%s” to “%s”."
 msgstr "%s dosyası için karakter kümesi “%s”den “%s”e değiştirildi."
 
-#: src/sendmsg-window.c:1685 src/sendmsg-window.c:5177
+#: src/sendmsg-window.c:1685 src/sendmsg-window.c:5184
 msgid "(no subject)"
 msgstr "(konusuz)"
 
@@ -6832,7 +6951,7 @@ msgid "Attach file"
 msgstr "Dosya ekle"
 
 #: src/sendmsg-window.c:2117 src/sendmsg-window.c:2193
-#: src/sendmsg-window.c:7143
+#: src/sendmsg-window.c:7150
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -6840,87 +6959,87 @@ msgstr ""
 "İletinin eklenmesi başarısız.\n"
 "Olası neden: yeterli geçici alan yok"
 
-#: src/sendmsg-window.c:2410
+#: src/sendmsg-window.c:2414
 msgid "F_rom:"
 msgstr "_Kimden:"
 
 #. Subject:
-#: src/sendmsg-window.c:2560
+#: src/sendmsg-window.c:2564
 msgid "S_ubject:"
 msgstr "Kon_u:"
 
-#: src/sendmsg-window.c:2592
+#: src/sendmsg-window.c:2596
 msgid "F_CC:"
 msgstr "F_CC:"
 
 #. Attachment list
-#: src/sendmsg-window.c:2619
+#: src/sendmsg-window.c:2623
 msgid "_Attachments:"
 msgstr "_Eklentiler:"
 
-#: src/sendmsg-window.c:2663
+#: src/sendmsg-window.c:2667
 msgid "Mode"
 msgstr "Kip"
 
-#: src/sendmsg-window.c:2686
+#: src/sendmsg-window.c:2690
 msgid "Description"
 msgstr "Tanımlama"
 
-#: src/sendmsg-window.c:2984
+#: src/sendmsg-window.c:2991
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Eklenti kaydedilemedi: %s"
 
-#: src/sendmsg-window.c:3058
+#: src/sendmsg-window.c:3065
 msgid "No subject"
 msgstr "Konu yok"
 
-#: src/sendmsg-window.c:3107
+#: src/sendmsg-window.c:3114
 msgid "decrypted: "
 msgstr "şifresi çözülmüş: "
 
-#: src/sendmsg-window.c:3115
+#: src/sendmsg-window.c:3122
 #, c-format
 msgid "inlined file “%s” (%s)"
 msgstr "satır arası yapılmış dosya “%s” (%s)"
 
-#: src/sendmsg-window.c:3118
+#: src/sendmsg-window.c:3125
 #, c-format
 msgid "attached file “%s” (%s)"
 msgstr "eklenmiş dosya “%s” (%s)"
 
-#: src/sendmsg-window.c:3123
+#: src/sendmsg-window.c:3130
 #, c-format
 msgid "inlined %s part"
 msgstr "%s bölümü satır arasına alındı"
 
-#: src/sendmsg-window.c:3125
+#: src/sendmsg-window.c:3132
 #, c-format
 msgid "attached %s part"
 msgstr "%s kısmı eklentilendi"
 
-#: src/sendmsg-window.c:3206
+#: src/sendmsg-window.c:3213
 #, c-format
 msgid "message from %s, subject “%s”"
 msgstr "%s’den ileti, konu “%s”"
 
-#: src/sendmsg-window.c:3334
+#: src/sendmsg-window.c:3341
 msgid "quoted"
 msgstr "alıntılanmış"
 
-#: src/sendmsg-window.c:3339 src/sendmsg-window.c:3342
+#: src/sendmsg-window.c:3346 src/sendmsg-window.c:3349
 msgid "quoted attachment"
 msgstr "alıntılanmış eklenti"
 
-#: src/sendmsg-window.c:3386
+#: src/sendmsg-window.c:3393
 msgid "Select parts for quotation"
 msgstr "Alıntılama için bölümleri seç"
 
-#: src/sendmsg-window.c:3395
+#: src/sendmsg-window.c:3402
 msgid "Select the parts of the message which shall be quoted in the reply"
 msgstr "İletinin yanıtta alıntılanacak bölümlerini seç"
 
-#: src/sendmsg-window.c:3424
+#: src/sendmsg-window.c:3431
 msgid ""
 "<b>Warning:</b> The original message contains an abnormal mixture of "
 "encrypted and unencrypted parts. This <i>might</i> indicate an attack.\n"
@@ -6930,7 +7049,7 @@ msgstr ""
 "karışımını içeriyor. Bu bir saldırı anlamına geliyor <i>olabilir</i>.\n"
 "Göndermeden önce yanıt içeriğini iki kez denetleyin."
 
-#: src/sendmsg-window.c:3431 src/sendmsg-window.c:3506
+#: src/sendmsg-window.c:3438 src/sendmsg-window.c:3513
 msgid ""
 "You reply to an encrypted message. The reply will contain the decrypted "
 "contents of the original message.\n"
@@ -6942,70 +7061,70 @@ msgstr ""
 "Yanıtı şifrelemeyi düşünün ve istemeden hassas bilgileri sızdırmadığınıza "
 "emin olun."
 
-#: src/sendmsg-window.c:3512
+#: src/sendmsg-window.c:3519
 msgid "Do not remind me again."
 msgstr "Yeniden anımsatma."
 
-#: src/sendmsg-window.c:3606
+#: src/sendmsg-window.c:3613
 msgid "you"
 msgstr "sen"
 
-#: src/sendmsg-window.c:3615
+#: src/sendmsg-window.c:3622
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------%s’den iletilen ileti------\n"
 
-#: src/sendmsg-window.c:3652
+#: src/sendmsg-window.c:3659
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "İleti Kimliği: %s\n"
 
-#: src/sendmsg-window.c:3658
+#: src/sendmsg-window.c:3665
 msgid "References:"
 msgstr "Referanslar:"
 
-#: src/sendmsg-window.c:3669
+#: src/sendmsg-window.c:3676
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "%s’de %s yazmış:\n"
 
-#: src/sendmsg-window.c:3671
+#: src/sendmsg-window.c:3678
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s bunu yazmış:\n"
 
-#: src/sendmsg-window.c:3937
+#: src/sendmsg-window.c:3944
 msgid "Could not save message."
 msgstr "İleti kaydedilemedi."
 
-#: src/sendmsg-window.c:3944
+#: src/sendmsg-window.c:3951
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Takas kutusu açılamadı: %s"
 
-#: src/sendmsg-window.c:3973
+#: src/sendmsg-window.c:3980
 msgid "Message saved."
 msgstr "İleti alındı."
 
-#: src/sendmsg-window.c:4611 src/sendmsg-window.c:4619
-#: src/sendmsg-window.c:4626 src/sendmsg-window.c:4650
+#: src/sendmsg-window.c:4618 src/sendmsg-window.c:4626
+#: src/sendmsg-window.c:4633 src/sendmsg-window.c:4657
 #, c-format
 msgid "Could not attach the file %s: %s."
 msgstr "Dosya eklenemedi %s: %s."
 
-#: src/sendmsg-window.c:4612
+#: src/sendmsg-window.c:4619
 msgid "not an absolute path"
 msgstr "mutlak bir yol değil"
 
-#: src/sendmsg-window.c:4620
+#: src/sendmsg-window.c:4627
 msgid "does not exist"
 msgstr "yok"
 
-#: src/sendmsg-window.c:4651
+#: src/sendmsg-window.c:4658
 msgid "not in current directory"
 msgstr "geçerli dizinde değil"
 
-#: src/sendmsg-window.c:4703
+#: src/sendmsg-window.c:4710
 msgid ""
 "The link that you selected created\n"
 "a “Blind copy” (BCC) address.\n"
@@ -7017,51 +7136,51 @@ msgstr ""
 "Lütfen adresin uygun olup olmadığını\n"
 "denetle."
 
-#: src/sendmsg-window.c:4828
+#: src/sendmsg-window.c:4835
 msgid "Include file"
 msgstr "Dosyayı içer"
 
 #. Translators: please do not translate Face.
-#: src/sendmsg-window.c:5018
+#: src/sendmsg-window.c:5025
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "%s Face başlık dosyası yüklenemedi: %s"
 
 #. Translators: please do not translate Face.
-#: src/sendmsg-window.c:5021
+#: src/sendmsg-window.c:5028
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "%s X-Face başlık dosyası yüklenemedi: %s"
 
-#: src/sendmsg-window.c:5133
+#: src/sendmsg-window.c:5140
 msgid "No Subject"
 msgstr "Konu Yok"
 
-#: src/sendmsg-window.c:5138
+#: src/sendmsg-window.c:5145
 msgid "_Send"
 msgstr "_Gönder"
 
-#: src/sendmsg-window.c:5163
+#: src/sendmsg-window.c:5170
 msgid "You did not specify a subject for this message"
 msgstr "İleti için bir konu belirtmedin"
 
-#: src/sendmsg-window.c:5164
+#: src/sendmsg-window.c:5171
 msgid "If you would like to provide one, enter it below."
 msgstr "İstersen, aşağıya girebilirsin."
 
-#: src/sendmsg-window.c:5225
+#: src/sendmsg-window.c:5232
 msgid "Message could be encrypted"
 msgstr "İleti şifrelenmiş olabilir"
 
-#: src/sendmsg-window.c:5228
+#: src/sendmsg-window.c:5235
 msgid "Send _encrypted"
 msgstr "_Şifreli gönder"
 
-#: src/sendmsg-window.c:5229
+#: src/sendmsg-window.c:5236
 msgid "Send _unencrypted"
 msgstr "Şifrelenmemiş _gönder"
 
-#: src/sendmsg-window.c:5299 src/sendmsg-window.c:5387
+#: src/sendmsg-window.c:5306 src/sendmsg-window.c:5394
 #, c-format
 msgid ""
 "You did not select encryption for this message, although %s public keys are "
@@ -7072,12 +7191,12 @@ msgstr ""
 "ileti için şifreleme seçmedin. Gizliliği korumak için, ileti %s "
 "şifrelenebilirdi."
 
-#: src/sendmsg-window.c:5374
+#: src/sendmsg-window.c:5381
 #, c-format
 msgid "error checking Autocrypt keys: %s"
 msgstr "Autocrypt anahtarları denetlenirken hata: %s"
 
-#: src/sendmsg-window.c:5405
+#: src/sendmsg-window.c:5412
 msgid ""
 "\n"
 "However, encryption is discouraged as the Autocrypt status indicates that "
@@ -7087,7 +7206,7 @@ msgstr ""
 "Ancak, Autocrypt durumu bazı alıcıların iletiyi okuyamaması neden "
 "<i>olabileceğinden</i> şifreleme önerilmez."
 
-#: src/sendmsg-window.c:5418
+#: src/sendmsg-window.c:5425
 #, c-format
 msgid ""
 "<i>Note:</i> choosing encryption will import %u key from the Autocrypt "
@@ -7099,16 +7218,16 @@ msgstr[0] ""
 "<i>Not:</i> şifrelemenin seçilmesi, Autocrypt veri tabanından GnuPG "
 "anahtarlığına %u anahtarı içe aktarır."
 
-#: src/sendmsg-window.c:5443
+#: src/sendmsg-window.c:5450
 #, c-format
 msgid "Cannot import Autocrypt keys: %s"
 msgstr "Autocrypt anahtarları içe aktarılamıyor: %s"
 
-#: src/sendmsg-window.c:5503
+#: src/sendmsg-window.c:5510
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "Bu ileti için OpenPGP güvenliğini seçtin.\n"
 
-#: src/sendmsg-window.c:5508
+#: src/sendmsg-window.c:5515
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
@@ -7116,12 +7235,12 @@ msgstr ""
 "İleti metni düz metin ve HTML olarak gönderilecek, ama yalnızca düz kısmı "
 "imzalanabilir.\n"
 
-#: src/sendmsg-window.c:5513
+#: src/sendmsg-window.c:5520
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr "İleti imzalanamayan veya şifrelenemeyen eklentiler içeriyor.\n"
 
-#: src/sendmsg-window.c:5517
+#: src/sendmsg-window.c:5524
 msgid ""
 "You should select MIME mode if the complete message shall be protected. Do "
 "you really want to proceed?"
@@ -7129,36 +7248,36 @@ msgstr ""
 "Tüm ileti korunacaksa bir MIME kipi seçmelisin. Gerçekten devam etmek "
 "istiyor musun?"
 
-#: src/sendmsg-window.c:5537
+#: src/sendmsg-window.c:5544
 #, c-format
 msgid "sending message with GPG mode %d"
 msgstr "ileti GPG kipi %d ile gönderiliyor"
 
-#: src/sendmsg-window.c:5567
+#: src/sendmsg-window.c:5574
 msgid "Message could not be created"
 msgstr "İleti oluşturulamadı"
 
-#: src/sendmsg-window.c:5569
+#: src/sendmsg-window.c:5576
 msgid "Message could not be queued in outbox"
 msgstr "İleti giden kutusunda kuyruklanamadı"
 
-#: src/sendmsg-window.c:5571
+#: src/sendmsg-window.c:5578
 msgid "Message could not be saved in sentbox"
 msgstr "İleti gönderi kutusuna kaydedilemedi"
 
-#: src/sendmsg-window.c:5573
+#: src/sendmsg-window.c:5580
 msgid "Message could not be sent"
 msgstr "İleti gönderilemedi"
 
-#: src/sendmsg-window.c:5575
+#: src/sendmsg-window.c:5582
 msgid "Message could not be signed"
 msgstr "İleti imzalanamadı"
 
-#: src/sendmsg-window.c:5577
+#: src/sendmsg-window.c:5584
 msgid "Message could not be encrypted"
 msgstr "İleti şifrelenemedi"
 
-#: src/sendmsg-window.c:5582
+#: src/sendmsg-window.c:5589
 #, c-format
 msgid ""
 "Send failed: %s\n"
@@ -7167,45 +7286,45 @@ msgstr ""
 "Gönderim başarısız: %s\n"
 "%s"
 
-#: src/sendmsg-window.c:5588
+#: src/sendmsg-window.c:5595
 #, c-format
 msgid "Send failed: %s"
 msgstr "Gönderim başarısız: %s"
 
-#: src/sendmsg-window.c:5679
+#: src/sendmsg-window.c:5686
 #, c-format
 msgid "Could not postpone message: %s"
 msgstr "İleti ertelenemedi: %s"
 
-#: src/sendmsg-window.c:5700
+#: src/sendmsg-window.c:5707
 msgid "Message postponed."
 msgstr "İleti ertelendi."
 
-#: src/sendmsg-window.c:5705
+#: src/sendmsg-window.c:5712
 msgid "Could not postpone message."
 msgstr "İleti ertelenemedi."
 
-#: src/sendmsg-window.c:5917
+#: src/sendmsg-window.c:5924
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Yazım denetimi başlatırken hata: %s"
 
-#: src/sendmsg-window.c:6682
+#: src/sendmsg-window.c:6689
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Yanıtla %s: %s"
 
-#: src/sendmsg-window.c:6687
+#: src/sendmsg-window.c:6694
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "İletiyi ilet %s: %s"
 
-#: src/sendmsg-window.c:6691
+#: src/sendmsg-window.c:6698
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Yeni ileti %s: %s"
 
-#: src/sendmsg-window.c:6838 ui/sendmsg-window.ui:197
+#: src/sendmsg-window.c:6845 ui/sendmsg-window.ui:197
 msgid "_Language"
 msgstr "_Dil"
 

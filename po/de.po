@@ -22,8 +22,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-10-14 15:45+0000\n"
-"PO-Revision-Date: 2023-10-14 19:39+0200\n"
+"POT-Creation-Date: 2023-10-16 19:44+0000\n"
+"PO-Revision-Date: 2023-10-18 20:43+0200\n"
 "Last-Translator: Jürgen Benvenuti <gastornis@posteo.org>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "Language: de\n"
@@ -134,6 +134,33 @@ msgstr "Die Adresse konnte nicht im Adressbuch gefunden werden"
 msgid "Unknown error"
 msgstr "Unbekannter Fehler"
 
+#: libbalsa/address-book-carddav.c:405 libbalsa/address-book-ldap.c:950
+#: libbalsa/server.c:340
+msgid "Balsa passwords"
+msgstr "Balsa-Passwörter"
+
+#. Translators: #1 address book name; #2 error message
+#: libbalsa/address-book-carddav.c:411
+#, c-format
+msgid "Error saving CardDAV credentials for address book “%s”: %s"
+msgstr ""
+"Fehler beim Speichern der CardDAV-Zugangsinformationen für Adressbuch »%s«: "
+"%s"
+
+#. Translators: #1 address book name; #2 error message
+#: libbalsa/address-book-carddav.c:452
+#, c-format
+msgid "Error loading CardDAV credentials for address book “%s”: %s"
+msgstr ""
+"Fehler beim Laden der CardDAV-Zugangsinformationen für Adressbuch »%s«: %s"
+
+#: libbalsa/address-book-carddav.c:490 libbalsa/gmime-gpgme-signature.c:239
+#: libbalsa/imap/imap-handle.c:46 libbalsa/libbalsa-carddav.c:543
+#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
+#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
+msgid "unknown"
+msgstr "unbekannt"
+
 #. The extern database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:189 libbalsa/address-book-ldif.c:243
 msgid "No-Id"
@@ -172,10 +199,6 @@ msgstr "LDAP-Adressbuch konnte nicht geöffnet werden %s: %s"
 #: libbalsa/address-book-ldap.c:694
 msgid "Undefined location of user address book"
 msgstr "Ort des Benutzer-Adressbuchs wurde nicht angegeben"
-
-#: libbalsa/address-book-ldap.c:950 libbalsa/server.c:340
-msgid "Balsa passwords"
-msgstr "Balsa-Passwörter"
 
 #: libbalsa/address-book-ldap.c:955
 #, c-format
@@ -600,12 +623,6 @@ msgid ""
 msgstr ""
 "\n"
 "Fingerabdruck des Schlüssels: %s"
-
-#: libbalsa/gmime-gpgme-signature.c:239 libbalsa/imap/imap-handle.c:46
-#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
-#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
-msgid "unknown"
-msgstr "unbekannt"
 
 #: libbalsa/gmime-multipart-crypt.c:235
 msgid "Cannot verify multipart/signed part due to missing subparts."
@@ -1258,6 +1275,30 @@ msgstr "Klangereignis »%s« konnte nicht wiedergegeben werden: %s"
 msgid "Cannot play sound file “%s”: %s"
 msgstr "Klangdatei »%s« konnte nicht wiedergegeben werden: %s"
 
+#: libbalsa/libbalsa-carddav.c:442
+msgid "The server returned an invalid reply."
+msgstr "Vom Server wurde eine ungültige Antwort zurückgegeben."
+
+#: libbalsa/libbalsa-carddav.c:514
+msgid "The server does not support any usable address book report."
+msgstr "Der Server unterstützt keinerlei verwendbaren Adressbuchbericht."
+
+#. Translators: #1 address book name, #2 address book URL, #3 error message
+#: libbalsa/libbalsa-carddav.c:542
+#, c-format
+msgid ""
+"CardDAV error for address book “%s” (URL %s):\n"
+"%s"
+msgstr ""
+"CardDAV-Fehler für Adressbuch »%s« (URL %s):\n"
+"%s"
+
+#. Translators: #1 error message
+#: libbalsa/libbalsa-carddav.c:564
+#, c-format
+msgid "CardDAV error: %s"
+msgstr "CardDAV-Fehler: %s"
+
 #: libbalsa/libbalsa-conf.c:139
 msgid "Your Balsa configuration is now stored in “~/.balsa/config”."
 msgstr "Ihre Konfiguration von Balsa wurde in »~/.balsa/config« gesichert."
@@ -1779,6 +1820,34 @@ msgstr "Mit %s öffnen"
 #, c-format
 msgid "Open _part with %s"
 msgstr "_Teil mit %s öffnen"
+
+#: libbalsa/libbalsa-webdav.c:237 libbalsa/libbalsa-webdav.c:290
+msgid "failed to evaluate XPath expression"
+msgstr "XPath-Ausdruck konnte nicht ausgewertet werden"
+
+#. Translators: #1 HTTP (RFC 2616) status code, #2 HTTP status message
+#: libbalsa/libbalsa-webdav.c:349 libbalsa/libbalsa-webdav.c:402
+#: libbalsa/libbalsa-webdav.c:721 libbalsa/libbalsa-webdav.c:818
+#, c-format
+msgid "WebDAV response %d: %s"
+msgstr "WebDAV-Antwort %d: %s"
+
+#: libbalsa/libbalsa-webdav.c:725 libbalsa/libbalsa-webdav.c:732
+#: libbalsa/libbalsa-webdav.c:820
+msgid "WebDAV: empty response"
+msgstr "WebDAV: leere Antwort"
+
+#: libbalsa/libbalsa-webdav.c:736 libbalsa/libbalsa-webdav.c:824
+msgid "cannot parse the WebDAV server response as XML"
+msgstr "Die WebDAV-Server-Antwort konnte nicht als XML verarbeitet werden"
+
+#: libbalsa/libbalsa-webdav.c:963
+msgid "cannot add namespaces to XPath context"
+msgstr "Es konnten keine Namensräume zum XPath-Kontext hinzugefügt werden"
+
+#: libbalsa/libbalsa-webdav.c:966
+msgid "cannot create XPath context"
+msgstr "XPath-Kontext konnte nicht erzeugt werden"
 
 #: libbalsa/mailbox.c:539
 #, c-format
@@ -3054,7 +3123,7 @@ msgstr "SMTP-Server"
 #. split large messages
 #: libbalsa/smtp-server.c:347
 msgid "Sp_lit message larger than"
-msgstr "Nachrichten a_ufteilen die größer sind als"
+msgstr "Nachrichten a_ufteilen, die größer sind als"
 
 #: libbalsa/smtp-server.c:353 src/pref-manager.c:2161
 msgid "MB"
@@ -3080,7 +3149,7 @@ msgstr "Balsa: Sie haben neue Nachrichten erhalten"
 #: libbalsa/x509-cert-widget.c:134
 msgid "Broken key, cannot identify certificate chain."
 msgstr ""
-"Der Schlüssel ist beschädigt, daher kann die Zertifikatkette nicht "
+"Der Schlüssel ist beschädigt, daher kann die Zertifikatskette nicht "
 "identifiziert werden."
 
 #: libbalsa/x509-cert-widget.c:286
@@ -3091,7 +3160,7 @@ msgstr "Fingerabdruck %s"
 #: libbalsa/x509-cert-widget.c:287
 #, c-format
 msgid "cannot load key with fingerprint %s: %s"
-msgstr "Schlüssel mit dem Fingerabdruck %s konnte nicht gefladen werden: %s"
+msgstr "Schlüssel mit dem Fingerabdruck %s konnte nicht geladen werden: %s"
 
 #: libbalsa/x509-cert-widget.c:488
 msgid ""
@@ -3692,7 +3761,7 @@ msgstr "_Passwort"
 
 #: src/address-book-config.c:601
 msgid "_User Address Book DN"
-msgstr "_Benutzerdressbuch-DN"
+msgstr "_Benutzeradressbuch-DN"
 
 #: src/address-book-config.c:607
 msgid "Enable _TLS"
@@ -5723,7 +5792,7 @@ msgstr "Der Pfad »%s« zeigt nicht auf ein Postfach."
 #: src/main.c:116 src/main.c:121 src/main.c:127 src/main.c:133 src/main.c:139
 #, c-format
 msgid "Balsa cannot open your “%s” mailbox."
-msgstr "Das Postfach »%s« kann nicht geöffnet werden."
+msgstr "Ihr Postfach »%s« kann nicht geöffnet werden."
 
 #: src/main.c:116
 msgid "Inbox"
@@ -6296,7 +6365,7 @@ msgstr "Nach dieser Spalte sortieren:"
 
 #: src/pref-manager.c:2411
 msgid "Thread messages by default"
-msgstr "Nachrichtenkonversationen per Vorgabe zusammanfassen"
+msgstr "Nachrichtenkonversationen per Vorgabe zusammenfassen"
 
 #: src/pref-manager.c:2413
 msgid "Expand threads on open"
@@ -7726,7 +7795,7 @@ msgstr "Nur _Text"
 #: src/toolbar-factory.c:717
 #, c-format
 msgid "Use Desktop _Default (%s)"
-msgstr "_Desktopvorgabe verwenden (%s)"
+msgstr "Vorgabe _der Arbeitsumgebung verwenden (%s)"
 
 #: src/toolbar-factory.c:743
 msgid "_Customize Toolbars…"

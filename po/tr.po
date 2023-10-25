@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-10-16 19:44+0000\n"
-"PO-Revision-Date: 2023-10-18 20:00+0300\n"
+"POT-Creation-Date: 2023-10-23 06:13+0000\n"
+"PO-Revision-Date: 2023-10-25 16:38+0300\n"
 "Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
@@ -135,7 +135,8 @@ msgstr "Balsa parolaları"
 #: libbalsa/address-book-carddav.c:411
 #, c-format
 msgid "Error saving CardDAV credentials for address book “%s”: %s"
-msgstr "“%s” adres defteri için CardDAV kimlik bilgileri kaydedilirken hata: %s"
+msgstr ""
+"“%s” adres defteri için CardDAV kimlik bilgileri kaydedilirken hata: %s"
 
 #. Translators: #1 address book name; #2 error message
 #: libbalsa/address-book-carddav.c:452
@@ -2879,11 +2880,11 @@ msgstr "özel yapılandırma dosyasından geri dönüş parolası yüklendi"
 
 #: libbalsa/server-config.c:90
 msgid "_Remember user password in Secret Service"
-msgstr "Gizli Serviste kullanıcı parolasını _anımsa"
+msgstr "Giz Hizmetinde kullanıcı parolasını _anımsa"
 
 #: libbalsa/server-config.c:91
 msgid "_Remember certificate pass phrase in Secret Service"
-msgstr "Gizli Serviste sertifika parola sözcüğünü _anımsa"
+msgstr "Giz Hizmetinde sertifika parola sözcüğünü _anımsa"
 
 #: libbalsa/server-config.c:95
 msgid "_Remember user password"
@@ -3343,7 +3344,7 @@ msgid ""
 msgstr ""
 "E-posta göndermeden ya da almadan önce:\n"
 "\n"
-"• ya bir İnternet Servis Sağlayıcısınca sunulan internet erişimi ve bir e-"
+"• ya bir İnternet Hizmet Sağlayıcısınca sunulan internet erişimi ve bir e-"
 "posta hesabınız olmalı, ve bilgisayarınızda bu internet bağlantısını yapmış "
 "olmalısınız\n"
 "\n"
@@ -3479,7 +3480,7 @@ msgstr "kalıcı hata %d: %s"
 #: libnetclient/net-client-utils.c:208
 #, c-format
 msgid "importing GSS service name %s failed: %s"
-msgstr "GSS servis adı %s içe aktarımı başarısız oldu: %s"
+msgstr "GSS hizmet adı %s içe aktarılamadı: %s"
 
 #: libnetclient/net-client-utils.c:252
 #, c-format
@@ -3690,8 +3691,8 @@ msgid ""
 "No DNS service record for the domain “%s” and service “carddavs” found. "
 "Please enter the “https://” URI manually."
 msgstr ""
-"“%s” alan adı ve “carddavs” hizmeti için DNS hizmet kaydı bulunamadı. "
-"Lütfen “https://” URI’sini elle girin."
+"“%s” alan adı ve “carddavs” hizmeti için DNS hizmet kaydı bulunamadı. Lütfen "
+"“https://” URI’sini elle girin."
 
 #: src/address-book-config.c:716
 msgid "Authorization failed"
@@ -3762,7 +3763,7 @@ msgstr "CardDAV Adres Defteri"
 
 #: src/balsa-app.c:56 src/balsa-app.c:136
 msgid "_Remember password in Secret Service"
-msgstr "Gizli Servisteki parolayı _anımsa"
+msgstr "Giz Hizmetinde parolayı _anımsa"
 
 #: src/balsa-app.c:59 src/balsa-app.c:139
 msgid "_Remember password"

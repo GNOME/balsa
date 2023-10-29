@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-10-23 06:13+0000\n"
-"PO-Revision-Date: 2023-10-25 16:38+0300\n"
-"Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
+"POT-Creation-Date: 2023-10-25 13:39+0000\n"
+"PO-Revision-Date: 2023-10-26 16:33+0300\n"
+"Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -6190,7 +6190,7 @@ msgstr "Ana pencere"
 
 #: src/pref-manager.c:2336
 msgid "Use preview pane"
-msgstr "Önizleme penceresini kullan"
+msgstr "Ön izleme penceresini kullan"
 
 #: src/pref-manager.c:2340
 msgid "Show message counts in mailbox list"
@@ -7595,7 +7595,7 @@ msgstr ""
 
 #: src/toolbar-factory.c:148
 msgid "Message Preview"
-msgstr "İleti Önizlemesi"
+msgstr "İleti Ön İzlemesi"
 
 #: src/toolbar-factory.c:149
 msgid "Sign"
@@ -7678,7 +7678,7 @@ msgstr "Araç çubuğu yardımı görüntülenirken hata: %s\n"
 #. Preview display
 #: src/toolbar-prefs.c:387
 msgid "Preview"
-msgstr "Önizleme"
+msgstr "Ön izleme"
 
 #: src/toolbar-prefs.c:414
 msgid "_Restore toolbar to standard buttons"

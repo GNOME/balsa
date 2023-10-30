@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-05-10 16:49+0000\n"
-"PO-Revision-Date: 2023-05-10 20:04+0200\n"
+"POT-Creation-Date: 2023-10-15 11:57+0000\n"
+"PO-Revision-Date: 2023-10-30 15:48+0100\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -23,9 +23,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.4\n"
 
-#: balsa.appdata.xml.in:7
+#: balsa.appdata.xml.in:6 org.desktop.Balsa.desktop.in.in:3
+#: balsa-mailto-handler.desktop.in.in:3 libbalsa/system-tray.c:102
+msgid "Balsa"
+msgstr "Balsa"
+
+#: balsa.appdata.xml.in:7 org.desktop.Balsa.desktop.in.in:4
+#: balsa-mailto-handler.desktop.in.in:4
+msgid "Email utility"
+msgstr "E-postverktyg"
+
+#: balsa.appdata.xml.in:10
 msgid ""
 "Balsa is a graphical mail client. While it is in active development, Balsa "
 "has many features such as:"
@@ -33,50 +43,41 @@ msgstr ""
 "Balsa är en grafisk e-postklient. Balsa utvecklas kontinuerligt och har "
 "många egenskaper som:"
 
-#: balsa.appdata.xml.in:10
+#: balsa.appdata.xml.in:13
 msgid "IMAP and POP3 support;"
 msgstr "IMAP- och POP3-stöd;"
 
-#: balsa.appdata.xml.in:11
+#: balsa.appdata.xml.in:14
 msgid "sendmail or direct SMTP support;"
 msgstr "stöd för sendmail eller direkt SMTP;"
 
-#: balsa.appdata.xml.in:12
+#: balsa.appdata.xml.in:15
 msgid "end-to-end encryption using GnuPG or S/MIME;"
 msgstr "totalsträckskryptering med GnuPG eller S/MIME;"
 
-#: balsa.appdata.xml.in:13
+#: balsa.appdata.xml.in:16
 msgid "multi-threaded retrieval and sending of messages;"
 msgstr "flertrådad hämtning och sändning av meddelanden;"
 
-#: balsa.appdata.xml.in:14
+#: balsa.appdata.xml.in:17
 msgid "support for all configurations of local mail folders;"
 msgstr "stöd för alla konfigurationer för lokala e-postmappar;"
 
-#: balsa.appdata.xml.in:15
+#: balsa.appdata.xml.in:18
 msgid "automatic mail checking;"
 msgstr "automatisk e-postkontroll;"
 
-#: balsa.appdata.xml.in:16
+#: balsa.appdata.xml.in:19
 msgid "mail printing;"
 msgstr "e-postutskrift;"
 
-#: balsa.appdata.xml.in:17
+#: balsa.appdata.xml.in:20
 msgid "inline attachment viewing;"
 msgstr "direkt visning av bilagor;"
 
-#: balsa.appdata.xml.in:19
+#: balsa.appdata.xml.in:22
 msgid "and the proverbial much, much more."
 msgstr "och mycket, mycket mer."
-
-#: org.desktop.Balsa.desktop.in.in:3 balsa-mailto-handler.desktop.in.in:3
-#: libbalsa/system-tray.c:102
-msgid "Balsa"
-msgstr "Balsa"
-
-#: org.desktop.Balsa.desktop.in.in:4 balsa-mailto-handler.desktop.in.in:4
-msgid "Email utility"
-msgstr "E-postverktyg"
 
 #: org.desktop.Balsa.desktop.in.in:5 balsa-mailto-handler.desktop.in.in:5
 msgid "Mail Client"
@@ -86,44 +87,68 @@ msgstr "E-postklient"
 msgid "Mail;E-mail;Email;IMAP"
 msgstr "Mail;Mejl;E-mail;email;E-post;Epost;IMAP"
 
-#: libbalsa/address-book.c:299 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:308 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Inget fel"
 
-#: libbalsa/address-book.c:300
+#: libbalsa/address-book.c:309
 msgid "Cannot read from address book"
 msgstr "Det går inte att läsa från adressbok"
 
-#: libbalsa/address-book.c:301
+#: libbalsa/address-book.c:310
 msgid "Cannot write to address book"
 msgstr "Det går inte att skriva till adressbok"
 
-#: libbalsa/address-book.c:302
+#: libbalsa/address-book.c:311
 msgid "Cannot connect to the server"
 msgstr "Det går inte att ansluta till servern"
 
-#: libbalsa/address-book.c:303
+#: libbalsa/address-book.c:312
 msgid "Cannot search in the address book"
 msgstr "Det går inte att söka i adressboken"
 
-#: libbalsa/address-book.c:305
+#: libbalsa/address-book.c:314
 msgid "Cannot add duplicate entry"
 msgstr "Det går inte att lägga till dubblettpost"
 
-#: libbalsa/address-book.c:307
+#: libbalsa/address-book.c:316
 msgid "Cannot find address in address book"
 msgstr "Det går inte att hitta adressen i adressboken"
 
-#: libbalsa/address-book.c:308 libbalsa/html.c:95 src/ab-window.c:438
-#: src/balsa-message.c:1906 src/balsa-mime-widget.c:222
+#: libbalsa/address-book.c:317 libbalsa/html.c:95 src/ab-window.c:438
+#: src/balsa-message.c:1910 src/balsa-mime-widget.c:222
 #: src/balsa-mime-widget-callbacks.c:50 src/balsa-mime-widget-callbacks.c:176
 #: src/balsa-mime-widget-callbacks.c:208 src/balsa-mime-widget-crypto.c:78
 #: src/balsa-mime-widget-crypto.c:84 src/balsa-mime-widget-message.c:362
 #: src/balsa-mime-widget-text.c:255 src/main-window.c:3059
-#: src/main-window.c:4265 src/sendmsg-window.c:1446 src/sendmsg-window.c:2985
-#: src/sendmsg-window.c:3945
+#: src/main-window.c:4265 src/sendmsg-window.c:1446 src/sendmsg-window.c:2992
+#: src/sendmsg-window.c:3952
 msgid "Unknown error"
 msgstr "Okänt fel"
+
+#: libbalsa/address-book-carddav.c:405 libbalsa/address-book-ldap.c:950
+#: libbalsa/server.c:340
+msgid "Balsa passwords"
+msgstr "Balsa-lösenord"
+
+#. Translators: #1 address book name; #2 error message
+#: libbalsa/address-book-carddav.c:411
+#, c-format
+msgid "Error saving CardDAV credentials for address book “%s”: %s"
+msgstr "Fel vid sparande av CardDAV-uppgifter för adressboken ”%s”: %s"
+
+#. Translators: #1 address book name; #2 error message
+#: libbalsa/address-book-carddav.c:452
+#, c-format
+msgid "Error loading CardDAV credentials for address book “%s”: %s"
+msgstr "Fel vid inläsning av CardDAV-uppgifter för adressboken ”%s”: %s"
+
+#: libbalsa/address-book-carddav.c:490 libbalsa/gmime-gpgme-signature.c:239
+#: libbalsa/imap/imap-handle.c:46 libbalsa/libbalsa-carddav.c:543
+#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
+#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
+msgid "unknown"
+msgstr "okänd"
 
 #. The extern database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:189 libbalsa/address-book-ldif.c:243
@@ -134,8 +159,8 @@ msgstr "Inget-Id"
 #: libbalsa/address-book-ldap.c:577 libbalsa/address-book-ldif.c:189
 #: libbalsa/address-book-ldif.c:227 libbalsa/address-book-ldif.c:270
 #: libbalsa/address-book-ldif.c:274 libbalsa/address-book-vcard.c:142
-#: libbalsa/address-book-vcard.c:249 libbalsa/address.c:392
-#: libbalsa/rfc6350.c:112
+#: libbalsa/address-book-vcard.c:249 libbalsa/address.c:393
+#: libbalsa/rfc6350.c:119
 msgid "No-Name"
 msgstr "Namnlös"
 
@@ -162,10 +187,6 @@ msgstr "Det går inte att öppna LDAP-adressboken %s: %s"
 msgid "Undefined location of user address book"
 msgstr "Odefinierad plats för användaradressbok"
 
-#: libbalsa/address-book-ldap.c:950 libbalsa/server.c:340
-msgid "Balsa passwords"
-msgstr "Balsa-lösenord"
-
 #: libbalsa/address-book-ldap.c:955
 #, c-format
 msgid "Error saving LDAP credentials for address book %s: %s"
@@ -176,7 +197,7 @@ msgstr "Fel vid sparande av LDAP-uppgifter för adressboken %s: %s"
 msgid "Error loading LDAP credentials for address book %s: %s"
 msgstr "Fel vid inläsning av LDAP-uppgifter för adressboken %s: %s"
 
-#: libbalsa/address-book-ldap.c:1165
+#: libbalsa/address-book-ldap.c:1168
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr "LDAP-servern %s nere, nästa försök kommer att försöka ansluta på nytt."
@@ -186,43 +207,43 @@ msgstr "LDAP-servern %s nere, nästa försök kommer att försöka ansluta på n
 msgid "Reading Osmo contacts failed: %s"
 msgstr "Misslyckades med att läsa Osmo-kontakter: %s"
 
-#: libbalsa/address.c:955
+#: libbalsa/address.c:957
 msgid "D_isplayed Name:"
 msgstr "V_isat namn:"
 
-#: libbalsa/address.c:956
+#: libbalsa/address.c:958
 msgid "_First Name:"
 msgstr "_Förnamn:"
 
-#: libbalsa/address.c:957
+#: libbalsa/address.c:959
 msgid "_Last Name:"
 msgstr "_Efternamn:"
 
-#: libbalsa/address.c:958
+#: libbalsa/address.c:960
 msgid "_Nickname:"
 msgstr "_Smeknamn:"
 
-#: libbalsa/address.c:959
+#: libbalsa/address.c:961
 msgid "O_rganization:"
 msgstr "O_rganisation:"
 
-#: libbalsa/address.c:960
+#: libbalsa/address.c:962
 msgid "_Email Address:"
 msgstr "_E-postadress:"
 
-#: libbalsa/address.c:980 src/filter-edit-callbacks.c:1069
+#: libbalsa/address.c:982 src/filter-edit-callbacks.c:1069
 msgid "A_dd"
 msgstr "L_ägg till"
 
 #: libbalsa/address-view.c:193 src/balsa-mime-widget-message.c:738
 #: src/balsa-print-object-header.c:146 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:3640
+#: src/sendmsg-window.c:3647
 msgid "To:"
 msgstr "Till:"
 
 #: libbalsa/address-view.c:194 src/balsa-mime-widget-message.c:740
 #: src/balsa-print-object-header.c:148 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:3648
+#: src/sendmsg-window.c:3655
 msgid "CC:"
 msgstr "Kopia:"
 
@@ -372,9 +393,9 @@ msgstr "”insert” av användaren ”%s” misslyckades: %s"
 msgid "_Show details…"
 msgstr "_Visa detaljer…"
 
-#: libbalsa/autocrypt.c:933 libbalsa/html-pref-db.c:457 src/balsa-index.c:2001
-#: src/mailbox-node.c:1040 src/mailbox-node.c:1056 src/pref-manager.c:2014
-#: src/pref-manager.c:2099 src/pref-manager.c:2822 ui/ab-main.ui:44
+#: libbalsa/autocrypt.c:933 libbalsa/html-pref-db.c:457 src/balsa-index.c:2005
+#: src/mailbox-node.c:1040 src/mailbox-node.c:1056 src/pref-manager.c:2018
+#: src/pref-manager.c:2103 src/pref-manager.c:2826 ui/ab-main.ui:44
 #: ui/main-window.ui:348
 msgid "_Delete"
 msgstr "_Ta bort"
@@ -532,7 +553,7 @@ msgstr "Misslyckades att dekryptera MIME-del: tolkningsfel"
 
 #: libbalsa/gmime-gpgme-signature.c:147 libbalsa/libbalsa-gpgme-widgets.c:371
 #: libbalsa/libbalsa-gpgme-widgets.c:744 libbalsa/rfc3156.c:550
-#: src/address-book-config.c:192
+#: src/address-book-config.c:208
 msgid "never"
 msgstr "aldrig"
 
@@ -580,24 +601,18 @@ msgstr ""
 "\n"
 "Nyckelfingeravtryck: %s"
 
-#: libbalsa/gmime-gpgme-signature.c:239 libbalsa/imap/imap-handle.c:46
-#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546
-#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5375
-msgid "unknown"
-msgstr "okänd"
-
-#: libbalsa/gmime-multipart-crypt.c:230
+#: libbalsa/gmime-multipart-crypt.c:235
 msgid "Cannot verify multipart/signed part due to missing subparts."
 msgstr ""
 "Det går inte att verifiera multipart/signed-del på grund av saknade "
 "underliggande delar."
 
-#: libbalsa/gmime-multipart-crypt.c:254
+#: libbalsa/gmime-multipart-crypt.c:259
 #, c-format
 msgid "unsupported protocol “%s”"
 msgstr "protokollet ”%s” stöds ej"
 
-#: libbalsa/gmime-multipart-crypt.c:267
+#: libbalsa/gmime-multipart-crypt.c:272
 msgid ""
 "Cannot verify multipart/signed part: signature content-type does not match "
 "protocol."
@@ -605,7 +620,7 @@ msgstr ""
 "Det går inte att verifiera multipart/signed-del: signaturens innehållstyp "
 "matchar inte med protokollet."
 
-#: libbalsa/gmime-multipart-crypt.c:463
+#: libbalsa/gmime-multipart-crypt.c:468
 #, c-format
 msgid ""
 "Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
@@ -614,11 +629,11 @@ msgstr ""
 "Det går inte att dekryptera multipart/encrypted-del: krypteringsprotokollet "
 "”%s” stöds ej."
 
-#: libbalsa/gmime-multipart-crypt.c:464
+#: libbalsa/gmime-multipart-crypt.c:469
 msgid "(none)"
 msgstr "(ingen)"
 
-#: libbalsa/gmime-multipart-crypt.c:477
+#: libbalsa/gmime-multipart-crypt.c:482
 msgid ""
 "Cannot decrypt multipart/encrypted part: content-type does not match "
 "protocol."
@@ -626,12 +641,12 @@ msgstr ""
 "Det går inte att dekryptera multipart/encrypted-del: innehållstyp matchar "
 "inte med protokollet."
 
-#: libbalsa/gmime-multipart-crypt.c:492
+#: libbalsa/gmime-multipart-crypt.c:497
 msgid "Cannot decrypt multipart/encrypted part: unexpected content type"
 msgstr ""
 "Det går inte att dekryptera multipart/encrypted-del: oväntad innehållstyp"
 
-#: libbalsa/gmime-multipart-crypt.c:534
+#: libbalsa/gmime-multipart-crypt.c:539
 msgid ""
 "Cannot decrypt multipart/encrypted part: failed to parse decrypted content"
 msgstr ""
@@ -715,13 +730,13 @@ msgstr "Det går inte att ta bort databaspost: %s"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:105 libbalsa/mailbox_local.c:2007
-#: libbalsa/mailbox_local.c:2009 src/sendmsg-window.c:3893
-#: src/sendmsg-window.c:3895
+#: libbalsa/mailbox_local.c:2009 src/sendmsg-window.c:3900
+#: src/sendmsg-window.c:3902
 msgid "Re:"
 msgstr "Sv:"
 
-#: libbalsa/identity.c:106 src/sendmsg-window.c:3832 src/sendmsg-window.c:3833
-#: src/sendmsg-window.c:3834
+#: libbalsa/identity.c:106 src/sendmsg-window.c:3839 src/sendmsg-window.c:3840
+#: src/sendmsg-window.c:3841
 msgid "Fwd:"
 msgstr "Vb:"
 
@@ -751,32 +766,32 @@ msgstr "Signaturen i ”%s” är inte en UTF-8-text."
 
 #: libbalsa/identity.c:364 libbalsa/libbalsa-gpgme-cb.c:181
 #: libbalsa/libbalsa-gpgme-cb.c:357 libbalsa/smtp-server.c:330
-#: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:259
-#: src/address-book-config.c:367 src/address-book-config.c:410
-#: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2792
-#: src/balsa-mblist.c:1877 src/balsa-message.c:1782
+#: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:275
+#: src/address-book-config.c:387 src/address-book-config.c:430
+#: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2796
+#: src/balsa-mblist.c:1894 src/balsa-message.c:1786
 #: src/balsa-mime-widget-callbacks.c:89 src/filter-edit-callbacks.c:1257
 #: src/filter-edit-dialog.c:399 src/filter-edit-dialog.c:575
 #: src/filter-export-dialog.c:81 src/filter-run-dialog.c:302
 #: src/folder-conf.c:340 src/folder-conf.c:473 src/folder-conf.c:873
 #: src/folder-conf.c:1122 src/mailbox-conf.c:203 src/mailbox-conf.c:225
 #: src/mailbox-conf.c:241 src/mailbox-conf.c:726 src/mailbox-conf.c:780
-#: src/pref-manager.c:3322 src/sendmsg-window.c:489 src/sendmsg-window.c:1541
-#: src/sendmsg-window.c:2011 src/sendmsg-window.c:3391
-#: src/sendmsg-window.c:4831 src/sendmsg-window.c:5137
-#: src/sendmsg-window.c:5230 src/spell-check.c:392 src/store-address.c:204
+#: src/pref-manager.c:3326 src/sendmsg-window.c:489 src/sendmsg-window.c:1541
+#: src/sendmsg-window.c:2011 src/sendmsg-window.c:3398
+#: src/sendmsg-window.c:4838 src/sendmsg-window.c:5144
+#: src/sendmsg-window.c:5237 src/spell-check.c:392 src/store-address.c:204
 msgid "_Cancel"
 msgstr "_Avbryt"
 
 #: libbalsa/identity.c:365 libbalsa/libbalsa-gpgme-cb.c:180
 #: libbalsa/libbalsa-gpgme-cb.c:356 libbalsa/smtp-server.c:329
 #: src/ab-window.c:140 src/balsa-app.c:91 src/balsa-app.c:156
-#: src/balsa-message.c:1783 src/balsa-mime-widget-callbacks.c:90
+#: src/balsa-message.c:1787 src/balsa-mime-widget-callbacks.c:90
 #: src/filter-edit-callbacks.c:1256 src/filter-edit-dialog.c:574
 #: src/filter-export-dialog.c:80 src/filter-run-dialog.c:301
-#: src/folder-conf.c:341 src/main-window.c:4046 src/pref-manager.c:3320
+#: src/folder-conf.c:341 src/main-window.c:4046 src/pref-manager.c:3324
 #: src/sendmsg-window.c:1540 src/sendmsg-window.c:2012
-#: src/sendmsg-window.c:3390 src/sendmsg-window.c:4832 src/store-address.c:205
+#: src/sendmsg-window.c:3397 src/sendmsg-window.c:4839 src/store-address.c:205
 msgid "_OK"
 msgstr "_OK"
 
@@ -987,11 +1002,11 @@ msgid "Manage Identities"
 msgstr "Hantera identiteter"
 
 #: libbalsa/identity.c:1646 libbalsa/smtp-server.c:331
-#: src/address-book-config.c:260 src/address-book-config.c:365
-#: src/address-book-config.c:408 src/filter-edit-callbacks.c:1258
+#: src/address-book-config.c:276 src/address-book-config.c:385
+#: src/address-book-config.c:428 src/filter-edit-callbacks.c:1258
 #: src/filter-edit-dialog.c:576 src/filter-export-dialog.c:82
 #: src/filter-run-dialog.c:303 src/folder-conf.c:474 src/folder-conf.c:874
-#: src/main-window.c:3937 src/pref-manager.c:3323 src/toolbar-prefs.c:126
+#: src/main-window.c:3937 src/pref-manager.c:3327 src/toolbar-prefs.c:126
 #: ui/ab-main.ui:70 ui/main-window.ui:543
 msgid "_Help"
 msgstr "_Hjälp"
@@ -1132,27 +1147,27 @@ msgstr "misslyckades med att avsluta prenumeration på ”%s”"
 msgid "do not show again"
 msgstr "visa inte igen"
 
-#: libbalsa/libbalsa.c:404
+#: libbalsa/libbalsa.c:407
 msgid "broken TLS certificate"
 msgstr "trasigt TLS-certifikat"
 
-#: libbalsa/libbalsa.c:408
+#: libbalsa/libbalsa.c:411
 msgid "SSL/TLS certificate"
 msgstr "SSL/TLS-certifikat"
 
-#: libbalsa/libbalsa.c:412
+#: libbalsa/libbalsa.c:415
 msgid "_Accept Once"
 msgstr "_Acceptera en gång"
 
-#: libbalsa/libbalsa.c:413
+#: libbalsa/libbalsa.c:416
 msgid "Accept & _Save"
 msgstr "Acceptera och _spara"
 
-#: libbalsa/libbalsa.c:414
+#: libbalsa/libbalsa.c:417
 msgid "_Reject"
 msgstr "_Förkasta"
 
-#: libbalsa/libbalsa.c:420
+#: libbalsa/libbalsa.c:423
 #, c-format
 msgid ""
 "<big><b>Authenticity of this certificate could not be verified.</b></big>\n"
@@ -1161,11 +1176,11 @@ msgstr ""
 "<big><b>Äktheten av detta certifikat kunde inte verifieras.</b></big>\n"
 "Orsak: %s"
 
-#: libbalsa/libbalsa.c:461
+#: libbalsa/libbalsa.c:464
 msgid "the signing certificate authority is not known"
 msgstr "den signerande certifikatutfärdaren är okänd"
 
-#: libbalsa/libbalsa.c:462
+#: libbalsa/libbalsa.c:465
 msgid ""
 "the certificate does not match the expected identity of the site that it was "
 "retrieved from"
@@ -1173,57 +1188,81 @@ msgstr ""
 "certifikatet stämmer inte överens med den förväntade identiteten för platsen "
 "som det hämtades från"
 
-#: libbalsa/libbalsa.c:463
+#: libbalsa/libbalsa.c:466
 msgid "the certificate’s activation time is still in the future"
 msgstr "certifikatets aktiveringstid ligger fortfarande i framtiden"
 
-#: libbalsa/libbalsa.c:464
+#: libbalsa/libbalsa.c:467
 msgid "the certificate has expired"
 msgstr "certifikatet har gått ut"
 
-#: libbalsa/libbalsa.c:465
+#: libbalsa/libbalsa.c:468
 msgid "the certificate has been revoked"
 msgstr "certifikatet har återkallats"
 
-#: libbalsa/libbalsa.c:466
+#: libbalsa/libbalsa.c:469
 msgid "the certificate’s algorithm is considered insecure"
 msgstr "certifikatets algoritm betraktas som osäker"
 
-#: libbalsa/libbalsa.c:467
+#: libbalsa/libbalsa.c:470
 msgid "an error occurred validating the certificate"
 msgstr "ett fel inträffade när certifikatet validerades"
 
-#: libbalsa/libbalsa.c:483
+#: libbalsa/libbalsa.c:486
 #, c-format
 msgid "unknown certificate validation error %u"
 msgstr "okänt certifikatvalideringsfel %u"
 
-#: libbalsa/libbalsa.c:562
+#: libbalsa/libbalsa.c:565
 msgid "No image data"
 msgstr "Inget bilddata"
 
-#: libbalsa/libbalsa.c:596
+#: libbalsa/libbalsa.c:599
 msgid "Invalid input format"
 msgstr "Ogiltigt inmatningsformat"
 
-#: libbalsa/libbalsa.c:600
+#: libbalsa/libbalsa.c:603
 msgid "Internal buffer overrun"
 msgstr "Internbuffert överkörd"
 
 #. Translators: please do not translate Face.
-#: libbalsa/libbalsa.c:617
+#: libbalsa/libbalsa.c:620
 msgid "Bad X-Face data"
 msgstr "Felaktig X-Face-data"
 
-#: libbalsa/libbalsa.c:716
+#: libbalsa/libbalsa.c:719
 #, c-format
 msgid "Cannot play sound event “%s”: %s"
 msgstr "Det går inte att spela ljudhändelsen ”%s”: %s"
 
-#: libbalsa/libbalsa.c:732
+#: libbalsa/libbalsa.c:735
 #, c-format
 msgid "Cannot play sound file “%s”: %s"
 msgstr "Det går inte att spela ljudfilen ”%s”: %s"
+
+#: libbalsa/libbalsa-carddav.c:442
+msgid "The server returned an invalid reply."
+msgstr "Signaturen returnerade ett ogiltigt svar."
+
+#: libbalsa/libbalsa-carddav.c:514
+msgid "The server does not support any usable address book report."
+msgstr "Servern stödjer inte någon användbar adressboksrapport."
+
+#. Translators: #1 address book name, #2 address book URL, #3 error message
+#: libbalsa/libbalsa-carddav.c:542
+#, c-format
+msgid ""
+"CardDAV error for address book “%s” (URL %s):\n"
+"%s"
+msgstr ""
+"CardDAV-fel för adressboken ”%s” (URL %s):\n"
+"%s"
+
+#. Translators: #1 error message
+#: libbalsa/libbalsa-carddav.c:564
+#, c-format
+msgid "CardDAV error: %s"
+msgstr "CardDAV-fel: %s"
 
 #: libbalsa/libbalsa-conf.c:139
 msgid "Your Balsa configuration is now stored in “~/.balsa/config”."
@@ -1233,7 +1272,7 @@ msgstr "Din Balsa-konfiguration lagras nu i ”~/.balsa/config”."
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: libbalsa/libbalsa-gpgme.c:184 src/balsa-message.c:3037
+#: libbalsa/libbalsa-gpgme.c:184 src/balsa-message.c:3041
 msgid "S/MIME"
 msgstr "S/MIME"
 
@@ -1360,7 +1399,7 @@ msgid "User ID"
 msgstr "Användar-ID"
 
 #: libbalsa/libbalsa-gpgme-cb.c:283 src/balsa-index.c:456
-#: src/pref-manager.c:222 src/sendmsg-window.c:2674
+#: src/pref-manager.c:222 src/sendmsg-window.c:2678
 msgid "Size"
 msgstr "Storlek"
 
@@ -1721,7 +1760,7 @@ msgstr " kurvan ”%s”"
 msgid "_Hide"
 msgstr "_Dölj"
 
-#: libbalsa/libbalsa-vfs.c:406 src/sendmsg-window.c:4627
+#: libbalsa/libbalsa-vfs.c:406 src/sendmsg-window.c:4634
 msgid "not a regular file"
 msgstr "inte en vanlig fil"
 
@@ -1738,6 +1777,34 @@ msgstr "Öppna med %s"
 #, c-format
 msgid "Open _part with %s"
 msgstr "Öppna _del med %s"
+
+#: libbalsa/libbalsa-webdav.c:237 libbalsa/libbalsa-webdav.c:290
+msgid "failed to evaluate XPath expression"
+msgstr "misslyckades med att utvärdera XPath-uttryck"
+
+#. Translators: #1 HTTP (RFC 2616) status code, #2 HTTP status message
+#: libbalsa/libbalsa-webdav.c:349 libbalsa/libbalsa-webdav.c:402
+#: libbalsa/libbalsa-webdav.c:721 libbalsa/libbalsa-webdav.c:818
+#, c-format
+msgid "WebDAV response %d: %s"
+msgstr "WebDAV-svar %d: %s"
+
+#: libbalsa/libbalsa-webdav.c:725 libbalsa/libbalsa-webdav.c:732
+#: libbalsa/libbalsa-webdav.c:820
+msgid "WebDAV: empty response"
+msgstr "WebDAV: tomt svar"
+
+#: libbalsa/libbalsa-webdav.c:736 libbalsa/libbalsa-webdav.c:824
+msgid "cannot parse the WebDAV server response as XML"
+msgstr "det går inte att tolka WebDAV-serversvaret som XML"
+
+#: libbalsa/libbalsa-webdav.c:963
+msgid "cannot add namespaces to XPath context"
+msgstr "det går inte att lägga till namnrymder till XPath-sammanhang"
+
+#: libbalsa/libbalsa-webdav.c:966
+msgid "cannot create XPath context"
+msgstr "det går inte att skapa XPath-sammanhang"
 
 #: libbalsa/mailbox.c:539
 #, c-format
@@ -2737,20 +2804,20 @@ msgstr "fullständig"
 msgid "ultimate"
 msgstr "ultimat"
 
-#: libbalsa/rfc6350.c:62
+#: libbalsa/rfc6350.c:69
 msgid "malformed card, BEGIN:VCARD expected"
 msgstr "felaktigt kort, förväntade BEGIN:VCARD"
 
-#: libbalsa/rfc6350.c:100
+#: libbalsa/rfc6350.c:107
 msgid "malformed card, END:VCARD missing"
 msgstr "felaktigt kort, saknar END:VCARD"
 
-#: libbalsa/rfc6350.c:259
+#: libbalsa/rfc6350.c:354
 #, c-format
 msgid "malformed line “%s”, missing “:”"
 msgstr "felaktig rad ”%s”, saknar ”:”"
 
-#: libbalsa/rfc6350.c:270
+#: libbalsa/rfc6350.c:365
 #, c-format
 msgid "malformed line “%s”, empty name or value"
 msgstr "felaktig rad ”%s”, tomt namn eller värde"
@@ -2872,7 +2939,7 @@ msgstr "_Enkel"
 msgid "_Descriptive Name:"
 msgstr "Beskrivande _namn:"
 
-#: libbalsa/server-config.c:125
+#: libbalsa/server-config.c:125 src/address-book-config.c:785
 msgid "probe…"
 msgstr "undersök…"
 
@@ -2890,11 +2957,11 @@ msgid "_Authentication:"
 msgstr "_Autentisering:"
 
 #. user name and password
-#: libbalsa/server-config.c:154
+#: libbalsa/server-config.c:154 src/address-book-config.c:774
 msgid "_User Name:"
 msgstr "_Användarnamn:"
 
-#: libbalsa/server-config.c:158
+#: libbalsa/server-config.c:158 src/address-book-config.c:778
 msgid "_Pass Phrase:"
 msgstr "Lösen_fras:"
 
@@ -2981,9 +3048,9 @@ msgstr ""
 "• Kryptering: %s\n"
 "• Autentisering: %s\n"
 
-#: libbalsa/server-config.c:553 src/ab-main.c:814 src/address-book-config.c:248
-#: src/address-book-config.c:356 src/address-book-config.c:397
-#: src/filter-edit-dialog.c:503 src/main-window.c:3997 src/pref-manager.c:3321
+#: libbalsa/server-config.c:553 src/ab-main.c:814 src/address-book-config.c:264
+#: src/address-book-config.c:376 src/address-book-config.c:417
+#: src/filter-edit-dialog.c:503 src/main-window.c:3997 src/pref-manager.c:3325
 msgid "_Apply"
 msgstr "_Verkställ"
 
@@ -3006,7 +3073,7 @@ msgstr "SMTP-server"
 msgid "Sp_lit message larger than"
 msgstr "Dela _upp meddelande större än"
 
-#: libbalsa/smtp-server.c:353 src/pref-manager.c:2157
+#: libbalsa/smtp-server.c:353 src/pref-manager.c:2161
 msgid "MB"
 msgstr "MB"
 
@@ -3018,7 +3085,7 @@ msgstr "Postlådan stängd"
 msgid "Message Source"
 msgstr "Meddelandekällkod"
 
-#: libbalsa/source-viewer.c:228 src/message-window.c:877
+#: libbalsa/source-viewer.c:228 src/message-window.c:912
 #, c-format
 msgid "Error adding from %s: %s\n"
 msgstr "Fel vid tillägg från %s: %s\n"
@@ -3552,119 +3619,177 @@ msgstr ""
 "Fel vid öppnande av adressboken ”%s”:\n"
 "%s"
 
-#: src/address-book-config.c:172
+#: src/address-book-config.c:188
 msgid "Suggest complete addresses:"
 msgstr "Föreslå kompletta adresser:"
 
-#: src/address-book-config.c:177
+#: src/address-book-config.c:193
 msgid "as I type"
 msgstr "när jag skriver"
 
-#: src/address-book-config.c:185
+#: src/address-book-config.c:201
 msgid "when I hit the Escape key"
 msgstr "när jag trycker Escape-tangenten"
 
-#: src/address-book-config.c:247 src/address-book-config.c:355
+#: src/address-book-config.c:263 src/address-book-config.c:375
 #, c-format
 msgid "Modify %s Address Book"
 msgstr "Ändra %s-adressbok"
 
-#: src/address-book-config.c:251 src/address-book-config.c:358
+#: src/address-book-config.c:267 src/address-book-config.c:378
 #, c-format
 msgid "Add %s Address Book"
 msgstr "Lägg till %s-adressbok"
 
-#: src/address-book-config.c:252 src/address-book-config.c:359
-#: src/address-book-config.c:401 src/mailbox-conf.c:359 src/pref-manager.c:2009
-#: src/pref-manager.c:2092 src/pref-manager.c:2815
+#: src/address-book-config.c:268 src/address-book-config.c:379
+#: src/address-book-config.c:421 src/mailbox-conf.c:359 src/pref-manager.c:2013
+#: src/pref-manager.c:2096 src/pref-manager.c:2819
 msgid "_Add"
 msgstr "_Lägg till"
 
 #. mailbox name
 #. may be NULL
 #. mailbox name
-#: src/address-book-config.c:271 src/address-book-config.c:418
-#: src/address-book-config.c:474 src/address-book-config.c:553
-#: src/address-book-config.c:622
+#. may be NULL
+#. address book name
+#: src/address-book-config.c:287 src/address-book-config.c:438
+#: src/address-book-config.c:494 src/address-book-config.c:573
+#: src/address-book-config.c:642 src/address-book-config.c:766
 msgid "A_ddress Book Name:"
 msgstr "A_dressboksnamn:"
 
-#: src/address-book-config.c:396
+#: src/address-book-config.c:416
 msgid "Modify Osmo Address Book"
 msgstr "Redigera Osmo-adressbok"
 
-#: src/address-book-config.c:400
+#: src/address-book-config.c:420
 msgid "Add Osmo Address Book"
 msgstr "Lägg till Osmo-adressbok"
 
-#: src/address-book-config.c:483
+#: src/address-book-config.c:503
 msgid "Load program location:"
 msgstr "Plats för inläsningsprogram:"
 
-#: src/address-book-config.c:488
+#: src/address-book-config.c:508
 msgid "Select load program for address book"
 msgstr "Välj inläsningsprogram för adressboken"
 
-#: src/address-book-config.c:499
+#: src/address-book-config.c:519
 msgid "Save program location:"
 msgstr "Plats för sparprogram:"
 
-#: src/address-book-config.c:504
+#: src/address-book-config.c:524
 msgid "Select save program for address book"
 msgstr "Välj sparprogram för adressboken"
 
-#: src/address-book-config.c:560
+#: src/address-book-config.c:580
 msgid "_LDAP Server URI"
 msgstr "URI för _LDAP-server"
 
-#: src/address-book-config.c:565
+#: src/address-book-config.c:585
 msgid "Base Domain _Name"
 msgstr "Basdomän_namn"
 
-#: src/address-book-config.c:570
+#: src/address-book-config.c:590
 msgid "_User Name (Bind DN)"
 msgstr "_Användarnamn (Bind-DN)"
 
-#: src/address-book-config.c:575
+#: src/address-book-config.c:595
 msgid "_Password"
 msgstr "_Lösenord"
 
-#: src/address-book-config.c:581
+#: src/address-book-config.c:601
 msgid "_User Address Book DN"
 msgstr "Namn för _användaradressbok"
 
-#: src/address-book-config.c:587
+#: src/address-book-config.c:607
 msgid "Enable _TLS"
 msgstr "Aktivera _TLS"
 
-#: src/address-book-config.c:626 src/address-book-config.c:926
+#: src/address-book-config.c:646 src/address-book-config.c:1165
 msgid "GPE Address Book"
 msgstr "GPE-adressbok"
 
-#: src/address-book-config.c:650 src/main-window.c:1049 src/main-window.c:4120
+#: src/address-book-config.c:711
+msgid "DNS service record not found"
+msgstr "DNS-tjänstpost hittades inte"
+
+#: src/address-book-config.c:712
+#, c-format
+msgid ""
+"No DNS service record for the domain “%s” and service “carddavs” found. "
+"Please enter the “https://” URI manually."
+msgstr ""
+"Ingen DNS-tjänstpost hittades för domänen ”%s” och tjänsten ”carddavs”. Ange "
+"”https://”-URI manuellt."
+
+#: src/address-book-config.c:716
+msgid "Authorization failed"
+msgstr "Auktorisering misslyckades"
+
+#: src/address-book-config.c:717
+#, c-format
+msgid ""
+"The server rejected the authorization for “%s”. Please check the user name "
+"and the pass phrase"
+msgstr ""
+"Servern nekade auktoriseringen för ”%s”. Kontrollera användarnamnet och "
+"lösenfrasen"
+
+#: src/address-book-config.c:721
+msgid "Error"
+msgstr "Fel"
+
+#: src/address-book-config.c:770
+msgid "D_omain or URL:"
+msgstr "D_omän eller URL:"
+
+#: src/address-book-config.c:789
+msgid "_CardDAV address book name:"
+msgstr "_CardDAV-adressboksnamn:"
+
+#: src/address-book-config.c:798
+msgid "_Refresh period:"
+msgstr "Uppdate_ringsperiod:"
+
+# TODO: felrapport för att skilja "more than X minutes" samt "every X minutes" på svenska
+#: src/address-book-config.c:805 src/pref-manager.c:2137
+#: src/pref-manager.c:2308 src/pref-manager.c:2952 src/pref-manager.c:3006
+msgid "minutes"
+msgstr "minut"
+
+#: src/address-book-config.c:808
+msgid "Force _Multiget for non-standard server"
+msgstr "Tvinga _Multiget för server annan än standard"
+
+#: src/address-book-config.c:836 src/main-window.c:1049 src/main-window.c:4120
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Fel vid visning av hjälp: %s\n"
 
-#: src/address-book-config.c:902
+#: src/address-book-config.c:1141
 msgid "vCard Address Book (GnomeCard)"
 msgstr "vCard-adressbok (GnomeCard)"
 
-#: src/address-book-config.c:908
+#: src/address-book-config.c:1147
 msgid "External query (a program)"
 msgstr "Extern fråga (ett program)"
 
-#: src/address-book-config.c:913
+#: src/address-book-config.c:1152
 msgid "LDIF Address Book"
 msgstr "LDIF-adressbok"
 
-#: src/address-book-config.c:919
+#: src/address-book-config.c:1158
 msgid "LDAP Address Book"
 msgstr "LDAP-adressbok"
 
-#: src/address-book-config.c:933
+#: src/address-book-config.c:1172
 msgid "Osmo Address Book"
 msgstr "Osmo-adressbok"
+
+#: src/address-book-config.c:1179
+msgid "CardDAV Address Book"
+msgstr "CardDAV-adressbok"
 
 #: src/balsa-app.c:56 src/balsa-app.c:136
 msgid "_Remember password in Secret Service"
@@ -3719,120 +3844,120 @@ msgstr[1] "Svara grupp: %d meddelanden är inte från en sändlista."
 msgid "Move to Trash failed: %s"
 msgstr "Flyttning till papperskorg misslyckades: %s"
 
-#: src/balsa-index.c:1975 ui/main-window.ui:390 ui/message-window.ui:116
+#: src/balsa-index.c:1979 ui/main-window.ui:390 ui/message-window.ui:116
 msgid "_Reply…"
 msgstr "_Svara…"
 
-#: src/balsa-index.c:1977
+#: src/balsa-index.c:1981
 msgid "Reply To _All…"
 msgstr "Svara _alla…"
 
-#: src/balsa-index.c:1979
+#: src/balsa-index.c:1983
 msgid "Reply To _Group…"
 msgstr "Svara _grupp…"
 
-#: src/balsa-index.c:1981 ui/main-window.ui:408 ui/message-window.ui:134
+#: src/balsa-index.c:1985 ui/main-window.ui:408 ui/message-window.ui:134
 msgid "_Forward Attached…"
 msgstr "_Vidarebefordra bifogat…"
 
-#: src/balsa-index.c:1983 ui/main-window.ui:414 ui/message-window.ui:140
+#: src/balsa-index.c:1987 ui/main-window.ui:414 ui/message-window.ui:140
 msgid "Forward _Inline…"
 msgstr "Vidarebefordra _infogat…"
 
-#: src/balsa-index.c:1985 ui/main-window.ui:421
+#: src/balsa-index.c:1989 ui/main-window.ui:421
 msgid "_Pipe through…"
 msgstr "Kör genom _rör…"
 
-#: src/balsa-index.c:1987 ui/main-window.ui:507
+#: src/balsa-index.c:1991 ui/main-window.ui:507
 msgid "_Store Address…"
 msgstr "_Lagra adress…"
 
-#: src/balsa-index.c:2005
+#: src/balsa-index.c:2009
 msgid "_Undelete"
 msgstr "_Återskapa"
 
-#: src/balsa-index.c:2009
+#: src/balsa-index.c:2013
 msgid "Move To _Trash"
 msgstr "Flytta till _papperskorgen"
 
-#: src/balsa-index.c:2013
+#: src/balsa-index.c:2017
 msgid "T_oggle"
 msgstr "Vä_xla"
 
-#: src/balsa-index.c:2016 ui/main-window.ui:308 ui/main-window.ui:482
+#: src/balsa-index.c:2020 ui/main-window.ui:308 ui/main-window.ui:482
 msgid "_Flagged"
 msgstr "_Flaggat"
 
-#: src/balsa-index.c:2019
+#: src/balsa-index.c:2023
 msgid "_Unread"
 msgstr "_Oläst"
 
-#: src/balsa-index.c:2027
+#: src/balsa-index.c:2031
 msgid "_Move to"
 msgstr "_Flytta till"
 
-#: src/balsa-index.c:2034
+#: src/balsa-index.c:2038
 msgid "_View Source"
 msgstr "_Visa källa"
 
-#: src/balsa-index.c:2261
+#: src/balsa-index.c:2265
 #, c-format
 msgid "Failed to copy %d message to mailbox “%s”: %s"
 msgid_plural "Failed to copy %d messages to mailbox “%s”: %s"
 msgstr[0] "Misslyckades med att kopiera %d meddelande till postlådan ”%s”: %s"
 msgstr[1] "Misslyckades med att kopiera %d meddelanden till postlådan ”%s”: %s"
 
-#: src/balsa-index.c:2273
+#: src/balsa-index.c:2277
 #, c-format
 msgid "Copied to “%s”."
 msgstr "Kopierad till ”%s”."
 
-#: src/balsa-index.c:2274
+#: src/balsa-index.c:2278
 #, c-format
 msgid "Moved to “%s”."
 msgstr "Flyttad till ”%s”."
 
-#: src/balsa-index.c:2365
+#: src/balsa-index.c:2369
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Ändring av postlådan %s misslyckades."
 
-#: src/balsa-index.c:2474
+#: src/balsa-index.c:2478
 #, c-format
 msgid "Cannot process the message: %s"
 msgstr "Kan inte behandla meddelandet: %s"
 
-#: src/balsa-index.c:2589
+#: src/balsa-index.c:2593
 #, c-format
 msgid "Cannot access message %u to pass to %s"
 msgstr "Kunde inte komma åt meddelande %u för att skicka till %s"
 
-#: src/balsa-index.c:2616
+#: src/balsa-index.c:2620
 #, c-format
 msgid "Cannot read message %u to pass to %s"
 msgstr "Kan inte läsa meddelande %u för att skicka till %s"
 
-#: src/balsa-index.c:2787
+#: src/balsa-index.c:2791
 msgid "Pipe message through a program"
 msgstr "Kör meddelandet genom ett program"
 
-#: src/balsa-index.c:2791
+#: src/balsa-index.c:2795
 msgid "_Run"
 msgstr "_Kör"
 
-#: src/balsa-index.c:2800
+#: src/balsa-index.c:2804
 msgid "Specify the program to run:"
 msgstr "Ange det program som ska köras:"
 
-#: src/balsa-mblist.c:1742
+#: src/balsa-mblist.c:1733
 msgid "_Other…"
 msgstr "_Annan…"
 
-#: src/balsa-mblist.c:1873
+#: src/balsa-mblist.c:1890
 msgid "Choose destination folder"
 msgstr "Välj destinationsmapp"
 
-#: src/balsa-mblist.c:2073
+#: src/balsa-mblist.c:2088
 msgid "Other…"
 msgstr "Annan…"
 
@@ -3889,7 +4014,7 @@ msgstr "(Ingen avsändare)"
 msgid "Could not access message %u in mailbox “%s”."
 msgstr "Kunde inte komma åt meddelandet %u i postlådan ”%s”."
 
-#: src/balsa-message.c:1211 src/main.c:519
+#: src/balsa-message.c:1211 src/main.c:528
 #, c-format
 msgid "Autocrypt error: %s"
 msgstr "Autocrypt-fel: %s"
@@ -3946,55 +4071,55 @@ msgstr "del %s: %s"
 msgid "encrypted: "
 msgstr "krypterad: "
 
-#: src/balsa-message.c:1636
+#: src/balsa-message.c:1640
 #, c-format
 msgid "Reading embedded message failed: %s"
 msgstr "Läsning av inbäddat meddelande misslyckades: %s"
 
-#: src/balsa-message.c:1644
+#: src/balsa-message.c:1648
 #, c-format
 msgid "Appending message to %s failed: %s"
 msgstr "Tillägg till meddelande till %s misslyckades: %s"
 
-#: src/balsa-message.c:1673
+#: src/balsa-message.c:1677
 msgid "_Save…"
 msgstr "S_para…"
 
-#: src/balsa-message.c:1682 src/balsa-mime-widget-message.c:458
+#: src/balsa-message.c:1686 src/balsa-mime-widget-message.c:458
 msgid "_Copy to folder…"
 msgstr "_Kopiera till mapp…"
 
 #. Translators: save to folder and open the folder in standard file manager app
-#: src/balsa-message.c:1693
+#: src/balsa-message.c:1697
 msgid "Save and open folder…"
 msgstr "Spara och öppna mapp…"
 
-#: src/balsa-message.c:1779
+#: src/balsa-message.c:1783
 msgid "Select folder for saving selected parts"
 msgstr "Välj mapp för att spara valda delar i"
 
-#: src/balsa-message.c:1844
+#: src/balsa-message.c:1848
 #, c-format
 msgid "%s message part"
 msgstr "%s meddelandedel"
 
-#: src/balsa-message.c:1865 src/balsa-message.c:1903
+#: src/balsa-message.c:1869 src/balsa-message.c:1907
 #: src/balsa-mime-widget-callbacks.c:175
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "Kunde inte spara %s: %s"
 
-#: src/balsa-message.c:1913 src/balsa-mime-widget-callbacks.c:180
+#: src/balsa-message.c:1917 src/balsa-mime-widget-callbacks.c:180
 #, c-format
 msgid "Empty part was not saved to %s"
 msgstr "Tom del sparades inte till %s"
 
-#: src/balsa-message.c:2580 src/balsa-message.c:2722
+#: src/balsa-message.c:2584 src/balsa-message.c:2726
 #, c-format
 msgid "Sending the disposition notification failed: %s"
 msgstr "Sändning av meddelandedisposition misslyckades: %s"
 
-#: src/balsa-message.c:2680
+#: src/balsa-message.c:2684
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -4005,11 +4130,11 @@ msgstr ""
 "meddelandedispositionsbekräftelse (MDN) skickas tillbaka till ”%s”.\n"
 "Vill du skicka denna bekräftelse?"
 
-#: src/balsa-message.c:2687
+#: src/balsa-message.c:2691
 msgid "Reply to MDN?"
 msgstr "Svara till MDN?"
 
-#: src/balsa-message.c:2897
+#: src/balsa-message.c:2901
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -4019,16 +4144,16 @@ msgstr ""
 "gång.\n"
 "Stäng de andra instanserna av det här meddelandet och försök igen."
 
-#: src/balsa-message.c:2918 src/balsa-message.c:3003 src/balsa-message.c:3129
+#: src/balsa-message.c:2922 src/balsa-message.c:3007 src/balsa-message.c:3133
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Tolkning av meddelandedel misslyckades: %s"
 
-#: src/balsa-message.c:2919 src/balsa-message.c:3004 src/balsa-message.c:3130
+#: src/balsa-message.c:2923 src/balsa-message.c:3008 src/balsa-message.c:3134
 msgid "Possible disk space problem."
 msgstr "Möjligen diskutrymmesproblem."
 
-#: src/balsa-message.c:2933
+#: src/balsa-message.c:2937
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains an encrypted part, but its "
@@ -4037,7 +4162,7 @@ msgstr ""
 "Meddelandet som skickades av %s med ämnet ”%s” innehåller en krypterad del, "
 "men dess struktur är ogiltig."
 
-#: src/balsa-message.c:2941
+#: src/balsa-message.c:2945
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a PGP encrypted part, but "
@@ -4046,7 +4171,7 @@ msgstr ""
 "Meddelandet som skickades av %s med ämnet ”%s” innehåller en PGP-krypterad "
 "del, men krypteringsprotokollet är inte tillgängligt."
 
-#: src/balsa-message.c:2954
+#: src/balsa-message.c:2958
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a S/MIME encrypted part, "
@@ -4055,7 +4180,7 @@ msgstr ""
 "Meddelandet som skickades av %s med ämnet ”%s” innehåller en S/MIME-"
 "krypterad del, men krypteringsprotokollet är inte tillgängligt."
 
-#: src/balsa-message.c:3021
+#: src/balsa-message.c:3025
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a signed part, but its "
@@ -4064,7 +4189,7 @@ msgstr ""
 "Meddelandet som skickades av %s med ämnet ”%s” innehåller en signerad del, "
 "men dess struktur är ogiltig. En eventuell signatur kan inte kontrolleras."
 
-#: src/balsa-message.c:3034
+#: src/balsa-message.c:3038
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a %s signed part, but this "
@@ -4073,19 +4198,19 @@ msgstr ""
 "Meddelandet som skickades av %s med ämnet ”%s” innehåller en %s-signerad "
 "del, men krypteringsprotokollet är inte tillgängligt."
 
-#: src/balsa-message.c:3037
+#: src/balsa-message.c:3041
 msgid "PGP"
 msgstr "PGP"
 
-#: src/balsa-message.c:3066
+#: src/balsa-message.c:3070
 msgid "Detected a good signature with insufficient validity"
 msgstr "Detekterade en bra signatur med otillräcklig giltighet"
 
-#: src/balsa-message.c:3071 src/balsa-message.c:3196
+#: src/balsa-message.c:3075 src/balsa-message.c:3200
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Detekterade en bra signatur med otillräcklig giltighet/tillit"
 
-#: src/balsa-message.c:3081 src/balsa-message.c:3205
+#: src/balsa-message.c:3085 src/balsa-message.c:3209
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” "
@@ -4096,7 +4221,7 @@ msgstr ""
 "returnerade:\n"
 "%s"
 
-#: src/balsa-message.c:3094
+#: src/balsa-message.c:3098
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” failed "
@@ -4105,7 +4230,7 @@ msgstr ""
 "Kontroll av signaturen för meddelandet som skickades av %s med ämnet ”%s” "
 "misslyckades med ett fel!"
 
-#: src/balsa-message.c:3156
+#: src/balsa-message.c:3160
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
@@ -4114,7 +4239,7 @@ msgstr ""
 "gång."
 
 # Armor? Bättre ord.
-#: src/balsa-message.c:3158
+#: src/balsa-message.c:3162
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
@@ -4122,7 +4247,7 @@ msgstr ""
 "Kontroll av signatur och borttagning av OpenPGP-armor kan inte genomföras på "
 "grund av att meddelandet visas mer än en gång."
 
-#: src/balsa-message.c:3161
+#: src/balsa-message.c:3165
 msgid "Please close the other instances of this message and try again."
 msgstr "Stäng de andra instanserna av det här meddelandet och försök igen."
 
@@ -4352,18 +4477,18 @@ msgstr "IMAP-servern rapporterade inte meddelandestrukturen"
 
 #: src/balsa-mime-widget-message.c:716 src/balsa-print-object-header.c:131
 #: src/sendmsg-window.c:736 src/sendmsg-window.c:738 src/sendmsg-window.c:839
-#: src/sendmsg-window.c:3625 src/sendmsg-window.c:5173
+#: src/sendmsg-window.c:3632 src/sendmsg-window.c:5180
 msgid "Subject:"
 msgstr "Ämne:"
 
 #: src/balsa-mime-widget-message.c:721 src/balsa-print-object-header.c:139
-#: src/sendmsg-window.c:3621
+#: src/sendmsg-window.c:3628
 msgid "Date:"
 msgstr "Datum:"
 
 #. addresses
 #: src/balsa-mime-widget-message.c:727 src/balsa-print-object-header.c:144
-#: src/sendmsg-window.c:3632
+#: src/sendmsg-window.c:3639
 msgid "From:"
 msgstr "Från:"
 
@@ -4481,7 +4606,7 @@ msgstr ""
 msgid "This is an iTIP calendar “%s” message."
 msgstr "Det här är ett iTIP-kalender ”%s”-meddelande."
 
-#: src/balsa-mime-widget-vcalendar.c:182 src/balsa-mime-widget-vcalendar.c:379
+#: src/balsa-mime-widget-vcalendar.c:182 src/balsa-mime-widget-vcalendar.c:374
 #: src/balsa-print-object-text.c:542
 msgid "Summary:"
 msgstr "Sammandrag:"
@@ -4490,12 +4615,12 @@ msgstr "Sammandrag:"
 msgid "Organizer:"
 msgstr "Organisatör:"
 
-#: src/balsa-mime-widget-vcalendar.c:188 src/balsa-mime-widget-vcalendar.c:380
+#: src/balsa-mime-widget-vcalendar.c:188 src/balsa-mime-widget-vcalendar.c:375
 #: src/balsa-print-object-text.c:548
 msgid "Start:"
 msgstr "Start:"
 
-#: src/balsa-mime-widget-vcalendar.c:189 src/balsa-mime-widget-vcalendar.c:381
+#: src/balsa-mime-widget-vcalendar.c:189 src/balsa-mime-widget-vcalendar.c:376
 #: src/balsa-print-object-text.c:549
 msgid "End:"
 msgstr "Slut:"
@@ -4508,7 +4633,7 @@ msgstr "Längd:"
 msgid "Recurrence:"
 msgstr "Upprepning:"
 
-#: src/balsa-mime-widget-vcalendar.c:203 src/balsa-mime-widget-vcalendar.c:382
+#: src/balsa-mime-widget-vcalendar.c:203 src/balsa-mime-widget-vcalendar.c:377
 #: src/balsa-print-object-text.c:563
 msgid "Location:"
 msgstr "Plats:"
@@ -4525,7 +4650,7 @@ msgid_plural "Categories:"
 msgstr[0] "Kategori:"
 msgstr[1] "Kategorier:"
 
-#: src/balsa-mime-widget-vcalendar.c:249 src/balsa-mime-widget-vcalendar.c:383
+#: src/balsa-mime-widget-vcalendar.c:249 src/balsa-mime-widget-vcalendar.c:378
 #: src/balsa-print-object-text.c:586
 msgid "Description:"
 msgstr "Beskrivning:"
@@ -4534,24 +4659,24 @@ msgstr "Beskrivning:"
 msgid "The sender asks you for a reply to this request:"
 msgstr "Avsändaren frågar dig om ett svar på denna begäran:"
 
-#: src/balsa-mime-widget-vcalendar.c:275
+#: src/balsa-mime-widget-vcalendar.c:273
 msgid "Accept"
 msgstr "Acceptera"
 
-#: src/balsa-mime-widget-vcalendar.c:288
+#: src/balsa-mime-widget-vcalendar.c:285
 msgid "Accept tentatively"
 msgstr "Acceptera preliminärt"
 
-#: src/balsa-mime-widget-vcalendar.c:296
+#: src/balsa-mime-widget-vcalendar.c:292
 msgid "Decline"
 msgstr "Neka"
 
-#: src/balsa-mime-widget-vcalendar.c:365
+#: src/balsa-mime-widget-vcalendar.c:360
 msgid "iTIP Calendar Request"
 msgstr "iTIP-kalenderbegäran"
 
 #. Translators: #1 message sender display name; #2 sender's event action (e.g. "accepted", "rejected", ...)
-#: src/balsa-mime-widget-vcalendar.c:377
+#: src/balsa-mime-widget-vcalendar.c:372
 #, c-format
 msgid ""
 "%s %s the following iTIP calendar request:\n"
@@ -4560,7 +4685,7 @@ msgstr ""
 "%s har satt status %s för följande iTIP-kalenderförfrågan:\n"
 "\n"
 
-#: src/balsa-mime-widget-vcalendar.c:410
+#: src/balsa-mime-widget-vcalendar.c:405
 #, c-format
 msgid "Sending the iTIP calendar reply failed: %s"
 msgstr "Sändning av iTIP-kalendersvar misslyckades: %s"
@@ -5449,7 +5574,7 @@ msgstr ""
 "_Dekryptera och kontrollera\n"
 "signaturer automatiskt:"
 
-#: src/mailbox-conf.c:894 src/pref-manager.c:214 src/pref-manager.c:1163
+#: src/mailbox-conf.c:894 src/pref-manager.c:214 src/pref-manager.c:1167
 msgid "Never"
 msgstr "Aldrig"
 
@@ -5457,7 +5582,7 @@ msgstr "Aldrig"
 msgid "If Possible"
 msgstr "Om möjligt"
 
-#: src/mailbox-conf.c:896 src/pref-manager.c:1165
+#: src/mailbox-conf.c:896 src/pref-manager.c:1169
 msgid "Always"
 msgstr "Alltid"
 
@@ -5573,68 +5698,68 @@ msgstr "_Redigera/Tillämpa filter"
 msgid "The path “%s” does not lead to a mailbox."
 msgstr "Sökvägen ”%s” leder inte till en postlåda."
 
-#: src/main.c:112 src/main.c:117 src/main.c:123 src/main.c:129 src/main.c:135
+#: src/main.c:116 src/main.c:121 src/main.c:127 src/main.c:133 src/main.c:139
 #, c-format
 msgid "Balsa cannot open your “%s” mailbox."
 msgstr "Balsa kan inte öppna din ”%s”-postlåda."
 
-#: src/main.c:112
+#: src/main.c:116
 msgid "Inbox"
 msgstr "Inkorg"
 
-#: src/main.c:118
+#: src/main.c:122
 msgid "Outbox"
 msgstr "Utkorg"
 
-#: src/main.c:124
+#: src/main.c:128
 msgid "Sentbox"
 msgstr "Skickatkorg"
 
-#: src/main.c:130
+#: src/main.c:134
 msgid "Draftbox"
 msgstr "Utkastkorg"
 
-#: src/main.c:135
+#: src/main.c:139
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: src/main.c:349
+#: src/main.c:353
 msgid "Compressing mail folders…"
 msgstr "Komprimerar postmappar…"
 
-#: src/main.c:588
+#: src/main.c:597
 msgid "Get new mail on start-up"
 msgstr "Hämta ny post vid uppstart"
 
-#: src/main.c:590
+#: src/main.c:599
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Skriv nytt meddelande till EPOST@ADRESS"
 
-#: src/main.c:592
+#: src/main.c:601
 msgid "Attach file at URI"
 msgstr "Bifoga fil på URI"
 
-#: src/main.c:594
+#: src/main.c:603
 msgid "Opens MAILBOXNAME"
 msgstr "Öppnar POSTLÅDENAMN"
 
-#: src/main.c:594
+#: src/main.c:603
 msgid "MAILBOXNAME"
 msgstr "POSTLÅDENAMN"
 
-#: src/main.c:596
+#: src/main.c:605
 msgid "Opens first unread mailbox"
 msgstr "Öppnar första olästa postlådan"
 
-#: src/main.c:598
+#: src/main.c:607
 msgid "Opens default Inbox on start-up"
 msgstr "Öppnar standardinkorgen vid uppstart"
 
-#: src/main.c:600
+#: src/main.c:609
 msgid "Prints number unread and unsent messages"
 msgstr "Skriv ut antalet olästa och ej skickade meddelanden"
 
-#: src/main.c:602
+#: src/main.c:611
 msgid "Show version"
 msgstr "Visa version"
 
@@ -5865,11 +5990,11 @@ msgstr "Nästa olästa meddelande finns i %s"
 msgid "Do you want to select %s?"
 msgstr "Vill du välja %s?"
 
-#: src/message-window.c:305 ui/message-window.ui:109
+#: src/message-window.c:307 ui/message-window.ui:109
 msgid "M_ove"
 msgstr "_Flytta"
 
-#: src/message-window.c:780
+#: src/message-window.c:815
 #, c-format
 msgid "Message from %s: %s"
 msgstr "Meddelande från %s: %s"
@@ -5894,156 +6019,150 @@ msgstr "Platt"
 msgid "JWZ"
 msgstr "JWZ"
 
-#: src/pref-manager.c:953 src/pref-manager.c:3628
+#: src/pref-manager.c:957 src/pref-manager.c:3632
 msgid "Unknown"
 msgstr "Okänd"
 
 #. Translators: #1 address book name
-#: src/pref-manager.c:957
+#: src/pref-manager.c:961
 #, c-format
 msgid "%s (default)"
 msgstr "%s (standard)"
 
-#: src/pref-manager.c:1074
+#: src/pref-manager.c:1078
 msgid "Default layout"
 msgstr "Standardlayout"
 
-#: src/pref-manager.c:1075
+#: src/pref-manager.c:1079
 msgid "Wide message layout"
 msgstr "Layout för brett meddelande"
 
-#: src/pref-manager.c:1076
+#: src/pref-manager.c:1080
 msgid "Wide screen layout"
 msgstr "Layout för bred skärm"
 
-#: src/pref-manager.c:1084
+#: src/pref-manager.c:1088
 msgid "Show next unread message"
 msgstr "Visa nästa olästa meddelande"
 
-#: src/pref-manager.c:1085
+#: src/pref-manager.c:1089
 msgid "Show next message"
 msgstr "Visa nästa meddelande"
 
-#: src/pref-manager.c:1086
+#: src/pref-manager.c:1090
 msgid "Close message window"
 msgstr "Stäng meddelandefönstret"
 
-#: src/pref-manager.c:1131
+#: src/pref-manager.c:1135
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Fel vid visning: %s: %s\n"
 
-#: src/pref-manager.c:1144
+#: src/pref-manager.c:1148
 msgid "Show nothing"
 msgstr "Visa ingenting"
 
-#: src/pref-manager.c:1146
+#: src/pref-manager.c:1150
 msgid "Show dialog"
 msgstr "Visa dialogfönster"
 
-#: src/pref-manager.c:1148
+#: src/pref-manager.c:1152
 msgid "Show in list"
 msgstr "Visa i listan"
 
-#: src/pref-manager.c:1150
+#: src/pref-manager.c:1154
 msgid "Show in status bar"
 msgstr "Visa i statusraden"
 
-#: src/pref-manager.c:1152
+#: src/pref-manager.c:1156
 msgid "Print to console"
 msgstr "Skriv ut på konsol"
 
-#: src/pref-manager.c:1164
+#: src/pref-manager.c:1168
 msgid "Ask me"
 msgstr "Fråga mig"
 
-#: src/pref-manager.c:1700
+#: src/pref-manager.c:1704
 msgid "Remote POP3 mailbox…"
 msgstr "POP3-fjärrpostlåda…"
 
-#: src/pref-manager.c:1704 ui/main-window.ui:28
+#: src/pref-manager.c:1708 ui/main-window.ui:28
 msgid "Remote IMAP folder…"
 msgstr "IMAP-fjärrmapp…"
 
-#: src/pref-manager.c:1965
+#: src/pref-manager.c:1969
 msgid "Remote mailbox servers"
 msgstr "Fjärrpostlådeservrar"
 
-#: src/pref-manager.c:1982 src/pref-manager.c:2776 src/sendmsg-window.c:2656
+#: src/pref-manager.c:1986 src/pref-manager.c:2780 src/sendmsg-window.c:2660
 msgid "Type"
 msgstr "Typ"
 
-#: src/pref-manager.c:1990
+#: src/pref-manager.c:1994
 msgid "Mailbox name"
 msgstr "Postlådenamn"
 
-#: src/pref-manager.c:2012 src/pref-manager.c:2095 src/pref-manager.c:2819
+#: src/pref-manager.c:2016 src/pref-manager.c:2099 src/pref-manager.c:2823
 msgid "_Modify"
 msgstr "_Modifiera"
 
-#: src/pref-manager.c:2034
+#: src/pref-manager.c:2038
 msgid "Local mail directory"
 msgstr "Lokal postkatalog"
 
-#: src/pref-manager.c:2037
+#: src/pref-manager.c:2041
 msgid "Select your local mail directory"
 msgstr "Välj din lokala postkatalog"
 
-#: src/pref-manager.c:2061
+#: src/pref-manager.c:2065
 msgid "Outgoing mail servers"
 msgstr "Utgående e-postservrar"
 
-#: src/pref-manager.c:2079
+#: src/pref-manager.c:2083
 msgid "Server name"
 msgstr "Servernamn"
 
-#: src/pref-manager.c:2122
+#: src/pref-manager.c:2126
 msgid "Checking"
 msgstr "Kontroll"
 
-#: src/pref-manager.c:2125
+#: src/pref-manager.c:2129
 msgid "_Check mail automatically every"
 msgstr "_Kontrollera posten automatiskt var"
 
-# TODO: felrapport för att skilja "more than X minutes" samt "every X minutes" på svenska
-#: src/pref-manager.c:2133 src/pref-manager.c:2304 src/pref-manager.c:2948
-#: src/pref-manager.c:3002
-msgid "minutes"
-msgstr "minut"
-
-#: src/pref-manager.c:2138
+#: src/pref-manager.c:2142
 msgid "Check _IMAP mailboxes"
 msgstr "Kontrollera _IMAP-postlådor"
 
-#: src/pref-manager.c:2142
+#: src/pref-manager.c:2146
 msgid "Check Inbox _only"
 msgstr "Kontrollera _endast Inkorg"
 
-#: src/pref-manager.c:2146
+#: src/pref-manager.c:2150
 msgid "Do background check quietly (no messages in status bar)"
 msgstr "Gör tyst kontroll i bakgrunden (inga meddelanden i statusraden)"
 
-#: src/pref-manager.c:2149
+#: src/pref-manager.c:2153
 msgid "_POP message size limit:"
 msgstr "Storleksgräns för POP-_meddelande:"
 
-#: src/pref-manager.c:2173
+#: src/pref-manager.c:2177
 msgid "Notification about new messages"
 msgstr "Avisering om nya meddelanden"
 
-#: src/pref-manager.c:2175
+#: src/pref-manager.c:2179
 msgid "Display message"
 msgstr "Visa meddelande"
 
-#: src/pref-manager.c:2179
+#: src/pref-manager.c:2183
 msgid "Play sound"
 msgstr "Spela ljud"
 
-#: src/pref-manager.c:2200
+#: src/pref-manager.c:2204
 msgid "Message disposition notification requests"
 msgstr "Begäranden om meddelandedispositionsbekräftelse"
 
-#: src/pref-manager.c:2205
+#: src/pref-manager.c:2209
 msgid ""
 "When I receive a message whose sender requested a Message Disposition "
 "Notification (MDN), send it if:"
@@ -6051,7 +6170,7 @@ msgstr ""
 "När jag tar emot ett meddelande och dess avsändare begärde att få en "
 "meddelandedispositionsbekräftelse (MDN) ska det skickas i följande fall:"
 
-#: src/pref-manager.c:2213
+#: src/pref-manager.c:2217
 msgid ""
 "The message header looks clean (the notify-to address is the return path, "
 "and I am in the “To:” or “CC:” list)."
@@ -6059,303 +6178,303 @@ msgstr ""
 "Meddelandehuvudet ser ok ut (aviseringsadressen är lika med returadressen "
 "och jag är i ”Till:”- eller ”Kopia:”-listan)."
 
-#: src/pref-manager.c:2227
+#: src/pref-manager.c:2231
 msgid "The message header looks suspicious."
 msgstr "Meddelandehuvudet ser konstigt ut."
 
-#: src/pref-manager.c:2251
+#: src/pref-manager.c:2255
 msgid "Word wrap"
 msgstr "Ordbrytning"
 
-#: src/pref-manager.c:2254
+#: src/pref-manager.c:2258
 msgid "Wrap outgoing text at"
 msgstr "Radbryt utgående text vid"
 
-#: src/pref-manager.c:2263 src/pref-manager.c:2513
+#: src/pref-manager.c:2267 src/pref-manager.c:2517
 msgid "characters"
 msgstr "tecken"
 
-#: src/pref-manager.c:2282
+#: src/pref-manager.c:2286
 msgid "Other options"
 msgstr "Övriga alternativ"
 
-#: src/pref-manager.c:2284
+#: src/pref-manager.c:2288
 msgid "Reply prefix:"
 msgstr "Svarsprefix:"
 
-#: src/pref-manager.c:2287
+#: src/pref-manager.c:2291
 msgid "Automatically quote original when replying"
 msgstr "Citera automatiskt originalet vid svar"
 
-#: src/pref-manager.c:2290
+#: src/pref-manager.c:2294
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "Vidarebefordra ett meddelande som bilaga i stället för att citera det"
 
-#: src/pref-manager.c:2293
+#: src/pref-manager.c:2297
 msgid "Copy outgoing messages to sentbox"
 msgstr "Kopiera utgående meddelanden till skickatkorgen"
 
-#: src/pref-manager.c:2295
+#: src/pref-manager.c:2299
 msgid "Send button always queues outgoing mail in outbox"
 msgstr "Skicka-knappen kölägger alltid utgående e-post i utkorgen"
 
-#: src/pref-manager.c:2299
+#: src/pref-manager.c:2303
 msgid "_Send queued mail automatically every"
 msgstr "_Skicka kölagd post automatiskt var"
 
-#: src/pref-manager.c:2309
+#: src/pref-manager.c:2313
 msgid "Edit headers in external editor"
 msgstr "Redigera huvuden i extern redigerare"
 
-#: src/pref-manager.c:2311
+#: src/pref-manager.c:2315
 msgid "Include HTML parts as text when replying or forwarding"
 msgstr "Inkludera HTML-delar som text vid svar eller vidarebefordran"
 
-#: src/pref-manager.c:2329 src/toolbar-prefs.c:152
+#: src/pref-manager.c:2333 src/toolbar-prefs.c:152
 msgid "Main window"
 msgstr "Huvudfönster"
 
-#: src/pref-manager.c:2332
+#: src/pref-manager.c:2336
 msgid "Use preview pane"
 msgstr "Använd förhandsgranskningspanel"
 
-#: src/pref-manager.c:2336
+#: src/pref-manager.c:2340
 msgid "Show message counts in mailbox list"
 msgstr "Visa meddelandeantal i postlådelista"
 
-#: src/pref-manager.c:2342
+#: src/pref-manager.c:2346
 msgid "Automatically view message when mailbox opened"
 msgstr "Visa automatiskt meddelanden när postlådan öppnas"
 
-#: src/pref-manager.c:2345
+#: src/pref-manager.c:2349
 msgid "Ask me before selecting a different mailbox to show an unread message"
 msgstr ""
 "Fråga mig innan en annan e-postlåda väljs för att visa ett oläst meddelande"
 
-#: src/pref-manager.c:2349
+#: src/pref-manager.c:2353
 msgid "Page Up/Page Down keys scroll text by"
 msgstr "PageUp/PageDown-tangenterna rullar text med"
 
-#: src/pref-manager.c:2357
+#: src/pref-manager.c:2361
 msgid "percent"
 msgstr "procent"
 
-#: src/pref-manager.c:2374 src/toolbar-prefs.c:170
+#: src/pref-manager.c:2378 src/toolbar-prefs.c:170
 msgid "Message window"
 msgstr "Meddelandefönster"
 
-#: src/pref-manager.c:2376
+#: src/pref-manager.c:2380
 msgid "After moving a message:"
 msgstr "Efter ett meddelande flyttats:"
 
-#: src/pref-manager.c:2397
+#: src/pref-manager.c:2401
 msgid "Sorting and threading"
 msgstr "Sortering och trådning"
 
-#: src/pref-manager.c:2399
+#: src/pref-manager.c:2403
 msgid "Default sort column:"
 msgstr "Standardsorteringskolumn:"
 
-#: src/pref-manager.c:2407
+#: src/pref-manager.c:2411
 msgid "Thread messages by default"
 msgstr "Gruppera meddelanden i trådar som standard"
 
-#: src/pref-manager.c:2409
+#: src/pref-manager.c:2413
 msgid "Expand threads on open"
 msgstr "Expandera trådar vid öppning"
 
 #. fonts
-#: src/pref-manager.c:2434 src/print-gtk.c:618
+#: src/pref-manager.c:2438 src/print-gtk.c:618
 msgid "Fonts"
 msgstr "Typsnitt"
 
-#: src/pref-manager.c:2437
+#: src/pref-manager.c:2441
 msgid "Use system fonts"
 msgstr "Använd systemtypsnitt"
 
-#: src/pref-manager.c:2445
+#: src/pref-manager.c:2449
 msgid "Use default font size"
 msgstr "Använd standardstorlek för typsnitt"
 
-#: src/pref-manager.c:2451
+#: src/pref-manager.c:2455
 msgid "Message font:"
 msgstr "Meddelandetypsnitt:"
 
-#: src/pref-manager.c:2458
+#: src/pref-manager.c:2462
 msgid "Subject font:"
 msgstr "Ämnestypsnitt:"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:2498
+#: src/pref-manager.c:2502
 msgid "Quoted and flowed text"
 msgstr "Citerad text och flödestext"
 
-#: src/pref-manager.c:2501
+#: src/pref-manager.c:2505
 msgid "Mark quoted text"
 msgstr "Markera citerad text"
 
-#: src/pref-manager.c:2504
+#: src/pref-manager.c:2508
 msgid "Quoted text regular expression:"
 msgstr "Reguljärt uttryck för citerad text:"
 
-#: src/pref-manager.c:2507
+#: src/pref-manager.c:2511
 msgid "Wrap text at"
 msgstr "Radbryt text vid"
 
-#: src/pref-manager.c:2526
+#: src/pref-manager.c:2530
 #, c-format
 msgid "HTTP cache size: %s"
 msgstr "HTTP-cachestorlek: %s"
 
 #. handling of multipart/alternative
-#: src/pref-manager.c:2559
+#: src/pref-manager.c:2563
 msgid "Display of multipart/alternative parts"
 msgstr "Visning av multipart/alternative-delar"
 
-#: src/pref-manager.c:2563
+#: src/pref-manager.c:2567
 msgid "Prefer text/plain over HTML"
 msgstr "Föredra text/plain framför HTML"
 
 #. Translators: per-sender database of exceptions over global HTTP
 #. * preferences (display HTML vs. plain, auto-load external items)
-#: src/pref-manager.c:2568
+#: src/pref-manager.c:2572
 msgid "Manage exceptions…"
 msgstr "Hantera undantag…"
 
-#: src/pref-manager.c:2576
+#: src/pref-manager.c:2580
 msgid "Clear HTTP cache…"
 msgstr "Rensa HTTP-cache…"
 
-#: src/pref-manager.c:2595
+#: src/pref-manager.c:2599
 msgid "Message colors"
 msgstr "Meddelandefärger"
 
-#: src/pref-manager.c:2600
+#: src/pref-manager.c:2604
 #, c-format
 msgid "Quote level %d color"
 msgstr "Färg på citat nivå %d"
 
-#: src/pref-manager.c:2618
+#: src/pref-manager.c:2622
 msgid "Link color"
 msgstr "Länkfärg"
 
-#: src/pref-manager.c:2620
+#: src/pref-manager.c:2624
 msgid "Hyperlink color"
 msgstr "Hyperlänksfärg"
 
-#: src/pref-manager.c:2635 src/pref-manager.c:3245
+#: src/pref-manager.c:2639 src/pref-manager.c:3249
 msgid "Format"
 msgstr "Format"
 
-#: src/pref-manager.c:2638
+#: src/pref-manager.c:2642
 msgid "Date encoding (for strftime):"
 msgstr "Datumformat (för strftime):"
 
-#: src/pref-manager.c:2640
+#: src/pref-manager.c:2644
 msgid "Selected headers:"
 msgstr "Valda rubriker:"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: src/pref-manager.c:2658
+#: src/pref-manager.c:2662
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr ""
 "Nationella tecken (8-bitarstecken) i trasiga meddelanden utan "
 "teckenkodningshuvud"
 
-#: src/pref-manager.c:2663
+#: src/pref-manager.c:2667
 msgid "display as “?”"
 msgstr "visa som ”?”"
 
-#: src/pref-manager.c:2671
+#: src/pref-manager.c:2675
 msgid "display in codeset"
 msgstr "visa i teckenkodning"
 
-#: src/pref-manager.c:2696
+#: src/pref-manager.c:2700
 msgid "Information messages"
 msgstr "Informationsmeddelanden"
 
-#: src/pref-manager.c:2700
+#: src/pref-manager.c:2704
 msgid "Information messages:"
 msgstr "Informationsmeddelanden:"
 
-#: src/pref-manager.c:2704
+#: src/pref-manager.c:2708
 msgid "Warning messages:"
 msgstr "Varningsmeddelanden:"
 
-#: src/pref-manager.c:2708
+#: src/pref-manager.c:2712
 msgid "Error messages:"
 msgstr "Felmeddelanden:"
 
-#: src/pref-manager.c:2712
+#: src/pref-manager.c:2716
 msgid "Fatal error messages:"
 msgstr "Ödesdigra felmeddelanden:"
 
-#: src/pref-manager.c:2716
+#: src/pref-manager.c:2720
 msgid "Debug messages:"
 msgstr "Felsökningsmeddelanden:"
 
-#: src/pref-manager.c:2732
+#: src/pref-manager.c:2736
 msgid "Display progress dialog"
 msgstr "Visa förloppsmätarfönster"
 
-#: src/pref-manager.c:2733
+#: src/pref-manager.c:2737
 msgid "Display progress dialog when sending messages"
 msgstr "Visa förloppsmätarfönster då meddelanden skickas"
 
-#: src/pref-manager.c:2734
+#: src/pref-manager.c:2738
 msgid "Display progress dialog when retrieving messages"
 msgstr "Visa förloppsmätarfönster då meddelanden tas emot"
 
-#: src/pref-manager.c:2756 src/pref-manager.c:3371
+#: src/pref-manager.c:2760 src/pref-manager.c:3375
 msgid "Address books"
 msgstr "Adressböcker"
 
-#: src/pref-manager.c:2784
+#: src/pref-manager.c:2788
 msgid "Address book name"
 msgstr "Adressboksnamn"
 
-#: src/pref-manager.c:2792
+#: src/pref-manager.c:2796
 msgid "Auto-complete"
 msgstr "Automatiskt komplettering"
 
-#: src/pref-manager.c:2825
+#: src/pref-manager.c:2829
 msgid "_Set as default"
 msgstr "_Sätt som standard"
 
-#: src/pref-manager.c:2842
+#: src/pref-manager.c:2846
 msgid "Miscellaneous spelling settings"
 msgstr "Diverse stavningsinställningar"
 
-#: src/pref-manager.c:2846
+#: src/pref-manager.c:2850
 msgid "Check signature"
 msgstr "Kontrollera signatur"
 
-#: src/pref-manager.c:2848
+#: src/pref-manager.c:2852
 msgid "Check quoted"
 msgstr "Kontrollera citerat"
 
-#: src/pref-manager.c:2864
+#: src/pref-manager.c:2868
 msgid "Start-up options"
 msgstr "Uppstartsalternativ"
 
-#: src/pref-manager.c:2867
+#: src/pref-manager.c:2871
 msgid "Open Inbox upon start-up"
 msgstr "Öppna inkorgen vid uppstart"
 
-#: src/pref-manager.c:2869
+#: src/pref-manager.c:2873
 msgid "Check mail upon start-up"
 msgstr "Hämta e-post vid uppstart"
 
-#: src/pref-manager.c:2871
+#: src/pref-manager.c:2875
 msgid "Remember open mailboxes between sessions"
 msgstr "Kom ihåg öppna postlådor mellan sessionerna"
 
-#: src/pref-manager.c:2889
+#: src/pref-manager.c:2893
 msgid "Folder scanning"
 msgstr "Genomsökning av mapp"
 
-#: src/pref-manager.c:2892
+#: src/pref-manager.c:2896
 msgid ""
 "Choose depth 1 for fast start-up; this defers scanning some folders. To see "
 "more of the tree at start-up, choose a greater depth."
@@ -6363,38 +6482,38 @@ msgstr ""
 "Välj djupet 1 för snabb uppstart; detta förhindrar genomsökning av vissa "
 "mappar. För att se mer av trädet vid uppstart väljer du ett större djup."
 
-#: src/pref-manager.c:2899
+#: src/pref-manager.c:2903
 msgid "Scan local folders to depth"
 msgstr "Genomsök lokala mappar på djupet"
 
-#: src/pref-manager.c:2908
+#: src/pref-manager.c:2912
 msgid "Scan IMAP folders to depth"
 msgstr "Genomsök IMAP-mappar på djupet"
 
-#: src/pref-manager.c:2930 src/pref-manager.c:3385
+#: src/pref-manager.c:2934 src/pref-manager.c:3389
 msgid "Miscellaneous"
 msgstr "Diverse"
 
-#: src/pref-manager.c:2933
+#: src/pref-manager.c:2937
 msgid "Empty trash on exit"
 msgstr "Töm papperskorgen vid avslut"
 
-#: src/pref-manager.c:2937
+#: src/pref-manager.c:2941
 msgid "Close mailbox if unused more than"
 msgstr "Stäng postlådan om den varit oanvänd mer än"
 
-#: src/pref-manager.c:2952
+#: src/pref-manager.c:2956
 msgid "Enable System Tray Icon support"
 msgstr "Aktivera ikonstöd för aktivitetsfältet"
 
-#: src/pref-manager.c:2970
+#: src/pref-manager.c:2974
 msgid "Deleting messages"
 msgstr "Tar bort meddelanden"
 
 #. Translators: this used to be "using Mailbox -> Hide messages";
 #. * the UTF-8 string for the right-arrow symbol is broken out to
 #. * avoid msgconv problems.
-#: src/pref-manager.c:2975
+#: src/pref-manager.c:2979
 #, c-format
 msgid ""
 "The following setting is global, but may be overridden for the selected "
@@ -6403,64 +6522,64 @@ msgstr ""
 "Följande inställning är global men kan åsidosättas för den valda postlådan "
 "med Postlåda %s Dölj meddelanden:"
 
-#: src/pref-manager.c:2983
+#: src/pref-manager.c:2987
 msgid "Hide messages marked as deleted"
 msgstr "Dölj meddelanden markerade som borttagna"
 
-#: src/pref-manager.c:2985
+#: src/pref-manager.c:2989
 msgid "The following settings are global:"
 msgstr "Följande inställningar är globala:"
 
-#: src/pref-manager.c:2988
+#: src/pref-manager.c:2992
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr "Rensa bort borttagna meddelanden när postlådan stängs"
 
-#: src/pref-manager.c:2992
+#: src/pref-manager.c:2996
 msgid "…and if unused more than"
 msgstr "…och om den är oanvänd mer än"
 
-#: src/pref-manager.c:3210
+#: src/pref-manager.c:3214
 msgid "Mail options"
 msgstr "E-postalternativ"
 
-#: src/pref-manager.c:3214
+#: src/pref-manager.c:3218
 msgid "Incoming"
 msgstr "Inkommande"
 
-#: src/pref-manager.c:3218
+#: src/pref-manager.c:3222
 msgid "Outgoing"
 msgstr "Utgående"
 
-#: src/pref-manager.c:3229
+#: src/pref-manager.c:3233
 msgid "Display options"
 msgstr "Visningsalternativ"
 
-#: src/pref-manager.c:3233
+#: src/pref-manager.c:3237
 msgid "Sort and thread"
 msgstr "Sortera och tråda"
 
-#: src/pref-manager.c:3237 src/print-gtk.c:610
+#: src/pref-manager.c:3241 src/print-gtk.c:610
 msgid "Message"
 msgstr "Meddelande"
 
-#: src/pref-manager.c:3241
+#: src/pref-manager.c:3245
 msgid "Colors"
 msgstr "Färger"
 
-#: src/pref-manager.c:3249
+#: src/pref-manager.c:3253
 msgid "Status messages"
 msgstr "Statusmeddelanden"
 
 #. must NOT be modal
-#: src/pref-manager.c:3316
+#: src/pref-manager.c:3320
 msgid "Balsa Preferences"
 msgstr "Inställningar för Balsa"
 
-#: src/pref-manager.c:3376 src/toolbar-factory.c:141
+#: src/pref-manager.c:3380 src/toolbar-factory.c:141
 msgid "Spelling"
 msgstr "Stavning"
 
-#: src/pref-manager.c:3381
+#: src/pref-manager.c:3385
 msgid "Start-up"
 msgstr "Uppstart"
 
@@ -6791,7 +6910,7 @@ msgstr ""
 msgid "Editing failed: %s"
 msgstr "Redigering misslyckades: %s"
 
-#: src/sendmsg-window.c:706 src/sendmsg-window.c:4809
+#: src/sendmsg-window.c:706 src/sendmsg-window.c:4816
 #, c-format
 msgid "Cannot read the file “%s”: %s"
 msgstr "Det går inte att läsa filen ”%s”: %s"
@@ -6854,7 +6973,7 @@ msgstr "Bifoga som MIME-typ:"
 msgid "Character set for file %s changed from “%s” to “%s”."
 msgstr "Teckentabell för filen %s ändrades från ”%s” till ”%s”."
 
-#: src/sendmsg-window.c:1685 src/sendmsg-window.c:5177
+#: src/sendmsg-window.c:1685 src/sendmsg-window.c:5184
 msgid "(no subject)"
 msgstr "(inget ämne)"
 
@@ -6884,7 +7003,7 @@ msgid "Attach file"
 msgstr "Bifoga fil"
 
 #: src/sendmsg-window.c:2117 src/sendmsg-window.c:2193
-#: src/sendmsg-window.c:7143
+#: src/sendmsg-window.c:7150
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
@@ -6892,88 +7011,88 @@ msgstr ""
 "Bifogande av meddelande misslyckades.\n"
 "Möjlig orsak: för lite temporärt utrymme"
 
-#: src/sendmsg-window.c:2410
+#: src/sendmsg-window.c:2414
 msgid "F_rom:"
 msgstr "_Från:"
 
 #. Subject:
-#: src/sendmsg-window.c:2560
+#: src/sendmsg-window.c:2564
 msgid "S_ubject:"
 msgstr "_Ämne:"
 
 # /* fcc: mailbox folder where the message copy will be written to */
-#: src/sendmsg-window.c:2592
+#: src/sendmsg-window.c:2596
 msgid "F_CC:"
 msgstr "F_CC:"
 
 #. Attachment list
-#: src/sendmsg-window.c:2619
+#: src/sendmsg-window.c:2623
 msgid "_Attachments:"
 msgstr "_Bifogade filer:"
 
-#: src/sendmsg-window.c:2663
+#: src/sendmsg-window.c:2667
 msgid "Mode"
 msgstr "Läge"
 
-#: src/sendmsg-window.c:2686
+#: src/sendmsg-window.c:2690
 msgid "Description"
 msgstr "Beskrivning"
 
-#: src/sendmsg-window.c:2984
+#: src/sendmsg-window.c:2991
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Kunde inte spara bilaga: %s"
 
-#: src/sendmsg-window.c:3058
+#: src/sendmsg-window.c:3065
 msgid "No subject"
 msgstr "Inget ämne"
 
-#: src/sendmsg-window.c:3107
+#: src/sendmsg-window.c:3114
 msgid "decrypted: "
 msgstr "dekrypterad: "
 
-#: src/sendmsg-window.c:3115
+#: src/sendmsg-window.c:3122
 #, c-format
 msgid "inlined file “%s” (%s)"
 msgstr "infogad fil ”%s” (%s)"
 
-#: src/sendmsg-window.c:3118
+#: src/sendmsg-window.c:3125
 #, c-format
 msgid "attached file “%s” (%s)"
 msgstr "bifogad fil ”%s” (%s)"
 
-#: src/sendmsg-window.c:3123
+#: src/sendmsg-window.c:3130
 #, c-format
 msgid "inlined %s part"
 msgstr "infogad %s-del"
 
-#: src/sendmsg-window.c:3125
+#: src/sendmsg-window.c:3132
 #, c-format
 msgid "attached %s part"
 msgstr "bifogad %s-del"
 
-#: src/sendmsg-window.c:3206
+#: src/sendmsg-window.c:3213
 #, c-format
 msgid "message from %s, subject “%s”"
 msgstr "meddelande från %s, ämne: ”%s”"
 
-#: src/sendmsg-window.c:3334
+#: src/sendmsg-window.c:3341
 msgid "quoted"
 msgstr "citerad"
 
-#: src/sendmsg-window.c:3339 src/sendmsg-window.c:3342
+#: src/sendmsg-window.c:3346 src/sendmsg-window.c:3349
 msgid "quoted attachment"
 msgstr "citerad bilaga"
 
-#: src/sendmsg-window.c:3386
+#: src/sendmsg-window.c:3393
 msgid "Select parts for quotation"
 msgstr "Välj delar för citering"
 
-#: src/sendmsg-window.c:3395
+#: src/sendmsg-window.c:3402
 msgid "Select the parts of the message which shall be quoted in the reply"
 msgstr "Välj delarna av meddelandet som ska citeras i svaret"
 
-#: src/sendmsg-window.c:3424
+#: src/sendmsg-window.c:3431
 msgid ""
 "<b>Warning:</b> The original message contains an abnormal mixture of "
 "encrypted and unencrypted parts. This <i>might</i> indicate an attack.\n"
@@ -6983,7 +7102,7 @@ msgstr ""
 "krypterade och okrypterade delar. Detta <i>kan</i> indikera en attack.\n"
 "Kontrollera svarets innehåll en gång till innan du skickar."
 
-#: src/sendmsg-window.c:3431 src/sendmsg-window.c:3506
+#: src/sendmsg-window.c:3438 src/sendmsg-window.c:3513
 msgid ""
 "You reply to an encrypted message. The reply will contain the decrypted "
 "contents of the original message.\n"
@@ -6995,70 +7114,70 @@ msgstr ""
 "Överväg att kryptera svaret, och bekräfta att du inte omedvetet läcker "
 "känslig information."
 
-#: src/sendmsg-window.c:3512
+#: src/sendmsg-window.c:3519
 msgid "Do not remind me again."
 msgstr "Påminn mig inte igen."
 
-#: src/sendmsg-window.c:3606
+#: src/sendmsg-window.c:3613
 msgid "you"
 msgstr "du"
 
-#: src/sendmsg-window.c:3615
+#: src/sendmsg-window.c:3622
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------vidarebefordrat meddelande från %s------\n"
 
-#: src/sendmsg-window.c:3652
+#: src/sendmsg-window.c:3659
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Meddelande-ID: %s\n"
 
-#: src/sendmsg-window.c:3658
+#: src/sendmsg-window.c:3665
 msgid "References:"
 msgstr "Referenser:"
 
-#: src/sendmsg-window.c:3669
+#: src/sendmsg-window.c:3676
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "Den %s skrev %s:\n"
 
-#: src/sendmsg-window.c:3671
+#: src/sendmsg-window.c:3678
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s skrev:\n"
 
-#: src/sendmsg-window.c:3937
+#: src/sendmsg-window.c:3944
 msgid "Could not save message."
 msgstr "Kunde inte spara meddelandet."
 
-#: src/sendmsg-window.c:3944
+#: src/sendmsg-window.c:3951
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Kunde inte öppna utkastkorg: %s"
 
-#: src/sendmsg-window.c:3973
+#: src/sendmsg-window.c:3980
 msgid "Message saved."
 msgstr "Meddelande sparat."
 
-#: src/sendmsg-window.c:4611 src/sendmsg-window.c:4619
-#: src/sendmsg-window.c:4626 src/sendmsg-window.c:4650
+#: src/sendmsg-window.c:4618 src/sendmsg-window.c:4626
+#: src/sendmsg-window.c:4633 src/sendmsg-window.c:4657
 #, c-format
 msgid "Could not attach the file %s: %s."
 msgstr "Kunde inte bifoga filen %s: %s."
 
-#: src/sendmsg-window.c:4612
+#: src/sendmsg-window.c:4619
 msgid "not an absolute path"
 msgstr "inte en absolut sökväg"
 
-#: src/sendmsg-window.c:4620
+#: src/sendmsg-window.c:4627
 msgid "does not exist"
 msgstr "finns inte"
 
-#: src/sendmsg-window.c:4651
+#: src/sendmsg-window.c:4658
 msgid "not in current directory"
 msgstr "inte i aktuell katalog"
 
-#: src/sendmsg-window.c:4703
+#: src/sendmsg-window.c:4710
 msgid ""
 "The link that you selected created\n"
 "a “Blind copy” (BCC) address.\n"
@@ -7070,51 +7189,51 @@ msgstr ""
 "Kontrollera att adressen är\n"
 "lämplig."
 
-#: src/sendmsg-window.c:4828
+#: src/sendmsg-window.c:4835
 msgid "Include file"
 msgstr "Inkludera fil"
 
 #. Translators: please do not translate Face.
-#: src/sendmsg-window.c:5018
+#: src/sendmsg-window.c:5025
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Kunde inte läsa in Face-huvudfilen %s: %s"
 
 #. Translators: please do not translate Face.
-#: src/sendmsg-window.c:5021
+#: src/sendmsg-window.c:5028
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Kunde inte läsa in X-Face-huvudfilen %s: %s"
 
-#: src/sendmsg-window.c:5133
+#: src/sendmsg-window.c:5140
 msgid "No Subject"
 msgstr "Inget ämne"
 
-#: src/sendmsg-window.c:5138
+#: src/sendmsg-window.c:5145
 msgid "_Send"
 msgstr "_Skicka"
 
-#: src/sendmsg-window.c:5163
+#: src/sendmsg-window.c:5170
 msgid "You did not specify a subject for this message"
 msgstr "Du angav inget ämne för detta meddelande"
 
-#: src/sendmsg-window.c:5164
+#: src/sendmsg-window.c:5171
 msgid "If you would like to provide one, enter it below."
 msgstr "Om du vill tillhandahålla en, ange den nedan."
 
-#: src/sendmsg-window.c:5225
+#: src/sendmsg-window.c:5232
 msgid "Message could be encrypted"
 msgstr "Meddelandet skulle kunna krypteras"
 
-#: src/sendmsg-window.c:5228
+#: src/sendmsg-window.c:5235
 msgid "Send _encrypted"
 msgstr "Skicka som _krypterat"
 
-#: src/sendmsg-window.c:5229
+#: src/sendmsg-window.c:5236
 msgid "Send _unencrypted"
 msgstr "Skicka _okrypterat"
 
-#: src/sendmsg-window.c:5299 src/sendmsg-window.c:5387
+#: src/sendmsg-window.c:5306 src/sendmsg-window.c:5394
 #, c-format
 msgid ""
 "You did not select encryption for this message, although %s public keys are "
@@ -7125,12 +7244,12 @@ msgstr ""
 "finns tillgängliga för alla mottagare. För att skydda din integritet kan "
 "meddelandet %s-krypteras."
 
-#: src/sendmsg-window.c:5374
+#: src/sendmsg-window.c:5381
 #, c-format
 msgid "error checking Autocrypt keys: %s"
 msgstr "fel vid kontroll av Autocrypt-nycklar: %s"
 
-#: src/sendmsg-window.c:5405
+#: src/sendmsg-window.c:5412
 msgid ""
 "\n"
 "However, encryption is discouraged as the Autocrypt status indicates that "
@@ -7140,7 +7259,7 @@ msgstr ""
 "Kryptering avrådes dock från då Autocrypt-status indikerar att vissa "
 "mottagare <i>kanske</i> inte kommer kunna läsa meddelandet."
 
-#: src/sendmsg-window.c:5418
+#: src/sendmsg-window.c:5425
 #, c-format
 msgid ""
 "<i>Note:</i> choosing encryption will import %u key from the Autocrypt "
@@ -7155,16 +7274,16 @@ msgstr[1] ""
 "<i>Obs:</i> att välja kryptering kommer att importera %u nycklar från "
 "Autocrypt-databasen till GnuPG-nyckelringen."
 
-#: src/sendmsg-window.c:5443
+#: src/sendmsg-window.c:5450
 #, c-format
 msgid "Cannot import Autocrypt keys: %s"
 msgstr "Det går inte att importera Autocrypt-nycklar: %s"
 
-#: src/sendmsg-window.c:5503
+#: src/sendmsg-window.c:5510
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "Du valde OpenPGP-säkerhet för detta meddelande.\n"
 
-#: src/sendmsg-window.c:5508
+#: src/sendmsg-window.c:5515
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
@@ -7172,13 +7291,13 @@ msgstr ""
 "Meddelandetexten kommer att skickas som vanlig text och som HTML, men endast "
 "textdelen kan signeras.\n"
 
-#: src/sendmsg-window.c:5513
+#: src/sendmsg-window.c:5520
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr ""
 "Meddelandet innehåller bilagor som inte kan signeras eller krypteras.\n"
 
-#: src/sendmsg-window.c:5517
+#: src/sendmsg-window.c:5524
 msgid ""
 "You should select MIME mode if the complete message shall be protected. Do "
 "you really want to proceed?"
@@ -7186,36 +7305,36 @@ msgstr ""
 "Du bör välja MIME-läget om hela meddelandet ska skyddas. Vill du verkligen "
 "fortsätta?"
 
-#: src/sendmsg-window.c:5537
+#: src/sendmsg-window.c:5544
 #, c-format
 msgid "sending message with GPG mode %d"
 msgstr "skickar meddelande med GPG-läge %d"
 
-#: src/sendmsg-window.c:5567
+#: src/sendmsg-window.c:5574
 msgid "Message could not be created"
 msgstr "Meddelandet kunde inte skapas"
 
-#: src/sendmsg-window.c:5569
+#: src/sendmsg-window.c:5576
 msgid "Message could not be queued in outbox"
 msgstr "Meddelandet kunde inte köläggas i utkorgen"
 
-#: src/sendmsg-window.c:5571
+#: src/sendmsg-window.c:5578
 msgid "Message could not be saved in sentbox"
 msgstr "Meddelandet kunde inte sparas i skickatkorgen"
 
-#: src/sendmsg-window.c:5573
+#: src/sendmsg-window.c:5580
 msgid "Message could not be sent"
 msgstr "Meddelandet kunde inte sändas"
 
-#: src/sendmsg-window.c:5575
+#: src/sendmsg-window.c:5582
 msgid "Message could not be signed"
 msgstr "Meddelandet kunde inte signeras"
 
-#: src/sendmsg-window.c:5577
+#: src/sendmsg-window.c:5584
 msgid "Message could not be encrypted"
 msgstr "Meddelandet kunde inte krypteras"
 
-#: src/sendmsg-window.c:5582
+#: src/sendmsg-window.c:5589
 #, c-format
 msgid ""
 "Send failed: %s\n"
@@ -7224,45 +7343,45 @@ msgstr ""
 "Sändning misslyckades: %s\n"
 "%s"
 
-#: src/sendmsg-window.c:5588
+#: src/sendmsg-window.c:5595
 #, c-format
 msgid "Send failed: %s"
 msgstr "Sändning misslyckades: %s"
 
-#: src/sendmsg-window.c:5679
+#: src/sendmsg-window.c:5686
 #, c-format
 msgid "Could not postpone message: %s"
 msgstr "Kunde inte senarelägga meddelandet: %s"
 
-#: src/sendmsg-window.c:5700
+#: src/sendmsg-window.c:5707
 msgid "Message postponed."
 msgstr "Meddelande uppskjutet."
 
-#: src/sendmsg-window.c:5705
+#: src/sendmsg-window.c:5712
 msgid "Could not postpone message."
 msgstr "Kunde inte senarelägga meddelandet."
 
-#: src/sendmsg-window.c:5917
+#: src/sendmsg-window.c:5924
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Fel vid start av stavningskontroll: %s"
 
-#: src/sendmsg-window.c:6682
+#: src/sendmsg-window.c:6689
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Svara till %s: %s"
 
-#: src/sendmsg-window.c:6687
+#: src/sendmsg-window.c:6694
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Vidarebefordra meddelande till %s: %s"
 
-#: src/sendmsg-window.c:6691
+#: src/sendmsg-window.c:6698
 #, c-format
 msgid "New message to %s: %s"
 msgstr "Nytt meddelande till %s: %s"
 
-#: src/sendmsg-window.c:6838 ui/sendmsg-window.ui:197
+#: src/sendmsg-window.c:6845 ui/sendmsg-window.ui:197
 msgid "_Language"
 msgstr "_Språk"
 

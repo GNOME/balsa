@@ -110,6 +110,10 @@ messages, and for syntax highlighting in attachments.
 `--enable-systray`
 	Enable Freedesktop System Tray Icon support (requires libxapp).
 
+`--with-webdav`
+	Enable limited support for CardDAV address books (see
+README-CardDAV.md, requires libsoup and libxml).
+
 `--disable-nls`
 	Do not use Native Language Support (Localization).
 
@@ -266,6 +270,7 @@ following custom domains are implemented in Balsa:
 - mbox-pop3: POP3 mailbox operations
 - send: message transmission
 - spell-check: internal spell checker
+- webdav: WebDAV (CardDAV) operation
 
 
 ## Reporting Bugs:

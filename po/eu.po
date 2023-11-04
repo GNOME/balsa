@@ -9,8 +9,8 @@
 msgid ""
 msgstr "Project-Id-Version: eu_to_be_translate\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-05-10 16:49+0000\n"
-"PO-Revision-Date: 2023-08-20 10:00+0100\n"
+"POT-Creation-Date: 2023-10-15 11:57+0000\n"
+"PO-Revision-Date: 2023-10-21 10:00+0100\n"
 "Last-Translator: Asier Sarasua Garmendia <asiersarasua@ni.eus>\n"
 "Language-Team: Basque <librezale@librezale.eus>\n"
 "Language: eu\n"
@@ -19,56 +19,57 @@ msgstr "Project-Id-Version: eu_to_be_translate\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: balsa.appdata.xml.in:7
+#: balsa.appdata.xml.in:6 org.desktop.Balsa.desktop.in.in:3
+#: balsa-mailto-handler.desktop.in.in:3 libbalsa/system-tray.c:102
+msgid "Balsa"
+msgstr "Balsa"
+
+#: balsa.appdata.xml.in:7 org.desktop.Balsa.desktop.in.in:4
+#: balsa-mailto-handler.desktop.in.in:4
+msgid "Email utility"
+msgstr "Posta elektronikoen utilitatea"
+
+#: balsa.appdata.xml.in:10
 msgid ""
 "Balsa is a graphical mail client. While it is in active development, Balsa "
 "has many features such as:"
 msgstr "Balsa posta-bezero grafikoa da. Oraindik garapen-bidean badago ere, Balsak dagoeneko eginbide asko ditu, adibidez:"
 
-#: balsa.appdata.xml.in:10
+#: balsa.appdata.xml.in:13
 msgid "IMAP and POP3 support;"
 msgstr "IMAP eta POP3 euskarria;"
 
-#: balsa.appdata.xml.in:11
+#: balsa.appdata.xml.in:14
 msgid "sendmail or direct SMTP support;"
 msgstr "sendmail edo SMTP euskarri zuzena;"
 
-#: balsa.appdata.xml.in:12
+#: balsa.appdata.xml.in:15
 msgid "end-to-end encryption using GnuPG or S/MIME;"
 msgstr "muturretik muturrerako zifratzea GnuPG edo S/MIME erabiliz;"
 
-#: balsa.appdata.xml.in:13
+#: balsa.appdata.xml.in:16
 msgid "multi-threaded retrieval and sending of messages;"
 msgstr "mezuak hari anitzetan atzitu eta bidaltzea;"
 
-#: balsa.appdata.xml.in:14
+#: balsa.appdata.xml.in:17
 msgid "support for all configurations of local mail folders;"
 msgstr "posta-karpeta lokalen konfigurazio guztien euskarria;"
 
-#: balsa.appdata.xml.in:15
+#: balsa.appdata.xml.in:18
 msgid "automatic mail checking;"
 msgstr "posta-egiaztatze automatikoa;"
 
-#: balsa.appdata.xml.in:16
+#: balsa.appdata.xml.in:19
 msgid "mail printing;"
 msgstr "mezuen inprimatzea;"
 
-#: balsa.appdata.xml.in:17
+#: balsa.appdata.xml.in:20
 msgid "inline attachment viewing;"
 msgstr "eranskinak mezuen barnean bistaratzea;"
 
-#: balsa.appdata.xml.in:19
+#: balsa.appdata.xml.in:22
 msgid "and the proverbial much, much more."
 msgstr "eta askoz gehiago."
-
-#: org.desktop.Balsa.desktop.in.in:3 balsa-mailto-handler.desktop.in.in:3
-#: libbalsa/system-tray.c:102
-msgid "Balsa"
-msgstr "Balsa"
-
-#: org.desktop.Balsa.desktop.in.in:4 balsa-mailto-handler.desktop.in.in:4
-msgid "Email utility"
-msgstr "Posta elektronikoen utilitatea"
 
 #: org.desktop.Balsa.desktop.in.in:5 balsa-mailto-handler.desktop.in.in:5
 msgid "Mail Client"
@@ -78,44 +79,68 @@ msgstr "Posta-bezeroa"
 msgid "Mail;E-mail;Email;IMAP"
 msgstr "posta;posta elektronikoa;emaila;IMAP"
 
-#: libbalsa/address-book.c:299 libbalsa/filter-error.c:45
+#: libbalsa/address-book.c:308 libbalsa/filter-error.c:45
 msgid "No error"
 msgstr "Errorerik ez"
 
-#: libbalsa/address-book.c:300
+#: libbalsa/address-book.c:309
 msgid "Cannot read from address book"
 msgstr "Ezin da irakurri helbide-liburutik"
 
-#: libbalsa/address-book.c:301
+#: libbalsa/address-book.c:310
 msgid "Cannot write to address book"
 msgstr "Ezin da idatzi helbide-liburuan"
 
-#: libbalsa/address-book.c:302
+#: libbalsa/address-book.c:311
 msgid "Cannot connect to the server"
 msgstr "Ezin da konektatu zerbitzarira"
 
-#: libbalsa/address-book.c:303
+#: libbalsa/address-book.c:312
 msgid "Cannot search in the address book"
 msgstr "Ezin da bilatu helbide liburuan"
 
-#: libbalsa/address-book.c:305
+#: libbalsa/address-book.c:314
 msgid "Cannot add duplicate entry"
 msgstr "Ezin da gehitu sarrera bikoizturik"
 
-#: libbalsa/address-book.c:307
+#: libbalsa/address-book.c:316
 msgid "Cannot find address in address book"
 msgstr "Ezin izan da helbidea aurkitu helbide-liburuan"
 
-#: libbalsa/address-book.c:308 libbalsa/html.c:95 src/ab-window.c:438
-#: src/balsa-message.c:1906 src/balsa-mime-widget.c:222
+#: libbalsa/address-book.c:317 libbalsa/html.c:95 src/ab-window.c:438
+#: src/balsa-message.c:1910 src/balsa-mime-widget.c:222
 #: src/balsa-mime-widget-callbacks.c:50 src/balsa-mime-widget-callbacks.c:176
 #: src/balsa-mime-widget-callbacks.c:208 src/balsa-mime-widget-crypto.c:78
 #: src/balsa-mime-widget-crypto.c:84 src/balsa-mime-widget-message.c:362
 #: src/balsa-mime-widget-text.c:255 src/main-window.c:3059
-#: src/main-window.c:4265 src/sendmsg-window.c:1446 src/sendmsg-window.c:2985
-#: src/sendmsg-window.c:3945
+#: src/main-window.c:4265 src/sendmsg-window.c:1446 src/sendmsg-window.c:2992
+#: src/sendmsg-window.c:3952
 msgid "Unknown error"
 msgstr "Errore ezezaguna"
+
+#: libbalsa/address-book-carddav.c:405 libbalsa/address-book-ldap.c:950
+#: libbalsa/server.c:340
+msgid "Balsa passwords"
+msgstr "Balsaren pasahitzak"
+
+#. Translators: #1 address book name; #2 error message
+#: libbalsa/address-book-carddav.c:411
+#, c-format
+msgid "Error saving CardDAV credentials for address book “%s”: %s"
+msgstr "Errorea CardDAV kredentzialak gordetzen “%s” helbide-libururako: %s"
+
+#. Translators: #1 address book name; #2 error message
+#: libbalsa/address-book-carddav.c:452
+#, c-format
+msgid "Error loading CardDAV credentials for address book “%s”: %s"
+msgstr "Errorea CardDAV kredentzialak kargatzen “%s” helbide-libururako: %s"
+
+#: libbalsa/address-book-carddav.c:490 libbalsa/gmime-gpgme-signature.c:239
+#: libbalsa/imap/imap-handle.c:46 libbalsa/libbalsa-carddav.c:543
+#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
+#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
+msgid "unknown"
+msgstr "ezezaguna"
 
 #. The extern database doesn't support Id's, sorry!
 #: libbalsa/address-book-extern.c:189 libbalsa/address-book-ldif.c:243
@@ -126,8 +151,8 @@ msgstr "Identifikaziorik ez"
 #: libbalsa/address-book-ldap.c:577 libbalsa/address-book-ldif.c:189
 #: libbalsa/address-book-ldif.c:227 libbalsa/address-book-ldif.c:270
 #: libbalsa/address-book-ldif.c:274 libbalsa/address-book-vcard.c:142
-#: libbalsa/address-book-vcard.c:249 libbalsa/address.c:392
-#: libbalsa/rfc6350.c:112
+#: libbalsa/address-book-vcard.c:249 libbalsa/address.c:393
+#: libbalsa/rfc6350.c:119
 msgid "No-Name"
 msgstr "Izenik ez"
 
@@ -154,10 +179,6 @@ msgstr "Ezin da %s LDAP helbide-liburua ireki: %s"
 msgid "Undefined location of user address book"
 msgstr "Erabiltzailearen helbide-liburuaren kokalekua definitu gabe"
 
-#: libbalsa/address-book-ldap.c:950 libbalsa/server.c:340
-msgid "Balsa passwords"
-msgstr "Balsaren pasahitzak"
-
 #: libbalsa/address-book-ldap.c:955
 #, c-format
 msgid "Error saving LDAP credentials for address book %s: %s"
@@ -168,7 +189,7 @@ msgstr "Errorea LDAP kredentzialak gordetzen %s helbide-libururako: %s"
 msgid "Error loading LDAP credentials for address book %s: %s"
 msgstr "Errorea LDAP kredentzialak kargatzen %s helbide-libururako: %s"
 
-#: libbalsa/address-book-ldap.c:1165
+#: libbalsa/address-book-ldap.c:1168
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr "%s LDAP zerbitzaria erorita dago, hurrengo saialdian berriro konektatzeko saioa egingo da."
@@ -178,43 +199,43 @@ msgstr "%s LDAP zerbitzaria erorita dago, hurrengo saialdian berriro konektatzek
 msgid "Reading Osmo contacts failed: %s"
 msgstr "Huts egin du Osmo kontaktuak irakurtzeak: %s"
 
-#: libbalsa/address.c:955
+#: libbalsa/address.c:957
 msgid "D_isplayed Name:"
 msgstr "B_istaratutako izena:"
 
-#: libbalsa/address.c:956
+#: libbalsa/address.c:958
 msgid "_First Name:"
 msgstr "I_zena:"
 
-#: libbalsa/address.c:957
+#: libbalsa/address.c:959
 msgid "_Last Name:"
 msgstr "A_bizena:"
 
-#: libbalsa/address.c:958
+#: libbalsa/address.c:960
 msgid "_Nickname:"
 msgstr "_Goitizena:"
 
-#: libbalsa/address.c:959
+#: libbalsa/address.c:961
 msgid "O_rganization:"
 msgstr "E_rakundea:"
 
-#: libbalsa/address.c:960
+#: libbalsa/address.c:962
 msgid "_Email Address:"
 msgstr "_Helbide elektronikoa:"
 
-#: libbalsa/address.c:980 src/filter-edit-callbacks.c:1069
+#: libbalsa/address.c:982 src/filter-edit-callbacks.c:1069
 msgid "A_dd"
 msgstr "G_ehitu"
 
 #: libbalsa/address-view.c:193 src/balsa-mime-widget-message.c:738
 #: src/balsa-print-object-header.c:146 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:3640
+#: src/sendmsg-window.c:3647
 msgid "To:"
 msgstr "Nori:"
 
 #: libbalsa/address-view.c:194 src/balsa-mime-widget-message.c:740
 #: src/balsa-print-object-header.c:148 src/sendmsg-window.c:670
-#: src/sendmsg-window.c:3648
+#: src/sendmsg-window.c:3655
 msgid "CC:"
 msgstr "CC:"
 
@@ -360,9 +381,9 @@ msgstr "“%s” erabiltzailea txertatzeak huts egin du: %s"
 msgid "_Show details…"
 msgstr "Erakutsi xehetasunak…"
 
-#: libbalsa/autocrypt.c:933 libbalsa/html-pref-db.c:457 src/balsa-index.c:2001
-#: src/mailbox-node.c:1040 src/mailbox-node.c:1056 src/pref-manager.c:2014
-#: src/pref-manager.c:2099 src/pref-manager.c:2822 ui/ab-main.ui:44
+#: libbalsa/autocrypt.c:933 libbalsa/html-pref-db.c:457 src/balsa-index.c:2005
+#: src/mailbox-node.c:1040 src/mailbox-node.c:1056 src/pref-manager.c:2018
+#: src/pref-manager.c:2103 src/pref-manager.c:2826 ui/ab-main.ui:44
 #: ui/main-window.ui:348
 msgid "_Delete"
 msgstr "_Ezabatu"
@@ -520,7 +541,7 @@ msgstr "Huts egin du MIME zatia deszifratzean: analisi-errorea"
 
 #: libbalsa/gmime-gpgme-signature.c:147 libbalsa/libbalsa-gpgme-widgets.c:371
 #: libbalsa/libbalsa-gpgme-widgets.c:744 libbalsa/rfc3156.c:550
-#: src/address-book-config.c:192
+#: src/address-book-config.c:208
 msgid "never"
 msgstr "inoiz ere ez"
 
@@ -565,49 +586,43 @@ msgid ""
 msgstr "\n"
 "Gakoaren hatz-marka: %s"
 
-#: libbalsa/gmime-gpgme-signature.c:239 libbalsa/imap/imap-handle.c:46
-#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546
-#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5375
-msgid "unknown"
-msgstr "ezezaguna"
-
-#: libbalsa/gmime-multipart-crypt.c:230
+#: libbalsa/gmime-multipart-crypt.c:235
 msgid "Cannot verify multipart/signed part due to missing subparts."
 msgstr "Ezin da egiaztatu multipart/sinatutako zatia, azpiatalak falta baitira."
 
-#: libbalsa/gmime-multipart-crypt.c:254
+#: libbalsa/gmime-multipart-crypt.c:259
 #, c-format
 msgid "unsupported protocol “%s”"
 msgstr "Onartzen ez den “%s” protokoloa"
 
-#: libbalsa/gmime-multipart-crypt.c:267
+#: libbalsa/gmime-multipart-crypt.c:272
 msgid ""
 "Cannot verify multipart/signed part: signature content-type does not match "
 "protocol."
 msgstr "Ezin da egiaztatu multipart/sinatutako zatia: sindaduraren content-type elementua ez dator bat protokoloarekin."
 
-#: libbalsa/gmime-multipart-crypt.c:463
+#: libbalsa/gmime-multipart-crypt.c:468
 #, c-format
 msgid ""
 "Cannot decrypt multipart/encrypted part: unsupported encryption protocol "
 "“%s”."
 msgstr "Ezin da deszifratu multipart/sinatutako zatia: onartzen ez den zifratze-protokoloa (“%s”)."
 
-#: libbalsa/gmime-multipart-crypt.c:464
+#: libbalsa/gmime-multipart-crypt.c:469
 msgid "(none)"
 msgstr "(bat ere ez)"
 
-#: libbalsa/gmime-multipart-crypt.c:477
+#: libbalsa/gmime-multipart-crypt.c:482
 msgid ""
 "Cannot decrypt multipart/encrypted part: content-type does not match "
 "protocol."
 msgstr "Ezin da deszifratu multipart/sinatutako zatia: content-type elementua ez dator bat protokoloarekin."
 
-#: libbalsa/gmime-multipart-crypt.c:492
+#: libbalsa/gmime-multipart-crypt.c:497
 msgid "Cannot decrypt multipart/encrypted part: unexpected content type"
 msgstr "Ezin da deszifratu multipart/sinatutako zatia: espero ez zen content-type elementua."
 
-#: libbalsa/gmime-multipart-crypt.c:534
+#: libbalsa/gmime-multipart-crypt.c:539
 msgid ""
 "Cannot decrypt multipart/encrypted part: failed to parse decrypted content"
 msgstr "Ezin da deszifratu multipart/sinatutako zatia: ezin izan da analizatu deszifratutako edukia."
@@ -683,13 +698,13 @@ msgstr "Ezin da datu-baseko sarrera ezabatu: %s"
 
 #. should "re" be localized ?
 #: libbalsa/identity.c:105 libbalsa/mailbox_local.c:2007
-#: libbalsa/mailbox_local.c:2009 src/sendmsg-window.c:3893
-#: src/sendmsg-window.c:3895
+#: libbalsa/mailbox_local.c:2009 src/sendmsg-window.c:3900
+#: src/sendmsg-window.c:3902
 msgid "Re:"
 msgstr "Re:"
 
-#: libbalsa/identity.c:106 src/sendmsg-window.c:3832 src/sendmsg-window.c:3833
-#: src/sendmsg-window.c:3834
+#: libbalsa/identity.c:106 src/sendmsg-window.c:3839 src/sendmsg-window.c:3840
+#: src/sendmsg-window.c:3841
 msgid "Fwd:"
 msgstr "Fwd:"
 
@@ -719,32 +734,32 @@ msgstr "“%s”(e)ko sinadura ez da UTF-8 testua."
 
 #: libbalsa/identity.c:364 libbalsa/libbalsa-gpgme-cb.c:181
 #: libbalsa/libbalsa-gpgme-cb.c:357 libbalsa/smtp-server.c:330
-#: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:259
-#: src/address-book-config.c:367 src/address-book-config.c:410
-#: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2792
-#: src/balsa-mblist.c:1877 src/balsa-message.c:1782
+#: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:275
+#: src/address-book-config.c:387 src/address-book-config.c:430
+#: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2796
+#: src/balsa-mblist.c:1894 src/balsa-message.c:1786
 #: src/balsa-mime-widget-callbacks.c:89 src/filter-edit-callbacks.c:1257
 #: src/filter-edit-dialog.c:399 src/filter-edit-dialog.c:575
 #: src/filter-export-dialog.c:81 src/filter-run-dialog.c:302
 #: src/folder-conf.c:340 src/folder-conf.c:473 src/folder-conf.c:873
 #: src/folder-conf.c:1122 src/mailbox-conf.c:203 src/mailbox-conf.c:225
 #: src/mailbox-conf.c:241 src/mailbox-conf.c:726 src/mailbox-conf.c:780
-#: src/pref-manager.c:3322 src/sendmsg-window.c:489 src/sendmsg-window.c:1541
-#: src/sendmsg-window.c:2011 src/sendmsg-window.c:3391
-#: src/sendmsg-window.c:4831 src/sendmsg-window.c:5137
-#: src/sendmsg-window.c:5230 src/spell-check.c:392 src/store-address.c:204
+#: src/pref-manager.c:3326 src/sendmsg-window.c:489 src/sendmsg-window.c:1541
+#: src/sendmsg-window.c:2011 src/sendmsg-window.c:3398
+#: src/sendmsg-window.c:4838 src/sendmsg-window.c:5144
+#: src/sendmsg-window.c:5237 src/spell-check.c:392 src/store-address.c:204
 msgid "_Cancel"
 msgstr "_Utzi"
 
 #: libbalsa/identity.c:365 libbalsa/libbalsa-gpgme-cb.c:180
 #: libbalsa/libbalsa-gpgme-cb.c:356 libbalsa/smtp-server.c:329
 #: src/ab-window.c:140 src/balsa-app.c:91 src/balsa-app.c:156
-#: src/balsa-message.c:1783 src/balsa-mime-widget-callbacks.c:90
+#: src/balsa-message.c:1787 src/balsa-mime-widget-callbacks.c:90
 #: src/filter-edit-callbacks.c:1256 src/filter-edit-dialog.c:574
 #: src/filter-export-dialog.c:80 src/filter-run-dialog.c:301
-#: src/folder-conf.c:341 src/main-window.c:4046 src/pref-manager.c:3320
+#: src/folder-conf.c:341 src/main-window.c:4046 src/pref-manager.c:3324
 #: src/sendmsg-window.c:1540 src/sendmsg-window.c:2012
-#: src/sendmsg-window.c:3390 src/sendmsg-window.c:4832 src/store-address.c:205
+#: src/sendmsg-window.c:3397 src/sendmsg-window.c:4839 src/store-address.c:205
 msgid "_OK"
 msgstr "_Ados"
 
@@ -953,11 +968,11 @@ msgid "Manage Identities"
 msgstr "Kudeatu identitateak"
 
 #: libbalsa/identity.c:1646 libbalsa/smtp-server.c:331
-#: src/address-book-config.c:260 src/address-book-config.c:365
-#: src/address-book-config.c:408 src/filter-edit-callbacks.c:1258
+#: src/address-book-config.c:276 src/address-book-config.c:385
+#: src/address-book-config.c:428 src/filter-edit-callbacks.c:1258
 #: src/filter-edit-dialog.c:576 src/filter-export-dialog.c:82
 #: src/filter-run-dialog.c:303 src/folder-conf.c:474 src/folder-conf.c:874
-#: src/main-window.c:3937 src/pref-manager.c:3323 src/toolbar-prefs.c:126
+#: src/main-window.c:3937 src/pref-manager.c:3327 src/toolbar-prefs.c:126
 #: ui/ab-main.ui:70 ui/main-window.ui:543
 msgid "_Help"
 msgstr "_Laguntza"
@@ -1097,27 +1112,27 @@ msgstr "“%s”(e)ko harpidetza bertan behera uzteak huts egin du"
 msgid "do not show again"
 msgstr "ez erakutsi berriro"
 
-#: libbalsa/libbalsa.c:404
+#: libbalsa/libbalsa.c:407
 msgid "broken TLS certificate"
 msgstr "TLS ziurtagiri hautsia"
 
-#: libbalsa/libbalsa.c:408
+#: libbalsa/libbalsa.c:411
 msgid "SSL/TLS certificate"
 msgstr "SSL/TLS ziurtagiria"
 
-#: libbalsa/libbalsa.c:412
+#: libbalsa/libbalsa.c:415
 msgid "_Accept Once"
 msgstr "On_artu behin"
 
-#: libbalsa/libbalsa.c:413
+#: libbalsa/libbalsa.c:416
 msgid "Accept & _Save"
 msgstr "Onartu eta _gorde"
 
-#: libbalsa/libbalsa.c:414
+#: libbalsa/libbalsa.c:417
 msgid "_Reject"
 msgstr "_Ezetsi"
 
-#: libbalsa/libbalsa.c:420
+#: libbalsa/libbalsa.c:423
 #, c-format
 msgid ""
 "<big><b>Authenticity of this certificate could not be verified.</b></big>\n"
@@ -1125,67 +1140,90 @@ msgid ""
 msgstr "<big><b>Ziurtagiri honen benetakotasuna ezin izan da egiaztatu.</b></big>\n"
 "Arrazoia: %s"
 
-#: libbalsa/libbalsa.c:461
+#: libbalsa/libbalsa.c:464
 msgid "the signing certificate authority is not known"
 msgstr "sinaduraren ziurtagiri-emailea ez da ezaguna"
 
-#: libbalsa/libbalsa.c:462
+#: libbalsa/libbalsa.c:465
 msgid ""
 "the certificate does not match the expected identity of the site that it was "
 "retrieved from"
 msgstr "ziurtagiria ez dator bat hura eskuratu zeneko gunean espero zen identitatearekin"
 
-#: libbalsa/libbalsa.c:463
+#: libbalsa/libbalsa.c:466
 msgid "the certificate’s activation time is still in the future"
 msgstr "ziurtagiria aktibatzeko data oraindik etorkizunekoa da"
 
-#: libbalsa/libbalsa.c:464
+#: libbalsa/libbalsa.c:467
 msgid "the certificate has expired"
 msgstr "ziurtagiria iraungi da"
 
-#: libbalsa/libbalsa.c:465
+#: libbalsa/libbalsa.c:468
 msgid "the certificate has been revoked"
 msgstr "ziurtagiria errebokatu da"
 
-#: libbalsa/libbalsa.c:466
+#: libbalsa/libbalsa.c:469
 msgid "the certificate’s algorithm is considered insecure"
 msgstr "ziurtagiriaren algoritmoa ez da segurutzat jotzen"
 
-#: libbalsa/libbalsa.c:467
+#: libbalsa/libbalsa.c:470
 msgid "an error occurred validating the certificate"
 msgstr "errorea gertatu da ziurtagiria balioztatzean"
 
-#: libbalsa/libbalsa.c:483
+#: libbalsa/libbalsa.c:486
 #, c-format
 msgid "unknown certificate validation error %u"
 msgstr "ziurtagiriaren balioztatze-errore ezezaguna, %u"
 
-#: libbalsa/libbalsa.c:562
+#: libbalsa/libbalsa.c:565
 msgid "No image data"
 msgstr "Irudi-daturik ez"
 
-#: libbalsa/libbalsa.c:596
+#: libbalsa/libbalsa.c:599
 msgid "Invalid input format"
 msgstr "Sarrera-formatu baliogabea"
 
-#: libbalsa/libbalsa.c:600
+#: libbalsa/libbalsa.c:603
 msgid "Internal buffer overrun"
 msgstr "Barneko bufferrak gainezka egin du"
 
 #. Translators: please do not translate Face.
-#: libbalsa/libbalsa.c:617
+#: libbalsa/libbalsa.c:620
 msgid "Bad X-Face data"
 msgstr "X-Face-ren datu okerrak"
 
-#: libbalsa/libbalsa.c:716
+#: libbalsa/libbalsa.c:719
 #, c-format
 msgid "Cannot play sound event “%s”: %s"
 msgstr "Ezin da “%s” soinu-gertaera erreproduzitu: %s"
 
-#: libbalsa/libbalsa.c:732
+#: libbalsa/libbalsa.c:735
 #, c-format
 msgid "Cannot play sound file “%s”: %s"
 msgstr "Ezin da “%s” soinu-fitxategia erreproduzitu: %s"
+
+#: libbalsa/libbalsa-carddav.c:442
+msgid "The server returned an invalid reply."
+msgstr "Zerbitzariak sarrera baliogabea itzuli du."
+
+#: libbalsa/libbalsa-carddav.c:514
+msgid "The server does not support any usable address book report."
+msgstr "Zerbitzariak ez du onartzen helbide-liburuen txosten erabilgarririk."
+
+#. Translators: #1 address book name, #2 address book URL, #3 error message
+#: libbalsa/libbalsa-carddav.c:542
+#, c-format
+msgid ""
+"CardDAV error for address book “%s” (URL %s):\n"
+"%s"
+msgstr "CardDAV errorea “%s” helbide-libururako (%s URLa):\n"
+"%s"
+
+#. Translators: #1 error message
+#: libbalsa/libbalsa-carddav.c:564
+#, c-format
+msgid "CardDAV error: %s"
+msgstr "CardDAV errorea: %s"
 
 #: libbalsa/libbalsa-conf.c:139
 msgid "Your Balsa configuration is now stored in “~/.balsa/config”."
@@ -1195,7 +1233,7 @@ msgstr "Zure Balsa konfigurazioa “~/.balsa/config” direktorioan gorde da."
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: libbalsa/libbalsa-gpgme.c:184 src/balsa-message.c:3037
+#: libbalsa/libbalsa-gpgme.c:184 src/balsa-message.c:3041
 msgid "S/MIME"
 msgstr "S/MIME"
 
@@ -1317,7 +1355,7 @@ msgid "User ID"
 msgstr "Erabiltzailearen ID"
 
 #: libbalsa/libbalsa-gpgme-cb.c:283 src/balsa-index.c:456
-#: src/pref-manager.c:222 src/sendmsg-window.c:2674
+#: src/pref-manager.c:222 src/sendmsg-window.c:2678
 msgid "Size"
 msgstr "Tamaina"
 
@@ -1662,7 +1700,7 @@ msgstr " “%s” kurba"
 msgid "_Hide"
 msgstr "_Ezkutatu"
 
-#: libbalsa/libbalsa-vfs.c:406 src/sendmsg-window.c:4627
+#: libbalsa/libbalsa-vfs.c:406 src/sendmsg-window.c:4634
 msgid "not a regular file"
 msgstr "ez da fitxategi arrunta"
 
@@ -1679,6 +1717,34 @@ msgstr "Ireki honekin: %s"
 #, c-format
 msgid "Open _part with %s"
 msgstr "Ireki _zatia honekin: %s"
+
+#: libbalsa/libbalsa-webdav.c:237 libbalsa/libbalsa-webdav.c:290
+msgid "failed to evaluate XPath expression"
+msgstr "huts egin du XPath adierazpenaren ebaluazioak"
+
+#. Translators: #1 HTTP (RFC 2616) status code, #2 HTTP status message
+#: libbalsa/libbalsa-webdav.c:349 libbalsa/libbalsa-webdav.c:402
+#: libbalsa/libbalsa-webdav.c:721 libbalsa/libbalsa-webdav.c:818
+#, c-format
+msgid "WebDAV response %d: %s"
+msgstr "WebDAV %d erantzuna: %s"
+
+#: libbalsa/libbalsa-webdav.c:725 libbalsa/libbalsa-webdav.c:732
+#: libbalsa/libbalsa-webdav.c:820
+msgid "WebDAV: empty response"
+msgstr "WebDAV: erantzun hutsa"
+
+#: libbalsa/libbalsa-webdav.c:736 libbalsa/libbalsa-webdav.c:824
+msgid "cannot parse the WebDAV server response as XML"
+msgstr "ezin da analizatu WebDAV zerbitzariaren erantzuna XML gisa"
+
+#: libbalsa/libbalsa-webdav.c:963
+msgid "cannot add namespaces to XPath context"
+msgstr "ezin zaizkio izen-espazioak gehitu XPath edukiari"
+
+#: libbalsa/libbalsa-webdav.c:966
+msgid "cannot create XPath context"
+msgstr "ezin da XPath testuingurua sortu"
 
 #: libbalsa/mailbox.c:539
 #, c-format
@@ -2666,20 +2732,20 @@ msgstr "osoa"
 msgid "ultimate"
 msgstr "azkena"
 
-#: libbalsa/rfc6350.c:62
+#: libbalsa/rfc6350.c:69
 msgid "malformed card, BEGIN:VCARD expected"
 msgstr "formatu okerreko txartela, BEGIN:VCARD espero zen"
 
-#: libbalsa/rfc6350.c:100
+#: libbalsa/rfc6350.c:107
 msgid "malformed card, END:VCARD missing"
 msgstr "formatu okerreko txartela, END:VCARD espero zen"
 
-#: libbalsa/rfc6350.c:259
+#: libbalsa/rfc6350.c:354
 #, c-format
 msgid "malformed line “%s”, missing “:”"
 msgstr "formatu okerreko “%s” lerroa, “:” falta da"
 
-#: libbalsa/rfc6350.c:270
+#: libbalsa/rfc6350.c:365
 #, c-format
 msgid "malformed line “%s”, empty name or value"
 msgstr "formatu okerreko “%s” lerroa, hutsik dagoen izen edo balioa"
@@ -2794,7 +2860,7 @@ msgstr "_Oinarrizkoa"
 msgid "_Descriptive Name:"
 msgstr "Izen _argigarria:"
 
-#: libbalsa/server-config.c:125
+#: libbalsa/server-config.c:125 src/address-book-config.c:785
 msgid "probe…"
 msgstr "probatu…"
 
@@ -2812,11 +2878,11 @@ msgid "_Authentication:"
 msgstr "A_utentifikazioa:"
 
 #. user name and password
-#: libbalsa/server-config.c:154
+#: libbalsa/server-config.c:154 src/address-book-config.c:774
 msgid "_User Name:"
 msgstr "_Erabiltzaile-izena:"
 
-#: libbalsa/server-config.c:158
+#: libbalsa/server-config.c:158 src/address-book-config.c:778
 msgid "_Pass Phrase:"
 msgstr "_Pasaesaldia:"
 
@@ -2902,9 +2968,9 @@ msgstr "Probaren emaitzak %s zerbitzarirako\n"
 "• Zifratzea: %s\n"
 "• Autentifikazioa: %s\n"
 
-#: libbalsa/server-config.c:553 src/ab-main.c:814 src/address-book-config.c:248
-#: src/address-book-config.c:356 src/address-book-config.c:397
-#: src/filter-edit-dialog.c:503 src/main-window.c:3997 src/pref-manager.c:3321
+#: libbalsa/server-config.c:553 src/ab-main.c:814 src/address-book-config.c:264
+#: src/address-book-config.c:376 src/address-book-config.c:417
+#: src/filter-edit-dialog.c:503 src/main-window.c:3997 src/pref-manager.c:3325
 msgid "_Apply"
 msgstr "_Aplikatu"
 
@@ -2927,7 +2993,7 @@ msgstr "SMTP zerbitzaria"
 msgid "Sp_lit message larger than"
 msgstr "Zatitu mezuak, hau baino handiagoak badira:"
 
-#: libbalsa/smtp-server.c:353 src/pref-manager.c:2157
+#: libbalsa/smtp-server.c:353 src/pref-manager.c:2161
 msgid "MB"
 msgstr "MB"
 
@@ -2939,7 +3005,7 @@ msgstr "Postontzia itxia dago"
 msgid "Message Source"
 msgstr "Mezu-iturburua"
 
-#: libbalsa/source-viewer.c:228 src/message-window.c:877
+#: libbalsa/source-viewer.c:228 src/message-window.c:912
 #, c-format
 msgid "Error adding from %s: %s\n"
 msgstr "Errorea %s(e)tik gehitzean: %s\n"
@@ -3450,119 +3516,172 @@ msgid ""
 msgstr "Errorea “%s” helbide-liburua irekitzean:\n"
 "%s"
 
-#: src/address-book-config.c:172
+#: src/address-book-config.c:188
 msgid "Suggest complete addresses:"
 msgstr "Proposatu helbide osoa:"
 
-#: src/address-book-config.c:177
+#: src/address-book-config.c:193
 msgid "as I type"
 msgstr "idatzi ahala"
 
-#: src/address-book-config.c:185
+#: src/address-book-config.c:201
 msgid "when I hit the Escape key"
 msgstr "Ihes tekla sakatzean"
 
-#: src/address-book-config.c:247 src/address-book-config.c:355
+#: src/address-book-config.c:263 src/address-book-config.c:375
 #, c-format
 msgid "Modify %s Address Book"
 msgstr "Aldatu %s helbide-liburua"
 
-#: src/address-book-config.c:251 src/address-book-config.c:358
+#: src/address-book-config.c:267 src/address-book-config.c:378
 #, c-format
 msgid "Add %s Address Book"
 msgstr "Gehitu %s helbide-liburua"
 
-#: src/address-book-config.c:252 src/address-book-config.c:359
-#: src/address-book-config.c:401 src/mailbox-conf.c:359 src/pref-manager.c:2009
-#: src/pref-manager.c:2092 src/pref-manager.c:2815
+#: src/address-book-config.c:268 src/address-book-config.c:379
+#: src/address-book-config.c:421 src/mailbox-conf.c:359 src/pref-manager.c:2013
+#: src/pref-manager.c:2096 src/pref-manager.c:2819
 msgid "_Add"
 msgstr "_Gehitu"
 
 #. mailbox name
 #. may be NULL
 #. mailbox name
-#: src/address-book-config.c:271 src/address-book-config.c:418
-#: src/address-book-config.c:474 src/address-book-config.c:553
-#: src/address-book-config.c:622
+#. may be NULL
+#. address book name
+#: src/address-book-config.c:287 src/address-book-config.c:438
+#: src/address-book-config.c:494 src/address-book-config.c:573
+#: src/address-book-config.c:642 src/address-book-config.c:766
 msgid "A_ddress Book Name:"
 msgstr "_Helbide-liburuaren izena:"
 
-#: src/address-book-config.c:396
+#: src/address-book-config.c:416
 msgid "Modify Osmo Address Book"
 msgstr "Aldatu Osmo helbide-liburua"
 
-#: src/address-book-config.c:400
+#: src/address-book-config.c:420
 msgid "Add Osmo Address Book"
 msgstr "Gehitu Osmo helbide-liburua"
 
-#: src/address-book-config.c:483
+#: src/address-book-config.c:503
 msgid "Load program location:"
 msgstr "Kargatze-programaren kokalekua:"
 
-#: src/address-book-config.c:488
+#: src/address-book-config.c:508
 msgid "Select load program for address book"
 msgstr "Hautatu helbide-liburuaren kargatze-programa"
 
-#: src/address-book-config.c:499
+#: src/address-book-config.c:519
 msgid "Save program location:"
 msgstr "Gordetze-programaren kokalekua:"
 
-#: src/address-book-config.c:504
+#: src/address-book-config.c:524
 msgid "Select save program for address book"
 msgstr "Hautatu helbide-liburuaren gordetze-programa"
 
-#: src/address-book-config.c:560
+#: src/address-book-config.c:580
 msgid "_LDAP Server URI"
 msgstr "_LDAP zerbitzariaren URIa"
 
-#: src/address-book-config.c:565
+#: src/address-book-config.c:585
 msgid "Base Domain _Name"
 msgstr "Oinarrizko domeinuaren _izena"
 
-#: src/address-book-config.c:570
+#: src/address-book-config.c:590
 msgid "_User Name (Bind DN)"
 msgstr "_Erabiltzaile-izena (Bind DN)"
 
-#: src/address-book-config.c:575
+#: src/address-book-config.c:595
 msgid "_Password"
 msgstr "_Pasahitza"
 
-#: src/address-book-config.c:581
+#: src/address-book-config.c:601
 msgid "_User Address Book DN"
 msgstr "_Erabiltzailearen helbide-liburua (DN)"
 
-#: src/address-book-config.c:587
+#: src/address-book-config.c:607
 msgid "Enable _TLS"
 msgstr "Gaitu _TLS"
 
-#: src/address-book-config.c:626 src/address-book-config.c:926
+#: src/address-book-config.c:646 src/address-book-config.c:1165
 msgid "GPE Address Book"
 msgstr "GPE helbide-liburua"
 
-#: src/address-book-config.c:650 src/main-window.c:1049 src/main-window.c:4120
+#: src/address-book-config.c:711
+msgid "DNS service record not found"
+msgstr "Ez da aurkitu DNS zerbitzuaren erregistroa"
+
+#: src/address-book-config.c:712
+#, c-format
+msgid ""
+"No DNS service record for the domain “%s” and service “carddavs” found. "
+"Please enter the “https://” URI manually."
+msgstr "Ez dago DNS zerbitzuaren erregistrorik “%s” domeinurako eta “carddavs” zerbitzurako. Sartu “https://” URIa eskuz."
+
+#: src/address-book-config.c:716
+msgid "Authorization failed"
+msgstr "Autorizazioak huts egin du"
+
+#: src/address-book-config.c:717
+#, c-format
+msgid ""
+"The server rejected the authorization for “%s”. Please check the user name "
+"and the pass phrase"
+msgstr "Zerbitzariak “%s” erabiltzailearen baimena baztertu du. Egiaztatu erabiltzaile-izena eta pasaesaldia."
+
+#: src/address-book-config.c:721
+msgid "Error"
+msgstr "Errorea"
+
+#: src/address-book-config.c:770
+msgid "D_omain or URL:"
+msgstr "D_omeinua edo URLa:"
+
+#: src/address-book-config.c:789
+msgid "_CardDAV address book name:"
+msgstr "_CardDAV helbide-liburuaren izena:"
+
+#: src/address-book-config.c:798
+msgid "_Refresh period:"
+msgstr "_Freskatze-tartea:"
+
+#: src/address-book-config.c:805 src/pref-manager.c:2137
+#: src/pref-manager.c:2308 src/pref-manager.c:2952 src/pref-manager.c:3006
+msgid "minutes"
+msgstr "minutuan behin"
+
+#: src/address-book-config.c:808
+msgid "Force _Multiget for non-standard server"
+msgstr "Behartu _Multiget estandarrak ez diren zerbitzarietan"
+
+#: src/address-book-config.c:836 src/main-window.c:1049 src/main-window.c:4120
 #, c-format
 msgid "Error displaying help: %s\n"
 msgstr "Errorea gertatu da laguntza bistaratzean: %s\n"
 
-#: src/address-book-config.c:902
+#: src/address-book-config.c:1141
 msgid "vCard Address Book (GnomeCard)"
 msgstr "VCard helbide-liburua (GnomeCard)"
 
-#: src/address-book-config.c:908
+#: src/address-book-config.c:1147
 msgid "External query (a program)"
 msgstr "Kanpoko kontsulta (programa bat)"
 
-#: src/address-book-config.c:913
+#: src/address-book-config.c:1152
 msgid "LDIF Address Book"
 msgstr "LDIF helbide-liburua"
 
-#: src/address-book-config.c:919
+#: src/address-book-config.c:1158
 msgid "LDAP Address Book"
 msgstr "LDAP helbide-liburua"
 
-#: src/address-book-config.c:933
+#: src/address-book-config.c:1172
 msgid "Osmo Address Book"
 msgstr "Osmo helbide-liburua"
+
+#: src/address-book-config.c:1179
+msgid "CardDAV Address Book"
+msgstr "CardDAV helbide-liburua"
 
 #: src/balsa-app.c:56 src/balsa-app.c:136
 msgid "_Remember password in Secret Service"
@@ -3615,120 +3734,120 @@ msgstr[1] "Erantzun taldeari: %d mezu ez dira posta-zerrenda batekoa."
 msgid "Move to Trash failed: %s"
 msgstr "Huts egin du zakarrontzira botatzean: %s"
 
-#: src/balsa-index.c:1975 ui/main-window.ui:390 ui/message-window.ui:116
+#: src/balsa-index.c:1979 ui/main-window.ui:390 ui/message-window.ui:116
 msgid "_Reply…"
 msgstr "_Erantzun…"
 
-#: src/balsa-index.c:1977
+#: src/balsa-index.c:1981
 msgid "Reply To _All…"
 msgstr "Erantzun g_uztiei…"
 
-#: src/balsa-index.c:1979
+#: src/balsa-index.c:1983
 msgid "Reply To _Group…"
 msgstr "Erantzun _taldeari…"
 
-#: src/balsa-index.c:1981 ui/main-window.ui:408 ui/message-window.ui:134
+#: src/balsa-index.c:1985 ui/main-window.ui:408 ui/message-window.ui:134
 msgid "_Forward Attached…"
 msgstr "_Birbidali eranskin gisa…"
 
-#: src/balsa-index.c:1983 ui/main-window.ui:414 ui/message-window.ui:140
+#: src/balsa-index.c:1987 ui/main-window.ui:414 ui/message-window.ui:140
 msgid "Forward _Inline…"
 msgstr "B_irbidali barnean…"
 
-#: src/balsa-index.c:1985 ui/main-window.ui:421
+#: src/balsa-index.c:1989 ui/main-window.ui:421
 msgid "_Pipe through…"
 msgstr "_Pasarazi hemendik…"
 
-#: src/balsa-index.c:1987 ui/main-window.ui:507
+#: src/balsa-index.c:1991 ui/main-window.ui:507
 msgid "_Store Address…"
 msgstr "_Gorde helbidea…"
 
-#: src/balsa-index.c:2005
+#: src/balsa-index.c:2009
 msgid "_Undelete"
 msgstr "_Desezabatu"
 
-#: src/balsa-index.c:2009
+#: src/balsa-index.c:2013
 msgid "Move To _Trash"
 msgstr "Bota _zakarrontzira"
 
-#: src/balsa-index.c:2013
+#: src/balsa-index.c:2017
 msgid "T_oggle"
 msgstr "T_xandakatu"
 
-#: src/balsa-index.c:2016 ui/main-window.ui:308 ui/main-window.ui:482
+#: src/balsa-index.c:2020 ui/main-window.ui:308 ui/main-window.ui:482
 msgid "_Flagged"
 msgstr "_Bandera du"
 
-#: src/balsa-index.c:2019
+#: src/balsa-index.c:2023
 msgid "_Unread"
 msgstr "Irakurri _gabea"
 
-#: src/balsa-index.c:2027
+#: src/balsa-index.c:2031
 msgid "_Move to"
 msgstr "_Eraman hona:"
 
-#: src/balsa-index.c:2034
+#: src/balsa-index.c:2038
 msgid "_View Source"
 msgstr "_Ikusi iturburua"
 
-#: src/balsa-index.c:2261
+#: src/balsa-index.c:2265
 #, c-format
 msgid "Failed to copy %d message to mailbox “%s”: %s"
 msgid_plural "Failed to copy %d messages to mailbox “%s”: %s"
 msgstr[0] "Huts egin du mezu %d “%s” postontzian kopiatzeak: %s"
 msgstr[1] "Huts egin du %d mezu “%s” postontzian kopiatzeak: %s"
 
-#: src/balsa-index.c:2273
+#: src/balsa-index.c:2277
 #, c-format
 msgid "Copied to “%s”."
 msgstr "“%s” postontzian kopiatu da."
 
-#: src/balsa-index.c:2274
+#: src/balsa-index.c:2278
 #, c-format
 msgid "Moved to “%s”."
 msgstr "“%s” postontzira lekuz aldatu da."
 
-#: src/balsa-index.c:2365
+#: src/balsa-index.c:2369
 #, c-format
 msgid "Committing mailbox %s failed."
 msgstr "Huts egin du %s postontzia esleitzeak."
 
-#: src/balsa-index.c:2474
+#: src/balsa-index.c:2478
 #, c-format
 msgid "Cannot process the message: %s"
 msgstr "Ezin da mezua prozesatu: %s"
 
-#: src/balsa-index.c:2589
+#: src/balsa-index.c:2593
 #, c-format
 msgid "Cannot access message %u to pass to %s"
 msgstr "Ezin izan da %u mezua atzitu %s-(r)i bidaltzeko"
 
-#: src/balsa-index.c:2616
+#: src/balsa-index.c:2620
 #, c-format
 msgid "Cannot read message %u to pass to %s"
 msgstr "Ezin izan da %u mezua irakurri %s-(r)i bidaltzeko"
 
-#: src/balsa-index.c:2787
+#: src/balsa-index.c:2791
 msgid "Pipe message through a program"
 msgstr "Pasarazi mezua programa batetik"
 
-#: src/balsa-index.c:2791
+#: src/balsa-index.c:2795
 msgid "_Run"
 msgstr "_Exekutatu"
 
-#: src/balsa-index.c:2800
+#: src/balsa-index.c:2804
 msgid "Specify the program to run:"
 msgstr "Zehaztu exekutatu nahi duzun programa:"
 
-#: src/balsa-mblist.c:1742
+#: src/balsa-mblist.c:1733
 msgid "_Other…"
 msgstr "_Bestelakoak…"
 
-#: src/balsa-mblist.c:1873
+#: src/balsa-mblist.c:1890
 msgid "Choose destination folder"
 msgstr "Aukeratu helburuko karpeta"
 
-#: src/balsa-mblist.c:2073
+#: src/balsa-mblist.c:2088
 msgid "Other…"
 msgstr "Bestelakoa…"
 
@@ -3785,7 +3904,7 @@ msgstr "(Bidaltzailerik ez)"
 msgid "Could not access message %u in mailbox “%s”."
 msgstr "Ezin da %u mezua atzitu “%s” postontzitik."
 
-#: src/balsa-message.c:1211 src/main.c:519
+#: src/balsa-message.c:1211 src/main.c:528
 #, c-format
 msgid "Autocrypt error: %s"
 msgstr "Autocrypt errorea: %s"
@@ -3842,55 +3961,55 @@ msgstr "%s zatia: %s"
 msgid "encrypted: "
 msgstr "zifratuta: "
 
-#: src/balsa-message.c:1636
+#: src/balsa-message.c:1640
 #, c-format
 msgid "Reading embedded message failed: %s"
 msgstr "Huts egin du kapsulatutako mezua irakurtzean: %s"
 
-#: src/balsa-message.c:1644
+#: src/balsa-message.c:1648
 #, c-format
 msgid "Appending message to %s failed: %s"
 msgstr "Huts egin du mezua %s-(r)i eranstean: %s"
 
-#: src/balsa-message.c:1673
+#: src/balsa-message.c:1677
 msgid "_Save…"
 msgstr "_Gorde…"
 
-#: src/balsa-message.c:1682 src/balsa-mime-widget-message.c:458
+#: src/balsa-message.c:1686 src/balsa-mime-widget-message.c:458
 msgid "_Copy to folder…"
 msgstr "K_opiatu karpeta honetan…"
 
 #. Translators: save to folder and open the folder in standard file manager app
-#: src/balsa-message.c:1693
+#: src/balsa-message.c:1697
 msgid "Save and open folder…"
 msgstr "Gorde eta ireki karpeta…"
 
-#: src/balsa-message.c:1779
+#: src/balsa-message.c:1783
 msgid "Select folder for saving selected parts"
 msgstr "Hautatu karpeta, hautatutako zatiak gordetzeko"
 
-#: src/balsa-message.c:1844
+#: src/balsa-message.c:1848
 #, c-format
 msgid "%s message part"
 msgstr "%s mezu zatia"
 
-#: src/balsa-message.c:1865 src/balsa-message.c:1903
+#: src/balsa-message.c:1869 src/balsa-message.c:1907
 #: src/balsa-mime-widget-callbacks.c:175
 #, c-format
 msgid "Could not save %s: %s"
 msgstr "ezin izan da %s gorde: %s"
 
-#: src/balsa-message.c:1913 src/balsa-mime-widget-callbacks.c:180
+#: src/balsa-message.c:1917 src/balsa-mime-widget-callbacks.c:180
 #, c-format
 msgid "Empty part was not saved to %s"
 msgstr "Hutsik dagoen zatia ez da gorde hemen: %s"
 
-#: src/balsa-message.c:2580 src/balsa-message.c:2722
+#: src/balsa-message.c:2584 src/balsa-message.c:2726
 #, c-format
 msgid "Sending the disposition notification failed: %s"
 msgstr "Huts egin du banaketa-jakinarazpena bidaltzean: %s"
 
-#: src/balsa-message.c:2680
+#: src/balsa-message.c:2684
 #, c-format
 msgid ""
 "The sender of this mail, %s, requested \n"
@@ -3900,11 +4019,11 @@ msgstr "Mezu hori bidali duenak (%s) eskatu du\n"
 "mezuen banaketa-jakinarazpena (MDN) bidaltzeko honi: “%s”.\n"
 "Jakinarazpena bidali nahi diozu?"
 
-#: src/balsa-message.c:2687
+#: src/balsa-message.c:2691
 msgid "Reply to MDN?"
 msgstr "Erantzun MDNri?"
 
-#: src/balsa-message.c:2897
+#: src/balsa-message.c:2901
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once.\n"
@@ -3912,63 +4031,63 @@ msgid ""
 msgstr "Ezin izan da mezu hori deszifratu, behin baino gehiagotan bistaratua dagoelako.\n"
 "Itxi mezu horren beste instantziak, eta saiatu berriz."
 
-#: src/balsa-message.c:2918 src/balsa-message.c:3003 src/balsa-message.c:3129
+#: src/balsa-message.c:2922 src/balsa-message.c:3007 src/balsa-message.c:3133
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr "Huts egin du mezu zati bat analizatzean: %s"
 
-#: src/balsa-message.c:2919 src/balsa-message.c:3004 src/balsa-message.c:3130
+#: src/balsa-message.c:2923 src/balsa-message.c:3008 src/balsa-message.c:3134
 msgid "Possible disk space problem."
 msgstr "Litekeena da diskoko lekuarekin arazoa izatea."
 
-#: src/balsa-message.c:2933
+#: src/balsa-message.c:2937
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains an encrypted part, but its "
 "structure is invalid."
 msgstr "%s bidaltzailearen mezuaren (gaia: “%s”) zati bat zifratuta dago, baina haren egitura ez da baliozkoa."
 
-#: src/balsa-message.c:2941
+#: src/balsa-message.c:2945
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a PGP encrypted part, but "
 "this crypto protocol is not available."
 msgstr "%s bidaltzailearen mezuaren (gaia: “%s”) zati bat PGPrekin zifratutako zati bat du, baina zifratze-protokolo hori ez dago erabilgarri."
 
-#: src/balsa-message.c:2954
+#: src/balsa-message.c:2958
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a S/MIME encrypted part, "
 "but this crypto protocol is not available."
 msgstr "%s bidaltzailearen mezuaren (gaia: “%s”) zati bat S/MIMErekin zifratua da, baina zifratze-protokolo hori ez dago erabilgarri."
 
-#: src/balsa-message.c:3021
+#: src/balsa-message.c:3025
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a signed part, but its "
 "structure is invalid. The signature, if there is any, cannot be checked."
 msgstr "%s bidaltzailearen mezuaren (gaia: “%s”) zati bat sinatua dago, baina haren egitura ez da baliozkoa. Sinadura, baldin badago, ezin da egiaztatu."
 
-#: src/balsa-message.c:3034
+#: src/balsa-message.c:3038
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a %s signed part, but this "
 "crypto protocol is not available."
 msgstr "%s bidaltzailearen mezuaren (gaia: “%s”) zati bat %s bidez sinatua dago, baina zifratze-protokolo hori ez dago erabilgarri."
 
-#: src/balsa-message.c:3037
+#: src/balsa-message.c:3041
 msgid "PGP"
 msgstr "PGP"
 
-#: src/balsa-message.c:3066
+#: src/balsa-message.c:3070
 msgid "Detected a good signature with insufficient validity"
 msgstr "Sinadura zuzen bat aurkitu da, baina baliozkotasuna ez da nahikoa"
 
-#: src/balsa-message.c:3071 src/balsa-message.c:3196
+#: src/balsa-message.c:3075 src/balsa-message.c:3200
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Sinadura zuzen bat aurkitu da, baina baliozkotasuna edo fidagarritasuna ez da nahikoa"
 
-#: src/balsa-message.c:3081 src/balsa-message.c:3205
+#: src/balsa-message.c:3085 src/balsa-message.c:3209
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” "
@@ -3977,26 +4096,26 @@ msgid ""
 msgstr "%s erabiltzaileak “%s” gaiarekin bidali duen mezuaren sinadura egiaztatzeak honakoa itzuli du:\n"
 "%s"
 
-#: src/balsa-message.c:3094
+#: src/balsa-message.c:3098
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” failed "
 "with an error!"
 msgstr "%s erabiltzaileak “%s” gaiarekin bidali duen mezuaren sinadura egiaztatzeak huts egin du errore batekin."
 
-#: src/balsa-message.c:3156
+#: src/balsa-message.c:3160
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 msgstr "Ezin izan da mezu hori deszifratu, behin baino gehiagotan bistaratua dagoelako."
 
-#: src/balsa-message.c:3158
+#: src/balsa-message.c:3162
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
 msgstr "Ezin izan da sinadura kontrolatu eta OpenPGP blindajea kendu, mezu hori behin baino gehiagotan bistaratua dagoelako."
 
-#: src/balsa-message.c:3161
+#: src/balsa-message.c:3165
 msgid "Please close the other instances of this message and try again."
 msgstr "Itxi mezu horren beste instantziak, eta saiatu berriz."
 
@@ -4221,18 +4340,18 @@ msgstr "IMAP zerbitzariak ez du mezuaren egiturari buruzko txostenik eman"
 
 #: src/balsa-mime-widget-message.c:716 src/balsa-print-object-header.c:131
 #: src/sendmsg-window.c:736 src/sendmsg-window.c:738 src/sendmsg-window.c:839
-#: src/sendmsg-window.c:3625 src/sendmsg-window.c:5173
+#: src/sendmsg-window.c:3632 src/sendmsg-window.c:5180
 msgid "Subject:"
 msgstr "Gaia:"
 
 #: src/balsa-mime-widget-message.c:721 src/balsa-print-object-header.c:139
-#: src/sendmsg-window.c:3621
+#: src/sendmsg-window.c:3628
 msgid "Date:"
 msgstr "Data:"
 
 #. addresses
 #: src/balsa-mime-widget-message.c:727 src/balsa-print-object-header.c:144
-#: src/sendmsg-window.c:3632
+#: src/sendmsg-window.c:3639
 msgid "From:"
 msgstr "Nork:"
 
@@ -4347,7 +4466,7 @@ msgstr "%s bidaltzaileak “%s” gaiarekin bidalitako mezuak 8 bit-eko karakter
 msgid "This is an iTIP calendar “%s” message."
 msgstr "Haut iTIP egutegiaren “%s” mezu bat da."
 
-#: src/balsa-mime-widget-vcalendar.c:182 src/balsa-mime-widget-vcalendar.c:379
+#: src/balsa-mime-widget-vcalendar.c:182 src/balsa-mime-widget-vcalendar.c:374
 #: src/balsa-print-object-text.c:542
 msgid "Summary:"
 msgstr "Laburpena:"
@@ -4356,12 +4475,12 @@ msgstr "Laburpena:"
 msgid "Organizer:"
 msgstr "Antolatzailea:"
 
-#: src/balsa-mime-widget-vcalendar.c:188 src/balsa-mime-widget-vcalendar.c:380
+#: src/balsa-mime-widget-vcalendar.c:188 src/balsa-mime-widget-vcalendar.c:375
 #: src/balsa-print-object-text.c:548
 msgid "Start:"
 msgstr "Hasiera:"
 
-#: src/balsa-mime-widget-vcalendar.c:189 src/balsa-mime-widget-vcalendar.c:381
+#: src/balsa-mime-widget-vcalendar.c:189 src/balsa-mime-widget-vcalendar.c:376
 #: src/balsa-print-object-text.c:549
 msgid "End:"
 msgstr "Amaiera:"
@@ -4374,7 +4493,7 @@ msgstr "Iraupena:"
 msgid "Recurrence:"
 msgstr "Errepikapena:"
 
-#: src/balsa-mime-widget-vcalendar.c:203 src/balsa-mime-widget-vcalendar.c:382
+#: src/balsa-mime-widget-vcalendar.c:203 src/balsa-mime-widget-vcalendar.c:377
 #: src/balsa-print-object-text.c:563
 msgid "Location:"
 msgstr "Kokalekua:"
@@ -4391,7 +4510,7 @@ msgid_plural "Categories:"
 msgstr[0] "Kategoria:"
 msgstr[1] "Kategoriak:"
 
-#: src/balsa-mime-widget-vcalendar.c:249 src/balsa-mime-widget-vcalendar.c:383
+#: src/balsa-mime-widget-vcalendar.c:249 src/balsa-mime-widget-vcalendar.c:378
 #: src/balsa-print-object-text.c:586
 msgid "Description:"
 msgstr "Azalpena:"
@@ -4400,24 +4519,24 @@ msgstr "Azalpena:"
 msgid "The sender asks you for a reply to this request:"
 msgstr "Bidaltzaileak eskaera honi erantzuteko eskatzen dizu:"
 
-#: src/balsa-mime-widget-vcalendar.c:275
+#: src/balsa-mime-widget-vcalendar.c:273
 msgid "Accept"
 msgstr "Onartu"
 
-#: src/balsa-mime-widget-vcalendar.c:288
+#: src/balsa-mime-widget-vcalendar.c:285
 msgid "Accept tentatively"
 msgstr "Onartu behin-behinekoa"
 
-#: src/balsa-mime-widget-vcalendar.c:296
+#: src/balsa-mime-widget-vcalendar.c:292
 msgid "Decline"
 msgstr "Ukatu"
 
-#: src/balsa-mime-widget-vcalendar.c:365
+#: src/balsa-mime-widget-vcalendar.c:360
 msgid "iTIP Calendar Request"
 msgstr "ITIP egutegiaren eskaera"
 
 #. Translators: #1 message sender display name; #2 sender's event action (e.g. "accepted", "rejected", ...)
-#: src/balsa-mime-widget-vcalendar.c:377
+#: src/balsa-mime-widget-vcalendar.c:372
 #, c-format
 msgid ""
 "%s %s the following iTIP calendar request:\n"
@@ -4425,7 +4544,7 @@ msgid ""
 msgstr "%s %s hurrengo iTIP egutegiaren eskaera:\n"
 "\n"
 
-#: src/balsa-mime-widget-vcalendar.c:410
+#: src/balsa-mime-widget-vcalendar.c:405
 #, c-format
 msgid "Sending the iTIP calendar reply failed: %s"
 msgstr "Huts egin du iTIP egutegiaren erantzuna bidaltzeak: %s"
@@ -5284,7 +5403,7 @@ msgid ""
 msgstr "_Deszifratu eta egiaztatu \n"
 "sinadurak automatikoki:"
 
-#: src/mailbox-conf.c:894 src/pref-manager.c:214 src/pref-manager.c:1163
+#: src/mailbox-conf.c:894 src/pref-manager.c:214 src/pref-manager.c:1167
 msgid "Never"
 msgstr "Inoiz ere ez"
 
@@ -5292,7 +5411,7 @@ msgstr "Inoiz ere ez"
 msgid "If Possible"
 msgstr "Ahal bada"
 
-#: src/mailbox-conf.c:896 src/pref-manager.c:1165
+#: src/mailbox-conf.c:896 src/pref-manager.c:1169
 msgid "Always"
 msgstr "Beti"
 
@@ -5407,68 +5526,68 @@ msgstr "_Editatu/aplikatu iragazkiak"
 msgid "The path “%s” does not lead to a mailbox."
 msgstr "“%s” bide-izenak ez darama postontzi batera."
 
-#: src/main.c:112 src/main.c:117 src/main.c:123 src/main.c:129 src/main.c:135
+#: src/main.c:116 src/main.c:121 src/main.c:127 src/main.c:133 src/main.c:139
 #, c-format
 msgid "Balsa cannot open your “%s” mailbox."
 msgstr "Balsak ezin du zure “%s” postontzia ireki."
 
-#: src/main.c:112
+#: src/main.c:116
 msgid "Inbox"
 msgstr "Sarrerako postontzia"
 
-#: src/main.c:118
+#: src/main.c:122
 msgid "Outbox"
 msgstr "Irteerako postontzia"
 
-#: src/main.c:124
+#: src/main.c:128
 msgid "Sentbox"
 msgstr "Bidalitakoen postontzia"
 
-#: src/main.c:130
+#: src/main.c:134
 msgid "Draftbox"
 msgstr "Zirriborroen postontzia"
 
-#: src/main.c:135
+#: src/main.c:139
 msgid "Trash"
 msgstr "Zakarrontzia"
 
-#: src/main.c:349
+#: src/main.c:353
 msgid "Compressing mail folders…"
 msgstr "Posta-karpetak konprimatzen…"
 
-#: src/main.c:588
+#: src/main.c:597
 msgid "Get new mail on start-up"
 msgstr "Eskuratu mezu berriak abioan"
 
-#: src/main.c:590
+#: src/main.c:599
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Idatzi mezu berri bat honi: HELBIDE@ELEKTRONIKOA"
 
-#: src/main.c:592
+#: src/main.c:601
 msgid "Attach file at URI"
 msgstr "Erantsi fitxategia URIan"
 
-#: src/main.c:594
+#: src/main.c:603
 msgid "Opens MAILBOXNAME"
 msgstr "Ireki POSTONTZIARENIZENA"
 
-#: src/main.c:594
+#: src/main.c:603
 msgid "MAILBOXNAME"
 msgstr "POSTONTZIARENIZENA"
 
-#: src/main.c:596
+#: src/main.c:605
 msgid "Opens first unread mailbox"
 msgstr "Ireki lehen postontzi irakurri gabea"
 
-#: src/main.c:598
+#: src/main.c:607
 msgid "Opens default Inbox on start-up"
 msgstr "Postontzi lehenetsia irekitzen du abioan"
 
-#: src/main.c:600
+#: src/main.c:609
 msgid "Prints number unread and unsent messages"
 msgstr "Irakurri gabeko eta bidali gabeko mezuen kopurua inprimatzen du"
 
-#: src/main.c:602
+#: src/main.c:611
 msgid "Show version"
 msgstr "Erakutsi bertsioa"
 
@@ -5685,11 +5804,11 @@ msgstr "Irakurri gabeko hurrengo mezua hemen dago: %s"
 msgid "Do you want to select %s?"
 msgstr "%s hautatzea nahi duzu?"
 
-#: src/message-window.c:305 ui/message-window.ui:109
+#: src/message-window.c:307 ui/message-window.ui:109
 msgid "M_ove"
 msgstr "_Eraman"
 
-#: src/message-window.c:780
+#: src/message-window.c:815
 #, c-format
 msgid "Message from %s: %s"
 msgstr "%s-(r)en mezua: %s"
@@ -5714,561 +5833,556 @@ msgstr "Laua"
 msgid "JWZ"
 msgstr "JWZ"
 
-#: src/pref-manager.c:953 src/pref-manager.c:3628
+#: src/pref-manager.c:957 src/pref-manager.c:3632
 msgid "Unknown"
 msgstr "Ezezaguna"
 
 #. Translators: #1 address book name
-#: src/pref-manager.c:957
+#: src/pref-manager.c:961
 #, c-format
 msgid "%s (default)"
 msgstr "%s (lehenetsia)"
 
-#: src/pref-manager.c:1074
+#: src/pref-manager.c:1078
 msgid "Default layout"
 msgstr "Diseinu lehenetsia"
 
-#: src/pref-manager.c:1075
+#: src/pref-manager.c:1079
 msgid "Wide message layout"
 msgstr "Mezu zabalaren diseinua"
 
-#: src/pref-manager.c:1076
+#: src/pref-manager.c:1080
 msgid "Wide screen layout"
 msgstr "Pantaila zabalaren diseinua"
 
-#: src/pref-manager.c:1084
+#: src/pref-manager.c:1088
 msgid "Show next unread message"
 msgstr "Erakutsi hurrengo mezu irakurri gabea"
 
-#: src/pref-manager.c:1085
+#: src/pref-manager.c:1089
 msgid "Show next message"
 msgstr "Erakutsi hurrengo mezua"
 
-#: src/pref-manager.c:1086
+#: src/pref-manager.c:1090
 msgid "Close message window"
 msgstr "Itxi mezuaren leihoa"
 
-#: src/pref-manager.c:1131
+#: src/pref-manager.c:1135
 #, c-format
 msgid "Error displaying %s: %s\n"
 msgstr "Errorea %s bistaratzean: %s\n"
 
-#: src/pref-manager.c:1144
+#: src/pref-manager.c:1148
 msgid "Show nothing"
 msgstr "Ez ezer ere erakutsi"
 
-#: src/pref-manager.c:1146
+#: src/pref-manager.c:1150
 msgid "Show dialog"
 msgstr "Erakutsi elkarrizketa-koadroa"
 
-#: src/pref-manager.c:1148
+#: src/pref-manager.c:1152
 msgid "Show in list"
 msgstr "Erakutsi zerrendan"
 
-#: src/pref-manager.c:1150
+#: src/pref-manager.c:1154
 msgid "Show in status bar"
 msgstr "Erakutsi egoera-barran"
 
-#: src/pref-manager.c:1152
+#: src/pref-manager.c:1156
 msgid "Print to console"
 msgstr "Bistaratu kontsolan"
 
-#: src/pref-manager.c:1164
+#: src/pref-manager.c:1168
 msgid "Ask me"
 msgstr "Galdetu niri"
 
-#: src/pref-manager.c:1700
+#: src/pref-manager.c:1704
 msgid "Remote POP3 mailbox…"
 msgstr "Urruneko POP3 postontzia…"
 
-#: src/pref-manager.c:1704 ui/main-window.ui:28
+#: src/pref-manager.c:1708 ui/main-window.ui:28
 msgid "Remote IMAP folder…"
 msgstr "Urruneko IMAP karpeta…"
 
-#: src/pref-manager.c:1965
+#: src/pref-manager.c:1969
 msgid "Remote mailbox servers"
 msgstr "Urruneko postontzi-zerbitzaria"
 
-#: src/pref-manager.c:1982 src/pref-manager.c:2776 src/sendmsg-window.c:2656
+#: src/pref-manager.c:1986 src/pref-manager.c:2780 src/sendmsg-window.c:2660
 msgid "Type"
 msgstr "Mota"
 
-#: src/pref-manager.c:1990
+#: src/pref-manager.c:1994
 msgid "Mailbox name"
 msgstr "Postontziaren izena"
 
-#: src/pref-manager.c:2012 src/pref-manager.c:2095 src/pref-manager.c:2819
+#: src/pref-manager.c:2016 src/pref-manager.c:2099 src/pref-manager.c:2823
 msgid "_Modify"
 msgstr "_Aldatu"
 
-#: src/pref-manager.c:2034
+#: src/pref-manager.c:2038
 msgid "Local mail directory"
 msgstr "Posta-direktorio lokala"
 
-#: src/pref-manager.c:2037
+#: src/pref-manager.c:2041
 msgid "Select your local mail directory"
 msgstr "Hautatu posta lokalaren direktorioa"
 
-#: src/pref-manager.c:2061
+#: src/pref-manager.c:2065
 msgid "Outgoing mail servers"
 msgstr "Posta bidaltzeko zerbitzariak"
 
-#: src/pref-manager.c:2079
+#: src/pref-manager.c:2083
 msgid "Server name"
 msgstr "Zerbitzariaren izena"
 
-#: src/pref-manager.c:2122
+#: src/pref-manager.c:2126
 msgid "Checking"
 msgstr "Kontrolatu"
 
-#: src/pref-manager.c:2125
+#: src/pref-manager.c:2129
 msgid "_Check mail automatically every"
 msgstr "_Begiratu automatikoki mezurik badagoen"
 
-#: src/pref-manager.c:2133 src/pref-manager.c:2304 src/pref-manager.c:2948
-#: src/pref-manager.c:3002
-msgid "minutes"
-msgstr "minutuan behin"
-
-#: src/pref-manager.c:2138
+#: src/pref-manager.c:2142
 msgid "Check _IMAP mailboxes"
 msgstr "Begiratu _IMAP postontziak"
 
-#: src/pref-manager.c:2142
+#: src/pref-manager.c:2146
 msgid "Check Inbox _only"
 msgstr "Begiratu sarrerako ontzia _soilik"
 
-#: src/pref-manager.c:2146
+#: src/pref-manager.c:2150
 msgid "Do background check quietly (no messages in status bar)"
 msgstr "Atzeko planoan begiratu mezurik badagoen (egoera-barran mezurik erakutsi gabe)"
 
-#: src/pref-manager.c:2149
+#: src/pref-manager.c:2153
 msgid "_POP message size limit:"
 msgstr "_POP mezuen tamaina-muga:"
 
-#: src/pref-manager.c:2173
+#: src/pref-manager.c:2177
 msgid "Notification about new messages"
 msgstr "Mezu berriei buruzko jakinarazpena"
 
-#: src/pref-manager.c:2175
+#: src/pref-manager.c:2179
 msgid "Display message"
 msgstr "Bistaratu mezua"
 
-#: src/pref-manager.c:2179
+#: src/pref-manager.c:2183
 msgid "Play sound"
 msgstr "Erreproduzitu soinua"
 
-#: src/pref-manager.c:2200
+#: src/pref-manager.c:2204
 msgid "Message disposition notification requests"
 msgstr "Mezuen banaketa-jakinarazpen eskariak"
 
-#: src/pref-manager.c:2205
+#: src/pref-manager.c:2209
 msgid ""
 "When I receive a message whose sender requested a Message Disposition "
 "Notification (MDN), send it if:"
 msgstr "Mezuaren banaketa-jakinarazpena (MDN) eskatu duen bidaltzaile baten mezua jasotzean, bidali jakinarazpena honako hau betetzen bada:"
 
-#: src/pref-manager.c:2213
+#: src/pref-manager.c:2217
 msgid ""
 "The message header looks clean (the notify-to address is the return path, "
 "and I am in the “To:” or “CC:” list)."
 msgstr "Mezu-goiburuak garbia dirudi (nori jakinarazi behar zaion ezartzen duen helbidea itzulerako bide-izena da eta ni “Nori:” edo “CC:” zerrendan nago)."
 
-#: src/pref-manager.c:2227
+#: src/pref-manager.c:2231
 msgid "The message header looks suspicious."
 msgstr "Mezuaren goiburuak itxura susmagarria du."
 
-#: src/pref-manager.c:2251
+#: src/pref-manager.c:2255
 msgid "Word wrap"
 msgstr "Egokitu hitza"
 
-#: src/pref-manager.c:2254
+#: src/pref-manager.c:2258
 msgid "Wrap outgoing text at"
 msgstr "Egokitu irteerako testua hemen:"
 
-#: src/pref-manager.c:2263 src/pref-manager.c:2513
+#: src/pref-manager.c:2267 src/pref-manager.c:2517
 msgid "characters"
 msgstr "karaktereak"
 
-#: src/pref-manager.c:2282
+#: src/pref-manager.c:2286
 msgid "Other options"
 msgstr "Beste aukera batzuk"
 
-#: src/pref-manager.c:2284
+#: src/pref-manager.c:2288
 msgid "Reply prefix:"
 msgstr "Erantzuteko aurrizkia:"
 
-#: src/pref-manager.c:2287
+#: src/pref-manager.c:2291
 msgid "Automatically quote original when replying"
 msgstr "Erantzutean, jarri automatikoki jatorrizko testuaren aipamena"
 
-#: src/pref-manager.c:2290
+#: src/pref-manager.c:2294
 msgid "Forward a mail as attachment instead of quoting it"
 msgstr "Birbidali mezua eranskin gisa, eta ez aipamen gisa"
 
-#: src/pref-manager.c:2293
+#: src/pref-manager.c:2297
 msgid "Copy outgoing messages to sentbox"
 msgstr "Kopiatu irteerako mezua bidalitakoen postontzian"
 
-#: src/pref-manager.c:2295
+#: src/pref-manager.c:2299
 msgid "Send button always queues outgoing mail in outbox"
 msgstr "Irteerako mezua irteerako postontziko ilaran jartzen du beti 'Bidali' botoiak"
 
-#: src/pref-manager.c:2299
+#: src/pref-manager.c:2303
 msgid "_Send queued mail automatically every"
 msgstr "_Bidali ilarako mezuak automatikoki tarte honekin:"
 
-#: src/pref-manager.c:2309
+#: src/pref-manager.c:2313
 msgid "Edit headers in external editor"
 msgstr "Editatu goiburuak kanpoko editore batean"
 
-#: src/pref-manager.c:2311
+#: src/pref-manager.c:2315
 msgid "Include HTML parts as text when replying or forwarding"
 msgstr "Sartu HTML zatiak testu gisa, mezuak erantzutean edo birbidaltzean"
 
-#: src/pref-manager.c:2329 src/toolbar-prefs.c:152
+#: src/pref-manager.c:2333 src/toolbar-prefs.c:152
 msgid "Main window"
 msgstr "Leiho nagusia"
 
-#: src/pref-manager.c:2332
+#: src/pref-manager.c:2336
 msgid "Use preview pane"
 msgstr "Erabili aurrebista-panela"
 
-#: src/pref-manager.c:2336
+#: src/pref-manager.c:2340
 msgid "Show message counts in mailbox list"
 msgstr "Erakutsi mezuen kopurua sarrerako ontziaren zerrendan"
 
-#: src/pref-manager.c:2342
+#: src/pref-manager.c:2346
 msgid "Automatically view message when mailbox opened"
 msgstr "Ikusi mezuak automatikoki, postontzia irekitzean"
 
-#: src/pref-manager.c:2345
+#: src/pref-manager.c:2349
 msgid "Ask me before selecting a different mailbox to show an unread message"
 msgstr "Galdetu niri postontzi desberdina hautatu aurretik irakurri gabeko mezu bat erakusteko."
 
-#: src/pref-manager.c:2349
+#: src/pref-manager.c:2353
 msgid "Page Up/Page Down keys scroll text by"
 msgstr "Page Up/Page Down teklek testua korritzen dute honenbeste:"
 
-#: src/pref-manager.c:2357
+#: src/pref-manager.c:2361
 msgid "percent"
 msgstr "(ehunekoak)"
 
-#: src/pref-manager.c:2374 src/toolbar-prefs.c:170
+#: src/pref-manager.c:2378 src/toolbar-prefs.c:170
 msgid "Message window"
 msgstr "Mezuaren leihoa"
 
-#: src/pref-manager.c:2376
+#: src/pref-manager.c:2380
 msgid "After moving a message:"
 msgstr "Mezua lekuz aldatu ondoren:"
 
-#: src/pref-manager.c:2397
+#: src/pref-manager.c:2401
 msgid "Sorting and threading"
 msgstr "Ordenatzea eta harilkatzea"
 
-#: src/pref-manager.c:2399
+#: src/pref-manager.c:2403
 msgid "Default sort column:"
 msgstr "Ordenatzeko zutabe lehenetsia:"
 
-#: src/pref-manager.c:2407
+#: src/pref-manager.c:2411
 msgid "Thread messages by default"
 msgstr "Harilkatu mezuak modu lehenetsian"
 
-#: src/pref-manager.c:2409
+#: src/pref-manager.c:2413
 msgid "Expand threads on open"
 msgstr "Zabaldu hariak, irekitzean"
 
 #. fonts
-#: src/pref-manager.c:2434 src/print-gtk.c:618
+#: src/pref-manager.c:2438 src/print-gtk.c:618
 msgid "Fonts"
 msgstr "Letra-tipoak"
 
-#: src/pref-manager.c:2437
+#: src/pref-manager.c:2441
 msgid "Use system fonts"
 msgstr "Erabili sistemako letra-tipoak"
 
-#: src/pref-manager.c:2445
+#: src/pref-manager.c:2449
 msgid "Use default font size"
 msgstr "Erabili letra-tamaina lehenetsia"
 
-#: src/pref-manager.c:2451
+#: src/pref-manager.c:2455
 msgid "Message font:"
 msgstr "Mezuen letra-tipoa:"
 
-#: src/pref-manager.c:2458
+#: src/pref-manager.c:2462
 msgid "Subject font:"
 msgstr "Gaiaren letra-tipoa:"
 
 #. Quoted text regular expression
 #. and RFC2646-style flowed text
-#: src/pref-manager.c:2498
+#: src/pref-manager.c:2502
 msgid "Quoted and flowed text"
 msgstr "Aipamen-testua eta testu jarraitua"
 
-#: src/pref-manager.c:2501
+#: src/pref-manager.c:2505
 msgid "Mark quoted text"
 msgstr "Markatu aipatutako testua"
 
-#: src/pref-manager.c:2504
+#: src/pref-manager.c:2508
 msgid "Quoted text regular expression:"
 msgstr "Aipatutako testuaren adierazpen erregularra:"
 
-#: src/pref-manager.c:2507
+#: src/pref-manager.c:2511
 msgid "Wrap text at"
 msgstr "Egokitu testua hemen:"
 
-#: src/pref-manager.c:2526
+#: src/pref-manager.c:2530
 #, c-format
 msgid "HTTP cache size: %s"
 msgstr "HTTP cachearen tamaina: %s"
 
 #. handling of multipart/alternative
-#: src/pref-manager.c:2559
+#: src/pref-manager.c:2563
 msgid "Display of multipart/alternative parts"
 msgstr "Zati anizkoitzak/alternatiboak bistaratzea"
 
-#: src/pref-manager.c:2563
+#: src/pref-manager.c:2567
 msgid "Prefer text/plain over HTML"
 msgstr "Hobetsi testu arrunta HTMLren aldean"
 
 #. Translators: per-sender database of exceptions over global HTTP
 #. * preferences (display HTML vs. plain, auto-load external items)
-#: src/pref-manager.c:2568
+#: src/pref-manager.c:2572
 msgid "Manage exceptions…"
 msgstr "Kudeatu salbuespenak…"
 
-#: src/pref-manager.c:2576
+#: src/pref-manager.c:2580
 msgid "Clear HTTP cache…"
 msgstr "Garbitu HTTP cachea…"
 
-#: src/pref-manager.c:2595
+#: src/pref-manager.c:2599
 msgid "Message colors"
 msgstr "Mezuen koloreak"
 
-#: src/pref-manager.c:2600
+#: src/pref-manager.c:2604
 #, c-format
 msgid "Quote level %d color"
 msgstr "%d mailako aipamenen kolorea"
 
-#: src/pref-manager.c:2618
+#: src/pref-manager.c:2622
 msgid "Link color"
 msgstr "Esteken kolorea"
 
-#: src/pref-manager.c:2620
+#: src/pref-manager.c:2624
 msgid "Hyperlink color"
 msgstr "Hiperesteken kolorea"
 
-#: src/pref-manager.c:2635 src/pref-manager.c:3245
+#: src/pref-manager.c:2639 src/pref-manager.c:3249
 msgid "Format"
 msgstr "Formatua"
 
-#: src/pref-manager.c:2638
+#: src/pref-manager.c:2642
 msgid "Date encoding (for strftime):"
 msgstr "Data-kodetzea (strftime):"
 
-#: src/pref-manager.c:2640
+#: src/pref-manager.c:2644
 msgid "Selected headers:"
 msgstr "Goiburu hautatuak:"
 
 #. treatment of messages with 8-bit chars, but without proper MIME encoding
-#: src/pref-manager.c:2658
+#: src/pref-manager.c:2662
 msgid "National (8-bit) characters in broken messages without codeset header"
 msgstr "(8 bit-eko) karaktere nazionalak daude kode-multzoen goibururik ez duen mezu akastun batean"
 
-#: src/pref-manager.c:2663
+#: src/pref-manager.c:2667
 msgid "display as “?”"
 msgstr "bistaratu “?” gisa"
 
-#: src/pref-manager.c:2671
+#: src/pref-manager.c:2675
 msgid "display in codeset"
 msgstr "bistaratu kode-multzoaren arabera"
 
-#: src/pref-manager.c:2696
+#: src/pref-manager.c:2700
 msgid "Information messages"
 msgstr "Informazio-mezuak"
 
-#: src/pref-manager.c:2700
+#: src/pref-manager.c:2704
 msgid "Information messages:"
 msgstr "Informazio-mezuak:"
 
-#: src/pref-manager.c:2704
+#: src/pref-manager.c:2708
 msgid "Warning messages:"
 msgstr "Abisu-mezuak:"
 
-#: src/pref-manager.c:2708
+#: src/pref-manager.c:2712
 msgid "Error messages:"
 msgstr "Errore-mezuak:"
 
-#: src/pref-manager.c:2712
+#: src/pref-manager.c:2716
 msgid "Fatal error messages:"
 msgstr "Errore larrien mezuak:"
 
-#: src/pref-manager.c:2716
+#: src/pref-manager.c:2720
 msgid "Debug messages:"
 msgstr "Arazte-mezuak:"
 
-#: src/pref-manager.c:2732
+#: src/pref-manager.c:2736
 msgid "Display progress dialog"
 msgstr "Bistaratu progresioaren elkarrizketa-koadroa"
 
-#: src/pref-manager.c:2733
+#: src/pref-manager.c:2737
 msgid "Display progress dialog when sending messages"
 msgstr "Bistaratu progresioaren elkarrizketa-koadroa mezuak bidaltzean"
 
-#: src/pref-manager.c:2734
+#: src/pref-manager.c:2738
 msgid "Display progress dialog when retrieving messages"
 msgstr "Bistaratu progresioaren elkarrizketa-koadroa mezuak atzitzean"
 
-#: src/pref-manager.c:2756 src/pref-manager.c:3371
+#: src/pref-manager.c:2760 src/pref-manager.c:3375
 msgid "Address books"
 msgstr "Helbide-liburua"
 
-#: src/pref-manager.c:2784
+#: src/pref-manager.c:2788
 msgid "Address book name"
 msgstr "Helbide-liburuaren izena"
 
-#: src/pref-manager.c:2792
+#: src/pref-manager.c:2796
 msgid "Auto-complete"
 msgstr "Osatze automatikoa"
 
-#: src/pref-manager.c:2825
+#: src/pref-manager.c:2829
 msgid "_Set as default"
 msgstr "_Ezarri lehenetsi gisa"
 
-#: src/pref-manager.c:2842
+#: src/pref-manager.c:2846
 msgid "Miscellaneous spelling settings"
 msgstr "Hainbat ortografia-ezarpen"
 
-#: src/pref-manager.c:2846
+#: src/pref-manager.c:2850
 msgid "Check signature"
 msgstr "Kontrolatu sinadura"
 
-#: src/pref-manager.c:2848
+#: src/pref-manager.c:2852
 msgid "Check quoted"
 msgstr "Kontrolatu aipamena"
 
-#: src/pref-manager.c:2864
+#: src/pref-manager.c:2868
 msgid "Start-up options"
 msgstr "Abioko aukerak"
 
-#: src/pref-manager.c:2867
+#: src/pref-manager.c:2871
 msgid "Open Inbox upon start-up"
 msgstr "Ireki sarrerako postontzia abioan"
 
-#: src/pref-manager.c:2869
+#: src/pref-manager.c:2873
 msgid "Check mail upon start-up"
 msgstr "Egiaztatu mezurik dagoen abioan"
 
-#: src/pref-manager.c:2871
+#: src/pref-manager.c:2875
 msgid "Remember open mailboxes between sessions"
 msgstr "Gogoratu postontzi irekiak saio batetik bestera"
 
-#: src/pref-manager.c:2889
+#: src/pref-manager.c:2893
 msgid "Folder scanning"
 msgstr "Karpetak miatzea"
 
-#: src/pref-manager.c:2892
+#: src/pref-manager.c:2896
 msgid ""
 "Choose depth 1 for fast start-up; this defers scanning some folders. To see "
 "more of the tree at start-up, choose a greater depth."
 msgstr "Abio azkarrerako, aukeratu \"1\" sakonera; horrela, zenbait karpetaren eskaneatzea atzeratuko da. Zuhaitza sakonago ikusteko abioan, aukeratu sakonera handiagoa."
 
-#: src/pref-manager.c:2899
+#: src/pref-manager.c:2903
 msgid "Scan local folders to depth"
 msgstr "Miatu karpeta lokalak, sakonera honetara arte:"
 
-#: src/pref-manager.c:2908
+#: src/pref-manager.c:2912
 msgid "Scan IMAP folders to depth"
 msgstr "Miatu IMAP karpetak, sakonera honetara arte:"
 
-#: src/pref-manager.c:2930 src/pref-manager.c:3385
+#: src/pref-manager.c:2934 src/pref-manager.c:3389
 msgid "Miscellaneous"
 msgstr "Hainbat"
 
-#: src/pref-manager.c:2933
+#: src/pref-manager.c:2937
 msgid "Empty trash on exit"
 msgstr "Hustu zakarrontzia irtetean"
 
-#: src/pref-manager.c:2937
+#: src/pref-manager.c:2941
 msgid "Close mailbox if unused more than"
 msgstr "Itxi postontzia, hau baino denbora gehiagoan erabili ez bada:"
 
-#: src/pref-manager.c:2952
+#: src/pref-manager.c:2956
 msgid "Enable System Tray Icon support"
 msgstr "Gaitu sistemaren erretiluaren ikonoa"
 
-#: src/pref-manager.c:2970
+#: src/pref-manager.c:2974
 msgid "Deleting messages"
 msgstr "Mezuak ezabatzea"
 
 #. Translators: this used to be "using Mailbox -> Hide messages";
 #. * the UTF-8 string for the right-arrow symbol is broken out to
 #. * avoid msgconv problems.
-#: src/pref-manager.c:2975
+#: src/pref-manager.c:2979
 #, c-format
 msgid ""
 "The following setting is global, but may be overridden for the selected "
 "mailbox using Mailbox %s Hide messages:"
 msgstr "Ezarpen hau orokorra da, baina saihestu egin daiteke postontzi hautatuetan. Horretarako, erabili Postontzia %s Gorde mezuak:"
 
-#: src/pref-manager.c:2983
+#: src/pref-manager.c:2987
 msgid "Hide messages marked as deleted"
 msgstr "Gorde 'ezabatuta' markatutako mezuak"
 
-#: src/pref-manager.c:2985
+#: src/pref-manager.c:2989
 msgid "The following settings are global:"
 msgstr "Ezarpen hauek orokorrak dira:"
 
-#: src/pref-manager.c:2988
+#: src/pref-manager.c:2992
 msgid "Expunge deleted messages when mailbox is closed"
 msgstr "Betiko suntsitu ezabatutako mezuak postontzia ixtean"
 
-#: src/pref-manager.c:2992
+#: src/pref-manager.c:2996
 msgid "…and if unused more than"
 msgstr "…eta erabili gabe badago, hau baino gehiago:"
 
-#: src/pref-manager.c:3210
+#: src/pref-manager.c:3214
 msgid "Mail options"
 msgstr "Posta-aukerak"
 
-#: src/pref-manager.c:3214
+#: src/pref-manager.c:3218
 msgid "Incoming"
 msgstr "Sarrerakoa"
 
-#: src/pref-manager.c:3218
+#: src/pref-manager.c:3222
 msgid "Outgoing"
 msgstr "Irteerakoa"
 
-#: src/pref-manager.c:3229
+#: src/pref-manager.c:3233
 msgid "Display options"
 msgstr "Bistaratze-aukerak"
 
-#: src/pref-manager.c:3233
+#: src/pref-manager.c:3237
 msgid "Sort and thread"
 msgstr "Ordenatu eta harilkatu"
 
-#: src/pref-manager.c:3237 src/print-gtk.c:610
+#: src/pref-manager.c:3241 src/print-gtk.c:610
 msgid "Message"
 msgstr "Mezua"
 
-#: src/pref-manager.c:3241
+#: src/pref-manager.c:3245
 msgid "Colors"
 msgstr "Koloreak"
 
-#: src/pref-manager.c:3249
+#: src/pref-manager.c:3253
 msgid "Status messages"
 msgstr "Egoera-mezuak"
 
 #. must NOT be modal
-#: src/pref-manager.c:3316
+#: src/pref-manager.c:3320
 msgid "Balsa Preferences"
 msgstr "Balsa hobespenak"
 
-#: src/pref-manager.c:3376 src/toolbar-factory.c:141
+#: src/pref-manager.c:3380 src/toolbar-factory.c:141
 msgid "Spelling"
 msgstr "Ortografia"
 
-#: src/pref-manager.c:3381
+#: src/pref-manager.c:3385
 msgid "Start-up"
 msgstr "Abioa"
 
@@ -6586,7 +6700,7 @@ msgstr "“%s” hartzailearentzako mezua aldatu da.\n"
 msgid "Editing failed: %s"
 msgstr "Edizioak huts egin du: %s"
 
-#: src/sendmsg-window.c:706 src/sendmsg-window.c:4809
+#: src/sendmsg-window.c:706 src/sendmsg-window.c:4816
 #, c-format
 msgid "Cannot read the file “%s”: %s"
 msgstr "Ezin da “%s” fitxategia irakurri: %s"
@@ -6644,7 +6758,7 @@ msgstr "Erantsi mota honetako MIME gisa:"
 msgid "Character set for file %s changed from “%s” to “%s”."
 msgstr "%s fitxategiaren karaktere multzoa aldatu da, lehen “%s” zen eta orain “%s”."
 
-#: src/sendmsg-window.c:1685 src/sendmsg-window.c:5177
+#: src/sendmsg-window.c:1685 src/sendmsg-window.c:5184
 msgid "(no subject)"
 msgstr "(gairik ez)"
 
@@ -6674,94 +6788,94 @@ msgid "Attach file"
 msgstr "Erantsi fitxategia"
 
 #: src/sendmsg-window.c:2117 src/sendmsg-window.c:2193
-#: src/sendmsg-window.c:7143
+#: src/sendmsg-window.c:7150
 msgid ""
 "Attaching message failed.\n"
 "Possible reason: not enough temporary space"
 msgstr "Huts egin du mezua eransteak.\n"
 "Hau izan daiteke horren arrazoia: ez dago nahikoa aldi baterako leku"
 
-#: src/sendmsg-window.c:2410
+#: src/sendmsg-window.c:2414
 msgid "F_rom:"
 msgstr "_Nork:"
 
 #. Subject:
-#: src/sendmsg-window.c:2560
+#: src/sendmsg-window.c:2564
 msgid "S_ubject:"
 msgstr "_Gaia:"
 
-#: src/sendmsg-window.c:2592
+#: src/sendmsg-window.c:2596
 msgid "F_CC:"
 msgstr "F_CC:"
 
 #. Attachment list
-#: src/sendmsg-window.c:2619
+#: src/sendmsg-window.c:2623
 msgid "_Attachments:"
 msgstr "_Eranskinak:"
 
-#: src/sendmsg-window.c:2663
+#: src/sendmsg-window.c:2667
 msgid "Mode"
 msgstr "Modua"
 
-#: src/sendmsg-window.c:2686
+#: src/sendmsg-window.c:2690
 msgid "Description"
 msgstr "Azalpena"
 
-#: src/sendmsg-window.c:2984
+#: src/sendmsg-window.c:2991
 #, c-format
 msgid "Could not save attachment: %s"
 msgstr "Ezin izan da eranskina gorde: %s"
 
-#: src/sendmsg-window.c:3058
+#: src/sendmsg-window.c:3065
 msgid "No subject"
 msgstr "Gairik ez"
 
-#: src/sendmsg-window.c:3107
+#: src/sendmsg-window.c:3114
 msgid "decrypted: "
 msgstr "deszifratua: "
 
-#: src/sendmsg-window.c:3115
+#: src/sendmsg-window.c:3122
 #, c-format
 msgid "inlined file “%s” (%s)"
 msgstr "integratutako “%s” fitxategia (%s)"
 
-#: src/sendmsg-window.c:3118
+#: src/sendmsg-window.c:3125
 #, c-format
 msgid "attached file “%s” (%s)"
 msgstr "erantsitako “%s” fitxategia (%s)"
 
-#: src/sendmsg-window.c:3123
+#: src/sendmsg-window.c:3130
 #, c-format
 msgid "inlined %s part"
 msgstr "barneko %s zatia"
 
-#: src/sendmsg-window.c:3125
+#: src/sendmsg-window.c:3132
 #, c-format
 msgid "attached %s part"
 msgstr "erantsitako %s zatia"
 
-#: src/sendmsg-window.c:3206
+#: src/sendmsg-window.c:3213
 #, c-format
 msgid "message from %s, subject “%s”"
 msgstr "%s bidaltzailearen mezua, gaia: “%s”"
 
-#: src/sendmsg-window.c:3334
+#: src/sendmsg-window.c:3341
 msgid "quoted"
 msgstr "aipamen gisa"
 
-#: src/sendmsg-window.c:3339 src/sendmsg-window.c:3342
+#: src/sendmsg-window.c:3346 src/sendmsg-window.c:3349
 msgid "quoted attachment"
 msgstr "eranskina aipamen gisa"
 
-#: src/sendmsg-window.c:3386
+#: src/sendmsg-window.c:3393
 msgid "Select parts for quotation"
 msgstr "Hautatu aipuaren zatiak"
 
-#: src/sendmsg-window.c:3395
+#: src/sendmsg-window.c:3402
 msgid "Select the parts of the message which shall be quoted in the reply"
 msgstr "Hautatu mezuaren zatiak aipu gisa bidaltzeko erantzunean"
 
-#: src/sendmsg-window.c:3424
+#: src/sendmsg-window.c:3431
 msgid ""
 "<b>Warning:</b> The original message contains an abnormal mixture of "
 "encrypted and unencrypted parts. This <i>might</i> indicate an attack.\n"
@@ -6769,7 +6883,7 @@ msgid ""
 msgstr "<b>Abisua:</b> Jatorrizko mesuak zifratutako eta zifratu gabeko zatien nahaste bitxia du. Horrek eraso bat adierazi <i>dezake</i> .\n"
 "Egiaztatu erantzunaren edukiak bi aldiz, bidali baino lehen."
 
-#: src/sendmsg-window.c:3431 src/sendmsg-window.c:3506
+#: src/sendmsg-window.c:3438 src/sendmsg-window.c:3513
 msgid ""
 "You reply to an encrypted message. The reply will contain the decrypted "
 "contents of the original message.\n"
@@ -6778,70 +6892,70 @@ msgid ""
 msgstr "Zifratutako mezu bati erantzuten ari zara. Erantzunak jatorrizko mezuaren zifratu gabeko edukiak izango ditu.\n"
 "Beharbada erantzuna zifratu beharko zenuke, nahi gabe informazio babestua ez argitaratzeko."
 
-#: src/sendmsg-window.c:3512
+#: src/sendmsg-window.c:3519
 msgid "Do not remind me again."
 msgstr "Ez gogorarazi berriro."
 
-#: src/sendmsg-window.c:3606
+#: src/sendmsg-window.c:3613
 msgid "you"
 msgstr "zu"
 
-#: src/sendmsg-window.c:3615
+#: src/sendmsg-window.c:3622
 #, c-format
 msgid "------forwarded message from %s------\n"
 msgstr "------%s-(r)en mezua, birbidalia------\n"
 
-#: src/sendmsg-window.c:3652
+#: src/sendmsg-window.c:3659
 #, c-format
 msgid "Message-ID: %s\n"
 msgstr "Mezuaren IDa: %s\n"
 
-#: src/sendmsg-window.c:3658
+#: src/sendmsg-window.c:3665
 msgid "References:"
 msgstr "Erreferentziak:"
 
-#: src/sendmsg-window.c:3669
+#: src/sendmsg-window.c:3676
 #, c-format
 msgid "On %s, %s wrote:\n"
 msgstr "%s(e)an, %s(e)k hau idatzi zuen:\n"
 
-#: src/sendmsg-window.c:3671
+#: src/sendmsg-window.c:3678
 #, c-format
 msgid "%s wrote:\n"
 msgstr "%s(e)k hau idatzi zuen:\n"
 
-#: src/sendmsg-window.c:3937
+#: src/sendmsg-window.c:3944
 msgid "Could not save message."
 msgstr "Ezin izan da mezua gorde."
 
-#: src/sendmsg-window.c:3944
+#: src/sendmsg-window.c:3951
 #, c-format
 msgid "Could not open draftbox: %s"
 msgstr "Ezin izan da zirriborroen postontzia ireki: %s"
 
-#: src/sendmsg-window.c:3973
+#: src/sendmsg-window.c:3980
 msgid "Message saved."
 msgstr "Mezua gorde da."
 
-#: src/sendmsg-window.c:4611 src/sendmsg-window.c:4619
-#: src/sendmsg-window.c:4626 src/sendmsg-window.c:4650
+#: src/sendmsg-window.c:4618 src/sendmsg-window.c:4626
+#: src/sendmsg-window.c:4633 src/sendmsg-window.c:4657
 #, c-format
 msgid "Could not attach the file %s: %s."
 msgstr "Ezin izan da %s fitxategia erantsi: %s."
 
-#: src/sendmsg-window.c:4612
+#: src/sendmsg-window.c:4619
 msgid "not an absolute path"
 msgstr "ez da bide-izen absolutua"
 
-#: src/sendmsg-window.c:4620
+#: src/sendmsg-window.c:4627
 msgid "does not exist"
 msgstr "ez dago"
 
-#: src/sendmsg-window.c:4651
+#: src/sendmsg-window.c:4658
 msgid "not in current directory"
 msgstr "ez dago uneko direktorioan"
 
-#: src/sendmsg-window.c:4703
+#: src/sendmsg-window.c:4710
 msgid ""
 "The link that you selected created\n"
 "a “Blind copy” (BCC) address.\n"
@@ -6852,51 +6966,51 @@ msgstr "Hautatu duzun estekak\n"
 "Egiaztatu helbidea\n"
 "egokia dela."
 
-#: src/sendmsg-window.c:4828
+#: src/sendmsg-window.c:4835
 msgid "Include file"
 msgstr "Sartu fitxategia"
 
 #. Translators: please do not translate Face.
-#: src/sendmsg-window.c:5018
+#: src/sendmsg-window.c:5025
 #, c-format
 msgid "Could not load Face header file %s: %s"
 msgstr "Ezin izan da kargatu %s, Face-ren goiburu-fitxategia: %s"
 
 #. Translators: please do not translate Face.
-#: src/sendmsg-window.c:5021
+#: src/sendmsg-window.c:5028
 #, c-format
 msgid "Could not load X-Face header file %s: %s"
 msgstr "Ezin izan da kargatu %s, X-Face-ren goiburu-fitxategia: %s"
 
-#: src/sendmsg-window.c:5133
+#: src/sendmsg-window.c:5140
 msgid "No Subject"
 msgstr "Gairik ez"
 
-#: src/sendmsg-window.c:5138
+#: src/sendmsg-window.c:5145
 msgid "_Send"
 msgstr "_Bidali"
 
-#: src/sendmsg-window.c:5163
+#: src/sendmsg-window.c:5170
 msgid "You did not specify a subject for this message"
 msgstr "Ez duzu gairik jarri mezu horretan"
 
-#: src/sendmsg-window.c:5164
+#: src/sendmsg-window.c:5171
 msgid "If you would like to provide one, enter it below."
 msgstr "Jarri nahi baduzu, idatzi hemen behean."
 
-#: src/sendmsg-window.c:5225
+#: src/sendmsg-window.c:5232
 msgid "Message could be encrypted"
 msgstr "Mezua ezin izan da zifratu"
 
-#: src/sendmsg-window.c:5228
+#: src/sendmsg-window.c:5235
 msgid "Send _encrypted"
 msgstr "Bidali _zifratuta"
 
-#: src/sendmsg-window.c:5229
+#: src/sendmsg-window.c:5236
 msgid "Send _unencrypted"
 msgstr "Bidali zifratu _gabe"
 
-#: src/sendmsg-window.c:5299 src/sendmsg-window.c:5387
+#: src/sendmsg-window.c:5306 src/sendmsg-window.c:5394
 #, c-format
 msgid ""
 "You did not select encryption for this message, although %s public keys are "
@@ -6904,12 +7018,12 @@ msgid ""
 "could be %s encrypted."
 msgstr "Ez duzu zifratzerik hautatu mezu honentzako, nahiz eta %s gako publikoak hartzaile guztientzako erabilgarri egon. Zure pribatutasuna babaesteko, mezua zifratuko (%s ) da."
 
-#: src/sendmsg-window.c:5374
+#: src/sendmsg-window.c:5381
 #, c-format
 msgid "error checking Autocrypt keys: %s"
 msgstr "errorea Autocrypt gakoak egiaztatzean: %s"
 
-#: src/sendmsg-window.c:5405
+#: src/sendmsg-window.c:5412
 msgid ""
 "\n"
 "However, encryption is discouraged as the Autocrypt status indicates that "
@@ -6917,7 +7031,7 @@ msgid ""
 msgstr "\n"
 "Hala ere, ez da zifratzea gomendatzen, Autocrypt egoerak adierazi baitu zenbait hartzailek <i>beharbada</i> ezin izango dutela mezua irakurri."
 
-#: src/sendmsg-window.c:5418
+#: src/sendmsg-window.c:5425
 #, c-format
 msgid ""
 "<i>Note:</i> choosing encryption will import %u key from the Autocrypt "
@@ -6928,62 +7042,62 @@ msgid_plural ""
 msgstr[0] "<i>Oharra:</i> Zifratzea aukeratzen bada, gako %u inportatuko da Autocrypt datu-basetik GnuPG gako sortara."
 msgstr[1] "<i>Oharra:</i> Zifratzea aukeratzen bada, %u gako inportatuko dira Autocrypt datu-basetik GnuPG gako sortara."
 
-#: src/sendmsg-window.c:5443
+#: src/sendmsg-window.c:5450
 #, c-format
 msgid "Cannot import Autocrypt keys: %s"
 msgstr "Ezin dira Autocrypt gakoak inportatu: %s"
 
-#: src/sendmsg-window.c:5503
+#: src/sendmsg-window.c:5510
 msgid "You selected OpenPGP security for this message.\n"
 msgstr "OpenGPG segurtasuna hautatu duzu mezu honentzako.\n"
 
-#: src/sendmsg-window.c:5508
+#: src/sendmsg-window.c:5515
 msgid ""
 "The message text will be sent as plain text and as HTML, but only the plain "
 "part can be signed.\n"
 msgstr "Mezuaren testua testu soil eta HTML gisa bidaliko da, baina zati soila bakarrik sinatu daiteke.\n"
 
-#: src/sendmsg-window.c:5513
+#: src/sendmsg-window.c:5520
 msgid ""
 "The message contains attachments, which cannot be signed or encrypted.\n"
 msgstr "Mezuak eranskinak ditu, ezin direnak sinatu edo zifratu.\n"
 
-#: src/sendmsg-window.c:5517
+#: src/sendmsg-window.c:5524
 msgid ""
 "You should select MIME mode if the complete message shall be protected. Do "
 "you really want to proceed?"
 msgstr "MIME modua hautatu behar duzu mezu osoa babesteko. Ziur zaude aurrera jarraitu nahi duzula?"
 
-#: src/sendmsg-window.c:5537
+#: src/sendmsg-window.c:5544
 #, c-format
 msgid "sending message with GPG mode %d"
 msgstr "mezua %d GPG moduarekin bidaltzen"
 
-#: src/sendmsg-window.c:5567
+#: src/sendmsg-window.c:5574
 msgid "Message could not be created"
 msgstr "Ezin izan da mezua sortu"
 
-#: src/sendmsg-window.c:5569
+#: src/sendmsg-window.c:5576
 msgid "Message could not be queued in outbox"
 msgstr "Ezin izan da jarri mezua irteerako postontziko ilaran"
 
-#: src/sendmsg-window.c:5571
+#: src/sendmsg-window.c:5578
 msgid "Message could not be saved in sentbox"
 msgstr "Ezin izan da gorde mezua bidalitakoen postontzian"
 
-#: src/sendmsg-window.c:5573
+#: src/sendmsg-window.c:5580
 msgid "Message could not be sent"
 msgstr "Ezin izan da mezua bidali"
 
-#: src/sendmsg-window.c:5575
+#: src/sendmsg-window.c:5582
 msgid "Message could not be signed"
 msgstr "Ezin izan da mezua sinatu"
 
-#: src/sendmsg-window.c:5577
+#: src/sendmsg-window.c:5584
 msgid "Message could not be encrypted"
 msgstr "Ezin izan da mezua zifratu"
 
-#: src/sendmsg-window.c:5582
+#: src/sendmsg-window.c:5589
 #, c-format
 msgid ""
 "Send failed: %s\n"
@@ -6991,45 +7105,45 @@ msgid ""
 msgstr "Huts egin du bidaltzean: %s\n"
 "%s"
 
-#: src/sendmsg-window.c:5588
+#: src/sendmsg-window.c:5595
 #, c-format
 msgid "Send failed: %s"
 msgstr "Huts egin du bidaltzean: %s"
 
-#: src/sendmsg-window.c:5679
+#: src/sendmsg-window.c:5686
 #, c-format
 msgid "Could not postpone message: %s"
 msgstr "Ezin izan da mezua geroratu: %s"
 
-#: src/sendmsg-window.c:5700
+#: src/sendmsg-window.c:5707
 msgid "Message postponed."
 msgstr "Mezua geroratu da."
 
-#: src/sendmsg-window.c:5705
+#: src/sendmsg-window.c:5712
 msgid "Could not postpone message."
 msgstr "Ezin izan da mezua geroratu."
 
-#: src/sendmsg-window.c:5917
+#: src/sendmsg-window.c:5924
 #, c-format
 msgid "Error starting spell checker: %s"
 msgstr "Errorea gertatu da ortografia-egiaztatzailea abiaraztean: %s"
 
-#: src/sendmsg-window.c:6682
+#: src/sendmsg-window.c:6689
 #, c-format
 msgid "Reply to %s: %s"
 msgstr "Erantzun %s-(r)i: %s"
 
-#: src/sendmsg-window.c:6687
+#: src/sendmsg-window.c:6694
 #, c-format
 msgid "Forward message to %s: %s"
 msgstr "Birbidali mezua %s-(r)i: %s"
 
-#: src/sendmsg-window.c:6691
+#: src/sendmsg-window.c:6698
 #, c-format
 msgid "New message to %s: %s"
 msgstr "%s-(r)entzako mezu berria: %s"
 
-#: src/sendmsg-window.c:6838 ui/sendmsg-window.ui:197
+#: src/sendmsg-window.c:6845 ui/sendmsg-window.ui:197
 msgid "_Language"
 msgstr "_Hizkuntza"
 

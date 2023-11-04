@@ -54,6 +54,19 @@ struct _AddressBookConfig {
 	    GtkWidget *enable_tls;
 	} ldap;
 #endif
+
+#ifdef HAVE_WEBDAV
+	struct {
+		GtkWidget *domain_url;
+		GtkWidget *user;
+		GtkWidget *passwd;
+		GtkWidget *probe;
+		GtkWidget *addressbook;
+		GtkWidget *remote_name;
+		GtkWidget *refresh_period;
+		GtkWidget *force_mget;
+	} carddav;
+#endif
     } ab_specific;
 
     LibBalsaAddressBook *address_book;
@@ -73,6 +86,9 @@ static GtkWidget *create_gpe_dialog(AddressBookConfig * abc);
 #endif
 #ifdef HAVE_OSMO
 static GtkWidget *create_osmo_dialog(AddressBookConfig *abc);
+#endif
+#ifdef HAVE_WEBDAV
+static GtkWidget *create_carddav_dialog(AddressBookConfig *abc);
 #endif
 
 static void help_button_cb(AddressBookConfig * abc);
@@ -334,6 +350,10 @@ create_dialog_from_type(AddressBookConfig * abc)
 #ifdef HAVE_OSMO
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
     	return create_osmo_dialog(abc);
+#endif
+#ifdef HAVE_WEBDAV
+    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_CARDDAV) {
+    	return create_carddav_dialog(abc);
 #endif
     } else {
         g_assert_not_reached();
@@ -636,6 +656,172 @@ create_gpe_dialog(AddressBookConfig * abc)
 }
 #endif
 
+#ifdef HAVE_WEBDAV
+static void
+carddav_dlg_widget_active(GtkEditable G_GNUC_UNUSED *editable, gpointer user_data)
+{
+	AddressBookConfig *abc = (AddressBookConfig *) user_data;
+
+	if (abc->ab_specific.carddav.probe != NULL) {
+		const gchar *domain_url;
+		const gchar *user;
+		const gchar *passwd;
+		gboolean have_basic;
+		GtkTreeIter iter;
+		gboolean probe_done;
+
+		domain_url = gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.domain_url));
+		user = gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.user));
+		passwd = gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.passwd));
+		have_basic = (domain_url != NULL) && (domain_url[0] != '\0') &&
+			(user != NULL) && (user[0] != '\0') &&
+			(passwd != NULL) && (passwd[0] != '\0');
+		probe_done = gtk_tree_model_get_iter_first(gtk_combo_box_get_model(GTK_COMBO_BOX(abc->ab_specific.carddav.remote_name)),
+			&iter);
+		gtk_widget_set_sensitive(abc->ab_specific.carddav.probe, have_basic);
+		gtk_widget_set_sensitive(abc->ab_specific.carddav.remote_name, have_basic & probe_done);
+		gtk_widget_set_sensitive(abc->ab_specific.carddav.refresh_period, have_basic & probe_done);
+		gtk_widget_set_sensitive(abc->ab_specific.carddav.force_mget, have_basic & probe_done);
+		if (GTK_IS_DIALOG(abc->window)) {
+			gtk_dialog_set_response_sensitive(GTK_DIALOG(abc->window), GTK_RESPONSE_APPLY, have_basic & probe_done);
+		}
+	}
+}
+
+static void
+carddav_run_probe(GtkButton G_GNUC_UNUSED *button, gpointer user_data)
+{
+	AddressBookConfig *abc = (AddressBookConfig *) user_data;
+	const gchar *domain_or_url;
+	const gchar *username;
+	const gchar *password;
+	GList *addressbooks;
+	GError *error = NULL;
+
+	domain_or_url = gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.domain_url));
+	username = gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.user));
+	password = gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.passwd));
+	addressbooks = libbalsa_carddav_list(domain_or_url, username, password, &error);
+	if (error != NULL) {
+		const gchar *ptext;
+		gchar *stext;
+		GtkWidget *dialog;
+
+		if ((error->domain == G_RESOLVER_ERROR) && (error->code == G_RESOLVER_ERROR_NOT_FOUND)) {
+			ptext = _("DNS service record not found");
+			stext = g_strdup_printf(_("No DNS service record for the domain “%s” and service “carddavs” found. "
+									  "Please enter the “https://” URI manually."),
+				gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.domain_url)));
+		} else if ((error->domain == WEBDAV_ERROR_QUARK) && (error->code == 401)) {
+			ptext = _("Authorization failed");
+			stext = g_strdup_printf(_("The server rejected the authorization for “%s”. "
+									  "Please check the user name and the pass phrase"),
+				gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.user)));
+		} else {
+			ptext = _("Error");
+			stext = g_strdup(error->message);
+		}
+		dialog = gtk_message_dialog_new(NULL, libbalsa_dialog_flags() | GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
+			"%s", ptext);
+		gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG(dialog), "%s", stext);
+		(void) gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy(dialog);
+		g_free(stext);
+		g_error_free(error);
+	} else {
+		GtkListStore *store;
+		GList *this_ab;
+
+		store = GTK_LIST_STORE(gtk_combo_box_get_model(GTK_COMBO_BOX(abc->ab_specific.carddav.remote_name)));
+		gtk_list_store_clear(store);
+		for (this_ab = addressbooks; this_ab != NULL; this_ab = this_ab->next) {
+			GtkTreeIter iter;
+			libbalsa_webdav_resource_t *res = (libbalsa_webdav_resource_t *) this_ab->data;
+
+			gtk_list_store_append(store, &iter);
+			g_debug("%s: '%s': %s", __func__, res->name, res->href);
+			gtk_list_store_set(store, &iter, 0, res->name, 1, res->href, -1);
+			libbalsa_webdav_resource_free(res);
+		}
+		gtk_combo_box_set_active(GTK_COMBO_BOX(abc->ab_specific.carddav.remote_name), 0);
+		g_list_free(addressbooks);
+		carddav_dlg_widget_active(NULL, abc);
+	}
+}
+
+static GtkWidget *
+create_carddav_dialog(AddressBookConfig *abc)
+{
+	GtkWidget *grid = libbalsa_create_grid();
+	LibBalsaAddressBookCarddav *ab;
+	GtkWidget *label;
+	GtkListStore *store;
+	GtkCellRenderer *renderer;
+	GtkWidget *box;
+	GtkWidget *dialog;
+
+	ab = (LibBalsaAddressBookCarddav *) abc->address_book; /* may be NULL */
+
+	/* address book name */
+	label = libbalsa_create_grid_label(_("A_ddress Book Name:"), grid, 0);
+	abc->name_entry = libbalsa_create_grid_entry(grid, NULL, NULL, 0,
+		(ab != NULL) ? libbalsa_address_book_get_name(LIBBALSA_ADDRESS_BOOK(ab)) : "", label);
+
+	label = libbalsa_create_grid_label(_("D_omain or URL:"), grid, 1);
+	abc->ab_specific.carddav.domain_url = libbalsa_create_grid_entry(grid, G_CALLBACK(carddav_dlg_widget_active), abc, 1,
+		(ab != NULL) ? libbalsa_address_book_carddav_get_base_dom_url(ab) : "", label);
+
+	label = libbalsa_create_grid_label(_("_User Name:"), grid, 2);
+	abc->ab_specific.carddav.user = libbalsa_create_grid_entry(grid, G_CALLBACK(carddav_dlg_widget_active), abc, 2,
+		(ab != NULL) ? libbalsa_address_book_carddav_get_user(ab) : "", label);
+
+	label = libbalsa_create_grid_label(_("_Pass Phrase:"), grid, 3);
+	abc->ab_specific.carddav.passwd = libbalsa_create_grid_entry(grid, G_CALLBACK(carddav_dlg_widget_active), abc, 3,
+		(ab != NULL) ? libbalsa_address_book_carddav_get_password(ab) : "", label);
+	gtk_entry_set_visibility(GTK_ENTRY(abc->ab_specific.carddav.passwd), FALSE);
+
+	abc->ab_specific.carddav.probe = gtk_button_new_from_icon_name("system-run", GTK_ICON_SIZE_MENU);
+	g_signal_connect(abc->ab_specific.carddav.probe, "clicked", G_CALLBACK(carddav_run_probe), abc);
+	gtk_button_set_label(GTK_BUTTON(abc->ab_specific.carddav.probe), _("probe…"));
+	gtk_button_set_always_show_image(GTK_BUTTON(abc->ab_specific.carddav.probe), TRUE);
+	gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.carddav.probe, 0, 4, 2, 1);
+
+	label = libbalsa_create_grid_label(_("_CardDAV address book name:"), grid, 5);
+	store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+	abc->ab_specific.carddav.remote_name = gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));
+	g_object_unref(store);
+	renderer = gtk_cell_renderer_text_new();
+	gtk_cell_layout_pack_start(GTK_CELL_LAYOUT(abc->ab_specific.carddav.remote_name), renderer, TRUE);
+	gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(abc->ab_specific.carddav.remote_name), renderer, "text", 0, NULL);
+	gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.carddav.remote_name, 1, 5, 1, 1);
+
+	label = libbalsa_create_grid_label(_("_Refresh period:"), grid, 6);
+	box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
+	abc->ab_specific.carddav.refresh_period = gtk_spin_button_new_with_range(1.0, 30.0, 1.0);
+	gtk_spin_button_set_value(GTK_SPIN_BUTTON(abc->ab_specific.carddav.refresh_period),
+		(ab != NULL) ? libbalsa_address_book_carddav_get_refresh(ab) : 30.0);
+	gtk_spin_button_set_digits(GTK_SPIN_BUTTON(abc->ab_specific.carddav.refresh_period), 0);
+	gtk_container_add(GTK_CONTAINER(box), abc->ab_specific.carddav.refresh_period);
+	gtk_container_add(GTK_CONTAINER(box), gtk_label_new(_("minutes")));
+	gtk_grid_attach(GTK_GRID(grid), box, 1, 6, 1, 1);
+
+	abc->ab_specific.carddav.force_mget = libbalsa_create_grid_check(_("Force _Multiget for non-standard server"), grid, 7,
+		(ab != NULL) ? libbalsa_address_book_carddav_get_force_mget(ab) : FALSE);
+
+	add_radio_buttons(grid, 8, abc);
+	gtk_widget_show(grid);
+	dialog = create_generic_dialog(abc, "CardDAV");
+	gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog), GTK_RESPONSE_APPLY, ab != NULL);
+	gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), grid);
+	if (ab != NULL) {
+		carddav_run_probe(NULL, abc);
+	}
+	carddav_dlg_widget_active(NULL, abc);
+
+	return dialog;
+}
+#endif	/* HAVE_WEBDAV */
+
 static void
 help_button_cb(AddressBookConfig * abc)
 {
@@ -732,6 +918,26 @@ create_book(AddressBookConfig * abc)
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
     	address_book = libbalsa_address_book_osmo_new(name);
 #endif
+#if HAVE_WEBDAV
+    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_CARDDAV) {
+		GtkTreeIter iter;
+		gchar *carddav_name;
+		gchar *carddav_uri;
+
+		gtk_combo_box_get_active_iter(GTK_COMBO_BOX(abc->ab_specific.carddav.remote_name), &iter);
+		gtk_tree_model_get(gtk_combo_box_get_model(GTK_COMBO_BOX(abc->ab_specific.carddav.remote_name)), &iter,
+			0, &carddav_name, 1, &carddav_uri, -1);
+		address_book = libbalsa_address_book_carddav_new(name,
+			gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.domain_url)),
+			gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.user)),
+			gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.passwd)),
+			carddav_uri,
+			carddav_name,
+			gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(abc->ab_specific.carddav.refresh_period)),
+			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->ab_specific.carddav.force_mget)));
+		g_free(carddav_name);
+		g_free(carddav_uri);
+#endif
     } else
         g_assert_not_reached();
 
@@ -817,6 +1023,29 @@ modify_book(AddressBookConfig * abc)
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
     	/* nothing to do here */
 #endif
+#if HAVE_WEBDAV
+    } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_CARDDAV) {
+		LibBalsaAddressBookCarddav *carddav;
+		GtkTreeIter iter;
+		gchar *carddav_name;
+		gchar *carddav_uri;
+
+		gtk_combo_box_get_active_iter(GTK_COMBO_BOX(abc->ab_specific.carddav.remote_name), &iter);
+		gtk_tree_model_get(gtk_combo_box_get_model(GTK_COMBO_BOX(abc->ab_specific.carddav.remote_name)), &iter,
+			0, &carddav_name, 1, &carddav_uri, -1);
+		carddav = LIBBALSA_ADDRESS_BOOK_CARDDAV(address_book);
+		libbalsa_address_book_carddav_set_base_dom_url(carddav, gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.domain_url)));
+		libbalsa_address_book_carddav_set_user(carddav, gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.user)));
+		libbalsa_address_book_carddav_set_password(carddav, gtk_entry_get_text(GTK_ENTRY(abc->ab_specific.carddav.passwd)));
+		libbalsa_address_book_carddav_set_full_url(carddav, carddav_uri);
+		libbalsa_address_book_carddav_set_carddav_name(carddav, carddav_name);
+		libbalsa_address_book_carddav_set_refresh(carddav,
+			gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(abc->ab_specific.carddav.refresh_period)));
+		libbalsa_address_book_carddav_set_force_mget(carddav,
+			gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abc->ab_specific.carddav.force_mget)));
+		g_free(carddav_name);
+		g_free(carddav_uri);
+#endif
     } else
         g_assert_not_reached();
 
@@ -884,6 +1113,16 @@ add_osmo_cb(GtkWidget * widget, AddressBookConfig * abc)
 }
 #endif /* HAVE_OSMO */
 
+#ifdef HAVE_WEBDAV
+static void
+add_carddav_cb(GtkWidget * widget, AddressBookConfig * abc)
+{
+    abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_CARDDAV;
+    abc->window = create_carddav_dialog(abc);
+    gtk_widget_show_all(abc->window);
+}
+#endif /* HAVE_WEBDAV */
+
 GtkWidget *
 balsa_address_book_add_menu(BalsaAddressBookCallback callback,
                             GtkWindow * parent)
@@ -933,6 +1172,13 @@ balsa_address_book_add_menu(BalsaAddressBookCallback callback,
     menuitem = gtk_menu_item_new_with_label(_("Osmo Address Book"));
     g_signal_connect(menuitem, "activate",
                      G_CALLBACK(add_osmo_cb), abc);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
+#endif
+
+#ifdef HAVE_WEBDAV
+    menuitem = gtk_menu_item_new_with_label(_("CardDAV Address Book"));
+    g_signal_connect(menuitem, "activate",
+                     G_CALLBACK(add_carddav_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 #endif
 

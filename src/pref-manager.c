@@ -949,6 +949,10 @@ update_address_books(void)
         else if (LIBBALSA_IS_ADDRESS_BOOK_OSMO(address_book))
         	type = "Osmo";
 #endif
+#if HAVE_WEBDAV
+        else if (LIBBALSA_IS_ADDRESS_BOOK_CARDDAV(address_book))
+        	type = "CardDAV";
+#endif
         else
             type = _("Unknown");
 

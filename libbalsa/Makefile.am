@@ -20,6 +20,8 @@ libbalsa_a_SOURCES = 		\
 	address-book-text.h	\
 	address-book-vcard.c	\
 	address-book-vcard.h	\
+	address-book-carddav.c	\
+	address-book-carddav.h	\
 	address-book.c		\
 	address-book.h		\
 	address-view.c		\
@@ -136,8 +138,11 @@ libbalsa_a_SOURCES = 		\
 	geometry-manager.c	\
 	geometry-manager.h	\
 	x509-cert-widget.c	\
-	x509-cert-widget.h
-
+	x509-cert-widget.h	\
+	libbalsa-webdav.c	\
+	libbalsa-webdav.h	\
+	libbalsa-carddav.c	\
+	libbalsa-carddav.h
 
 pkglib_LTLIBRARIES = libhtmlfilter.la
 libhtmlfilter_la_SOURCES = html-filter.c

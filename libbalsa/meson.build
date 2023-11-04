@@ -3,6 +3,8 @@
 libbalsa_a_sources = [
   'abook-completion.c',
   'abook-completion.h',
+  'address-book-carddav.c',
+  'address-book-carddav.h',
   'address-book-extern.c',
   'address-book-extern.h',
   'address-book-gpe.c',
@@ -133,7 +135,11 @@ libbalsa_a_sources = [
   'geometry-manager.c',
   'geometry-manager.h',
   'x509-cert-widget.c',
-  'x509-cert-widget.h'
+  'x509-cert-widget.h',
+  'libbalsa-webdav.c',
+  'libbalsa-webdav.h',
+  'libbalsa-carddav.c',
+  'libbalsa-carddav.h'
 ]
 
 libimap_include = include_directories('imap')

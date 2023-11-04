@@ -4,6 +4,7 @@ balsa.appdata.xml.in
 org.desktop.Balsa.desktop.in.in
 balsa-mailto-handler.desktop.in.in
 libbalsa/address-book.c
+libbalsa/address-book-carddav.c
 libbalsa/address-book-extern.c
 libbalsa/address-book-ldap.c
 libbalsa/address-book-ldif.c
@@ -33,6 +34,7 @@ libbalsa/imap/imap-tls.c
 libbalsa/imap-server.c
 libbalsa/information.c
 libbalsa/libbalsa.c
+libbalsa/libbalsa-carddav.c
 libbalsa/libbalsa-conf.c
 libbalsa/libbalsa-gpgme.c
 libbalsa/libbalsa-gpgme-cb.c
@@ -40,6 +42,7 @@ libbalsa/libbalsa-gpgme-keys.c
 libbalsa/libbalsa-gpgme-widgets.c
 libbalsa/libbalsa-progress.c
 libbalsa/libbalsa-vfs.c
+libbalsa/libbalsa-webdav.c
 libbalsa/mailbox.c
 libbalsa/mailbox.h
 libbalsa/mailbox_imap.c

@@ -124,9 +124,9 @@ https://pawsa.fedorapeople.org/balsa/bugs.html\fR
 for more information on reporting Balsa bugs.
 .PP
 Before reporting bugs, please check to see if the bug is mentioned
-in the FAQ's or the mailing list archive \fI
-.UR https://mail.gnome.org/mailman/listinfo/balsa-list
-https://mail.gnome.org/mailman/listinfo/balsa-list\fR.
+in the FAQ's or the support forum \fI
+.UR https://discourse.gnome.org/tag/balsa
+https://discourse.gnome.org/tag/balsa\fR.
 .PP
 When reporting Balsa bugs, it is important to include
   * a reliable way to reproduce the bug,

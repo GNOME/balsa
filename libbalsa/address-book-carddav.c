@@ -500,7 +500,7 @@ libbalsa_address_book_carddav_add_address(LibBalsaAddressBook *ab, LibBalsaAddre
 /** @brief Case-insensitive UTF-8 strstr
  *
  * @param[in] haystack string to check
- * @param[in] utf8_needle string to detect, @em must be created by calling g_utf8_casefold()
+ * @param[in] utf8_needle string to detect, @em must be created by calling g_utf8_normalize() and g_utf8_casefold()
  * @return @c TRUE iff @em haystack contains @em utf8_needle
  */
 static inline gboolean
@@ -509,9 +509,12 @@ utf8_strstr(const gchar *haystack, const gchar *utf8_needle)
 	gboolean result;
 
 	if (haystack != NULL) {
+		gchar *norm_str;
 		gchar *test;
 
-		test = g_utf8_casefold(haystack, -1);
+		norm_str = g_utf8_normalize(haystack, -1, G_NORMALIZE_ALL);
+		test = g_utf8_casefold(norm_str, -1);
+		g_free(norm_str);
 		result = (strstr(test, utf8_needle) != NULL);
 		g_free(test);
 	} else {

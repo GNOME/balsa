@@ -376,7 +376,7 @@ if webdav
   endif
   webdav_xml_dep = dependency('libxml-2.0')
   conf.set('HAVE_WEBDAV', 1,
-    description : 'Defined when Webkit (CardDAV) support is enabled.')
+    description : 'Defined when WebDAV (CardDAV) support is enabled.')
   balsa_deps += [webdav_dep, webdav_xml_dep]
   balsa_ab_deps += [webdav_dep, webdav_xml_dep]
 endif # webdav

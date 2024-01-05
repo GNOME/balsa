@@ -481,7 +481,7 @@ if test x$with_webdav != xno ; then
             libsoup-2.4
             libxml-2.0
         ])])
-    AC_DEFINE(HAVE_WEBDAV,1,[If defined, enable Webkit (CardDAV) support.])
+    AC_DEFINE(HAVE_WEBDAV,1,[If defined, enable WebDAV (CardDAV) support.])
     BALSA_CFLAGS="$BALSA_CFLAGS $WEBDAV_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $WEBDAV_LIBS"
     BALSA_AB_LIBS="$BALSA_AB_LIBS $WEBDAV_LIBS"

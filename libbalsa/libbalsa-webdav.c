@@ -597,10 +597,10 @@ static void
 libbalsa_webdav_init(LibBalsaWebdav *self)
 {
 #if SOUP_CHECK_VERSION(3, 0, 0)
-	soup_session_set_user_agent(SOUP_SESSION(self), "balsa/" BALSA_VERSION);
+	soup_session_set_user_agent(SOUP_SESSION(self), "balsa/" BALSA_VERSION " ");
 	soup_session_set_timeout(SOUP_SESSION(self), 30U);
 #else
-	g_object_set(self, SOUP_SESSION_USER_AGENT, "balsa/" BALSA_VERSION, SOUP_SESSION_TIMEOUT, 30U, NULL);
+	g_object_set(self, SOUP_SESSION_USER_AGENT, "balsa/" BALSA_VERSION " ", SOUP_SESSION_TIMEOUT, 30U, NULL);
 	g_signal_connect(self, "authenticate", G_CALLBACK(do_soup_auth), self);
 #endif		/* libsoup 2.4/3 */
 }

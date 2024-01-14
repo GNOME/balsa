@@ -413,7 +413,15 @@ fi
 # OAuth2 configuration
 AC_MSG_CHECKING(whether to include OAuth2 support)
 if test "x$with_oauth2" != xno  ; then
-    PKG_CHECK_MODULES(OAUTH2, [libsoup-2.4 json-glib-1.0])
+    PKG_CHECK_MODULES(OAUTH2, [
+        libsoup-3.0
+        json-glib-1.0
+    ], , [
+        PKG_CHECK_MODULES(OAUTH2, [
+            libsoup-2.4
+            json-glib-1.0
+        ])
+    ])
     AC_DEFINE(HAVE_OAUTH2,1,[Defined when OAuth2 is available.])
     BALSA_CFLAGS="$BALSA_CFLAGS $OAUTH2_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $OAUTH2_LIBS"
@@ -499,7 +507,8 @@ if test x$with_webdav != xno ; then
         PKG_CHECK_MODULES(WEBDAV, [
             libsoup-2.4
             libxml-2.0
-        ])])
+        ])
+    ])
     AC_DEFINE(HAVE_WEBDAV,1,[If defined, enable WebDAV (CardDAV) support.])
     BALSA_CFLAGS="$BALSA_CFLAGS $WEBDAV_CFLAGS"
     BALSA_LIBS="$BALSA_LIBS $WEBDAV_LIBS"

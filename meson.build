@@ -306,13 +306,16 @@ endif # gss
 # OAuth2 configuration
 #
 if oauth2
-  oauth2_dep = dependency('libsoup-2.4 json-glib-1.0')
-  if oauth2_dep.found()
-    conf.set('HAVE_GCR', 1,
-      description : 'Defined when OAuth2 is available')
+  oauth2_dep = dependency('libsoup-3.0', required : false)
+  if not oauth2_dep.found()
+    oauth2_dep = dependency('libsoup-2.4')
   endif
-  balsa_deps        += oauth2_dep
-  libnetclient_deps += oauth2_dep
+  oauth2_json_dep = dependency('json-glib-1.0')
+  conf.set('HAVE_OAUTH2', 1,
+    description : 'Defined when OAuth2 is available')
+  endif
+  balsa_deps        += oauth2_dep oauth2_json_dep
+  libnetclient_deps += oauth2_dep oauth2_json_dep
 endif #oauth2
 
 # gcr configuration

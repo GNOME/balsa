@@ -185,11 +185,14 @@ static void erase_oauth2_token_config(const LibBalsaOauth2 *oauth);
 static gboolean oauth2_refresh(LibBalsaOauth2  *oauth,
 							   GError         **error);
 static gboolean eval_json_auth_reply(LibBalsaOauth2     *oauth,
-									 const SoupMessage  *message,
+									 const gchar        *reply_buf,
+									 gsize               reply_len,
 									 gboolean            is_auth,
 									 GError            **error);
 static void eval_json_error(const gchar        *prefix,
-							const SoupMessage  *message,
+							const gchar        *reply_buf,
+							gsize               reply_len,
+							SoupMessage  *message,
 							GError            **error);
 
 static gboolean oauth2_authorise(LibBalsaOauth2  *oauth,
@@ -202,12 +205,26 @@ static gboolean oauth2_authorise_real(LibBalsaOauth2  *oauth,
 static oauth2_auth_ctx_t *oauth2_authorize_init(const oauth2_provider_t  *provider,
 												GError                  **error)
 	G_GNUC_WARN_UNUSED_RESULT;
+
+#if SOUP_CHECK_VERSION(3, 0, 0)
+
+static void oauth2_listener_cb(SoupServer        *server,
+							   SoupServerMessage *msg,
+							   const char        *path,
+							   GHashTable        *query,
+							   gpointer           user_data);
+
+#else				/* libsoup 2.4 */
+
 static void oauth2_listener_cb(SoupServer        *server,
 							   SoupMessage       *msg,
 							   const char        *path,
 							   GHashTable        *query,
 							   SoupClientContext *client,
 							   gpointer           user_data);
+
+#endif				/* libsoup 2.4 vs. 3 */
+
 static void oauth2_authorize_finish(oauth2_auth_ctx_t *auth_ctx,
 									const gchar       *auth_code);
 static gboolean run_oauth2_dialog(oauth2_auth_ctx_t		  *auth_ctx,
@@ -577,6 +594,89 @@ erase_oauth2_token_config(const LibBalsaOauth2 *oauth)
 
 /* == OAuth2 token refresh related functions ==================================================================================== */
 
+#if SOUP_CHECK_VERSION(3, 0, 0)
+
+/** @brief Refresh a OAuth2 access token
+ *
+ * @param[in] oauth OAuth2 context
+ * @param[out] error location for error, may be NULL
+ * @return TRUE on success, FALSE on error
+ *
+ * Send a @c refresh_token request to the provider's oauth2_provider_t::token_uri, and call eval_json_auth_reply() to extract the
+ * new access token.
+ */
+static gboolean
+oauth2_refresh(LibBalsaOauth2 *oauth, GError **error)
+{
+	gboolean result;
+	SoupSession *session;
+	gchar *form_data;
+	SoupMessage *message;
+	GBytes *reply;
+	GError *local_err = NULL;
+	const gchar *reply_buf = NULL;
+	gsize reply_len = 0UL;
+	SoupStatus status;
+
+	g_return_val_if_fail((oauth->refresh_token != NULL) && (oauth->provider != NULL), FALSE);
+
+	/* send the refresh token */
+	g_debug("%s: post refresh request for %s: uri=%s id=%s secret=%s token=%s", __func__, oauth->account,
+		oauth->provider->token_uri, oauth->provider->client_id, oauth->provider->client_secret, oauth->refresh_token);
+	session = oauth_soup_session_new();
+	if (oauth->provider->client_secret != NULL) {
+		form_data = soup_form_encode(
+			"grant_type", "refresh_token",
+			"client_id", oauth->provider->client_id,
+			"client_secret", oauth->provider->client_secret,
+			"refresh_token", oauth->refresh_token,
+			NULL);
+	} else {
+		form_data = soup_form_encode(
+			"grant_type", "refresh_token",
+			"client_id", oauth->provider->client_id,
+			"refresh_token", oauth->refresh_token,
+			NULL);
+	}
+	message = soup_message_new_from_encoded_form("POST", oauth->provider->token_uri, form_data);
+	reply = soup_session_send_and_read(session, message, NULL, &local_err);
+	status = soup_message_get_status(message);
+	if (reply != NULL) {
+		reply_buf = g_bytes_get_data(reply, &reply_len);
+	}
+	g_debug("%s: status=%d, reason=%s", __func__, (int) status, soup_message_get_reason_phrase(message));
+
+	g_free(oauth->access_token);
+	oauth->access_token = NULL;
+	if ((status != SOUP_STATUS_OK) || (reply_buf == NULL)) {
+		if (local_err != NULL) {
+			g_propagate_error(error, local_err);
+		} else {
+			eval_json_error(_("OAuth2 refresh token request failed"), reply_buf, reply_len, message, error);
+		}
+		/* a 4xy status probably means that we must re-authorise, so erase the refresh token in this case */
+		if (SOUP_STATUS_IS_CLIENT_ERROR(status)) {
+			g_free(oauth->access_token);
+			oauth->access_token = NULL;
+			g_free(oauth->refresh_token);
+			oauth->refresh_token = NULL;
+#if defined(HAVE_LIBSECRET)
+			erase_oauth2_token_libsecret(oauth);
+#endif
+			erase_oauth2_token_config(oauth);
+		}
+		result = FALSE;
+	} else {
+		result = eval_json_auth_reply(oauth, reply_buf, reply_len, FALSE, error);
+	}
+	g_bytes_unref(reply);
+	g_object_unref(message);
+	g_object_unref(session);
+	return result;
+}
+
+#else				/* libsoup 2.4 */
+
 /** @brief Refresh a OAuth2 access token
  *
  * @param[in] oauth OAuth2 context
@@ -620,7 +720,8 @@ oauth2_refresh(LibBalsaOauth2 *oauth, GError **error)
 	g_free(oauth->access_token);
 	oauth->access_token = NULL;
 	if ((status != SOUP_STATUS_OK) || (message->status_code != SOUP_STATUS_OK) || (message->response_body == NULL)) {
-		eval_json_error(_("OAuth2 refresh token request failed"), message, error);
+		eval_json_error(_("OAuth2 refresh token request failed"), message->response_body->data, message->response_body->length,
+			message, error);
 		/* a 4xy status probably means that we must re-authorise, so erase the refresh token in this case */
 		if ((status / 100U) == 4U) {
 			g_free(oauth->access_token);
@@ -634,18 +735,21 @@ oauth2_refresh(LibBalsaOauth2 *oauth, GError **error)
 		}
 		result = FALSE;
 	} else {
-		result = eval_json_auth_reply(oauth, message, FALSE, error);
+		result = eval_json_auth_reply(oauth, message->response_body->data, message->response_body->length, FALSE, error);
 	}
 	g_object_unref(message);
 	g_object_unref(session);
 	return result;
 }
 
+#endif				/* libsoup 2.4 vs. 3 */
+
 
 /** @brief Evaluate the JSON success reply from an OAuth2 server
  *
  * @param[in] oauth OAuth2 context
- * @param[in] message message received from the remote OAuth2 server which @em must have a non-NULL @c response_body
+ * @param[in] reply_buf JSON reply received from the remote OAuth2 server
+ * @param[in] reply_len length of the JSON reply received from the remote OAuth2 server
  * @param[in] is_auth TRUE if the JSON string @em must contain a refresh token (i.e. the reply to a authorisation request)
  * @param[out] error location for error, may be NULL
  * @return TRUE on success, FALSE on error
@@ -658,13 +762,13 @@ oauth2_refresh(LibBalsaOauth2 *oauth, GError **error)
  * just copy the scope from @ref oauth2_provider_t::scope.
  */
 static gboolean
-eval_json_auth_reply(LibBalsaOauth2 *oauth, const SoupMessage *message, gboolean is_auth, GError **error)
+eval_json_auth_reply(LibBalsaOauth2 *oauth, const gchar *reply_buf, gsize reply_len, gboolean is_auth, GError **error)
 {
 	gboolean result = FALSE;
 	JsonParser *parser;
 
 	parser = json_parser_new();
-	if (json_parser_load_from_data(parser, message->response_body->data, message->response_body->length, error)) {
+	if (json_parser_load_from_data(parser, reply_buf, reply_len, error)) {
 		JsonNode *root;
 
 		root = json_parser_get_root(parser);
@@ -706,6 +810,8 @@ eval_json_auth_reply(LibBalsaOauth2 *oauth, const SoupMessage *message, gboolean
 /** @brief Evaluate the JSON error reply from an OAuth2 server
  *
  * @param[in] prefix error message prefix string
+ * @param[in] reply_buf JSON reply received from the remote OAuth2 server
+ * @param[in] reply_len length of the JSON reply received from the remote OAuth2 server
  * @param[in] message message received from the remote OAuth2 server
  * @param[out] error filled with the error information
  *
@@ -713,15 +819,13 @@ eval_json_auth_reply(LibBalsaOauth2 *oauth, const SoupMessage *message, gboolean
  * the status code and reason phrase if parsing the JSON body fails.
  */
 static void
-eval_json_error(const gchar *prefix, const SoupMessage *message, GError **error)
+eval_json_error(const gchar *prefix, const gchar *reply_buf, gsize reply_len, SoupMessage *message, GError **error)
 {
-	gboolean assigned = FALSE;
-
-	if (message->response_body != NULL) {
+	if (reply_buf != NULL) {
 		JsonParser *parser;
 
 		parser = json_parser_new();
-		if (json_parser_load_from_data(parser, message->response_body->data, message->response_body->length, NULL)) {
+		if (json_parser_load_from_data(parser, reply_buf, reply_len, error)) {
 			JsonNode *root;
 
 			root = json_parser_get_root(parser);
@@ -733,15 +837,19 @@ eval_json_error(const gchar *prefix, const SoupMessage *message, GError **error)
 				err_desc = json_object_get_string_member(reply, "error_description");
 				if (err_desc != NULL) {
 					g_set_error(error, LIBBALSA_OAUTH2_ERROR_QUARK, -1, "%s: %s", prefix, err_desc);
-					assigned = TRUE;
 				}
 			}
 			g_object_unref(parser);
 		}
 	}
-	if (!assigned) {
+	if ((error != NULL) && (*error == NULL)) {
+#if SOUP_CHECK_VERSION(3, 0, 0)
+		g_set_error(error, LIBBALSA_OAUTH2_ERROR_QUARK, (int) soup_message_get_status(message), "%s: %d: %s", prefix,
+			(int) soup_message_get_status(message), soup_message_get_reason_phrase(message));
+#else
 		g_set_error(error, LIBBALSA_OAUTH2_ERROR_QUARK, message->status_code, "%s: %u: %s", prefix, message->status_code,
 			message->reason_phrase);
+#endif
 	}
 }
 
@@ -851,6 +959,210 @@ oauth2_authorise_real(LibBalsaOauth2 *oauth, GtkWindow *parent, GError **error)
 	return result;
 }
 
+
+#if SOUP_CHECK_VERSION(3, 0, 0)
+
+/** @brief Initialise a OAuth2 authorisation context
+ *
+ * @param[in] provider provider data
+ * @param[out] error location for error information may be NULL
+ * @return an initialised OAuth2 authorisation context on success, NULL on error
+ *
+ * Create a new OAuth2 authorisation context, and fill in:
+ * - oauth2_auth_ctx_t::server with a newly created listening soup server, unless oauth2_provider_t::oob_mode is set;
+ * - oauth2_auth_ctx_t::listen_uri
+ * - oauth2_auth_ctx_t::auth_request_uri
+ */
+static oauth2_auth_ctx_t *
+oauth2_authorize_init(const oauth2_provider_t *provider, GError **error)
+{
+	oauth2_auth_ctx_t *auth_ctx;
+
+	g_return_val_if_fail(provider != NULL, NULL);
+
+	auth_ctx = g_new0(oauth2_auth_ctx_t, 1U);
+
+	/* create the local listener unless the provider supports OOB mode only */
+	if (!provider->oob_mode) {
+		auth_ctx->server = soup_server_new("server-header", PACKAGE "/" BALSA_VERSION " ", NULL);
+		soup_server_add_handler(auth_ctx->server, NULL, oauth2_listener_cb, auth_ctx, NULL);
+		if (!soup_server_listen_local(auth_ctx->server, 0U, SOUP_SERVER_LISTEN_IPV4_ONLY, error)) {
+			g_object_unref(auth_ctx->server);
+			g_free(auth_ctx);
+			auth_ctx = NULL;
+		} else {
+			GSList *uris;
+			GUri *uri;
+
+			/* get the local listener uri */
+			uris = soup_server_get_uris(auth_ctx->server);
+			uri = (GUri *) uris->data;
+			auth_ctx->listen_uri = g_strdup_printf("http://%s:%d", g_uri_get_host(uri), g_uri_get_port(uri));
+			g_slist_free_full(uris, (GDestroyNotify) g_uri_unref);
+			g_debug("%s: listening on %s for auth reply", __func__, auth_ctx->listen_uri);
+		}
+	} else {
+		auth_ctx->listen_uri = g_strdup("oob");
+	}
+
+	if (auth_ctx != NULL) {
+		GUri *uri;
+		gchar *uri_base;
+		gchar *form_data;
+
+		/* calculate the authentication uri */
+		uri = g_uri_parse(provider->auth_uri, SOUP_HTTP_URI_FLAGS, NULL);
+		uri_base = g_uri_to_string_partial(uri, G_URI_HIDE_QUERY | G_URI_HIDE_FRAGMENT);
+		g_uri_unref(uri);
+		if (provider->scope == NULL) {
+			form_data = soup_form_encode(
+				"client_id", provider->client_id,
+				"redirect_uri", auth_ctx->listen_uri,
+				"response_type", "code",
+				NULL);
+		} else {
+			form_data = soup_form_encode(
+				"client_id", provider->client_id,
+				"redirect_uri", auth_ctx->listen_uri,
+				"scope", provider->scope,
+				"response_type", "code",
+				NULL);
+		}
+		auth_ctx->auth_request_uri = g_strconcat(uri_base, "?", form_data, NULL);
+		g_free(form_data);
+		g_debug("%s: auth request uri %s", __func__, auth_ctx->auth_request_uri);
+	}
+
+	return auth_ctx;
+}
+
+
+/** @brief Local listening server callback
+ *
+ * @param[in] server server object, unused
+ * @param[in] msg received message
+ * @param[in] path path component of the received URI
+ * @param[in] query query component of the received URI
+ * @param[in] user_data authorisation context, cast'ed to @ref oauth2_auth_ctx_t *
+ *
+ * Evaluate the authorisation message received from the remote server.  The message @em must be directed to path "/" and contain
+ * query data, including a "code" component containing the actual authorisation code.  oauth2_authorize_finish() is called with this
+ * code to get the refresh and access tokens.  The status of the passed message is set to 200 (ok) in this case, or to a 4xy error
+ * code otherwise.
+ */
+static void
+oauth2_listener_cb(SoupServer G_GNUC_UNUSED *server, SoupServerMessage *msg, const char *path, GHashTable *query,
+	gpointer user_data)
+{
+	oauth2_auth_ctx_t *auth_ctx = (oauth2_auth_ctx_t *) user_data;
+
+	if ((strcmp(path, "/") == 0) && (query != NULL) && (auth_ctx->oauth->access_token == NULL) && (auth_ctx->auth_err == NULL)) {
+		gconstpointer code;
+
+		code = g_hash_table_lookup(query, "code");
+		if (code != NULL) {
+			gchar *reply;
+
+			g_debug("%s: got authentication code '%s'", __func__, (const gchar *) code);
+			reply = g_strdup_printf(OAUTH_AUTH_DONE_TEMPLATE, _("Received Code"),
+				_("The OAuth2 Authorization code for Balsa has been received."), _("You may close this window."));
+			soup_server_message_set_status(msg, 200, "OK");
+			soup_server_message_set_response(msg, "text/html", SOUP_MEMORY_TAKE, reply, strlen(reply));
+			oauth2_authorize_finish(auth_ctx, (const gchar *) code);
+		} else {
+			g_debug("%s: got request for '%s', but no 'code' parameter", __func__, path);
+			soup_server_message_set_status(msg, 403, "Bad request");
+		}
+	} else {
+		g_debug("%s: ignore request for '%s'", __func__, path);
+		soup_server_message_set_status(msg, 404, "Request ignored");
+	}
+}
+
+
+/** @brief Finish authorisation and receive refresh and access tokens
+ *
+ * @param[in] auth_ctx authorisation context
+ * @param[in] auth_code authorisation code
+ *
+ * Post the authorisation code to the provider's authorisation uri, and receive the JSON reply which shall contain the refresh and
+ * access tokens.  The reply is parsed by calling eval_json_auth_reply().  Any error is remembered in oauth2_auth_ctx_t::auth_err.
+ * Additionally, the function finally stops the spinner oauth2_auth_ctx_t::spinner in the authorisation dialogue, and updates the
+ * related label oauth2_auth_ctx_t::spinner_label accordingly.
+ */
+static void
+oauth2_authorize_finish(oauth2_auth_ctx_t *auth_ctx, const gchar *auth_code)
+{
+	const oauth2_provider_t *provider = auth_ctx->oauth->provider;
+	SoupSession *session;
+	gchar *form_data;
+	SoupMessage *message;
+	GBytes *reply;
+	GError *local_err = NULL;
+	const gchar *reply_buf = NULL;
+	gsize reply_len = 0UL;
+	SoupStatus status;
+	gboolean success = FALSE;
+	GtkWidget *icon;
+
+	gtk_label_set_label(GTK_LABEL(auth_ctx->spinner_label), _("sending authorization code…"));
+	g_debug("%s: uri=%s, client_id=%s, client_secret=%s code=%s listen_uri=%s", __func__, provider->token_uri, provider->client_id,
+		provider->client_secret, auth_code, auth_ctx->listen_uri);
+
+	/* send the authorisation code */
+	session = oauth_soup_session_new();
+	if (provider->client_secret != NULL) {
+		form_data = soup_form_encode(
+			"grant_type", "authorization_code",
+			"client_id", provider->client_id,
+			"client_secret", provider->client_secret,
+			"code", auth_code,
+			"redirect_uri", auth_ctx->listen_uri,
+			NULL);
+	} else {
+		form_data = soup_form_encode(
+			"grant_type", "authorization_code",
+			"client_id", provider->client_id,
+			"code", auth_code,
+			"redirect_uri", auth_ctx->listen_uri,
+			NULL);
+	}
+	message = soup_message_new_from_encoded_form("POST", provider->token_uri, form_data);
+	reply = soup_session_send_and_read(session, message, NULL, &local_err);
+	status = soup_message_get_status(message);
+	if (reply != NULL) {
+		reply_buf = g_bytes_get_data(reply, &reply_len);
+	}
+	g_debug("%s: status=%d, reason=%s", __func__, (int) status, soup_message_get_reason_phrase(message));
+
+	gtk_spinner_stop(GTK_SPINNER(auth_ctx->spinner));
+	if ((status != SOUP_STATUS_OK) || (reply_buf == NULL)) {
+		if (local_err != NULL) {
+			g_propagate_error(&auth_ctx->auth_err, local_err);
+		} else {
+			eval_json_error(_("OAuth2 authorization request failed"), reply_buf, reply_len, message, &auth_ctx->auth_err);
+		}
+		gtk_label_set_label(GTK_LABEL(auth_ctx->spinner_label), _("send error"));
+	} else {
+		if (eval_json_auth_reply(auth_ctx->oauth, reply_buf, reply_len, TRUE, &auth_ctx->auth_err)) {
+			gtk_label_set_label(GTK_LABEL(auth_ctx->spinner_label), _("authorization successful"));
+			gtk_dialog_set_response_sensitive(GTK_DIALOG(auth_ctx->auth_dialog), GTK_RESPONSE_ACCEPT, TRUE);
+			success = TRUE;
+		} else {
+			gtk_label_set_label(GTK_LABEL(auth_ctx->spinner_label), _("authorization failed"));
+		}
+	}
+	icon = gtk_image_new_from_icon_name(success ? "gtk-yes" : "gtk-no", GTK_ICON_SIZE_BUTTON);
+	gtk_box_pack_start(GTK_BOX(gtk_widget_get_parent(auth_ctx->spinner)), icon, FALSE, FALSE, 0U);
+	gtk_widget_hide(auth_ctx->spinner);
+	gtk_widget_destroy(auth_ctx->spinner);
+	gtk_widget_show(icon);
+	g_bytes_unref(reply);
+	g_object_unref(message);
+	g_object_unref(session);
+}
+
+#else				/* libsoup 2.4 */
 
 /** @brief Initialise a OAuth2 authorisation context
  *
@@ -1014,10 +1326,12 @@ oauth2_authorize_finish(oauth2_auth_ctx_t *auth_ctx, const gchar *auth_code)
 
 	gtk_spinner_stop(GTK_SPINNER(auth_ctx->spinner));
 	if ((status != SOUP_STATUS_OK) || (message->status_code != SOUP_STATUS_OK) || (message->response_body == NULL)) {
-		eval_json_error(_("OAuth2 authorization request failed"), message, &auth_ctx->auth_err);
+		eval_json_error(_("OAuth2 authorization request failed"), message->response_body->data, message->response_body->length,
+			message, &auth_ctx->auth_err);
 		gtk_label_set_label(GTK_LABEL(auth_ctx->spinner_label), _("send error"));
 	} else {
-		if (eval_json_auth_reply(auth_ctx->oauth, message, TRUE, &auth_ctx->auth_err)) {
+		if (eval_json_auth_reply(auth_ctx->oauth, message->response_body->data, message->response_body->length, TRUE,
+								 &auth_ctx->auth_err)) {
 			gtk_label_set_label(GTK_LABEL(auth_ctx->spinner_label), _("authorization successful"));
 			gtk_dialog_set_response_sensitive(GTK_DIALOG(auth_ctx->auth_dialog), GTK_RESPONSE_ACCEPT, TRUE);
 			success = TRUE;
@@ -1033,6 +1347,8 @@ oauth2_authorize_finish(oauth2_auth_ctx_t *auth_ctx, const gchar *auth_code)
 	g_object_unref(message);
 	g_object_unref(session);
 }
+
+#endif				/* libsoup 2.4 vs. 3 */
 
 
 /** @brief Authorisation code entry change callback
@@ -1175,7 +1491,11 @@ oauth_soup_session_new(void)
 			domlist = g_strsplit(log_domains, " ", -1);
 			for (n = 0U; (logger == NULL) && (domlist[n] != NULL); n++) {
 				if ((strcmp(domlist[n], "all") == 0) || (strcmp(domlist[n], G_LOG_DOMAIN) == 0)) {
+#if SOUP_CHECK_VERSION(3, 0, 0)
+					logger = soup_logger_new(SOUP_LOGGER_LOG_BODY);
+#else				/* libsoup 2.4 */
 					logger = soup_logger_new(SOUP_LOGGER_LOG_BODY, -1);
+#endif				/* libsoup 2.4 vs. 3 */
 					g_debug("%s: create Soup logger", __func__);
 				}
 			}
@@ -1186,7 +1506,11 @@ oauth_soup_session_new(void)
 
 	/* create the new session */
 	session = soup_session_new();
-	g_object_set(session, "user-agent", PACKAGE "/" BALSA_VERSION " ", NULL);
+#if SOUP_CHECK_VERSION(3, 0, 0)
+	soup_session_set_user_agent(session, "balsa/" BALSA_VERSION " ");
+#else				/* libsoup 2.4 */
+	g_object_set(session, "user-agent", "balsa/" BALSA_VERSION " ", NULL);
+#endif				/* libsoup 2.4 vs. 3 */
 	if (logger != NULL) {
 		soup_session_add_feature(session, SOUP_SESSION_FEATURE(logger));
 	}

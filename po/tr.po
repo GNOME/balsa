@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-10-25 13:39+0000\n"
-"PO-Revision-Date: 2023-10-26 16:33+0300\n"
+"POT-Creation-Date: 2023-10-29 11:23+0000\n"
+"PO-Revision-Date: 2024-02-08 01:49+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.2\n"
 "X-POOTLE-MTIME: 1426069247.000000\n"
 
 #: balsa.appdata.xml.in:6 org.desktop.Balsa.desktop.in.in:3
@@ -7352,7 +7352,7 @@ msgstr "Geçerli sözcüğün tüm yinelemelerini seçilen öneri ile değiştir
 
 #: src/spell-check.c:365
 msgid "_Ignore"
-msgstr "_Yoksay"
+msgstr "_Yok Say"
 
 #: src/spell-check.c:367
 msgid "Skip the current word"
@@ -7360,7 +7360,7 @@ msgstr "Geçerli sözcüğü atla"
 
 #: src/spell-check.c:372
 msgid "I_gnore All"
-msgstr "Tümünü Yoksa_y"
+msgstr "Tümünü Yok Sa_y"
 
 #: src/spell-check.c:374
 msgid "Skip all occurrences of the current word"

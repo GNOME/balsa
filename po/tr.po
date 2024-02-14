@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-10-29 11:23+0000\n"
-"PO-Revision-Date: 2024-02-08 01:49+0300\n"
+"POT-Creation-Date: 2024-02-10 11:08+0000\n"
+"PO-Revision-Date: 2024-02-14 03:53+0300\n"
 "Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
@@ -4718,7 +4718,7 @@ msgstr "Eşleştirme için en az bir alan belirtmelisiniz"
 
 #: src/filter-edit-callbacks.c:555
 msgid "You must provide a string"
-msgstr "Bir karakter dizisi sağlamalısınız"
+msgstr "Bir dizge sağlamalısınız"
 
 #: src/filter-edit-callbacks.c:563
 msgid "You must provide at least one regular expression"
@@ -5048,7 +5048,7 @@ msgid ""
 msgstr ""
 "“%s” süzgeci “%s” posta kutusu türüyle uyumlu değil.\n"
 "Bu, örneğin IMAP posta kutularıyla düzenli ifadeler kullandığınızda olur. "
-"Çok yavaş sonuç döndürdüğünden, oluyorsa bunun yerine alt dizi eşleşmesi "
+"Çok yavaş sonuç döndürdüğünden, oluyorsa bunun yerine alt dizge eşleşmesi "
 "kullanın."
 
 #: src/filter-run-dialog.c:175

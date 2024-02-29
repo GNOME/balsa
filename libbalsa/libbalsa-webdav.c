@@ -577,6 +577,7 @@ libbalsa_webdav_lookup_srv(const gchar *domain, const gchar *service, gchar **pa
 			g_free(srv_val);
 		}
 	}
+	g_object_unref(resolver);
 
 	return result;
 }

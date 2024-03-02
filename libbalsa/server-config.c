@@ -27,6 +27,7 @@
 #include "net-client-smtp.h"
 #include "net-client-pop.h"
 #include "imap-handle.h"
+#include "libbalsa-conf.h"
 #include "server-config.h"
 
 
@@ -85,17 +86,12 @@ static void on_server_probe(GtkWidget *widget, LibBalsaServerCfg *server_cfg);
 static guint changed_sig;
 
 
-#if defined(HAVE_LIBSECRET)
-static const gchar *remember_password_message[2] = {
+static const gchar *remember_password_message[4] = {
 	N_("_Remember user password in Secret Service"),
-	N_("_Remember certificate pass phrase in Secret Service")
-};
-#else
-static const gchar *remember_password_message[2] = {
+	N_("_Remember certificate pass phrase in Secret Service"),
 	N_("_Remember user password"),
 	N_("_Remember certificate pass phrase")
 };
-#endif                          /* defined(HAVE_LIBSECRET) */
 
 
 LibBalsaServerCfg *
@@ -104,8 +100,15 @@ libbalsa_server_cfg_new(LibBalsaServer *server, const gchar *name)
 	LibBalsaServerCfg *server_cfg;
 	const gchar *protocol;
 	const gchar *cert_file;
+	int pwd_msg_offs;
 
 	g_return_val_if_fail(LIBBALSA_IS_SERVER(server), NULL);
+
+#if defined(HAVE_LIBSECRET)
+	pwd_msg_offs = libbalsa_conf_use_libsecret() ? 0 : 2;
+#else
+	pwd_msg_offs = 2;
+#endif
 
     server_cfg = LIBBALSA_SERVER_CFG(g_object_new(libbalsa_server_cfg_get_type(), NULL));
 
@@ -158,11 +161,11 @@ libbalsa_server_cfg_new(LibBalsaServer *server, const gchar *name)
     server_cfg->password = server_cfg_add_entry(server_cfg->basic_grid, server_cfg->basic_rows++, _("_Pass Phrase:"),
                                           libbalsa_server_get_password(server),
 										  G_CALLBACK(on_server_cfg_changed), NULL, server_cfg);
-    g_object_set(server_cfg->password, "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
-    gtk_entry_set_visibility(GTK_ENTRY(server_cfg->password), FALSE);
+    libbalsa_entry_config_passwd(GTK_ENTRY(server_cfg->password));
 
-    server_cfg->remember_pass = server_cfg_add_check(server_cfg->basic_grid, server_cfg->basic_rows++, remember_password_message[0],
-        libbalsa_server_get_remember_password(server), G_CALLBACK(on_server_cfg_changed), server_cfg);
+    server_cfg->remember_pass = server_cfg_add_check(server_cfg->basic_grid, server_cfg->basic_rows++,
+        remember_password_message[pwd_msg_offs], libbalsa_server_get_remember_password(server), G_CALLBACK(on_server_cfg_changed),
+        server_cfg);
 
     /* notebook page with advanced options */
     server_cfg->advanced_grid = libbalsa_create_grid();
@@ -186,11 +189,11 @@ libbalsa_server_cfg_new(LibBalsaServer *server, const gchar *name)
 	server_cfg->cert_pass = server_cfg_add_entry(server_cfg->advanced_grid, server_cfg->advanced_rows++,
 		_("Certificate _Pass Phrase:"),	libbalsa_server_get_cert_passphrase(server), G_CALLBACK(on_server_cfg_changed), NULL,
 		server_cfg);
-    g_object_set(server_cfg->cert_pass, "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
-    gtk_entry_set_visibility(GTK_ENTRY(server_cfg->cert_pass), FALSE);
+	libbalsa_entry_config_passwd(GTK_ENTRY(server_cfg->cert_pass));
 
-    server_cfg->remember_cert_pass = server_cfg_add_check(server_cfg->advanced_grid, server_cfg->advanced_rows++, remember_password_message[1],
-        libbalsa_server_get_remember_cert_passphrase(server), G_CALLBACK(on_server_cfg_changed), server_cfg);
+    server_cfg->remember_cert_pass = server_cfg_add_check(server_cfg->advanced_grid, server_cfg->advanced_rows++,
+        remember_password_message[pwd_msg_offs + 1], libbalsa_server_get_remember_cert_passphrase(server),
+        G_CALLBACK(on_server_cfg_changed), server_cfg);
 
     /* initially run the validity check */
     on_server_cfg_changed(NULL, server_cfg);

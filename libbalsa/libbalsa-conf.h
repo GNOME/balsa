@@ -21,6 +21,10 @@
 #ifndef __LIBCONFIG_H__
 #define __LIBCONFIG_H__
 
+#ifndef BALSA_VERSION
+# error "Include config.h before this file."
+#endif
+
 #include <gtk/gtk.h>
 
 void libbalsa_conf_push_group(const char *group);
@@ -122,5 +126,9 @@ void libbalsa_conf_get_vector_with_default   (const char *path,
 void libbalsa_conf_drop_all                  (void);
 void libbalsa_conf_sync                      (void);
 void libbalsa_conf_queue_sync                (void);
+
+#if defined(HAVE_LIBSECRET)
+gboolean libbalsa_conf_use_libsecret(void);
+#endif
 
 #endif                          /* __LIBCONFIG_H__ */

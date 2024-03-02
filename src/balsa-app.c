@@ -51,13 +51,10 @@ struct BalsaApplication balsa_app;
 static gchar *
 ask_password_real(LibBalsaServer *server, const gchar *cert_subject)
 {
-#if defined(HAVE_LIBSECRET)
-    static const gchar *remember_password_message =
-        N_("_Remember password in Secret Service");
-#else
-    static const gchar *remember_password_message =
-        N_("_Remember password");
-#endif                          /* defined(HAVE_LIBSECRET) */
+    static const gchar *remember_password_message[2] = {
+        N_("_Remember password in Secret Service"),
+        N_("_Remember password")
+    };
 	GcrPromptDialog *dialog;
 	gchar *prompt;
 	gboolean remember;
@@ -65,28 +62,32 @@ ask_password_real(LibBalsaServer *server, const gchar *cert_subject)
         const gchar *user;
         const gchar *host;
         const gchar *protocol;
+        int use_remember_idx;
 
     g_return_val_if_fail(server != NULL, NULL);
 
+#if defined(HAVE_LIBSECRET)
+    use_remember_idx = libbalsa_conf_use_libsecret() ? 0 : 1;
+#else
+    use_remember_idx = 1;
+#endif                          /* defined(HAVE_LIBSECRET) */
     user = libbalsa_server_get_user(server);
     host = libbalsa_server_get_host(server);
     protocol = libbalsa_server_get_protocol(server);
     if (cert_subject != NULL) {
-    	prompt = g_strdup_printf(_("Password to unlock the user certificate\n%s\nfor %s@%s (%s)"),
-    		cert_subject,
-                user, host, protocol);
+		/* Translators: #1 Certificate CN, #2 user name; #3 protocol (imap, etc); #4 server name */
+    	prompt = g_strdup_printf(_("Password to unlock the user certificate\n%s\nfor user %s, protocol “%s”, server “%s”"),
+    		cert_subject, user, protocol, host);
     	remember = libbalsa_server_get_remember_cert_passphrase(server);
     } else {
-    	prompt = g_strdup_printf(_("Password for %s@%s (%s)"),
-                user, host, protocol);
+		/* Translators: #1 user name; #2 protocol (imap, etc); #3 server name */
+    	prompt = g_strdup_printf(_("Password for user %s, protocol “%s”, server “%s”"),
+                user, protocol, host);
     	remember = libbalsa_server_get_remember_password(server);
     }
 	dialog = g_object_new(GCR_TYPE_PROMPT_DIALOG,
 						  "use-header-bar", libbalsa_use_headerbar(),
 						  "title", _("Password needed"),
-						  "description", prompt,
-						  "message", _("Password needed"),
-						  "choice-label", remember_password_message,
 						  "cancel-label", _("_Cancel"),
 						  "continue-label", _("_OK"),
 						  "choice-chosen", remember,
@@ -94,6 +95,11 @@ ask_password_real(LibBalsaServer *server, const gchar *cert_subject)
 						  "transient-for", GTK_WINDOW(balsa_app.main_window),
 						  "modal", TRUE,
 						  NULL);
+	/* for some strange reason, the following property strings are not displayed when they are
+	 * added to the call above - no idea why */
+	gcr_prompt_set_message(GCR_PROMPT(dialog), _("Password needed"));
+	gcr_prompt_set_description(GCR_PROMPT(dialog), prompt);
+	gcr_prompt_set_choice_label(GCR_PROMPT(dialog),remember_password_message[use_remember_idx]);
 	g_free(prompt);
 	passwd = g_strdup(gcr_prompt_password_run(GCR_PROMPT(dialog), NULL, NULL));
 	if (passwd != NULL) {
@@ -131,21 +137,22 @@ ask_password_real(LibBalsaServer * server, const gchar *cert_subject)
     gchar *prompt;
     gchar *passwd;
 	gboolean remember;
-#if defined(HAVE_LIBSECRET)
-    static const gchar *remember_password_message =
-        N_("_Remember password in Secret Service");
-#else
-    static const gchar *remember_password_message =
-        N_("_Remember password");
-#endif                          /* defined(HAVE_LIBSECRET) */
+    int use_remember_idx;
+    static const gchar *remember_password_message[2] = {
+        N_("_Remember password in Secret Service"),
+        N_("_Remember password")
+    };
 
     g_return_val_if_fail(server != NULL, NULL);
     if (cert_subject != NULL) {
-    	prompt = g_strdup_printf(_("Password to unlock the user certificate\n%s\nfor %s@%s (%s)"),
-    		cert_subject, libbalsa_server_get_user(server), libbalsa_server_get_host(server), libbalsa_server_get_protocol(server));
+		/* Translators: #1 Certificate CN, #2 user name; #3 protocol (imap, etc); #4 server name */
+    	prompt = g_strdup_printf(_("Password to unlock the user certificate\n%s\nfor user %s, protocol “%s”, server “%s”"),
+    		cert_subject, libbalsa_server_get_user(server), libbalsa_server_get_protocol(server), libbalsa_server_get_host(server));
     	remember = libbalsa_server_get_remember_cert_passphrase(server);
     } else {
-    	prompt = g_strdup_printf(_("Password for %s@%s (%s)"), libbalsa_server_get_user(server), libbalsa_server_get_host(server), libbalsa_server_get_protocol(server));
+		/* Translators: #1 user name; #2 protocol (imap, etc); #3 server name */
+    	prompt = g_strdup_printf(_("Password for user %s, protocol “%s”, server “%s”"),
+    		libbalsa_server_get_user(server), libbalsa_server_get_protocol(server), libbalsa_server_get_host(server));
        	remember = libbalsa_server_get_remember_password(server);
     }
 
@@ -168,12 +175,16 @@ ask_password_real(LibBalsaServer * server, const gchar *cert_subject)
 
     label = libbalsa_create_grid_label(_("Password:"), grid, 1);
     entry = libbalsa_create_grid_entry(grid, NULL, NULL, 1, NULL, label);
-    g_object_set(entry, "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
-    gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE);
+    libbalsa_entry_config_passwd(GTK_ENTRY(entry));
     gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
     gtk_widget_grab_focus(entry);
 
-    rememb_check = libbalsa_create_grid_check(remember_password_message, grid, 2, remember);
+#if defined(HAVE_LIBSECRET)
+    use_remember_idx = libbalsa_conf_use_libsecret() ? 0 : 1;
+#else
+    use_remember_idx = 1;
+#endif                          /* defined(HAVE_LIBSECRET) */
+    rememb_check = libbalsa_create_grid_check(remember_password_message[use_remember_idx], grid, 2, remember);
 
     gtk_widget_show_all(grid);
     gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);

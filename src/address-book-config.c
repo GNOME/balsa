@@ -596,7 +596,7 @@ create_ldap_dialog(AddressBookConfig * abc)
     abc->ab_specific.ldap.passwd = 
 	libbalsa_create_grid_entry(grid, NULL, NULL, 4, 
 		     ab ? libbalsa_address_book_ldap_get_passwd(ab) : "", label);
-    gtk_entry_set_visibility(GTK_ENTRY(abc->ab_specific.ldap.passwd), FALSE);
+    libbalsa_entry_config_passwd(GTK_ENTRY(abc->ab_specific.ldap.passwd));
 
     label = libbalsa_create_grid_label(_("_User Address Book DN"), grid, 5);
     abc->ab_specific.ldap.book_dn = 
@@ -778,7 +778,7 @@ create_carddav_dialog(AddressBookConfig *abc)
 	label = libbalsa_create_grid_label(_("_Pass Phrase:"), grid, 3);
 	abc->ab_specific.carddav.passwd = libbalsa_create_grid_entry(grid, G_CALLBACK(carddav_dlg_widget_active), abc, 3,
 		(ab != NULL) ? libbalsa_address_book_carddav_get_password(ab) : "", label);
-	gtk_entry_set_visibility(GTK_ENTRY(abc->ab_specific.carddav.passwd), FALSE);
+	libbalsa_entry_config_passwd(GTK_ENTRY(abc->ab_specific.carddav.passwd));
 
 	abc->ab_specific.carddav.probe = gtk_button_new_from_icon_name("system-run", GTK_ICON_SIZE_MENU);
 	g_signal_connect(abc->ab_specific.carddav.probe, "clicked", G_CALLBACK(carddav_run_probe), abc);

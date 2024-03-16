@@ -610,3 +610,24 @@ libbalsa_rot(const gchar * pass)
     }
     return buff;
 }
+
+#if defined(HAVE_LIBSECRET)
+gboolean
+libbalsa_conf_use_libsecret(void)
+{
+	static gboolean use_libsecret = TRUE;
+	static gint check_done = 0;
+
+	if (g_atomic_int_get(&check_done) == 0) {
+		const gchar *libsecret_env;
+
+		libsecret_env = g_getenv("BALSA_DISABLE_LIBSECRET");
+		if ((libsecret_env != NULL) && (atoi(libsecret_env) == 1)) {
+			use_libsecret = FALSE;
+			g_info("Secret Service is disabled, credentials are stored in the config file.");
+		}
+		g_atomic_int_set(&check_done, 1);
+	}
+	return use_libsecret;
+}
+#endif		/* HAVE_LIBSECRET */

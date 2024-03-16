@@ -123,6 +123,8 @@ static void libbalsa_address_book_ldap_save_config(LibBalsaAddressBook *ab,
 						   const gchar * prefix);
 static void libbalsa_address_book_ldap_load_config(LibBalsaAddressBook *ab,
 						   const gchar * prefix);
+static void libbalsa_address_book_ldap_store_passwd(LibBalsaAddressBookLdap *ab_ldap);
+static void libbalsa_address_book_ldap_load_passwd(LibBalsaAddressBookLdap *ab_ldap);
 
 static GList *libbalsa_address_book_ldap_alias_complete(LibBalsaAddressBook * ab,
 							 const gchar * prefix);
@@ -926,6 +928,7 @@ libbalsa_address_book_ldap_modify_address(LibBalsaAddressBook *ab,
     return LBABERR_CANNOT_WRITE;
 }
 
+
 static void
 libbalsa_address_book_ldap_save_config(LibBalsaAddressBook * ab,
 				       const gchar * prefix)
@@ -944,23 +947,7 @@ libbalsa_address_book_ldap_save_config(LibBalsaAddressBook * ab,
     if (ab_ldap->bind_dn != NULL)
         libbalsa_conf_private_set_string("BindDN", ab_ldap->bind_dn, FALSE);
     if (ab_ldap->passwd != NULL) {
-#if defined(HAVE_LIBSECRET)
-		GError *error = NULL;
-
-		secret_password_store_sync(&ldap_schema, NULL, _("Balsa passwords"), ab_ldap->passwd, NULL, &error,
-			"server", ab_ldap->host,
-			"user", ab_ldap->bind_dn,
-			NULL);
-		if (error != NULL) {
-			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Error saving LDAP credentials for address book %s: %s"),
-				libbalsa_address_book_get_name(ab), error->message);
-			g_error_free(error);
-		} else {
-			libbalsa_conf_clean_key("Passwd");
-		}
-#else
-		libbalsa_conf_private_set_string("Passwd", ab_ldap->passwd, TRUE);
-#endif
+    	libbalsa_address_book_ldap_store_passwd(ab_ldap);
     }
     if (ab_ldap->priv_book_dn != NULL)
         libbalsa_conf_set_string("BookDN", ab_ldap->priv_book_dn);
@@ -995,31 +982,7 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
     }
 
 	if (ab_ldap->bind_dn != NULL) {
-#if defined(HAVE_LIBSECRET)
-		GError *error = NULL;
-
-		ab_ldap->passwd = secret_password_lookup_sync(&ldap_schema, NULL, &error,
-			"server", ab_ldap->host,
-			"user", ab_ldap->bind_dn,
-			NULL);
-		if (error != NULL) {
-			libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Error loading LDAP credentials for address book %s: %s"),
-				libbalsa_address_book_get_name(ab), error->message);
-			g_error_free(error);
-		} else {
-			libbalsa_conf_clean_key("Passwd");
-		}
-#else
-		ab_ldap->passwd = libbalsa_conf_private_get_string("Passwd", TRUE);
-#endif
-		if ((ab_ldap->passwd != NULL) && (*ab_ldap->passwd == '\0')) {
-#if defined(HAVE_LIBSECRET)
-			secret_password_free(ab_ldap->passwd);
-#else
-			g_free(ab_ldap->passwd);
-#endif
-			ab_ldap->passwd = NULL;
-		}
+		libbalsa_address_book_ldap_load_passwd(ab_ldap);
 	} else {
 		ab_ldap->passwd = NULL;
 	}
@@ -1036,6 +999,82 @@ libbalsa_address_book_ldap_load_config(LibBalsaAddressBook * ab,
 
     if (libbalsa_address_book_get_is_expensive(ab) < 0)
         libbalsa_address_book_set_is_expensive(ab, TRUE);
+}
+
+
+static void
+libbalsa_address_book_ldap_store_passwd(LibBalsaAddressBookLdap *ab_ldap)
+{
+#if defined(HAVE_LIBSECRET)
+	if (libbalsa_conf_use_libsecret()) {
+		GError *error = NULL;
+
+		secret_password_store_sync(&ldap_schema, NULL, _("Balsa passwords"), ab_ldap->passwd, NULL, &error,
+			"server", ab_ldap->host,
+			"user", ab_ldap->bind_dn,
+			NULL);
+		if (error != NULL) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				/* Translators: #1 address book name; #2 error message */
+				_("Error saving credentials for address book “%s” in Secret Service: %s"),
+				libbalsa_address_book_get_name(LIBBALSA_ADDRESS_BOOK(ab_ldap)), error->message);
+			g_error_free(error);
+		} else {
+			libbalsa_conf_clean_key("Passwd");
+		}
+	} else {
+		libbalsa_conf_private_set_string("Passwd", ab_ldap->passwd, TRUE);
+	}
+#else		/* !HAVE_LIBSECRET */
+	libbalsa_conf_private_set_string("Passwd", ab_ldap->passwd, TRUE);
+#endif
+}
+
+
+static void
+libbalsa_address_book_ldap_load_passwd(LibBalsaAddressBookLdap *ab_ldap)
+{
+#if defined(HAVE_LIBSECRET)
+	if (libbalsa_conf_use_libsecret()) {
+		GError *error = NULL;
+
+		ab_ldap->passwd = secret_password_lookup_sync(&ldap_schema, NULL, &error,
+			"server", ab_ldap->host,
+			"user", ab_ldap->bind_dn,
+			NULL);
+		if (error != NULL) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				/* Translators: #1 address book name; #2 error message */
+				_("Error loading credentials for address book “%s” from Secret Service: %s"),
+				libbalsa_address_book_get_name(LIBBALSA_ADDRESS_BOOK(ab_ldap)), error->message);
+			g_error_free(error);
+		}
+
+		/* check the config file if the returned password is NULL, make sure to remove it from the config file otherwise */
+		if (ab_ldap->passwd == NULL) {
+			ab_ldap->passwd = libbalsa_conf_private_get_string("Passwd", TRUE);
+			if (ab_ldap->passwd != NULL) {
+				libbalsa_address_book_ldap_store_passwd(ab_ldap);
+			}
+		} else {
+			libbalsa_conf_clean_key("Passwd");
+		}
+	} else {
+		ab_ldap->passwd = libbalsa_conf_private_get_string("Passwd", TRUE);
+	}
+#else
+	ab_ldap->passwd = libbalsa_conf_private_get_string("Passwd", TRUE);
+#endif		/* HAVE_LIBSECRET */
+
+	/* reset empty password to NULL */
+	if ((ab_ldap->passwd != NULL) && (*ab_ldap->passwd == '\0')) {
+#if defined(HAVE_LIBSECRET)
+		secret_password_free(ab_ldap->passwd);
+#else
+		g_free(ab_ldap->passwd);
+#endif
+		ab_ldap->passwd = NULL;
+	}
 }
 
 

@@ -330,60 +330,74 @@ libbalsa_free_password(gchar *password)
 }
 
 static void
-store_password_libsecret(LibBalsaServer *server,
-	    				 const gchar          *password,
-						 const SecretSchema   *schema)
+store_password_libsecret(LibBalsaServer     *server,
+						 const gchar        *password,
+						 const gchar        *cfg_path,
+						 const SecretSchema *schema)
 {
-    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
-    GError *err = NULL;
+	if (libbalsa_conf_use_libsecret()) {
+		LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+		GError *err = NULL;
 
-    secret_password_store_sync(schema, NULL, _("Balsa passwords"), password, NULL, &err,
-        "protocol", priv->protocol,
-		"server",   priv->host,
-		"user",     priv->user,
-		NULL);
-    if (err != NULL) {
-        g_info(_("Error storing password for %s@%s:%s: %s"), priv->user, priv->protocol, priv->host, err->message);
-        g_error_free(err);
-    } else {
-        g_debug("stored password for %s@%s:%s in secret service", priv->user, priv->protocol, priv->host);
-    }
+		secret_password_store_sync(schema, NULL, _("Balsa passwords"), password, NULL, &err,
+			"protocol", priv->protocol,
+			"server",   priv->host,
+			"user",     priv->user,
+			NULL);
+		if (err != NULL) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				/* Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message */
+				_("Error saving credentials for user “%s”, protocol “%s”, server “%s” in Secret Service: %s"),
+				priv->user, priv->protocol, priv->host, err->message);
+			g_error_free(err);
+		} else {
+			g_debug("stored password for %s@%s:%s in secret service", priv->user, priv->protocol, priv->host);
+			libbalsa_conf_clean_key(cfg_path);
+		}
+	} else {
+		libbalsa_conf_private_set_string(cfg_path, password, TRUE);
+	}
 }
 
 static gchar *
-load_password_libsecret(LibBalsaServer *server,
-			  	  	    const gchar          *cfg_path,
-						const SecretSchema   *schema)
+load_password_libsecret(LibBalsaServer     *server,
+						const gchar        *cfg_path,
+						const SecretSchema *schema)
 {
-    LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
-    GError *err = NULL;
-    gchar *password;
+	gchar *password;
 
-    password = secret_password_lookup_sync(schema, NULL, &err,
-        "protocol", priv->protocol,
-		"server",   priv->host,
-		"user",     priv->user,
-		NULL);
-    if (err != NULL) {
-        g_info(_("Error looking up password for %s@%s:%s: %s"), priv->user, priv->protocol, priv->host, err->message);
-        g_error_free(err);
+	if (libbalsa_conf_use_libsecret()) {
+		LibBalsaServerPrivate *priv = libbalsa_server_get_instance_private(server);
+		GError *err = NULL;
 
-        /* fall back to the private config file */
-        password = libbalsa_conf_private_get_string(cfg_path, TRUE);
-        if ((password != NULL) && (password[0] != '\0')) {
-        g_info(_("loaded fallback password from private config file"));
-        /* store a fallback password in the key ring */
-        store_password_libsecret(server, password, schema);
-            /* We could in principle clear the password in the config file here but we do not for the backward compatibility.
-             * FIXME - Is this really the proper approach, as we leave the obfuscated password in the config file, and the user
-             * relies on the message that the password is stored in the Secret Service only.  OTOH, there are better methods for
-             * protecting the user's secrets, like full disk encryption. */
-        }
-    } else {
-        g_debug("loaded password for %s@%s:%s from secret service", priv->user, priv->protocol, priv->host);
-    }
+		password = secret_password_lookup_sync(schema, NULL, &err,
+			"protocol", priv->protocol,
+			"server",   priv->host,
+			"user",     priv->user,
+			NULL);
+		if (err != NULL) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				/* Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message */
+				_("Error loading credentials for user %s, protocol “%s”, server “%s” from Secret Service: %s"),
+				priv->user, priv->protocol, priv->host, err->message);
+			g_error_free(err);
+		}
 
-    return password;
+		/* check the config file if the returned password is NULL, make sure to remove it from the config file otherwise */
+		if (password == NULL) {
+			password = libbalsa_conf_private_get_string(cfg_path, TRUE);
+			if (password != NULL) {
+				store_password_libsecret(server, password, cfg_path, schema);
+			}
+		} else {
+			g_debug("loaded password for %s@%s:%s from secret service", priv->user, priv->protocol, priv->host);
+			libbalsa_conf_clean_key(cfg_path);
+		}
+	} else {
+		password = libbalsa_conf_private_get_string(cfg_path, TRUE);
+	}
+
+	return password;
 }
 
 static void
@@ -509,7 +523,7 @@ libbalsa_server_save_config(LibBalsaServer * server)
     if (priv->remember_passwd && (priv->passwd != NULL)) {
         libbalsa_conf_set_bool("RememberPasswd", TRUE);
 #if defined(HAVE_LIBSECRET)
-        store_password_libsecret(server, priv->passwd, &server_schema);
+        store_password_libsecret(server, priv->passwd, "Password", &server_schema);
 #else
         libbalsa_conf_private_set_string("Password", priv->passwd, TRUE);
 #endif
@@ -527,7 +541,7 @@ libbalsa_server_save_config(LibBalsaServer * server)
         if (priv->remember_cert_passphrase && (priv->cert_passphrase != NULL)) {
         	libbalsa_conf_set_bool("RememberCertPasswd", TRUE);
 #if defined(HAVE_LIBSECRET)
-        	store_password_libsecret(server, priv->cert_passphrase, &cert_pass_schema);
+        	store_password_libsecret(server, priv->cert_passphrase, "CertificatePassphrase", &cert_pass_schema);
 #else
         	libbalsa_conf_private_set_string("CertificatePassphrase", priv->cert_passphrase, TRUE);
 #endif

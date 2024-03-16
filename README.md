@@ -60,8 +60,9 @@ use this option to compile the code and hope for the best.
 	Add "GNOME;" to Balsa's categories in the two .desktop files.
 
 `--with-libsecret`
-	Link to libsecret to store credentials in the key ring instead of
-the obfuscated text file ~/.balsa/config-private.
+	Link to libsecret to store credentials in the Secret Service instead of
+the obfuscated text file `~/.balsa/config-private`.  See also section
+_Credentials_ below.
 
 `--with-gss[=/usr/kerberos]`
 	This enables GSSAPI Kerberos based authentication scheme. 
@@ -191,6 +192,30 @@ Split large messages:
 	appropriate value here.
 
 
+## Credentials
+
+Balsa uses the desktop environment's Secret Service (using the
+org.freedesktop.Secret.Service D-Bus service) to safely store credentials if
+support for `libsecret` has been included (see _Configuration_ above).  The
+Secret Service is implemented by, inter alia, GNOME keyring, Kwallet and
+KeePassXC.
+
+Otherwise, the credentials are stored obfuscated in the file
+`~/.balsa/config-private`.  **This method is not recommended, though.**
+
+If a password cannot be loaded from the Secret Service, Balsa tries to read it
+from the config file as fallback, and to store it in the Secret Service.  On
+success, it is removed from the config file for security.  Note that Balsa will
+never _store_ any credentials in the config file unless using the Secret Service
+is explicitly disabled.
+
+In the unlikely case of a desktop environment which does not provide any usable
+Secret Service D-Bus service, using the config file can be enforced for Balsa
+binaries including `libsecret` support by setting the environment variable
+
+	`BALSA_DISABLE_LIBSECRET=1`.
+
+
 ## Gtk+-3 Dialog Header Bars:
 
 If the Gtk+ version is >= 3.12.0, Balsa uses the new Gtk header
@@ -198,7 +223,7 @@ bars instead of the traditional action areas.  As this may look ugly when
 using other desktop environments than Gnome (e.g. XFCE), Balsa can be
 switched to the old style by defining the environment variable
 
-	BALSA_DIALOG_HEADERBAR=0
+	`BALSA_DIALOG_HEADERBAR=0`
 
 
 ## Help System:

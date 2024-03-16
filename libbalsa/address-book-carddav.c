@@ -70,6 +70,9 @@ static void libbalsa_address_book_carddav_save_config(LibBalsaAddressBook *ab,
 													  const gchar         *prefix);
 static void libbalsa_address_book_carddav_load_config(LibBalsaAddressBook *ab,
 													  const gchar         *prefix);
+static void libbalsa_address_book_carddav_store_passwd(LibBalsaAddressBookCarddav *ab_carddav);
+static void libbalsa_address_book_carddav_load_passwd(LibBalsaAddressBookCarddav *ab_carddav);
+
 static LibBalsaABErr libbalsa_address_book_carddav_add_address(LibBalsaAddressBook *ab,
 															   LibBalsaAddress     *address);
 static inline gboolean utf8_strstr(const gchar *haystack,
@@ -332,7 +335,11 @@ libbalsa_address_book_carddav_set_password(LibBalsaAddressBookCarddav *ab, const
 {
 	g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_CARDDAV(ab) && (password != NULL));
 
+#if defined(HAVE_LIBSECRET)
+	secret_password_free(ab->password);
+#else
 	g_free(ab->password);
+#endif
 	ab->password = g_strdup(password);
 	if (ab->carddav != NULL) {
 		g_object_unref(ab->carddav);
@@ -392,31 +399,13 @@ libbalsa_address_book_carddav_save_config(LibBalsaAddressBook *ab, const gchar *
 {
 	LibBalsaAddressBookClass *parent_class = LIBBALSA_ADDRESS_BOOK_CLASS(libbalsa_address_book_carddav_parent_class);
 	LibBalsaAddressBookCarddav *ab_carddav;
-#if defined(HAVE_LIBSECRET)
-	GError *error = NULL;
-#endif
 
 	g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_CARDDAV(ab));
 	ab_carddav = LIBBALSA_ADDRESS_BOOK_CARDDAV(ab);
 
 	libbalsa_conf_set_string("Domain", ab_carddav->base_dom_url);
 	libbalsa_conf_private_set_string("User", ab_carddav->user, FALSE);
-#if defined(HAVE_LIBSECRET)
-	secret_password_store_sync(&carddav_schema, NULL, _("Balsa passwords"), ab_carddav->password, NULL, &error,
-		"url", ab_carddav->full_url,
-		"user", ab_carddav->user,
-		NULL);
-	if (error != NULL) {
-		/* Translators: #1 address book name; #2 error message */
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Error saving CardDAV credentials for address book “%s”: %s"),
-			libbalsa_address_book_get_name(ab), error->message);
-		g_error_free(error);
-	} else {
-		libbalsa_conf_clean_key("Passwd");
-	}
-#else
-	libbalsa_conf_private_set_string("Passwd", ab_carddav->password, TRUE);
-#endif
+	libbalsa_address_book_carddav_store_passwd(ab_carddav);
 	libbalsa_conf_set_string("URL", ab_carddav->full_url);
 	libbalsa_conf_set_string("CarddavName", ab_carddav->carddav_name);
 	libbalsa_conf_set_int("Refresh", ab_carddav->refresh_minutes);
@@ -432,9 +421,6 @@ libbalsa_address_book_carddav_load_config(LibBalsaAddressBook *ab, const gchar *
 {
 	LibBalsaAddressBookClass *parent_class = LIBBALSA_ADDRESS_BOOK_CLASS(libbalsa_address_book_carddav_parent_class);
 	LibBalsaAddressBookCarddav *ab_carddav;
-#if defined(HAVE_LIBSECRET)
-	GError *error = NULL;
-#endif
 
 	g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_CARDDAV(ab));
 	ab_carddav = LIBBALSA_ADDRESS_BOOK_CARDDAV(ab);
@@ -442,22 +428,7 @@ libbalsa_address_book_carddav_load_config(LibBalsaAddressBook *ab, const gchar *
 	ab_carddav->base_dom_url = libbalsa_conf_get_string("Domain");
 	ab_carddav->user = libbalsa_conf_private_get_string("User", FALSE);
 	ab_carddav->full_url = libbalsa_conf_get_string("URL");
-#if defined(HAVE_LIBSECRET)
-	ab_carddav->password = secret_password_lookup_sync(&carddav_schema, NULL, &error,
-		"url", ab_carddav->full_url,
-		"user", ab_carddav->user,
-		NULL);
-	if (error != NULL) {
-		/* Translators: #1 address book name; #2 error message */
-		libbalsa_information(LIBBALSA_INFORMATION_ERROR, _("Error loading CardDAV credentials for address book “%s”: %s"),
-			libbalsa_address_book_get_name(ab), error->message);
-		g_error_free(error);
-	} else {
-		libbalsa_conf_clean_key("Passwd");
-	}
-#else
-	ab_carddav->password = libbalsa_conf_private_set_string("Passwd", TRUE);
-#endif
+	libbalsa_address_book_carddav_load_passwd(ab_carddav);
 	ab_carddav->carddav_name = libbalsa_conf_get_string("CarddavName");
 	ab_carddav->refresh_minutes = libbalsa_conf_get_int("Refresh");
 	ab_carddav->force_mget = libbalsa_conf_get_bool("ForceMGet");
@@ -471,6 +442,72 @@ libbalsa_address_book_carddav_load_config(LibBalsaAddressBook *ab, const gchar *
 
 	ab_carddav->carddav = libbalsa_carddav_new(ab_carddav->full_url, ab_carddav->user, ab_carddav->password,
 		ab_carddav->refresh_minutes * 60U, ab_carddav->force_mget);
+}
+
+
+static void
+libbalsa_address_book_carddav_store_passwd(LibBalsaAddressBookCarddav *ab_carddav)
+{
+#if defined(HAVE_LIBSECRET)
+	if (libbalsa_conf_use_libsecret()) {
+		GError *error = NULL;
+
+		secret_password_store_sync(&carddav_schema, NULL, _("Balsa passwords"), ab_carddav->password, NULL, &error,
+			"url", ab_carddav->full_url,
+			"user", ab_carddav->user,
+			NULL);
+		if (error != NULL) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				/* Translators: #1 address book name; #2 error message */
+				_("Error saving credentials for address book “%s” in Secret Service: %s"),
+				libbalsa_address_book_get_name(LIBBALSA_ADDRESS_BOOK(ab_carddav)), error->message);
+			g_error_free(error);
+		} else {
+			libbalsa_conf_clean_key("Passwd");
+		}
+	} else {
+		libbalsa_conf_private_set_string("Passwd", ab_carddav->password, TRUE);
+	}
+#else		/* !HAVE_LIBSECRET */
+	libbalsa_conf_private_set_string("Passwd", ab_carddav->password, TRUE);
+#endif
+}
+
+
+static void
+libbalsa_address_book_carddav_load_passwd(LibBalsaAddressBookCarddav *ab_carddav)
+{
+#if defined(HAVE_LIBSECRET)
+	if (libbalsa_conf_use_libsecret()) {
+		GError *error = NULL;
+
+		ab_carddav->password = secret_password_lookup_sync(&carddav_schema, NULL, &error,
+			"url", ab_carddav->full_url,
+			"user", ab_carddav->user,
+			NULL);
+		if (error != NULL) {
+			libbalsa_information(LIBBALSA_INFORMATION_ERROR,
+				/* Translators: #1 address book name; #2 error message */
+				_("Error loading credentials for address book “%s” from Secret Service: %s"),
+				libbalsa_address_book_get_name(LIBBALSA_ADDRESS_BOOK(ab_carddav)), error->message);
+			g_error_free(error);
+		}
+
+		/* check the config file if the returned password is NULL, make sure to remove it from the config file otherwise */
+		if (ab_carddav->password == NULL) {
+			ab_carddav->password = libbalsa_conf_private_get_string("Passwd", TRUE);
+			if (ab_carddav->password != NULL) {
+				libbalsa_address_book_carddav_store_passwd(ab_carddav);
+			}
+		} else {
+			libbalsa_conf_clean_key("Passwd");
+		}
+	} else {
+		ab_carddav->password = libbalsa_conf_private_get_string("Passwd", TRUE);
+	}
+#else
+	ab_carddav->password = libbalsa_conf_private_get_string("Passwd", TRUE);
+#endif		/* HAVE_LIBSECRET */
 }
 
 

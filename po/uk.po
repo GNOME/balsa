@@ -3,13 +3,13 @@
 #
 # Yuri Syrota <rasta@renome.rovno.ua>, 1999.
 # Maxim Dziumanenko <mvd@mylinux.com.ua>, 2004.
-# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2021, 2022, 2023.
+# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2021, 2022, 2023, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-10-15 11:57+0000\n"
-"PO-Revision-Date: 2023-10-15 15:20+0300\n"
+"Report-Msgid-Bugs-To: http://pawsa.fedorapeople.org/balsa/bugs.html\n"
+"POT-Creation-Date: 2024-03-16 19:08+0000\n"
+"PO-Revision-Date: 2024-03-16 22:50+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
 "%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Lokalize 20.12.0\n"
+"X-Generator: Lokalize 23.04.1\n"
 
 #: balsa.appdata.xml.in:6 org.desktop.Balsa.desktop.in.in:3
 #: balsa-mailto-handler.desktop.in.in:3 libbalsa/system-tray.c:102
@@ -123,34 +123,34 @@ msgstr "Не вдалося знайти адресу у адресній кни
 msgid "Unknown error"
 msgstr "Невідома помилка"
 
-#: libbalsa/address-book-carddav.c:405 libbalsa/address-book-ldap.c:950
-#: libbalsa/server.c:340
+#: libbalsa/address-book-carddav.c:455 libbalsa/address-book-ldap.c:1012
+#: libbalsa/server.c:342
 msgid "Balsa passwords"
 msgstr "Паролі Balsa"
 
 #. Translators: #1 address book name; #2 error message
-#: libbalsa/address-book-carddav.c:411
+#: libbalsa/address-book-carddav.c:462 libbalsa/address-book-ldap.c:1019
 #, c-format
-#| msgid "Error saving LDAP credentials for address book %s: %s"
-msgid "Error saving CardDAV credentials for address book “%s”: %s"
+#| msgid "Error saving CardDAV credentials for address book “%s”: %s"
+msgid "Error saving credentials for address book “%s” in Secret Service: %s"
 msgstr ""
-"Помилка під час зберігання реєстраційних даних CardDAV для адресної книги «"
-"%s»: %s"
+"Помилка під час зберігання реєстраційних даних для адресної книги «%s» до"
+" «Секретної служби»: %s"
 
 #. Translators: #1 address book name; #2 error message
-#: libbalsa/address-book-carddav.c:452
+#: libbalsa/address-book-carddav.c:491 libbalsa/address-book-ldap.c:1048
 #, c-format
-#| msgid "Error loading LDAP credentials for address book %s: %s"
-msgid "Error loading CardDAV credentials for address book “%s”: %s"
+#| msgid "Error loading CardDAV credentials for address book “%s”: %s"
+msgid ""
+"Error loading credentials for address book “%s” from Secret Service: %s"
 msgstr ""
-"Помилка під час завантаження реєстраційних даних CardDAV для адресної книги"
-" «%s»: "
-"%s"
+"Помилка під час завантаження реєстраційних даних для адресної книги «%s» з"
+" «Секретної служби»: %s"
 
-#: libbalsa/address-book-carddav.c:490 libbalsa/gmime-gpgme-signature.c:239
+#: libbalsa/address-book-carddav.c:527 libbalsa/gmime-gpgme-signature.c:239
 #: libbalsa/imap/imap-handle.c:46 libbalsa/libbalsa-carddav.c:543
 #: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
-#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
+#: libbalsa/server-config.c:564 src/folder-conf.c:412 src/sendmsg-window.c:5382
 msgid "unknown"
 msgstr "невідомо"
 
@@ -160,7 +160,7 @@ msgid "No-Id"
 msgstr "Без-ідентифікатора"
 
 #: libbalsa/address-book-extern.c:191 libbalsa/address-book-extern.c:349
-#: libbalsa/address-book-ldap.c:577 libbalsa/address-book-ldif.c:189
+#: libbalsa/address-book-ldap.c:579 libbalsa/address-book-ldif.c:189
 #: libbalsa/address-book-ldif.c:227 libbalsa/address-book-ldif.c:270
 #: libbalsa/address-book-ldif.c:274 libbalsa/address-book-vcard.c:142
 #: libbalsa/address-book-vcard.c:249 libbalsa/address.c:393
@@ -169,44 +169,31 @@ msgid "No-Name"
 msgstr "Без назви"
 
 #. very unlikely...
-#: libbalsa/address-book-ldap.c:356
+#: libbalsa/address-book-ldap.c:358
 msgid "Host not found"
 msgstr "Вузол не знайдено"
 
-#: libbalsa/address-book-ldap.c:368
+#: libbalsa/address-book-ldap.c:370
 #, c-format
 msgid "The LDAP server “%s” does not support LDAPv3, interaction may fail."
 msgstr ""
 "На сервері LDAP «%s» не передбачено підтримки LDAPv3 — можливі проблеми у "
 "взаємодії."
 
-#: libbalsa/address-book-ldap.c:393
+#: libbalsa/address-book-ldap.c:395
 msgid "TLS requested but not compiled in"
 msgstr "Запитано TLS, але програма скомпільована баз підтримки TLS"
 
-#: libbalsa/address-book-ldap.c:418
+#: libbalsa/address-book-ldap.c:420
 #, c-format
 msgid "Cannot open LDAP address book %s: %s"
 msgstr "Не вдалося відкрити адресну книгу LDAP %s: %s"
 
-#: libbalsa/address-book-ldap.c:694
+#: libbalsa/address-book-ldap.c:696
 msgid "Undefined location of user address book"
 msgstr "Невизначене розташування адресної книги користувача"
 
-#: libbalsa/address-book-ldap.c:955
-#, c-format
-msgid "Error saving LDAP credentials for address book %s: %s"
-msgstr ""
-"Помилка під час зберігання реєстраційних даних LDAP для адресної книги %s: %s"
-
-#: libbalsa/address-book-ldap.c:1006
-#, c-format
-msgid "Error loading LDAP credentials for address book %s: %s"
-msgstr ""
-"Помилка під час завантаження реєстраційних даних LDAP для адресної книги %s: "
-"%s"
-
-#: libbalsa/address-book-ldap.c:1168
+#: libbalsa/address-book-ldap.c:1207
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr ""
@@ -374,7 +361,7 @@ msgstr "База даних автошифрування"
 
 #: libbalsa/autocrypt.c:491 libbalsa/html.c:459 libbalsa/html-pref-db.c:141
 #: libbalsa/identity.c:1650 libbalsa/libbalsa-gpgme-widgets.c:840
-#: libbalsa/server-config.c:554 src/ab-window.c:148 src/folder-conf.c:334
+#: libbalsa/server-config.c:557 src/ab-window.c:148 src/folder-conf.c:334
 #: src/mailbox-node.c:1048 src/main-window.c:3938 src/toolbar-prefs.c:125
 #: ui/main-window.ui:374 ui/message-window.ui:21 ui/sendmsg-window.ui:67
 #: ui/source-viewer.ui:8
@@ -788,7 +775,7 @@ msgstr "Підпис у «%s» не є текстом у кодуванні UTF-
 #: libbalsa/libbalsa-gpgme-cb.c:357 libbalsa/smtp-server.c:330
 #: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:275
 #: src/address-book-config.c:387 src/address-book-config.c:430
-#: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2796
+#: src/balsa-app.c:91 src/balsa-app.c:164 src/balsa-index.c:2796
 #: src/balsa-mblist.c:1894 src/balsa-message.c:1786
 #: src/balsa-mime-widget-callbacks.c:89 src/filter-edit-callbacks.c:1257
 #: src/filter-edit-dialog.c:399 src/filter-edit-dialog.c:575
@@ -805,7 +792,7 @@ msgstr "_Скасувати"
 
 #: libbalsa/identity.c:365 libbalsa/libbalsa-gpgme-cb.c:180
 #: libbalsa/libbalsa-gpgme-cb.c:356 libbalsa/smtp-server.c:329
-#: src/ab-window.c:140 src/balsa-app.c:91 src/balsa-app.c:156
+#: src/ab-window.c:140 src/balsa-app.c:92 src/balsa-app.c:163
 #: src/balsa-message.c:1787 src/balsa-mime-widget-callbacks.c:90
 #: src/filter-edit-callbacks.c:1256 src/filter-edit-dialog.c:574
 #: src/filter-export-dialog.c:80 src/filter-run-dialog.c:301
@@ -1265,23 +1252,18 @@ msgid "Cannot play sound file “%s”: %s"
 msgstr "Не вдалося відтворити файл звукових даних «%s»: %s"
 
 #: libbalsa/libbalsa-carddav.c:442
-#| msgid "The signature is invalid."
 msgid "The server returned an invalid reply."
 msgstr "Сервером повернуто некоректну відповідь."
 
 #: libbalsa/libbalsa-carddav.c:514
-#| msgid "the server does not support quotas"
 msgid "The server does not support any usable address book report."
 msgstr ""
-"На сервері не передбачено підтримки жодного придатного до використання звіту"
-" щодо адресної книги."
+"На сервері не передбачено підтримки жодного придатного до використання звіту "
+"щодо адресної книги."
 
 #. Translators: #1 address book name, #2 address book URL, #3 error message
 #: libbalsa/libbalsa-carddav.c:542
 #, c-format
-#| msgid ""
-#| "Error opening address book “%s”:\n"
-#| "%s"
 msgid ""
 "CardDAV error for address book “%s” (URL %s):\n"
 "%s"
@@ -1292,7 +1274,6 @@ msgstr ""
 #. Translators: #1 error message
 #: libbalsa/libbalsa-carddav.c:564
 #, c-format
-#| msgid "error: %s"
 msgid "CardDAV error: %s"
 msgstr "Помилка CardDAV: %s"
 
@@ -1844,16 +1825,14 @@ msgstr "Відкрити за допомогою %s"
 msgid "Open _part with %s"
 msgstr "Відкрити _частину за допомогою %s"
 
-#: libbalsa/libbalsa-webdav.c:237 libbalsa/libbalsa-webdav.c:290
-#| msgid "failed to create a temporary folder"
+#: libbalsa/libbalsa-webdav.c:236 libbalsa/libbalsa-webdav.c:289
 msgid "failed to evaluate XPath expression"
 msgstr "не вдалося обробити вираз XPath"
 
 #. Translators: #1 HTTP (RFC 2616) status code, #2 HTTP status message
-#: libbalsa/libbalsa-webdav.c:349 libbalsa/libbalsa-webdav.c:402
+#: libbalsa/libbalsa-webdav.c:348 libbalsa/libbalsa-webdav.c:401
 #: libbalsa/libbalsa-webdav.c:721 libbalsa/libbalsa-webdav.c:818
 #, c-format
-#| msgid "IMAP response: %s"
 msgid "WebDAV response %d: %s"
 msgstr "Відповідь WebDAV %d: %s"
 
@@ -1871,7 +1850,6 @@ msgid "cannot add namespaces to XPath context"
 msgstr "не вдалося додати простори назв до контексту XPath"
 
 #: libbalsa/libbalsa-webdav.c:966
-#| msgid "could not create context"
 msgid "cannot create XPath context"
 msgstr "не вдалося створити контекст XPath"
 
@@ -2349,7 +2327,7 @@ msgstr "Вичерпано час очікування на спробі вик�
 msgid "Waiting for flock attempt… %d"
 msgstr "Очікування блокування через flock… %d"
 
-#: libbalsa/misc.c:1076
+#: libbalsa/misc.c:1098
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Каталог LDAP для %s"
@@ -2993,19 +2971,26 @@ msgstr[2] ""
 msgstr[3] ""
 "Це повідомлення не буде шифруватись для отримувача прихованої копії."
 
-#: libbalsa/server.c:346
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message
+#: libbalsa/server.c:350
 #, c-format
-msgid "Error storing password for %s@%s:%s: %s"
-msgstr "Помилка під час спроби зберегти пароль для %s@%s:%s: %s"
+msgid ""
+"Error saving credentials for user “%s”, protocol “%s”, server “%s” in Secret "
+"Service: %s"
+msgstr ""
+"Помилка під час спроби зберегти реєстраційні дані для користувача «%s»,"
+" протокол «%s», сервер «%s» до «Секретної служби»: %s"
 
-#: libbalsa/server.c:368
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message
+#: libbalsa/server.c:381
 #, c-format
-msgid "Error looking up password for %s@%s:%s: %s"
-msgstr "Помилка під час пошуку пароля для %s@%s:%s: %s"
-
-#: libbalsa/server.c:374
-msgid "loaded fallback password from private config file"
-msgstr "завантажено резервний пароль із приватного файла налаштувань"
+#| msgid "Error loading CardDAV credentials for address book “%s”: %s"
+msgid ""
+"Error loading credentials for user %s, protocol “%s”, server “%s” from "
+"Secret Service: %s"
+msgstr ""
+"Помилка під час спроби завантажити реєстраційні дані для користувача %s,"
+" протокол «%s», сервер «%s» з «Секретної служби»: %s"
 
 #: libbalsa/server-config.c:90
 msgid "_Remember user password in Secret Service"
@@ -3015,120 +3000,120 @@ msgstr "За_пам'ятати пароль користувача у «Секр
 msgid "_Remember certificate pass phrase in Secret Service"
 msgstr "_Пам'ятати пароль до сертифіката у «Секретній службі»"
 
-#: libbalsa/server-config.c:95
+#: libbalsa/server-config.c:92
 msgid "_Remember user password"
 msgstr "З_апам'ятати пароль користувача"
 
-#: libbalsa/server-config.c:96
+#: libbalsa/server-config.c:93
 msgid "_Remember certificate pass phrase"
 msgstr "З_апам'ятати пароль сертифіката"
 
-#: libbalsa/server-config.c:117
+#: libbalsa/server-config.c:120
 msgid "_Basic"
 msgstr "_Базова"
 
 #. server descriptive name
-#: libbalsa/server-config.c:120
+#: libbalsa/server-config.c:123
 msgid "_Descriptive Name:"
 msgstr "_Описова назва:"
 
-#: libbalsa/server-config.c:125 src/address-book-config.c:785
+#: libbalsa/server-config.c:128 src/address-book-config.c:785
 msgid "probe…"
 msgstr "зондувати…"
 
 #. host and port
-#: libbalsa/server-config.c:140
+#: libbalsa/server-config.c:143
 msgid "_Server:"
 msgstr "_Сервер:"
 
-#: libbalsa/server-config.c:145
+#: libbalsa/server-config.c:148
 msgid "Se_curity:"
 msgstr "За_хист:"
 
-#: libbalsa/server-config.c:150
+#: libbalsa/server-config.c:153
 msgid "_Authentication:"
 msgstr "_Розпізнавання:"
 
 #. user name and password
-#: libbalsa/server-config.c:154 src/address-book-config.c:774
+#: libbalsa/server-config.c:157 src/address-book-config.c:774
 msgid "_User Name:"
 msgstr "_Ім'я користувача:"
 
-#: libbalsa/server-config.c:158 src/address-book-config.c:778
+#: libbalsa/server-config.c:161 src/address-book-config.c:778
 msgid "_Pass Phrase:"
 msgstr "_Пароль:"
 
-#: libbalsa/server-config.c:171
+#: libbalsa/server-config.c:174
 msgid "_Advanced"
 msgstr "_Додатково"
 
 #. client certificate and passphrase
-#: libbalsa/server-config.c:174
+#: libbalsa/server-config.c:177
 msgid "Server _requires client certificate"
 msgstr "Сервер _потребує сертифіката клієнта"
 
-#: libbalsa/server-config.c:177
+#: libbalsa/server-config.c:180
 msgid "Choose Client Certificate"
 msgstr "Виберіть сертифікат клієнта"
 
-#: libbalsa/server-config.c:178
+#: libbalsa/server-config.c:181
 msgid "Certificate _File:"
 msgstr "_Файл сертифіката:"
 
-#: libbalsa/server-config.c:187
+#: libbalsa/server-config.c:190
 msgid "Certificate _Pass Phrase:"
 msgstr "Па_роль сертифіката:"
 
-#: libbalsa/server-config.c:405
+#: libbalsa/server-config.c:408
 #, c-format
 msgid "%s over SSL (%sS)"
 msgstr "%s з використанням SSL (%sS)"
 
-#: libbalsa/server-config.c:409
+#: libbalsa/server-config.c:412
 msgid "TLS required"
 msgstr "Обов'язково TLS"
 
-#: libbalsa/server-config.c:410
+#: libbalsa/server-config.c:413
 msgid "TLS if possible (not recommended)"
 msgstr "TLS, якщо можливо (не рекомендуємо)"
 
-#: libbalsa/server-config.c:411
+#: libbalsa/server-config.c:414
 msgid "None (not recommended)"
 msgstr "Жодного (не рекомендуємо)"
 
-#: libbalsa/server-config.c:427
+#: libbalsa/server-config.c:430
 msgid "anonymous access"
 msgstr "анонімний доступ"
 
-#: libbalsa/server-config.c:429
+#: libbalsa/server-config.c:432
 msgid "none required"
 msgstr "жодне не є обов'язковим"
 
-#: libbalsa/server-config.c:431 libbalsa/server-config.c:541
+#: libbalsa/server-config.c:434 libbalsa/server-config.c:544
 msgid "user name and pass phrase"
 msgstr "ім'я користувача і пароль"
 
-#: libbalsa/server-config.c:433 libbalsa/server-config.c:538
+#: libbalsa/server-config.c:436 libbalsa/server-config.c:541
 msgid "Kerberos (GSSAPI)"
 msgstr "Kerberos (GSSAPI)"
 
-#: libbalsa/server-config.c:528
+#: libbalsa/server-config.c:531
 msgid "yes (SSL/TLS)"
 msgstr "так (SSL/TLS)"
 
-#: libbalsa/server-config.c:531
+#: libbalsa/server-config.c:534
 msgid "yes (STARTTLS)"
 msgstr "так (STARTTLS)"
 
-#: libbalsa/server-config.c:534
+#: libbalsa/server-config.c:537
 msgid "no"
 msgstr "ні"
 
-#: libbalsa/server-config.c:544
+#: libbalsa/server-config.c:547
 msgid "none"
 msgstr "немає"
 
-#: libbalsa/server-config.c:548
+#: libbalsa/server-config.c:551
 #, c-format
 msgid ""
 "Probe results for server %s\n"
@@ -3141,13 +3126,13 @@ msgstr ""
 "• Шифрування: %s\n"
 "• Розпізнавання: %s\n"
 
-#: libbalsa/server-config.c:553 src/ab-main.c:814 src/address-book-config.c:264
+#: libbalsa/server-config.c:556 src/ab-main.c:814 src/address-book-config.c:264
 #: src/address-book-config.c:376 src/address-book-config.c:417
 #: src/filter-edit-dialog.c:503 src/main-window.c:3997 src/pref-manager.c:3325
 msgid "_Apply"
 msgstr "_Застосувати"
 
-#: libbalsa/server-config.c:560
+#: libbalsa/server-config.c:563
 #, c-format
 msgid "Error probing server %s: %s"
 msgstr "Помилка під час спроби зондування сервера %s: %s"
@@ -3885,39 +3870,47 @@ msgstr "Адресна книга Osmo"
 msgid "CardDAV Address Book"
 msgstr "Адресна книга CardDAV"
 
-#: src/balsa-app.c:56 src/balsa-app.c:136
+#: src/balsa-app.c:55 src/balsa-app.c:142
 msgid "_Remember password in Secret Service"
 msgstr "За_пам'ятати пароль у «Секретній службі»"
 
-#: src/balsa-app.c:59 src/balsa-app.c:139
+#: src/balsa-app.c:56 src/balsa-app.c:143
 msgid "_Remember password"
 msgstr "З_апам'ятати пароль"
 
-#: src/balsa-app.c:75 src/balsa-app.c:144
+#. Translators: #1 Certificate CN, #2 user name; #3 protocol (imap, etc); #4 server name
+#: src/balsa-app.c:79 src/balsa-app.c:149
 #, c-format
+#| msgid ""
+#| "Password to unlock the user certificate\n"
+#| "%s\n"
+#| "for %s@%s (%s)"
 msgid ""
 "Password to unlock the user certificate\n"
 "%s\n"
-"for %s@%s (%s)"
+"for user %s, protocol “%s”, server “%s”"
 msgstr ""
 "Пароль для розблокування сертифіката користувача\n"
 "%s\n"
-"для %s@%s (%s)"
+"для користувача %s, протокол «%s», сервер «%s»"
 
-#: src/balsa-app.c:80 src/balsa-app.c:148
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name
+#: src/balsa-app.c:84 src/balsa-app.c:154
 #, c-format
-msgid "Password for %s@%s (%s)"
-msgstr "Пароль до %s@%s (%s)"
+msgid "Password for user %s, protocol “%s”, server “%s”"
+msgstr "Пароль для користувача %s, протокол «%s», сервер «%s»"
 
-#: src/balsa-app.c:86 src/balsa-app.c:88 src/balsa-app.c:152
+#. for some strange reason, the following property strings are not displayed when they are
+#. * added to the call above - no idea why
+#: src/balsa-app.c:90 src/balsa-app.c:100 src/balsa-app.c:159
 msgid "Password needed"
 msgstr "Потрібний пароль"
 
-#: src/balsa-app.c:169
+#: src/balsa-app.c:176
 msgid "Password:"
 msgstr "Пароль:"
 
-#: src/balsa-app.c:538
+#: src/balsa-app.c:549
 #, c-format
 msgid "Couldn’t open mailbox “%s”"
 msgstr "Не вдалося відкрити поштову скриньку «%s»"
@@ -8384,6 +8377,33 @@ msgstr "Долучити _відкритий ключ GnuPG"
 #: ui/source-viewer.ui:38
 msgid "_Escape Special Characters"
 msgstr "_Екранувати спеціальні символи"
+
+#, c-format
+#~ msgid "Error saving LDAP credentials for address book %s: %s"
+#~ msgstr ""
+#~ "Помилка під час зберігання реєстраційних даних LDAP для адресної книги "
+#~ "%s: %s"
+
+#, c-format
+#~ msgid "Error loading LDAP credentials for address book %s: %s"
+#~ msgstr ""
+#~ "Помилка під час завантаження реєстраційних даних LDAP для адресної книги "
+#~ "%s: %s"
+
+#, c-format
+#~ msgid "Error storing password for %s@%s:%s: %s"
+#~ msgstr "Помилка під час спроби зберегти пароль для %s@%s:%s: %s"
+
+#, c-format
+#~ msgid "Error looking up password for %s@%s:%s: %s"
+#~ msgstr "Помилка під час пошуку пароля для %s@%s:%s: %s"
+
+#~ msgid "loaded fallback password from private config file"
+#~ msgstr "завантажено резервний пароль із приватного файла налаштувань"
+
+#, c-format
+#~ msgid "Password for %s@%s (%s)"
+#~ msgstr "Пароль до %s@%s (%s)"
 
 #~ msgid "No path found. Do you want to give one?"
 #~ msgstr "Шляху не знайдено. Хочете надати шлях?"

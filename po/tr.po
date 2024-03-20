@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://pawsa.fedorapeople.org/balsa/bugs.html\n"
-"POT-Creation-Date: 2024-02-14 14:05+0000\n"
-"PO-Revision-Date: 2024-03-13 19:21+0300\n"
+"POT-Creation-Date: 2024-03-16 19:08+0000\n"
+"PO-Revision-Date: 2024-03-19 23:42+0300\n"
 "Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
@@ -126,28 +126,30 @@ msgstr "Adres, adres defterinde bulunamıyor"
 msgid "Unknown error"
 msgstr "Bilinmeyen hata"
 
-#: libbalsa/address-book-carddav.c:405 libbalsa/address-book-ldap.c:950
-#: libbalsa/server.c:340
+#: libbalsa/address-book-carddav.c:455 libbalsa/address-book-ldap.c:1012
+#: libbalsa/server.c:342
 msgid "Balsa passwords"
 msgstr "Balsa parolaları"
 
 #. Translators: #1 address book name; #2 error message
-#: libbalsa/address-book-carddav.c:411
+#: libbalsa/address-book-carddav.c:462 libbalsa/address-book-ldap.c:1019
 #, c-format
-msgid "Error saving CardDAV credentials for address book “%s”: %s"
+msgid "Error saving credentials for address book “%s” in Secret Service: %s"
 msgstr ""
-"“%s” adres defteri için CardDAV kimlik bilgileri kaydedilirken hata: %s"
+"“%s” adres defteri için kimlik bilgileri Giz Hizmetinde kaydedilirken hata "
+"oluştu: %s"
 
 #. Translators: #1 address book name; #2 error message
-#: libbalsa/address-book-carddav.c:452
+#: libbalsa/address-book-carddav.c:491 libbalsa/address-book-ldap.c:1048
 #, c-format
-msgid "Error loading CardDAV credentials for address book “%s”: %s"
-msgstr "“%s” adres defteri için CardDAV kimlik bilgileri yüklenirken hata: %s"
+msgid "Error loading credentials for address book “%s” from Secret Service: %s"
+msgstr ""
+"“%s” adres defteri için kimlik bilgileri Giz Hizmetinden yüklenirken hata: %s"
 
-#: libbalsa/address-book-carddav.c:490 libbalsa/gmime-gpgme-signature.c:239
+#: libbalsa/address-book-carddav.c:527 libbalsa/gmime-gpgme-signature.c:239
 #: libbalsa/imap/imap-handle.c:46 libbalsa/libbalsa-carddav.c:543
 #: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
-#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
+#: libbalsa/server-config.c:564 src/folder-conf.c:412 src/sendmsg-window.c:5382
 msgid "unknown"
 msgstr "bilinmeyen"
 
@@ -157,7 +159,7 @@ msgid "No-Id"
 msgstr "Kimliksiz"
 
 #: libbalsa/address-book-extern.c:191 libbalsa/address-book-extern.c:349
-#: libbalsa/address-book-ldap.c:577 libbalsa/address-book-ldif.c:189
+#: libbalsa/address-book-ldap.c:579 libbalsa/address-book-ldif.c:189
 #: libbalsa/address-book-ldif.c:227 libbalsa/address-book-ldif.c:270
 #: libbalsa/address-book-ldif.c:274 libbalsa/address-book-vcard.c:142
 #: libbalsa/address-book-vcard.c:249 libbalsa/address.c:393
@@ -166,41 +168,31 @@ msgid "No-Name"
 msgstr "Adsız"
 
 #. very unlikely...
-#: libbalsa/address-book-ldap.c:356
+#: libbalsa/address-book-ldap.c:358
 msgid "Host not found"
 msgstr "Makine bulunamadı"
 
-#: libbalsa/address-book-ldap.c:368
+#: libbalsa/address-book-ldap.c:370
 #, c-format
 msgid "The LDAP server “%s” does not support LDAPv3, interaction may fail."
 msgstr ""
 "LDAP sunucusu “%s”, LDAPv3 sürümünü desteklemiyor ve etkileşim başarısız "
 "olabilir."
 
-#: libbalsa/address-book-ldap.c:393
+#: libbalsa/address-book-ldap.c:395
 msgid "TLS requested but not compiled in"
 msgstr "TLS istendi ama bu destekle derlenmemiş"
 
-#: libbalsa/address-book-ldap.c:418
+#: libbalsa/address-book-ldap.c:420
 #, c-format
 msgid "Cannot open LDAP address book %s: %s"
 msgstr "LDAP adres defteri %s açılamadı: %s"
 
-#: libbalsa/address-book-ldap.c:694
+#: libbalsa/address-book-ldap.c:696
 msgid "Undefined location of user address book"
 msgstr "Kullanıcı adres defterinin konumu tanımlanmamış"
 
-#: libbalsa/address-book-ldap.c:955
-#, c-format
-msgid "Error saving LDAP credentials for address book %s: %s"
-msgstr "%s adres defteri için LDAP kimlik bilgileri kaydedilirken hata: %s"
-
-#: libbalsa/address-book-ldap.c:1006
-#, c-format
-msgid "Error loading LDAP credentials for address book %s: %s"
-msgstr "%s adres defteri için LDAP kimlik bilgileri yüklenirken hata: %s"
-
-#: libbalsa/address-book-ldap.c:1168
+#: libbalsa/address-book-ldap.c:1207
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr "LDAP sunucusu %s kapalı, sonraki deneme yeniden bağlanmayı deneyecek."
@@ -353,7 +345,7 @@ msgstr "Autocrypt veri tabanı"
 
 #: libbalsa/autocrypt.c:491 libbalsa/html.c:459 libbalsa/html-pref-db.c:141
 #: libbalsa/identity.c:1650 libbalsa/libbalsa-gpgme-widgets.c:840
-#: libbalsa/server-config.c:554 src/ab-window.c:148 src/folder-conf.c:334
+#: libbalsa/server-config.c:557 src/ab-window.c:148 src/folder-conf.c:334
 #: src/mailbox-node.c:1048 src/main-window.c:3938 src/toolbar-prefs.c:125
 #: ui/main-window.ui:374 ui/message-window.ui:21 ui/sendmsg-window.ui:67
 #: ui/source-viewer.ui:8
@@ -766,7 +758,7 @@ msgstr "“%s” içindeki imza bir UTF-8 metni değil."
 #: libbalsa/libbalsa-gpgme-cb.c:357 libbalsa/smtp-server.c:330
 #: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:275
 #: src/address-book-config.c:387 src/address-book-config.c:430
-#: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2796
+#: src/balsa-app.c:91 src/balsa-app.c:164 src/balsa-index.c:2796
 #: src/balsa-mblist.c:1894 src/balsa-message.c:1786
 #: src/balsa-mime-widget-callbacks.c:89 src/filter-edit-callbacks.c:1257
 #: src/filter-edit-dialog.c:399 src/filter-edit-dialog.c:575
@@ -783,7 +775,7 @@ msgstr "İ_ptal"
 
 #: libbalsa/identity.c:365 libbalsa/libbalsa-gpgme-cb.c:180
 #: libbalsa/libbalsa-gpgme-cb.c:356 libbalsa/smtp-server.c:329
-#: src/ab-window.c:140 src/balsa-app.c:91 src/balsa-app.c:156
+#: src/ab-window.c:140 src/balsa-app.c:92 src/balsa-app.c:163
 #: src/balsa-message.c:1787 src/balsa-mime-widget-callbacks.c:90
 #: src/filter-edit-callbacks.c:1256 src/filter-edit-dialog.c:574
 #: src/filter-export-dialog.c:80 src/filter-run-dialog.c:301
@@ -1758,12 +1750,12 @@ msgstr "%s ile aç"
 msgid "Open _part with %s"
 msgstr "Bölümü %s ile _aç"
 
-#: libbalsa/libbalsa-webdav.c:237 libbalsa/libbalsa-webdav.c:290
+#: libbalsa/libbalsa-webdav.c:236 libbalsa/libbalsa-webdav.c:289
 msgid "failed to evaluate XPath expression"
 msgstr "XPath ifadesi değerlendirilemedi"
 
 #. Translators: #1 HTTP (RFC 2616) status code, #2 HTTP status message
-#: libbalsa/libbalsa-webdav.c:349 libbalsa/libbalsa-webdav.c:402
+#: libbalsa/libbalsa-webdav.c:348 libbalsa/libbalsa-webdav.c:401
 #: libbalsa/libbalsa-webdav.c:721 libbalsa/libbalsa-webdav.c:818
 #, c-format
 msgid "WebDAV response %d: %s"
@@ -2255,7 +2247,7 @@ msgstr "flock kilitlemesi denenirken bekleme süresi sınırı aşıldı!"
 msgid "Waiting for flock attempt… %d"
 msgstr "flock denemesi için bekleniyor… %d"
 
-#: libbalsa/misc.c:1076
+#: libbalsa/misc.c:1098
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "%s için LDAP Dizini"
@@ -2864,19 +2856,25 @@ msgid "This message will not be encrypted for the BCC: recipient."
 msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "Bu ileti Saklı Bilgi için şifrelenmeyecek: alıcılar."
 
-#: libbalsa/server.c:346
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message
+#: libbalsa/server.c:350
 #, c-format
-msgid "Error storing password for %s@%s:%s: %s"
-msgstr "%s@%s için parola depolanırken hata:%s: %s"
+msgid ""
+"Error saving credentials for user “%s”, protocol “%s”, server “%s” in Secret "
+"Service: %s"
+msgstr ""
+"Kullanıcı “%s”, iletişim kuralı “%s”, sunucu “%s” için kimlik bilgileri Giz "
+"Hizmetinde kaydedilirken hata oluştu: %s"
 
-#: libbalsa/server.c:368
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message
+#: libbalsa/server.c:381
 #, c-format
-msgid "Error looking up password for %s@%s:%s: %s"
-msgstr "%s@%s için parola aranırken hata:%s: %s"
-
-#: libbalsa/server.c:374
-msgid "loaded fallback password from private config file"
-msgstr "özel yapılandırma dosyasından geri dönüş parolası yüklendi"
+msgid ""
+"Error loading credentials for user %s, protocol “%s”, server “%s” from "
+"Secret Service: %s"
+msgstr ""
+"Kullanıcı %s, iletişim kuralı “%s”, sunucu “%s” için kimlik bilgileri Giz "
+"Hizmetinden yüklenirken hata oluştu: %s"
 
 #: libbalsa/server-config.c:90
 msgid "_Remember user password in Secret Service"
@@ -2886,120 +2884,120 @@ msgstr "Giz Hizmetinde kullanıcı parolasını _anımsa"
 msgid "_Remember certificate pass phrase in Secret Service"
 msgstr "Giz Hizmetinde sertifika parola sözcüğünü _anımsa"
 
-#: libbalsa/server-config.c:95
+#: libbalsa/server-config.c:92
 msgid "_Remember user password"
 msgstr "Kullanıcı parolasını _anımsa"
 
-#: libbalsa/server-config.c:96
+#: libbalsa/server-config.c:93
 msgid "_Remember certificate pass phrase"
 msgstr "Sertifika parola sözcüğünü _anımsa"
 
-#: libbalsa/server-config.c:117
+#: libbalsa/server-config.c:120
 msgid "_Basic"
 msgstr "_Temel"
 
 #. server descriptive name
-#: libbalsa/server-config.c:120
+#: libbalsa/server-config.c:123
 msgid "_Descriptive Name:"
 msgstr "_Tanımlayıcı Ad:"
 
-#: libbalsa/server-config.c:125 src/address-book-config.c:785
+#: libbalsa/server-config.c:128 src/address-book-config.c:785
 msgid "probe…"
 msgstr "araştır…"
 
 #. host and port
-#: libbalsa/server-config.c:140
+#: libbalsa/server-config.c:143
 msgid "_Server:"
 msgstr "_Sunucu:"
 
-#: libbalsa/server-config.c:145
+#: libbalsa/server-config.c:148
 msgid "Se_curity:"
 msgstr "Gü_venlik:"
 
-#: libbalsa/server-config.c:150
+#: libbalsa/server-config.c:153
 msgid "_Authentication:"
 msgstr "_Kimlik doğrulama:"
 
 #. user name and password
-#: libbalsa/server-config.c:154 src/address-book-config.c:774
+#: libbalsa/server-config.c:157 src/address-book-config.c:774
 msgid "_User Name:"
 msgstr "_Kullanıcı Adı:"
 
-#: libbalsa/server-config.c:158 src/address-book-config.c:778
+#: libbalsa/server-config.c:161 src/address-book-config.c:778
 msgid "_Pass Phrase:"
 msgstr "_Parola Sözcüğü:"
 
-#: libbalsa/server-config.c:171
+#: libbalsa/server-config.c:174
 msgid "_Advanced"
 msgstr "_Gelişmiş"
 
 #. client certificate and passphrase
-#: libbalsa/server-config.c:174
+#: libbalsa/server-config.c:177
 msgid "Server _requires client certificate"
 msgstr "Sunucu _istemci sertifikası gerektiriyor"
 
-#: libbalsa/server-config.c:177
+#: libbalsa/server-config.c:180
 msgid "Choose Client Certificate"
 msgstr "İstemci Sertifikası Seç"
 
-#: libbalsa/server-config.c:178
+#: libbalsa/server-config.c:181
 msgid "Certificate _File:"
 msgstr "Sertifika _Dosyası:"
 
-#: libbalsa/server-config.c:187
+#: libbalsa/server-config.c:190
 msgid "Certificate _Pass Phrase:"
 msgstr "Sertifika _Parola Sözcüğü:"
 
-#: libbalsa/server-config.c:405
+#: libbalsa/server-config.c:408
 #, c-format
 msgid "%s over SSL (%sS)"
 msgstr "%s üstünde SSL (%sS)"
 
-#: libbalsa/server-config.c:409
+#: libbalsa/server-config.c:412
 msgid "TLS required"
 msgstr "TLS gerekli"
 
-#: libbalsa/server-config.c:410
+#: libbalsa/server-config.c:413
 msgid "TLS if possible (not recommended)"
 msgstr "TLS olabiliyorsa (önerilmez)"
 
-#: libbalsa/server-config.c:411
+#: libbalsa/server-config.c:414
 msgid "None (not recommended)"
 msgstr "Hiç (önerilmez)"
 
-#: libbalsa/server-config.c:427
+#: libbalsa/server-config.c:430
 msgid "anonymous access"
 msgstr "anonim erişim"
 
-#: libbalsa/server-config.c:429
+#: libbalsa/server-config.c:432
 msgid "none required"
 msgstr "hiçbir şey gerekli değil"
 
-#: libbalsa/server-config.c:431 libbalsa/server-config.c:541
+#: libbalsa/server-config.c:434 libbalsa/server-config.c:544
 msgid "user name and pass phrase"
 msgstr "kullanıcı adı ve parola metni"
 
-#: libbalsa/server-config.c:433 libbalsa/server-config.c:538
+#: libbalsa/server-config.c:436 libbalsa/server-config.c:541
 msgid "Kerberos (GSSAPI)"
 msgstr "Kerberos (GSSAPI)"
 
-#: libbalsa/server-config.c:528
+#: libbalsa/server-config.c:531
 msgid "yes (SSL/TLS)"
 msgstr "evet (SSL/TLS)"
 
-#: libbalsa/server-config.c:531
+#: libbalsa/server-config.c:534
 msgid "yes (STARTTLS)"
 msgstr "evet (STARTTLS)"
 
-#: libbalsa/server-config.c:534
+#: libbalsa/server-config.c:537
 msgid "no"
 msgstr "hayır"
 
-#: libbalsa/server-config.c:544
+#: libbalsa/server-config.c:547
 msgid "none"
 msgstr "hiçbiri"
 
-#: libbalsa/server-config.c:548
+#: libbalsa/server-config.c:551
 #, c-format
 msgid ""
 "Probe results for server %s\n"
@@ -3012,13 +3010,13 @@ msgstr ""
 "• Şifreleme: %s\n"
 "• Kimlik doğrulama: %s\n"
 
-#: libbalsa/server-config.c:553 src/ab-main.c:814 src/address-book-config.c:264
+#: libbalsa/server-config.c:556 src/ab-main.c:814 src/address-book-config.c:264
 #: src/address-book-config.c:376 src/address-book-config.c:417
 #: src/filter-edit-dialog.c:503 src/main-window.c:3997 src/pref-manager.c:3325
 msgid "_Apply"
 msgstr "_Uygula"
 
-#: libbalsa/server-config.c:560
+#: libbalsa/server-config.c:563
 #, c-format
 msgid "Error probing server %s: %s"
 msgstr "%s sunucusu araştırılamadı: %s"
@@ -3761,39 +3759,43 @@ msgstr "Osmo Adres Defteri"
 msgid "CardDAV Address Book"
 msgstr "CardDAV Adres Defteri"
 
-#: src/balsa-app.c:56 src/balsa-app.c:136
+#: src/balsa-app.c:55 src/balsa-app.c:142
 msgid "_Remember password in Secret Service"
 msgstr "Giz Hizmetinde parolayı _anımsa"
 
-#: src/balsa-app.c:59 src/balsa-app.c:139
+#: src/balsa-app.c:56 src/balsa-app.c:143
 msgid "_Remember password"
 msgstr "Parolayı _anımsa"
 
-#: src/balsa-app.c:75 src/balsa-app.c:144
+#. Translators: #1 Certificate CN, #2 user name; #3 protocol (imap, etc); #4 server name
+#: src/balsa-app.c:79 src/balsa-app.c:149
 #, c-format
 msgid ""
 "Password to unlock the user certificate\n"
 "%s\n"
-"for %s@%s (%s)"
+"for user %s, protocol “%s”, server “%s”"
 msgstr ""
 "Kullanıcı sertifikasının kilidini açacak parola\n"
 "%s\n"
-"%s@%s (%s) için"
+"kullanıcı %s, iletişim kuralı “%s”, sunucu “%s” için"
 
-#: src/balsa-app.c:80 src/balsa-app.c:148
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name
+#: src/balsa-app.c:84 src/balsa-app.c:154
 #, c-format
-msgid "Password for %s@%s (%s)"
-msgstr "%s@%s (%s) için parola"
+msgid "Password for user %s, protocol “%s”, server “%s”"
+msgstr "Kullanıcı %s, iletişim kuralı “%s”, sunucu “%s” parolası"
 
-#: src/balsa-app.c:86 src/balsa-app.c:88 src/balsa-app.c:152
+#. for some strange reason, the following property strings are not displayed when they are
+#. * added to the call above - no idea why
+#: src/balsa-app.c:90 src/balsa-app.c:100 src/balsa-app.c:159
 msgid "Password needed"
 msgstr "Parola gerekiyor"
 
-#: src/balsa-app.c:169
+#: src/balsa-app.c:176
 msgid "Password:"
 msgstr "Parola:"
 
-#: src/balsa-app.c:538
+#: src/balsa-app.c:549
 #, c-format
 msgid "Couldn’t open mailbox “%s”"
 msgstr "“%s” posta kutusu açılamadı"
@@ -8194,3 +8196,21 @@ msgstr "GnuPG _Genel Anahtarı Ekle"
 #: ui/source-viewer.ui:38
 msgid "_Escape Special Characters"
 msgstr "_Özel Karakterleri Ayır"
+
+#~ msgid "Error saving LDAP credentials for address book %s: %s"
+#~ msgstr "%s adres defteri için LDAP kimlik bilgileri kaydedilirken hata: %s"
+
+#~ msgid "Error loading LDAP credentials for address book %s: %s"
+#~ msgstr "%s adres defteri için LDAP kimlik bilgileri yüklenirken hata: %s"
+
+#~ msgid "Error storing password for %s@%s:%s: %s"
+#~ msgstr "%s@%s için parola depolanırken hata:%s: %s"
+
+#~ msgid "Error looking up password for %s@%s:%s: %s"
+#~ msgstr "%s@%s için parola aranırken hata:%s: %s"
+
+#~ msgid "loaded fallback password from private config file"
+#~ msgstr "özel yapılandırma dosyasından geri dönüş parolası yüklendi"
+
+#~ msgid "Password for %s@%s (%s)"
+#~ msgstr "%s@%s (%s) için parola"

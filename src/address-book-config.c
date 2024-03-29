@@ -786,7 +786,7 @@ create_carddav_dialog(AddressBookConfig *abc)
 	gtk_button_set_always_show_image(GTK_BUTTON(abc->ab_specific.carddav.probe), TRUE);
 	gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.carddav.probe, 0, 4, 2, 1);
 
-	label = libbalsa_create_grid_label(_("_CardDAV address book name:"), grid, 5);
+	(void) libbalsa_create_grid_label(_("_CardDAV address book name:"), grid, 5);
 	store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
 	abc->ab_specific.carddav.remote_name = gtk_combo_box_new_with_model(GTK_TREE_MODEL(store));
 	g_object_unref(store);
@@ -795,7 +795,7 @@ create_carddav_dialog(AddressBookConfig *abc)
 	gtk_cell_layout_set_attributes(GTK_CELL_LAYOUT(abc->ab_specific.carddav.remote_name), renderer, "text", 0, NULL);
 	gtk_grid_attach(GTK_GRID(grid), abc->ab_specific.carddav.remote_name, 1, 5, 1, 1);
 
-	label = libbalsa_create_grid_label(_("_Refresh period:"), grid, 6);
+	(void) libbalsa_create_grid_label(_("_Refresh period:"), grid, 6);
 	box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 12);
 	abc->ab_specific.carddav.refresh_period = gtk_spin_button_new_with_range(1.0, 30.0, 1.0);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(abc->ab_specific.carddav.refresh_period),

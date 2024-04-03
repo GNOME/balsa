@@ -968,8 +968,10 @@ modify_book(AddressBookConfig * abc)
         gchar *path =
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(abc->window));
 
-        if (path != NULL)
+        if (path != NULL) {
             libbalsa_address_book_text_set_path(ab_text, path);
+            g_free(path);
+        }
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ) {
         LibBalsaAddressBookExternq *ab_externq;
         gchar *load =

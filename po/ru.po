@@ -9,9 +9,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-10-15 11:57+0000\n"
-"PO-Revision-Date: 2023-10-19 09:56+1000\n"
+"Report-Msgid-Bugs-To: http://pawsa.fedorapeople.org/balsa/bugs.html\n"
+"POT-Creation-Date: 2024-03-16 19:08+0000\n"
+"PO-Revision-Date: 2024-03-21 22:45+1000\n"
 "Last-Translator: Ser82-png <asvmail.as@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -123,27 +123,30 @@ msgstr "Не удалось найти адрес в адресной книге
 msgid "Unknown error"
 msgstr "Неизвестная ошибка"
 
-#: libbalsa/address-book-carddav.c:405 libbalsa/address-book-ldap.c:950
-#: libbalsa/server.c:340
+#: libbalsa/address-book-carddav.c:455 libbalsa/address-book-ldap.c:1012
+#: libbalsa/server.c:342
 msgid "Balsa passwords"
 msgstr "Пароли Balsa"
 
 #. Translators: #1 address book name; #2 error message
-#: libbalsa/address-book-carddav.c:411
+#: libbalsa/address-book-carddav.c:462 libbalsa/address-book-ldap.c:1019
 #, c-format
-msgid "Error saving CardDAV credentials for address book “%s”: %s"
-msgstr "Ошибка сохранения учётных данных CardDAV для адресной книги «%s»: %s"
+msgid "Error saving credentials for address book “%s” in Secret Service: %s"
+msgstr ""
+"Ошибка сохранения учётных данных для адресной книги «%s» в Secret Service: %s"
 
 #. Translators: #1 address book name; #2 error message
-#: libbalsa/address-book-carddav.c:452
+#: libbalsa/address-book-carddav.c:491 libbalsa/address-book-ldap.c:1048
 #, c-format
-msgid "Error loading CardDAV credentials for address book “%s”: %s"
-msgstr "Ошибка при загрузке учётных данных CardDAV для адресной книги «%s»: %s"
+msgid "Error loading credentials for address book “%s” from Secret Service: %s"
+msgstr ""
+"Ошибка при загрузке учётных данных для адресной книги «%s» из Secret "
+"Service: %s"
 
-#: libbalsa/address-book-carddav.c:490 libbalsa/gmime-gpgme-signature.c:239
+#: libbalsa/address-book-carddav.c:527 libbalsa/gmime-gpgme-signature.c:239
 #: libbalsa/imap/imap-handle.c:46 libbalsa/libbalsa-carddav.c:543
 #: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
-#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
+#: libbalsa/server-config.c:564 src/folder-conf.c:412 src/sendmsg-window.c:5382
 msgid "unknown"
 msgstr "неизвестно"
 
@@ -153,7 +156,7 @@ msgid "No-Id"
 msgstr "Без ID"
 
 #: libbalsa/address-book-extern.c:191 libbalsa/address-book-extern.c:349
-#: libbalsa/address-book-ldap.c:577 libbalsa/address-book-ldif.c:189
+#: libbalsa/address-book-ldap.c:579 libbalsa/address-book-ldif.c:189
 #: libbalsa/address-book-ldif.c:227 libbalsa/address-book-ldif.c:270
 #: libbalsa/address-book-ldif.c:274 libbalsa/address-book-vcard.c:142
 #: libbalsa/address-book-vcard.c:249 libbalsa/address.c:393
@@ -162,41 +165,31 @@ msgid "No-Name"
 msgstr "Без названия"
 
 #. very unlikely...
-#: libbalsa/address-book-ldap.c:356
+#: libbalsa/address-book-ldap.c:358
 msgid "Host not found"
 msgstr "Узел не найден"
 
-#: libbalsa/address-book-ldap.c:368
+#: libbalsa/address-book-ldap.c:370
 #, c-format
 msgid "The LDAP server “%s” does not support LDAPv3, interaction may fail."
 msgstr ""
 "На сервере LDAP «%s» не предусмотрено поддержки LDAPv3, возможны проблемы во "
 "взаимодействии."
 
-#: libbalsa/address-book-ldap.c:393
+#: libbalsa/address-book-ldap.c:395
 msgid "TLS requested but not compiled in"
 msgstr "Запрошено TLS, но программа скомпилирована базами поддержки TLS"
 
-#: libbalsa/address-book-ldap.c:418
+#: libbalsa/address-book-ldap.c:420
 #, c-format
 msgid "Cannot open LDAP address book %s: %s"
 msgstr "Не удалось открыть адресную книгу LDAP %s: %s"
 
-#: libbalsa/address-book-ldap.c:694
+#: libbalsa/address-book-ldap.c:696
 msgid "Undefined location of user address book"
 msgstr "Неопределенное расположение адресной книги пользователя"
 
-#: libbalsa/address-book-ldap.c:955
-#, c-format
-msgid "Error saving LDAP credentials for address book %s: %s"
-msgstr "Ошибка сохранения учётных данных LDAP для адресной книги %s: %s"
-
-#: libbalsa/address-book-ldap.c:1006
-#, c-format
-msgid "Error loading LDAP credentials for address book %s: %s"
-msgstr "Ошибка при загрузке учётных данных LDAP для адресной книги %s: %s"
-
-#: libbalsa/address-book-ldap.c:1168
+#: libbalsa/address-book-ldap.c:1207
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr ""
@@ -362,7 +355,7 @@ msgstr "База данных автошифрования"
 
 #: libbalsa/autocrypt.c:491 libbalsa/html.c:459 libbalsa/html-pref-db.c:141
 #: libbalsa/identity.c:1650 libbalsa/libbalsa-gpgme-widgets.c:840
-#: libbalsa/server-config.c:554 src/ab-window.c:148 src/folder-conf.c:334
+#: libbalsa/server-config.c:557 src/ab-window.c:148 src/folder-conf.c:334
 #: src/mailbox-node.c:1048 src/main-window.c:3938 src/toolbar-prefs.c:125
 #: ui/main-window.ui:374 ui/message-window.ui:21 ui/sendmsg-window.ui:67
 #: ui/source-viewer.ui:8
@@ -777,7 +770,7 @@ msgstr "Подпись в «%s» не является текстом в код�
 #: libbalsa/libbalsa-gpgme-cb.c:357 libbalsa/smtp-server.c:330
 #: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:275
 #: src/address-book-config.c:387 src/address-book-config.c:430
-#: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2796
+#: src/balsa-app.c:91 src/balsa-app.c:164 src/balsa-index.c:2796
 #: src/balsa-mblist.c:1894 src/balsa-message.c:1786
 #: src/balsa-mime-widget-callbacks.c:89 src/filter-edit-callbacks.c:1257
 #: src/filter-edit-dialog.c:399 src/filter-edit-dialog.c:575
@@ -794,7 +787,7 @@ msgstr "_Отменить"
 
 #: libbalsa/identity.c:365 libbalsa/libbalsa-gpgme-cb.c:180
 #: libbalsa/libbalsa-gpgme-cb.c:356 libbalsa/smtp-server.c:329
-#: src/ab-window.c:140 src/balsa-app.c:91 src/balsa-app.c:156
+#: src/ab-window.c:140 src/balsa-app.c:92 src/balsa-app.c:163
 #: src/balsa-message.c:1787 src/balsa-mime-widget-callbacks.c:90
 #: src/filter-edit-callbacks.c:1256 src/filter-edit-dialog.c:574
 #: src/filter-export-dialog.c:80 src/filter-run-dialog.c:301
@@ -1807,12 +1800,12 @@ msgstr "Открыть с помощью %s"
 msgid "Open _part with %s"
 msgstr "Открыть _часть с помощью %s"
 
-#: libbalsa/libbalsa-webdav.c:237 libbalsa/libbalsa-webdav.c:290
+#: libbalsa/libbalsa-webdav.c:236 libbalsa/libbalsa-webdav.c:289
 msgid "failed to evaluate XPath expression"
 msgstr "не удалось обработать выражение XPath"
 
 #. Translators: #1 HTTP (RFC 2616) status code, #2 HTTP status message
-#: libbalsa/libbalsa-webdav.c:349 libbalsa/libbalsa-webdav.c:402
+#: libbalsa/libbalsa-webdav.c:348 libbalsa/libbalsa-webdav.c:401
 #: libbalsa/libbalsa-webdav.c:721 libbalsa/libbalsa-webdav.c:818
 #, c-format
 msgid "WebDAV response %d: %s"
@@ -2301,7 +2294,7 @@ msgstr "Исчерпано время ожидания при попытке в�
 msgid "Waiting for flock attempt… %d"
 msgstr "Ожидание завершения попытки выполнить flock… %d"
 
-#: libbalsa/misc.c:1076
+#: libbalsa/misc.c:1098
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Каталог LDAP для %s"
@@ -2930,19 +2923,25 @@ msgstr[0] "Это сообщение не будет зашифровано дл
 msgstr[1] "Это сообщение не будет зашифровано для получателей скрытой копии."
 msgstr[2] "Это сообщение не будет зашифровано для получателей скрытой копии."
 
-#: libbalsa/server.c:346
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message
+#: libbalsa/server.c:350
 #, c-format
-msgid "Error storing password for %s@%s:%s: %s"
-msgstr "Возникла ошибка при попытке сохранить пароль для %s@%s:%s: %s"
+msgid ""
+"Error saving credentials for user “%s”, protocol “%s”, server “%s” in Secret "
+"Service: %s"
+msgstr ""
+"Ошибка при сохранении учётных данных пользователя «%s», протокол «%s», "
+"сервер «%s» в Secret Service: %s"
 
-#: libbalsa/server.c:368
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message
+#: libbalsa/server.c:381
 #, c-format
-msgid "Error looking up password for %s@%s:%s: %s"
-msgstr "Возникла ошибка при поиске пароля для %s@%s:%s: %s"
-
-#: libbalsa/server.c:374
-msgid "loaded fallback password from private config file"
-msgstr "загружен резервный пароль из приватного файла настроек"
+msgid ""
+"Error loading credentials for user %s, protocol “%s”, server “%s” from "
+"Secret Service: %s"
+msgstr ""
+"Ошибка при загрузке учётных данных пользователя «%s», протокол «%s», сервер "
+"«%s» из Secret Service: %s"
 
 #: libbalsa/server-config.c:90
 msgid "_Remember user password in Secret Service"
@@ -2952,120 +2951,120 @@ msgstr "_Запомнить пароль пользователя в Secret Serv
 msgid "_Remember certificate pass phrase in Secret Service"
 msgstr "_Запомнить пароль сертификата в Secret Service"
 
-#: libbalsa/server-config.c:95
+#: libbalsa/server-config.c:92
 msgid "_Remember user password"
 msgstr "_Запомнить пароль пользователя"
 
-#: libbalsa/server-config.c:96
+#: libbalsa/server-config.c:93
 msgid "_Remember certificate pass phrase"
 msgstr "_Запомнить пароль сертификата"
 
-#: libbalsa/server-config.c:117
+#: libbalsa/server-config.c:120
 msgid "_Basic"
 msgstr "_Основные"
 
 #. server descriptive name
-#: libbalsa/server-config.c:120
+#: libbalsa/server-config.c:123
 msgid "_Descriptive Name:"
 msgstr "_Описательное имя:"
 
-#: libbalsa/server-config.c:125 src/address-book-config.c:785
+#: libbalsa/server-config.c:128 src/address-book-config.c:785
 msgid "probe…"
 msgstr "проверка…"
 
 #. host and port
-#: libbalsa/server-config.c:140
+#: libbalsa/server-config.c:143
 msgid "_Server:"
 msgstr "Сервер:"
 
-#: libbalsa/server-config.c:145
+#: libbalsa/server-config.c:148
 msgid "Se_curity:"
 msgstr "_Защита:"
 
-#: libbalsa/server-config.c:150
+#: libbalsa/server-config.c:153
 msgid "_Authentication:"
 msgstr "_Аутентификация:"
 
 #. user name and password
-#: libbalsa/server-config.c:154 src/address-book-config.c:774
+#: libbalsa/server-config.c:157 src/address-book-config.c:774
 msgid "_User Name:"
 msgstr "_Имя пользователя:"
 
-#: libbalsa/server-config.c:158 src/address-book-config.c:778
+#: libbalsa/server-config.c:161 src/address-book-config.c:778
 msgid "_Pass Phrase:"
 msgstr "_Пароль:"
 
-#: libbalsa/server-config.c:171
+#: libbalsa/server-config.c:174
 msgid "_Advanced"
 msgstr "_Расширенные"
 
 #. client certificate and passphrase
-#: libbalsa/server-config.c:174
+#: libbalsa/server-config.c:177
 msgid "Server _requires client certificate"
 msgstr "Серверу _требуется клиентский сертификат"
 
-#: libbalsa/server-config.c:177
+#: libbalsa/server-config.c:180
 msgid "Choose Client Certificate"
 msgstr "Выбрать сертификат клиента"
 
-#: libbalsa/server-config.c:178
+#: libbalsa/server-config.c:181
 msgid "Certificate _File:"
 msgstr "_Файл сертификата:"
 
-#: libbalsa/server-config.c:187
+#: libbalsa/server-config.c:190
 msgid "Certificate _Pass Phrase:"
 msgstr "_Пароль для сертификата:"
 
-#: libbalsa/server-config.c:405
+#: libbalsa/server-config.c:408
 #, c-format
 msgid "%s over SSL (%sS)"
 msgstr "%s через SSL (%sS)"
 
-#: libbalsa/server-config.c:409
+#: libbalsa/server-config.c:412
 msgid "TLS required"
 msgstr "Требуется TLS"
 
-#: libbalsa/server-config.c:410
+#: libbalsa/server-config.c:413
 msgid "TLS if possible (not recommended)"
 msgstr "TLS, если возможно (не рекомендуется)"
 
-#: libbalsa/server-config.c:411
+#: libbalsa/server-config.c:414
 msgid "None (not recommended)"
 msgstr "Отсутствует (не рекомендуется)"
 
-#: libbalsa/server-config.c:427
+#: libbalsa/server-config.c:430
 msgid "anonymous access"
 msgstr "анонимный доступ"
 
-#: libbalsa/server-config.c:429
+#: libbalsa/server-config.c:432
 msgid "none required"
 msgstr "не требуется"
 
-#: libbalsa/server-config.c:431 libbalsa/server-config.c:541
+#: libbalsa/server-config.c:434 libbalsa/server-config.c:544
 msgid "user name and pass phrase"
 msgstr "имя пользователя и пароль"
 
-#: libbalsa/server-config.c:433 libbalsa/server-config.c:538
+#: libbalsa/server-config.c:436 libbalsa/server-config.c:541
 msgid "Kerberos (GSSAPI)"
 msgstr "Kerberos (GSSAPI)"
 
-#: libbalsa/server-config.c:528
+#: libbalsa/server-config.c:531
 msgid "yes (SSL/TLS)"
 msgstr "да (SSL/TLS)"
 
-#: libbalsa/server-config.c:531
+#: libbalsa/server-config.c:534
 msgid "yes (STARTTLS)"
 msgstr "да (STARTTLS)"
 
-#: libbalsa/server-config.c:534
+#: libbalsa/server-config.c:537
 msgid "no"
 msgstr "нет"
 
-#: libbalsa/server-config.c:544
+#: libbalsa/server-config.c:547
 msgid "none"
 msgstr "ничего"
 
-#: libbalsa/server-config.c:548
+#: libbalsa/server-config.c:551
 #, c-format
 msgid ""
 "Probe results for server %s\n"
@@ -3078,13 +3077,13 @@ msgstr ""
 "• Шифрование: %s\n"
 "• Аутентификация: %s\n"
 
-#: libbalsa/server-config.c:553 src/ab-main.c:814 src/address-book-config.c:264
+#: libbalsa/server-config.c:556 src/ab-main.c:814 src/address-book-config.c:264
 #: src/address-book-config.c:376 src/address-book-config.c:417
 #: src/filter-edit-dialog.c:503 src/main-window.c:3997 src/pref-manager.c:3325
 msgid "_Apply"
 msgstr "_Применить"
 
-#: libbalsa/server-config.c:560
+#: libbalsa/server-config.c:563
 #, c-format
 msgid "Error probing server %s: %s"
 msgstr "Ошибка проверки сервера %s: %s"
@@ -3828,39 +3827,43 @@ msgstr "Адресная книга Osmo"
 msgid "CardDAV Address Book"
 msgstr "Адресная книга CardDAV"
 
-#: src/balsa-app.c:56 src/balsa-app.c:136
+#: src/balsa-app.c:55 src/balsa-app.c:142
 msgid "_Remember password in Secret Service"
 msgstr "_Запомнить пароль в Secret Service"
 
-#: src/balsa-app.c:59 src/balsa-app.c:139
+#: src/balsa-app.c:56 src/balsa-app.c:143
 msgid "_Remember password"
 msgstr "_Запомнить пароль"
 
-#: src/balsa-app.c:75 src/balsa-app.c:144
+#. Translators: #1 Certificate CN, #2 user name; #3 protocol (imap, etc); #4 server name
+#: src/balsa-app.c:79 src/balsa-app.c:149
 #, c-format
 msgid ""
 "Password to unlock the user certificate\n"
 "%s\n"
-"for %s@%s (%s)"
+"for user %s, protocol “%s”, server “%s”"
 msgstr ""
-"Пароль разблокировки сертификата пользователя\n"
+"Пароль для разблокирования сертификата пользователя\n"
 "%s\n"
-"для %s@%s (%s)"
+"для пользователя %s, протокол «%s», сервер «%s»"
 
-#: src/balsa-app.c:80 src/balsa-app.c:148
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name
+#: src/balsa-app.c:84 src/balsa-app.c:154
 #, c-format
-msgid "Password for %s@%s (%s)"
-msgstr "Пароль для %s@%s (%s)"
+msgid "Password for user %s, protocol “%s”, server “%s”"
+msgstr "Пароль для пользователя %s, протокол «%s», сервер «%s»"
 
-#: src/balsa-app.c:86 src/balsa-app.c:88 src/balsa-app.c:152
+#. for some strange reason, the following property strings are not displayed when they are
+#. * added to the call above - no idea why
+#: src/balsa-app.c:90 src/balsa-app.c:100 src/balsa-app.c:159
 msgid "Password needed"
 msgstr "Требуется пароль"
 
-#: src/balsa-app.c:169
+#: src/balsa-app.c:176
 msgid "Password:"
 msgstr "Пароль:"
 
-#: src/balsa-app.c:538
+#: src/balsa-app.c:549
 #, c-format
 msgid "Couldn’t open mailbox “%s”"
 msgstr "Не удалось открыть почтовый ящик «%s»"
@@ -5846,7 +5849,7 @@ msgstr ""
 "Alexander Kirillov <kirillov@math.ias.edu>, 1999\n"
 "Sergey Panov <sipan@mit.edu>, 1999\n"
 "Valek Filippov <frob@df.ru>, 2000-2001\n"
-"Ser82-png <asvmail.as@gmail.com>, 2022-2023"
+"Ser82-png <asvmail.as@gmail.com>, 2022-2024"
 
 #: src/main-window.c:1085
 msgid "The Balsa email client is part of the GNOME desktop environment."
@@ -8304,6 +8307,29 @@ msgstr "Прикрепить _открытый ключ GnuPG"
 #: ui/source-viewer.ui:38
 msgid "_Escape Special Characters"
 msgstr "Специальные _Escape-символы"
+
+#, c-format
+#~ msgid "Error saving LDAP credentials for address book %s: %s"
+#~ msgstr "Ошибка сохранения учётных данных LDAP для адресной книги %s: %s"
+
+#, c-format
+#~ msgid "Error loading LDAP credentials for address book %s: %s"
+#~ msgstr "Ошибка при загрузке учётных данных LDAP для адресной книги %s: %s"
+
+#, c-format
+#~ msgid "Error storing password for %s@%s:%s: %s"
+#~ msgstr "Возникла ошибка при попытке сохранить пароль для %s@%s:%s: %s"
+
+#, c-format
+#~ msgid "Error looking up password for %s@%s:%s: %s"
+#~ msgstr "Возникла ошибка при поиске пароля для %s@%s:%s: %s"
+
+#~ msgid "loaded fallback password from private config file"
+#~ msgstr "загружен резервный пароль из приватного файла настроек"
+
+#, c-format
+#~ msgid "Password for %s@%s (%s)"
+#~ msgstr "Пароль для %s@%s (%s)"
 
 #~ msgid "No path found. Do you want to give one?"
 #~ msgstr "Путь не найден. Хотите создать новый?"

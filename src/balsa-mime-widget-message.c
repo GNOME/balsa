@@ -33,6 +33,7 @@
 #include "balsa-mime-widget-callbacks.h"
 #include "sendmsg-window.h"
 #include "libbalsa-gpgme.h"
+#include "dkim.h"
 
 typedef enum _rfc_extbody_t {
     RFC2046_EXTBODY_FTP,
@@ -77,6 +78,8 @@ static GtkWidget *bm_header_widget_new(BalsaMessage * bm,
 				       GtkWidget * const * buttons);
 static void add_header_sigstate(GtkGrid * grid,
 				GMimeGpgmeSigstat * siginfo);
+static void add_header_dmarc_dkim(GtkGrid      *grid,
+								  LibBalsaDkim *dkim);
 
 static void bmw_message_set_headers(BalsaMessage        * bm,
                                     BalsaMimeWidget     * mw,
@@ -684,6 +687,7 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
                           BalsaMimeWidget        * mw,
                           LibBalsaMessageHeaders * headers,
                           LibBalsaMessageBody    * part,
+                          LibBalsaDkim           * dkim,
                           const gchar            * subject,
                           gboolean                 show_all_headers)
 {
@@ -778,6 +782,9 @@ bmw_message_set_headers_d(BalsaMessage           * bm,
 	    add_header_sigstate(grid, part->sig_info);
 	}
     }
+    if ((balsa_app.enable_dkim_checks != 0) && (libbalsa_dkim_status_code(dkim) >= DKIM_SUCCESS)) {
+	    add_header_dmarc_dkim(grid, dkim);
+    }
 }
 
 static void
@@ -789,7 +796,7 @@ bmw_message_set_headers(BalsaMessage        * bm,
     GtkWidget *widget;
     GtkGrid *grid;
 
-    bmw_message_set_headers_d(bm, mw, part->embhdrs, part->parts,
+    bmw_message_set_headers_d(bm, mw, part->embhdrs, part->parts, part->dkim,
                               part->embhdrs ? part->embhdrs->subject : NULL,
                               show_all_headers);
 
@@ -817,7 +824,7 @@ balsa_mime_widget_message_set_headers_d(BalsaMessage           * bm,
                                         LibBalsaMessageBody    * part,
                                         const gchar            * subject)
 {
-    bmw_message_set_headers_d(bm, mw, headers, part, subject,
+    bmw_message_set_headers_d(bm, mw, headers, part, part->dkim, subject,
                               balsa_message_get_shown_headers(bm) == HEADERS_ALL);
 }
 
@@ -843,4 +850,59 @@ add_header_sigstate(GtkGrid * grid, GMimeGpgmeSigstat * siginfo)
     gtk_widget_show(label);
 
     gtk_grid_attach_next_to(grid, label, NULL, GTK_POS_BOTTOM, 2, 1);
+}
+
+
+static void
+show_dkim_details(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
+	if (event->type == GDK_BUTTON_PRESS) {
+		GdkEventButton *btn_ev = (GdkEventButton *) event;
+		GdkRectangle rect;
+
+		rect.x = (int) btn_ev->x;
+		rect.y = (int) btn_ev->y;
+		rect.width = 1;
+		rect.height = 1;
+		gtk_popover_set_pointing_to(GTK_POPOVER(user_data), &rect);
+	}
+	gtk_popover_popup(GTK_POPOVER(user_data));
+}
+
+
+static void
+add_header_dmarc_dkim(GtkGrid *grid, LibBalsaDkim *dkim)
+{
+	gint dkim_status;
+	gchar *msg;
+	GtkWidget *evbox;
+	GtkWidget *box;
+	GtkWidget *details;
+	GtkWidget *label;
+
+	dkim_status = libbalsa_dkim_status_code(dkim);
+	evbox = gtk_event_box_new();
+	gtk_event_box_set_above_child(GTK_EVENT_BOX(evbox), TRUE);
+	box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+	gtk_container_add(GTK_CONTAINER(evbox), box);
+	if (dkim_status == DKIM_WARNING) {
+		gtk_container_add(GTK_CONTAINER(box), gtk_image_new_from_icon_name("dialog-warning", GTK_ICON_SIZE_MENU));
+	} else if (dkim_status == DKIM_FAILED) {
+		gtk_container_add(GTK_CONTAINER(box), gtk_image_new_from_icon_name("dialog-error", GTK_ICON_SIZE_MENU));
+	} else {
+		/* valid: no icon */
+	}
+	msg = g_markup_printf_escaped("<i>%s</i>", libbalsa_dkim_status_str_short(dkim));
+	label = libbalsa_create_wrap_label(msg, TRUE);
+	g_free(msg);
+	gtk_container_add(GTK_CONTAINER(box), label);
+	details = gtk_popover_new(evbox);
+	gtk_popover_set_modal(GTK_POPOVER(details), TRUE);
+	label = libbalsa_create_wrap_label(libbalsa_dkim_status_str_long(dkim), FALSE);
+	gtk_widget_show(label);
+	gtk_container_add(GTK_CONTAINER(details), label);
+	gtk_container_set_border_width(GTK_CONTAINER(details), HIG_PADDING);
+	g_signal_connect(evbox, "button-press-event", G_CALLBACK(show_dkim_details), details);
+	gtk_widget_show_all(evbox);
+	gtk_grid_attach_next_to(grid, evbox, NULL, GTK_POS_BOTTOM, 2, 1);
 }

@@ -176,6 +176,7 @@ extern struct BalsaApplication {
 #ifdef ENABLE_SYSTRAY
     gint enable_systray_icon;
 #endif
+    gint enable_dkim_checks;
 
     /* automatically close mailboxes after XX minutes */
     gboolean close_mailbox_auto;

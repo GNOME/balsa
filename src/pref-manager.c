@@ -101,6 +101,7 @@ typedef struct _PropertyUI {
 #ifdef ENABLE_SYSTRAY
     GtkWidget *enable_systray_icon;
 #endif
+    GtkWidget *enable_dkim_checks;
 
     GtkWidget *previewpane;
     GtkWidget *layout_type;
@@ -529,6 +530,9 @@ apply_prefs(GtkDialog * pbox)
     libbalsa_systray_icon_enable(balsa_app.enable_systray_icon != 0);
 #endif
 
+    balsa_app.enable_dkim_checks =
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pui->enable_dkim_checks));
+
     libbalsa_mailbox_set_filter(NULL, pui->filter);
     balsa_app.expunge_on_close =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON
@@ -753,6 +757,9 @@ set_prefs(void)
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->enable_systray_icon),
                                  balsa_app.enable_systray_icon);
 #endif
+
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->enable_dkim_checks),
+                                 balsa_app.enable_dkim_checks);
 
     pui->filter = libbalsa_mailbox_get_filter(NULL);
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pui->hide_deleted),
@@ -2956,6 +2963,9 @@ pm_grid_add_misc_group(GtkWidget * grid_widget)
         pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Enable System Tray Icon support"));
 #endif
 
+    pui->enable_dkim_checks =
+        pm_grid_attach_check(grid, 1, ++row, 3, 1, _("Enable checking DKIM signatures and DMARC compliance"));
+
     pm_grid_set_next_row(grid, ++row);
 }
 
@@ -3465,6 +3475,9 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
     g_signal_connect(pui->enable_systray_icon, "toggled",
                      G_CALLBACK(properties_modified_cb), property_box);
 #endif
+
+    g_signal_connect(pui->enable_dkim_checks, "toggled",
+                     G_CALLBACK(properties_modified_cb), property_box);
 
     g_signal_connect(pui->hide_deleted, "toggled",
                      G_CALLBACK(filter_modified_cb), property_box);

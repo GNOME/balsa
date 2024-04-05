@@ -42,6 +42,7 @@
 #include "balsa-mime-widget-crypto.h"
 #include "libbalsa-gpgme.h"
 #include "autocrypt.h"
+#include "dkim.h"
 
 #include <gdk/gdkkeysyms.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -1173,6 +1174,11 @@ balsa_message_set(BalsaMessage * balsa_message, LibBalsaMailbox * mailbox, guint
         /* update the icon if necessary */
         if (prot_state != new_prot_state)
             libbalsa_message_set_crypt_mode(message, new_prot_state);
+    }
+
+    /* DKIM */
+    if (balsa_app.enable_dkim_checks != 0) {
+        libbalsa_dkim_message(message);
     }
 
     /* may update the icon */

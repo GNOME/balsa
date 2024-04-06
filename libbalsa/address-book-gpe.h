@@ -29,7 +29,7 @@
 # error "Include config.h before this file."
 #endif
 
-#ifdef HAVE_SQLITE
+#ifdef HAVE_GPE
 
 #include "address-book.h"
 
@@ -39,5 +39,5 @@ G_DECLARE_FINAL_TYPE(LibBalsaAddressBookGpe, libbalsa_address_book_gpe,
 
 LibBalsaAddressBook *libbalsa_address_book_gpe_new(const gchar *name);
 
-#endif /* HAVE_SQLITE */
+#endif /* HAVE_GPE */
 #endif				/* __LIBBALSA_ADDRESS_BOOK_GPE_H__ */

@@ -82,7 +82,7 @@ libbalsa_init(void)
 #if ENABLE_LDAP
     LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
 #endif
-#if HAVE_SQLITE
+#if HAVE_GPE
     LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
 #endif
 #if HAVE_OSMO

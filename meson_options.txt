@@ -65,10 +65,10 @@ option('osmo',
   value       : false,
   description : 'add Osmo address book support (experimental, needs osmo > svn rev. 1099, default=false)')
 
-option('sqlite',
+option('gpe',
   type        : 'string',
   value       : 'false',
-  description : 'Use SQLite for GPE address books (true|false|path to SQLite installation, default=false)')
+  description : 'Add support for GPE address books (requires sqlite3, default=no)')
 
 option('libsecret',
   type        : 'boolean',

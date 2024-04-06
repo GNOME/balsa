@@ -941,7 +941,7 @@ update_address_books(void)
         else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book))
             type = "LDAP";
 #endif
-#if HAVE_SQLITE
+#if HAVE_GPE
         else if (LIBBALSA_IS_ADDRESS_BOOK_GPE(address_book))
             type = "GPE";
 #endif

@@ -59,7 +59,7 @@ gtksourceview = get_option('gtksourceview')
 spell_checker = get_option('spell-checker')
 ldap          = get_option('ldap')
 osmo          = get_option('osmo')
-sqlite        = get_option('sqlite')
+gpe           = get_option('gpe')
 libsecret     = get_option('libsecret')
 webdav        = get_option('webdav')
 gcr           = get_option('gcr')
@@ -241,33 +241,15 @@ if ldap != 'false'
   balsa_ab_deps += ldap_dep
 endif # ldap != 'false'
 
-# SQLite configuration.
+# GPE address book configuration.
 #
-if sqlite != 'false'
-  sqlite_dep = dependency('sqlite3', required : false)
-  if sqlite_dep.found()
-    conf.set('HAVE_SQLITE3', 1,
-      description : 'If defined, use sqlite3 api.')
-  else
-    sqlite_dep = dependency('sqlite', version : '>= 2.8')
-  endif
-  conf.set('HAVE_SQLITE', 1,
+if gpe != 'false'
+  gpe_dep = dependency('sqlite3', required : true)
+  conf.set('HAVE_GPE', 1,
     description : 'If defined, enable GPE address book support.')
-
-  if sqlite != 'true'
-    # If sqlite is installed in a nonstandard location, PKG_CONFIG_PATH
-    # would probably need to be set appropriately in the environment.
-    # There doesn't seem to be a way to do that within dependency().
-    real_dep = declare_dependency(dependencies : sqlite_dep,
-                                  compile_args : '-I' + join_paths(sqlite, 'include'),
-                                  link_args    : '-L' + join_paths(sqlite, 'lib'))
-  else
-    real_dep = sqlite_dep
-  endif
-
-  balsa_deps += real_dep
-  balsa_ab_deps += real_dep
-endif # sqlite != 'false'
+  balsa_deps += gpe_dep
+  balsa_ab_deps += gpe_dep
+endif # gpe != 'false'
 
 # Osmo address book support
 #
@@ -609,7 +591,7 @@ summary = [
   '          Use Autocrypt: @0@'.format(autocrypt),
   '               Use LDAP: @0@'.format(ldap),
   '                Use GSS: @0@'.format(gss),
-  '             Use SQLite: @0@'.format(sqlite),
+  '       GPE address book: @0@'.format(gpe),
   '          Spell checker: @0@'.format(spell_checker),
   '      Use GtkSourceView: @0@'.format(gtksourceview),
   '           Use Compface: @0@'.format(compface),

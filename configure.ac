@@ -115,10 +115,10 @@ AC_ARG_WITH([webdav],
                   [add WebDAV support: CardDAV address book (requires libsoup and libxml2, default=no)]),
                   [with_webdav=$withval],[with_webdav=no])
 
-AC_ARG_WITH([sqlite],
-   AS_HELP_STRING([--with-sqlite=DIR],
-                  [Use SQLite for GPE address books (default=no)]),
-                  [with_sqlite=$withval],[with_sqlite=no])
+AC_ARG_WITH([gpe],
+   AS_HELP_STRING([--with-gpe],
+                  [add support for GPE address books (requires sqlite3, default=no)]),
+                  [with_gpe=$withval],[with_gpe=no])
 
 AC_ARG_WITH(libsecret,
    AS_HELP_STRING([--with-libsecret],
@@ -356,21 +356,16 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-# SQLite configuration.
+# GPE address book configuration.
 #
-AC_MSG_CHECKING(whether to use SQLite)
-if test x$with_sqlite != xno ; then
+AC_MSG_CHECKING(whether to include GPE address book support)
+if test x$with_gpe != xno ; then
     AC_MSG_RESULT([yes])
-    if $PKG_CONFIG --exists sqlite3 ; then
-        PKG_CHECK_MODULES(SQLITE, [sqlite3])
-        AC_DEFINE(HAVE_SQLITE3,1,[If defined, use sqlite3 api.])
-    else
-        PKG_CHECK_MODULES(SQLITE, [sqlite >= 2.8])
-    fi
-    AC_DEFINE(HAVE_SQLITE,1,[If defined, enable GPE address book support.])
-    BALSA_CFLAGS="$BALSA_CFLAGS $SQLITE_CFLAGS"
-    BALSA_LIBS="$BALSA_LIBS $SQLITE_LIBS"
-    BALSA_AB_LIBS="$BALSA_AB_LIBS $SQLITE_LIBS"
+    PKG_CHECK_MODULES(SQLITE3, [sqlite3])
+    AC_DEFINE(HAVE_GPE,1,[If defined, enable GPE address book support.])
+    BALSA_CFLAGS="$BALSA_CFLAGS $SQLITE3_CFLAGS"
+    BALSA_LIBS="$BALSA_LIBS $SQLITE3_LIBS"
+    BALSA_AB_LIBS="$BALSA_AB_LIBS $SQLITE3_LIBS"
 else
     AC_MSG_RESULT([no])
 fi
@@ -660,7 +655,7 @@ echo "             Use Autocrypt: $autocrypt"
 echo "          System Tray Icon: $systray"
 echo "                  Use LDAP: $with_ldap"
 echo "                   Use GSS: $with_gss"
-echo "                Use SQLite: $with_sqlite"
+echo "          GPE address book: $with_gpe"
 echo "            WebDAV support: $with_webdav"
 echo "             Spell checker: $use_spell_checker"
 echo "         Use GtkSourceView: $with_gtksourceview"

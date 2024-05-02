@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://pawsa.fedorapeople.org/balsa/bugs.html\n"
 "POT-Creation-Date: 2024-03-16 19:08+0000\n"
-"PO-Revision-Date: 2024-04-29 19:14+0200\n"
+"PO-Revision-Date: 2024-05-02 12:27+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenščina <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
@@ -32,7 +32,7 @@ msgstr "Balsa"
 #: balsa.appdata.xml.in:7 org.desktop.Balsa.desktop.in.in:4
 #: balsa-mailto-handler.desktop.in.in:4
 msgid "Email utility"
-msgstr "Elektronska pošta"
+msgstr "Pripomoček za e-pošto"
 
 #: balsa.appdata.xml.in:10
 msgid ""
@@ -48,17 +48,15 @@ msgstr "podpora za IMAP in POP3,"
 
 #: balsa.appdata.xml.in:14
 msgid "sendmail or direct SMTP support;"
-msgstr "podpora za sendmail in SMTP,"
+msgstr "podpora za sendmail in neposredni SMTP,"
 
 #: balsa.appdata.xml.in:15
 msgid "end-to-end encryption using GnuPG or S/MIME;"
-msgstr "šifriranje od konca do konca z uporabo GnuPG ali S/MIME;"
+msgstr "šifriranje od konca do konca z uporabo GnuPG ali S/MIME,"
 
 #: balsa.appdata.xml.in:16
-#, fuzzy
-#| msgid "optional multi-threaded retrieval and sending of messages;"
 msgid "multi-threaded retrieval and sending of messages;"
-msgstr "izbirno več-nitno pridobivanje in pošiljanje sporočil,"
+msgstr "več-nitno pridobivanje in pošiljanje sporočil,"
 
 #: balsa.appdata.xml.in:17
 msgid "support for all configurations of local mail folders;"
@@ -70,7 +68,7 @@ msgstr "samodejno preverjanje pošte,"
 
 #: balsa.appdata.xml.in:19
 msgid "mail printing;"
-msgstr "tiskanje sporočil elektronske pošte,"
+msgstr "tiskanje e-sporočil,"
 
 #: balsa.appdata.xml.in:20
 msgid "inline attachment viewing;"
@@ -78,11 +76,11 @@ msgstr "pregledovanje prilog v sporočilu"
 
 #: balsa.appdata.xml.in:22
 msgid "and the proverbial much, much more."
-msgstr "in še veliko veliko več."
+msgstr "in še veliko, veliko več."
 
 #: org.desktop.Balsa.desktop.in.in:5 balsa-mailto-handler.desktop.in.in:5
 msgid "Mail Client"
-msgstr "Odjemalec elektronske pošte"
+msgstr "Odjemalec e-pošte"
 
 #: org.desktop.Balsa.desktop.in.in:15
 msgid "Mail;E-mail;Email;IMAP"
@@ -273,51 +271,45 @@ msgstr[3] ""
 
 #. Translators: #1 crypto protocol; #2 RFC 5322 internet address
 #: libbalsa/address-view.c:990
-#, fuzzy, c-format
-#| msgid "%s: multiple keys for %s"
+#, c-format
 msgid "Looking for %s key for “%s”"
-msgstr "Več ključev"
+msgstr "Iskanje ključa %s za »%s«"
 
 #. Translators: #1 crypto protocol; #2 RFC 5322 internet address
 #: libbalsa/address-view.c:997
-#, fuzzy, c-format
-#| msgid "%s: could not find a key for %s"
+#, c-format
 msgid "Cannot find any %s key for “%s”"
-msgstr "Ni mogoče najti tujega ključa za \"'%s\""
+msgstr "Ni mogoče najti nobenega ključa %s za »%s«"
 
 #. Translators: #1 key count, #2 crypto protocol; #2 RFC 5322 internet address
 #: libbalsa/address-view.c:1003
-#, fuzzy, c-format
-#| msgid "Import key into the local key ring"
+#, c-format
 msgid "Imported %d %s key for “%s” into your key ring."
 msgid_plural "Imported %d %s keys for “%s” into your key ring."
-msgstr[0] "Uvozi ključ v osebno zbirko ključev"
-msgstr[1] "Uvozi ključ v osebno zbirko ključev"
-msgstr[2] "Uvozi ključ v osebno zbirko ključev"
-msgstr[3] "Uvozi ključ v osebno zbirko ključev"
+msgstr[0] "Uvoženih %d ključev %s za »%s« v osebno zbirko ključev."
+msgstr[1] "Uvožen %d ključ %s za »%s« v osebno zbirko ključev."
+msgstr[2] "Uvožena %d ključa %s za »%s« v osebno zbirko ključev."
+msgstr[3] "Uvoženi %d ključi %s za »%s« v osebno zbirko ključev."
 
 #: libbalsa/address-view.c:1011
-#, fuzzy, c-format
-#| msgid "%s: could not find a key for %s"
+#, c-format
 msgid "Cannot import missing keys for “%s”: %s"
-msgstr "Ni mogoče najti tujega ključa za \"'%s\""
+msgstr "Ni mogoče uvoziti manjkajočih ključev za »%s«: %s"
 
 #. paranoid, should never happen
 #: libbalsa/address-view.c:1087
-#, fuzzy, c-format
-#| msgid "%s: could not find a key for %s"
+#, c-format
 msgid "cannot find a key for “%s”"
-msgstr "Ni mogoče najti tujega ključa za \"'%s\""
+msgstr "Ni mogoče najti ključa za »%s«"
 
 #: libbalsa/address-view.c:1095
-#, fuzzy, c-format
-#| msgid "Multiple keys for “%s”"
+#, c-format
 msgid "Encryption key for “%s”"
 msgid_plural "Encryption keys for “%s”"
-msgstr[0] "Več ključev za »%s«"
-msgstr[1] "Več ključev za »%s«"
-msgstr[2] "Več ključev za »%s«"
-msgstr[3] "Več ključev za »%s«"
+msgstr[0] "Šifrirni ključi za »%s«"
+msgstr[1] "Šifrirni ključ za »%s«"
+msgstr[2] "Šifrirna ključa za »%s«"
+msgstr[3] "Šifrirni ključi za »%s«"
 
 #: libbalsa/address-view.c:1195
 msgid "public key(s) missing, click to search key server"
@@ -419,10 +411,9 @@ msgid "The database entry for “%s” does not contain a key."
 msgstr "Vpis podatkovne zbirke »%s« ne vsebuje ključa."
 
 #: libbalsa/autocrypt.c:1031
-#, fuzzy, c-format
-#| msgid "Cannot open %s: %s"
+#, c-format
 msgid "cannot show key details: %s"
-msgstr "Ni mogoče odpreti %s: %s"
+msgstr "ni mogoče pokazati podrobnosti ključa: %s"
 
 #. Translators: #1 email address
 #: libbalsa/autocrypt.c:1093
@@ -677,34 +668,29 @@ msgid "Could not convert HTML part to text: %s"
 msgstr "Ni mogoče pretvoriti HTML v neoblikovano besedilo: %s"
 
 #: libbalsa/html.c:452
-#, fuzzy
-#| msgid ""
-#| "This message part contains images from a remote server. To protect your "
-#| "privacy, Balsa has not downloaded them. You may choose to download them "
-#| "if you trust the server."
 msgid ""
 "This message part references content on one or more external servers. To "
 "protect your privacy, Balsa has not downloaded it. You may choose to "
 "download it if you trust the sender of the message."
 msgstr ""
-"Ta del sporočila vsebuje slike z oddaljenega strežnika. Za zaščito vaše "
-"zasebnosti niso bile prenesene. V primeru da zaupate strežniku, lahko "
-"izberete njihov prejem."
+"Ta del sporočila se sklicuje na vsebino v enem ali več zunanjih strežnikih. "
+"Da bi zaščitili vašo zasebnost, je program Balsa ni prenesel. Prenesete ga "
+"lahko, če zaupate pošiljatelju sporočila."
 
 #: libbalsa/html.c:457
 msgid "_Download external content"
 msgstr "_Prejmi oddaljeno vsebino"
 
 #: libbalsa/html.c:719
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Balsa's external HTML resources filter web extension is not available in the "
 "folder “%s”, falling back to simplified image filtering. Please check your "
 "installation. "
 msgstr ""
-"Balsina zunanja spletna razširitev filtra virov HTML ni na voljo v mapi \"%s"
-"\", ki se vrača na poenostavljeno filtriranje slik. Preverite svojo "
-"namestitev. "
+"Zunanja spletna razširitev filtra virov HTML za program Balsa ni na voljo v "
+"mapi »%s«; delovanje je povrnjeno na poenostavljeno filtriranje slik. "
+"Preverite svojo namestitev. "
 
 #: libbalsa/html-pref-db.c:140
 msgid "HTML preferences"
@@ -764,10 +750,9 @@ msgid "New Identity"
 msgstr "Nova istovetnost"
 
 #: libbalsa/identity.c:231
-#, fuzzy, c-format
-#| msgid "Error executing signature generator “%s”: %s"
+#, c-format
 msgid "Error executing signature generator “%s”: "
-msgstr "Napaka izvajanja ustvarjalnika podpisa »%s«: %s"
+msgstr "Napaka izvajanja ustvarjalnika podpisa »%s«: "
 
 #: libbalsa/identity.c:235
 #, c-format
@@ -943,37 +928,27 @@ msgid "default protocol"
 msgstr "privzet protokol"
 
 #: libbalsa/identity.c:941
-#, fuzzy
-#| msgid "always trust GnuPG keys when encrypting"
 msgid "always trust GnuPG keys to encrypt messages"
-msgstr "med šifriranjem vedno zaupaj ključem GnuPG"
+msgstr "pri šifriranju vedno zaupaj ključem GnuPG"
 
 #: libbalsa/identity.c:944
 msgid "remind me if messages can be encrypted"
 msgstr "opomni, če je sporočila mogoče šifrirati"
 
 #: libbalsa/identity.c:947
-#, fuzzy
-#| msgid ""
-#| "use secret key with this id for signing\n"
-#| "(leave empty for automatic selection)"
 msgid ""
 "use secret key with this id for signing GnuPG messages\n"
 "(leave empty for automatic selection)"
 msgstr ""
-"uporabi skrivni ključ s tem ID za podpisovanje\n"
+"uporabi skrivni ključ s tem ID za podpisovanje sporočil GnuPG\n"
 "(pustite prazno za samodejen izbor)"
 
 #: libbalsa/identity.c:951
-#, fuzzy
-#| msgid ""
-#| "use secret key with this id for signing\n"
-#| "(leave empty for automatic selection)"
 msgid ""
 "use certificate with this id for signing S/MIME messages\n"
 "(leave empty for automatic selection)"
 msgstr ""
-"uporabi skrivni ključ s tem ID za podpisovanje\n"
+"uporabi skrivni ključ s tem ID za podpisovanje sporočil S/MIME\n"
 "(pustite prazno za samodejen izbor)"
 
 #: libbalsa/identity.c:956
@@ -1025,10 +1000,9 @@ msgid "Do you really want to delete the selected identity?"
 msgstr "Ali zares želite izbrisati izbrano istovetnost?"
 
 #: libbalsa/identity.c:1603
-#, fuzzy, c-format
-#| msgid "Error displaying help for identities: %s\n"
+#, c-format
 msgid "Error displaying help for identities: %s"
-msgstr "Napaka med prikazovanjem pomoči za istovetnosti: %s\n"
+msgstr "Napaka med prikazovanjem pomoči za istovetnosti: %s"
 
 #: libbalsa/identity.c:1642
 msgid "Manage Identities"
@@ -1089,10 +1063,9 @@ msgid "User name required, authentication cancelled"
 msgstr "Zahtevano je uporabniško ime, preverjanje pristnosti preklicano"
 
 #: libbalsa/imap/auth-gssapi.c:162
-#, fuzzy, c-format
-#| msgid "Sending the disposition notification failed: %s"
+#, c-format
 msgid "GSSAPI authentication failed: %s"
-msgstr "Pošiljanje sporočila o prejetju je spodletelo: %s"
+msgstr "Preverjanje pristnosti GSSAPI ni uspelo: %s"
 
 #: libbalsa/imap/imap-auth.c:72
 msgid "No way to authenticate is known"
@@ -1108,7 +1081,6 @@ msgid "Unordered data received from server"
 msgstr "S strežnika je prejet je nenaročen odziv"
 
 #: libbalsa/imap/imap-commands.c:1744
-#, fuzzy
 msgid "Bug in implementation of SORT command on IMAP server exposed."
 msgstr "Napaka pri izvajanju ukaza SORT na izpostavljenem strežniku IMAP."
 
@@ -1265,48 +1237,38 @@ msgid "Bad X-Face data"
 msgstr "Slabi podatki X-Face"
 
 #: libbalsa/libbalsa.c:719
-#, fuzzy, c-format
-#| msgid "Could not write file %s: %s"
+#, c-format
 msgid "Cannot play sound event “%s”: %s"
-msgstr "Datoteka PO »%s« ne obstaja ali pa je ni mogoče prebrati."
+msgstr "Zvočnega dogodka »%s« ni mogoče predvajati: %s"
 
 #: libbalsa/libbalsa.c:735
-#, fuzzy, c-format
-#| msgid "Could not write file %s: %s"
+#, c-format
 msgid "Cannot play sound file “%s”: %s"
-msgstr "Datoteka PO »%s« ne obstaja ali pa je ni mogoče prebrati."
+msgstr "Zvočne datoteke »%s« ni mogoče predvajati: %s"
 
 #: libbalsa/libbalsa-carddav.c:442
-#, fuzzy
-#| msgid "The signature is invalid."
 msgid "The server returned an invalid reply."
-msgstr "Podpis je neveljaven."
+msgstr "Strežnik je vrnil neveljaven odgovor."
 
 #: libbalsa/libbalsa-carddav.c:514
-#, fuzzy
-#| msgid "the server does not support quotas"
 msgid "The server does not support any usable address book report."
-msgstr "strežnik ne podpira omejitve prostora"
+msgstr "Strežnik ne podpira nobenega uporabnega poročila adresarja."
 
 #. Translators: #1 address book name, #2 address book URL, #3 error message
 #: libbalsa/libbalsa-carddav.c:542
-#, fuzzy, c-format
-#| msgid ""
-#| "Error opening address book “%s”:\n"
-#| "%s"
+#, c-format
 msgid ""
 "CardDAV error for address book “%s” (URL %s):\n"
 "%s"
 msgstr ""
-"Napaka med odpiranjem imenika »%s«:\n"
+"Napaka CardDAV za adresar »%s« (URL %s):\n"
 "%s"
 
 #. Translators: #1 error message
 #: libbalsa/libbalsa-carddav.c:564
-#, fuzzy, c-format
-#| msgid "error: %s"
+#, c-format
 msgid "CardDAV error: %s"
-msgstr "napaka: %s"
+msgstr "Napaka CardDAV: %s"
 
 #: libbalsa/libbalsa-conf.c:139
 msgid "Your Balsa configuration is now stored in “~/.balsa/config”."
@@ -1330,10 +1292,8 @@ msgid "could not set protocol “%s”"
 msgstr "ni mogoče določiti protokola »%s«"
 
 #: libbalsa/libbalsa-gpgme.c:301
-#, fuzzy
-#| msgid "Failed to create temporary file \"%s\": %s"
 msgid "failed to create a temporary folder"
-msgstr "Ni mogoče ustvariti začasne datoteke: %s"
+msgstr "začasne mape ni bilo mogoče ustvariti"
 
 #: libbalsa/libbalsa-gpgme.c:321
 #, c-format
@@ -1342,10 +1302,9 @@ msgstr "ni mogoče nastaviti mape »%s« za programnik »%s«"
 
 #. paranoid - should *never* happen
 #: libbalsa/libbalsa-gpgme.c:326
-#, fuzzy, c-format
-#| msgid "the crypto engine for protocol CMS is not available"
+#, c-format
 msgid "no crypto engine for “%s” available"
-msgstr "šifrirni programnik za protokol CMS ni na voljo"
+msgstr "šifrirni programnik za protokol »%s« ni na voljo"
 
 #: libbalsa/libbalsa-gpgme.c:392 libbalsa/libbalsa-gpgme.c:403
 #: libbalsa/libbalsa-gpgme.c:504 libbalsa/libbalsa-gpgme.c:627
@@ -1384,26 +1343,22 @@ msgid "decryption failed"
 msgstr "dešifriranje je spodletelo"
 
 #: libbalsa/libbalsa-gpgme.c:845
-#, fuzzy, c-format
+#, c-format
 msgid "No private key for protocol %s is available for the signer “%s”"
-msgstr "Za podpisnika \"%s\" ni na voljo zasebnega ključa za protokol %s"
+msgstr "Za podpisnika »%s« zasebni ključ za protokol %s ni na voljo"
 
 #: libbalsa/libbalsa-gpgme.c:995
-#, fuzzy, c-format
-#| msgid ""
-#| "%s: a key for %s is present, but it is expired, disabled, revoked or "
-#| "invalid"
+#, c-format
 msgid ""
 "A key for “%s” is present, but it is expired, disabled, revoked or invalid"
 msgstr ""
-"%s: ključ za %s je na prisoten, vendar je potekel, onemogočen, preklican ali "
-"pa neveljaven"
+"Ključ za »%s« je prisoten, vendar je potekel, onemogočen, preklican ali pa "
+"neveljaven"
 
 #: libbalsa/libbalsa-gpgme.c:998
-#, fuzzy, c-format
-#| msgid "%s: could not find a key for %s"
+#, c-format
 msgid "Could not find a key for “%s”"
-msgstr "Ni mogoče najti tujega ključa za \"'%s\""
+msgstr "Ni bilo mogoče najti ključa za »%s«"
 
 #: libbalsa/libbalsa-gpgme.c:1013
 #, c-format
@@ -1513,10 +1468,9 @@ msgid "could not list keys for “%s”"
 msgstr "ni mogoče izpisati seznama ključev za »%s«"
 
 #: libbalsa/libbalsa-gpgme-keys.c:227
-#, fuzzy, c-format
-#| msgid "%s: multiple keys for %s"
+#, c-format
 msgid "ambiguous keys for “%s”"
-msgstr "Več ključev"
+msgstr "dvoumni ključi za »%s«"
 
 #: libbalsa/libbalsa-gpgme-keys.c:330 libbalsa/libbalsa-gpgme-keys.c:375
 #: libbalsa/libbalsa-gpgme-keys.c:590 libbalsa/libbalsa-gpgme-keys.c:797
@@ -1529,10 +1483,9 @@ msgid "exporting key for “%s” failed"
 msgstr "izvažanje ključa za »%s« je spodletelo"
 
 #: libbalsa/libbalsa-gpgme-keys.c:400 libbalsa/libbalsa-gpgme-keys.c:408
-#, fuzzy, c-format
-#| msgid "%s: could not find a key for %s"
+#, c-format
 msgid "cannot export minimal key for “%s”"
-msgstr "Ni mogoče najti tujega ključa za \"'%s\""
+msgstr "minimalnega ključa za »%s« ni mogoče izvoziti"
 
 #: libbalsa/libbalsa-gpgme-keys.c:594 libbalsa/libbalsa-gpgme-keys.c:807
 msgid "importing key data failed"
@@ -1544,17 +1497,25 @@ msgid "Cannot find a key with fingerprint %s on the key server."
 msgstr "Ni mogoče najti ključa s prstnim odtisom %s na strežniku."
 
 #: libbalsa/libbalsa-gpgme-keys.c:684
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Found %u key with fingerprint %s on the key server. Please check and import "
 "the proper key manually."
 msgid_plural ""
 "Found %u keys with fingerprint %s on the key server. Please check and import "
 "the proper key manually."
-msgstr[0] "Na tem mestu ni mogoče najti ključa »%s«."
-msgstr[1] "Na tem mestu ni mogoče najti ključa »%s«."
-msgstr[2] "Na tem mestu ni mogoče najti ključa »%s«."
-msgstr[3] "Na tem mestu ni mogoče najti ključa »%s«."
+msgstr[0] ""
+"Najdenih %u ključev s prstnim odtisom %s na ključnem strežniku. Preverite in "
+"uvozite ustrezen ključ ročno."
+msgstr[1] ""
+"Najden %u ključ s prstnim odtisom %s na ključnem strežniku. Preverite in "
+"uvozite ustrezen ključ ročno."
+msgstr[2] ""
+"Najdena %u ključa s prstnim odtisom %s na ključnem strežniku. Preverite in "
+"uvozite ustrezen ključ ročno."
+msgstr[3] ""
+"Najdeni %u ključi s prstnim odtisom %s na ključnem strežniku. Preverite in "
+"uvozite ustrezen ključ ročno."
 
 #: libbalsa/libbalsa-gpgme-keys.c:703
 #, c-format
@@ -1562,16 +1523,13 @@ msgid "Searching the key server failed: %s"
 msgstr "Iskanje strežnika ključev je spodletelo: %s"
 
 #: libbalsa/libbalsa-gpgme-keys.c:802
-#, fuzzy, c-format
-#| msgid "cannot load key with fingerprint %s: %s"
+#, c-format
 msgid "no data for key with fingerprint %s"
-msgstr "ni mogoče naložiti ključa s prstnim odtisom %s: %s"
+msgstr "ni podatkov za ključ s prstnim odtisom %s"
 
 #: libbalsa/libbalsa-gpgme-keys.c:813
-#, fuzzy
-#| msgid "importing key data failed"
 msgid "reading key data failed"
-msgstr "uvažanje podatkov ključa je spodletelo"
+msgstr "branje podatkov ključa ni uspelo"
 
 #: libbalsa/libbalsa-gpgme-keys.c:852 libbalsa/libbalsa-gpgme-keys.c:1056
 msgid "error importing key"
@@ -1582,19 +1540,16 @@ msgid "No key was imported or updated."
 msgstr "Noben ključ ni bil uvožen oziroma posodobljen."
 
 #: libbalsa/libbalsa-gpgme-keys.c:889
-#, fuzzy
 msgid "The key was ignored because it does not have a user ID."
-msgstr "Uvozi izbrane ključe v osebno zbirko ključev"
+msgstr "Ključ je bil prezrt, ker nima ID-ja uporabnika."
 
 #: libbalsa/libbalsa-gpgme-keys.c:892
-#, fuzzy
 msgid "The key was imported into the local key ring."
-msgstr "Uvozi izbrane ključe v osebno zbirko ključev"
+msgstr "Ključ je bil uvožen v krajevno zbirko ključev."
 
 #: libbalsa/libbalsa-gpgme-keys.c:896
-#, fuzzy
 msgid "The key was updated in the local key ring:"
-msgstr "Uvozi izbrane ključe v osebno zbirko ključev"
+msgstr "Ključ je bil posodobljen v krajevni zbirki ključev:"
 
 #: libbalsa/libbalsa-gpgme-keys.c:899
 #, c-format
@@ -1605,9 +1560,17 @@ msgid_plural ""
 "\n"
 "• %d new user IDs"
 msgstr[0] ""
+"\n"
+"• %d novih ID-jev uporabnikov"
 msgstr[1] ""
+"\n"
+"• %d nov ID uporabnika"
 msgstr[2] ""
+"\n"
+"• %d nova ID-ja uporabnikov"
 msgstr[3] ""
+"\n"
+"• %d novi ID-ji uporabnikov"
 
 #: libbalsa/libbalsa-gpgme-keys.c:904
 #, c-format
@@ -1660,9 +1623,17 @@ msgid_plural ""
 "\n"
 "• %d new revocations"
 msgstr[0] ""
+"\n"
+"• %d novih preklicev"
 msgstr[1] ""
+"\n"
+"• %d nov preklic"
 msgstr[2] ""
+"\n"
+"• %d nova preklica"
 msgstr[3] ""
+"\n"
+"• %d novi preklici"
 
 #: libbalsa/libbalsa-gpgme-keys.c:921
 msgid "The existing key in the key ring was not changed."
@@ -1817,12 +1788,9 @@ msgstr[3] "%u biti"
 
 #. Translators: Elliptic Curve Cryptography (ECC) curve name
 #: libbalsa/libbalsa-gpgme-widgets.c:815
-#, fuzzy, c-format
-#| msgid "Moved to \"%s\"."
+#, c-format
 msgid " curve “%s”"
-msgstr ""
-"Datoteka »%s« je okvarjena in je ni mogoče razčleniti. Premaknjena je v "
-"»%s«, vstavek Latex pa bo povrnjen na osnoven nabor orodij."
+msgstr " krivulja »%s«"
 
 #: libbalsa/libbalsa-progress.c:180
 msgid "_Hide"
@@ -1853,10 +1821,9 @@ msgstr "ni uspelo ovrednotiti izraza XPath"
 #. Translators: #1 HTTP (RFC 2616) status code, #2 HTTP status message
 #: libbalsa/libbalsa-webdav.c:348 libbalsa/libbalsa-webdav.c:401
 #: libbalsa/libbalsa-webdav.c:721 libbalsa/libbalsa-webdav.c:818
-#, fuzzy, c-format
-#| msgid "IMAP response: %s"
+#, c-format
 msgid "WebDAV response %d: %s"
-msgstr "Odziv strežnika IMAP: %s"
+msgstr "Odziv strežnika WebDAV %d: %s"
 
 #: libbalsa/libbalsa-webdav.c:725 libbalsa/libbalsa-webdav.c:732
 #: libbalsa/libbalsa-webdav.c:820
@@ -1872,10 +1839,8 @@ msgid "cannot add namespaces to XPath context"
 msgstr "imenskih prostorov ni mogoče dodati v kontekst XPath"
 
 #: libbalsa/libbalsa-webdav.c:966
-#, fuzzy
-#| msgid "could not create context"
 msgid "cannot create XPath context"
-msgstr "ni mogoče ustvariti vsebine"
+msgstr "ni mogoče ustvariti konteksta XPath"
 
 #: libbalsa/mailbox.c:539
 #, c-format
@@ -1942,24 +1907,21 @@ msgstr "*** NAPAKA: Pretok poštnega predala Mailbox je zaprt: %s ***\n"
 #. login information...
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name
 #: libbalsa/mailbox_imap.c:610
-#, fuzzy, c-format
-#| msgid "IMAP connection has been severed. Reconnecting…"
+#, c-format
 msgid "IMAP %s %s: connection has been severed. Reconnecting…"
-msgstr "Povezava IMAP je bila prekinjena. Poteka ponovno povezovanje …"
+msgstr "%s IMAP %s: povezava je bila odrezana. Poteka ponovno povezovanje …"
 
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name
 #: libbalsa/mailbox_imap.c:614
-#, fuzzy, c-format
-#| msgid "IMAP protocol error. Try enabling bug workarounds."
+#, c-format
 msgid "IMAP %s %s: protocol error. Try enabling bug workarounds."
-msgstr "Napaka protokola IMAP. Poskusite omogočiti obhode hroščev."
+msgstr "%s IMAP %s: napaka protokola. Poskusite omogočiti obhode hroščev."
 
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name; #3 error message
 #: libbalsa/mailbox_imap.c:618
-#, fuzzy, c-format
-#| msgid "IMAP server has shut the connection: %s Reconnecting..."
+#, c-format
 msgid "IMAP %s %s: server has shut down the connection: %s. Reconnecting…"
-msgstr "Strežnik IMAP je prekinil povezavo: %s Ponovno povezovanje ..."
+msgstr "%s IMAP %s: strežnik je prekinil povezavo: %s Ponovno povezovanje ..."
 
 #. helper macro for calling II in the context of a mailbox
 #: libbalsa/mailbox_imap.c:623
@@ -1972,10 +1934,9 @@ msgid "Downloading %ld kB"
 msgstr "Prejemanje %ld kB"
 
 #: libbalsa/mailbox_imap.c:1698
-#, fuzzy, c-format
-#| msgid "No path found for mailbox \"%s\", using \"%s\""
+#, c-format
 msgid "No path found for mailbox “%s”, using “%s”"
-msgstr "\"%s\" ni mogoče najti na poti"
+msgstr "Za poštni predal »%s«, ki uporabblja »%s«, ni bilo najdene poti"
 
 #: libbalsa/mailbox_imap.c:1805 libbalsa/mailbox_imap.c:1846
 msgid "Cannot get IMAP handle"
@@ -2055,17 +2016,15 @@ msgid "Mailbox %s does not appear to be a Maildir mailbox."
 msgstr "Poštni predal %s ni videti kot poštni predal v obliki Maildir."
 
 #: libbalsa/mailbox_maildir.c:184
-#, fuzzy, c-format
-#| msgid "Could not create a MailDir directory at %s (%s)"
+#, c-format
 msgid "Could not create a Maildir directory at %s (%s)"
-msgstr "Ni mogoče ustvariti začasne mape v »%s«."
+msgstr "Ni mogoče ustvariti mape Maildir v %s (%s)"
 
 #: libbalsa/mailbox_maildir.c:192 libbalsa/mailbox_maildir.c:201
 #: libbalsa/mailbox_maildir.c:212
-#, fuzzy, c-format
-#| msgid "Could not create a MailDir at %s (%s)"
+#, c-format
 msgid "Could not create a Maildir at %s (%s)"
-msgstr "Ni mogoče ustvariti mape '%s'"
+msgstr "Ni mogoče ustvariti mape Maildir v %s (%s)"
 
 #: libbalsa/mailbox_maildir.c:319 libbalsa/mailbox_mh.c:276
 #, c-format
@@ -2098,18 +2057,16 @@ msgid "Could not write file %s: %s"
 msgstr "Ni mogoče pisati v datoteko %s: %s"
 
 #: libbalsa/mailbox_mbox.c:396
-#, fuzzy, c-format
-#| msgid "Failed to create temporary file \"%s\": %s"
+#, c-format
 msgid "Failed to create temporary file “%s”: %s"
-msgstr "Ni mogoče ustvariti začasne datoteke: %s"
+msgstr "Ni mogoče ustvariti začasne datoteke »%s«: %s"
 
 #: libbalsa/mailbox_mbox.c:408
-#, fuzzy, c-format
-#| msgid "Failed to save cache file \"%s\": %s.  New version saved as \"%s\""
+#, c-format
 msgid "Failed to save cache file “%s”: %s. New version saved as “%s”"
 msgstr ""
-"Napaka med shranjevanjem predpomnilniške datoteke \"%s\": %s.  Nova "
-"različica datoteke je bila shranjena kot \"%s\""
+"Datoteke predpomnilnika »%s« ni bilo mogoče shraniti: %s. Nova različica je "
+"shranjena kot »%s«"
 
 #: libbalsa/mailbox_mbox.c:416
 #, c-format
@@ -2134,10 +2091,9 @@ msgid "%s: could not open %s."
 msgstr "%s: ni mogoče odpreti %s."
 
 #: libbalsa/mailbox_mbox.c:1903
-#, fuzzy, c-format
-#| msgid "%s: could not get new mime stream."
+#, c-format
 msgid "%s: could not get new MIME stream."
-msgstr "Ni mogoče pridobiti poveril za obnovitev istovetnosti %s: %k"
+msgstr "%s: ni bilo mogoče dobiti novega toka MIME."
 
 #: libbalsa/mailbox_mbox.c:1911
 #, c-format
@@ -2145,10 +2101,9 @@ msgid "%s: %s is not in mbox format."
 msgstr "%s: %s ni oblike mbox ."
 
 #: libbalsa/mailbox_mh.c:157
-#, fuzzy, c-format
-#| msgid "Mailbox %s does not appear to be a Mh mailbox."
+#, c-format
 msgid "Mailbox %s does not appear to be an MH mailbox."
-msgstr "Poštni predal %s ni videti kot poštni predal v obliki Maildir."
+msgstr "Poštni predal %s ni videti kot poštni predal v obliki MH."
 
 #: libbalsa/mailbox_mh.c:167
 #, c-format
@@ -2169,26 +2124,23 @@ msgid "Message rename error"
 msgstr "Napaka preimenovanja sporočila"
 
 #: libbalsa/mailbox_pop3.c:241
-#, fuzzy, c-format
-#| msgid "Saving sent message to %s failed: %s"
+#, c-format
 msgid "Saving the POP3 message UID list failed: %s"
-msgstr "Shranjevanje poslanega sporočila v %s ni uspelo: %s"
+msgstr "Shranjevanje seznama UID sporočil POP3 ni uspelo: %s"
 
 #: libbalsa/mailbox_pop3.c:279 libbalsa/mailbox_pop3.c:303
-#, fuzzy, c-format
-#| msgid "Saving POP message to %s failed"
+#, c-format
 msgid "Passing POP message to %s failed: %s"
-msgstr "Overitev na strežniku POP %s je spodletela:"
+msgstr "Posredovanje sporočila POP %s ni uspelo: %s"
 
 #: libbalsa/mailbox_pop3.c:308
 msgid "Saving POP message failed"
 msgstr "Shranjevanje sporočila POP je spodletelo"
 
 #: libbalsa/mailbox_pop3.c:327
-#, fuzzy, c-format
-#| msgid "Transferring POP message to %s failed."
+#, c-format
 msgid "Transferring POP message to %s failed: %s"
-msgstr "Overitev na strežniku POP %s je spodletela:"
+msgstr "Prenos sporočila POP v %s ni uspel: %s"
 
 #: libbalsa/mailbox_pop3.c:363
 #, c-format
@@ -2212,10 +2164,9 @@ msgid "Connecting %s…"
 msgstr "Vzpostavljanje povezave s %s …"
 
 #: libbalsa/mailbox_pop3.c:505
-#, fuzzy, c-format
-#| msgid "POP3 mailbox %s error: %s\n"
+#, c-format
 msgid "POP3 mailbox %s: cannot connect %s: %s"
-msgstr "Ni mogoče odpreti začasnega poštnega predala: %s"
+msgstr "Poštni predal POP3 %s: povezave ni mogoče vzpostaviti s %s: %s"
 
 #. load message list
 #: libbalsa/mailbox_pop3.c:518
@@ -2223,16 +2174,14 @@ msgid "List messages…"
 msgstr "Izpiši sporočila …"
 
 #: libbalsa/mailbox_pop3.c:520 libbalsa/mailbox_pop3.c:695
-#, fuzzy, c-format
-#| msgid "POP3 mailbox %s error: %s\n"
+#, c-format
 msgid "POP3 mailbox %s error: %s"
-msgstr "Strežnik POP3 za %s na %s"
+msgstr "Napaka poštnega predala POP3 %s: %s"
 
 #: libbalsa/mailbox_pop3.c:567
-#, fuzzy, c-format
-#| msgid "POP3 message %d oversized: %d kB - skipped."
+#, c-format
 msgid "POP3 mailbox %s: message %d oversized: %s — skipped."
-msgstr "POP3 sporočilo %d je preveliko: %d kB - izpuščeno."
+msgstr "Poštni predal POP3 %s: sporočilo je preveliko %d: %s - izpuščeno."
 
 #: libbalsa/mailbox_pop3.c:643 libbalsa/send.c:1035
 #, c-format
@@ -2240,14 +2189,13 @@ msgid "Connected to %s"
 msgstr "Vzpostavljena je povezava s strežnikom %s"
 
 #: libbalsa/mailbox_pop3.c:659
-#, fuzzy, c-format
-#| msgid "New message to %s: %s"
+#, c-format
 msgid "%lu new message (%s)"
 msgid_plural "%lu new messages (%s)"
-msgstr[0] "%s: preiskovanje novih sporočil"
-msgstr[1] "%s: preiskovanje novih sporočil"
-msgstr[2] "%s: preiskovanje novih sporočil"
-msgstr[3] "%s: preiskovanje novih sporočil"
+msgstr[0] "%lu novih sporočil (%s)"
+msgstr[1] "%lu novo sporočilo (%s)"
+msgstr[2] "%lu novi sporočili (%s)"
+msgstr[3] "%lu nova sporočila (%s)"
 
 #: libbalsa/mailbox_pop3.c:670
 msgid "Deleting messages on server…"
@@ -2258,17 +2206,15 @@ msgid "Finished"
 msgstr "Končano"
 
 #: libbalsa/message.c:697
-#, fuzzy, c-format
-#| msgid "Mailbox (%s) is readonly: cannot change flags."
+#, c-format
 msgid "Mailbox (%s) is read-only: cannot change flags."
 msgstr ""
-"Poštni predal (%s) je odprt le za branje: ni mogoče spremeniti zastavice."
+"Poštni predal (%s) je odprt le za branje: ni mogoče spremeniti zastavic."
 
 #: libbalsa/misc.c:226 libbalsa/misc.c:235
-#, fuzzy, c-format
-#| msgid "Cannot read the file “%s”: %s"
+#, c-format
 msgid "cannot delete “%s”: %s"
-msgstr "Ni mogoče prebrati datoteke »%s«: %s"
+msgstr "Ni mogoče izbrisati »%s«: %s"
 
 #: libbalsa/misc.c:388
 msgid "West European"
@@ -2343,10 +2289,9 @@ msgid "Korean"
 msgstr "Korejski"
 
 #: libbalsa/misc.c:711
-#, fuzzy, c-format
-#| msgid "Send failed: %s"
+#, c-format
 msgid "fcntl failed: %s."
-msgstr "Pošiljanje je spodletelo: %s"
+msgstr "fcntl je spodletelo: %s."
 
 #: libbalsa/misc.c:727
 msgid "Timeout exceeded while attempting fcntl lock!"
@@ -2747,17 +2692,14 @@ msgid "every %d years on the %s of %s"
 msgstr "vsakih %d let na vsak %s %s"
 
 #: libbalsa/rfc2445.c:861
-#, fuzzy
 msgctxt "ical_recurrence"
 msgid "secondly"
 msgstr "drugič"
 
 #: libbalsa/rfc2445.c:864
-#, fuzzy
-#| msgid "minutes"
 msgctxt "ical_recurrence"
 msgid "minutely"
-msgstr "minut"
+msgstr "posamično"
 
 #: libbalsa/rfc2445.c:867
 msgctxt "ical_recurrence"
@@ -2765,14 +2707,13 @@ msgid "hourly"
 msgstr "vsako uro"
 
 #: libbalsa/rfc2445.c:887
-#, fuzzy, c-format
-#| msgid "Prefere_nces"
+#, c-format
 msgid ", %d occurrence"
 msgid_plural ", %d occurrences"
-msgstr[0] "Mož_nosti"
-msgstr[1] "Mož_nosti"
-msgstr[2] "Mož_nosti"
-msgstr[3] "Mož_nosti"
+msgstr[0] ", %d pojavitev"
+msgstr[1] ", %d pojavitev"
+msgstr[2] ", %d pojavitvi"
+msgstr[3] ", %d pojavitve"
 
 #. #1: time string
 #: libbalsa/rfc2445.c:893
@@ -2852,17 +2793,15 @@ msgstr "Podpis vsebuje več podpisnikov, to je lahko ponaredek."
 
 #. Translators: #1 error source; #2 error message
 #: libbalsa/rfc3156.c:509
-#, fuzzy, c-format
-#| msgid "An error prevented the signature verification."
+#, c-format
 msgid "An error prevented the signature verification: %s: %s"
-msgstr "Napaka je preprečila preverjanje podpisa."
+msgstr "Napaka je preprečila preverjanje podpisa: %s: %s"
 
 #. Translators: #1 error message
 #: libbalsa/rfc3156.c:512
-#, fuzzy, c-format
-#| msgid "An error prevented the signature verification."
+#, c-format
 msgid "An error prevented the signature verification: %s"
-msgstr "Napaka je preprečila preverjanje podpisa."
+msgstr "Napaka je preprečila preverjanje podpisa: %s"
 
 #: libbalsa/rfc3156.c:524
 msgid "The user ID is of unknown validity."
@@ -2910,11 +2849,11 @@ msgstr "popolno"
 
 #: libbalsa/rfc6350.c:69
 msgid "malformed card, BEGIN:VCARD expected"
-msgstr ""
+msgstr "nepravilno zapisana kartica, pričakovano BEGIN:VCARD"
 
 #: libbalsa/rfc6350.c:107
 msgid "malformed card, END:VCARD missing"
-msgstr ""
+msgstr "nepravilno zapisana kartica, manjka END:VCARD"
 
 #: libbalsa/rfc6350.c:354
 #, c-format
@@ -2924,7 +2863,7 @@ msgstr "Izmaličena vrstica stanja »%s«, manjka » : «."
 #: libbalsa/rfc6350.c:365
 #, c-format
 msgid "malformed line “%s”, empty name or value"
-msgstr ""
+msgstr "nepravilno zapisana vrstica »%s«, prazno ime ali vrednost"
 
 #: libbalsa/send.c:186
 #, c-format
@@ -2967,20 +2906,18 @@ msgstr ""
 "Sporočilo je ostalo v odhodnem predalu."
 
 #: libbalsa/send.c:1100
-#, fuzzy, c-format
-#| msgid "Scanning of %s failed: %s"
+#, c-format
 msgid "Connecting SMTP server %s (%s) failed: %s"
-msgstr "Povezava s strežnikom SMTP %s v varnem načinu je spodletela: %s"
+msgstr "Povezava s strežnikom SMTP %s (%s) je spodletela: %s"
 
 #: libbalsa/send.c:1119
-#, fuzzy, c-format
-#| msgid "Forward message to %s: %s"
+#, c-format
 msgid "Transmitted %u message to %s"
 msgid_plural "Transmitted %u messages to %s"
-msgstr[0] "Posreduj sporočilo osebi %s: %s"
-msgstr[1] "Posreduj sporočilo osebi %s: %s"
-msgstr[2] "Posreduj sporočilo osebi %s: %s"
-msgstr[3] "Posreduj sporočilo osebi %s: %s"
+msgstr[0] "Posredovanih %u sporočil osebi %s"
+msgstr[1] "Posredovano %u sporočilo osebi %s"
+msgstr[2] "Posredovani %u sporočili osebi %s"
+msgstr[3] "Posredovana %u sporočila osebi %s"
 
 #: libbalsa/send.c:1270 libbalsa/send.c:1338
 #, c-format
@@ -3010,23 +2947,23 @@ msgstr[3] "Sporočilo ne bo šifrirano za prejemnike BCC:."
 
 #. Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message
 #: libbalsa/server.c:350
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error saving credentials for user “%s”, protocol “%s”, server “%s” in Secret "
 "Service: %s"
 msgstr ""
-"Napaka pri shranjevanju poverilnic za uporabnika \"%s\", protokol \"%s\", "
-"strežnik \"%s\" v tajni službi: %s"
+"Napaka pri shranjevanju poverilnic za uporabnika »%s«, protokol »%s«, "
+"strežnik »%s« v tajni službi: %s"
 
 #. Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message
 #: libbalsa/server.c:381
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error loading credentials for user %s, protocol “%s”, server “%s” from "
 "Secret Service: %s"
 msgstr ""
-"Napaka pri nalaganju poverilnic za uporabniški %s, protokol \"%s\", strežnik "
-"\"%s\" iz tajne službe: %s"
+"Napaka pri nalaganju poverilnic za uporabnika %s, protokol »%s«, strežnik "
+"»%s« iz tajne službe: %s"
 
 #: libbalsa/server-config.c:90
 msgid "_Remember user password in Secret Service"
@@ -3067,10 +3004,8 @@ msgid "Se_curity:"
 msgstr "_Varnost:"
 
 #: libbalsa/server-config.c:153
-#, fuzzy
-#| msgid "authenticate"
 msgid "_Authentication:"
-msgstr "overi"
+msgstr "_Preverjanje pristnosti:"
 
 #. user name and password
 #: libbalsa/server-config.c:157 src/address-book-config.c:774
@@ -3087,9 +3022,8 @@ msgstr "_Napredno"
 
 #. client certificate and passphrase
 #: libbalsa/server-config.c:177
-#, fuzzy
 msgid "Server _requires client certificate"
-msgstr "Potrdilo za overitev odjemalca"
+msgstr "Strežnik _zahteva potrdilo odjemalca"
 
 #: libbalsa/server-config.c:180
 msgid "Choose Client Certificate"
@@ -3172,10 +3106,9 @@ msgid "_Apply"
 msgstr "_Uveljavi"
 
 #: libbalsa/server-config.c:563
-#, fuzzy, c-format
-#| msgid "Error displaying server help: %s\n"
+#, c-format
 msgid "Error probing server %s: %s"
-msgstr "Napaka med prikazovanjem pomoči strežnika: %s\n"
+msgstr "Napaka pri preverjanju strežnika %s: %s"
 
 #: libbalsa/smtp-server.c:248
 #, c-format
@@ -3235,12 +3168,7 @@ msgstr ""
 "<b>Potrdilo je izdal:</b>\n"
 
 #: libbalsa/x509-cert-widget.c:497
-#, fuzzy, c-format
-#| msgid ""
-#| "<b>This certificate is valid</b>\n"
-#| "from %s\n"
-#| "to %s\n"
-#| "<b>Fingerprint:</b> %s"
+#, c-format
 msgid ""
 "<b>This certificate is valid</b>\n"
 "from %s\n"
@@ -3251,8 +3179,10 @@ msgid ""
 msgstr ""
 "<b>To potrdilo je veljavno</b>\n"
 "od %s\n"
-"do %s\n"
-"<b>Prstni odtis:</b> %s"
+"za %s\n"
+"<b>Prstni odtis:</b> \n"
+"SHA1: %s\n"
+"SHA256: %s"
 
 #: libinit_balsa/assistant_helper.c:177
 #, c-format
@@ -3261,16 +3191,12 @@ msgstr ""
 "Pot %s mora biti relativna na korenski datotečni sistem (začeti se mora z /)."
 
 #: libinit_balsa/assistant_helper.c:189
-#, fuzzy, c-format
-#| msgid ""
-#| "Couldn't create a directory: mkdir() failed on pathname \"%s\", with "
-#| "error \"%s\"."
+#, c-format
 msgid ""
 "Couldn’t create a directory: mkdir() failed on pathname “%s”, with error "
 "“%s”."
 msgstr ""
-"Ni mogoče ustvariti mape: mkdir() na poti \"%s\" je spodletel z napako \"%s"
-"\"."
+"Ni mogoče ustvariti mape: mkdir() na poti »%s« je spodletel z napako »%s«."
 
 #: libinit_balsa/assistant_helper.c:201 libinit_balsa/assistant_helper.c:224
 #, c-format
@@ -3278,10 +3204,9 @@ msgid "The file with pathname “%s” is not a directory."
 msgstr "Datoteka z imenom poti »%s« ni mapa."
 
 #: libinit_balsa/assistant_helper.c:215
-#, fuzzy, c-format
-#| msgid "Couldn't create a directory: mkdir() failed on pathname \"%s\"."
+#, c-format
 msgid "Couldn’t create a directory: mkdir() failed on pathname “%s”."
-msgstr "Ni mogoče ustvariti mape: mkdir() na poti \"%s\" je spodletel."
+msgstr "Ni mogoče ustvariti mape: mkdir() na poti »%s« je spodletel."
 
 #: libinit_balsa/assistant_init.c:54
 msgid ""
@@ -3394,7 +3319,6 @@ msgid "All Done!"
 msgstr "Vse je opravljeno!"
 
 #: libinit_balsa/assistant_page_server.c:68
-#, fuzzy
 msgid ""
 "The pre-set server configuration is a best guess based upon your email "
 "address. Balsa will automatically choose optimum settings for encryption and "
@@ -3404,13 +3328,13 @@ msgid ""
 "Check the “Edit ⏵ Preferences ⏵ Settings ⏵ Mail options” menu item if you "
 "need to fine-tune them."
 msgstr ""
-"Prednastavljeno konfiguracijo strežnika najbolje ugibate glede na vaš e-"
-"poštni naslov. Balsa bo samodejno izbrala optimalne nastavitve za šifriranje "
-"in uporabniško ime ter izbrala preverjanje pristnosti na podlagi gesla. "
-"Upoštevajte, da bo sondiranje zmogljivosti strežnika, ko kliknete »Naprej«, "
-"trajalo nekaj sekund.\n"
-"Preverite točko menija »Uredi ⏵ Nastavitve ⏵ Nastavitve ⏵ Možnosti pošte«, "
-"če jih morate natančno nastaviti."
+"Prednastavljeno konfiguracijo strežnika najbolje ugibate glede na svoj e-"
+"poštni naslov. Program Balsa bo samodejno izbral optimalne nastavitve za "
+"šifriranje in uporabniško ime ter izbral preverjanje pristnosti na podlagi "
+"gesla. Upoštevajte, da bo sondiranje zmogljivosti strežnika, ko kliknete "
+"»Naprej«, trajalo nekaj sekund.\n"
+"V meniju izberite »Uredi ⏵ Nastavitve ⏵ Nastavitve ⏵ Možnosti pošte«, če jih "
+"želite natančno nastaviti."
 
 #: libinit_balsa/assistant_page_server.c:77
 msgid "Yes, remember it"
@@ -3445,24 +3369,18 @@ msgid "_Remember your password:"
 msgstr "_Zapomni si geslo:"
 
 #: libinit_balsa/assistant_page_server.c:147
-#, fuzzy
-#| msgid "User Settings"
 msgid "Server Settings"
-msgstr "Uporabniške nastavitve"
+msgstr "Nastavitve strežnika"
 
 #: libinit_balsa/assistant_page_user.c:55
-#, fuzzy
-#| msgid ""
-#| "The following settings are also needed (and you can find them later, if "
-#| "need be, in the Email application in the “Preferences” and “Identities” "
-#| "menu items)"
 msgid ""
 "The following settings are also needed (and you can find them later, if need "
 "be, in the Email application in the “Edit ⏵ Preferences ⏵ Identities…” menu "
 "item)"
 msgstr ""
-"Spodnje nastavitve so namenjene vpisu poštnega računa (zbrane so v meniju "
-"»Lastnostmi« in »Istovetnosti«)"
+"Potrebne so tudi naslednje nastavitve (in jih lahko najdete kasneje, če je "
+"potrebno, v menijih programa za e-pošto pod »Uredi ⏵ Nastavitve ⏵ Identitete "
+"…«)"
 
 #. 2.1
 #: libinit_balsa/assistant_page_user.c:81
@@ -3599,16 +3517,12 @@ msgid "no suitable authentication mechanism"
 msgstr "ni podanega ustreznega načina overitve"
 
 #: libnetclient/net-client-pop.c:620 libnetclient/net-client-smtp.c:514
-#, fuzzy
-#| msgid "password required"
 msgid "user name required"
-msgstr "zahtevano je geslo"
+msgstr "zahtevano je uporabniško ime"
 
 #: libnetclient/net-client-pop.c:629 libnetclient/net-client-smtp.c:523
-#, fuzzy
-#| msgid "password required"
 msgid "user name and password required"
-msgstr "zahtevano je geslo"
+msgstr "zahtevani sta uporabniško ime in geslo"
 
 #: libnetclient/net-client-smtp.c:228
 #, c-format
@@ -3616,25 +3530,19 @@ msgid "the server %s does not offer the SMTP service at port 465, 587 or 25"
 msgstr "strežnik %s ne ponuja storitve SMTP na vratih 465, 587 ali 25"
 
 #: libnetclient/net-client-smtp.c:270
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "the server does not support ACL's"
 msgid "remote server does not support STARTTLS"
-msgstr "Strežnik ne podpira protokola STARTTLS"
+msgstr "oddaljeni strežnik ne podpira STARTTLS"
 
 #: libnetclient/net-client-smtp.c:829
-#, fuzzy, c-format
-#| msgid "bad server reply: %s"
+#, c-format
 msgid "unexpected reply: %s"
-msgstr "neustrezen odziv strežnika: %s"
+msgstr "nepričakovan odgovor: %s"
 
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
 #: libnetclient/net-client-smtp.c:836
-#, fuzzy, c-format
-#| msgid "Sending error: %s"
+#, c-format
 msgid "transient error %d: %s"
-msgstr "Napaka v vrstici %d: %s"
+msgstr "prehodna napaka %d: %s"
 
 #. Translators: #1 SMTP (RFC 5321) error code; #2 error message
 #: libnetclient/net-client-smtp.c:843
@@ -3649,10 +3557,9 @@ msgid "permanent error %d: %s"
 msgstr "trajna napaka %d: %s"
 
 #: libnetclient/net-client-utils.c:208
-#, fuzzy, c-format
-#| msgid "Removing duplicates failed: %s"
+#, c-format
 msgid "importing GSS service name %s failed: %s"
-msgstr "Odstranjevanje dvojnikov ni uspelo: %s"
+msgstr "Uvoz imena storitve GSS %s ni uspel: %s"
 
 #: libnetclient/net-client-utils.c:252
 #, c-format
@@ -3858,19 +3765,17 @@ msgid "DNS service record not found"
 msgstr "Zapisa storitve DNS ni mogoče najti"
 
 #: src/address-book-config.c:712
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "No DNS service record for the domain “%s” and service “carddavs” found. "
 "Please enter the “https://” URI manually."
 msgstr ""
-"Ni najdenega zapisa storitve DNS za domeno »%s« in »carddavs«. Prosimo, "
-"ročno vnesite URI \"https://\"."
+"Ni najdenega zapisa storitve DNS za domeno »%s« in storitev »carddavs«. "
+"Prosimo, ročno vnesite URI »https://«."
 
 #: src/address-book-config.c:716
-#, fuzzy
-#| msgid "Authentication cancelled"
 msgid "Authorization failed"
-msgstr "Overitev je preklicana"
+msgstr "Overitev ni uspela"
 
 #: src/address-book-config.c:717
 #, c-format
@@ -3882,25 +3787,18 @@ msgstr ""
 "šifrirno geslo"
 
 #: src/address-book-config.c:721
-#, fuzzy
-#| msgid "Error:"
 msgid "Error"
-msgstr "Napaka:"
+msgstr "Napaka"
 
 #: src/address-book-config.c:770
-#, fuzzy
-#| msgid "_Domain:"
 msgid "D_omain or URL:"
-msgstr "_Domena:"
+msgstr "D_omena ali URL:"
 
 #: src/address-book-config.c:789
-#, fuzzy
-#| msgid "Address book name"
 msgid "_CardDAV address book name:"
-msgstr "Ime imenika"
+msgstr "Ime adresarja _CardDAV:"
 
 #: src/address-book-config.c:798
-#, fuzzy
 msgid "_Refresh period:"
 msgstr "Pe_rioda osveževanja:"
 
@@ -3910,7 +3808,6 @@ msgid "minutes"
 msgstr "min"
 
 #: src/address-book-config.c:808
-#, fuzzy
 msgid "Force _Multiget for non-standard server"
 msgstr "Vsili _Multiget za nestandardni strežnik"
 
@@ -3940,10 +3837,8 @@ msgid "Osmo Address Book"
 msgstr "Imenik Osmo"
 
 #: src/address-book-config.c:1179
-#, fuzzy
-#| msgid "LDAP Address Book"
 msgid "CardDAV Address Book"
-msgstr "Imenik LDAP"
+msgstr "Adresar CardDAV"
 
 #: src/balsa-app.c:55 src/balsa-app.c:142
 msgid "_Remember password in Secret Service"
@@ -3994,10 +3889,10 @@ msgstr "Datum"
 #, c-format
 msgid "Reply to Group: %d message is not from a mailing list."
 msgid_plural "Reply to Group: %d messages are not from a mailing list."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Odgovori skupini: %d sporočil ni s poštnega seznama."
+msgstr[1] "Odgovori skupini: %d sporočilo ni s poštnega seznama."
+msgstr[2] "Odgovori skupini: %d sporočili nista s poštnega seznama."
+msgstr[3] "Odgovori skupini: %d sporočila niso s poštnega seznama."
 
 #: src/balsa-index.c:1815
 #, c-format
@@ -4061,15 +3956,13 @@ msgid "_View Source"
 msgstr "_Ogled izvorne kode"
 
 #: src/balsa-index.c:2265
-#, fuzzy, c-format
-#| msgid "Failed to copy %d message to mailbox \"%s\": %s"
-#| msgid_plural "Failed to copy %d messages to mailbox \"%s\": %s"
+#, c-format
 msgid "Failed to copy %d message to mailbox “%s”: %s"
 msgid_plural "Failed to copy %d messages to mailbox “%s”: %s"
-msgstr[0] "Kopiranje %d sporočil v poštni predal \"%s\" je spodletelo: %s"
-msgstr[1] "Kopiranje %d sporočila v poštni predal \"%s\" je spodletelo: %s"
-msgstr[2] "Kopiranje %d sporočil v poštni predal \"%s\" je spodletelo: %s"
-msgstr[3] "Kopiranje %d sporočil v poštni predal \"%s\" je spodletelo: %s"
+msgstr[0] "Kopiranje %d sporočil v poštni predal »%s« je spodletelo: %s"
+msgstr[1] "Kopiranje %d sporočila v poštni predal »%s« je spodletelo: %s"
+msgstr[2] "Kopiranje %d sporočil v poštni predal »%s« je spodletelo: %s"
+msgstr[3] "Kopiranje %d sporočil v poštni predal »%s« je spodletelo: %s"
 
 #: src/balsa-index.c:2277
 #, c-format
@@ -4204,10 +4097,9 @@ msgid "RFC822 message"
 msgstr "Sporočilo RFC822"
 
 #: src/balsa-message.c:1355
-#, fuzzy, c-format
-#| msgid "\"%s\" parts"
+#, c-format
 msgid "“%s” parts"
-msgstr "delov"
+msgstr "»%s« delov"
 
 #: src/balsa-message.c:1403
 msgid "force inline for all parts"
@@ -4318,64 +4210,48 @@ msgid "Possible disk space problem."
 msgstr "Mogoča je težava s prostorom na disku."
 
 #: src/balsa-message.c:2937
-#, fuzzy, c-format
-#| msgid ""
-#| "The message sent by %s with subject \"%s\" contains an encrypted part, "
-#| "but it's structure is invalid."
+#, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains an encrypted part, but its "
 "structure is invalid."
 msgstr ""
-"Sporočilo poslano od %s z zadevo \"%s\" vsebuje šifriran del, vendar je "
-"njihova struktura napačna."
+"Sporočilo, ki ga je poslal %s z zadevo »%s«, vsebuje šifriran del, vendar je "
+"njegova struktura neveljavna."
 
 #: src/balsa-message.c:2945
-#, fuzzy, c-format
-#| msgid ""
-#| "The message sent by %s with subject \"%s\" contains a PGP encrypted part, "
-#| "but this crypto protocol is not available."
+#, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a PGP encrypted part, but "
 "this crypto protocol is not available."
 msgstr ""
-"Sporočilo poslano od %s z zadevo \"%s\" vsebuje PGP šifriran del, vendar "
-"šifrirni protokol ni na voljo."
+"Sporočilo, ki ga je poslal %s z zadevo »%s«, vsebuje šifriran del PGP, "
+"vendar šifrirni protokol ni na voljo."
 
 #: src/balsa-message.c:2958
-#, fuzzy, c-format
-#| msgid ""
-#| "The message sent by %s with subject \"%s\" contains a S/MIME encrypted "
-#| "part, but this crypto protocol is not available."
+#, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a S/MIME encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
-"Sporočilo poslano od %s z zadevo \"%s\" vsebuje S/MIME šifriran del, vendar "
-"šifrirni protokol ni na voljo."
+"Sporočilo, ki ga je poslal %s z zadevo »%s«, vsebuje šifriran del S/MIME, "
+"vendar šifrirni protokol ni na voljo."
 
 #: src/balsa-message.c:3025
-#, fuzzy, c-format
-#| msgid ""
-#| "The message sent by %s with subject \"%s\" contains a signed part, but "
-#| "its structure is invalid. The signature, if there is any, cannot be "
-#| "checked."
+#, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a signed part, but its "
 "structure is invalid. The signature, if there is any, cannot be checked."
 msgstr ""
-"Sporočilo poslano od %s z zadevo \"%s\" vsebuje podpisan del, vendar je "
+"Sporočilo, ki ga je poslal %s z zadevo »%s«, vsebuje podpisan del, vendar je "
 "njegova struktura neveljavna. Podpisa, če obstaja, ni mogoče preveriti."
 
 #: src/balsa-message.c:3038
-#, fuzzy, c-format
-#| msgid ""
-#| "The message sent by %s with subject \"%s\" contains a %s signed part, but "
-#| "this crypto protocol is not available."
+#, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a %s signed part, but this "
 "crypto protocol is not available."
 msgstr ""
-"Sporočilo poslano od %s z zadevo  \"%s\" vsebuje podpisan del %s, vendar "
+"Sporočilo, ki ga je poslal %s z zadevo »%s«, vsebuje podpisan del %s, vendar "
 "šifrirni protokol ni na voljo."
 
 #: src/balsa-message.c:3041
@@ -4391,29 +4267,22 @@ msgid "Detected a good signature with insufficient validity/trust"
 msgstr "Zaznan je dober podpis z nezadostno veljavnostjo ali zaupanjem"
 
 #: src/balsa-message.c:3085 src/balsa-message.c:3209
-#, fuzzy, c-format
-#| msgid ""
-#| "Checking the signature of the message sent by %s with subject \"%s\" "
-#| "returned:\n"
-#| "%s"
+#, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” "
 "returned:\n"
 "%s"
 msgstr ""
-"Preverjanje podpisa sporočila od %s z zadevo \"%s\" je vrnilo:\n"
+"Preverjanje podpisa sporočila od %s z zadevo »%s« je vrnilo:\n"
 "%s"
 
 #: src/balsa-message.c:3098
-#, fuzzy, c-format
-#| msgid ""
-#| "Checking the signature of the message sent by %s with subject \"%s\" "
-#| "failed with an error!"
+#, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” failed "
 "with an error!"
 msgstr ""
-"Preverjanje podpisa sporočila od %s z zadevo \"%s\" je spodletelo z napako!"
+"Preverjanje podpisa sporočila od %s z zadevo »%s« je spodletelo z napako!"
 
 #: src/balsa-message.c:3160
 msgid ""
@@ -4475,10 +4344,9 @@ msgid "Save %s MIME Part"
 msgstr "Shrani %s MIME del"
 
 #: src/balsa-mime-widget-callbacks.c:158
-#, fuzzy, c-format
-#| msgid "Failed to create temporary file \"%s\": %s"
+#, c-format
 msgid "Failed to create file “%s”: %s"
-msgstr "Ni mogoče ustvariti začasne datoteke: %s"
+msgstr "Ni mogoče ustvariti datoteke »%s«: %s"
 
 #: src/balsa-mime-widget-callbacks.c:207
 #, c-format
@@ -4516,15 +4384,12 @@ msgstr ""
 "istovetnosti nima omogočene podpore samošifriranja."
 
 #: src/balsa-mime-widget-crypto.c:162
-#, fuzzy
 msgid "_Search key server for this key"
-msgstr "Poišči ključe na strežniku ključev"
+msgstr "_Preišči strežnik ključev za ta ključ"
 
 #: src/balsa-mime-widget-crypto.c:165
-#, fuzzy
-#| msgid "_Run GnuPG to check for an update of this key"
 msgid "_Search key server for updates of this key"
-msgstr "Poišči ključe na strežniku ključev"
+msgstr "_Preišči strežnik ključev za posodobitve tega ključa"
 
 #: src/balsa-mime-widget-crypto.c:207
 msgid "decrypted"
@@ -4778,16 +4643,13 @@ msgid "Email Address:"
 msgstr "Elektronski naslov:"
 
 #: src/balsa-mime-widget-text.c:1419
-#, fuzzy, c-format
-#| msgid ""
-#| "The message sent by %s with subject \"%s\" contains 8-bit characters, but "
-#| "no header describing the used codeset (converted to %s)"
+#, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains 8-bit characters, but no "
 "header describing the used codeset (converted to %s)"
 msgstr ""
-"Sporočilo poslano od %s z zadevo \"%s\" vsebuje 8-bitne znake, vendar brez "
-"podatkov o uporabi kodnega nabora (pretvorjeno v %s)."
+"Sporočilo, ki ga je poslal %s z zadevo »%s«, vsebuje 8-bitne znake, vendar "
+"brez glave, ki opisuje uporabljeni kodni nabor (pretvorjeno v %s)"
 
 #. Translators: #1 calendar message type
 #: src/balsa-mime-widget-vcalendar.c:67 src/balsa-print-object-text.c:533
@@ -4870,12 +4732,12 @@ msgstr "Zahteva koledarja iTIP"
 
 #. Translators: #1 message sender display name; #2 sender's event action (e.g. "accepted", "rejected", ...)
 #: src/balsa-mime-widget-vcalendar.c:372
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "%s %s the following iTIP calendar request:\n"
 "\n"
 msgstr ""
-"%s %s te zahteve za koledar iTIP:\n"
+"%s %s naslednjo zahtevo za koledar iTIP:\n"
 "\n"
 
 #: src/balsa-mime-widget-vcalendar.c:405
@@ -5628,28 +5490,18 @@ msgid "No mailbox selected."
 msgstr "Ni izbranega poštnega predala."
 
 #: src/mailbox-conf.c:179
-#, fuzzy, c-format
-#| msgid ""
-#| "Mailbox \"%s\" is used by Balsa and I cannot remove it.\n"
-#| "If you really want to remove it, assign its function\n"
-#| "to some other mailbox."
+#, c-format
 msgid ""
 "Mailbox “%s” is used by Balsa and I cannot remove it.\n"
 "If you really want to remove it, assign its function\n"
 "to some other mailbox."
 msgstr ""
-"Program uporablja poštni predal \"%s\", zato ga ni mogoče odstraniti.\n"
+"Program uporablja poštni predal »%s«, zato ga ni mogoče odstraniti.\n"
 "V primeru, da ga zares želite odstraniti, dodelite \n"
 "njegovo delovanje drugemu poštnemu predalu."
 
 #: src/mailbox-conf.c:189
-#, fuzzy, c-format
-#| msgid ""
-#| "This will remove the mailbox \"%s\" from the list of mailboxes.  You may "
-#| "also delete the disk file or files associated with this mailbox.\n"
-#| "If you do not remove the file on disk you may \"Add  Mailbox\" to access "
-#| "the mailbox again.\n"
-#| "What would you like to do?"
+#, c-format
 msgid ""
 "This will remove the mailbox “%s” from the list of mailboxes. You may also "
 "delete the disk file or files associated with this mailbox.\n"
@@ -5657,10 +5509,10 @@ msgid ""
 "mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"To bo odstranilo predal \"%s\" s seznama poštnih predalov. Mogoče je "
-"odstraniti tudi datoteko ali datoteke povezane s tem poštnim predalom.\n"
+"To bo odstranilo predal »%s« s seznama poštnih predalov. Mogoče je "
+"odstraniti tudi datoteko ali datoteke, povezane s tem poštnim predalom.\n"
 "V primeru, da datoteke ne odstranite z diska, lahko kasneje za ponoven "
-"dostop do predala uporabite \"Dodaj poštni predal\".\n"
+"dostop do predala uporabite »Dodaj poštni predal«.\n"
 "Kaj želite narediti?"
 
 #: src/mailbox-conf.c:201
@@ -5672,14 +5524,7 @@ msgid "Remove from list and _disk"
 msgstr "Odstrani s seznama in z _diska"
 
 #: src/mailbox-conf.c:211
-#, fuzzy, c-format
-#| msgid ""
-#| "This will remove the mailbox \"%s\" and all its messages from your IMAP "
-#| "server.  If %s has subfolders, it will still appear as a node in the "
-#| "folder tree.\n"
-#| "You may use \"New IMAP subfolder\" later to add a mailbox with this "
-#| "name.\n"
-#| "What would you like to do?"
+#, c-format
 msgid ""
 "This will remove the mailbox “%s” and all its messages from your IMAP "
 "server. If %s has subfolders, it will still appear as a node in the folder "
@@ -5687,10 +5532,10 @@ msgid ""
 "You may use “New IMAP subfolder” later to add a mailbox with this name.\n"
 "What would you like to do?"
 msgstr ""
-"To bo s strežnika IMAP odstranilo predal \"%s\" in vsa njegova sporočila.\n"
-"Če ima %s podmape, bodo še vedno vidno kot vozlišče v drevesu map.\n"
-"Kasneje lahko za dodajanje predalov s tem imenom uporabite \"Dodaj novo "
-"podmapo IMAP\".\n"
+"To bo s strežnika IMAP odstranilo predal »%s« in vsa njegova sporočila. Če "
+"ima %s podmape, bodo še vedno vidne kot vozlišče v drevesu map.\n"
+"Kasneje lahko za dodajanje predalov s tem imenom uporabite »Dodaj novo "
+"podmapo IMAP«.\n"
 "Kaj želite narediti?"
 
 #: src/mailbox-conf.c:224
@@ -5698,19 +5543,15 @@ msgid "_Remove from server"
 msgstr "_Odstrani s strežnika"
 
 #: src/mailbox-conf.c:231
-#, fuzzy, c-format
-#| msgid ""
-#| "This will remove the mailbox \"%s\" from the list of mailboxes.\n"
-#| "You may use \"Add Mailbox\" later to access this mailbox again.\n"
-#| "What would you like to do?"
+#, c-format
 msgid ""
 "This will remove the mailbox “%s” from the list of mailboxes.\n"
 "You may use “Add Mailbox” later to access this mailbox again.\n"
 "What would you like to do?"
 msgstr ""
-"To bo poštni predal \"%s\" odstranilo s seznama poštnih predalov.\n"
-"Za ponoven dostop do tega predala kasneje lahko uporabite \"Dodaj poštni "
-"predal\".\n"
+"To bo poštni predal »%s« odstranilo s seznama poštnih predalov.\n"
+"Za ponoven dostop do tega predala kasneje lahko uporabite »Dodaj poštni "
+"predal«.\n"
 "Kaj želite narediti?"
 
 #: src/mailbox-conf.c:240
@@ -6903,23 +6744,16 @@ msgstr ""
 "Filtri so lahko nepravilni."
 
 #: src/save-restore.c:798
-#, fuzzy
-#| msgid "The option not to recognize \"format=flowed\" text has been removed."
 msgid "The option not to recognize “format=flowed” text has been removed."
-msgstr ""
-"Možnost za neprepoznavanje besedila \"format=povezano\" je bila odstranjena."
+msgstr "Možnost, da besedilo »format=flowed« ne prepozna, je bila odstranjena."
 
 #: src/save-restore.c:1067
-#, fuzzy
-#| msgid ""
-#| "The option not to send \"format=flowed\" text is now on the Options menu "
-#| "of the compose window."
 msgid ""
 "The option not to send “format=flowed” text is now on the Options menu of "
 "the compose window."
 msgstr ""
-"Možnost za ne-pošiljanje besedila \"format=povezano\" je sedaj zapisana v "
-"meniju možnosti sestavljalnega okna."
+"Možnost, da besedila »format=flowed« ne pošljete, je zdaj v meniju Možnosti "
+"okna za novo sporočilo."
 
 #: src/save-restore.c:1108
 msgid ""
@@ -6929,16 +6763,13 @@ msgstr ""
 "sestavljalnega okna."
 
 #: src/save-restore.c:1188
-#, fuzzy
-#| msgid ""
-#| "This version of Balsa uses a new user interface; if you have changed "
-#| "Balsa's keyboard accelerators, you will need to set them again."
 msgid ""
 "This version of Balsa uses a new user interface; if you have changed Balsa’s "
 "keyboard accelerators, you will need to set them again."
 msgstr ""
-"Ta različica programa uporablja nov uporabniški vmesnik; v primeru da ste "
-"spremenili tipkovne bližnjice programa, jih boste morali ponovno nastaviti."
+"Ta različica programa Balsa uporablja nov uporabniški vmesnik; v primeru da "
+"ste spremenili tipkovne bližnjice programa, jih boste morali ponovno "
+"nastaviti."
 
 #. Translators: please use the initial letter of each language as
 #. * its accelerator; this is a long list, and unique accelerators
@@ -7485,9 +7316,17 @@ msgid_plural ""
 "<i>Note:</i> choosing encryption will import %u keys from the Autocrypt "
 "database into the GnuPG key ring."
 msgstr[0] ""
+"<i>Opomba:</i> če izberete šifriranje, uvozite %u ključev iz zbirke podatkov "
+"Autocrypt v zbirko ključev GnuPG."
 msgstr[1] ""
+"<i>Opomba:</i> če izberete šifriranje, uvozite %u ključ iz zbirke podatkov "
+"Autocrypt v zbirko ključev GnuPG."
 msgstr[2] ""
+"<i>Opomba:</i> če izberete šifriranje, uvozite %u ključa iz zbirke podatkov "
+"Autocrypt v zbirko ključev GnuPG."
 msgstr[3] ""
+"<i>Opomba:</i> če izberete šifriranje, uvozite %u ključe iz zbirke podatkov "
+"Autocrypt v zbirko ključev GnuPG."
 
 #: src/sendmsg-window.c:5450
 #, c-format
@@ -7806,10 +7645,8 @@ msgid "Send"
 msgstr "Pošlji"
 
 #: src/toolbar-factory.c:135
-#, fuzzy
-#| msgid "_Send Queued Mail"
 msgid "Send queued"
-msgstr "Pošlje čakajočo pošto in prejme novo"
+msgstr "Pošlji čakajočo pošto"
 
 #: src/toolbar-factory.c:136
 msgid "Exchange"

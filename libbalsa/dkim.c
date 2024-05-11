@@ -142,7 +142,7 @@ static gboolean dmarc_get_policy(guint       *dest,
 								 const gchar *value,
 								 const gchar *tag_name,
 								 GError     **error);
-static const gnutls_pubkey_t dkim_get_pubkey(dkim_header_t *dkim_header);
+static gnutls_pubkey_t dkim_get_pubkey(dkim_header_t *dkim_header);
 
 static void dkim_verify_signature(GMimeStream    *stream,
 								  dkim_header_t  *dkim_header,
@@ -161,9 +161,9 @@ static gchar *canon_header_relaxed(gchar *header);
 static void dkim_check_body_hash(GMimeStream   *stream,
 								 dkim_header_t *dkim_header);
 
-static const gnutls_pubkey_t eval_dkim_dns_txt(const gchar         *txt_str,
-											   const dkim_header_t *dkim_header,
-											   GError             **error);
+static gnutls_pubkey_t eval_dkim_dns_txt(const gchar         *txt_str,
+										 const dkim_header_t *dkim_header,
+										 GError             **error);
 static gpointer dns_lookup_txt(const gchar  *rrname,
 							   dns_eval_fn   callback,
 							   gconstpointer user_data,
@@ -1521,7 +1521,7 @@ dmarc_get_policy(guint *dest, const gchar *value, const gchar *tag_name, GError 
  *
  * @sa RFC 6376 sect. 6.1.2
  */
-static const gnutls_pubkey_t
+static gnutls_pubkey_t
 dkim_get_pubkey(dkim_header_t *dkim_header)
 {
 	gchar *rrname;
@@ -1574,7 +1574,7 @@ dkim_get_pubkey(dkim_header_t *dkim_header)
  * @note Callback function called from dns_lookup_txt().
  * @sa RFC 6376 sect. 3.6.1
  */
-static const gnutls_pubkey_t
+static gnutls_pubkey_t
 eval_dkim_dns_txt(const gchar *txt_str, const dkim_header_t *dkim_header, GError **error)
 {
 	gchar **items;

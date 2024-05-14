@@ -533,7 +533,9 @@ dkim_verify_signature(GMimeStream *stream, dkim_header_t *dkim_header, gnutls_pu
 		} else {
 			gtls_res = gnutls_pubkey_verify_hash2(pubkey, dkim_header->cryptalg, 0, &hash_val, &dkim_header->b);
 		}
-		if (gtls_res != GNUTLS_E_SUCCESS) {
+		/* Note: these two GnuTLS functions ONLY return "zero or positive code on success", whilst *all* others return
+		 * GNUTLS_E_SUCCESS (0); see https://www.gnutls.org/manual/html_node/Operations.html */
+		if (gtls_res < GNUTLS_E_SUCCESS) {
 			/* Translators: #1 reason for signature verification failure */
 			(void) dkim_error(dkim_header, DKIM_FAILED, _("signature verification failed: %s"), gnutls_strerror(gtls_res));
 		} else if (dkim_header->x != NULL) {

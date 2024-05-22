@@ -8,6 +8,12 @@
  * - RFC 7489: Domain-based Message Authentication, Reporting, and Conformance (DMARC)
  * - RFC 8463: A New Cryptographic Signature Method for DomainKeys Identified Mail (DKIM)
  *
+ * RFC 6376, sect. 3.1 defines that DKIM tags and values must be interpreted in a case-sensitive manner unless explicitly specified
+ * otherwise.  RFC 7489 sect. 3.1 defines that domain names shall be compared in a case-insensitive manner.  As domain names are
+ * case-insensitive (see RFC 1035 sect. 2.3.3 and RFC 4343), it makes sense to treat the domain parts of the DKIM "d" and "i" tags
+ * as being case-insensitive although they are not specified as such by RFC 6376.  This avoids some (rare) misleading "domain
+ * mismatch" results.
+ *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2, or (at your option) any later version.
  *
@@ -62,8 +68,8 @@ typedef struct {
 										 * 'c' tag (OPTIONAL) */
 	gboolean body_canon_relaxed;		/**< body canonicalisation mode 'simple' (FALSE, default) or 'relaxed' (TRUE), from the 'c'
 										 * tag (OPTIONAL) */
-	gchar *d;							/**< SDID claiming responsibility for an introduction of a message into the mail stream
-										 * (REQUIRED) */
+	gchar *d;							/**< SDID claiming responsibility for an introduction of a message into the mail stream,
+										 * converted to lower-case (REQUIRED) */
 	gchar **h;							/**< signed header fields (REQUIRED) */
 	gint64 l;							/**< body length count (OPTIONAL, default == -1 is entire body) */
 	gchar *s;							/**< selector subdividing the namespace for the "d=" (domain) tag (REQUIRED) */
@@ -341,14 +347,14 @@ libbalsa_dkim_new(GMimeStream *stream, LibBalsaMessageHeaders *headers)
 				p = p->next) {
 				const dkim_header_t *dkim_header = (const dkim_header_t *) p->data;
 
-				if (g_ascii_strcasecmp(dmarc_domain, dkim_header->d) == 0) {
+				if (strcmp(dmarc_domain, dkim_header->d) == 0) {
 					dmarc_header = dkim_header;
 				} else if ((dmarc_mode & DMARC_DKIM_STRICT) == 0U) {
 					size_t dkim_len;
 
 					dkim_len = strlen(dkim_header->d);
 					if ((dkim_len < dmarc_len) && (dmarc_domain[dmarc_len - dkim_len - 1] == '.') &&
-						(g_ascii_strcasecmp(dkim_header->d, &dmarc_domain[dmarc_len - dkim_len]) == 0)) {
+						(strcmp(dkim_header->d, &dmarc_domain[dmarc_len - dkim_len]) == 0)) {
 						dmarc_header = dkim_header;
 					}
 				} else {
@@ -921,13 +927,13 @@ eval_dkim_header(const gchar *header)
 						success = tag_get_c(value, result, &error);
 						break;
 					case 'd':
-						result->d = g_strdup(value);
+						result->d = g_ascii_strdown(value, -1);
 						break;
 					case 'h':
 						result->h = strsplit_clean(value, ":", FALSE);
 						break;
 					case 'i':
-						auid = g_strdup(value);
+						auid = g_ascii_strdown(value, -1);
 						break;
 					case 'l':
 						success = tag_get_number(value, &result->l, &error);
@@ -1296,7 +1302,7 @@ dkim_stat_str(gint status) {
 /** @brief Get the DMARC mode for a From: address
  *
  * @param[in] from From: address
- * @param[out] dmarc_domain filled with the domain extracted from the From: address
+ * @param[out] dmarc_domain filled with the domain extracted from the From: address, converted to lower-case
  * @return the DMARC mode (&gt; 0) on success
  *
  * A DMARC policy can be checked iff the passed From: address contains a single mailbox with a non-empty domain part (see RFC 7489,
@@ -1331,7 +1337,7 @@ dmarc_dns_lookup(InternetAddressList *from, gchar **dmarc_domain)
 					domain = NULL;
 				} else {
 					domain = &domain[1];
-					*dmarc_domain = g_strdup(domain);
+					*dmarc_domain = g_ascii_strdown(domain, -1);
 				}
 			}
 		}

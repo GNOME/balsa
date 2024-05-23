@@ -243,13 +243,13 @@ endif # ldap != 'false'
 
 # GPE address book configuration.
 #
-if gpe != 'false'
+if gpe
   gpe_dep = dependency('sqlite3', required : true)
   conf.set('HAVE_GPE', 1,
     description : 'If defined, enable GPE address book support.')
   balsa_deps += gpe_dep
   balsa_ab_deps += gpe_dep
-endif # gpe != 'false'
+endif # gpe
 
 # Osmo address book support
 #

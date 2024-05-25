@@ -226,7 +226,7 @@ parse_externq_file(LibBalsaAddressBookExternq *ab_externq,
 {
     FILE *gc;
     gchar string[LINE_LEN];
-    char name[LINE_LEN], email[LINE_LEN], tmp[LINE_LEN];
+    char name[LINE_LEN + 1], email[LINE_LEN + 1], tmp[LINE_LEN + 1];
     gchar command[LINE_LEN];
 
     /* Start the program */

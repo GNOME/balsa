@@ -284,7 +284,7 @@ struct _BalsaAttachInfo {
     LibBalsaMessageHeaders *headers;  /* information about a forwarded message */
 };
 
-static BalsaAttachInfo* balsa_attach_info_new();
+static BalsaAttachInfo* balsa_attach_info_new(BalsaSendmsg *bm);
 static void balsa_attach_info_finalize(GObject * object);
 
 

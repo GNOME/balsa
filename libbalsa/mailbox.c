@@ -160,21 +160,21 @@ struct _LibBalsaMailboxPrivate {
     guint run_filters_idle_id;
     guint sort_idle_id;
 
-    gboolean readonly : 1;
-    gboolean view_filter_pending : 1;  /* a view filter has been set
+    unsigned readonly : 1;
+    unsigned view_filter_pending : 1;  /* a view filter has been set
                                         * but the view has not been updated */
     /* info fields */
-    gboolean has_unread_messages : 1;
+    unsigned has_unread_messages : 1;
     /* Associated filters (struct mailbox_filter) */
-    gboolean filters_loaded : 1;
+    unsigned filters_loaded : 1;
     /* Whether to reassemble a message from its parts. */
-    gboolean no_reassemble : 1;
+    unsigned no_reassemble : 1;
     /* Whether the tree has been changed since some event. */
-    gboolean msg_tree_changed : 1;
+    unsigned msg_tree_changed : 1;
     /* Whether messages have been threaded. */
-    gboolean messages_threaded : 1;
+    unsigned messages_threaded : 1;
     /* Whether a message should be cached. */
-    gboolean must_cache_message : 1;
+    unsigned must_cache_message : 1;
 };
 
 #define LBM_GET_INDEX_ENTRY(priv, msgno) \

@@ -153,11 +153,11 @@ struct _BalsaIndex {
     guint current_msgno;
     guint next_msgno;
 
-    gboolean current_message_is_deleted:1;
-    gboolean prev_message:1;
-    gboolean next_message:1;
-    gboolean collapsing:1;
-    gboolean expanded:1;
+    unsigned current_message_is_deleted:1;
+    unsigned prev_message:1;
+    unsigned next_message:1;
+    unsigned collapsing:1;
+    unsigned expanded:1;
 
     int    filter_no;
     gchar *filter_string; /* Quick view filter string, if any */
@@ -2423,8 +2423,8 @@ struct PipeData {
     guint in_source;
     guint out_source;
     guint err_source;
-    int out_closed:1;
-    int err_closed:1;
+    unsigned out_closed:1;
+    unsigned err_closed:1;
 };
 
 static void

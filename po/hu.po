@@ -12,9 +12,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: balsa.master\n"
-"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
-"POT-Creation-Date: 2023-10-15 11:57+0000\n"
-"PO-Revision-Date: 2024-02-16 21:50+0100\n"
+"Report-Msgid-Bugs-To: http://pawsa.fedorapeople.org/balsa/bugs.html\n"
+"POT-Creation-Date: 2024-03-16 19:08+0000\n"
+"PO-Revision-Date: 2024-05-26 12:02+0200\n"
 "Last-Translator: Balázs Úr <ur.balazs at fsf dot hu>\n"
 "Language-Team: Hungarian <openscope at fsf dot hu>\n"
 "Language: hu\n"
@@ -55,7 +55,6 @@ msgid "end-to-end encryption using GnuPG or S/MIME;"
 msgstr "végpontok közti titkosítás GnuPG vagy S/MIME használatával;"
 
 #: balsa.appdata.xml.in:16
-#| msgid "optional multi-threaded retrieval and sending of messages;"
 msgid "multi-threaded retrieval and sending of messages;"
 msgstr "a levelek többszálas lekérése és küldése;"
 
@@ -126,34 +125,33 @@ msgstr "A cím nem található a címjegyzékben"
 msgid "Unknown error"
 msgstr "Ismeretlen hiba"
 
-#: libbalsa/address-book-carddav.c:405 libbalsa/address-book-ldap.c:950
-#: libbalsa/server.c:340
+#: libbalsa/address-book-carddav.c:455 libbalsa/address-book-ldap.c:1012
+#: libbalsa/server.c:342
 msgid "Balsa passwords"
 msgstr "Balsa jelszavak"
 
 #. Translators: #1 address book name; #2 error message
-#: libbalsa/address-book-carddav.c:411
+#: libbalsa/address-book-carddav.c:462 libbalsa/address-book-ldap.c:1019
 #, c-format
-#| msgid ""
-#| "Error opening address book “%s”:\n"
-#| "%s"
-msgid "Error saving CardDAV credentials for address book “%s”: %s"
-msgstr "Hiba a(z) „%s” címjegyzék CardDAV hitelesítő adatainak mentésekor: %s"
+#| msgid "Error saving CardDAV credentials for address book “%s”: %s"
+msgid "Error saving credentials for address book “%s” in Secret Service: %s"
+msgstr ""
+"Hiba a(z) „%s” címjegyzék hitelesítési adatainak a Titokszolgáltatásba való"
+" mentésekor: %s"
 
 #. Translators: #1 address book name; #2 error message
-#: libbalsa/address-book-carddav.c:452
+#: libbalsa/address-book-carddav.c:491 libbalsa/address-book-ldap.c:1048
 #, c-format
-#| msgid ""
-#| "Error opening address book “%s”:\n"
-#| "%s"
-msgid "Error loading CardDAV credentials for address book “%s”: %s"
+#| msgid "Error loading CardDAV credentials for address book “%s”: %s"
+msgid "Error loading credentials for address book “%s” from Secret Service: %s"
 msgstr ""
-"Hiba a(z) „%s” címjegyzék CardDAV hitelesítő adatainak betöltésekor: %s"
+"Hiba a(z) „%s” címjegyzék hitelesítési adatainak a Titokszolgáltatásból való"
+" betöltésekor: %s"
 
-#: libbalsa/address-book-carddav.c:490 libbalsa/gmime-gpgme-signature.c:239
+#: libbalsa/address-book-carddav.c:527 libbalsa/gmime-gpgme-signature.c:239
 #: libbalsa/imap/imap-handle.c:46 libbalsa/libbalsa-carddav.c:543
 #: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
-#: libbalsa/server-config.c:561 src/folder-conf.c:412 src/sendmsg-window.c:5382
+#: libbalsa/server-config.c:564 src/folder-conf.c:412 src/sendmsg-window.c:5382
 msgid "unknown"
 msgstr "ismeretlen"
 
@@ -163,7 +161,7 @@ msgid "No-Id"
 msgstr "Nincs azonosító"
 
 #: libbalsa/address-book-extern.c:191 libbalsa/address-book-extern.c:349
-#: libbalsa/address-book-ldap.c:577 libbalsa/address-book-ldif.c:189
+#: libbalsa/address-book-ldap.c:579 libbalsa/address-book-ldif.c:189
 #: libbalsa/address-book-ldif.c:227 libbalsa/address-book-ldif.c:270
 #: libbalsa/address-book-ldif.c:274 libbalsa/address-book-vcard.c:142
 #: libbalsa/address-book-vcard.c:249 libbalsa/address.c:393
@@ -172,48 +170,31 @@ msgid "No-Name"
 msgstr "Nincs név"
 
 #. very unlikely...
-#: libbalsa/address-book-ldap.c:356
+#: libbalsa/address-book-ldap.c:358
 msgid "Host not found"
 msgstr "A gép nem található"
 
-#: libbalsa/address-book-ldap.c:368
+#: libbalsa/address-book-ldap.c:370
 #, c-format
 msgid "The LDAP server “%s” does not support LDAPv3, interaction may fail."
 msgstr ""
 "A(z) „%s” LDAP-kiszolgáló nem támogatja az LDAPv3-at, az interakció "
 "sikertelen lehet."
 
-#: libbalsa/address-book-ldap.c:393
+#: libbalsa/address-book-ldap.c:395
 msgid "TLS requested but not compiled in"
 msgstr "TLS támogatása szükséges, de az nincs befordítva"
 
-#: libbalsa/address-book-ldap.c:418
+#: libbalsa/address-book-ldap.c:420
 #, c-format
-#| msgid "Cannot write to address book"
 msgid "Cannot open LDAP address book %s: %s"
 msgstr "Nem lehet megnyitni a(z) %s LDAP-címjegyzéket: %s"
 
-#: libbalsa/address-book-ldap.c:694
+#: libbalsa/address-book-ldap.c:696
 msgid "Undefined location of user address book"
 msgstr "A felhasználói címjegyzék helye ismeretlen"
 
-#: libbalsa/address-book-ldap.c:955
-#, c-format
-#| msgid ""
-#| "Error opening address book “%s”:\n"
-#| "%s"
-msgid "Error saving LDAP credentials for address book %s: %s"
-msgstr "Hiba a(z) „%s” címjegyzék LDAP hitelesítő adatainak mentésekor: %s"
-
-#: libbalsa/address-book-ldap.c:1006
-#, c-format
-#| msgid ""
-#| "Error opening address book “%s”:\n"
-#| "%s"
-msgid "Error loading LDAP credentials for address book %s: %s"
-msgstr "Hiba a(z) „%s” címjegyzék LDAP hitelesítő adatainak betöltésekor: %s"
-
-#: libbalsa/address-book-ldap.c:1168
+#: libbalsa/address-book-ldap.c:1207
 #, c-format
 msgid "LDAP server %s down, next attempt will try to reconnect."
 msgstr ""
@@ -276,18 +257,11 @@ msgstr "Válaszcím:"
 
 #: libbalsa/address-view.c:972
 #, c-format
-#| msgid "Cannot import Autocrypt keys: %s"
 msgid "Cannot load Autocrypt keys: %s"
 msgstr "Nem lehet betölteni az Autocrypt-kulcsokat: %s"
 
 #: libbalsa/address-view.c:976
 #, c-format
-#| msgid ""
-#| "<i>Note:</i> choosing encryption will import %u key from the Autocrypt "
-#| "database into the GnuPG key ring."
-#| msgid_plural ""
-#| "<i>Note:</i> choosing encryption will import %u keys from the Autocrypt "
-#| "database into the GnuPG key ring."
 msgid "Imported %d key from the Autocrypt database into your key ring."
 msgid_plural "Imported %d keys from the Autocrypt database into your key ring."
 msgstr[0] "%d kulcs importálva az Autocrypt-adatbázisból a kulcstartóba."
@@ -296,21 +270,18 @@ msgstr[1] "%d kulcs importálva az Autocrypt-adatbázisból a kulcstartóba."
 #. Translators: #1 crypto protocol; #2 RFC 5322 internet address
 #: libbalsa/address-view.c:990
 #, c-format
-#| msgid "ambiguous keys for “%s”"
 msgid "Looking for %s key for “%s”"
 msgstr "A(z) %s kulcs keresése ehhez: „%s”"
 
 #. Translators: #1 crypto protocol; #2 RFC 5322 internet address
 #: libbalsa/address-view.c:997
 #, c-format
-#| msgid "Could not find a key for “%s”"
 msgid "Cannot find any %s key for “%s”"
 msgstr "Nem található semmilyen %s kulcs ehhez: „%s”"
 
 #. Translators: #1 key count, #2 crypto protocol; #2 RFC 5322 internet address
 #: libbalsa/address-view.c:1003
 #, c-format
-#| msgid "Import key into the local key ring"
 msgid "Imported %d %s key for “%s” into your key ring."
 msgid_plural "Imported %d %s keys for “%s” into your key ring."
 msgstr[0] "%d %s-kulcs importálva a kulcstartóba ehhez: „%s”."
@@ -318,20 +289,17 @@ msgstr[1] "%d %s-kulcs importálva a kulcstartóba ehhez: „%s”."
 
 #: libbalsa/address-view.c:1011
 #, c-format
-#| msgid "cannot export minimal key for “%s”"
 msgid "Cannot import missing keys for “%s”: %s"
 msgstr "Nem lehet importálni a(z) „%s” hiányzó kulcsait: %s"
 
 #. paranoid, should never happen
 #: libbalsa/address-view.c:1087
 #, c-format
-#| msgid "Could not find a key for “%s”"
 msgid "cannot find a key for “%s”"
 msgstr "nem található kulcs ehhez: „%s”"
 
 #: libbalsa/address-view.c:1095
 #, c-format
-#| msgid "Multiple keys for “%s”"
 msgid "Encryption key for “%s”"
 msgid_plural "Encryption keys for “%s”"
 msgstr[0] "Titkosítási kulcs ehhez: „%s”"
@@ -385,7 +353,7 @@ msgstr "Autocrypt-adatbázis"
 
 #: libbalsa/autocrypt.c:491 libbalsa/html.c:459 libbalsa/html-pref-db.c:141
 #: libbalsa/identity.c:1650 libbalsa/libbalsa-gpgme-widgets.c:840
-#: libbalsa/server-config.c:554 src/ab-window.c:148 src/folder-conf.c:334
+#: libbalsa/server-config.c:557 src/ab-window.c:148 src/folder-conf.c:334
 #: src/mailbox-node.c:1048 src/main-window.c:3938 src/toolbar-prefs.c:125
 #: ui/main-window.ui:374 ui/message-window.ui:21 ui/sendmsg-window.ui:67
 #: ui/source-viewer.ui:8
@@ -438,7 +406,6 @@ msgstr "A(z) „%s” adatbázis-bejegyzés nem tartalmaz kulcsot."
 
 #: libbalsa/autocrypt.c:1031
 #, c-format
-#| msgid "Cannot open %s: %s"
 msgid "cannot show key details: %s"
 msgstr "nem lehet megjeleníteni a kulcs részleteit: %s"
 
@@ -797,7 +764,7 @@ msgstr "A(z) „%s” fájlban lévő aláírás nem UTF-8 szöveg."
 #: libbalsa/libbalsa-gpgme-cb.c:357 libbalsa/smtp-server.c:330
 #: src/ab-main.c:822 src/ab-window.c:141 src/address-book-config.c:275
 #: src/address-book-config.c:387 src/address-book-config.c:430
-#: src/balsa-app.c:90 src/balsa-app.c:157 src/balsa-index.c:2796
+#: src/balsa-app.c:91 src/balsa-app.c:164 src/balsa-index.c:2796
 #: src/balsa-mblist.c:1894 src/balsa-message.c:1786
 #: src/balsa-mime-widget-callbacks.c:89 src/filter-edit-callbacks.c:1257
 #: src/filter-edit-dialog.c:399 src/filter-edit-dialog.c:575
@@ -814,7 +781,7 @@ msgstr "_Mégse"
 
 #: libbalsa/identity.c:365 libbalsa/libbalsa-gpgme-cb.c:180
 #: libbalsa/libbalsa-gpgme-cb.c:356 libbalsa/smtp-server.c:329
-#: src/ab-window.c:140 src/balsa-app.c:91 src/balsa-app.c:156
+#: src/ab-window.c:140 src/balsa-app.c:92 src/balsa-app.c:163
 #: src/balsa-message.c:1787 src/balsa-mime-widget-callbacks.c:90
 #: src/filter-edit-callbacks.c:1256 src/filter-edit-dialog.c:574
 #: src/filter-export-dialog.c:80 src/filter-run-dialog.c:301
@@ -1132,8 +1099,7 @@ msgstr "IMAP-válasz: %s"
 #, c-format
 msgid "the server %s does not offer the IMAP service at port 993 or 143"
 msgstr ""
-"a(z) %s kiszolgáló nem nyújt IMAP szolgáltatást a 993-as vagy 143-as "
-"porton"
+"a(z) %s kiszolgáló nem nyújt IMAP szolgáltatást a 993-as vagy 143-as porton"
 
 #. IMAP host name + message
 #: libbalsa/imap-server.c:213
@@ -1274,21 +1240,16 @@ msgid "Cannot play sound file “%s”: %s"
 msgstr "Nem lehet lejátszani a(z) „%s” hangfájlt: %s"
 
 #: libbalsa/libbalsa-carddav.c:442
-#| msgid "The signature is invalid."
 msgid "The server returned an invalid reply."
 msgstr "A kiszolgáló érvénytelen választ adott."
 
 #: libbalsa/libbalsa-carddav.c:514
-#| msgid "the server does not support quotas"
 msgid "The server does not support any usable address book report."
 msgstr "A kiszolgáló nem támogat egyetlen használható címjegyzékjelentést sem."
 
 #. Translators: #1 address book name, #2 address book URL, #3 error message
 #: libbalsa/libbalsa-carddav.c:542
 #, c-format
-#| msgid ""
-#| "Error opening address book “%s”:\n"
-#| "%s"
 msgid ""
 "CardDAV error for address book “%s” (URL %s):\n"
 "%s"
@@ -1299,7 +1260,6 @@ msgstr ""
 #. Translators: #1 error message
 #: libbalsa/libbalsa-carddav.c:564
 #, c-format
-#| msgid "error: %s"
 msgid "CardDAV error: %s"
 msgstr "CardDAV-hiba: %s"
 
@@ -1326,7 +1286,6 @@ msgid "could not set protocol “%s”"
 msgstr "nem sikerült beállítani a(z) „%s” protokollt"
 
 #: libbalsa/libbalsa-gpgme.c:301
-#| msgid "Failed to create temporary file “%s”: %s"
 msgid "failed to create a temporary folder"
 msgstr "nem sikerült létrehozni átmeneti mappát"
 
@@ -1338,7 +1297,6 @@ msgstr "nem sikerült a(z) „%s” mappát beállítani a(z) „%s” motorhoz"
 #. paranoid - should *never* happen
 #: libbalsa/libbalsa-gpgme.c:326
 #, c-format
-#| msgid "exporting key for “%s” failed"
 msgid "no crypto engine for “%s” available"
 msgstr "nem érhető el kriptográfiai motor ehhez: „%s”"
 
@@ -1556,12 +1514,10 @@ msgstr "A kulcskiszolgáló keresése meghiúsult: %s"
 
 #: libbalsa/libbalsa-gpgme-keys.c:802
 #, c-format
-#| msgid "cannot load key with fingerprint %s: %s"
 msgid "no data for key with fingerprint %s"
 msgstr "nincs adat a(z) %s ujjlenyomatú kulcshoz"
 
 #: libbalsa/libbalsa-gpgme-keys.c:813
-#| msgid "importing key data failed"
 msgid "reading key data failed"
 msgstr "a kulcsadatok olvasása sikertelen"
 
@@ -1823,15 +1779,14 @@ msgstr "Megnyitás ezzel: %s"
 msgid "Open _part with %s"
 msgstr "_Rész megnyitása ezzel: %s"
 
-#: libbalsa/libbalsa-webdav.c:237 libbalsa/libbalsa-webdav.c:290
+#: libbalsa/libbalsa-webdav.c:236 libbalsa/libbalsa-webdav.c:289
 msgid "failed to evaluate XPath expression"
 msgstr "nem sikerült az XPath kifejezés kiértékelése"
 
 #. Translators: #1 HTTP (RFC 2616) status code, #2 HTTP status message
-#: libbalsa/libbalsa-webdav.c:349 libbalsa/libbalsa-webdav.c:402
+#: libbalsa/libbalsa-webdav.c:348 libbalsa/libbalsa-webdav.c:401
 #: libbalsa/libbalsa-webdav.c:721 libbalsa/libbalsa-webdav.c:818
 #, c-format
-#| msgid "IMAP response: %s"
 msgid "WebDAV response %d: %s"
 msgstr "WebDAV-válasz: %d: %s"
 
@@ -1849,7 +1804,6 @@ msgid "cannot add namespaces to XPath context"
 msgstr "nem adható névtér az XPath környezethez"
 
 #: libbalsa/libbalsa-webdav.c:966
-#| msgid "could not create context"
 msgid "cannot create XPath context"
 msgstr "nem hozható létre XPath környezet"
 
@@ -2042,7 +1996,6 @@ msgstr "Nem sikerült létrehozni Maildirt itt: %s (%s)"
 
 #: libbalsa/mailbox_maildir.c:319 libbalsa/mailbox_mh.c:276
 #, c-format
-#| msgid "Could not remove %s: %s"
 msgid "Could not remove “%s”: %s"
 msgstr "Nem sikerült a(z) „%s” eltávolítása: %s"
 
@@ -2225,7 +2178,6 @@ msgstr "A postafiók (%s) csak olvasható: nem lehet megváltoztatni a jelzőket
 
 #: libbalsa/misc.c:226 libbalsa/misc.c:235
 #, c-format
-#| msgid "Cannot read the file “%s”: %s"
 msgid "cannot delete “%s”: %s"
 msgstr "a(z) „%s” nem törölhető: %s"
 
@@ -2324,7 +2276,7 @@ msgstr "Időtúllépés az flock zárolási kísérletekor."
 msgid "Waiting for flock attempt… %d"
 msgstr "Várakozás az flock kísérletre… %d"
 
-#: libbalsa/misc.c:1076
+#: libbalsa/misc.c:1098
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "LDAP könyvtár ehhez: %s"
@@ -2788,8 +2740,8 @@ msgstr "Ez a rész nem valódi aláírás."
 #: libbalsa/rfc3156.c:500
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
-"Az aláírást nem sikerült ellenőrizni egy érvénytelen kriptográfiai motor"
-" miatt."
+"Az aláírást nem sikerült ellenőrizni egy érvénytelen kriptográfiai motor "
+"miatt."
 
 #: libbalsa/rfc3156.c:502
 msgid "The signature contains multiple signers, this may be a forgery."
@@ -2945,19 +2897,26 @@ msgid_plural "This message will not be encrypted for the BCC: recipients."
 msgstr[0] "A levél nem lesz titkosítva a rejtett másolatot kapó címzettnek."
 msgstr[1] "A levél nem lesz titkosítva a rejtett másolatot kapó címzetteknek."
 
-#: libbalsa/server.c:346
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message
+#: libbalsa/server.c:350
 #, c-format
-msgid "Error storing password for %s@%s:%s: %s"
-msgstr "Hiba történt %s@%s:%s jelszavának tárolásakor: %s"
+msgid ""
+"Error saving credentials for user “%s”, protocol “%s”, server “%s” in Secret "
+"Service: %s"
+msgstr ""
+"Hiba „%s” felhasználó, „%s” protokoll, „%s” kiszolgáló hitelesítési adatainak"
+" a Titokszolgáltatásba való mentésekor: %s"
 
-#: libbalsa/server.c:368
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name; #4 error message
+#: libbalsa/server.c:381
 #, c-format
-msgid "Error looking up password for %s@%s:%s: %s"
-msgstr "Hiba történt %s@%s:%s jelszavának keresésekor: %s"
-
-#: libbalsa/server.c:374
-msgid "loaded fallback password from private config file"
-msgstr "tartalék jelszó betöltve a személyes konfigurációs fájlból"
+#| msgid "Error loading CardDAV credentials for address book “%s”: %s"
+msgid ""
+"Error loading credentials for user %s, protocol “%s”, server “%s” from "
+"Secret Service: %s"
+msgstr ""
+"Hiba „%s” felhasználó, „%s” protokoll, „%s” kiszolgáló hitelesítési adatainak"
+" a Titokszolgáltatásból való betöltésekor: %s"
 
 #: libbalsa/server-config.c:90
 msgid "_Remember user password in Secret Service"
@@ -2967,124 +2926,120 @@ msgstr "Felhasználói jelszó _megjegyzése a Titokszolgáltatásban"
 msgid "_Remember certificate pass phrase in Secret Service"
 msgstr "Tanúsítvány jelmondat _megjegyzése a Titokszolgáltatásban"
 
-#: libbalsa/server-config.c:95
+#: libbalsa/server-config.c:92
 msgid "_Remember user password"
 msgstr "Felhasználói jelszó _megjegyzése"
 
-#: libbalsa/server-config.c:96
+#: libbalsa/server-config.c:93
 msgid "_Remember certificate pass phrase"
 msgstr "Tanúsítvány jelmondatának _megjegyzése"
 
-#: libbalsa/server-config.c:117
+#: libbalsa/server-config.c:120
 msgid "_Basic"
 msgstr "_Alap"
 
 #. server descriptive name
-#: libbalsa/server-config.c:120
+#: libbalsa/server-config.c:123
 msgid "_Descriptive Name:"
 msgstr "_Leíró név:"
 
-#: libbalsa/server-config.c:125 src/address-book-config.c:785
+#: libbalsa/server-config.c:128 src/address-book-config.c:785
 msgid "probe…"
 msgstr "vizsgálat…"
 
 #. host and port
-#: libbalsa/server-config.c:140
+#: libbalsa/server-config.c:143
 msgid "_Server:"
 msgstr "_Kiszolgáló:"
 
-#: libbalsa/server-config.c:145
+#: libbalsa/server-config.c:148
 msgid "Se_curity:"
 msgstr "_Biztonság:"
 
-#: libbalsa/server-config.c:150
-#| msgid "authenticate"
+#: libbalsa/server-config.c:153
 msgid "_Authentication:"
 msgstr "_Hitelesítés:"
 
 #. user name and password
-#: libbalsa/server-config.c:154 src/address-book-config.c:774
+#: libbalsa/server-config.c:157 src/address-book-config.c:774
 msgid "_User Name:"
 msgstr "_Felhasználónév:"
 
-#: libbalsa/server-config.c:158 src/address-book-config.c:778
+#: libbalsa/server-config.c:161 src/address-book-config.c:778
 msgid "_Pass Phrase:"
 msgstr "_Jelmondat:"
 
-#: libbalsa/server-config.c:171
+#: libbalsa/server-config.c:174
 msgid "_Advanced"
 msgstr "_Speciális"
 
 #. client certificate and passphrase
-#: libbalsa/server-config.c:174
+#: libbalsa/server-config.c:177
 msgid "Server _requires client certificate"
 msgstr "A kiszolgáló ügyféltanúsítványt _igényel"
 
-#: libbalsa/server-config.c:177
+#: libbalsa/server-config.c:180
 msgid "Choose Client Certificate"
 msgstr "Válasszon ügyféltanúsítványt"
 
-#: libbalsa/server-config.c:178
+#: libbalsa/server-config.c:181
 msgid "Certificate _File:"
 msgstr "Tanúsítvány_fájl:"
 
-#: libbalsa/server-config.c:187
+#: libbalsa/server-config.c:190
 msgid "Certificate _Pass Phrase:"
 msgstr "Tanúsítvány _jelmondata:"
 
-#: libbalsa/server-config.c:405
+#: libbalsa/server-config.c:408
 #, c-format
 msgid "%s over SSL (%sS)"
 msgstr "%s SSL felett (%sS)"
 
-#: libbalsa/server-config.c:409
+#: libbalsa/server-config.c:412
 msgid "TLS required"
 msgstr "TLS szükséges"
 
-#: libbalsa/server-config.c:410
+#: libbalsa/server-config.c:413
 msgid "TLS if possible (not recommended)"
 msgstr "TLS, ha lehetséges (nem ajánlott)"
 
-#: libbalsa/server-config.c:411
+#: libbalsa/server-config.c:414
 msgid "None (not recommended)"
 msgstr "Nincs (nem javasolt)"
 
-#: libbalsa/server-config.c:427
+#: libbalsa/server-config.c:430
 msgid "anonymous access"
 msgstr "névtelen hozzáférés"
 
-#: libbalsa/server-config.c:429
-#| msgid "TLS required"
+#: libbalsa/server-config.c:432
 msgid "none required"
 msgstr "nem szükséges"
 
-#: libbalsa/server-config.c:431 libbalsa/server-config.c:541
+#: libbalsa/server-config.c:434 libbalsa/server-config.c:544
 msgid "user name and pass phrase"
 msgstr "felhasználónév és jelmondat"
 
-#: libbalsa/server-config.c:433 libbalsa/server-config.c:538
+#: libbalsa/server-config.c:436 libbalsa/server-config.c:541
 msgid "Kerberos (GSSAPI)"
 msgstr "Kerberos (GSSAPI)"
 
-#: libbalsa/server-config.c:528
+#: libbalsa/server-config.c:531
 msgid "yes (SSL/TLS)"
 msgstr "igen (SSL/TLS)"
 
-#: libbalsa/server-config.c:531
+#: libbalsa/server-config.c:534
 msgid "yes (STARTTLS)"
 msgstr "igen (STARTTLS)"
 
-#: libbalsa/server-config.c:534
-#| msgid "Undo"
+#: libbalsa/server-config.c:537
 msgid "no"
 msgstr "nem"
 
-#: libbalsa/server-config.c:544
-#| msgid "(none)"
+#: libbalsa/server-config.c:547
 msgid "none"
 msgstr "egyik sem"
 
-#: libbalsa/server-config.c:548
+#: libbalsa/server-config.c:551
 #, c-format
 msgid ""
 "Probe results for server %s\n"
@@ -3097,15 +3052,14 @@ msgstr ""
 "• Titkosítás: %s\n"
 "• Hitelesítés: %s\n"
 
-#: libbalsa/server-config.c:553 src/ab-main.c:814 src/address-book-config.c:264
+#: libbalsa/server-config.c:556 src/ab-main.c:814 src/address-book-config.c:264
 #: src/address-book-config.c:376 src/address-book-config.c:417
 #: src/filter-edit-dialog.c:503 src/main-window.c:3997 src/pref-manager.c:3325
 msgid "_Apply"
 msgstr "_Alkalmaz"
 
-#: libbalsa/server-config.c:560
+#: libbalsa/server-config.c:563
 #, c-format
-#| msgid "Error displaying server help: %s\n"
 msgid "Error probing server %s: %s"
 msgstr "Hiba a(z) %s kiszolgáló vizsgálatakor: %s"
 
@@ -3333,8 +3287,8 @@ msgid ""
 msgstr ""
 "Az előre beállított kiszolgálókonfiguráció az e-mail-cím alapján adott "
 "legjobb találgatás. A Balsa megpróbálja automatikusan az optimális "
-"beállításokat választani a titkosításnál és a felhasználónévnél, valamint "
-"a jelszó alapú hitelesítést választja. Vegye figyelembe, hogy a „Következő” "
+"beállításokat választani a titkosításnál és a felhasználónévnél, valamint a "
+"jelszó alapú hitelesítést választja. Vegye figyelembe, hogy a „Következő” "
 "gombra kattintás után a kiszolgáló képességeinek vizsgálata eltart néhány "
 "másodpercig.\n"
 "A finomhangoláshoz nézze meg a „Szerkesztés ⏵ Beállítások ⏵ Beállítások ⏵ "
@@ -3373,15 +3327,10 @@ msgid "_Remember your password:"
 msgstr "Jelszó _megjegyzése:"
 
 #: libinit_balsa/assistant_page_server.c:147
-#| msgid "User Settings"
 msgid "Server Settings"
 msgstr "Kiszolgáló beállításai"
 
 #: libinit_balsa/assistant_page_user.c:55
-#| msgid ""
-#| "The following settings are also needed (and you can find them later, if "
-#| "need be, in the Email application in the “Preferences” and “Identities” "
-#| "menu items)"
 msgid ""
 "The following settings are also needed (and you can find them later, if need "
 "be, in the Email application in the “Edit ⏵ Preferences ⏵ Identities…” menu "
@@ -3502,8 +3451,7 @@ msgstr "a kapcsolat már tömörítve van"
 #, c-format
 msgid "the server %s does not offer the POP3 service at port 995 or 110"
 msgstr ""
-"a(z) %s kiszolgáló nem nyújt POP3 szolgáltatást a 995-ös vagy 110-es "
-"porton"
+"a(z) %s kiszolgáló nem nyújt POP3 szolgáltatást a 995-ös vagy 110-es porton"
 
 #. unexpected server reply
 #: libnetclient/net-client-pop.c:336 libnetclient/net-client-pop.c:554
@@ -3530,12 +3478,10 @@ msgid "no suitable authentication mechanism"
 msgstr "nincs megfelelő hitelesítési mechanizmus"
 
 #: libnetclient/net-client-pop.c:620 libnetclient/net-client-smtp.c:514
-#| msgid "password required"
 msgid "user name required"
 msgstr "felhasználónév szükséges"
 
 #: libnetclient/net-client-pop.c:629 libnetclient/net-client-smtp.c:523
-#| msgid "password required"
 msgid "user name and password required"
 msgstr "felhasználónév és jelszó szükséges"
 
@@ -3552,7 +3498,6 @@ msgstr "a távoli kiszolgáló nem támogatja a STARTTLS-t"
 
 #: libnetclient/net-client-smtp.c:829
 #, c-format
-#| msgid "bad server reply: %s"
 msgid "unexpected reply: %s"
 msgstr "váratlan válasz: %s"
 
@@ -3792,7 +3737,6 @@ msgstr ""
 "szolgáltatáshoz. Kézzel írja be a „https://” URI-t."
 
 #: src/address-book-config.c:716
-#| msgid "Authentication cancelled"
 msgid "Authorization failed"
 msgstr "Az engedélyezés sikertelen"
 
@@ -3806,17 +3750,14 @@ msgstr ""
 "felhasználónevet és a jelmondatot."
 
 #: src/address-book-config.c:721
-#| msgid "Error:"
 msgid "Error"
 msgstr "Hiba"
 
 #: src/address-book-config.c:770
-#| msgid "_Domain:"
 msgid "D_omain or URL:"
 msgstr "_Tartomány vagy URL:"
 
 #: src/address-book-config.c:789
-#| msgid "Address book name"
 msgid "_CardDAV address book name:"
 msgstr "_CardDAV-címjegyzék neve:"
 
@@ -3859,43 +3800,50 @@ msgid "Osmo Address Book"
 msgstr "Osmo-címjegyzék"
 
 #: src/address-book-config.c:1179
-#| msgid "LDAP Address Book"
 msgid "CardDAV Address Book"
 msgstr "CardDAV-címjegyzék"
 
-#: src/balsa-app.c:56 src/balsa-app.c:136
+#: src/balsa-app.c:55 src/balsa-app.c:142
 msgid "_Remember password in Secret Service"
 msgstr "Jelszó _megjegyzése a Titokszolgáltatásban"
 
-#: src/balsa-app.c:59 src/balsa-app.c:139
+#: src/balsa-app.c:56 src/balsa-app.c:143
 msgid "_Remember password"
 msgstr "Jelszó _megjegyzése"
 
-#: src/balsa-app.c:75 src/balsa-app.c:144
+#. Translators: #1 Certificate CN, #2 user name; #3 protocol (imap, etc); #4 server name
+#: src/balsa-app.c:79 src/balsa-app.c:149
 #, c-format
+#| msgid ""
+#| "Password to unlock the user certificate\n"
+#| "%s\n"
+#| "for %s@%s (%s)"
 msgid ""
 "Password to unlock the user certificate\n"
 "%s\n"
-"for %s@%s (%s)"
+"for user %s, protocol “%s”, server “%s”"
 msgstr ""
 "Az ügyféltanúsítvány feloldásához használt jelszó\n"
 "%s\n"
-"ehhez: %s@%s (%s)"
+"ehhez: %s felhasználó, „%s” protokoll, „%s” kiszolgáló"
 
-#: src/balsa-app.c:80 src/balsa-app.c:148
+#. Translators: #1 user name; #2 protocol (imap, etc); #3 server name
+#: src/balsa-app.c:84 src/balsa-app.c:154
 #, c-format
-msgid "Password for %s@%s (%s)"
-msgstr "%s@%s (%s) jelszava"
+msgid "Password for user %s, protocol “%s”, server “%s”"
+msgstr "%s felhasználó, „%s” protokoll, „%s” kiszolgáló jelszava"
 
-#: src/balsa-app.c:86 src/balsa-app.c:88 src/balsa-app.c:152
+#. for some strange reason, the following property strings are not displayed when they are
+#. * added to the call above - no idea why
+#: src/balsa-app.c:90 src/balsa-app.c:100 src/balsa-app.c:159
 msgid "Password needed"
 msgstr "Jelszó szükséges"
 
-#: src/balsa-app.c:169
+#: src/balsa-app.c:176
 msgid "Password:"
 msgstr "Jelszó:"
 
-#: src/balsa-app.c:538
+#: src/balsa-app.c:549
 #, c-format
 msgid "Couldn’t open mailbox “%s”"
 msgstr "Nem sikerült megnyitni a(z) „%s” postafiókot"
@@ -4370,7 +4318,6 @@ msgstr "%s MIME részének mentése"
 
 #: src/balsa-mime-widget-callbacks.c:158
 #, c-format
-#| msgid "Failed to create temporary file “%s”: %s"
 msgid "Failed to create file “%s”: %s"
 msgstr "Nem sikerült létrehozni a(z) „%s” fájlt: %s"
 

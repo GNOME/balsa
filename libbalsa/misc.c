@@ -1239,19 +1239,17 @@ libbalsa_font_string_to_css(const gchar * font_string,
     return g_string_free(string, FALSE);
 }
 
-static GMimeParserOptions *parser_options;
-
-void
-libbalsa_parser_options_init(void)
-{
-    parser_options = g_mime_parser_options_new();
-    g_mime_parser_options_set_rfc2047_compliance_mode(parser_options,
-                                                      GMIME_RFC_COMPLIANCE_LOOSE);
-}
-
 GMimeParserOptions *
 libbalsa_parser_options(void)
 {
+    static GMimeParserOptions *parser_options = NULL;
+
+    if (g_once_init_enter(&parser_options)) {
+        GMimeParserOptions *tmp = g_mime_parser_options_new();
+
+        g_mime_parser_options_set_rfc2047_compliance_mode(tmp, GMIME_RFC_COMPLIANCE_LOOSE);
+        g_once_init_leave(&parser_options, tmp);
+    }
     return parser_options;
 }
 

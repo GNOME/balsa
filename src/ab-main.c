@@ -1094,7 +1094,6 @@ main(int argc, char *argv[])
     libbalsa_information_init(G_APPLICATION(application),
     	_("Balsa Address Book"), BALSA_AB_NOTIFICATION);
     g_mime_init();
-    libbalsa_parser_options_init();
 
     /* load address book data */
     libbalsa_conf_push_group("Globals");

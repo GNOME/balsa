@@ -161,7 +161,6 @@ gchar * libbalsa_text_to_html(const gchar * title, const gchar * body, const gch
 GString * libbalsa_html_encode_hyperlinks(GString * paragraph);
 gchar *libbalsa_font_string_to_css(const gchar * font_string, const gchar * name);
 
-void libbalsa_parser_options_init(void);
 GMimeParserOptions *libbalsa_parser_options(void);
 
 /* Some margin helpers */

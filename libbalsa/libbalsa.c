@@ -62,7 +62,6 @@ libbalsa_init(void)
     main_thread_id = g_thread_self();
 
     g_mime_init(); /* Registers all GMime types */
-    libbalsa_parser_options_init();
 
     /* Register our types to avoid possible race conditions. See
        output of "valgrind --tool=helgrind --log-file=balsa.log balsa"

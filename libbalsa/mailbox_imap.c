@@ -2197,9 +2197,11 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         filename = g_build_filename(pair[0], pair[1], NULL);
         g_strfreev(pair);
         fd = open(filename, O_RDONLY);
-        g_free(filename);
-        if (fd == -1)
+        if (fd == -1) {
+            g_debug("%s: loading MIME message from %s failed", __func__, filename);
+            g_free(filename);
             return FALSE;
+        }
 
         stream = g_mime_stream_fs_new(fd);
         fstream = g_mime_stream_filter_new(stream);
@@ -2217,6 +2219,13 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         mime_msg = g_mime_parser_construct_message(mime_parser, libbalsa_parser_options());
         g_object_unref(mime_parser);
 
+        if (mime_msg == NULL) {
+            g_debug("%s: parsing MIME message from %s failed", __func__, filename);
+            g_free(filename);
+            return FALSE;
+        }
+        g_debug("%s: loaded MIME message from %s", __func__, filename);
+        g_free(filename);
         libbalsa_message_set_mime_message(message, mime_msg);
     }
 

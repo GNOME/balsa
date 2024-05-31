@@ -983,7 +983,7 @@ ic_construct_header_list(const char **hdr, ImapFetchType ift)
     if(ift & IMFETCH_LIST_POST)    hdr[idx++] = "LIST-POST";
     hdr[idx++] = ")]";
   }
-  if(ift & IMFETCH_RFC822HEADERS) hdr[idx++] = "RFC822.HEADERS";
+  if(ift & IMFETCH_RFC822HEADERS) hdr[idx++] = "BODY.PEEK[HEADER]";
   if(ift & IMFETCH_RFC822HEADERS_SELECTED)
     hdr[idx++] = "BODY.PEEK[HEADER.FIELDS.NOT (DATE SUBJECT FROM SENDER "
       "REPLY-TO TO CC BCC IN-REPLY-TO MESSAGE-ID)]";

@@ -1309,14 +1309,6 @@ lb_message_set_headers_from_string(LibBalsaMessage *message,
 }
 
 
-gboolean
-libbalsa_message_set_headers_from_string(LibBalsaMessage *message,
-                                         const gchar     *lines)
-{
-    return lb_message_set_headers_from_string(message, lines, TRUE);
-}
-
-
 void
 libbalsa_message_load_envelope_from_stream(LibBalsaMessage *message,
                                            GMimeStream     *gmime_stream)

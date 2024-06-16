@@ -4029,7 +4029,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
     { "FLAGS",         ir_msg_att_flags },
     { "ENVELOPE",      ir_msg_att_envelope },
     { "INTERNALDATE",  ir_msg_att_internaldate }, 
-    { "RFC822",        ir_msg_att_rfc822 },     
+    { "BODY[]",        ir_msg_att_rfc822 },
     { "RFC822.HEADER", ir_msg_att_rfc822_header }, 
     { "RFC822.TEXT",   ir_msg_att_rfc822_text }, 
     { "RFC822.SIZE",   ir_msg_att_rfc822_size }, 
@@ -4059,6 +4059,17 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
       atom[i] = c;
     }
     atom[i] = '\0';
+    /* special case to work around #94: check for 'BODY[]' */
+    if ((strcmp(atom, "BODY") == 0) && (c == '[')) {
+      if (sio_getc(h->sio) == ']') {
+        atom[i++] = '[';
+        atom[i++] = ']';
+        atom[i] = '\0';
+        c = sio_getc(h->sio);
+      } else {
+        sio_ungetc(h->sio);
+      }
+    }
     for(i=0; i<G_N_ELEMENTS(msg_att); i++) {
       if(g_ascii_strcasecmp(atom, msg_att[i].name) == 0) {
         if( (rc=msg_att[i].handler(h, c, seqno)) != IMR_OK)

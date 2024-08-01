@@ -83,8 +83,8 @@ checker depends on the enchant library (any version except 1.6.1).
         Use ldap libraries for a read-only address book. The read/write
 address book is in the works but needs some finishing touches.
 
-`--with-sqlite`
-	Use SQLite for GPE address books.
+`--with-gpe`
+	Include support for GPE address books (requires sqlite3).
 
 `--with-osmo`
 	Enable experimental support for read-only DBus access to the Osmo

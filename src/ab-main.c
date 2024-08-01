@@ -37,9 +37,9 @@
 #if ENABLE_LDAP
 #include "address-book-ldap.h"
 #endif /* ENABLE_LDAP */
-#if HAVE_SQLITE
+#if HAVE_GPE
 #include "address-book-gpe.h"
-#endif /* HAVE_SQLITE */
+#endif /* HAVE_GPE */
 #include "address-book-config.h"
 #include "application-helpers.h"
 #include "libbalsa-conf.h"
@@ -198,7 +198,7 @@ bab_window_set_title(LibBalsaAddressBook * address_book)
     else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book))
         type = "LDAP";
 #endif
-#if HAVE_SQLITE
+#if HAVE_GPE
     else if (LIBBALSA_IS_ADDRESS_BOOK_GPE(address_book))
         type = "GPE";
 #endif
@@ -380,7 +380,7 @@ file_new_ldap_activated(GSimpleAction * action,
 }
 #endif /* ENABLE_LDAP */
 
-#if HAVE_SQLITE
+#if HAVE_GPE
 static void
 file_new_gpe_activated(GSimpleAction * action,
                        GVariant      * state,
@@ -390,7 +390,7 @@ file_new_gpe_activated(GSimpleAction * action,
         (LIBBALSA_TYPE_ADDRESS_BOOK_GPE, address_book_change,
          contacts_app.window);
 }
-#endif /* HAVE_SQLITE */
+#endif /* HAVE_GPE */
 
 static void
 file_properties_activated(GSimpleAction * action,
@@ -536,9 +536,9 @@ get_main_menu(GtkApplication * application)
 #if ENABLE_LDAP
         {"file-new-ldap",       file_new_ldap_activated},
 #endif /* ENABLE_LDAP */
-#if HAVE_SQLITE
+#if HAVE_GPE
         {"file-new-gpe",        file_new_gpe_activated},
-#endif /* HAVE_SQLITE */
+#endif /* HAVE_GPE */
         {"file-properties",     file_properties_activated},
         {"file-delete",         file_delete_activated},
         {"file-quit",           file_quit_activated},
@@ -1011,7 +1011,7 @@ bab_init(void)
 #if ENABLE_LDAP
     LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
 #endif
-#if HAVE_SQLITE
+#if HAVE_GPE
     LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
 #endif
     memset(&contacts_app, 0, sizeof(contacts_app));

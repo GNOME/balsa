@@ -81,7 +81,7 @@ static GtkWidget *create_externq_dialog(AddressBookConfig * abc);
 #ifdef ENABLE_LDAP
 static GtkWidget *create_ldap_dialog(AddressBookConfig * abc);
 #endif
-#ifdef HAVE_SQLITE
+#ifdef HAVE_GPE
 static GtkWidget *create_gpe_dialog(AddressBookConfig * abc);
 #endif
 #ifdef HAVE_OSMO
@@ -343,7 +343,7 @@ create_dialog_from_type(AddressBookConfig * abc)
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_LDAP) {
         return create_ldap_dialog(abc);
 #endif
-#ifdef HAVE_SQLITE
+#ifdef HAVE_GPE
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_GPE) {
         return create_gpe_dialog(abc);
 #endif
@@ -623,7 +623,7 @@ create_ldap_dialog(AddressBookConfig * abc)
 }
 #endif
 
-#ifdef HAVE_SQLITE
+#ifdef HAVE_GPE
 static GtkWidget *
 create_gpe_dialog(AddressBookConfig * abc)
 {
@@ -909,7 +909,7 @@ create_book(AddressBookConfig * abc)
                                            bind_dn, passwd, book_dn,
                                            enable_tls);
 #endif
-#ifdef HAVE_SQLITE
+#ifdef HAVE_GPE
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_GPE) {
         address_book =
             libbalsa_address_book_gpe_new(name);
@@ -1018,9 +1018,9 @@ modify_book(AddressBookConfig * abc)
         libbalsa_address_book_ldap_set_enable_tls(ldap, enable_tls);
         libbalsa_address_book_ldap_close_connection(ldap);
 #endif
-#if HAVE_SQLITE
+#if HAVE_GPE
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_GPE) {
-#endif /* HAVE_SQLITE */
+#endif /* HAVE_GPE */
 #if HAVE_OSMO
     } else if (abc->type == LIBBALSA_TYPE_ADDRESS_BOOK_OSMO) {
     	/* nothing to do here */
@@ -1095,7 +1095,7 @@ add_ldap_cb(GtkWidget * widget, AddressBookConfig * abc)
 }
 #endif /* ENABLE_LDAP */
 
-#ifdef HAVE_SQLITE
+#ifdef HAVE_GPE
 static void
 add_gpe_cb(GtkWidget * widget, AddressBookConfig * abc)
 {
@@ -1103,7 +1103,7 @@ add_gpe_cb(GtkWidget * widget, AddressBookConfig * abc)
     abc->window = create_gpe_dialog(abc);
     gtk_widget_show_all(abc->window);
 }
-#endif /* HAVE_SQLITE */
+#endif /* HAVE_GPE */
 
 #ifdef HAVE_OSMO
 static void
@@ -1163,12 +1163,12 @@ balsa_address_book_add_menu(BalsaAddressBookCallback callback,
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
 #endif /* ENABLE_LDAP */
 
-#ifdef HAVE_SQLITE
+#ifdef HAVE_GPE
     menuitem = gtk_menu_item_new_with_label(_("GPE Address Book"));
     g_signal_connect(menuitem, "activate",
                      G_CALLBACK(add_gpe_cb), abc);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-#endif /* HAVE_SQLITE */
+#endif /* HAVE_GPE */
 
 #ifdef HAVE_OSMO
     menuitem = gtk_menu_item_new_with_label(_("Osmo Address Book"));

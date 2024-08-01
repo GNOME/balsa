@@ -53,7 +53,7 @@ typedef struct _LibbalsaVfs LibbalsaVfs;
 #if ENABLE_LDAP
 #include "address-book-ldap.h"
 #endif
-#if HAVE_SQLITE
+#if HAVE_GPE
 #include "address-book-gpe.h"
 #endif
 #if HAVE_OSMO

@@ -691,7 +691,7 @@ balsa_ab_window_set_title(BalsaAbWindow *ab)
     else if (LIBBALSA_IS_ADDRESS_BOOK_LDAP(address_book))
         type = "LDAP";
 #endif
-#if HAVE_SQLITE
+#if HAVE_GPE
     else if (LIBBALSA_IS_ADDRESS_BOOK_GPE(address_book))
         type = "GPE";
 #endif

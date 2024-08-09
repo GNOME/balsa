@@ -1656,9 +1656,15 @@ libbalsa_mailbox_mbox_sync(LibBalsaMailbox * mailbox, gboolean expunge)
 
 	msg_info->status = msg_info->x_status = msg_info->mime_version = -1;
 	mime_msg = g_mime_parser_construct_message(gmime_parser, libbalsa_parser_options());
-        if (!mime_msg)
-            /* Try to recover */
-            continue;
+
+        if (mime_msg == NULL) {
+            /* Unrecoverable error */
+            libbalsa_mime_stream_shared_unlock(mbox_stream);
+            g_object_unref(gmime_parser);
+
+            return FALSE;
+        }
+
         msg_info->start = g_mime_parser_get_mbox_marker_offset(gmime_parser);
 
 	/* Make sure we don't have offsets for any encapsulated headers. */

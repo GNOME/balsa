@@ -188,5 +188,6 @@ GtkWidget * libbalsa_add_mnemonic_button_to_box(const gchar *markup,
                                                 GtkWidget   *box,
                                                 GtkAlign     align);
 
+gchar * libbalsa_pixmap_finder(const gchar * filename);
 
 #endif				/* __LIBBALSA_MISC_H__ */

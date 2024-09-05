@@ -1065,6 +1065,7 @@ main(int argc, char *argv[])
     GtkWidget *ab_window;
     GList *l;
     GError *error = NULL;
+    gchar *default_icon;
 
 #if GLIB_CHECK_VERSION(2, 73, 3)
     application =
@@ -1109,6 +1110,14 @@ main(int argc, char *argv[])
         ab = contacts_app.default_address_book ?
             contacts_app.default_address_book :
             contacts_app.address_book_list->data;
+    }
+
+    g_set_prgname("org.desktop.Balsa");
+
+    default_icon = libbalsa_pixmap_finder("balsa_icon.png");
+    if (default_icon) { /* may be NULL for developer installations */
+        gtk_window_set_default_icon_from_file(default_icon, NULL);
+        g_free(default_icon);
     }
 
     ab_window = bab_window_new(application);

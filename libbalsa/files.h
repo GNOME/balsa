@@ -27,18 +27,6 @@
 #include "body.h"
 #include "libbalsa-vfs.h"
 
-/* filename is the filename (naw!)
- * splice is what to put in between the prefix and the filename, if desired
- * prefixes is a null-termed array of strings of prefixes to try. There are defaults that are always
- *   tried.
- * We ignore proper slashing of names. Ie, /prefix//splice//file won't be caught.
- */
-
-gchar *balsa_file_finder(const gchar  * filename,
-                         const gchar  * splice);
-
-#define balsa_pixmap_finder(filename) (balsa_file_finder((filename), "pixmaps"))
-
 GdkPixbuf *libbalsa_icon_finder(GtkWidget         * widget,
                                 const char        * mime_type,
                                 const LibbalsaVfs * for_file,

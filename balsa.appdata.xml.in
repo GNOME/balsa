@@ -6,6 +6,7 @@
     <name>Balsa</name>
     <summary>Email utility</summary>
     <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-2.0-or-later</project_license>
     <description>
         <p>Balsa is a graphical mail client. While it is in active development,
             Balsa has many features such as:</p>
@@ -21,6 +22,44 @@
         </ul>
         <p>and the proverbial much, much more.</p>
     </description>
+    <screenshots>
+        <screenshot type="default">
+            <caption>Main Window</caption>
+            <image>https://pawsa.fedorapeople.org/balsa/screens/2.2/balsa-main-window.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>Filter Edition</caption>
+            <image>https://pawsa.fedorapeople.org/balsa/screens/2.0/filters-edit.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>Address Book</caption>
+            <image>https://pawsa.fedorapeople.org/balsa/screens/2.0/address-book.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>GPG capabilities</caption>
+            <image>https://pawsa.fedorapeople.org/balsa/screens/2.2/balsa-gpg.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>Multithread capabilities</caption>
+            <image>https://pawsa.fedorapeople.org/balsa/screens/2.2/balsa-multi-thread.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>Preferences</caption>
+            <image>https://pawsa.fedorapeople.org/balsa/screens/2.0/prefs.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>Tabbed View</caption>
+            <image>https://pawsa.fedorapeople.org/balsa/screens/2.2/balsa-main-window-tabbed.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>Automatic GPG key import</caption>
+            <image>https://pawsa.fedorapeople.org/balsa/screens/2.2/balsa-gpg-import-key.png</image>
+        </screenshot>
+        <screenshot>
+            <caption>Spell Checker</caption>
+            <image>https://pawsa.fedorapeople.org/balsa/screens/2.0/spell-checker.png</image>
+        </screenshot>
+    </screenshots>
     <releases>
         <release date="2022-09-20" version="2.6.4">
             <description>
@@ -41,8 +80,13 @@
             </description>
         </release>
     </releases>
+    <translation type="gettext">balsa</translation>
     <url type="homepage">https://pawsa.fedorapeople.org/balsa/</url>
-    <url type="contact">https://gitlab.gnome.org/GNOME/balsa/-/issues</url>
+    <url type="bugtracker">https://gitlab.gnome.org/GNOME/balsa/-/issues</url>
+    <url type="contact">https://discourse.gnome.org/tag/balsa</url>
+    <url type="faq">https://pawsa.fedorapeople.org/balsa/faq.html</url>
+    <url type="translate">https://l10n.gnome.org/module/balsa/</url>
+    <url type="vcs-browser">https://gitlab.gnome.org/GNOME/balsa</url>
     <content_rating type="oars-1.1" />
     <provides>
         <mediatype>x-scheme-handler/mailto</mediatype>

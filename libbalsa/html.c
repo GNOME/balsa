@@ -447,6 +447,7 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
     GtkWidget *info_bar_widget;
     GtkInfoBar *info_bar;
     GtkWidget *label;
+    GtkWidget *action_area;
     GtkWidget *content_area;
     static const gchar text[] =
                  N_("This message part references content on one or more external servers. "
@@ -460,9 +461,11 @@ lbh_info_bar(LibBalsaWebKitInfo * info)
                                      NULL);
 
     info_bar = GTK_INFO_BAR(info_bar_widget);
-    gtk_orientable_set_orientation(GTK_ORIENTABLE
-                                   (gtk_info_bar_get_action_area
-                                    (info_bar)), GTK_ORIENTATION_VERTICAL);
+
+    action_area = gtk_info_bar_get_action_area(info_bar);
+    gtk_orientable_set_orientation(GTK_ORIENTABLE(action_area),
+                                   GTK_ORIENTATION_VERTICAL);
+    gtk_box_set_homogeneous(GTK_BOX(action_area), TRUE);
 
     label = libbalsa_create_wrap_label(text, FALSE);
 

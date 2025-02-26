@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: balsa 0.9.2\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
 "POT-Creation-Date: 2021-12-16 15:34+0000\n"
-"PO-Revision-Date: 2024-02-19 12:03+0100\n"
+"PO-Revision-Date: 2025-02-26 12:03+0100\n"
 "Last-Translator: maite guix <maite.guix@me.com>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "Language: ca\n"
@@ -2903,7 +2903,7 @@ msgstr "S'ha tancat la bústia"
 
 #: ../libbalsa/source-viewer.c:219
 msgid "Message Source"
-msgstr "Codi font del missatge"
+msgstr "Font del missatge"
 
 #: ../libbalsa/source-viewer.c:229 ../src/message-window.c:852
 #, c-format
@@ -5044,7 +5044,7 @@ msgstr "S'ha produït un error en tornar a anomenar la carpeta. Raó: %s"
 #: ../src/folder-conf.c:773 ../src/folder-conf.c:1133
 #, c-format
 msgid "Folder creation failed. Reason: %s"
-msgstr "S'ha produït un crear la carpeta. Raó: %s"
+msgstr "S'ha produït un error en crear la carpeta. Raó: %s"
 
 #: ../src/folder-conf.c:824
 msgid ""
@@ -5137,7 +5137,7 @@ msgstr "informació de citació disponible només per a carpetes obertes"
 
 #: ../src/folder-conf.c:990
 msgid "the server does not support quotas"
-msgstr "el servidor d'IMAP no implementa les citacions"
+msgstr "el servidor d'IMAP no implementa límits"
 
 #: ../src/folder-conf.c:992
 msgid "no limits"
@@ -5999,7 +5999,7 @@ msgstr ""
 
 #: ../src/pref-manager.c:2289
 msgid "_Send queued mail automatically every"
-msgstr "_Envia un correu de la cua automàticament cada"
+msgstr "_Envia el correu de la cua automàticament cada"
 
 #: ../src/pref-manager.c:2299
 msgid "Edit headers in external editor"
@@ -6371,7 +6371,7 @@ msgstr "Signat i xifrat"
 
 #: ../src/print-gtk.c:173
 msgid "Signed"
-msgstr "Dedicat"
+msgstr "Signat"
 
 #: ../src/print-gtk.c:176
 msgid "Encrypted"
@@ -6997,7 +6997,7 @@ msgstr "Si voleu especificar-ne un, introduïu-lo a sota."
 
 #: ../src/sendmsg-window.c:5162
 msgid "Message could be encrypted"
-msgstr "No s'ha pogut xifrar el missatge"
+msgstr "S'ha pogut xifrar el missatge"
 
 #: ../src/sendmsg-window.c:5165
 msgid "Send _encrypted"
@@ -7735,7 +7735,7 @@ msgstr "Mostra les pes_tanyes de la bústia"
 #: ../ui/main-window.ui.h:35 ../ui/message-window.ui.h:10
 #: ../ui/sendmsg-window.ui.h:28
 msgid "Show Too_lbar"
-msgstr "Mostra la barra d_eines"
+msgstr "Mostra la barra d'_eines"
 
 #: ../ui/main-window.ui.h:36
 msgid "Show St_atus Bar"
@@ -7872,7 +7872,7 @@ msgstr "_Visualitza el codi font…"
 
 #: ../ui/main-window.ui.h:78 ../ui/message-window.ui.h:30
 msgid "Decrypt and check signatures"
-msgstr "Desxifra i comprova automàticament les signatures"
+msgstr "Desxifra i comprova les signatures"
 
 #: ../ui/main-window.ui.h:79 ../ui/source-viewer.ui.h:5
 msgid "_Select Text"

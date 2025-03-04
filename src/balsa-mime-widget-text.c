@@ -202,10 +202,6 @@ mwt_controller_motion_cb(GtkEventControllerMotion * motion,
 
 static void
 mwt_controller_leave_cb(GtkEventControllerMotion * motion,
-                        gdouble                    x,
-                        gdouble                    y,
-                        GdkCrossingMode            mode,
-                        GdkNotifyType              detail,
                         gpointer                   user_data)
 {
     BalsaMimeWidgetText *mwt = user_data;

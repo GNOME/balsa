@@ -4454,30 +4454,15 @@ set_cc_from_all_recipients(BalsaSendmsg* bsmsg,
 }
 
 static void
-set_in_reply_to(BalsaSendmsg *bsmsg, const gchar *message_id,
-                LibBalsaMessageHeaders *headers)
+set_in_reply_to(BalsaSendmsg *bsmsg, const gchar *message_id)
 {
-    gchar *tmp;
-
-    g_assert(message_id);
-    if(message_id[0] == '<')
-        tmp = g_strdup(message_id);
-    else
-        tmp = g_strconcat("<", message_id, ">", NULL);
-    if (headers && headers->from) {
-        gchar recvtime[50];
-
-        ctime_r(&headers->date, recvtime);
-        if (recvtime[0]) /* safety check; remove trailing '\n' */
-            recvtime[strlen(recvtime)-1] = '\0';
-        bsmsg->in_reply_to =
-            g_strconcat(tmp, " (from ",
-                        libbalsa_address_get_mailbox_from_list
-                        (headers->from),
-                        " on ", recvtime, ")", NULL);
-        g_free(tmp);
-    } else
-        bsmsg->in_reply_to = tmp;
+    if (message_id != NULL) {
+        if (message_id[0] == '<') {
+            bsmsg->in_reply_to = g_strdup(message_id);
+        } else {
+            bsmsg->in_reply_to = g_strconcat("<", message_id, ">", NULL);
+        }
+    }
 }
 
 static void
@@ -7065,8 +7050,7 @@ sendmsg_window_reply(LibBalsaMailbox * mailbox, guint msgno,
     set_to(bsmsg, headers);
 
     message_id = libbalsa_message_get_message_id(message);
-    if (message_id != NULL)
-        set_in_reply_to(bsmsg, message_id, headers);
+    set_in_reply_to(bsmsg, message_id);
     if (reply_type == SEND_REPLY_ALL)
         set_cc_from_all_recipients(bsmsg, headers);
 
@@ -7113,8 +7097,7 @@ sendmsg_window_reply_embedded(LibBalsaMessageBody *part,
             libbalsa_message_header_get_one(part->embhdrs, "In-Reply-To");
         GList *references =
             libbalsa_message_header_get_all(part->embhdrs, "References");
-        if (message_id)
-            set_in_reply_to(bsmsg, message_id, headers);
+        set_in_reply_to(bsmsg, message_id);
         set_references_reply(bsmsg, references,
                              in_reply_to, message_id);
         fill_body_from_part(bsmsg, part->embhdrs, message_id, references,

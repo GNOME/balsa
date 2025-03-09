@@ -1919,39 +1919,6 @@ libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
     return retval;
 }
 
-guint
-libbalsa_mailbox_add_messages(LibBalsaMailbox * mailbox,
-			      LibBalsaAddMessageIterator iterator,
-			      void *arg,
-			      GError ** err)
-{
-    guint retval;
-
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-
-    libbalsa_lock_mailbox(mailbox);
-
-    retval =
-        LIBBALSA_MAILBOX_GET_CLASS(mailbox)->add_messages(mailbox, 
-							  iterator, arg,
-							  err);
-
-    if (retval) {
-#ifdef FIXED
-	/* this is something that should be returned/taken care of by
-	   add_messages? */
-        if (!(flags & LIBBALSA_MESSAGE_FLAG_DELETED)
-            && (flags & LIBBALSA_MESSAGE_FLAG_NEW))
-            libbalsa_mailbox_set_unread_messages_flag(mailbox, TRUE);
-#endif
-        lbm_queue_check(mailbox);
-    }
-
-    libbalsa_unlock_mailbox(mailbox);
-
-    return retval;
-}
-
 gboolean
 libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox)
 {

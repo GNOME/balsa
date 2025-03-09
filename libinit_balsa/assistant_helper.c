@@ -137,25 +137,6 @@ balsa_option_get_active(GtkWidget *option_widget)
     return gtk_combo_box_get_active(GTK_COMBO_BOX(option_widget));
 }
 
-void
-balsa_init_add_grid_checkbox(GtkGrid *grid, guint num,
-                             const gchar *ltext, gboolean defval,
-                             GtkAssistant *druid, GtkWidget **dest)
-{
-    GtkWidget *l;
-
-    l = gtk_label_new_with_mnemonic(ltext);
-    gtk_label_set_justify(GTK_LABEL(l), GTK_JUSTIFY_RIGHT);
-    gtk_widget_set_halign(l, GTK_ALIGN_END);
-    gtk_grid_attach(grid, l, 0, num + 1, 1, 1);
-
-    *dest = gtk_check_button_new();
-    gtk_grid_attach(grid, *dest, 1, num + 1, 1, 1);
-    if(defval)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(*dest), TRUE);
-    gtk_label_set_mnemonic_widget(GTK_LABEL(l), *dest);
-}
-
 gboolean
 balsa_init_create_to_directory(const gchar * dir, gchar ** complaint)
 {

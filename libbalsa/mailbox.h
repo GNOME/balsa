@@ -390,11 +390,6 @@ gboolean libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
                                       LibBalsaMessageFlag flags,
                                       GError ** err);
 
-guint libbalsa_mailbox_add_messages(LibBalsaMailbox * mailbox,
-				    LibBalsaAddMessageIterator msg_iterator,
-				    void *arg,
-				    GError ** err);
-
 gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
 
 /* Message number-list methods */

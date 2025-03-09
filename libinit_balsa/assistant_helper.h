@@ -51,9 +51,6 @@ GtkWidget *balsa_init_add_grid_entry(GtkGrid * grid, guint num,
 void balsa_init_add_grid_option(GtkGrid *grid, guint num,
                                 const gchar *ltext, const gchar **optns,
                                 GtkAssistant *druid, GtkWidget **dest);
-void balsa_init_add_grid_checkbox(GtkGrid *grid, guint num,
-                                  const gchar *ltext, gboolean defval,
-                                  GtkAssistant *druid, GtkWidget **dest);
 gint balsa_option_get_active(GtkWidget *option_widget);
 
 gboolean balsa_init_create_to_directory(const gchar * dir,

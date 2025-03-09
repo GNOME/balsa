@@ -1176,15 +1176,3 @@ folder_conf_add_imap_sub_cb(GtkWidget * widget, gpointer data)
 	    gtk_widget_destroy(dialog);
 	}
 }
-
-void
-folder_conf_edit_imap_cb(GtkWidget * widget, gpointer data)
-{
-    folder_conf_imap_node(BALSA_MAILBOX_NODE(data));
-}
-
-void
-folder_conf_delete_cb(GtkWidget * widget, gpointer data)
-{
-    folder_conf_delete(BALSA_MAILBOX_NODE(data));
-}

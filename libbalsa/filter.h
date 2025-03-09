@@ -282,9 +282,4 @@ gboolean libbalsa_condition_is_flag_only(LibBalsaCondition * cond,
                                          LibBalsaMailbox * mailbox,
                                          guint msgno, gboolean * match);
 
-/* Compatibility */
-LibBalsaCondition *libbalsa_condition_new_2_0(const gchar *
-                                              filter_section_name,
-                                              ConditionMatchType cmt);
-
 #endif				/* __FILTER_H__ */

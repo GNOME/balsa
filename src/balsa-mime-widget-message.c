@@ -802,15 +802,6 @@ bmw_message_set_headers(BalsaMessage        * bm,
 }
 
 void
-balsa_mime_widget_message_set_headers(BalsaMessage        * bm,
-                                      BalsaMimeWidget     * mw,
-                                      LibBalsaMessageBody * part)
-{
-    bmw_message_set_headers(bm, mw, part,
-                            balsa_message_get_shown_headers(bm) == HEADERS_ALL);
-}
-
-void
 balsa_mime_widget_message_set_headers_d(BalsaMessage           * bm,
                                         BalsaMimeWidget        * mw,
                                         LibBalsaMessageHeaders * headers,

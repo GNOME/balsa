@@ -27,7 +27,5 @@ void folder_conf_imap_sub_node(BalsaMailboxNode *mn);
 /* callbacks used also by the main window menu */
 void folder_conf_add_imap_cb(GtkWidget * widget, gpointer data);
 void folder_conf_add_imap_sub_cb(GtkWidget * widget, gpointer data);
-void folder_conf_edit_imap_cb(GtkWidget * widget, gpointer data);
 void folder_conf_delete(BalsaMailboxNode* mbnode);
-void folder_conf_delete_cb(GtkWidget * widget, gpointer data);
 #endif				/* __FOLDER_CONF_H__ */

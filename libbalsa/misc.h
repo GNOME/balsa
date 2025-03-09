@@ -151,8 +151,6 @@ void libbalsa_assure_balsa_dir(void);
 gchar *libbalsa_guess_ldap_base(void);
 gchar *libbalsa_guess_ldap_name(void);
 
-gboolean libbalsa_ldap_exists(const gchar *server);
-
 gboolean libbalsa_path_is_below_dir(const gchar * path, const gchar * dir);
 
 gchar *libbalsa_size_to_gchar(guint64 length);

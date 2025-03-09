@@ -133,9 +133,7 @@ LibBalsaMessageStatus libbalsa_get_icon_from_flags(LibBalsaMessageFlag flags);
 
 gboolean libbalsa_is_cert_known(GTlsCertificate      *cert,
 								GTlsCertificateFlags  errors);
-void libbalsa_certs_destroy(void);
 
-GThread *libbalsa_get_main_thread(void);
 gboolean libbalsa_am_i_subthread(void);
 
 typedef enum {

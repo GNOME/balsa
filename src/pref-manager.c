@@ -202,18 +202,6 @@ struct pm_combo_box_info {
 static void properties_modified_cb(GtkWidget * widget, GtkWidget * pbox);
 static void address_book_change(LibBalsaAddressBook * address_book, gboolean append);
 
-guint pwindow_type[NUM_PWINDOW_MODES] = {
-    WHILERETR,
-    UNTILCLOSED,
-    NEVER
-};
-
-gchar *pwindow_type_label[NUM_PWINDOW_MODES] = {
-    N_("While retrieving messages"),
-    N_("Until closed"),
-    N_("Never")
-};
-
     /* These labels must match the LibBalsaMailboxSortFields enum. */
 const gchar *sort_field_label[] = {
     N_("Message number"),
@@ -221,12 +209,6 @@ const gchar *sort_field_label[] = {
     N_("Date"),
     N_("Size"),
     N_("Sender")
-};
-
-const gchar *threading_type_label[NUM_THREADING_STYLES] = {
-    N_("Flat"),
-    N_("Simple"),
-    N_("JWZ")
 };
 
 /* combo boxes */

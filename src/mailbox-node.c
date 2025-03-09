@@ -636,12 +636,6 @@ balsa_mailbox_node_append_subtree(BalsaMailboxNode * mn)
     }
 }
 
-void
-balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data)
-{
-    balsa_mailbox_node_show_prop_dialog((BalsaMailboxNode*)data);
-}
-
 /* balsa_mailbox_node_load_config:
    load general configurtion: name ordering, threading option etc
    with some sane defaults.

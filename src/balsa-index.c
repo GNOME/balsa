@@ -1777,14 +1777,6 @@ balsa_message_forward_inline(gpointer user_data)
     bndx_compose_from_list(BALSA_INDEX(user_data), SEND_FORWARD_INLINE);
 }
 
-void
-balsa_message_forward_default(gpointer user_data)
-{
-    bndx_compose_from_list(BALSA_INDEX(user_data),
-                           balsa_app.forward_attached ?
-                           SEND_FORWARD_ATTACH : SEND_FORWARD_INLINE);
-}
-
 /*
  * bndx_do_delete: helper for message delete methods
  */

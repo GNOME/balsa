@@ -94,7 +94,6 @@ G_DECLARE_FINAL_TYPE(BalsaIndex, balsa_index, BALSA, INDEX, GtkTreeView)
     void balsa_message_forward_attached(gpointer data);
     void balsa_message_forward_inline(gpointer data);
     void balsa_message_forward_quoted(gpointer data);
-    void balsa_message_forward_default(gpointer data);
     void balsa_message_continue(gpointer data);
 
     void balsa_message_move_to_trash(gpointer user_data);

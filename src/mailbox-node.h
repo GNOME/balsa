@@ -63,7 +63,6 @@ void balsa_mailbox_node_show_prop_dialog(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_append_subtree(BalsaMailboxNode * mbnode);
 void balsa_mailbox_node_load_config(BalsaMailboxNode* mn, const gchar* prefix);
 void balsa_mailbox_node_save_config(BalsaMailboxNode* mn, const gchar* prefix);
-void balsa_mailbox_node_show_prop_dialog_cb(GtkWidget * widget, gpointer data);
 
 /* applicable only to local mailboxes (mailbox collections) */
 void balsa_mailbox_local_append(LibBalsaMailbox* mbx);

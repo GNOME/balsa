@@ -96,49 +96,6 @@ libbalsa_init(void)
 }
 
 
-/* libbalsa_guess_email_address:
-   Email address can be determined in four ways:
-   1. Using the environment variable 'EMAIL'
-
-   2. The file '/etc/mailname' should contain the external host
-      address for the host. Prepend the username (`username`@`cat
-      /etc/mailname`).
-
-   3. Append the domainname to the user name.
-   4. Append the hostname to the user name.
-
-*/
-gchar*
-libbalsa_guess_email_address(void)
-{
-    /* Q: Find this location with configure? or at run-time? */
-    static const gchar* MAILNAME_FILE = "/etc/mailname";
-    gchar* preset, *domain;
-    gchar *mailname;
-
-    if(g_getenv("EMAIL") != NULL){                  /* 1. */
-        preset = g_strdup(g_getenv("EMAIL"));
-    } else if (g_file_get_contents(MAILNAME_FILE, &mailname, NULL, NULL)) { /* 2. */
-    	gchar *newline;
-
-    	newline = strchr(mailname, '\n');
-    	if (newline != NULL) {
-    		newline[0] = '\0';
-    	}
-        preset = g_strconcat(g_get_user_name(), "@", mailname, NULL);
-        g_free(mailname);
-    }else if((domain = libbalsa_get_domainname())){ /* 3. */
-        preset = g_strconcat(g_get_user_name(), "@", domain, NULL);
-        g_free(domain);    
-    } else {                                        /* 4. */
-        char hostbuf[512];
-
-        gethostname(hostbuf, 511);
-        preset = g_strconcat(g_get_user_name(), "@", hostbuf, NULL);
-    }
-    return preset;
-}
-
 /* libbalsa_guess_mail_spool
 
    Returns an allocated gchar * with our best guess of the user's
@@ -180,21 +137,6 @@ libbalsa_guess_mail_spool(void)
     return g_strconcat(g_get_home_dir(), "/mailbox", NULL);
 }
 
-
-gboolean libbalsa_ldap_exists(const gchar *server)
-{
-#if ENABLE_LDAP
-    LDAP *ldap;
-    ldap_initialize(&ldap, server);
-
-    if(ldap) {
-	ldap_unbind_ext(ldap, NULL, NULL);
-	return TRUE;
-    }
-#endif /* #if ENABLE_LDAP */
-
-    return FALSE;
-}
 
 gchar*
 libbalsa_date_to_utf8(const time_t date, const gchar *date_string)
@@ -297,15 +239,6 @@ static int libbalsa_ask_for_cert_acceptance(GTlsCertificate      *cert,
 
 static GList *accepted_certs = NULL; /* GTlsCertificate items accepted for this session */
 static GMutex certificate_lock;
-
-void
-libbalsa_certs_destroy(void)
-{
-	g_mutex_lock(&certificate_lock);
-    g_list_free_full(accepted_certs, g_object_unref);
-    accepted_certs = NULL;
-    g_mutex_unlock(&certificate_lock);
-}
 
 
 #define CERT_ACCEPT_NO			0
@@ -487,12 +420,6 @@ libbalsa_ask_for_cert_acceptance(GTlsCertificate      *cert,
     return libbalsa_ask(ask_cert_real, &acd);
 }
 
-
-GThread *
-libbalsa_get_main_thread(void)
-{
-    return main_thread_id;
-}
 
 gboolean
 libbalsa_am_i_subthread(void)

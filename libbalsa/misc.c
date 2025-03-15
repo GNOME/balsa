@@ -1001,7 +1001,7 @@ on_view_pwd_icon_press(GtkWidget *widget, gpointer data)
 
 	gtk_entry_set_visibility(GTK_ENTRY(widget), !visible);
 	gtk_entry_set_icon_from_icon_name(GTK_ENTRY(widget), GTK_ENTRY_ICON_SECONDARY,
-		visible ? "view-reveal-symbolic.symbolic" : "view-conceal-symbolic.symbolic");
+		visible ? "view-reveal-symbolic" : "view-conceal-symbolic");
 }
 
 void
@@ -1011,7 +1011,7 @@ libbalsa_entry_config_passwd(GtkEntry *entry)
 
 	gtk_entry_set_visibility(entry, FALSE);
 	g_object_set(entry, "input-purpose", GTK_INPUT_PURPOSE_PASSWORD, NULL);
-	gtk_entry_set_icon_from_icon_name(entry, GTK_ENTRY_ICON_SECONDARY, "view-reveal-symbolic.symbolic");
+	gtk_entry_set_icon_from_icon_name(entry, GTK_ENTRY_ICON_SECONDARY, "view-reveal-symbolic");
 	gtk_entry_set_icon_activatable(entry, GTK_ENTRY_ICON_SECONDARY, TRUE);
 	g_signal_connect(entry, "icon-press", G_CALLBACK (on_view_pwd_icon_press), NULL);
 }

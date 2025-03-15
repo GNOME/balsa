@@ -45,7 +45,6 @@ static void balsa_druid_page_user_next(GtkAssistant * druid,
                                        GtkWidget * page,
                                        BalsaDruidPageUser * user);
 
-
 static void
 balsa_druid_page_user_init(BalsaDruidPageUser * user,
                            GtkWidget * page,
@@ -69,13 +68,15 @@ balsa_druid_page_user_init(BalsaDruidPageUser * user,
     user->ed2.controller = &(user->econtroller);
     label = GTK_LABEL(gtk_label_new(_(header2)));
     gtk_label_set_line_wrap(label, TRUE);
-    gtk_widget_set_vexpand(GTK_WIDGET(label), TRUE);
-    gtk_widget_set_valign(GTK_WIDGET(label), GTK_ALIGN_FILL);
+    gtk_widget_set_hexpand(GTK_WIDGET(label), TRUE);
+    gtk_widget_set_valign(GTK_WIDGET(label), GTK_ALIGN_START);
+    gtk_widget_set_margin_bottom(GTK_WIDGET(label), 12);
     gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(label));
 
     grid = GTK_GRID(gtk_grid_new());
     gtk_grid_set_row_spacing(grid, 2);
     gtk_grid_set_column_spacing(grid, 5);
+    gtk_widget_set_valign(GTK_WIDGET(grid), GTK_ALIGN_START);
 
     /* 2.1 */
     balsa_init_add_grid_entry(grid, row++, _("Your real _name:"),

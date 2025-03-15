@@ -131,8 +131,6 @@ libbalsa_a_SOURCES = 		\
 	system-tray.c		\
 	system-tray.h		\
 	source-viewer.c		\
-	url.c			\
-	url.h			\
 	geometry-manager.c	\
 	geometry-manager.h	\
 	x509-cert-widget.c	\

@@ -82,6 +82,8 @@ balsa_druid_page_server_init(BalsaDruidPageServer *server, GtkWidget *page, GtkA
 
 	label = GTK_LABEL(gtk_label_new(_(header)));
 	gtk_label_set_line_wrap(label, TRUE);
+	gtk_widget_set_hexpand(GTK_WIDGET(label), TRUE);
+	gtk_widget_set_margin_bottom(GTK_WIDGET(label), 12);
 	gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(label));
 
 	grid = GTK_GRID(gtk_grid_new());
@@ -103,7 +105,7 @@ balsa_druid_page_server_init(BalsaDruidPageServer *server, GtkWidget *page, GtkA
 	balsa_init_add_grid_entry(grid, row++, _("Your _password:"),
 		"",
 		NULL, druid, page, &(server->passwd));
-	gtk_entry_set_visibility(GTK_ENTRY(server->passwd), FALSE);
+	libbalsa_entry_config_passwd(GTK_ENTRY(server->passwd));
 	/* separator line here */
 
 	preset = "localhost:25";

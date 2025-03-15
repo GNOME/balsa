@@ -122,10 +122,7 @@ gchar *libbalsa_guess_email_address(void);
 gchar *libbalsa_guess_mail_spool(void);
 gboolean libbalsa_is_sending_mail(void);
 
-gchar *libbalsa_guess_imap_server(void);
 gchar *libbalsa_guess_ldap_server(void);
-
-gchar *libbalsa_guess_imap_inbox(void);
 
 
 gchar* libbalsa_date_to_utf8(time_t date, const gchar *date_string);

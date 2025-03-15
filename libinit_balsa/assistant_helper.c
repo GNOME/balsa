@@ -23,16 +23,13 @@
 #include "assistant_helper.h"
 
 #include <errno.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
 #include <gtk/gtk.h>
 
 #include <glib/gi18n.h>
 #include "libbalsa.h"
-#include "url.h"
 
 /*
  * #ifdef BALSA_LOCAL_INSTALL
@@ -48,7 +45,7 @@ static void entry_changed_cb(GtkEntry * entry, EntryData * ed);
 /* ************************************************************************** */
 
 GtkWidget *
-balsa_init_add_grid_entry(GtkGrid * grid, guint num, const gchar * ltext,
+balsa_init_add_grid_entry(GtkGrid * grid, gint num, const gchar * ltext,
                           const gchar * etext, EntryData * ed,
                           GtkAssistant * druid, GtkWidget *page,
                           GtkWidget ** dest)
@@ -63,7 +60,6 @@ balsa_init_add_grid_entry(GtkGrid * grid, guint num, const gchar * ltext,
     e = gtk_entry_new();
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), e);
     gtk_widget_set_hexpand(e, TRUE);
-    gtk_widget_set_vexpand(e, TRUE);
     gtk_grid_attach(grid, e, 1, num + 1, 1, 1);
     (*dest) = e;
     if(ed) {
@@ -110,7 +106,7 @@ entry_changed_cb(GtkEntry * entry, EntryData * ed)
 
 
 void
-balsa_init_add_grid_option(GtkGrid *grid, guint num,
+balsa_init_add_grid_option(GtkGrid *grid, gint num,
                             const gchar *ltext, const gchar **optns,
                             GtkAssistant *druid, GtkWidget **dest)
 {
@@ -127,7 +123,6 @@ balsa_init_add_grid_option(GtkGrid *grid, guint num,
     gtk_label_set_mnemonic_widget(GTK_LABEL(l), om);
     gtk_combo_box_set_active(GTK_COMBO_BOX(om), 0);
     gtk_widget_set_hexpand(om, TRUE);
-    gtk_widget_set_vexpand(om, TRUE);
     gtk_grid_attach(grid, om, 1, num + 1, 1, 1);
 }
 
@@ -140,19 +135,7 @@ balsa_option_get_active(GtkWidget *option_widget)
 gboolean
 balsa_init_create_to_directory(const gchar * dir, gchar ** complaint)
 {
-    /* Security. Well, we could create some weird directories, but
-       a) that's not very destructive and b) unless we have root
-       privileges (which would be so, so, wrong) we can't do any
-       damage. */
-    struct stat sb;
-    gchar *sofar;
-    guint32 i;
-    url_scheme_t scheme = url_check_scheme(dir);
-
-    if (scheme == U_IMAP || scheme == U_POP)
-        return FALSE;           /* *** For now */
-
-    if (dir[0] != '/') {
+    if (!g_path_is_absolute(dir)) {
         (*complaint) =
             g_strdup_printf(_
                             ("The path %s must be relative to the filesystem root (start with /)."),
@@ -160,50 +143,9 @@ balsa_init_create_to_directory(const gchar * dir, gchar ** complaint)
         return TRUE;
     }
 
-    for (i = 1; dir[i] != '\0'; i++) {
-        if (dir[i] == '/') {
-            sofar = g_strndup(dir, i);
-
-            if (stat(sofar, &sb) < 0) {
-                if (mkdir(sofar, S_IRUSR | S_IWUSR | S_IXUSR) < 0) {
-                    (*complaint) =
-                        g_strdup_printf(_("Couldn’t create a directory:"
-                                          " mkdir() failed on pathname “%s”,"
-                                          " with error “%s”."),
-                                        sofar, g_strerror(errno));
-                    g_free(sofar);
-                    return TRUE;
-                }
-            }
-
-            if (!S_ISDIR(sb.st_mode)) {
-                (*complaint) =
-                    g_strdup_printf(_
-                                    ("The file with pathname “%s” is not a directory."),
-                                    sofar);
-                g_free(sofar);
-                return TRUE;
-            }
-
-            g_free(sofar);
-        }
-    }
-
-    if (stat(dir, &sb) < 0) {
-        if (mkdir(dir, S_IRUSR | S_IWUSR | S_IXUSR) < 0) {
-            (*complaint) =
-                g_strdup_printf(_
-                                ("Couldn’t create a directory: mkdir() failed on pathname “%s”."),
-                                dir);
-            return TRUE;
-        }
-    }
-
-    if (!S_ISDIR(sb.st_mode)) {
-        (*complaint) =
-            g_strdup_printf(_
-                            ("The file with pathname “%s” is not a directory."),
-                            dir);
+    if (g_mkdir_with_parents(dir, S_IRWXU) == -1) {
+        (*complaint) = g_strdup_printf(_("Couldn’t create a directory “%s”: %s"), dir,
+            g_strerror(errno));
         return TRUE;
     }
 

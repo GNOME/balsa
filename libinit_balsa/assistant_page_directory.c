@@ -36,7 +36,6 @@
 #include "save-restore.h"
 #include "misc.h"
 #include "server.h"
-#include "url.h"
 
 #define INBOX_NAME    "Inbox"
 #define OUTBOX_NAME   "Outbox"
@@ -66,105 +65,26 @@ static void
 unconditional_mailbox(const gchar * path, const gchar * prettyname,
                       LibBalsaMailbox ** box, gchar ** error)
 {
-    gchar *dup;
-    gchar *index;
-    ciss_url_t url;
-    gboolean ssl = FALSE, is_remote = FALSE;
+    gchar *folder;
 
     if ((*error) != NULL)
         return;
 
-    dup = g_strdup(path);
-    index = strrchr(dup, G_DIR_SEPARATOR);
-
-    if (index == NULL) {
-        (*error) =
-            g_strdup_printf(_
-                            ("The pathname “%s” must be specified"
-                             " canonically — it must start with a “/”."),
-                            dup);
-        g_free(dup);
-        return;
-    }
-
-    *index = '\0';           /*Split off the dirs from the file. */
-
-    if (balsa_init_create_to_directory(dup, error)) {
+    folder = g_path_get_dirname(path);
+    if (balsa_init_create_to_directory(folder, error)) {
         /*TRUE->error */
-        g_free(dup);
+        g_free(folder);
         return;
     }
+    g_free(folder);
 
-    *index = G_DIR_SEPARATOR;
-
-    url_parse_ciss(&url, dup);
-
-    switch (url.scheme) {
-    case U_IMAPS:
-        ssl = TRUE;
-    case U_IMAP:
-        *box = libbalsa_mailbox_imap_new();
-        libbalsa_mailbox_imap_set_path((LibBalsaMailboxImap *) * box,
-                                       url.path);
-        is_remote = TRUE;
-        break;
-    case U_POPS:
-        ssl = TRUE;
-    case U_POP:
-        *box = (LibBalsaMailbox *) libbalsa_mailbox_pop3_new();
-        is_remote = TRUE;
-        break;
-    case U_FILE:
-        *box = libbalsa_mailbox_local_new(url.path, TRUE);
-        break;
-    default:
-        *box = libbalsa_mailbox_local_new(path, TRUE);
-        if (!*box) {
-            *error = g_strdup_printf(_("Could not create mailbox"
-                                       " at path “%s”\n"), path);
-            g_free(dup);
-            return;
-        }
-    }
-
-    if (is_remote) {
-        libbalsa_server_set_host(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(*box),
-                                 url.host,
-                                 ssl ? NET_CLIENT_CRYPT_ENCRYPTED :
-                                       NET_CLIENT_CRYPT_NONE);
-        libbalsa_server_set_username(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(*box),
-                                     getenv("USER"));
-    }
-    g_free(dup);
-
-
+    *box = libbalsa_mailbox_local_new(path, TRUE);
     if (*box == NULL) {
-        if (strcmp("/var/spool/mail/", path)) {
-            char tmp[32] = "/tmp/balsa.XXXXXX";
-
-	    /* Don't fail if you can't create the spool mailbox. */
-	    close(mkstemp(tmp));
-            *box = libbalsa_mailbox_local_new(tmp, FALSE);
-            if (*box != NULL) {
-                gchar *mailbox_url;
-
-                mailbox_url = g_strdup_printf("file://%s", path);
-                libbalsa_mailbox_set_url(*box, mailbox_url);
-                g_free(mailbox_url);
-            }
-            unlink(tmp);
-	}
-    }
-    if ( *box == NULL) {
-            (*error) =
-                g_strdup_printf(_
-                                ("The mailbox “%s” does not appear to be valid."),
-                                path);
+        *error = g_strdup_printf(_("Could not create mailbox at path “%s”."), path);
         return;
     }
 
     libbalsa_mailbox_set_name(*box, gettext(prettyname));
-
     config_mailbox_add(*box, (char *) prettyname);
     if (box == &balsa_app.outbox)
         libbalsa_mailbox_set_no_reassemble(*box, TRUE);
@@ -248,10 +168,8 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
 {
     GtkGrid *grid;
     GtkWidget *label_widget;
-    GtkLabel *label;
     int i;
     GtkWidget **init_widgets[NUM_EDs];
-    gchar *imap_inbox = libbalsa_guess_imap_inbox();
     gchar *init_presets[NUM_EDs] = { NULL, NULL, NULL, NULL, NULL };
 
     dir->druid = druid;
@@ -263,20 +181,14 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
     label_widget = gtk_label_new(_("Please verify the locations "
                                    "of your default mail files. "
                                    "These will be created if necessary."));
-    label = GTK_LABEL(label_widget);
-    gtk_label_set_justify(label, GTK_JUSTIFY_RIGHT);
-    gtk_label_set_line_wrap(label, TRUE);
+    gtk_label_set_line_wrap(GTK_LABEL(label_widget), TRUE);
     gtk_widget_set_hexpand(label_widget, TRUE);
-    gtk_widget_set_vexpand(label_widget, TRUE);
+    gtk_widget_set_vexpand(label_widget, FALSE);
+    gtk_widget_set_margin_bottom(label_widget, 12);
 
-    gtk_grid_attach(grid, GTK_WIDGET(label), 0, 0, 2, 1);
+    gtk_grid_attach(grid, label_widget, 0, 0, 2, 1);
 
-    if (0 /* FIXME: libbalsa_mailbox_exists(imap_inbox) */ )
-        init_presets[INBOX] = imap_inbox;
-    else {
-        g_free(imap_inbox);
-        init_presets[INBOX] = libbalsa_guess_mail_spool();
-    }
+    init_presets[INBOX] = libbalsa_guess_mail_spool();
 
     init_widgets[INBOX] = &(dir->inbox);
     init_widgets[OUTBOX] = &(dir->outbox);
@@ -302,7 +214,7 @@ balsa_druid_page_directory_init(BalsaDruidPageDirectory * dir,
         g_free(preset);
     }
 
-    gtk_widget_set_vexpand(GTK_WIDGET(grid), TRUE);
+    gtk_widget_set_vexpand(GTK_WIDGET(grid), FALSE);
     gtk_widget_set_valign(GTK_WIDGET(grid), GTK_ALIGN_FILL);
     gtk_container_add(GTK_CONTAINER(page), GTK_WIDGET(grid));
     gtk_widget_show_all(GTK_WIDGET(grid));

@@ -43,12 +43,12 @@ struct EntryController_s {
 #define ENTRY_CONTROLLER_INIT { 0, 0, 0 }
 #define ENTRY_CONTROLLER_DONE( e ) ( ((e)->setbits & (e)->donemask) == (e)->donemask )
 
-GtkWidget *balsa_init_add_grid_entry(GtkGrid * grid, guint num,
+GtkWidget *balsa_init_add_grid_entry(GtkGrid * grid, gint num,
                                      const gchar * ltext,
                                      const gchar * etext, EntryData * ed,
                                      GtkAssistant * druid,
                                      GtkWidget * page, GtkWidget ** dest);
-void balsa_init_add_grid_option(GtkGrid *grid, guint num,
+void balsa_init_add_grid_option(GtkGrid *grid, gint num,
                                 const gchar *ltext, const gchar **optns,
                                 GtkAssistant *druid, GtkWidget **dest);
 gint balsa_option_get_active(GtkWidget *option_widget);

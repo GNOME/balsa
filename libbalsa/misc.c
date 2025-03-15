@@ -1046,29 +1046,9 @@ qualified_hostname(const char *name)
 }
 
 
-gchar *libbalsa_guess_imap_server()
-{
-    return qualified_hostname(IMAP_SERVER);
-}
-
 gchar *libbalsa_guess_ldap_server()
 {
     return qualified_hostname(LDAP_SERVER);
-}
-
-gchar *libbalsa_guess_imap_inbox()
-{
-    gchar *server = libbalsa_guess_imap_server();
-
-    if(server) {
-	gchar *url = g_strdup_printf("imap://%s/INBOX", server);
-	
-	g_free(server);
-
-	return url;
-    }
-
-    return NULL;
 }
 
 gchar *libbalsa_guess_ldap_base()

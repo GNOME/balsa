@@ -128,8 +128,6 @@ libbalsa_a_sources = [
   'source-viewer.c',
   'system-tray.c',
   'system-tray.h',
-  'url.c',
-  'url.h',
   'geometry-manager.c',
   'geometry-manager.h',
   'x509-cert-widget.c',

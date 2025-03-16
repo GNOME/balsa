@@ -93,6 +93,7 @@ balsa_print_object_header_new_real(GList * list,
 				   GtkPrintContext * context,
 				   LibBalsaMessageBody * sig_body,
 				   LibBalsaMessageHeaders * headers,
+				   LibBalsaDkim *dkim,
 				   const gchar * the_subject,
 				   BalsaPrintSetup * psetup,
 				   gboolean print_all_headers)
@@ -212,6 +213,10 @@ balsa_print_object_header_new_real(GList * list,
     	    g_string_append_printf(header_buf, "%s\n", info_str);
     	    g_free(info_str);
     	}
+
+        if ((balsa_app.enable_dkim_checks != 0) && (libbalsa_dkim_status_code(dkim) >= DKIM_SUCCESS)) {
+        	g_string_append_printf(header_buf, "%s\n", libbalsa_dkim_status_str_short(dkim));
+        }
     }
 
     /* strip the trailing '\n' */
@@ -302,6 +307,7 @@ balsa_print_object_header_from_message(GList *list,
     return balsa_print_object_header_new_real(list, context,
 					      libbalsa_message_get_body_list(message),
 					      libbalsa_message_get_headers(message),
+						  libbalsa_message_get_body_list(message)->dkim,
                                               subject, psetup, FALSE);
 }
 
@@ -313,7 +319,7 @@ balsa_print_object_header_from_body(GList *list,
 				    BalsaPrintSetup * psetup)
 {
     return balsa_print_object_header_new_real(list, context, body->parts,
-					      body->embhdrs,
+					      body->embhdrs, body->dkim,
 					      body->embhdrs->subject,
 					      psetup,
 					      body->body_type == LIBBALSA_MESSAGE_BODY_TYPE_TEXT);

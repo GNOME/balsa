@@ -213,7 +213,7 @@ In the unlikely case of a desktop environment which does not provide any usable
 Secret Service D-Bus service, using the config file can be enforced for Balsa
 binaries including `libsecret` support by setting the environment variable
 
-	`BALSA_DISABLE_LIBSECRET=1`.
+	BALSA_DISABLE_LIBSECRET=1
 
 
 ## Gtk+-3 Dialog Header Bars:
@@ -223,7 +223,7 @@ bars instead of the traditional action areas.  As this may look ugly when
 using other desktop environments than Gnome (e.g. XFCE), Balsa can be
 switched to the old style by defining the environment variable
 
-	`BALSA_DIALOG_HEADERBAR=0`
+	BALSA_DIALOG_HEADERBAR=0
 
 
 ## Help System:
@@ -296,6 +296,8 @@ following custom domains are implemented in Balsa:
 - send: message transmission
 - spell-check: internal spell checker
 - webdav: WebDAV (CardDAV) operation
+- dkim: DKIM/DMARC processing (enable DKIM/DMARC checks in 
+        *Preferences -> Settings -> Miscellaneous*).
 
 
 ## Reporting Bugs:

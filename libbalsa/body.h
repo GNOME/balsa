@@ -34,6 +34,7 @@
 
 #include "libbalsa-vfs.h"
 #include "gmime-gpgme-signature.h"
+#include "dkim.h"
 
 typedef enum _LibBalsaMessageBodyType LibBalsaMessageBodyType;
 
@@ -90,6 +91,7 @@ struct _LibBalsaMessageBody {
 
     gboolean was_encrypted;
     GMimeGpgmeSigstat* sig_info;  /* info about a pgp or S/MIME signature body */
+    LibBalsaDkim *dkim;           /* DKIM status, message body and embedded message/rfc822 parts only */
 
 #ifdef HAVE_HTML_WIDGET
     gboolean html_ext_loaded;	/* if external HTML content was loaded */

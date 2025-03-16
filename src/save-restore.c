@@ -1149,6 +1149,8 @@ config_global_load(void)
 	d_get_gint("EnableSystrayIcon", 0);
 #endif
 
+    balsa_app.enable_dkim_checks = d_get_gint("EnableDkimChecks", 0);
+
     libbalsa_conf_pop_group();
     
     /* Toolbars */
@@ -1538,6 +1540,8 @@ config_save(void)
 #ifdef ENABLE_SYSTRAY
     libbalsa_conf_set_int("EnableSystrayIcon", balsa_app.enable_systray_icon);
 #endif
+
+    libbalsa_conf_set_int("EnableDkimChecks", balsa_app.enable_dkim_checks);
 
     libbalsa_conf_pop_group();
 

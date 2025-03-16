@@ -36,6 +36,8 @@ libbalsa_a_SOURCES = 		\
 	body.h			\
 	completion.c            \
 	completion.h            \
+	dkim.c			\
+	dkim.h			\
 	files.c			\
 	files.h			\
 	filter-error.c		\

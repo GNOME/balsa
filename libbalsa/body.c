@@ -106,7 +106,9 @@ libbalsa_message_body_free(LibBalsaMessageBody * body)
 
     if (body->sig_info)
 	g_object_unref(body->sig_info);
-
+    if (body->dkim != NULL) {
+	g_object_unref(body->dkim);
+    }
     libbalsa_message_body_free(body->next);
     libbalsa_message_body_free(body->parts);
 

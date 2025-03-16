@@ -424,6 +424,8 @@ balsa_app_init(void)
     balsa_app.enable_systray_icon = 0;
 #endif
 
+    balsa_app.enable_dkim_checks = 0;
+
     /* Local and IMAP */
     balsa_app.local_scan_depth = 1;
     balsa_app.check_imap = 1;

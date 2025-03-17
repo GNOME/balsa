@@ -4,7 +4,7 @@ if HAVE_YELPTOOL
 
 HELP_ID      = balsa
 
-HELP_LINGUAS = cs de el es fr sl
+HELP_LINGUAS = cs de el es fr sl sv
 
 if BUILD_WITH_SPELL_CHECKER
 HELP_FILES   =	 						\
@@ -69,6 +69,7 @@ balsa_spell_extra_dist =
 endif
 
 EXTRA_DIST   = $(balsa_spell_extra_dist)	\
+	LINGUAS \
 	meson.build
 
 HELP_EXTRA   = balsa.entities

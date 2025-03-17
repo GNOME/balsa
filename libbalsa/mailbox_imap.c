@@ -180,6 +180,8 @@ static gboolean libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox *
 						    LibBalsaMailbox *
 						    dest,
                                                     GError **err);
+static void libbalsa_mailbox_imap_parse_set_headers(LibBalsaMessage *message,
+													const gchar     *header_str);
 
 static void server_host_settings_changed_cb(LibBalsaServer * server,
 					    LibBalsaMailbox * mailbox);
@@ -2051,7 +2053,7 @@ libbalsa_mailbox_imap_load_envelope(LibBalsaMailboxImap *mimap,
     lb_set_headers(libbalsa_message_get_headers(message), imsg->envelope, FALSE);
 
     if ((hdr = imsg->fetched_header_fields) && *hdr && *hdr != '\r')
-	libbalsa_message_set_headers_from_string(message, hdr);
+	libbalsa_mailbox_imap_parse_set_headers(message, hdr);
 
     libbalsa_message_set_length(message, imsg->rfc822size);
     envelope = imsg->envelope;
@@ -2197,9 +2199,11 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         filename = g_build_filename(pair[0], pair[1], NULL);
         g_strfreev(pair);
         fd = open(filename, O_RDONLY);
-        g_free(filename);
-        if (fd == -1)
+        if (fd == -1) {
+            g_debug("%s: loading MIME message from %s failed", __func__, filename);
+            g_free(filename);
             return FALSE;
+        }
 
         stream = g_mime_stream_fs_new(fd);
         fstream = g_mime_stream_filter_new(stream);
@@ -2217,6 +2221,13 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         mime_msg = g_mime_parser_construct_message(mime_parser, libbalsa_parser_options());
         g_object_unref(mime_parser);
 
+        if (mime_msg == NULL) {
+            g_debug("%s: parsing MIME message from %s failed", __func__, filename);
+            g_free(filename);
+            return FALSE;
+        }
+        g_debug("%s: loaded MIME message from %s", __func__, filename);
+        g_free(filename);
         libbalsa_message_set_mime_message(message, mime_msg);
     }
 
@@ -2238,6 +2249,30 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
     g_object_unref(mime_msg);
 
     return TRUE;
+}
+
+static void
+libbalsa_mailbox_imap_parse_set_headers(LibBalsaMessage *message,
+										const gchar     *header_str)
+{
+	GMimeMessage *mime_msg;
+	GMimeStream *stream;
+	GMimeParser *parser;
+
+	stream = g_mime_stream_mem_new_with_buffer(header_str, strlen(header_str));
+	parser = g_mime_parser_new_with_stream(stream);
+	mime_msg = g_mime_parser_construct_message(parser, libbalsa_parser_options());
+	g_object_unref(parser);
+	g_object_unref(stream);
+	if (mime_msg != NULL) {
+		LibBalsaMessageHeaders *headers = libbalsa_message_get_headers(message);
+
+		libbalsa_message_headers_from_gmime(headers, mime_msg);
+		headers->user_hdrs = libbalsa_message_user_hdrs_from_gmime(mime_msg);
+		g_object_unref(mime_msg);
+	} else {
+		g_debug("%s: parsing header data failed", __func__);
+	}
 }
 
 static gboolean
@@ -2286,7 +2321,7 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
     if(get_struct_from_cache(mailbox, message, flags))
         return TRUE;
 
-    if(flags & LB_FETCH_RFC822_HEADERS) ift |= IMFETCH_RFC822HEADERS_SELECTED;
+    if(flags & LB_FETCH_RFC822_HEADERS) ift |= IMFETCH_RFC822HEADERS;
     if(flags & LB_FETCH_STRUCTURE)      ift |= IMFETCH_BODYSTRUCT;
 
     II_mbx(rc, mimap->handle, mailbox,
@@ -2303,7 +2338,7 @@ libbalsa_mailbox_imap_fetch_structure(LibBalsaMailbox *mailbox,
         }
         if( (flags & LB_FETCH_RFC822_HEADERS) &&
             (hdr = im->fetched_header_fields) && *hdr && *hdr != '\r') {
-            libbalsa_message_set_headers_from_string(message, hdr);
+            libbalsa_mailbox_imap_parse_set_headers(message, hdr);
             libbalsa_message_set_has_all_headers(message, TRUE);
         }
         return TRUE;
@@ -2328,12 +2363,12 @@ libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
 
     II_mbx(rc,mimap->handle,mailbox,
        imap_mbox_handle_fetch_range(mimap->handle, msgno, msgno,
-                                    IMFETCH_RFC822HEADERS_SELECTED));
+                                    IMFETCH_RFC822HEADERS));
     if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
         const gchar *hdr;
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle, msgno);
         if ((hdr = im->fetched_header_fields) && *hdr && *hdr != '\r')
-            libbalsa_message_set_headers_from_string(message, hdr);
+            libbalsa_mailbox_imap_parse_set_headers(message, hdr);
     }
 }
 

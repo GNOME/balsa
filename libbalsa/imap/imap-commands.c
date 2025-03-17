@@ -983,7 +983,7 @@ ic_construct_header_list(const char **hdr, ImapFetchType ift)
     if(ift & IMFETCH_LIST_POST)    hdr[idx++] = "LIST-POST";
     hdr[idx++] = ")]";
   }
-  if(ift & IMFETCH_RFC822HEADERS) hdr[idx++] = "RFC822.HEADERS";
+  if(ift & IMFETCH_RFC822HEADERS) hdr[idx++] = "BODY.PEEK[HEADER]";
   if(ift & IMFETCH_RFC822HEADERS_SELECTED)
     hdr[idx++] = "BODY.PEEK[HEADER.FIELDS.NOT (DATE SUBJECT FROM SENDER "
       "REPLY-TO TO CC BCC IN-REPLY-TO MESSAGE-ID)]";
@@ -1169,6 +1169,7 @@ fetch_body_passthrough(unsigned seqno,
   }
 }
 
+/* note: this function is called by imap_tst.c *only* */
 ImapResponse
 imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
 			      unsigned cnt, unsigned *set,
@@ -1190,7 +1191,7 @@ imap_mbox_handle_fetch_rfc822(ImapMboxHandle* handle,
     gchar *cmd = g_strdup_printf("FETCH %s %s", seq,
 				 peek_only
 				 ? "(BODY.PEEK[HEADER] BODY.PEEK[TEXT])"
-				 : "RFC822");
+				 : "BODY[]");
     struct FetchBodyPassthroughData passthrough_data;
     passthrough_data.cb = fetch_cb;
     passthrough_data.arg = fetch_cb_data;
@@ -1325,7 +1326,7 @@ imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid,
   } else {
     handle->body_cb  = write_nstring;
     handle->body_arg = fl;
-    cmdstr = "UID FETCH %u RFC822";
+    cmdstr = "UID FETCH %u BODY[]";
   }
 
   snprintf(cmd, sizeof(cmd), cmdstr, uid);

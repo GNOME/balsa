@@ -272,8 +272,6 @@ GList *libbalsa_message_refs_for_threading(LibBalsaMessage* msg);
 void libbalsa_message_load_envelope_from_stream(LibBalsaMessage * message,
                                                 GMimeStream * stream);
 void libbalsa_message_load_envelope(LibBalsaMessage *message);
-gboolean libbalsa_message_set_headers_from_string(LibBalsaMessage *message,
-                                                  const gchar *str);
 void libbalsa_message_set_references_from_string(LibBalsaMessage * message,
 						 const gchar *str);
 void libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,

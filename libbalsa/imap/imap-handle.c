@@ -3875,13 +3875,13 @@ ir_body (NetClientSioBuf *sio, int c, ImapBody * body,
 
 /* read [section] and following string. FIXME: other kinds of body. */ 
 static ImapResponse
-ir_body_section(NetClientSioBuf *sio, unsigned seqno,
+ir_body_section(ImapMboxHandle *h, unsigned seqno,
 		ImapFetchBodyType body_type,
 		ImapFetchBodyInternalCb body_cb, void *arg)
 {
   char buf[80];
   GString *bs;
-  int i, c = imap_get_atom(sio, buf, sizeof(buf));
+  int i, c = imap_get_atom(h->sio, buf, sizeof(buf));
 
   for(i=0; buf[i] && (isdigit((int)buf[i]) || buf[i] == '.'); i++)
     ;
@@ -3889,11 +3889,21 @@ ir_body_section(NetClientSioBuf *sio, unsigned seqno,
     body_type = IMAP_BODY_TYPE_HEADER;
 
   if(c != ']') { g_debug("] expected"); return IMR_PROTOCOL; }
-  if(sio_getc(sio) != ' ') { g_debug("space expected"); return IMR_PROTOCOL;}
-  bs = imap_get_binary_string(sio);
+  if(sio_getc(h->sio) != ' ') { g_debug("space expected"); return IMR_PROTOCOL;}
+  bs = imap_get_binary_string(h->sio);
   if(bs) {
-    if(bs->str && body_cb)
-      body_cb(seqno, body_type, bs->str, bs->len, arg);
+    if (bs->str != NULL) {
+      if (body_cb != NULL) {
+        body_cb(seqno, body_type, bs->str, bs->len, arg);
+      } else if (body_type == IMAP_BODY_TYPE_HEADER) {
+        ImapMessage *msg;
+
+        CREATE_IMSG_IF_NEEDED(h, seqno);
+        msg = h->msg_cache[seqno-1];
+        g_free(msg->fetched_header_fields);
+        msg->fetched_header_fields = g_strdup(bs->str);
+      }
+    }
     g_string_free(bs, TRUE);
   }
   return IMR_OK;
@@ -3944,7 +3954,7 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
     c = sio_getc (h->sio);
     sio_ungetc (h->sio);
     if(isdigit (c)) {
-      rc = ir_body_section(h->sio, seqno, IMAP_BODY_TYPE_BODY,
+      rc = ir_body_section(h, seqno, IMAP_BODY_TYPE_BODY,
 			   h->body_cb, h->body_arg);
       break;
     }
@@ -3956,7 +3966,7 @@ ir_msg_att_body(ImapMboxHandle *h, int c, unsigned seqno)
 	(g_ascii_strcasecmp(buf, "TEXT") == 0)
 	? IMAP_BODY_TYPE_TEXT : IMAP_BODY_TYPE_HEADER;
       sio_ungetc (h->sio); /* put the ']' back */
-      rc = ir_body_section(h->sio, seqno, body_type, h->body_cb, h->body_arg);
+      rc = ir_body_section(h, seqno, body_type, h->body_cb, h->body_arg);
     } else {
       if (c == ' ' && 
           (g_ascii_strcasecmp(buf, "HEADER.FIELDS") == 0 ||
@@ -4019,7 +4029,7 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
     { "FLAGS",         ir_msg_att_flags },
     { "ENVELOPE",      ir_msg_att_envelope },
     { "INTERNALDATE",  ir_msg_att_internaldate }, 
-    { "RFC822",        ir_msg_att_rfc822 },     
+    { "BODY[]",        ir_msg_att_rfc822 },
     { "RFC822.HEADER", ir_msg_att_rfc822_header }, 
     { "RFC822.TEXT",   ir_msg_att_rfc822_text }, 
     { "RFC822.SIZE",   ir_msg_att_rfc822_size }, 
@@ -4049,6 +4059,17 @@ ir_fetch_seq(ImapMboxHandle *h, unsigned seqno)
       atom[i] = c;
     }
     atom[i] = '\0';
+    /* special case to work around #94: check for 'BODY[]' */
+    if ((strcmp(atom, "BODY") == 0) && (c == '[')) {
+      if (sio_getc(h->sio) == ']') {
+        atom[i++] = '[';
+        atom[i++] = ']';
+        atom[i] = '\0';
+        c = sio_getc(h->sio);
+      } else {
+        sio_ungetc(h->sio);
+      }
+    }
     for(i=0; i<G_N_ELEMENTS(msg_att); i++) {
       if(g_ascii_strcasecmp(atom, msg_att[i].name) == 0) {
         if( (rc=msg_att[i].handler(h, c, seqno)) != IMR_OK)

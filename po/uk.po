@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa 2.0.16\n"
 "Report-Msgid-Bugs-To: http://pawsa.fedorapeople.org/balsa/bugs.html\n"
-"POT-Creation-Date: 2025-03-16 17:57+0000\n"
-"PO-Revision-Date: 2025-03-16 22:44+0200\n"
+"POT-Creation-Date: 2025-03-17 17:48+0000\n"
+"PO-Revision-Date: 2025-03-17 22:28+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -30,7 +30,7 @@ msgstr "Balsa"
 msgid "Email utility"
 msgstr "Поштова програма"
 
-#: balsa.appdata.xml.in:10
+#: balsa.appdata.xml.in:11
 msgid ""
 "Balsa is a graphical mail client. While it is in active development, Balsa "
 "has many features such as:"
@@ -39,41 +39,83 @@ msgstr ""
 "активна розробка програми, Balsa вже багата на можливості. Зокрема, вже "
 "реалізовано такі можливості:"
 
-#: balsa.appdata.xml.in:13
+#: balsa.appdata.xml.in:14
 msgid "IMAP and POP3 support;"
 msgstr "підтримка IMAP і POP3;"
 
-#: balsa.appdata.xml.in:14
+#: balsa.appdata.xml.in:15
 msgid "sendmail or direct SMTP support;"
 msgstr "надсилання за допомогою sendmail або безпосередньо SMTP;"
 
-#: balsa.appdata.xml.in:15
+#: balsa.appdata.xml.in:16
 msgid "end-to-end encryption using GnuPG or S/MIME;"
 msgstr "міжвузлове шифрування з використанням GnuPG або S/MIME;"
 
-#: balsa.appdata.xml.in:16
+#: balsa.appdata.xml.in:17
 msgid "multi-threaded retrieval and sending of messages;"
 msgstr "отримання і надсилання повідомлень у декілька потоків;"
 
-#: balsa.appdata.xml.in:17
+#: balsa.appdata.xml.in:18
 msgid "support for all configurations of local mail folders;"
 msgstr "підтримка усіх налаштувань локальних тек пошти;"
 
-#: balsa.appdata.xml.in:18
+#: balsa.appdata.xml.in:19
 msgid "automatic mail checking;"
 msgstr "автоматична перевірка поштових скриньок;"
 
-#: balsa.appdata.xml.in:19
+#: balsa.appdata.xml.in:20
 msgid "mail printing;"
 msgstr "друк пошти;"
 
-#: balsa.appdata.xml.in:20
+#: balsa.appdata.xml.in:21
 msgid "inline attachment viewing;"
 msgstr "вбудований перегляд долучень;"
 
-#: balsa.appdata.xml.in:22
+#: balsa.appdata.xml.in:23
 msgid "and the proverbial much, much more."
 msgstr "а також багато-багато чого іншого."
+
+#: balsa.appdata.xml.in:27
+#| msgid "Main window"
+msgid "Main Window"
+msgstr "Головне вікно"
+
+#: balsa.appdata.xml.in:31
+#| msgid "Flag condition"
+msgid "Filter Edition"
+msgstr "Редагування фільтрів"
+
+#: balsa.appdata.xml.in:35 libinit_balsa/assistant_init.c:91
+#: libinit_balsa/assistant_init.c:99 src/ab-window.c:243
+msgid "Address Book"
+msgstr "Адресна книга"
+
+#: balsa.appdata.xml.in:39
+#| msgid "Capabilities:"
+msgid "GPG capabilities"
+msgstr "Можливості GPG"
+
+#: balsa.appdata.xml.in:43
+msgid "Multithread capabilities"
+msgstr "Можливості багатопотокової обробки"
+
+#: balsa.appdata.xml.in:47
+#| msgid "_Preferences"
+msgid "Preferences"
+msgstr "Налаштування"
+
+#: balsa.appdata.xml.in:51
+msgid "Tabbed View"
+msgstr "Перегляд з вкладками"
+
+#: balsa.appdata.xml.in:55
+msgid "Automatic GPG key import"
+msgstr "Автоматичне імпортування ключів GPG"
+
+#: balsa.appdata.xml.in:59
+#| msgid "Spell check"
+msgid "Spell Checker"
+msgstr "Перевірка правопису"
 
 #: org.desktop.Balsa.desktop.in.in:5 balsa-mailto-handler.desktop.in.in:5
 msgid "Mail Client"
@@ -81,8 +123,7 @@ msgstr "Поштовий клієнт"
 
 #: org.desktop.Balsa.desktop.in.in:15
 msgid "Mail;E-mail;Email;IMAP"
-msgstr ""
-"Mail;E-mail;Email;IMAP;пошта;електронна;повідомлення;листи;імап;аймап;"
+msgstr "Mail;E-mail;Email;IMAP;пошта;електронна;повідомлення;листи;імап;аймап;"
 
 #: libbalsa/address-book.c:308 libbalsa/filter-error.c:45
 msgid "No error"
@@ -139,8 +180,7 @@ msgstr ""
 #. Translators: #1 address book name; #2 error message
 #: libbalsa/address-book-carddav.c:491 libbalsa/address-book-ldap.c:1048
 #, c-format
-msgid ""
-"Error loading credentials for address book “%s” from Secret Service: %s"
+msgid "Error loading credentials for address book “%s” from Secret Service: %s"
 msgstr ""
 "Помилка під час завантаження реєстраційних даних для адресної книги «%s» з "
 "«Секретної служби»: %s"
@@ -260,8 +300,7 @@ msgstr "Не вдалося завантажити ключі автоматич
 #: libbalsa/address-view.c:976
 #, c-format
 msgid "Imported %d key from the Autocrypt database into your key ring."
-msgid_plural ""
-"Imported %d keys from the Autocrypt database into your key ring."
+msgid_plural "Imported %d keys from the Autocrypt database into your key ring."
 msgstr[0] "Імпортовано %d ключ з бази даних Autocrypt до сховища ключів."
 msgstr[1] "Імпортовано %d ключі з бази даних Autocrypt до сховища ключів."
 msgstr[2] "Імпортовано %d ключів з бази даних Autocrypt до сховища ключів."
@@ -437,45 +476,38 @@ msgstr "Не вдалося прочитати вбудоване повідом
 #. Translators: #1 DMARC domain; please do not translate DKIM
 #: libbalsa/dkim.c:369
 #, c-format
-#| msgid "%s signature of “%s”: %s"
 msgid "DKIM signature for sender domain “%s”: missing"
 msgstr "Підпис DKIM для домену відправника «%s»: пропущено"
 
 #. Translators: #1 DMARC domain; please do not translate DKIM
 #: libbalsa/dkim.c:373
 #, c-format
-#| msgid "%s signature of “%s”: %s"
 msgid "DKIM signature for sender domain “%s”: %s"
 msgstr "Підпис DKIM для домену відправника «%s»: %s"
 
 #. Translators: please do not translate DKIM
 #: libbalsa/dkim.c:403
-#| msgid "low trust signature"
 msgid "no DKIM signature"
 msgstr "немає підпису DKIM"
 
 #. Translators: please do not translate DKIM
 #: libbalsa/dkim.c:407
-#| msgid "bad signature"
 msgid "DKIM signature"
 msgstr "підпис DKIM"
 
 #: libbalsa/dkim.c:407
-#| msgid " signature: %s"
 msgid "DKIM signatures"
 msgstr "підписи DKIM"
 
 #. Translators: #1 reason for signature verification failure
 #: libbalsa/dkim.c:546
 #, c-format
-#| msgid "signature verification failed"
 msgid "signature verification failed: %s"
 msgstr "підпис не пройшов перевірки: %s"
 
 #. Translators: #1 date end time of signature expiry
 #: libbalsa/dkim.c:556
 #, c-format
-#| msgid "The signature is valid but expired."
 msgid "the signature is valid, but has expired on %s"
 msgstr "підпис є коректним, але строк його дії вичерпано ще %s"
 
@@ -489,13 +521,11 @@ msgstr "хеш вмісту не стосується усього вмісту"
 
 #: libbalsa/dkim.c:898
 #, c-format
-#| msgid "Cannot read the file “%s”: %s"
 msgid "malformed header element “%s”"
 msgstr "помилкове форматування елемента заголовка «%s»"
 
 #: libbalsa/dkim.c:910 libbalsa/dkim.c:1621
 #, c-format
-#| msgid "Copied to “%s”."
 msgid "duplicated tag “%s”"
 msgstr "дублювання теґу «%s»"
 
@@ -505,7 +535,6 @@ msgid "wrong version “%s”, expect 1"
 msgstr "помилкова версія «%s», мала бути 1"
 
 #: libbalsa/dkim.c:976
-#| msgid "malformed card, END:VCARD missing"
 msgid "malformed header: required tag missing"
 msgstr "помилкове форматування заголовка: пропущено обов'язковий теґ"
 
@@ -514,7 +543,6 @@ msgid "malformed header: From field not signed"
 msgstr "помилкове форматування заголовка: поле From не підписано"
 
 #: libbalsa/dkim.c:995
-#| msgid "malformed line “%s”, empty name or value"
 msgid "malformed “i” header tag"
 msgstr "помилкове форматування теґу заголовка «i»"
 
@@ -528,25 +556,21 @@ msgstr "порожній елемент у кодуванні Base64"
 
 #: libbalsa/dkim.c:1061
 #, c-format
-#| msgid "unsupported protocol “%s”"
 msgid "unsupported algorithm “%s”"
 msgstr "непідтримуваний алгоритм «%s»"
 
 #: libbalsa/dkim.c:1088 libbalsa/dkim.c:1098
 #, c-format
-#| msgid "unsupported protocol “%s”"
 msgid "unsupported  canonicalization mode “%s”"
 msgstr "непідтримуваний режим перетворення на канонічну форму «%s»"
 
 #: libbalsa/dkim.c:1122
 #, c-format
-#| msgid " curve “%s”"
 msgid "bad numerical value “%s”"
 msgstr "помилкове числове значення «%s»"
 
 #. Translators: please do not translate DMARC
 #: libbalsa/dkim.c:1216
-#| msgid " signature: %s"
 msgid "DMARC signature:"
 msgstr "Підпис DMARC:"
 
@@ -574,26 +598,22 @@ msgstr[3] ""
 
 #. Translators: please do not translate DKIM
 #: libbalsa/dkim.c:1234
-#| msgid " signature: %s"
 msgid "No DKIM signatures"
 msgstr "Немає підписів DKIM"
 
 #. Translators: #1 DKIM Signing Domain Identifier (SDID), #2 signature status
 #: libbalsa/dkim.c:1252
 #, c-format
-#| msgid "%s signature of “%s”: %s"
 msgid "• Signing domain “%s”: %s"
 msgstr "• Домен підписування «%s»: %s"
 
 #: libbalsa/dkim.c:1257
 #, c-format
-#| msgid "Connected to %s"
 msgid ", created on %s"
 msgstr ", створено %s"
 
 #: libbalsa/dkim.c:1267
 #, c-format
-#| msgid "expired"
 msgid ", expired on %s"
 msgstr ", строк дії вичерпано %s"
 
@@ -603,7 +623,6 @@ msgid ", expires on %s"
 msgstr ", строк дії до %s"
 
 #: libbalsa/dkim.c:1289
-#| msgid "invalid"
 msgid "valid"
 msgstr "коректний"
 
@@ -636,8 +655,8 @@ msgstr "помилкове форматування запису TXT DMARC DNS: 
 #, c-format
 msgid "malformed DMARC DNS TXT record: duplicated “x” tag value “%s”"
 msgstr ""
-"помилкове форматування запису TXT DMARC DNS: дублювання значення «%s» теґу"
-" «x»"
+"помилкове форматування запису TXT DMARC DNS: дублювання значення «%s» теґу "
+"«x»"
 
 #. Translators: please do not translate "DMARC DNS TXT"
 #: libbalsa/dkim.c:1472
@@ -672,19 +691,15 @@ msgstr "помилковий алгоритм хешування ключа"
 
 #: libbalsa/dkim.c:1652
 #, c-format
-#| msgid "Encryption key for “%s”"
-#| msgid_plural "Encryption keys for “%s”"
 msgid "bad key crypto algorithm “%s”"
 msgstr "помилковий алгоритм шифрування ключа «%s»"
 
 #: libbalsa/dkim.c:1660
-#| msgid "the certificate has been revoked"
 msgid "public key has been revoked"
 msgstr "відкритий ключ було відкликано"
 
 #: libbalsa/dkim.c:1674
 #, c-format
-#| msgid "unsupported protocol “%s”"
 msgid "unsupported service type “%s”"
 msgstr "непідтримуваний тип служби «%s»"
 
@@ -699,13 +714,11 @@ msgstr "помилковий алгоритм шифрування ключа"
 
 #: libbalsa/dkim.c:1710
 #, c-format
-#| msgid "cannot initialize GSS security context: %s"
 msgid "cannot initialize public key buffer: %s"
 msgstr "не вдалося ініціалізувати буфер відкритого ключа: %s"
 
 #: libbalsa/dkim.c:1719
 #, c-format
-#| msgid "Cannot load Autocrypt keys: %s"
 msgid "cannot load public key: %s"
 msgstr "не вдалося завантажити відкритий ключ: %s"
 
@@ -1353,11 +1366,11 @@ msgid "Cannot LOGIN with UTF-8 username or password"
 msgstr ""
 "Неможливо виконати LOGIN із іменем користувача або паролем у кодуванні UTF-8"
 
-#: libbalsa/imap/imap-commands.c:1209
+#: libbalsa/imap/imap-commands.c:1210
 msgid "Unordered data received from server"
 msgstr "Від сервера отримано невпорядковані дані"
 
-#: libbalsa/imap/imap-commands.c:1744
+#: libbalsa/imap/imap-commands.c:1745
 msgid "Bug in implementation of SORT command on IMAP server exposed."
 msgstr "Виявлено ваду у реалізації команди SORT на сервері IMAP."
 
@@ -1382,7 +1395,7 @@ msgstr "Потрібна TLS, але вона недоступна"
 msgid "IMAP response: %s"
 msgstr "Відповідь IMAP: %s"
 
-#: libbalsa/imap/imap-handle.c:4539
+#: libbalsa/imap/imap-handle.c:4560
 #, c-format
 msgid "the server %s does not offer the IMAP service at port 993 or 143"
 msgstr "сервер %s не пропонує служби IMAP на порту 993 або 143"
@@ -2188,72 +2201,72 @@ msgstr "*** ПОМИЛКА: потік даних поштової скринь�
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name
-#: libbalsa/mailbox_imap.c:610
+#: libbalsa/mailbox_imap.c:612
 #, c-format
 msgid "IMAP %s %s: connection has been severed. Reconnecting…"
 msgstr "IMAP %s %s: з'єднання було розірвано. Повторне підключення…"
 
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name
-#: libbalsa/mailbox_imap.c:614
+#: libbalsa/mailbox_imap.c:616
 #, c-format
 msgid "IMAP %s %s: protocol error. Try enabling bug workarounds."
 msgstr "IMAP %s %s: помилка протоколу. Намагаємося обійти проблему."
 
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name; #3 error message
-#: libbalsa/mailbox_imap.c:618
+#: libbalsa/mailbox_imap.c:620
 #, c-format
 msgid "IMAP %s %s: server has shut down the connection: %s. Reconnecting…"
 msgstr ""
 "IMAP %s %s: сервер розірвав з'єднання: %s Намагаємося з'єднатися повторно…"
 
 #. helper macro for calling II in the context of a mailbox
-#: libbalsa/mailbox_imap.c:623
+#: libbalsa/mailbox_imap.c:625
 msgid "mailbox"
 msgstr "скринька"
 
-#: libbalsa/mailbox_imap.c:1233
+#: libbalsa/mailbox_imap.c:1235
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Отримуємо %ld кБ"
 
-#: libbalsa/mailbox_imap.c:1698
+#: libbalsa/mailbox_imap.c:1700
 #, c-format
 msgid "No path found for mailbox “%s”, using “%s”"
 msgstr "Не знайдено шлях до поштової скриньки «%s», використовуємо «%s»"
 
-#: libbalsa/mailbox_imap.c:1805 libbalsa/mailbox_imap.c:1846
+#: libbalsa/mailbox_imap.c:1807 libbalsa/mailbox_imap.c:1848
 msgid "Cannot get IMAP handle"
 msgstr "Не вдалося отримати дескриптор IMAP"
 
-#: libbalsa/mailbox_imap.c:1856
+#: libbalsa/mailbox_imap.c:1858
 msgid "server"
 msgstr "сервер"
 
-#: libbalsa/mailbox_imap.c:2475 libbalsa/mailbox_imap.c:2538
+#: libbalsa/mailbox_imap.c:2510 libbalsa/mailbox_imap.c:2573
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr "Помилка під час отримання повідомлення з сервера IMAP: %s"
 
-#: libbalsa/mailbox_imap.c:2510
+#: libbalsa/mailbox_imap.c:2545
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Отримуємо %u кБ"
 
-#: libbalsa/mailbox_imap.c:2551
+#: libbalsa/mailbox_imap.c:2586
 msgid "Cannot create temporary file"
 msgstr "Не вдалося створити тимчасовий файл"
 
-#: libbalsa/mailbox_imap.c:2575
+#: libbalsa/mailbox_imap.c:2610
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Не вдалося записати дані до тимчасового файла %s"
 
-#: libbalsa/mailbox_imap.c:2803 libbalsa/mailbox_imap.c:2920
+#: libbalsa/mailbox_imap.c:2838 libbalsa/mailbox_imap.c:2955
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Вивантажуємо %ld кБ"
 
-#: libbalsa/mailbox_imap.c:3229
+#: libbalsa/mailbox_imap.c:3264
 msgid "Server-side threading not supported."
 msgstr "Розбивання на гілки на сервері не підтримується."
 
@@ -3167,8 +3180,7 @@ msgstr "Повідомлення %u з %u"
 
 #: libbalsa/send.c:621
 #, c-format
-msgid ""
-"Cannot reach SMTP server %s (%s), any queued message will remain in %s."
+msgid "Cannot reach SMTP server %s (%s), any queued message will remain in %s."
 msgstr ""
 "Не вдалося зв'язатися із сервером SMTP %s (%s). Усі повідомлення з черги "
 "лишаться у %s."
@@ -3500,11 +3512,6 @@ msgstr ""
 #: libinit_balsa/assistant_init.c:84
 msgid "GnomeCard Address Book"
 msgstr "Адресна книга GnomeCard"
-
-#: libinit_balsa/assistant_init.c:91 libinit_balsa/assistant_init.c:99
-#: src/ab-window.c:243
-msgid "Address Book"
-msgstr "Адресна книга"
 
 #: libinit_balsa/assistant_init.c:150
 msgid "Configure Balsa"
@@ -4346,8 +4353,7 @@ msgstr "(Немає відправника)"
 #: src/balsa-message.c:1147 src/balsa-message.c:1159
 #, c-format
 msgid "Could not access message %u in mailbox “%s”."
-msgstr ""
-"Не вдалося отримати доступ до повідомлення %u у поштовій скриньці «%s»"
+msgstr "Не вдалося отримати доступ до повідомлення %u у поштовій скриньці «%s»"
 
 #: src/balsa-message.c:1217 src/main.c:528
 #, c-format
@@ -7036,8 +7042,7 @@ msgstr ""
 
 #: src/save-restore.c:798
 msgid "The option not to recognize “format=flowed” text has been removed."
-msgstr ""
-"Параметр не розпізнавати текст із «format=flowed» текст було вилучено."
+msgstr "Параметр не розпізнавати текст із «format=flowed» текст було вилучено."
 
 #: src/save-restore.c:1067
 msgid ""

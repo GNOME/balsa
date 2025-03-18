@@ -3751,7 +3751,7 @@ bw_display_new_mail_notification(int num_new, int has_new)
         GIcon *icon = NULL;
 
         tmp = g_notification_new("Balsa");
-        balsa_icon = balsa_pixmap_finder("balsa_icon.png");
+        balsa_icon = libbalsa_pixmap_finder("balsa_icon.png");
         if (balsa_icon != NULL) {
         	GFile * icon_file;
 

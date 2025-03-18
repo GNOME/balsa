@@ -47,6 +47,12 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
+static const gchar *permanent_prefixes[] = {
+    BALSA_DATA_PREFIX,
+    "src",
+    "."
+};
+
 static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
 					      LibBalsaCodeset Codeset);
 #ifndef HAVE_STRUCT_UTSNAME_DOMAINNAME
@@ -1292,4 +1298,34 @@ libbalsa_add_mnemonic_button_to_box(const gchar *markup,
     gtk_container_add(GTK_CONTAINER(box), button);
 
     return button;
+}
+
+/* filename is the filename (naw!)
+ * We ignore proper slashing of names. Ie, /prefix//pixmaps//file won't be caught.
+ */
+gchar *
+libbalsa_pixmap_finder(const gchar  * filename)
+{
+    gchar *cat;
+    guint i;
+
+    g_return_val_if_fail(filename, NULL);
+
+    for (i = 0; i < G_N_ELEMENTS(permanent_prefixes); i++) {
+	cat = g_build_filename(permanent_prefixes[i], "pixmaps", filename, NULL);
+
+	if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
+	    return cat;
+
+	g_free(cat);
+    }
+
+    cat = g_build_filename("images", "pixmaps", NULL);
+    if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
+        return cat;
+    g_free(cat);
+
+    g_warning("Cannot find expected pixmap file “%s”", filename);
+
+    return NULL;
 }

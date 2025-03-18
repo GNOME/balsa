@@ -50,8 +50,8 @@ libbalsa_systray_icon_init(GtkMenu *menu, libbalsa_systray_cb_t activate_cb, gpo
 {
 	g_return_if_fail(icon_path[0] == NULL);
 
-	icon_path[0] = balsa_pixmap_finder("balsa_icon.png");
-	icon_path[1] = balsa_pixmap_finder("balsa_attention.png");
+	icon_path[0] = libbalsa_pixmap_finder("balsa_icon.png");
+	icon_path[1] = libbalsa_pixmap_finder("balsa_attention.png");
 	icon_activate_cb = activate_cb;
 	icon_activate_cb_data = activate_cb_data;
 	if (menu != NULL) {

@@ -32,55 +32,13 @@
 #include "libbalsa.h"
 #include <glib/gi18n.h>
 
-static const gchar *permanent_prefixes[] = {
-    BALSA_DATA_PREFIX,
-    "src",
-    "."
-};
-
-/* filename is the filename (naw!)
- * splice is what to put in between the prefix and the filename, if desired
- * We ignore proper slashing of names. Ie, /prefix//splice//file won't be caught.
- */
-gchar *
-balsa_file_finder(const gchar  * filename,
-                  const gchar  * splice)
-{
-    gchar *cat;
-    guint i;
-
-    g_return_val_if_fail(filename, NULL);
-
-    if (splice == NULL)
-	splice = "";
-
-    for (i = 0; i < G_N_ELEMENTS(permanent_prefixes); i++) {
-	cat = g_build_filename(permanent_prefixes[i], splice, filename, NULL);
-
-	if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
-	    return cat;
-
-	g_free(cat);
-    }
-
-    cat = g_build_filename("images", filename, NULL);
-    if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
-        return cat;
-    g_free(cat);
-
-    g_warning("Cannot find expected file “%s” (spliced with “%s”)", filename, splice);
-
-    return NULL;
-}
-
-
 static GdkPixbuf *
 libbalsa_default_attachment_pixbuf(gint size)
 {
     char *icon;
     GdkPixbuf *tmp, *retval;
 
-    icon = balsa_pixmap_finder ("attachment.png");
+    icon = libbalsa_pixmap_finder ("attachment.png");
     tmp = gdk_pixbuf_new_from_file(icon, NULL);
     g_free(icon);
     if (!tmp)

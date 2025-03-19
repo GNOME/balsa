@@ -11,18 +11,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa master\n"
 "Report-Msgid-Bugs-To: http://pawsa.fedorapeople.org/balsa/bugs.html\n"
-"POT-Creation-Date: 2025-03-16 17:57+0000\n"
-"PO-Revision-Date: 2025-03-17 02:16+0100\n"
+"POT-Creation-Date: 2025-03-18 18:35+0000\n"
+"PO-Revision-Date: 2025-03-19 22:00+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenščina <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || "
-"n%100==4 ? 3 : 0);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
+"%100==4 ? 3 : 0);\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 2.2.1\n"
 
 #: balsa.appdata.xml.in:6 org.desktop.Balsa.desktop.in.in:3
 #: balsa-mailto-handler.desktop.in.in:3 libbalsa/system-tray.c:102
@@ -34,7 +34,7 @@ msgstr "Balsa"
 msgid "Email utility"
 msgstr "Pripomoček za e-pošto"
 
-#: balsa.appdata.xml.in:10
+#: balsa.appdata.xml.in:11
 msgid ""
 "Balsa is a graphical mail client. While it is in active development, Balsa "
 "has many features such as:"
@@ -42,41 +42,78 @@ msgstr ""
 "Balsa je odjemalec za elektronsko pošto s stalnim razvojem in pestrim "
 "naborom zmožnosti:"
 
-#: balsa.appdata.xml.in:13
+#: balsa.appdata.xml.in:14
 msgid "IMAP and POP3 support;"
 msgstr "podpora za IMAP in POP3,"
 
-#: balsa.appdata.xml.in:14
+#: balsa.appdata.xml.in:15
 msgid "sendmail or direct SMTP support;"
 msgstr "podpora za sendmail in neposredni SMTP,"
 
-#: balsa.appdata.xml.in:15
+#: balsa.appdata.xml.in:16
 msgid "end-to-end encryption using GnuPG or S/MIME;"
 msgstr "šifriranje od konca do konca z uporabo GnuPG ali S/MIME,"
 
-#: balsa.appdata.xml.in:16
+#: balsa.appdata.xml.in:17
 msgid "multi-threaded retrieval and sending of messages;"
 msgstr "več-nitno pridobivanje in pošiljanje sporočil,"
 
-#: balsa.appdata.xml.in:17
+#: balsa.appdata.xml.in:18
 msgid "support for all configurations of local mail folders;"
 msgstr "podpora za različne nastavitve krajevnih map,"
 
-#: balsa.appdata.xml.in:18
+#: balsa.appdata.xml.in:19
 msgid "automatic mail checking;"
 msgstr "samodejno preverjanje pošte,"
 
-#: balsa.appdata.xml.in:19
+#: balsa.appdata.xml.in:20
 msgid "mail printing;"
 msgstr "tiskanje e-sporočil,"
 
-#: balsa.appdata.xml.in:20
+#: balsa.appdata.xml.in:21
 msgid "inline attachment viewing;"
 msgstr "pregledovanje prilog v sporočilu"
 
-#: balsa.appdata.xml.in:22
+#: balsa.appdata.xml.in:23
 msgid "and the proverbial much, much more."
 msgstr "in še veliko, veliko več."
+
+#: balsa.appdata.xml.in:27
+msgid "Main Window"
+msgstr "Glavno okno"
+
+#: balsa.appdata.xml.in:31
+msgid "Filter Edition"
+msgstr "Izdaja s filtri"
+
+#: balsa.appdata.xml.in:35 libinit_balsa/assistant_init.c:91
+#: libinit_balsa/assistant_init.c:99 src/ab-window.c:243
+msgid "Address Book"
+msgstr "Imenik"
+
+#: balsa.appdata.xml.in:39
+msgid "GPG capabilities"
+msgstr "Zmogljivosti GPG"
+
+#: balsa.appdata.xml.in:43
+msgid "Multithread capabilities"
+msgstr "Večnitne zmogljivosti"
+
+#: balsa.appdata.xml.in:47
+msgid "Preferences"
+msgstr "Nastavitve"
+
+#: balsa.appdata.xml.in:51
+msgid "Tabbed View"
+msgstr "Pogled v zavihkih"
+
+#: balsa.appdata.xml.in:55
+msgid "Automatic GPG key import"
+msgstr "Samodejni uvoz ključa GPG"
+
+#: balsa.appdata.xml.in:59
+msgid "Spell Checker"
+msgstr "Preverjevalnik črkovanja"
 
 #: org.desktop.Balsa.desktop.in.in:5 balsa-mailto-handler.desktop.in.in:5
 msgid "Mail Client"
@@ -1323,11 +1360,11 @@ msgid "Cannot LOGIN with UTF-8 username or password"
 msgstr ""
 "Ni se mogoče povezati z uporabniškim imenom in geslom v kodnem zapisu UTF-8"
 
-#: libbalsa/imap/imap-commands.c:1209
+#: libbalsa/imap/imap-commands.c:1210
 msgid "Unordered data received from server"
 msgstr "S strežnika je prejet je nenaročen odziv"
 
-#: libbalsa/imap/imap-commands.c:1744
+#: libbalsa/imap/imap-commands.c:1745
 msgid "Bug in implementation of SORT command on IMAP server exposed."
 msgstr "Napaka pri izvajanju ukaza SORT na izpostavljenem strežniku IMAP."
 
@@ -1352,7 +1389,7 @@ msgstr "Zahtevana je uporaba TLS, ki pa ni na voljo"
 msgid "IMAP response: %s"
 msgstr "Odziv strežnika IMAP: %s"
 
-#: libbalsa/imap/imap-handle.c:4539
+#: libbalsa/imap/imap-handle.c:4560
 #, c-format
 msgid "the server %s does not offer the IMAP service at port 993 or 143"
 msgstr "strežnik %s ne ponuja storitve IMAP na vratih 993 ali 143"
@@ -2149,71 +2186,71 @@ msgstr "*** NAPAKA: Pretok poštnega predala Mailbox je zaprt: %s ***\n"
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name
-#: libbalsa/mailbox_imap.c:610
+#: libbalsa/mailbox_imap.c:612
 #, c-format
 msgid "IMAP %s %s: connection has been severed. Reconnecting…"
 msgstr "%s IMAP %s: povezava je bila odrezana. Poteka ponovno povezovanje …"
 
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name
-#: libbalsa/mailbox_imap.c:614
+#: libbalsa/mailbox_imap.c:616
 #, c-format
 msgid "IMAP %s %s: protocol error. Try enabling bug workarounds."
 msgstr "%s IMAP %s: napaka protokola. Poskusite omogočiti obhode hroščev."
 
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name; #3 error message
-#: libbalsa/mailbox_imap.c:618
+#: libbalsa/mailbox_imap.c:620
 #, c-format
 msgid "IMAP %s %s: server has shut down the connection: %s. Reconnecting…"
 msgstr "%s IMAP %s: strežnik je prekinil povezavo: %s Ponovno povezovanje ..."
 
 #. helper macro for calling II in the context of a mailbox
-#: libbalsa/mailbox_imap.c:623
+#: libbalsa/mailbox_imap.c:625
 msgid "mailbox"
 msgstr "poštni predal"
 
-#: libbalsa/mailbox_imap.c:1233
+#: libbalsa/mailbox_imap.c:1235
 #, c-format
 msgid "Downloading %ld kB"
 msgstr "Prejemanje %ld kB"
 
-#: libbalsa/mailbox_imap.c:1698
+#: libbalsa/mailbox_imap.c:1700
 #, c-format
 msgid "No path found for mailbox “%s”, using “%s”"
 msgstr "Za poštni predal »%s«, ki uporabblja »%s«, ni bilo najdene poti"
 
-#: libbalsa/mailbox_imap.c:1805 libbalsa/mailbox_imap.c:1846
+#: libbalsa/mailbox_imap.c:1807 libbalsa/mailbox_imap.c:1848
 msgid "Cannot get IMAP handle"
 msgstr "Ni mogoče dobiti ročice IMAP"
 
-#: libbalsa/mailbox_imap.c:1856
+#: libbalsa/mailbox_imap.c:1858
 msgid "server"
 msgstr "strežnik"
 
-#: libbalsa/mailbox_imap.c:2475 libbalsa/mailbox_imap.c:2538
+#: libbalsa/mailbox_imap.c:2510 libbalsa/mailbox_imap.c:2573
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr "Napaka med pridobivanjem sporočila s strežnika IMAP: %s"
 
-#: libbalsa/mailbox_imap.c:2510
+#: libbalsa/mailbox_imap.c:2545
 #, c-format
 msgid "Downloading %u kB"
 msgstr "Prejemanje %u kB"
 
-#: libbalsa/mailbox_imap.c:2551
+#: libbalsa/mailbox_imap.c:2586
 msgid "Cannot create temporary file"
 msgstr "Ni mogoče ustvariti začasne datoteke"
 
-#: libbalsa/mailbox_imap.c:2575
+#: libbalsa/mailbox_imap.c:2610
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr "Ni mogoče pisati v začasno datoteko %s"
 
-#: libbalsa/mailbox_imap.c:2803 libbalsa/mailbox_imap.c:2920
+#: libbalsa/mailbox_imap.c:2838 libbalsa/mailbox_imap.c:2955
 #, c-format
 msgid "Uploading %ld kB"
 msgstr "Pošiljanje %ld kB"
 
-#: libbalsa/mailbox_imap.c:3229
+#: libbalsa/mailbox_imap.c:3264
 msgid "Server-side threading not supported."
 msgstr "Strežniško nitenje ni podprto."
 
@@ -2454,107 +2491,107 @@ msgid "Mailbox (%s) is read-only: cannot change flags."
 msgstr ""
 "Poštni predal (%s) je odprt le za branje: ni mogoče spremeniti zastavic."
 
-#: libbalsa/misc.c:226 libbalsa/misc.c:235
+#: libbalsa/misc.c:232 libbalsa/misc.c:241
 #, c-format
 msgid "cannot delete “%s”: %s"
 msgstr "Ni mogoče izbrisati »%s«: %s"
 
-#: libbalsa/misc.c:388
+#: libbalsa/misc.c:394
 msgid "West European"
 msgstr "Zahodnoevropski"
 
-#: libbalsa/misc.c:390 libbalsa/misc.c:424
+#: libbalsa/misc.c:396 libbalsa/misc.c:430
 msgid "East European"
 msgstr "Vzhodnoevropski"
 
-#: libbalsa/misc.c:392
+#: libbalsa/misc.c:398
 msgid "South European"
 msgstr "Južnoevropski"
 
-#: libbalsa/misc.c:394
+#: libbalsa/misc.c:400
 msgid "North European"
 msgstr "severnoevropsko"
 
-#: libbalsa/misc.c:396 libbalsa/misc.c:426
+#: libbalsa/misc.c:402 libbalsa/misc.c:432
 msgid "Cyrillic"
 msgstr "Cirilica"
 
-#: libbalsa/misc.c:398 libbalsa/misc.c:432
+#: libbalsa/misc.c:404 libbalsa/misc.c:438
 msgid "Arabic"
 msgstr "Arabski"
 
-#: libbalsa/misc.c:400 libbalsa/misc.c:428
+#: libbalsa/misc.c:406 libbalsa/misc.c:434
 msgid "Greek"
 msgstr "Grški"
 
-#: libbalsa/misc.c:402 libbalsa/misc.c:430
+#: libbalsa/misc.c:408 libbalsa/misc.c:436
 msgid "Hebrew"
 msgstr "Hebrejski"
 
-#: libbalsa/misc.c:404
+#: libbalsa/misc.c:410
 msgid "Turkish"
 msgstr "Turški"
 
-#: libbalsa/misc.c:406
+#: libbalsa/misc.c:412
 msgid "Nordic"
 msgstr "Nordijski"
 
-#: libbalsa/misc.c:408
+#: libbalsa/misc.c:414
 msgid "Thai"
 msgstr "Tajski"
 
-#: libbalsa/misc.c:410 libbalsa/misc.c:434
+#: libbalsa/misc.c:416 libbalsa/misc.c:440
 msgid "Baltic"
 msgstr "Baltski"
 
-#: libbalsa/misc.c:412
+#: libbalsa/misc.c:418
 msgid "Celtic"
 msgstr "Keltski"
 
-#: libbalsa/misc.c:414
+#: libbalsa/misc.c:420
 msgid "West European (euro)"
 msgstr "Zahodnoevropski (evro)"
 
-#: libbalsa/misc.c:416
+#: libbalsa/misc.c:422
 msgid "Russian"
 msgstr "ruski"
 
-#: libbalsa/misc.c:418
+#: libbalsa/misc.c:424
 msgid "Ukrainian"
 msgstr "Ukrajinsko"
 
-#: libbalsa/misc.c:420
+#: libbalsa/misc.c:426
 msgid "Japanese"
 msgstr "Japonski"
 
-#: libbalsa/misc.c:422
+#: libbalsa/misc.c:428
 msgid "Korean"
 msgstr "Korejski"
 
-#: libbalsa/misc.c:711
+#: libbalsa/misc.c:717
 #, c-format
 msgid "fcntl failed: %s."
 msgstr "fcntl je spodletelo: %s."
 
-#: libbalsa/misc.c:727
+#: libbalsa/misc.c:733
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr "Zakasnitev je bila presežena med poskusom zaklepanja fcntl !"
 
-#: libbalsa/misc.c:734
+#: libbalsa/misc.c:740
 #, c-format
 msgid "Waiting for fcntl lock… %d"
 msgstr "Poteka čakanje na zaklep fcntl … %d"
 
-#: libbalsa/misc.c:763
+#: libbalsa/misc.c:769
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr "Zakasnitev med poskusom zaklepanja flock!"
 
-#: libbalsa/misc.c:771
+#: libbalsa/misc.c:777
 #, c-format
 msgid "Waiting for flock attempt… %d"
 msgstr "Poteka čakanje na poskus flock … %d"
 
-#: libbalsa/misc.c:1078
+#: libbalsa/misc.c:1084
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr "Mapa LDAP za %s"
@@ -3450,11 +3487,6 @@ msgstr ""
 msgid "GnomeCard Address Book"
 msgstr "Imenik GnomeVizitka"
 
-#: libinit_balsa/assistant_init.c:91 libinit_balsa/assistant_init.c:99
-#: src/ab-window.c:243
-msgid "Address Book"
-msgstr "Imenik"
-
 #: libinit_balsa/assistant_init.c:150
 msgid "Configure Balsa"
 msgstr "Nastavi Balso"
@@ -3827,7 +3859,7 @@ msgstr "Prebrskaj"
 msgid "Edit"
 msgstr "Uredi"
 
-#: src/ab-main.c:1095
+#: src/ab-main.c:1096
 msgid "Balsa Address Book"
 msgstr "Imenik Balsa"
 
@@ -6000,39 +6032,39 @@ msgstr "Smeti"
 msgid "Compressing mail folders…"
 msgstr "Poteka stiskanje map …"
 
-#: src/main.c:597
+#: src/main.c:599
 msgid "Get new mail on start-up"
 msgstr "Ob zagonu pridobi novo pošto"
 
-#: src/main.c:599
+#: src/main.c:601
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr "Sestavi novo elektronsko pošto za ELEKTRONSKI@NASLOV"
 
-#: src/main.c:601
+#: src/main.c:603
 msgid "Attach file at URI"
 msgstr "Priloži datoteko na URI"
 
-#: src/main.c:603
+#: src/main.c:605
 msgid "Opens MAILBOXNAME"
 msgstr "Odpre ImePoštnegaPredala"
 
-#: src/main.c:603
+#: src/main.c:605
 msgid "MAILBOXNAME"
 msgstr "ImePoštnegaPredala"
 
-#: src/main.c:605
+#: src/main.c:607
 msgid "Opens first unread mailbox"
 msgstr "Odpre prvi neprebran poštni predal"
 
-#: src/main.c:607
+#: src/main.c:609
 msgid "Opens default Inbox on start-up"
 msgstr "Odpre privzeto mapo dohodne pošte ob zagonu."
 
-#: src/main.c:609
+#: src/main.c:611
 msgid "Prints number unread and unsent messages"
 msgstr "Izpiše število neprebranih in neposlanih sporočil"
 
-#: src/main.c:611
+#: src/main.c:613
 msgid "Show version"
 msgstr "Pokaži različico"
 

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: http://pawsa.fedorapeople.org/balsa/bugs.html\n"
-"POT-Creation-Date: 2025-03-16 17:57+0000\n"
-"PO-Revision-Date: 2025-03-16 20:26+0100\n"
+"POT-Creation-Date: 2025-03-18 18:35+0000\n"
+"PO-Revision-Date: 2025-03-20 04:07+0100\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <(nothing)>\n"
 "Language: ka\n"
@@ -28,47 +28,84 @@ msgstr "Balsa"
 msgid "Email utility"
 msgstr "ელფოსტის პროგრამა"
 
-#: balsa.appdata.xml.in:10
+#: balsa.appdata.xml.in:11
 msgid ""
 "Balsa is a graphical mail client. While it is in active development, Balsa "
 "has many features such as:"
 msgstr ""
 
-#: balsa.appdata.xml.in:13
+#: balsa.appdata.xml.in:14
 msgid "IMAP and POP3 support;"
 msgstr "IMAP -ის და POP3 -ის მხარდაჭერა;"
 
-#: balsa.appdata.xml.in:14
+#: balsa.appdata.xml.in:15
 msgid "sendmail or direct SMTP support;"
 msgstr "sendmail ან პირდაპირი SMTP მხარდაჭერა;"
 
-#: balsa.appdata.xml.in:15
+#: balsa.appdata.xml.in:16
 msgid "end-to-end encryption using GnuPG or S/MIME;"
 msgstr ""
 
-#: balsa.appdata.xml.in:16
+#: balsa.appdata.xml.in:17
 msgid "multi-threaded retrieval and sending of messages;"
 msgstr ""
 
-#: balsa.appdata.xml.in:17
+#: balsa.appdata.xml.in:18
 msgid "support for all configurations of local mail folders;"
 msgstr ""
 
-#: balsa.appdata.xml.in:18
+#: balsa.appdata.xml.in:19
 msgid "automatic mail checking;"
 msgstr "ელფოსტის ავტომატური შემოწმება;"
 
-#: balsa.appdata.xml.in:19
+#: balsa.appdata.xml.in:20
 msgid "mail printing;"
 msgstr "ელფოსტის დაბეჭდვა;"
 
-#: balsa.appdata.xml.in:20
+#: balsa.appdata.xml.in:21
 msgid "inline attachment viewing;"
 msgstr ""
 
-#: balsa.appdata.xml.in:22
+#: balsa.appdata.xml.in:23
 msgid "and the proverbial much, much more."
 msgstr ""
+
+#: balsa.appdata.xml.in:27
+msgid "Main Window"
+msgstr "მთავარი ფანჯარა"
+
+#: balsa.appdata.xml.in:31
+msgid "Filter Edition"
+msgstr ""
+
+#: balsa.appdata.xml.in:35 libinit_balsa/assistant_init.c:91
+#: libinit_balsa/assistant_init.c:99 src/ab-window.c:243
+msgid "Address Book"
+msgstr "მისამართების წიგნი"
+
+#: balsa.appdata.xml.in:39
+msgid "GPG capabilities"
+msgstr "GPG შესაძლებლობები"
+
+#: balsa.appdata.xml.in:43
+msgid "Multithread capabilities"
+msgstr ""
+
+#: balsa.appdata.xml.in:47
+msgid "Preferences"
+msgstr "მორგება"
+
+#: balsa.appdata.xml.in:51
+msgid "Tabbed View"
+msgstr "ჩანართებიანი ინტერფეისი"
+
+#: balsa.appdata.xml.in:55
+msgid "Automatic GPG key import"
+msgstr ""
+
+#: balsa.appdata.xml.in:59
+msgid "Spell Checker"
+msgstr "მართლწერის შემოწმება"
 
 #: org.desktop.Balsa.desktop.in.in:5 balsa-mailto-handler.desktop.in.in:5
 msgid "Mail Client"
@@ -505,7 +542,6 @@ msgstr ""
 
 #. Translators: please do not translate DMARC
 #: libbalsa/dkim.c:1216
-#| msgid " signature: %s"
 msgid "DMARC signature:"
 msgstr "DMARC ხელმოწერა:"
 
@@ -523,7 +559,6 @@ msgstr[1] ""
 
 #. Translators: please do not translate DKIM
 #: libbalsa/dkim.c:1234
-#| msgid " signature: %s"
 msgid "No DKIM signatures"
 msgstr "DKIM ხელმოწერების გარეშე"
 
@@ -1262,11 +1297,11 @@ msgstr ""
 msgid "Cannot LOGIN with UTF-8 username or password"
 msgstr ""
 
-#: libbalsa/imap/imap-commands.c:1209
+#: libbalsa/imap/imap-commands.c:1210
 msgid "Unordered data received from server"
 msgstr ""
 
-#: libbalsa/imap/imap-commands.c:1744
+#: libbalsa/imap/imap-commands.c:1745
 msgid "Bug in implementation of SORT command on IMAP server exposed."
 msgstr ""
 
@@ -1291,7 +1326,7 @@ msgstr ""
 msgid "IMAP response: %s"
 msgstr "IMAP პასუხი: %s"
 
-#: libbalsa/imap/imap-handle.c:4539
+#: libbalsa/imap/imap-handle.c:4560
 #, c-format
 msgid "the server %s does not offer the IMAP service at port 993 or 143"
 msgstr ""
@@ -2015,71 +2050,71 @@ msgstr ""
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
 #. login information...
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name
-#: libbalsa/mailbox_imap.c:610
+#: libbalsa/mailbox_imap.c:612
 #, c-format
 msgid "IMAP %s %s: connection has been severed. Reconnecting…"
 msgstr ""
 
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name
-#: libbalsa/mailbox_imap.c:614
+#: libbalsa/mailbox_imap.c:616
 #, c-format
 msgid "IMAP %s %s: protocol error. Try enabling bug workarounds."
 msgstr ""
 
 #. Translators: #1 context (mailbox, server); #2 mailbox or server name; #3 error message
-#: libbalsa/mailbox_imap.c:618
+#: libbalsa/mailbox_imap.c:620
 #, c-format
 msgid "IMAP %s %s: server has shut down the connection: %s. Reconnecting…"
 msgstr ""
 
 #. helper macro for calling II in the context of a mailbox
-#: libbalsa/mailbox_imap.c:623
+#: libbalsa/mailbox_imap.c:625
 msgid "mailbox"
 msgstr "საფოსტო ყუთი"
 
-#: libbalsa/mailbox_imap.c:1233
+#: libbalsa/mailbox_imap.c:1235
 #, c-format
 msgid "Downloading %ld kB"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:1698
+#: libbalsa/mailbox_imap.c:1700
 #, c-format
 msgid "No path found for mailbox “%s”, using “%s”"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:1805 libbalsa/mailbox_imap.c:1846
+#: libbalsa/mailbox_imap.c:1807 libbalsa/mailbox_imap.c:1848
 msgid "Cannot get IMAP handle"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:1856
+#: libbalsa/mailbox_imap.c:1858
 msgid "server"
 msgstr "სერვერი"
 
-#: libbalsa/mailbox_imap.c:2475 libbalsa/mailbox_imap.c:2538
+#: libbalsa/mailbox_imap.c:2510 libbalsa/mailbox_imap.c:2573
 #, c-format
 msgid "Error fetching message from IMAP server: %s"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:2510
+#: libbalsa/mailbox_imap.c:2545
 #, c-format
 msgid "Downloading %u kB"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:2551
+#: libbalsa/mailbox_imap.c:2586
 msgid "Cannot create temporary file"
 msgstr "დროებითი ფაილის შექმნა შეუძლებელია"
 
-#: libbalsa/mailbox_imap.c:2575
+#: libbalsa/mailbox_imap.c:2610
 #, c-format
 msgid "Cannot write to temporary file %s"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:2803 libbalsa/mailbox_imap.c:2920
+#: libbalsa/mailbox_imap.c:2838 libbalsa/mailbox_imap.c:2955
 #, c-format
 msgid "Uploading %ld kB"
 msgstr ""
 
-#: libbalsa/mailbox_imap.c:3229
+#: libbalsa/mailbox_imap.c:3264
 msgid "Server-side threading not supported."
 msgstr ""
 
@@ -2315,107 +2350,107 @@ msgstr "დასრულებულია"
 msgid "Mailbox (%s) is read-only: cannot change flags."
 msgstr ""
 
-#: libbalsa/misc.c:226 libbalsa/misc.c:235
+#: libbalsa/misc.c:232 libbalsa/misc.c:241
 #, c-format
 msgid "cannot delete “%s”: %s"
 msgstr "%s-ის წაშლის შეცდომა: %s"
 
-#: libbalsa/misc.c:388
+#: libbalsa/misc.c:394
 msgid "West European"
 msgstr "დასავლეთ ევროპული"
 
-#: libbalsa/misc.c:390 libbalsa/misc.c:424
+#: libbalsa/misc.c:396 libbalsa/misc.c:430
 msgid "East European"
 msgstr "აღმოსავლურ ევროპული"
 
-#: libbalsa/misc.c:392
+#: libbalsa/misc.c:398
 msgid "South European"
 msgstr "სამხრეთ ევროპული"
 
-#: libbalsa/misc.c:394
+#: libbalsa/misc.c:400
 msgid "North European"
 msgstr "ჩრდილოეთ ევროპული"
 
-#: libbalsa/misc.c:396 libbalsa/misc.c:426
+#: libbalsa/misc.c:402 libbalsa/misc.c:432
 msgid "Cyrillic"
 msgstr "კირილიცა"
 
-#: libbalsa/misc.c:398 libbalsa/misc.c:432
+#: libbalsa/misc.c:404 libbalsa/misc.c:438
 msgid "Arabic"
 msgstr "არაბული"
 
-#: libbalsa/misc.c:400 libbalsa/misc.c:428
+#: libbalsa/misc.c:406 libbalsa/misc.c:434
 msgid "Greek"
 msgstr "ბერძნული"
 
-#: libbalsa/misc.c:402 libbalsa/misc.c:430
+#: libbalsa/misc.c:408 libbalsa/misc.c:436
 msgid "Hebrew"
 msgstr "ივრითი"
 
-#: libbalsa/misc.c:404
+#: libbalsa/misc.c:410
 msgid "Turkish"
 msgstr "თურქული"
 
-#: libbalsa/misc.c:406
+#: libbalsa/misc.c:412
 msgid "Nordic"
 msgstr "სკანდინავიური"
 
-#: libbalsa/misc.c:408
+#: libbalsa/misc.c:414
 msgid "Thai"
 msgstr "ტაილანდური"
 
-#: libbalsa/misc.c:410 libbalsa/misc.c:434
+#: libbalsa/misc.c:416 libbalsa/misc.c:440
 msgid "Baltic"
 msgstr "ბალტიური"
 
-#: libbalsa/misc.c:412
+#: libbalsa/misc.c:418
 msgid "Celtic"
 msgstr "კელტური"
 
-#: libbalsa/misc.c:414
+#: libbalsa/misc.c:420
 msgid "West European (euro)"
 msgstr "დასავლეთ ევროპული (ევრო)"
 
-#: libbalsa/misc.c:416
+#: libbalsa/misc.c:422
 msgid "Russian"
 msgstr "რუსული"
 
-#: libbalsa/misc.c:418
+#: libbalsa/misc.c:424
 msgid "Ukrainian"
 msgstr "უკრაინული"
 
-#: libbalsa/misc.c:420
+#: libbalsa/misc.c:426
 msgid "Japanese"
 msgstr "იაპონური"
 
-#: libbalsa/misc.c:422
+#: libbalsa/misc.c:428
 msgid "Korean"
 msgstr "კორეული"
 
-#: libbalsa/misc.c:711
+#: libbalsa/misc.c:717
 #, c-format
 msgid "fcntl failed: %s."
 msgstr "fcntl-ის შეცდომა: %s."
 
-#: libbalsa/misc.c:727
+#: libbalsa/misc.c:733
 msgid "Timeout exceeded while attempting fcntl lock!"
 msgstr ""
 
-#: libbalsa/misc.c:734
+#: libbalsa/misc.c:740
 #, c-format
 msgid "Waiting for fcntl lock… %d"
 msgstr ""
 
-#: libbalsa/misc.c:763
+#: libbalsa/misc.c:769
 msgid "Timeout exceeded while attempting flock lock!"
 msgstr ""
 
-#: libbalsa/misc.c:771
+#: libbalsa/misc.c:777
 #, c-format
 msgid "Waiting for flock attempt… %d"
 msgstr ""
 
-#: libbalsa/misc.c:1078
+#: libbalsa/misc.c:1084
 #, c-format
 msgid "LDAP Directory for %s"
 msgstr ""
@@ -3268,11 +3303,6 @@ msgstr ""
 msgid "GnomeCard Address Book"
 msgstr ""
 
-#: libinit_balsa/assistant_init.c:91 libinit_balsa/assistant_init.c:99
-#: src/ab-window.c:243
-msgid "Address Book"
-msgstr "მისამართების წიგნი"
-
 #: libinit_balsa/assistant_init.c:150
 msgid "Configure Balsa"
 msgstr ""
@@ -3622,7 +3652,7 @@ msgstr "დათვალიერება"
 msgid "Edit"
 msgstr "რედაქტირება"
 
-#: src/ab-main.c:1095
+#: src/ab-main.c:1096
 msgid "Balsa Address Book"
 msgstr ""
 
@@ -5695,39 +5725,39 @@ msgstr "ნაგავი"
 msgid "Compressing mail folders…"
 msgstr ""
 
-#: src/main.c:597
+#: src/main.c:599
 msgid "Get new mail on start-up"
 msgstr ""
 
-#: src/main.c:599
+#: src/main.c:601
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr ""
 
-#: src/main.c:601
+#: src/main.c:603
 msgid "Attach file at URI"
 msgstr ""
 
-#: src/main.c:603
+#: src/main.c:605
 msgid "Opens MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:603
+#: src/main.c:605
 msgid "MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:605
+#: src/main.c:607
 msgid "Opens first unread mailbox"
 msgstr ""
 
-#: src/main.c:607
+#: src/main.c:609
 msgid "Opens default Inbox on start-up"
 msgstr ""
 
-#: src/main.c:609
+#: src/main.c:611
 msgid "Prints number unread and unsent messages"
 msgstr ""
 
-#: src/main.c:611
+#: src/main.c:613
 msgid "Show version"
 msgstr "ვერსიის ჩვენება"
 

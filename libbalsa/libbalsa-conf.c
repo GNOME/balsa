@@ -24,23 +24,16 @@
 #include "libbalsa-conf.h"
 
 #include <string.h>
-
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <glib/gstdio.h>
 
 #include "libbalsa.h"
-#include "misc.h"
 #include <glib/gi18n.h>
 
 typedef struct {
     GKeyFile *key_file;
     gchar *path;
     guint changes;
-    time_t mtime;
     gboolean private;
 } LibBalsaConf;
 
@@ -51,7 +44,6 @@ static GSList *lbc_groups;
 static gchar * libbalsa_rot(const gchar * pass)
 	G_GNUC_WARN_UNUSED_RESULT;
 
-#define BALSA_KEY_FILE "config"
 #define LBC_KEY_FILE(priv) \
     ((priv) ? lbc_conf_priv.key_file : lbc_conf.key_file)
 #define LBC_CHANGED(priv) \
@@ -80,27 +72,22 @@ static void
 lbc_init(LibBalsaConf * conf, const gchar * filename,
          const gchar * old_dir, gboolean private)
 {
-    struct stat buf;
     GError *error = NULL;
-    gint rc;
 
     conf->private = private;
     if (!conf->path)
         conf->path =
             g_build_filename(g_get_home_dir(), ".balsa", filename, NULL);
-    rc = stat(conf->path, &buf);
     if (conf->key_file) {
-        if (rc >= 0 && buf.st_mtime <= conf->mtime)
-            /* found the config file, and it hasn't been touched since
-             * we loaded it */
+        if (g_file_test(conf->path, G_FILE_TEST_IS_REGULAR))
+            /* found the config file */
             return;
     } else {
         conf->key_file = g_key_file_new();
-        if (rc < 0)
+        if (!g_file_test(conf->path, G_FILE_TEST_IS_REGULAR))
             /* no config file--must be first time startup */
             return;
     }
-    conf->mtime = buf.st_mtime;
 
     libbalsa_assure_balsa_dir();
     if (!g_key_file_load_from_file
@@ -513,37 +500,24 @@ libbalsa_conf_drop_all(void)
 static void
 lbc_sync(LibBalsaConf * conf)
 {
-    gchar *buf;
-    gsize len;
-    GError *error = NULL;
+	if (conf->changes > 0U) {
+		GError *error = NULL;
 
-    if (!conf->changes)
-        return;
-
-    buf = g_key_file_to_data(conf->key_file, &len, &error);
-    if (error) {
-        g_warning("Failed to sync config file “%s”: %s;"
-                  " changes not saved", conf->path, error->message);
-        g_error_free(error);
-        g_free(buf);
-        return;
-    }
-
-    conf->mtime = time(NULL);
-    if (!g_file_set_contents(conf->path, buf, len, &error)) {
-        if (error) {
-        	g_warning("Failed to rewrite config file “%s”: %s;"
-                      " changes not saved", conf->path, error->message);
-            g_error_free(error);
-        } else {
-        	g_warning("Failed to rewrite config file “%s”;"
-                          " changes not saved", conf->path);
-        }
-    } else if (conf->private) {
-        g_chmod(conf->path, 0600);
-    }
-
-    g_free(buf);
+		if (g_key_file_save_to_file(conf->key_file, conf->path, &error)) {
+			g_debug("Sync'ed config file “%s”", conf->path);
+			conf->changes = 0U;
+			if (conf->private) {
+				g_chmod(conf->path, S_IRUSR | S_IWUSR);
+			}
+		} else {
+			if (error != NULL) {
+				g_warning("Failed to rewrite config file “%s”: %s; changes not saved", conf->path, error->message);
+				g_error_free(error);
+			} else {
+				g_warning("Failed to rewrite config file “%s”; changes not saved", conf->path);
+			}
+		}
+	}
 }
 
 static guint lbc_sync_idle_id;

@@ -35,7 +35,8 @@ balsa_extra_dist =		\
 	meson_options.txt	\
 	balsa-mailto-handler.desktop.meson	\
 	org.desktop.Balsa.desktop.meson	\
-	po/meson.build
+	po/meson.build		\
+	README-CardDAV.md
 
 EXTRA_DIST =			\
 	$(balsa_extra_dist)

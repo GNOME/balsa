@@ -61,7 +61,7 @@ use this option to compile the code and hope for the best.
 
 `--with-libsecret`
 	Link to libsecret to store credentials in the Secret Service instead of
-the obfuscated text file `~/.balsa/config-private`.  See also section
+the obfuscated text file `~/.config/balsa/config-private`.  See also section
 _Credentials_ below.
 
 `--with-gss[=/usr/kerberos]`
@@ -201,7 +201,7 @@ Secret Service is implemented by, inter alia, GNOME keyring, Kwallet and
 KeePassXC.
 
 Otherwise, the credentials are stored obfuscated in the file
-`~/.balsa/config-private`.  **This method is not recommended, though.**
+`~/.config/balsa/config-private`.  **This method is not recommended, though.**
 
 If a password cannot be loaded from the Secret Service, Balsa tries to read it
 from the config file as fallback, and to store it in the Secret Service.  On

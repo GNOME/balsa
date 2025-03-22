@@ -147,7 +147,7 @@ GtkWidget *libbalsa_create_wrap_label(const gchar *text,
 									  gboolean     markup);
 void libbalsa_entry_config_passwd(GtkEntry *entry);
 
-void libbalsa_assure_balsa_dir(void);
+void libbalsa_assure_balsa_dirs(void);
 gchar *libbalsa_guess_ldap_base(void);
 gchar *libbalsa_guess_ldap_name(void);
 

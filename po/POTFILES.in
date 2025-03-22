@@ -117,6 +117,7 @@ src/spell-check.c
 src/store-address.c
 src/toolbar-factory.c
 src/toolbar-prefs.c
+src/xdg-folders.c
 ui/ab-main.ui
 ui/main-window.ui
 ui/message-window.ui

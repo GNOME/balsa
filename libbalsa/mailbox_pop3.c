@@ -147,7 +147,7 @@ libbalsa_mailbox_pop3_open(LibBalsaMailbox * mailbox, GError **err)
 }
 
 
-#define POP_UID_FILE	"/.balsa/pop-uids"
+#define POP_UID_FILE	"pop-uids"
 static GMutex uid_mutex;
 
 
@@ -161,7 +161,7 @@ mp_load_uids(const gchar *prefix)
 
 	res = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
-	fname = g_strconcat(g_get_home_dir(), POP_UID_FILE, NULL);
+	fname = g_strconcat(g_get_user_state_dir(), "balsa", POP_UID_FILE, NULL);
 	g_mutex_lock(&uid_mutex);
 	read_res = g_file_get_contents(fname, &contents, NULL, NULL);
 	g_mutex_unlock(&uid_mutex);
@@ -207,7 +207,7 @@ mp_save_uids(GHashTable *uids, const gchar *prefix, GError **error)
 	FILE *out;
 	gboolean result;
 
-	fname = g_strconcat(g_get_home_dir(), POP_UID_FILE, NULL);
+	fname = g_strconcat(g_get_user_state_dir(), "balsa", POP_UID_FILE, NULL);
 
 	g_mutex_lock(&uid_mutex);
 	read_res = g_file_get_contents(fname, &contents, NULL, NULL);

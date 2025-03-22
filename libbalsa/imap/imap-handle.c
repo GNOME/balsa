@@ -1494,7 +1494,7 @@ append_body(GString *res, const ImapBody *body)
   append_quoted_string(res, body->media_basic_name);
   append_quoted_string(res, body->media_subtype);
   append_hash(res, body->params);
-  g_string_append_printf(res, "%d %d", body->octets, body->lines);
+  g_string_append_printf(res, "%u %u", body->octets, body->lines);
   append_quoted_string(res, body->content_id);
   append_quoted_string(res, body->desc);
 

@@ -1964,23 +1964,23 @@ static GtkWidget *
 bndx_popup_menu_create(BalsaIndex * index)
 {
     static const struct {       /* this is a invariable part of */
-        const char *icon, *label;       /* the context message menu.    */
+        const char *label;       /* the context message menu.    */
         GCallback func;
     } entries[] = {
         {
-        BALSA_PIXMAP_REPLY, N_("_Reply…"),
+        N_("_Reply…"),
                 G_CALLBACK(balsa_message_reply)}, {
-        BALSA_PIXMAP_REPLY_ALL, N_("Reply To _All…"),
+        N_("Reply To _All…"),
                 G_CALLBACK(balsa_message_replytoall)}, {
-        BALSA_PIXMAP_REPLY_GROUP, N_("Reply To _Group…"),
+        N_("Reply To _Group…"),
                 G_CALLBACK(balsa_message_replytogroup)}, {
-        BALSA_PIXMAP_FORWARD, N_("_Forward Attached…"),
+        N_("_Forward Attached…"),
                 G_CALLBACK(balsa_message_forward_attached)}, {
-        BALSA_PIXMAP_FORWARD, N_("Forward _Inline…"),
+        N_("Forward _Inline…"),
                 G_CALLBACK(balsa_message_forward_inline)}, {
-        NULL,                 N_("_Pipe through…"),
+        N_("_Pipe through…"),
                 G_CALLBACK(balsa_index_pipe)}, {
-        BALSA_PIXMAP_BOOK_RED, N_("_Store Address…"),
+        N_("_Store Address…"),
                 G_CALLBACK(bndx_store_address)}};
     GtkWidget *menu, *menuitem, *submenu;
     unsigned i;

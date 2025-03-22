@@ -206,14 +206,14 @@ tm_load_model(BalsaToolbarModel * model)
     for (j = 0;; j++) {
         BalsaToolbarEntry entry;
 
-        key = g_strdup_printf("Action%d", j);
+        key = g_strdup_printf("Action%u", j);
         entry.action = libbalsa_conf_get_string(key);
         g_free(key);
 
         if (!entry.action)
             break;
 
-        key = g_strdup_printf("Icon%d", j);
+        key = g_strdup_printf("Icon%u", j);
         entry.icon = libbalsa_conf_get_string(key);
         g_free(key);
 
@@ -242,10 +242,10 @@ tm_save_model(BalsaToolbarModel * model)
         BalsaToolbarEntry *entry;
 
         entry = &g_array_index(model->current, BalsaToolbarEntry, j);
-        key = g_strdup_printf("Action%d", j);
+        key = g_strdup_printf("Action%u", j);
         libbalsa_conf_set_string(key, entry->action);
         g_free(key);
-        key = g_strdup_printf("Icon%d", j);
+        key = g_strdup_printf("Icon%u", j);
         libbalsa_conf_set_string(key, entry->icon);
         g_free(key);
     }

@@ -806,8 +806,7 @@ config_global_load(void)
             const gchar *def_val;
 
             key = g_strdup_printf("QuotedColor%d", i);
-            def_val =
-                i < 6 ? default_quoted_color[i] : DEFAULT_QUOTED_COLOR;
+            def_val = default_quoted_color[i];
             load_color(key, def_val, &balsa_app.quoted_color[i]);
             g_free(key);
 	}

@@ -61,7 +61,6 @@ struct _AddressBookConfig {
 		GtkWidget *user;
 		GtkWidget *passwd;
 		GtkWidget *probe;
-		GtkWidget *addressbook;
 		GtkWidget *remote_name;
 		GtkWidget *refresh_period;
 		GtkWidget *force_mget;

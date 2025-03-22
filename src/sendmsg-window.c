@@ -814,6 +814,7 @@ sw_edit_activated(GSimpleAction * action,
                                    _("Could not create temporary file: %s"),
                                    error->message);
         g_error_free(error);
+        g_object_unref(app);
         return;
     }
     filename = g_file_get_path(tmp_file);

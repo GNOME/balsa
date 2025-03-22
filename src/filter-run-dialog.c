@@ -157,7 +157,7 @@ balsa_filter_run_dialog_new(LibBalsaMailbox *mbox,
 {
     BalsaFilterRunDialog *p;
     gchar *dialog_title;
-    gboolean use_headerbar = TRUE;
+    gboolean use_headerbar;
     GSList *filters;
 
     g_return_val_if_fail(mbox, NULL);

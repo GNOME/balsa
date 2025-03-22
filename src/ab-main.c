@@ -272,13 +272,13 @@ set_address_book_menu_items(void)
 
         name = libbalsa_address_book_get_name(address_book);
 
-        label = g_strdup_printf("_%d:%s", ++pos, name);
+        label = g_strdup_printf("_%u:%s", ++pos, name);
         detailed_action = g_strdup_printf("win.address-book::%s", name);
         item = g_menu_item_new(label, detailed_action);
         g_free(detailed_action);
         g_free(label);
 
-        accel = g_strdup_printf("<Primary>%d", pos);
+        accel = g_strdup_printf("<Primary>%u", pos);
         g_menu_item_set_attribute(item, "accel", "s", accel);
         g_free(accel);
 
@@ -476,7 +476,7 @@ ab_remove_address(LibBalsaAddress* address)
 
     g_return_val_if_fail(address, err);
 
-    libbalsa_address_book_remove_address(contacts_app.address_book, address);
+    err = libbalsa_address_book_remove_address(contacts_app.address_book, address);
 
     if(err == LBABERR_OK) {
         GtkTreeIter       iter;

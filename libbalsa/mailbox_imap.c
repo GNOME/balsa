@@ -2540,10 +2540,18 @@ lbm_imap_get_msg_part_from_cache(LibBalsaMessage * message,
         }
         dt.block = g_malloc(dt.body->octets+1);
         dt.pos   = 0;
-        if(dt.body->octets>SizeMsgThreshold)
-            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
+        if(dt.body->octets>SizeMsgThreshold) {
+            LibBalsaServer *s = LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mailbox);
+            gchar *hide_id;
+
+            hide_id = g_strdup_printf("LBIMAP_LOAD_%u_%u",
+                g_str_hash(libbalsa_server_get_user(s)),
+                g_str_hash(libbalsa_server_get_host(s)));
+            libbalsa_information_may_hide(LIBBALSA_INFORMATION_MESSAGE, hide_id,
                                  _("Downloading %u kB"),
                                  dt.body->octets/1024);
+            g_free(hide_id);
+        }
 	/* Imap_mbox_handle_fetch_body fetches the MIME headers of the
          * section, followed by the text. We write this unfiltered to
          * the cache. The probably only exception is the main body

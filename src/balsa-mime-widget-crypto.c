@@ -395,7 +395,7 @@ create_import_keys_widget(BalsaMimeWidget *mw, const gchar *key_buf, GError **er
 
 					import_btn = gtk_button_new_with_label(_("Import key into the local key ring"));
 					g_object_set_data_full(G_OBJECT(import_btn), "keydata", key_ascii, (GDestroyNotify) g_free);
-					g_signal_connect(import_btn, "clicked", (GCallback) on_key_import_button, NULL);
+					g_signal_connect(import_btn, "clicked", G_CALLBACK(on_key_import_button), NULL);
 					gtk_container_add(container, import_btn);
 
 					if (item->next != NULL) {

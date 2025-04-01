@@ -6926,7 +6926,7 @@ sendmsg_window_new()
                      balsa_app.identities->next != NULL);
     bsmsg->identities_changed_id =
         g_signal_connect_swapped(balsa_app.main_window, "identities-changed",
-                                 (GCallback)bsmsg_identities_changed_cb,
+                                 G_CALLBACK(bsmsg_identities_changed_cb),
                                  bsmsg);
 #if !HAVE_GTKSOURCEVIEW
     sw_buffer_set_undo(bsmsg, TRUE, FALSE);

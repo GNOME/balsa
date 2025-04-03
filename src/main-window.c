@@ -4264,7 +4264,7 @@ empty_trash(BalsaWindow * window)
                                        err ?
                                        err->message : _("Unknown error"));
 
-	g_error_free(err);
+	g_clear_error(&err);
         g_object_unref(balsa_app.trash);
 	return;
     }

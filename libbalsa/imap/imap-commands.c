@@ -567,11 +567,11 @@ imap_mbox_append_multi_real(ImapMboxHandle *handle,
       /* MULTIAPPEND continuation */
       if(flags) {
 	gchar *str = enum_flag_to_str(flags);
-	sio_printf(handle->sio, " (%s) {%lu%s}", str,
+	sio_printf(handle->sio, " (%s) {%lu%s}\r\n", str,
 		   (unsigned long)msg_size, litstr);
 	g_free(str);
       } else 
-	sio_printf(handle->sio, " {%lu%s}",
+	sio_printf(handle->sio, " {%lu%s}\r\n",
 		   (unsigned long)msg_size, litstr);
     }
 

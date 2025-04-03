@@ -2986,27 +2986,22 @@ create_cache_copy(const gchar *src, const gchar *cache_dir, const gchar *name)
 {
     gchar *fname = libbalsa_urlencode(name);
     gchar *dst = g_build_filename(cache_dir, fname, NULL);
-    if(link(src, dst) != 0) {
-	/* Link failed possibly because the two caches reside on
-	   different file systems. We attempt to copy the cache instead. */
-	FILE *in  = fopen(src, "r");
 
-	if(in) {
-	    FILE *out = fopen(dst, "w");
-	    if(out) {
-	        size_t sz;
-	        char buf[65536];
-		gboolean err;
-		while( (sz=fread(buf, 1, sizeof(buf), in)) > 0)
-		    if(fwrite(buf, 1, sz, out) != sz)
-			break;
-		err = ferror(in) || ferror(out);
-		fclose(out);
-		if(err)
-		    unlink(dst);
-	    }
-	    fclose(in);
-	}
+	if (link(src, dst) != 0) {
+		/* Link failed possibly because the two caches reside on
+		   different file systems. We attempt to copy the cache instead. */
+		GFile *srcfile;
+		GFile *dstfile;
+		GError *error = NULL;
+
+		srcfile = g_file_new_for_path(src);
+		dstfile = g_file_new_for_path(dst);
+		if (!g_file_copy(srcfile, dstfile, G_FILE_COPY_NONE, NULL, NULL, NULL, &error)) {
+			g_warning("%s: copy %s -> %s failed: %s", __func__, src, dst, error->message);
+			g_error_free(error);
+		}
+		g_object_unref(srcfile);
+		g_object_unref(dstfile);
     }
     g_free(fname);
     g_free(dst);

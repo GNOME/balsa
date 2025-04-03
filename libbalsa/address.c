@@ -874,7 +874,7 @@ GtkTargetEntry libbalsa_address_target_list[2] = {
 static void
 addrlist_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
                           gint x, gint y, GtkSelectionData * selection_data,
-                          guint target_type, guint32 time, gpointer data)
+                          guint target_type, guint time, gpointer data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);

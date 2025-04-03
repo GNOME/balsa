@@ -792,60 +792,59 @@ bmbl_column_resize(GtkWidget * widget,
 static void
 bmbl_drag_cb(GtkWidget * widget, GdkDragContext * context,
              gint x, gint y, GtkSelectionData * selection_data,
-             guint info, guint32 time, gpointer data)
+             guint info, guint time, gpointer data)
 {
     GtkTreeView *tree_view = GTK_TREE_VIEW(widget);
     GtkTreeModel *model = gtk_tree_view_get_model(tree_view);
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
-    GtkTreePath *path;
-    GtkTreeIter iter;
-    LibBalsaMailbox *mailbox;
-    LibBalsaMailbox *orig_mailbox;
-    BalsaIndex *orig_index;
-    GArray *selected;
+    gboolean dnd_ok = FALSE;
 
-    if (!selection_data || !gtk_selection_data_get_data(selection_data))
-	/* Drag'n'drop is weird... */
-	return;
+	if ((selection_data != NULL) && (gtk_selection_data_get_data(selection_data) != NULL)) {
+		BalsaIndex *orig_index;
+		GArray *selected;
 
-    orig_index =
-        *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
-    selected = balsa_index_selected_msgnos_new(orig_index);
-    if (selected->len == 0) {
-	/* it is actually possible to drag from GtkTreeView when no rows
-	 * are selected: Disable preview for that. */
-        balsa_index_selected_msgnos_free(orig_index, selected);
-        return;
-    }
+		orig_index = *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
+		selected = balsa_index_selected_msgnos_new(orig_index);
 
-    orig_mailbox = balsa_index_get_mailbox(orig_index);
+		/* it is actually possible to drag from GtkTreeView when no rows
+		 * are selected: Disable preview for that. */
+		if (selected->len > 0U) {
+			LibBalsaMailbox *orig_mailbox;
+			GtkTreePath *path;
+			GtkTreeIter iter;
 
-    /* find the node and mailbox */
+			orig_mailbox = balsa_index_get_mailbox(orig_index);
 
-    /* we should be able to use:
-     * gtk_tree_view_get_drag_dest_row(tree_view, &path, NULL);
-     * but it sets path to NULL for some reason, so we'll go down to a
-     * lower level. */
-    if (gtk_tree_view_get_dest_row_at_pos(tree_view,
-                                          x, y, &path, NULL)) {
-	BalsaMailboxNode *mbnode;
+			/* find the node and mailbox */
 
-        gtk_tree_model_get_iter(model, &iter, path);
-        gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
-        mailbox = balsa_mailbox_node_get_mailbox(mbnode);
-	g_object_unref(mbnode);
+			/* we should be able to use:
+			 * gtk_tree_view_get_drag_dest_row(tree_view, &path, NULL);
+			 * but it sets path to NULL for some reason, so we'll go down to a
+			 * lower level. */
+			if (gtk_tree_view_get_dest_row_at_pos(tree_view, x, y, &path, NULL)) {
+				BalsaMailboxNode *mbnode;
+				LibBalsaMailbox *mailbox;
 
-        /* cannot transfer to the originating mailbox */
-        if (mailbox != NULL && mailbox != orig_mailbox)
-            balsa_index_transfer(orig_index, selected, mailbox,
-                                 gdk_drag_context_get_selected_action
-                                 (context) != GDK_ACTION_MOVE);
-        gtk_tree_path_free(path);
-    }
-    balsa_index_selected_msgnos_free(orig_index, selected);
+				gtk_tree_model_get_iter(model, &iter, path);
+				gtk_tree_model_get(model, &iter, MBNODE_COLUMN, &mbnode, -1);
+				mailbox = balsa_mailbox_node_get_mailbox(mbnode);
+				g_object_unref(mbnode);
 
-    if (balsa_find_iter_by_data(&iter, orig_mailbox))
-        gtk_tree_selection_select_iter(selection, &iter);
+				/* cannot transfer to the originating mailbox */
+				if ((mailbox != NULL) && (mailbox != orig_mailbox)) {
+					balsa_index_transfer(orig_index, selected, mailbox,
+							gdk_drag_context_get_selected_action(context) != GDK_ACTION_MOVE);
+					dnd_ok = TRUE;
+				}
+				gtk_tree_path_free(path);
+			}
+			if (balsa_find_iter_by_data(&iter, orig_mailbox)) {
+				gtk_tree_selection_select_iter(selection, &iter);
+			}
+		}
+		balsa_index_selected_msgnos_free(orig_index, selected);
+	}
+	gtk_drag_finish(context, dnd_ok, FALSE, time);
 }
 
 /* bmbl_select_mailbox

@@ -2169,7 +2169,7 @@ attachments_add(GtkWidget * widget,
 		gint x,
 		gint y,
 		GtkSelectionData * selection_data,
-		guint info, guint32 time, BalsaSendmsg * bsmsg)
+		guint info, guint time, BalsaSendmsg * bsmsg)
 {
     gboolean drag_result = TRUE;
 
@@ -2230,7 +2230,7 @@ to_add(GtkWidget * widget,
        gint x,
        gint y,
        GtkSelectionData * selection_data,
-       guint info, guint32 time)
+       guint info, guint time, gpointer user_data)
 {
     gboolean drag_result = FALSE;
 
@@ -2373,7 +2373,7 @@ create_email_header(BalsaSendmsg         *bsmsg,
 
     create_email_or_string_header(bsmsg, grid, _(label), y_pos, header);
 
-    g_signal_connect(*view, "drag_data_received",
+    g_signal_connect(*view, "drag-data-received",
                      G_CALLBACK(to_add), NULL);
     g_signal_connect(*view, "open-address-book",
 		     G_CALLBACK(address_book_cb), bsmsg);
@@ -2702,7 +2702,7 @@ sw_attachment_list(BalsaSendmsg *bsmsg)
     g_signal_connect(gesture, "pressed",
                      G_CALLBACK(attachment_button_press_cb), view);
 
-    g_signal_connect(bsmsg->window, "drag_data_received",
+    g_signal_connect(bsmsg->window, "drag-data-received",
 		     G_CALLBACK(attachments_add), bsmsg);
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->window), GTK_DEST_DEFAULT_ALL,
 		      drop_types, G_N_ELEMENTS(drop_types),
@@ -2750,7 +2750,7 @@ drag_data_quote(GtkWidget * widget,
                 gint x,
                 gint y,
                 GtkSelectionData * selection_data,
-                guint info, guint32 time, BalsaSendmsg * bsmsg)
+                guint info, guint time, BalsaSendmsg * bsmsg)
 {
     GtkTextBuffer *buffer;
     BalsaIndex *index;
@@ -2807,7 +2807,7 @@ drag_data_quote(GtkWidget * widget,
         break;
     case TARGET_EMAIL:
     case TARGET_STRING: /* perhaps we should allow dropping in these, too? */
-    default: return;
+    default: break;
     }
     gtk_drag_finish(context, TRUE, FALSE, time);
 }
@@ -2909,7 +2909,7 @@ create_text_area(BalsaSendmsg * bsmsg)
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll),
     				   GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
     gtk_container_add(GTK_CONTAINER(scroll), bsmsg->text);
-    g_signal_connect(bsmsg->text, "drag_data_received",
+    g_signal_connect(bsmsg->text, "drag-data-received",
 		     G_CALLBACK(drag_data_quote), bsmsg);
     /* GTK_DEST_DEFAULT_ALL in drag_set would trigger bug 150141 */
     gtk_drag_dest_set(GTK_WIDGET(bsmsg->text), 0,

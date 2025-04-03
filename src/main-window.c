@@ -4553,41 +4553,37 @@ static void
 bw_notebook_drag_received_cb(GtkWidget * widget, GdkDragContext * context,
                              gint x, gint y,
                              GtkSelectionData * selection_data, guint info,
-                             guint32 time, gpointer data)
+                             guint time, gpointer data)
 {
-    BalsaIndex* index;
-    LibBalsaMailbox* mailbox;
-    BalsaIndex *orig_index;
-    GArray *selected;
-    LibBalsaMailbox* orig_mailbox;
+	gboolean dnd_ok = FALSE;
 
-    if (!selection_data)
-	/* Drag'n'drop is weird... */
-	return;
+	if ((selection_data != NULL) && (gtk_selection_data_get_data(selection_data) != NULL)) {
+		BalsaIndex *orig_index;
+		GArray *selected;
 
-    orig_index =
-        *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
-    selected = balsa_index_selected_msgnos_new(orig_index);
-    if (selected->len == 0) {
-        /* it is actually possible to drag from GtkTreeView when no rows
-         * are selected: Disable preview for that. */
-        balsa_index_selected_msgnos_free(orig_index, selected);
-        return;
-    }
+		orig_index = *(BalsaIndex **) gtk_selection_data_get_data(selection_data);
+		selected = balsa_index_selected_msgnos_new(orig_index);
+		if (selected->len > 0U) {
+			LibBalsaMailbox* orig_mailbox;
+			BalsaIndex* index;
 
-    orig_mailbox = balsa_index_get_mailbox(orig_index);
+			orig_mailbox = balsa_index_get_mailbox(orig_index);
+			index = bw_notebook_find_page(GTK_NOTEBOOK(widget), x, y);
+			if (index != NULL) {
+				LibBalsaMailbox* mailbox;
 
-    index = bw_notebook_find_page (GTK_NOTEBOOK(widget), x, y);
+				mailbox = balsa_index_get_mailbox(index);
 
-    if (index == NULL)
-        return;
-
-    mailbox = balsa_index_get_mailbox(index);
-
-    if (mailbox != NULL && mailbox != orig_mailbox)
-        balsa_index_transfer(orig_index, selected, mailbox,
-                             gdk_drag_context_get_selected_action(context) != GDK_ACTION_MOVE);
-    balsa_index_selected_msgnos_free(orig_index, selected);
+				if ((mailbox != NULL) && (mailbox != orig_mailbox)) {
+					balsa_index_transfer(orig_index, selected, mailbox,
+							gdk_drag_context_get_selected_action(context) != GDK_ACTION_MOVE);
+					dnd_ok = TRUE;
+				}
+			}
+		}
+		balsa_index_selected_msgnos_free(orig_index, selected);
+	}
+	gtk_drag_finish(context, dnd_ok, FALSE, time);
 }
 
 static gboolean bw_notebook_drag_motion_cb(GtkWidget * widget,

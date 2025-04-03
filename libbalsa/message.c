@@ -630,11 +630,12 @@ libbalsa_message_save(LibBalsaMessage *message,
     if ((outfile = fopen(filename, "w")) == NULL)
         return FALSE;
 
-    g_return_val_if_fail(outfile, FALSE);
-
     msg_stream = libbalsa_message_stream(message);
-    if (msg_stream == NULL)
+    if (msg_stream == NULL) {
+        fclose(outfile);
+        unlink(filename);
         return FALSE;
+    }
 
     out_stream = g_mime_stream_file_new(outfile);
     libbalsa_mailbox_lock_store(message->mailbox);

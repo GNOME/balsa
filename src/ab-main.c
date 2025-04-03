@@ -572,7 +572,10 @@ get_main_menu(GtkApplication * application)
 }
 
 static void
-list_row_activated_cb(GtkTreeView *tview, gpointer data);
+list_row_activated_cb(GtkTreeView       *tview,
+                      GtkTreePath       *path,
+                      GtkTreeViewColumn *column,
+                      gpointer           data);
 
 static void
 ab_set_edit_widget(LibBalsaAddress * address, gboolean can_remove)
@@ -616,7 +619,7 @@ list_selection_changed_cb(GtkTreeSelection *selection, gpointer data)
 }
 
 static void
-list_row_activated_cb(GtkTreeView *tree, gpointer data)
+list_row_activated_cb(GtkTreeView *tree, GtkTreePath *path, GtkTreeViewColumn *column, gpointer data)
 {
     GtkTreeIter iter;
     GtkTreeModel *model;

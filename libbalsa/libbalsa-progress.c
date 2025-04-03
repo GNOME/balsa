@@ -64,7 +64,8 @@ static void libbalsa_progress_dialog_ensure_real(ProgressDialog *progress_dialog
 static gboolean libbalsa_progress_dialog_create_cb(create_progress_dlg_t *dlg_data);
 
 static void progress_dialog_response_cb(GtkWidget *dialog,
-                            		    gint       response);
+                            		    gint       response,
+                                        gpointer   user_data);
 static void progress_dialog_destroy_cb(GtkWidget G_GNUC_UNUSED *widget,
 									   ProgressDialog          *progress_dialog);
 static progress_widget_data_t *find_progress_data_by_name(GtkContainer *container,
@@ -228,7 +229,8 @@ libbalsa_progress_dialog_create_cb(create_progress_dlg_t *dlg_data)
 
 static void
 progress_dialog_response_cb(GtkWidget *dialog,
-                            gint       response)
+                            gint       response,
+                            gpointer   user_data)
 {
     if (response == GTK_RESPONSE_CLOSE) {
         gtk_widget_destroy(dialog);

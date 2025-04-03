@@ -42,7 +42,8 @@ static void balsa_initdruid_cancel_response(GtkDialog *self,
                                             gpointer   user_data);
 
 static void
-balsa_initdruid_cancel(GtkAssistant * druid)
+balsa_initdruid_cancel(GtkAssistant * druid,
+                       gpointer       user_data)
 {
     GtkWidget *dialog =
         gtk_message_dialog_new(GTK_WINDOW(gtk_widget_get_ancestor
@@ -74,7 +75,8 @@ balsa_initdruid_cancel_response(GtkDialog *self,
 }
 
 static void
-balsa_initdruid_apply(GtkAssistant * druid)
+balsa_initdruid_apply(GtkAssistant * druid,
+                      gpointer       user_data)
 {
     gchar *address_book;
     LibBalsaAddressBook *ab = NULL;

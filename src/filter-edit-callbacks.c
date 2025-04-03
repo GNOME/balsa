@@ -2160,7 +2160,7 @@ fe_date_sample(void)
 
 /* Callback for the sound file-chooser-button's dialog. */
 void
-fe_sound_response(GtkDialog * dialog, gint response)
+fe_sound_response(GtkDialog * dialog, gint response, gpointer data)
 {
     if (response == GTK_RESPONSE_ACCEPT)
         set_button_sensitivities(TRUE);

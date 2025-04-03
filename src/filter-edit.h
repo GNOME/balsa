@@ -93,7 +93,7 @@ void fe_action_changed(GtkWidget * widget, gpointer data);
 void fe_enable_right_page(gboolean enabled);
 
 /* Callback for the sound file-chooser-button's dialog. */
-void fe_sound_response(GtkDialog * dialog, gint response);
+void fe_sound_response(GtkDialog * dialog, gint response, gpointer data);
 
 void fe_add_new_user_header(const gchar *);
 

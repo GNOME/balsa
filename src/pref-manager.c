@@ -1452,7 +1452,7 @@ properties_modified_cb(GtkWidget * widget, GtkWidget * pbox)
 }
 
 static void
-server_edit_cb(GtkTreeView * tree_view)
+server_edit_cb(GtkTreeView * tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data)
 {
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model;
@@ -1523,7 +1523,7 @@ smtp_server_add_cb(void)
 }
 
 static void
-smtp_server_edit_cb(GtkTreeView * tree_view)
+smtp_server_edit_cb(GtkTreeView * tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data)
 {
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);
     GtkTreeModel *model;
@@ -1600,7 +1600,7 @@ address_book_change(LibBalsaAddressBook * address_book, gboolean append)
 }
 
 static void
-address_book_edit_cb(GtkTreeView * tree_view)
+address_book_edit_cb(GtkTreeView * tree_view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data)
 {
     LibBalsaAddressBook *address_book;
     GtkTreeSelection *selection = gtk_tree_view_get_selection(tree_view);

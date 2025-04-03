@@ -853,7 +853,7 @@ lba_addr_list_widget(GCallback changed_cb, gpointer changed_data)
 }
 
 static void
-add_row(GtkWidget*button, gpointer data)
+add_row(GtkButton*button, gpointer data)
 {
     GtkTreeView *tv = GTK_TREE_VIEW(data);
     GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(tv));

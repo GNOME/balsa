@@ -87,7 +87,7 @@ folder_conf_destroy_common_data(CommonDialogData * common_data)
 }
 
 static void
-folder_conf_response(GtkDialog * dialog, int response,
+folder_conf_response(GtkDialog * dialog, gint response,
                      CommonDialogData * common_data)
 {
     GError *err = NULL;

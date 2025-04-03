@@ -309,7 +309,7 @@ balsa_window_init(BalsaWindow * window)
 }
 
 static gboolean
-bw_delete_cb(GtkWidget* main_window)
+bw_delete_cb(GtkWidget* main_window, GdkEvent *event, gpointer user_data)
 {
     /* we cannot leave main window disabled because compose windows
      * (for example) could refuse to get deleted and we would be left

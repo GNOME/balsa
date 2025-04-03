@@ -68,14 +68,14 @@ static void available_selection_changed_cb(GtkTreeSelection * selection,
                                            ToolbarPage * page);
 static void current_selection_changed_cb(GtkTreeSelection * selection,
                                          ToolbarPage * page);
-static void available_row_activated_cb(GtkTreeView * treeview,
-                                       GtkTreeIter * arg1,
-                                       GtkTreePath * arg2,
-                                       ToolbarPage * page);
-static void current_row_activated_cb(GtkTreeView * treeview,
-                                     GtkTreeIter * arg1,
-                                     GtkTreePath * arg2,
-                                     ToolbarPage * page);
+static void available_row_activated_cb(GtkTreeView       *treeview,
+                                       GtkTreePath       *path,
+                                       GtkTreeViewColumn *column,
+                                       ToolbarPage       *page);
+static void current_row_activated_cb(GtkTreeView       *treeview,
+                                     GtkTreePath       *path,
+                                     GtkTreeViewColumn *column,
+                                     ToolbarPage       *page);
 
 /* Helpers. */
 static GtkWidget *create_toolbar_page(BalsaToolbarModel * model,
@@ -284,8 +284,8 @@ style_button_cb(GtkWidget *widget, ToolbarPage * page)
 
 /* Callback for the "row-activated" signal for the available list. */
 static void
-available_row_activated_cb(GtkTreeView * treeview, GtkTreeIter * arg1,
-                        GtkTreePath * arg2, ToolbarPage * page)
+available_row_activated_cb(GtkTreeView *treeview, GtkTreePath *path,
+                        GtkTreeViewColumn *column, ToolbarPage * page)
 {
     tp_page_add_selected(page);
 }
@@ -302,8 +302,8 @@ available_selection_changed_cb(GtkTreeSelection * selection,
 
 /* Callback for the "row-activated" signal for the current list. */
 static void
-current_row_activated_cb(GtkTreeView * treeview, GtkTreeIter * arg1,
-                      GtkTreePath * arg2, ToolbarPage * page)
+current_row_activated_cb(GtkTreeView *treeview, GtkTreePath *path,
+                      GtkTreeViewColumn *column, ToolbarPage *page)
 {
     tp_page_remove_selected(page);
 }

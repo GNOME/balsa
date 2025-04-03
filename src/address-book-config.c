@@ -1061,7 +1061,7 @@ modify_book(AddressBookConfig * abc)
 /* Pref manager callbacks */
 
 static void
-add_vcard_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_vcard_cb(GtkMenuItem * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_VCARD;
     abc->window = create_vcard_dialog(abc);
@@ -1069,7 +1069,7 @@ add_vcard_cb(GtkWidget * widget, AddressBookConfig * abc)
 }
 
 static void
-add_externq_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_externq_cb(GtkMenuItem * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_EXTERNQ;
     abc->window = create_externq_dialog(abc);
@@ -1077,7 +1077,7 @@ add_externq_cb(GtkWidget * widget, AddressBookConfig * abc)
 }
 
 static void
-add_ldif_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_ldif_cb(GtkMenuItem * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDIF;
     abc->window = create_ldif_dialog(abc);
@@ -1086,7 +1086,7 @@ add_ldif_cb(GtkWidget * widget, AddressBookConfig * abc)
 
 #ifdef ENABLE_LDAP
 static void
-add_ldap_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_ldap_cb(GtkMenuItem * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_LDAP;
     abc->window = create_ldap_dialog(abc);
@@ -1096,7 +1096,7 @@ add_ldap_cb(GtkWidget * widget, AddressBookConfig * abc)
 
 #ifdef HAVE_GPE
 static void
-add_gpe_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_gpe_cb(GtkMenuItem * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_GPE;
     abc->window = create_gpe_dialog(abc);
@@ -1106,7 +1106,7 @@ add_gpe_cb(GtkWidget * widget, AddressBookConfig * abc)
 
 #ifdef HAVE_OSMO
 static void
-add_osmo_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_osmo_cb(GtkMenuItem * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_OSMO;
     abc->window = create_osmo_dialog(abc);
@@ -1116,7 +1116,7 @@ add_osmo_cb(GtkWidget * widget, AddressBookConfig * abc)
 
 #ifdef HAVE_WEBDAV
 static void
-add_carddav_cb(GtkWidget * widget, AddressBookConfig * abc)
+add_carddav_cb(GtkMenuItem * widget, AddressBookConfig * abc)
 {
     abc->type = LIBBALSA_TYPE_ADDRESS_BOOK_CARDDAV;
     abc->window = create_carddav_dialog(abc);

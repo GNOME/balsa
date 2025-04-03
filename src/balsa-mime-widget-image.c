@@ -162,7 +162,7 @@ balsa_image_button_press_cb(GtkGestureMultiPress *multi_press_gesture,
 }
 
 static void
-img_size_allocate_cb(BalsaMimeWidgetImage *mwi)
+img_size_allocate_cb(BalsaMimeWidgetImage *mwi, GtkAllocation *allocation, gpointer user_data)
 {
     if (mwi->pixbuf != NULL && mwi->img_check_size_id == 0) {
         mwi->img_check_size_id = g_idle_add((GSourceFunc) img_check_size, mwi);

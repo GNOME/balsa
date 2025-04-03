@@ -1223,14 +1223,14 @@ md_sig_path_changed_cb(GtkToggleButton *sig_button, GObject *dialog)
 
 #define LIBBALSA_IDENTITY_INFO "libbalsa-identity-info"
 static void
-file_chooser_cb(GtkWidget * chooser, gpointer data)
+file_chooser_cb(GtkFileChooser * chooser, gpointer data)
 {
     gchar *filename;
     LibBalsaIdentityPathType type;
     GtkToggleButton *check;
     gboolean active;
 
-    filename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(chooser));
+    filename = gtk_file_chooser_get_filename(chooser);
     if (!filename || !*filename) {
         g_free(filename);
         return;

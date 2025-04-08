@@ -1,5 +1,5 @@
 project('balsa', 'c',
-        version         : '2.6.4',
+        version         : '2.6.5',
         meson_version   : '>= 0.50.0',
         default_options : ['sysconfdir=/etc', 'buildtype=debugoptimized'])
 
@@ -10,10 +10,16 @@ balsa_from_git = run_command('sh', '-c', 'test -d ${MESON_SOURCE_ROOT}/.git',
                              check : false).returncode() == 0
 
 if balsa_from_git
-  git_describe = run_command('git', 'describe', '--tags',
-                             check : true)
-  if git_describe.returncode() == 0
-    balsa_version = git_describe.stdout().strip()
+  git_reltag = run_command('git', 'tag', '--points-at', check : true)
+  reltag_version = git_reltag.stdout().strip()
+  if reltag_version != ''
+    balsa_version = reltag_version
+  else
+    git_describe = run_command('git', 'describe', '--tags',
+                               check : true)
+    if git_describe.returncode() == 0
+      balsa_version = git_describe.stdout().strip()
+    endif
   endif
 endif
 

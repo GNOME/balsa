@@ -8,8 +8,10 @@ dnl ###########################################################################
 dnl Boilerplace and versioning
 dnl ###########################################################################
 
-# if autoconf is used not in a git source tree, use version=2.6.4
-AC_INIT([balsa],[m4_esyscmd(test -d .git && echo -n `git describe --tags` || echo -n 2.6.4)],[])
+# if autoconf is used not in a git source tree, use version=2.6.5
+AC_INIT([balsa],
+	m4_esyscmd(test -d .git && (V=`git tag --points-at`; test -n "$V" || V=`git describe --tags`; echo -n $V) || echo -n 2.6.5),
+	[])
 
 AM_INIT_AUTOMAKE
 AC_LANG([C])
@@ -615,7 +617,8 @@ dnl #####################################################################
 dnl 8. Output
 dnl #####################################################################
 
-AC_CONFIG_FILES([ po/Makefile.in
+AC_CONFIG_FILES([
+po/Makefile.in
 Makefile
 balsa.1
 balsa.spec

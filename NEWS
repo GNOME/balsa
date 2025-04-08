@@ -1,3 +1,21 @@
+* Balsa-2.6.5 release. Release date 2025-04-NN
+
+- fix connection issues with broken IMAP servers
+- add limited support for CardDAV address books
+- always store user credentials in the Secret Service if possible
+- improve dealing with user credentials iff the Secret Service is unusable
+- improve saving attachments
+- improved setup wizard with server probing
+- add support for Web Key Directory (WKD) GnuPG keys
+- improve crypto user interface
+- add optional DKIM and DMARC checks
+- prefer TLS connections over STARTTLS
+- Webkit 4.1 support
+- use XDG-compliant user data folder layout
+- remove deprecated stuff (SQLite2, Rubrica, ige-mac-integration)
+- lots of bug fixes
+- documentation updates (yet incomplete)
+
 * Balsa-2.6.4 release. Release date 2022-09-20
 
 - Fix display/printout with nondefault HTML preferences.

@@ -265,7 +265,7 @@ libbalsa_is_cert_known(GTlsCertificate      *cert,
 	}
 
 	/* check the database of accepted certificates */
-	cert_file = g_build_filename(g_get_home_dir(), ".balsa", "certificates", NULL);
+	cert_file = g_build_filename(g_get_user_config_dir(), "balsa", "certificates", NULL);
 	cert_db = g_tls_certificate_list_new_from_file(cert_file, NULL);
 	g_mutex_unlock(&certificate_lock);
 

@@ -676,7 +676,7 @@ lbh_get_web_view_context(void)
 		gchar *cache_dir;
 		WebKitSettings *settings;
 
-		cache_dir = g_build_filename(g_get_home_dir(), ".balsa", CACHE_DIR, NULL);
+		cache_dir = g_build_filename(g_get_user_cache_dir(), "balsa", CACHE_DIR, NULL);
 		data_manager = webkit_website_data_manager_new("base-cache-directory", cache_dir, NULL);
 		g_free(cache_dir);
 		webkit_website_data_manager_set_tls_errors_policy(data_manager, WEBKIT_TLS_ERRORS_POLICY_FAIL);
@@ -1194,7 +1194,7 @@ libbalsa_html_cache_size(void)
 	GFile *cache_dir;
 	guint64 result = 0;
 
-	cache_dir = g_file_new_build_filename(g_get_home_dir(), ".balsa", CACHE_DIR, NULL);
+	cache_dir = g_file_new_build_filename(g_get_user_cache_dir(), "balsa", CACHE_DIR, NULL);
 	g_file_measure_disk_usage(cache_dir, G_FILE_MEASURE_NONE, NULL, NULL, NULL, &result, NULL, NULL, NULL);
 	g_object_unref(cache_dir);
 	return result;

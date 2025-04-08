@@ -244,9 +244,7 @@ pref_db_check(void)
 		int sqlite_res;
 
 		g_debug("open HTML preferences database");
-		/* ensure that the config folder exists, otherwise Balsa will throw an error on first use */
-		libbalsa_assure_balsa_dir();
-		db_path = g_build_filename(g_get_home_dir(), ".balsa", "html-prefs.db", NULL);
+		db_path = g_build_filename(g_get_user_config_dir(), "balsa", "html-prefs.db", NULL);
 		require_init = (g_access(db_path, R_OK + W_OK) != 0);
 		sqlite_res = sqlite3_open(db_path, &pref_db);
 		if (sqlite_res == SQLITE_OK) {

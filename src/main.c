@@ -44,6 +44,7 @@
 #include "imap-server.h"
 #include "libbalsa-conf.h"
 #include "autocrypt.h"
+#include "xdg-folders.h"
 
 #include "libinit_balsa/assistant_init.h"
 
@@ -82,7 +83,7 @@ static void
 accel_map_load(void)
 {
     gchar *accel_map_filename =
-        g_build_filename(g_get_home_dir(), ".balsa", "accelmap", NULL);
+        g_build_filename(g_get_user_config_dir(), "balsa", "accelmap", NULL);
     gtk_accel_map_load(accel_map_filename);
     g_free(accel_map_filename);
 }
@@ -91,7 +92,7 @@ static void
 accel_map_save(void)
 {
     gchar *accel_map_filename =
-        g_build_filename(g_get_home_dir(), ".balsa", "accelmap", NULL);
+        g_build_filename(g_get_user_config_dir(), "balsa", "accelmap", NULL);
     gtk_accel_map_save(accel_map_filename);
     g_free(accel_map_filename);
 }
@@ -509,7 +510,21 @@ balsa_startup_cb(GApplication *application,
     libbalsa_gpgme_init(lb_gpgme_passphrase, lb_gpgme_select_key,
 			lb_gpgme_accept_low_trust_key);
 
+    libbalsa_assure_balsa_dirs();
     balsa_app_init();
+
+    g_set_prgname("org.desktop.Balsa");
+
+    default_icon = libbalsa_pixmap_finder("balsa_icon.png");
+    if (default_icon) { /* may be NULL for developer installations */
+        gtk_window_set_default_icon_from_file(default_icon, NULL);
+        g_free(default_icon);
+    }
+
+    /* migrate to XDG folders if necessary, terminate on serious error */
+    if (!xdg_config_check()) {
+        g_error("migration to XDG standard folders FAILED");
+    }
 
     /* Initialize libbalsa */
     libbalsa_information_init(application, "Balsa", BALSA_NOTIFICATION);
@@ -529,14 +544,6 @@ balsa_startup_cb(GApplication *application,
     	g_error_free(error);
     }
 #endif
-
-    g_set_prgname("org.desktop.Balsa");
-
-    default_icon = libbalsa_pixmap_finder("balsa_icon.png");
-    if (default_icon) { /* may be NULL for developer installations */
-        gtk_window_set_default_icon_from_file(default_icon, NULL);
-        g_free(default_icon);
-    }
 
     balsa_app.has_openpgp =
         libbalsa_gpgme_check_crypto_engine(GPGME_PROTOCOL_OpenPGP);

@@ -1023,11 +1023,20 @@ libbalsa_entry_config_passwd(GtkEntry *entry)
 }
 
 void
-libbalsa_assure_balsa_dir(void)
+libbalsa_assure_balsa_dirs(void)
 {
-    gchar* dir = g_build_filename(g_get_home_dir(), ".balsa", NULL);
-    g_mkdir_with_parents(dir, S_IRUSR|S_IWUSR|S_IXUSR);
-    g_free(dir);
+	const gchar *(*dir_fn[3])(void) = { g_get_user_config_dir, g_get_user_state_dir, g_get_user_cache_dir };
+	guint n;
+
+	for (n = 0U; n < G_N_ELEMENTS(dir_fn); n++) {
+		gchar *folder;
+
+		folder = g_build_filename(dir_fn[n](), "balsa", NULL);
+		if (g_mkdir_with_parents(folder, S_IRWXU) == -1) {
+			g_error("cannot create folder %s: %s", folder, g_strerror(errno));
+		}
+		g_free(folder);
+	}
 }
 
 /* Some more "guess" functions symmetric to libbalsa_guess_mail_spool()... */

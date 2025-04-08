@@ -67,7 +67,9 @@ balsa_base_srclist = [
   'toolbar-factory.c',
   'toolbar-factory.h',
   'toolbar-prefs.c',
-  'toolbar-prefs.h'
+  'toolbar-prefs.h',
+  'xdg-folders.c',
+  'xdg-folders.h'
   ]
 
 balsa_print_source = [

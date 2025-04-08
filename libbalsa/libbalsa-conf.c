@@ -49,83 +49,25 @@ static gchar * libbalsa_rot(const gchar * pass)
 #define LBC_CHANGED(priv) \
     ((priv) ? ++lbc_conf_priv.changes : ++lbc_conf.changes)
 
-static gchar *
-lbc_readfile(const gchar * filename)
-{
-    gchar *buf;
-    gchar **split;
-
-    if (!g_file_get_contents(filename, &buf, NULL, NULL)) {
-        g_debug("Failed to read “%s”", filename);
-        return NULL;
-    }
-
-    split = g_strsplit(buf, "\\\\ ", 0);
-    g_free(buf);
-    buf = g_strjoinv("\\ ", split);
-    g_strfreev(split);
-
-    return buf;
-}
-
 static void
 lbc_init(LibBalsaConf * conf, const gchar * filename,
-         const gchar * old_dir, gboolean private)
+         gboolean private)
 {
     GError *error = NULL;
 
     conf->private = private;
-    if (!conf->path)
-        conf->path =
-            g_build_filename(g_get_home_dir(), ".balsa", filename, NULL);
-    if (conf->key_file) {
-        if (g_file_test(conf->path, G_FILE_TEST_IS_REGULAR))
-            /* found the config file */
-            return;
-    } else {
-        conf->key_file = g_key_file_new();
-        if (!g_file_test(conf->path, G_FILE_TEST_IS_REGULAR))
-            /* no config file--must be first time startup */
-            return;
+    conf->path = g_build_filename(g_get_user_config_dir(), "balsa", filename, NULL);
+    conf->key_file = g_key_file_new();
+    if (!g_file_test(conf->path, G_FILE_TEST_IS_REGULAR)) {
+        /* no config file--must be first time startup */
+        return;
     }
 
-    libbalsa_assure_balsa_dir();
     if (!g_key_file_load_from_file
         (conf->key_file, conf->path, G_KEY_FILE_NONE, &error)) {
-        gchar *old_path;
-        gchar *key_file_text;
-        static gboolean warn = TRUE;
-
-        old_path =
-            g_build_filename(g_get_home_dir(), old_dir, "balsa", NULL);
-        g_debug("Could not load config from “%s”: %s;"
-                  " trying “%s”", conf->path, error->message, old_path);
+        g_debug("Could not load config from “%s”: %s;",
+                  conf->path, error->message);
         g_clear_error(&error);
-
-        key_file_text = lbc_readfile(old_path);
-        if (key_file_text != NULL) {
-            /* GnomeConfig used ' ' as the list separator... */
-            g_key_file_set_list_separator(conf->key_file, ' ');
-            g_key_file_load_from_data(conf->key_file, key_file_text, -1,
-                                      G_KEY_FILE_KEEP_COMMENTS, &error);
-            g_free(key_file_text);
-            /* ...but GKeyFile doesn't handle it properly, so we'll
-             * revert to the default ';'. */
-            g_key_file_set_list_separator(conf->key_file, ';');
-        }
-        if (key_file_text == NULL || error != NULL) {
-            g_debug("Could not load key file from file “%s”: %s",
-                      old_path,
-                      error ? error->message : g_strerror(errno));
-            g_clear_error(&error);
-            warn = FALSE;
-        }
-        g_free(old_path);
-        if (warn)
-            libbalsa_information(LIBBALSA_INFORMATION_WARNING,
-                                 _("Your Balsa configuration "
-                                   "is now stored in "
-                                   "“~/.balsa/config”."));
     }
 }
 
@@ -138,8 +80,8 @@ lbc_lock(void)
 
     g_rec_mutex_lock(&lbc_mutex);
     if (!initialized) {
-        lbc_init(&lbc_conf, "config", ".gnome2", FALSE);
-        lbc_init(&lbc_conf_priv, "config-private", ".gnome2_private", TRUE);
+        lbc_init(&lbc_conf, "config", FALSE);
+        lbc_init(&lbc_conf_priv, "config-private", TRUE);
         initialized = TRUE;
     }
 }

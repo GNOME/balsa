@@ -161,16 +161,14 @@ autocrypt_init(GError **error)
 	};
 	gboolean result;
 
+	g_debug("open Autocrypt database");
 	G_LOCK(db_mutex);
 	if (autocrypt_db == NULL) {
 		gchar *db_path;
 		gboolean require_init;
 		int sqlite_res;
 
-		/* ensure that the config folder exists, otherwise Balsa will throw an error on first use */
-		libbalsa_assure_balsa_dir();
-
-		db_path = g_build_filename(g_get_home_dir(), ".balsa", "autocrypt.db", NULL);
+		db_path = g_build_filename(g_get_user_config_dir(), "balsa", "autocrypt.db", NULL);
 		require_init = (g_access(db_path, R_OK + W_OK) != 0);
 		sqlite_res = sqlite3_open(db_path, &autocrypt_db);
 		if (sqlite_res == SQLITE_OK) {

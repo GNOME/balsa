@@ -1,44 +1,19 @@
-balsa (0.5.0-1) frozen unstable; urgency=high
+balsa (2.6.5) UNRELEASED; urgency=low
 
-  * New upstream.
-  * Many problems fixed.
+  * fix connection issues with broken IMAP servers
+  * add limited support for CardDAV address books
+  * always store user credentials in the Secret Service if possible
+  * improve dealing with user credentials iff the Secret Service is unusable
+  * improve saving attachments
+  * improved setup wizard with server probing
+  * add support for Web Key Directory (WKD) GnuPG keys
+  * improve crypto user interface
+  * add optional DKIM and DMARC checks
+  * prefer TLS connections over STARTTLS
+  * Webkit 4.1 support
+  * use XDG-compliant user data folder layout
+  * remove deprecated stuff (SQLite2, Rubrica, ige-mac-integration)
+  * lots of bug fixes
+  * documentation updates (yet incomplete)
 
- -- Stuart Parmenter <pavlov@balsa.net>  Sun, 26 Sep 1999 14:17:31 -0700
-
-balsa (0.4.9.5-1) frozen unstable; urgency=high
-
-  * New upstream.
-  * Many problems fixed.
-
- -- Stuart Parmenter <pavlov@pavlov.net>  Tue, 20 Apr 1999 22:42:13 +0200
-
-balsa (0.4.6.2-1) frozen unstable; urgency=low
-
-  * Cleans up .deps and some config files in the clean target
-  * Upstream bugfix only release. Fixes a bug that makes it
-    impossible to start balsa without a valid ~/.balsa.
-
- -- Ole J. Tetlie <olet@debian.org>  Sat, 17 Oct 1998 22:42:13 +0200
-
-balsa (0.4.6-1) unstable; urgency=low
-
-  * New upstream.
-
- -- Ole J. Tetlie <olet@debian.org>  Thu, 15 Oct 1998 21:18:14 +0200
-
-balsa (0.4.5-1) unstable; urgency=low
-
-  * New upstream release.
-
- -- Stuart Parmenter <pavlov@innerx.net>  Sun, 23 Aug 1998 14:21:12 -0400
-
-balsa (0.4.0-1) unstable; urgency=low
-
-  * Initial Release.
-
- -- Stuart Parmenter <pavlov@innerx.net>  Mon, 03 Aug 1998 21:24:58 -0400
-
-Local variables:
-mode: debian-changelog
-add-log-mailing-address: "olet@debian.org"
-End:
+ -- Albrecht Dreß <albrecht.dress@posteo.de>  Tue, 08 Apr 2025 19:17:49 +0200

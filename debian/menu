@@ -1,2 +1,0 @@
-?package(balsa):needs=X11 section=Apps/Net\
-  title="balsa" command="/usr/bin/balsa"

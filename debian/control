@@ -1,13 +1,59 @@
 Source: balsa
-Section: net
+Section: mail
 Priority: optional
-Maintainer: Ole J. Tetlie <olet@debian.org>
-Standards-Version: 2.4.0.0
+Maintainer: Paweł Salek <pawsa0@gmail.com>
+Uploaders: Albrecht Dreß <albrecht.dress@posteo.de>
+Build-Depends: debhelper-compat (= 13),
+               pkg-config,
+               meson (>= 0.50.0),
+               libglib2.0-dev (>= 2.48.0),
+               libgtk-3-dev (>= 3.24.0),
+               libfribidi-dev,
+               libgmime-3.0-dev (>= 3.2.6),
+               libgnutls28-dev,
+               libical-dev,
+               libsqlite3-dev (>= 3.24.0),
+               libwebkit2gtk-4.1-dev,
+               libgpgme-dev (>= 1.8.0),
+               libxapp-dev,
+               libldap-dev,
+               libkrb5-dev,
+               libgcr-3-dev,
+               libcompfaceg1-dev,
+               libcanberra-gtk3-dev,
+               libgtksourceview-4-dev,
+               libsecret-1-dev,
+               libgspell-1-dev,
+               libsoup-3.0-dev,
+               libxml2-dev,
+               html2text | python3-html2text,
+               yelp-tools,
+               zlib1g-dev,
+Standards-Version: 4.6.1
+Homepage: https://pawsa.fedorapeople.org/balsa/
 
 Package: balsa
 Architecture: any
-Depends: ${shlibs:Depends}
-Description: GNOME email client
- Balsa is a e-mail reader.  This client is part of the GNOME
- desktop environment.  It supports local mailboxes, POP3 and
- IMAP.
+Provides: imap-client, mail-reader
+Depends: pinentry-gnome3 | pinentry-x11 | pinentry-qt,
+         ${misc:Depends},
+         ${shlibs:Depends},
+Recommends: ca-certificates, gpgsm, html2text | python3-html2text, yelp
+Description: e-mail client for GNOME
+ Balsa is a highly configurable and robust mail client for the GNOME desktop.
+ It supports both POP3 and IMAP servers as well as the mbox, maildir and mh
+ local mailbox formats. Balsa also supports SMTP and/or the use of a local MTA
+ such as Sendmail.
+ .
+ Some of Balsa's other features include:
+   * Allowing nested mailboxes
+   * Printing
+   * Spell Checking
+   * Multi-threaded mail retrieval
+   * MIME support (view images inline, save parts)
+   * CardDAV, LDAP, LDIF and vCard address book support
+   * Multiple character sets for composing and reading messages
+   * File attachments on outgoing messages
+   * GPG/OpenPGP mail signing and encryption
+ .
+ Support for Kerberos and SSL has been enabled in this package.

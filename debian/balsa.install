@@ -1,0 +1,13 @@
+usr/bin/*
+usr/lib/*/balsa/libhtmlfilter.so
+usr/share/applications/*.desktop
+usr/share/metainfo/balsa.appdata.xml
+usr/share/balsa/*
+usr/share/help/*/balsa/*
+usr/share/man/man1/balsa.1
+usr/share/pixmaps/*
+usr/share/sounds/balsa/*
+usr/share/locale/*/LC_MESSAGES/balsa.mo
+etc/sound/events/balsa.soundlist
+README*.md usr/share/doc/balsa
+NEWS usr/share/doc/balsa

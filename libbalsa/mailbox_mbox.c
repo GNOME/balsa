@@ -339,7 +339,7 @@ lbm_mbox_get_cache_filename(LibBalsaMailboxMbox * mbox)
     basename = g_strconcat("mbox", encoded_path, NULL);
     g_free(encoded_path);
     filename =
-        g_build_filename(g_get_home_dir(), ".balsa", basename, NULL);
+        g_build_filename(g_get_user_state_dir(), "balsa", basename, NULL);
     g_free(basename);
 
     return filename;

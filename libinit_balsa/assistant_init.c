@@ -96,12 +96,11 @@ balsa_initdruid_apply(GtkAssistant * druid,
     }
     if(!ab) {
         /* This will be the default address book and its location */
-        address_book = g_build_filename(g_get_home_dir(), 
-                                        ".balsa", "addressbook.ldif", NULL);
+        address_book = g_build_filename(g_get_user_config_dir(),
+                                        "balsa", "addressbook.ldif", NULL);
         ab = libbalsa_address_book_ldif_new(_("Address Book"),
                                             address_book); 
         g_free(address_book);
-        libbalsa_assure_balsa_dir();
    }
 
     balsa_app.address_book_list =

@@ -522,7 +522,7 @@ lbm_local_get_cache_filename(LibBalsaMailboxLocal * local)
     encoded_path =
         libbalsa_urlencode(libbalsa_mailbox_local_get_path(local));
     filename =
-        g_build_filename(g_get_home_dir(), ".balsa", encoded_path, NULL);
+        g_build_filename(g_get_user_state_dir(), "balsa", encoded_path, NULL);
     g_free(encoded_path);
 
     return filename;

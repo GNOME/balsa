@@ -69,3 +69,4 @@ po/*.sed
 po/*.header
 po/*.sin
 po/stamp-po
+src/balsa-*resources.c

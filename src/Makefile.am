@@ -120,9 +120,9 @@ balsa_built_sources =		\
 balsa_SOURCES =			\
 	$(balsa_BASE_SRCLIST)	\
 	$(balsa_spell_extra) \
-	$(balsa_print_source)	\
-	$(balsa_built_sources)
+	$(balsa_print_source)
 
+nodist_balsa_SOURCES = $(balsa_built_sources)
 
 EXTRA_DIST = $(balsa_spell_extra_dist) $(resource_xml) $(ab_resource_xml) \
 	meson.build
@@ -142,7 +142,7 @@ balsa_LDADD = \
 	$(top_builddir)/libbalsa/imap/libimap.a	\
 	$(top_builddir)/libnetclient/libnetclient.a \
 	$(INTLLIBS) \
-        $(BALSA_LIBS)
+	$(BALSA_LIBS)
 
 
 ab_resource_xml = $(top_srcdir)/ui/balsa-ab.gresource.xml
@@ -162,8 +162,9 @@ balsa_ab_built_sources =		\
 
 balsa_ab_SOURCES =	ab-main.c		\
 			address-book-config.c	\
-			address-book-config.h	\
-			balsa-ab-resources.c
+			address-book-config.h
+
+nodist_balsa_ab_SOURCES	= $(balsa_ab_built_sources)
 
 balsa_ab_LDADD = \
 	$(top_builddir)/libbalsa/libbalsa.a	\

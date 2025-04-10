@@ -4597,27 +4597,48 @@ static void
 sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
 {
     GtkFileChooser *attach;
+    gchar *filename;
 
-    if (!g_path_is_absolute(val)) {
+    g_return_if_fail(val != NULL);
+    if (strncmp(val, "file://", 7UL) == 0) {
+        GError *error = NULL;
+
+        filename = g_filename_from_uri(val, NULL, &error);
+        if (filename == NULL) {
+            balsa_information_parented(GTK_WINDOW(bsmsg->window),
+                                       LIBBALSA_INFORMATION_WARNING,
+                                       _("Could not attach the file %s: %s."), val,
+                                       error->message);
+            g_error_free(error);
+            return;
+        }
+    } else {
+        filename = g_strdup(val);
+    }
+
+    if (!g_path_is_absolute(filename)) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
-                                   _("Could not attach the file %s: %s."), val,
+                                   _("Could not attach the file %s: %s."), filename,
                                    _("not an absolute path"));
+        g_free(filename);
         return;
     }
 
-    if (!g_file_test(val, G_FILE_TEST_EXISTS)) {
+    if (!g_file_test(filename, G_FILE_TEST_EXISTS)) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
-                                   _("Could not attach the file %s: %s."), val,
+                                   _("Could not attach the file %s: %s."), filename,
                                    _("does not exist"));
+        g_free(filename);
         return;
     }
-    if (!g_file_test(val, G_FILE_TEST_IS_REGULAR)) {
+    if (!g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
-                                   _("Could not attach the file %s: %s."), val,
+                                   _("Could not attach the file %s: %s."), filename,
                                    _("not a regular file"));
+        g_free(filename);
         return;
     }
     attach = g_object_get_data(G_OBJECT(bsmsg->window),
@@ -4628,11 +4649,11 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
                           "balsa-sendmsg-window-attach-dialog", attach);
         g_object_set_data_full(G_OBJECT(attach),
                                "balsa-sendmsg-window-attach-dir",
-                               g_path_get_dirname(val), g_free);
+                               g_path_get_dirname(filename), g_free);
     } else {
         gchar *dirname = g_object_get_data(G_OBJECT(attach),
                                            "balsa-sendmsg-window-attach-dir");
-        gchar *valdir = g_path_get_dirname(val);
+        gchar *valdir = g_path_get_dirname(filename);
         gboolean good = (strcmp(dirname, valdir) == 0);
 
         g_free(valdir);
@@ -4640,12 +4661,14 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
             /* gtk_file_chooser_select_filename will crash */
             balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                        LIBBALSA_INFORMATION_WARNING,
-                                       _("Could not attach the file %s: %s."), val,
+                                       _("Could not attach the file %s: %s."), filename,
                                        _("not in current directory"));
+            g_free(filename);
             return;
         }
     }
-    gtk_file_chooser_select_filename(attach, val);
+    gtk_file_chooser_select_filename(attach, filename);
+    g_free(filename);
 }
 #endif
 

@@ -1,4 +1,4 @@
-* Balsa-2.6.5 release. Release date 2025-04-NN
+* Balsa-2.6.5 release. Release date 2025-04-12
 
 - fix connection issues with broken IMAP servers
 - add limited support for CardDAV address books

@@ -4600,7 +4600,7 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
     gchar *filename;
 
     g_return_if_fail(val != NULL);
-    if (strncmp(val, "file://", 7UL) == 0) {
+    if (g_ascii_strncasecmp(val, "file://", 7UL) == 0) {
         GError *error = NULL;
 
         filename = g_filename_from_uri(val, NULL, &error);

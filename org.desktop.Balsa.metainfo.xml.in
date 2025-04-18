@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2023 The Balsa developers -->
 <component type="desktop">
-    <id>org.desktop.Balsa.desktop</id>
+    <id>org.desktop.Balsa</id>
     <launchable type="desktop-id">org.desktop.Balsa.desktop</launchable>
     <name>Balsa</name>
     <summary>Email utility</summary>

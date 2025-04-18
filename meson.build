@@ -574,8 +574,8 @@ foreach file : desktop_files
 endforeach
 
 i18n.merge_file(
-  input       : 'balsa.appdata.xml.in',
-  output      : 'balsa.appdata.xml',
+  input       : 'org.desktop.Balsa.metainfo.xml.in',
+  output      : 'org.desktop.Balsa.metainfo.xml',
   po_dir      : 'po',
   install     : true,
   install_dir : join_paths(get_option('datadir'), 'metainfo')

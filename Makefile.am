@@ -15,8 +15,8 @@ desktop_DATA = org.desktop.Balsa.desktop balsa-mailto-handler.desktop
 # Appdata files
 
 appdatadir = $(datarootdir)/metainfo
-appdata_in_files = balsa.appdata.xml.in
-dist_appdata_DATA = balsa.appdata.xml
+appdata_in_files = org.desktop.Balsa.metainfo.xml.in
+dist_appdata_DATA = org.desktop.Balsa.metainfo.xml
 
 balsa_extra_dist =		\
 	HACKING			\

@@ -1,7 +1,7 @@
 usr/bin/*
 usr/lib/*/balsa/libhtmlfilter.so
 usr/share/applications/*.desktop
-usr/share/metainfo/balsa.appdata.xml
+usr/share/metainfo/*.metainfo.xml
 usr/share/balsa/*
 usr/share/help/*/balsa/*
 usr/share/man/man1/balsa.1

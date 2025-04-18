@@ -4610,7 +4610,7 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
                                        _("Could not attach the file %s: %s."), val,
                                        error->message);
             g_error_free(error);
-            return;
+            goto cleanup;
         }
     } else {
         filename = g_strdup(val);
@@ -4621,8 +4621,7 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
                                    LIBBALSA_INFORMATION_WARNING,
                                    _("Could not attach the file %s: %s."), filename,
                                    _("not an absolute path"));
-        g_free(filename);
-        return;
+        goto cleanup;
     }
 
     if (!g_file_test(filename, G_FILE_TEST_EXISTS)) {
@@ -4630,16 +4629,15 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
                                    LIBBALSA_INFORMATION_WARNING,
                                    _("Could not attach the file %s: %s."), filename,
                                    _("does not exist"));
-        g_free(filename);
-        return;
+        goto cleanup;
     }
+
     if (!g_file_test(filename, G_FILE_TEST_IS_REGULAR)) {
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
                                    _("Could not attach the file %s: %s."), filename,
                                    _("not a regular file"));
-        g_free(filename);
-        return;
+        goto cleanup;
     }
     attach = g_object_get_data(G_OBJECT(bsmsg->window),
                                "balsa-sendmsg-window-attach-dialog");
@@ -4663,11 +4661,13 @@ sw_attach_file(BalsaSendmsg * bsmsg, const gchar * val)
                                        LIBBALSA_INFORMATION_WARNING,
                                        _("Could not attach the file %s: %s."), filename,
                                        _("not in current directory"));
-            g_free(filename);
-            return;
+            goto cleanup;
         }
     }
+
     gtk_file_chooser_select_filename(attach, filename);
+
+cleanup:
     g_free(filename);
 }
 #endif

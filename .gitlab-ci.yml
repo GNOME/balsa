@@ -1,3 +1,55 @@
-# This file is a template, and might need editing before it works on your project.
 include:
-  template: Jobs/Code-Quality.gitlab-ci.yml
+  - project: 'GNOME/citemplates'
+    file: 'templates/default-rules.yml'
+  - project: 'Infrastructure/freedesktop-ci-templates'
+    file: 'templates/debian.yml'
+    ref: 'b61a03cabbf308e81289f7aaaf0b5a80a34ffb99'
+
+.balsa.debian@common:
+  variables:
+    BASE_TAG: '2025-04-19.1'
+    FDO_UPSTREAM_REPO: GNOME/balsa
+    FDO_DISTRIBUTION_PACKAGES:
+      debhelper-compat
+      pkg-config
+      meson
+      libglib2.0-dev
+      libgtk-3-dev
+      libfribidi-dev
+      libgmime-3.0-dev
+      libgnutls28-dev
+      libical-dev
+      libsqlite3-dev
+      libwebkit2gtk-4.1-dev
+      libgpgme-dev
+      libxapp-dev
+      libldap-dev
+      libkrb5-dev
+      libgcr-3-dev
+      libcompfaceg1-dev
+      libcanberra-gtk3-dev
+      libgtksourceview-4-dev
+      libsecret-1-dev
+      libgspell-1-dev
+      libsoup-3.0-dev
+      libxml2-dev
+      html2text
+      yelp-tools
+      zlib1g-dev
+      clang-tools-19
+
+.balsa.debian:stable@x86_64:
+  extends: .balsa.debian@common
+  variables:
+    FDO_DISTRIBUTION_VERSION: stable
+    FDO_DISTRIBUTION_TAG: "x86_64-${BASE_TAG}"
+    FDO_EXPIRES_AFTER: 4w
+
+build-check@x86_64:
+  extends:
+    - .fdo.container-build@debian
+    - .balsa.debian:stable@x86_64
+  stage: build
+  script:
+    - meson setup build -Dautocrypt=true -Dcanberra=true -Dcompface=true -Dgss=true -Dgtksourceview=true -Dhelp-files=true -Dldap=true -Dspell-checker=gspell -Dlibsecret=true -Dgcr=true -Dsystray=true -Dhtml-widget=webkit2 -Dwebdav=true
+    - SCANBUILD=/usr/bin/scan-build-19 ninja -C build scan-build

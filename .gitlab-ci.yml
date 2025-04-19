@@ -5,10 +5,17 @@ include:
     file: 'templates/debian.yml'
     ref: 'b61a03cabbf308e81289f7aaaf0b5a80a34ffb99'
 
-.balsa.debian@common:
+stages:
+  - prepare
+  - build
+
+build-debian-container@x86_64:
+  extends: .fdo.container-build@debian
+  stage: prepare
   variables:
     BASE_TAG: '2025-04-19.1'
     FDO_UPSTREAM_REPO: GNOME/balsa
+    FDO_DISTRIBUTION_VERSION: stable
     FDO_DISTRIBUTION_PACKAGES:
       debhelper-compat
       pkg-config
@@ -37,19 +44,14 @@ include:
       yelp-tools
       zlib1g-dev
       clang-tools-19
-
-.balsa.debian:stable@x86_64:
-  extends: .balsa.debian@common
-  variables:
-    FDO_DISTRIBUTION_VERSION: stable
     FDO_DISTRIBUTION_TAG: "x86_64-${BASE_TAG}"
     FDO_EXPIRES_AFTER: 4w
 
 build-check@x86_64:
-  extends:
-    - .fdo.container-build@debian
-    - .balsa.debian:stable@x86_64
+  extends: .fdo.container-build@debian
   stage: build
+  needs:
+    - build-debian-container@x86_64
   script:
-    - meson setup build -Dautocrypt=true -Dcanberra=true -Dcompface=true -Dgss=true -Dgtksourceview=true -Dhelp-files=true -Dldap=true -Dspell-checker=gspell -Dlibsecret=true -Dgcr=true -Dsystray=true -Dhtml-widget=webkit2 -Dwebdav=true
-    - SCANBUILD=/usr/bin/scan-build-19 ninja -C build scan-build
+    - meson setup _build -Dautocrypt=true -Dcanberra=true -Dcompface=true -Dgss=true -Dgtksourceview=true -Dhelp-files=true -Dldap=true -Dspell-checker=gspell -Dlibsecret=true -Dgcr=true -Dsystray=true -Dhtml-widget=webkit2 -Dwebdav=true
+    - SCANBUILD=/usr/bin/scan-build-19 ninja -C _build scan-build

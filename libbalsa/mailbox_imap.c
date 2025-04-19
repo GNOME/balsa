@@ -3578,8 +3578,10 @@ imap_cache_manager_new_from_file(const char *header_cache_path)
 	    if(fread(&slen, sizeof(slen), 1, f) != 1)
 		break;
 	    s = g_malloc(slen+1); /* slen would be sufficient? */
-	    if(fread(s, 1, slen, f) != slen)
-                break;
+	    if(fread(s, 1, slen, f) != slen) {
+			g_free(s);
+			break;
+		}
 	    s[slen] = '\0'; /* Unneeded? */
 	    g_hash_table_insert(icm->headers, GUINT_TO_POINTER(uid), s);
 	}

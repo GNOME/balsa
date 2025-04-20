@@ -2,6 +2,7 @@ usr/bin/*
 usr/lib/*/balsa/libhtmlfilter.so
 usr/share/applications/*.desktop
 usr/share/metainfo/*.metainfo.xml
+usr/share/dbus-1/services/*.service
 usr/share/balsa/*
 usr/share/help/*/balsa/*
 usr/share/man/man1/balsa.1

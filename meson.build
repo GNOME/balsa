@@ -581,6 +581,16 @@ i18n.merge_file(
   install_dir : join_paths(get_option('datadir'), 'metainfo')
 )
 
+service_conf = configuration_data()
+service_conf.set('BINDIR', join_paths(get_option('prefix'), get_option('bindir')))
+configure_file(
+  input         : 'org.desktop.Balsa.service.meson',
+  output        : 'org.desktop.Balsa.service',
+  configuration : service_conf,
+  install       : true,
+  install_dir   : join_paths(get_option('datadir'), 'dbus-1', 'services')
+)
+
 ##########################################################################
 # Summary
 ##########################################################################

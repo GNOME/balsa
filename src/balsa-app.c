@@ -446,7 +446,8 @@ balsa_app_init(void)
 void
 balsa_app_destroy(void)
 {
-    config_save();
+    if (balsa_app.main_window)
+        config_save();
 
     g_list_free_full(balsa_app.address_book_list, g_object_unref);
     balsa_app.address_book_list = NULL;

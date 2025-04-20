@@ -9,5 +9,6 @@ Icon=gnome-balsa2
 Terminal=false
 Type=Application
 StartupNotify=true
+DBusActivatable=true
 Categories=@TOOLKIT_CATEGORIES@Network;Email;
 X-GNOME-UsesNotifications=true

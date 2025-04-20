@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.desktop.Balsa
+Exec=@BINDIR@/balsa --gapplication-service

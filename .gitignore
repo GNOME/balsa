@@ -62,6 +62,8 @@ gnome-doc-utils.make
 libnetclient/test/start-test-env.sh
 org.desktop.Balsa.desktop
 org.desktop.Balsa.desktop.in
+org.desktop.Balsa.metainfo.xml
+org.desktop.Balsa.service
 po/Makevars.template
 po/Rules-quot
 po/balsa.pot
@@ -70,3 +72,10 @@ po/*.header
 po/*.sin
 po/stamp-po
 src/balsa-*resources.c
+debian/.debhelper/**
+debian/*.log
+debian/*.substvars
+debian/balsa/**
+debian/debhelper-build-stamp
+debian/files
+debian/tmp/**

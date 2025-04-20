@@ -242,7 +242,7 @@ sw_preferred_charset(BalsaSendmsg * bsmsg)
  * lists of actions that are enabled or disabled as groups
  */
 static const gchar *const ready_actions[] = {
-    "send", "queue", "postpone"
+    "send", "toolbar-send", "queue", "postpone"
 };
 
 /* ===================================================================

@@ -560,7 +560,7 @@ subdir('po')
 
 desktop_files = ['org.desktop.Balsa.desktop', 'balsa-mailto-handler.desktop']
 foreach file : desktop_files
-  file_in = configure_file(input         : file + '.meson',
+  file_in = configure_file(input         : file + '.in.in',
                            output        : file + '.in',
                            configuration : conf)
   i18n.merge_file(
@@ -584,7 +584,7 @@ i18n.merge_file(
 service_conf = configuration_data()
 service_conf.set('BINDIR', join_paths(get_option('prefix'), get_option('bindir')))
 configure_file(
-  input         : 'org.desktop.Balsa.service.meson',
+  input         : 'org.desktop.Balsa.service.in',
   output        : 'org.desktop.Balsa.service',
   configuration : service_conf,
   install       : true,

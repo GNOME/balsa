@@ -3,8 +3,8 @@ description=The Balsa E-Mail Client
 
 [startup]
 file=balsa/startup.wav
-_description=Program start-up
+description=Program start-up
 
 [newmail]
 file=balsa/newmail.wav
-_description=New mail notification
+description=New mail notification

@@ -19,13 +19,8 @@ appdata_in_files = org.desktop.Balsa.metainfo.xml.in
 dist_appdata_DATA = org.desktop.Balsa.metainfo.xml
 
 dbusservicedir = $(datadir)/dbus-1/services
+dbusservice_in_files = org.desktop.Balsa.service.in
 dbusservice_DATA = org.desktop.Balsa.service
-
-org.desktop.Balsa.service: Makefile
-	$(AM_V_GEN) (echo '[D-BUS Service]'; \
-		     echo 'Name=org.desktop.Balsa'; \
-		     echo 'Exec=${bindir}/balsa --gapplication-service') > $@.tmp && \
-		     mv $@.tmp $@
 
 balsa_extra_dist =		\
 	HACKING			\
@@ -39,12 +34,10 @@ balsa_extra_dist =		\
 	docs/vconvert.awk	\
 	$(desktop_in_files)	\
 	$(appdata_in_files)	\
+	$(dbusservice_in_files)	\
 	gnome-balsa2.png	\
 	meson.build	\
 	meson_options.txt	\
-	balsa-mailto-handler.desktop.meson	\
-	org.desktop.Balsa.desktop.meson	\
-	org.desktop.Balsa.service.meson	\
 	po/meson.build		\
 	README-CardDAV.md
 
@@ -64,6 +57,9 @@ DISTCLEANFILES = $(desktop_DATA) $(server_DATA) $(dist_appdata_DATA) $(dbusservi
 
 %.xml:	%.xml.in
 	$(AM_V_GEN)$(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@
+
+%.service:	%.service.in
+	$(AM_V_GEN)$(SED) -e 's|@BINDIR[@]|$(bindir)|g' $< > $@
 
 dist-hook: balsa.spec
 	cp balsa.spec $(distdir)

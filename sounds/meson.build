@@ -16,7 +16,7 @@ sound_list_dir = join_paths(get_option('sysconfdir'), 'sound', 'events')
 #                 install_dir :  sound_list_dir)
 # instead:
 custom_target('soundlist-file',
-              input       : 'balsa.soundlist.meson',
+              input       : 'balsa.soundlist.in',
               output      : 'balsa.soundlist',
               install     : true,
               install_dir : sound_list_dir,

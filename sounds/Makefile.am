@@ -8,7 +8,6 @@ soundlist_in_files = balsa.soundlist.in
 soundlist_DATA = $(soundlist_in_files:.soundlist.in=.soundlist)
 
 EXTRA_DIST = $(balsa_SOUNDS) $(soundlist_in_files) \
-	balsa.soundlist.meson	\
 	meson.build
 
 DISTCLEANFILES = $(soundlist_DATA)

@@ -18,6 +18,15 @@ appdatadir = $(datarootdir)/metainfo
 appdata_in_files = org.desktop.Balsa.metainfo.xml.in
 dist_appdata_DATA = org.desktop.Balsa.metainfo.xml
 
+dbusservicedir = $(datadir)/dbus-1/services
+dbusservice_DATA = org.desktop.Balsa.service
+
+org.desktop.Balsa.service: Makefile
+	$(AM_V_GEN) (echo '[D-BUS Service]'; \
+		     echo 'Name=org.desktop.Balsa'; \
+		     echo 'Exec=${bindir}/balsa --gapplication-service') > $@.tmp && \
+		     mv $@.tmp $@
+
 balsa_extra_dist =		\
 	HACKING			\
 	balsa-mail-style.xml	\
@@ -35,6 +44,7 @@ balsa_extra_dist =		\
 	meson_options.txt	\
 	balsa-mailto-handler.desktop.meson	\
 	org.desktop.Balsa.desktop.meson	\
+	org.desktop.Balsa.service.meson	\
 	po/meson.build		\
 	README-CardDAV.md
 
@@ -47,7 +57,7 @@ gtksourceview_DATA = balsa-mail.lang		\
 	balsa-mail-style.xml
 endif
 
-DISTCLEANFILES = $(desktop_DATA) $(server_DATA) $(dist_appdata_DATA)
+DISTCLEANFILES = $(desktop_DATA) $(server_DATA) $(dist_appdata_DATA) $(dbusservice_DATA)
 
 %.desktop:	%.desktop.in
 	$(AM_V_GEN)$(MSGFMT) --desktop --template $< -d $(top_srcdir)/po -o $@

@@ -579,6 +579,9 @@ balsa_activate_cb(GApplication *application,
         return;
     }
 
+    /* checking for valid config files */
+    config_init();
+
     window = balsa_window_new(GTK_APPLICATION(application));
     balsa_app.main_window = BALSA_WINDOW(window);
     g_object_add_weak_pointer(G_OBJECT(window),
@@ -714,7 +717,8 @@ balsa_command_line_cb(GApplication            * application,
      * handled by the primary instance of Balsa. */
     parse_options(command_line);
 
-    if (g_application_command_line_get_is_remote(command_line)) {
+    if (g_application_command_line_get_is_remote(command_line) &&
+        balsa_app.main_window != NULL) {
         /* A remote instance caused the emission; skip start-up, just
          * handle the command line. */
         handle_remote(command_line);
@@ -726,12 +730,12 @@ balsa_command_line_cb(GApplication            * application,
         balsa_app.outbox =
             libbalsa_mailbox_new_from_config("mailbox-Outbox", FALSE);
         balsa_get_stats(&unread, &unsent);
-        g_print("Unread: %ld Unsent: %ld\n", unread, unsent);
+        g_application_command_line_print(command_line,
+                                         "Unread: %ld Unsent: %ld\n",
+                                         unread, unsent);
         g_object_unref(balsa_app.outbox);
         g_object_unref(balsa_app.inbox);
     } else {
-        /* checking for valid config files */
-        config_init();
         g_application_activate(application);
     }
 

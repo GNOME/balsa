@@ -301,9 +301,8 @@ if oauth2
   oauth2_json_dep = dependency('json-glib-1.0')
   conf.set('HAVE_OAUTH2', 1,
     description : 'Defined when OAuth2 is available')
-  endif
-  balsa_deps        += oauth2_dep oauth2_json_dep
-  libnetclient_deps += oauth2_dep oauth2_json_dep
+  balsa_deps        += [oauth2_dep, oauth2_json_dep]
+  libnetclient_deps += [oauth2_dep, oauth2_json_dep]
 endif #oauth2
 
 # gcr configuration

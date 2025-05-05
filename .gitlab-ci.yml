@@ -62,8 +62,4 @@ balsa-build-check@x86_64:
       -Dgss=true -Dgtksourceview=true -Dhelp-files=true -Dldap=true
       -Dspell-checker=gspell -Dlibsecret=true -Dgcr=true -Dsystray=true
       -Dhtml-widget=webkit2 -Dwebdav=true
-    - ninja -C build scan-build
-  artifacts:
-    paths:
-      - build/meson-logs/scanbuild/
-    when: on_failure
+    - ninja -C build

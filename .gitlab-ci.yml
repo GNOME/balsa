@@ -62,7 +62,7 @@ balsa-build-check@x86_64:
       -Dgss=true -Dgtksourceview=true -Dhelp-files=true -Dldap=true
       -Dspell-checker=gspell -Dlibsecret=true -Dgcr=true -Dsystray=true
       -Dhtml-widget=webkit2 -Dwebdav=true
-    - SCANBUILD=$(pwd)/scan-build.sh ninja -C build scan-build
+    - ninja -C build scan-build
   artifacts:
     paths:
       - build/meson-logs/scanbuild/

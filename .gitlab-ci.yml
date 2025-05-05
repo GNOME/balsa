@@ -11,7 +11,7 @@ stages:
 
 .balsa-debian-cfg:
   variables:
-    BASE_TAG: '2025-05-05.1'
+    BASE_TAG: '2025-05-05.2'
     FDO_DISTRIBUTION_VERSION: stable
     FDO_DISTRIBUTION_TAG: "x86_64-${BASE_TAG}"
 
@@ -24,6 +24,7 @@ balsa-debian-container@x86_64:
     FDO_DISTRIBUTION_PACKAGES:
       debhelper-compat
       pkg-config
+      git
       meson
       libglib2.0-dev
       libgtk-3-dev

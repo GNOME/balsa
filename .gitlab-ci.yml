@@ -60,12 +60,12 @@ balsa-build-check@x86_64:
   variables:
     SCANBUILD: "$CI_PROJECT_DIR/scan-build.sh"
   script:
-    - ls -al /usr/bin/scan-build-*
     - meson setup _builddir -Dautocrypt=true -Dcanberra=true -Dcompface=true
       -Dgss=true -Dgtksourceview=true -Dhelp-files=true -Dldap=true
       -Dspell-checker=gspell -Dlibsecret=true -Dgcr=true -Dsystray=true
       -Dhtml-widget=webkit2 -Dwebdav=true
-    - ninja -C _builddir
+    - ninja -C _builddir scan-build
   artifacts:
     paths:
-      - "_builddir/"
+      - "_builddir/meson-logs/scanbuild/"
+    when: on_failure

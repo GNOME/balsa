@@ -298,6 +298,7 @@ void
 libbalsa_server_cfg_assign_server(LibBalsaServerCfg *server_cfg, LibBalsaServer *server)
 {
 	gchar *cert_file;
+	const gchar *auth_id;
 
 	g_return_if_fail(LIBBALSA_IS_SERVER_CFG(server_cfg) && LIBBALSA_IS_SERVER(server));
 
@@ -305,8 +306,9 @@ libbalsa_server_cfg_assign_server(LibBalsaServerCfg *server_cfg, LibBalsaServer 
     libbalsa_server_set_security(server, (NetClientCryptMode) (gtk_combo_box_get_active(GTK_COMBO_BOX(server_cfg->security)) + 1));
     libbalsa_server_set_host(server, gtk_entry_get_text(GTK_ENTRY(server_cfg->host_port)), libbalsa_server_get_security(server));
 
-    /* authentication stuff */
-    libbalsa_server_set_auth_mode(server, atoi(gtk_combo_box_get_active_id(GTK_COMBO_BOX(server_cfg->auth_mode))));
+    /* authentication stuff - use no or anonymous authentication if noting is selected */
+    auth_id = gtk_combo_box_get_active_id(GTK_COMBO_BOX(server_cfg->auth_mode));
+    libbalsa_server_set_auth_mode(server, (auth_id != NULL) ? atoi(auth_id) : NET_CLIENT_AUTH_NONE_ANON);
     libbalsa_server_set_username(server, gtk_entry_get_text(GTK_ENTRY(server_cfg->username)));
     libbalsa_server_set_password(server, gtk_entry_get_text(GTK_ENTRY(server_cfg->password)), FALSE);
     libbalsa_server_set_remember_password(server, gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(server_cfg->remember_pass)));

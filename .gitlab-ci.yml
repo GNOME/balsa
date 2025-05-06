@@ -58,8 +58,11 @@ balsa-build-check@x86_64:
     - .fdo.distribution-image@debian
   stage: build
   script:
-    - meson setup build -Dautocrypt=true -Dcanberra=true -Dcompface=true
+    - meson setup _builddir -Dautocrypt=true -Dcanberra=true -Dcompface=true
       -Dgss=true -Dgtksourceview=true -Dhelp-files=true -Dldap=true
       -Dspell-checker=gspell -Dlibsecret=true -Dgcr=true -Dsystray=true
       -Dhtml-widget=webkit2 -Dwebdav=true
-    - ninja -C build
+    - ninja -C _builddir
+  artifacts:
+    paths:
+      - "_builddir/"

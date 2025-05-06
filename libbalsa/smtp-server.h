@@ -45,7 +45,6 @@ void libbalsa_smtp_server_add_to_list(LibBalsaSmtpServer * smtp_server,
                                       GSList ** server_list);
 
 typedef void (*LibBalsaSmtpServerUpdate) (LibBalsaSmtpServer * smtp_server,
-                                          GtkResponseType response,
                                           const gchar * old_name);
 void libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
                                  GtkWindow * parent,

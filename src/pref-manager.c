@@ -1469,46 +1469,34 @@ server_edit_cb(GtkTreeView * tree_view, GtkTreePath *path, GtkTreeViewColumn *co
 
 #define SMTP_SERVER_SECTION_PREFIX "smtp-server-"
 
-/* Callback for the server-dialog's response handler. */
+/* Callback for the server-dialog's response handler - called iff the user selected 'OK'. */
 static void
-smtp_server_update(LibBalsaSmtpServer * smtp_server,
-                   GtkResponseType response, const gchar * old_name)
+smtp_server_update(LibBalsaSmtpServer * smtp_server, const gchar * old_name)
 {
-    gchar *group;
-    const gchar *new_name;
+	const gchar *new_name;
+	gchar *group;
 
-    new_name = libbalsa_smtp_server_get_name(smtp_server);
+	new_name = libbalsa_smtp_server_get_name(smtp_server);
 
-    if (old_name) {
-        /* We were editing an existing server. */
-        if (strcmp(old_name, new_name) == 0)
-	    return;
-	else {
-            /* Name was changed. */
-            group =
-                g_strconcat(SMTP_SERVER_SECTION_PREFIX, old_name, NULL);
-            libbalsa_conf_remove_group(group);
-            g_free(group);
-        }
-    } else {
-        /* Populating a new server. */
-        if (response == GTK_RESPONSE_OK)
-            libbalsa_smtp_server_add_to_list(smtp_server,
-                                             &balsa_app.smtp_servers);
-        else {
-            /*  The user killed the dialog. */
-            g_object_unref(smtp_server);
-            return;
-        }
-    }
+	if (old_name == NULL) {
+		/* add a new server to the list */
+		libbalsa_smtp_server_add_to_list(smtp_server, &balsa_app.smtp_servers);
+	} else if (strcmp(old_name, new_name) != 0) {
+		/* remove old config section if the server name changed */
+		group = g_strconcat(SMTP_SERVER_SECTION_PREFIX, old_name, NULL);
+		libbalsa_conf_remove_group(group);
+		g_free(group);
+	} else {
+		/* existing server, same name - nothing to do here */
+	}
 
-    update_smtp_servers();
-
-    group = g_strconcat(SMTP_SERVER_SECTION_PREFIX, new_name, NULL);
-    libbalsa_conf_push_group(group);
-    g_free(group);
-    libbalsa_smtp_server_save_config(smtp_server);
-    libbalsa_conf_pop_group();
+	update_smtp_servers();
+	group = g_strconcat(SMTP_SERVER_SECTION_PREFIX, new_name, NULL);
+	libbalsa_conf_push_group(group);
+	g_free(group);
+	libbalsa_smtp_server_save_config(smtp_server);
+	libbalsa_conf_pop_group();
+	libbalsa_conf_queue_sync();
 }
 
 static void
@@ -1561,6 +1549,7 @@ smtp_server_del_cb(GtkTreeView * tree_view)
                         libbalsa_smtp_server_get_name(smtp_server), NULL);
     libbalsa_conf_remove_group(group);
     g_free(group);
+    libbalsa_conf_queue_sync();
 
     balsa_app.smtp_servers =
         g_slist_remove(balsa_app.smtp_servers, smtp_server);

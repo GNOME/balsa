@@ -260,17 +260,21 @@ smtp_server_response(GtkDialog * dialog, gint response,
         } else {
         	sdi->smtp_server->big_message = 0U;
         }
+        /* The update may unref the server, so we temporarily ref it;
+         * we use server instead of sdi->smtp_server, as sdi is deallocated
+         * when the object data is cleared. */
+        g_object_ref(server);
+        sdi->update(sdi->smtp_server, sdi->old_name);
+        g_object_unref(server);
         break;
     default:
+        /* user cancelled */
+        if (sdi->old_name == NULL) {
+            /* new server: destroy it */
+            g_object_unref(server);
+        }
         break;
     }
-
-    /* The update may unref the server, so we temporarily ref it;
-     * we use server instead of sdi->smtp_server, as sdi is deallocated
-     * when the object data is cleared. */
-    g_object_ref(server);
-    sdi->update(sdi->smtp_server, response, sdi->old_name);
-    g_object_unref(server);
 
     gtk_widget_destroy(GTK_WIDGET(dialog));
 }

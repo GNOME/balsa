@@ -57,7 +57,10 @@ balsa-build-check@x86_64:
     - .balsa-debian-cfg
     - .fdo.distribution-image@debian
   stage: build
+  variables:
+    SCANBUILD: "$CI_PROJECT_DIR/scan-build.sh"
   script:
+    - ls -al /usr/bin/scan-build-*
     - meson setup _builddir -Dautocrypt=true -Dcanberra=true -Dcompface=true
       -Dgss=true -Dgtksourceview=true -Dhelp-files=true -Dldap=true
       -Dspell-checker=gspell -Dlibsecret=true -Dgcr=true -Dsystray=true

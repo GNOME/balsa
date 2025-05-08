@@ -962,7 +962,7 @@ eval_dkim_header(const gchar *header)
 				}
 				if (error != NULL) {
 					result->status = DKIM_FAILED;
-					result->detail = error->message;
+					result->detail = g_strdup(error->message);
 					g_error_free(error);
 				}
 			}

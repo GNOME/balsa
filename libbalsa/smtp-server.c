@@ -305,6 +305,7 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     LibBalsaServer *server = LIBBALSA_SERVER(smtp_server);
     struct smtp_server_dialog_info *sdi;
     GtkWidget *dialog;
+    const gchar *action;
     GtkWidget *content_area;
     GtkWidget *label, *hbox;
 
@@ -324,13 +325,14 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
 
     sdi->smtp_server = smtp_server;
     sdi->old_name = g_strdup(libbalsa_smtp_server_get_name(smtp_server));
+    action = (sdi->old_name == NULL) ? _("_Add") : _("_Apply");
     sdi->update = update;
     sdi->dialog = dialog =
         gtk_dialog_new_with_buttons(_("SMTP Server"),
                                     parent,
                                     GTK_DIALOG_DESTROY_WITH_PARENT |
                                     libbalsa_dialog_flags(),
-                                    _("_OK"),     GTK_RESPONSE_OK,
+                                    action,       GTK_RESPONSE_OK,
                                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                                     _("_Help"),   GTK_RESPONSE_HELP,
                                     NULL);
@@ -369,8 +371,6 @@ libbalsa_smtp_server_dialog(LibBalsaSmtpServer * smtp_server,
     g_signal_connect(sdi->notebook, "changed", G_CALLBACK(smtp_server_changed), sdi);
     g_signal_connect(sdi->split_button, "toggled", G_CALLBACK(smtp_server_changed), sdi);
     g_signal_connect(sdi->big_message, "changed", G_CALLBACK(smtp_server_changed), sdi);
-
-    smtp_server_changed(NULL, sdi);
 
     gtk_widget_show_all(dialog);
 }

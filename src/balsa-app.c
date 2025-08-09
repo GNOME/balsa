@@ -446,8 +446,11 @@ balsa_app_init(void)
 void
 balsa_app_destroy(void)
 {
-    if (balsa_app.main_window)
+    /* Be paranoid - do not overwrite a "good" config with all-NULL values:
+     * the list of identities will never be NULL if the config has been loaded. */
+    if (balsa_app.identities != NULL) {
         config_save();
+    }
 
     g_list_free_full(balsa_app.address_book_list, g_object_unref);
     balsa_app.address_book_list = NULL;

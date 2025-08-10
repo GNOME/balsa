@@ -115,6 +115,10 @@ messages, and for syntax highlighting in attachments.
 	Enable limited support for CardDAV address books (see
 README-CardDAV.md, requires libsoup and libxml).
 
+`--with-oauth2`
+	Enable support for OAuth2 authentication (see README-OAuth2.md,
+requires libsoup and libjson-glib)
+
 `--disable-nls`
 	Do not use Native Language Support (Localization).
 

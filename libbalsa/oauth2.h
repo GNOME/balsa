@@ -36,6 +36,15 @@
 G_DECLARE_FINAL_TYPE(LibBalsaOauth2, libbalsa_oauth2, LIBBALSA, OAUTH2, GObject)
 
 
+/** @brief Load the configuration of OAuth2 providers
+ *
+ * The function looks for files named @c balsa-oauth2.cfg in this order in the subfolder @c balsa of all folders defined in
+ * <em>XDG_DATA_DIRS</em>, the user's @em XDG_CONFIG_HOME (<c>~/.config/balsa</c>) and the folder from which Balsa is launched. See
+ * the file distributed with Balsa for the format.  Note that items with the same section identifier overwrite previously loaded
+ * definitions.
+ */
+void libbalsa_oauth2_load_providers(void);
+
 /** @brief Check for a provider supporting OAuth2
  *
  * @param[in] mailbox email address

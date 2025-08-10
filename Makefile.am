@@ -12,6 +12,9 @@ desktopdir = $(datadir)/applications
 desktop_in_files = org.desktop.Balsa.desktop.in balsa-mailto-handler.desktop.in
 desktop_DATA = org.desktop.Balsa.desktop balsa-mailto-handler.desktop
 
+oauth2cfgdir = $(datadir)/balsa
+oauth2cfg_DATA = balsa-oauth2.cfg
+
 # Appdata files
 
 appdatadir = $(datarootdir)/metainfo
@@ -39,7 +42,9 @@ balsa_extra_dist =		\
 	meson.build	\
 	meson_options.txt	\
 	po/meson.build		\
-	README-CardDAV.md
+	README-CardDAV.md	\
+	README-OAuth2.md	\
+	balsa-oauth2.cfg
 
 EXTRA_DIST =			\
 	$(balsa_extra_dist)

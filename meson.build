@@ -685,6 +685,10 @@ endif
 install_data('gnome-balsa2.png',
              install_dir : join_paths(get_option('datadir'), 'pixmaps'))
 
+# OAuth2 configuration
+install_data('balsa-oauth2.cfg',
+             install_dir : join_paths(get_option('datadir'), 'balsa'))
+
 ####################### Autotools stuff below this line #######################
 #
 #dist-hook: balsa.spec

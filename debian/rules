@@ -18,7 +18,8 @@ override_dh_auto_configure:
 		-Dgcr=true \
 		-Dsystray=true \
 		-Dhtml-widget=webkit2 \
-		-Dwebdav=true
+		-Dwebdav=true \
+		-Doauth2=true
 
 override_dh_auto_install:
 	dh_auto_install --destdir=debian/tmp

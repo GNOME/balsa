@@ -66,6 +66,10 @@
 #include <libxml/parser.h>
 #endif
 
+#ifdef HAVE_OAUTH2
+#include "oauth2.h"
+#endif
+
 /* We need separate variable for storing command line requests to check the
    mail because such selection cannot be stored in balsa_app and later
    saved to the configuration file.
@@ -504,6 +508,10 @@ balsa_startup_cb(GApplication *application,
 #ifdef HAVE_WEBDAV
     LIBXML_TEST_VERSION
     xmlInitParser();
+#endif
+
+#ifdef HAVE_OAUTH2
+    libbalsa_oauth2_load_providers();
 #endif
 
     /* initialise the gpgme library and set the callback funcs */

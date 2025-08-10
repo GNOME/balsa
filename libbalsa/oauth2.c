@@ -58,10 +58,9 @@
  */
 typedef struct {
 	gchar *id;							/**< Provider identifier. */
-	gchar *display_name;				/**< Provider display name. */
-	gchar *email_re;					/**< Regular Expression for e-mail addresses. */
+	GRegex *email_regex;				/**< Regular Expression for e-mail addresses. */
 	gchar *client_id;					/**< Balsa client ID. */
-	gchar *client_secret;				/**< Balsa client "secret" (not really secret, as its hard-coded in the sources). */
+	gchar *client_secret;				/**< Balsa client "secret", not used by some providers. */
 	gchar *auth_uri;					/**< URI to call for authentication. */
 	gchar *token_uri;					/**< URI to call for for receiving an access token. */
 	gchar *scope;						/**< OAuth2 scope, not used by some providers. */
@@ -86,6 +85,11 @@ typedef struct {
 } oauth2_auth_ctx_t;
 
 
+/* list of provider definitions (oauth2_provider_t) loaded from the configuration files (see documentation of
+ * libbalsa_oauth2_load_providers()) */
+static GList *providers = NULL;
+
+
 struct _LibBalsaOauth2 {
 	GObject parent;
 
@@ -103,49 +107,6 @@ struct _LibBalsaOauth2 {
 G_DEFINE_TYPE(LibBalsaOauth2, libbalsa_oauth2, G_TYPE_OBJECT)
 
 
-// FIXME:
-// - not all OAuth2 providers are listed here
-static const oauth2_provider_t providers[] = {
-	{ 	// FIXME - limited account, users must be added explicitly for the time being
-		// alternative: create your own account, and modify the client credentials below
-		.id            = "gmail.com",
-		.display_name  = "Gmail",
-		.email_re      = "^.*@(gmail|googlemail|google)\\.com$",		// FIXME - are there more?
-		.client_id     = "855255990023-n0gsa2lgg5ubudrce69kcvu0bpmi1m2q.apps.googleusercontent.com",
-		.client_secret = "0Od0RKXFtomBoOgDidCyRxKs",
-		.auth_uri      = "https://accounts.google.com/o/oauth2/v2/auth",
-		.token_uri     = "https://oauth2.googleapis.com/token",
-		.scope         = "https://mail.google.com/",
-		.oob_mode      = FALSE },
-	{	// see https://developer.verizonmedia.com/mail/mail-api-access/ and
-		// https://developer.verizonmedia.com/mail/imap-smtp-documentation/
-		// FIXME - Thunderbird client id & secret
-		.id            = "yahoo.com",
-		.display_name  = "Yahoo Mail",
-		.email_re      = "^.*@yahoo\\.[a-z.]+$",						// FIXME - are there more?
-		.client_id     = "dj0yJmk9NUtCTWFMNVpTaVJmJmQ9WVdrOVJ6UjVTa2xJTXpRbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD0yYw--",
-		.client_secret = "f2de6a30ae123cdbc258c15e0812799010d589cc",
-		.auth_uri      = "https://api.login.yahoo.com/oauth2/request_auth",
-		.token_uri     = "https://api.login.yahoo.com/oauth2/get_token",
-		.scope         = "mail-w",
-		.oob_mode      = TRUE },
-	{	/*
-		 * Microsoft Accounts: see
-	     * https://docs.microsoft.com/en-us/Exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
-	     */
-		.id            = "outlook.com",
-		.display_name  = "Microsoft",
-		.email_re      = "^.*@(outlook|hotmail)(\\.com)?\\.[a-z]{2,3}$",	// FIXME - are there more?
-		.client_id     = "41c99e15-0609-40ed-90c4-64c613e19e90",
-		.client_secret = NULL,
-		.auth_uri      = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
-		.token_uri     = "https://login.microsoftonline.com/common/oauth2/v2.0/token",
-		.scope         = "https://outlook.office.com/IMAP.AccessAsUser.All https://outlook.office.com/POP.AccessAsUser.All "
-						 "https://outlook.office.com/SMTP.Send offline_access",
-		.oob_mode      = FALSE }
-};
-
-
 #if defined(HAVE_LIBSECRET)
 
 /** @brief Balsa OAuth2 tokens in Secret Service
@@ -155,7 +116,7 @@ static const oauth2_provider_t providers[] = {
  * validity end time stamp.
  *
  * If Secret Service support is disabled, or if accessing it fails, Balsa falls back to the private configuration file.  The group
- * containing the tokes and validity is identified by the sha256 hash of provider id and user name.
+ * containing the token and validity is identified by the sha256 hash of provider id and user name.
  */
 static const SecretSchema oauth2_schema = {
     "org.gnome.Balsa.OAuth2Token",
@@ -166,6 +127,16 @@ static const SecretSchema oauth2_schema = {
 };
 #endif  /* defined(HAVE_LIBSECRET) */
 
+
+static GList *load_oauth_cfg_file(GList		  *prov_list,
+								  const gchar *folder)
+	G_GNUC_WARN_UNUSED_RESULT;
+static oauth2_provider_t *load_provider_cfg(GKeyFile	*oauth_cfg,
+											const gchar	*provider_id,
+											GError	   **error)
+	G_GNUC_WARN_UNUSED_RESULT;
+static void oauth2_provider_free(oauth2_provider_t *item);
+static void cleanup_oauth2_providers(void);
 
 static void on_oauth_toggle_notify(gpointer  data,
 								   GObject  *object,
@@ -241,6 +212,32 @@ G_LOCK_DEFINE_STATIC(oauth_list);
 
 /* == OAuth2 object implementation ============================================================================================== */
 
+void
+libbalsa_oauth2_load_providers(void)
+{
+	const gchar * const *xdg_data_dirs;
+	guint n;
+
+	/* don't call this function multiple times... (programming error) */
+	g_return_if_fail(providers == NULL);
+
+	/* try XDG_DATA_DIRS */
+	xdg_data_dirs = g_get_system_data_dirs();
+	for (n = 0U; xdg_data_dirs[n] != NULL; n++) {
+		providers = load_oauth_cfg_file(providers, xdg_data_dirs[n]);
+	}
+
+	/* try XDG_CONFIG_HOME */
+	providers = load_oauth_cfg_file(providers, g_get_user_config_dir());
+
+	/* try launch folder */
+	providers = load_oauth_cfg_file(providers, NULL);
+
+	/* clean up on exit */
+	atexit(cleanup_oauth2_providers);
+}
+
+
 gboolean
 libbalsa_oauth2_supported(const gchar *mailbox)
 {
@@ -264,7 +261,7 @@ libbalsa_oauth2_new(LibBalsaServer *server, GError **error)
 	} else {
 		GList *p;
 
-		g_debug("%s: user='%s', provider '%s'", __func__, user, provider->display_name);
+		g_debug("%s: user='%s', provider '%s'", __func__, user, provider->id);
 		G_LOCK(oauth_list);
 		for (p = oauth_list;
 			 (p != NULL) && (LIBBALSA_OAUTH2(p->data)->provider != provider) &&
@@ -389,14 +386,170 @@ on_oauth_toggle_notify(gpointer G_GNUC_UNUSED data, GObject *object, gboolean is
 static const oauth2_provider_t *
 libbalsa_oauth2_find_provider(const gchar *mailbox)
 {
-	guint n;
+	GList *p;
 
-	for (n = 0U; n < G_N_ELEMENTS(providers); ++n) {
-		if (g_regex_match_simple(providers[n].email_re, mailbox, G_REGEX_CASELESS, 0)) {
-			return &providers[n];
+	for (p = providers; p != NULL; p = p->next) {
+		if (g_regex_match(((oauth2_provider_t *) p->data)->email_regex, mailbox, G_REGEX_MATCH_DEFAULT, NULL)) {
+			return (oauth2_provider_t *) p->data;
 		}
 	}
 	return NULL;
+}
+
+
+/* == OAuth2 providers management helpers ======================================================================================= */
+
+/** @brief Load OAuth2 providers from a configuration file
+ *
+ * @param[in] prov_list the list of OAuth2 providers (@ref oauth2_provider_t *)
+ * @param[in] folder the base folder from which the configuration is loaded, or NULL for the current directory
+ * @return the passed providers list, wit all new definitions prepended, and existing items being updated
+ * @note The configuration file name is always <c>balsa-oauth2.cfg</c>.  Unless the base folder is NULL, it is loaded from the
+ *       subfolder <c>balsa</c>.
+ */
+static GList *
+load_oauth_cfg_file(GList *prov_list, const gchar *folder)
+{
+	gchar *filename;
+	GKeyFile *oauth_cfg;
+	GError *error = NULL;
+
+	if (folder != NULL) {
+		filename = g_build_filename(folder, "balsa", "balsa-oauth2.cfg", NULL);
+	} else {
+		filename = g_build_filename(".", "balsa-oauth2.cfg", NULL);
+	}
+	oauth_cfg = g_key_file_new();
+	if (g_key_file_load_from_file(oauth_cfg, filename, G_KEY_FILE_NONE, &error)) {
+		gchar **provider_id;
+		guint n;
+
+		g_debug("loaded OAuth2 configuration file '%s'", filename);
+		provider_id = g_key_file_get_groups(oauth_cfg, NULL);
+		for (n = 0U; provider_id[n] != NULL; n++) {
+			oauth2_provider_t *new_prov;
+
+			new_prov = load_provider_cfg(oauth_cfg, provider_id[n], &error);
+			if (new_prov) {
+				GList *p;
+
+				/* check if we should overwrite an existing item */
+				for (p = prov_list;
+					 (p != NULL) && (g_ascii_strcasecmp(((oauth2_provider_t *) p->data)->id, new_prov->id) != 0);
+					 p = p->next);
+				if (p != NULL) {
+					g_debug("replace configuration for provider '%s'", new_prov->id);
+					oauth2_provider_free((oauth2_provider_t *) p->data);
+					p->data = new_prov;
+				} else {
+					g_debug("add configuration for provider '%s'", new_prov->id);
+					prov_list = g_list_prepend(prov_list, new_prov);
+				}
+			} else {
+				g_warning("error loading OAuth2 configuration for provider '%s': %s", provider_id[n], error->message);
+				g_clear_error(&error);
+			}
+		}
+		g_strfreev(provider_id);
+	} else if (g_error_matches(error, G_FILE_ERROR, G_FILE_ERROR_NOENT)) {
+		g_debug("OAuth2 configuration file '%s' missing", filename);
+	} else {
+		g_warning("cannot load OAuth2 configuration file '%s': %s", filename, error->message);
+	}
+	g_key_file_free(oauth_cfg);
+	g_clear_error(&error);
+	g_free(filename);
+	return prov_list;
+}
+
+
+/** @brief Load a single provider configuration
+ *
+ * @param[in] oauth_cfg key file object
+ * @param[in] provider_id provider identifier, i.e. the group name in the cofiguration file
+ * @param[out] error location for error, may be NULL
+ * @return a newly allocated provider record on success, NULL on error
+ */
+static oauth2_provider_t *
+load_provider_cfg(GKeyFile *oauth_cfg, const gchar *provider_id, GError **error)
+{
+	gchar *email_re_str;
+	oauth2_provider_t *prov_cfg;
+
+	prov_cfg = g_new0(oauth2_provider_t, 1UL);
+	prov_cfg->id = g_strdup(provider_id);
+
+	/* regular expression for email address matching - required */
+	email_re_str = g_key_file_get_value(oauth_cfg, provider_id, "email_re", error);
+	if (email_re_str == NULL) {
+		goto err_out;
+	}
+	prov_cfg->email_regex = g_regex_new(email_re_str, G_REGEX_CASELESS, G_REGEX_MATCH_DEFAULT, error);
+	g_free(email_re_str);
+	if (prov_cfg->email_regex == NULL) {
+		goto err_out;
+	}
+
+	/* required items: client_id, auth_uri, token_uri */
+	prov_cfg->client_id = g_key_file_get_value(oauth_cfg, provider_id, "client_id", error);
+	if (prov_cfg->client_id == NULL) {
+		goto err_out;
+	}
+	prov_cfg->auth_uri = g_key_file_get_value(oauth_cfg, provider_id, "auth_uri", error);
+	if (prov_cfg->auth_uri == NULL) {
+		goto err_out;
+	}
+	prov_cfg->token_uri = g_key_file_get_value(oauth_cfg, provider_id, "token_uri", error);
+	if (prov_cfg->token_uri == NULL) {
+		goto err_out;
+	}
+
+	/* optional items: client_secret, scope, oob_mode */
+	prov_cfg->client_secret = g_key_file_get_value(oauth_cfg, provider_id, "client_secret", NULL);
+	prov_cfg->scope = g_key_file_get_value(oauth_cfg, provider_id, "scope", NULL);
+	prov_cfg->oob_mode = g_key_file_get_boolean(oauth_cfg, provider_id, "oob_mode", NULL);
+
+	return prov_cfg;
+
+err_out:
+	oauth2_provider_free(prov_cfg);
+	return NULL;
+}
+
+
+/** @brief Free a OAuth2 provider record
+ *
+ * @param item the item which shall be released, may be NULL
+ */
+static void
+oauth2_provider_free(oauth2_provider_t *item)
+{
+	if (item != NULL) {
+		if (item->email_regex != NULL) {
+			g_regex_unref(item->email_regex);
+		}
+		g_free(item->auth_uri);
+		g_free(item->client_id);
+		g_free(item->client_secret);
+		g_free(item->id);
+		g_free(item->scope);
+		g_free(item->token_uri);
+		g_free(item);
+	}
+}
+
+
+/** @brief Release all OAuth2 provider configurations
+ *
+ * Free the global list of provider configurations @ref providers, called via atexit().
+ */
+static void
+cleanup_oauth2_providers(void)
+{
+	if (providers != NULL) {
+		g_list_free_full(providers, (GDestroyNotify) oauth2_provider_free);
+		providers = NULL;
+	}
 }
 
 
@@ -1405,18 +1558,18 @@ run_oauth2_dialog(oauth2_auth_ctx_t *auth_ctx, const oauth2_provider_t *provider
 	gtk_container_set_border_width(GTK_CONTAINER(content), 12U);
 	gtk_box_set_spacing(GTK_BOX(content), 6U);
 	if (provider->oob_mode) {
-		message = g_strdup_printf(_("Balsa must be authorized to access %s:\n"
+		message = g_strdup_printf(_("Balsa must be authorized to access “%s”:\n"
 			 	 	 	 	 	 	"\342\200\242 click the link to open the authorization page\n"
 			 	 	 	 	 	 	"\342\200\242 log in as user %s\n"
 			 	 	 	 	 	 	"\342\200\242 follow the instructions on the web page and\n"
 			 	 	 	 	 	 	"\342\200\242 enter the authorization code."),
-			provider->display_name,	account);
+			provider->id,	account);
 	} else {
-		message = g_strdup_printf(_("Balsa must be authorized to access %s:\n"
+		message = g_strdup_printf(_("Balsa must be authorized to access “%s”:\n"
 			 	 	 	 	 	    "\342\200\242 click the link to open the authorization page\n"
 			 	 	 	 	 	 	"\342\200\242 log in as user %s and\n"
 			 	 	 	 	 	 	"\342\200\242 follow the instructions on the web page."),
-			provider->display_name, account);
+			provider->id, account);
 	}
 	widget = gtk_label_new(message);
 	g_free(message);
@@ -1424,7 +1577,7 @@ run_oauth2_dialog(oauth2_auth_ctx_t *auth_ctx, const oauth2_provider_t *provider
 	gtk_label_set_xalign(GTK_LABEL(widget), 0.0);
 	gtk_box_pack_start(GTK_BOX(content), widget, FALSE, FALSE, 0U);
 
-	message = g_strdup_printf(_("Authorize Balsa for %s"), provider->display_name);
+	message = g_strdup_printf(_("Authorize Balsa for %s"), provider->id);
 	widget = gtk_link_button_new_with_label(auth_ctx->auth_request_uri, message);
 	g_free(message);
 	gtk_widget_grab_focus(widget);

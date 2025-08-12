@@ -135,6 +135,12 @@ static oauth2_provider_t *load_provider_cfg(GKeyFile	*oauth_cfg,
 											const gchar	*provider_id,
 											GError	   **error)
 	G_GNUC_WARN_UNUSED_RESULT;
+static gboolean load_uri_config(GKeyFile	*oauth_cfg,
+								gchar	   **target,
+								const gchar	*provider_id,
+								const gchar	*item_id,
+								GError	   **error);
+
 static void oauth2_provider_free(oauth2_provider_t *item);
 static void cleanup_oauth2_providers(void);
 
@@ -466,7 +472,7 @@ load_oauth_cfg_file(GList *prov_list, const gchar *folder)
 /** @brief Load a single provider configuration
  *
  * @param[in] oauth_cfg key file object
- * @param[in] provider_id provider identifier, i.e. the group name in the cofiguration file
+ * @param[in] provider_id provider identifier, i.e. the group name in the configuration file
  * @param[out] error location for error, may be NULL
  * @return a newly allocated provider record on success, NULL on error
  */
@@ -495,12 +501,8 @@ load_provider_cfg(GKeyFile *oauth_cfg, const gchar *provider_id, GError **error)
 	if (prov_cfg->client_id == NULL) {
 		goto err_out;
 	}
-	prov_cfg->auth_uri = g_key_file_get_value(oauth_cfg, provider_id, "auth_uri", error);
-	if (prov_cfg->auth_uri == NULL) {
-		goto err_out;
-	}
-	prov_cfg->token_uri = g_key_file_get_value(oauth_cfg, provider_id, "token_uri", error);
-	if (prov_cfg->token_uri == NULL) {
+	if (!load_uri_config(oauth_cfg, &prov_cfg->auth_uri, provider_id, "auth_uri", error) ||
+		!load_uri_config(oauth_cfg, &prov_cfg->token_uri, provider_id, "token_uri", error)) {
 		goto err_out;
 	}
 
@@ -514,6 +516,32 @@ load_provider_cfg(GKeyFile *oauth_cfg, const gchar *provider_id, GError **error)
 err_out:
 	oauth2_provider_free(prov_cfg);
 	return NULL;
+}
+
+
+/** @brief Load a URI from a key file with validation
+ *
+ * @param[in] oauth_cfg key file object
+ * @param[out] target filled with the URI read from the config file
+ * @param[in] provider_id provider identifier, i.e. the group name in the configuration file
+ * @param[in] item_id the key in the provider group
+ * @param[out] error location for error, may be NULL
+ * @return TRUE on success, FALSE on error
+ */
+static gboolean
+load_uri_config(GKeyFile *oauth_cfg, gchar **target, const gchar *provider_id, const gchar *item_id, GError **error)
+{
+	gboolean success = FALSE;
+
+	*target = g_key_file_get_value(oauth_cfg, provider_id, item_id, error);
+	if ((*target != NULL) && g_uri_is_valid(*target, G_URI_FLAGS_NONE, error)) {
+		if (g_str_has_prefix(*target, "http://") || g_str_has_prefix(*target, "https://")) {
+			success = TRUE;
+		} else {
+			g_set_error(error, G_URI_ERROR, G_URI_ERROR_BAD_SCHEME, "“%s” is not a http:// or https:// URI", *target);
+		}
+	}
+	return success;
 }
 
 

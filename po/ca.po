@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: balsa 0.9.2\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/issues\n"
 "POT-Creation-Date: 2021-12-16 15:34+0000\n"
-"PO-Revision-Date: 2025-02-26 12:03+0100\n"
+"PO-Revision-Date: 2025-08-27 12:03+0100\n"
 "Last-Translator: maite guix <maite.guix@me.com>\n"
 "Language-Team: Catalan <tradgnome@softcatala.org>\n"
 "Language: ca\n"
@@ -4847,7 +4847,7 @@ msgstr ""
 
 #: ../src/filter-run-callbacks.c:236 ../src/filter-run-callbacks.c:258
 msgid "Error when applying filters"
-msgstr "S'ha produït un error en aplicar les filtres"
+msgstr "S'ha produït un error en aplicar els filtres"
 
 #: ../src/filter-run-callbacks.c:239 ../src/filter-run-callbacks.c:261
 #, c-format
@@ -5056,7 +5056,7 @@ msgstr ""
 
 #: ../src/folder-conf.c:837
 msgid "Remote IMAP subfolder"
-msgstr "Subcarpeta remota de l'IMAP"
+msgstr "Subcarpeta IMAP remota"
 
 #. INPUT FIELD CREATION
 #: ../src/folder-conf.c:873 ../src/folder-conf.c:1106
@@ -5129,15 +5129,15 @@ msgstr "meu: "
 
 #: ../src/folder-conf.c:981
 msgid "Quota:"
-msgstr "Citació:"
+msgstr "Quota:"
 
 #: ../src/folder-conf.c:985
 msgid "quota information available only for open folders"
-msgstr "informació de citació disponible només per a carpetes obertes"
+msgstr "informació de la quota només disponible per a carpetes obertes"
 
 #: ../src/folder-conf.c:990
 msgid "the server does not support quotas"
-msgstr "el servidor d'IMAP no implementa límits"
+msgstr "el servidor d'IMAP no implementa quotas"
 
 #: ../src/folder-conf.c:992
 msgid "no limits"
@@ -5578,14 +5578,14 @@ msgstr "Té més de (dies):"
 
 #: ../src/main-window.c:497
 msgid "Old at most (days):"
-msgstr "Té més de com a mínim (dies):"
+msgstr "Antiguitat màxima (dies):"
 
 #: ../src/main-window.c:1065
 msgid "translator-credits"
 msgstr ""
 "Softcatalà <info@softcatala.org>\n"
 "Aleix Badia i Bosch <abadia@ica.es>\n"
-"Jordi Mas <jmas@softcatala.org>\n"
+"Jordi Mas i Hernàndez <jmas@softcatala.org>\n"
 "Xavier Conde Rueda <xaviconde@eresmas.com>\n"
 "David Planella <david.planella@gmail.com>"
 
@@ -5600,7 +5600,7 @@ msgstr "Quant al Balsa"
 
 #: ../src/main-window.c:1103
 msgid "Balsa closes files and connections. Please wait…"
-msgstr "Balsa tanca arxius i connexions. Espereu..."
+msgstr "Balsa tanca fitxers i connexions. Espereu..."
 
 #: ../src/main-window.c:1502
 msgid "You can apply filters only on mailbox\n"
@@ -6855,7 +6855,7 @@ msgstr "adjunció citada"
 
 #: ../src/sendmsg-window.c:3339
 msgid "Select parts for quotation"
-msgstr "Seleccioneu la citació"
+msgstr "Seleccioneu parts per a citar-les"
 
 #: ../src/sendmsg-window.c:3351
 msgid "Select the parts of the message which shall be quoted in the reply"
@@ -7221,7 +7221,7 @@ msgstr "Desfés tots els canvis i finalitza la comprovació ortogràfica"
 #: ../src/spell-check.c:1024
 #, c-format
 msgid "BalsaSpellCheck: Enchant Error: %s\n"
-msgstr "BalsaSpellCheck: Error d'encantament: %s\n"
+msgstr "BalsaSpellCheck: Error de l'Enchant: %s\n"
 
 #: ../src/store-address.c:105
 msgid "Store address: no addresses"
@@ -7398,7 +7398,7 @@ msgstr "Desa"
 
 #: ../src/toolbar-factory.c:140
 msgid "Identity"
-msgstr "Identificació"
+msgstr "Identitat"
 
 #: ../src/toolbar-factory.c:143
 msgid ""
@@ -7491,7 +7491,7 @@ msgstr "_Només text"
 #: ../src/toolbar-factory.c:717
 #, c-format
 msgid "Use Desktop _Default (%s)"
-msgstr "Utilitza el _predeterminat del sistema (%s)"
+msgstr "Utilitza el _predeterminat de l'escriptori (%s)"
 
 #: ../src/toolbar-factory.c:743
 msgid "_Customize Toolbars…"

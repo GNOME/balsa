@@ -966,6 +966,8 @@ update_address_books(void)
     if (gtk_tree_model_get_iter_first(model, &iter))
         gtk_tree_selection_select_iter(gtk_tree_view_get_selection
                                        (tree_view), &iter);
+
+    properties_modified_cb(NULL, property_box);
 }
 
 enum {
@@ -1443,7 +1445,7 @@ pm_grid_attach_information_menu(GtkGrid     * grid,
  * callbacks
  */
 static void
-properties_modified_cb(GtkWidget * widget, GtkWidget * pbox)
+properties_modified_cb(GtkWidget G_GNUC_UNUSED * widget, GtkWidget * pbox)
 {
     gtk_dialog_set_response_sensitive(GTK_DIALOG(pbox), GTK_RESPONSE_OK,
                                       TRUE);
@@ -1496,7 +1498,9 @@ smtp_server_update(LibBalsaSmtpServer * smtp_server, const gchar * old_name)
 	g_free(group);
 	libbalsa_smtp_server_save_config(smtp_server);
 	libbalsa_conf_pop_group();
-	libbalsa_conf_queue_sync();
+	if (property_box != NULL) {
+		properties_modified_cb(NULL, property_box);
+	}
 }
 
 static void
@@ -1549,12 +1553,12 @@ smtp_server_del_cb(GtkTreeView * tree_view)
                         libbalsa_smtp_server_get_name(smtp_server), NULL);
     libbalsa_conf_remove_group(group);
     g_free(group);
-    libbalsa_conf_queue_sync();
 
     balsa_app.smtp_servers =
         g_slist_remove(balsa_app.smtp_servers, smtp_server);
     g_object_unref(smtp_server);
     update_smtp_servers();
+    properties_modified_cb(NULL, property_box);
 }
 
 /* Set sensitivity of the Modify and Delete buttons; we can edit a server
@@ -1683,7 +1687,7 @@ server_add_menu_widget(void)
     g_signal_connect(menuitem, "activate",
                      G_CALLBACK(pop3_add_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-    menuitem = gtk_menu_item_new_with_label(_("Remote IMAP folder…"));
+    menuitem = gtk_menu_item_new_with_label(_("Remote IMAP account…"));
     g_signal_connect(menuitem, "activate",
 		     G_CALLBACK(folder_conf_add_imap_cb), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
@@ -3547,10 +3551,10 @@ open_preferences_manager(GtkWidget * widget, gpointer data)
 
     /* Colour */
     for (i = 0; i < MAX_QUOTED_COLOR; i++)
-        g_signal_connect(pui->quoted_color[i], "released",
+        g_signal_connect(pui->quoted_color[i], "color-set",
                          G_CALLBACK(properties_modified_cb), property_box);
 
-    g_signal_connect(pui->url_color, "released",
+    g_signal_connect(pui->url_color, "color-set",
                      G_CALLBACK(properties_modified_cb), property_box);
 
     /* handling of message parts with 8-bit chars without codeset headers */
@@ -3639,4 +3643,5 @@ update_mail_servers(void)
     if (gtk_tree_model_get_iter_first(model, &iter))
         gtk_tree_selection_select_iter(gtk_tree_view_get_selection
                                        (tree_view), &iter);
+    properties_modified_cb(NULL, property_box);
 }

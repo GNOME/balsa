@@ -295,7 +295,7 @@ net_client_read_line(NetClient *client, gchar **recv_line, GError **error)
 					(unsigned long) length, (unsigned long) priv->max_line_len);
 				g_free(line_buf);
 			} else {
-				g_debug("R '%s'", line_buf);
+				g_debug("[%s] R '%s'", priv->host_and_port, line_buf);
 				result = TRUE;
 				if (recv_line != NULL) {
 					*recv_line = line_buf;
@@ -332,9 +332,9 @@ net_client_write_buffer(NetClient *client, const gchar *buffer, gsize count, GEr
 		gsize bytes_written;
 
 		if ((count >= 2U) && (buffer[count - 1U] == '\n')) {
-			g_debug("W '%.*s'", (int) count - 2, buffer);
+			g_debug("[%s] W '%.*s'", priv->host_and_port, (int) count - 2, buffer);
 		} else {
-			g_debug("W '%.*s'", (int) count, buffer);
+			g_debug("[%s] W '%.*s'", priv->host_and_port, (int) count, buffer);
 		}
 		result = g_output_stream_write_all(priv->ostream, buffer, count, &bytes_written, NULL, error);
 		if (result) {
@@ -472,7 +472,7 @@ net_client_set_cert_from_pem(NetClient *client, const gchar *pem_data, GError **
 							g_free(dn_str);
 							dn_str = buf;
 						}
-						g_debug("emit 'cert-pass' signal for client %p", client);
+						g_debug("[%s] emit 'cert-pass' signal", priv->host_and_port);
 						g_signal_emit(client, signals[2], 0, dn_str, &key_pass);
 						if (key_pass != NULL) {
 							res = gnutls_x509_privkey_import2(key, &data, GNUTLS_X509_FMT_PEM, key_pass, 0);
@@ -567,7 +567,7 @@ net_client_start_tls(NetClient *client, GError **error)
 				priv->istream = g_data_input_stream_new(g_io_stream_get_input_stream(G_IO_STREAM(priv->tls_conn)));
 				g_data_input_stream_set_newline_type(priv->istream, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
 				priv->ostream = g_io_stream_get_output_stream(G_IO_STREAM(priv->tls_conn));
-				g_debug("connection is encrypted");
+				g_debug("[%s] connection is encrypted", priv->host_and_port);
 			} else {
 				g_object_unref(priv->tls_conn);
 				priv->tls_conn = NULL;
@@ -613,7 +613,7 @@ net_client_start_compression(NetClient *client, GError **error)
 
 		priv->ostream = g_converter_output_stream_new(priv->ostream, G_CONVERTER(priv->comp));
 		result = TRUE;
-		g_debug("connection is compressed");
+		g_debug("[%s] connection is compressed", priv->host_and_port);
 	}
 
 	return result;
@@ -715,9 +715,11 @@ static gboolean
 cert_accept_cb(G_GNUC_UNUSED GTlsConnection *conn, GTlsCertificate *peer_cert, GTlsCertificateFlags errors, gpointer user_data)
 {
 	NetClient *client = NET_CLIENT(user_data);
+	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
+	NetClientPrivate *priv = net_client_get_instance_private(client);
 	gboolean result;
 
-	g_debug("emit 'cert-check' signal for client %p", client);
+	g_debug("[%s] emit 'cert-check' signal", priv->host_and_port);
 	g_signal_emit(client, signals[0], 0, peer_cert, errors, &result);
 	return result;
 }

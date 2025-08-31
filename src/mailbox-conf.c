@@ -352,7 +352,7 @@ run_mailbox_conf(BalsaMailboxNode* mbnode, GType mailbox_type,
 
     if (update) {
         mcw->ok_handler = mailbox_conf_update;
-        mcw->ok_button_name = _("_Update");
+        mcw->ok_button_name = _("_Apply");
         mcw->mailbox = balsa_mailbox_node_get_mailbox(mbnode);
     } else {
         mcw->ok_handler = mailbox_conf_add;
@@ -810,6 +810,7 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 
     /* initially call the check */
     check_for_blank_fields(NULL, mcw);
+    gtk_dialog_set_response_sensitive(mcw->window, MCW_RESPONSE, FALSE);
 
     return GTK_WIDGET(mcw->window);
 }

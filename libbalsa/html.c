@@ -855,9 +855,11 @@ libbalsa_html_print_bitmap(LibBalsaMessageBody *body,
     		gtk_main_iteration_do(FALSE);
     		g_usleep(100);
     	}
-    	g_debug("%s: snapshot done, size %dx%d", __func__, cairo_image_surface_get_width(info->surface),
-    		cairo_image_surface_get_height(info->surface));
-    	html_surface = info->surface;
+    	if (info->surface != NULL) {
+    		g_debug("%s: snapshot done, size %dx%d", __func__, cairo_image_surface_get_width(info->surface),
+    			cairo_image_surface_get_height(info->surface));
+    		html_surface = info->surface;
+    	}
     }
 
     /* destroy the offscreen window */

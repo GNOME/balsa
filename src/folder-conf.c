@@ -465,14 +465,15 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     folder_data->common_data.mbnode = mn;
     folder_data->common_data.dialog =
         GTK_DIALOG(gtk_dialog_new_with_buttons
-                   (_("Remote IMAP folder"),
+                   (_("Remote IMAP account"),
                     GTK_WINDOW(balsa_app.main_window),
                     GTK_DIALOG_DESTROY_WITH_PARENT |
                     libbalsa_dialog_flags(),
-                    mn ? _("_Update") : _("C_reate"), GTK_RESPONSE_OK,
+                    (mn != NULL) ? _("_Apply") : _("_Add"), GTK_RESPONSE_OK,
                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                     _("_Help"), GTK_RESPONSE_HELP,
                     NULL));
+    gtk_dialog_set_response_sensitive(folder_data->common_data.dialog, GTK_RESPONSE_OK, FALSE);
     g_object_add_weak_pointer(G_OBJECT(folder_data->common_data.dialog),
                               (gpointer *) &folder_data->common_data.dialog);
     gtk_window_set_role(GTK_WINDOW(folder_data->common_data.dialog), "folder_config_dialog");
@@ -533,8 +534,6 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     	libbalsa_imap_server_get_use_status(LIBBALSA_IMAP_SERVER(folder_data->server)), NULL, NULL);
 
     gtk_widget_show_all(GTK_WIDGET(folder_data->common_data.dialog));
-
-    validate_folder(NULL, folder_data);
 
     gtk_dialog_set_default_response(folder_data->common_data.dialog, 
                                     mn ? GTK_RESPONSE_OK 
@@ -869,7 +868,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                     GTK_WINDOW(balsa_app.main_window),
                     GTK_DIALOG_DESTROY_WITH_PARENT | /* must NOT be modal */
                     libbalsa_dialog_flags(),
-                    _("_Update"), GTK_RESPONSE_OK,
+                    _("_Apply"), GTK_RESPONSE_OK,
                     _("_Cancel"), GTK_RESPONSE_CANCEL,
                     _("_Help"), GTK_RESPONSE_HELP,
                     NULL));

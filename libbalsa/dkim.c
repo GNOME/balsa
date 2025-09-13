@@ -281,9 +281,11 @@ static void
 libbalsa_dkim_finalize(GObject *self)
 {
 	LibBalsaDkim *dkim = LIBBALSA_DKIM(self);
+	const GObjectClass *parent_class = G_OBJECT_CLASS(libbalsa_dkim_parent_class);
 
 	g_free(dkim->msg_short);
 	g_free(dkim->msg_long);
+	(*parent_class->finalize)(self);
 }
 
 

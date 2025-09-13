@@ -2242,7 +2242,9 @@ get_struct_from_cache(LibBalsaMailbox *mailbox, LibBalsaMessage *message,
         libbalsa_message_headers_from_gmime(headers, mime_msg);
     }
     if (flags & LB_FETCH_RFC822_HEADERS) {
-        headers->user_hdrs = libbalsa_message_user_hdrs_from_gmime(mime_msg);
+        if (headers->user_hdrs == NULL) {
+            headers->user_hdrs = libbalsa_message_user_hdrs_from_gmime(mime_msg);
+        }
         libbalsa_message_set_has_all_headers(message, TRUE);
     }
 
@@ -2268,7 +2270,9 @@ libbalsa_mailbox_imap_parse_set_headers(LibBalsaMessage *message,
 		LibBalsaMessageHeaders *headers = libbalsa_message_get_headers(message);
 
 		libbalsa_message_headers_from_gmime(headers, mime_msg);
-		headers->user_hdrs = libbalsa_message_user_hdrs_from_gmime(mime_msg);
+		if (headers->user_hdrs == NULL) {
+			headers->user_hdrs = libbalsa_message_user_hdrs_from_gmime(mime_msg);
+		}
 		g_object_unref(mime_msg);
 	} else {
 		g_debug("%s: parsing header data failed", __func__);

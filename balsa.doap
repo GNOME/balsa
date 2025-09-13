@@ -10,10 +10,10 @@
 Balsa is an e-mail reader.  This client is part of the GNOME
 desktop environment.  It supports local mailboxes, POP3 and IMAP.
   </description>
-  <homepage rdf:resource="http://pawsa.fedorapeople.org/balsa/" />
+  <homepage rdf:resource="https://gitlab.gnome.org/GNOME/balsa" />
   <support-forum rdf:resource="https://discourse.gnome.org/tag/balsa" />
-  <download-page rdf:resource="http://pawsa.fedorapeople.org/balsa/download.html" />
-  <bug-database rdf:resource="http://pawsa.fedorapeople.org/balsa/bugs.html" />
+  <download-page rdf:resource="https://gitlab.gnome.org/GNOME/balsa/-/releases" />
+  <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/balsa/-/issues" />
 
   <!-- DOAP category: This is used to categorize repositories in cgit.
        Pulse has taken its best guess at the correct category.  You may

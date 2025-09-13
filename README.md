@@ -1,9 +1,13 @@
 # Balsa 
 An E-Mail Client, version 2.6.x
 
-See [ChangeLog](./ChangeLog) for the list of the recent changes and [NEWS](./NEWS) for highlights.
+The latest releases are available from [Gnome Gitlab](https://gitlab.gnome.org/GNOME/balsa/-/releases).
+For older releases up to version 2.6.4 see [Paweł Salek's Balsa website](https://pawsa.fedorapeople.org/balsa/).
 
-Copyright (C) 1997-2020 Stuart Parmenter and others
+See the [git log](https://gitlab.gnome.org/GNOME/balsa/-/commits/master?ref_type=HEADS)
+for the list of the recent changes and [NEWS](./NEWS) for highlights.
+
+Copyright (C) 1997-2025 Stuart Parmenter and others
 
 See [COPYING](./COPYING) for license information.
 
@@ -17,7 +21,10 @@ See [AUTHORS](./AUTHORS)
 
 ## Website:
 
-https://pawsa.fedorapeople.org/balsa/
+See the [Balsa website at Gnome Gitlab](https://gitlab.gnome.org/GNOME/balsa).
+
+More (but somewhat outdated) information is available from
+[Paweł Salek's Balsa website](https://pawsa.fedorapeople.org/balsa/).
 
 
 ## Description:
@@ -113,7 +120,7 @@ messages, and for syntax highlighting in attachments.
 
 `--with-webdav`
 	Enable limited support for CardDAV address books (see
-README-CardDAV.md, requires libsoup and libxml).
+[README-CardDAV.md](./README-CardDAV.md), requires libsoup and libxml).
 
 `--disable-nls`
 	Do not use Native Language Support (Localization).
@@ -129,22 +136,23 @@ need to install just that package).
 
 ## Balsa GIT:
 
-Balsa is hosted on the Gnome GitLab server. To get the latest
+Balsa is hosted on the [Gnome GitLab](https://gitlab.gnome.org/) server. To get the latest
 source, get the module 'balsa':
-git clone https://gitlab.gnome.org/GNOME/balsa.git
+
+	git clone https://gitlab.gnome.org/GNOME/balsa.git
 
 
 ## End-to-End Encryption (E2EE):
 
 Balsa supports E2EE using the multipart OpenPGP (RFC 3156)
 or S/MIME (RFC RFC 8551) standards as well as single-part OpenPGP
-(RFC 4880).  Messages can be signed, encrypted, or both.  The GpgME
-library (https://gnupg.org/software/gpgme/) must be installed.  For
+(RFC 4880).  Messages can be signed, encrypted, or both.  The [GpgME
+library](https://gnupg.org/software/gpgme/) must be installed.  For
 the cryptographic operations, suitable backends like gnupg for the
 OpenPGP protocols and/or gpgsm for S/MIME are required.
  
-Optionally, Balsa can be configured to include Autocrypt support
-(https://autocrypt.org/index.html).
+Optionally, Balsa can be configured to include
+[Autocrypt](https://autocrypt.org/index.html) support.
 
 
 ## Specifying the SMTP Server:
@@ -155,15 +163,15 @@ Remote SMTP Server:
 	server you use for submitting mail.  Please note that the
 	default port number is 587 or 465 for SMTPS (see below).  The
 	syntax is hostname[:port].  Port can be a decimal number or the
-	name of the service as specified in /etc/services.  Just click
+	name of the service as specified in `/etc/services`.  Just click
 	the *probe...* button to let Balsa detect the best port and
 	security (see below) combination.
 	If like system is running a local MTA (e.g. Postfix or Exim),
-	you can just set this to localhost:25 without encryption..
+	you can just set this to `localhost:25` without encryption..
 
 Security:
-	Specify the security level.  For an ISP, this is typically "SMTP
-	over SSL (SMTPS)" (default port 465) or "TLS required" (default
+	Specify the security level.  For an ISP, this is typically “SMTP
+	over SSL (SMTPS)” (default port 465) or “TLS required” (default
 	587, but many ISP's listen on port 25).  If your ISP does not
 	support either, choose a different ISP.  For a local connection
 	(i.e. to localhost), an unencrypted connection is fine.

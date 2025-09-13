@@ -61,27 +61,30 @@
         </screenshot>
     </screenshots>
     <releases>
-        <release date="2022-09-20" version="2.6.4">
+        <release date="2025-04-12" version="2.6.5">
             <description>
                 <ul>
-                    <li>Fix display/printout with nondefault HTML preferences.</li>
-                    <li>HTML context meny improvements,
-                        integration with Webkit HTML privacy filter.</li>
-                    <li>Header editing in GNOME editor fixed.</li>
-                    <li>Some MDN, iCalendar issues fixed.</li>
-                    <li>More informative error messages.</li>
-                    <li>Notification improvements.</li>
-                    <li>Show UI for opening download location after download.</li>
-                    <li>Minor memory leaks plugged.</li>
-                    <li>Code refactoring and cleanup.</li>
-                    <li>Library and build system deprecation cleanups.</li>
-                    <li>Translation updates.</li>
+                    <li>fix connection issues with broken IMAP servers</li>
+                    <li>add limited support for CardDAV address books</li>
+                    <li>always store user credentials in the Secret Service if possible</li>
+                    <li>improve dealing with user credentials iff the Secret Service is unusable</li>
+                    <li>improve saving attachments</li>
+                    <li>improved setup wizard with server probing</li>
+                    <li>add support for Web Key Directory (WKD) GnuPG keys</li>
+                    <li>improve crypto user interface</li>
+                    <li>add optional DKIM and DMARC checks</li>
+                    <li>prefer TLS connections over STARTTLS</li>
+                    <li>Webkit 4.1 support</li>
+                    <li>use XDG-compliant user data folder layout</li>
+                    <li>remove deprecated stuff (SQLite2, Rubrica, ige-mac-integration)</li>
+                    <li>lots of bug fixes</li>
+                    <li>documentation updates (yet incomplete)</li>
                 </ul>
             </description>
         </release>
     </releases>
     <translation type="gettext">balsa</translation>
-    <url type="homepage">https://pawsa.fedorapeople.org/balsa/</url>
+    <url type="homepage">https://gitlab.gnome.org/GNOME/balsa</url>
     <url type="bugtracker">https://gitlab.gnome.org/GNOME/balsa/-/issues</url>
     <url type="contact">https://discourse.gnome.org/tag/balsa</url>
     <url type="faq">https://pawsa.fedorapeople.org/balsa/faq.html</url>

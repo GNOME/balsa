@@ -193,7 +193,7 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
 	rfc2440header =
 	    g_strdup_printf("-----BEGIN PGP MESSAGE-----\nCharset: %s\n"
 			    "Comment: created by Balsa " BALSA_VERSION
-			    " (https://pawsa.fedorapeople.org/balsa)", charset);
+			    " (https://gitlab.gnome.org/GNOME/balsa)", charset);
 	g_byte_array_remove_range(cipherdata, 0, 27);
 	g_byte_array_prepend(cipherdata, (guint8 *) rfc2440header,
 			     strlen(rfc2440header));

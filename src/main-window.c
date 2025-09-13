@@ -1092,7 +1092,7 @@ about_activated(GSimpleAction * action,
                           strcmp(translator_credits, "translator-credits") ?
 			  translator_credits : NULL,
 			  "logo", balsa_logo,
-                          "website", "https://pawsa.fedorapeople.org/balsa/",
+                          "website", "https://gitlab.gnome.org/GNOME/balsa",
                           "wrap-license", TRUE,
                           NULL);
     g_object_unref(balsa_logo);

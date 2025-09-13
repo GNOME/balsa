@@ -7041,6 +7041,19 @@ sendmsg_window_compose_with_address(const gchar * address)
     return bsmsg;
 }
 
+BalsaSendmsg*
+sendmsg_window_new_to_sender(LibBalsaMailbox * mailbox, guint msgno)
+{
+	LibBalsaMessage *message = libbalsa_mailbox_get_message(mailbox, msgno);
+	BalsaSendmsg *bsmsg;
+
+	g_assert(message);
+	bsmsg = sendmsg_window_compose();
+	set_identity(bsmsg, message);
+	set_to(bsmsg, libbalsa_message_get_headers(message));
+	return bsmsg;
+}
+
 BalsaSendmsg *
 sendmsg_window_reply(LibBalsaMailbox * mailbox, guint msgno,
                      SendType reply_type)

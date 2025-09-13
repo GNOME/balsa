@@ -33,6 +33,7 @@
 #define BALSA_PIXMAP_REPLY			"balsa_reply"
 #define BALSA_PIXMAP_REPLY_ALL			"balsa_reply_all"
 #define BALSA_PIXMAP_REPLY_GROUP		"balsa_reply_group"
+#define BALSA_PIXMAP_NEW_TO_SENDER		"balsa_new_to_sender"
 #define BALSA_PIXMAP_FORWARD			"balsa_forward"
 #define BALSA_PIXMAP_NEXT			"balsa_next"
 #define BALSA_PIXMAP_NEXT_PART			"balsa_next_part"

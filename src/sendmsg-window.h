@@ -35,6 +35,7 @@ G_BEGIN_DECLS
        SEND_REPLY,             /* by Reply               */
        SEND_REPLY_ALL,         /* by Reply All           */
        SEND_REPLY_GROUP,       /* by Reply to Group      */
+       SEND_NEW_TO_SENDER,     /* by New to Sender       */
        SEND_FORWARD_ATTACH,    /* by Forward attached    */
        SEND_FORWARD_INLINE,    /* by Forward inline      */
        SEND_CONTINUE           /* by Continue postponed  */
@@ -118,6 +119,8 @@ G_BEGIN_DECLS
     BalsaSendmsg *sendmsg_window_compose(void);
     BalsaSendmsg *sendmsg_window_compose_with_address(const gchar *
                                                       address);
+    BalsaSendmsg* sendmsg_window_new_to_sender(LibBalsaMailbox * mailbox,
+                                               guint msgno);
     BalsaSendmsg *sendmsg_window_reply(LibBalsaMailbox *,
                                        guint msgno, SendType rt);
     BalsaSendmsg *sendmsg_window_reply_embedded(LibBalsaMessageBody *part,

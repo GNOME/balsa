@@ -16,7 +16,7 @@ option('fcntl',
 option('autocrypt',
   type        : 'boolean',
   value       : false,
-  description : 'build with Autocrypt support (see https://autocrypt.org/), (default=false), requires sqlite3')
+  description : 'build with Autocrypt support (see https://autocrypt.org/; default=false), requires sqlite3')
 
 option('systray',
   type        : 'boolean',
@@ -36,7 +36,7 @@ option('compface',
 option('gss',
   type        : 'boolean',
   value       : false,
-  description : 'Enable GSS (default=false)')
+  description : 'Enable GSSAPI Kerberos authentication (default=false)')
 
 option('html-widget',
   type        : 'combo',
@@ -47,7 +47,7 @@ option('html-widget',
 option('gtksourceview',
   type        : 'boolean',
   value       : false,
-  description : 'Use GtkSourceView-3 if available (default=false)')
+  description : 'Use GtkSourceView-3 for syntax highlighting (default=false)')
 
 option('spell-checker',
   type        : 'combo',
@@ -56,9 +56,9 @@ option('spell-checker',
   description : 'select the spell checker (default internal)')
 
 option('ldap',
-  type        : 'string',
+  type        : 'boolean',
   value       : 'false',
-  description : 'Use OpenLDAP if available (true|false|path to LDAP installation, default=false)')
+  description : 'Add support for read-only LDAP address books (default=false)')
 
 option('osmo',
   type        : 'boolean',
@@ -83,7 +83,7 @@ option('webdav',
 option('gcr',
   type        : 'boolean',
   value       : false,
-  description : 'Use libgcr-3 for dealing with TLS certificates (experimental, default=false)')
+  description : 'Use the GCR library for displaying certificates and crypto UI (default=false)')
 
 option('more-warnings',
   type        : 'boolean',

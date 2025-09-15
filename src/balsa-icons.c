@@ -99,7 +99,8 @@ balsa_register_pixmaps(void)
 	/* icons for buttons and menus (24x24 and 16x16) */
 	{ BALSA_PIXMAP_COMPOSE,         "mail-message-new" },
 	{ BALSA_PIXMAP_REPLY,           "mail-reply-sender" },
-	{ BALSA_PIXMAP_REPLY_GROUP,     "stock_mail-reply-to-all" },
+	{ BALSA_PIXMAP_REPLY_GROUP,     "mail-reply-all" },
+	{ BALSA_PIXMAP_NEW_TO_SENDER,   "mail-message-new" },
 	{ BALSA_PIXMAP_REQUEST_MDN,     "mail-reply-sender" },
 	{ BALSA_PIXMAP_SEND,            "mail-send" },
 	{ BALSA_PIXMAP_RECEIVE,         "stock_mail-receive" },

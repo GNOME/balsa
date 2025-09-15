@@ -1690,6 +1690,9 @@ bndx_compose_foreach(BalsaIndex * index, SendType send_type)
         case SEND_REPLY_GROUP:
             sm = sendmsg_window_reply(mailbox, msgno, send_type);
             break;
+        case SEND_NEW_TO_SENDER:
+            sm = sendmsg_window_new_to_sender(mailbox, msgno);
+            break;
         case SEND_CONTINUE:
             sm = sendmsg_window_continue(mailbox, msgno);
             break;
@@ -1737,6 +1740,12 @@ void
 balsa_message_replytogroup(gpointer user_data)
 {
     bndx_compose_foreach(BALSA_INDEX (user_data), SEND_REPLY_GROUP);
+}
+
+void
+balsa_message_newtosender(gpointer user_data)
+{
+	bndx_compose_foreach(BALSA_INDEX (user_data), SEND_NEW_TO_SENDER);
 }
 
 void
@@ -1978,6 +1987,8 @@ bndx_popup_menu_create(BalsaIndex * index)
                 G_CALLBACK(balsa_message_forward_attached)}, {
         N_("Forward _Inline…"),
                 G_CALLBACK(balsa_message_forward_inline)}, {
+        N_("_New to Sender…"),
+                G_CALLBACK(balsa_message_newtosender)}, {
         N_("_Pipe through…"),
                 G_CALLBACK(balsa_index_pipe)}, {
         N_("_Store Address…"),

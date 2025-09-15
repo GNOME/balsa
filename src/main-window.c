@@ -731,6 +731,7 @@ static const BalsaToolbarEntry main_toolbar[] = {
 static const BalsaToolbarEntry main_toolbar_extras[] = {
     { "quit",              "application-exit"          },
     { "reply-group",        BALSA_PIXMAP_REPLY_GROUP   },
+    { "new-sender",         BALSA_PIXMAP_NEW_TO_SENDER },
     { "previous-message",   BALSA_PIXMAP_PREVIOUS      },
     { "next-message",       BALSA_PIXMAP_NEXT          },
     { "next-flagged",       BALSA_PIXMAP_NEXT_FLAGGED  },
@@ -1579,6 +1580,16 @@ reply_group_activated(GSimpleAction * action,
 }
 
 static void
+new_to_sender_activated(GSimpleAction G_GNUC_UNUSED *action,
+                        GVariant G_GNUC_UNUSED *parameter,
+                        gpointer user_data)
+{
+    BalsaWindow *window = BALSA_WINDOW(user_data);
+
+    balsa_message_newtosender(balsa_window_find_current_index(window));
+}
+
+static void
 forward_attached_activated(GSimpleAction * action,
                            GVariant      * parameter,
                            gpointer        user_data)
@@ -2099,6 +2110,7 @@ static GActionEntry win_entries[] = {
     {"reply",                 reply_activated},
     {"reply-all",             reply_all_activated},
     {"reply-group",           reply_group_activated},
+    {"new-sender",            new_to_sender_activated},
     {"forward-attached",      forward_attached_activated},
     {"forward-inline",        forward_inline_activated},
     {"pipe",                  pipe_activated},
@@ -2223,7 +2235,7 @@ static const gchar *const mailbox_actions[] = {
 };
 
 static const gchar *const message_actions[] = {
-    "reply", "reply-all",
+    "reply", "reply-all", "new-sender",
     "store-address", "view-source", "forward-attached", "forward-inline",
     "pipe", "select-thread"
 };

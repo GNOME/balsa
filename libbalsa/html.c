@@ -743,21 +743,7 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 	settings = webkit_web_view_get_settings(view);
 	/* might be paranoid - see note in function lbh_get_web_view_context() above */
 	webkit_settings_set_hardware_acceleration_policy(settings, WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER);
-#if WEBKIT_CHECK_VERSION(2, 32, 0)
-    /* g_object_set(G_OBJECT(settings), "enable-plugins", FALSE, NULL); */
-    /* The property WebKitSettings:enable-plugins is deprecated and
-     * shouldn't be used anymore. It will be removed in a future
-     * version. */
-    /* webkit_settings_set_enable_plugins is deprecated and does
-     * nothing. Plugins are no longer supported. */
-#else  /* WEBKIT_CHECK_VERSION(2, 32, 0) */
-    webkit_settings_set_enable_plugins(settings, FALSE);
-#endif /* WEBKIT_CHECK_VERSION(2, 32, 0) */
-#if WEBKIT_CHECK_VERSION(2, 38, 0)
     g_object_set(G_OBJECT(settings), "enable-java", FALSE, NULL);
-#else  /* WEBKIT_CHECK_VERSION(2, 38, 0) */
-    webkit_settings_set_enable_java(settings, FALSE);
-#endif /* WEBKIT_CHECK_VERSION(2, 38, 0) */
     webkit_settings_set_enable_javascript(settings, FALSE);
 	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);
 	webkit_settings_set_auto_load_images(settings,

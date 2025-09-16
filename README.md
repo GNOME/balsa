@@ -35,104 +35,120 @@ desktop environment.  It supports local mailboxes, POP3 and IMAP.
 
 ## Configuration:
 
-Balsa can be built using either Autotools (configure, make, and so on)
-or using Meson and an appropriate backend such as Ninja. Details of the
-autotools configure script follow; the corresponding Meson files, meson.build
-and meson_options.txt, provide exactly the same configuration options, in a
-more Mesonish way.
+Balsa can be built using Meson and an appropriate backend such as Ninja.
 
-Balsa has a lot of options to its configure script; you
-should run `./configure --help` to get an idea of them. More
-complete descriptions are here.
+It has a lot of configuration options; you should run `meson configure`
+(set `TERM=dumb` to disable its colourised output) to get an idea of them.
+More complete descriptions are here.
 
 Basically, Balsa requires
-- glib-2.0 >= 2.48.0
-- gtk+-3.0 >= 3.18.0
-- gmime-3.0 >= 3.2.6
+- glib-2.0 >= 2.74.0
+- gtk+-3.0 >= 3.24.0
+- gmime-3.0 >= 3.2.13
 - gio-2.0
-- gthread-2.0
-- gnutls >= 3.0
-- gpgme >= 1.6.0
-- libical >= 2.0.0
+- gnutls >= 3.7
+- gpgme >= 1.18.0
+- libical >= 3.0.0
 - fribidi
 
-`--disable-more-warnings`
-	Balsa by default is very sensitive to compilation warnings
+`-Dmore-warnings=(true, false)`
+	Enable maximum compiler warnings (default=true).
+Balsa by default is very sensitive to compilation warnings
 which often mean simply programming or configuration errors. If you
 are sure this is not the case, or you cannot change your system setup
 use this option to compile the code and hope for the best. 
 (some Solaris setups require this).
 
-`--with-gnome`
-	Add "GNOME;" to Balsa's categories in the two .desktop files.
+`-Dgnome-desktop=(true, false)`
+	Add "GNOME;" to Balsa's categories in the two .desktop files
+(default=true).
 
-`--with-libsecret`
+`-Dlibsecret=(true, false)`
 	Link to libsecret to store credentials in the Secret Service instead of
-the obfuscated text file `~/.config/balsa/config-private`.  See also section
-_Credentials_ below.
+the obfuscated text file `~/.config/balsa/config-private` (default=true).  See
+also section [Credentials](#credentials) below.
 
-`--with-gss[=/usr/kerberos]`
-	This enables GSSAPI Kerberos based authentication scheme. 
-Specify the kerberos directory as the argument.
+`-Dgss=(true, false)`
+	This enables GSSAPI Kerberos based authentication schemes (default=false).
 
-`--with-html-widget=(no|webkit2)`
-	When using webkit2, in order to quote html-only messages
-it is recommended to install a html-to-text conversion tool.  Supported
-tools are python-html2text, html2markdown, html2markdown.py2,
-html2markdown.py3 and html2text.  Additionally, sqlite3 is required for
-managing sender-dependent HTML preferences.
+`-Dhtml-widget=(webkit2, no`
+	Select the HTML renderer (default webkit2).  When using webkit2, in
+order to quote html-only messages, it is recommended to install a html-to-text
+conversion tool.  Supported tools are `python-html2text`, `html2markdown`,
+`html2markdown.py3`, `html2markdown.py2` and `html2text`.  Additionally, sqlite3
+is required for managing sender-dependent HTML preferences.
 
-`--with-spell-checker=(internal|gtkspell|gspell)`
-	Select the spell checker for the message composer. The internal spell
-checker depends on the enchant library (any version except 1.6.1).
+`-Dspell-checker=(internal, gspell, gtkspell)`
+	Select the spell checker for the message composer (default internal). The
+internal spell checker depends on the enchant library (any version except 1.6.1).
 
-`--with-ldap`
-        Use ldap libraries for a read-only address book. The read/write
-address book is in the works but needs some finishing touches.
+`-Dldap=(true|false)`
+	Use ldap libraries for a read-only address book (default=false). The
+read/write address book is in the works but needs some finishing touches.
 
-`--with-gpe`
-	Include support for GPE address books (requires sqlite3).
+`-Dgpe=(true, false)`
+	Include support for [GPE Palmtop Environment](https://en.wikipedia.org/wiki/GPE_Palmtop_Environment)
+address books (requires sqlite3, default=false).
 
-`--with-osmo`
+`-Dosmo=(true, false)`
 	Enable experimental support for read-only DBus access to the Osmo
-	contacts.  Note that Osmo svn rev. 1099 or later is required.
+	contacts (default=false).  Note that Osmo svn rev. 1099 or later is required.
 
-`--with-canberra`
-	Use libcanberra-gtk3 for filter sounds.
+`-Dcanberra=(true, false)`
+	Use libcanberra-gtk3 for filter sounds (default=false).
 
-`--with-compface`
-	Use Compface for rendering X-Face format thumbnails of email
-authors in a mail header.
+`-Dcompface=(true|false|path to compface installation)`
+	Use Compface for rendering [X-Face](https://en.wikipedia.org/wiki/X-Face)
+format thumbnails of email authors in a mail header (default=false).
 
-`--with-gtksourceview`
+`-Dgtksourceview=(true, false)`
 	Use GtkSourceview for highlighting structured phrases in
-messages, and for syntax highlighting in attachments.
+messages, and for syntax highlighting in attachments (default=false).
 
-`--with-gcr`
-	Use the GCR library for displaying certificates and crypto UI.
+`-Dgcr=(true, false)`
+	Use the GCR library for displaying certificates and crypto UI (default=false).
 
-`--enable-autocrypt`
-	Build with Autocrypt support to simplify GnuPG key exchange
-(see https://autocrypt.org/, requires sqlite3).
+`-Dautocrypt=(true, false)`
+	Build with [Autocrypt](https://autocrypt.org) support to simplify GnuPG key exchange
+(default=false, requires sqlite3).
 
-`--enable-systray`
-	Enable Freedesktop System Tray Icon support (requires libxapp).
+`-Dsystray=(true, false)`
+	Enable Freedesktop System Tray Icon support (default=false, requires libxapp).
 
-`--with-webdav`
-	Enable limited support for CardDAV address books (see
+`-Dwebdav=(true, false)`
+	Enable limited support for CardDAV address books (default=false, see
 [README-CardDAV.md](./README-CardDAV.md), requires libsoup and libxml).
 
-`--disable-nls`
-	Do not use Native Language Support (Localization).
+`-Dnls=(true, false)`
+	Use Native Language Support (default=true)..
+
+`-Dfcntl=(true, false)`
+	Use `fcntl()` to lock files (default=true).
+
+`-Dflock=(true, false)`
+	Use `flock()` to lock files (default=false).
+
+`-Dhelp-files=(true, false)`
+	Install the help files (default=false).
+
+`-Dlibnetclient-docs=(true, false)`
+	Check requirements for building the  libnetclient API docs (see
+[libnetclient/README](libnetclient/README); default=false).
+
+`-Dlibnetclient-test=(true, false)`
+	Check requirements for running libnetclient tests (see
+[libnetclient/README](libnetclient/README); default=false).
 
 
-## Libraries:
+## Building:
 
-If you use the autotools build system, make sure you have libtool
-installed (if you get some error messages during compilation or when
-running precompiled binaries saying that libtdl is missing it means you
-need to install just that package).
+In order to build Balsa, run
 
+	meson setup build [add build options, see section *Configuration*]
+	ninja -C build
+
+On a Debian-like system, simply run `dpkg-buildpackage` to create `*.deb` packages
+(requires the `dpkg-dev`package).
 
 ## Balsa GIT:
 
@@ -146,13 +162,13 @@ source, get the module 'balsa':
 
 Balsa supports E2EE using the multipart OpenPGP (RFC 3156)
 or S/MIME (RFC RFC 8551) standards as well as single-part OpenPGP
-(RFC 4880).  Messages can be signed, encrypted, or both.  The [GpgME
-library](https://gnupg.org/software/gpgme/) must be installed.  For
+(RFC 4880).  Messages can be signed, encrypted, or both.  The
+[GpgME library](https://gnupg.org/software/gpgme/) must be installed.  For
 the cryptographic operations, suitable backends like gnupg for the
 OpenPGP protocols and/or gpgsm for S/MIME are required.
  
 Optionally, Balsa can be configured to include
-[Autocrypt](https://autocrypt.org/index.html) support.
+[Autocrypt](https://autocrypt.org) support (see section [Configuration](#configuration)).
 
 
 ## Specifying the SMTP Server:
@@ -264,30 +280,30 @@ shoot yourself in your leg.
 
 When the respective POP3 'mailbox' has the 'filter' box checked, the
 downloaded mail is passed on to procmail which will use
-~/.procmailrc file as its configuration, so you can share it between
+`~/.procmailrc` file as its configuration, so you can share it between
 Balsa and fetchmail and get consistent behavior no matter you use
 Balsa or fetchmail for downloading.
 
 Simple example ~/.procmailrc file:
-```
---------- cut here ----------------
-:0H:
-* ^Subject:.*balsa
-mail/balsa-related-mail
---------- cut here ----------------
-```
+
+	--------- cut here ----------------
+	:0H:
+	* ^Subject:.*balsa
+	mail/balsa-related-mail
+	--------- cut here ----------------
+
 It is recommended to read procmail(1) and procmailrc(1) for more
 real-life examples and syntax explanation.
 
 
 ## Debugging:
 
-Set the environment variable G_MESSAGES_DEBUG to print debugging
+Set the environment variable `G_MESSAGES_DEBUG` to print debugging
 information to the console.  The value shall be either a space-
-separated list of log domains, or the special value "all".  The
+separated list of log domains, or the special value *all*.  The
 following custom domains are implemented in Balsa:
-- libnetclient: low-level network IO.  Warning: the output may contain
-        plain-text passwords.
+- libnetclient: low-level network IO.  **Warning:** the output may contain
+        plain-text passwords!
 - imap: IMAP server interaction.  Warning: the output may contain
         plain-text passwords.
 - crypto: GnuPG and S/MIME crypto operations
@@ -310,15 +326,15 @@ following custom domains are implemented in Balsa:
 
 ## Reporting Bugs:
 
-To report a bug, please create an issue at
-https://gitlab.gnome.org/GNOME/balsa/issues.
+To report a bug, please create an issue at the
+[Balsa Gitlab](https://gitlab.gnome.org/GNOME/balsa/issues).
 Patches are welcome!
 
 
 ## Known issues:
 
-*	When dotlocking is not possible (Wrong access privilieges for
+*	When dotlocking is not possible (Wrong access privileges for
 	the mailbox file) Balsa will open mailbox for reading only.
 	Verify that Balsa can create dot file in the mailbox directory.
-	Recommended access privileges to /var/spool/mail are rwxrwxrwxt (01777)
+	Recommended access privileges to `/var/spool/mail` are *rwxrwxrwxt* (01777)
 

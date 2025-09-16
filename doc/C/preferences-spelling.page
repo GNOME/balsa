@@ -24,7 +24,7 @@ id="preferences-spelling">
         <gui>Pspell Module</gui>
       </title>
       <p>The Pspell library allows you to use whatever spell
-      checking engine you prefer, though the use of loadable
+      checking engine you prefer, through the use of loadable
       modules. Currently Pspell has support for two modules, the
       traditional ispell, and the newer and more advanced
       aspell.</p>

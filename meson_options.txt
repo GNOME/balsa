@@ -57,7 +57,7 @@ option('spell-checker',
 
 option('ldap',
   type        : 'boolean',
-  value       : 'false',
+  value       : false,
   description : 'Add support for read-only LDAP address books (default=false)')
 
 option('osmo',

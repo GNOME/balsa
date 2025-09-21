@@ -435,7 +435,7 @@ g_mime_data_wrapper_get_decoded_stream(GMimeDataWrapper * wrapper)
 GMimeObject *
 g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 			 GMimeGpgmeSigstat ** signature,
-			 GtkWindow * parent, GError ** err)
+			 GError ** err)
 {
     GMimeObject *decrypted, *version, *encrypted;
     GMimeStream *stream, *ciphertext;
@@ -513,7 +513,7 @@ g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
     /* get the cleartext */
     sigstat =
 	libbalsa_gpgme_decrypt(ciphertext, filtered_stream,
-			       GPGME_PROTOCOL_OpenPGP, parent, err);
+			       GPGME_PROTOCOL_OpenPGP, err);
     if (!sigstat) {
 	g_object_unref(filtered_stream);
 	g_object_unref(ciphertext);

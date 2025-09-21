@@ -302,7 +302,7 @@ autocrypt_header(LibBalsaIdentity *identity, GError **error)
 	if ((force_gpg_key_id == NULL) || (force_gpg_key_id[0] == '\0')) {
 		gpgme_ctx_t ctx;
 
-		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
+		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, error);
 		if (ctx != NULL) {
 			GList *keys = NULL;
 
@@ -419,7 +419,7 @@ gint autocrypt_import_keys(InternetAddressList *addresses, GError **error)
 	g_return_val_if_fail(IS_INTERNET_ADDRESS_LIST(addresses), -1);
 
 	/* create the gpgme context and set the protocol */
-	gpgme_ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
+	gpgme_ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, error);
 	if (gpgme_ctx == NULL) {
 		result = -1;
 	} else {
@@ -440,7 +440,7 @@ autocrypt_recommendation(InternetAddressList *recipients, GList **missing_keys, 
 	g_return_val_if_fail(IS_INTERNET_ADDRESS_LIST(recipients), AUTOCRYPT_ENCR_DISABLE);
 
     /* create the gpgme context and set the protocol */
-    gpgme_ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
+    gpgme_ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, error);
     if (gpgme_ctx == NULL) {
     	result = AUTOCRYPT_ENCR_ERROR;
     } else {

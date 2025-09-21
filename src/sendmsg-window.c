@@ -5325,7 +5325,7 @@ import_autocrypt_keys(GList *missing_keys, GError **error)
 	gpgme_ctx_t ctx;
 	gboolean result;
 
-	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
+	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, error);
 	if (ctx != NULL) {
 		GList *key;
 

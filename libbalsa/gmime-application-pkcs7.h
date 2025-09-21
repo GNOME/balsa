@@ -25,12 +25,9 @@ G_BEGIN_DECLS
 #include <gmime/gmime.h>
 
 
-    GMimeObject *g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
-							 GMimeGpgmeSigstat
-							 ** signature,
-							 GtkWindow *
-							 parent,
-							 GError ** err);
+GMimeObject *g_mime_application_pkcs7_decrypt_verify(GMimePart          *pkcs7,
+													 GMimeGpgmeSigstat **signature,
+													 GError            **err);
 	gboolean g_mime_application_pkcs7_encrypt(GMimePart * pkcs7,
 				  GMimeObject * content,
 					 GPtrArray * recipients,

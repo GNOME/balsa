@@ -40,9 +40,6 @@ typedef enum {
 } lb_key_sel_md_t;
 
 
-gpgme_error_t lb_gpgme_passphrase(void *hook, const gchar * uid_hint,
-				  const gchar * passphrase_info,
-				  int prev_was_bad, int fd);
 gpgme_key_t lb_gpgme_select_key(const gchar * user_name, lb_key_sel_md_t mode,
 				GList * keys, gpgme_protocol_t protocol,
 				GtkWindow * parent);

@@ -109,7 +109,7 @@ g_mime_gpgme_sigstat_new_from_gpgme_ctx(gpgme_ctx_t ctx)
 				gpgme_ctx_t key_ctx;
 				GError *error = NULL;
 
-				key_ctx = libbalsa_gpgme_new_with_proto(sig_stat->protocol, NULL, NULL, &error);
+				key_ctx = libbalsa_gpgme_new_with_proto(sig_stat->protocol, &error);
 				if (key_ctx != NULL) {
 					sig_stat->key = libbalsa_gpgme_load_key(key_ctx, sig_stat->fingerprint, &error);
 					gpgme_release(key_ctx);

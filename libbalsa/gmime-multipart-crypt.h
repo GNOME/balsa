@@ -52,7 +52,7 @@ gboolean g_mime_gpgme_mpe_encrypt(GMimeMultipartEncrypted * mpe,
 			     GError ** err);
 GMimeObject *g_mime_gpgme_mpe_decrypt(GMimeMultipartEncrypted * mpe,
 				      GMimeGpgmeSigstat ** signature,
-				      GtkWindow * parent, GError ** err);
+				      GError ** err);
 
 
 G_END_DECLS

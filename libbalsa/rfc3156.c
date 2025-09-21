@@ -60,7 +60,7 @@ libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
 	return TRUE;  /* we can of course encrypt for nobody... */
 
     /* create the gpgme context and set the protocol */
-    gpgme_ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, NULL);
+    gpgme_ctx = libbalsa_gpgme_new_with_proto(protocol, NULL);
     if (gpgme_ctx == NULL) {
     	result = FALSE;
     } else {
@@ -258,7 +258,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
  * decrypted bodies. Otherwise, the original body is returned.
  */
 LibBalsaMessageBody *
-libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkWindow *parent)
+libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol)
 {
     LibBalsaMailbox *mailbox;
     GMimeObject *mime_obj = NULL;
@@ -294,11 +294,11 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
     	mime_obj =
     		g_mime_gpgme_mpe_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
-    			&sig_state, parent, &error);
+    			&sig_state, &error);
     } else {
     	mime_obj =
     		g_mime_application_pkcs7_decrypt_verify(GMIME_PART(body->mime_part),
-    			&sig_state, parent, &error);
+    			&sig_state, &error);
     }
     libbalsa_mailbox_unlock_store(mailbox);
 
@@ -428,8 +428,7 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
  * signature info object there.
  */
 gpgme_error_t
-libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
-			 GtkWindow * parent)
+libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 {
     GError *error = NULL;
     GMimeGpgmeSigstat *result;
@@ -445,7 +444,7 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
     }
 
     /* decrypt */
-    result = g_mime_part_rfc2440_decrypt(part, parent, &error);
+    result = g_mime_part_rfc2440_decrypt(part, &error);
     if (result == NULL) {
 	if (error) {
 	    if (error->code != GPG_ERR_CANCELED)

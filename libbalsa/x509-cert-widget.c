@@ -109,7 +109,7 @@ x509_cert_chain_smime(const gchar *fingerprint)
 	GtkWidget *widget = NULL;
 
 	if (fingerprint != NULL) {
-		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_CMS, NULL, NULL, NULL);
+		ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_CMS, NULL);
 		if (ctx != NULL) {
 			GList *chain = NULL;
 			gchar *keyid;

@@ -251,7 +251,7 @@ libbalsa_gpgme_keyserver_op(const gchar *fingerprint,
 	g_return_val_if_fail(fingerprint != NULL, FALSE);
 
 	keyserver_op = g_new0(keyserver_op_t, 1U);
-	keyserver_op->gpgme_ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
+	keyserver_op->gpgme_ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, error);
 	if (keyserver_op->gpgme_ctx != NULL) {
 		size_t fp_len;
 		GThread *keyserver_th;
@@ -365,7 +365,7 @@ libbalsa_gpgme_export_autocrypt_key(const gchar  *fingerprint,
 
 	g_return_val_if_fail((fingerprint != NULL) && (mailbox != NULL), NULL);
 
-	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_SPAWN, NULL, NULL, error);
+	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_SPAWN, error);
 	if (ctx != NULL) {
 		gpgme_data_t keybuf;
 		gpgme_error_t gpgme_err;

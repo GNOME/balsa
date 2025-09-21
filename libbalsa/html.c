@@ -745,7 +745,6 @@ lbh_web_view_new(LibBalsaWebKitInfo *info,
 	webkit_settings_set_hardware_acceleration_policy(settings, WEBKIT_HARDWARE_ACCELERATION_POLICY_NEVER);
     g_object_set(G_OBJECT(settings), "enable-java", FALSE, NULL);
     webkit_settings_set_enable_javascript(settings, FALSE);
-	webkit_settings_set_enable_hyperlink_auditing(settings, TRUE);
 	webkit_settings_set_auto_load_images(settings,
 		auto_load_ext_content || (g_atomic_int_get(&html_filter_found) != 0));
 	lbh_load_external_resources(view, auto_load_ext_content);

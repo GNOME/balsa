@@ -107,7 +107,7 @@ void net_client_free_authstr(gchar *str);
  *
  * This helper function calculates a base64-encoded SASL AUTH ANONYMOUS authentication token which is used as trace information by
  * the server.  As recommended by RFC 4505, the token does not contain personal data.  The returned value is the encoded SHA256 hex
- * hash of the string <c>user-name@host-name:time<c> (time is the creation time stamp as returned by time()).  This token will be
+ * hash of the string <c>user-name\@host-name:time</c> (time is the creation time stamp as returned by time()).  This token will be
  * unique, but makes it impossible for the server to extract user and host.  However, the client @em may store to token if linking
  * server to client operations is required, e.g. for debugging purposes.
  *

@@ -131,6 +131,11 @@
         </item>
         <item>
           <attribute name="label"
+            translatable="yes">New to _Sender…</attribute>
+          <attribute name="action">win.new-sender</attribute>
+        </item>
+        <item>
+          <attribute name="label"
             translatable="yes">_Forward Attached…</attribute>
           <attribute name="action">win.forward-attached</attribute>
           <attribute name="accel">f</attribute>

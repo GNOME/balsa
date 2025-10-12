@@ -193,7 +193,7 @@ g_mime_part_rfc2440_sign_encrypt(GMimePart * part, const char *sign_userid,
 	rfc2440header =
 	    g_strdup_printf("-----BEGIN PGP MESSAGE-----\nCharset: %s\n"
 			    "Comment: created by Balsa " BALSA_VERSION
-			    " (https://pawsa.fedorapeople.org/balsa)", charset);
+			    " (https://gitlab.gnome.org/GNOME/balsa)", charset);
 	g_byte_array_remove_range(cipherdata, 0, 27);
 	g_byte_array_prepend(cipherdata, (guint8 *) rfc2440header,
 			     strlen(rfc2440header));
@@ -288,8 +288,6 @@ g_mime_part_rfc2440_verify(GMimePart * part, GError ** err)
 /* \brief Decrypt a RFC 2440 encrypted part
  *
  * \param part GMime part which shall be verified.
- * \param parent Parent window to be passed to the passphrase callback
- *        function.
  * \param error Filled with error information on error.
  * \return A new signature status object on success, or NULL on error.
  *
@@ -301,8 +299,7 @@ g_mime_part_rfc2440_verify(GMimePart * part, GError ** err)
  * verified.
  */
 GMimeGpgmeSigstat *
-g_mime_part_rfc2440_decrypt(GMimePart * part, GtkWindow * parent,
-			    GError ** err)
+g_mime_part_rfc2440_decrypt(GMimePart * part, GError ** err)
 {
     GMimeStream *stream;
     GMimeStream *plainstream;
@@ -328,7 +325,7 @@ g_mime_part_rfc2440_decrypt(GMimePart * part, GtkWindow * parent,
     /* decrypt and (if possible) verify the input */
     result =
 	libbalsa_gpgme_decrypt(stream, plainstream, GPGME_PROTOCOL_OpenPGP,
-			       parent, err);
+			       err);
 
     if (result != NULL) {
 	GMimeStream *filter_stream;

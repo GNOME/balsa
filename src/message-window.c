@@ -163,6 +163,7 @@ static const BalsaToolbarEntry message_toolbar_extras[] = {
     { "next-flagged",     BALSA_PIXMAP_NEXT_FLAGGED  },
     { "previous-part",    BALSA_PIXMAP_PREVIOUS_PART },
     { "close",           "window-close-symbolic"     },
+    { "new-sender",       BALSA_PIXMAP_NEW_TO_SENDER },
     { "show-all-headers", BALSA_PIXMAP_SHOW_HEADERS  },
 	{ "recheck-crypt",    BALSA_PIXMAP_GPG_RECHECK   },
 };
@@ -446,6 +447,19 @@ mw_reply_group_activated(GSimpleAction * action, GVariant * parameter,
     sendmsg_window_reply(libbalsa_message_get_mailbox(mw->message),
                          libbalsa_message_get_msgno(mw->message),
                          SEND_REPLY_GROUP);
+}
+
+static void
+mw_new_to_sender_activated(GSimpleAction G_GNUC_UNUSED *action,
+						   GVariant G_GNUC_UNUSED		*parameter,
+						   gpointer					 data)
+{
+	MessageWindow *mw = (MessageWindow *) data;
+
+	g_return_if_fail(mw != NULL);
+
+	sendmsg_window_new_to_sender(libbalsa_message_get_mailbox(mw->message),
+								 libbalsa_message_get_msgno(mw->message));
 }
 
 static void
@@ -845,6 +859,7 @@ static GActionEntry win_entries[] = {
     {"reply",                 mw_reply_activated},
     {"reply-all",             mw_reply_all_activated},
     {"reply-group",           mw_reply_group_activated},
+    {"new-sender",            mw_new_to_sender_activated},
     {"forward-attached",      mw_forward_attached_activated},
     {"forward-inline",        mw_forward_inline_activated},
     {"next-part",             mw_next_part_activated},

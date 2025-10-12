@@ -48,9 +48,8 @@ gboolean g_mime_part_rfc2440_sign_encrypt(GMimePart * part,
 				     GtkWindow * parent, GError ** err);
 GMimeGpgmeSigstat *g_mime_part_rfc2440_verify(GMimePart * part,
 				     GError ** err);
-GMimeGpgmeSigstat *g_mime_part_rfc2440_decrypt(GMimePart * part,
-					       GtkWindow * parent,
-                                                GError ** err);
+GMimeGpgmeSigstat *g_mime_part_rfc2440_decrypt(GMimePart *part,
+                                               GError   **err);
 
 G_END_DECLS
 

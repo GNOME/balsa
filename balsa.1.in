@@ -1,4 +1,5 @@
 .TH Balsa 1 "February 2020" "Version @VERSION@" "Gnome Manpage"
+.mso www.tmac
 .SH NAME
 Balsa \- the GNOME e-mail client.
 .SH DESCRIPTION
@@ -107,26 +108,20 @@ Open all mailboxes that may contain unread messages.
 Balsa prints the numbers of unread and unsent messages and exits.
 .RE
 .SH WEBSITE
-Balsa's website is \fI
-.UR https://pawsa.fedorapeople.org/balsa
-https://pawsa.fedorapeople.org/balsa\fR
+Balsa's website is
+.URL https://gitlab.gnome.org/GNOME/balsa https://gitlab.gnome.org/GNOME/balsa .
 
 .SH SUGGESTIONS AND BUG REPORTS
-Any bugs found in Balsa can be reported through
-the Balsa Developer mailing list at \fBbalsa-list@gnome.org\fR,
-or the online bug-tracking system at \fI
-.UR https://gitlab.gnome.org/GNOME/balsa/issues
-https://gitlab.gnome.org/GNOME/balsa/issues\fR.
+Any bugs found in Balsa can be reported through the
+.URL https://gitlab.gnome.org/GNOME/balsa/issues "Balsa Gitlab" " issue tracker ."
 .PP
-See \fI
-.UR https://pawsa.fedorapeople.org/balsa/bugs.html
-https://pawsa.fedorapeople.org/balsa/bugs.html\fR
+See
+.URL https://gitlab.gnome.org/GNOME/balsa "the Balsa website" " "
 for more information on reporting Balsa bugs.
 .PP
 Before reporting bugs, please check to see if the bug is mentioned
 in the FAQ's or the support forum \fI
-.UR https://discourse.gnome.org/tag/balsa
-https://discourse.gnome.org/tag/balsa\fR.
+.URL https://discourse.gnome.org/tag/balsa "support forum" "."
 .PP
 When reporting Balsa bugs, it is important to include
   * a reliable way to reproduce the bug,
@@ -143,8 +138,9 @@ And of course, patches to rectify the bug are even better.
 See the AUTHORS file included with Balsa, probably at
 \fB/usr/share/doc/balsa-@VERSION@/AUTHORS\fR.
 .SH FILES
-\fB ~/.balsa/config                   \fRBalsa's preferences file.
-\fB ~/.balsa/config-private           \fRBalsa's POP and IMAP passwords file.
+\fB ~/.config/balsa/*                 \fRBalsa's preferences file.
+\fB ~/.cache/balsa/*                  \fRBalsa's cache files
+\fB ~/.local/*/balsa/*                \fRBalsa's local state files
 \fB /etc/sound/events/balsa.soundlist \fRsystem-wide configuration file
 .SH SEE ALSO
 Package names given in parenthesis are Debian package names.

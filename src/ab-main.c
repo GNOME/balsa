@@ -1070,13 +1070,8 @@ main(int argc, char *argv[])
     GError *error = NULL;
     gchar *default_icon;
 
-#if GLIB_CHECK_VERSION(2, 73, 3)
     application =
         gtk_application_new("org.desktop.BalsaAb", G_APPLICATION_DEFAULT_FLAGS);
-#else  /* GLIB_CHECK_VERSION(2, 73, 3) */
-    application =
-        gtk_application_new("org.desktop.BalsaAb", G_APPLICATION_FLAGS_NONE);
-#endif /* GLIB_CHECK_VERSION(2, 73, 3) */
     if (!g_application_register(G_APPLICATION(application), NULL, &error)) {
         g_warning("Could not register address book editor: %s", error->message);
         g_error_free(error);

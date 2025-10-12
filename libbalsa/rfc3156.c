@@ -60,7 +60,7 @@ libbalsa_can_encrypt_for_all(InternetAddressList * recipients,
 	return TRUE;  /* we can of course encrypt for nobody... */
 
     /* create the gpgme context and set the protocol */
-    gpgme_ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, NULL);
+    gpgme_ctx = libbalsa_gpgme_new_with_proto(protocol, NULL);
     if (gpgme_ctx == NULL) {
     	result = FALSE;
     } else {
@@ -258,7 +258,7 @@ libbalsa_body_check_signature(LibBalsaMessageBody * body,
  * decrypted bodies. Otherwise, the original body is returned.
  */
 LibBalsaMessageBody *
-libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkWindow *parent)
+libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol)
 {
     LibBalsaMailbox *mailbox;
     GMimeObject *mime_obj = NULL;
@@ -266,6 +266,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     LibBalsaMessage *message;
     GMimeGpgmeSigstat *sig_state = NULL;
     gboolean smime_encrypted = FALSE;
+    LibBalsaMessageBody *parent;
 
     /* paranoia checks */
     g_return_val_if_fail(body != NULL, body);
@@ -294,11 +295,11 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     if (protocol == GPGME_PROTOCOL_OpenPGP) {
     	mime_obj =
     		g_mime_gpgme_mpe_decrypt(GMIME_MULTIPART_ENCRYPTED(body->mime_part),
-    			&sig_state, parent, &error);
+    			&sig_state, &error);
     } else {
     	mime_obj =
     		g_mime_application_pkcs7_decrypt_verify(GMIME_PART(body->mime_part),
-    			&sig_state, parent, &error);
+    			&sig_state, &error);
     }
     libbalsa_mailbox_unlock_store(mailbox);
 
@@ -316,6 +317,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
 	return body;
     }
     message = body->message;
+    parent = body->parent;
     libbalsa_message_body_free(body);
     body = libbalsa_message_body_new(message);
 
@@ -327,6 +329,27 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol, GtkW
     }
     if (body->was_encrypted)
         libbalsa_message_set_crypt_mode(body->message, LIBBALSA_PROTECT_ENCRYPT);
+
+    /* check for a draft-autocrypt-lamps-protected-headers content-type parameter and fix the subject if it is present */
+    if (g_strcmp0(g_mime_object_get_content_type_parameter(mime_obj, "protected-headers"), "v1") == 0) {
+    	const gchar *orig_subject;
+
+    	orig_subject = g_mime_object_get_header(mime_obj, "subject");
+    	if (orig_subject != NULL) {
+    		g_debug("%s: original message subject '%s'", __func__, orig_subject);
+    		if (parent != NULL) {
+    			/* embedded message */
+    			if (parent->embhdrs != NULL) {
+    				g_free(parent->embhdrs->subject);
+    				parent->embhdrs->subject = g_strdup(orig_subject);
+    				libbalsa_utf8_sanitize(&parent->embhdrs->subject, TRUE, NULL);
+    			}
+    		} else {
+    			/* top-level subject */
+    			libbalsa_message_set_subject(message, orig_subject);
+    		}
+    	}
+    }
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
     if (sig_state) {
@@ -428,8 +451,7 @@ libbalsa_rfc2440_verify(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
  * signature info object there.
  */
 gpgme_error_t
-libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
-			 GtkWindow * parent)
+libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info)
 {
     GError *error = NULL;
     GMimeGpgmeSigstat *result;
@@ -445,7 +467,7 @@ libbalsa_rfc2440_decrypt(GMimePart * part, GMimeGpgmeSigstat ** sig_info,
     }
 
     /* decrypt */
-    result = g_mime_part_rfc2440_decrypt(part, parent, &error);
+    result = g_mime_part_rfc2440_decrypt(part, &error);
     if (result == NULL) {
 	if (error) {
 	    if (error->code != GPG_ERR_CANCELED)

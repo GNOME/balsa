@@ -51,8 +51,7 @@ gboolean libbalsa_sign_encrypt_mime_object(GMimeObject ** content,
 gboolean libbalsa_body_check_signature(LibBalsaMessageBody * body,
 				       gpgme_protocol_t protocol);
 LibBalsaMessageBody *libbalsa_body_decrypt(LibBalsaMessageBody * body,
-					   gpgme_protocol_t protocol,
-					   GtkWindow * parent);
+					   gpgme_protocol_t protocol);
 
 /* routines dealing with RFC 2440 stuff */
 gboolean libbalsa_rfc2440_sign_encrypt(GMimePart * part,
@@ -64,8 +63,7 @@ gboolean libbalsa_rfc2440_sign_encrypt(GMimePart * part,
 gpgme_error_t libbalsa_rfc2440_verify(GMimePart * part,
 				      GMimeGpgmeSigstat ** sig_info);
 gpgme_error_t libbalsa_rfc2440_decrypt(GMimePart * part,
-				       GMimeGpgmeSigstat ** sig_info,
-				       GtkWindow * parent);
+				       GMimeGpgmeSigstat ** sig_info);
 
 /* helper functions to convert states to human-readable form */
 gchar *libbalsa_gpgme_sig_stat_to_gchar(gpgme_error_t stat)

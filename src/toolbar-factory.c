@@ -120,6 +120,7 @@ button_data toolbar_buttons[]={
     {BALSA_PIXMAP_REPLY,         N_("Reply"),           TRUE},
     {BALSA_PIXMAP_REPLY_ALL,     N_("Reply\nto all"),   FALSE},
     {BALSA_PIXMAP_REPLY_GROUP,   N_("Reply\nto group"), FALSE},
+    {BALSA_PIXMAP_NEW_TO_SENDER, N_("New to\nsender"),  FALSE},
     {BALSA_PIXMAP_FORWARD,       N_("Forward"),         FALSE},
     {BALSA_PIXMAP_PREVIOUS,      N_("Previous"),        FALSE},
     {BALSA_PIXMAP_NEXT,          N_("Next"),            FALSE},

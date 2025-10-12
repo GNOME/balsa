@@ -49,7 +49,7 @@
 GMimeObject *
 g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
 					GMimeGpgmeSigstat ** signature,
-					GtkWindow * parent, GError ** err)
+					GError ** err)
 {
     GMimeObject *decrypted;
     GMimeDataWrapper *wrapper;
@@ -89,7 +89,7 @@ g_mime_application_pkcs7_decrypt_verify(GMimePart * pkcs7,
     if (g_ascii_strcasecmp(smime_type, "enveloped-data") == 0)
 	*signature =
 	    libbalsa_gpgme_decrypt(ciphertext, filtered_stream,
-				   GPGME_PROTOCOL_CMS, parent, err);
+				   GPGME_PROTOCOL_CMS, err);
     else
 	*signature =
 	    libbalsa_gpgme_verify(ciphertext, filtered_stream,

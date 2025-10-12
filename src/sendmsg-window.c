@@ -685,11 +685,7 @@ edit_with_gnome_check(GPid     pid,
 
     g_free(data_real);
 
-#if GLIB_CHECK_VERSION(2, 70, 0)
     if (!g_spawn_check_wait_status(wait_status, &error)) {
-#else
-    if (!g_spawn_check_exit_status(wait_status, &error)) {
-#endif
         balsa_information_parented(GTK_WINDOW(bsmsg->window),
                                    LIBBALSA_INFORMATION_WARNING,
                                    _("Editing failed: %s"),
@@ -5329,7 +5325,7 @@ import_autocrypt_keys(GList *missing_keys, GError **error)
 	gpgme_ctx_t ctx;
 	gboolean result;
 
-	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, error);
+	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, error);
 	if (ctx != NULL) {
 		GList *key;
 
@@ -7039,6 +7035,19 @@ sendmsg_window_compose_with_address(const gchar * address)
     libbalsa_address_view_add_from_string(bsmsg->recipient_view,
                                           "To:", address);
     return bsmsg;
+}
+
+BalsaSendmsg*
+sendmsg_window_new_to_sender(LibBalsaMailbox * mailbox, guint msgno)
+{
+	LibBalsaMessage *message = libbalsa_mailbox_get_message(mailbox, msgno);
+	BalsaSendmsg *bsmsg;
+
+	g_assert(message);
+	bsmsg = sendmsg_window_compose();
+	set_identity(bsmsg, message);
+	set_to(bsmsg, libbalsa_message_get_headers(message));
+	return bsmsg;
 }
 
 BalsaSendmsg *

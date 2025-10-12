@@ -4456,6 +4456,8 @@ libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
     LibBalsaMailboxPrivate *priv = libbalsa_mailbox_get_instance_private(mailbox);
     LibBalsaMailboxIndexEntry *entry;
     LibBalsaMessageAttach attach_icon;
+    const gchar *subject;
+    gboolean fix_subject;
 
     if (!mailbox || !priv->mindex || priv->mindex->len < msgno)
 	return;
@@ -4465,10 +4467,16 @@ libbalsa_mailbox_msgno_update_attach(LibBalsaMailbox * mailbox,
 	return;
 
     attach_icon = libbalsa_message_get_attach_icon(message);
-    if (entry->attach_icon != attach_icon) {
+    subject = libbalsa_message_get_subject(message);
+    fix_subject = (g_strcmp0(entry->subject, subject) != 0);
+    if ((entry->attach_icon != attach_icon) || fix_subject) {
         GtkTreeIter iter;
 
 	entry->attach_icon = attach_icon;
+	if (fix_subject) {
+		g_free(entry->subject);
+		entry->subject = g_strdup(subject);
+	}
         iter.user_data = NULL;
 	lbm_msgno_changed(mailbox, msgno, &iter);
     }

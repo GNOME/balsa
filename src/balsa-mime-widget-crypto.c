@@ -319,7 +319,7 @@ on_key_import_button(GtkButton *button,
 	gchar *import_info = NULL;
 	GtkWidget *dialog;
 
-	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, NULL, NULL, &error);
+	ctx = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_OpenPGP, &error);
 	if (ctx != NULL) {
 		const gchar *keydata;
 

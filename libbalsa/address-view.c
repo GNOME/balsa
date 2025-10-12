@@ -981,7 +981,7 @@ keyserver_thread_func(gpointer data)
     }
 #endif /* ENABLE_AUTOCRYPT */
 
-    ctx = libbalsa_gpgme_new_with_proto(thread_data->protocol, NULL, NULL, &error);
+    ctx = libbalsa_gpgme_new_with_proto(thread_data->protocol, &error);
     if (ctx != NULL) {
         gint keyserver_res;
 
@@ -1642,7 +1642,7 @@ libbalsa_address_view_set_crypt_mode(LibBalsaAddressView *address_view,
             GError *error = NULL;
 
             protocol = ((mode & LIBBALSA_PROTECT_SMIME) != 0U) ? GPGME_PROTOCOL_CMS : GPGME_PROTOCOL_OpenPGP;
-            address_view->gpgme_ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, &error);
+            address_view->gpgme_ctx = libbalsa_gpgme_new_with_proto(protocol, &error);
             if (error != NULL) {
                 libbalsa_information(LIBBALSA_INFORMATION_ERROR, "%s", error->message);
                 g_error_free(error);

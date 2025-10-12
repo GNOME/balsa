@@ -120,9 +120,7 @@ NetClientPop *net_client_pop_new(const gchar *host, guint16 port, NetClientCrypt
  *
  * Set the allowed authentication methods for the passed connection.  The default is to enable all authentication methods.
  *
- * @note Call this function @em before calling net_client_pop_connect().\n
- *       POP3 does not allow anonymous access without authentication, i.e. the flag @ref NET_CLIENT_AUTH_ANONYMOUS in the argument
- *       is ignored.
+ * @note Call this function @em before calling net_client_pop_connect().
  */
 gboolean net_client_pop_set_auth_mode(NetClientPop *client, NetClientAuthMode auth_mode, gboolean disable_apop);
 

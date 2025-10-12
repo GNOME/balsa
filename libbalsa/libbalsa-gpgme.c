@@ -43,6 +43,7 @@
 #endif
 #define G_LOG_DOMAIN "crypto"
 
+static void check_gpg_agent_version(void);
 
 static gboolean gpgme_add_signer(gpgme_ctx_t ctx, const gchar * signer,
 				 GtkWindow * parent, GError ** error);
@@ -82,18 +83,12 @@ static gboolean has_proto_openpgp = FALSE;
 static gboolean has_proto_cms = FALSE;
 static gpg_capabilities gpg_capas;
 
-static gpgme_passphrase_cb_t gpgme_passphrase_cb = NULL;
 static lbgpgme_select_key_cb select_key_cb = NULL;
 static lbgpgme_accept_low_trust_cb accept_low_trust_cb = NULL;
 
 
 /** \brief Initialise GpgME
  *
- * \param get_passphrase Callback function to read a passphrase from the
- *        user.  Note that this function is used \em only for OpenPGP and
- *        \em only if no GPG Agent is running and can therefore usually be
- *        NULL.  The first (HOOK) argument the passed function accepts
- *        shall be the parent GtkWindow.
  * \param select_key Callback function to let the user select a key from a
  *        list if more than one is available.
  * \param accept_low_trust Callback function to ask the user whether a low
@@ -105,12 +100,10 @@ static lbgpgme_accept_low_trust_cb accept_low_trust_cb = NULL;
  *       from this module.
  */
 void
-libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
-		    lbgpgme_select_key_cb select_key,
+libbalsa_gpgme_init(lbgpgme_select_key_cb select_key,
 		    lbgpgme_accept_low_trust_cb accept_low_trust)
 {
     gpgme_engine_info_t e;
-    const gchar *agent_info;
 
     /* initialise the gpgme library */
     g_debug("init gpgme version %s", gpgme_check_version(NULL));
@@ -133,14 +126,8 @@ libbalsa_gpgme_init(gpgme_passphrase_cb_t get_passphrase,
 	}
     }
 
-    /* check for gpg-agent */
-    agent_info = g_getenv("GPG_AGENT_INFO");
-    if (agent_info) {
-    	g_debug("gpg-agent found: %s", agent_info);
-    	gpgme_passphrase_cb = NULL;
-    } else {
-	gpgme_passphrase_cb = get_passphrase;
-    }
+	/* check for gpg-agent */
+	check_gpg_agent_version();
 
     /* verify that the engines we need are there */
     if (gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP) ==
@@ -230,7 +217,6 @@ libbalsa_gpgme_gpg_capabilities(void)
 /** \brief Create a new GpgME context for a protocol
  *
  * \param protocol requested protocol
- * \param callback callback to request a passphrase, may be NULL to use pinentry (recommended)
  * \param parent parent window, passed to the callback function
  * \param error Filled with error information on error.
  * \return the new gpgme context on success, or NULL on error
@@ -239,8 +225,6 @@ libbalsa_gpgme_gpg_capabilities(void)
  */
 gpgme_ctx_t
 libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,
-	  	  	  	  	  	  	  gpgme_passphrase_cb_t   callback,
-							  GtkWindow				 *parent,
 							  GError                **error)
 {
 	gpgme_error_t err;
@@ -257,13 +241,10 @@ libbalsa_gpgme_new_with_proto(gpgme_protocol_t        protocol,
 		    gpgme_release(ctx);
 		    ctx = NULL;
 		} else {
+			gpgme_set_passphrase_cb(ctx, NULL, NULL);
 			if (protocol == GPGME_PROTOCOL_CMS) {
-				/* s/mime signing fails with error "not implemented" if a passphrase callback has been set... */
-				gpgme_set_passphrase_cb(ctx, NULL, NULL);
-				/* ...but make sure the user certificate is always included when signing */
+				/* make sure the user certificate is always included when signing */
 				gpgme_set_include_certs(ctx, 1);
-			} else {
-				gpgme_set_passphrase_cb(ctx, callback, parent);
 			}
 		}
 	}
@@ -293,7 +274,7 @@ libbalsa_gpgme_temp_with_proto(gpgme_protocol_t   protocol,
 	g_return_val_if_fail(home_dir != NULL, NULL);
 
 	*home_dir = NULL;
-	ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
+	ctx = libbalsa_gpgme_new_with_proto(protocol, error);
 	if (ctx != NULL) {
 		char *temp_dir;
 
@@ -378,8 +359,8 @@ libbalsa_gpgme_verify(GMimeStream * content, GMimeStream * sig_plain,
     g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP ||
 			 protocol == GPGME_PROTOCOL_CMS, NULL);
 
-    /* create the GpgME context (no passphrase callback needed) */
-    ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
+    /* create the GpgME context */
+    ctx = libbalsa_gpgme_new_with_proto(protocol, error);
     if (ctx == NULL) {
     	return NULL;
     }
@@ -472,8 +453,8 @@ libbalsa_gpgme_sign(const gchar * userid, GMimeStream * istream,
     g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP ||
 			 protocol == GPGME_PROTOCOL_CMS, GPGME_MD_NONE);
 
-    /* create the GpgME context (passphrase callback required) */
-    ctx = libbalsa_gpgme_new_with_proto(protocol, gpgme_passphrase_cb, parent, error);
+    /* create the GpgME context */
+    ctx = libbalsa_gpgme_new_with_proto(protocol, error);
     if (ctx == NULL) {
     	return GPGME_MD_NONE;
     }
@@ -580,8 +561,8 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
     g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP ||
 			 protocol == GPGME_PROTOCOL_CMS, FALSE);
 
-    /* create the GpgME context (passphrase callback required) */
-    ctx = libbalsa_gpgme_new_with_proto(protocol, gpgme_passphrase_cb, parent, error);
+    /* create the GpgME context */
+    ctx = libbalsa_gpgme_new_with_proto(protocol, error);
     if (ctx == NULL) {
     	return FALSE;
     }
@@ -685,7 +666,7 @@ libbalsa_gpgme_encrypt(GPtrArray * recipients, const char *sign_for,
  */
 GMimeGpgmeSigstat *
 libbalsa_gpgme_decrypt(GMimeStream * crypted, GMimeStream * plain,
-		       gpgme_protocol_t protocol, GtkWindow * parent,
+		       gpgme_protocol_t protocol,
 		       GError ** error)
 {
     gpgme_ctx_t ctx;
@@ -706,8 +687,8 @@ libbalsa_gpgme_decrypt(GMimeStream * crypted, GMimeStream * plain,
     g_return_val_if_fail(protocol == GPGME_PROTOCOL_OpenPGP ||
 			 protocol == GPGME_PROTOCOL_CMS, NULL);
 
-    /* create the GpgME context (passphrase callback required) */
-    ctx = libbalsa_gpgme_new_with_proto(protocol, gpgme_passphrase_cb, parent, error);
+    /* create the GpgME context */
+    ctx = libbalsa_gpgme_new_with_proto(protocol, error);
     if (ctx == NULL) {
     	return NULL;
     }
@@ -773,7 +754,7 @@ libbalsa_gpgme_get_pubkey(gpgme_protocol_t   protocol,
 
 	g_return_val_if_fail(name != NULL, NULL);
 
-	ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
+	ctx = libbalsa_gpgme_new_with_proto(protocol, error);
 	if (ctx != NULL) {
 		gpgme_error_t gpgme_err;
 		gpgme_key_t key = NULL;
@@ -810,7 +791,7 @@ libbalsa_gpgme_get_seckey(gpgme_protocol_t   protocol,
 	gpgme_ctx_t ctx;
 	gchar *keyid = NULL;
 
-	ctx = libbalsa_gpgme_new_with_proto(protocol, NULL, NULL, error);
+	ctx = libbalsa_gpgme_new_with_proto(protocol, error);
 	if (ctx != NULL) {
 		GList *keys = NULL;
 
@@ -886,6 +867,45 @@ libbalsa_gpgme_set_error(GError        **error,
 
 
 /* ---- local stuff ---------------------------------------------------- */
+
+/* GpgME callback for gpgme_op_assuan_transact_ext(), see check_gpg_agent_version() */
+static gpgme_error_t
+assuan_data_cb(void *opaque, const void *data, size_t datalen)
+{
+	*((gchar **) opaque) = g_strndup(data, datalen);
+	return GPG_ERR_NO_ERROR;
+}
+
+/** \brief Check the version of the GPG Agent
+ *
+ * Try to get the version of the GPG agent, and print it as debug message on success.  Warn the user if any error occurred.
+ */
+static void
+check_gpg_agent_version(void)
+{
+	gchar *agent_ver = NULL;
+	gpgme_ctx_t assuan;
+	GError *error = NULL;
+
+	assuan = libbalsa_gpgme_new_with_proto(GPGME_PROTOCOL_ASSUAN, &error);
+	if (assuan != NULL) {
+		gpgme_error_t err;
+		gpgme_error_t op_err;
+
+		err = gpgme_op_assuan_transact_ext(assuan, "GETINFO version", assuan_data_cb, &agent_ver, NULL, NULL, NULL, NULL, &op_err);
+		if ((err != GPG_ERR_NO_ERROR) || (op_err != GPG_ERR_NO_ERROR)) {
+			libbalsa_gpgme_set_error(&error, (err != GPG_ERR_NO_ERROR) ? err : op_err, _("accessing the GPG agent failed"));
+		} else {
+			g_debug("GPG Agent version %s", agent_ver);
+		}
+		gpgme_release(assuan);
+	}
+	if (error != NULL) {
+		libbalsa_information(LIBBALSA_INFORMATION_WARNING,
+				_("Signing or decrypting GPG or S/MIME messages may fail, please check the GPG agent: %s"), error->message);
+		g_error_free(error);
+	}
+}
 
 static gchar *
 utf8_valid_str(const char *gpgme_str)
@@ -1221,11 +1241,7 @@ gpg_check_capas(const gchar *gpg_path, const gchar *version)
 	/* check for the "--export-filter keep-uid=..." option */
 	if (g_spawn_sync(NULL, gpg_args, NULL, G_SPAWN_STDOUT_TO_DEV_NULL + G_SPAWN_STDERR_TO_DEV_NULL, NULL, NULL, NULL, NULL,
 					 &exit_status, NULL)) {
-#if       GLIB_CHECK_VERSION(2, 70, 0)
 		gpg_capas.export_filter_uid = g_spawn_check_wait_status(exit_status, NULL);
-#else  /* GLIB_CHECK_VERSION(2, 70, 0) */
-		gpg_capas.export_filter_uid = g_spawn_check_exit_status(exit_status, NULL);
-#endif /* GLIB_CHECK_VERSION(2, 70, 0) */
 	}
 	g_debug("%s supports '--export-filter keep-uid=...': %d", gpg_path, gpg_capas.export_filter_uid);
 

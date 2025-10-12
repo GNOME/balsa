@@ -16,11 +16,8 @@ Summary:        Mail Client
 
 Group:          Applications/Internet
 License:        GPLv2+
-URL:            https://pawsa.fedorapeople.org/balsa/
-Source0:        https://pawsa.fedorapeople.org/balsa/%{name}-%{version}.tar.bz2
-%if ! %fedora
-Source1:        https://pawsa.fedorapeople.org/balsa/gmime-%{gmimever}.tar.bz2
-%endif
+URL:            https://gitlab.gnome.org/GNOME/balsa
+Source0:        https://gitlab.gnome.org/GNOME/balsa/-/archive/2.6.5/balsa-%{version}.tar.bz2
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 

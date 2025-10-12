@@ -514,10 +514,6 @@ balsa_startup_cb(GApplication *application,
     libbalsa_oauth2_load_providers();
 #endif
 
-    /* initialise the gpgme library and set the callback funcs */
-    libbalsa_gpgme_init(lb_gpgme_passphrase, lb_gpgme_select_key,
-			lb_gpgme_accept_low_trust_key);
-
     libbalsa_assure_balsa_dirs();
     balsa_app_init();
 
@@ -545,6 +541,9 @@ balsa_startup_cb(GApplication *application,
     libbalsa_progress_set_activity = balsa_progress_set_activity;
 
     libbalsa_mailbox_date_format = &balsa_app.date_string;
+
+    /* initialise the gpgme library and set the callback funcs */
+    libbalsa_gpgme_init(lb_gpgme_select_key, lb_gpgme_accept_low_trust_key);
 
 #ifdef ENABLE_AUTOCRYPT
     if (!autocrypt_init(&error)) {

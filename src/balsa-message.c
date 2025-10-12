@@ -2954,8 +2954,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
                          chk_crypto->sender, chk_crypto->subject);
                 else
                     this_body =
-                        libbalsa_body_decrypt(this_body,
-                                              GPGME_PROTOCOL_OpenPGP, NULL);
+                        libbalsa_body_decrypt(this_body, GPGME_PROTOCOL_OpenPGP);
             } else if (encrres & LIBBALSA_PROTECT_SMIME) {
                 if (!balsa_app.has_smime)
                     libbalsa_information
@@ -2967,8 +2966,7 @@ libbalsa_msg_try_decrypt(LibBalsaMessage * message, LibBalsaMessageBody * body,
                          chk_crypto->sender, chk_crypto->subject);
                 else
                     this_body =
-                        libbalsa_body_decrypt(this_body, GPGME_PROTOCOL_CMS,
-					      NULL);
+                        libbalsa_body_decrypt(this_body, GPGME_PROTOCOL_CMS);
             }
         }
 
@@ -3184,9 +3182,7 @@ libbalsa_msg_part_2440(LibBalsaMessage * message, LibBalsaMessageBody * body,
 				    &body->sig_info);
     else {
         sig_res =
-            libbalsa_rfc2440_decrypt(GMIME_PART(body->mime_part),
-				     &body->sig_info,
-				     NULL);
+            libbalsa_rfc2440_decrypt(GMIME_PART(body->mime_part), &body->sig_info);
 	body->was_encrypted = (body->sig_info || sig_res == GPG_ERR_NO_ERROR);
 	if (sig_res == GPG_ERR_NO_ERROR) {
 	    /* decrypting may change the charset, so be sure to use the one

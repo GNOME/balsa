@@ -1,6 +1,6 @@
 project('balsa', 'c',
         version         : '2.6.5',
-        meson_version   : '>= 0.50.0',
+        meson_version   : '>= 1.0.0',
         default_options : ['sysconfdir=/etc', 'buildtype=debugoptimized'])
 
 # if meson is used not in a git source tree, use project version:
@@ -74,10 +74,6 @@ more_warnings = get_option('more-warnings')
 help_files    = get_option('help-files')
 nls           = get_option('nls')
 
-# Documentation and Testing requirements for libnetclient
-libnetclient_docs = get_option('libnetclient-docs')
-libnetclient_test = get_option('libnetclient-test')
-
 # #####################################################################
 # Programs: compilers and their options.
 # #####################################################################
@@ -122,15 +118,15 @@ conf.set('TOOLKIT_CATEGORIES', TOOLKIT_CATEGORIES)
 # #####################################################################
 
 # Dependencies for balsa and balsa_ab:
-glib_dep    = dependency('glib-2.0',  version : '>= 2.48.0')
+glib_dep    = dependency('glib-2.0',  version : '>= 2.74.0')
 gtk_dep     = dependency('gtk+-3.0',  version : '>= 3.24.0')
-gmime_dep   = dependency('gmime-3.0', version : '>= 3.2.6' )
+gmime_dep   = dependency('gmime-3.0', version : '>= 3.2.13')
 gio_dep     = dependency('gio-2.0'                         )
 gthread_dep = dependency('gthread-2.0'                     )
-gnutls_dep  = dependency('gnutls',    version : '>= 3.0'   )
-gpgme_dep   = dependency('gpgme',     version : '>= 1.8.0' )
+gnutls_dep  = dependency('gnutls',    version : '>= 3.7'   )
+gpgme_dep   = dependency('gpgme',     version : '>= 1.18.0')
 fribidi_dep = dependency('fribidi'                         )
-libical_dep = dependency('libical',   version : '>= 2.0.0' )
+libical_dep = dependency('libical',   version : '>= 3.0.0' )
 
 # Dependencies for balsa
 balsa_deps = [glib_dep,
@@ -162,7 +158,7 @@ libnetclient_deps = [glib_dep,
 if html_widget == 'webkit2'
   html_dep = dependency('webkit2gtk-4.1', required : false)
   if not html_dep.found()
-    html_dep = dependency('webkit2gtk-4.0', version : '>= 2.28.0')
+    html_dep = dependency('webkit2gtk-4.0', version : '>= 2.48.5')
   endif
   htmlpref_dep = dependency('sqlite3', version : '>= 3.24.0')
   balsa_web_extensions = join_paths(get_option('prefix'), get_option('libdir'), 'balsa')
@@ -171,16 +167,12 @@ if html_widget == 'webkit2'
 
   html2text = find_program('python-html2text',
                            'html2markdown',
-                           'html2markdown.py2',
                            'html2markdown.py3',
+                           'html2markdown.py2',
                            'html2text',
                            required : false)
   if html2text.found()
-    if meson.version().version_compare('>=0.55')
-      html2text_path = html2text.full_path()
-    else # meson.version().version_compare('>=0.55')
-      html2text_path = html2text.path()
-    endif # meson.version().version_compare('>=0.55')
+    html2text_path = html2text.full_path()
     conf.set_quoted('HTML2TEXT', html2text_path,
       description : 'Path to html2text program.')
     conftest_htm = join_paths(meson.current_build_dir(), 'conftest.htm')
@@ -206,54 +198,36 @@ endif
 
 # Autocrypt
 if autocrypt
-  autocrypt_dep = dependency('sqlite3', required : true)
+  autocrypt_dep = dependency('sqlite3')
   conf.set('ENABLE_AUTOCRYPT', 1, description : 'If defined, enable Autocrypt support.')
   balsa_deps += autocrypt_dep
 endif
 
 # System Tray Icons
 if systray
-  systray_dep = dependency('xapp', required : true)
+  systray_dep = dependency('xapp')
   conf.set('ENABLE_SYSTRAY', 1, description : 'If defined, enable System Tray Icon support.')
   balsa_deps += systray_dep
 endif
 
 # OpenLDAP configuration.
 #
-if ldap != 'false'
-  ldap_compile_args = []
-  ldap_link_args    = ['-lldap', '-llber', '-lresolv']
-  if ldap != 'true'
-    ldap_compile_args += '-I' + join_paths(ldap, 'include')
-    ldap_link_args    += '-L' + join_paths(ldap, 'lib')
-  endif
-
-  result = compiler.has_function('ldap_search', args : ldap_link_args)
+if ldap
+  ldap_dep = dependency('ldap')
+  conf.set('ENABLE_LDAP', 1, description : 'Defined when the LDAP support is to be compiled in.')
+  result = compiler.has_function('ldap_start_tls', dependencies : ldap_dep)
   if result
-    conf.set('ENABLE_LDAP', 1,
-      description : 'Defined when the LDAP support is to be compiled in.')
-  else
-    error('*** You enabled LDAP but ldap library is not found.')
+    conf.set('HAVE_LDAP_TLS', 1, description : 'Defined when LDAP lib supports TLS')
   endif
-
-  result = compiler.has_function('ldap_start_tls', args : ldap_link_args)
-  if result
-    conf.set('HAVE_LDAP_TLS', 1,
-      description : 'Defined when LDAP lib supports TLS')
-  endif
-
-  ldap_dep = declare_dependency(compile_args : ldap_compile_args,
-                                link_args    : ldap_link_args)
   balsa_deps += ldap_dep
   balsa_ab_deps += ldap_dep
-endif # ldap != 'false'
+endif # ldap
 
 # GPE address book configuration.
 #
 if gpe
-  gpe_dep = dependency('sqlite3', required : true)
-  conf.set('HAVE_GPE', 1,
-    description : 'If defined, enable GPE address book support.')
+  gpe_dep = dependency('sqlite3')
+  conf.set('HAVE_GPE', 1, description : 'If defined, enable GPE address book support.')
   balsa_deps += gpe_dep
   balsa_ab_deps += gpe_dep
 endif # gpe
@@ -261,32 +235,14 @@ endif # gpe
 # Osmo address book support
 #
 if osmo
-  conf.set('HAVE_OSMO', 1,
-    description : 'If defined, enable Osmo address book support.')
+  conf.set('HAVE_OSMO', 1, description : 'If defined, enable Osmo address book support.')
 endif # osmo
 
 # KRB5/GSSAPI configuration.
 #
 if gss
-  krb5_config = find_program('krb5-config',
-                             '/usr/kerberos/bin/krb5-config',
-                             '/usr/lib/mit/bin/krb5-config',
-                             required : false)
-  if not krb5_config.found()
-    error('GSS requested but krb5-config not found. Install krb5-devel/heimdal-devel')
-  endif
-  conf.set('HAVE_GSSAPI', 1,
-    description : 'Defined when GSSAPI support is to be compiled.')
-  krb5_cflags = run_command(krb5_config, ['--cflags', 'gssapi'], check : true).stdout().strip().split()
-  krb5_libs   = run_command(krb5_config, ['--libs',   'gssapi'], check : true).stdout().strip().split()
-  if compiler.has_header('gssapi.h')
-    conf.set('HAVE_HEIMDAL', 1,
-      description : 'Defined for Heimdal.')
-  elif not compiler.has_header('gssapi/gssapi.h')
-    error('gssapi.h not found')
-  endif
-  krb5_dep = declare_dependency(compile_args : krb5_cflags,
-                                link_args    : krb5_libs)
+  krb5_dep = dependency('krb5-gssapi')
+  conf.set('HAVE_GSSAPI', 1, description : 'Defined when GSSAPI support is to be compiled.')
   balsa_deps        += krb5_dep
   libnetclient_deps += krb5_dep
 endif # gss
@@ -309,10 +265,7 @@ endif #oauth2
 #
 if gcr
   gcr_dep = dependency('gcr-3')
-  if gcr_dep.found()
-    conf.set('HAVE_GCR', 1,
-      description : 'Defined when gcr-3 can be used.')
-  endif
+  conf.set('HAVE_GCR', 1, description : 'Defined when gcr-3 can be used.')
   balsa_deps += gcr_dep
 endif # gcr
 
@@ -344,28 +297,22 @@ endif # compface != 'false'
 if gtksourceview
   gsv_dep = dependency('gtksourceview-4')
   balsa_deps += gsv_dep
-  conf.set('HAVE_GTKSOURCEVIEW', 1,
-    description : 'Defined when GtkSourceView-4 can be used.')
+  conf.set('HAVE_GTKSOURCEVIEW', 1, description : 'Defined when GtkSourceView-4 can be used.')
 endif # gtksourceview
 
 # libcanberra configuration
 #
 if canberra
   canberra_dep = dependency('libcanberra-gtk3')
-  conf.set('HAVE_CANBERRA', 1,
-    description : 'Defined when canberra can be used.')
+  conf.set('HAVE_CANBERRA', 1, description : 'Defined when canberra can be used.')
   balsa_deps += canberra_dep
 endif # canberra
 
 # Libsecret configuration
 #
 if libsecret
-  secret_dep = dependency('libsecret-1', required : false)
-  if not secret_dep.found()
-    error('You asked to link to libsecret, but the development files are not installed')
-  endif
-  conf.set('HAVE_LIBSECRET', 1,
-    description : 'Defined when libsecret can be used.')
+  secret_dep = dependency('libsecret-1')
+  conf.set('HAVE_LIBSECRET', 1, description : 'Defined when libsecret can be used.')
   balsa_deps += secret_dep
   balsa_ab_deps += secret_dep
 endif # libsecret
@@ -378,8 +325,7 @@ if webdav
     webdav_dep = dependency('libsoup-2.4')
   endif
   webdav_xml_dep = dependency('libxml-2.0')
-  conf.set('HAVE_WEBDAV', 1,
-    description : 'Defined when WebDAV (CardDAV) support is enabled.')
+  conf.set('HAVE_WEBDAV', 1, description : 'Defined when WebDAV (CardDAV) support is enabled.')
   balsa_deps += [webdav_dep, webdav_xml_dep]
   balsa_ab_deps += [webdav_dep, webdav_xml_dep]
 endif # webdav
@@ -392,18 +338,14 @@ endif # webdav
 #
 if spell_checker == 'gspell'
   spell_dep = dependency('gspell-1', version : '>= 1.6.0')
-  conf.set('HAVE_GSPELL', 1,
-    description : 'Defined when Gspell can be used.')
+  conf.set('HAVE_GSPELL', 1, description : 'Defined when Gspell can be used.')
 elif spell_checker == 'gtkspell'
   spell_dep = dependency('gtkspell3-3.0', version : '>= 3.0.9')
-  conf.set('HAVE_GTKSPELL', 1,
-    description : 'Defined when GtkSpell can be used.')
+  conf.set('HAVE_GTKSPELL', 1, description : 'Defined when GtkSpell can be used.')
 elif spell_checker == 'internal'
-  spell_dep = dependency('enchant-2',
-                         required : false)
+  spell_dep = dependency('enchant-2', required : false)
   if not spell_dep.found()
-    spell_dep = dependency('enchant',
-                           version : '!= 1.6.1')
+    spell_dep = dependency('enchant', version : '!= 1.6.1')
   endif
 endif
 
@@ -510,40 +452,6 @@ endif # balsa_from_git
 balsa_data_prefix = join_paths(get_option('prefix'), get_option('datadir'), 'balsa')
 add_global_arguments('-DBALSA_DATA_PREFIX="' + balsa_data_prefix + '"', language : 'c')
 
-###########################################################################
-# Documentation and Testing requirements for libnetclient
-###########################################################################
-
-if libnetclient_docs
-  doxygen_program = find_program('doxygen', required : false)
-  if not doxygen_program.found()
-    error('*** Cannot build libnetclient API documentation, see libnetclient/README for fixing this issue ***')
-  endif
-endif # libnetclient_docs
-
-if libnetclient_test
-  have_sput           = compiler.has_header('sput.h')
-  valgrind_program    = find_program('valgrind',    required : false)
-  lcov_program        = find_program('lcov',        required : false)
-  genhtml_program     = find_program('genhtml',     required : false)
-  screen_program      = find_program('screen',      required : false)
-  gnutls_serv_program = find_program('gnutls-serv', required : false)
-  sudo_program        = find_program('sudo',        required : false)
-  inetsim_program     = find_program('inetsim',     required : false)
-
-  if not (have_sput
-          and valgrind_program.found()
-          and lcov_program.found()
-          and genhtml_program.found()
-          and screen_program.found()
-          and gnutls_serv_program.found()
-          and sudo_program.found()
-          and inetsim_program.found())
-    error('*** Cannot run libnetclient tests, see libnetclient/README for fixing this issue ***')
-  endif
-
-endif # libnetclient_test
-
 #####################################################################
 # Output
 #####################################################################
@@ -621,8 +529,8 @@ summary = [
   '           Use Canberra: @0@'.format(canberra),
   '          Use Autocrypt: @0@'.format(autocrypt),
   '       System Tray Icon: @0@'.format(systray),
-  '               Use LDAP: @0@'.format(ldap),
-  '                Use GSS: @0@'.format(gss),
+  '      LDAP address book: @0@'.format(ldap),
+  ' Use GSS authentication: @0@'.format(gss),
   '       GPE address book: @0@'.format(gpe),
   '   CardDAV address book: @0@'.format(webdav),
   '          Spell checker: @0@'.format(spell_checker),
@@ -630,6 +538,7 @@ summary = [
   '           Use Compface: @0@'.format(compface),
   '          Use libsecret: @0@'.format(libsecret),
   '                Use gcr: @0@'.format(gcr),
+  '     Install help files: @0@'.format(help_files),
   '===============================================',
   ''
   ]

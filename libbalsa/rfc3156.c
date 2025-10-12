@@ -266,6 +266,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol)
     LibBalsaMessage *message;
     GMimeGpgmeSigstat *sig_state = NULL;
     gboolean smime_encrypted = FALSE;
+    LibBalsaMessageBody *parent;
 
     /* paranoia checks */
     g_return_val_if_fail(body != NULL, body);
@@ -316,6 +317,7 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol)
 	return body;
     }
     message = body->message;
+    parent = body->parent;
     libbalsa_message_body_free(body);
     body = libbalsa_message_body_new(message);
 
@@ -327,6 +329,27 @@ libbalsa_body_decrypt(LibBalsaMessageBody *body, gpgme_protocol_t protocol)
     }
     if (body->was_encrypted)
         libbalsa_message_set_crypt_mode(body->message, LIBBALSA_PROTECT_ENCRYPT);
+
+    /* check for a draft-autocrypt-lamps-protected-headers content-type parameter and fix the subject if it is present */
+    if (g_strcmp0(g_mime_object_get_content_type_parameter(mime_obj, "protected-headers"), "v1") == 0) {
+    	const gchar *orig_subject;
+
+    	orig_subject = g_mime_object_get_header(mime_obj, "subject");
+    	if (orig_subject != NULL) {
+    		g_debug("%s: original message subject '%s'", __func__, orig_subject);
+    		if (parent != NULL) {
+    			/* embedded message */
+    			if (parent->embhdrs != NULL) {
+    				g_free(parent->embhdrs->subject);
+    				parent->embhdrs->subject = g_strdup(orig_subject);
+    				libbalsa_utf8_sanitize(&parent->embhdrs->subject, TRUE, NULL);
+    			}
+    		} else {
+    			/* top-level subject */
+    			libbalsa_message_set_subject(message, orig_subject);
+    		}
+    	}
+    }
 
     libbalsa_message_body_set_mime_body(body, mime_obj);
     if (sig_state) {

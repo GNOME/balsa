@@ -131,14 +131,6 @@ messages, and for syntax highlighting in attachments (default=false).
 `-Dhelp-files=(true, false)`
 	Install the help files (default=false).
 
-`-Dlibnetclient-docs=(true, false)`
-	Check requirements for building the  libnetclient API docs (see
-[libnetclient/README](libnetclient/README); default=false).
-
-`-Dlibnetclient-test=(true, false)`
-	Check requirements for running libnetclient tests (see
-[libnetclient/README](libnetclient/README); default=false).
-
 
 ## Building:
 

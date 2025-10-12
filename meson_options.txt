@@ -95,16 +95,6 @@ option('help-files',
   value       : false,
   description : 'Install the help files (default=false)')
 
-option('libnetclient-docs',
-  type        : 'boolean',
-  value       : false,
-  description : 'Check requirements for building the libnetclient API docs (see libnetclient/README; default=false)')
-
-option('libnetclient-test',
-  type        : 'boolean',
-  value       : false,
-  description : 'Check requirements for running libnetclient tests (see libnetclient/README; default=false)')
-
 option('nls',
   type        : 'boolean',
   value       : true,

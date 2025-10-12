@@ -73,10 +73,6 @@ more_warnings = get_option('more-warnings')
 help_files    = get_option('help-files')
 nls           = get_option('nls')
 
-# Documentation and Testing requirements for libnetclient
-libnetclient_docs = get_option('libnetclient-docs')
-libnetclient_test = get_option('libnetclient-test')
-
 # #####################################################################
 # Programs: compilers and their options.
 # #####################################################################
@@ -440,40 +436,6 @@ endif # balsa_from_git
 
 balsa_data_prefix = join_paths(get_option('prefix'), get_option('datadir'), 'balsa')
 add_global_arguments('-DBALSA_DATA_PREFIX="' + balsa_data_prefix + '"', language : 'c')
-
-###########################################################################
-# Documentation and Testing requirements for libnetclient
-###########################################################################
-
-if libnetclient_docs
-  doxygen_program = find_program('doxygen', required : false)
-  if not doxygen_program.found()
-    error('*** Cannot build libnetclient API documentation, see libnetclient/README for fixing this issue ***')
-  endif
-endif # libnetclient_docs
-
-if libnetclient_test
-  have_sput           = compiler.has_header('sput.h')
-  valgrind_program    = find_program('valgrind',    required : false)
-  lcov_program        = find_program('lcov',        required : false)
-  genhtml_program     = find_program('genhtml',     required : false)
-  screen_program      = find_program('screen',      required : false)
-  gnutls_serv_program = find_program('gnutls-serv', required : false)
-  sudo_program        = find_program('sudo',        required : false)
-  inetsim_program     = find_program('inetsim',     required : false)
-
-  if not (have_sput
-          and valgrind_program.found()
-          and lcov_program.found()
-          and genhtml_program.found()
-          and screen_program.found()
-          and gnutls_serv_program.found()
-          and sudo_program.found()
-          and inetsim_program.found())
-    error('*** Cannot run libnetclient tests, see libnetclient/README for fixing this issue ***')
-  endif
-
-endif # libnetclient_test
 
 #####################################################################
 # Output

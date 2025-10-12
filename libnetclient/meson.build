@@ -1,4 +1,4 @@
-# libnetclient/test/meson.build
+# libnetclient/meson.build
 
 libnetclient_a_sources = [
   'net-client.c',
@@ -18,10 +18,3 @@ libnetclient_a = static_library('netclient', libnetclient_a_sources,
                                 dependencies        : libnetclient_deps,
                                 include_directories : top_include,
                                 install             : false)
-
-if libnetclient_docs
-  dox_path = join_paths(meson.source_root(), meson.current_source_dir(), 'libnetclient.dox')
-  run_command(doxygen_program, dox_path, check : true)
-endif
-
-subdir('test')

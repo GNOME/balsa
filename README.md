@@ -7,7 +7,7 @@ For older releases up to version 2.6.4 see [Paweł Salek's Balsa website](https:
 See the [git log](https://gitlab.gnome.org/GNOME/balsa/-/commits/master?ref_type=HEADS)
 for the list of the recent changes and [NEWS](./NEWS) for highlights.
 
-Copyright (C) 1997-2025 Stuart Parmenter and others
+Copyright © 1997-2025 Stuart Parmenter and others
 
 See [COPYING](./COPYING) for license information.
 
@@ -51,7 +51,7 @@ Basically, Balsa requires
 - libical >= 3.0.0
 - fribidi
 
-`-Dmore-warnings=(true, false)`
+`-Dmore-warnings=(true|false)`
 	Enable maximum compiler warnings (default=true).
 Balsa by default is very sensitive to compilation warnings
 which often mean simply programming or configuration errors. If you
@@ -59,26 +59,26 @@ are sure this is not the case, or you cannot change your system setup
 use this option to compile the code and hope for the best. 
 (some Solaris setups require this).
 
-`-Dgnome-desktop=(true, false)`
+`-Dgnome-desktop=(true|false)`
 	Add "GNOME;" to Balsa's categories in the two .desktop files
 (default=true).
 
-`-Dlibsecret=(true, false)`
-	Link to libsecret to store credentials in the Secret Service instead of
+`-Dlibsecret=(true|false)`
+	Link to `libsecret` to store credentials in the Secret Service instead of
 the obfuscated text file `~/.config/balsa/config-private` (default=true).  See
 also section [Credentials](#credentials) below.
 
 `-Dgss=(true, false)`
 	This enables GSSAPI Kerberos based authentication schemes (default=false).
 
-`-Dhtml-widget=(webkit2, no`
+`-Dhtml-widget=(webkit2|no)`
 	Select the HTML renderer (default webkit2).  When using webkit2, in
 order to quote html-only messages, it is recommended to install a html-to-text
 conversion tool.  Supported tools are `python-html2text`, `html2markdown`,
-`html2markdown.py3`, `html2markdown.py2` and `html2text`.  Additionally, sqlite3
+`html2markdown.py3`, `html2markdown.py2` and `html2text`.  Additionally, `libsqlite3`
 is required for managing sender-dependent HTML preferences.
 
-`-Dspell-checker=(internal, gspell, gtkspell)`
+`-Dspell-checker=(internal|gspell|gtkspell)`
 	Select the spell checker for the message composer (default internal). The
 internal spell checker depends on the enchant library (any version except 1.6.1).
 
@@ -86,49 +86,50 @@ internal spell checker depends on the enchant library (any version except 1.6.1)
 	Use ldap libraries for a read-only address book (default=false). The
 read/write address book is in the works but needs some finishing touches.
 
-`-Dgpe=(true, false)`
+`-Dgpe=(true|false)`
 	Include support for [GPE Palmtop Environment](https://en.wikipedia.org/wiki/GPE_Palmtop_Environment)
-address books (requires sqlite3, default=false).
+address books (requires `libsqlite3`, default=false).
 
-`-Dosmo=(true, false)`
+`-Dosmo=(true|false)`
 	Enable experimental support for read-only DBus access to the Osmo
 	contacts (default=false).  Note that Osmo svn rev. 1099 or later is required.
 
-`-Dcanberra=(true, false)`
-	Use libcanberra-gtk3 for filter sounds (default=false).
+`-Dcanberra=(true|false)`
+	Use `libcanberra-gtk3` for filter sounds (default=false).
 
 `-Dcompface=(true|false|path to compface installation)`
-	Use Compface for rendering [X-Face](https://en.wikipedia.org/wiki/X-Face)
+	Use `libcompface` for rendering [X-Face](https://en.wikipedia.org/wiki/X-Face)
 format thumbnails of email authors in a mail header (default=false).
 
-`-Dgtksourceview=(true, false)`
-	Use GtkSourceview for highlighting structured phrases in
+`-Dgtksourceview=(true|false)`
+	Use `libgtksourceview` for highlighting structured phrases in
 messages, and for syntax highlighting in attachments (default=false).
 
-`-Dgcr=(true, false)`
+`-Dgcr=(true|false)`
 	Use the GCR library for displaying certificates and crypto UI (default=false).
 
-`-Dautocrypt=(true, false)`
+`-Dautocrypt=(true|false)`
 	Build with [Autocrypt](https://autocrypt.org) support to simplify GnuPG key exchange
-(default=false, requires sqlite3).
+(default=false, requires `libsqlite3`).
 
-`-Dsystray=(true, false)`
-	Enable Freedesktop System Tray Icon support (default=false, requires libxapp).
+`-Dsystray=(true|false)`
+	Enable Freedesktop System Tray Icon support (default=false, requires
+	`[libxapp](https://github.com/linuxmint/xapp)`).
 
-`-Dwebdav=(true, false)`
+`-Dwebdav=(true|false)`
 	Enable limited support for CardDAV address books (default=false, see
-[README-CardDAV.md](./README-CardDAV.md), requires libsoup and libxml).
+[README-CardDAV.md](./README-CardDAV.md), requires `libsoup` and `libxml2`).
 
-`-Dnls=(true, false)`
-	Use Native Language Support (default=true)..
+`-Dnls=(true|false)`
+	Use Native Language Support (default=true).
 
-`-Dfcntl=(true, false)`
+`-Dfcntl=(true|false)`
 	Use `fcntl()` to lock files (default=true).
 
-`-Dflock=(true, false)`
+`-Dflock=(true|false)`
 	Use `flock()` to lock files (default=false).
 
-`-Dhelp-files=(true, false)`
+`-Dhelp-files=(true|false)`
 	Install the help files (default=false).
 
 
@@ -136,7 +137,7 @@ messages, and for syntax highlighting in attachments (default=false).
 
 In order to build Balsa, run
 
-	meson setup build [add build options, see section *Configuration*]
+	meson setup build [add build options, see section Configuration]
 	ninja -C build
 
 On a Debian-like system, simply run `dpkg-buildpackage` to create `*.deb` packages
@@ -160,7 +161,7 @@ the cryptographic operations, suitable backends like gnupg for the
 OpenPGP protocols and/or gpgsm for S/MIME are required.
  
 Optionally, Balsa can be configured to include
-[Autocrypt](https://autocrypt.org) support (see section [Configuration](#configuration)).
+[Autocrypt](https://autocrypt.org) support (see section *[Configuration](#configuration)*).
 
 
 ## Specifying the SMTP Server:
@@ -170,12 +171,12 @@ Remote SMTP Server:
 	Specify the domain name and optionally the port for of the SMTP
 	server you use for submitting mail.  Please note that the
 	default port number is 587 or 465 for SMTPS (see below).  The
-	syntax is hostname[:port].  Port can be a decimal number or the
+	syntax is `hostname[:port]`.  Port can be a decimal number or the
 	name of the service as specified in `/etc/services`.  Just click
 	the *probe...* button to let Balsa detect the best port and
 	security (see below) combination.
 	If like system is running a local MTA (e.g. Postfix or Exim),
-	you can just set this to `localhost:25` without encryption..
+	you can just set this to `localhost:25` without encryption.
 
 Security:
 	Specify the security level.  For an ISP, this is typically “SMTP
@@ -188,7 +189,7 @@ Security:
 
 User:
 	If the remote SMTP server requires authentication, enter your
-	user name here.  Note that the exact format depends on the MTA
+	user name here.  Note that the exact format depends on the ISP
 	in use.  For example, some systems expect a user name, others
 	may require an email address.
 
@@ -212,7 +213,7 @@ Split large messages:
 
 Balsa uses the desktop environment's Secret Service (using the
 org.freedesktop.Secret.Service D-Bus service) to safely store credentials if
-support for `libsecret` has been included (see _Configuration_ above).  The
+support for `libsecret` has been included (see section *[Configuration](#configuration)*).  The
 Secret Service is implemented by, inter alia, GNOME keyring, Kwallet and
 KeePassXC.
 

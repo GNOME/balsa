@@ -524,7 +524,7 @@ imap_mbox_append_multi_real(ImapMboxHandle *handle,
   char *litstr;
   char buf[16384];
   size_t s, msg_size, delta, current_transaction_size = 0;
-  int c, msg_cnt;
+  int c;
   ImapMsgFlags flags;
   gboolean new_append = TRUE;
 
@@ -537,10 +537,8 @@ imap_mbox_append_multi_real(ImapMboxHandle *handle,
     uid_sequence->ranges = NULL;
 
   if (!imap_handle_idle_disable(handle)) return IMR_SEVERED;
-  for(msg_cnt=0;
-      (msg_size = dump_cb(buf, sizeof(buf),
-			  IMA_STAGE_NEW_MSG, &flags, cb_arg)) >0;
-      msg_cnt++) {
+  while ((msg_size = dump_cb(buf, sizeof(buf),
+			     IMA_STAGE_NEW_MSG, &flags, cb_arg)) >0) {
 
     if (handle->state == IMHS_DISCONNECTED)
       return IMR_SEVERED;

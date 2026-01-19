@@ -806,7 +806,7 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
     g_match_info_free(url_match);
 
     while (match) {
-        gchar *spc;
+        const gchar *spc;
 
         gtk_text_buffer_insert_with_tags(buffer, &iter, chars,
                                          start_pos, tag, NULL);
@@ -850,14 +850,15 @@ libbalsa_insert_with_url(GtkTextBuffer * buffer,
         if ((spc = strchr(chars + start_pos, ' ')) && spc < chars + end_pos) {
             GString *uri_real = g_string_new("");
             gchar *q, *buf;
+            gchar *buf_spc;
 
             q = buf = g_strndup(chars + start_pos, end_pos - start_pos);
-            spc = buf + (spc - (chars + start_pos));
+            buf_spc = buf + (spc - (chars + start_pos));
             do {
-                *spc = '\n';
-                g_string_append_len(uri_real, q, spc - q);
-                q = spc + 1;
-            } while ((spc = strchr(q, ' ')));
+                *buf_spc = '\n';
+                g_string_append_len(uri_real, q, buf_spc - q);
+                q = buf_spc + 1;
+            } while ((buf_spc = strchr(q, ' ')));
             g_string_append(uri_real, q);
             gtk_text_buffer_insert_with_tags(buffer, &iter, buf, -1,
                                              url_tag, tag, NULL);

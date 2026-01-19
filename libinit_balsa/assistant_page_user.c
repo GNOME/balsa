@@ -150,7 +150,7 @@ balsa_druid_page_user_next(GtkAssistant * druid, GtkWidget * page,
     /* identity */
     mailbox = gtk_entry_get_text(GTK_ENTRY(user->name));
     if (balsa_app.identities == NULL) {
-	gchar *domain = strrchr(mailbox, '@');
+	const gchar *domain = strrchr(mailbox, '@');
         ident = LIBBALSA_IDENTITY(libbalsa_identity_new_with_name
 				  (_("Default Identity")));
         balsa_app.identities = g_list_append(NULL, ident);

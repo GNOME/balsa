@@ -1179,8 +1179,9 @@ libbalsa_message_set_in_reply_to_from_string(LibBalsaMessage * message,
 {
     if (message->in_reply_to == NULL && str != NULL) {
         /* FIXME for Balsa's old non-compliant header */
-        gchar *p = strrchr(str, ';');
-        p = p ? g_strndup(str, p - str) : g_strdup(str);
+        const gchar *const_p = strrchr(str, ';');
+        gchar *p;
+        p = const_p != NULL ? g_strndup(str, const_p - str) : g_strdup(str);
         message->in_reply_to = references_decode(p);
         g_free(p);
     }

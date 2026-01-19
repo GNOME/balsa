@@ -1424,7 +1424,7 @@ imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
     if(options == IMFB_HEADER) {
       /* We have to strip last section part and replace it with HEADER */
       unsigned sz;
-      char *last_dot = strrchr(section, '.');
+      const char *last_dot = strrchr(section, '.');
       strncpy(prefix, section, sizeof(prefix) - 1);
       
       if(last_dot) {

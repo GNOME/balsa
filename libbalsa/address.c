@@ -265,7 +265,7 @@ static char **
 vcard_strsplit(const char *string)
 {
     GPtrArray *string_list;
-    char *s;
+    const char *s;
     const char *remainder;
     char **str;
 

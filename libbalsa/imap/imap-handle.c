@@ -1300,7 +1300,7 @@ print_body_structure(ImapBody *body, int indent)
 static ImapBody*
 get_body_from_section(ImapBody *body, const char *section)
 {
-  char * dot;
+  const char * dot;
   int is_parent_a_message = 1;
   do {
     int no = strtol(section, NULL, 10);
@@ -2834,7 +2834,7 @@ extract_acl(ImapMboxHandle *h, const char *eject, ImapAclType *acl, int *eol)
   static const char* rights = "lrswipkxtea";
   static const char* ignore = "cd\r";
   int c;
-  char* p;
+  const char* p;
 
   if (!imap_mbox_handle_can_do(h, IMCAP_RIGHTS)) {
     /* workaround for RFC 2086- but not RFC 4314-compliant server */

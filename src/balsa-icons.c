@@ -129,14 +129,6 @@ balsa_register_pixmaps(void)
         { BALSA_PIXMAP_SIGN_BAD,        "balsa-signature-bad" },
         { BALSA_PIXMAP_ENCR,            "balsa-encrypted" },
 
-	/* the following book icons aren't strictly necessary as Gnome provides
-	   them. However, this simplifies porting balsa if the Gnome libs
-	   aren't present... */
-        { BALSA_PIXMAP_BOOK_YELLOW,     "stock_book_yellow" },
-        { BALSA_PIXMAP_BOOK_GREEN,      "stock_book_green" },
-        { BALSA_PIXMAP_BOOK_BLUE,       "stock_book_blue" },
-        { BALSA_PIXMAP_BOOK_OPEN,       "stock_book_open" },
-
 	/* button-only icons */
 	{ BALSA_PIXMAP_SHOW_HEADERS,    "stock_view-fields" },
 	{ BALSA_PIXMAP_SHOW_PREVIEW,	"balsa-preview" },

@@ -54,11 +54,6 @@
 #define BALSA_PIXMAP_MARK_ALL			"balsa_marked_all"
 #define BALSA_PIXMAP_IDENTITY			"balsa_identity"
 
-#define BALSA_OLD_PIXMAP_PRINT			"balsa_print"
-#define BALSA_OLD_PIXMAP_SAVE			"balsa_save"
-#define BALSA_OLD_PIXMAP_TRASH			"balsa_trash"
-#define BALSA_OLD_PIXMAP_CLOSE_MBOX		"balsa_close_mbox"
-
 #define BALSA_PIXMAP_MBOX_DRAFT                 "balsa_mbox_draft"
 #define BALSA_PIXMAP_MBOX_IN                    "balsa_mbox_in"
 #define BALSA_PIXMAP_MBOX_OUT                   "balsa_mbox_out"
@@ -73,8 +68,6 @@
 #define BALSA_PIXMAP_INFO_FLAGGED               "balsa_info_flagged"
 #define BALSA_PIXMAP_INFO_REPLIED               "balsa_info_replied"
 #define BALSA_PIXMAP_INFO_NEW                   "balsa_info_new"
-#define BALSA_PIXMAP_INFO_ATTACHMENT            BALSA_PIXMAP_ATTACHMENT
-#define BALSA_PIXMAP_INFO_DELETED               "edit-delete"
 #define BALSA_PIXMAP_GPG_SIGN                   "balsa_gpg_sign"
 #define BALSA_PIXMAP_GPG_ENCRYPT                "balsa_gpg_encrypt"
 #define BALSA_PIXMAP_GPG_RECHECK                "balsa_gpg_recheck"
@@ -85,12 +78,6 @@
 #define BALSA_PIXMAP_ENCR                       "balsa_encr"
 
 #define BALSA_PIXMAP_BOOK_RED                   "balsa_book_red"
-#define BALSA_PIXMAP_BOOK_YELLOW                "balsa_book_yellow"
-#define BALSA_PIXMAP_BOOK_GREEN                 "balsa_book_green"
-#define BALSA_PIXMAP_BOOK_BLUE                  "balsa_book_blue"
-#define BALSA_PIXMAP_BOOK_OPEN                  "balsa_book_open"
-
-#define BALSA_PIXMAP_DROP_DOWN                  "balsa_drop_down"
 
 void balsa_register_pixmaps(void);
 void balsa_unregister_pixmaps(void);

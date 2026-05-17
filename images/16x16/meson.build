@@ -22,7 +22,6 @@ extra_appicons_imgs = [
   'stock_contact.png',
   'stock_mail.png',
   'stock_book_red.png',
-  'stock_book_open.png',
   'mail-queue.png',
   'mail-inbox.png',
   'mail-outbox.png'

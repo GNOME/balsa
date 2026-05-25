@@ -483,7 +483,6 @@ static void
 balsa_startup_cb(GApplication *application,
            gpointer      user_data)
 {
-    gchar *default_icon;
 #ifdef ENABLE_AUTOCRYPT
     GError *error = NULL;
 #endif
@@ -510,12 +509,6 @@ balsa_startup_cb(GApplication *application,
     balsa_app_init();
 
     g_set_prgname("org.desktop.Balsa");
-
-    default_icon = libbalsa_pixmap_finder("balsa_icon.png");
-    if (default_icon) { /* may be NULL for developer installations */
-        gtk_window_set_default_icon_from_file(default_icon, NULL);
-        g_free(default_icon);
-    }
 
     /* migrate to XDG folders if necessary, terminate on serious error */
     if (!xdg_config_check()) {
@@ -571,11 +564,22 @@ balsa_activate_cb(GApplication *application,
             gpointer      user_data)
 {
     GtkWidget *window;
+    GdkPixbuf *icon;
+    GError *error = NULL;
 
     if (balsa_app.main_window != NULL) {
         gtk_window_present_with_time(GTK_WINDOW(balsa_app.main_window),
                                      gtk_get_current_event_time());
         return;
+    }
+
+    icon = gdk_pixbuf_new_from_resource("/org/desktop/Balsa/icons/balsa_icon.png", &error);
+    if (icon != NULL) {
+        gtk_window_set_default_icon(icon);
+        g_object_unref(icon);
+    } else {
+        g_warning("cannot load window icon from resource: %s", error->message);
+        g_clear_error(&error);
     }
 
     /* checking for valid config files */

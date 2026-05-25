@@ -3758,23 +3758,14 @@ bw_display_new_mail_notification(int num_new, int has_new)
     gtk_window_set_urgency_hint(window, TRUE);
 
     if (g_once_init_enter(&notify_ctx.notification)) {
-    	gchar *balsa_icon;
         GNotification *tmp;
-        GIcon *icon = NULL;
+        GIcon *icon;
 
         tmp = g_notification_new("Balsa");
-        balsa_icon = libbalsa_pixmap_finder("balsa_icon.png");
-        if (balsa_icon != NULL) {
-        	GFile * icon_file;
-
-        	icon_file = g_file_new_for_path(balsa_icon);
-        	g_free(balsa_icon);
-        	icon = g_file_icon_new(icon_file);
-        	g_object_unref(icon_file);
-        }
-
+        icon = g_bytes_icon_new(g_resources_lookup_data("/org/desktop/Balsa/icons/balsa_icon.png", G_RESOURCE_LOOKUP_FLAGS_NONE,
+            NULL));
         if (icon == NULL) {
-        	icon = g_themed_icon_new("dialog-information");
+            icon = g_themed_icon_new("dialog-information");
         }
 
         g_notification_set_icon(tmp, icon);

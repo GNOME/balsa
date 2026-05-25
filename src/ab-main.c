@@ -1064,11 +1064,11 @@ int
 main(int argc, char *argv[])
 {
     GtkApplication *application;
+    GdkPixbuf *icon;
     LibBalsaAddressBook *ab;
     GtkWidget *ab_window;
     GList *l;
     GError *error = NULL;
-    gchar *default_icon;
 
     application =
         gtk_application_new("org.desktop.BalsaAb", G_APPLICATION_DEFAULT_FLAGS);
@@ -1111,11 +1111,13 @@ main(int argc, char *argv[])
     }
 
     g_set_prgname("org.desktop.Balsa");
-
-    default_icon = libbalsa_pixmap_finder("balsa_icon.png");
-    if (default_icon) { /* may be NULL for developer installations */
-        gtk_window_set_default_icon_from_file(default_icon, NULL);
-        g_free(default_icon);
+    icon = gdk_pixbuf_new_from_resource("/org/desktop/BalsaAb/icons/balsa_icon.png", &error);
+    if (icon != NULL) {
+        gtk_window_set_default_icon(icon);
+        g_object_unref(icon);
+    } else {
+        g_warning("cannot load window icon from resource: %s", error->message);
+        g_clear_error(&error);
     }
 
     ab_window = bab_window_new(application);

@@ -32,12 +32,13 @@
 
 
 static XAppStatusIcon *status_icon;
-static gchar *icon_path[2] = {NULL, NULL};
 static gboolean icon_attention;
 static GtkMenu *icon_menu;
 static libbalsa_systray_cb_t icon_activate_cb;
 static gpointer icon_activate_cb_data;
 
+#define ICON_IDLE			"balsa_icon"
+#define ICON_NEW_MAIL		"balsa_attention"
 
 static void systray_cb_internal(XAppStatusIcon *icon,
 								guint           button,
@@ -48,10 +49,6 @@ static void systray_cb_internal(XAppStatusIcon *icon,
 void
 libbalsa_systray_icon_init(GtkMenu *menu, libbalsa_systray_cb_t activate_cb, gpointer activate_cb_data)
 {
-	g_return_if_fail(icon_path[0] == NULL);
-
-	icon_path[0] = libbalsa_pixmap_finder("balsa_icon.png");
-	icon_path[1] = libbalsa_pixmap_finder("balsa_attention.png");
 	icon_activate_cb = activate_cb;
 	icon_activate_cb_data = activate_cb_data;
 	if (menu != NULL) {
@@ -63,8 +60,6 @@ libbalsa_systray_icon_init(GtkMenu *menu, libbalsa_systray_cb_t activate_cb, gpo
 void
 libbalsa_systray_icon_enable(gboolean enable)
 {
-	g_return_if_fail(icon_path[0] != NULL);
-
 	if (enable) {
 		if (status_icon == NULL) {
 			status_icon = xapp_status_icon_new();
@@ -90,15 +85,13 @@ libbalsa_systray_icon_enable(gboolean enable)
 void
 libbalsa_systray_icon_attention(gboolean attention)
 {
-	g_return_if_fail(icon_path[0] != NULL);
-
 	if ((status_icon != NULL) && (attention != icon_attention)) {
 		icon_attention = attention;
 		if (attention) {
-			xapp_status_icon_set_icon_name(status_icon, icon_path[1]);
+			xapp_status_icon_set_icon_name(status_icon, ICON_NEW_MAIL);
 			xapp_status_icon_set_tooltip_text(status_icon, _("Balsa: you have new mail"));
 		} else {
-			xapp_status_icon_set_icon_name(status_icon, icon_path[0]);
+			xapp_status_icon_set_icon_name(status_icon, ICON_IDLE);
 			xapp_status_icon_set_tooltip_text(status_icon, _("Balsa"));
 		}
 	}
@@ -108,22 +101,14 @@ libbalsa_systray_icon_attention(gboolean attention)
 void
 libbalsa_systray_icon_destroy(void)
 {
-	size_t n;
-
-	if (icon_path[0] != NULL) {
-		icon_activate_cb = NULL;
-		if (icon_menu != NULL) {
-			g_object_unref(icon_menu);
-			icon_menu = NULL;
-		}
-		for (n = 0; n < G_N_ELEMENTS(icon_path); n++) {
-			g_free(icon_path[n]);
-			icon_path[n] = NULL;
-		}
-		if (status_icon != NULL) {
-			g_object_unref(status_icon);
-			status_icon = NULL;
-		}
+	icon_activate_cb = NULL;
+	if (icon_menu != NULL) {
+		g_object_unref(icon_menu);
+		icon_menu = NULL;
+	}
+	if (status_icon != NULL) {
+		g_object_unref(status_icon);
+		status_icon = NULL;
 	}
 }
 

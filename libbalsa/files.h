@@ -24,7 +24,6 @@
 #include <glib.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gtk/gtk.h>
-#include "body.h"
 #include "libbalsa-vfs.h"
 
 GdkPixbuf *libbalsa_icon_finder(GtkWidget         * widget,

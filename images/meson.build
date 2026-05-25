@@ -7,12 +7,8 @@ endforeach
 
 # balsa_logo.png used by About menu (small one).
 balsa_imgs = [
-  'attachment.png',
-  'balsa-top.png',
-  'balsa_icon.png',
-  'balsa_attention.png',
   'balsa_logo.png'
-  ]
+]
 
 balsa_bitmaps_dir = join_paths(get_option('datadir'), 'balsa', 'pixmaps')
 install_data(balsa_imgs, install_dir : balsa_bitmaps_dir)

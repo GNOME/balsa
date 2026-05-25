@@ -3,4 +3,7 @@
   <gresource prefix="/org/desktop/BalsaAb">
     <file compressed="true">ab-main.ui</file>
   </gresource>
+  <gresource prefix="/org/desktop/BalsaAb/icons">
+    <file alias="balsa_icon.png">../images/balsa_icon.png</file>
+  </gresource>
 </gresources>

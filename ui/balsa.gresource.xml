@@ -6,4 +6,8 @@
     <file compressed="true">sendmsg-window.ui</file>
     <file compressed="true">source-viewer.ui</file>
   </gresource>
+  <gresource prefix="/org/desktop/Balsa/icons">
+    <file alias="balsa_icon.png">../images/balsa_icon.png</file>
+    <file alias="balsa_attention.png">../images/balsa_attention.png</file>
+  </gresource>
 </gresources>

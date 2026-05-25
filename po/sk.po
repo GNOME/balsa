@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-11 07:16+0100\n"
-"PO-Revision-Date: 2009-02-11 07:19+0100\n"
-"Last-Translator: Marcel Telka <marcel@telka.sk>\n"
+"PO-Revision-Date: 2026-04-10 23:19+0200\n"
+"Last-Translator: Jose Riha <jose1711@gmail.com>\n"
 "Language-Team: Slovak <sk-i18n@lists.linux.sk>\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
@@ -44,11 +44,11 @@ msgstr "Interakcia SASL\n"
 
 #: ../libbalsa/address-book-ldap.c:329
 msgid "TLS requested but not compiled in"
-msgstr "Je požadované TLS, ale nebolo zakompilované"
+msgstr "Je požadované TLS, ale nebolo zapnuté pri kompilácii"
 
 #: ../libbalsa/address-book-ldap.c:609
 msgid "Undefined location of user address book"
-msgstr "Nedefinované umiestnenie používateľovho adresára"
+msgstr "Umiestnenie používateľského adresára nebolo zadané"
 
 #: ../libbalsa/address-book.c:315 ../libbalsa/filter-error.c:45
 msgid "No error"
@@ -56,27 +56,27 @@ msgstr "Bez chyby"
 
 #: ../libbalsa/address-book.c:316
 msgid "Cannot read from address book"
-msgstr "Nemožno čítať z adresára"
+msgstr "Chyba pri čítaní adresára"
 
 #: ../libbalsa/address-book.c:317
 msgid "Cannot write to address book"
-msgstr "Nemožno zapísať do adresára"
+msgstr "Chyba pri zápise do adresára"
 
 #: ../libbalsa/address-book.c:318
 msgid "Cannot connect to the server"
-msgstr "Nemožno sa spojiť so serverom"
+msgstr "Chyba spojenia so serverom"
 
 #: ../libbalsa/address-book.c:319
 msgid "Cannot search in the address book"
-msgstr "Nemožno vyhľadávať v adresári"
+msgstr "V adresári nie je možné vyhľadávať"
 
 #: ../libbalsa/address-book.c:321
 msgid "Cannot add duplicate entry"
-msgstr "Nemožno pridať duplikátnu položku"
+msgstr "Nie je možné pridať duplicitnú položku"
 
 #: ../libbalsa/address-book.c:323
 msgid "Cannot find address in address book"
-msgstr "Nemožno nájsť adresu v adresári"
+msgstr "Adresu sa v adresári nepodarilo nájsť"
 
 #: ../libbalsa/address-book.c:324 ../src/main-window.c:2258
 #: ../src/main-window.c:4523 ../src/sendmsg-window.c:4148
@@ -166,7 +166,7 @@ msgstr "Chybná syntax regulárneho výrazu"
 
 #: ../libbalsa/filter-error.c:49
 msgid "Attempt to apply an invalid filter"
-msgstr "Pokus o aplikáciu neplatného filtra"
+msgstr "Pokus o použitie neplatného filtra"
 
 #: ../libbalsa/filter-file.c:141
 #, c-format
@@ -215,7 +215,7 @@ msgid ""
 "\n"
 "Key: %s"
 msgstr ""
-"Heslo pre tento kľúč bolo nesprávne. Prosím skúste znova!\n"
+"Heslo pre tento kľúč bolo nesprávne. Prosím, skúste to znova!\n"
 "\n"
 "Kľúč: %s"
 
@@ -226,7 +226,7 @@ msgid ""
 "\n"
 "Key: %s"
 msgstr ""
-"Prosím zadajte heslo pre tajný kľúč!\n"
+"Prosím, zadajte heslo pre tajný kľúč!\n"
 "\n"
 "Kľúč: %s"
 
@@ -354,7 +354,7 @@ msgstr "Chyba pri spustení generátora podpisu %s"
 #: ../libbalsa/identity.c:359
 #, c-format
 msgid "Cannot open signature file '%s' for reading"
-msgstr "Nemožno otvoriť súbor s podpisom '%s' na čítanie"
+msgstr "Chyba pri otváraní súbor s podpisom '%s' na čítanie"
 
 #: ../libbalsa/identity.c:365
 #, c-format
@@ -597,12 +597,12 @@ msgstr "Balsa heslá"
 #: ../libbalsa/imap-server.c:586
 #, c-format
 msgid "Cannot connect to %s"
-msgstr "Nemožno sa spojiť s %s"
+msgstr "Nepodarilo sa spojiť s %s"
 
 #: ../libbalsa/imap-server.c:591 ../libbalsa/imap-server.c:596
 #, c-format
 msgid "Cannot connect to the server: %s"
-msgstr "Nemožno sa spojiť so serverom: %s"
+msgstr "Nepodarilo sa spojiť so serverom: %s"
 
 #: ../libbalsa/imap-server.c:744
 #, c-format
@@ -628,32 +628,32 @@ msgstr "nie je bežný súbor"
 #: ../libbalsa/libbalsa-vfs.c:813
 #, c-format
 msgid "cannot read file information"
-msgstr "nemožno prečítať informácie o súbore"
+msgstr "nepodarilo sa prečítať informácie o súbore"
 
 #: ../libbalsa/libbalsa-vfs.c:819 ../libbalsa/libbalsa-vfs.c:834
 #, c-format
 msgid "cannot read"
-msgstr "nemožno prečítať"
+msgstr "chyba čítania"
 
 #: ../libbalsa/libbalsa-vfs.c:823
 #, c-format
 msgid "cannot access file"
-msgstr "nemožno pristupovať k súboru"
+msgstr "nepodarilo sa otvoriť súbor"
 
 #: ../libbalsa/libbalsa-vfs.c:908 ../libbalsa/libbalsa-vfs.c:921
 #, c-format
 msgid "Cannot launch, missing application"
-msgstr "Nemožno spustiť, aplikácia chýba"
+msgstr "Chyba pri spustení, aplikácia chýba"
 
 #: ../libbalsa/libbalsa-vfs.c:931
 #, c-format
 msgid "Cannot find application for id %s"
-msgstr "Nemožno nájsť aplikáciu pre identifikátor %s"
+msgstr "Nepodarilo sa nájsť aplikáciu pre identifikátor %s"
 
 #: ../libbalsa/libbalsa-vfs.c:940
 #, c-format
 msgid "Cannot launch %s: %s"
-msgstr "Nemožno spustiť %s: %s"
+msgstr "Chyba pri spustení %s: %s"
 
 #: ../libbalsa/libbalsa-vfs.c:1023 ../libbalsa/libbalsa-vfs.c:1038
 #, c-format
@@ -751,7 +751,7 @@ msgstr "Zlé dáta X-Face"
 #: ../libbalsa/mailbox.c:466
 #, c-format
 msgid "Cannot load mailbox %s"
-msgstr "Nemožno nahrať poštovú schránku %s"
+msgstr "Nepodarilo sa načítať poštovú schránku %s"
 
 #: ../libbalsa/mailbox.c:473
 #, c-format
@@ -808,7 +808,7 @@ msgstr "Rekonštrukcia správy"
 #: ../libbalsa/mailbox.c:4175
 #, c-format
 msgid "Finding duplicate messages in source mailbox failed"
-msgstr "Vyhľadanie duplikátnych správ v zdrojovej poštovej schránke zlyhalo"
+msgstr "Vyhľadanie duplicitných správ v zdrojovej poštovej schránke zlyhalo"
 
 #. ImapIssue macro handles reconnecting. We might issue a
 #. LIBBALSA_INFORMATION_MESSAGE here but it would be overwritten by
@@ -855,7 +855,7 @@ msgstr "Nebola nájdená cesta pre poštovú schránku \"%s\", použijem \"%s\""
 #: ../libbalsa/mailbox_imap.c:1668 ../libbalsa/mailbox_imap.c:1709
 #, c-format
 msgid "Cannot get IMAP handle"
-msgstr "Nemožno získať IMAP deskriptor"
+msgstr "Nepodarilo sa získať IMAP deskriptor"
 
 #: ../libbalsa/mailbox_imap.c:2341
 #, c-format
@@ -870,12 +870,12 @@ msgstr "Chyba pri získavaní správy z IMAP servera: %s"
 #: ../libbalsa/mailbox_imap.c:2385
 #, c-format
 msgid "Cannot create temporary file"
-msgstr "Nemožno vytvoriť dočasný súbor"
+msgstr "Nepodarilo sa vytvoriť dočasný súbor"
 
 #: ../libbalsa/mailbox_imap.c:2405
 #, c-format
 msgid "Cannot write to temporary file %s"
-msgstr "Nemožno zapísať do dočasného súboru %s"
+msgstr "Chyba pri zápise do dočasného súboru %s"
 
 #: ../libbalsa/mailbox_imap.c:2634 ../libbalsa/mailbox_imap.c:2753
 #, c-format
@@ -1004,7 +1004,7 @@ msgstr "Nepodarilo sa odpojiť súbor %s: %s"
 #: ../libbalsa/mailbox_mbox.c:701
 #, c-format
 msgid "Cannot open mailbox."
-msgstr "Nemožno otvoriť poštovú schránku."
+msgstr "Nepodarilo sa otvoriť poštovú schránku."
 
 #: ../libbalsa/mailbox_mbox.c:713
 #, c-format
@@ -1014,7 +1014,7 @@ msgstr "Poštová schránka nie je vo formáte mbox."
 #: ../libbalsa/mailbox_mbox.c:721
 #, c-format
 msgid "Cannot lock mailbox."
-msgstr "Nemožno uzamknúť poštovú schránku."
+msgstr "Nepodarilo sa uzamknúť poštovú schránku."
 
 #: ../libbalsa/mailbox_mbox.c:1966
 #, c-format
@@ -1049,7 +1049,7 @@ msgstr "Nemôžem vytvoriť štruktúru MH v %s (%s)"
 #: ../libbalsa/mailbox_mh.c:1091
 #, c-format
 msgid "Cannot create message"
-msgstr "Nemožno vytvoriť správu"
+msgstr "Nepodarilo sa vytvoriť správu"
 
 #: ../libbalsa/mailbox_mh.c:1135
 #, c-format
@@ -1108,12 +1108,12 @@ msgstr "POP3 správa %d prekročila veľkosť: %d kB - preskočené."
 #: ../libbalsa/mailbox_pop3.c:544
 #, c-format
 msgid "POP3 error: cannot open %s for writing."
-msgstr "Chyba POP3: nemožno otvoriť %s pre zápis."
+msgstr "Chyba POP3: nepodarilo sa otvoriť %s pre zápis."
 
 #: ../libbalsa/mailbox_pop3.c:552
 #, c-format
 msgid "POP3 error: cannot close %s."
-msgstr "Chyba POP3: nemožno zatvoriť %s."
+msgstr "Chyba POP3: nepodarilo sa uzatvoriť %s."
 
 #: ../libbalsa/mailbox_pop3.c:585
 #, c-format
@@ -1123,7 +1123,7 @@ msgstr "Chyba POP3: %s."
 #: ../libbalsa/message.c:607
 #, c-format
 msgid "Mailbox (%s) is readonly: cannot change flags."
-msgstr "Poštová schránka (%s) je len na čítanie: nemožno zmeniť príznaky."
+msgstr "Poštová schránka (%s) je len na čítanie: nepodarilo sa zmeniť príznaky."
 
 #: ../libbalsa/misc.c:600
 msgid "west european"
@@ -1200,12 +1200,12 @@ msgstr "kórejský"
 #: ../libbalsa/misc.c:808
 #, c-format
 msgid "Cannot open %s: %s"
-msgstr "Nemožno otvoriť %s: %s"
+msgstr "Nepodarilo sa otvoriť %s: %s"
 
 #: ../libbalsa/misc.c:817
 #, c-format
 msgid "Cannot open %s: is a symbolic link"
-msgstr "Nemožno otvoriť %s: je to symbolický odkaz"
+msgstr "Nepodarilo sa otvoriť %s: je to symbolický odkaz"
 
 #: ../libbalsa/misc.c:944
 msgid "Timeout exceeded while attempting fcntl lock!"
@@ -1337,7 +1337,7 @@ msgstr "Identifikátor používateľa má neznámu platnosť."
 
 #: ../libbalsa/rfc3156.c:998
 msgid "The validity of the user ID is undefined."
-msgstr "Platnosť používateľovho identifikátora je nedefinovaná."
+msgstr "Platnosť používateľovho identifikátora nie je definovaná."
 
 #: ../libbalsa/rfc3156.c:1000
 msgid "The user ID is never valid."
@@ -1703,18 +1703,18 @@ msgstr ""
 #: ../libbalsa/send.c:1737 ../libbalsa/send.c:1806
 #, c-format
 msgid "Cannot read %s: %s"
-msgstr "Nemožno prečítať %s: %s"
+msgstr "Chyba pri čítaní %s: %s"
 
 #: ../libbalsa/send.c:1740 ../libbalsa/send.c:1809
 #, c-format
 msgid "Cannot read %s"
-msgstr "Nemožno prečítať %s"
+msgstr "Chyba pri čítaní %s"
 
 #: ../libbalsa/send.c:1770
 #, c-format
 msgid "Cannot determine charset for text file `%s'; sending as mime type `%s'"
 msgstr ""
-"Nemožno určiť znakovú sadu pre textový súbor `%s'; odosielanie ako mime typ `"
+"Nepodarilo sa určiť znakovú sadu pre textový súbor `%s'; odosielanie ako mime typ `"
 "%s'"
 
 #: ../libbalsa/send.c:2121
@@ -2533,17 +2533,17 @@ msgstr "Potvrdenie poštovej schránky %s zlyhalo."
 #: ../src/balsa-index.c:2328
 #, c-format
 msgid "Cannot process the message: %s"
-msgstr "Nemožno spracovať správu: %s"
+msgstr "Nepodarilo sa spracovať správu: %s"
 
 #: ../src/balsa-index.c:2451
 #, c-format
 msgid "Cannot access message %u to pass to %s"
-msgstr "Nemožno pristúpiť k správe %u na odovzdanie do %s"
+msgstr "Nepodarilo sa pristúpiť k správe %u na odovzdanie do %s"
 
 #: ../src/balsa-index.c:2478
 #, c-format
 msgid "Cannot read message %u to pass to %s"
-msgstr "Nemožno prečítať správu %u na odovzdanie do %s"
+msgstr "Nepodarilo sa prečítať správu %u na odovzdanie do %s"
 
 #: ../src/balsa-index.c:2642
 msgid "Pipe message through a program"
@@ -2776,7 +2776,7 @@ msgid ""
 "than once.\n"
 "Please close the other instances of this message and try again."
 msgstr ""
-"Dešifrovanie nemožno vykonať, pretože táto správa je zobrazená viac ako "
+"Dešifrovanie sa nedá vykonať, pretože táto správa je zobrazená viac ako "
 "raz.\n"
 "Prosím, zatvorte ostatné inštancie tejto správy a skúste znova."
 
@@ -2825,7 +2825,7 @@ msgid ""
 "structure is invalid. The signature, if there is any, cannot be checked."
 msgstr ""
 "Správa odoslaná od %s s predmetom \"%s\" obsahuje podpísanú časť, ale jej "
-"štruktúra je neplatná. Podpis, ak tam je nejaký, nemožno skontrolovať."
+"štruktúra je neplatná. Podpis, ak tam je nejaký, sa nedá skontrolovať."
 
 #: ../src/balsa-message.c:2851
 #, c-format
@@ -2881,14 +2881,14 @@ msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 msgstr ""
-"Dešifrovanie nemožno vykonať, pretože táto správa je zobrazená viac ako raz."
+"Dešifrovanie sa nedá vykonať, pretože táto správa je zobrazená viac ako raz."
 
 #: ../src/balsa-message.c:2969
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
 msgstr ""
-"Kontrola podpisu a odstránenie brnenia OpenPGP nemožno vykonať, pretože táto "
+"Kontrola podpisu a odstránenie brnenia OpenPGP sa nedá vykonať, pretože táto "
 "správa je zobrazená viac ako raz."
 
 #: ../src/balsa-message.c:2972
@@ -4465,11 +4465,11 @@ msgstr ""
 
 #: ../src/main-window.c:485
 msgid "_Remove Duplicates"
-msgstr "_Odstrániť duplikáty"
+msgstr "_Odstrániť duplicity"
 
 #: ../src/main-window.c:486
 msgid "Remove duplicated messages from the current mailbox"
-msgstr "Odstrániť duplikátne správy z aktuálnej poštovej schránky"
+msgstr "Odstrániť duplicitné správy z aktuálnej poštovej schránky"
 
 #: ../src/main-window.c:496 ../src/message-window.c:265
 msgid "Reply to the current message"
@@ -4957,13 +4957,13 @@ msgstr "Odstránenie suplikátov zlyhalo: %s"
 #, c-format
 msgid "Removed %d duplicate"
 msgid_plural "Removed %d duplicates"
-msgstr[0] "Odstránených %d duplikátov"
-msgstr[1] "Odstránený %d duplikát"
-msgstr[2] "Odstránené %d duplikáty"
+msgstr[0] "Odstránených %d duplicít"
+msgstr[1] "Odstránená %d duplicita"
+msgstr[2] "Odstránené %d duplicity"
 
 #: ../src/main-window.c:4305
 msgid "No duplicates found"
-msgstr "Duplikáty neboli nájdené!"
+msgstr "Duplicity neboli nájdené!"
 
 #: ../src/main-window.c:4522
 #, c-format
@@ -5693,7 +5693,7 @@ msgstr "Toto je vložená časť správy %2$s, podpísaná %1$s:"
 #: ../src/print-gtk.c:344
 #, c-format
 msgid "Cannot print page %d because the document has only %d pages."
-msgstr "Nemožno vytlačiť stranu %d, pretože dokument má len %d strán."
+msgstr "Nepodarilo sa vytlačiť stranu %d, pretože dokument má len %d strán."
 
 #. Translate to the default units to use for presenting
 #. * lengths to the user. Translate to default:inch if you
@@ -6366,7 +6366,7 @@ msgstr "(bez predmetu)"
 #: ../src/sendmsg-window.c:2037
 #, c-format
 msgid "Cannot create file URI object for %s"
-msgstr "Nemožno vytvoriť súborový URI objekt pre %s"
+msgstr "Nepodarilo sa vytvoriť súborový URI objekt pre %s"
 
 #: ../src/sendmsg-window.c:2045
 msgid "unknown error"

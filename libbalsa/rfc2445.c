@@ -1293,6 +1293,9 @@ vcalendar_extract(const gchar *vcal_buf)
 			if (icaldurationtype_is_bad_duration(event->duration)) {
 				event->duration = icaldurationtype_null_duration();
 			}
+#if ICAL_CHECK_VERSION(4, 0, 0)
+                        event->duration = icaldurationtype_normalize(event->duration);
+#endif /* ICAL_CHECK_VERSION(4, 0, 0) */
 
 			/* RECURRENCE-ID */
 			event->recurrence_id = icalcomponent_get_recurrenceid(item);

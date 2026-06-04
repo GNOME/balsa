@@ -2371,7 +2371,7 @@ libbalsa_mailbox_imap_fetch_headers(LibBalsaMailbox *mailbox,
     if(rc == IMR_OK) { /* translate ImapData to LibBalsaMessage */
         const gchar *hdr;
         ImapMessage *im = imap_mbox_handle_get_msg(mimap->handle, msgno);
-        if ((hdr = im->fetched_header_fields) && *hdr && *hdr != '\r')
+        if ((im != NULL) && (hdr = im->fetched_header_fields) && *hdr && *hdr != '\r')
             libbalsa_mailbox_imap_parse_set_headers(message, hdr);
     }
 }

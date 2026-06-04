@@ -266,8 +266,7 @@ lb_imap_server_info_free(struct handle_info *info)
     if (info == NULL)
         return;
 
-    //imap_handle_force_disconnect(info->handle); -- FIXME unref'ing handle will disconnect?
-    g_object_unref(info->handle);
+    g_object_unref(info->handle);	/* note: forces a disconnect */
     g_free(info);
 }
 

@@ -280,11 +280,18 @@ bw_network_changed_cb(GNetworkMonitor * monitor,
         print_network_status(available);
     }
 
-    if (priv->network_changed_source_id == 0) {
-        /* Wait 2 seconds or so to let the network stabilize */
-        priv->network_changed_source_id =
-            g_timeout_add_seconds(2, bw_change_connection_status_idle, window);
-    }
+	if (available) {
+		/* the network may need some time to stabilise, so delay the callback for 2 seconds unless it has already been scheduled */
+		if (priv->network_changed_source_id == 0) {
+			priv->network_changed_source_id = g_timeout_add_seconds(2, bw_change_connection_status_idle, window);
+		}
+	} else {
+		/* immediately handle a lost network connection, removing any other scheduled callback if necessary */
+		if (priv->network_changed_source_id != 0) {
+			g_source_remove(priv->network_changed_source_id);
+		}
+		priv->network_changed_source_id = g_idle_add(bw_change_connection_status_idle, window);
+	}
 }
 
 static void
@@ -3824,14 +3831,15 @@ mw_mbox_change_connection_status(GtkTreeModel * model, GtkTreePath * path,
     gtk_tree_model_get(model, iter, 0, &mbnode, -1);
     g_return_val_if_fail(mbnode, FALSE);
 
-    if ((mailbox = balsa_mailbox_node_get_mailbox(mbnode))) {  /* mailbox, not a folder */
-        if (LIBBALSA_IS_MAILBOX_IMAP(mailbox) &&
-            bw_imap_check_test(balsa_mailbox_node_get_dir(mbnode) ? balsa_mailbox_node_get_dir(mbnode) :
-                               libbalsa_mailbox_imap_get_path(LIBBALSA_MAILBOX_IMAP(mailbox)))) {
-            libbalsa_mailbox_test_can_reach(g_object_ref(mailbox),
-                                            mw_mbox_can_reach_cb, NULL);
-        }
-    }
+	mailbox = balsa_mailbox_node_get_mailbox(mbnode);
+	if (LIBBALSA_IS_MAILBOX_IMAP(mailbox)) {
+		LibBalsaMailboxState state;
+
+		state = libbalsa_mailbox_get_state(mailbox);
+		if ((state == LB_MAILBOX_STATE_OPEN) || (state == LB_MAILBOX_STATE_OPENING)) {
+			libbalsa_mailbox_test_can_reach(g_object_ref(mailbox), mw_mbox_can_reach_cb, NULL);
+		}
+	}
 
     g_object_unref(mbnode);
 

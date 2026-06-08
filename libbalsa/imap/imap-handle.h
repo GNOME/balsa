@@ -82,6 +82,7 @@ typedef enum
   IMCAP_THREAD_REFERENCES,
   IMCAP_UIDPLUS,                /* RFC 4315 */
   IMCAP_UNSELECT,               /* RFC 3691 */
+  IMCAP_QRESYNC,                /* RFC 7162 */
   IMCAP_FETCHBODY,              /* basic imap implemented correctly by
                                  * most imap servers but not all. We
                                  * have to detect that. */
@@ -142,6 +143,7 @@ int      imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);
 unsigned imap_mbox_handle_get_exists(ImapMboxHandle* handle);
 unsigned imap_mbox_handle_get_validity(ImapMboxHandle* handle);
 unsigned imap_mbox_handle_get_uidnext(ImapMboxHandle* handle);
+guint64  imap_mbox_handle_get_hghmodseq(ImapMboxHandle* handle);
 int      imap_mbox_handle_get_delim(ImapMboxHandle* handle,
                                     const char *namespace);
 char* imap_mbox_handle_get_last_msg(ImapMboxHandle *handle);

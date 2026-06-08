@@ -136,6 +136,7 @@ struct _ImapMboxHandle {
   gulong quota_max_k;         /**< max. available quota in kByte */
   gulong quota_used_k;        /**< used quota in kByte */
   gchar *quota_root;
+  guint64 highestmodseq;      /**< HIGHESTMODSEQ value, 0 if not supported (RFC 7162, sect. 7) */
 };
 
 #define IMAP_MBOX_IS_DISCONNECTED(h)  ((h)->state == IMHS_DISCONNECTED)

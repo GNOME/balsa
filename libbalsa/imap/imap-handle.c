@@ -807,6 +807,12 @@ imap_mbox_handle_get_uidnext(ImapMboxHandle* handle)
   return handle->uidnext;
 }
 
+guint64
+imap_mbox_handle_get_hghmodseq(ImapMboxHandle* handle)
+{
+  return handle->highestmodseq;
+}
+
 static void
 get_delim(ImapMboxHandle* handle, int delim, ImapMboxFlags flags,
           char *folder, int *my_delim)
@@ -2114,7 +2120,7 @@ ir_capability_data(ImapMboxHandle *handle)
     "LOGINDISABLED", "MULTIAPPEND", "NAMESPACE", "QUOTA", "SASL-IR",
     "SCAN", "STARTTLS",
     "SORT", "THREAD=ORDEREDSUBJECT", "THREAD=REFERENCES",
-    "UIDPLUS", "UNSELECT"
+    "UIDPLUS", "UNSELECT", "QRESYNC"
   };
   unsigned x;
   int c;
@@ -2231,7 +2237,7 @@ ir_resp_text_code(ImapMboxHandle *h)
   static const char* resp_text_code[] = {
     "ALERT", "BADCHARSET", "CAPABILITY","PARSE", "PERMANENTFLAGS",
     "READ-ONLY", "READ-WRITE", "TRYCREATE", "UIDNEXT", "UIDVALIDITY",
-    "UNSEEN", "APPENDUID", "COPYUID"
+    "UNSEEN", "APPENDUID", "COPYUID", "HIGHESTMODSEQ"
   };
   unsigned o;
   char buf[128];
@@ -2273,6 +2279,12 @@ ir_resp_text_code(ImapMboxHandle *h)
     if( (rc=ir_get_append_copy_uids(h, FALSE)) != IMR_OK)
       return rc;
     c = sio_getc(h->sio);
+    break;
+  case 13: /* HIGHESTMODSEQ */
+    c = imap_get_atom(h->sio, buf, sizeof(buf));
+    if (h->capabilities[IMCAP_QRESYNC]) {
+      h->highestmodseq = strtoull(buf, NULL, 10);
+    }
     break;
   default: while( c != ']' && (c=sio_getc(h->sio)) != EOF) ; break;
   }

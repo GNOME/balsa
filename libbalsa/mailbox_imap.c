@@ -89,6 +89,8 @@ struct _LibBalsaMailboxImap {
 
     GArray *expunged_seqnos;
     guint expunged_idle_id;
+    gboolean force_rescan;
+    guint64 last_highestmodseq;
 };
 
 struct message_info {
@@ -830,20 +832,25 @@ imap_exists_idle(gpointer data)
     mimap->sort_field = -1;	/* Invalidate. */
 
     if(mimap->handle && /* was it closed in meantime? */
-       (cnt = imap_mbox_handle_get_exists(mimap->handle))
-       != mimap->messages_info->len) {
+      (((cnt = imap_mbox_handle_get_exists(mimap->handle)) != mimap->messages_info->len) ||
+       mimap->force_rescan)) {
         unsigned i;
         struct message_info a = {0};
         GNode *sibling = NULL;
 
-        if(cnt<mimap->messages_info->len) {
+        if (mimap->force_rescan || (cnt < mimap->messages_info->len)) {
             /* remove messages; we probably missed some EXPUNGE responses
                - the only sensible scenario is that the connection was
                severed. Still, we need to recover from this somehow... -
                We invalidate all the cache now. */
-            g_debug("%s: expunge ignored? Had %u messages and now only %u. "
-            		"Bug in the program or broken connection",
-                   __func__, mimap->messages_info->len, cnt);
+            if (mimap->force_rescan) {
+                g_debug("%s: reconnected after a broken connection", __func__);
+            } else {
+                g_debug("%s: expunge ignored? Had %u messages and now only %u. "
+                        "Bug in the program or broken connection",
+                        __func__, mimap->messages_info->len, cnt);
+            }
+            mimap->force_rescan = FALSE;
             for(i=0; i<mimap->messages_info->len; i++) {
                 gchar *msgid;
                 struct message_info *msg_info =
@@ -1744,8 +1751,10 @@ libbalsa_mailbox_imap_force_disconnect(LibBalsaMailboxImap* mimap)
     if (mimap->handle) {/* we do not attempt to reconnect here */
         const gchar *name = libbalsa_mailbox_get_name(LIBBALSA_MAILBOX(mimap));
         g_debug("Disconnecting %s (%u)", name, (unsigned)time(NULL));
+        mimap->last_highestmodseq = imap_mbox_handle_get_hghmodseq(mimap->handle);
         imap_handle_force_disconnect(mimap->handle);
-        g_debug("Disconnected %s (%u)", name, (unsigned)time(NULL));
+        g_debug("Disconnected %s (%u), last HIGHESTMODSEQ %" G_GUINT64_FORMAT, name, (unsigned)time(NULL),
+            mimap->last_highestmodseq);
     }
 }
 
@@ -1762,9 +1771,14 @@ libbalsa_mailbox_imap_reconnect(LibBalsaMailboxImap* mimap)
                 libbalsa_server_get_host(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap)),
                 (unsigned)time(NULL));
         if (imap_mbox_handle_reconnect(mimap->handle, &readonly) == IMAP_SUCCESS) {
-        	g_debug("Reconnected %s (%u)",
-                    libbalsa_server_get_host(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap)),
-                    (unsigned)time(NULL));
+            if (imap_mbox_handle_can_do(mimap->handle, IMCAP_QRESYNC) && (imap_mbox_handle_get_hghmodseq(mimap->handle) != 0UL)) {
+                mimap->force_rescan = imap_mbox_handle_get_hghmodseq(mimap->handle) != mimap->last_highestmodseq;
+            } else {
+                mimap->force_rescan = TRUE;
+            }
+            g_debug("Reconnected %s (%u), rescan %d, HIGHESTMODSEQ = %" G_GUINT64_FORMAT,
+                    libbalsa_server_get_host(LIBBALSA_MAILBOX_REMOTE_GET_SERVER(mimap)), (unsigned)time(NULL),
+                    mimap->force_rescan, imap_mbox_handle_get_hghmodseq(mimap->handle));
         }
         libbalsa_mailbox_set_readonly(LIBBALSA_MAILBOX(mimap), readonly);
     }

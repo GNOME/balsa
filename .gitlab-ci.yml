@@ -49,7 +49,7 @@ balsa-debian-container@x86_64:
       html2text
       yelp-tools
       zlib1g-dev
-      clang-tools-19
+      clang-tools
     FDO_EXPIRES_AFTER: 4w
 
 balsa-build-check@x86_64:

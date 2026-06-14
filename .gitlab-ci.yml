@@ -11,7 +11,7 @@ stages:
 
 .balsa-debian-cfg:
   variables:
-    BASE_TAG: '2025-08-31.1'
+    BASE_TAG: '2026-06-14'
     FDO_DISTRIBUTION_VERSION: stable
     FDO_DISTRIBUTION_TAG: "x86_64-${BASE_TAG}"
 

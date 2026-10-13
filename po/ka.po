@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: balsa\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/balsa/-/issues\n"
-"POT-Creation-Date: 2025-09-16 21:01+0000\n"
-"PO-Revision-Date: 2025-09-17 13:53+0200\n"
+"POT-Creation-Date: 2026-10-06 21:01+0000\n"
+"PO-Revision-Date: 2026-10-13 17:01+0200\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <(nothing)>\n"
 "Language: ka\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.7\n"
+"X-Generator: Poedit 3.9\n"
 
 #: org.desktop.Balsa.desktop.in.in:2 org.desktop.Balsa.metainfo.xml.in:6
 #: balsa-mailto-handler.desktop.in.in:2 libbalsa/system-tray.c:102
@@ -173,7 +173,7 @@ msgstr ""
 
 #: libbalsa/address-book-carddav.c:527 libbalsa/gmime-gpgme-signature.c:239
 #: libbalsa/imap/imap-handle.c:46 libbalsa/libbalsa-carddav.c:543
-#: libbalsa/libbalsa-gpgme.c:186 libbalsa/rfc3156.c:546 libbalsa/rfc6350.c:169
+#: libbalsa/libbalsa-gpgme.c:173 libbalsa/rfc3156.c:568 libbalsa/rfc6350.c:169
 #: libbalsa/server-config.c:566 src/folder-conf.c:412 src/sendmsg-window.c:5387
 msgid "unknown"
 msgstr "unknown"
@@ -441,7 +441,6 @@ msgid "Cannot open %s: %s"
 msgstr "%s-ის გახსნის შეცდომა: %s"
 
 #: libbalsa/body.c:603
-#, c-format
 msgid "Could not read embedded message"
 msgstr ""
 
@@ -523,7 +522,6 @@ msgid "malformed header: domain mismatch"
 msgstr ""
 
 #: libbalsa/dkim.c:1032
-#, c-format
 msgid "empty Base64 encoded element"
 msgstr ""
 
@@ -599,13 +597,11 @@ msgstr "მცდარი"
 
 #. Translators: please do not translate "DMARC DNS TXT"
 #: libbalsa/dkim.c:1433
-#, c-format
 msgid "malformed DMARC DNS TXT record"
 msgstr ""
 
 #. Translators: please do not translate "DMARC DNS TXT"
 #: libbalsa/dkim.c:1442
-#, c-format
 msgid "malformed DMARC DNS TXT record: bad version"
 msgstr ""
 
@@ -623,7 +619,6 @@ msgstr ""
 
 #. Translators: please do not translate "DMARC DNS TXT"
 #: libbalsa/dkim.c:1474
-#, c-format
 msgid "malformed DMARC DNS TXT record: mandatory tag “p” missing"
 msgstr ""
 
@@ -640,18 +635,15 @@ msgstr ""
 
 #. Translators: please do not translate "DKIM DNS TXT"
 #: libbalsa/dkim.c:1610
-#, c-format
 msgid "malformed DKIM DNS TXT record"
 msgstr ""
 
 #. Translators: please do not translate "DKIM DNS TXT"
 #: libbalsa/dkim.c:1634
-#, c-format
 msgid "malformed DKIM DNS TXT record: bad version"
 msgstr ""
 
 #: libbalsa/dkim.c:1645
-#, c-format
 msgid "bad key hash algorithm"
 msgstr ""
 
@@ -661,7 +653,6 @@ msgid "bad key crypto algorithm “%s”"
 msgstr "არასწორი გასაღების კრიპროგრაფიის ალგორითმი \"%s\""
 
 #: libbalsa/dkim.c:1662
-#, c-format
 msgid "public key has been revoked"
 msgstr "საჯარო გასაღები გაუქმებულია"
 
@@ -672,12 +663,10 @@ msgstr "მხარდაუჭერელი სერვისის ტი�
 
 #. Translators: please do not translate "DKIM DNS TXT"
 #: libbalsa/dkim.c:1698
-#, c-format
 msgid "malformed DKIM DNS TXT record: pubkey missing"
 msgstr ""
 
 #: libbalsa/dkim.c:1702
-#, c-format
 msgid "bad key crypto algorithm"
 msgstr ""
 
@@ -809,12 +798,11 @@ msgid "Could not connect to “%s”"
 msgstr ""
 
 #: libbalsa/gmime-application-pkcs7.c:121
-#, c-format
 msgid "Failed to decrypt MIME part: parse error"
 msgstr ""
 
 #: libbalsa/gmime-gpgme-signature.c:147 libbalsa/libbalsa-gpgme-widgets.c:371
-#: libbalsa/libbalsa-gpgme-widgets.c:744 libbalsa/rfc3156.c:550
+#: libbalsa/libbalsa-gpgme-widgets.c:744 libbalsa/rfc3156.c:572
 #: src/address-book-config.c:290
 msgid "never"
 msgstr "არასოდეს"
@@ -1009,11 +997,11 @@ msgstr "ხელმოწერის ფაილის (\"%s\") წაკი�
 msgid "Signature in “%s” is not a UTF-8 text."
 msgstr "ხელმოწერა \"%s\"-ში UTF-8 ტექსტი არაა."
 
-#: libbalsa/identity.c:364 libbalsa/libbalsa-gpgme-cb.c:181
-#: libbalsa/libbalsa-gpgme-cb.c:357 libbalsa/smtp-server.c:336
-#: src/ab-main.c:825 src/ab-window.c:141 src/address-book-config.c:341
-#: src/address-book-config.c:452 src/balsa-app.c:91 src/balsa-app.c:164
-#: src/balsa-index.c:2799 src/balsa-mblist.c:1893 src/balsa-message.c:1792
+#: libbalsa/identity.c:364 libbalsa/libbalsa-gpgme-cb.c:122
+#: libbalsa/smtp-server.c:336 src/ab-main.c:825 src/ab-window.c:141
+#: src/address-book-config.c:341 src/address-book-config.c:452
+#: src/balsa-app.c:91 src/balsa-app.c:164 src/balsa-index.c:2799
+#: src/balsa-mblist.c:1893 src/balsa-message.c:1792
 #: src/balsa-mime-widget-callbacks.c:89 src/filter-edit-callbacks.c:1257
 #: src/filter-edit-dialog.c:399 src/filter-edit-dialog.c:575
 #: src/filter-export-dialog.c:81 src/filter-run-dialog.c:302
@@ -1027,9 +1015,8 @@ msgstr "ხელმოწერა \"%s\"-ში UTF-8 ტექსტი ა�
 msgid "_Cancel"
 msgstr "გაუქმება"
 
-#: libbalsa/identity.c:365 libbalsa/libbalsa-gpgme-cb.c:180
-#: libbalsa/libbalsa-gpgme-cb.c:356 src/ab-window.c:140 src/balsa-app.c:92
-#: src/balsa-app.c:163 src/balsa-message.c:1793
+#: libbalsa/identity.c:365 libbalsa/libbalsa-gpgme-cb.c:121 src/ab-window.c:140
+#: src/balsa-app.c:92 src/balsa-app.c:163 src/balsa-message.c:1793
 #: src/balsa-mime-widget-callbacks.c:90 src/filter-edit-callbacks.c:1256
 #: src/filter-edit-dialog.c:574 src/filter-export-dialog.c:80
 #: src/filter-run-dialog.c:301 src/folder-conf.c:341 src/main-window.c:4058
@@ -1044,7 +1031,7 @@ msgstr "მიმდინარე"
 
 #: libbalsa/identity.c:638 libbalsa/smtp-server.c:142
 msgid "Default"
-msgstr "ნაგულისხმები"
+msgstr "ნაგულისხმევი"
 
 #. Translators: please do not translate Face.
 #: libbalsa/identity.c:832
@@ -1161,7 +1148,7 @@ msgstr "შეტყობინებების ავტომატურ�
 
 #: libbalsa/identity.c:938
 msgid "default protocol"
-msgstr "ნაგულისხმები პროტოკოლი"
+msgstr "ნაგულისხმევი პროტოკოლი"
 
 #: libbalsa/identity.c:941
 msgid "always trust GnuPG keys to encrypt messages"
@@ -1307,11 +1294,11 @@ msgstr ""
 msgid "Cannot LOGIN with UTF-8 username or password"
 msgstr ""
 
-#: libbalsa/imap/imap-commands.c:1210
+#: libbalsa/imap/imap-commands.c:1208
 msgid "Unordered data received from server"
 msgstr ""
 
-#: libbalsa/imap/imap-commands.c:1745
+#: libbalsa/imap/imap-commands.c:1743
 msgid "Bug in implementation of SORT command on IMAP server exposed."
 msgstr ""
 
@@ -1447,23 +1434,19 @@ msgid "unknown certificate validation error %u"
 msgstr ""
 
 #: libbalsa/libbalsa.c:491
-#, c-format
 msgid "No image data"
 msgstr ""
 
 #: libbalsa/libbalsa.c:525
-#, c-format
 msgid "Invalid input format"
 msgstr "არასწორი შეყვანის ფორმატი"
 
 #: libbalsa/libbalsa.c:529
-#, c-format
 msgid "Internal buffer overrun"
 msgstr "შიდა ბუფერის გადავსება"
 
 #. Translators: please do not translate Face.
 #: libbalsa/libbalsa.c:546
-#, c-format
 msgid "Bad X-Face data"
 msgstr ""
 
@@ -1499,118 +1482,126 @@ msgstr ""
 msgid "CardDAV error: %s"
 msgstr "CardDAV-ის შეცდომა: %s"
 
-#: libbalsa/libbalsa-gpgme.c:182
+#: libbalsa/libbalsa-gpgme.c:169
 msgid "OpenPGP"
 msgstr "OpenPGP"
 
-#: libbalsa/libbalsa-gpgme.c:184 src/balsa-message.c:3047
+#: libbalsa/libbalsa-gpgme.c:171 src/balsa-message.c:3045
 msgid "S/MIME"
 msgstr "S/MIME"
 
-#: libbalsa/libbalsa-gpgme.c:252
+#: libbalsa/libbalsa-gpgme.c:236
 msgid "could not create context"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:256
+#: libbalsa/libbalsa-gpgme.c:240
 #, c-format
 msgid "could not set protocol “%s”"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:301
-#, c-format
+#: libbalsa/libbalsa-gpgme.c:282
 msgid "failed to create a temporary folder"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:321
+#: libbalsa/libbalsa-gpgme.c:302
 #, c-format
 msgid "could not set folder “%s” for engine “%s”"
 msgstr ""
 
 #. paranoid - should *never* happen
-#: libbalsa/libbalsa-gpgme.c:326
+#: libbalsa/libbalsa-gpgme.c:307
 #, c-format
 msgid "no crypto engine for “%s” available"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:392 libbalsa/libbalsa-gpgme.c:403
-#: libbalsa/libbalsa-gpgme.c:504 libbalsa/libbalsa-gpgme.c:627
-#: libbalsa/libbalsa-gpgme.c:720
+#: libbalsa/libbalsa-gpgme.c:373 libbalsa/libbalsa-gpgme.c:384
+#: libbalsa/libbalsa-gpgme.c:485 libbalsa/libbalsa-gpgme.c:608
+#: libbalsa/libbalsa-gpgme.c:701
 msgid "could not get data from stream"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:416 libbalsa/rfc3156.c:241 libbalsa/rfc3156.c:246
-#: libbalsa/rfc3156.c:402 libbalsa/rfc3156.c:408
+#: libbalsa/libbalsa-gpgme.c:397 libbalsa/rfc3156.c:241 libbalsa/rfc3156.c:246
+#: libbalsa/rfc3156.c:425 libbalsa/rfc3156.c:431
 msgid "signature verification failed"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:512 libbalsa/libbalsa-gpgme.c:636
-#: libbalsa/libbalsa-gpgme.c:728
+#: libbalsa/libbalsa-gpgme.c:493 libbalsa/libbalsa-gpgme.c:617
+#: libbalsa/libbalsa-gpgme.c:709
 msgid "could not create new data object"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:521
+#: libbalsa/libbalsa-gpgme.c:502
 msgid "signing failed"
 msgstr "ხელმოწერის შეცდომა"
 
-#: libbalsa/libbalsa-gpgme.c:595
-#, c-format
+#: libbalsa/libbalsa-gpgme.c:576
 msgid "combined signing and encryption is defined only for RFC 2440"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:663
+#: libbalsa/libbalsa-gpgme.c:644
 msgid "signing and encryption failed"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:665
+#: libbalsa/libbalsa-gpgme.c:646
 msgid "encryption failed"
 msgstr "დაშიფვრის შეცდომა"
 
-#: libbalsa/libbalsa-gpgme.c:738 libbalsa/rfc3156.c:310 libbalsa/rfc3156.c:315
+#: libbalsa/libbalsa-gpgme.c:719 libbalsa/rfc3156.c:311 libbalsa/rfc3156.c:316
 msgid "decryption failed"
 msgstr "გაშიფვრის შეცდომა"
 
-#: libbalsa/libbalsa-gpgme.c:845
+#: libbalsa/libbalsa-gpgme.c:826
 #, c-format
 msgid "No private key for protocol %s is available for the signer “%s”"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:995
+#: libbalsa/libbalsa-gpgme.c:897
+msgid "accessing the GPG agent failed"
+msgstr ""
+
+#: libbalsa/libbalsa-gpgme.c:905
+#, c-format
+msgid ""
+"Signing or decrypting GPG or S/MIME messages may fail, please check the GPG "
+"agent: %s"
+msgstr ""
+
+#: libbalsa/libbalsa-gpgme.c:1015
 #, c-format
 msgid ""
 "A key for “%s” is present, but it is expired, disabled, revoked or invalid"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:998
+#: libbalsa/libbalsa-gpgme.c:1018
 #, c-format
 msgid "Could not find a key for “%s”"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:1013
+#: libbalsa/libbalsa-gpgme.c:1033
 #, c-format
 msgid "Multiple keys for “%s”"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme.c:1035
-#, c-format
+#: libbalsa/libbalsa-gpgme.c:1055
 msgid "Insufficient key validity"
 msgstr ""
 
 #. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/libbalsa-gpgme-cb.c:176
+#: libbalsa/libbalsa-gpgme-cb.c:117
 msgid "Select key"
 msgstr "აირჩიეთ გასაღები"
 
-#: libbalsa/libbalsa-gpgme-cb.c:195
+#: libbalsa/libbalsa-gpgme-cb.c:136
 #, c-format
 msgid "Select the private key for the signer “%s”"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme-cb.c:200
+#: libbalsa/libbalsa-gpgme-cb.c:141
 #, c-format
 msgid "Select the public key for the recipient “%s”"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme-cb.c:205
+#: libbalsa/libbalsa-gpgme-cb.c:146
 #, c-format
 msgid ""
 "There seems to be no public key for recipient “%s” in your key ring.\n"
@@ -1618,56 +1609,33 @@ msgid ""
 "list."
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme-cb.c:217
+#: libbalsa/libbalsa-gpgme-cb.c:158
 msgid "Double-click key to show details"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme-cb.c:276
+#: libbalsa/libbalsa-gpgme-cb.c:217
 msgid "User ID"
 msgstr "მომხმარებლის ID"
 
-#: libbalsa/libbalsa-gpgme-cb.c:283 src/balsa-index.c:456
+#: libbalsa/libbalsa-gpgme-cb.c:224 src/balsa-index.c:456
 #: src/pref-manager.c:211 src/sendmsg-window.c:2675
 msgid "Size"
 msgstr "ზომა"
 
-#: libbalsa/libbalsa-gpgme-cb.c:290
+#: libbalsa/libbalsa-gpgme-cb.c:231
 msgid "Created"
 msgstr "შექმნილია"
 
 #. create the dialog
-#: libbalsa/libbalsa-gpgme-cb.c:323
+#: libbalsa/libbalsa-gpgme-cb.c:264
 #, c-format
 msgid ""
 "The owner trust for this key is “%s” only.\n"
 "Use this key anyway?"
 msgstr ""
 
-#: libbalsa/libbalsa-gpgme-cb.c:325
+#: libbalsa/libbalsa-gpgme-cb.c:266
 msgid "Insufficient key owner trust"
-msgstr ""
-
-#. FIXME: create dialog according to the Gnome HIG
-#: libbalsa/libbalsa-gpgme-cb.c:353
-msgid "Enter Passphrase"
-msgstr "შეიყვანეთ საკვანძო ფრაზა"
-
-#: libbalsa/libbalsa-gpgme-cb.c:376
-#, c-format
-msgid ""
-"%s\n"
-"The passphrase for this key was bad, please try again!\n"
-"\n"
-"Key: %s"
-msgstr ""
-
-#: libbalsa/libbalsa-gpgme-cb.c:381
-#, c-format
-msgid ""
-"%s\n"
-"Please enter the passphrase for the secret key!\n"
-"\n"
-"Key: %s"
 msgstr ""
 
 #: libbalsa/libbalsa-gpgme-keys.c:210 libbalsa/libbalsa-gpgme-keys.c:479
@@ -1954,12 +1922,10 @@ msgid "_Hide"
 msgstr "_დამალვა"
 
 #: libbalsa/libbalsa-vfs.c:406 src/sendmsg-window.c:4635
-#, c-format
 msgid "not a regular file"
 msgstr "არ წარმოადგენს ჩვეულებრივ ფაილს"
 
 #: libbalsa/libbalsa-vfs.c:456
-#, c-format
 msgid "Cannot launch, missing application"
 msgstr ""
 
@@ -1974,7 +1940,6 @@ msgid "Open _part with %s"
 msgstr ""
 
 #: libbalsa/libbalsa-webdav.c:236 libbalsa/libbalsa-webdav.c:289
-#, c-format
 msgid "failed to evaluate XPath expression"
 msgstr ""
 
@@ -1987,22 +1952,18 @@ msgstr "WebDAV პასუხი %d: %s"
 
 #: libbalsa/libbalsa-webdav.c:725 libbalsa/libbalsa-webdav.c:732
 #: libbalsa/libbalsa-webdav.c:820
-#, c-format
 msgid "WebDAV: empty response"
 msgstr ""
 
 #: libbalsa/libbalsa-webdav.c:736 libbalsa/libbalsa-webdav.c:824
-#, c-format
 msgid "cannot parse the WebDAV server response as XML"
 msgstr ""
 
 #: libbalsa/libbalsa-webdav.c:963
-#, c-format
 msgid "cannot add namespaces to XPath context"
 msgstr ""
 
 #: libbalsa/libbalsa-webdav.c:966
-#, c-format
 msgid "cannot create XPath context"
 msgstr ""
 
@@ -2037,7 +1998,6 @@ msgid "Copying from %s to %s"
 msgstr ""
 
 #: libbalsa/mailbox.c:2242
-#, c-format
 msgid "Removing messages from source mailbox failed"
 msgstr ""
 
@@ -2058,8 +2018,7 @@ msgstr ""
 msgid "Reconstructing message"
 msgstr ""
 
-#: libbalsa/mailbox.c:4600
-#, c-format
+#: libbalsa/mailbox.c:4608
 msgid "Finding duplicate messages in source mailbox failed"
 msgstr ""
 
@@ -2105,7 +2064,6 @@ msgid "No path found for mailbox “%s”, using “%s”"
 msgstr ""
 
 #: libbalsa/mailbox_imap.c:1807 libbalsa/mailbox_imap.c:1848
-#, c-format
 msgid "Cannot get IMAP handle"
 msgstr ""
 
@@ -2124,7 +2082,6 @@ msgid "Downloading %u kB"
 msgstr ""
 
 #: libbalsa/mailbox_imap.c:2598
-#, c-format
 msgid "Cannot create temporary file"
 msgstr "დროებითი ფაილის შექმნა შეუძლებელია"
 
@@ -2201,13 +2158,11 @@ msgstr ""
 
 #: libbalsa/mailbox_maildir.c:463 libbalsa/mailbox_mbox.c:648
 #: libbalsa/mailbox_mh.c:504
-#, c-format
 msgid "Mailbox does not exist."
 msgstr ""
 
 #: libbalsa/mailbox_maildir.c:904 libbalsa/mailbox_mbox.c:1933
 #: libbalsa/mailbox_mh.c:1084
-#, c-format
 msgid "Data copy error"
 msgstr "მონაცემების კოპირების შეცდომა"
 
@@ -2242,17 +2197,14 @@ msgid "Could not unlink file %s: %s"
 msgstr ""
 
 #: libbalsa/mailbox_mbox.c:657
-#, c-format
 msgid "Cannot open mailbox."
 msgstr ""
 
 #: libbalsa/mailbox_mbox.c:669
-#, c-format
 msgid "Mailbox is not in mbox format."
 msgstr ""
 
 #: libbalsa/mailbox_mbox.c:677
-#, c-format
 msgid "Cannot lock mailbox."
 msgstr ""
 
@@ -2287,12 +2239,10 @@ msgid "Could not create MH structure at %s (%s)"
 msgstr ""
 
 #: libbalsa/mailbox_mh.c:1066
-#, c-format
 msgid "Cannot create message"
 msgstr ""
 
 #: libbalsa/mailbox_mh.c:1109
-#, c-format
 msgid "Message rename error"
 msgstr ""
 
@@ -2307,7 +2257,6 @@ msgid "Passing POP message to %s failed: %s"
 msgstr ""
 
 #: libbalsa/mailbox_pop3.c:308
-#, c-format
 msgid "Saving POP message failed"
 msgstr ""
 
@@ -2576,22 +2525,22 @@ msgstr ""
 #: libbalsa/rfc2445.c:469
 msgctxt "ical_partstat"
 msgid "accepted"
-msgstr ""
+msgstr "მიიღო"
 
 #: libbalsa/rfc2445.c:470
 msgctxt "ical_partstat"
 msgid "declined"
-msgstr ""
+msgstr "უარჰყო"
 
 #: libbalsa/rfc2445.c:471
 msgctxt "ical_partstat"
 msgid "tentatively accepted"
-msgstr ""
+msgstr "მერყევად დაეთანხმა"
 
 #: libbalsa/rfc2445.c:472
 msgctxt "ical_partstat"
 msgid "delegated"
-msgstr ""
+msgstr "დელეგირებულია"
 
 #: libbalsa/rfc2445.c:515
 msgctxt "day_of_week"
@@ -2905,112 +2854,110 @@ msgctxt "ical_role"
 msgid "non-participant, information only"
 msgstr ""
 
-#: libbalsa/rfc3156.c:453 libbalsa/rfc3156.c:460
+#: libbalsa/rfc3156.c:475 libbalsa/rfc3156.c:482
 msgid "decryption and signature verification failed"
 msgstr ""
 
-#: libbalsa/rfc3156.c:486
+#: libbalsa/rfc3156.c:508
 msgid "The signature is valid."
 msgstr ""
 
-#: libbalsa/rfc3156.c:488
+#: libbalsa/rfc3156.c:510
 msgid "The signature is valid but expired."
 msgstr ""
 
-#: libbalsa/rfc3156.c:490
+#: libbalsa/rfc3156.c:512
 msgid ""
 "The signature is valid but the key used to verify the signature has expired."
 msgstr ""
 
-#: libbalsa/rfc3156.c:492
+#: libbalsa/rfc3156.c:514
 msgid ""
 "The signature is valid but the key used to verify the signature has been "
 "revoked."
 msgstr ""
 
-#: libbalsa/rfc3156.c:494
+#: libbalsa/rfc3156.c:516
 msgid "The signature is invalid."
 msgstr "ხელმოწერა არასწორია."
 
-#: libbalsa/rfc3156.c:496
+#: libbalsa/rfc3156.c:518
 msgid "The signature could not be verified due to a missing key."
 msgstr ""
 
-#: libbalsa/rfc3156.c:498
+#: libbalsa/rfc3156.c:520
 msgid "This part is not a real signature."
 msgstr ""
 
-#: libbalsa/rfc3156.c:500
+#: libbalsa/rfc3156.c:522
 msgid "The signature could not be verified due to an invalid crypto engine."
 msgstr ""
 
-#: libbalsa/rfc3156.c:502
+#: libbalsa/rfc3156.c:524
 msgid "The signature contains multiple signers, this may be a forgery."
 msgstr ""
 
 #. Translators: #1 error source; #2 error message
-#: libbalsa/rfc3156.c:509
+#: libbalsa/rfc3156.c:531
 #, c-format
 msgid "An error prevented the signature verification: %s: %s"
 msgstr ""
 
 #. Translators: #1 error message
-#: libbalsa/rfc3156.c:512
+#: libbalsa/rfc3156.c:534
 #, c-format
 msgid "An error prevented the signature verification: %s"
 msgstr ""
 
-#: libbalsa/rfc3156.c:524
+#: libbalsa/rfc3156.c:546
 msgid "The user ID is of unknown validity."
 msgstr ""
 
-#: libbalsa/rfc3156.c:526
+#: libbalsa/rfc3156.c:548
 msgid "The validity of the user ID is undefined."
 msgstr ""
 
-#: libbalsa/rfc3156.c:528
+#: libbalsa/rfc3156.c:550
 msgid "The user ID is never valid."
 msgstr ""
 
-#: libbalsa/rfc3156.c:530
+#: libbalsa/rfc3156.c:552
 msgid "The user ID is marginally valid."
 msgstr ""
 
-#: libbalsa/rfc3156.c:532
+#: libbalsa/rfc3156.c:554
 msgid "The user ID is fully valid."
 msgstr ""
 
-#: libbalsa/rfc3156.c:534
+#: libbalsa/rfc3156.c:556
 msgid "The user ID is ultimately valid."
 msgstr ""
 
-#: libbalsa/rfc3156.c:536 libbalsa/rfc3156.c:558
+#: libbalsa/rfc3156.c:558 libbalsa/rfc3156.c:580
 msgid "bad validity"
 msgstr ""
 
-#: libbalsa/rfc3156.c:548
+#: libbalsa/rfc3156.c:570
 msgid "undefined"
 msgstr "გაურკვეველი"
 
-#: libbalsa/rfc3156.c:552
+#: libbalsa/rfc3156.c:574
 msgid "marginal"
 msgstr "საბოლოო"
 
-#: libbalsa/rfc3156.c:554
+#: libbalsa/rfc3156.c:576
 msgid "full"
 msgstr "მთლიანი"
 
-#: libbalsa/rfc3156.c:556
+#: libbalsa/rfc3156.c:578
 msgid "ultimate"
 msgstr "უკანასკნელი"
 
 #: libbalsa/rfc6350.c:69
-#, c-format
 msgid "malformed card, BEGIN:VCARD expected"
 msgstr ""
 
 #: libbalsa/rfc6350.c:107
-#, c-format
 msgid "malformed card, END:VCARD missing"
 msgstr ""
 
@@ -3519,12 +3466,10 @@ msgid ""
 msgstr ""
 
 #: libnetclient/net-client.c:104 libnetclient/net-client.c:145
-#, c-format
 msgid "network client is already connected"
 msgstr ""
 
 #: libnetclient/net-client.c:265 libnetclient/net-client.c:311
-#, c-format
 msgid "network client is not connected"
 msgstr ""
 
@@ -3534,12 +3479,10 @@ msgid "reply length %lu exceeds the maximum allowed length %lu"
 msgstr ""
 
 #: libnetclient/net-client.c:292
-#, c-format
 msgid "connection lost"
 msgstr "კავშირი დაკარგულია"
 
 #: libnetclient/net-client.c:344
-#, c-format
 msgid "line too long"
 msgstr "ხაზი ძალიან გრძელია"
 
@@ -3564,17 +3507,14 @@ msgid "error loading key: %s"
 msgstr ""
 
 #: libnetclient/net-client.c:535 libnetclient/net-client.c:574
-#, c-format
 msgid "not connected"
 msgstr "არაა დაკავშირებული"
 
 #: libnetclient/net-client.c:537
-#, c-format
 msgid "connection is already encrypted"
 msgstr ""
 
 #: libnetclient/net-client.c:576
-#, c-format
 msgid "connection is already compressed"
 msgstr ""
 
@@ -3591,7 +3531,6 @@ msgid "bad server reply: %s"
 msgstr ""
 
 #: libnetclient/net-client-pop.c:375
-#, c-format
 msgid "bad server reply"
 msgstr ""
 
@@ -3601,22 +3540,18 @@ msgid "error: %s"
 msgstr "შეცდომა: %s"
 
 #: libnetclient/net-client-pop.c:549
-#, c-format
 msgid "error"
 msgstr "ბრძანება"
 
 #: libnetclient/net-client-pop.c:612 libnetclient/net-client-smtp.c:509
-#, c-format
 msgid "no suitable authentication mechanism"
 msgstr ""
 
 #: libnetclient/net-client-pop.c:620 libnetclient/net-client-smtp.c:514
-#, c-format
 msgid "user name required"
 msgstr ""
 
 #: libnetclient/net-client-pop.c:629 libnetclient/net-client-smtp.c:523
-#, c-format
 msgid "user name and password required"
 msgstr ""
 
@@ -3626,7 +3561,6 @@ msgid "the server %s does not offer the SMTP service at port 465, 587 or 25"
 msgstr ""
 
 #: libnetclient/net-client-smtp.c:270
-#, c-format
 msgid "remote server does not support STARTTLS"
 msgstr ""
 
@@ -3669,7 +3603,6 @@ msgid "malformed GSS security token: %s"
 msgstr ""
 
 #: libnetclient/net-client-utils.c:301
-#, c-format
 msgid "malformed GSS security token"
 msgstr ""
 
@@ -3729,7 +3662,7 @@ msgstr ""
 
 #: src/ab-window.c:331
 msgid "Run _Editor"
-msgstr ""
+msgstr "რ_ედაქტორის გაშვება"
 
 #: src/ab-window.c:335
 msgid "_Re-import"
@@ -4139,7 +4072,7 @@ msgstr "(გამომგზავნის გარეშე)"
 msgid "Could not access message %u in mailbox “%s”."
 msgstr ""
 
-#: src/balsa-message.c:1217 src/main.c:543
+#: src/balsa-message.c:1217 src/main.c:542
 #, c-format
 msgid "Autocrypt error: %s"
 msgstr ""
@@ -4263,12 +4196,12 @@ msgid ""
 "Please close the other instances of this message and try again."
 msgstr ""
 
-#: src/balsa-message.c:2928 src/balsa-message.c:3013 src/balsa-message.c:3139
+#: src/balsa-message.c:2928 src/balsa-message.c:3011 src/balsa-message.c:3137
 #, c-format
 msgid "Parsing a message part failed: %s"
 msgstr ""
 
-#: src/balsa-message.c:2929 src/balsa-message.c:3014 src/balsa-message.c:3140
+#: src/balsa-message.c:2929 src/balsa-message.c:3012 src/balsa-message.c:3138
 msgid "Possible disk space problem."
 msgstr ""
 
@@ -4286,40 +4219,40 @@ msgid ""
 "this crypto protocol is not available."
 msgstr ""
 
-#: src/balsa-message.c:2964
+#: src/balsa-message.c:2963
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a S/MIME encrypted part, "
 "but this crypto protocol is not available."
 msgstr ""
 
-#: src/balsa-message.c:3031
+#: src/balsa-message.c:3029
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a signed part, but its "
 "structure is invalid. The signature, if there is any, cannot be checked."
 msgstr ""
 
-#: src/balsa-message.c:3044
+#: src/balsa-message.c:3042
 #, c-format
 msgid ""
 "The message sent by %s with subject “%s” contains a %s signed part, but this "
 "crypto protocol is not available."
 msgstr ""
 
-#: src/balsa-message.c:3047
+#: src/balsa-message.c:3045
 msgid "PGP"
 msgstr "PGP"
 
-#: src/balsa-message.c:3076
+#: src/balsa-message.c:3074
 msgid "Detected a good signature with insufficient validity"
 msgstr ""
 
-#: src/balsa-message.c:3081 src/balsa-message.c:3206
+#: src/balsa-message.c:3079 src/balsa-message.c:3202
 msgid "Detected a good signature with insufficient validity/trust"
 msgstr ""
 
-#: src/balsa-message.c:3091 src/balsa-message.c:3215
+#: src/balsa-message.c:3089 src/balsa-message.c:3211
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” "
@@ -4327,26 +4260,26 @@ msgid ""
 "%s"
 msgstr ""
 
-#: src/balsa-message.c:3104
+#: src/balsa-message.c:3102
 #, c-format
 msgid ""
 "Checking the signature of the message sent by %s with subject “%s” failed "
 "with an error!"
 msgstr ""
 
-#: src/balsa-message.c:3166
+#: src/balsa-message.c:3164
 msgid ""
 "The decryption cannot be performed because this message is displayed more "
 "than once."
 msgstr ""
 
-#: src/balsa-message.c:3168
+#: src/balsa-message.c:3166
 msgid ""
 "The signature check and removal of the OpenPGP armor cannot be performed "
 "because this message is displayed more than once."
 msgstr ""
 
-#: src/balsa-message.c:3171
+#: src/balsa-message.c:3169
 msgid "Please close the other instances of this message and try again."
 msgstr ""
 
@@ -4354,7 +4287,7 @@ msgstr ""
 #: src/balsa-mime-widget-message.c:238
 #, c-format
 msgid "File name: %s"
-msgstr ""
+msgstr "ფაილის სახელი: %s"
 
 #: src/balsa-mime-widget.c:221
 #, c-format
@@ -4494,12 +4427,10 @@ msgid "Content Type: external-body\n"
 msgstr ""
 
 #: src/balsa-mime-widget-message.c:191
-#, c-format
 msgid "Access type: local-file\n"
 msgstr ""
 
 #: src/balsa-mime-widget-message.c:203
-#, c-format
 msgid "Access type: URL\n"
 msgstr ""
 
@@ -5026,7 +4957,7 @@ msgstr ""
 
 #: src/filter-edit-dialog.c:106
 msgid "Send to Trash"
-msgstr ""
+msgstr "ნაგვის ყუთში გადატანა"
 
 #: src/filter-edit-dialog.c:110
 msgid "OR"
@@ -5369,7 +5300,7 @@ msgstr "პოსტი"
 
 #: src/folder-conf.c:944
 msgid "append"
-msgstr ""
+msgstr "ბოლოში მიწერა"
 
 #: src/folder-conf.c:945
 msgid "delete"
@@ -5377,7 +5308,7 @@ msgstr "წაშლა"
 
 #: src/folder-conf.c:946
 msgid "special"
-msgstr ""
+msgstr "სპეციალური"
 
 #: src/folder-conf.c:953
 msgid "Permissions:"
@@ -5598,7 +5529,7 @@ msgstr ""
 
 #: src/mailbox-conf.c:869
 msgid "_Identity:"
-msgstr ""
+msgstr "_იდენტიფიკაცია:"
 
 #: src/mailbox-conf.c:887
 msgid ""
@@ -5717,7 +5648,7 @@ msgstr ""
 
 #: src/mailbox-node.c:1063
 msgid "_Empty trash"
-msgstr ""
+msgstr "ნაგვის ყუთის დაცარი_ელება"
 
 #: src/mailbox-node.c:1068
 msgid "_Edit/Apply filters"
@@ -5751,45 +5682,45 @@ msgstr ""
 
 #: src/main.c:140
 msgid "Trash"
-msgstr "ნაგავი"
+msgstr "ნაგვის ყუთი"
 
 #: src/main.c:354
 msgid "Compressing mail folders…"
 msgstr ""
 
-#: src/main.c:609
+#: src/main.c:608
 msgid "Get new mail on start-up"
 msgstr ""
 
-#: src/main.c:611
+#: src/main.c:610
 msgid "Compose a new email to EMAIL@ADDRESS"
 msgstr ""
 
-#: src/main.c:613
+#: src/main.c:612
 msgid "Attach file at URI"
 msgstr ""
 
-#: src/main.c:615
+#: src/main.c:614
 msgid "Opens MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:615
+#: src/main.c:614
 msgid "MAILBOXNAME"
 msgstr ""
 
-#: src/main.c:617
+#: src/main.c:616
 msgid "Opens first unread mailbox"
 msgstr ""
 
-#: src/main.c:619
+#: src/main.c:618
 msgid "Opens default Inbox on start-up"
 msgstr ""
 
-#: src/main.c:621
+#: src/main.c:620
 msgid "Prints number unread and unsent messages"
 msgstr ""
 
-#: src/main.c:623
+#: src/main.c:622
 msgid "Show version"
 msgstr "ვერსიის ჩვენება"
 
@@ -6025,11 +5956,11 @@ msgstr "უცნობ"
 #: src/pref-manager.c:950
 #, c-format
 msgid "%s (default)"
-msgstr "%s (ნაგულისხმები)"
+msgstr "%s (ნაგულისხმევი)"
 
 #: src/pref-manager.c:1069
 msgid "Default layout"
-msgstr "ნაგულისხმები განლაგება"
+msgstr "ნაგულისხმევი განლაგება"
 
 #: src/pref-manager.c:1070
 msgid "Wide message layout"
@@ -6313,7 +6244,7 @@ msgstr ""
 
 #: src/pref-manager.c:2493
 msgid "Wrap text at"
-msgstr ""
+msgstr "ტექსტის გადატანა სად"
 
 #: src/pref-manager.c:2512
 #, c-format
@@ -6431,7 +6362,7 @@ msgstr ""
 
 #: src/pref-manager.c:2811
 msgid "_Set as default"
-msgstr "ნაგულისხმებად დაყენება"
+msgstr "ნაგულისხმევად დაყენება"
 
 #: src/pref-manager.c:2828
 msgid "Miscellaneous spelling settings"
@@ -6439,7 +6370,7 @@ msgstr ""
 
 #: src/pref-manager.c:2832
 msgid "Check signature"
-msgstr ""
+msgstr "ხელმოწერის შემოწმება"
 
 #: src/pref-manager.c:2834
 msgid "Check quoted"
@@ -6485,7 +6416,7 @@ msgstr "სხვადასხვა"
 
 #: src/pref-manager.c:2919
 msgid "Empty trash on exit"
-msgstr ""
+msgstr "ნაგვის ყუთის გასუფთავება გასვლისას"
 
 #: src/pref-manager.c:2923
 msgid "Close mailbox if unused more than"
@@ -6920,7 +6851,7 @@ msgstr ""
 
 #: src/sendmsg-window.c:1533
 msgid "Choose character set"
-msgstr ""
+msgstr "სიმბოლოთა ნაკრების არჩევა"
 
 #: src/sendmsg-window.c:1541
 #, c-format
@@ -7620,11 +7551,11 @@ msgstr ""
 
 #: src/toolbar-factory.c:492
 msgid "_Icons Only"
-msgstr ""
+msgstr "მხოლოდ ხატულებ_ი"
 
 #: src/toolbar-factory.c:493
 msgid "_Text Only"
-msgstr ""
+msgstr "მხოლოდ _ტექსტი"
 
 #: src/toolbar-factory.c:718
 #, c-format
@@ -8233,6 +8164,9 @@ msgstr ""
 #: ui/source-viewer.ui:38
 msgid "_Escape Special Characters"
 msgstr ""
+
+#~ msgid "Enter Passphrase"
+#~ msgstr "შეიყვანეთ საკვანძო ფრაზა"
 
 #~ msgid "_Update"
 #~ msgstr "_განახლება"

@@ -47,12 +47,6 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-static const gchar *permanent_prefixes[] = {
-    BALSA_DATA_PREFIX,
-    "src",
-    "."
-};
-
 static const gchar *libbalsa_get_codeset_name(const gchar *txt, 
 					      LibBalsaCodeset Codeset);
 #ifndef HAVE_STRUCT_UTSNAME_DOMAINNAME
@@ -1311,30 +1305,33 @@ libbalsa_add_mnemonic_button_to_box(const gchar *markup,
 
 /* filename is the filename (naw!)
  * We ignore proper slashing of names. Ie, /prefix//pixmaps//file won't be caught.
+ * Look for the file in @ref BALSA_DATA_PREFIX.  If is is not found there, Balsa is probably running from a build folder, so look
+ * in the sub-folder @em images of the current dir.  Note that the Xapp status icon requires an @em absolute path, so prepend the
+ * current folder, as we don't want to expose the build folder (e.g. by using meson.global_source_root()).
  */
 gchar *
 libbalsa_pixmap_finder(const gchar  * filename)
 {
-    gchar *cat;
-    guint i;
+	gchar *cat;
 
-    g_return_val_if_fail(filename, NULL);
+	g_return_val_if_fail(filename, NULL);
 
-    for (i = 0; i < G_N_ELEMENTS(permanent_prefixes); i++) {
-	cat = g_build_filename(permanent_prefixes[i], "pixmaps", filename, NULL);
+	cat = g_build_filename(BALSA_DATA_PREFIX, "pixmaps", filename, NULL);
+	if (!g_file_test(cat, G_FILE_TEST_IS_REGULAR)) {
+		gchar *curr_dir;
 
-	if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
-	    return cat;
+		/* maybe Balsa is launched from the build folder... */
+		g_free(cat);
+		curr_dir = g_get_current_dir();		/* the xapp status icon requires an absolute path, don't expose the build folder... */
+		cat = g_build_filename(curr_dir, "images", filename, NULL);
+		g_free(curr_dir);
+		if (!g_file_test(cat, G_FILE_TEST_IS_REGULAR)) {
+			g_warning("Cannot find expected pixmap file “%s”", filename);
+			g_free(cat);
+			cat = NULL;
+		}
+	}
+	g_debug("%s: '%s' -> '%s'", __func__, filename, cat);
 
-	g_free(cat);
-    }
-
-    cat = g_build_filename("images", "pixmaps", NULL);
-    if (g_file_test(cat, G_FILE_TEST_IS_REGULAR))
-        return cat;
-    g_free(cat);
-
-    g_warning("Cannot find expected pixmap file “%s”", filename);
-
-    return NULL;
+	return cat;
 }

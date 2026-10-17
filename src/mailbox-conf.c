@@ -788,11 +788,12 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 
     /* toggle for deletion from server */
     mcw->mb_data.pop3.delete_from_server = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE,
-    	_("_Delete messages from server after download"), libbalsa_mailbox_pop3_get_delete_from_server(mailbox_pop3), NULL, NULL);
+	_("_Delete messages from server after download"), libbalsa_mailbox_pop3_get_delete_from_server(mailbox_pop3),
+	G_CALLBACK(check_for_blank_fields), mcw);
 
     /* toggle for check */
     mcw->mb_data.pop3.check = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE, _("_Enable check for new mail"),
-    	libbalsa_mailbox_pop3_get_check(mailbox_pop3), NULL, NULL);
+	libbalsa_mailbox_pop3_get_check(mailbox_pop3), G_CALLBACK(check_for_blank_fields), mcw);
 
     /* Procmail */
     mcw->mb_data.pop3.filter = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, TRUE,
@@ -802,11 +803,11 @@ create_pop_mailbox_dialog(MailboxConfWindow *mcw)
 
     /* advanced - toggle for apop */
     mcw->mb_data.pop3.disable_apop = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, FALSE, _("Disable _APOP"),
-    	libbalsa_mailbox_pop3_get_disable_apop(mailbox_pop3), NULL, NULL);
+	libbalsa_mailbox_pop3_get_disable_apop(mailbox_pop3), G_CALLBACK(check_for_blank_fields), mcw);
 
     /* toggle for enabling pipeling */
     mcw->mb_data.pop3.enable_pipe = libbalsa_server_cfg_add_check(mcw->mb_data.pop3.server_cfg, FALSE, _("Overlap commands"),
-    	libbalsa_mailbox_pop3_get_enable_pipe(mailbox_pop3), NULL, NULL);
+	libbalsa_mailbox_pop3_get_enable_pipe(mailbox_pop3), G_CALLBACK(check_for_blank_fields), mcw);
 
     /* initially call the check */
     check_for_blank_fields(NULL, mcw);

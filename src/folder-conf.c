@@ -398,6 +398,37 @@ create_imap_folder_dialog(LibBalsaServer  *server,
 	return dialog;
 }
 
+static gboolean
+chk_imap_subscription_change(GtkTreeModel			   *model,
+							 GtkTreePath G_GNUC_UNUSED *path,
+							 GtkTreeIter			   *iter,
+							 gboolean				   *have_change)
+{
+	gboolean new_state;
+	gboolean old_state;
+
+	gtk_tree_model_get(model, iter, LB_SCANNER_IMAP_SUBS_NEW, &new_state, LB_SCANNER_IMAP_SUBS_OLD, &old_state, -1);
+	*have_change = old_state != new_state;
+	return *have_change;
+}
+
+static void
+on_folder_conf_imap_subscr_done(GtkDialog		  *dialog,
+								gint G_GNUC_UNUSED response_id,
+								FolderDialogData  *folder_data)
+{
+	if (folder_data->common_data.store != NULL) {
+		gboolean have_change = FALSE;
+
+		gtk_tree_model_foreach(GTK_TREE_MODEL(folder_data->common_data.store),
+			(GtkTreeModelForeachFunc) chk_imap_subscription_change, &have_change);
+		if (have_change) {
+			validate_folder(NULL, folder_data);
+		}
+	}
+	gtk_widget_destroy(GTK_WIDGET(dialog));
+}
+
 static void
 folder_conf_imap_subscriptions(GtkButton        *widget,
                                FolderDialogData *folder_data)
@@ -419,7 +450,7 @@ folder_conf_imap_subscriptions(GtkButton        *widget,
 	if (dialog != NULL) {
 		/* dialog is modal, so the UI is blocked until it is closed */
 		g_signal_connect(dialog, "response",
-				 G_CALLBACK(gtk_widget_destroy), NULL);
+				 G_CALLBACK(on_folder_conf_imap_subscr_done), folder_data);
 		gtk_widget_show_all(dialog);
 	}
 }
@@ -512,12 +543,13 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     }
     gtk_container_add(GTK_CONTAINER(box), button);
     g_signal_connect(folder_data->subscribed, "toggled", G_CALLBACK(folder_data_subscribed_toggled), button);
+    g_signal_connect(folder_data->subscribed, "toggled", G_CALLBACK(validate_folder), folder_data);
     libbalsa_server_cfg_add_row(folder_data->server_cfg, TRUE, box, NULL);
 
     folder_data->list_inbox = libbalsa_server_cfg_add_check(folder_data->server_cfg, TRUE, _("Always show _Inbox"),
-    	(mn != NULL) ? balsa_mailbox_node_get_list_inbox(mn) : TRUE, NULL, NULL);
+	(mn != NULL) ? balsa_mailbox_node_get_list_inbox(mn) : TRUE, G_CALLBACK(validate_folder), folder_data);
     folder_data->prefix = libbalsa_server_cfg_add_entry(folder_data->server_cfg, TRUE, _("Pr_efix:"),
-    	(mn != NULL) ? balsa_mailbox_node_get_dir(mn) : NULL, NULL, NULL);
+	(mn != NULL) ? balsa_mailbox_node_get_dir(mn) : NULL, G_CALLBACK(validate_folder), folder_data);
 
     /* additional advanced settings */
     folder_data->connection_limit = gtk_spin_button_new_with_range(1.0, 40.0, 1.0);
@@ -525,13 +557,17 @@ folder_conf_imap_node(BalsaMailboxNode *mn)
     	(gdouble) libbalsa_imap_server_get_max_connections(LIBBALSA_IMAP_SERVER(folder_data->server)));
     libbalsa_server_cfg_add_item(folder_data->server_cfg, FALSE, _("_Max number of connections:"), folder_data->connection_limit);
     folder_data->enable_persistent = libbalsa_server_cfg_add_check(folder_data->server_cfg, FALSE, _("Enable _persistent cache"),
-    	libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(folder_data->server)), NULL, NULL);
+	libbalsa_imap_server_has_persistent_cache(LIBBALSA_IMAP_SERVER(folder_data->server)),
+	G_CALLBACK(validate_folder), folder_data);
     folder_data->use_idle = libbalsa_server_cfg_add_check(folder_data->server_cfg, FALSE, _("Use IDLE command"),
-    	libbalsa_imap_server_get_use_idle(LIBBALSA_IMAP_SERVER(folder_data->server)), NULL, NULL);
+	libbalsa_imap_server_get_use_idle(LIBBALSA_IMAP_SERVER(folder_data->server)),
+	G_CALLBACK(validate_folder), folder_data);
     folder_data->has_bugs = libbalsa_server_cfg_add_check(folder_data->server_cfg, FALSE, _("Enable _bug workarounds"),
-    	libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(folder_data->server), ISBUG_FETCH), NULL, NULL);
+	libbalsa_imap_server_has_bug(LIBBALSA_IMAP_SERVER(folder_data->server), ISBUG_FETCH),
+	G_CALLBACK(validate_folder), folder_data);
     folder_data->use_status = libbalsa_server_cfg_add_check(folder_data->server_cfg, FALSE, _("Use STATUS for mailbox checking"),
-    	libbalsa_imap_server_get_use_status(LIBBALSA_IMAP_SERVER(folder_data->server)), NULL, NULL);
+	libbalsa_imap_server_get_use_status(LIBBALSA_IMAP_SERVER(folder_data->server)),
+	G_CALLBACK(validate_folder), folder_data);
 
     gtk_widget_show_all(GTK_WIDGET(folder_data->common_data.dialog));
 

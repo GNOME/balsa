@@ -5,10 +5,8 @@ foreach dir : subdirs
   subdir(dir)
 endforeach
 
-# balsa_logo.png used by About menu (small one).
+# balsa_logo.png used by About menu and status icon (small one).
 balsa_imgs = [
-  'attachment.png',
-  'balsa-top.png',
   'balsa_icon.png',
   'balsa_attention.png',
   'balsa_logo.png'

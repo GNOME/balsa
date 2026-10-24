@@ -28,10 +28,10 @@ typedef enum {
   IM_EVENT_EXPUNGE
 } ImapMboxEventType;
 
-int imap_mbox_is_disconnected (ImapMboxHandle *h);
-int imap_mbox_is_connected    (ImapMboxHandle *h);
-int imap_mbox_is_authenticated(ImapMboxHandle *h);
-int imap_mbox_is_selected     (ImapMboxHandle *h);
+int imap_mbox_is_disconnected (const ImapMboxHandle *h);
+int imap_mbox_is_connected    (const ImapMboxHandle *h);
+int imap_mbox_is_authenticated(const ImapMboxHandle *h);
+int imap_mbox_is_selected     (const ImapMboxHandle *h);
 
 /* imap server responses, as defined in rfc-2060 */
 typedef enum {
@@ -128,7 +128,7 @@ int imap_handle_set_timeout(ImapMboxHandle *, int milliseconds);
 gboolean imap_handle_idle_enable(ImapMboxHandle *, int seconds);
 gboolean imap_handle_idle_disable(ImapMboxHandle *)
     __attribute__ ((warn_unused_result));
-gboolean imap_handle_op_cancelled(ImapMboxHandle *h);
+gboolean imap_handle_op_cancelled(const ImapMboxHandle *h);
 ImapResult imap_mbox_handle_connect(ImapMboxHandle* r, const char *hst);
 ImapResult imap_mbox_handle_reconnect(ImapMboxHandle* r,
                                       gboolean *readonly);
@@ -140,15 +140,15 @@ NetClientAuthMode imap_handle_set_auth_mode(ImapMboxHandle *h, NetClientAuthMode
 /* int below is a boolean */
 int      imap_mbox_handle_can_do(ImapMboxHandle* handle, ImapCapability cap);
 unsigned imap_mbox_handle_get_exists(ImapMboxHandle* handle);
-unsigned imap_mbox_handle_get_validity(ImapMboxHandle* handle);
-unsigned imap_mbox_handle_get_uidnext(ImapMboxHandle* handle);
+unsigned imap_mbox_handle_get_validity(const ImapMboxHandle* handle);
+unsigned imap_mbox_handle_get_uidnext(const ImapMboxHandle* handle);
 int      imap_mbox_handle_get_delim(ImapMboxHandle* handle,
                                     const char *namespace);
 char* imap_mbox_handle_get_last_msg(ImapMboxHandle *handle);
 
-void imap_mbox_handle_connect_notify(ImapMboxHandle* handle,
+void imap_mbox_handle_connect_notify(const ImapMboxHandle* handle,
                                      ImapMboxNotifyCb cb,
-                                     void *data);
+                                     const void *data);
 
 void imap_mbox_handle_destroy(ImapMboxHandle* handle);
 
@@ -160,7 +160,7 @@ ImapResponse imap_mbox_handle_fetch_env(ImapMboxHandle* handle,
 
 ImapMessage* imap_mbox_handle_get_msg(ImapMboxHandle* handle, unsigned seqno);
 
-unsigned imap_mbox_handle_first_unseen(ImapMboxHandle* handle);
+unsigned imap_mbox_handle_first_unseen(const ImapMboxHandle* handle);
 ImapResponse imap_mbox_find_all(ImapMboxHandle *h, const char *search_str,
                                 unsigned *msgcnt, unsigned**msgs);
 
@@ -168,7 +168,7 @@ unsigned imap_mbox_set_sort(ImapMboxHandle *h, ImapSortKey isr,
                             int ascending);
 const char *imap_mbox_get_filter(ImapMboxHandle *h);
 /* get_thread_root is deprecated */
-GNode *imap_mbox_handle_get_thread_root(ImapMboxHandle* handle); 
+GNode *imap_mbox_handle_get_thread_root(const ImapMboxHandle* handle);
 
 /* ================ BEGIN OF BODY STRUCTURE FUNCTIONS ================== */
 const gchar *imap_body_get_param(ImapBody *body, const gchar *param);
@@ -207,11 +207,11 @@ void mbox_view_init(MboxView *mv);
 void mbox_view_resize(MboxView *mv, unsigned old_sz, unsigned new_sz);
 void mbox_view_expunge(MboxView *mv, unsigned seqno);
 void mbox_view_dispose(MboxView *mv);
-gboolean mbox_view_is_active(MboxView *mv);
-unsigned mbox_view_cnt(MboxView *mv);
-unsigned mbox_view_get_msg_no(MboxView *mv, unsigned msgno);
-unsigned mbox_view_get_rev_no(MboxView *mv, unsigned seqno);
-const char *mbox_view_get_str(MboxView *mv);
+gboolean mbox_view_is_active(const MboxView *mv);
+unsigned mbox_view_cnt(const MboxView *mv);
+unsigned mbox_view_get_msg_no(const MboxView *mv, unsigned msgno);
+unsigned mbox_view_get_rev_no(const MboxView *mv, unsigned seqno);
+const char *mbox_view_get_str(const MboxView *mv);
 
 /* ================ END OF MBOX_VIEW FUNCTIONS ========================= */
 

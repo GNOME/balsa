@@ -620,7 +620,7 @@ execute_flag_only_search(ImapMboxHandle *h, ImapSearchKey *s,
     return FALSE;
   
   for(i=0; i<h->exists; i++) {
-    ImapFlagCache *f =
+    const ImapFlagCache *f =
       &g_array_index(h->flag_cache, ImapFlagCache, i);
     if(search_key_matches(s, f->flag_values))
       cb(h, i+1, cb_arg);

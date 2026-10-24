@@ -134,7 +134,7 @@ libbalsa_webdav_get_resource(LibBalsaWebdav *webdav, const gchar *path, const gc
 		.ns_list = { NULL },
 		.eval_fn = libbalsa_webdav_xp_get_strlist
 	};
-	LibBalsaWebdavPrivate *priv;
+	const LibBalsaWebdavPrivate *priv;
 	GList *principals;
 	GList *p;
 	GError *local_err = NULL;
@@ -455,7 +455,7 @@ libbalsa_webdav_get_sync_token(LibBalsaWebdav *webdav, GError **error)
 const gchar *
 libbalsa_webdav_get_uri(LibBalsaWebdav *webdav)
 {
-	LibBalsaWebdavPrivate *priv = libbalsa_webdav_get_instance_private(webdav);
+	const LibBalsaWebdavPrivate *priv = libbalsa_webdav_get_instance_private(webdav);
 
 	g_return_val_if_fail(LIBBALSA_IS_WEBDAV(webdav), NULL);
 	return priv->uri;
@@ -642,7 +642,7 @@ do_soup_auth(SoupMessage *msg, SoupAuth *auth, gboolean retrying, gpointer user_
 	LibBalsaWebdav *webdav = LIBBALSA_WEBDAV(user_data);
 
 	if (!retrying) {
-		LibBalsaWebdavPrivate *priv = libbalsa_webdav_get_instance_private(webdav);
+		const LibBalsaWebdavPrivate *priv = libbalsa_webdav_get_instance_private(webdav);
 
 		soup_auth_authenticate(auth, priv->username, priv->password);
 	}
@@ -678,7 +678,7 @@ static xmlDocPtr
 webdav_request(LibBalsaWebdav *webdav, const gchar *path, const gchar *method, const gchar *depth, const gchar *req_xml,
 			   GError **error)
 {
-	LibBalsaWebdavPrivate *priv = libbalsa_webdav_get_instance_private(webdav);
+	const LibBalsaWebdavPrivate *priv = libbalsa_webdav_get_instance_private(webdav);
 	SoupMessage *msg;
 	GBytes *buffer;
 	SoupMessageHeaders *msg_headers;

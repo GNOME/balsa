@@ -742,7 +742,7 @@ imap_mbox_expunge_a(ImapMboxHandle *handle)
 
 /* 6.4.4 SEARCH Command */
 unsigned
-imap_mbox_handle_first_unseen(ImapMboxHandle* handle)
+imap_mbox_handle_first_unseen(const ImapMboxHandle* handle)
 {
   /* might have to do search here. */
   return handle->unseen;
@@ -834,7 +834,7 @@ static void
 set_flag_cache_cb(ImapMboxHandle* h, unsigned seqno, void*arg)
 {
   ImapFlagCache *flags;
-  ImapMsgFlag *searched_flag = (ImapMsgFlag*)arg;
+  const ImapMsgFlag *searched_flag = (ImapMsgFlag*)arg;
   flags = &g_array_index(h->flag_cache, ImapFlagCache, seqno-1);
   if(*searched_flag & IMSGF_SEEN)
     flags->flag_values &= ~*searched_flag;
@@ -849,7 +849,7 @@ struct flag_needed_data {
 static unsigned
 flag_unknown(int i, struct flag_needed_data* d)
 {
-  ImapFlagCache *f =
+  const ImapFlagCache *f =
     &g_array_index(d->handle->flag_cache, ImapFlagCache, i-1);
   return (f->known_flags & d->flag) == d->flag ? 0 : i;
 }
@@ -869,7 +869,7 @@ imap_assure_needed_flags(ImapMboxHandle *h, ImapMsgFlag needed_flags)
   int ics;
   gchar *cmd = NULL, *seqno;
   ImapResponse rc = IMR_OK;
-  gchar *cmd_format;
+  const gchar *cmd_format;
 
   if (h->state == IMHS_DISCONNECTED)
     return IMR_SEVERED;
@@ -942,7 +942,7 @@ imap_mbox_handle_msgno_has_flags(ImapMboxHandle *h, unsigned msgno,
                                  ImapMsgFlag flag_set,
                                  ImapMsgFlag flag_unset)
 {
-  ImapFlagCache *flags;
+  const ImapFlagCache *flags;
   ImapMsgFlag needed_flags;
   gboolean retval;
 
@@ -998,11 +998,12 @@ set_avail_headers(ImapMboxHandle *h, const char *seq, ImapFetchType ift)
 {
   const char *s = seq;
   char *tmp;
-  unsigned lo, hi; 
 
   if( !(ift & (IMFETCH_HEADER_MASK|IMFETCH_RFC822HEADERS|
                IMFETCH_RFC822HEADERS_SELECTED)) ) return;
   while(*s) {
+    unsigned lo, hi;
+
     lo = strtoul(s, &tmp, 10);
     switch(*tmp) {
     case '\0':
@@ -1304,7 +1305,7 @@ imap_mbox_handle_fetch_rfc822_uid(ImapMboxHandle* handle, unsigned uid,
   ImapFetchBodyInternalCb cb = handle->body_cb;
   void          *arg = handle->body_arg;
   ImapResponse rc;
-  char *cmdstr;
+  const char *cmdstr;
   struct FetchBodyHeaderText separate_arg;
 
 
@@ -1458,7 +1459,7 @@ static unsigned
 cf_flag(unsigned idx, struct msg_set *csd)
 {
   unsigned seqno = csd->seqno[idx];
-  ImapMessage *imsg = imap_mbox_handle_get_msg(csd->handle, seqno);
+  const ImapMessage *imsg = imap_mbox_handle_get_msg(csd->handle, seqno);
   if(imsg &&
      ( (csd->state  && (imsg->flags & csd->flag)) || 
        (!csd->state && !(imsg->flags & csd->flag))) )
@@ -1673,9 +1674,9 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
 
 
 ImapResponse
-imap_mbox_uid_search(ImapMboxHandle *handle, ImapSearchKey *key,
+imap_mbox_uid_search(const ImapMboxHandle *handle, const ImapSearchKey *key,
                      void (*cb)(unsigned uid, void *),
-                     void *cb_data)
+					 const void *cb_data)
 {
   /* FIXME: Implement me! */
   return IMR_BAD;
@@ -1841,7 +1842,7 @@ imap_mbox_sort_msgno_client(ImapMboxHandle *handle, ImapSortKey key,
   }
   seqno_to_fetch = g_new(unsigned, cnt);
   for(i=fetch_cnt=0; i<cnt; i++) {
-    ImapMessage *imsg = imap_mbox_handle_get_msg(handle, msgno[i]);
+    const ImapMessage *imsg = imap_mbox_handle_get_msg(handle, msgno[i]);
     if(!imsg || !imsg->envelope)
       seqno_to_fetch[fetch_cnt++] = msgno[i];
   }
@@ -2069,7 +2070,7 @@ imap_mbox_complete_msgids(ImapMboxHandle *h,
 			  GPtrArray *msgids,
 			  unsigned first_seqno_to_fetch)
 {
-  gchar *seq, *cmd;
+  gchar *seq;
   ImapResponse rc = IMR_OK;
   ImapFetchBodyInternalCb cb;
   void *arg;
@@ -2079,6 +2080,8 @@ imap_mbox_complete_msgids(ImapMboxHandle *h,
   seq = imap_coalesce_seq_range(first_seqno_to_fetch, msgids->len,
 				(ImapCoalesceFunc)need_msgid, msgids);
   if(seq) {
+    gchar *cmd;
+
     cmd = g_strdup_printf("FETCH %s BODY.PEEK[HEADER.FIELDS (message-id)]",
 			  seq);
     g_free(seq);

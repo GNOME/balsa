@@ -143,9 +143,9 @@ ImapResponse imap_mbox_unselect(ImapMboxHandle *h);
 ImapResponse imap_mbox_thread(ImapMboxHandle *h, const char *how,
                               ImapSearchKey *filter);
 
-ImapResponse imap_mbox_uid_search(ImapMboxHandle *handle, ImapSearchKey *key,
+ImapResponse imap_mbox_uid_search(const ImapMboxHandle *handle, const ImapSearchKey *key,
                                   void (*cb)(unsigned uid, void *),
-                                  void *cb_data);
+								  const void *cb_data);
 
 ImapResponse imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
                                   int ascending, unsigned int *msgno,

@@ -193,7 +193,7 @@ ImapResponse imap_assure_needed_flags(ImapMboxHandle *h,
                                       ImapMsgFlag needed_flags);
 
 void imap_handle_disconnect(ImapMboxHandle *h);
-ImapConnectionState imap_mbox_handle_get_state(ImapMboxHandle *h);
+ImapConnectionState imap_mbox_handle_get_state(const ImapMboxHandle *h);
 void imap_mbox_handle_set_state(ImapMboxHandle *h,
                                 ImapConnectionState newstate);
 void imap_mbox_handle_set_msg(ImapMboxHandle *handle, const gchar *fmt, ...)

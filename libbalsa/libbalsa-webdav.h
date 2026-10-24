@@ -311,7 +311,7 @@ gchar *libbalsa_webdav_xp_string_from_sub(xmlNodePtr         node,
  * @return the text content of the attribute node on success, @c NULL on error
  */
 static inline const gchar *
-libbalsa_webdav_peek_xml_attr(xmlNodePtr node)
+libbalsa_webdav_peek_xml_attr(const xmlNodePtr node)
 {
 	if ((node->type == XML_ATTRIBUTE_NODE) && (node->children != NULL) && (node->children->type == XML_TEXT_NODE)) {
 		return (const gchar *) node->children->content;

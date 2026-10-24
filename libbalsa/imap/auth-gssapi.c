@@ -39,7 +39,6 @@ imap_gss_auth_init(ImapMboxHandle* handle, NetClientGssCtx *gss_ctx, unsigned *c
 {
 	gint state;
 	gchar *output_token;
-	ImapResponse rc;
 	gboolean result;
 
 	state = net_client_gss_auth_step(gss_ctx, NULL, &output_token, error);
@@ -52,6 +51,8 @@ imap_gss_auth_init(ImapMboxHandle* handle, NetClientGssCtx *gss_ctx, unsigned *c
 		} else {
 			result = net_client_write_line(NET_CLIENT(handle->sio), "%s AUTHENTICATE GSSAPI", error, tag);
 			if (result) {
+				ImapResponse rc;
+
 				rc = imap_cmd_process_untagged(handle, *cmdno);
 
 				if (rc == IMR_RESPOND) {
@@ -73,12 +74,13 @@ imap_gss_auth_init(ImapMboxHandle* handle, NetClientGssCtx *gss_ctx, unsigned *c
 static gboolean
 imap_gss_auth_loop(ImapMboxHandle* handle, NetClientGssCtx *gss_ctx, unsigned cmdno, GError **error)
 {
-    int rc;
 	gchar *input_token;
 	gint state = 0;
 	gboolean result;
 
 	do {
+		ImapResponse rc;
+
 		rc = imap_cmd_process_untagged(handle, cmdno);
 		result = FALSE;
 		if (rc == IMR_RESPOND) {

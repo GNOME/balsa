@@ -491,7 +491,7 @@ imap_handle_idle_disable(ImapMboxHandle *h)
 }
 
 gboolean
-imap_handle_op_cancelled(ImapMboxHandle *h)
+imap_handle_op_cancelled(const ImapMboxHandle *h)
 {
   return h->op_cancelled;
 }
@@ -509,13 +509,13 @@ imap_handle_disconnect(ImapMboxHandle *h)
   h->state = IMHS_DISCONNECTED;
 }
 
-int imap_mbox_is_disconnected (ImapMboxHandle *h)
+int imap_mbox_is_disconnected (const ImapMboxHandle *h)
 { return IMAP_MBOX_IS_DISCONNECTED(h); }
-int imap_mbox_is_connected    (ImapMboxHandle *h)
+int imap_mbox_is_connected    (const ImapMboxHandle *h)
 { return IMAP_MBOX_IS_CONNECTED(h); }
-int imap_mbox_is_authenticated(ImapMboxHandle *h)
+int imap_mbox_is_authenticated(const ImapMboxHandle *h)
 { return IMAP_MBOX_IS_AUTHENTICATED(h); }
-int imap_mbox_is_selected     (ImapMboxHandle *h)
+int imap_mbox_is_selected     (const ImapMboxHandle *h)
 { return IMAP_MBOX_IS_SELECTED(h); }
 
 ImapResult
@@ -630,12 +630,12 @@ const char* imap_msg_flags[6] = {
   "seen", "answered", "flagged", "deleted", "draft", "recent"
 };
 
+#if 0
 struct ListData { 
   ImapListCb cb;
   void * cb_data;
 };
 
-#if 0
 static int
 imap_timeout_cb(void *arg)
 {
@@ -776,7 +776,7 @@ imap_cmd_get_tag(NetClientSioBuf *sio, char* tag, size_t len)
 
   
 ImapConnectionState
-imap_mbox_handle_get_state(ImapMboxHandle *h)
+imap_mbox_handle_get_state(const ImapMboxHandle *h)
 {
   return h->state; 
 }
@@ -797,12 +797,12 @@ imap_mbox_handle_get_exists(ImapMboxHandle* handle)
 }
 
 unsigned
-imap_mbox_handle_get_validity(ImapMboxHandle* handle)
+imap_mbox_handle_get_validity(const ImapMboxHandle* handle)
 {
   return handle->uidval;
 }
 unsigned
-imap_mbox_handle_get_uidnext(ImapMboxHandle* handle)
+imap_mbox_handle_get_uidnext(const ImapMboxHandle* handle)
 {
   return handle->uidnext;
 }
@@ -859,8 +859,8 @@ imap_mbox_handle_get_last_msg(ImapMboxHandle *handle)
 }
 
 void
-imap_mbox_handle_connect_notify(ImapMboxHandle* handle,
-                                ImapMboxNotifyCb cb, void *data)
+imap_mbox_handle_connect_notify(const ImapMboxHandle* handle,
+                                ImapMboxNotifyCb cb, const void *data)
 {
 }
 
@@ -1039,8 +1039,8 @@ get_quoted_string(const gchar *source, gchar const **endpos)
 static void
 append_quoted_string(GString *res, const gchar *source)
 {
-  const gchar *p;
   if(source) {
+    const gchar *p;
     g_string_append_c(res, '"');
     for(p=source; *p; p++) {
       if(*p == '\\' || *p == '"') g_string_append_c(res, '\\');
@@ -1341,7 +1341,7 @@ imap_sequence_length(ImapSequence *i_seq)
   unsigned length = 0;
   GList *l;
   for(l = i_seq->ranges; l; l = l->next) {
-    ImapUidRange *r = (ImapUidRange*)l->data;
+    const ImapUidRange *r = (ImapUidRange*)l->data;
     length += r->hi - r->lo +1;
   }
   return length;
@@ -1355,7 +1355,7 @@ imap_sequence_nth(ImapSequence *i_seq, unsigned nth)
   g_return_val_if_fail(i_seq->ranges, 0);
 
   for(l = i_seq->ranges; l; l = l->next) {
-    ImapUidRange *r = (ImapUidRange*)l->data;
+    const ImapUidRange *r = (ImapUidRange*)l->data;
     unsigned range_length = r->hi - r->lo +1;
     if( nth < range_length)
       return r->lo + nth;
@@ -1372,7 +1372,7 @@ imap_sequence_foreach(ImapSequence *i_seq,
   GList *l;
   for(l = i_seq->ranges; l; l = l->next) {
     unsigned uid;
-    ImapUidRange *iur = (ImapUidRange*)l->data;
+    const ImapUidRange *iur = (ImapUidRange*)l->data;
     for(uid=iur->lo; uid<=iur->hi; uid++)
       cb(uid, cb_arg);
   }
@@ -1742,7 +1742,7 @@ imap_message_deserialize(void *data)
 size_t
 imap_serialized_message_size(void *data)
 {
-  struct ImapMsgSerialized *imes = (struct ImapMsgSerialized*)data;
+  const struct ImapMsgSerialized *imes = (struct ImapMsgSerialized*)data;
   return imes->total_size;
 }
 
@@ -2141,7 +2141,7 @@ static ImapResponse
 imap_get_sequence(ImapMboxHandle *h, ImapUidRangeCb seq_cb, void *seq_arg)
 {
   char value[30];
-  gchar *p;
+  const gchar *p;
   int offset = 0;
   int c = ' ';
 
@@ -2834,7 +2834,6 @@ extract_acl(ImapMboxHandle *h, const char *eject, ImapAclType *acl, int *eol)
   static const char* rights = "lrswipkxtea";
   static const char* ignore = "cd\r";
   int c;
-  const char* p;
 
   if (!imap_mbox_handle_can_do(h, IMCAP_RIGHTS)) {
     /* workaround for RFC 2086- but not RFC 4314-compliant server */
@@ -2842,6 +2841,8 @@ extract_acl(ImapMboxHandle *h, const char *eject, ImapAclType *acl, int *eol)
   }
   *acl = IMAP_ACL_NONE;
   while ((c = sio_getc(h->sio)) != -1 && !strchr(eject, c)) {
+    const char* p;
+
     if ((p = strchr(rights, c))) {
       *acl |= 1 << (p - rights);
     } else if (!strchr(ignore, c)) {
@@ -2912,13 +2913,13 @@ ir_getacl(ImapMboxHandle *h)
   } else if (eol == '\n') {
     retval = IMR_OK;
   } else {
-    int c;
     GString *uid;
 
     retval = IMR_OK;
     do {
       ImapAclType acl_flags;
       ImapUserAclType *acl;
+      int c;
 
       uid = g_string_new("");
       while ((c = sio_getc(h->sio)) != -1 && c != '\n' && c != ' ')
@@ -4262,7 +4263,7 @@ ir_handle_response(ImapMboxHandle *h)
 }
 
 GNode*
-imap_mbox_handle_get_thread_root(ImapMboxHandle* handle)
+imap_mbox_handle_get_thread_root(const ImapMboxHandle* handle)
 {
   g_return_val_if_fail(handle, NULL);
   return handle->thread_root;
@@ -4415,25 +4416,25 @@ mbox_view_append_no(MboxView *mv, unsigned seqno)
 }
 
 gboolean
-mbox_view_is_active(MboxView *mv)
+mbox_view_is_active(const MboxView *mv)
 {
   return MBOX_VIEW_IS_ACTIVE(mv);
 }
 
 unsigned
-mbox_view_cnt(MboxView *mv)
+mbox_view_cnt(const MboxView *mv)
 {
   return mv->entries;
 }
 
 unsigned
-mbox_view_get_msg_no(MboxView *mv, unsigned msgno)
+mbox_view_get_msg_no(const MboxView *mv, unsigned msgno)
 {
   return mv->arr[msgno-1];
 }
 
 unsigned
-mbox_view_get_rev_no(MboxView *mv, unsigned seqno)
+mbox_view_get_rev_no(const MboxView *mv, unsigned seqno)
 {
   unsigned lo = 0, hi = mv->entries-1;
   if(mv->entries == 0) return 0;
@@ -4456,7 +4457,7 @@ mbox_view_get_rev_no(MboxView *mv, unsigned seqno)
 }
 
 const char*
-mbox_view_get_str(MboxView *mv)
+mbox_view_get_str(const MboxView *mv)
 {
   return mv->filter_str ? mv->filter_str : "";
 }

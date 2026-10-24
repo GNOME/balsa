@@ -110,7 +110,7 @@ static void
 lbmss_finalize(GObject *object)
 {
     LibBalsaMimeStreamShared *shared_stream = (LibBalsaMimeStreamShared *) object;
-    GMimeStreamFs *fs_stream                = (GMimeStreamFs *) object;
+    const GMimeStreamFs *fs_stream          = (GMimeStreamFs *) object;
 
     if (fs_stream->owner)
         g_free(shared_stream->lock);

@@ -215,7 +215,7 @@ GList *
 libbalsa_completion_complete(LibBalsaCompletion * cmp,
                              const gchar        * prefix)
 {
-    gsize plen, len;
+    gsize len;
     gboolean done = FALSE;
     GList *list;
 
@@ -224,6 +224,8 @@ libbalsa_completion_complete(LibBalsaCompletion * cmp,
 
     len = strlen(prefix);
     if (cmp->prefix && cmp->cache) {
+        gsize plen;
+
         plen = strlen(cmp->prefix);
         if (plen <= len && !cmp->strncmp_func(prefix, cmp->prefix, plen)) {
             /* use the cache */

@@ -48,7 +48,6 @@ static ImapAuthenticator imap_authenticators_arr[] = {
 ImapResult
 imap_authenticate(ImapMboxHandle* handle)
 {
-  ImapAuthenticator* authenticator;
   ImapResult r = IMAP_AUTH_UNAVAIL;
 
   g_return_val_if_fail(handle, IMAP_AUTH_UNAVAIL);
@@ -61,6 +60,8 @@ imap_authenticate(ImapMboxHandle* handle)
   } else if ((handle->auth_mode & NET_CLIENT_AUTH_NONE_ANON) != 0U) {
 	  r = imap_auth_anonymous(handle);
   } else {
+	  ImapAuthenticator* authenticator;
+
 	  for (authenticator = imap_authenticators_arr; (r != IMAP_SUCCESS) && *authenticator; authenticator++) {
 		  r = (*authenticator)(handle);
 	  }

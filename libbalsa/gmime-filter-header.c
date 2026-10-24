@@ -82,7 +82,7 @@ filter_filter(GMimeFilter *filter, char *inbuf, size_t inlen, size_t prespace,
 		memcpy(filter->outbuf, inbuf, inlen);
 		*outlen = inlen;
 	} else {
-		gchar *newline;
+		const gchar *newline;
 		gchar *outptr;
 
 		outptr = filter->outbuf;

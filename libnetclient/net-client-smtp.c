@@ -873,19 +873,19 @@ net_client_smtp_dsn_to_string(const NetClientSmtp *client, NetClientSmtpDsnMode 
 		start_len = dsn_buf->len;
 		/*lint -save -e655 -e9027 -e9029	accept logical AND for enum, MISRA C:2012 Rules 10.1, 10.4 */
 		if ((dsn_mode & NET_CLIENT_SMTP_DSN_DELAY) == NET_CLIENT_SMTP_DSN_DELAY) {
-			dsn_buf = g_string_append(dsn_buf, "DELAY");
+			(void) g_string_append(dsn_buf, "DELAY");
 		}
 		if ((dsn_mode & NET_CLIENT_SMTP_DSN_FAILURE) == NET_CLIENT_SMTP_DSN_FAILURE) {
 			if (start_len != dsn_buf->len) {
-				dsn_buf = g_string_append_c(dsn_buf, ',');
+				(void) g_string_append_c(dsn_buf, ',');
 			}
-			dsn_buf = g_string_append(dsn_buf, "FAILURE");
+			(void) g_string_append(dsn_buf, "FAILURE");
 		}
 		if ((dsn_mode & NET_CLIENT_SMTP_DSN_SUCCESS) == NET_CLIENT_SMTP_DSN_SUCCESS) {
 			if (start_len != dsn_buf->len) {
-				dsn_buf = g_string_append_c(dsn_buf, ',');
+				(void) g_string_append_c(dsn_buf, ',');
 			}
-			dsn_buf = g_string_append(dsn_buf, "SUCCESS");
+			(void) g_string_append(dsn_buf, "SUCCESS");
 		}
 		/*lint -restore */
 		result = g_string_free(dsn_buf, FALSE);

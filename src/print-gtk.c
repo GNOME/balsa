@@ -371,8 +371,8 @@ begin_print(GtkPrintOperation * operation, GtkPrintContext * context,
     date = libbalsa_message_date_to_utf8(pdata->message, balsa_app.date_string);
     if (date != NULL) {
     	if (footer_string != NULL) {
-    		footer_string = g_string_append(footer_string, " \342\200\224 ");
-    		footer_string = g_string_append(footer_string, date);
+    		g_string_append(footer_string, " \342\200\224 ");
+    		g_string_append(footer_string, date);
     	} else {
     		footer_string = g_string_new(date);
     	}

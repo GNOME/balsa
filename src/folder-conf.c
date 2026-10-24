@@ -992,16 +992,13 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
         readonly = libbalsa_mailbox_get_readonly(mailbox);
         if (!libbalsa_mailbox_imap_is_connected(LIBBALSA_MAILBOX_IMAP(mailbox))) {
             rights_str = g_string_new(std_acls[readonly ? 1 : 3]);
-            rights_str =
-                g_string_append(rights_str,
+            g_string_append(rights_str,
                                 _("\ndetailed permissions are available only for open folders"));
         } else {
             rights = libbalsa_imap_get_rights(LIBBALSA_MAILBOX_IMAP(mailbox));
             if (!rights) {
                 rights_str = g_string_new(std_acls[readonly ? 1 : 3]);
-                rights_str =
-                    g_string_append(rights_str,
-                                    _("\nthe server does not support ACLs"));
+                g_string_append(rights_str, _("\nthe server does not support ACLs"));
             } else {
                 gint n;
                 gchar **acls;
@@ -1012,7 +1009,7 @@ folder_conf_imap_sub_node(BalsaMailboxNode * mn)
                      n += 2);
                 rights_str = g_string_new(_("mine: "));
                 if (std_acls[n])
-                    rights_str = g_string_append(rights_str, std_acls[n + 1]);
+                    g_string_append(rights_str, std_acls[n + 1]);
                 else
                     g_string_append_printf(rights_str, "%s (%s)",
                                            std_acls[n + 1], rights);

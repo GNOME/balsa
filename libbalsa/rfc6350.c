@@ -423,9 +423,9 @@ rfc6350_fn_from_n(gchar **n_items)
 	for (n = 0; n < 5U; n++) {
 		if ((n_items[add_idx[n]] != NULL) && (n_items[add_idx[n]][0] != '\0')) {
 			if (fn->len > 0U) {
-				fn = g_string_append_c(fn, ' ');
+				g_string_append_c(fn, ' ');
 			}
-			fn = g_string_append(fn, n_items[add_idx[n]]);
+			g_string_append(fn, n_items[add_idx[n]]);
 		}
 	}
 

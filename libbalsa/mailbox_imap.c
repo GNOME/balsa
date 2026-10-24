@@ -385,7 +385,7 @@ imap_acl_to_str(ImapAclType acl)
     rights = g_string_new("");
     for (n = 0; n < strlen(flags); n++)
         if (acl & (1 << n))
-            rights = g_string_append_c(rights, flags[n]);
+            g_string_append_c(rights, flags[n]);
     return g_string_free(rights, FALSE);
 }
 

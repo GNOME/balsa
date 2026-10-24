@@ -1012,17 +1012,17 @@ net_client_pop_retr_msg(NetClientPop *client, const NetClientPopMessageInfo *inf
 				done = TRUE;
 			} else {
 				if (linebuf[0] == '.') {
-					msg_buf = g_string_append(msg_buf, &linebuf[1]);
+					(void) g_string_append(msg_buf, &linebuf[1]);
 				} else {
-					msg_buf = g_string_append(msg_buf, linebuf);
+					(void) g_string_append(msg_buf, linebuf);
 				}
-				msg_buf = g_string_append_c(msg_buf, '\n');
+				(void) g_string_append_c(msg_buf, '\n');
 				lines++;
 
 				/* pass an almost full buffer to the callback */
 				if (msg_buf->len > (POP_DATA_BUF_SIZE - 100U)) {
 					result = callback(msg_buf->str, (gssize) msg_buf->len, lines, info, user_data, error);
-					msg_buf = g_string_truncate(msg_buf, 0U);
+					(void) g_string_truncate(msg_buf, 0U);
 					lines = 0U;
 				}
 			}

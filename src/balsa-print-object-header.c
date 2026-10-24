@@ -220,7 +220,7 @@ balsa_print_object_header_new_real(GList * list,
     }
 
     /* strip the trailing '\n' */
-    header_buf = g_string_truncate(header_buf, header_buf->len - 1);
+    g_string_truncate(header_buf, header_buf->len - 1);
 
     /* check if we have a face pixbuf */
     rect.c_width = psetup->c_width - 2 * psetup->curr_depth * C_LABEL_SEP;

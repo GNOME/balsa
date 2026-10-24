@@ -224,7 +224,7 @@ libbalsa_vcal_attendee_to_str(LibBalsaAddress *person)
     }
 
     str = libbalsa_address_to_gchar(person, -1);
-    retval = g_string_append(retval, str);
+    g_string_append(retval, str);
     g_free(str);
 
     if (info->part_stat != ICAL_PARTSTAT_NONE) {

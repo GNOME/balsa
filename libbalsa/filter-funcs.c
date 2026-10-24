@@ -396,7 +396,7 @@ append_header_names(LibBalsaCondition *cond, GString *res)
                 g_string_append_printf(res, ",%s",
                                        _(header_name_map[i].header_name));
             } else {
-                res = g_string_append(res, _(header_name_map[i].header_name));
+                g_string_append(res, _(header_name_map[i].header_name));
             }
         }
     }
@@ -419,7 +419,7 @@ append_flag_names(LibBalsaCondition *cond, GString *res)
     for (i=0; i<G_N_ELEMENTS(flag_name_map); ++i) {
         if (cond->match.flags & flag_name_map[i].flag) {
             if (res->len == len) {
-                res = g_string_append(res, _(flag_name_map[i].flag_name));
+                g_string_append(res, _(flag_name_map[i].flag_name));
             } else {
                 g_string_printf(res, ",%s",
                                 _(flag_name_map[i].flag_name));

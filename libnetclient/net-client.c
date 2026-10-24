@@ -344,7 +344,7 @@ net_client_vwrite_line(NetClient *client, const gchar *format, va_list args, GEr
 		g_set_error(error, NET_CLIENT_ERROR_QUARK, (gint) NET_CLIENT_ERROR_LINE_TOO_LONG, _("line too long"));
 		result = FALSE;
 	} else {
-		buffer = g_string_append(buffer, "\r\n");
+		(void) g_string_append(buffer, "\r\n");
 		result = net_client_write_buffer(client, buffer->str, buffer->len, error);
 	}
 	(void) g_string_free(buffer, TRUE);

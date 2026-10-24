@@ -126,7 +126,7 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
 		if (ptr)
 		    *ptr = '\0';
                 if (reply_prefix_str)
-		reply = g_string_append(reply, reply_prefix_str);
+		g_string_append(reply, reply_prefix_str);
                 if (flow) {
                     gchar *p;
                     /* we're making a `format=flowed' message, but the
@@ -137,8 +137,8 @@ process_mime_part(LibBalsaMessage * message, LibBalsaMessageBody * body,
                     while (*--p == ' ');
                     *++p = '\0';
                 }
-		reply = g_string_append(reply, str);
-		reply = g_string_append_c(reply, '\n');
+		g_string_append(reply, str);
+		g_string_append_c(reply, '\n');
 		str = ptr;
 	    } while (str++);
 	} else
@@ -190,7 +190,7 @@ content2reply(LibBalsaMessageBody * root, gchar * reply_prefix_str,
 	if (!res)
 	    continue;
 	if (reply) {
-	    reply = g_string_append(reply, res->str);
+	    g_string_append(reply, res->str);
 	    g_string_free(res, TRUE);
 	} else
 	    reply = res;
@@ -1030,14 +1030,14 @@ libbalsa_html_encode_hyperlinks(GString * paragraph)
         /* add the url to the result */
         if (start_pos > 0) {
             markup = g_markup_escape_text(p, start_pos);
-            retval = g_string_append(retval, markup);
+            g_string_append(retval, markup);
             g_free(markup);
         }
-        retval = g_string_append(retval, "<a href=\"");
-        retval = g_string_append_len(retval, p + start_pos, end_pos - start_pos);
-        retval = g_string_append(retval, "\">");
-        retval = g_string_append_len(retval, p + start_pos, end_pos - start_pos);
-        retval = g_string_append(retval, "</a>");
+        g_string_append(retval, "<a href=\"");
+        g_string_append_len(retval, p + start_pos, end_pos - start_pos);
+        g_string_append(retval, "\">");
+        g_string_append_len(retval, p + start_pos, end_pos - start_pos);
+        g_string_append(retval, "</a>");
 
         /* find next (if any) */
         p += end_pos;
@@ -1052,7 +1052,7 @@ libbalsa_html_encode_hyperlinks(GString * paragraph)
     /* copy remainder */
     if (*p != '\0') {
         markup = g_markup_escape_text(p, -1);
-        retval = g_string_append(retval, markup);
+        g_string_append(retval, markup);
         g_free(markup);
     }
 
@@ -1150,7 +1150,7 @@ libbalsa_text_to_html(const gchar * title, const gchar * body, const gchar * lan
     }
 
     /* close the html context */
-    html_body = g_string_append(html_body, "</body>\n</html>\n");
+    g_string_append(html_body, "</body>\n</html>\n");
 
     /* return the utf-8 encoded text/html */
     return g_string_free(html_body, FALSE);

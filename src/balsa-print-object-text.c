@@ -202,8 +202,8 @@ balsa_print_object_text_plain(GList *list, GtkPrintContext * context,
     				level_buf = g_string_new(thispar);
     				curr_level = cite_level;
     			} else {
-    				level_buf = g_string_append_c(level_buf, '\n');
-    				level_buf = g_string_append(level_buf, thispar);
+    				g_string_append_c(level_buf, '\n');
+    				g_string_append(level_buf, thispar);
     			}
 
     			par_start = eol ? eol + 1 : par_start + par_len;

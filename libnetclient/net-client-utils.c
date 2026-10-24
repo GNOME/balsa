@@ -362,15 +362,15 @@ gss_error_string(OM_uint32 err_maj, OM_uint32 err_min)
     	maj_stat = gss_display_status(&min_stat, err_maj, GSS_C_GSS_CODE, GSS_C_NO_OID, &msg_ctx, &status_string);
     	if (GSS_ERROR(maj_stat) == 0U) {
     		if (message->len > 0U) {
-    			message = g_string_append(message, "; ");
+    			(void) g_string_append(message, "; ");
     		}
-    		message = g_string_append(message, (const gchar *) status_string.value);	/*lint !e9079 (MISRA C:2012 Rule 11.5) */
+    		(void) g_string_append(message, (const gchar *) status_string.value);	/*lint !e9079 (MISRA C:2012 Rule 11.5) */
     		(void) gss_release_buffer(&min_stat, &status_string);
 
     		maj_stat = gss_display_status(&min_stat, err_min, GSS_C_MECH_CODE, GSS_C_NULL_OID, &msg_ctx, &status_string);
     		if (GSS_ERROR(maj_stat) == 0U) {
-    			message = g_string_append(message, ": ");
-    			message = g_string_append(message, (const gchar *) status_string.value);   /*lint !e9079 (MISRA C:2012 Rule 11.5) */
+    			(void) g_string_append(message, ": ");
+    			(void) g_string_append(message, (const gchar *) status_string.value);   /*lint !e9079 (MISRA C:2012 Rule 11.5) */
     			(void) gss_release_buffer(&min_stat, &status_string);
     		}
     	}

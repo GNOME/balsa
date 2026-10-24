@@ -2923,7 +2923,7 @@ ir_getacl(ImapMboxHandle *h)
 
       uid = g_string_new("");
       while ((c = sio_getc(h->sio)) != -1 && c != '\n' && c != ' ')
-        uid = g_string_append_c(uid, c);
+        g_string_append_c(uid, c);
       if (c != ' ') {
         g_string_free(uid, TRUE);
         EAT_LINE(h, c);

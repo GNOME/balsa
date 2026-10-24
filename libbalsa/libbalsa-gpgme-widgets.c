@@ -449,7 +449,7 @@ create_status_str(gboolean revoked,
 
 	status = g_string_new(NULL);
 	if (revoked) {
-		status = g_string_append(status, _("revoked"));
+		g_string_append(status, _("revoked"));
 	}
 	if (expired) {
 		g_string_append_printf(status, "%s%s", (status->len > 0U) ? ", " : "", _("expired"));
@@ -775,7 +775,7 @@ create_purpose_str(gboolean can_sign,
 	purpose = g_string_new(NULL);
 
 	if (can_sign) {
-		purpose = g_string_append(purpose, _("sign"));
+		g_string_append(purpose, _("sign"));
 	}
 	if (can_encrypt) {
 		g_string_append_printf(purpose, "%s%s", (purpose->len > 0U) ? ", " : "", _("encrypt"));

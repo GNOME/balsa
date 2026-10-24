@@ -449,9 +449,6 @@ configure_file(input         : file + '.in',
                install_dir   : join_paths(get_option('datadir'),
                                           'man/man1'))
 
-file = 'balsa.spec'
-configure_file(input : file + '.in', output : file, configuration : conf)
-
 # config.h
 configure_file(output : 'config.h', configuration : conf)
 add_project_arguments('-DHAVE_CONFIG_H=1', language : 'c')

@@ -1091,19 +1091,6 @@ libbalsa_address_new_from_edit_entries(GtkWidget ** entries)
 }
 
 /*
- * Comparison func
- */
-
-gint
-libbalsa_address_compare(LibBalsaAddress *a, LibBalsaAddress *b)
-{
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(a), -1);
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS(b), +1);
-
-    return g_ascii_strcasecmp(a->full_name, b->full_name);
-}
-
-/*
  * Getters
  */
 

@@ -148,19 +148,6 @@ gboolean net_client_pop_set_auth_mode(NetClientPop *client, NetClientAuthMode au
 gboolean net_client_pop_connect(NetClientPop *client, gchar **greeting, GError **error);
 
 
-/** @brief Get the status of a POP3 mailbox
- *
- * @param client POP network client object
- * @param msg_count filled with the number of messages available in the mailbox, may be NULL to ignore the value
- * @param mbox_size filled with the total mailbox size in bytes, may be NULL to ignore the value
- * @param error filled with error information if the connection fails
- * @return TRUE on success or FALSE if the command failed
- *
- * Run the POP3 STAT command to retrieve the mailbox status.
- */
-gboolean net_client_pop_stat(NetClientPop *client, gsize *msg_count, gsize *mbox_size, GError **error);
-
-
 /** @brief List the messages in the POP3 mailbox
  *
  * @param client POP network client object

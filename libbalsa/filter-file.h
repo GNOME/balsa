@@ -33,20 +33,8 @@
 #define MAILBOX_FILTERS_KEY "MailboxFilters"
 #define MAILBOX_FILTERS_WHEN_KEY "MailboxFilters-When"
 
-/* Load conditions list using filter_section_name as prefix to find sections */
-
-void libbalsa_conditions_new_from_config(gchar* prefix,
-                                         gchar * filter_section_name,
-                                         LibBalsaFilter* fil);
-
 /* Save conditions list using filter_section_name as prefix to create
  * sections. */
-
-void libbalsa_clean_condition_sections(const gchar * prefix,
-				       const gchar * filter_section_name);
-
-void libbalsa_conditions_save_config(GSList * conds,const gchar * prefix,
-                                     const gchar * filter_section_name);
 
 void libbalsa_filter_save_config(LibBalsaFilter * f);
 

@@ -239,29 +239,6 @@ imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
   return rc;
 }
 
-/* 6.3.2 EXAMINE Command */
-ImapResponse
-imap_mbox_examine(ImapMboxHandle* handle, const char* mbox)
-{
-	g_mutex_lock(&handle->mutex);
-  IMAP_REQUIRED_STATE3(handle, IMHS_CONNECTED, IMHS_AUTHENTICATED,
-                       IMHS_SELECTED, IMR_BAD);
-  {
-  gchar *mbx7 = imap_utf8_to_mailbox(mbox);
-  gchar* cmd = g_strdup_printf("EXAMINE \"%s\"", mbx7);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);
-  g_free(mbx7); g_free(cmd);
-  if(rc == IMR_OK) {
-    g_free(handle->mbox);
-    handle->mbox = g_strdup(mbox);
-    handle->state = IMHS_SELECTED;
-    handle->has_rights = 0;
-  } 
-  g_mutex_unlock(&handle->mutex);
-  return rc;
-  }
-}
-
 
 /* 6.3.3 CREATE Command */
 ImapResponse
@@ -676,21 +653,6 @@ imap_mbox_append_str(ImapMboxHandle *handle, const char *mbox,
 }
 #endif
 
-static size_t
-pass_stream(char* buf, size_t sz, void*arg)
-{
-  return g_mime_stream_read((GMimeStream *) arg, buf, sz);
-}
-
-ImapResponse
-imap_mbox_append_stream(ImapMboxHandle *handle, const char *mbox,
-			ImapMsgFlags flags, GMimeStream *stream, ssize_t len)
-{
-  if (len < 0)
-    len = g_mime_stream_length(stream);
-  return imap_mbox_append(handle, mbox, flags, len, pass_stream, stream);
-}
-
 
 /* 6.4 Client Commands - Selected State */
 
@@ -746,79 +708,6 @@ imap_mbox_handle_first_unseen(const ImapMboxHandle* handle)
 {
   /* might have to do search here. */
   return handle->unseen;
-}
-
-struct find_all_data {
-  unsigned *seqno;
-  unsigned msgcnt, allocated;
-};
-
-static void
-find_all_cb(ImapMboxHandle* handle, unsigned seqno, void*arg)
-{
-  struct find_all_data *ms = arg;
-  if(ms->msgcnt==ms->allocated) {
-    ms->allocated = ms->allocated > 0 ? ms->allocated*2 : 16;
-    ms->seqno = g_realloc(ms->seqno, ms->allocated*sizeof(unsigned));
-    /* FIXME: error handling */
-  }
-  ms->seqno[ms->msgcnt++] = seqno;
-}
-
-static ImapResponse
-imap_mbox_find_helper(ImapMboxHandle * h,
-		      const char     * cmd,
-		      unsigned       * msgcnt,
-		      unsigned      ** msgs)
-{
-  ImapResponse rc;
-  void *arg;
-  ImapSearchCb cb;
-  struct find_all_data fad;
-
-  fad.allocated = fad.msgcnt = 0;  fad.seqno = NULL;
-  cb  = h->search_cb;  h->search_cb  = (ImapSearchCb)find_all_cb;
-  arg = h->search_arg; h->search_arg = &fad;
-  rc = imap_cmd_exec(h, cmd);
-  h->search_cb = cb; h->search_arg = arg;
-  *msgcnt = fad.msgcnt; *msgs = fad.seqno;
-  return rc;
-}
-
-ImapResponse
-imap_mbox_find_all(ImapMboxHandle * h,
-		   const char     * search_str,
-		   unsigned       * msgcnt,
-		   unsigned      ** msgs)
-{
-  const char *filter_str;
-  gchar *cmd;
-  ImapResponse rc;
-
-  g_mutex_lock(&h->mutex);
-  IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
-  filter_str = mbox_view_get_str(&h->mbox_view);
-  cmd = g_strdup_printf("SEARCH ALL (SUBJECT \"%s\"%s%s)", search_str,
-			*filter_str ? " " : "", filter_str);
-  rc = imap_mbox_find_helper(h, cmd, msgcnt, msgs);
-  g_free(cmd);
-
-  g_mutex_unlock(&h->mutex);
-  return rc;
-}
-
-ImapResponse
-imap_mbox_find_unseen(ImapMboxHandle * h,
-		      unsigned       * msgcnt,
-		      unsigned      ** msgs)
-{
-    ImapResponse rc;
-
-    g_mutex_lock(&h->mutex);
-    IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
-    rc = imap_mbox_find_helper(h, "SEARCH UNSEEN UNDELETED", msgcnt, msgs);
-    g_mutex_unlock(&h->mutex);
-    return rc;
 }
 
 /* imap_mbox_handle_msgno_has_flags() this is optimized under
@@ -1527,27 +1416,6 @@ imap_mbox_store_flag(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
   return res;
 }
 
-ImapResponse
-imap_mbox_store_flag_a(ImapMboxHandle *h, unsigned msgcnt, unsigned*seqno,
-		       ImapMsgFlag flg, gboolean state)
-{
-  gchar* cmd;
-  ImapResponse rc;
-
-  g_mutex_lock(&h->mutex);
-  IMAP_REQUIRED_STATE1(h, IMHS_SELECTED, IMR_BAD);
-  cmd = imap_store_prepare(h, msgcnt, seqno, flg, state);
-  if(cmd) {
-    unsigned res = imap_cmd_issue(h, cmd);
-    g_free(cmd);
-    rc = res != 0 ? IMR_OK : IMR_NO;
-  } else /* no action to be done, perhaps message has the flag set already? */
-    rc = IMR_OK;
-  
-  g_mutex_unlock(&h->mutex);
-  return rc;
-}
-
 
 /* 6.4.7 COPY Command */
 /** imap_mbox_handle_copy() copies given set of seqno from the mailbox
@@ -1597,20 +1465,6 @@ imap_mbox_handle_copy(ImapMboxHandle* handle, unsigned cnt, unsigned *seqno,
 
 
 /* 6.5 Client Commands - Experimental/Expansion */
-/* 6.5.1 X<atom> Command */
-ImapResponse
-imap_mbox_scan(ImapMboxHandle *handle, const char*what, const char*str)
-{
-  IMAP_REQUIRED_STATE2(handle,IMHS_AUTHENTICATED, IMHS_SELECTED, IMR_BAD);
-  if(!imap_mbox_handle_can_do(handle, IMCAP_SCAN)) return IMR_NO;
-  {
-  gchar * cmd = g_strdup_printf("SCAN \"%s\" \"*\" \"%s\"",what, str);
-  ImapResponse rc = imap_cmd_exec(handle, cmd);  
-  g_free(cmd);
-  return rc;
-  }
-}
-
 /* imap_mbox_unselect()'s main purpose is to stop the notification
    signals from being triggered. On the other hand, all the precached
    data is lost on UNSELECT so the gain from using UNSELECT can be
@@ -1670,16 +1524,6 @@ imap_mbox_thread(ImapMboxHandle *h, const char *how, ImapSearchKey *filter)
   g_mutex_unlock(&h->mutex);
 
   return rc;
-}
-
-
-ImapResponse
-imap_mbox_uid_search(const ImapMboxHandle *handle, const ImapSearchKey *key,
-                     void (*cb)(unsigned uid, void *),
-					 const void *cb_data)
-{
-  /* FIXME: Implement me! */
-  return IMR_BAD;
 }
 
 static const char*

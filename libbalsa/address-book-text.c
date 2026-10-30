@@ -763,39 +763,6 @@ libbalsa_address_book_text_get_path(LibBalsaAddressBookText * ab_text)
     return priv->path;
 }
 
-GSList *
-libbalsa_address_book_text_get_item_list(LibBalsaAddressBookText * ab_text)
-{
-    LibBalsaAddressBookTextPrivate *priv =
-        libbalsa_address_book_text_get_instance_private(ab_text);
-
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_TEXT(ab_text), NULL);
-
-    return priv->item_list;
-}
-
-time_t
-libbalsa_address_book_text_get_mtime(LibBalsaAddressBookText * ab_text)
-{
-    LibBalsaAddressBookTextPrivate *priv =
-        libbalsa_address_book_text_get_instance_private(ab_text);
-
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_TEXT(ab_text), 0);
-
-    return priv->mtime;
-}
-
-LibBalsaCompletion *
-libbalsa_address_book_text_get_name_complete(LibBalsaAddressBookText * ab_text)
-{
-    LibBalsaAddressBookTextPrivate *priv =
-        libbalsa_address_book_text_get_instance_private(ab_text);
-
-    g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_TEXT(ab_text), NULL);
-
-    return priv->name_complete;
-}
-
 /*
  * Setters
  */
@@ -811,43 +778,4 @@ libbalsa_address_book_text_set_path(LibBalsaAddressBookText * ab_text,
 
     g_free(priv->path);
     priv->path = g_strdup(path);
-}
-
-void
-libbalsa_address_book_text_set_item_list(LibBalsaAddressBookText * ab_text,
-                                         GSList                  * item_list)
-{
-    LibBalsaAddressBookTextPrivate *priv =
-        libbalsa_address_book_text_get_instance_private(ab_text);
-    LibBalsaAddressBookTextClass *ab_text_class;
-
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_TEXT(ab_text));
-
-    ab_text_class = LIBBALSA_ADDRESS_BOOK_TEXT_GET_CLASS(ab_text);
-    g_slist_free_full(priv->item_list, ab_text_class->text_item_free_func);
-    priv->item_list = item_list;
-}
-
-void
-libbalsa_address_book_text_set_mtime(LibBalsaAddressBookText * ab_text,
-                                     time_t                    mtime)
-{
-    LibBalsaAddressBookTextPrivate *priv =
-        libbalsa_address_book_text_get_instance_private(ab_text);
-
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_TEXT(ab_text));
-
-    priv->mtime = mtime;
-}
-
-void
-libbalsa_address_book_text_set_name_complete(LibBalsaAddressBookText * ab_text,
-                                             LibBalsaCompletion      * name_complete)
-{
-    LibBalsaAddressBookTextPrivate *priv =
-        libbalsa_address_book_text_get_instance_private(ab_text);
-
-    g_return_if_fail(LIBBALSA_IS_ADDRESS_BOOK_TEXT(ab_text));
-
-    priv->name_complete = name_complete;
 }

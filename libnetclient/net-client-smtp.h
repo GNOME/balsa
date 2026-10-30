@@ -139,17 +139,6 @@ gboolean net_client_smtp_set_auth_mode(NetClientSmtp *client, NetClientAuthMode 
 gboolean net_client_smtp_connect(NetClientSmtp *client, gchar **greeting, GError **error);
 
 
-/** @brief Check if the SMTP network client supports Delivery Status Notifications
- *
- * @param client connected SMTP network client object
- * @return TRUE is DSN's are supported, FALSE if not
- *
- * Return if the connected SMTP server announced support for Delivery Status Notifications (DSNs) according to
- * <a href="https://tools.ietf.org/html/rfc3461">RFC 3461</a>.
- */
-gboolean net_client_smtp_can_dsn(NetClientSmtp *client);
-
-
 /** @brief Send a message to a SMTP network client
  *
  * @param client connected SMTP network client object

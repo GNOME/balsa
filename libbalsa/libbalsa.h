@@ -118,7 +118,6 @@ void libbalsa_show_message_source(GtkApplication * application,
                                   const gchar * font,
                                   gboolean *escape_specials);
 
-gchar *libbalsa_guess_email_address(void);
 gchar *libbalsa_guess_mail_spool(void);
 gboolean libbalsa_is_sending_mail(void);
 

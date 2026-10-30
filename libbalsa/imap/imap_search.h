@@ -38,13 +38,10 @@ ImapSearchKey *imap_search_key_new_string(unsigned negated,
                                           ImapSearchHeader hdr,
                                           const char *string, 
                                           const char *user_header);
-ImapSearchKey* imap_search_key_new_size_greater(unsigned negated, size_t sz);
 ImapSearchKey* imap_search_key_new_date(ImapSearchDateRange range,
                                         int internal, time_t tm);
 ImapSearchKey* imap_search_key_new_range(unsigned negated, int uid,
                                          unsigned lo, unsigned hi);
-ImapSearchKey* imap_search_key_new_set(unsigned negated, int uid,
-				       int cnt, unsigned *seqnos);
 
 void imap_search_key_free(ImapSearchKey *s);
 void imap_search_key_set_next(ImapSearchKey *list, ImapSearchKey *next);

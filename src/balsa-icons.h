@@ -77,8 +77,6 @@
 #define BALSA_PIXMAP_SIGN_BAD                   "balsa_sign_bad"
 #define BALSA_PIXMAP_ENCR                       "balsa_encr"
 
-#define BALSA_PIXMAP_BOOK_RED                   "balsa_book_red"
-
 void balsa_register_pixmaps(void);
 void balsa_unregister_pixmaps(void);
 void balsa_register_icon_names(void);

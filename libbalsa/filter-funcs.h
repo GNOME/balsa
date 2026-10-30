@@ -67,8 +67,6 @@
 
 LibBalsaCondition* libbalsa_condition_new(void);
 
-void libbalsa_conditions_free(GSList * conditions);
-
 LibBalsaConditionRegex* libbalsa_condition_regex_new(void);
 void libbalsa_condition_regex_free(LibBalsaConditionRegex *, gpointer);
 void regexs_free(GSList *);
@@ -83,11 +81,8 @@ gboolean libbalsa_condition_compare(LibBalsaCondition *c1,
 LibBalsaFilter *libbalsa_filter_new(void);
 void libbalsa_filter_free(LibBalsaFilter *, gpointer free_condition);
 void libbalsa_filter_clear_filters(GSList *,gint free_conditions);
-void libbalsa_filter_append_condition(LibBalsaFilter*, LibBalsaCondition *);
 void libbalsa_filter_prepend_condition(LibBalsaFilter*, LibBalsaCondition*,
                                        ConditionMatchType op);
-void libbalsa_filter_delete_regex(LibBalsaFilter*,LibBalsaCondition*,
-                                  LibBalsaConditionRegex *, gpointer);
 gboolean libbalsa_filter_compile_regexs(LibBalsaFilter *);
 
 gboolean libbalsa_filter_export_sieve(LibBalsaFilter* fil, gchar* filename);

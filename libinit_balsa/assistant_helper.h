@@ -32,15 +32,12 @@ struct EntryData_s {
     EntryController *controller;
 };
 
-#define ENTRY_DATA_INIT { NULL, 0 }
-
 struct EntryController_s {
     guint32 setbits;
     guint32 numentries;
     guint32 donemask;
 };
 
-#define ENTRY_CONTROLLER_INIT { 0, 0, 0 }
 #define ENTRY_CONTROLLER_DONE( e ) ( ((e)->setbits & (e)->donemask) == (e)->donemask )
 
 GtkWidget *balsa_init_add_grid_entry(GtkGrid * grid, gint num,

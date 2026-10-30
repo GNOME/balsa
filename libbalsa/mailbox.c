@@ -1919,15 +1919,6 @@ libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
     return retval;
 }
 
-gboolean
-libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox)
-{
-    g_return_val_if_fail(mailbox != NULL, FALSE);
-    g_return_val_if_fail(LIBBALSA_IS_MAILBOX(mailbox), FALSE);
-
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->close_backend(mailbox);
-}
-
 guint
 libbalsa_mailbox_total_messages(LibBalsaMailbox * mailbox)
 {
@@ -2319,13 +2310,6 @@ libbalsa_mailbox_real_can_do(LibBalsaMailbox* mailbox,
     return TRUE;
 }
 
-gboolean
-libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
-                        enum LibBalsaMailboxCapability cap)
-{
-    return LIBBALSA_MAILBOX_GET_CLASS(mailbox)->can_do(mailbox, cap);
-}
-
 
 static void lbm_sort(LibBalsaMailbox * mailbox, GNode * parent);
 
@@ -2492,22 +2476,6 @@ libbalsa_mailbox_set_subject_gather(LibBalsaMailbox * mailbox,
     if (view->subject_gather != subject_gather) {
 	view->subject_gather = subject_gather;
 	if (mailbox != NULL)
-	    view->in_sync = 0;
-    }
-}
-
-void
-libbalsa_mailbox_set_sort_type(LibBalsaMailbox * mailbox,
-			    LibBalsaMailboxSortType sort_type)
-{
-    LibBalsaMailboxView *view;
-
-    g_return_if_fail(mailbox == NULL || LIBBALSA_IS_MAILBOX(mailbox));
-    view = lbm_get_view(mailbox);
-
-    if (view->sort_type != sort_type) {
-	view->sort_type = sort_type;
-	if (mailbox)
 	    view->in_sync = 0;
     }
 }

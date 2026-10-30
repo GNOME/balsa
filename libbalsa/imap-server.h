@@ -50,8 +50,6 @@ void libbalsa_imap_server_enable_persistent_cache(LibBalsaImapServer *server,
 gboolean libbalsa_imap_server_has_persistent_cache(LibBalsaImapServer *srv);
 void libbalsa_imap_server_force_disconnect(LibBalsaImapServer *server);
 void libbalsa_imap_server_close_all_connections(void);
-gboolean libbalsa_imap_server_has_free_handles(LibBalsaImapServer *server);
-gboolean libbalsa_imap_server_is_offline(LibBalsaImapServer *server);
 void libbalsa_imap_server_set_offline_mode(LibBalsaImapServer *server,
                                            gboolean offline);
 

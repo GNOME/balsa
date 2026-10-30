@@ -115,17 +115,6 @@ imap_search_key_new_string(unsigned negated, ImapSearchHeader hdr,
   return s;
 }
 
-ImapSearchKey*
-imap_search_key_new_size_greater(unsigned negated, size_t sz)
-{
-  ImapSearchKey *s = g_new(ImapSearchKey,1);
-  s->next = NULL;
-  s->type = IMSE_SIZE;
-  s->negated = negated;
-  s->d.size = sz;
-  return s;
-}
-
 /* imap_search_key_new_date() creates new term that matches earlier or
    later dates. It can match both internal date as well as sent
    date. */
@@ -157,23 +146,6 @@ imap_search_key_new_range(unsigned negated, int uid,
     s->d.seq.string = lo<hi 
       ? g_strdup_printf("%u:%u", lo, hi)
       : g_strdup_printf("%u", lo);
-    return s;
-  } else { /* always false */
-    return NULL;
-  }
-}
-
-ImapSearchKey*
-imap_search_key_new_set(unsigned negated, int uid, int cnt, unsigned *seqnos)
-
-{
-  if(cnt>0) {
-    ImapSearchKey *s = g_new(ImapSearchKey,1);
-    s->next = NULL;
-    s->type = IMSE_SEQUENCE;
-    s->negated = negated;
-    s->d.seq.uid = uid;
-    s->d.seq.string = imap_coalesce_set(cnt, seqnos);
     return s;
   } else { /* always false */
     return NULL;

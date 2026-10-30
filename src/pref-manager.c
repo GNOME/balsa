@@ -75,9 +75,7 @@ typedef struct _PropertyUI {
     GtkWidget *smtp_servers;
     GtkWidget *smtp_server_edit_button;
     GtkWidget *smtp_server_del_button;
-    GtkWidget *smtp_certificate_passphrase;
     GtkWidget *mail_directory;
-    GtkWidget *encoding_menu;
     GtkWidget *check_mail_auto;
     GtkWidget *check_mail_minutes;
     GtkWidget *quiet_background_check;
@@ -109,7 +107,6 @@ typedef struct _PropertyUI {
     GtkWidget *ask_before_select;
     GtkWidget *pgdownmod;
     GtkWidget *pgdown_percent;
-    GtkWidget *view_allheaders;
     GtkWidget *empty_trash;
     GtkWidget *recv_progress_dlg;
     GtkWidget *send_progress_dlg;

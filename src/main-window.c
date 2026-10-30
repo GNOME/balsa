@@ -2393,11 +2393,6 @@ balsa_window_new(GtkApplication *application)
     gtk_container_add(GTK_CONTAINER(hbox), priv->statusbar);
     gtk_widget_show_all(hbox);
 
-#if 0
-    gnome_app_install_appbar_menu_hints(GNOME_APPBAR(balsa_app.appbar),
-                                        main_menu);
-#endif
-
     geometry_manager_attach(GTK_WINDOW(window), "MainWindow");
 
     priv->notebook = gtk_notebook_new();

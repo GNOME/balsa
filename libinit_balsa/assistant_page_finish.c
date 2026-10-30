@@ -27,14 +27,6 @@
 #include <glib/gi18n.h>
 #include "save-restore.h"
 
-#if 0
-/* here are local prototypes */
-static void balsa_druid_page_finish_prepare(GtkWidget * page,
-                                            GtkAssistant * druid);
-static void balsa_druid_page_finish_finish(GtkWidget * page,
-                                           GtkAssistant * druid);
-#endif
-
 void
 balsa_druid_page_finish(GtkAssistant * druid)
 {
@@ -47,13 +39,3 @@ balsa_druid_page_finish(GtkAssistant * druid)
     gtk_assistant_set_page_title(druid, page, _("All Done!"));
     gtk_assistant_set_page_type(druid, page, GTK_ASSISTANT_PAGE_SUMMARY);
 }
-
-#if 0
-static void
-balsa_druid_page_finish_prepare(GnomeDruidPage * page, GnomeDruid * druid)
-{
-    gnome_druid_set_buttons_sensitive(druid, TRUE, FALSE, TRUE, FALSE);
-    gnome_druid_set_show_finish(druid, TRUE);
-}
-
-#endif

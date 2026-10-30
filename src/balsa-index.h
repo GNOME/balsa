@@ -94,7 +94,6 @@ G_DECLARE_FINAL_TYPE(BalsaIndex, balsa_index, BALSA, INDEX, GtkTreeView)
 
     void balsa_message_forward_attached(gpointer data);
     void balsa_message_forward_inline(gpointer data);
-    void balsa_message_forward_quoted(gpointer data);
     void balsa_message_continue(gpointer data);
 
     void balsa_message_move_to_trash(gpointer user_data);
@@ -102,15 +101,11 @@ G_DECLARE_FINAL_TYPE(BalsaIndex, balsa_index, BALSA, INDEX, GtkTreeView)
     void balsa_index_toggle_flag(BalsaIndex *index,
                                  LibBalsaMessageFlag flag);
 
-    void balsa_index_reset(BalsaIndex * index);
     gint balsa_find_notebook_page_num(LibBalsaMailbox * mailbox);
     void balsa_index_set_column_widths(BalsaIndex * index);
     GList * balsa_index_selected_list(BalsaIndex * index);
     GArray * balsa_index_selected_msgnos_new(BalsaIndex * index);
     void balsa_index_selected_msgnos_free(BalsaIndex * index, GArray * msgnos);
-    void balsa_index_move_subtree(BalsaIndex * index,
-                                  GtkTreePath * root,
-                                  GtkTreePath * new_parent);
 
     /* Updating index columns when preferences change */
     void balsa_index_refresh_date (BalsaIndex * index);

@@ -29,7 +29,6 @@ typedef enum {
 } ImapMboxEventType;
 
 int imap_mbox_is_disconnected (const ImapMboxHandle *h);
-int imap_mbox_is_connected    (const ImapMboxHandle *h);
 int imap_mbox_is_authenticated(const ImapMboxHandle *h);
 int imap_mbox_is_selected     (const ImapMboxHandle *h);
 
@@ -104,9 +103,6 @@ typedef struct {
   void *cb_data;
 } LBIResponseHandler;
 
-typedef void (*ImapMboxNotifyCb)(ImapMboxHandle*handle, ImapMboxEventType ev, 
-                                 int seqno, void* data);
-
 typedef void (*ImapInfoCb)(ImapMboxHandle *h, ImapResponse rc,
                            const char *buffer, void *arg);
 typedef void (*ImapMonitorCb)(const char *buffer, int length, int direction,
@@ -146,27 +142,14 @@ int      imap_mbox_handle_get_delim(ImapMboxHandle* handle,
                                     const char *namespace);
 char* imap_mbox_handle_get_last_msg(ImapMboxHandle *handle);
 
-void imap_mbox_handle_connect_notify(const ImapMboxHandle* handle,
-                                     ImapMboxNotifyCb cb,
-                                     const void *data);
-
-void imap_mbox_handle_destroy(ImapMboxHandle* handle);
-
 ImapResponse imap_mbox_handle_fetch_unlocked(ImapMboxHandle* handle,
                                              const gchar *seq, 
                                              const gchar* headers[]);
-ImapResponse imap_mbox_handle_fetch_env(ImapMboxHandle* handle,
-                                        const gchar *seq);
 
 ImapMessage* imap_mbox_handle_get_msg(ImapMboxHandle* handle, unsigned seqno);
 
 unsigned imap_mbox_handle_first_unseen(const ImapMboxHandle* handle);
-ImapResponse imap_mbox_find_all(ImapMboxHandle *h, const char *search_str,
-                                unsigned *msgcnt, unsigned**msgs);
 
-unsigned imap_mbox_set_sort(ImapMboxHandle *h, ImapSortKey isr, 
-                            int ascending);
-const char *imap_mbox_get_filter(ImapMboxHandle *h);
 /* get_thread_root is deprecated */
 GNode *imap_mbox_handle_get_thread_root(const ImapMboxHandle* handle);
 
@@ -210,8 +193,6 @@ void mbox_view_dispose(MboxView *mv);
 gboolean mbox_view_is_active(const MboxView *mv);
 unsigned mbox_view_cnt(const MboxView *mv);
 unsigned mbox_view_get_msg_no(const MboxView *mv, unsigned msgno);
-unsigned mbox_view_get_rev_no(const MboxView *mv, unsigned seqno);
-const char *mbox_view_get_str(const MboxView *mv);
 
 /* ================ END OF MBOX_VIEW FUNCTIONS ========================= */
 

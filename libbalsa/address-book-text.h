@@ -56,9 +56,6 @@ typedef struct _LibBalsaAddressBookTextClass LibBalsaAddressBookTextClass;
  */
 
 const gchar *        libbalsa_address_book_text_get_path(LibBalsaAddressBookText * ab_text);
-GSList *             libbalsa_address_book_text_get_item_list(LibBalsaAddressBookText * ab_text);
-time_t               libbalsa_address_book_text_get_mtime(LibBalsaAddressBookText * ab_text);
-LibBalsaCompletion * libbalsa_address_book_text_get_name_complete(LibBalsaAddressBookText * ab_text);
 
 /*
  * Setters
@@ -66,11 +63,5 @@ LibBalsaCompletion * libbalsa_address_book_text_get_name_complete(LibBalsaAddres
 
 void libbalsa_address_book_text_set_path(LibBalsaAddressBookText * ab_text,
                                          const gchar             * path);
-void libbalsa_address_book_text_set_item_list(LibBalsaAddressBookText * ab_text,
-                                              GSList                  * item_list);
-void libbalsa_address_book_text_set_mtime(LibBalsaAddressBookText * ab_text,
-                                          time_t                    mtime);
-void libbalsa_address_book_text_set_name_complete(LibBalsaAddressBookText * ab_text,
-                                                  LibBalsaCompletion      * name_complete);
 
 #endif                          /* __LIBBALSA_ADDRESS_BOOK_TEXT_H__ */

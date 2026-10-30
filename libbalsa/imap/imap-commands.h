@@ -30,7 +30,6 @@ ImapResponse imap_mbox_handle_noop(ImapMboxHandle *r);
 /* Authenticated State */
 ImapResponse imap_mbox_select(ImapMboxHandle* handle, const char *mbox,
                               gboolean *readonly_mbox);
-ImapResponse imap_mbox_examine(ImapMboxHandle* handle, const char* mbox);
 ImapResponse imap_mbox_create(ImapMboxHandle* handle, const char* new_mbox);
 ImapResponse imap_mbox_delete(ImapMboxHandle* handle, const char* mbox);
 ImapResponse imap_mbox_rename(ImapMboxHandle* handle,
@@ -76,33 +75,21 @@ ImapResponse imap_mbox_append_multi(ImapMboxHandle *handle,
 ImapResponse imap_mbox_append_str(ImapMboxHandle *handle, const char *mbox,
                               ImapMsgFlags flags, size_t sz, char *txt);
 #endif
-ImapResponse imap_mbox_append_stream(ImapMboxHandle * handle,
-				     const char *mbox, ImapMsgFlags flags,
-				     GMimeStream * stream, ssize_t len);
 
 /* Selected State */
 ImapResponse imap_mbox_close(ImapMboxHandle *h);
-ImapResult imap_mbox_search(ImapMboxHandle *h, const char* query);
-ImapResponse imap_mbox_noop(ImapMboxHandle *r);
 ImapResponse imap_mbox_expunge(ImapMboxHandle* h);
 ImapResponse imap_mbox_expunge_a(ImapMboxHandle *h);
 
 ImapResponse imap_mbox_store_flag(ImapMboxHandle *r, unsigned cnt,
                                   unsigned *seqno, ImapMsgFlag flg,
                                   gboolean state);
-ImapResponse imap_mbox_store_flag_a(ImapMboxHandle *r,
-                                    unsigned        cnt,
-                                    unsigned       *seqno,
-                                    ImapMsgFlag     flg,
-                                    gboolean        state);
 
 ImapResponse imap_mbox_handle_copy(ImapMboxHandle* handle,
 				   unsigned cnt, unsigned *seqno,
 				   const gchar *dest,
 				   ImapSequence *ret_sequence);
 
-ImapResponse imap_mbox_find_unseen(ImapMboxHandle * h, unsigned *msgcnt,
-				   unsigned **msgs);
 gboolean imap_mbox_handle_msgno_has_flags(ImapMboxHandle *h, unsigned msgno,
                                           ImapMsgFlag flag_set,
                                           ImapMsgFlag flag_unset);
@@ -137,15 +124,9 @@ ImapResponse imap_mbox_handle_fetch_body(ImapMboxHandle* handle,
 
 /* Experimental/Expansion */
 ImapResponse imap_handle_starttls(ImapMboxHandle *handle, GError **error);
-ImapResponse imap_mbox_scan(ImapMboxHandle *r, const char*what,
-                            const char*str);
 ImapResponse imap_mbox_unselect(ImapMboxHandle *h);
 ImapResponse imap_mbox_thread(ImapMboxHandle *h, const char *how,
                               ImapSearchKey *filter);
-
-ImapResponse imap_mbox_uid_search(const ImapMboxHandle *handle, const ImapSearchKey *key,
-                                  void (*cb)(unsigned uid, void *),
-								  const void *cb_data);
 
 ImapResponse imap_mbox_sort_msgno(ImapMboxHandle *handle, ImapSortKey key,
                                   int ascending, unsigned int *msgno,

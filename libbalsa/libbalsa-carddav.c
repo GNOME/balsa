@@ -180,22 +180,6 @@ libbalsa_carddav_unlock_addrlist(LibBalsaCarddav *carddav)
 
 
 /* documentation: see header file */
-gchar *
-libbalsa_carddav_get_last_error(LibBalsaCarddav *carddav)
-{
-	gchar *retval;
-
-	g_return_val_if_fail(LIBBALSA_IS_CARDDAV(carddav), NULL);
-
-	g_mutex_lock(&carddav->mutex);
-	retval = carddav->last_error;
-	carddav->last_error = NULL;
-	g_mutex_unlock(&carddav->mutex);
-	return retval;
-}
-
-
-/* documentation: see header file */
 gboolean
 libbalsa_carddav_add_address(LibBalsaCarddav *carddav, LibBalsaAddress *address, GError **error)
 {

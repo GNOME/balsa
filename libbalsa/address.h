@@ -86,12 +86,6 @@ GtkWidget *libbalsa_address_get_edit_widget(LibBalsaAddress *addr,
 LibBalsaAddress *libbalsa_address_new_from_edit_entries(GtkWidget **widget);
 
 /*
- * Comparison func
- */
-gint libbalsa_address_compare(LibBalsaAddress *a,
-                              LibBalsaAddress *b);
-
-/*
  * Getters
  */
 

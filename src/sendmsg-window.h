@@ -47,8 +47,6 @@ G_BEGIN_DECLS
         SENDMSG_STATE_AUTO_SAVED
     } SendmsgState;
 
-#define VIEW_MENU_LENGTH 5
-
     typedef struct _BalsaSendmsgHeader BalsaSendmsgHeader;
     struct _BalsaSendmsgHeader {
 	GtkWidget *name;

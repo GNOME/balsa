@@ -32,8 +32,6 @@ G_BEGIN_DECLS
 #define BMW_HBOX_SPACE               6
 #define BMW_MESSAGE_PADDING          6
 #define BMW_BUTTON_PACK_SPACE        5
-#define BMW_HEADER_MARGIN_LEFT       2
-#define BMW_HEADER_MARGIN_RIGHT     15
 
 /*
  * GObject class definitions

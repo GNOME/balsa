@@ -832,10 +832,6 @@ balsa_ab_window_find(GtkWidget * group_entry, BalsaAbWindow * ab)
             gtk_tree_selection_select_path(selection, path);
             if (first_path) {
                 gtk_tree_view_set_cursor(tree_view, path, NULL, FALSE);
-#if 0
-                gtk_tree_view_scroll_to_cell(tree_view, path, NULL,
-                                             TRUE, 0.5, 0);
-#endif
                 first_path = FALSE;
             }
             gtk_tree_path_free(path);

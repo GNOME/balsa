@@ -155,9 +155,6 @@ libbalsa_imap_server_class_init(LibBalsaImapServerClass * klass)
 
     server_class->set_username = libbalsa_imap_server_set_username;
     server_class->set_host = libbalsa_imap_server_set_host;
-#if 0
-    klass->get_password = NULL; /* libbalsa_imap_server_real_get_password; */
-#endif
 }
 
 static void
@@ -746,11 +743,7 @@ libbalsa_imap_server_force_disconnect(LibBalsaImapServer *imap_server)
 static void close_all_connections_cb(gpointer key, gpointer value,
                                      gpointer user_data)
 {
-#if 0
-    libbalsa_imap_server_force_disconnect(LIBBALSA_IMAP_SERVER(value));
-#else
     libbalsa_imap_server_set_offline_mode(LIBBALSA_IMAP_SERVER(value), TRUE);
-#endif
 }
 void
 libbalsa_imap_server_close_all_connections(void)
@@ -760,38 +753,6 @@ libbalsa_imap_server_close_all_connections(void)
         g_hash_table_foreach(imap_servers, close_all_connections_cb, NULL);
     g_mutex_unlock(&imap_servers_lock);
     libbalsa_imap_purge_temp_dir(0);
-}
-
-/**
- * libbalsa_imap_server_has_free_handles:
- * @server: A #LibBalsaImapServer
- *
- * Returns %TRUE when there are free connections. This does NOT guarantee that
- * libbalsa_imap_server_get_handle() returns a handle.
- *
- * Return value: is %TRUE when there are free connections.
- **/
-gboolean libbalsa_imap_server_has_free_handles(LibBalsaImapServer *imap_server)
-{
-    gboolean result;
-    g_mutex_lock(&imap_server->lock);
-    result = imap_server->used_connections < imap_server->max_connections
-        || imap_server->free_handles;
-    g_mutex_unlock(&imap_server->lock);
-    return result;
-}
-
-/**
- * libbalsa_imap_server_is_offline:
- * @server: A #LibBalsaImapServer
- *
- * Returns %TRUE when this server is in offline mode.
- *
- * Return value: is %TRUE when this server is in offline mode.
- **/
-gboolean libbalsa_imap_server_is_offline(LibBalsaImapServer *server)
-{
-    return server->offline_mode;
 }
 
 /**

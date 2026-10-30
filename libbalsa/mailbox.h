@@ -390,8 +390,6 @@ gboolean libbalsa_mailbox_add_message(LibBalsaMailbox * mailbox,
                                       LibBalsaMessageFlag flags,
                                       GError ** err);
 
-gboolean libbalsa_mailbox_close_backend(LibBalsaMailbox * mailbox);
-
 /* Message number-list methods */
 gboolean libbalsa_mailbox_messages_change_flags(LibBalsaMailbox * mailbox,
 						GArray * msgnos,
@@ -419,8 +417,6 @@ gint libbalsa_mailbox_move_duplicates(LibBalsaMailbox * mailbox,
  * Mailbox views-related functions.
  */
 typedef struct LibBalsaMailboxIndexEntry_ LibBalsaMailboxIndexEntry;
-void libbalsa_mailbox_index_entry_set_no(LibBalsaMailboxIndexEntry *entry,
-                                         unsigned no);
 void libbalsa_mailbox_index_entry_clear(LibBalsaMailbox * mailbox,
                                         guint msgno);
 void libbalsa_mailbox_index_set_flags(LibBalsaMailbox *mailbox,
@@ -431,9 +427,6 @@ gboolean libbalsa_mailbox_set_view_filter(LibBalsaMailbox * mailbox,
                                           gboolean update_immediately);
 void libbalsa_mailbox_make_view_filter_persistent(LibBalsaMailbox *
                                                   mailbox);
-
-gboolean libbalsa_mailbox_can_do(LibBalsaMailbox *mailbox,
-                                 enum LibBalsaMailboxCapability cap);
 
 /** libbalsa_mailbox_set_threading() uses backend-optimized threading mode
     to produce a tree of messages. The tree is put in msg_tree and used
@@ -458,8 +451,6 @@ void libbalsa_mailbox_set_threading_type(LibBalsaMailbox * mailbox,
 					 threading_type);
 void libbalsa_mailbox_set_subject_gather(LibBalsaMailbox * mailbox,
                                          gboolean subject_gather);
-void libbalsa_mailbox_set_sort_type(LibBalsaMailbox * mailbox,
-				    LibBalsaMailboxSortType sort_type);
 void libbalsa_mailbox_set_sort_field(LibBalsaMailbox * mailbox,
 				     LibBalsaMailboxSortFields sort_field);
 gboolean libbalsa_mailbox_set_show(LibBalsaMailbox * mailbox,

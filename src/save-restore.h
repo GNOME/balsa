@@ -45,7 +45,6 @@ void config_load_sections(void);
 gint config_save(void);
 void config_defclient_save(void);
 
-gchar *mailbox_get_pkey(const LibBalsaMailbox * mbox);
 gint config_mailbox_add(LibBalsaMailbox * mailbox, const char *key_arg);
 gint config_mailbox_delete(LibBalsaMailbox * mailbox);
 gint config_mailbox_update(LibBalsaMailbox * mailbox);
@@ -69,6 +68,5 @@ gint config_mailbox_get_position(const gchar * url);
 
 void config_filters_save(void);
 void config_mailbox_filters_save(LibBalsaMailbox * mbox);
-void clean_filter_config_section(const gchar * name);
 
 #endif				/* __SAVE_RESTORE_H__ */

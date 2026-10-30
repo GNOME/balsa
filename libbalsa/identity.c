@@ -1241,12 +1241,7 @@ file_chooser_cb(GtkFileChooser * chooser, gpointer data)
     check = g_object_get_data(G_OBJECT(chooser), LIBBALSA_IDENTITY_CHECK);
     active = gtk_toggle_button_get_active(check);
 
-#if 0
-    if (type == LBI_PATH_TYPE_SIG)
-        md_sig_path_changed(filename, active, data);
-    else
-#endif
-        md_face_path_changed(filename, active, type, data);
+    md_face_path_changed(filename, active, type, data);
     g_free(filename);
 }
 
@@ -2306,22 +2301,6 @@ libbalsa_identity_get_gpg_encrypt(LibBalsaIdentity *ident)
     return ident->gpg_encrypt;
 }
 
-gboolean
-libbalsa_identity_get_sig_executable(LibBalsaIdentity *ident)
-{
-    g_return_val_if_fail(LIBBALSA_IS_IDENTITY(ident), 0);
-
-    return ident->sig_executable;
-}
-
-gboolean
-libbalsa_identity_get_sig_separator(LibBalsaIdentity *ident)
-{
-    g_return_val_if_fail(LIBBALSA_IS_IDENTITY(ident), 0);
-
-    return ident->sig_separator;
-}
-
 guint
 libbalsa_identity_get_crypt_protocol(LibBalsaIdentity *ident)
 {
@@ -2408,14 +2387,6 @@ libbalsa_identity_get_x_face_path(LibBalsaIdentity *ident)
     g_return_val_if_fail(LIBBALSA_IS_IDENTITY(ident), NULL);
 
     return ident->x_face;
-}
-
-const gchar *
-libbalsa_identity_get_signature_path(LibBalsaIdentity *ident)
-{
-    g_return_val_if_fail(LIBBALSA_IS_IDENTITY(ident), NULL);
-
-    return ident->signature_path;
 }
 
 InternetAddress *

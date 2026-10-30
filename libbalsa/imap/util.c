@@ -51,46 +51,6 @@ imap_quote_string(const gchar *src)
 	}
 }
 
-/* imap_skip_atom: return index into string where next IMAP atom begins.
- * see RFC for a definition of the atom. */
-#define LIST_SPECIALS   "%*"
-#define QUOTED_SPECIALS "\"\\"
-#define RESP_SPECIALS   "]"
-char*
-imap_skip_atom(char *s)
-{
-  static const char ATOM_SPECIALS[] = 
-    "(){ " LIST_SPECIALS QUOTED_SPECIALS RESP_SPECIALS;
-  while (*s && !strchr(ATOM_SPECIALS,*s))
-      s++;
-  SKIPWS (s);
-  return s;
-}
-
-char*
-imap_next_word(char *s)
-{
-  int quoted = 0;
-
-  while (*s) {
-    if (*s == '\\') {
-      s++;
-      if (*s)
-        s++;
-      continue;
-    }
-    if (*s == '\"')
-      quoted = quoted ? 0 : 1;
-    if (!quoted && isspace(*s))
-      break;
-    s++;
-  }
-
-  SKIPWS (s);
-  return s;
-}
-  
-
 /* ===================================================================
  * UTF-7 conversion routines as in RFC 2192
  * =================================================================== */
@@ -190,19 +150,3 @@ imap_mailbox_to_utf8(const gchar *mbox)
 
 	return g_string_free(buffer, FALSE);
 }
-
-#if 0
-int main(int argc, char *argv[])
-{
-  int i;
-  for(i=1; i<argc; i++) {
-    char *mbx = imap_utf8_to_mailbox(argv[i]);
-    char *utf8 = imap_mailbox_to_utf8(mbx);
-    if (!mbx || !utf8)
-      continue;
-    printf("orig='%s' mbx='%s' back='%s'\n", argv[i], mbx, utf8);
-    free(mbx); free(utf8);
-  }
-  return 0;
-}
-#endif

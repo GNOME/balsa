@@ -82,12 +82,6 @@ void balsa_window_update_tab(BalsaMailboxNode * mbnode);
 void enable_empty_trash(BalsaWindow * window, TrashState status);
 void balsa_window_enable_continue(BalsaWindow * window);
 void balsa_change_window_layout(BalsaWindow *window);
-gboolean mail_progress_notify_cb(GIOChannel * source,
-                                 GIOCondition condition,
-                                 BalsaWindow ** window);
-gboolean send_progress_notify_cb(GIOChannel * source,
-                                 GIOCondition condition,
-                                 BalsaWindow ** window);
 void check_new_messages_real(BalsaWindow * window, gboolean background_check);
 void check_new_messages_count(LibBalsaMailbox * mailbox, gboolean notify);
 void empty_trash(BalsaWindow * window);
@@ -100,7 +94,6 @@ gboolean balsa_window_next_unread(BalsaWindow * window);
 /* functions to manipulate the progress bars of the window */
 gboolean balsa_window_setup_progress(BalsaWindow * window,
                                      const gchar * text);
-void balsa_window_clear_progress(BalsaWindow* window);
 void balsa_window_progress_bar_set_fraction(BalsaWindow * window,
                                             gdouble       fraction);
 void balsa_window_increase_activity(BalsaWindow * window,

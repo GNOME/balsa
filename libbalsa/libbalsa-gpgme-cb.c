@@ -53,18 +53,6 @@ enum {
 };
 
 
-/* FIXME: is this really necessary? */
-typedef struct {
-    GCond cond;
-    const gchar *uid_hint;
-    const gchar *passphrase_info;
-    gint was_bad;
-    GtkWindow *parent;
-    gchar *res;
-    gboolean done;
-} ask_passphrase_data_t;
-
-
 static void key_selection_changed_cb(GtkTreeSelection * selection,
 				     gpgme_key_t * key);
 static gint sort_iter_cmp_fn(GtkTreeModel *model, GtkTreeIter *a,

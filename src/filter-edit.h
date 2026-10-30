@@ -75,9 +75,6 @@ void fe_delete_pressed(GtkWidget * widget, gpointer data);
 void fe_apply_pressed(GtkWidget * widget, gpointer data);
 void fe_revert_pressed(GtkWidget * widget, gpointer data);
 
-/*op codes callback */
-void fe_op_codes_toggled(GtkWidget * widget, gpointer data);
-
 /* Conditions callbacks */
 void fe_conditions_row_activated(GtkTreeView * treeview,
                                  GtkTreePath * path,

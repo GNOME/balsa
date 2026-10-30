@@ -78,17 +78,6 @@ const GList *libbalsa_carddav_lock_addrlist(LibBalsaCarddav *carddav);
  */
 void libbalsa_carddav_unlock_addrlist(LibBalsaCarddav *carddav);
 
-/** @brief Get the last error message from running a thread
- *
- * @param[in] carddav CardDAV object
- * @return the last error message, @c NULL of no error occurred
- * @note Reading the last error message clears the internal storage.\n
- *       The caller @em MUST free the returned value.\n
- *       The threads display @em all error messages by calling libbalsa_information().
- */
-gchar *libbalsa_carddav_get_last_error(LibBalsaCarddav *carddav)
-	G_GNUC_WARN_UNUSED_RESULT;
-
 /** @brief Add an address to the CardDAV address book
  *
  * @param[in] carddav CardDAV object

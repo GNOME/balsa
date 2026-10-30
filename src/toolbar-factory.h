@@ -54,8 +54,6 @@ typedef enum {
     BALSA_TOOLBAR_TYPE_MESSAGE_WINDOW
 } BalsaToolbarType;
 
-void update_all_toolbars(void);
-
 /* toolbar code for gtk+-2 */
 const gchar *balsa_toolbar_button_text(gint button);
 const gchar *balsa_toolbar_sanitize_id(const gchar * id);
@@ -73,8 +71,6 @@ GArray *balsa_toolbar_model_get_current(BalsaToolbarModel * model);
 gboolean balsa_toolbar_model_is_standard(BalsaToolbarModel * model);
 void balsa_toolbar_model_append_icon(BalsaToolbarModel * model,
                                      gchar             * icon);
-void balsa_toolbar_model_delete_icon(BalsaToolbarModel * model,
-                                     gchar * icon);
 void balsa_toolbar_model_clear(BalsaToolbarModel * model);
 void balsa_toolbar_model_changed(BalsaToolbarModel * model);
 

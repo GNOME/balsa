@@ -274,22 +274,6 @@ libbalsa_address_book_carddav_get_password(LibBalsaAddressBookCarddav *ab)
 }
 
 
-const gchar *
-libbalsa_address_book_carddav_get_full_url(LibBalsaAddressBookCarddav *ab)
-{
-	g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_CARDDAV(ab), NULL);
-	return ab->full_url;
-}
-
-
-const gchar *
-libbalsa_address_book_carddav_get_carddav_name(LibBalsaAddressBookCarddav *ab)
-{
-	g_return_val_if_fail(LIBBALSA_IS_ADDRESS_BOOK_CARDDAV(ab), NULL);
-	return ab->carddav_name;
-}
-
-
 guint
 libbalsa_address_book_carddav_get_refresh(LibBalsaAddressBookCarddav *ab)
 {

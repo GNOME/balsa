@@ -47,7 +47,6 @@ G_BEGIN_DECLS
  * Public methods
  */
     void balsa_druid_page_defclient(GtkAssistant * druid);
-    void balsa_druid_page_defclient_save(BalsaDruidPageDefclient * defclient);
 
 G_END_DECLS
 

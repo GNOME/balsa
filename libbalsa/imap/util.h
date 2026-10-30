@@ -21,8 +21,6 @@
 
 gchar *imap_quote_string(const gchar *src)
 	G_GNUC_WARN_UNUSED_RESULT;
-char* imap_next_word(char *s);
-char* imap_skip_atom(char *s);
 
 gchar* imap_mailbox_to_utf8(const char *src)
 	G_GNUC_WARN_UNUSED_RESULT;

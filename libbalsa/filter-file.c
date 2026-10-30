@@ -74,12 +74,6 @@ libbalsa_filter_new_from_config(void)
 }
 
 /*
- * libbalsa_conditions_save_config saves a list of conditions using
- * prefix and filter_section_name to create the name of the section We
- * clean all preceding saved conditions to keep the config file clean
- * and coherent. */
-
-/*
  * void libbalsa_filter_save_config(filter * f)
  *
  * Saves the filter into the config file.

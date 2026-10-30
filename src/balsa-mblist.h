@@ -47,9 +47,6 @@ gboolean balsa_mblist_close_lru_peer_mbx(BalsaMBList * mblist,
                                          LibBalsaMailbox *mailbox);
 
 BalsaMailboxNode *balsa_mblist_get_selected_node(BalsaMBList * mblist);
-BalsaMailboxNode *balsa_mblist_get_node_by_mailbox(BalsaMBList * mblist,
-                                                   LibBalsaMailbox *
-                                                   mailbox);
 GtkWidget *balsa_mblist_mru_menu(GtkWindow            *window,
                                  GList               **url_list,
                                  GAsyncReadyCallback   callback,

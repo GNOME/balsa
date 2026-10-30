@@ -66,31 +66,6 @@ static void net_client_finalise(GObject *object);
 static gboolean cert_accept_cb(GTlsConnection *conn, GTlsCertificate *peer_cert, GTlsCertificateFlags errors, gpointer user_data);
 
 
-NetClient *
-net_client_new(const gchar *host_and_port, guint16 default_port, gsize max_line_len)
-{
-	NetClient *client;
-	NetClientPrivate *priv;
-
-	g_return_val_if_fail(host_and_port != NULL, NULL);
-
-	client = NET_CLIENT(g_object_new(NET_CLIENT_TYPE, NULL));
-	/*lint -e{9079}		(MISRA C:2012 Rule 11.5) intended use of this function */
-	priv = net_client_get_instance_private(client);
-
-	if (priv->sock == NULL) {
-		g_object_unref(client);
-		client = NULL;
-	} else {
-		priv->host_and_port = g_strdup(host_and_port);
-		priv->default_port = default_port;
-		priv->max_line_len = max_line_len;
-	}
-
-	return client;
-}
-
-
 gboolean
 net_client_configure(NetClient *client, const gchar *host_and_port, guint16 default_port, gsize max_line_len, GError **error)
 {

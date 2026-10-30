@@ -244,7 +244,6 @@ gchar* imap_body_to_string(const ImapBody *body);
 ImapBody* imap_body_from_string(const gchar *s);
 
 void imap_body_set_desc(ImapBody* body, char* str);
-void imap_body_add_param(ImapBody *body, char *key, char *val);
 void imap_body_append_part(ImapBody* body, ImapBody* sibling);
 void imap_body_append_child(ImapBody* body, ImapBody* child);
 void imap_body_set_id(ImapBody *body, char *id);

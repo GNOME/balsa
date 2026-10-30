@@ -86,8 +86,6 @@ gboolean     libbalsa_identity_get_warn_send_plain(LibBalsaIdentity *ident);
 gboolean     libbalsa_identity_get_always_trust(LibBalsaIdentity *ident);
 gboolean     libbalsa_identity_get_gpg_sign(LibBalsaIdentity *ident);
 gboolean     libbalsa_identity_get_gpg_encrypt(LibBalsaIdentity *ident);
-gboolean     libbalsa_identity_get_sig_executable(LibBalsaIdentity *ident);
-gboolean     libbalsa_identity_get_sig_separator(LibBalsaIdentity *ident);
 guint        libbalsa_identity_get_crypt_protocol(LibBalsaIdentity *ident);
 gchar* libbalsa_identity_get_signature(LibBalsaIdentity *ident, GError **error);
 const gchar *libbalsa_identity_get_identity_name(LibBalsaIdentity *ident);
@@ -100,7 +98,6 @@ const gchar *libbalsa_identity_get_forward_string(LibBalsaIdentity *ident);
 const gchar *libbalsa_identity_get_domain(LibBalsaIdentity *ident);
 const gchar *libbalsa_identity_get_face_path(LibBalsaIdentity *ident);
 const gchar *libbalsa_identity_get_x_face_path(LibBalsaIdentity *ident);
-const gchar *libbalsa_identity_get_signature_path(LibBalsaIdentity *ident);
 InternetAddress *libbalsa_identity_get_address(LibBalsaIdentity *ident);
 LibBalsaSmtpServer *libbalsa_identity_get_smtp_server(LibBalsaIdentity *ident);
 #ifdef ENABLE_AUTOCRYPT

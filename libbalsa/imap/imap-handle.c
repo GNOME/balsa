@@ -511,8 +511,6 @@ imap_handle_disconnect(ImapMboxHandle *h)
 
 int imap_mbox_is_disconnected (const ImapMboxHandle *h)
 { return IMAP_MBOX_IS_DISCONNECTED(h); }
-int imap_mbox_is_connected    (const ImapMboxHandle *h)
-{ return IMAP_MBOX_IS_CONNECTED(h); }
 int imap_mbox_is_authenticated(const ImapMboxHandle *h)
 { return IMAP_MBOX_IS_AUTHENTICATED(h); }
 int imap_mbox_is_selected     (const ImapMboxHandle *h)
@@ -630,33 +628,6 @@ const char* imap_msg_flags[6] = {
   "seen", "answered", "flagged", "deleted", "draft", "recent"
 };
 
-#if 0
-struct ListData { 
-  ImapListCb cb;
-  void * cb_data;
-};
-
-static int
-imap_timeout_cb(void *arg)
-{
-  ImapMboxHandle *h = (ImapMboxHandle*)arg;
-  int ok = 1;
-
-  /* No reason to lock the handle here: if we get here, we have
-     already been performing some operation and keep the handle
-     locked. */
-  if(h->user_cb) {
-    h->user_cb(IME_TIMEOUT, h->user_arg, &ok);
-    if(ok) {
-      h->op_cancelled = TRUE;
-      imap_handle_disconnect(h);
-    }
-  }
-
-  return ok;
-}
-#endif
-
 static ImapResult
 imap_mbox_connect(ImapMboxHandle* handle)
 {
@@ -684,12 +655,6 @@ imap_mbox_connect(ImapMboxHandle* handle)
 	return IMAP_CONNECT_FAILED;
   }
   
-#if 0
-  if(handle->timeout>0) {
-    sio_set_timeout(handle->sio, handle->timeout);
-    sio_set_timeoutcb(handle->sio, imap_timeout_cb, handle);
-  }
-#endif
   if (handle->tls_mode == NET_CLIENT_CRYPT_ENCRYPTED) {
     if (!net_client_start_tls(NET_CLIENT(handle->sio), &error)) {
       imap_mbox_handle_set_msg(handle, _("TLS negotiation failed: %s"), error_safe(error));
@@ -858,12 +823,6 @@ imap_mbox_handle_get_last_msg(ImapMboxHandle *handle)
 		  : (handle->last_msg ? handle->last_msg : "") );
 }
 
-void
-imap_mbox_handle_connect_notify(const ImapMboxHandle* handle,
-                                ImapMboxNotifyCb cb, const void *data)
-{
-}
-
 static void
 imap_mbox_handle_finalize(GObject* gobject)
 {
@@ -956,19 +915,6 @@ imap_mbox_handle_fetch_unlocked(ImapMboxHandle* handle, const gchar *seq,
   return rc;
 }
 
-ImapResponse
-imap_mbox_handle_fetch_env(ImapMboxHandle* handle, const gchar *seq)
-{
-  char* cmd;
-  ImapResponse rc;
-  
-  IMAP_REQUIRED_STATE1_U(handle, IMHS_SELECTED, IMR_BAD);
-  cmd = g_strdup_printf("FETCH %s (ENVELOPE FLAGS UID)", seq);
-  rc = imap_cmd_exec(handle, cmd);
-  g_free(cmd);
-  return rc;
-}
-
 
 ImapMessage*
 imap_mbox_handle_get_msg(ImapMboxHandle* h, unsigned seqno)
@@ -976,37 +922,6 @@ imap_mbox_handle_get_msg(ImapMboxHandle* h, unsigned seqno)
   g_return_val_if_fail(h, 0);
   g_return_val_if_fail(seqno-1<h->exists, NULL);
   return h->msg_cache[seqno-1];
-}
-
-const char*
-imap_mbox_get_filter(ImapMboxHandle *h)
-{
-  return h->mbox_view.filter_str ? h->mbox_view.filter_str : "ALL";
-}
-
-/* imap_mbox_set_sort:
- */
-unsigned
-imap_mbox_set_sort(ImapMboxHandle *h, ImapSortKey isr, int ascending)
-{
-  gchar *cmd;
-  const char *field;
-  switch(isr) {
-  default:
-  case IMSO_ARRIVAL: return 1;
-  case IMSO_SUBJECT: field = "SUBJECT"; break;
-  case IMSO_DATE   : field = "DATE";    break;
-  case IMSO_FROM   : field = "FROM";    break;
-  }
-  cmd= g_strdup_printf("SORT (%s%s) UTF-8 %s", field,
-                       ascending ? "" : " REVERSE",
-                       imap_mbox_get_filter(h));
-  h->mbox_view.entries = 0; /* FIXME: I do not like this! 
-                             * we should not be doing such 
-                             * low level manipulations here */
-  imap_cmd_exec(h, cmd);
-  g_free(cmd);
-  return 1;
 }
 
 /** Parse given source string expected to contain a quoted
@@ -1209,15 +1124,6 @@ imap_body_set_desc(ImapBody* body, char* str)
   body->desc = str;
 }
 
-void
-imap_body_add_param(ImapBody *body, char *key, char *val)
-{
-  int c;
-  for(c=0; key[c]; c++)
-    key[c] = tolower(key[c]);
-  g_hash_table_insert(body->params, key, val);
-}
-
 const gchar*
 imap_body_get_param(ImapBody *body, const gchar *key)
 {
@@ -1278,24 +1184,6 @@ imap_body_get_content_type(ImapBody *body)
   g_hash_table_foreach(body->params, append_body_param, res);
   return g_string_free(res, FALSE);
 }
-
-#if 0
-static void
-do_indent(int indent)
-{ int i; for(i=0; i<indent; i++) putchar(' '); }
-static void
-print_body_structure(ImapBody *body, int indent)
-{
-  while(body) {
-    gchar *type = imap_body_get_mime_type(body);
-    do_indent(indent); printf("%s\n", type);
-    g_free(type);
-    if(body->child)
-      print_body_structure(body->child, indent+3);
-    body = body->next;
-  }
-}
-#endif
 
 static ImapBody*
 get_body_from_section(ImapBody *body, const char *section)
@@ -1616,14 +1504,6 @@ ImapBody*
 imap_body_from_string(const gchar *s)
 {
   ImapBody *res = imap_body_from_stringi(s, NULL);
-#if 0
-  gchar *s1 = imap_body_to_string(res);
-  if(s && *s)
-    printf("Creating body from: '%s'\n"
-           "New one is        : '%s'\n",
-           s, s1);
-  g_free(s1);
-#endif
   return res;
 }
 
@@ -1749,21 +1629,6 @@ imap_serialized_message_size(void *data)
 /* =================================================================== */
 /*                Imap command processing routines                     */
 /* =================================================================== */
-#if 0
-static ImapResponse
-imap_code(const gchar* resp)
-{
-  if(strncmp(resp+sizeof(ImapCmdTag)+1,"OK", 2) ==0)
-    return IMR_OK;
-  else if(strncmp(resp+sizeof(ImapCmdTag)+1,"NO", 2) ==0)
-    return IMR_NO;
-  else  if(strncmp(resp+sizeof(ImapCmdTag)+1,"BAD", 3) ==0) {
-    g_warning("Protocol error:\n");
-    return IMR_BAD;
-  } else return IMR_BAD; /* nothing known */
-}
-#endif
-
 /* imap_cmd_start sends the command to the server. We do it carefully
  * without using printf because our cmds can be pretty long.
  */
@@ -4431,35 +4296,6 @@ unsigned
 mbox_view_get_msg_no(const MboxView *mv, unsigned msgno)
 {
   return mv->arr[msgno-1];
-}
-
-unsigned
-mbox_view_get_rev_no(const MboxView *mv, unsigned seqno)
-{
-  unsigned lo = 0, hi = mv->entries-1;
-  if(mv->entries == 0) return 0;
-  if(seqno<mv->arr[lo] || seqno>mv->arr[hi]) return 0;
-  while(lo<=hi) {
-    if(seqno == mv->arr[lo])
-      return lo+1;
-    else if(seqno == mv->arr[hi])
-      return hi+1;
-    else {
-      unsigned mid = (lo+hi)/2;
-      if(seqno<mv->arr[mid])
-        hi=mid-1;
-      else if(seqno>mv->arr[mid])
-        lo=mid+1;
-      else return mid+1;
-    }
-  }
-  return 0;
-}
-
-const char*
-mbox_view_get_str(const MboxView *mv)
-{
-  return mv->filter_str ? mv->filter_str : "";
 }
 
 gboolean

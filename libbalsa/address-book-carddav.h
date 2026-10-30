@@ -61,8 +61,6 @@ LibBalsaAddressBook *libbalsa_address_book_carddav_new(const gchar *name,
 const gchar *libbalsa_address_book_carddav_get_base_dom_url(LibBalsaAddressBookCarddav *ab);
 const gchar *libbalsa_address_book_carddav_get_user(LibBalsaAddressBookCarddav *ab);
 const gchar *libbalsa_address_book_carddav_get_password(LibBalsaAddressBookCarddav *ab);
-const gchar *libbalsa_address_book_carddav_get_full_url(LibBalsaAddressBookCarddav *ab);
-const gchar *libbalsa_address_book_carddav_get_carddav_name(LibBalsaAddressBookCarddav *ab);
 guint libbalsa_address_book_carddav_get_refresh(LibBalsaAddressBookCarddav *ab);
 gboolean libbalsa_address_book_carddav_get_force_mget(LibBalsaAddressBookCarddav *ab);
 

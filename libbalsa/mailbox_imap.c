@@ -1229,12 +1229,6 @@ get_cache_stream(LibBalsaMailboxImap *mimap, guint uid, gboolean peek)
 	ImapResponse rc;
 
         g_mkdir_with_parents(pair[0], S_IRUSR|S_IWUSR|S_IXUSR);
-#if 0
-        if(msg->length>(signed)SizeMsgThreshold)
-            libbalsa_information(LIBBALSA_INFORMATION_MESSAGE, 
-                                 _("Downloading %ld kB"),
-                                 msg->length/1024);
-#endif
         cache = fopen(path, "wb");
         if(cache) {
 	    int ferr;
@@ -1569,79 +1563,6 @@ lbmi_build_imap_query(const LibBalsaCondition* cond,
     return query;
 }
 
-typedef struct {
-    GHashTable * uids;
-    GHashTable * res;
-} ImapSearchData;
-
-static void
-imap_matched(unsigned uid, ImapSearchData* data)
-{
-    LibBalsaMessage* m = 
-        g_hash_table_lookup(data->uids,GUINT_TO_POINTER(uid)); 
-    if(m) 
-        g_hash_table_insert(data->res, m, m);
-    else
-        g_debug("Could not find UID: %u in message list", uid);
-}
-
-/* Gets the messages matching the conditions via the IMAP search command
-   error is put to TRUE if an error occurred
-*/
-
-GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
-						 LibBalsaCondition *ct,
-						 gboolean only_recent,
-						 gboolean * err)
-{
-    ImapSearchKey* query;
-    ImapResponse rc = IMR_NO;
-    ImapSearchData * cbdata;
-    GHashTable *result;
-
-    *err = FALSE;
-    
-    cbdata = g_new( ImapSearchData, 1 );
-    cbdata->uids = g_hash_table_new(NULL, NULL); 
-    cbdata->res  = g_hash_table_new(NULL, NULL);
-    query = lbmi_build_imap_query(ct /* FIXME: ONLY RECENT! */, NULL);
-    if (query) {
-#ifdef UID_SEARCH_IMPLEMENTED
-	for(msgs= LIBBALSA_MAILBOX(mbox)->message_list; msgs;
-	    msgs = msgs->next){
-	    LibBalsaMessage *m = LIBBALSA_MESSAGE(msgs->data);
-	    ImapMessage *imsg = mi_get_imsg(mbox, m->msgno);
-            if (imsg) {
-                g_hash_table_insert(cbdata->uids,
-				    GUINT_TO_POINTER(imsg->uid), m);
-            } else
-                g_warning("Msg %d out of range", m->msgno);
-	}
-#else	
-        g_warning("Search results ignored. Fixme!");
-#endif
-        II_mbx(rc,mbox->handle,LIBBALSA_MAILBOX(mbox),
-           imap_mbox_uid_search(mbox->handle, query,
-                                (void(*)(unsigned,void*))imap_matched,
-                                cbdata));
-        imap_search_key_free(query);
-    }
-    g_hash_table_destroy(cbdata->uids);
-    /* Clean up on error */
-    if (rc != IMR_OK) {
-	g_hash_table_destroy(cbdata->res);
-	cbdata->res = NULL;
-	*err = TRUE;
-	g_debug("IMAP SEARCH command failed for mailbox %s, falling back to default searching method",
-		libbalsa_mailbox_get_url(LIBBALSA_MAILBOX(mbox)));
-    }
-
-    result = cbdata->res;
-    g_free(cbdata);
-
-    return result;
-}
-
 /* Returns false if the conditions contain regex matches
    User must be informed that regex match on IMAP will
    be done by default filters functions hence leading to
@@ -1650,14 +1571,6 @@ GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
 gboolean libbalsa_mailbox_imap_can_match(LibBalsaMailbox  *mailbox,
 					 LibBalsaCondition *condition)
 {
-#if 0
-    GSList *cnds;
-    for (cnds =  conditions->cond_list; cnds; cnds = g_slist_next(cnds)) {
-	LibBalsaCondition * cnd = cnds->data;
-	
-	if (cnd->type==CONDITION_REGEX) return FALSE;
-    }
-#endif
     return TRUE;
 }
 
@@ -1774,15 +1687,6 @@ gboolean
 libbalsa_mailbox_imap_is_connected(LibBalsaMailboxImap* mimap)
 {
     return mimap->handle && !imap_mbox_is_disconnected(mimap->handle);
-}
-
-/* imap_close_all_connections:
-   close all connections to leave the place cleanly.
-*/
-void
-libbalsa_imap_close_all_connections(void)
-{
-    libbalsa_imap_server_close_all_connections();
 }
 
 /* libbalsa_imap_rename_subfolder:
@@ -2404,32 +2308,6 @@ is_child_of(LibBalsaMessageBody *body, LibBalsaMessageBody *child,
     return FALSE;
 }
 
-#if 0
-static void
-print_structure(LibBalsaMessageBody *part, LibBalsaMessageBody* m, int ind)
-{
-    static const char *t[] = {
-        "LIBBALSA_MESSAGE_BODY_TYPE_OTHER",
-        "LIBBALSA_MESSAGE_BODY_TYPE_AUDIO",
-        "LIBBALSA_MESSAGE_BODY_TYPE_APPLICATION",
-        "LIBBALSA_MESSAGE_BODY_TYPE_IMAGE",
-        "LIBBALSA_MESSAGE_BODY_TYPE_MESSAGE",
-        "LIBBALSA_MESSAGE_BODY_TYPE_MODEL",
-        "LIBBALSA_MESSAGE_BODY_TYPE_MULTIPART",
-        "LIBBALSA_MESSAGE_BODY_TYPE_TEXT",
-        "LIBBALSA_MESSAGE_BODY_TYPE_VIDEO" };
-
-    int j,i=1;
-    while(part) {
-        for(j=0; j<ind; j++) putchar(' ');
-        g_debug("%d: %s%s", i++, t[part->body_type],
-               part == m ? " <--" : "");
-        if(part->parts)
-            print_structure(part->parts, m, ind+2);
-        part = part->next;
-    }
-}
-#endif
 static gchar*
 get_section_for(LibBalsaMessage *message, LibBalsaMessageBody *part)
 {
@@ -2783,94 +2661,6 @@ libbalsa_mailbox_imap_duplicate_msgnos(LibBalsaMailbox *mailbox)
     Method can be called on a closed mailbox.
     Called with mailbox locked.
 */
-#if 0
-static guint
-libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
-				   LibBalsaAddMessageIterator msg_iterator,
-				   void *arg, GError ** err)
-{
-    LibBalsaMailboxImap *mimap = LIBBALSA_MAILBOX_IMAP(mailbox);
-    LibBalsaMessageFlag flags;
-    GMimeStream *stream;
-    unsigned successfully_copied = 0;
-
-    while( msg_iterator(&flags, &stream, arg) ) {
-	ImapMsgFlags imap_flags = IMAP_FLAGS_EMPTY;
-	ImapResponse rc;
-	GMimeStream *tmpstream;
-	GMimeFilter *crlffilter;
-	ImapMboxHandle *handle;
-	gint outfd;
-	gchar *outfile;
-	GMimeStream *outstream;
-	gssize len;
-
-	if (!(flags & LIBBALSA_MESSAGE_FLAG_NEW))
-	    IMSG_FLAG_SET(imap_flags, IMSGF_SEEN);
-	if (flags & LIBBALSA_MESSAGE_FLAG_DELETED)
-	    IMSG_FLAG_SET(imap_flags, IMSGF_DELETED);
-	if (flags & LIBBALSA_MESSAGE_FLAG_FLAGGED)
-	    IMSG_FLAG_SET(imap_flags, IMSGF_FLAGGED);
-	if (flags & LIBBALSA_MESSAGE_FLAG_REPLIED)
-	    IMSG_FLAG_SET(imap_flags, IMSGF_ANSWERED);
-
-	tmpstream = g_mime_stream_filter_new(stream);
-
-	crlffilter = g_mime_filter_unix2dos_new(FALSE);
-	g_mime_stream_filter_add(GMIME_STREAM_FILTER(tmpstream), crlffilter);
-	g_object_unref(crlffilter);
-
-	outfd = g_file_open_tmp("balsa-tmp-file-XXXXXX", &outfile, err);
-	if (outfd < 0) {
-	    g_warning("Could not create temporary file: %s", (*err)->message);
-	    g_object_unref(tmpstream);
-	    g_object_unref(stream);
-	    return successfully_copied;
-	}
-
-	handle = libbalsa_mailbox_imap_get_handle(mimap, err);
-	if (!handle)
-	    /* Perhaps the mailbox was closed and the authentication
-	       failed or was cancelled? err is set already, we just
-	       return. */
-	    return successfully_copied;
-
-	outstream = g_mime_stream_fs_new(outfd);
-	libbalsa_mime_stream_shared_lock(stream);
-	g_mime_stream_write_to_stream(tmpstream, outstream);
-	libbalsa_mime_stream_shared_unlock(stream);
-	g_object_unref(tmpstream);
-	g_object_unref(stream);
-
-	len = g_mime_stream_tell(outstream);
-	g_mime_stream_reset(outstream);
-
-	if (len > (signed) SizeMsgThreshold)
-	    libbalsa_information(LIBBALSA_INFORMATION_MESSAGE,
-				 _("Uploading %ld kB"), (long) len / 1024);
-	rc = imap_mbox_append_stream(handle, mimap->path,
-				     imap_flags, outstream, len);
-	if (rc != IMR_OK) {
-	    gchar *msg = imap_mbox_handle_get_last_msg(handle);
-	    g_set_error(err, LIBBALSA_MAILBOX_ERROR,
-			LIBBALSA_MAILBOX_APPEND_ERROR, "%s", msg);
-	    g_free(msg);
-	}
-	libbalsa_mailbox_imap_release_handle(mimap);
-
-	g_object_unref(outstream);
-	unlink(outfile);
-	g_free(outfile);
-
-	if(rc != IMR_OK)
-	    return successfully_copied;
-
-	successfully_copied++;
-    }
-    return successfully_copied;
-}
-#else
-
 struct MultiAppendCbData {
     LibBalsaAddMessageIterator msg_iterator;
     void *iterator_data;
@@ -3083,7 +2873,6 @@ libbalsa_mailbox_imap_add_messages(LibBalsaMailbox * mailbox,
     macd_destroy(&macd);
     return rc == IMR_OK ? macd.copied : 0;
 }
-#endif
 
 static void
 transform_flags(LibBalsaMessageFlag set, LibBalsaMessageFlag clr,
@@ -3482,12 +3271,6 @@ libbalsa_mailbox_imap_messages_copy(LibBalsaMailbox * mailbox,
     /* Couldn't use server-side copy, fall back to default method. */
     return LIBBALSA_MAILBOX_CLASS(libbalsa_mailbox_imap_parent_class)->
         messages_copy(mailbox, msgnos, dest, err);
-}
-
-void
-libbalsa_imap_set_cache_size(off_t cache_size)
-{
-    ImapCacheSize = cache_size;
 }
 
 /** Purges the temporary directory used for non-persistent message

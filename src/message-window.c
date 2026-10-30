@@ -488,21 +488,6 @@ mw_forward_inline_activated(GSimpleAction * action, GVariant * parameter,
                            FALSE);
 }
 
-#if 0
-static void
-mw_forward_default_activated(GSimpleAction * action, GVariant * parameter,
-                             gpointer data)
-{
-    MessageWindow *mw = (MessageWindow *) data;
-
-    g_return_if_fail(mw != NULL);
-
-    sendmsg_window_forward(libbalsa_message_get_mailbox(mw->message),
-                           libbalsa_message_get_msgno(mw->message),
-                           balsa_app.forward_attached);
-}
-#endif
-
 static void
 mw_next_part_activated(GSimpleAction * action, GVariant * parameter,
                        gpointer data)

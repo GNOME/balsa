@@ -139,7 +139,6 @@ struct _ImapMboxHandle {
 };
 
 #define IMAP_MBOX_IS_DISCONNECTED(h)  ((h)->state == IMHS_DISCONNECTED)
-#define IMAP_MBOX_IS_CONNECTED(h)     ((h)->state == IMHS_CONNECTED)
 #define IMAP_MBOX_IS_AUTHENTICATED(h) ((h)->state == IMHS_AUTHENTICATED)
 #define IMAP_MBOX_IS_SELECTED(h)      ((h)->state == IMHS_SELECTED)
 

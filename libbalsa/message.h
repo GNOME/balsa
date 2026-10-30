@@ -229,7 +229,6 @@ void libbalsa_message_body_unref(LibBalsaMessage * message);
 /*
  * misc message releated functions
  */
-const gchar *libbalsa_message_pathname(LibBalsaMessage * message);
 const gchar *libbalsa_message_body_charset(LibBalsaMessageBody * body);
 gboolean libbalsa_message_is_multipart(LibBalsaMessage * message);
 gboolean libbalsa_message_is_partial(LibBalsaMessage * message,

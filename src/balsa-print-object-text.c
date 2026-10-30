@@ -63,7 +63,6 @@ static GList * phrase_highlight(const gchar * buffer, gunichar tag_char,
 struct _BalsaPrintObjectText {
     BalsaPrintObject parent;
 
-    gint p_label_width;
     gchar *text;
     guint cite_level;
     GList *attributes;

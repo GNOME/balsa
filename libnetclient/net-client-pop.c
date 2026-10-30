@@ -310,41 +310,6 @@ net_client_pop_connect(NetClientPop *client, gchar **greeting, GError **error)
 
 
 gboolean
-net_client_pop_stat(NetClientPop *client, gsize *msg_count, gsize *mbox_size, GError **error)
-{
-	gboolean result;
-	gchar *stat_buf;
-
-	/* paranoia checks */
-	g_return_val_if_fail(NET_IS_CLIENT_POP(client), FALSE);
-
-	/* run the STAT command */
-	result = net_client_pop_execute(client, "STAT", &stat_buf, error);
-	if (result) {
-		unsigned long count;
-		unsigned long total_size;
-
-		if (sscanf(stat_buf, "%lu %lu", &count, &total_size) == 2) {
-			if (msg_count != NULL) {
-				*msg_count = count;
-			}
-			if (mbox_size != NULL) {
-				*mbox_size = total_size;
-			}
-		} else {
-			result = FALSE;
-			g_set_error(error, NET_CLIENT_POP_ERROR_QUARK, (gint) NET_CLIENT_ERROR_POP_PROTOCOL, _("bad server reply: %s"),
-				stat_buf);
-		}
-
-		g_free(stat_buf);
-	}
-
-	return result;
-}
-
-
-gboolean
 net_client_pop_list(NetClientPop *client, GList **msg_list, gboolean with_uid, GError **error)
 {
 	gboolean result;

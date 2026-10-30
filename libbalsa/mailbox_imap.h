@@ -38,17 +38,11 @@ void libbalsa_mailbox_imap_set_path(LibBalsaMailboxImap * mailbox,
 				    const gchar * path);
 const gchar* libbalsa_mailbox_imap_get_path(LibBalsaMailboxImap * mailbox);
 
-GHashTable * libbalsa_mailbox_imap_get_matchings(LibBalsaMailboxImap* mbox,
-						 LibBalsaCondition *condition,
-						 gboolean only_recent,
-						 gboolean * err);
-
 void libbalsa_mailbox_imap_noop(LibBalsaMailboxImap* mbox);
 
 void libbalsa_mailbox_imap_force_disconnect(LibBalsaMailboxImap* mimap);
 gboolean libbalsa_mailbox_imap_is_connected(LibBalsaMailboxImap* mimap);
 void libbalsa_mailbox_imap_reconnect(LibBalsaMailboxImap* mimap);
-void libbalsa_imap_close_all_connections(void);
 
 gboolean libbalsa_imap_new_subfolder(const gchar *parent, const gchar *folder,
                                      gboolean subscribe,
@@ -70,6 +64,5 @@ gchar **libbalsa_imap_get_acls(LibBalsaMailboxImap * mailbox);
 
 gchar *libbalsa_imap_url(LibBalsaServer * server, const gchar * path);
 
-void libbalsa_imap_set_cache_size(off_t cache_size);
 void libbalsa_imap_purge_temp_dir(off_t cache_size);
 #endif				/* __LIBBALSA_MAILBOX_IMAP_H__ */

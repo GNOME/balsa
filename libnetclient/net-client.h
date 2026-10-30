@@ -73,19 +73,6 @@ enum _NetClientError {
 };
 
 
-/** @brief Create a new network client
- *
- * @param host_and_port remote host and port or service, separated by a colon, which shall be connected
- * @param default_port default remote port if host_and_port does not contain a port
- * @param max_line_len maximum line length supported by the underlying protocol, 0 for no limit
- * @return the net network client object
- *
- * Create a new network client object with the passed parameters.  Call <tt>g_object_unref()</tt> on it to shut down the connection
- * and to free all resources of it.
- */
-NetClient *net_client_new(const gchar *host_and_port, guint16 default_port, gsize max_line_len);
-
-
 /** @brief Configure a network client
  *
  * @param client network client
@@ -96,7 +83,7 @@ NetClient *net_client_new(const gchar *host_and_port, guint16 default_port, gsiz
  * @return TRUE is the connection was successful, FALSE on error
  *
  * Set the remote host and port and the maximum line length to the passed parameters, replacing the previous values set by calling
- * net_client_new().
+ * the specific constructors.
  */
 gboolean net_client_configure(NetClient *client, const gchar *host_and_port, guint16 default_port, gsize max_line_len,
 							  GError **error);
@@ -107,7 +94,7 @@ gboolean net_client_configure(NetClient *client, const gchar *host_and_port, gui
  * @param client network client
  * @return the currently set host on success, or NULL on error
  *
- * @note The function returns the value of @em host_and_port set by net_client_new() or net_client_configure().
+ * @note The function returns the value of @em host_and_port set by the specific constructors or net_client_configure().
  */
 const gchar *net_client_get_host(NetClient *client);
 

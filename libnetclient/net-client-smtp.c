@@ -288,13 +288,6 @@ net_client_smtp_connect(NetClientSmtp *client, gchar **greeting, GError **error)
 
 
 gboolean
-net_client_smtp_can_dsn(NetClientSmtp *client)
-{
-	return NET_IS_CLIENT_SMTP(client) ? client->can_dsn : FALSE;
-}
-
-
-gboolean
 net_client_smtp_send_msg(NetClientSmtp *client, const NetClientSmtpMessage *message, gchar **server_stat, GError **error)
 {
 	NetClient *netclient;

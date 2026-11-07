@@ -48,7 +48,7 @@ Basically, Balsa requires
 - gio-2.0
 - gnutls >= 3.7
 - gpgme >= 1.18.0
-- libical >= 3.0.0
+- libical >= 3.0.0, < 4.0.0
 - fribidi
 
 `-Dmore-warnings=(true|false)`

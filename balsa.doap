@@ -34,8 +34,8 @@ desktop environment.  It supports local mailboxes, POP3 and IMAP.
   <maintainer>
     <foaf:Person>
       <foaf:name>Balsa Maintainer</foaf:name>
-      <foaf:mbox rdf:resource="mailto:balsa-maintainer@theochem.kth.se" />
-      <gnome:userid>pawels</gnome:userid>
+      <foaf:mbox rdf:resource="mailto:balsa-maintainer@posteo.de" />
+      <gnome:userid>albrecht</gnome:userid>
     </foaf:Person>
   </maintainer>
 </Project>
